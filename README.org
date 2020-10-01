@@ -166,4 +166,8 @@
       #+begin_src sh
       cd ../Data && rm *.dta
       #+end_src
+      or (if you have a more complex directory structure) perhaps
+      #+begin_src sh
+      find ../Data -name \*.dta -exec rm \{\} \;
+      #+end_src
 
