@@ -1,5 +1,4 @@
 [core]
-    autostage = true
     remote = ligonresearch
 ['remote "ligonresearch"']
     url = gdrive://1oVOdo2-oeM_LYBSe1lKSr-pm08syczdu/LSMS
