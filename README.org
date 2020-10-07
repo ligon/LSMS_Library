@@ -54,7 +54,7 @@
    passphrase.  To learn the secret passphrase you'll need to ask
    =ligon@berkeley.edu=.  Once you have it:
    #+begin_src sh
-   gpg -d dvc-data-store-290614-8f28d1ad760e.p12.gpg > dvc-data-store-290614-8f28d1ad760e.p12
+   gpg -d -o dvc-data-store-290614-8f28d1ad760e.p12 dvc-data-store-290614-8f28d1ad760e.p12.gpg 
    #+end_src
    And supply the secret passphrase, yielding the service account file
    =dvc-data-store-038f7b78c250.p12=. 
