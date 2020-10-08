@@ -2,3 +2,6 @@
     remote = ligonresearch
 ['remote "ligonresearch"']
     url = gdrive://1oVOdo2-oeM_LYBSe1lKSr-pm08syczdu/LSMS
+    gdrive_use_service_account = true
+    gdrive_service_account_email = ligonresearch@dvc-data-store-290614.iam.gserviceaccount.com
+    gdrive_service_account_p12_file_path = dvc-data-store-290614-8f28d1ad760e.p12
