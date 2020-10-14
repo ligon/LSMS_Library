@@ -15,7 +15,10 @@ def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market'
     # Unit labels
     with dvc.api.open(fn,mode='rb') as dta:
         sr = pd.io.stata.StataReader(dta)
-        unitlabels = sr.value_labels()[units]
+        try:
+            unitlabels = sr.value_labels()[units]
+        except KeyError: # Capitalization may  be inconsistent?
+            unitlabels = sr.value_labels()[units.upper()]
 
     # Prices
     with dvc.api.open(fn,mode='rb') as dta:
