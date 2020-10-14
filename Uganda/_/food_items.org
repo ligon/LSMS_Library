@@ -1,5 +1,4 @@
 | Code | Preferred Label        |
-|------+------------------------+
 |  100 | Matoke (??)            |
 |  101 | Matoke (bunch)         |
 |  102 | Matoke (cluster)       |
