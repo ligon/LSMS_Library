@@ -17,8 +17,10 @@ def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market'
         sr = pd.io.stata.StataReader(dta)
         try:
             unitlabels = sr.value_labels()[units]
-        except KeyError: # Capitalization may  be inconsistent?
-            unitlabels = sr.value_labels()[units.upper()]
+        except KeyError: # No guarantee that keys for labels match variables!?
+            foo = sr.value_labels()
+            key = [k for k,v in foo.items() if 'Kilogram' in [u for l,u in v.items()]][0]
+            unitlabels = sr.value_labels()[key]
 
     # Prices
     with dvc.api.open(fn,mode='rb') as dta:
