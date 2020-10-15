@@ -7,7 +7,7 @@ parquet := $(source:.py=.parquet)
 
 all: $(parquet)
 
-%.parquet: %.py food_items.org
+%.parquet: %.py food_items.org uganda.py
 	(cd $(@D) && python ./$(<F))
 
 clean:
