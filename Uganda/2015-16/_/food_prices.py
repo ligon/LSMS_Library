@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import sys
 sys.path.append('../../_')
 from uganda import prices_and_units
@@ -11,4 +13,7 @@ myvars = {'fn':'Uganda/2015-16/Data/GSEC15B.dta',
           'farmgate':'h15bq13'}
         
 
-prices_and_units(**myvars)
+prices = prices_and_units(**myvars)
+
+prices.to_parquet('./food_prices.parquet')
+
