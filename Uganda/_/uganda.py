@@ -19,7 +19,7 @@ def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market'
             unitlabels = sr.value_labels()[units]
         except KeyError: # No guarantee that keys for labels match variables!?
             foo = sr.value_labels()
-            key = [k for k,v in foo.items() if 'Kilogram' in [u for l,u in v.items()]][0]
+            key = [k for k,v in foo.items() if 'Kilogram' in [u[:8] for l,u in v.items()]][0]
             unitlabels = sr.value_labels()[key]
 
     # Prices
