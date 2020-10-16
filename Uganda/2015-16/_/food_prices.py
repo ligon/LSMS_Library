@@ -8,7 +8,7 @@ from uganda import prices_and_units
 myvars = {'fn':'Uganda/2015-16/Data/gsec15b.dta',
           'units':'untcd',
           'item':'itmcd',
-          'HHID':'hh',
+          'HHID':'HHID',
           'market':'h15bq12',
           'farmgate':'h15bq13'}
         
