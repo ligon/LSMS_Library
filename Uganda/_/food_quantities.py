@@ -19,6 +19,7 @@ q.columns.name='t'
 q = q.stack()
 q = q.reset_index().replace({'units':unitlabels})
 q = q.set_index(['t','HHID','itmcd','units'])
-q = q.squeeze()
+q.index.names = ['t','j','i','units']
+q.rename(columns={0:'quantities'},inplace=True)
 
 q.to_parquet('food_quantities.parquet')

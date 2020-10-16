@@ -12,7 +12,8 @@ for t in ['2005-06','2009-10','2010-11','2011-12','2013-14','2015-16']:
     x[t] = x[t].reset_index().set_index(['HHID','itmcd']).squeeze()
 
 x = pd.DataFrame(x)
-x.columns.name='t'
-x = x.stack().squeeze()
+x = x.stack().unstack('itmcd')
+x.columns.name='i'
+x.index.names=['j','t']
 
 x.to_parquet('food_expenditures.parquet')
