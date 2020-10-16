@@ -24,6 +24,7 @@ d = pd.DataFrame(d)
 #+name: unitlabels
 |   Code | Preferred                         | 2005-06                            | 2009-10                          | 2010-11                           | 2011-12                           | 2013-14                           | 2015-16                           |
 |--------+-----------------------------------+------------------------------------+----------------------------------+-----------------------------------+-----------------------------------+-----------------------------------+-----------------------------------|
+|      0 | ---                               |                                    |                                  |                                   |                                   |                                   |                                   |
 |      1 | Kilogram (kg)                     | Kilogram (kg)                      | Kilogram                         | Kilogram (kg)                     | Kilogram (kg)                     | Kilogram (kg)                     | Kilogram (kg)                     |
 |      2 | Gram                              | Gram                               | Gram                             | Gram                              | Gram                              | Gram                              | Gram                              |
 |      3 | Litre                             | Litre                              | Litre                            | Litre                             | Litre                             | Litre                             | Litre                             |
@@ -307,7 +308,7 @@ d = pd.DataFrame(d)
 
 #+end_example
 
-#+begin_src python :var tab=unitlabels :colnames no
+#+begin_src python :var tab=unitlabels :colnames no :prologue "# -*- coding: utf-8 -*-" :tangle unitlabels.py
 from cfe.df_utils import orgtbl_to_df
 
 units = orgtbl_to_df(tab).set_index('Code')['Preferred']
