@@ -1,0 +1,34 @@
+| Code | Preferred Label         |
+|  301 | Rice                    |
+|  302 | Maize                   |
+|  303 | Millet                  |
+|  304 | Bread                   |
+|  305 | Attiéké                 |
+|  306 | Cassava                 |
+|  307 | Macaroni                |
+|  308 | Cookies & Cakes         |
+|  309 | Yam                     |
+|  310 | Plantain                |
+|  311 | Taro                    |
+|  312 | Oil palm nuts           |
+|  313 | Peanuts                 |
+|  314 | Other seeds             |
+|  315 | Fish & shellfish        |
+|  316 | Game                    |
+|  317 | Poultry                 |
+|  318 | Beef, mutton, etc.      |
+|  319 | Chicken eggs            |
+|  320 | Palm oil                |
+|  321 | Refined oil             |
+|  322 | Butter & margine        |
+|  323 | Fruits                  |
+|  324 | Sugar & sweets          |
+|  325 | Salt                    |
+|  326 | Alcohol                 |
+|  327 | Non-alcoholic beverages |
+|  328 | Bouillion cubes         |
+|  329 | Tomato paste            |
+|  330 | Other vegetables        |
+|  331 | Carry-out dishes        |
+|  332 | Milk & diary            |
+
