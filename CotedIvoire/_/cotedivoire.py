@@ -1,4 +1,5 @@
-from lsms.tools import get_food_prices, get_food_expenditures
+from lsms.tools import get_food_prices, get_food_expenditures, get_household_roster
+
 import pandas as pd
 import dvc.api
 
@@ -65,3 +66,18 @@ def food_quantities(fn='',item='item',HHID='HHID',
     quantities.replace(0, np.nan, inplace=True)
 
     return quantities
+
+def household_demographics(fn='',sex='',age='',HHID='HHID',months_spent='months_spent'):
+
+    if type(sex) in [list,tuple]:
+        sex,sex_converter = sex
+    else:
+        sex_converter = None
+
+    with dvc.api.open(fn,mode='rb') as dta:
+        df = get_household_roster(dta,sex=sex,sex_converter=sex_converter,age=age,HHID=HHID,months_spent=months_spent,fn_type='csv')
+
+    return df
+
+    
+    
