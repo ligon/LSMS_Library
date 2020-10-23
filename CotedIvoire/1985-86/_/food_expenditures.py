@@ -8,5 +8,10 @@ myvars = dict(fn='CotedIvoire/1985-86/Data/F12A.DAT',item='FOODCD',HHID='HID',
 
 x = food_expenditures(**myvars)
 
+x['t'] = '1985-86'
+x['m'] = "Cote d'Ivoire"
+
+x = x.reset_index().set_index(['j','t','m'])
+
 x.to_parquet('food_expenditures.parquet')
 

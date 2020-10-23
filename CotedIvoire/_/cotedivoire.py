@@ -2,6 +2,7 @@ from lsms.tools import get_food_prices, get_food_expenditures, get_household_ros
 
 import pandas as pd
 import dvc.api
+import numpy as np
 
 def harmonized_food_labels(fn='../../_/food_items.org'):
     # Harmonized food labels
