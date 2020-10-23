@@ -46,6 +46,10 @@ def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,it
     with dvc.api.open(fn,mode='r') as f:
         expenditures,itemlabels=get_food_expenditures(f,purchased,away,produced,given,itmcd=item,HHID=HHID,itemlabels=food_items,fn_type='csv')
 
+    expenditures.columns.name = 'i'
+    expenditures.index.name = 'j'
+    expenditures.replace(0, np.nan, inplace=True)
+    
     return expenditures
 
 def food_quantities(fn='',item='item',HHID='HHID',
@@ -56,5 +60,8 @@ def food_quantities(fn='',item='item',HHID='HHID',
     with dvc.api.open(fn,mode='rb') as dta:
         quantities,itemlabels=get_food_expenditures(dta,purchased,away,produced,given,
                                                     itmcd=item,HHID=HHID,units=units,itemlabels=food_items,fn_type='csv')
+    quantities.columns.name = 'i'
+    quantities.index.name = 'j'
+    quantities.replace(0, np.nan, inplace=True)
 
     return quantities
