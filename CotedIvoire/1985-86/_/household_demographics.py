@@ -9,5 +9,8 @@ myvars = dict(fn='CotedIvoire/1985-86/Data/F01A.DAT',HHID='HID',
 
 z = household_demographics(**myvars)
 
+z.columns.name = 'k'
+z.index.name = 'j'
+
 z.to_parquet('household_demographics.parquet')
 
