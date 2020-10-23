@@ -20,7 +20,7 @@
 |  319 | Chicken eggs            |
 |  320 | Palm oil                |
 |  321 | Refined oil             |
-|  322 | Butter & margine        |
+|  322 | Butter & margarine      |
 |  323 | Fruits                  |
 |  324 | Sugar & sweets          |
 |  325 | Salt                    |
@@ -31,4 +31,6 @@
 |  330 | Other vegetables        |
 |  331 | Carry-out dishes        |
 |  332 | Milk & diary            |
+|  333 | Milk & diary            |
+|  334 | Other foods             |
 
