@@ -21,6 +21,12 @@ food_quantities.parquet: food_quantities.py $(food_expenditure_parquet)
 unitvalues.parquet: unitvalues.py $(food_expenditure_parquet) $(food_quantities_parquet)
 	python unitvalues.py
 
+household_characteristics = $(shell find $(rounds) -name household_characteristics.py)
+household_characteristics_parquet := $(household_characteristics:.py=.parquet)
+
+household_characteristics.parquet: household_characteristics.py $(household_characteristics_parquet)
+	python household_characteristics.py
+
 %.parquet: %.py food_items.org uganda.py
 	(cd $(@D) && python ./$(<F))
 

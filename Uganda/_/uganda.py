@@ -64,8 +64,9 @@ def food_quantities(fn='',item='item',HHID='HHID',
 
 def age_sex_composition(fn,sex='sex',sex_converter=None,age='age',months_spent='months_spent',HHID='HHID',months_converter=None, convert_categoricals=True,Age_ints=None,fn_type='stata'):
 
-    df = get_household_roster(fn=fn,HHID=HHID,sex=sex,age=age,months_spent=months_spent,
-                              sex_converter=sex_converter,months_converter=months_converter)
+    with dvc.api.open(fn,mode='rb') as dta:
+        df = get_household_roster(fn=dta,HHID=HHID,sex=sex,age=age,months_spent=months_spent,
+                                  sex_converter=sex_converter,months_converter=months_converter)
 
     df.index.name = 'j'
     df.columns.name = 'k'
