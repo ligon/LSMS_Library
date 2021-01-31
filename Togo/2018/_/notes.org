@@ -1,0 +1,155 @@
+* Extract food labels
+#+begin_src python :results output raw table
+import pandas as pd
+from cfe.df_utils import df_to_orgtbl
+
+food=pd.read_stata('../Data/Togo_survey2018_fooditems_forEthan.dta')
+items = food.food_item.value_counts().reset_index()
+
+df = pd.DataFrame({'Code':items['index'].cat.codes,'Label':items['index'],'Frequency':items.food_item}).set_index('Code')
+df.sort_index(inplace=True)
+
+print(df_to_orgtbl(df,float_fmt='%d'))
+#+end_src
+
+#+results:
+| Code | Label                                                                   | Frequency |
+|------+-------------------------------------------------------------------------+-----------|
+|    0 | Riz local longs grains                                                  |      1916 |
+|    1 | Riz local (KoviÃ©)                                                      |       222 |
+|    2 | Riz importÃ© longs grains                                               |      1852 |
+|    3 | Riz importÃ© brisÃ©                                                     |       179 |
+|    4 | MaÃ¯s en Ã©pis                                                          |       309 |
+|    5 | MaÃ¯s en grains                                                         |      5225 |
+|    6 | Mil                                                                     |       114 |
+|    7 | Sorgho                                                                  |       197 |
+|    8 | BlÃ©                                                                    |         1 |
+|    9 | Fonio                                                                   |        49 |
+|   10 | 11                                                                      |         6 |
+|   11 | Farine de maÃ¯s                                                         |       511 |
+|   12 | Farine de mil                                                           |        24 |
+|   13 | Farine de blÃ© local ou importÃ©                                        |         4 |
+|   14 | 15                                                                      |         6 |
+|   15 | PÃ¢tes alimentaires                                                     |      1868 |
+|   16 | Pain moderne                                                            |       335 |
+|   17 | Pain traditionnel                                                       |      1121 |
+|   18 | Croissants                                                              |        11 |
+|   19 | Biscuits                                                                |       236 |
+|   20 | GÃ¢teaux                                                                |        66 |
+|   21 | Beignets, galettes                                                      |       695 |
+|   22 | Viande de bÅuf                                                      |       877 |
+|   23 | Viande de chameau                                                       |         1 |
+|   24 | Viande de mouton                                                        |       140 |
+|   25 | Viande de chÃ¨vre                                                       |       178 |
+|   26 | Abats et tripes (foie, rognon, etc.)                                    |        28 |
+|   27 | Viande de porc                                                          |       295 |
+|   28 | Poulet sur pied                                                         |       647 |
+|   29 | Viande de poulet                                                        |       587 |
+|   30 | Viande d'autres volailles domestiques                                   |        55 |
+|   31 | Charcuterie (jambon, saucisson), conserves de viandes                   |        18 |
+|   32 | Gibiers                                                                 |       108 |
+|   33 | Autres viandes n.d.a                                                    |        76 |
+|   34 | Chinchard frais                                                         |       469 |
+|   35 | Carpe fraÃ®che                                                          |        90 |
+|   36 | Dorade fraiche                                                          |        31 |
+|   37 | Maquereau frais                                                         |        33 |
+|   38 | Chinchard fumÃ©                                                         |      2599 |
+|   39 | Anchois fumÃ©                                                           |      4027 |
+|   40 | Poisson sÃ©chÃ©                                                         |       647 |
+|   41 | Crabes, crevettes et autres fruits de mer                               |       175 |
+|   42 | Conserves de poisson                                                    |       209 |
+|   43 | Lait frais                                                              |       243 |
+|   44 | Lait caillÃ©, yaourt                                                    |        62 |
+|   45 | Lait concentrÃ© sucrÃ©                                                  |       179 |
+|   46 | Lait concentrÃ© non-sucrÃ©                                              |       181 |
+|   47 | Lait en poudre                                                          |       378 |
+|   48 | Fromage local                                                           |       532 |
+|   49 | Lait et farines pour bÃ©bÃ©                                             |        44 |
+|   50 | Autres produits laitiers                                                |        25 |
+|   51 | Oeufs                                                                   |       934 |
+|   52 | Beurre                                                                  |        54 |
+|   53 | Beurre de karitÃ©                                                       |       146 |
+|   54 | Huile de palme rouge                                                    |      2766 |
+|   55 | Huile d'arachide                                                        |      2236 |
+|   56 | Huile de coton                                                          |       902 |
+|   57 | Huile de palme raffinÃ©e                                                |      1046 |
+|   58 | Autres huiles n.d.a. (maÃ¯s, soja, huile palmiste, etc.)                |       378 |
+|   59 | Mangue                                                                  |      1781 |
+|   60 | Ananas                                                                  |       259 |
+|   61 | Orange                                                                  |      1868 |
+|   62 | Banane douce                                                            |       965 |
+|   63 | Citrons                                                                 |       339 |
+|   64 | Autres agrumes                                                          |        14 |
+|   65 | Avocats                                                                 |       305 |
+|   66 | PastÃ¨que, Melon                                                        |        79 |
+|   67 | Dattes                                                                  |        65 |
+|   68 | Noix de coco                                                            |       190 |
+|   69 | Canne Ã  sucre                                                          |       131 |
+|   70 | Autres fruits (pommes, raisin, etc.)                                    |       218 |
+|   71 | Salade (laitue)                                                         |       140 |
+|   72 | Choux                                                                   |       118 |
+|   73 | Carotte                                                                 |       145 |
+|   74 | Haricot vert                                                            |        98 |
+|   75 | Concombre                                                               |        81 |
+|   76 | Aubergine, Courge/Courgette                                             |       404 |
+|   77 | Poivron frais                                                           |        91 |
+|   78 | Tomate fraÃ®che                                                         |      3675 |
+|   79 | Tomate sÃ©chÃ©e                                                         |        21 |
+|   80 | Gombo frais                                                             |      2897 |
+|   81 | Gombo sec                                                               |      2562 |
+|   82 | Oignon frais                                                            |      4591 |
+|   83 | Ail                                                                     |      1782 |
+|   84 | Feuilles d'oseille (dakoumou, bissap/floerÃ¨)                           |      1282 |
+|   85 | Feuilles de baobab                                                      |      2030 |
+|   86 | Gboma                                                                   |      1350 |
+|   87 | AdÃ©mÃ¨ (Feuilles crin-crin)                                            |      2621 |
+|   88 | Moringa, feuilles de manioc, feuilles de taro et autres feuilles        |       372 |
+|   89 | Autre lÃ©gumes frais n.d.a                                              |       166 |
+|   90 | ConcentrÃ© de tomate                                                    |      2281 |
+|   91 | Petits pois                                                             |        23 |
+|   92 | Petit pois secs                                                         |         2 |
+|   93 | Autres lÃ©gumes secs n.d.a                                              |        65 |
+|   94 | NiÃ©bÃ©/Haricots secs                                                   |      3118 |
+|   95 | Arachides fraÃ®ches en coques                                           |       359 |
+|   96 | Arachides sÃ©chÃ©es en coques                                           |       186 |
+|   97 | Arachides dÃ©cortiquÃ©es ou pilÃ©es                                     |       457 |
+|   98 | Arachide grillÃ©e                                                       |       423 |
+|   99 | PÃ¢te d'arachide                                                        |       600 |
+|  100 | SÃ©same                                                                 |      1061 |
+|  101 | Noix de cajou                                                           |         3 |
+|  102 | Noix de karitÃ©                                                         |         6 |
+|  103 | Manioc                                                                  |       819 |
+|  104 | Igname                                                                  |      2172 |
+|  105 | Plantain                                                                |       218 |
+|  106 | Pomme de terre                                                          |        59 |
+|  107 | Taro, macabo                                                            |       227 |
+|  108 | Patate douce                                                            |       234 |
+|  109 | Autres tubercules n.d.a                                                 |         4 |
+|  110 | Farines de manioc                                                       |       316 |
+|  111 | Gari, tapioca                                                           |      2578 |
+|  112 | AttiÃ©ke                                                                |        26 |
+|  113 | Sucre (poudre ou morceaux)                                              |      3121 |
+|  114 | Miel                                                                    |       228 |
+|  115 | Chocolat Ã  croquer, pÃ¢te Ã  tartiner                                  |        23 |
+|  116 | Caramel, bonbons, confiseries, etc                                      |        31 |
+|  117 | Sel                                                                     |      5955 |
+|  118 | Piment                                                                  |      5828 |
+|  119 | Gingembre                                                               |      2690 |
+|  120 | Cube alimentaire (Maggi, Jumbo, )                                       |      5425 |
+|  121 | ArÃ´me (Maggi, Jumbo, etc.)                                             |        88 |
+|  122 | Afintin (Moutarde africaine)                                            |      3099 |
+|  123 | Mayonnaise                                                              |       170 |
+|  124 | Vinaigre /moutarde                                                      |        76 |
+|  125 | Autres condiments (poivre etc.)                                         |        97 |
+|  126 | Noix de cola                                                            |       364 |
+|  127 | Autres produits alimentaires                                            |        82 |
+|  128 | CafÃ©                                                                   |       112 |
+|  129 | ThÃ©                                                                    |       149 |
+|  130 | Chocolat en poudre                                                      |       131 |
+|  131 | Autres tisanes et infusions n.d.a. (quinquelibat, citronelle, etc.)     |       151 |
+|  132 | Jus de fruits (orange, bissap, gingembre, jus de cajou,etc.)            |       278 |
+|  133 | Eau minÃ©rale/ filtrÃ©e                                                 |       265 |
+|  134 | Boissons gazeuses (coca, etc.)                                          |       129 |
+|  135 | Jus en poudre                                                           |        22 |
+|  136 | BiÃ¨res et vins traditionnels (dolo, vin de palme, vin de raphia, etc.) |      1135 |
+|  137 | BiÃ¨res industrielles                                                   |       222 |
