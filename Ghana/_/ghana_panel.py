@@ -1,4 +1,4 @@
-from lsms.tools import get_food_prices, get_food_expenditures
+from lsms.tools import get_food_prices, get_food_expenditures, get_household_roster
 import pandas as pd
 import dvc.api
 
@@ -38,8 +38,6 @@ def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market'
 
     return prices
 
-
-
 def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,item='item',HHID='HHID'):
 
     with dvc.api.open(fn,mode='rb') as dta:
@@ -54,3 +52,32 @@ def food_quantities(fn='',item='item',HHID='HHID',
         quantities,itemlabels=get_food_expenditures(dta,purchased,away,produced,given,itmcd=item,HHID=HHID,units=units,convert_categoricals=True)
 
     return quantities
+
+def age_sex_composition(fn,sex='sex',sex_converter=None,
+                        age='age',months_spent='months_spent',HHID='HHID',months_converter=None, convert_categoricals=True,Age_ints=None,fn_type='stata'):
+
+    with dvc.api.open(fn,mode='rb') as dta:
+        df = get_household_roster(fn=dta,HHID=HHID,sex=sex,age=age,months_spent=months_spent,
+                                  sex_converter=sex_converter,months_converter=months_converter)
+
+    df.index.name = 'j'
+    df.columns.name = 'k'
+    
+    return df
+
+def household_demographics(fn='',sex='',age='',HHID='HHID',months_spent='months_spent'):
+
+    if type(sex) in [list,tuple]:
+        sex,sex_converter = sex
+    else:
+        sex_converter = None
+
+    with dvc.api.open(fn,mode='rb') as dta:
+        df = get_household_roster(dta,sex=sex,sex_converter=sex_converter,age=age,HHID=HHID,months_spent=months_spent,fn_type='stata')
+
+    df.index.name = 'j'
+    df.columns.name = 'k'
+
+    return df
+
+
