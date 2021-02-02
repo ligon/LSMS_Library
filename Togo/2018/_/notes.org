@@ -153,3 +153,25 @@ print(df_to_orgtbl(df,float_fmt='%d'))
 |  135 | Jus en poudre                                                           |        22 |
 |  136 | BiÃ¨res et vins traditionnels (dolo, vin de palme, vin de raphia, etc.) |      1135 |
 |  137 | BiÃ¨res industrielles                                                   |       222 |
+
+* Estimate demand system
+#+begin_src python :tangle /tmp/estimate.py
+import cfe
+import pandas as pd
+import numpy as np
+
+y = np.log(pd.read_parquet('../2018/_/food_expenditures.parquet'))
+z = pd.read_parquet('../2018/_/household_characteristics.parquet')
+
+y['t'] = 2018
+z['t'] = 2018
+
+y['m'] = 'Togo'
+z['m'] = 'Togo'
+
+y = y.reset_index().set_index(['j','t','m'])
+z = z.reset_index().set_index(['j','t','m'])
+
+r = cfe.Result(y=y,z=z)
+
+#+end_src

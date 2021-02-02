@@ -1,5 +1,4 @@
 | Code | Preferred Label                                                        | English                                                                                  | Frequency |
-|------+------------------------------------------------------------------------+------------------------------------------------------------------------------------------+-----------|
 |    0 | Riz local longs grains                                                 | Local long grain rice                                                                    |      1916 |
 |    1 | Riz local (Kovié)                                                      | Local rice (Kovié)                                                                       |       222 |
 |    2 | Riz importé longs grains                                               | Imported long grain rice                                                                 |      1852 |
@@ -138,4 +137,5 @@
 |  135 | Jus en poudre                                                          | Juice powder                                                                             |        22 |
 |  136 | Bières et vins traditionnels (dolo, vin de palme, vin de raphia, etc.) | Traditional beer and wines (Dolo, palm wine, raffia wine, etc.)                          |      1135 |
 |  137 | Bières industrielles                                                   | Industrial beers                                                                         |       222 |
+|  138 | Missing                                                                | Missing                                                                                  |           |
                                                                                                                                                                          

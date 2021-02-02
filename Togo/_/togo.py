@@ -1,6 +1,7 @@
-from lsms.tools import get_food_prices, get_food_expenditures
+from lsms.tools import get_food_prices, get_food_expenditures, get_household_roster
 import pandas as pd
 import dvc.api
+import numpy as np
 
 def harmonized_food_labels(fn='../../_/food_items.org'):
     # Harmonized food labels
@@ -42,8 +43,15 @@ def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market'
 
 def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,item='item',HHID='HHID'):
 
+    food_items = harmonized_food_labels(fn='../../_/food_items.org')
+
     with dvc.api.open(fn,mode='rb') as dta:
-        expenditures,itemlabels=get_food_expenditures(dta,purchased,away,produced,given,itmcd=item,HHID=HHID)
+        expenditures,itemlabels=get_food_expenditures(dta,purchased,away,produced,given,itmcd=item,HHID=HHID,itemlabels=food_items)
+
+    expenditures = expenditures.replace(0,np.nan)
+
+    expenditures.columns.name = 'i'
+    expenditures.index.name = 'j'
 
     return expenditures
 
@@ -53,4 +61,21 @@ def food_quantities(fn='',item='item',HHID='HHID',
     with dvc.api.open(fn,mode='rb') as dta:
         quantities,itemlabels=get_food_expenditures(dta,purchased,away,produced,given,itmcd=item,HHID=HHID,units=units,convert_categoricals=True)
 
+    quantities = quantities.replace(0,np.nan)
+
+    quantities.columns.name = 'i'
+    quantities.index.name = 'j'
+
     return quantities
+
+def age_sex_composition(fn,sex='sex',sex_converter=None,
+                        age='age',months_spent='months_spent',HHID='HHID',months_converter=None, convert_categoricals=True,Age_ints=None,fn_type='stata'):
+
+    with dvc.api.open(fn,mode='rb') as dta:
+        df = get_household_roster(fn=dta,HHID=HHID,sex=sex,age=age,months_spent=months_spent,
+                                  sex_converter=sex_converter,months_converter=months_converter)
+
+    df.index.name = 'j'
+    df.columns.name = 'k'
+    
+    return df
