@@ -1,0 +1,4 @@
+outs:
+- md5: badc565d31748bac7ceb0b7f07a7a7f5
+  size: 45211
+  path: ag_filters.dta
