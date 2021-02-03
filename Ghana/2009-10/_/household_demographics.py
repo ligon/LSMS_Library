@@ -3,10 +3,10 @@ import sys
 sys.path.append('../../_')
 from ghana_panel import household_demographics
 
-t = '2017-18'
+t = '2009-10'
 
-myvars = dict(fn='Ghana/%s/Data/01b2_roster.dta' % t, HHID='FPrimary',
-              age='ageyears',sex=('gender',lambda s: s.lower()[0]),
+myvars = dict(fn='Ghana/%s/Data/S1D.dta' % t, HHID='hhno',
+              age='s1d_4i',sex=('s1d_1',lambda s: s.lower()[0]),
               months_spent=None)
 
 z = household_demographics(**myvars)
