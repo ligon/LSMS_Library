@@ -46,7 +46,8 @@ def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,it
     food_items = harmonized_food_labels(fn='../../_/food_items.org')
 
     with dvc.api.open(fn,mode='rb') as dta:
-        expenditures,itemlabels=get_food_expenditures(dta,purchased,away,produced,given,itmcd=item,HHID=HHID,itemlabels=food_items)
+        expenditures,itemlabels=get_food_expenditures(dta,purchased,away,produced,given,itmcd=item,HHID=HHID,
+                                                      convert_categoricals=True) #,itemlabels=food_items)
 
     expenditures = expenditures.replace(0,np.nan)
 

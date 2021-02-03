@@ -1,141 +1,141 @@
-| Code | Preferred Label                                                        | English                                                                                  | Frequency |
-|    0 | Riz local longs grains                                                 | Local long grain rice                                                                    |      1916 |
-|    1 | Riz local (Kovié)                                                      | Local rice (Kovié)                                                                       |       222 |
-|    2 | Riz importé longs grains                                               | Imported long grain rice                                                                 |      1852 |
-|    3 | Riz importé brisé                                                      | Imported broken rice                                                                     |       179 |
-|    4 | Maïs en épis                                                           | Ears of corn                                                                             |       309 |
-|    5 | Maïs en grains                                                         | Grain corn                                                                               |      5225 |
-|    6 | Mil                                                                    | Millet                                                                                   |       114 |
-|    7 | Sorgho                                                                 | Sorghum                                                                                  |       197 |
-|    8 | Blé                                                                    | Wheat                                                                                    |         1 |
-|    9 | Fonio                                                                  | Fonio                                                                                    |        49 |
-|   10 | Other Grains                                                           | Other grains                                                                             |         6 |
-|   11 | Farine de maïs                                                         | Corn flour                                                                               |       511 |
-|   12 | Farine de mil                                                          | Millet flour                                                                             |        24 |
-|   13 | Farine de blé local ou importé                                         | Wheat flour                                                                              |         4 |
-|   14 | Other cereal flours                                                    | Other cereal flours                                                                      |         6 |
-|   15 | Pâtes alimentaires                                                     | Pasta                                                                                    |      1868 |
-|   16 | Pain moderne                                                           | Modern bread                                                                             |       335 |
-|   17 | Pain traditionnel                                                      | Traditional bread                                                                        |      1121 |
-|   18 | Croissants                                                             | Croissants                                                                               |        11 |
-|   19 | Biscuits                                                               | Biscuits (cookies)                                                                       |       236 |
-|   20 | Gâteaux                                                                | Cakes                                                                                    |        66 |
-|   21 | Beignets, galettes                                                     | Donuts, galettes                                                                         |       695 |
-|   22 | Viande de bœuf                                                         | Beef meat                                                                                |       877 |
-|   23 | Viande de chameau                                                      | Camel Meat                                                                               |         1 |
-|   24 | Viande de mouton                                                       | Mutton meat                                                                              |       140 |
-|   25 | Viande de chèvre                                                       | Goat meat                                                                                |       178 |
-|   26 | Abats et tripes (foie, rognon, etc.)                                   | Offal and tripe (liver, kidney, etc.)                                                    |        28 |
-|   27 | Viande de porc                                                         | Pork meat                                                                                |       295 |
-|   28 | Poulet sur pied                                                        | Chicken feet                                                                             |       647 |
-|   29 | Viande de poulet                                                       | Chicken meat                                                                             |       587 |
-|   30 | Viande d'autres volailles domestiques                                  | Meat from other domestic poultry                                                         |        55 |
-|   31 | Charcuterie (jambon, saucisson), conserves de viandes                  | Cold cuts (ham, sausage), canned meat                                                    |        18 |
-|   32 | Gibiers                                                                | Game                                                                                     |       108 |
-|   33 | Autres viandes n.d.a                                                   | Other meat not elsewhere specified                                                       |        76 |
-|   34 | Chinchard frais                                                        | Fresh mackerel                                                                           |       469 |
-|   35 | Carpe fraiche                                                          | Fresh carp                                                                               |        90 |
-|   36 | Dorade fraiche                                                         | Fresh dorade                                                                             |        31 |
-|   37 | Maquereau frais                                                        | Other fresh fish and small fresh fish                                                    |        33 |
-|   38 | Chinchard fumé                                                         | Smoked mackerel                                                                          |      2599 |
-|   39 | Anchois fumé                                                           | Smoked anchovies                                                                         |      4027 |
-|   40 | Poisson séché                                                          | Dried fish                                                                               |       647 |
-|   41 | Crabes, crevettes et autres fruits de mer                              | Crabs, shrimp and other seafood                                                          |       175 |
-|   42 | Conserves de poisson                                                   | Canned fish                                                                              |       209 |
-|   43 | Lait frais                                                             | Fresh milk                                                                               |       243 |
-|   44 | Lait caillé, yaourt                                                    | Milk curd, yoghurt                                                                       |        62 |
-|   45 | Lait concentré sucré                                                   | Sweetened condensed milk                                                                 |       179 |
-|   46 | Lait concentré non-sucré                                               | Un-sweetened condensed milk                                                              |       181 |
-|   47 | Lait en poudre                                                         | Powdered milk                                                                            |       378 |
-|   48 | Fromage local                                                          | Cheese                                                                                   |       532 |
-|   49 | Lait et farines pour bébé                                              | Milk and flour for babies                                                                |        44 |
-|   50 | Autres produits laitiers                                               | Other dairy products                                                                     |        25 |
-|   51 | Oeufs                                                                  | Eggs                                                                                     |       934 |
-|   52 | Beurre                                                                 | Butter                                                                                   |        54 |
-|   53 | Beurre de karité                                                       | Shea Butter                                                                              |       146 |
-|   54 | Huile de palme rouge                                                   | Red palm oil                                                                             |      2766 |
-|   55 | Huile d'arachide                                                       | Peanut oil                                                                               |      2236 |
-|   56 | Huile de coton                                                         | Cottonseed oil                                                                           |       902 |
-|   57 | Huile de palme raffinée                                                | Refined palm oil                                                                         |      1046 |
-|   58 | Autres huiles n.d.a. (maïs, soja, huile palmiste, etc.)                | Other oils not elsewhere specified (corn, palm oil, soybean oil, etc.)                   |       378 |
-|   59 | Mangue                                                                 | Mango                                                                                    |      1781 |
-|   60 | Ananas                                                                 | Pineapple                                                                                |       259 |
-|   61 | Orange                                                                 | Orange                                                                                   |      1868 |
-|   62 | Banane douce                                                           | Sweet banana                                                                             |       965 |
-|   63 | Citrons                                                                | Lemons                                                                                   |       339 |
-|   64 | Autres agrumes                                                         | Other citrus                                                                             |        14 |
-|   65 | Avocats                                                                | Avocado                                                                                  |       305 |
-|   66 | Pastèque, Melon                                                        | Watermelon                                                                               |        79 |
-|   67 | Dattes                                                                 | Dates                                                                                    |        65 |
-|   68 | Noix de coco                                                           | Coconut                                                                                  |       190 |
-|   69 | Canne à sucre                                                          | Sugar cane                                                                               |       131 |
-|   70 | Autres fruits (pommes, raisin, etc.)                                   | Other fruits (apples, grapes, etc.)                                                      |       218 |
-|   71 | Salade (laitue)                                                        | Salad (lettuce)                                                                          |       140 |
-|   72 | Choux                                                                  | Cabbage                                                                                  |       118 |
-|   73 | Carotte                                                                | Carrot                                                                                   |       145 |
-|   74 | Haricot vert                                                           | Green bean                                                                               |        98 |
-|   75 | Concombre                                                              | Cucumber                                                                                 |        81 |
-|   76 | Aubergine, Courge/Courgette                                            | Eggplant, Squash / Zucchini                                                              |       404 |
-|   77 | Poivron frais                                                          | Fresh pepper                                                                             |        91 |
-|   78 | Tomate fraiche                                                         | Fresh tomato                                                                             |      3675 |
-|   79 | Tomate séchée                                                          | Dried tomato                                                                             |        21 |
-|   80 | Gombo frais                                                            | Fresh okra                                                                               |      2897 |
-|   81 | Gombo sec                                                              | Dry okra                                                                                 |      2562 |
-|   82 | Oignon frais                                                           | Fresh onion                                                                              |      4591 |
-|   83 | Ail                                                                    | Garlic                                                                                   |      1782 |
-|   84 | Feuilles d'oseille (dakoumou, bissap/floerè)                           | Sorrel leaves                                                                            |      1282 |
-|   85 | Feuilles de baobab                                                     | Baobab leaves                                                                            |      2030 |
-|   86 | Gboma                                                                  | Gboma (Leaves of eggplant)                                                               |      1350 |
-|   87 | Adémè (Feuilles crin-crin)                                             | Ademe (Leaves crin-crin)                                                                 |      2621 |
-|   88 | Moringa, feuilles de manioc, feuilles de taro et autres feuilles       | Moringa, cassava leaves, taro leaves, bean leaves, aloma, other leaves                   |       372 |
-|   89 | Autre légumes frais n.d.a                                              | Other vegetables not specified elsewhere                                                 |       166 |
-|   90 | Concentré de tomate                                                    | Tomato concentrate                                                                       |      2281 |
-|   91 | Petits pois                                                            | Peas                                                                                     |        23 |
-|   92 | Petit pois secs                                                        | Dried peas                                                                               |         2 |
-|   93 | Autres légumes secs n.d.a                                              | Other dried vegetables not specified elsewhere                                           |        65 |
-|   94 | Niébé/Haricots secs                                                    | Cowpea / Beans                                                                           |      3118 |
-|   95 | Arachides fraiches en coques                                           | Fresh peanuts in shell                                                                   |       359 |
-|   96 | Arachides séchées en coques                                            | Dried peanuts in shell                                                                   |       186 |
-|   97 | Arachides décortiquées ou pilées                                       | Shelled or pounded peanuts                                                               |       457 |
-|   98 | Arachide grillée                                                       | Grilled peanuts                                                                          |       423 |
-|   99 | Pâte d'arachide                                                        | Peanut paste                                                                             |       600 |
-|  100 | Sésame                                                                 | Sesame                                                                                   |      1061 |
-|  101 | Noix de cajou                                                          | Cashew nuts                                                                              |         3 |
-|  102 | Noix de karité                                                         | Shea nuts                                                                                |         6 |
-|  103 | Manioc                                                                 | Cassava                                                                                  |       819 |
-|  104 | Igname                                                                 | Yam                                                                                      |      2172 |
-|  105 | Plantain                                                               | Plantain                                                                                 |       218 |
-|  106 | Pomme de terre                                                         | Potato                                                                                   |        59 |
-|  107 | Taro, macabo                                                           | Taro, cocoyam                                                                            |       227 |
-|  108 | Patate douce                                                           | Sweet potato                                                                             |       234 |
-|  109 | Autres tubercules n.d.a                                                | Other tubers not specified elsewhere                                                     |         4 |
-|  110 | Farines de manioc                                                      | Cassava flour                                                                            |       316 |
-|  111 | Gari, tapioca                                                          | Gari, tapioca                                                                            |      2578 |
-|  112 | Attiéke                                                                | Attiéké                                                                                  |        26 |
-|  113 | Sucre (poudre ou morceaux)                                             | Sugar (powder or pieces)                                                                 |      3121 |
-|  114 | Miel                                                                   | Honey                                                                                    |       228 |
-|  115 | Chocolat à croquer, pâte à tartiner                                    | Plain chocolate, chocolate spread                                                        |        23 |
-|  116 | Caramel, bonbons, confiseries, etc                                     | Caramel, candy, sweets, etc.                                                             |        31 |
-|  117 | Sel                                                                    | Salt                                                                                     |      5955 |
-|  118 | Piment                                                                 | Chilli pepper                                                                            |      5828 |
-|  119 | Gingembre                                                              | Ginger                                                                                   |      2690 |
-|  120 | Cube alimentaire (Maggi, Jumbo, )                                      | Food Cube (Maggi, Jumbo)                                                                 |      5425 |
-|  121 | Arôme (Maggi, Jumbo, etc.)                                             | Arome (Maggi, Jumbo, etc.)                                                               |        88 |
-|  122 | Afintin (Moutarde africaine)                                           | Afiti (African mustard)                                                                  |      3099 |
-|  123 | Mayonnaise                                                             | Mayonnaise                                                                               |       170 |
-|  124 | Vinaigre /moutarde                                                     | Vinegar / mustard                                                                        |        76 |
-|  125 | Autres condiments (poivre etc.)                                        | Other condiments (pepper etc.)                                                           |        97 |
-|  126 | Noix de cola                                                           | Kola nuts                                                                                |       364 |
-|  127 | Autres produits alimentaires                                           | Other food products                                                                      |        82 |
-|  128 | Café                                                                   | Coffee                                                                                   |       112 |
-|  129 | Thé                                                                    | Tea                                                                                      |       149 |
-|  130 | Chocolat en poudre                                                     | Chocolate powder                                                                         |       131 |
-|  131 | Autres tisanes et infusions n.d.a. (quinquelibat, citronelle, etc.)    | Other herbal teas and infusions not specified elsewhere (quinquelibat, lemongrass, etc.) |       151 |
-|  132 | Jus de fruits (orange, bissap, gingembre, jus de cajou,etc.)           | Fruit juices (orange, hibiscus, ginger, cashew juice, etc.)                              |       278 |
-|  133 | Eau minérale/ filtrée                                                  | Mineral/filtered water                                                                   |       265 |
-|  134 | Boissons gazeuses (coca, etc.)                                         | Soft drinks (Coke, etc.)                                                                 |       129 |
-|  135 | Jus en poudre                                                          | Juice powder                                                                             |        22 |
-|  136 | Bières et vins traditionnels (dolo, vin de palme, vin de raphia, etc.) | Traditional beer and wines (Dolo, palm wine, raffia wine, etc.)                          |      1135 |
-|  137 | Bières industrielles                                                   | Industrial beers                                                                         |       222 |
-|  138 | Missing                                                                | Missing                                                                                  |           |
+| Code | Preferred Label         | French                                                                 | English                                                                                  | Frequency |
+|    0 | Local Rice              | Riz local longs grains                                                 | Local long grain rice                                                                    |      1916 |
+|    1 | Local Rice              | Riz local (Kovié)                                                      | Local rice (Kovié)                                                                       |       222 |
+|    2 | Imported Rice           | Riz importé longs grains                                               | Imported long grain rice                                                                 |      1852 |
+|    3 | Imported Rice           | Riz importé brisé                                                      | Imported broken rice                                                                     |       179 |
+|    4 | Maize                   | Maïs en épis                                                           | Ears of corn                                                                             |       309 |
+|    5 | Maize                   | Maïs en grains                                                         | Grain corn                                                                               |      5225 |
+|    6 | Millet                  | Mil                                                                    | Millet                                                                                   |       114 |
+|    7 | Sorghum                 | Sorgho                                                                 | Sorghum                                                                                  |       197 |
+|    8 | Wheat                   | Blé                                                                    | Wheat                                                                                    |         1 |
+|    9 | Fonio                   | Fonio                                                                  | Fonio                                                                                    |        49 |
+|   10 | Other Grains            | Other Grains                                                           | Other grains                                                                             |         6 |
+|   11 | Ground Maize            | Farine de maïs                                                         | Corn flour                                                                               |       511 |
+|   12 | Millet                  | Farine de mil                                                          | Millet flour                                                                             |        24 |
+|   13 | Wheat Flour             | Farine de blé local ou importé                                         | Wheat flour                                                                              |         4 |
+|   14 | Other Flours            | Other cereal flours                                                    | Other cereal flours                                                                      |         6 |
+|   15 | Pasta                   | Pâtes alimentaires                                                     | Pasta                                                                                    |      1868 |
+|   16 | Bread                   | Pain moderne                                                           | Modern bread                                                                             |       335 |
+|   17 | Bread                   | Pain traditionnel                                                      | Traditional bread                                                                        |      1121 |
+|   18 | Bread                   | Croissants                                                             | Croissants                                                                               |        11 |
+|   19 | Biscuits                | Biscuits                                                               | Biscuits (cookies)                                                                       |       236 |
+|   20 | Cakes                   | Gâteaux                                                                | Cakes                                                                                    |        66 |
+|   21 | Donuts                  | Beignets, galettes                                                     | Donuts, galettes                                                                         |       695 |
+|   22 | Beef                    | Viande de bœuf                                                         | Beef meat                                                                                |       877 |
+|   23 | Camel Meat              | Viande de chameau                                                      | Camel Meat                                                                               |         1 |
+|   24 | Mutton                  | Viande de mouton                                                       | Mutton meat                                                                              |       140 |
+|   25 | Goat Meat               | Viande de chèvre                                                       | Goat meat                                                                                |       178 |
+|   26 | Offal                   | Abats et tripes (foie, rognon, etc.)                                   | Offal and tripe (liver, kidney, etc.)                                                    |        28 |
+|   27 | Pork                    | Viande de porc                                                         | Pork meat                                                                                |       295 |
+|   28 | Chicken/Guinea fowl     | Poulet sur pied                                                        | Chicken feet                                                                             |       647 |
+|   29 | Chicken/Guinea fowl     | Viande de poulet                                                       | Chicken meat                                                                             |       587 |
+|   30 | Other Meat              | Viande d'autres volailles domestiques                                  | Meat from other domestic poultry                                                         |        55 |
+|   31 | Other Meat              | Charcuterie (jambon, saucisson), conserves de viandes                  | Cold cuts (ham, sausage), canned meat                                                    |        18 |
+|   32 | Bush Meat               | Gibiers                                                                | Game                                                                                     |       108 |
+|   33 | Other Meat              | Autres viandes n.d.a                                                   | Other meat not elsewhere specified                                                       |        76 |
+|   34 | Fish                    | Chinchard frais                                                        | Fresh mackerel                                                                           |       469 |
+|   35 | Fish                    | Carpe fraiche                                                          | Fresh carp                                                                               |        90 |
+|   36 | Fish                    | Dorade fraiche                                                         | Fresh dorade                                                                             |        31 |
+|   37 | Fish                    | Maquereau frais                                                        | Other fresh fish and small fresh fish                                                    |        33 |
+|   38 | Fish                    | Chinchard fumé                                                         | Smoked mackerel                                                                          |      2599 |
+|   39 | Fish                    | Anchois fumé                                                           | Smoked anchovies                                                                         |      4027 |
+|   40 | Fish                    | Poisson séché                                                          | Dried fish                                                                               |       647 |
+|   41 | Crab                    | Crabes, crevettes et autres fruits de mer                              | Crabs, shrimp and other seafood                                                          |       175 |
+|   42 | Canned Fish             | Conserves de poisson                                                   | Canned fish                                                                              |       209 |
+|   43 | Milk (Fresh)            | Lait frais                                                             | Fresh milk                                                                               |       243 |
+|   44 | Other Dairy             | Lait caillé, yaourt                                                    | Milk curd, yoghurt                                                                       |        62 |
+|   45 | Other Dairy             | Lait concentré sucré                                                   | Sweetened condensed milk                                                                 |       179 |
+|   46 | Other Dairy             | Lait concentré non-sucré                                               | Un-sweetened condensed milk                                                              |       181 |
+|   47 | Milk (Powder)           | Lait en poudre                                                         | Powdered milk                                                                            |       378 |
+|   48 | Other Diary             | Fromage local                                                          | Cheese                                                                                   |       532 |
+|   49 | Baby Milk               | Lait et farines pour bébé                                              | Milk and flour for babies                                                                |        44 |
+|   50 | Other Diary             | Autres produits laitiers                                               | Other dairy products                                                                     |        25 |
+|   51 | Eggs                    | Oeufs                                                                  | Eggs                                                                                     |       934 |
+|   52 | Margarine/Butter        | Beurre                                                                 | Butter                                                                                   |        54 |
+|   53 | Margarine/Butter        | Beurre de karité                                                       | Shea Butter                                                                              |       146 |
+|   54 | Palm Oil                | Huile de palme rouge                                                   | Red palm oil                                                                             |      2766 |
+|   55 | Groundnut Oil           | Huile d'arachide                                                       | Peanut oil                                                                               |      2236 |
+|   56 | Other Vegetable Oils    | Huile de coton                                                         | Cottonseed oil                                                                           |       902 |
+|   57 | Palm Oil                | Huile de palme raffinée                                                | Refined palm oil                                                                         |      1046 |
+|   58 | Other Vegetable Oils    | Autres huiles n.d.a. (maïs, soja, huile palmiste, etc.)                | Other oils not elsewhere specified (corn, palm oil, soybean oil, etc.)                   |       378 |
+|   59 | Mango                   | Mangue                                                                 | Mango                                                                                    |      1781 |
+|   60 | Pineapple               | Ananas                                                                 | Pineapple                                                                                |       259 |
+|   61 | Orange/Tangerine        | Orange                                                                 | Orange                                                                                   |      1868 |
+|   62 | Banana                  | Banane douce                                                           | Sweet banana                                                                             |       965 |
+|   63 | Other Fruits            | Citrons                                                                | Lemons                                                                                   |       339 |
+|   64 | Other Fruits            | Autres agrumes                                                         | Other citrus                                                                             |        14 |
+|   65 | Avocado/Pear            | Avocats                                                                | Avocado                                                                                  |       305 |
+|   66 | Watermelon              | Pastèque, Melon                                                        | Watermelon                                                                               |        79 |
+|   67 | Other Fruits            | Dattes                                                                 | Dates                                                                                    |        65 |
+|   68 | Coconut                 | Noix de coco                                                           | Coconut                                                                                  |       190 |
+|   69 | Sugarcane               | Canne à sucre                                                          | Sugar cane                                                                               |       131 |
+|   70 | Other Fruits            | Autres fruits (pommes, raisin, etc.)                                   | Other fruits (apples, grapes, etc.)                                                      |       218 |
+|   71 | Lettuce                 | Salade (laitue)                                                        | Salad (lettuce)                                                                          |       140 |
+|   72 | Cabbage                 | Choux                                                                  | Cabbage                                                                                  |       118 |
+|   73 | Carrots                 | Carotte                                                                | Carrot                                                                                   |       145 |
+|   74 | Other Beans             | Haricot vert                                                           | Green bean                                                                               |        98 |
+|   75 | Cucumbers               | Concombre                                                              | Cucumber                                                                                 |        81 |
+|   76 | Garden Eggs             | Aubergine, Courge/Courgette                                            | Eggplant, Squash / Zucchini                                                              |       404 |
+|   77 | Pepper (fresh or dried) | Poivron frais                                                          | Fresh pepper                                                                             |        91 |
+|   78 | Tomatoes (fresh)        | Tomate fraiche                                                         | Fresh tomato                                                                             |      3675 |
+|   79 | Tomatoes (dried)        | Tomate séchée                                                          | Dried tomato                                                                             |        21 |
+|   80 | Okro                    | Gombo frais                                                            | Fresh okra                                                                               |      2897 |
+|   81 | Okro                    | Gombo sec                                                              | Dry okra                                                                                 |      2562 |
+|   82 | Onions                  | Oignon frais                                                           | Fresh onion                                                                              |      4591 |
+|   83 | Garlic                  | Ail                                                                    | Garlic                                                                                   |      1782 |
+|   84 | Sorrel                  | Feuilles d'oseille (dakoumou, bissap/floerè)                           | Sorrel leaves                                                                            |      1282 |
+|   85 | Boabab                  | Feuilles de baobab                                                     | Baobab leaves                                                                            |      2030 |
+|   86 | Gboma                   | Gboma                                                                  | Gboma (Leaves of eggplant)                                                               |      1350 |
+|   87 | Ademe                   | Adémè (Feuilles crin-crin)                                             | Ademe (Leaves crin-crin)                                                                 |      2621 |
+|   88 | Cassava Leaves          | Moringa, feuilles de manioc, feuilles de taro et autres feuilles       | Moringa, cassava leaves, taro leaves, bean leaves, aloma, other leaves                   |       372 |
+|   89 | Other Vegetables        | Autre légumes frais n.d.a                                              | Other vegetables not specified elsewhere                                                 |       166 |
+|   90 | Tomatoes (dried)        | Concentré de tomate                                                    | Tomato concentrate                                                                       |      2281 |
+|   91 | Peas                    | Petits pois                                                            | Peas                                                                                     |        23 |
+|   92 | Peas                    | Petit pois secs                                                        | Dried peas                                                                               |         2 |
+|   93 | Other Vegetables        | Autres légumes secs n.d.a                                              | Other dried vegetables not specified elsewhere                                           |        65 |
+|   94 | Cowpea Beans            | Niébé/Haricots secs                                                    | Cowpea / Beans                                                                           |      3118 |
+|   95 | Groundnuts              | Arachides fraiches en coques                                           | Fresh peanuts in shell                                                                   |       359 |
+|   96 | Groundnuts              | Arachides séchées en coques                                            | Dried peanuts in shell                                                                   |       186 |
+|   97 | Groundnuts              | Arachides décortiquées ou pilées                                       | Shelled or pounded peanuts                                                               |       457 |
+|   98 | Groundnuts              | Arachide grillée                                                       | Grilled peanuts                                                                          |       423 |
+|   99 | Groundnuts              | Pâte d'arachide                                                        | Peanut paste                                                                             |       600 |
+|  100 | Sesame                  | Sésame                                                                 | Sesame                                                                                   |      1061 |
+|  101 | Cashews                 | Noix de cajou                                                          | Cashew nuts                                                                              |         3 |
+|  102 | Shea Nuts               | Noix de karité                                                         | Shea nuts                                                                                |         6 |
+|  103 | Cassava                 | Manioc                                                                 | Cassava                                                                                  |       819 |
+|  104 | Yam                     | Igname                                                                 | Yam                                                                                      |      2172 |
+|  105 | Plantain                | Plantain                                                               | Plantain                                                                                 |       218 |
+|  106 | Potato                  | Pomme de terre                                                         | Potato                                                                                   |        59 |
+|  107 | Cocoyam                 | Taro, macabo                                                           | Taro, cocoyam                                                                            |       227 |
+|  108 | Sweet Potato            | Patate douce                                                           | Sweet potato                                                                             |       234 |
+|  109 | Potato                  | Autres tubercules n.d.a                                                | Other tubers not specified elsewhere                                                     |         4 |
+|  110 | Cassava Flour           | Farines de manioc                                                      | Cassava flour                                                                            |       316 |
+|  111 | Gari                    | Gari, tapioca                                                          | Gari, tapioca                                                                            |      2578 |
+|  112 | Cassava                 | Attiéke                                                                | Attiéké                                                                                  |        26 |
+|  113 | Sugar                   | Sucre (poudre ou morceaux)                                             | Sugar (powder or pieces)                                                                 |      3121 |
+|  114 | Honey                   | Miel                                                                   | Honey                                                                                    |       228 |
+|  115 | Chocolate               | Chocolat à croquer, pâte à tartiner                                    | Plain chocolate, chocolate spread                                                        |        23 |
+|  116 | Sweets                  | Caramel, bonbons, confiseries, etc                                     | Caramel, candy, sweets, etc.                                                             |        31 |
+|  117 | Salt                    | Sel                                                                    | Salt                                                                                     |      5955 |
+|  118 | Pepper (fresh or dried) | Piment                                                                 | Chilli pepper                                                                            |      5828 |
+|  119 | Ginger                  | Gingembre                                                              | Ginger                                                                                   |      2690 |
+|  120 | Maggi                   | Cube alimentaire (Maggi, Jumbo, )                                      | Food Cube (Maggi, Jumbo)                                                                 |      5425 |
+|  121 | Maggi                   | Arôme (Maggi, Jumbo, etc.)                                             | Arome (Maggi, Jumbo, etc.)                                                               |        88 |
+|  122 | Afiti                   | Afintin (Moutarde africaine)                                           | Afiti (African mustard)                                                                  |      3099 |
+|  123 | Mayonnaise              | Mayonnaise                                                             | Mayonnaise                                                                               |       170 |
+|  124 | Vinegar                 | Vinaigre /moutarde                                                     | Vinegar / mustard                                                                        |        76 |
+|  125 | Other Condiments        | Autres condiments (poivre etc.)                                        | Other condiments (pepper etc.)                                                           |        97 |
+|  126 | Kola Nuts               | Noix de cola                                                           | Kola nuts                                                                                |       364 |
+|  127 | Other Food              | Autres produits alimentaires                                           | Other food products                                                                      |        82 |
+|  128 | Coffee                  | Café                                                                   | Coffee                                                                                   |       112 |
+|  129 | Tea                     | Thé                                                                    | Tea                                                                                      |       149 |
+|  130 | Chocolate               | Chocolat en poudre                                                     | Chocolate powder                                                                         |       131 |
+|  131 | Tea                     | Autres tisanes et infusions n.d.a. (quinquelibat, citronelle, etc.)    | Other herbal teas and infusions not specified elsewhere (quinquelibat, lemongrass, etc.) |       151 |
+|  132 | Fruit Juice             | Jus de fruits (orange, bissap, gingembre, jus de cajou,etc.)           | Fruit juices (orange, hibiscus, ginger, cashew juice, etc.)                              |       278 |
+|  133 | Bottled Water           | Eau minérale/ filtrée                                                  | Mineral/filtered water                                                                   |       265 |
+|  134 | Soft Drinks             | Boissons gazeuses (coca, etc.)                                         | Soft drinks (Coke, etc.)                                                                 |       129 |
+|  135 | Juice Powder            | Jus en poudre                                                          | Juice powder                                                                             |        22 |
+|  136 | Alcoholic Beverages     | Bières et vins traditionnels (dolo, vin de palme, vin de raphia, etc.) | Traditional beer and wines (Dolo, palm wine, raffia wine, etc.)                          |      1135 |
+|  137 | Beer                    | Bières industrielles                                                   | Industrial beers                                                                         |       222 |
+|  138 | Missing                 | Missing                                                                | Missing                                                                                  |           |
                                                                                                                                                                          
