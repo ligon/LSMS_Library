@@ -1,14 +1,309 @@
+* Work out food labels across rounds
+#+begin_src python
+import pandas as pd
+from cfe.df_utils import df_to_orgtbl
+
+rounds = ['2009-10','2013-14','2017-18']
+
+labels = {t:pd.Series(pd.read_parquet('../%s/_/food_expenditures.parquet' % t).columns.tolist()) for t in rounds}
+
+df = pd.DataFrame(labels)
+
+print(df_to_orgtbl(df))
+#+end_src
+
+#+results:
+|    | 2009-10                        | 2013-14                                            | 2017-18                                    |
+|----+--------------------------------+----------------------------------------------------+--------------------------------------------|
+|  0 | ALCHOHOLIC BEVERAGES           | Alcoholic Beverages                                | Alcoholic beverages                        |
+|  1 | APPLE                          | Apple                                              | Apple                                      |
+|  2 | AVOCADO PEAR                   | Avocado/Pear                                       | Avocado/pear                               |
+|  3 | BABY FOOD                      | Baby Milk                                          | Baby food                                  |
+|  4 | BABY MILK                      | Baby food                                          | Baby milk                                  |
+|  5 | BANANA                         | Banana                                             | Banana                                     |
+|  6 | BEEF                           | Beef                                               | Beef                                       |
+|  7 | BISCUITS                       | Biscuits                                           | Biscuits                                   |
+|  8 | BLACK PEPPER                   | Black Pepper                                       | Black pepper                               |
+|  9 | BOTTLED WATER, SOFT DRINK & JU | Bottled water, Soft Drinks, and Juices             | Bread                                      |
+| 10 | BREAD                          | Bread                                              | Bush meat/wild game                        |
+| 11 | BUSH MEAT/WILD GAME            | Bush Meat/Wild Game                                | Cabbage                                    |
+| 12 | CABBAGE                        | Cabbage                                            | Canned/tinned fish                         |
+| 13 | CANNED/TIN FISH                | Canned/Tinned Fish                                 | Carrots                                    |
+| 14 | CARROTS                        | Carrots                                            | Cassava                                    |
+| 15 | CASSAVA                        | Cassava                                            | Cassava dough                              |
+| 16 | CASSAVA DOUGH                  | Cassava Dough                                      | Chicken/guinea fowl                        |
+| 17 | CHICKEN/GUINEA FOWL            | Chicken/Guinea Fowl                                | Chocolate                                  |
+| 18 | CHOCOLATE                      | Chocolate                                          | Coconut                                    |
+| 19 | COCONUT                        | Coconut                                            | Coconut oil                                |
+| 20 | COCONUT OIL                    | Coconut Oil                                        | Cocoyam                                    |
+| 21 | COCOYAM                        | Cocoyam                                            | Cocoyam leaves (Kontomire)                 |
+| 22 | COCOYAM LEAVES                 | Cocoyam Leaves                                     | Coffee, tea, cocoa, etc.                   |
+| 23 | COFFEE, TEA COCOA, ETC         | Coffea, Tea, Cocoa, etc.                           | Cola nuts                                  |
+| 24 | COLA NUTS                      | Cola nuts                                          | Cooked meals                               |
+| 25 | COOKED MEALS $(AS WAGES)       | Cooked Meals                                       | Corned beef                                |
+| 26 | CORNED BEEF                    | Corned Beef                                        | Cowpea beans                               |
+| 27 | COWPEA BEANS                   | Cowpea beans                                       | Crab                                       |
+| 28 | EGGS                           | Crab                                               | Dawadawa                                   |
+| 29 | FISH                           | Dawa dawa                                          | Eggs                                       |
+| 30 | FLOUR $(WHEAT)                 | Eggs                                               | Fish                                       |
+| 31 | GAME BIRDS                     | Fish                                               | Flour                                      |
+| 32 | GARDEN EGGS                    | Flour                                              | Game birds                                 |
+| 33 | GARI                           | Game Birds                                         | Garden Eggs                                |
+| 34 | GINGER                         | Garden Eggs                                        | Gari                                       |
+| 35 | GOAT MEAT                      | Gari                                               | Ginger                                     |
+| 36 | GROUNDNUT OIL                  | Ginger                                             | Goat meat                                  |
+| 37 | GROUNDNUTS                     | Goat Meat                                          | Ground maize/corn dough                    |
+| 38 | GUINEA CORN/SORGHUM            | Ground maize/corn dough                            | Groundnut oil                              |
+| 39 | HONEY                          | Groundnut Oil                                      | Groundnuts                                 |
+| 40 | ICE CREAM, ICE LOLLIES         | Groundnuts                                         | Guinea corn/sorghum                        |
+| 41 | KENKEY/BANKU $(WITHOUT SAUCE)  | Guinea corn/sorghum                                | Honey                                      |
+| 42 | MAIZE                          | Honey                                              | Ice cream, ice lollies, etc.               |
+| 43 | MAIZE GROUND/ CORN DOUGH       | Ice Cream, Ice Lollies, etc.                       | Imported rice                              |
+| 44 | MANGO                          | Kenkey/banku                                       | Kenkey/banku                               |
+| 45 | MARGARINE/BUTTER               | Maize                                              | Local rice                                 |
+| 46 | MILK $(FRESH)                  | Mango                                              | Maize                                      |
+| 47 | MILK $(POWDER)                 | Margarine / Butter                                 | Mango                                      |
+| 48 | MILLET                         | Milk Fresh                                         | Margarine/butter                           |
+| 49 | MUTTON                         | Milk Powder                                        | Milk fresh                                 |
+| 50 | OKRO $(FRESH/DRIED)            | Millet                                             | Milk powder                                |
+| 51 | ONIONS $(LARGE/SMALL)          | Mutton                                             | Millet                                     |
+| 52 | ORANGE/TANGERINE               | Okro                                               | Mutton                                     |
+| 53 | OTHER BEANS                    | Onions (large or small)                            | Okro                                       |
+| 54 | OTHER BEVERAGES                | Orange/Tangerine                                   | Onions (large or small)                    |
+| 55 | OTHER CEREALS                  | Other Beverages                                    | Orange/tangerine                           |
+| 56 | OTHER CONDIMENTS/SPICES        | Other Cereals                                      | Other beans                                |
+| 57 | OTHER CONFECTIONARIES          | Other Condiments/Spices                            | Other beverages                            |
+| 58 | OTHER MILK PRODUCTS            | Other Confectionaries                              | Other cereals                              |
+| 59 | OTHER PULSES AND NUTS          | Other Milk Products                                | Other condiments/spices                    |
+| 60 | OTHER STARCHY STAPLES          | Other Starchy Staples                              | Other confectioneries                      |
+| 61 | OTHER VEGETABLE OILS           | Other Vegetable Oils                               | Other eggs/poultry                         |
+| 62 | OTHER VEGETABLES               | Other Vegetables                                   | Other fruits                               |
+| 63 | PALM KERNEL OIL                | Other beans                                        | Other meat                                 |
+| 64 | PALM NUTS                      | Other pulses and nuts                              | Other milk products                        |
+| 65 | PALM OIL                       | Palm Kernel Oil                                    | Other pulses and nuts                      |
+| 66 | PAWPAW                         | Palm Oil                                           | Other starchy staples                      |
+| 67 | PEPPER $(FRESH OR DRIED)       | Palm nuts                                          | Other vegetable oils                       |
+| 68 | PINEAPPLE                      | Pawpaw                                             | Other vegetables                           |
+| 69 | PLANTAIN                       | Pepper                                             | Palm kernel oil                            |
+| 70 | PORK                           | Pineapple                                          | Palm nuts                                  |
+| 71 | RESTAURANTS, CAFES, CANTEENS,  | Plantain                                           | Palm oil                                   |
+| 72 | RICE-IMPORTED                  | Pork                                               | Pawpaw                                     |
+| 73 | RICE-LOCAL                     | Prekese                                            | Pepper (fresh or dried)                    |
+| 74 | SALT                           | Restaurants, Cafes, Canteens, Hotels, Prepared Foo | Pineapple                                  |
+| 75 | SHEA BUTTER                    | Salt                                               | Plantain                                   |
+| 76 | SOYA BEANS                     | Shea Butter                                        | Pork                                       |
+| 77 | SUGAR $(CUBE, GRANULATED       | Shea nuts                                          | Prekese                                    |
+| 78 | SUGARCANE                      | Snails                                             | Restaurants, cafes, canteens, hotels, etc. |
+| 79 | TINNED MILK                    | Soya beans                                         | Sachet/bottled water                       |
+| 80 | TOBACCO                        | Sugar                                              | Salt                                       |
+| 81 | TOMATO PUREE $(CANNED)         | Sugarcane                                          | Shea butter                                |
+| 82 | TOMATOES $(FRESH)              | Tinned Milk                                        | Snails                                     |
+| 83 | WATER MELON                    | Tobacco                                            | Soft drinks and juices                     |
+| 84 | YAM                            | Tomatoes                                           | Soya beans                                 |
+| 85 | ---                            | Watermelon                                         | Sugar (cube, granulated)                   |
+| 86 | ---                            | Wild mushrooms                                     | Sugarcane                                  |
+| 87 | ---                            | Yam                                                | Tinned milk                                |
+| 88 | ---                            | imported rice                                      | Tobacco                                    |
+| 89 | ---                            | local rice                                         | Tomato puree (canned)                      |
+| 90 | ---                            | ---                                                | Tomatoes (fresh)                           |
+| 91 | ---                            | ---                                                | Watermelon                                 |
+| 92 | ---                            | ---                                                | Wild Mushrooms                             |
+| 93 | ---                            | ---                                                | Yam                                        |
+
+#+end_example
+
+
+
+#+name: food_labels
+| 2009-10                        | 2013-14                                            | 2017-18                                    | Preferred Label          |
+|--------------------------------+----------------------------------------------------+--------------------------------------------+--------------------------|
+| ALCHOHOLIC BEVERAGES           | Alcoholic Beverages                                | Alcoholic beverages                        | Alcoholic Beverages      |
+| APPLE                          | Apple                                              | Apple                                      | Apple                    |
+| AVOCADO PEAR                   | Avocado/Pear                                       | Avocado/pear                               | Avocado/Pear             |
+| BABY FOOD                      | Baby Milk                                          | Baby food                                  | Baby Food                |
+| BABY MILK                      | Baby food                                          | Baby milk                                  | Baby Milk                |
+| BANANA                         | Banana                                             | Banana                                     | Banana                   |
+| BEEF                           | Beef                                               | Beef                                       | Beef                     |
+| BISCUITS                       | Biscuits                                           | Biscuits                                   | Biscuits                 |
+| BLACK PEPPER                   | Black Pepper                                       | Black pepper                               | Black Pepper             |
+| BOTTLED WATER, SOFT DRINK & JU | Bottled water, Soft Drinks, and Juices             | Sachet/bottled water                       | Bottled Drink            |
+| BREAD                          | Bread                                              | Bread                                      | Bread                    |
+| BUSH MEAT/WILD GAME            | Bush Meat/Wild Game                                | Bush meat/wild game                        | Bush Meat                |
+| CABBAGE                        | Cabbage                                            | Cabbage                                    | Cabbage                  |
+| CANNED/TIN FISH                | Canned/Tinned Fish                                 | Canned/tinned fish                         | Canned Fish              |
+| CARROTS                        | Carrots                                            | Carrots                                    | Carrots                  |
+| CASSAVA                        | Cassava                                            | Cassava                                    | Cassava                  |
+| CASSAVA DOUGH                  | Cassava Dough                                      | Cassava dough                              | Cassava Dough            |
+| CHICKEN/GUINEA FOWL            | Chicken/Guinea Fowl                                | Chicken/guinea fowl                        | Chicken/Guinea fowl      |
+| CHOCOLATE                      | Chocolate                                          | Chocolate                                  | Chocolate                |
+| COCONUT                        | Coconut                                            | Coconut                                    | Coconut                  |
+| COCONUT OIL                    | Coconut Oil                                        | Coconut oil                                | Coconut Oil              |
+| COCOYAM                        | Cocoyam                                            | Cocoyam                                    | Cocoyam                  |
+| COCOYAM LEAVES                 | Cocoyam Leaves                                     | Cocoyam leaves (Kontomire)                 | Cocoyam Leaves           |
+| COFFEE, TEA COCOA, ETC         | Coffea, Tea, Cocoa, etc.                           | Coffee, tea, cocoa, etc.                   | Coffee, Tea, Cocoa, Etc. |
+| COLA NUTS                      | Cola nuts                                          | Cola nuts                                  | Cola Nuts                |
+| COOKED MEALS $(AS WAGES)       | Cooked Meals                                       | Cooked meals                               | Cooked Meals             |
+| CORNED BEEF                    | Corned Beef                                        | Corned beef                                | Corned Beef              |
+| COWPEA BEANS                   | Cowpea beans                                       | Cowpea beans                               | Cowpea Beans             |
+|                                | Crab                                               | Crab                                       | Crab                     |
+|                                | Dawa dawa                                          | Dawadawa                                   | Dawadawa                 |
+| EGGS                           | Eggs                                               | Eggs                                       | Eggs                     |
+| FISH                           | Fish                                               | Fish                                       | Fish                     |
+| FLOUR $(WHEAT)                 | Flour                                              | Flour                                      | Flour                    |
+| GAME BIRDS                     | Game Birds                                         | Game birds                                 | Game Birds               |
+| GARDEN EGGS                    | Garden Eggs                                        | Garden Eggs                                | Garden Eggs              |
+| GARI                           | Gari                                               | Gari                                       | Gari                     |
+| GINGER                         | Ginger                                             | Ginger                                     | Ginger                   |
+| GOAT MEAT                      | Goat Meat                                          | Goat meat                                  | Goat Meat                |
+| MAIZE GROUND/ CORN DOUGH       | Ground maize/corn dough                            | Ground maize/corn dough                    | Ground Maize             |
+| GROUNDNUT OIL                  | Groundnut Oil                                      | Groundnut oil                              | Groundnut Oil            |
+| GROUNDNUTS                     | Groundnuts                                         | Groundnuts                                 | Groundnuts               |
+| GUINEA CORN/SORGHUM            | Guinea corn/sorghum                                | Guinea corn/sorghum                        | Sorghum                  |
+| HONEY                          | Honey                                              | Honey                                      | Honey                    |
+| ICE CREAM, ICE LOLLIES         | Ice Cream, Ice Lollies, etc.                       | Ice cream, ice lollies, etc.               | Ice Cream                |
+| RICE-IMPORTED                  | imported rice                                      | Imported rice                              | Imported Rice            |
+| KENKEY/BANKU $(WITHOUT SAUCE)  | Kenkey/banku                                       | Kenkey/banku                               | Kenkey                   |
+| RICE-LOCAL                     | local rice                                         | Local rice                                 | Local Rice               |
+| MAIZE                          | Maize                                              | Maize                                      | Maize                    |
+| MANGO                          | Mango                                              | Mango                                      | Mango                    |
+| MARGARINE/BUTTER               | Margarine / Butter                                 | Margarine/butter                           | Margarine/Butter         |
+| MILK $(FRESH)                  | Milk Fresh                                         | Milk fresh                                 | Milk (Fresh)             |
+| MILK $(POWDER)                 | Milk Powder                                        | Milk powder                                | Milk (Powder)            |
+| MILLET                         | Millet                                             | Millet                                     | Millet                   |
+| MUTTON                         | Mutton                                             | Mutton                                     | Mutton                   |
+| OKRO $(FRESH/DRIED)            | Okro                                               | Okro                                       | Okro                     |
+| ONIONS $(LARGE/SMALL)          | Onions (large or small)                            | Onions (large or small)                    | Onions                   |
+| ORANGE/TANGERINE               | Orange/Tangerine                                   | Orange/tangerine                           | Orange/Tangerine         |
+| OTHER BEANS                    | Other beans                                        | Other beans                                | Other Beans              |
+| OTHER BEVERAGES                | Other Beverages                                    | Other beverages                            | Other Beverages          |
+| OTHER CEREALS                  | Other Cereals                                      | Other cereals                              | Other Cereals            |
+| OTHER CONDIMENTS/SPICES        | Other Condiments/Spices                            | Other condiments/spices                    | Other Condiments/Spices  |
+| OTHER CONFECTIONARIES          | Other Confectionaries                              | Other confectioneries                      | Other Confectioneries    |
+|                                | Other eggs/poultry                                 |                                            | Other Eggs/Poultry       |
+|                                | Other fruits                                       |                                            | Other Fruits             |
+|                                | Other meat                                         |                                            | Other Meat               |
+| OTHER MILK PRODUCTS            | Other Milk Products                                | Other milk products                        | Other Diary              |
+| OTHER PULSES AND NUTS          | Other pulses and nuts                              | Other pulses and nuts                      | Other Pulses and Nuts    |
+| OTHER STARCHY STAPLES          | Other Starchy Staples                              | Other starchy staples                      | Other Starchy Staples    |
+| OTHER VEGETABLE OILS           | Other Vegetable Oils                               | Other vegetable oils                       | Other Vegetable Oils     |
+| OTHER VEGETABLES               | Other Vegetables                                   | Other vegetables                           | Other Vegetables         |
+| PALM KERNEL OIL                | Palm Kernel Oil                                    | Palm kernel oil                            | Palm Kernel Oil          |
+| PALM NUTS                      | Palm nuts                                          | Palm nuts                                  | Palm Nuts                |
+| PALM OIL                       | Palm Oil                                           | Palm oil                                   | Palm Oil                 |
+| PAWPAW                         | Pawpaw                                             | Pawpaw                                     | Pawpaw                   |
+| PEPPER $(FRESH OR DRIED)       | Pepper                                             | Pepper (fresh or dried)                    | Pepper (fresh or dried)  |
+| PINEAPPLE                      | Pineapple                                          | Pineapple                                  | Pineapple                |
+| PLANTAIN                       | Plantain                                           | Plantain                                   | Plantain                 |
+| PORK                           | Pork                                               | Pork                                       | Pork                     |
+|                                | Prekese                                            | Prekese                                    | Prekese                  |
+| RESTAURANTS, CAFES, CANTEENS,  | Restaurants, Cafes, Canteens, Hotels, Prepared Foo | Restaurants, cafes, canteens, hotels, etc. | Restaurants              |
+| SALT                           | Salt                                               | Salt                                       | Salt                     |
+| SHEA BUTTER                    | Shea Butter                                        | Shea butter                                | Shea Butter              |
+|                                | Shea nuts                                          |                                            | Shea Nuts                |
+|                                | Snails                                             | Snails                                     | Snails                   |
+|                                |                                                    | Soft drinks and juices                     | Bottled Drink            |
+| SOYA BEANS                     | Soya beans                                         | Soya beans                                 | Soya Beans               |
+| SUGAR $(CUBE, GRANULATED       | Sugar                                              | Sugar (cube, granulated)                   | Sugar                    |
+| SUGARCANE                      | Sugarcane                                          | Sugarcane                                  | Sugarcane                |
+| TINNED MILK                    | Tinned Milk                                        | Tinned milk                                | Tinned milk              |
+| TOBACCO                        | Tobacco                                            | Tobacco                                    | Tobacco                  |
+| TOMATO PUREE $(CANNED)         |                                                    | Tomato puree (canned)                      | Tomato puree (canned)    |
+| TOMATOES $(FRESH)              | Tomatoes                                           | Tomatoes (fresh)                           | Tomatoes (fresh)         |
+| WATER MELON                    | Watermelon                                         | Watermelon                                 | Watermelon               |
+|                                | Wild mushrooms                                     | Wild Mushrooms                             | Wild Mushrooms           |
+| YAM                            | Yam                                                | Yam                                        | Yam                      |
+
+
+** Create dictionary for food items
+#+begin_src python :var labels=food_labels
+import json
+
+d={}
+for row in labels:
+    d[row[0]]=row[-1]
+    d[row[1]]=row[-1]
+
+with open('food_items.json','w') as f:
+    json.dump(d,f)
+#+end_src
+
+#+results:
+
 * Estimate demand system
+Note that this relies on the json file created above to harmonize
+labels for food items.
 #+begin_src python :tangle /tmp/estimate.py
 import cfe
 import pandas as pd
 import numpy as np
+import json
 
-y = np.log(pd.read_parquet('../2017-18/_/food_expenditures.parquet'))
-z = pd.read_parquet('../2017-18/_/household_demographics.parquet')
+rounds = ['2009-10','2013-14','2017-18']
 
-r = cfe.Result(y=y,z=z)
+labels = json.load(open('food_items.json'))
+
+y=[]
+z=[]
+for t in rounds:
+    x = pd.read_parquet('../%s/_/food_expenditures.parquet' % t).rename(columns=labels)
+    x = x.groupby('i',axis=1).sum()
+    x = x.replace(0,np.nan)
+    y.append(np.log(x))
+    z.append(pd.read_parquet('../%s/_/household_demographics.parquet' % t))
+
+z = pd.concat(z)
+z = z.filter(regex='ales ')
+
+r = cfe.Result(y=pd.concat(y),z=z)
 
 r.get_predicted_expenditures()
 
+print(cfe.df_utils.df_to_orgtbl(r.get_beta(as_df=True).sort_values(ascending=False),float_fmt='%3.2'))
 #+end_src
+
+#+results:
+
+| i                       |  beta |
+|-------------------------+-------|
+| Biscuits                | 0.580 |
+| Groundnuts              | 0.542 |
+| Pawpaw                  | 0.536 |
+| Okro                    | 0.523 |
+| Mango                   | 0.497 |
+| Other Beans             | 0.496 |
+| Kenkey                  | 0.493 |
+| Banana                  | 0.491 |
+| Pineapple               | 0.488 |
+| Bread                   | 0.485 |
+| Watermelon              | 0.480 |
+| Apple                   | 0.479 |
+| Coconut                 | 0.476 |
+| Pork                    | 0.472 |
+| Tomatoes (fresh)        | 0.465 |
+| Eggs                    | 0.460 |
+| Sugarcane               | 0.452 |
+| Ginger                  | 0.452 |
+| Beef                    | 0.442 |
+| Cowpea Beans            | 0.435 |
+| Tinned milk             | 0.430 |
+| Carrots                 | 0.428 |
+| Onions                  | 0.423 |
+| Ground Maize            | 0.418 |
+| Maize                   | 0.417 |
+| Pepper (fresh or dried) | 0.398 |
+| Garden Eggs             | 0.389 |
+| Cabbage                 | 0.387 |
+| Mutton                  | 0.385 |
+| Gari                    | 0.372 |
+| Fish                    | 0.363 |
+| Palm Nuts               | 0.346 |
+| Salt                    | 0.342 |
+| Yam                     | 0.338 |
+| Plantain                | 0.330 |
+| Cassava                 | 0.301 |
+| Honey                   | 0.290 |
+| Cocoyam                 | 0.289 |
+
+#+end_example
+
+
