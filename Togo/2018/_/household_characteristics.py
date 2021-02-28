@@ -21,4 +21,21 @@ N = df.sum(axis=1)
 
 df['log HSize'] = np.log(N[N>0])
 
+# Get data on region
+
+region =  pd.read_stata('../Data/Togo_survey2018_fooditems_forEthan.dta').set_index('hhid')['region_survey']
+region.index.name = 'j'
+region = region.groupby('j').head(1)
+region = region.reset_index('j')
+region['j'] = region['j'].astype(int).astype(str)
+region = region.set_index('j').squeeze()
+region.name = 'm'
+
+df = df.join(region,how='left')
+df['t'] = 2018
+
+df = df.reset_index().set_index(['j','t','m'])
+
+#df = df.drop_duplicates()
+
 df.to_parquet('household_characteristics.parquet')

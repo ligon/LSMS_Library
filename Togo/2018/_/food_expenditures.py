@@ -60,7 +60,22 @@ x = x.groupby('i',axis=1).sum()
 
 x = x.replace(0,np.nan)
 
-x = x.iloc[:,2:]
+region =  pd.read_stata('../Data/Togo_survey2018_fooditems_forEthan.dta').set_index('hhid')['region_survey']
+region.index.name = 'j'
+region = region.groupby('j').head(1)
+region = region.reset_index('j')
+region['j'] = region['j'].astype(int).astype(str)
+region = region.set_index('j').squeeze()
+region.name = 'm'
+
+x = x.join(region,how='left')
+x['t'] = 2018
+
+x = x.reset_index().set_index(['j','t','m'])
+
+x = x.iloc[:,2:] # Drop two funky columns with numeric labels
+
+x = x.drop_duplicates()
 
 x.to_parquet('food_expenditures.parquet')
 
