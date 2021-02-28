@@ -312,7 +312,39 @@ with open('food_items.json','w') as f:
 
 #+results:
 
+* Calculate value of consumption
+  The elicitation of food expenditures has an unusual structure in
+  this survey.  First, the enumerator elicits the total /quantity consumed/ for
+  each item in the last seven days, then elicits the quantity and cost
+  of the last /purchase/ over the previous 30 days.
 
+  Units of quantities consumed need not be the same as the units
+  purchased.
+** Unit Values
+  Our strategy here is to use the data on purchases to construct unit
+  values.  These can be computed for every household that reports a
+  purchase, but these will be the /wrong/ unit values for consumption
+  if the latter is measured using different units, and is
+  /missing/ for many households that report consumption but no recent
+  purchase.   
+
+  So: we construct unit values for every good x region x observed
+  purchase units; typically there will be several (or sometimes many)
+  unit values observed at this level of dis-aggregation.  We take the
+  median unit value for a given good-region-unit.
+
+** Value of consumption
+   Recall that the survey elicits /quantities consumed/ over the last
+   seven days.  To turn this into a value, we simply find the
+   corresponding unit value, and take the product.
+
+** Outcome
+   Using unit values inferred from other local consumers allows for a
+   43% increase in the number of items consumed that we can assign a
+   value to; a total of over 110,000.  Even more important, it
+   increases the number of households with enough observed items
+   consumed (and valued) to include them in the demand estimation from
+   46% to 79%. 
 * Estimate demand system
 #+begin_src python :tangle /tmp/estimate_togo.py
 import cfe
