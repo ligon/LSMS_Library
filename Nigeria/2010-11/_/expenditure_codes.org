@@ -1,0 +1,118 @@
+* Codes from 2010-11 Planting time Q.
+#+name: food_codes_planting2010
+| Code | Label                                  |
+|------+----------------------------------------|
+|    1 | Full Breakfast (Away)                  |
+|    2 | Full Lunch (Away)                      |
+|    3 | Full Dinner (Away)                     |
+|    4 | Side dishes (Away)                     |
+|    5 | Snacks (Away)                          |
+|    6 | Dairy beverages (Away)                 |
+|    7 | Vegetables (Away)                      |
+|    8 | Non alcoholic drinks                   |
+|    9 | Alcoholic drinks                       |
+|   10 | Guinea corn/sorghum                    |
+|   11 | Millet                                 |
+|   12 | Maize                                  |
+|   13 | Rice--local                            |
+|   14 | Rice--imported                         |
+|   15 | Bread                                  |
+|   16 | Maize flour                            |
+|   17 | Yam flour                              |
+|   18 | Cassava flour                          |
+|   19 | Wheat flour                            |
+|   20 | Other grains and flour                 |
+|   30 | Cassava--roots                         |
+|   31 | Yam--roots                             |
+|   32 | Gari--white                            |
+|   33 | Gari--yellow                           |
+|   34 | Cocoyam                                |
+|   35 | Plantains                              |
+|   36 | Sweet potatoes                         |
+|   37 | Potatoes                               |
+|   38 | Other roots and tuber                  |
+|   40 | Soya beans                             |
+|   41 | Brown beans                            |
+|   42 | White beans                            |
+|   43 | Groundnuts                             |
+|   44 | Other nuts/seeds/pulses                |
+|   50 | Palm oil                               |
+|   51 | Butter/Margarine                       |
+|   52 | Groundnut oil                          |
+|   53 | Other oils and fats                    |
+|   60 | Bananas                                |
+|   61 | Orange/tangerine                       |
+|   62 | Mangoes                                |
+|   63 | Avocado pear                           |
+|   64 | Pineapples                             |
+|   65 | Fruit canned                           |
+|   66 | Other fruits                           |
+|   70 | Tomatoes                               |
+|   71 | Tomato puree (canned)                  |
+|   72 | Onions                                 |
+|   73 | Garden eggs/egg plant                  |
+|   74 | Okra--fresh                            |
+|   75 | Okra--dried                            |
+|   76 | Pepper                                 |
+|   77 | Leaves (Cocoyam, Spinach, etc.)        |
+|   78 | Other vegetables (fresh or canned)     |
+|   80 | Chicken                                |
+|   81 | Duck                                   |
+|   82 | Other domestic poultry                 |
+|   83 | Agricultural eggs                      |
+|   84 | Local eggs                             |
+|   85 | Other eggs (not chicken)               |
+|   90 | Beef                                   |
+|   91 | Mutton                                 |
+|   92 | Pork                                   |
+|   93 | Goat                                   |
+|   94 | Wild game meat                         |
+|   95 | Canned beef/corned beef                |
+|   96 | Other meat (excl. poultry)             |
+|  100 | Fish--fresh                            |
+|  101 | Fish--frozen                           |
+|  102 | Fish--smoked                           |
+|  103 | Fish--dried                            |
+|  104 | Snails                                 |
+|  105 | Seafood (lobster, crab, prawns, etc)   |
+|  106 | Canned fish/seafood                    |
+|  107 | Other fish or seafood                  |
+|  110 | Fresh milk                             |
+|  111 | Milk powder                            |
+|  112 | Baby milk powder                       |
+|  113 | Milk tinned (unsweetened)              |
+|  114 | Other milk products                    |
+|  120 | Coffee                                 |
+|  121 | Chocolate drinks (including Milo)      |
+|  122 | Tea                                    |
+|  130 | Sugar                                  |
+|  131 | Jams                                   |
+|  132 | Honey                                  |
+|  133 | Other sweets and confectionary         |
+|  140 | Condiments (salt, spices, pepper, etc) |
+|  150 | Bottled water                          |
+|  151 | Sachet water                           |
+|  152 | Malt drinks                            |
+|  153 | Soft drinks (Coca Cola, spirit, etc)   |
+|  154 | Fruit juice canned/Pack                |
+|  155 | Other non--alcoholic drinks            |
+|  160 | Beer (local and imported)              |
+|  161 | Palm wine                              |
+|  162 | Pito                                   |
+|  163 | Gin                                    |
+|  164 | Other alcoholic beverages              |
+
+** Create dictionary for food items
+#+begin_src python :var labels=food_codes_planting2010
+import json
+
+d={}
+for row in labels:
+    d[row[0]]=row[-1]
+
+with open('food_items.json','w') as f:
+    json.dump(d,f)
+#+end_src
+
+#+results:
+
