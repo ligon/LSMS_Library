@@ -32,7 +32,11 @@ region = region.set_index('j').squeeze()
 region.name = 'm'
 
 df = df.join(region,how='left')
-df['t'] = 2018
+
+# Add data on time
+food = pd.read_parquet('food_expenditures.parquet')
+t = food.groupby(['j','t']).count().reset_index('t')['t']
+df = df.join(t,on='j').reset_index()
 
 df = df.reset_index().set_index(['j','t','m'])
 

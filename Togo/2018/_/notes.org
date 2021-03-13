@@ -297,14 +297,172 @@ print(df_to_orgtbl(df,float_fmt='%d'))
 |  136 | Alcoholic Beverages     | Bières et vins traditionnels (dolo, vin de palme, vin de raphia, etc.) | Traditional beer and wines (Dolo, palm wine, raffia wine, etc.)                          |      1135 | BiÃ¨res et vins traditionnels (dolo, vin de palme, vin de raphia, etc.) |
 |  137 | Beer                    | Bières industrielles                                                   | Industrial beers                                                                         |       222 | BiÃ¨res industrielles                                                   |
 |  138 | Missing                 | Missing                                                                | Missing                                                                                  |           |                                                                         |
+
+** Non-food expenditure labels
+We can extract label information directly from the survey instrument.
+#+begin_src python :results output raw table :tangle /tmp/foo.py
+import pandas as pd
+from cfe.df_utils import df_to_orgtbl
+
+S9 = []
+S9.append(pd.read_excel('../Documentation/EHCVM_UEMOA_MEN_TOGO_V2.xls',sheet_name='S9b__Conso_NA',skiprows=6).iloc[:,0:2].dropna())
+S9[-1].columns = ['Code','Label']
+S9.append(pd.read_excel('../Documentation/EHCVM_UEMOA_MEN_TOGO_V2.xls',sheet_name='S9c__Conso_NA',skiprows=4).iloc[:,0:2].dropna())
+S9[-1].columns = ['Code','Label']
+S9.append(pd.read_excel('../Documentation/EHCVM_UEMOA_MEN_TOGO_V2.xls',sheet_name='S9d___Conso_NA',skiprows=4).iloc[:,0:2].dropna())
+S9[-1].columns = ['Code','Label']
+S9.append(pd.read_excel('../Documentation/EHCVM_UEMOA_MEN_TOGO_V2.xls',sheet_name='S9e__Conso_NA',skiprows=4).iloc[:,0:2].dropna())
+S9[-1].columns = ['Code','Label']
+S9.append(pd.read_excel('../Documentation/EHCVM_UEMOA_MEN_TOGO_V2.xls',sheet_name='S9f__Conso_NA',skiprows=4).iloc[:,0:2].dropna())
+S9[-1].columns = ['Code','Label']
+
+s9 = pd.concat(S9)
+s9['Code'] = s9['Code'].astype(int)
+s9.set_index('Code',inplace=True)
+
+s9.sort_index(inplace=True)
+
+print(df_to_orgtbl(s9,float_fmt='%d'))
+#+end_src
+
+#+name: nonfood_labels
+| Code | Label                                                                                                                                                                                                                                                                 |
+|------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|  201 | Cigarettes, Tabac                                                                                                                                                                                                                                                     |
+|  202 | Pétrole lampant                                                                                                                                                                                                                                                       |
+|  203 | Charbon de bois/Charbon minéral                                                                                                                                                                                                                                       |
+|  204 | Bois de chauffe acheté                                                                                                                                                                                                                                                |
+|  205 | Bois de chauffe ramassé (estimer la valeur)                                                                                                                                                                                                                           |
+|  206 | Bougies                                                                                                                                                                                                                                                               |
+|  207 | Allumettes                                                                                                                                                                                                                                                            |
+|  208 | Carburant pour véhicule                                                                                                                                                                                                                                               |
+|  209 | Carburant pour motocyclette                                                                                                                                                                                                                                           |
+|  210 | Transport urbain en taxi                                                                                                                                                                                                                                              |
+|  211 | Transport urbain en bus                                                                                                                                                                                                                                               |
+|  212 | Transport urbain / rural en moto-taxi                                                                                                                                                                                                                                 |
+|  213 | Transport urbain en train                                                                                                                                                                                                                                             |
+|  214 | Transport urbain / rural par voie fluviale                                                                                                                                                                                                                            |
+|  215 | Transport urbain / rural par traction animale                                                                                                                                                                                                                         |
+|  216 | Journaux                                                                                                                                                                                                                                                              |
+|  217 | Frais de mouture des céréales                                                                                                                                                                                                                                         |
+|  301 | Whisky et autres liqueurs                                                                                                                                                                                                                                             |
+|  302 | Vins modernes                                                                                                                                                                                                                                                         |
+|  303 | Gaz domestique                                                                                                                                                                                                                                                        |
+|  304 | Carburant pour groupe electrogène à usage domestique                                                                                                                                                                                                                  |
+|  305 | Piles électriques,                                                                                                                                                                                                                                                    |
+|  306 | Savon de ménage, lessive en poudre, détergents (eau de javel, etc.)                                                                                                                                                                                                   |
+|  307 | Insecticide, tortillon anti-moustique                                                                                                                                                                                                                                 |
+|  308 | Salaire du personnel de maison (gardien, boy, chauffeur, cuisinier, etc.)                                                                                                                                                                                             |
+|  309 | Frais de blanchiment des vêtements, linge, etc. (Pressing)                                                                                                                                                                                                            |
+|  310 | Frais de ramassage des ordures ménagères                                                                                                                                                                                                                              |
+|  311 | Lavage de véhicules                                                                                                                                                                                                                                                   |
+|  312 | Frais de parking                                                                                                                                                                                                                                                      |
+|  313 | Frais de communication téléphonique dans une cabine / télécentre                                                                                                                                                                                                      |
+|  314 | Billet de lotterie nationale, billet de PMU                                                                                                                                                                                                                           |
+|  315 | Revues, journal ou magazine mensuel etc.                                                                                                                                                                                                                              |
+|  316 | Frais de coiffure homme et femme (salon, tressage, mèches, coupe, etc.), manucure, pédicure                                                                                                                                                                           |
+|  317 | Savon de toilette, Shampoing                                                                                                                                                                                                                                          |
+|  318 | Pâte dentifrice                                                                                                                                                                                                                                                       |
+|  319 | Papier toilette                                                                                                                                                                                                                                                       |
+|  320 | Serviettes hygiéniques, couches jetables pour bébé, etc.                                                                                                                                                                                                              |
+|  321 | Lait, lotion de toilette corporelle (glycérine, vaseline, etc.)                                                                                                                                                                                                       |
+|  322 | Autres produits de toilettes (rasoir, coton, crème / mousse à raser, etc.)                                                                                                                                                                                            |
+|  401 | Frais d'entretien et de réparation de chaussures: cirage, ressemelage, etc.                                                                                                                                                                                           |
+|  402 | Ampoules électriques pour le logement                                                                                                                                                                                                                                 |
+|  403 | Lubrifiants (huile moteur; huile de frein; liquide batterie (acide); graisses; autres lubrifiants n.d.a.)                                                                                                                                                             |
+|  404 | Services de réparation et d'entretien (vidange, graissage, etc.) de moyens de transport personnel (voitures, motos, bicyclette, etc.)                                                                                                                                 |
+|  405 | Transport inter-localité par voitures                                                                                                                                                                                                                                 |
+|  406 | Transport inter-locaité à traction animale                                                                                                                                                                                                                            |
+|  407 | Transport  interlocalité par eau (bateau, pirogue, pinasse)                                                                                                                                                                                                           |
+|  408 | Frais de timbre postaux, d'expédition de mandat, etc                                                                                                                                                                                                                  |
+|  409 | Frais d'envoi de fax                                                                                                                                                                                                                                                  |
+|  410 | Produits pour le jardinage (plantes et fleurs ornementales), pas pour l'agriculture                                                                                                                                                                                   |
+|  411 | Aliments, frais d'entretien, frais de vétérinaire des animaux de compagnie (chiens, chats, etc.)                                                                                                                                                                      |
+|  412 | Droit d'entrée (achat d'un ticket) à des manifestations sportives.                                                                                                                                                                                                    |
+|  413 | Droit d'entrée (achat d'un ticket) pour cinéma, concert, pièce de théâtre, musée, expositions, etc                                                                                                                                                                    |
+|  414 | Autres services récréatifs: services de photographe (développement, tirage), photo d'identité, etc.                                                                                                                                                                   |
+|  415 | Parfums                                                                                                                                                                                                                                                               |
+|  416 | Brosse à dents                                                                                                                                                                                                                                                        |
+|  417 | Contraceptifs                                                                                                                                                                                                                                                         |
+|  418 | Frais de photocopies de document                                                                                                                                                                                                                                      |
+|  501 | Tissus d'habillement: tissus pagne, tissu pagne du tisserand, tissu synthétique, etc.                                                                                                                                                                                 |
+|  502 | Vêtements femmes (15 ans et plus): robe, jupe, pantalon, ensemble, etc.                                                                                                                                                                                               |
+|  503 | Sous-vêtements femme (15 ans et plus): slip, jupon, tee shirt,soutien gorge, collant, etc.                                                                                                                                                                            |
+|  504 | Vêtements enfants (0-14 ans): layette pour bébé, chemise, pantalon garçon, robe fillette, slip enfant, blouses, etc. (Pas inclure les uniformes scolaires)                                                                                                            |
+|  505 | Vêtements hommes (15 ans et plus): chemise, pantalon, veste, ensemble, vêtements de travail, etc.                                                                                                                                                                     |
+|  506 | Sous-vêtements homme (15 ans et plus): slip, chaussettes, tee shirt et maillot de corps, etc.                                                                                                                                                                         |
+|  507 | Frais de confection et de réparation de vêtements homme: ensemble, pantalon, chemise, réparation, location vêtement, etc.                                                                                                                                             |
+|  508 | Frais de confection et de réparation de vêtements femme: robe, pantalon, jupe, ensemble, réparation, location, etc.                                                                                                                                                   |
+|  509 | Frais de confection et de réparation de vêtements enfants                                                                                                                                                                                                             |
+|  510 | Chaussures hommes                                                                                                                                                                                                                                                     |
+|  511 | Chaussures femmes                                                                                                                                                                                                                                                     |
+|  512 | Chaussures enfants                                                                                                                                                                                                                                                    |
+|  601 | Matériel pour l'entretien et les petites réparations du logement (remplacement d'une tôle, d'une vitre, d'une ampoule, etc.)                                                                                                                                          |
+|  602 | Main-d'oeuvre et services d'entretien et de réparation courante du logement  (vidange fosse septique,main d'œuvre pour l'entretien du logement, etc.)                                                                                                                 |
+|  603 | Matériaux de maçonnerie pour la construction ou les grosses réparations de logement: ciment, briques, fer à béton, sable, gravier, parpaings, etc.                                                                                                                    |
+|  604 | Autres matériaux pour la construction ou les grosses réparations de logement: tôles, bois de charpente, planches, lattes, contre-plaqués, matériaux d'électricité, matériaux de plomberie, matériaux de peinture, carreaux, tapis et revêtement du sol, etc.          |
+|  605 | Main-d'oeuvre pour la construction et les grosses réparation de logement (maçonnerie, toiture et charpente, électricité, plomberie, menuiserie, peinture et revêtement du sol), etc.                                                                                  |
+|  606 | Frais d'acquisition d'un terrain ou d'un logement                                                                                                                                                                                                                     |
+|  607 | Frais d'études et d'architecte                                                                                                                                                                                                                                        |
+|  608 | Frais d'abonnement au réseau de distribution d'eau                                                                                                                                                                                                                    |
+|  609 | Frais d'abonnement au réseau de distribution d'électricité                                                                                                                                                                                                            |
+|  610 | Frais de connexion au réseau de distribution d'eau                                                                                                                                                                                                                    |
+|  611 | Frais de connexion au réseau de distribution d'électricité                                                                                                                                                                                                            |
+|  612 | Meubles de salon et de salle à manger (fauteuils, table, chaises, armoires, etc.)                                                                                                                                                                                     |
+|  613 | Lit, matelas, armoire et autres meubles de chambre à coucher                                                                                                                                                                                                          |
+|  614 | Réparation de meubles (fauteuils, chaises, lits, armoires, etc.)                                                                                                                                                                                                      |
+|  615 | Linge de maison et articles associés (serviettes de bain, drap, couverture, couvre-lit, oreillers, moustiquaire, nattes, tapis, rideaux, éventail, etc.)                                                                                                              |
+|  616 | Appareils électro-ménagers: frigo, climatiseurs, réchaud, four, cuisinière, lave-linge, chauffe-eau, fer à repasser, etc.                                                                                                                                             |
+|  617 | Réparation d'appareils électro-ménagers (fer à repasser, frigo, cuisinière, four, réchaud, climatiseur, ventilateur, chauffe-eau, etc.)                                                                                                                               |
+|  618 | Vaisselle: assiettes, couteau, fourchette, cuillère, gobelets, verres, etc.                                                                                                                                                                                           |
+|  619 | Ustensiles de cuisine: casserole, marmite, tamis local, réparation d'ustensiles de cuisine, etc.                                                                                                                                                                      |
+|  620 | Autres ustensiles de ménage: seau, bouilloire, biberon, poubelle, tasses, cafétière non électrique, théière, calebasse, louche, jarre, canari, mortier, pilon, etc.                                                                                                   |
+|  621 | Outillage de maison: outils de bricolage (marteau, tournevis, etc.); outil de jardinage (pelle, râteau, brouette, etc.);                                                                                                                                              |
+|  622 | Lampes électriques, lampes tempêtes, torches                                                                                                                                                                                                                          |
+|  623 | Achat d'une voiture pour usage personnel                                                                                                                                                                                                                              |
+|  624 | Achat d'un motocycle (vélo, moto) pour usage personnel                                                                                                                                                                                                                |
+|  625 | Pièces détachées de moyens de transport individuel: pneu, batterie, bougie, carburateur, etc.                                                                                                                                                                         |
+|  626 | Frais d'assurance d'un moyen de transport individuel (auto, moto, etc.), assurance de voyage                                                                                                                                                                          |
+|  627 | Vignette automobile/ moto                                                                                                                                                                                                                                             |
+|  628 | Location d'un véhicule pour usage personnel: voiture, moto/vélo, etc.                                                                                                                                                                                                 |
+|  629 | Transport inter-urbain en train dans le pays et à l'étranger                                                                                                                                                                                                          |
+|  630 | Transport en avion dans le pays et à l'étranger                                                                                                                                                                                                                       |
+|  631 | Frais de déménagement                                                                                                                                                                                                                                                 |
+|  632 | Frais de visa, taxes d'aéroport                                                                                                                                                                                                                                       |
+|  633 | Achat d'un téléphone portable                                                                                                                                                                                                                                         |
+|  634 | Appareils de musique et d'images: radio, radio-cassette, chaîne de musique, TV, lecteur CD/DVD, MP3, MP4, caméra, camescope, etc.                                                                                                                                     |
+|  635 | Ordinateur, imprimante, tablette,machine à écrire, etc.                                                                                                                                                                                                               |
+|  636 | Réparation d'appareils électroniques: radio, radio-cassettes, TV, camera, lecteur CD/DVD, ordinateur, etc.                                                                                                                                                            |
+|  637 | Petit matériel électronique à usage personnel: cassettes, CD/DVD, clé USB, encre pour imprimante, papier d'impression photos, pellicule photos, etc.                                                                                                                  |
+|  638 | Articles de sport et de détente: ballon, jeu ludo, poids (pétanque), jeu de carte, jouets pour enfants, jeux vidéo, petits instruments de musique, etc.                                                                                                               |
+|  639 | Livres non scolaires, bande dessinée                                                                                                                                                                                                                                  |
+|  640 | Papier rame, enveloppes, articles de dessin (pinceaux, papier, peinture etc.), etc.                                                                                                                                                                                   |
+|  641 | Frais de pélérinage                                                                                                                                                                                                                                                   |
+|  642 | Formation professionnelle (en particulier directement auprès des ateliers, maîtres, etc.)                                                                                                                                                                             |
+|  643 | Frais de cours particuliers pour adultes (alphabétisation) et personnes non scolarisées                                                                                                                                                                               |
+|  644 | Services d'hébergement: chambres d'hôtel, etc.                                                                                                                                                                                                                        |
+|  645 | Montres, réveils                                                                                                                                                                                                                                                      |
+|  646 | Boucle d'oreilles, colliers, bracelets, bijoux, autres articles de bijouterie et joaillerie n.d.a.                                                                                                                                                                    |
+|  647 | Autres effets personnels: valise, sac de voyage, sac à main, perruques, chapeau, lunettes solaires, parapluies, parasol, canne, porte-monnaie, portefeuille, articles pour fumeurs (cendrier etc.); articles pour bébé (poussette, sièges), articles funéraires, etc. |
+|  648 | Frais d'assurance d'une maison ou tout autre bien qu'un moyen de transport                                                                                                                                                                                            |
+|  649 | Taxes d'habitation (immeubles bâties et non bâties), taxes de voiries                                                                                                                                                                                                 |
+|  650 | Frais d'assurance vie                                                                                                                                                                                                                                                 |
+|  651 | Frais d'assurance maladie                                                                                                                                                                                                                                             |
+|  652 | Frais de légalisation (confection) de documents administratifs (actes d'Etat-civil, diplômes, etc.)                                                                                                                                                                   |
+|  653 | Autres services: annonce à la radio, dans un journal/à la télévision, pompe funèbre, etc.                                                                                                                                                                             |
+
                                                                                                                                                                          
+
 ** Create dictionary for food items
-#+begin_src python :var labels=food_labels
+#+begin_src python :var food_labels=food_labels nonfood_labels=nonfood_labels
 import json
 
 d={}
-for row in labels:
+for row in food_labels:
     d[row[-1]]=row[2] 
+
+for row in nonfood_labels:
+    d[row[0]]=row[1] 
 
 with open('food_items.json','w') as f:
     json.dump(d,f)
@@ -345,13 +503,17 @@ with open('food_items.json','w') as f:
    increases the number of households with enough observed items
    consumed (and valued) to include them in the demand estimation from
    46% to 79%. 
+
 * Estimate demand system
 #+begin_src python :tangle /tmp/estimate_togo.py
 import cfe
 import pandas as pd
 import numpy as np
 
-x = pd.read_parquet('./food_expenditures.parquet')
+food = pd.read_parquet('./food_expenditures.parquet')
+nonfood = pd.read_parquet('./nonfood_expenditures.parquet')
+
+x = food.join(nonfood,how='outer')
 
 y = np.log(x)
 z = pd.read_parquet('../_/household_characteristics.parquet')

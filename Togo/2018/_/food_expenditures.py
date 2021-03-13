@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 import sys
 sys.path.append('../../_')
-from togo import food_expenditures
 import numpy as np
 import pandas as pd
 import json
+import dvc.api
 from cfe.df_utils import broadcast_binary_op
 
-food = pd.read_stata('../Data/Togo_survey2018_fooditems_forEthan.dta')
+with dvc.api.open('Togo/Data/Togo_survey2018_fooditems_forEthan.dta') as dta:
+    food = pd.read_stata(dta)
 
 vars={'hhid': 'j',
       's07bq01' : 'i',
@@ -22,10 +23,9 @@ vars={'hhid': 'j',
       's07bq07b' : 'purchased unit', # What quantity of [XX] did you buy last time? Unit
       's07bq07c' : 'purchased unit modifier', # What quantity of [XX] did you buy last time? Unit size
       's07bq08': 'purchase value', # What was the value of [XX] bought the last time?
-      'region_survey': 'm'
+      'region_survey': 'm',
+      'vague':'t'
       }
-
-food['t'] = 2018
 
 food = food.rename(columns=vars).set_index(['j','t','m','i','unit','unit modifier'])
 
@@ -51,6 +51,7 @@ x = broadcast_binary_op(c,lambda x,y: x*y, p)
 x = x.groupby(['j','t','m','i']).sum().dropna().reset_index()
 
 x['j'] = x['j'].astype(int).astype(str)
+x['t'] = x['t'].astype(int).astype(str)
 
 x = x.set_index(['j','t','m','i']).squeeze()
 
@@ -70,6 +71,6 @@ x = x.iloc[:,2:] # Drop two funky columns with numeric labels
 
 x = x.drop_duplicates()
 
-x.to_parquet('food_expenditures.parquet')
+x.to_parquet('food_expenditures.parquet',compression='gzip')
 
 
