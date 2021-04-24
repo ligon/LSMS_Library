@@ -1,0 +1,291 @@
+* Consolidated Codes 
+  These codes are consistent across rounds, but not all codes appear
+  in all rounds.
+#+name: food_codes
+| Code | 2010Q3                                 | 2011Q1                                 | 2012Q3                                 | 2013Q1                                 | 2015Q3                                 | 2016Q1                                 | 2018Q3                               | 2019Q1                               |
+|------+----------------------------------------+----------------------------------------+----------------------------------------+----------------------------------------+----------------------------------------+----------------------------------------+--------------------------------------+--------------------------------------|
+|    1 | Full Breakfast (Away)                  | Full Breakfast (Away)                  | Full Breakfast (Away)                  | Full Breakfast (Away)                  | Full Breakfast (Away)                  | Full Breakfast (Away)                  | Full Breakfast (Away)                | Full Breakfast (Away)                |
+|    2 | Full Lunch (Away)                      | Full Lunch (Away)                      | Full Lunch (Away)                      | Full Lunch (Away)                      | Full Lunch (Away)                      | Full Lunch (Away)                      | Full Lunch (Away)                    | Full Lunch (Away)                    |
+|    3 | Full Dinner (Away)                     | Full Dinner (Away)                     | Full Dinner (Away)                     | Full Dinner (Away)                     | Full Dinner (Away)                     | Full Dinner (Away)                     | Full Dinner (Away)                   | Full Dinner (Away)                   |
+|    4 | Side dishes (Away)                     | Side dishes (Away)                     | Side dishes (Away)                     | Side dishes (Away)                     | Side dishes (Away)                     | Side dishes (Away)                     | Side dishes (Away)                   | Side dishes (Away)                   |
+|    5 | Snacks (Away)                          | Snacks (Away)                          | Snacks (Away)                          | Snacks (Away)                          | Snacks (Away)                          | Snacks (Away)                          | Snacks (Away)                        | Snacks (Away)                        |
+|    6 | Dairy beverages (Away)                 | Dairy beverages (Away)                 | Dairy beverages (Away)                 | Dairy beverages (Away)                 | Dairy beverages (Away)                 | Dairy beverages (Away)                 | Dairy beverages (Away)               | Dairy beverages (Away)               |
+|    7 | Vegetables (Away)                      | Vegetables (Away)                      | Vegetables (Away)                      | Vegetables (Away)                      | Vegetables (Away)                      | Vegetables (Away)                      | Vegetables (Away)                    | Vegetables (Away)                    |
+|    8 | Non alcoholic drinks                   | Non alcoholic drinks                   | Non alcoholic drinks                   | Non alcoholic drinks                   | Non alcoholic drinks                   | Non alcoholic drinks                   | Non alcoholic drinks                 | Non alcoholic drinks                 |
+|    9 | Alcoholic drinks                       | Alcoholic drinks                       | Alcoholic drinks                       | Alcoholic drinks                       | Alcoholic drinks                       | Alcoholic drinks                       | Alcoholic drinks                     | Alcoholic drinks                     |
+|   10 | Guinea corn/sorghum                    | Guinea corn/sorghum                    | Guinea corn/sorghum                    | Guinea corn/sorghum                    | Guinea corn/sorghum                    | Guinea corn/sorghum                    | Guinea corn/sorghum                  | Guinea corn/sorghum                  |
+|   11 | Millet                                 | Millet                                 | Millet                                 | Millet                                 | Millet                                 | Millet                                 | Millet                               | Millet                               |
+|   12 | Maize                                  | Maize                                  |                                        |                                        |                                        |                                        |                                      |                                      |
+|   13 | Rice--local                            | Rice--local                            | Rice--local                            | Rice--local                            | Rice--local                            | Rice--local                            | Rice--local                          | Rice--local                          |
+|   14 | Rice--imported                         | Rice--imported                         | Rice--imported                         | Rice--imported                         | Rice--imported                         | Rice--imported                         | Rice--imported                       | Rice--imported                       |
+|   15 | Bread                                  | Bread                                  |                                        |                                        |                                        |                                        |                                      |                                      |
+|   16 | Maize flour                            | Maize flour                            | Maize flour                            | Maize flour                            | Maize flour                            | Maize flour                            | Maize flour                          | Maize flour                          |
+|   17 | Yam flour                              | Yam flour                              | Yam flour                              | Yam flour                              | Yam flour                              | Yam flour                              | Yam flour                            | Yam flour                            |
+|   18 | Cassava flour                          | Cassava flour                          | Cassava flour                          | Cassava flour                          | Cassava flour                          | Cassava flour                          | Cassava flour                        | Cassava flour                        |
+|   19 | Wheat flour                            | Wheat flour                            | Wheat flour                            | Wheat flour                            | Wheat flour                            | Wheat flour                            | Wheat flour                          | Wheat flour                          |
+|   20 | Other grains and flour                 | Other grains and flour                 | Maize (unshelled)                      | Maize (unshelled, on the cob)          | Maize (unshelled, on the cob)          | Maize (unshelled, on the cob)          | Maize (unshelled, on the cob)        | Maize (unshelled, on the cob)        |
+|   21 |                                        |                                        | Maize (shelled)                        | Maize (shelled)                        | Maize (shelled, on the cob)            | Maize (shelled, on the cob)            | Maize (shelled, on the cob)          | Maize (shelled, on the cob)          |
+|   22 |                                        |                                        | Other grains and flour                 | Other grains and flour                 | Maize (shelled, off the cob)           | Maize (shelled, off the cob)           | Maize (shelled, off the cob)         | Maize (shelled, off the cob)         |
+|   23 |                                        |                                        |                                        |                                        | Other grains and flour                 | Other grains and flour                 | Other grains and flour               | Other grains and flour               |
+|   24 |                                        |                                        |                                        |                                        |                                        |                                        |                                      |                                      |
+|   25 |                                        |                                        | Bread                                  | Bread                                  | Bread                                  | Bread                                  | Bread                                | Bread                                |
+|   26 |                                        |                                        | Cake                                   | Cake                                   | Cake                                   | Cake                                   | Cake                                 | Cake                                 |
+|   27 |                                        |                                        | Buns/Pofpof/Donuts                     | Buns/Pofpof/Donuts                     | Buns/Pofpof/Donuts                     | Buns/Pofpof/Donuts                     | Buns/Pofpof/Donuts                   | Buns/Pofpof/Donuts                   |
+|   28 |                                        |                                        | Biscuits                               | Biscuits                               | Biscuits                               | Biscuits                               | Biscuits                             | Biscuits                             |
+|   29 |                                        |                                        | Meat Pie/Sausage Roll                  | Meat Pie/Sausage Roll                  | Meat Pie/Sausage Roll                  | Meat Pie/Sausage Roll                  | Meat Pie/Sausage Roll                | Meat Pie/Sausage Roll                |
+|   30 | Cassava--roots                         | Cassava--roots                         | Cassava--roots                         | Cassava--roots                         | Cassava--roots                         | Cassava--roots                         | Cassava--roots                       | Cassava--roots                       |
+|   31 | Yam--roots                             | Yam--roots                             | Yam--roots                             | Yam--roots                             | Yam--roots                             | Yam--roots                             | Yam--roots                           | Yam--roots                           |
+|   32 | Gari--white                            | Gari--white                            | Gari--white                            | Gari--white                            | Gari--white                            | Gari--white                            | Gari--white                          | Gari--white                          |
+|   33 | Gari--yellow                           | Gari--yellow                           | Gari--yellow                           | Gari--yellow                           | Gari--yellow                           | Gari--yellow                           | Gari--yellow                         | Gari--yellow                         |
+|   34 | Cocoyam                                | Cocoyam                                | Cocoyam                                | Cocoyam                                | Cocoyam                                | Cocoyam                                | Cocoyam                              | Cocoyam                              |
+|   35 | Plantains                              | Plantains                              | Plantains                              | Plantains                              | Plantains                              | Plantains                              | Plantains                            | Plantains                            |
+|   36 | Sweet potatoes                         | Sweet potatoes                         | Sweet potatoes                         | Sweet potatoes                         | Sweet potatoes                         | Sweet potatoes                         | Sweet potatoes                       | Sweet potatoes                       |
+|   37 | Potatoes                               | Potatoes                               | Potatoes                               | Potatoes                               | Potatoes                               | Potatoes                               | Potatoes                             | Potatoes                             |
+|   38 | Other roots and tuber                  | Other roots and tuber                  | Other roots and tuber                  | Other roots and tuber                  | Other roots and tuber                  | Other roots and tuber                  | Other roots and tuber                | Other roots and tuber                |
+|   40 | Soya beans                             | Soya beans                             | Soya beans                             | Soya beans                             | Soya beans                             | Soya beans                             | Soya beans                           | Soya beans                           |
+|   41 | Brown beans                            | Brown beans                            | Brown beans                            | Brown beans                            | Brown beans                            | Brown beans                            | Brown beans                          | Brown beans                          |
+|   42 | White beans                            | White beans                            | White beans                            | White beans                            | White beans                            | White beans                            | White beans                          | White beans                          |
+|   43 | Groundnuts                             | Groundnuts                             | Groundnuts (unshelled)                 | Groundnuts                             | Groundnuts (unshelled)                 | Groundnuts (unshelled)                 | Groundnuts (unshelled)               | Groundnuts (unshelled)               |
+|   44 | Other nuts/seeds/pulses                | Other nuts/seeds/pulses                | Groundnuts (shelled)                   | Other nuts/seeds/pulses                | Groundnuts (shelled)                   | Groundnuts (shelled)                   | Groundnuts (shelled)                 | Groundnuts (shelled)                 |
+|   45 |                                        |                                        | Other nuts/seeds/pulses                |                                        | Other nuts/seeds/pulses                | Other nuts/seeds/pulses                | Other nuts/seeds/pulses              | Other nuts/seeds/pulses              |
+|   46 |                                        |                                        |                                        |                                        | Coconut                                | Coconut                                | Coconut                              | Coconut                              |
+|   47 |                                        |                                        |                                        |                                        | Kola nut                               | Kola nut                               | Kola nut                             | Kola nut                             |
+|   48 |                                        |                                        |                                        |                                        | Cashew nut                             | Cashew nut                             | Cashew nut                           | Cashew nut                           |
+|   50 | Palm oil                               | Palm oil                               | Palm oil                               | Palm oil                               | Palm oil                               | Palm oil                               | Palm oil                             | Palm oil                             |
+|   51 | Butter/Margarine                       | Butter/Margarine                       | Butter/Margarine                       | Butter/Margarine                       | Butter/Margarine                       | Butter/Margarine                       | Butter/Margarine                     | Butter/Margarine                     |
+|   52 | Groundnut oil                          | Groundnut oil                          | Groundnut oil                          | Groundnut oil                          | Groundnut oil                          | Groundnut oil                          | Groundnut oil                        | Groundnut oil                        |
+|   53 | Other oils and fats                    | Other oils and fats                    | Other oils and fats                    | Other oils and fats                    | Other oils and fats                    | Other oils and fats                    | Other oils and fats                  | Other oils and fats                  |
+|   54 |                                        |                                        |                                        |                                        | Sheabutter                             | Sheabutter                             |                                      |                                      |
+|   55 |                                        |                                        |                                        |                                        | Coconut oil                            | Coconut oil                            | Coconut oil                          | Coconut oil                          |
+|   56 |                                        |                                        |                                        |                                        | Animal fat                             | Animal fat                             | Animal fat                           | Animal fat                           |
+|   60 | Bananas                                | Bananas                                | Bananas                                | Bananas                                | Bananas                                | Bananas                                | Bananas                              | Bananas                              |
+|   61 | Orange/tangerine                       | Orange/tangerine                       | Orange/tangerine                       | Orange/tangerine                       | Orange/tangerine                       | Orange/tangerine                       | Orange/tangerine                     | Orange/tangerine                     |
+|   62 | Mangoes                                | Mangoes                                | Mangoes                                | Mangoes                                | Mangoes                                | Mangoes                                | Mangoes                              | Mangoes                              |
+|   63 | Avocado pear                           | Avocado pear                           | Avocado pear                           | Avocado pear                           | Avocado pear                           | Avocado pear                           | Avocado pear                         | Avocado pear                         |
+|   64 | Pineapples                             | Pineapples                             | Pineapples                             | Pineapples                             | Pineapples                             | Pineapples                             | Pineapples                           | Pineapples                           |
+|   65 | Fruit canned                           | Fruit canned                           | Fruit canned                           | Fruit canned                           | Fruit canned                           | Fruit canned                           | Fruit canned                         | Fruit canned                         |
+|   66 | Other fruits                           | Other fruits                           | Other fruits                           | Other fruits                           | Other fruits                           | Other fruits                           | Other fruits                         | Other fruits                         |
+|   67 |                                        |                                        |                                        |                                        | Pawpaw                                 | Pawpaw                                 | Pawpaw                               | Pawpaw                               |
+|   68 |                                        |                                        |                                        |                                        | Watermelon                             | Watermelon                             | Watermelon                           | Watermelon                           |
+|   69 |                                        |                                        |                                        |                                        | Apples                                 | Apples                                 | Apples                               | Apples                               |
+|  601 |                                        |                                        |                                        |                                        | Guava                                  | Guava                                  | Guava                                | Guava                                |
+|   70 | Tomatoes                               | Tomatoes                               | Tomatoes                               | Tomatoes                               | Tomatoes                               | Tomatoes                               | Tomatoes                             | Tomatoes                             |
+|   71 | Tomato puree (canned)                  | Tomato puree (canned)                  | Tomato puree (canned)                  | Tomato puree (canned)                  | Tomato puree (canned)                  | Tomato puree (canned)                  | Tomato puree (canned)                | Tomato puree (canned)                |
+|   72 | Onions                                 | Onions                                 | Onions                                 | Onions                                 | Onions                                 | Onions                                 | Onions                               | Onions                               |
+|   73 | Garden eggs/egg plant                  | Garden eggs/egg plant                  | Garden eggs/egg plant                  | Garden eggs/egg plant                  | Garden eggs/egg plant                  | Garden eggs/egg plant                  | Garden eggs/egg plant                | Garden eggs/egg plant                |
+|   74 | Okra--fresh                            | Okra--fresh                            | Okra--fresh                            | Okra--fresh                            | Okra--fresh                            | Okra--fresh                            | Okra--fresh                          | Okra--fresh                          |
+|   75 | Okra--dried                            | Okra--dried                            | Okra--dried                            | Okra--dried                            | Okra--dried                            | Okra--dried                            | Okra--dried                          | Okra--dried                          |
+|   76 | Pepper                                 | Pepper                                 | Fresh Pepper                           | Pepper                                 | Fresh Pepper                           | Fresh Pepper                           | Fresh Pepper                         | Fresh Pepper                         |
+|   77 | Leaves (Cocoyam, Spinach, etc.)        | Leaves (Cocoyam, Spinach, etc.)        | Dry Pepper                             | Leaves (Cocoyam, Spinach, etc.)        | Dry Pepper                             | Dry Pepper                             | Dry Pepper                           | Dry Pepper                           |
+|   78 | Other vegetables (fresh or canned)     | Other vegetables (fresh or canned)     | Leaves (Cocoyam, Spinach, etc.)        | Other vegetables (fresh or canned)     | Leaves (Cocoyam, Spinach, etc.)        | Leaves (Cocoyam, Spinach, etc.)        | Leaves (Cocoyam, Spinach, etc.)      | Leaves (Cocoyam, Spinach, etc.)      |
+|   79 |                                        |                                        | Other vegetables (fresh or canned)     |                                        | Other vegetables (fresh or canned)     | Other vegetables (fresh or canned)     | Other vegetables (fresh or canned)   | Other vegetables (fresh or canned)   |
+|   80 | Chicken                                | Chicken                                | Chicken                                | Chicken                                | Chicken                                | Chicken                                | Chicken                              | Chicken                              |
+|   81 | Duck                                   | Duck                                   | Duck                                   | Duck                                   | Duck                                   | Duck                                   | Duck                                 | Duck                                 |
+|   82 | Other domestic poultry                 | Other domestic poultry                 | Other domestic poultry                 | Other domestic poultry                 | Other domestic poultry                 | Other domestic poultry                 | Other domestic poultry               | Other domestic poultry               |
+|   83 | Agricultural eggs                      | Agricultural eggs                      | Agricultural eggs                      | Agricultural eggs                      | Agricultural eggs                      | Agricultural eggs                      | Agricultural eggs                    | Agricultural eggs                    |
+|   84 | Local eggs                             | Local eggs                             | Local eggs                             | Local eggs                             | Local eggs                             | Local eggs                             | Local eggs                           | Local eggs                           |
+|   85 | Other eggs (not chicken)               | Other eggs (not chicken)               | Other eggs (not chicken)               | Other eggs (not chicken)               | Other eggs (not chicken)               | Other eggs (not chicken)               | Other eggs (not chicken)             | Other eggs (not chicken)             |
+|   90 | Beef                                   | Beef                                   | Beef                                   | Beef                                   | Beef                                   | Beef                                   | Beef                                 | Beef                                 |
+|   91 | Mutton                                 | Mutton                                 | Mutton                                 | Mutton                                 | Mutton                                 | Mutton                                 | Mutton                               | Mutton                               |
+|   92 | Pork                                   | Pork                                   | Pork                                   | Pork                                   | Pork                                   | Pork                                   | Pork                                 | Pork                                 |
+|   93 | Goat                                   | Goat                                   | Goat                                   | Goat                                   | Goat                                   | Goat                                   | Goat                                 | Goat                                 |
+|   94 | Wild game meat                         | Wild game meat                         | Wild game meat                         | Wild game meat                         | Wild game meat                         | Wild game meat                         | Wild game meat                       | Wild game meat                       |
+|   95 | Canned beef/corned beef                | Canned beef/corned beef                | Canned beef/corned beef                | Canned beef/corned beef                | Canned beef/corned beef                | Canned beef/corned beef                | Canned beef/corned beef              | Canned beef/corned beef              |
+|   96 | Other meat (excl. poultry)             | Other meat (excl. poultry)             | Other meat (excl. poultry)             | Other meat (excl. poultry)             | Other meat (excl. poultry)             | Other meat (excl. poultry)             | Other meat (excl. poultry)           | Other meat (excl. poultry)           |
+|  100 | Fish--fresh                            | Fish--fresh                            | Fish--fresh                            | Fish--fresh                            | Fish--fresh                            | Fish--fresh                            | Fish--fresh                          | Fish--fresh                          |
+|  101 | Fish--frozen                           | Fish--frozen                           | Fish--frozen                           | Fish--frozen                           | Fish--frozen                           | Fish--frozen                           | Fish--frozen                         | Fish--frozen                         |
+|  102 | Fish--smoked                           | Fish--smoked                           | Fish--smoked                           | Fish--smoked                           | Fish--smoked                           | Fish--smoked                           | Fish--smoked                         | Fish--smoked                         |
+|  103 | Fish--dried                            | Fish--dried                            | Fish--dried                            | Fish--dried                            | Fish--dried                            | Fish--dried                            | Fish--dried                          | Fish--dried                          |
+|  104 | Snails                                 | Snails                                 | Snails                                 | Snails                                 | Snails                                 | Snails                                 | Snails                               | Snails                               |
+|  105 | Seafood (lobster, crab, prawns, etc)   | Seafood (lobster, crab, prawns, etc)   | Seafood (lobster, crab, prawns, etc)   | Seafood (lobster, crab, prawns, etc)   | Seafood (lobster, crab, prawns, etc)   | Seafood (lobster, crab, prawns, etc)   | Seafood (lobster, crab, prawns, etc) | Seafood (lobster, crab, prawns, etc) |
+|  106 | Canned fish/seafood                    | Canned fish/seafood                    | Canned fish/seafood                    | Canned fish/seafood                    | Canned fish/seafood                    | Canned fish/seafood                    | Canned fish/seafood                  | Canned fish/seafood                  |
+|  107 | Other fish or seafood                  | Other fish or seafood                  | Other fish or seafood                  | Other fish or seafood                  | Other fish or seafood                  | Other fish or seafood                  | Other fish or seafood                | Other fish or seafood                |
+|  110 | Fresh milk                             | Fresh milk                             | Fresh milk                             | Fresh milk                             | Fresh milk                             | Fresh milk                             | Fresh milk                           | Fresh milk                           |
+|  111 | Milk powder                            | Milk powder                            | Milk powder                            | Milk powder                            | Milk powder                            | Milk powder                            | Milk powder                          | Milk powder                          |
+|  112 | Baby milk powder                       | Baby milk powder                       | Baby milk powder                       | Baby milk powder                       | Baby milk powder                       | Baby milk powder                       | Baby milk powder                     | Baby milk powder                     |
+|  113 | Milk tinned (unsweetened)              | Milk tinned (unsweetened)              | Milk tinned (unsweetened)              | Milk tinned (unsweetened)              | Milk tinned (unsweetened)              | Milk tinned (unsweetened)              | Milk tinned (unsweetened)            | Milk tinned (unsweetened)            |
+|  114 | Other milk products                    | Other milk products                    | Cheese (wara)                          | Cheese (wara)                          | Cheese (wara)                          | Cheese (wara)                          | Cheese (wara)                        | Cheese (wara)                        |
+|  115 |                                        |                                        | Other milk products                    | Other milk products                    | Other milk products                    | Other milk products                    | Other milk products                  | Other milk products                  |
+|  120 | Coffee                                 | Coffee                                 | Coffee                                 | Coffee                                 | Coffee                                 | Coffee                                 | Coffee                               | Coffee                               |
+|  121 | Chocolate drinks (including Milo)      | Chocolate drinks (including Milo)      | Chocolate drinks (including Milo)      | Chocolate drinks (including Milo)      | Chocolate drinks (including Milo)      | Chocolate drinks (including Milo)      | Chocolate drinks (including Milo)    | Chocolate drinks (including Milo)    |
+|  122 | Tea                                    | Tea                                    | Tea                                    | Tea                                    | Tea                                    | Tea                                    | Tea                                  | Tea                                  |
+|  130 | Sugar                                  | Sugar                                  | Sugar                                  | Sugar                                  | Sugar                                  | Sugar                                  | Sugar                                | Sugar                                |
+|  131 | Jams                                   | Jams                                   | Jams                                   | Jams                                   | Jams                                   | Jams                                   | Jams                                 | Jams                                 |
+|  132 | Honey                                  | Honey                                  | Honey                                  | Honey                                  | Honey                                  | Honey                                  | Honey                                | Honey                                |
+|  133 | Other sweets and confectionary         | Other sweets and confectionary         | Other sweets and confectionary         | Other sweets and confectionary         | Other sweets and confectionary         | Other sweets and confectionary         | Other sweets and confectionary       | Other sweets and confectionary       |
+|  140 | Condiments (salt, spices, pepper, etc) | Condiments (salt, spices, pepper, etc) | Condiments (salt, spices, pepper, etc) | Condiments (salt, spices, pepper, etc) | Condiments (salt, spices, pepper, etc) | Condiments (salt, spices, pepper, etc) |                                      |                                      |
+|  141 |                                        |                                        | Salt                                   |                                        | Salt                                   | Salt                                   | Salt                                 | Salt                                 |
+|  142 |                                        |                                        | Unground Ogbono                        |                                        | Unground Ogbono                        | Unground Ogbono                        | Unground Ogbono                      | Unground Ogbono                      |
+|  143 |                                        |                                        | Ground Ogbono                          |                                        | Ground Ogbono                          | Ground Ogbono                          | Ground Ogbono                        | Ground Ogbono                        |
+|  144 |                                        |                                        | Ground Pepper                          |                                        | Ground Pepper                          | Ground Pepper                          | Ground Pepper                        | Ground Pepper                        |
+|  145 |                                        |                                        | Melon (shelled)                        |                                        | Melon (shelled)                        | Melon (shelled)                        | Melon (shelled)                      | Melon (shelled)                      |
+|  146 |                                        |                                        | Melon (unshelled)                      |                                        | Melon (unshelled)                      | Melon (unshelled)                      | Melon (unshelled)                    | Melon (unshelled)                    |
+|  147 |                                        |                                        |                                        |                                        | Melon (ground)                         | Melon (ground)                         | Melon (ground)                       | Melon (ground)                       |
+|  148 |                                        | f                                      |                                        |                                        |                                        |                                        | Other Spices (e.g. Maggi)            | Other Spices                         |
+|  150 | Bottled water                          | Bottled water                          | Bottled water                          | Bottled water                          | Bottled water                          | Bottled water                          | Bottled water                        | Bottled water                        |
+|  151 | Sachet water                           | Sachet water                           | Sachet water                           | Sachet water                           | Sachet water                           | Sachet water                           | Sachet water                         | Sachet water                         |
+|  152 | Malt drinks                            | Malt drinks                            | Malt drinks                            | Malt drinks                            | Malt drinks                            | Malt drinks                            | Malt drinks                          | Malt drinks                          |
+|  153 | Soft drinks (Coca Cola, spirit, etc)   | Soft drinks (Coca Cola, spirit, etc)   | Soft drinks (Coca Cola, spirit, etc)   | Soft drinks (Coca Cola, spirit, etc)   | Soft drinks (Coca Cola, spirit, etc)   | Soft drinks (Coca Cola, spirit, etc)   | Soft drinks (Coca Cola, spirit, etc) | Soft drinks (Coca Cola, spirit, etc) |
+|  154 | Fruit juice canned/Pack                | Fruit juice canned/Pack                | Fruit juice canned/Pack                | Fruit juice canned/Pack                | Fruit juice canned/Pack                | Fruit juice canned/Pack                | Fruit juice canned/Pack              | Fruit juice canned/Pack              |
+|  155 | Other non--alcoholic drinks            | Other non--alcoholic drinks            | Other non--alcoholic drinks            | Other non--alcoholic drinks            | Other non--alcoholic drinks            | Other non--alcoholic drinks            | Other non--alcoholic drinks          | Other non--alcoholic drinks          |
+|  160 | Beer (local and imported)              | Beer (local and imported)              | Beer (local and imported)              | Beer (local and imported)              | Beer (local and imported)              | Beer (local and imported)              | Beer (local and imported)            | Beer (local and imported)            |
+|  161 | Palm wine                              | Palm wine                              | Palm wine                              | Palm wine                              | Palm wine                              | Palm wine                              | Palm wine                            | Palm wine                            |
+|  162 | Pito                                   | Pito                                   | Pito                                   | Pito                                   | Pito                                   | Pito                                   | Pito                                 | Pito                                 |
+|  163 | Gin                                    | Gin                                    | Gin                                    | Gin                                    | Gin                                    | Gin                                    | Gin                                  | Gin                                  |
+|  164 | Other alcoholic beverages              | Other alcoholic beverages              | Other alcoholic beverages              | Other alcoholic beverages              | Other alcoholic beverages              | Other alcoholic beverages              | Other alcoholic beverages            | Other alcoholic beverages            |
+
+** Create dictionary for food items
+#+begin_src python :var labels=food_codes :colnames no :tangle /tmp/bar.py
+from cfe.df_utils import orgtbl_to_df
+import json
+
+df = orgtbl_to_df(labels).set_index('Code')
+
+with open('food_items.json','w') as f:
+    json.dump(df.to_dict(),f)
+#+end_src
+
+#+results:
+
+** Aggregate/Harmonize food items
+#+name: aggregation
+| Original Label                         | Aggregated Label                     |
+|----------------------------------------+--------------------------------------|
+| Agricultural eggs                      | Eggs                                 |
+| Animal fat                             | Other Fats & Oils                    |
+| Apples                                 | Apples                               |
+| Avocado pear                           | Avocado pear                         |
+| Baby milk powder                       | Baby milk powder                     |
+| Bananas                                | Bananas                              |
+| Beef                                   | Beef                                 |
+| Beer (local and imported)              | Beer                                 |
+| Biscuits                               | Biscuits                             |
+| Bottled water                          | Bottled water                        |
+| Bread                                  | Bread                                |
+| Brown beans                            | Brown beans                          |
+| Buns/Pofpof/Donuts                     | Buns/Pofpof/Donuts                   |
+| Butter/Margarine                       | Butter/Margarine                     |
+| Cake                                   | Cake                                 |
+| Canned beef/corned beef                | Canned beef/corned beef              |
+| Canned fish/seafood                    | Canned fish/seafood                  |
+| Cashew nut                             | Cashew nut                           |
+| Cassava flour                          | Cassava flour                        |
+| Cassava--roots                         | Cassava (root)                       |
+| Cheese (wara)                          | Cheese (wara)                        |
+| Chicken                                | Chicken                              |
+| Chocolate drinks (including Milo)      | Chocolate drinks                     |
+| Coconut                                | Coconut                              |
+| Coconut oil                            | Other Fats & Oils                    |
+| Cocoyam                                | Cocoyam                              |
+| Coffee                                 | Coffee                               |
+| Condiments (salt, spices, pepper, etc) | Condiments                           |
+| Dry Pepper                             | Pepper                               |
+| Duck                                   | Duck                                 |
+| Fish--dried                            | Fish--dried                          |
+| Fish--fresh                            | Fish--fresh                          |
+| Fish--frozen                           | Fish--frozen                         |
+| Fish--smoked                           | Fish--smoked                         |
+| Fresh Pepper                           | Fresh Pepper                         |
+| Fresh milk                             | Fresh milk                           |
+| Fruit canned                           | Fruit canned                         |
+| Fruit juice canned/Pack                | Fruit juice canned/Pack              |
+| Garden eggs/egg plant                  | Garden eggs/egg plant                |
+| Gari--white                            | Gari                                 |
+| Gari--yellow                           | Gari                                 |
+| Gin                                    | Gin                                  |
+| Goat                                   | Goat                                 |
+| Ground Ogbono                          | Ogbono                               |
+| Ground Pepper                          | Ground Pepper                        |
+| Groundnut oil                          | Groundnut oil                        |
+| Groundnuts                             | Groundnuts                           |
+| Groundnuts (shelled)                   | Groundnuts                           |
+| Groundnuts (unshelled)                 | Groundnuts                           |
+| Guava                                  | Guava                                |
+| Guinea corn/sorghum                    | Guinea corn/sorghum                  |
+| Honey                                  | Honey                                |
+| Jams                                   | Jams                                 |
+| Kola nut                               | Kola nut                             |
+| Leaves (Cocoyam, Spinach, etc.)        | Leaves (Cocoyam, Spinach, etc.)      |
+| Local eggs                             | Eggs                                 |
+| Maize                                  | Maize                                |
+| Maize (shelled)                        | Maize                                |
+| Maize (shelled, off the cob)           | Maize                                |
+| Maize (shelled, on the cob)            | Maize                                |
+| Maize (unshelled)                      | Maize                                |
+| Maize (unshelled, on the cob)          | Maize                                |
+| Maize flour                            | Maize flour                          |
+| Malt drinks                            | Malt drinks                          |
+| Mangoes                                | Mangoes                              |
+| Meat Pie/Sausage Roll                  | Meat Pie/Sausage Roll                |
+| Melon (ground)                         | Melon                                |
+| Melon (shelled)                        | Melon                                |
+| Melon (unshelled)                      | Melon                                |
+| Milk powder                            | Milk powder                          |
+| Milk tinned (unsweetened)              | Milk tinned (unsweetened)            |
+| Millet                                 | Millet                               |
+| Mutton                                 | Mutton                               |
+| Okra--dried                            | Okra                                 |
+| Okra--fresh                            | Okra                                 |
+| Onions                                 | Onions                               |
+| Orange/tangerine                       | Orange/tangerine                     |
+| Other Spices                           | Other Spices                         |
+| Other Spices (e.g. Maggi)              | Other Spices (e.g. Maggi)            |
+| Other alcoholic beverages              | Other alcoholic beverages            |
+| Other domestic poultry                 | Other domestic poultry               |
+| Other eggs (not chicken)               | Other eggs (not chicken)             |
+| Other fish or seafood                  | Other fish or seafood                |
+| Other fruits                           | Other fruits                         |
+| Other grains and flour                 | Other grains and flour               |
+| Other meat (excl. poultry)             | Other meat (excl. poultry)           |
+| Other milk products                    | Other milk products                  |
+| Other non--alcoholic drinks            | Other non--alcoholic drinks          |
+| Other nuts/seeds/pulses                | Other nuts/seeds/pulses              |
+| Other oils and fats                    | Other oils and fats                  |
+| Other roots and tuber                  | Other roots and tuber                |
+| Other sweets and confectionary         | Other sweets and confectionary       |
+| Other vegetables (fresh or canned)     | Other vegetables (fresh or canned)   |
+| Palm oil                               | Palm oil                             |
+| Palm wine                              | Palm wine                            |
+| Pawpaw                                 | Pawpaw                               |
+| Pepper                                 | Pepper                               |
+| Pineapples                             | Pineapples                           |
+| Pito                                   | Pito                                 |
+| Plantains                              | Plantains                            |
+| Pork                                   | Pork                                 |
+| Potatoes                               | Potatoes                             |
+| Rice--imported                         | Rice--imported                       |
+| Rice--local                            | Rice--local                          |
+| Sachet water                           | Sachet water                         |
+| Salt                                   | Salt                                 |
+| Seafood (lobster, crab, prawns, etc)   | Seafood (lobster, crab, prawns, etc) |
+| Sheabutter                             | Other Fats & Oils                    |
+| Snails                                 | Snails                               |
+| Soft drinks (Coca Cola, spirit, etc)   | Soft drinks (Coca Cola, spirit, etc) |
+| Soya beans                             | Soya beans                           |
+| Sugar                                  | Sugar                                |
+| Sweet potatoes                         | Sweet potatoes                       |
+| Tea                                    | Tea                                  |
+| Tomato puree (canned)                  | Tomato puree (canned)                |
+| Tomatoes                               | Tomatoes                             |
+| Unground Ogbono                        | Ogbono                               |
+| Watermelon                             | Watermelon                           |
+| Wheat flour                            | Wheat flour                          |
+| White beans                            | White beans                          |
+| Wild game meat                         | Wild game meat                       |
+| Yam flour                              | Yam flour                            |
+| Yam--roots                             | Yam--roots                           |
+
+
+
+
+#+begin_src python :var labels=aggregation :colnames no :tangle /tmp/bar.py
+from cfe.df_utils import orgtbl_to_df
+import json
+
+df = orgtbl_to_df(labels).set_index('Original Label')
+
+with open('aggregate_items.json','w') as f:
+    json.dump(df.to_dict(),f)
+#+end_src
+
+#+results:
