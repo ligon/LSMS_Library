@@ -19,7 +19,18 @@ q.columns.name='t'
 q = q.stack()
 q = q.reset_index().replace({'units':unitlabels})
 q = q.set_index(['t','HHID','itmcd','units'])
-q.index.names = ['t','j','i','units']
+q.index.names = ['t','j','i','u']
 q.rename(columns={0:'quantities'},inplace=True)
 
+# Convert amenable units to Kg
+def to_kgs(x):
+    try:
+        x['quantities'] = x['quantities']*conv[x['u']]
+        x['u'] = 'Kg'
+    except KeyError:
+        pass
+ 
+    return x
+
+q = q.reset_index().apply(to_kgs,axis=1).set_index(['t','j','i','u'])
 q.to_parquet('food_quantities.parquet')
