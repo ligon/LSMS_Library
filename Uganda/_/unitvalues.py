@@ -8,7 +8,7 @@ import numpy as np
 
 q = pd.read_parquet('food_quantities.parquet').squeeze()
 # Use_units turns out to almost always be kilograms...
-q = q.xs('Kilogram (kg)',level='units')
+q = q.xs('Kg',level='u')
 q = q.replace(0.0,np.nan).dropna()
 
 x = pd.read_parquet('food_expenditures.parquet').stack('i')
