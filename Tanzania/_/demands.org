@@ -1,0 +1,939 @@
+* Introduction
+These notes document a process for mapping data on food consumption
+and expenditures in the Tanzanian LSMS into demands and nutritional
+outcomes which allow comparison with standard recommended dietary
+intakes.
+
+To make this all work, it's important that units and labels match
+across different datasets.
+
+The different datasets should be indexed as follows:
+
+   | Dataset            | Indexed by | Columns |
+   |--------------------+------------+---------|
+   | Expenditures       | j,t,m      | i       |
+   | Consumption        | j,t,m,u    | i       |
+   | HH Characteristics | j,t,m      | k       |
+   | FCT                | i,u        | n       |
+   | RDI                | n          | k       |
+   | Prices             | t,m        | i       |
+
+where =j= indexes households, =t= indexes periods, =m= indexes
+markets, =i= indexes goods, =k= indexes different kinds of household
+characteristics, =u= indexes different unit names, and =n= indexes
+different nutrients.  Any RDI ("recommended daily intake") tables
+should be indexed by nutrients, with columns corresponding to
+characteristics of persons within the household (e.g., age & sex
+categories).  Finally, for any given good prices are assumed to be the
+same within a period and market.
+
+After getting all the indices to match, code below will write the
+various datasets to different google sheets at 
+
+#+name: data_url
+  - https://docs.google.com/spreadsheets/d/1Tknc2F8K6SaA7j0R7J_NE8yJBTsCPPw77_Bfc04MY40/
+    
+* Units
+  Here we define some units that are peculiar to the Tanzanian data
+** Periods (t)
+   We have several rounds of data:
+   #+name: t_index
+     - 2008-09
+     - 2010-11
+     - 2012-13
+     - 2014-15
+** Quantity units (u)
+
+In the Tanzanian food data units are either metric, or by the "piece," so
+we can avoid difficulties some other surveys have with units.  We
+convert all quantities to Kg.
+** Expenditure items (i)
+
+  The list of foods in the FCT is much more detailed and extensive
+  than the list of foods we obtain from the expenditure surveys.
+  What follows is a crude mapping of expenditure survey names into a
+  set of preferred labels and =fct_codes=.
+
+*** Expenditure Labels
+ #+begin_src python :results output raw table :tangle /tmp/foo.py
+import pandas as pd
+from pandas.io import stata
+from cfe.df_utils import df_to_orgtbl
+import dvc
+
+Rounds = {'2008-09':{'fn':'Tanzania/2008-09/Data/SEC_K1.dta','itmcd':'SKCODE'},
+          '2010-11':{'fn':'Tanzania/2010-11/Data/HH_SEC_K1.dta','itmcd':'itemcode'},
+          '2012-13':{'fn':'Tanzania/2012-13/Data/HH_SEC_J1.dta','itmcd':'itemcode'},
+          '2014-15':{'fn':'Tanzania/2014-15/Data/hh_sec_j1.DTA','itmcd':'HH_J00'}}
+
+D = {}
+for k,v in Rounds.items():
+    with dvc.api.open(v['fn'],mode='rb') as f:
+        sr = stata.StataReader(f)
+        D[k] = sr.value_labels()[v['itmcd']]
+
+D = pd.DataFrame(D).T.sort_index().T.sort_index()
+D.index.name = "Code"
+
+print(df_to_orgtbl(D))
+ #+end_src
+
+ The following just modifies the output of =item_expenditures= to add a
+ "Preferred label" column (and column headings).
+
+#+name: food_labels
+ | Code | Preferred Label                                        | 2008-09                                                  | 2010-11                                                  | 2012-13                                                  | 2014-15                                                  |
+ |------+--------------------------------------------------------+----------------------------------------------------------+----------------------------------------------------------+----------------------------------------------------------+----------------------------------------------------------|
+ |  101 | Rice (paddy)                                           | Rice (paddy)                                             | Rice (paddy)                                             | RICE (PADDY)                                             | RICE (PADDY)                                             |
+ |  102 | Rice (husked)                                          | Rice (husked)                                            | Rice (husked)                                            | RICE (HUSKED)                                            | RICE (HUSKED)                                            |
+ |  103 | Maize (green, cob)                                     | Maize (green, cob)                                       | Maize (green, cob)                                       | MAIZE (GREEN, COB)                                       | MAIZE (GREEN, COB)                                       |
+ |  104 | Maize (grain)                                          | Maize (grain)                                            | Maize (grain)                                            | MAIZE (GRAIN)                                            | MAIZE (GRAIN)                                            |
+ |  105 | Maize (flour)                                          | Maize (flour)                                            | Maize (flour)                                            | MAIZE (FLOUR)                                            | MAIZE (FLOUR)                                            |
+ |  106 | Millet and sorghum (grain)                             | Millet and sorghum (grain)                               | Millet and sorghum (grain)                               | MILLET AND SORGHUM (GRAIN)                               | MILLET AND SORGHUM (GRAIN)                               |
+ |  107 | Millet and sorghum (flour)                             | Millet and sorghum (flour)                               | Millet and sorghum (flour)                               | MILLET AND SORGHUM (FLOUR)                               | MILLET AND SORGHUM (FLOUR)                               |
+ |  108 | Wheat, barley, other grains                            | Wheat, barley grain and other cereals                    | Wheat, barley grain and other cereals                    | WHEAT, BARLEY GRAIN AND OTHER CEREALS                    | ---                                                      |
+ |  109 | Bread                                                  | Bread                                                    | Bread                                                    | BREAD                                                    | BREAD                                                    |
+ |  110 | Pastries                                               | Buns, cakes and biscuts                                  | Buns, cakes and biscuits                                 | BUNS, CAKES AND BISCUITS                                 | BUNS, CAKES AND BISCUITS                                 |
+ |  111 | Pasta                                                  | Macaroini, spaghetti                                     | Macaroni, spaghetti                                      | MACARONI, SPAGHETTI                                      | MACARONI, SPAGHETTI                                      |
+ |  112 | Other cereal products                                  | Other cereal products                                    | Other cereal products                                    | OTHER CEREAL PRODUCTS                                    | OTHER CEREAL PRODUCTS                                    |
+ |  201 | Cassava fresh                                          | Cassava fresh                                            | Cassava fresh                                            | CASSAVA FRESH                                            | CASSAVA FRESH                                            |
+ |  202 | Cassava dry/flour                                      | Cassava dry/flour                                        | Cassava dry/flour                                        | CASSAVA DRY/FLOUR                                        | CASSAVA DRY/FLOUR                                        |
+ |  203 | Sweet potatoes                                         | Sweet potatoes                                           | Sweet potatoes                                           | SWEET POTATOES                                           | SWEET POTATOES                                           |
+ |  204 | Yams/cocoyams                                          | Yams/cocoyams                                            | Yams/cocoyams                                            | YAMS/COCOYAMS                                            | YAMS/COCOYAMS                                            |
+ |  205 | Irish potatoes                                         | Irish potatoes                                           | Irish potatoes                                           | IRISH POTATOES                                           | IRISH POTATOES                                           |
+ |  206 | Plantains                                              | Cooking bananas, plantains                               | Cooking bananas, plantains                               | COOKING BANANAS, PLANTAINS                               | COOKING BANANAS, PLANTAINS                               |
+ |  207 | Other starches                                         | Other starches                                           | Other starches                                           | OTHER STARCHES                                           | OTHER STARCHES                                           |
+ |  301 | Sugar                                                  | Sugar                                                    | Sugar                                                    | SUGAR                                                    | SUGAR                                                    |
+ |  302 | Sweets                                                 | Sweets                                                   | Sweets                                                   | SWEETS                                                   | SWEETS                                                   |
+ |  303 | Honey, syrups, jams, marmalade, jellies, canned fruits | Honey, syrups, jams, marmalade, jellies, canned fruits   | Honey, syrups, jams, marmalade, jellies, canned fruits   | HONEY, SYRUPS, JAMS, MARMALADE, JELLIES, CANNED FRUITS   | HONEY, SYRUPS, JAMS, MARMALADE, JELLIES, CANNED FRUITS   |
+ |  401 | Peas, beans, lentils and other pulses                  | Peas, beans, lentils and other pulses                    | Peas, beans, lentils and other pulses                    | PEAS, BEANS, LENTILS AND OTHER PULSES                    | PEAS, BEANS, LENTILS AND OTHER PULSES                    |
+ |  501 | Groundnuts                                             | Groundnuts in shell/shelled                              | Groundnuts in shell/shelled                              | GROUNDNUTS IN SHELL/SHELLED                              | GROUNDNUTS IN SHELL/SHELLED                              |
+ |  502 | Coconuts                                               | Coconuts (mature/immature)                               | Coconuts (mature/immature)                               | COCONUTS (MATURE/IMMATURE)                               | COCONUTS (MATURE/IMMATURE)                               |
+ |  503 | Nuts                                                   | Cashew, almonds and other nuts                           | Cashew, almonds and other nuts                           | CASHEW, ALMONDS AND OTHER NUTS                           | CASHEW, ALMONDS AND OTHER NUTS                           |
+ |  504 | Seeds and nut products                                 | Seeds and products from nuts/seeds (excl. cooking oil)   | Seeds and products from nuts/seeds (excl. cooking oil)   | SEEDS AND PRODUCTS FROM NUTS/SEEDS (EXCL. COOKING OIL)   | SEEDS AND PRODUCTS FROM NUTS/SEEDS (EXCL. COOKING OIL)   |
+ |  601 | Onions, tomatoes, carrots, green pepper, other viungo  | Onions, tomatoes, carrots and green pepper, other viungo | Onions, tomatoes, carrots and green pepper, other viungo | ONIONS, TOMATOES, CARROTS AND GREEN PEPPER, OTHER VIUNGO | ONIONS, TOMATOES, CARROTS AND GREEN PEPPER, OTHER VIUNGO |
+ |  602 | Spinach, cabbage, other green vegetables               | Spinach, cabbage and other green vegetables              | Spinach, cabbage and other green vegetables              | SPINACH, CABBAGE AND OTHER GREEN VEGETABLES              | SPINACH, CABBAGE AND OTHER GREEN VEGETABLES              |
+ |  603 | Canned, dried and wild vegetables                      | Canned, dried and wild vegetables                        | Canned, dried and wild vegetables                        | CANNED, DRIED AND WILD VEGETABLES                        | CANNED, DRIED AND WILD VEGETABLES                        |
+ |  701 | Ripe bananas                                           | Ripe bananas                                             | Ripe bananas                                             | RIPE BANANAS                                             | RIPE BANANAS                                             |
+ |  702 | Citrus fruits                                          | Citrus fruits (oranges, lemon, tangarines, etc.)         | Citrus fruits (oranges, lemon, tangerines, etc.)         | CITRUS FRUITS (ORANGES, LEMON, TANGERINES, ETC.)         | CITRUS FRUITS (ORANGES, LEMON, TANGERINES, ETC.)         |
+ |  703 | Mangoes                                                | Mangoes, avocadoes and other fruits                      | Mangoes, avocadoes and other fruits                      | MANGOES, AVOCADOES AND OTHER FRUITS                      | MANGOES, AVOCADOES AND OTHER FRUITS                      |
+ |  704 | Sugarcane                                              | Sugarcane                                                | Sugarcane                                                | SUGARCANE                                                | SUGARCANE                                                |
+ |  801 | Goat meat                                              | Goat meat                                                | Goat meat                                                | GOAT MEAT                                                | GOAT MEAT                                                |
+ |  802 | Beef                                                   | Beef including minced sausage                            | Beef including minced sausage                            | BEEF INCLUDING MINCED SAUSAGE                            | BEEF INCLUDING MINCED SAUSAGE                            |
+ |  803 | Pork                                                   | Pork including sauages and bacon                         | Pork including sausages and bacon                        | PORK INCLUDING SAUSAGES AND BACON                        | PORK INCLUDING SAUSAGES AND BACON                        |
+ |  804 | Chicken                                                | Chicken and other poultry                                | Chicken and other poultry                                | CHICKEN AND OTHER POULTRY                                | CHICKEN AND OTHER POULTRY                                |
+ |  805 | Wild birds and insects                                 | Wild birds and insects                                   | Wild birds and insects                                   | WILD BIRDS AND INSECTS                                   | WILD BIRDS AND INSECTS                                   |
+ |  806 | Cricket                                                | Other domestic/wild meat products                        | Other domestic/wild meat products                        | OTHER DOMESTIC/WILD MEAT PRODUCTS                        | OTHER DOMESTIC/WILD MEAT PRODUCTS                        |
+ |  807 | Eggs                                                   | Eggs                                                     | Eggs                                                     | EGGS                                                     | EGGS                                                     |
+ |  808 | Fresh fish                                             | Fresh fish and seafood (including dagaa)                 | Fresh fish and seafood (including dagaa)                 | FRESH FISH AND SEAFOOD (INCLUDING DAGAA)                 | FRESH FISH AND SEAFOOD (INCLUDING DAGAA)                 |
+ |  809 | Dried/salted/canned fish                               | Dried/salted/canned fish and seafood (incl. dagaa)       | Dried/salted/canned fish and seafood (incl. dagaa)       | DRIED/SALTED/CANNED FISH AND SEAFOOD (INCL. DAGAA)       | DRIED/SALTED/CANNED FISH AND SEAFOOD (INCL. DAGAA)       |
+ |  810 | Fish                                                   | Package fish                                             | Package fish                                             | PACKAGE FISH                                             | PACKAGE FISH                                             |
+ |  901 | Fresh milk                                             | Fresh milk                                               | Fresh milk                                               | FRESH MILK                                               | FRESH MILK                                               |
+ |  902 | Dairy                                                  | Milk products (like cream, cheese, yoghurt etc)          | Milk products (like cream, cheese, yoghurt etc)          | MILK PRODUCTS (LIKE CREAM, CHEESE, YOGHURT ETC)          | MILK PRODUCTS (LIKE CREAM, CHEESE, YOGHURT ETC)          |
+ |  903 | Canned milk/milk powder                                | Canned milk/milk powder                                  | Canned milk/milk powder                                  | CANNED MILK/MILK POWDER                                  | CANNED MILK/MILK POWDER                                  |
+ | 1001 | Cooking oil                                            | Cooking oil                                              | Cooking oil                                              | COOKING OIL                                              | COOKING OIL                                              |
+ | 1002 | Butter                                                 | Butter, margarine, ghee and other fat products           | Butter, margarine, ghee and other fat products           | BUTTER, MARGARINE, GHEE AND OTHER FAT PRODUCTS           | BUTTER, MARGARINE, GHEE AND OTHER FAT PRODUCTS           |
+ | 1003 | Salt                                                   | Salt                                                     | Salt                                                     | SALT                                                     | SALT                                                     |
+ | 1004 | Other spices                                           | Other spices                                             | Other spices                                             | OTHER SPICES                                             | OTHER SPICES                                             |
+ | 1081 | Wheat (flour)                                          | ---                                                      | ---                                                      | ---                                                      | WHEAT FLOUR                                              |
+ | 1082 | Wheat, barley, other grains                            | ---                                                      | ---                                                      | ---                                                      | WHEAT, BARLEY GRAIN AND OTHER CEREALS                    |
+ | 1101 | Tea (dry)                                              | Tea dry                                                  | Tea dry                                                  | TEA DRY                                                  | TEA DRY                                                  |
+ | 1102 | Coffee and cocoa                                       | Coffee and cocoa                                         | Coffee and cocoa                                         | COFFEE AND COCOA                                         | COFFEE AND COCOA                                         |
+ | 1103 | Other raw materials for drinks                         | Other raw materals for drinks                            | Other raw materials for drinks                           | OTHER RAW MATERIALS FOR DRINKS                           | OTHER RAW MATERIALS FOR DRINKS                           |
+ | 1104 | Soft drinks                                            | Bottled/canned soft drinks (soda, juice, water)          | Bottled/canned soft drinks (soda, juice, water)          | BOTTLED/CANNED SOFT DRINKS (SODA, JUICE, WATER)          | BOTTLED/CANNED SOFT DRINKS (SODA, JUICE, WATER)          |
+ | 1105 | Prepared tea, coffee                                   | Prepared tea, coffee                                     | Prepared tea, coffee                                     | PREPARED TEA, COFFEE                                     | PREPARED TEA, COFFEE                                     |
+ | 1106 | Bottled beer                                           | Bottled beer                                             | Bottled beer                                             | BOTTLED BEER                                             | BOTTLED BEER                                             |
+ | 1107 | Local beer                                             | Local brews                                              | Local brews                                              | LOCAL BREWS                                              | LOCAL BREWS                                              |
+ | 1108 | Wine and spirits                                       | Wine and spirits                                         | Wine and spirits                                         | WINE AND SPIRITS                                         | WINE AND SPIRITS                                         |
+
+*** Map expenditure labels to Preferred
+#+begin_src python :var labels=food_labels :colnames no :tangle /tmp/bar.py
+from cfe.df_utils import orgtbl_to_df
+import json
+import numpy as np
+
+df = orgtbl_to_df(labels).set_index('Preferred Label')
+
+D = {}
+# Map year labels to Preferred
+for t in df.filter(regex="^2"):
+    labels = df[t].replace('---','').to_dict()
+    D.update({v:k for k,v in labels.items() if len(v) and k is not v})
+    
+with open('food_items.json','w') as f:
+    json.dump(D,f)
+#+end_src
+
+#+results:
+
+* RDI
+
+   A compilation of dietary guidelines are provided at
+   https://www.dietaryguidelines.gov/sites/default/files/2019-05/2015-2020_Dietary_Guidelines.pdf;
+   these provide recommended levels of 31 different nutrients by age
+   and sex.  Here are selected nutrients from those guidelines.  With
+   these selections and tweaked labels this should be regarded as the
+   canonical input to project.
+
+#+name: rdi
+| n            | Nutrition                      | Source | F 00-03 | M 00-03 | F 04-08 | M 04-08 | F 09-13 | M 09-13 | F 14-18 | M 14-18 | F 19-30 | M 19-30 | F 31-50 | M 31-50 |  F 51+ |  M 51+ |
+|--------------+--------------------------------+--------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+--------+--------|
+| Energy       | Energy                         | ---    |  1000.0 |  1000.0 |  1200.0 |  1400.0 |  1600.0 |  1800.0 |  1800.0 |  2200.0 |  2000.0 |  2400.0 |  1800.0 |  2200.0 | 1600.0 | 2000.0 |
+| Protein      | Protein                        | RDA    |    13.0 |    13.0 |    19.0 |    19.0 |    34.0 |    34.0 |    46.0 |    52.0 |    46.0 |    56.0 |    46.0 |    56.0 |   46.0 |   56.0 |
+| Fiber        | Fiber, total dietary           | ---    |    14.0 |    14.0 |    16.8 |    19.6 |    22.4 |    25.2 |    25.2 |    30.8 |    28.0 |    33.6 |    25.2 |    30.8 |   22.4 |   28.0 |
+| Folate       | Folate, DFE                    | RDA    |   150.0 |   150.0 |   200.0 |   200.0 |   300.0 |   300.0 |   400.0 |   400.0 |   400.0 |   400.0 |   400.0 |   400.0 |  400.0 |  400.0 |
+| Calcium      | Calcium, Ca                    | RDA    |   700.0 |   700.0 |  1000.0 |  1000.0 |  1300.0 |  1300.0 |  1300.0 |  1300.0 |  1000.0 |  1000.0 |  1000.0 |  1000.0 | 1200.0 | 1000.0 |
+| Carbohydrate | Carbohydrate, by difference    | RDA    |   130.0 |   130.0 |   130.0 |   130.0 |   130.0 |   130.0 |   130.0 |   130.0 |   130.0 |   130.0 |   130.0 |   130.0 |  130.0 |  130.0 |
+| Iron         | Iron, Fe                       | RDA    |     7.0 |     7.0 |    10.0 |    10.0 |     8.0 |     8.0 |    15.0 |    11.0 |    18.0 |     8.0 |    18.0 |     8.0 |    8.0 |    8.0 |
+| Magnesium    | Magnesium, Mg                  | RDA    |    80.0 |    80.0 |   130.0 |   130.0 |   240.0 |   240.0 |   360.0 |   410.0 |   310.0 |   400.0 |   320.0 |   420.0 |  320.0 |  420.0 |
+| Niacin       | Niacin                         | RDA    |     6.0 |     6.0 |     8.0 |     8.0 |    12.0 |    12.0 |    14.0 |    16.0 |    14.0 |    16.0 |    14.0 |    16.0 |   14.0 |   16.0 |
+| Phosphorus   | Phosphorus, P                  | RDA    |   460.0 |   460.0 |   500.0 |   500.0 |  1250.0 |  1250.0 |  1250.0 |  1250.0 |   700.0 |   700.0 |   700.0 |   700.0 |  700.0 |  700.0 |
+| Potassium    | Potassium, K                   | AI     |  3000.0 |  3000.0 |  3800.0 |  3800.0 |  4500.0 |  4500.0 |  4700.0 |  4700.0 |  4700.0 |  4700.0 |  4700.0 |  4700.0 | 4700.0 | 4700.0 |
+| Riboflavin   | Riboflavin                     | RDA    |     0.5 |     0.5 |     0.6 |     0.6 |     0.9 |     0.9 |     1.0 |     1.3 |     1.1 |     1.3 |     1.1 |     1.3 |    1.1 |    1.3 |
+| Thiamin      | Thiamin                        | RDA    |     0.5 |     0.5 |     0.6 |     0.6 |     0.9 |     0.9 |     1.0 |     1.2 |     1.1 |     1.2 |     1.1 |     1.2 |    1.1 |    1.2 |
+| Vitamin A    | Vitamin A, RAE                 | RDA    |   300.0 |   300.0 |   400.0 |   400.0 |   600.0 |   600.0 |   700.0 |   900.0 |   700.0 |   900.0 |   700.0 |   900.0 |  700.0 |  900.0 |
+| Vitamin B-12 | Vitamin B-12                   | RDA    |     0.9 |     0.9 |     1.2 |     1.2 |     1.8 |     1.8 |     2.4 |     2.4 |     2.4 |     2.4 |     2.4 |     2.4 |    2.4 |    2.4 |
+| Vitamin B-6  | Vitamin B-6                    | RDA    |     0.5 |     0.5 |     0.6 |     0.6 |     1.0 |     1.0 |     1.2 |     1.3 |     1.3 |     1.3 |     1.3 |     1.3 |    1.5 |    1.7 |
+| Vitamin C    | Vitamin C, total ascorbic acid | RDA    |    15.0 |    15.0 |    25.0 |    25.0 |    45.0 |    45.0 |    65.0 |    75.0 |    75.0 |    90.0 |    75.0 |    90.0 |   75.0 |   90.0 |
+| Vitamin E    | Vitamin E (alpha-tocopherol)   | RDA    |     6.0 |     6.0 |     7.0 |     7.0 |    11.0 |    11.0 |    15.0 |    15.0 |    15.0 |    15.0 |    15.0 |    15.0 |   15.0 |   15.0 |
+| Vitamin K    | Vitamin K (phylloquinone)      | AI     |    30.0 |    30.0 |    55.0 |    55.0 |    60.0 |    60.0 |    75.0 |    75.0 |    90.0 |   120.0 |    90.0 |   120.0 |   90.0 |  120.0 |
+| Zinc         | Zinc, Zn                       | RDA    |     3.0 |     3.0 |     5.0 |     5.0 |     8.0 |     8.0 |     9.0 |    11.0 |     8.0 |    11.0 |     8.0 |    11.0 |    8.0 |   11.0 |
+
+Note that this table pins down labels for nutrients =n= as well as
+age-sex categories =k=.
+
+#+begin_src python :results raw output :var RDI=rdi :colnames no 
+import cfe
+
+rdi = cfe.df_utils.orgtbl_to_df(RDI)
+
+n_index_labels = rdi.n.tolist()
+
+k_index_labels = rdi.columns.tolist()[3:]
+
+print(r"#+name: k_index")
+for l in k_index_labels:
+    print("  - %s" % l)
+
+print(r"#+name: n_index")
+for l in n_index_labels:
+    print("  - %s" % l)
+
+#+end_src
+
+#+name: k_index
+  - F 00-03
+  - M 00-03
+  - F 04-08
+  - M 04-08
+  - F 09-13
+  - M 09-13
+  - F 14-18
+  - M 14-18
+  - F 19-30
+  - M 19-30
+  - F 31-50
+  - M 31-50
+  - F 51+
+  - M 51+
+
+#+name: n_index
+  - Energy
+  - Protein
+  - Fiber
+  - Folate
+  - Calcium
+  - Carbohydrate
+  - Iron
+  - Magnesium
+  - Niacin
+  - Phosphorus
+  - Potassium
+  - Riboflavin
+  - Thiamin
+  - Vitamin A
+  - Vitamin B-12
+  - Vitamin B-6
+  - Vitamin C
+  - Vitamin E
+  - Vitamin K
+  - Zinc
+
+** Write RDI to google sheet
+#+begin_src python :results raw output :var RDI=rdi url = data_url :colnames no :tangle /tmp/foo.py
+import cfe
+from eep153_tools import write_sheet
+   
+url = url[0][0]
+
+rdi = cfe.df_utils.orgtbl_to_df(RDI).set_index('n')
+
+# Drop informational colums
+rdi = rdi.iloc[:,3:]
+
+write_sheet(rdi,
+            'ligon@berkeley.edu','writer',json_creds='instructors.json',
+            key=url,sheet='RDI')
+#+end_src
+
+#+results:
+
+* FCT
+
+A food conversion table for Tanzania is available from
+https://cdn1.sph.harvard.edu/wp-content/uploads/sites/30/2012/10/tanzania-food-composition-tables.pdf.
+An adaptation to the foods observed in the Tanzanian expenditure data
+is given below:
+
+** FCT Table
+#+begin_src python
+from eep153_tools import read_sheets
+
+fct = read_sheets('https://docs.google.com/spreadsheets/d/18EuF3OLGDB6-hb9PToJzDMfyvN8cDqEpzPmQl9leJBU/',
+                  json_creds='instructors.json',
+                  sheet='For Use in Code')
+
+print(fct.to_markdown())
+#+end_src
+
+#+name: fct
+| FCT Code | FCT Label                                              | energy kcal | protein g | vit a ug | vit d ug | vit e ug | vit c mg | vit b6 mg | vit b12 ug | ca mg | mg mg | fe mg | zn mg |
+|----------+--------------------------------------------------------+-------------+-----------+----------+----------+----------+----------+-----------+------------+-------+-------+-------+-------|
+|      101 | Rice (paddy)                                           |         358 |       6.5 |        0 |        0 |        0 |        0 |       0.1 |          0 |     8 |    36 |   0.6 |   1.1 |
+|      102 | Rice (husked)                                          |         358 |       6.5 |        0 |        0 |        0 |        0 |       0.1 |          0 |     8 |    36 |   0.6 |   1.1 |
+|      103 | Maize (green, cob)                                     |          59 |       1.8 |        7 |        0 |        0 |        3 |         0 |          0 |     1 |    18 |   0.3 |   0.3 |
+|      104 | Maize (grain)                                          |         362 |       8.1 |        0 |        0 |        1 |        0 |       0.3 |          0 |     6 |   127 |   3.5 |   1.8 |
+|      105 | Maize (flour)                                          |         362 |       8.1 |        0 |        0 |        1 |        0 |       0.3 |          0 |     6 |   127 |   3.5 |   1.8 |
+|      106 | Millet and sorghum (grain)                             |         328 |       6.6 |        5 |        0 |        0 |        0 |       0.2 |          0 |   275 |    27 |   2.7 |   1.2 |
+|      107 | Millet and sorghum (flour)                             |         328 |       6.6 |        5 |        0 |        0 |        0 |       0.2 |          0 |   275 |    27 |   2.7 |   1.2 |
+|      109 | Bread                                                  |         274 |         8 |        0 |        0 |        0 |        0 |         0 |          0 |    10 |    27 |   0.5 |   0.9 |
+|      110 | Pastries                                               |         320 |       4.7 |       34 |        0 |        1 |        0 |         0 |        0.2 |    38 |     9 |   0.4 |   0.4 |
+|      111 | Pasta                                                  |         371 |      10.5 |        0 |        0 |        0 |        0 |         0 |          0 |    15 |    22 |   1.2 |   0.1 |
+|      112 | Other cereal products                                  |         nan |       nan |      nan |      nan |      nan |      nan |       nan |        nan |   nan |   nan |   nan |   nan |
+|      201 | Cassava fresh                                          |         160 |       1.4 |        1 |        0 |      0.2 |     20.6 |       0.1 |          0 |    16 |    21 |   0.3 |   0.3 |
+|      202 | Cassava dry/flour                                      |         314 |       2.6 |       14 |        0 |        0 |       72 |       0.7 |          0 |    46 |    24 |   1.9 |   0.7 |
+|      203 | Sweet potatoes                                         |          74 |       1.2 |     1056 |        0 |        4 |       18 |       0.2 |          0 |    20 |    14 |   0.4 |   0.2 |
+|      204 | Yams/cocoyams                                          |          97 |       2.1 |        0 |        0 |        5 |       12 |       0.2 |          0 |     8 |    26 |   0.8 |   0.5 |
+|      205 | Irish potatoes                                         |          93 |         2 |        0 |        0 |      6.7 |     18.6 |       0.7 |          0 |     5 |    25 |   0.4 |   0.3 |
+|      206 | Plantains                                              |         nan |       nan |      nan |      nan |      nan |      nan |       nan |        nan |   nan |   nan |   nan |   nan |
+|      207 | Other starches                                         |         381 |       0.3 |        0 |        0 |        0 |        0 |         0 |          0 |     2 |     3 |   0.5 |   0.1 |
+|      301 | Sugar                                                  |         387 |         0 |        0 |        0 |        0 |        0 |         0 |          0 |     1 |     0 |   0.1 |     0 |
+|      302 | Sweets                                                 |         479 |       4.2 |        0 |        0 |      0.3 |        0 |         0 |          0 |    32 |   115 |   3.1 |   1.6 |
+|      303 | Honey, syrups, jams, marmalade, jellies, canned fruits |         304 |       0.3 |        0 |        0 |        0 |        1 |         0 |          0 |     6 |     2 |   0.4 |   0.2 |
+|      401 | Peas, beans, lentils and other pulses                  |         116 |         9 |        3 |        0 |        0 |        5 |       0.5 |          0 |    51 |    96 |   8.8 |   3.5 |
+|      501 | Groundnuts                                             |         567 |      25.8 |        0 |        0 |        9 |        0 |       0.3 |          0 |    92 |   168 |   4.6 |   3.3 |
+|      502 | Coconuts                                               |          70 |       0.5 |        0 |        0 |        0 |        1 |         0 |          0 |   126 |     3 |   0.4 |   0.1 |
+|      503 | Nuts                                                   |         589 |        20 |        0 |        0 |       24 |        1 |       0.1 |          0 |   266 |   296 |   3.7 |   2.9 |
+|      504 | Seeds and nut products                                 |         588 |      26.4 |        7 |        0 |        2 |        0 |       0.2 |          0 |   131 |   347 |   7.8 |  10.3 |
+|      601 | Onions, tomatoes, carrots, green pepper, other viungo  |          40 |       1.3 |        0 |        0 |        0 |      7.4 |       0.1 |          0 |    23 |    10 |   0.2 |   0.2 |
+|      602 | Spinach, cabbage, other green vegetables               |          23 |         3 |      819 |        0 |        1 |       10 |       0.2 |          0 |   136 |    87 |   3.6 |   0.8 |
+|      603 | Canned, dried and wild vegetables                      |          23 |       8.5 |      146 |        0 |        0 |     44.5 |       0.2 |          0 |  96.9 |    55 |   2.3 |   0.6 |
+|      701 | Ripe bananas                                           |          89 |       1.1 |        3 |        0 |      0.1 |      8.7 |       0.4 |          0 |     5 |    27 |   0.3 |   0.2 |
+|      702 | Citrus fruits                                          |          47 |       0.9 |        8 |        0 |        0 |       53 |       0.1 |          0 |    40 |    10 |   0.1 |   0.1 |
+|      703 | Mangoes                                                |          65 |       0.5 |       38 |        0 |      1.1 |     27.7 |       0.1 |          0 |    10 |     9 |   0.1 |     0 |
+|      704 | Sugarcane                                              |          26 |         0 |        0 |        0 |        0 |        0 |         0 |          0 |     6 |     2 |   0.1 |     0 |
+|      801 | Goat meat                                              |         269 |      24.9 |        0 |        0 |        0 |        0 |       0.3 |        1.9 |     4 |    23 |   1.7 |   4.1 |
+|      802 | Beef                                                   |         323 |      24.9 |        0 |        0 |        0 |        0 |       0.3 |        1.9 |     4 |    23 |   1.7 |   4.1 |
+|      803 | Pork                                                   |         537 |      19.6 |        1 |        1 |        0 |        0 |       0.3 |        0.6 |    18 |    17 |   0.8 |   2.1 |
+|      804 | Chicken                                                |         167 |      24.5 |       27 |        0 |        0 |        0 |       0.2 |        0.2 |     9 |    14 |     1 |   1.3 |
+|      805 | Wild birds and insects                                 |         nan |       nan |      nan |      nan |      nan |      nan |       nan |        nan |   nan |   nan |   nan |   nan |
+|      806 | Cricket                                                |         7.5 |       9.6 |        1 |        1 |        0 |        2 |       0.3 |        1.6 |    90 |    62 |   2.5 |   8.4 |
+|      807 | Eggs                                                   |         278 |      19.2 |      810 |        8 |        2 |        0 |       0.4 |        8.1 |    96 |    26 |   5.9 |   2.1 |
+|      808 | Fresh fish                                             |         112 |      21.4 |       43 |       12 |        1 |        0 |       0.3 |        1.1 |    48 |    86 |   0.9 |   0.4 |
+|      809 | Dried/salted/canned fish                               |         309 |      66.4 |        0 |        0 |        4 |        0 |       7.3 |         35 |    41 |   122 |   1.4 |   1.7 |
+|      810 | Fish                                                   |          98 |      18.1 |        0 |        0 |        0 |       17 |       0.5 |          0 |     7 |    21 |   0.3 |   0.3 |
+|      901 | Fresh milk                                             |          60 |       3.2 |       28 |        0 |      0.1 |        0 |         0 |        0.4 |   115 |    12 |     0 |     0 |
+|      902 | Dairy                                                  |         349 |       7.6 |      366 |        0 |      0.3 |        0 |         0 |        0.4 |    80 |     6 |   1.2 |   0.5 |
+|      903 | Canned milk/milk powder                                |         496 |      26.3 |      407 |        0 |        0 |        7 |       0.4 |          3 |   851 |    81 |   0.7 |     3 |
+|     1001 | Cooking oil                                            |         862 |         0 |        0 |        0 |        1 |        0 |         0 |          0 |     0 |     0 |     0 |     0 |
+|     1002 | Butter                                                 |         876 |       0.3 |      925 |        2 |        3 |        0 |         0 |          0 |     8 |     1 |   0.1 |     0 |
+|     1003 | Salt                                                   |           0 |         0 |        0 |        0 |        0 |        0 |         0 |          0 |    45 |     2 |   0.1 |     0 |
+|     1004 | Other spices                                           |         nan |       nan |      nan |      nan |      nan |      nan |       nan |        nan |   nan |   nan |   nan |   nan |
+|     1081 | Wheat (flour)                                          |         399 |      13.7 |        0 |        0 |        0 |        0 |       0.3 |          0 |    15 |    22 |   1.2 |   0.7 |
+|     1082 | Wheat, barley, other grains                            |         349 |      12.3 |        0 |        0 |        1 |        0 |       0.2 |          0 |    26 |    92 |   2.8 |     2 |
+|     1101 | Tea (dry)                                              |           1 |         0 |        0 |        0 |        0 |        0 |         0 |          0 |     2 |     2 |     0 |     0 |
+|     1102 | Coffee and cocoa                                       |         200 |        10 |        0 |        0 |        0 |        0 |         0 |          0 |   300 |   400 |    10 |     0 |
+|     1103 | Other raw materials for drinks                         |         nan |       nan |      nan |      nan |      nan |      nan |       nan |        nan |   nan |   nan |   nan |   nan |
+|     1104 | Soft drinks                                            |          54 |       0.2 |      168 |        0 |        0 |       15 |       0.1 |          0 |     4 |     4 |     0 |     0 |
+|     1105 | Prepared tea, coffee                                   |         200 |        10 |        0 |        0 |        0 |        0 |         0 |          0 |   300 |   400 |    10 |     0 |
+|     1106 | Bottled beer                                           |          41 |       0.3 |        0 |        0 |        0 |        0 |       0.1 |          0 |     5 |     6 |     0 |     0 |
+|     1107 | Local beer                                             |          41 |       0.3 |        0 |        0 |        0 |        0 |       0.1 |          0 |     5 |     6 |     0 |     0 |
+|     1108 | Wine and spirits                                       |          19 |         0 |        0 |        0 |        0 |      0.5 |         0 |          0 |     8 |    10 |   0.4 |   0.1 |
+
+
+** Nutrient mapping
+We need mappings of the nutrient labels from the FCT into the
+nutrients in the RDA:
+
+#+begin_src python :results raw output :var fct = fct n_index = n_index :colnames no
+import cfe
+import pandas as pd
+
+fct = cfe.df_utils.orgtbl_to_df(fct)
+
+n_index = pd.Series([l[0] for l in n_index])
+print(n_index.to_markdown())
+
+print(pd.Series(fct.columns.tolist()).to_markdown())
+#+end_src
+
+
+#+name: fct_n_dict
+| FCT labels  | n            |
+|-------------+--------------|
+| energy kcal | Energy       |
+| protein g   | Protein      |
+| vit a ug    | Vitamin A    |
+| vit d ug    | Vitamin D    |
+| vit e ug    | Vitamin E    |
+| vit c mg    | Vitamin C    |
+| vit b6 mg   | Vitamin B-6  |
+| vit b12 ug  | Vitamin B-12 |
+| ca mg       | Calcium      |
+| mg mg       | Magnesium    |
+| fe mg       | Iron         |
+| zn mg       | Zinc         |
+
+** Age-Sex category mapping
+We need mappings of the nutrient labels from the FCT into the
+nutrients in the RDA:
+
+#+begin_src python :results raw output :var fct = fct k_index = k_index :colnames no
+import cfe
+import pandas as pd
+
+k_index = pd.Series([l[0] for l in k_index])
+print(k_index.to_markdown())
+#+end_src
+
+#+name: fct_k_dict
+| FCT     | k       |
+|---------+---------|
+| C 01-03 | F 00-03 |
+| C 01-03 | M 00-03 |
+| F 04-08 | F 04-08 |
+| M 04-08 | M 04-08 |
+| F 09-13 | F 09-13 |
+| M 09-13 | M 09-13 |
+| F 14-18 | F 14-18 |
+| M 14-18 | M 14-18 |
+| F 19-30 | F 19-30 |
+| M 19-30 | M 19-30 |
+| F 31-50 | F 31-50 |
+| M 31-50 | M 31-50 |
+| F 51+   | F 51+   |
+| M 51+   | M 51+   |
+
+** Reconciliation of FCT and Expenditures
+*** Construct mapping of expenditures into categories
+
+ #+name: expenditure_dictionary
+ #+BEGIN_SRC python :noweb no-export :results output :tangle test.py :var X=food_expenditure_labels :var MAP_TO="Aggregate Label" :colnames no :tangle /tmp/foo.py
+# MAP_TO = "Preferred Label" # Uncomment to avoid any aggregation
+from collections import defaultdict
+import json
+
+d=defaultdict(list)
+for r in X[1:]:
+    for i in range(len(X[0])): 
+        d[X[0][i]]+=[r[i]]
+
+ed=defaultdict(list)
+for (l,n) in zip(d[MAP_TO],d['Code']):
+    ed[l]+=[n]
+
+with open('./expenditure_codes.json','w') as f:
+    json.dump(ed,f)
+ #+END_SRC
+
+ #+results: expenditure_dictionary
+
+*** Mapping of preferred labels into FCT Codes
+ #+begin_src python :results raw output :var xlabels=food_labels fct=fct :colnames no :tangle /tmp/foo.py
+from cfe.df_utils import orgtbl_to_df
+
+xlabels = set(orgtbl_to_df(xlabels)['Preferred Label'].tolist())
+fctlabels = set(orgtbl_to_df(fct)['FCT Label'].tolist())
+
+diff1 = sorted(list(xlabels.difference(fctlabels)))
+diff2 = sorted(list(fctlabels.difference(xlabels)))
+
+ #+end_src
+
+
+*** Select Foods from FCT, harmonize labels, write to google sheet
+Here we munge the FCT to match labels in expenditures and RDI.   We
+also make the units match up with units (Kg) we expect for expenditure
+quantities. 
+#+begin_src python :results raw output :var fct=fct fct_n_dict=fct_n_dict url = data_url :colnames no :tangle /tmp/foo.py
+import pandas as pd
+from cfe.df_utils import orgtbl_to_df
+from eep153_tools import write_sheet
+
+url = url[0][0]
+
+fct = orgtbl_to_df(fct)
+fct = fct.drop('FCT Code',axis=1)
+
+# Rename food codes to expenditure labels
+fct = fct.set_index('FCT Label')
+fct.index.name = 'i'
+
+# Drop any duplicates
+fct = fct[~fct.index.duplicated()]
+fct = fct.sort_index()
+
+# Rename & select nutrients
+fct_n_dict = dict(fct_n_dict[1:])
+try:
+    del fct_n_dict['']
+except KeyError: pass
+
+fct = fct[fct_n_dict.keys()].rename(columns=fct_n_dict)
+fct.columns.name = 'n'
+
+# Anything that's stringlike we make a number
+fct = fct.apply(lambda x: pd.to_numeric(x,errors='coerce'))
+
+# Convert serving size to Kgs instead of hectograms
+fct = fct*10
+
+# Replace any missing values with zeros
+fct = fct.fillna(0)
+
+write_sheet(fct,
+            'ligon@berkeley.edu','writer',json_creds='instructors.json',
+            key=url,sheet='FCT')
+#+end_src
+
+#+results:
+
+
+
+*** Harmonize labels, write Expenditures to google sheet
+Here we munge expenditure labels to be harmonious with the FCT and
+write to a google sheet.
+
+#+begin_src python :results raw output :var url = data_url :colnames no :tangle /tmp/foo.py
+import pandas as pd
+import numpy as np
+from eep153_tools import write_sheet
+from cfe.df_utils import orgtbl_to_df
+
+url = url[0][0]
+
+x = pd.read_parquet('food_expenditures.parquet').unstack('i')
+
+# Set market if not in evidence
+if 'm' not in x.index.names:
+    x['m'] = 'Tanzania'
+    x = x.reset_index().set_index(['j','t','m'])
+
+# Change to new expenditure labels
+x = x.groupby('i',axis=1).sum()
+
+# Replace zeros with NaNs
+x = x.replace(0,np.nan)
+
+write_sheet(x,
+            'ligon@berkeley.edu','writer',json_creds='instructors.json',
+            key=url,sheet='Expenditures')
+#+end_src
+
+#+results:
+
+* Consumption
+** Consumption units mapping
+   The =i= labels for quantities consumed are the same as the =i=
+   labels for expenditures, but we have a new set of unit labels =u=.
+
+    There are different codes for different units in different rounds
+    of the Uganda data; further the corresponding labels are sometimes
+    irregular.
+
+
+ #+begin_src python :tangle compare_unit_labels.py
+from cfe.df_utils import df_to_orgtbl
+import pandas as pd
+
+d = {}
+for t in ['2005-06','2009-10','2010-11','2011-12','2013-14','2015-16']:
+    d[t] = pd.read_csv('../'+t+'/_/unitlabels.csv',index_col=0).squeeze()
+
+d = pd.DataFrame(d)
+#print(df_to_orgtbl(d))
+
+ #+end_src
+
+ #+begin_src python :var tab=unitlabels :colnames no :prologue "# -*- coding: utf-8 -*-" :tangle unitlabels.py
+from cfe.df_utils import orgtbl_to_df
+
+units = orgtbl_to_df(tab).set_index('Code')['Preferred']
+
+units.to_csv('unitlabels.csv')
+
+ #+end_src
+
+** Check of consumption units
+To what extent can we rely on exclusively using kilograms as our
+preferred unit of measure, without conversion?  The following examines
+the frequency of different units being used for different consumption items.
+#+begin_src python :results output raw
+import pandas as pd
+import numpy as np
+
+df = pd.read_parquet('food_quantities.parquet')
+
+print(df.squeeze().replace(0,np.nan).groupby(['i','t','units']).count().replace(0,np.nan).dropna().unstack('units').idxmax(axis=1).unstack('t').to_markdown())
+#+end_src
+
+| i                        | 2005-06                             | 2009-10                             | 2010-11                     | 2011-12                     | 2013-14                             | 2015-16                             |
+| :----------------------- | :---------------------------------- | :---------------------------------- | :-------------------------- | :-------------------------- | :---------------------------------- | :---------------------------------- |
+| Apples                   | nan                                 | nan                                 | nan                         | nan                         | Piece (Medium)                      | Piece (Medium)                      |
+| Avocado                  | nan                                 | nan                                 | Piece (Medium)              | Piece (Medium)              | Piece (Small)                       | Piece (Big)                         |
+| Beans (dry)              | Kilogram (kg)                       | Kilogram (kg)                       | Kilogram (kg)               | Kilogram (kg)               | Kilogram (kg)                       | Kilogram (kg)                       |
+| Beans (fresh)            | Cup/Mug(0.5lt)                      | Cup/Mug(0.5lt)                      | Cup/Mug(0.5lt)              | Cup/Mug(0.5lt)              | Cup/Mug(0.5lt)                      | Cup/Mug(0.5lt)                      |
+| Beef                     | Kilogram (kg)                       | Kilogram (kg)                       | Kilogram (kg)               | Kilogram (kg)               | Kilogram (kg)                       | Kilogram (kg)                       |
+| Beer                     | Bottle(500ml)                       | Bottle(500ml)                       | Bottle(500ml)               | Bottle(500ml)               | Bottle(500ml)                       | Bottle(500ml)                       |
+| Bread                    | Buns (100 g)                        | Loaf (1kg)                          | Piece (Big)                 | Piece (Big)                 | Loaf (1kg)                          | Loaf (1kg)                          |
+| Cabbages                 | Number of Units (General)           | Number of Units (General)           | Piece (Medium)              | Piece (Medium)              | Piece (Small)                       | Piece (Medium)                      |
+| Carrots                  | nan                                 | nan                                 | Heap (Medium)               | Heap (Medium)               | Heap (Small)                        | Heap (Small)                        |
+| Cassava                  | nan                                 | nan                                 | nan                         | nan                         | Kilogram (kg)                       | Kilogram (kg)                       |
+| Cassava (dry/flour)      | Kilogram (kg)                       | Kilogram (kg)                       | Kilogram (kg)               | Kilogram (kg)               | nan                                 | nan                                 |
+| Cassava (fresh)          | Heap (unspecified)                  | Heap (unspecified)                  | Heap (unspecified)          | Heap (unspecified)          | Heap (Medium)                       | Heap (Medium)                       |
+| Chapati                  | nan                                 | nan                                 | nan                         | nan                         | Number of Units (General)           | Number of Units (General)           |
+| Chicken                  | Number of Units (General)           | Number of Units (General)           | Piece (Big)                 | Piece (Big)                 | Piece (Small)                       | Piece (Big)                         |
+| Cigarettes               | Number of Units (General)           | Number of Units (General)           | ---                         | ---                         | Packet(125g)                        | Number of Units (General)           |
+| Coffee                   | Packet(125g)                        | Packet(125g)                        | Packet(125g)                | Packet (100 g)              | Packet (100 g)                      | Packet (100 g)                      |
+| Cooking oil              | Akendo (Small)                      | Akendo (Small)                      | Akendo (Medium)             | Akendo (Medium)             | Akendo (Small)                      | Akendo (Big)                        |
+| Dodo                     | Bundle (Unspecified)                | Bundle (Unspecified)                | Bundle (Medium)             | Bundle (Medium)             | Bundle (Medium)                     | Bundle (Medium)                     |
+| Dry/Smoked fish          | Fish Whole (Small)                  | Fish Whole (Small)                  | Heap (Medium)               | Fish Whole (Medium)         | Fish Whole (Medium)                 | Heap (Medium)                       |
+| Eggplant                 | nan                                 | nan                                 | Heap (Small)                | Heap (Small)                | Piece (Medium)                      | Piece (Medium)                      |
+| Eggs                     | Number of Units (General)           | Number of Units (General)           | Number of Units (General)   | Piece (Medium)              | Piece (Medium)                      | Piece (Medium)                      |
+| Fresh Fish               | Fish Whole (Small)                  | Fish Whole (Small)                  | Fish Whole (Medium)         | Fish Whole (Medium)         | Fish Whole (Medium)                 | Fish Whole (Medium)                 |
+| Fresh Milk               | Cup/Mug(0.5lt)                      | Litre                               | Litre                       | Litre                       | Litre                               | Litre                               |
+| Ghee                     | Kilogram (kg)                       | Table spoon                         | Kilogram (kg)               | Kilogram (kg)               | Table spoon                         | Table spoon                         |
+| Goat Meat                | Kilogram (kg)                       | Kilogram (kg)                       | Kilogram (kg)               | Kilogram (kg)               | Kilogram (kg)                       | Kilogram (kg)                       |
+| Green pepper             | nan                                 | nan                                 | Piece (Small)               | Piece (Small)               | Piece (Small)                       | Piece (Small)                       |
+| Ground nut (paste)       | nan                                 | nan                                 | Container (Small)           | Container (Small)           | Container (Small)                   | Container (Small)                   |
+| Ground nuts (in shell)   | Kimbo/Cowboy/Blueband Tin (2kg)     | Cup/Mug(0.5lt)                      | Cup/Mug(0.5lt)              | Cup/Mug(0.5lt)              | Nice cup (60g) - Medium             | Cup/Mug(0.5lt)                      |
+| Ground nuts (pounded)    | Kilogram (kg)                       | Kilogram (kg)                       | Kilogram (kg)               | Kilogram (kg)               | Kilogram (kg)                       | Kilogram (kg)                       |
+| Ground nuts (shelled)    | Cup/Mug(0.5lt)                      | Kilogram (kg)                       | Cup/Mug(0.5lt)              | Cup/Mug(0.5lt)              | Cup/Mug(0.5lt)                      | Cup/Mug(0.5lt)                      |
+| Infant Formula           | Kilogram (kg)                       | Kilogram (kg)                       | Kilogram (kg)               | Kilogram (kg)               | Nido Tin (400g)                     | Kilogram (kg)                       |
+| Irish Potatoes           | Heap (unspecified)                  | Heap (unspecified)                  | Heap (Small)                | Kilogram (kg)               | Heap (Small)                        | Kilogram (kg)                       |
+| Maize (cobs)             | Number of Units (General)           | Number of Units (General)           | Piece (Medium)              | Piece (Medium)              | Piece (Medium)                      | Piece (Medium)                      |
+| Maize (flour)            | Kilogram (kg)                       | Kilogram (kg)                       | Kilogram (kg)               | Kilogram (kg)               | Kilogram (kg)                       | Kilogram (kg)                       |
+| Maize (grains)           | Cup/Mug(0.5lt)                      | Cup/Mug(0.5lt)                      | Cup/Mug(0.5lt)              | Cup/Mug(0.5lt)              | Kilogram (kg)                       | Cup/Mug(0.5lt)                      |
+| Mangos                   | Heap (unspecified)                  | Heap (unspecified)                  | Piece (Medium)              | Heap (unspecified)          | Piece (Small)                       | Heap (Medium)                       |
+| Margarine, Butter, etc   | Kimbo/Cowboy/Blueband Tin (0.5kg)   | Kimbo/Cowboy/Blueband Tin (0.5kg)   | Litre                       | Gram                        | Kimbo/Cowboy/Blueband Tin (0.5kg)   | Kimbo/Cowboy/Blueband Tin (0.5kg)   |
+| Matoke (??)              | nan                                 | Bunch (Big)                         | nan                         | nan                         | nan                                 | nan                                 |
+| Matoke (bunch)           | Bunch (Medium)                      | Bunch (Big)                         | Bunch (Medium)              | Bunch (Medium)              | Bunch (Small)                       | Bunch (Small)                       |
+| Matoke (cluster)         | Bunch (Medium)                      | Bunch (Medium)                      | Cluster (Medium)            | Cluster (Medium)            | Cluster (Medium)                    | Cluster (Medium)                    |
+| Matoke (heap)            | Bunch (Small)                       | Bunch (Small)                       | Heap (Medium)               | Heap (Medium)               | Heap (Medium)                       | Heap (Medium)                       |
+| Matoke (other)           | Heap (unspecified)                  | Heap (unspecified)                  | nan                         | Bunch (Small)               | Bunch (Small)                       | Piece (Small)                       |
+| Millet                   | Kilogram (kg)                       | Kilogram (kg)                       | Kilogram (kg)               | Kilogram (kg)               | Kilogram (kg)                       | Kilogram (kg)                       |
+| Onions                   | Heap (unspecified)                  | Heap (unspecified)                  | Heap (Medium)               | Heap (Small)                | Heap (Small)                        | Heap (Small)                        |
+| Oranges                  | Heap (unspecified)                  | Heap (unspecified)                  | Heap (Small)                | Heap (Small)                | Heap (Small)                        | Heap (Small)                        |
+| Other Alcoholic drinks   | Glass(0.25lt)                       | Cup/Mug(0.5lt)                      | Cup/Mug(0.5lt)              | Jug (2 lts)                 | Tot (50 ml)                         | Bottle(150ml)                       |
+| Other Fruits             | Number of Units (General)           | Number of Units (General)           | Piece (Medium)              | Number of Units (General)   | Piece (Medium)                      | Piece (Medium)                      |
+| Other Meat               | Kilogram (kg)                       | Kilogram (kg)                       | Kilogram (kg)               | Kilogram (kg)               | Kilogram (kg)                       | Kilogram (kg)                       |
+| Other Tobacco            | Tobacco leaf (Number)               | Tobacco leaf (Number)               | ---                         | ---                         | Tobacco leaf (Number)               | Tobacco leaf (Number)               |
+| Other drinks             | Cup/Mug(0.5lt)                      | Cup/Mug(0.5lt)                      | Cup/Mug(0.5lt)              | Bottle(300ml)               | Litre                               | Bottle(500ml)                       |
+| Other vegetables         | Bundle (Unspecified)                | Bundle (Unspecified)                | Bundle (Small)              | Bundle (Unspecified)        | Bundle (Medium)                     | Bundle (Medium)                     |
+| Passion Fruits           | Heap (unspecified)                  | Heap (unspecified)                  | Heap (Medium)               | Heap (Medium)               | Heap (Small)                        | Heap (Small)                        |
+| Pawpaw                   | nan                                 | nan                                 | Piece (Medium)              | Piece (Medium)              | Piece (Medium)                      | Piece (Medium)                      |
+| Peas                     | Cup/Mug(0.5lt)                      | Cup/Mug(0.5lt)                      | Cup/Mug(0.5lt)              | Cup/Mug(0.5lt)              | Cup/Mug(0.5lt)                      | Cup/Mug(0.5lt)                      |
+| Peas (dry)               | nan                                 | nan                                 | Cup/Mug(0.5lt)              | Cup/Mug(0.5lt)              | Cup/Mug(0.5lt)                      | Cup/Mug(0.5lt)                      |
+| Pineapple                | nan                                 | Number of Units (General)           | Piece (Medium)              | Piece (Medium)              | Piece (Medium)                      | Piece (Medium)                      |
+| Pork                     | Kilogram (kg)                       | Kilogram (kg)                       | Kilogram (kg)               | Kilogram (kg)               | Kilogram (kg)                       | Kilogram (kg)                       |
+| Pumpkins                 | nan                                 | nan                                 | Piece (Medium)              | Piece (Medium)              | Piece (Medium)                      | Piece (Medium)                      |
+| Restaurant (beer)        | Bottle(500ml)                       | Bottle(500ml)                       | Bottle(500ml)               | Bottle(500ml)               | Bottle(500ml)                       | Bottle(500ml)                       |
+| Restaurant (food)        | nan                                 | nan                                 | ---                         | nan                         | nan                                 | nan                                 |
+| Restaurant (soda)        | Bottle(300ml)                       | Bottle(300ml)                       | Bottle(300ml)               | Bottle(300ml)               | Bottle(300ml)                       | Bottle(300ml)                       |
+| Rice                     | Kilogram (kg)                       | Kilogram (kg)                       | Kilogram (kg)               | Kilogram (kg)               | Kilogram (kg)                       | Kilogram (kg)                       |
+| Salt                     | Packet (500 g)                      | Packet (500 g)                      | Packet (500 g)              | Packet (500 g)              | Packet (500 g)                      | Packet (500 g)                      |
+| Sim sim                  | Piece (Medium)                      | Cup/Mug(0.5lt)                      | Cup/Mug(0.5lt)              | Cup/Mug(0.5lt)              | Nice cup (60g) - Medium             | Cup/Mug(0.5lt)                      |
+| Soda                     | Bottle(300ml)                       | Bottle(300ml)                       | Bottle(300ml)               | Bottle(300ml)               | Bottle(300ml)                       | Bottle(300ml)                       |
+| Sorghum                  | Cup/Mug(0.5lt)                      | Kilogram (kg)                       | Cup/Mug(0.5lt)              | Kilogram (kg)               | Kilogram (kg)                       | Cup/Mug(0.5lt)                      |
+| Sugar                    | Kilogram (kg)                       | Kilogram (kg)                       | Kilogram (kg)               | Kilogram (kg)               | Kilogram (kg)                       | Kilogram (kg)                       |
+| Sweet Bananas            | Bunch (Big)                         | Bunch (Big)                         | Cluster (Small)             | Cluster (Small)             | Cluster (Medium)                    | Bunch (Small)                       |
+| Sweet Potatoes (dry)     | Plastic Basin (15 lts)              | Heap (unspecified)                  | Heap (unspecified)          | Plastic Basin (15 lts)      | Heap (Small)                        | Heap (Medium)                       |
+| Sweet Potatoes (flour)   | nan                                 | nan                                 | nan                         | nan                         | Kilogram (kg)                       | Kilogram (kg)                       |
+| Sweet Potatoes (fresh)   | Heap (unspecified)                  | Heap (unspecified)                  | Plastic Basin (15 lts)      | Heap (Medium)               | Heap (Medium)                       | Heap (Medium)                       |
+| Tea                      | Packet(125g)                        | Packet(125g)                        | Packet (100 g)              | Packet (100 g)              | Sacket (15g)                        | Sacket (15g)                        |
+| Tomatoes                 | Heap (unspecified)                  | Heap (unspecified)                  | Heap (Small)                | Heap (Medium)               | Heap (Small)                        | Heap (Medium)                       |
+| Water                    | nan                                 | nan                                 | nan                         | nan                         | Bottle (1ltr)                       | Bottle (1ltr)                       |
+| Watermelon               | nan                                 | nan                                 | Piece (Medium)              | Piece (Medium)              | Piece (Medium)                      | Piece (Medium)                      |
+| Wheat (flour)            | nan                                 | nan                                 | nan                         | nan                         | Kilogram (kg)                       | Kilogram (kg)                       |
+
+** Conversion of some consumption units
+   Here we provide a dictionary of mappings for some of the canonical
+   consumption units into kilograms.  These mappings then inform the
+   construction of food quantities in =food_quantities.py=.
+#+begin_src python :results output raw :var units = unitlabels :colnames no
+from cfe.df_utils import orgtbl_to_df
+import pandas as pd
+
+df = pd.Series(orgtbl_to_df(units)['Preferred'].unique())
+
+conversion_to_kgs = pd.DataFrame({'Unit':df,'Mapping':'lambda x: x'})
+conversion_to_kgs.to_json('conversion_to_kgs.json')
+
+print(conversion_to_kgs.to_markdown())
+#+end_src
+
+
+#+name: conversion_to_kgs
+| Unit                              | Mapping |
+|-----------------------------------+---------|
+| Kilogram (kg)                     |       1 |
+| Gram                              |    .001 |
+| Litre                             |       1 |
+| Akendo (Small)                    |     .22 |
+| Sack (120 kgs)                    |     120 |
+| Sack (100 kgs)                    |     100 |
+| Sack (80 kgs)                     |      80 |
+| Sack (50 kgs)                     |      50 |
+| Jerrican (20 lts)                 |      20 |
+| Jerrican (10 lts)                 |      10 |
+| Jerrican (5 lts)                  |       5 |
+| Jerrican (3 lts)                  |       3 |
+| Jerrican (2 lts)                  |       2 |
+| Jerrican (1 lt)                   |       1 |
+| Tin (Debe) (20 lts)               |      20 |
+| Tin (5 lts)                       |       5 |
+| Plastic Basin (15 lts)            |      15 |
+| Bottle(750ml)                     |     .75 |
+| Bottle(500ml)                     |      .5 |
+| Bottle(350ml)                     |     .35 |
+| Bottle(300ml)                     |      .3 |
+| Bottle(250ml)                     |     .25 |
+| Bottle(150ml)                     |     .15 |
+| Kimbo/Cowboy/Blueband Tin (2kg)   |       2 |
+| Kimbo/Cowboy/Blueband Tin (1kg)   |       1 |
+| Kimbo/Cowboy/Blueband Tin (0.5kg) |      .5 |
+| Cup/Mug(0.5lt)                    |      .5 |
+| Glass(0.25lt)                     |     .25 |
+| Ladle(100g)                       |     .10 |
+| Table spoon                       |    .015 |
+| Tea spoon                         |    .005 |
+| Basket (20 kg)                    |      20 |
+| Basket (10 kg)                    |      10 |
+| Basket (5 kg)                     |       5 |
+| Basket (2 kg)                     |       2 |
+| Loaf (1kg)                        |       1 |
+| Loaf (500g)                       |      .5 |
+| Buns (200 g)                      |      .2 |
+| Buns (100 g)                      |     .10 |
+| Buns (50 g)                       |     .05 |
+| Packet (2 kg)                     |       2 |
+| Packet (1 kg)                     |       1 |
+| Packet (500 g)                    |      .5 |
+| Packet (250 g)                    |     .25 |
+| Packet (100 g)                    |     .10 |
+| Packet(125g)                      |    .125 |
+| Fish Whole (Small)                |       1 |
+| Fish Whole (Medium)               |       2 |
+| Fish Whole (Large)                |       3 |
+| Fish Cut piece (up to 1kg)        |     .75 |
+| Fish Cut piece (1 - 2 kg)         |     1.5 |
+| Fish Cut piece(Above 2  kg)       |       3 |
+| Gourd (1-5lts)                    |     3.5 |
+| Gourd (5-10lts)                   |     7.5 |
+| Gourd (Above 10 lts)              |      15 |
+| Jug (2 lts)                       |       2 |
+| Jug (1.5 lts)                     |     1.5 |
+| Jug (1 lt)                        |       1 |
+| Tot (50 ml)                       |    .050 |
+| Tot (sachet)                      |    .020 |
+| Plastic Basin (5 ltrs)            |       5 |
+| Glass (500ml)                     |      .5 |
+| Glass (125ml)                     |    .125 |
+| Jug (2.5ltrs)                     |     2.5 |
+| Nice cup (100g) - Large           |     .10 |
+| Nice cup (60g) - Medium           |     .06 |
+| Nice cup (50g) - Small            |     .05 |
+| Metallic tumbler (100g) - Big     |     .10 |
+| Metallic tumbler (50g) - Small    |     .05 |
+| Plastic tumbler (50g) - Big       |     .05 |
+| Plastic tumbler (30g) - Small     |     .03 |
+| Plastic plate (60g) - Large       |     .06 |
+| Plastic plate (30g) - Small       |     .03 |
+| Metallic plate (100g) - Large     |     .10 |
+| Metallic plate (80g) - Small      |     .08 |
+| Plastic bowl (40g)                |     .04 |
+| Nomi Tin (1kg)                    |       1 |
+| Nomi Tin (500g)                   |      .5 |
+| Nomi Tin (250g)                   |     .25 |
+| Nido Tin (400g)                   |      .4 |
+| Akendo (Big)                      |     .33 |
+| Akendo (Medium)                   |     .25 |
+| Jerrican (500 ml)                 |      .5 |
+| Bottle (500g)                     |      .5 |
+| Bottle (350g)                     |     .35 |
+| Sadolin Tin (3ltrs)               |       3 |
+| Bottle (1ltr)                     |       1 |
+| Bottle (1.5ltr)                   |     1.5 |
+| Bottle (2ltr)                     |       2 |
+| Sacket (10g)                      |     .01 |
+| Sacket (15g)                      |    .015 |
+| Sacket (20g)                      |    .020 |
+| Sacket (25g)                      |    .025 |
+| Sacket (30g)                      |     .03 |
+| Sacket (50g)                      |     .05 |
+| Sacket (100g)                     |      .1 |
+| Sacket (150g)                     |     .15 |
+| GRAMS                             |    .001 |
+| KILOGRAMS                         |       1 |
+| LITRE                             |       1 |
+| MILLILITRE                        |    .001 |
+| GRAM                              |    .001 |
+| KILOGRAM                          |       1 |
+| LITRES                            |       1 |
+| MILLILITRES                       |    .001 |
+
+
+#+begin_src python :var conversion = conversion_to_kgs :colnames no
+import pandas as pd
+from cfe.df_utils import orgtbl_to_df
+
+df = orgtbl_to_df(conversion).set_index('Unit').squeeze()
+
+df.to_json('conversion_to_kgs.json')
+
+#+end_src
+
+#+results:
+
+** Harmonize labels, write consumption quantities to google sheet
+Here we munge consumption labels and write to a google sheet.
+But *NOTE*: this may be a big dataframe, and I recommend *not* doing
+this, but instead adding prices to the sheet (see below).
+
+#+begin_src python :results raw output :var i_labels=food_expenditure_labels url = data_url :colnames no :tangle /tmp/foo.py
+import pandas as pd
+import numpy as np
+from eep153_tools import write_sheet
+from cfe.df_utils import orgtbl_to_df
+
+i_labels = orgtbl_to_df(i_labels)[['Preferred Label','Aggregate Label']].set_index('Preferred Label')
+i_labels = i_labels.squeeze().to_dict()
+
+url = url[0][0]
+
+q = pd.read_parquet('food_quantities.parquet').squeeze().unstack('i')
+
+# Set market if not in evidence
+if 'm' not in q.index.names:
+    q['m'] = 'Uganda'
+    q = q.reset_index().set_index(['j','t','m','u'])
+
+# Change to new expenditure labels
+q = q.rename(columns=i_labels)
+q = q.groupby('i',axis=1).sum()
+
+# Replace zeros with NaNs
+q = q.replace(0,np.nan)
+
+write_sheet(q,
+            'ligon@berkeley.edu','writer',json_creds='instructors.json',
+            key=url,sheet='Consumption')
+#+end_src
+* Prices
+  For the Tanzanian data, the survey elicits (among other things) the
+  quantity, units, and amount spent on different goods /purchased/ in
+  the last seven days.  The file =food_unitvalues.py= uses this to
+  calculate unit values.  Here we use those unit values, but take the
+  median price within each =(t,m)=.
+** Harmonize labels, write prices to google sheet
+Here we munge labels for unit values, find medians, and write to a google sheet.
+
+#+begin_src python :results raw output :var url = data_url :colnames no :tangle /tmp/foo.py
+import pandas as pd
+import numpy as np
+from eep153_tools import write_sheet
+from cfe.df_utils import orgtbl_to_df
+
+url = url[0][0]
+
+p = pd.read_parquet('food_unitvalues.parquet').squeeze().unstack('i')
+
+# Set market if not in evidence
+if 'm' not in p.index.names:
+    p['m'] = 'Tanzania'
+    p = p.reset_index().set_index(['j','t','m'])
+
+
+# Replace zeros with NaNs
+p = p.replace(0,np.nan)
+
+p = p.groupby(['t','m']).median()
+
+write_sheet(p,
+            'ligon@berkeley.edu','writer',json_creds='instructors.json',
+            key=url,sheet='Prices')
+#+end_src
+
+#+results:
+
+
+* HH Characteristics
+Here we collect household characteristics, make sure labels match up
+with  the RDI table, and write to our google sheet.
+#+begin_src python :var url = data_url k_index=k_index :tangle /tmp/foo.py
+import pandas as pd
+from eep153_tools import write_sheet
+
+url = url[0][0]
+
+z = pd.read_parquet('./household_characteristics.parquet')
+
+# Set market if not in evidence
+if 'm' not in z.index.names:
+    z['m'] = 'Tanzania'
+    z = z.reset_index().set_index(['j','t','m'])
+
+z.columns = [l.replace('Males','M').replace('Females','F').replace('-99','+') for l in z.columns]
+
+# Check on intersection with k_index, adopt k_index ordering for
+# variables in intersection.
+k_index = [l[0] for l in k_index] 
+k_index += z.columns.difference(k_index).tolist()
+
+write_sheet(z[k_index],
+            'ligon@berkeley.edu','writer',json_creds='instructors.json',
+           key=url,sheet='HH Characteristics')
+#+end_src
+
+#+results:
+
+* Estimate Demands
+
+Drawing on the data in our google sheet, estimate demands and save a
+slimmed down version of the result instances locally.
+#+begin_src python :var url = data_url :tangle /tmp/demands.py
+import cfe
+import numpy as np
+from eep153_tools import read_sheets
+
+url = url[0][0]
+
+x = read_sheets(url,json_creds='instructors.json',sheet='Expenditures').set_index(['j','t','m'])
+x.columns.name = 'i'
+x = x.replace(0,np.nan)
+y = np.log(x)
+
+z = read_sheets(url,json_creds='instructors.json',sheet='HH Characteristics').set_index(['j','t','m'])
+z.columns.name = 'k'
+
+p = read_sheets(url,json_creds='instructors.json',sheet='Prices').set_index(['t','m'])
+p.columns.name = 'i'
+
+r = cfe.Result(y=y,z=z,prices=p)
+r.get_alpha()
+r.get_predicted_expenditures()
+
+r.drop_vars(['y','ce','cehat']).to_dataset('/tmp/Uganda_small.ds')
+#+end_src
+
+#+results:

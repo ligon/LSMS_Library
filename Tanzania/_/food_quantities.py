@@ -7,24 +7,21 @@ import pandas as pd
 import numpy as np
 import json
 
-unitlabels = pd.read_csv('unitlabels.csv',index_col=0).squeeze().to_dict()
-
 q={}
-for t in ['2005-06','2009-10','2010-11','2011-12','2013-14','2015-16']:
+for t in ['2008-09','2010-11','2012-13','2014-15']:
     q[t] = pd.read_parquet('../'+t+'/_/food_quantities.parquet')
-    q[t] = q[t].stack('itmcd')
-    q[t] = q[t].reset_index().set_index(['HHID','itmcd','units']).squeeze()
+    q[t] = q[t].reset_index().set_index(['j','i','u']).squeeze()
     q[t] = q[t].replace(0,np.nan).dropna()
 
-q = pd.DataFrame(q)
+q = pd.DataFrame(q).squeeze()
 q.columns.name='t'
 q = q.stack()
-q = q.reset_index().replace({'units':unitlabels})
-q = q.set_index(['t','HHID','itmcd','units'])
-q.index.names = ['t','j','i','u']
-q.rename(columns={0:'quantities'},inplace=True)
+q = q.reset_index()
+q = q.set_index(['j','t','u','i'])
 
 conv = json.load(open('conversion_to_kgs.json'))
+
+q = q.rename(columns={0:'quantities'})
 
 # Convert amenable units to Kg
 def to_kgs(x):
@@ -38,7 +35,7 @@ def to_kgs(x):
 
 q = q.reset_index().apply(to_kgs,axis=1).set_index(['t','j','i','u'])
 
-q = q.groupby(['t','j','i','u']).sum()
 
+q = q.groupby(['t','j','i','u']).sum()
 
 q.to_parquet('food_quantities.parquet')
