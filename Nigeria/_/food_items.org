@@ -213,7 +213,7 @@ with open('food_items.json','w') as f:
 | Maize (shelled, on the cob)            | Maize                                |
 | Maize (unshelled)                      | Maize                                |
 | Maize (unshelled, on the cob)          | Maize                                |
-| Maize flour                            | Maize flour                          |
+| Maize flour                            | Maize                                |
 | Malt drinks                            | Malt drinks                          |
 | Mangoes                                | Mangoes                              |
 | Meat Pie/Sausage Roll                  | Meat Pie/Sausage Roll                |
