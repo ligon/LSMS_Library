@@ -548,7 +548,7 @@ write_sheet(x,
    labels for expenditures, but we have a new set of unit labels =u=.
 
     There are different codes for different units in different rounds
-    of the Uganda data; further the corresponding labels are sometimes
+    of the data; further the corresponding labels are sometimes
     irregular.
 
 

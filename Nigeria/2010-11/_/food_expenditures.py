@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import sys
-sys.path.append('../../_')
 import numpy as np
 import pandas as pd
 import json
@@ -14,7 +13,12 @@ units = {1:'Kg',
          5:'piece',
          6:'other'}
 
-def rectify(food,units=units):
+conv = {'Kg':1,
+        'g':.001,
+        'l':1,
+        'ml':.001}
+
+def rectify(food,units=units,conv=conv):
 
     food['m'] = food['m'].replace({1:'North central',
                                    2:'North east',
@@ -25,52 +29,53 @@ def rectify(food,units=units):
 
     food['u'] = food['u'].replace(units)
     food['u'] = food['u'].fillna('None')
-    food['other unit'] = food['other unit'].fillna('None')
-
+ 
     food['purchased unit'] = food['purchased unit'].replace(units)
     food['purchased unit'] = food['purchased unit'].fillna('None')
-    food['purchased other unit'] = food['purchased other unit'].fillna('None')
-
+ 
     food['home produced unit'] = food['home produced unit'].replace(units)
     food['home produced unit'] = food['home produced unit'].fillna('None')
-    food['produced other unit'] = food['produced other unit'].fillna('None')
-
+ 
     food['gift unit'] = food['gift unit'].replace(units)
     food['gift unit'] = food['gift unit'].fillna('None')
-    food['gift other unit'] = food['gift other unit'].fillna('None')
 
-
-
-    food.set_index(['j','t','m','i','u','other unit'],inplace=True)
+    food.set_index(['j','t','m','i','u'],inplace=True)
 
     # Get prices implied by purchases
 
-    purchases = food.reset_index().set_index(['j','t','m','i'])[['purchased value','purchased quantity','purchased unit','purchased other unit']]
-    purchases['purchased other unit'] = purchases['purchased other unit'].fillna('None')
-
+    purchases = food.reset_index().set_index(['j','t','m','i'])[['purchased value','purchased quantity','purchased unit',]]
+ 
     purchases['unit value'] = purchases['purchased value']/purchases['purchased quantity']
 
-    unit_values = purchases.groupby(['t','m','i','purchased unit','purchased other unit']).median()['unit value'].dropna()
-    unit_values.index.names = ['t','m','i','u','other unit']
+    unit_values = purchases[['purchased unit','unit value']].dropna()
+    unit_values.rename(columns={'purchased unit':'u'},inplace=True)
+    unit_values = unit_values.reset_index().set_index(['j','t','m','i','u']).squeeze()
 
-    c = food['c'].unstack(['t','m','i','u','other unit'])
+    def convert_p(x,col,conv):
+        try:
+            x[col] = x[col]/conv[x.name[4]]
+            return x
+        except KeyError:
+            return x
+    
+    p_per_kg = pd.DataFrame(unit_values).apply(lambda x: convert_p(x,'unit value',conv),axis=1)
+    p_per_kg = p_per_kg.rename(index={'g':'Kg','ml':'Kg','l':'Kg'},level='u')
+                               
+    p = p_per_kg.squeeze().groupby(['t','m','i','u']).median()
+    n = p_per_kg.squeeze().groupby(['t','m','i','u']).count()
 
-    idx = c.columns.intersection(unit_values.index)
+    c = food['c']
 
-    c = c[idx]
+    c_in_kg = pd.DataFrame(c).apply(lambda x: convert_p(x,'c',{k:1/v for k,v in conv.items()}),axis=1)
+    c_in_kg = c_in_kg.rename(index={'g':'Kg','ml':'Kg','l':'Kg'},level='u')
 
-    c = c.stack(['u'])
-    c = c.stack(['i'])
-    c = c.stack(['other unit'])
-    c = c.stack(['t','m'])
+    c = c_in_kg.squeeze().groupby(['j','t','m','i','u']).sum()
 
-    p = unit_values[idx]
-    p.index.names = ['t','m','i','u','other unit']
-
-    return c,p
+    return c,p,n
 
 C = []
 P = []
+N = []
 
 lbls = json.load(open('../../_/food_items.json'))
 
@@ -99,19 +104,13 @@ vars={'hhid': 'j',
 harvest = harvest.rename(columns=vars)
 
 harvest['t'] = '2010Q3'
+harvest = harvest.replace({'i':{int(k):v for k,v in lbls['2010Q3'].items()}})
 
-harvest['other unit'] = 'None'
-harvest['purchased other unit'] = 'None'
-harvest['produced other unit'] = 'None'
-harvest['gift other unit'] = 'None'
-
-c,p = rectify(harvest)
-
-c = c.rename(index={int(k):v for k,v in lbls['2010Q3'].items()},level='i')
-p = p.rename(index={int(k):v for k,v in lbls['2010Q3'].items()},level='i')
+c,p,n = rectify(harvest)
 
 C.append(c)
 P.append(p)
+N.append(n)
 
 ##################
 # Planting (2011Q1)
@@ -141,18 +140,18 @@ vars={'hhid': 'j',
 planting = planting.rename(columns=vars)
 
 planting['t'] = '2011Q1'
+planting = planting.replace({'i':{int(k):v for k,v in lbls['2011Q1'].items()}})
 
-c,p = rectify(planting)
-
-c = c.rename(index={int(k):v for k,v in lbls['2011Q1'].items()},level='i')
-p = p.rename(index={int(k):v for k,v in lbls['2011Q1'].items()},level='i')
+c,p,n = rectify(planting)
 
 C.append(c)
 P.append(p)
+N.append(n)
 ###################
 
 c = pd.concat(C,axis=0)
 p = pd.concat(P,axis=0)
+n = pd.concat(N,axis=0)
 
 x = broadcast_binary_op(c,lambda x,y: x*y, p)
 
@@ -174,10 +173,12 @@ x = x.drop_duplicates()
 
 x.to_parquet('food_expenditures.parquet',compression='gzip')
 
-p = p.xs('Kg',level='u')
-p = p.xs('None',level='other unit')
-
 p = p.unstack('i')
+
+p = p.xs('Kg',level='u')
 
 p.to_parquet('unitvalues.parquet')
 
+c = c.xs('Kg',level='u')
+
+c.unstack('i').to_parquet('food_quantities.parquet')

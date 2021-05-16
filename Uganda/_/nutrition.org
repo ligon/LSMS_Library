@@ -1567,7 +1567,6 @@ d = pd.DataFrame(d)
  | 142090 | ---                               |                                    |                                  |                                   |                                   |                                   |                                   |
 
 
- #+end_example
 
  #+begin_src python :var tab=unitlabels :colnames no :prologue "# -*- coding: utf-8 -*-" :tangle unitlabels.py
 from cfe.df_utils import orgtbl_to_df

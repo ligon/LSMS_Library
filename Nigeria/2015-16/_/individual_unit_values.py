@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 import sys
-sys.path.append('../../_')
 import numpy as np
 import pandas as pd
 import json
 import dvc.api
 from cfe.df_utils import broadcast_binary_op
 from units import conv, unitcodes
+
 
 def rectify(food,units=unitcodes,conv=conv):
 
@@ -19,55 +19,38 @@ def rectify(food,units=unitcodes,conv=conv):
 
     food['u'] = food['u'].replace(units)
     food['u'] = food['u'].fillna('None')
-    food['other unit'] = food['other unit'].fillna('None')
-
+ 
     food['purchased unit'] = food['purchased unit'].replace(units)
     food['purchased unit'] = food['purchased unit'].fillna('None')
-    food['purchased other unit'] = food['purchased other unit'].fillna('None')
-
+ 
     food['home produced unit'] = food['home produced unit'].replace(units)
     food['home produced unit'] = food['home produced unit'].fillna('None')
-    food['produced other unit'] = food['produced other unit'].fillna('None')
-
+ 
     food['gift unit'] = food['gift unit'].replace(units)
     food['gift unit'] = food['gift unit'].fillna('None')
-    food['gift other unit'] = food['gift other unit'].fillna('None')
 
     food.set_index(['j','t','m','i','u'],inplace=True)
 
     # Get prices implied by purchases
 
-    purchases = food.reset_index().set_index(['j','t','m','i'])[['purchased value','purchased quantity','purchased unit']]
-
+    purchases = food.reset_index().set_index(['j','t','m','i'])[['purchased value','purchased quantity','purchased unit',]]
+ 
     purchases['unit value'] = purchases['purchased value']/purchases['purchased quantity']
 
     unit_values = purchases[['purchased unit','unit value']].dropna()
     unit_values.rename(columns={'purchased unit':'u'},inplace=True)
     unit_values = unit_values.reset_index().set_index(['j','t','m','i','u']).squeeze()
-    p_per_kg = broadcast_binary_op(unit_values,lambda x,y:x/y,conv)
 
-    p_per_kg = p_per_kg.loc[p_per_kg.index.isin(conv.index.levels[3].tolist(),level='u')]
 
-    p = p_per_kg.squeeze().groupby(['t','m','i']).median()
+    return unit_values
 
-    c = food['c']
 
-    c_in_kg = broadcast_binary_op(c,lambda x,y:x*y,conv)
-
-    c_in_kg = c_in_kg.loc[c_in_kg.index.isin(conv.index.levels[2].tolist(),level='u')]
-
-    c = c_in_kg.squeeze().groupby(['j','t','m','i']).sum()
-
-    return c,p
-
-C = []
-P = []
+U = []
 
 lbls = json.load(open('../../_/food_items.json'))
 
 #########################
 # Harvest
-
 with dvc.api.open('Nigeria/2015-16/Data/sect10b_harvestw3.csv',mode='rb') as csv:
     harvest = pd.read_csv(csv)
 
@@ -91,15 +74,16 @@ vars={'hhid': 'j',
       'sector':'rural' # 1=Urban; 2=Rural
       }
 t = '2015Q3'
+
 harvest = harvest.rename(columns=vars)
 
 harvest['t'] = t
 harvest = harvest.replace({'i':{int(k):v for k,v in lbls[t].items()}})
 
-c,p = rectify(harvest)
+unit_values = rectify(harvest)
 
-C.append(c)
-P.append(p)
+U.append(unit_values)
+
 
 ##################
 # Planting (2016Q1)
@@ -131,37 +115,13 @@ planting = planting.rename(columns=vars)
 planting['t'] = t
 planting = planting.replace({'i':{int(k):v for k,v in lbls[t].items()}})
 
-c,p = rectify(planting)
+unit_values = rectify(planting)
 
-C.append(c)
-P.append(p)
-#####################
+U.append(unit_values)
 
-c = pd.concat(C,axis=0)
-p = pd.concat(P,axis=0)
+###################
 
-x = broadcast_binary_op(c,lambda x,y: x*y, p)
+u = pd.concat(U,axis=0)
 
-x = x.groupby(['j','t','m','i']).sum().dropna().reset_index()
+u.to_pickle('individual_unit_values.pickle')
 
-x['j'] = x['j'].astype(int).astype(str)
-
-x = x.set_index(['j','t','m','i']).squeeze()
-
-x = x.replace(0,np.nan)
-
-x = x.unstack('i')
-
-x = x.groupby('i',axis=1).sum()
-
-x = x.reset_index().set_index(['j','t','m'])
-
-x = x.drop_duplicates()
-
-x.to_parquet('food_expenditures.parquet',compression='gzip')
-
-p = p.unstack('i')
-
-p.to_parquet('unitvalues.parquet')
-
-c.unstack('i').to_parquet('food_quantities.parquet')

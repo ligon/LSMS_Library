@@ -1,127 +1,399 @@
 * Nigeria LSMS
+** Introduction
+These notes document a process for mapping data on food consumption
+and expenditures in the Nigerian LSMS into nutritional outcomes which
+allow comparison with standard recommended dietary intakes.  
+
+To make this all work, it's important that units and labels match
+across different datasets.
+
+The different datasets should be indexed as follows:
+
+   | Dataset            | Indexed by | Columns |
+   |--------------------+------------+---------|
+   | Expenditures       | j,t,m      | i       |
+   | Consumption        | j,t,m,u    | i       |
+   | HH Characteristics | j,t,m      | k       |
+   | FCT                | i,u        | n       |
+   | RDI                | n          | k       |
+   | Prices             | t,m        | i       |
+
+where =j= indexes households, =t= indexes periods, =m= indexes
+markets, =i= indexes goods, =k= indexes different kinds of household
+characteristics, =u= indexes different unit names, and =n= indexes
+different nutrients.  Any RDI ("recommended daily intake") tables
+should be indexed by nutrients, with columns corresponding to
+characteristics of persons within the household (e.g., age & sex
+categories).  Finally, for any given good prices are assumed to be the
+same within a period and market.
+
+After getting all the indices to match, code below will write the
+various datasets to different google sheets at 
+#+name: data_url
+  - https://docs.google.com/spreadsheets/d/1whE_EW5x-jxrsKvYWfefdBppzp_TZhPP61bdEN-FEJ4/
+
+
+
   We use tools from =cfe.input_files= to build dataframes below.
   Note that each round actually collects data twice; once (third
   quarter) after harvest, and later after planting.
 
   We divide Nigeria into markets corresponding to one of six zones:
+#+name: regions
   | 1 | North central |
   | 2 | North east    |
   | 3 | North west    |
   | 4 | South east    |
   | 5 | South south   |
   | 6 | South west    |
+
+** RDI
+
+   A compilation of dietary guidelines are provided at
+   https://www.dietaryguidelines.gov/sites/default/files/2019-05/2015-2020_Dietary_Guidelines.pdf;
+   these provide recommended levels of 31 different nutrients by age
+   and sex.  Here are selected nutrients from those guidelines.  With
+   these selections and tweaked labels this should be regarded as the
+   canonical input to project.
+
+#+name: rdi
+| n            | Nutrition                      | Source | F 00-03 | M 00-03 | F 04-08 | M 04-08 | F 09-13 | M 09-13 | F 14-18 | M 14-18 | F 19-30 | M 19-30 | F 31-50 | M 31-50 |  F 51+ |  M 51+ |
+|--------------+--------------------------------+--------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+--------+--------|
+| Energy       | Energy                         | ---    |  1000.0 |  1000.0 |  1200.0 |  1400.0 |  1600.0 |  1800.0 |  1800.0 |  2200.0 |  2000.0 |  2400.0 |  1800.0 |  2200.0 | 1600.0 | 2000.0 |
+| Protein      | Protein                        | RDA    |    13.0 |    13.0 |    19.0 |    19.0 |    34.0 |    34.0 |    46.0 |    52.0 |    46.0 |    56.0 |    46.0 |    56.0 |   46.0 |   56.0 |
+| Fiber        | Fiber, total dietary           | ---    |    14.0 |    14.0 |    16.8 |    19.6 |    22.4 |    25.2 |    25.2 |    30.8 |    28.0 |    33.6 |    25.2 |    30.8 |   22.4 |   28.0 |
+| Folate       | Folate, DFE                    | RDA    |   150.0 |   150.0 |   200.0 |   200.0 |   300.0 |   300.0 |   400.0 |   400.0 |   400.0 |   400.0 |   400.0 |   400.0 |  400.0 |  400.0 |
+| Calcium      | Calcium, Ca                    | RDA    |   700.0 |   700.0 |  1000.0 |  1000.0 |  1300.0 |  1300.0 |  1300.0 |  1300.0 |  1000.0 |  1000.0 |  1000.0 |  1000.0 | 1200.0 | 1000.0 |
+| Carbohydrate | Carbohydrate, by difference    | RDA    |   130.0 |   130.0 |   130.0 |   130.0 |   130.0 |   130.0 |   130.0 |   130.0 |   130.0 |   130.0 |   130.0 |   130.0 |  130.0 |  130.0 |
+| Iron         | Iron, Fe                       | RDA    |     7.0 |     7.0 |    10.0 |    10.0 |     8.0 |     8.0 |    15.0 |    11.0 |    18.0 |     8.0 |    18.0 |     8.0 |    8.0 |    8.0 |
+| Magnesium    | Magnesium, Mg                  | RDA    |    80.0 |    80.0 |   130.0 |   130.0 |   240.0 |   240.0 |   360.0 |   410.0 |   310.0 |   400.0 |   320.0 |   420.0 |  320.0 |  420.0 |
+| Niacin       | Niacin                         | RDA    |     6.0 |     6.0 |     8.0 |     8.0 |    12.0 |    12.0 |    14.0 |    16.0 |    14.0 |    16.0 |    14.0 |    16.0 |   14.0 |   16.0 |
+| Phosphorus   | Phosphorus, P                  | RDA    |   460.0 |   460.0 |   500.0 |   500.0 |  1250.0 |  1250.0 |  1250.0 |  1250.0 |   700.0 |   700.0 |   700.0 |   700.0 |  700.0 |  700.0 |
+| Potassium    | Potassium, K                   | AI     |  3000.0 |  3000.0 |  3800.0 |  3800.0 |  4500.0 |  4500.0 |  4700.0 |  4700.0 |  4700.0 |  4700.0 |  4700.0 |  4700.0 | 4700.0 | 4700.0 |
+| Riboflavin   | Riboflavin                     | RDA    |     0.5 |     0.5 |     0.6 |     0.6 |     0.9 |     0.9 |     1.0 |     1.3 |     1.1 |     1.3 |     1.1 |     1.3 |    1.1 |    1.3 |
+| Thiamin      | Thiamin                        | RDA    |     0.5 |     0.5 |     0.6 |     0.6 |     0.9 |     0.9 |     1.0 |     1.2 |     1.1 |     1.2 |     1.1 |     1.2 |    1.1 |    1.2 |
+| Vitamin A    | Vitamin A, RAE                 | RDA    |   300.0 |   300.0 |   400.0 |   400.0 |   600.0 |   600.0 |   700.0 |   900.0 |   700.0 |   900.0 |   700.0 |   900.0 |  700.0 |  900.0 |
+| Vitamin B-12 | Vitamin B-12                   | RDA    |     0.9 |     0.9 |     1.2 |     1.2 |     1.8 |     1.8 |     2.4 |     2.4 |     2.4 |     2.4 |     2.4 |     2.4 |    2.4 |    2.4 |
+| Vitamin B-6  | Vitamin B-6                    | RDA    |     0.5 |     0.5 |     0.6 |     0.6 |     1.0 |     1.0 |     1.2 |     1.3 |     1.3 |     1.3 |     1.3 |     1.3 |    1.5 |    1.7 |
+| Vitamin C    | Vitamin C, total ascorbic acid | RDA    |    15.0 |    15.0 |    25.0 |    25.0 |    45.0 |    45.0 |    65.0 |    75.0 |    75.0 |    90.0 |    75.0 |    90.0 |   75.0 |   90.0 |
+| Vitamin E    | Vitamin E (alpha-tocopherol)   | RDA    |     6.0 |     6.0 |     7.0 |     7.0 |    11.0 |    11.0 |    15.0 |    15.0 |    15.0 |    15.0 |    15.0 |    15.0 |   15.0 |   15.0 |
+| Vitamin K    | Vitamin K (phylloquinone)      | AI     |    30.0 |    30.0 |    55.0 |    55.0 |    60.0 |    60.0 |    75.0 |    75.0 |    90.0 |   120.0 |    90.0 |   120.0 |   90.0 |  120.0 |
+| Zinc         | Zinc, Zn                       | RDA    |     3.0 |     3.0 |     5.0 |     5.0 |     8.0 |     8.0 |     9.0 |    11.0 |     8.0 |    11.0 |     8.0 |    11.0 |    8.0 |   11.0 |
+
+Note that this table pins down labels for nutrients =n= as well as
+age-sex categories =k=.
+
+#+begin_src python :results raw output :var RDI=rdi :colnames no 
+import cfe
+
+rdi = cfe.df_utils.orgtbl_to_df(RDI)
+
+n_index_labels = rdi.n.tolist()
+
+k_index_labels = rdi.columns.tolist()[3:]
+
+print(r"#+name: k_index")
+for l in k_index_labels:
+    print("  - %s" % l)
+
+print(r"#+name: n_index")
+for l in n_index_labels:
+    print("  - %s" % l)
+
+#+end_src
+
+#+name: k_index
+  - F 00-03
+  - M 00-03
+  - F 04-08
+  - M 04-08
+  - F 09-13
+  - M 09-13
+  - F 14-18
+  - M 14-18
+  - F 19-30
+  - M 19-30
+  - F 31-50
+  - M 31-50
+  - F 51+
+  - M 51+
+
+#+name: n_index
+  - Energy
+  - Protein
+  - Fiber
+  - Folate
+  - Calcium
+  - Carbohydrate
+  - Iron
+  - Magnesium
+  - Niacin
+  - Phosphorus
+  - Potassium
+  - Riboflavin
+  - Thiamin
+  - Vitamin A
+  - Vitamin B-12
+  - Vitamin B-6
+  - Vitamin C
+  - Vitamin E
+  - Vitamin K
+  - Zinc
+
+*** Write RDI to google sheet
+ #+begin_src python :results raw output :var RDI=rdi url = data_url :colnames no :tangle /tmp/foo.py
+import cfe
+from eep153_tools import write_sheet
+
+url = url[0][0]   
+
+rdi = cfe.df_utils.orgtbl_to_df(RDI).set_index('n')
+
+# Drop informational colums
+rdi = rdi.iloc[:,2:]
+
+write_sheet(rdi,
+            'ligon@berkeley.edu','writer',json_creds='instructors.json',
+            key=url,sheet='RDI')
+ #+end_src
+
+ #+results:
+
+** FCT
+
+A high-quality food conversion table for Uganda is available from
+https://www.harvestplus.org/node/562; an adaption of this table is
+given below:
+
+
+*** Nutrient mapping
+ We need mappings of the nutrient labels from the FCT into the
+ nutrients in the RDI.  A high quality FCT for West Africa (including
+ data for Nigeria) is available at
+ http://www.fao.org/fileadmin/user_upload/faoweb/2020/WAFCT_2019.xlsx. We've
+ made a copy of this as a google sheet at
+ https://docs.google.com/spreadsheets/d/1TM7FpKURXFAuXW4dLpGt98QA2CH4WTDty-4nPOUv1Mg/. 
+
+ Here's a renaming of the (verbose) nutrients:
+ #+name: fct_n_dict
+ | FCT labels                                                                        | n            |
+ |-----------------------------------------------------------------------------------+--------------|
+ | Energy\n(kcal)                                                                    | Energy       |
+ | Protein, total\n(g)                                                               | Protein      |
+ | Fibre, total dietary or [fibre, crude]\n(g)                                       | Fiber        |
+ | Folate, dietary folate equivalents\n(mcg)                                         | Folate       |
+ | Calcium\n(mg)                                                                     | Calcium      |
+ | Carbohydrate, available; calculated by difference\n(g)                            | Carbohydrate |
+ | Iron\n(mg)                                                                        | Iron         |
+ | Magnesium\n(mg)                                                                   | Magnesium    |
+ | Niacin, preformed\n(mg)                                                           | Niacin       |
+ | Phosphorus\n(mg)                                                                  | Phosphorus   |
+ | Potassium\n(mg)                                                                   | Potassium    |
+ | Riboflavin (vitamin B2)\n(mg)                                                     | Riboflavin   |
+ | Thiamine (vitamin B1)\n(mg)                                                       | Thiamin      |
+ | Vitamin A (expressed in retinol equivalents)\n(mcg)                               | Vitamin A    |
+ | Vitamin B12\n(mcg)                                                                | Vitamin B-12 |
+ | Vitamin B6\n(mg)                                                                  | Vitamin B-6  |
+ | Vitamin C\n(mg)                                                                   | Vitamin C    |
+ | Vitamin E (expressed in alpha-tocopherol equivalents) or [alpha-tocopherol]\n(mg) | Vitamin E    |
+ | Zinc\n(mg)                                                                        | Zinc         |
+ | Fat, total or [fat, derived by analysis using continuous extraction]\n(g)         | Fat, total   |
+ | Retinol\n(mcg)                                                                    | Retinol      |
+
+
+ #+begin_src python :results raw output :var url = data_url fct_n_dict = fct_n_dict :colnames no :tangle /tmp/test.py
+import cfe
+import pandas as pd
+import json
+from eep153_tools import read_sheets, write_sheet
+
+url = url[0][0]
+
+fct = read_sheets('https://docs.google.com/spreadsheets/d/1TM7FpKURXFAuXW4dLpGt98QA2CH4WTDty-4nPOUv1Mg/',
+                  json_creds='instructors.json',sheet='03 NV_sum_39 (per 100g EP)').set_index('Code')
+
+# Here's a mapping from expenditure labels into the FCT:
+fctidx = read_sheets('https://docs.google.com/spreadsheets/d/1IAgJj0g6r_3I6esD13dwXy-s-G5vl-zmcqHccYXkrVs/',
+                     json_creds='instructors.json',sheet='Codes')
+
+fctidx = fctidx.set_index('Food description')['WAFCT ID'].to_dict()
+
+fctidx = {k:v.split('//')[0].strip() for k,v in fctidx.items() if '_' in v}
+
+fct = fct.loc[fctidx.values()] # Keep only foods we have data on
+
+fct = fct.rename(index={v:k for k,v in fctidx.items()})
+
+ndict = cfe.df_utils.orgtbl_to_df(fct_n_dict).set_index('FCT labels').squeeze().to_dict()
+ndict = {k.replace('\\n','\n'):v for k,v in ndict.items()} # Fix \\n in keys
+
+fct = fct.rename(columns=ndict)
+fct = fct.loc[:,ndict.values()]
+
+# Now aggregate labels to match expenditures
+with open('./aggregate_items.json') as f:
+    aggregate_labels = json.load(f)
+
+fct = fct.rename(index=aggregate_labels['Aggregated Label'])
+
+fct = fct[~fct.index.duplicated()]
+fct.index.name = 'i'
+fct.columns.name = 'n'
+
+fct = fct.apply(lambda x: pd.to_numeric(x,errors='coerce'))
+
+# Convert to kilograms for serving size:
+fct = fct*10
+
+write_sheet(fct,'ligon@berkeley.edu',user_role='writer',json_creds='instructors.json',
+            key=url,sheet='FCT')
+ #+end_src
+
+ #+results:
+
+
+*** Age-Sex category mapping
+ We need mappings of the nutrient labels from the  into the
+ nutrients in the RDA:
+
+ #+begin_src python :results raw output :var fct = fct k_index = k_index :colnames no
+import cfe
+import pandas as pd
+
+k_index = pd.Series([l[0] for l in k_index])
+print(k_index.to_markdown())
+ #+end_src
+
+ #+name: fct_k_dict
+ | FCT     | k       |
+ |---------+---------|
+ | C 01-03 | F 00-03 |
+ | C 01-03 | M 00-03 |
+ | F 04-08 | F 04-08 |
+ | M 04-08 | M 04-08 |
+ | F 09-13 | F 09-13 |
+ | M 09-13 | M 09-13 |
+ | F 14-18 | F 14-18 |
+ | M 14-18 | M 14-18 |
+ | F 19-30 | F 19-30 |
+ | M 19-30 | M 19-30 |
+ | F 31-50 | F 31-50 |
+ | M 31-50 | M 31-50 |
+ | F 51+   | F 51+   |
+ | M 51+   | M 51+   |
+
 ** Constructing Household Characteristics
 #+name: VARS_Nigeria
 | t      | Output  | File                                      | Grouping  | Mapping                                                      |
 |--------+---------+-------------------------------------------+-----------+--------------------------------------------------------------|
-| 2010Q3 | M 0-3   | Nigeria/2010-11/Data/sect1_harvestw1.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 0) & (x.s1q4 < 4) & (x.s1q2 ==1)    |
-| 2010Q3 | M 4-8   | Nigeria/2010-11/Data/sect1_harvestw1.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 4) & (x.s1q4 < 9) & (x.s1q2 ==1)    |
-| 2010Q3 | M 9-13  | Nigeria/2010-11/Data/sect1_harvestw1.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 9) & (x.s1q4 < 14) & (x.s1q2 ==1)   |
+| 2010Q3 | M 00-03 | Nigeria/2010-11/Data/sect1_harvestw1.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 0) & (x.s1q4 < 4) & (x.s1q2 ==1)    |
+| 2010Q3 | M 04-08 | Nigeria/2010-11/Data/sect1_harvestw1.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 4) & (x.s1q4 < 9) & (x.s1q2 ==1)    |
+| 2010Q3 | M 09-13 | Nigeria/2010-11/Data/sect1_harvestw1.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 9) & (x.s1q4 < 14) & (x.s1q2 ==1)   |
 | 2010Q3 | M 14-18 | Nigeria/2010-11/Data/sect1_harvestw1.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 14) & (x.s1q4 < 19) & (x.s1q2 ==1)  |
 | 2010Q3 | M 19-30 | Nigeria/2010-11/Data/sect1_harvestw1.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 19)  & (x.s1q4 < 31) & (x.s1q2 ==1) |
 | 2010Q3 | M 31-50 | Nigeria/2010-11/Data/sect1_harvestw1.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 31) & (x.s1q4 < 51) & (x.s1q2 ==1)  |
 | 2010Q3 | M 51+   | Nigeria/2010-11/Data/sect1_harvestw1.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 51) & (x.s1q2 ==1)                  |
-| 2010Q3 | F 0-3   | Nigeria/2010-11/Data/sect1_harvestw1.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 0) & (x.s1q4 < 4) & (x.s1q2 ==2)    |
-| 2010Q3 | F 4-8   | Nigeria/2010-11/Data/sect1_harvestw1.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 4) & (x.s1q4 < 9) & (x.s1q2 ==2)    |
-| 2010Q3 | F 9-13  | Nigeria/2010-11/Data/sect1_harvestw1.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 9) & (x.s1q4 < 14) & (x.s1q2 ==2)   |
+| 2010Q3 | F 00-03 | Nigeria/2010-11/Data/sect1_harvestw1.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 0) & (x.s1q4 < 4) & (x.s1q2 ==2)    |
+| 2010Q3 | F 04-08 | Nigeria/2010-11/Data/sect1_harvestw1.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 4) & (x.s1q4 < 9) & (x.s1q2 ==2)    |
+| 2010Q3 | F 09-13 | Nigeria/2010-11/Data/sect1_harvestw1.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 9) & (x.s1q4 < 14) & (x.s1q2 ==2)   |
 | 2010Q3 | F 14-18 | Nigeria/2010-11/Data/sect1_harvestw1.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 14) & (x.s1q4 < 19) & (x.s1q2 ==2)  |
 | 2010Q3 | F 19-30 | Nigeria/2010-11/Data/sect1_harvestw1.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 19)  & (x.s1q4 < 31) & (x.s1q2 ==2) |
 | 2010Q3 | F 31-50 | Nigeria/2010-11/Data/sect1_harvestw1.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 31) & (x.s1q4 < 51) & (x.s1q2 ==2)  |
 | 2010Q3 | F 51+   | Nigeria/2010-11/Data/sect1_harvestw1.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 51) & (x.s1q2 ==2)                  |
-| 2012Q3 | M 0-3   | Nigeria/2012-13/Data/sect1_harvestw2.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 0) & (x.s1q4 < 4) & (x.s1q2 ==1)    |
-| 2012Q3 | M 4-8   | Nigeria/2012-13/Data/sect1_harvestw2.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 4) & (x.s1q4 < 9) & (x.s1q2 ==1)    |
-| 2012Q3 | M 9-13  | Nigeria/2012-13/Data/sect1_harvestw2.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 9) & (x.s1q4 < 14) & (x.s1q2 ==1)   |
+| 2012Q3 | M 00-03 | Nigeria/2012-13/Data/sect1_harvestw2.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 0) & (x.s1q4 < 4) & (x.s1q2 ==1)    |
+| 2012Q3 | M 04-08 | Nigeria/2012-13/Data/sect1_harvestw2.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 4) & (x.s1q4 < 9) & (x.s1q2 ==1)    |
+| 2012Q3 | M 09-13 | Nigeria/2012-13/Data/sect1_harvestw2.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 9) & (x.s1q4 < 14) & (x.s1q2 ==1)   |
 | 2012Q3 | M 14-18 | Nigeria/2012-13/Data/sect1_harvestw2.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 14) & (x.s1q4 < 19) & (x.s1q2 ==1)  |
 | 2012Q3 | M 19-30 | Nigeria/2012-13/Data/sect1_harvestw2.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 19)  & (x.s1q4 < 31) & (x.s1q2 ==1) |
 | 2012Q3 | M 31-50 | Nigeria/2012-13/Data/sect1_harvestw2.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 31) & (x.s1q4 < 51) & (x.s1q2 ==1)  |
 | 2012Q3 | M 51+   | Nigeria/2012-13/Data/sect1_harvestw2.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 51) & (x.s1q2 ==1)                  |
-| 2012Q3 | F 0-3   | Nigeria/2012-13/Data/sect1_harvestw2.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 0) & (x.s1q4 < 4) & (x.s1q2 ==2)    |
-| 2012Q3 | F 4-8   | Nigeria/2012-13/Data/sect1_harvestw2.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 4) & (x.s1q4 < 9) & (x.s1q2 ==2)    |
-| 2012Q3 | F 9-13  | Nigeria/2012-13/Data/sect1_harvestw2.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 9) & (x.s1q4 < 14) & (x.s1q2 ==2)   |
+| 2012Q3 | F 00-03 | Nigeria/2012-13/Data/sect1_harvestw2.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 0) & (x.s1q4 < 4) & (x.s1q2 ==2)    |
+| 2012Q3 | F 04-08 | Nigeria/2012-13/Data/sect1_harvestw2.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 4) & (x.s1q4 < 9) & (x.s1q2 ==2)    |
+| 2012Q3 | F 09-13 | Nigeria/2012-13/Data/sect1_harvestw2.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 9) & (x.s1q4 < 14) & (x.s1q2 ==2)   |
 | 2012Q3 | F 14-18 | Nigeria/2012-13/Data/sect1_harvestw2.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 14) & (x.s1q4 < 19) & (x.s1q2 ==2)  |
 | 2012Q3 | F 19-30 | Nigeria/2012-13/Data/sect1_harvestw2.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 19)  & (x.s1q4 < 31) & (x.s1q2 ==2) |
 | 2012Q3 | F 31-50 | Nigeria/2012-13/Data/sect1_harvestw2.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 31) & (x.s1q4 < 51) & (x.s1q2 ==2)  |
 | 2012Q3 | F 51+   | Nigeria/2012-13/Data/sect1_harvestw2.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 51) & (x.s1q2 ==2)                  |
-| 2015Q3 | M 0-3   | Nigeria/2015-16/Data/sect1_harvestw3.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 0) & (x.s1q4 < 4) & (x.s1q2 ==1)    |
-| 2015Q3 | M 4-8   | Nigeria/2015-16/Data/sect1_harvestw3.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 4) & (x.s1q4 < 9) & (x.s1q2 ==1)    |
-| 2015Q3 | M 9-13  | Nigeria/2015-16/Data/sect1_harvestw3.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 9) & (x.s1q4 < 14) & (x.s1q2 ==1)   |
+| 2015Q3 | M 00-03 | Nigeria/2015-16/Data/sect1_harvestw3.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 0) & (x.s1q4 < 4) & (x.s1q2 ==1)    |
+| 2015Q3 | M 04-08 | Nigeria/2015-16/Data/sect1_harvestw3.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 4) & (x.s1q4 < 9) & (x.s1q2 ==1)    |
+| 2015Q3 | M 09-13 | Nigeria/2015-16/Data/sect1_harvestw3.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 9) & (x.s1q4 < 14) & (x.s1q2 ==1)   |
 | 2015Q3 | M 14-18 | Nigeria/2015-16/Data/sect1_harvestw3.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 14) & (x.s1q4 < 19) & (x.s1q2 ==1)  |
 | 2015Q3 | M 19-30 | Nigeria/2015-16/Data/sect1_harvestw3.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 19)  & (x.s1q4 < 31) & (x.s1q2 ==1) |
 | 2015Q3 | M 31-50 | Nigeria/2015-16/Data/sect1_harvestw3.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 31) & (x.s1q4 < 51) & (x.s1q2 ==1)  |
 | 2015Q3 | M 51+   | Nigeria/2015-16/Data/sect1_harvestw3.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 51) & (x.s1q2 ==1)                  |
-| 2015Q3 | F 0-3   | Nigeria/2015-16/Data/sect1_harvestw3.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 0) & (x.s1q4 < 4) & (x.s1q2 ==2)    |
-| 2015Q3 | F 4-8   | Nigeria/2015-16/Data/sect1_harvestw3.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 4) & (x.s1q4 < 9) & (x.s1q2 ==2)    |
-| 2015Q3 | F 9-13  | Nigeria/2015-16/Data/sect1_harvestw3.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 9) & (x.s1q4 < 14) & (x.s1q2 ==2)   |
+| 2015Q3 | F 00-03 | Nigeria/2015-16/Data/sect1_harvestw3.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 0) & (x.s1q4 < 4) & (x.s1q2 ==2)    |
+| 2015Q3 | F 04-08 | Nigeria/2015-16/Data/sect1_harvestw3.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 4) & (x.s1q4 < 9) & (x.s1q2 ==2)    |
+| 2015Q3 | F 09-13 | Nigeria/2015-16/Data/sect1_harvestw3.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 9) & (x.s1q4 < 14) & (x.s1q2 ==2)   |
 | 2015Q3 | F 14-18 | Nigeria/2015-16/Data/sect1_harvestw3.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 14) & (x.s1q4 < 19) & (x.s1q2 ==2)  |
 | 2015Q3 | F 19-30 | Nigeria/2015-16/Data/sect1_harvestw3.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 19)  & (x.s1q4 < 31) & (x.s1q2 ==2) |
 | 2015Q3 | F 31-50 | Nigeria/2015-16/Data/sect1_harvestw3.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 31) & (x.s1q4 < 51) & (x.s1q2 ==2)  |
 | 2015Q3 | F 51+   | Nigeria/2015-16/Data/sect1_harvestw3.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 51) & (x.s1q2 ==2)                  |
-| 2018Q3 | M 0-3   | Nigeria/2018-19/Data/sect1_harvestw4.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 0) & (x.s1q4 < 4) & (x.s1q2 ==1)    |
-| 2018Q3 | M 4-8   | Nigeria/2018-19/Data/sect1_harvestw4.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 4) & (x.s1q4 < 9) & (x.s1q2 ==1)    |
-| 2018Q3 | M 9-13  | Nigeria/2018-19/Data/sect1_harvestw4.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 9) & (x.s1q4 < 14) & (x.s1q2 ==1)   |
+| 2018Q3 | M 00-03 | Nigeria/2018-19/Data/sect1_harvestw4.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 0) & (x.s1q4 < 4) & (x.s1q2 ==1)    |
+| 2018Q3 | M 04-08 | Nigeria/2018-19/Data/sect1_harvestw4.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 4) & (x.s1q4 < 9) & (x.s1q2 ==1)    |
+| 2018Q3 | M 09-13 | Nigeria/2018-19/Data/sect1_harvestw4.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 9) & (x.s1q4 < 14) & (x.s1q2 ==1)   |
 | 2018Q3 | M 14-18 | Nigeria/2018-19/Data/sect1_harvestw4.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 14) & (x.s1q4 < 19) & (x.s1q2 ==1)  |
 | 2018Q3 | M 19-30 | Nigeria/2018-19/Data/sect1_harvestw4.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 19)  & (x.s1q4 < 31) & (x.s1q2 ==1) |
 | 2018Q3 | M 31-50 | Nigeria/2018-19/Data/sect1_harvestw4.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 31) & (x.s1q4 < 51) & (x.s1q2 ==1)  |
 | 2018Q3 | M 51+   | Nigeria/2018-19/Data/sect1_harvestw4.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 51) & (x.s1q2 ==1)                  |
-| 2018Q3 | F 0-3   | Nigeria/2018-19/Data/sect1_harvestw4.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 0) & (x.s1q4 < 4) & (x.s1q2 ==2)    |
-| 2018Q3 | F 4-8   | Nigeria/2018-19/Data/sect1_harvestw4.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 4) & (x.s1q4 < 9) & (x.s1q2 ==2)    |
-| 2018Q3 | F 9-13  | Nigeria/2018-19/Data/sect1_harvestw4.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 9) & (x.s1q4 < 14) & (x.s1q2 ==2)   |
+| 2018Q3 | F 00-03 | Nigeria/2018-19/Data/sect1_harvestw4.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 0) & (x.s1q4 < 4) & (x.s1q2 ==2)    |
+| 2018Q3 | F 04-08 | Nigeria/2018-19/Data/sect1_harvestw4.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 4) & (x.s1q4 < 9) & (x.s1q2 ==2)    |
+| 2018Q3 | F 09-13 | Nigeria/2018-19/Data/sect1_harvestw4.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 9) & (x.s1q4 < 14) & (x.s1q2 ==2)   |
 | 2018Q3 | F 14-18 | Nigeria/2018-19/Data/sect1_harvestw4.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 14) & (x.s1q4 < 19) & (x.s1q2 ==2)  |
 | 2018Q3 | F 19-30 | Nigeria/2018-19/Data/sect1_harvestw4.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 19)  & (x.s1q4 < 31) & (x.s1q2 ==2) |
 | 2018Q3 | F 31-50 | Nigeria/2018-19/Data/sect1_harvestw4.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 31) & (x.s1q4 < 51) & (x.s1q2 ==2)  |
 | 2018Q3 | F 51+   | Nigeria/2018-19/Data/sect1_harvestw4.csv  | ('j',sum) | lambda x: 0 + (x.s1q4 >= 51) & (x.s1q2 ==2)                  |
-| 2011Q1 | M 0-3   | Nigeria/2010-11/Data/sect1_plantingw1.csv | ('j',sum) | lambda x: 0 + (x.s1q4 >= 0) & (x.s1q4 < 4) & (x.s1q2 ==1)    |
-| 2011Q1 | M 4-8   | Nigeria/2010-11/Data/sect1_plantingw1.csv | ('j',sum) | lambda x: 0 + (x.s1q4 >= 4) & (x.s1q4 < 9) & (x.s1q2 ==1)    |
-| 2011Q1 | M 9-13  | Nigeria/2010-11/Data/sect1_plantingw1.csv | ('j',sum) | lambda x: 0 + (x.s1q4 >= 9) & (x.s1q4 < 14) & (x.s1q2 ==1)   |
+| 2011Q1 | M 00-03 | Nigeria/2010-11/Data/sect1_plantingw1.csv | ('j',sum) | lambda x: 0 + (x.s1q4 >= 0) & (x.s1q4 < 4) & (x.s1q2 ==1)    |
+| 2011Q1 | M 04-08 | Nigeria/2010-11/Data/sect1_plantingw1.csv | ('j',sum) | lambda x: 0 + (x.s1q4 >= 4) & (x.s1q4 < 9) & (x.s1q2 ==1)    |
+| 2011Q1 | M 09-13 | Nigeria/2010-11/Data/sect1_plantingw1.csv | ('j',sum) | lambda x: 0 + (x.s1q4 >= 9) & (x.s1q4 < 14) & (x.s1q2 ==1)   |
 | 2011Q1 | M 14-18 | Nigeria/2010-11/Data/sect1_plantingw1.csv | ('j',sum) | lambda x: 0 + (x.s1q4 >= 14) & (x.s1q4 < 19) & (x.s1q2 ==1)  |
 | 2011Q1 | M 19-30 | Nigeria/2010-11/Data/sect1_plantingw1.csv | ('j',sum) | lambda x: 0 + (x.s1q4 >= 19)  & (x.s1q4 < 31) & (x.s1q2 ==1) |
 | 2011Q1 | M 31-50 | Nigeria/2010-11/Data/sect1_plantingw1.csv | ('j',sum) | lambda x: 0 + (x.s1q4 >= 31) & (x.s1q4 < 51) & (x.s1q2 ==1)  |
 | 2011Q1 | M 51+   | Nigeria/2010-11/Data/sect1_plantingw1.csv | ('j',sum) | lambda x: 0 + (x.s1q4 >= 51) & (x.s1q2 ==1)                  |
-| 2011Q1 | F 0-3   | Nigeria/2010-11/Data/sect1_plantingw1.csv | ('j',sum) | lambda x: 0 + (x.s1q4 >= 0) & (x.s1q4 < 4) & (x.s1q2 ==2)    |
-| 2011Q1 | F 4-8   | Nigeria/2010-11/Data/sect1_plantingw1.csv | ('j',sum) | lambda x: 0 + (x.s1q4 >= 4) & (x.s1q4 < 9) & (x.s1q2 ==2)    |
-| 2011Q1 | F 9-13  | Nigeria/2010-11/Data/sect1_plantingw1.csv | ('j',sum) | lambda x: 0 + (x.s1q4 >= 9) & (x.s1q4 < 14) & (x.s1q2 ==2)   |
+| 2011Q1 | F 00-03 | Nigeria/2010-11/Data/sect1_plantingw1.csv | ('j',sum) | lambda x: 0 + (x.s1q4 >= 0) & (x.s1q4 < 4) & (x.s1q2 ==2)    |
+| 2011Q1 | F 04-08 | Nigeria/2010-11/Data/sect1_plantingw1.csv | ('j',sum) | lambda x: 0 + (x.s1q4 >= 4) & (x.s1q4 < 9) & (x.s1q2 ==2)    |
+| 2011Q1 | F 09-13 | Nigeria/2010-11/Data/sect1_plantingw1.csv | ('j',sum) | lambda x: 0 + (x.s1q4 >= 9) & (x.s1q4 < 14) & (x.s1q2 ==2)   |
 | 2011Q1 | F 14-18 | Nigeria/2010-11/Data/sect1_plantingw1.csv | ('j',sum) | lambda x: 0 + (x.s1q4 >= 14) & (x.s1q4 < 19) & (x.s1q2 ==2)  |
 | 2011Q1 | F 19-30 | Nigeria/2010-11/Data/sect1_plantingw1.csv | ('j',sum) | lambda x: 0 + (x.s1q4 >= 19)  & (x.s1q4 < 31) & (x.s1q2 ==2) |
 | 2011Q1 | F 31-50 | Nigeria/2010-11/Data/sect1_plantingw1.csv | ('j',sum) | lambda x: 0 + (x.s1q4 >= 31) & (x.s1q4 < 51) & (x.s1q2 ==2)  |
 | 2011Q1 | F 51+   | Nigeria/2010-11/Data/sect1_plantingw1.csv | ('j',sum) | lambda x: 0 + (x.s1q4 >= 51) & (x.s1q2 ==2)                  |
-| 2013Q1 | M 0-3   | Nigeria/2012-13/Data/sect1_plantingw2.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 0) & (x.s1q6 < 4) & (x.s1q2 ==1)    |
-| 2013Q1 | M 4-8   | Nigeria/2012-13/Data/sect1_plantingw2.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 4) & (x.s1q6 < 9) & (x.s1q2 ==1)    |
-| 2013Q1 | M 9-13  | Nigeria/2012-13/Data/sect1_plantingw2.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 9) & (x.s1q6 < 14) & (x.s1q2 ==1)   |
+| 2013Q1 | M 00-03 | Nigeria/2012-13/Data/sect1_plantingw2.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 0) & (x.s1q6 < 4) & (x.s1q2 ==1)    |
+| 2013Q1 | M 04-08 | Nigeria/2012-13/Data/sect1_plantingw2.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 4) & (x.s1q6 < 9) & (x.s1q2 ==1)    |
+| 2013Q1 | M 09-13 | Nigeria/2012-13/Data/sect1_plantingw2.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 9) & (x.s1q6 < 14) & (x.s1q2 ==1)   |
 | 2013Q1 | M 14-18 | Nigeria/2012-13/Data/sect1_plantingw2.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 14) & (x.s1q6 < 19) & (x.s1q2 ==1)  |
 | 2013Q1 | M 19-30 | Nigeria/2012-13/Data/sect1_plantingw2.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 19)  & (x.s1q6 < 31) & (x.s1q2 ==1) |
 | 2013Q1 | M 31-50 | Nigeria/2012-13/Data/sect1_plantingw2.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 31) & (x.s1q6 < 51) & (x.s1q2 ==1)  |
 | 2013Q1 | M 51+   | Nigeria/2012-13/Data/sect1_plantingw2.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 51) & (x.s1q2 ==1)                  |
-| 2013Q1 | F 0-3   | Nigeria/2012-13/Data/sect1_plantingw2.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 0) & (x.s1q6 < 4) & (x.s1q2 ==2)    |
-| 2013Q1 | F 4-8   | Nigeria/2012-13/Data/sect1_plantingw2.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 4) & (x.s1q6 < 9) & (x.s1q2 ==2)    |
-| 2013Q1 | F 9-13  | Nigeria/2012-13/Data/sect1_plantingw2.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 9) & (x.s1q6 < 14) & (x.s1q2 ==2)   |
+| 2013Q1 | F 00-03 | Nigeria/2012-13/Data/sect1_plantingw2.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 0) & (x.s1q6 < 4) & (x.s1q2 ==2)    |
+| 2013Q1 | F 04-08 | Nigeria/2012-13/Data/sect1_plantingw2.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 4) & (x.s1q6 < 9) & (x.s1q2 ==2)    |
+| 2013Q1 | F 09-13 | Nigeria/2012-13/Data/sect1_plantingw2.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 9) & (x.s1q6 < 14) & (x.s1q2 ==2)   |
 | 2013Q1 | F 14-18 | Nigeria/2012-13/Data/sect1_plantingw2.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 14) & (x.s1q6 < 19) & (x.s1q2 ==2)  |
 | 2013Q1 | F 19-30 | Nigeria/2012-13/Data/sect1_plantingw2.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 19)  & (x.s1q6 < 31) & (x.s1q2 ==2) |
 | 2013Q1 | F 31-50 | Nigeria/2012-13/Data/sect1_plantingw2.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 31) & (x.s1q6 < 51) & (x.s1q2 ==2)  |
 | 2013Q1 | F 51+   | Nigeria/2012-13/Data/sect1_plantingw2.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 51) & (x.s1q2 ==2)                  |
-| 2016Q1 | M 0-3   | Nigeria/2015-16/Data/sect1_plantingw3.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 0) & (x.s1q6 < 4) & (x.s1q2 ==1)    |
-| 2016Q1 | M 4-8   | Nigeria/2015-16/Data/sect1_plantingw3.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 4) & (x.s1q6 < 9) & (x.s1q2 ==1)    |
-| 2016Q1 | M 9-13  | Nigeria/2015-16/Data/sect1_plantingw3.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 9) & (x.s1q6 < 14) & (x.s1q2 ==1)   |
+| 2016Q1 | M 00-03 | Nigeria/2015-16/Data/sect1_plantingw3.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 0) & (x.s1q6 < 4) & (x.s1q2 ==1)    |
+| 2016Q1 | M 04-08 | Nigeria/2015-16/Data/sect1_plantingw3.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 4) & (x.s1q6 < 9) & (x.s1q2 ==1)    |
+| 2016Q1 | M 09-13 | Nigeria/2015-16/Data/sect1_plantingw3.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 9) & (x.s1q6 < 14) & (x.s1q2 ==1)   |
 | 2016Q1 | M 14-18 | Nigeria/2015-16/Data/sect1_plantingw3.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 14) & (x.s1q6 < 19) & (x.s1q2 ==1)  |
 | 2016Q1 | M 19-30 | Nigeria/2015-16/Data/sect1_plantingw3.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 19)  & (x.s1q6 < 31) & (x.s1q2 ==1) |
 | 2016Q1 | M 31-50 | Nigeria/2015-16/Data/sect1_plantingw3.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 31) & (x.s1q6 < 51) & (x.s1q2 ==1)  |
 | 2016Q1 | M 51+   | Nigeria/2015-16/Data/sect1_plantingw3.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 51) & (x.s1q2 ==1)                  |
-| 2016Q1 | F 0-3   | Nigeria/2015-16/Data/sect1_plantingw3.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 0) & (x.s1q6 < 4) & (x.s1q2 ==2)    |
-| 2016Q1 | F 4-8   | Nigeria/2015-16/Data/sect1_plantingw3.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 4) & (x.s1q6 < 9) & (x.s1q2 ==2)    |
-| 2016Q1 | F 9-13  | Nigeria/2015-16/Data/sect1_plantingw3.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 9) & (x.s1q6 < 14) & (x.s1q2 ==2)   |
+| 2016Q1 | F 00-03 | Nigeria/2015-16/Data/sect1_plantingw3.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 0) & (x.s1q6 < 4) & (x.s1q2 ==2)    |
+| 2016Q1 | F 04-08 | Nigeria/2015-16/Data/sect1_plantingw3.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 4) & (x.s1q6 < 9) & (x.s1q2 ==2)    |
+| 2016Q1 | F 09-13 | Nigeria/2015-16/Data/sect1_plantingw3.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 9) & (x.s1q6 < 14) & (x.s1q2 ==2)   |
 | 2016Q1 | F 14-18 | Nigeria/2015-16/Data/sect1_plantingw3.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 14) & (x.s1q6 < 19) & (x.s1q2 ==2)  |
 | 2016Q1 | F 19-30 | Nigeria/2015-16/Data/sect1_plantingw3.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 19)  & (x.s1q6 < 31) & (x.s1q2 ==2) |
 | 2016Q1 | F 31-50 | Nigeria/2015-16/Data/sect1_plantingw3.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 31) & (x.s1q6 < 51) & (x.s1q2 ==2)  |
 | 2016Q1 | F 51+   | Nigeria/2015-16/Data/sect1_plantingw3.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 51) & (x.s1q2 ==2)                  |
-| 2019Q1 | M 0-3   | Nigeria/2018-19/Data/sect1_plantingw4.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 0) & (x.s1q6 < 4) & (x.s1q2 ==1)    |
-| 2019Q1 | M 4-8   | Nigeria/2018-19/Data/sect1_plantingw4.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 4) & (x.s1q6 < 9) & (x.s1q2 ==1)    |
-| 2019Q1 | M 9-13  | Nigeria/2018-19/Data/sect1_plantingw4.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 9) & (x.s1q6 < 14) & (x.s1q2 ==1)   |
+| 2019Q1 | M 00-03 | Nigeria/2018-19/Data/sect1_plantingw4.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 0) & (x.s1q6 < 4) & (x.s1q2 ==1)    |
+| 2019Q1 | M 04-08 | Nigeria/2018-19/Data/sect1_plantingw4.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 4) & (x.s1q6 < 9) & (x.s1q2 ==1)    |
+| 2019Q1 | M 09-13 | Nigeria/2018-19/Data/sect1_plantingw4.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 9) & (x.s1q6 < 14) & (x.s1q2 ==1)   |
 | 2019Q1 | M 14-18 | Nigeria/2018-19/Data/sect1_plantingw4.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 14) & (x.s1q6 < 19) & (x.s1q2 ==1)  |
 | 2019Q1 | M 19-30 | Nigeria/2018-19/Data/sect1_plantingw4.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 19)  & (x.s1q6 < 31) & (x.s1q2 ==1) |
 | 2019Q1 | M 31-50 | Nigeria/2018-19/Data/sect1_plantingw4.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 31) & (x.s1q6 < 51) & (x.s1q2 ==1)  |
 | 2019Q1 | M 51+   | Nigeria/2018-19/Data/sect1_plantingw4.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 51) & (x.s1q2 ==1)                  |
-| 2019Q1 | F 0-3   | Nigeria/2018-19/Data/sect1_plantingw4.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 0) & (x.s1q6 < 4) & (x.s1q2 ==2)    |
-| 2019Q1 | F 4-8   | Nigeria/2018-19/Data/sect1_plantingw4.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 4) & (x.s1q6 < 9) & (x.s1q2 ==2)    |
-| 2019Q1 | F 9-13  | Nigeria/2018-19/Data/sect1_plantingw4.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 9) & (x.s1q6 < 14) & (x.s1q2 ==2)   |
+| 2019Q1 | F 00-03 | Nigeria/2018-19/Data/sect1_plantingw4.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 0) & (x.s1q6 < 4) & (x.s1q2 ==2)    |
+| 2019Q1 | F 04-08 | Nigeria/2018-19/Data/sect1_plantingw4.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 4) & (x.s1q6 < 9) & (x.s1q2 ==2)    |
+| 2019Q1 | F 09-13 | Nigeria/2018-19/Data/sect1_plantingw4.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 9) & (x.s1q6 < 14) & (x.s1q2 ==2)   |
 | 2019Q1 | F 14-18 | Nigeria/2018-19/Data/sect1_plantingw4.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 14) & (x.s1q6 < 19) & (x.s1q2 ==2)  |
 | 2019Q1 | F 19-30 | Nigeria/2018-19/Data/sect1_plantingw4.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 19)  & (x.s1q6 < 31) & (x.s1q2 ==2) |
 | 2019Q1 | F 31-50 | Nigeria/2018-19/Data/sect1_plantingw4.csv | ('j',sum) | lambda x: 0 + (x.s1q6 >= 31) & (x.s1q6 < 51) & (x.s1q2 ==2)  |
@@ -140,17 +412,37 @@
 | Nigeria/2018-19/Data/sect1_plantingw4.csv | hhid | 2019Q1 | zone |
 
 
-
-#+begin_src python :var VARS=VARS_Nigeria INDICES=INDICES_Nigeria :colnames no :tangle /tmp/foo.py
+#+begin_src python :var regions=regions url=data_url VARS=VARS_Nigeria INDICES=INDICES_Nigeria :colnames no :tangle /tmp/foo.py
 from cfe.df_utils import orgtbl_to_df
 from cfe.input_files import construct_df
 import pandas as pd
+import numpy as np
+from eep153_tools import write_sheet
+
+url = url[0][0]
 
 VARS = orgtbl_to_df(VARS)
 INDICES = orgtbl_to_df(INDICES).set_index('File')
 
 df=construct_df(VARS,INDICES,dvcstream=True)
+
+# Rename regions
+df = df.reset_index().replace({'m':dict(regions)}).set_index(['j','t','m'])
+
+# Add up people
+df = df.groupby(['j','t','m']).sum()
+
+df['log HHSize'] = np.log(df.sum(axis=1))
+
+# Make HH IDs strings
+df.rename(index=lambda s: str(s),level='j',inplace=True) 
+
 df.to_parquet('./z.parquet')
+
+# Write to google sheet
+#write_sheet(df,'ligon@berkeley.edu',user_role='writer',json_creds='instructors.json',
+#            key=url,sheet='HH Characteristics')
+
 print(df.groupby(['t','m']).mean())
 print(df.head())
 print(len(df))
@@ -158,272 +450,85 @@ print(len(df))
 
 #+results:
 #+begin_example
-          M 0-3  M 4-8  M 9-13  M 14-18  ...  F 14-18  F 19-30  F 31-50  F 51+
-t      m                                 ...                                  
-2010Q3 1      0      0       0        0  ...        0        0        0      0
-       2      0      0       0        0  ...        0        0        0      0
-       3      0      0       0        0  ...        0        0        0      0
-       4      0      0       0        0  ...        0        0        0      0
-       5      0      0       0        0  ...        0        0        0      0
-       6      0      0       0        0  ...        0        0        0      0
-2011Q1 1      0      0       0        0  ...        0        0        0      0
-       2      0      0       0        0  ...        0        0        0      0
-       3      0      0       0        0  ...        0        0        0      0
-       4      0      0       0        0  ...        0        0        0      0
-       5      0      0       0        0  ...        0        0        0      0
-       6      0      0       0        0  ...        0        0        0      0
-2012Q3 1      0      0       0        0  ...        0        0        0      0
-       2      0      0       0        0  ...        0        0        0      0
-       3      0      0       0        0  ...        0        0        0      0
-       4      0      0       0        0  ...        0        0        0      0
-       5      0      0       0        0  ...        0        0        0      0
-       6      0      0       0        0  ...        0        0        0      0
-2013Q1 1      0      0       0        0  ...        0        0        0      0
-       2      0      0       0        0  ...        0        0        0      0
-       3      0      0       0        0  ...        0        0        0      0
-       4      0      0       0        0  ...        0        0        0      0
-       5      0      0       0        0  ...        0        0        0      0
-       6      0      0       0        0  ...        0        0        0      0
-2015Q3 1      0      0       0        0  ...        0        0        0      0
-       2      0      0       0        0  ...        0        0        0      0
-       3      0      0       0        0  ...        0        0        0      0
-       4      0      0       0        0  ...        0        0        0      0
-       5      0      0       0        0  ...        0        0        0      0
-       6      0      0       0        0  ...        0        0        0      0
-2016Q1 1      0      0       0        0  ...        0        0        0      0
-       2      0      0       0        0  ...        0        0        0      0
-       3      0      0       0        0  ...        0        0        0      0
-       4      0      0       0        0  ...        0        0        0      0
-       5      0      0       0        0  ...        0        0        0      0
-       6      0      0       0        0  ...        0        0        0      0
-2018Q3 1      0      0       0        0  ...        0        0        0      0
-       2      0      0       0        0  ...        0        0        0      0
-       3      0      0       0        0  ...        0        0        0      0
-       4      0      0       0        0  ...        0        0        0      0
-       5      0      0       0        0  ...        0        0        0      0
-       6      0      0       0        0  ...        0        0        0      0
-2019Q1 1      0      0       0        0  ...        0        0        0      0
-       2      0      0       0        0  ...        0        0        0      0
-       3      0      0       0        0  ...        0        0        0      0
-       4      0      0       0        0  ...        0        0        0      0
-       5      0      0       0        0  ...        0        0        0      0
-       6      0      0       0        0  ...        0        0        0      0
+                       M 00-03   M 04-08  ...     F 51+  log HHSize
+t      m                                  ...                      
+2010Q3 North central  0.403023  0.575567  ...  0.234257    1.638568
+       North east     0.574655  0.722710  ...  0.210790    1.791254
+       North west     0.531180  0.755011  ...  0.170379    1.766476
+       South east     0.227960  0.304786  ...  0.453401    1.385137
+       South south    0.267880  0.370611  ...  0.288687        -inf
+       South west     0.224277  0.277457  ...  0.332948    1.283524
+2011Q1 North central  0.362500  0.561250  ...  0.227500    1.594257
+       North east     0.480000  0.721250  ...  0.202500    1.749409
+       North west     0.484444  0.756667  ...  0.167778    1.748077
+       South east     0.195000  0.292500  ...  0.438750        -inf
+       South south    0.231250  0.360000  ...  0.281250    1.463638
+       South west     0.187291  0.268673  ...  0.317726    1.223421
+2012Q3 North central  0.272383  0.624212  ...  0.322825        -inf
+       North east     0.441710  0.742228  ...  0.256477    1.866554
+       North west     0.451025  0.771071  ...  0.241458    1.868869
+       South east     0.175163  0.317647  ...  0.535948    1.421029
+       South south    0.233290  0.352556  ...  0.366972    1.591061
+       South west     0.153942  0.299124  ...  0.401752    1.303769
+2013Q1 North central  0.289507  0.562579  ...  0.280657        -inf
+       North east     0.432796  0.700269  ...  0.243280    1.818557
+       North west     0.408000  0.780571  ...  0.214857        -inf
+       South east     0.165150  0.293888  ...  0.513654        -inf
+       South south    0.216710  0.319843  ...  0.321149        -inf
+       South west     0.147316  0.263421  ...  0.338327        -inf
+2015Q3 North central  0.198232  0.497475  ...  0.332071    1.589304
+       North east     0.438185  0.658842  ...  0.294210    1.882191
+       North west     0.469921  0.693530  ...  0.257662    1.868990
+       South east     0.140770  0.278884  ...  0.544489    1.310746
+       South south    0.182306  0.285523  ...  0.359249    1.419753
+       South west     0.149157  0.221790  ...  0.412451    1.201183
+2016Q1 North central  0.201754  0.547619  ...  0.342105    1.629250
+       North east     0.403727  0.669255  ...  0.282609    1.875009
+       North west     0.467650  0.695800  ...  0.258797    1.885542
+       South east     0.143610  0.270092  ...  0.550725    1.344731
+       South south    0.201602  0.300401  ...  0.355140    1.443954
+       South west     0.139744  0.239744  ...  0.415385    1.239698
+2018Q3 North central  0.217751  0.423669  ...  0.294675    1.470115
+       North east     0.341404  0.665860  ...  0.276029    1.770691
+       North west     0.431791  0.717675  ...  0.215896    1.827713
+       South east     0.190534  0.308252  ...  0.490291    1.226773
+       South south    0.208333  0.269608  ...  0.339461    1.361943
+       South west     0.146489  0.222760  ...  0.318402    1.123135
+2019Q1 North central  0.234670  0.468160  ...  0.280660    1.484037
+       North east     0.417874  0.685990  ...  0.274155    1.790299
+       North west     0.484988  0.750577  ...  0.211316    1.840438
+       South east     0.193087  0.315852  ...  0.482718    1.269002
+       South south    0.191566  0.327711  ...  0.331325    1.396549
+       South west     0.142857  0.221429  ...  0.319048    1.131793
 
-[48 rows x 14 columns]
-                M 0-3  M 4-8  M 9-13  M 14-18  ...  F 14-18  F 19-30  F 31-50  F 51+
-j     t      m                                 ...                                  
-10001 2010Q3 4      0      0       0        0  ...        0        0        0      0
-             4      0      0       0        0  ...        0        0        0      0
-             4      0      0       0        0  ...        0        0        0      0
-             4      0      0       0        0  ...        0        0        0      0
-             4      0      0       0        0  ...        0        0        0      0
+[48 rows x 15 columns]
+                         M 00-03  M 04-08  M 09-13  ...  F 31-50  F 51+  log HHSize
+j     t      m                                      ...                            
+10001 2010Q3 South east        0        0        0  ...        2      0    1.945910
+      2011Q1 South east        0        0        0  ...        2      0    1.945910
+      2012Q3 South east        1        0        0  ...        2      0    2.079442
+      2013Q1 South east        0        0        0  ...        2      0    1.945910
+      2015Q3 South east        1        1        0  ...        2      0    1.791759
 
-[5 rows x 14 columns]
-241078
+[5 rows x 15 columns]
+38654
 #+end_example
 
-
 ** Constructing Household Expenditures
-#+name: xVARS_Nigeria
-| t      | Output | File                                       | Grouping | Mapping |
-|--------+--------+--------------------------------------------+----------+---------|
-| 2010Q3 | value  | Nigeria/2010-11/Data/sect10b_harvestw1.csv | None     | s10bq4  |
-| 2012Q3 | value  | Nigeria/2012-13/Data/sect10b_harvestw2.csv | None     | s10bq4  |
-| 2015Q3 | value  | Nigeria/2015-16/Data/sect10b_harvestw3.csv | None     | s10bq4  |
-| 2018Q3 | value  | Nigeria/2018-19/Data/sect10b_harvestw4.csv | None     | s10bq10 |
-| 2011Q1 | value  | Nigeria/2010-11/Data/sect7b_plantingw1.csv | None     | s7bq4   |
-| 2013Q1 | value  | Nigeria/2012-13/Data/sect7b_plantingw2.csv | None     | s7bq4   |
-| 2016Q1 | value  | Nigeria/2015-16/Data/sect7b_plantingw3.csv | None     | s7bq4   |
-| 2019Q1 | value  | Nigeria/2018-19/Data/sect7b_plantingw4.csv | None     | s7bq10  |
+The data on food consumption is constructed via a question which asks
+the quantity the household has /consumed/ of various items in the last
+seven days (call this quantity consumed).  There are no values associated
+with this quantity.  However, separately the household is asked the
+/quantity purchased/ during the same period, and the amount spent on
+these purchases.  Call the latter the /value of purchases/. 
 
+Our strategy for constructing a value of consumption is to find the
+median unit values of purchases (i.e., value of purchases divided by
+quantities), and then to multiply the quantities consumed by this unit
+value. 
 
+Code to construct expenditures is found in =food_expenditures.py=.
 
-
-#+name: xINDICES_Nigeria
-| File                                       | i       | j    | t      | m    |
-|--------------------------------------------+---------+------+--------+------|
-| Nigeria/2010-11/Data/sect10b_harvestw1.csv | item_cd | hhid | 2010Q3 | zone |
-| Nigeria/2012-13/Data/sect10b_harvestw2.csv | item_cd | hhid | 2012Q3 | zone |
-| Nigeria/2015-16/Data/sect10b_harvestw3.csv | item_cd | hhid | 2015Q3 | zone |
-| Nigeria/2018-19/Data/sect10b_harvestw4.csv | item_cd | hhid | 2018Q3 | zone |
-| Nigeria/2010-11/Data/sect7b_plantingw1.csv | item_cd | hhid | 2011Q1 | zone |
-| Nigeria/2012-13/Data/sect7b_plantingw2.csv | item_cd | hhid | 2013Q1 | zone |
-| Nigeria/2015-16/Data/sect7b_plantingw3.csv | item_cd | hhid | 2016Q1 | zone |
-| Nigeria/2018-19/Data/sect7b_plantingw4.csv | item_cd | hhid | 2019Q1 | zone |
-
-
-
-#+name: build_expenditures
-#+begin_src python :var VARS=xVARS_Nigeria INDICES=xINDICES_Nigeria  :colnames no  :tangle /tmp/foo.py
-from cfe.df_utils import orgtbl_to_df
-from cfe.input_files import construct_df
-import pandas as pd
-import numpy as np
-import json
-
-VARS = orgtbl_to_df(VARS)
-INDICES = orgtbl_to_df(INDICES).set_index('File')
-
-# Grab food labels 
-with open('./food_items.json') as f:
-    food_labels = json.load(f)
-
-df=construct_df(VARS,INDICES,dvcstream=True,label_mappings=food_labels).reset_index()
-df=df.pivot_table(index=['j','t','m'],columns='i',values='value',aggfunc=np.sum)
-
-
-df.to_parquet('x.parquet')
-#print(df.groupby('t').count())
-#+end_src
-
-#+results: build_expenditures
-
-
-#+BEGIN_SRC python :noweb no-export :results output
-import pandas as pd
-nigeria_expenditures = pd.read_pickle("/tmp/y.pickle")
-nigeria_expenditures.to_csv("~/nigeria_expenditures.csv")
-print(nigeria_expenditures.head())
-
-#+END_SRC
-
-#+RESULTS:
-: i           (Cocoyam, Spinach, etc)  Agricultural eggs  ...  Yam flour  Yam-roots
-: t    j                                                  ...                      
-: 2010 10001                      NaN              280.0  ...        NaN     1500.0
-:      10002                      NaN              280.0  ...        NaN     1200.0
-:      10003                      NaN              180.0  ...        NaN      400.0
-:      10004                      NaN              180.0  ...        NaN      400.0
-:      10006                      NaN                NaN  ...        NaN      400.0
-: 
-: [5 rows x 124 columns]
-
-
-** Constructing Household Consumption
-The file =consumption.csv= generated below is filtered after the fact
-in order to bring cell count below five million. Removed all rows
-where units were not descriptive in terms of weight (g, kg, l, ml,
-etc.)
-
-#+name: cVARS_Nigeria
-|    t | Output | File                                                                | Grouping | Mapping |
-|------+--------+---------------------------------------------------------------------+----------+---------|
-| 2010 | value  | ../2010-11/Post Harvest Wave 1/Household/Data/sect10b_harvestw1.dta | None     | s10bq3a |
-| 2012 | value  | ../2012-13/Post Harvest Wave 2/Household/Data/sect10b_harvestw2.dta | None     | s10bq3a |
-| 2015 | value  | ../2015-16/Data/sect10b_harvestw3.dta                               | None     | s10bq3a |
-| 2018 | value  | ../2018-19/Data/sect10b_harvestw4.dta                               | None     | s10bq9a |
-
-#+name: cINDICES_Nigeria
-| File                                                                    | i       | j    |    t | u       |
-|-------------------------------------------------------------------------+---------+------+------+---------|
-| ../2010-11/Post Harvest Wave 1/Household/Data/sect10b_harvestw1.dta | item_cd | hhid | 2010 | s10bq3b |
-| ../2012-13/Post Harvest Wave 2/Household/Data/sect10b_harvestw2.dta | item_cd | hhid | 2012 | s10bq3b |
-| ../2015-16/Data/sect10b_harvestw3.dta                               | item_cd | hhid | 2015 | s10bq3b |
-| ../2018-19/Data/sect10b_harvestw4.dta                               | item_cd | hhid | 2018 | s10bq9b |
-
-#+call: build_consumption(VARS=cVARS_Nigeria, INDICES=cINDICES_Nigeria)
-
-#+RESULTS:
-
-#+BEGIN_SRC python :noweb no-export :results output
-import pandas as pd
-import numpy as np
-nigeria_consumption = pd.read_pickle("/tmp/y.pickle").reset_index()
-nigeria_consumption['u'] = nigeria_consumption['u'].astype('str')
-nigeria_consumption = nigeria_consumption.set_index(['t', 'j'])
-nigeria_consumption.to_csv("~/nigeria_consumption.csv")
-print(nigeria_consumption.head())
-#+END_SRC
-
-#+RESULTS:
-: i                   u  (Cocoyam, Spinach, etc)  ...  Yam flour  Yam-roots
-: t    j                                          ...                      
-: 2010 10001  Kilograms                      NaN  ...        NaN       16.0
-:      10001     Litres                      NaN  ...        NaN        NaN
-:      10002  Kilograms                      NaN  ...        NaN       13.8
-:      10002     Litres                      NaN  ...        NaN        NaN
-:      10003  Kilograms                      NaN  ...        NaN        4.6
-: 
-: [5 rows x 125 columns]
-
-** Constructing Household Consumption from Own Production
-The file =consumption.csv= generated below is filtered after the fact
-in order to bring cell count below five million. Removed all rows
-where units were not descriptive in terms of weight (g, kg, l, ml,
-etc.)
-
-#+name: zVARS_Nigeria
-|    t | Output | File                                       | Grouping | Mapping |
-|------+--------+--------------------------------------------+----------+---------|
-| 2010 | value  | Nigeria/2010-11/Data/sect10b_harvestw1.dta | None     | s10bq5a |
-| 2012 | value  | Nigeria/2012-13/Data/sect10b_harvestw2.dta | None     | s10bq5a |
-| 2015 | value  | Nigeria/2015-16/Data/sect10b_harvestw3.dta | None     | s10bq5a |
-| 2018 | value  | Nigeria/2018-19/Data/sect10b_harvestw4.dta | None     | s10bq6a |
-
-#+name: zINDICES_Nigeria
-| File                                       | i       | j    |    t | u       |
-|--------------------------------------------+---------+------+------+---------|
-| Nigeria/2010-11/Data/sect10b_harvestw1.dta | item_cd | hhid | 2010 | s10bq5b |
-| Nigeria/2012-13/Data/sect10b_harvestw2.dta | item_cd | hhid | 2012 | s10bq5b |
-| Nigeria/2015-16/Data/sect10b_harvestw3.dta | item_cd | hhid | 2015 | s10bq5b |
-| Nigeria/2018-19/Data/sect10b_harvestw4.dta | item_cd | hhid | 2018 | s10bq2b |
-
-#+call: build_consumption(VARS=zVARS_Nigeria, INDICES=zINDICES_Nigeria)
-
-#+RESULTS:
-
-#+BEGIN_SRC python :noweb no-export :results output
-import pandas as pd
-import numpy as np
-nigeria_consumption = pd.read_pickle("/tmp/y.pickle").reset_index()
-nigeria_consumption['u'] = nigeria_consumption['u'].astype('str')
-nigeria_consumption = nigeria_consumption.set_index(['t', 'j'])
-nigeria_consumption.to_csv("~/nigeria_consumption_ownproduction.csv")
-print(nigeria_consumption.head())
-#+END_SRC
-
-#+RESULTS:
-: i             u (Cocoyam, Spinach, etc)  ... Yam flour Yam-roots
-: t    j                                   ...                    
-: 2010 10001  nan                     NaN  ...       NaN         0
-:      10002  nan                     NaN  ...       NaN         0
-:      10003  nan                     NaN  ...       NaN         0
-:      10004  nan                     NaN  ...       NaN         0
-:      10006  nan                     NaN  ...       NaN         0
-: 
-: [5 rows x 125 columns]
-
-** Export to Google Sheets
-#+NAME: nigeria-gsheets
-| Worksheet Name     | File                          |
-|--------------------+-------------------------------|
-| Expenditures       | ~/nigeria_expenditures.csv    |
-| HH Characteristics | ~/nigeria_characteristics.csv |
-
-#+NAME: nigeria-gs
-#+BEGIN_SRC python :noweb no-export :results output table :var gsheets=nigeria-gsheets
-import pygsheets
-import pandas as pd
-
-gc = pygsheets.authorize(service_file='client_secret.json')
-spreadsheet = gc.create("Nigeria", folder="1GyTb2tGIBb4nbqdWyYvVIYvZvFgl0ocM")
-
-wksts = []
-for row in gsheets:
-    combine = [row[0], row[1]]
-    wksts.append(combine)
-    combine = []
-
-for sheet in wksts:
-    df = pd.read_csv(sheet[1])
-    wks = spreadsheet.add_worksheet(sheet[0], rows=len(df), cols=(len(df.columns)))
-    wks.set_dataframe(df,(1,1))
-
-spreadsheet.del_worksheet(spreadsheet.worksheet_by_title("Sheet1"))
-
-#+END_SRC
-
-#+RESULTS: nigeria-gs
 ** Estimate Demands
 #+begin_src python :tangle /tmp/demands.py
 import cfe
@@ -431,26 +536,26 @@ import json
 import pandas as pd
 import numpy as np
 
-# Aggregate food items
-with open('./aggregate_items.json') as f:
-    labels = json.load(f)['Aggregated Label']
 
+x = pd.read_parquet('food_expenditures.parquet')
 
-x = pd.read_parquet('x.parquet')
-
-x = x.rename(columns=labels).stack().groupby(['j','t','m','i']).sum().unstack('i')
+#x = x.rename(columns=labels).stack().groupby(['j','t','m','i']).sum().unstack('i')
 
 z = pd.read_parquet('z.parquet')
 z = z.groupby(['j','t','m']).sum()
+z.columns.name = 'k'
+
+# Drop any non-finite rows in z
+z = z[np.isfinite(z.sum(axis=1))]
 
 x = x.replace(0,np.nan)
 
 y = np.log(x)
 
-r = cfe.Result(y=y,z=z)
+#r = cfe.Result(y=y,z=z)
 
 # Restrict to NE region, which includes Gombe
-#r = cfe.Result(y=y.xs(2,level='m',drop_level=False),z=z.xs(2,level='m',drop_level=False)) 
+r = cfe.Result(y=y.xs("North east",level='m',drop_level=False),z=z.xs("North east",level='m',drop_level=False)) 
 
 r.get_predicted_expenditures()
 #+end_src
