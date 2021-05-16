@@ -1,0 +1,5 @@
+outs:
+- md5: 2fe09b9af84730eda025d3cdee0f63e2
+  size: 29248
+  path: croppriceother_W3.dta.bc
+  isexec: true

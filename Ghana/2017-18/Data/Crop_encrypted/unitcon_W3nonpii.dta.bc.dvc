@@ -1,0 +1,5 @@
+outs:
+- md5: 93791c9ac92153dcc9547822ee28ba5f
+  size: 1291152
+  path: unitcon_W3nonpii.dta.bc
+  isexec: true

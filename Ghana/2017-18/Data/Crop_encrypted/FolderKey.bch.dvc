@@ -1,0 +1,5 @@
+outs:
+- md5: 4c306811ae31496e596cbfa5e7817b90
+  size: 4096
+  path: FolderKey.bch
+  isexec: true

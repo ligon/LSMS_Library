@@ -1,0 +1,5 @@
+outs:
+- md5: e7ea0641dd7eccdbfb073ea65eba9bea
+  size: 282368
+  path: cropprice_W3.dta.bc
+  isexec: true
