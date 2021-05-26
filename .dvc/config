@@ -4,4 +4,4 @@
 ['remote "ligonresearch"']
     url = gdrive://1oVOdo2-oeM_LYBSe1lKSr-pm08syczdu/LSMS
     gdrive_use_service_account = true
-    gdrive_service_account_json_file_path = .dvc/tmp/gdrive-user-credentials.json
+    gdrive_service_account_json_file_path = ./tmp/gdrive-user-credentials.json
