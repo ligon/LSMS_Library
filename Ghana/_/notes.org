@@ -229,6 +229,77 @@ with open('food_items.json','w') as f:
 
 #+results:
 
+* Work out labels for other expenditures across rounds
+#+begin_src python :results output raw table
+import pandas as pd
+from cfe.df_utils import df_to_orgtbl
+
+rounds = ['2009-10','2013-14','2017-18']
+
+labels = {t:pd.Series(pd.read_parquet('../%s/_/other_expenditures.parquet' % t).sort_index(axis=1).columns.tolist()) for t in rounds}
+
+df = pd.DataFrame(labels)
+
+print(df_to_orgtbl(df))
+#+end_src
+
+#+name: other_items_labels
+| 2013-14                | 2017-18                | 2009-10                        | Preferred Label         |
+|------------------------+------------------------+--------------------------------+-------------------------|
+| babysitters            | babysitters            | BABY SITTERS, DAY CARE ATTENDA | Babysitters             |
+| beauty                 | beauty                 | BARBERS AND BEAUTY SHOPS       | Beauty                  |
+| cement                 | cement                 | CEMENT (FOR MINOR REPAIRS OF T | Cement                  |
+| cleaningfluid          | cleaningfluid          | SOAPS, BLEECHES, DISINFECTANTS | Cleaning fluids         |
+| communications         | communications         | POSTAL, TELEPHONE, TELEGRAM, F | Communications          |
+| entertainment          | entertainment          | ENTERTAINMENT                  | Entertainment           |
+| festivals              | festivals              | CULTURAL FESTIVALS (DONATIONS) | Festivals               |
+| funeraldonations       | funeraldonations       | FUNERALS (DONATIONS)           | Funeral donations       |
+| gardensupplies         | gardensupplies         | GARDENING EXPENSES             | Garden supplies         |
+| gifts                  | gifts                  | GIFTS/SUPPORT TO HELP AT TIME  | Gifts                   |
+| hiredlabour            | hiredlabour            | HIRED LABOUR FOR DWELLING REPA | Hired labour            |
+| houseboysmaids         | houseboysmaids         | HOUSE BOYS/ HOUSE MAIDS        | Houseboys/maids         |
+| housekeeperscaretakers | housekeeperscaretakers | HOUSE KEEPERS/ CARETAKERS      | Housekeepers/caretakers |
+| insecticides           | insecticides           | INSECTICIDES - COILS AND SPRAY | Insecticides            |
+| lawnboys               | lawnboys               | LAWN BOYS/GARDENERS            | Lawnboys                |
+| matches                | matches                | MATCHES AND CANDLES            | Matches                 |
+| medicine               | medicine               | MEDICINE                       | Medicine                |
+| newsmedia              | newsmedia              | NEWSPAPERS, MAGAZINES, AND BOO | Newsmedia               |
+| owneroccupyrent        | owneroccupyrent        | OWNER OCCUPY HOUSING RENT      | Inferred rent           |
+| personalcare           | personalcare           | GOODS FOR PERSONAL CARE        | Personal care           |
+| pets                   | pets                   | PETS, PET FOOD, VERTERNARY SER | Pets                    |
+| plumbelectcarp         | plumbelectcarp         | PLUMBING, ELECTRICAL, AND CARP | Plumbing, etc.          |
+| religiousdonations     | religiousdonations     | CHURCH DONATIONS               | Religious donations     |
+| remittances            | remittances            | REGULAR REMITTANCES/GIFTS      | Remittances             |
+| rent                   | rent                   | PAYMENT FOR RENT               | Rent                    |
+| repairstoappliances    | repairstoappliances    | REPAIRS TO HOUSEHOLD APPLIANCE | Appliance repairs       |
+| repairstocar           | repairstocar           | CAR AND TRUCK REPAIRS, MAINTEN | Auto repairs            |
+| repairstofurniture     | repairstofurniture     | REPAIRS TO FURNITURE AND FLOOR | Furniture repairs       |
+| securityguards         | securityguards         | SECURITY GUARDS                | Security guards         |
+| wastedisposal          | wastedisposal          | SEWERAGE REMOVAL, REFUSE DISPO | Waste disposal          |
+| waterpiped             | waterpiped             | WATER (PIBE-BORNE, METERED)    | Water (piped)           |
+| watertanker            | watertanker            | WATER (TANKER SERVICES)        | Water (tanker)          |
+
+
+
+
+
+
+** Create dictionary for other items
+#+begin_src python :var labels=other_items_labels
+import json
+
+d={}
+for row in labels:
+    d[row[0]]=row[-1]
+    d[row[1]]=row[-1]
+    d[row[2]]=row[-1]
+
+with open('other_items.json','w') as f:
+    json.dump(d,f)
+#+end_src
+
+#+results:
+
 * Estimate demand system
 Note that this relies on the json file created above to harmonize
 labels for food items.
@@ -241,22 +312,32 @@ import json
 rounds = ['2009-10','2013-14','2017-18']
 
 labels = json.load(open('food_items.json'))
+labels.update(json.load(open('other_items.json')))
+
+items = list(set(labels.values()))
 
 y=[]
 z=[]
 for t in rounds:
-    x = pd.read_parquet('../%s/_/food_expenditures.parquet' % t).rename(columns=labels)
+    x = pd.concat([pd.read_parquet('../%s/_/food_expenditures.parquet' % t).rename(columns=labels),
+                   pd.read_parquet('../%s/_/other_expenditures.parquet' % t).rename(columns=labels)],axis=1)
     x = x.groupby('i',axis=1).sum()
     x = x.replace(0,np.nan)
+    x = x[x.columns.intersection(items)] # Drop anything not an item with expenditures
+
     y.append(np.log(x))
     z.append(pd.read_parquet('../%s/_/household_demographics.parquet' % t))
 
 z = pd.concat(z)
 z = z.filter(regex='ales ')
 
+z['log HSize'] = np.log(z.sum(axis=1).replace(0,np.nan))
+
 r = cfe.Result(y=pd.concat(y),z=z)
 
 r.get_predicted_expenditures()
+
+r.to_dataset('result.ds')
 
 print(cfe.df_utils.df_to_orgtbl(r.get_beta(as_df=True).sort_values(ascending=False),float_fmt='%3.2'))
 #+end_src
@@ -304,6 +385,20 @@ print(cfe.df_utils.df_to_orgtbl(r.get_beta(as_df=True).sort_values(ascending=Fal
 | Honey                   | 0.290 |
 | Cocoyam                 | 0.289 |
 
-#+end_example
 
 
+
+
+* Association between \log\lambda and other variables of interest
+#+begin_src python
+import cfe
+import pandas as pd
+import dvc.api
+
+r = cfe.from_dataset('result.ds') 
+
+l = r.get_loglambdas(as_df=True).droplevel('m')
+
+
+
+#+end_src

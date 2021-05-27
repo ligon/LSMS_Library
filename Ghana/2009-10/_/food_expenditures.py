@@ -20,6 +20,8 @@ df['given'] = df['s11a_dii'] + df['s11a_diii']/100
 
 x = df[[myvars['HHID'],myvars['item'],'purchased','produced','given']]
 
+x[myvars['HHID']] = x[myvars['HHID']].astype(str)
+
 x = x.set_index([myvars['HHID'],myvars['item']]).sum(axis=1).unstack(myvars['item'])
 
 x.index.name = 'j'
