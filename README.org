@@ -148,7 +148,7 @@
      #+begin_src sh
      cd ../Data
      dvc add *.dta
-     git add *.dvc .gitignore
+     git add *.dvc .gitignore # Depending on settings, this may be done automatically.
      git commit -m"Add Uganda/2015-16/Data/*.dta files to dvc store."
      git pull && git push
      #+end_src
