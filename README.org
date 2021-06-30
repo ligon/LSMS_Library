@@ -48,16 +48,15 @@
    #+begin_src sh
    pip install dvc[gdrive]
    #+end_src
-   The private key for accessing the NSS data on google drive is found
-   in the file =dvc-data-store-290614-8f28d1ad760e.p12=.  The =gpg=
+   The private key for accessing the data on google drive is found
+   in the file =dvc-data-store-290614-*.json.gpg=.  The =gpg=
    string indicates that this file is encrypted using a secret
    passphrase.  To learn the secret passphrase you'll need to ask
    =ligon@berkeley.edu=.  Once you have it:
    #+begin_src sh
-   gpg -d -o dvc-data-store-290614-8f28d1ad760e.p12 dvc-data-store-290614-8f28d1ad760e.p12.gpg 
+   gpg -d dvc-data-store-290614-8f28d1ad760e.json.gpg > .dvc/my_creds.json
    #+end_src
-   And supply the secret passphrase, yielding the service account file
-   =dvc-data-store-038f7b78c250.p12=. 
+   And supply the secret passphrase.
 
    (If this doesn't work, make sure you have =gpg= installed: https://gnupg.org/download/)
 
