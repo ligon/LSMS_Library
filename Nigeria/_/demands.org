@@ -161,11 +161,6 @@ write_sheet(rdi,
 
 ** FCT
 
-A high-quality food conversion table for Uganda is available from
-https://www.harvestplus.org/node/562; an adaption of this table is
-given below:
-
-
 *** Nutrient mapping
  We need mappings of the nutrient labels from the FCT into the
  nutrients in the RDI.  A high quality FCT for West Africa (including
@@ -517,7 +512,7 @@ j     t      m                                      ...
 ** Constructing Household Expenditures
 The data on food consumption is constructed via a question which asks
 the quantity the household has /consumed/ of various items in the last
-seven days (call this quantity consumed).  There are no values associated
+seven days (call this quantity consumed).  There are no monetary values associated
 with this quantity.  However, separately the household is asked the
 /quantity purchased/ during the same period, and the amount spent on
 these purchases.  Call the latter the /value of purchases/. 
