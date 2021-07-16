@@ -33,7 +33,6 @@ various datasets to different google sheets at
   - https://docs.google.com/spreadsheets/d/1whE_EW5x-jxrsKvYWfefdBppzp_TZhPP61bdEN-FEJ4/
 
 
-
   We use tools from =cfe.input_files= to build dataframes below.
   Note that each round actually collects data twice; once (third
   quarter) after harvest, and later after planting.
@@ -444,70 +443,6 @@ print(len(df))
 #+end_src
 
 #+results:
-#+begin_example
-                       M 00-03   M 04-08  ...     F 51+  log HHSize
-t      m                                  ...                      
-2010Q3 North central  0.403023  0.575567  ...  0.234257    1.638568
-       North east     0.574655  0.722710  ...  0.210790    1.791254
-       North west     0.531180  0.755011  ...  0.170379    1.766476
-       South east     0.227960  0.304786  ...  0.453401    1.385137
-       South south    0.267880  0.370611  ...  0.288687        -inf
-       South west     0.224277  0.277457  ...  0.332948    1.283524
-2011Q1 North central  0.362500  0.561250  ...  0.227500    1.594257
-       North east     0.480000  0.721250  ...  0.202500    1.749409
-       North west     0.484444  0.756667  ...  0.167778    1.748077
-       South east     0.195000  0.292500  ...  0.438750        -inf
-       South south    0.231250  0.360000  ...  0.281250    1.463638
-       South west     0.187291  0.268673  ...  0.317726    1.223421
-2012Q3 North central  0.272383  0.624212  ...  0.322825        -inf
-       North east     0.441710  0.742228  ...  0.256477    1.866554
-       North west     0.451025  0.771071  ...  0.241458    1.868869
-       South east     0.175163  0.317647  ...  0.535948    1.421029
-       South south    0.233290  0.352556  ...  0.366972    1.591061
-       South west     0.153942  0.299124  ...  0.401752    1.303769
-2013Q1 North central  0.289507  0.562579  ...  0.280657        -inf
-       North east     0.432796  0.700269  ...  0.243280    1.818557
-       North west     0.408000  0.780571  ...  0.214857        -inf
-       South east     0.165150  0.293888  ...  0.513654        -inf
-       South south    0.216710  0.319843  ...  0.321149        -inf
-       South west     0.147316  0.263421  ...  0.338327        -inf
-2015Q3 North central  0.198232  0.497475  ...  0.332071    1.589304
-       North east     0.438185  0.658842  ...  0.294210    1.882191
-       North west     0.469921  0.693530  ...  0.257662    1.868990
-       South east     0.140770  0.278884  ...  0.544489    1.310746
-       South south    0.182306  0.285523  ...  0.359249    1.419753
-       South west     0.149157  0.221790  ...  0.412451    1.201183
-2016Q1 North central  0.201754  0.547619  ...  0.342105    1.629250
-       North east     0.403727  0.669255  ...  0.282609    1.875009
-       North west     0.467650  0.695800  ...  0.258797    1.885542
-       South east     0.143610  0.270092  ...  0.550725    1.344731
-       South south    0.201602  0.300401  ...  0.355140    1.443954
-       South west     0.139744  0.239744  ...  0.415385    1.239698
-2018Q3 North central  0.217751  0.423669  ...  0.294675    1.470115
-       North east     0.341404  0.665860  ...  0.276029    1.770691
-       North west     0.431791  0.717675  ...  0.215896    1.827713
-       South east     0.190534  0.308252  ...  0.490291    1.226773
-       South south    0.208333  0.269608  ...  0.339461    1.361943
-       South west     0.146489  0.222760  ...  0.318402    1.123135
-2019Q1 North central  0.234670  0.468160  ...  0.280660    1.484037
-       North east     0.417874  0.685990  ...  0.274155    1.790299
-       North west     0.484988  0.750577  ...  0.211316    1.840438
-       South east     0.193087  0.315852  ...  0.482718    1.269002
-       South south    0.191566  0.327711  ...  0.331325    1.396549
-       South west     0.142857  0.221429  ...  0.319048    1.131793
-
-[48 rows x 15 columns]
-                         M 00-03  M 04-08  M 09-13  ...  F 31-50  F 51+  log HHSize
-j     t      m                                      ...                            
-10001 2010Q3 South east        0        0        0  ...        2      0    1.945910
-      2011Q1 South east        0        0        0  ...        2      0    1.945910
-      2012Q3 South east        1        0        0  ...        2      0    2.079442
-      2013Q1 South east        0        0        0  ...        2      0    1.945910
-      2015Q3 South east        1        1        0  ...        2      0    1.791759
-
-[5 rows x 15 columns]
-38654
-#+end_example
 
 ** Constructing Household Expenditures
 The data on food consumption is constructed via a question which asks
@@ -532,7 +467,8 @@ import pandas as pd
 import numpy as np
 
 
-x = pd.read_parquet('food_expenditures.parquet')
+x = pd.concat([pd.read_parquet('food_expenditures.parquet'),
+               pd.read_parquet('nonfood_expenditures.parquet')],axis=1)
 
 #x = x.rename(columns=labels).stack().groupby(['j','t','m','i']).sum().unstack('i')
 
@@ -547,10 +483,11 @@ x = x.replace(0,np.nan)
 
 y = np.log(x)
 
-#r = cfe.Result(y=y,z=z)
+r = cfe.Result(y=y,z=z,verbose=True)
 
 # Restrict to NE region, which includes Gombe
-r = cfe.Result(y=y.xs("North east",level='m',drop_level=False),z=z.xs("North east",level='m',drop_level=False)) 
+#r = cfe.Result(y=y.xs("North east",level='m',drop_level=False),z=z.xs("North east",level='m',drop_level=False),
+#               verbose=True,min_proportion_items=0.05,min_xproducts=10) 
 
 r.get_predicted_expenditures()
 #+end_src
