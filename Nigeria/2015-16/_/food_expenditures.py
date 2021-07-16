@@ -46,7 +46,7 @@ def rectify(food,units=unitcodes,conv=conv):
     unit_values = unit_values.reset_index().set_index(['j','t','m','i','u']).squeeze()
     p_per_kg = broadcast_binary_op(unit_values,lambda x,y:x/y,conv)
 
-    p_per_kg = p_per_kg.loc[p_per_kg.index.isin(conv.index.levels[3].tolist(),level='u')]
+    p_per_kg = p_per_kg.loc[p_per_kg.index.isin(conv.index.get_level_values('u').tolist(),level='u')]
 
     p = p_per_kg.squeeze().groupby(['t','m','i']).median()
 
@@ -54,7 +54,7 @@ def rectify(food,units=unitcodes,conv=conv):
 
     c_in_kg = broadcast_binary_op(c,lambda x,y:x*y,conv)
 
-    c_in_kg = c_in_kg.loc[c_in_kg.index.isin(conv.index.levels[2].tolist(),level='u')]
+    c_in_kg = c_in_kg.loc[c_in_kg.index.isin(conv.index.get_level_values('u').tolist(),level='u')]
 
     c = c_in_kg.squeeze().groupby(['j','t','m','i']).sum()
 
