@@ -1,4 +1,5 @@
-* Consolidated Codes 
+
+* Consolidated Codes for Foods
   These codes are consistent across rounds, but not all codes appear
   in all rounds.
 #+name: food_codes
@@ -121,7 +122,7 @@
 |  145 |                                        |                                        | Melon (shelled)                        |                                        | Melon (shelled)                        | Melon (shelled)                        | Melon (shelled)                      | Melon (shelled)                      |
 |  146 |                                        |                                        | Melon (unshelled)                      |                                        | Melon (unshelled)                      | Melon (unshelled)                      | Melon (unshelled)                    | Melon (unshelled)                    |
 |  147 |                                        |                                        |                                        |                                        | Melon (ground)                         | Melon (ground)                         | Melon (ground)                       | Melon (ground)                       |
-|  148 |                                        | f                                      |                                        |                                        |                                        |                                        | Other Spices (e.g. Maggi)            | Other Spices                         |
+|  148 |                                        |                                        |                                        |                                        |                                        |                                        | Other Spices (e.g. Maggi)            | Other Spices                         |
 |  150 | Bottled water                          | Bottled water                          | Bottled water                          | Bottled water                          | Bottled water                          | Bottled water                          | Bottled water                        | Bottled water                        |
 |  151 | Sachet water                           | Sachet water                           | Sachet water                           | Sachet water                           | Sachet water                           | Sachet water                           | Sachet water                         | Sachet water                         |
 |  152 | Malt drinks                            | Malt drinks                            | Malt drinks                            | Malt drinks                            | Malt drinks                            | Malt drinks                            | Malt drinks                          | Malt drinks                          |
@@ -134,7 +135,7 @@
 |  163 | Gin                                    | Gin                                    | Gin                                    | Gin                                    | Gin                                    | Gin                                    | Gin                                  | Gin                                  |
 |  164 | Other alcoholic beverages              | Other alcoholic beverages              | Other alcoholic beverages              | Other alcoholic beverages              | Other alcoholic beverages              | Other alcoholic beverages              | Other alcoholic beverages            | Other alcoholic beverages            |
 
-** Create dictionary for food items
+* Create dictionary for food items
 #+begin_src python :var labels=food_codes :colnames no :tangle /tmp/bar.py
 from cfe.df_utils import orgtbl_to_df
 import json
@@ -147,7 +148,124 @@ with open('food_items.json','w') as f:
 
 #+results:
 
-** Aggregate/Harmonize food items
+
+
+* Consolidated Codes for non-food expenditures
+  These codes are consistent across rounds, but not all codes appear
+  in all rounds.
+#+name: nonfood_codes
+| Code | 2010Q3                      | 2011Q1                      | 2012Q3                      | 2013Q1                      | 2015Q3                         | 2016Q1                         | 2018Q3                         | 2019Q1                         |
+|------+-----------------------------+-----------------------------+-----------------------------+-----------------------------+--------------------------------+--------------------------------+--------------------------------+--------------------------------|
+|  101 | Cigarettes or tobacco       | Cigarettes or tobacco       | Cigarettes or tobacco       | Cigarettes or tobacco       | Cigarettes or tobacco          | Cigarettes or tobacco          | Cigarettes or tobacco          | Cigarettes or tobacco          |
+|  102 | Matches                     | Matches                     | Matches                     | Matches                     | Matches                        | Matches                        | Matches                        | Matches                        |
+|  103 | Newspapers and Magazines    | Newspapers and Magazines    | Newspapers and Magazines    | Newspapers and Magazines    | Newspapers and Magazines       | Newspapers and Magazines       | Newspapers and Magazines       | Newspapers and Magazines       |
+|  104 | Public transport            | Public transport            | Public transport            | Public transport            | Public transport               | Public transport               | Public transport               | Public transport               |
+|  105 |                             |                             |                             |                             |                                |                                | Gambling, lotto, raffles       | Gambling, lotto, raffles       |
+|  301 | Kerosene                    | Kerosene                    | Kerosene                    | Kerosene                    | Kerosene                       | Kerosene                       | Kerosene                       | Kerosene                       |
+|  302 | Palm Kernel Oil             | Palm Kernel Oil             | Palm Kernel Oil             | Palm Kernel Oil             | Palm Kernel Oil                | Palm Kernel Oil                | Palm Kernel Oil                | Palm Kernel Oil                |
+|  303 | Gas (for lighting/cooking)  | Gas (for lighting/cooking)  | Gas (for lighting/cooking)  | Gas (for lighting/cooking)  | Gas (for lighting/cooking)     | Gas (for lighting/cooking)     | Gas (for lighting/cooking)     | Gas (for lighting/cooking)     |
+|  304 | Other liquid cooking fuel   | Other liquid cooking fuel   | Other liquid cooking fuel   | Other liquid cooking fuel   | Other liquid cooking fuel      | Other liquid cooking fuel      | Other liquid cooking fuel      | Other liquid cooking fuel      |
+|  305 | Electricity                 | Electricity                 | Electricity                 | Electricity                 | Electricity                    | Electricity                    | Electricity                    | Electricity                    |
+|  306 | Candle                      | Candle                      | Candle                      | Candle                      | Candle                         | Candle                         | Candle                         | Candle                         |
+|  307 | Firewood                    | Firewood                    | Firewood                    | Firewood                    | Firewood                       | Firewood                       | Firewood                       | Firewood                       |
+|  308 | Charcoal                    | Charcoal                    | Charcoal                    | Charcoal                    | Charcoal                       | Charcoal                       | Charcoal                       | Charcoal                       |
+|  309 | Petrol                      | Petrol                      | Petrol                      | Petrol                      | Petrol                         | Petrol                         | Petrol                         | Petrol                         |
+|  310 | Diesel                      | Diesel                      | Diesel                      | Diesel                      | Diesel                         | Diesel                         | Diesel                         | Diesel                         |
+|  311 | Light bulbs/globes          | Light bulbs/globes          | Light bulbs/globes          | Light bulbs/globes          | Light bulbs/globes             | Light bulbs/globes             | Light bulbs/globes             | Light bulbs/globes             |
+|  312 | Water                       | Water                       | Water                       | Water                       | Water                          | Water                          | Water                          | Water                          |
+|  313 | Soap & washing powder       | Soap & washing powder       | Soap & washing powder       | Soap & washing powder       | Soap & washing powder          | Soap & washing powder          | Soap & washing powder          | Soap & washing powder          |
+|  314 | Toilet paper                | Toilet paper                | Toilet paper                | Toilet paper                | Toilet paper                   | Toilet paper                   | Toilet paper                   | Toilet paper                   |
+|  315 | Personal care goods         | Personal care goods         | Personal care goods         | Personal care goods         | Personal care goods            | Personal care goods            | Personal care goods            | Personal care goods            |
+|  316 | Vitamins                    | Vitamin                     | Vitamin                     | Vitamin                     | Vitamin                        | Vitamin                        | Vitamin                        | Vitamin                        |
+|  317 | Insecticides, disinfectants | Insecticides, disinfectants | Insecticides, disinfectants | Insecticides, disinfectants | Insecticides, disinfectants    | Insecticides, disinfectants    | Insecticides, disinfectants    | Insecticides, disinfectants    |
+|  318 | Postage                     | Postage                     | Postage                     | Postage                     | Postage                        | Postage                        | Postage                        | Postage                        |
+|  319 | Recharge cards              | Recharge cards              | Recharge cards              | Recharge cards              | Recharge cards                 | Recharge cards                 | Recharge cards                 | Recharge cards                 |
+|  320 | Landline cards              | Landline cards              | Landline cards              | Landline cards              | Landline cards                 | Landline cards                 | Landline cards                 | Landline cards                 |
+|  321 | Internet services           | Internet services           | Internet services           | Internet services           | Internet services              | Internet services              | Internet services              | Internet services              |
+|  322 | Recreational                | Recreational                | Recreational                | Recreational                | Recreational                   | Recreational                   | Recreational                   | Recreational                   |
+|  323 | Motor vehicle repair        | Motor vehicle repair        | Motor vehicle repair        | Motor vehicle repair        | Motor vehicle repair           | Motor vehicle repair           | Motor vehicle repair           | Motor vehicle repair           |
+|  324 | Bicycle repair              | Bicycle repair              | Bicycle repair              | Bicycle repair              | Bicycle repair                 | Bicycle repair                 | Bicycle repair                 | Bicycle repair                 |
+|  325 | Wages to servants           | Wages to servants           | Wages to servants           | Wages to servants           | Wages to servants              | Wages to servants              | Wages to servants              | Wages to servants              |
+|  326 | Mortgage                    | Mortgage                    | Mortgage                    | Mortgage                    | Mortgage                       | Mortgage                       | Mortgage                       | Mortgage                       |
+|  327 | Repairs to dwelling         | Repairs to dwelling         | Repairs to dwelling         | Repairs to dwelling         | Repairs to dwelling            | Repairs to dwelling            | Repairs to dwelling            | Repairs to dwelling            |
+|  328 | Repairs to household items  | Repairs to household items  | Repairs to household items  | Repairs to household items  | Repairs to household items     | Repairs to household items     | Repairs to household items     | Repairs to household items     |
+|  329 | House rent                  | House rent                  | House rent                  | House rent                  | House rent                     | House rent                     | House rent                     | House rent                     |
+|  330 |                             |                             |                             |                             | Lubricants                     | Lubricants                     | Lubricants                     | Lubricants                     |
+|  401 | Infant clothing             | Infant clothing             | Infant clothing             | Infant clothing             | Infant clothing                | Infant clothing                | Infant clothing                | Infant clothing                |
+|  402 | Baby diapers                | Baby diapers                | Baby diapers                | Baby diapers                | Baby diapers                   | Baby diapers                   | Baby diapers                   | Baby diapers                   |
+|  403 | Boys' tailored clothes      | Boys' tailored clothes      | Boys' tailored clothes      | Boys' tailored clothes      | Boys' tailored clothes         | Boys' tailored clothes         | Boys' tailored clothes         | Boys' tailored clothes         |
+|  404 | Boys' dress                 | Boys' dress                 | Boys' dress                 | Boys' dress                 | Boys' dress                    | Boys' dress                    | Boys' dress                    | Boys' dress                    |
+|  405 | Girls tailored clothes      | Girls tailored clothes      | Girls tailored clothes      | Girls tailored clothes      | Girls tailored clothes         | Girls tailored clothes         | Girls tailored clothes         | Girls tailored clothes         |
+|  406 | Girls dress                 | Girls dress                 | Girls dress                 | Girls dress                 | Girls dress                    | Girls dress                    | Girls dress                    | Girls dress                    |
+|  407 | Men's tailored clothes      | Men's tailored clothes      | Men's tailored clothes      | Men's tailored clothes      | Men's tailored clothes         | Men's tailored clothes         | Men's tailored clothes         | Men's tailored clothes         |
+|  408 | Men's dress                 | Men's dress                 | Men's dress                 | Men's dress                 | Men's dress                    | Men's dress                    | Men's dress                    | Men's dress                    |
+|  409 | Women's tailored clothes    | Women's tailored clothes    | Women's tailored clothes    | Women's tailored clothes    | Women's tailored clothes       | Women's tailored clothes       | Women's tailored clothes       | Women's tailored clothes       |
+|  410 | Women's dress               | Women's dress               | Women's dress               | Women's dress               | Women's dress                  | Women's dress                  | Women's dress                  | Women's dress                  |
+|  411 | Ankara, George materials    | Ankara, George materials    | Ankara, George materials    | Ankara, George materials    | Ankara, George materials       | Ankara, George materials       | Ankara, George materials       | Ankara, George materials       |
+|  412 | Other clothing materials    | Other clothing materials    | Other clothing materials    | Other clothing materials    | Other clothing materials       | Other clothing materials       | Other clothing materials       | Other clothing materials       |
+|  413 | Boy's shoes                 | Boy's shoes                 | Boy's shoes                 | Boy's shoes                 | Boy's shoes                    | Boy's shoes                    | Boy's shoes                    | Boy's shoes                    |
+|  414 | Men's shoes                 | Men's shoes                 | Men's shoes                 | Men's shoes                 | Men's shoes                    | Men's shoes                    | Men's shoes                    | Men's shoes                    |
+|  415 | Girl's shoes                | Girl's shoes                | Girl's shoes                | Girl's shoes                | Girl's shoes                   | Girl's shoes                   | Girl's shoes                   | Girl's shoes                   |
+|  416 | Women's shoes               | Women's shoes               | Women's shoes               | Women's shoes               | Women's shoes                  | Women's shoes                  | Women's shoes                  | Women's shoes                  |
+|  417 | Tailoring charges           | Tailoring charges           | Tailoring charges           | Tailoring charges           | Tailoring charges              | Tailoring charges              | Tailoring charges              | Tailoring charges              |
+|  418 | Laundry & dry cleaning      | Laundry & dry cleaning      | Laundry & dry cleaning      | Laundry & dry cleaning      | Laundry & dry cleaning         | Laundry & dry cleaning         | Laundry & dry cleaning         | Laundry & dry cleaning         |
+|  419 | Bowls, glassware, etc.      | Bowls, glassware, etc.      | Bowls, glassware, etc.      | Bowls, glassware, etc.      | Bowls, glassware, etc.         | Bowls, glassware, etc.         | Bowls, glassware, etc.         | Bowls, glassware, etc.         |
+|  420 | Cooking utensils            | Cooking utensils            | Cooking utensils            | Cooking utensils            | Cooking utensils               | Cooking utensils               | Cooking utensils               | Cooking utensils               |
+|  421 | Cleaning utensils           | Cleaning utensils           | Cleaning utensils           | Cleaning utensils           | Cleaning utensils              | Cleaning utensils              | Cleaning utensils              | Cleaning utensils              |
+|  422 | Torch/flashlight            | Torch/flashlight            | Torch/flashlight            | Torch/flashlight            | Torch/flashlight               | Torch/flashlight               | Torch/flashlight               | Torch/flashlight               |
+|  423 | Rain gear                   | Rain gear                   | Rain gear                   | Rain gear                   | Rain gear                      | Rain gear                      | Rain gear                      | Rain gear                      |
+|  424 | Paraffin lamp               | Paraffin lamp               | Paraffin lamp               | Paraffin lamp               | Paraffin lamp                  | Paraffin lamp                  | Paraffin lamp                  | Paraffin lamp                  |
+|  425 | Stationery                  | Stationery                  | Stationery                  | Stationery                  | Stationery                     | Stationery                     | Stationery                     | Stationery                     |
+|  426 | Books                       | Books                       | Books                       | Books                       | Books                          | Books                          | Books                          | Books                          |
+|  427 | House decor                 | House decor                 | House decor                 | House decor                 | House decor                    | House decor                    | House decor                    | House decor                    |
+|  428 | Lodging                     | Lodging                     | Lodging                     | Lodging                     | Lodging                        | Lodging                        | Lodging                        | Lodging                        |
+|  429 | Religious donations         | Religious donations         | Religious donations         | Religious donations         | Religious donations            | Religious donations            | Religious donations            | Religious donations            |
+|  430 | Health care                 | Health care                 | Health care                 | Health care                 | Health care                    | Health care                    | Health care                    | Health care                    |
+|  431 |                             |                             |                             |                             | Hand-loomed: ASO-OKE           | Hand-loomed: ASO-OKE           | Hand-loomed: ASO-OKE           | Hand-loomed: ASO-OKE           |
+|  432 |                             |                             |                             |                             | Repair of footwear             | Repair of footwear             | Repair of footwear             | Repair of footwear             |
+|  433 |                             |                             |                             |                             | Electric kettle                | Electric kettle                | Electric kettle                | Electric kettle                |
+|  434 |                             |                             |                             |                             | Coal pot                       | Coal pot                       | Coal pot                       | Coal pot                       |
+|  435 |                             |                             |                             |                             | Appliance repairs              | Appliance repairs              | Appliance repairs              | Appliance repairs              |
+|  436 |                             |                             |                             |                             | Bed sheets                     | Bed sheets                     | Bed sheets                     | Bed sheets                     |
+|  437 |                             |                             |                             |                             | Pillow                         | Pillow                         | Pillow                         | Pillow                         |
+|  438 |                             |                             |                             |                             | Curtains and other linens      | Curtains and other linens      | Curtains and other linens      | Curtains and other linens      |
+|  439 |                             |                             |                             |                             | Carpet & other floor coverings | Carpet & other floor coverings | Carpet & other floor coverings | Carpet & other floor coverings |
+|  440 |                             |                             |                             |                             | Cell phone                     | Cell phone                     | Cell phone                     | Cell phone                     |
+|  441 |                             |                             |                             |                             | Personal computer              | Personal computer              | Personal computer              | Personal computer              |
+|  501 | Carpets, drapes             | Carpets, drapes             | Carpets, drapes             | Carpets, drapes             | Carpets, drapes                | Carpets, drapes                | Carpets, drapes                | Carpets, drapes                |
+|  502 | Linens                      | Linens                      | Linens                      | Linens                      | Linens                         | Linens                         | Linens                         | Linens                         |
+|  503 | Mats (sleeping or drying)   | Mats (sleeping or drying)   | Mats (sleeping or drying)   | Mats (sleeping or drying)   | Mats (sleeping or drying)      | Mats (sleeping or drying)      | Mats (sleeping or drying)      | Mats (sleeping or drying)      |
+|  504 | Mosquito nets               | Mosquito nets               | Mosquito nets               | Mosquito nets               | Mosquito nets                  | Mosquito nets                  | Mosquito nets                  | Mosquito nets                  |
+|  505 | Mattress                    | Mattress                    | Mattress                    | Mattress                    | Mattress                       | Mattress                       | Mattress                       | Mattress                       |
+|  506 | Sport & hobby equipment     | Sport & hobby equipment     | Sport & hobby equipment     | Sport & hobby equipment     | Sport & hobby equipment        | Sport & hobby equipment        | Sport & hobby equipment        | Sport & hobby equipment        |
+|  507 | Film & camera               | Film & camera               | Film & camera               | Film & camera               | Film & camera                  | Film & camera                  | Film & camera                  | Film & camera                  |
+|  508 | Building materials          | Building materials          | Building materials          | Building materials          | Building materials             | Building materials             | Building materials             | Building materials             |
+|  509 | Council rates               | Council rates               | Council rates               | Council rates               | Council rates                  | Council rates                  | Council rates                  | Council rates                  |
+|  510 | Health insurance            | Health insurance            | Health insurance            | Health insurance            | Health insurance               | Health insurance               | Health insurance               | Health insurance               |
+|  511 | Auto insurance              | Auto insurance              | Auto insurance              | Auto insurance              | Auto insurance                 | Auto insurance                 | Auto insurance                 | Auto insurance                 |
+|  512 | Home insurance              | Home insurance              | Home insurance              | Home insurance              | Home insurance                 | Home insurance                 | Home insurance                 | Home insurance                 |
+|  513 | Life insurance              | Life insurance              | Life insurance              | Life insurance              | Life insurance                 | Life insurance                 | Life insurance                 | Life insurance                 |
+|  514 | Fines or legal fees         | Fines or legal fees         | Fines or legal fees         | Fines or legal fees         | Fines or legal fees            | Fines or legal fees            | Fines or legal fees            | Fines or legal fees            |
+|  515 | Dowry costs                 | Dowry costs                 | Dowry costs                 | Dowry costs                 | Dowry costs                    | Dowry costs                    | Dowry costs                    | Dowry costs                    |
+|  516 | Marriage ceremonies         | Marriage ceremonies         | Marriage ceremonies         | Marriage ceremonies         | Marriage ceremonies            | Marriage ceremonies            | Marriage ceremonies            | Marriage ceremonies            |
+|  517 | Funeral costs               | Funeral costs               | Funeral costs               | Funeral costs               | Funeral costs                  | Funeral costs                  | Funeral costs                  | Funeral costs                  |
+|  518 | Poles                       | Poles                       | Poles                       | Poles                       | Poles                          | Poles                          | Poles                          | Poles                          |
+|  519 | Thatch                      | Thatch                      | Thatch                      | Thatch                      | Thatch                         | Thatch                         | Thatch                         | Thatch                         |
+
+* Create dictionary for non-food items
+#+begin_src python :var labels=nonfood_codes :colnames no :tangle /tmp/bar.py
+from cfe.df_utils import orgtbl_to_df
+import json
+
+df = orgtbl_to_df(labels).set_index('Code')
+
+with open('nonfood_items.json','w') as f:
+    json.dump(df.to_dict(),f)
+#+end_src
+
+#+results:
+
+* Aggregate/Harmonize food items
 #+name: aggregation
 | Original Label                         | Aggregated Label                     |
 |----------------------------------------+--------------------------------------|
