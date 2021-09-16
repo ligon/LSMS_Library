@@ -911,7 +911,7 @@ write_sheet(z[k_index],
 
 Drawing on the data in our google sheet, estimate demands and save a
 slimmed down version of the result instances locally.
-#+begin_src python :var url = data_url :tangle /tmp/demands.py
+#+begin_src python :var url = data_url :tangle /tmp/tanzania_demands.py
 import cfe
 import numpy as np
 from eep153_tools import read_sheets
@@ -933,7 +933,10 @@ r = cfe.Result(y=y,z=z,prices=p)
 r.get_alpha()
 r.get_predicted_expenditures()
 
-r.drop_vars(['y','ce','cehat']).to_dataset('/tmp/Uganda_small.ds')
+r.to_dataset('/tmp/Tanzania_all.ds')
+
+r.drop_vars(['y','ce','cehat']).to_dataset('/tmp/Tanzania_small.ds')
 #+end_src
 
 #+results:
+: None
