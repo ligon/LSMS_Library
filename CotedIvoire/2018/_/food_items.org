@@ -1,0 +1,208 @@
+* Food items
+Get food labels from questionnaire.
+#+begin_src python :results output raw table
+import pandas as pd
+
+food_items = pd.read_excel('../Documentation/CIV-EHCVM1-QNR-MEN-EXCEL-VAGUE1.xlsx',
+                           sheet_name='S7b_Conso_Al',
+                           usecols=[0,1],
+                           names = ['Code','Label'],
+                           skiprows=17).dropna()
+
+
+food_items = food_items.set_index('Code')
+print(food_items.to_markdown())
+#+end_src
+
+#+name: food_items
+| Code | Label                                                                  |
+|------+------------------------------------------------------------------------|
+|    1 | Riz local petit grain                                                  |
+|    2 | Riz local gros grain                                                   |
+|    3 | Riz importé populaire                                                  |
+|    4 | Autre riz importé                                                      |
+|    5 | Maïs en épi                                                            |
+|    6 | Maïs en grain                                                          |
+|    7 | Mil                                                                    |
+|    8 | Sorgho                                                                 |
+|    9 | Blé                                                                    |
+|   10 | Fonio                                                                  |
+|   11 | Autres céréales                                                        |
+|   12 | Farine de maïs                                                         |
+|   13 | Farine de mil                                                          |
+|   14 | Farine de blé local ou importé                                         |
+|   15 | Autres farines de céréales                                             |
+|   16 | Pâtes alimentaires                                                     |
+|   17 | Pain moderne                                                           |
+|   18 | Pain traditionnel                                                      |
+|   19 | Croissants                                                             |
+|   20 | Biscuits                                                               |
+|   21 | Gâteaux                                                                |
+|   22 | Beignets, galettes                                                     |
+|   23 | Viande de bœuf                                                         |
+|   24 | Viande de chameau                                                      |
+|   25 | Viande de mouton                                                       |
+|   26 | Viande de chèvre                                                       |
+|   27 | Abats et tripes (foie, rognon, etc.)                                   |
+|   28 | Viande de porc                                                         |
+|   29 | Poulet sur pied                                                        |
+|   30 | Viande de poulet                                                       |
+|   31 | Viande d'autres volailles domestiques                                  |
+|   32 | Charcuterie (jambon, saucisson), conserves de viandes                  |
+|   33 | Gibiers                                                                |
+|   34 | Autres viandes n.d.a.                                                  |
+|   35 | Tilapia frais ( carpe grise importée)                                  |
+|   36 | Appolo frais (Chinchards)                                              |
+|   37 | Sardinelles fraiches                                                   |
+|   38 | Autres poissons frais                                                  |
+|   39 | Poisson fumé mangni                                                    |
+|   40 | Autres Poissons fumés                                                  |
+|   41 | Poisson séché                                                          |
+|   42 | Crabes, crevettes et autres fruits de mer                              |
+|   43 | Conserves de poisson                                                   |
+|   44 | Lait frais                                                             |
+|   45 | Lait caillé, yaourt                                                    |
+|   46 | Lait concentré sucré                                                   |
+|   47 | Lait concentré non-sucré                                               |
+|   48 | Lait en poudre                                                         |
+|   49 | Fromage                                                                |
+|   50 | Lait et farines pour bébé                                              |
+|   51 | Autres produits laitiers                                               |
+|   52 | Œufs                                                                   |
+|   53 | Beurre                                                                 |
+|   54 | Beurre de karité                                                       |
+|   55 | Huile de palme rouge                                                   |
+|   56 | Huile d'arachide                                                       |
+|   57 | Huile de coton                                                         |
+|   58 | Huile de palme raffinée                                                |
+|   59 | Autres huiles n.d.a. (maïs, soja, huile palmiste, etc.)                |
+|   60 | Mangue                                                                 |
+|   61 | Ananas                                                                 |
+|   62 | Orange                                                                 |
+|   63 | Banane douce                                                           |
+|   64 | Citrons                                                                |
+|   65 | Autres agrumes                                                         |
+|   66 | Avocats                                                                |
+|   67 | Pastèque, Melon                                                        |
+|   68 | Dattes                                                                 |
+|   69 | Noix de coco                                                           |
+|   70 | Canne à sucre                                                          |
+|   71 | Autres fruits (pommes, raisin, etc.)                                   |
+|   72 | Salade (laitue)                                                        |
+|   73 | Choux                                                                  |
+|   74 | Carotte                                                                |
+|   75 | Haricot vert                                                           |
+|   76 | Concombre                                                              |
+|   77 | Aubergine, Courge/Courgette                                            |
+|   78 | Poivron frais                                                          |
+|   79 | Tomate fraîche                                                         |
+|   80 | Tomate séchée                                                          |
+|   81 | Gombo frais                                                            |
+|   82 | Gombo sec                                                              |
+|   83 | Oignon frais                                                           |
+|   84 | Ail                                                                    |
+|   85 | Feuilles d'oseille (dah)                                               |
+|   86 | Feuilles de patate                                                     |
+|   87 | Epinards                                                               |
+|   88 | Kplala                                                                 |
+|   89 | Autres feuilles (manioc, taro, baobab, haricot)                        |
+|   90 | Autre légumes frais n.d.a.                                             |
+|   91 | Concentré de tomate                                                    |
+|   92 | Petits pois                                                            |
+|   93 | Petit pois secs                                                        |
+|   94 | Autres légumes secs n.d.a.                                             |
+|   95 | Niébé/Haricots secs                                                    |
+|   96 | Arachides fraîches en coques                                           |
+|   97 | Arachides séchées en coques                                            |
+|   98 | Arachides décortiquées ou pilées                                       |
+|   99 | Arachide grillée                                                       |
+|  100 | Pâte d'arachide                                                        |
+|  101 | Sésame                                                                 |
+|  102 | Noix de cajou                                                          |
+|  103 | Noix de karité                                                         |
+|  104 | Manioc                                                                 |
+|  105 | Igname                                                                 |
+|  106 | Plantain                                                               |
+|  107 | Pomme de terre                                                         |
+|  108 | Taro, macabo                                                           |
+|  109 | Patate douce                                                           |
+|  110 | Autres tubercules n.d.a.                                               |
+|  111 | Farines de manioc                                                      |
+|  112 | Gari, tapioca                                                          |
+|  113 | Attiéke                                                                |
+|  114 | Sucre (poudre ou morceaux)                                             |
+|  115 | Miel                                                                   |
+|  116 | Chocolat à croquer, pâte à tartiner                                    |
+|  117 | Caramel, bonbons, confiseries, etc.                                    |
+|  118 | Sel                                                                    |
+|  119 | Piment                                                                 |
+|  120 | Gingembre                                                              |
+|  121 | Cube alimentaire                                                       |
+|  122 | Arôme (Maggi, Jumbo, etc.)                                             |
+|  123 | Soumbala (moutarde africaine)                                          |
+|  124 | Mayonnaise                                                             |
+|  125 | Vinaigre /moutarde                                                     |
+|  126 | Autres condiments (poivre etc.)                                        |
+|  127 | Noix de cola                                                           |
+|  128 | Autres produits alimentaires                                           |
+|  129 | Café                                                                   |
+|  130 | Thé                                                                    |
+|  131 | Chocolat en poudre                                                     |
+|  132 | Autres tisanes et infusions n.d.a. (quinquelibat, citronelle, etc.)    |
+|  133 | Jus de fruits (orange, bissap, gingembre, jus de cajou,etc.)           |
+|  134 | Eau minérale/ filtrée                                                  |
+|  135 | Boissons gazeuses (coca, etc.)                                         |
+|  136 | Jus en poudre                                                          |
+|  137 | Bières et vins traditionnels (dolo, vin de palme, vin de raphia, etc.) |
+|  138 | Bières industrielles                                                   |
+
+#+begin_src python :var items=food_items :colnames no
+import pandas as pd
+from cfe.df_utils import orgtbl_to_df
+
+food_items = orgtbl_to_df(items).set_index('Code')
+food_items.to_json('food_items.json')
+
+#+end_src
+
+#+results:
+: None
+
+* Nonfood items
+#+begin_src python :results output raw table
+import pandas as pd
+
+items = pd.read_excel('../Documentation/CIV-EHCVM1-QNR-MEN-EXCEL-VAGUE1.xlsx',
+                      sheet_name='S9b__Conso_NA',
+                      usecols=[0,1],
+                      names = ['Code','Label'],
+                      skiprows=11).dropna()
+
+items = items.set_index('Code')
+print(items.to_markdown())
+
+items.to_json('nonfood_items.json')
+#+end_src
+
+#+results:
+| Code | Label                                       |
+|------+---------------------------------------------|
+|  201 | Cigarettes, Tabac                           |
+|  202 | Pétrole lampant                             |
+|  203 | Charbon de bois/Charbon minéral             |
+|  204 | Bois de chauffe acheté                      |
+|  205 | Bois de chauffe ramassé (estimer la valeur) |
+|  206 | Bougies                                     |
+|  207 | Allumettes                                  |
+|  208 | Carburant pour véhicule                     |
+|  209 | Carburant pour motocyclette                 |
+|  210 | Transport urbain en taxi                    |
+|  211 | Transport urbain en bus                     |
+|  212 | Transport urbain/rural en moto-taxi         |
+|  213 | Transport urbain en train                   |
+|  214 | Transport urbain/rural par voie fluviale    |
+|  215 | Transport urbain/rural par traction animale |
+|  216 | Journaux                                    |
+|  217 | Frais de mouture des céréales               |
+
+
