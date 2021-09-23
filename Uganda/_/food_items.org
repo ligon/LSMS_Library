@@ -1,82 +1,83 @@
-| Code | Preferred Label        |
-|  100 | Matoke (??)            |
-|  101 | Matoke (bunch)         |
-|  102 | Matoke (cluster)       |
-|  103 | Matoke (heap)          |
-|  104 | Matoke (other)         |
-|  105 | Sweet Potatoes (fresh) |
-|  106 | Sweet Potatoes (dry)   |
-|  107 | Cassava (fresh)        |
-|  108 | Cassava (dry/flour)    |
-|  109 | Irish Potatoes         |
-|  110 | Rice                   |
-|  111 | Maize (grains)         |
-|  112 | Maize (cobs)           |
-|  113 | Maize (flour)          |
-|  114 | Bread                  |
-|  115 | Millet                 |
-|  116 | Sorghum                |
-|  117 | Beef                   |
-|  118 | Pork                   |
-|  119 | Goat Meat              |
-|  120 | Other Meat             |
-|  121 | Chicken                |
-|  122 | Fresh Fish             |
-|  123 | Dry/Smoked fish        |
-|  124 | Eggs                   |
-|  125 | Fresh Milk             |
-|  126 | Infant Formula         |
-|  127 | Cooking oil            |
-|  128 | Ghee                   |
-|  129 | Margarine, Butter, etc |
-|  130 | Passion Fruits         |
-|  131 | Sweet Bananas          |
-|  132 | Mangos                 |
-|  133 | Oranges                |
-|  134 | Other Fruits           |
-|  135 | Onions                 |
-|  136 | Tomatoes               |
-|  137 | Cabbages               |
-|  138 | Dodo                   |
-|  139 | Other vegetables       |
-|  140 | Beans (fresh)          |
-|  141 | Beans (dry)            |
-|  142 | Ground nuts (in shell) |
-|  143 | Ground nuts (shelled)  |
-|  144 | Ground nuts (pounded)  |
-|  145 | Peas                   |
-|  146 | Sim sim                |
-|  147 | Sugar                  |
-|  148 | Coffee                 |
-|  149 | Tea                    |
-|  150 | Salt                   |
-|  151 | Soda                   |
-|  152 | Beer                   |
-|  153 | Other Alcoholic drinks |
-|  154 | Other drinks           |
-|  155 | Cigarettes             |
-|  156 | Other Tobacco          |
-|  157 | Restaurant (food)      |
-|  158 | Restaurant (soda)      |
-|  159 | Restaurant (beer)      |
-|  160 | Other juice            |
-|  161 | Other foods            |
-|  162 | Peas (dry)             |
-|  163 | Ground nut (paste)     |
-|  164 | Green pepper           |
-|  165 | Pumpkins               |
-|  166 | Avocado                |
-|  167 | Carrots                |
-|  168 | Eggplant               |
-|  169 | Watermelon             |
-|  170 | Pineapple              |
-|  171 | Pawpaw                 |
-|  172 | Wheat (flour)          |
-|  173 | Chapati                |
-|  174 | Apples                 |
-|  175 | Water                  |
-|  180 | Sweet Potatoes (flour) |
-|  181 | Cassava                |
-|  182 | Cassava                |
-|  190 | Bread                  |
-|  191 | Bread                  |
+| Code | Preferred Label        | Aggregate Label        |
+|  100 | Matoke (??)            | Matoke                 |
+|  101 | Matoke (bunch)         | Matoke                 |
+|  102 | Matoke (cluster)       | Matoke                 |
+|  103 | Matoke (heap)          | Matoke                 |
+|  104 | Matoke (other)         | Matoke                 |
+|  105 | Sweet Potatoes (fresh) | Sweet Potatoes         |
+|  106 | Sweet Potatoes (dry)   | Sweet Potatoes         |
+|  107 | Cassava (fresh)        | Cassava                |
+|  108 | Cassava (dry/flour)    | Cassava                |
+|  109 | Irish Potatoes         | Irish Potatoes         |
+|  110 | Rice                   | Rice                   |
+|  111 | Maize (grains)         | Maize                  |
+|  112 | Maize (cobs)           | Maize                  |
+|  113 | Maize (flour)          | Maize                  |
+|  114 | Bread                  | Bread                  |
+|  115 | Millet                 | Millet                 |
+|  116 | Sorghum                | Sorghum                |
+|  117 | Beef                   | Beef                   |
+|  118 | Pork                   | Pork                   |
+|  119 | Goat Meat              | Goat Meat              |
+|  120 | Other Meat             | Other Meat             |
+|  121 | Chicken                | Chicken                |
+|  122 | Fresh Fish             | Fresh Fish             |
+|  123 | Dry/Smoked fish        | Dry/Smoked fish        |
+|  124 | Eggs                   | Eggs                   |
+|  125 | Fresh Milk             | Fresh Milk             |
+|  126 | Infant Formula         | Infant Formula         |
+|  127 | Cooking oil            | Cooking oil            |
+|  128 | Ghee                   | Ghee                   |
+|  129 | Margarine, Butter, etc | Margarine, Butter, etc |
+|  130 | Passion Fruits         | Passion Fruits         |
+|  131 | Sweet Bananas          | Sweet Bananas          |
+|  132 | Mangos                 | Mangoes                |
+|  133 | Oranges                | Oranges                |
+|  134 | Other Fruits           | Other Fruits           |
+|  135 | Onions                 | Onions                 |
+|  136 | Tomatoes               | Tomatoes               |
+|  137 | Cabbages               | Cabbages               |
+|  138 | Dodo                   | Dodo                   |
+|  139 | Other vegetables       | Other Vegetables       |
+|  140 | Beans (fresh)          | Beans                  |
+|  141 | Beans (dry)            | Beans                  |
+|  142 | Ground nuts (in shell) | Ground nuts            |
+|  143 | Ground nuts (shelled)  | Ground nuts            |
+|  144 | Ground nuts (pounded)  | Ground nuts            |
+|  145 | Peas                   | Peas                   |
+|  146 | Sim sim                | Sim sim                |
+|  147 | Sugar                  | Sugar                  |
+|  148 | Coffee                 | Coffee                 |
+|  149 | Tea                    | Tea                    |
+|  150 | Salt                   | Salt                   |
+|  151 | Soda                   | Soda                   |
+|  152 | Beer                   | Beer                   |
+|  153 | Other Alcoholic drinks | Other Alcoholic drinks |
+|  154 | Other drinks           | Other drinks           |
+|  155 | Cigarettes             | Cigarettes             |
+|  156 | Other Tobacco          | Other Tobacco          |
+|  157 | Restaurant (food)      | Restaurant (food)      |
+|  158 | Restaurant (soda)      | Soda                   |
+|  159 | Restaurant (beer)      | Beer                   |
+|  160 | Other juice            | Other juice            |
+|  161 | Other foods            | Other foods            |
+|  162 | Peas (dry)             | Peas                   |
+|  163 | Ground nut (paste)     | Ground nuts            |
+|  164 | Green pepper           | Other Vegetables       |
+|  165 | Pumpkins               | Other Vegetables       |
+|  166 | Avocado                | Other Fruits           |
+|  167 | Carrots                | Other Vegetables       |
+|  168 | Eggplant               | Other Vegetables       |
+|  169 | Watermelon             | Other Fruits           |
+|  170 | Pineapple              | Other Fruits           |
+|  171 | Pawpaw                 | Other Fruits           |
+|  172 | Wheat flour            | Wheat flour            |
+|  173 | Chapati                | Chapati                |
+|  174 | Apples                 | Other Fruits           |
+|  175 | Water                  | Water                  |
+|  180 | Sweet Potatoes (flour) | Sweet potato flour     |
+|  181 | Cassava                | Cassava                |
+|  182 | Cassava                | Cassava                |
+|  190 | Bread                  | Bread                  |
+|  191 | Bread                  | Bread                  |
+
