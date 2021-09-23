@@ -15,7 +15,7 @@
     to install dependencies which allow =dvc= to work with google
     drive.  Provided you have a reasonably modern =python=
     installation (if you don't we recommend
-    https://www.anaconda.com/), a simple =pip install dvc[gdrive]=
+    https://www.anaconda.com/), a simple =pip install 'dvc[gdrive]'=
     may do the trick.
 
   - =gnupg=, for managing encryption.
