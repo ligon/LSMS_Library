@@ -4,3 +4,4 @@ __pycache__/
 /Nigeria/_/instructors.json
 /.dvc/gdrive-user-credentials.json
 /.dvc/my_creds.json
+*.dta

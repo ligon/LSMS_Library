@@ -228,6 +228,7 @@ with open('food_items.json','w') as f:
 #+end_src
 
 #+results:
+: None
 
 * Work out labels for other expenditures across rounds
 #+begin_src python :results output raw table
@@ -299,6 +300,7 @@ with open('other_items.json','w') as f:
 #+end_src
 
 #+results:
+: None
 
 * Estimate demand system
 Note that this relies on the json file created above to harmonize
