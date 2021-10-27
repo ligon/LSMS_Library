@@ -46,6 +46,8 @@ def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,it
 
     expenditures.index.name = 'j'
     expenditures.columns.name = 'i'
+
+    expenditures = expenditures[expenditures.columns.intersection(food_items.values())]
         
     return expenditures
 
