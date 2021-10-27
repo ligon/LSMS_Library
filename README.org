@@ -43,8 +43,7 @@
 
 ** DVC Setup
    DVC manages the versioning of more-or-less static datasets.
-   For this repository, the DVC datastore is kept on google drive.  To
-   set things up, first install dvc (if it isn't already) with
+data-store-290614-8f28d1ad760e.json.gpg > .dvc/my_creds.json
    #+begin_src sh
    pip install dvc[gdrive]
    #+end_src
@@ -169,4 +168,5 @@
       #+begin_src sh
       find ../Data -name \*.dta -exec rm \{\} \;
       #+end_src
+exit
 
