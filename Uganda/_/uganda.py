@@ -1,6 +1,9 @@
 from lsms.tools import get_food_prices, get_food_expenditures, get_household_roster
+import numpy as np
 import pandas as pd
 import dvc.api
+from collections import defaultdict
+from cfe.df_utils import use_indices
 
 def harmonized_food_labels(fn='../../_/food_items.org'):
     # Harmonized food labels
@@ -79,3 +82,62 @@ def age_sex_composition(fn,sex='sex',sex_converter=None,age='age',months_spent='
     df.columns.name = 'k'
     
     return df
+
+def change_id(x,fn=None,id0=None,id1=None):
+    """Replace instances of id0 with id1.
+
+    The identifier id0 is assumed to be unique.
+
+    If mapping id0->id1 not one-to-one, then id1 modified with
+    suffixes of the form _%d, with %d replaced by a sequence of
+    numbers.
+    """
+
+    if fn is None:
+        x = x.reset_index()
+        if x['j'].dtype==float:
+            x['j'].astype(str).apply(lambda s: s.split('.')[0]).replace('nan',np.nan)
+        elif x['j'].dtype==int:
+            x['j'] = x['j'].astype(str)
+
+        x = x.set_index('j')
+
+        return x
+
+    try:
+        with open(fn,mode='rb') as dta:
+            id = pd.read_stata(dta,convert_categoricals=False)
+    except IOError:
+        with dvc.api.open(fn,mode='rb') as dta:
+            id = pd.read_stata(dta,convert_categoricals=False)
+
+    id = id[[id0,id1]]
+
+    for column in id:
+        if id[column].dtype==float:
+            id[column] = id[column].astype(str).apply(lambda s: s.split('.')[0]).replace('nan',np.nan)
+        elif id[column].dtype==int:
+            id[column] = id[column].astype(str)
+
+    ids = dict(id[[id0,id1]].values.tolist())
+
+    d = defaultdict(list)
+
+    for k,v in ids.items():
+        d[v] += [k]
+
+    updated_id = {}
+    for k,v in d.items():
+        if len(v)==1: updated_id[v[0]]=k
+        else:
+            for it,v_element in enumerate(v):
+                updated_id['%s_%d' % (v_element,it)] = k
+
+    x = x.reset_index()
+    x['j'] = x['j'].map(updated_id).fillna(x['j'])
+    x = x.set_index('j')
+
+    return x
+
+
+
