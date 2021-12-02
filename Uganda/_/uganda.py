@@ -128,14 +128,16 @@ def change_id(x,fn=None,id0=None,id1=None):
 
     updated_id = {}
     for k,v in d.items():
-        if len(v)==1: updated_id[v[0]]=k
+        if len(v)==1: updated_id[v[0]] = k
         else:
             for it,v_element in enumerate(v):
-                updated_id['%s_%d' % (v_element,it)] = k
+                updated_id[v_element] = '%s_%d' % (k,it)
 
     x = x.reset_index()
     x['j'] = x['j'].map(updated_id).fillna(x['j'])
     x = x.set_index('j')
+
+    assert x.index.is_unique, "Non-unique index."
 
     return x
 

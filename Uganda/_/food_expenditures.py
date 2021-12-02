@@ -2,7 +2,6 @@
 """
 Read food expenditures; use harmonized food labels.
 """
-
 import pandas as pd
 from uganda import change_id
 
