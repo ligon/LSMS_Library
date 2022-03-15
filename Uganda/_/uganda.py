@@ -117,7 +117,9 @@ def change_id(x,fn=None,id0=None,id1=None):
         if id[column].dtype==float:
             id[column] = id[column].astype(str).apply(lambda s: s.split('.')[0]).replace('nan',np.nan)
         elif id[column].dtype==int:
-            id[column] = id[column].astype(str)
+            id[column] = id[column].astype(str).replace('nan',np.nan)
+        elif id[column].dtype==object:
+            id[column] = id[column].replace('nan',np.nan)
 
     ids = dict(id[[id0,id1]].values.tolist())
 
@@ -125,6 +127,10 @@ def change_id(x,fn=None,id0=None,id1=None):
 
     for k,v in ids.items():
         d[v] += [k]
+
+    try:
+        d.pop(np.nan)  # Get rid of nan key, if any
+    except KeyError: pass
 
     updated_id = {}
     for k,v in d.items():
