@@ -14,6 +14,8 @@ myvars = dict(fn='Uganda/2005-06/Data/GSEC2.dta',
 
 df = age_sex_composition(**myvars)
 
+mydf = df.copy()
+
 df = df.filter(regex='ales ')
 
 df['log HSize'] = np.log(df.sum(axis=1))

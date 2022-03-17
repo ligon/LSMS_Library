@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sys
 sys.path.append('../../_')
-from uganda import food_expenditures
+from uganda import food_expenditures, change_id
 
 myvars = dict(fn='Uganda/2018-19/Data/GSEC15B.dta',item='CEB01',HHID='hhid',
               purchased='CEB07',

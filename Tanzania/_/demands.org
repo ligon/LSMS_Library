@@ -360,7 +360,6 @@ print(fct.to_markdown())
 |     1107 | Local beer                                             |          41 |       0.3 |        0 |        0 |        0 |        0 |       0.1 |          0 |     5 |     6 |     0 |     0 |
 |     1108 | Wine and spirits                                       |          19 |         0 |        0 |        0 |        0 |      0.5 |         0 |          0 |     8 |    10 |   0.4 |   0.1 |
 
-
 ** Nutrient mapping
 We need mappings of the nutrient labels from the FCT into the
 nutrients in the RDA:
