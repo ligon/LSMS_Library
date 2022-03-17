@@ -1,4 +1,4 @@
-from lsms.tools import get_food_prices, get_food_expenditures, get_household_roster
+from lsms.tools import get_food_prices, get_food_expenditures, get_household_roster, get_household_identification_particulars
 import pandas as pd
 import dvc.api
 
@@ -76,4 +76,14 @@ def age_sex_composition(fn,sex='sex',sex_converter=None,age='age',months_spent='
     df.index.name = 'j'
     df.columns.name = 'k'
     
+    return df
+
+def other_features(fn,urban=None,region=None,HHID='HHID'):
+
+    with dvc.api.open(fn,mode='rb') as dta:
+        df = get_household_identification_particulars(fn=dta,HHID=HHID,urban=urban,region=region)
+
+    df.index.name = 'j'
+    df.columns.name = 'k'
+
     return df
