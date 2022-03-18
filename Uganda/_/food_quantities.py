@@ -18,6 +18,7 @@ for t in ['2005-06','2009-10','2010-11','2011-12','2013-14','2015-16']:
 
 q = pd.DataFrame(q)
 q.columns.name='t'
+
 q = q.stack()
 q = q.reset_index().replace({'units':unitlabels})
 q = q.set_index(['t','HHID','itmcd','units'])

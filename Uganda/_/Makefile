@@ -27,6 +27,12 @@ household_characteristics_parquet := $(household_characteristics:.py=.parquet)
 household_characteristics.parquet: household_characteristics.py $(household_characteristics_parquet)
 	python household_characteristics.py
 
+other_features = $(shell find $(rounds) -name other_features.py)
+other_features_parquet := $(other_features:.py=.parquet)
+
+other_features.parquet: other_features.py $(other_features_parquet)
+	python other_features.py
+
 %.parquet: %.py food_items.org uganda.py
 	(cd $(@D) && python ./$(<F))
 

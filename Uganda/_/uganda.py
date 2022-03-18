@@ -1,4 +1,5 @@
 from lsms.tools import get_food_prices, get_food_expenditures, get_household_roster, get_household_identification_particulars
+from lsms import from_dta
 import numpy as np
 import pandas as pd
 import dvc.api
@@ -29,8 +30,8 @@ def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market'
             key = [k for k,v in foo.items() if 'Kilogram' in [u[:8] for l,u in v.items()]][0]
             unitlabels = sr.value_labels()[key]
 
-    # Prices
     with dvc.api.open(fn,mode='rb') as dta:
+        # Prices
         prices,itemlabels=get_food_prices(dta,itmcd=item,HHID=HHID, market=market,
                                           farmgate=farmgate,units=units,itemlabels=food_items)
 
@@ -117,10 +118,10 @@ def change_id(x,fn=None,id0=None,id1=None):
 
     try:
         with open(fn,mode='rb') as dta:
-            id = pd.read_stata(dta,convert_categoricals=False)
+            id = from_dta(dta)
     except IOError:
         with dvc.api.open(fn,mode='rb') as dta:
-            id = pd.read_stata(dta,convert_categoricals=False)
+            id = from_dta(dta)
 
     id = id[[id0,id1]]
 
