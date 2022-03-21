@@ -15,7 +15,7 @@ food_expenditures.parquet: food_expenditures.py $(food_expenditures_parquet)
 food_quantities = $(shell find $(rounds) -name food_quantities.py)
 food_quantities_parquet := $(food_quantities:.py=.parquet)
 
-food_quantities.parquet: food_quantities.py $(food_expenditure_parquet)
+food_quantities.parquet: food_quantities.py $(food_quantities_parquet)
 	python food_quantities.py
 
 unitvalues.parquet: unitvalues.py $(food_expenditure_parquet) $(food_quantities_parquet)
