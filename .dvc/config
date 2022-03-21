@@ -1,6 +1,8 @@
 [core]
     remote = ligonresearch
     autostage = true
+[cache]
+    type = reflink
 ['remote "ligonresearch"']
     url = gdrive://1oVOdo2-oeM_LYBSe1lKSr-pm08syczdu/LSMS
     gdrive_use_service_account = true
