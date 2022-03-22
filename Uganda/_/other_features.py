@@ -28,14 +28,14 @@ Waves = {'2005-06':(),
          '2018-19':('GSEC1.dta','hhid','t0_hhid'),
          '2019-20':('HH/gsec1.dta','hhid','hhidold')}
 
-x={}
+x = {}
 
 for t in Waves.keys():
     print(t)
     x[t] = pd.read_parquet('../'+t+'/_/other_features.parquet')
-    x[t] = id_walk(x[t],t,Waves)
     if 't' in x[t].index.names:
         x[t] = x[t].droplevel('t')
+    x[t] = id_walk(x[t],t,Waves)
     x[t] = x[t].stack('k').dropna()
     x[t] = x[t].reset_index().set_index(['j','k']).squeeze()
 
@@ -44,7 +44,20 @@ z.columns.name = 't'
 
 z = z.stack().unstack('k')
 
-z['m'] = 'Uganda'
+#z['m'] = 'Uganda'
+
+# Harmonize region labels
+regions = {' kampala':'Central',
+           'central':'Central',
+           'central without kampala':'Central',
+           'eastern':'Eastern',
+           'kampala':'Central',
+           'nan':'Central',
+           'northern':'Northern',
+           'western':'Western'}
+
+z = z.replace({'m':regions})
+
 z = z.reset_index().set_index(['j','t','m'])
 
 z.to_parquet('../var/other_features.parquet')
