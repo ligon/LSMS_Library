@@ -16,7 +16,10 @@ oc = pd.read_parquet(dir % 'other_features')
 
 def m_regions(df,oc):
 
-    df = df.droplevel('m')
+    try:
+        df = df.droplevel('m')
+    except KeyError:
+        pass
     oc = oc.reset_index('m')
     try:
         colnames = df.columns.names
