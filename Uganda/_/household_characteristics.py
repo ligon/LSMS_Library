@@ -4,7 +4,7 @@ Concatenate data on other household features across rounds.
 """
 
 import pandas as pd
-from uganda import change_id
+from uganda import change_id, Waves
 
 def id_walk(df,wave,waves):
     
@@ -17,18 +17,9 @@ def id_walk(df,wave,waves):
             df = change_id(df)
 
     return df
-    
-# Data to link household ids across waves
-Waves = {'2005-06':(),
-         '2009-10':(),
-         '2010-11':(),
-         '2011-12':(),
-         '2013-14':('GSEC1.dta','HHID','HHID_old'),
-         '2015-16':('gsec1.dta','hh','HHID'),
-         '2018-19':('GSEC1.dta','hhid','t0_hhid'),
-         '2019-20':('HH/gsec1.dta','hhid','hhidold')}
 
-x={}
+
+x = {}
 
 for t in Waves.keys():
     print(t)
@@ -36,6 +27,7 @@ for t in Waves.keys():
     x[t] = id_walk(x[t],t,Waves)
     x[t] = x[t].stack('k').dropna()
     x[t] = x[t].reset_index().set_index(['j','k']).squeeze()
+
 
 z = pd.DataFrame(x)
 z.columns.name = 't'
