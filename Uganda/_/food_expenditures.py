@@ -37,5 +37,6 @@ x['m'] = 'Uganda'
 x = x.reset_index().set_index(['j','t','m'])
 
 x = x.fillna(0)
+x.columns.name = 'i'
 
 x.to_parquet('../var/food_expenditures.parquet')
