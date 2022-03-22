@@ -6,6 +6,17 @@ import dvc.api
 from collections import defaultdict
 from cfe.df_utils import use_indices
 
+# Data to link household ids across waves
+Waves = {'2005-06':(),
+         '2009-10':(),
+         '2010-11':(),
+         '2011-12':(),
+         '2013-14':('GSEC1.dta','HHID','HHID_old'),
+         '2015-16':('gsec1.dta','HHID','hh',lambda s: s.replace('-05-','-04-')),
+         '2018-19':('GSEC1.dta','hhid','t0_hhid'),
+         '2019-20':('HH/gsec1.dta','hhid','hhidold')}
+
+
 def harmonized_food_labels(fn='../../_/food_items.org'):
     # Harmonized food labels
     food_items = pd.read_csv(fn,delimiter='|',skipinitialspace=True,converters={1:int,2:lambda s: s.strip()})
@@ -63,7 +74,7 @@ def food_quantities(fn='',item='item',HHID='HHID',
     with dvc.api.open(fn,mode='rb') as dta:
         quantities,itemlabels=get_food_expenditures(dta,purchased,away,produced,given,itmcd=item,HHID=HHID,units=units,itemlabels=food_items)
 
-    quantities.index.name = 'j'
+    quantities.index.names = ['j','u']
     quantities.columns.name = 'i'
         
     return quantities
@@ -95,7 +106,7 @@ def other_features(fn,urban=None,region=None,HHID='HHID'):
 
     return df
 
-def change_id(x,fn=None,id0=None,id1=None):
+def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
     """Replace instances of id0 with id1.
 
     The identifier id0 is assumed to be unique.
@@ -135,6 +146,9 @@ def change_id(x,fn=None,id0=None,id1=None):
 
     ids = dict(id[[id0,id1]].values.tolist())
 
+    if transform_id1 is not None:
+        ids = {k:transform_id1(v) for k,v in ids.items()}
+
     d = defaultdict(list)
 
     for k,v in ids.items():
@@ -158,3 +172,23 @@ def change_id(x,fn=None,id0=None,id1=None):
     assert x.index.is_unique, "Non-unique index."
 
     return x
+
+def panel_attrition(df,return_ids=False):
+    """
+    Produce a (lower-triangular) matrix showing the number of households (j) that
+    transition between rounds (t) of df.
+    """
+    idxs = df.reset_index().groupby('t')['j'].apply(list).to_dict()
+
+    waves = list(Waves.keys())
+    foo = pd.DataFrame(index=waves,columns=waves)
+    IDs = {}
+    for m,s in enumerate(waves):
+        for t in waves[m:]:
+            IDs[(s,t)] = set(idxs[s]).intersection(idxs[t])
+            foo.loc[s,t] = len(IDs[(s,t)])
+
+    if return_ids:
+        return foo,IDs
+    else:
+        return foo
