@@ -16,7 +16,6 @@ myvars = dict(fn='Uganda/%s/Data/GSEC1.dta' % round,
               urban='urban',
               region='region',
               urban_converter = lambda s: s.lower() == 'urban')
-)
 
 df = other_features(**myvars)
 
