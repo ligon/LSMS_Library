@@ -16,12 +16,10 @@ oc = pd.read_parquet(dir % 'other_features')
 
 def m_regions(df,oc):
 
-    df = df.reset_index('m')
+    df = df.droplevel('m')
     oc = oc.reset_index('m')
-    df['m'] = use_indices(oc,['m'])
-    df = df.set_index(['j','t','m'])
-
-    df = pd.concat([df,oc],axis=1)
+    df = df.join(oc)
+    df = df.reset_index().set_index(['j','t','m'])
 
     return df
 
