@@ -24,7 +24,7 @@ df = other_features(**myvars)
 # See https://microdata.worldbank.org/index.php/catalog/1001/data-dictionary/F41?file_name=2005_GSEC1
 df = df.replace({'region':{'0':'Kampala'}})
 
-df['Rural'] = 1 - df.urban
+df['Rural'] = 1 - df.urban.astype(int)
 
 df = df.rename(columns={'region':'m'})
 
