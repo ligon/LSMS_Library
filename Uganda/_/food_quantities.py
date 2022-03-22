@@ -56,5 +56,6 @@ q = q.reset_index().apply(to_kgs,axis=1).set_index(['j','t','u','i'])
 
 q = q.groupby(['j','t','u','i']).sum()
 
+q = q.unstack('i')
 
 q.to_parquet('food_quantities.parquet')
