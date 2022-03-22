@@ -18,8 +18,18 @@ def m_regions(df,oc):
 
     df = df.droplevel('m')
     oc = oc.reset_index('m')
-    df = df.join(oc)
-    df = df.reset_index().set_index(['j','t','m'])
+    try:
+        colnames = df.columns.names
+        df = df.join(oc)
+        df = df.reset_index().set_index(['j','t','m'])
+        df.columns.names = colnames
+    except ValueError: # Already has variable?
+        pass
+
+    if not df.columns.name=='k':
+        # Drop other characteristics
+        oc = oc.reset_index().set_index(['j','t','m'])
+        df = df.drop(oc.columns,axis=1)
 
     return df
 
