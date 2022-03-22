@@ -99,7 +99,7 @@ def age_sex_composition(fn,sex='sex',sex_converter=None,age='age',months_spent='
 def other_features(fn,urban=None,region=None,HHID='HHID',urban_converter=None):
 
     with dvc.api.open(fn,mode='rb') as dta:
-        df = get_household_identification_particulars(fn=dta,HHID=HHID,urban=urban,region=region)
+        df = get_household_identification_particulars(fn=dta,HHID=HHID,urban=urban,region=region,urban_converter=urban_converter)
 
     df.index.name = 'j'
     df.columns.name = 'k'
