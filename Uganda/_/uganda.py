@@ -115,6 +115,7 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
     suffixes of the form _%d, with %d replaced by a sequence of
     numbers.
     """
+    idx = x.index.names
 
     if fn is None:
         x = x.reset_index()
@@ -123,7 +124,7 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
         elif x['j'].dtype==int:
             x['j'] = x['j'].astype(str)
 
-        x = x.set_index('j')
+        x = x.set_index(idx)
 
         return x
 
@@ -167,7 +168,7 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
 
     x = x.reset_index()
     x['j'] = x['j'].map(updated_id).fillna(x['j'])
-    x = x.set_index('j')
+    x = x.set_index(idx)
 
     assert x.index.is_unique, "Non-unique index."
 
