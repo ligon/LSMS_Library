@@ -15,7 +15,7 @@ myvars = dict(fn='Uganda/%s/Data/HH/gsec1.dta' % round,
               HHID='hhid',
               urban='urban',
               region='region',
-              urban_converter = lambda s: s.lower() == 'urban')
+              urban_converter = lambda s: False if ('%s' % s).lower()=='nan' else s.lower() == 'urban')
 
 df = other_features(**myvars)
 

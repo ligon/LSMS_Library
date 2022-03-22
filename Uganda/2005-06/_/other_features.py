@@ -15,14 +15,14 @@ myvars = dict(fn='Uganda/%s/Data/GSEC1.dta' % round,
               HHID='HHID',
               urban='urban',
               region='region',
-              urban_converter = lambda s: s.lower() == 'urban')
-
+              urban_converter=lambda x: True if x=='urban' else False)
 
 df = other_features(**myvars)
 
-# Some "Central" households have region coded as 0?  These seem to be households in one of the 34
-# Enumeration Areas (comm) of Kampala.
-# See https://microdata.worldbank.org/index.php/catalog/1001/data-dictionary/F41?file_name=2005_GSEC1
+# Some "Central" households have region coded as 0?  These seem to be
+# households in one of the 34 Enumeration Areas (comm) of Kampala.
+# See
+# https://microdata.worldbank.org/index.php/catalog/1001/data-dictionary/F41?file_name=2005_GSEC1
 df = df.replace({'region':{'0':'Kampala'}})
 
 df['Rural'] = 1 - df.urban
