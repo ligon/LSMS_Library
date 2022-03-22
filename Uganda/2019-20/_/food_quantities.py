@@ -10,7 +10,7 @@ myvars = dict(fn='Uganda/2019-20/Data/HH/gsec15b.dta',
               purchased='CEB06',
               away='CEB08',
               produced='CEB10',
-              given='CEB12',
+              given='CEB012',
               units='CEB03C')
 
 q = food_quantities(**myvars)
