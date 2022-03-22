@@ -42,7 +42,7 @@ for t in Waves.keys():
 z = pd.DataFrame(x)
 z.columns.name = 't'
 
-z = z.stack().unstack('k')
+z = z.stack().unstack('m')
 
 #z['m'] = 'Uganda'
 
@@ -56,7 +56,9 @@ regions = {' kampala':'Central',
            'northern':'Northern',
            'western':'Western'}
 
-z = z.replace({'m':regions})
+z = z.rename(columns=regions)
+
+z = z.stack().unstack('k')
 
 z = z.reset_index().set_index(['j','t','m'])
 

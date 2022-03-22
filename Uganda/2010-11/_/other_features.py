@@ -14,7 +14,8 @@ round = str(pwd.parent).split('/')[-1]
 myvars = dict(fn='Uganda/%s/Data/GSEC1.dta' % round,
               HHID='HHID',
               urban='urban',
-              region='region')
+              region='region',
+              urban_converter = lambda s: s.lower() == 'urban')
 
 df = other_features(**myvars)
 
