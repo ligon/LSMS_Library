@@ -5,3 +5,6 @@ __pycache__/
 /.dvc/gdrive-user-credentials.json
 /.dvc/my_creds.json
 *.dta
+Uganda/var/*
+/Uganda/_/compare_unit_labels.py
+/Uganda/_/unitlabels.csv
