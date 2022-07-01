@@ -2054,7 +2054,6 @@ write_sheet(p,
             key=url,sheet='Prices')
 #+end_src
 
-
 * HH Characteristics
 Here we collect household characteristics, make sure labels match up
 with  the RDI table, and write to our google sheet.
