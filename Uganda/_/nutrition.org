@@ -897,28 +897,28 @@ print(pd.Series(fct.columns.tolist()).to_markdown())
 #+end_src
 
 #+name: fct_n_dict
-|       FCT labels | n                      |
-|------------------+------------------------|
-|      energy_kcal | Energy                 |
-|        protein_g | Protein                |
-|          fiber_g | Fiber                  |
-| folate_total_mcg | Folate                 |
-|       calcium_mg | Calcium                |
-|   carbohydrate_g | Carbohydrate           |
-|          iron_mg | Iron                   |
-|                  | Magnesium              |
-|        niacin_mg | Niacin                 |
-|                  | Phosphorus             |
-|                  | Potassium              |
-|    riboflavin_mg | Riboflavin             |
-|       thiamin_mg | Thiamin                |
-|    vit_a_rae_mcg | Vitamin A              |
-|      vit_b12_mcg | Vitamin B-12           |
-|        vit_b6_mg | Vitamin B-6            |
-|         vit_c_mg | Vitamin C              |
-|                  | Vitamin E              |
-|                  | Vitamin K              |
-|          zinc_mg | Zinc                   |
+| FCT labels       | n            |
+|------------------+--------------|
+| energy_kcal      | Energy       |
+| protein_g        | Protein      |
+| fiber_g          | Fiber        |
+| folate_total_mcg | Folate       |
+| calcium_mg       | Calcium      |
+| carbohydrate_g   | Carbohydrate |
+| iron_mg          | Iron         |
+|                  | Magnesium    |
+| niacin_mg        | Niacin       |
+|                  | Phosphorus   |
+|                  | Potassium    |
+| riboflavin_mg    | Riboflavin   |
+| thiamin_mg       | Thiamin      |
+| vit_a_rae_mcg    | Vitamin A    |
+| vit_b12_mcg      | Vitamin B-12 |
+| vit_b6_mg        | Vitamin B-6  |
+| vit_c_mg         | Vitamin C    |
+|                  | Vitamin E    |
+|                  | Vitamin K    |
+| zinc_mg          | Zinc         |
 
 ** Age-Sex category mapping
 We need mappings of the nutrient labels from the FCT into the
@@ -969,7 +969,8 @@ Rounds = {'2005':{'fn':'./Uganda/2005-06/Data/GSEC14A.dta','itmcd':'H14AQ2'},
           '2011':{'fn':'./Uganda/2011-12/Data/GSEC15B.dta','itmcd':'itmds'},
           '2013':{'fn':'./Uganda/2013-14/Data/GSEC15B.dta','itmcd':'itmcd'},
           '2015':{'fn':'./Uganda/2015-16/Data/gsec15b.dta','itmcd':'itmcd'},
-          '2018':{'fn':'./Uganda/2018-19/Data/GSEC15B.dta','itmcd':'itmcd'}}
+          '2018':{'fn':'./Uganda/2018-19/Data/GSEC15B.dta','itmcd':'itmcd'},
+          '2019':{'fn':'./Uganda/2019-20/Data/HH/gsec15b.dta','itmcd':'itmcd'}}
 
 D = {}
 for k,v in Rounds.items():
@@ -984,182 +985,184 @@ print(df_to_orgtbl(D))
 #+end_src
 
 #+results:
-| Code | 2005                               | 2009                   | 2010                           | 2011                           | Code | Preferred Label                | Aggregate Label    | 2013                           | 2015                           | 2018                                  |
-|------+------------------------------------+------------------------+--------------------------------+--------------------------------+------+--------------------------------+--------------------+--------------------------------+--------------------------------+---------------------------------------|
-|  100 | ---                                | Matooke(cluster)       | ---                            | ---                            |  100 | Matoke (??)                    | Matoke             | ---                            | ---                            | Matooke                               |
-|  101 | matooke                            | Matooke(big)           | Plantains(Matooke)-Bunch       | Plantains(Matooke)-Bunch       |  101 | Matoke (bunch)                 | Matoke             | Plantains(Matooke)-Bunch       | Plantains(Matooke)-Bunch       | Matooke (Bunch)                       |
-|  102 | matooke                            | Matooke(medium)        | Plantains(Matooke)-Cluster     | Plantains(Matooke)-Cluster     |  102 | Matoke (cluster)               | Matoke             | Plantains(Matooke)-Cluster     | Plantains(Matooke)-Cluster     | Matooke (Cluster)                     |
-|  103 | matooke                            | Matooke(small)         | Plantains(Matooke)-heap        | Plantains(Matooke)-heap        |  103 | Matoke (heap)                  | Matoke             | Plantains(Matooke)-heap        | Plantains(Matooke)-heap        | Matooke (Heap)                        |
-|  104 | matooke                            | Matooke(heap)          | Plantains(Matooke)-Other units | Plantains(Matooke)-Other units |  104 | Matoke (other)                 | Matoke             | Plantains(Matooke)-Other units | Plantains(Matooke)-Other units | Matooke others                        |
-|  105 | sweet potatoes fresh               | Sweet Potatoes (Fresh) | Sweet potatoes (fresh)         | Sweet potatoes (fresh)         |  105 | Sweet Potatoes (fresh)         | Sweet Potatoes     | Sweet potatoes (fresh)         | Sweet potatoes (fresh)         | Sweet Potatoes                        |
-|  106 | sweet potatoes dry                 | Sweet Potatoes (Dry)   | Sweet potatoes (dry)           | Sweet potatoes (dry)           |  106 | Sweet Potatoes (dry)           | Sweet Potatoes     | Sweet potatoes (dry)           | Sweet potatoes (dry)           | Sweet Potatoes  (Dry)                 |
-|  107 | cassava fresh                      | Cassava (Fresh)        | Cassava (fresh)                | Cassava (fresh)                |  107 | Cassava (fresh)                | Cassava            | Cassava (fresh)                | Cassava (fresh)                | Cassava (Fresh)                       |
-|  108 | cassava dry/flour                  | Cassava (Dry/ Flour)   | Cassava (dry/flour)            | Cassava (dry/flour)            |  108 | Cassava (dry/flour)            | Cassava (flour)    | Cassava (dry/flour)            | Cassava (dry/flour)            | Cassava (Dry)                         |
-|  109 | irish potatoes                     | Irish Potatoes         | Irish potatoes                 | Irish potatoes                 |  109 | Irish Potatoes                 | Irish potato       | Irish potatoes                 | Irish potatoes                 | Irish Potatoes                        |
-|  110 | rice                               | Rice                   | Rice                           | Rice                           |  110 | Rice                           | Rice               | Rice                           | Rice                           | Rice                                  |
-|  111 | maize grains                       | Maize (grains)         | Maize (grains)                 | Maize (grains)                 |  111 | Maize (grains)                 | Maize              | Maize (grains)                 | Maize (grains)                 | Maize grains                          |
-|  112 | maize cobs                         | Maize (cobs)           | Maize (cobs)                   | Maize (cobs)                   |  112 | Maize (cobs)                   | Maize              | Maize (cobs)                   | Maize (cobs)                   | Maize cobs                            |
-|  113 | maize flour                        | Maize (flour)          | Maize (flour)                  | Maize (flour)                  |  113 | Maize (flour)                  | Maize              | Maize (flour)                  | Maize (flour)                  | Maize flour                           |
-|  114 | bread                              | Bread                  | bread                          | bread                          |  114 | Bread                          | Bread              | bread                          | bread                          | Bread (wheat)                         |
-|  115 | millet                             | Millet                 | Millet (flour)                 | Millet (flour)                 |  115 | Millet                         | Millet             | Millet (flour)                 | Millet (flour)                 | ---                                   |
-|  116 | sorghum                            | Sorghum                | Sorghum (flour)                | Sorghum (flour)                |  116 | Sorghum                        | Sorghum            | Sorghum (flour)                | Sorghum (flour)                | Sorghum                               |
-|  117 | beef                               | Beef                   | Beef                           | Beef                           |  117 | Beef                           | Beef               | Beef                           | Beef                           | Beef                                  |
-|  118 | pork                               | Pork                   | Pork                           | Pork                           |  118 | Pork                           | Pork               | Pork                           | Pork                           | Pork                                  |
-|  119 | goat meat                          | Goat Meat              | Goat meat                      | Goat meat                      |  119 | Goat Meat                      | Goat               | Goat meat                      | Goat meat                      | Goat Meat                             |
-|  120 | other meat                         | Other Meat             | Other meat                     | Other meat                     |  120 | Other Meat                     | Other meat         | Other meat                     | Other meat                     | Other Meat (eg duck, rabbit etc)      |
-|  121 | chicken                            | Chicken                | chicken - Local                | chicken - Local                |  121 | Chicken                        | Chicken            | chicken - Local                | chicken - Local                | Chicken                               |
-|  122 | fresh fish                         | Fresh Fish             | Fresh fish                     | Fresh fish                     |  122 | Fresh Fish                     | Fish (fresh)       | Fresh fish                     | Fresh fish                     | ---                                   |
-|  123 | dry/smoked fish                    | Dry/ Smoked fish       | dry/smocked  fish              | dry/smocked  fish              |  123 | Dry/Smoked fish                | Fish (dried)       | dry/smocked  fish              | dry/smocked  fish              | ---                                   |
-|  124 | eggs                               | Eggs                   | Eggs                           | Eggs                           |  124 | Eggs                           | Eggs               | Eggs                           | Eggs                           | Eggs                                  |
-|  125 | fresh milk                         | Fresh Milk             | Fresh milk                     | Fresh milk                     |  125 | Fresh Milk                     | Fresh milk         | Fresh milk                     | Fresh milk                     | Fresh Milk                            |
-|  126 | infant formula foods               | Infant Formula Foods   | Infant formula food            | Infant formula food            |  126 | Infant Formula                 | Infant formula     | Infant formula food            | Infant formula food            | Infant Formula Foods                  |
-|  127 | cooking oil                        | Cooking oil            | Cooking oil                    | Cooking oil                    |  127 | Cooking oil                    | Cooking oil        | Cooking oil                    | Cooking oil                    | ---                                   |
-|  128 | ghee                               | Ghee                   | Ghee                           | Ghee                           |  128 | Ghee                           | Ghee               | Ghee                           | Ghee                           | Ghee                                  |
-|  129 | margarine,butter                   | Margarine, Butter, etc | margarine, butter, etc         | margarine, butter, etc         |  129 | Margarine, Butter, etc         | Butter, etc.       | margarine, butter, etc         | margarine, butter, etc         | Margarine                             |
-|  130 | passion fruits                     | Passion Fruits         | Passion fruits                 | Passion fruits                 |  130 | Passion Fruits                 | Passion fruit      | Passion fruits                 | Passion fruits                 | Passion Fruits                        |
-|  131 | sweet bananas                      | Sweet Bananas          | Sweet bananas                  | Sweet bananas                  |  131 | Sweet Bananas                  | Sweet Banana       | Sweet bananas                  | Sweet bananas                  | ---                                   |
-|  132 | mangoes                            | Mangos                 | Mangos                         | Mangos                         |  132 | Mangos                         | Mangos             | Mangos                         | Mangos                         | Mangoes                               |
-|  133 | oranges                            | Oranges                | Oranges                        | Oranges                        |  133 | Oranges                        | Oranges            | Oranges                        | Oranges                        | Oranges/Tangerines                    |
-|  134 | other fruits                       | Other Fruits           | Other Fruits                   | Other Fruits                   |  134 | Other Fruits                   | Other Fruit        | Other Fruits                   | Other Fruits                   | Other Fruits                          |
-|  135 | onions                             | Onions                 | Onions                         | Onions                         |  135 | Onions                         | Onions             | Onions                         | Onions                         | Onions                                |
-|  136 | tomatoes                           | Tomatoes               | Tomatoes                       | Tomatoes                       |  136 | Tomatoes                       | Tomatoes           | Tomatoes                       | Tomatoes                       | Tomatoes                              |
-|  137 | cabbages                           | Cabbages               | Cabbages                       | Cabbages                       |  137 | Cabbages                       | Cabbages           | Cabbages                       | Cabbages                       | ---                                   |
-|  138 | dodo                               | Dodo                   | Dodo                           | Dodo                           |  138 | Dodo                           | Dodo               | Dodo                           | Dodo                           | Dodo/Nakati/gyobyo/Malakwang          |
-|  139 | other vegetables                   | Other vegetables       | Other Vegetables               | Other Vegetables               |  139 | Other vegetables               | Other Veg.         | Other Vegetables               | Other Vegetables               | Other vegetables                      |
-|  140 | beans fresh                        | Beans fresh)           | Beans (fresh)                  | Beans (fresh)                  |  140 | Beans (fresh)                  | Beans              | Beans (fresh)                  | Beans (fresh)                  | Bean( fresh)                          |
-|  141 | beans dry                          | Beans (dry)            | Beans (dry)                    | Beans (dry)                    |  141 | Beans (dry)                    | Beans              | Beans (dry)                    | Beans (dry)                    | Beans (dry)                           |
-|  142 | ground nuts in shell               | Ground nuts (in shell) | Ground nuts (in shell)         | Ground nuts (in shell)         |  142 | Ground nuts (in shell)         | Ground nut         | Ground nuts (in shell)         | Ground nuts (in shell)         | Ground nuts (in shell)                |
-|  143 | ground nuts shelled                | Ground nuts (shelled)  | Ground nut seeds (unshelled)   | Ground nut seeds (unshelled)   |  143 | Ground nuts (shelled)          | Ground nut         | Ground nut seeds (unshelled)   | Ground nut seeds (unshelled)   | Ground nuts (shelled)                 |
-|  144 | ground nuts pounded                | Ground nuts (pounded)  | ground nuts (pounded)          | ground nuts (pounded)          |  144 | Ground nuts (pounded)          | Ground nut         | ground nuts (pounded)          | ground nuts (pounded)          | Ground nuts (pounded)                 |
-|  145 | peas                               | Peas                   | Peas (fresh)                   | Peas (fresh)                   |  145 | Peas                           | Peas               | Peas (fresh)                   | Peas (fresh)                   | Peas(fresh)                           |
-|  146 | simsim                             | Sim sim                | Simsim                         | Simsim                         |  146 | Sim sim                        | Sim sim            | Simsim                         | Simsim                         | ---                                   |
-|  147 | sugar                              | Sugar                  | Sugar                          | Sugar                          |  147 | Sugar                          | Sugar              | Sugar                          | Sugar                          | Sugar                                 |
-|  148 | coffee                             | Coffee                 | Coffee                         | Coffee                         |  148 | Coffee                         | Coffee             | Coffee                         | Coffee                         | Coffee instant                        |
-|  149 | tea                                | Tea                    | Tea                            | Tea                            |  149 | Tea                            | Tea                | Tea                            | Tea                            | Tea                                   |
-|  150 | salt                               | Salt                   | Salt                           | Salt                           |  150 | Salt                           | Salt               | Salt                           | Salt                           | Salt                                  |
-|  151 | soda                               | Soda                   | Soda                           | Soda                           |  151 | Soda                           | Soda               | Soda                           | Soda                           | Soda*                                 |
-|  152 | beer                               | Beer                   | Beer                           | Beer                           |  152 | Beer                           | Beer               | Beer                           | Beer                           | Beer*                                 |
-|  153 | other alcoholic drinks             | Other Alcoholic drinks | Other alcholic drinks          | Other alcholic drinks          |  153 | Other Alcoholic drinks         | Other Alcohol      | Other alcholic drinks          | Other alcholic drinks          | Other Alcoholic drinks                |
-|  154 | other drinks                       | Other drinks           | Other drinks                   | Other drinks                   |  154 | Other drinks                   | Other drinks       | Other drinks                   | Other drinks                   | Other drinks                          |
-|  155 | cigarettes                         | Cigarettes             | Cigarettes                     | Cigarettes                     |  155 | Cigarettes                     | Cigarettes         | Cigarettes                     | Cigarettes                     | Cigarrates                            |
-|  156 | other tobbaco                      | Other Tobacco          | Other Tobacco                  | Other Tobacco                  |  156 | Other Tobacco                  | Other Tobacco      | Other Tobacco                  | Other Tobacco                  | Other Tobacco                         |
-|  157 | expenditure in restaurants on food | Food                   | Food                           | Food                           |  157 | Restaurant (food)              | Restaurant         | Food                           | Food                           | Food      in Restaurants              |
-|  158 | expenditure in restaurants on soda | Soda                   | Soda                           | Soda                           |  158 | Restaurant (soda)              | Soda               | Soda                           | Soda                           | Soda in Restaurants                   |
-|  159 | expenditure in restaurants on beer | Beer                   | Beer                           | Beer                           |  159 | Restaurant (beer)              | Beer               | Beer                           | Beer                           | Beer Restaurants                      |
-|  160 | other juice                        | Other juice            | Other juice                    | Other juice                    |  160 | Other juice                    | Other juice        | Other juice                    | Other juice                    | Other juice Packed in Restaurants     |
-|  161 | other foods                        | Other foods            | Other foods                    | Other foods                    |  161 | Other foods                    | Other foods        | Other foods                    | Other foods                    | Other foods in  Restaurants           |
-|  162 | ---                                | ---                    | Peas(dry)                      | Peas(dry)                      |  162 | Peas (dry)                     | Peas               | Peas(dry)                      | Peas(dry)                      | Peas(dry)                             |
-|  163 | ---                                | ---                    | Ground nuts paste              | Ground nuts paste              |  163 | Ground nut (paste)             | Ground nut         | Ground nuts paste              | Ground nuts paste              | Ground nuts (paste)                   |
-|  164 | ---                                | ---                    | Green pepper                   | Green pepper                   |  164 | Green pepper                   | Other Veg.         | Green pepper                   | Green pepper                   | Green Pepper                          |
-|  165 | ---                                | ---                    | Pumpkins                       | Pumpkins                       |  165 | Pumpkins                       | Other Veg.         | Pumpkins                       | Pumpkins                       | Pumpkins                              |
-|  166 | ---                                | ---                    | Avocado                        | Avocado                        |  166 | Avocado                        | Other Fruit        | Avocado                        | Avocado                        | Avocado                               |
-|  167 | ---                                | ---                    | Carrots                        | Carrots                        |  167 | Carrots                        | Other Veg.         | Carrots                        | Carrots                        | Carrots                               |
-|  168 | ---                                | ---                    | Egg plant                      | Egg plant                      |  168 | Eggplant                       | Other Veg.         | Egg plant                      | Egg plant                      | Egg plants                            |
-|  169 | ---                                | ---                    | Watermelon                     | Watermelon                     |  169 | Watermelon                     | Other Fruit        | Watermelon                     | Watermelon                     | Watermelon                            |
-|  170 | ---                                | Matooke(others)        | Pineapple                      | Pineapple                      |  170 | Pineapple                      | Other Fruit        | Pineapple                      | Pineapple                      | Pineapple                             |
-|  171 | ---                                | ---                    | Pawpaw                         | Pawpaw                         |  171 | Pawpaw                         | Other Fruit        | Pawpaw                         | Pawpaw                         | Pawpaw                                |
-|  172 | ---                                | ---                    | ---                            | ---                            |  172 | Wheat (flour)                  | Wheat (flour)      | Wheat (flour)                  | Wheat (flour)                  | Wheat (flour)                         |
-|  173 | ---                                | ---                    | ---                            | ---                            |  173 | Chapati                        | Chapati            | Chapati                        | Chapati                        | Chapati                               |
-|  174 | ---                                | ---                    | ---                            | ---                            |  174 | Apples                         | Other Fruit        | Apples                         | Apples                         | Apples                                |
-|  175 | ---                                | ---                    | ---                            | ---                            |  175 | Water                          | Water              | water                          | water                          | Water                                 |
-|  180 | ---                                | ---                    | ---                            | ---                            |  180 | Sweet Potatoes (flour)         | Sweet Potatoes     | sweet potatoes flour           | sweet potatoes flour           | ---                                   |
-|  181 | ---                                | ---                    | ---                            | ---                            |  181 | Cassava (dry)                  | Cassava            | Cassava (dry)                  | Cassava (dry)                  | ---                                   |
-|  182 | ---                                | ---                    | ---                            | ---                            |  182 | Cassava (flour)                | Cassava            | Cassava (flour)                | Cassava (flour)                | ---                                   |
-|  190 | ---                                | ---                    | ---                            | ---                            |  190 | Bread                          | Bread              | Loaf                           | Loaf                           | ---                                   |
-|  191 | ---                                | ---                    | ---                            | ---                            |  191 | Bread                          | Bun                | Bun                            | Bun                            | ---                                   |
-| 1041 | ---                                | ---                    | ---                            | ---                            |      | Matoke (sack)                  | Matoke             | ---                            | ---                            | Matooke (Sack)                        |
-| 1042 | ---                                | ---                    | ---                            | ---                            |      | Matoke (piece)                 | Matoke             | ---                            | ---                            | Matooke (Piece)                       |
-| 1043 | ---                                | ---                    | ---                            | ---                            |      | Matoke (other)                 | Matoke             | ---                            | ---                            | Matooke (other)                       |
-| 1051 | ---                                | ---                    | ---                            | ---                            |      | Sweet Potatoes (white, fresh)  | Sweet Potatoes     | ---                            | ---                            | Sweet Potatoes white/yellow(Fresh)    |
-| 1052 | ---                                | ---                    | ---                            | ---                            |      | Sweet Potatoes (orange, fresh) | Sweet Potatoes     | ---                            | ---                            | Sweet Potatoes-orange fleshed (fresh) |
-| 1061 | ---                                | ---                    | ---                            | ---                            |      | Sweet Potatoes (white, dry)    | Sweet Potatoes     | ---                            | ---                            | Sweet Potatoes white/yellow (Dry)     |
-| 1062 | ---                                | ---                    | ---                            | ---                            |      | Sweet Potatoes (orange, dry)   | Sweet Potatoes     | ---                            | ---                            | Sweet Potatoes-orange (Dry)           |
-| 1063 | ---                                | ---                    | ---                            | ---                            |      | Sweet Potatoes (white, flour)  | Sweet Potatoes     | ---                            | ---                            | Sweet Potatoes white/yellow (flour)   |
-| 1064 | ---                                | ---                    | ---                            | ---                            |      | Sweet Potatoes (orange, flour) | Sweet Potatoes     | ---                            | ---                            | Sweet Potatoes orange (flour)         |
-| 1081 | ---                                | ---                    | ---                            | ---                            |      | Cassava (dry)                  | Cassava            | ---                            | ---                            | Cassava (Dry)                         |
-| 1082 | ---                                | ---                    | ---                            | ---                            |      | Cassava (flour)                | Cassava (flour)    | ---                            | ---                            | Cassava (flour)                       |
-| 1083 | ---                                | ---                    | ---                            | ---                            |      | Kabalagala                     | Kabalagala         | ---                            | ---                            | Pancakes(Kabalagala)                  |
-| 1101 | ---                                | ---                    | ---                            | ---                            |      | Rice (white)                   | Rice               | ---                            | ---                            | Rice (white)                          |
-| 1102 | ---                                | ---                    | ---                            | ---                            |      | Rice (brown)                   | Rice               | ---                            | ---                            | Rice (brown)                          |
-| 1103 | ---                                | ---                    | ---                            | ---                            |      | Rice flour                     | Rice               | ---                            | ---                            | Rice flour                            |
-| 1111 | ---                                | ---                    | ---                            | ---                            |      | Maize yellow (grains)          | Maize              | ---                            | ---                            | Maize yellow (grains)                 |
-| 1112 | ---                                | ---                    | ---                            | ---                            |      | Maize white (grains)           | Maize              | ---                            | ---                            | Maize white (grains)                  |
-| 1121 | ---                                | ---                    | ---                            | ---                            |      | Maize white  (cobs)            | Maize              | ---                            | ---                            | Maize white  (cobs)                   |
-| 1122 | ---                                | ---                    | ---                            | ---                            |      | Maize yellow (cobs)            | Maize              | ---                            | ---                            | Maize yellow (cobs)                   |
-| 1131 | ---                                | ---                    | ---                            | ---                            |      | Maize white (flour)            | Maize              | ---                            | ---                            | Maize white (flour)                   |
-| 1132 | ---                                | ---                    | ---                            | ---                            |      | Maize yellow (flour)           | Maize              | ---                            | ---                            | Maize yellow (flour)                  |
-| 1151 | ---                                | ---                    | ---                            | ---                            |      | Millet flour                   | Millet             | ---                            | ---                            | Millet flour                          |
-| 1171 | ---                                | ---                    | ---                            | ---                            |      | Beef Liver                     | Beef Liver         | ---                            | ---                            | Beef Liver                            |
-| 1172 | ---                                | ---                    | ---                            | ---                            |      | Beef Offal                     | Beef Offal         | ---                            | ---                            | Beef Offals                           |
-| 1173 | ---                                | ---                    | ---                            | ---                            |      | Beef (roasted)                 | Beef               | ---                            | ---                            | Roasted beef                          |
-| 1174 | ---                                | ---                    | ---                            | ---                            |      | Sausages                       | Pork               | ---                            | ---                            | Sausages                              |
-| 1181 | ---                                | ---                    | ---                            | ---                            |      | Pork                           | Pork               | ---                            | ---                            | Pork                                  |
-| 1182 | ---                                | ---                    | ---                            | ---                            |      | Pork (roasted)                 | Pork               | ---                            | ---                            | Roasted Pork                          |
-| 1191 | ---                                | ---                    | ---                            | ---                            |      | Goat Liver                     | Goat Liver         | ---                            | ---                            | Goat Liver                            |
-| 1192 | ---                                | ---                    | ---                            | ---                            |      | Goat Offal                     | Goat Offal         | ---                            | ---                            | Goat offals                           |
-| 1193 | ---                                | ---                    | ---                            | ---                            |      | Goat (roasted)                 | Goat               | ---                            | ---                            | Roasted goat meat                     |
-| 1201 | ---                                | ---                    | ---                            | ---                            |      | Other meat (roasted)           | Other meat         | ---                            | ---                            | Roasted other meat                    |
-| 1211 | ---                                | ---                    | ---                            | ---                            |      | Chicken off-layer              | Chicken            | ---                            | ---                            | Chicken off-layer                     |
-| 1212 | ---                                | ---                    | ---                            | ---                            |      | Chicken Broiler                | Chicken            | ---                            | ---                            | Chicken Broiler                       |
-| 1213 | ---                                | ---                    | ---                            | ---                            |      | Chicken Broiler                | Chicken            | ---                            | ---                            | Chicken Kroiler                       |
-| 1214 | ---                                | ---                    | ---                            | ---                            |      | Chicken Local                  | Chicken            | ---                            | ---                            | Chicken Local                         |
-| 1215 | ---                                | ---                    | ---                            | ---                            |      | Chicken (roasted)              | Chicken            | ---                            | ---                            | Roasted Chicken                       |
-| 1221 | ---                                | ---                    | ---                            | ---                            |      | Tilapia (fresh)                | Fish (fresh)       | ---                            | ---                            | Fresh tilapia Fish                    |
-| 1222 | ---                                | ---                    | ---                            | ---                            |      | Perch (fresh)                  | Fish (fresh)       | ---                            | ---                            | Fresh Nile perch                      |
-| 1231 | ---                                | ---                    | ---                            | ---                            |      | Tilapia (dried)                | Fish (dried)       | ---                            | ---                            | Dry/ Smoked tilapia fish              |
-| 1232 | ---                                | ---                    | ---                            | ---                            |      | Perch (dried)                  | Fish (dried)       | ---                            | ---                            | Dry/Smoked Nile perch                 |
-| 1234 | ---                                | ---                    | ---                            | ---                            |      | Nkejje (dried)                 | Fish (dried)       | ---                            | ---                            | Dried Nkejje                          |
-| 1235 | ---                                | ---                    | ---                            | ---                            |      | Other Fish (fresh)             | Fish (fresh)       | ---                            | ---                            | Other fresh fish                      |
-| 1236 | ---                                | ---                    | ---                            | ---                            |      | Other Fish (dried)             | Fish (dried)       | ---                            | ---                            | Other dry/smoked fish                 |
-| 1237 | ---                                | ---                    | ---                            | ---                            |      | Mukene                         | Fish (fresh)       | ---                            | ---                            | Silver Fish (Mukene)                  |
-| 1241 | ---                                | ---                    | ---                            | ---                            |      | Eggs (yellow yolk)             | Eggs               | ---                            | ---                            | Eggs  (yellow yolk)                   |
-| 1242 | ---                                | ---                    | ---                            | ---                            |      | Eggs (white yolk)              | Eggs               | ---                            | ---                            | Eggs  (white  yolk)                   |
-| 1243 | ---                                | ---                    | ---                            | ---                            |      | Other Eggs                     | Eggs               | ---                            | ---                            | Other eggs (duck, turkey etc)         |
-| 1251 | ---                                | ---                    | ---                            | ---                            |      | Milk (powdered)                | Milk               | ---                            | ---                            | Milk (powdered)                       |
-| 1252 | ---                                | ---                    | ---                            | ---                            |      | Bongo                          | Bongo              | ---                            | ---                            | Fermented milk (Bongo)                |
-| 1253 | ---                                | ---                    | ---                            | ---                            |      | Ice Cream                      | Ice Cream          | ---                            | ---                            | Ice-cream                             |
-| 1254 | ---                                | ---                    | ---                            | ---                            |      | Yoghurt                        | Yogurt             | ---                            | ---                            | Yoghurt                               |
-| 1271 | ---                                | ---                    | ---                            | ---                            |      | Cooking Oil (refined)          | Cooking Oil        | ---                            | ---                            | Cooking oil refined                   |
-| 1272 | ---                                | ---                    | ---                            | ---                            |      | Cooking Oil (unrefined)        | Cooking Oil        | ---                            | ---                            | Cooking oil unrefined                 |
-| 1281 | ---                                | ---                    | ---                            | ---                            |      | Cheese                         | Cheese             | ---                            | ---                            | Cheese                                |
-| 1291 | ---                                | ---                    | ---                            | ---                            |      | Butter                         | Butter             | ---                            | ---                            | Butter                                |
-| 1311 | ---                                | ---                    | ---                            | ---                            |      | Ndiizi                         | Sweet Bananas      | ---                            | ---                            | Sweet Bananas-Ndiizi                  |
-| 1312 | ---                                | ---                    | ---                            | ---                            |      | Bogoya                         | Sweet Bananas      | ---                            | ---                            | Sweet Bananas-Bogoya                  |
-| 1313 | ---                                | ---                    | ---                            | ---                            |      | Platains                       | Plantains          | ---                            | ---                            | Plantain (gonja/kivuvu)               |
-| 1351 | ---                                | ---                    | ---                            | ---                            |      | Garlic                         | Garlic             | ---                            | ---                            | Garlic                                |
-| 1352 | ---                                | ---                    | ---                            | ---                            |      | Ginger (fresh)                 | Ginger             | ---                            | ---                            | Ginger fresh                          |
-| 1353 | ---                                | ---                    | ---                            | ---                            |      | Ginger (powder)                | Ginger             | ---                            | ---                            | Ginger powder                         |
-| 1371 | ---                                | ---                    | ---                            | ---                            |      | Cabbage (red)                  | Cabbage            | ---                            | ---                            | Cabbages – Red leaf                   |
-| 1372 | ---                                | ---                    | ---                            | ---                            |      | Cabbage (green)                | Cabbage            | ---                            | ---                            | Cabbage – green leaf                  |
-| 1391 | ---                                | ---                    | ---                            | ---                            |      | Other Spices                   | Other Spices       | ---                            | ---                            | Other spices                          |
-| 1461 | ---                                | ---                    | ---                            | ---                            |      | Simsim                         | Sim sim            | ---                            | ---                            | Simsim                                |
-| 1462 | ---                                | ---                    | ---                            | ---                            |      | Simsim (paste)                 | Sim sim            | ---                            | ---                            | Simsim paste                          |
-| 1471 | ---                                | ---                    | ---                            | ---                            |      | Honey                          | Honey              | ---                            | ---                            | Honey                                 |
-| 1472 | ---                                | ---                    | ---                            | ---                            |      | Jam/Marmalade                  | Jam/Marmalade      | ---                            | ---                            | Jam/ Mamalede                         |
-| 1481 | ---                                | ---                    | ---                            | ---                            |      | Coffee                         | Coffee             | ---                            | ---                            | Coffee                                |
-| 1482 | ---                                | ---                    | ---                            | ---                            |      | Coffee (other)                 | Coffee             | ---                            | ---                            | Coffee Other                          |
-| 1491 | ---                                | ---                    | ---                            | ---                            |      | Tea (leaves)                   | Tea                | ---                            | ---                            | Tea leaves                            |
-| 1492 | ---                                | ---                    | ---                            | ---                            |      | Tea (other)                    | Tea                | ---                            | ---                            | Tea bags                              |
-| 1493 | ---                                | ---                    | ---                            | ---                            |      | Tea (green)                    | Tea                | ---                            | ---                            | Green tea                             |
-| 1501 | ---                                | ---                    | ---                            | ---                            |      | Salt                           | Salt               | ---                            | ---                            | Salt                                  |
-| 1601 | ---                                | ---                    | ---                            | ---                            |      | Other Juice (fresh)            | Other Juice        | ---                            | ---                            | Other juice fresh                     |
-| 1602 | ---                                | ---                    | ---                            | ---                            |      | Other Juice (packed)           | Other Juice        | ---                            | ---                            | Other juice packed                    |
-| 1603 | ---                                | ---                    | ---                            | ---                            |      | Other Juice (restaurants)      | Other Juice        | ---                            | ---                            | Other juice Fresh in Restaurants      |
-| 1651 | ---                                | ---                    | ---                            | ---                            |      | Pumpkin Leaves                 | Other Veg.         | ---                            | ---                            | Pumpkin Leaves                        |
-| 1652 | ---                                | ---                    | ---                            | ---                            |      | Mushrooms                      | Other Veg.         | ---                            | ---                            | Mushrooms                             |
-| 1653 | ---                                | ---                    | ---                            | ---                            |      | Cucumber                       | Other Veg.         | ---                            | ---                            | Cucumber                              |
-| 1654 | ---                                | ---                    | ---                            | ---                            |      | Okra                           | Other Veg.         | ---                            | ---                            | Okra                                  |
-| 1721 | ---                                | ---                    | ---                            | ---                            |      | Macaroni/Spaghetti             | Macaroni/Spaghetti | ---                            | ---                            | Macaroni/Spaghetti                    |
-| 1731 | ---                                | ---                    | ---                            | ---                            |      | Biscuits                       | Biscuits           | ---                            | ---                            | Biscuits                              |
-| 1732 | ---                                | ---                    | ---                            | ---                            |      | Cakes                          | Cake               | ---                            | ---                            | Cakes                                 |
-| 1733 | ---                                | ---                    | ---                            | ---                            |      | Donuts                         | Donut              | ---                            | ---                            | Doughnuts                             |
-| 1734 | ---                                | ---                    | ---                            | ---                            |      | Cornflakes                     | Cornflakes         | ---                            | ---                            | Cornflakes                            |
-| 1735 | ---                                | ---                    | ---                            | ---                            |      | Samosas                        | Samosa             | ---                            | ---                            | Samosas                               |
-| 1741 | ---                                | ---                    | ---                            | ---                            |      | Yams (arrowroot)               | Yam                | ---                            | ---                            | Yarms(arrow root)                     |
-| 1742 | ---                                | ---                    | ---                            | ---                            |      | Sugarcane                      | Sugarcane          | ---                            | ---                            | sugarcane                             |
-| 1743 | ---                                | ---                    | ---                            | ---                            |      | Jackfruit (fresh)              | Jackfruit          | ---                            | ---                            | Jackfruit(ffene)                      |
-| 1761 | ---                                | ---                    | ---                            | ---                            |      | Soybeans (fresh)               | Soybean            | ---                            | ---                            | Soya beans (fresh)                    |
-| 1762 | ---                                | ---                    | ---                            | ---                            |      | Soybeans (dry)                 | Soybean            | ---                            | ---                            | Soya beans (dry)                      |
+| Code | 2005                               | 2009                   | 2010                           | 2011                           | 2013                           | 2015                           | 2018                                  | 2019                                  |
+|------+------------------------------------+------------------------+--------------------------------+--------------------------------+--------------------------------+--------------------------------+---------------------------------------+---------------------------------------|
+|  100 | ---                                | Matooke(cluster)       | ---                            | ---                            | ---                            | ---                            | Matooke                               | Matooke                               |
+|  101 | matooke                            | Matooke(big)           | Plantains(Matooke)-Bunch       | Plantains(Matooke)-Bunch       | Plantains(Matooke)-Bunch       | Plantains(Matooke)-Bunch       | Matooke (Bunch)                       | Matooke (Bunch)                       |
+|  102 | matooke                            | Matooke(medium)        | Plantains(Matooke)-Cluster     | Plantains(Matooke)-Cluster     | Plantains(Matooke)-Cluster     | Plantains(Matooke)-Cluster     | Matooke (Cluster)                     | Matooke (Cluster)                     |
+|  103 | matooke                            | Matooke(small)         | Plantains(Matooke)-heap        | Plantains(Matooke)-heap        | Plantains(Matooke)-heap        | Plantains(Matooke)-heap        | Matooke (Heap)                        | Matooke (Heap)                        |
+|  104 | matooke                            | Matooke(heap)          | Plantains(Matooke)-Other units | Plantains(Matooke)-Other units | Plantains(Matooke)-Other units | Plantains(Matooke)-Other units | Matooke others                        | Matooke others                        |
+|  105 | sweet potatoes fresh               | Sweet Potatoes (Fresh) | Sweet potatoes (fresh)         | Sweet potatoes (fresh)         | Sweet potatoes (fresh)         | Sweet potatoes (fresh)         | Sweet Potatoes                        | Sweet Potatoes                        |
+|  106 | sweet potatoes dry                 | Sweet Potatoes (Dry)   | Sweet potatoes (dry)           | Sweet potatoes (dry)           | Sweet potatoes (dry)           | Sweet potatoes (dry)           | Sweet Potatoes  (Dry)                 | Sweet Potatoes  (Dry)                 |
+|  107 | cassava fresh                      | Cassava (Fresh)        | Cassava (fresh)                | Cassava (fresh)                | Cassava (fresh)                | Cassava (fresh)                | Cassava (Fresh)                       | Cassava (Fresh)                       |
+|  108 | cassava dry/flour                  | Cassava (Dry/ Flour)   | Cassava (dry/flour)            | Cassava (dry/flour)            | Cassava (dry/flour)            | Cassava (dry/flour)            | Cassava (Dry)                         | Cassava (Dry)                         |
+|  109 | irish potatoes                     | Irish Potatoes         | Irish potatoes                 | Irish potatoes                 | Irish potatoes                 | Irish potatoes                 | Irish Potatoes                        | Irish Potatoes                        |
+|  110 | rice                               | Rice                   | Rice                           | Rice                           | Rice                           | Rice                           | Rice                                  | Rice                                  |
+|  111 | maize grains                       | Maize (grains)         | Maize (grains)                 | Maize (grains)                 | Maize (grains)                 | Maize (grains)                 | Maize grains                          | Maize grains                          |
+|  112 | maize cobs                         | Maize (cobs)           | Maize (cobs)                   | Maize (cobs)                   | Maize (cobs)                   | Maize (cobs)                   | Maize cobs                            | Maize cobs                            |
+|  113 | maize flour                        | Maize (flour)          | Maize (flour)                  | Maize (flour)                  | Maize (flour)                  | Maize (flour)                  | Maize flour                           | Maize flour                           |
+|  114 | bread                              | Bread                  | bread                          | bread                          | bread                          | bread                          | Bread (wheat)                         | Bread (wheat)                         |
+|  115 | millet                             | Millet                 | Millet (flour)                 | Millet (flour)                 | Millet (flour)                 | Millet (flour)                 | ---                                   | ---                                   |
+|  116 | sorghum                            | Sorghum                | Sorghum (flour)                | Sorghum (flour)                | Sorghum (flour)                | Sorghum (flour)                | Sorghum                               | Sorghum                               |
+|  117 | beef                               | Beef                   | Beef                           | Beef                           | Beef                           | Beef                           | Beef                                  | Beef                                  |
+|  118 | pork                               | Pork                   | Pork                           | Pork                           | Pork                           | Pork                           | Pork                                  | Pork                                  |
+|  119 | goat meat                          | Goat Meat              | Goat meat                      | Goat meat                      | Goat meat                      | Goat meat                      | Goat Meat                             | Goat Meat                             |
+|  120 | other meat                         | Other Meat             | Other meat                     | Other meat                     | Other meat                     | Other meat                     | Other Meat (eg duck, rabbit etc)      | Other Meat (eg duck, rabbit etc)      |
+|  121 | chicken                            | Chicken                | chicken - Local                | chicken - Local                | chicken - Local                | chicken - Local                | Chicken                               | Chicken                               |
+|  122 | fresh fish                         | Fresh Fish             | Fresh fish                     | Fresh fish                     | Fresh fish                     | Fresh fish                     | ---                                   | ---                                   |
+|  123 | dry/smoked fish                    | Dry/ Smoked fish       | dry/smocked  fish              | dry/smocked  fish              | dry/smocked  fish              | dry/smocked  fish              | ---                                   | ---                                   |
+|  124 | eggs                               | Eggs                   | Eggs                           | Eggs                           | Eggs                           | Eggs                           | Eggs                                  | Eggs                                  |
+|  125 | fresh milk                         | Fresh Milk             | Fresh milk                     | Fresh milk                     | Fresh milk                     | Fresh milk                     | Fresh Milk                            | Fresh Milk                            |
+|  126 | infant formula foods               | Infant Formula Foods   | Infant formula food            | Infant formula food            | Infant formula food            | Infant formula food            | Infant Formula Foods                  | Infant Formula Foods                  |
+|  127 | cooking oil                        | Cooking oil            | Cooking oil                    | Cooking oil                    | Cooking oil                    | Cooking oil                    | ---                                   | ---                                   |
+|  128 | ghee                               | Ghee                   | Ghee                           | Ghee                           | Ghee                           | Ghee                           | Ghee                                  | Ghee                                  |
+|  129 | margarine,butter                   | Margarine, Butter, etc | margarine, butter, etc         | margarine, butter, etc         | margarine, butter, etc         | margarine, butter, etc         | Margarine                             | Margarine                             |
+|  130 | passion fruits                     | Passion Fruits         | Passion fruits                 | Passion fruits                 | Passion fruits                 | Passion fruits                 | Passion Fruits                        | Passion Fruits                        |
+|  131 | sweet bananas                      | Sweet Bananas          | Sweet bananas                  | Sweet bananas                  | Sweet bananas                  | Sweet bananas                  | ---                                   | ---                                   |
+|  132 | mangoes                            | Mangos                 | Mangos                         | Mangos                         | Mangos                         | Mangos                         | Mangoes                               | Mangoes                               |
+|  133 | oranges                            | Oranges                | Oranges                        | Oranges                        | Oranges                        | Oranges                        | Oranges/Tangerines                    | Oranges/Tangerines                    |
+|  134 | other fruits                       | Other Fruits           | Other Fruits                   | Other Fruits                   | Other Fruits                   | Other Fruits                   | Other Fruits                          | Other Fruits                          |
+|  135 | onions                             | Onions                 | Onions                         | Onions                         | Onions                         | Onions                         | Onions                                | Onions                                |
+|  136 | tomatoes                           | Tomatoes               | Tomatoes                       | Tomatoes                       | Tomatoes                       | Tomatoes                       | Tomatoes                              | Tomatoes                              |
+|  137 | cabbages                           | Cabbages               | Cabbages                       | Cabbages                       | Cabbages                       | Cabbages                       | ---                                   | Cabbages                              |
+|  138 | dodo                               | Dodo                   | Dodo                           | Dodo                           | Dodo                           | Dodo                           | Dodo/Nakati/gyobyo/Malakwang          | Dodo/Nakati/gyobyo/Malakwang          |
+|  139 | other vegetables                   | Other vegetables       | Other Vegetables               | Other Vegetables               | Other Vegetables               | Other Vegetables               | Other vegetables                      | Other vegetables                      |
+|  140 | beans fresh                        | Beans fresh)           | Beans (fresh)                  | Beans (fresh)                  | Beans (fresh)                  | Beans (fresh)                  | Bean( fresh)                          | Bean( fresh)                          |
+|  141 | beans dry                          | Beans (dry)            | Beans (dry)                    | Beans (dry)                    | Beans (dry)                    | Beans (dry)                    | Beans (dry)                           | Beans (dry)                           |
+|  142 | ground nuts in shell               | Ground nuts (in shell) | Ground nuts (in shell)         | Ground nuts (in shell)         | Ground nuts (in shell)         | Ground nuts (in shell)         | Ground nuts (in shell)                | Ground nuts (in shell)                |
+|  143 | ground nuts shelled                | Ground nuts (shelled)  | Ground nut seeds (unshelled)   | Ground nut seeds (unshelled)   | Ground nut seeds (unshelled)   | Ground nut seeds (unshelled)   | Ground nuts (shelled)                 | Ground nuts (shelled)                 |
+|  144 | ground nuts pounded                | Ground nuts (pounded)  | ground nuts (pounded)          | ground nuts (pounded)          | ground nuts (pounded)          | ground nuts (pounded)          | Ground nuts (pounded)                 | Ground nuts (pounded)                 |
+|  145 | peas                               | Peas                   | Peas (fresh)                   | Peas (fresh)                   | Peas (fresh)                   | Peas (fresh)                   | Peas(fresh)                           | Peas(fresh)                           |
+|  146 | simsim                             | Sim sim                | Simsim                         | Simsim                         | Simsim                         | Simsim                         | ---                                   | ---                                   |
+|  147 | sugar                              | Sugar                  | Sugar                          | Sugar                          | Sugar                          | Sugar                          | Sugar                                 | Sugar                                 |
+|  148 | coffee                             | Coffee                 | Coffee                         | Coffee                         | Coffee                         | Coffee                         | Coffee instant                        | Coffee instant                        |
+|  149 | tea                                | Tea                    | Tea                            | Tea                            | Tea                            | Tea                            | Tea                                   | Tea                                   |
+|  150 | salt                               | Salt                   | Salt                           | Salt                           | Salt                           | Salt                           | Salt                                  | Salt                                  |
+|  151 | soda                               | Soda                   | Soda                           | Soda                           | Soda                           | Soda                           | Soda*                                 | Soda*                                 |
+|  152 | beer                               | Beer                   | Beer                           | Beer                           | Beer                           | Beer                           | Beer*                                 | Beer*                                 |
+|  153 | other alcoholic drinks             | Other Alcoholic drinks | Other alcholic drinks          | Other alcholic drinks          | Other alcholic drinks          | Other alcholic drinks          | Other Alcoholic drinks                | Other Alcoholic drinks                |
+|  154 | other drinks                       | Other drinks           | Other drinks                   | Other drinks                   | Other drinks                   | Other drinks                   | Other drinks                          | Other drinks                          |
+|  155 | cigarettes                         | Cigarettes             | Cigarettes                     | Cigarettes                     | Cigarettes                     | Cigarettes                     | Cigarrates                            | Cigarrates                            |
+|  156 | other tobbaco                      | Other Tobacco          | Other Tobacco                  | Other Tobacco                  | Other Tobacco                  | Other Tobacco                  | Other Tobacco                         | Other Tobacco                         |
+|  157 | expenditure in restaurants on food | Food                   | Food                           | Food                           | Food                           | Food                           | Food      in Restaurants              | Food      in Restaurants              |
+|  158 | expenditure in restaurants on soda | Soda                   | Soda                           | Soda                           | Soda                           | Soda                           | Soda in Restaurants                   | Soda in Restaurants                   |
+|  159 | expenditure in restaurants on beer | Beer                   | Beer                           | Beer                           | Beer                           | Beer                           | Beer Restaurants                      | Beer Restaurants                      |
+|  160 | other juice                        | Other juice            | Other juice                    | Other juice                    | Other juice                    | Other juice                    | Other juice Packed in Restaurants     | Other juice Packed in Restaurants     |
+|  161 | other foods                        | Other foods            | Other foods                    | Other foods                    | Other foods                    | Other foods                    | Other foods in  Restaurants           | Other foods in  Restaurants           |
+|  162 | ---                                | ---                    | Peas(dry)                      | Peas(dry)                      | Peas(dry)                      | Peas(dry)                      | Peas(dry)                             | Peas(dry)                             |
+|  163 | ---                                | ---                    | Ground nuts paste              | Ground nuts paste              | Ground nuts paste              | Ground nuts paste              | Ground nuts (paste)                   | Ground nuts (paste)                   |
+|  164 | ---                                | ---                    | Green pepper                   | Green pepper                   | Green pepper                   | Green pepper                   | Green Pepper                          | Green Pepper                          |
+|  165 | ---                                | ---                    | Pumpkins                       | Pumpkins                       | Pumpkins                       | Pumpkins                       | Pumpkins                              | Pumpkins                              |
+|  166 | ---                                | ---                    | Avocado                        | Avocado                        | Avocado                        | Avocado                        | Avocado                               | Avocado                               |
+|  167 | ---                                | ---                    | Carrots                        | Carrots                        | Carrots                        | Carrots                        | Carrots                               | Carrots                               |
+|  168 | ---                                | ---                    | Egg plant                      | Egg plant                      | Egg plant                      | Egg plant                      | Egg plants                            | Egg plants                            |
+|  169 | ---                                | ---                    | Watermelon                     | Watermelon                     | Watermelon                     | Watermelon                     | Watermelon                            | Watermelon                            |
+|  170 | ---                                | Matooke(others)        | Pineapple                      | Pineapple                      | Pineapple                      | Pineapple                      | Pineapple                             | Pineapple                             |
+|  171 | ---                                | ---                    | Pawpaw                         | Pawpaw                         | Pawpaw                         | Pawpaw                         | Pawpaw                                | Pawpaw                                |
+|  172 | ---                                | ---                    | ---                            | ---                            | Wheat (flour)                  | Wheat (flour)                  | Wheat (flour)                         | Wheat (flour)                         |
+|  173 | ---                                | ---                    | ---                            | ---                            | Chapati                        | Chapati                        | Chapati                               | Chapati                               |
+|  174 | ---                                | ---                    | ---                            | ---                            | Apples                         | Apples                         | Apples                                | Apples                                |
+|  175 | ---                                | ---                    | ---                            | ---                            | water                          | water                          | Water                                 | Water                                 |
+|  180 | ---                                | ---                    | ---                            | ---                            | sweet potatoes flour           | sweet potatoes flour           | ---                                   | ---                                   |
+|  181 | ---                                | ---                    | ---                            | ---                            | Cassava (dry)                  | Cassava (dry)                  | ---                                   | ---                                   |
+|  182 | ---                                | ---                    | ---                            | ---                            | Cassava (flour)                | Cassava (flour)                | ---                                   | ---                                   |
+|  190 | ---                                | ---                    | ---                            | ---                            | Loaf                           | Loaf                           | ---                                   | ---                                   |
+|  191 | ---                                | ---                    | ---                            | ---                            | Bun                            | Bun                            | ---                                   | ---                                   |
+| 1041 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Matooke (Sack)                        | Matooke (Sack)                        |
+| 1042 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Matooke (Piece)                       | Matooke (Piece)                       |
+| 1043 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Matooke (other)                       | Matooke (other)                       |
+| 1051 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Sweet Potatoes white/yellow(Fresh)    | Sweet Potatoes white/yellow(Fresh)    |
+| 1052 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Sweet Potatoes-orange fleshed (fresh) | Sweet Potatoes-orange fleshed (fresh) |
+| 1061 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Sweet Potatoes white/yellow (Dry)     | Sweet Potatoes white/yellow (Dry)     |
+| 1062 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Sweet Potatoes-orange (Dry)           | Sweet Potatoes-orange (Dry)           |
+| 1063 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Sweet Potatoes white/yellow (flour)   | Sweet Potatoes white/yellow (flour)   |
+| 1064 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Sweet Potatoes orange (flour)         | Sweet Potatoes orange (flour)         |
+| 1081 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Cassava (Dry)                         | Cassava (Dry)                         |
+| 1082 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Cassava (flour)                       | Cassava (flour)                       |
+| 1083 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Pancakes(Kabalagala)                  | Pancakes(Kabalagala)                  |
+| 1101 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Rice (white)                          | Rice (white)                          |
+| 1102 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Rice (brown)                          | Rice (brown)                          |
+| 1103 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Rice flour                            | Rice flour                            |
+| 1111 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Maize yellow (grains)                 | Maize yellow (grains)                 |
+| 1112 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Maize white (grains)                  | Maize white (grains)                  |
+| 1121 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Maize white  (cobs)                   | Maize white  (cobs)                   |
+| 1122 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Maize yellow (cobs)                   | Maize yellow (cobs)                   |
+| 1131 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Maize white (flour)                   | Maize white (flour)                   |
+| 1132 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Maize yellow (flour)                  | Maize yellow (flour)                  |
+| 1151 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Millet flour                          | Millet flour                          |
+| 1171 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Beef Liver                            | Beef Liver                            |
+| 1172 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Beef Offals                           | Beef Offals                           |
+| 1173 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Roasted beef                          | Roasted beef                          |
+| 1174 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Sausages                              | Sausages                              |
+| 1181 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Pork                                  | Pork                                  |
+| 1182 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Roasted Pork                          | Roasted Pork                          |
+| 1191 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Goat Liver                            | Goat Liver                            |
+| 1192 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Goat offals                           | Goat offals                           |
+| 1193 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Roasted goat meat                     | Roasted goat meat                     |
+| 1201 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Roasted other meat                    | Roasted other meat                    |
+| 1211 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Chicken off-layer                     | Chicken off-layer                     |
+| 1212 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Chicken Broiler                       | Chicken Broiler                       |
+| 1213 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Chicken Kroiler                       | Chicken Kroiler                       |
+| 1214 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Chicken Local                         | Chicken Local                         |
+| 1215 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Roasted Chicken                       | Roasted Chicken                       |
+| 1221 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Fresh tilapia Fish                    | Fresh tilapia Fish                    |
+| 1222 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Fresh Nile perch                      | Fresh Nile perch                      |
+| 1231 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Dry/ Smoked tilapia fish              | Dry/ Smoked tilapia fish              |
+| 1232 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Dry/Smoked Nile perch                 | Dry/Smoked Nile perch                 |
+| 1234 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Dried Nkejje                          | Dried Nkejje                          |
+| 1235 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Other fresh fish                      | Other fresh fish                      |
+| 1236 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Other dry/smoked fish                 | Other dry/smoked fish                 |
+| 1237 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Silver Fish (Mukene)                  | Silver Fish (Mukene)                  |
+| 1241 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Eggs  (yellow yolk)                   | Eggs  (yellow yolk)                   |
+| 1242 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Eggs  (white  yolk)                   | Eggs  (white  yolk)                   |
+| 1243 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Other eggs (duck, turkey etc)         | Other eggs (duck, turkey etc)         |
+| 1251 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Milk Powdered                         | Milk Powdered                         |
+| 1252 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Fermented milk (Bongo)                | Fermented milk (Bongo)                |
+| 1253 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Ice-cream                             | Ice-cream                             |
+| 1254 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Yoghurt                               | Yoghurt                               |
+| 1271 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Cooking oil refined                   | Cooking oil refined                   |
+| 1272 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Cooking oil unrefined                 | Cooking oil unrefined                 |
+| 1281 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Cheese                                | Cheese                                |
+| 1291 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Butter                                | Butter                                |
+| 1311 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Sweet Bananas-Ndiizi                  | Sweet Bananas-Ndiizi                  |
+| 1312 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Sweet Bananas-Bogoya                  | Sweet Bananas-Bogoya                  |
+| 1313 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Plantain (gonja/kivuvu)               | Plantain (gonja/kivuvu)               |
+| 1351 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Garlic                                | Garlic                                |
+| 1352 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Ginger fresh                          | Ginger fresh                          |
+| 1353 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Ginger powder                         | Ginger powder                         |
+| 1371 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Cabbages – Red leaf                   | Cabbages – Red leaf                   |
+| 1372 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Cabbage – green leaf                  | Cabbage – green leaf                  |
+| 1391 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Other spices                          | Other spices                          |
+| 1461 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Simsim                                | Simsim                                |
+| 1462 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Simsim paste                          | Simsim paste                          |
+| 1471 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Honey                                 | Honey                                 |
+| 1472 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Jam/ Mamalede                         | Jam/ Mamalede                         |
+| 1481 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Coffee                                | Coffee                                |
+| 1482 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Coffee Other                          | Coffee Other                          |
+| 1491 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Tea leaves                            | Tea leaves                            |
+| 1492 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Tea bags                              | Tea bags                              |
+| 1493 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Green tea                             | Green tea                             |
+| 1501 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Salt                                  | Salt                                  |
+| 1531 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | ---                                   | Waragi                                |
+| 1601 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Other juice fresh                     | Other juice fresh                     |
+| 1602 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Other juice packed                    | Other juice packed                    |
+| 1603 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Other juice Fresh in Restaurants      | Other juice Fresh in Restaurants      |
+| 1651 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Pumpkin Leaves                        | Pumpkin Leaves                        |
+| 1652 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Mushrooms                             | Mushrooms                             |
+| 1653 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Cucumber                              | Cucumber                              |
+| 1654 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Okra                                  | Okra                                  |
+| 1721 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Macaroni/Spaghetti                    | Macaroni/Spaghetti                    |
+| 1731 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Biscuits                              | Biscuits                              |
+| 1732 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Cakes                                 | Cakes                                 |
+| 1733 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Doughnuts                             | Doughnuts                             |
+| 1734 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Cornflakes                            | Cornflakes                            |
+| 1735 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Samosas                               | Samosas                               |
+| 1741 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Yarms(arrow root)                     | Yarms(arrow root)                     |
+| 1742 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | sugarcane                             | sugarcane                             |
+| 1743 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Jackfruit(ffene)                      | Jackfruit(ffene)                      |
+| 1761 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Soya beans (fresh)                    | Soya beans (fresh)                    |
+| 1762 | ---                                | ---                    | ---                            | ---                            | ---                            | ---                            | Soya beans (dry)                      | Soya beans (dry)                      |
+
 
 The following just modifies the output of =item_expenditures= to add a
 "Preferred label" column (and column headings), and an "Aggregate
@@ -1167,90 +1170,89 @@ Label."  The "Aggregate Label" need not be unique; expenditures
 for all items with the same "Aggregate Label" will be summed together.
 
 #+name: food_expenditure_labels
-
-| Code | Preferred Label        | Aggregate Label | 2015                           | 2005                               | 2009                   | 2010                           | 2011                           | 2013                           |
-|------+------------------------+-----------------+--------------------------------+------------------------------------+------------------------+--------------------------------+--------------------------------+--------------------------------|
-|  100 | Matoke (??)            | Matoke          | ---                            | ---                                | Matooke(cluster)       | ---                            | ---                            | ---                            |
-|  101 | Matoke (bunch)         | Matoke          | Plantains(Matooke)-Bunch       | matooke                            | Matooke(big)           | Plantains(Matooke)-Bunch       | Plantains(Matooke)-Bunch       | Plantains(Matooke)-Bunch       |
-|  102 | Matoke (cluster)       | Matoke          | Plantains(Matooke)-Cluster     | matooke                            | Matooke(medium)        | Plantains(Matooke)-Cluster     | Plantains(Matooke)-Cluster     | Plantains(Matooke)-Cluster     |
-|  103 | Matoke (heap)          | Matoke          | Plantains(Matooke)-heap        | matooke                            | Matooke(small)         | Plantains(Matooke)-heap        | Plantains(Matooke)-heap        | Plantains(Matooke)-heap        |
-|  104 | Matoke (other)         | Matoke          | Plantains(Matooke)-Other units | matooke                            | Matooke(heap)          | Plantains(Matooke)-Other units | Plantains(Matooke)-Other units | Plantains(Matooke)-Other units |
-|  105 | Sweet Potatoes (fresh) | Sweet Potatoes  | Sweet potatoes (fresh)         | sweet potatoes fresh               | Sweet Potatoes (Fresh) | Sweet potatoes (fresh)         | Sweet potatoes (fresh)         | Sweet potatoes (fresh)         |
-|  106 | Sweet Potatoes (dry)   | Sweet Potatoes  | Sweet potatoes (dry)           | sweet potatoes dry                 | Sweet Potatoes (Dry)   | Sweet potatoes (dry)           | Sweet potatoes (dry)           | Sweet potatoes (dry)           |
-|  107 | Cassava (fresh)        | Cassava         | Cassava (fresh)                | cassava fresh                      | Cassava (Fresh)        | Cassava (fresh)                | Cassava (fresh)                | Cassava (fresh)                |
-|  108 | Cassava (dry/flour)    | Cassava (flour) | Cassava (dry/flour)            | cassava dry/flour                  | Cassava (Dry/ Flour)   | Cassava (dry/flour)            | Cassava (dry/flour)            | Cassava (dry/flour)            |
-|  109 | Irish Potatoes         | Irish potato    | Irish potatoes                 | irish potatoes                     | Irish Potatoes         | Irish potatoes                 | Irish potatoes                 | Irish potatoes                 |
-|  110 | Rice                   | Rice            | Rice                           | rice                               | Rice                   | Rice                           | Rice                           | Rice                           |
-|  111 | Maize (grains)         | Maize           | Maize (grains)                 | maize grains                       | Maize (grains)         | Maize (grains)                 | Maize (grains)                 | Maize (grains)                 |
-|  112 | Maize (cobs)           | Maize           | Maize (cobs)                   | maize cobs                         | Maize (cobs)           | Maize (cobs)                   | Maize (cobs)                   | Maize (cobs)                   |
-|  113 | Maize (flour)          | Maize           | Maize (flour)                  | maize flour                        | Maize (flour)          | Maize (flour)                  | Maize (flour)                  | Maize (flour)                  |
-|  114 | Bread                  | Bread           | bread                          | bread                              | Bread                  | bread                          | bread                          | bread                          |
-|  115 | Millet                 | Millet          | Millet (flour)                 | millet                             | Millet                 | Millet (flour)                 | Millet (flour)                 | Millet (flour)                 |
-|  116 | Sorghum                | Sorghum         | Sorghum (flour)                | sorghum                            | Sorghum                | Sorghum (flour)                | Sorghum (flour)                | Sorghum (flour)                |
-|  117 | Beef                   | Beef            | Beef                           | beef                               | Beef                   | Beef                           | Beef                           | Beef                           |
-|  118 | Pork                   | Pork            | Pork                           | pork                               | Pork                   | Pork                           | Pork                           | Pork                           |
-|  119 | Goat Meat              | Goat meat       | Goat meat                      | goat meat                          | Goat Meat              | Goat meat                      | Goat meat                      | Goat meat                      |
-|  120 | Other Meat             | Other meat      | Other meat                     | other meat                         | Other Meat             | Other meat                     | Other meat                     | Other meat                     |
-|  121 | Chicken                | Chicken         | chicken - Local                | chicken                            | Chicken                | chicken - Local                | chicken - Local                | chicken - Local                |
-|  122 | Fresh Fish             | Fresh fish      | Fresh fish                     | fresh fish                         | Fresh Fish             | Fresh fish                     | Fresh fish                     | Fresh fish                     |
-|  123 | Dry/Smoked fish        | Dried fish      | dry/smocked  fish              | dry/smoked fish                    | Dry/ Smoked fish       | dry/smocked  fish              | dry/smocked  fish              | dry/smocked  fish              |
-|  124 | Eggs                   | Eggs            | Eggs                           | eggs                               | Eggs                   | Eggs                           | Eggs                           | Eggs                           |
-|  125 | Fresh Milk             | Fresh milk      | Fresh milk                     | fresh milk                         | Fresh Milk             | Fresh milk                     | Fresh milk                     | Fresh milk                     |
-|  126 | Infant Formula         | Infant formula  | Infant formula food            | infant formula foods               | Infant Formula Foods   | Infant formula food            | Infant formula food            | Infant formula food            |
-|  127 | Cooking oil            | Cooking oil     | Cooking oil                    | cooking oil                        | Cooking oil            | Cooking oil                    | Cooking oil                    | Cooking oil                    |
-|  128 | Ghee                   | Ghee            | Ghee                           | ghee                               | Ghee                   | Ghee                           | Ghee                           | Ghee                           |
-|  129 | Margarine, Butter, etc | Butter, etc.    | margarine, butter, etc         | margarine,butter                   | Margarine, Butter, etc | margarine, butter, etc         | margarine, butter, etc         | margarine, butter, etc         |
-|  130 | Passion Fruits         | Passion fruit   | Passion fruits                 | passion fruits                     | Passion Fruits         | Passion fruits                 | Passion fruits                 | Passion fruits                 |
-|  131 | Sweet Bananas          | Sweet Banana    | Sweet bananas                  | sweet bananas                      | Sweet Bananas          | Sweet bananas                  | Sweet bananas                  | Sweet bananas                  |
-|  132 | Mangos                 | Mangos          | Mangos                         | mangoes                            | Mangos                 | Mangos                         | Mangos                         | Mangos                         |
-|  133 | Oranges                | Oranges         | Oranges                        | oranges                            | Oranges                | Oranges                        | Oranges                        | Oranges                        |
-|  134 | Other Fruits           | Other Fruit     | Other Fruits                   | other fruits                       | Other Fruits           | Other Fruits                   | Other Fruits                   | Other Fruits                   |
-|  135 | Onions                 | Onions          | Onions                         | onions                             | Onions                 | Onions                         | Onions                         | Onions                         |
-|  136 | Tomatoes               | Tomatoes        | Tomatoes                       | tomatoes                           | Tomatoes               | Tomatoes                       | Tomatoes                       | Tomatoes                       |
-|  137 | Cabbages               | Cabbages        | Cabbages                       | cabbages                           | Cabbages               | Cabbages                       | Cabbages                       | Cabbages                       |
-|  138 | Dodo                   | Dodo            | Dodo                           | dodo                               | Dodo                   | Dodo                           | Dodo                           | Dodo                           |
-|  139 | Other vegetables       | Other Veg.      | Other Vegetables               | other vegetables                   | Other vegetables       | Other Vegetables               | Other Vegetables               | Other Vegetables               |
-|  140 | Beans (fresh)          | Beans           | Beans (fresh)                  | beans fresh                        | Beans fresh)           | Beans (fresh)                  | Beans (fresh)                  | Beans (fresh)                  |
-|  141 | Beans (dry)            | Beans           | Beans (dry)                    | beans dry                          | Beans (dry)            | Beans (dry)                    | Beans (dry)                    | Beans (dry)                    |
-|  142 | Ground nuts (in shell) | Ground nut      | Ground nuts (in shell)         | ground nuts in shell               | Ground nuts (in shell) | Ground nuts (in shell)         | Ground nuts (in shell)         | Ground nuts (in shell)         |
-|  143 | Ground nuts (shelled)  | Ground nut      | Ground nut seeds (unshelled)   | ground nuts shelled                | Ground nuts (shelled)  | Ground nut seeds (unshelled)   | Ground nut seeds (unshelled)   | Ground nut seeds (unshelled)   |
-|  144 | Ground nuts (pounded)  | Ground nut      | ground nuts (pounded)          | ground nuts pounded                | Ground nuts (pounded)  | ground nuts (pounded)          | ground nuts (pounded)          | ground nuts (pounded)          |
-|  145 | Peas                   | Peas            | Peas (fresh)                   | peas                               | Peas                   | Peas (fresh)                   | Peas (fresh)                   | Peas (fresh)                   |
-|  146 | Sim sim                | Sim sim         | Simsim                         | simsim                             | Sim sim                | Simsim                         | Simsim                         | Simsim                         |
-|  147 | Sugar                  | Sugar           | Sugar                          | sugar                              | Sugar                  | Sugar                          | Sugar                          | Sugar                          |
-|  148 | Coffee                 | Coffee          | Coffee                         | coffee                             | Coffee                 | Coffee                         | Coffee                         | Coffee                         |
-|  149 | Tea                    | Tea             | Tea                            | tea                                | Tea                    | Tea                            | Tea                            | Tea                            |
-|  150 | Salt                   | Salt            | Salt                           | salt                               | Salt                   | Salt                           | Salt                           | Salt                           |
-|  151 | Soda                   | Soda            | Soda                           | soda                               | Soda                   | Soda                           | Soda                           | Soda                           |
-|  152 | Beer                   | Beer            | Beer                           | beer                               | Beer                   | Beer                           | Beer                           | Beer                           |
-|  153 | Other Alcoholic drinks | Other Alcohol   | Other alcholic drinks          | other alcoholic drinks             | Other Alcoholic drinks | Other alcholic drinks          | Other alcholic drinks          | Other alcholic drinks          |
-|  154 | Other drinks           | Other drinks    | Other drinks                   | other drinks                       | Other drinks           | Other drinks                   | Other drinks                   | Other drinks                   |
-|  155 | Cigarettes             | Cigarettes      | Cigarettes                     | cigarettes                         | Cigarettes             | Cigarettes                     | Cigarettes                     | Cigarettes                     |
-|  156 | Other Tobacco          | Other Tobacco   | Other Tobacco                  | other tobbaco                      | Other Tobacco          | Other Tobacco                  | Other Tobacco                  | Other Tobacco                  |
-|  157 | Restaurant (food)      | Restaurant      | Food                           | expenditure in restaurants on food | Food                   | Food                           | Food                           | Food                           |
-|  158 | Restaurant (soda)      | Soda            | Soda                           | expenditure in restaurants on soda | Soda                   | Soda                           | Soda                           | Soda                           |
-|  159 | Restaurant (beer)      | Beer            | Beer                           | expenditure in restaurants on beer | Beer                   | Beer                           | Beer                           | Beer                           |
-|  160 | Other juice            | Other juice     | Other juice                    | other juice                        | Other juice            | Other juice                    | Other juice                    | Other juice                    |
-|  161 | Other foods            | Other foods     | Other foods                    | other foods                        | Other foods            | Other foods                    | Other foods                    | Other foods                    |
-|  162 | Peas (dry)             | Peas            | Peas(dry)                      | ---                                | ---                    | Peas(dry)                      | Peas(dry)                      | Peas(dry)                      |
-|  163 | Ground nut (paste)     | Ground nut      | Ground nuts paste              | ---                                | ---                    | Ground nuts paste              | Ground nuts paste              | Ground nuts paste              |
-|  164 | Green pepper           | Other Veg.      | Green pepper                   | ---                                | ---                    | Green pepper                   | Green pepper                   | Green pepper                   |
-|  165 | Pumpkins               | Other Veg.      | Pumpkins                       | ---                                | ---                    | Pumpkins                       | Pumpkins                       | Pumpkins                       |
-|  166 | Avocado                | Other Fruit     | Avocado                        | ---                                | ---                    | Avocado                        | Avocado                        | Avocado                        |
-|  167 | Carrots                | Other Veg.      | Carrots                        | ---                                | ---                    | Carrots                        | Carrots                        | Carrots                        |
-|  168 | Eggplant               | Other Veg.      | Egg plant                      | ---                                | ---                    | Egg plant                      | Egg plant                      | Egg plant                      |
-|  169 | Watermelon             | Other Fruit     | Watermelon                     | ---                                | ---                    | Watermelon                     | Watermelon                     | Watermelon                     |
-|  170 | Pineapple              | Other Fruit     | Pineapple                      | ---                                | Matooke(others)        | Pineapple                      | Pineapple                      | Pineapple                      |
-|  171 | Pawpaw                 | Other Fruit     | Pawpaw                         | ---                                | ---                    | Pawpaw                         | Pawpaw                         | Pawpaw                         |
-|  172 | Wheat (flour)          | Wheat (flour)   | Wheat (flour)                  | ---                                | ---                    | ---                            | ---                            | Wheat (flour)                  |
-|  173 | Chapati                | Chapati         | Chapati                        | ---                                | ---                    | ---                            | ---                            | Chapati                        |
-|  174 | Apples                 | Other Fruit     | Apples                         | ---                                | ---                    | ---                            | ---                            | Apples                         |
-|  175 | Water                  | Water           | water                          | ---                                | ---                    | ---                            | ---                            | water                          |
-|  180 | Sweet Potatoes (flour) | Sweet Potatoes  | sweet potatoes flour           | ---                                | ---                    | ---                            | ---                            | sweet potatoes flour           |
-|  181 | Cassava                | Cassava         | Cassava (dry)                  | ---                                | ---                    | ---                            | ---                            | Cassava (dry)                  |
-|  182 | Cassava                | Cassava         | Cassava (flour)                | ---                                | ---                    | ---                            | ---                            | Cassava (flour)                |
-|  190 | Bread                  | Bread           | Loaf                           | ---                                | ---                    | ---                            | ---                            | Loaf                           |
-|  191 | Bread                  | Bun             | Bun                            | ---                                | ---                    | ---                            | ---                            | Bun                            |
+| Code | Preferred Label        | Aggregate Label | 2005                               | 2009                   | 2010                           | 2011                           | 2013                           | 2015                           |
+|------+------------------------+-----------------+------------------------------------+------------------------+--------------------------------+--------------------------------+--------------------------------+--------------------------------|
+|  100 | Matoke (??)            | Matoke          | ---                                | Matooke(cluster)       | ---                            | ---                            | ---                            | ---                            |
+|  101 | Matoke (bunch)         | Matoke          | matooke                            | Matooke(big)           | Plantains(Matooke)-Bunch       | Plantains(Matooke)-Bunch       | Plantains(Matooke)-Bunch       | Plantains(Matooke)-Bunch       |
+|  102 | Matoke (cluster)       | Matoke          | matooke                            | Matooke(medium)        | Plantains(Matooke)-Cluster     | Plantains(Matooke)-Cluster     | Plantains(Matooke)-Cluster     | Plantains(Matooke)-Cluster     |
+|  103 | Matoke (heap)          | Matoke          | matooke                            | Matooke(small)         | Plantains(Matooke)-heap        | Plantains(Matooke)-heap        | Plantains(Matooke)-heap        | Plantains(Matooke)-heap        |
+|  104 | Matoke (other)         | Matoke          | matooke                            | Matooke(heap)          | Plantains(Matooke)-Other units | Plantains(Matooke)-Other units | Plantains(Matooke)-Other units | Plantains(Matooke)-Other units |
+|  105 | Sweet Potatoes (fresh) | Sweet Potatoes  | sweet potatoes fresh               | Sweet Potatoes (Fresh) | Sweet potatoes (fresh)         | Sweet potatoes (fresh)         | Sweet potatoes (fresh)         | Sweet potatoes (fresh)         |
+|  106 | Sweet Potatoes (dry)   | Sweet Potatoes  | sweet potatoes dry                 | Sweet Potatoes (Dry)   | Sweet potatoes (dry)           | Sweet potatoes (dry)           | Sweet potatoes (dry)           | Sweet potatoes (dry)           |
+|  107 | Cassava (fresh)        | Cassava         | cassava fresh                      | Cassava (Fresh)        | Cassava (fresh)                | Cassava (fresh)                | Cassava (fresh)                | Cassava (fresh)                |
+|  108 | Cassava (dry/flour)    | Cassava (flour) | cassava dry/flour                  | Cassava (Dry/ Flour)   | Cassava (dry/flour)            | Cassava (dry/flour)            | Cassava (dry/flour)            | Cassava (dry/flour)            |
+|  109 | Irish Potatoes         | Irish potato    | irish potatoes                     | Irish Potatoes         | Irish potatoes                 | Irish potatoes                 | Irish potatoes                 | Irish potatoes                 |
+|  110 | Rice                   | Rice            | rice                               | Rice                   | Rice                           | Rice                           | Rice                           | Rice                           |
+|  111 | Maize (grains)         | Maize           | maize grains                       | Maize (grains)         | Maize (grains)                 | Maize (grains)                 | Maize (grains)                 | Maize (grains)                 |
+|  112 | Maize (cobs)           | Maize           | maize cobs                         | Maize (cobs)           | Maize (cobs)                   | Maize (cobs)                   | Maize (cobs)                   | Maize (cobs)                   |
+|  113 | Maize (flour)          | Maize           | maize flour                        | Maize (flour)          | Maize (flour)                  | Maize (flour)                  | Maize (flour)                  | Maize (flour)                  |
+|  114 | Bread                  | Bread           | bread                              | Bread                  | bread                          | bread                          | bread                          | bread                          |
+|  115 | Millet                 | Millet          | millet                             | Millet                 | Millet (flour)                 | Millet (flour)                 | Millet (flour)                 | Millet (flour)                 |
+|  116 | Sorghum                | Sorghum         | sorghum                            | Sorghum                | Sorghum (flour)                | Sorghum (flour)                | Sorghum (flour)                | Sorghum (flour)                |
+|  117 | Beef                   | Beef            | beef                               | Beef                   | Beef                           | Beef                           | Beef                           | Beef                           |
+|  118 | Pork                   | Pork            | pork                               | Pork                   | Pork                           | Pork                           | Pork                           | Pork                           |
+|  119 | Goat Meat              | Goat meat       | goat meat                          | Goat Meat              | Goat meat                      | Goat meat                      | Goat meat                      | Goat meat                      |
+|  120 | Other Meat             | Other meat      | other meat                         | Other Meat             | Other meat                     | Other meat                     | Other meat                     | Other meat                     |
+|  121 | Chicken                | Chicken         | chicken                            | Chicken                | chicken - Local                | chicken - Local                | chicken - Local                | chicken - Local                |
+|  122 | Fresh Fish             | Fresh fish      | fresh fish                         | Fresh Fish             | Fresh fish                     | Fresh fish                     | Fresh fish                     | Fresh fish                     |
+|  123 | Dry/Smoked fish        | Dried fish      | dry/smoked fish                    | Dry/ Smoked fish       | dry/smocked  fish              | dry/smocked  fish              | dry/smocked  fish              | dry/smocked  fish              |
+|  124 | Eggs                   | Eggs            | eggs                               | Eggs                   | Eggs                           | Eggs                           | Eggs                           | Eggs                           |
+|  125 | Fresh Milk             | Fresh milk      | fresh milk                         | Fresh Milk             | Fresh milk                     | Fresh milk                     | Fresh milk                     | Fresh milk                     |
+|  126 | Infant Formula         | Infant formula  | infant formula foods               | Infant Formula Foods   | Infant formula food            | Infant formula food            | Infant formula food            | Infant formula food            |
+|  127 | Cooking oil            | Cooking oil     | cooking oil                        | Cooking oil            | Cooking oil                    | Cooking oil                    | Cooking oil                    | Cooking oil                    |
+|  128 | Ghee                   | Ghee            | ghee                               | Ghee                   | Ghee                           | Ghee                           | Ghee                           | Ghee                           |
+|  129 | Margarine, Butter, etc | Butter, etc.    | margarine,butter                   | Margarine, Butter, etc | margarine, butter, etc         | margarine, butter, etc         | margarine, butter, etc         | margarine, butter, etc         |
+|  130 | Passion Fruits         | Passion fruit   | passion fruits                     | Passion Fruits         | Passion fruits                 | Passion fruits                 | Passion fruits                 | Passion fruits                 |
+|  131 | Sweet Bananas          | Sweet Banana    | sweet bananas                      | Sweet Bananas          | Sweet bananas                  | Sweet bananas                  | Sweet bananas                  | Sweet bananas                  |
+|  132 | Mangos                 | Mangos          | mangoes                            | Mangos                 | Mangos                         | Mangos                         | Mangos                         | Mangos                         |
+|  133 | Oranges                | Oranges         | oranges                            | Oranges                | Oranges                        | Oranges                        | Oranges                        | Oranges                        |
+|  134 | Other Fruits           | Other Fruit     | other fruits                       | Other Fruits           | Other Fruits                   | Other Fruits                   | Other Fruits                   | Other Fruits                   |
+|  135 | Onions                 | Onions          | onions                             | Onions                 | Onions                         | Onions                         | Onions                         | Onions                         |
+|  136 | Tomatoes               | Tomatoes        | tomatoes                           | Tomatoes               | Tomatoes                       | Tomatoes                       | Tomatoes                       | Tomatoes                       |
+|  137 | Cabbages               | Cabbages        | cabbages                           | Cabbages               | Cabbages                       | Cabbages                       | Cabbages                       | Cabbages                       |
+|  138 | Dodo                   | Dodo            | dodo                               | Dodo                   | Dodo                           | Dodo                           | Dodo                           | Dodo                           |
+|  139 | Other vegetables       | Other Veg.      | other vegetables                   | Other vegetables       | Other Vegetables               | Other Vegetables               | Other Vegetables               | Other Vegetables               |
+|  140 | Beans (fresh)          | Beans           | beans fresh                        | Beans fresh)           | Beans (fresh)                  | Beans (fresh)                  | Beans (fresh)                  | Beans (fresh)                  |
+|  141 | Beans (dry)            | Beans           | beans dry                          | Beans (dry)            | Beans (dry)                    | Beans (dry)                    | Beans (dry)                    | Beans (dry)                    |
+|  142 | Ground nuts (in shell) | Ground nut      | ground nuts in shell               | Ground nuts (in shell) | Ground nuts (in shell)         | Ground nuts (in shell)         | Ground nuts (in shell)         | Ground nuts (in shell)         |
+|  143 | Ground nuts (shelled)  | Ground nut      | ground nuts shelled                | Ground nuts (shelled)  | Ground nut seeds (unshelled)   | Ground nut seeds (unshelled)   | Ground nut seeds (unshelled)   | Ground nut seeds (unshelled)   |
+|  144 | Ground nuts (pounded)  | Ground nut      | ground nuts pounded                | Ground nuts (pounded)  | ground nuts (pounded)          | ground nuts (pounded)          | ground nuts (pounded)          | ground nuts (pounded)          |
+|  145 | Peas                   | Peas            | peas                               | Peas                   | Peas (fresh)                   | Peas (fresh)                   | Peas (fresh)                   | Peas (fresh)                   |
+|  146 | Sim sim                | Sim sim         | simsim                             | Sim sim                | Simsim                         | Simsim                         | Simsim                         | Simsim                         |
+|  147 | Sugar                  | Sugar           | sugar                              | Sugar                  | Sugar                          | Sugar                          | Sugar                          | Sugar                          |
+|  148 | Coffee                 | Coffee          | coffee                             | Coffee                 | Coffee                         | Coffee                         | Coffee                         | Coffee                         |
+|  149 | Tea                    | Tea             | tea                                | Tea                    | Tea                            | Tea                            | Tea                            | Tea                            |
+|  150 | Salt                   | Salt            | salt                               | Salt                   | Salt                           | Salt                           | Salt                           | Salt                           |
+|  151 | Soda                   | Soda            | soda                               | Soda                   | Soda                           | Soda                           | Soda                           | Soda                           |
+|  152 | Beer                   | Beer            | beer                               | Beer                   | Beer                           | Beer                           | Beer                           | Beer                           |
+|  153 | Other Alcoholic drinks | Other Alcohol   | other alcoholic drinks             | Other Alcoholic drinks | Other alcholic drinks          | Other alcholic drinks          | Other alcholic drinks          | Other alcholic drinks          |
+|  154 | Other drinks           | Other drinks    | other drinks                       | Other drinks           | Other drinks                   | Other drinks                   | Other drinks                   | Other drinks                   |
+|  155 | Cigarettes             | Cigarettes      | cigarettes                         | Cigarettes             | Cigarettes                     | Cigarettes                     | Cigarettes                     | Cigarettes                     |
+|  156 | Other Tobacco          | Other Tobacco   | other tobbaco                      | Other Tobacco          | Other Tobacco                  | Other Tobacco                  | Other Tobacco                  | Other Tobacco                  |
+|  157 | Restaurant (food)      | Restaurant      | expenditure in restaurants on food | Food                   | Food                           | Food                           | Food                           | Food                           |
+|  158 | Restaurant (soda)      | Soda            | expenditure in restaurants on soda | Soda                   | Soda                           | Soda                           | Soda                           | Soda                           |
+|  159 | Restaurant (beer)      | Beer            | expenditure in restaurants on beer | Beer                   | Beer                           | Beer                           | Beer                           | Beer                           |
+|  160 | Other juice            | Other juice     | other juice                        | Other juice            | Other juice                    | Other juice                    | Other juice                    | Other juice                    |
+|  161 | Other foods            | Other foods     | other foods                        | Other foods            | Other foods                    | Other foods                    | Other foods                    | Other foods                    |
+|  162 | Peas (dry)             | Peas            | ---                                | ---                    | Peas(dry)                      | Peas(dry)                      | Peas(dry)                      | Peas(dry)                      |
+|  163 | Ground nut (paste)     | Ground nut      | ---                                | ---                    | Ground nuts paste              | Ground nuts paste              | Ground nuts paste              | Ground nuts paste              |
+|  164 | Green pepper           | Other Veg.      | ---                                | ---                    | Green pepper                   | Green pepper                   | Green pepper                   | Green pepper                   |
+|  165 | Pumpkins               | Other Veg.      | ---                                | ---                    | Pumpkins                       | Pumpkins                       | Pumpkins                       | Pumpkins                       |
+|  166 | Avocado                | Other Fruit     | ---                                | ---                    | Avocado                        | Avocado                        | Avocado                        | Avocado                        |
+|  167 | Carrots                | Other Veg.      | ---                                | ---                    | Carrots                        | Carrots                        | Carrots                        | Carrots                        |
+|  168 | Eggplant               | Other Veg.      | ---                                | ---                    | Egg plant                      | Egg plant                      | Egg plant                      | Egg plant                      |
+|  169 | Watermelon             | Other Fruit     | ---                                | ---                    | Watermelon                     | Watermelon                     | Watermelon                     | Watermelon                     |
+|  170 | Pineapple              | Other Fruit     | ---                                | Matooke(others)        | Pineapple                      | Pineapple                      | Pineapple                      | Pineapple                      |
+|  171 | Pawpaw                 | Other Fruit     | ---                                | ---                    | Pawpaw                         | Pawpaw                         | Pawpaw                         | Pawpaw                         |
+|  172 | Wheat (flour)          | Wheat (flour)   | ---                                | ---                    | ---                            | ---                            | Wheat (flour)                  | Wheat (flour)                  |
+|  173 | Chapati                | Chapati         | ---                                | ---                    | ---                            | ---                            | Chapati                        | Chapati                        |
+|  174 | Apples                 | Other Fruit     | ---                                | ---                    | ---                            | ---                            | Apples                         | Apples                         |
+|  175 | Water                  | Water           | ---                                | ---                    | ---                            | ---                            | water                          | water                          |
+|  180 | Sweet Potatoes (flour) | Sweet Potatoes  | ---                                | ---                    | ---                            | ---                            | sweet potatoes flour           | sweet potatoes flour           |
+|  181 | Cassava                | Cassava         | ---                                | ---                    | ---                            | ---                            | Cassava (dry)                  | Cassava (dry)                  |
+|  182 | Cassava                | Cassava         | ---                                | ---                    | ---                            | ---                            | Cassava (flour)                | Cassava (flour)                |
+|  190 | Bread                  | Bread           | ---                                | ---                    | ---                            | ---                            | Loaf                           | Loaf                           |
+|  191 | Bread                  | Bun             | ---                                | ---                    | ---                            | ---                            | Bun                            | Bun                            |
 
 
 ** Reconciliation of FCT and Expenditures
@@ -1287,64 +1289,65 @@ print(agglabels.groupby('Aggregate Label').head(1).squeeze().sort_values().to_ma
  #+end_src
 
 
+
  #+name: i_to_fct
- | Aggregate Label | FCT Code |
- |-----------------+----------|
- | Beans           |   806001 |
- | Beef            |   811022 |
- | Beer            |    27281 |
- | Bread           |     1305 |
- | Bun             |     1311 |
- | Butter, etc.    |          |
- | Cabbages        |    29001 |
- | Cassava         |     2001 |
- | Cassava (dry)   |     2020 |
- | Cassava (flour) |     2020 |
- | Chapati         |     1371 |
- | Chicken         |    13062 |
- | Cigarettes      |          |
- | Coffee          |          |
- | Cooking oil     |   725001 |
- | Dodo            |    18031 |
- | Dried fish      |    14025 |
- | Eggs            |    17001 |
- | Fresh fish      |   814001 |
- | Fresh milk      |     9001 |
- | Ghee            |    25050 |
- | Goat meat       |   811121 |
- | Ground nut      |     1006 |
- | Infant formula  |   809005 |
- | Irish potato    |     2101 |
- | Maize           |     1015 |
- | Mangos          |     9176 |
- | Matoke          |     5001 |
- | Millet          |   801104 |
- | Onions          |    29052 |
- | Oranges         |   830093 |
- | Other Alcohol   |          |
- | Other Fruit     |          |
- | Other Tobacco   |          |
- | Other Veg.      |          |
- | Other drinks    |          |
- | Other foods     |          |
- | Other juice     |          |
- | Other meat      |          |
- | Passion fruit   |   830012 |
- | Peas            |     6201 |
- | Pork            |   811321 |
- | Restaurant      |          |
- | Rice            |   801201 |
- | Salt            |          |
- | Sim sim         |     8051 |
- | Soda            |    27090 |
- | Sorghum         |   801106 |
- | Sugar           |   826002 |
- | Sweet Banana    |     5150 |
- | Sweet Potatoes  |     3003 |
- | Tea             |          |
- | Tomatoes        |    29063 |
- | Water           |          |
- | Wheat (flour)   |     1301 |
+ | Aggregate Label | FCT Code | FCT Description                             |
+ |-----------------+----------+---------------------------------------------|
+ | Beans           |   806001 | BEANS,PINTO(K20/NAMBALE),FRESH,RAW *BOILED* |
+ | Beef            |   811022 |                                             |
+ | Beer            |    27281 |                                             |
+ | Bread           |     1305 |                                             |
+ | Bun             |     1311 |                                             |
+ | Butter, etc.    |          |                                             |
+ | Cabbages        |    29001 |                                             |
+ | Cassava         |     2001 |                                             |
+ | Cassava (dry)   |     2020 |                                             |
+ | Cassava (flour) |     2020 |                                             |
+ | Chapati         |     1371 |                                             |
+ | Chicken         |    13062 |                                             |
+ | Cigarettes      |          |                                             |
+ | Coffee          |          |                                             |
+ | Cooking oil     |   725001 |                                             |
+ | Dodo            |    18031 |                                             |
+ | Dried fish      |    14025 |                                             |
+ | Eggs            |    17001 |                                             |
+ | Fresh fish      |   814001 |                                             |
+ | Fresh milk      |     9001 |                                             |
+ | Ghee            |    25050 |                                             |
+ | Goat meat       |   811121 |                                             |
+ | Ground nut      |     1006 |                                             |
+ | Infant formula  |   809005 |                                             |
+ | Irish potato    |     2101 |                                             |
+ | Maize           |     1015 |                                             |
+ | Mangos          |     9176 |                                             |
+ | Matoke          |     5001 |                                             |
+ | Millet          |   801104 |                                             |
+ | Onions          |    29052 |                                             |
+ | Oranges         |   830093 |                                             |
+ | Other Alcohol   |          |                                             |
+ | Other Fruit     |          |                                             |
+ | Other Tobacco   |          |                                             |
+ | Other Veg.      |          |                                             |
+ | Other drinks    |          |                                             |
+ | Other foods     |          |                                             |
+ | Other juice     |          |                                             |
+ | Other meat      |          |                                             |
+ | Passion fruit   |   830012 |                                             |
+ | Peas            |     6201 |                                             |
+ | Pork            |   811321 |                                             |
+ | Restaurant      |          |                                             |
+ | Rice            |   801201 |                                             |
+ | Salt            |          |                                             |
+ | Sim sim         |     8051 |                                             |
+ | Soda            |    27090 |                                             |
+ | Sorghum         |   801106 |                                             |
+ | Sugar           |   826002 |                                             |
+ | Sweet Banana    |     5150 |                                             |
+ | Sweet Potatoes  |     3003 |                                             |
+ | Tea             |          |                                             |
+ | Tomatoes        |    29063 |                                             |
+ | Water           |          |                                             |
+ | Wheat (flour)   |     1301 |                                             |
 
 *** Select Foods from FCT, harmonize labels, write to google sheet
 Here we munge the FCT to match labels in expenditures and RDI.   We
@@ -1352,14 +1355,14 @@ also make the units match up with units (Kg) we expect for expenditure
 quantities. 
 #+begin_src python :results raw output :var fct=fct i_to_fct=i_to_fct fct_n_dict=fct_n_dict url = data_url :colnames no :tangle /tmp/foo.py
 import pandas as pd
-from cfe.df_utils import orgtbl_to_df
-from eep153_tools import write_sheet
+from cfe.df_utils import orgtbl_to_df, df_to_orgtbl
+#from eep153_tools import write_sheet
 
 url = url[0][0]
 
 fct = orgtbl_to_df(fct).set_index('FCT Code')
 
-i_to_fct = dict(i_to_fct[1:])
+i_to_fct = dict([(r[0],r[1]) for r in i_to_fct[1:]])
 # Drop fct foods without  corresponding expenditures
 fct = fct.loc[fct.index.intersection(i_to_fct.values()),:]
 
@@ -1389,13 +1392,96 @@ fct = fct*10
 # Replace any missing values with zeros
 fct = fct.fillna(0)
 
-write_sheet(fct,
-            'ligon@berkeley.edu','writer',json_creds='instructors.json',
-            key=url,sheet='FCT')
+print(df_to_orgtbl(fct,float_fmt='%6.2f'))
+#write_sheet(fct,
+#            'ligon@berkeley.edu','writer',json_creds='instructors.json',
+#            key=url,sheet='FCT')
 #+end_src
 
 #+results:
+Missing dependencies for OracleDemands.
+| i               |  Energy | Protein |  Fiber |  Folate | Calcium | Carbohydrate |   Iron | Niacin | Riboflavin | Thiamin | Vitamin A | Vitamin B-12 | Vitamin B-6 | Vitamin C |  Zinc |
+|-----------------+---------+---------+--------+---------+---------+--------------+--------+--------+------------+---------+-----------+--------------+-------------+-----------+-------|
+| Beans           | 1060.00 |   65.00 |  50.00 | 1040.00 |  270.00 |       191.00 |  16.00 |   2.86 |       0.49 |    0.87 |      0.00 |         0.00 |        0.73 |     14.00 |  7.00 |
+| Beef            | 2910.00 |  264.00 |   0.00 |   50.00 |   90.00 |         0.00 |  27.00 |  33.50 |       2.20 |    0.50 |      0.00 |        18.50 |        1.70 |      0.00 | 60.00 |
+| Beer            |  430.00 |    5.00 |   0.00 |   60.00 |   40.00 |        35.00 |   0.00 |   5.10 |       0.30 |    0.10 |      0.00 |         0.20 |        0.50 |      0.00 |  0.00 |
+| Bread           | 2660.00 |   76.00 |  20.00 | 1110.00 | 1510.00 |       506.00 |  37.00 |  43.85 |       3.31 |    4.55 |      0.00 |         0.00 |        0.84 |      0.00 |  7.00 |
+| Bun             | 2660.00 |   76.00 |  20.00 | 1110.00 | 1510.00 |       506.00 |  37.00 |  43.85 |       3.31 |    4.55 |      0.00 |         0.00 |        0.84 |      0.00 |  7.00 |
+| Cabbages        |  250.00 |   13.00 |  30.00 |  430.00 |  400.00 |        58.00 |   5.00 |   2.34 |       0.40 |    0.61 |     50.00 |         0.00 |        1.24 |    366.00 |  2.00 |
+| Cassava         | 1600.00 |   14.00 |  20.00 |  270.00 |  160.00 |       381.00 |   3.00 |   8.54 |       0.48 |    0.87 |     10.00 |         0.00 |        0.88 |    206.00 |  3.00 |
+| Cassava (flour) | 3140.00 |   26.00 |  40.00 |  360.00 |  310.00 |       766.00 |  19.00 |  14.00 |       0.50 |    3.10 |     70.00 |         0.00 |        7.00 |    720.00 |  7.00 |
+| Chapati         | 2750.00 |   91.00 |  20.00 |  240.00 |  860.00 |       557.00 |  14.00 |  21.42 |       0.97 |    2.67 |      0.00 |         0.00 |        0.34 |      0.00 |  8.00 |
+| Chicken         | 1840.00 |  274.00 |   0.00 |   30.00 |  130.00 |         0.00 |   9.00 |  78.07 |       1.15 |    0.41 |    250.00 |         2.10 |        2.90 |      0.00 | 10.00 |
+| Cooking oil     | 8840.00 |    0.00 |   0.00 |    0.00 |    0.00 |         0.00 |   0.00 |   0.00 |       0.00 |    0.00 |      0.00 |         0.00 |        0.00 |      0.00 |  0.00 |
+| Dodo            |  230.00 |   25.00 |   0.00 |  850.00 | 2150.00 |        40.00 |  23.00 |   6.58 |       1.58 |    0.27 |   1460.00 |         0.00 |        1.92 |    433.00 |  9.00 |
+| Dried fish      | 1170.00 |  249.00 |   0.00 |   60.00 | 1020.00 |         0.00 |  12.00 |  19.00 |       1.20 |    0.80 |    100.00 |        22.00 |        1.40 |     17.00 | 14.00 |
+| Eggs            | 1430.00 |  126.00 |   0.00 |  470.00 |  530.00 |         8.00 |  18.00 |   0.70 |       4.78 |    0.69 |   1400.00 |        12.90 |        1.43 |      0.00 | 11.00 |
+| Fresh fish      |  960.00 |  201.00 |   0.00 |  220.00 |  100.00 |         0.00 |   6.00 |  37.08 |       0.60 |    0.37 |      0.00 |        14.20 |        1.46 |      0.00 |  3.00 |
+| Fresh milk      |  600.00 |   32.00 |   0.00 |   50.00 | 1130.00 |        45.00 |   0.00 |   1.07 |       1.83 |    0.44 |    280.00 |         4.40 |        0.36 |      0.00 |  4.00 |
+| Ghee            | 8760.00 |    3.00 |   0.00 |    0.00 |   40.00 |         0.00 |   0.00 |   0.03 |       0.05 |    0.01 |   8400.00 |         0.10 |        0.01 |      0.00 |  0.00 |
+| Goat meat       | 1090.00 |  206.00 |   0.00 |   40.00 |  130.00 |         0.00 |  28.00 |  35.63 |       4.41 |    0.61 |      0.00 |         7.50 |        1.30 |      0.00 | 40.00 |
+| Ground nut      | 2240.00 |   57.00 |  40.00 |  100.00 |   40.00 |       455.00 |  17.00 |  21.09 |       1.16 |    2.12 |     60.00 |         0.00 |        3.61 |      0.00 | 13.00 |
+| Infant formula  | 4960.00 |  263.00 |   0.00 |  310.00 | 9120.00 |       384.00 |   5.00 |   5.17 |      10.85 |    1.98 |   1930.00 |        26.00 |        1.81 |     69.00 | 33.00 |
+| Irish potato    |  770.00 |   20.00 |  20.00 |  160.00 |  120.00 |       175.00 |   8.00 |  10.54 |       0.32 |    0.80 |      0.00 |         0.00 |        2.95 |    197.00 |  3.00 |
+| Maize           | 3970.00 |  102.00 |  80.00 |  140.00 |   80.00 |       809.00 |  28.00 |  35.52 |       1.97 |    3.35 |    110.00 |         0.00 |        6.09 |      0.00 | 24.00 |
+| Matoke          | 1220.00 |   13.00 |  20.00 |  220.00 |   30.00 |       319.00 |   6.00 |   6.86 |       0.54 |    0.52 |    560.00 |         0.00 |        2.99 |    184.00 |  1.00 |
+| Millet          | 3740.00 |  109.00 |  90.00 |  500.00 |   70.00 |       721.00 |  29.00 |  28.01 |       2.73 |    2.29 |      0.00 |         0.00 |        1.90 |      0.00 | 17.00 |
+| Onions          |  400.00 |   11.00 |  20.00 |  190.00 |  230.00 |        93.00 |   2.00 |   1.20 |       0.30 |    0.50 |      0.00 |         0.00 |        1.20 |     74.00 |  2.00 |
+| Oranges         |  470.00 |    9.00 |  20.00 |  290.00 |  400.00 |       118.00 |   1.00 |   2.82 |       0.40 |    0.83 |    110.00 |         0.00 |        0.57 |    505.00 |  1.00 |
+| Passion fruit   |  970.00 |   22.00 | 100.00 |   80.00 |  110.00 |       234.00 |  14.00 |  12.00 |       1.17 |    0.00 |    480.00 |         0.00 |        0.80 |    240.00 |  1.00 |
+| Peas            |  810.00 |   54.00 |  50.00 |  650.00 |  250.00 |       145.00 |  15.00 |  20.90 |       1.32 |    2.66 |    380.00 |         0.00 |        1.69 |    400.00 | 12.00 |
+| Pork            | 2000.00 |  195.00 |   0.00 |   40.00 |  190.00 |         0.00 |   8.00 |  42.66 |       2.25 |    4.90 |     20.00 |         0.00 |        2.99 |      5.00 | 19.00 |
+| Rice            | 3600.00 |   66.00 |   0.00 |   50.00 |   90.00 |       793.00 |   8.00 |  14.40 |       0.43 |    0.49 |      0.00 |         0.00 |        1.31 |      0.00 | 12.00 |
+| Sim sim         | 5730.00 |  177.00 | 118.00 |  970.00 | 9750.00 |       235.00 | 145.50 |  45.20 |       2.50 |    7.90 |      0.00 |         0.00 |        7.90 |      0.00 | 77.50 |
+| Soda            |  480.00 |    0.00 |   0.00 |    0.00 |   50.00 |       123.00 |   1.00 |   0.00 |       0.00 |    0.00 |      0.00 |         0.00 |        0.00 |      0.00 |  1.00 |
+| Sorghum         | 3390.00 |  113.00 |  60.00 |   80.00 |  240.00 |       746.00 |  42.00 |  17.56 |       1.35 |    1.30 |      0.00 |         0.00 |        0.75 |      0.00 | 16.00 |
+| Sugar           | 3870.00 |    0.00 |   0.00 |    0.00 |   10.00 |      1000.00 |   0.00 |   0.00 |       0.19 |    0.00 |      0.00 |         0.00 |        0.00 |      0.00 |  0.00 |
+| Sweet Banana    | 1220.00 |   13.00 |  20.00 |  220.00 |   30.00 |       319.00 |   6.00 |   6.86 |       0.54 |    0.52 |    560.00 |         0.00 |        2.99 |    184.00 |  1.00 |
+| Sweet Potatoes  | 1170.00 |   22.00 |  40.00 |  150.00 |  410.00 |       274.00 |   8.00 |   7.61 |       0.83 |    1.07 |      0.00 |         0.00 |        2.85 |     33.00 |  4.00 |
+| Tomatoes        |  180.00 |    9.00 |  10.00 |  150.00 |  100.00 |        39.00 |   3.00 |   5.94 |       0.19 |    0.37 |    420.00 |         0.00 |        0.80 |    127.00 |  2.00 |
+| Wheat (flour)   | 3640.00 |  103.00 |  30.00 |  260.00 |  150.00 |       763.00 |  12.00 |  12.50 |       0.40 |    1.20 |      0.00 |         0.00 |        0.44 |      0.00 |  7.00 |
 
+Missing dependencies for OracleDemands.
+| i               | Energy       | Protein     | Fiber       | Folate       | Calcium      | Carbohydrate | Iron        | Niacin     | Riboflavin | Thiamin   | Vitamin A    | Vitamin B-12 | Vitamin B-6 | Vitamin C   | Zinc       |
+|-----------------+--------------+-------------+-------------+--------------+--------------+--------------+-------------+------------+------------+-----------+--------------+--------------+-------------+-------------+------------|
+| Beans           | \(1060.000\) | \(65.000\)  | \(50.000\)  | \(1040.000\) | \(270.000\)  | \(191.000\)  | \(16.000\)  | \(2.860\)  | \(0.490\)  | \(0.870\) | \(0.000\)    | \(0.000\)    | \(0.730\)   | \(14.000\)  | \(7.000\)  |
+| Beef            | \(2910.000\) | \(264.000\) | \(0.000\)   | \(50.000\)   | \(90.000\)   | \(0.000\)    | \(27.000\)  | \(33.500\) | \(2.200\)  | \(0.500\) | \(0.000\)    | \(18.500\)   | \(1.700\)   | \(0.000\)   | \(60.000\) |
+| Beer            | \(430.000\)  | \(5.000\)   | \(0.000\)   | \(60.000\)   | \(40.000\)   | \(35.000\)   | \(0.000\)   | \(5.100\)  | \(0.300\)  | \(0.100\) | \(0.000\)    | \(0.200\)    | \(0.500\)   | \(0.000\)   | \(0.000\)  |
+| Bread           | \(2660.000\) | \(76.000\)  | \(20.000\)  | \(1110.000\) | \(1510.000\) | \(506.000\)  | \(37.000\)  | \(43.850\) | \(3.310\)  | \(4.550\) | \(0.000\)    | \(0.000\)    | \(0.840\)   | \(0.000\)   | \(7.000\)  |
+| Bun             | \(2660.000\) | \(76.000\)  | \(20.000\)  | \(1110.000\) | \(1510.000\) | \(506.000\)  | \(37.000\)  | \(43.850\) | \(3.310\)  | \(4.550\) | \(0.000\)    | \(0.000\)    | \(0.840\)   | \(0.000\)   | \(7.000\)  |
+| Cabbages        | \(250.000\)  | \(13.000\)  | \(30.000\)  | \(430.000\)  | \(400.000\)  | \(58.000\)   | \(5.000\)   | \(2.340\)  | \(0.400\)  | \(0.610\) | \(50.000\)   | \(0.000\)    | \(1.240\)   | \(366.000\) | \(2.000\)  |
+| Cassava         | \(1600.000\) | \(14.000\)  | \(20.000\)  | \(270.000\)  | \(160.000\)  | \(381.000\)  | \(3.000\)   | \(8.540\)  | \(0.480\)  | \(0.870\) | \(10.000\)   | \(0.000\)    | \(0.880\)   | \(206.000\) | \(3.000\)  |
+| Cassava (flour) | \(3140.000\) | \(26.000\)  | \(40.000\)  | \(360.000\)  | \(310.000\)  | \(766.000\)  | \(19.000\)  | \(14.000\) | \(0.500\)  | \(3.100\) | \(70.000\)   | \(0.000\)    | \(7.000\)   | \(720.000\) | \(7.000\)  |
+| Chapati         | \(2750.000\) | \(91.000\)  | \(20.000\)  | \(240.000\)  | \(860.000\)  | \(557.000\)  | \(14.000\)  | \(21.420\) | \(0.970\)  | \(2.670\) | \(0.000\)    | \(0.000\)    | \(0.340\)   | \(0.000\)   | \(8.000\)  |
+| Chicken         | \(1840.000\) | \(274.000\) | \(0.000\)   | \(30.000\)   | \(130.000\)  | \(0.000\)    | \(9.000\)   | \(78.070\) | \(1.150\)  | \(0.410\) | \(250.000\)  | \(2.100\)    | \(2.900\)   | \(0.000\)   | \(10.000\) |
+| Cooking oil     | \(8840.000\) | \(0.000\)   | \(0.000\)   | \(0.000\)    | \(0.000\)    | \(0.000\)    | \(0.000\)   | \(0.000\)  | \(0.000\)  | \(0.000\) | \(0.000\)    | \(0.000\)    | \(0.000\)   | \(0.000\)   | \(0.000\)  |
+| Dodo            | \(230.000\)  | \(25.000\)  | \(0.000\)   | \(850.000\)  | \(2150.000\) | \(40.000\)   | \(23.000\)  | \(6.580\)  | \(1.580\)  | \(0.270\) | \(1460.000\) | \(0.000\)    | \(1.920\)   | \(433.000\) | \(9.000\)  |
+| Dried fish      | \(1170.000\) | \(249.000\) | \(0.000\)   | \(60.000\)   | \(1020.000\) | \(0.000\)    | \(12.000\)  | \(19.000\) | \(1.200\)  | \(0.800\) | \(100.000\)  | \(22.000\)   | \(1.400\)   | \(17.000\)  | \(14.000\) |
+| Eggs            | \(1430.000\) | \(126.000\) | \(0.000\)   | \(470.000\)  | \(530.000\)  | \(8.000\)    | \(18.000\)  | \(0.700\)  | \(4.780\)  | \(0.690\) | \(1400.000\) | \(12.900\)   | \(1.430\)   | \(0.000\)   | \(11.000\) |
+| Fresh fish      | \(960.000\)  | \(201.000\) | \(0.000\)   | \(220.000\)  | \(100.000\)  | \(0.000\)    | \(6.000\)   | \(37.080\) | \(0.600\)  | \(0.370\) | \(0.000\)    | \(14.200\)   | \(1.460\)   | \(0.000\)   | \(3.000\)  |
+| Fresh milk      | \(600.000\)  | \(32.000\)  | \(0.000\)   | \(50.000\)   | \(1130.000\) | \(45.000\)   | \(0.000\)   | \(1.070\)  | \(1.830\)  | \(0.440\) | \(280.000\)  | \(4.400\)    | \(0.360\)   | \(0.000\)   | \(4.000\)  |
+| Ghee            | \(8760.000\) | \(3.000\)   | \(0.000\)   | \(0.000\)    | \(40.000\)   | \(0.000\)    | \(0.000\)   | \(0.030\)  | \(0.050\)  | \(0.010\) | \(8400.000\) | \(0.100\)    | \(0.010\)   | \(0.000\)   | \(0.000\)  |
+| Goat meat       | \(1090.000\) | \(206.000\) | \(0.000\)   | \(40.000\)   | \(130.000\)  | \(0.000\)    | \(28.000\)  | \(35.630\) | \(4.410\)  | \(0.610\) | \(0.000\)    | \(7.500\)    | \(1.300\)   | \(0.000\)   | \(40.000\) |
+| Ground nut      | \(2240.000\) | \(57.000\)  | \(40.000\)  | \(100.000\)  | \(40.000\)   | \(455.000\)  | \(17.000\)  | \(21.090\) | \(1.160\)  | \(2.120\) | \(60.000\)   | \(0.000\)    | \(3.610\)   | \(0.000\)   | \(13.000\) |
+| Infant formula  | \(4960.000\) | \(263.000\) | \(0.000\)   | \(310.000\)  | \(9120.000\) | \(384.000\)  | \(5.000\)   | \(5.170\)  | \(10.850\) | \(1.980\) | \(1930.000\) | \(26.000\)   | \(1.810\)   | \(69.000\)  | \(33.000\) |
+| Irish potato    | \(770.000\)  | \(20.000\)  | \(20.000\)  | \(160.000\)  | \(120.000\)  | \(175.000\)  | \(8.000\)   | \(10.540\) | \(0.320\)  | \(0.800\) | \(0.000\)    | \(0.000\)    | \(2.950\)   | \(197.000\) | \(3.000\)  |
+| Maize           | \(3970.000\) | \(102.000\) | \(80.000\)  | \(140.000\)  | \(80.000\)   | \(809.000\)  | \(28.000\)  | \(35.520\) | \(1.970\)  | \(3.350\) | \(110.000\)  | \(0.000\)    | \(6.090\)   | \(0.000\)   | \(24.000\) |
+| Matoke          | \(1220.000\) | \(13.000\)  | \(20.000\)  | \(220.000\)  | \(30.000\)   | \(319.000\)  | \(6.000\)   | \(6.860\)  | \(0.540\)  | \(0.520\) | \(560.000\)  | \(0.000\)    | \(2.990\)   | \(184.000\) | \(1.000\)  |
+| Millet          | \(3740.000\) | \(109.000\) | \(90.000\)  | \(500.000\)  | \(70.000\)   | \(721.000\)  | \(29.000\)  | \(28.010\) | \(2.730\)  | \(2.290\) | \(0.000\)    | \(0.000\)    | \(1.900\)   | \(0.000\)   | \(17.000\) |
+| Onions          | \(400.000\)  | \(11.000\)  | \(20.000\)  | \(190.000\)  | \(230.000\)  | \(93.000\)   | \(2.000\)   | \(1.200\)  | \(0.300\)  | \(0.500\) | \(0.000\)    | \(0.000\)    | \(1.200\)   | \(74.000\)  | \(2.000\)  |
+| Oranges         | \(470.000\)  | \(9.000\)   | \(20.000\)  | \(290.000\)  | \(400.000\)  | \(118.000\)  | \(1.000\)   | \(2.820\)  | \(0.400\)  | \(0.830\) | \(110.000\)  | \(0.000\)    | \(0.570\)   | \(505.000\) | \(1.000\)  |
+| Passion fruit   | \(970.000\)  | \(22.000\)  | \(100.000\) | \(80.000\)   | \(110.000\)  | \(234.000\)  | \(14.000\)  | \(12.000\) | \(1.170\)  | \(0.000\) | \(480.000\)  | \(0.000\)    | \(0.800\)   | \(240.000\) | \(1.000\)  |
+| Peas            | \(810.000\)  | \(54.000\)  | \(50.000\)  | \(650.000\)  | \(250.000\)  | \(145.000\)  | \(15.000\)  | \(20.900\) | \(1.320\)  | \(2.660\) | \(380.000\)  | \(0.000\)    | \(1.690\)   | \(400.000\) | \(12.000\) |
+| Pork            | \(2000.000\) | \(195.000\) | \(0.000\)   | \(40.000\)   | \(190.000\)  | \(0.000\)    | \(8.000\)   | \(42.660\) | \(2.250\)  | \(4.900\) | \(20.000\)   | \(0.000\)    | \(2.990\)   | \(5.000\)   | \(19.000\) |
+| Rice            | \(3600.000\) | \(66.000\)  | \(0.000\)   | \(50.000\)   | \(90.000\)   | \(793.000\)  | \(8.000\)   | \(14.400\) | \(0.430\)  | \(0.490\) | \(0.000\)    | \(0.000\)    | \(1.310\)   | \(0.000\)   | \(12.000\) |
+| Sim sim         | \(5730.000\) | \(177.000\) | \(118.000\) | \(970.000\)  | \(9750.000\) | \(235.000\)  | \(145.500\) | \(45.200\) | \(2.500\)  | \(7.900\) | \(0.000\)    | \(0.000\)    | \(7.900\)   | \(0.000\)   | \(77.500\) |
+| Soda            | \(480.000\)  | \(0.000\)   | \(0.000\)   | \(0.000\)    | \(50.000\)   | \(123.000\)  | \(1.000\)   | \(0.000\)  | \(0.000\)  | \(0.000\) | \(0.000\)    | \(0.000\)    | \(0.000\)   | \(0.000\)   | \(1.000\)  |
+| Sorghum         | \(3390.000\) | \(113.000\) | \(60.000\)  | \(80.000\)   | \(240.000\)  | \(746.000\)  | \(42.000\)  | \(17.560\) | \(1.350\)  | \(1.300\) | \(0.000\)    | \(0.000\)    | \(0.750\)   | \(0.000\)   | \(16.000\) |
+| Sugar           | \(3870.000\) | \(0.000\)   | \(0.000\)   | \(0.000\)    | \(10.000\)   | \(1000.000\) | \(0.000\)   | \(0.000\)  | \(0.190\)  | \(0.000\) | \(0.000\)    | \(0.000\)    | \(0.000\)   | \(0.000\)   | \(0.000\)  |
+| Sweet Banana    | \(1220.000\) | \(13.000\)  | \(20.000\)  | \(220.000\)  | \(30.000\)   | \(319.000\)  | \(6.000\)   | \(6.860\)  | \(0.540\)  | \(0.520\) | \(560.000\)  | \(0.000\)    | \(2.990\)   | \(184.000\) | \(1.000\)  |
+| Sweet Potatoes  | \(1170.000\) | \(22.000\)  | \(40.000\)  | \(150.000\)  | \(410.000\)  | \(274.000\)  | \(8.000\)   | \(7.610\)  | \(0.830\)  | \(1.070\) | \(0.000\)    | \(0.000\)    | \(2.850\)   | \(33.000\)  | \(4.000\)  |
+| Tomatoes        | \(180.000\)  | \(9.000\)   | \(10.000\)  | \(150.000\)  | \(100.000\)  | \(39.000\)   | \(3.000\)   | \(5.940\)  | \(0.190\)  | \(0.370\) | \(420.000\)  | \(0.000\)    | \(0.800\)   | \(127.000\) | \(2.000\)  |
+| Wheat (flour)   | \(3640.000\) | \(103.000\) | \(30.000\)  | \(260.000\)  | \(150.000\)  | \(763.000\)  | \(12.000\)  | \(12.500\) | \(0.400\)  | \(1.200\) | \(0.000\)    | \(0.000\)    | \(0.440\)   | \(0.000\)   | \(7.000\)  |
 
 
 *** Harmonize labels, write Expenditures to google sheet
@@ -2059,11 +2145,12 @@ Here we collect household characteristics, make sure labels match up
 with  the RDI table, and write to our google sheet.
 #+begin_src python :var url = data_url k_index=k_index :tangle /tmp/foo.py
 import pandas as pd
-from eep153_tools import write_sheet
+#from eep153_tools import write_sheet
+from cfe.df_utils import df_to_orgtbl
 
 url = url[0][0]
 
-z = pd.read_parquet('./household_characteristics.parquet')
+z = pd.read_parquet('../var/household_characteristics.parquet')
 
 # Set market if not in evidence
 if 'm' not in z.index.names:
@@ -2077,12 +2164,14 @@ z.columns = [l.replace('Males','M').replace('Females','F').replace('-99','+') fo
 k_index = [l[0] for l in k_index] 
 k_index += z.columns.difference(k_index).tolist()
 
-write_sheet(z[k_index],
-            'ligon@berkeley.edu','writer',json_creds='instructors.json',
-           key=url,sheet='HH Characteristics')
+print(df_to_orgtbl(z[k_index]))
+
+#write_sheet(z[k_index],
+#            'ligon@berkeley.edu','writer',json_creds='instructors.json',
+#           key=url,sheet='HH Characteristics')
 #+end_src
 
-#+results:
+
 
 * Estimate Demands
 

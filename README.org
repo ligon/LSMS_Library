@@ -43,7 +43,7 @@
 
 ** DVC Setup
    DVC manages the versioning of more-or-less static datasets.
-data-store-290614-8f28d1ad760e.json.gpg > .dvc/my_creds.json
+   To install,
    #+begin_src sh
    pip install dvc[gdrive]
    #+end_src
