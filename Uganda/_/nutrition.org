@@ -1226,17 +1226,17 @@ for all items with the same "Aggregate Label" will be summed together.
 |  151 | Soda                   | Soda            | soda                               | Soda                   | Soda                           | Soda                           | Soda                           | Soda                           |
 |  152 | Beer                   | Beer            | beer                               | Beer                   | Beer                           | Beer                           | Beer                           | Beer                           |
 |  153 | Other Alcoholic drinks | Other Alcohol   | other alcoholic drinks             | Other Alcoholic drinks | Other alcholic drinks          | Other alcholic drinks          | Other alcholic drinks          | Other alcholic drinks          |
-|  154 | Other drinks           | Other drinks    | other drinks                       | Other drinks           | Other drinks                   | Other drinks                   | Other drinks                   | Other drinks                   |
+|  154 | Other Drinks           | Other drinks    | other drinks                       | Other drinks           | Other drinks                   | Other drinks                   | Other drinks                   | Other drinks                   |
 |  155 | Cigarettes             | Cigarettes      | cigarettes                         | Cigarettes             | Cigarettes                     | Cigarettes                     | Cigarettes                     | Cigarettes                     |
 |  156 | Other Tobacco          | Other Tobacco   | other tobbaco                      | Other Tobacco          | Other Tobacco                  | Other Tobacco                  | Other Tobacco                  | Other Tobacco                  |
 |  157 | Restaurant (food)      | Restaurant      | expenditure in restaurants on food | Food                   | Food                           | Food                           | Food                           | Food                           |
 |  158 | Restaurant (soda)      | Soda            | expenditure in restaurants on soda | Soda                   | Soda                           | Soda                           | Soda                           | Soda                           |
 |  159 | Restaurant (beer)      | Beer            | expenditure in restaurants on beer | Beer                   | Beer                           | Beer                           | Beer                           | Beer                           |
-|  160 | Other juice            | Other juice     | other juice                        | Other juice            | Other juice                    | Other juice                    | Other juice                    | Other juice                    |
-|  161 | Other foods            | Other foods     | other foods                        | Other foods            | Other foods                    | Other foods                    | Other foods                    | Other foods                    |
+|  160 | Other Juice            | Other juice     | other juice                        | Other juice            | Other juice                    | Other juice                    | Other juice                    | Other juice                    |
+|  161 | Other Foods            | Other foods     | other foods                        | Other foods            | Other foods                    | Other foods                    | Other foods                    | Other foods                    |
 |  162 | Peas (dry)             | Peas            | ---                                | ---                    | Peas(dry)                      | Peas(dry)                      | Peas(dry)                      | Peas(dry)                      |
-|  163 | Ground nut (paste)     | Ground nut      | ---                                | ---                    | Ground nuts paste              | Ground nuts paste              | Ground nuts paste              | Ground nuts paste              |
-|  164 | Green pepper           | Other Veg.      | ---                                | ---                    | Green pepper                   | Green pepper                   | Green pepper                   | Green pepper                   |
+|  163 | Ground Nut (paste)     | Ground nut      | ---                                | ---                    | Ground nuts paste              | Ground nuts paste              | Ground nuts paste              | Ground nuts paste              |
+|  164 | Green Pepper           | Other Veg.      | ---                                | ---                    | Green pepper                   | Green pepper                   | Green pepper                   | Green pepper                   |
 |  165 | Pumpkins               | Other Veg.      | ---                                | ---                    | Pumpkins                       | Pumpkins                       | Pumpkins                       | Pumpkins                       |
 |  166 | Avocado                | Other Fruit     | ---                                | ---                    | Avocado                        | Avocado                        | Avocado                        | Avocado                        |
 |  167 | Carrots                | Other Veg.      | ---                                | ---                    | Carrots                        | Carrots                        | Carrots                        | Carrots                        |
@@ -1528,17 +1528,16 @@ write_sheet(x,
     irregular.
 
 
- #+begin_src python :tangle compare_unit_labels.py
+ #+begin_src python :results output raw table :tangle compare_unit_labels.py 
 from cfe.df_utils import df_to_orgtbl
 import pandas as pd
 
 d = {}
-for t in ['2005-06','2009-10','2010-11','2011-12','2013-14','2015-16']:
+for t in ['2005-06','2009-10','2010-11','2011-12','2013-14','2015-16','2018-19','2019-20']:
     d[t] = pd.read_csv('../'+t+'/_/unitlabels.csv',index_col=0).squeeze()
 
 d = pd.DataFrame(d)
-#print(df_to_orgtbl(d))
-
+print(df_to_orgtbl(d))
  #+end_src
 
 
@@ -2180,7 +2179,7 @@ slimmed down version of the result instances locally.
 #+begin_src python :var url = data_url :tangle /tmp/demands.py
 import cfe
 import numpy as np
-from eep153_tools import read_sheets
+from eep153_tools.sheets import read_sheets
 
 url = url[0][0]
 
