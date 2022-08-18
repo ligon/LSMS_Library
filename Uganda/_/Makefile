@@ -3,34 +3,36 @@ rounds := $(shell ls -d ../2*-*)
 
 source = $(shell find $(rounds) -name \*.py)
 parquet := $(source:.py=.parquet)
+var = ../var/food_expenditures.parquet ../var/food_quantities.parquet ../var/unitvalues.parquet \
+	  ../var/household_characteristics.parquet ../var/other_features.parquet
 
-all: $(parquet)
+all: $(parquet) $(var)
 
 food_expenditures = $(shell find $(rounds) -name food_expenditures.py)
 food_expenditures_parquet := $(food_expenditures:.py=.parquet)
 
-food_expenditures.parquet: food_expenditures.py $(food_expenditures_parquet)
+../var/food_expenditures.parquet: food_expenditures.py $(food_expenditures_parquet)
 	python food_expenditures.py
 
 food_quantities = $(shell find $(rounds) -name food_quantities.py)
 food_quantities_parquet := $(food_quantities:.py=.parquet)
 
-food_quantities.parquet: food_quantities.py $(food_quantities_parquet)
+../var/food_quantities.parquet: food_quantities.py $(food_quantities_parquet)
 	python food_quantities.py
 
-unitvalues.parquet: unitvalues.py $(food_expenditure_parquet) $(food_quantities_parquet)
+../var/unitvalues.parquet: unitvalues.py $(food_expenditure_parquet) $(food_quantities_parquet)
 	python unitvalues.py
 
 household_characteristics = $(shell find $(rounds) -name household_characteristics.py)
 household_characteristics_parquet := $(household_characteristics:.py=.parquet)
 
-household_characteristics.parquet: household_characteristics.py $(household_characteristics_parquet)
+../var/household_characteristics.parquet: household_characteristics.py $(household_characteristics_parquet)
 	python household_characteristics.py
 
 other_features = $(shell find $(rounds) -name other_features.py)
 other_features_parquet := $(other_features:.py=.parquet)
 
-other_features.parquet: other_features.py $(other_features_parquet)
+../var/other_features.parquet: other_features.py $(other_features_parquet)
 	python other_features.py
 
 %.parquet: %.py food_items.org uganda.py
@@ -38,5 +40,4 @@ other_features.parquet: other_features.py $(other_features_parquet)
 
 clean:
 	-rm $(parquet)
-	-rm *.parquet
-
+	-rm ../var/*.parquet

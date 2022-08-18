@@ -11,12 +11,11 @@ pwd = Path.cwd()
 round = str(pwd.parent).split('/')[-1]
 
 
-myvars = dict(fn='Uganda/%s/Data/GSEC1.dta' % round,
+myvars = dict(fn='../Data/GSEC1.dta',
               HHID='HHID',
               urban='urban',
               region='region',
               urban_converter = lambda s: s.lower() == 'urban')
-
 
 df = other_features(**myvars)
 
