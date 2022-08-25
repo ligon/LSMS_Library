@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 from uganda import age_sex_composition
 
-myvars = dict(fn='Uganda/2019-20/Data/HH/gsec2.dta',
+myvars = dict(fn='../Data/HH/gsec2.dta',
               HHID='hhid',
               sex='h2q3',
               age='h2q8',

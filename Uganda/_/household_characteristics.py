@@ -12,7 +12,7 @@ def id_walk(df,wave,waves):
     T = use_waves.index(wave)
     for t in use_waves[T::-1]:
         if len(waves[t]):
-            df = change_id(df,'Uganda/%s/Data/%s' % (t,waves[t][0]),*waves[t][1:])
+            df = change_id(df,'../%s/Data/%s' % (t,waves[t][0]),*waves[t][1:])
         else:
             df = change_id(df)
 

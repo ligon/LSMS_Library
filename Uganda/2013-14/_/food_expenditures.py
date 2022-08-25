@@ -3,7 +3,7 @@ import sys
 sys.path.append('../../_')
 from uganda import food_expenditures
 
-myvars = dict(fn='Uganda/2013-14/Data/GSEC15B.dta',item='itmds',HHID='hh',
+myvars = dict(fn='../Data/GSEC15B.dta',item='itmds',HHID='hh',
               purchased='h15bq5',
               away='h15bq7',
               produced='h15bq9',

@@ -1622,7 +1622,7 @@ write_sheet(x,
     irregular.
 
 
- #+begin_src python :tangle compare_unit_labels.py
+ #+begin_src python :results output raw table :tangle compare_unit_labels.py 
 from cfe.df_utils import df_to_orgtbl
 import pandas as pd
 
@@ -1632,7 +1632,6 @@ for t in ['2005-06','2009-10','2010-11','2011-12','2013-14','2015-16','2018-19',
 
 d = pd.DataFrame(d)
 print(df_to_orgtbl(d))
-
  #+end_src
 
  #+RESULTS:
@@ -2276,7 +2275,7 @@ slimmed down version of the result instances locally.
 #+begin_src python :var url = data_url :tangle /tmp/demands.py
 import cfe
 import numpy as np
-from eep153_tools import read_sheets
+from eep153_tools.sheets import read_sheets
 
 url = url[0][0]
 

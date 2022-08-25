@@ -11,7 +11,7 @@ pwd = Path.cwd()
 round = str(pwd.parent).split('/')[-1]
 
 
-myvars = dict(fn='Uganda/%s/Data/GSEC1.dta' % round,
+myvars = dict(fn='../Data/GSEC1.dta',
               HHID='hhid',
               urban='urban',
               region='region',
