@@ -1,4 +1,5 @@
 | Code | Preferred Label                | Aggregate Label    |
+|------+--------------------------------+--------------------|
 |  100 | Matoke (??)                    | Matoke             |
 |  101 | Matoke (bunch)                 | Matoke             |
 |  102 | Matoke (cluster)               | Matoke             |
@@ -8,7 +9,7 @@
 |  106 | Sweet Potatoes (dry)           | Sweet Potatoes     |
 |  107 | Cassava (fresh)                | Cassava            |
 |  108 | Cassava (dry/flour)            | Cassava (flour)    |
-|  109 | Irish Potatoes                 | Irish potato       |
+|  109 | Irish Potatoes                 | Irish Potato       |
 |  110 | Rice                           | Rice               |
 |  111 | Maize (grains)                 | Maize              |
 |  112 | Maize (cobs)                   | Maize              |
@@ -19,17 +20,17 @@
 |  117 | Beef                           | Beef               |
 |  118 | Pork                           | Pork               |
 |  119 | Goat Meat                      | Goat               |
-|  120 | Other Meat                     | Other meat         |
+|  120 | Other Meat                     | Other Meat         |
 |  121 | Chicken                        | Chicken            |
 |  122 | Fresh Fish                     | Fish (fresh)       |
-|  123 | Dry/Smoked fish                | Fish (dried)       |
+|  123 | Dry/Smoked Fish                | Fish (dried)       |
 |  124 | Eggs                           | Eggs               |
-|  125 | Fresh Milk                     | Fresh milk         |
-|  126 | Infant Formula                 | Infant formula     |
-|  127 | Cooking oil                    | Cooking oil        |
+|  125 | Fresh Milk                     | Fresh Milk         |
+|  126 | Infant Formula                 | Infant Formula     |
+|  127 | Cooking oil                    | Cooking Oil        |
 |  128 | Ghee                           | Ghee               |
 |  129 | Margarine, Butter, etc         | Butter, etc.       |
-|  130 | Passion Fruits                 | Passion fruit      |
+|  130 | Passion Fruits                 | Passion Fruit      |
 |  131 | Sweet Bananas                  | Sweet Banana       |
 |  132 | Mangos                         | Mangos             |
 |  133 | Oranges                        | Oranges            |
@@ -38,32 +39,32 @@
 |  136 | Tomatoes                       | Tomatoes           |
 |  137 | Cabbages                       | Cabbages           |
 |  138 | Dodo                           | Dodo               |
-|  139 | Other vegetables               | Other Veg.         |
+|  139 | Other Vegetables               | Other Veg.         |
 |  140 | Beans (fresh)                  | Beans              |
 |  141 | Beans (dry)                    | Beans              |
-|  142 | Ground nuts (in shell)         | Ground nut         |
-|  143 | Ground nuts (shelled)          | Ground nut         |
-|  144 | Ground nuts (pounded)          | Ground nut         |
+|  142 | Ground Nuts (in shell)         | Ground Nut         |
+|  143 | Ground Nuts (shelled)          | Ground Nut         |
+|  144 | Ground Nuts (pounded)          | Ground Nut         |
 |  145 | Peas                           | Peas               |
-|  146 | Sim sim                        | Sim sim            |
+|  146 | Sim Sim                        | Sim Sim            |
 |  147 | Sugar                          | Sugar              |
 |  148 | Coffee                         | Coffee             |
 |  149 | Tea                            | Tea                |
 |  150 | Salt                           | Salt               |
 |  151 | Soda                           | Soda               |
 |  152 | Beer                           | Beer               |
-|  153 | Other Alcoholic drinks         | Other Alcohol      |
-|  154 | Other drinks                   | Other drinks       |
+|  153 | Other Alcoholic Drinks         | Other Alcohol      |
+|  154 | Other Drinks                   | Other Drinks       |
 |  155 | Cigarettes                     | Cigarettes         |
 |  156 | Other Tobacco                  | Other Tobacco      |
 |  157 | Restaurant (food)              | Restaurant         |
 |  158 | Restaurant (soda)              | Soda               |
 |  159 | Restaurant (beer)              | Beer               |
-|  160 | Other juice                    | Other juice        |
-|  161 | Other foods                    | Other foods        |
+|  160 | Other Juice                    | Other Juice        |
+|  161 | Other Foods                    | Other Foods        |
 |  162 | Peas (dry)                     | Peas               |
-|  163 | Ground nut (paste)             | Ground nut         |
-|  164 | Green pepper                   | Other Veg.         |
+|  163 | Ground Nut (paste)             | Ground Nut         |
+|  164 | Green Pepper                   | Other Veg.         |
 |  165 | Pumpkins                       | Other Veg.         |
 |  166 | Avocado                        | Other Fruit        |
 |  167 | Carrots                        | Other Veg.         |
@@ -101,7 +102,7 @@
 | 1122 | Maize yellow (cobs)            | Maize              |
 | 1131 | Maize white (flour)            | Maize              |
 | 1132 | Maize yellow (flour)           | Maize              |
-| 1151 | Millet flour                   | Millet             |
+| 1151 | Millet Flour                   | Millet             |
 | 1171 | Beef Liver                     | Beef Liver         |
 | 1172 | Beef Offal                     | Beef Offal         |
 | 1173 | Beef (roasted)                 | Beef               |
@@ -111,11 +112,11 @@
 | 1191 | Goat Liver                     | Goat Liver         |
 | 1192 | Goat Offal                     | Goat Offal         |
 | 1193 | Goat (roasted)                 | Goat               |
-| 1201 | Other meat (roasted)           | Other meat         |
-| 1211 | Chicken off-layer              | Chicken            |
-| 1212 | Chicken Broiler                | Chicken            |
-| 1213 | Chicken Broiler                | Chicken            |
-| 1214 | Chicken Local                  | Chicken            |
+| 1201 | Other Meat (roasted)           | Other Meat         |
+| 1211 | Chicken (off-layer)            | Chicken            |
+| 1212 | Chicken (broiler)              | Chicken            |
+| 1213 | Chicken (kroiler)              | Chicken            |
+| 1214 | Chicken (local)                | Chicken            |
 | 1215 | Chicken (roasted)              | Chicken            |
 | 1221 | Tilapia (fresh)                | Fish (fresh)       |
 | 1222 | Perch (fresh)                  | Fish (fresh)       |
@@ -145,8 +146,8 @@
 | 1371 | Cabbage (red)                  | Cabbage            |
 | 1372 | Cabbage (green)                | Cabbage            |
 | 1391 | Other Spices                   | Other Spices       |
-| 1461 | Simsim                         | Sim sim            |
-| 1462 | Simsim (paste)                 | Sim sim            |
+| 1461 | Simsim                         | Sim Sim            |
+| 1462 | Simsim (paste)                 | Sim Sim            |
 | 1471 | Honey                          | Honey              |
 | 1472 | Jam/Marmalade                  | Jam/Marmalade      |
 | 1481 | Coffee                         | Coffee             |
@@ -155,6 +156,7 @@
 | 1492 | Tea (other)                    | Tea                |
 | 1493 | Tea (green)                    | Tea                |
 | 1501 | Salt                           | Salt               |
+| 1531 | Waragi                         | Waragi             |
 | 1601 | Other Juice (fresh)            | Other Juice        |
 | 1602 | Other Juice (packed)           | Other Juice        |
 | 1603 | Other Juice (restaurants)      | Other Juice        |
