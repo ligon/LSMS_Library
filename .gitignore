@@ -8,3 +8,4 @@ __pycache__/
 Uganda/var/*
 /Uganda/_/compare_unit_labels.py
 /Uganda/_/unitlabels.csv
+.DS_Store
