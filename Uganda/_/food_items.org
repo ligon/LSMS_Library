@@ -9,7 +9,7 @@
 |  106 | Sweet Potatoes (dry)           | Sweet Potatoes     |
 |  107 | Cassava (fresh)                | Cassava            |
 |  108 | Cassava (dry/flour)            | Cassava (flour)    |
-|  109 | Irish Potatoes                 | Irish Potato       |
+|  109 | Irish Potatoes                 | Irish Potatoes     |
 |  110 | Rice                           | Rice               |
 |  111 | Maize (grains)                 | Maize              |
 |  112 | Maize (cobs)                   | Maize              |
@@ -115,7 +115,7 @@
 | 1201 | Other Meat (roasted)           | Other Meat         |
 | 1211 | Chicken (off-layer)            | Chicken            |
 | 1212 | Chicken (broiler)              | Chicken            |
-| 1213 | Chicken (kroiler)              | Chicken            |
+| 1213 | Chicken (broiler)              | Chicken            |
 | 1214 | Chicken (local)                | Chicken            |
 | 1215 | Chicken (roasted)              | Chicken            |
 | 1221 | Tilapia (fresh)                | Fish (fresh)       |
