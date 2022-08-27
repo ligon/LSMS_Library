@@ -128,7 +128,7 @@ for l in n_index_labels:
 ** Write RDI to google sheet
 #+begin_src python :results raw output :var RDI=rdi url = data_url :colnames no :tangle /tmp/foo.py
 import cfe
-from eep153_tools import write_sheet
+from eep153_tools.sheets import write_sheet
 
 url = url[0][0]   
 
@@ -1623,7 +1623,7 @@ quantities.
 #+begin_src python :results raw output :var fct=fct i_to_fct=i_to_fct fct_n_dict=fct_n_dict url = data_url :colnames no :tangle /tmp/foo.py
 import pandas as pd
 from cfe.df_utils import orgtbl_to_df, df_to_orgtbl
-#from eep153_tools import write_sheet
+#from eep153_tools.sheets import write_sheet
 
 url = url[0][0]
 
@@ -2807,7 +2807,7 @@ r.drop_vars(['y','ce','cehat']).to_dataset('/tmp/Uganda_small.ds')
 #+begin_src python :results raw output :colnames no 
 import cfe
 import pandas as pd
-from eep153_tools import read__sheet
+from eep153_tools.sheets import read__sheets
 
 # In first round, averaged over households
 zbar = r.z.sel(t=r.firstround,drop=True).mean(['j','m'])[:-1].squeeze() # Leave out log HSize
@@ -2836,7 +2836,7 @@ print(hh_rda.to_markdown())
 #+begin_src python :results raw output :var zbar=zbar RDA_url = RDA_url :colnames no 
 import cfe
 import pandas as pd
-from eep153_tools import read__sheet
+from eep153_tools.sheets import read__sheets
 import warnings 
 
 def my_prices(p0,p=p,i='apple'):
