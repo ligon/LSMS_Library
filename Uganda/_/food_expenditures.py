@@ -4,7 +4,7 @@ Read food expenditures; use harmonized food labels.
 """
 import pandas as pd
 import numpy as np
-from uganda import change_id, Waves
+from uganda import change_id, Waves, harmonized_food_labels
 
 def id_walk(df,wave,waves):
     
@@ -33,10 +33,16 @@ df.columns.name = 't'
 
 x = df.stack().unstack('i')
 
+agg_labels = harmonized_food_labels(fn='./food_items.org',
+                                    key='Preferred Label',
+                                    value='Aggregate Label')
+x = x.rename(columns=agg_labels)
+
+x = x.groupby('i',axis=1).sum()
+
 x['m'] = 'Uganda'
 x = x.reset_index().set_index(['j','t','m'])
 
 x = x.fillna(0)
-x.columns.name = 'i'
 
 x.to_parquet('../var/food_expenditures.parquet')
