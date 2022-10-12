@@ -17,15 +17,15 @@ Waves = {'2005-06':(),
          '2019-20':('HH/gsec1.dta','hhid','hhidold')}
 
 
-def harmonized_food_labels(fn='../../_/food_items.org'):
+def harmonized_food_labels(fn='../../_/food_items.org',key='Code',value='Preferred Label'):
     # Harmonized food labels
     food_items = pd.read_csv(fn,delimiter='|',skipinitialspace=True,converters={1:int,2:lambda s: s.strip()})
     food_items.columns = [s.strip() for s in food_items.columns]
-    food_items = food_items[['Code','Preferred Label']].dropna()
-    food_items.set_index('Code',inplace=True)    
+    food_items = food_items[[key,value]].dropna()
+    food_items.set_index(key,inplace=True)
 
-    return food_items.to_dict()['Preferred Label']
-    
+    return food_items.squeeze().str.strip().to_dict()
+
 
 def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market',farmgate='farmgate'):
 
