@@ -41,7 +41,23 @@ shocks = pd.DataFrame({"j": df.hhid.values.tolist(),
                     "HowCoped1":df.s16q04b.values.tolist(),
                     "HowCoped2":df.s16q04c.values.tolist()})
 
+#converting data types 
+for col in ["EffectedIncome",  "EffectedAssets",  "EffectedProduction", "EffectedConsumption"]:
+    shocks[col] = shocks[col].map({"Yes": True,"No": False})
+    shocks[col] = shocks[col].astype('boolean')
+shocks = shocks.astype({'Shock': 'category',
+                        'Year': 'Int64',
+                        'Onset': 'Int64',
+                        'Duration': 'float',
+                        "HowCoped0": 'category',
+                        "HowCoped1": 'category',
+                        "HowCoped2": 'category'
+                        }) 
+
 shocks.insert(1, 't', '2019-20')
+
 shocks.set_index(['j','t','Shock'], inplace = True)
+
+
 
 shocks.to_parquet('shocks.parquet')
