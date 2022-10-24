@@ -42,6 +42,20 @@ shocks = pd.DataFrame({"j": df.master_hhid.values.tolist(),
                     "HowCoped0":df.h16q4a.values.tolist(),
                     "HowCoped1":df.h16q4b.values.tolist(),
                     "HowCoped2":df.h16q4c.values.tolist()})
+
+#converting data types 
+for col in ["EffectedIncome",  "EffectedAssets",  "EffectedProduction", "EffectedConsumption"]:
+    shocks[col] = shocks[col].map({"Yes": True,"No": False})
+    shocks[col] = shocks[col].astype('boolean')
+shocks = shocks.astype({'Shock': 'category',
+                        'Year': 'Int64',
+                        'Onset': 'Int64',
+                        'Duration': 'float',
+                        "HowCoped0": 'category',
+                        "HowCoped1": 'category',
+                        "HowCoped2": 'category'
+                        }) 
+
 shocks.insert(1, 't', '2015-16')
 shocks.set_index(['j','t','Shock'], inplace = True)
 
