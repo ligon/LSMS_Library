@@ -21,15 +21,16 @@ date = date[date.set_index('hhid').index.isin(df.set_index('hhid').index)]
 
 #calculate shock onset 
 df['s16q02a'] = pd.to_datetime(df.s16q02a, format='%B').dt.month
-df['start_date'] = pd.to_datetime(df.rename(columns={'s16q02y': 'year', 's16q02a': 'month'})[['year', 'month']].assign(DAY=1))
-date['end_date'] = pd.to_datetime(date[['year', 'month']].assign(DAY=1))
+df['start_date'] = pd.to_datetime(df.rename(columns={'s16q02y': 'year', 's16q02a': 'month'})[['year', 'month']].assign(DAY=1)) #no day reported; assume 1st of the month 
+date['end_date'] = pd.to_datetime(date[['year', 'month']].assign(DAY=1)) #round the interview date to 1st of the month to match shock date
 date = date[["hhid", "end_date"]]
 df = pd.merge(df, date, on='hhid')
 df['Onset'] = (df.end_date.dt.to_period('M') - df.start_date.dt.to_period('M')).apply(lambda x: x.n)
 
 
-shocks = pd.DataFrame({"i": df.hhid.values.tolist(),
+shocks = pd.DataFrame({"j": df.hhid.values.tolist(),
                     "Shock":df.s16qa01.values.tolist(), 
+                    "Year": df.s16q02y.values.tolist(), 
                     "Onset":df.Onset.values.tolist(), 
                     "Duration":df.s16q02b.values.tolist(),
                     "EffectedIncome":df.s10q03a.values.tolist(), 
@@ -39,7 +40,8 @@ shocks = pd.DataFrame({"i": df.hhid.values.tolist(),
                     "HowCoped0":df.s16q04a.values.tolist(),
                     "HowCoped1":df.s16q04b.values.tolist(),
                     "HowCoped2":df.s16q04c.values.tolist()})
+
 shocks.insert(1, 't', '2019-20')
-shocks = shocks.set_index(['i','t','Shock'])
+shocks.set_index(['j','t','Shock'], inplace = True)
 
 shocks.to_parquet('shocks.parquet')

@@ -6,35 +6,33 @@ sys.path.append('../../_/')
 import pandas as pd
 import dvc.api
 from datetime import datetime
-
-
-modelpkl = dvc.api.read(
-    'GSEC16.dta.dvc',
-    repo='../Data/',
-    mode='rb'
-)
+from lsms import from_dta
 
 #shock dataset
-with dvc.api.open('../Data/GSEC16.dta.dvc',mode='rb') as dta:
-         df = pd.read_stata(dta)
+with dvc.api.open('../Data/GSEC16.dta',mode='rb') as dta: 
+    df = from_dta(dta)
 df = df[df['h16q2y'].notna()] #filter for valid entry 
 
 #general hh dataset 
-with dvc.api.open('../Data/gsec1.dta.dvc',mode='rb') as dta:
-         date = pd.read_stata(dta)
+with dvc.api.open('../Data/gsec1.dta',mode='rb') as dta: 
+    date = from_dta(dta)
+
 #filter for hhs who have taken the shock questionnaire 
-date = date[date.set_index('HHID').index.isin(df.set_index('HHID').index)]
+date = date[date.set_index('hh').index.isin(df.set_index('HHID').index)] 
+
 
 #calculate shock onset 
 df['h16q02a'] = pd.to_datetime(df.h16q02a, format='%B').dt.month
-df['start_date'] = pd.to_datetime(df.rename(columns={'h16q2y': 'year', 'h16q02a': 'month'})[['year', 'month']].assign(DAY=1))
-date['end_date'] = pd.to_datetime(date[['year', 'month']].assign(DAY=1))
-date = date[["HHID", "end_date"]]
+
+df['start_date'] = pd.to_datetime(df.rename(columns={'h16q2y': 'year', 'h16q02a': 'month'})[['year', 'month']].assign(DAY=1)) #no day reported; assume 1st of the month 
+date['end_date'] = pd.to_datetime(date[['year', 'month']].assign(DAY=1)) #round the interview date to 1st of the month to match shock date
+date = date[["hh", "end_date","HHID"]].rename(columns={'hh': 'HHID', 'HHID': 'master_hhid'})
 df = pd.merge(df, date, on='HHID')
 df['Onset'] = (df.end_date.dt.to_period('M') - df.start_date.dt.to_period('M')).apply(lambda x: x.n)
 
-shocks = pd.DataFrame({"i": df.HHID.values.tolist(),
+shocks = pd.DataFrame({"j": df.master_hhid.values.tolist(),
                     "Shock":df.h16q00.values.tolist(), 
+                    "Year": df.h16q2y.values.tolist(),
                     "Onset":df.Onset.values.tolist(), 
                     "Duration":df.h16q02b.values.tolist(),
                     "EffectedIncome":df.h16q3a.values.tolist(), 
@@ -45,6 +43,6 @@ shocks = pd.DataFrame({"i": df.HHID.values.tolist(),
                     "HowCoped1":df.h16q4b.values.tolist(),
                     "HowCoped2":df.h16q4c.values.tolist()})
 shocks.insert(1, 't', '2015-16')
-shocks.set_index(['i','t','Shock'])
+shocks.set_index(['j','t','Shock'], inplace = True)
 
 shocks.to_parquet('shocks.parquet')
