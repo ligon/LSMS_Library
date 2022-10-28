@@ -1,0 +1,75 @@
+Code,Preferred Label,Aggregate Label ,2005,2009,2010,2011,2013,2015,2018,2019
+108,Public Transport (Bus),Public Transport,,,,,,,,Public Transport - Bus
+109,Public Transport (Others),Public Transport,,,,,,,,"Public transport – Others (Truck,)"
+301,Rent of Rented House,Rent,rent of rented house,Rent of rented house,Rent of rented house,Rent of rented house,Rent of rented house,Rent of rented house,Rent of rented house,Rent of rented house
+302,Imputed Rent of Owned House,Rent ,imputed rent of owned house,Imputed rent of owned house,Imputed rent of owned house,Imputed rent of owned house,Imputed rent of owned house,Imputed rent of owned house,Imputed rent of owned house,Imputed rent of owned house
+303,Imputed Rent of Free House,Rent,imputed rent of free house,Imputed rent of free house,Imputed rent of free house,Imputed rent of free house,Imputed rent of free house,Imputed rent of free house,Imputed rent of free house,Imputed rent of free house
+304,Maintenance/Repair (House),Maintenance/Repair,maintenance and repair expenses,Maintenance and repair expenses,Maintenance and repair expenses,Maintenance and repair expenses,Maintenance and repair expenses,Maintenance and repair expenses,Maintenance and repair expenses,Maintenance and repair expenses
+305,Water,Water,water,Water,Water,Water,Water,Water,,
+306,Electricity,Electricity,electricity,Electricity,Electricity,Electricity,Electricity,Electricity,Electricity,Electricity
+307,Fuels (Generators/Lawn Mower),Fuels,generators/lawn mower fuels,Generators/lawn mover fuels,Generators/lawn mover fuels,Generators/lawn mover fuels,Generators/lawn mower fuels,Generators/lawn mower fuels,Generators/lawn mower fuels,Generators/lawn mower fuels
+308,Paraffin (Kerosene),Paraffin,paraffin (kerosene),Paraffin (Kerosene),Paraffin (Kerosene),Paraffin (Kerosene),Paraffin (Kerosene),Paraffin (Kerosene),,Paraffin or kerosene
+309,Charcoal,Charcoal,charcoal,Charcoal,Charcoal,Charcoal,Charcoal,Charcoal,,Charcoal
+310,Firewood,Firewood,firewood,Firewood,Firewood,Firewood,Firewood,Firewood,,Firewood
+311,Other Rent/Fuel/Power,Other Rent/Fuel/Power,others,Others,Others,Others,Others,Others,Others,Others
+451,Matches,Matches,matches,Matches,Matches,Matches,Matches,Matches,,
+452,Washing Soap,Soap,washing soap,Washing soap,Washing soap,Washing soap,Washing soap,Washing soap,Washing soap,Washing soap
+453,Bathing Soap,Soap,bathing saop,Bathing soap,Bathing soap,Bathing soap,Bathing soap,Bathing soap,Bathing soap,Bathing soap
+454,Tooth Paste,Tooth Paste,tooth paste,Tooth paste,Tooth paste,Tooth paste,Tooth paste,Tooth paste,Tooth paste,Tooth paste
+455,"Cosmetics (Body Lotion, Deodorant, etc)",Cosmetics ,cosmetics,Cosmetics,Cosmetics,Cosmetics,Cosmetics,Cosmetics,"Cosmetics (body lotion, deodorant etc)","Cosmetics (body lotion, deodorant etc)"
+456,"Handbags, Travel Bags, etc",Bags,"handbags,travel bags","Handbags, travel bags etc","Handbags, travel bags etc","Handbags, travel bags etc","Handbags, travel bags etc","Handbags, travel bags etc","Handbags, travel bags etc","Handbags, travel bags etc"
+457,Batteries (Dry cells),Batteries,batteries,Batteries (Dry cells),Batteries (Dry cells),Batteries (Dry cells),Batteries (Dry cells),Batteries (Dry cells),Batteries (Dry cells),Batteries (Dry cells)
+458,Newspapers/Magazines,Newspapers/Magazines,news papers and magazines,Newspapers and Magazines,Newspapers and Magazines,Newspapers and Magazines,Newspapers and Magazines,Newspapers and Magazines,,Newspapers or magazines
+459,Other Non-Durable/Personal Goods,Other Non-Durable/Personal Goods,others,Others,Others,Others,Others,Others,Others,Others
+460,Diapers,Diapers,,,,,Diapers,Diapers,Diapers,Diapers
+461,"Tyres, Tubes, Spares, Brake Pads, etc",Automobile Parts ,"tires,tubes,spares","Tires, tubes, spares, etc","Tires, tubes, spares, etc","Tires, tubes, spares, etc","Tires, tubes, spares, etc","Tires, tubes, spares, etc","Tyres, tubes, spares, brake pads etc","Tyres, tubes, spares, brake pads etc"
+462,"Petrol, Diesel, etc ","Petrol, Diesel, etc ","petrol,diesel","Petrol, diesel etc","Petrol, diesel etc","Petrol, diesel etc","Petrol, diesel etc","Petrol, diesel etc",,
+463,Public Transport (Taxi/Minibus) ,Public Transport,taxi fares,Taxi fares,Taxi fares,Taxi fares,Taxi fares,Taxi fares,,Public transport - Taxi/Minibus
+464,Public Transport (Bus),Public Transport,bus fares,Bus fares,Bus fares,Bus fares,Bus fares,Bus fares,,
+465,Public Transport (Bodaboda/Bicycle),Public Transport,boda boda fares,Boda boda fares,Boda boda fares,Boda boda fares,Bodaboda fares,Bodaboda fares,,Public transport – Bodaboda-Bicycle
+466,"Stamps, Envelops, etc",Postal Services,"stamps, envelopes","Stamps, envelops, etc.","Stamps, envelops, etc.","Stamps, envelops, etc.","Stamps, envelops, etc.","Stamps, envelops, etc.","Stamps, envelops, etc.","Stamps, envelops, etc."
+467,Air Time/Services Fee (Owned Fixed/Mobile Phones),Air Time/Servie Fee,air time and service fee for owned fixed mobile phones,Air time & services fee for owned fixed/ mobile phones,Air time & services fee for owned fixed/ mobile phones,Air time & services fee for owned fixed/ mobile phones,Air time & services fee for owned fixed/ mobile phones,Air time & services fee for owned fixed/       mobile  phones,,
+468,Air Time/Services Fee (Phones not Owned),Air Time/Servie Fee,expenditure on phones not owned,Expenditure on phones not owned,Expenditure on phones not owned,Expenditure on phones not owned,Expenditure on phones not owned,Expenditure on phones not owned,Expenditure on phone calls for phones not owned,Expenditure on phone calls for phones not owned
+469,Other Transportation/Communication,Other Transportation/Communication,others,Others,Others,Others,Others,Others,Others,Others
+470,Sanitary Towels,Sanitary Towels,,,,,Sanitary Towels,Sanitary Towels,Sanitary Towels,Sanitary Towels
+501,Consultation Fees,Consultation Fees,consultation fees,Consultation Fees,Consultation Fees,Consultation Fees,Consultation Fees,Consultation Fees,Consultation Fees,Consultation Fees
+502,Medicines,Medicines,medicine,Medicines etc,Medicines etc,Medicines etc,Medicines etc,Medicines etc,Medicines etc,Medicines etc
+503,Hospital/Clinic Charges,Hospital/Clinic Charges,hospital /clinic charges,Hospital/ clinic charges,Hospital/ clinic charges,Hospital/ clinic charges,Hospital/ clinic charges,Hospital/ clinic charges,Hospital/ clinic charges,Hospital/ clinic charges
+504,Traditional Doctors Fees/Medicines,Hospital/Clinic Charges,traditional doctors fees/medicine,Traditional Doctors fees/ medicines,Traditional Doctors fees/ medicines,Traditional Doctors fees/ medicines,Traditional Doctors fees/ medicines,Traditional Doctors fees/ medicines,Traditional Doctors fees/ medicines,Traditional Doctors fees/ medicines
+505,Other Health/Medical Care,Other Health/Medical Care,,Others,Others,Others,Others,Others,Others,Others
+506,Total Health Expenditure ,Total Health Expenditure ,combined (health + medical care),,,,,,Total expenditure on health,Total expenditure on health
+507,Total Health Expenditure ,Total Health Expenditure ,,,,,,,,Total expenditure on health
+509,Total Health Expenditure ,Total Health Expenditure ,others,,,,,,,
+601,"Sports, Theaters, etc","Sports, Theaters, etc",,"Sports, theaters, etc","Sports, theaters, etc","Sports, theaters, etc","Sports, theaters, etc","Sports, theaters, etc","Sports, theaters, etc","Sports, theaters, etc"
+602,Dry Cleaning/Laundry,Laundry,,Dry Cleaning and Laundry,Dry Cleaning and Laundry,Dry Cleaning and Laundry,Dry Cleaning and Laundry,Dry Cleaning and Laundry,Dry Cleaning and Laundry,Dry Cleaning and Laundry
+603,"Houseboys/girls, Shamba Boys, etc",Houseboys/girls,,"Houseboys/ girls, Shamba boys etc","Houseboys/ girls, Shamba boys etc","Houseboys/ girls, Shamba boys etc","Houseboys/ girls, Shamba boys etc","Houseboys/ girls, Shamba boys etc","Houseboys/ girls, Shamba boys etc","Houseboys/ girls, Shamba boys etc"
+604,Barber/Beauty Shops,Barber/Beauty Shops,,Barber and Beauty Shops,Barber and Beauty Shops,Barber and Beauty Shops,Barber and Beauty Shops,Barber and Beauty Shops,Barber and Beauty Shops,Barber and Beauty Shops
+605,"Hotels, Lodging, etc",Hotels,,"Expenses in hotels, lodging, etc","Expenses in hotels, lodging, etc","Expenses in hotels, lodging, etc","Expenses in hotels, lodging, etc","Expenses in hotels, lodging, etc","Expenses in hotels, lodging, etc","Expenses in hotels, lodging, etc"
+701,"Sports, Theaters, etc","Sports, Theaters, etc",sports theaters,,,,,,,
+702,Dry Cleaning/Laundry,Laundry,dry cleaning and laundry,,,,,,,
+703,"Houseboys/girls, Shamba Boys, etc",Houseboys/girls,"houseboys/girls,shamba boys",,,,,,,
+704,Barber/Beauty Shops,Barber/Beauty Shops,barber and beauty shops,,,,,,,
+705,"Hotels, Lodging, etc",Hotels,expenses in hotels lodging,,,,,,,
+3051,Water (NWSC),Water,,,,,,,Water NWSC,Water NWSC
+3052,Water (Other Sources),Water,,,,,,,Water Other sources,Water Other sources
+3111,Candles,Candles,,,,,,,,Candles
+3112,Matches,Matches,,,,,,,,Matches
+3121,Refuse Collection,Refuse Collection,,,,,,,Refuse collection,Refuse collection
+4501,Internet Fees,Internet Fees,,,,,,,Internet fees,Internet fees
+4511,Mobile Money Charges,Mobile Money Charges,,,,,,,Mobile money charges,Mobile money charges
+4521,Detergent,Detergent,,,,,,,,Detergent
+4541,Tooth Brush,Tooth Brush,,,,,,,Tooth brush,Tooth brush
+4542,Toilet Paper,Toilet Paper,,,,,,,Toilet Paper,Toilet Paper
+4591,"Toys, Games, etc","Toys, Games, etc",,,,,,,"Toys, games etc","Toys, games etc"
+4621,"Lubricants (Engine oil, Grease, Coolant, etc)",Lubricants,,,,,,,"Lubricants (, engine oil, grease, coolant etc)","Lubricants (, engine oil, grease, coolant etc)"
+4622,Petrol,"Petrol, Diesel, etc ",,,,,,,Petrol,Petrol
+4623,Diesel,"Petrol, Diesel, etc ",,,,,,,Diesel,Diesel
+4624,"Maintenance/Repair (Vehicles, Motorcycles, Bicycles)",Maintenance/Repair,,,,,,,,"Maintenance,repair of vehicles,motorcycles, bicycles"
+4631,Public Transport (Bus),Public Transport,,,,,,,,Public transport - Bus
+4632,Public Transport (Others),Public Transport,,,,,,,,"Public transport – Others (Truck,)"
+4651,"Maintenance/Repair (Vehicles, Motorcycles, Bicycles)",Maintenance/Repair,,,,,,,"Maintenance and repair of vehicles, motorcycles and bicycles","Maintenance and repair of vehicles, motorcycles and bicycles"
+4661,Postal Services,Postal Services,,,,,,,Postal Services,Postal Services
+4671,Air Time (Fixed Phones),Air Time/Servie Fee,,,,,,,,Air time for fixed phones
+4672,Air Time (Mobile Phones),Air Time/Servie Fee,,,,,,,,Air time for mobile phones
+5041,Transport to and From Health Facility,Other Transportation/Communication,,,,,,,Transport to and From health facility,Transport to and From health facility
+6061,"Security Fees (Guard, LC Defense, Community Security)",Security Fees ,,,,,,,"Security fees (guard, LC defense, community security)","Security fees (guard, LC defense, community security)"
