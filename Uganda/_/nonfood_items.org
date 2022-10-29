@@ -1,76 +1,75 @@
-
-| Code | Preferred Label|   Aggregate Label   |
-| 108  | Public Transport (Bus) | Public Transport |
-| 109  | Public Transport (Others) | Public Transport |
-| 301  | Rent of Rented House | Rent |
-| 302  | Imputed Rent of Owned House | Rent  |
-| 303  | Imputed Rent of Free House | Rent |
-| 304  | Maintenance/Repair (House) | Maintenance/Repair |
-| 305  | Water | Water |
-| 306  | Electricity | Electricity |
-| 307  | Fuels (Generators/Lawn Mower) | Fuels |
-| 308  | Paraffin (Kerosene) | Paraffin |
-| 309  | Charcoal | Charcoal |
-| 310  | Firewood | Firewood |
-| 311  | Other Rent/Fuel/Power | Other Rent/Fuel/Power |
-| 451  | Matches | Matches |
-| 452  | Washing Soap | Soap |
-| 453  | Bathing Soap | Soap |
-| 454  | Tooth Paste | Tooth Paste |
-| 455  | Cosmetics (Body Lotion, Deodorant, etc) | Cosmetics  |
-| 456  | Handbags, Travel Bags, etc | Bags |
-| 457  | Batteries (Dry cells) | Batteries |
-| 458  | Newspapers/Magazines | Newspapers/Magazines |
-| 459  | Other Non-Durable/Personal Goods | Other Non-Durable/Personal Goods |
-| 460  | Diapers | Diapers |
-| 461  | Tyres, Tubes, Spares, Brake Pads, etc | Automobile Parts  |
-| 462  | Petrol, Diesel, etc  | Petrol, Diesel, etc  |
-| 463  | Public Transport (Taxi/Minibus)  | Public Transport |
-| 464  | Public Transport (Bus) | Public Transport |
-| 465  | Public Transport (Bodaboda/Bicycle) | Public Transport |
-| 466  | Stamps, Envelops, etc | Postal Services |
-| 467  | Air Time/Services Fee (Owned Fixed/Mobile Phones) | Air Time/Servie Fee |
-| 468  | Air Time/Services Fee (Phones not Owned) | Air Time/Servie Fee |
-| 469  | Other Transportation/Communication | Other Transportation/Communication |
-| 470  | Sanitary Towels | Sanitary Towels |
-| 501  | Consultation Fees | Consultation Fees |
-| 502  | Medicines | Medicines |
-| 503  | Hospital/Clinic Charges | Hospital/Clinic Charges |
-| 504  | Traditional Doctors Fees/Medicines | Hospital/Clinic Charges |
-| 505  | Other Health/Medical Care | Other Health/Medical Care |
-| 506  | Total Health Expenditure  | Total Health Expenditure  |
-| 507  | Total Health Expenditure  | Total Health Expenditure  |
-| 509  | Total Health Expenditure  | Total Health Expenditure  |
-| 601  | Sports, Theaters, etc | Sports, Theaters, etc |
-| 602  | Dry Cleaning/Laundry | Laundry |
-| 603  | Houseboys/girls, Shamba Boys, etc | Houseboys/girls |
-| 604  | Barber/Beauty Shops | Barber/Beauty Shops |
-| 605  | Hotels, Lodging, etc | Hotels |
-| 701  | Sports, Theaters, etc | Sports, Theaters, etc |
-| 702  | Dry Cleaning/Laundry | Laundry |
-| 703  | Houseboys/girls, Shamba Boys, etc | Houseboys/girls |
-| 704  | Barber/Beauty Shops | Barber/Beauty Shops |
-| 705  | Hotels, Lodging, etc | Hotels |
-| 3051  | Water (NWSC) | Water |
-| 3052  | Water (Other Sources) | Water |
-| 3111  | Candles | Candles |
-| 3112  | Matches | Matches |
-| 3121  | Refuse Collection | Refuse Collection |
-| 4501  | Internet Fees | Internet Fees |
-| 4511  | Mobile Money Charges | Mobile Money Charges |
-| 4521  | Detergent | Detergent |
-| 4541  | Tooth Brush | Tooth Brush |
-| 4542  | Toilet Paper | Toilet Paper |
-| 4591  | Toys, Games, etc | Toys, Games, etc |
-| 4621  | Lubricants (Engine oil, Grease, Coolant, etc) | Lubricants |
-| 4622  | Petrol | Petrol, Diesel, etc  |
-| 4623  | Diesel | Petrol, Diesel, etc  |
-| 4624  | Maintenance/Repair (Vehicles, Motorcycles, Bicycles) | Maintenance/Repair |
-| 4631  | Public Transport (Bus) | Public Transport |
-| 4632  | Public Transport (Others) | Public Transport |
-| 4651  | Maintenance/Repair (Vehicles, Motorcycles, Bicycles) | Maintenance/Repair |
-| 4661  | Postal Services | Postal Services |
-| 4671  | Air Time (Fixed Phones) | Air Time/Servie Fee |
-| 4672  | Air Time (Mobile Phones) | Air Time/Servie Fee |
-| 5041  | Transport to and From Health Facility | Other Transportation/Communication |
-| 6061  | Security Fees (Guard, LC Defense, Community Security) | Security Fees  |
+| Code | Preferred Label                                       | Aggregate Label               |
+|  108 | Public Transport (Bus)                                | Bus                           |
+|  109 | Public Transport (Others)                             | Public Transport              |
+|  301 | Rent of Rented House                                  | Rent                          |
+|  302 | Imputed Rent of Owned House                           | Rent                          |
+|  303 | Imputed Rent of Free House                            | Rent                          |
+|  304 | Maintenance/Repair (House)                            | Maintenance/Repair            |
+|  305 | Water                                                 | Water (Utility)                |
+|  306 | Electricity                                           | Electricity                   |
+|  307 | Fuels (Generators/Lawn Mower)                         | Other                         |
+|  308 | Paraffin (Kerosene)                                   | Paraffin/Candles              |
+|  309 | Charcoal                                              | Charcoal                      |
+|  310 | Firewood                                              | Firewood                      |
+|  311 | Other Rent/Fuel/Power                                 | Other                         |
+|  451 | Matches                                               | Matches                       |
+|  452 | Washing Soap                                          | Soap                          |
+|  453 | Bathing Soap                                          | Soap                          |
+|  454 | Tooth Paste                                           | Tooth Paste                   |
+|  455 | Cosmetics (Body Lotion, Deodorant, etc)               | Cosmetics                     |
+|  456 | Handbags, Travel Bags, etc                            | Other                         |
+|  457 | Batteries (Dry cells)                                 | Batteries                     |
+|  458 | Newspapers/Magazines                                  | Newspapers/Magazines          |
+|  459 | Other Non-Durable/Personal Goods                      | Other                         |
+|  460 | Diapers                                               | Diapers                       |
+|  461 | Tyres, Tubes, Spares, Brake Pads, etc                 | Automobile Parts              |
+|  462 | Petrol, Diesel, etc                                   | Petrol, Diesel, etc           |
+|  463 | Public Transport (Taxi/Minibus)                       | Taxi/Minibus                  |
+|  464 | Public Transport (Bus)                                | Bus                           |
+|  465 | Public Transport (Bodaboda/Bicycle)                   | Bodaboda                      |
+|  466 | Stamps, Envelops, etc                                 | Postal Services               |
+|  467 | Air Time/Services Fee (Owned Fixed/Mobile Phones)     | Air Time/Service Fee          |
+|  468 | Air Time/Services Fee (Phones not Owned)              | Air Time/Service Fee          |
+|  469 | Other Transportation/Communication                    | Other                         |
+|  470 | Sanitary Towels                                       | Sanitary Towels               |
+|  501 | Consultation Fees                                     | Consultation Fees             |
+|  502 | Medicines                                             | Medicines                     |
+|  503 | Hospital/Clinic Charges                               | Hospital/Clinic Charges       |
+|  504 | Traditional Doctors Fees/Medicines                    | Health Expenditure            |
+|  505 | Other Health/Medical Care                             | Health Expenditure            |
+|  506 | Total Health Expenditure                              | Health Expenditure            |
+|  507 | Total Health Expenditure                              | Health Expenditure            |
+|  509 | Total Health Expenditure                              | Health Expenditure            |
+|  601 | Sports, Theaters, etc                                 | Sports, Theaters, Lodging etc |
+|  602 | Dry Cleaning/Laundry                                  | Laundry                       |
+|  603 | Houseboys/girls, Shamba Boys, etc                     | Houseboys/girls               |
+|  604 | Barber/Beauty Shops                                   | Barber/Beauty Shops           |
+|  605 | Hotels, Lodging, etc                                  | Sports, Theaters, Lodging etc |
+|  701 | Sports, Theaters, etc                                 | Sports, Theaters, Lodging etc |
+|  702 | Dry Cleaning/Laundry                                  | Laundry                       |
+|  703 | Houseboys/girls, Shamba Boys, etc                     | Houseboys/girls               |
+|  704 | Barber/Beauty Shops                                   | Barber/Beauty Shops           |
+|  705 | Hotels, Lodging, etc                                  | Sports, Theaters, Lodging etc |
+| 3051 | Water (NWSC)                                          | Water (Utility)                |
+| 3052 | Water (Other Sources)                                 | Water (Utility)                |
+| 3111 | Candles                                               | Paraffin/Candles              |
+| 3112 | Matches                                               | Matches                       |
+| 3121 | Refuse Collection                                     | Refuse Collection             |
+| 4501 | Internet Fees                                         | Internet Fees                 |
+| 4511 | Mobile Money Charges                                  | Mobile Money Charges          |
+| 4521 | Detergent                                             | Detergent                     |
+| 4541 | Tooth Brush                                           | Tooth Brush                   |
+| 4542 | Toilet Paper                                          | Toilet Paper                  |
+| 4591 | Toys, Games, etc                                      | Entertainment                 |
+| 4621 | Lubricants (Engine oil, Grease, Coolant, etc)         | Lubricants                    |
+| 4622 | Petrol                                                | Petrol, Diesel, etc           |
+| 4623 | Diesel                                                | Petrol, Diesel, etc           |
+| 4624 | Maintenance/Repair (Vehicles, Motorcycles, Bicycles)  | Maintenance/Repair            |
+| 4631 | Public Transport (Bus)                                | Public Transport              |
+| 4632 | Public Transport (Others)                             | Public Transport              |
+| 4651 | Maintenance/Repair (Vehicles, Motorcycles, Bicycles)  | Maintenance/Repair            |
+| 4661 | Postal Services                                       | Postal Services               |
+| 4671 | Air Time (Fixed Phones)                               | Air Time/Service Fee          |
+| 4672 | Air Time (Mobile Phones)                              | Air Time/Service Fee          |
+| 5041 | Transport to and From Health Facility                 | Other                         |
+| 6061 | Security Fees (Guard, LC Defense, Community Security) | Security Fees                 |
