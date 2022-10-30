@@ -5,7 +5,7 @@ source = $(shell find $(rounds) -name \*.py)
 parquet := $(source:.py=.parquet)
 var = ../var/food_expenditures.parquet ../var/food_quantities.parquet ../var/unitvalues.parquet \
 	  ../var/household_characteristics.parquet ../var/other_features.parquet \
-      ../var/shocks.parquet
+      ../var/shocks.parquet ../var/nonfood_expenditures.parquet
 
 all: $(parquet) $(var)
 
@@ -20,6 +20,12 @@ food_expenditures_parquet := $(food_expenditures:.py=.parquet)
 
 ../var/food_expenditures.parquet: food_expenditures.py $(food_expenditures_parquet)
 	python food_expenditures.py
+
+nonfood_expenditures = $(shell find $(rounds) -name nonfood_expenditures.py)
+nonfood_expenditures_parquet := $(nonfood_expenditures:.py=.parquet)
+
+../var/nonfood_expenditures.parquet: nonfood_expenditures.py $(nonfood_expenditures_parquet)
+	python nonfood_expenditures.py
 
 food_quantities = $(shell find $(rounds) -name food_quantities.py)
 food_quantities_parquet := $(food_quantities:.py=.parquet)

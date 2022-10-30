@@ -136,8 +136,8 @@
 | 1272 | Cooking Oil (unrefined)        | Cooking Oil        |
 | 1281 | Cheese                         | Cheese             |
 | 1291 | Butter                         | Butter             |
-| 1311 | Ndiizi                         | Sweet Bananas      |
-| 1312 | Bogoya                         | Sweet Bananas      |
+| 1311 | Ndiizi                         | Sweet Banana       |
+| 1312 | Bogoya                         | Sweet Banana       |
 | 1313 | Platains                       | Plantains          |
 | 1351 | Garlic                         | Garlic             |
 | 1352 | Ginger (fresh)                 | Ginger             |
