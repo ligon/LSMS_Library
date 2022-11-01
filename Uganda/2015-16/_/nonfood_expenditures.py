@@ -21,6 +21,6 @@ with dvc.api.open('../Data/gsec1.dta',mode='rb') as f:
 
 ids = ids.set_index('hh').squeeze().to_dict()
 
-x = x.replace({'hhid':ids})
+x = x.reset_index().replace({'j':ids}).set_index('j')
 
 x.to_parquet('nonfood_expenditures.parquet')
