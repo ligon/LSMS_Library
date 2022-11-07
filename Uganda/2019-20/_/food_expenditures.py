@@ -14,6 +14,5 @@ myvars = dict(fn='../Data/HH/gsec15b.dta',
 x = food_expenditures(**myvars)  # Uses wave-specific hhids
 
 
-
 x.to_parquet('food_expenditures.parquet')
 

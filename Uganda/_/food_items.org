@@ -114,7 +114,7 @@
 | 1201 | Other Meat (roasted)           | Other Meat         |
 | 1211 | Chicken (off-layer)            | Chicken            |
 | 1212 | Chicken (broiler)              | Chicken            |
-| 1213 | Chicken (broiler)              | Chicken            |
+| 1213 | Chicken (kroiler)              | Chicken            |
 | 1214 | Chicken (local)                | Chicken            |
 | 1215 | Chicken (roasted)              | Chicken            |
 | 1221 | Tilapia (fresh)                | Fish (fresh)       |
@@ -138,7 +138,7 @@
 | 1291 | Butter                         | Butter             |
 | 1311 | Ndiizi                         | Sweet Banana       |
 | 1312 | Bogoya                         | Sweet Banana       |
-| 1313 | Platains                       | Plantains          |
+| 1313 | Plantains                      | Plantains          |
 | 1351 | Garlic                         | Garlic             |
 | 1352 | Ginger (fresh)                 | Ginger             |
 | 1353 | Ginger (powder)                | Ginger             |
@@ -165,7 +165,7 @@
 | 1654 | Okra                           | Other Veg.         |
 | 1721 | Macaroni/Spaghetti             | Macaroni/Spaghetti |
 | 1731 | Biscuits                       | Biscuits           |
-| 1732 | Cakes                          | Cake               |
+| 1732 | Cakes                          | Cakes              |
 | 1733 | Donuts                         | Donut              |
 | 1734 | Cornflakes                     | Cornflakes         |
 | 1735 | Samosas                        | Samosa             |
