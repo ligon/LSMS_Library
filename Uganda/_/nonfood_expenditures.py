@@ -36,7 +36,7 @@ x = df.stack().unstack('i')
 agg_labels = harmonized_nonfood_labels(fn='./nonfood_items.org',
                                     key='Preferred Label',
                                     value='Aggregate Label')
-x = x.rename(columns=agg_labels)
+#x = x.rename(columns=agg_labels)
 
 x = x.groupby('i',axis=1).sum()
 
