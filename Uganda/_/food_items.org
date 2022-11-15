@@ -24,16 +24,16 @@
 |  122 | Fresh Fish                     | Fish (fresh)       |
 |  123 | Dry/Smoked Fish                | Fish (dried)       |
 |  124 | Eggs                           | Eggs               |
-|  125 | Fresh Milk                     | Fresh Milk         |
+|  125 | Milk (fresh)                   | Milk (fresh)       |
 |  126 | Infant Formula                 | Infant Formula     |
-|  127 | Cooking oil                    | Cooking Oil        |
+|  127 | Cooking Oil                    | Cooking Oil        |
 |  128 | Ghee                           | Ghee               |
 |  129 | Margarine, Butter, etc         | Butter, etc.       |
-|  130 | Passion Fruits                 | Passion Fruit      |
-|  131 | Sweet Bananas                  | Sweet Banana       |
+|  130 | Passion Fruits                 | Passion Fruits     |
+|  131 | Sweet Bananas                  | Sweet Bananas      |
 |  132 | Mangos                         | Mangos             |
 |  133 | Oranges                        | Oranges            |
-|  134 | Other Fruits                   | Other Fruit        |
+|  134 | Other Fruits                   | Other Fruits       |
 |  135 | Onions                         | Onions             |
 |  136 | Tomatoes                       | Tomatoes           |
 |  137 | Cabbages                       | Cabbages           |
@@ -41,9 +41,9 @@
 |  139 | Other Vegetables               | Other Veg.         |
 |  140 | Beans (fresh)                  | Beans              |
 |  141 | Beans (dry)                    | Beans              |
-|  142 | Ground Nuts (in shell)         | Ground Nut         |
-|  143 | Ground Nuts (shelled)          | Ground Nut         |
-|  144 | Ground Nuts (pounded)          | Ground Nut         |
+|  142 | Ground Nuts (in shell)         | Ground Nuts        |
+|  143 | Ground Nuts (shelled)          | Ground Nuts        |
+|  144 | Ground Nuts (pounded)          | Ground Nuts        |
 |  145 | Peas                           | Peas               |
 |  146 | Sim Sim                        | Sim Sim            |
 |  147 | Sugar                          | Sugar              |
@@ -62,24 +62,24 @@
 |  160 | Other Juice                    | Other Juice        |
 |  161 | Other Foods                    | Other Foods        |
 |  162 | Peas (dry)                     | Peas               |
-|  163 | Ground Nut (paste)             | Ground Nut         |
+|  163 | Ground Nuts (paste)            | Ground Nuts        |
 |  164 | Green Pepper                   | Other Veg.         |
 |  165 | Pumpkins                       | Other Veg.         |
-|  166 | Avocado                        | Other Fruit        |
+|  166 | Avocado                        | Other Fruits       |
 |  167 | Carrots                        | Other Veg.         |
 |  168 | Eggplant                       | Other Veg.         |
-|  169 | Watermelon                     | Other Fruit        |
-|  170 | Pineapple                      | Other Fruit        |
-|  171 | Pawpaw                         | Other Fruit        |
+|  169 | Watermelon                     | Other Fruits       |
+|  170 | Pineapple                      | Other Fruits       |
+|  171 | Pawpaw                         | Other Fruits       |
 |  172 | Wheat (flour)                  | Wheat (flour)      |
 |  173 | Chapati                        | Chapati            |
-|  174 | Apples                         | Other Fruit        |
+|  174 | Apples                         | Other Fruits       |
 |  175 | Water                          | Water              |
 |  180 | Sweet Potatoes (flour)         | Sweet Potatoes     |
 |  181 | Cassava (dry)                  | Cassava            |
 |  182 | Cassava (flour)                | Cassava            |
 |  190 | Bread                          | Bread              |
-|  191 | Bread                          | Bun                |
+|  191 | Bread                          | Bread              |
 | 1041 | Matoke (sack)                  | Matoke             |
 | 1042 | Matoke (piece)                 | Matoke             |
 | 1043 | Matoke (other)                 | Matoke             |
@@ -95,12 +95,12 @@
 | 1101 | Rice (white)                   | Rice               |
 | 1102 | Rice (brown)                   | Rice               |
 | 1103 | Rice flour                     | Rice               |
-| 1111 | Maize yellow (grains)          | Maize              |
-| 1112 | Maize white (grains)           | Maize              |
-| 1121 | Maize white  (cobs)            | Maize              |
-| 1122 | Maize yellow (cobs)            | Maize              |
-| 1131 | Maize white (flour)            | Maize              |
-| 1132 | Maize yellow (flour)           | Maize              |
+| 1111 | Maize (yellow;grains)          | Maize              |
+| 1112 | Maize (white;grains)           | Maize              |
+| 1121 | Maize (white;cobs)             | Maize              |
+| 1122 | Maize (yellow;cobs)            | Maize              |
+| 1131 | Maize (white;flour)            | Maize              |
+| 1132 | Maize (yellow;flour)           | Maize              |
 | 1151 | Millet Flour                   | Millet             |
 | 1171 | Beef Liver                     | Beef Liver         |
 | 1172 | Beef Offal                     | Beef Offal         |
@@ -114,7 +114,7 @@
 | 1201 | Other Meat (roasted)           | Other Meat         |
 | 1211 | Chicken (off-layer)            | Chicken            |
 | 1212 | Chicken (broiler)              | Chicken            |
-| 1213 | Chicken (kroiler)              | Chicken            |
+| 1213 | Chicken (broiler)              | Chicken            |
 | 1214 | Chicken (local)                | Chicken            |
 | 1215 | Chicken (roasted)              | Chicken            |
 | 1221 | Tilapia (fresh)                | Fish (fresh)       |
@@ -128,25 +128,25 @@
 | 1241 | Eggs (yellow yolk)             | Eggs               |
 | 1242 | Eggs (white yolk)              | Eggs               |
 | 1243 | Other Eggs                     | Eggs               |
-| 1251 | Milk (powdered)                | Milk               |
+| 1251 | Milk (powdered)                | Milk (powdered)    |
 | 1252 | Bongo                          | Bongo              |
 | 1253 | Ice Cream                      | Ice Cream          |
 | 1254 | Yoghurt                        | Yogurt             |
 | 1271 | Cooking Oil (refined)          | Cooking Oil        |
 | 1272 | Cooking Oil (unrefined)        | Cooking Oil        |
 | 1281 | Cheese                         | Cheese             |
-| 1291 | Butter                         | Butter             |
-| 1311 | Ndiizi                         | Sweet Banana       |
-| 1312 | Bogoya                         | Sweet Banana       |
-| 1313 | Plantains                      | Plantains          |
+| 1291 | Butter                         | Butter, etc.       |
+| 1311 | Ndiizi                         | Sweet Bananas      |
+| 1312 | Bogoya                         | Sweet Bananas      |
+| 1313 | Platains                       | Plantains          |
 | 1351 | Garlic                         | Garlic             |
 | 1352 | Ginger (fresh)                 | Ginger             |
 | 1353 | Ginger (powder)                | Ginger             |
-| 1371 | Cabbage (red)                  | Cabbage            |
-| 1372 | Cabbage (green)                | Cabbage            |
+| 1371 | Cabbage (red)                  | Cabbages           |
+| 1372 | Cabbage (green)                | Cabbages           |
 | 1391 | Other Spices                   | Other Spices       |
-| 1461 | Simsim                         | Sim Sim            |
-| 1462 | Simsim (paste)                 | Sim Sim            |
+| 1461 | Sim Sim                        | Sim Sim            |
+| 1462 | Sim Sim (paste)                | Sim Sim            |
 | 1471 | Honey                          | Honey              |
 | 1472 | Jam/Marmalade                  | Jam/Marmalade      |
 | 1481 | Coffee                         | Coffee             |
@@ -165,7 +165,7 @@
 | 1654 | Okra                           | Other Veg.         |
 | 1721 | Macaroni/Spaghetti             | Macaroni/Spaghetti |
 | 1731 | Biscuits                       | Biscuits           |
-| 1732 | Cakes                          | Cakes              |
+| 1732 | Cakes                          | Cake               |
 | 1733 | Donuts                         | Donut              |
 | 1734 | Cornflakes                     | Cornflakes         |
 | 1735 | Samosas                        | Samosa             |
@@ -174,4 +174,3 @@
 | 1743 | Jackfruit (fresh)              | Jackfruit          |
 | 1761 | Soybeans (fresh)               | Soybean            |
 | 1762 | Soybeans (dry)                 | Soybean            |
-

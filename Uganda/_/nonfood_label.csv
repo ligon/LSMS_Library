@@ -8,9 +8,9 @@ Code,Preferred Label,Aggregate Label ,2005,2009,2010,2011,2013,2015,2018,2019
 305,Water,Water,water,Water,Water,Water,Water,Water,,
 306,Electricity,Electricity,electricity,Electricity,Electricity,Electricity,Electricity,Electricity,Electricity,Electricity
 307,Fuels (Generators/Lawn Mower),Fuels,generators/lawn mower fuels,Generators/lawn mover fuels,Generators/lawn mover fuels,Generators/lawn mover fuels,Generators/lawn mower fuels,Generators/lawn mower fuels,Generators/lawn mower fuels,Generators/lawn mower fuels
-308,Paraffin (Kerosene),Paraffin,paraffin (kerosene),Paraffin (Kerosene),Paraffin (Kerosene),Paraffin (Kerosene),Paraffin (Kerosene),Paraffin (Kerosene),,Paraffin or kerosene
-309,Charcoal,Charcoal,charcoal,Charcoal,Charcoal,Charcoal,Charcoal,Charcoal,,Charcoal
-310,Firewood,Firewood,firewood,Firewood,Firewood,Firewood,Firewood,Firewood,,Firewood
+308,Paraffin (Kerosene),Paraffin,paraffin (kerosene),Paraffin (Kerosene),Paraffin (Kerosene),Paraffin (Kerosene),Paraffin (Kerosene),Paraffin (Kerosene),nan ,Paraffin or kerosene
+309,Charcoal,Charcoal,charcoal,Charcoal,Charcoal,Charcoal,Charcoal,Charcoal,nan,Charcoal
+310,Firewood,Firewood,firewood,Firewood,Firewood,Firewood,Firewood,Firewood,nan ,Firewood
 311,Other Rent/Fuel/Power,Other Rent/Fuel/Power,others,Others,Others,Others,Others,Others,Others,Others
 451,Matches,Matches,matches,Matches,Matches,Matches,Matches,Matches,,
 452,Washing Soap,Soap,washing soap,Washing soap,Washing soap,Washing soap,Washing soap,Washing soap,Washing soap,Washing soap
@@ -19,7 +19,7 @@ Code,Preferred Label,Aggregate Label ,2005,2009,2010,2011,2013,2015,2018,2019
 455,"Cosmetics (Body Lotion, Deodorant, etc)",Cosmetics ,cosmetics,Cosmetics,Cosmetics,Cosmetics,Cosmetics,Cosmetics,"Cosmetics (body lotion, deodorant etc)","Cosmetics (body lotion, deodorant etc)"
 456,"Handbags, Travel Bags, etc",Bags,"handbags,travel bags","Handbags, travel bags etc","Handbags, travel bags etc","Handbags, travel bags etc","Handbags, travel bags etc","Handbags, travel bags etc","Handbags, travel bags etc","Handbags, travel bags etc"
 457,Batteries (Dry cells),Batteries,batteries,Batteries (Dry cells),Batteries (Dry cells),Batteries (Dry cells),Batteries (Dry cells),Batteries (Dry cells),Batteries (Dry cells),Batteries (Dry cells)
-458,Newspapers/Magazines,Newspapers/Magazines,news papers and magazines,Newspapers and Magazines,Newspapers and Magazines,Newspapers and Magazines,Newspapers and Magazines,Newspapers and Magazines,,Newspapers or magazines
+458,Newspapers/Magazines,Newspapers/Magazines,news papers and magazines,Newspapers and Magazines,Newspapers and Magazines,Newspapers and Magazines,Newspapers and Magazines,Newspapers and Magazines,nan,Newspapers or magazines
 459,Other Non-Durable/Personal Goods,Other Non-Durable/Personal Goods,others,Others,Others,Others,Others,Others,Others,Others
 460,Diapers,Diapers,,,,,Diapers,Diapers,Diapers,Diapers
 461,"Tyres, Tubes, Spares, Brake Pads, etc",Automobile Parts ,"tires,tubes,spares","Tires, tubes, spares, etc","Tires, tubes, spares, etc","Tires, tubes, spares, etc","Tires, tubes, spares, etc","Tires, tubes, spares, etc","Tyres, tubes, spares, brake pads etc","Tyres, tubes, spares, brake pads etc"
@@ -28,7 +28,7 @@ Code,Preferred Label,Aggregate Label ,2005,2009,2010,2011,2013,2015,2018,2019
 464,Public Transport (Bus),Public Transport,bus fares,Bus fares,Bus fares,Bus fares,Bus fares,Bus fares,,
 465,Public Transport (Bodaboda/Bicycle),Public Transport,boda boda fares,Boda boda fares,Boda boda fares,Boda boda fares,Bodaboda fares,Bodaboda fares,,Public transport – Bodaboda-Bicycle
 466,"Stamps, Envelops, etc",Postal Services,"stamps, envelopes","Stamps, envelops, etc.","Stamps, envelops, etc.","Stamps, envelops, etc.","Stamps, envelops, etc.","Stamps, envelops, etc.","Stamps, envelops, etc.","Stamps, envelops, etc."
-467,Air Time/Services Fee (Owned Fixed/Mobile Phones),Air Time/Servie Fee,air time and service fee for owned fixed mobile phones,Air time & services fee for owned fixed/ mobile phones,Air time & services fee for owned fixed/ mobile phones,Air time & services fee for owned fixed/ mobile phones,Air time & services fee for owned fixed/ mobile phones,Air time & services fee for owned fixed/       mobile  phones,,
+467,Air Time/Services Fee (Owned Fixed/Mobile Phones),Air Time/Servie Fee,air time and service fee for owned fixed mobile phones,Air time & services fee for owned fixed/ mobile phones,Air time & services fee for owned fixed/ mobile phones,Air time & services fee for owned fixed/ mobile phones,Air time & services fee for owned fixed/ mobile phones,Air time & services fee for owned fixed/       mobile  phones,nan,
 468,Air Time/Services Fee (Phones not Owned),Air Time/Servie Fee,expenditure on phones not owned,Expenditure on phones not owned,Expenditure on phones not owned,Expenditure on phones not owned,Expenditure on phones not owned,Expenditure on phones not owned,Expenditure on phone calls for phones not owned,Expenditure on phone calls for phones not owned
 469,Other Transportation/Communication,Other Transportation/Communication,others,Others,Others,Others,Others,Others,Others,Others
 470,Sanitary Towels,Sanitary Towels,,,,,Sanitary Towels,Sanitary Towels,Sanitary Towels,Sanitary Towels
@@ -52,8 +52,8 @@ Code,Preferred Label,Aggregate Label ,2005,2009,2010,2011,2013,2015,2018,2019
 705,"Hotels, Lodging, etc",Hotels,expenses in hotels lodging,,,,,,,
 3051,Water (NWSC),Water,,,,,,,Water NWSC,Water NWSC
 3052,Water (Other Sources),Water,,,,,,,Water Other sources,Water Other sources
-3111,Candles,Candles,,,,,,,,Candles
-3112,Matches,Matches,,,,,,,,Matches
+3111,Candles,Candles,,,,,,,nan,Candles
+3112,Matches,Matches,,,,,,,nan,Matches
 3121,Refuse Collection,Refuse Collection,,,,,,,Refuse collection,Refuse collection
 4501,Internet Fees,Internet Fees,,,,,,,Internet fees,Internet fees
 4511,Mobile Money Charges,Mobile Money Charges,,,,,,,Mobile money charges,Mobile money charges

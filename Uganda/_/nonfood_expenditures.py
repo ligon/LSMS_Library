@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 """
-Read food expenditures; use harmonized food labels.
+Read non-food expenditures; use harmonized non-food labels.
 """
 import pandas as pd
 import numpy as np
-from uganda import change_id, Waves, harmonized_nonfood_labels
+from uganda import change_id, Waves, harmonized_food_labels
 
 def id_walk(df,wave,waves):
     
@@ -33,7 +33,7 @@ df.columns.name = 't'
 
 x = df.stack().unstack('i')
 
-agg_labels = harmonized_nonfood_labels(fn='./nonfood_items.org',
+agg_labels = harmonized_food_labels(fn='./nonfood_items.org',
                                     key='Preferred Label',
                                     value='Aggregate Label')
 #x = x.rename(columns=agg_labels)

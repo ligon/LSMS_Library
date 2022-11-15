@@ -1,0 +1,4 @@
+outs:
+- md5: c980a72c727be31f32bcd47457c8c875
+  size: 703015
+  path: plotgeovariables_ihs3_rerelease.dta
