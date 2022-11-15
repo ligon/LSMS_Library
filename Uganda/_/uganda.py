@@ -8,7 +8,7 @@ from cfe.df_utils import use_indices
 
 # Data to link household ids across waves
 Waves = {'2005-06':(),
-         '2009-10':(),
+         '2009-10':(), # ID of parent household  in ('GSEC1.dta',"HHID",'HHID_parent'), but not clear how to use
          '2010-11':(),
          '2011-12':(),
          '2013-14':('GSEC1.dta','HHID','HHID_old'),
@@ -132,9 +132,9 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
 
     The identifier id0 is assumed to be unique.
 
-    If mapping id0->id1 not one-to-one, then id1 modified with
+    If mapping id0->id1 is not one-to-one, then id1 modified with
     suffixes of the form _%d, with %d replaced by a sequence of
-    numbers.
+    integers.
     """
     idx = x.index.names
 
@@ -195,14 +195,16 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
 
     return x
 
-def panel_attrition(df,return_ids=False):
+def panel_attrition(df,return_ids=False,waves=None):
     """
-    Produce a (lower-triangular) matrix showing the number of households (j) that
+    Produce an upper-triangular) matrix showing the number of households (j) that
     transition between rounds (t) of df.
     """
     idxs = df.reset_index().groupby('t')['j'].apply(list).to_dict()
 
-    waves = list(Waves.keys())
+    if waves is None:
+        waves = list(Waves.keys())
+
     foo = pd.DataFrame(index=waves,columns=waves)
     IDs = {}
     for m,s in enumerate(waves):
