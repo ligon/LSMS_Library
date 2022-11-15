@@ -26,16 +26,6 @@ def harmonized_food_labels(fn='../../_/food_items.org',key='Code',value='Preferr
 
     return food_items.squeeze().str.strip().to_dict()
 
-
-def harmonized_nonfood_labels(fn='../../_/nonfood_items.org',key='Code',value='Preferred Label'):
-    # Harmonized food labels
-    non_food_items = pd.read_csv(fn,delimiter='|',skipinitialspace=True,converters={1:int,2:lambda s: s.strip()})
-    non_food_items.columns = [s.strip() for s in non_food_items.columns]
-    non_food_items = non_food_items[[key,value]].dropna()
-    non_food_items.set_index(key,inplace=True)
-
-    return non_food_items.squeeze().str.strip().to_dict()
-
 def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market',farmgate='farmgate'):
 
     food_items = harmonized_food_labels(fn='../../_/food_items.org')
@@ -77,7 +67,7 @@ def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,it
 
 
 def nonfood_expenditures(fn='',purchased=None,away=None,produced=None,given=None,item='item',HHID='HHID'):
-    nonfood_items = harmonized_food_labels(fn='../../_/nonfood_items.org')
+    nonfood_items = harmonized_food_labels(fn='../../_/nonfood_items.org',key='Code',value='Preferred Label')
     with dvc.api.open(fn,mode='rb') as dta:
         expenditures,itemlabels=get_food_expenditures(dta,purchased,away,produced,given,itmcd=item,HHID=HHID,itemlabels=nonfood_items)
 
