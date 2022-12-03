@@ -9,8 +9,14 @@ var = ../var/food_expenditures.parquet ../var/food_quantities.parquet ../var/uni
 
 all: $(parquet) $(var)
 
-shocks = $(shell find $(rounds) -name shocks.py)
-shocks_parquet := $(shocks:.py=.parquet)
+earnings = $(shell find $(rounds) -name earnings.py)
+earnings_parquet := $(earnings:.py=.parquet)
+
+../var/earnings.parquet: earnings.py $(earnings_parquet)
+	python earnings.py
+
+earnings = $(shell find $(rounds) -name earnings.py)
+earnings_parquet := $(earnings:.py=.parquet)
 
 ../var/shocks.parquet: shocks.py $(shocks_parquet)
 	python shocks.py
