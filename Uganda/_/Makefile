@@ -5,9 +5,23 @@ source = $(shell find $(rounds) -name \*.py)
 parquet := $(source:.py=.parquet)
 var = ../var/food_expenditures.parquet ../var/food_quantities.parquet ../var/unitvalues.parquet \
 	  ../var/household_characteristics.parquet ../var/other_features.parquet \
-      ../var/shocks.parquet ../var/nonfood_expenditures.parquet
+      ../var/shocks.parquet ../var/nonfood_expenditures.parquet ../var/enterprise_income.parquet \
+	  ../var/assets.parquet ../var/earnings.parquet
+
 
 all: $(parquet) $(var)
+
+enterprise_income = $(shell find $(rounds) -name enterprise_income.py)
+enterprise_income_parquet := $(enterprise_income:.py=.parquet)
+
+../var/enterprise_income.parquet: enterprise_income.py $(enterprise_income_parquet)
+	python enterprise_income.py
+
+assets = $(shell find $(rounds) -name assets.py)
+assets_parquet := $(assets:.py=.parquet)
+
+../var/assets.parquet: assets.py $(assets_parquet)
+	python assets.py
 
 earnings = $(shell find $(rounds) -name earnings.py)
 earnings_parquet := $(earnings:.py=.parquet)
@@ -15,8 +29,8 @@ earnings_parquet := $(earnings:.py=.parquet)
 ../var/earnings.parquet: earnings.py $(earnings_parquet)
 	python earnings.py
 
-earnings = $(shell find $(rounds) -name earnings.py)
-earnings_parquet := $(earnings:.py=.parquet)
+shocks = $(shell find $(rounds) -name shocks.py)
+shocks_parquet := $(shocks:.py=.parquet)
 
 ../var/shocks.parquet: shocks.py $(shocks_parquet)
 	python shocks.py
