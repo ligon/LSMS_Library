@@ -18,7 +18,7 @@
 18,Jerrican (2 lts)
 19,Jerrican (1 lt)
 20,Tin (Debe) - 20 lts
-21,Tin (5 lts)
+21, Tin (5 lts)
 22,Plastic Basin (15 lts)
 23,Bottle(750ml)
 24,Bottle(500ml)
@@ -32,7 +32,7 @@
 32,Cup/Mug(0.5lt)
 33,Glass(0.25lt)
 34,Ladle(100g)
-35,Table spoon
+35,Table spoon 
 36,Tea spoon
 37,Basket (20 kg)
 38,Basket (10 kg)
@@ -62,9 +62,6 @@
 64,Heap(unspecified)
 65,Dozen
 66,Bundle (Unspecified)
-67,Bunch- Big
-68,Bunch- medium
-69,Bunch- small
 70,Bunch(Big)
 71,Bunch(Medium)
 72,Bunch(Small)
@@ -85,12 +82,6 @@
 87,Piece-Big
 88,Piece-Medium
 89,Piece-Small
-90,Heap - Big
-91,Heap - medium
-92,Heap - small
-93,Cluster - big
-94,Cluster - medium
-95,Cluster - Small
 96,Bundle-Big
 97,Bundle-Medium
 98,Bundle-Small
@@ -134,6 +125,15 @@
 137,Bottle (1tr
 138,Bottle (1.5ltr)
 139,Bottle (2ltr)
+67,Bunch- Big
+68,Bunch- medium
+69,Bunch- small
+93,Cluster - big
+94,Cluster - medium
+95,Cluster - Small
+90,Heap - Big
+91,Heap - medium
+92,Heap - small
 140,sacket (10g)
 141,Sacket (15g)
 142,Sacket (20g)
@@ -142,3 +142,6 @@
 145,Sacket (50g)
 146,Sacket (100g)
 147,Sacket (150g)
+996,Whole chicken -Big
+997,Whole chicken-Medium
+998,Whole chicken -Small
