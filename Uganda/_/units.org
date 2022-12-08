@@ -22,7 +22,7 @@ d = pd.DataFrame(d)
 
 
 #+name: unitlabels
-|   Code | Preferred                         | 2005-06                            | 2009-10                          | 2010-11                           | 2011-12                           | 2013-14                           | 2015-16                           | 2018-19                           | 2019-20                           |
+|   Code | Preferred Label                   | 2005-06                            | 2009-10                          | 2010-11                           | 2011-12                           | 2013-14                           | 2015-16                           | 2018-19                           | 2019-20                           |
 |--------+-----------------------------------+------------------------------------+----------------------------------+-----------------------------------+-----------------------------------+-----------------------------------+-----------------------------------+-----------------------------------+-----------------------------------|
 |      0 | ---                               |                                    |                                  |                                   |                                   |                                   |                                   |                                   |                                   |
 |      1 | Kg                                | Kilogram (kg)                      | Kilogram                         | Kilogram (kg)                     | Kilogram (kg)                     | Kilogram (kg)                     | Kilogram (kg)                     | Kilogram (kg)                     | Kilogram (kg)                     |
@@ -320,7 +320,7 @@ d = pd.DataFrame(d)
 #+begin_src python :var tab=unitlabels :colnames no :prologue "# -*- coding: utf-8 -*-" :tangle unitlabels.py
 from cfe.df_utils import orgtbl_to_df
 
-units = orgtbl_to_df(tab).set_index('Code')['Preferred']
+units = orgtbl_to_df(tab).set_index('Code')['Preferred Label']
 
 units.to_csv('unitlabels.csv')
 
