@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 import sys
 sys.path.append('../../_/')
-from uganda import harmonized_food_labels
+from uganda import harmonized_food_labels, harmonized_unit_labels
 import dvc.api
 from lsms import from_dta
 import pandas as pd
 import json
+import warnings
 
 fn = '../Data/HH/gsec15b.dta'
 
@@ -26,27 +27,17 @@ myvars = {'units':'CEB03C',
           'quantity_inkind':'CEB012'}
 
 with dvc.api.open(fn,mode='rb') as dta:
-    df = from_dta(dta,convert_categoricals=True)
-
-########################################################################
-# Awkwardly we need the numeric codes to assign the item labels we want...
-with dvc.api.open(fn,mode='rb') as dta:
-    codes = from_dta(dta,convert_categoricals=False)
-
-with dvc.api.open(fn,mode='rb') as dta:
-    codes = from_dta(dta,convert_categoricals=False)
-d = dict(zip(df.CEB01.tolist(),codes.CEB01.tolist()))
-df = df.replace({'CEB01':d})
-
-df = df.replace({'CEB01':harmonized_food_labels()})
-# This gives us preferred labels
-#######################################################################
+    df = from_dta(dta,convert_categoricals=False)
 
 
 df = df.loc[:,[v for v in myvars.values()]].rename(columns={v:k for k,v in myvars.items()})
 
 df = df.set_index(['HHID','item','units']).dropna(how='all')
+df = df.rename(index=harmonized_food_labels(),level='item')
+unitlabels = harmonized_unit_labels()
+df = df.rename(index=unitlabels,level='units')
 
+# Compute unit values
 df['unitvalue_home'] = df['value_home']/df['quantity_home']
 df['unitvalue_away'] = df['value_away']/df['quantity_away']
 df['unitvalue_own'] = df['value_own']/df['quantity_own']
@@ -60,35 +51,17 @@ values = pd.concat([unitvalues,prices],axis=1)
 # Get list of units used in 2019 survey
 units = list(set(prices.index.get_level_values('units').tolist()))
 
-# Drop units that aren't strings
-units = [s for s in units if type(s)==str]
-
-# Create cleaned up units
-myunits = [s.strip() for s in units]
-myunits = [s.replace('  ',' ') for s in myunits]
-myunits = [s.replace('  ',' ') for s in myunits]
-myunits = [s.replace('p(','p (') for s in myunits]
-myunits = [s.replace('n(','n (') for s in myunits]
-myunits = [s.replace(')-',') -') for s in myunits]
-myunits = [s.replace('-B','- B') for s in myunits]
-myunits = [s.replace('-M','- M') for s in myunits]
-myunits = [s.replace('-S','- S') for s in myunits]
-myunits = [s.replace('e(','e (') for s in myunits]
-myunits = [s.replace('e-','e -') for s in myunits]
-myunits = [s.replace('s(','s (') for s in myunits]
-myunits = [s.replace('Sackets','Sacket') for s in myunits]
-myunits = [s.replace('Plastin','Plastic') for s in myunits]
-myunits = [s.replace('sacket','Sacket') for s in myunits]
-
-unitnames = dict(zip(units,myunits))
+unknown_units = set(units).difference(unitlabels.values())
+if len(unknown_units):
+    warnings.warn("Dropping some unknown unit codes!")
+    print(unknown_units)
+    df = df.loc[df.index.isin(unitlabels.values(),level='units')]
 
 with open('../../_/conversion_to_kgs.json','r') as f:
     conversion_to_kgs = pd.Series(json.load(f))
 
 conversion_to_kgs.name='Kgs'
 conversion_to_kgs.index.name='units'
-
-values.rename(index=unitnames,level='units')
 
 values = values.join(conversion_to_kgs,on='units')
 values = values.divide(values.Kgs,axis=0)  # Convert to Kgs
@@ -113,4 +86,7 @@ p = pd.DataFrame({'home':home.mean(axis=1),
 p['own'] = pd.DataFrame({'own':p.own,'farmgate':values.farmgate}).mean(axis=1)
 p.index.names = ['j','i']
 
-pd.DataFrame({'Price/Kg':p.median(axis=1)}).to_parquet('food_prices.parquet')
+p = p.median(axis=1)
+pbar = p.groupby('i').median()
+
+pd.DataFrame({'Price/Kg':pbar}).to_parquet('food_prices.parquet')
