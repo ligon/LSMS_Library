@@ -53,6 +53,12 @@ food_quantities_parquet := $(food_quantities:.py=.parquet)
 ../var/food_quantities.parquet: food_quantities.py $(food_quantities_parquet)
 	python food_quantities.py
 
+food_prices = $(shell find $(rounds) -name food_prices.py)
+food_prices_parquet := $(food_prices:.py=.parquet)
+
+../var/food_prices.parquet: food_prices.py $(food_prices_parquet)
+	python food_prices.py
+
 ../var/unitvalues.parquet: unitvalues.py $(food_expenditure_parquet) $(food_quantities_parquet)
 	python unitvalues.py
 
