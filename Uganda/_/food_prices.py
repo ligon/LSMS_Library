@@ -19,5 +19,4 @@ p = p.unstack('i')
 p['m'] = 'Uganda'
 p = p.reset_index().set_index(['t','m']).T
 
-p.to_parquet('food_price.parquet')
-
+p.to_parquet('../var/food_prices.parquet')
