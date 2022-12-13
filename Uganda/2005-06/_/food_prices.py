@@ -8,8 +8,6 @@ import pandas as pd
 import json
 import warnings
 
-fn = '../Data/HH/gsec15b.dta'
-
 fn='../Data/GSEC14A.dta'
 
 myvars = dict(item='h14aq2',
@@ -37,6 +35,8 @@ df = df.rename(index=harmonized_food_labels(),level='item')
 unitlabels = harmonized_unit_labels()
 df = df.rename(index=unitlabels,level='units')
 
+df.index.names = ['j','i','units']
+
 # Compute unit values
 df['unitvalue_home'] = df['value_home']/df['quantity_home']
 df['unitvalue_away'] = df['value_away']/df['quantity_away']
@@ -62,6 +62,10 @@ with open('../../_/conversion_to_kgs.json','r') as f:
 
 conversion_to_kgs.name='Kgs'
 conversion_to_kgs.index.name='units'
+
+df = df.join(conversion_to_kgs,on='units')
+df = df.astype(float)
+df.to_parquet('food_values.parquet')
 
 values = values.join(conversion_to_kgs,on='units')
 values = values.divide(values.Kgs,axis=0)  # Convert to Kgs

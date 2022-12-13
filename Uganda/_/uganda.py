@@ -5,6 +5,8 @@ import pandas as pd
 import dvc.api
 from collections import defaultdict
 from cfe.df_utils import use_indices
+import warnings
+import json
 
 # Data to link household ids across waves
 Waves = {'2005-06':(),
@@ -59,6 +61,56 @@ def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market'
     pd.Series(unitlabels).to_csv('unitlabels.csv')
 
     return prices
+
+def food_acquired(fn,myvars):
+
+    with dvc.api.open(fn,mode='rb') as dta:
+        df = from_dta(dta,convert_categoricals=False)
+
+    df = df.loc[:,[v for v in myvars.values()]].rename(columns={v:k for k,v in myvars.items()})
+
+    df = df.set_index(['HHID','item','units']).dropna(how='all')
+
+    df.index.names = ['j','i','units']
+
+
+    # Fix type of hhids if need be
+    if df.index.get_level_values('j').dtype ==float:
+        fix = dict(zip(df.index.levels[0],df.index.levels[0].astype(int).astype(str)))
+        df = df.rename(index=fix,level=0)
+
+    df = df.rename(index=harmonized_food_labels(),level='i')
+    unitlabels = harmonized_unit_labels()
+    df = df.rename(index=unitlabels,level='units')
+
+    if not 'market' in df.columns:
+        df['market'] = df.filter(regex='^market').median(axis=1)
+
+    # Compute unit values
+    df['unitvalue_home'] = df['value_home']/df['quantity_home']
+    df['unitvalue_away'] = df['value_away']/df['quantity_away']
+    df['unitvalue_own'] = df['value_own']/df['quantity_own']
+    df['unitvalue_inkind'] = df['value_inkind']/df['quantity_inkind']
+
+    # Get list of units used in current survey
+    units = list(set(df.index.get_level_values('units').tolist()))
+
+    unknown_units = set(units).difference(unitlabels.values())
+    if len(unknown_units):
+        warnings.warn("Dropping some unknown unit codes!")
+        print(unknown_units)
+        df = df.loc[df.index.isin(unitlabels.values(),level='units')]
+
+    with open('../../_/conversion_to_kgs.json','r') as f:
+        conversion_to_kgs = pd.Series(json.load(f))
+
+    conversion_to_kgs.name='Kgs'
+    conversion_to_kgs.index.name='units'
+
+    df = df.join(conversion_to_kgs,on='units')
+    df = df.astype(float)
+
+    return df
 
 def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,item='item',HHID='HHID'):
     food_items = harmonized_food_labels(fn='../../_/food_items.org')

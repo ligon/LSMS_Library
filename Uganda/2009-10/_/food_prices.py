@@ -31,9 +31,15 @@ with dvc.api.open(fn,mode='rb') as dta:
 df = df.loc[:,[v for v in myvars.values()]].rename(columns={v:k for k,v in myvars.items()})
 
 df = df.set_index(['HHID','item','units']).dropna(how='all')
+
+# Fix type of hhids
+fix = dict(zip(df.index.levels[0],df.index.levels[0].astype(int).astype(str)))
+df = df.rename(index=fix,level=0)
 df = df.rename(index=harmonized_food_labels(),level='item')
 unitlabels = harmonized_unit_labels()
 df = df.rename(index=unitlabels,level='units')
+
+df.index.names = ['j','i','units']
 
 # Compute unit values
 df['unitvalue_home'] = df['value_home']/df['quantity_home']
@@ -61,16 +67,25 @@ with open('../../_/conversion_to_kgs.json','r') as f:
 conversion_to_kgs.name='Kgs'
 conversion_to_kgs.index.name='units'
 
+df = df.join(conversion_to_kgs,on='units')
+df = df.astype(float)
+df.to_parquet('food_values.parquet')
+
 values = values.join(conversion_to_kgs,on='units')
-values = values.divide(values.Kgs,axis=0)  # Convert to Kgs
-del values['Kgs']
-
-values = values.droplevel('units').dropna(how='all')
 values = values.astype(float)
+p_per_kg = values.divide(values.Kgs,axis=0)  # Convert to Kgs
+del p_per_kg['Kgs']
+p_per_kg = p_per_kg.droplevel('units')
+p_per_kg = p_per_kg.astype(float)
+p_per_kg = p_per_kg.dropna(how='all')
 
-p = values.median(axis=1)
-p.index.names = ['j','i']
+p_per_kg.to_parquet('food_prices_per_kg.parquet')
 
-pbar = p.groupby('i').median()
+#values = values.droplevel('units').dropna(how='all')
 
-pd.DataFrame({'Price/Kg':pbar}).to_parquet('food_prices.parquet')
+#p = values.median(axis=1)
+#p.index.names = ['j','i']
+
+#pbar = p.groupby('i').median()
+
+#pd.DataFrame({'Price/Kg':pbar}).to_parquet('food_prices.parquet')
