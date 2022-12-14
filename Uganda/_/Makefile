@@ -35,11 +35,6 @@ shocks_parquet := $(shocks:.py=.parquet)
 ../var/shocks.parquet: shocks.py $(shocks_parquet)
 	python shocks.py
 
-food_expenditures = $(shell find $(rounds) -name food_expenditures.py)
-food_expenditures_parquet := $(food_expenditures:.py=.parquet)
-
-../var/food_expenditures.parquet: food_expenditures.py $(food_expenditures_parquet)
-	python food_expenditures.py
 
 nonfood_expenditures = $(shell find $(rounds) -name nonfood_expenditures.py)
 nonfood_expenditures_parquet := $(nonfood_expenditures:.py=.parquet)
@@ -50,14 +45,8 @@ nonfood_expenditures_parquet := $(nonfood_expenditures:.py=.parquet)
 food_quantities = $(shell find $(rounds) -name food_quantities.py)
 food_quantities_parquet := $(food_quantities:.py=.parquet)
 
-../var/food_quantities.parquet: food_quantities.py $(food_quantities_parquet)
-	python food_quantities.py
-
-food_prices = $(shell find $(rounds) -name food_prices.py)
-food_prices_parquet := $(food_prices:.py=.parquet)
-
-../var/food_prices.parquet: food_prices.py $(food_prices_parquet)
-	python food_prices.py
+../var/food_quantities.parquet ../var/food_expenditures.parquet ../var/food_prices.parquet &: ../var/food_acquired.parquet food_acquired.py
+	python food_acquired.py
 
 food_acquired = $(shell find $(rounds) -name food_acquired.py)
 food_acquired_parquet := $(food_acquired:.py=.parquet)
