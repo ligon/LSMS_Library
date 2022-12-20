@@ -42,20 +42,14 @@ nonfood_expenditures_parquet := $(nonfood_expenditures:.py=.parquet)
 ../var/nonfood_expenditures.parquet: nonfood_expenditures.py $(nonfood_expenditures_parquet)
 	python nonfood_expenditures.py
 
-food_quantities = $(shell find $(rounds) -name food_quantities.py)
-food_quantities_parquet := $(food_quantities:.py=.parquet)
-
 ../var/food_quantities.parquet ../var/food_expenditures.parquet ../var/food_prices.parquet &: ../var/food_acquired.parquet food_acquired.py
-	python food_acquired.py
+	python food_prices_quantities_and_expenditures.py
 
 food_acquired = $(shell find $(rounds) -name food_acquired.py)
 food_acquired_parquet := $(food_acquired:.py=.parquet)
 
 ../var/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
 	python food_acquired.py
-
-../var/unitvalues.parquet: unitvalues.py $(food_expenditure_parquet) $(food_quantities_parquet)
-	python unitvalues.py
 
 household_characteristics = $(shell find $(rounds) -name household_characteristics.py)
 household_characteristics_parquet := $(household_characteristics:.py=.parquet)
