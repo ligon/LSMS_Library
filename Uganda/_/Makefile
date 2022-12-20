@@ -69,6 +69,12 @@ other_features_parquet := $(other_features:.py=.parquet)
 ../var/other_features.parquet: other_features.py $(other_features_parquet)
 	python other_features.py
 
+housing = $(shell find $(rounds) -name housing.py)
+housing_parquet := $(housing:.py=.parquet)
+
+../var/housing.parquet: housing.py $(housing_parquet)
+	python housing.py
+
 %.parquet: %.py food_items.org uganda.py
 	(cd $(@D) && python ./$(<F))
 
