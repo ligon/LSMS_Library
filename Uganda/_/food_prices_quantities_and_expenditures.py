@@ -43,5 +43,8 @@ tokg = {k:'Kg' for k,v in d.items() if np.isreal(v)}
 p = p.rename(index=tokg,level='units')
 q = q.rename(index=tokg,level='units')
 
+p = p.replace(0,np.nan)
 p.to_parquet('../var/food_prices.parquet')
+
+q = q.replace(0,np.nan)
 q.to_parquet('../var/food_quantities.parquet')
