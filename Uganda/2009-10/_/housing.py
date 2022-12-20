@@ -4,7 +4,7 @@ import pandas as pd
 import dvc.api
 from lsms import from_dta
 
-fn = '../Data/2009_GSEC9A.dta'
+fn = '../Data/GSEC9A.dta'
 d = {"hhid":['Hhid'],
     "Thatched roof" : ['H9q04',lambda x: 0 + ('Thatch' in x)],
      "Earthen floor" : ['H9q06',lambda x: 0 + ('Earth' in x)]}
