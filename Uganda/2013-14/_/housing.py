@@ -4,16 +4,17 @@ import pandas as pd
 import dvc.api
 from lsms import from_dta
 
-fn = '../Data/GSEC11.dta'
+fn = '../Data/GSEC9_1.dta'
 d = {"hhid":['HHID'],
-    "Thatched roof" : ['h11q4a',lambda x:0 + ('thatch' in x.lower())],
-     "Earthen floor" : ['h11q6a',lambda x:0 + ('earth' in x.lower())]}
+    "Thatched roof" : ['h9q4',lambda x: 0 + ('Thatch' in x)],
+     "Earthen floor" : ['h9q6',lambda x: 0 + ('earth' in x)]}
 
 with dvc.api.open(fn,mode='rb') as dta:
     df = from_dta(dta)
 
 housing = df[[v[0] for v in d.values()]]
 housing.columns.name = 'k'
+housing = housing.fillna('0')
 
 housing = housing.rename(columns={v[0]:k for k,v in d.items()})
 
@@ -22,6 +23,7 @@ for k,v in d.items():
         housing[k] = housing[k].apply(v[1])
     except IndexError:
         pass
+
 housing.set_index('hhid', inplace=True)
 housing.index.name = 'j'
 
