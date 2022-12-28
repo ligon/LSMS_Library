@@ -1,6 +1,10 @@
 from lsms.tools import get_food_prices, get_food_expenditures, get_household_roster
+from lsms import from_dta
 import pandas as pd
+import numpy as np
 import dvc.api
+import warnings
+import json
 
 def harmonized_food_labels(fn='../../_/food_items.org'):
     # Harmonized food labels
@@ -76,4 +80,49 @@ def age_sex_composition(fn,sex='sex',sex_converter=None,age='age',months_spent='
     df.index.name = 'j'
     df.columns.name = 'k'
     
+    return df
+
+def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Label',value='Preferred Label'):
+    unitlabels = pd.read_csv(fn)
+    unitlabels.columns = [s.strip() for s in unitlabels.columns]
+    unitlabels = unitlabels[[key,value]].dropna()
+    unitlabels.set_index(key,inplace=True)
+    return unitlabels.squeeze().str.strip().to_dict()
+
+    
+def food_acquired(fn,myvars):
+    
+    with dvc.api.open(fn,mode='rb') as dta:
+        df = from_dta(dta)
+
+    df = df.loc[:,[v for v in myvars.values()]].rename(columns={v:k for k,v in myvars.items()})
+
+    #map round code to actual years
+    dict = {1:'2008-09', 2:'2010-11', 3:'2012-13', 4:'2014-15'}
+    df.replace({"year": dict},inplace=True)
+
+    df = df.set_index(['HHID','item','year']).dropna(how='all')
+    df.index.names = ['j','i','t']
+
+    # Fix type of hhids if need be
+    if df.index.get_level_values('j').dtype ==float:
+        fix = dict(zip(df.index.levels[0],df.index.levels[0].astype(int).astype(str)))
+        df = df.rename(index=fix,level=0)
+    print('hhidfix success')
+    print(df)
+
+    #harmonize food labels 
+    #df = df.rename(index=harmonized_food_labels(),level='i')
+    unitlabels = {0: float("nan"), 'KILOGRAMS':'Kg', 'GRAMS':'Gram', 'LITRE':'Litre', 'MILLILITRE':'Millilitre', 'PIECE':'Piece'}
+    unitcolumn = {'unit_ttl_consume': unitlabels, 'unit_purchase': unitlabels, 'unit_own': unitlabels, 'unit_inkind': unitlabels}
+    df.replace(unitcolumn,inplace=True)
+
+    df['unitvalue_purchase'] = df['value_purchase']/df['quant_purchase']
+
+    #with open('../../_/conversion_to_kgs.json','r') as f:
+        #conversion_to_kgs = pd.Series(json.load(f))
+    #conversion_to_kgs.name='unit_ttl_consume_Kgs'
+    #conversion_to_kgs.index.name='unit_ttl_consume'
+    #df = df.join(conversion_to_kgs,on='unit_ttl_consume')
+    #df = df.astype(float)
     return df
