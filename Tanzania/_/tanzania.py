@@ -108,12 +108,10 @@ def food_acquired(fn,myvars):
     if df.index.get_level_values('j').dtype ==float:
         fix = dict(zip(df.index.levels[0],df.index.levels[0].astype(int).astype(str)))
         df = df.rename(index=fix,level=0)
-    print('hhidfix success')
-    print(df)
 
     #harmonize food labels 
     #df = df.rename(index=harmonized_food_labels(),level='i')
-    unitlabels = {0: float("nan"), 'KILOGRAMS':'Kg', 'GRAMS':'Gram', 'LITRE':'Litre', 'MILLILITRE':'Millilitre', 'PIECE':'Piece'}
+    unitlabels = {0: float("nan"), 'KILOGRAMS':'Kg', 'GRAMS':'Gram', 'LITRE':'Litre', 'MILLILITRE':'Millilitre', 'PIECES':'Piece'}
     unitcolumn = {'unit_ttl_consume': unitlabels, 'unit_purchase': unitlabels, 'unit_own': unitlabels, 'unit_inkind': unitlabels}
     df.replace(unitcolumn,inplace=True)
 
