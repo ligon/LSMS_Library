@@ -6,7 +6,7 @@ parquet := $(source:.py=.parquet)
 var = ../var/food_expenditures.parquet ../var/food_quantities.parquet ../var/unitvalues.parquet \
 	  ../var/household_characteristics.parquet ../var/other_features.parquet \
       ../var/shocks.parquet ../var/nonfood_expenditures.parquet ../var/enterprise_income.parquet \
-	  ../var/assets.parquet ../var/earnings.parquet
+	  ../var/assets.parquet ../var/earnings.parquet ../var/housing.parquet
 
 
 all: $(parquet) $(var)
