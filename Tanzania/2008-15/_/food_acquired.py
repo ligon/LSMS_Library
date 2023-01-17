@@ -4,11 +4,6 @@ sys.path.append('../../_/')
 from tanzania import food_acquired
 
 fn='../Data/upd4_hh_j1.dta'
-import dvc.api
-from lsms import from_dta
-
-#with dvc.api.open('../Data/upd4_hh_j1.dta',mode='rb') as dta:
-    #df = from_dta(dta)
 
 myvars = dict(item='hj_00',
               HHID='r_hhid',
