@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 from togo import age_sex_composition
 
-myvars = dict(fn='Togo/2018/Data/Togo_survey2018_hhroster_forEthan.dta',
+myvars = dict(fn='../Data/Togo_survey2018_hhroster_forEthan.dta',
               HHID='hhid',
               sex='gender',
               sex_converter = lambda x:['m','f'][x=='woman'],

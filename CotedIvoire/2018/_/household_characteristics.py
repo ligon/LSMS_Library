@@ -6,7 +6,7 @@ import dvc.api
 import pandas as pd
 
 
-def household_demographics(fn='',sex='',age='',HHID='HHID',months_spent='months_spent',filter=None):
+def household_characteristics(fn='',sex='',age='',HHID='HHID',months_spent='months_spent',filter=None):
 
     if type(sex) in [list,tuple]:
         sex,sex_converter = sex
@@ -33,12 +33,12 @@ def household_demographics(fn='',sex='',age='',HHID='HHID',months_spent='months_
 
 t = '2018'
 
-myvars = dict(fn='CotedIvoire/%s/Data/Menage/s01_me_CIV2018.dta' % t, 
+myvars = dict(fn='../Data/Menage/s01_me_CIV2018.dta',
               age=('s01q03c',lambda y: 2018-y), sex=('s01q01',lambda s: 'm' if s==1 else 'f'),
               filter='vague==1')
 
 
-z0 = household_demographics(**myvars)
+z0 = household_characteristics(**myvars)
 
 z0.columns.name = 'k'
 z0.index.name = 'j'
@@ -56,7 +56,7 @@ myvars['age'] = ('s01q03c',lambda y: 2019-y)
 myvars['filter'] = 'vague==2'
 
 
-z1 = household_demographics(**myvars)
+z1 = household_characteristics(**myvars)
 
 z1.columns.name = 'k'
 z1.index.name = 'j'
@@ -69,7 +69,7 @@ z1 = z1.reset_index().set_index(['j','t','m'])
 z = pd.concat([z0,z1])
 
 # Get rural/urban indicator
-with dvc.api.open('CotedIvoire/2018/Data/Menage/s00_me_CIV2018.dta',mode='rb') as dta:
+with dvc.api.open('../Data/Menage/s00_me_CIV2018.dta',mode='rb') as dta:
     df = pd.read_stata(dta,convert_categoricals=False,preserve_dtypes=False)[['vague','grappe','menage','s00q04']]
 
 df['j'] = (df.grappe*1000+df.menage).apply(lambda x: '%d' % int(float(x)))
@@ -81,5 +81,5 @@ df.set_index(['j','t','m'],inplace=True)
 
 z = z.join(df['Rural'])
 
-z.to_parquet('household_demographics.parquet')
+z.to_parquet('household_characteristics.parquet')
 

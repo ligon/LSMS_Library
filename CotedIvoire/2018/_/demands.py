@@ -9,7 +9,7 @@ x = pd.concat([pd.read_parquet('food_expenditures.parquet'),
 
 #x = x.rename(columns=labels).stack().groupby(['j','t','m','i']).sum().unstack('i')
 
-z = pd.read_parquet('household_demographics.parquet')
+z = pd.read_parquet('household_characteristics.parquet')
 z = z.groupby(['j','t','m']).sum()
 z.columns.name = 'k'
 

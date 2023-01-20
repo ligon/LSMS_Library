@@ -35,7 +35,7 @@ def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,it
 # Wave 1
 t = '2018'
 
-myvars = dict(fn='CotedIvoire/%s/Data/Menage/s07b_me_CIV2018.dta' % t,item='s07bq01',
+myvars = dict(fn='../Data/Menage/s07b_me_CIV2018.dta',item='s07bq01',
               purchased='s07bq08',filter='vague==1')
 
 x = food_expenditures(**myvars)
@@ -49,7 +49,7 @@ X = [x.copy()]
 
 # Wave 2
 
-myvars = dict(fn='CotedIvoire/%s/Data/Menage/s07b_me_CIV2018.dta' % t,item='s07bq01',
+myvars = dict(fn='../Data/Menage/s07b_me_CIV2018.dta',item='s07bq01',
               purchased='s07bq08',filter='vague==2')
 
 x = food_expenditures(**myvars)

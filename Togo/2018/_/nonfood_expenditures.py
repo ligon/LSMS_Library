@@ -10,7 +10,7 @@ from cfe.df_utils import broadcast_binary_op
 
 Dfs = []
 for period in ['7days','30days','3months','6months','12months']:
-    with dvc.api.open('Togo/2018/Data/Togo_survey2018_nonfooditems%s.csv' % period,mode='rb') as csv:
+    with dvc.api.open('../Data/Togo_survey2018_nonfooditems%s.csv' % period,mode='rb') as csv:
         Dfs.append(pd.read_csv(csv))
 
 vars={'hhid': 'j',
