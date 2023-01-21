@@ -1,0 +1,4 @@
+outs:
+- md5: e3ea4dc3a809905fdd1d98b2ed0c95fd
+  size: 5672
+  path: SurvivorsPensionAggregate.dta
