@@ -5,7 +5,7 @@ from lsms import from_dta
 import dvc.api
 import json
 
-with dvc.api.open('Tanzania/2010-11/Data/HH_SEC_K1.dta',mode='rb') as dta:
+with dvc.api.open('../Data/HH_SEC_K1.dta',mode='rb') as dta:
     q = from_dta(dta)
 
 q = q[['y2_hhid','itemcode','hh_k02_1','hh_k02_2']]    

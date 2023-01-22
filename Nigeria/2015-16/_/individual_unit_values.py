@@ -51,7 +51,7 @@ lbls = json.load(open('../../_/food_items.json'))
 
 #########################
 # Harvest
-with dvc.api.open('Nigeria/2015-16/Data/sect10b_harvestw3.csv',mode='rb') as csv:
+with dvc.api.open('../Data/sect10b_harvestw3.csv',mode='rb') as csv:
     harvest = pd.read_csv(csv)
 
 vars={'hhid': 'j',
@@ -87,7 +87,7 @@ U.append(unit_values)
 
 ##################
 # Planting (2016Q1)
-with dvc.api.open('Nigeria/2015-16/Data/sect7b_plantingw3.csv',mode='rb') as csv:
+with dvc.api.open('../Data/sect7b_plantingw3.csv',mode='rb') as csv:
     planting = pd.read_csv(csv)
 
 vars={'hhid': 'j',

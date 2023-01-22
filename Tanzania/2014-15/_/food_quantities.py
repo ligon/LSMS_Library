@@ -5,7 +5,7 @@ from lsms import from_dta
 import dvc.api
 import json
 
-with dvc.api.open('Tanzania/2014-15/Data/hh_sec_j1.DTA',mode='rb') as dta:
+with dvc.api.open('../Data/hh_sec_j1.DTA',mode='rb') as dta:
     q = from_dta(dta)
 
 q = q.rename(columns={'y4_hhid':'j','itemcode':'i','hh_j02_2':'q','hh_j02_1':'u'})

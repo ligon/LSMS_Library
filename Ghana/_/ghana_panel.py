@@ -65,7 +65,7 @@ def age_sex_composition(fn,sex='sex',sex_converter=None,
     
     return df
 
-def household_demographics(fn='',sex='',age='',HHID='HHID',months_spent='months_spent'):
+def household_characteristics(fn='',sex='',age='',HHID='HHID',months_spent='months_spent'):
 
     if type(sex) in [list,tuple]:
         sex,sex_converter = sex

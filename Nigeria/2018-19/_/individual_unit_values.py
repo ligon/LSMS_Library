@@ -49,7 +49,7 @@ lbls = json.load(open('../../_/food_items.json'))
 # Harvest
 t = '2018Q3'
 
-with dvc.api.open('Nigeria/2018-19/Data/sect10b_harvestw4.csv',mode='rb') as csv:
+with dvc.api.open('../Data/sect10b_harvestw4.csv',mode='rb') as csv:
     harvest = pd.read_csv(csv)
 
 vars={'hhid': 'j',

@@ -6,7 +6,7 @@ import numpy as np
 
 t = '2017-18'
 
-myvars = dict(fn='Ghana/%s/Data/11a_foodconsumption_prod_purch.dta' % t,item='foodname',HHID='FPrimary',
+myvars = dict(fn='../Data/11a_foodconsumption_prod_purch.dta',item='foodname',HHID='FPrimary',
               purchased='purchasedcedis',
               produced='producedcedis',
               given='receivedgiftcedis')

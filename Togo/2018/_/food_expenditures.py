@@ -7,7 +7,7 @@ import json
 import dvc.api
 from cfe.df_utils import broadcast_binary_op
 
-with dvc.api.open('Togo/Data/Togo_survey2018_fooditems_forEthan.dta') as dta:
+with dvc.api.open('../Data/Togo_survey2018_fooditems_forEthan.dta') as dta:
     food = pd.read_stata(dta)
 
 vars={'hhid': 'j',

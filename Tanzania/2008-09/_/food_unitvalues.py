@@ -5,7 +5,7 @@ import dvc.api
 import json
 import pandas as pd
 
-with dvc.api.open('Tanzania/2008-09/Data/SEC_K1.dta',mode='rb') as dta:
+with dvc.api.open('../Data/SEC_K1.dta',mode='rb') as dta:
     p = from_dta(dta)
 
 p = p.rename(columns={'hhid':'j','skcode':'i','skq3_amount':'q','skq3_meas':'u','skq4':'x'})

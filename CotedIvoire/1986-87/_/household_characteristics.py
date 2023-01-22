@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 import sys
 sys.path.append('../../_')
-from cotedivoire import household_demographics
+from cotedivoire import household_characteristics
 
-t = '1987-88'
+t = '1986-87'
 
-myvars = dict(fn='CotedIvoire/%s/Data/F01A.DAT' % t, HHID='HID',
+myvars = dict(fn='../Data/F01A.DAT', HHID='HID',
               age='AGEY',sex=('SEX',lambda s: 'm' if s==1 else 'f'),
               months_spent='MON')
 
-z = household_demographics(**myvars)
+z = household_characteristics(**myvars)
 
 z.columns.name = 'k'
 z.index.name = 'j'
@@ -19,5 +19,5 @@ z['m'] = "Cote d'Ivoire"
 
 z = z.reset_index().set_index(['j','t','m'])
 
-z.to_parquet('household_demographics.parquet')
+z.to_parquet('household_characteristics.parquet')
 

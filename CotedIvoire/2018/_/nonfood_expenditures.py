@@ -35,7 +35,7 @@ def nonfood_expenditures(fn='',purchased=None,away=None,produced=None,given=None
 # Wave 1
 t = '2018'
 
-myvars = dict(fn='../%s/Data/Menage/s09b_me_CIV2018.dta' % t,purchased='s09bq03',
+myvars = dict(fn='../Data/Menage/s09b_me_CIV2018.dta',purchased='s09bq03',
               item='s09bq01',filter='vague==1')
 
 x = nonfood_expenditures(**myvars)
