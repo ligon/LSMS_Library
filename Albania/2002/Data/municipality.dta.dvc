@@ -1,0 +1,4 @@
+outs:
+- md5: db123dd7c3edb2245978f6121006051d
+  size: 6798
+  path: municipality.dta
