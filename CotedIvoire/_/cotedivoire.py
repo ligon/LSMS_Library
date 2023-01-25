@@ -68,7 +68,7 @@ def food_quantities(fn='',item='item',HHID='HHID',
 
     return quantities
 
-def household_demographics(fn='',sex='',age='',HHID='HHID',months_spent='months_spent'):
+def household_characteristics(fn='',sex='',age='',HHID='HHID',months_spent='months_spent'):
 
     if type(sex) in [list,tuple]:
         sex,sex_converter = sex

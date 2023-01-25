@@ -58,7 +58,7 @@ with open('../../_/food_items.json') as f:
 
 # See https://microdata.worldbank.org/index.php/catalog/2734/data-dictionary/F112?file_name=food_conv_w3
 
-with dvc.api.open('Nigeria/2015-16/Data/food_conv_w3.csv') as csv:
+with dvc.api.open('../Data/food_conv_w3.csv') as csv:
     conv0 = pd.read_csv(csv)
 
 # Replace unit codes and food codes with labels

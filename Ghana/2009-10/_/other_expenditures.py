@@ -6,7 +6,7 @@ import numpy as np
 
 t = '2009-10'
 
-myvars = dict(fn='Ghana/%s/Data/S11C.dta' % t,item='itemname',HHID='hhno')
+myvars = dict(fn='../Data/S11C.dta',item='itemname',HHID='hhno')
 
 with dvc.api.open(myvars['fn'],mode='rb') as dta:
     df = pd.read_stata(dta)

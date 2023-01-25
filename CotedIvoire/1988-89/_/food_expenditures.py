@@ -5,7 +5,7 @@ from cotedivoire import food_expenditures
 
 t = '1988-89'
 
-myvars = dict(fn='CotedIvoire/%s/Data/SEC12A.DAT' % t,item='FOODCD',HHID='NH',
+myvars = dict(fn='../Data/SEC12A.DAT',item='FOODCD',HHID='NH',
               purchased='CFOODB')
 
 x = food_expenditures(**myvars)
