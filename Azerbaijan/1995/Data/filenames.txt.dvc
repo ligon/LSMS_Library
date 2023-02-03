@@ -1,0 +1,4 @@
+outs:
+- md5: d0991d0bfa584de1ba4c87f7e52256de
+  size: 310
+  path: filenames.txt

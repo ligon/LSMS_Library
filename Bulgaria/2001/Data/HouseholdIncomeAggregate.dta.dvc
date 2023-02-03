@@ -1,0 +1,4 @@
+outs:
+- md5: 492d689b6a70f06b6a708034fbc61034
+  size: 1253152
+  path: HouseholdIncomeAggregate.dta

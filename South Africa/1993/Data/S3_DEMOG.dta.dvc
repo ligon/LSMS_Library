@@ -1,0 +1,4 @@
+outs:
+- md5: d0079c8e8aed593ca2cec3ecd7b7b07a
+  size: 14236
+  path: S3_DEMOG.dta
