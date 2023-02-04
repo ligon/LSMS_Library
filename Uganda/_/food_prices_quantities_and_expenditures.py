@@ -29,6 +29,7 @@ kgs.index.name = 'units'
 kgs.name = 'Kgs/unit'
 
 kgs = kgs.reindex(v.index,level='units')
+kgs = kgs[kgs!=0]
 
 # Convert other units to kilograms, where possible
 p = v[prices]
