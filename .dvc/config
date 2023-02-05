@@ -9,5 +9,5 @@
     gdrive_service_account_json_file_path = gdrive_creds.json
 ['remote "ligonresearch_s3"']
     url = s3://dvcbucket0/LSMS
-    credentialpath = s3_reader_creds
+    credentialpath = s3_creds
     configpath = s3_config
