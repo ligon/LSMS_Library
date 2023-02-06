@@ -1,0 +1,59 @@
+* Prerequisites
+
+  Things you'll want to have set up in advance include:
+
+  - A =bitbucket.org= account.  You'll be much happier if you upload
+    your public =ssh-key= to =bitbucket.org= for authentication
+    purposes.  This is the service that will track changes to source
+    code or other documents, other than those which should be
+    ephemeral (e.g., log files) or files managed by =dvc= (see below).
+
+  - The =git= binary on your local computer.
+
+  - =dvc=.  See https://dvc.org/doc.  This is used to manage static,
+    large files (which aren't a good fit for =git=).  You'll also need
+    to install dependencies which allow =dvc= to work with google
+    drive and s3 buckets.  Provided you have a reasonably modern =python=
+    installation (if you don't we recommend
+    https://www.anaconda.com/), a simple =pip install 'dvc[gdrive]'= and =pip install 'dvc[s3]'= may do the trick.
+
+  - =gnupg=, for managing encryption.
+
+  - =emacs=, for working with the =org-mode= files used in this project.
+
+
+* Setting Up the LSMS Library
+  Follow the following steps to use or add to the LSMS Library.
+
+** Fork or Clone
+   Optionally fork (creating your own version), then clone (using
+   either your own or =eligon='s version) the repo to your local
+   machine, using 
+   #+begin_src sh
+   git clone git@bitbucket.org:eligon/lsms_library.git LSMS_Library
+   #+end_src
+   (Note the capitalization of LSMS_Library, which we'll assume for
+   the purposes of this document).  If you fork, then you should
+   replace the "eligon" string in the above with your own username.
+
+   This step will set up all the files managed by git in the local
+   directory =LSMS_Library= on your machine.
+
+** DVC Setup
+   DVC manages the versioning of more-or-less static datasets.
+   To install,
+   #+begin_src sh
+   pip install dvc[gdrive]
+   pip install dvc[s3]
+   #+end_src
+The private key for accessing the data on google drive is found in the file =gdrive_data_store.json.gpg=.  The =gpg= string indicates that this file is encrypted, in this case using a secret passphrase.
+
+Similarly, the private key for /accessing/ data on the s3 data store is found in =s3_reader_creds.gpg=.  This is encrypted using the same passphrase mentioned above. To learn the secret passphrase you'll need to ask
+   =ligon@berkeley.edu=.  Once you have it:
+   #+begin_src sh
+   gpg -d gdrive_data_store.json.gpg > .dvc/gdrive_creds.json
+   gpg -d s3_reader_creds.gpg > .dvc/s3_creds.json
+   #+end_src
+   And supply the secret passphrase.
+
+   (If this doesn't work, make sure you have =gpg= installed: https://gnupg.org/download/)
