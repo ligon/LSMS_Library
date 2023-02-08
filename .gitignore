@@ -9,3 +9,5 @@ Uganda/var/*
 /Uganda/_/compare_unit_labels.py
 /Uganda/_/unitlabels.csv
 .DS_Store
+/.dvc/s3_creds
+/.dvc/gdrive_creds.json

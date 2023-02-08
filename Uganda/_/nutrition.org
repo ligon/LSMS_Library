@@ -883,7 +883,52 @@ given below:
 |   830103 | * TAMARIND,DRIED,RAW *BOILED*                               | Raw        |               1 | HarvestPlus Uganda |           30103 | Based on #30103 Tamarind,dried,raw                                                                                                                                                    |                                                                                                                                                                                       | USDA                      |                 255.0 | Applied USDA retention factor #255, Fruits(dried),stewed                                                                                                                              | FRUITS AND FRESH/PURE FRUIT JUICES |               9 |      21 |           79 |             275.0 |               3.2 |               0.7 |              72.0 |                   6 |               68.0 |                2.9 |                0.1 |               3.2 |               0.271 |              0.166 |              1.339 |                0.038 |               10.0 |              0 |               10.0 |               10.0 |         0.0 |               26.0 |                2.0 |           0 |               0 |              16.0 |              0 |
 
 *** Supplementary Food Conversion Table
-#+name: fct_add
+The following food from the preferred labels created below don't have matching FCT codes from the table above; thus, their FDC IDs are pulled from FoodData Central
+https://fdc.nal.usda.gov/fdc-app.html#/.
+Labels that starts with "Other" are ignored.
+
+#+name: fct_addition
+| Preferred Label         |  FDC ID | FDC Description                                                 |
+|-------------------------+---------+-----------------------------------------------------------------|
+| Apples                  | 1750339 | Apples, red delicious, with skin, raw                           |
+| Butter                  |  789828 | Butter, stick, unsalted                                         |
+| Cheese                  |  746767 | Cheese, swiss                                                   |
+| Chicken (broiler)       |  171447 | Chicken, broilers or fryers, meat and skin, raw                 |
+| Coffee                  |  171881 | Beverages, coffee, brewed, breakfast blend                      |
+| Coffee (other)          |  171890 | Beverages, coffee, brewed, prepared with tap water              |
+| Cooking Oil (refined)   |  172370 | Oil, vegetable, soybean, refined                                |
+| Cooking Oil (unrefined) |  748608 | Oil, olive, extra virgin                                        |
+| Cornflakes              | 2343937 | Cereal, corn flakes, plain                                      |
+| Cucumber                | 2346406 | Cucumber, with peel, raw                                        |
+| Donuts                  |  174990 | Doughnuts, cake-type, plain (includes unsugared, old-fashioned) |
+| Ginger (fresh)          |  169231 | Ginger root, raw                                                |
+| Ginger (powder)         |  170926 | Spices, ginger, ground                                          |
+| Ice Cream               |  167575 | Ice creams, vanilla                                             |
+| Infant Formula          |  173554 | Infant formula, PBM PRODUCTS, store brand, powder               |
+| Jam/Marmalade           |  169641 | Jams and preserves                                              |
+| Margarine, Butter, etc  |  172339 | Margarine-like, margarine-butter blend, soybean oil and butter  |
+| Salt                    |  746775 | Salt, table, iodized                                            |
+| Sausages                |  174585 | Sausage, smoked link sausage, pork and beef                     |
+| Soybeans (fresh)        |  174270 | Soybeans, mature seeds, raw                                     |
+| Tea                     |  174144 | Beverages, tea, black, ready to drink                           |
+| Tea (green)             |  171917 | Beverages, tea, green, brewed, regular                          |
+| Tea (leaves)            |  173227 | Beverages, tea, black, brewed, prepared with tap water          |
+| Tea (other)             |  173232 | Beverages, tea, herb, other than chamomile, brewed              |
+| Water                   |  173647 | Beverages, water, tap, drinking                                 |
+| Yoghurt                 |  171284 | Yogurt, plain, whole milk                                       |
+
+ #+begin_src python :var tab=fct_addition :colnames no :prologue "# -*- coding: utf-8 -*-" :tangle foo.py
+from cfe.df_utils import orgtbl_to_df
+
+units = orgtbl_to_df(tab)
+
+units.to_csv('fct_addition.csv')
+
+ #+end_src
+
+ #+RESULTS:
+ : None
+
 
 
 ** Nutrient mapping
@@ -1643,174 +1688,173 @@ print(agglabels.groupby('Preferred Label').head(1).squeeze().sort_values().to_ma
 
 
  #+name: i_to_fct
-  | Preferred Label                |  FCT Code | FCT Description                                           |
-  |--------------------------------+-----------+-----------------------------------------------------------|
-  | Apples                         | FDC168203 |                                                           |
-  | Avocado                        |     29110 | AVOCADO,FRESH,RAW                                         |
-  | Beans (dry)                    |      6001 | BEANS,PINTO(K20/NAMBALE),FRESH,RAW                        |
-  | Beans (fresh)                  |      6009 | BEANS,PINTO(K20/NAMBALE),DRIED,RAW                        |
-  | Beef                           |     11021 | BEEF,MEDIUM FAT,FRESH,RAW                                 |
-  | Beef (roasted)                 |     11024 | BEEF,MEDIUM FAT,FRESH,ROASTED                             |
-  | Beef Liver                     |     12001 | BEEF,LIVER,RAW                                            |
-  | Beef Offal                     |     12041 | BEEF,TRIPE,RAW                                            |
-  | Beer                           |     27204 | BEER,CRUDE,AJONO/MALWA/TONTO/OTHERS                       |
-  | Biscuits                       |      1390 | BISCUITS,BASIC RECIPE,BAKED                               |
-  | Bogoya                         |     30001 | BANANA,BOGOYA,RIPE,FRESH,RAW                              |
-  | Bongo                          |      9205 | SOURMILK,FRESH,RAW                                        |
-  | Bread                          |      1305 | BREAD,WHEAT,REFINED FLOUR,BAKED                           |
-  | Butter                         |           |                                                           |
-  | Cabbage (green)                |     29001 | CABBAGE,GREEN,FRESH,RAW                                   |
-  | Cabbage (red)                  |     29005 | CABBAGE,RED,FRESH,RAW                                     |
-  | Cabbages                       |     29001 | CABBAGE,GREEN,FRESH,RAW                                   |
-  | Cakes                          |      1351 | CAKE,BASIC RECIPE,BAKED                                   |
-  | Carrots                        |     29011 | CARROTS,FRESH,RAW                                         |
-  | Cassava (dry)                  |      2020 | CASSAVA FLOUR,RAW                                         |
-  | Cassava (dry/flour)            |      2020 | CASSAVA FLOUR,RAW                                         |
-  | Cassava (flour)                |      2020 | CASSAVA FLOUR,RAW                                         |
-  | Cassava (fresh)                |      2001 | CASSAVA,FRESH,RAW                                         |
-  | Chapati                        |      1371 | CHAPATI,FRIED                                             |
-  | Cheese                         |           |                                                           |
-  | Chicken                        |     13001 | CHICKEN,UNSPECIFIED PART,W/O BONE,MEAT&SKIN,FRESH,RAW     |
-  | Chicken (broiler)              |           |                                                           |
-  | Chicken (local)                |           |                                                           |
-  | Chicken (off-layer)            |           |                                                           |
-  | Chicken (roasted)              |     13004 | CHICKEN,UNSPECIFIED PART,W/O BONE,MEAT&SKIN,FRESH,ROASTED |
-  | Cigarettes                     |           |                                                           |
-  | Coffee                         |           |                                                           |
-  | Coffee (other)                 |           |                                                           |
-  | Cooking Oil (refined)          |           |                                                           |
-  | Cooking Oil (unrefined)        |           |                                                           |
-  | Cooking Oil                    |     25001 | VEGETABLE OIL,UNSPECIFIED BRAND,RAW                       |
-  | Cornflakes                     |           |                                                           |
-  | Cucumber                       |           |                                                           |
-  | Dodo                           |     18031 | AMARANTH LEAVES,FRESH,RAW                                 |
-  | Donuts                         |           |                                                           |
-  | Dry/Smoked Fish                |     14006 | FISH,TILAPIA(TYPE2),SMOKED/DRIED,RAW                      |
-  | Eggplant                       |     29021 | EGGPLANT,THICK&LONG(TYPE1),W/SKIN,FRESH,RAW               |
-  | Eggs                           |     17001 | EGG,CHICKEN,WHOLE,RAW                                     |
-  | Eggs (white yolk)              |           |                                                           |
-  | Eggs (yellow yolk)             |           |                                                           |
-  | Fresh Fish                     |     15101 | FISH,SMALL,WHOLE (UNSPECIFIED),FRESH,RAW                  |
-  | Garlic                         |     29050 | GARLIC,FRESH,RAW                                          |
-  | Ghee                           |     25050 | ANIMAL FAT,COW GHEE(MUZIGO),RAW                           |
-  | Ginger (fresh)                 |           |                                                           |
-  | Ginger (powder)                |           |                                                           |
-  | Goat (roasted)                 |     11124 | GOAT,MEDIUM FAT,FRESH,ROASTED                             |
-  | Goat Liver                     |     12101 | GOAT/LAMB,LIVER,RAW                                       |
-  | Goat Meat                      |     11121 | GOAT,MEDIUM FAT,FRESH,RAW                                 |
-  | Goat Offal                     |     12121 | GOAT/LAMB,TRIPE,RAW                                       |
-  | Green Pepper                   |     29180 | SWEET PEPPER,ALL TYPES,GREEN,FRESH,RAW                    |
-  | Ground Nuts (paste)            |      8010 | GROUNDNUTS,PASTE,RAW                                      |
-  | Ground Nuts (in shell)         |      8005 | GROUNDNUTS,IN-SHELL,FRESH,RAW                             |
-  | Ground Nuts (pounded)          |      8007 | GROUNDNUTS,POWDER,RAW                                     |
-  | Ground Nuts (shelled)          |      8015 | GROUNDNUTS,FRESH,RAW                                      |
-  | Honey                          |     26011 | BEE HONEY,RAW                                             |
-  | Ice Cream                      |           |                                                           |
-  | Infant Formula                 |           |                                                           |
-  | Irish Potatoes                 |      2101 | IRISH POTATO,W/SKIN,FRESH,RAW                             |
-  | Jackfruit (fresh)              |     30091 | JACKFRUIT,RIPE,FRESH,RAW                                  |
-  | Jam/Marmalade                  |           |                                                           |
-  | Kabalagala                     |      1350 | PANCAKE, BANANA/CASSAVA FLOUR,FRIED                       |
-  | Macaroni/Spaghetti             |      1330 | MACARONI,RAW                                              |
-  | Maize (cobs)                   |      1021 | MAIZE ON COB,WHITE VARIETY,FRESH,RAW                      |
-  | Maize (flour)                  |      1041 | MAIZE FLOUR,WHITE VARIETY,REFINED,RAW                     |
-  | Maize (grains)                 |      1001 | MAIZE GRAIN,WHITE VARIETY,FRESH,RAW                       |
-  | Maize (white;cobs)             |      1021 | MAIZE ON COB,WHITE VARIETY,FRESH,RAW                      |
-  | Maize (white;flour)            |      1041 | MAIZE FLOUR,WHITE VARIETY,REFINED,RAW                     |
-  | Maize (white;grains)           |      1001 | MAIZE GRAIN,WHITE VARIETY,FRESH,RAW                       |
-  | Maize (yellow;cobs)            |      1025 | MAIZE ON COB,YELLOW VARIETY,FRESH,RAW                     |
-  | Maize (yellow;flour)           |      1043 | MAIZE FLOUR,YELLOW VARIETY,REFINED,RAW                    |
-  | Maize (yellow;grains)          |      1004 | MAIZE GRAIN,YELLOW VARIETY,FRESH,RAW                      |
-  | Mangos                         |     30025 | MANGO,RIPE,W/SKIN,FRESH,RAW                               |
-  | Margarine, Butter, etc         |           |                                                           |
-  | Matoke (??)                    |      5011 | BANANA,MATOOKE,RIPE,FRESH,RAW                             |
-  | Matoke (bunch)                 |           |                                                           |
-  | Matoke (cluster)               |           |                                                           |
-  | Matoke (heap)                  |           |                                                           |
-  | Matoke (other)                 |           |                                                           |
-  | Matoke (piece)                 |           |                                                           |
-  | Matoke (sack)                  |           |                                                           |
-  | Milk (Fresh)                   |      9001 | MILK,COW,WHOLE,FRESH,RAW                                  |
-  | Milk (powdered)                |      9005 | MILK,POWDER,WHOLE,DRIED,RAW                               |
-  | Millet                         |      1101 | MILLET GRAIN,DRIED,RAW                                    |
-  | Millet Flour                   |      1104 | MILLET FLOUR,RAW                                          |
-  | Mukene                         |     15020 | FISH,SILVER FISH (TYPE6),FRESH,RAW                        |
-  | Mushrooms                      |     29200 | MUSHROOM,FRESH,RAW                                        |
-  | Ndiizi                         |      5170 | BANANA,NDIIZI,GREEN,FRESH,RAW                             |
-  | Nkejje (dried)                 |     15006 | FISH,NKEJJE (TYPE 6),DRIED,RAW                            |
-  | Okra                           |     18081 | OKRA LEAVES,FRESH,RAW                                     |
-  | Onions                         |     29052 | ONION,LARGE BULB,FRESH,RAW                                |
-  | Oranges                        |     30093 | ORANGE,FRESH,RAW                                          |
-  | Other Alcoholic Drinks         |           |                                                           |
-  | Other Drinks                   |           |                                                           |
-  | Other Eggs                     |           |                                                           |
-  | Other Fish (dried)             |           |                                                           |
-  | Other Fish (fresh)             |           |                                                           |
-  | Other Foods                    |           |                                                           |
-  | Other Fruits                   |           |                                                           |
-  | Other Juice                    |           |                                                           |
-  | Other Juice (fresh)            |           |                                                           |
-  | Other Juice (packed)           |     27086 | FRUIT FLAVOURED DRINK/JUICE,COMMERCIAL,READY-TO-DRINK     |
-  | Other Juice (restaurants)      |           |                                                           |
-  | Other Meat                     |           |                                                           |
-  | Other Meat (roasted)           |           |                                                           |
-  | Other Spices                   |           |                                                           |
-  | Other Tobacco                  |           |                                                           |
-  | Other Vegetables               |           |                                                           |
-  | Passion Fruits                 |     30012 | PASSIONFRUIT,ALL TYPES,RIPE,FRESH,RAW                     |
-  | Pawpaw                         |           |                                                           |
-  | Peas                           |      6211 | COWPEAS,FRESH,RAW                                         |
-  | Peas (dry)                     |      6215 | COWPEAS,DRIED,RAW                                         |
-  | Perch (dried)                  |     14026 | FISH,NILE PERCH(TYPE3),SMOKED/DRIED,RAW                   |
-  | Perch (fresh)                  |     14021 | FISH,NILE PERCH(TYPE3),FRESH,RAW                          |
-  | Pineapple                      |     30043 | PINEAPPLE,RIPE,FRESH,RAW                                  |
-  | Platains                       |           |                                                           |
-  | Pork                           |     11321 | PORK,MEDIUM FAT,FRESH,RAW                                 |
-  | Pork (roasted)                 |     11326 | PORK,MEDIUM FAT,SMOKED,RAW                                |
-  | Pumpkin Leaves                 |     18051 | PUMPKIN LEAVES,FRESH,RAW                                  |
-  | Pumpkins                       |     29120 | PUMPKIN,MATURE,WO/SKIN,FRESH,RAW                          |
-  | Restaurant (beer)              |     27204 | BEER,CRUDE,AJONO/MALWA/TONTO/OTHERS                       |
-  | Restaurant (food)              |           |                                                           |
-  | Restaurant (soda)              |     27090 | CARBONATED SOFT DRINK (SODA)                              |
-  | Rice                           |      1201 | RICE,WHITE,POLISHED,RAW                                   |
-  | Rice (brown)                   |      1204 | RICE,BROWN,UNPOLISHED,RAW                                 |
-  | Rice (white)                   |      1201 | RICE,WHITE,POLISHED,RAW                                   |
-  | Rice flour                     |      1207 | RICE FLOUR,WHITE,RAW                                      |
-  | Salt                           |           |                                                           |
-  | Samosas                        |      1400 | SAMOSA,BEEF FILLING,FRIED                                 |
-  | Sausages                       |           |                                                           |
-  | Sim Sim                        |      8051 | SESAME SEEDS,DRIED,RAW                                    |
-  | Sim Sim (paste)                |      8053 | SESAME SEED PASTE,RAW                                     |
-  | Soda                           |     27090 | CARBONATED SOFT DRINK (SODA)                              |
-  | Sorghum                        |      1106 | SORGHUM,DRIED,RAW                                         |
-  | Soybeans (dry)                 |      7011 | SOYBEAN,DRIED,ROASTED                                     |
-  | Soybeans (fresh)               |           |                                                           |
-  | Sugar                          |     26002 | SUGAR,ALL GRADES,RAW                                      |
-  | Sugarcane                      |     26001 | SUGARCANE,RAW                                             |
-  | Sweet Bananas                  |      5071 | BANANA,GONJA,RIPE,FRESH,RAW                               |
-  | Sweet Potatoes (dry)           |      4018 | SWEETPOTATO,YELLOW,WO/SKIN,DRIED,RAW                      |
-  | Sweet Potatoes (flour)         |      4133 | SWEETPOTATO FLOUR, YELLOW,RAW                             |
-  | Sweet Potatoes (fresh)         |      4003 | SWEETPOTATO,YELLOW,W/SKIN,FRESH,RAW                       |
-  | Sweet Potatoes (orange, dry)   |      4118 | SWEETPOTATO,ORANGE,WO/SKIN,DRIED,RAW                      |
-  | Sweet Potatoes (orange, flour) |      4131 | SWEETPOTATO FLOUR,ORANGE, RAW                             |
-  | Sweet Potatoes (orange, fresh) |      4103 | SWEETPOTATO,ORANGE,W/SKIN,FRESH,RAW                       |
-  | Sweet Potatoes (white, dry)    |      3018 | SWEETPOTATO,WHITE,WO/SKIN,DRIED,RAW                       |
-  | Sweet Potatoes (white, flour)  |      4132 | SWEETPOTATO FLOUR, WHITE,RAW                              |
-  | Sweet Potatoes (white, fresh)  |      3003 | SWEETPOTATO,WHITE,W/SKIN,FRESH,RAW                        |
-  | Tea                            |           |                                                           |
-  | Tea (green)                    |           |                                                           |
-  | Tea (leaves)                   |           |                                                           |
-  | Tea (other)                    |           |                                                           |
-  | Tilapia (dried)                |     14006 | FISH,TILAPIA(TYPE2),SMOKED/DRIED,RAW                      |
-  | Tilapia (fresh)                |     14001 | FISH,TILAPIA(TYPE2)FRESH,RAW                              |
-  | Tomatoes                       |     29063 | TOMATO,RIPE,FRESH,RAW                                     |
-  | Waragi                         |     27301 | WARAGI (GIN),CRUDE                                        |
-  | Water                          |           |                                                           |
-  | Watermelon                     |     30201 | WATERMELON,RIPE,FRESH,RAW                                 |
-  | Wheat (flour)                  |      1301 | WHEAT FLOUR,REFINED,RAW                                   |
-  | Yams (arrowroot)               |      2241 | YAM,(NDAGGU,BALUGGU,OTHERS),FRESH,RAW                     |
-  | Yoghurt                        |           |                                                           |
-
+  | Preferred Label                |   FCT Code | FCT Description                                                 |
+  |--------------------------------+------------+-----------------------------------------------------------------|
+  | Apples                         | FDC1750339 | Apples, red delicious, with skin, raw                           |
+  | Avocado                        |      29110 | AVOCADO,FRESH,RAW                                               |
+  | Beans (dry)                    |       6001 | BEANS,PINTO(K20/NAMBALE),FRESH,RAW                              |
+  | Beans (fresh)                  |       6009 | BEANS,PINTO(K20/NAMBALE),DRIED,RAW                              |
+  | Beef                           |      11021 | BEEF,MEDIUM FAT,FRESH,RAW                                       |
+  | Beef (roasted)                 |      11024 | BEEF,MEDIUM FAT,FRESH,ROASTED                                   |
+  | Beef Liver                     |      12001 | BEEF,LIVER,RAW                                                  |
+  | Beef Offal                     |      12041 | BEEF,TRIPE,RAW                                                  |
+  | Beer                           |      27204 | BEER,CRUDE,AJONO/MALWA/TONTO/OTHERS                             |
+  | Biscuits                       |       1390 | BISCUITS,BASIC RECIPE,BAKED                                     |
+  | Bogoya                         |      30001 | BANANA,BOGOYA,RIPE,FRESH,RAW                                    |
+  | Bongo                          |       9205 | SOURMILK,FRESH,RAW                                              |
+  | Bread                          |       1305 | BREAD,WHEAT,REFINED FLOUR,BAKED                                 |
+  | Butter                         |  FDC789828 | Butter, stick, unsalted                                         |
+  | Cabbage (green)                |      29001 | CABBAGE,GREEN,FRESH,RAW                                         |
+  | Cabbage (red)                  |      29005 | CABBAGE,RED,FRESH,RAW                                           |
+  | Cabbages                       |      29001 | CABBAGE,GREEN,FRESH,RAW                                         |
+  | Cakes                          |       1351 | CAKE,BASIC RECIPE,BAKED                                         |
+  | Carrots                        |      29011 | CARROTS,FRESH,RAW                                               |
+  | Cassava (dry)                  |       2020 | CASSAVA FLOUR,RAW                                               |
+  | Cassava (dry/flour)            |       2020 | CASSAVA FLOUR,RAW                                               |
+  | Cassava (flour)                |       2020 | CASSAVA FLOUR,RAW                                               |
+  | Cassava (fresh)                |       2001 | CASSAVA,FRESH,RAW                                               |
+  | Chapati                        |       1371 | CHAPATI,FRIED                                                   |
+  | Cheese                         |  FDC746767 | Cheese, swiss                                                   |
+  | Chicken                        |      13001 | CHICKEN,UNSPECIFIED PART,W/O BONE,MEAT&SKIN,FRESH,RAW           |
+  | Chicken (broiler)              |  FDC171447 | Chicken, broilers or fryers, meat and skin, raw                 |
+  | Chicken (local)                |      13001 | CHICKEN,UNSPECIFIED PART,W/O BONE,MEAT&SKIN,FRESH,RAW           |
+  | Chicken (off-layer)            |      13001 | CHICKEN,UNSPECIFIED PART,W/O BONE,MEAT&SKIN,FRESH,RAW           |
+  | Chicken (roasted)              |      13004 | CHICKEN,UNSPECIFIED PART,W/O BONE,MEAT&SKIN,FRESH,ROASTED       |
+  | Cigarettes                     |            |                                                                 |
+  | Coffee                         |  FDC171881 | Beverages, coffee, brewed, breakfast blend                      |
+  | Coffee (other)                 |  FDC171890 | Beverages, coffee, brewed, prepared with tap water              |
+  | Cooking Oil (refined)          |  FDC172370 | Oil, vegetable, soybean, refined                                |
+  | Cooking Oil (unrefined)        |  FDC748608 | Oil, olive, extra virgin                                        |
+  | Cooking Oil                    |      25001 | VEGETABLE OIL,UNSPECIFIED BRAND,RAW                             |
+  | Cornflakes                     | FDC2343937 | Cereal, corn flakes, plain                                      |
+  | Cucumber                       | FDC2346406 | Cucumber, with peel, raw                                        |
+  | Dodo                           |      18031 | AMARANTH LEAVES,FRESH,RAW                                       |
+  | Donuts                         |  FDC174990 | Doughnuts, cake-type, plain (includes unsugared, old-fashioned) |
+  | Dry/Smoked Fish                |      14006 | FISH,TILAPIA(TYPE2),SMOKED/DRIED,RAW                            |
+  | Eggplant                       |      29021 | EGGPLANT,THICK&LONG(TYPE1),W/SKIN,FRESH,RAW                     |
+  | Eggs                           |      17001 | EGG,CHICKEN,WHOLE,RAW                                           |
+  | Eggs (white yolk)              |      17016 | EGG,CHICKEN,WHITE,RAW                                           |
+  | Eggs (yellow yolk)             |      17004 | EGG,CHICKEN,YOLK,RAW                                            |
+  | Fresh Fish                     |      15101 | FISH,SMALL,WHOLE (UNSPECIFIED),FRESH,RAW                        |
+  | Garlic                         |      29050 | GARLIC,FRESH,RAW                                                |
+  | Ghee                           |      25050 | ANIMAL FAT,COW GHEE(MUZIGO),RAW                                 |
+  | Ginger (fresh)                 |  FDC169231 | Ginger root, raw                                                |
+  | Ginger (powder)                |  FDC170926 | Spices, ginger, ground                                          |
+  | Goat (roasted)                 |      11124 | GOAT,MEDIUM FAT,FRESH,ROASTED                                   |
+  | Goat Liver                     |      12101 | GOAT/LAMB,LIVER,RAW                                             |
+  | Goat Meat                      |      11121 | GOAT,MEDIUM FAT,FRESH,RAW                                       |
+  | Goat Offal                     |      12121 | GOAT/LAMB,TRIPE,RAW                                             |
+  | Green Pepper                   |      29180 | SWEET PEPPER,ALL TYPES,GREEN,FRESH,RAW                          |
+  | Ground Nuts (paste)            |       8010 | GROUNDNUTS,PASTE,RAW                                            |
+  | Ground Nuts (in shell)         |       8005 | GROUNDNUTS,IN-SHELL,FRESH,RAW                                   |
+  | Ground Nuts (pounded)          |       8007 | GROUNDNUTS,POWDER,RAW                                           |
+  | Ground Nuts (shelled)          |       8015 | GROUNDNUTS,FRESH,RAW                                            |
+  | Honey                          |      26011 | BEE HONEY,RAW                                                   |
+  | Ice Cream                      |  FDC167575 | Ice creams, vanilla                                             |
+  | Infant Formula                 |  FDC173554 | Infant formula, PBM PRODUCTS, store brand, powder               |
+  | Irish Potatoes                 |       2101 | IRISH POTATO,W/SKIN,FRESH,RAW                                   |
+  | Jackfruit (fresh)              |      30091 | JACKFRUIT,RIPE,FRESH,RAW                                        |
+  | Jam/Marmalade                  |  FDC169641 | Jams and preserves                                              |
+  | Kabalagala                     |       1350 | PANCAKE, BANANA/CASSAVA FLOUR,FRIED                             |
+  | Macaroni/Spaghetti             |       1330 | MACARONI,RAW                                                    |
+  | Maize (cobs)                   |       1021 | MAIZE ON COB,WHITE VARIETY,FRESH,RAW                            |
+  | Maize (flour)                  |       1041 | MAIZE FLOUR,WHITE VARIETY,REFINED,RAW                           |
+  | Maize (grains)                 |       1001 | MAIZE GRAIN,WHITE VARIETY,FRESH,RAW                             |
+  | Maize (white;cobs)             |       1021 | MAIZE ON COB,WHITE VARIETY,FRESH,RAW                            |
+  | Maize (white;flour)            |       1041 | MAIZE FLOUR,WHITE VARIETY,REFINED,RAW                           |
+  | Maize (white;grains)           |       1001 | MAIZE GRAIN,WHITE VARIETY,FRESH,RAW                             |
+  | Maize (yellow;cobs)            |       1025 | MAIZE ON COB,YELLOW VARIETY,FRESH,RAW                           |
+  | Maize (yellow;flour)           |       1043 | MAIZE FLOUR,YELLOW VARIETY,REFINED,RAW                          |
+  | Maize (yellow;grains)          |       1004 | MAIZE GRAIN,YELLOW VARIETY,FRESH,RAW                            |
+  | Mangos                         |      30025 | MANGO,RIPE,W/SKIN,FRESH,RAW                                     |
+  | Margarine, Butter, etc         |  FDC172339 | Margarine-like, margarine-butter blend, soybean oil and butter  |
+  | Matoke (??)                    |       5011 | BANANA,MATOOKE,RIPE,FRESH,RAW                                   |
+  | Matoke (bunch)                 |       5011 | BANANA,MATOOKE,RIPE,FRESH,RAW                                   |
+  | Matoke (cluster)               |       5011 | BANANA,MATOOKE,RIPE,FRESH,RAW                                   |
+  | Matoke (heap)                  |       5011 | BANANA,MATOOKE,RIPE,FRESH,RAW                                   |
+  | Matoke (other)                 |       5011 | BANANA,MATOOKE,RIPE,FRESH,RAW                                   |
+  | Matoke (piece)                 |       5011 | BANANA,MATOOKE,RIPE,FRESH,RAW                                   |
+  | Matoke (sack)                  |       5011 | BANANA,MATOOKE,RIPE,FRESH,RAW                                   |
+  | Milk (Fresh)                   |       9001 | MILK,COW,WHOLE,FRESH,RAW                                        |
+  | Milk (powdered)                |       9005 | MILK,POWDER,WHOLE,DRIED,RAW                                     |
+  | Millet                         |       1101 | MILLET GRAIN,DRIED,RAW                                          |
+  | Millet Flour                   |       1104 | MILLET FLOUR,RAW                                                |
+  | Mukene                         |      15020 | FISH,SILVER FISH (TYPE6),FRESH,RAW                              |
+  | Mushrooms                      |      29200 | MUSHROOM,FRESH,RAW                                              |
+  | Ndiizi                         |       5170 | BANANA,NDIIZI,GREEN,FRESH,RAW                                   |
+  | Nkejje (dried)                 |      15006 | FISH,NKEJJE (TYPE 6),DRIED,RAW                                  |
+  | Okra                           |      18081 | OKRA LEAVES,FRESH,RAW                                           |
+  | Onions                         |      29052 | ONION,LARGE BULB,FRESH,RAW                                      |
+  | Oranges                        |      30093 | ORANGE,FRESH,RAW                                                |
+  | Other Alcoholic Drinks         |            |                                                                 |
+  | Other Drinks                   |            |                                                                 |
+  | Other Eggs                     |            |                                                                 |
+  | Other Fish (dried)             |            |                                                                 |
+  | Other Fish (fresh)             |            |                                                                 |
+  | Other Foods                    |            |                                                                 |
+  | Other Fruits                   |            |                                                                 |
+  | Other Juice                    |            |                                                                 |
+  | Other Juice (fresh)            |            |                                                                 |
+  | Other Juice (packed)           |      27086 | FRUIT FLAVOURED DRINK/JUICE,COMMERCIAL,READY-TO-DRINK           |
+  | Other Juice (restaurants)      |            |                                                                 |
+  | Other Meat                     |            |                                                                 |
+  | Other Meat (roasted)           |            |                                                                 |
+  | Other Spices                   |            |                                                                 |
+  | Other Tobacco                  |            |                                                                 |
+  | Other Vegetables               |            |                                                                 |
+  | Passion Fruits                 |      30012 | PASSIONFRUIT,ALL TYPES,RIPE,FRESH,RAW                           |
+  | Pawpaw                         |            |                                                                 |
+  | Peas                           |       6211 | COWPEAS,FRESH,RAW                                               |
+  | Peas (dry)                     |       6215 | COWPEAS,DRIED,RAW                                               |
+  | Perch (dried)                  |      14026 | FISH,NILE PERCH(TYPE3),SMOKED/DRIED,RAW                         |
+  | Perch (fresh)                  |      14021 | FISH,NILE PERCH(TYPE3),FRESH,RAW                                |
+  | Pineapple                      |      30043 | PINEAPPLE,RIPE,FRESH,RAW                                        |
+  | Platains                       |       5061 | BANANA,GONJA,GREEN,FRESH,RAW                                    |
+  | Pork                           |      11321 | PORK,MEDIUM FAT,FRESH,RAW                                       |
+  | Pork (roasted)                 |      11326 | PORK,MEDIUM FAT,SMOKED,RAW                                      |
+  | Pumpkin Leaves                 |      18051 | PUMPKIN LEAVES,FRESH,RAW                                        |
+  | Pumpkins                       |      29120 | PUMPKIN,MATURE,WO/SKIN,FRESH,RAW                                |
+  | Restaurant (beer)              |      27204 | BEER,CRUDE,AJONO/MALWA/TONTO/OTHERS                             |
+  | Restaurant (food)              |            |                                                                 |
+  | Restaurant (soda)              |      27090 | CARBONATED SOFT DRINK (SODA)                                    |
+  | Rice                           |       1201 | RICE,WHITE,POLISHED,RAW                                         |
+  | Rice (brown)                   |       1204 | RICE,BROWN,UNPOLISHED,RAW                                       |
+  | Rice (white)                   |       1201 | RICE,WHITE,POLISHED,RAW                                         |
+  | Rice flour                     |       1207 | RICE FLOUR,WHITE,RAW                                            |
+  | Salt                           |  FDC746775 | Salt, table, iodized                                            |
+  | Samosas                        |       1400 | SAMOSA,BEEF FILLING,FRIED                                       |
+  | Sausages                       |  FDC174585 | Sausage, smoked link sausage, pork and beef                     |
+  | Sim Sim                        |       8051 | SESAME SEEDS,DRIED,RAW                                          |
+  | Sim Sim (paste)                |       8053 | SESAME SEED PASTE,RAW                                           |
+  | Soda                           |      27090 | CARBONATED SOFT DRINK (SODA)                                    |
+  | Sorghum                        |       1106 | SORGHUM,DRIED,RAW                                               |
+  | Soybeans (dry)                 |       7011 | SOYBEAN,DRIED,ROASTED                                           |
+  | Soybeans (fresh)               |  FDC174270 | Soybeans, mature seeds, raw                                     |
+  | Sugar                          |      26002 | SUGAR,ALL GRADES,RAW                                            |
+  | Sugarcane                      |      26001 | SUGARCANE,RAW                                                   |
+  | Sweet Bananas                  |       5071 | BANANA,GONJA,RIPE,FRESH,RAW                                     |
+  | Sweet Potatoes (dry)           |       4018 | SWEETPOTATO,YELLOW,WO/SKIN,DRIED,RAW                            |
+  | Sweet Potatoes (flour)         |       4133 | SWEETPOTATO FLOUR, YELLOW,RAW                                   |
+  | Sweet Potatoes (fresh)         |       4003 | SWEETPOTATO,YELLOW,W/SKIN,FRESH,RAW                             |
+  | Sweet Potatoes (orange, dry)   |       4118 | SWEETPOTATO,ORANGE,WO/SKIN,DRIED,RAW                            |
+  | Sweet Potatoes (orange, flour) |       4131 | SWEETPOTATO FLOUR,ORANGE, RAW                                   |
+  | Sweet Potatoes (orange, fresh) |       4103 | SWEETPOTATO,ORANGE,W/SKIN,FRESH,RAW                             |
+  | Sweet Potatoes (white, dry)    |       3018 | SWEETPOTATO,WHITE,WO/SKIN,DRIED,RAW                             |
+  | Sweet Potatoes (white, flour)  |       4132 | SWEETPOTATO FLOUR, WHITE,RAW                                    |
+  | Sweet Potatoes (white, fresh)  |       3003 | SWEETPOTATO,WHITE,W/SKIN,FRESH,RAW                              |
+  | Tea                            |  FDC174144 | Beverages, tea, black, ready to drink                           |
+  | Tea (green)                    |  FDC171917 | Beverages, tea, green, brewed, regular                          |
+  | Tea (leaves)                   |  FDC173227 | Beverages, tea, black, brewed, prepared with tap water          |
+  | Tea (other)                    |  FDC173232 | Beverages, tea, herb, other than chamomile, brewed              |
+  | Tilapia (dried)                |      14006 | FISH,TILAPIA(TYPE2),SMOKED/DRIED,RAW                            |
+  | Tilapia (fresh)                |      14001 | FISH,TILAPIA(TYPE2)FRESH,RAW                                    |
+  | Tomatoes                       |      29063 | TOMATO,RIPE,FRESH,RAW                                           |
+  | Waragi                         |      27301 | WARAGI (GIN),CRUDE                                              |
+  | Water                          |  FDC173647 | Beverages, water, tap, drinking                                 |
+  | Watermelon                     |      30201 | WATERMELON,RIPE,FRESH,RAW                                       |
+  | Wheat (flour)                  |       1301 | WHEAT FLOUR,REFINED,RAW                                         |
+  | Yams (arrowroot)               |       2241 | YAM,(NDAGGU,BALUGGU,OTHERS),FRESH,RAW                           |
+  | Yoghurt                        |  FDC171284 | Yogurt, plain, whole milk                                       |
 
 
 *** Select Foods from FCT, harmonize labels, write to google sheet
@@ -1863,130 +1907,112 @@ print(df_to_orgtbl(fct,float_fmt='%6.2f'))
 #+end_src
 
 #+results:
-| i               |  Energy | Protein |  Fiber |  Folate | Calcium | Carbohydrate |   Iron | Niacin | Riboflavin | Thiamin | Vitamin A | Vitamin B-12 | Vitamin B-6 | Vitamin C |  Zinc |
-|-----------------+---------+---------+--------+---------+---------+--------------+--------+--------+------------+---------+-----------+--------------+-------------+-----------+-------|
-| Beans           | 1060.00 |   65.00 |  50.00 | 1040.00 |  270.00 |       191.00 |  16.00 |   2.86 |       0.49 |    0.87 |      0.00 |         0.00 |        0.73 |     14.00 |  7.00 |
-| Beef            | 2910.00 |  264.00 |   0.00 |   50.00 |   90.00 |         0.00 |  27.00 |  33.50 |       2.20 |    0.50 |      0.00 |        18.50 |        1.70 |      0.00 | 60.00 |
-| Beer            |  430.00 |    5.00 |   0.00 |   60.00 |   40.00 |        35.00 |   0.00 |   5.10 |       0.30 |    0.10 |      0.00 |         0.20 |        0.50 |      0.00 |  0.00 |
-| Bread           | 2660.00 |   76.00 |  20.00 | 1110.00 | 1510.00 |       506.00 |  37.00 |  43.85 |       3.31 |    4.55 |      0.00 |         0.00 |        0.84 |      0.00 |  7.00 |
-| Bun             | 2660.00 |   76.00 |  20.00 | 1110.00 | 1510.00 |       506.00 |  37.00 |  43.85 |       3.31 |    4.55 |      0.00 |         0.00 |        0.84 |      0.00 |  7.00 |
-| Cabbages        |  250.00 |   13.00 |  30.00 |  430.00 |  400.00 |        58.00 |   5.00 |   2.34 |       0.40 |    0.61 |     50.00 |         0.00 |        1.24 |    366.00 |  2.00 |
-| Cassava         | 1600.00 |   14.00 |  20.00 |  270.00 |  160.00 |       381.00 |   3.00 |   8.54 |       0.48 |    0.87 |     10.00 |         0.00 |        0.88 |    206.00 |  3.00 |
-| Cassava (flour) | 3140.00 |   26.00 |  40.00 |  360.00 |  310.00 |       766.00 |  19.00 |  14.00 |       0.50 |    3.10 |     70.00 |         0.00 |        7.00 |    720.00 |  7.00 |
-| Chapati         | 2750.00 |   91.00 |  20.00 |  240.00 |  860.00 |       557.00 |  14.00 |  21.42 |       0.97 |    2.67 |      0.00 |         0.00 |        0.34 |      0.00 |  8.00 |
-| Chicken         | 1840.00 |  274.00 |   0.00 |   30.00 |  130.00 |         0.00 |   9.00 |  78.07 |       1.15 |    0.41 |    250.00 |         2.10 |        2.90 |      0.00 | 10.00 |
-| Cooking Oil     | 8840.00 |    0.00 |   0.00 |    0.00 |    0.00 |         0.00 |   0.00 |   0.00 |       0.00 |    0.00 |      0.00 |         0.00 |        0.00 |      0.00 |  0.00 |
-| Dodo            |  230.00 |   25.00 |   0.00 |  850.00 | 2150.00 |        40.00 |  23.00 |   6.58 |       1.58 |    0.27 |   1460.00 |         0.00 |        1.92 |    433.00 |  9.00 |
-| Dried Fish      | 1170.00 |  249.00 |   0.00 |   60.00 | 1020.00 |         0.00 |  12.00 |  19.00 |       1.20 |    0.80 |    100.00 |        22.00 |        1.40 |     17.00 | 14.00 |
-| Eggs            | 1430.00 |  126.00 |   0.00 |  470.00 |  530.00 |         8.00 |  18.00 |   0.70 |       4.78 |    0.69 |   1400.00 |        12.90 |        1.43 |      0.00 | 11.00 |
-| Fresh Fish      |  960.00 |  201.00 |   0.00 |  220.00 |  100.00 |         0.00 |   6.00 |  37.08 |       0.60 |    0.37 |      0.00 |        14.20 |        1.46 |      0.00 |  3.00 |
-| Fresh Milk      |  600.00 |   32.00 |   0.00 |   50.00 | 1130.00 |        45.00 |   0.00 |   1.07 |       1.83 |    0.44 |    280.00 |         4.40 |        0.36 |      0.00 |  4.00 |
-| Ghee            | 8760.00 |    3.00 |   0.00 |    0.00 |   40.00 |         0.00 |   0.00 |   0.03 |       0.05 |    0.01 |   8400.00 |         0.10 |        0.01 |      0.00 |  0.00 |
-| Goat Meat       | 1090.00 |  206.00 |   0.00 |   40.00 |  130.00 |         0.00 |  28.00 |  35.63 |       4.41 |    0.61 |      0.00 |         7.50 |        1.30 |      0.00 | 40.00 |
-| Ground Nut      | 2240.00 |   57.00 |  40.00 |  100.00 |   40.00 |       455.00 |  17.00 |  21.09 |       1.16 |    2.12 |     60.00 |         0.00 |        3.61 |      0.00 | 13.00 |
-| Infant Formula  | 4960.00 |  263.00 |   0.00 |  310.00 | 9120.00 |       384.00 |   5.00 |   5.17 |      10.85 |    1.98 |   1930.00 |        26.00 |        1.81 |     69.00 | 33.00 |
-| Irish Potato    |  770.00 |   20.00 |  20.00 |  160.00 |  120.00 |       175.00 |   8.00 |  10.54 |       0.32 |    0.80 |      0.00 |         0.00 |        2.95 |    197.00 |  3.00 |
-| Maize           | 3970.00 |  102.00 |  80.00 |  140.00 |   80.00 |       809.00 |  28.00 |  35.52 |       1.97 |    3.35 |    110.00 |         0.00 |        6.09 |      0.00 | 24.00 |
-| Matoke          | 1220.00 |   13.00 |  20.00 |  220.00 |   30.00 |       319.00 |   6.00 |   6.86 |       0.54 |    0.52 |    560.00 |         0.00 |        2.99 |    184.00 |  1.00 |
-| Millet          | 3740.00 |  109.00 |  90.00 |  500.00 |   70.00 |       721.00 |  29.00 |  28.01 |       2.73 |    2.29 |      0.00 |         0.00 |        1.90 |      0.00 | 17.00 |
-| Onions          |  400.00 |   11.00 |  20.00 |  190.00 |  230.00 |        93.00 |   2.00 |   1.20 |       0.30 |    0.50 |      0.00 |         0.00 |        1.20 |     74.00 |  2.00 |
-| Oranges         |  470.00 |    9.00 |  20.00 |  290.00 |  400.00 |       118.00 |   1.00 |   2.82 |       0.40 |    0.83 |    110.00 |         0.00 |        0.57 |    505.00 |  1.00 |
-| Passion Fruit   |  970.00 |   22.00 | 100.00 |   80.00 |  110.00 |       234.00 |  14.00 |  12.00 |       1.17 |    0.00 |    480.00 |         0.00 |        0.80 |    240.00 |  1.00 |
-| Peas            |  810.00 |   54.00 |  50.00 |  650.00 |  250.00 |       145.00 |  15.00 |  20.90 |       1.32 |    2.66 |    380.00 |         0.00 |        1.69 |    400.00 | 12.00 |
-| Pork            | 2000.00 |  195.00 |   0.00 |   40.00 |  190.00 |         0.00 |   8.00 |  42.66 |       2.25 |    4.90 |     20.00 |         0.00 |        2.99 |      5.00 | 19.00 |
-| Rice            | 3600.00 |   66.00 |   0.00 |   50.00 |   90.00 |       793.00 |   8.00 |  14.40 |       0.43 |    0.49 |      0.00 |         0.00 |        1.31 |      0.00 | 12.00 |
-| Sim Sim         | 5730.00 |  177.00 | 118.00 |  970.00 | 9750.00 |       235.00 | 145.50 |  45.20 |       2.50 |    7.90 |      0.00 |         0.00 |        7.90 |      0.00 | 77.50 |
-| Soda            |  480.00 |    0.00 |   0.00 |    0.00 |   50.00 |       123.00 |   1.00 |   0.00 |       0.00 |    0.00 |      0.00 |         0.00 |        0.00 |      0.00 |  1.00 |
-| Sorghum         | 3390.00 |  113.00 |  60.00 |   80.00 |  240.00 |       746.00 |  42.00 |  17.56 |       1.35 |    1.30 |      0.00 |         0.00 |        0.75 |      0.00 | 16.00 |
-| Sugar           | 3870.00 |    0.00 |   0.00 |    0.00 |   10.00 |      1000.00 |   0.00 |   0.00 |       0.19 |    0.00 |      0.00 |         0.00 |        0.00 |      0.00 |  0.00 |
-| Sweet Banana    | 1220.00 |   13.00 |  20.00 |  220.00 |   30.00 |       319.00 |   6.00 |   6.86 |       0.54 |    0.52 |    560.00 |         0.00 |        2.99 |    184.00 |  1.00 |
-| Sweet Potatoes  | 1170.00 |   22.00 |  40.00 |  150.00 |  410.00 |       274.00 |   8.00 |   7.61 |       0.83 |    1.07 |      0.00 |         0.00 |        2.85 |     33.00 |  4.00 |
-| Tomatoes        |  180.00 |    9.00 |  10.00 |  150.00 |  100.00 |        39.00 |   3.00 |   5.94 |       0.19 |    0.37 |    420.00 |         0.00 |        0.80 |    127.00 |  2.00 |
-| Wheat (flour)   | 3640.00 |  103.00 |  30.00 |  260.00 |  150.00 |       763.00 |  12.00 |  12.50 |       0.40 |    1.20 |      0.00 |         0.00 |        0.44 |      0.00 |  7.00 |
-
 Missing dependencies for OracleDemands.
-| i               |  Energy | Protein |  Fiber |  Folate | Calcium | Carbohydrate |   Iron | Niacin | Riboflavin | Thiamin | Vitamin A | Vitamin B-12 | Vitamin B-6 | Vitamin C |  Zinc |
-|-----------------+---------+---------+--------+---------+---------+--------------+--------+--------+------------+---------+-----------+--------------+-------------+-----------+-------|
-| Beans           | 1060.00 |   65.00 |  50.00 | 1040.00 |  270.00 |       191.00 |  16.00 |   2.86 |       0.49 |    0.87 |      0.00 |         0.00 |        0.73 |     14.00 |  7.00 |
-| Beef            | 2910.00 |  264.00 |   0.00 |   50.00 |   90.00 |         0.00 |  27.00 |  33.50 |       2.20 |    0.50 |      0.00 |        18.50 |        1.70 |      0.00 | 60.00 |
-| Beer            |  430.00 |    5.00 |   0.00 |   60.00 |   40.00 |        35.00 |   0.00 |   5.10 |       0.30 |    0.10 |      0.00 |         0.20 |        0.50 |      0.00 |  0.00 |
-| Bread           | 2660.00 |   76.00 |  20.00 | 1110.00 | 1510.00 |       506.00 |  37.00 |  43.85 |       3.31 |    4.55 |      0.00 |         0.00 |        0.84 |      0.00 |  7.00 |
-| Bun             | 2660.00 |   76.00 |  20.00 | 1110.00 | 1510.00 |       506.00 |  37.00 |  43.85 |       3.31 |    4.55 |      0.00 |         0.00 |        0.84 |      0.00 |  7.00 |
-| Cabbages        |  250.00 |   13.00 |  30.00 |  430.00 |  400.00 |        58.00 |   5.00 |   2.34 |       0.40 |    0.61 |     50.00 |         0.00 |        1.24 |    366.00 |  2.00 |
-| Cassava         | 1600.00 |   14.00 |  20.00 |  270.00 |  160.00 |       381.00 |   3.00 |   8.54 |       0.48 |    0.87 |     10.00 |         0.00 |        0.88 |    206.00 |  3.00 |
-| Cassava (flour) | 3140.00 |   26.00 |  40.00 |  360.00 |  310.00 |       766.00 |  19.00 |  14.00 |       0.50 |    3.10 |     70.00 |         0.00 |        7.00 |    720.00 |  7.00 |
-| Chapati         | 2750.00 |   91.00 |  20.00 |  240.00 |  860.00 |       557.00 |  14.00 |  21.42 |       0.97 |    2.67 |      0.00 |         0.00 |        0.34 |      0.00 |  8.00 |
-| Chicken         | 1840.00 |  274.00 |   0.00 |   30.00 |  130.00 |         0.00 |   9.00 |  78.07 |       1.15 |    0.41 |    250.00 |         2.10 |        2.90 |      0.00 | 10.00 |
-| Cooking oil     | 8840.00 |    0.00 |   0.00 |    0.00 |    0.00 |         0.00 |   0.00 |   0.00 |       0.00 |    0.00 |      0.00 |         0.00 |        0.00 |      0.00 |  0.00 |
-| Dodo            |  230.00 |   25.00 |   0.00 |  850.00 | 2150.00 |        40.00 |  23.00 |   6.58 |       1.58 |    0.27 |   1460.00 |         0.00 |        1.92 |    433.00 |  9.00 |
-| Dried fish      | 1170.00 |  249.00 |   0.00 |   60.00 | 1020.00 |         0.00 |  12.00 |  19.00 |       1.20 |    0.80 |    100.00 |        22.00 |        1.40 |     17.00 | 14.00 |
-| Eggs            | 1430.00 |  126.00 |   0.00 |  470.00 |  530.00 |         8.00 |  18.00 |   0.70 |       4.78 |    0.69 |   1400.00 |        12.90 |        1.43 |      0.00 | 11.00 |
-| Fresh fish      |  960.00 |  201.00 |   0.00 |  220.00 |  100.00 |         0.00 |   6.00 |  37.08 |       0.60 |    0.37 |      0.00 |        14.20 |        1.46 |      0.00 |  3.00 |
-| Fresh milk      |  600.00 |   32.00 |   0.00 |   50.00 | 1130.00 |        45.00 |   0.00 |   1.07 |       1.83 |    0.44 |    280.00 |         4.40 |        0.36 |      0.00 |  4.00 |
-| Ghee            | 8760.00 |    3.00 |   0.00 |    0.00 |   40.00 |         0.00 |   0.00 |   0.03 |       0.05 |    0.01 |   8400.00 |         0.10 |        0.01 |      0.00 |  0.00 |
-| Goat meat       | 1090.00 |  206.00 |   0.00 |   40.00 |  130.00 |         0.00 |  28.00 |  35.63 |       4.41 |    0.61 |      0.00 |         7.50 |        1.30 |      0.00 | 40.00 |
-| Ground nut      | 2240.00 |   57.00 |  40.00 |  100.00 |   40.00 |       455.00 |  17.00 |  21.09 |       1.16 |    2.12 |     60.00 |         0.00 |        3.61 |      0.00 | 13.00 |
-| Infant formula  | 4960.00 |  263.00 |   0.00 |  310.00 | 9120.00 |       384.00 |   5.00 |   5.17 |      10.85 |    1.98 |   1930.00 |        26.00 |        1.81 |     69.00 | 33.00 |
-| Irish potato    |  770.00 |   20.00 |  20.00 |  160.00 |  120.00 |       175.00 |   8.00 |  10.54 |       0.32 |    0.80 |      0.00 |         0.00 |        2.95 |    197.00 |  3.00 |
-| Maize           | 3970.00 |  102.00 |  80.00 |  140.00 |   80.00 |       809.00 |  28.00 |  35.52 |       1.97 |    3.35 |    110.00 |         0.00 |        6.09 |      0.00 | 24.00 |
-| Matoke          | 1220.00 |   13.00 |  20.00 |  220.00 |   30.00 |       319.00 |   6.00 |   6.86 |       0.54 |    0.52 |    560.00 |         0.00 |        2.99 |    184.00 |  1.00 |
-| Millet          | 3740.00 |  109.00 |  90.00 |  500.00 |   70.00 |       721.00 |  29.00 |  28.01 |       2.73 |    2.29 |      0.00 |         0.00 |        1.90 |      0.00 | 17.00 |
-| Onions          |  400.00 |   11.00 |  20.00 |  190.00 |  230.00 |        93.00 |   2.00 |   1.20 |       0.30 |    0.50 |      0.00 |         0.00 |        1.20 |     74.00 |  2.00 |
-| Oranges         |  470.00 |    9.00 |  20.00 |  290.00 |  400.00 |       118.00 |   1.00 |   2.82 |       0.40 |    0.83 |    110.00 |         0.00 |        0.57 |    505.00 |  1.00 |
-| Passion fruit   |  970.00 |   22.00 | 100.00 |   80.00 |  110.00 |       234.00 |  14.00 |  12.00 |       1.17 |    0.00 |    480.00 |         0.00 |        0.80 |    240.00 |  1.00 |
-| Peas            |  810.00 |   54.00 |  50.00 |  650.00 |  250.00 |       145.00 |  15.00 |  20.90 |       1.32 |    2.66 |    380.00 |         0.00 |        1.69 |    400.00 | 12.00 |
-| Pork            | 2000.00 |  195.00 |   0.00 |   40.00 |  190.00 |         0.00 |   8.00 |  42.66 |       2.25 |    4.90 |     20.00 |         0.00 |        2.99 |      5.00 | 19.00 |
-| Rice            | 3600.00 |   66.00 |   0.00 |   50.00 |   90.00 |       793.00 |   8.00 |  14.40 |       0.43 |    0.49 |      0.00 |         0.00 |        1.31 |      0.00 | 12.00 |
-| Sim sim         | 5730.00 |  177.00 | 118.00 |  970.00 | 9750.00 |       235.00 | 145.50 |  45.20 |       2.50 |    7.90 |      0.00 |         0.00 |        7.90 |      0.00 | 77.50 |
-| Soda            |  480.00 |    0.00 |   0.00 |    0.00 |   50.00 |       123.00 |   1.00 |   0.00 |       0.00 |    0.00 |      0.00 |         0.00 |        0.00 |      0.00 |  1.00 |
-| Sorghum         | 3390.00 |  113.00 |  60.00 |   80.00 |  240.00 |       746.00 |  42.00 |  17.56 |       1.35 |    1.30 |      0.00 |         0.00 |        0.75 |      0.00 | 16.00 |
-| Sugar           | 3870.00 |    0.00 |   0.00 |    0.00 |   10.00 |      1000.00 |   0.00 |   0.00 |       0.19 |    0.00 |      0.00 |         0.00 |        0.00 |      0.00 |  0.00 |
-| Sweet Banana    | 1220.00 |   13.00 |  20.00 |  220.00 |   30.00 |       319.00 |   6.00 |   6.86 |       0.54 |    0.52 |    560.00 |         0.00 |        2.99 |    184.00 |  1.00 |
-| Sweet Potatoes  | 1170.00 |   22.00 |  40.00 |  150.00 |  410.00 |       274.00 |   8.00 |   7.61 |       0.83 |    1.07 |      0.00 |         0.00 |        2.85 |     33.00 |  4.00 |
-| Tomatoes        |  180.00 |    9.00 |  10.00 |  150.00 |  100.00 |        39.00 |   3.00 |   5.94 |       0.19 |    0.37 |    420.00 |         0.00 |        0.80 |    127.00 |  2.00 |
-| Wheat (flour)   | 3640.00 |  103.00 |  30.00 |  260.00 |  150.00 |       763.00 |  12.00 |  12.50 |       0.40 |    1.20 |      0.00 |         0.00 |        0.44 |      0.00 |  7.00 |
-
-Missing dependencies for OracleDemands.
-| i               | Energy       | Protein     | Fiber       | Folate       | Calcium      | Carbohydrate | Iron        | Niacin     | Riboflavin | Thiamin   | Vitamin A    | Vitamin B-12 | Vitamin B-6 | Vitamin C   | Zinc       |
-|-----------------+--------------+-------------+-------------+--------------+--------------+--------------+-------------+------------+------------+-----------+--------------+--------------+-------------+-------------+------------|
-| Beans           | \(1060.000\) | \(65.000\)  | \(50.000\)  | \(1040.000\) | \(270.000\)  | \(191.000\)  | \(16.000\)  | \(2.860\)  | \(0.490\)  | \(0.870\) | \(0.000\)    | \(0.000\)    | \(0.730\)   | \(14.000\)  | \(7.000\)  |
-| Beef            | \(2910.000\) | \(264.000\) | \(0.000\)   | \(50.000\)   | \(90.000\)   | \(0.000\)    | \(27.000\)  | \(33.500\) | \(2.200\)  | \(0.500\) | \(0.000\)    | \(18.500\)   | \(1.700\)   | \(0.000\)   | \(60.000\) |
-| Beer            | \(430.000\)  | \(5.000\)   | \(0.000\)   | \(60.000\)   | \(40.000\)   | \(35.000\)   | \(0.000\)   | \(5.100\)  | \(0.300\)  | \(0.100\) | \(0.000\)    | \(0.200\)    | \(0.500\)   | \(0.000\)   | \(0.000\)  |
-| Bread           | \(2660.000\) | \(76.000\)  | \(20.000\)  | \(1110.000\) | \(1510.000\) | \(506.000\)  | \(37.000\)  | \(43.850\) | \(3.310\)  | \(4.550\) | \(0.000\)    | \(0.000\)    | \(0.840\)   | \(0.000\)   | \(7.000\)  |
-| Bun             | \(2660.000\) | \(76.000\)  | \(20.000\)  | \(1110.000\) | \(1510.000\) | \(506.000\)  | \(37.000\)  | \(43.850\) | \(3.310\)  | \(4.550\) | \(0.000\)    | \(0.000\)    | \(0.840\)   | \(0.000\)   | \(7.000\)  |
-| Cabbages        | \(250.000\)  | \(13.000\)  | \(30.000\)  | \(430.000\)  | \(400.000\)  | \(58.000\)   | \(5.000\)   | \(2.340\)  | \(0.400\)  | \(0.610\) | \(50.000\)   | \(0.000\)    | \(1.240\)   | \(366.000\) | \(2.000\)  |
-| Cassava         | \(1600.000\) | \(14.000\)  | \(20.000\)  | \(270.000\)  | \(160.000\)  | \(381.000\)  | \(3.000\)   | \(8.540\)  | \(0.480\)  | \(0.870\) | \(10.000\)   | \(0.000\)    | \(0.880\)   | \(206.000\) | \(3.000\)  |
-| Cassava (flour) | \(3140.000\) | \(26.000\)  | \(40.000\)  | \(360.000\)  | \(310.000\)  | \(766.000\)  | \(19.000\)  | \(14.000\) | \(0.500\)  | \(3.100\) | \(70.000\)   | \(0.000\)    | \(7.000\)   | \(720.000\) | \(7.000\)  |
-| Chapati         | \(2750.000\) | \(91.000\)  | \(20.000\)  | \(240.000\)  | \(860.000\)  | \(557.000\)  | \(14.000\)  | \(21.420\) | \(0.970\)  | \(2.670\) | \(0.000\)    | \(0.000\)    | \(0.340\)   | \(0.000\)   | \(8.000\)  |
-| Chicken         | \(1840.000\) | \(274.000\) | \(0.000\)   | \(30.000\)   | \(130.000\)  | \(0.000\)    | \(9.000\)   | \(78.070\) | \(1.150\)  | \(0.410\) | \(250.000\)  | \(2.100\)    | \(2.900\)   | \(0.000\)   | \(10.000\) |
-| Cooking oil     | \(8840.000\) | \(0.000\)   | \(0.000\)   | \(0.000\)    | \(0.000\)    | \(0.000\)    | \(0.000\)   | \(0.000\)  | \(0.000\)  | \(0.000\) | \(0.000\)    | \(0.000\)    | \(0.000\)   | \(0.000\)   | \(0.000\)  |
-| Dodo            | \(230.000\)  | \(25.000\)  | \(0.000\)   | \(850.000\)  | \(2150.000\) | \(40.000\)   | \(23.000\)  | \(6.580\)  | \(1.580\)  | \(0.270\) | \(1460.000\) | \(0.000\)    | \(1.920\)   | \(433.000\) | \(9.000\)  |
-| Dried fish      | \(1170.000\) | \(249.000\) | \(0.000\)   | \(60.000\)   | \(1020.000\) | \(0.000\)    | \(12.000\)  | \(19.000\) | \(1.200\)  | \(0.800\) | \(100.000\)  | \(22.000\)   | \(1.400\)   | \(17.000\)  | \(14.000\) |
-| Eggs            | \(1430.000\) | \(126.000\) | \(0.000\)   | \(470.000\)  | \(530.000\)  | \(8.000\)    | \(18.000\)  | \(0.700\)  | \(4.780\)  | \(0.690\) | \(1400.000\) | \(12.900\)   | \(1.430\)   | \(0.000\)   | \(11.000\) |
-| Fresh fish      | \(960.000\)  | \(201.000\) | \(0.000\)   | \(220.000\)  | \(100.000\)  | \(0.000\)    | \(6.000\)   | \(37.080\) | \(0.600\)  | \(0.370\) | \(0.000\)    | \(14.200\)   | \(1.460\)   | \(0.000\)   | \(3.000\)  |
-| Fresh milk      | \(600.000\)  | \(32.000\)  | \(0.000\)   | \(50.000\)   | \(1130.000\) | \(45.000\)   | \(0.000\)   | \(1.070\)  | \(1.830\)  | \(0.440\) | \(280.000\)  | \(4.400\)    | \(0.360\)   | \(0.000\)   | \(4.000\)  |
-| Ghee            | \(8760.000\) | \(3.000\)   | \(0.000\)   | \(0.000\)    | \(40.000\)   | \(0.000\)    | \(0.000\)   | \(0.030\)  | \(0.050\)  | \(0.010\) | \(8400.000\) | \(0.100\)    | \(0.010\)   | \(0.000\)   | \(0.000\)  |
-| Goat meat       | \(1090.000\) | \(206.000\) | \(0.000\)   | \(40.000\)   | \(130.000\)  | \(0.000\)    | \(28.000\)  | \(35.630\) | \(4.410\)  | \(0.610\) | \(0.000\)    | \(7.500\)    | \(1.300\)   | \(0.000\)   | \(40.000\) |
-| Ground nut      | \(2240.000\) | \(57.000\)  | \(40.000\)  | \(100.000\)  | \(40.000\)   | \(455.000\)  | \(17.000\)  | \(21.090\) | \(1.160\)  | \(2.120\) | \(60.000\)   | \(0.000\)    | \(3.610\)   | \(0.000\)   | \(13.000\) |
-| Infant formula  | \(4960.000\) | \(263.000\) | \(0.000\)   | \(310.000\)  | \(9120.000\) | \(384.000\)  | \(5.000\)   | \(5.170\)  | \(10.850\) | \(1.980\) | \(1930.000\) | \(26.000\)   | \(1.810\)   | \(69.000\)  | \(33.000\) |
-| Irish potato    | \(770.000\)  | \(20.000\)  | \(20.000\)  | \(160.000\)  | \(120.000\)  | \(175.000\)  | \(8.000\)   | \(10.540\) | \(0.320\)  | \(0.800\) | \(0.000\)    | \(0.000\)    | \(2.950\)   | \(197.000\) | \(3.000\)  |
-| Maize           | \(3970.000\) | \(102.000\) | \(80.000\)  | \(140.000\)  | \(80.000\)   | \(809.000\)  | \(28.000\)  | \(35.520\) | \(1.970\)  | \(3.350\) | \(110.000\)  | \(0.000\)    | \(6.090\)   | \(0.000\)   | \(24.000\) |
-| Matoke          | \(1220.000\) | \(13.000\)  | \(20.000\)  | \(220.000\)  | \(30.000\)   | \(319.000\)  | \(6.000\)   | \(6.860\)  | \(0.540\)  | \(0.520\) | \(560.000\)  | \(0.000\)    | \(2.990\)   | \(184.000\) | \(1.000\)  |
-| Millet          | \(3740.000\) | \(109.000\) | \(90.000\)  | \(500.000\)  | \(70.000\)   | \(721.000\)  | \(29.000\)  | \(28.010\) | \(2.730\)  | \(2.290\) | \(0.000\)    | \(0.000\)    | \(1.900\)   | \(0.000\)   | \(17.000\) |
-| Onions          | \(400.000\)  | \(11.000\)  | \(20.000\)  | \(190.000\)  | \(230.000\)  | \(93.000\)   | \(2.000\)   | \(1.200\)  | \(0.300\)  | \(0.500\) | \(0.000\)    | \(0.000\)    | \(1.200\)   | \(74.000\)  | \(2.000\)  |
-| Oranges         | \(470.000\)  | \(9.000\)   | \(20.000\)  | \(290.000\)  | \(400.000\)  | \(118.000\)  | \(1.000\)   | \(2.820\)  | \(0.400\)  | \(0.830\) | \(110.000\)  | \(0.000\)    | \(0.570\)   | \(505.000\) | \(1.000\)  |
-| Passion fruit   | \(970.000\)  | \(22.000\)  | \(100.000\) | \(80.000\)   | \(110.000\)  | \(234.000\)  | \(14.000\)  | \(12.000\) | \(1.170\)  | \(0.000\) | \(480.000\)  | \(0.000\)    | \(0.800\)   | \(240.000\) | \(1.000\)  |
-| Peas            | \(810.000\)  | \(54.000\)  | \(50.000\)  | \(650.000\)  | \(250.000\)  | \(145.000\)  | \(15.000\)  | \(20.900\) | \(1.320\)  | \(2.660\) | \(380.000\)  | \(0.000\)    | \(1.690\)   | \(400.000\) | \(12.000\) |
-| Pork            | \(2000.000\) | \(195.000\) | \(0.000\)   | \(40.000\)   | \(190.000\)  | \(0.000\)    | \(8.000\)   | \(42.660\) | \(2.250\)  | \(4.900\) | \(20.000\)   | \(0.000\)    | \(2.990\)   | \(5.000\)   | \(19.000\) |
-| Rice            | \(3600.000\) | \(66.000\)  | \(0.000\)   | \(50.000\)   | \(90.000\)   | \(793.000\)  | \(8.000\)   | \(14.400\) | \(0.430\)  | \(0.490\) | \(0.000\)    | \(0.000\)    | \(1.310\)   | \(0.000\)   | \(12.000\) |
-| Sim sim         | \(5730.000\) | \(177.000\) | \(118.000\) | \(970.000\)  | \(9750.000\) | \(235.000\)  | \(145.500\) | \(45.200\) | \(2.500\)  | \(7.900\) | \(0.000\)    | \(0.000\)    | \(7.900\)   | \(0.000\)   | \(77.500\) |
-| Soda            | \(480.000\)  | \(0.000\)   | \(0.000\)   | \(0.000\)    | \(50.000\)   | \(123.000\)  | \(1.000\)   | \(0.000\)  | \(0.000\)  | \(0.000\) | \(0.000\)    | \(0.000\)    | \(0.000\)   | \(0.000\)   | \(1.000\)  |
-| Sorghum         | \(3390.000\) | \(113.000\) | \(60.000\)  | \(80.000\)   | \(240.000\)  | \(746.000\)  | \(42.000\)  | \(17.560\) | \(1.350\)  | \(1.300\) | \(0.000\)    | \(0.000\)    | \(0.750\)   | \(0.000\)   | \(16.000\) |
-| Sugar           | \(3870.000\) | \(0.000\)   | \(0.000\)   | \(0.000\)    | \(10.000\)   | \(1000.000\) | \(0.000\)   | \(0.000\)  | \(0.190\)  | \(0.000\) | \(0.000\)    | \(0.000\)    | \(0.000\)   | \(0.000\)   | \(0.000\)  |
-| Sweet Banana    | \(1220.000\) | \(13.000\)  | \(20.000\)  | \(220.000\)  | \(30.000\)   | \(319.000\)  | \(6.000\)   | \(6.860\)  | \(0.540\)  | \(0.520\) | \(560.000\)  | \(0.000\)    | \(2.990\)   | \(184.000\) | \(1.000\)  |
-| Sweet Potatoes  | \(1170.000\) | \(22.000\)  | \(40.000\)  | \(150.000\)  | \(410.000\)  | \(274.000\)  | \(8.000\)   | \(7.610\)  | \(0.830\)  | \(1.070\) | \(0.000\)    | \(0.000\)    | \(2.850\)   | \(33.000\)  | \(4.000\)  |
-| Tomatoes        | \(180.000\)  | \(9.000\)   | \(10.000\)  | \(150.000\)  | \(100.000\)  | \(39.000\)   | \(3.000\)   | \(5.940\)  | \(0.190\)  | \(0.370\) | \(420.000\)  | \(0.000\)    | \(0.800\)   | \(127.000\) | \(2.000\)  |
-| Wheat (flour)   | \(3640.000\) | \(103.000\) | \(30.000\)  | \(260.000\)  | \(150.000\)  | \(763.000\)  | \(12.000\)  | \(12.500\) | \(0.400\)  | \(1.200\) | \(0.000\)    | \(0.000\)    | \(0.440\)   | \(0.000\)   | \(7.000\)  |
+| i | Energy|   Protein|   Fiber|   Folate|   Calcium|   Carbohydrate|   Iron|   Niacin|   Riboflavin|   Thiamin|   Vitamin A|   Vitamin B-12|   Vitamin B-6|   Vitamin C|   Zinc  |
+|-
+| Avocado  | 1600.00 |  20.00 |  70.00 | 810.00 | 120.00 |  85.00 |   6.00 |  17.38 |   1.30 |   0.67 |  70.00 |   0.00 |   2.57 | 100.00 |   6.00 |
+| Beans (dry)  | 1700.00 |  98.00 |  60.00 | 500.00 | 580.00 | 325.00 |  30.00 |   7.00 |   1.20 |   3.40 |   0.00 |   0.00 |   2.15 |  10.00 |   8.00 |
+| Beans (fresh)  | 3470.00 | 214.00 | 160.00 | 5250.00 | 1130.00 | 626.00 |  51.00 |  11.74 |   2.12 |   7.13 |   0.00 |   0.00 |   4.74 |  63.00 |  23.00 |
+| Beef  | 2510.00 | 182.00 |   0.00 |  60.00 |  70.00 |   0.00 |  19.00 |  31.50 |   1.60 |   0.90 |   0.00 |  28.90 |   3.80 |   0.00 |  37.00 |
+| Beef (roasted)  | 2910.00 | 264.00 |   0.00 |  70.00 |  90.00 |   0.00 |  27.00 |  37.20 |   2.20 |   0.90 |   0.00 |  24.70 |   3.40 |   0.00 |  60.00 |
+| Beef Liver  | 1350.00 | 204.00 |   0.00 | 2900.00 |  50.00 |  39.00 |  49.00 | 131.75 |  27.55 |   1.89 | 49680.00 | 593.00 |  10.83 |  13.00 |  40.00 |
+| Beef Offal  | 850.00 | 120.70 |   0.00 |  50.00 | 690.00 |   0.00 |   5.90 |   8.81 |   0.64 |   0.00 |   0.00 |  13.90 |   0.14 |   0.00 |  14.20 |
+| Biscuits  | 4460.00 |  69.00 |  10.00 | 1030.00 | 430.00 | 741.00 |  28.00 |  34.70 |   3.26 |   3.50 |   0.00 |   0.50 |   0.22 |   0.00 |   6.00 |
+| Bogoya  | 890.00 |  11.00 |  30.00 | 200.00 |  50.00 | 228.00 |   3.00 |   6.65 |   0.73 |   0.31 |  30.00 |   0.00 |   3.67 |  87.00 |   2.00 |
+| Bongo  | 640.00 |  33.00 |   0.00 |  50.00 | 1620.00 |  45.00 |   1.00 |   1.00 |   1.50 |   0.20 | 370.00 |   4.40 |   0.36 |   0.00 |   6.00 |
+| Bread  | 2660.00 |  76.00 |  20.00 | 1110.00 | 1510.00 | 506.00 |  37.00 |  43.85 |   3.31 |   4.55 |   0.00 |   0.00 |   0.84 |   0.00 |   7.00 |
+| Cabbage (red)  | 310.00 |  14.00 |  20.00 | 180.00 | 450.00 |  74.00 |   8.00 |   4.18 |   0.69 |   0.64 | 560.00 |   0.00 |   2.09 | 570.00 |   2.00 |
+| Cabbages  | 250.00 |  13.00 |  30.00 | 430.00 | 400.00 |  58.00 |   5.00 |   2.34 |   0.40 |   0.61 |  50.00 |   0.00 |   1.24 | 366.00 |   2.00 |
+| Cakes  | 3570.00 |  54.00 |  10.00 | 380.00 | 1300.00 | 572.00 |  15.00 |  15.33 |   2.42 |   1.86 | 150.00 |   0.80 |   0.21 |   2.00 |   3.00 |
+| Carrots  | 410.00 |   9.00 |  30.00 | 190.00 | 330.00 |  96.00 |   3.00 |   9.83 |   0.58 |   0.66 | 8350.00 |   0.00 |   1.38 |  59.00 |   2.00 |
+| Cassava (flour)  | 3140.00 |  26.00 |  40.00 | 360.00 | 310.00 | 766.00 |  19.00 |  14.00 |   0.50 |   3.10 |  70.00 |   0.00 |   7.00 | 720.00 |   7.00 |
+| Cassava (fresh)  | 1600.00 |  14.00 |  20.00 | 270.00 | 160.00 | 381.00 |   3.00 |   8.54 |   0.48 |   0.87 |  10.00 |   0.00 |   0.88 | 206.00 |   3.00 |
+| Chapati  | 2750.00 |  91.00 |  20.00 | 240.00 | 860.00 | 557.00 |  14.00 |  21.42 |   0.97 |   2.67 |   0.00 |   0.00 |   0.34 |   0.00 |   8.00 |
+| Chicken (off-layer)  | 2150.00 | 186.00 |   0.00 |  60.00 | 110.00 |   0.00 |   9.00 |  68.01 |   1.20 |   0.60 | 420.00 |   3.10 |   3.50 |  16.00 |  13.00 |
+| Chicken (roasted)  | 2390.00 | 273.00 |   0.00 |  50.00 | 150.00 |   0.00 |  13.00 |  84.87 |   1.68 |   0.63 | 480.00 |   3.00 |   4.00 |   0.00 |  19.00 |
+| Cooking Oil  | 8840.00 |   0.00 |   0.00 |   0.00 |   0.00 |   0.00 |   0.00 |   0.00 |   0.00 |   0.00 |   0.00 |   0.00 |   0.00 |   0.00 |   0.00 |
+| Dodo  | 230.00 |  25.00 |   0.00 | 850.00 | 2150.00 |  40.00 |  23.00 |   6.58 |   1.58 |   0.27 | 1460.00 |   0.00 |   1.92 | 433.00 |   9.00 |
+| Eggplant  | 240.00 |  10.00 |  30.00 | 220.00 |  90.00 |  57.00 |   2.00 |   6.49 |   0.37 |   0.39 |  10.00 |   0.00 |   0.84 |  22.00 |   2.00 |
+| Eggs  | 1430.00 | 126.00 |   0.00 | 470.00 | 530.00 |   8.00 |  18.00 |   0.70 |   4.78 |   0.69 | 1400.00 |  12.90 |   1.43 |   0.00 |  11.00 |
+| Eggs (white yolk)  | 480.00 | 109.00 |   0.00 |  40.00 |  70.00 |   7.00 |   1.00 |   1.05 |   4.39 |   0.04 |   0.00 |   0.90 |   0.05 |   0.00 |   0.00 |
+| Eggs (yellow yolk)  | 3170.00 | 159.00 |   0.00 | 1460.00 | 1290.00 |  36.00 |  27.00 |   0.24 |   5.28 |   1.76 | 3810.00 |  19.50 |   3.50 |   0.00 |  23.00 |
+| Fresh Fish  | 1390.00 | 193.00 |   0.00 |  10.00 | 110.00 |   0.00 |   4.00 |  23.00 |   1.70 |   1.30 | 300.00 |  24.00 |   4.00 |  16.00 |   5.00 |
+| Garlic  | 1490.00 |  64.00 |  20.00 |  30.00 | 1810.00 | 331.00 |  17.00 |   7.00 |   1.10 |   2.00 |   0.00 |   0.00 |  12.35 | 312.00 |  12.00 |
+| Ghee  | 8760.00 |   3.00 |   0.00 |   0.00 |  40.00 |   0.00 |   0.00 |   0.03 |   0.05 |   0.01 | 8400.00 |   0.10 |   0.01 |   0.00 |   0.00 |
+| Goat (roasted)  | 1570.00 | 297.00 |   0.00 |  60.00 | 180.00 |   0.00 |  38.00 |  51.36 |   6.71 |   1.27 |   0.00 |  16.30 |   2.74 |   0.00 |  55.00 |
+| Goat Liver  | 1390.00 | 204.00 |   0.00 | 2300.00 |  70.00 |  18.00 |  74.00 | 161.10 |  36.30 |   3.40 | 73910.00 | 900.50 |   9.00 |  40.00 |  47.00 |
+| Goat Meat  | 1090.00 | 206.00 |   0.00 |  50.00 | 130.00 |   0.00 |  28.00 |  37.50 |   4.90 |   1.10 |   0.00 |  11.30 |   2.00 |   0.00 |  40.00 |
+| Goat Offal  | 850.00 | 120.70 |   0.00 |  50.00 | 690.00 |   0.00 |   5.90 |   8.81 |   0.64 |   0.00 |   0.00 |  13.90 |   0.14 |   0.00 |  14.20 |
+| Green Pepper  | 200.00 |   9.00 |  20.00 | 100.00 | 100.00 |  46.00 |   3.00 |   4.80 |   0.28 |   0.57 | 180.00 |   0.00 |   2.24 | 804.00 |   1.00 |
+| Ground Nuts (in shell)  | 4370.00 | 199.00 |  70.00 | 1850.00 | 710.00 | 124.00 |  35.00 |  93.03 |   1.04 |   4.93 |   0.00 |   0.00 |   2.68 |   0.00 |  25.00 |
+| Ground Nuts (paste)  | 5880.00 | 251.00 |  60.00 | 740.00 | 430.00 | 196.00 |  19.00 | 134.03 |   1.05 |   0.73 |   0.00 |   0.00 |   5.43 |   0.00 |  29.00 |
+| Ground Nuts (pounded)  | 5670.00 | 258.00 |  90.00 | 2400.00 | 920.00 | 161.00 |  46.00 | 120.66 |   1.35 |   6.40 |   0.00 |   0.00 |   3.48 |   0.00 |  33.00 |
+| Ground Nuts (shelled)  | 4370.00 | 199.00 |  70.00 | 1850.00 | 710.00 | 124.00 |  35.00 |  93.03 |   1.04 |   4.93 |   0.00 |   0.00 |   2.68 |   0.00 |  25.00 |
+| Honey  | 3040.00 |   3.00 |   0.00 |  20.00 |  60.00 | 824.00 |   4.00 |   1.21 |   0.38 |   0.00 |   0.00 |   0.00 |   0.24 |   5.00 |   2.00 |
+| Irish Potatoes  | 770.00 |  20.00 |  20.00 | 160.00 | 120.00 | 175.00 |   8.00 |  10.54 |   0.32 |   0.80 |   0.00 |   0.00 |   2.95 | 197.00 |   3.00 |
+| Jackfruit (fresh)  | 940.00 |  15.00 |  20.00 | 140.00 | 340.00 | 240.00 |   6.00 |   4.00 |   1.10 |   0.30 | 150.00 |   0.00 |   1.08 |  67.00 |   4.00 |
+| Kabalagala  | 2540.00 |  17.00 |  30.00 | 160.00 | 200.00 | 487.00 |  11.00 |   8.60 |   0.38 |   1.26 | 1100.00 |   0.00 |   4.57 | 320.00 |   4.00 |
+| Macaroni/Spaghetti  | 3710.00 | 130.00 |  32.00 | 180.00 | 210.00 | 747.00 |  13.00 |  17.00 |   0.60 |   0.90 |   0.00 |   0.00 |   1.42 |   0.00 |  14.00 |
+| Maize (white;cobs)  | 1720.00 |  44.00 |  40.00 | 120.00 |  30.00 | 349.00 |  13.00 |  17.04 |   0.94 |   1.81 |   0.00 |   0.00 |   2.92 |   0.00 |  10.00 |
+| Maize (white;flour)  | 3690.00 |  73.00 |  40.00 | 300.00 |  30.00 | 792.00 |  11.00 |  10.00 |   0.50 |   1.40 |   0.00 |   0.00 |   1.98 |   0.00 |   7.00 |
+| Maize (white;grains)  | 1720.00 |  44.00 |  40.00 | 120.00 |  30.00 | 349.00 |  13.00 |  17.04 |   0.94 |   1.81 |   0.00 |   0.00 |   2.92 |   0.00 |  10.00 |
+| Maize (yellow;cobs)  | 1720.00 |  44.00 |  30.00 |  90.00 |  30.00 | 349.00 |  13.00 |  17.04 |   0.94 |   1.81 |  50.00 |   0.00 |   2.92 |   0.00 |  10.00 |
+| Maize (yellow;flour)  | 3690.00 |  73.00 |  40.00 | 300.00 |  30.00 | 792.00 |  11.00 |  10.00 |   0.50 |   1.40 | 110.00 |   0.00 |   1.98 |   0.00 |   7.00 |
+| Maize (yellow;grains)  | 1720.00 |  44.00 |  30.00 |  90.00 |  30.00 | 349.00 |  13.00 |  17.04 |   0.94 |   1.81 |  50.00 |   0.00 |   2.92 |   0.00 |  10.00 |
+| Mangos  | 650.00 |   5.00 |  20.00 | 140.00 | 100.00 | 170.00 |   1.00 |   5.84 |   0.57 |   0.58 | 380.00 |   0.00 |   1.34 | 277.00 |   0.00 |
+| Matoke (sack)  | 890.00 |  11.00 |  30.00 | 200.00 |  50.00 | 228.00 |   3.00 |   6.65 |   0.73 |   0.31 |  30.00 |   0.00 |   3.67 |  87.00 |   2.00 |
+| Milk (Fresh)  | 600.00 |  32.00 |   0.00 |  50.00 | 1130.00 |  45.00 |   0.00 |   1.07 |   1.83 |   0.44 | 280.00 |   4.40 |   0.36 |   0.00 |   4.00 |
+| Milk (powdered)  | 4960.00 | 263.00 |   0.00 | 370.00 | 9120.00 | 384.00 |   5.00 |   6.46 |  12.05 |   2.83 | 2570.00 |  32.50 |   3.02 |  86.00 |  33.00 |
+| Millet  | 3780.00 | 110.00 |  90.00 | 850.00 |  80.00 | 729.00 |  30.00 |  47.20 |   2.90 |   4.21 |   0.00 |   0.00 |   3.84 |   0.00 |  17.00 |
+| Millet Flour  | 3740.00 | 109.00 |  90.00 | 840.00 |  80.00 | 721.00 |  30.00 |  46.68 |   2.87 |   4.16 |   0.00 |   0.00 |   3.80 |   0.00 |  17.00 |
+| Mukene  | 960.00 | 201.00 |   0.00 | 240.00 | 100.00 |   0.00 |   6.00 |  39.03 |   0.63 |   0.41 |   0.00 |  15.80 |   1.62 |   0.00 |   3.00 |
+| Mushrooms  | 220.00 |  31.00 |  10.00 | 160.00 |  30.00 |  33.00 |   5.00 |  36.07 |   4.02 |   0.81 |   0.00 |   0.40 |   1.04 |  21.00 |   5.00 |
+| Ndiizi  | 1220.00 |  13.00 |  20.00 | 220.00 |  30.00 | 319.00 |   6.00 |   6.86 |   0.54 |   0.52 | 560.00 |   0.00 |   2.99 | 184.00 |   1.00 |
+| Nkejje (dried)  | 3670.00 | 418.00 |   0.00 | 230.00 | 1320.00 |   0.00 |  26.00 |  74.68 |   5.41 |   2.14 | 650.00 | 317.30 |   7.01 |  16.00 |  23.00 |
+| Okra  | 580.00 |  44.00 |  20.00 | 1180.00 | 5300.00 |  90.00 |   7.00 |   2.00 |  28.00 |   2.50 | 610.00 |   0.00 |   0.00 | 590.00 |  20.00 |
+| Onions  | 400.00 |  11.00 |  20.00 | 190.00 | 230.00 |  93.00 |   2.00 |   1.20 |   0.30 |   0.50 |   0.00 |   0.00 |   1.20 |  74.00 |   2.00 |
+| Oranges  | 470.00 |   9.00 |  20.00 | 300.00 | 400.00 | 118.00 |   1.00 |   2.82 |   0.40 |   0.87 | 110.00 |   0.00 |   0.60 | 532.00 |   1.00 |
+| Other Juice (packed)  | 450.00 |   1.00 |   0.00 |   0.00 | 1180.00 | 113.00 |   1.00 |   2.50 |  10.40 |   1.10 |   0.00 |   0.00 |   0.70 | 551.00 |   0.00 |
+| Passion Fruits  | 970.00 |  22.00 | 100.00 | 140.00 | 120.00 | 234.00 |  16.00 |  15.00 |   1.30 |   0.00 | 640.00 |   0.00 |   1.00 | 300.00 |   1.00 |
+| Peas  | 900.00 |  30.00 |  50.00 | 1680.00 | 1260.00 | 188.00 |  11.00 |  14.50 |   1.45 |   1.10 | 410.00 |   0.00 |   0.67 |  25.00 |  10.00 |
+| Peas (dry)  | 3360.00 | 235.00 | 110.00 | 6330.00 | 1100.00 | 600.00 |  83.00 |  20.75 |   2.26 |   8.53 |  30.00 |   0.00 |   3.57 |  15.00 |  34.00 |
+| Perch (dried)  | 4100.00 | 874.00 |   0.00 | 210.00 | 3610.00 |   0.00 |  41.00 |  68.52 |   4.51 |   3.00 | 370.00 |  81.40 |   5.14 |  65.00 |  50.00 |
+| Perch (fresh)  | 910.00 | 194.00 |   0.00 |  50.00 | 800.00 |   0.00 |   9.00 |  15.20 |   1.00 |   0.70 |  90.00 |  19.00 |   1.20 |  17.00 |  11.00 |
+| Pineapple  | 450.00 |   6.00 |   0.00 | 110.00 | 130.00 | 118.00 |   3.00 |   4.70 |   0.29 |   0.78 |  30.00 |   0.00 |   1.06 | 169.00 |   1.00 |
+| Platains  | 1220.00 |  13.00 |  20.00 | 220.00 |  30.00 | 319.00 |   6.00 |   6.86 |   0.54 |   0.52 | 560.00 |   0.00 |   2.99 | 184.00 |   1.00 |
+| Pork  | 2000.00 | 195.00 |   0.00 |  50.00 | 190.00 |   0.00 |   8.00 |  44.90 |   2.50 |   8.90 |  20.00 |   6.30 |   4.60 |   6.00 |  19.00 |
+| Pork (roasted)  | 4610.00 | 450.00 |   0.00 |  90.00 | 440.00 |   0.00 |  18.00 |  98.45 |   5.54 |  18.52 |  40.00 |  14.50 |   9.99 |  10.00 |  44.00 |
+| Pumpkin Leaves  | 190.00 |  32.00 |   0.00 | 360.00 | 390.00 |  23.00 |  22.00 |   9.20 |   1.28 |   0.94 | 970.00 |   0.00 |   2.07 | 110.00 |   2.00 |
+| Pumpkins  | 260.00 |  10.00 |  10.00 | 160.00 | 210.00 |  65.00 |   8.00 |   6.00 |   1.10 |   0.50 | 3690.00 |   0.00 |   0.61 |  90.00 |   3.00 |
+| Restaurant (beer)  | 410.00 |   3.00 |   0.00 |  60.00 |  50.00 |  37.00 |   0.00 |   5.10 |   0.30 |   0.10 |   0.00 |   0.20 |   0.50 |   0.00 |   0.00 |
+| Rice (brown)  | 3620.00 |  75.00 |  30.00 | 200.00 | 330.00 | 762.00 |  18.00 |  43.08 |   0.43 |   4.13 |   0.00 |   0.00 |   5.09 |   0.00 |  20.00 |
+| Rice (white)  | 3600.00 |  66.00 |   0.00 |  90.00 |  90.00 | 793.00 |   8.00 |  16.00 |   0.48 |   0.70 |   0.00 |   0.00 |   1.45 |   0.00 |  12.00 |
+| Rice flour  | 3660.00 |  60.00 |  20.00 |  40.00 | 100.00 | 801.00 |   4.00 |  25.90 |   0.21 |   1.38 |   0.00 |   0.00 |   4.36 |   0.00 |   8.00 |
+| Samosas  | 5930.00 |  51.00 |  20.00 |  60.00 | 340.00 | 179.00 |   8.00 |  10.00 |   0.50 |   0.90 | 280.00 |   0.00 |   0.70 |  10.00 |   7.00 |
+| Sim Sim  | 5730.00 | 177.00 | 118.00 | 970.00 | 9750.00 | 235.00 | 145.50 |  45.20 |   2.50 |   7.90 |   0.00 |   0.00 |   7.90 |   0.00 |  77.50 |
+| Sim Sim (paste)  | 5860.00 | 181.00 |  60.00 | 1000.00 | 9600.00 | 241.00 | 192.00 |  67.00 |   2.00 |   2.40 |  30.00 |   0.00 |   8.16 |   0.00 |  73.00 |
+| Soda  | 480.00 |   0.00 |   0.00 |   0.00 |  50.00 | 123.00 |   1.00 |   0.00 |   0.00 |   0.00 |   0.00 |   0.00 |   0.00 |   0.00 |   1.00 |
+| Sorghum  | 3390.00 | 113.00 |  60.00 | 140.00 | 280.00 | 746.00 |  44.00 |  29.27 |   1.42 |   2.37 |   0.00 |   0.00 |   1.50 |   0.00 |  16.00 |
+| Soybeans (dry)  | 4710.00 | 352.00 | 180.00 | 2110.00 | 1380.00 | 336.00 |  39.00 |  14.10 |   1.45 |   1.00 |   0.00 |   0.00 |   2.08 |  22.00 |  31.00 |
+| Sugar  | 3870.00 |   0.00 |   0.00 |   0.00 |  10.00 | 1000.00 |   0.00 |   0.00 |   0.19 |   0.00 |   0.00 |   0.00 |   0.00 |   0.00 |   0.00 |
+| Sugarcane  | 540.00 |   6.00 |  31.00 |   0.00 |  80.00 | 130.00 |  14.00 |   1.00 |   0.10 |   0.20 |   0.00 |   0.00 |   0.00 |  30.00 |   0.00 |
+| Sweet Bananas  | 890.00 |  11.00 |  30.00 | 200.00 |  50.00 | 228.00 |   3.00 |   6.65 |   0.73 |   0.31 |  30.00 |   0.00 |   3.67 |  87.00 |   2.00 |
+| Sweet Potatoes (dry)  | 3430.00 |  64.00 | 110.00 | 400.00 | 1140.00 | 807.00 |  24.00 |  21.22 |   2.33 |   2.50 | 4960.00 |   0.00 |   7.96 |  71.00 |  11.00 |
+| Sweet Potatoes (flour)  | 3430.00 |  64.00 | 110.00 | 400.00 | 1140.00 | 807.00 |  24.00 |  21.22 |   2.33 |   2.50 | 4960.00 |   0.00 |   7.96 |  71.00 |  11.00 |
+| Sweet Potatoes (fresh)  | 1230.00 |  23.00 |  40.00 | 160.00 | 430.00 | 289.00 |   9.00 |   8.00 |   0.88 |   1.12 | 2250.00 |   0.00 |   3.00 |  34.00 |   4.00 |
+| Sweet Potatoes (orange, dry)  | 3430.00 |  64.00 | 110.00 | 400.00 | 1140.00 | 807.00 |  24.00 |  21.22 |   2.33 |   2.50 | 13900.00 |   0.00 |   7.96 |  71.00 |  11.00 |
+| Sweet Potatoes (orange, flour)  | 3430.00 |  64.00 | 110.00 | 400.00 | 1140.00 | 807.00 |  24.00 |  21.22 |   2.33 |   2.50 | 13900.00 |   0.00 |   7.96 |  71.00 |  11.00 |
+| Sweet Potatoes (orange, fresh)  | 1230.00 |  23.00 |  40.00 | 160.00 | 430.00 | 289.00 |   9.00 |   8.00 |   0.88 |   1.12 | 6300.00 |   0.00 |   3.00 |  34.00 |   4.00 |
+| Sweet Potatoes (white, dry)  | 3430.00 |  65.00 | 120.00 | 400.00 | 1200.00 | 804.00 |  23.00 |  21.22 |   2.31 |   2.67 |   0.00 |   0.00 |   7.95 |  77.00 |  12.00 |
+| Sweet Potatoes (white, flour)  | 3430.00 |  65.00 | 120.00 | 400.00 | 1200.00 | 804.00 |  23.00 |  21.22 |   2.31 |   2.67 |   0.00 |   0.00 |   7.95 |  77.00 |  12.00 |
+| Sweet Potatoes (white, fresh)  | 1170.00 |  22.00 |  40.00 | 150.00 | 410.00 | 274.00 |   8.00 |   7.61 |   0.83 |   1.07 |   0.00 |   0.00 |   2.85 |  33.00 |   4.00 |
+| Tilapia (dried)  | 4130.00 | 865.00 |   0.00 | 930.00 | 430.00 |   0.00 |  26.00 | 159.51 |   2.57 |   1.59 |   0.00 |  61.20 |   6.27 |   0.00 |  13.00 |
+| Tilapia (fresh)  | 960.00 | 201.00 |   0.00 | 240.00 | 100.00 |   0.00 |   6.00 |  39.03 |   0.63 |   0.41 |   0.00 |  15.80 |   1.62 |   0.00 |   3.00 |
+| Tomatoes  | 180.00 |   9.00 |  10.00 | 150.00 | 100.00 |  39.00 |   3.00 |   5.94 |   0.19 |   0.37 | 420.00 |   0.00 |   0.80 | 127.00 |   2.00 |
+| Waragi  | 2630.00 |   0.00 |   0.00 |   0.00 |   0.00 |   0.00 |   0.00 |   0.00 |   0.00 |   0.00 |   0.00 |   0.00 |   0.00 |   0.00 |   0.00 |
+| Watermelon  | 300.00 |   6.10 |   4.00 |  30.00 |  70.00 |  75.50 |   2.40 |   1.78 |   0.21 |   0.33 | 280.00 |   0.00 |   0.45 |  81.00 |   1.00 |
+| Wheat (flour)  | 3640.00 | 103.00 |  30.00 | 260.00 | 150.00 | 763.00 |  12.00 |  12.50 |   0.40 |   1.20 |   0.00 |   0.00 |   0.44 |   0.00 |   7.00 |
+| Yams (arrowroot)  | 1180.00 |  15.00 |  40.00 | 230.00 | 170.00 | 279.00 |   5.00 |   5.52 |   0.32 |   1.12 |  70.00 |   0.00 |   2.93 | 171.00 |   2.00 |
 
 
 *** Harmonize labels, write Expenditures to google sheet
