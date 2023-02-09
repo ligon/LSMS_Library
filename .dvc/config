@@ -1,5 +1,5 @@
 [core]
-    remote = ligonresearch
+    remote = ligonresearch_s3
     autostage = true
 [cache]
     type = reflink
