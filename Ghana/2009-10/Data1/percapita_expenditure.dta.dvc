@@ -1,0 +1,4 @@
+outs:
+- md5: 72c9065ded73cd7e3b6674ce13e309b8
+  size: 832005
+  path: percapita_expenditure.dta
