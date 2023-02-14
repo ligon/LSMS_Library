@@ -1,0 +1,4 @@
+outs:
+- md5: 9007d98ab228e34e7ecd989eff5b8546
+  size: 3538
+  path: ehcvm_ponderations_ner2018.dta
