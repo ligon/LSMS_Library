@@ -1,0 +1,4 @@
+outs:
+- md5: b99d858fe0fe0c92d21583bd03f52e7f
+  size: 581991
+  path: ehcvm_welfare_ner2018.dta
