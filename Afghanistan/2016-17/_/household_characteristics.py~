@@ -1,0 +1,23 @@
+#!/usr/bin/env python
+
+import sys
+sys.path.append('../../_/')
+import pandas as pd
+import numpy as np
+import json
+import dvc.api
+from lsms import from_dta
+from lsms.tools import get_household_roster
+from afghanistan import age_sex_composition
+
+with dvc.api.open('../Data/H_03.dta', mode='rb') as dta:
+    df1 = from_dta(dta, convert_categoricals=True)
+
+df = age_sex_composition(df1)
+#df1 = df1.groupby("hh_id").agg({'q_1_1a' : 'first'})
+#df['t'] = "2016-17"
+#df['m'] = "Afghanistan"
+#df = df.set_index(['t', 'm'], append = True)
+#df.columns.name = 'k'
+
+#df.to_parquet('household_characteristics.parquet')
