@@ -1,0 +1,4 @@
+outs:
+- md5: d99dec727042b1663ac4a1cf906c5e1c
+  size: 5443520
+  path: s14_me_ner2018.dta
