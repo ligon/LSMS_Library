@@ -8,8 +8,24 @@ Contains code common to different Ethiopia rounds
 ** TODO food_items.org
 Should have columns for each year, with "Preferred Labels" and "Aggregate Labels"
 
-** TODO unitlabels.csv
 ** TODO conversion_to_kgs.json
+This comes from data in =Ethiopia/2015-16/Data/=
+#+begin_src python
+import dvc.api
+from lsms.tools import from_dta
+import json
+
+with dvc.api.open('../2015-16/Data/Food_CF_Wave3.dta',mode='rb') as dta:
+    df = from_dta(dta)
+
+foo=df.groupby('unit_cd')['mean_cf_nat'].median().to_dict()
+
+with open('conversion_to_kgs.json') as f:
+    json.dump(f,{s.split('. ')[1]:v for s,v in foo.items()})
+
+#+end_src
+
+#+results:
 
 * Files in Ethiopia/<SOMEYEAR>/_/
 ** TODO household_characteristics.py
