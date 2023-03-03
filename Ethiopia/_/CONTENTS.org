@@ -1,0 +1,16 @@
+#+title: Contents
+
+Brief table of contents and todo list.
+
+* Files in Ethiopia/_/
+** Ethiopia.py
+Contains code common to different Ethiopia rounds
+** TODO food_items.org
+Should have columns for each year, with "Preferred Labels" and "Aggregate Labels"
+
+** TODO unitlabels.csv
+** TODO conversion_to_kgs.json
+
+* Files in Ethiopia/<SOMEYEAR>/_/
+** TODO household_characteristics.py
+** TODO food_acquired.py
