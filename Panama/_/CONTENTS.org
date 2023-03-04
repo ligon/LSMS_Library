@@ -31,7 +31,31 @@ print(itemlabels)
 
 ** TODO conversion_to_kgs.json
 ** TODO nutrition
-A food conversion table, with foods keyed to the "Preferred Labels" of food_items.org.
+A food conversion table, with foods keyed to the "Preferred Labels" of food_items.org.   See https://docs.google.com/spreadsheets/d/1YwfdL0LMPVl3UGo-KfyvpC7S7KR_jDL54rsVLUQOCVE/, prepared by Kaylee Vu, which indexes the FCT at http://www.incap.int/mesocaribefoods/dmdocuments/TablaCAlimentos.pdf.
+
+Code to extract the nutrient tables from the aforementioned pdf:
+#+begin_src python
+import camelot
+
+# Produces a list of tables, one from each page
+foo = camelot.read_pdf('TablaCAlimentos.pdf',flavor='stream',pages='26-83')
+
+def assign_index_and_columns(df):
+    idx = pd.MultiIndex.from_frame(df.iloc[3:,[0,1]])
+    idx.names = ['Code','Name']
+    cols = pd.MultiIndex.from_frame(df.iloc[[0,2],2:].T)
+    cols.names = ['Nutrient','Unit']
+
+    return pd.DataFrame(df.iloc[3:,2:].values,index=idx,columns=cols)
+
+L = []
+for table in foo:
+    L.append(assign_index_and_columns(table.df))
+
+D = pd.concat(L)
+
+
+#+end_src
 
 * Files in Panama/<SOMEYEAR>/_/
 ** TODO household_characteristics.py
