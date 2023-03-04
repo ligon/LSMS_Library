@@ -406,12 +406,12 @@ print(k_index.to_markdown())
 | Nigeria/2018-19/Data/sect1_plantingw4.csv | hhid | 2019Q1 | zone |
 
 
-#+begin_src python :var regions=regions url=data_url VARS=VARS_Nigeria INDICES=INDICES_Nigeria :colnames no :tangle /tmp/foo.py
+#+begin_src python :var regions=regions url=data_url VARS=VARS_Nigeria INDICES=INDICES_Nigeria :colnames no :tangle household_characteristics.py
 from cfe.df_utils import orgtbl_to_df
 from cfe.input_files import construct_df
 import pandas as pd
 import numpy as np
-from eep153_tools import write_sheet
+#from eep153_tools import write_sheet
 
 url = url[0][0]
 

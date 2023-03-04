@@ -1,0 +1,72 @@
+| Code | Preferred Label     | Aggregate Label | 2011-12       | 2013          | 2015                                     |
+|    1 | Teff                |                 | Teff          | Teff          | Teff                                     |
+|    2 | Wheat               |                 | Wheat         | Wheat         | Wheat                                    |
+|    3 | Barley              |                 | Barley        | Barley        | Barley                                   |
+|    4 | Maize               |                 | Maize         | Maize         | Maize                                    |
+|    5 | Sorghum             |                 | Sorghum       | Sorghum       | Sorghum                                  |
+|    6 | Millet              |                 | Millet        | Millet        | Millet                                   |
+|    7 | Horsebeans          |                 | Horsebeans    | Horsebeans    | Horsebeans                               |
+|    8 | Chick Pea           |                 | Chick Pea     | Chick Pea     | Field Pea                                |
+|    9 | Field Pea           |                 | Field Pea     | Field Pea     | Chick Pea                                |
+|   10 | Lentils             |                 | Lentils       | Lentils       | Lentils                                  |
+|   11 | Haricot Beans       |                 | Haricot Beans | Haricot Beans | Haricot Beans                            |
+|   12 | Niger Seed          |                 | Niger Seed    | Niger Seed    | Niger Seed                               |
+|   13 | Linseed             |                 | Linseed       | Linseed       | Linseed                                  |
+|   14 | Onion               |                 | Onion         | Onion         | Onion                                    |
+|   15 | Banana              |                 | Banana        | Banana        | Banana                                   |
+|   16 | Potato              |                 | Potato        | Potato        | Potato                                   |
+|   17 | Kocho               |                 | Kocho         | Kocho         | Kocho                                    |
+|   18 | Meat                |                 | Meat          | Meat          | ---                                      |
+|   19 | Milk                |                 | Milk          | Milk          | Milk                                     |
+|   20 | Cheese              |                 | Cheese        | Cheese        | Cheese                                   |
+|   21 | Eggs                |                 | Eggs          | Eggs          | Eggs                                     |
+|   22 | Sugar               |                 | Sugar         | Sugar         | Sugar                                    |
+|   23 | Salt                |                 | Salt          | Salt          | Salt                                     |
+|   24 | Coffee              |                 | Coffee        | Coffee        | Coffee                                   |
+|   25 | Chat                |                 | Chat / Kat    | Chat / Kat    | Chat / Kat                               |
+|   26 | Bula                |                 | ---           | Bula          | Bula                                     |
+|   60 | Other Cereal        |                 | ---           | ---           | Other cereal (SPECIFY)                   |
+|  110 | Ground nuts         |                 | ---           | ---           | Ground nuts                              |
+|  111 | Other Pulse         |                 | ---           | ---           | Other pulse or nut (SPECIFY)             |
+|  131 | Other Seed          |                 | ---           | ---           | Other seed (SPECIFY)                     |
+|  141 | Kariya              |                 | ---           | ---           | Green chili pepper (kariya)              |
+|  142 | Berbere             |                 | ---           | ---           | Red pepper (berbere)                     |
+|  143 | Greens              |                 | ---           | ---           | Greens (kale, cabbage, etc.)             |
+|  144 | Tomato              |                 | ---           | ---           | Tomato                                   |
+|  145 | Other Vegetable     |                 | ---           | ---           | Other vegetable (SPECIFY)                |
+|  151 | Orange              |                 | ---           | ---           | Orange                                   |
+|  152 | Other Fruit         |                 | ---           | ---           | Other fruit (SPECIFY)                    |
+|  170 | Sweet Potato        |                 | ---           | ---           | Sweet potato                             |
+|  171 | Boye                |                 | ---           | ---           | Boye/Yam                                 |
+|  172 | Cassava             |                 | ---           | ---           | Cassava                                  |
+|  173 | Godere              |                 | ---           | ---           | Godere                                   |
+|  174 | Other Tuber         |                 | ---           | ---           | Other tuber or stem (SPECIFY)            |
+|  180 | Goat & Mutton       |                 | ---           | ---           | Goat & mutton meat                       |
+|  181 | Beef                |                 | ---           | ---           | Beef                                     |
+|  182 | Poultry             |                 | ---           | ---           | Poultry                                  |
+|  183 | Fish                |                 | ---           | ---           | Fish                                     |
+|  195 | Injera              |                 | ---           | ---           | PuUrchased Injera                        |
+|  196 | Bread               |                 | ---           | ---           | Purchased Bread or Biscuits              |
+|  197 | Pasta               |                 | ---           | ---           | Pasta/Maccaroni                          |
+|  198 | Other Prepared Food |                 | ---           | ---           | Other prepared food and consumed at Home |
+|  201 | Butter              |                 | ---           | ---           | Butter/ghee                              |
+|  202 | Oils                |                 | ---           | ---           | Oils (processed)                         |
+|  203 | Tea                 |                 | ---           | ---           | Tea                                      |
+|  204 | Soda                |                 | ---           | ---           | Soft drinks/Soda                         |
+|  205 | Beer                |                 | ---           | ---           | Beer                                     |
+|  206 | Tella               |                 | ---           | ---           | Tella                                    |
+|  901 | Oats                |                 | ---           | ---           | Oats                                     |
+|  902 | Vetch               |                 | ---           | ---           | Vetch                                    |
+|  903 | Sesame              |                 | ---           | ---           | Sesame                                   |
+|  904 | Sunflower           |                 | ---           | ---           | Sunflower                                |
+|  905 | Fenugreek           |                 | ---           | ---           | Fenugreek                                |
+|  906 | Lemon               |                 | ---           | ---           | Lemons                                   |
+|  907 | Mango               |                 | ---           | ---           | Mangos                                   |
+|  908 | Beet root           |                 | ---           | ---           | Beet root                                |
+|  909 | Cabbage             |                 | ---           | ---           | Cabbage                                  |
+|  910 | Carrot              |                 | ---           | ---           | Carrot                                   |
+|  911 | Garlic              |                 | ---           | ---           | Garlic                                   |
+|  912 | Kale                |                 | ---           | ---           | Kale                                     |
+|  913 | Pumpkin             |                 | ---           | ---           | Pumpkins                                 |
+|  914 | Gesho               |                 | ---           | ---           | Gesho                                    |
+|  915 | Avocado             |                 | ---           | ---           | Avocados                                 |
