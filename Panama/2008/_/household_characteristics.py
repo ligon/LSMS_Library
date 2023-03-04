@@ -22,6 +22,11 @@ final  = age_sex_composition(df, sex='p3_sexo', sex_converter=lambda x: ['m', 'f
 final = pd.merge(left = final, right = regions, how = 'left', left_index = True, right_index = True)
 final = final.rename(columns = {'prov' : 'm'})
 final['t'] = '2008'
+region_dict = {'bocas del toro' : 'Bocas Del Toro', 'colón': 'Colón', 'coclé': 'Coclé',
+               'chiriquí': 'Chíriqui', 'darién': 'Darién', 'panamá': 'Panamá', 'veraguas': 'Veraguas',
+               'herrera': 'Herrera', 'los santos': 'Los Santos', 'comarca kuna yala': 'Comarca de San Blas', 'comarca emberá': 'Comarca Emberá', 'comarca ngöbe bugle': 'Comarca Ngobe Bugle'}
+final = final.replace({'m' : region_dict})
+
 final = final.set_index(['t', 'm'], append = True)
 final.columns.name = 'k'
 
