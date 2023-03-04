@@ -6,6 +6,10 @@ import dvc.api
 import warnings
 import json
 
+Waves = {'2008-15':('upd4_hh_a.dta','UPHI','r_hhid','round'),
+         '2019-20':('HH_SEC_A.dta','y4_hhid','sdd_hhid'),
+         '2020-21':('hh_sec_a.dta','y4_hhid','y5_hhid')}
+
 def harmonized_food_labels(fn='../../_/food_items.org'):
     # Harmonized food labels
     food_items = pd.read_csv(fn,delimiter='|',skipinitialspace=True,converters={1:int,2:lambda s: s.strip()})
@@ -91,22 +95,26 @@ def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Label',value='Prefer
 
     
 def food_acquired(fn,myvars):
-    
-    with dvc.api.open(fn,mode='rb') as dta:
-        df = from_dta(dta)
+    if 'year' in myvars:
+        with dvc.api.open(fn,mode='rb') as dta:
+            df = from_dta(dta)
 
-    df = df.loc[:,[v for v in myvars.values()]].rename(columns={v:k for k,v in myvars.items()})
-
-    #map round code to actual years
-    dict = {1:'2008-09', 2:'2010-11', 3:'2012-13', 4:'2014-15'}
-    df.replace({"year": dict},inplace=True)
-
-    df = df.set_index(['HHID','item','year']).dropna(how='all')
-    df.index.names = ['j','i','t']
-
+        df = df.loc[:,[v for v in myvars.values()]].rename(columns={v:k for k,v in myvars.items()})
+        #map round code to actual years
+        dict = {1:'2008-09', 2:'2010-11', 3:'2012-13', 4:'2014-15'}
+        df.replace({"year": dict},inplace=True)
+        df = df.set_index(['HHID','item','year']).dropna(how='all')
+        df.index.names = ['j','i','t']
+    else:
+        with dvc.api.open(fn,mode='rb') as dta:
+            df = from_dta(dta)
+        df = df.loc[:,[v for v in myvars.values()]].rename(columns={v:k for k,v in myvars.items()})
+        df = df.set_index(['HHID','item']).dropna(how='all')
+        df.index.names = ['j','i']
+        
     # Fix type of hhids if need be
     if df.index.get_level_values('j').dtype ==float:
-        fix = dict(zip(df.index.levels[0],df.index.levels[0].astype(int).astype(str)))
+        fix = {k: v for k, v in zip(df.index.levels[0],df.index.levels[0].astype(int).astype(str))}
         df = df.rename(index=fix,level=0)
 
     #harmonize food labels 
@@ -124,3 +132,4 @@ def food_acquired(fn,myvars):
     #df = df.join(conversion_to_kgs,on='unit_ttl_consume')
     #df = df.astype(float)
     return df
+

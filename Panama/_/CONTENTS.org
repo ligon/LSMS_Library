@@ -1,0 +1,38 @@
+#+title: Contents
+
+Brief table of contents and todo list.
+
+* Files in Panama/_/
+** TODO panama.py
+Contains code common to different Ethiopia rounds
+** TODO food_items.org
+Should have columns for each year, with "Preferred Labels" and "Aggregate Labels".   Labels for different years:
+#+begin_src python :results output
+from lsms.tools import from_dta
+import dvc.api
+import pyreadstat
+
+fs = dvc.api.DVCFileSystem('../../')
+
+itemlabel_location = {'2008':('05alimentos.dta','producto'),
+                      '2003':('E03GA10B.DTA','gai00'),
+                      '1997':('GAST-A.DTA','ga100'}
+
+itemlabels = {}
+for k,v in itemlabel_location.items():
+    fs.get_file(f'/Panama/{k}/Data/{v[0]}',f'/tmp/{v[0]}')
+    df, meta = pyreadstat.read_dta(f'/tmp/{v[0]}')
+    itemlabels[k] = list(meta.value_labels[v[1]].values())
+
+print(itemlabels)
+#+end_src
+
+#+results:
+
+** TODO conversion_to_kgs.json
+** TODO nutrition
+A food conversion table, with foods keyed to the "Preferred Labels" of food_items.org.
+
+* Files in Panama/<SOMEYEAR>/_/
+** TODO household_characteristics.py
+** TODO food_acquired.py

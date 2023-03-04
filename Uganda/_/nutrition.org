@@ -28,7 +28,7 @@ same within a period and market.
 
 After getting all the indices to match, code below will write the
 various datasets to different google sheets at
-(
+
 #+name: data_url
   - https://docs.google.com/spreadsheets/d/1yVLriVpo7KGUXvR3hq_n53XpXlD5NmLaH1oOMZyV0gQ
 
