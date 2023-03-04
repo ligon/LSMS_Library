@@ -48,8 +48,7 @@ for t in ['2008-09','2010-11','2012-13','2014-15']:
 z = pd.DataFrame(z)
 z = z.stack().unstack('k')
 z.index.names=['j','t']
-z['m'] = "Tanzania"
-z = z.reset_index().set_index(['j','t','m'])
+z = z.reset_index().set_index(['j','t'])
 
 
 z.to_parquet('household_characteristics.parquet')

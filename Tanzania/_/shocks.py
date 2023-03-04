@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Concatenate data on household characteristics across rounds.
+Concatenate data on shocks across rounds.
 """
 
 import sys
@@ -36,7 +36,7 @@ def id_match(df, wave, waves_dict):
                 m.insert(1, 't', wave)
 
     if len(waves_dict[wave]) == 4:
-        if 'UPHI'  in df.columns: 
+        if 'UPHI' in df.columns: 
             m = df.rename(columns={'UPHI': 'j'})
         else: 
             with dvc.api.open('../%s/Data/%s' % (wave,waves_dict[wave][0]),mode='rb') as dta:
@@ -52,13 +52,13 @@ def id_match(df, wave, waves_dict):
     return m
 
 
-z={}
+s={}
 for t in Waves.keys():
-    z[t] = pd.read_parquet('../'+t+'/_/household_characteristics.parquet')
-    z[t] = id_match(z[t],t,Waves)
+    s[t] = pd.read_parquet('../'+t+'/_/shocks.parquet')
+    s[t] = id_match(s[t],t,Waves)
 
-z = pd.concat(z.values())
-z['m'] = 'Tanzania'
-z = z.reset_index().set_index(['j','t','m'])
-z = z.drop(columns ='index')
-z.to_parquet('household_characteristics.parquet')
+s = pd.concat(s.values())
+s['m'] = 'Tanzania'
+s = s.reset_index().set_index(['j','t','m'])
+s = s.drop(columns ='index')
+s.to_parquet('shocks.parquet')
