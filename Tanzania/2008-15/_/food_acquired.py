@@ -6,7 +6,7 @@ from tanzania import food_acquired
 fn='../Data/upd4_hh_j1.dta'
 
 myvars = dict(item='hj_00',
-              HHID='r_hhid',
+              HHID='UPHI',
               year ='round',
               quant_ttl_consume='hj_02_2',
               unit_ttl_consume = 'hj_02_1',
