@@ -2,6 +2,8 @@
 """
 Compile data on reported shocks.
 """
+import sys
+sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
 from uganda import change_id, Waves

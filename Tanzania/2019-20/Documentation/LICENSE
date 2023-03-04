@@ -1,0 +1,45 @@
+LICENSE
+
+https://microdata.worldbank.org/index.php/catalog/3885#metadata-data_access
+
+1.Access policy
+CONTACTS
+Name	Affiliation	Email
+Jonathan G Kastelic	World Bank	jkastelic@worldbank.org
+Talip Kilic	World Bank	tkilic@worldbank.org
+Heather Moylan	World Bank	hmoylan@worldbank.org
+LSMS Data Manager	World Bank	lsms@worldbank.org
+
+CONFIDENTIALITY
+The Primary Data Investigator undertakes that no attempt will be made to identify any individual person, family, business, enterprise or organization. If such a unique disclosure is made inadvertently, no use will be made of the identity of any person or establishment discovered and full details will be reported to the NBS. The identification will not be revealed to any other person not included in the Data Access Agreement.
+
+ACCESS CONDITIONS
+The dataset has been anonymized and is available as a Public Use Dataset. It is accessible to all for statistical and research purposes only, under the following terms and conditions:
+1. The data and other materials will not be redistributed or sold to other individuals, institutions, or organizations without the written agreement of the National Bureau of Statistics, Tanzania.
+2. The data will be used for statistical and scientific research purposes only. They will be used solely for reporting of aggregated information, and not for investigation of specific individuals or organizations.
+3. No attempt will be made to re-identify respondents, and no use will be made of the identity of any person or establishment discovered inadvertently. Any such discovery would immediately be reported to the National Bureau of Statistics.
+4. No attempt will be made to produce links among datasets provided by the NBS, or among data from the National Bureau of Statistics and other datasets that could identify individuals or organizations.
+5. Any books, articles, conference papers, theses, dissertations, reports, or other publications that employ data obtained from the National Bureau of Statistics will cite the source of data in accordance with the Citation Requirement provided with each dataset.
+6. An electronic copy of all reports and publications based on the requested data will be sent to the National Bureau of Statistics The original collector of the data, the National Bureau of Statistics, and the relevant funding agencies bear no responsibility for use of the data or for interpretations or inferences based upon such uses.
+
+CITATION REQUIREMENTS
+Use of the dataset must be acknowledged using a citation which would include:
+- the Identification of the Primary Investigator
+- the title of the survey (including country, acronym and year of implementation)
+- the survey reference number
+- the source and date of download
+
+Example:
+World Bank. Tanzania National Panel Survey 2019-2020 - Extended Panel with Sex Disaggregated Data (NPS 2019-2020). Ref: TZA_2019_NPS-SDD_v06_M. Downloaded from [uri] on [date]
+
+ACCESS AUTHORITY
+Name	Affiliation	URL
+Microdata Library	World Bank	microdata.worldbank.org
+
+
+2.Disclaimer and copyrights
+DISCLAIMER
+The user of the data acknowledges that the original collector of the data, the authorized distributor of the data, and the relevant funding agency bear no responsibility for use of the data or for interpretations or inferences based upon such uses.
+
+COPYRIGHT
+World Bank 2021
