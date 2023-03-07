@@ -82,3 +82,9 @@ print(hc.final.describe())
 #+end_src
 
 ** TODO food_acquired.py
+Code to test for 2000:
+#+begin_src python :dir ../2000/_ :results output
+import food_acquired as fa
+
+print(fa.final.describe())
+#+end_src
