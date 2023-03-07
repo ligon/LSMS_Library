@@ -14,7 +14,7 @@ import pandas as pd
 
 fs = dvc.api.DVCFileSystem('../../')
 
-itemlabel_location = {'2000':('05alimentos.dta','producto'),)
+itemlabel_location = {'2000':('ECVPLIB.DTA','item'),)
 
 itemlabels = {}
 for k,v in itemlabel_location.items():
