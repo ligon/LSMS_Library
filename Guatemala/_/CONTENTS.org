@@ -3,9 +3,9 @@
 Brief table of contents and todo list.
 
 * Files in Guatemala/_/
-** TODO food_items.org
+** DONE food_items.org
 Should have columns for each year, with "Preferred Labels" and "Aggregate Labels".   Labels for different years:
-#+begin_src python :results output
+#+begin_src python :results output raw table
 from lsms.tools import from_dta
 import dvc.api
 import pyreadstat
@@ -14,11 +14,11 @@ import pandas as pd
 
 fs = dvc.api.DVCFileSystem('../../')
 
-itemlabel_location = {'2000':('ECVPLIB.DTA','item'),)
+itemlabel_location = {'2000':('ECVPLIB.DTA','item'),}
 
 itemlabels = {}
 for k,v in itemlabel_location.items():
-    fs.get_file(f'/Panama/{k}/Data/{v[0]}',f'/tmp/{v[0]}')
+    fs.get_file(f'/Guatemala/{k}/Data/{v[0]}',f'/tmp/{v[0]}')
     df, meta = pyreadstat.read_dta(f'/tmp/{v[0]}')
     itemlabels[k] = list(meta.value_labels[v[1]].values())
 
@@ -29,7 +29,7 @@ import difflib
 D = defaultdict(dict)
 D.update({k:{'Preferred Label':k} for k in itemlabels['2000']})
 
-for wave in ['2013-14','2011-12']:
+for wave in ['2000']:
     for l in itemlabels[wave]:
         k = difflib.get_close_matches(l,itemlabels['2000'])
         if len(k):
@@ -38,11 +38,11 @@ for wave in ['2013-14','2011-12']:
             D[l][wave] = l
 
 df = pd.DataFrame(D).T
+df['Preferred Label'] = df['Preferred Label'].str.capitalize()
 
 print(df_to_orgtbl(df))
 #+end_src
 
-#+results:
 
 ** TODO conversion_to_kgs.json
 ** TODO nutrition
