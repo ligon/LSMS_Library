@@ -8,6 +8,13 @@ from cfe.df_utils import use_indices
 import warnings
 import json
 
+# Data to link household ids across waves
+Waves = {'2011-12':(),
+         '2013-14':('sect_cover_hh_w2.dta','household_id2','household_id'),
+         '2015-16':(), #'sect_cover_hh_w3.dta','household_id2','household_id2'),
+         '2018-19':(),   #'sect_cover_hh_w4.dta','household_id','household_id2'),  # But entirely new sample drawn in 2018-19!
+         }
+
 
 def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Code',value='Preferred Label'):
     unitlabels = pd.read_csv(fn)
@@ -184,9 +191,11 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
     if fn is None:
         x = x.reset_index()
         if x['j'].dtype==float:
-            x['j'].astype(str).apply(lambda s: s.split('.')[0]).replace('nan',np.nan)
+            x['j'] = x['j'].astype(str).apply(lambda s: s.split('.')[0]).replace('nan',np.nan)
         elif x['j'].dtype==int:
             x['j'] = x['j'].astype(str)
+        elif x['j'].dtype==str:
+            x['j'] = x['j'].replace('',np.nan)
 
         x = x.set_index(idx)
 
@@ -208,6 +217,7 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
             id[column] = id[column].astype(str).replace('nan',np.nan)
         elif id[column].dtype==object:
             id[column] = id[column].replace('nan',np.nan)
+            id[column] = id[column].replace('',np.nan)
 
     ids = dict(id[[id0,id1]].values.tolist())
 
