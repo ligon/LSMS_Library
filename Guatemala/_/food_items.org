@@ -1,0 +1,100 @@
+| Preferred Label                    | 2000                               |
+| Pan dulce                          | PAN DULCE                          |
+| Pan frances                        | PAN FRANCES                        |
+| Pan de rodaja                      | PAN DE RODAJA                      |
+| Galletas                           | GALLETAS                           |
+| Pasteles                           | PASTELES                           |
+| Tostadas                           | TOSTADAS                           |
+| Tortillas                          | TORTILLAS                          |
+| Masa de maiz fresca                | MASA DE MAIZ FRESCA                |
+| Corn flakes                        | CORN FLAKES                        |
+| Incaparina                         | INCAPARINA                         |
+| Mosh, avenas                       | MOSH, AVENAS                       |
+| Atol de maiz                       | ATOL DE MAIZ                       |
+| Otros atoles                       | OTROS ATOLES                       |
+| Azucar granulada                   | AZUCAR GRANULADA                   |
+| Panela o rapadura                  | PANELA O RAPADURA                  |
+| Mieles melaza y jarabes            | MIELES MELAZA Y JARABES            |
+| Dulces                             | DULCES                             |
+| Harina de maiz                     | HARINA DE MAIZ                     |
+| Harina de trigo                    | HARINA DE TRIGO                    |
+| Frijol                             | FRIJOL                             |
+| Arroz                              | ARROZ                              |
+| Maiz                               | MAIZ                               |
+| Fideos, tallarines, coditos etc.   | FIDEOS, TALLARINES, CODITOS ETC.   |
+| Sopas en sobre                     | SOPAS EN SOBRE                     |
+| Salsa y pasta de tomate            | SALSA Y PASTA DE TOMATE            |
+| Otras pastas y salsa               | OTRAS PASTAS Y SALSA               |
+| Carne de res                       | CARNE DE RES                       |
+| Viceras de res                     | VICERAS DE RES                     |
+| Carne de res con hueso             | CARNE DE RES CON HUESO             |
+| Carne de cerdo                     | CARNE DE CERDO                     |
+| Carne de cerdo con hueso           | CARNE DE CERDO CON HUESO           |
+| Carne de pollo o gallina           | CARNE DE POLLO O GALLINA           |
+| Visceras de pollo o gallina        | VISCERAS DE POLLO O GALLINA        |
+| Pescado fresco                     | PESCADO FRESCO                     |
+| Lata de sardinas o atun            | LATA DE SARDINAS O ATUN            |
+| Embutidos                          | EMBUTIDOS                          |
+| Leche en polvo para bebe           | LECHE EN POLVO PARA BEBE           |
+| Leche en polvo                     | LECHE EN POLVO                     |
+| Leche liquida                      | LECHE LIQUIDA                      |
+| Leche evaporada / condensada       | LECHE EVAPORADA / CONDENSADA       |
+| Huevos de gallina                  | HUEVOS DE GALLINA                  |
+| Crema fresca                       | CREMA FRESCA                       |
+| Queso fresco / duro                | QUESO FRESCO / DURO                |
+| Yogures                            | YOGURES                            |
+| Mantequilla                        | MANTEQUILLA                        |
+| Aceites comestibles                | ACEITES COMESTIBLES                |
+| Manteca vegetal                    | MANTECA VEGETAL                    |
+| Manteca de cerdo                   | MANTECA DE CERDO                   |
+| Margarina                          | MARGARINA                          |
+| Tomate                             | TOMATE                             |
+| Cebolla                            | CEBOLLA                            |
+| Chiles                             | CHILES                             |
+| Repollo                            | REPOLLO                            |
+| Zanahoria                          | ZANAHORIA                          |
+| Guisquil                           | GUISQUIL                           |
+| Lechuga                            | LECHUGA                            |
+| Pepino                             | PEPINO                             |
+| Remolacha                          | REMOLACHA                          |
+| Ajo                                | AJO                                |
+| Hierbas                            | HIERBAS                            |
+| Apio                               | APIO                               |
+| Papas                              | PAPAS                              |
+| Yuca                               | YUCA                               |
+| Arveja                             | ARVEJA                             |
+| Platanos                           | PLATANOS                           |
+| Guineos / bananos                  | GUINEOS / BANANOS                  |
+| Naranjas / mandarinas              | NARANJAS / MANDARINAS              |
+| Piña                               | PIÑA                               |
+| Manzanas, uvas, melocoton          | MANZANAS, UVAS, MELOCOTON          |
+| Sandias                            | SANDIAS                            |
+| Mangos                             | MANGOS                             |
+| Limones                            | LIMONES                            |
+| Frutas secas                       | FRUTAS SECAS                       |
+| Aguacate                           | AGUACATE                           |
+| Papaya                             | PAPAYA                             |
+| Melones                            | MELONES                            |
+| Condimentos y especias             | CONDIMENTOS Y ESPECIAS             |
+| Sal                                | SAL                                |
+| Aguas gaseosas                     | AGUAS GASEOSAS                     |
+| Jugos empacados                    | JUGOS EMPACADOS                    |
+| Agua embotellada                   | AGUA EMBOTELLADA                   |
+| Helados / granizadas               | HELADOS / GRANIZADAS               |
+| Cafe en grano,  molido instantaneo | CAFE EN GRANO,  MOLIDO INSTANTANEO |
+| Chocolate                          | CHOCOLATE                          |
+| Cerveza                            | CERVEZA                            |
+| Golosinas                          | GOLOSINAS                          |
+| Mermelada                          | MERMELADA                          |
+| Ayote, xilacayote                  | AYOTE, XILACAYOTE                  |
+| Anacate y otros hongos             | ANACATE Y OTROS HONGOS             |
+| Zompopo y otros insectos           | ZOMPOPO Y OTROS INSECTOS           |
+| Semillas secas                     | SEMILLAS SECAS                     |
+| Licores                            | LICORES                            |
+| Cigarrillos /tabaco                | CIGARRILLOS /TABACO                |
+| Otros envasados                    | OTROS ENVASADOS                    |
+| Tamales de maiz                    | TAMALES DE MAIZ                    |
+| Paches                             | PACHES                             |
+| Chicharrones de cerdo              | CHICHARRONES DE CERDO              |
+| Te                                 | TE                                 |
+| Otros productos                    | OTROS PRODUCTOS                    |
