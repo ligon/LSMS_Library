@@ -1,75 +1,80 @@
-| Preferred Label               | 2018-19                                            | 2013-14       | 2011-12       |
-| Teff                          | 101. Teff                                          | Teff          | Teff          |
-| Avocado                       | 505. Avocado                                       | ---           | ---           |
-| Milk                          | 705. Milk                                          | Milk          | Milk          |
-| Fish                          | 704. Fish                                          | ---           | ---           |
-| Poultry                       | 703. Poultry                                       | ---           | ---           |
-| Beef                          | 702. Beef                                          | ---           | ---           |
-| Goat & mutton meat            | 701. Goat & mutton meat                            | ---           | ---           |
-| Other tuber or stem           | 610. Other tuber or stem (SPECIFY)                 | ---           | ---           |
-| Beetroot                      | 609. Beetroot                                      | ---           | ---           |
-| Carrot                        | 608. Carrot                                        | ---           | ---           |
-| Godere                        | 607. Godere                                        | ---           | ---           |
-| Cassava                       | 606. Cassava                                       | ---           | ---           |
-| Boye/Yam                      | 605. Boye/Yam                                      | ---           | ---           |
-| Sweet potato                  | 604. Sweet potato                                  | ---           | ---           |
-| Bula                          | 603. Bula                                          | Bula          | ---           |
-| Kocho                         | 602. Kocho                                         | Kocho         | Kocho         |
-| Potato                        | 601. Potato                                        | Potato        | Potato        |
-| Cheese                        | 706. Cheese                                        | Cheese        | Cheese        |
-| Butter/ghee                   | 707. Butter/ghee                                   | ---           | ---           |
-| Oils (processed)              | 708. Oils (processed)                              | ---           | ---           |
-| Beer                          | 804. Beer                                          | ---           | ---           |
-| Pasta/Macaroni                | 903. Pasta/Maccaroni                               | ---           | ---           |
-| Bread/biscuit                 | 902. purchased bread/biscuit                       | ---           | ---           |
-| Injera                        | 901. purchased Injera                              | ---           | ---           |
-| Hops (gesho)                  | 807. Hops (gesho)                                  | ---           | ---           |
-| Chat/Kat                      | 806. Chat / Kat                                    | Chat / Kat    | Chat / Kat    |
-| Tella                         | 805. Tella                                         | ---           | ---           |
-| Soda                          | 803. Soft drinks/Soda                              | ---           | ---           |
-| Eggs                          | 709. Eggs                                          | Eggs          | Eggs          |
-| Tea                           | 802. Tea                                           | ---           | ---           |
-| Coffee                        | 801. Coffee                                        | Coffee        | Coffee        |
-| Other condiments              | 713. Other condiments                              | ---           | ---           |
-| Salt                          | 712. Salt                                          | Salt          | Salt          |
-| Honey                         | 711. Honey, natural                                | ---           | ---           |
-| Sugar                         | 710. Sugar                                         | Sugar         | Sugar         |
-| Other fruit                   | 506. Other fruit (SPECIFY) ____                    | ---           | ---           |
-| Papaya                        | 504. Papaya                                        | ---           | ---           |
-| Wheat                         | 102. Wheat (Incl. Flour factory product)           | Wheat         | Wheat         |
-| Mango                         | 503. Mango                                         | ---           | ---           |
-| Fenugreek                     | 208. Fenugreek                                     | ---           | ---           |
-| Vetch                         | 207. Vetch                                         | ---           | ---           |
-| Ground nuts                   | 206. Ground nuts                                   | ---           | ---           |
-| Haricot Beans                 | 205. Haricot Beans                                 | Haricot Beans | Haricot Beans |
-| Lentils                       | 204. Lentils                                       | Lentils       | Lentils       |
-| Field Pea                     | 203. Field Pea                                     | Field Pea     | Field Pea     |
-| Chick Pea                     | 202. Chick Pea                                     | Chick Pea     | Chick Pea     |
-| Horsebeans                    | 201. Horsebeans                                    | Horsebeans    | Horsebeans    |
-| Other cereal                  | 109. Other cereal (SPECIFY)                        | ---           | ---           |
-| Oats                          | 108. Oats                                          | ---           | ---           |
-| Rice                          | 107. Rice                                          | ---           | ---           |
-| Millet                        | 106. Millet                                        | Millet        | Millet        |
-| Sorghum                       | 105. Sorghum                                       | Sorghum       | Sorghum       |
-| Maize                         | 104. Maize                                         | Maize         | Maize         |
-| Barley                        | 103. Barley (Incl. Beso: roasted & milled barely)  | Barley        | Barley        |
-| Mung Bean                     | 209. mung bean                                     | ---           | ---           |
-| Shiro                         | 210. Processed pulses (Shiro)                      | ---           | ---           |
-| Other pulse or nut            | 211. Other pulse or nut (SPECIFY)                  | ---           | ---           |
-| Leafy Greens                  | 404. kale, cabbage, Pumpikn Leaf, Lettuce, spinach | ---           | ---           |
-| Orange                        | 502. Orange                                        | ---           | ---           |
-| Banana                        | 501. Banana                                        | Banana        | Banana        |
-| Other vegetable               | 408. Other vegetable (SPECIFY)                     | ---           | ---           |
-| Moringa/Shiferaw/Halloka      | 407. Moringa/Shiferaw/Halloka                      | ---           | ---           |
-| Garlic                        | 406. Garlic                                        | ---           | ---           |
-| Tomato                        | 405. Tomato                                        | ---           | ---           |
-| Berbere                       | 403. Red pepper (Processed pepper (Berbere))       | ---           | ---           |
-| Niger Seed                    | 301. Niger Seed                                    | Niger Seed    | Niger Seed    |
-| Kariya                        | 402. Green chili pepper (kariya)                   | ---           | ---           |
-| Onion                         | 401. Onion                                         | Onion         | Onion         |
-| Other seed                    | 305. Other seed (SPECIFY)                          | ---           | ---           |
-| Sun Flower                    | 304. Sun Flower                                    | ---           | ---           |
-| SESAME                        | 303. SESAME                                        | ---           | ---           |
-| Linseed                       | 302. Linseed                                       | Linseed       | Linseed       |
-| Other purchased prepared food | 904. Other purchased prepared food                 | ---           | ---           |
-| Meat                          | ---                                                | Meat          | Meat          |
+| Preferred Label          | 2011-12       | 2013-14       | 2015-16                  | 2018-19                                            |
+| Teff                     | Teff          | Teff          | Teff                     | 101. Teff                                          |
+| Avocado                  | ---           | ---           | ---                      | 505. Avocado                                       |
+| Milk                     | Milk          | Milk          | Milk                     | 705. Milk                                          |
+| Fish                     | ---           | ---           | Fish                     | 704. Fish                                          |
+| Poultry                  | ---           | ---           | Poultry                  | 703. Poultry                                       |
+| Beef                     | ---           | ---           | Beef                     | 702. Beef                                          |
+| Goat & mutton meat       | ---           | ---           | Goat & mutton meat       | 701. Goat & mutton meat                            |
+| Other tuber or stem      | ---           | ---           | Other tuber or stem (SPE | 610. Other tuber or stem (SPECIFY)                 |
+| Beetroot                 | ---           | ---           | ---                      | 609. Beetroot                                      |
+| Carrot                   | ---           | ---           | ---                      | 608. Carrot                                        |
+| Godere                   | ---           | ---           | Godere                   | 607. Godere                                        |
+| Cassava                  | ---           | ---           | Cassava                  | 606. Cassava                                       |
+| Boye/Yam                 | ---           | ---           | Boye/Yam                 | 605. Boye/Yam                                      |
+| Sweet potato             | ---           | ---           | Sweet potato             | 604. Sweet potato                                  |
+| Bula                     | ---           | Bula          | Bula                     | 603. Bula                                          |
+| Kocho                    | Kocho         | Kocho         | Kocho                    | 602. Kocho                                         |
+| Potato                   | Potato        | Potato        | Potato                   | 601. Potato                                        |
+| Cheese                   | Cheese        | Cheese        | Cheese                   | 706. Cheese                                        |
+| Butter/ghee              | ---           | ---           | Butter/ghee              | 707. Butter/ghee                                   |
+| Oils                     | ---           | ---           | Oils (processed)         | 708. Oils (processed)                              |
+| Beer                     | ---           | ---           | Beer                     | 804. Beer                                          |
+| Pasta/Macaroni           | ---           | ---           | Pasta/Maccaroni          | 903. Pasta/Maccaroni                               |
+| Bread/biscuit            | ---           | ---           | Purchased Bread or Biscu | 902. purchased bread/biscuit                       |
+| Injera                   | ---           | ---           | PuUrchased Injera        | 901. purchased Injera                              |
+| Hops (gesho)             | ---           | ---           | ---                      | 807. Hops (gesho)                                  |
+| Chat/Kat                 | Chat / Kat    | Chat / Kat    | Chat / Kat               | 806. Chat / Kat                                    |
+| Tella                    | ---           | ---           | Tella                    | 805. Tella                                         |
+| Soda                     | ---           | ---           | Soft drinks/Soda         | 803. Soft drinks/Soda                              |
+| Eggs                     | Eggs          | Eggs          | Eggs                     | 709. Eggs                                          |
+| Tea                      | ---           | ---           | ---                      | 802. Tea                                           |
+| Coffee                   | Coffee        | Coffee        | Coffee                   | 801. Coffee                                        |
+| Other condiments         | ---           | ---           | ---                      | 713. Other condiments                              |
+| Salt                     | Salt          | Salt          | Salt                     | 712. Salt                                          |
+| Honey                    | ---           | ---           | ---                      | 711. Honey, natural                                |
+| Sugar                    | Sugar         | Sugar         | Sugar                    | 710. Sugar                                         |
+| Other fruit              | ---           | ---           | Other fruit (SPECIFY)    | 506. Other fruit (SPECIFY) ____                    |
+| Papaya                   | ---           | ---           | ---                      | 504. Papaya                                        |
+| Wheat                    | ---           | ---           | ---                      | 102. Wheat (Incl. Flour factory product)           |
+| Mango                    | ---           | ---           | ---                      | 503. Mango                                         |
+| Fenugreek                | ---           | ---           | ---                      | 208. Fenugreek                                     |
+| Vetch                    | ---           | ---           | ---                      | 207. Vetch                                         |
+| Ground nuts              | ---           | ---           | Ground nuts              | 206. Ground nuts                                   |
+| Haricot Beans            | Haricot Beans | Haricot Beans | Haricot Beans            | 205. Haricot Beans                                 |
+| Lentils                  | Lentils       | Lentils       | Lentils                  | 204. Lentils                                       |
+| Field Pea                | Field Pea     | Field Pea     | Field Pea                | 203. Field Pea                                     |
+| Chick Pea                | Chick Pea     | Chick Pea     | Chick Pea                | 202. Chick Pea                                     |
+| Horsebeans               | Horsebeans    | Horsebeans    | Horsebeans               | 201. Horsebeans                                    |
+| Other cereal             | ---           | ---           | Other cereal (SPECIFY)   | 109. Other cereal (SPECIFY)                        |
+| Oats                     | ---           | ---           | ---                      | 108. Oats                                          |
+| Rice                     | ---           | ---           | ---                      | 107. Rice                                          |
+| Millet                   | Millet        | Millet        | Millet                   | 106. Millet                                        |
+| Sorghum                  | Sorghum       | Sorghum       | Sorghum                  | 105. Sorghum                                       |
+| Maize                    | Maize         | Maize         | Maize                    | 104. Maize                                         |
+| Barley                   | ---           | ---           | ---                      | 103. Barley (Incl. Beso: roasted & milled barely)  |
+| Mung bean                | ---           | ---           | ---                      | 209. mung bean                                     |
+| Shiro                    | ---           | ---           | ---                      | 210. Processed pulses (Shiro)                      |
+| Other pulse or nut       | ---           | ---           | Other pulse or nut (SPEC | 211. Other pulse or nut (SPECIFY)                  |
+| Leafy Greens             | ---           | ---           | ---                      | 404. kale, cabbage, Pumpikn Leaf, Lettuce, spinach |
+| Orange                   | ---           | ---           | Orange                   | 502. Orange                                        |
+| Banana                   | Banana        | Banana        | Banana                   | 501. Banana                                        |
+| Other vegetable          | ---           | ---           | Other vegetable (SPECIFY | 408. Other vegetable (SPECIFY)                     |
+| Moringa/Shiferaw/Halloka | ---           | ---           | ---                      | 407. Moringa/Shiferaw/Halloka                      |
+| Garlic                   | ---           | ---           | ---                      | 406. Garlic                                        |
+| Tomato                   | ---           | ---           | Tomato                   | 405. Tomato                                        |
+| Berbere                  | ---           | ---           | Red pepper (berbere)     | 403. Red pepper (Processed pepper (Berbere))       |
+| Niger Seed               | Niger Seed    | Niger Seed    | Niger Seed               | 301. Niger Seed                                    |
+| Kariya                   | ---           | ---           | Green chili pepper (kari | 402. Green chili pepper (kariya)                   |
+| Onion                    | Onion         | Onion         | Onion                    | 401. Onion                                         |
+| Other seed               | ---           | ---           | Other seed (SPECIFY)     | 305. Other seed (SPECIFY)                          |
+| Sun Flower               | ---           | ---           | ---                      | 304. Sun Flower                                    |
+| Sesame                   | ---           | ---           | ---                      | 303. SESAME                                        |
+| Linseed                  | Linseed       | Linseed       | Linseed                  | 302. Linseed                                       |
+| Other prepared food      | ---           | ---           | Other prepared food and  | 904. Other purchased prepared food                 |
+| Meat                     | Meat          | Meat          | ---                      | ---                                                |
+| Wheat                    | Wheat         | Wheat         | Wheat                    | ---                                                |
+| Barley                   | Barley        | Barley        | Barley                   | ---                                                |
+| Tea                      | ---           | ---           | Tea                      | ---                                                |
+| Leafy Greens             | ---           | ---           | Greens (kale, cabbage, e | ---                                                |
+| Leafy Greens             | ---           | ---           | Greens (kale        cabb | ---                                                |

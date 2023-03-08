@@ -12,7 +12,7 @@ round = str(pwd.parent).split('/')[-1]
 
 
 myvars = dict(fn='../Data/sect_cover_hh_w3.dta',
-              HHID='household_id',
+              HHID='household_id2',
               urban='rural',
               region='saq01',
               urban_converter = lambda x: x.lower() != 'rural')

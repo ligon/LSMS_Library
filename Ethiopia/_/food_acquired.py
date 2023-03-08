@@ -4,8 +4,15 @@ different prices for different units.
 
 import pandas as pd
 import numpy as np
-from ethiopia import change_id, Waves
+from ethiopia import change_id, Waves, harmonized_food_labels
 import warnings
+
+def fix_food_labels():
+    D = {}
+    for w in Waves.keys():
+        D.update(harmonized_food_labels(fn='./food_items.org',key=w))
+
+    return D
 
 def id_walk(df,wave,waves):
 
@@ -24,10 +31,10 @@ for t in Waves.keys():
     df = pd.read_parquet('../'+t+'/_/food_acquired.parquet').squeeze()
     df['t'] = t
     # There may be occasional repeated reports of purchases of same food
-    df = df.groupby(['j','t','i','units','units_purchased']).sum()
-    df = df.reset_index().set_index(['j','t','i','units'])
-    df = id_walk(df,t,Waves)
-    p.append(df)
+    df0 = df.groupby(['j','t','i','units','units_purchased']).sum()
+    #df = df.reset_index().set_index(['j','t','i','units','units_purchased'])
+    df1 = id_walk(df0,t,Waves)
+    p.append(df1)
 
 p = pd.concat(p)
 
@@ -35,9 +42,12 @@ try:
     of = pd.read_parquet('../var/other_features.parquet')
 
     p = p.join(of.reset_index('m')['m'],on=['j','t'])
-    p = p.reset_index().set_index(['j','t','m','i','units'])
+    p = p.reset_index().set_index(['j','t','m','i','units','units_purchased'])
 except FileNotFoundError:
     warnings.warn('No other_features.parquet found.')
-    pass
+    p['m'] = 'Ethiopia'
+    p = p.reset_index().set_index(['j','t','m','i','units','units_purchased'])
+
+p = p.rename(index=fix_food_labels(),level='i')
 
 p.to_parquet('../var/food_acquired.parquet')

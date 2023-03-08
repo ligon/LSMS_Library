@@ -27,8 +27,17 @@ def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Code',value='Preferr
 
 def harmonized_food_labels(fn='../../_/food_items.org',key='Code',value='Preferred Label'):
     # Harmonized food labels
-    food_items = pd.read_csv(fn,delimiter='|',skipinitialspace=True,converters={1:int,2:lambda s: s.strip()})
+    food_items = pd.read_csv(fn,delimiter='|',skipinitialspace=True,converters={1:lambda s: s.strip(),2:lambda s: s.strip()})
     food_items.columns = [s.strip() for s in food_items.columns]
+    food_items = food_items.loc[:,food_items.count()>0]
+    food_items = food_items.apply(lambda x: x.str.strip())
+
+    if type(key) is not str:  # Assume a series of foods
+        myfoods = set(key.values)
+        for key in food_items.columns:
+            if len(myfoods.difference(set(food_items[key].values)))==0: # my foods all in key
+                break
+
     food_items = food_items[[key,value]].dropna()
     food_items.set_index(key,inplace=True)
 
@@ -65,11 +74,11 @@ def food_acquired(fn,myvars):
     with dvc.api.open(fn,mode='rb') as dta:
         df = from_dta(dta,convert_categoricals=True)
 
-    df = df.loc[:,[v for v in myvars.values()]].rename(columns={v:k for k,v in myvars.items()})
+    df = df.loc[:,list(myvars.values())].rename(columns={v:k for k,v in myvars.items()})
 
-    df = df.set_index(['HHID','item','units']).dropna(how='all')
+    df = df.set_index(['HHID','item','units','units_purchased']).dropna(how='all')
 
-    df.index.names = ['j','i','units']
+    df.index.names = ['j','i','units','units_purchased']
 
 
     # Fix type of hhids if need be
@@ -77,14 +86,14 @@ def food_acquired(fn,myvars):
         fix = dict(zip(df.index.levels[0],df.index.levels[0].astype(int).astype(str)))
         df = df.rename(index=fix,level=0)
 
-    df = df.rename(index=harmonized_food_labels(),level='i')
+    df = df.rename(index=harmonized_food_labels(key=df.index.get_level_values('i')),level='i')
 
     # Compute unit values; BUT note these are in units_purchased, not necessarily units.
     df['unitvalue'] = df['value_purchased']/df['quantity_purchased']
 
     # Get list of units used in current survey
     units = list(set(df.index.get_level_values('units').tolist()))
-    units_purchased =  list(set(df.units_purchased.tolist()))
+    units_purchased = list(set(df.index.get_level_values('units_purchased').tolist()))
     units = list(set(units+units_purchased))
 
     #unknown_units = set(units).difference(unitlabels.values())

@@ -37,14 +37,23 @@ z = z.stack().unstack('m')
 #z['m'] = 'Uganda'
 
 # Harmonize region labels
-regions = {' kampala':'Central',
-           'central':'Central',
-           'central without kampala':'Central',
-           'eastern':'Eastern',
-           'kampala':'Central',
-           'nan':'Central',
-           'northern':'Northern',
-           'western':'Western'}
+regions = {'addis ababa':'Addis Ababa',
+           'tigray':'Tigray',
+           'afar':'Afar',
+           'amhara':'Amhara',
+           'benishangul gumuz':'Benishangul-Gumuz',
+           'benshagul gumuz':'Benishangul-Gumuz',
+           'dire dawa':'Dire Dawa',
+           'diredwa':'Dire Dawa',
+           'gambela':'Gambela',
+           'gambelia':'Gambela',
+           'harar':'Harari',
+           'harari':'Harari',
+           'oromia':'Oromia',
+           'snnp':'SNNP',
+           'somali':'Somali',
+           'somalie':'Somali'
+           }
 
 z = z.rename(columns=regions)
 
