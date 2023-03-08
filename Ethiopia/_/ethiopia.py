@@ -8,6 +8,13 @@ from cfe.df_utils import use_indices
 import warnings
 import json
 
+# Data to link household ids across waves
+Waves = {'2011-12':(),
+         '2013-14':('sect_cover_hh_w2.dta','household_id2','household_id'),
+         '2015-16':(), #'sect_cover_hh_w3.dta','household_id2','household_id2'),
+         '2018-19':(),   #'sect_cover_hh_w4.dta','household_id','household_id2'),  # But entirely new sample drawn in 2018-19!
+         }
+
 
 def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Code',value='Preferred Label'):
     unitlabels = pd.read_csv(fn)
@@ -20,8 +27,17 @@ def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Code',value='Preferr
 
 def harmonized_food_labels(fn='../../_/food_items.org',key='Code',value='Preferred Label'):
     # Harmonized food labels
-    food_items = pd.read_csv(fn,delimiter='|',skipinitialspace=True,converters={1:int,2:lambda s: s.strip()})
+    food_items = pd.read_csv(fn,delimiter='|',skipinitialspace=True,converters={1:lambda s: s.strip(),2:lambda s: s.strip()})
     food_items.columns = [s.strip() for s in food_items.columns]
+    food_items = food_items.loc[:,food_items.count()>0]
+    food_items = food_items.apply(lambda x: x.str.strip())
+
+    if type(key) is not str:  # Assume a series of foods
+        myfoods = set(key.values)
+        for key in food_items.columns:
+            if len(myfoods.difference(set(food_items[key].values)))==0: # my foods all in key
+                break
+
     food_items = food_items[[key,value]].dropna()
     food_items.set_index(key,inplace=True)
 
@@ -58,11 +74,11 @@ def food_acquired(fn,myvars):
     with dvc.api.open(fn,mode='rb') as dta:
         df = from_dta(dta,convert_categoricals=True)
 
-    df = df.loc[:,[v for v in myvars.values()]].rename(columns={v:k for k,v in myvars.items()})
+    df = df.loc[:,list(myvars.values())].rename(columns={v:k for k,v in myvars.items()})
 
-    df = df.set_index(['HHID','item','units']).dropna(how='all')
+    df = df.set_index(['HHID','item','units','units_purchased']).dropna(how='all')
 
-    df.index.names = ['j','i','units']
+    df.index.names = ['j','i','units','units_purchased']
 
 
     # Fix type of hhids if need be
@@ -70,14 +86,14 @@ def food_acquired(fn,myvars):
         fix = dict(zip(df.index.levels[0],df.index.levels[0].astype(int).astype(str)))
         df = df.rename(index=fix,level=0)
 
-    df = df.rename(index=harmonized_food_labels(),level='i')
+    df = df.rename(index=harmonized_food_labels(key=df.index.get_level_values('i')),level='i')
 
     # Compute unit values; BUT note these are in units_purchased, not necessarily units.
     df['unitvalue'] = df['value_purchased']/df['quantity_purchased']
 
     # Get list of units used in current survey
     units = list(set(df.index.get_level_values('units').tolist()))
-    units_purchased =  list(set(df.units_purchased.tolist()))
+    units_purchased = list(set(df.index.get_level_values('units_purchased').tolist()))
     units = list(set(units+units_purchased))
 
     #unknown_units = set(units).difference(unitlabels.values())
@@ -184,9 +200,11 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
     if fn is None:
         x = x.reset_index()
         if x['j'].dtype==float:
-            x['j'].astype(str).apply(lambda s: s.split('.')[0]).replace('nan',np.nan)
+            x['j'] = x['j'].astype(str).apply(lambda s: s.split('.')[0]).replace('nan',np.nan)
         elif x['j'].dtype==int:
             x['j'] = x['j'].astype(str)
+        elif x['j'].dtype==str:
+            x['j'] = x['j'].replace('',np.nan)
 
         x = x.set_index(idx)
 
@@ -208,6 +226,7 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
             id[column] = id[column].astype(str).replace('nan',np.nan)
         elif id[column].dtype==object:
             id[column] = id[column].replace('nan',np.nan)
+            id[column] = id[column].replace('',np.nan)
 
     ids = dict(id[[id0,id1]].values.tolist())
 
