@@ -1,0 +1,90 @@
+#+title: Contents
+
+Brief table of contents and todo list.
+
+* Files in Guatemala/_/
+** TODO food_items.org
+Should have columns for each year, with "Preferred Labels" and "Aggregate Labels".   Labels for different years:
+#+begin_src python :results output
+from lsms.tools import from_dta
+import dvc.api
+import pyreadstat
+from cfe.df_utils import df_to_orgtbl
+import pandas as pd
+
+fs = dvc.api.DVCFileSystem('../../')
+
+itemlabel_location = {'2000':('05alimentos.dta','producto'),)
+
+itemlabels = {}
+for k,v in itemlabel_location.items():
+    fs.get_file(f'/Panama/{k}/Data/{v[0]}',f'/tmp/{v[0]}')
+    df, meta = pyreadstat.read_dta(f'/tmp/{v[0]}')
+    itemlabels[k] = list(meta.value_labels[v[1]].values())
+
+# Build dictionary of dictionaries for matching
+from collections import defaultdict
+import difflib
+
+D = defaultdict(dict)
+D.update({k:{'Preferred Label':k} for k in itemlabels['2000']})
+
+for wave in ['2013-14','2011-12']:
+    for l in itemlabels[wave]:
+        k = difflib.get_close_matches(l,itemlabels['2000'])
+        if len(k):
+            D[k[0]][wave] = l
+        else:
+            D[l][wave] = l
+
+df = pd.DataFrame(D).T
+
+print(df_to_orgtbl(df))
+#+end_src
+
+#+results:
+
+** TODO conversion_to_kgs.json
+** TODO nutrition
+A food conversion table, with foods keyed to the "Preferred Labels" of food_items.org.   See https://docs.google.com/spreadsheets/d/1YwfdL0LMPVl3UGo-KfyvpC7S7KR_jDL54rsVLUQOCVE/, prepared by Kaylee Vu, which indexes the FCT at http://www.incap.int/mesocaribefoods/dmdocuments/TablaCAlimentos.pdf.
+
+Code to extract the nutrient tables from the aforementioned pdf:
+#+begin_src python
+import camelot
+
+# Produces a list of tables, one from each page
+foo = camelot.read_pdf('TablaCAlimentos.pdf',flavor='stream',pages='26-83')
+
+def assign_index_and_columns(df):
+    idx = pd.MultiIndex.from_frame(df.iloc[3:,[0,1]])
+    idx.names = ['Code','Name']
+    cols = pd.MultiIndex.from_frame(df.iloc[[0,2],2:].T)
+    cols.names = ['Nutrient','Unit']
+
+    return pd.DataFrame(df.iloc[3:,2:].values,index=idx,columns=cols)
+
+L = []
+for table in foo:
+    L.append(assign_index_and_columns(table.df))
+
+D = pd.concat(L)
+
+
+#+end_src
+
+* Files in Guatemala/<SOMEYEAR>/_/
+** TODO household_characteristics.py
+Code to test for 2000:
+#+begin_src python :dir ../2000/_ :results output
+import household_characteristics as hc
+
+print(hc.final.describe())
+#+end_src
+
+** TODO food_acquired.py
+Code to test for 2000:
+#+begin_src python :dir ../2000/_ :results output
+import food_acquired as fa
+
+print(fa.final.describe())
+#+end_src

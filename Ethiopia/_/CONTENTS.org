@@ -1,0 +1,254 @@
+#+title: Contents
+
+Brief table of contents and todo list.
+
+* Files in Ethiopia/_/
+** DONE ethiopia.py
+Contains code common to different Ethiopia rounds
+** DONE food_items.org
+CLOSED: [2023-03-07 Tue 11:05]
+Should have columns for each year, with "Preferred Labels" and "Aggregate Labels".   Labels for different years:
+#+begin_src python :results output raw table :tangle /tmp/test.py
+from lsms.tools import from_dta
+import dvc.api
+import pyreadstat
+import pandas as pd
+from cfe.df_utils import df_to_orgtbl
+
+Country = 'Ethiopia'
+
+fs = dvc.api.DVCFileSystem('./')
+
+itemlabel_location = {'2011-12':('sect5a_hh_w1.dta','hh_s5aq00'),
+                      '2013-14':('sect5a_hh_w2.dta','hh_s5aq00'),
+                      '2015-16':('sect5a_hh_w3.dta','hh_s5aq0a'),
+                      '2018-19':('sect6a_hh_w4.dta','item_cd')}
+
+itemlabels = {}
+for k,v in itemlabel_location.items():
+    try:
+        with fs.open(f'/{Country}/{k}/Data/{v[0]}') as dta:
+            df = from_dta(dta)
+            itemlabels[k] = df[v[1]].value_counts().index.tolist()
+    except ValueError:  # pd.io.stata can't read some versions of dta files...
+        fs.get_file(f'/{Country}/{k}/Data/{v[0]}',f'/tmp/{v[0]}')
+        df, meta = pyreadstat.read_dta(f'/tmp/{v[0]}')
+        itemlabels[k] = list(meta.value_labels[v[1]].values())
+
+# Build dictionary of dictionaries for matching
+from collections import defaultdict
+import difflib
+from ethiopia import Waves
+
+D = defaultdict(dict)
+D.update({k:{'Preferred Label':k} for k in itemlabels['2018-19']})
+
+for wave in Waves.keys():
+    for l in itemlabels[wave]:
+        k = difflib.get_close_matches(l,itemlabels['2018-19'])
+        if len(k):
+            D[k[0]][wave] = l
+        else:
+            D[l][wave] = l
+
+df = pd.DataFrame(D).T
+
+print(df_to_orgtbl(df))
+#+end_src
+
+#+results:
+
+| Preferred Label          | 2011-12       | 2013-14       | 2015-16                  | 2018-19                                            |
+|--------------------------+---------------+---------------+--------------------------+----------------------------------------------------|
+| Teff                     | Teff          | Teff          | Teff                     | 101. Teff                                          |
+| Avocado                  | ---           | ---           | ---                      | 505. Avocado                                       |
+| Milk                     | Milk          | Milk          | Milk                     | 705. Milk                                          |
+| Fish                     | ---           | ---           | Fish                     | 704. Fish                                          |
+| Poultry                  | ---           | ---           | Poultry                  | 703. Poultry                                       |
+| Beef                     | ---           | ---           | Beef                     | 702. Beef                                          |
+| Goat & mutton meat       | ---           | ---           | Goat & mutton meat       | 701. Goat & mutton meat                            |
+| Other tuber or stem      | ---           | ---           | Other tuber or stem (SPE | 610. Other tuber or stem (SPECIFY)                 |
+| Beetroot                 | ---           | ---           | ---                      | 609. Beetroot                                      |
+| Carrot                   | ---           | ---           | ---                      | 608. Carrot                                        |
+| Godere                   | ---           | ---           | Godere                   | 607. Godere                                        |
+| Cassava                  | ---           | ---           | Cassava                  | 606. Cassava                                       |
+| Boye/Yam                 | ---           | ---           | Boye/Yam                 | 605. Boye/Yam                                      |
+| Sweet potato             | ---           | ---           | Sweet potato             | 604. Sweet potato                                  |
+| Bula                     | ---           | Bula          | Bula                     | 603. Bula                                          |
+| Kocho                    | Kocho         | Kocho         | Kocho                    | 602. Kocho                                         |
+| Potato                   | Potato        | Potato        | Potato                   | 601. Potato                                        |
+| Cheese                   | Cheese        | Cheese        | Cheese                   | 706. Cheese                                        |
+| Butter/ghee              | ---           | ---           | Butter/ghee              | 707. Butter/ghee                                   |
+| Oils                     | ---           | ---           | Oils (processed)         | 708. Oils (processed)                              |
+| Beer                     | ---           | ---           | Beer                     | 804. Beer                                          |
+| Pasta/Macaroni           | ---           | ---           | Pasta/Maccaroni          | 903. Pasta/Maccaroni                               |
+| Bread/biscuit            | ---           | ---           | Purchased Bread or Biscu | 902. purchased bread/biscuit                       |
+| Injera                   | ---           | ---           | PuUrchased Injera        | 901. purchased Injera                              |
+| Hops (gesho)             | ---           | ---           | ---                      | 807. Hops (gesho)                                  |
+| Chat/Kat                 | Chat / Kat    | Chat / Kat    | Chat / Kat               | 806. Chat / Kat                                    |
+| Tella                    | ---           | ---           | Tella                    | 805. Tella                                         |
+| Soda                     | ---           | ---           | Soft drinks/Soda         | 803. Soft drinks/Soda                              |
+| Eggs                     | Eggs          | Eggs          | Eggs                     | 709. Eggs                                          |
+| Tea                      | ---           | ---           | ---                      | 802. Tea                                           |
+| Coffee                   | Coffee        | Coffee        | Coffee                   | 801. Coffee                                        |
+| Other condiments         | ---           | ---           | ---                      | 713. Other condiments                              |
+| Salt                     | Salt          | Salt          | Salt                     | 712. Salt                                          |
+| Honey                    | ---           | ---           | ---                      | 711. Honey, natural                                |
+| Sugar                    | Sugar         | Sugar         | Sugar                    | 710. Sugar                                         |
+| Other fruit              | ---           | ---           | Other fruit (SPECIFY)    | 506. Other fruit (SPECIFY) ____                    |
+| Papaya                   | ---           | ---           | ---                      | 504. Papaya                                        |
+| Wheat                    | ---           | ---           | ---                      | 102. Wheat (Incl. Flour factory product)           |
+| Mango                    | ---           | ---           | ---                      | 503. Mango                                         |
+| Fenugreek                | ---           | ---           | ---                      | 208. Fenugreek                                     |
+| Vetch                    | ---           | ---           | ---                      | 207. Vetch                                         |
+| Ground nuts              | ---           | ---           | Ground nuts              | 206. Ground nuts                                   |
+| Haricot Beans            | Haricot Beans | Haricot Beans | Haricot Beans            | 205. Haricot Beans                                 |
+| Lentils                  | Lentils       | Lentils       | Lentils                  | 204. Lentils                                       |
+| Field Pea                | Field Pea     | Field Pea     | Field Pea                | 203. Field Pea                                     |
+| Chick Pea                | Chick Pea     | Chick Pea     | Chick Pea                | 202. Chick Pea                                     |
+| Horsebeans               | Horsebeans    | Horsebeans    | Horsebeans               | 201. Horsebeans                                    |
+| Other cereal             | ---           | ---           | Other cereal (SPECIFY)   | 109. Other cereal (SPECIFY)                        |
+| Oats                     | ---           | ---           | ---                      | 108. Oats                                          |
+| Rice                     | ---           | ---           | ---                      | 107. Rice                                          |
+| Millet                   | Millet        | Millet        | Millet                   | 106. Millet                                        |
+| Sorghum                  | Sorghum       | Sorghum       | Sorghum                  | 105. Sorghum                                       |
+| Maize                    | Maize         | Maize         | Maize                    | 104. Maize                                         |
+| Barley                   | ---           | ---           | ---                      | 103. Barley (Incl. Beso: roasted & milled barely)  |
+| Mung bean                | ---           | ---           | ---                      | 209. mung bean                                     |
+| Shiro                    | ---           | ---           | ---                      | 210. Processed pulses (Shiro)                      |
+| Other pulse or nut       | ---           | ---           | Other pulse or nut (SPEC | 211. Other pulse or nut (SPECIFY)                  |
+| Leafy Greens             | ---           | ---           | ---                      | 404. kale, cabbage, Pumpikn Leaf, Lettuce, spinach |
+| Orange                   | ---           | ---           | Orange                   | 502. Orange                                        |
+| Banana                   | Banana        | Banana        | Banana                   | 501. Banana                                        |
+| Other vegetable          | ---           | ---           | Other vegetable (SPECIFY | 408. Other vegetable (SPECIFY)                     |
+| Moringa/Shiferaw/Halloka | ---           | ---           | ---                      | 407. Moringa/Shiferaw/Halloka                      |
+| Garlic                   | ---           | ---           | ---                      | 406. Garlic                                        |
+| Tomato                   | ---           | ---           | Tomato                   | 405. Tomato                                        |
+| Berbere                  | ---           | ---           | Red pepper (berbere)     | 403. Red pepper (Processed pepper (Berbere))       |
+| Niger Seed               | Niger Seed    | Niger Seed    | Niger Seed               | 301. Niger Seed                                    |
+| Kariya                   | ---           | ---           | Green chili pepper (kari | 402. Green chili pepper (kariya)                   |
+| Onion                    | Onion         | Onion         | Onion                    | 401. Onion                                         |
+| Other seed               | ---           | ---           | Other seed (SPECIFY)     | 305. Other seed (SPECIFY)                          |
+| Sun Flower               | ---           | ---           | ---                      | 304. Sun Flower                                    |
+| Sesame                   | ---           | ---           | ---                      | 303. SESAME                                        |
+| Linseed                  | Linseed       | Linseed       | Linseed                  | 302. Linseed                                       |
+| Other prepared food      | ---           | ---           | Other prepared food and  | 904. Other purchased prepared food                 |
+| Meat                     | Meat          | Meat          | ---                      | ---                                                |
+| Wheat                    | Wheat         | Wheat         | Wheat                    | ---                                                |
+| Barley                   | Barley        | Barley        | Barley                   | ---                                                |
+| Tea                      | ---           | ---           | Tea                      | ---                                                |
+| Leafy Greens             | ---           | ---           | Greens (kale, cabbage, e | ---                                                |
+| Leafy Greens             | ---           | ---           | Greens (kale        cabb | ---                                                |
+
+
+** DONE conversion_to_kgs.json
+CLOSED: [2023-03-03 Fri 11:26]
+This comes from data in =Ethiopia/2015-16/Data/=
+#+begin_src python :tangle /tmp/test.py
+import dvc.api
+from lsms.tools import from_dta
+import json
+
+unitfiles = ['../2011-12/Data/Food_CF_Wave1.dta',
+             '../2013-14/Data/Food_CF_Wave2.dta',
+             '../2015-16/Data/Food_CF_Wave3.dta',
+             '../2018-19/Data/Food_CF_Wave4.dta']
+
+D = {}
+for fn in unitfiles:
+    with dvc.api.open(fn,mode='rb') as dta:
+        df = from_dta(dta)
+
+        foo=df.groupby('unit_cd')['mean_cf_nat'].median().to_dict()
+        D.update(foo)
+
+D = {k.title():v for k,v in D.items()}
+with open('conversion_to_kgs.json','w') as f:
+    #json.dump({s.split('. ')[1]:v for s,v in foo.items()},f)
+    json.dump(D,f)
+
+#+end_src
+
+#+results:
+: None
+** DONE other_features.py
+CLOSED: [2023-03-07 Tue 11:25]
+** DONE household_characteristics.py
+CLOSED: [2023-03-07 Tue 11:32]
+** DONE food_acquired.py
+CLOSED: [2023-03-07 Tue 21:10]
+Test...
+#+begin_src python :results output
+import pandas as pd
+
+fa = pd.read_parquet('../var/food_acquired.parquet')
+
+print(fa.describe())
+#+end_src
+
+#+results:
+#+begin_example
+            quantity  value_purchased  ...            Kgs  Kgs Purchased
+count  189663.000000    189663.000000  ...  189663.000000  189663.000000
+mean      120.060827        38.112630  ...       0.475441       0.477268
+std       638.640276       218.505495  ...       0.639778       0.665748
+min         0.000000         0.000000  ...       0.000000       0.000000
+25%         1.000000        10.000000  ...       0.000000       0.000000
+50%         2.000000        20.000000  ...       0.160000       0.160000
+75%        10.000000        40.000000  ...       1.000000       1.000000
+max     58800.000000     70000.000000  ...      52.500000      52.500000
+
+[8 rows x 6 columns]
+#+end_example
+** DONE food_prices_quantities_and_expenditures.py
+CLOSED: [2023-03-07 Tue 21:12]
+Test...
+#+begin_src python :results output
+import pandas as pd
+
+print(pd.read_parquet('../var/food_prices.parquet').describe())
+print(pd.read_parquet('../var/food_quantities.parquet').describe())
+print(pd.read_parquet('../var/food_expenditures.parquet').describe())
+#+end_src
+
+#+results:
+#+begin_example
+          unitvalue
+count  1.365890e+05
+mean            inf
+std             NaN
+min    4.000000e-03
+25%    1.200000e+01
+50%    2.200000e+01
+75%    4.411765e+01
+max             inf
+                   q
+count  135606.000000
+mean        1.850766
+std        15.492912
+min         0.000050
+25%         0.400000
+50%         1.000000
+75%         1.783000
+max      5046.800213
+       value_purchased
+count    188862.000000
+mean         38.274273
+std         218.954241
+min           0.050000
+25%          10.000000
+50%          20.000000
+75%          40.000000
+max       70000.000000
+#+end_example
+
+** TODO Food Conversion Table
+See https://www.fao.org/3/X6877E/X6877E00.htm
+
+* Files in Ethiopia/<SOMEYEAR>/_/
+** DONE household_characteristics.py
+CLOSED: [2023-03-03 Fri 11:26]
+** DONE food_acquired.py
+CLOSED: [2023-03-03 Fri 11:26]
+** DONE other_features.py
+CLOSED: [2023-03-07 Tue 11:32]
