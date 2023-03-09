@@ -65,4 +65,4 @@ s = s.drop(columns ='index')
 #p = p.join(of.reset_index('m')['m'],on=['j','t'])
 #p = p.reset_index().set_index(['j','t','m','i','units'])
 
-s.to_parquet('food_acquired.parquet')
+s.to_parquet('../var/food_acquired.parquet')
