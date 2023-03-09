@@ -51,18 +51,18 @@ def id_match(df, wave, waves_dict):
     return m
 
 
-s={}
+x={}
 for t in Waves.keys():
-    s[t] = pd.read_parquet('../'+t+'/_/food_acquired.parquet')
-    s[t] = id_match(s[t],t,Waves)
+    x[t] = pd.read_parquet('../'+t+'/_/food_acquired.parquet')
+    x[t] = id_match(x[t],t,Waves)
 
-s = pd.concat(s.values())
-s['m'] = 'Tanzania'
-s = s.reset_index().set_index(['j','t','m'])
-s = s.drop(columns ='index')
+x = pd.concat(x.values())
+x['m'] = 'Tanzania'
+x = x.reset_index().set_index(['j','t','m', 'i'])
+x = x.drop(columns ='index')
 #of = pd.read_parquet('../var/other_features.parquet')
 
 #p = p.join(of.reset_index('m')['m'],on=['j','t'])
 #p = p.reset_index().set_index(['j','t','m','i','units'])
 
-s.to_parquet('food_acquired.parquet')
+x.to_parquet('../var/food_acquired.parquet')

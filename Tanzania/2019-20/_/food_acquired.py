@@ -47,5 +47,7 @@ for i in range(4):
 
 df['agg_u'] = df[pair['unit']].apply(lambda x: max(x) if min(x) == max(x) else min(x) + '+' + max(x), axis = 1)
 
+df['unitvalue_purchase'] = df['value_purchase']/df['quant_purchase']
+df.replace([np.inf, -np.inf, 0], np.nan, inplace=True)
 
 df.to_parquet('food_acquired.parquet')
