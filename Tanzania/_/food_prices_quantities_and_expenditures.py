@@ -15,18 +15,29 @@ v = pd.read_parquet('../var/food_acquired.parquet')
 #
 expenditures = ['value_purchase']
 
-prices = ['unitvalue_purchase']
+prices = ['unitvalue_purchase', 'unit_purchase']
 
-quantities =  ['quant_ttl_consume']
+quantities =  ['quant_ttl_consume', 'unit_ttl_consume']
 
 # Deal with expenditures; no need to fuss with units.
 x = v.groupby(['j','t','m','i'])[expenditures].sum().replace(0,np.nan)
 
-pd.DataFrame({'value':x}).to_parquet('../var/food_expenditures.parquet')
+x.to_parquet('../var/food_expenditures.parquet')
 
 
-# Now prices and quantitites, which *do* involve units
-v = v[prices + quantities]
+# Now prices and quantitites; unit conversion already handled in food_acquired
+
+p = v[prices].rename(columns = {'unit_purchase': 'units'})
+p = p.reset_index().set_index(['j','t','m','i','units'])
+p.to_parquet('../var/food_prices.parquet')
+
+q = v[quantities].rename(columns = {'unit_ttl_consume': 'units'})
+q = q.reset_index().set_index(['j','t','m','i','units'])
+q.to_parquet('../var/food_quantities.parquet')
+
+#code below temporarily commented out for reference 
+
+""" v = v[prices + quantities]
 
 with open('conversion_to_kgs.json','r') as f:
     d = json.load(f)
@@ -55,3 +66,4 @@ p.to_parquet('../var/food_prices.parquet')
 
 q = q.replace(0,np.nan)
 q.to_parquet('../var/food_quantities.parquet')
+ """
