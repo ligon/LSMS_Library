@@ -130,3 +130,65 @@ def food_acquired(fn,myvars):
     #df = df.astype(float)
     return df
 
+
+
+def id_match(df, wave, waves_dict):
+    df = df.reset_index()
+    if len(waves_dict[wave]) == 3:
+        if 'y4_hhid' and 'UPHI' not in df.columns:
+            with dvc.api.open('../%s/Data/%s' % (wave,waves_dict[wave][0]),mode='rb') as dta:
+                h = from_dta(dta)
+            h = h[[waves_dict[wave][1], waves_dict[wave][2]]]
+            m = df.merge(h, how = 'left', left_on ='j', right_on =waves_dict[wave][2])
+
+            with dvc.api.open('../2008-15/Data/upd4_hh_a.dta',mode='rb') as dta:
+                uphi = from_dta(dta)[['UPHI','r_hhid','round']]
+            uphi['UPHI'] = uphi['UPHI'].astype(int).astype(str)
+            y4 = uphi.loc[uphi['round']==4, 'r_hhid'].to_frame().rename(columns ={'r_hhid':'y4_hhid'})
+            uphi = uphi.join(y4)    
+            uphi = uphi[['UPHI', 'y4_hhid']].dropna()
+            m = m.merge(uphi, how= 'left', on = 'y4_hhid')
+
+            m['UPHI'].replace('', np.nan, inplace=True)
+            m['UPHI'] = m['UPHI'].fillna(m.pop(waves_dict[wave][2]))
+            m.j = m.UPHI
+            m = m.drop(columns=['UPHI', 'y4_hhid'])
+            if 't' not in m.columns:
+                m.insert(1, 't', wave)
+
+    if len(waves_dict[wave]) == 4:
+        if 'UPHI'  in df.columns: 
+            m = df.rename(columns={'UPHI': 'j'})
+        else: 
+            with dvc.api.open('../%s/Data/%s' % (wave,waves_dict[wave][0]),mode='rb') as dta:
+                h = from_dta(dta)
+            h = h[[waves_dict[wave][1], waves_dict[wave][2], waves_dict[wave][3]]]
+            h[waves_dict[wave][1]] = h[waves_dict[wave][1]].astype(int).astype(str)
+            dict = {1:'2008-09', 2:'2010-11', 3:'2012-13', 4:'2014-15'}
+            h.replace({"round": dict},inplace=True)
+            m = df.merge(h.drop_duplicates(), how = 'left', left_on =['j','t'], right_on =[waves_dict[wave][2], waves_dict[wave][3]])
+            m['UPHI'] = m['UPHI'].fillna(m.pop('j'))
+            m = m.rename(columns={'UPHI': 'j'})
+            m = m.drop(columns=[waves_dict[wave][2], waves_dict[wave][3]])
+    return m
+
+def new_harmonize_units(df, unit_conversion):
+    pair = {'quant': ['quant_ttl_consume', 'quant_purchase', 'quant_own', 'quant_inkind'] ,
+        'unit': ['unit_ttl_consume', 'unit_purchase', 'unit_own', 'unit_inkind']}
+
+    df = df.fillna(0).replace(unit_conversion).replace(['none', 'NONE', 'hakuna'], 0)
+    pattern = r"[p+]"
+    for i in range(4):
+        df[pair['quant'][i]] = df[pair['quant'][i]].astype(np.int64) * df[pair['unit'][i]]
+        df[pair['quant'][i]].replace('', 0, inplace=True)
+        if df[pair['quant'][i]].dtype != 'O':
+            df[pair['unit'][i]] = 'kg'
+        else: 
+            df[pair['unit'][i]] = np.where(df[pair['quant'][i]].str.contains(pattern).to_frame() == True, 'piece', 'kg')
+            df[pair['quant'][i]] = df[pair['quant'][i]].apply(lambda x: x if str(x).count('p') == 0 else str(x).count('p'))
+
+    df['agg_u'] = df[pair['unit']].apply(lambda x: max(x) if min(x) == max(x) else min(x) + '+' + max(x), axis = 1)
+
+    df['unitvalue_purchase'] = df['value_purchase']/df['quant_purchase']
+    df.replace([np.inf, -np.inf, 0], np.nan, inplace=True)
+    return df
