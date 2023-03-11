@@ -1,0 +1,32 @@
+#+title: Readme
+
+| Year | Data Set      | File Name | File Description  | Variable | Variable Description          |
+|------+---------------+-----------+-------------------+----------+-------------------------------|
+| 1998 | Food Expenses | SEC9B     | Section 9 Part B  | fdexpcd  | Food Item                     |
+|      |               |           |                   | s9bq1    | Amount spent 2nd visit        |
+|      |               |           |                   | s9bq2    | Amount spent 3rd visit        |
+|      |               |           |                   | s9bq3    | Amount spent 4th visit        |
+|      |               |           |                   | s9bq4    | Amount spent 5th visit        |
+|      |               |           |                   | s9bq5    | Amount spent 6th visit        |
+|      |               |           |                   | s9bq6    | Amount spent 7th visit        |
+|      |               |           |                   |          |                               |
+| 1991 | Food Expenses | S9B       | Section 9 Part B  | fdexpcd  | Food Item                     |
+|      |               |           |                   | s9bq1    | Amount spent 1nd visit        |
+|      |               |           |                   | s9bq2    | Amount spent 3rd visit        |
+|      |               |           |                   | s9bq3    | Amount spent 4th visit        |
+|      |               |           |                   | s9bq4    | Amount spent 5th visit        |
+|      |               |           |                   | s9bq5    | Amount spent 6th visit        |
+|      |               |           |                   | s9bq6    | Amount spent 7th visit        |
+|      |               |           |                   | s9bq7    | Amount spent 8th visit        |
+|      |               |           |                   | s9bq8    | Amount spent 9th visit        |
+|      |               |           |                   | s9bq9    | Amount spent 10th visit       |
+|      |               |           |                   | s9bq10   | Amount spent 11th visit       |
+|      |               |           |                   |          |                               |
+| 1989 | Food Expenses | y12a      | Section 12 Part A | foodcd   | Food Item                     |
+|      |               |           |                   | cfoodblv | Amount spent since last visit |
+|      |               |           |                   | cfoodb   | Usual amount spent            |
+|      |               |           |                   |          |                               |
+| 1988 | Food Expenses | y12a      | Section 12 Part A | foodcd   | Food Item                     |
+|      |               |           |                   | cfoodblv | Amount spent since last visit |
+|      |               |           |                   | cfoodb   | Usual amount spent            |
+|      |               |           |                   |          |                               |

@@ -1,43 +1,57 @@
 
-#rounds := ../2008-09/ ../2010-11/ ../2012-13/ ../2014-15/  #$(shell ls -d ../2*-*)
 rounds := $(shell ls -d ../2*-*)
 
 source = $(shell find $(rounds) -name \*.py)
 parquet := $(source:.py=.parquet)
 
-all: $(parquet)
+var = ../var/food_expenditures.parquet ../var/food_quantities.parquet ../var/unitvalues.parquet \
+	  ../var/household_characteristics.parquet ../var/other_features.parquet \
+
+
+all: $(parquet) $(var)
+
+../var/food_quantities.parquet ../var/food_expenditures.parquet ../var/food_prices.parquet &: ../var/food_acquired.parquet food_acquired.py
+	python food_prices_quantities_and_expenditures.py
 
 food_acquired = $(shell find $(rounds) -name food_acquired.py)
 food_acquired_parquet := $(food_acquired:.py=.parquet)
 
+../%/_/food_acquired.parquet: $(food_acquired)
+	(cd $(@D) && python food_acquired.py)
+
 ../var/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
 	python food_acquired.py
-
-food_quantities = $(shell find $(rounds) -name food_quantities.py)
-food_quantities_parquet := $(food_quantities:.py=.parquet)
-
-food_quantities.parquet: food_quantities.py $(food_expenditure_parquet)
-	python food_quantities.py
-
-unitvalues.parquet: unitvalues.py $(food_expenditure_parquet) $(food_quantities_parquet)
-	python unitvalues.py
 
 household_characteristics = $(shell find $(rounds) -name household_characteristics.py)
 household_characteristics_parquet := $(household_characteristics:.py=.parquet)
 
-../var/household_characteristics.parquet: household_characteristics.py $(household_characteristics_parquet)
-	python household_characteristics.py
-
-../var/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
-	python household_characteristics.py
-
 ../%/_/household_characteristics.parquet:
 	(cd $(@D) && python household_characteristics.py)
 
-../%.parquet: %.py food_items.org uganda.py
+../var/household_characteristics.parquet: household_characteristics.py $(household_characteristics_parquet)
+	python household_characteristics.py
+
+other_features = $(shell find $(rounds) -name other_features.py)
+other_features_parquet := $(other_features:.py=.parquet)
+
+../%/_/other_features.parquet:
+	(cd $(@D) && python other_features.py)
+
+../var/other_features.parquet: other_features.py $(other_features_parquet)
+	python other_features.py
+
+shocks = $(shell find $(rounds) -name shocks.py)
+shocks_parquet := $(shocks:.py=.parquet)
+
+../var/shocks.parquet: shocks.py $(shocks_parquet)
+	python shocks.py
+
+../%/_/shocks.parquet:
+	(cd $(@D) && python shocks.py)
+
+%.parquet: %.py food_items.org uganda.py
 	(cd $(@D) && python ./$(<F))
 
 clean:
 	-rm $(parquet)
-	-rm *.parquet
-
+	-rm ../var/*.parquet
