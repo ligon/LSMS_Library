@@ -35,7 +35,7 @@
 | Honey                    | ---           | ---           | ---                      | 711. Honey, natural                                |      303 |          |
 | Sugar                    | Sugar         | Sugar         | Sugar                    | 710. Sugar                                         |      301 |          |
 | Other fruit              | ---           | ---           | Other fruit (SPECIFY)    | 506. Other fruit (SPECIFY) ____                    |          | ---      |
-| Papaya                   | ---           | ---           | ---                      | 504. Papaya                                        |          | 2344741  |
+| Papaya                   | ---           | ---           | ---                      | 504. Papaya                                        |          | 169926   |
 | Wheat                    | ---           | ---           | ---                      | 102. Wheat (Incl. Flour factory product)           |     1081 |          |
 | Mango                    | ---           | ---           | ---                      | 503. Mango                                         |      703 |          |
 | Fenugreek                | ---           | ---           | ---                      | 208. Fenugreek                                     |          | 171324   |
@@ -47,7 +47,7 @@
 | Chick Pea                | Chick Pea     | Chick Pea     | Chick Pea                | 202. Chick Pea                                     |      401 |          |
 | Horsebeans               | Horsebeans    | Horsebeans    | Horsebeans               | 201. Horsebeans                                    |      401 |          |
 | Other cereal             | ---           | ---           | Other cereal (SPECIFY)   | 109. Other cereal (SPECIFY)                        |      112 |          |
-| Oats                     | ---           | ---           | ---                      | 108. Oats                                          |          | 2346397  |
+| Oats                     | ---           | ---           | ---                      | 108. Oats                                          |          | 169705   |
 | Rice                     | ---           | ---           | ---                      | 107. Rice                                          |      102 |          |
 | Millet                   | Millet        | Millet        | Millet                   | 106. Millet                                        |      106 |          |
 | Sorghum                  | Sorghum       | Sorghum       | Sorghum                  | 105. Sorghum                                       |      106 |          |
@@ -78,4 +78,5 @@
 | Tea                      | ---           | ---           | Tea                      | ---                                                |     1101 |          |
 | Leafy Greens             | ---           | ---           | Greens (kale, cabbage, e | ---                                                |      602 |          |
 | Leafy Greens             | ---           | ---           | Greens (kale        cabb | ---                                                |      602 |          |
+|                          |               |               |                          |                                                    |          |          |
 |                          |               |               |                          |                                                    |          |          |
