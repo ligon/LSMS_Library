@@ -30,5 +30,7 @@ list2 = final_fct.columns.values.tolist()
 final_q = final_q.filter(items=list2).replace(np.nan,0)
 final_fct = final_fct.filter(items=list1).replace(np.nan,0)
 
+final_fct.to_parquet('../var/fct.parquet')
+
 n = final_q@final_fct.T
 n.to_parquet('../var/nutrition.parquet')
