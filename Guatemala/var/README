@@ -1,0 +1,2 @@
+This directory (./var) is meant to hold transient, derived files; one
+should /not/ add files in this to git or dvc.
