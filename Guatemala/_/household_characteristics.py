@@ -12,9 +12,13 @@ for t in years:
 
 hc = pd.concat(x)
 
-of = pd.read_parquet('../var/other_features.parquet')
+if 'm' not in hc.index.names:
+    of = pd.read_parquet('../var/other_features.parquet')
 
-hc = hc.join(of.reset_index('m')['m'],on=['j','t'])
-hc = hc.reset_index().set_index(['j','t','m'])
+    hc = hc.join(of.reset_index('m')['m'],on=['j','t'])
+    hc = hc.reset_index().set_index(['j','t','m'])
+hc.columns.name = 'k'
 
-hc.to_parquet('household_characteristics.parquet')
+hc = hc.filter(regex='ales [0-9]')
+
+hc.to_parquet('../var/household_characteristics.parquet')
