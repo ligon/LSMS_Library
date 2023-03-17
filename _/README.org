@@ -1,0 +1,11 @@
+Some things you can do:
+* Build files
+This will build all the files associated with Uganda:
+#+begin_src sh
+make build country=$(COUNTRY)   # E.g., make build country=Uganda
+#+end_src
+* Test files
+This will test the structure and correctness of files that have been built.
+#+begin_src sh
+make test country=$(COUNTRY)   # E.g., make test country=Uganda
+#+end_src
