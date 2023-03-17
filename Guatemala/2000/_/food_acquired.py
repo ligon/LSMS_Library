@@ -33,17 +33,34 @@ df = df[(df['bought'] == 1) | (df['obtained'] == 1)] #filter out unbought and un
 
 df['pounds bought'] = df['amount bought'].mul(df['conversion factor'])
 df['pounds bought'] = df['pounds bought'].mul(df['equivalent'])
+
+df['pounds obtained'] = df['amount obtained'].mul(df['conversion factor'])
+df['pounds obtained'] = df['pounds obtained'].mul(df['equivalent'])
+
 df['price/original unit'] = df['expense']/df['amount bought']
 df['price/umr'] = df['expense']/(df['amount bought'] * df['equivalent'])
-df['price/pounds'] = df['expense']/df['pounds bought']
+df['price/pound'] = df['expense']/df['pounds bought']
 df = df.loc[df.index.dropna()]
 
-means = df.groupby('i').agg({'price/pounds' : np.mean})
-stds = df.groupby('i').agg({'price/pounds' : np.std})
+means = df.groupby('i').agg({'price/pound' : np.mean})
+stds = df.groupby('i').agg({'price/pound' : np.std})
 
 def unbelievable(row):
     if row['bought'] == 2:
         return True
-    return abs(row['price/pounds'] - means.loc[row.name[1]]) < 2*stds.loc[row.name[1]]
+    return abs(row['price/pound'] - means.loc[row.name[1]]) < 2*stds.loc[row.name[1]]
 
 df['plausible'] = df.apply(lambda x: unbelievable(x), axis=1)
+
+cols = {'expense':'Purchased Value',
+        'pounds bought':'Purchased Amount',
+        'pounds obtained':'Obtained Amount',
+        'price/pound':'Unit Value'}
+
+final = df.rename(columns=cols)[list(cols.values())]
+
+final['Total Quantity'] = final[['Purchased Amount','Obtained Amount']].sum(axis=1)
+final['Total Expenditure'] = final['Total Quantity']*final['Unit Value']
+
+final = final.reset_index().set_index(['j','i'])
+final.to_parquet('food_acquired.parquet')
