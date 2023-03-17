@@ -25,10 +25,10 @@ with open('kgs_per_other_units.json','r') as f:
     d = json.load(f)
 
 kgs = pd.Series(d)
-kgs.index.name = 'units'
+kgs.index.name = 'u'
 kgs.name = 'Kgs/unit'
 
-kgs = kgs.reindex(v.index,level='units')
+kgs = kgs.reindex(v.index,level='u')
 kgs = kgs[kgs!=0]
 
 # Convert other units to kilograms, where possible
@@ -41,8 +41,8 @@ q = q.multiply(kgs,axis=0)
 # What units were converted?
 tokg = {k:'Kg' for k,v in d.items() if np.isreal(v)}
 
-p = p.rename(index=tokg,level='units')
-q = q.rename(index=tokg,level='units')
+p = p.rename(index=tokg,level='u')
+q = q.rename(index=tokg,level='u')
 
 p = p.replace(0,np.nan)
 p.to_parquet('../var/food_prices.parquet')

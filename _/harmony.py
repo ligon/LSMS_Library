@@ -37,7 +37,7 @@ def main(country):
 
     p = pd.read_parquet(f"../{country}/var/food_prices.parquet")
 
-    p = p.stack().groupby(['t','m','i','units']).median()
+    p = p.stack().groupby(['t','m','i','u']).median()
 
     # Food labels consistent?
     plabels = set(p.index.get_level_values('i'))

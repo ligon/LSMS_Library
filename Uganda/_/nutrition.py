@@ -20,7 +20,7 @@ final_fct = pd.concat([fct, n1]).sort_index().T
 
 #sum all quantities 
 q['q_sum'] = q.sum(axis=1)
-q = q[['q_sum']].droplevel('units').reset_index()
+q = q[['q_sum']].droplevel('u').reset_index()
 final_q = q.pivot_table(index = ['j','t','m'], columns = 'i', values = 'q_sum')
 
 #cross-filter two dfs to align matrices; replace NaN values with 0 

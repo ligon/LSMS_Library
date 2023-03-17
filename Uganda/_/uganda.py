@@ -71,7 +71,7 @@ def food_acquired(fn,myvars):
 
     df = df.set_index(['HHID','item','units']).dropna(how='all')
 
-    df.index.names = ['j','i','units']
+    df.index.names = ['j','i','u']
 
 
     # Fix type of hhids if need be
@@ -81,7 +81,7 @@ def food_acquired(fn,myvars):
 
     df = df.rename(index=harmonized_food_labels(),level='i')
     unitlabels = harmonized_unit_labels()
-    df = df.rename(index=unitlabels,level='units')
+    df = df.rename(index=unitlabels,level='u')
 
     if not 'market' in df.columns:
         df['market'] = df.filter(regex='^market').median(axis=1)
@@ -93,21 +93,21 @@ def food_acquired(fn,myvars):
     df['unitvalue_inkind'] = df['value_inkind']/df['quantity_inkind']
 
     # Get list of units used in current survey
-    units = list(set(df.index.get_level_values('units').tolist()))
+    units = list(set(df.index.get_level_values('u').tolist()))
 
     unknown_units = set(units).difference(unitlabels.values())
     if len(unknown_units):
         warnings.warn("Dropping some unknown unit codes!")
         print(unknown_units)
-        df = df.loc[df.index.isin(unitlabels.values(),level='units')]
+        df = df.loc[df.index.isin(unitlabels.values(),level='u')]
 
     with open('../../_/conversion_to_kgs.json','r') as f:
         conversion_to_kgs = pd.Series(json.load(f))
 
     conversion_to_kgs.name='Kgs'
-    conversion_to_kgs.index.name='units'
+    conversion_to_kgs.index.name='u'
 
-    df = df.join(conversion_to_kgs,on='units')
+    df = df.join(conversion_to_kgs,on='u')
     df = df.astype(float)
 
     return df

@@ -2713,7 +2713,7 @@ import numpy as np
 
 df = pd.read_parquet('food_quantities.parquet')
 
-print(df.squeeze().replace(0,np.nan).groupby(['i','t','units']).count().replace(0,np.nan).dropna().unstack('units').idxmax(axis=1).unstack('t').to_markdown())
+print(df.squeeze().replace(0,np.nan).groupby(['i','t','u']).count().replace(0,np.nan).dropna().unstack('u').idxmax(axis=1).unstack('t').to_markdown())
 #+end_src
 
 | i                        | 2005-06                             | 2009-10                             | 2010-11                     | 2011-12                     | 2013-14                             | 2015-16                             |

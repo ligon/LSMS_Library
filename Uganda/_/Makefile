@@ -11,6 +11,9 @@ var = ../var/food_expenditures.parquet ../var/food_quantities.parquet ../var/uni
 
 all: $(parquet) $(var)
 
+unitlabels.csv: unitlabels.py
+	python unitlabels.py
+
 enterprise_income = $(shell find $(rounds) -name enterprise_income.py)
 enterprise_income_parquet := $(enterprise_income:.py=.parquet)
 
