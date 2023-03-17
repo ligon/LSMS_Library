@@ -16,3 +16,12 @@ def age_sex_composition(df, sex, sex_converter, age, age_converter, hhid):
     testdf['log HSize'] = np.log(testdf[['girls', 'boys', 'men', 'women']].sum(axis=1))
     testdf.index.name = 'j'
     return testdf
+
+def harmonized_food_labels(fn='../../_/food_items.org',key='Code',value='Preferred Label'):
+    # Harmonized food labels
+    food_items = pd.read_csv(fn, dtype = str)
+    food_items.columns = [s.strip() for s in food_items.columns]
+    food_items = food_items[[key,value]].dropna()
+    food_items.set_index(key,inplace=True)
+
+    return food_items.squeeze().str.strip().to_dict()

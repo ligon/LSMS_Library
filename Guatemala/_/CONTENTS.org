@@ -73,13 +73,28 @@ D = pd.concat(L)
 #+end_src
 
 * Files in Guatemala/<SOMEYEAR>/_/
-** TODO household_characteristics.py
+** DONE household_characteristics.py
 Code to test for 2000:
 #+begin_src python :dir ../2000/_ :results output
 import household_characteristics as hc
 
 print(hc.final.describe())
 #+end_src
+
+#+RESULTS:
+#+begin_example
+k            girls         boys  ...  Females 51-99    log HSize
+count  7276.000000  7276.000000  ...    7276.000000  7276.000000
+mean      1.296454     1.340297  ...       0.292331     1.514433
+std       1.322475     1.345039  ...       0.488382     0.548276
+min       0.000000     0.000000  ...       0.000000     0.000000
+25%       0.000000     0.000000  ...       0.000000     1.098612
+50%       1.000000     1.000000  ...       0.000000     1.609438
+75%       2.000000     2.000000  ...       1.000000     1.945910
+max       8.000000     9.000000  ...       4.000000     2.890372
+
+[8 rows x 19 columns]
+#+end_example
 
 ** TODO food_acquired.py
 Code to test for 2000:
