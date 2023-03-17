@@ -4,8 +4,111 @@ Brief table of contents and todo list.
 
 * Files in Panama/_/
 ** TODO panama.py
-Contains code common to different Ethiopia rounds
+Contains code common to different rounds
 ** TODO food_items.org
+*** Final Version
+Cleaned up by a human, keyed to FCT Table
+#+begin_src python :results output raw table
+from eep153_tools.sheets import read_sheets
+from cfe.df_utils import df_to_orgtbl
+
+food_items = read_sheets('1YwfdL0LMPVl3UGo-KfyvpC7S7KR_jDL54rsVLUQOCVE')['food_items']
+
+food_items = food_items.set_index('Preferred Label')
+food_items.to_csv('food_items.csv')
+
+print(df_to_orgtbl(food_items,float_fmt='%d'))
+#+end_src
+
+#+results:
+Key available for instructors@eep153.iam.gserviceaccount.com.
+Key available for students@eep153.iam.gserviceaccount.com.
+| Preferred Label | 2008|   2003|   1997|   FCT ID  |
+|-
+| Leche En Polvo  | leche en polvo | Leche en polvo | 2 | 1016 |
+| Leche Líquida  | leche líquida | Leche Líquida | 3 | 1015 |
+| Lecha Evaporada  | lecha evaporada | Leche Evaporada | 4 | 1014 |
+| Queso (Balnco Y Amarillo)  | queso (balnco y amarillo) | Queso (Blanco y Amarillo) | 5 | 1028 |
+| Huevos De Gallina  | huevos de gallina | Huevos de Gallina | 6 | 2002 |
+| Carne De Res  | carne de res | Carne de res | 7 | 5025 |
+| Viscera De Res  | viscera de res | Vísceras de res | 8 | 5022 |
+| Carnes De Puerco  | carnes de puerco | Carnes de puerco | 9 | 4003 |
+| Pollo O Gallina  | pollo o gallina | Pollo o gallina | 10 | 3014 |
+| Visceras De Pollo O Gallina  | visceras de pollo o gallina | Víscera de pollo | 11 | 3046 |
+| Embutidos  | embutidos (jamón, mortadela, salchichas...) | --- | 12 | 7008 |
+| Pescados  | pescados | Pescados | 13 | 8032 |
+| Mariscos  | mariscos (camarones, ...) | Mariscos (camarones) | 14 | 8006 |
+| Sardina Y Atún  | sardina y atún (tuna) | Sardina y Atún | 15 | 8019 |
+| Lentejas  | lentejas | Lenteja | 16 | 9029 |
+| Porotos  | porotos | Porotos | 17 | 9012 |
+| Frijoles  | frijoles | Frijoles | 18 | 9017 |
+| Arvejas Amarillas Y Verdes  | arvejas amarillas y verdes | --- | 19 | 9001 |
+| Pan De Sal Y Pan De Dulce  | pan de sal y pan de dulce | Pan de sal y dulce | 21 | 14028 |
+| Galletas / Pasteles Y Dulces  | galletas / pasteles y dulces | Galletas / Dulces | 30 | 14003 |
+| Arroz(Todos)  | arroz(todos) | --- | 20 | 13002 |
+| Maíz De Grano  | maíz de grano | Maíz en grano | 22 | 13046 |
+| Maíz De Mazorca  | maíz de mazorca | Maíz en mazorca | 23 | 11074 |
+| Preparación De Maíz  | preparación de maíz | Preparados de maíz | 24 | 13110 |
+| Cereales Y Cremas  | cereales y cremas | Cereales y cremas | 25 | 13021 |
+| Harina De Trigo  | harina de trigo | Harina de trigo | 26 | 13039 |
+| Pastas Alimenticias  | pastas alimenticias (coditos, macarrones, ...) | --- | 27 | 13060 |
+| Azúcar (Blanca Y Morena)  | azúcar (blanca y morena) | --- | 28 | 15001 |
+| Panela, Raspadura, Etc  | panela, raspadura, etc | Panela, raspadura | 29 | 15027 |
+| Miel  | miel | Miel | 29 | 15024 |
+| Aceite Vegetal  | aceite vegetal | Aceite vegetal | 31 | 16010 |
+| Manteca  | manteca | Manteca | --- | 16012 |
+| Mantequilla  | mantequilla | Mantequilla | 32 | 16016 |
+| Margarina  | margarina | Margarina | 32 | 16024 |
+| Mayonesa  | mayonesa | Mayonesa | 63 | 16021 |
+| Ajo  | ajo | Ajo | 33 | 11006 |
+| Culanto, Perejil, Cebollina  | culanto, perejil, cebollina | Culantro, perejil | 34 | 11040 |
+| Tomate  | tomate | Tomate | 35 | 11157 |
+| Cebolla  | cebolla | Cebolla | 36 | 11036 |
+| Ahí Verde  | ahí verde, pimiento y picantes | Ají verde, pimiento | 37 | 11060 |
+| Repollo  | repollo | Repollo | 38 | 11150 |
+| Zanahoria  | zanahoria | Zanahoria | 39 | 11169 |
+| Zapallo / Chayote  | zapallo / chayote | Zapallo / Challote | 40 | 11047 |
+| Lechuga  | lechuga | Lechuga | 41 | 11105 |
+| Pepino  | pepino | Pepino | 42 | 11138 |
+| Remolacha  | remolacha | Remolacha | 43 | 11147 |
+| Apio  | apio | Apio | 44 | 11010 |
+| Papas  | papas | Papas | 45 | 11127 |
+| Ñame  | Ñame | Ñame | 46 | 11118 |
+| Yuca  | yuca | Yuca | 47 | 11167 |
+| Otoes  | otoes | Otoes | 48 | 11112 |
+| Plátanos Verdes  | plátanos verdes y/o maduros | --- | 50 | 12130 |
+| Cocos (Pipas)  | cocos (pipas) | Cocos | 49 | 12023 |
+| Guineos (Bananos)  | guineos (bananos) | --- | 51 | 12056 |
+| Naranjas  | naranjas | Naranjas | 52 | 12105 |
+| Piñas  | piñas | Piñas | 53 | 12159 |
+| Manzanas  | manzanas | Manzanas | 54 | 12086 |
+| Aguacates  | aguacates | Aguacate | 55 | 11005 |
+| Melones  | melones | Melones | 56 | 12096 |
+| Sandias  | sandias | Sandías | 57 | 12134 |
+| Mangos  | mangos | Mangos | 58 | 12080 |
+| Limones  | limones | Limones | 59 | 12070 |
+| Papayas  | papayas | Papayas | 60 | 12113 |
+| Alimento Infantil  | alimento infantil | Alimento Infantil | 1 | 19093 |
+| Sopa Enlatada   | sopa enlatada y en sobres | Enlatados y envasados | 61 | 20007 |
+| Pastas De Tomate  | pastas de tomate y salsas de tomate | --- | 62 | 20071 |
+| Condimentos  | condimentos (orégano, pimienta, ...) | --- | 64 | 22017 |
+| Sal  | sal | Sal | 65 | 22021 |
+| Sodas, Refrescos Y Jugos  | sodas, refrescos y jugos | Sodas y refrescos | 66 | 17018 |
+| Helados  | helados | Helados | 67 | 18015 |
+| Raspados Y Duros  | raspados y duros | Raspados y duros | 67 | 18014 |
+| Café Y Té  | café y té | Café y té | 68 | 17040 |
+| Enlatados Y Envasados  | enlatados y envasados (maíz, frijoles, vegetales, ...) | --- | 72 | 11110 |
+| Pastillas Y Confites  | pastillas y confites | Pastillas y confites | --- | 15006 |
+| Chocolates  | chocolates | Chocolates | --- | 15009 |
+| Picaritas  | picaritas, menitos, snacks, etc | Picaritas, snacks | --- | 21072 |
+| Gelatinas  | gelatinas, pudines, postres y mermeladas | --- | --- | 18011 |
+| Cervezas  | cervezas | Cerveza | 69 | 17010 |
+| Licores Varios  | licores varios | Licores varios | 70 | 17009 |
+| Cigarrillo Y Tabaco  | cigarrillo y tabaco | Cigarrillo y Tabaco | 71 | --- |
+| Otros  | otros |  | 73 | --- |
+
+
+*** Rough Version
 Should have columns for each year, with "Preferred Labels" and "Aggregate Labels".   Labels for different years:
 #+begin_src python :results output raw table
 from lsms.tools import from_dta
