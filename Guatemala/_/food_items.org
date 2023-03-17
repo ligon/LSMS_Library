@@ -1,100 +1,90 @@
-| Preferred Label                    | 2000                               |
-| Pan dulce                          | PAN DULCE                          |
-| Pan frances                        | PAN FRANCES                        |
-| Pan de rodaja                      | PAN DE RODAJA                      |
-| Galletas                           | GALLETAS                           |
-| Pasteles                           | PASTELES                           |
-| Tostadas                           | TOSTADAS                           |
-| Tortillas                          | TORTILLAS                          |
-| Masa de maiz fresca                | MASA DE MAIZ FRESCA                |
-| Corn flakes                        | CORN FLAKES                        |
-| Incaparina                         | INCAPARINA                         |
-| Mosh, avenas                       | MOSH, AVENAS                       |
-| Atol de maiz                       | ATOL DE MAIZ                       |
-| Otros atoles                       | OTROS ATOLES                       |
-| Azucar granulada                   | AZUCAR GRANULADA                   |
-| Panela o rapadura                  | PANELA O RAPADURA                  |
-| Mieles melaza y jarabes            | MIELES MELAZA Y JARABES            |
-| Dulces                             | DULCES                             |
-| Harina de maiz                     | HARINA DE MAIZ                     |
-| Harina de trigo                    | HARINA DE TRIGO                    |
-| Frijol                             | FRIJOL                             |
-| Arroz                              | ARROZ                              |
-| Maiz                               | MAIZ                               |
-| Fideos, tallarines, coditos etc.   | FIDEOS, TALLARINES, CODITOS ETC.   |
-| Sopas en sobre                     | SOPAS EN SOBRE                     |
-| Salsa y pasta de tomate            | SALSA Y PASTA DE TOMATE            |
-| Otras pastas y salsa               | OTRAS PASTAS Y SALSA               |
-| Carne de res                       | CARNE DE RES                       |
-| Viceras de res                     | VICERAS DE RES                     |
-| Carne de res con hueso             | CARNE DE RES CON HUESO             |
-| Carne de cerdo                     | CARNE DE CERDO                     |
-| Carne de cerdo con hueso           | CARNE DE CERDO CON HUESO           |
-| Carne de pollo o gallina           | CARNE DE POLLO O GALLINA           |
-| Visceras de pollo o gallina        | VISCERAS DE POLLO O GALLINA        |
-| Pescado fresco                     | PESCADO FRESCO                     |
-| Lata de sardinas o atun            | LATA DE SARDINAS O ATUN            |
-| Embutidos                          | EMBUTIDOS                          |
-| Leche en polvo para bebe           | LECHE EN POLVO PARA BEBE           |
-| Leche en polvo                     | LECHE EN POLVO                     |
-| Leche liquida                      | LECHE LIQUIDA                      |
-| Leche evaporada / condensada       | LECHE EVAPORADA / CONDENSADA       |
-| Huevos de gallina                  | HUEVOS DE GALLINA                  |
-| Crema fresca                       | CREMA FRESCA                       |
-| Queso fresco / duro                | QUESO FRESCO / DURO                |
-| Yogures                            | YOGURES                            |
-| Mantequilla                        | MANTEQUILLA                        |
-| Aceites comestibles                | ACEITES COMESTIBLES                |
-| Manteca vegetal                    | MANTECA VEGETAL                    |
-| Manteca de cerdo                   | MANTECA DE CERDO                   |
-| Margarina                          | MARGARINA                          |
-| Tomate                             | TOMATE                             |
-| Cebolla                            | CEBOLLA                            |
-| Chiles                             | CHILES                             |
-| Repollo                            | REPOLLO                            |
-| Zanahoria                          | ZANAHORIA                          |
-| Guisquil                           | GUISQUIL                           |
-| Lechuga                            | LECHUGA                            |
-| Pepino                             | PEPINO                             |
-| Remolacha                          | REMOLACHA                          |
-| Ajo                                | AJO                                |
-| Hierbas                            | HIERBAS                            |
-| Apio                               | APIO                               |
-| Papas                              | PAPAS                              |
-| Yuca                               | YUCA                               |
-| Arveja                             | ARVEJA                             |
-| Platanos                           | PLATANOS                           |
-| Guineos / bananos                  | GUINEOS / BANANOS                  |
-| Naranjas / mandarinas              | NARANJAS / MANDARINAS              |
-| Piña                               | PIÑA                               |
-| Manzanas, uvas, melocoton          | MANZANAS, UVAS, MELOCOTON          |
-| Sandias                            | SANDIAS                            |
-| Mangos                             | MANGOS                             |
-| Limones                            | LIMONES                            |
-| Frutas secas                       | FRUTAS SECAS                       |
-| Aguacate                           | AGUACATE                           |
-| Papaya                             | PAPAYA                             |
-| Melones                            | MELONES                            |
-| Condimentos y especias             | CONDIMENTOS Y ESPECIAS             |
-| Sal                                | SAL                                |
-| Aguas gaseosas                     | AGUAS GASEOSAS                     |
-| Jugos empacados                    | JUGOS EMPACADOS                    |
-| Agua embotellada                   | AGUA EMBOTELLADA                   |
-| Helados / granizadas               | HELADOS / GRANIZADAS               |
-| Cafe en grano,  molido instantaneo | CAFE EN GRANO,  MOLIDO INSTANTANEO |
-| Chocolate                          | CHOCOLATE                          |
-| Cerveza                            | CERVEZA                            |
-| Golosinas                          | GOLOSINAS                          |
-| Mermelada                          | MERMELADA                          |
-| Ayote, xilacayote                  | AYOTE, XILACAYOTE                  |
-| Anacate y otros hongos             | ANACATE Y OTROS HONGOS             |
-| Zompopo y otros insectos           | ZOMPOPO Y OTROS INSECTOS           |
-| Semillas secas                     | SEMILLAS SECAS                     |
-| Licores                            | LICORES                            |
-| Cigarrillos /tabaco                | CIGARRILLOS /TABACO                |
-| Otros envasados                    | OTROS ENVASADOS                    |
-| Tamales de maiz                    | TAMALES DE MAIZ                    |
-| Paches                             | PACHES                             |
-| Chicharrones de cerdo              | CHICHARRONES DE CERDO              |
-| Te                                 | TE                                 |
-| Otros productos                    | OTROS PRODUCTOS                    |
+| Preferred Label          | 2000                             | FCT code |
+| Pan Dulce                | pan dulce                        |    14025 |
+| Pan Frances              | pan frances                      |    14072 |
+| Pan de Rodaja            | pan de rodaja                    |    14021 |
+| Galletas                 | galletas                         |    14010 |
+| Pasteles                 | pasteles                         |    14071 |
+| Toasted Maiz             | tostadas                         |    11078 |
+| Tortillas                | tortillas                        |    14057 |
+| Masa de Maiz Fresca      | masa de maiz fresca              |    13110 |
+| Corn Flakes              | corn flakes                      |    13021 |
+| Incaparina               | incaparina                       |    17022 |
+| Rolled Oats              | mosh, avenas                     |    13008 |
+| Atol de Maiz             | atol de maiz                     |    17068 |
+| Other Atoles             | otros atoles                     |    17001 |
+| Granulated Sugar         | azucar granulada                 |    15001 |
+| Brown Sugar              | panela o rapadura                |    15003 |
+| Honey, Molasses          | mieles melaza y jarabes          |    15022 |
+| Candies                  | dulces                           |    15006 |
+| Harina de Maiz           | harina de maiz                   |    13110 |
+| Harina de Trigo          | harina de trigo                  |    13039 |
+| Beans                    | frijol                           |     9017 |
+| Rice                     | arroz                            |    13002 |
+| Maiz                     | maiz                             |    11074 |
+| Pasta                    | fideos, tallarines, coditos etc. |    13073 |
+| Soup                     | sopas en sobre                   |    20023 |
+| Tomato Sauce             | salsa y pasta de tomate          |    11161 |
+| Other Sauces             | otras pastas y salsa             |    20015 |
+| Beef                     | carne de res                     |     5021 |
+| Carne de Cerdo           | carne de cerdo                   |     4002 |
+| Carne de Cerdo con Hueso | carne de cerdo con hueso         |     4009 |
+| Chicken                  | carne de pollo o gallina         |     3014 |
+| Chicken Giblets          | visceras de pollo o gallina      |     3046 |
+| Fish (Fresh)             | pescado fresco                   |     8018 |
+| Fish (Canned)            | lata de sardinas o atun          |     8019 |
+| Sausages                 | embutidos                        |     7003 |
+| Infant Formula           | leche en polvo para bebe         |     1007 |
+| Powdered Milk            | leche en polvo                   |     1069 |
+| Milk                     | leche liquida                    |     1015 |
+| Condensed Milk           | leche evaporada / condensada     |     1009 |
+| Eggs                     | huevos de gallina                |     2002 |
+| Queso                    | queso fresco / duro              |     1031 |
+| Yogurt                   | yogures                          |     1041 |
+| Butter                   | mantequilla                      |    16015 |
+| Cooking Oil              | aceites comestibles              |    16029 |
+| Vegetable Oil            | manteca vegetal                  |    16010 |
+| Margarine                | margarina                        |    16026 |
+| Tomatoes                 | tomate                           |    11157 |
+| Onions                   | cebolla                          |    11036 |
+| Chiles                   | chiles                           |    11057 |
+| Cabbage                  | repollo                          |    11150 |
+| Carrots                  | zanahoria                        |    11169 |
+| Guisquil                 | guisquil                         |    11047 |
+| Lettuce                  | lechuga                          |    11105 |
+| Cucumber                 | pepino                           |          |
+| Beets                    | remolacha                        |    11147 |
+| Garlic                   | ajo                              |    11006 |
+| Herbs                    | hierbas                          |    11025 |
+| Celery                   | apio                             |    11010 |
+| Potatoes                 | papas                            |    11127 |
+| Yucca                    | yuca                             |    11167 |
+| Peas                     | arveja                           |     9001 |
+| Oranges                  | naranjas / mandarinas            |    12105 |
+| Pineapple                | piÑa                             |    12159 |
+| Watermelon               | sandias                          |    12134 |
+| Mangos                   | mangos                           |    12080 |
+| Lemons                   | limones                          |    12070 |
+| Dried Fruit              | frutas secas                     |    12147 |
+| Avocado                  | aguacate                         |    11005 |
+| Papaya                   | papaya                           |    12115 |
+| Melons                   | melones                          |    12096 |
+| Spices                   | condimentos y especias           |    22010 |
+| Salt                     | sal                              |    22021 |
+| Mineral Water            | aguas gaseosas                   |    17016 |
+| Juices (Packaged)        | jugos empacados                  |    17031 |
+| Ice Cream                | helados / granizadas             |    18017 |
+| Chocolate                | chocolate                        |    15009 |
+| Beer                     | cerveza                          |    17010 |
+| Sweets                   | golosinas                        |    15005 |
+| Jam                      | mermelada                        |    15023 |
+| Pumpkin                  | ayote, xilacayote                |    10015 |
+| Mushrooms                | anacate y otros hongos           |    11095 |
+| Dried Seeds              | semillas secas                   |          |
+| Liquor                   | licores                          |    17009 |
+| Cigarettes               | cigarrillos /tabaco              |          |
+| Other Canned Goods       | otros envasados                  |     7002 |
+| Tamales de Maiz          | tamales de maiz                  |    21137 |
+| Paches                   | paches                           |    21138 |
+| Chicharrones de Cerdo    | chicharrones de cerdo            |     4012 |
+| Tea                      | te                               |    17062 |
+| Other                    | otros productos                  |          |

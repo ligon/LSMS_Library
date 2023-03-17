@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 import sys
 sys.path.append('../../_/')
-from tanzania import food_acquired
+from tanzania import food_acquired, new_harmonize_units
+import numpy as np
 
 fn='../Data/hh_sec_j1.dta'
 
@@ -20,8 +21,15 @@ myvars = dict(item='itemcode',
               unit_inkind = 'hh_j06_1'
               )
 
-df = food_acquired(fn,myvars)
-df['t'] = '2020-21'
-df = df.reset_index().set_index(['j','t','i'])
+d = food_acquired(fn,myvars)
+d['t'] = '2020-21'
+df = d.reset_index().set_index(['j','t','i'])
+
+unit_conversion = {'kilogram': 1,
+                   'gram': 0.001,
+                   'litre': 1,
+                   'mililitre': 0.001,
+                   'piece': 'p'}
+df = new_harmonize_units(df, unit_conversion)
 
 df.to_parquet('food_acquired.parquet')
