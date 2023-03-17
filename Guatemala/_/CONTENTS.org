@@ -3,7 +3,8 @@
 Brief table of contents and todo list.
 
 * Files in Guatemala/_/
-** TODO food_items.org
+** DONE food_items.org
+CLOSED: [2023-03-16 Thu 11:41]
 Should have columns for each year, with "Preferred Labels" and "Aggregate Labels".   Labels for different years:
 #+begin_src python :results output raw table :tangle /tmp/foo.py
 from lsms.tools import from_dta
@@ -67,7 +68,6 @@ print(df_to_orgtbl(df))
 
 
 | Preferred Label          | 2000                             | FCT code |
-|--------------------------+----------------------------------+----------|
 | Pan Dulce                | pan dulce                        |    14025 |
 | Pan Frances              | pan frances                      |    14072 |
 | Pan de Rodaja            | pan de rodaja                    |    14021 |
@@ -158,9 +158,9 @@ print(df_to_orgtbl(df))
 | Tea                      | te                               |    17062 |
 | Other                    | otros productos                  |          |
 
-** TODO conversion_to_kgs.json
-** TODO nutrition
-A food conversion table, with foods keyed to the "Preferred Labels" of food_items.org.   See https://docs.google.com/spreadsheets/d/1YwfdL0LMPVl3UGo-KfyvpC7S7KR_jDL54rsVLUQOCVE/, prepared by Kaylee Vu, which indexes the FCT at http://www.incap.int/mesocaribefoods/dmdocuments/TablaCAlimentos.pdf.
+** DONE Food Conversion
+CLOSED: [2023-03-16 Thu 11:59]
+A food conversion table, with foods keyed to the "Preferred Labels" of food_items.org.   See  prepared by Kaylee Vu, which indexes the FCT at http://www.incap.int/mesocaribefoods/dmdocuments/TablaCAlimentos.pdf; see excel version at https://docs.google.com/spreadsheets/d/1qljY2xrxbc37d9tLSyuFa9CnjEsh3Re2ufDQlBHzPEQ/
 
 Code to extract the nutrient tables from the aforementioned pdf:
 #+begin_src python
@@ -186,8 +186,33 @@ D = pd.concat(L)
 
 #+end_src
 
+After cleaning this up manually, we have  a complete FCT for Central America and Panama at https://docs.google.com/spreadsheets/d/1qljY2xrxbc37d9tLSyuFa9CnjEsh3Re2ufDQlBHzPEQ/
+** TODO Nutrition
 * Files in Guatemala/<SOMEYEAR>/_/
-** TODO household_characteristics.py
+** DONE other_features.py
+CLOSED: [2023-03-16 Thu 22:53]
+Code to test for 2000:
+#+begin_src python :dir ../2000/_ :results output
+import other_features as of
+
+print(of.of.describe())
+
+assert 'Rural' in of.of.columns
+assert 'k' in of.of.columns.names
+#+end_src
+
+#+results:
+:              Rural
+: count  7276.000000
+: mean      0.529412
+: std       0.499169
+: min       0.000000
+: 25%       0.000000
+: 50%       1.000000
+: 75%       1.000000
+: max       1.000000
+** DONE household_characteristics.py
+CLOSED: [2023-03-16 Thu 11:52]
 Code to test for 2000:
 #+begin_src python :dir ../2000/_ :results output
 import household_characteristics as hc
@@ -195,10 +220,42 @@ import household_characteristics as hc
 print(hc.final.describe())
 #+end_src
 
-** TODO food_acquired.py
+#+results:
+#+begin_example
+k            girls         boys  ...  Females 51-99    log HSize
+count  7276.000000  7276.000000  ...    7276.000000  7276.000000
+mean      1.296454     1.340297  ...       0.292331     1.514433
+std       1.322475     1.345039  ...       0.488382     0.548276
+min       0.000000     0.000000  ...       0.000000     0.000000
+25%       0.000000     0.000000  ...       0.000000     1.098612
+50%       1.000000     1.000000  ...       0.000000     1.609438
+75%       2.000000     2.000000  ...       1.000000     1.945910
+max       8.000000     9.000000  ...       4.000000     2.890372
+
+[8 rows x 19 columns]
+#+end_example
+
+** DONE food_acquired.py
+CLOSED: [2023-03-16 Thu 14:25]
+:LOGBOOK:
+- State "DONE"       from "WAITING"    [2023-03-16 Thu 14:25]
+- State "WAITING"    from "TODO"       [2023-03-16 Thu 11:51] \\
+  EZ is working on this.
+:END:
 Code to test for 2000:
 #+begin_src python :dir ../2000/_ :results output
 import food_acquired as fa
 
 print(fa.final.describe())
 #+end_src
+
+#+results:
+:               Value  Purchased Amount
+: count  36961.000000      36961.000000
+: mean      21.833412         13.410879
+: std       28.756041         26.375157
+: min        0.150000          0.000900
+: 25%        5.000000          1.452000
+: 50%       12.000000          3.950000
+: 75%       30.000000         12.600001
+: max      600.000000        800.000000
