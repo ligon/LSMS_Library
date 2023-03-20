@@ -34,7 +34,14 @@ z.columns.name = 't'
 
 z = z.stack().unstack('k')
 
-z['m'] = 'Uganda'
+try:
+    of = pd.read_parquet('../var/other_features.parquet')
+
+    z = z.join(of.reset_index('m')['m'],on=['j','t'])
+
+except FileNotFoundError:
+    z['m'] ='Uganda'
+
 z = z.reset_index().set_index(['j','t','m'])
 
 z.to_parquet('../var/household_characteristics.parquet')

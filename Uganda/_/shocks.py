@@ -29,7 +29,14 @@ for t in list(Waves.keys()):
 
 x = pd.concat(x.values())
 
-x['m'] = 'Uganda'
+try:
+    of = pd.read_parquet('../var/other_features.parquet')
+
+    x = x.join(of.reset_index('m')['m'],on=['j','t'])
+
+except FileNotFoundError:
+    x['m'] ='Uganda'
+
 x = x.reset_index().set_index(['j','t','m'])
 
 x.to_parquet('../var/shocks.parquet')

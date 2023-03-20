@@ -46,7 +46,7 @@ def main(country):
     assert len(xlabels.intersection(plabels)) == len(plabels)
 
 if __name__=='__main__':
-    parser = argparse.ArgumentParser('Find optimal solution to wordle.')
+    parser = argparse.ArgumentParser('Check for consistency of datasets.')
     parser.add_argument("country")
 
     args = parser.parse_args()
