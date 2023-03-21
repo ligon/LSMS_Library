@@ -5,6 +5,9 @@ import numpy as np
 import dvc.api
 import warnings
 import json
+import sys
+sys.path.append('../../_')
+from local_tools import add_markets_from_other_features
 
 Waves = {'2008-15':('upd4_hh_a.dta','UPHI','r_hhid','round'),
          '2019-20':('HH_SEC_A.dta','y4_hhid','sdd_hhid'),
