@@ -6,21 +6,7 @@ in particular checking whether indices and column labels are consistent.
 
 import pandas as pd
 import argparse
-
-def add_markets_from_other_features(country,df):
-    of = pd.read_parquet(f"../{country}/var/other_features.parquet")
-
-    df_idx = df.index.names
-
-    try:
-        df = df.droplevel('m')
-    except KeyError:
-        pass
-
-    df = df.join(of.reset_index('m')['m'],on=['j','t'])
-    df = df.reset_index().set_index(df_idx)
-
-    return df
+from local_tools import add_markets_from_other_features
 
 
 def main(country):
