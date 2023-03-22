@@ -17,10 +17,20 @@ def age_sex_composition(df, sex, sex_converter, age, age_converter, hhid):
     testdf.index.name = 'j'
     return testdf
 
-def harmonized_food_labels(fn='../../_/food_items.org',key='Code',value='Preferred Label'):
+
+def harmonized_food_labels(fn='../../_/food_items.csv',key='Code',value='Preferred Label'):
     # Harmonized food labels
-    food_items = pd.read_csv(fn, dtype = str)
+    food_items = pd.read_csv(fn,delimiter='|',skipinitialspace=True,converters={1:lambda s: s.strip(),2:lambda s: s.strip()})
     food_items.columns = [s.strip() for s in food_items.columns]
+    food_items = food_items.loc[:,food_items.count()>0]
+    food_items = food_items.apply(lambda x: x.str.strip())
+
+    if type(key) is not str:  # Assume a series of foods
+        myfoods = set(key.values)
+        for key in food_items.columns:
+            if len(myfoods.difference(set(food_items[key].values)))==0: # my foods all in key
+                break
+
     food_items = food_items[[key,value]].dropna()
     food_items.set_index(key,inplace=True)
 

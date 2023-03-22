@@ -191,7 +191,7 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
     if fn is None:
         x = x.reset_index()
         if x['j'].dtype==float:
-            x['j'].astype(str).apply(lambda s: s.split('.')[0]).replace('nan',np.nan)
+            x['j'] = x['j'].astype(str).apply(lambda s: s.split('.')[0]).replace('nan',None)
         elif x['j'].dtype==int:
             x['j'] = x['j'].astype(str)
 
@@ -210,11 +210,11 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
 
     for column in id:
         if id[column].dtype==float:
-            id[column] = id[column].astype(str).apply(lambda s: s.split('.')[0]).replace('nan',np.nan)
+            id[column] = id[column].astype(str).apply(lambda s: s.split('.')[0]).replace('nan',None)
         elif id[column].dtype==int:
-            id[column] = id[column].astype(str).replace('nan',np.nan)
+            id[column] = id[column].astype(str).replace('nan',None)
         elif id[column].dtype==object:
-            id[column] = id[column].replace('nan',np.nan)
+            id[column] = id[column].replace('nan',None)
 
     ids = dict(id[[id0,id1]].values.tolist())
 
@@ -227,7 +227,8 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
         d[v] += [k]
 
     try:
-        d.pop(np.nan)  # Get rid of nan key, if any
+        #d.pop(np.nan)  # Get rid of nan key, if any
+        d.pop(None)
     except KeyError: pass
 
     updated_id = {}
