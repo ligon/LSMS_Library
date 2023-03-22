@@ -11,10 +11,10 @@ pkg = v[prices].divide(v.Kgs,axis=0)  # Now in p/kg (or missing)
 
 pkg = pkg.groupby(['t','m','i']).median().median(axis=1)
 
-po = v[prices].groupby(['t','m','i','units']).median().median(axis=1)
+po = v[prices].groupby(['t','m','i','u']).median().median(axis=1)
 
 kgper = (po/pkg).dropna()
-kgper = kgper.groupby('units').median()
+kgper = kgper.groupby('u').median()
 
 with open('conversion_to_kgs.json','r') as f:
     conversion_to_kgs = pd.Series(json.load(f))

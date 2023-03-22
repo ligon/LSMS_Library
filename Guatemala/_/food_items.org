@@ -1,0 +1,90 @@
+| Preferred Label          | 2000                             | FCT code |
+| Pan Dulce                | pan dulce                        |    14025 |
+| Pan Frances              | pan frances                      |    14072 |
+| Pan de Rodaja            | pan de rodaja                    |    14021 |
+| Galletas                 | galletas                         |    14010 |
+| Pasteles                 | pasteles                         |    14071 |
+| Toasted Maiz             | tostadas                         |    11078 |
+| Tortillas                | tortillas                        |    14057 |
+| Masa de Maiz Fresca      | masa de maiz fresca              |    13110 |
+| Corn Flakes              | corn flakes                      |    13021 |
+| Incaparina               | incaparina                       |    17022 |
+| Rolled Oats              | mosh, avenas                     |    13008 |
+| Atol de Maiz             | atol de maiz                     |    17068 |
+| Other Atoles             | otros atoles                     |    17001 |
+| Granulated Sugar         | azucar granulada                 |    15001 |
+| Brown Sugar              | panela o rapadura                |    15003 |
+| Honey, Molasses          | mieles melaza y jarabes          |    15022 |
+| Candies                  | dulces                           |    15006 |
+| Harina de Maiz           | harina de maiz                   |    13110 |
+| Harina de Trigo          | harina de trigo                  |    13039 |
+| Beans                    | frijol                           |     9017 |
+| Rice                     | arroz                            |    13002 |
+| Maiz                     | maiz                             |    11074 |
+| Pasta                    | fideos, tallarines, coditos etc. |    13073 |
+| Soup                     | sopas en sobre                   |    20023 |
+| Tomato Sauce             | salsa y pasta de tomate          |    11161 |
+| Other Sauces             | otras pastas y salsa             |    20015 |
+| Beef                     | carne de res                     |     5021 |
+| Carne de Cerdo           | carne de cerdo                   |     4002 |
+| Carne de Cerdo con Hueso | carne de cerdo con hueso         |     4009 |
+| Chicken                  | carne de pollo o gallina         |     3014 |
+| Chicken Giblets          | visceras de pollo o gallina      |     3046 |
+| Fish (Fresh)             | pescado fresco                   |     8018 |
+| Fish (Canned)            | lata de sardinas o atun          |     8019 |
+| Sausages                 | embutidos                        |     7003 |
+| Infant Formula           | leche en polvo para bebe         |     1007 |
+| Powdered Milk            | leche en polvo                   |     1069 |
+| Milk                     | leche liquida                    |     1015 |
+| Condensed Milk           | leche evaporada / condensada     |     1009 |
+| Eggs                     | huevos de gallina                |     2002 |
+| Queso                    | queso fresco / duro              |     1031 |
+| Yogurt                   | yogures                          |     1041 |
+| Butter                   | mantequilla                      |    16015 |
+| Cooking Oil              | aceites comestibles              |    16029 |
+| Vegetable Oil            | manteca vegetal                  |    16010 |
+| Margarine                | margarina                        |    16026 |
+| Tomatoes                 | tomate                           |    11157 |
+| Onions                   | cebolla                          |    11036 |
+| Chiles                   | chiles                           |    11057 |
+| Cabbage                  | repollo                          |    11150 |
+| Carrots                  | zanahoria                        |    11169 |
+| Guisquil                 | guisquil                         |    11047 |
+| Lettuce                  | lechuga                          |    11105 |
+| Cucumber                 | pepino                           |          |
+| Beets                    | remolacha                        |    11147 |
+| Garlic                   | ajo                              |    11006 |
+| Herbs                    | hierbas                          |    11025 |
+| Celery                   | apio                             |    11010 |
+| Potatoes                 | papas                            |    11127 |
+| Yucca                    | yuca                             |    11167 |
+| Peas                     | arveja                           |     9001 |
+| Oranges                  | naranjas / mandarinas            |    12105 |
+| Pineapple                | piÑa                             |    12159 |
+| Watermelon               | sandias                          |    12134 |
+| Mangos                   | mangos                           |    12080 |
+| Lemons                   | limones                          |    12070 |
+| Dried Fruit              | frutas secas                     |    12147 |
+| Avocado                  | aguacate                         |    11005 |
+| Papaya                   | papaya                           |    12115 |
+| Melons                   | melones                          |    12096 |
+| Spices                   | condimentos y especias           |    22010 |
+| Salt                     | sal                              |    22021 |
+| Mineral Water            | aguas gaseosas                   |    17016 |
+| Juices (Packaged)        | jugos empacados                  |    17031 |
+| Ice Cream                | helados / granizadas             |    18017 |
+| Chocolate                | chocolate                        |    15009 |
+| Beer                     | cerveza                          |    17010 |
+| Sweets                   | golosinas                        |    15005 |
+| Jam                      | mermelada                        |    15023 |
+| Pumpkin                  | ayote, xilacayote                |    10015 |
+| Mushrooms                | anacate y otros hongos           |    11095 |
+| Dried Seeds              | semillas secas                   |          |
+| Liquor                   | licores                          |    17009 |
+| Cigarettes               | cigarrillos /tabaco              |          |
+| Other Canned Goods       | otros envasados                  |     7002 |
+| Tamales de Maiz          | tamales de maiz                  |    21137 |
+| Paches                   | paches                           |    21138 |
+| Chicharrones de Cerdo    | chicharrones de cerdo            |     4012 |
+| Tea                      | te                               |    17062 |
+| Other                    | otros productos                  |          |

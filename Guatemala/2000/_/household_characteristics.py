@@ -17,13 +17,12 @@ df, meta = pyreadstat.read_dta('/tmp/ECV09P05.DTA', apply_value_formats = True, 
 
 final  = age_sex_composition(df, sex='sexo', sex_converter=lambda x: ['m', 'f'][x=='femenino'],
                            age='edad', age_converter=None, hhid='hogar')
-regions = df.groupby('hogar').agg({'region' : 'first'})
-regions.index = regions.index.map(int).map(str)
-regions['region'] = regions['region'].str.capitalize()
-final = pd.merge(left = final, right = regions, how = 'left', left_index = True, right_index = True)
-final = final.rename(columns = {'region':'m'})
+
+final = final.reset_index()
+final['j'] = final.j.astype(str).apply(lambda s: s.split('.')[0])
+
 final['t'] = '2000'
-final = final.set_index(['t', 'm'], append = True)
+final = final.set_index(['j','t'])
 final.columns.name = 'k'
 
 final.to_parquet('household_characteristics.parquet')

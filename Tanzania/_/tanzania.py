@@ -1,10 +1,13 @@
-from lsms.tools import get_food_prices, get_food_expenditures, get_household_roster
+from lsms.tools import get_food_prices, get_food_expenditures, get_household_roster, get_household_identification_particulars
 from lsms import from_dta
 import pandas as pd
 import numpy as np
 import dvc.api
 import warnings
 import json
+import sys
+sys.path.append('../../_')
+from local_tools import add_markets_from_other_features
 
 Waves = {'2008-15':('upd4_hh_a.dta','UPHI','r_hhid','round'),
          '2019-20':('HH_SEC_A.dta','y4_hhid','sdd_hhid'),
@@ -130,6 +133,21 @@ def food_acquired(fn,myvars):
     #df = df.astype(float)
     return df
 
+def other_features(fn,urban=None,region=None,HHID='HHID',urban_converter=None,wave=None):
+    """
+    Pass a dictionary othervars to grab other variables.
+    """
+    with dvc.api.open(fn,mode='rb') as dta:
+        df = get_household_identification_particulars(fn=dta,
+                                                      HHID=HHID,
+                                                      urban=urban,
+                                                      region=region,
+                                                      urban_converter=urban_converter,
+                                                      wave=wave)
+    df.index.name = 'j'
+    df.columns.name = 'k'
+
+    return df
 
 
 def id_match(df, wave, waves_dict):
