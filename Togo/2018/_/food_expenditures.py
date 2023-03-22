@@ -5,10 +5,11 @@ import numpy as np
 import pandas as pd
 import json
 import dvc.api
+from lsms import from_dta
 from cfe.df_utils import broadcast_binary_op
 
-with dvc.api.open('../Data/Togo_survey2018_fooditems_forEthan.dta') as dta:
-    food = pd.read_stata(dta)
+with dvc.api.open('../Data/Togo_survey2018_fooditems_forEthan.dta',mode='rb') as dta:
+    food = from_dta(dta)
 
 vars={'hhid': 'j',
       's07bq01' : 'i',

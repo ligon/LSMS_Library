@@ -3,13 +3,16 @@ rounds := $(shell ls -d ../2*-*)
 
 source = $(shell find $(rounds) -name \*.py)
 parquet := $(source:.py=.parquet)
-var = ../var/food_expenditures.parquet ../var/food_quantities.parquet ../var/unitvalues.parquet \
+var = ../var/food_expenditures.parquet ../var/food_quantities.parquet ../var/food_prices.parquet \
 	  ../var/household_characteristics.parquet ../var/other_features.parquet \
       ../var/shocks.parquet ../var/nonfood_expenditures.parquet ../var/enterprise_income.parquet \
 	  ../var/assets.parquet ../var/earnings.parquet ../var/housing.parquet
 
 
 all: $(parquet) $(var)
+
+unitlabels.csv: unitlabels.py
+	python unitlabels.py
 
 enterprise_income = $(shell find $(rounds) -name enterprise_income.py)
 enterprise_income_parquet := $(enterprise_income:.py=.parquet)
@@ -48,13 +51,13 @@ nonfood_expenditures_parquet := $(nonfood_expenditures:.py=.parquet)
 food_acquired = $(shell find $(rounds) -name food_acquired.py)
 food_acquired_parquet := $(food_acquired:.py=.parquet)
 
-../var/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
+../var/food_acquired.parquet: food_acquired.py $(food_acquired_parquet) ../var/other_features.parquet
 	python food_acquired.py
 
 household_characteristics = $(shell find $(rounds) -name household_characteristics.py)
 household_characteristics_parquet := $(household_characteristics:.py=.parquet)
 
-../var/household_characteristics.parquet: household_characteristics.py $(household_characteristics_parquet)
+../var/household_characteristics.parquet: household_characteristics.py $(household_characteristics_parquet) ../var/other_features.parquet
 	python household_characteristics.py
 
 other_features = $(shell find $(rounds) -name other_features.py)

@@ -3,22 +3,25 @@
 Brief table of contents and todo list.
 
 * Files in Guatemala/_/
-** TODO food_items.org
+** DONE food_items.org
+CLOSED: [2023-03-16 Thu 11:41]
 Should have columns for each year, with "Preferred Labels" and "Aggregate Labels".   Labels for different years:
-#+begin_src python :results output
+#+begin_src python :results output raw table :tangle /tmp/foo.py
 from lsms.tools import from_dta
 import dvc.api
 import pyreadstat
 from cfe.df_utils import df_to_orgtbl
 import pandas as pd
 
+Country = 'Guatemala'
+
 fs = dvc.api.DVCFileSystem('../../')
 
-itemlabel_location = {'2000':('05alimentos.dta','producto'),)
+itemlabel_location = {'2000':('ECV13G12.DTA','item'),}
 
 itemlabels = {}
 for k,v in itemlabel_location.items():
-    fs.get_file(f'/Panama/{k}/Data/{v[0]}',f'/tmp/{v[0]}')
+    fs.get_file(f'/{Country}/{k}/Data/{v[0]}',f'/tmp/{v[0]}')
     df, meta = pyreadstat.read_dta(f'/tmp/{v[0]}')
     itemlabels[k] = list(meta.value_labels[v[1]].values())
 
@@ -29,7 +32,7 @@ import difflib
 D = defaultdict(dict)
 D.update({k:{'Preferred Label':k} for k in itemlabels['2000']})
 
-for wave in ['2013-14','2011-12']:
+for wave in ['2000']:
     for l in itemlabels[wave]:
         k = difflib.get_close_matches(l,itemlabels['2000'])
         if len(k):
@@ -39,14 +42,125 @@ for wave in ['2013-14','2011-12']:
 
 df = pd.DataFrame(D).T
 
+# Merge in FCT codes & preferred labels
+from eep153_tools.sheets import read_sheets
+
+codes = read_sheets('https://docs.google.com/spreadsheets/d/1nphLv40dyIaAapZPeOwxIPdMCaP8iSBXV_SF-PCHuRM/')['Sheet1']
+
+codes = pd.DataFrame(codes.iloc[3:,:].values,columns = codes.iloc[2,:])
+
+codes = codes.loc[codes['Product label (Spanish)']!='',:]
+
+codes = codes.set_index('Product label (Spanish)')
+codes = codes[['Preferred Label','FCT code']]
+
+codes.index.name = ''
+codes.columns.name = ''
+
+df = df[['2000']].join(codes)
+df = df.reset_index(drop=True).set_index('Preferred Label')
+
+df = df.loc[~pd.isnull(df.index),:]
+df = df.loc[df.index!='',:]
+
 print(df_to_orgtbl(df))
 #+end_src
 
-#+results:
 
-** TODO conversion_to_kgs.json
-** TODO nutrition
-A food conversion table, with foods keyed to the "Preferred Labels" of food_items.org.   See https://docs.google.com/spreadsheets/d/1YwfdL0LMPVl3UGo-KfyvpC7S7KR_jDL54rsVLUQOCVE/, prepared by Kaylee Vu, which indexes the FCT at http://www.incap.int/mesocaribefoods/dmdocuments/TablaCAlimentos.pdf.
+| Preferred Label          | 2000                             | FCT code |
+| Pan Dulce                | pan dulce                        |    14025 |
+| Pan Frances              | pan frances                      |    14072 |
+| Pan de Rodaja            | pan de rodaja                    |    14021 |
+| Galletas                 | galletas                         |    14010 |
+| Pasteles                 | pasteles                         |    14071 |
+| Toasted Maiz             | tostadas                         |    11078 |
+| Tortillas                | tortillas                        |    14057 |
+| Masa de Maiz Fresca      | masa de maiz fresca              |    13110 |
+| Corn Flakes              | corn flakes                      |    13021 |
+| Incaparina               | incaparina                       |    17022 |
+| Rolled Oats              | mosh, avenas                     |    13008 |
+| Atol de Maiz             | atol de maiz                     |    17068 |
+| Other Atoles             | otros atoles                     |    17001 |
+| Granulated Sugar         | azucar granulada                 |    15001 |
+| Brown Sugar              | panela o rapadura                |    15003 |
+| Honey, Molasses          | mieles melaza y jarabes          |    15022 |
+| Candies                  | dulces                           |    15006 |
+| Harina de Maiz           | harina de maiz                   |    13110 |
+| Harina de Trigo          | harina de trigo                  |    13039 |
+| Beans                    | frijol                           |     9017 |
+| Rice                     | arroz                            |    13002 |
+| Maiz                     | maiz                             |    11074 |
+| Pasta                    | fideos, tallarines, coditos etc. |    13073 |
+| Soup                     | sopas en sobre                   |    20023 |
+| Tomato Sauce             | salsa y pasta de tomate          |    11161 |
+| Other Sauces             | otras pastas y salsa             |    20015 |
+| Beef                     | carne de res                     |     5021 |
+| Carne de Cerdo           | carne de cerdo                   |     4002 |
+| Carne de Cerdo con Hueso | carne de cerdo con hueso         |     4009 |
+| Chicken                  | carne de pollo o gallina         |     3014 |
+| Chicken Giblets          | visceras de pollo o gallina      |     3046 |
+| Fish (Fresh)             | pescado fresco                   |     8018 |
+| Fish (Canned)            | lata de sardinas o atun          |     8019 |
+| Sausages                 | embutidos                        |     7003 |
+| Infant Formula           | leche en polvo para bebe         |     1007 |
+| Powdered Milk            | leche en polvo                   |     1069 |
+| Milk                     | leche liquida                    |     1015 |
+| Condensed Milk           | leche evaporada / condensada     |     1009 |
+| Eggs                     | huevos de gallina                |     2002 |
+| Queso                    | queso fresco / duro              |     1031 |
+| Yogurt                   | yogures                          |     1041 |
+| Butter                   | mantequilla                      |    16015 |
+| Cooking Oil              | aceites comestibles              |    16029 |
+| Vegetable Oil            | manteca vegetal                  |    16010 |
+| Margarine                | margarina                        |    16026 |
+| Tomatoes                 | tomate                           |    11157 |
+| Onions                   | cebolla                          |    11036 |
+| Chiles                   | chiles                           |    11057 |
+| Cabbage                  | repollo                          |    11150 |
+| Carrots                  | zanahoria                        |    11169 |
+| Guisquil                 | guisquil                         |    11047 |
+| Lettuce                  | lechuga                          |    11105 |
+| Cucumber                 | pepino                           |          |
+| Beets                    | remolacha                        |    11147 |
+| Garlic                   | ajo                              |    11006 |
+| Herbs                    | hierbas                          |    11025 |
+| Celery                   | apio                             |    11010 |
+| Potatoes                 | papas                            |    11127 |
+| Yucca                    | yuca                             |    11167 |
+| Peas                     | arveja                           |     9001 |
+| Oranges                  | naranjas / mandarinas            |    12105 |
+| Pineapple                | piÑa                             |    12159 |
+| Watermelon               | sandias                          |    12134 |
+| Mangos                   | mangos                           |    12080 |
+| Lemons                   | limones                          |    12070 |
+| Dried Fruit              | frutas secas                     |    12147 |
+| Avocado                  | aguacate                         |    11005 |
+| Papaya                   | papaya                           |    12115 |
+| Melons                   | melones                          |    12096 |
+| Spices                   | condimentos y especias           |    22010 |
+| Salt                     | sal                              |    22021 |
+| Mineral Water            | aguas gaseosas                   |    17016 |
+| Juices (Packaged)        | jugos empacados                  |    17031 |
+| Ice Cream                | helados / granizadas             |    18017 |
+| Chocolate                | chocolate                        |    15009 |
+| Beer                     | cerveza                          |    17010 |
+| Sweets                   | golosinas                        |    15005 |
+| Jam                      | mermelada                        |    15023 |
+| Pumpkin                  | ayote, xilacayote                |    10015 |
+| Mushrooms                | anacate y otros hongos           |    11095 |
+| Dried Seeds              | semillas secas                   |          |
+| Liquor                   | licores                          |    17009 |
+| Cigarettes               | cigarrillos /tabaco              |          |
+| Other Canned Goods       | otros envasados                  |     7002 |
+| Tamales de Maiz          | tamales de maiz                  |    21137 |
+| Paches                   | paches                           |    21138 |
+| Chicharrones de Cerdo    | chicharrones de cerdo            |     4012 |
+| Tea                      | te                               |    17062 |
+| Other                    | otros productos                  |          |
+
+** DONE Food Conversion
+CLOSED: [2023-03-16 Thu 11:59]
+A food conversion table, with foods keyed to the "Preferred Labels" of food_items.org.   See  prepared by Kaylee Vu, which indexes the FCT at http://www.incap.int/mesocaribefoods/dmdocuments/TablaCAlimentos.pdf; see excel version at https://docs.google.com/spreadsheets/d/1qljY2xrxbc37d9tLSyuFa9CnjEsh3Re2ufDQlBHzPEQ/
 
 Code to extract the nutrient tables from the aforementioned pdf:
 #+begin_src python
@@ -72,8 +186,33 @@ D = pd.concat(L)
 
 #+end_src
 
+After cleaning this up manually, we have  a complete FCT for Central America and Panama at https://docs.google.com/spreadsheets/d/1qljY2xrxbc37d9tLSyuFa9CnjEsh3Re2ufDQlBHzPEQ/
+** TODO Nutrition
 * Files in Guatemala/<SOMEYEAR>/_/
-** TODO household_characteristics.py
+** DONE other_features.py
+CLOSED: [2023-03-16 Thu 22:53]
+Code to test for 2000:
+#+begin_src python :dir ../2000/_ :results output
+import other_features as of
+
+print(of.of.describe())
+
+assert 'Rural' in of.of.columns
+assert 'k' in of.of.columns.names
+#+end_src
+
+#+results:
+:              Rural
+: count  7276.000000
+: mean      0.529412
+: std       0.499169
+: min       0.000000
+: 25%       0.000000
+: 50%       1.000000
+: 75%       1.000000
+: max       1.000000
+** DONE household_characteristics.py
+CLOSED: [2023-03-16 Thu 11:52]
 Code to test for 2000:
 #+begin_src python :dir ../2000/_ :results output
 import household_characteristics as hc
@@ -81,10 +220,42 @@ import household_characteristics as hc
 print(hc.final.describe())
 #+end_src
 
-** TODO food_acquired.py
+#+results:
+#+begin_example
+k            girls         boys  ...  Females 51-99    log HSize
+count  7276.000000  7276.000000  ...    7276.000000  7276.000000
+mean      1.296454     1.340297  ...       0.292331     1.514433
+std       1.322475     1.345039  ...       0.488382     0.548276
+min       0.000000     0.000000  ...       0.000000     0.000000
+25%       0.000000     0.000000  ...       0.000000     1.098612
+50%       1.000000     1.000000  ...       0.000000     1.609438
+75%       2.000000     2.000000  ...       1.000000     1.945910
+max       8.000000     9.000000  ...       4.000000     2.890372
+
+[8 rows x 19 columns]
+#+end_example
+
+** DONE food_acquired.py
+CLOSED: [2023-03-16 Thu 14:25]
+:LOGBOOK:
+- State "DONE"       from "WAITING"    [2023-03-16 Thu 14:25]
+- State "WAITING"    from "TODO"       [2023-03-16 Thu 11:51] \\
+  EZ is working on this.
+:END:
 Code to test for 2000:
 #+begin_src python :dir ../2000/_ :results output
 import food_acquired as fa
 
 print(fa.final.describe())
 #+end_src
+
+#+results:
+:               Value  Purchased Amount
+: count  36961.000000      36961.000000
+: mean      21.833412         13.410879
+: std       28.756041         26.375157
+: min        0.150000          0.000900
+: 25%        5.000000          1.452000
+: 50%       12.000000          3.950000
+: 75%       30.000000         12.600001
+: max      600.000000        800.000000

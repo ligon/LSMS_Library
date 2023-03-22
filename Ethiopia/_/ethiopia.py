@@ -131,7 +131,7 @@ def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,it
     expenditures.columns.name = 'i'
 
     expenditures = expenditures[expenditures.columns.intersection(food_items.values())]
-        
+
     return expenditures
 
 
@@ -156,7 +156,7 @@ def food_quantities(fn='',item='item',HHID='HHID',
 
     quantities.index.names = ['j','u']
     quantities.columns.name = 'i'
-        
+
     return quantities
 
 def age_sex_composition(fn,sex='sex',sex_converter=None,age='age',months_spent='months_spent',HHID='HHID',months_converter=None, convert_categoricals=True,Age_ints=None,fn_type='stata'):
@@ -164,7 +164,7 @@ def age_sex_composition(fn,sex='sex',sex_converter=None,age='age',months_spent='
     if Age_ints is None:
         # Match Uganda FCT categories
         Age_ints = ((0,4),(4,9),(9,14),(14,19),(19,31),(31,51),(51,100))
-        
+
     with dvc.api.open(fn,mode='rb') as dta:
         df = get_household_roster(fn=dta,HHID=HHID,sex=sex,age=age,months_spent=months_spent,
                                   sex_converter=sex_converter,months_converter=months_converter,
@@ -172,7 +172,7 @@ def age_sex_composition(fn,sex='sex',sex_converter=None,age='age',months_spent='
 
     df.index.name = 'j'
     df.columns.name = 'k'
-    
+
     return df
 
 
