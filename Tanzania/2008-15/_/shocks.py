@@ -28,15 +28,15 @@ date['end_date'] = pd.to_datetime(date.rename(columns={'ha_18_3': 'year', 'ha_18
 
 
 #merge 
-date = date[["round", "r_hhid", "end_date"]].drop_duplicates()
-df = df.merge(date.drop_duplicates(), how = 'inner', on = ['r_hhid', 'round'])
+date = date[["round", "UPHI", "end_date"]].drop_duplicates()
+df = df.merge(date.drop_duplicates(), how = 'inner', on = ['UPHI', 'round'])
 df['Onset'] = (df.end_date.dt.to_period('M') - df.start_date.dt.to_period('M')).apply(lambda x: x.n if pd.notnull(x) else np.nan)
 
 #y4 = df.loc[df['round']==4, 'r_hhid'].to_frame().rename(columns ={'r_hhid':'y4_hhid'})
 #df = df.join(y4)
 
 #formatting
-shocks = pd.DataFrame({"UPHI": df.UPHI.values.tolist(),
+shocks = pd.DataFrame({"j": df.UPHI.values.tolist(),
                        #"hhid": df.r_hhid.values.tolist(), 
                        "t": df['round'].values.tolist(),
                        #'y4_hhid': df.y4_hhid.values.tolist(),
@@ -53,7 +53,7 @@ dict = {1:'2008-09', 2:'2010-11', 3:'2012-13', 4:'2014-15'}
 shocks.replace({"t": dict},inplace=True)
 
 #converting data types 
-shocks = shocks.astype({"UPHI": 'object',
+shocks = shocks.astype({"j": 'object',
                        #"hhid": 'object',
                        "t": 'object',
                        #"y4_hhid": 'object',
@@ -67,7 +67,9 @@ shocks = shocks.astype({"UPHI": 'object',
                        "Dispersion": 'category'
                        }) 
 
-shocks['UPHI'] = shocks['UPHI'].astype(int).astype(str)
-shocks.set_index(['UPHI','t','Shock'], inplace = True)
+shocks['j'] = shocks['j'].astype(int).astype(str)
+shocks.set_index(['j','t','Shock'], inplace = True)
+
+assert df.index.is_unique, "Non-unique index!  Fix me!"
 
 shocks.to_parquet('shocks.parquet')
