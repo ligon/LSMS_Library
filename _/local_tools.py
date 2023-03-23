@@ -282,3 +282,45 @@ def add_markets_from_other_features(country,df):
     df = df.reset_index().set_index(df_idx)
 
     return df
+
+def df_from_orgfile(orgfn,name,set_columns=True):
+    """
+    Extract the org table with name from the orgmode file named orgfn; return a pd.DataFrame.
+    """
+    # Grab file as a list of strings
+    with open(orgfn,'r') as f:
+        contents = f.readlines()
+
+    # Get indices of #+name: lines:
+    names = [i for i,s in enumerate(contents) if f'#+name: {name}' in s.strip().lower()]
+
+    if len(names)==0:
+        warnings.warn(f'No table {name} in {orgfn}.')
+        return None
+    if len(names)>1:
+        start = names[0]
+        warnings.warn(f'More than one table with {name} in {orgfn}.  Reading first one at line {start}.')
+    else:
+        start = names[0]
+
+    # Advance to line that starts table
+    i = start
+    while contents[i].strip()[:2] == '#+': i +=1
+
+    table =[]
+    nextline = contents[i].strip()
+    if set_columns and len(nextline) and nextline[0] == '|':
+        columns = [s.strip() for s in nextline.split('|')[1:-1]]
+        i+=1
+        nextline = contents[i].strip()
+    else:
+        columns = None
+
+    while len(nextline) and nextline[0] == '|':
+        line = contents[i].strip()
+        if line[-1] == '|' and  line[:2] != '|-':
+            table.append([s.strip() for s in line.split('|')[1:-1]])
+        i+=1
+        nextline = contents[i].strip()
+
+    return pd.DataFrame(table,columns=columns)
