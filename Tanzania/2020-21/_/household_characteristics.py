@@ -25,4 +25,6 @@ df = df.reset_index()
 df.insert(1, 't', '2020-21')
 df.set_index(['j','t'], inplace = True)
 
+assert df.index.is_unique, "Non-unique index!  Fix me!"
+
 df.to_parquet('household_characteristics.parquet')

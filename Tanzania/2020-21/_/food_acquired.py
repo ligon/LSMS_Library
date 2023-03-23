@@ -32,4 +32,6 @@ unit_conversion = {'kilogram': 1,
                    'piece': 'p'}
 df = new_harmonize_units(df, unit_conversion)
 
+assert df.index.is_unique, "Non-unique index!  Fix me!"
+
 df.to_parquet('food_acquired.parquet')

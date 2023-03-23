@@ -50,5 +50,6 @@ z = z.stack().unstack('k')
 z.index.names=['j','t']
 z = z.reset_index().set_index(['j','t'])
 
+assert z.index.is_unique, "Non-unique index!  Fix me!"
 
 z.to_parquet('household_characteristics.parquet')

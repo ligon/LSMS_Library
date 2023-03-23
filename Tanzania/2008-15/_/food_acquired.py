@@ -31,6 +31,9 @@ unit_conversion = {'Kg': 1,
                    'Litre': 1,
                    'Millilitre': 0.001,
                    'Piece': 'p'}
+
 df = new_harmonize_units(df, unit_conversion)
+
+assert df.index.is_unique, "Non-unique index!  Fix me!"
 
 df.to_parquet('food_acquired.parquet')

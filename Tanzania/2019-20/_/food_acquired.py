@@ -5,6 +5,7 @@ from tanzania import food_acquired, new_harmonize_units
 import numpy as np
 
 fn='../Data/HH_SEC_J1.dta'
+round = '2019-20'
 
 myvars = dict(item='itemcode',
               HHID='sdd_hhid',
@@ -22,14 +23,16 @@ myvars = dict(item='itemcode',
               )
 
 d = food_acquired(fn,myvars)
-d['t'] = '2019-20'
+d['t'] = round
 df = d.reset_index().set_index(['j','t','i'])
+
+assert df.index.is_unique, "Non-unique index!  Fix me!"
 
 unit_conversion = {'Kg': 1,
                    'Gram': 0.001,
                    'Litre': 1,
                    'Millilitre': 0.001,
-                   'Piece': 'p'}
+                   'Piece': np.nan}
 df = new_harmonize_units(df, unit_conversion)
 
 df.to_parquet('food_acquired.parquet')
