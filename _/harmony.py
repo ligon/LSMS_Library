@@ -31,6 +31,8 @@ def main(country):
 
     assert len(xlabels.intersection(plabels)) == len(plabels)
 
+    return x,z,p
+
 if __name__=='__main__':
     parser = argparse.ArgumentParser('Check for consistency of datasets.')
     parser.add_argument("country")
