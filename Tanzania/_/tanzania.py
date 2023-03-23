@@ -7,6 +7,7 @@ import warnings
 import json
 import sys
 sys.path.append('../../_')
+sys.path.append('../../../_')
 from local_tools import add_markets_from_other_features
 
 Waves = {'2008-15':('upd4_hh_a.dta','UPHI','r_hhid','round'),
