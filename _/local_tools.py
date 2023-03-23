@@ -289,6 +289,8 @@ def df_from_orgfile(orgfn,name=None,set_columns=True,to_numeric=True):
     If name is None (the default), then we assume the orgtable is the very first
     thing in the file, with the possible exception of options (lines starting with #+).
 
+    Note that we assume that cells with the string '---' should be null.
+
     Ethan Ligon                                                       March 2023
     """
     # Grab file as a list of strings
@@ -331,6 +333,8 @@ def df_from_orgfile(orgfn,name=None,set_columns=True,to_numeric=True):
             break
 
     df = pd.DataFrame(table,columns=columns)
+
+    df = df.replace({'---':np.nan})
 
     if to_numeric:
         # Try to convert columns to numeric types, but fail gracefully
