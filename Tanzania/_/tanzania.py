@@ -10,6 +10,8 @@ sys.path.append('../../_')
 sys.path.append('../../../_')
 from local_tools import add_markets_from_other_features
 
+country = 'Tanzania'
+
 Waves = {'2008-15':('upd4_hh_a.dta','UPHI','r_hhid','round'),
          '2019-20':('HH_SEC_A.dta','y4_hhid','sdd_hhid'),
          '2020-21':('hh_sec_a.dta','y4_hhid','y5_hhid')}
@@ -145,8 +147,14 @@ def other_features(fn,urban=None,region=None,HHID='HHID',urban_converter=None,wa
                                                       region=region,
                                                       urban_converter=urban_converter,
                                                       wave=wave)
+    # Fix any floats in j
     df.index.name = 'j'
+    k = df.index.get_level_values('j')
+    f2s = {i:str(i).split('.')[0] for i in k}
+
     df.columns.name = 'k'
+
+    df = df.rename(index=f2s,level='j')
 
     return df
 

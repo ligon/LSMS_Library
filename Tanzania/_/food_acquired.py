@@ -1,13 +1,12 @@
 """Calculate food prices for different items across rounds; allow
 different prices for different units.  
 """
-
 import sys
 sys.path.append('../../_')
 from local_tools import df_from_orgfile
 import pandas as pd
 import numpy as np
-from tanzania import Waves, id_match, add_markets_from_other_features
+from tanzania import Waves, id_match, add_markets_from_other_features, country
 import dvc.api
 from lsms import from_dta
 import json
@@ -65,5 +64,7 @@ x = x.reset_index().set_index(['j','t','m','i'])
 # Drop any observations with NaN in the index
 idx = pd.MultiIndex.from_frame(pd.DataFrame(x.index.to_list(),columns=x.index.names).dropna())
 x = x.loc[idx].sort_index()
+
+assert x.index.is_unique, "Non-unique index!  Fix me!"
 
 x.to_parquet('../var/food_acquired.parquet')

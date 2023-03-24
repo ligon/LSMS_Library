@@ -4,8 +4,9 @@ rounds := $(shell ls -d ../2*-*)
 source = $(shell find $(rounds) -name \*.py)
 parquet := $(source:.py=.parquet)
 
-var = ../var/food_expenditures.parquet ../var/food_quantities.parquet ../var/unitvalues.parquet \
+var = ../var/food_expenditures.parquet ../var/food_quantities.parquet ../var/food_prices.parquet \
 	  ../var/household_characteristics.parquet ../var/other_features.parquet \
+      ../var/shocks.parquet
 
 
 all: $(parquet) $(var)
@@ -19,7 +20,7 @@ food_acquired_parquet := $(food_acquired:.py=.parquet)
 ../%/_/food_acquired.parquet: $(food_acquired)
 	(cd $(@D) && python food_acquired.py)
 
-../var/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
+../var/food_acquired.parquet: food_acquired.py $(food_acquired_parquet) ../var/other_features.parquet
 	python food_acquired.py
 
 household_characteristics = $(shell find $(rounds) -name household_characteristics.py)
@@ -49,7 +50,7 @@ shocks_parquet := $(shocks:.py=.parquet)
 ../%/_/shocks.parquet:
 	(cd $(@D) && python shocks.py)
 
-%.parquet: %.py food_items.org uganda.py
+%.parquet: %.py CONTENTS.org tanzania.py
 	(cd $(@D) && python ./$(<F))
 
 clean:

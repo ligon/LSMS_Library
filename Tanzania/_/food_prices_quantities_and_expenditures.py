@@ -26,16 +26,25 @@ quantities =  ['quant_ttl_consume', 'unit_ttl_consume']
 x = fa.groupby(['j','t','m','i'])[expenditures].sum().replace(0,np.nan)
 
 x = x.dropna()
+
+assert x.index.is_unique, "Non-unique index!  Fix me!"
+
 x.to_parquet('../var/food_expenditures.parquet')
 
 # Now prices and quantitites; unit conversion already handled in food_acquired
 
 p = fa[prices].rename(columns = {'unit_purchase': 'u'})
 p = p.reset_index().set_index(['j','t','m','i','u'])
+
+assert p.index.is_unique, "Non-unique index!  Fix me!"
+
 p.to_parquet('../var/food_prices.parquet')
 
 q = fa[quantities].rename(columns = {'unit_ttl_consume': 'u'})
 q = q.reset_index().set_index(['j','t','m','i','u'])
+
+assert q.index.is_unique, "Non-unique index!  Fix me!"
+
 q.to_parquet('../var/food_quantities.parquet')
 
 #code below temporarily commented out for reference 
