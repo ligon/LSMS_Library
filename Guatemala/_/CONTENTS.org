@@ -4,6 +4,7 @@ Brief table of contents and todo list.
 
 * Files in Guatemala/_/
 ** DONE food_items.org
+
 CLOSED: [2023-03-16 Thu 11:41]
 Should have columns for each year, with "Preferred Labels" and "Aggregate Labels".   Labels for different years:
 #+begin_src python :results output raw table :tangle /tmp/foo.py
@@ -41,6 +42,7 @@ for wave in ['2000']:
             D[l][wave] = l
 
 df = pd.DataFrame(D).T
+df['Preferred Label'] = df['Preferred Label'].str.capitalize()
 
 # Merge in FCT codes & preferred labels
 from eep153_tools.sheets import read_sheets
@@ -189,6 +191,7 @@ D = pd.concat(L)
 After cleaning this up manually, we have  a complete FCT for Central America and Panama at https://docs.google.com/spreadsheets/d/1qljY2xrxbc37d9tLSyuFa9CnjEsh3Re2ufDQlBHzPEQ/
 ** TODO Nutrition
 * Files in Guatemala/<SOMEYEAR>/_/
+
 ** DONE other_features.py
 CLOSED: [2023-03-16 Thu 22:53]
 Code to test for 2000:
@@ -235,6 +238,7 @@ max       8.000000     9.000000  ...       4.000000     2.890372
 [8 rows x 19 columns]
 #+end_example
 
+=======
 ** DONE food_acquired.py
 CLOSED: [2023-03-16 Thu 14:25]
 :LOGBOOK:
