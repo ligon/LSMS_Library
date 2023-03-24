@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Calculate expenditures, prices, and quantities.
 
@@ -15,21 +16,12 @@ fa = pd.read_parquet('../var/food_acquired.parquet')
 # at home during the last week, with detail about where the food came from
 # (purchased, out of own production, in kind transfers).
 # This means no direct data on prices, among other things.
-
-expenditures = ['value_purchase']
+#
+# Also, the value of expenditures will be less than the value of consumption.
 
 prices = ['unitvalue_purchase', 'unit_purchase']
 
 quantities =  ['quant_ttl_consume', 'unit_ttl_consume']
-
-# Deal with expenditures; no need to fuss with units.
-x = fa.groupby(['j','t','m','i'])[expenditures].sum().replace(0,np.nan)
-
-x = x.dropna()
-
-assert x.index.is_unique, "Non-unique index!  Fix me!"
-
-x.to_parquet('../var/food_expenditures.parquet')
 
 # Now prices and quantitites; unit conversion already handled in food_acquired
 
@@ -47,35 +39,15 @@ assert q.index.is_unique, "Non-unique index!  Fix me!"
 
 q.to_parquet('../var/food_quantities.parquet')
 
-#code below temporarily commented out for reference 
-"""
-v = fa[prices + quantities]
+# Now, using median unit prices, value quantities consumed q
 
-with open('conversion_to_kgs.json','r') as f:
-    d = json.load(f)
+pbar = p.groupby(['t','m','i','u']).median()
 
-kgs = pd.Series(d)
-kgs.index.name = 'u'
-kgs.name = 'Kgs/unit'
+x = (pbar.squeeze()*q.squeeze()) # Value of consumption
+x = x.groupby(['j','t','m','i']).sum() # Sum over different units
 
-kgs = kgs.reindex(v.index,level='u')
+x = x.replace(0,np.nan).dropna()
 
-# Convert other units to kilograms, where possible
-p = v[prices]
-p = p.divide(kgs,axis=0)
+assert x.index.is_unique, "Non-unique index!  Fix me!"
 
-q = v[quantities]
-q = q.multiply(kgs,axis=0)
-
-# What units were converted?
-tokg = {k:'Kg' for k,v in d.items() if np.isreal(v)}
-
-p = p.rename(index=tokg,level='u')
-q = q.rename(index=tokg,level='u')
-
-p = p.replace(0,np.nan)
-p.to_parquet('../var/food_prices.parquet')
-
-q = q.replace(0,np.nan)
-q.to_parquet('../var/food_quantities.parquet')
-"""
+pd.DataFrame({'consumed value':x}).to_parquet('../var/food_expenditures.parquet')
