@@ -34,4 +34,6 @@ shocks = shocks.astype({
 
 shocks.set_index(['j','t','Shock'], inplace = True)
 
+assert df.index.is_unique, "Non-unique index!  Fix me!"
+
 shocks.to_parquet('shocks.parquet')
