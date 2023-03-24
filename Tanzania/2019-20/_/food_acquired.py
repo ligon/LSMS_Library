@@ -35,4 +35,8 @@ unit_conversion = {'Kg': 1,
                    'Piece': np.nan}
 df = new_harmonize_units(df, unit_conversion)
 
+assert df.index.is_unique, "Non-unique index!  Fix me!"
+
+assert len(df[['quant_purchase','quant_own','quant_inkind']].dropna(how='all'))>0
+
 df.to_parquet('food_acquired.parquet')
