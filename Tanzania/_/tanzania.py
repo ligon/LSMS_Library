@@ -106,8 +106,8 @@ def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Label',value='Prefer
 def food_acquired(fn,myvars):
     with dvc.api.open(fn,mode='rb') as dta:
         df = from_dta(dta)
-    df = df.loc[:,[v for v in myvars.values()]].rename(columns={v:k for k,v in myvars.items()})
-    
+    df = df.loc[:,list(myvars.values())].rename(columns={v:k for k,v in myvars.items()})
+
     if 'year' in myvars:
         #map round code to actual years
         dict = {1:'2008-09', 2:'2010-11', 3:'2012-13', 4:'2014-15'}
@@ -117,7 +117,7 @@ def food_acquired(fn,myvars):
     else:
         df = df.set_index(['HHID','item']).dropna(how='all')
         df.index.names = ['j','i']
-        
+
     # Fix type of hhids if need be
     if df.index.get_level_values('j').dtype ==float:
         fix = {k: v for k, v in zip(df.index.levels[0],df.index.levels[0].astype(int).astype(str))}

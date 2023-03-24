@@ -18,7 +18,7 @@ for t in Waves.keys():
     #x[t] = id_match(y[t],t,Waves)
 
 foo = x.copy()
-x = pd.concat(x.values())
+x = pd.concat(x)
 
 x = x.reset_index().set_index(['j','t','i'])
 
