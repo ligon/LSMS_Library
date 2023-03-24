@@ -13,10 +13,9 @@ import json
 import warnings
 
 x={}
-y ={}
 for t in Waves.keys():
-    y[t] = pd.read_parquet('../'+t+'/_/food_acquired.parquet')
-    x[t] = id_match(y[t],t,Waves)
+    x[t] = pd.read_parquet('../'+t+'/_/food_acquired.parquet')
+    #x[t] = id_match(y[t],t,Waves)
 
 foo = x.copy()
 x = pd.concat(x.values())

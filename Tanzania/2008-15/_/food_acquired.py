@@ -23,8 +23,7 @@ myvars = dict(item='hj_00',
 
 df = food_acquired(fn,myvars)
 
-df = df.reset_index().rename(columns = {'j':'UPHI'}).set_index(['UPHI','i', 't'])
-
+df = df.reset_index().set_index(['j','i', 't'])
 
 unit_conversion = {'Kg': 1,
                    'Gram': 0.001,
