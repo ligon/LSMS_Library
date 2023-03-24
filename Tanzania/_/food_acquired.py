@@ -21,7 +21,6 @@ foo = x.copy()
 x = pd.concat(x.values())
 
 x = x.reset_index().set_index(['j','t','i'])
-x = x.drop(columns ='index')
 
 if 'm' in x.columns:
     x = x.drop('m',axis=1)

@@ -19,5 +19,5 @@ for t in Waves.keys():
 s = pd.concat(s.values())
 s['m'] = 'Tanzania'
 s = s.reset_index().set_index(['j','t','m'])
-s = s.drop(columns ='index')
+
 s.to_parquet('../var/shocks.parquet')
