@@ -189,7 +189,9 @@ D = pd.concat(L)
 #+end_src
 
 After cleaning this up manually, we have  a complete FCT for Central America and Panama at https://docs.google.com/spreadsheets/d/1qljY2xrxbc37d9tLSyuFa9CnjEsh3Re2ufDQlBHzPEQ/
-** TODO Nutrition
+** DONE Nutrition
+CLOSED: [2023-04-04 Tue 18:15]
+The file =nutrition.py= now uses data from the FCT https://docs.google.com/spreadsheets/d/1qljY2xrxbc37d9tLSyuFa9CnjEsh3Re2ufDQlBHzPEQ/ and =../var/food_quantities.parquet= to produce =../var/nutrition.parquet= and =../var/fct.parquet=.
 * Files in Guatemala/<SOMEYEAR>/_/
 
 ** DONE other_features.py

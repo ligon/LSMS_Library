@@ -1,0 +1,276 @@
+#+title: Contents
+
+* Issues
+** WAITING Missing food quantities!!
+:LOGBOOK:
+- Note taken on [2023-03-24 Fri 05:28] \\
+  Emailed lsms@worldbank.org regarding this.
+:END:
+In rounds 2019-20 and 2020-21 there is critical data missing from the files
+provided by the World Bank on food acquisition. See for example
+https://microdata.worldbank.org/index.php/catalog/3885/data-dictionary/F23?file_name=HH_SEC_J1
+which records food acquisition for 2019-2o.
+
+The structure of this module for Tanzania elicits for both of these waves:
+- Amount consumed (hh_j02_2) :: Okay
+- Value purchased (hh_j04) :: Okay
+- Quantity purchased (hh_j03_2) :: MISSING
+- Quantity consumed from own production (hh_j05_2) :: MISSING
+- Quantity received in kind (hh_j06_2) :: MISSING
+
+An interesting point is that the /units/ seem to be recorded (e.g., hh_02_1,
+hh_03_1, hh_05_1, hh_06_1), suggesting this is some data processing issue rather
+than a data collection failure.
+
+** TODO Get Community Level Prices
+Currently for Tanzania we use "Value purchased" divided by "Quantity purchased" to obtain unit values at the level of (some) households, then multiply "Amount consumed" by this unit value to obtain a value of total consumption.  This fails in the last two rounds because we're missing data on "Quantity purchased", so we can't construct unit values.
+
+However, an alternative exists: there's "Community-level" data on prices collected on the same food items we want.   Data on prices seems decent for 2019-20.  Unfortunately, linking the /places/ these prices are observed to the location of the households seems difficult.
+** TODO Link  2019-20 and 2020-21 to panel
+According to docs this is possible; e.g., see p. 12 of [[../2019-20/Documentation/tznps_sdd_2019_20_basic_information_document_updated_november_2022.pdf][Basic Information Document]].
+
+* Files in Tanzania/_/
+** DONE tanzania.py
+Contains code common to different Tanzania rounds
+** DONE food_items.org
+CLOSED: [2023-03-23 Thu 10:58]
+Should have columns for each year, with "Preferred Labels" and perhaps "Aggregate Labels".
+#+begin_src python :results output raw table :tangle /tmp/test.py
+from lsms.tools import from_dta
+import dvc.api
+import pyreadstat
+import pandas as pd
+from cfe.df_utils import df_to_orgtbl
+
+Country = 'Tanzania'
+
+fs = dvc.api.DVCFileSystem('./')
+
+itemlabel_location = {'2008-15':('upd4_hh_j1.dta','hj_00'),
+                      '2019-20':('HH_SEC_J1.dta','itemcode'),
+                      '2020-21':('hh_sec_j1.dta','itemcode')}
+
+reference_year = list(itemlabel_location.keys())[0]
+
+itemlabels = {}
+for k,v in itemlabel_location.items():
+    try:
+        with fs.open(f'/{Country}/{k}/Data/{v[0]}') as dta:
+            df = from_dta(dta)
+            itemlabels[k] = df[v[1]].value_counts().index.tolist()
+    except ValueError:  # pd.io.stata can't read some versions of dta files...
+        fs.get_file(f'/{Country}/{k}/Data/{v[0]}',f'/tmp/{v[0]}')
+        df, meta = pyreadstat.read_dta(f'/tmp/{v[0]}')
+        itemlabels[k] = list(meta.value_labels[v[1]].values())
+
+# Build dictionary of dictionaries for matching
+from collections import defaultdict
+import difflib
+from tanzania import Waves
+
+D = defaultdict(dict)
+#D.update({k.title():'Preferred Label' for k in itemlabels[reference_year]]})
+
+itemlabels_reference = [s.strip().title() for s in itemlabels[reference_year]]
+
+for wave in Waves.keys():
+    for l in itemlabels[wave]:
+        k = difflib.get_close_matches(l.title(),itemlabels_reference)
+        if len(k):
+            D[k[0]][wave] = l
+        else:
+            D[l][wave] = l
+
+def preferred(s):
+    t = s.strip().title()
+    t = t.replace(' And ',' & ')
+    t = t.replace(' / ','/')
+    return t
+
+# Regularize keys
+D = {preferred(k):v for k,v in D.items()}
+
+df = pd.DataFrame(D).T
+df.index.name = 'Preferred Label'
+
+print(df_to_orgtbl(df))
+#+end_src
+
+#+name: food_labels
+| Preferred Label          | 2008-15                                                  | 2019-20                                                  | 2020-21                                                  |
+|--------------------------+----------------------------------------------------------+----------------------------------------------------------+----------------------------------------------------------|
+| Rice (paddy)             | RICE (PADDY)                                             | RICE (PADDY)                                             | RICE (PADDY)                                             |
+| Dairy Products           | MILK PRODUCTS (LIKE CREAM, CHEESE, YOGHURT ETC)          | MILK PRODUCTS (LIKE CREAM, CHEESE, YOGHURT ETC)          | MILK PRODUCTS (LIKE CREAM, CHEESE, YOGHURT ETC)          |
+| Sugarcane                | SUGARCANE                                                | SUGARCANE                                                | sugarcane                                                |
+| Goat Meat                | GOAT MEAT                                                | GOAT MEAT                                                | GOAT MEAT                                                |
+| Beef                     | BEEF INCLUDING MINCED SAUSAGE                            | BEEF INCLUDING MINCED SAUSAGE                            | BEEF INCLUDING MINCED SAUSAGE                            |
+| Pork                     | PORK INCLUDING SAUSAGES AND BACON                        | PORK INCLUDING SAUSAGES AND BACON                        | PORK INCLUDING SAUSAGES AND BACON                        |
+| Chicken                  | CHICKEN AND OTHER POULTRY                                | CHICKEN AND OTHER POULTRY                                | CHICKEN AND OTHER POULTRY                                |
+| Wild Birds & Insects     | WILD BIRDS AND INSECTS                                   | WILD BIRDS AND INSECTS                                   | WILD BIRDS AND INSECTS                                   |
+| Other Meat               | OTHER DOMESTIC/WILD MEAT PRODUCTS                        | OTHER DOMESTIC/WILD MEAT PRODUCTS                        | OTHER DOMESTIC/WILD MEAT PRODUCTS                        |
+| Eggs                     | EGGS                                                     | EGGS                                                     | eggs                                                     |
+| Fish (fresh)             | FRESH FISH AND SEAFOOD (INCLUDING DAGAA)                 | FRESH FISH AND SEAFOOD (INCLUDING DAGAA)                 | FRESH FISH AND SEAFOOD (INCLUDING DAGAA)                 |
+| Fish (dried)             | DRIED/SALTED/CANNED FISH AND SEAFOOD (INCL. DAGAA)       | DRIED/SALTED/CANNED FISH AND SEAFOOD (INCL. DAGAA)       | DRIED/SALTED/CANNED FISH AND SEAFOOD (INCL. DAGAA)       |
+| Fish (packaged)          | PACKAGE FISH                                             | PACKAGE FISH                                             | PACKAGE FISH                                             |
+| Milk (fresh)             | FRESH MILK                                               | FRESH MILK                                               | FRESH MILK                                               |
+| Milk (dry or canned)     | CANNED MILK/MILK POWDER                                  | CANNED MILK/MILK POWDER                                  | CANNED MILK/MILK POWDER                                  |
+| Rice (husked)            | RICE (HUSKED)                                            | RICE (HUSKED)                                            | RICE (HUSKED)                                            |
+| Cooking Oil              | COOKING OIL                                              | COOKING OIL                                              | COOKING OIL                                              |
+| Butter, Etc.             | BUTTER, MARGARINE, GHEE AND OTHER FAT PRODUCTS           | BUTTER, MARGARINE, GHEE AND OTHER FAT PRODUCTS           | BUTTER, MARGARINE, GHEE AND OTHER FAT PRODUCTS           |
+| Salt                     | SALT                                                     | SALT                                                     | salt                                                     |
+| Other Spices             | OTHER SPICES                                             | OTHER SPICES                                             | OTHER SPICES                                             |
+| Tea (dry)                | TEA DRY                                                  | TEA DRY                                                  | TEA DRY                                                  |
+| Coffee & Cocoa           | COFFEE AND COCOA                                         | COFFEE AND COCOA                                         | COFFEE AND COCOA                                         |
+| Materials For Drinks     | OTHER RAW MATERIALS FOR DRINKS                           | OTHER RAW MATERIALS FOR DRINKS                           | OTHER RAW MATERIALS FOR DRINKS                           |
+| Soft drinks              | BOTTLED/CANNED SOFT DRINKS (SODA, JUICE, WATER)          | BOTTLED/CANNED SOFT DRINKS (SODA, JUICE, WATER)          | BOTTLED/CANNED SOFT DRINKS (SODA, JUICE, WATER)          |
+| Prepared Tea, Coffee     | PREPARED TEA, COFFEE                                     | PREPARED TEA, COFFEE                                     | PREPARED TEA, COFFEE                                     |
+| Bottled Beer             | BOTTLED BEER                                             | BOTTLED BEER                                             | BOTTLED BEER                                             |
+| Local Brews              | LOCAL BREWS                                              | LOCAL BREWS                                              | LOCAL BREWS                                              |
+| Wine & Spirits           | WINE AND SPIRITS                                         | WINE AND SPIRITS                                         | WINE AND SPIRITS                                         |
+| Other Fruits             | MANGOES, AVOCADOES AND OTHER FRUITS                      | MANGOES, AVOCADOES AND OTHER FRUITS                      | MANGOES, AVOCADOES AND OTHER FRUITS                      |
+| Citrus Fruits            | CITRUS FRUITS (ORANGES, LEMON, TANGERINES, ETC.)         | CITRUS FRUITS (ORANGES, LEMON, TANGERINES, ETC.)         | CITRUS FRUITS (ORANGES, LEMON, TANGERINES, ETC.)         |
+| Ripe Bananas             | RIPE BANANAS                                             | RIPE BANANAS                                             | RIPE BANANAS                                             |
+| Vegetables (preserved)   | CANNED, DRIED AND WILD VEGETABLES                        | CANNED, DRIED AND WILD VEGETABLES                        | CANNED, DRIED AND WILD VEGETABLES                        |
+| Maize (green, cob)       | MAIZE (GREEN, COB)                                       | MAIZE (GREEN, COB)                                       | MAIZE (GREEN, COB)                                       |
+| Maize (grain)            | MAIZE (GRAIN)                                            | MAIZE (GRAIN)                                            | MAIZE (GRAIN)                                            |
+| Maize (flour)            | MAIZE (FLOUR)                                            | MAIZE (FLOUR)                                            | MAIZE (FLOUR)                                            |
+| Millet & Sorghum (grain) | MILLET AND SORGHUM (GRAIN)                               | MILLET AND SORGHUM (GRAIN)                               | MILLET AND SORGHUM (GRAIN)                               |
+| Millet & Sorghum (flour) | MILLET AND SORGHUM (FLOUR)                               | MILLET AND SORGHUM (FLOUR)                               | MILLET AND SORGHUM (FLOUR)                               |
+| Bread                    | BREAD                                                    | BREAD                                                    | bread                                                    |
+| Buns, Cakes And Biscuits | BUNS, CAKES AND BISCUITS                                 | BUNS, CAKES AND BISCUITS                                 | BUNS, CAKES AND BISCUITS                                 |
+| Macaroni, Spaghetti      | MACARONI, SPAGHETTI                                      | MACARONI, SPAGHETTI                                      | MACARONI, SPAGHETTI                                      |
+| Other Cereal Products    | OTHER CEREAL PRODUCTS                                    | OTHER CEREAL PRODUCTS                                    | OTHER CEREAL PRODUCTS                                    |
+| Cassava Fresh            | CASSAVA FRESH                                            | CASSAVA FRESH                                            | CASSAVA FRESH                                            |
+| Cassava Dry/Flour        | CASSAVA DRY/FLOUR                                        | CASSAVA DRY/FLOUR                                        | CASSAVA DRY/FLOUR                                        |
+| Sweet Potatoes           | SWEET POTATOES                                           | SWEET POTATOES                                           | SWEET POTATOES                                           |
+| Yams/Cocoyams            | YAMS/COCOYAMS                                            | YAMS/COCOYAMS                                            | YAMS/COCOYAMS                                            |
+| Irish Potatoes           | IRISH POTATOES                                           | IRISH POTATOES                                           | IRISH POTATOES                                           |
+| Plantains                | COOKING BANANAS, PLANTAINS                               | COOKING BANANAS, PLANTAINS                               | COOKING BANANAS, PLANTAINS                               |
+| Other Starches           | OTHER STARCHES                                           | OTHER STARCHES                                           | OTHER STARCHES                                           |
+| Sugar                    | SUGAR                                                    | SUGAR                                                    | sugar                                                    |
+| Sweets                   | SWEETS                                                   | SWEETS                                                   | sweets                                                   |
+| Honey, Syrups, etc.      | HONEY, SYRUPS, JAMS, MARMALADE, JELLIES, CANNED FRUITS   | HONEY, SYRUPS, JAMS, MARMALADE, JELLIES, CANNED FRUITS   | HONEY, SYRUPS, JAMS, MARMALADE, JELLIES, CANNED FRUITS   |
+| Pulses                   | PEAS, BEANS, LENTILS AND OTHER PULSES                    | PEAS, BEANS, LENTILS AND OTHER PULSES                    | PEAS, BEANS, LENTILS AND OTHER PULSES                    |
+| Groundnuts               | GROUNDNUTS IN SHELL/SHELLED                              | GROUNDNUTS IN SHELL/SHELLED                              | GROUNDNUTS IN SHELL/SHELLED                              |
+| Coconuts                 | COCONUTS (MATURE/IMMATURE)                               | COCONUTS (MATURE/IMMATURE)                               | COCONUTS (MATURE/IMMATURE)                               |
+| Nuts                     | CASHEW, ALMONDS AND OTHER NUTS                           | CASHEW, ALMONDS AND OTHER NUTS                           | CASHEW, ALMONDS AND OTHER NUTS                           |
+| Seeds                    | SEEDS AND PRODUCTS FROM NUTS/SEEDS (EXCL. COOKING OIL)   | SEEDS AND PRODUCTS FROM NUTS/SEEDS (EXCL. COOKING OIL)   | SEEDS AND PRODUCTS FROM NUTS/SEEDS (EXCL. COOKING OIL)   |
+| Vegetables (fresh)       | ONIONS, TOMATOES, CARROTS AND GREEN PEPPER, OTHER VIUNGO | ONIONS, TOMATOES, CARROTS AND GREEN PEPPER, OTHER VIUNGO | ONIONS, TOMATOES, CARROTS AND GREEN PEPPER, OTHER VIUNGO |
+| Leafy Greens             | SPINACH, CABBAGE AND OTHER GREEN VEGETABLES              | SPINACH, CABBAGE AND OTHER GREEN VEGETABLES              | SPINACH, CABBAGE AND OTHER GREEN VEGETABLES              |
+| Wheat Flour              | WHEAT FLOUR                                              | WHEAT FLOUR                                              | WHEAT FLOUR                                              |
+| Other Cereals            | WHEAT, BARLEY, GRAIN, AND OTHER CEREALS                  | WHEAT, BARLEY GRAIN AND OTHER CEREALS                    | WHEAT, BARLEY GRAIN AND OTHER CEREALS                    |
+
+** DONE conversion_to_kgs.json
+CLOSED: [2023-03-03 Fri 11:26]
+This comes from data in =Tanzania/2015-16/Data/=
+#+begin_src python :tangle /tmp/test.py
+import dvc.api
+from lsms.tools import from_dta
+import json
+
+unitfiles = ['../2011-12/Data/Food_CF_Wave1.dta',
+             '../2013-14/Data/Food_CF_Wave2.dta',
+             '../2015-16/Data/Food_CF_Wave3.dta',
+             '../2018-19/Data/Food_CF_Wave4.dta']
+
+D = {}
+for fn in unitfiles:
+    with dvc.api.open(fn,mode='rb') as dta:
+        df = from_dta(dta)
+
+        foo=df.groupby('unit_cd')['mean_cf_nat'].median().to_dict()
+        D.update(foo)
+
+D = {k.title():v for k,v in D.items()}
+with open('conversion_to_kgs.json','w') as f:
+    #json.dump({s.split('. ')[1]:v for s,v in foo.items()},f)
+    json.dump(D,f)
+
+#+end_src
+
+#+results:
+: None
+** DONE other_features.py
+CLOSED: [2023-03-07 Tue 11:25]
+** DONE household_characteristics.py
+CLOSED: [2023-03-07 Tue 11:32]
+** DONE food_acquired.py
+CLOSED: [2023-03-07 Tue 21:10]
+Test...
+#+begin_src python :results output
+import pandas as pd
+
+fa = pd.read_parquet('../var/food_acquired.parquet')
+
+print(fa.describe())
+#+end_src
+
+#+results:
+#+begin_example
+            quantity  value_purchased  ...            Kgs  Kgs Purchased
+count  189663.000000    189663.000000  ...  189663.000000  189663.000000
+mean      120.060827        38.112630  ...       0.475441       0.477268
+std       638.640276       218.505495  ...       0.639778       0.665748
+min         0.000000         0.000000  ...       0.000000       0.000000
+25%         1.000000        10.000000  ...       0.000000       0.000000
+50%         2.000000        20.000000  ...       0.160000       0.160000
+75%        10.000000        40.000000  ...       1.000000       1.000000
+max     58800.000000     70000.000000  ...      52.500000      52.500000
+
+[8 rows x 6 columns]
+#+end_example
+** DONE food_prices_quantities_and_expenditures.py
+CLOSED: [2023-03-07 Tue 21:12]
+Test...
+#+begin_src python :results output
+import pandas as pd
+
+print(pd.read_parquet('../var/food_prices.parquet').describe())
+print(pd.read_parquet('../var/food_quantities.parquet').describe())
+print(pd.read_parquet('../var/food_expenditures.parquet').describe())
+#+end_src
+
+#+results:
+#+begin_example
+       unitvalue_purchase
+count        3.153600e+05
+mean         2.776713e+03
+std          3.341748e+04
+min          1.000000e-01
+25%          8.333333e+02
+50%          1.400000e+03
+75%          2.400000e+03
+max          8.000000e+06
+       quant_ttl_consume
+count      434116.000000
+mean            3.082105
+std            47.187853
+min             0.001000
+25%             0.500000
+50%             1.000000
+75%             3.000000
+max         10500.000000
+       value_purchase
+count   338007.000000
+mean      2394.617389
+std       3434.192279
+min          0.340000
+25%        500.000000
+50%       1400.000000
+75%       3000.000000
+max     450000.000000
+#+end_example
+
+** TODO Food Conversion Table
+See https://www.fao.org/3/X6877E/X6877E00.htm
+** DONE shocks.py
+CLOSED: [2023-03-23 Thu 15:59]
+
+* Files in Tanzania/<SOMEYEAR>/_/
+** DONE household_characteristics.py
+CLOSED: [2023-03-03 Fri 11:26]
+** WAITING food_acquired.py
+** DONE other_features.py
+CLOSED: [2023-03-07 Tue 11:32]
+** DONE shocks.py
+CLOSED: [2023-03-23 Thu 15:59]
