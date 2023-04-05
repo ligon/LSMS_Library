@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Create a nutrition DataFrame for households based on food consumption quantities
 """
