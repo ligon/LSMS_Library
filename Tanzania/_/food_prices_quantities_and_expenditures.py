@@ -1,11 +1,15 @@
-"""Calculate food prices for different items across rounds; allow
+#!/usr/bin/env python
+"""
+Calculate expenditures, prices, and quantities.
+
+Calculate food prices for different items across rounds; allow
 different prices for different units.  
 """
 import pandas as pd
 import numpy as np
 import json
 
-v = pd.read_parquet('../var/food_acquired.parquet')
+fa = pd.read_parquet('../var/food_acquired.parquet')
 
 # Distinguish expenditures, quantities, and prices Conception is somewhat
 # different from other LSMSs (e.g., Uganda). Focus is on quantities /consumed/
@@ -13,57 +17,37 @@ v = pd.read_parquet('../var/food_acquired.parquet')
 # (purchased, out of own production, in kind transfers).
 # This means no direct data on prices, among other things.
 #
-expenditures = ['value_purchase']
+# Also, the value of expenditures will be less than the value of consumption.
 
 prices = ['unitvalue_purchase', 'unit_purchase']
 
 quantities =  ['quant_ttl_consume', 'unit_ttl_consume']
 
-# Deal with expenditures; no need to fuss with units.
-x = v.groupby(['j','t','m','i'])[expenditures].sum().replace(0,np.nan)
-
-x.to_parquet('../var/food_expenditures.parquet')
-
-
 # Now prices and quantitites; unit conversion already handled in food_acquired
 
-p = v[prices].rename(columns = {'unit_purchase': 'units'})
-p = p.reset_index().set_index(['j','t','m','i','units'])
+p = fa[prices].rename(columns = {'unit_purchase': 'u'})
+p = p.reset_index().set_index(['j','t','m','i','u'])
+
+assert p.index.is_unique, "Non-unique index!  Fix me!"
+
 p.to_parquet('../var/food_prices.parquet')
 
-q = v[quantities].rename(columns = {'unit_ttl_consume': 'units'})
-q = q.reset_index().set_index(['j','t','m','i','units'])
+q = fa[quantities].rename(columns = {'unit_ttl_consume': 'u'})
+q = q.reset_index().set_index(['j','t','m','i','u'])
+
+assert q.index.is_unique, "Non-unique index!  Fix me!"
+
 q.to_parquet('../var/food_quantities.parquet')
 
-#code below temporarily commented out for reference 
+# Now, using median unit prices, value quantities consumed q
 
-""" v = v[prices + quantities]
+pbar = p.groupby(['t','m','i','u']).median()
 
-with open('conversion_to_kgs.json','r') as f:
-    d = json.load(f)
+x = (pbar.squeeze()*q.squeeze()) # Value of consumption
+x = x.groupby(['j','t','m','i']).sum() # Sum over different units
 
-kgs = pd.Series(d)
-kgs.index.name = 'units'
-kgs.name = 'Kgs/unit'
+x = x.replace(0,np.nan).dropna()
 
-kgs = kgs.reindex(v.index,level='units')
+assert x.index.is_unique, "Non-unique index!  Fix me!"
 
-# Convert other units to kilograms, where possible
-p = v[prices]
-p = p.divide(kgs,axis=0)
-
-q = v[quantities]
-q = q.multiply(kgs,axis=0)
-
-# What units were converted?
-tokg = {k:'Kg' for k,v in d.items() if np.isreal(v)}
-
-p = p.rename(index=tokg,level='units')
-q = q.rename(index=tokg,level='units')
-
-p = p.replace(0,np.nan)
-p.to_parquet('../var/food_prices.parquet')
-
-q = q.replace(0,np.nan)
-q.to_parquet('../var/food_quantities.parquet')
- """
+pd.DataFrame({'consumed value':x}).to_parquet('../var/food_expenditures.parquet')

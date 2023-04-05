@@ -17,6 +17,7 @@ def age_sex_composition(df, sex, sex_converter, age, age_converter, hhid):
     testdf.index.name = 'j'
     return testdf
 
+
 def harmonized_food_labels(fn='../../_/food_items.csv',key='Code',value='Preferred Label'):
     # Harmonized food labels
     food_items = pd.read_csv(fn,delimiter='|',skipinitialspace=True,converters={1:lambda s: s.strip(),2:lambda s: s.strip()})

@@ -6,49 +6,51 @@ import pandas as pd
 import numpy as np
 import dvc.api
 from lsms import from_dta
-from lsms.tools import get_household_roster
+import sys
+sys.path.append('../../_/')
+from tanzania import age_sex_composition, get_household_roster
 
+round_match = {1:'2008-09', 2:'2010-11', 3:'2012-13', 4:'2014-15'}
 
-with dvc.api.open('../Data/upd4_hh_b.dta',mode='rb') as dta:
-    df = from_dta(dta)
+roster = from_dta('../Data/upd4_hh_b.dta')
 
-year1 = df.loc[df['round'] == 1]
-year2 = df.loc[df['round'] == 2]
-year3 = df.loc[df['round'] == 3]
-year4 = df.loc[df['round'] == 4]
+# Problem is that we don't have the household id we need in the roster!
+b = dict(HHID = 'r_hhid',
+         ID='UPI',
+         sex = 'hb_02',
+         age = 'hb_04',
+         wave = 'round')
 
-round_match = {'2008-09':year1, '2010-11':year2, '2012-13':year3, '2014-15':year4}
+roster = roster[b.values()]
 
+# Grab other file that has id we need
+#with dvc.api.open('../Data/upd4_hh_a.dta',mode='rb') as dta:
+cover =  from_dta('../Data/upd4_hh_a.dta')
 
-def process_each_year(df):
-    # Match Uganda FCT categories
-    Age_ints = ((0,4),(4,9),(9,14),(14,19),(19,31),(31,51),(51,100))
-    
-    df = get_household_roster(df, sex='hb_02', sex_converter=None,
-                            age='hb_04',age_converter=None,
-                            HHID='r_hhid',
-                            convert_categoricals=True,Age_ints=Age_ints,fn_type=None)
-    df.index.name = 'j'
-    df.columns.name = 'k'
-    df = df.filter(regex='ales ')    
-    df['log HSize'] = np.log(df.sum(axis=1))
+cover = cover[['r_hhid','UPHI','round']]
 
-    # Drop any obs with infinities...
-    df = df.loc[np.isfinite(df.min(axis=1)),:]
-    return df
+df = pd.merge(roster,cover,on=['r_hhid','round'])
 
-year_df = {k: v.pipe(process_each_year) for k, v in round_match.items()}
+b['HHID'] = 'UPHI'
+del b['ID']
 
-z={}
-for t in ['2008-09','2010-11','2012-13','2014-15']:
-    z[t] = year_df[t]
-    z[t] = z[t].stack('k')
-    z[t] = z[t].reset_index().set_index(['j','k']).squeeze()
+Age_ints = ((0,4),(4,9),(9,14),(14,19),(19,31),(31,51),(51,100))
 
-z = pd.DataFrame(z)
-z = z.stack().unstack('k')
-z.index.names=['j','t']
-z = z.reset_index().set_index(['j','t'])
+hc = get_household_roster(df,fn_type=None,Age_ints=Age_ints,**b)
 
+hc.index = hc.index.rename({'HHID':'j','region':'m','wave':'t'})
 
-z.to_parquet('household_characteristics.parquet')
+hc = hc.rename(index=round_match,level='t')
+
+hc = hc.reset_index().set_index(['j','t'])
+
+hc = hc.filter(regex='ales ')
+
+hc['log HSize'] = np.log(hc.sum(axis=1))
+
+# Drop any obs with infinities...
+hc = hc.loc[np.isfinite(hc.min(axis=1)),:]
+
+assert hc.index.is_unique, "Non-unique index!  Fix me!"
+
+hc.to_parquet('household_characteristics.parquet')
