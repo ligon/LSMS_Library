@@ -10,6 +10,8 @@ sys.path.append('../../_')
 sys.path.append('../../../_')
 from local_tools import add_markets_from_other_features
 
+country = 'Tanzania'
+
 Waves = {'2008-15':('upd4_hh_a.dta','UPHI','r_hhid','round'),
          '2019-20':('HH_SEC_A.dta','y4_hhid','sdd_hhid'),
          '2020-21':('hh_sec_a.dta','y4_hhid','y5_hhid')}
@@ -74,16 +76,19 @@ def food_quantities(fn='',item='item',HHID='HHID',
         
     return quantities
 
-def age_sex_composition(fn,sex='sex',sex_converter=None,age='age',months_spent='months_spent',HHID='HHID',months_converter=None, convert_categoricals=True,Age_ints=None,fn_type='stata'):
+def age_sex_composition(fn,sex='sex',sex_converter=None,age='age',
+                        months_spent='months_spent',HHID='HHID',months_converter=None,
+                        wave=None,convert_categoricals=True,Age_ints=None,fn_type='stata'):
 
     if Age_ints is None:
         # Match Uganda FCT categories
         Age_ints = ((0,4),(4,9),(9,14),(14,19),(19,31),(31,51),(51,100))
-        
+
     with dvc.api.open(fn,mode='rb') as dta:
         df = get_household_roster(fn=dta,HHID=HHID,sex=sex,age=age,months_spent=months_spent,
                                   sex_converter=sex_converter,months_converter=months_converter,
-                                  Age_ints=Age_ints)
+                                  Age_ints=Age_ints,
+                                  wave=wave)
 
     df.index.name = 'j'
     df.columns.name = 'k'
@@ -101,8 +106,8 @@ def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Label',value='Prefer
 def food_acquired(fn,myvars):
     with dvc.api.open(fn,mode='rb') as dta:
         df = from_dta(dta)
-    df = df.loc[:,[v for v in myvars.values()]].rename(columns={v:k for k,v in myvars.items()})
-    
+    df = df.loc[:,list(myvars.values())].rename(columns={v:k for k,v in myvars.items()})
+
     if 'year' in myvars:
         #map round code to actual years
         dict = {1:'2008-09', 2:'2010-11', 3:'2012-13', 4:'2014-15'}
@@ -112,7 +117,7 @@ def food_acquired(fn,myvars):
     else:
         df = df.set_index(['HHID','item']).dropna(how='all')
         df.index.names = ['j','i']
-        
+
     # Fix type of hhids if need be
     if df.index.get_level_values('j').dtype ==float:
         fix = {k: v for k, v in zip(df.index.levels[0],df.index.levels[0].astype(int).astype(str))}
@@ -145,8 +150,14 @@ def other_features(fn,urban=None,region=None,HHID='HHID',urban_converter=None,wa
                                                       region=region,
                                                       urban_converter=urban_converter,
                                                       wave=wave)
+    # Fix any floats in j
     df.index.name = 'j'
+    k = df.index.get_level_values('j')
+    f2s = {i:str(i).split('.')[0] for i in k}
+
     df.columns.name = 'k'
+
+    df = df.rename(index=f2s,level='j')
 
     return df
 

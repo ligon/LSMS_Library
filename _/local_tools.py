@@ -278,8 +278,11 @@ def add_markets_from_other_features(country,df):
     except KeyError:
         pass
 
+    colname = df.columns.names
+
     df = df.join(of.reset_index('m')['m'],on=['j','t'])
     df = df.reset_index().set_index(df_idx)
+    df.columns.names = colname
 
     return df
 

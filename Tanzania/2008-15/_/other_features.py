@@ -21,6 +21,8 @@ myvars = dict(fn='../Data/upd4_hh_a.dta',
 
 df = other_features(**myvars)
 
+
+
 df['Rural'] = 1 - df.urban.astype(int)
 
 df = df.rename(columns={'region':'m','wave':'t'})
