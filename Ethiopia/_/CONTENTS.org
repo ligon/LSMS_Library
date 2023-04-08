@@ -163,8 +163,9 @@ for fn in unitfiles:
         D.update(foo)
 
 D = {k.title():v for k,v in D.items()}
+D.update({s.split('. ')[1]:v for s,v in foo.items()})
+D = {k.title(): v for k, v in D.items()}
 with open('conversion_to_kgs.json','w') as f:
-    #json.dump({s.split('. ')[1]:v for s,v in foo.items()},f)
     json.dump(D,f)
 
 #+end_src
