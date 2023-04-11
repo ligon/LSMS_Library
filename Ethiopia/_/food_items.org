@@ -1,4 +1,4 @@
-| Preferred Label          | 2011-12       | 2013-14       | 2015-16                  | 2018-19                                            | FTC Code | FDC Code |
+| Preferred Label          | 2011-12       | 2013-14       | 2015-16                  | 2018-19                                            | FTC Code | FDC ID |
 | Teff                     | Teff          | Teff          | Teff                     | 101. Teff                                          |          | 169747   |
 | Avocado                  | ---           | ---           | ---                      | 505. Avocado                                       |          | 171705   |
 | Milk                     | Milk          | Milk          | Milk                     | 705. Milk                                          |      901 |          |
@@ -63,7 +63,7 @@
 | Moringa/Shiferaw/Halloka | ---           | ---           | ---                      | 407. Moringa/Shiferaw/Halloka                      |          | 168416   |
 | Garlic                   | ---           | ---           | ---                      | 406. Garlic                                        |          | 169230   |
 | Tomato                   | ---           | ---           | Tomato                   | 405. Tomato                                        |      601 |          |
-| Berbere                  | ---           | ---           | Red pepper (berbere)     | 403. Red pepper (Processed pepper (Berbere))       |          | 2816599  |
+| Berbere                  | ---           | ---           | Red pepper (berbere)     | 403. Red pepper (Processed pepper (Berbere))       |          | 2258590  |
 | Niger Seed               | Niger Seed    | Niger Seed    | Niger Seed               | 301. Niger Seed                                    |      504 |          |
 | Kariya                   | ---           | ---           | Green chili pepper (kari | 402. Green chili pepper (kariya)                   |      601 |          |
 | Onion                    | Onion         | Onion         | Onion                    | 401. Onion                                         |      601 |          |
@@ -78,5 +78,3 @@
 | Tea                      | ---           | ---           | Tea                      | ---                                                |     1101 |          |
 | Leafy Greens             | ---           | ---           | Greens (kale, cabbage, e | ---                                                |      602 |          |
 | Leafy Greens             | ---           | ---           | Greens (kale        cabb | ---                                                |      602 |          |
-|                          |               |               |                          |                                                    |          |          |
-|                          |               |               |                          |                                                    |          |          |

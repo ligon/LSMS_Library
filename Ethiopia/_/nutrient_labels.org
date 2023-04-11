@@ -1,0 +1,22 @@
+| Preferred Label   | FCT Label   | FDC Label                      |
+| Energy           | energy kcal | Energy                         |
+| Protein          | protein g   | Protein                        |
+| Fiber            |             | Fiber, total dietary           |
+| Folate           |             | Folate, total                  |
+| Calcium          | ca mg       | Calcium, Ca                    |
+| Carbohydrate     |             | Carbohydrate, by difference    |
+| Iron             | fe mg       | Iron, Fe                       |
+| Magnesium        | mg mg       | Magnesium, Mg                  |
+| Niacin           |             | Niacin                         |
+| Phosphorus       |             | Phosphorus, P                  |
+| Potassium        |             | Potassium, K                   |
+| Riboflavin       |             | Riboflavin                     |
+| Thiamin          |             | Thiamin                        |
+| Vitamin A        | vit a ug    | Vitamin A, RAE                 |
+| Vitamin B-12     | vit b12 ug  | Vitamin B-12                   |
+| Vitamin B-6      | vit b6 mg   | Vitamin B-6                    |
+| Vitamin C        | vit c mg    | Vitamin C, total ascorbic acid |
+| Vitamin D        | vit d ug    | Vitamin D (D2 + D3)            |
+| Vitamin E        | vit e ug    | Vitamin E (alpha-tocopherol)   |
+| Vitamin K        |             | Vitamin K (phylloquinone)      |
+| Zinc             | zn mg       | Zinc, Zn                       |
