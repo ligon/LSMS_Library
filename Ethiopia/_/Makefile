@@ -4,13 +4,13 @@ rounds := $(shell ls -d ../2*-*)
 source = $(shell find $(rounds) -name \*.py)
 parquet := $(source:.py=.parquet)
 
-var = ../var/food_expenditures.parquet ../var/food_quantities.parquet ../var/unitvalues.parquet \
+var = ../var/food_expenditures.parquet ../var/food_quantities.parquet ../var/food_prices.parquet \
 	  ../var/household_characteristics.parquet ../var/other_features.parquet \
-
+      ../var/shocks.parquet
 
 all: $(parquet) $(var)
 
-../var/food_quantities.parquet ../var/food_expenditures.parquet ../var/food_prices.parquet &: ../var/food_acquired.parquet food_acquired.py
+../var/food_quantities.parquet ../var/food_expenditures.parquet ../var/food_prices.parquet &: ../var/food_acquired.parquet food_prices_quantities_and_expenditures.py
 	python food_prices_quantities_and_expenditures.py
 
 food_acquired = $(shell find $(rounds) -name food_acquired.py)
@@ -40,9 +40,15 @@ other_features_parquet := $(other_features:.py=.parquet)
 ../var/other_features.parquet: other_features.py $(other_features_parquet)
 	python other_features.py
 
+shocks = $(shell find $(rounds) -name shocks.py)
+shocks_parquet := $(shocks:.py=.parquet)
 
-%.parquet: %.py food_items.org uganda.py
-	(cd $(@D) && python ./$(<F))
+../%/_/shocks.parquet:
+	(cd $(@D) && python shocks.py)
+
+../var/shocks.parquet: shocks.py $(shocks_parquet)
+	python shocks.py
+
 
 clean:
 	-rm $(parquet)
