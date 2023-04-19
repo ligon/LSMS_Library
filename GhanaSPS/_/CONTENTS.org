@@ -35,7 +35,10 @@ print(pd.read_parquet('../var/food_expenditures.parquet').describe())
 #+end_src
 
 ** TODO Food Conversion Table
-See https://mail.google.com/mail/u/0/#search/to%3Amgao7%40berkeley.edu/QgrcJHsbflnMHgKJnmxhgnLwXwkPPmMcLnv
+West Africa Food Conversion Table (Inputs into Ghana Food Expenditue Data): https://mail.google.com/mail/u/0/#search/to%3Amgao7%40berkeley.edu/QgrcJHsbflnMHgKJnmxhgnLwXwkPPmMcLnv
+Ghana Food Expenditure Data with Aggregate Labels and FTC Codes:
+https://docs.google.com/spreadsheets/d/1qZhbq5gpAmCsYH1ixUn0Ix_Cb5YKSIpU-Pc2_hh2lhU/edit?usp=sharing
+
 * Files in GhanaSPS/<SOMEYEAR>/_/
 ** TODO household_characteristics.py
 ** TODO food_acquired.py
