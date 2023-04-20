@@ -11,8 +11,8 @@ import json
 # Data to link household ids across waves
 Waves = {'2011-12':(),
          '2013-14':('sect_cover_hh_w2.dta','household_id2','household_id'),
-         '2015-16':(), #'sect_cover_hh_w3.dta','household_id2','household_id2'),
-         '2018-19':(),   #'sect_cover_hh_w4.dta','household_id','household_id2'),  # But entirely new sample drawn in 2018-19!
+         '2015-16':('sect_cover_hh_w3.dta','household_id2','household_id'),
+         '2018-19':() #'sect_cover_hh_w4.dta','household_id','household_id2'),  # But entirely new sample drawn in 2018-19!
          }
 
 
@@ -194,7 +194,6 @@ def other_features(fn,urban=None,region=None,HHID='HHID',urban_converter=None):
 
     with dvc.api.open(fn,mode='rb') as dta:
         df = get_household_identification_particulars(fn=dta,HHID=HHID,urban=urban,region=region,urban_converter=urban_converter)
-
     df.index.name = 'j'
     df.columns.name = 'k'
 
