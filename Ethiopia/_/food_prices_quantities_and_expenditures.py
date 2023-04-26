@@ -34,17 +34,17 @@ kgs.name = 'Kgs/unit'
 # Convert other units to kilograms, where possible
 p = v[prices].droplevel('units')
 p = p.reset_index().set_index(['j','t','m','i','units_purchased'])
-p.index.names = ['j','t','m','i','units']
+p.index.names = ['j','t','m','i','u']
 
-kgs_unitvalue = kgs.reindex(p.index,level='units')
+kgs_unitvalue = kgs.reindex(p.index,level='u')
 kgs_unitvalue = kgs_unitvalue[kgs_unitvalue!=0]
 p = p.divide(kgs_unitvalue,axis=0)
-p = p.rename(index=tokg,level='units')
+p = p.rename(index=tokg,level='u')
 
 q = v['quantity'].droplevel('units_purchased')
 
 q = q.multiply(kgs_unitvalue,axis=0)
-q = q.rename(index=tokg,level='units')
+q = q.rename(index=tokg,level='u')
 
 p = p.replace(0,np.nan)
 p = p.dropna()
