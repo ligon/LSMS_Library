@@ -72,6 +72,9 @@ housing_parquet := $(housing:.py=.parquet)
 ../var/housing.parquet: housing.py $(housing_parquet)
 	python housing.py
 
+../var/income.parquet: income.py ../var/enterprise_income.parquet ../var/earnings.parquet
+	python income.py
+
 %.parquet: %.py food_items.org uganda.py
 	(cd $(@D) && python ./$(<F))
 
