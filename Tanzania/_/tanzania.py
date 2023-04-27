@@ -103,9 +103,13 @@ def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Label',value='Prefer
     return unitlabels.squeeze().str.strip().to_dict()
 
     
-def food_acquired(fn,myvars):
-    with dvc.api.open(fn,mode='rb') as dta:
-        df = from_dta(dta)
+def food_acquired(fn,myvars, fix_categorical = False):
+    if fix_categorical == False:
+        with dvc.api.open(fn,mode='rb') as dta:
+            df = from_dta(dta)
+    else:
+        sr=pd.io.stata.StataReader(fn)
+        df = sr.read(convert_categoricals=True)
     df = df.loc[:,list(myvars.values())].rename(columns={v:k for k,v in myvars.items()})
 
     if 'year' in myvars:
@@ -128,6 +132,12 @@ def food_acquired(fn,myvars):
     unitlabels = {0: float("nan"), 'KILOGRAMS':'Kg', 'GRAMS':'Gram', 'LITRE':'Litre', 'MILLILITRE':'Millilitre', 'PIECES':'Piece'}
     unitcolumn = {'unit_ttl_consume': unitlabels, 'unit_purchase': unitlabels, 'unit_own': unitlabels, 'unit_inkind': unitlabels}
     df.replace(unitcolumn,inplace=True)
+
+    #fix quantities that are read as categorical vars
+    df.replace(['none', 'NONE', 'hakuna'], 0, inplace = True)
+    df = df.astype({"quant_purchase": 'float64',
+                    "quant_own" : 'float64',
+                    "quant_inkind" : 'float64'})
 
     df['unitvalue_purchase'] = df['value_purchase']/df['quant_purchase']
 
@@ -205,6 +215,9 @@ def id_match(df, wave, waves_dict):
 def new_harmonize_units(df, unit_conversion):
     pair = {'quant': ['quant_ttl_consume', 'quant_purchase', 'quant_own', 'quant_inkind'] ,
         'unit': ['unit_ttl_consume', 'unit_purchase', 'unit_own', 'unit_inkind']}
+    
+    #convert categorical columns to object columns for fillna to work
+    df[pair['unit']] = df[pair['unit']].astype('object') 
 
     df = df.fillna(0).replace(unit_conversion).replace(['none', 'NONE', 'hakuna'], 0)
     pattern = r"[p+]"
@@ -222,3 +235,26 @@ def new_harmonize_units(df, unit_conversion):
     df['unitvalue_purchase'] = df['value_purchase']/df['quant_purchase']
     df.replace([np.inf, -np.inf, 0], np.nan, inplace=True)
     return df
+
+
+
+def from_dta_new(fn,convert_categoricals=True):
+    sr=pd.io.stata.StataReader(fn)
+
+    df = sr.read(convert_categoricals=True)
+
+    values = sr.value_labels()
+
+    var_to_label = dict(zip(sr.varlist,sr.lbllist))    
+
+    """ if convert_categoricals:
+        for var in sr.varlist: # Check mapping for each variable with values
+            if len(var_to_label[var]):
+                try:
+                    code2label = values[var_to_label[var]]
+                    df[var] = df[var].map(code2label)
+                except KeyError:
+                    print('Issue with categorical mapping: %s' % var) """
+
+    return df
+

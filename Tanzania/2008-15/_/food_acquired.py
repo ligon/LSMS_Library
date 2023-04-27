@@ -21,7 +21,7 @@ myvars = dict(item='hj_00',
               unit_inkind = 'hj_07_1'
               )
 
-df = food_acquired(fn,myvars)
+df = food_acquired(fn,myvars, fix_categorical = False)
 
 df = df.reset_index().set_index(['j','t','i'])
 
