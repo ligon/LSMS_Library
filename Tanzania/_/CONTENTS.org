@@ -29,6 +29,59 @@ However, an alternative exists: there's "Community-level" data on prices collect
 ** TODO Link  2019-20 and 2020-21 to panel
 According to docs this is possible; e.g., see p. 12 of [[../2019-20/Documentation/tznps_sdd_2019_20_basic_information_document_updated_november_2022.pdf][Basic Information Document]].
 
+
+** TODO Fix r_hhid & UPHI matching problem for 2008-15
+- Observed issue: Non unique index in food_acquired
+  Unique pairs of ('round', 'r_hhid') as indices are found to be mapped to multiple UPHIs.
+  Example:
+|                |       |   UPHI |
+|         r_hhid | round |        |
+| 19030070580080 |   1.0 | 4866.0 |
+|                |   1.0 | 4865.0 |
+|                |   1.0 | 4872.0 |
+|                |   1.0 | 4864.0 |
+|                |   1.0 | 4873.0 |
+|                |   1.0 | 4874.0 |
+|                |   1.0 | 4871.0 |
+|                |   1.0 | 4870.0 |
+|                |   1.0 | 4869.0 |
+|                |   1.0 | 4868.0 |
+|                |   1.0 | 4867.0 |
+
+   If excluding UPHIs, after performing drop_duplicates(), the indices become unique (technically meaning that the data across rows, except for the UPHI, is the same for the same round & r_hhid pair), and valid row number halves (from 408707 to 228281). When grouping the r_hhid in resulted df by round, the number of households recorded each year roughly lines up with the number recorded in the corresponding year's report.
+| round | r_hhid count |
+|   1.0 |        44771 |
+|   2.0 |        54465 |
+|   3.0 |        67439 |
+|   4.0 |        61606 |
+
+- steps of proposed solution (similar to id_walk in other countries's dataset):
+  1. map each r_hhid & round pair to a list of its corresponding UPHIs in a dictionary.
+  2. for round 1, append 001 to the original 14-digit r_hhid to indicate primary household with the lowest individual id
+
+     id = r_hhid-001
+
+  3. for round 2, match to previous round's r_hhid by checking if current r_hhid's UPHI is in any list of UPHI of a previous r_hhid, and append the last 2 digit of the current 16-digit r_hhid to previous round's r_hhid, indicating primary or split-off households
+
+     id = previous_hhid-0[r_hhid[-2:]]
+
+  4. for round 3 and 4, match to earliest previous round's r_hhid by  checking if current r_hhid's UPHI is in any list of UPHI of a previous r_hhid, and append the last 3 digit of the current 7-digit r_hhid to, indicating primary or split-off households
+     - note:  last three digits of the split-off HHID in R3 are in the 100’s to indicate uncollected data in R2
+
+
+     id = previous_hhid-0[r_hhid[-3:]]
+
+     example:
+     | UPHI | round |           r_hhid |                 id |
+     |  273 |     1 |   02040010010327 | 02040010010327-001 |
+     |  273 |     2 | 0204001001032701 | 02040010010327-001 |
+     |  273 |     3 |         0187-001 | 02040010010327-001 |
+     |  273 |     4 |         0041-004 | 02040010010327-004 |
+
+
+
+
+
 * Files in Tanzania/_/
 ** DONE tanzania.py
 Contains code common to different Tanzania rounds
