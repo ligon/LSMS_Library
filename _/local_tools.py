@@ -344,3 +344,24 @@ def df_from_orgfile(orgfn,name=None,set_columns=True,to_numeric=True):
         df = df.apply(lambda x: pd.to_numeric(x,errors='ignore'))
 
     return df
+
+def to_parquet(df,fn):
+    """
+    Write df to parquet file fn.
+
+    Parquet (pyarrow) is slightly more picky about data types and layout than is pandas;
+    here we fix some possible problems before calling pd.DataFrame.to_parquet.
+    """
+    if len(df.shape)==0: # A series?  Need a dataframe.
+        df = pd.DataFrame(df)
+
+    # Can't mix types of category labels.
+    for col in df:
+        if df[col].dtype == 'category':
+            cats = df[col].cat.categories
+            if str in [type(x) for x in cats]: # At least some categories are strings...
+                df[col] = df[col].cat.rename_categories(lambda x: str(x))
+
+    df.to_parquet(fn)
+
+    return df
