@@ -106,6 +106,7 @@ def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Label',value='Prefer
 def food_acquired(fn,myvars):
     with dvc.api.open(fn,mode='rb') as dta:
         df = from_dta(dta)
+    
     df = df.loc[:,list(myvars.values())].rename(columns={v:k for k,v in myvars.items()})
 
     if 'year' in myvars:
@@ -114,6 +115,7 @@ def food_acquired(fn,myvars):
         df.replace({"year": dict},inplace=True)
         df = df.set_index(['HHID','item','year']).dropna(how='all')
         df.index.names = ['j','i','t']
+        assert df.index.is_unique, "Non-unique index!  Fix me!"
     else:
         df = df.set_index(['HHID','item']).dropna(how='all')
         df.index.names = ['j','i']
@@ -128,6 +130,12 @@ def food_acquired(fn,myvars):
     unitlabels = {0: float("nan"), 'KILOGRAMS':'Kg', 'GRAMS':'Gram', 'LITRE':'Litre', 'MILLILITRE':'Millilitre', 'PIECES':'Piece'}
     unitcolumn = {'unit_ttl_consume': unitlabels, 'unit_purchase': unitlabels, 'unit_own': unitlabels, 'unit_inkind': unitlabels}
     df.replace(unitcolumn,inplace=True)
+
+    #fix quantities that are read as categorical vars
+    df.replace(['none', 'NONE', 'hakuna'], 0, inplace = True)
+    df = df.astype({"quant_purchase": 'float64',
+                    "quant_own" : 'float64',
+                    "quant_inkind" : 'float64'})
 
     df['unitvalue_purchase'] = df['value_purchase']/df['quant_purchase']
 
@@ -184,7 +192,7 @@ def id_match(df, wave, waves_dict):
             m.j = m.UPHI
             m = m.drop(columns=['UPHI', 'y4_hhid'])
             if 't' not in m.columns:
-                m.insert(1, 't', wave)
+                m.insert(1, 't', wave) 
 
     if len(waves_dict[wave]) == 4:
         if 'UPHI'  in df.columns: 
@@ -205,6 +213,9 @@ def id_match(df, wave, waves_dict):
 def new_harmonize_units(df, unit_conversion):
     pair = {'quant': ['quant_ttl_consume', 'quant_purchase', 'quant_own', 'quant_inkind'] ,
         'unit': ['unit_ttl_consume', 'unit_purchase', 'unit_own', 'unit_inkind']}
+    
+    #convert categorical columns to object columns for fillna to work
+    df[pair['unit']] = df[pair['unit']].astype('object') 
 
     df = df.fillna(0).replace(unit_conversion).replace(['none', 'NONE', 'hakuna'], 0)
     pattern = r"[p+]"

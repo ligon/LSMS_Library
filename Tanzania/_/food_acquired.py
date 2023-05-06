@@ -17,6 +17,8 @@ for t in Waves.keys():
     x[t] = pd.read_parquet('../'+t+'/_/food_acquired.parquet')
     #x[t] = id_match(y[t],t,Waves)
 
+x['2008-15'] = x['2008-15'].reset_index().rename(columns = {'UPHI':'j'}).set_index(['j','t','i'])
+
 foo = x.copy()
 x = pd.concat(x)
 

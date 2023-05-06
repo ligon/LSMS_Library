@@ -21,7 +21,7 @@ myvars = dict(item='itemcode',
               unit_inkind = 'hh_j06_1'
               )
 
-d = food_acquired(fn,myvars)
+d = food_acquired(fn, myvars)
 d['t'] = '2020-21'
 df = d.reset_index().set_index(['j','t','i'])
 
