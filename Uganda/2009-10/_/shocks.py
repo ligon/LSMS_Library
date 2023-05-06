@@ -3,7 +3,8 @@
 from calendar import month
 from stat import SF_APPEND
 import sys
-sys.path.append('../../_/')
+sys.path.append('../../../_/')
+from local_tools import to_parquet
 import pandas as pd
 import dvc.api
 from datetime import datetime
@@ -90,4 +91,4 @@ shocks = shocks.astype({'Shock': 'category',
 shocks.insert(1, 't', '2009-10')
 shocks.set_index(['j','t','Shock'], inplace = True)
 
-shocks.to_parquet('shocks.parquet')
+to_parquet(shocks,'shocks.parquet')

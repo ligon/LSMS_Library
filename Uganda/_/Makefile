@@ -9,7 +9,7 @@ var = ../var/food_expenditures.parquet ../var/food_quantities.parquet ../var/foo
 	  ../var/assets.parquet ../var/earnings.parquet ../var/housing.parquet
 
 
-all: $(parquet) $(var)
+all: unitlabels.csv $(parquet) $(var)
 
 unitlabels.csv: unitlabels.py
 	python unitlabels.py
