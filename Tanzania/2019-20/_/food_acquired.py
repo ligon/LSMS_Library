@@ -22,7 +22,7 @@ myvars = dict(item='itemcode',
               unit_inkind = 'hh_j06_1'
               )
 
-d = food_acquired(fn,myvars, fix_categorical = True)
+d = food_acquired(fn,myvars)
 d['t'] = round
 df = d.reset_index().set_index(['j','t','i'])
 

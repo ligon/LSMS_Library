@@ -103,13 +103,10 @@ def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Label',value='Prefer
     return unitlabels.squeeze().str.strip().to_dict()
 
     
-def food_acquired(fn,myvars, fix_categorical = False):
-    if fix_categorical == False:
-        with dvc.api.open(fn,mode='rb') as dta:
-            df = from_dta(dta)
-    else:
-        sr=pd.io.stata.StataReader(fn)
-        df = sr.read(convert_categoricals=True)
+def food_acquired(fn,myvars):
+    with dvc.api.open(fn,mode='rb') as dta:
+        df = from_dta(dta)
+    
     df = df.loc[:,list(myvars.values())].rename(columns={v:k for k,v in myvars.items()})
 
     if 'year' in myvars:
@@ -118,6 +115,7 @@ def food_acquired(fn,myvars, fix_categorical = False):
         df.replace({"year": dict},inplace=True)
         df = df.set_index(['HHID','item','year']).dropna(how='all')
         df.index.names = ['j','i','t']
+        assert df.index.is_unique, "Non-unique index!  Fix me!"
     else:
         df = df.set_index(['HHID','item']).dropna(how='all')
         df.index.names = ['j','i']
@@ -194,7 +192,7 @@ def id_match(df, wave, waves_dict):
             m.j = m.UPHI
             m = m.drop(columns=['UPHI', 'y4_hhid'])
             if 't' not in m.columns:
-                m.insert(1, 't', wave)
+                m.insert(1, 't', wave) 
 
     if len(waves_dict[wave]) == 4:
         if 'UPHI'  in df.columns: 
@@ -235,26 +233,3 @@ def new_harmonize_units(df, unit_conversion):
     df['unitvalue_purchase'] = df['value_purchase']/df['quant_purchase']
     df.replace([np.inf, -np.inf, 0], np.nan, inplace=True)
     return df
-
-
-
-def from_dta_new(fn,convert_categoricals=True):
-    sr=pd.io.stata.StataReader(fn)
-
-    df = sr.read(convert_categoricals=True)
-
-    values = sr.value_labels()
-
-    var_to_label = dict(zip(sr.varlist,sr.lbllist))    
-
-    """ if convert_categoricals:
-        for var in sr.varlist: # Check mapping for each variable with values
-            if len(var_to_label[var]):
-                try:
-                    code2label = values[var_to_label[var]]
-                    df[var] = df[var].map(code2label)
-                except KeyError:
-                    print('Issue with categorical mapping: %s' % var) """
-
-    return df
-

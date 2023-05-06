@@ -7,7 +7,7 @@ import numpy as np
 fn='../Data/upd4_hh_j1.dta'
 
 myvars = dict(item='hj_00',
-              HHID='UPHI',
+              HHID='r_hhid',
               year ='round',
               quant_ttl_consume='hj_02_2',
               unit_ttl_consume = 'hj_02_1',
@@ -21,7 +21,7 @@ myvars = dict(item='hj_00',
               unit_inkind = 'hj_07_1'
               )
 
-df = food_acquired(fn,myvars, fix_categorical = False)
+df = food_acquired(fn,myvars)
 
 df = df.reset_index().set_index(['j','t','i'])
 
