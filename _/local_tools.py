@@ -365,3 +365,51 @@ def to_parquet(df,fn):
     df.to_parquet(fn)
 
     return df
+
+from collections import UserDict
+
+class RecursiveDict(UserDict):
+    def __init__(self,*arg,**kw):
+      super(RecursiveDict, self).__init__(*arg, **kw)
+
+    def __getitem__(self,k):
+        try:
+            while True:
+                k = UserDict.__getitem__(self,k)
+        except KeyError:
+            return k
+
+def format_id(id):
+    """Nice string format for any id, string or numeric.
+    """
+    if pd.isnull(id) or id=='': return None
+
+    try:  # If numeric, return as string int
+        return '%d' % id
+    except TypeError:  # Not numeric
+        return id.split('.')[0].strip()
+    except ValueError:
+        return None
+
+def panel_ids(Waves):
+    """Return RecursiveDict of household identifiers.
+    """
+    D = RecursiveDict()
+    for t,v in Waves.items():
+        if len(v):
+            fn = f"../{t}/Data/{v[0]}"
+            try:
+                df = from_dta(fn)[[v[1],v[2]]]
+            except FileNotFoundError:
+                with dvc.api.open(fn,mode='rb') as dta: df = from_dta(dta)[[v[1],v[2]]]
+
+            # Clean-up ids
+            df[v[1]] = df[v[1]].apply(format_id)
+            df[v[2]] = df[v[2]].apply(format_id)
+
+            if len(v)==4: # Remap id1
+                df[v[2]] = df[v[2]].apply(v[3])
+
+            D.update(df[[v[1],v[2]]].dropna().values.tolist())
+
+    return D
