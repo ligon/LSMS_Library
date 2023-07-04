@@ -24,8 +24,9 @@ def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Code',value='Preferr
     unitlabels = unitlabels[[key,value]].dropna()
     unitlabels.set_index(key,inplace=True)
 
-    return unitlabels.squeeze().str.strip().to_dict()
+    unitlabels = unitlabels.squeeze().str.strip().to_dict()
 
+    return unitlabels
 
 def harmonized_food_labels(fn='../../_/food_items.org',key='Code',value='Preferred Label'):
     # Harmonized food labels
@@ -68,6 +69,9 @@ def food_acquired(fn,myvars):
         df = from_dta(dta,convert_categoricals=False)
 
     df = df.loc[:,[v for v in myvars.values()]].rename(columns={v:k for k,v in myvars.items()})
+
+    # Replace missing unit values
+    df['units'] = df['units'].fillna('---')
 
     df = df.set_index(['HHID','item','units']).dropna(how='all')
 

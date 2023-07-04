@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Calculate food prices for different items across rounds; allow
 different prices for different units.  
 """
