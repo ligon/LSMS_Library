@@ -24,7 +24,7 @@ final = final.rename(columns = {'prov' : 'm'})
 final['t'] = '2008'
 region_dict = {'bocas del toro' : 'Bocas Del Toro', 'colón': 'Colón', 'coclé': 'Coclé',
                'chiriquí': 'Chíriqui', 'darién': 'Darién', 'panamá': 'Panamá', 'veraguas': 'Veraguas',
-               'herrera': 'Herrera', 'los santos': 'Los Santos', 'comarca kuna yala': 'Comarca de San Blas', 'comarca emberá': 'Comarca Emberá', 'comarca ngöbe bugle': 'Comarca Ngobe Bugle'}
+               'herrera': 'Herrera', 'los santos': 'Los Santos', 'comarca kuna yala': 'Guna Yala', 'comarca emberá': 'Comarca Emberá', 'comarca ngöbe bugle': 'Comarca Ngobe Bugle'}
 final = final.replace({'m' : region_dict})
 
 final = final.set_index(['t', 'm'], append = True)

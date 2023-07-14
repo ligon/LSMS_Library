@@ -7,14 +7,13 @@ import pandas as pd
 
 x = []
 for t in ['1997', '2003', '2008']:
-    df = pd.read_parquet('../'+t+'/_/household_characteristics.parquet')
+    df = pd.read_parquet('../'+t+'/_/other_features.parquet')
     df = df.reset_index()
+    df['t'] = t
     df['j'] = t + df['j']
-    df = df.set_index('j', 't', 'm')
-    df.columns.name = 'k'
+    df = df.set_index(['j', 't'])
     x.append(df)
-
 
 concatenated = pd.concat(x)
 
-concatenated.to_parquet('household_characteristics.parquet')
+concatenated.to_parquet('../var/other_features.parquet')
