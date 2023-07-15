@@ -273,5 +273,6 @@ D = pd.concat(L)
 #+end_src
 
 * Files in Panama/<SOMEYEAR>/_/
-** TODO household_characteristics.py
-** TODO food_acquired.py
+** DONE household_characteristics.py
+** DONE food_acquired.py
+* DONE nutritiion.py

@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import sys
+sys.path.append('../../_/')
 import pandas as pd
 import pyreadstat
 import numpy as np
