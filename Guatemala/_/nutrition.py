@@ -31,9 +31,10 @@ for i in x:
     final_fct.loc[counter] = fct.loc[fct['Code'] == i].values[0]
     counter += 1
 
-final_fct = final_fct.replace(r'^\s*$', np.nan, regex=True)
+final_fct.columns = final_fct.columns.str.replace('\\n%*', '', regex=True)
 final_fct['Food'] = list(final_q.columns)
 final_fct = final_fct.drop(['Nutrient', 'Code'], axis = 1).fillna(0).set_index('Food')
+final_fct = final_fct.replace('', np.nan)
 
 for column in final_fct.columns:
     final_fct[column] = final_fct[column].astype(float)
