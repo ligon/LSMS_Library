@@ -36,7 +36,7 @@ df['quantity bought'] = df['quantity bought'].mask(df['quantity bought'] >= 9999
 df['quantity obtained'] = df['quantity obtained'].mask(df['quantity obtained'] >= 99999)
 df.loc[df['unitcode (bought)'] == 'FRAMO', 'unitcode (bought)'] = 'GRAMO'
 
-unit_dict = {'GALON': 'gallon', 'GRAMO': 'grams', 'KILOGRAMO': 'kilograms', 'LIBRA': 'pounds', 'LITRO': 'liters', 'ONZA': 'ounces', 'MILILITRO' :'milliliters'}
+unit_dict = {'GALON': 'gallon', 'GRAMO': 'grams', 'KILOGRAMO': 'kilograms', 'LIBRA': 'pounds', 'LITRO': 'liters', 'ONZA': 'ounces', 'MILILITRO': 'milliliters'}
 
 df['unitcode (bought)'] = df['unitcode (bought)'].map(unit_dict).astype(str)
 df['unitcode (obtained)'] = df['unitcode (obtained)'].map(unit_dict).astype(str)

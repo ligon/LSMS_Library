@@ -14,10 +14,6 @@ regional_info, meta_r = pyreadstat.read_dta('/tmp/E03BASE.DTA', apply_value_form
 regions = regional_info.groupby('form').agg({'prov' : 'first'})
 regions.index = regions.index.map(str)
 
-region_dict = {'Comarca de San Blas': 'Comarca Kuna Yala'}
-
-regions = regions.replace({'prov' : region_dict})
-
 regions = regions.reset_index().rename(columns = {'prov': 'm', 'form' : 'j'})
 
 #regions['j'] = '2003' + regions['j'].map(str)

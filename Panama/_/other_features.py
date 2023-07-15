@@ -15,5 +15,6 @@ for t in ['1997', '2003', '2008']:
     x.append(df)
 
 concatenated = pd.concat(x)
+concatenated.replace({'Comarca de San Blas': 'Comarca Kuna Yala'})
 
 concatenated.to_parquet('../var/other_features.parquet')
