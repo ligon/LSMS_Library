@@ -344,3 +344,72 @@ def df_from_orgfile(orgfn,name=None,set_columns=True,to_numeric=True):
         df = df.apply(lambda x: pd.to_numeric(x,errors='ignore'))
 
     return df
+
+def to_parquet(df,fn):
+    """
+    Write df to parquet file fn.
+
+    Parquet (pyarrow) is slightly more picky about data types and layout than is pandas;
+    here we fix some possible problems before calling pd.DataFrame.to_parquet.
+    """
+    if len(df.shape)==0: # A series?  Need a dataframe.
+        df = pd.DataFrame(df)
+
+    # Can't mix types of category labels.
+    for col in df:
+        if df[col].dtype == 'category':
+            cats = df[col].cat.categories
+            if str in [type(x) for x in cats]: # At least some categories are strings...
+                df[col] = df[col].cat.rename_categories(lambda x: str(x))
+
+    df.to_parquet(fn)
+
+    return df
+
+from collections import UserDict
+
+class RecursiveDict(UserDict):
+    def __init__(self,*arg,**kw):
+      super(RecursiveDict, self).__init__(*arg, **kw)
+
+    def __getitem__(self,k):
+        try:
+            while True:
+                k = UserDict.__getitem__(self,k)
+        except KeyError:
+            return k
+
+def format_id(id):
+    """Nice string format for any id, string or numeric.
+    """
+    if pd.isnull(id) or id=='': return None
+
+    try:  # If numeric, return as string int
+        return '%d' % id
+    except TypeError:  # Not numeric
+        return id.split('.')[0].strip()
+    except ValueError:
+        return None
+
+def panel_ids(Waves):
+    """Return RecursiveDict of household identifiers.
+    """
+    D = RecursiveDict()
+    for t,v in Waves.items():
+        if len(v):
+            fn = f"../{t}/Data/{v[0]}"
+            try:
+                df = from_dta(fn)[[v[1],v[2]]]
+            except FileNotFoundError:
+                with dvc.api.open(fn,mode='rb') as dta: df = from_dta(dta)[[v[1],v[2]]]
+
+            # Clean-up ids
+            df[v[1]] = df[v[1]].apply(format_id)
+            df[v[2]] = df[v[2]].apply(format_id)
+
+            if len(v)==4: # Remap id1
+                df[v[2]] = df[v[2]].apply(v[3])
+
+            D.update(df[[v[1],v[2]]].dropna().values.tolist())
+
+    return D

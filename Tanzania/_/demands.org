@@ -296,7 +296,7 @@ fct = read_sheets('https://docs.google.com/spreadsheets/d/18EuF3OLGDB6-hb9PToJzD
 print(fct.to_markdown())
 #+end_src
 
-#+name: fct
+#+name: fct_origin
 | FCT Code | FCT Label                                              | energy kcal | protein g | vit a ug | vit d ug | vit e ug | vit c mg | vit b6 mg | vit b12 ug | ca mg | mg mg | fe mg | zn mg |
 |----------+--------------------------------------------------------+-------------+-----------+----------+----------+----------+----------+-----------+------------+-------+-------+-------+-------|
 |      101 | Rice (paddy)                                           |         358 |       6.5 |        0 |        0 |        0 |        0 |       0.1 |          0 |     8 |    36 |   0.6 |   1.1 |

@@ -11,8 +11,8 @@ import json
 # Data to link household ids across waves
 Waves = {'2011-12':(),
          '2013-14':('sect_cover_hh_w2.dta','household_id2','household_id'),
-         '2015-16':(), #'sect_cover_hh_w3.dta','household_id2','household_id2'),
-         '2018-19':(),   #'sect_cover_hh_w4.dta','household_id','household_id2'),  # But entirely new sample drawn in 2018-19!
+         '2015-16':('sect_cover_hh_w3.dta','household_id2','household_id'),
+         '2018-19':() #'sect_cover_hh_w4.dta','household_id','household_id2'),  # But entirely new sample drawn in 2018-19!
          }
 
 
@@ -25,20 +25,25 @@ def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Code',value='Preferr
     return unitlabels.squeeze().str.strip().to_dict()
 
 
-def harmonized_food_labels(fn='../../_/food_items.org',key='Code',value='Preferred Label'):
+def harmonized_food_labels(fn='../../_/food_items.org',key=list(Waves.keys()),value='Preferred Label'):
     # Harmonized food labels
     food_items = pd.read_csv(fn,delimiter='|',skipinitialspace=True,converters={1:lambda s: s.strip(),2:lambda s: s.strip()})
     food_items.columns = [s.strip() for s in food_items.columns]
     food_items = food_items.loc[:,food_items.count()>0]
-    food_items = food_items.apply(lambda x: x.str.strip())
+    food_items = food_items.drop(columns = ['FTC Code', 'FDC ID']).apply(lambda x: x.str.strip())
 
-    if type(key) is not str:  # Assume a series of foods
-        myfoods = set(key.values)
-        for key in food_items.columns:
-            if len(myfoods.difference(set(food_items[key].values)))==0: # my foods all in key
-                break
+    if type(key) == list :
+        for k in key:
+            if type(k) is not str:  # Assume a series of foods
+                myfoods = set(k.values)
+                for k in food_items.columns:
+                    if len(myfoods.difference(set(food_items[k].values)))==0: # my foods all in key
+                        break
 
-    food_items = food_items[[key,value]].dropna()
+        food_items = food_items[key + [value]].replace('---', np.nan).dropna(how = 'all')
+    else:
+        food_items = food_items[[key] + [value]].replace('---', np.nan).dropna(how = 'all')
+        
     food_items.set_index(key,inplace=True)
 
     return food_items.squeeze().str.strip().to_dict()
@@ -76,6 +81,15 @@ def food_acquired(fn,myvars):
 
     df = df.loc[:,list(myvars.values())].rename(columns={v:k for k,v in myvars.items()})
 
+    #correct unit labels 
+    df['units_purchased'] = df['units_purchased'].str.title()
+    df['units'] = df['units'].str.title()
+    rep = {r'\s+':' ',
+           'Meduim': 'Medium',
+           'Kubaya ':'Kubaya/Cup ',
+           'Milliliter' : 'Mili Liter'}
+    df=df.replace(rep, regex = True)
+
     df = df.set_index(['HHID','item','units','units_purchased']).dropna(how='all')
 
     df.index.names = ['j','i','units','units_purchased']
@@ -86,7 +100,7 @@ def food_acquired(fn,myvars):
         fix = dict(zip(df.index.levels[0],df.index.levels[0].astype(int).astype(str)))
         df = df.rename(index=fix,level=0)
 
-    df = df.rename(index=harmonized_food_labels(key=df.index.get_level_values('i')),level='i')
+    #df = df.rename(index=harmonized_food_labels(key=df.index.get_level_values('i')),level='i')
 
     # Compute unit values; BUT note these are in units_purchased, not necessarily units.
     df['unitvalue'] = df['value_purchased']/df['quantity_purchased']
@@ -131,7 +145,7 @@ def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,it
     expenditures.columns.name = 'i'
 
     expenditures = expenditures[expenditures.columns.intersection(food_items.values())]
-
+        
     return expenditures
 
 
@@ -156,7 +170,7 @@ def food_quantities(fn='',item='item',HHID='HHID',
 
     quantities.index.names = ['j','u']
     quantities.columns.name = 'i'
-
+        
     return quantities
 
 def age_sex_composition(fn,sex='sex',sex_converter=None,age='age',months_spent='months_spent',HHID='HHID',months_converter=None, convert_categoricals=True,Age_ints=None,fn_type='stata'):
@@ -164,7 +178,7 @@ def age_sex_composition(fn,sex='sex',sex_converter=None,age='age',months_spent='
     if Age_ints is None:
         # Match Uganda FCT categories
         Age_ints = ((0,4),(4,9),(9,14),(14,19),(19,31),(31,51),(51,100))
-
+        
     with dvc.api.open(fn,mode='rb') as dta:
         df = get_household_roster(fn=dta,HHID=HHID,sex=sex,age=age,months_spent=months_spent,
                                   sex_converter=sex_converter,months_converter=months_converter,
@@ -172,7 +186,7 @@ def age_sex_composition(fn,sex='sex',sex_converter=None,age='age',months_spent='
 
     df.index.name = 'j'
     df.columns.name = 'k'
-
+    
     return df
 
 
@@ -180,7 +194,6 @@ def other_features(fn,urban=None,region=None,HHID='HHID',urban_converter=None):
 
     with dvc.api.open(fn,mode='rb') as dta:
         df = get_household_identification_particulars(fn=dta,HHID=HHID,urban=urban,region=region,urban_converter=urban_converter)
-
     df.index.name = 'j'
     df.columns.name = 'k'
 

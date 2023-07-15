@@ -1,0 +1,4 @@
+outs:
+- md5: e663f70e6d68b1444eef274a4b83e3f3
+  size: 185275
+  path: weights.dta

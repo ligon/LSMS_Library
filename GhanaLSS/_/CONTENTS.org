@@ -1,0 +1,46 @@
+#+title: Contents
+
+The Ghana Living Standards Survey (Ghana LSS) is one of two major surveys we have for Ghana, the other being the Ghana Social Panel Survey (GhanaSPS).
+We have tried to make it possible to compare food expenditures not only across rounds within one of these surveys, but also across surveys.  The main tool needed for harmonization is a set of consistent food labels.  Those consistent labels are the "Aggregate Labels" found in https://docs.google.com/spreadsheets/d/1qZhbq5gpAmCsYH1ixUn0Ix_Cb5YKSIpU-Pc2_hh2lhU/.
+
+
+* Files in GhanaLSS/_/
+** TODO ghana_lss.py
+Contains code common to different GLSS rounds.
+** TODO food_items.org
+See discussion above for harmonization of food labels across rounds and surveys.  But we should provide code here to usefully extract that information.
+
+** TODO conversion_to_kgs.json
+
+** TODO other_features.py
+** TODO household_characteristics.py
+** TODO food_acquired.py
+Test...
+#+begin_src python :results output
+import pandas as pd
+
+fa = pd.read_parquet('../var/food_acquired.parquet')
+
+print(fa.describe())
+#+end_src
+
+** TODO food_prices_quantities_and_expenditures.py
+Test...
+#+begin_src python :results output
+import pandas as pd
+
+print(pd.read_parquet('../var/food_prices.parquet').describe())
+print(pd.read_parquet('../var/food_quantities.parquet').describe())
+print(pd.read_parquet('../var/food_expenditures.parquet').describe())
+#+end_src
+
+** TODO Food Conversion Table
+West Africa Food Conversion Table (Inputs into Ghana Food Expenditure Data):
+https://docs.google.com/spreadsheets/d/1Ar88nD6jQl4u8iCIsAIkLxOjHpfvi6ZBVJlwf91HOOQ/edit?usp=sharing
+Ghana Food Expenditure Data with Aggregate Labels and FTC Codes:
+https://docs.google.com/spreadsheets/d/1qZhbq5gpAmCsYH1ixUn0Ix_Cb5YKSIpU-Pc2_hh2lhU/edit?usp=sharing
+
+* Files in GhanaLSS/<SOMEYEAR>/_/
+** TODO household_characteristics.py
+** TODO food_acquired.py
+** TODO other_features.py
