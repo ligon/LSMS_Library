@@ -7,7 +7,13 @@ import pandas as pd
 
 x = []
 for t in ['1997', '2003', '2008']:
-    x.append(pd.read_parquet('../'+t+'/_/household_characteristics.parquet'))
+    df = pd.read_parquet('../'+t+'/_/household_characteristics.parquet')
+    df = df.reset_index()
+    df['j'] = t + df['j']
+    df.replace({'Comarca de San Blas': 'Comarca Kuna Yala'})
+    df = df.set_index(['j', 't', 'm'])
+    df.columns.name = 'k'
+    x.append(df)
 
 concatenated = pd.concat(x)
 
