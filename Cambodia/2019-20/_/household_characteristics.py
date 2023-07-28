@@ -15,7 +15,10 @@ with dvc.api.open('../Data/hh_sec_2.dta', mode='rb') as dta:
 
 df = age_sex_composition(df)
 df['t'] = "2019-20"
-df['m'] = "Cambodia"
+
+regions = pd.read_parquet('other_features.parquet')
+df = df.join(regions, on=['j'])
+
 df = df.set_index(['t', 'm'], append = True)
 df.columns.name = 'k'
 
