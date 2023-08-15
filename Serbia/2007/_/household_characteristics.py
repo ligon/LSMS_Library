@@ -22,8 +22,6 @@ df = get_household_roster(df, sex='pol', sex_converter=lambda x:['m','f'][x==2],
 df['log HSize'] = np.log(df[['girls', 'boys', 'men', 'women']].sum(axis=1))
 
 df.index.name = 'j'
-df['t'] = '2007'
-df = df.set_index('t', append=True)
 df.columns.name = 'k'
 
 df.to_parquet('household_characteristics.parquet')
