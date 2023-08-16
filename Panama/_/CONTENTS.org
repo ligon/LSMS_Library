@@ -5,7 +5,7 @@ Brief table of contents and todo list.
 * Files in Panama/_/
 ** TODO panama.py
 Contains code common to different rounds
-** TODO food_items.org
+** DONE food_items.org
 *** Final Version
 Cleaned up by a human, keyed to FCT Table
 #+begin_src python :results output raw table
@@ -245,7 +245,7 @@ print(df_to_orgtbl(df))
 
 
 ** TODO conversion_to_kgs.json
-** TODO nutrition
+** DONE nutrition
 A food conversion table, with foods keyed to the "Preferred Labels" of food_items.org.   See https://docs.google.com/spreadsheets/d/1YwfdL0LMPVl3UGo-KfyvpC7S7KR_jDL54rsVLUQOCVE/, prepared by Kaylee Vu, which indexes the FCT at http://www.incap.int/mesocaribefoods/dmdocuments/TablaCAlimentos.pdf.
 
 Code to extract the nutrient tables from the aforementioned pdf:
@@ -275,4 +275,4 @@ D = pd.concat(L)
 * Files in Panama/<SOMEYEAR>/_/
 ** DONE household_characteristics.py
 ** DONE food_acquired.py
-* DONE nutritiion.py
+** DONE nutrition.py

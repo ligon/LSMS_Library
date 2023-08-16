@@ -1,0 +1,13 @@
+#+title: Contents
+
+Brief table of contents and todo list.
+
+
+* Files in Burkina_Faso/_/
+** TODO food_items.org
+** TODO nutrition
+
+* Files in Burkina_Faso/<SOMEYEAR>/_/
+** DONE other_features.py
+** DONE household_characteristics.py
+** TODO food_acquired.py
