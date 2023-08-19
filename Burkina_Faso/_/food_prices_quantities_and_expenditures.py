@@ -7,7 +7,7 @@ import json
 
 df = pd.read_parquet('../var/food_acquired.parquet')
 
-x = df[['total spent']].rename({'total spent': 'total expenditure'})
+x = df[['total expenses']].rename({'total expenses': 'total expenditure'})
 x.droplevel('u').to_parquet('../var/food_expenditures.parquet')
 x.droplevel('u').unstack('i').to_csv('~/Downloads/food_expenditures.csv')
 
@@ -16,7 +16,7 @@ p.unstack('t').to_parquet('../var/food_prices.parquet')
 p.unstack('t').to_csv('~/Downloads/food_prices.csv')
 
 q = x.join(p,on=['t','m','i','u'])
-q = q['total spent']/q['price per unit']
+q = q['total expenses']/q['price per unit']
 q = q.dropna()
 
 pd.DataFrame({'Quantity':q}).to_parquet('../var/food_quantities.parquet')
