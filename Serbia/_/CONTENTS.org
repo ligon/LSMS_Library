@@ -17,3 +17,4 @@ CLOSED: [2023-07-24 Mon 10:32]
 CLOSED: [2023-07-24 Mon 10:32]
 ** DONE food_acquired.py
 CLOSED: [2023-08-04 Tues 12:45]
+The data provided contains daily recall for each food product. Therefore, for "Total Expenditure" and "Quantity", the daily values are summed. For "Price", the daily expenditure is divided by the the quantity purchased that day, then the median is taken over all the prices of the week.

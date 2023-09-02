@@ -16,5 +16,7 @@ regions  = df.groupby('hhid').agg({'region' : 'first'})
 
 regions = regions.rename(columns = {'region' : 'm'})
 regions.index.name = 'j'
+regions['t'] = '2013_Q4'
+regions = regions.set_index('t', append = True)
 
 regions.to_parquet('other_features.parquet')

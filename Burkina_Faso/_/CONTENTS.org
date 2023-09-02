@@ -6,8 +6,12 @@ Brief table of contents and todo list.
 * Files in Burkina_Faso/_/
 ** TODO food_items.org
 ** TODO nutrition
+** TODO Makefile
+Makefile works for current files in the folder.
+
 
 * Files in Burkina_Faso/<SOMEYEAR>/_/
 ** DONE other_features.py
 ** DONE household_characteristics.py
-** TODO food_acquired.py
+** DONE food_acquired.py
+issue for 4 rounds (called passages in documentation) wherein following rounds contain no data for food quantities or units for some reason though documentation states it was surveyed. for now, only contains data on first round.

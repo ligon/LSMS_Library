@@ -11,5 +11,6 @@ for t in ['2014', '2018-19']:
     x.append(df)
 
 concatenated = pd.concat(x)
+concatenated['m'] = concatenated['m'].astype(str)
 
 concatenated.to_parquet('../var/other_features.parquet')
