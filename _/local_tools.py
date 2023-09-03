@@ -286,7 +286,7 @@ def add_markets_from_other_features(country,df):
 
     return df
 
-def df_from_orgfile(orgfn,name=None,set_columns=True,to_numeric=True):
+def df_from_orgfile(orgfn,name=None,set_columns=True,to_numeric=True,encoding=None):
     """Extract the org table with name from the orgmode file named orgfn; return a pd.DataFrame.
 
     If name is None (the default), then we assume the orgtable is the very first
@@ -297,7 +297,7 @@ def df_from_orgfile(orgfn,name=None,set_columns=True,to_numeric=True):
     Ethan Ligon                                                       March 2023
     """
     # Grab file as a list of strings
-    with open(orgfn,'r') as f:
+    with open(orgfn,'r',encoding=encoding) as f:
         contents = f.readlines()
 
     # Get indices of #+name: lines:
