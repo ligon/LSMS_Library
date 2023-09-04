@@ -22,6 +22,6 @@ of = of.rename(columns = {'s00q01': 'm',
 
 of.index.name = 'j'
 
-of = of.reset_index().set_index(['j','t''m'])
+of = of.reset_index().set_index(['j','t','m'])
 
 of.to_parquet('other_features.parquet')
