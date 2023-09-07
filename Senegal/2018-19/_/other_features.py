@@ -24,4 +24,6 @@ of.index.name = 'j'
 
 of = of.reset_index().set_index(['j','t','m'])
 
+of['Rural'] = (of.Rural=='Rural') + 0.
+
 of.to_parquet('other_features.parquet')

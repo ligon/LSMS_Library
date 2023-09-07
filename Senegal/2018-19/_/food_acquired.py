@@ -11,7 +11,7 @@ from lsms import from_dta
 from local_tools import df_from_orgfile
 
 with dvc.api.open('../Data/s07b_me_sen2018.dta', mode='rb') as dta:
-    df = from_dta(dta, convert_categoricals=True)
+    df = from_dta(dta, convert_categoricals=True,encoding='ISO-8859-1')
 
 df['j'] = df['vague'].astype(str) + df['grappe'].astype(str) + df['menage'].astype(str)
 waves = {1: 2018, 2: 2019}

@@ -345,6 +345,15 @@ def df_from_orgfile(orgfn,name=None,set_columns=True,to_numeric=True,encoding=No
 
     return df
 
+def change_encoding(s,from_encoding,to_encoding='utf-8',errors='ignore'):
+    """
+    Change encoding of a string s from_encoding to_encoding.
+
+    For example, strings in data may be encoded in latin-1 or ISO-8859-1.
+    We usually want utf-8.
+    """
+    return bytes(s,encoding=from_encoding).decode(to_encoding,errors=errors)
+
 def to_parquet(df,fn):
     """
     Write df to parquet file fn.
