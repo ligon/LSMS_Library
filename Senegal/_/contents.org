@@ -1,0 +1,14 @@
+#+title: Contents
+
+Brief table of contents and todo list.
+
+* Files in Senegal/_/
+** TODO food_items.org
+** TODO Food Conversion
+** DONE Nutrition
+** DONE Makefile
+
+* Files in Senegal/<SOMEYEAR>/_/
+** DONE other_features.py
+** DONE household_characteristics.py
+** DONE food_acquired.py

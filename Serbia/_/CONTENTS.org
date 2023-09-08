@@ -1,0 +1,20 @@
+#+title: Contents
+
+Brief table of contents and todo list.
+
+* Files in Serbia/_/
+** DONE food_items.org
+** TODO food_items.org
+** TODO Food Conversion
+** TODO Nutrition
+** TODO Makefile
+code does not currently run due to lacking food_items.org and FCT table
+
+* Files in Serbia/<SOMEYEAR>/_/
+** DONE other_features.py
+CLOSED: [2023-07-24 Mon 10:32]
+** DONE household_characteristics.py
+CLOSED: [2023-07-24 Mon 10:32]
+** DONE food_acquired.py
+CLOSED: [2023-08-04 Tues 12:45]
+The data provided contains daily recall for each food product. Therefore, for "Total Expenditure" and "Quantity", the daily values are summed. For "Price", the daily expenditure is divided by the the quantity purchased that day, then the median is taken over all the prices of the week.

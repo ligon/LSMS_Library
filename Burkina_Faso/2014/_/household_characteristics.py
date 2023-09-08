@@ -9,19 +9,45 @@ import json
 import dvc.api
 from lsms import from_dta
 from lsms.tools import get_household_roster
+import pyreadstat
 
-with dvc.api.open('../Data/emc2014_p1_individu_27022015.dta', mode='rb') as dta:
-    df = from_dta(dta, convert_categoricals=True)
+x = []
 
-df["hhid"]  = df["zd"].astype(str) + '-'  + df["menage"].astype(int).astype(str)
-regions  = df.groupby('hhid').agg({'region' : 'first'})
+def sexconverter(x):
+    if x == 'Masculin':
+        return 'm'
+    if x == 'Feminin' or x == 'Féminin':
+        return 'f'
 
-df = age_sex_composition(df, sex='B2', sex_converter=lambda x:['m','f'][x=='Feminin'], age='B4', age_converter=None, hhid='hhid')
-df = pd.merge(left = df, right = regions, how = 'left', left_index = True, right_index = True)
+variables = [
+    {'sex': 'B2', 'age': 'B4', 't': '2013_Q4'},
+    {'sex': 'B2', 'age': 'B4', 't': '2014_Q1'},
+    {'sex': 'sexe3', 'age': 'age3', 't': '2014_Q2'},
+    {'sex': 'B2', 'age': 'B4B', 't': '2014_Q3'},
+    ]
 
-df = df.rename(columns = {'region' : 'm'})
-df['t'] = '2014'
-df = df.set_index(['t', 'm'], append = True)
-df.columns.name = 'k'
+for i in np.arange(1,5):
+    round = variables[i-1]
 
-df.to_parquet('household_characteristics.parquet')
+    filestring = 'emc2014_p'+str(i)+'_individu_27022015.dta'
+    fs = dvc.api.DVCFileSystem('../../')
+    fs.get_file('/Burkina_Faso/2014/Data/'+filestring, '/tmp/'+filestring)
+    df, meta_r = pyreadstat.read_dta('/tmp/'+filestring, apply_value_formats = True, formats_as_category = True)
+
+    df["hhid"]  = df["zd"].astype(str) + '-'  + df["menage"].astype(int).astype(str)
+    regions  = df.groupby('hhid').agg({'region' : 'first'})
+    regions['region'] = regions['region'].str.capitalize().str.replace(' ', '-')
+
+    df = age_sex_composition(df, sex=round['sex'], sex_converter=sexconverter, age=round['age'], age_converter=None, hhid='hhid')
+    df = pd.merge(left = df, right = regions, how = 'left', left_index = True, right_index = True)
+
+    df = df.rename(columns = {'region' : 'm'})
+    df['t'] = round['t']
+    df = df.set_index(['t', 'm'], append = True)
+    x.append(df)
+
+concatenated = pd.concat(x)
+
+concatenated.columns.name = 'k'
+
+concatenated.to_parquet('household_characteristics.parquet')
