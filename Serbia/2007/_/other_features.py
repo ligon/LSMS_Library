@@ -14,7 +14,10 @@ with dvc.api.open('../Data/household.dta', mode='rb') as dta:
 cols = ['opstina', 'popkrug', 'dom']
 df['j'] = df[cols].apply(lambda row: ''.join(row.values.astype(str)), axis=1)
 
-df = df.set_index('j').loc[:, 'region2'].str.capitalize().to_frame()
-df = df.rename({'region2': 'm'}, axis=1)
+df = df.set_index('j').loc[:, ['region2', 'urban']]
+df.region2 = df.region2.str.capitalize()
+df = df.rename({'region2': 'm', 
+                'urban': 'Rural'}, axis=1)
+df.Rural = (df.Rural=='rural') + 0.
 
 df.to_parquet('other_features.parquet')
