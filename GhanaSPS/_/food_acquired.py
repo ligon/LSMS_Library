@@ -38,9 +38,8 @@ for k in unitsd.keys():
 p = []
 for t in Waves.keys():
     df = pd.read_parquet('../'+t+'/_/food_acquired.parquet').squeeze()
-    print(df)
+    print(t)
     df = df.replace({'unit': unitsd[t]})
-    print(df)
     # There may be occasional repeated reports of purchases of same food
     df = df.drop(columns = 'price')
     df0 = df.groupby(['j','t','i','unit']).sum()
