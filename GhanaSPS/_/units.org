@@ -1,0 +1,117 @@
+There are different codes for different units in the  GhanaSPS data; further the corresponding labels are sometimes irregular.
+
+This file aims to construct a consistent mapping for numeric unit codes for 2009-10 into labels (based on Codebook.pdf and manually extracted additions from later rounds), and then aggregate labels from all rounds into a harmonized set of unit labels.
+
+#+name: unit09
+| Code | Preferred Label   |
+|------+-------------------|
+| 02   | American tin      |
+| 27   | Balls             |
+| 28   | Bar               |
+| 03   | Barrel            |
+| 04   | Basket            |
+| 05   | Beer bottle       |
+| 06   | Bowl              |
+| 07   | Box               |
+| 29   | Bucket            |
+| 08   | Bunch             |
+| 09   | Bundle            |
+| 30   | Crate             |
+| 40   | Calabash          |
+| 31   | Dozen             |
+| 10   | Fanta/coke bottle |
+| 11   | Fingers           |
+| 12   | Fruits            |
+| 13   | Gallon            |
+| 14   | Kilogram          |
+| 15   | Litre             |
+| 32   | Loaf              |
+| 16   | Log               |
+| 17   | Margarine tin     |
+| 18   | Maxi bag          |
+| 19   | Mini bag          |
+| 39   | Meters            |
+| 20   | Nut               |
+| 95   | Other             |
+| 43   | Packet            |
+| 33   | Pair              |
+| 34   | Pieces            |
+| 35   | Pots              |
+| 21   | Pounds            |
+| 42   | Sachet            |
+| 36   | Set               |
+| 22   | Sheet             |
+| 37   | Singles           |
+| 23   | Stick             |
+| 44   | Tie               |
+| 41   | Tin               |
+| 24   | Tonne             |
+| 25   | Tree              |
+| 26   | Tubers            |
+| 38   | Yards             |
+
+
+
+#+name: harmonizedunit
+| Preferred Label      | 2009-10              | 2013-14           | 2017-18              |
+|----------------------+----------------------+-------------------+----------------------|
+| American tin         | American tin         | American tin      | American tins        |
+| Ball                 | Balls                | Balls             | Balls                |
+| Bar                  | Bar                  | Bar               | Bars                 |
+| Barrel               | Barrel               | Barrel            | Barrels              |
+| Basket               | Basket               | Basket            | Baskets              |
+| Beer bottle          | Beer bottle          | Beer bottle       | Beer bottles         |
+| Bowl                 | Bowl                 | Bowl              | Bowls                |
+| Box                  | Box                  | Box               | Boxes                |
+| Bucket               | Bucket               | Bucket            | Buckets              |
+| Bunch                | Bunch                | Bunch             | Bunches              |
+| Bundle               | Bundle               | Bundle            | Bundles              |
+| Calabash             | Calabash             | Calabash          | Calabashes           |
+| Crate                | Crate                | Crate             | Crates               |
+| Dozen                | Dozen                | Dozen             | Dozens               |
+| Fanta/coke bottle    | Fanta/coke bottle    | Fanta/Coke bottle | Fanta/coke bottles   |
+| Finger               | Fingers              | Fingers           | Fingers              |
+| Fruit                | Fruits               | Fruits            | Fruits               |
+| Gallon               | Gallon               | Gallon            | Gallons              |
+| Groups of 100 pieces | Groups of 100 pieces |                   | Groups of 100 pieces |
+| Kilogram             | Kilogram             | Kilogram          | Kilograms            |
+| Litre                | Litre                | Litre             | Litres               |
+| Loaf                 | Loaf                 | Loaf              | Loafs                |
+| Log                  | Log                  | Log               | Logs                 |
+| Margarine tin        | Margarine tin        | Margarine tin     | Margarine tins       |
+| Maxi bag             | Maxi bag             | Maxi bag          | Maxi bags            |
+| Meter                | Meters               | Meters            |                      |
+| Milk tin             |                      |                   | Milk tins            |
+| Mini bag             | Mini bag             | Mini bag          | Mini bags            |
+| Nut                  | Nut                  | Nut               | Nuts                 |
+| Other                | Other                | Other             |                      |
+| Packet               | Packet               | Packet            | Packets              |
+| Pair                 | Pair                 | Pair              | Pairs                |
+| Piece                | Pieces               | Pieces            | Pieces               |
+| Pot                  | Pots                 | Pots              | Pots                 |
+| Pound                | Pounds               | Pounds            | Pounds               |
+| Sachet               | Sachet               | Sachet            | Sachets              |
+| Set                  | Set                  | Set               | Sets                 |
+| Sheet                | Sheet                | Sheet             | Sheets               |
+| Single               | Singles              | Singles           | Singles              |
+| Stick                | Stick                | Stick             | Sticks               |
+| Tie                  | Tie                  | Tie               | Ties                 |
+| Tin                  | Tin                  | Tin               | Tins                 |
+| Tonne                | Tonne                | Tonne             | Tonnes               |
+| Tree                 | Tree                 | Tree              | Trees                |
+| Tuber                | Tubers               | Tubers            | Tubers               |
+| Yards                | Yards                | Yards             |                      |
+| Yard/metre           |                      |                   | Yards/metres         |
+
+
+#+begin_src python :var tab=unitlabels :colnames no :prologue "# -*- coding: utf-8 -*-" :tangle unitlabels.py
+from cfe.df_utils import orgtbl_to_df
+
+units = orgtbl_to_df(tab).set_index('Code')['Preferred Label']
+
+units.to_csv('unitlabels.csv')
+
+#+end_src
+
+#+results:
+: None
