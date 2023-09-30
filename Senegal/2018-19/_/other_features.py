@@ -15,10 +15,15 @@ df['hhid'] = df['vague'].astype(str) + df['grappe'].astype(str) + df['menage'].a
 waves = {1: 2018, 2: 2019}
 df['t'] = df['vague'].map(waves)
 
-regions  = df.groupby('hhid').agg({'s00q01' : 'first', 't': 'first'})
+of  = df.groupby('hhid').agg({'s00q01' : 'first', 't': 'first', 's00q04': 'first'})
 
-regions = regions.rename(columns = {'s00q01' : 'm'})
-regions.index.name = 'j'
-regions = regions.set_index('t', append = True)
+of = of.rename(columns = {'s00q01': 'm',
+                          's00q04': 'Rural'})
 
-regions.to_parquet('other_features.parquet')
+of.index.name = 'j'
+
+of = of.reset_index().set_index(['j','t','m'])
+
+of['Rural'] = (of.Rural=='Rural') + 0.
+
+of.to_parquet('other_features.parquet')

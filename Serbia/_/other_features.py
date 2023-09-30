@@ -10,7 +10,7 @@ for t in ['2007']:
     df = pd.read_parquet('../'+t+'/_/other_features.parquet')
     df = df.reset_index()
     df['t'] = t
-    df = df.set_index(['j', 't'])
+    df = df.set_index(['j', 't', 'm'])
     x.append(df)
 
 concatenated = pd.concat(x)

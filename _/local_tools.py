@@ -286,7 +286,7 @@ def add_markets_from_other_features(country,df):
 
     return df
 
-def df_from_orgfile(orgfn,name=None,set_columns=True,to_numeric=True):
+def df_from_orgfile(orgfn,name=None,set_columns=True,to_numeric=True,encoding=None):
     """Extract the org table with name from the orgmode file named orgfn; return a pd.DataFrame.
 
     If name is None (the default), then we assume the orgtable is the very first
@@ -297,7 +297,7 @@ def df_from_orgfile(orgfn,name=None,set_columns=True,to_numeric=True):
     Ethan Ligon                                                       March 2023
     """
     # Grab file as a list of strings
-    with open(orgfn,'r') as f:
+    with open(orgfn,'r',encoding=encoding) as f:
         contents = f.readlines()
 
     # Get indices of #+name: lines:
@@ -344,6 +344,15 @@ def df_from_orgfile(orgfn,name=None,set_columns=True,to_numeric=True):
         df = df.apply(lambda x: pd.to_numeric(x,errors='ignore'))
 
     return df
+
+def change_encoding(s,from_encoding,to_encoding='utf-8',errors='ignore'):
+    """
+    Change encoding of a string s from_encoding to_encoding.
+
+    For example, strings in data may be encoded in latin-1 or ISO-8859-1.
+    We usually want utf-8.
+    """
+    return bytes(s,encoding=from_encoding).decode(to_encoding,errors=errors)
 
 def to_parquet(df,fn):
     """

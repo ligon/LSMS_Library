@@ -17,7 +17,7 @@ z.index.name = 'j'
 z['t'] = t
 z['m'] = "Ghana"
 
-z = z.reset_index().set_index(['j','t','m'])
-
+z = z.reset_index()
+z['j'] = z['j'].astype(str)
+z = z.set_index(['j','t','m'])
 z.to_parquet('household_characteristics.parquet')
-

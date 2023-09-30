@@ -6,6 +6,7 @@ df = pd.read_parquet('../var/food_acquired.parquet')
 df.index = df.index.rename({'units':'u'})
 
 x = df[['Total Expenditure']]
+x = x.swaplevel(1,2)
 x.droplevel('u').to_parquet('../var/food_expenditures.parquet')
 x.droplevel('u').unstack('i').to_csv('~/Downloads/food_expenditures.csv')
 
