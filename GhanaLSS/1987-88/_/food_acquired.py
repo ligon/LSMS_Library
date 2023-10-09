@@ -14,6 +14,10 @@ myvars = dict(fn='../Data/Y12A.DAT',item='itname',HHID='hhno')
 with dvc.api.open(myvars['fn'],mode='rb') as csv:
     df = pd.read_csv(csv)
 
+myvars = dict(fn='../STATA/Y12A.DAT',item='itname',HHID='hhno')
+with dvc.api.open(myvars['fn'],mode='rb') as csv:
+    df2 = pd.read_csv(csv)
+
 raise SystemExit(0)
 # Values recorded as cedis & pesewas; add 'em up
 df['purchased_value'] = df['s11a_cii'] + df['s11a_ciii']/100

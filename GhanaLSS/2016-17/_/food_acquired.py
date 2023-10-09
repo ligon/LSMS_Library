@@ -77,3 +77,27 @@ f = f.reset_index().groupby(['j','t', 'i', 'u']).agg({'purchased_value':sum,
                                                       'produced_quantity': sum, 
                                                       'produced_price':np.mean})
 f.to_parquet('food_acquired.parquet')
+
+
+#temporary code 
+try:
+    of = pd.read_parquet('other_features.parquet')
+    f2 = f.reset_index().drop(columns = 't')
+    f2['t'] = t
+    f2 = f2.set_index(['j','t','i','u'])
+    f2 = f2.join(of.reset_index('m')['m'],on=['j','t'])
+    f2 = f2.reset_index().set_index(['j','t','m','i','u'])
+except FileNotFoundError:
+    warnings.warn('No other_features.parquet found.')
+    f2['m'] = 'Ghana'
+    f2 = f2.reset_index().set_index(['j','t','m','i','u'])
+#expenditure
+e = f2.groupby(['j', 'i'])['purchased_value'].agg(sum).to_frame()
+e.to_parquet('food_expenditures.parquet')
+
+#price
+f2['purchased_price'] = f2['purchased_value'] / f2['purchased_quantity']
+p = f2[['purchased_price', 'produced_price']].groupby(['t','m','i','u']).median()
+p = p.reset_index().set_index(['t','m','i','u'])
+p.unstack('t').to_parquet('food_prices.parquet')
+

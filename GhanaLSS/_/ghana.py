@@ -6,9 +6,9 @@ import dvc.api
 from collections import defaultdict
 
 # Data to link household ids across waves
-Waves = {'2009-10':(),
-         '2013-14':(),
-         '2017-18':('00_hh_info.dta', 'FPrimary', 'FPrimary_original')
+Waves = {'2005-06':(), #'parta/sec0.dta', 'hhid', ['clust','rhhno']
+         '2012-13':(), #'PARTA/SEC0.dta', 'HID', ['clust', 'rhhno']
+         '2016-17':()
          }
 
 def split_by_visit(df, first_visit, last_visit, t, ind = ['j','t','i'], unit_col = None, aggregate_amount = False):
@@ -163,6 +163,13 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
     except IOError:
         with dvc.api.open(fn,mode='rb') as dta:
             id = from_dta(dta)
+    #generalize to ids being a list of columns needing to be joined        
+    if type(id0) == list:
+        id['id0'] = concate_id(id, id0[0], id0[1],True, 2)
+        id0 = 'id0'
+    if type(id1) == list:
+        id['id1'] = concate_id(id, id1[0], id1[1],True, 2)
+        id1 = 'id1'
 
     id = id[[id0,id1]]
     id[id1] = id[id1].replace('', np.nan).fillna(id[id0])
@@ -204,3 +211,14 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
     assert x.index.is_unique, "Non-unique index."
 
     return x
+
+def concate_id(df, parta, partb, leading_zero = False, digit = None):
+    df = df.replace('', np.nan)
+    df.loc[df[parta].isna(), partb] = np.nan
+    df.loc[df[partb].isna(), parta] = np.nan
+    if leading_zero and digit != None:
+        df['newid'] = df[parta].astype('Int64').astype(str) + df[partb].astype('Int64').astype(str).str.zfill(digit)
+    else:
+        df['newid'] = df[parta].astype('Int64').astype(str) + df[partb].astype('Int64').astype(str)
+    df['newid'] = df['newid'].replace(df[df[parta].isna()]['newid'][0], np.nan)
+    return df['newid']
