@@ -34,31 +34,40 @@ def id_walk(df,wave,waves):
 # for k in unitsd.keys():
 #     unitsd[k] = {v: k for k, v in unitsd[k].items()}
 
-p = []
+dfs = []
 for t in Waves.keys():
     df = pd.read_parquet('../'+t+'/_/food_acquired.parquet').squeeze()
     print(t)
     #df = df.replace({'unit': unitsd[t]})
-    # There may be occasional repeated reports of purchases of same food
-    df = df.drop(columns = 'price')
-    df0 = df.groupby(['j','t','i','unit']).sum()
-    df0['purchased_value'] = df0['purchased_value'].replace(0, np.nan)
-    df0['price'] = df0['purchased_value']/df0['purchased_quantity']
+    if 'purchased_value' in df.columns and 'purchased_quantity' in df.columns:
+        df['purchased_value'] = df['purchased_value'].replace(0, np.nan)
+        df['purchased_price'] = df['purchased_value']/df['purchased_quantity']
     #df = df.reset_index().set_index(['j','t','i','units','units_purchased'])
-    df1 = id_walk(df0,t,Waves)
-    p.append(df1)
+    df1 = id_walk(df,t,Waves)
+    df1 = df1.reset_index()
+    df1['t_temp'] = df1['t']
+    df1['t'] = t
+    df1 = df1.set_index(['j', 't', 'i', 'u'])
+    print(df1)
+    dfs.append(df1)
 
-p = pd.concat(p)
+p = pd.concat(dfs)
 
 try:
     of = pd.read_parquet('../var/other_features.parquet')
-
+    p = p.reset_index()
     p = p.join(of.reset_index('m')['m'],on=['j','t'])
-    p = p.reset_index().set_index(['j','t','m','i','unit'])
+    p['t'] = p['t_temp']
+    p = p.drop(columns = 't_temp')
+    p = p.set_index(['j','t','m','i','u'])
 except FileNotFoundError:
     warnings.warn('No other_features.parquet found.')
     p['m'] = 'Ghana'
-    p = p.reset_index().set_index(['j','t','m','i','unit'])
+    p = p.reset_index()
+    p['t'] = p['t_temp']
+    p = p.drop(columns = 't_tempt')
+    p = p.set_index(['j','t','m','i','u'])
+    p.join()
 
 #p = p.rename(index=fix_food_labels(),level='i')
 

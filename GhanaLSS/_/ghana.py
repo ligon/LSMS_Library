@@ -11,13 +11,30 @@ Waves = {'2005-06':(), #'parta/sec0.dta', 'hhid', ['clust','rhhno']
          '2016-17':()
          }
 
+def load_large_dta(fn, convert_categoricals = False):
+    import sys
+
+    reader = pd.read_stata(fn, iterator=True, convert_categoricals = convert_categoricals)
+    df = pd.DataFrame()
+
+    try:
+        chunk = reader.get_chunk(100*1000)
+        while len(chunk) > 0:
+            df = pd.concat([df, chunk], ignore_index=True)
+            chunk = reader.get_chunk(100*1000)
+            sys.stdout.flush()
+    except (StopIteration, KeyboardInterrupt):
+        pass
+    print('\nloaded {} rows'.format(len(df)))
+    return df
+
 def split_by_visit(df, first_visit, last_visit, t, ind = ['j','t','i'], unit_col = None, aggregate_amount = False):
     df = df.set_index([ind[0]] + ind[2:])
     df_by_visit = []
     for i in range(first_visit, last_visit+1):
         tem = df[df.columns[df.columns.str.contains(str(i))]]
         temp = tem.dropna(how='all').copy()
-        temp['t']= [(t,str(i))] * len(temp) #a tuple in the form: (round, visit)
+        temp['t']= t + ', ' + str(i)
         temp = temp.reset_index().set_index(ind)
         temp.columns = ['_'.join(c.split('_')[:-1]) for c in temp.columns]
         #temp = temp.set_index('t', append = True)
