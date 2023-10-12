@@ -5,7 +5,7 @@ import numpy as np
 import dvc.api
 import pandas as pd
 sys.path.append('../../_')
-from ghana import split_by_visit
+from ghana import split_by_visit, load_large_dta
 
 t = '2016-17'
 
@@ -16,7 +16,7 @@ myvars = dict(fn='../Data/g7sec9b.dta')
 with dvc.api.open(myvars['fn'],mode='rb') as dta:
     labels = pd.read_stata(dta, iterator=True).value_labels()
 with dvc.api.open(myvars['fn'],mode='rb') as dta:
-    df = pd.read_stata(dta, convert_categoricals=False)
+    df = load_large_dta(dta, convert_categoricals=False)
     #harmonize food labels and fix missing unit labels:
     labels['freqcd'] = harmonized_label[['Preferred Label', 'Code_9b']].dropna().set_index('Code_9b').to_dict('dict')['Preferred Label']
     for i in range(1, 7):
@@ -77,3 +77,26 @@ f = f.reset_index().groupby(['j','t', 'i', 'u']).agg({'purchased_value':sum,
                                                       'produced_quantity': sum, 
                                                       'produced_price':np.mean})
 f.to_parquet('food_acquired.parquet')
+
+
+#temporary code 
+try:
+    of = pd.read_parquet('other_features.parquet')
+    f2 = f.reset_index().drop(columns = 't')
+    f2['t'] = t
+    f2 = f2.set_index(['j','t','i','u'])
+    f2 = f2.join(of.reset_index('m')['m'],on=['j','t'])
+    f2 = f2.reset_index().set_index(['j','t','m','i','u'])
+except FileNotFoundError:
+    warnings.warn('No other_features.parquet found.')
+    f2['m'] = 'Ghana'
+    f2 = f2.reset_index().set_index(['j','t','m','i','u'])
+#expenditure
+e = f2.groupby(['j', 'i'])['purchased_value'].agg(sum).to_frame()
+e.to_parquet('food_expenditures.parquet')
+
+#price
+f2['purchased_price'] = f2['purchased_value'] / f2['purchased_quantity']
+p = f2[['purchased_price', 'produced_price']].groupby(['t','m','i','u']).median()
+p = p.reset_index().set_index(['t','m','i','u'])
+p.unstack('t').to_parquet('food_prices.parquet')

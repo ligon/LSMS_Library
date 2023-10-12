@@ -8,11 +8,8 @@ import json
 import dvc.api
 from lsms import from_dta
 
-with dvc.api.open('../Data/PARTA/SEC0.dta', mode='rb') as dta: #complete list of HID
+with dvc.api.open('../Data/PARTA/SEC0.dta', mode='rb') as dta: 
     df = from_dta(dta, convert_categoricals=True)
-
-with dvc.api.open('../Data/stata/partb/partb.zip', mode='rb') as dta: #complete list of HID
-    df = dta
 
 with dvc.api.open('../Data/GOVERNANCE/gps-sec0.dta', mode='rb') as dta: #urban indicator for an incomplete list of HID
     df2 = from_dta(dta, convert_categoricals=True)
