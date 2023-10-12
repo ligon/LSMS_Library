@@ -8,6 +8,11 @@ import argparse
 def main(country):
     x,z,p = mydata(country)
 
+    try:
+        x = x.sum(axis=1)
+    except ValueError: # Perhaps a series?
+        pass
+
     y = np.log(x.replace(0,np.nan)).squeeze()
 
     r = Regression(y=y,d=z)
