@@ -24,6 +24,7 @@ fa = pd.read_parquet('../var/food_acquired.parquet')
 print(fa.describe())
 #+end_src
 
+
 ** TODO food_prices_quantities_and_expenditures.py
 Test...
 #+begin_src python :results output
@@ -32,6 +33,38 @@ import pandas as pd
 print(pd.read_parquet('../var/food_prices.parquet').describe())
 print(pd.read_parquet('../var/food_quantities.parquet').describe())
 print(pd.read_parquet('../var/food_expenditures.parquet').describe())
+#+end_src
+
+
+*** TODO food_expenditures
+This parquet file built in a non-standard fashion, and is missing indices (t,m).  Code here acquires those indices from =household_characteristics=.
+#+begin_src python
+import pandas as pd
+import numpy as np
+import cfe.regression as rgsn
+
+z = pd.read_parquet('../var/household_characteristics.parquet')
+x = pd.read_parquet('../var/food_expenditures.parquet')
+o = pd.read_parquet('../2016-17/_/other_features.parquet')
+
+z = z.droplevel('m').join(o)
+z = z.iloc[:,4:]  # Drop boys, girls, men, women
+
+x = x.join(z)['purchased_value']
+
+y = np.log(x.replace(0,np.nan)).dropna()
+
+y = y.reorder_levels(['j','t','m','i'])
+y.index.names = ['i','t','m','j']
+
+z.index.names = ['i','t','m']
+
+r = rgsn.Regression(y=y,d=z)
+
+r.predicted_expenditures()
+r.get_gamma_se()
+
+r.to_pickle('../var/cfe_demands.rgsn')
 #+end_src
 
 ** TODO Food Conversion Table

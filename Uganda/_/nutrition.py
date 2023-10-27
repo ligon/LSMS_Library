@@ -7,7 +7,7 @@ import numpy as np
 from fct_addition import nutrient_df, harmonize_nutrient
 
 apikey = "hAkb5LsLAS1capOD60K6ILrZDkC29eK6ZmqCumXB"
-fct_add = pd.read_csv('fct_addition.csv').drop("Unnamed: 0", axis = 1)
+fct_add = pd.read_csv('fct_addition.csv').drop("Unnamed: 0", axis=1)
 fct = pd.read_csv('fct.csv').set_index('i')
 q = pd.read_parquet('../var/food_quantities.parquet')
 
