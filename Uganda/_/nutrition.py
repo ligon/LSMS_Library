@@ -2,13 +2,17 @@
 Create a nutrition DataFrame for households based on food consumption quantities
 """
 
+import sys
+sys.path.append('../../_/')
+sys.path.append('../../../_/')
 import pandas as pd
 import numpy as np
 from fct_addition import nutrient_df, harmonize_nutrient
+from local_tools import df_from_orgfile
 
 apikey = "hAkb5LsLAS1capOD60K6ILrZDkC29eK6ZmqCumXB"
-fct_add = pd.read_csv('fct_addition.csv').drop("Unnamed: 0", axis = 1)
-fct = pd.read_csv('fct.csv').set_index('i')
+fct_add = df_from_orgfile('nutrition.org',name='fct_addition',encoding='ISO-8859-1')
+fct = pd.read_csv('fct_part1.csv').set_index('i')
 q = pd.read_parquet('../var/food_quantities.parquet')
 
 #create and restructure fct for fdc food items; 
