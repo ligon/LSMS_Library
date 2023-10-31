@@ -15,6 +15,8 @@ myvars = dict(fn='../Data/Togo_survey2018_hhroster_forEthan.dta',
 
 df = age_sex_composition(**myvars)
 
+df.index = df.index.get_level_values('j').astype(int).astype(str)
+
 df = df.filter(regex='ales ')
 
 N = df.sum(axis=1)
@@ -39,7 +41,7 @@ t = food.groupby(['j','t']).count().reset_index('t')['t']
 df = df.join(t,on='j').reset_index()
 
 df = df.reset_index().set_index(['j','t','m'])
-
+df = df.drop(columns=['index'])
 #df = df.drop_duplicates()
 
 df.to_parquet('household_characteristics.parquet')
