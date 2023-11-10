@@ -6,7 +6,7 @@ from ghana import household_characteristics
 t = '1998-99'
 
 myvars = dict(fn='../Data/SEC1.DTA', HHID=['clust', 'nh'],
-              age='agey',sex=('sex',lambda s: s.lower()[0]),
+              age='agey',sex=('sex',lambda s: 'male' if s == 1 else 'female'),
               months_spent=None)
 
 z = household_characteristics(**myvars)
