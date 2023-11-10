@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Create a nutrition DataFrame for households based on food consumption quantities
 """
@@ -13,6 +14,7 @@ from local_tools import df_from_orgfile
 apikey = "hAkb5LsLAS1capOD60K6ILrZDkC29eK6ZmqCumXB"
 fct_add = df_from_orgfile('nutrition.org',name='fct_addition',encoding='ISO-8859-1')
 fct = pd.read_csv('fct_part1.csv').set_index('i')
+
 q = pd.read_parquet('../var/food_quantities.parquet')
 
 #create and restructure fct for fdc food items; 
