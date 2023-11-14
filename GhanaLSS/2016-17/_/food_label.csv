@@ -273,7 +273,7 @@ Cocoa (milk powder beverages),Cocoa (milk powder beverages),557,       Country m
 Cocoa (milk powder beverages),Cocoa (milk powder beverages),558,       Ideal   ,,
 Cocoa (milk powder beverages),Cocoa (milk powder beverages),559,       Milo    ,,
 Cocoa (milk powder beverages),Cocoa (milk powder beverages),560,       Richoco ,,
-Other Beverage,Other Beverage,561,       Other beverage drinks   ,92,92. Non-alchoholic beverages
+Other Beverages,Other Beverages,561,       Other beverage drinks   ,92,92. Non-alcoholic beverages
 Water,Water,565,       Mineral water (bottled) ,,
 Water,Water,566,       Satchet water   ,,
 Soft Drinks,Soft Drinks,567,       Coca Cola /Fanta/Sprite ,,
@@ -319,7 +319,7 @@ Beer,Beer,635,       National beer (star/club)       ,,
 Beer,Beer,636,"       Dark beer (e.g. Guilder, Guinness)      ",,
 Beer,Beer,637,       Beer (Imported) ,,
 Beer,Beer,638,       Traditional beer (Pito) ,,
-Other Alchoholic Beverage,Other Alchoholic Beverage,,,91,91. Alchoholic beverages
+Other Alcoholic Beverages,Other Alcoholic Beverages,,,91,91. Alcoholic beverages
 Cigarette,Tobacco,645,       Cigarette       ,,
 Tobacco,Tobacco,646,       Tobacco (processed)     ,,
 Other Tobacco,Other Tobacco,647,       Other tobacco products  ,,

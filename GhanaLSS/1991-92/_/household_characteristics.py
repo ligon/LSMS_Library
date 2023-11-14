@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 import sys
 sys.path.append('../../_')
-from ghana_panel import household_characteristics
+from ghana import household_characteristics
 
-t = '2009-10'
+t = '1991-92'
 
-myvars = dict(fn='../Data/S1D.dta', HHID='hhno',
-              age='s1d_4i',sex=('s1d_1',lambda s: s.lower()[0]),
+myvars = dict(fn='../Data/S1.DTA', HHID=['clust', 'nh'],
+              age='agey',sex=('sex',lambda s: 'male' if s == 1 else 'female'),
               months_spent=None)
 
 z = household_characteristics(**myvars)
