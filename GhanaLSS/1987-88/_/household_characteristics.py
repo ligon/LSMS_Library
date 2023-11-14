@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import sys
 sys.path.append('../../_')
-from ghana_panel import household_characteristics
+from ghana import household_characteristics
 
-t = '2009-10'
+t = '1987-88'
 
 myvars = dict(fn='../Data/S1D.dta', HHID='hhno',
               age='s1d_4i',sex=('s1d_1',lambda s: s.lower()[0]),
