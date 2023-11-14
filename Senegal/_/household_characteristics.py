@@ -15,7 +15,7 @@ hc = pd.concat(x)
 if 'm' not in hc.index.names:
     of = pd.read_parquet('../var/other_features.parquet')
 
-    hc = hc.join(of, on=['j','t'])
+    hc = hc.join(of.reset_index('m'), on=['j','t'])
     hc = hc.reset_index().set_index(['j','t','m'])
 hc.columns.name = 'k'
 

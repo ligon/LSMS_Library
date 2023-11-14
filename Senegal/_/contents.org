@@ -7,13 +7,8 @@ Brief table of contents and todo list.
 ** TODO Food Conversion
 ** DONE Nutrition
 ** DONE Makefile
-code works for available files
 
 * Files in Senegal/<SOMEYEAR>/_/
 ** DONE other_features.py
-CLOSED: [2023-07-24 Mon 10:32]
 ** DONE household_characteristics.py
-CLOSED: [2023-07-24 Mon 10:32]
 ** DONE food_acquired.py
-CLOSED: [2023-08-04 Tues 12:45]
-Food quantities and expenditures will need to be adjusted due to lack of total expenditure data, there is only data of the last expenditure.

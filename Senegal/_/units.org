@@ -1,0 +1,80 @@
+There are different codes for different units in the Senegal data; further the corresponding labels are sometimes irregular.
+
+This file aims to construct a consistent mapping for numeric unit codes for each round into a harmonized set of unit labels.
+
+#+name: unitlabels
+| Code                   | Preferred Label       |
+|------------------------+-----------------------|
+| Sachet                 | Sachet                |
+| Kg                     | Kg                    |
+| unité                  | Unit                  |
+| tas                    | Tas                   |
+| Morceau                | Morceau               |
+| Boite de tomate/Pot    | Boite De Tomate/Pot   |
+| paquet                 | Paquet                |
+| Litre                  | Litre                 |
+| Cube                   | Cube                  |
+| miche                  | Miche                 |
+| cuillère à&nbsp; soupe | Tablespoon            |
+| quart de litre         | Quart De Litre        |
+| verre à  thé           | Teacup                |
+| Boîte                  | Boîte                 |
+| pot                    | Pot                   |
+| Bouteilles             | Bouteilles            |
+| Bouteille de 25cl      | Bouteille de 25cl     |
+| Cuillère à café        | Teaspoon              |
+| tranche                | Tranche               |
+| Seau                   | Seau                  |
+| boule (dankk)          | Boule (Dankk)         |
+| Bouteille de 1l        | Bouteille de 1L       |
+| demi litre             | Demi Litre            |
+| Bouteille de 1,5 L     | Bouteille de 1,5 L    |
+| demi-miche             | Demi-Miche            |
+| cup/gobelet            | Cup/Goblet            |
+| Louche traditionnelle  | Louche Traditionnelle |
+| cornet                 | Cornet                |
+| bol                    | Bol                   |
+| 12,5cl(demi walatt)    | 12,5cl(Demi Walatt)   |
+| tablette               | Tablette              |
+| Bouteille de 50 cl     | Bouteille de 50 cl    |
+| bouteille de 1 litre   | Bouteille de 1 Litre  |
+| demi tablette          | Demi Tablette         |
+| Canette                | Canette               |
+| barquette              | Barquette             |
+| paquet (1 kg)          | Paquet (1 Kg)         |
+| Bouteille de 33cl      | Bouteille de 33cl     |
+| calebasse              | Calebasse             |
+| Bouteille de 5L        | Bouteille de 5L       |
+| Bouteille de 10L       | Bouteille de 10L      |
+| tablette (30)          | Tablette (30)         |
+| tiers de miche         | Tiers de Miche        |
+| sac                    | Sac                   |
+| régime                 | Régime                |
+| Brique carton          | Brique Carton         |
+| Bouteille de 19L       | Bouteille De 19L      |
+| verre                  | Verre                 |
+| Sac (25 Kg)            | Sac (25 Kg)           |
+| lakhass                | Lakhass               |
+| bouteille de 5 litres  | Bouteille de 5 Litres |
+| bassine                | Bassine               |
+| filet (1 kg)           | Filet (1 Kg)          |
+| quart de miche         | Quart de Miche        |
+| sac (50 kg)            | Sac (50 Kg)           |
+| Yéll                   | Yéll                  |
+| filet (5 kg)           | Filet (5 Kg)          |
+| panier                 | Panier                |
+| 1.0                    | Unit                  |
+| carton                 | Carton                |
+| sac (10 kg)            | Sac (10 Kg)           |
+
+#+begin_src python :var tab=unitlabels :colnames no :prologue "# -*- coding: utf-8 -*-" :tangle unitlabels.py
+from cfe.df_utils import orgtbl_to_df
+
+units = orgtbl_to_df(tab).set_index('Code')['Preferred Label']
+
+units.to_csv('unitlabels.csv')
+
+#+end_src
+
+#+results:
+: None
