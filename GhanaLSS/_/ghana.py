@@ -11,6 +11,25 @@ Waves = {'2005-06':(), #'parta/sec0.dta', 'hhid', ['clust','rhhno']
          '2016-17':()
          }
 
+def yearly_expenditure(row, cost = 'CFOODB', freq = 'TFOODB', freq_unit = 'UTFOODB', months = 'MFOODBLY'):
+    row = row.replace({'.':0})
+    val = float(row[cost]) * float(row[freq]) #cost each time * freq per time unit
+    if row[freq_unit] == '3': #if bought daily
+        val *= 30 * float(row[months]) # * days in a month * num of months item bought
+    elif row[freq_unit] == '4': #if bought weekly
+        val *= 4 * float(row[months]) # * weeks in a month * num of months item bought
+    elif row[freq_unit] == '5': #if bought monthly
+        val *= float(row[months]) # * num of months item bought
+    elif row[freq_unit] == '6': #if bought quarterly
+        val *= 4 # * quarters in a year 
+    elif row[freq_unit] == '7': #if bought semiannually
+        val *= 2 # * half years in a year
+    elif row[freq_unit] == '8': #if bought yearly
+        val *= 1
+    else:
+        val = 0
+    return val
+
 def load_large_dta(fn, convert_categoricals = False):
     import sys
 
@@ -133,7 +152,7 @@ def age_sex_composition(fn,sex='sex',sex_converter=None,
     
     return df
 
-def household_characteristics(fn='',sex='',age='',HHID='HHID',months_spent='months_spent'):
+def household_characteristics(fn='',sex='',age='',HHID='HHID',months_spent='months_spent', fn_type = 'stata'):
 
     if type(sex) in [list,tuple]:
         sex,sex_converter = sex
@@ -141,7 +160,7 @@ def household_characteristics(fn='',sex='',age='',HHID='HHID',months_spent='mont
         sex_converter = None
 
     with dvc.api.open(fn,mode='rb') as dta:
-        df = get_household_roster(dta,sex=sex,sex_converter=sex_converter,age=age,HHID=HHID,months_spent=months_spent,fn_type='stata')
+        df = get_household_roster(dta,sex=sex,sex_converter=sex_converter,age=age,HHID=HHID,months_spent=months_spent,fn_type=fn_type)
 
     df.index.name = 'j'
     df.columns.name = 'k'

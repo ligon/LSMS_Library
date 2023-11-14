@@ -5,9 +5,9 @@ from ghana import household_characteristics
 
 t = '1987-88'
 
-myvars = dict(fn='../Data/S1D.dta', HHID='hhno',
-              age='s1d_4i',sex=('s1d_1',lambda s: s.lower()[0]),
-              months_spent=None)
+myvars = dict(fn='../Data/Y01A.DAT', HHID= 'HID',
+              age='AGEY',sex=('SEX',lambda s: 'male' if s == 1 else 'female'),
+              months_spent=None, fn_type='csv')
 
 z = household_characteristics(**myvars)
 
