@@ -11,7 +11,28 @@ import warnings
 
 
 def main(country):
-    x = pd.read_parquet(f"../{country}/var/food_expenditures.parquet")
+    xfn = f"../{country}/var/food_expenditures.parquet"
+    x = pd.read_parquet(xfn)
+
+    idx_value_counts = {idxname:len(set(x.index.get_level_values(idxname))) for idxname in x.index.names}
+
+    if idx_value_counts['j'] < idx_value_counts['i']:
+        warnings.warn(f'In {xfn} the index j should index households; index i should index goods.\n'
+        + 'It looks like these are backwards? (There should probably be more households than goods!)\n'
+        + 'Switching these around.')
+        x = x.rename(index={'i':'j','j':'i'})
+
+    if 't' not in idx_value_counts.keys():
+        warnings.warn(f'In {xfn} we should have a t index for period!\nAdding a dummy value.')
+        x['t'] = 0
+        x = x.set_index('t',append=True)
+
+    if 'm' not in idx_value_counts.keys():
+        warnings.warn(f'In {xfn} we should have a m index for markets!\nAdding a dummy value.')
+        x['m'] = 0
+        x = x.set_index('m',append=True)
+
+    x = x.reorder_levels(['j','t','m','i'])
 
     assert x.index.names == ['j','t','m','i'], "Indices incorrectly named or ordered."
     x = add_markets_from_other_features(country,x)
