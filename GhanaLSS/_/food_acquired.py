@@ -10,12 +10,17 @@ import sys
 sys.path.append('../../_/')
 from local_tools import df_from_orgfile
 
-# def fix_food_labels():
-#     D = {}
-#     for w in Waves.keys():
-#         D.update(harmonized_food_labels(fn='./food_items.org',key=w))
+#harmonize food labels 
+labels = df_from_orgfile('./food_items.org',name='food_label',encoding='ISO-8859-1')
+labelsd = {}
+for column in Waves:
+    labels[column] = labels[column].astype('string')
+    labelsd[column] = labels[['Preferred Label', column]].set_index(column).to_dict('dict')
 
-#     return D
+#harmonize unit labels 
+ulabels = df_from_orgfile('./unit_labels.org',name='unit_label',encoding='ISO-8859-1')
+ulabelsd = {}
+ulabelsd['u'] = ulabels.set_index('u').to_dict('dict')
 
 def id_walk(df,wave,waves):
 
@@ -28,11 +33,6 @@ def id_walk(df,wave,waves):
             df = change_id(df)
     return df
 
-#harmonize unit labels 
-# units = df_from_orgfile('./units.org',name='harmonizedunit',encoding='ISO-8859-1')
-# unitsd = units.set_index('Preferred Label').squeeze().to_dict('dict')
-# for k in unitsd.keys():
-#     unitsd[k] = {v: k for k, v in unitsd[k].items()}
 
 dfs = []
 for t in Waves.keys():
@@ -47,6 +47,8 @@ for t in Waves.keys():
     df1 = df1.reset_index()
     df1['t_temp'] = df1['t']
     df1['t'] = t
+    df1['i'] = df1['i'].astype('string').replace(labelsd[t]['Preferred Label'])
+    df1['u'] = df1['u'].astype('string').replace(ulabelsd['u']['Preferred Label'])
     df1 = df1.set_index(['j', 't', 'i', 'u'])
     print(df1)
     dfs.append(df1)

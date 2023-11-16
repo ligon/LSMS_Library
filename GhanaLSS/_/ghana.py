@@ -6,7 +6,11 @@ import dvc.api
 from collections import defaultdict
 
 # Data to link household ids across waves
-Waves = {'2005-06':(), #'parta/sec0.dta', 'hhid', ['clust','rhhno']
+Waves = {'1987-88': (),
+         '1988-89': (),
+         '1991-92': (),
+         '1998-99': (),
+         '2005-06':(), #'parta/sec0.dta', 'hhid', ['clust','rhhno']
          '2012-13':(), #'PARTA/SEC0.dta', 'HID', ['clust', 'rhhno']
          '2016-17':()
          }
