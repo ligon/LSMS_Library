@@ -1,0 +1,354 @@
+The following tables are mapping of numerical codes to categorical labels for 1998-99
+
+* SEC0A
+
+#+name: region
+| Code | Label         |
+|------+---------------|
+|    1 | Western       |
+|    2 | Central       |
+|    3 | Greater Accra |
+|    4 | Eastern       |
+|    5 | Volta         |
+|    6 | Ashanti       |
+|    7 | Brong Ahafo   |
+|    8 | Northern      |
+|    9 | Upper East    |
+|   10 | Upper West    |
+
+#+name: rural
+| Code | Label |
+|------+-------|
+|    1 | Urban |
+|    2 | Rural |
+
+
+* SEC8H
+
+#+name: s8hq9
+| Code | Label         |
+|------+---------------|
+|    0 | None          |
+|    1 | Pounds        |
+|    2 | Kilogram      |
+|    3 | Ton           |
+|    4 | Mini bag      |
+|    5 | Maxi bag      |
+|    6 | Sheet         |
+|    7 | Basket        |
+|    8 | Bowl          |
+|    9 | American tin  |
+|   10 | Tree          |
+|   11 | Stick         |
+|   12 | Bundle        |
+|   13 | Barrel        |
+|   14 | Liter         |
+|   15 | Gallon        |
+|   16 | Beer Bottle   |
+|   17 | Bunch         |
+|   18 | Nut           |
+|   19 | Fruits        |
+|   20 | Log           |
+|   21 | Box           |
+|   22 | Margarine tin |
+|   23 | Tubers        |
+|   24 | Fingers       |
+|   25 | All           |
+
+#+name: homagrcd
+| Code | Label                          |
+|------+--------------------------------|
+|    1 | Rice (paddy, grain)            |
+|    2 | Maize cob (fresh)              |
+|    3 | Maize flour/dough              |
+|    4 | Sorghum                        |
+|    5 | Millet grain                   |
+|    6 | Millet flour                   |
+|    7 | Guinea corn                    |
+|    8 | Other grains                   |
+|    9 | Other flours                   |
+|   10 | Cassava –roots                 |
+|   11 | Cassava –gari                  |
+|   12 | Cassava (other forms)          |
+|   13 | Yams                           |
+|   14 | Cocoyams                       |
+|   15 | Plantain                       |
+|   16 | Sweet potatoes                 |
+|   17 | Other roots & tubers           |
+|   20 | Banbara beans                  |
+|   21 | Palm Oil                       |
+|   22 | Cowpeas                        |
+|   23 | Groundnuts (roasted or raw)    |
+|   24 | Other Pulses or Legumes        |
+|   25 | Palm nuts                      |
+|   26 | Coconuts                       |
+|   27 | Coconuts oil                   |
+|   28 | Sheabutter                     |
+|   29 | Other nuts, & Seeds            |
+|   30 | Bananas                        |
+|   31 | Water Melon                    |
+|   32 | Oranges, tangerine             |
+|   33 | Mangoes                        |
+|   34 | Pawpaw                         |
+|   35 | Avocado pears                  |
+|   36 | Pineapples                     |
+|   37 | Other fruits                   |
+|   40 | Tomatoes                       |
+|   41 | Onions                         |
+|   42 | Carrots                        |
+|   43 | Okro                           |
+|   44 | Gardens eggs, Cucumbers        |
+|   45 | Pepper                         |
+|   46 | Cabbage/Lettuce                |
+|   47 | Spinach/other Leafy vegetables |
+|   48 | Other vegetables               |
+|   60 | Chicken                        |
+|   61 | Other Dom. Poultry             |
+|   62 | Game birds                     |
+|   63 | Beef                           |
+|   64 | Mutton                         |
+|   65 | Pork                           |
+|   66 | Goat                           |
+|   67 | Other Domestic meat            |
+|   68 | Wild game                      |
+|   69 | Fish & Shellfish               |
+|   70 | Eggs                           |
+|   71 | Milk                           |
+|   90 | Alcoholic beverages            |
+|   91 | Non-alcoholic                  |
+
+
+* SEC9B
+
+#+name: fdexpcd
+| Code | Label                                           |
+|------+-------------------------------------------------|
+|    1 | Guinea corn/sorghum                             |
+|    2 | Maize                                           |
+|    3 | Millet                                          |
+|    4 | Rice                                            |
+|    5 | Maize flour and products (not Koko)             |
+|    6 | Bread, buns                                     |
+|    7 | Biscuits                                        |
+|    8 | Flour and other cereal products                 |
+|    9 | Cassava                                         |
+|   10 | Cocoyam                                         |
+|   11 | Plantain                                        |
+|   12 | Yam                                             |
+|   13 | Other starchy roots and tubers                  |
+|   14 | Konkonte                                        |
+|   15 | Gari                                            |
+|   16 | Cassava dough                                   |
+|   17 | Other starchy products                          |
+|   18 | Small beans                                     |
+|   19 | Banbara Beans                                   |
+|   20 | Broad beans                                     |
+|   21 | Groundnuts                                      |
+|   22 | Other Pulses                                    |
+|   23 | Dawadawa                                        |
+|   24 | Kola nut                                        |
+|   25 | Palm nut                                        |
+|   26 | Other oil seeds and nuts                        |
+|   27 | Animals Fats                                    |
+|   28 | Coconut oil                                     |
+|   29 | Groundnut oil                                   |
+|   30 | Palm kernel oil                                 |
+|   31 | Red palm oil                                    |
+|   32 | Shea butter                                     |
+|   33 | Margarine                                       |
+|   34 | Other Vegetable oil & fats                      |
+|   35 | Avocado pear                                    |
+|   36 | Banana                                          |
+|   37 | Mango                                           |
+|   38 | Orange                                          |
+|   39 | Pineapple                                       |
+|   40 | Other fruits (not canned)                       |
+|   41 | Fruit canned                                    |
+|   42 | Fruit juices                                    |
+|   60 | Chicken                                         |
+|   61 | Duck                                            |
+|   62 | Guinea fowl                                     |
+|   63 | Other poultry                                   |
+|   64 | Chicken eggs                                    |
+|   65 | Other eggs (not chicken)                        |
+|   66 | Fresh milk                                      |
+|   67 | Milk powder                                     |
+|   68 | Baby milk                                       |
+|   69 | Milk tinned (unsweetened)                       |
+|   70 | Other milk products (Including butter & cheese) |
+|   71 | Smoked fish                                     |
+|   72 | Crustaceans (Lobster, crab Prawns etc)          |
+|   73 | Fish (fresh and frozen)                         |
+|   74 | Fish (dried)                                    |
+|   75 | Fish (fried)                                    |
+|   76 | Canned fish                                     |
+|   77 | Other fish                                      |
+|   78 | Sugar                                           |
+|   79 | Pepper (dry)                                    |
+|   80 | Salt                                            |
+|   81 | Other Condiments & Spices                       |
+|   82 | Coffee                                          |
+|   83 | Chocolate Drinks                                |
+|   84 | Tea                                             |
+|   85 | Other (not beverage)                            |
+|   86 | Cooked Rice and Stew                            |
+|   87 | Fufu and Soup                                   |
+|   88 | Tuo and Soup                                    |
+|   89 | Banku and Stew                                  |
+|   90 | Kenkey                                          |
+|   91 | Koko                                            |
+|   92 | Other Prepared Meals                            |
+|   93 | Jams                                            |
+|   94 | Honey                                           |
+|   95 | Confectionary not Frozen                        |
+|   96 | Ice Cream, Ice Lollics                          |
+|   97 | Other Miscellaneous Food Items                  |
+|   98 | Soft Drinks and Minerals                        |
+|   99 | Local and Imported Beer and Guinness            |
+|  100 | Palm Wine                                       |
+|  101 | Pito                                            |
+|  102 | Akpeteshie and Other Local Spirits              |
+|  103 | Gin                                             |
+|  104 | Other Alcoholic Beverages                       |
+|  105 | Cigarette                                       |
+|  106 | Tobacco                                         |
+|  107 | Other Tobacco Products                          |
+
+
+
+* Harmonizing Food Lables across SEC8H and SEC9B
+
+#+name: harmonize_food
+| Preferred Label                | Aggregate Label                | Code_9b | Label_9b                                        | Code_8h | Label_8h                       |
+|--------------------------------+--------------------------------+---------+-------------------------------------------------+---------+--------------------------------|
+| Guinea corn/sorghum            | Guinea corn/sorghum            |       1 | Guinea corn/sorghum                             |         |                                |
+| Sorghum                        | Sorghum                        |         |                                                 |       4 | Sorghum                        |
+| Guinea Corn                    | Guinea Corn                    |         |                                                 |       7 | Guinea corn                    |
+| Maize                          | Maize                          |       2 | Maize                                           |         |                                |
+| Maize (cob)                    | Maize                          |         |                                                 |       2 | Maize cob (fresh)              |
+| Maize (flour/dough)            | Maize                          |       5 | Maize flour and products (not Koko)             |       3 | Maize flour/dough              |
+| Millet                         | Millet                         |       3 | Millet                                          |       5 | Millet grain                   |
+| Rice                           | Rice                           |       4 | Rice                                            |       1 | Rice (paddy, grain)            |
+| Millet (flour)                 | Millet                         |         |                                                 |       6 | Millet flour                   |
+| Bread                          | Bread                          |       6 | Bread, buns                                     |         |                                |
+| Biscuit                        | Biscuit                        |       7 | Biscuits                                        |         |                                |
+| Other Grain                    | Other Grain                    |         |                                                 |       8 | Other grains                   |
+| Other Flour                    | Other Flour                    |       8 | Flour and other cereal products                 |       9 | Other flours                   |
+| Cassava                        | Cassava                        |       9 | Cassava                                         |      10 | Cassava –roots                 |
+| Cocoyam                        | Cocoyam                        |      10 | Cocoyam                                         |      14 | Cocoyams                       |
+| Plantain                       | Plantain                       |      11 | Plantain                                        |      15 | Plantain                       |
+| Yam                            | Yam                            |      12 | Yam                                             |      13 | Yams                           |
+| Sweet Potato                   | Sweet Potato                   |         |                                                 |      16 | Sweet potatoes                 |
+| Other Tubers                   | Other Tubers                   |      13 | Other starchy roots and tubers                  |      17 | Other roots & tubers           |
+| Konkonte                       | Konkonte                       |      14 | Konkonte                                        |         |                                |
+| Cassava (flour)                | Cassava                        |      15 | Gari                                            |      11 | Cassava –gari                  |
+| Cassava (dough)                | Cassava                        |      16 | Cassava dough                                   |      12 | Cassava (other forms)          |
+| Other Starchy Products         | Other Starchy Products         |      17 | Other starchy products                          |         |                                |
+| Cowpea                         | Pulses, Nuts                   |         |                                                 |      22 | Cowpeas                        |
+| Small Bean                     | Pulses, Nuts                   |      18 | Small beans                                     |         |                                |
+| Bambara Bean                   | Pulses, Nuts                   |      19 | Banbara Beans                                   |      20 | Banbara beans                  |
+| Broad Bean                     | Pulses, Nuts                   |      20 | Broad beans                                     |         |                                |
+| Groundnut                      | Pulses, Nuts                   |      21 | Groundnuts                                      |      23 | Groundnuts (roasted or raw)    |
+| Other Pulses                   | Pulses, Nuts                   |      22 | Other Pulses                                    |      24 | Other Pulses or Legumes        |
+| Dawadawa                       | Pulses, Nuts                   |      23 | Dawadawa                                        |         |                                |
+| Kola Nut                       | Pulses, Nuts                   |      24 | Kola nut                                        |         |                                |
+| Palm Nut                       | Pulses, Nuts                   |      25 | Palm nut                                        |      25 | Palm nuts                      |
+| Coconut                        | Pulses, Nuts                   |         |                                                 |      26 | Coconuts                       |
+| Other Oil Seeds                | Pulses, Nuts                   |      26 | Other oil seeds and nuts                        |      29 | Other nuts, & Seeds            |
+| Animals Fat                    | Oils, Fats                     |      27 | Animals Fats                                    |         |                                |
+| Oil (coconut)                  | Oils, Fats                     |      28 | Coconut oil                                     |      27 | Coconuts oil                   |
+| Oil (groundnut)                | Oils, Fats                     |      29 | Groundnut oil                                   |         |                                |
+| Oil (palm kernel)              | Oils, Fats                     |      30 | Palm kernel oil                                 |      21 | Palm Oil                       |
+| Oil (red palm)                 | Oils, Fats                     |      31 | Red palm oil                                    |         |                                |
+| Shea Butter                    | Oils, Fats                     |      32 | Shea butter                                     |      28 | Sheabutter                     |
+| Margarine                      | Oils, Fats                     |      33 | Margarine                                       |         |                                |
+| Other Oils                     | Oils, Fats                     |      34 | Other Vegetable oil & fats                      |         |                                |
+| Avocado                        | Avocado                        |      35 | Avocado pear                                    |      35 | Avocado pears                  |
+| Banana                         | Banana                         |      36 | Banana                                          |      30 | Bananas                        |
+| Watermelon                     | Watermelon                     |         |                                                 |      31 | Water Melon                    |
+| Mango                          | Mango                          |      37 | Mango                                           |      33 | Mangoes                        |
+| Orange                         | Orange                         |      38 | Orange                                          |      32 | Oranges, tangerine             |
+| Pineapple                      | Pineapple                      |      39 | Pineapple                                       |      36 | Pineapples                     |
+| Pawpaw                         |                                |         |                                                 |      34 | Pawpaw                         |
+| Other Fruits                   | Other Fruits                   |      40 | Other fruits (not canned)                       |      37 | Other fruits                   |
+| Canned Fruits                  | Canned Fruits                  |      41 | Fruit canned                                    |         |                                |
+| Juice                          | Juice                          |      42 | Fruit juices                                    |         |                                |
+| Tomato                         | Tomato                         |         |                                                 |      40 | Tomatoes                       |
+| Onion                          | Onion                          |         |                                                 |      41 | Onions                         |
+| Carrot                         | Carrot                         |         |                                                 |      42 | Carrots                        |
+| Okra                           | Okra                           |         |                                                 |      43 | Okro                           |
+| Eggplant/Cucumber              | Eggplant/Cucumber              |         |                                                 |      44 | Gardens eggs, Cucumbers        |
+| Pepper                         | Pepper                         |         |                                                 |      45 | Pepper                         |
+| Cabbage                        | Cabbage                        |         |                                                 |      46 | Cabbage/Lettuce                |
+| Spinach                        | Spinach                        |         |                                                 |      47 | Spinach/other Leafy vegetables |
+| Other Vegetables               | Other Vegetables               |         |                                                 |      48 | Other vegetables               |
+| Chicken                        | Chicken                        |      60 | Chicken                                         |      60 | Chicken                        |
+| Duck                           | Duck                           |      61 | Duck                                            |         |                                |
+| Guinea Fowl                    | Guinea Fowl                    |      62 | Guinea fowl                                     |         |                                |
+| Other Poultry                  | Other Poultry                  |      63 | Other poultry                                   |      61 | Other Dom. Poultry             |
+| Other Meat                     | Other Meat                     |         |                                                 |      62 | Game birds                     |
+| Eggs                           | Eggs                           |      64 | Chicken eggs                                    |      70 | Eggs                           |
+| Other Eggs                     | Other Eggs                     |      65 | Other eggs (not chicken)                        |         |                                |
+| Beef                           | Beef                           |         |                                                 |      63 | Beef                           |
+| Goat                           | Goat                           |         |                                                 |      64 | Mutton                         |
+| Pork                           | Pork                           |         |                                                 |      65 | Pork                           |
+| Goat                           | Goat                           |         |                                                 |      66 | Goat                           |
+| Other Meat                     | Other Meat                     |         |                                                 |      67 | Other Domestic meat            |
+| Other Meat                     | Other Meat                     |         |                                                 |      68 | Wild game                      |
+| Milk (fresh)                   | Milk                           |      66 | Fresh milk                                      |      71 | Milk                           |
+| Milk (powder)                  | Milk                           |      67 | Milk powder                                     |         |                                |
+| Baby Milk                      | Milk                           |      68 | Baby milk                                       |         |                                |
+| Milk (tinned, unsweetened)     | Milk                           |      69 | Milk tinned (unsweetened)                       |         |                                |
+| Other Milk Products            | Milk                           |      70 | Other milk products (Including butter & cheese) |         |                                |
+| Fish (smoked)                  | Fish                           |      71 | Smoked fish                                     |         |                                |
+| Crustaceans                    | Fish                           |      72 | Crustaceans (Lobster, crab Prawns etc)          |         |                                |
+| Fish (fresh and frozen)        | Fish                           |      73 | Fish (fresh and frozen)                         |      69 | Fish & Shellfish               |
+| Fish (dried)                   | Fish                           |      74 | Fish (dried)                                    |         |                                |
+| Fish (fried)                   | Fish                           |      75 | Fish (fried)                                    |         |                                |
+| Fish (canned)                  | Fish                           |      76 | Canned fish                                     |         |                                |
+| Other Fish                     | Other Fish                     |      77 | Other fish                                      |         |                                |
+| Sugar                          | Sugar                          |      78 | Sugar                                           |         |                                |
+| Pepper (dry)                   | Pepper                         |      79 | Pepper (dry)                                    |         |                                |
+| Salt                           | Salt                           |      80 | Salt                                            |         |                                |
+| Other Condiments & Spices      | Other Condiments & Spices      |      81 | Other Condiments & Spices                       |         |                                |
+| Coffee                         | Coffee                         |      82 | Coffee                                          |         |                                |
+| Chocolate Drink                | Chocolate Drink                |      83 | Chocolate Drinks                                |         |                                |
+| Tea                            | Tea                            |      84 | Tea                                             |         |                                |
+| Other Drink                    | Other Drink                    |      85 | Other (not beverage)                            |         |                                |
+| Other Beverage                 | Other Beverage                 |         |                                                 |      91 | Non-alcoholic beverages        |
+| Cooked Rice and Stew           | Cooked Rice and Stew           |      86 | Cooked Rice and Stew                            |         |                                |
+| Soup                           | Soup                           |      87 | Fufu and Soup                                   |         |                                |
+| Soup                           | Soup                           |      88 | Tuo and Soup                                    |         |                                |
+| Banku                          | Banku                          |      89 | Banku and Stew                                  |         |                                |
+| Kenkey                         | Kenkey                         |      90 | Kenkey                                          |         |                                |
+| Koko                           | Koko                           |      91 | Koko                                            |         |                                |
+| Other Prepared Meals           | Other Prepared Meals           |      92 | Other Prepared Meals                            |         |                                |
+| Jam                            | Jam                            |      93 | Jam                                             |         |                                |
+| Honey                          | Honey                          |      94 | Honey                                           |         |                                |
+| Confectionary (not frozen)     | Confectionary (not frozen)     |      95 | Confectionary not Frozen                        |         |                                |
+| Ice Cream                      | Ice Cream                      |      96 | Ice Cream, Ice Lollics                          |         |                                |
+| Other Miscellaneous Food Items | Other Miscellaneous Food Items |      97 | Other Miscellaneous Food Items                  |         |                                |
+| Soft Drinks                    | Soft Drinks                    |      98 | Soft Drinks and Minerals                        |         |                                |
+| Beer                           | Beer                           |      99 | Local and Imported Beer and Guinness            |         |                                |
+| Wine                           | Wine                           |     100 | Palm Wine                                       |         |                                |
+| Beer                           | Beer                           |     101 | Pito                                            |         |                                |
+| Akpeteshie                     | Spirits                        |     102 | Akpeteshie and Other Local Spirits              |         |                                |
+| Gin                            | Spirits                        |     103 | Gin                                             |         |                                |
+| Other Alcoholic Beverages      | Other Alcoholic Beverages      |     104 | Other Alcoholic Beverages                       |      90 | Alcoholic beverages            |
+| Cigarette                      | Cigarette                      |     105 | Cigarette                                       |         |                                |
+| Tobacco                        | Tobacco                        |     106 | Tobacco                                         |         |                                |
+| Other Tobacco                  | Other Tobacco                  |     107 | Other Tobacco Products                          |         |                                |
+
+
+
+#+begin_src python :var tab=unitlabels :colnames no :prologue "# -*- coding: utf-8 -*-" :tangle unitlabels.py
+from cfe.df_utils import orgtbl_to_df
+
+units = orgtbl_to_df(tab).set_index('Code')['Preferred Label']
+
+units.to_csv('unitlabels.csv')
+
+#+end_src
+
+#+results:
+: None

@@ -12,15 +12,17 @@ t = '2016-17'
 harmonized_label = pd.read_csv('food_label.csv', encoding='ISO-8859-1')
 
 #food expenditure 
-myvars = dict(fn='../Data/g7sec9b.dta')
-with dvc.api.open(myvars['fn'],mode='rb') as dta:
+myvars = dict(fn='../Data/g7sec9b_small.dta')
+#with dvc.api.open(myvars['fn'],mode='rb') as dta:
+with open(myvars['fn'],mode='rb') as dta:
     labels = pd.read_stata(dta, iterator=True).value_labels()
-with dvc.api.open(myvars['fn'],mode='rb') as dta:
+#with dvc.api.open(myvars['fn'],mode='rb') as dta:
+with open(myvars['fn'],mode='rb') as dta:
     df = load_large_dta(dta, convert_categoricals=False)
     #harmonize food labels and fix missing unit labels:
     labels['freqcd'] = harmonized_label[['Preferred Label', 'Code_9b']].dropna().set_index('Code_9b').to_dict('dict')['Preferred Label']
-    for i in range(1, 7):
-        labels[f's9bq{i}c'] = labels['S9BQ1C']
+    #for i in range(1, 7):
+    #    labels[f's9bq{i}c'] = labels['S9BQ1C']
 
     df = df.replace(labels)
 
@@ -31,7 +33,7 @@ for i in range(1, 7):
     visit = i + 1
     selector_pur[f's9bq{i}a'] = f'purchased_value_v{visit}'
     selector_pur[f's9bq{i}b'] = f'purchased_quantity_v{visit}'
-    selector_pur[f's9bq{i}c'] = f'purchased_unit_v{visit}'
+    #selector_pur[f's9bq{i}c'] = f'purchased_unit_v{visit}'
 x = df.rename(columns=selector_pur)[[*selector_pur.values()]]
 #only select food expenditures,since section9b also recorded non-food expenditures
 #non-food expenditures remained as numerical codes in previous harmonization steps 

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 import sys
 sys.path.append('../../_/')
 import pandas as pd
@@ -7,20 +6,19 @@ import numpy as np
 import json
 import dvc.api
 from lsms import from_dta
+sys.path.append('../../../_/')
+from local_tools import df_from_orgfile
 
-with dvc.api.open('../Data/key_hhld_info.dta', mode='rb') as dta:
-    df = from_dta(dta, convert_categoricals=True)
+with dvc.api.open('../Data/Y00A.DAT', mode='rb') as csv:
+    df = pd.read_csv(csv)
 
-of = df[['hhno','id1','urbrur']]
+of = df[['HID']].drop_duplicates()
+of = of.rename(columns = {'HID': 'j'})
 
-of = of.rename(columns = {'hhno': 'j',
-                          'id1': 'm',
-                          'urbrur': 'Rural'})
-
+#no data on specific region and rural/urban classification
 of['j'] = of['j'].astype(str)
-of['t'] = '2009-10'
+of['t'] = '1987-88'
+of['m'] = 'Ghana'
+of['Rural'] = np.nan
 of = of.set_index(['j','t','m'])
-
-of['Rural'] = (of.Rural=='Rural') + 0.
-
 of.to_parquet('other_features.parquet')

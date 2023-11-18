@@ -511,18 +511,21 @@ import pandas as pd
 import numpy as np
 
 food = pd.read_parquet('./food_expenditures.parquet')
-nonfood = pd.read_parquet('./nonfood_expenditures.parquet')
+#nonfood = pd.read_parquet('./nonfood_expenditures.parquet')
 
-x = food.join(nonfood,how='outer')
+x = food #.join(nonfood,how='outer')
 
-y = np.log(x)
+y = np.log(x.stack())
+y.index.names = ['i','t','m','j']
+
 z = pd.read_parquet('../_/household_characteristics.parquet')
+z.index.names = ['i','t','m']
 
-r = cfe.Result(y=y,z=z)
+r = cfe.Regression(y=y,d=z)
 
-r.get_predicted_expenditures()
+r.predicted_expenditures()
 
-print(cfe.df_utils.df_to_orgtbl(r.get_beta(as_df=True).sort_values(ascending=False),float_fmt='%3.2'))
+print(cfe.df_utils.df_to_orgtbl(r.get_beta().sort_values(ascending=False),float_fmt='%3.2'))
 #+end_src
 
 #+results:
