@@ -38,6 +38,7 @@ df = df.reset_index().merge(conversions, how='left', left_on=['i', 'm', 'unitcod
 df = df.merge(conversions, how='left', left_on=['i', 'm', 'unitcode_bought'], right_on=['item_name', 'region', 'unit_code']).rename({'factor' : 'cfactor_bought'}, axis = 1)
 df = df.set_index(['j', 'm', 'i'])
 
+# custom convert some units in formats such as "300 grams" into kg, typically handled by handling_unusual_units in malawi.py for data with conversion tables
 grams = r'(\d+)\s*g(?:\s+|r)'
 kgs =r'(\d+)\s*k(?:g|ilo)'
 
@@ -57,6 +58,7 @@ df['u_consumed'] = df['u_consumed'].replace('nan', np.NaN).fillna(df['unitcode_c
 df['u_bought'] = np.where(~df['cfactor_bought'].isna(), 'kg', df['unitsdetail_bought'])
 df['u_bought'] = df['u_bought'].replace('nan', np.NaN).fillna(df['unitcode_bought'])
 
+# prices
 df['price per unit'] = df['expenditure']/df['quantity_bought']
 
 final = df.loc[:, ['quantity_consumed', 'u_consumed', 'quantity_bought', 'u_bought', 'price per unit', 'expenditure', 'cfactor_consumed', 'cfactor_bought']]

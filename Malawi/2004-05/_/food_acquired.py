@@ -33,6 +33,7 @@ df = df.join(regions).set_index('m', append=True).replace(r'^\s*$', np.nan, rege
 
 df = df.reset_index().set_index(['j', 'm', 'i']).replace(r'^\s*$', np.NaN, regex=True)
 
+#custom convert some units in formats such as "300 grams" into kg, typically handled by handling_unusual_units in malawi.py for data with conversion tables
 grams = r'(\d+)\s*g(?:\s+|r)'
 kgs =r'(\d+)\s*k(?:g|ilo)'
 
@@ -50,6 +51,7 @@ df["quantity_bought"] = df['quantity_bought'].mul(df['cfactor_bought'].fillna(1)
 df['u_consumed'] = np.where(~df['cfactor_consumed'].isna(), 'kg', df['u_consumed'])
 df['u_bought'] = np.where(~df['cfactor_bought'].isna(), 'kg', df['u_bought'])
 
+#prices
 df['price per unit'] = df['expenditure']/df['quantity_bought']
 
 final = df.loc[:, ['quantity_consumed', 'u_consumed', 'quantity_bought', 'u_bought', 'price per unit', 'expenditure', 'cfactor_consumed', 'cfactor_bought']]

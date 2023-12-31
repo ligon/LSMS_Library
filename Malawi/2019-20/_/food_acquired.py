@@ -33,13 +33,14 @@ df[cols] = df[cols].apply(pd.to_numeric, errors='coerce')
 df = df.set_index(['j', 'i'])
 df = df.join(regions).set_index('m', append=True).replace(r'^\s*$', np.nan, regex=True)
 
+#handling conversion table
 conversions['item_name'] = conversions['item_name'].apply(clean_text)
 conversions = conversions.replace({'South': 'Southern'}).groupby(['region', 'item_name', 'unit_code']).agg({'factor': 'mean'})
 df = df.reset_index().merge(conversions, how='left', left_on=['i', 'm', 'unitcode_consumed'], right_on=['item_name', 'region', 'unit_code']).rename({'factor' : 'cfactor_consumed'}, axis=1)
 df = df.merge(conversions, how='left', left_on=['i', 'm', 'unitcode_bought'], right_on=['item_name', 'region', 'unit_code']).rename({'factor' : 'cfactor_bought'}, axis = 1)
 df = df.set_index(['j', 'm', 'i'])
-
 df = handling_unusual_units(df)
+
 df['price per unit'] = df['expenditure']/df['quantity_bought']
 
 final = df.loc[:, ['quantity_consumed', 'u_consumed', 'quantity_bought', 'u_bought', 'price per unit', 'expenditure', 'cfactor_consumed', 'cfactor_bought']]
