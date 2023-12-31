@@ -1,0 +1,832 @@
+item_name,unit_code,region,factor
+Maize ufa mgaiwa normal flour,4,North,1.93
+Maize ufa mgaiwa normal flour,4A,North,1.93
+Maize ufa mgaiwa normal flour,4B,North,13.72
+Maize ufa mgaiwa normal flour,4C,North,15.19
+Maize ufa mgaiwa normal flour,5,North,15.19
+Maize ufa mgaiwa normal flour,7,North,0.35
+Maize ufa mgaiwa normal flour,21,North,2.95
+Maize ufa refined fine flour,4,North,1.83
+Maize ufa refined fine flour,4A,North,1.83
+Maize ufa refined fine flour,4B,North,13.74
+Maize ufa refined fine flour,4C,North,15.19
+Maize ufa refined fine flour,5,North,15.19
+Maize ufa refined fine flour,7,North,0.33
+Maize ufa refined fine flour,21,North,7.76
+Maize ufa madeya bran flour,4,North,1.64
+Maize ufa madeya bran flour,4A,North,1.64
+Maize ufa madeya bran flour,4B,North,11.38
+Maize ufa madeya bran flour,4C,North,17.67
+Maize ufa madeya bran flour,5,North,17.67
+Maize grain not as ufa,4,North,4.38
+Maize grain not as ufa,4A,North,4.38
+Maize grain not as ufa,4B,North,9.19
+Maize grain not as ufa,4C,North,18.49
+Maize grain not as ufa,5,North,18.49
+Maize grain not as ufa,6,North,0.2
+Maize grain not as ufa,7,North,0.33
+Maize grain not as ufa,16,North,0.3
+Maize grain not as ufa,21,North,4.05
+Green maize,9,North,0.38
+Green maize,9A,North,0.24
+Green maize,9B,North,0.38
+Green maize,9C,North,0.53
+Rice,4,North,2.48
+Rice,4B,North,5.88
+Rice,6,North,0.13
+Rice,7,North,0.34
+Rice,16,North,0.62
+Rice,21,North,4.2
+Finger millet mawere,6,North,0.2
+Finger millet mawere,7,North,0.35
+Finger millet mawere,16,North,0.25
+Finger millet mawere,21,North,4.58
+Sorghum mapira,6,North,0.16
+Sorghum mapira,7,North,0.21
+Sorghum mapira,21,North,2.17
+Pearl millet mchewere,4,North,3.87
+Pearl millet mchewere,4B,North,10.27
+Wheat flour,9,North,1.01
+Bread,9,North,0.56
+"Buns, scones",9,North,0.14
+Biscuits,9,North,0.14
+Biscuits,22,North,0.14
+"Spaghetti, macaroni, pasta",9,North,0.38
+"Spaghetti, macaroni, pasta",22,North,0.39
+Cassava tubers,9,North,0.3
+Cassava tubers,9A,North,0.13
+Cassava tubers,9B,North,0.3
+Cassava tubers,9C,North,0.46
+Cassava tubers,10,North,0.98
+Cassava flour,4,North,4.01
+Cassava flour,4A,North,4.01
+Cassava flour,4B,North,10.03
+Cassava flour,7,North,0.2
+White sweet potato,4,North,4.79
+White sweet potato,4B,North,11.55
+White sweet potato,9,North,0.15
+White sweet potato,9A,North,0.07
+White sweet potato,9B,North,0.15
+White sweet potato,9C,North,0.34
+White sweet potato,10,North,1.11
+White sweet potato,10A,North,0.7
+White sweet potato,10B,North,1.11
+White sweet potato,10C,North,2.04
+Orange sweet potato,9,North,0.1
+Orange sweet potato,9A,North,0.04
+Orange sweet potato,9B,North,0.1
+Orange sweet potato,9C,North,0.24
+Orange sweet potato,10,North,1.16
+Orange sweet potato,10A,North,0.73
+Orange sweet potato,10B,North,1.16
+Orange sweet potato,10C,North,1.98
+Irish potato,4,North,3.01
+Irish potato,4A,North,3.01
+Irish potato,4B,North,9.31
+Irish potato,4C,North,18.02
+Irish potato,5,North,18.02
+Irish potato,10,North,1.01
+Irish potato,21,North,6.65
+Potato crisps,9,North,0.03
+Potato crisps,22,North,0.03
+"Plantain, cooking banana",8A,North,1.68
+"Plantain, cooking banana",8C,North,9.42
+"Plantain, cooking banana",9,North,0.12
+Cocoyam masimbi,9,North,0.74
+Cocoyam masimbi,10,North,1.25
+"Bean, white",6,North,0.13
+"Bean, white",7,North,0.27
+"Bean, white",16,North,0.48
+"Bean, brown",6,North,0.15
+"Bean, brown",6A,North,0.13
+"Bean, brown",6B,North,0.23
+"Bean, brown",7,North,0.24
+"Bean, brown",16,North,0.31
+"Bean, brown",21,North,4.09
+Pigeonpea nandolo,6,North,0.13
+Pigeonpea nandolo,6A,North,0.08
+Pigeonpea nandolo,6B,North,0.13
+Pigeonpea nandolo,7,North,0.32
+Pigeonpea nandolo,16,North,0.42
+Pigeonpea nandolo,21,North,7.11
+Groundnut,4,North,4.08
+Groundnut,6,North,0.11
+Groundnut,6A,North,0.09
+Groundnut,6B,North,0.13
+Groundnut,7,North,0.25
+Groundnut,10,North,0.05
+Groundnut,16,North,0.31
+Groundnut,21,North,0.93
+Groundnut flour,6,North,0.07
+Groundnut flour,6A,North,0.06
+Groundnut flour,6B,North,0.06
+Groundnut flour,7,North,0.23
+Groundnut flour,16,North,0.45
+Soyabean flour,6,North,0.19
+Soyabean flour,7,North,0.23
+Ground bean nzama,6,North,0.14
+Ground bean nzama,7,North,0.24
+Ground bean nzama,16,North,0.48
+Cowpea khobwe,6,North,0.14
+Cowpea khobwe,7,North,0.24
+Cowpea khobwe,10,North,0.17
+Cowpea khobwe,16,North,0.41
+Onion,8,North,0.25
+Onion,8A,North,0.1
+Onion,8B,North,0.25
+Onion,8C,North,0.46
+Onion,9,North,0.06
+Onion,9A,North,0.04
+Onion,9B,North,0.06
+Onion,9C,North,0.14
+Onion,10,North,0.8
+Cabbage,9,North,1.19
+Cabbage,9A,North,0.8
+Cabbage,9B,North,1.19
+Cabbage,9C,North,1.95
+Tanaposi/Rape,8,North,0.35
+Tanaposi/Rape,8A,North,0.11
+Tanaposi/Rape,8B,North,0.35
+Tanaposi/Rape,8C,North,0.54
+Tanaposi/Rape,10,North,0.35
+Nkhwani,8,North,0.16
+Nkhwani,9,North,0.03
+Nkhwani,10,North,0.4
+Nkhwani,10A,North,0.14
+Nkhwani,10B,North,0.4
+Nkhwani,10C,North,0.69
+Chinese cabbage,8,North,0.12
+Chinese cabbage,10,North,0.26
+Gathered wild green leaves,10,North,0.4
+Gathered wild green leaves,10A,North,0.14
+Gathered wild green leaves,10B,North,0.4
+Gathered wild green leaves,10C,North,0.69
+Tomato,9,North,0.12
+Tomato,9A,North,0.09
+Tomato,9B,North,0.12
+Tomato,9C,North,0.17
+Tomato,10,North,0.44
+Tomato,10A,North,0.22
+Tomato,10B,North,0.44
+Tomato,10C,North,0.72
+Tomato,21,North,6.16
+Cucumber,9,North,0.77
+Cucumber,21,North,0.75
+Pumpkin,9,North,1.94
+Pumpkin,9A,North,1.51
+Pumpkin,9B,North,1.94
+Pumpkin,9C,North,2.57
+Okra / Therere,9,North,0.08
+Okra / Therere,9A,North,0.04
+Okra / Therere,9B,North,0.08
+Okra / Therere,10,North,0.11
+Okra / Therere,10A,North,0.09
+Okra / Therere,10B,North,0.11
+Okra / Therere,10C,North,0.26
+Okra / Therere,16,North,0.38
+Mushroom,9,North,0.19
+Mushroom,10,North,0.38
+Eggs,9,North,0.07
+Dried fish,9,North,0.21
+Dried fish,9A,North,0.08
+Dried fish,9B,North,0.21
+Dried fish,9C,North,0.84
+Dried fish,10,North,0.19
+Dried fish,10A,North,0.08
+Dried fish,10D,North,0.08
+Dried fish,10B,North,0.28
+Dried fish,10E,North,0.25
+Dried fish,10C,North,1.22
+Dried fish,10F,North,0.75
+Fresh fish,9,North,0.44
+Fresh fish,9A,North,0.35
+Fresh fish,9B,North,0.44
+Fresh fish,9C,North,0.77
+Fresh fish,10,North,0.34
+Fresh fish,10A,North,0.17
+Fresh fish,10D,North,0.28
+Fresh fish,10B,North,0.28
+Fresh fish,10E,North,0.37
+Fresh fish,10C,North,0.79
+Fresh fish,10F,North,0.77
+Chicken,9,North,1.68
+"Termites, other insects eg Ngumbi, caterpillar",6,North,0.07
+"Termites, other insects eg Ngumbi, caterpillar",7,North,0.16
+"Termites, other insects eg Ngumbi, caterpillar",10,North,0.06
+Tinned meat or fish,17,North,0.18
+Smoked fish,9,North,0.26
+Smoked fish,9A,North,0.04
+Smoked fish,9B,North,0.26
+Smoked fish,9C,North,0.32
+Smoked fish,10A,North,0.07
+Smoked fish,10B,North,0.16
+Mango,4,North,3.78
+Mango,8,North,1.08
+Mango,9,North,0.18
+Mango,9A,North,0.13
+Mango,9B,North,0.18
+Mango,9C,North,0.3
+Mango,21,North,2.36
+Banana,8,North,0.46
+Banana,8A,North,0.32
+Banana,8B,North,0.46
+Banana,8C,North,1.18
+Banana,9,North,0.17
+Banana,9A,North,0.09
+Banana,9B,North,0.17
+Banana,9C,North,0.24
+"Citrus ñ naartje, orange, etc.",9,North,0.18
+"Citrus ñ naartje, orange, etc.",21,North,0.79
+Pineapple,9,North,1.67
+Papaya,9,North,1.41
+Guava,9,North,0.08
+Guava,9A,North,0.05
+Guava,9B,North,0.08
+Guava,9C,North,0.09
+Guava,21,North,1.62
+Avocado,9,North,0.46
+"Wild fruit masau, malambe, etc.",9,North,0.25
+Apple,9,North,0.1
+Powdered milk,17,North,0.45
+Powdered milk,22,North,0.06
+Margarine ‐ Blue band,17,North,0.26
+Margarine ‐ Blue band,22,North,0.12
+Sugar,6,North,0.12
+Sugar,7,North,0.23
+Sugar,9,North,1.02
+Sugar,16,North,0.21
+Sugar,22,North,0.66
+Sugar Cane,9,North,1.29
+Salt,6,North,0.2
+Salt,6A,North,0.19
+Salt,6B,North,0.17
+Salt,7,North,0.21
+Salt,9,North,0.96
+Salt,10,North,0.35
+Salt,16,North,0.47
+Salt,22,North,0.75
+Maize ‐ boiled or roasted vendor,9,North,0.35
+Chips vendor,6,North,0.21
+Chips vendor,7,North,0.32
+Chips vendor,10,North,0.33
+Cassava ‐ boiled vendor,9,North,0.06
+Eggs ‐ boiled vendor,9,North,0.07
+Chicken vendor,9,North,0.1
+Meat vendor,9,North,0.02
+Fish vendor,9,North,0.11
+"Mandazi, doughnut vendor",9,North,0.06
+Samosa vendor,9,North,0.04
+Maize ufa mgaiwa normal flour,4,Southern,5.13
+Maize ufa mgaiwa normal flour,4A,Southern,5.13
+Maize ufa mgaiwa normal flour,4B,Southern,13.72
+Maize ufa mgaiwa normal flour,4C,Southern,15.19
+Maize ufa mgaiwa normal flour,5,Southern,15.19
+Maize ufa mgaiwa normal flour,7,Southern,0.31
+Maize ufa mgaiwa normal flour,21,Southern,2.1
+Maize ufa refined fine flour,4,Southern,5.02
+Maize ufa refined fine flour,4A,Southern,5.02
+Maize ufa refined fine flour,4B,Southern,13.74
+Maize ufa refined fine flour,4C,Southern,15.19
+Maize ufa refined fine flour,5,Southern,15.19
+Maize ufa refined fine flour,7,Southern,0.27
+Maize ufa refined fine flour,21,Southern,7.76
+Maize ufa madeya bran flour,4,Southern,1.64
+Maize ufa madeya bran flour,4A,Southern,1.64
+Maize ufa madeya bran flour,4B,Southern,11.38
+Maize ufa madeya bran flour,4C,Southern,17.67
+Maize ufa madeya bran flour,5,Southern,17.67
+Maize grain not as ufa,4,Southern,4.47
+Maize grain not as ufa,4A,Southern,4.47
+Maize grain not as ufa,4B,Southern,8.41
+Maize grain not as ufa,4C,Southern,16.46
+Maize grain not as ufa,5,Southern,16.46
+Maize grain not as ufa,6,Southern,0.2
+Maize grain not as ufa,7,Southern,0.26
+Maize grain not as ufa,16,Southern,0.3
+Maize grain not as ufa,21,Southern,4.65
+Green maize,9,Southern,0.33
+Green maize,9A,Southern,0.19
+Green maize,9B,Southern,0.33
+Green maize,9C,Southern,0.42
+Rice,4,Southern,2.48
+Rice,4B,Southern,5.88
+Rice,6,Southern,0.19
+Rice,7,Southern,0.32
+Rice,16,Southern,0.52
+Rice,21,Southern,0.96
+Finger millet mawere,6,Southern,0.09
+Finger millet mawere,7,Southern,0.21
+Finger millet mawere,16,Southern,0.25
+Finger millet mawere,21,Southern,3.54
+Sorghum mapira,6,Southern,0.11
+Sorghum mapira,7,Southern,0.11
+Sorghum mapira,21,Southern,2.17
+Pearl millet mchewere,4,Southern,3.87
+Pearl millet mchewere,4B,Southern,10.27
+Wheat flour,9,Southern,0.91
+Bread,9,Southern,0.54
+"Buns, scones",9,Southern,0.09
+Biscuits,9,Southern,0.15
+Biscuits,22,Southern,0.17
+"Spaghetti, macaroni, pasta",9,Southern,0.38
+"Spaghetti, macaroni, pasta",22,Southern,0.39
+Cassava tubers,9,Southern,0.32
+Cassava tubers,9A,Southern,0.18
+Cassava tubers,9B,Southern,0.32
+Cassava tubers,9C,Southern,0.56
+Cassava tubers,10,Southern,1.2
+Cassava flour,4,Southern,4.01
+Cassava flour,4A,Southern,4.01
+Cassava flour,4B,Southern,10.03
+Cassava flour,7,Southern,0.26
+White sweet potato,4,Southern,4.79
+White sweet potato,4B,Southern,11.55
+White sweet potato,9,Southern,0.1
+White sweet potato,9A,Southern,0.03
+White sweet potato,9B,Southern,0.1
+White sweet potato,9C,Southern,0.3
+White sweet potato,10,Southern,1.82
+White sweet potato,10A,Southern,1.18
+White sweet potato,10B,Southern,1.82
+White sweet potato,10C,Southern,2.86
+Orange sweet potato,9,Southern,0.07
+Orange sweet potato,9A,Southern,0.02
+Orange sweet potato,9B,Southern,0.07
+Orange sweet potato,9C,Southern,0.19
+Orange sweet potato,10,Southern,1.99
+Orange sweet potato,10A,Southern,1.16
+Orange sweet potato,10B,Southern,1.99
+Orange sweet potato,10C,Southern,3.21
+Irish potato,4,Southern,3.23
+Irish potato,4A,Southern,3.23
+Irish potato,4B,Southern,8.24
+Irish potato,4C,Southern,19.62
+Irish potato,5,Southern,19.62
+Irish potato,10,Southern,0.97
+Irish potato,21,Southern,6.97
+Potato crisps,9,Southern,0.03
+Potato crisps,22,Southern,0.08
+"Plantain, cooking banana",8A,Southern,1.55
+"Plantain, cooking banana",8C,Southern,9.42
+"Plantain, cooking banana",9,Southern,0.12
+Cocoyam masimbi,9,Southern,0.61
+Cocoyam masimbi,10,Southern,1.25
+"Bean, white",6,Southern,0.12
+"Bean, white",7,Southern,0.23
+"Bean, white",16,Southern,0.48
+"Bean, brown",6,Southern,0.15
+"Bean, brown",6A,Southern,0.1
+"Bean, brown",6B,Southern,0.13
+"Bean, brown",7,Southern,0.23
+"Bean, brown",16,Southern,0.32
+"Bean, brown",21,Southern,4.09
+Pigeonpea nandolo,6,Southern,0.13
+Pigeonpea nandolo,6A,Southern,0.1
+Pigeonpea nandolo,6B,Southern,0.29
+Pigeonpea nandolo,7,Southern,0.32
+Pigeonpea nandolo,16,Southern,0.42
+Pigeonpea nandolo,21,Southern,7.11
+Groundnut,4,Southern,4.08
+Groundnut,6,Southern,0.11
+Groundnut,6A,Southern,0.09
+Groundnut,6B,Southern,0.11
+Groundnut,7,Southern,0.17
+Groundnut,10,Southern,0.05
+Groundnut,16,Southern,0.36
+Groundnut,21,Southern,0.93
+Groundnut flour,6,Southern,0.07
+Groundnut flour,6A,Southern,0.08
+Groundnut flour,6B,Southern,0.09
+Groundnut flour,7,Southern,0.13
+Groundnut flour,16,Southern,0.45
+Soyabean flour,6,Southern,0.27
+Soyabean flour,7,Southern,0.26
+Ground bean nzama,6,Southern,0.1
+Ground bean nzama,7,Southern,0.2
+Ground bean nzama,16,Southern,0.48
+Cowpea khobwe,6,Southern,0.12
+Cowpea khobwe,7,Southern,0.24
+Cowpea khobwe,10,Southern,0.17
+Cowpea khobwe,16,Southern,0.42
+Onion,8,Southern,0.31
+Onion,8A,Southern,0.14
+Onion,8B,Southern,0.31
+Onion,8C,Southern,0.55
+Onion,9,Southern,0.08
+Onion,9A,Southern,0.05
+Onion,9B,Southern,0.08
+Onion,9C,Southern,0.13
+Onion,10,Southern,0.8
+Cabbage,9,Southern,1.79
+Cabbage,9A,Southern,1.09
+Cabbage,9B,Southern,1.79
+Cabbage,9C,Southern,2.48
+Tanaposi/Rape,8,Southern,0.42
+Tanaposi/Rape,8A,Southern,0.17
+Tanaposi/Rape,8B,Southern,0.42
+Tanaposi/Rape,8C,Southern,0.55
+Tanaposi/Rape,10,Southern,0.44
+Nkhwani,8,Southern,0.25
+Nkhwani,9,Southern,0.03
+Nkhwani,10,Southern,0.28
+Nkhwani,10A,Southern,0.11
+Nkhwani,10B,Southern,0.28
+Nkhwani,10C,Southern,0.52
+Chinese cabbage,8,Southern,0.27
+Chinese cabbage,10,Southern,0.26
+Gathered wild green leaves,10,Southern,0.28
+Gathered wild green leaves,10A,Southern,0.11
+Gathered wild green leaves,10B,Southern,0.28
+Gathered wild green leaves,10C,Southern,0.52
+Tomato,9,Southern,0.11
+Tomato,9A,Southern,0.08
+Tomato,9B,Southern,0.11
+Tomato,9C,Southern,0.18
+Tomato,10,Southern,0.44
+Tomato,10A,Southern,0.28
+Tomato,10B,Southern,0.44
+Tomato,10C,Southern,0.68
+Tomato,21,Southern,6.16
+Cucumber,9,Southern,0.47
+Cucumber,21,Southern,1.22
+Pumpkin,9,Southern,1.43
+Pumpkin,9A,Southern,0.96
+Pumpkin,9B,Southern,1.43
+Pumpkin,9C,Southern,2.39
+Okra / Therere,9,Southern,0.08
+Okra / Therere,9A,Southern,0.04
+Okra / Therere,9B,Southern,0.08
+Okra / Therere,10,Southern,0.21
+Okra / Therere,10A,Southern,0.14
+Okra / Therere,10B,Southern,0.21
+Okra / Therere,10C,Southern,0.25
+Okra / Therere,16,Southern,0.38
+Mushroom,9,Southern,0.19
+Mushroom,10,Southern,0.36
+Eggs,9,Southern,0.06
+Dried fish,9,Southern,0.13
+Dried fish,9A,Southern,0.05
+Dried fish,9B,Southern,0.13
+Dried fish,9C,Southern,0.4
+Dried fish,10,Southern,0.19
+Dried fish,10A,Southern,0.06
+Dried fish,10D,Southern,0.08
+Dried fish,10B,Southern,0.17
+Dried fish,10E,Southern,0.13
+Dried fish,10C,Southern,0.21
+Dried fish,10F,Southern,0.22
+Fresh fish,9,Southern,0.37
+Fresh fish,9A,Southern,0.19
+Fresh fish,9B,Southern,0.37
+Fresh fish,9C,Southern,0.71
+Fresh fish,10,Southern,0.34
+Fresh fish,10A,Southern,0.29
+Fresh fish,10D,Southern,0.17
+Fresh fish,10B,Southern,0.31
+Fresh fish,10E,Southern,0.29
+Fresh fish,10C,Southern,0.41
+Fresh fish,10F,Southern,0.42
+Chicken,9,Southern,1.53
+"Termites, other insects eg Ngumbi, caterpillar",6,Southern,0.1
+"Termites, other insects eg Ngumbi, caterpillar",7,Southern,0.11
+"Termites, other insects eg Ngumbi, caterpillar",10,Southern,0.08
+Tinned meat or fish,17,Southern,0.16
+Smoked fish,9,Southern,0.16
+Smoked fish,9A,Southern,0.04
+Smoked fish,9B,Southern,0.16
+Smoked fish,9C,Southern,0.32
+Smoked fish,10A,Southern,0.08
+Smoked fish,10B,Southern,0.14
+Mango,4,Southern,3.78
+Mango,8,Southern,1.08
+Mango,9,Southern,0.19
+Mango,9A,Southern,0.11
+Mango,9B,Southern,0.19
+Mango,9C,Southern,0.32
+Mango,21,Southern,2.36
+Banana,8,Southern,1.14
+Banana,8A,Southern,0.71
+Banana,8B,Southern,1.14
+Banana,8C,Southern,1.99
+Banana,9,Southern,0.16
+Banana,9A,Southern,0.07
+Banana,9B,Southern,0.16
+Banana,9C,Southern,0.26
+"Citrus ñ naartje, orange, etc.",9,Southern,0.14
+"Citrus ñ naartje, orange, etc.",21,Southern,0.52
+Pineapple,9,Southern,0.95
+Papaya,9,Southern,1.29
+Guava,9,Southern,0.09
+Guava,9A,Southern,0.07
+Guava,9B,Southern,0.09
+Guava,9C,Southern,0.12
+Guava,21,Southern,0.87
+Avocado,9,Southern,0.41
+"Wild fruit masau, malambe, etc.",9,Southern,0.19
+Apple,9,Southern,0.14
+Powdered milk,17,Southern,0.44
+Powdered milk,22,Southern,0.04
+Margarine ‐ Blue band,17,Southern,0.36
+Margarine ‐ Blue band,22,Southern,0.05
+Sugar,6,Southern,0.13
+Sugar,7,Southern,0.24
+Sugar,9,Southern,0.92
+Sugar,16,Southern,0.48
+Sugar,22,Southern,0.1
+Sugar Cane,9,Southern,0.83
+Salt,6,Southern,0.2
+Salt,6A,Southern,0.22
+Salt,6B,Southern,0.23
+Salt,7,Southern,0.4
+Salt,9,Southern,0.94
+Salt,10,Southern,0.43
+Salt,16,Southern,0.58
+Salt,22,Southern,0.26
+Maize ‐ boiled or roasted vendor,9,Southern,0.31
+Chips vendor,6,Southern,0.23
+Chips vendor,7,Southern,0.32
+Chips vendor,10,Southern,0.24
+Cassava ‐ boiled vendor,9,Southern,0.16
+Eggs ‐ boiled vendor,9,Southern,0.08
+Chicken vendor,9,Southern,0.05
+Meat vendor,9,Southern,0.02
+Fish vendor,9,Southern,0.02
+"Mandazi, doughnut vendor",9,Southern,0.05
+Samosa vendor,9,Southern,0.06
+Maize ufa mgaiwa normal flour,4,Central,5.15
+Maize ufa mgaiwa normal flour,4A,Central,5.15
+Maize ufa mgaiwa normal flour,4B,Central,13.72
+Maize ufa mgaiwa normal flour,4C,Central,15.19
+Maize ufa mgaiwa normal flour,5,Central,15.19
+Maize ufa mgaiwa normal flour,7,Central,0.3
+Maize ufa mgaiwa normal flour,21,Central,3.81
+Maize ufa refined fine flour,4,Central,3.11
+Maize ufa refined fine flour,4A,Central,3.11
+Maize ufa refined fine flour,4B,Central,13.74
+Maize ufa refined fine flour,4C,Central,15.19
+Maize ufa refined fine flour,5,Central,15.19
+Maize ufa refined fine flour,7,Central,0.24
+Maize ufa refined fine flour,21,Central,7.76
+Maize ufa madeya bran flour,4,Central,1.64
+Maize ufa madeya bran flour,4A,Central,1.64
+Maize ufa madeya bran flour,4B,Central,11.38
+Maize ufa madeya bran flour,4C,Central,17.67
+Maize ufa madeya bran flour,5,Central,17.67
+Maize grain not as ufa,4,Central,4.26
+Maize grain not as ufa,4A,Central,4.26
+Maize grain not as ufa,4B,Central,6.77
+Maize grain not as ufa,4C,Central,17.6
+Maize grain not as ufa,5,Central,17.6
+Maize grain not as ufa,6,Central,0.2
+Maize grain not as ufa,7,Central,0.37
+Maize grain not as ufa,16,Central,0.3
+Maize grain not as ufa,21,Central,3.67
+Green maize,9,Central,0.34
+Green maize,9A,Central,0.24
+Green maize,9B,Central,0.34
+Green maize,9C,Central,0.39
+Rice,4,Central,2.48
+Rice,4B,Central,5.88
+Rice,6,Central,0.2
+Rice,7,Central,0.25
+Rice,16,Central,0.42
+Rice,21,Central,1.78
+Finger millet mawere,6,Central,0.11
+Finger millet mawere,7,Central,0.12
+Finger millet mawere,16,Central,0.25
+Finger millet mawere,21,Central,2.5
+Sorghum mapira,6,Central,0.17
+Sorghum mapira,7,Central,0.25
+Sorghum mapira,21,Central,2.17
+Pearl millet mchewere,4,Central,3.87
+Pearl millet mchewere,4B,Central,10.27
+Wheat flour,9,Central,1.01
+Bread,9,Central,0.59
+"Buns, scones",9,Central,0.1
+Biscuits,9,Central,0.14
+Biscuits,22,Central,0.23
+"Spaghetti, macaroni, pasta",9,Central,0.4
+"Spaghetti, macaroni, pasta",22,Central,0.34
+Cassava tubers,9,Central,0.36
+Cassava tubers,9A,Central,0.21
+Cassava tubers,9B,Central,0.36
+Cassava tubers,9C,Central,0.68
+Cassava tubers,10,Central,1.12
+Cassava flour,4,Central,4.01
+Cassava flour,4A,Central,4.01
+Cassava flour,4B,Central,10.03
+Cassava flour,7,Central,0.21
+White sweet potato,4,Central,4.79
+White sweet potato,4B,Central,11.55
+White sweet potato,9,Central,0.19
+White sweet potato,9A,Central,0.1
+White sweet potato,9B,Central,0.19
+White sweet potato,9C,Central,0.39
+White sweet potato,10,Central,1.26
+White sweet potato,10A,Central,0.73
+White sweet potato,10B,Central,1.26
+White sweet potato,10C,Central,1.71
+Orange sweet potato,9,Central,0.21
+Orange sweet potato,9A,Central,0.1
+Orange sweet potato,9B,Central,0.21
+Orange sweet potato,9C,Central,0.41
+Orange sweet potato,10,Central,1.11
+Orange sweet potato,10A,Central,0.83
+Orange sweet potato,10B,Central,1.11
+Orange sweet potato,10C,Central,1.72
+Irish potato,4,Central,4.49
+Irish potato,4A,Central,4.49
+Irish potato,4B,Central,6.71
+Irish potato,4C,Central,17.36
+Irish potato,5,Central,17.36
+Irish potato,10,Central,0.87
+Irish potato,21,Central,5.36
+Potato crisps,9,Central,0.03
+Potato crisps,22,Central,0.04
+"Plantain, cooking banana",8A,Central,1.36
+"Plantain, cooking banana",8C,Central,9.42
+"Plantain, cooking banana",9,Central,0.12
+Cocoyam masimbi,9,Central,0.99
+Cocoyam masimbi,10,Central,1.25
+"Bean, white",6,Central,0.16
+"Bean, white",7,Central,0.3
+"Bean, white",16,Central,0.48
+"Bean, brown",6,Central,0.15
+"Bean, brown",6A,Central,0.12
+"Bean, brown",6B,Central,0.16
+"Bean, brown",7,Central,0.23
+"Bean, brown",16,Central,0.41
+"Bean, brown",21,Central,4.09
+Pigeonpea nandolo,6,Central,0.13
+Pigeonpea nandolo,6A,Central,0.07
+Pigeonpea nandolo,6B,Central,0.11
+Pigeonpea nandolo,7,Central,0.32
+Pigeonpea nandolo,16,Central,0.42
+Pigeonpea nandolo,21,Central,7.11
+Groundnut,4,Central,4.08
+Groundnut,6,Central,0.11
+Groundnut,6A,Central,0.08
+Groundnut,6B,Central,0.12
+Groundnut,7,Central,0.22
+Groundnut,10,Central,0.05
+Groundnut,16,Central,0.32
+Groundnut,21,Central,0.93
+Groundnut flour,6,Central,0.07
+Groundnut flour,6A,Central,0.05
+Groundnut flour,6B,Central,0.08
+Groundnut flour,7,Central,0.16
+Groundnut flour,16,Central,0.45
+Soyabean flour,6,Central,0.12
+Soyabean flour,7,Central,0.3
+Ground bean nzama,6,Central,0.15
+Ground bean nzama,7,Central,0.18
+Ground bean nzama,16,Central,0.48
+Cowpea khobwe,6,Central,0.15
+Cowpea khobwe,7,Central,0.27
+Cowpea khobwe,10,Central,0.17
+Cowpea khobwe,16,Central,0.39
+Onion,8,Central,0.29
+Onion,8A,Central,0.13
+Onion,8B,Central,0.29
+Onion,8C,Central,0.55
+Onion,9,Central,0.09
+Onion,9A,Central,0.03
+Onion,9B,Central,0.09
+Onion,9C,Central,0.14
+Onion,10,Central,0.8
+Cabbage,9,Central,1.22
+Cabbage,9A,Central,0.86
+Cabbage,9B,Central,1.22
+Cabbage,9C,Central,1.75
+Tanaposi/Rape,8,Central,0.28
+Tanaposi/Rape,8A,Central,0.16
+Tanaposi/Rape,8B,Central,0.28
+Tanaposi/Rape,8C,Central,0.48
+Tanaposi/Rape,10,Central,0.17
+Nkhwani,8,Central,0.27
+Nkhwani,9,Central,0.03
+Nkhwani,10,Central,0.28
+Nkhwani,10A,Central,0.09
+Nkhwani,10B,Central,0.28
+Nkhwani,10C,Central,0.66
+Chinese cabbage,8,Central,0.25
+Chinese cabbage,10,Central,0.27
+Gathered wild green leaves,10,Central,0.28
+Gathered wild green leaves,10A,Central,0.09
+Gathered wild green leaves,10B,Central,0.28
+Gathered wild green leaves,10C,Central,0.66
+Tomato,9,Central,0.12
+Tomato,9A,Central,0.08
+Tomato,9B,Central,0.12
+Tomato,9C,Central,0.18
+Tomato,10,Central,0.49
+Tomato,10A,Central,0.28
+Tomato,10B,Central,0.49
+Tomato,10C,Central,0.66
+Tomato,21,Central,6.16
+Cucumber,9,Central,0.56
+Cucumber,21,Central,0.59
+Pumpkin,9,Central,1.63
+Pumpkin,9A,Central,1.2
+Pumpkin,9B,Central,1.63
+Pumpkin,9C,Central,2.45
+Okra / Therere,9,Central,0.08
+Okra / Therere,9A,Central,0.04
+Okra / Therere,9B,Central,0.08
+Okra / Therere,10,Central,0.2
+Okra / Therere,10A,Central,0.13
+Okra / Therere,10B,Central,0.2
+Okra / Therere,10C,Central,0.32
+Okra / Therere,16,Central,0.38
+Mushroom,9,Central,0.19
+Mushroom,10,Central,0.23
+Eggs,9,Central,0.06
+Dried fish,9,Central,0.19
+Dried fish,9A,Central,0.04
+Dried fish,9B,Central,0.19
+Dried fish,9C,Central,0.36
+Dried fish,10,Central,0.19
+Dried fish,10A,Central,0.06
+Dried fish,10D,Central,0.11
+Dried fish,10B,Central,0.14
+Dried fish,10E,Central,0.15
+Dried fish,10C,Central,0.37
+Dried fish,10F,Central,0.19
+Fresh fish,9,Central,0.41
+Fresh fish,9A,Central,0.28
+Fresh fish,9B,Central,0.41
+Fresh fish,9C,Central,0.52
+Fresh fish,10,Central,0.34
+Fresh fish,10A,Central,0.22
+Fresh fish,10D,Central,0.22
+Fresh fish,10B,Central,0.33
+Fresh fish,10E,Central,0.44
+Fresh fish,10C,Central,0.37
+Fresh fish,10F,Central,0.64
+Chicken,9,Central,1.31
+"Termites, other insects eg Ngumbi, caterpillar",6,Central,0.06
+"Termites, other insects eg Ngumbi, caterpillar",7,Central,0.11
+"Termites, other insects eg Ngumbi, caterpillar",10,Central,0.04
+Tinned meat or fish,17,Central,0.18
+Smoked fish,9,Central,0.14
+Smoked fish,9A,Central,0.05
+Smoked fish,9B,Central,0.14
+Smoked fish,9C,Central,0.32
+Smoked fish,10A,Central,0.07
+Smoked fish,10B,Central,0.17
+Mango,4,Central,3.78
+Mango,8,Central,1.08
+Mango,9,Central,0.3
+Mango,9A,Central,0.22
+Mango,9B,Central,0.3
+Mango,9C,Central,0.67
+Mango,21,Central,2.36
+Banana,8,Central,1.28
+Banana,8A,Central,0.78
+Banana,8B,Central,1.28
+Banana,8C,Central,2.1
+Banana,9,Central,0.18
+Banana,9A,Central,0.1
+Banana,9B,Central,0.18
+Banana,9C,Central,0.22
+"Citrus ñ naartje, orange, etc.",9,Central,0.22
+"Citrus ñ naartje, orange, etc.",21,Central,0.25
+Pineapple,9,Central,0.94
+Papaya,9,Central,0.96
+Guava,9,Central,0.14
+Guava,9A,Central,0.08
+Guava,9B,Central,0.14
+Guava,9C,Central,0.22
+Guava,21,Central,0.5
+Avocado,9,Central,0.4
+"Wild fruit masau, malambe, etc.",9,Central,0.31
+Apple,9,Central,0.12
+Powdered milk,17,Central,0.39
+Powdered milk,22,Central,0.09
+Margarine ‐ Blue band,17,Central,0.33
+Margarine ‐ Blue band,22,Central,0.25
+Sugar,6,Central,0.15
+Sugar,7,Central,0.23
+Sugar,9,Central,1.01
+Sugar,16,Central,0.34
+Sugar,22,Central,0.33
+Sugar Cane,9,Central,1.15
+Salt,6,Central,0.2
+Salt,6A,Central,0.21
+Salt,6B,Central,0.21
+Salt,7,Central,0.35
+Salt,9,Central,0.23
+Salt,10,Central,0.29
+Salt,16,Central,0.42
+Salt,22,Central,0.28
+Maize ‐ boiled or roasted vendor,9,Central,0.32
+Chips vendor,6,Central,0.22
+Chips vendor,7,Central,0.25
+Chips vendor,10,Central,0.28
+Cassava ‐ boiled vendor,9,Central,0.28
+Eggs ‐ boiled vendor,9,Central,0.1
+Chicken vendor,9,Central,0.11
+Meat vendor,9,Central,0.02
+Fish vendor,9,Central,0.09
+"Mandazi, doughnut vendor",9,Central,0.1
+Samosa vendor,9,Central,0.05
