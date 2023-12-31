@@ -11,10 +11,11 @@ from lsms import from_dta
 with dvc.api.open('../Data/sec_a.dta', mode='rb') as dta:
     df = from_dta(dta, convert_categoricals=False)
 
-df = df.loc[:,[ "case_id", "region"]]
+df = df.loc[:,[ "case_id", "region","reside"]]
 df['region'] = df['region'].map({1: 'North', 2: 'Central', 3: 'Southern'})
-df =  df.rename({'case_id': 'j', 'region' : 'm'}, axis = 1)
+df =  df.rename({'case_id': 'j', 'region' : 'm','reside':'Rural'}, axis = 1)
 df['t'] = '2004-05'
+
 df = df.set_index(['j','t'])
 df.columns.name = 'k'
 

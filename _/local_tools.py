@@ -280,7 +280,11 @@ def add_markets_from_other_features(country,df):
 
     colname = df.columns.names
 
-    df = df.join(of.reset_index('m')['m'],on=['j','t'])
+    if 'm' in of.index.names:
+        df = df.join(of.reset_index('m')['m'], on=['j','t'])
+    else:
+        df = df.join(of, on=['j','t'])
+
     df = df.reset_index().set_index(df_idx)
     df.columns.names = colname
 

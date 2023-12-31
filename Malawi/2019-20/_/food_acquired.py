@@ -20,6 +20,10 @@ df[cols] = df[cols].apply(pd.to_numeric, errors='coerce')
 
 df = df.loc[:, list(columns_dict.values())]
 df['price per unit'] = (df['expenditure'])/df['quantity_bought']
-df = df.set_index(['j', 'i'])
+
+df['t'] = '2019-20'
+df = df.set_index(['j','t','i'])
+
+df = df.dropna(how='all')
 
 df.to_parquet("food_acquired.parquet")
