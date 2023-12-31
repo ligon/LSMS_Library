@@ -21,4 +21,8 @@ df = df.loc[:, list(columns_dict.values())]
 df['price per unit'] = (df['expenditure'])/df['quantity_bought']
 df = df.set_index(['j', 'i'])
 
+# Deal with some problematic units which are floats
+df['units'] = df.units.astype(str)
+df['units_bought'] = df.units_bought.astype(str)
+
 df.to_parquet("food_acquired.parquet")
