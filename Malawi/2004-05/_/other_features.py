@@ -12,6 +12,6 @@ from malawi import get_other_features
 with dvc.api.open('../Data/sec_a.dta', mode='rb') as dta:
     df = from_dta(dta, convert_categoricals=False)
 
-df = get_other_features(df, '2004-05')
+df = get_other_features(df, '2004-05', 'reside')
 
 df.to_parquet('other_features.parquet')

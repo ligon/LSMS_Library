@@ -32,7 +32,11 @@ df[cols] = df[cols].apply(pd.to_numeric, errors='coerce')
 df = df.set_index(['j', 'i'])
 df = df.join(regions).set_index('m', append=True).replace(r'^\s*$', np.nan, regex=True)
 
-#handling conversion table
+# Deal with some problematic units which are floats
+df['units_consumed'] = df.units_consumed.astype(str)
+df['units_bought'] = df.units_bought.astype(str)
+
+# handling conversion table
 conversions['item_name'] = conversions['item_name'].apply(clean_text)
 conversions = conversions.set_index(['region', 'item_name', 'unit_code'])
 df = df.reset_index().merge(conversions, how='left', left_on=['i', 'm', 'unitcode_consumed'], right_on=['item_name', 'region', 'unit_code']).rename({'factor' : 'cfactor_consumed'}, axis=1)
@@ -41,6 +45,8 @@ df = df.set_index(['j', 'm', 'i'])
 df = handling_unusual_units(df)
 
 df['price per unit'] = df['expenditure']/df['quantity_bought']
+df['t'] = '2016-17'
+df = df.reset_index().set_index(['j','t', 'i']).dropna(how='all')
 
 final = df.loc[:, ['quantity_consumed', 'u_consumed', 'quantity_bought', 'u_bought', 'price per unit', 'expenditure', 'cfactor_consumed', 'cfactor_bought']]
 final.to_parquet("food_acquired.parquet")

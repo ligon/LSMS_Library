@@ -34,16 +34,16 @@ def get_household_characteristics(df, year):
     return df
 
 #other features code for 2010-11, 2016-17, 2019-20
-def get_other_features(df, year):
-    df = df.loc[:,[ "case_id", "region"]]
+def get_other_features(df, year, reside):
+    df = df.loc[:,[ "case_id", "region", reside]]
     df['region'] = df['region'].map({1: 'North', 2: 'Central', 3: 'Southern'})
-    df =  df.rename({'case_id': 'j', 'region' : 'm'}, axis = 1)
+    df =  df.rename({'case_id': 'j', 'region' : 'm', reside: 'Rural'}, axis = 1)
     df['t'] = year
     df = df.set_index(['j','t'])
     df.columns.name = 'k'
     return df
 
-#food_acquired code for 2010-11, 2016-17, 2019-20; not comprehensive of all the units, but can handle some [insert number] kilograms and grams formatting
+#food_acquired code; not comprehensive of all the units, but can handle some [insert number] kilograms and grams formatting
 def handling_unusual_units(df):
     grams = r'(\d+)\s*g(?:\s+|r)'
     kgs =r'(\d+)\s*k(?:g|ilo)'

@@ -43,5 +43,8 @@ df = handling_unusual_units(df)
 
 df['price per unit'] = df['expenditure']/df['quantity_bought']
 
+df['t'] = '2019-20'
+df = df.reset_index().set_index(['j','t','i']).dropna(how='all')
+
 final = df.loc[:, ['quantity_consumed', 'u_consumed', 'quantity_bought', 'u_bought', 'price per unit', 'expenditure', 'cfactor_consumed', 'cfactor_bought']]
 final.to_parquet("food_acquired.parquet")

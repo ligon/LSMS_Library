@@ -12,6 +12,8 @@ from malawi import get_other_features
 with dvc.api.open('../Data/Panel/Round 1 (2010) Consumption Aggregate.dta', mode='rb') as dta:
     df = from_dta(dta, convert_categoricals=False)
 
-df = get_other_features(df, '2010-11')
+df = get_other_features(df, '2010-11', 'urban')
+
+df['Rural'] = df.Rural - 1
 
 df.to_parquet('other_features.parquet')
