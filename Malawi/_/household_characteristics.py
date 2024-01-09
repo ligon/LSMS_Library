@@ -19,6 +19,4 @@ if 'm' not in hc.index.names:
     hc = hc.reset_index().set_index(['j','t','m'])
 hc.columns.name = 'k'
 
-hc = hc.filter(regex='ales [0-9]')
-
 hc.to_parquet('../var/household_characteristics.parquet')

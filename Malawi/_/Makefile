@@ -6,7 +6,6 @@ parquet := $(source:.py=.parquet)
 var = ../var/food_expenditures.parquet ../var/food_quantities.parquet ../var/food_prices.parquet \
 	  ../var/household_characteristics.parquet ../var/other_features.parquet 
 
-
 all: $(parquet) $(var)
 
 ../var/food_quantities.parquet ../var/food_expenditures.parquet ../var/food_prices.parquet &: ../var/food_acquired.parquet food_acquired.py
@@ -15,10 +14,10 @@ all: $(parquet) $(var)
 food_acquired = $(shell find $(rounds) -name food_acquired.py)
 food_acquired_parquet := $(food_acquired:.py=.parquet)
 
-../%/_/food_acquired.parquet: $(food_acquired)
+../%/_/food_acquired.parquet: $(food_acquired)  ../var/other_features.parquet
 	(cd $(@D) && python food_acquired.py)
 
-../var/food_acquired.parquet: food_acquired.py $(food_acquired_parquet) ../var/other_features.parquet
+../var/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
 	python food_acquired.py
 
 household_characteristics = $(shell find $(rounds) -name household_characteristics.py)
