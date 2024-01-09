@@ -7,19 +7,11 @@ import numpy as np
 import json
 import dvc.api
 from lsms import from_dta
-from lsms.tools import get_household_roster
-from malawi import age_sex_composition, sex_conv
+from malawi import get_household_characteristics
 
 with dvc.api.open('../Data/HH_MOD_B.dta', mode='rb') as dta:
     df = from_dta(dta, convert_categoricals=True)
 
-final  = age_sex_composition(df, sex='hh_b03', sex_converter=sex_conv,
-                           age='hh_b05a', age_converter=None, hhid='case_id')
-
-final = final.reset_index()
-
-final['t'] = '2019-20'
-final = final.set_index(['j','t'])
-final.columns.name = 'k'
+final = get_household_characteristics(df, '2019-20')
 
 final.to_parquet('household_characteristics.parquet')
