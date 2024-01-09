@@ -13,7 +13,7 @@ def main(country):
     except ValueError: # Perhaps a series?
         pass
 
-    y = np.log(x.replace(0,np.nan)).squeeze()
+    y = np.log(x.replace(0,np.nan).dropna()).squeeze()
 
     r = Regression(y=y,d=z)
 
