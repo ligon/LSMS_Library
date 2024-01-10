@@ -47,4 +47,6 @@ df['t'] = '2019-20'
 df = df.reset_index().set_index(['j','t','i']).dropna(how='all')
 
 final = df.loc[:, ['quantity_consumed', 'u_consumed', 'quantity_bought', 'u_bought', 'price per unit', 'expenditure', 'cfactor_consumed', 'cfactor_bought']]
+final['u_bought'] = final.u_bought.astype(str)
+
 final.to_parquet("food_acquired.parquet")
