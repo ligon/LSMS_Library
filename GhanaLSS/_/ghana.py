@@ -47,7 +47,8 @@ def load_large_dta(fn, convert_categoricals = False):
     print('\nloaded {} rows'.format(len(df)))
     return df
 
-def split_by_visit(df, first_visit, last_visit, t, ind = ['j','t','i'], unit_col = None, aggregate_amount = False):
+def split_by_visit(df, first_visit, last_visit, t, ind = ('j','t','i'), unit_col = None, aggregate_amount = False):
+    ind = list(ind)
     df = df.set_index([ind[0]] + ind[2:])
     df_by_visit = []
     for i in range(first_visit, last_visit+1):
@@ -61,12 +62,15 @@ def split_by_visit(df, first_visit, last_visit, t, ind = ['j','t','i'], unit_col
     result = pd.concat(df_by_visit)
     result = result.rename(columns={unit_col: 'u'})
     if aggregate_amount:
-        if unit_col != None:
-            return result.groupby(ind + ['u']).agg(sum)
-        return result.groupby(ind).agg(sum) 
-    if unit_col != None:
-        return result.reset_index().set_index(ind + ['u'])
-    return result.reset_index().set_index(ind)
+        try:
+            return result.groupby(ind + ['u']).agg("sum")
+        except KeyError:
+            return result.groupby(ind).agg("sum")
+    else:
+        try:
+            return result.reset_index().set_index(ind + ['u'])
+        except KeyError:
+            return result.reset_index().set_index(ind)
 
 def harmonized_food_labels2(fn='../../_/food_items.org'):
     # Harmonized food labels
