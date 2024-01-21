@@ -26,7 +26,7 @@ df['purchased_value_yearly'] = df.apply(yearly_expenditure, axis=1)
 
 selector_pur = {'HID': 'j', 
               'FOODCD': 'i', 
-              'CFOODBLV': 'purchased_value_vlast', #amount spent since last visit 
+              'CFOODBLV': 'purchased_value', #amount spent since last visit
               'purchased_value_yearly': 'purchased_value_yearly'}  
 x = df.rename(columns=selector_pur)[[*selector_pur.values()]]
 x = x.replace({'.':np.nan, 0: np.nan})
