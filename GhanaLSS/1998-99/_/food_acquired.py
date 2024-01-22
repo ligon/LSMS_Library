@@ -58,7 +58,7 @@ with dvc.api.open('../Data/SEC8H.DTA',mode='rb') as dta:
 
 prod = prod[prod['s8hq1'] == 1] #select only if hh consumed any own produced food in the past 12 months
 #create produced column labels for each visit -- 3-day recall starting from the 2nd to 7th visit
-prod['hhid'] = prod['clust'].astype(int).astype("string")+'-'+prod['nh'].astype(int).astype("string")
+prod['hhid'] = prod['clust'].astype(int).astype("string")+'/'+prod['nh'].astype(int).astype("string")
 
 selector_pro = {'hhid': 'j',
                 'homagrcd': 'i',

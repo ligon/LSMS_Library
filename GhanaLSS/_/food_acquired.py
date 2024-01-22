@@ -53,6 +53,10 @@ for t in Waves.keys():
 
 p = pd.concat(dfs)
 
+# Why?!
+p['purchased_value'] = p.purchased_value.astype(float)
+p = p.drop('index',axis=1)
+
 try:
     of = pd.read_parquet('../var/other_features.parquet')
     p = p.reset_index()
