@@ -1,0 +1,508 @@
+#+title: Categorical Mapping
+
+* Food mapping
+#+name: harmonize_food
+| Preferred Label               | Aggregate Label               | Code_9b | Label_9b                                                        | Code_8h | Label_8h                       |
+|-------------------------------+-------------------------------+---------+-----------------------------------------------------------------+---------+--------------------------------|
+| Rice (local)                  | Rice                          |       1 | ÊÊ Ê Ê Dada BaÊ                                                 |       1 | 1. Rice (Paddy,grain)          |
+| Rice (local)                  | Rice                          |       2 | ÊÊ Ê Ê Oman BaÊ                                                 |         |                                |
+| Rice (local)                  | Rice                          |       3 | ÊÊ Ê Ê MandelaÊ                                                 |         |                                |
+| Rice (local)                  | Rice                          |       4 | ÊÊ Ê Ê Gold StarÊ Ê Ê Ê                                         |         |                                |
+| Rice (local)                  | Rice                          |       5 | ÊÊ Ê Ê AfifeÊ Ê                                                 |         |                                |
+| Rice (local)                  | Rice                          |       6 | ÊÊ Ê Ê OtherÊ Ê                                                 |         |                                |
+| Rice (imported)               | Rice                          |      10 | ÊÊ Ê Ê Jasmine Rice Ê Ê                                         |         |                                |
+| Rice (imported)               | Rice                          |      11 | ÊÊ Ê Ê Basmati Rice Ê Ê                                         |         |                                |
+| Rice (imported)               | Rice                          |      12 | ÊÊ Ê Ê Uncle Ben's Rice (imported)Ê Ê Ê                         |         |                                |
+| Rice (imported)               | Rice                          |      13 | ÊÊ Ê Ê Lele RiceÊ Ê Ê Ê                                         |         |                                |
+| Rice (imported)               | Rice                          |      14 | ÊÊ Ê Ê Royal FeastÊ Ê Ê                                         |         |                                |
+| Rice (imported)               | Rice                          |      15 | ÊÊ Ê Ê Gino RiceÊ Ê Ê Ê                                         |         |                                |
+| Rice (imported)               | Rice                          |      16 | ÊÊ Ê Ê Royal AromaÊ Ê Ê                                         |         |                                |
+| Rice (imported)               | Rice                          |      17 | ÊÊ Ê Ê Heaven Ê                                                 |         |                                |
+| Rice (imported)               | Rice                          |      18 | ÊÊ Ê Ê CindyÊ Ê                                                 |         |                                |
+| Rice (imported)               | Rice                          |      19 | ÊÊ Ê Ê BellaÊ Ê                                                 |         |                                |
+| Rice (imported)               | Rice                          |      20 | ÊÊ Ê Ê SultanaÊ                                                 |         |                                |
+| Rice (imported)               | Rice                          |      21 | ÊÊ Ê Ê Mama's Pride Ê Ê                                         |         |                                |
+| Rice (imported)               | Rice                          |      22 | ÊÊ Ê Ê Red EagleÊ Ê Ê Ê                                         |         |                                |
+| Rice (imported)               | Rice                          |      23 | ÊÊ Ê Ê Other imported riceÊ Ê Ê                                 |         |                                |
+| Guinea corn/sorghum           | Guinea corn/sorghum           |      27 | ÊÊ Ê Ê Guinea corn/sorghumÊ Ê Ê                                 |       4 | 4. Sorghum/guinea corn         |
+| Maize (cob)                   | Maize                         |         |                                                                 |       2 | 2. Maize-cob (fresh)           |
+| Maize (flour/dough)           | Maize                         |         |                                                                 |       3 | 3. Maize-flour/dough           |
+| Maize (grain)                 | Maize                         |      28 | ÊÊ Ê Ê White maize grains Ê Ê Ê                                 |         |                                |
+| Maize (grain)                 | Maize                         |      29 | ÊÊ Ê Ê Yellow maize grainsÊ Ê Ê                                 |         |                                |
+| Millet                        | Millet                        |      30 | ÊÊ Ê Ê Millet Ê                                                 |       5 | 5. Millet grain                |
+| Millet (flour)                | Millet                        |      31 | ÊÊ Ê Ê Millet flour Ê Ê                                         |       6 | 6. Millet flour                |
+| Other Grains                  | Other Grains                  |         |                                                                 |       8 | 8. Other grains                |
+| Other Flours                  | Other Flours                  |         |                                                                 |       9 | 9. Other flours                |
+| Wheat Flour                   | Wheat Flour                   |      32 | ÊÊ Ê Ê Takoradi Flour MillÊ Ê Ê                                 |         |                                |
+| Wheat Flour                   | Wheat Flour                   |      33 | ÊÊ Ê Ê GMGÊ Ê Ê                                                 |         |                                |
+| Wheat Flour                   | Wheat Flour                   |      34 | ÊÊ Ê Ê Wheat semolina,sujiÊ Ê Ê                                 |         |                                |
+| Maize (flour/dough)           | Maize                         |      35 | ÊÊ Ê Ê Corn dough Ê Ê Ê                                         |         |                                |
+| Cerelac (Baby food)           | Cerelac (Baby food)           |      36 | ÊÊ Ê Ê MaizeÊ Ê                                                 |         |                                |
+| Cerelac (Baby food)           | Cerelac (Baby food)           |      37 | ÊÊ Ê Ê Millet Ê                                                 |         |                                |
+| Cerelac (Baby food)           | Cerelac (Baby food)           |      38 | ÊÊ Ê Ê Rice Ê Ê                                                 |         |                                |
+| Cerelac (Baby food)           | Cerelac (Baby food)           |      39 | ÊÊ Ê Ê BeansÊ Ê                                                 |         |                                |
+| Cerelac (Baby food)           | Cerelac (Baby food)           |      40 | ÊÊ Ê Ê Mixed fruitÊ Ê Ê                                         |         |                                |
+| Cerelac (Baby food)           | Cerelac (Baby food)           |      41 | ÊÊ Ê Ê WheatÊ Ê                                                 |         |                                |
+| Cerelac (Baby food)           | Cerelac (Baby food)           |      42 | ÊÊ Ê Ê OtherÊ Ê                                                 |         |                                |
+| White Oats                    | White Oats                    |      47 | ÊÊ Ê Ê Good Morning Ê Ê                                         |         |                                |
+| White Oats                    | White Oats                    |      48 | ÊÊ Ê Ê Quaker oatsÊ Ê Ê                                         |         |                                |
+| White Oats                    | White Oats                    |      49 | ÊÊ Ê Ê Other oats Ê Ê Ê                                         |         |                                |
+| Cassava (dried)               | Cassava                       |      53 | ÊÊ Ê Ê Cassava - KokonteÊ Ê Ê Ê                                 |         |                                |
+| Cassava (dough)               | Cassava                       |      54 | ÊÊ Ê Ê Cassava doughÊ Ê                                         |      12 | 12. Cassava(other forms)       |
+| Cassava (yellow, flour)       | Cassava                       |      55 | ÊÊ Ê Ê Yellow gariÊ Ê Ê                                         |      11 | 11. Cassava-gari               |
+| Cassava (white, flour)        | Cassava                       |      56 | ÊÊ Ê Ê White gari Ê Ê Ê                                         |         |                                |
+| Bread                         | Bread                         |      58 | ÊÊ Ê Ê Sugar breadÊ Ê Ê                                         |         |                                |
+| Bread                         | Bread                         |      59 | ÊÊ Ê Ê Whole wheat breadÊ Ê Ê Ê                                 |         |                                |
+| Bread                         | Bread                         |      60 | ÊÊ Ê Ê Butter bread Ê Ê                                         |         |                                |
+| Bread                         | Bread                         |      61 | ÊÊ Ê Ê Tea breadÊ Ê Ê Ê                                         |         |                                |
+| Bread                         | Bread                         |      62 | ÊÊ Ê Ê Other breadÊ Ê Ê                                         |         |                                |
+| Biscuit                       | Biscuit                       |      67 | ÊÊ Ê Ê Picadilly biscuitÊ Ê Ê Ê                                 |         |                                |
+| Biscuit                       | Biscuit                       |      68 | ÊÊ Ê Ê Kings crackers Ê                                         |         |                                |
+| Biscuit                       | Biscuit                       |      69 | ÊÊ Ê Ê Malt and milkÊ Ê                                         |         |                                |
+| Biscuit                       | Biscuit                       |      70 | ÊÊ Ê Ê Cream crackers Ê                                         |         |                                |
+| Biscuit                       | Biscuit                       |      71 | ÊÊ Ê Ê Short cake Ê Ê Ê                                         |         |                                |
+| Biscuit                       | Biscuit                       |      72 | ÊÊ Ê Ê Perks biscuitÊ Ê                                         |         |                                |
+| Biscuit                       | Biscuit                       |      73 | ÊÊ Ê Ê Digestive biscuitÊ Ê Ê Ê                                 |         |                                |
+| Biscuit                       | Biscuit                       |      74 | ÊÊ Ê Ê Jack and JillÊ Ê                                         |         |                                |
+| Biscuit                       | Biscuit                       |      75 | ÊÊ Ê Ê Wafers Ê                                                 |         |                                |
+| Biscuit                       | Biscuit                       |      76 | ÊÊ Ê Ê Ginger Ê                                                 |         |                                |
+| Biscuit                       | Biscuit                       |      77 | ÊÊ Ê Ê Short BreadÊ Ê Ê                                         |         |                                |
+| Biscuit                       | Biscuit                       |      78 | ÊÊ Ê Ê Other biscuits Ê                                         |         |                                |
+| Instant Noodle                | Other Cereal                  |      83 | ÊÊ Ê Ê Indomie or instant noodles Ê Ê Ê                         |         |                                |
+| Corflake                      | Other Cereal                  |      84 | ÊÊ Ê Ê Cornflakes (Kellogg's) Ê                                 |         |                                |
+| Macaroni                      | Other Cereal                  |      85 | ÊÊ Ê Ê Macaroni Ê Ê Ê Ê                                         |         |                                |
+| Spaghetti                     | Other Cereal                  |      86 | ÊÊ Ê Ê SpaghettiÊ Ê Ê Ê                                         |         |                                |
+| Maizena                       | Other Cereal                  |      87 | ÊÊ Ê Ê MaizenaÊ                                                 |         |                                |
+| Couscous                      | Other Cereal                  |      88 | ÊÊ Ê Ê Couscous Ê Ê Ê Ê                                         |         |                                |
+| Other Cereal                  | Other Cereal                  |      89 | ÊÊ Ê Ê Other cereal productsÊ Ê                                 |         |                                |
+| Beef                          | Beef                          |      95 | ÊÊ Ê Ê Beef with bonesÊ                                         |      67 | 67. Beef                       |
+| Beef (steak)                  | Beef                          |      96 | ÊÊ Ê Ê Beef without bones (steak) Ê Ê Ê                         |         |                                |
+| Beef (leg)                    | Beef                          |      97 | ÊÊ Ê Ê Cow leg , localÊ                                         |         |                                |
+| Beef (leg)                    | Beef                          |      98 | ÊÊ Ê Ê Cow leg imported Ê Ê Ê Ê                                 |         |                                |
+| Beef (face)                   | Beef                          |      99 | ÊÊ Ê Ê Cow face (head)Ê                                         |         |                                |
+| Beef (offal)                  | Beef                          |     100 | ÊÊ Ê Ê Cow offals (towel) Ê Ê Ê                                 |         |                                |
+| Beef                          | Beef                          |     101 | ÊÊ Ê Ê Other cow/beef product Ê                                 |         |                                |
+| Pork                          | Pork                          |     105 | ÊÊ Ê Ê pork meatÊ Ê Ê Ê                                         |      69 | 69. Pork                       |
+| Pork (rib)                    | Pork                          |     106 | ÊÊ Ê Ê pork, ribs Ê Ê Ê                                         |         |                                |
+| Pork (shoulder)               | Pork                          |     107 | ÊÊ Ê Ê pork, shoulder Ê                                         |         |                                |
+| Pork (fillet)                 | Pork                          |     108 | ÊÊ Ê Ê pork , filletÊ Ê                                         |         |                                |
+| Pork (feet)                   | Pork                          |     109 | ÊÊ Ê Ê Pork feetÊ Ê Ê Ê                                         |         |                                |
+| Pork                          | Pork                          |     110 | ÊÊ Ê Ê Other pork meatÊ                                         |         |                                |
+| Goat                          | Goat                          |     115 | ÊÊ Ê Ê mutton mixed cut Ê Ê Ê Ê                                 |      68 | 68. Mutton                     |
+| Goat                          | Goat                          |     116 | ÊÊ Ê Ê Goat , liveÊ Ê Ê                                         |      70 | 70. Goat                       |
+| Goat                          | Goat                          |     117 | ÊÊ Ê Ê Goat meatÊ Ê Ê Ê                                         |         |                                |
+| Chicken (live)                | Chicken                       |     118 | ÊÊ Ê Ê Local breedÊ Ê Ê                                         |      63 | 63. Chicken                    |
+| Chicken (live)                | Chicken                       |     119 | ÊÊ Ê Ê Poultry farm breed Ê Ê Ê                                 |         |                                |
+| Chicken (broiler)             | Chicken                       |     120 | ÊÊ Ê Ê whole chicken broilerÊ Ê                                 |         |                                |
+| Chicken (thigh)               | Chicken                       |     121 | ÊÊ Ê Ê Chicken parts(thighs)Ê Ê                                 |         |                                |
+| Chicken (wing)                | Chicken                       |     122 | ÊÊ Ê Ê Chicken parts(wings) Ê Ê                                 |         |                                |
+| Chicken (gizzard)             | Chicken                       |     123 | ÊÊ Ê Ê GizzardÊ                                                 |         |                                |
+| Chicken (breast)              | Chicken                       |     124 | ÊÊ Ê Ê chicken breast without skinÊ Ê Ê                         |         |                                |
+| Chicken (breast)              | Chicken                       |     125 | ÊÊ Ê Ê chicken breast with skin and bones Ê Ê Ê                 |         |                                |
+| Chicken (frozen)              | Chicken                       |     126 | ÊÊ Ê Ê Other chicken productÊ Ê                                 |         |                                |
+| Guineafowl                    | Guineafowl                    |     127 | ÊÊ Ê Ê Guinea fowl - live Ê Ê Ê                                 |      64 | 64. Guinea fowl                |
+| Other Domestic Poultry        | Other Domestic Poultry        |         |                                                                 |      65 | 65. Other Domestic Poultry     |
+| Beef (corned)                 | Corned Beef                   |     131 | ÊÊ Ê Ê Lele corned Beef Ê Ê Ê Ê                                 |         |                                |
+| Beef (corned)                 | Corned Beef                   |     132 | ÊÊ Ê Ê Exeter corned beef Ê Ê Ê                                 |         |                                |
+| Beef (corned)                 | Corned Beef                   |     133 | ÊÊ Ê Ê Bella corned beefÊ Ê Ê Ê                                 |         |                                |
+| Beef (corned)                 | Corned Beef                   |     134 | ÊÊ Ê Ê Other corned beefÊ Ê Ê Ê                                 |         |                                |
+| Sausage (beef)                | Sausage                       |     139 | ÊÊ Ê Ê Beef sausage Ê Ê                                         |         |                                |
+| Sausage (pork)                | Sausage                       |     140 | ÊÊ Ê Ê Pork sausage Ê Ê                                         |         |                                |
+| Sausage (chicken)             | Sausage                       |     141 | ÊÊ Ê Ê Chicken sausageÊ                                         |         |                                |
+| Other Meat                    | Other Meat                    |     142 | ÊÊ Ê Ê Bushmeat (Grasscutter) Ê                                 |         |                                |
+| Other Meat                    | Other Meat                    |     143 | ÊÊ Ê Ê Game birds Ê Ê Ê                                         |      66 | 66. Game birds                 |
+| Other Meat                    | Other Meat                    |         |                                                                 |      72 | 72. Wild game                  |
+| Other Meat                    | Other Meat                    |     144 | ÊÊ Ê Ê Other meat (dog, cat, etc.)Ê Ê Ê                         |      71 | 71. Other Domestic Meat        |
+| Kapla                         | Fish                          |     149 | ÊÊ Ê Ê Kpala (Starvids) frozenÊ                                 |         |                                |
+| Shrimp                        | Fish                          |     150 | ÊÊ Ê Ê ShrimpsÊ                                                 |         |                                |
+| Snail                         | Fish                          |     151 | ÊÊ Ê Ê Snails Ê                                                 |      75 | 75. Snail                      |
+| Crab                          | Fish                          |     152 | ÊÊ Ê Ê Crab Ê Ê                                                 |         |                                |
+| Fish (smoked, river)          | Fish                          |     153 | ÊÊ Ê Ê Fish smoked (river)Ê Ê Ê                                 |         |                                |
+| Fish (smoked, sea)            | Fish                          |     154 | ÊÊ Ê Ê Fish smoked (sea)Ê Ê Ê Ê                                 |         |                                |
+| Herring (smoked)              | Fish                          |     155 | ÊÊ Ê Ê Herrings -smoked Ê Ê Ê Ê                                 |         |                                |
+| Salmon (smoked)               | Fish                          |     156 | ÊÊ Ê Ê Salmon (smoked)Ê                                         |         |                                |
+| Fish (fried)                  | Fish                          |     157 | ÊÊ Ê Ê Fish (fried) Ê Ê                                         |         |                                |
+| Fish (dried)                  | Fish                          |     158 | ÊÊ Ê Ê Dried fish - Koobi Ê Ê Ê                                 |         |                                |
+| Fish (salted)                 | Fish                          |     159 | ÊÊ Ê Ê Fish (salted) e.g. KakoÊ                                 |         |                                |
+| Tilapia                       | Fish                          |     160 | ÊÊ Ê Ê Tilapia (fresh and frozen) Ê Ê Ê                         |         |                                |
+| Other Fish                    | Other Fish                    |     161 | ÊÊ Ê Ê Other fish Ê Ê Ê                                         |      73 | 73. Fish and shellfish         |
+| Fish (canned)                 | Fish                          |     165 | ÊÊ Ê Ê TitusÊ Ê                                                 |         |                                |
+| Fish (canned)                 | Fish                          |     166 | ÊÊ Ê Ê Princess Ê Ê Ê Ê                                         |         |                                |
+| Fish (canned)                 | Fish                          |     167 | ÊÊ Ê Ê Obaapa Ê                                                 |         |                                |
+| Fish (canned)                 | Fish                          |     168 | ÊÊ Ê Ê Gino Ê Ê                                                 |         |                                |
+| Fish (canned)                 | Fish                          |     169 | ÊÊ Ê Ê SmileÊ Ê                                                 |         |                                |
+| Fish (canned)                 | Fish                          |     170 | ÊÊ Ê Ê Lele Ê Ê                                                 |         |                                |
+| Fish (canned)                 | Fish                          |     171 | ÊÊ Ê Ê Vega Ê Ê                                                 |         |                                |
+| Fish (canned)                 | Fish                          |     172 | ÊÊ Ê Ê Other sardines Ê                                         |         |                                |
+| Tuna (processed)              | Fish                          |     176 | ÊÊ Ê Ê Star kistÊ Ê Ê Ê                                         |         |                                |
+| Tuna (processed)              | Fish                          |     177 | ÊÊ Ê Ê Vega Ê Ê                                                 |         |                                |
+| Tuna (processed)              | Fish                          |     178 | ÊÊ Ê Ê Geisha Ê                                                 |         |                                |
+| Tuna (processed)              | Fish                          |     179 | ÊÊ Ê Ê TescoÊ Ê                                                 |         |                                |
+| Tuna (processed)              | Fish                          |     180 | ÊÊ Ê Ê John WestÊ Ê Ê Ê                                         |         |                                |
+| Tuna (processed)              | Fish                          |     181 | ÊÊ Ê Ê OtherÊ Ê                                                 |         |                                |
+| Mackerel (processed)          | Fish                          |     185 | ÊÊ Ê Ê African QueenÊ Ê                                         |         |                                |
+| Mackerel (processed)          | Fish                          |     186 | ÊÊ Ê Ê Geisha Ê                                                 |         |                                |
+| Mackerel (processed)          | Fish                          |     187 | ÊÊ Ê Ê Gino Ê Ê                                                 |         |                                |
+| Mackerel (processed)          | Fish                          |     188 | ÊÊ Ê Ê Ena pa Ê                                                 |         |                                |
+| Mackerel (processed)          | Fish                          |     189 | ÊÊ Ê Ê Obaapa Ê                                                 |         |                                |
+| Mackerel (processed)          | Fish                          |     190 | ÊÊ Ê Ê DelayÊ Ê                                                 |         |                                |
+| Mackerel (processed)          | Fish                          |     191 | ÊÊ Ê Ê TeacherÊ                                                 |         |                                |
+| Mackerel (processed)          | Fish                          |     192 | ÊÊ Ê Ê Other mackerel Ê                                         |         |                                |
+| Milk (fresh)                  | Milk                          |     197 | ÊÊ Ê Ê Milk (Fresh) Ê Ê                                         |      81 | 81. Milk (fresh)               |
+| Milk (powdered)               | Milk                          |     198 | ÊÊ Ê Ê Nido (Sachet)Ê Ê                                         |         |                                |
+| Milk (powdered)               | Milk                          |     199 | ÊÊ Ê Ê Peak (Sachet)Ê Ê                                         |         |                                |
+| Milk (powdered)               | Milk                          |     200 | ÊÊ Ê Ê Milgro (Sachet)Ê                                         |         |                                |
+| Milk (powdered)               | Milk                          |     201 | ÊÊ Ê Ê Cowbell (Sachet) Ê Ê Ê Ê                                 |         |                                |
+| Milk (powdered)               | Milk                          |     202 | ÊÊ Ê Ê Ideal (sachet) Ê                                         |         |                                |
+| Milk (powdered)               | Milk                          |     203 | ÊÊ Ê Ê Nunu (sachet)Ê Ê                                         |         |                                |
+| Milk (powdered)               | Milk                          |     204 | ÊÊ Ê Ê Loya (sachet)Ê Ê                                         |         |                                |
+| Milk (powdered)               | Milk                          |     205 | ÊÊ Ê Ê Miksi (sachet) Ê                                         |         |                                |
+| Milk (powdered)               | Milk                          |     206 | ÊÊ Ê Ê Vega (sachet)Ê Ê                                         |         |                                |
+| Milk (powdered)               | Milk                          |     207 | ÊÊ Ê Ê Other powdered milkÊ Ê Ê                                 |         |                                |
+| Milk (evaporated)             | Milk                          |     301 | ÊÊ Ê Ê IdealÊ Ê                                                 |         |                                |
+| Milk (evaporated)             | Milk                          |     302 | ÊÊ Ê Ê Peak Ê Ê                                                 |         |                                |
+| Milk (evaporated)             | Milk                          |     303 | ÊÊ Ê Ê Nunu Ê Ê                                                 |         |                                |
+| Milk (evaporated)             | Milk                          |     304 | ÊÊ Ê Ê Vega Ê Ê                                                 |         |                                |
+| Milk (evaporated)             | Milk                          |     305 | ÊÊ Ê Ê CarnationÊ Ê Ê Ê                                         |         |                                |
+| Milk (evaporated)             | Milk                          |     306 | ÊÊ Ê Ê Other milk Ê Ê Ê                                         |         |                                |
+| Milk (tinned, condensed)      | Milk                          |     401 | ÊÊ Ê Ê Peak Ê Ê                                                 |         |                                |
+| Milk (tinned, condensed)      | Milk                          |     402 | ÊÊ Ê Ê Other tinned milkÊ Ê Ê Ê                                 |         |                                |
+| Ice Cream                     | Other Milk Products           |     407 | ÊÊ Ê Ê Fan IceÊ                                                 |         |                                |
+| Yoghurt                       | Other Milk Products           |     408 | ÊÊ Ê Ê Fan YoghurtÊ Ê Ê                                         |         |                                |
+| Other Milk Products           | Other Milk Products           |     409 | ÊÊ Ê Ê FanDango Ê Ê Ê Ê                                         |         |                                |
+| Other Milk Products           | Other Milk Products           |     410 | ÊÊ Ê Ê Fan ChocoÊ Ê Ê Ê                                         |         |                                |
+| Ice Cream                     | Other Milk Products           |     411 | ÊÊ Ê Ê Other ice creamÊ                                         |         |                                |
+| Eggs                          | Eggs                          |     416 | ÊÊ Ê Ê Chicken eggs (fresh, single) Ê Ê                         |      74 | 74. Eggs                       |
+| Eggs                          | Eggs                          |     417 | ÊÊ Ê Ê Other eggs Ê Ê Ê                                         |         |                                |
+| Margarine                     | Oils, Fats                    |     421 | ÊÊ Ê Ê MargarineÊ Ê Ê Ê                                         |         |                                |
+| Oil (coconut)                 | Oils, Fats                    |     422 | ÊÊ Ê Ê Coconut oilÊ Ê Ê                                         |      30 | 30. Coconut oil                |
+| Oil (groundnut)               | Oils, Fats                    |     423 | ÊÊ Ê Ê Groundnut oilÊ Ê                                         |      31 | 31. Groundnut oil              |
+| Oil (palm)                    | Oils, Fats                    |     424 | ÊÊ Ê Ê Palm oil (red oil) Ê Ê Ê                                 |      28 | 28. Palm oil                   |
+| Oil (vegetable)               | Oils, Fats                    |     425 | ÊÊ Ê Ê Vegetable oil (eg. Frytol, Gino, Obaapa) Ê Ê Ê Ê         |         |                                |
+| Shea Butter                   | Oils, Fats                    |     426 | ÊÊ Ê Ê Shea butterÊ Ê Ê                                         |      32 | 32. Shea butter                |
+| Oil (palm kernel)             | Oils, Fats                    |     427 | ÊÊ Ê Ê Palm kernel oilÊ                                         |      29 | 29. Palm Kernel oil            |
+| Other Oils                    | Oils, Fats                    |     428 | ÊÊ Ê Ê Other oils Ê Ê Ê                                         |      33 | 33. Other Oil                  |
+| Coconut (fresh)               | Coconut                       |     432 | ÊÊ Ê Ê Coconut (fresh)Ê                                         |      26 | 26. Coconut                    |
+| Coconut (dried)               | Coconut                       |     433 | ÊÊ Ê Ê Coconut (dried)Ê                                         |         |                                |
+| Banana                        | Banana                        |     434 | ÊÊ Ê Ê Banana Ê                                                 |      40 | 40. Bananas                    |
+| Orange                        | Orange                        |     435 | ÊÊ Ê Ê OrangesÊ                                                 |      42 | 42. Oranges,tangerine          |
+| Pineapple                     | Pineapple                     |     436 | ÊÊ Ê Ê PineappleÊ Ê Ê Ê                                         |      46 | 46. Pineapples                 |
+| Mango                         | Mango                         |     437 | ÊÊ Ê Ê MangoÊ Ê                                                 |      43 | 43. Mangoes                    |
+| Watermelon                    | Watermelon                    |     438 | ÊÊ Ê Ê Water melonÊ Ê Ê                                         |      41 | 41. Water Melon                |
+| Avocado                       | Avocado                       |     439 | ÊÊ Ê Ê Avocado pear Ê Ê                                         |      45 | 45. Avocado Pears              |
+| Apple                         | Apple                         |     440 | ÊÊ Ê Ê Apples (foreign) Ê Ê Ê Ê                                 |         |                                |
+| Grape                         | Grape                         |     441 | ÊÊ Ê Ê Grapes Ê                                                 |         |                                |
+| Apple                         | Apple                         |     442 | ÊÊ Ê Ê Sweet appleÊ Ê Ê                                         |         |                                |
+| Lime                          | Lime                          |     443 | ÊÊ Ê Ê Lime Ê Ê                                                 |         |                                |
+| Cashew                        | Cashew                        |     444 | ÊÊ Ê Ê Cashew Ê                                                 |         |                                |
+| Pawpaw                        | Pawpaw                        |     445 | ÊÊ Ê Ê Pawpaw Ê                                                 |      44 | 44. Pawpaw                     |
+| Other Fruits                  | Other Fruits                  |     446 | ÊÊ Ê Ê Other fruits Ê Ê                                         |      47 | 47. Other fruits               |
+| Canned Fruits                 | Canned Fruits                 |     452 | ÊÊ Ê Ê Canned or processed fruits Ê Ê Ê                         |         |                                |
+| Cocoyam Leaves                | Cocoyam Leaves                |     453 | ÊÊ Ê Ê Cocoyam leaves (kontomire) or AlefuÊ Ê Ê                 |         |                                |
+| Sweet Pepper                  | Sweet Pepper                  |     454 | ÊÊ Ê Ê Sweet pepper Ê Ê                                         |         |                                |
+| Carrot                        | Carrot                        |     455 | ÊÊ Ê Ê Carrot Ê                                                 |      52 | 52. Carrots                    |
+| Eggplant                      | Eggplant                      |     456 | ÊÊ Ê Ê Garden eggsÊ Ê Ê                                         |      54 | 54. Garden eggs/egg plant      |
+| Okra                          | Okra                          |     457 | ÊÊ Ê Ê Okro (fresh) Ê Ê                                         |      53 | 53. Okro                       |
+| Pepper (fresh)                | Pepper                        |     458 | ÊÊ Ê Ê Pepper (fresh) Ê                                         |      55 | 55. Pepper                     |
+| Pepper (dried, red)           | Pepper                        |     459 | ÊÊ Ê Ê Dried pepper (red) Ê Ê Ê                                 |         |                                |
+| Pepper (powder)               | Pepper                        |     460 | ÊÊ Ê Ê Powder PepperÊ Ê                                         |         |                                |
+| Onion                         | Onion                         |     461 | ÊÊ Ê Ê Onions (large) Ê                                         |      51 | 51. Onions                     |
+| Shallot                       | Shallot                       |     462 | ÊÊ Ê Ê Shallots Ê Ê Ê Ê                                         |         |                                |
+| Cabbage                       | Cabbage                       |         |                                                                 |      56 | 56. Cabbage/lettuce            |
+| Spinach                       | Spinach                       |         |                                                                 |      57 | 57. Nkontomire                 |
+| Eggplant Leaf                 | Eggplant Leaf                 |         |                                                                 |      58 | 58. Gboma                      |
+| Jute Leaf                     | Jute Leaf                     |         |                                                                 |      59 | 59. Ayoyo/Ahefu                |
+| Other Leafy Vegetable         | Other Leafy Vegetable         |         |                                                                 |      61 | 61. Other leafy vegetables     |
+| Tomato (fresh)                | Tomato                        |     463 | ÊÊ Ê Ê Tomatoes (Fresh) Ê Ê Ê Ê                                 |      50 | 50. Tomatoes                   |
+| Other Vegetable               | Other Vegetable               |     464 | ÊÊ Ê Ê Other vegetables Ê Ê Ê Ê                                 |      62 | 62. Other vegetables           |
+| Tomato (paste)                | Tomato                        |     473 | ÊÊ Ê Ê Gino Ê Ê                                                 |         |                                |
+| Tomato (paste)                | Tomato                        |     474 | ÊÊ Ê Ê Obaapa Ê                                                 |         |                                |
+| Tomato (paste)                | Tomato                        |     475 | ÊÊ Ê Ê Pomo Ê Ê                                                 |         |                                |
+| Tomato (paste)                | Tomato                        |     476 | ÊÊ Ê Ê Tam TamÊ                                                 |         |                                |
+| Tomato (paste)                | Tomato                        |     477 | ÊÊ Ê Ê Lele Ê Ê                                                 |         |                                |
+| Tomato (paste)                | Tomato                        |     478 | ÊÊ Ê Ê BellaÊ Ê                                                 |         |                                |
+| Tomato (paste)                | Tomato                        |     479 | ÊÊ Ê Ê Tasty tomÊ Ê Ê Ê                                         |         |                                |
+| Tomato (paste)                | Tomato                        |     480 | ÊÊ Ê Ê Other tomato paste Ê Ê Ê                                 |         |                                |
+| Bambara Bean                  | Pulses, Nuts                  |         |                                                                 |      20 | 20. Bambara beans              |
+| Soybean                       | Pulses, Nuts                  |         |                                                                 |      22 | 22. Soyabeans                  |
+| Cowpea                        | Pulses, Nuts                  |     485 | ÊÊ Ê Ê White beans (cowpea) Ê Ê                                 |      21 | 21. Cowpeas                    |
+| Palm Nut                      | Pulses, Nuts                  |     486 | ÊÊ Ê Ê PalmÊ nut (fruits) Ê Ê Ê                                 |      25 | 25. Palm nuts                  |
+| Groundnut                     | Pulses, Nuts                  |     487 | ÊÊ Ê Ê Groundnuts (shelled) Ê Ê                                 |      23 | 23. Groundnuts(roasted or raw) |
+| Groundnut                     | Pulses, Nuts                  |     488 | ÊÊ Ê Ê Groundnut (paste)Ê Ê Ê Ê                                 |         |                                |
+| Agushie Seed                  | Pulses, Nuts                  |     489 | ÊÊ Ê Ê Agushie seeds (or milled)Ê Ê Ê Ê                         |         |                                |
+| Other Pulses                  | Pulses, Nuts                  |         |                                                                 |      24 | 24. Other legumes/pulses       |
+| Other Nut/Seed                | Pulses, Nuts                  |         |                                                                 |      27 | 27. Other nuts/seeds           |
+| Plantain                      | Plantain                      |     491 | ÊÊ Ê Ê Plantain Ê Ê Ê Ê                                         |      15 | 15. Plantain                   |
+| Cassava (fresh)               | Cassava                       |     492 | ÊÊ Ê Ê Cassava (fresh)Ê                                         |      10 | 10. Cassava-tubers             |
+| Cocoyam                       | Cocoyam                       |     493 | ÊÊ Ê Ê CocoyamÊ                                                 |      14 | 14. Cocoyam                    |
+| Yam                           | Yam                           |     494 | ÊÊ Ê Ê YamÊ Ê Ê                                                 |      13 | 13. Yam                        |
+| Water Yam                     | Water Yam                     |     495 | ÊÊ Ê Ê Water yamÊ Ê Ê Ê                                         |         |                                |
+| Taro                          | Taro                          |     496 | ÊÊ Ê Ê Taro Ê Ê                                                 |         |                                |
+| Sweet Potato                  | Sweet Potato                  |         |                                                                 |      16 | 16. Sweet potatoes             |
+| Potato                        | Potato                        |     497 | ÊÊ Ê Ê Potatoes Ê Ê Ê Ê                                         |         |                                |
+| Other Tubers                  | Other Tubers                  |     498 | ÊÊ Ê Ê Other Tubers Ê Ê                                         |      17 | 17. Other roots of tubers      |
+| Sugar (cubed)                 | Sugar                         |     503 | ÊÊ Ê Ê Cubed sugarÊ Ê Ê                                         |         |                                |
+| Sugar (granulated)            | Sugar                         |     504 | ÊÊ Ê Ê Granulated sugar Ê Ê Ê Ê                                 |         |                                |
+| Honey                         | Honey                         |     505 | ÊÊ Ê Ê HoneyÊ Ê                                                 |         |                                |
+| Chocolate                     | Chocolate                     |     511 | ÊÊ Ê Ê Golden treeÊ Ê Ê                                         |         |                                |
+| Chocolate                     | Chocolate                     |     512 | ÊÊ Ê Ê Other cholateÊ Ê                                         |         |                                |
+| Chewing Gum                   | Chewing Gum                   |     513 | ÊÊ Ê Ê TridentÊ                                                 |         |                                |
+| Chewing Gum                   | Chewing Gum                   |     514 | ÊÊ Ê Ê PK Ê Ê Ê                                                 |         |                                |
+| Chewing Gum                   | Chewing Gum                   |     515 | ÊÊ Ê Ê Bubble gum Ê Ê Ê                                         |         |                                |
+| Chewing Gum                   | Chewing Gum                   |     516 | ÊÊ Ê Ê Mentos Ê                                                 |         |                                |
+| Chewing Gum                   | Chewing Gum                   |     517 | ÊÊ Ê Ê Other gums Ê Ê Ê                                         |         |                                |
+| Chewing Gum                   | Chewing Gum                   |     518 | ÊÊ Ê Ê Other confectioneryÊ Ê Ê                                 |         |                                |
+| Garlic                        | Garlic                        |     523 | ÊÊ Ê Ê Garlic Ê                                                 |         |                                |
+| Ginger                        | Ginger                        |     524 | ÊÊ Ê Ê Ginger Ê                                                 |         |                                |
+| Vinegar                       | Vinegar                       |     525 | ÊÊ Ê Ê VinegarÊ                                                 |         |                                |
+| Dawadawa                      | Dawadawa                      |     526 | ÊÊ Ê Ê Dawadawa Ê Ê Ê Ê                                         |      60 | 60. Dawadawa                   |
+| Curry Power                   | Curry Power                   |     527 | ÊÊ Ê Ê Curry powder Ê Ê                                         |         |                                |
+| Chilli Powder (black pepper)  | Chilli Powder (black pepper)  |     528 | ÊÊ Ê Ê Chilli powder (black pepper) Ê Ê                         |         |                                |
+| Other Spices                  | Other Spices                  |     529 | ÊÊ Ê Ê Other spices Ê Ê                                         |         |                                |
+| Condiments                    | Condiments                    |     535 | ÊÊ Ê Ê Maggi Cube Ê Ê Ê                                         |         |                                |
+| Condiments                    | Condiments                    |     536 | ÊÊ Ê Ê Royco cube Ê Ê Ê                                         |         |                                |
+| Condiments                    | Condiments                    |     537 | ÊÊ Ê Ê Onga cubeÊ Ê Ê Ê                                         |         |                                |
+| Condiments                    | Condiments                    |     538 | ÊÊ Ê Ê Onga 3-in-1Ê Ê Ê                                         |         |                                |
+| Condiments                    | Condiments                    |     539 | ÊÊ Ê Ê BennyÊ Ê                                                 |         |                                |
+| Condiments                    | Condiments                    |     540 | ÊÊ Ê Ê Other condiments Ê Ê Ê Ê                                 |         |                                |
+| Salt                          | Salt                          |     545 | ÊÊ Ê Ê Anapuna iodated salt Ê Ê                                 |         |                                |
+| Salt                          | Salt                          |     546 | ÊÊ Ê Ê U2 iodated saltÊ                                         |         |                                |
+| Salt                          | Salt                          |     547 | ÊÊ Ê Ê Other salt Ê Ê Ê                                         |         |                                |
+| Coffee                        | Coffee                        |     550 | ÊÊ Ê Ê NescafeÊ                                                 |         |                                |
+| Cocoa Powder                  | Cocoa Powder                  |     551 | ÊÊ Ê Ê Pure Cocoa Powder (eg. Brown gold) Ê Ê Ê                 |         |                                |
+| Tea bag                       | Tea bag                       |     552 | ÊÊ Ê Ê Tea bags, (eg. Lipton) Ê                                 |         |                                |
+| Cocoa (milk powder beverages) | Cocoa (milk powder beverages) |     554 | ÊÊ Ê Ê BournvitaÊ Ê Ê Ê                                         |         |                                |
+| Cocoa (milk powder beverages) | Cocoa (milk powder beverages) |     555 | ÊÊ Ê Ê Cow bell (coffee, choco etc.)Ê Ê                         |         |                                |
+| Cocoa (milk powder beverages) | Cocoa (milk powder beverages) |     556 | ÊÊ Ê Ê This way chocolate drink Ê Ê Ê Ê                         |         |                                |
+| Cocoa (milk powder beverages) | Cocoa (milk powder beverages) |     557 | ÊÊ Ê Ê Country milk Ê Ê                                         |         |                                |
+| Cocoa (milk powder beverages) | Cocoa (milk powder beverages) |     558 | ÊÊ Ê Ê IdealÊ Ê                                                 |         |                                |
+| Cocoa (milk powder beverages) | Cocoa (milk powder beverages) |     559 | ÊÊ Ê Ê Milo Ê Ê                                                 |         |                                |
+| Cocoa (milk powder beverages) | Cocoa (milk powder beverages) |     560 | ÊÊ Ê Ê RichocoÊ                                                 |         |                                |
+| Other Beverages               | Other Beverages               |     561 | ÊÊ Ê Ê Other beverage drinksÊ Ê                                 |      92 | 92. Non-alcoholic beverages    |
+| Water                         | Water                         |     565 | ÊÊ Ê Ê Mineral water (bottled)Ê                                 |         |                                |
+| Water                         | Water                         |     566 | ÊÊ Ê Ê Satchet waterÊ Ê                                         |         |                                |
+| Soft Drinks                   | Soft Drinks                   |     567 | ÊÊ Ê Ê Coca Cola /Fanta/SpriteÊ                                 |         |                                |
+| Soft Drinks                   | Soft Drinks                   |     568 | ÊÊ Ê Ê Pepsi/MirindaÊ Ê                                         |         |                                |
+| Soft Drinks                   | Soft Drinks                   |     569 | ÊÊ Ê Ê Alvaro Ê                                                 |         |                                |
+| Soft Drinks                   | Soft Drinks                   |     570 | ÊÊ Ê Ê Other soft drinksÊ Ê Ê Ê                                 |         |                                |
+| Malt Drinks (bottle)          | Malt Drinks (bottle)          |     575 | ÊÊ Ê Ê Beta maltÊ Ê Ê Ê                                         |         |                                |
+| Malt Drinks (bottle)          | Malt Drinks (bottle)          |     576 | ÊÊ Ê Ê 5 star Ê                                                 |         |                                |
+| Malt Drinks (bottle)          | Malt Drinks (bottle)          |     577 | ÊÊ Ê Ê Malta Guinness Ê                                         |         |                                |
+| Malt Drinks (bottle)          | Malt Drinks (bottle)          |     578 | ÊÊ Ê Ê Malt schweppes Ê                                         |         |                                |
+| Malt Drinks (bottle)          | Malt Drinks (bottle)          |     579 | ÊÊ Ê Ê Mighty maltÊ Ê Ê                                         |         |                                |
+| Malt Drinks (bottle)          | Malt Drinks (bottle)          |     580 | ÊÊ Ê Ê Magic malt Ê Ê Ê                                         |         |                                |
+| Malt Drinks (bottle)          | Malt Drinks (bottle)          |     581 | ÊÊ Ê Ê Giant malt Ê Ê Ê                                         |         |                                |
+| Malt Drinks (bottle)          | Malt Drinks (bottle)          |     582 | ÊÊ Ê Ê Lion MaltÊ Ê Ê Ê                                         |         |                                |
+| Malt Drinks (bottle)          | Malt Drinks (bottle)          |     583 | ÊÊ Ê Ê Other bottled malt drinksÊ Ê Ê Ê                         |         |                                |
+| Malt Drinks (canned)          | Malt Drinks (canned)          |     587 | ÊÊ Ê Ê Magic malt Ê Ê Ê                                         |         |                                |
+| Malt Drinks (canned)          | Malt Drinks (canned)          |     588 | ÊÊ Ê Ê Malta Guinness Ê                                         |         |                                |
+| Malt Drinks (canned)          | Malt Drinks (canned)          |     589 | ÊÊ Ê Ê VolcoÊ Ê                                                 |         |                                |
+| Malt Drinks (canned)          | Malt Drinks (canned)          |     590 | ÊÊ Ê Ê Giant malt Ê Ê Ê                                         |         |                                |
+| Malt Drinks (canned)          | Malt Drinks (canned)          |     591 | ÊÊ Ê Ê Power malt Ê Ê Ê                                         |         |                                |
+| Malt Drinks (canned)          | Malt Drinks (canned)          |     592 | ÊÊ Ê Ê Mighty maltÊ Ê Ê                                         |         |                                |
+| Malt Drinks (canned)          | Malt Drinks (canned)          |     593 | ÊÊ Ê Ê Lion MaltÊ Ê Ê Ê                                         |         |                                |
+| Malt Drinks (canned)          | Malt Drinks (canned)          |     594 | ÊÊ Ê Ê Other canned malt drinks Ê Ê Ê Ê                         |         |                                |
+| Juice                         | Juice                         |     605 | ÊÊ Ê Ê Don SimonÊ Ê Ê Ê                                         |         |                                |
+| Juice                         | Juice                         |     606 | ÊÊ Ê Ê Fru TelliÊ Ê Ê Ê                                         |         |                                |
+| Juice                         | Juice                         |     607 | ÊÊ Ê Ê Blue skies Ê Ê Ê                                         |         |                                |
+| Juice                         | Juice                         |     608 | ÊÊ Ê Ê Junior Ê                                                 |         |                                |
+| Juice                         | Juice                         |     609 | ÊÊ Ê Ê Pure HeavenÊ Ê Ê                                         |         |                                |
+| Juice                         | Juice                         |     610 | ÊÊ Ê Ê Kalipo Ê                                                 |         |                                |
+| Juice                         | Juice                         |     611 | ÊÊ Ê Ê Healthy Live Ê Ê                                         |         |                                |
+| Juice                         | Juice                         |     612 | ÊÊ Ê Ê CeresÊ Ê                                                 |         |                                |
+| Juice                         | Juice                         |     613 | ÊÊ Ê Ê Other fruit drinkÊ Ê Ê Ê                                 |         |                                |
+| Gin                           | Spirits                       |     618 | ÊÊ Ê Ê GinÊ Ê Ê                                                 |         |                                |
+| Whisky                        | Spirits                       |     619 | ÊÊ Ê Ê Whisky Ê                                                 |         |                                |
+| Akpeteshie                    | Spirits                       |     620 | ÊÊ Ê Ê Akpeteshie Ê Ê Ê                                         |         |                                |
+| Bitters                       | Spirits                       |     621 | ÊÊ Ê Ê Bitters (eg. Alomo, Agya Appiah, HerbAfric etc.) Ê Ê Ê Ê |         |                                |
+| Schnapps                      | Spirits                       |     622 | ÊÊ Ê Ê Schnapps Ê Ê Ê Ê                                         |         |                                |
+| Other Spirits                 | Spirits                       |     623 | ÊÊ Ê Ê Other spiritsÊ Ê                                         |         |                                |
+| Wine                          | Wine                          |     629 | ÊÊ Ê Ê Palm WineÊ Ê Ê Ê                                         |         |                                |
+| Wine                          | Wine                          |     630 | ÊÊ Ê Ê Imported WineÊ Ê                                         |         |                                |
+| Wine                          | Wine                          |     631 | ÊÊ Ê Ê Other local wine Ê Ê Ê Ê                                 |         |                                |
+| Beer                          | Beer                          |     635 | ÊÊ Ê Ê National beer (star/club)Ê Ê Ê Ê                         |         |                                |
+| Beer                          | Beer                          |     636 | ÊÊ Ê Ê Dark beer (e.g. Guilder, Guinness) Ê Ê Ê                 |         |                                |
+| Beer                          | Beer                          |     637 | ÊÊ Ê Ê Beer (Imported)Ê                                         |         |                                |
+| Beer                          | Beer                          |     638 | ÊÊ Ê Ê Traditional beer (Pito)Ê                                 |         |                                |
+| Other Alcoholic Beverages     | Other Alcoholic Beverages     |         |                                                                 |      91 | 91. Alcoholic beverages        |
+| Cigarette                     | Tobacco                       |     645 | ÊÊ Ê Ê CigaretteÊ Ê Ê Ê                                         |         |                                |
+| Tobacco                       | Tobacco                       |     646 | ÊÊ Ê Ê Tobacco (processed)Ê Ê Ê                                 |         |                                |
+| Other Tobacco                 | Other Tobacco                 |     647 | ÊÊ Ê Ê Other tobacco products Ê                                 |         |                                |
+|                               |                               |     650 | ÊÊ Ê Ê Kola NutsÊ Ê Ê Ê                                         |         |                                |
+|                               |                               |     651 | ÊÊ Ê Ê Refuse collectionÊ Ê Ê Ê                                 |         |                                |
+|                               |                               |     652 | ÊÊ Ê Ê Refuse disposalÊ                                         |         |                                |
+|                               |                               |     653 | ÊÊ Ê Ê Expenditure on Public toilet Ê Ê                         |         |                                |
+|                               |                               |     655 | ÊÊ Ê Ê Gas for household use not for carÊ Ê Ê Ê                 |         |                                |
+|                               |                               |     657 | ÊÊ Ê Ê Kerosene Ê Ê Ê Ê                                         |         |                                |
+|                               |                               |     658 | ÊÊ Ê Ê Other fuel and power Ê Ê                                 |         |                                |
+|                               |                               |     660 | ÊÊ Ê Ê Charcoal Ê Ê Ê Ê                                         |         |                                |
+|                               |                               |     661 | ÊÊ Ê Ê Firewood Ê Ê Ê Ê                                         |         |                                |
+|                               |                               |     662 | ÊÊ Ê Ê Other solid fuel Ê Ê Ê Ê                                 |         |                                |
+|                               |                               |     663 | ÊÊ Ê Ê Ice block (household cooling and refrigeration only) Ê Ê |         |                                |
+|                               |                               |     665 | ÊÊ Ê Ê OmoÊ Ê Ê                                                 |         |                                |
+|                               |                               |     666 | ÊÊ Ê Ê ArielÊ Ê                                                 |         |                                |
+|                               |                               |     667 | ÊÊ Ê Ê Yazz Ê Ê                                                 |         |                                |
+|                               |                               |     668 | ÊÊ Ê Ê Kleesoft Ê Ê Ê Ê                                         |         |                                |
+|                               |                               |     669 | ÊÊ Ê Ê Sunlight powderÊ                                         |         |                                |
+|                               |                               |     670 | ÊÊ Ê Ê Other washing powder Ê Ê                                 |         |                                |
+|                               |                               |     675 | ÊÊ Ê Ê Sunlight soapÊ Ê                                         |         |                                |
+|                               |                               |     676 | ÊÊ Ê Ê Key soap Ê Ê Ê Ê                                         |         |                                |
+|                               |                               |     677 | ÊÊ Ê Ê Ameen soap Ê Ê Ê                                         |         |                                |
+|                               |                               |     678 | ÊÊ Ê Ê Duck soapÊ Ê Ê Ê                                         |         |                                |
+|                               |                               |     679 | ÊÊ Ê Ê BF Ê Ê Ê                                                 |         |                                |
+|                               |                               |     680 | ÊÊ Ê Ê Guardian Ê Ê Ê Ê                                         |         |                                |
+|                               |                               |     681 | ÊÊ Ê Ê Other washing soap Ê Ê Ê                                 |         |                                |
+|                               |                               |     687 | ÊÊ Ê Ê LuxÊ Ê Ê                                                 |         |                                |
+|                               |                               |     688 | ÊÊ Ê Ê Rexona Ê                                                 |         |                                |
+|                               |                               |     689 | ÊÊ Ê Ê Medisoft Ê Ê Ê Ê                                         |         |                                |
+|                               |                               |     690 | ÊÊ Ê Ê Geshia Ê                                                 |         |                                |
+|                               |                               |     691 | ÊÊ Ê Ê Other bathing soap Ê Ê Ê                                 |         |                                |
+|                               |                               |     692 | ÊÊ Ê Ê Bleaches Ê Ê Ê Ê                                         |         |                                |
+|                               |                               |     693 | ÊÊ Ê Ê Disinfectants and cleaners Ê Ê Ê                         |         |                                |
+|                               |                               |     695 | ÊÊ Ê Ê Insecticides-coils Ê Ê Ê                                 |         |                                |
+|                               |                               |     696 | ÊÊ Ê Ê Insecticides-spraysÊ Ê Ê                                 |         |                                |
+|                               |                               |     697 | ÊÊ Ê Ê MatchesÊ                                                 |         |                                |
+|                               |                               |     698 | ÊÊ Ê Ê Household candlesÊ Ê Ê Ê                                 |         |                                |
+|                               |                               |     699 | ÊÊ Ê Ê Brooms Ê                                                 |         |                                |
+|                               |                               |     703 | ÊÊ Ê Ê Paper napkins (tissue) Ê                                 |         |                                |
+|                               |                               |     704 | ÊÊ Ê Ê Kitchen paper roll Ê Ê Ê                                 |         |                                |
+|                               |                               |     705 | ÊÊ Ê Ê Toilet bowl cleanerÊ Ê Ê                                 |         |                                |
+|                               |                               |     706 | ÊÊ Ê Ê Shoe polish and brushÊ Ê                                 |         |                                |
+|                               |                               |     708 | ÊÊ Ê Ê Laundry services Ê Ê Ê Ê                                 |         |                                |
+|                               |                               |     710 | ÊÊ Ê Ê Pain killers (paracetamol, APC, etc.)Ê Ê                 |         |                                |
+|                               |                               |     711 | ÊÊ Ê Ê AntibioticsÊ Ê Ê                                         |         |                                |
+|                               |                               |     712 | ÊÊ Ê Ê Artemether + LumefantrineÊ Ê Ê Ê                         |         |                                |
+|                               |                               |     713 | ÊÊ Ê Ê Artesunate ammodiaquin Ê                                 |         |                                |
+|                               |                               |     714 | ÊÊ Ê Ê Other anti-malaria medicineÊ Ê Ê                         |         |                                |
+|                               |                               |     715 | ÊÊ Ê Ê Sulpha doxineÊ Ê                                         |         |                                |
+|                               |                               |     716 | ÊÊ Ê Ê IbuprofenÊ Ê Ê Ê                                         |         |                                |
+|                               |                               |     717 | ÊÊ Ê Ê Metronidazole (Original) Ê Ê Ê Ê                         |         |                                |
+|                               |                               |     718 | ÊÊ Ê Ê Metronidazole (Generic)Ê                                 |         |                                |
+|                               |                               |     719 | ÊÊ Ê Ê Oral rehydration salts Ê                                 |         |                                |
+|                               |                               |     722 | ÊÊ Ê Ê Absorbent cotton woolÊ Ê                                 |         |                                |
+|                               |                               |     723 | ÊÊ Ê Ê Disposable syringe for intramuscular injection Ê         |         |                                |
+|                               |                               |     724 | ÊÊ Ê Ê Kiss condomÊ Ê Ê                                         |         |                                |
+|                               |                               |     725 | ÊÊ Ê Ê Other condomsÊ Ê                                         |         |                                |
+|                               |                               |     800 | ÊÊ Ê Ê Kingdom Kookoo CapsulesÊ                                 |         |                                |
+|                               |                               |     801 | ÊÊ Ê Ê Adom tablets Ê Ê                                         |         |                                |
+|                               |                               |     802 | ÊÊ Ê Ê Abgeve syrup Ê Ê                                         |         |                                |
+|                               |                               |     803 | ÊÊ Ê Ê Other traditional drugsÊ                                 |         |                                |
+|                               |                               |     807 | ÊÊ Ê Ê Adhesive stripsÊ                                         |         |                                |
+|                               |                               |     808 | ÊÊ Ê Ê Contraceptive pillsÊ Ê Ê                                 |         |                                |
+|                               |                               |     809 | ÊÊ Ê Ê DiapersÊ                                                 |         |                                |
+|                               |                               |     810 | ÊÊ Ê Ê Other Medical Products Ê                                 |         |                                |
+|                               |                               |     820 | ÊÊ Ê Ê Petrol Ê                                                 |         |                                |
+|                               |                               |     821 | ÊÊ Ê Ê Diesel Ê                                                 |         |                                |
+|                               |                               |     822 | ÊÊ Ê Ê GasÊ Ê Ê                                                 |         |                                |
+|                               |                               |     823 | ÊÊ Ê Ê Other lubricants Ê Ê Ê Ê                                 |         |                                |
+|                               |                               |     825 | ÊÊ Ê Ê Car WashingÊ Ê Ê                                         |         |                                |
+|                               |                               |     826 | ÊÊ Ê Ê Street parking/parking spaces services Ê                 |         |                                |
+|                               |                               |     827 | ÊÊ Ê Ê Cost of travel by rail Ê                                 |         |                                |
+|                               |                               |     829 | ÊÊ Ê Ê STCÊ Ê Ê                                                 |         |                                |
+|                               |                               |     830 | ÊÊ Ê Ê VIPÊ Ê Ê                                                 |         |                                |
+|                               |                               |     831 | ÊÊ Ê Ê VVIP Ê Ê                                                 |         |                                |
+|                               |                               |     832 | ÊÊ Ê Ê Mass transport Ê                                         |         |                                |
+|                               |                               |     833 | ÊÊ Ê Ê Mini bus Ê Ê Ê Ê                                         |         |                                |
+|                               |                               |     835 | ÊÊ Ê Ê Trotro (Intra-city)Ê Ê Ê                                 |         |                                |
+|                               |                               |     836 | ÊÊ Ê Ê Mass transport (Intra-city)Ê Ê Ê                         |         |                                |
+|                               |                               |     837 | ÊÊ Ê Ê Taxi (intra-city)Ê Ê Ê Ê                                 |         |                                |
+|                               |                               |     838 | ÊÊ Ê Ê Other transportÊ                                         |         |                                |
+|                               |                               |     842 | ÊÊ Ê Ê One way public transport tripÊ Ê                         |         |                                |
+|                               |                               |     844 | ÊÊ Ê Ê River crossing (Big ferry) Ê Ê Ê                         |         |                                |
+|                               |                               |     845 | ÊÊ Ê Ê River crossing (Canoe) Ê                                 |         |                                |
+|                               |                               |     846 | ÊÊ Ê Ê Domestic flight two wayÊ                                 |         |                                |
+|                               |                               |     847 | ÊÊ Ê Ê Domestic flight one wayÊ                                 |         |                                |
+|                               |                               |     848 | ÊÊ Ê Ê Other purchased transport services Ê Ê Ê                 |         |                                |
+|                               |                               |     849 | ÊÊ Ê Ê Porters (kayaye, male porters, etc.).Ê Ê                 |         |                                |
+|                               |                               |     850 | ÊÊ Ê Ê PostageÊ                                                 |         |                                |
+|                               |                               |     851 | ÊÊ Ê Ê Other postal services (e.g. DHL) Ê Ê Ê Ê                 |         |                                |
+|                               |                               |     853 | ÊÊ Ê Ê Prepaid Phone Card Ê Ê Ê                                 |         |                                |
+|                               |                               |     854 | ÊÊ Ê Ê Internet Services at Cyber CafeÊ                         |         |                                |
+|                               |                               |     855 | ÊÊ Ê Ê Fixed line Ê Ê Ê                                         |         |                                |
+|                               |                               |     866 | ÊÊ Ê Ê Mobile Ê                                                 |         |                                |
+|                               |                               |     868 | ÊÊ Ê Ê Scanning (1 Page)Ê Ê Ê Ê                                 |         |                                |
+|                               |                               |     869 | ÊÊ Ê Ê Printing (1 Page)Ê Ê Ê Ê                                 |         |                                |
+|                               |                               |     870 | ÊÊ Ê Ê Photocopying Ê Ê                                         |         |                                |
+|                               |                               |     871 | ÊÊ Ê Ê Use of Gym facilitiesÊ Ê                                 |         |                                |
+|                               |                               |     872 | ÊÊ Ê Ê Football gameÊ Ê                                         |         |                                |
+|                               |                               |     873 | ÊÊ Ê Ê Cinema/theatre/Video housesÊ Ê Ê                         |         |                                |
+|                               |                               |     874 | ÊÊ Ê Ê Rental of DVD MovieÊ Ê Ê                                 |         |                                |
+|                               |                               |     875 | ÊÊ Ê Ê SafaribetÊ Ê Ê Ê                                         |         |                                |
+|                               |                               |     876 | ÊÊ Ê Ê National lotteries Ê Ê Ê                                 |         |                                |
+|                               |                               |     877 | ÊÊ Ê Ê Other lotteriesÊ                                         |         |                                |
+|                               |                               |     880 | ÊÊ Ê Ê Crusading GuideÊ                                         |         |                                |
+|                               |                               |     881 | ÊÊ Ê Ê InsightÊ News paperÊ Ê Ê                                 |         |                                |
+|                               |                               |     882 | ÊÊ Ê Ê Other private paperÊ Ê Ê                                 |         |                                |
+|                               |                               |     885 | ÊÊ Ê Ê National Daily Newspaper (Graphic) Ê Ê Ê                 |         |                                |
+|                               |                               |     886 | ÊÊ Ê Ê National Daily Newspaper (Times) Ê Ê Ê Ê                 |         |                                |
+|                               |                               |     887 | ÊÊ Ê Ê Other newspaperÊ                                         |         |                                |
+|                               |                               |     888 | ÊÊ Ê Ê Magazine Ê Ê Ê Ê                                         |         |                                |
+|                               |                               |     889 | ÊÊ Ê Ê Graphic Sports Ê                                         |         |                                |
+|                               |                               |     890 | ÊÊ Ê Ê International Weekly Newspaper Ê                         |         |                                |
+|                               |                               |     891 | ÊÊ Ê Ê Exercise bookÊ Ê                                         |         |                                |
+|                               |                               |     892 | ÊÊ Ê Ê Writing pads Ê Ê                                         |         |                                |
+|                               |                               |     893 | ÊÊ Ê Ê Other textbook, story booksÊ Ê Ê                         |         |                                |
+|                               |                               |     894 | ÊÊ Ê Ê Other expenditure on education not Sec2A Ê Ê Ê Ê         |         |                                |
+|                               |                               |     895 | ÊÊ Ê Ê 2B Ê Ê Ê                                                 |         |                                |
+|                               |                               |     896 | ÊÊ Ê Ê HB Ê Ê Ê                                                 |         |                                |
+|                               |                               |     897 | ÊÊ Ê Ê BicÊ Ê Ê                                                 |         |                                |
+|                               |                               |     898 | ÊÊ Ê Ê Allwrite Ê Ê Ê Ê                                         |         |                                |
+|                               |                               |     899 | ÊÊ Ê Ê PelikanÊ                                                 |         |                                |
+|                               |                               |     900 | ÊÊ Ê Ê Other penÊ Ê Ê Ê                                         |         |                                |
+|                               |                               |     901 | ÊÊ Ê Ê Eraser Ê                                                 |         |                                |
+|                               |                               |     902 | ÊÊ Ê Ê SharpenerÊ Ê Ê Ê                                         |         |                                |
+|                               |                               |     903 | ÊÊ Ê Ê Other stationery Ê Ê Ê Ê                                 |         |                                |
+|                               |                               |     905 | ÊÊ Ê Ê Tinned Dog FoodÊ                                         |         |                                |
+|                               |                               |     906 | ÊÊ Ê Ê Tinned Cat FoodÊ                                         |         |                                |
+| Pizza                         | Pizza                         |     907 | ÊÊ Ê Ê PizzaÊ Ê                                                 |         |                                |
+| Khebabs                       | Khebabs                       |     908 | ÊÊ Ê Ê Khebabs and other meatsÊ                                 |         |                                |
+| Cooked Rice and Stew          | Cooked Rice and Stew          |     909 | ÊÊ Ê Ê Cooked rice and stew Ê Ê                                 |         |                                |
+| Soup                          | Soup                          |     910 | ÊÊ Ê Ê Fufu and light soupÊ Ê Ê                                 |         |                                |
+| Other Prepared Meals          | Other Prepared Meals          |     911 | ÊÊ Ê Ê Other prepared meals Ê Ê                                 |         |                                |
+| Cooked Rice and Stew          | Cooked Rice and Stew Ê Ê      |     915 | ÊÊ Ê Ê Cooked rice and stew Ê Ê                                 |         |                                |
+| Soup                          | Soup                          |     916 | ÊÊ Ê Ê Fufu and light soupÊ Ê Ê                                 |         |                                |
+| Tuo Zaafi                     | Tuo Zaafi                     |     917 | ÊÊ Ê Ê Tuo zaafiÊ Ê Ê Ê                                         |         |                                |
+| Kenkey/Banku                  | Kenkey/Banku                  |     918 | ÊÊ Ê Ê Kenkey/Banku with fried fish/sauce Ê Ê Ê                 |         |                                |
+| Fried Plantian and Beans      | Fried Plantian and Beans      |     919 | ÊÊ Ê Ê Fried Plantain and beans (red red) Ê Ê Ê                 |         |                                |
+| Khebabs                       | Khebabs                       |     920 | ÊÊ Ê Ê KhebabsÊ                                                 |         |                                |
+| Other Prepared Meals          | Other Prepared Meals          |     921 | ÊÊ Ê Ê Other prepared meals Ê Ê                                 |         |                                |
+|                               |                               |     923 | ÊÊ Ê Ê Cost of bed occupancy in hotel/hostelÊ Ê                 |         |                                |
+|                               |                               |     925 | ÊÊ Ê Ê Men's haircutÊ Ê                                         |         |                                |
+|                               |                               |     926 | ÊÊ Ê Ê Hair wash & stylingÊ Ê Ê                                 |         |                                |
+|                               |                               |     927 | ÊÊ Ê Ê Braiding Ê Ê Ê Ê                                         |         |                                |
+|                               |                               |     928 | ÊÊ Ê Ê Manicure & pedicureÊ Ê Ê                                 |         |                                |
+|                               |                               |     929 | ÊÊ Ê Ê Other personal grooming services Ê Ê Ê Ê                 |         |                                |
+|                               |                               |     935 | ÊÊ Ê Ê DarlingÊ                                                 |         |                                |
+|                               |                               |     936 | ÊÊ Ê Ê Auntie lizyÊ Ê Ê                                         |         |                                |
+|                               |                               |     937 | ÊÊ Ê Ê UltraÊ Ê                                                 |         |                                |
+|                               |                               |     938 | ÊÊ Ê Ê Other hair Ê Ê Ê                                         |         |                                |
+|                               |                               |     939 | ÊÊ Ê Ê Wigs Ê Ê                                                 |         |                                |
+|                               |                               |     941 | ÊÊ Ê Ê Orange Ê                                                 |         |                                |
+|                               |                               |     942 | ÊÊ Ê Ê TangoÊ Ê                                                 |         |                                |
+|                               |                               |     943 | ÊÊ Ê Ê Rose Ê Ê                                                 |         |                                |
+|                               |                               |     944 | ÊÊ Ê Ê Other toilet rollÊ Ê Ê Ê                                 |         |                                |
+|                               |                               |     949 | ÊÊ Ê Ê PepsodentÊ Ê Ê Ê                                         |         |                                |
+|                               |                               |     950 | ÊÊ Ê Ê Close up Ê Ê Ê Ê                                         |         |                                |
+|                               |                               |     951 | ÊÊ Ê Ê ColgateÊ                                                 |         |                                |
+|                               |                               |     952 | ÊÊ Ê Ê Other toothpaste Ê Ê Ê Ê                                 |         |                                |
+|                               |                               |     960 | ÊÊ Ê Ê Blue ice Ê Ê Ê Ê                                         |         |                                |
+|                               |                               |     961 | ÊÊ Ê Ê Sure Ê Ê                                                 |         |                                |
+|                               |                               |     962 | ÊÊ Ê Ê Rexona Ê                                                 |         |                                |
+|                               |                               |     963 | ÊÊ Ê Ê Fa Ê Ê Ê                                                 |         |                                |
+|                               |                               |     964 | ÊÊ Ê Ê Other deodorantÊ                                         |         |                                |
+|                               |                               |     968 | ÊÊ Ê Ê BicÊ Ê Ê                                                 |         |                                |
+|                               |                               |     969 | ÊÊ Ê Ê Lord Ê Ê                                                 |         |                                |
+|                               |                               |     970 | ÊÊ Ê Ê Gillette Ê Ê Ê Ê                                         |         |                                |
+|                               |                               |     971 | ÊÊ Ê Ê Other erazor Ê Ê                                         |         |                                |
+|                               |                               |     975 | ÊÊ Ê Ê Queen ElizabethÊ                                         |         |                                |
+|                               |                               |     976 | ÊÊ Ê Ê VaslineÊ                                                 |         |                                |
+|                               |                               |     977 | ÊÊ Ê Ê OtherÊ Ê                                                 |         |                                |
+|                               |                               |     980 | ÊÊ Ê Ê AzuraÊ Ê                                                 |         |                                |
+|                               |                               |     981 | ÊÊ Ê Ê Dustin powderÊ Ê                                         |         |                                |
+|                               |                               |     982 | ÊÊ Ê Ê Stay powderÊ Ê Ê                                         |         |                                |
+|                               |                               |     983 | ÊÊ Ê Ê Other skin powderÊ Ê Ê Ê                                 |         |                                |
+|                               |                               |     984 | ÊÊ Ê Ê TamponsÊ                                                 |         |                                |
+|                               |                               |     985 | ÊÊ Ê Ê Always Ê                                                 |         |                                |
+|                               |                               |     986 | ÊÊ Ê Ê Yazz Ê Ê                                                 |         |                                |
+|                               |                               |     987 | ÊÊ Ê Ê Other sanitary pad Ê Ê Ê                                 |         |                                |
+|                               |                               |     990 | ÊÊ Ê Ê Fee for money transfer Ê                                 |         |                                |
