@@ -11,7 +11,7 @@
 | Rice (local)                 | Rice (local)                 |       4 | rice-local                                                  |       1 | rice (paddy,grain)         |
 | Rice (imported)              | Rice                         |       5 | rice-imported                                               |         |                            |
 | Other Cereal                 | Other Cereal                 |       6 | other cereals                                               |         |                            |
-| Bread                        | Bread                        |       7 | bread-sugar bread                                           |         |                            |
+| Sugar Bread                  | Bread                        |       7 | bread-sugar bread                                           |         |                            |
 | Bread                        | Bread                        |       8 | other bread                                                 |         |                            |
 | Biscuit                      | Biscuit                      |       9 | biscuits                                                    |         |                            |
 | Wheat Flour                  | Wheat Flour                  |      10 | flour (wheat)                                               |         |                            |
