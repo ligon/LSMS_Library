@@ -13,7 +13,7 @@ with dvc.api.open('../Data/POV_GH.DTA', mode='rb') as dta:
     df = from_dta(dta, convert_categoricals=True)
 
 of = df[['region','loc2']]
-of['hhid'] = df['clust'].astype(int).astype("string")+'-'+df['nh'].astype(int).astype("string")
+of['hhid'] = of.apply(lambda x:f"{int(x['clust']):d}/{int(x['nh']):02d}",axis=1)
 
 of = of.rename(columns = {'hhid': 'j',
                           'region': 'm',
