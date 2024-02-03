@@ -12,7 +12,7 @@ from local_tools import df_from_orgfile
 with dvc.api.open('../Data/POV_GH.DTA', mode='rb') as dta:
     df = from_dta(dta, convert_categoricals=True)
 
-of = df[['region','loc2']]
+of = df[['clust','nh','region','loc2']]
 of['hhid'] = of.apply(lambda x:f"{int(x['clust']):d}/{int(x['nh']):02d}",axis=1)
 
 of = of.rename(columns = {'hhid': 'j',

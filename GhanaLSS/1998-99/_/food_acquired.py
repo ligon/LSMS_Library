@@ -27,7 +27,7 @@ with dvc.api.open('../Data/SEC9B.DTA',mode='rb') as dta:
     #harmonize food labels
     df['fdexpcd'] = df['fdexpcd'].replace(labelsd['Code_9b']['Preferred Label'])
 
-df['hhid'] = df['clust'].astype(int).astype("string")+'/'+prod['nh'].astype(int).astype("string")
+df['hhid'] = df.apply(lambda x:f"{int(x['clust']):d}/{int(x['nh']):02d}",axis=1)
 
 #create purchased column labels for each visit -- from the 2nd to 11th visit
 selector_pur.update({f's9bq{i}':f'purchased_value_v{i}' for i in range(1,7)})
