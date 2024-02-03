@@ -41,7 +41,7 @@ def main(country):
     z = pd.read_parquet(f"../{country}/var/household_characteristics.parquet")
     assert z.index.names == ['j','t','m'], "Indices incorrectly named or ordered in household_characteristics."
     z.columns.name = 'k'
-    z = add_markets_from_other_features(country,z)
+    z = add_markets_from_other_features(country,z,additional_other_features=True)
     assert z.columns.name == 'k', "Columns incorrectly named or ordered in household_characteristics."
     z.index.names = ['i','t','m']
 

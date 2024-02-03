@@ -28,9 +28,9 @@ fa = fa.replace(0,np.NaN)
 of = pd.read_parquet('../var/other_features.parquet')
 
 if 'm' in of.index.names:
-    fa = fa.join(of.reset_index('m'), on=['j','t'])
+    fa = fa.join(of.reset_index('m')['m'], on=['j','t'])
 else:
-    fa = fa.join(of, on=['j','t'])
+    fa = fa.join(of['m'], on=['j','t'])
 
 fa = fa.reset_index().set_index(['j','t','m','i','units'])
 
