@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+import dvc.api
 import sys
 sys.path.append('../../_/')
 import pandas as pd
@@ -24,8 +24,9 @@ N = df.sum(axis=1)
 df['log HSize'] = np.log(N[N>0])
 
 # Get data on region
+with dvc.api.open('../Data/Togo_survey2018_fooditems_forEthan.dta',mode='rb') as dta:
+    region =  pd.read_stata(dta).set_index('hhid')['region_survey']
 
-region =  pd.read_stata('../Data/Togo_survey2018_fooditems_forEthan.dta').set_index('hhid')['region_survey']
 region.index.name = 'j'
 region = region.groupby('j').head(1)
 region = region.reset_index('j')
