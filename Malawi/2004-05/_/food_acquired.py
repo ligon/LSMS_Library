@@ -22,7 +22,7 @@ regions = pd.read_parquet('other_features.parquet').reset_index().set_index(['j'
 df = df.astype(str).apply(lambda x: x.astype(str).str.lower()).replace('nan', np.NaN)
 df = df.rename(columns_dict, axis=1)
 df = df.loc[:, list(columns_dict.values())]
-df['i'] = df['i'].apply(clean_text)
+#df['i'] = df['i'].apply(clean_text)
 
 cols = df.loc[:, ['quantity_consumed', 'expenditure', 'quantity_bought',
                   'quantity_produced', 'quantity_gifted']].columns
