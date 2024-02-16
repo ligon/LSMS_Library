@@ -469,6 +469,7 @@ with open('food_items.json','w') as f:
 #+end_src
 
 #+results:
+: None
 
 * Calculate value of consumption
   The elicitation of food expenditures has an unusual structure in
