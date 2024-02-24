@@ -136,6 +136,7 @@
 |  164 | Other alcoholic beverages              | Other alcoholic beverages              | Other alcoholic beverages              | Other alcoholic beverages              | Other alcoholic beverages              | Other alcoholic beverages              | Other alcoholic beverages            | Other alcoholic beverages            |
 
 * Create dictionary for food items
+#+name: food_codes_json
 #+begin_src python :var labels=food_codes :colnames no :tangle /tmp/bar.py
 from cfe.df_utils import orgtbl_to_df
 import json
@@ -253,6 +254,7 @@ with open('food_items.json','w') as f:
 |  519 | Thatch                      | Thatch                      | Thatch                      | Thatch                      | Thatch                         | Thatch                         | Thatch                         | Thatch                         |
 
 * Create dictionary for non-food items
+#+name: nonfood_codes_json
 #+begin_src python :var labels=nonfood_codes :colnames no :tangle /tmp/bar.py
 from cfe.df_utils import orgtbl_to_df
 import json
@@ -395,7 +397,7 @@ with open('nonfood_items.json','w') as f:
 
 
 
-
+#+name: aggregation_json
 #+begin_src python :var labels=aggregation :colnames no :tangle /tmp/bar.py
 from cfe.df_utils import orgtbl_to_df
 import json

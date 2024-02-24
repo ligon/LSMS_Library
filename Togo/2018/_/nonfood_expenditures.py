@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import sys
 sys.path.append('../../_')
+sys.path.append('../../../_')
 from togo import food_expenditures
 import dvc.api
 import numpy as np
@@ -35,7 +36,6 @@ df = df.rename(columns=vars).set_index(['j','t','m','i'])
 x = df['purchase value']
 
 x = x.unstack('i')
-
 
 labels = json.load(open('food_items.json'))
 

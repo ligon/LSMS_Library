@@ -40,7 +40,7 @@ for t in Waves.keys():
     print(t)
     #df = df.replace({'unit': unitsd[t]})
     if 'purchased_value' in df.columns and 'purchased_quantity' in df.columns:
-        df['purchased_value'] = df['purchased_value'].replace(0, np.nan)
+        df['purchased_value'] = pd.to_numeric(df['purchased_value'],errors='coerce').replace(0, np.nan)
         df['purchased_price'] = df['purchased_value']/df['purchased_quantity']
     #df = df.reset_index().set_index(['j','t','i','units','units_purchased'])
     df1 = id_walk(df,t,Waves)
@@ -54,6 +54,10 @@ for t in Waves.keys():
     dfs.append(df1)
 
 p = pd.concat(dfs)
+
+# Why?!
+p['purchased_value'] = p.purchased_value.astype(float)
+p = p.drop('index',axis=1)
 
 try:
     of = pd.read_parquet('../var/other_features.parquet')
