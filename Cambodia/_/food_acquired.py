@@ -10,6 +10,7 @@ for t in ['2019-20']:
     df = pd.read_parquet('../'+t+'/_/food_acquired.parquet').squeeze()
     df['t'] = t
     df = df.reset_index()
+    df['units'] = df['units'].astype(str)
     df = df.set_index(['j', 't', 'i', 'units'])
     df.index = df.index.rename({'units': 'u'})
     df.columns.name = 'k'
