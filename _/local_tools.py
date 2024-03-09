@@ -7,7 +7,7 @@ from collections import defaultdict
 from cfe.df_utils import use_indices
 import warnings
 import json
-
+import difflib
 
 # Data to link household ids across waves
 Waves = {'2005-06':(),
@@ -433,3 +433,20 @@ def panel_ids(Waves):
             D.update(df[[v[1],v[2]]].dropna().values.tolist())
 
     return D
+
+def conversion_table_matching_global(df, conversions, conversion_label_name, num_matches=3, cutoff = 0.6):
+    """Returns a Dataframe containing matches and Dictionary mapping top choice from a conversion table's labels  to item labels from a given df.
+    """
+    D = defaultdict(dict)
+    all_matches = pd.DataFrame(columns = ["Conversion Table Label"] + ["Match " + str(n) for n in range(1, num_matches + 1)])
+    items_unique = df['i'].str.capitalize().unique()
+    for l in conversions[conversion_label_name].unique():
+        k = difflib.get_close_matches(l.capitalize(), items_unique, n = num_matches, cutoff=cutoff)
+        if len(k):
+            D[l] = k[0]
+            k = [l] + k
+            all_matches.loc[len(all_matches.index)] = k + [np.nan] * (num_matches + 1 - len(k))
+        else:
+            D[l] = l
+            all_matches.loc[len(all_matches.index)] = [l] + [np.nan] * num_matches
+    return all_matches, D

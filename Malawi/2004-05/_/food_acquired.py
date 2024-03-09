@@ -7,7 +7,6 @@ import numpy as np
 import json
 import dvc.api
 from lsms import from_dta
-from malawi import clean_text
 
 with dvc.api.open('../Data/sec_i.dta', mode='rb') as dta:
     df = from_dta(dta, convert_categoricals=True)
@@ -22,7 +21,6 @@ regions = pd.read_parquet('other_features.parquet').reset_index().set_index(['j'
 df = df.astype(str).apply(lambda x: x.astype(str).str.lower()).replace('nan', np.NaN)
 df = df.rename(columns_dict, axis=1)
 df = df.loc[:, list(columns_dict.values())]
-#df['i'] = df['i'].apply(clean_text)
 
 cols = df.loc[:, ['quantity_consumed', 'expenditure', 'quantity_bought',
                   'quantity_produced', 'quantity_gifted']].columns
