@@ -23,7 +23,12 @@ myvars = dict(item='hj_00',
 
 df = food_acquired(fn,myvars)
 
-df = df.reset_index().set_index(['j','t','i'])
+df = df.reset_index()
+# Manual correction of a missing food label mapping 
+# Refer to page 87 of the questionnaire
+df.i = df.i.replace(1083.0, 'WHEAT, BARLEY, GRAIN, AND OTHER CEREALS')
+
+df = df.set_index(['j','t','i'])
 
 unit_conversion = {'Kg': 1,
                    'Gram': 0.001,

@@ -70,6 +70,6 @@ shocks = shocks.astype({"j": 'object',
 shocks['j'] = shocks['j'].astype(int).astype(str)
 shocks.set_index(['j','t','Shock'], inplace = True)
 
-assert df.index.is_unique, "Non-unique index!  Fix me!"
+assert shocks.index.is_unique, "Non-unique index!  Fix me!"
 
 shocks.to_parquet('shocks.parquet')
