@@ -7,9 +7,7 @@ import numpy as np
 import json
 import dvc.api
 from lsms import from_dta
-from malawi import handling_unusual_units, clean_text
-import difflib
-from collections import defaultdict
+from malawi import handling_unusual_units, conversion_table_matching
 
 with dvc.api.open('../Data/HH_MOD_G1.dta', mode='rb') as dta:
     df = from_dta(dta, convert_categoricals=True)
@@ -32,18 +30,12 @@ cols = df.loc[:, ['quantity_consumed', 'expenditure', 'quantity_bought',
                   'quantity_produced', 'quantity_gifted']].columns
 df[cols] = df[cols].apply(pd.to_numeric, errors='coerce')
 
-D = defaultdict(dict)
-items_unique = df['i'].unique()
-for l in conversions['item_name'].unique():
-    k = difflib.get_close_matches(l.capitalize(), items_unique)
-    if len(k):
-        D[l] = k[0]
-    else:
-        D[l] = l
+match_df, D = conversion_table_matching(df, conversions, conversion_label_name = 'item_name')
 conversions['item_name'] = conversions['item_name'].map(D)
 
 df = df.set_index(['j', 'i'])
 df = df.join(regions).set_index('m', append=True).replace(r'^\s*$', np.nan, regex=True)
+df['unitcode_consumed'], df['unitcode_bought'] = df['unitcode_consumed'].str.upper(), df['unitcode_bought'].str.upper()
 
 #handling conversion table
 conversions = conversions.replace({'South': 'Southern'}).groupby(['region', 'item_name', 'unit_code']).agg({'factor': 'mean'})

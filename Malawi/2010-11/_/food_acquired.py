@@ -7,9 +7,7 @@ import numpy as np
 import json
 import dvc.api
 from lsms import from_dta
-from malawi import clean_text
-import difflib
-from collections import defaultdict
+from malawi import conversion_table_matching
 
 with dvc.api.open('../Data/Full_Sample/Household/hh_mod_g1.dta', mode='rb') as dta:
     df = from_dta(dta, convert_categoricals=True)
@@ -25,27 +23,23 @@ columns_dict = {'case_id': 'j', 'hh_g02' : 'i', 'hh_g03a': 'quantity_consumed', 
 
 df = df.rename(columns_dict, axis=1)
 df = df.loc[:, list(columns_dict.values())]
-df['i'] = df['i'].astype(str)
+df['i'] = df['i'].astype(str).str.capitalize()
 
 cols = df.loc[:, ['quantity_consumed', 'expenditure', 'quantity_bought',
                   'quantity_produced', 'quantity_gifted']].columns
 df[cols] = df[cols].apply(pd.to_numeric, errors='coerce')
 
-D = defaultdict(dict)
-items_unique = df['i'].unique()
-for l in conversions['item_name'].unique():
-    k = difflib.get_close_matches(l.capitalize(), items_unique)
-    if len(k):
-        D[l] = k[0]
-    else:
-        D[l] = l
+
+match_df, D = conversion_table_matching(df, conversions, conversion_label_name = 'item_name')
 conversions['item_name'] = conversions['item_name'].map(D)
 
 df = df.set_index(['j', 'i'])
 df = df.join(regions).set_index('m', append=True).replace(r'^\s*$', np.nan, regex=True)
 
-#conversions['item_name'] = conversions['item_name'].apply(clean_text)
+df['unitcode_consumed'] = df['unitcode_consumed'].str.upper()
 conversions = conversions.set_index(['region', 'item_name', 'unit_code'])
+
+df['unitcode_consumed'], df['unitcode_bought'] = df['unitcode_consumed'].str.upper(), df['unitcode_bought'].str.upper()
 df = df.reset_index().merge(conversions, how='left', left_on=['i', 'm', 'unitcode_consumed'], right_on=['item_name', 'region', 'unit_code']).rename({'factor' : 'cfactor_consumed'}, axis=1)
 df = df.merge(conversions, how='left', left_on=['i', 'm', 'unitcode_bought'], right_on=['item_name', 'region', 'unit_code']).rename({'factor' : 'cfactor_bought'}, axis = 1)
 df = df.set_index(['j', 'm', 'i'])
