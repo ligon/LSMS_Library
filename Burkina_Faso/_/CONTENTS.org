@@ -15,3 +15,6 @@ Makefile works for current files in the folder.
 ** DONE household_characteristics.py
 ** DONE food_acquired.py
 issue for 4 rounds (called passages in documentation) wherein following rounds contain no data for food quantities or units for some reason though documentation states it was surveyed. for now, only contains data on first round.
+
+ISSUE: Categorical Mapping Missing for Units
+In both rounds, many units remain as numerical codes without categorical mappings, and they constitude a significant portion of the entries (e.g. 22% recorded units cannot be identified in 2014). The questionnaires claim to have lists of unit mapping but missing from the actual document.
