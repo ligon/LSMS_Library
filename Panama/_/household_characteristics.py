@@ -9,7 +9,7 @@ x = []
 for t in ['1997', '2003', '2008']:
     df = pd.read_parquet('../'+t+'/_/household_characteristics.parquet')
     df = df.reset_index()
-    df['j'] = t + df['j']
+    df['j'] = t + df['j'].astype(str)
     df.replace({'Comarca de San Blas': 'Comarca Kuna Yala'})
     df = df.set_index(['j', 't', 'm'])
     df.columns.name = 'k'
@@ -17,4 +17,4 @@ for t in ['1997', '2003', '2008']:
 
 concatenated = pd.concat(x)
 
-concatenated.to_parquet('household_characteristics.parquet')
+concatenated.to_parquet('../var/household_characteristics.parquet')

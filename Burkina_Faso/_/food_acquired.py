@@ -9,6 +9,7 @@ x = []
 for t in ['2014', '2018-19']:
     df = pd.read_parquet('../'+t+'/_/food_acquired.parquet').squeeze()
     df = df.reset_index()
+    df['units'] = df['units'].astype(str)
     df = df.set_index(['j', 't', 'i', 'units'])
     df = df.loc[:, ['quantity', 'total expenses', 'price per unit']]
     df.index = df.index.rename({'units': 'u'})
