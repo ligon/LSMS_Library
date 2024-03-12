@@ -6,6 +6,9 @@ import json
 import dvc.api
 from lsms import from_dta
 from lsms.tools import get_household_roster
+import sys
+sys.path.append('../../../_/')
+from local_tools import conversion_table_matching_global
 
 def age_sex_composition(df, sex, sex_converter, age, age_converter, hhid):
     Age_ints = ((0,4),(4,9),(9,14),(14,19),(19,31),(31,51),(51,100))
@@ -65,7 +68,5 @@ def handling_unusual_units(df):
     df['u_bought'] = df['u_bought'].replace('nan', np.NaN).fillna(df['units_bought'])
     return df
 
-def clean_text(txt):
-    txt = txt.replace('(', '').replace(')', '').replace(r'\s+', ' ')
-    txt = txt.capitalize().strip()
-    return txt
+def conversion_table_matching(df, conversions, conversion_label_name, num_matches=3, cutoff = 0.6):
+    return conversion_table_matching_global(df, conversions, conversion_label_name, num_matches=num_matches, cutoff = cutoff)

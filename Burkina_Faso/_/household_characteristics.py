@@ -11,4 +11,4 @@ for t in ['2014', '2018-19']:
 
 concatenated = pd.concat(x)
 
-concatenated.to_parquet('household_characteristics.parquet')
+concatenated.to_parquet('../var/household_characteristics.parquet')
