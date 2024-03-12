@@ -5,7 +5,7 @@ import numpy as np
 from cfe.regression import Regression
 import argparse
 
-def main(country,alltm=True):
+def main(country,alltm=False):
     x,z,p = mydata(country)
 
     try:

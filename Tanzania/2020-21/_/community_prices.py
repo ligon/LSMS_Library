@@ -63,8 +63,8 @@ from lsms.tools import from_dta
 
 fn = '../Data/hh_sec_a.dta'
 
-myvars = dict(HHID='sdd_hhid',
-              urban='sdd_rural',
+myvars = dict(HHID='y5_hhid',
+              urban='y5_rural',
               domain='domain',
               ea = 'hh_a04_1',
               village = 'hh_a03_3a',
