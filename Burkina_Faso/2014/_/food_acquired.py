@@ -41,5 +41,7 @@ for i in np.arange(1,2): #change to 5 to get the files for all 4 rounds
 concatenated = pd.concat(x)
 
 concatenated.columns.name = 'k'
+#inspect missing encoding for units
+concatenated = concatenated.replace('nan', np.nan).dropna(how = 'all')
 
 concatenated.to_parquet('food_acquired.parquet')
