@@ -7,7 +7,8 @@ import sys
 sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
-from tanzania import Waves, id_match
+from tanzania import Waves, id_match, add_markets_from_other_features
+import warnings
 import dvc.api
 from lsms import from_dta
 
@@ -17,7 +18,12 @@ for t in Waves.keys():
     #s[t] = id_match(s[t],t,Waves)
 
 s = pd.concat(s.values())
-s['m'] = 'Tanzania'
-s = s.reset_index().set_index(['j','t','m'])
+
+try:
+    s = add_markets_from_other_features('',s).reset_index().set_index(['j','t','m','Shock'])
+except FileNotFoundError:
+    warnings.warn('No other_features.parquet found.')
+    s['m'] = 'Tanzania'
+    s = s.reset_index().set_index(['j','t','m','Shock'])
 
 s.to_parquet('../var/shocks.parquet')
