@@ -1,6 +1,9 @@
 """Calculate food prices for different items across rounds; allow
 different prices for different units.  
 """
+import sys
+sys.path.append('../../_/')
+from local_tools import to_parquet
 
 import pandas as pd
 import numpy as np
@@ -50,4 +53,4 @@ except FileNotFoundError:
 
 p = p.rename(index=fix_food_labels(),level='i')
 
-p.to_parquet('../var/food_acquired.parquet')
+to_parquet(p,'../var/food_acquired.parquet')
