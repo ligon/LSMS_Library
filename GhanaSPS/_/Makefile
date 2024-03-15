@@ -40,6 +40,12 @@ other_features_parquet := $(other_features:.py=.parquet)
 ../var/other_features.parquet: other_features.py $(other_features_parquet)
 	python other_features.py
 
+../%/_/other_expenditures.parquet:
+	(cd $(@D) && python other_expenditures.py)
+
+../var/other_expenditures.parquet: other_expenditures.py $(other_expenditures_parquet)
+	python other_expenditures.py
+
 
 clean:
 	-rm $(parquet)
