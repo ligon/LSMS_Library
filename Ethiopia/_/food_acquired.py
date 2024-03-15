@@ -6,6 +6,10 @@ import pandas as pd
 import numpy as np
 from ethiopia import change_id, Waves, harmonized_food_labels
 import warnings
+import sys
+sys.path.append('../../_/')
+from local_tools import to_parquet
+
 
 def fix_food_labels():
     D = {}
@@ -42,7 +46,9 @@ try:
     of = pd.read_parquet('../var/other_features.parquet')
 
     p = p.join(of.reset_index('m')['m'],on=['j','t'])
-    p = p.reset_index().set_index(['j','t','m','i','units','units_purchased'])
+    p = p.reset_index()
+    p['units'], p['units_purchased'] = p['units'].astype(str), p['units_purchased'].astype(str)
+    p = p.set_index(['j','t','m','i','units','units_purchased'])
 except FileNotFoundError:
     warnings.warn('No other_features.parquet found.')
     p['m'] = 'Ethiopia'
@@ -50,4 +56,4 @@ except FileNotFoundError:
 
 p = p.rename(index=fix_food_labels(),level='i')
 
-p.to_parquet('../var/food_acquired.parquet')
+to_parquet(p, '../var/food_acquired.parquet')

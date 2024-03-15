@@ -9,7 +9,7 @@ df = pd.read_parquet('../var/food_acquired.parquet')
 
 x = df[['total spent']].rename({'total spent': 'total expenditure'})
 x.droplevel('u').to_parquet('../var/food_expenditures.parquet')
-x.droplevel('u').unstack('i').to_csv('~/Downloads/food_expenditures.csv')
+x.droplevel('u').groupby(['j', 'm', 't', 'i']).sum().unstack('i').to_csv('~/Downloads/food_expenditures.csv')
 
 p = df['price per unit'].groupby(['t','m','i','u']).median()
 p.unstack('t').to_parquet('../var/food_prices.parquet')
