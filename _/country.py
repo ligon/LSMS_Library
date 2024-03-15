@@ -26,3 +26,6 @@ class Country:
 
     def household_characteristics(self):
         return self.read_parquet('household_characteristics')
+
+    def nutrition(self):
+        return self.read_parquet('nutrition')

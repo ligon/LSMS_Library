@@ -6,7 +6,7 @@ parquet := $(source:.py=.parquet)
 
 var = ../var/food_expenditures.parquet ../var/food_quantities.parquet ../var/food_prices.parquet \
 	  ../var/household_characteristics.parquet ../var/other_features.parquet \
-      ../var/shocks.parquet
+      ../var/shocks.parquet ../var/fct.parquet ../var/nutrition.parquet
 
 all: $(parquet) $(var)
 
@@ -19,7 +19,7 @@ food_acquired_parquet := $(food_acquired:.py=.parquet)
 ../%/_/food_acquired.parquet: $(food_acquired)
 	(cd $(@D) && python food_acquired.py)
 
-../var/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
+../var/food_acquired.parquet: food_acquired.py $(food_acquired_parquet) ../var/other_features.parquet
 	python food_acquired.py
 
 household_characteristics = $(shell find $(rounds) -name household_characteristics.py)
@@ -48,6 +48,9 @@ shocks_parquet := $(shocks:.py=.parquet)
 
 ../var/shocks.parquet: shocks.py $(shocks_parquet)
 	python shocks.py
+
+../var/fct.parquet ../var/nutrition.parquet: nutrition.py food_items.org ../var/food_quantities.parquet
+	python nutrition.py
 
 
 clean:

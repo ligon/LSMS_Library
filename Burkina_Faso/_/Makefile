@@ -4,7 +4,7 @@ source = $(shell find $(rounds) -name \*.py)
 parquet := $(source:.py=.parquet)
 
 var = ../var/food_expenditures.parquet ../var/food_quantities.parquet ../var/food_prices.parquet \
-	  ../var/household_characteristics.parquet ../var/other_features.parquet 
+	  ../var/household_characteristics.parquet ../var/other_features.parquet ../var/nutrition.parquet
 
 all: $(parquet) $(var)
 
@@ -37,6 +37,9 @@ other_features_parquet := $(other_features:.py=.parquet)
 
 ../var/other_features.parquet: other_features.py $(other_features_parquet)
 	python other_features.py
+
+../var/fct.parquet ../var/nutrition.parquet: nutrition.py food_items.org
+	python nutrition.py
 
 %.parquet: %.py food_items.org burkina_faso.py
 	(cd $(@D) && python ./$(<F))
