@@ -1,6 +1,9 @@
 """Calculate food prices for different items across rounds; allow
 different prices for different units.  
 """
+import sys
+sys.path.append('../../_/')
+from local_tools import to_parquet
 
 import pandas as pd
 import numpy as np
