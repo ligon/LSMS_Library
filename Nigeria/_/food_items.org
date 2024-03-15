@@ -147,6 +147,9 @@ with open('food_items.json','w') as f:
     json.dump(df.to_dict(),f)
 #+end_src
 
+#+results: food_codes_json
+: None
+
 #+results:
 
 
@@ -264,6 +267,9 @@ df = orgtbl_to_df(labels).set_index('Code')
 with open('nonfood_items.json','w') as f:
     json.dump(df.to_dict(),f)
 #+end_src
+
+#+results: nonfood_codes_json
+: None
 
 #+results:
 
@@ -407,5 +413,8 @@ df = orgtbl_to_df(labels).set_index('Original Label')
 with open('aggregate_items.json','w') as f:
     json.dump(df.to_dict(),f)
 #+end_src
+
+#+results: aggregation_json
+: None
 
 #+results:
