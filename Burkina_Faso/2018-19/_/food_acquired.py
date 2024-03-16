@@ -3,6 +3,8 @@
 import sys
 sys.path.append('../../_/')
 from burkina_faso import age_sex_composition
+sys.path.append('../../../_')
+from local_tools import to_parquet
 import pandas as pd
 import numpy as np
 import json
@@ -30,6 +32,5 @@ df['i'] = df['i'].replace({11: 'Autres céréales',
 df = df.set_index(['j', 'i', 't'])
 #inspect missing encoding for units
 df = df.dropna(subset=['quantity', 'total expenses', 'price per unit'])
-df['units'] = df['units'].map(lambda x: str(int(x)) if isinstance(x,float) == True or isinstance(x,int) else x)
 
-df.to_parquet('food_acquired.parquet')
+to_parquet(df,'food_acquired.parquet')
