@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import pandas as pd
+from eep153_tools.sheets import write_sheet
 from importlib.resources import files
 
 
@@ -15,17 +16,59 @@ class Country:
 
     def read_parquet(self,parquet):
         try:
-            x = pd.read_parquet((self.resources / f'{parquet}.parquet'))
+            return pd.read_parquet((self.resources / f'{parquet}.parquet'))
         except FileNotFoundError:
-            print("Need to build {parquet}")
-
-        return x
+            print(f"Need to build {parquet}")
 
     def food_expenditures(self):
-        return self.read_parquet('food_expenditures')
+        x = self.read_parquet('food_expenditures').squeeze().dropna()
+        x.index.names = ['i','t','m','j']
+        return x
 
     def household_characteristics(self):
-        return self.read_parquet('household_characteristics')
+        x = self.read_parquet('household_characteristics')
+        x.index.names = ['i','t','m']
+        return x
 
-    def nutrition(self):
-        return self.read_parquet('nutrition')
+    def fct(self):
+        x = self.read_parquet('fct')
+        if x is None: return
+        x.index.name = 'j'
+        return x
+
+    def export_to_google_sheet(self,key=None,t=None,z=None):
+        x = self.food_expenditures()
+        if z is None:
+            z = self.household_characteristics()
+        fct = self.fct()
+        if t is not None:
+            x = x.xs(t,level='t',drop_level=False)
+            z = z.xs(t,level='t',drop_level=False)
+            modifier = f' ({t})'
+        else:
+            modifier = ''
+
+        if key is None:
+            key = write_sheet(x.unstack('j'),
+                          'ligon@berkeley.edu',user_role='writer',
+                          json_creds='/home/ligon/.eep153.service_accounts/instructors@eep153.iam.gserviceaccount.com',
+                          sheet='Food Expenditures'+modifier)
+            print(f"Key={key}")
+        else:
+            write_sheet(x.unstack('j'),
+                        'ligon@berkeley.edu',user_role='writer',
+                        json_creds='/home/ligon/.eep153.service_accounts/instructors@eep153.iam.gserviceaccount.com',
+                        sheet='Food Expenditures'+modifier,key=key)
+
+        write_sheet(z,
+                    'ligon@berkeley.edu',user_role='writer',
+                    json_creds='/home/ligon/.eep153.service_accounts/instructors@eep153.iam.gserviceaccount.com',
+                    sheet='Household Characteristics'+modifier,key=key)
+
+        if fct is not None:
+            write_sheet(self.fct(),
+                    'ligon@berkeley.edu',user_role='writer',
+                    json_creds='/home/ligon/.eep153.service_accounts/instructors@eep153.iam.gserviceaccount.com',
+                        sheet='FCT',key=key)
+
+        return key
