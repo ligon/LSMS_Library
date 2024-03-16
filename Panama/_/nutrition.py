@@ -35,5 +35,6 @@ for column in final_fct.columns:
 
 final_fct.to_parquet('../var/fct.parquet')
 
+final_q = final_q.drop(columns=['nan'])
 n = final_q@final_fct
 n.to_parquet('../var/nutrition.parquet')

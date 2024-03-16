@@ -2,6 +2,8 @@
 import sys
 sys.path.append('../../_/')
 from ethiopia import food_acquired
+sys.path.append('../../../_/')
+from local_tools import to_parquet
 
 fn='../Data/sect6a_hh_w4.dta'
 
@@ -15,4 +17,4 @@ myvars = dict(item='item_cd',                  # Code label uniquely identifying
 
 df = food_acquired(fn,myvars)
 
-df.to_parquet('food_acquired.parquet')
+to_parquet(df, 'food_acquired.parquet')

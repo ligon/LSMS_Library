@@ -8,6 +8,8 @@ import json
 import dvc.api
 from lsms import from_dta
 import pyreadstat
+sys.path.append('../../../_/')
+from local_tools import to_parquet
 
 fs = dvc.api.DVCFileSystem('../../')
 fs.get_file('/Panama/1997/Data/GAST-A.DTA', '/tmp/GAST-A.DTA')
@@ -40,11 +42,15 @@ pound_dict = units.loc[:, ["Translation", "Conversion to Pounds"]].set_index("Tr
 poundmappingb = df["unitcode (bought)"].map(pound_dict).fillna(1) * df['quantity bought']
 poundmappingo = df["unitcode (obtained)"].map(pound_dict).fillna(1) * df['quantity obtained']
 
-df.loc[poundmappingb != df["quantity bought"], "unitcode (bought)"] = "pound"
-df.loc[poundmappingo != df["quantity obtained"], "unitcode (obtained)"] = "pound"
+df['unitcode (bought)'] = np.where(poundmappingb != df["quantity bought"], 'pound',  df["unitcode (bought)"])
+df['unitcode (obtained)'] = np.where(poundmappingo != df["quantity obtained"], 'pound', df["unitcode (obtained)"])
+
 df['quantity bought'] = poundmappingb
 df['quantity obtained'] = poundmappingo
 
+df['unitcode (bought)'] = df['unitcode (bought)'].astype(str)
+df['unitcode (obtained)'] = df['unitcode (obtained)'].astype(str)
+
 df['price per unit'] = df['total spent']/df['quantity bought']
 
-df.to_parquet("food_acquired.parquet")
+to_parquet(df, "food_acquired.parquet")
