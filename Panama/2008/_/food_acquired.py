@@ -8,7 +8,8 @@ import json
 import dvc.api
 from lsms import from_dta
 import pyreadstat
-
+sys.path.append('../../../_/')
+from local_tools import to_parquet
 
 fs = dvc.api.DVCFileSystem('../../')
 fs.get_file('/Panama/2008/Data/05alimentos.dta', '/tmp/05alimentos.dta')
@@ -21,9 +22,10 @@ df = df.rename({'hogar': 'j', 'producto':'i', 's11a6a':'quantity bought', 's11a6
 
 cat_columns = df.iloc[:, 2:].select_dtypes(['category']).columns
 df[cat_columns] = df[cat_columns].apply(lambda x: x.cat.codes)
-df.replace({-1: None}, inplace=True)
+df.replace({-1: np.NaN}, inplace=True)
 val = df._get_numeric_data()
-val[val >= 99999] = 0
+val[val >= 99999] = np.NaN
+val[val == 0] = np.NaN
 
 food_items = pd.read_csv('../../_/food_items.org', sep='|', skipinitialspace=True, converters={1:lambda s: s.strip()})
 food_items.columns = [s.strip() for s in food_items.columns]
@@ -44,4 +46,5 @@ df['quantity obtained'] = pd.to_numeric(df['quantity obtained'], errors='coerce'
 
 df['price per unit'] = df['total spent']/df['quantity bought']
 
-df.to_parquet("food_acquired.parquet")
+
+to_parquet(df, "food_acquired.parquet")
