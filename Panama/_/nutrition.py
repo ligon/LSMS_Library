@@ -13,7 +13,7 @@ q = pd.read_parquet('../var/food_quantities.parquet')
 
 q['q_sum'] = q.sum(axis=1)
 q = q[['q_sum']].droplevel('u').reset_index()
-final_q = q.pivot_table(index = ['j','t','m'], columns = 'i', values = 'q_sum').fillna(0).drop(['Arroz(Todos)', 'Cigarrillo Y Tabaco', 'Otros', 'Queso (Balnco Y Amarillo)'], axis = 1)
+final_q = q.pivot_table(index = ['j','t','m'], columns = 'i', values = 'q_sum').fillna(0).drop(['Cigarrillo Y Tabaco', 'Otros'], axis = 1)
 # missing fct information
 
 # find FCT codes for foods
@@ -35,6 +35,9 @@ for column in final_fct.columns:
 
 final_fct.to_parquet('../var/fct.parquet')
 
-final_q = final_q.drop(columns=['nan'])
-n = final_q@final_fct
+print("Unmatched foods: ",final_q.columns.difference(final_fct.index))
+
+final_q = final_q.mask(~np.isfinite(final_q),0)
+
+n = final_q.reindex(columns=final_fct.index)@final_fct
 n.to_parquet('../var/nutrition.parquet')
