@@ -12,7 +12,6 @@ import pyreadstat
 fs = dvc.api.DVCFileSystem('../../')
 fs.get_file('/Panama/1997/Data/GAST-A.DTA', '/tmp/GAST-A.DTA')
 df, meta = pyreadstat.read_dta('/tmp/GAST-A.DTA')
-
 with open('../../_/units.json','r') as f:
    unit_conversions = json.load(f)
 
@@ -44,6 +43,11 @@ df.loc[poundmappingb != df["quantity bought"], "unitcode (bought)"] = "pound"
 df.loc[poundmappingo != df["quantity obtained"], "unitcode (obtained)"] = "pound"
 df['quantity bought'] = poundmappingb
 df['quantity obtained'] = poundmappingo
+
+# replace numbers near 9999 which indicate missing 
+tolerance = 1
+numeric_cols = df.select_dtypes(include=[np.number])
+df[numeric_cols.columns] = numeric_cols.where((numeric_cols < (9999 - tolerance)) | (numeric_cols > (9999 + tolerance)), np.nan)
 
 df['price per unit'] = df['total spent']/df['quantity bought']
 
