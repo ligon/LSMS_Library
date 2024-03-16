@@ -46,7 +46,11 @@ p = p.rename(index=tokg,level='u')
 
 q = v['quantity'].droplevel('units_purchased')
 
-q = q.multiply(kgs_unitvalue,axis=0)
+q = q.multiply(kgs_unitvalue,axis=0).dropna()
+
+if 'units' in q.index.names:
+    q = q.droplevel('units')
+
 q.index.names = ['j','t','m','i','u']
 q = q.rename(index=tokg,level='u')
 
