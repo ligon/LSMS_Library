@@ -382,6 +382,15 @@ def to_parquet(df,fn):
             if str in [type(x) for x in cats]: # At least some categories are strings...
                 df[col] = df[col].cat.rename_categories(lambda x: str(x))
 
+    # Pyarrow can't deal with mixes of types in columns of type object. Just
+    # convert them all to str.
+    idxnames = df.index.names
+    all = df.reset_index()
+    for column in all:
+        if all[column].dtype=='O':
+            all[column] = all[column].astype(str)
+    df = all.set_index(idxnames)
+
     df.to_parquet(fn)
 
     return df

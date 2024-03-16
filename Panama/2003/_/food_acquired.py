@@ -6,6 +6,8 @@ import json
 import dvc.api
 from lsms import from_dta
 import pyreadstat
+sys.path.append('../../../_/')
+from local_tools import to_parquet
 
 fs = dvc.api.DVCFileSystem('../../')
 fs.get_file('/Panama/2003/Data/E03GA10B.DTA', '/tmp/E03GA10B.DTA')
@@ -43,4 +45,4 @@ df['unitcode (obtained)'] = df['unitcode (obtained)'].map(unit_dict).astype(str)
 
 df['price per unit'] = df['total spent']/df['quantity bought']
 
-df.to_parquet("food_acquired.parquet")
+to_parquet(df, "food_acquired.parquet")
