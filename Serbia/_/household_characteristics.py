@@ -8,14 +8,9 @@ x = []
 for t in ['2007']:
     df = pd.read_parquet('../'+t+'/_/household_characteristics.parquet')
     df['t'] = t
-    regions = pd.read_parquet('../'+t+'/_/household_characteristics.parquet')
-    df = pd.merge(left = df, right = regions, how = 'left', left_index = True, right_index = True)
     x.append(df)
 
 concatenated = pd.concat(x)
-
-of = pd.read_parquet('../var/other_features.parquet')
-
 
 if 'm' not in concatenated.index.names:
     of = pd.read_parquet('../var/other_features.parquet')

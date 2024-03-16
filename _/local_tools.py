@@ -93,6 +93,13 @@ def food_acquired(fn,myvars):
     df['unitvalue_own'] = df['value_own']/df['quantity_own']
     df['unitvalue_inkind'] = df['value_inkind']/df['quantity_inkind']
 
+    # Deal with possible zeros in quantities
+    df['unitvalue_home'] = df['unitvalue_home'].where(np.isfinite(df['unitvalue_home']))
+    df['unitvalue_away'] = df['unitvalue_away'].where(np.isfinite(df['unitvalue_away']))
+    df['unitvalue_own'] = df['unitvalue_own'].where(np.isfinite(df['unitvalue_own']))
+    df['unitvalue_inkind'] = df['unitvalue_inkind'].where(np.isfinite(df['unitvalue_inkind']))
+
+
     # Get list of units used in current survey
     units = list(set(df.index.get_level_values('units').tolist()))
 
