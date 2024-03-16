@@ -50,7 +50,6 @@ try:
 
     p = p.join(of.reset_index('m')['m'],on=['j','t'])
     p = p.reset_index()
-    p['units'], p['units_purchased'] = p['units'].astype(str), p['units_purchased'].astype(str)
     p = p.set_index(['j','t','m','i','units','units_purchased'])
 except FileNotFoundError:
     warnings.warn('No other_features.parquet found.')
