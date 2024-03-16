@@ -13,6 +13,13 @@ See discussion above for harmonization of food labels across rounds and surveys.
 ** TODO conversion_to_kgs.json
 
 ** TODO other_features.py
+
+'2013-14' has no regions or urban/rural data.
+
+According to the data map, 'District codes need to be checked; may be good to harmonize across waves; may be good to integrate numerical codes and string names into numerical labeled variables; at least a few communities span two Eas--does that make sense? Rural/urban codes are missing from Wave 2; within Wave 1, there is some rural vs. urban inconsistency between public World Bank data and private PII data; there is some admin data from W1 that I haven't found in W2 that we may want to consider either removing from the dataset or pursuing in W2.'
+
+So 2009-10 (Wave 1) has information but 2013-14 (Wave 2) does not. For now, all of 2013-14 has Ghana set as its region.
+
 ** TODO household_characteristics.py
 ** TODO food_acquired.py
 Test...
