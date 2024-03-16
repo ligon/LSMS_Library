@@ -4,6 +4,9 @@ different prices for different units.
 
 import pandas as pd
 import numpy as np
+import sys
+sys.path.append('../../_/')
+from local_tools import to_parquet
 
 fa = []
 for t in ['2018-19']:
@@ -25,4 +28,4 @@ fa = fa.join(of.reset_index('m'), on=['j','t'])
 fa = fa.reset_index().set_index(['j','t','m','i','units'])
 
 fa = fa.replace(0,np.nan)
-fa.to_parquet('../var/food_acquired.parquet')
+to_parquet(fa, '../var/food_acquired.parquet')

@@ -8,7 +8,7 @@ import numpy as np
 import json
 import dvc.api
 from lsms import from_dta
-from local_tools import df_from_orgfile
+from local_tools import df_from_orgfile, to_parquet
 
 with dvc.api.open('../Data/s07b_me_sen2018.dta', mode='rb') as dta:
     df = from_dta(dta, convert_categoricals=True,encoding='ISO-8859-1')
@@ -33,4 +33,4 @@ final = final.replace({'units':unitsd,'last purchase units':unitsd})
 final['price'] = final['last expenditure']/final['last purchase quantity']
 
 final = final.set_index(['j', 't', 'i'])
-final.to_parquet('food_acquired.parquet')
+to_parquet(final, 'food_acquired.parquet')

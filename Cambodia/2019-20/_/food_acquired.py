@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
 import sys
-sys.path.append('../../_/')
+sys.path.append('../../../_/')
 import pandas as pd
 import numpy as np
 import json
 import dvc.api
 from lsms import from_dta
+from local_tools import to_parquet
 
 with dvc.api.open('../Data/hh_sec_5.dta', mode='rb') as dta:
     foods = from_dta(dta, convert_categoricals=True)
@@ -25,4 +26,4 @@ df['price per unit'] = (df['total spent']+ df['value obtained'])/df['quantity']
 df = df.drop({'s05_start_time', 's05_end_time', 's05_respondent'}, axis=1)
 df = df.set_index(['j', 'i'])
 
-df.to_parquet("food_acquired.parquet")
+to_parquet(df, "food_acquired.parquet")
