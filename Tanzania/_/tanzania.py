@@ -149,6 +149,8 @@ def food_acquired(fn,myvars):
                     "quant_inkind" : 'float64'})
 
     df['unitvalue_purchase'] = df['value_purchase']/df['quant_purchase']
+    df['unitvalue_purchase'] = df['unitvalue_purchase'].where(np.isfinite(df['unitvalue_purchase']))
+
 
     #with open('../../_/conversion_to_kgs.json','r') as f:
         #conversion_to_kgs = pd.Series(json.load(f))

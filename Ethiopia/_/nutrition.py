@@ -35,7 +35,9 @@ final_fct = pd.concat([fct, fct_add]).sort_index().T
 #sum all quantities 
 q = pd.read_parquet('../var/food_quantities.parquet')
 q['q_sum'] = q.sum(axis=1)
-q = q[['q_sum']].droplevel('units').reset_index()
+#q = q[['q_sum']].droplevel('units').reset_index()
+q = q[['q_sum']].reset_index()
+
 final_q = q.pivot_table(index = ['j','t','m'], columns = 'i', values = 'q_sum')
 
 #cross-filter two dfs to align matrices; replace NaN values with 0 

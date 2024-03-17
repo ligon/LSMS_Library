@@ -105,6 +105,8 @@ def food_acquired(fn,myvars):
     # Compute unit values; BUT note these are in units_purchased, not necessarily units.
     df['unitvalue'] = df['value_purchased']/df['quantity_purchased']
 
+    df['unitvalue'] = df['unitvalue'].where(np.isfinite(df.unitvalue))
+
     # Get list of units used in current survey
     units = list(set(df.index.get_level_values('units').tolist()))
     units_purchased = list(set(df.index.get_level_values('units_purchased').tolist()))

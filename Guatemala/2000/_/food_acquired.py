@@ -42,8 +42,8 @@ df['price/umr'] = df['expense']/(df['amount bought'] * df['equivalent'])
 df['price/pound'] = df['expense']/df['pounds bought']
 df = df.loc[df.index.dropna()]
 
-means = df.groupby('i').agg({'price/pound' : np.mean})
-stds = df.groupby('i').agg({'price/pound' : np.std})
+means = df.groupby('i').agg({'price/pound' : 'mean'})
+stds = df.groupby('i').agg({'price/pound' : 'std'})
 
 def unbelievable(row):
     if row['bought'] == 2:
@@ -59,7 +59,7 @@ cols = {'expense':'Purchased Value',
 
 final = df.rename(columns=cols)[list(cols.values())]
 
-final['Total Quantity'] = final[['Purchased Amount','Obtained Amount']].sum(axis=1)
+final['Total Quantity'] = final[['Purchased Amount']].sum(axis=1)
 final['Total Expenditure'] = final['Total Quantity']*final['Unit Value']
 
 final = final.reset_index().set_index(['j','i'])

@@ -26,7 +26,7 @@ df['wave'] = '2020-21'
 
 df = df.rename(columns={'region':'m','wave':'t'})
 
-df = df.replace({'t':round_match})
+df['m'] = df['m'].replace({'Nan': np.nan, 'NAN': np.nan, 'nan': np.nan, 'NaN': np.nan}).fillna('Tanzania')
 
 df = df.reset_index().set_index(['j','t','m'])
 df = df[['Rural']]
