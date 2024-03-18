@@ -36,7 +36,13 @@ food_items = food_items.replace(['','---'],np.nan).dropna()
 food_items = food_items.set_index(t).dropna()
 food_items = food_items.squeeze().str.strip().to_dict()
 
-unit_dict = {'galón': 'gallon', 'gramos': 'grams', 'libra': 'pounds', 'litro': 'liters', 'onzas': 'ounces', 'unidad':'units', 'centímetro cúbico o mililitro': 'milliliters'}
+unit_dict = {'galón': 'gallon',
+             'gramos': 'gram',
+             'libra': 'pound',
+             'litro': 'liter',
+             'onzas': 'ounce',
+             'unidad':'unit',
+             'centímetro cúbico o mililitro': 'milliliter'}
 
 df['i'] = df['i'].replace(food_items)
 df['j'] = df['j'].apply(format_id)
