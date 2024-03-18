@@ -14,6 +14,7 @@ for t in ['1997', '2003', '2008']:
     df = df.reset_index()
     df['j'] = t + df['j'].map(str)
     df['unitcode (bought)'] = df['unitcode (bought)'].astype(str)
+
     df = df.set_index(['j', 't', 'i', 'unitcode (bought)'])
     df.index = df.index.rename({'unitcode (bought)': 'u'})
     df.columns.name = 'k'
