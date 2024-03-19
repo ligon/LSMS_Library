@@ -9,7 +9,8 @@ df = pd.read_parquet('../var/food_acquired.parquet')
 
 x = df[['total spent']].rename({'total spent': 'total expenditure'})
 x = x.replace(0,np.nan).dropna()
-x.droplevel('u').to_parquet('../var/food_expenditures.parquet')
+z = x.droplevel('u').groupby(['j','m','t', 'i']).sum()
+z.to_parquet('../var/food_expenditures.parquet')
 
 p = df['price per unit'].replace(0,np.nan).dropna()
 
