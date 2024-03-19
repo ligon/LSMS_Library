@@ -40,9 +40,9 @@ class Country:
 
     def food_prices(self,drop_na_units=True):
         x = self.read_parquet('food_prices').squeeze()
-        x.index.names = ['j','u']
-        assert np.all(x.columns.names == ['t','m'])
         x = x.stack(x.columns.names,future_stack=True).dropna()
+        assert np.all(x.index.names==['i','t','m','u'])
+        x.index = x.rename({'i':'j'})
         if drop_na_units:
             u = x.reset_index('u')['u'].replace(['<NA>','nan'],np.nan)
             x = x.loc[~pd.isnull(u).values,:]

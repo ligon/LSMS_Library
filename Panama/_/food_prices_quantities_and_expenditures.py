@@ -15,7 +15,7 @@ z.to_parquet('../var/food_expenditures.parquet')
 p = df['price per unit'].replace(0,np.nan).dropna()
 
 p = p.groupby(['t','m','i','u']).median()
-p.unstack(['t','m']).to_parquet('../var/food_prices.parquet')
+p.to_frame('Prices').to_parquet('../var/food_prices.parquet')
 
 q = x.join(p,on=['t','m','i','u'])
 q = q['total spent']/q['price per unit']
