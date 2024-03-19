@@ -36,6 +36,12 @@ class Country:
         x.index.name = 'j'
         return x
 
+    def food_prices(self):
+        x = self.read_parquet('food_prices').squeeze().dropna()
+        x.index.names = ['m','j','u']
+        x.columns.name = 't'
+        return x
+
     def export_to_google_sheet(self,key=None,t=None,z=None):
         x = self.food_expenditures()
         if z is None:

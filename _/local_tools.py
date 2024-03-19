@@ -9,6 +9,12 @@ import warnings
 import json
 import difflib
 
+def _to_numeric(x):
+    try:
+        return pd.to_numeric(x)
+    except (ValueError,TypeError):
+        return x
+
 # Data to link household ids across waves
 Waves = {'2005-06':(),
          '2009-10':(), # ID of parent household  in ('GSEC1.dta',"HHID",'HHID_parent'), but not clear how to use
@@ -63,7 +69,7 @@ def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market'
 
     return prices
 
-def food_acquired(fn,myvars):
+def food_acquired(fn,myvars,convert_categoricals):
 
     with dvc.api.open(fn,mode='rb') as dta:
         df = from_dta(dta,convert_categoricals=False)
@@ -359,7 +365,7 @@ def df_from_orgfile(orgfn,name=None,set_columns=True,to_numeric=True,encoding=No
 
     if to_numeric:
         # Try to convert columns to numeric types, but fail gracefully
-        df = df.apply(lambda x: pd.to_numeric(x,errors='ignore'))
+        df = df.apply(_to_numeric)
 
     return df
 

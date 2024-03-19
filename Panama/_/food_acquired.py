@@ -14,6 +14,7 @@ for t in ['1997', '2003', '2008']:
     df = df.reset_index()
     df['j'] = t + df['j'].map(str)
     df['unitcode (bought)'] = df['unitcode (bought)'].astype(str)
+
     df = df.set_index(['j', 't', 'i', 'unitcode (bought)'])
     df.index = df.index.rename({'unitcode (bought)': 'u'})
     df.columns.name = 'k'
@@ -28,5 +29,5 @@ fa = fa.join(of, on=['j','t'])
 fa = fa.reset_index().set_index(['j','t','m','i','u'])
 
 fa = fa.replace(0,np.nan)
-fa = fa.groupby(['j','m','t','i','u']).sum()
+fa = fa.groupby(['j','t','m','i','u']).sum()
 to_parquet(fa,'../var/food_acquired.parquet')
