@@ -6,17 +6,17 @@
 | Garlic                           | ajo                                |    11006 |
 | Mushrooms                        | anacate y otros hongos             |    11095 |
 | Celery                           | apio                               |    11010 |
-| Rice                             | arroz                              |    13002 |
+| Rice                             | arroz                              |    13006 |
 | Peas                             | arveja                             |     9001 |
 | Corn Atole                       | atol de maiz                       |    17068 |
 | Pumpkin                          | ayote, xilacayote                  |    10015 |
 | Granulated Sugar                 | azucar granulada                   |    15001 |
-| Coffee (instant)                 | cafe en grano,  molido instantaneo |          |
+| Coffee (instant)                 | cafe en grano,  molido instantaneo |    17041 |
 | Pork                             | carne de cerdo                     |     4002 |
 | Pork                             | carne de cerdo con hueso           |     4009 |
 | Chicken                          | carne de pollo o gallina           |     3014 |
 | Beef                             | carne de res                       |     5021 |
-| Beef                             | carne de res con hueso             |          |
+| Beef                             | carne de res con hueso             |     5021 |
 | Onions                           | cebolla                            |    11036 |
 | Beer                             | cerveza                            |    17010 |
 | Pork (cracklings)                | chicharrones de cerdo              |     4012 |
@@ -25,7 +25,7 @@
 | Cigarettes                       | cigarrillos /tabaco                |          |
 | Spices                           | condimentos y especias             |    22010 |
 | Corn Flakes                      | corn flakes                        |    13021 |
-| Crema Fresca                     | crema fresca                       |          |
+| Crema Fresca                     | crema fresca                       |     1002 |
 | Candies                          | dulces                             |    15006 |
 | Sausages                         | embutidos                          |     7003 |
 | Pasta                            | fideos, tallarines, coditos etc.   |    13073 |
@@ -33,7 +33,7 @@
 | Dried Fruit                      | frutas secas                       |    12147 |
 | Cookies                          | galletas                           |    14010 |
 | Sweets                           | golosinas                          |    15005 |
-| Bananas                          | guineos / bananos                  |          |
+| Bananas                          | guineos / bananos                  |    12010 |
 | Chayote                          | guisquil                           |    11047 |
 | Cornmeal                         | harina de maiz                     |    13110 |
 | Wheat Flour                      | harina de trigo                    |    13039 |
@@ -52,10 +52,10 @@
 | Lemons                           | limones                            |    12070 |
 | Maize                            | maiz                               |    11074 |
 | Mangos                           | mangos                             |    12080 |
-| Lard                             | manteca de cerdo                   |          |
+| Lard                             | manteca de cerdo                   |    16012 |
 | Vegetable Oil                    | manteca vegetal                    |    16010 |
 | Butter                           | mantequilla                        |    16015 |
-| Juice (Branded)                  | manzanas, uvas, melocoton          |          |
+| Juice (Branded)                  | manzanas, uvas, melocoton          |    12035 |
 | Margarine                        | margarina                          |    16026 |
 | Corn Dough (fresh(               | masa de maiz fresca                |    13110 |
 | Melons                           | melones                            |    12096 |
@@ -75,11 +75,11 @@
 | Potatoes                         | papas                              |    11127 |
 | Papaya                           | papaya                             |    12115 |
 | Cakes                            | pasteles                           |    14071 |
-| Cucumbers                        | pepino                             |          |
+| Cucumbers                        | pepino                             |    11138 |
 | Fish (Fresh)                     | pescado fresco                     |     8018 |
 | Pineapples                       | piÑa                               |    12159 |
-| Bananas                          | platanos                           |          |
-| Queso                            | queso fresco / duro                |     1031 |
+| Bananas                          | platanos                           |    12010 |
+| Queso                            | queso fresco / duro                |     1064 |
 | Beets                            | remolacha                          |    11147 |
 | Cabbages                         | repollo                            |    11150 |
 | Salt                             | sal                                |    22021 |
@@ -93,7 +93,7 @@
 | Tortillas                        | tortillas                          |    14057 |
 | Tostadas                         | tostadas                           |    11078 |
 | Chicken Giblets                  | visceras de pollo o gallina        |     3046 |
-| Beef Entrails                    | viceras de res                     |          |
+| Beef Entrails                    | viceras de res                     |     5035 |
 | Yogurt                           | yogures                            |     1041 |
 | Yucca                            | yuca                               |    11167 |
 | Carrots                          | zanahoria                          |    11169 |
