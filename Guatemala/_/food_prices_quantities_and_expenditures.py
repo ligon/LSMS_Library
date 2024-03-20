@@ -9,7 +9,7 @@ x = df[['Total Expenditure']]
 x.droplevel('u').to_parquet('../var/food_expenditures.parquet')
 
 p = df['Unit Value'].groupby(['t','m','i','u']).median()
-p.unstack('t').to_parquet('../var/food_prices.parquet')
+p.to_frame('Prices').to_parquet('../var/food_prices.parquet')
 
 q = x.join(p,on=['t','m','i','u'])
 q = q['Total Expenditure']/q['Unit Value']
