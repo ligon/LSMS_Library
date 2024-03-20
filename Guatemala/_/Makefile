@@ -40,7 +40,10 @@ other_features_parquet := $(other_features:.py=.parquet)
 ../var/other_features.parquet: other_features.py $(other_features_parquet)
 	python other_features.py
 
-../var/fct.parquet ../var/nutrition.parquet : nutrition.py ../var/food_quantities.parquet food_items.org
+../var/fct.parquet : fct.py food_items.org
+	./fct.py
+
+../var/nutrition.parquet : nutrition.py ../var/food_quantities.parquet ../var/fct.parquet
 	./nutrition.py
 
 %.parquet: %.py food_items.org guatemala.py

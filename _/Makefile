@@ -30,6 +30,6 @@ demands: build test
 	./demands.py $(country)
 
 clean:
-	+make -C ../$(country)/_
+	+make -C ../$(country)/_ clean
 
 # end
