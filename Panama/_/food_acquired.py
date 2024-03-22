@@ -25,7 +25,7 @@ fa = pd.concat(fa)
 
 of = pd.read_parquet('../var/other_features.parquet')
 
-fa = fa.join(of, on=['j','t'])
+fa = fa.join(of.reset_index('m')['m'], on=['j','t'])
 fa = fa.reset_index().set_index(['j','t','m','i','u'])
 
 fa = fa.replace(0,np.nan)
