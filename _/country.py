@@ -40,58 +40,63 @@ class Country:
 
     def food_prices(self,drop_na_units=True):
         x = self.read_parquet('food_prices').squeeze()
-        x = x.stack(x.columns.names,future_stack=True).dropna()
-        assert np.all(x.index.names==['i','t','m','u'])
-        x.index = x.rename({'i':'j'})
+        try:
+            x = x.stack(x.columns.names,future_stack=True).dropna()
+        except AttributeError: # Already a series?
+            x = x.dropna()
+
+        if len(x.index.names)==4:
+            x = x.reorder_levels(['t','m','i','u'])
+        elif len(x.index.names)==5: # Individual level?
+            x = x.reorder_levels(['j','t','m','i','u'])
+            x = x.groupby(['t','m','i','u']).median()
+
+        x.index = x.index.rename({'i':'j'})
         if drop_na_units:
             u = x.reset_index('u')['u'].replace(['<NA>','nan'],np.nan)
             x = x.loc[~pd.isnull(u).values,:]
-        x = x.reset_index().set_index(['j','u','t','m']).squeeze()
+        x = x.reset_index().set_index(['t','m','j','u']).squeeze()
         x = x.unstack(['t','m'])
+
         return x
 
     def export_to_google_sheet(self,key=None,t=None,z=None):
-        x = self.food_expenditures()
+        sheets = {"Food Expenditures":self.food_expenditures(),
+                  'FCT':self.fct(),
+                  'Food Prices':self.food_prices()}
+
         if z is None:
-            z = self.household_characteristics()
-        fct = self.fct()
-        food_prices = self.food_prices()
+            sheets['Household Characteristics'] = self.household_characteristics()
+        else:
+            sheets['Household Characteristics'] = z
 
         if t is not None:
-            x = x.xs(t,level='t',drop_level=False)
-            z = z.xs(t,level='t',drop_level=False)
+            sheets['Food Expenditures'] = sheets['Food Expenditures'].xs(t,level='t',drop_level=False)
+            sheets['Household Characteristics'] = sheets['Household Characteristics'].xs(t,level='t',drop_level=False)
+            sheets['Food Prices'] = sheets['Food Prices'].xs(t,level='t',drop_level=False,axis=1)
             modifier = f' ({t})'
-            food_prices = food_prices.xs(t,level='t',drop_level=False,axis=1)
         else:
             modifier = ''
 
+        k = 'Food Expenditures'
+        v = sheets.pop(k)
         if key is None:
-            key = write_sheet(x.unstack('j'),
+            key = write_sheet(v.unstack('j'),
                           'ligon@berkeley.edu',user_role='writer',
                           json_creds='/home/ligon/.eep153.service_accounts/instructors@eep153.iam.gserviceaccount.com',
-                          sheet='Food Expenditures'+modifier)
+                          sheet=k+modifier)
             print(f"Key={key}")
         else:
-            write_sheet(x.unstack('j'),
+            write_sheet(v.unstack('j'),
                         'ligon@berkeley.edu',user_role='writer',
                         json_creds='/home/ligon/.eep153.service_accounts/instructors@eep153.iam.gserviceaccount.com',
-                        sheet='Food Expenditures'+modifier,key=key)
+                        sheet=k+modifier,key=key)
 
-        write_sheet(z,
-                    'ligon@berkeley.edu',user_role='writer',
-                    json_creds='/home/ligon/.eep153.service_accounts/instructors@eep153.iam.gserviceaccount.com',
-                    sheet='Household Characteristics'+modifier,key=key)
-
-        if fct is not None:
-            write_sheet(self.fct(),
-                    'ligon@berkeley.edu',user_role='writer',
-                    json_creds='/home/ligon/.eep153.service_accounts/instructors@eep153.iam.gserviceaccount.com',
-                        sheet='FCT',key=key)
-
-        if food_prices is not None:
-            write_sheet(self.food_prices(),
-                    'ligon@berkeley.edu',user_role='writer',
-                    json_creds='/home/ligon/.eep153.service_accounts/instructors@eep153.iam.gserviceaccount.com',
-                        sheet='Food Prices',key=key)
+        for k,v in sheets.items():
+            if v is not None:
+                write_sheet(v,
+                            'ligon@berkeley.edu',user_role='writer',
+                            json_creds='/home/ligon/.eep153.service_accounts/instructors@eep153.iam.gserviceaccount.com',
+                            sheet=k+modifier,key=key)
 
         return key
