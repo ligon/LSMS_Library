@@ -35,8 +35,9 @@ def main(country):
     x = x.reorder_levels(['j','t','m','i'])
 
     assert x.index.names == ['j','t','m','i'], "Indices incorrectly named or ordered."
-    x = add_markets_from_other_features(country,x,additional_other_features=False)
+    x = add_markets_from_other_features(country,x,additional_other_features=True)
     x.index.names = ['i','t','m','j']
+    assert 'Rural' in x.columns, "Missing Rural Dummy"
 
     z = pd.read_parquet(f"../{country}/var/household_characteristics.parquet")
     assert z.index.names == ['j','t','m'], "Indices incorrectly named or ordered in household_characteristics."
@@ -48,7 +49,7 @@ def main(country):
     p = pd.read_parquet(f"../{country}/var/food_prices.parquet")
 
     try:
-        p = p.stack().groupby(['t','m','i','u']).median()
+        p = p.stack().groupby(['t','m','i','u'],observed=False).median()
     except KeyError:
         warnings.warn('food_prices indices are incorrect (or incorrectly labelled)')
     p.index.names = ['t','m','j','u']
