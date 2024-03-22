@@ -475,12 +475,12 @@ def conversion_table_matching_global(df, conversions, conversion_label_name, num
 
 def make_parquet_with_rural(df: str, countries:list, year: list = None, rural = True):
     """
-    Create parquet files of a given df attached with the Rural dummy for all countries in list.
-    Year can be a mixed list of None and string representation of specific years or rounds:
+    Create parquet files of a given df type attached with the Rural dummy for all countries in list.
+    Year can be a mixed list of None and string representations of specific years or rounds:
     e.g. 
     countries = ['a', 'b', 'c']
     year = [None, ['2010-2011','2012-13'], None] 
-    -> attach rural to overall df for country a and c, 
+    -> attach rural to overall dfs for country a and c, 
     -> and to only 2010-2011 and 2012-13 dfs for country b
     """
     def rural_for_one_df(country, df, rural, y = None):
@@ -512,8 +512,7 @@ def make_parquet_with_rural(df: str, countries:list, year: list = None, rural = 
                     y_dfs[sub_y] = rural_for_one_df(c, df, rural, sub_y)
                 dfs[c] = y_dfs       
             else:
-                # one year for one country or no year
-                r = rural_for_one_df(c, df, rural, y)
-                dfs[c] = r
+                # one year for one country, or no year
+                dfs[c] = rural_for_one_df(c, df, rural, y)
     return dfs
         
