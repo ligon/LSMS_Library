@@ -16,10 +16,7 @@ with dvc.api.open('../Data/s07b_me_bfa2018.dta', mode='rb') as dta:
 
 df["j"] = df["grappe"].astype(int).astype(str) + '-'  + df["menage"].astype(int).astype(str) #concatenate menage and grappe
 
-df['t'] = df['vague']
-df.loc[df['vague'] == 1.0, 't'] = '2018'
-df.loc[df['vague'] == 2.0, 't'] = '2019'
-
+df['t'] = df['vague'].map({1.0: '2018', 2.0:'2019'})
 
 df = df.rename({"s07bq01": "i", "s07bq03a" : "quantity", "s07bq03b" : "units", "s07bq08" : "total expenses", "s07bq07a" : "amount bought"}, axis = 1)
 df['price per unit'] = df['total expenses']/df['amount bought']
