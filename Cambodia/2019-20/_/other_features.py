@@ -12,10 +12,10 @@ with dvc.api.open('../Data/hh_sec_1.dta', mode='rb') as dta:
     df = from_dta(dta, convert_categoricals=True)
 
 df = df.reset_index()
-df = df.rename(columns = {'s01q02': 'm', 'HHID': 'j'})
-df = df.loc[:,['j', 'm']]
-
-df = df.set_index('j')
+df = df.rename(columns = {'s01q02': 'm', 'HHID': 'j', 's01q06b' : 'Rural'})
+df = df.loc[:,['j', 'm', 'Rural']]
+df['Rural'] = df['Rural'].map({'Urban':0, 'Rural':1})
 df['m'] = df['m'].str.strip()
+df = df.set_index(['j', 'm'])
 
 df.to_parquet('other_features.parquet')
