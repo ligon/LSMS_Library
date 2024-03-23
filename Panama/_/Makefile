@@ -9,7 +9,7 @@ var = ../var/food_expenditures.parquet ../var/food_quantities.parquet ../var/foo
       
 all: $(parquet) $(var)
 
-../var/food_quantities.parquet ../var/food_expenditures.parquet ../var/food_prices.parquet &: ../var/food_acquired.parquet food_acquired.py
+../var/food_quantities.parquet ../var/food_expenditures.parquet ../var/food_prices.parquet &: ../var/food_acquired.parquet food_acquired.py food_prices_quantities_and_expenditures.py
 	python food_prices_quantities_and_expenditures.py
 
 food_acquired = $(shell find $(rounds) -name food_acquired.py)

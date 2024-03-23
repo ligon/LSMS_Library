@@ -1,27 +1,23 @@
 #!/usr/bin/env python
 
 import sys
-sys.path.append('../../_/')
 import pandas as pd
 import pyreadstat
 import numpy as np
-import json
 import dvc.api
-from lsms import from_dta
+sys.path.append('../../../_/')
+from local_tools import df_from_orgfile
 
 fs = dvc.api.DVCFileSystem('../../')
 fs.get_file('/Guatemala/2000/Data/ECV13G12.DTA', '/tmp/ECV13G12.DTA')
 df, meta = pyreadstat.read_dta('/tmp/ECV13G12.DTA', apply_value_formats = True, formats_as_category = True)
 
-food_labels = df['item']
-
 #deal with labels
-food_items = pd.read_csv('../../_/food_items.org', sep='|', skipinitialspace=True, converters={1:lambda s: s.strip()})
-food_items.columns = [s.strip() for s in food_items.columns]
-food_items = food_items['Preferred Label']
-food_items.index = food_items.str.strip().str.lower()
-food_items = food_items.squeeze().str.strip().to_dict()
-df['item'] = df['item'].map(food_items)
+food_items = df_from_orgfile('../../_/food_items.org')
+food_labels = {}
+food_labels = food_items[['Preferred Label', '2000']].set_index('2000').to_dict('dict')
+df['item'] = df['item'].replace(food_labels['Preferred Label'])
+
 
 df['hogar'] = df['hogar'].astype(int).astype(str)
 labels = {'hogar': 'j', 'item': 'i', 'p12a03': 'bought', 'p12a06d': 'expense', 'p12a06a' : 'amount bought','p12a06b': 'units in bought',

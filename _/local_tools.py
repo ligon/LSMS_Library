@@ -401,7 +401,7 @@ def to_parquet(df,fn):
     all = df.reset_index()
     for column in all:
         if all[column].dtype=='O':
-            all[column] = all[column].astype(str)
+            all[column] = all[column].astype(str).astype('str[pyarrow]').replace('nan',None)
     df = all.set_index(idxnames)
 
     df.to_parquet(fn)

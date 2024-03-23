@@ -21,9 +21,12 @@ regional_info, meta_r  = pyreadstat.read_dta('/tmp/E03BASE.DTA', apply_value_for
 regions = regional_info.groupby('form').agg({'prov' : 'first'})
 regions.index = regions.index.map(str)
 
-final  = age_sex_composition(df, sex='p003', sex_converter=lambda x: ['m', 'f'][x==2],
+out  = age_sex_composition(df, sex='p003', sex_converter=lambda x: ['m', 'f'][x==2],
                            age='p004', age_converter=None, hhid='form')
-final = pd.merge(left = final, right = regions, how = 'left', left_index = True, right_index = True)
+
+out.index = out.index.map(str)
+
+final = out.join(regions)
 final = final.rename(columns = {'prov' : 'm'})
 final['t'] = '2003'
 final = final.set_index(['t', 'm'], append = True)
