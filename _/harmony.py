@@ -39,6 +39,9 @@ def main(country):
     x.index.names = ['i','t','m','j']
     assert 'Rural' in x.columns, "Missing Rural Dummy"
 
+    # Check for missing values in index
+    #
+
     z = pd.read_parquet(f"../{country}/var/household_characteristics.parquet")
     assert z.index.names == ['j','t','m'], "Indices incorrectly named or ordered in household_characteristics."
     z.columns.name = 'k'
