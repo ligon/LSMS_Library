@@ -6,7 +6,8 @@ parquet := $(source:.py=.parquet)
 var = ../var/food_expenditures.parquet ../var/food_quantities.parquet ../var/food_prices.parquet \
 	  ../var/household_characteristics.parquet ../var/other_features.parquet \
       ../var/shocks.parquet ../var/nonfood_expenditures.parquet ../var/enterprise_income.parquet \
-	  ../var/assets.parquet ../var/earnings.parquet ../var/housing.parquet ../var/income.parquet
+	  ../var/assets.parquet ../var/earnings.parquet ../var/housing.parquet ../var/income.parquet \
+	  ../var/fct.parquet ../var/nutrition.parquet
 
 
 all: unitlabels.csv $(parquet) $(var)
@@ -74,6 +75,9 @@ housing_parquet := $(housing:.py=.parquet)
 
 ../var/income.parquet: income.py ../var/enterprise_income.parquet ../var/earnings.parquet
 	python income.py
+
+../var/nutrition.parquet: nutrition.py ../var/food_quantities.parquet
+	python nutrition.py
 
 %.parquet: %.py food_items.org uganda.py
 	(cd $(@D) && python ./$(<F))

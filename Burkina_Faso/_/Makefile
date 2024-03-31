@@ -32,7 +32,7 @@ household_characteristics_parquet := $(household_characteristics:.py=.parquet)
 other_features = $(shell find $(rounds) -name other_features.py)
 other_features_parquet := $(other_features:.py=.parquet)
 
-../%/_/other_features.parquet:
+../%/_/other_features.parquet: household_characteristics.py
 	(cd $(@D) && python other_features.py)
 
 ../var/other_features.parquet: other_features.py $(other_features_parquet)

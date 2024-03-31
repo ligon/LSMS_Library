@@ -11,10 +11,10 @@ import json
 df = pd.read_parquet('../var/food_acquired.parquet')
 
 x = df[['total expenses']].rename({'total expenses': 'total expenditure'})
-x = x.replace(0,np.nan).dropna()
+x = x.replace(0,np.nan)
 x.droplevel('u').to_parquet('../var/food_expenditures.parquet')
 
-p = df['price per unit'].groupby(['t','m','i','u']).median()
+p = df['price per unit'].groupby(['t','m','i','u']).median().replace(0, np.nan)
 p.unstack('t').to_parquet('../var/food_prices.parquet')
 
 q = x.join(p,on=['t','m','i','u'])

@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from eep153_tools.sheets import write_sheet
 from importlib.resources import files
+import cfe.regression as rgsn
 
 pd.set_option('future.no_silent_downcasting', True)
 
@@ -27,15 +28,43 @@ class Country:
         x.index.names = ['i','t','m','j']
         return x
 
-    def household_characteristics(self):
+    def other_features(self):
+        x = self.read_parquet('other_features').squeeze()
+        x.index.names = ['i','t','m']
+        return x
+
+
+    def household_characteristics(self,additional_other_features=False,agesex=False):
         x = self.read_parquet('household_characteristics')
         x.index.names = ['i','t','m']
+
+        if 'log HSize' not in x.columns:
+            x['log HSize'] = np.log(x.sum(axis=1).replace(0,np.nan))
+
+        cols = x.columns
+        if not agesex: # aggregate to girls,boys,women,men
+            agesex_cols = x.filter(axis=1,regex=r' [0-9]')
+            fcols = agesex_cols.filter(regex='^F').columns
+            x['Girls'] = x[[c for c in fcols if int(c[-2:])<=18]].sum(axis=1)
+            x['Women'] = x[[c for c in fcols if int(c[-2:])>18]].sum(axis=1)
+
+            mcols = x.filter(regex='^M').columns
+            x['Boys'] = x[[c for c in mcols if int(c[-2:])<=18]].sum(axis=1)
+            x['Men'] = x[[c for c in mcols if int(c[-2:])>18]].sum(axis=1)
+
+            x = x.drop(fcols.tolist()+mcols.tolist(),axis=1)
+
+        if additional_other_features:
+            of = self.other_features()
+            x = x.join(of)
+
         return x
 
     def fct(self):
         x = self.read_parquet('fct')
         if x is None: return
         x.index.name = 'j'
+        x.columns.name = 'n'
         return x
 
     def food_prices(self,drop_na_units=True):
@@ -66,7 +95,7 @@ class Country:
                   'Food Prices':self.food_prices()}
 
         if z is None:
-            sheets['Household Characteristics'] = self.household_characteristics()
+            sheets['Household Characteristics'] = self.household_characteristics(agesex=True,additional_other_features=True)
         else:
             sheets['Household Characteristics'] = z
 
@@ -100,3 +129,10 @@ class Country:
                             sheet=k+modifier,key=key)
 
         return key
+
+    def cfe_regression(self,**kwargs):
+        x = self.food_expenditures()
+        z = self.household_characteristics(additional_other_features=True)
+        r = rgsn.Regression(y=np.log(x.replace(0,np.nan).dropna()),
+                            d=z,**kwargs)
+        return r

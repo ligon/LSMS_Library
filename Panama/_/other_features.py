@@ -11,7 +11,7 @@ for t in ['1997', '2003', '2008']:
     df = df.reset_index()
     df['t'] = t
     df['j'] = t + df['j']
-    df = df.set_index(['j', 't'])
+    df = df.set_index(['j', 't', 'm'])
     x.append(df)
 
 concatenated = pd.concat(x)

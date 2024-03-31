@@ -160,7 +160,7 @@ def food_acquired(fn,myvars):
     #df = df.astype(float)
     return df
 
-def other_features(fn,urban=None,region=None,HHID='HHID',urban_converter=None,wave=None):
+def other_features(fn,urban=None,region=None,HHID='HHID',urban_converter=None,wave=None,**kwargs):
     """
     Pass a dictionary othervars to grab other variables.
     """
@@ -170,7 +170,7 @@ def other_features(fn,urban=None,region=None,HHID='HHID',urban_converter=None,wa
                                                       urban=urban,
                                                       region=region,
                                                       urban_converter=urban_converter,
-                                                      wave=wave)
+                                                      wave=wave,**kwargs)
     # Fix any floats in j
     df.index.name = 'j'
     k = df.index.get_level_values('j')
