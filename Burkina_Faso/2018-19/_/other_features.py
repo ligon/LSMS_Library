@@ -10,7 +10,7 @@ from lsms import from_dta
 with dvc.api.open('../Data/s00_me_bfa2018.dta', mode='rb') as dta:
     df = from_dta(dta, convert_categoricals=True)
 
-df['j'] =  df["grappe"].astype(int).astype(str) + '-'  + df["menage"].astype(int).astype(str)
+df['j'] =  df["grappe"].astype(int).astype(str) + df["menage"].astype(int).astype(str).str.rjust(3, '0')
 
 df  = df.groupby('j').agg({'s00q01' : 'first', 's00q04': 'first'}).rename({'s00q01': 'm', 's00q04':'Rural'}, axis =1)
 

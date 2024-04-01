@@ -11,7 +11,7 @@ from lsms import from_dta
 with dvc.api.open('../Data/emc2014_p1_individu_27022015.dta', mode='rb') as dta:
     df = from_dta(dta, convert_categoricals=True)
 
-df["j"]  = df["zd"].astype(str) + '-'  + df["menage"].astype(int).astype(str)
+df["j"]  = df["zd"].astype(str) + df["menage"].astype(int).astype(str).str.rjust(3, '0')
 regions  = df.groupby('j').agg({'region' : 'first', 'milieu': 'first'})
 
 regions = regions.rename(columns = {'region' : 'm', 'milieu': 'Rural'})
