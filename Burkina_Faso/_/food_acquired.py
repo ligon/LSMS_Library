@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 
 x = []
-for t in ['2014', '2018-19']:
+for t in ['2014', '2018-19', '2021-22']:
     df = pd.read_parquet('../'+t+'/_/food_acquired.parquet').squeeze()
     df = df.reset_index()
     df['units'] = df['units'].astype(str)

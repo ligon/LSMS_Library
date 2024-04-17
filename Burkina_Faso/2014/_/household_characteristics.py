@@ -34,7 +34,7 @@ for i in np.arange(1,5):
     fs.get_file('/Burkina_Faso/2014/Data/'+filestring, '/tmp/'+filestring)
     df, meta_r = pyreadstat.read_dta('/tmp/'+filestring, apply_value_formats = True, formats_as_category = True)
 
-    df["hhid"]  = df["zd"].astype(str) + '-'  + df["menage"].astype(int).astype(str)
+    df["hhid"]  = df["zd"].astype(str) + df["menage"].astype(int).astype(str).str.rjust(3, '0')
     regions  = df.groupby('hhid').agg({'region' : 'first'})
     regions['region'] = regions['region'].str.capitalize().str.replace(' ', '-')
 
