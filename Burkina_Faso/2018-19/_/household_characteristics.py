@@ -15,11 +15,11 @@ with dvc.api.open('../Data/s01_me_bfa2018.dta', mode='rb') as dta:
 with dvc.api.open('../Data/s00_me_bfa2018.dta', mode='rb') as dta:
     regions = from_dta(dta, convert_categoricals=True)
 
-regions['j'] =  regions["grappe"].astype(int).astype(str) + '-'  + regions["menage"].astype(int).astype(str)
+regions['j'] =  regions["grappe"].astype(int).astype(str) + regions["menage"].astype(int).astype(str).str.rjust(3, '0')
 regions  = regions.groupby('j').agg({'s00q01' : 'first'}).rename({'s00q01': 'm'}, axis =1)
 
 df_orig["age"] = df_orig['s01q04a'].fillna(2019-df_orig['s01q03c'])
-df_orig["hhid"]  = df_orig["grappe"].astype(int).astype(str) + '-'  + df_orig["menage"].astype(int).astype(str) #concatenate menage and grappe
+df_orig["hhid"]  = df_orig["grappe"].astype(int).astype(str) + df_orig["menage"].astype(int).astype(str).str.rjust(3, '0') #concatenate menage and grappe
 
 def waves(df):
     wave_dict = dict()

@@ -25,7 +25,7 @@ for i in np.arange(1,2): #change to 5 to get the files for all 4 rounds
     fs.get_file('/Burkina_Faso/2014/Data/'+filestring, '/tmp/'+filestring)
     df, meta_r = pyreadstat.read_dta('/tmp/'+filestring, apply_value_formats = True, formats_as_category = True)
 
-    df["j"] = df["zd"].astype(str) + '-' + df["menage"].astype(int).astype(str)
+    df["j"] = df["zd"].astype(str) + df["menage"].astype(int).astype(str).str.rjust(3, '0')
     df = df.set_index('j')
 
     df = df.loc[:, list(round.values())[:-1]]
