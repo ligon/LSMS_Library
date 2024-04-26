@@ -5,7 +5,8 @@ sys.path.append('../../../_/')
 from local_tools import df_data_grabber, to_parquet
 
 idxvars = dict(j='y5_hhid',
-               m='domain')
+               t=('domain',lambda x:'2020-21'),  # Note trivial mapping
+               m='domain') # Includes NaNs & strings
 
 myvars = dict(Rural=('y5_rural',lambda x: x.lower()!='urban'))
 
