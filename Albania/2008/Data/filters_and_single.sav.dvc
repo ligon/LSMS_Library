@@ -1,0 +1,5 @@
+outs:
+- md5: f2017a87b5c25302bd7ed627ee0082f5
+  size: 53095
+  hash: md5
+  path: filters_and_single.sav

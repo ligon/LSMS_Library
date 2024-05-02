@@ -27,7 +27,6 @@ z = z.rename(index=f2s,level='j')
 
 try:
     of = pd.read_parquet('../var/other_features.parquet')
-
     z = z.join(of.reset_index('m')[['m']],on=['j','t'])
     z = z.reset_index().set_index(['j','t','m'])
 except FileNotFoundError:
@@ -36,6 +35,5 @@ except FileNotFoundError:
     z = z.reset_index().set_index(['j','t','m'])
 
 z.columns.name = 'k'
-
 
 z.to_parquet('../var/household_characteristics.parquet')

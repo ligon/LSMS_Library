@@ -14,7 +14,7 @@ from lsms import from_dta
 with dvc.api.open('../Data/s07b_me_bfa2018.dta', mode='rb') as dta:
     df = from_dta(dta, convert_categoricals=True, encoding='iso-8859-1')
 
-df["j"] = df["grappe"].astype(int).astype(str) + '-'  + df["menage"].astype(int).astype(str) #concatenate menage and grappe
+df["j"] = df["grappe"].astype(int).astype(str) + df["menage"].astype(int).astype(str).str.rjust(3, '0') #concatenate menage and grappe
 
 df['t'] = df['vague'].map({1.0: '2018', 2.0:'2019'})
 
@@ -22,9 +22,6 @@ df = df.rename({"s07bq01": "i", "s07bq03a" : "quantity", "s07bq03b" : "units", "
 df['price per unit'] = df['total expenses']/df['amount bought']
 df = df.loc[:, ['j', 'i', 'quantity', 'units', 'total expenses', 'price per unit', 't']]
 
-#Manual correction of missing food label mapping 
-df['i'] = df['i'].replace({11: 'Autres céréales',
-                           15: 'Autres farines de céréales'})
 
 df = df.set_index(['j', 'i', 't'])
 #inspect missing encoding for units
