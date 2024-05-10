@@ -2,8 +2,8 @@
 
   Things you'll want to have set up in advance include:
 
-  - A =bitbucket.org= account.  You'll be much happier if you upload
-    your public =ssh-key= to =bitbucket.org= for authentication
+  - A =github.com= account.  You'll be much happier if you upload
+    your public =ssh-key= to =github.com= for authentication
     purposes.  This is the service that will track changes to source
     code or other documents, other than those which should be
     ephemeral (e.g., log files) or files managed by =dvc= (see below).
@@ -15,7 +15,7 @@
     to install dependencies which allow =dvc= to work with google
     drive and s3 buckets.  Provided you have a reasonably modern =python=
     installation (if you don't we recommend
-    https://www.anaconda.com/), a simple =pip install 'dvc[gdrive]'= and =pip install 'dvc[s3]'= may do the trick.
+    https://www.anaconda.com/), a simple =pip install 'dvc[gdrive]'= and =pip install 'dvc[s3]'= may do the trick.  Some shells (e.g., the default zsh on Macs) may require you to escape the square brackets, e.g., =pip install dvc\[s3\]=.
 
   - =gnupg=, for managing encryption.
 
@@ -30,7 +30,7 @@
    either your own or =eligon='s version) the repo to your local
    machine, using 
    #+begin_src sh
-   git clone git@bitbucket.org:eligon/lsms_library.git LSMS_Library
+   git clone git@github.com:ligon/LSMS_Library.git LSMS_Library
    #+end_src
    (Note the capitalization of LSMS_Library, which we'll assume for
    the purposes of this document).  If you fork, then you should
