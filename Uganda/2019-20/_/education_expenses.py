@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 
 import sys
 import pandas as pd
@@ -21,10 +20,10 @@ labels = {'hhid': 'j',
           's4q08': 'Main Reason for Leaving School',
           's4q09': 'Grade/Class Attending Last Year',
           's4q10': 'Grade/Class Attending Currently',
-          's4q11': 'School Mangagement Authority',
+          's4q11': 'School Management Authority',
           's4q12': 'Type of School',
           's4q7_1a': 'Duration of Course',
-          's4q7_1b': 'Duration of Couse (Unit)',
+          's4q7_1b': 'Duration of Course (Unit)',
           's4q12_1': 'Boarding School',
           's4q13': 'Distance to School in km',
           's4q14': 'Time in min',
@@ -46,14 +45,16 @@ labels = {'hhid': 'j',
 
 ed = df[labels.keys()].rename(columns = labels).dropna(how = 'all')
 
-ed = ed.set_index('j')
+ed = ed.set_index(['j','pid'])
 
 ed_expense = ed[['School Fee','Registration Fee','Exam Fee',
-                 'Boarding Fee', 'Uniform Fee', 'Book Fee', 
+                 'Boarding Fee', 'Uniform Fee', 'Book Fee',
                  'Transportation Fee','Day Care Facility Fee',
                  'Other Fee', 'Fees that Cannot be Broken Down',
-                 'Total Education Expenditure']].reset_index().groupby('j').sum()
+                 'Total Education Expenditure']]
 
-ed_expense.replace({0: np.nan}).dropna(how='all')
+ed_expense = ed_expense.replace({0: np.nan}).dropna(how='all')
+
+#ed_expense = ed_expense.groupby('j').sum()
 
 ed_expense.to_parquet('education_expenses.parquet')
