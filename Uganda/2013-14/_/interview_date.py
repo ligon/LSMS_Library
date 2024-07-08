@@ -15,3 +15,4 @@ df['date'] = pd.to_datetime(df[['year', 'month', 'day']])
 df=df.drop(columns=['year','month','day'])
 
 to_parquet(df,'interview_date.parquet')
+
