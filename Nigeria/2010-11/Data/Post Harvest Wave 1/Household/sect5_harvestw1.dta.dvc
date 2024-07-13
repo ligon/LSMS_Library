@@ -1,0 +1,5 @@
+outs:
+- md5: 9a405021a750391ca9766c999a4da5a7
+  size: 2000008
+  hash: md5
+  path: sect5_harvestw1.dta
