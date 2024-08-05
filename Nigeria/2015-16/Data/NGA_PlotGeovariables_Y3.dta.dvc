@@ -1,0 +1,5 @@
+outs:
+- md5: 1b48ad40a358bd9fdb93230b734e0974
+  size: 204909
+  hash: md5
+  path: NGA_PlotGeovariables_Y3.dta

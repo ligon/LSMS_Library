@@ -1,0 +1,5 @@
+outs:
+- md5: 4a0916cd9a85b871ec99278f553ed534
+  size: 166187
+  hash: md5
+  path: food_conv_w3.dta
