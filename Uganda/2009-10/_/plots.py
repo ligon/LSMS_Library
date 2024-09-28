@@ -10,17 +10,18 @@ def intercrop_area(row):
     else:
         return row['acres']
 
-idxvars = dict(j='hhid',
-               t=('hhid', lambda x: "2019-20"),
-               plt=(['parcelID','pltid'],lambda x: "{parcelID}-{pltid}".format_map(x)),
-               crop="cropID"
+idxvars = dict(j='HHID',
+               t=('HHID', lambda x: "2009-10"),
+               plt=(['a4aq2','a4aq4'],lambda x: "{a4aq2}-{a4aq4}".format_map(x)),
+               crop="a4aq5"
                )
 
-myvars = dict(acres='s4aq07',
-              area_units = ('s4aq07', lambda x: 'ACRES'),
-              intercrop = 's4aq08',
-              area_percentage = 's4aq09')
+myvars = dict(acres = 'a4aq8',
+              area_units = ('a4aq8', lambda x: 'ACRES'),
+              intercrop='a4aq7',
+              area_percentage = 'a4aq9')
+df = df_data_grabber('../Data/AGSEC4A.dta',idxvars,**myvars)
 
-df = df_data_grabber('../Data/Agric/agsec4a.dta',idxvars,**myvars)
 df = df.assign(acres = df.apply(intercrop_area,axis=1)).drop(columns=['area_percentage'])
+df = df.dropna(subset=['acres'])
 to_parquet(df,'plots.parquet')

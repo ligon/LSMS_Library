@@ -12,9 +12,9 @@ from local_tools import add_markets_from_other_features
 
 country = 'Tanzania'
 
-Waves = {'2008-15':('upd4_hh_a.dta','UPHI','r_hhid','round'),
-         '2019-20':('HH_SEC_A.dta','y4_hhid','sdd_hhid'),
-         '2020-21':('hh_sec_a.dta','y4_hhid','y5_hhid')}
+Waves = {'2008-15':('upd4_hh_a.dta',['r_hhid','round','UPHI']),
+         '2019-20':('HH_SEC_A.dta','sdd_hhid','y4_hhid'),
+         '2020-21':('hh_sec_a.dta','y5_hhid','y4_hhid')}
 
 def harmonized_food_labels(fn='../../_/food_items.org'):
     # Harmonized food labels
