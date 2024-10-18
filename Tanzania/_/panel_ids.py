@@ -9,6 +9,7 @@ from local_tools import format_id, RecursiveDict
 
 def panel_ids(Waves):
     """Return RecursiveDict of household identifiers.
+    Modified since Tanzania has a complex panel structure in 2008-2015, requiring more than 2 variables to link households.
     """
     D = RecursiveDict()
     for t,v in Waves.items():
@@ -35,27 +36,31 @@ def panel_ids(Waves):
 
     return D
 
+
 def map_08_15(df, v1, D):
-    # Grouping and initial dictionary population
-    grouped = df.groupby([v1[0], v1[1]])[v1[2]].apply(list).to_dict()
-    # Initialize the dictionary for tracking the lowest round for each hhid
-    lowest_round = {}
+    r_hhid_column, round_column, uphis_column = v1
+    # Group by household_id and round to a list of uphis
+    grouped = df.groupby([r_hhid_column, round_column])[uphis_column].apply(list).to_dict()
 
-    # Sort the items by round for orderly processing
-    for (hhid, rnd), uphis in sorted(grouped.items(), key=lambda x: x[0][1]):
-        if rnd == 1:
-            lowest_round[hhid] = (hhid, rnd)
-            continue
-        else:
-            # Track the lowest round and corresponding hhid for later usage
-            if hhid not in lowest_round or rnd < lowest_round[hhid][1]:
-                lowest_round[hhid] = (hhid, rnd)
+    # Sort groups for orderly processing
+    sorted_keys = sorted(grouped.keys(), key=lambda x: x[1])  # Sort by round number
+    for key in sorted_keys:
+        hh_id, round_num = key
+        uphis = grouped[key]
 
-            # Check intersections with all previous hhids and map accordingly
-            for (other_hhid, other_rnd), other_uphis in grouped.items():
-                if rnd > other_rnd and set(uphis).intersection(other_uphis):
-                    # Map current hhid to the hhid from the lowest round that intersects
-                    D[hhid] = lowest_round[other_hhid][0]
+        # Loop through each previously processed group to find intersections of uphis
+        for prev_key in sorted_keys:
+            if prev_key[1] >= round_num:  # Skip the current and future entries
+                break
+            other_hh_id, other_round_num = prev_key
+            other_uphis = grouped[prev_key]
+
+            if set(uphis).intersection(other_uphis):
+                # Assign the hh_id to the identifier from the lowest intersecting round
+                D[hh_id] = other_hh_id
+                # End the loop early if processing the lowest possible round
+                if other_round_num == 1:
+                    break
     return D
 
 D = panel_ids(Waves)

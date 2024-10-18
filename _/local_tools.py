@@ -311,7 +311,7 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
 
     return x
 
-def panel_attrition(df,return_ids=False,waves=None):
+def panel_attrition(df, Waves, return_ids=False, waves = None):
     """
     Produce an upper-triangular) matrix showing the number of households (j) that
     transition between rounds (t) of df.
@@ -486,7 +486,23 @@ def format_id(id):
         return None
 
 def panel_ids(Waves):
-    """Return RecursiveDict of household identifiers.
+    """
+    Used to build panel_ids data. 
+    Return RecursiveDict of household identifiers to trace households(splited) across waves.
+    
+    Waves: Dictionary of waves with the following structure:
+        The key of the dictionary is each wave year;
+        The value is a tuple in the maximum of 4 elements: (id_datafile, recent_id, old_id, function_to_transform_old_id)
+        
+        For example (Uganda example):
+        Waves = {'2011-12':(),
+        '2013-14':('GSEC1.dta','HHID','HHID_old'),
+        '2015-16':('gsec1.dta','HHID','hh',lambda s: s.replace('-05-','-04-')),
+        '2018-19':('GSEC1.dta','hhid','t0_hhid'),
+        '2019-20':('HH/gsec1.dta','hhid','hhidold')}
+    
+    Faye Fang                                                                            Sept. 2024
+
     """
     D = RecursiveDict()
     for t,v in Waves.items():
