@@ -1,0 +1,5 @@
+outs:
+- md5: c34384e821f1bf830de57072a07ccc0e
+  size: 8656330
+  hash: md5
+  path: ehcvm_conso_bfa2021.dta

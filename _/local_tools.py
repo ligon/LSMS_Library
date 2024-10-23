@@ -7,17 +7,72 @@ from collections import defaultdict
 from cfe.df_utils import use_indices
 import warnings
 import json
+import difflib
+import types
 
+def _to_numeric(x):
+    try:
+        return pd.to_numeric(x)
+    except (ValueError,TypeError):
+        return x
 
-# Data to link household ids across waves
-Waves = {'2005-06':(),
-         '2009-10':(), # ID of parent household  in ('GSEC1.dta',"HHID",'HHID_parent'), but not clear how to use
-         '2010-11':(),
-         '2011-12':(),
-         '2013-14':('GSEC1.dta','HHID','HHID_old'),
-         '2015-16':('gsec1.dta','HHID','hh',lambda s: s.replace('-05-','-04-')),
-         '2018-19':('GSEC1.dta','hhid','t0_hhid'),
-         '2019-20':('HH/gsec1.dta','hhid','hhidold')}
+def df_data_grabber(fn,idxvars,convert_categoricals=True,encoding=None,**kwargs):
+    """From a file named fn, grab both index variables and additional variables
+    specified in kwargs and construct a pandas dataframe.
+
+    For both idxvars and kwargs, expect one of the three following formats:
+
+     - Simple: {newvarname:existingvarname}, where "newvarname" is the name of
+      the variable we want in the final dataframe, and "existingvarname" is the
+      name of the variable as it's found in fn; or
+
+     - Tricky: {newvarname:(existingvarname,transformation)}, where varnames are
+       as in "Simple", but where "transformation" is a function mapping the
+       existing data into the form desired for newvarname; or
+
+     - Trickier: {newvarname:(listofexistingvarnames,transformation)}, where newvarname is
+       as in "Simple", but where "transformation" is a function mapping the variables in
+       listofexistingvarnames into the form desired for newvarname.
+
+    Options convert_categoricals and encoding are passed to lsms.from_dta, and
+    are documented there.
+
+    Ethan Ligon                                                      March 2024
+
+    """
+
+    def grabber(df,v):
+        if isinstance(v,str): # Simple
+            return df[v]
+        else:
+            s,f = v
+            if isinstance(f,types.FunctionType): # Tricky & Trickier
+                return df[s].apply(f)
+            elif isinstance(f,dict):
+                return df[s].apply(lambda x: f.get(x,x))
+
+        raise ValueError(df_data_grabber.__doc__)
+
+    try:
+        with open(fn,'rb') as dta:
+            df = from_dta(dta,convert_categoricals=convert_categoricals,encoding=encoding)
+    except IOError:
+        with dvc.api.open(fn,mode='rb') as dta:
+            df = from_dta(dta,convert_categoricals=convert_categoricals,encoding=encoding)
+
+    out = {}
+    for k,v in idxvars.items():
+        out[k] = grabber(df,v)
+
+    out = pd.DataFrame(out)
+
+    for k,v in kwargs.items():
+        out[k] = grabber(df,v)
+
+    out = out.set_index(list(idxvars.keys()))
+
+    return out
+
 
 def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Code',value='Preferred Label'):
     unitlabels = pd.read_csv(fn)
@@ -63,7 +118,7 @@ def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market'
 
     return prices
 
-def food_acquired(fn,myvars):
+def food_acquired(fn,myvars,convert_categoricals):
 
     with dvc.api.open(fn,mode='rb') as dta:
         df = from_dta(dta,convert_categoricals=False)
@@ -92,6 +147,13 @@ def food_acquired(fn,myvars):
     df['unitvalue_away'] = df['value_away']/df['quantity_away']
     df['unitvalue_own'] = df['value_own']/df['quantity_own']
     df['unitvalue_inkind'] = df['value_inkind']/df['quantity_inkind']
+
+    # Deal with possible zeros in quantities
+    df['unitvalue_home'] = df['unitvalue_home'].where(np.isfinite(df['unitvalue_home']))
+    df['unitvalue_away'] = df['unitvalue_away'].where(np.isfinite(df['unitvalue_away']))
+    df['unitvalue_own'] = df['unitvalue_own'].where(np.isfinite(df['unitvalue_own']))
+    df['unitvalue_inkind'] = df['unitvalue_inkind'].where(np.isfinite(df['unitvalue_inkind']))
+
 
     # Get list of units used in current survey
     units = list(set(df.index.get_level_values('units').tolist()))
@@ -268,7 +330,7 @@ def panel_attrition(df,return_ids=False,waves=None):
     else:
         return foo
 
-def add_markets_from_other_features(country,df):
+def add_markets_from_other_features(country,df,additional_other_features=False):
     of = pd.read_parquet(f"../{country}/var/other_features.parquet")
 
     df_idx = df.index.names
@@ -280,7 +342,18 @@ def add_markets_from_other_features(country,df):
 
     colname = df.columns.names
 
-    df = df.join(of.reset_index('m')['m'],on=['j','t'])
+    if additional_other_features:
+        if 'm' in of.index.names:
+            df = df.join(of.reset_index('m'), on=['j','t'])
+        else:
+            df = df.join(of, on=['j','t'])
+    else:
+        if 'm' in of.index.names:
+            df = df.join(of.reset_index('m')['m'], on=['j','t'])
+        else:
+            df = df.join(of['m'], on=['j','t'])
+
+
     df = df.reset_index().set_index(df_idx)
     df.columns.names = colname
 
@@ -341,7 +414,7 @@ def df_from_orgfile(orgfn,name=None,set_columns=True,to_numeric=True,encoding=No
 
     if to_numeric:
         # Try to convert columns to numeric types, but fail gracefully
-        df = df.apply(lambda x: pd.to_numeric(x,errors='ignore'))
+        df = df.apply(_to_numeric)
 
     return df
 
@@ -370,6 +443,15 @@ def to_parquet(df,fn):
             cats = df[col].cat.categories
             if str in [type(x) for x in cats]: # At least some categories are strings...
                 df[col] = df[col].cat.rename_categories(lambda x: str(x))
+
+    # Pyarrow can't deal with mixes of types in columns of type object. Just
+    # convert them all to str.
+    idxnames = df.index.names
+    all = df.reset_index()
+    for column in all:
+        if all[column].dtype=='O':
+            all[column] = all[column].astype(str).astype('str[pyarrow]').replace('nan',None)
+    df = all.set_index(idxnames)
 
     df.to_parquet(fn)
 
@@ -422,3 +504,23 @@ def panel_ids(Waves):
             D.update(df[[v[1],v[2]]].dropna().values.tolist())
 
     return D
+
+def conversion_table_matching_global(df, conversions, conversion_label_name, num_matches=3, cutoff = 0.6):
+    """
+    Returns a Dataframe containing matches and Dictionary mapping top choice
+    from a conversion table's labels to item labels from a given df.
+
+    """
+    D = defaultdict(dict)
+    all_matches = pd.DataFrame(columns = ["Conversion Table Label"] + ["Match " + str(n) for n in range(1, num_matches + 1)])
+    items_unique = df['i'].str.capitalize().unique()
+    for l in conversions[conversion_label_name].unique():
+        k = difflib.get_close_matches(l.capitalize(), items_unique, n = num_matches, cutoff=cutoff)
+        if len(k):
+            D[l] = k[0]
+            k = [l] + k
+            all_matches.loc[len(all_matches.index)] = k + [np.nan] * (num_matches + 1 - len(k))
+        else:
+            D[l] = l
+            all_matches.loc[len(all_matches.index)] = [l] + [np.nan] * num_matches
+    return all_matches, D

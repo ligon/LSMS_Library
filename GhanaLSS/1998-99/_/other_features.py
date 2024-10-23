@@ -12,9 +12,9 @@ from local_tools import df_from_orgfile
 with dvc.api.open('../Data/SEC0A.DTA', mode='rb') as dta:
     df = from_dta(dta, convert_categoricals=True)
 
-of = df[['region','loc2']]
-of['hhid'] = df['clust'].astype("string")+'-'+df['nh'].astype("string")
-#of['hhid'] = df['clust'].astype('Int64').astype("string")+'-'+df['nh'].astype('Int64').astype("string")
+of = df[['clust','nh','region','loc2']]
+
+of['hhid'] = of.apply(lambda x:f"{int(x['clust']):d}/{int(x['nh']):02d}",axis=1)
 
 of = of.rename(columns = {'hhid': 'j',
                           'region': 'm',

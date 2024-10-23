@@ -11,12 +11,12 @@ from lsms import from_dta
 with dvc.api.open('../Data/emc2014_p1_individu_27022015.dta', mode='rb') as dta:
     df = from_dta(dta, convert_categoricals=True)
 
-df["hhid"]  = df["zd"].astype(str) + '-'  + df["menage"].astype(int).astype(str)
-regions  = df.groupby('hhid').agg({'region' : 'first'})
+df["j"]  = df["zd"].astype(str) + df["menage"].astype(int).astype(str).str.rjust(3, '0')
+regions  = df.groupby('j').agg({'region' : 'first', 'milieu': 'first'})
 
-regions = regions.rename(columns = {'region' : 'm'})
-regions.index.name = 'j'
+regions = regions.rename(columns = {'region' : 'm', 'milieu': 'Rural'})
+regions['Rural'] = regions['Rural'].map({'Rural':1, 'Urbain':0})
 regions['t'] = '2013_Q4'
-regions = regions.set_index('t', append = True)
+regions = regions.set_index(['t','m'], append = True)
 
 regions.to_parquet('other_features.parquet')

@@ -1,104 +1,90 @@
 #!/usr/bin/env python
 import sys
-sys.path.append('../../_')
+from lsms.tools import from_dta
 import numpy as np
 import dvc.api
 import pandas as pd
-sys.path.append('../../_')
-from ghana import split_by_visit, load_large_dta
+sys.path.append('../../../_/')
+from local_tools import df_from_orgfile
 
 t = '2016-17'
 
-harmonized_label = pd.read_csv('food_label.csv', encoding='ISO-8859-1')
+selector_pur = {'hhid': 'j',
+                'freqcd': 'i'}
 
-#food expenditure 
-myvars = dict(fn='../Data/g7sec9b_small.dta')
-#with dvc.api.open(myvars['fn'],mode='rb') as dta:
-with open(myvars['fn'],mode='rb') as dta:
-    labels = pd.read_stata(dta, iterator=True).value_labels()
-#with dvc.api.open(myvars['fn'],mode='rb') as dta:
-with open(myvars['fn'],mode='rb') as dta:
-    df = load_large_dta(dta, convert_categoricals=False)
-    #harmonize food labels and fix missing unit labels:
-    labels['freqcd'] = harmonized_label[['Preferred Label', 'Code_9b']].dropna().set_index('Code_9b').to_dict('dict')['Preferred Label']
-    #for i in range(1, 7):
-    #    labels[f's9bq{i}c'] = labels['S9BQ1C']
+#categorical mapping
+labels = df_from_orgfile('./categorical_mapping.org',name='harmonize_food',encoding='ISO-8859-1')
+labelsd = {}
+for column in ['Code_9b', 'Code_8h']:
+    labelsd[column] = labels[['Preferred Label', column]].set_index(column).to_dict('dict')
+#units = df_from_orgfile('./categorical_mapping.org',name='s8hq9',encoding='ISO-8859-1')
+#unitsd = units.set_index('Code').to_dict('dict')
 
-    df = df.replace(labels)
+#food expenditure
+with dvc.api.open('../Data/g7sec9b_small.dta',mode='rb') as dta:
+    df = from_dta(dta, convert_categoricals=False)
+    #harmonize food labels
+    df['freqcd'] = df['freqcd'].replace(labelsd['Code_9b']['Preferred Label'])
 
-selector_pur = {'hid': 'j', 
-              'freqcd': 'i'} 
-#create purchased column labels for each visit -- 3-day recall starting from the 2nd to 7th visit
-for i in range(1, 7):
-    visit = i + 1
-    selector_pur[f's9bq{i}a'] = f'purchased_value_v{visit}'
-    selector_pur[f's9bq{i}b'] = f'purchased_quantity_v{visit}'
-    #selector_pur[f's9bq{i}c'] = f'purchased_unit_v{visit}'
+df['hhid'] = (df.apply(lambda x:f"{int(x['clust']):d}/{int(x['nh']):02d}",axis=1))
+#df['clust'].astype(int).astype("string")+'/'+df['nh'].astype(int).astype("string")
+
+
+#create purchased column labels for each visit -- from the 2nd to 11th visit
+selector_pur.update({f's9bq{i}a':f'purchased_value_v{i}' for i in range(1,7)})
+selector_pur.update({f's9bq{i}b':f'purchased_quantity_v{i}' for i in range(1,7)})
+selector_pur.update({f's9bq{i}c':f'purchased_unit_v{i}' for i in range(1,7)})
+
 x = df.rename(columns=selector_pur)[[*selector_pur.values()]]
-#only select food expenditures,since section9b also recorded non-food expenditures
-#non-food expenditures remained as numerical codes in previous harmonization steps 
-x = x[~x['i'].apply(lambda x: type(x) == float)]
-#unstack by visits 
 x = x.replace({r'':np.nan, 0 : np.nan})
-x = x.dropna(subset = x.columns.tolist()[2:], how ='all')
-xf = split_by_visit(x, 2, 7, t, unit_col = 'purchased_unit', aggregate_amount = True)
+x = x.groupby(['j','i']).sum() # Deal with some cases with multiple records for purchases
+x = pd.wide_to_long(x.reset_index(),['purchased_value','purchased_quantity','purchased_unit'],['j','i'],'visit',sep='_v')
+x = x.replace(0,np.nan).dropna(how='all')
 
-#home produced amounts
-myvars = dict(fn='../Data/g7sec8h.dta')
-with dvc.api.open(myvars['fn'],mode='rb') as dta:
-    labels2 = pd.read_stata(dta, iterator=True).value_labels()
-with dvc.api.open(myvars['fn'],mode='rb') as dta:
-    prod = pd.read_stata(dta, convert_categoricals=True)
+# Only select food expenditures,since section9b also recorded non-food expenditures.
+x = x.loc[x.index.isin(labelsd['Code_9b']['Preferred Label'].values(),level='i')]
 
-#harmonize food labels and unit labels:
-food_l = harmonized_label[['Preferred Label', 'Label_8h']].dropna().set_index('Label_8h').to_dict('dict')['Preferred Label']
-prod['foodcd'] = prod['foodcd'].replace(food_l)
-unit_l = dict(zip(labels2['S8HU'].values(),pd.Series(labels2['S8HU'].values()).str.split(None, n=1).str[1]))
-prod = prod.replace(unit_l)
+# Add null unit index
+x = x.rename(columns={'purchased_unit':'u'})
+x = x.reset_index().set_index(['j','i','u','visit'])
 
-prod = prod[prod['s8hq1'] == '1. Yes'] #select only if hh consumed any own produced food in the past 12 months
+# Home produced amounts
+with dvc.api.open('../Data/g7sec8h.dta',mode='rb') as dta:
+    prod = from_dta(dta, convert_categoricals=False)
+    #harmonize food labels and map unit labels:
+    #prod['foodcd'] = prod['foodcd'].replace(labelsd['Code_8h']['Preferred Label'])
+    #prod['s8hq13'] = prod['s8hq13'].replace(unitsd['Label'])
+
+prod = prod[prod['s8hq1'] == 1] #select only if hh consumed any own produced food in the past 12 months
 #create produced column labels for each visit -- 3-day recall starting from the 2nd to 7th visit
-selector_pro = {'hid': 'j', 
-              'foodcd': 'i'} 
-for i in range(3, 9):
-    visit = i - 1
-    selector_pro[f's8hq{i}q'] = f'produced_quantity_v{visit}'
-    selector_pro[f's8hq{i}u'] = f'produced_unit_v{visit}'
-    selector_pro[f's8hq{i}p'] = f'produced_price_v{visit}'
+
+prod['hhid'] = (prod.apply(lambda x:f"{int(x['clust']):d}/{int(x['nh']):02d}",axis=1))
+
+selector_pro = {'hhid': 'j',
+                'foodcd': 'i'}
+
+selector_pro.update({f's8hq{i}q':f'produced_quantity_v{i}' for i in range(3,9)})
+selector_pro.update({f's8hq{i}u':f'produced_unit_v{i}' for i in range(3,9)})
+selector_pro.update({f's8hq{i}p':f'produced_price_v{i}' for i in range(3,9)})
+
 y = prod.rename(columns=selector_pro)[[*selector_pro.values()]]
-#unstack by visits 
+#unit code 1.7498005798264095e+100 has no categorical mapping
+y.index = y.index.map(str)
+
+#unstack by visits
 y = y.replace({r'':np.nan, 0 : np.nan})
-y = y.dropna(subset = y.columns.tolist()[2:], how ='all')
-yf = split_by_visit(y, 2, 7, t, unit_col ='produced_unit')
+y = y.dropna(how='all')
+y = pd.wide_to_long(y.reset_index(),['produced_quantity','produced_unit','produced_price'],['j','i'],'visit',sep='_v')
+y = y.rename(labelsd['Code_8h']['Preferred Label'],level='i')
 
+y = y.join(x,how='outer')
 
-#combine xf and yf
-f = pd.concat([xf, yf], axis =0) 
-f = f.reset_index().groupby(['j','t', 'i', 'u']).agg({'purchased_value':sum, 
-                                                      'purchased_quantity':sum,
-                                                      'produced_quantity': sum, 
-                                                      'produced_price':np.mean})
-f.to_parquet('food_acquired.parquet')
+y['t'] = t
+y = y.reset_index().set_index(['j','t','i','u','visit'])
 
+fa = y.groupby(['j','t','i','u']).sum()
+fa = fa.replace(0,np.nan).dropna(how='all')
 
-#temporary code 
-try:
-    of = pd.read_parquet('other_features.parquet')
-    f2 = f.reset_index().drop(columns = 't')
-    f2['t'] = t
-    f2 = f2.set_index(['j','t','i','u'])
-    f2 = f2.join(of.reset_index('m')['m'],on=['j','t'])
-    f2 = f2.reset_index().set_index(['j','t','m','i','u'])
-except FileNotFoundError:
-    warnings.warn('No other_features.parquet found.')
-    f2['m'] = 'Ghana'
-    f2 = f2.reset_index().set_index(['j','t','m','i','u'])
-#expenditure
-e = f2.groupby(['j', 'i'])['purchased_value'].agg(sum).to_frame()
-e.to_parquet('food_expenditures.parquet')
-
-#price
-f2['purchased_price'] = f2['purchased_value'] / f2['purchased_quantity']
-p = f2[['purchased_price', 'produced_price']].groupby(['t','m','i','u']).median()
-p = p.reset_index().set_index(['t','m','i','u'])
-p.unstack('t').to_parquet('food_prices.parquet')
+# Deal with non-string values in units
+fa.index = fa.index.set_levels(fa.index.levels[3].astype(str),level='u')
+fa.to_parquet('food_acquired.parquet')

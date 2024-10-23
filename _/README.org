@@ -1,11 +1,19 @@
 Some things you can do:
+
 * Build files
-This will build all the files associated with Uganda:
+This will build all the files associated with =COUNTRY=, where =COUNTRY= is a string corresponding to a directory name in the base directory of =LSMS_Library=:
 #+begin_src sh
-make build country=$(COUNTRY)   # E.g., make build country=Uganda
+make build country=$(COUNTRY)   # E.g., make build country=Malawi
 #+end_src
+
 * Test files
-This will test the structure and correctness of files that have been built.
+This will test the structure and correctness of files that have been built:
 #+begin_src sh
-make test country=$(COUNTRY)   # E.g., make test country=Uganda
+make test country=$(COUNTRY)   # E.g., make test country=Malawi
+#+end_src
+
+* Estimate Demands
+This will constsuct an object to estimate  a CFE demand system:
+#+begin_src sh
+make demands country=$(COUNTRY) # E.g., make demands country=Malawi
 #+end_src

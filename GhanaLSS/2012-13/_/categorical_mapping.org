@@ -1,0 +1,190 @@
+#+title: Categorical Mapping
+
+* Food Labels
+
+#+name: harmonize_food
+| Preferred Label              | Aggregate Label              | Code_9b | Label_9b                                                     | Code_8h | Label_8h                   |
+|------------------------------+------------------------------+---------+--------------------------------------------------------------+---------+----------------------------|
+| Guinea corn/sorghum          | Guinea corn/sorghum          |       1 | guinea corn/sorghum                                          |       4 | sorghum/guinea corn        |
+| Maize (cob)                  | Maize                        |       2 | maize                                                        |       2 | maize-cob (fresh)          |
+| Millet                       | Millet                       |       3 | millet                                                       |       5 | millet grain               |
+| Millet (flour)               | Millet                       |         |                                                              |       6 | millet flour               |
+| Rice (local)                 | Rice (local)                 |       4 | rice-local                                                   |       1 | rice (paddy,grain)         |
+| Rice (imported)              | Rice                         |       5 | rice-imported                                                |         |                            |
+| Other Cereal                 | Other Cereal                 |       6 | other cereals                                                |         |                            |
+| Sugar Bread                  | Bread                        |       7 | bread-sugar bread                                            |         |                            |
+| Bread                        | Bread                        |       8 | other bread                                                  |         |                            |
+| Biscuit                      | Biscuit                      |       9 | biscuits                                                     |         |                            |
+| Wheat Flour                  | Wheat Flour                  |      10 | flour (wheat)                                                |         |                            |
+| Maize (flour/dough)          | Maize                        |      11 | maize ground/corn dough                                      |       3 | maize-flour/dough          |
+| Kenkey/Banku                 | Kenkey/Banku                 |      12 | kenkey/banku (without sauce)                                 |         |                            |
+| Cerelac (Baby food)          | Cerelac (Baby food)          |      13 | baby food (cerelac,etc)                                      |         |                            |
+| Other Cereal                 | Other Cereal                 |      14 | other cereal products                                        |         |                            |
+| Other Cereal                 | Other Cereal                 |      15 | processing of cereals                                        |         |                            |
+| Other Grain                  | Other Grain                  |         |                                                              |       8 | other grains               |
+| Beef (corned)                | Corned Beef                  |      18 | corned beef                                                  |         |                            |
+| Pork                         | Pork                         |      19 | pork                                                         |      65 | pork                       |
+| Beef                         | Beef                         |      20 | beef                                                         |      63 | beef                       |
+| Goat                         | Goat                         |      21 | goat meat                                                    |      66 | goat                       |
+| Goat                         | Goat                         |      22 | mutton                                                       |      64 | mutton                     |
+| Other Meat                   | Other Meat                   |      23 | bushmeat/wild game                                           |      68 | wild game                  |
+| Other Meat                   | Other Meat                   |      24 | other meat (dog, cat,etc.)                                   |      67 | other domestic meat        |
+| Chicken (live)               | Chicken                      |      27 | chicken                                                      |      60 | chicken                    |
+| Other Domestic Poultry       | Other Domestic Poultry       |      28 | other domestic poultry                                       |      61 | other domestic poultry     |
+| Other Meat                   | Other Meat                   |      29 | game birds                                                   |      62 | game birds                 |
+| Crustaceans                  | Fish                         |      33 | crustaceans (snails,lobsters,crabs,prawns)                   |         |                            |
+| Snail                        | Snail                        |         |                                                              |      71 | snail                      |
+| Fish (fresh and frozen)      | Fish                         |      34 | fish (fresh and frozen)                                      |         |                            |
+| Fish (dried)                 | Fish                         |      35 | fish (dried)                                                 |         |                            |
+| Fish (smoked)                | Fish                         |      36 | fish (smoked)                                                |         |                            |
+| Fish (fried)                 | Fish                         |      37 | fish (fried)                                                 |         |                            |
+| Fish (canned)                | Fish                         |      38 | fish (canned)                                                |         |                            |
+| Fish (salted)                | Fish                         |      39 | fish (salted)                                                |         |                            |
+| Other Fish                   | Other Fish                   |      40 | other fish                                                   |      69 | fish and shellfish         |
+| Milk (fresh)                 | Milk                         |      44 | milk (fresh)                                                 |      81 | milk (fresh)               |
+| Milk (powdered)              | Milk                         |      45 | milk (powder)                                                |         |                            |
+| Milk (powdered)              | Milk                         |      46 | baby milk                                                    |         |                            |
+| Milk (evaporated)            | Milk                         |      47 | tinned milk (unsweetened,evaporated)                         |         |                            |
+| Milk (tinned, condensed)     | Milk                         |      48 | tinned milk (condensed)                                      |         |                            |
+| Other Milk Products          | Other Milk Products          |      49 | other milk products including cheese                         |         |                            |
+| Eggs                         | Eggs                         |      53 | chicken eggs                                                 |      70 | eggs                       |
+| Eggs                         | Eggs                         |      54 | other eggs                                                   |         |                            |
+| Oil (coconut)                | Oils, Fats                   |      58 | coconut oil                                                  |      30 | coconut oil                |
+| Oil (groundnut)              | Oils, Fats                   |      59 | groundnut oil                                                |      31 | groundnut oil              |
+| Oil (palm kernel)            | Oils, Fats                   |      60 | palm kernel oil                                              |      29 | palm kernel oil            |
+| Oil (palm)                   | Oils, Fats                   |      61 | palm oil                                                     |      28 | palm oil                   |
+| Shea Butter                  | Oils, Fats                   |      62 | shea butter                                                  |      32 | shea butter                |
+| Margarine                    | Oils, Fats                   |      63 | margarine/butter                                             |         |                            |
+| Other Oils                   | Oils, Fats                   |      64 | other vegetable oils including animal fats                   |      33 | other oil                  |
+| Coconut (fresh)              | Coconut                      |      68 | coconut                                                      |      26 | coconut                    |
+| Banana                       | Banana                       |      69 | banana                                                       |      40 | bananas                    |
+| Orange                       | Orange                       |      70 | orange/tangerine                                             |      42 | oranges,tangerine          |
+| Pineapple                    | Pineapple                    |      71 | pineapple                                                    |      46 | pineapples                 |
+| Mango                        | Mango                        |      72 | mango                                                        |      43 | mangoes                    |
+| Avocado                      | Avocado                      |      73 | avocado pear                                                 |      45 | avocado pears              |
+| Watermelon                   | Watermelon                   |      74 | water melon                                                  |      41 | water melon                |
+| Pawpaw                       | Pawpaw                       |         |                                                              |      44 | pawpaw                     |
+| Canned Fruits                | Canned Fruits                |      75 | canned or processed fruits                                   |         |                            |
+| Other Fruits                 | Other Fruits                 |      76 | other fruits not canned                                      |      47 | other fruits               |
+| Cocoyam Leaves               | Cocoyam Leaves               |      80 | cocoyam leaves (kontomire)                                   |         |                            |
+| Eggplant                     | Eggplant                     |      81 | garden eggs                                                  |      54 | garden eggs/egg plant      |
+| Okra                         | Okra                         |      82 | okoro                                                        |      53 | okro                       |
+| Carrot                       | Carrot                       |      83 | carrots                                                      |      52 | carrots                    |
+| Pepper                       | Pepper                       |      84 | pepper (fresh or dried)                                      |      55 | pepper                     |
+| Onion                        | Onion                        |      85 | onions (large/small)                                         |      51 | onions                     |
+| Tomato (fresh)               | Tomato                       |      86 | tomatoes (fresh)                                             |      50 | tomatoes                   |
+| Tomato (paste)               | Tomato                       |      87 | tomato puree (canned)                                        |         |                            |
+| Cabbage                      | Cabbage                      |         |                                                              |      56 | cabbage/lettuce            |
+| Spinach                      | Spinach                      |         |                                                              |      57 | nkontomire                 |
+| Other Leafy Vegetable        | Other Leafy Vegetable        |         |                                                              |      58 | other leafy vegetables     |
+| Other Vegetables             | Other Vegetables             |      88 | other vegetables                                             |      59 | other vegetables           |
+| Sugar                        | Sugar                        |      92 | sugar (cube,granulated)                                      |         |                            |
+| Honey                        | Honey                        |      93 | honey                                                        |         |                            |
+| Ice Cream                    | Other Milk Products          |      94 | ice cream,ice lollies,etc.                                   |         |                            |
+| Chocolate                    | Chocolate                    |      95 | chocolate                                                    |         |                            |
+| Other Confectioneries        | Other Confectioneries        |      96 | other confectioneries                                        |         |                            |
+| Chilli Powder (black pepper) | Chilli Powder (black pepper) |     100 | black pepper                                                 |         |                            |
+| Salt                         | Salt                         |     101 | salt                                                         |         |                            |
+| Ginger                       | Ginger                       |     102 | ginger                                                       |         |                            |
+| Dawadawa                     | Dawadawa                     |     103 | dawadawa                                                     |         |                            |
+| Condiments                   | Condiments                   |     104 | other condiments (royco,maggie,etc)                          |         |                            |
+| Cassava (fresh)              | Cassava                      |     107 | cassava                                                      |      10 | cassava-tubers             |
+| Cocoyam                      | Cocoyam                      |     108 | cocoyam                                                      |      14 | cocoyam                    |
+| Plantain                     | Plantain                     |     109 | plantain                                                     |      15 | plantain                   |
+| Sweet Potato                 | Sweet Potato                 |         |                                                              |      16 | sweet potatoes             |
+| Yam                          | Yam                          |     110 | yam                                                          |      13 | yam                        |
+| Other Tubers                 | Other Tubers                 |     111 | other starchy staples                                        |      17 | other roots of tubers      |
+| Bean                         | Pulses, Nuts                 |     115 | beans                                                        |         |                            |
+| Bambara Bean                 | Pulses, Nuts                 |         |                                                              |      20 | bambara beans              |
+| Cowpea                       | Pulses, Nuts                 |         |                                                              |      21 | cowpeas                    |
+| Soybean                      | Pulses, Nuts                 |         |                                                              |      22 | soyabeans                  |
+| Groundnut                    | Pulses, Nuts                 |     116 | groundnuts (roasted or raw)                                  |      23 | groundnuts(roasted or raw) |
+| Palm Nut                     | Pulses, Nuts                 |     117 | palm nuts                                                    |      25 | palm nuts                  |
+| Cola Nut                     | Pulses, Nuts                 |     118 | cola nuts                                                    |         |                            |
+| Other Pulses                 | Pulses, Nuts                 |     119 | other pulses and nuts                                        |      24 | other legumes/pulses       |
+| Other Nut/Seed               | Pulses, Nuts                 |         |                                                              |      27 | other nuts/seeds           |
+| Cassava (dough)              | Cassava                      |     123 | cassava-dough                                                |      12 | cassava(other forms)       |
+| Cassava (flour)              | Cassava                      |     124 | gari                                                         |      11 | cassava-gari               |
+| Other Flours                 | Other Flours                 |     125 | other processed starchy staples                              |       9 | other flours               |
+| Coffee                       | Coffee                       |     129 | coffee                                                       |         |                            |
+| Cocoa Powder                 | Cocoa Powder                 |     130 | chocolate drinks (including milo,bournvita etc)              |         |                            |
+| Tea bags                     | Tea                          |     131 | tea                                                          |         |                            |
+| Other Beverages              | Other Beverages              |     132 | other beverage drinks                                        |      92 | non-alcoholic beverages    |
+| Soft Drinks                  | Soft Drinks                  |     136 | soft drinks and minerals                                     |         |                            |
+| Malt Drinks (bottle)         | Malt Drinks (bottle)         |     137 | malta and malt drinks                                        |         |                            |
+| Juice                        | Juice                        |     138 | fruits juices                                                |         |                            |
+| Water                        | Water                        |     139 | mineral water (bottled water)                                |         |                            |
+| Water                        | Water                        |     140 | mineral water (sachet water)                                 |         |                            |
+| Schnapps                     | Spirits                      |     143 | schnapps                                                     |         |                            |
+| Whisky                       | Spirits                      |     144 | whiskies and gins                                            |         |                            |
+| Akpeteshie                   | Spirits                      |     145 | akpeteshie                                                   |         |                            |
+| Other Spirits                | Spirits                      |     146 | other spirits                                                |         |                            |
+| Wine                         | Wine                         |     150 | palm wine/raffia palm wine etc                               |         |                            |
+| Wine                         | Wine                         |     151 | pito/brukutu,etc                                             |         |                            |
+| Wine                         | Wine                         |     152 | other local wine                                             |         |                            |
+| Wine                         | Wine                         |     153 | other imported wine                                          |         |                            |
+| Beer                         | Beer                         |     157 | beer (local)                                                 |         |                            |
+| Beer                         | Beer                         |     158 | beer (imported)                                              |         |                            |
+| Beer                         | Beer                         |     159 | guinness & other stout                                       |         |                            |
+| Other Alcoholic Beverages    | Other Alcoholic Beverages    |         |                                                              |      91 | alcoholic beverages        |
+| Tobacco                      | Tobacco                      |     163 | cigarrette, cigar                                            |         |                            |
+| Other Tobacco                | Other Tobacco                |     164 | tobacco (processed)                                          |         |                            |
+|                              |                              |     165 | other tobacco products                                       |         |                            |
+|                              |                              |     169 | refuse disposal                                              |         |                            |
+|                              |                              |     170 | expenditure on public toilets (wc and others)                |         |                            |
+|                              |                              |     174 | charcoal                                                     |         |                            |
+|                              |                              |     175 | firewood and other solid fuels                               |         |                            |
+|                              |                              |     179 | ice block (household cooling and refrigeration only)         |         |                            |
+|                              |                              |     180 | washing soaps and powder                                     |         |                            |
+|                              |                              |     181 | bathing /toilet soaps (liquid or solids)                     |         |                            |
+|                              |                              |     182 | bleaches                                                     |         |                            |
+|                              |                              |     183 | disinfectants and cleaners                                   |         |                            |
+|                              |                              |     184 | insecticides-coils and sprays                                |         |                            |
+|                              |                              |     185 | matches                                                      |         |                            |
+|                              |                              |     186 | toilet papers                                                |         |                            |
+|                              |                              |     187 | candles                                                      |         |                            |
+|                              |                              |     188 | kerosene                                                     |         |                            |
+|                              |                              |     189 | other non-durable goods                                      |         |                            |
+|                              |                              |     193 | pain killers (paracetamol, apc,etc)                          |         |                            |
+|                              |                              |     194 | antibiotics                                                  |         |                            |
+|                              |                              |     195 | anti malaria medicines                                       |         |                            |
+|                              |                              |     196 | condoms                                                      |         |                            |
+|                              |                              |     197 | traditional ghanaian drugs(tablets or syrup)                 |         |                            |
+|                              |                              |     198 | other medical and pharmaceutical drugs                       |         |                            |
+|                              |                              |     202 | petrol                                                       |         |                            |
+|                              |                              |     203 | diesel                                                       |         |                            |
+|                              |                              |     207 | washing/parking spaces services                              |         |                            |
+|                              |                              |     211 | cost of travel by rail                                       |         |                            |
+|                              |                              |     215 | bus fares (stc,metro mass transport,neoplan,etc)             |         |                            |
+|                              |                              |     216 | trotro,taxi & other transport                                |         |                            |
+|                              |                              |     220 | cost of travel by ferries and canoes                         |         |                            |
+|                              |                              |     224 | porters (kayaye,male porters,etc).                           |         |                            |
+|                              |                              |     225 | cost of luggage and itiems transported unaccompanied         |         |                            |
+|                              |                              |     229 | postage (within ghana)                                       |         |                            |
+|                              |                              |     230 | postage (outside)                                            |         |                            |
+|                              |                              |     231 | telephone calls                                              |         |                            |
+|                              |                              |     232 | internet/e-mail                                              |         |                            |
+|                              |                              |     233 | other postal services                                        |         |                            |
+|                              |                              |     237 | national lotteries                                           |         |                            |
+|                              |                              |     238 | other lotteries                                              |         |                            |
+|                              |                              |     242 | excercise books & writing pads                               |         |                            |
+|                              |                              |     243 | text books,story books,pamphlets/dictionaries,etc            |         |                            |
+|                              |                              |     247 | graphic and times                                            |         |                            |
+|                              |                              |     248 | private newspapers                                           |         |                            |
+|                              |                              |     249 | magazines                                                    |         |                            |
+|                              |                              |     250 | other newspapers & periodicals                               |         |                            |
+| Cooked Rice and Stew         | Cooked Rice and Stew         |     254 | cooked rice and sauce                                        |         |                            |
+| Soup                         | Soup                         |     255 | fufu or tuo with soup                                        |         |                            |
+| Kenkey/Banku                 | Kenkey/Banku                 |     256 | banku or kenkey with sauce                                   |         |                            |
+| Other Prepared Meals         | Other Prepared Meals         |     257 | other prepared meals                                         |         |                            |
+| Fast Food                    | Fast Food                    |     258 | fast foods                                                   |         |                            |
+| Cooked Rice and Stew         | Cooked Rice and Stew Ê Ê     |     262 | cooked rice and sauce                                        |         |                            |
+| Soup                         | Soup                         |     263 | fufu or tuo with soup                                        |         |                            |
+| Kenkey/Banku                 | Kenkey/Banku                 |     264 | banku or kenkey with sauce                                   |         |                            |
+| Other Prepared Meals         | Other Prepared Meals         |     265 | other meals                                                  |         |                            |
+|                              |                              |     269 | services of barbers,beauty shops,etc (men)                   |         |                            |
+|                              |                              |     270 | services of barbers,beauty shops (women) including manicureÊ |         |                            |
+|                              |                              |     271 | mesh/wigs (natural/artificial)                               |         |                            |
+|                              |                              |     272 | other personal grooming services                             |         |                            |
+|                              |                              |     276 | goods for personal care(toothpaste,razor blades,combs,scentÊ |         |                            |
+|                              |                              |     277 | other articles and products                                  |         |                            |

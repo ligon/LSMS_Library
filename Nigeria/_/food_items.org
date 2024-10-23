@@ -136,6 +136,7 @@
 |  164 | Other alcoholic beverages              | Other alcoholic beverages              | Other alcoholic beverages              | Other alcoholic beverages              | Other alcoholic beverages              | Other alcoholic beverages              | Other alcoholic beverages            | Other alcoholic beverages            |
 
 * Create dictionary for food items
+#+name: food_codes_json
 #+begin_src python :var labels=food_codes :colnames no :tangle /tmp/bar.py
 from cfe.df_utils import orgtbl_to_df
 import json
@@ -145,6 +146,9 @@ df = orgtbl_to_df(labels).set_index('Code')
 with open('food_items.json','w') as f:
     json.dump(df.to_dict(),f)
 #+end_src
+
+#+results: food_codes_json
+: None
 
 #+results:
 
@@ -253,6 +257,7 @@ with open('food_items.json','w') as f:
 |  519 | Thatch                      | Thatch                      | Thatch                      | Thatch                      | Thatch                         | Thatch                         | Thatch                         | Thatch                         |
 
 * Create dictionary for non-food items
+#+name: nonfood_codes_json
 #+begin_src python :var labels=nonfood_codes :colnames no :tangle /tmp/bar.py
 from cfe.df_utils import orgtbl_to_df
 import json
@@ -262,6 +267,9 @@ df = orgtbl_to_df(labels).set_index('Code')
 with open('nonfood_items.json','w') as f:
     json.dump(df.to_dict(),f)
 #+end_src
+
+#+results: nonfood_codes_json
+: None
 
 #+results:
 
@@ -395,7 +403,7 @@ with open('nonfood_items.json','w') as f:
 
 
 
-
+#+name: aggregation_json
 #+begin_src python :var labels=aggregation :colnames no :tangle /tmp/bar.py
 from cfe.df_utils import orgtbl_to_df
 import json
@@ -405,5 +413,8 @@ df = orgtbl_to_df(labels).set_index('Original Label')
 with open('aggregate_items.json','w') as f:
     json.dump(df.to_dict(),f)
 #+end_src
+
+#+results: aggregation_json
+: None
 
 #+results:

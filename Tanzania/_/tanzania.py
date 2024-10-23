@@ -106,7 +106,6 @@ def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Label',value='Prefer
 def food_acquired(fn,myvars):
     with dvc.api.open(fn,mode='rb') as dta:
         df = from_dta(dta)
-    
     df = df.loc[:,list(myvars.values())].rename(columns={v:k for k,v in myvars.items()})
 
     if 'year' in myvars:
@@ -115,7 +114,19 @@ def food_acquired(fn,myvars):
         df.replace({"year": dict},inplace=True)
         df = df.set_index(['HHID','item','year']).dropna(how='all')
         df.index.names = ['j','i','t']
-        assert df.index.is_unique, "Non-unique index!  Fix me!"
+        try:
+            # Attempt to assert that the index is unique
+            assert df.index.is_unique, "Non-unique index!  Fix me!"
+        except AssertionError as e:
+            # Drop completely duplicated rows 
+            # Same HH recorded down multiple times due to tracking of complete HH lineage in the UPHI system
+            if df[~df.index.duplicated()].shape[0] == df.reset_index().drop_duplicates().shape[0]:
+                pd.testing.assert_frame_equal(df.reset_index().drop_duplicates().set_index(['j','i','t']), df[~df.index.duplicated()])
+                df = df[~df.index.duplicated()]
+                if not df.index.is_unique:
+                    raise ValueError("Non-unique index! Even after attempted fix.")
+            else:
+                raise e
     else:
         df = df.set_index(['HHID','item']).dropna(how='all')
         df.index.names = ['j','i']
@@ -138,6 +149,8 @@ def food_acquired(fn,myvars):
                     "quant_inkind" : 'float64'})
 
     df['unitvalue_purchase'] = df['value_purchase']/df['quant_purchase']
+    df['unitvalue_purchase'] = df['unitvalue_purchase'].where(np.isfinite(df['unitvalue_purchase']))
+
 
     #with open('../../_/conversion_to_kgs.json','r') as f:
         #conversion_to_kgs = pd.Series(json.load(f))
@@ -147,7 +160,7 @@ def food_acquired(fn,myvars):
     #df = df.astype(float)
     return df
 
-def other_features(fn,urban=None,region=None,HHID='HHID',urban_converter=None,wave=None):
+def other_features(fn,urban=None,region=None,HHID='HHID',urban_converter=None,wave=None,**kwargs):
     """
     Pass a dictionary othervars to grab other variables.
     """
@@ -157,7 +170,7 @@ def other_features(fn,urban=None,region=None,HHID='HHID',urban_converter=None,wa
                                                       urban=urban,
                                                       region=region,
                                                       urban_converter=urban_converter,
-                                                      wave=wave)
+                                                      wave=wave,**kwargs)
     # Fix any floats in j
     df.index.name = 'j'
     k = df.index.get_level_values('j')

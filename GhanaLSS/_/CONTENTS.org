@@ -15,7 +15,15 @@ See discussion above for harmonization of food labels across rounds and surveys.
 ** TODO other_features.py
 ** TODO household_characteristics.py
 ** TODO food_acquired.py
-Test...
+Data on expenditures is somewhat unusual, in two different ways.
+
+First, for waves before 2016--17, the survey instrument elicits the amount spent in purchasing different items, but does /not/ elicit quantities purchased.  (A separate price survey was conducted, and could presumably be used to obtain quantities.)  A separate module elicits quantities of home produced food consumed, as well as the hypothetical price at which home produced goods could be sold.
+
+Second, starting in the 1991--92 wave, rather than eliciting expenditures over a single recall period, repeated visits (about a dozen in all) are made over the course of about a month, with expenditures and consumption from own production collected at every visit.  In =food_acquired= we sum over these visits (but it might be interesting to examine patterns at the visit level).
+
+NB: Differences in elicitation across waves may complicate comparisons across those waves.  In particular, the two rounds in the 1980s ask for expenditures "since my last visit", but only for one visit, while subsequent rounds elicit this information across several visits.
+
+*** Test...
 #+begin_src python :results output
 import pandas as pd
 

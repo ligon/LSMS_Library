@@ -36,9 +36,13 @@ z.columns.name = 't'
 
 z = z.stack().unstack('m')
 
-z = z.stack().unstack('k')
+z = z.stack().unstack('k').reset_index()
 
 z['Rural']= z['Rural'].replace('nan', np.nan)
-z = z.reset_index().set_index(['j','t','m'])
+z['m'] = z['m'].str.replace(' Region', '')
+z['m'] = z['m'].str.replace('-', ' ')
+z['m'] = np.where(z['t'] == '2013-14', 'Ghana', z['m'])
+
+z = z.set_index(['j','t','m'])
 
 z.to_parquet('../var/other_features.parquet')

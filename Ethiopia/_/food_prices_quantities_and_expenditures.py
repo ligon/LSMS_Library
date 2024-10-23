@@ -4,6 +4,9 @@ different prices for different units.
 import pandas as pd
 import numpy as np
 import json
+import sys
+sys.path.append('../../_/')
+from local_tools import to_parquet
 
 v = pd.read_parquet('../var/food_acquired.parquet')
 
@@ -16,7 +19,7 @@ expenditures = ['value_purchased']
 
 x = v.groupby(['j','t','m','i'])[expenditures].sum().replace(0,np.nan)
 
-x.to_parquet('../var/food_expenditures.parquet')
+to_parquet(x, '../var/food_expenditures.parquet')
 
 v = v[prices + quantities]
 
@@ -43,14 +46,19 @@ p = p.rename(index=tokg,level='u')
 
 q = v['quantity'].droplevel('units_purchased')
 
-q = q.multiply(kgs_unitvalue,axis=0)
+q = q.multiply(kgs_unitvalue,axis=0).dropna()
+
+if 'units' in q.index.names:
+    q = q.droplevel('units')
+
+q.index.names = ['j','t','m','i','u']
 q = q.rename(index=tokg,level='u')
 
 p = p.replace(0,np.nan)
 p = p.dropna()
-p.to_parquet('../var/food_prices.parquet')
+to_parquet(p, '../var/food_prices.parquet')
 
 q = q.replace(0,np.nan)
 q = q.dropna()
 
-pd.DataFrame({'q':q}).to_parquet('../var/food_quantities.parquet')
+to_parquet(pd.DataFrame({'q':q}), '../var/food_quantities.parquet')

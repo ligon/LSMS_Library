@@ -16,10 +16,12 @@ with dvc.api.open('../Data/04persona.dta', mode='rb') as dta:
 regions = df.groupby('hogar').agg({'prov' : 'first'})
 regions.index = regions.index.map(str)
 
-final  = age_sex_composition(df, sex='p3_sexo', sex_converter=lambda x: ['m', 'f'][x=='mujer'],
+out = age_sex_composition(df, sex='p3_sexo', sex_converter=lambda x: ['m', 'f'][x=='mujer'],
                            age='p4_edad', age_converter=None, hhid='hogar')
 
-final = pd.merge(left = final, right = regions, how = 'left', left_index = True, right_index = True)
+out.index = out.index.map(str)
+
+final = out.join(regions)
 final = final.rename(columns = {'prov' : 'm'})
 final['t'] = '2008'
 region_dict = {'bocas del toro' : 'Bocas Del Toro', 'colón': 'Colón', 'coclé': 'Coclé',

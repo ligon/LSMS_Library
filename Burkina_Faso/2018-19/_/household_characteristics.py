@@ -12,13 +12,14 @@ from burkina_faso import age_sex_composition
 
 with dvc.api.open('../Data/s01_me_bfa2018.dta', mode='rb') as dta:
     df_orig = from_dta(dta, convert_categoricals=False)
-
 with dvc.api.open('../Data/s00_me_bfa2018.dta', mode='rb') as dta:
-    regional_info  = from_dta(dta, convert_categoricals=True)
+    regions = from_dta(dta, convert_categoricals=True)
+
+regions['j'] =  regions["grappe"].astype(int).astype(str) + regions["menage"].astype(int).astype(str).str.rjust(3, '0')
+regions  = regions.groupby('j').agg({'s00q01' : 'first'}).rename({'s00q01': 'm'}, axis =1)
 
 df_orig["age"] = df_orig['s01q04a'].fillna(2019-df_orig['s01q03c'])
-df_orig["hhid"]  = df_orig["grappe"].astype(int).astype(str) + '-'  + df_orig["menage"].astype(int).astype(str) #concatenate menage and grappe
-regional_info['hhid'] =  regional_info["grappe"].astype(int).astype(str) + '-'  + regional_info["menage"].astype(int).astype(str)
+df_orig["hhid"]  = df_orig["grappe"].astype(int).astype(str) + df_orig["menage"].astype(int).astype(str).str.rjust(3, '0') #concatenate menage and grappe
 
 def waves(df):
     wave_dict = dict()
@@ -38,11 +39,8 @@ for i in wave_dict:
 
 final = pd.concat([wave_dict[1.0], wave_dict[2.0]])
 
-regions  = regional_info.groupby('hhid').agg({'s00q01' : 'first'})
 final = pd.merge(left = final, right = regions, how = 'left', left_index = True, right_index = True)
-
-final = final.rename(columns = {'s00q01' : 'm'})
-final = final.set_index(['t', 'm'], append = True)
+final = final.set_index(['t', 'm'], append=True)
 final.columns.name = 'k'
 
 final.to_parquet('household_characteristics.parquet')
