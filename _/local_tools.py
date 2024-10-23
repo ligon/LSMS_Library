@@ -46,8 +46,11 @@ def df_data_grabber(fn,idxvars,convert_categoricals=True,encoding=None,**kwargs)
             return df[v]
         else:
             s,f = v
-            if isinstance(f,types.FunctionType): # Tricky & Trickier
-                return df[s].apply(f)
+            if isinstance(f,types.FunctionType):  # Tricky & Trickier
+                if isinstance(s,str):
+                    return df[s].apply(f)
+                else:
+                    return df[s].apply(f,axis=1)
             elif isinstance(f,dict):
                 return df[s].apply(lambda x: f.get(x,x))
 

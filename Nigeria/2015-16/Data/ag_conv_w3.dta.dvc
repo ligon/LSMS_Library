@@ -1,0 +1,5 @@
+outs:
+- md5: 188456c9f0a97592d4e40dc6de36ea0b
+  size: 96949
+  hash: md5
+  path: ag_conv_w3.dta

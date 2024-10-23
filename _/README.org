@@ -1,19 +1,30 @@
+* Makefile
 Some things you can do:
 
-* Build files
+** Build files
 This will build all the files associated with =COUNTRY=, where =COUNTRY= is a string corresponding to a directory name in the base directory of =LSMS_Library=:
 #+begin_src sh
 make build country=$(COUNTRY)   # E.g., make build country=Malawi
 #+end_src
 
-* Test files
+** Test files
 This will test the structure and correctness of files that have been built:
 #+begin_src sh
 make test country=$(COUNTRY)   # E.g., make test country=Malawi
 #+end_src
 
-* Estimate Demands
-This will constsuct an object to estimate  a CFE demand system:
+** Estimate Demands
+This will construct an object to estimate  a CFE demand system:
 #+begin_src sh
 make demands country=$(COUNTRY) # E.g., make demands country=Malawi
+#+end_src
+* lsms_library
+#+begin_src python
+import lsms_library as ll
+
+uga = ll.Country('Uganda')
+
+x = uga.food_expenditures()
+
+r = uga.cfe_demands()
 #+end_src
