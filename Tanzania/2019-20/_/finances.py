@@ -6,10 +6,10 @@ from lsms import from_dta
 import sys
 sys.path.append('../../_')
 
-with dvc.api.open('../Data/hh_sec_q1.dta',mode='rb') as dta:
+with dvc.api.open('../Data/HH_SEC_Q1.dta',mode='rb') as dta:
     df = from_dta(dta)
 
-labels = {'y5_hhid': 'HHID',
+labels = {'sdd_hhid': 'HHID',
           'hh_q01_1': 'Use M-PESA?',
           'hh_q01_2': 'Use EZY-PESA?',
           'hh_q01_3': 'Use AIRTEL?',
@@ -25,7 +25,6 @@ labels = {'y5_hhid': 'HHID',
           'hh_q03_6': 'Save for emergencies',
           'hh_q03_7': 'Save for everyday expenses',
           'hh_q03_8': 'Save for large purchases',
-          'hh_q03_9': 'Credit',
           'hh_q04': 'Most important use of MM',
           'hh_q05_1': 'Main source of cash (1)',
           'hh_q05_2': 'Main source of cash (2)',
