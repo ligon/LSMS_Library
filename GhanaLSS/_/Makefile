@@ -1,10 +1,10 @@
-rounds := $(shell ls -d ../[12]*)
+rounds := $(shell ls -d ../19* ../2*-*)
 
 source = $(shell find $(rounds) -name \*.py)
 parquet := $(source:.py=.parquet)
 
 var = ../var/food_expenditures.parquet ../var/food_quantities.parquet ../var/food_prices.parquet \
-	  ../var/household_characteristics.parquet ../var/other_features.parquet 
+	  ../var/household_characteristics.parquet ../var/other_features.parquet
 
 all: $(parquet) $(var)
 
