@@ -23,23 +23,6 @@ joined = pd.merge(df, df_general, how = 'left', on ='j')
 
 joined.replace(9999, np.nan, inplace=True)
 
-'''
-#legacy code for fill function tailored to data, use to compare with age_handler if need be
-def fill_func(x):
-    if pd.notna(x['s01q04a']):
-        return x['s01q04a']
-    elif x[['s01q03b', 's01q03a', 's01q03c']].notna().all():
-        date = str(int(x['s01q03b'])) + '/' + str(int(x['s01q03a'])) + '/' + str(int(x['s01q03c']))
-        return (x['s00q23a'] - pd.to_datetime(date, format = '%m/%d/%Y')).days / 365.25
-    elif x['s01q03c']:
-        return x['s00q23a'].year - int(x['s01q03c'])
-    else:
-        return np.nan
-
-joined['age_orig'] = joined.apply(fill_funct, axis = 1)
-
-'''
-
 joined = age_handler(joined, interview_date = 's00q23a', age = 's01q04a',  m = 's01q03b', d= 's01q03a', y= 's01q03c', interview_year= '2018')
 
 joined['t'] = joined['s00q23a'].dt.year
