@@ -16,15 +16,22 @@ def age_sex_composition(df, sex, sex_converter, age, age_converter, hhid):
     return testdf
 
 def age_handler(df, interview_date = None, format_interv = None, age = None, dob = None, format_dob  = None, m = None, d = None, y = None, interview_year = None):
-    # a function to fill ages with the best available information for age, prioritizes more precise estimates
-    # interview_date : column name containing interview date
-    # format_interv: argument to be passed into pd.to_datetime(, format=) for interview_date
-    # age : column name containing age in years
-    # dob: column name containing date of birth
-    # format_dob: to be passed into pd.to_datetime(, format=) for date of birth
-    # m, d, y: pass column names for month, day, and year respectively
-    # interview_year: column name containing year of interview; please enter an estimation in case an interview date is not found
-    # this could be improved for mildly more precise calculations given month and year, but I'm not sure if that's relevant enough
+    '''
+    a function to fill ages with the best available information for age, prioritizes more precise estimates
+
+    Args:
+        interview_date : column name containing interview date
+        format_interv: argument to be passed into pd.to_datetime(, format=) for interview_date
+        age : column name containing age in years
+        dob: column name containing date of birth
+        format_dob: to be passed into pd.to_datetime(, format=) for date of birth
+        m, d, y: pass column names for month, day, and year respectively
+        interview_year: column name containing year of interview; please enter an estimation in case an interview date is not found
+
+    Returns:
+    dataframe: mutates the dataframe to add an 'age' column and returns the dataframe
+    '''
+
     if interview_date:
         df[interview_date] = pd.to_datetime(df[interview_date], format = format_interv)
     if dob:
