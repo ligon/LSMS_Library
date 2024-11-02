@@ -251,83 +251,102 @@ def new_harmonize_units(df, unit_conversion):
     return df
 
 
-def change_id(df, current_wave, id_update, panel_ids=None):
+import json
+from collections import defaultdict
+
+def change_id(df, current_wave, id_update, trace_split_number, panel_ids=None):
     '''
     Change the household ID based on the panel_ids (json file, previous round id if it can be traced) for the current wave. 
     If split happens, add suffix to the traced household ID to indicate it's a numbered split household.
-    For example:
-    If there is no split happens, count_splits  = 1 (the same household transit from the previous wave to the current wave)
-    If there is a split happens, count_splits > 1
-                {'j': '0001-001', 'former_j': '1001', 'split_suffix': 1, 'count_splits': 2, 'new_household_id': '0001_1'}
-                {'j': '0001-002', 'former_j': '1001', 'split_suffix': 2, 'count_splits': 2, 'new_household_id': '0001_2'}
-                {'j': '0002-001', 'former_j': '1002', 'split_suffix': 1, 'count_splits': 1, 'new_household_id': '1002'}
-    '''
 
+    For example:
+    If there is no split happens, count_splits  = 0 (the same household transit from the previous wave to the current wave)
+    If there is a split happens, count_splits > 0, keep one household as primary household no need to change id,
+                                                    the splits new_household_id = former_j + '_' + (split_suffix-1)
+                {'j': '0001-001', 'former_j': '1001', 'split_suffix': 1, 'count_splits': 1, 'new_household_id': '0001'}
+                {'j': '0001-002', 'former_j': '1001', 'split_suffix': 2, 'count_splits': 1, 'new_household_id': '0001_1'}
+                {'j': '0002-001', 'former_j': '1002', 'split_suffix': 1, 'count_splits': 0, 'new_household_id': '1002'}
+    
+    '''
     # Save the original index names for restoring later
     original_index_names = df.index.names
     df = df.reset_index()
     df['j'] = df['j'].apply(format_id)
 
     # Create a temporary DataFrame with the household ID and wave
-    temp_df = df[['j', 't']].copy()
+    temp_df = df.loc[df['t'] == current_wave, ['j', 't']].copy()
 
     # Get the former household ID from panel_ids and update based on id_update
     temp_df['former_j'] = temp_df['j'].apply(lambda s: panel_ids.get(s, s))
     temp_df['former_j'] = temp_df['former_j'].apply(lambda s: id_update.get(s, s))
 
-    # Fill missing 'former_j' values with current household ID ('j')
+    # Fill missing 'former_j' values with the current household ID ('j')
     temp_df['former_j'] = temp_df['former_j'].fillna(temp_df['j'])
 
     # Create a helper column to count occurrences of each household in the same year
     temp_df['split_suffix'] = temp_df.groupby(['former_j', 't']).cumcount() + 1
-    temp_df['count_split'] = temp_df.groupby(['former_j', 't']).transform('count')['j']
-
-    # Create the new household ID with suffix for splits
+    temp_df['count_split'] = temp_df.groupby(['former_j', 't'])['j'].transform('size') - 1
 
     # Define new household ID using vectorized operations
-    mask = (temp_df['split_suffix'] > 0) & (temp_df['count_split'] > 1)
+    mask = temp_df['split_suffix'] > 1
     temp_df['new_household_id'] = temp_df['former_j'].astype(str)
-    temp_df.loc[mask, 'new_household_id'] += '_' + temp_df['split_suffix'].astype(str)
 
+    # Add suffix value - 1 to the new household ID if split happens
+    temp_df.loc[mask, 'new_household_id'] = temp_df.loc[mask].apply(
+        lambda row: f"{row['new_household_id']}_{trace_split_number.get(row['new_household_id'], 0) + row['split_suffix'] - 1}",
+        axis=1
+    )
+
+    # Update the trace_split_number dictionary
+    trace_split_dict = temp_df[['former_j', 'count_split']].drop_duplicates().set_index('former_j')['count_split'].to_dict()
+    for key, value in trace_split_dict.items():
+        trace_split_number[key] += value
 
     # Only update the DataFrame for the current wave
-    temp_df = temp_df.loc[temp_df['t'] == current_wave, ['new_household_id', 't', 'j']]
+    temp_df = temp_df[['new_household_id', 't', 'j']]
 
-    # record the updated in id_update dictionary, so that the new_household_id can be used in the next wave
+    # Record the updated IDs in id_update dictionary for the next wave
     id_update.update(dict(temp_df[['j', 'new_household_id']].values))
 
-    # Replace the original household ID in current wave with the updated household ID
+    # Replace the original household ID in the current wave with the updated household ID
     df = df.merge(temp_df, on=['j', 't'], how='left')
-    df['j'] = df['new_household_id'].fillna(df['j']) # Retain original ID if no update
-    df = df.drop(columns=['new_household_id']) 
+    df['j'] = df['new_household_id'].fillna(df['j'])  # Retain original ID if no update
+    df = df.drop(columns=['new_household_id'])
     assert df.index.is_unique, "Non-unique index."
 
-    return df.set_index(original_index_names), id_update
+    return df.set_index(original_index_names), id_update, trace_split_number
 
 
 def id_walk(df, waves, panel_ids):
     '''
     Walk through the data and update the household IDs based on the panel_ids (json file).
     '''
-    id_update = defaultdict()
-
+    id_update = defaultdict(str)  # Initialize with default str to handle missing values
+    unique_id = df.index.get_level_values('j').unique()
+    trace_split_number = defaultdict(int, {k: 0 for k in unique_id})
     use_waves = waves if isinstance(waves, list) else list(waves.keys())
 
     for wave in use_waves:
-        df, id_update = change_id(df, wave, id_update, panel_ids)
+        df, id_update, trace_split_number = change_id(df, wave, id_update, trace_split_number, panel_ids)
 
     return df
 
 
-def panel_attrition(df, Waves, return_ids=False, waves = None, split_households=False):
+def panel_attrition(df, Waves, return_ids=False, waves = None,  split_households_new_sample=True):
     """
     Produce an upper-triangular) matrix showing the number of households (j) that
     transition between rounds (t) of df.
 
-        split_households (bool): Determines how to count split households:
-                                - If True, only counts the primary household in each split.
+        split_households_new_sample (bool): Determines how to count split households:
+                                - If True, we assume split_households as new sample. So we
+                                     do not count and trace splitted household, only counts 
+                                     the primary household in each split. The number represents
+                                     how many main (primary) households in previous waves have 
+                                     appeared in current round.
                                 - If False, counts all split households that can be traced 
-                                    back to previous wave households.
+                                    back to previous wave households. The number represents how 
+                                    many households (including splitted households
+                                    round can be traced back to the previous round.
 
 
     Notes：
@@ -346,29 +365,16 @@ def panel_attrition(df, Waves, return_ids=False, waves = None, split_households=
 
     foo = pd.DataFrame(index=waves,columns=waves)
     IDs = {}
-
-    def count_intersections(list1, list2, split_households):
-        count = 0
-        pairs = []
-        # Check each element in list1 against each element in list2
-        for item1 in list1:
-            for item2 in list2:
-                # Check if item1 is in item2 
-                if item1 in item2 and split_households:
-                    count  += 1
-                    pairs.append((item1, item2))
-                    break
-                elif item1 in item2:
-                    count  += 1
-                    pairs.append((item1, item2))
-        return pairs, count
-    
     for m,s in enumerate(waves):
-        foo.loc[s,s] = len(idxs[s])
-        for t in waves[m+1:]:
-            IDs[(s,t)], foo.loc[s,t] = count_intersections(idxs[s],idxs[t], split_households)
-
-
+        for t in waves[m:]:
+            pairs = set(idxs[s]).intersection(idxs[t])
+            list2_rest = set(idxs[t]) - pairs
+            if not split_households_new_sample:
+                new_paired = {i for i in list2_rest  if i.split('_')[0] in idxs[s]}
+                pairs.update(new_paired)   
+                
+            IDs[(s,t)] = pairs
+            foo.loc[s,t] = len(IDs[(s,t)])
 
     if return_ids:
         return foo,IDs

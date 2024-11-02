@@ -311,10 +311,21 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
 
     return x
 
-def panel_attrition(df, Waves, return_ids=False, waves = None):
+
+def panel_attrition(df, Waves, return_ids=False, waves = None,  split_households_new_sample=True):
     """
     Produce an upper-triangular) matrix showing the number of households (j) that
     transition between rounds (t) of df.
+            split_households_new_sample (bool): Determines how to count split households:
+                                - If True, we assume split_households as new sample. So we
+                                     do not count and trace splitted household, only counts 
+                                     the primary household in each split. The number represents
+                                     how many main (primary) households in previous waves have 
+                                     appeared in current round.
+                                - If False, counts all split households that can be traced 
+                                    back to previous wave households. The number represents how 
+                                    many households (including splitted households
+                                    round can be traced back to the previous round.
     """
     idxs = df.reset_index().groupby('t')['j'].apply(list).to_dict()
 
@@ -325,7 +336,13 @@ def panel_attrition(df, Waves, return_ids=False, waves = None):
     IDs = {}
     for m,s in enumerate(waves):
         for t in waves[m:]:
-            IDs[(s,t)] = set(idxs[s]).intersection(idxs[t])
+            pairs = set(idxs[s]).intersection(idxs[t])
+            list2_rest = set(idxs[t]) - pairs
+            if not split_households_new_sample:
+                new_paired = {i for i in list2_rest  if i.split('_')[0] in idxs[s]}
+                pairs.update(new_paired)   
+                
+            IDs[(s,t)] = pairs
             foo.loc[s,t] = len(IDs[(s,t)])
 
     if return_ids:
@@ -512,15 +529,18 @@ def panel_ids(Waves):
                 df = from_dta(fn)[[v[1],v[2]]]
             except FileNotFoundError:
                 with dvc.api.open(fn,mode='rb') as dta: df = from_dta(dta)[[v[1],v[2]]]
+            
+            # aviod same column names used in same wave to trace the household id
+            df.columns = ['id1','id2']
 
             # Clean-up ids
-            df[v[1]] = df[v[1]].apply(format_id)
-            df[v[2]] = df[v[2]].apply(format_id)
+            df['id1'] = df['id1'].apply(format_id)
+            df['id2'] = df['id2'].apply(format_id)
 
             if len(v)==4: # Remap id1
-                df[v[2]] = df[v[2]].apply(v[3])
+                df['id2'] = df['id2'].apply(v[3])
 
-            D.update(df[[v[1],v[2]]].dropna().values.tolist())
+            D.update(df[['id1', 'id2']].dropna().values.tolist())
 
     return D
 
