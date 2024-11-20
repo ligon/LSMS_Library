@@ -13,7 +13,33 @@ from collections import defaultdict
 
 country = 'Tanzania'
 
-Waves = {'2008-15':('upd4_hh_a.dta',['r_hhid','round','UPHI']),
+def map_08_15(df, v1, D):
+    r_hhid_column, round_column, uphis_column = v1
+    # Group by household_id and round to a list of uphis
+    grouped = df.groupby([r_hhid_column, round_column])[uphis_column].apply(list).to_dict()
+
+    # Sort groups for orderly processing
+    sorted_keys = sorted(grouped.keys(), key=lambda x: x[1])  # Sort by round number
+    for key in sorted_keys:
+        hh_id, round_num = key
+        uphis = grouped[key]
+
+        # Loop through each previously processed group to find intersections of uphis
+        for prev_key in sorted_keys:
+            if prev_key[1] >= round_num:  # Skip the current and future entries
+                break
+            other_hh_id, other_round_num = prev_key
+            other_uphis = grouped[prev_key]
+
+            if set(uphis).intersection(other_uphis):
+                # Assign the hh_id to the identifier from the lowest intersecting round
+                D[hh_id] = other_hh_id
+                # End the loop early if processing the lowest possible round
+                if other_round_num == 1:
+                    break
+    return D
+
+Waves = {'2008-15':('upd4_hh_a.dta',['r_hhid','round','UPHI'], map_08_15),
          '2019-20':('HH_SEC_A.dta','sdd_hhid','y4_hhid'),
          '2020-21':('hh_sec_a.dta','y5_hhid','y4_hhid')}
 
