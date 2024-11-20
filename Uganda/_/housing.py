@@ -28,7 +28,7 @@ x['m'] = 'Uganda'
 x = x.reset_index().set_index(['j','t','m'])
 
 x = x.fillna(0)
-panel_id_json = json.load(open('../var/panel_id.json'))
+panel_id_json = json.load(open('panel_ids.json'))
 x = id_walk(x, Waves, panel_id_json)
 
 x.to_parquet('../var/housing.parquet')

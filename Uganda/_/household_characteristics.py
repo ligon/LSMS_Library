@@ -31,7 +31,9 @@ except FileNotFoundError:
 
 z = z.reset_index().set_index(['j','t','m'])
 
-panel_id_json = json.load(open('../var/panel_id.json'))
+
+with open('panel_ids.json','r') as f:
+    panel_id_json =json.load(f)
 z = id_walk(z, Waves, panel_id_json)
 
 z.to_parquet('../var/household_characteristics.parquet')

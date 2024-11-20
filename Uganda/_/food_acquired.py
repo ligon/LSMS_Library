@@ -23,7 +23,7 @@ of = pd.read_parquet('../var/other_features.parquet')
 p = p.join(of.reset_index('m')['m'],on=['j','t'])
 p = p.reset_index().set_index(['j','t','m','i','u'])
 
-panel_id_json = json.load(open('../var/panel_id.json'))
+panel_id_json = json.load(open('panel_ids.json'))
 p = id_walk(p, Waves, panel_id_json)
 
 p.to_parquet('../var/food_acquired.parquet')

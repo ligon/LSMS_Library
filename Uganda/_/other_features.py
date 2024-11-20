@@ -40,6 +40,6 @@ z = z.rename(columns=regions)
 z = z.stack().unstack('k')
 
 z = z.reset_index().set_index(['j','t','m'])
-panel_id_json = json.load(open('../var/panel_id.json'))
+panel_id_json = json.load(open('panel_ids.json'))
 z = id_walk(z, Waves, panel_id_json)
 z.to_parquet('../var/other_features.parquet')

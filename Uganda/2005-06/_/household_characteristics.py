@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
-import sys
-sys.path.append('../../_/')
+
 import pandas as pd
 import numpy as np
+import sys
+sys.path.append('../../_/')
 from uganda import age_sex_composition
 
 myvars = dict(fn='../Data/GSEC2.dta',
