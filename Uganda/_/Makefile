@@ -82,7 +82,7 @@ housing_parquet := $(housing:.py=.parquet)
 ../var/income.parquet: income.py ../var/enterprise_income.parquet ../var/earnings.parquet
 	python income.py
 
-../var/nutrition.parquet: nutrition.py ../var/food_quantities.parquet
+../var/nutrition.parquet, ../var/fct.parquet: nutrition.py ../var/food_quantities.parquet
 	python nutrition.py
 
 %.parquet: %.py food_items.org uganda.py

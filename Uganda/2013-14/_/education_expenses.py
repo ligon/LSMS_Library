@@ -8,7 +8,7 @@ from lsms import from_dta
 sys.path.append('../../_')
 
 
-with dvc.api.open('../Data/gsec4.dta',mode='rb') as dta:
+with dvc.api.open('../Data/GSEC4.dta',mode='rb') as dta:
     df = from_dta(dta)
 
 labels = {'HHID': 'j',

@@ -6,7 +6,7 @@ sys.path.append('../../_')
 from local_tools import df_from_orgfile
 import pandas as pd
 import numpy as np
-from tanzania import Waves, id_match, add_markets_from_other_features, country
+from tanzania import Waves, add_markets_from_other_features, country, id_walk, waves
 import dvc.api
 from lsms import from_dta
 import json
@@ -15,7 +15,6 @@ import warnings
 x={}
 for t in Waves.keys():
     x[t] = pd.read_parquet('../'+t+'/_/food_acquired.parquet')
-    #x[t] = id_match(y[t],t,Waves)
 
 x['2008-15'] = x['2008-15'].reset_index().rename(columns = {'UPHI':'j'}).set_index(['j','t','i'])
 
@@ -64,6 +63,12 @@ x = x.reset_index().set_index(['j','t','m','i'])
 # Drop any observations with NaN in the index
 idx = pd.MultiIndex.from_frame(pd.DataFrame(x.index.to_list(),columns=x.index.names).dropna())
 x = x.loc[idx].sort_index()
+
+with open('panel_ids.json','r') as f:
+    panel_id_json =json.load(f)
+
+x = id_walk(x, waves, panel_id_json)
+
 
 assert x.index.is_unique, "Non-unique index!  Fix me!"
 

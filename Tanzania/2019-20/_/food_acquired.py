@@ -32,7 +32,7 @@ unit_conversion = {'Kg': 1,
                    'Gram': 0.001,
                    'Litre': 1,
                    'Millilitre': 0.001,
-                   'Piece': np.nan}
+                   'Piece': 'p'}
 df = new_harmonize_units(df, unit_conversion)
 
 assert df.index.is_unique, "Non-unique index!  Fix me!"

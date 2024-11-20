@@ -6,27 +6,14 @@ import sys
 sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
-from uganda import change_id, Waves
-
-def id_walk(df,wave,waves):
-    
-    use_waves = list(waves.keys())
-    T = use_waves.index(wave)
-    for t in use_waves[T::-1]:
-        if len(waves[t]):
-            df = change_id(df,'../%s/Data/%s' % (t,waves[t][0]),*waves[t][1:])
-        else:
-            df = change_id(df)
-
-    return df
+from uganda import change_id, Waves, id_walk
+import json
 
 x = {}
-
 for t in list(Waves.keys()):
     print(t)
     try: 
         x[t] = pd.read_parquet('../'+t+'/_/interview_date.parquet')
-        x[t] = id_walk(x[t],t,Waves)
     except FileNotFoundError:
         print(f"No parquet foound for {t}")
 
@@ -41,5 +28,8 @@ except FileNotFoundError:
     x['m'] ='Uganda'
 
 x = x.reset_index().set_index(['j','t','m'])
+
+panel_id_json = json.load(open('panel_ids.json'))
+x = id_walk(x, Waves, panel_id_json)
 
 x.to_parquet('../var/interview_date.parquet')

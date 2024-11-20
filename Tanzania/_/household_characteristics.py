@@ -7,14 +7,15 @@ import sys
 sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
-from tanzania import Waves, id_match
+from tanzania import Waves, waves, id_walk
 import dvc.api
 from lsms import from_dta
+import json
+import warnings
 
 y={}
 for t in Waves.keys():
     y[t] = pd.read_parquet('../'+t+'/_/household_characteristics.parquet')
-    #z[t] = id_match(z[t],t,Waves)
 
 z = pd.concat(y.values())
 
@@ -35,5 +36,10 @@ except FileNotFoundError:
     z = z.reset_index().set_index(['j','t','m'])
 
 z.columns.name = 'k'
+
+with open('panel_ids.json','r') as f:
+    panel_id_json =json.load(f)
+
+z = id_walk(z, waves, panel_id_json)
 
 z.to_parquet('../var/household_characteristics.parquet')

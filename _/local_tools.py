@@ -311,27 +311,7 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
 
     return x
 
-def panel_attrition(df,return_ids=False,waves=None):
-    """
-    Produce an upper-triangular) matrix showing the number of households (j) that
-    transition between rounds (t) of df.
-    """
-    idxs = df.reset_index().groupby('t')['j'].apply(list).to_dict()
 
-    if waves is None:
-        waves = list(Waves.keys())
-
-    foo = pd.DataFrame(index=waves,columns=waves)
-    IDs = {}
-    for m,s in enumerate(waves):
-        for t in waves[m:]:
-            IDs[(s,t)] = set(idxs[s]).intersection(idxs[t])
-            foo.loc[s,t] = len(IDs[(s,t)])
-
-    if return_ids:
-        return foo,IDs
-    else:
-        return foo
 
 def add_markets_from_other_features(country,df,additional_other_features=False):
     of = pd.read_parquet(f"../{country}/var/other_features.parquet")
@@ -486,25 +466,51 @@ def format_id(id):
         return None
 
 def panel_ids(Waves):
-    """Return RecursiveDict of household identifiers.
+    """
+    Used to build panel_ids data. 
+    Return RecursiveDict of household identifiers to trace households(splited) across waves.
+    
+    Waves: Dictionary of waves with the following structure:
+        The key of the dictionary is each wave year;
+        The value is a tuple in the maximum of 4 elements: (id_datafile, recent_id, old_id, function_to_transform_old_id)
+        
+        For example (Uganda example):
+        Waves = {'2011-12':(),
+        '2013-14':('GSEC1.dta','HHID','HHID_old'),
+        '2015-16':('gsec1.dta','HHID','hh',lambda s: s.replace('-05-','-04-')),
+        '2018-19':('GSEC1.dta','hhid','t0_hhid'),
+        '2019-20':('HH/gsec1.dta','hhid','hhidold')}
+
+        Waves include a list, example (Tanzania example), the list is used to map the ids by the function map_08_15:
+            Waves = {'2008-15':('upd4_hh_a.dta',['r_hhid','round','UPHI'], map_08_15),
+                    '2019-20':('HH_SEC_A.dta','sdd_hhid','y4_hhid'),
+                    '2020-21':('hh_sec_a.dta','y5_hhid','y4_hhid')}
+    
+    Faye Fang                                                                            Sept. 2024
+
     """
     D = RecursiveDict()
     for t,v in Waves.items():
         if len(v):
             fn = f"../{t}/Data/{v[0]}"
+            columns = v[1] if isinstance(v[1], list) else [v[1], v[2]]
             try:
-                df = from_dta(fn)[[v[1],v[2]]]
+                df = from_dta(fn)[columns]
             except FileNotFoundError:
-                with dvc.api.open(fn,mode='rb') as dta: df = from_dta(dta)[[v[1],v[2]]]
+                with dvc.api.open(fn,mode='rb') as dta: df = from_dta(dta)[columns]
 
-            # Clean-up ids
-            df[v[1]] = df[v[1]].apply(format_id)
-            df[v[2]] = df[v[2]].apply(format_id)
+            if isinstance(v[1], list):
+                df[v[1][0]]=df[v[1][0]].apply(format_id)
+                D = v[2](df,v[1], D) 
+            else:                  
+                # Clean-up ids
+                df[v[1]] = df[v[1]].apply(format_id)
+                df[v[2]] = df[v[2]].apply(format_id)
 
-            if len(v)==4: # Remap id1
-                df[v[2]] = df[v[2]].apply(v[3])
+                if len(v)==4: # Remap id1
+                    df[v[2]] = df[v[2]].apply(v[3])
 
-            D.update(df[[v[1],v[2]]].dropna().values.tolist())
+                D.update(df[[v[1],v[2]]].dropna().values.tolist())
 
     return D
 
