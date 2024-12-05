@@ -533,3 +533,43 @@ def conversion_table_matching_global(df, conversions, conversion_label_name, num
             D[l] = l
             all_matches.loc[len(all_matches.index)] = [l] + [np.nan] * num_matches
     return all_matches, D
+
+def panel_attrition(df, Waves, return_ids=False, waves = None,  split_households_new_sample=True):
+    """
+    Produce an upper-triangular) matrix showing the number of households (j) that
+    transition between rounds (t) of df.
+            split_households_new_sample (bool): Determines how to count split households:
+                                - If True, we assume split_households as new sample. So we
+                                     do not count and trace splitted household, only counts 
+                                     the primary household in each split. The number represents
+                                     how many main (primary) households in previous waves have 
+                                     appeared in current round.
+                                - If False, counts all split households that can be traced 
+                                    back to previous wave households. The number represents how 
+                                    many households (including splitted households
+                                    round can be traced back to the previous round.
+    
+    Note: First three rounds used same sample. Splits of the main households may happen in different rounds.
+    """
+    idxs = df.reset_index().groupby('t')['j'].apply(list).to_dict()
+
+    if waves is None:
+        waves = list(Waves.keys())
+
+    foo = pd.DataFrame(index=waves,columns=waves)
+    IDs = {}
+    for m,s in enumerate(waves):
+        for t in waves[m:]:
+            pairs = set(idxs[s]).intersection(idxs[t])
+            list2_rest = set(idxs[t]) - pairs
+            if not split_households_new_sample:
+                new_paired = {i for i in list2_rest  if i.split('_')[0] in idxs[s]}
+                pairs.update(new_paired)   
+                
+            IDs[(s,t)] = pairs
+            foo.loc[s,t] = len(IDs[(s,t)])
+
+    if return_ids:
+        return foo,IDs
+    else:
+        return foo
