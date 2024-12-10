@@ -66,7 +66,7 @@ P = []
 lbls = json.load(open('../../_/food_items.json'))
 
 #########################
-# Harvest
+# Harvest(2016Q1)
 
 with dvc.api.open('../Data/sect10b_harvestw3.csv',mode='rb') as csv:
     harvest = pd.read_csv(csv)
@@ -90,7 +90,7 @@ vars={'hhid': 'j',
       'zone': 'm',
       'sector':'rural' # 1=Urban; 2=Rural
       }
-t = '2015Q3'
+t = '2016Q1'
 harvest = harvest.rename(columns=vars)
 
 harvest['t'] = t
@@ -102,7 +102,7 @@ C.append(c)
 P.append(p)
 
 ##################
-# Planting (2016Q1)
+# Planting (2015Q3)
 with dvc.api.open('../Data/sect7b_plantingw3.csv',mode='rb') as csv:
     planting = pd.read_csv(csv)
 
@@ -125,7 +125,7 @@ vars={'hhid': 'j',
       'zone': 'm',
       'sector':'rural' # 1=Urban; 2=Rural
       }
-t = '2016Q1'
+t = '2015Q3'
 planting = planting.rename(columns=vars)
 
 planting['t'] = t
