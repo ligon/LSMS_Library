@@ -7,10 +7,14 @@ from collections import defaultdict
 from cfe.df_utils import use_indices
 import warnings
 import json
-import sys
-sys.path.append('../../_')
-sys.path.append('../../../_')
-from local_tools import format_id
+
+if __name__=='__main__':
+    import sys
+    sys.path.append('../../_')
+    sys.path.append('../../../_')
+    from local_tools import format_id
+else:
+    from lsms_library.local_tools import format_id
 
 # Data to link household ids across waves
 Waves = {'2005-06':(),

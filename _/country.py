@@ -17,6 +17,15 @@ class Country:
 
         return var
 
+    @property
+    def code(self):
+        var = files("lsms_library") / "countries" / self.name / "_"
+
+        return var
+
+    def waves(self):
+        return files("lsms_library") / "countries" / self.name
+
     def read_parquet(self,parquet):
         try:
             return pd.read_parquet((self.resources / f'{parquet}.parquet'))
