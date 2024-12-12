@@ -80,7 +80,7 @@ N = []
 lbls = json.load(open('../../_/food_items.json'))
 
 #########################
-# Harvest
+# Harvest(2011Q1)
 
 with dvc.api.open('../Data/sect10b_harvestw1.csv',mode='rb') as csv:
     harvest = pd.read_csv(csv)
@@ -103,7 +103,7 @@ vars={'hhid': 'j',
 
 harvest = harvest.rename(columns=vars)
 
-harvest['t'] = '2010Q3'
+harvest['t'] = '2011Q1'
 harvest = harvest.replace({'i':{int(k):v for k,v in lbls['2010Q3'].items()}})
 
 c,p,n = rectify(harvest)
@@ -113,7 +113,7 @@ P.append(p)
 N.append(n)
 
 ##################
-# Planting (2011Q1)
+# Planting (2010Q3)
 with dvc.api.open('../Data/sect7b_plantingw1.csv',mode='rb') as csv:
     planting = pd.read_csv(csv)
 
@@ -139,7 +139,7 @@ vars={'hhid': 'j',
 
 planting = planting.rename(columns=vars)
 
-planting['t'] = '2011Q1'
+planting['t'] = '2010Q3'
 planting = planting.replace({'i':{int(k):v for k,v in lbls['2011Q1'].items()}})
 
 c,p,n = rectify(planting)

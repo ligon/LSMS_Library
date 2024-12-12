@@ -11,12 +11,12 @@ lbls = json.load(open('../../_/nonfood_items.json'))
 
 #########################
 # Harvest
-files = {'2010Q3':['Nigeria/2010-11/Data/sect11a_harvestw1.csv',
+files = {'2011Q1':['Nigeria/2010-11/Data/sect11a_harvestw1.csv',
                    'Nigeria/2010-11/Data/sect11b_harvestw1.csv',
                    'Nigeria/2010-11/Data/sect11c_harvestw1.csv',
                    'Nigeria/2010-11/Data/sect11d_harvestw1.csv',
                    'Nigeria/2010-11/Data/sect11e_harvestw1.csv'],
-         '2011Q1':['Nigeria/2010-11/Data/sect81_plantingw1.csv',
+         '2010Q3':['Nigeria/2010-11/Data/sect81_plantingw1.csv',
                    'Nigeria/2010-11/Data/sect82_plantingw1.csv',
                    'Nigeria/2010-11/Data/sect83_plantingw1.csv',
                    'Nigeria/2010-11/Data/sect84_plantingw1.csv',

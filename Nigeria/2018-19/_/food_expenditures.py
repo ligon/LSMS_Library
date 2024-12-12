@@ -11,8 +11,8 @@ from units import conv, unitcodes
 
 # Replace t
 conv = conv.groupby(['m','i','u']).mean()
-conv = pd.DataFrame({'2018Q3':conv,
-                     '2019Q1':conv})
+conv = pd.DataFrame({'2019Q1':conv,
+                     '2018Q3':conv})
 conv.columns.name = 't'
 conv = conv.stack('t')
 
@@ -75,7 +75,7 @@ lbls = json.load(open('../../_/food_items.json'))
 
 #########################
 # Harvest
-t = '2018Q3'
+t = '2019Q1'
 
 with dvc.api.open('../Data/sect10b_harvestw4.csv',mode='rb') as csv:
     harvest = pd.read_csv(csv)
@@ -109,9 +109,9 @@ P.append(p)
 N.append(n)
 
 ##################
-# Planting (2019Q1)
+# Planting (2018Q3)
 
-t = '2019Q1'
+t = '2018Q3'
 
 with dvc.api.open('../Data/sect7b_plantingw4.csv',mode='rb') as csv:
     planting = pd.read_csv(csv)

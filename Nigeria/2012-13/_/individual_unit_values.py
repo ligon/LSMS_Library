@@ -74,7 +74,7 @@ vars={'hhid': 'j',
       'sector':'rural' # 1=Urban; 2=Rural
       }
 
-t = '2012Q3'
+t = '2013Q1'
 
 harvest = harvest.rename(columns=vars)
 
@@ -88,7 +88,7 @@ U.append(unit_values)
 
 ##################
 ##################
-# Planting (2013Q1)
+# Planting (2012Q3)
 with dvc.api.open('../Data/sect7b_plantingw2.csv',mode='rb') as csv:
     planting = pd.read_csv(csv)
 
@@ -112,7 +112,7 @@ vars={'hhid': 'j',
       'sector':'rural' # 1=Urban; 2=Rural
       }
 
-t = '2013Q1'
+t = '2012Q3'
 
 planting = planting.rename(columns=vars)
 

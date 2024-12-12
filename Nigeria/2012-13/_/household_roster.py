@@ -22,7 +22,7 @@ def extract_string(x):
 # Post planting:
 
 idxvars = dict(j='hhid',
-               t=('hhid', lambda x: "2018Q3"),
+               t=('hhid', lambda x: "2012Q3"),
                m=('zone', extract_string),
                indiv='indiv',
                )
@@ -31,12 +31,12 @@ myvars = dict(sex = ('s1q2', lambda s: extract_string(s).title()),
               age = 's1q6',
               relation = ('s1q3', lambda s: extract_string(s).title()))
 
-pp = df_data_grabber('../Data/sect1_plantingw4.dta',idxvars,**myvars)
+pp = df_data_grabber('../Data/Post Planting Wave 2/Household/sect1_plantingw2.dta',idxvars,**myvars)
 
 # Post harvest
 #
 idxvars = dict(j='hhid',
-               t=('hhid', lambda x: "2019Q1"),
+               t=('hhid', lambda x: "2013Q1"),
                m=('zone', extract_string),
                indiv='indiv',
                )
@@ -45,7 +45,7 @@ myvars = dict(sex = ('s1q2', lambda s: extract_string(s).title()),
               age = 's1q4',
               relation = ('s1q3', lambda s: extract_string(s).title()),)
 
-ph = df_data_grabber('../Data/sect1_harvestw4.dta',idxvars,**myvars)
+ph = df_data_grabber('../Data/Post Harvest Wave 2/Household/sect1_harvestw2.dta',idxvars,**myvars)
 df = pd.concat([pp,ph])
 
 # Drop rows for individuals who are not in household any longer
