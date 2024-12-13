@@ -23,4 +23,4 @@ p = p.groupby('i',axis=1).sum()
 
 p = p.replace(0,np.nan)
 
-p.to_parquet('./unitvalues.parquet')
+p.to_parquet('../var/unitvalues.parquet')
