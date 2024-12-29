@@ -61,7 +61,10 @@ def df_data_grabber(fn,idxvars,convert_categoricals=True,encoding=None,**kwargs)
             df = from_dta(dta,convert_categoricals=convert_categoricals,encoding=encoding)
     except IOError:
         with dvc.api.open(fn,mode='rb') as dta:
-            df = from_dta(dta,convert_categoricals=convert_categoricals,encoding=encoding)
+            try:
+                df = from_dta(dta,convert_categoricals=convert_categoricals,encoding=encoding)
+            except ValueError: # Not a dta?
+                df = pd.read_csv(dta,encoding=encoding)
 
     out = {}
     for k,v in idxvars.items():
