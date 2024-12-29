@@ -12,7 +12,7 @@ df['produced_value'] = df['produced_quantity'] * df['produced_price']
 prices = ['purchased_price', 'produced_price']
 quantities =  ['purchased_quantity','produced_quantity']
 expenditures = ['purchased_value', 'produced_value', 
-                'purchased_value_vlast', 'purchased_value_yearly',
+                'purchased_value_yearly',
                 'produced_value_daily', 'produced_value_yearly'
                 ]
 
