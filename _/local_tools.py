@@ -9,12 +9,76 @@ import warnings
 import json
 import difflib
 import types
+from pyarrow.lib import ArrowInvalid
 
 def _to_numeric(x):
     try:
         return pd.to_numeric(x)
     except (ValueError,TypeError):
         return x
+
+def get_dataframe(fn,convert_categoricals=True,encoding=None):
+    """From a file named fn, try  to return a dataframe.
+
+    Hope is that caller can be agnostic about file type,
+    or if file is local or on a dvc remote.
+    """
+
+    def local_file(fn):
+    # Is the file local?
+        try:
+            with open(fn) as f:
+                pass
+            return True
+        except FileNotFoundError:
+            return False
+
+    def read_file(f,convert_categoricals=convert_categoricals,encoding=encoding):
+        try:
+            return pd.read_parquet(f)
+        except (ArrowInvalid,):
+            pass
+
+        try:
+            f.seek(0)
+            return from_dta(f,convert_categoricals=convert_categoricals,encoding=encoding)
+        except ValueError:
+            pass
+
+        try:
+            f.seek(0)
+            return pd.read_csv(f,encoding=encoding)
+        except (pd.errors.ParserError, UnicodeDecodeError):
+            pass
+
+        try:
+            f.seek(0)
+            return pd.read_excel(f)
+        except (pd.errors.ParserError, UnicodeDecodeError):
+            pass
+
+        try:
+            f.seek(0)
+            return pd.read_feather(f)
+        except (pd.errors.ParserError, UnicodeDecodeError):
+            pass
+
+        try:
+            f.seek(0)
+            return pd.read_fwf(f)
+        except (pd.errors.ParserError, UnicodeDecodeError):
+            pass
+
+        raise ValueError(f"Unknown file type for {fn}.")
+
+    if local_file(fn):
+        with open(fn,mode='rb') as f:
+            df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
+    else:
+        with dvc.api.open(fn,mode='rb') as f:
+            df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
+
+    return df
 
 def df_data_grabber(fn,idxvars,convert_categoricals=True,encoding=None,**kwargs):
     """From a file named fn, grab both index variables and additional variables
@@ -56,15 +120,7 @@ def df_data_grabber(fn,idxvars,convert_categoricals=True,encoding=None,**kwargs)
 
         raise ValueError(df_data_grabber.__doc__)
 
-    try:
-        with open(fn,'rb') as dta:
-            df = from_dta(dta,convert_categoricals=convert_categoricals,encoding=encoding)
-    except IOError:
-        with dvc.api.open(fn,mode='rb') as dta:
-            try:
-                df = from_dta(dta,convert_categoricals=convert_categoricals,encoding=encoding)
-            except ValueError: # Not a dta?
-                df = pd.read_csv(dta,encoding=encoding)
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
 
     out = {}
     for k,v in idxvars.items():
