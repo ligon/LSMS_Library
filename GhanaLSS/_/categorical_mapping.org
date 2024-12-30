@@ -1,0 +1,38 @@
+#+title: Categorical Mapping
+
+* Regions
+#+name: region
+| Code | Label           |
+|------+-----------------|
+|    1 | Western         |
+|    2 | Central         |
+|    3 | Greater Accra   |
+|    4 | Eastern         |
+|    5 | Volta           |
+|    6 | Ashanti         |
+|    7 | Brong Ahafo     |
+|    8 | Northern        |
+|    9 | Upper East      |
+|   10 | Upper West      |
+|   11 | Foreign country |
+|    . | None            |
+
+* Relation to head
+See https://microdata.worldbank.org/index.php/catalog/2313/data-dictionary/F184?file_name=y01a
+#+name: relationship
+| Code | Label                 |
+|------+-----------------------|
+|    1 | Head                  |
+|    2 | Spouse                |
+|    3 | Child                 |
+|    4 | Grandchild            |
+|    5 | Parent                |
+|    6 | Sibling               |
+|    7 | Niece/nephew          |
+|    8 | Son/daughter in-law   |
+|    9 | Brother/sister in-law |
+|   10 | Father/mother in-law  |
+|   11 | Other relative        |
+|   12 | Servant               |
+|   13 | Tenant                |
+|   14 | Others not related    |

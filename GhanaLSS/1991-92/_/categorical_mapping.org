@@ -1,20 +1,6 @@
-The following tables are mapping of numerical codes to categorical labels for 1991-92
+The following tables are mapping of numerical codes to categorical labels for 1991--92
 
 * POV_GH
-
-#+name: region
-| Code | Label         |
-|------+---------------|
-|    1 | Western       |
-|    2 | Central       |
-|    3 | Greater Accra |
-|    4 | Eastern       |
-|    5 | Volta         |
-|    6 | Ashanti       |
-|    7 | Brong Ahafo   |
-|    8 | Northern      |
-|    9 | Upper East    |
-|   10 | Upper West    |
 
 #+name: rural
 | Code | Label      |

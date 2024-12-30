@@ -11,10 +11,10 @@ df['produced_value'] = df['produced_quantity'] * df['produced_price']
  
 prices = ['purchased_price', 'produced_price']
 quantities =  ['purchased_quantity','produced_quantity']
-expenditures = ['purchased_value', 'produced_value', 
-                'purchased_value_yearly',
-                'produced_value_daily', 'produced_value_yearly'
-                ]
+expenditures = ['purchased_value'] #, 'produced_value']
+                #'purchased_value_yearly',
+                #'produced_value_daily', 'produced_value_yearly'
+                #]
 
 x = df[expenditures].replace(np.nan, 0).groupby(['j','t','m','i']).sum().replace(0,np.nan)
 x.to_parquet('../var/food_expenditures.parquet')
