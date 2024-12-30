@@ -515,7 +515,7 @@ class RecursiveDict(UserDict):
 def format_id(id):
     """Nice string format for any id, string or numeric.
     """
-    if pd.isnull(id) or id=='': return None
+    if pd.isnull(id) or id in ['','.']: return None
 
     try:  # If numeric, return as string int
         return '%d' % id
