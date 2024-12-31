@@ -20,7 +20,7 @@ idxvars = dict(j=('hhid',lambda x: format_id(x)),
 
 myvars = dict(Sex = ('s1q2', lambda s: s.upper()[0]),
               Age = ('s1q5y',lambda x: int(x)),
-              Birthplace =('region',lambda x: x.title()),
+              Birthplace =('s1q11',lambda x: x.title()),
               Relation = ('s1q3', lambda x: x.title()))
 
 df = df_data_grabber('../Data/parta/sec1.dta',idxvars,**myvars,convert_categoricals=True)
