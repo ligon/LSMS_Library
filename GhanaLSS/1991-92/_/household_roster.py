@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import numpy as np
 import pandas as pd
 import sys
@@ -14,7 +15,7 @@ region_mapping = defaultdict(lambda:None,region_mapping)
 
 idxvars = dict(j=(['clust','nh'],lambda x: format_id(x.clust)+format_id(x.nh)),
                t=('nh', lambda x: "1991-92"),
-               indiv=('pid',lambda x: format_id(x.pid))
+               indiv=('pid',lambda x: format_id(x))
                )
 
 myvars = dict(Sex = ('sex', lambda s: 'MF'[int(s)-1]),
