@@ -46,5 +46,4 @@ except FileNotFoundError:
     z['m'] = 'Ghana'
     z = z.reset_index().set_index(['j','indiv','t','m'])
 
-
 z.to_parquet('../var/household_roster.parquet')

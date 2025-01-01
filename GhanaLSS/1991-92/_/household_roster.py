@@ -15,8 +15,9 @@ region_mapping = defaultdict(lambda:None,region_mapping)
 
 idxvars = dict(j=(['clust','nh'],lambda x: format_id(x.clust)+format_id(x.nh)),
                t=('nh', lambda x: "1991-92"),
-               indiv=('pid',lambda x: format_id(x))
-               )
+               v=('clust',format_id),
+               indiv=('pid',lambda x: format_id(x)))
+
 
 myvars = dict(Sex = ('sex', lambda s: 'MF'[int(s)-1]),
               Age = ('agey',lambda x: int(x)),
@@ -27,7 +28,8 @@ df = df_data_grabber('../Data/S1.DTA',idxvars,**myvars)
 
 # Oddity with large number for missing code
 na = df.select_dtypes(exclude='object').max().max()
-df = df.replace(na,np.nan)
+
+#df = df.replace(na,np.nan)
 
 if __name__=='__main__':
     to_parquet(df,'household_roster.parquet')
