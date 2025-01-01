@@ -80,9 +80,11 @@ def get_dataframe(fn,convert_categoricals=True,encoding=None):
 
     return df
 
-def df_data_grabber(fn,idxvars,convert_categoricals=True,encoding=None,**kwargs):
+def df_data_grabber(fn,idxvars,convert_categoricals=True,encoding=None,orgtbl=None,**kwargs):
     """From a file named fn, grab both index variables and additional variables
     specified in kwargs and construct a pandas dataframe.
+
+    A special case: if fn is an orgfile, grab orgtbl.
 
     For both idxvars and kwargs, expect one of the three following formats:
 
@@ -120,7 +122,10 @@ def df_data_grabber(fn,idxvars,convert_categoricals=True,encoding=None,**kwargs)
 
         raise ValueError(df_data_grabber.__doc__)
 
-    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+    if orgtbl is None:
+        df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+    else:
+        df = df_from_orgfile(fn,name=orgtbl,encoding=encoding)
 
     out = {}
     for k,v in idxvars.items():
@@ -134,6 +139,7 @@ def df_data_grabber(fn,idxvars,convert_categoricals=True,encoding=None,**kwargs)
     out = out.set_index(list(idxvars.keys()))
 
     return out
+
 
 
 def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Code',value='Preferred Label'):
