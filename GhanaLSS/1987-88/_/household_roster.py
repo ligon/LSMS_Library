@@ -11,9 +11,9 @@ region_mapping = region_mapping.set_index('Code').to_dict('dict')['Label']
 relationship_mapping = df_from_orgfile('../../_/categorical_mapping.org',name='relationship',encoding='ISO-8859-1')
 relationship_mapping = relationship_mapping.set_index('Code').to_dict('dict')['Label']
 
-idxvars = dict(j='HID',
+idxvars = dict(j=('HID',format_id),
                t=('HID', lambda x: "1987-88"),
-               indiv=('PID',lambda x: format_id(x))
+               indiv=('PID',format_id)
                )
 
 myvars = dict(Sex = ('SEX', lambda s: 'MF'[s-1]),

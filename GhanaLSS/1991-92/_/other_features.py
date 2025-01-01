@@ -3,33 +3,23 @@ import sys
 sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
-import json
-import dvc.api
 from lsms import from_dta
 sys.path.append('../../../_/')
-from local_tools import df_from_orgfile
+from local_tools import df_data_grabber, to_parquet, df_from_orgfile, format_id
 
-with dvc.api.open('../Data/POV_GH.DTA', mode='rb') as dta:
-    df = from_dta(dta, convert_categoricals=True)
-
-of = df[['clust','nh','region','loc2']]
-of['hhid'] = of.apply(lambda x:f"{int(x['clust']):d}/{int(x['nh']):02d}",axis=1)
-
-of = of.rename(columns = {'hhid': 'j',
-                          'region': 'm',
-                          'loc2': 'Rural'})
-
-#map numerical codes to categorical labels 
 rural = df_from_orgfile('./categorical_mapping.org',name='rural',encoding='ISO-8859-1')
-rurald = rural.set_index('Code').to_dict('dict')
-region = df_from_orgfile('./categorical_mapping.org',name='region',encoding='ISO-8859-1')
-regiond = region.set_index('Code').to_dict('dict')
-of['Rural'] = of['Rural'].replace(rurald['Label'])
-of['m'] = of['m'].replace(regiond['Label'])
+rurald = rural.set_index('Code').to_dict('dict')['Label']
+region = df_from_orgfile('../../_/categorical_mapping.org',name='region',encoding='ISO-8859-1')
+regiond = region.set_index('Code').to_dict('dict')['Label']
 
-of['j'] = of['j'].astype(str)
-of['t'] = '1991-92'
-of = of.set_index(['j','t','m'])
-of['Rural'] = (of.Rural=='Rural') + 0.
+idxvars = dict(j=(['clust','nh'],lambda x: format_id(x.clust)+format_id(x.nh)),
+               t=('nh', lambda x: "1991-92"),
+               m=('region',lambda x: regiond[f"{x:3.0f}".strip()]),
+               )
 
-of.to_parquet('other_features.parquet')
+myvars = dict(Rural=('loc2',rurald))
+
+of = df_data_grabber('../Data/POV_GH.DTA',idxvars,**myvars)
+
+if __name__=='__main__':
+    to_parquet(of,'other_features.parquet')

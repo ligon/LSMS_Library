@@ -21,6 +21,4 @@ of['j'] = of['j'].astype(str)
 of['t'] = '2016-17'
 of = of.set_index(['j','t','m'])
 
-of['Rural'] = (of.Rural=='Rural') + 0.
-
 of.to_parquet('other_features.parquet')
