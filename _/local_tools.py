@@ -126,20 +126,53 @@ def df_data_grabber(fn,idxvars,convert_categoricals=True,encoding=None,orgtbl=No
         df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
     else:
         df = df_from_orgfile(fn,name=orgtbl,encoding=encoding)
+        if df.shape[0]==0:
+            raise KeyError(f'No table {orgtbl} in {fn}.')
 
     out = {}
+
+    if isinstance(idxvars,str):
+        idxvars={idxvars:idxvars}
+
     for k,v in idxvars.items():
         out[k] = grabber(df,v)
 
     out = pd.DataFrame(out)
 
-    for k,v in kwargs.items():
-        out[k] = grabber(df,v)
+    if len(kwargs):
+        try:
+            for k,v in kwargs.items():
+                out[k] = grabber(df,v)
+        except AttributeError:
+            if isinstance(kwargs,str):
+                out[k] = df[k]
+            else: # A list?
+                for k in kwargs:
+                    out[k] = df[k]
+    else:
+        out = df
 
     out = out.set_index(list(idxvars.keys()))
 
     return out
 
+def get_categorical_mapping(fn='categorical_mapping.org',tablename=None,idxvars='Code',
+                            dirs=['./','../../_/','../../../_/'],asdict=True,**kwargs):
+    """
+    Find orgtable =tablename= in one of a sequence of org files, return
+    """
+    for d in dirs:
+        try:
+            if d[-1]!="/": d+='/'
+            df = df_data_grabber(d+fn,idxvars,orgtbl=tablename,**kwargs)
+            if asdict:
+                return df.to_dict()
+            else:
+                return df
+        except (FileNotFoundError,KeyError):
+            pass
+
+    raise FileNotFoundError(f"No file {fn} found in directories {dirs}.")
 
 
 def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Code',value='Preferred Label'):
