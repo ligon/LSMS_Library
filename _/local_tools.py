@@ -557,15 +557,18 @@ class RecursiveDict(UserDict):
         except KeyError:
             return k
 
-def format_id(id):
+def format_id(id,zeropadding=0):
     """Nice string format for any id, string or numeric.
+
+    Optional zeropadding parameter takes an integer
+    formats as {id:0z} where
     """
     if pd.isnull(id) or id in ['','.']: return None
 
     try:  # If numeric, return as string int
-        return '%d' % id
+        return ('%d' % id).zfill(zeropadding)
     except TypeError:  # Not numeric
-        return id.split('.')[0].strip()
+        return id.split('.')[0].strip().zfill(zeropadding)
     except ValueError:
         return None
 
