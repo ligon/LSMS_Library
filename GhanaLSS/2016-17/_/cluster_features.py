@@ -22,4 +22,4 @@ of = of.groupby('v').head(1).reset_index().set_index(['h','w','v'])
 of = of.droplevel('h')
 
 if __name__=='__main__':
-    to_parquet(of,'other_features.parquet')
+    to_parquet(of,'cluster_features.parquet')
