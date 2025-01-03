@@ -10,13 +10,18 @@ import json
 import difflib
 import types
 from pyarrow.lib import ArrowInvalid
+from functools import lru_cache
 
-def _to_numeric(x):
+def _to_numeric(x,coerce=False):
     try:
-        return pd.to_numeric(x)
+        if coerce:
+            return pd.to_numeric(x,errors='coerce')
+        else:
+            return pd.to_numeric(x)
     except (ValueError,TypeError):
         return x
 
+@lru_cache(maxsize=3)
 def get_dataframe(fn,convert_categoricals=True,encoding=None):
     """From a file named fn, try  to return a dataframe.
 
@@ -165,6 +170,7 @@ def get_categorical_mapping(fn='categorical_mapping.org',tablename=None,idxvars=
         try:
             if d[-1]!="/": d+='/'
             df = df_data_grabber(d+fn,idxvars,orgtbl=tablename,**kwargs)
+            df = df.squeeze()
             if asdict:
                 return df.to_dict()
             else:
