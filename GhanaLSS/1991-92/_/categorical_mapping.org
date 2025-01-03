@@ -11,7 +11,7 @@ The following tables are mapping of numerical codes to categorical labels for 19
 
 * SEC8H
 
-#+name: s8hq9
+#+name: units
 | Code | Label         |
 |------+---------------|
 |    0 | None          |
@@ -218,7 +218,7 @@ The following tables are mapping of numerical codes to categorical labels for 19
 
 
 
-* Harmonizing Food Lables across SEC8H and SEC9B
+* Harmonizing Food Labels across SEC8H and SEC9B
 
 #+name: harmonize_food
 | Preferred Label                | Aggregate Label                | Code_9b | Label_9b                                        | Code_8h | Label_8h                       |

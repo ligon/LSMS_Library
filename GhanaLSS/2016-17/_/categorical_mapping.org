@@ -506,3 +506,83 @@
 |                               |                               |     986 | Yazz                                                 |         |                                |
 |                               |                               |     987 | Other sanitary pad                                   |         |                                |
 |                               |                               |     990 | Fee for money transfer                               |         |                                |
+* Units
+Obtained from values_list() in ../Data/g7sec9b.dta.
+#+name: units
+| Code | Label                         |
+|------+-------------------------------|
+|    1 | American Tin (Olonka)         |
+|    2 | Balls                         |
+|    3 | Bar                           |
+|    4 | Barrel                        |
+|    5 | Basket                        |
+|    6 | Beer bottle                   |
+|    7 | Bowl                          |
+|    8 | Box/Carton                    |
+|    9 | Bucket                        |
+|   10 | Bunch                         |
+|   11 | Bundle                        |
+|   12 | Crate                         |
+|   13 | Dozen                         |
+|   14 | Fanta bottle                  |
+|   15 | Fingers                       |
+|   16 | Litres                        |
+|   17 | Loaf                          |
+|   18 | Log                           |
+|   19 | Margarin tin                  |
+|   20 | Maxi bag                      |
+|   21 | Mini bag                      |
+|   22 | Packet                        |
+|   23 | Pair                          |
+|   24 | Piece                         |
+|   25 | Pot                           |
+|   26 | Pound                         |
+|   27 | Satchet                       |
+|   28 | Set                           |
+|   29 | Sheet                         |
+|   30 | Single                        |
+|   31 | Stick                         |
+|   32 | Tree                          |
+|   33 | Tubers                        |
+|   34 | Yards                         |
+|   35 | Meter                         |
+|   36 | Drum                          |
+|   37 | 1000 kg /metric tonnes/tonnes |
+|   38 | Millilitre                    |
+|   39 | Ream                          |
+|   40 | Watts                         |
+|   41 | Kilowatts                     |
+|   42 | Megawatts                     |
+|   43 | Volt                          |
+|   44 | Kilovolt                      |
+|   45 | Acre                          |
+|   46 | Hectare                       |
+|   47 | Ounce                         |
+|   48 | Gigabyte                      |
+|   49 | Tetrabyte                     |
+|   50 | Gigawatts                     |
+|   51 | Kelvin                        |
+|   52 | Mole                          |
+|   53 | Ampere                        |
+|   54 | Kilojoules                    |
+|   55 | Carat                         |
+|   56 | Rolls                         |
+|   57 | Coil                          |
+|   58 | Bail                          |
+|   59 | Inches                        |
+|   60 | Blister / Strip               |
+|   61 | Feet                          |
+|   62 | Plot                          |
+|   63 | Plate (food)                  |
+|   64 | Room                          |
+|   65 | Ampoule                       |
+|   66 | Heap                          |
+|   67 | Tin                           |
+|   68 | Kilometre                     |
+|   69 | Hours                         |
+|   70 | Minutes                       |
+|   71 | Tot (25mls)                   |
+|   72 | Visit                         |
+|   73 | Kilogram                      |
+|   74 | Gram                          |
+|   99 | Other unit                    |
