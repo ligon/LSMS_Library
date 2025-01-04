@@ -11,6 +11,7 @@ import difflib
 import types
 from pyarrow.lib import ArrowInvalid
 from functools import lru_cache
+from pathlib import Path
 
 def _to_numeric(x,coerce=False):
     try:
@@ -22,7 +23,7 @@ def _to_numeric(x,coerce=False):
         return x
 
 @lru_cache(maxsize=3)
-def get_dataframe(fn,convert_categoricals=True,encoding=None):
+def get_dataframe(fn,convert_categoricals=True,encoding=None,categories_only=False):
     """From a file named fn, try  to return a dataframe.
 
     Hope is that caller can be agnostic about file type,
@@ -46,7 +47,7 @@ def get_dataframe(fn,convert_categoricals=True,encoding=None):
 
         try:
             f.seek(0)
-            return from_dta(f,convert_categoricals=convert_categoricals,encoding=encoding)
+            return from_dta(f,convert_categoricals=convert_categoricals,encoding=encoding,categories_only=categories_only)
         except ValueError:
             pass
 
@@ -163,9 +164,21 @@ def df_data_grabber(fn,idxvars,convert_categoricals=True,encoding=None,orgtbl=No
 
 def get_categorical_mapping(fn='categorical_mapping.org',tablename=None,idxvars='Code',
                             dirs=['./','../../_/','../../../_/'],asdict=True,**kwargs):
+    """Return mappings for categories.
+
+    By default, searches for =tablename= in an orgfile
+    'categorical_mapping.org'. But if fn is a path to a dta file instead,
+    returns categories for tablename from the stata file.
     """
-    Find orgtable =tablename= in one of a sequence of org files, return
-    """
+    ext = Path(fn).suffix
+
+    if ext.lower()=='.dta': # A stata file.
+        cats = get_dataframe(fn,convert_categoricals=True,categories_only=True)
+        if tablename is None:
+            return cats
+        else:
+            return cats[tablename]
+
     for d in dirs:
         try:
             if d[-1]!="/": d+='/'
@@ -175,10 +188,11 @@ def get_categorical_mapping(fn='categorical_mapping.org',tablename=None,idxvars=
                 return df.to_dict()
             else:
                 return df
-        except (FileNotFoundError,KeyError):
-            pass
+        except (FileNotFoundError,KeyError) as error:
+            exc = error
 
-    raise FileNotFoundError(f"No file {fn} found in directories {dirs}.")
+    exc.add_note(f"No table {tablename} found in any file {fn} in directories {dirs}.")
+    raise exc
 
 
 def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Code',value='Preferred Label'):
@@ -628,7 +642,8 @@ def conversion_table_matching_global(df, conversions, conversion_label_name, num
 
     """
     D = defaultdict(dict)
-    all_matches = pd.DataFrame(columns = ["Conversion Table Label"] + ["Match " + str(n) for n in range(1, num_matches + 1)])
+    all_matches = pd.DataFrame(columns=["Conversion Table Label"] +
+                               ["Match " + str(n) for n in range(1, num_matches + 1)])
     items_unique = df['i'].str.capitalize().unique()
     for l in conversions[conversion_label_name].unique():
         k = difflib.get_close_matches(l.capitalize(), items_unique, n = num_matches, cutoff=cutoff)
@@ -640,6 +655,46 @@ def conversion_table_matching_global(df, conversions, conversion_label_name, num
             D[l] = l
             all_matches.loc[len(all_matches.index)] = [l] + [np.nan] * num_matches
     return all_matches, D
+
+def category_union(dict_list):
+    """Construct union of a list of dictionaries, preserving unique *values*.
+
+    Returns this union, as well as a list of dictionaries mapping the original
+    dicts into the union.
+
+    >>> c1={1:'a',2:'b',3:'c'}
+    >>> c2={1:'b',2:'c',3:'d',4:"a'"}
+    >>> c0,t1,t2 = category_union([c1,c2])
+    >>> c0[t1[2]]==c1[2]
+    True
+    """
+    cv = []
+    for i in range(len(dict_list)):
+        cv += list(set(dict_list[i].values()))
+
+    cv = list(set(cv))
+
+    c0 = dict(zip(range(len(cv)),cv))
+
+    c0inv = {v:k for k,v in c0.items()}
+
+    t = []
+    for i in range(len(dict_list)):
+        t.append({k:c0inv[v] for k,v in dict_list[i].items()})
+
+    return c0,*tuple(t)
+
+def category_remap(c,remaps):
+    """
+    Return a "remapped" dictionary.
+
+    A dictionary remaps values in dict c into other values in c.
+    """
+    cinv = {v:k for k,v in c.items()}
+    for k,v in remaps.items():
+        c[cinv[k]] = v
+
+    return c
 
 def panel_attrition(df, Waves, return_ids=False, waves = None,  split_households_new_sample=True):
     """
