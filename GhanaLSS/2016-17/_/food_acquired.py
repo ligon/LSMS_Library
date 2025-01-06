@@ -15,7 +15,7 @@ labelsd = get_categorical_mapping(tablename='harmonize_food',idxvars={'Code':('C
 unitsd = defaultdict(lambda:np.nan,get_categorical_mapping(tablename='units'))
 
 # food expenditure
-idxvars = dict(h=(['clust','nh'],lambda x: format_id(x.clust)+format_id(x.nh)),
+idxvars = dict(h=(['clust','nh'],lambda x: format_id(x.clust)+'/'+format_id(x.nh,zeropadding=2)),
                w=('nh',lambda x: w),
                v=('clust',format_id),
                j=('freqcd',lambda x: labelsd[format_id(x)]))
@@ -42,7 +42,7 @@ Visits = range(3,8)
 labelsd = get_categorical_mapping(tablename='harmonize_food',idxvars={'Code':('Code_8h',format_id)},**{'Label':'Preferred Label'})
 
 # food quantities
-idxvars = dict(h=(['clust','nh'],lambda x: format_id(x.clust)+format_id(x.nh)),
+idxvars = dict(h=(['clust','nh'],lambda x: format_id(x.clust)+'/'+format_id(x.nh,zeropadding=2)),
                w=('nh',lambda x: w),
                v=('clust',format_id),
                j=('foodcd',lambda x: labelsd[format_id(x)]))

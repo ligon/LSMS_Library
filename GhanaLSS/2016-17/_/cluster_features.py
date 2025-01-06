@@ -5,7 +5,7 @@ from local_tools import df_data_grabber, to_parquet, df_from_orgfile, format_id,
 
 regiond = get_categorical_mapping(tablename='region')
 
-idxvars = dict(h=(['clust','nh'],lambda x: format_id(x.clust)+format_id(x.nh)),
+idxvars = dict(h=(['clust','nh'],lambda x: format_id(x.clust)+'/'+format_id(x.nh,zeropadding=2)),
                w=('nh', lambda x: "2016-17"),
                )
 

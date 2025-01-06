@@ -12,7 +12,7 @@ relationship_mapping = get_categorical_mapping(tablename='relationship')
 region_mapping = get_categorical_mapping(tablename='region')
 region_mapping = defaultdict(lambda:None,region_mapping)
 
-idxvars = dict(h=('hid',format_id),
+idxvars = dict(h=(['clust','nh'],lambda x: format_id(x.clust)+'/'+format_id(x.nh,zeropadding=2)),
                w=('hid', lambda x: "2016-17"),
                v = ('clust',format_id),
                indiv=('pid',format_id)
