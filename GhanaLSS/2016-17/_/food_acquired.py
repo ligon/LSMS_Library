@@ -1,9 +1,7 @@
 #!/usr/bin/env python
-import sys
-import numpy as np
 import pandas as pd
-sys.path.append('../../../_/')
-from local_tools import df_from_orgfile, get_categorical_mapping, format_id, df_data_grabber, _to_numeric, to_parquet
+import numpy as np
+from lsms_library.local_tools import df_from_orgfile, get_categorical_mapping, format_id, df_data_grabber, _to_numeric, to_parquet
 import warnings
 from collections import defaultdict
 

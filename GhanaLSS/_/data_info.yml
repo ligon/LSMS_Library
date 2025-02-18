@@ -1,0 +1,37 @@
+Country: GhanaLSS
+
+Waves:
+  - '1987-88'
+  - '1988-89'
+  - '1991-92'
+  - '1998-99'
+  - '2005-06'
+  - '2012-13'
+  - '2016-17'
+
+Index Info:
+  note: no interview date (int_t), compared with global index info
+  index_info:
+    cluster_features: (w, v)
+    household_roster: (w, v, i, pid)
+    food_acquired: (w, v, i, j)
+
+Data Scheme:
+  cluster_features:
+    index: (w, v)
+    Region: str
+    Rural: str
+  household_roster:
+    index: (w, v, i, pid)
+    Sex: str
+    Age: int
+    Birthplace: str
+    Relationship: str
+  food_acquired:
+    index: (w, v, i, j)
+    Expenditure: float
+    Quantity: float
+    Price: float
+    Produced: float
+
+
