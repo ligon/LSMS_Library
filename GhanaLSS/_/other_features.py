@@ -4,7 +4,12 @@ Concatenate data on other household features across rounds.
 """
 
 import pandas as pd
-from ghana import change_id, Waves
+
+try:
+    from .ghana import change_id, Waves  # Used as part of a package
+except ImportError:
+    from ghana import change_id, Waves # Running standalone
+
 import numpy as np
 import sys
 sys.path.append('../../_/')
