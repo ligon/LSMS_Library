@@ -1,0 +1,31 @@
+Country: GhanaLSS
+Wave: 2016-17
+
+cluster_features:
+    file: g7sec8h.dta
+    idxvars:
+        w: clust
+        v: clust
+    myvars:
+        Region: region
+        Rural: loc2
+
+
+household_roster:
+    file: g7sec1.dta
+    idxvars:
+        w: clust
+        v: clust
+        i: 
+            - clust
+            - nh
+        pid: pid
+    myvars:
+        Sex: s1q2
+        Age: s1q5y
+        Birthplace: s1q11
+        Relation: s1q3
+
+
+
+

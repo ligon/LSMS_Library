@@ -9,16 +9,88 @@ import warnings
 import json
 import difflib
 import types
+from pyarrow.lib import ArrowInvalid
+from functools import lru_cache
+from pathlib import Path
 
-def _to_numeric(x):
+def _to_numeric(x,coerce=False):
     try:
-        return pd.to_numeric(x)
+        if coerce:
+            return pd.to_numeric(x,errors='coerce')
+        else:
+            return pd.to_numeric(x)
     except (ValueError,TypeError):
         return x
 
-def df_data_grabber(fn,idxvars,convert_categoricals=True,encoding=None,**kwargs):
+@lru_cache(maxsize=3)
+def get_dataframe(fn,convert_categoricals=True,encoding=None,categories_only=False):
+    """From a file named fn, try  to return a dataframe.
+
+    Hope is that caller can be agnostic about file type,
+    or if file is local or on a dvc remote.
+    """
+
+    def local_file(fn):
+    # Is the file local?
+        try:
+            with open(fn) as f:
+                pass
+            return True
+        except FileNotFoundError:
+            return False
+
+    def read_file(f,convert_categoricals=convert_categoricals,encoding=encoding):
+        try:
+            return pd.read_parquet(f)
+        except (ArrowInvalid,):
+            pass
+
+        try:
+            f.seek(0)
+            return from_dta(f,convert_categoricals=convert_categoricals,encoding=encoding,categories_only=categories_only)
+        except ValueError:
+            pass
+
+        try:
+            f.seek(0)
+            return pd.read_csv(f,encoding=encoding)
+        except (pd.errors.ParserError, UnicodeDecodeError):
+            pass
+
+        try:
+            f.seek(0)
+            return pd.read_excel(f)
+        except (pd.errors.ParserError, UnicodeDecodeError):
+            pass
+
+        try:
+            f.seek(0)
+            return pd.read_feather(f)
+        except (pd.errors.ParserError, UnicodeDecodeError):
+            pass
+
+        try:
+            f.seek(0)
+            return pd.read_fwf(f)
+        except (pd.errors.ParserError, UnicodeDecodeError):
+            pass
+
+        raise ValueError(f"Unknown file type for {fn}.")
+
+    if local_file(fn):
+        with open(fn,mode='rb') as f:
+            df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
+    else:
+        with dvc.api.open(fn,mode='rb') as f:
+            df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
+
+    return df
+
+def df_data_grabber(fn,idxvars,convert_categoricals=True,encoding=None,orgtbl=None,**kwargs):
     """From a file named fn, grab both index variables and additional variables
     specified in kwargs and construct a pandas dataframe.
+
+    A special case: if fn is an orgfile, grab orgtbl.
 
     For both idxvars and kwargs, expect one of the three following formats:
 
@@ -56,25 +128,71 @@ def df_data_grabber(fn,idxvars,convert_categoricals=True,encoding=None,**kwargs)
 
         raise ValueError(df_data_grabber.__doc__)
 
-    try:
-        with open(fn,'rb') as dta:
-            df = from_dta(dta,convert_categoricals=convert_categoricals,encoding=encoding)
-    except IOError:
-        with dvc.api.open(fn,mode='rb') as dta:
-            df = from_dta(dta,convert_categoricals=convert_categoricals,encoding=encoding)
+    if orgtbl is None:
+        df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+    else:
+        df = df_from_orgfile(fn,name=orgtbl,encoding=encoding)
+        if df.shape[0]==0:
+            raise KeyError(f'No table {orgtbl} in {fn}.')
 
     out = {}
+
+    if isinstance(idxvars,str):
+        idxvars={idxvars:idxvars}
+
     for k,v in idxvars.items():
         out[k] = grabber(df,v)
 
     out = pd.DataFrame(out)
 
-    for k,v in kwargs.items():
-        out[k] = grabber(df,v)
+    if len(kwargs):
+        try:
+            for k,v in kwargs.items():
+                out[k] = grabber(df,v)
+        except AttributeError:
+            if isinstance(kwargs,str):
+                out[k] = df[k]
+            else: # A list?
+                for k in kwargs:
+                    out[k] = df[k]
+    else:
+        out = df
 
     out = out.set_index(list(idxvars.keys()))
 
     return out
+
+def get_categorical_mapping(fn='categorical_mapping.org',tablename=None,idxvars='Code',
+                            dirs=['./','../../_/','../../../_/'],asdict=True,**kwargs):
+    """Return mappings for categories.
+
+    By default, searches for =tablename= in an orgfile
+    'categorical_mapping.org'. But if fn is a path to a dta file instead,
+    returns categories for tablename from the stata file.
+    """
+    ext = Path(fn).suffix
+
+    if ext.lower()=='.dta': # A stata file.
+        cats = get_dataframe(fn,convert_categoricals=True,categories_only=True)
+        if tablename is None:
+            return cats
+        else:
+            return cats[tablename]
+
+    for d in dirs:
+        try:
+            if d[-1]!="/": d+='/'
+            df = df_data_grabber(d+fn,idxvars,orgtbl=tablename,**kwargs)
+            df = df.squeeze()
+            if asdict:
+                return df.to_dict()
+            else:
+                return df
+        except (FileNotFoundError,KeyError) as error:
+            exc = error
+
+    exc.add_note(f"No table {tablename} found in any file {fn} in directories {dirs}.")
+    raise exc
 
 
 def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Code',value='Preferred Label'):
@@ -453,15 +571,18 @@ class RecursiveDict(UserDict):
         except KeyError:
             return k
 
-def format_id(id):
+def format_id(id,zeropadding=0):
     """Nice string format for any id, string or numeric.
+
+    Optional zeropadding parameter takes an integer
+    formats as {id:0z} where
     """
-    if pd.isnull(id) or id=='': return None
+    if pd.isnull(id) or id in ['','.']: return None
 
     try:  # If numeric, return as string int
-        return '%d' % id
+        return ('%d' % id).zfill(zeropadding)
     except TypeError:  # Not numeric
-        return id.split('.')[0].strip()
+        return id.split('.')[0].strip().zfill(zeropadding)
     except ValueError:
         return None
 
@@ -521,7 +642,8 @@ def conversion_table_matching_global(df, conversions, conversion_label_name, num
 
     """
     D = defaultdict(dict)
-    all_matches = pd.DataFrame(columns = ["Conversion Table Label"] + ["Match " + str(n) for n in range(1, num_matches + 1)])
+    all_matches = pd.DataFrame(columns=["Conversion Table Label"] +
+                               ["Match " + str(n) for n in range(1, num_matches + 1)])
     items_unique = df['i'].str.capitalize().unique()
     for l in conversions[conversion_label_name].unique():
         k = difflib.get_close_matches(l.capitalize(), items_unique, n = num_matches, cutoff=cutoff)
@@ -533,6 +655,46 @@ def conversion_table_matching_global(df, conversions, conversion_label_name, num
             D[l] = l
             all_matches.loc[len(all_matches.index)] = [l] + [np.nan] * num_matches
     return all_matches, D
+
+def category_union(dict_list):
+    """Construct union of a list of dictionaries, preserving unique *values*.
+
+    Returns this union, as well as a list of dictionaries mapping the original
+    dicts into the union.
+
+    >>> c1={1:'a',2:'b',3:'c'}
+    >>> c2={1:'b',2:'c',3:'d',4:"a'"}
+    >>> c0,t1,t2 = category_union([c1,c2])
+    >>> c0[t1[2]]==c1[2]
+    True
+    """
+    cv = []
+    for i in range(len(dict_list)):
+        cv += list(set(dict_list[i].values()))
+
+    cv = list(set(cv))
+
+    c0 = dict(zip(range(len(cv)),cv))
+
+    c0inv = {v:k for k,v in c0.items()}
+
+    t = []
+    for i in range(len(dict_list)):
+        t.append({k:c0inv[v] for k,v in dict_list[i].items()})
+
+    return c0,*tuple(t)
+
+def category_remap(c,remaps):
+    """
+    Return a "remapped" dictionary.
+
+    A dictionary remaps values in dict c into other values in c.
+    """
+    cinv = {v:k for k,v in c.items()}
+    for k,v in remaps.items():
+        c[cinv[k]] = v
+
+    return c
 
 def panel_attrition(df, Waves, return_ids=False, waves = None,  split_households_new_sample=True):
     """

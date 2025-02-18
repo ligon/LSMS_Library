@@ -5,6 +5,7 @@ from eep153_tools.sheets import write_sheet
 from importlib.resources import files
 import cfe.regression as rgsn
 
+
 pd.set_option('future.no_silent_downcasting', True)
 
 class Country:

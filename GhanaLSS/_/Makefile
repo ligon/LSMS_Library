@@ -29,6 +29,15 @@ household_characteristics_parquet := $(household_characteristics:.py=.parquet)
 ../var/household_characteristics.parquet: household_characteristics.py $(household_characteristics_parquet) ../var/other_features.parquet
 	python household_characteristics.py
 
+household_roster = $(shell find $(rounds) -name household_roster.py)
+household_roster_parquet := $(household_roster:.py=.parquet)
+
+../%/_/household_roster.parquet: @D/household_roster.py
+	(cd $(@D) && python household_roster.py)
+
+../var/household_roster.parquet: household_roster.py $(household_roster_parquet) ../var/other_features.parquet
+	python household_roster.py
+
 other_features = $(shell find $(rounds) -name other_features.py)
 other_features_parquet := $(other_features:.py=.parquet)
 

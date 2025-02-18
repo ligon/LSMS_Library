@@ -1,0 +1,41 @@
+Country: GhanaLSS
+Wave: 2012-13
+
+cluster_features:
+    file: PARTA/g6loc_edt.dta
+    idxvars:
+        w: clust
+        v: clust
+    myvars:
+        Region: region
+        Rural: loc2
+        Ecological_zone: ez
+
+
+household_roster:
+    file: PARTA/SEC1.dta
+    idxvars:
+        w: HID
+        v: clust
+        i: HID
+        pid: PID
+    myvars:
+        Sex: s1q2
+        Age: s1q5y
+        Birthplace: s1q11
+        Relation: s1q3
+
+individual_education:
+    file: PARTA/SEC2a.dta
+    idxvars:
+        w: HID
+        v: clust
+        i: HID
+        pid: PID
+    myvars:
+        Highest_education: s2aq2
+        Current_grade: s2aq7
+
+
+
+

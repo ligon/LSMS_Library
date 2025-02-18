@@ -8,5 +8,4 @@ for t in ['2010-11','2012-13','2015-16','2018-19']:
 
 x = pd.concat(X,axis=0)
 
-
-x.to_parquet('./household_roster.parquet')
+x.to_parquet('../var/household_roster.parquet')
