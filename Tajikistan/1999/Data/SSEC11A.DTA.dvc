@@ -2,4 +2,5 @@ outs:
 - md5: ad471119d56857f471c4b17057151f1b
   size: 398305
   path: SSEC11A.DTA
+  md5-dos2unix: ad471119d56857f471c4b17057151f1b
   hash: md5

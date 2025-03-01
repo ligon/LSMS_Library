@@ -2,4 +2,5 @@ outs:
 - md5: 948946042e2cffbf51663aadf23e47bf
   size: 189476
   path: s13a_1_me_CIV2018.dta
+  md5-dos2unix: 948946042e2cffbf51663aadf23e47bf
   hash: md5

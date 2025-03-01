@@ -2,4 +2,5 @@ outs:
 - md5: 864e4ce3aea88ac70e393d384c6e78e2
   size: 4028355
   path: SECA04.dta
+  md5-dos2unix: 864e4ce3aea88ac70e393d384c6e78e2
   hash: md5

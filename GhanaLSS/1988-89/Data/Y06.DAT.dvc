@@ -1,4 +1,5 @@
 outs:
 - md5: 6b1244bffc511c27ca28762d65f5282c
   path: Y06.DAT
+  md5-dos2unix: 6b1244bffc511c27ca28762d65f5282c
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: 55f8cfee220c1a381d654facce481ec7
   size: 697117
   path: 2003 3 agriculture.dta
+  md5-dos2unix: 55f8cfee220c1a381d654facce481ec7
   hash: md5

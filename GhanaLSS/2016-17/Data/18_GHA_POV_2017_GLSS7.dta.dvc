@@ -1,4 +1,5 @@
 outs:
 - md5: 21d41583dcc3c2506cb0e436cd8f8661
   path: 18_GHA_POV_2017_GLSS7.dta
+  md5-dos2unix: 21d41583dcc3c2506cb0e436cd8f8661
   hash: md5

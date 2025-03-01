@@ -2,4 +2,5 @@ outs:
 - md5: a8f6942e8eaf15f359ecb96d6ed50b3a
   size: 3509095
   path: LinkIDs.dta
+  md5-dos2unix: a8f6942e8eaf15f359ecb96d6ed50b3a
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: e24a843b8facbf0e0d44484c662ea7b1
   size: 253173
   path: PHHM.dta
+  md5-dos2unix: e24a843b8facbf0e0d44484c662ea7b1
   hash: md5

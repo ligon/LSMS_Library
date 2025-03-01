@@ -1,4 +1,5 @@
 outs:
 - md5: 9c0e6c8ee3a06bd5bfaa8518b6c335de
   path: F13B.DCT
+  md5-dos2unix: 9c0e6c8ee3a06bd5bfaa8518b6c335de
   hash: md5

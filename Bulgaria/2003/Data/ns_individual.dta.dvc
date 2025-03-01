@@ -2,4 +2,5 @@ outs:
 - md5: c42d76cab4840a1b5b35e6cbbd5f8211
   size: 4695632
   path: ns_individual.dta
+  md5-dos2unix: c42d76cab4840a1b5b35e6cbbd5f8211
   hash: md5

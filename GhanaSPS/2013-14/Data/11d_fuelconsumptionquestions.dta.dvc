@@ -2,4 +2,5 @@ outs:
 - md5: d71fef0bc60ea19db91a304b9a14b1d4
   size: 2870261
   path: 11d_fuelconsumptionquestions.dta
+  md5-dos2unix: d71fef0bc60ea19db91a304b9a14b1d4
   hash: md5

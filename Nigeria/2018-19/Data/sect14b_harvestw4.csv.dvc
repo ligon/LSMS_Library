@@ -2,4 +2,5 @@ outs:
 - md5: c37df15067e98a6542bc5277c3adefd3
   size: 496914
   path: sect14b_harvestw4.csv
+  md5-dos2unix: c37df15067e98a6542bc5277c3adefd3
   hash: md5

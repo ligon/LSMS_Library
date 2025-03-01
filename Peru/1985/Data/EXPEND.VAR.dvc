@@ -2,4 +2,5 @@ outs:
 - md5: 3223deb89bd9928a05caee45f3dee057
   size: 232
   path: EXPEND.VAR
+  md5-dos2unix: 3223deb89bd9928a05caee45f3dee057
   hash: md5

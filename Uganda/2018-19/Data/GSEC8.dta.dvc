@@ -2,4 +2,5 @@ outs:
 - md5: afe17ceef3e55d8489a4af7eb6531905
   size: 6468029
   path: GSEC8.dta
+  md5-dos2unix: afe17ceef3e55d8489a4af7eb6531905
   hash: md5

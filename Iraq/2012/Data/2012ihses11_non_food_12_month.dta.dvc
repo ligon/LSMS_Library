@@ -2,4 +2,5 @@ outs:
 - md5: 34bfc034f532eb6867420a48a2e2230b
   size: 28683489
   path: 2012ihses11_non_food_12_month.dta
+  md5-dos2unix: 34bfc034f532eb6867420a48a2e2230b
   hash: md5

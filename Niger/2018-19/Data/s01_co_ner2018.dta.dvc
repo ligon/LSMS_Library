@@ -2,4 +2,5 @@ outs:
 - md5: 137544dab0572336b47928d8a7dbe589
   size: 154350
   path: s01_co_ner2018.dta
+  md5-dos2unix: 137544dab0572336b47928d8a7dbe589
   hash: md5

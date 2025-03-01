@@ -2,4 +2,5 @@ outs:
 - md5: 442a4e86fecdfe6bd7ecd045ab2c3554
   size: 2054971
   path: KCHILD.DTA
+  md5-dos2unix: 442a4e86fecdfe6bd7ecd045ab2c3554
   hash: md5

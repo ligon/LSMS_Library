@@ -2,4 +2,5 @@ outs:
 - md5: add2da31ebb3d16782f8ea0d56569983
   size: 11763181
   path: 04m_aglabourquestions.dta
+  md5-dos2unix: add2da31ebb3d16782f8ea0d56569983
   hash: md5

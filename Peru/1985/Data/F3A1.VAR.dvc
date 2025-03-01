@@ -2,4 +2,5 @@ outs:
 - md5: 1a797218d0d53ce8d66a3df499415b35
   size: 260
   path: F3A1.VAR
+  md5-dos2unix: 1a797218d0d53ce8d66a3df499415b35
   hash: md5

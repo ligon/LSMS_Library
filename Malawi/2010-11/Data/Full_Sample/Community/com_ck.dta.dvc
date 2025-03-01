@@ -2,4 +2,5 @@ outs:
 - md5: 75a5b9675e52a1f5576d6b3ecb8cdfbf
   size: 1491632
   path: com_ck.dta
+  md5-dos2unix: 75a5b9675e52a1f5576d6b3ecb8cdfbf
   hash: md5

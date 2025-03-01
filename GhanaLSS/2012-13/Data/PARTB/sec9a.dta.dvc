@@ -2,4 +2,5 @@ outs:
 - md5: ee3173e0c870804f5c4271bdcf57ee33
   size: 143143706
   path: sec9a.dta
+  md5-dos2unix: ee3173e0c870804f5c4271bdcf57ee33
   hash: md5

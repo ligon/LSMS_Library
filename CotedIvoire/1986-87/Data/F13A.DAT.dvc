@@ -1,4 +1,5 @@
 outs:
 - md5: 3b9c9cc92a2b35520b7f9a0e2598ce18
   path: F13A.DAT
+  md5-dos2unix: 3b9c9cc92a2b35520b7f9a0e2598ce18
   hash: md5

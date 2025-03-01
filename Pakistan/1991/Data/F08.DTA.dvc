@@ -2,4 +2,5 @@ outs:
 - md5: 8f8575fdbaa5bc6fdfc07e9629586a97
   size: 516486
   path: F08.DTA
+  md5-dos2unix: 8f8575fdbaa5bc6fdfc07e9629586a97
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: 6504464080fc39e3eb7e23183764482f
   size: 1002537
   path: EACIS01_p1.dta
+  md5-dos2unix: 6504464080fc39e3eb7e23183764482f
   hash: md5

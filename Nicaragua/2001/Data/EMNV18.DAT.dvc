@@ -2,4 +2,5 @@ outs:
 - md5: 133ae8385430203c62226fd1b6299fd7
   size: 1211925
   path: EMNV18.DAT
+  md5-dos2unix: 133ae8385430203c62226fd1b6299fd7
   hash: md5

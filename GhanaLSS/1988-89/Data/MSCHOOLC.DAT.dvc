@@ -1,4 +1,5 @@
 outs:
 - md5: 5bbc79c62a9aca3a792bf316540698fc
   path: MSCHOOLC.DAT
+  md5-dos2unix: 5bbc79c62a9aca3a792bf316540698fc
   hash: md5

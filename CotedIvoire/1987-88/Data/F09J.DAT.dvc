@@ -1,4 +1,5 @@
 outs:
 - md5: 64b890c7acc0aa054058592bdcbfcb19
   path: F09J.DAT
+  md5-dos2unix: 64b890c7acc0aa054058592bdcbfcb19
   hash: md5

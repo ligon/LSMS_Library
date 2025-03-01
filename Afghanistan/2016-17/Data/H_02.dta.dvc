@@ -2,4 +2,5 @@ outs:
 - md5: 500e499f93be6abdea7deee866576694
   size: 1235999
   path: H_02.dta
+  md5-dos2unix: 500e499f93be6abdea7deee866576694
   hash: md5

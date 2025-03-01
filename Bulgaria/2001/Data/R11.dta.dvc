@@ -2,4 +2,5 @@ outs:
 - md5: d123c411eeb1c79904dd086ca0f86a0a
   size: 84304
   path: R11.dta
+  md5-dos2unix: d123c411eeb1c79904dd086ca0f86a0a
   hash: md5

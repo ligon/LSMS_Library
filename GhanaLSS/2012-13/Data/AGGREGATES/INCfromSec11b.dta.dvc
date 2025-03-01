@@ -2,4 +2,5 @@ outs:
 - md5: db38bff07848c32bd15c33a577b0233b
   size: 266375
   path: INCfromSec11b.dta
+  md5-dos2unix: db38bff07848c32bd15c33a577b0233b
   hash: md5

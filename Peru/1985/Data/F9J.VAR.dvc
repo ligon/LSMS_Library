@@ -2,4 +2,5 @@ outs:
 - md5: de759da314b3c67abfad983eb1c9f89e
   size: 208
   path: F9J.VAR
+  md5-dos2unix: de759da314b3c67abfad983eb1c9f89e
   hash: md5

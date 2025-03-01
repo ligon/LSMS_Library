@@ -2,4 +2,5 @@ outs:
 - md5: 6d87556793c458cfb8e13182dfb8ed55
   size: 1024824
   path: 01_GHA_EXPFOOD.dta
+  md5-dos2unix: 6d87556793c458cfb8e13182dfb8ed55
   hash: md5

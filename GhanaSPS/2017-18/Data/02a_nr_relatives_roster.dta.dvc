@@ -2,4 +2,5 @@ outs:
 - md5: d0c006b535dabc1ec64828d2ff323b0d
   size: 845246
   path: 02a_nr_relatives_roster.dta
+  md5-dos2unix: d0c006b535dabc1ec64828d2ff323b0d
   hash: md5

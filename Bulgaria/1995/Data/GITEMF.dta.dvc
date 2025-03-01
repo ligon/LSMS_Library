@@ -2,4 +2,5 @@ outs:
 - md5: 8ff14add6fc3bf5efd6ba4fbc0a53e5b
   size: 1643
   path: GITEMF.dta
+  md5-dos2unix: 8ff14add6fc3bf5efd6ba4fbc0a53e5b
   hash: md5

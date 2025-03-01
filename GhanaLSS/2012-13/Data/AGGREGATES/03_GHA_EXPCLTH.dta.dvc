@@ -2,4 +2,5 @@ outs:
 - md5: 5fb26e8c452572dc90044fa5c7104513
   size: 470538
   path: 03_GHA_EXPCLTH.dta
+  md5-dos2unix: 5fb26e8c452572dc90044fa5c7104513
   hash: md5

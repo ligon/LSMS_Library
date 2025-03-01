@@ -1,4 +1,5 @@
 outs:
 - md5: 7229a357a29fa260696b0c7210c84188
   path: CSECTION4F.dta
+  md5-dos2unix: 7229a357a29fa260696b0c7210c84188
   hash: md5

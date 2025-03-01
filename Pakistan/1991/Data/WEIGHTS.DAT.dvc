@@ -2,4 +2,5 @@ outs:
 - md5: 325cbc4045740d9257a3e68d2a2fa46c
   size: 4156
   path: WEIGHTS.DAT
+  md5-dos2unix: 325cbc4045740d9257a3e68d2a2fa46c
   hash: md5

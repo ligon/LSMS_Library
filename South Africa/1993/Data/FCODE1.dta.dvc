@@ -2,4 +2,5 @@ outs:
 - md5: 527b025b38c719ff5597db86811c7559
   size: 943
   path: FCODE1.dta
+  md5-dos2unix: 527b025b38c719ff5597db86811c7559
   hash: md5

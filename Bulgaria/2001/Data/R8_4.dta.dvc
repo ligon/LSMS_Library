@@ -2,4 +2,5 @@ outs:
 - md5: 571cf1b690ddcc8f81c36f1bfeb35c54
   size: 15970
   path: R8_4.dta
+  md5-dos2unix: 571cf1b690ddcc8f81c36f1bfeb35c54
   hash: md5

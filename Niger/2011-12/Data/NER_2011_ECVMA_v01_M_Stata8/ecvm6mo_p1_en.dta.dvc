@@ -2,4 +2,5 @@ outs:
 - md5: c6013186002e8fac61adb4b550a27633
   size: 5877054
   path: ecvm6mo_p1_en.dta
+  md5-dos2unix: c6013186002e8fac61adb4b550a27633
   hash: md5

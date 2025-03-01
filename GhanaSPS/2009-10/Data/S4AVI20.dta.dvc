@@ -2,4 +2,5 @@ outs:
 - md5: 0bd149a2cf89ebec1e4267a7e87293af
   size: 35064
   path: S4AVI20.dta
+  md5-dos2unix: 0bd149a2cf89ebec1e4267a7e87293af
   hash: md5

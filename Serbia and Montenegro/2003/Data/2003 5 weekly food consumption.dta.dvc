@@ -2,4 +2,5 @@ outs:
 - md5: 83e4209eed283da9091d77aa0b926ceb
   size: 14564786
   path: 2003 5 weekly food consumption.dta
+  md5-dos2unix: 83e4209eed283da9091d77aa0b926ceb
   hash: md5

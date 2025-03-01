@@ -2,4 +2,5 @@ outs:
 - md5: 27cf0bda5f071e2e14aaeb2a1a4d1e5f
   size: 261992
   path: FECUND.DTA
+  md5-dos2unix: 27cf0bda5f071e2e14aaeb2a1a4d1e5f
   hash: md5

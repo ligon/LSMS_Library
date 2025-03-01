@@ -2,4 +2,5 @@ outs:
 - md5: b152c6a0843f14e82e61f59359042472
   size: 20117
   path: sm2a.dta
+  md5-dos2unix: b152c6a0843f14e82e61f59359042472
   hash: md5

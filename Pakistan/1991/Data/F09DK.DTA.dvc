@@ -2,4 +2,5 @@ outs:
 - md5: 28c4f63588570ce16543eda80ce70be8
   size: 109200
   path: F09DK.DTA
+  md5-dos2unix: 28c4f63588570ce16543eda80ce70be8
   hash: md5

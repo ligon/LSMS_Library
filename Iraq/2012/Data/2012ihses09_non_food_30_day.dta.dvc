@@ -2,4 +2,5 @@ outs:
 - md5: 77f91d6b954129d499669622ee6427a1
   size: 27751571
   path: 2012ihses09_non_food_30_day.dta
+  md5-dos2unix: 77f91d6b954129d499669622ee6427a1
   hash: md5

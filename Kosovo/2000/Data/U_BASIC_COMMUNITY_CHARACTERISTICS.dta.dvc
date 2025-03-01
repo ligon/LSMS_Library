@@ -2,4 +2,5 @@ outs:
 - md5: 5511748eb8b879695b8f916b39386bd9
   size: 14215
   path: U_BASIC_COMMUNITY_CHARACTERISTICS.dta
+  md5-dos2unix: 5511748eb8b879695b8f916b39386bd9
   hash: md5

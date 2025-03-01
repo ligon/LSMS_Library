@@ -2,4 +2,5 @@ outs:
 - md5: 5c6e92f478c2d01c86c5dcde78e727bf
   size: 179892
   path: 2007ihses12_p2_family_business.dta
+  md5-dos2unix: 5c6e92f478c2d01c86c5dcde78e727bf
   hash: md5

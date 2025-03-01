@@ -2,4 +2,5 @@ outs:
 - md5: f20e56c187a6dac299d889b865f19e3f
   size: 4074
   path: sm8a.dta
+  md5-dos2unix: f20e56c187a6dac299d889b865f19e3f
   hash: md5

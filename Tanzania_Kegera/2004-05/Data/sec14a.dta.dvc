@@ -2,4 +2,5 @@ outs:
 - md5: d4ce2674f1a12f4130e55522d57ba37b
   size: 225058
   path: sec14a.dta
+  md5-dos2unix: d4ce2674f1a12f4130e55522d57ba37b
   hash: md5

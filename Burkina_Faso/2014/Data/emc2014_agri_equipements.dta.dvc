@@ -2,4 +2,5 @@ outs:
 - md5: 76008d0b271a97bedaf5f34e7404cf36
   size: 25314637
   path: emc2014_agri_equipements.dta
+  md5-dos2unix: 76008d0b271a97bedaf5f34e7404cf36
   hash: md5

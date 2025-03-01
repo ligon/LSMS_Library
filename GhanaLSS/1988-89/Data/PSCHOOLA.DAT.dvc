@@ -1,4 +1,5 @@
 outs:
 - md5: b2182f91c52e0d2fa6f20eacca95718b
   path: PSCHOOLA.DAT
+  md5-dos2unix: b2182f91c52e0d2fa6f20eacca95718b
   hash: md5

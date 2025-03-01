@@ -2,4 +2,5 @@ outs:
 - md5: aaf74c5600df630ceb8c960d68d8dc64
   size: 10304594
   path: ehcvm_conso_tgo2018.dta
+  md5-dos2unix: aaf74c5600df630ceb8c960d68d8dc64
   hash: md5

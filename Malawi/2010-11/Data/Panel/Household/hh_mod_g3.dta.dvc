@@ -2,4 +2,5 @@ outs:
 - md5: cff3d7af671ab2d323f1dc61bd58e2fd
   size: 368425
   path: hh_mod_g3.dta
+  md5-dos2unix: cff3d7af671ab2d323f1dc61bd58e2fd
   hash: md5

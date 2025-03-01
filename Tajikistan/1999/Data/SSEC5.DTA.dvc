@@ -2,4 +2,5 @@ outs:
 - md5: cfa3d0358b07f4f6ecc4c16889efd24f
   size: 1579724
   path: SSEC5.DTA
+  md5-dos2unix: cfa3d0358b07f4f6ecc4c16889efd24f
   hash: md5

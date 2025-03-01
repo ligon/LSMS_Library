@@ -2,4 +2,5 @@ outs:
 - md5: 340d76d584741d26a4d9e4defea8587b
   size: 220844
   path: emc2014_p4_prix_27022015.dta
+  md5-dos2unix: 340d76d584741d26a4d9e4defea8587b
   hash: md5

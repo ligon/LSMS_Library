@@ -2,4 +2,5 @@ outs:
 - md5: 93a7a123cbd45930901342447308f901
   size: 184997
   path: ECVMA2_AS4KLP2.dta
+  md5-dos2unix: 93a7a123cbd45930901342447308f901
   hash: md5

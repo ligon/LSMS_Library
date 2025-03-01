@@ -2,4 +2,5 @@ outs:
 - md5: c1177fc05c0d288b142f1ef57df9e765
   size: 167289
   path: ID.dta
+  md5-dos2unix: c1177fc05c0d288b142f1ef57df9e765
   hash: md5

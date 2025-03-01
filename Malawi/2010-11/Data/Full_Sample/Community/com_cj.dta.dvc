@@ -2,4 +2,5 @@ outs:
 - md5: d3a19ed6e71c80a8f8fa817c14efb5aa
   size: 1039266
   path: com_cj.dta
+  md5-dos2unix: d3a19ed6e71c80a8f8fa817c14efb5aa
   hash: md5

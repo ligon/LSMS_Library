@@ -2,4 +2,5 @@ outs:
 - md5: dedaa9f9f605b526da857202c1206b78
   size: 139137
   path: s08b1_me_sen2018.dta
+  md5-dos2unix: dedaa9f9f605b526da857202c1206b78
   hash: md5

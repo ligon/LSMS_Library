@@ -2,4 +2,5 @@ outs:
 - md5: d3b32d1a1884295ec175395a0663645f
   size: 579726
   path: Filters.dta
+  md5-dos2unix: d3b32d1a1884295ec175395a0663645f
   hash: md5

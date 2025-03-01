@@ -1,4 +1,5 @@
 outs:
 - md5: 000648690ed8aed1885a038956bbe166
   path: GSEC15b.dta
+  md5-dos2unix: 000648690ed8aed1885a038956bbe166
   hash: md5

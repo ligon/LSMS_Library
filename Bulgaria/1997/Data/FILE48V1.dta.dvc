@@ -2,4 +2,5 @@ outs:
 - md5: 405da770ef251701c6d37b5ba2306184
   size: 11976
   path: FILE48V1.dta
+  md5-dos2unix: 405da770ef251701c6d37b5ba2306184
   hash: md5

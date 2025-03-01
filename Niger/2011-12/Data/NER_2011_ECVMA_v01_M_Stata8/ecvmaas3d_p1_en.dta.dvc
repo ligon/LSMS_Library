@@ -2,4 +2,5 @@ outs:
 - md5: accd6741b0e2b97f8de7795ce52e0ef6
   size: 244318
   path: ecvmaas3d_p1_en.dta
+  md5-dos2unix: accd6741b0e2b97f8de7795ce52e0ef6
   hash: md5

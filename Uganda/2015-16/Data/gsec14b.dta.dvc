@@ -1,4 +1,5 @@
 outs:
 - md5: aaf1931e97b1207f348e3ec992c35cfe
   path: gsec14b.dta
+  md5-dos2unix: aaf1931e97b1207f348e3ec992c35cfe
   hash: md5

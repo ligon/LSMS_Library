@@ -2,4 +2,5 @@ outs:
 - md5: db8e9c43699d937b4343dfcbb1031c70
   size: 92515
   path: CS2.DTA
+  md5-dos2unix: db8e9c43699d937b4343dfcbb1031c70
   hash: md5

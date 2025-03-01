@@ -2,4 +2,5 @@ outs:
 - md5: dc4b098014b59a70ac4680593c8766ee
   size: 255912
   path: wsec1a.dta
+  md5-dos2unix: dc4b098014b59a70ac4680593c8766ee
   hash: md5

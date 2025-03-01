@@ -2,4 +2,5 @@ outs:
 - md5: 5e9683c99986db954c4cce1ef27ba9e5
   size: 461056
   path: EXPEND.DTA
+  md5-dos2unix: 5e9683c99986db954c4cce1ef27ba9e5
   hash: md5

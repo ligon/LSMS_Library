@@ -2,4 +2,5 @@ outs:
 - md5: 44cbd12eab3c579d03b688661f9cdf9e
   size: 376081
   path: ag_mod_r2.dta
+  md5-dos2unix: 44cbd12eab3c579d03b688661f9cdf9e
   hash: md5

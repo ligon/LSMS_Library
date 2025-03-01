@@ -2,4 +2,5 @@ outs:
 - md5: 35a8be116244b17bc64a740b48375aab
   size: 150
   path: F10B.VAR
+  md5-dos2unix: 35a8be116244b17bc64a740b48375aab
   hash: md5

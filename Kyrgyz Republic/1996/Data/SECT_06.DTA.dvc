@@ -2,4 +2,5 @@ outs:
 - md5: 5a39e1ee8812c6f1cd82ee3c66d16f8d
   size: 1440384
   path: SECT_06.DTA
+  md5-dos2unix: 5a39e1ee8812c6f1cd82ee3c66d16f8d
   hash: md5

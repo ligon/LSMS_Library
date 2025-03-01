@@ -2,4 +2,5 @@ outs:
 - md5: ae5cd7643f1d252c20a3ea36d0266f7e
   size: 5752636
   path: upd4_hh_q2.dta
+  md5-dos2unix: ae5cd7643f1d252c20a3ea36d0266f7e
   hash: md5

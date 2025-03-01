@@ -2,4 +2,5 @@ outs:
 - md5: abc8bbc3e81f6b5a4fe0a3822ad8c4d7
   size: 5240
   path: weights_cl.dta
+  md5-dos2unix: abc8bbc3e81f6b5a4fe0a3822ad8c4d7
   hash: md5

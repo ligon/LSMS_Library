@@ -1,4 +1,5 @@
 outs:
 - md5: 31276afd438415168e4f14ffba059e38
   path: HEAD.DCT
+  md5-dos2unix: 31276afd438415168e4f14ffba059e38
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: 801dde1c69c3f85997f2433eb6a13f85
   size: 62682
   path: F09A1.DTA
+  md5-dos2unix: 801dde1c69c3f85997f2433eb6a13f85
   hash: md5

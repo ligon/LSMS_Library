@@ -2,4 +2,5 @@ outs:
 - md5: 75ac0a588a5a7429e8802c2883dbfde5
   size: 66438
   path: S3BV0.dta
+  md5-dos2unix: 75ac0a588a5a7429e8802c2883dbfde5
   hash: md5

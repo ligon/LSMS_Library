@@ -2,4 +2,5 @@ outs:
 - md5: c0844aa0afc03f000578e00449f4d9f7
   size: 4495409
   path: 21insumos_agricolas.dta
+  md5-dos2unix: c0844aa0afc03f000578e00449f4d9f7
   hash: md5

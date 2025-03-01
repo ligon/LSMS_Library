@@ -2,4 +2,5 @@ outs:
 - md5: 30a9a0afa59b7990a21597e952009f41
   size: 1729371
   path: E03BASE.DTA
+  md5-dos2unix: 30a9a0afa59b7990a21597e952009f41
   hash: md5

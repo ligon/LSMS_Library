@@ -1,4 +1,5 @@
 outs:
 - md5: 0222ec5ed4bc6d586db2b473e2392010
   path: s8_agriculture.sav
+  md5-dos2unix: 0222ec5ed4bc6d586db2b473e2392010
   hash: md5

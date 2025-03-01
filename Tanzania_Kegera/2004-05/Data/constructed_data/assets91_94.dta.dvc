@@ -2,4 +2,5 @@ outs:
 - md5: 0286fa4d4f2df6f2eba869d5d4653aca
   size: 154419
   path: assets91_94.dta
+  md5-dos2unix: 0286fa4d4f2df6f2eba869d5d4653aca
   hash: md5

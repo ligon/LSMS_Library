@@ -1,4 +1,5 @@
 outs:
 - md5: 2cf8601c4cb135ec68be57476dcd1bd7
   path: SEC13A.DAT
+  md5-dos2unix: 2cf8601c4cb135ec68be57476dcd1bd7
   hash: md5

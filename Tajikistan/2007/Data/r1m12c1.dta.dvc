@@ -2,4 +2,5 @@ outs:
 - md5: 1eb8013a3a4880254f87ca616a288860
   size: 1452769
   path: r1m12c1.dta
+  md5-dos2unix: 1eb8013a3a4880254f87ca616a288860
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: b46c18addece648dd64d9c9946569016
   size: 546663
   path: PovertyProfile.dta
+  md5-dos2unix: b46c18addece648dd64d9c9946569016
   hash: md5

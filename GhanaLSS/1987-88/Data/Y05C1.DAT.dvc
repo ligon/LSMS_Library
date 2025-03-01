@@ -1,4 +1,5 @@
 outs:
 - md5: b08157dc3c88fcd622397d0b1bd6ec31
   path: Y05C1.DAT
+  md5-dos2unix: b08157dc3c88fcd622397d0b1bd6ec31
   hash: md5

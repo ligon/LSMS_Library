@@ -2,4 +2,5 @@ outs:
 - md5: edf0fcfda376e9c9ef077507db5b3b1a
   size: 384378
   path: ehcvm_menage_bfa2018.dta
+  md5-dos2unix: edf0fcfda376e9c9ef077507db5b3b1a
   hash: md5

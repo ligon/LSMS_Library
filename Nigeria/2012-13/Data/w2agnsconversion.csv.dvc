@@ -2,4 +2,5 @@ outs:
 - md5: 6f2dd199b0512fd71e6706197ced9af1
   size: 58548
   path: w2agnsconversion.csv
+  md5-dos2unix: 6f2dd199b0512fd71e6706197ced9af1
   hash: md5

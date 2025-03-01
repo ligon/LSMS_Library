@@ -2,4 +2,5 @@ outs:
 - md5: caf19138feb8a92b86a70718175df003
   size: 248889
   path: PRECIOS.DTA
+  md5-dos2unix: caf19138feb8a92b86a70718175df003
   hash: md5

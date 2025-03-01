@@ -2,4 +2,5 @@ outs:
 - md5: dd18a36322b71a309599586973488eb1
   size: 29569007
   path: 2012ihses03_rations.dta
+  md5-dos2unix: dd18a36322b71a309599586973488eb1
   hash: md5

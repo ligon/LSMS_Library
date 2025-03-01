@@ -2,4 +2,5 @@ outs:
 - md5: 551a0143cf0b49319ab01a7369f02631
   size: 71103
   path: 07_womenshealth.dta
+  md5-dos2unix: 551a0143cf0b49319ab01a7369f02631
   hash: md5

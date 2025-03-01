@@ -1,4 +1,5 @@
 outs:
 - md5: 919fc04c0c8019984519716900baa67e
   path: s8_other_revenue.sav
+  md5-dos2unix: 919fc04c0c8019984519716900baa67e
   hash: md5

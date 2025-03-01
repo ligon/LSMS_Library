@@ -2,4 +2,5 @@ outs:
 - md5: 489a6344df0188e670c248bc620996a5
   size: 261367
   path: indtrackingform.dta
+  md5-dos2unix: 489a6344df0188e670c248bc620996a5
   hash: md5

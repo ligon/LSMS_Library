@@ -1,4 +1,5 @@
 outs:
 - md5: 2a6ff4c980670ea6b0dc99a56ec7507f
   path: MSCHOOLA.DCT
+  md5-dos2unix: 2a6ff4c980670ea6b0dc99a56ec7507f
   hash: md5

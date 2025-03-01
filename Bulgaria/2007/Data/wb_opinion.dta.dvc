@@ -2,4 +2,5 @@ outs:
 - md5: 86c71b3272b20abe96875782f0379da9
   size: 911282
   path: wb_opinion.dta
+  md5-dos2unix: 86c71b3272b20abe96875782f0379da9
   hash: md5

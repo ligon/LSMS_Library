@@ -2,4 +2,5 @@ outs:
 - md5: 22509de557f43272536ad56be432ecaa
   size: 510141
   path: 15fincas_propias.dta
+  md5-dos2unix: 22509de557f43272536ad56be432ecaa
   hash: md5

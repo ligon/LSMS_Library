@@ -1,4 +1,5 @@
 outs:
 - md5: 20590aecdcf8c4e3034f89a6988a379c
   path: Y12B.DAT
+  md5-dos2unix: 20590aecdcf8c4e3034f89a6988a379c
   hash: md5

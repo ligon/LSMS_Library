@@ -2,4 +2,5 @@ outs:
 - md5: 92d5c9b0f3799923a04fbfe7f69354f7
   size: 23454
   path: R_SCHOOL_FACILITIES.dta
+  md5-dos2unix: 92d5c9b0f3799923a04fbfe7f69354f7
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: 839f00dd968f497b05e0ccc1f1000307
   size: 908
   path: SUBAGG40.DTA
+  md5-dos2unix: 839f00dd968f497b05e0ccc1f1000307
   hash: md5

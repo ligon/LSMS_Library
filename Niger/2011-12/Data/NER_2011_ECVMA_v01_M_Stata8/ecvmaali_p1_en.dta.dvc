@@ -2,4 +2,5 @@ outs:
 - md5: f2b4025d409a43198442497d92f152cf
   size: 28278876
   path: ecvmaali_p1_en.dta
+  md5-dos2unix: f2b4025d409a43198442497d92f152cf
   hash: md5

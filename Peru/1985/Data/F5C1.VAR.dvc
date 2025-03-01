@@ -2,4 +2,5 @@ outs:
 - md5: cb3d1c92926c9b61641688341088bd8d
   size: 221
   path: F5C1.VAR
+  md5-dos2unix: cb3d1c92926c9b61641688341088bd8d
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: 30ae7eb5d930a08f38c7fe76add5ceb0
   size: 1375130
   path: KZ96INF_PUF.dta
+  md5-dos2unix: 30ae7eb5d930a08f38c7fe76add5ceb0
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: 46c9ce798267ce1d169ea2bbb8893776
   size: 1977382
   path: sect_cover_hh_w3.dta
+  md5-dos2unix: 46c9ce798267ce1d169ea2bbb8893776
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: 38d332f349a71c210dfa7680ac31e1ef
   size: 99491
   path: s08b1_me_gnb2018.dta
+  md5-dos2unix: 38d332f349a71c210dfa7680ac31e1ef
   hash: md5

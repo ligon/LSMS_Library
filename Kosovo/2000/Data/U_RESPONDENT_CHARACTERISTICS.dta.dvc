@@ -2,4 +2,5 @@ outs:
 - md5: 62ddbac3fe42bf0c657397386482c383
   size: 8869
   path: U_RESPONDENT_CHARACTERISTICS.dta
+  md5-dos2unix: 62ddbac3fe42bf0c657397386482c383
   hash: md5

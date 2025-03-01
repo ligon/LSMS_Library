@@ -2,4 +2,5 @@ outs:
 - md5: 9e58de66040fd778163c7fc19b229326
   size: 1226
   path: PRECIOS.DCT
+  md5-dos2unix: 9e58de66040fd778163c7fc19b229326
   hash: md5

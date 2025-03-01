@@ -2,4 +2,5 @@ outs:
 - md5: 865f87c86d56ef839e0945cd9ab0d8f5
   size: 461748
   path: S4_HDEF.dta
+  md5-dos2unix: 865f87c86d56ef839e0945cd9ab0d8f5
   hash: md5

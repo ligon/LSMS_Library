@@ -2,4 +2,5 @@ outs:
 - md5: f300bff72e7341e60fbe279e1f3f7b70
   size: 26651
   path: SECT09D2.DTA
+  md5-dos2unix: f300bff72e7341e60fbe279e1f3f7b70
   hash: md5

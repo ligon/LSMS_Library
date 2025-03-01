@@ -1,4 +1,5 @@
 outs:
 - md5: 56b04f0f5de78d4742f16c470c10532a
   path: s8_farm_expense.sav
+  md5-dos2unix: 56b04f0f5de78d4742f16c470c10532a
   hash: md5

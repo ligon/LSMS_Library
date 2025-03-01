@@ -2,4 +2,5 @@ outs:
 - md5: ca1b83294133443ada68aee52f2ee7c7
   size: 35264
   path: anthro1_cld.dta
+  md5-dos2unix: ca1b83294133443ada68aee52f2ee7c7
   hash: md5

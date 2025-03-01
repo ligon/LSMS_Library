@@ -2,4 +2,5 @@ outs:
 - md5: ca9e7d837ed4bf3ab3c49193f43c098c
   size: 192261
   path: AGG9.DTA
+  md5-dos2unix: ca9e7d837ed4bf3ab3c49193f43c098c
   hash: md5

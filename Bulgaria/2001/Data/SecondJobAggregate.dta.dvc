@@ -2,4 +2,5 @@ outs:
 - md5: ab88b9455ae32ae49c6b26bfa40a2f5a
   size: 1546
   path: SecondJobAggregate.dta
+  md5-dos2unix: ab88b9455ae32ae49c6b26bfa40a2f5a
   hash: md5

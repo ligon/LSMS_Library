@@ -2,4 +2,5 @@ outs:
 - md5: 3a8d8274c250f6b313e0439c25ffac36
   size: 7766
   path: F07CE.DTA
+  md5-dos2unix: 3a8d8274c250f6b313e0439c25ffac36
   hash: md5

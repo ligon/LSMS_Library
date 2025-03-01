@@ -2,4 +2,5 @@ outs:
 - md5: 8195cb1a457c30a5609af686b1bb2896
   size: 311888
   path: F0A.DTA
+  md5-dos2unix: 8195cb1a457c30a5609af686b1bb2896
   hash: md5

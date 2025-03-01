@@ -2,4 +2,5 @@ outs:
 - md5: 9a26b4f77d0fd775d5781b2df58262c3
   size: 44858
   path: EACITRR_p1.dta
+  md5-dos2unix: 9a26b4f77d0fd775d5781b2df58262c3
   hash: md5

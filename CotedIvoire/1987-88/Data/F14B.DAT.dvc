@@ -1,4 +1,5 @@
 outs:
 - md5: c3f463fb64cc699414b30ac4c856d041
   path: F14B.DAT
+  md5-dos2unix: c3f463fb64cc699414b30ac4c856d041
   hash: md5

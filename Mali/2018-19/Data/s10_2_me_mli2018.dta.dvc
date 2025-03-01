@@ -2,4 +2,5 @@ outs:
 - md5: 6eeab5a84a9ce98f7fbca4f857128fd3
   size: 7273154
   path: s10_2_me_mli2018.dta
+  md5-dos2unix: 6eeab5a84a9ce98f7fbca4f857128fd3
   hash: md5

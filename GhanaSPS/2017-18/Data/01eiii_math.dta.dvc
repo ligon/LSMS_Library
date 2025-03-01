@@ -2,4 +2,5 @@ outs:
 - md5: c30db84e178fe459ec48a2a431ddb219
   size: 1245335
   path: 01eiii_math.dta
+  md5-dos2unix: c30db84e178fe459ec48a2a431ddb219
   hash: md5

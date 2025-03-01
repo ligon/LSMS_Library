@@ -2,4 +2,5 @@ outs:
 - md5: 5e28ee324c857219bb63650b4a22f9c4
   size: 416893
   path: NF2X02.dta
+  md5-dos2unix: 5e28ee324c857219bb63650b4a22f9c4
   hash: md5

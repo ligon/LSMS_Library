@@ -2,4 +2,5 @@ outs:
 - md5: 11fcae316e7b7384aba3b0543afa7f31
   size: 21436
   path: sm12d.dta
+  md5-dos2unix: 11fcae316e7b7384aba3b0543afa7f31
   hash: md5

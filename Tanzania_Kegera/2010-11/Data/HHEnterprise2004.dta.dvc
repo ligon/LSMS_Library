@@ -2,4 +2,5 @@ outs:
 - md5: 4badaeed423bd54cea7eb76cc4983386
   size: 69330
   path: HHEnterprise2004.dta
+  md5-dos2unix: 4badaeed423bd54cea7eb76cc4983386
   hash: md5

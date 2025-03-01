@@ -1,4 +1,5 @@
 outs:
 - md5: 2346d47856c948c4d3aad60aa21d0f71
   path: EXPEND.DCT
+  md5-dos2unix: 2346d47856c948c4d3aad60aa21d0f71
   hash: md5

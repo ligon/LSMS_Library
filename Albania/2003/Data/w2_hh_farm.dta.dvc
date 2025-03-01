@@ -2,4 +2,5 @@ outs:
 - md5: 27defc21ba724dc8d25d9bc645ae2ae1
   size: 1494476
   path: w2_hh_farm.dta
+  md5-dos2unix: 27defc21ba724dc8d25d9bc645ae2ae1
   hash: md5

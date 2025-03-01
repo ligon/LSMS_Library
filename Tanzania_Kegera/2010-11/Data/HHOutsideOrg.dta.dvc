@@ -2,4 +2,5 @@ outs:
 - md5: b7a0990ab4ee8ca195ad37b6f2e44493
   size: 13178
   path: HHOutsideOrg.dta
+  md5-dos2unix: b7a0990ab4ee8ca195ad37b6f2e44493
   hash: md5

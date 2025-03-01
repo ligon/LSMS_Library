@@ -2,4 +2,5 @@ outs:
 - md5: 98daab508bfb75c8cd07ca5c9798f0df
   size: 388185
   path: secb0.dta
+  md5-dos2unix: 98daab508bfb75c8cd07ca5c9798f0df
   hash: md5

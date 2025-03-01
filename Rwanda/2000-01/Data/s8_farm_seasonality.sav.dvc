@@ -1,4 +1,5 @@
 outs:
 - md5: 31ed4b9284fd7069c1080fe8a6e30dce
   path: s8_farm_seasonality.sav
+  md5-dos2unix: 31ed4b9284fd7069c1080fe8a6e30dce
   hash: md5

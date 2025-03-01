@@ -2,4 +2,5 @@ outs:
 - md5: 131f5164c241ddbe43775a7f32e26ef6
   size: 53045
   path: F06B1.DTA
+  md5-dos2unix: 131f5164c241ddbe43775a7f32e26ef6
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: 5cc3bd04bb363d5f88c049a5c509ccfe
   size: 2727572
   path: SEC10PA2.DTA
+  md5-dos2unix: 5cc3bd04bb363d5f88c049a5c509ccfe
   hash: md5

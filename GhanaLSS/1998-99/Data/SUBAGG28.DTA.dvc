@@ -2,4 +2,5 @@ outs:
 - md5: fa68542331e39856fcb970de94bc43fe
   size: 144116
   path: SUBAGG28.DTA
+  md5-dos2unix: fa68542331e39856fcb970de94bc43fe
   hash: md5

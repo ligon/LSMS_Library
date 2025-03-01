@@ -2,4 +2,5 @@ outs:
 - md5: 32935cf17b24cc2b435c7b757162a7e4
   size: 759959
   path: QXOtherDescription.dta
+  md5-dos2unix: 32935cf17b24cc2b435c7b757162a7e4
   hash: md5

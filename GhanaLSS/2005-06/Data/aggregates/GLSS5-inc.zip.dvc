@@ -2,4 +2,5 @@ outs:
 - md5: 948d5b27be68b8df004197835179d2cf
   size: 583770
   path: GLSS5-inc.zip
+  md5-dos2unix: 948d5b27be68b8df004197835179d2cf
   hash: md5

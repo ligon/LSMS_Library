@@ -2,4 +2,5 @@ outs:
 - md5: e458899bd2845ef8cb4cc62a788913d7
   size: 622
   path: SYS13H.DTA
+  md5-dos2unix: e458899bd2845ef8cb4cc62a788913d7
   hash: md5

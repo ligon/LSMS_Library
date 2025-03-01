@@ -2,4 +2,5 @@ outs:
 - md5: 9da7dd511bffdc0e08f82149da7b1757
   size: 1338436
   path: 04l_chemquestions.dta
+  md5-dos2unix: 9da7dd511bffdc0e08f82149da7b1757
   hash: md5

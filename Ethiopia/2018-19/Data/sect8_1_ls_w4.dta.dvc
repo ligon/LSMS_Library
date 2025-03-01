@@ -2,4 +2,5 @@ outs:
 - md5: e574fb842e4f48656a2ebbbe7a4244a9
   size: 9473554
   path: sect8_1_ls_w4.dta
+  md5-dos2unix: e574fb842e4f48656a2ebbbe7a4244a9
   hash: md5

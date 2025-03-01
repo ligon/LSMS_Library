@@ -2,4 +2,5 @@ outs:
 - md5: b420d28cbb83855999c05994d6436f38
   size: 4708519
   path: s02_co_tgo2018.dta
+  md5-dos2unix: b420d28cbb83855999c05994d6436f38
   hash: md5

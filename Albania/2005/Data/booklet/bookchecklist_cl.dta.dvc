@@ -2,4 +2,5 @@ outs:
 - md5: f815d4037c8d84a943503a52b76f8403
   size: 2368249
   path: bookchecklist_cl.dta
+  md5-dos2unix: f815d4037c8d84a943503a52b76f8403
   hash: md5

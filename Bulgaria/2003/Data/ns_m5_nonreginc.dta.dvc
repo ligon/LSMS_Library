@@ -2,4 +2,5 @@ outs:
 - md5: 5f2130684e044a9f8e410f360c086769
   size: 534333
   path: ns_m5_nonreginc.dta
+  md5-dos2unix: 5f2130684e044a9f8e410f360c086769
   hash: md5

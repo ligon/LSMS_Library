@@ -1,4 +1,5 @@
 outs:
 - md5: b36bd8dd78712a48ea830acc4828a67f
   path: 00_GHA_BASICINFO.dta
+  md5-dos2unix: b36bd8dd78712a48ea830acc4828a67f
   hash: md5

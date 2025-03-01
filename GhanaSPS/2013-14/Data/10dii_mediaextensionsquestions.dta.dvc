@@ -2,4 +2,5 @@ outs:
 - md5: 0564adafd1b7241239e672b69ef2e411
   size: 3290015
   path: 10dii_mediaextensionsquestions.dta
+  md5-dos2unix: 0564adafd1b7241239e672b69ef2e411
   hash: md5

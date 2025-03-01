@@ -2,4 +2,5 @@ outs:
 - md5: 8f9b5b90c73bed082bc126f0b012990c
   size: 2527518
   path: 01ev_digitspan.dta
+  md5-dos2unix: 8f9b5b90c73bed082bc126f0b012990c
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: ebd6b8bbf5d2e60831e0b06b1aecd363
   size: 642235
   path: M4_B.DTA
+  md5-dos2unix: ebd6b8bbf5d2e60831e0b06b1aecd363
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: d4701b4dac733ecd579ebd728f64d717
   size: 833814
   path: s11_me_gnb2018.dta
+  md5-dos2unix: d4701b4dac733ecd579ebd728f64d717
   hash: md5

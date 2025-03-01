@@ -2,4 +2,5 @@ outs:
 - md5: a814b6a309ce3523e95062465a486585
   size: 15021985
   path: 2007ihses04_education.dta
+  md5-dos2unix: a814b6a309ce3523e95062465a486585
   hash: md5

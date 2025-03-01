@@ -2,4 +2,5 @@ outs:
 - md5: 79195903c8828bffb4a0eee5336aa87d
   size: 180342
   path: SUB_ABHC.DTA
+  md5-dos2unix: 79195903c8828bffb4a0eee5336aa87d
   hash: md5

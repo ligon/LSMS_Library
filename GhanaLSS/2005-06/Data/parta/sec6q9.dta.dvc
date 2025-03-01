@@ -2,4 +2,5 @@ outs:
 - md5: a443a5de59e9bb07c5dd23fbab0273d7
   size: 125735
   path: sec6q9.dta
+  md5-dos2unix: a443a5de59e9bb07c5dd23fbab0273d7
   hash: md5

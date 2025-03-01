@@ -2,4 +2,5 @@ outs:
 - md5: 960c3ad5230f8acf18f9036997bb12d1
   size: 753925
   path: EMNV15.DAT
+  md5-dos2unix: 960c3ad5230f8acf18f9036997bb12d1
   hash: md5

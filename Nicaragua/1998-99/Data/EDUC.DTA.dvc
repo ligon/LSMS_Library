@@ -2,4 +2,5 @@ outs:
 - md5: 5298dcad8355f760cca77d50b86f3882
   size: 1921256
   path: EDUC.DTA
+  md5-dos2unix: 5298dcad8355f760cca77d50b86f3882
   hash: md5

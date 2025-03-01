@@ -2,4 +2,5 @@ outs:
 - md5: ae6923864d66e3c40153cd45141a9c68
   size: 433967
   path: S3C.DTA
+  md5-dos2unix: ae6923864d66e3c40153cd45141a9c68
   hash: md5

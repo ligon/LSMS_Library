@@ -2,4 +2,5 @@ outs:
 - md5: 0e5913cc41c71eb39530fba829d27419
   size: 495647
   path: plotgeovariables.dta
+  md5-dos2unix: 0e5913cc41c71eb39530fba829d27419
   hash: md5

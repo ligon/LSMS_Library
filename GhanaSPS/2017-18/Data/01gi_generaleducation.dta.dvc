@@ -2,4 +2,5 @@ outs:
 - md5: 89396c909741fbcb941a4da1ebfb6008
   size: 12661485
   path: 01gi_generaleducation.dta
+  md5-dos2unix: 89396c909741fbcb941a4da1ebfb6008
   hash: md5

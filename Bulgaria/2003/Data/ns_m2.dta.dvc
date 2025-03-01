@@ -2,4 +2,5 @@ outs:
 - md5: 646713dfc1f779aebef498aacb20c390
   size: 1411467
   path: ns_m2.dta
+  md5-dos2unix: 646713dfc1f779aebef498aacb20c390
   hash: md5

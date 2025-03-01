@@ -2,4 +2,5 @@ outs:
 - md5: 3bf32fe70516d3b35113128cddfc14a3
   size: 440766
   path: PHHMWeddingPayment.dta
+  md5-dos2unix: 3bf32fe70516d3b35113128cddfc14a3
   hash: md5

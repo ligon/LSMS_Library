@@ -2,4 +2,5 @@ outs:
 - md5: 8939b6d3dd5915d01c430df3934eb332
   size: 3329006
   path: emc2014_p3_individu_27022015.dta
+  md5-dos2unix: 8939b6d3dd5915d01c430df3934eb332
   hash: md5

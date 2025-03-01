@@ -2,4 +2,5 @@ outs:
 - md5: 8274acea98e4fb25f2c6e6b5daaaf6b6
   size: 381
   path: F07EC.VAR
+  md5-dos2unix: 8274acea98e4fb25f2c6e6b5daaaf6b6
   hash: md5

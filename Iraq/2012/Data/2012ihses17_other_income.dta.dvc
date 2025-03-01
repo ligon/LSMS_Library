@@ -2,4 +2,5 @@ outs:
 - md5: c645df26b30bce333fbb6b92eec8e4b0
   size: 59826782
   path: 2012ihses17_other_income.dta
+  md5-dos2unix: c645df26b30bce333fbb6b92eec8e4b0
   hash: md5

@@ -1,4 +1,5 @@
 outs:
 - md5: 1657c726b7bf4328976a1a4a0ecd6de6
   path: census.zip
+  md5-dos2unix: 1657c726b7bf4328976a1a4a0ecd6de6
   hash: md5

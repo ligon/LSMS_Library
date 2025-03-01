@@ -2,4 +2,5 @@ outs:
 - md5: 2508cee5971f1950685f00237d27ef57
   size: 7221656
   path: EMNV19.DAT
+  md5-dos2unix: 2508cee5971f1950685f00237d27ef57
   hash: md5

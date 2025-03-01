@@ -2,4 +2,5 @@ outs:
 - md5: db0036463cfd7fc6d154ae830ef6a4d8
   size: 33040
   path: N10.SSP
+  md5-dos2unix: db0036463cfd7fc6d154ae830ef6a4d8
   hash: md5

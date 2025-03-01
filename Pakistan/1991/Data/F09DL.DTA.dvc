@@ -2,4 +2,5 @@ outs:
 - md5: 201010c6adc292890a6fc3277bd3d2ee
   size: 14600
   path: F09DL.DTA
+  md5-dos2unix: 201010c6adc292890a6fc3277bd3d2ee
   hash: md5

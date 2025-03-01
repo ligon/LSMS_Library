@@ -1,4 +1,5 @@
 outs:
 - md5: 5a30ad8ce9de9428e73558505a6015c0
   path: HHEXP86.DCT
+  md5-dos2unix: 5a30ad8ce9de9428e73558505a6015c0
   hash: md5

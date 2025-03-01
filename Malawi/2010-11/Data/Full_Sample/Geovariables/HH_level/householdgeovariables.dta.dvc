@@ -2,4 +2,5 @@ outs:
 - md5: 4f844148e02c8f5016bf93e96c26f68c
   size: 2514858
   path: householdgeovariables.dta
+  md5-dos2unix: 4f844148e02c8f5016bf93e96c26f68c
   hash: md5

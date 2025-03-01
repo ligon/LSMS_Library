@@ -2,4 +2,5 @@ outs:
 - md5: 9b283326bf2be3feefee83a29b79a271
   size: 33137
   path: ns_m6_loans-1-10.dta
+  md5-dos2unix: 9b283326bf2be3feefee83a29b79a271
   hash: md5

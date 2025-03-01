@@ -1,4 +1,5 @@
 outs:
 - md5: 4dab1168f975d1543cfd3b129d5aae45
   path: PRICE86.DAT
+  md5-dos2unix: 4dab1168f975d1543cfd3b129d5aae45
   hash: md5

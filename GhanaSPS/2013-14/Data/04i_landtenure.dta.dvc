@@ -2,4 +2,5 @@ outs:
 - md5: e7e1a33217c45fddf0923207e9d90004
   size: 3458082
   path: 04i_landtenure.dta
+  md5-dos2unix: e7e1a33217c45fddf0923207e9d90004
   hash: md5

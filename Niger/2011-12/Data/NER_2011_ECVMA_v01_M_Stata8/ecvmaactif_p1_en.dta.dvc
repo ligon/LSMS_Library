@@ -2,4 +2,5 @@ outs:
 - md5: f79a4e9c3993ea5ca3f86210e99d4d54
   size: 6209386
   path: ecvmaactif_p1_en.dta
+  md5-dos2unix: f79a4e9c3993ea5ca3f86210e99d4d54
   hash: md5

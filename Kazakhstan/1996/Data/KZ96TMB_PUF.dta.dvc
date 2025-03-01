@@ -2,4 +2,5 @@ outs:
 - md5: 076ec3d0222ca15342d5e60d2a78ef77
   size: 494985
   path: KZ96TMB_PUF.dta
+  md5-dos2unix: 076ec3d0222ca15342d5e60d2a78ef77
   hash: md5

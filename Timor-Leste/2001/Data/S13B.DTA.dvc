@@ -2,4 +2,5 @@ outs:
 - md5: 812d2a31cd8548bfbd47156c2d468054
   size: 85769
   path: S13B.DTA
+  md5-dos2unix: 812d2a31cd8548bfbd47156c2d468054
   hash: md5

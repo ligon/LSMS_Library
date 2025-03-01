@@ -2,4 +2,5 @@ outs:
 - md5: 5b2e23ed36c57522751e79ec58173322
   size: 867296
   path: m10b.dta
+  md5-dos2unix: 5b2e23ed36c57522751e79ec58173322
   hash: md5

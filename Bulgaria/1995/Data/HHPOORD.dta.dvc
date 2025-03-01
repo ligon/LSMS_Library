@@ -2,4 +2,5 @@ outs:
 - md5: 026021229f8fc12f297b175d1e92a307
   size: 219696
   path: HHPOORD.dta
+  md5-dos2unix: 026021229f8fc12f297b175d1e92a307
   hash: md5

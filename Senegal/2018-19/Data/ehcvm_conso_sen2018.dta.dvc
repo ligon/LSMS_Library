@@ -2,4 +2,5 @@ outs:
 - md5: 584ca52d8df3303a6a59e91bdaa1315e
   size: 15235624
   path: ehcvm_conso_sen2018.dta
+  md5-dos2unix: 584ca52d8df3303a6a59e91bdaa1315e
   hash: md5

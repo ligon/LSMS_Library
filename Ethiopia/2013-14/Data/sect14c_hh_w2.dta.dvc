@@ -2,4 +2,5 @@ outs:
 - md5: f9526e460f7012567bb00c4245bab089
   size: 1117903
   path: sect14c_hh_w2.dta
+  md5-dos2unix: f9526e460f7012567bb00c4245bab089
   hash: md5

@@ -1,4 +1,5 @@
 outs:
 - md5: b7bcf62c8aacd36a10e8c2166aa30497
   path: HHINC87.DAT
+  md5-dos2unix: b7bcf62c8aacd36a10e8c2166aa30497
   hash: md5

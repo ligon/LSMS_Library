@@ -2,4 +2,5 @@ outs:
 - md5: ada1cc604c791c24a0f1d7e6e57129b0
   size: 4211549
   path: F12A.DTA
+  md5-dos2unix: ada1cc604c791c24a0f1d7e6e57129b0
   hash: md5

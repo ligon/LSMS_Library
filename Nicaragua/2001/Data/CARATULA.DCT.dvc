@@ -2,4 +2,5 @@ outs:
 - md5: bbd277493842c172ab8b6ab9ad805a39
   size: 918
   path: CARATULA.DCT
+  md5-dos2unix: bbd277493842c172ab8b6ab9ad805a39
   hash: md5

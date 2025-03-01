@@ -2,4 +2,5 @@ outs:
 - md5: 8182c2d917d4ffb53d3cdbf253e47cff
   size: 72631
   path: women_s.dta
+  md5-dos2unix: 8182c2d917d4ffb53d3cdbf253e47cff
   hash: md5

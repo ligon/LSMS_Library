@@ -2,4 +2,5 @@ outs:
 - md5: ba247e0b4574b178276ffed3ac357140
   size: 1676520
   path: SECT9H_K.DTA
+  md5-dos2unix: ba247e0b4574b178276ffed3ac357140
   hash: md5

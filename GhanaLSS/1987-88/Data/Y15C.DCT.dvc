@@ -1,4 +1,5 @@
 outs:
 - md5: c38f6c001f7da62540abb145f6f2f65e
   path: Y15C.DCT
+  md5-dos2unix: c38f6c001f7da62540abb145f6f2f65e
   hash: md5

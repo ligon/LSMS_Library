@@ -2,4 +2,5 @@ outs:
 - md5: 6918e798e65a2f4170ad66b3eacde4d7
   size: 1971670
   path: S10DI.dta
+  md5-dos2unix: 6918e798e65a2f4170ad66b3eacde4d7
   hash: md5

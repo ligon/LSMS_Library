@@ -1,4 +1,5 @@
 outs:
 - md5: 8187c6a05e0f3c63a32ae4a792cb3a8c
   path: g7comSEC4-PERS.dta
+  md5-dos2unix: 8187c6a05e0f3c63a32ae4a792cb3a8c
   hash: md5

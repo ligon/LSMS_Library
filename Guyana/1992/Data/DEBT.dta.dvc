@@ -2,4 +2,5 @@ outs:
 - md5: 1c2481552b5fe5d9f439c525992b02f3
   size: 6173
   path: DEBT.dta
+  md5-dos2unix: 1c2481552b5fe5d9f439c525992b02f3
   hash: md5

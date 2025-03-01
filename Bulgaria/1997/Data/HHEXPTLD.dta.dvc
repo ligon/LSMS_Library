@@ -2,4 +2,5 @@ outs:
 - md5: 37db8c0071116b8d6fd2b2bd3e322aa7
   size: 629260
   path: HHEXPTLD.dta
+  md5-dos2unix: 37db8c0071116b8d6fd2b2bd3e322aa7
   hash: md5

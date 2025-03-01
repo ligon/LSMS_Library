@@ -2,4 +2,5 @@ outs:
 - md5: cb45b4a192017e60dde36df1bda83c61
   size: 76084
   path: pr3__nf1.dta
+  md5-dos2unix: cb45b4a192017e60dde36df1bda83c61
   hash: md5

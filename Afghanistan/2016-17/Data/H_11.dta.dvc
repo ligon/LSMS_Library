@@ -2,4 +2,5 @@ outs:
 - md5: 688527cbeece72dfb008d03b3fe088e3
   size: 7804003
   path: H_11.dta
+  md5-dos2unix: 688527cbeece72dfb008d03b3fe088e3
   hash: md5

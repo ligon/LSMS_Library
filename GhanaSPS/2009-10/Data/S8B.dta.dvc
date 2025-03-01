@@ -2,4 +2,5 @@ outs:
 - md5: 2bb269ccb9c5b93a06fe7484a803c7e0
   size: 214769
   path: S8B.dta
+  md5-dos2unix: 2bb269ccb9c5b93a06fe7484a803c7e0
   hash: md5

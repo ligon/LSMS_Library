@@ -1,4 +1,5 @@
 outs:
 - md5: 50e1eb44a9e6ee9825a0d720b1dc1b48
   path: SEC05E4.DAT
+  md5-dos2unix: 50e1eb44a9e6ee9825a0d720b1dc1b48
   hash: md5

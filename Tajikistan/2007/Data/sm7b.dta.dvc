@@ -2,4 +2,5 @@ outs:
 - md5: 7e9a78ba739df3ef0d60e4fe97fcfd9f
   size: 21247
   path: sm7b.dta
+  md5-dos2unix: 7e9a78ba739df3ef0d60e4fe97fcfd9f
   hash: md5

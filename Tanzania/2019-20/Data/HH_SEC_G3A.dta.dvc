@@ -2,4 +2,5 @@ outs:
 - md5: 072207f77e85ed3b656326005afcbc1c
   size: 263771
   path: HH_SEC_G3A.dta
+  md5-dos2unix: 072207f77e85ed3b656326005afcbc1c
   hash: md5

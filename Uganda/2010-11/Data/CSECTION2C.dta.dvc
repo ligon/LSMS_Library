@@ -1,4 +1,5 @@
 outs:
 - md5: 36074e55e017e21d978203376be19386
   path: CSECTION2C.dta
+  md5-dos2unix: 36074e55e017e21d978203376be19386
   hash: md5

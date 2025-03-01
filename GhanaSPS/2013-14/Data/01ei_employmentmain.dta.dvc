@@ -2,4 +2,5 @@ outs:
 - md5: 2aca7e78a5f13487f4563dc5d0f96d39
   size: 604379
   path: 01ei_employmentmain.dta
+  md5-dos2unix: 2aca7e78a5f13487f4563dc5d0f96d39
   hash: md5

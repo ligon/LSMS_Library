@@ -2,4 +2,5 @@ outs:
 - md5: 238897b141eb64ab8ac488c253dd67c5
   size: 313457
   path: com_cb.dta
+  md5-dos2unix: 238897b141eb64ab8ac488c253dd67c5
   hash: md5

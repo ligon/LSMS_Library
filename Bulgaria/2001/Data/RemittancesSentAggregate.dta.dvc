@@ -2,4 +2,5 @@ outs:
 - md5: da6c9f22c1a26358008930839b8caa30
   size: 26863
   path: RemittancesSentAggregate.dta
+  md5-dos2unix: da6c9f22c1a26358008930839b8caa30
   hash: md5

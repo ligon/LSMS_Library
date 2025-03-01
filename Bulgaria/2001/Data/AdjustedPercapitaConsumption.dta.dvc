@@ -2,4 +2,5 @@ outs:
 - md5: e9a9b98ff9b17d2f8afe4557904be646
   size: 302095
   path: AdjustedPercapitaConsumption.dta
+  md5-dos2unix: e9a9b98ff9b17d2f8afe4557904be646
   hash: md5

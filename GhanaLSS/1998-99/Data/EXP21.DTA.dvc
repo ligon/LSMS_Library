@@ -2,4 +2,5 @@ outs:
 - md5: 2ab954bfae0817b77032e6448f25589b
   size: 908
   path: EXP21.DTA
+  md5-dos2unix: 2ab954bfae0817b77032e6448f25589b
   hash: md5

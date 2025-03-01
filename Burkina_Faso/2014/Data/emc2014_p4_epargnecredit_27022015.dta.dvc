@@ -2,4 +2,5 @@ outs:
 - md5: 835b43ed3a413d0ddce04681fb2204e4
   size: 1510514
   path: emc2014_p4_epargnecredit_27022015.dta
+  md5-dos2unix: 835b43ed3a413d0ddce04681fb2204e4
   hash: md5

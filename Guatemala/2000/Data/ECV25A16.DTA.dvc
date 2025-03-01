@@ -2,4 +2,5 @@ outs:
 - md5: 98e1146769167761f2db5b4135f8f4ab
   size: 1309366
   path: ECV25A16.DTA
+  md5-dos2unix: 98e1146769167761f2db5b4135f8f4ab
   hash: md5

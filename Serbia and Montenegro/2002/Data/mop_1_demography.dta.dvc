@@ -2,4 +2,5 @@ outs:
 - md5: 90ef4afe9111951291fa97c33e81f8e5
   size: 123500
   path: mop_1_demography.dta
+  md5-dos2unix: 90ef4afe9111951291fa97c33e81f8e5
   hash: md5

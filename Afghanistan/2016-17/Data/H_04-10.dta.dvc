@@ -2,4 +2,5 @@ outs:
 - md5: dd25ebfea0b4c0273ae4ab3c47fce1a3
   size: 25845525
   path: H_04-10.dta
+  md5-dos2unix: dd25ebfea0b4c0273ae4ab3c47fce1a3
   hash: md5

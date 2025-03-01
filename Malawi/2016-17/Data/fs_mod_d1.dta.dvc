@@ -2,4 +2,5 @@ outs:
 - md5: 5887ae621f83486d5c9c94f059530184
   size: 35025
   path: fs_mod_d1.dta
+  md5-dos2unix: 5887ae621f83486d5c9c94f059530184
   hash: md5

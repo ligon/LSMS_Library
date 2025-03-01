@@ -2,4 +2,5 @@ outs:
 - md5: 8d5e166c34a2c6b181be02549d4c3644
   size: 603
   path: EMNV18.DCT
+  md5-dos2unix: 8d5e166c34a2c6b181be02549d4c3644
   hash: md5

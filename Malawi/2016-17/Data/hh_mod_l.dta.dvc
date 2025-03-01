@@ -2,4 +2,5 @@ outs:
 - md5: f17143b1d4512858140ba9816e26d388
   size: 14632847
   path: hh_mod_l.dta
+  md5-dos2unix: f17143b1d4512858140ba9816e26d388
   hash: md5

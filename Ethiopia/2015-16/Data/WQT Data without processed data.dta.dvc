@@ -2,4 +2,5 @@ outs:
 - md5: 2624bdb549c747a58ff530766675e85e
   size: 2152256
   path: WQT Data without processed data.dta
+  md5-dos2unix: 2624bdb549c747a58ff530766675e85e
   hash: md5

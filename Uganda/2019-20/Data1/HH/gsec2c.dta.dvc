@@ -2,4 +2,5 @@ outs:
 - md5: 3ba0ab98fcbfe0e1b3338c028cff1707
   size: 83353
   path: gsec2c.dta
+  md5-dos2unix: 3ba0ab98fcbfe0e1b3338c028cff1707
   hash: md5

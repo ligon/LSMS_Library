@@ -2,4 +2,5 @@ outs:
 - md5: ee5b0d2cc8878a15b98786a7d50d6380
   size: 292424
   path: ehcvm_menage_gnb2018.dta
+  md5-dos2unix: ee5b0d2cc8878a15b98786a7d50d6380
   hash: md5

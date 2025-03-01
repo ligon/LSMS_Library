@@ -2,4 +2,5 @@ outs:
 - md5: f60d4d9dee6f4e20f878b09df2dddbc8
   size: 43345
   path: S03E.DTA
+  md5-dos2unix: f60d4d9dee6f4e20f878b09df2dddbc8
   hash: md5

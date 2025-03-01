@@ -2,4 +2,5 @@ outs:
 - md5: 47d8f67e67e9b695acef559c81d57bab
   size: 243247
   path: s09f_me_ner2018.dta
+  md5-dos2unix: 47d8f67e67e9b695acef559c81d57bab
   hash: md5

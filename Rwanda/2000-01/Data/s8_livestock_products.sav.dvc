@@ -1,4 +1,5 @@
 outs:
 - md5: 73f86f921b67d4f7551aeb6dadcb0147
   path: s8_livestock_products.sav
+  md5-dos2unix: 73f86f921b67d4f7551aeb6dadcb0147
   hash: md5

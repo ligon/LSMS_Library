@@ -2,4 +2,5 @@ outs:
 - md5: 4947acd7decb506845b15e07e73c520b
   size: 176546
   path: roma_8_social_programs_members.dta
+  md5-dos2unix: 4947acd7decb506845b15e07e73c520b
   hash: md5

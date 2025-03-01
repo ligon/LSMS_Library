@@ -2,4 +2,5 @@ outs:
 - md5: c2f786fd999aff32daea30c5f28b397a
   size: 274588
   path: community.dta
+  md5-dos2unix: c2f786fd999aff32daea30c5f28b397a
   hash: md5

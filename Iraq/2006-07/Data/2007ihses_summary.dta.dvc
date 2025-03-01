@@ -2,4 +2,5 @@ outs:
 - md5: b46ac6dc5b4f7146df2cf2e196378d18
   size: 3281587
   path: 2007ihses_summary.dta
+  md5-dos2unix: b46ac6dc5b4f7146df2cf2e196378d18
   hash: md5

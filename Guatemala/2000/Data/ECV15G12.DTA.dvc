@@ -2,4 +2,5 @@ outs:
 - md5: 9e19a7d018561aa4ecf9b469060f5109
   size: 23754481
   path: ECV15G12.DTA
+  md5-dos2unix: 9e19a7d018561aa4ecf9b469060f5109
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: b0508ffa45c41a2412acb2b6f29cdadb
   size: 16854
   path: sm13.dta
+  md5-dos2unix: b0508ffa45c41a2412acb2b6f29cdadb
   hash: md5

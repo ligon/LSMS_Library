@@ -2,4 +2,5 @@ outs:
 - md5: d90f8239d810486f53fdd41407b71443
   size: 1777878
   path: SEC7.DTA
+  md5-dos2unix: d90f8239d810486f53fdd41407b71443
   hash: md5

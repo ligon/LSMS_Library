@@ -2,4 +2,5 @@ outs:
 - md5: 25f6804620aac6b5985433e8f67f7f9a
   size: 396746
   path: M2_NFS1.dta
+  md5-dos2unix: 25f6804620aac6b5985433e8f67f7f9a
   hash: md5

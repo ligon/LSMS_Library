@@ -1,4 +1,5 @@
 outs:
 - md5: 0eb7eb4c0cc2d2f0588ba54d181a5ad9
   path: AGSEC6C.dta
+  md5-dos2unix: 0eb7eb4c0cc2d2f0588ba54d181a5ad9
   hash: md5

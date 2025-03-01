@@ -2,4 +2,5 @@ outs:
 - md5: c2fa8484f12d808c11074701d949696f
   size: 6743603
   path: POV_GHA_2013_GLSS6-updated.dta
+  md5-dos2unix: c2fa8484f12d808c11074701d949696f
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: 81aa08b17d40a5cd0df4f90de1b922d9
   size: 1184304
   path: ns_m2_25-27.dta
+  md5-dos2unix: 81aa08b17d40a5cd0df4f90de1b922d9
   hash: md5

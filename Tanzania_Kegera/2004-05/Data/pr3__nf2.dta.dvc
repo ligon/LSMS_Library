@@ -2,4 +2,5 @@ outs:
 - md5: 32d6b6664f55ba4130eefa369fd403f8
   size: 3108
   path: pr3__nf2.dta
+  md5-dos2unix: 32d6b6664f55ba4130eefa369fd403f8
   hash: md5

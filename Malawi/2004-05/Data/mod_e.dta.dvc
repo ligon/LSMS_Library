@@ -2,4 +2,5 @@ outs:
 - md5: a3577bcdd20b1d6d69fadc8e17089307
   size: 49714
   path: mod_e.dta
+  md5-dos2unix: a3577bcdd20b1d6d69fadc8e17089307
   hash: md5

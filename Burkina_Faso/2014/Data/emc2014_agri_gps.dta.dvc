@@ -2,4 +2,5 @@ outs:
 - md5: ebbe9ce008b8a6cadc0081aa79a795a0
   size: 221784
   path: emc2014_agri_gps.dta
+  md5-dos2unix: ebbe9ce008b8a6cadc0081aa79a795a0
   hash: md5

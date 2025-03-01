@@ -2,4 +2,5 @@ outs:
 - md5: eb763ef4d056647c5fefa7321167bd41
   size: 323264
   path: market price.dta
+  md5-dos2unix: eb763ef4d056647c5fefa7321167bd41
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: 9c2d04190a14ab15a2a57de02e1dcd35
   size: 1675161
   path: ns_m4_culture-r1_13-24.dta
+  md5-dos2unix: 9c2d04190a14ab15a2a57de02e1dcd35
   hash: md5

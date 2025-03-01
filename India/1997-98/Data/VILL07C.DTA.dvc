@@ -2,4 +2,5 @@ outs:
 - md5: 648c19ca66868b55c3ff685e0a62c8ac
   size: 20660
   path: VILL07C.DTA
+  md5-dos2unix: 648c19ca66868b55c3ff685e0a62c8ac
   hash: md5

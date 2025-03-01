@@ -2,4 +2,5 @@ outs:
 - md5: e8a6799a6be59b03f79b7324ea0a03e5
   size: 5778
   path: S3_ECON2.dta
+  md5-dos2unix: e8a6799a6be59b03f79b7324ea0a03e5
   hash: md5

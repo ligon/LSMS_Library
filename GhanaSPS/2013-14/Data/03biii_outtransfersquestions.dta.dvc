@@ -2,4 +2,5 @@ outs:
 - md5: 764c8454e9ac7cf05aeb9b51e1180d43
   size: 925365
   path: 03biii_outtransfersquestions.dta
+  md5-dos2unix: 764c8454e9ac7cf05aeb9b51e1180d43
   hash: md5

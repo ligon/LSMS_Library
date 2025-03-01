@@ -2,4 +2,5 @@ outs:
 - md5: b3e79a6d96acc68cf0f86ae626c4bdb2
   size: 10929825
   path: sect8_1_ls_w3.dta
+  md5-dos2unix: b3e79a6d96acc68cf0f86ae626c4bdb2
   hash: md5

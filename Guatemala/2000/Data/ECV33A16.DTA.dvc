@@ -2,4 +2,5 @@ outs:
 - md5: 90e99f679926da8b8dc13f66f145be2e
   size: 799185
   path: ECV33A16.DTA
+  md5-dos2unix: 90e99f679926da8b8dc13f66f145be2e
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: 1b59d3904384bbc67941f6106a572cc6
   size: 628386
   path: sect11b_hh_w2.dta
+  md5-dos2unix: 1b59d3904384bbc67941f6106a572cc6
   hash: md5

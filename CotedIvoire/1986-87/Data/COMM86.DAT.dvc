@@ -1,4 +1,5 @@
 outs:
 - md5: ea0a193d176c8c50228a71e4d795413c
   path: COMM86.DAT
+  md5-dos2unix: ea0a193d176c8c50228a71e4d795413c
   hash: md5

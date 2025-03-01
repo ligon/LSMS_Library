@@ -2,4 +2,5 @@ outs:
 - md5: b1fe4ba12470b3dc582f74c2fb03e71a
   size: 273727
   path: FILE12V1.dta
+  md5-dos2unix: b1fe4ba12470b3dc582f74c2fb03e71a
   hash: md5

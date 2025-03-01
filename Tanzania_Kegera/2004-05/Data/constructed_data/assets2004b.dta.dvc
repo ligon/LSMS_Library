@@ -2,4 +2,5 @@ outs:
 - md5: 603e751652d04772bb66b4a488524f18
   size: 74120
   path: assets2004b.dta
+  md5-dos2unix: 603e751652d04772bb66b4a488524f18
   hash: md5

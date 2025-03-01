@@ -2,4 +2,5 @@ outs:
 - md5: 6541b9b10792d163efda9cf77b7bba16
   size: 408176
   path: SUB_AANF.DTA
+  md5-dos2unix: 6541b9b10792d163efda9cf77b7bba16
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: b4962594353c773855be5a70315adc81
   size: 2056343
   path: 06c_immunization.dta
+  md5-dos2unix: b4962594353c773855be5a70315adc81
   hash: md5

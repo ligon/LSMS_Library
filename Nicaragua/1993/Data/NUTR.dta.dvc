@@ -2,4 +2,5 @@ outs:
 - md5: 295b0de5870ef1e9e3d6068a6697ca6c
   size: 296124
   path: NUTR.dta
+  md5-dos2unix: 295b0de5870ef1e9e3d6068a6697ca6c
   hash: md5

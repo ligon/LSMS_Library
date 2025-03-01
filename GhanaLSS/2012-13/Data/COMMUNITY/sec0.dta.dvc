@@ -2,4 +2,5 @@ outs:
 - md5: a2c71b271d03787794f19a9697d49b9f
   size: 48842
   path: sec0.dta
+  md5-dos2unix: a2c71b271d03787794f19a9697d49b9f
   hash: md5

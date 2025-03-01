@@ -2,4 +2,5 @@ outs:
 - md5: 4d4328bccd86f3b0f624494a944fc77f
   size: 66731
   path: S2B0.dta
+  md5-dos2unix: 4d4328bccd86f3b0f624494a944fc77f
   hash: md5

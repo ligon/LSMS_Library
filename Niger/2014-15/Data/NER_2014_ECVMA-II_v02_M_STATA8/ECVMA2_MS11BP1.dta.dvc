@@ -2,4 +2,5 @@ outs:
 - md5: 97e76c9d8e449b395596a875f470fc00
   size: 3952769
   path: ECVMA2_MS11BP1.dta
+  md5-dos2unix: 97e76c9d8e449b395596a875f470fc00
   hash: md5

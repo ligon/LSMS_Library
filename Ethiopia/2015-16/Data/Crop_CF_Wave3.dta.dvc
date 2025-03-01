@@ -2,4 +2,5 @@ outs:
 - md5: bb4042a8d450a7166ffa6316ec46f993
   size: 127718
   path: Crop_CF_Wave3.dta
+  md5-dos2unix: bb4042a8d450a7166ffa6316ec46f993
   hash: md5

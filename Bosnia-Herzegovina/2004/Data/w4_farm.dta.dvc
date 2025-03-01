@@ -2,4 +2,5 @@ outs:
 - md5: 79b5fe91072366ca61eb1f2f7ef27240
   size: 4173537
   path: w4_farm.dta
+  md5-dos2unix: 79b5fe91072366ca61eb1f2f7ef27240
   hash: md5

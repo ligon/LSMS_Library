@@ -2,4 +2,5 @@ outs:
 - md5: c3d96c83dbefd90f155f28608cf58a57
   size: 3293506
   path: module9.dta
+  md5-dos2unix: c3d96c83dbefd90f155f28608cf58a57
   hash: md5

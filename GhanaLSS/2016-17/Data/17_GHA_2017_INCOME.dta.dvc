@@ -1,4 +1,5 @@
 outs:
 - md5: c483b8b3dd912b8887454a97ff16f921
   path: 17_GHA_2017_INCOME.dta
+  md5-dos2unix: c483b8b3dd912b8887454a97ff16f921
   hash: md5

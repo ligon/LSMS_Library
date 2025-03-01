@@ -1,4 +1,5 @@
 outs:
 - md5: e8a3cdb5ffc833f125c894639231a763
   path: GSEC13B.dta
+  md5-dos2unix: e8a3cdb5ffc833f125c894639231a763
   hash: md5

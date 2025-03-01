@@ -2,4 +2,5 @@ outs:
 - md5: 515ee1c8243fd3952e82d1710cd94829
   size: 1085591
   path: sec3f.dta
+  md5-dos2unix: 515ee1c8243fd3952e82d1710cd94829
   hash: md5

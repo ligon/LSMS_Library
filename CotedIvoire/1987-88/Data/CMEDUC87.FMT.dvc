@@ -1,4 +1,5 @@
 outs:
 - md5: e308bd185e6e5e660e537cb0dc22ab0f
   path: CMEDUC87.FMT
+  md5-dos2unix: e308bd185e6e5e660e537cb0dc22ab0f
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: e3091f1a15f04cb2617ffc8ef17adf3e
   size: 6060834
   path: s07b_me_tgo2018.dta
+  md5-dos2unix: e3091f1a15f04cb2617ffc8ef17adf3e
   hash: md5

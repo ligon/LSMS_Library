@@ -2,4 +2,5 @@ outs:
 - md5: 41440e1a2c197c31d7891862a97a45ec
   size: 168
   path: F01B.VAR
+  md5-dos2unix: 41440e1a2c197c31d7891862a97a45ec
   hash: md5

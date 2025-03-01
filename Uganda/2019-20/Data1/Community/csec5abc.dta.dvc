@@ -2,4 +2,5 @@ outs:
 - md5: 699f455b50cab8ea11034274fde3bbd8
   size: 121602
   path: csec5abc.dta
+  md5-dos2unix: 699f455b50cab8ea11034274fde3bbd8
   hash: md5

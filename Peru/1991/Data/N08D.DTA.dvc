@@ -2,4 +2,5 @@ outs:
 - md5: ae98a4177dd5c6864dd4f6c5f832d652
   size: 70316
   path: N08D.DTA
+  md5-dos2unix: ae98a4177dd5c6864dd4f6c5f832d652
   hash: md5

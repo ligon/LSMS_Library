@@ -2,4 +2,5 @@ outs:
 - md5: e57c6bbd9df98567ae300690129e1ba5
   size: 552537
   path: M9.DTA
+  md5-dos2unix: e57c6bbd9df98567ae300690129e1ba5
   hash: md5

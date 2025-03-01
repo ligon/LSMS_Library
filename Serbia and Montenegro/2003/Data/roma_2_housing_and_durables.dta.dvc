@@ -2,4 +2,5 @@ outs:
 - md5: b901e5de022fff1970f9cd8b30b0dc27
   size: 161700
   path: roma_2_housing_and_durables.dta
+  md5-dos2unix: b901e5de022fff1970f9cd8b30b0dc27
   hash: md5

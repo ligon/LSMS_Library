@@ -1,4 +1,5 @@
 outs:
 - md5: 507539cd9270f36f74ecb54b8db70d7a
   path: F12A.DCT
+  md5-dos2unix: 507539cd9270f36f74ecb54b8db70d7a
   hash: md5

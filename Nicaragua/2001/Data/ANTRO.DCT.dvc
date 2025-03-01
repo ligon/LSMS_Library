@@ -2,4 +2,5 @@ outs:
 - md5: 209379b31eae5ec41b6b7e0fdf8fc082
   size: 876
   path: ANTRO.DCT
+  md5-dos2unix: 209379b31eae5ec41b6b7e0fdf8fc082
   hash: md5

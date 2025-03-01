@@ -2,4 +2,5 @@ outs:
 - md5: 676c5da5a621e1b7b54b514ac6d2cbe5
   size: 6471292
   path: 06f_past2weeks.dta
+  md5-dos2unix: 676c5da5a621e1b7b54b514ac6d2cbe5
   hash: md5

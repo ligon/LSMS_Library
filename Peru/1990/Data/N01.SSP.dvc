@@ -2,4 +2,5 @@ outs:
 - md5: 7205de63f552f1f67aa0b2d20efa2529
   size: 288800
   path: N01.SSP
+  md5-dos2unix: 7205de63f552f1f67aa0b2d20efa2529
   hash: md5

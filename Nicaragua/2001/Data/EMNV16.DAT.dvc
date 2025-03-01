@@ -2,4 +2,5 @@ outs:
 - md5: 20026cddca19e38654a2036e304523e9
   size: 1700462
   path: EMNV16.DAT
+  md5-dos2unix: 20026cddca19e38654a2036e304523e9
   hash: md5

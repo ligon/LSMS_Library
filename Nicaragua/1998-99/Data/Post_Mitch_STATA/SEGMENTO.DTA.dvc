@@ -2,4 +2,5 @@ outs:
 - md5: 379d0a7885ea28b36daf75edb8120b2b
   size: 6208
   path: SEGMENTO.DTA
+  md5-dos2unix: 379d0a7885ea28b36daf75edb8120b2b
   hash: md5

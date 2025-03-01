@@ -2,4 +2,5 @@ outs:
 - md5: 7f1eec71c3ff944dc8e6ca950725af9a
   size: 723791
   path: agriculture_hhlevel.dta
+  md5-dos2unix: 7f1eec71c3ff944dc8e6ca950725af9a
   hash: md5

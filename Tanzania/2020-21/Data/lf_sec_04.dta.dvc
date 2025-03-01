@@ -2,4 +2,5 @@ outs:
 - md5: 1444e01d8ce4ade6fbd13653c0ba3c96
   size: 1119488
   path: lf_sec_04.dta
+  md5-dos2unix: 1444e01d8ce4ade6fbd13653c0ba3c96
   hash: md5

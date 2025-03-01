@@ -2,4 +2,5 @@ outs:
 - md5: 00f69da4d641fa7ae890b9af1ce63546
   size: 107964
   path: pr1__fdp.dta
+  md5-dos2unix: 00f69da4d641fa7ae890b9af1ce63546
   hash: md5

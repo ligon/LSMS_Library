@@ -2,4 +2,5 @@ outs:
 - md5: 04caf44c956759612a42bac0e804c55a
   size: 536418
   path: S7A.dta
+  md5-dos2unix: 04caf44c956759612a42bac0e804c55a
   hash: md5

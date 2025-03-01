@@ -1,4 +1,5 @@
 outs:
 - md5: 83637b3b9da6b77962ccb576fe4c7cbc
   path: PANELC.DAT
+  md5-dos2unix: 83637b3b9da6b77962ccb576fe4c7cbc
   hash: md5

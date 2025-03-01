@@ -1,4 +1,5 @@
 outs:
 - md5: db2b2faee65f0326e924cc1272967710
   path: GSEC17B.dta
+  md5-dos2unix: db2b2faee65f0326e924cc1272967710
   hash: md5

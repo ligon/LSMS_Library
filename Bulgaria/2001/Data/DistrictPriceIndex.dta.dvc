@@ -2,4 +2,5 @@ outs:
 - md5: b20ad5673704e1b5236a62093290acca
   size: 32729
   path: DistrictPriceIndex.dta
+  md5-dos2unix: b20ad5673704e1b5236a62093290acca
   hash: md5

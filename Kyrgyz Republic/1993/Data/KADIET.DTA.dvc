@@ -2,4 +2,5 @@ outs:
 - md5: d4afa09d7b2daae5aad2d30862093e5b
   size: 1007180
   path: KADIET.DTA
+  md5-dos2unix: d4afa09d7b2daae5aad2d30862093e5b
   hash: md5

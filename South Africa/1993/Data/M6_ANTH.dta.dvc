@@ -2,4 +2,5 @@ outs:
 - md5: c368e792f8e1df680e13f903b522d627
   size: 447972
   path: M6_ANTH.dta
+  md5-dos2unix: c368e792f8e1df680e13f903b522d627
   hash: md5

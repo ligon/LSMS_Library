@@ -2,4 +2,5 @@ outs:
 - md5: 740e7b8434d0a6aa0699998cf85b1642
   size: 199847
   path: S5F.dta
+  md5-dos2unix: 740e7b8434d0a6aa0699998cf85b1642
   hash: md5

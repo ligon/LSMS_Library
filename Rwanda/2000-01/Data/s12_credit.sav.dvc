@@ -1,4 +1,5 @@
 outs:
 - md5: e2558b198599bc812b2f5e68d9db218f
   path: s12_credit.sav
+  md5-dos2unix: e2558b198599bc812b2f5e68d9db218f
   hash: md5

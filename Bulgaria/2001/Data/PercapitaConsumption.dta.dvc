@@ -2,4 +2,5 @@ outs:
 - md5: 8bd925633c55797085d54147481be723
   size: 1508020
   path: PercapitaConsumption.dta
+  md5-dos2unix: 8bd925633c55797085d54147481be723
   hash: md5

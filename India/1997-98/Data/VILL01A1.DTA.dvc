@@ -2,4 +2,5 @@ outs:
 - md5: 84479fd5d2e5c919bfdbffb4956c2f3e
   size: 25966
   path: VILL01A1.DTA
+  md5-dos2unix: 84479fd5d2e5c919bfdbffb4956c2f3e
   hash: md5

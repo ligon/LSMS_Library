@@ -2,4 +2,5 @@ outs:
 - md5: 7ff899991c15a46dcb3db2df98088cd6
   size: 1367400
   path: PERSONAS.DTA
+  md5-dos2unix: 7ff899991c15a46dcb3db2df98088cd6
   hash: md5

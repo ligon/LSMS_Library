@@ -2,4 +2,5 @@ outs:
 - md5: 89bd682db813de395b88a94af8f45ac6
   size: 66731
   path: S1EI0.dta
+  md5-dos2unix: 89bd682db813de395b88a94af8f45ac6
   hash: md5

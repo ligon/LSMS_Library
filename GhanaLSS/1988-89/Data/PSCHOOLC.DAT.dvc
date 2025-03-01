@@ -1,4 +1,5 @@
 outs:
 - md5: 915de7cf2432fc9c968361eaf69e77b0
   path: PSCHOOLC.DAT
+  md5-dos2unix: 915de7cf2432fc9c968361eaf69e77b0
   hash: md5

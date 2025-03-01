@@ -2,4 +2,5 @@ outs:
 - md5: 7a7b665fe3098c87bf7423236d671611
   size: 3255914
   path: hh_sec_16a.dta
+  md5-dos2unix: 7a7b665fe3098c87bf7423236d671611
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: 610a3c520a40d72dd23adbeb44832e24
   size: 747737
   path: EACICULTURE_p1.dta
+  md5-dos2unix: 610a3c520a40d72dd23adbeb44832e24
   hash: md5

@@ -1,4 +1,5 @@
 outs:
 - md5: 90d5087ad9251f55b37f477628b64734
   path: rainasc.zip
+  md5-dos2unix: 90d5087ad9251f55b37f477628b64734
   hash: md5

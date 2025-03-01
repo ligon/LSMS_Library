@@ -2,4 +2,5 @@ outs:
 - md5: 50630acaa501664f49423f7147c5917e
   size: 41
   path: F09DL.VAR
+  md5-dos2unix: 50630acaa501664f49423f7147c5917e
   hash: md5

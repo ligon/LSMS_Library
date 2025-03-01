@@ -2,4 +2,5 @@ outs:
 - md5: 819aa001e031dfa4443f3ecd98d60db2
   size: 65221
   path: s00b_co_mli2018.dta
+  md5-dos2unix: 819aa001e031dfa4443f3ecd98d60db2
   hash: md5

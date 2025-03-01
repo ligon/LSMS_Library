@@ -2,4 +2,5 @@ outs:
 - md5: c538f92cc1956bcb763143766b5ac8d8
   size: 5624134
   path: M13_B2.DTA
+  md5-dos2unix: c538f92cc1956bcb763143766b5ac8d8
   hash: md5

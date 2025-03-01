@@ -2,4 +2,5 @@ outs:
 - md5: f78dd017cadf820732810a814fa2c581
   size: 195025
   path: CSEC3A.dta
+  md5-dos2unix: f78dd017cadf820732810a814fa2c581
   hash: md5

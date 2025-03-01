@@ -2,4 +2,5 @@ outs:
 - md5: d17f27a0ce6c684609f6b016137c5579
   size: 5154
   path: s18_4_me_ner2018.dta
+  md5-dos2unix: d17f27a0ce6c684609f6b016137c5579
   hash: md5

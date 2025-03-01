@@ -2,4 +2,5 @@ outs:
 - md5: b4e5752950186002d574966a33255d78
   size: 2748867
   path: E03PR01.DTA
+  md5-dos2unix: b4e5752950186002d574966a33255d78
   hash: md5

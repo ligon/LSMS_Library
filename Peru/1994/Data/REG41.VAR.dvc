@@ -2,4 +2,5 @@ outs:
 - md5: fd341e4f966000b72221496460c6ae28
   size: 252
   path: REG41.VAR
+  md5-dos2unix: fd341e4f966000b72221496460c6ae28
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: 6b55a23329fbbb820aaf3bb148690010
   size: 4526
   path: APP4.dta
+  md5-dos2unix: 6b55a23329fbbb820aaf3bb148690010
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: e61a064e9b24fee6ea23afe28f3085b4
   size: 880598
   path: water_testing.dta
+  md5-dos2unix: e61a064e9b24fee6ea23afe28f3085b4
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: 60eb6b5c1b6ef5a7d5071166fe197c06
   size: 20384
   path: F09DM.DTA
+  md5-dos2unix: 60eb6b5c1b6ef5a7d5071166fe197c06
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: f5f47311177bca3c2819bc0de03b1437
   size: 1488659
   path: s10_2_me_bfa2018.dta
+  md5-dos2unix: f5f47311177bca3c2819bc0de03b1437
   hash: md5

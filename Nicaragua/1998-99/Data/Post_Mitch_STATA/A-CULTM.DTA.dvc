@@ -2,4 +2,5 @@ outs:
 - md5: efcda4a6071c9dc556db653a2db23d3a
   size: 57104
   path: A-CULTM.DTA
+  md5-dos2unix: efcda4a6071c9dc556db653a2db23d3a
   hash: md5

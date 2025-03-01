@@ -2,4 +2,5 @@ outs:
 - md5: 80bff86f12ef993082a0739147c81d52
   size: 29233
   path: M3_CASW1.dta
+  md5-dos2unix: 80bff86f12ef993082a0739147c81d52
   hash: md5

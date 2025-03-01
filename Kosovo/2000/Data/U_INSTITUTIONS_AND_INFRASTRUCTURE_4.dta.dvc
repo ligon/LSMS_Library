@@ -2,4 +2,5 @@ outs:
 - md5: 58c14f250d3895450879490fcd015e9a
   size: 11443
   path: U_INSTITUTIONS_AND_INFRASTRUCTURE_4.dta
+  md5-dos2unix: 58c14f250d3895450879490fcd015e9a
   hash: md5

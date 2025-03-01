@@ -2,4 +2,5 @@ outs:
 - md5: 33b3db871c598b18cefc8e64dc58efc4
   size: 452
   path: EMNV13.DCT
+  md5-dos2unix: 33b3db871c598b18cefc8e64dc58efc4
   hash: md5

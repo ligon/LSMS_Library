@@ -2,4 +2,5 @@ outs:
 - md5: 1525cee60b75c0c3ad01895710be7c1b
   size: 84525
   path: section3_ed.dta
+  md5-dos2unix: 1525cee60b75c0c3ad01895710be7c1b
   hash: md5

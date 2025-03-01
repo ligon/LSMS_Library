@@ -2,4 +2,5 @@ outs:
 - md5: de727f5c64fb143cdffc5e5850480775
   size: 3966265
   path: 01b2_preroster.dta
+  md5-dos2unix: de727f5c64fb143cdffc5e5850480775
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: 25b2e4271430e9ff4bae1d2a734c0135
   size: 1404811
   path: part4_roster.dta
+  md5-dos2unix: 25b2e4271430e9ff4bae1d2a734c0135
   hash: md5

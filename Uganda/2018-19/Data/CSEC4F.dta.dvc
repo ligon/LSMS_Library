@@ -2,4 +2,5 @@ outs:
 - md5: 09fe79c44c9cec13f48d590aaf9cd954
   size: 58867
   path: CSEC4F.dta
+  md5-dos2unix: 09fe79c44c9cec13f48d590aaf9cd954
   hash: md5

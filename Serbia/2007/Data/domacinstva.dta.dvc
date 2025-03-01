@@ -2,4 +2,5 @@ outs:
 - md5: b38e1dfd5bbeff4acecff2dfec18d1bc
   size: 4913777
   path: domacinstva.dta
+  md5-dos2unix: b38e1dfd5bbeff4acecff2dfec18d1bc
   hash: md5

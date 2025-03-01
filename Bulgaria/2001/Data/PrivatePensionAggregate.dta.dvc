@@ -2,4 +2,5 @@ outs:
 - md5: cb1992d83e8893a8584875b79dafdc7f
   size: 906
   path: PrivatePensionAggregate.dta
+  md5-dos2unix: cb1992d83e8893a8584875b79dafdc7f
   hash: md5

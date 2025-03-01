@@ -2,4 +2,5 @@ outs:
 - md5: c095a597a523fa33ae643610a6fa85dd
   size: 21661
   path: R_HEALTH_FACILITIES_1.dta
+  md5-dos2unix: c095a597a523fa33ae643610a6fa85dd
   hash: md5

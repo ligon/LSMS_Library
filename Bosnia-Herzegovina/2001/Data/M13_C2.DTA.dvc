@@ -2,4 +2,5 @@ outs:
 - md5: 441b921f623ad1ff04977e207139b114
   size: 324294
   path: M13_C2.DTA
+  md5-dos2unix: 441b921f623ad1ff04977e207139b114
   hash: md5

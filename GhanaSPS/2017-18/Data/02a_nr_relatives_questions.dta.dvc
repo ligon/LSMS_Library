@@ -2,4 +2,5 @@ outs:
 - md5: 6622447d2aef94c96ba13ddc79441b61
   size: 15317284
   path: 02a_nr_relatives_questions.dta
+  md5-dos2unix: 6622447d2aef94c96ba13ddc79441b61
   hash: md5

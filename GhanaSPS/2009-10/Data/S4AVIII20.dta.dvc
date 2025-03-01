@@ -2,4 +2,5 @@ outs:
 - md5: f22220b6ad84d04b87dbb91f29285005
   size: 35076
   path: S4AVIII20.dta
+  md5-dos2unix: f22220b6ad84d04b87dbb91f29285005
   hash: md5

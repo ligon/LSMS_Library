@@ -1,4 +1,5 @@
 outs:
 - md5: d16c24617ea8e7416766999390602166
   path: COMM85.DCT
+  md5-dos2unix: d16c24617ea8e7416766999390602166
   hash: md5

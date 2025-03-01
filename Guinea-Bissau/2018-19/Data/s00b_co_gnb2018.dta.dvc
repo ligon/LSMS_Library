@@ -2,4 +2,5 @@ outs:
 - md5: 014351190359a7a9c98c495b79c66345
   size: 53309
   path: s00b_co_gnb2018.dta
+  md5-dos2unix: 014351190359a7a9c98c495b79c66345
   hash: md5

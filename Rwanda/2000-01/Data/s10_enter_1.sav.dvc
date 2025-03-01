@@ -1,4 +1,5 @@
 outs:
 - md5: 38d51a992fc768db0601f91d67092cad
   path: s10_enter_1.sav
+  md5-dos2unix: 38d51a992fc768db0601f91d67092cad
   hash: md5

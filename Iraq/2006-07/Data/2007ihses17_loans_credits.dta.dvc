@@ -2,4 +2,5 @@ outs:
 - md5: c4d82cc2ce80a3568a0ef10b150ea8d6
   size: 542622
   path: 2007ihses17_loans_credits.dta
+  md5-dos2unix: c4d82cc2ce80a3568a0ef10b150ea8d6
   hash: md5

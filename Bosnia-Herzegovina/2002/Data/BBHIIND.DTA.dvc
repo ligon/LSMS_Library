@@ -2,4 +2,5 @@ outs:
 - md5: 71055957c36110fe331c63a27023ac66
   size: 4768470
   path: BBHIIND.DTA
+  md5-dos2unix: 71055957c36110fe331c63a27023ac66
   hash: md5

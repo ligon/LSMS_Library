@@ -2,4 +2,5 @@ outs:
 - md5: a7a2e2742d769bf8dfc185c8eaad470d
   size: 143779
   path: community.zip
+  md5-dos2unix: a7a2e2742d769bf8dfc185c8eaad470d
   hash: md5

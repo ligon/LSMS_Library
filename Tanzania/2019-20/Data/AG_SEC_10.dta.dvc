@@ -2,4 +2,5 @@ outs:
 - md5: 515cfb89f5e9e449e393aa525a113e8a
   size: 159000
   path: AG_SEC_10.dta
+  md5-dos2unix: 515cfb89f5e9e449e393aa525a113e8a
   hash: md5

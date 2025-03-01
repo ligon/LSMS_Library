@@ -2,4 +2,5 @@ outs:
 - md5: 36dee9a8712542c2171f19bb50817fae
   size: 37843
   path: CORE.DTA
+  md5-dos2unix: 36dee9a8712542c2171f19bb50817fae
   hash: md5

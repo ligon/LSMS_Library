@@ -2,4 +2,5 @@ outs:
 - md5: d9c39f6269b9e9e9269f5a138f92aae2
   size: 34038816
   path: EACIALI_p1.dta
+  md5-dos2unix: d9c39f6269b9e9e9269f5a138f92aae2
   hash: md5

@@ -1,4 +1,5 @@
 outs:
 - md5: 1580af8a2666509f3efa2c21d7f66b73
   path: ZSCORE.DAT
+  md5-dos2unix: 1580af8a2666509f3efa2c21d7f66b73
   hash: md5

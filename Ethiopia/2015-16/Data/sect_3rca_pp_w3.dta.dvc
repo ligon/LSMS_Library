@@ -2,4 +2,5 @@ outs:
 - md5: f46ed15b2fd3a541751df4654662c09d
   size: 3770754
   path: sect_3rca_pp_w3.dta
+  md5-dos2unix: f46ed15b2fd3a541751df4654662c09d
   hash: md5

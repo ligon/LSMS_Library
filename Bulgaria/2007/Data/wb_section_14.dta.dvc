@@ -2,4 +2,5 @@ outs:
 - md5: db15fc807cd5df2b6a567020691e2061
   size: 317051
   path: wb_section_14.dta
+  md5-dos2unix: db15fc807cd5df2b6a567020691e2061
   hash: md5

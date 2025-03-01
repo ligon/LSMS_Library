@@ -2,4 +2,5 @@ outs:
 - md5: 2a14355a2a9f95588f78902fb8244f6f
   size: 241444
   path: EACI17_ECHANTILLON.dta
+  md5-dos2unix: 2a14355a2a9f95588f78902fb8244f6f
   hash: md5

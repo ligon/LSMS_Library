@@ -2,4 +2,5 @@ outs:
 - md5: 2914d184fd521abd60769cf3d2dd2dc4
   size: 69724
   path: F09E1.DTA
+  md5-dos2unix: 2914d184fd521abd60769cf3d2dd2dc4
   hash: md5

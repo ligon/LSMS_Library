@@ -2,4 +2,5 @@ outs:
 - md5: 8bb0073295469cf02dceffa0b1666502
   size: 2280896
   path: 2007ihses12_p1_jobs.dta
+  md5-dos2unix: 8bb0073295469cf02dceffa0b1666502
   hash: md5

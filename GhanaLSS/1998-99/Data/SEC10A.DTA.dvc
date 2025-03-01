@@ -2,4 +2,5 @@ outs:
 - md5: 65cf355cfef08e4e8723d7d89cac65ea
   size: 706043
   path: SEC10A.DTA
+  md5-dos2unix: 65cf355cfef08e4e8723d7d89cac65ea
   hash: md5

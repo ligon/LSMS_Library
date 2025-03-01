@@ -2,4 +2,5 @@ outs:
 - md5: cce7fd9028b8bcefb33a0de41559cb0f
   size: 8761
   path: Serb_ECONOMY_1.dta
+  md5-dos2unix: cce7fd9028b8bcefb33a0de41559cb0f
   hash: md5

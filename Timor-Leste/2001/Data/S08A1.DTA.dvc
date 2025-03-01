@@ -2,4 +2,5 @@ outs:
 - md5: 81a5bee14d583b4dbd737cdf69846e0a
   size: 119887
   path: S08A1.DTA
+  md5-dos2unix: 81a5bee14d583b4dbd737cdf69846e0a
   hash: md5

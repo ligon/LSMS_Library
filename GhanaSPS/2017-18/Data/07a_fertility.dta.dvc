@@ -2,4 +2,5 @@ outs:
 - md5: 888b10f6c0f1f784dc02154ebdd7a51e
   size: 5814822
   path: 07a_fertility.dta
+  md5-dos2unix: 888b10f6c0f1f784dc02154ebdd7a51e
   hash: md5

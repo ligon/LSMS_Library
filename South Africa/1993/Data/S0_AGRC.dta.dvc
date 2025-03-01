@@ -2,4 +2,5 @@ outs:
 - md5: 894e28b75bbbcadb0008e8e381cf333a
   size: 8855
   path: S0_AGRC.dta
+  md5-dos2unix: 894e28b75bbbcadb0008e8e381cf333a
   hash: md5

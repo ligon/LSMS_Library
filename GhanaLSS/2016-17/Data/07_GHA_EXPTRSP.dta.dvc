@@ -1,4 +1,5 @@
 outs:
 - md5: 71f425e28d7585f5459fa44e57c3d0be
   path: 07_GHA_EXPTRSP.dta
+  md5-dos2unix: 71f425e28d7585f5459fa44e57c3d0be
   hash: md5

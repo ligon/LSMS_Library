@@ -2,4 +2,5 @@ outs:
 - md5: bb3055370e21f8ca5497e10010238e6b
   size: 18657
   path: sm7a.dta
+  md5-dos2unix: bb3055370e21f8ca5497e10010238e6b
   hash: md5

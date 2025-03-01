@@ -2,4 +2,5 @@ outs:
 - md5: 030c1eafb0bccd73f02bff3ef9288ac0
   size: 1096431
   path: 04j_tracploughuse.dta
+  md5-dos2unix: 030c1eafb0bccd73f02bff3ef9288ac0
   hash: md5

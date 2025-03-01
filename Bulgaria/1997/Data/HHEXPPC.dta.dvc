@@ -2,4 +2,5 @@ outs:
 - md5: 55e2824d5d8d3cfae7dbfcb0ba81d388
   size: 138060
   path: HHEXPPC.dta
+  md5-dos2unix: 55e2824d5d8d3cfae7dbfcb0ba81d388
   hash: md5

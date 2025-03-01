@@ -1,4 +1,5 @@
 outs:
 - md5: 986dcec5296645cf0b80694d0076c461
   path: F09D1C.DCT
+  md5-dos2unix: 986dcec5296645cf0b80694d0076c461
   hash: md5

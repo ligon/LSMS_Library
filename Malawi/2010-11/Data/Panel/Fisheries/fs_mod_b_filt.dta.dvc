@@ -2,4 +2,5 @@ outs:
 - md5: ce42659c9e0d8fdad2308c62856dc605
   size: 6993
   path: fs_mod_b_filt.dta
+  md5-dos2unix: ce42659c9e0d8fdad2308c62856dc605
   hash: md5

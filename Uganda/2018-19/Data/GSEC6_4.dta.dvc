@@ -2,4 +2,5 @@ outs:
 - md5: 168416696218ab13c8de609da1add6f9
   size: 176963
   path: GSEC6_4.dta
+  md5-dos2unix: 168416696218ab13c8de609da1add6f9
   hash: md5

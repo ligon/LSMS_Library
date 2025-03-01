@@ -2,4 +2,5 @@ outs:
 - md5: 4c6c7386419b99daef330ee54965df81
   size: 234440
   path: FILE10V0.dta
+  md5-dos2unix: 4c6c7386419b99daef330ee54965df81
   hash: md5

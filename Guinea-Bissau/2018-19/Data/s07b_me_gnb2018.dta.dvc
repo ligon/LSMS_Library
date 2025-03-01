@@ -2,4 +2,5 @@ outs:
 - md5: ed4d0dc11ab37194fd2781300c3a90a7
   size: 7319505
   path: s07b_me_gnb2018.dta
+  md5-dos2unix: ed4d0dc11ab37194fd2781300c3a90a7
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: beac6ce469e11958756c252bf6d37009
   size: 1695260
   path: 05ai_basicinfo.dta
+  md5-dos2unix: beac6ce469e11958756c252bf6d37009
   hash: md5

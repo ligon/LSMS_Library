@@ -2,4 +2,5 @@ outs:
 - md5: 6061ed1520c08ea4f1ee1464ffd31f2f
   size: 3065453
   path: FILE11V1.dta
+  md5-dos2unix: 6061ed1520c08ea4f1ee1464ffd31f2f
   hash: md5

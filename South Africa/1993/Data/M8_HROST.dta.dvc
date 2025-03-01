@@ -2,4 +2,5 @@ outs:
 - md5: e8023739b926d27b6e5046b46bb2773d
   size: 1357329
   path: M8_HROST.dta
+  md5-dos2unix: e8023739b926d27b6e5046b46bb2773d
   hash: md5

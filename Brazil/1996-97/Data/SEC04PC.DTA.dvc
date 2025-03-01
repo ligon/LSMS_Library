@@ -2,4 +2,5 @@ outs:
 - md5: 45b49feef7501e2b9463009ab5692040
   size: 542361
   path: SEC04PC.DTA
+  md5-dos2unix: 45b49feef7501e2b9463009ab5692040
   hash: md5

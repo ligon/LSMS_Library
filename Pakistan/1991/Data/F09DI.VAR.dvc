@@ -2,4 +2,5 @@ outs:
 - md5: 68fdf827440b7ce053ad4746f6362202
   size: 121
   path: F09DI.VAR
+  md5-dos2unix: 68fdf827440b7ce053ad4746f6362202
   hash: md5

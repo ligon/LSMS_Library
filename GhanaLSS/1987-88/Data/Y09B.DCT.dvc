@@ -1,4 +1,5 @@
 outs:
 - md5: 8f8a06be4637a8f8eb9cd968f254c278
   path: Y09B.DCT
+  md5-dos2unix: 8f8a06be4637a8f8eb9cd968f254c278
   hash: md5

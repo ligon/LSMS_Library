@@ -2,4 +2,5 @@ outs:
 - md5: 8d87832a0c9ff99ddcf140ac888ff099
   size: 140747
   path: 09c_ravenspattern.dta
+  md5-dos2unix: 8d87832a0c9ff99ddcf140ac888ff099
   hash: md5

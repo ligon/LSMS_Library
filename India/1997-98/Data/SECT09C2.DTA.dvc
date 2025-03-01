@@ -2,4 +2,5 @@ outs:
 - md5: aabffc6faff7d680966337ef06a9b883
   size: 36079
   path: SECT09C2.DTA
+  md5-dos2unix: aabffc6faff7d680966337ef06a9b883
   hash: md5

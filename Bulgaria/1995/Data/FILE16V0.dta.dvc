@@ -2,4 +2,5 @@ outs:
 - md5: 5ad433673fa5339d19a138802f268a90
   size: 63361
   path: FILE16V0.dta
+  md5-dos2unix: 5ad433673fa5339d19a138802f268a90
   hash: md5

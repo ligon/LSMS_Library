@@ -2,4 +2,5 @@ outs:
 - md5: 431ffdc3bf5b32c46f707a07a529bbf4
   size: 4097795
   path: s19_me_mli2018.dta
+  md5-dos2unix: 431ffdc3bf5b32c46f707a07a529bbf4
   hash: md5

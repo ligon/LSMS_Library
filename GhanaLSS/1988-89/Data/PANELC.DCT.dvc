@@ -1,4 +1,5 @@
 outs:
 - md5: b9ae89fb63ae4126355b80f81225912f
   path: PANELC.DCT
+  md5-dos2unix: b9ae89fb63ae4126355b80f81225912f
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: e250dbd16647ff7a74d2d68cd4a58e2b
   size: 199713
   path: HouseAggregate.dta
+  md5-dos2unix: e250dbd16647ff7a74d2d68cd4a58e2b
   hash: md5

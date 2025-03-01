@@ -2,4 +2,5 @@ outs:
 - md5: 9a3cb6ffb935c642b960662b74b2faf8
   size: 12392
   path: N13D1.DTA
+  md5-dos2unix: 9a3cb6ffb935c642b960662b74b2faf8
   hash: md5

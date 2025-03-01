@@ -2,4 +2,5 @@ outs:
 - md5: e4f23a7e089b2e842cb7a2e84093d7bb
   size: 277953
   path: SUB_AAGM.DTA
+  md5-dos2unix: e4f23a7e089b2e842cb7a2e84093d7bb
   hash: md5

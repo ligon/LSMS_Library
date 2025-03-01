@@ -2,4 +2,5 @@ outs:
 - md5: c07db4e29b1dbb91ad8c0b045dbbcb3f
   size: 24637
   path: 28prestamos_agropecuarios.dta
+  md5-dos2unix: c07db4e29b1dbb91ad8c0b045dbbcb3f
   hash: md5

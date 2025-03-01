@@ -2,4 +2,5 @@ outs:
 - md5: 634f02b1372ca7655ab4e6d3050e16fb
   size: 236558
   path: 01a_consent.dta
+  md5-dos2unix: 634f02b1372ca7655ab4e6d3050e16fb
   hash: md5

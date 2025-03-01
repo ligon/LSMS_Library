@@ -2,4 +2,5 @@ outs:
 - md5: 220aca128b5941b81bb503787290f4eb
   size: 313753
   path: bg03exp.dta
+  md5-dos2unix: 220aca128b5941b81bb503787290f4eb
   hash: md5

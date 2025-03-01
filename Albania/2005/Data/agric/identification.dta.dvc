@@ -2,4 +2,5 @@ outs:
 - md5: 535b430bb1d002471a4daabbcf88dbee
   size: 103417
   path: identification.dta
+  md5-dos2unix: 535b430bb1d002471a4daabbcf88dbee
   hash: md5

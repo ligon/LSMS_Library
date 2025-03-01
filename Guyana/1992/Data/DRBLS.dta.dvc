@@ -2,4 +2,5 @@ outs:
 - md5: a1f6aee7fe247021f827c1d04f2e2d10
   size: 502748
   path: DRBLS.dta
+  md5-dos2unix: a1f6aee7fe247021f827c1d04f2e2d10
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: e88a1cffb607afca3df88750b35fdc74
   size: 1059447
   path: 2007ihses00_cover_page.dta
+  md5-dos2unix: e88a1cffb607afca3df88750b35fdc74
   hash: md5

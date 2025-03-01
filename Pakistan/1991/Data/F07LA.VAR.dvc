@@ -2,4 +2,5 @@ outs:
 - md5: 9701746252586b21f0d56684bd2bb081
   size: 51
   path: F07LA.VAR
+  md5-dos2unix: 9701746252586b21f0d56684bd2bb081
   hash: md5

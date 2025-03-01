@@ -2,4 +2,5 @@ outs:
 - md5: 0f03e452f3847e7d569affc45911512c
   size: 122
   path: F07AO.VAR
+  md5-dos2unix: 0f03e452f3847e7d569affc45911512c
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: e7ec969817177550d1eb4cca26399c07
   size: 4039946
   path: HHPriceData.dta
+  md5-dos2unix: e7ec969817177550d1eb4cca26399c07
   hash: md5

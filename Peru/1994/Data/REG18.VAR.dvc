@@ -2,4 +2,5 @@ outs:
 - md5: f7473aacdf77b432e0b66b73378c0eef
   size: 140
   path: REG18.VAR
+  md5-dos2unix: f7473aacdf77b432e0b66b73378c0eef
   hash: md5

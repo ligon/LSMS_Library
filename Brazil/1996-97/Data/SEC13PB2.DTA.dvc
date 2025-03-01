@@ -2,4 +2,5 @@ outs:
 - md5: 7ffe2b02b9732316501203080e94515e
   size: 503835
   path: SEC13PB2.DTA
+  md5-dos2unix: 7ffe2b02b9732316501203080e94515e
   hash: md5

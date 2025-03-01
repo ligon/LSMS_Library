@@ -2,4 +2,5 @@ outs:
 - md5: 62e9b81bedafa204c6c5c05ee0bad3dd
   size: 55404796
   path: 04persona.dta
+  md5-dos2unix: 62e9b81bedafa204c6c5c05ee0bad3dd
   hash: md5

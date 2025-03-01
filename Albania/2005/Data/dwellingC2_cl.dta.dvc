@@ -2,4 +2,5 @@ outs:
 - md5: 7a9e7ff9120a549f65ad000eca1de677
   size: 863234
   path: dwellingC2_cl.dta
+  md5-dos2unix: 7a9e7ff9120a549f65ad000eca1de677
   hash: md5

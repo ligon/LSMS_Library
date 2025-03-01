@@ -1,4 +1,5 @@
 outs:
 - md5: f609f8ddef5a91eaf516700c3c118ee4
   path: Y09D4B.DCT
+  md5-dos2unix: f609f8ddef5a91eaf516700c3c118ee4
   hash: md5

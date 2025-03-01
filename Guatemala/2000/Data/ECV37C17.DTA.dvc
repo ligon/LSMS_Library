@@ -2,4 +2,5 @@ outs:
 - md5: 076d988628537b7ba86e86de06e9859c
   size: 157913
   path: ECV37C17.DTA
+  md5-dos2unix: 076d988628537b7ba86e86de06e9859c
   hash: md5

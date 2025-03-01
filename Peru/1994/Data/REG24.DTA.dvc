@@ -2,4 +2,5 @@ outs:
 - md5: 27a9653bd1ad8efadec8c2e5ac0279c8
   size: 59845
   path: REG24.DTA
+  md5-dos2unix: 27a9653bd1ad8efadec8c2e5ac0279c8
   hash: md5

@@ -1,4 +1,5 @@
 outs:
 - md5: 587e16713af1992844a5a5acc77aa880
   path: CMEDUC87.WK1
+  md5-dos2unix: 587e16713af1992844a5a5acc77aa880
   hash: md5

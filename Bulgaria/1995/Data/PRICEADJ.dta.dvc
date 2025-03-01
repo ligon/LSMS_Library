@@ -2,4 +2,5 @@ outs:
 - md5: c1a68300af15dfdb17f13eaa909df808
   size: 1106
   path: PRICEADJ.dta
+  md5-dos2unix: c1a68300af15dfdb17f13eaa909df808
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: 4d65889acad3aaba136748957ebce7ee
   size: 36488
   path: MISC_A.dta
+  md5-dos2unix: 4d65889acad3aaba136748957ebce7ee
   hash: md5

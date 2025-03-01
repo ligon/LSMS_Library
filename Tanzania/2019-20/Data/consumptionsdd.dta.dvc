@@ -2,4 +2,5 @@ outs:
 - md5: fef0cbe07121890bc7d98a3aabc450cb
   size: 363092
   path: consumptionsdd.dta
+  md5-dos2unix: fef0cbe07121890bc7d98a3aabc450cb
   hash: md5

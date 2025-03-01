@@ -2,4 +2,5 @@ outs:
 - md5: 90656dd1dc0488e9434529f4857b5f09
   size: 194307
   path: COMMDTA.ZIP
+  md5-dos2unix: 90656dd1dc0488e9434529f4857b5f09
   hash: md5

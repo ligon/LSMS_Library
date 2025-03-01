@@ -2,4 +2,5 @@ outs:
 - md5: 260d35e5a28dcd856804c2017917800d
   size: 491145
   path: sec10D12.dta
+  md5-dos2unix: 260d35e5a28dcd856804c2017917800d
   hash: md5

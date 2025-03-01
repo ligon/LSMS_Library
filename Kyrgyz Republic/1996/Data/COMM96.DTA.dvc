@@ -2,4 +2,5 @@ outs:
 - md5: 9e5f375369e4091c6230c6019fb788b9
   size: 462492
   path: COMM96.DTA
+  md5-dos2unix: 9e5f375369e4091c6230c6019fb788b9
   hash: md5

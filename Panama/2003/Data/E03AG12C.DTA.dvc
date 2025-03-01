@@ -2,4 +2,5 @@ outs:
 - md5: 37fbd41ca2fd1ac3a6c5d368c7ab782e
   size: 8822
   path: E03AG12C.DTA
+  md5-dos2unix: 37fbd41ca2fd1ac3a6c5d368c7ab782e
   hash: md5

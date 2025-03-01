@@ -2,4 +2,5 @@ outs:
 - md5: 5426ef6a19ac7463807e18f6edff5f0c
   size: 6825487
   path: SUB_ACRO.DTA
+  md5-dos2unix: 5426ef6a19ac7463807e18f6edff5f0c
   hash: md5

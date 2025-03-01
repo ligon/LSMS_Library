@@ -2,4 +2,5 @@ outs:
 - md5: f9139c01d088da77416276181748132f
   size: 55349
   path: F07AR.DTA
+  md5-dos2unix: f9139c01d088da77416276181748132f
   hash: md5

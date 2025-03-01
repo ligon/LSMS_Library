@@ -2,4 +2,5 @@ outs:
 - md5: 0dee1d42bf4907cad26532c54b1d82fa
   size: 6741547
   path: precios.dta
+  md5-dos2unix: 0dee1d42bf4907cad26532c54b1d82fa
   hash: md5

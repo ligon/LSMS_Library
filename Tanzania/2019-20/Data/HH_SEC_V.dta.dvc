@@ -2,4 +2,5 @@ outs:
 - md5: ff070d5611f9b0144491305968f701ab
   size: 578466
   path: HH_SEC_V.dta
+  md5-dos2unix: ff070d5611f9b0144491305968f701ab
   hash: md5

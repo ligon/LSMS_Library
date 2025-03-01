@@ -2,4 +2,5 @@ outs:
 - md5: 9d61cd1436ed8ea21371174a7a0a7db5
   size: 9327921
   path: disability.dta
+  md5-dos2unix: 9d61cd1436ed8ea21371174a7a0a7db5
   hash: md5

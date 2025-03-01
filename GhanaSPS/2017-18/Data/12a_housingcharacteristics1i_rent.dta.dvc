@@ -2,4 +2,5 @@ outs:
 - md5: cbf65050fbc2b3d09c5111ff86a2de1e
   size: 340788
   path: 12a_housingcharacteristics1i_rent.dta
+  md5-dos2unix: cbf65050fbc2b3d09c5111ff86a2de1e
   hash: md5

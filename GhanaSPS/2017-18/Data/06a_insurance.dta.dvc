@@ -2,4 +2,5 @@ outs:
 - md5: 06efb4bbb144f5f47e85c5e6f026339f
   size: 12606255
   path: 06a_insurance.dta
+  md5-dos2unix: 06efb4bbb144f5f47e85c5e6f026339f
   hash: md5

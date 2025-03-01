@@ -2,4 +2,5 @@ outs:
 - md5: cf6708835eb65a6dce9e3ad1be2d5460
   size: 326039
   path: wb_section_10c_products.dta
+  md5-dos2unix: cf6708835eb65a6dce9e3ad1be2d5460
   hash: md5

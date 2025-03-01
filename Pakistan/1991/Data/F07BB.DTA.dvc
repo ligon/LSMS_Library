@@ -2,4 +2,5 @@ outs:
 - md5: a86580dc14203aba50976b75f04ee4ae
   size: 24000
   path: F07BB.DTA
+  md5-dos2unix: a86580dc14203aba50976b75f04ee4ae
   hash: md5

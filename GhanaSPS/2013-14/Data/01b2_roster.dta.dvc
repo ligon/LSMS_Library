@@ -2,4 +2,5 @@ outs:
 - md5: a8cf70844bcac365f2263447918a831a
   size: 508681
   path: 01b2_roster.dta
+  md5-dos2unix: a8cf70844bcac365f2263447918a831a
   hash: md5

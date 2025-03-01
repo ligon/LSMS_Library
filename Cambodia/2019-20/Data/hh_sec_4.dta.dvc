@@ -2,4 +2,5 @@ outs:
 - md5: 82bad7e6c86f891bb0ca5bf7fd755640
   size: 474346
   path: hh_sec_4.dta
+  md5-dos2unix: 82bad7e6c86f891bb0ca5bf7fd755640
   hash: md5

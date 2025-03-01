@@ -2,4 +2,5 @@ outs:
 - md5: 796e01cc1b451a5888a759055cb7147f
   size: 6131853
   path: 01fii_employmentsecondary.dta
+  md5-dos2unix: 796e01cc1b451a5888a759055cb7147f
   hash: md5

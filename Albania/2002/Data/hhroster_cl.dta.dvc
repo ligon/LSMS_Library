@@ -2,4 +2,5 @@ outs:
 - md5: bfa0714dae929e9799fe44e76bc3f3dc
   size: 4993983
   path: hhroster_cl.dta
+  md5-dos2unix: bfa0714dae929e9799fe44e76bc3f3dc
   hash: md5

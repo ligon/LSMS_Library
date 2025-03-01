@@ -2,4 +2,5 @@ outs:
 - md5: 85a1b10414c6f2d4d7053a4447062e9e
   size: 1157944
   path: consumption_real_y5.dta
+  md5-dos2unix: 85a1b10414c6f2d4d7053a4447062e9e
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: fc69f278a389d66839e0d297779d708b
   size: 111928
   path: 05bii_fourimportantquestions.dta
+  md5-dos2unix: fc69f278a389d66839e0d297779d708b
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: ec671480a3e947aa6440eeaef584b5c0
   size: 30942
   path: SECT05B.DTA
+  md5-dos2unix: ec671480a3e947aa6440eeaef584b5c0
   hash: md5

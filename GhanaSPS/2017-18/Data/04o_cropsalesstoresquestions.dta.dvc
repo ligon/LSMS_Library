@@ -2,4 +2,5 @@ outs:
 - md5: 0e4849af5c20fe7e9413cac87194aae4
   size: 5103039
   path: 04o_cropsalesstoresquestions.dta
+  md5-dos2unix: 0e4849af5c20fe7e9413cac87194aae4
   hash: md5

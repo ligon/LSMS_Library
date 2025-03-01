@@ -2,4 +2,5 @@ outs:
 - md5: 8a15edc3e894d24ac0e02101ef92cc1f
   size: 15184635
   path: GASTOSA.DTA
+  md5-dos2unix: 8a15edc3e894d24ac0e02101ef92cc1f
   hash: md5

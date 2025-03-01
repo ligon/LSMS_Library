@@ -2,4 +2,5 @@ outs:
 - md5: becfdaffb09c15999fcdcd30d98ffde7
   size: 218951
   path: EXP2.DTA
+  md5-dos2unix: becfdaffb09c15999fcdcd30d98ffde7
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: a690c17261ad70a60592470bba1fed9e
   size: 66149
   path: comm_sect3_public.dta
+  md5-dos2unix: a690c17261ad70a60592470bba1fed9e
   hash: md5

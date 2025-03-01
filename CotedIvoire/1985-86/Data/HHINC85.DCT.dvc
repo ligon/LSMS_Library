@@ -1,4 +1,5 @@
 outs:
 - md5: 6fc055926d8722c16b3237fe45e141c6
   path: HHINC85.DCT
+  md5-dos2unix: 6fc055926d8722c16b3237fe45e141c6
   hash: md5

@@ -2,4 +2,5 @@ outs:
 - md5: cc23cd20f414a45f6d461c6aa9efbd2e
   size: 8310868
   path: emc2014_agri_caracteristiques_parcelles.dta
+  md5-dos2unix: cc23cd20f414a45f6d461c6aa9efbd2e
   hash: md5
