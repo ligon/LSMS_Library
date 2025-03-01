@@ -4,12 +4,15 @@ version = "0.1.1"
 description = "Abstraction layer for Living Standards Measurement Survey data"
 authors = [
     {name = "Ethan Ligon", email = "ligon@berkeley.edu"}
-]
+    ]
+license = {text = "CC-BY-4.0"}
 readme = "README.org"
 requires-python = ">=3.9"
 dependencies = [
 ]
 
+[project-urls]
+repository = "https://github.com/ligon/LSMS_Library"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
