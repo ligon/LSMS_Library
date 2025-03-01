@@ -2,5 +2,4 @@ outs:
 - md5: 4e8e72d43465a7fce616c25e67f6e8bc
   size: 402860
   path: community_all.dta
-  md5-dos2unix: 4e8e72d43465a7fce616c25e67f6e8bc
   hash: md5

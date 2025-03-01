@@ -2,5 +2,4 @@ outs:
 - md5: f31a438bf16a896f3bfb643f4f0a4579
   size: 59045
   path: s13a_1_me_sen2018.dta
-  md5-dos2unix: f31a438bf16a896f3bfb643f4f0a4579
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: 86b43932b2ae2d4491b831b86dec89a9
   size: 4334
   path: Ponderation_Poverty_31_05_2013.dta
-  md5-dos2unix: 86b43932b2ae2d4491b831b86dec89a9
   hash: md5

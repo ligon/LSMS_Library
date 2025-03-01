@@ -2,5 +2,4 @@ outs:
 - md5: bf4e14eec998169ad8aaa827cc8a613b
   size: 4627
   path: U_AGRICULTURE_2.dta
-  md5-dos2unix: bf4e14eec998169ad8aaa827cc8a613b
   hash: md5

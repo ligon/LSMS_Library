@@ -2,5 +2,4 @@ outs:
 - md5: 4e28e59ae9b970878f64b37310f7a852
   size: 14194880
   path: 03social.dta
-  md5-dos2unix: 4e28e59ae9b970878f64b37310f7a852
   hash: md5

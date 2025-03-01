@@ -2,5 +2,4 @@ outs:
 - md5: 8b840d020937ba89d0a9c1ff085dddee
   size: 818131
   path: M2_C.DTA
-  md5-dos2unix: 8b840d020937ba89d0a9c1ff085dddee
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: 764a9e7d2e1a6c8bc5a5383b8fe0c5fd
   size: 152
   path: F5G2.VAR
-  md5-dos2unix: 764a9e7d2e1a6c8bc5a5383b8fe0c5fd
   hash: md5

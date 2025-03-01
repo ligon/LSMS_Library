@@ -1,5 +1,4 @@
 outs:
 - md5: 227f48d1ccc3c89cb6c019260a13890a
   path: Y15C.DAT
-  md5-dos2unix: 227f48d1ccc3c89cb6c019260a13890a
   hash: md5

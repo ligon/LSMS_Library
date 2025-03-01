@@ -2,5 +2,4 @@ outs:
 - md5: 837c46c95938e818dd050319f59cd184
   size: 770658
   path: SEC3B.DTA
-  md5-dos2unix: 837c46c95938e818dd050319f59cd184
   hash: md5

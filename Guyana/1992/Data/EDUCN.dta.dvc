@@ -2,5 +2,4 @@ outs:
 - md5: feeb81c2d8283d69d05e7e0af229934d
   size: 498658
   path: EDUCN.dta
-  md5-dos2unix: feeb81c2d8283d69d05e7e0af229934d
   hash: md5

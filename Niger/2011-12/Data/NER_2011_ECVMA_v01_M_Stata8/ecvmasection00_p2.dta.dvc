@@ -2,5 +2,4 @@ outs:
 - md5: 66e49403fef1a1cdc83262710059f91f
   size: 258465
   path: ecvmasection00_p2.dta
-  md5-dos2unix: 66e49403fef1a1cdc83262710059f91f
   hash: md5

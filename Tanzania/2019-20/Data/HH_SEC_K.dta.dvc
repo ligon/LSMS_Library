@@ -2,5 +2,4 @@ outs:
 - md5: 47b0dffe04cd8608742fccaaf9c6b65c
   size: 1449070
   path: HH_SEC_K.dta
-  md5-dos2unix: 47b0dffe04cd8608742fccaaf9c6b65c
   hash: md5

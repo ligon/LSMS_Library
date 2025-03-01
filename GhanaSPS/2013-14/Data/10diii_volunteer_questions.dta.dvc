@@ -2,5 +2,4 @@ outs:
 - md5: 534842e0e0ce896e4a74316fe089547f
   size: 2957726
   path: 10diii_volunteer_questions.dta
-  md5-dos2unix: 534842e0e0ce896e4a74316fe089547f
   hash: md5

@@ -1,5 +1,4 @@
 outs:
 - md5: 81f713dddd58a695d8b4e9e0906c8956
   path: CSEC3K_1.dta
-  md5-dos2unix: 81f713dddd58a695d8b4e9e0906c8956
   hash: md5

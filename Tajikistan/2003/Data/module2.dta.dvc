@@ -2,5 +2,4 @@ outs:
 - md5: ecd19b3e7a9ba78804d62c8e95ec3a4b
   size: 1959264
   path: module2.dta
-  md5-dos2unix: ecd19b3e7a9ba78804d62c8e95ec3a4b
   hash: md5

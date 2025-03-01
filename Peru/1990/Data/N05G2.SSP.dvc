@@ -2,5 +2,4 @@ outs:
 - md5: 10b8e11fe8986622e93b6097345e16f4
   size: 13200
   path: N05G2.SSP
-  md5-dos2unix: 10b8e11fe8986622e93b6097345e16f4
   hash: md5

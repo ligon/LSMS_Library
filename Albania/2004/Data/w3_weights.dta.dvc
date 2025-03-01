@@ -2,5 +2,4 @@ outs:
 - md5: 9975e5fcb85f622b98abc8d38cef7a33
   size: 383502
   path: w3_weights.dta
-  md5-dos2unix: 9975e5fcb85f622b98abc8d38cef7a33
   hash: md5

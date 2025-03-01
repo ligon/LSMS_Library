@@ -2,5 +2,4 @@ outs:
 - md5: 99de766f3cab68df80e83baf1d94e226
   size: 248975
   path: h_provider.dta
-  md5-dos2unix: 99de766f3cab68df80e83baf1d94e226
   hash: md5

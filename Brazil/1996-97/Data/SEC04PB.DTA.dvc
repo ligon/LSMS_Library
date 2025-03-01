@@ -2,5 +2,4 @@ outs:
 - md5: a6185e2fac93a09bebf82f18ccfd9f8a
   size: 883288
   path: SEC04PB.DTA
-  md5-dos2unix: a6185e2fac93a09bebf82f18ccfd9f8a
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: fa70b98c8a3e375004c7d75f5d3dae38
   size: 292628
   path: ns_m4_animals-r2_1-8.dta
-  md5-dos2unix: fa70b98c8a3e375004c7d75f5d3dae38
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: 5de7a9b5cc83d99018faa0d17ece1e30
   size: 874875
   path: 00_GHA_BASICINFO.dta
-  md5-dos2unix: 5de7a9b5cc83d99018faa0d17ece1e30
   hash: md5

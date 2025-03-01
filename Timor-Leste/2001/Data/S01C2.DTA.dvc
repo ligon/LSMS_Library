@@ -2,5 +2,4 @@ outs:
 - md5: cec957712fb4af7c0091ff88c06f36f0
   size: 36967
   path: S01C2.DTA
-  md5-dos2unix: cec957712fb4af7c0091ff88c06f36f0
   hash: md5

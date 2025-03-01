@@ -2,5 +2,4 @@ outs:
 - md5: d73ae15839c5dcc5e6d9379c8ea8b3b9
   size: 110459
   path: INVENTRY.dta
-  md5-dos2unix: d73ae15839c5dcc5e6d9379c8ea8b3b9
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: cc91f3e92a56717c6c740be5c5d28a11
   size: 6541803
   path: bookdaily_cl.dta
-  md5-dos2unix: cc91f3e92a56717c6c740be5c5d28a11
   hash: md5

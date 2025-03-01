@@ -2,5 +2,4 @@ outs:
 - md5: 47a61bf65f9fe2e956c48586f98f097f
   size: 167612
   path: M4_TRAN.dta
-  md5-dos2unix: 47a61bf65f9fe2e956c48586f98f097f
   hash: md5

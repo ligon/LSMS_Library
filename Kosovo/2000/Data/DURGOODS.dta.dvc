@@ -2,5 +2,4 @@ outs:
 - md5: 0e9adea28553f5949ec3b0bcbde377e2
   size: 849403
   path: DURGOODS.dta
-  md5-dos2unix: 0e9adea28553f5949ec3b0bcbde377e2
   hash: md5

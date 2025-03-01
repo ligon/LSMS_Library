@@ -2,5 +2,4 @@ outs:
 - md5: 2bad4495d4084b73daf27999b558cb33
   size: 66731
   path: S1EIII0.dta
-  md5-dos2unix: 2bad4495d4084b73daf27999b558cb33
   hash: md5

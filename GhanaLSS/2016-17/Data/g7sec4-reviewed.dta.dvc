@@ -1,5 +1,4 @@
 outs:
 - md5: df61c53c5d2bb774f69bd514a9b4ed29
   path: g7sec4-reviewed.dta
-  md5-dos2unix: df61c53c5d2bb774f69bd514a9b4ed29
   hash: md5

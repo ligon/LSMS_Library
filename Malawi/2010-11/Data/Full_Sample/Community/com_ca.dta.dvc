@@ -2,5 +2,4 @@ outs:
 - md5: e1fe530cc14a8b8701b12eb4d5ed51a7
   size: 34844
   path: com_ca.dta
-  md5-dos2unix: e1fe530cc14a8b8701b12eb4d5ed51a7
   hash: md5

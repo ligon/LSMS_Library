@@ -2,5 +2,4 @@ outs:
 - md5: de3298ab4cbc6a8705054a49fbd02752
   size: 12617417
   path: Core individual.dta
-  md5-dos2unix: de3298ab4cbc6a8705054a49fbd02752
   hash: md5

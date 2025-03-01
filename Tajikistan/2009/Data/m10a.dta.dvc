@@ -2,5 +2,4 @@ outs:
 - md5: e683498ffa90d9a25eb35d268c31f327
   size: 674731
   path: m10a.dta
-  md5-dos2unix: e683498ffa90d9a25eb35d268c31f327
   hash: md5

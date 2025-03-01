@@ -1,5 +1,4 @@
 outs:
 - md5: c0325636f94c3318447717d48873ef4e
   path: Comm_Sect5B.sav
-  md5-dos2unix: c0325636f94c3318447717d48873ef4e
   hash: md5

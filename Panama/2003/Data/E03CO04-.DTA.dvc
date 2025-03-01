@@ -2,5 +2,4 @@ outs:
 - md5: b4dc641abace8e90ab1210a1f8306803
   size: 63789
   path: E03CO04-.DTA
-  md5-dos2unix: b4dc641abace8e90ab1210a1f8306803
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: 4b8ccac4047e657cfd49a2501d732748
   size: 15686
   path: ag_equipment.dta
-  md5-dos2unix: 4b8ccac4047e657cfd49a2501d732748
   hash: md5

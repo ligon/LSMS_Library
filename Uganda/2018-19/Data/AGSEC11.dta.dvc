@@ -2,5 +2,4 @@ outs:
 - md5: 0a7a2b21830a18393893e2744b737eaf
   size: 471739
   path: AGSEC11.dta
-  md5-dos2unix: 0a7a2b21830a18393893e2744b737eaf
   hash: md5

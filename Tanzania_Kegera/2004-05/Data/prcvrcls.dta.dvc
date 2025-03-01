@@ -2,5 +2,4 @@ outs:
 - md5: 85db219937ba7e88388d55405756dbaf
   size: 3657
   path: prcvrcls.dta
-  md5-dos2unix: 85db219937ba7e88388d55405756dbaf
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: c9f584506e0921a6d8b609836a88cdcf
   size: 33682
   path: 02b_nr_spouses_newroster.dta
-  md5-dos2unix: c9f584506e0921a6d8b609836a88cdcf
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: 0bf80a76574fc92b723f81b6327e2217
   size: 335443
   path: s07a1_me_sen2018.dta
-  md5-dos2unix: 0bf80a76574fc92b723f81b6327e2217
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: 1c34cab76509cf8694d83d8ac71741e9
   size: 3866633
   path: s16c_me_bfa2018.dta
-  md5-dos2unix: 1c34cab76509cf8694d83d8ac71741e9
   hash: md5

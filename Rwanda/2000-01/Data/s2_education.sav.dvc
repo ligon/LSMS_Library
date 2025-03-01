@@ -1,5 +1,4 @@
 outs:
 - md5: 797acb42a6c3d78550bdc8755d575372
   path: s2_education.sav
-  md5-dos2unix: 797acb42a6c3d78550bdc8755d575372
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: 7ac28acae7f5e85c9c46a45d3c8ffcc2
   size: 2134
   path: weights_psu.dta
-  md5-dos2unix: 7ac28acae7f5e85c9c46a45d3c8ffcc2
   hash: md5

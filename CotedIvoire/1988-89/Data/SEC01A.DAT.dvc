@@ -1,5 +1,4 @@
 outs:
 - md5: 8ace199b7fbe5384c47f891082d16783
   path: SEC01A.DAT
-  md5-dos2unix: 8ace199b7fbe5384c47f891082d16783
   hash: md5

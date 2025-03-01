@@ -2,5 +2,4 @@ outs:
 - md5: 4ef9f87c29b0a5d7d3a4b85276001ea6
   size: 6525423
   path: HHMember.dta
-  md5-dos2unix: 4ef9f87c29b0a5d7d3a4b85276001ea6
   hash: md5

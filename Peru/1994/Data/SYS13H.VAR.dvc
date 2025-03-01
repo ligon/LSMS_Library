@@ -2,5 +2,4 @@ outs:
 - md5: 2d7a3622ecb5402d2f5046268beda7e4
   size: 86
   path: SYS13H.VAR
-  md5-dos2unix: 2d7a3622ecb5402d2f5046268beda7e4
   hash: md5

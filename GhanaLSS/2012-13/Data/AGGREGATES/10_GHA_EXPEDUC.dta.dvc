@@ -2,5 +2,4 @@ outs:
 - md5: e9ced9468a167930a0825cbdf4878173
   size: 1091750
   path: 10_GHA_EXPEDUC.dta
-  md5-dos2unix: e9ced9468a167930a0825cbdf4878173
   hash: md5

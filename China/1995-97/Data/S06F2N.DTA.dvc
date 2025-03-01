@@ -2,5 +2,4 @@ outs:
 - md5: 264ccb9b55e207c443c9ed96a15e2688
   size: 165595
   path: S06F2N.DTA
-  md5-dos2unix: 264ccb9b55e207c443c9ed96a15e2688
   hash: md5

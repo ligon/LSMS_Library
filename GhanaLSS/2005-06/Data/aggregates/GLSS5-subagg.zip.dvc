@@ -2,5 +2,4 @@ outs:
 - md5: 86ca0100b07a2e8feff6b966c36aeaa4
   size: 821354
   path: GLSS5-subagg.zip
-  md5-dos2unix: 86ca0100b07a2e8feff6b966c36aeaa4
   hash: md5

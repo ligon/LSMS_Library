@@ -1,5 +1,4 @@
 outs:
 - md5: 26334b55eaedfeba7fd728eb57028776
   path: F08.DCT
-  md5-dos2unix: 26334b55eaedfeba7fd728eb57028776
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: da2a43b367afeec7ebc6c94dcf0fe263
   size: 1043807
   path: DEMO.DTA
-  md5-dos2unix: da2a43b367afeec7ebc6c94dcf0fe263
   hash: md5

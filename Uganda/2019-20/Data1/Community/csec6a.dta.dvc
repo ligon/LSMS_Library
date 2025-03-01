@@ -2,5 +2,4 @@ outs:
 - md5: 00c97ded6ae288161f573c0f710cd552
   size: 32129
   path: csec6a.dta
-  md5-dos2unix: 00c97ded6ae288161f573c0f710cd552
   hash: md5

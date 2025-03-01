@@ -1,5 +1,4 @@
 outs:
 - md5: 5784af4791e8e0285d588b16d76a0e85
   path: HEAD.DAT
-  md5-dos2unix: 5784af4791e8e0285d588b16d76a0e85
   hash: md5

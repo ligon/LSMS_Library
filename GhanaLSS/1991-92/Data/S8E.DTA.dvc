@@ -2,5 +2,4 @@ outs:
 - md5: 411ffda2925d8df981e2b6bb10e5a9df
   size: 296909
   path: S8E.DTA
-  md5-dos2unix: 411ffda2925d8df981e2b6bb10e5a9df
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: 894a36d22c0a1926f141538c1ff5c5fe
   size: 3555203
   path: ns_m4.dta
-  md5-dos2unix: 894a36d22c0a1926f141538c1ff5c5fe
   hash: md5

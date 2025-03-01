@@ -1,5 +1,4 @@
 outs:
 - md5: 088524b884e637c316ef4ddccaaf68c8
   path: Y17A.DAT
-  md5-dos2unix: 088524b884e637c316ef4ddccaaf68c8
   hash: md5

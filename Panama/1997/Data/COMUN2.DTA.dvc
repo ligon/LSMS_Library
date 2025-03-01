@@ -2,5 +2,4 @@ outs:
 - md5: 8f422d85c497696bb2bfc05a75718a4f
   size: 1352318
   path: COMUN2.DTA
-  md5-dos2unix: 8f422d85c497696bb2bfc05a75718a4f
   hash: md5

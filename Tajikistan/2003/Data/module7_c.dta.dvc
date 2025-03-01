@@ -2,5 +2,4 @@ outs:
 - md5: 6604ed56ff6c3b5edd4a46ab070be241
   size: 2218178
   path: module7_c.dta
-  md5-dos2unix: 6604ed56ff6c3b5edd4a46ab070be241
   hash: md5

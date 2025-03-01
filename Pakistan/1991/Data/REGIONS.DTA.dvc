@@ -2,5 +2,4 @@ outs:
 - md5: dd5a4b3d6ad82d803e09b9debec5618c
   size: 152700
   path: REGIONS.DTA
-  md5-dos2unix: dd5a4b3d6ad82d803e09b9debec5618c
   hash: md5

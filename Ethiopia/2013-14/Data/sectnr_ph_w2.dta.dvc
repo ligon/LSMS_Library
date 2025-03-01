@@ -2,5 +2,4 @@ outs:
 - md5: 4c172d8fb69b6ff306cf21cfac28c3a7
   size: 559143
   path: sectnr_ph_w2.dta
-  md5-dos2unix: 4c172d8fb69b6ff306cf21cfac28c3a7
   hash: md5

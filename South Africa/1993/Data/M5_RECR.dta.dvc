@@ -2,5 +2,4 @@ outs:
 - md5: 2f60bdaf574e7dd0e28bf5b5f4bccc93
   size: 107846
   path: M5_RECR.dta
-  md5-dos2unix: 2f60bdaf574e7dd0e28bf5b5f4bccc93
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: 8671faa2563ecb6d9c89ba51fe3ecd58
   size: 2115160
   path: SSEC8.DTA
-  md5-dos2unix: 8671faa2563ecb6d9c89ba51fe3ecd58
   hash: md5

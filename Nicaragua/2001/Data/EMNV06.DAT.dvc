@@ -2,5 +2,4 @@ outs:
 - md5: ae0af926531946ba698e29a4eab94ca3
   size: 382412
   path: EMNV06.DAT
-  md5-dos2unix: ae0af926531946ba698e29a4eab94ca3
   hash: md5

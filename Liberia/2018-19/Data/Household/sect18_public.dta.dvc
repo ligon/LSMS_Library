@@ -2,5 +2,4 @@ outs:
 - md5: f3ca420a408a744bd60642c8ae195feb
   size: 517687
   path: sect18_public.dta
-  md5-dos2unix: f3ca420a408a744bd60642c8ae195feb
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: c6e7e6c60b5a72b168c05ceb0548ed3e
   size: 85
   path: F13E.VAR
-  md5-dos2unix: c6e7e6c60b5a72b168c05ceb0548ed3e
   hash: md5

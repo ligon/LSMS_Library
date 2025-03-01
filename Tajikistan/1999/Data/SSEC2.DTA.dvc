@@ -2,5 +2,4 @@ outs:
 - md5: 2e9e8bab402fd830e3c4f522b0b2b067
   size: 534355
   path: SSEC2.DTA
-  md5-dos2unix: 2e9e8bab402fd830e3c4f522b0b2b067
   hash: md5

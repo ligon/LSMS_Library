@@ -2,5 +2,4 @@ outs:
 - md5: d33a011f717a7ed3aa465a4c1f7b42a0
   size: 25678
   path: EACITRE_p1.dta
-  md5-dos2unix: d33a011f717a7ed3aa465a4c1f7b42a0
   hash: md5

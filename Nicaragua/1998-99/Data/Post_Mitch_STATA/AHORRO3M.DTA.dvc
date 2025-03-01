@@ -2,5 +2,4 @@ outs:
 - md5: 69e66b26ee93a6d70d468d2a99367556
   size: 4559
   path: AHORRO3M.DTA
-  md5-dos2unix: 69e66b26ee93a6d70d468d2a99367556
   hash: md5

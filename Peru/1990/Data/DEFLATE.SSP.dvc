@@ -2,5 +2,4 @@ outs:
 - md5: 51c4b1358de989b0ec9f21c24fb0b933
   size: 112240
   path: DEFLATE.SSP
-  md5-dos2unix: 51c4b1358de989b0ec9f21c24fb0b933
   hash: md5

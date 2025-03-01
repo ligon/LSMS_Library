@@ -1,5 +1,4 @@
 outs:
 - md5: 492b43914f6a8007c814834542f175dd
   path: F02B.DAT
-  md5-dos2unix: 492b43914f6a8007c814834542f175dd
   hash: md5

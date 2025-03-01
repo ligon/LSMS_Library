@@ -1,5 +1,4 @@
 outs:
 - md5: 5ee3035ce451f7b37e53367efb1665ff
   path: g7sec10d_1II AND 2II.dta
-  md5-dos2unix: 5ee3035ce451f7b37e53367efb1665ff
   hash: md5

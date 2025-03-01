@@ -2,5 +2,4 @@ outs:
 - md5: 6691ba64c847da4419ffcbe386d0a369
   size: 776520
   path: durables_cl.dta
-  md5-dos2unix: 6691ba64c847da4419ffcbe386d0a369
   hash: md5

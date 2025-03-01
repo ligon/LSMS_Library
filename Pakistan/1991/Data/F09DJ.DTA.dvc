@@ -2,5 +2,4 @@ outs:
 - md5: 75500a1ed79b682031c50304f7e30880
   size: 14324
   path: F09DJ.DTA
-  md5-dos2unix: 75500a1ed79b682031c50304f7e30880
   hash: md5

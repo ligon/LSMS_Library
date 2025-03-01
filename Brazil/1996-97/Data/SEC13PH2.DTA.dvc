@@ -2,5 +2,4 @@ outs:
 - md5: c4cac317818695e3b6e0e7a420760a7a
   size: 67970
   path: SEC13PH2.DTA
-  md5-dos2unix: c4cac317818695e3b6e0e7a420760a7a
   hash: md5

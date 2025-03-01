@@ -2,5 +2,4 @@ outs:
 - md5: fbb9d5f8b7beb5e553b71cf1e4965ceb
   size: 926280
   path: M8_EMPS.dta
-  md5-dos2unix: fbb9d5f8b7beb5e553b71cf1e4965ceb
   hash: md5

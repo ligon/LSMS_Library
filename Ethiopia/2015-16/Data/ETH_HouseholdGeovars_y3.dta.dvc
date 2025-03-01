@@ -2,5 +2,4 @@ outs:
 - md5: 3431c0bce4d93ad08d25258614668bc8
   size: 664690
   path: ETH_HouseholdGeovars_y3.dta
-  md5-dos2unix: 3431c0bce4d93ad08d25258614668bc8
   hash: md5

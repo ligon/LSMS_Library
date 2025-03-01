@@ -1,5 +1,4 @@
 outs:
 - md5: 463f1d591c6537d8bf2e0d94f2b4ec0f
   path: GSEC17C.dta
-  md5-dos2unix: 463f1d591c6537d8bf2e0d94f2b4ec0f
   hash: md5

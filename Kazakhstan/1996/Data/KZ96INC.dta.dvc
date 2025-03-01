@@ -2,5 +2,4 @@ outs:
 - md5: 22f714006ac591a02c4901be3f909f02
   size: 263871
   path: KZ96INC.dta
-  md5-dos2unix: 22f714006ac591a02c4901be3f909f02
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: 23f28ee40c9198e2485933d00b4bcae7
   size: 401078
   path: LF_SEC_06.dta
-  md5-dos2unix: 23f28ee40c9198e2485933d00b4bcae7
   hash: md5

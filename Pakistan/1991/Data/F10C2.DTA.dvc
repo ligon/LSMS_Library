@@ -2,5 +2,4 @@ outs:
 - md5: c276c3fa155babceb5ab177d5c06186a
   size: 30894
   path: F10C2.DTA
-  md5-dos2unix: c276c3fa155babceb5ab177d5c06186a
   hash: md5

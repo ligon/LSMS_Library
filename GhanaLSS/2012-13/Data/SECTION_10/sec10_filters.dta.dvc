@@ -2,5 +2,4 @@ outs:
 - md5: 183cc8a35509f2ad2c4416a5e541313a
   size: 216982
   path: sec10_filters.dta
-  md5-dos2unix: 183cc8a35509f2ad2c4416a5e541313a
   hash: md5

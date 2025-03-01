@@ -2,5 +2,4 @@ outs:
 - md5: 0ba1192567799dd000ebc0a57be70139
   size: 14408
   path: N13D2.DTA
-  md5-dos2unix: 0ba1192567799dd000ebc0a57be70139
   hash: md5

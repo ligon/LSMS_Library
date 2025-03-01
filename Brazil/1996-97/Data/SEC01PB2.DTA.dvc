@@ -2,5 +2,4 @@ outs:
 - md5: 1e7a1c777678905caf880967d2d037a5
   size: 1823682
   path: SEC01PB2.DTA
-  md5-dos2unix: 1e7a1c777678905caf880967d2d037a5
   hash: md5

@@ -1,5 +1,4 @@
 outs:
 - md5: dcf7f87fb3cdf1ea2969489a0ea69f30
   path: F13C.DAT
-  md5-dos2unix: dcf7f87fb3cdf1ea2969489a0ea69f30
   hash: md5

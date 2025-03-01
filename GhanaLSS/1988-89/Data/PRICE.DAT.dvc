@@ -1,5 +1,4 @@
 outs:
 - md5: 17e7bee240b12ab805812168846cf97e
   path: PRICE.DAT
-  md5-dos2unix: 17e7bee240b12ab805812168846cf97e
   hash: md5

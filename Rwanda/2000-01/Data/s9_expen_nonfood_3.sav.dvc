@@ -1,5 +1,4 @@
 outs:
 - md5: f7762e3c09b407de1073f08384826b33
   path: s9_expen_nonfood_3.sav
-  md5-dos2unix: f7762e3c09b407de1073f08384826b33
   hash: md5

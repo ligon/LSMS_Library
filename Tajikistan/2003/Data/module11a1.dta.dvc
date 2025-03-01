@@ -2,5 +2,4 @@ outs:
 - md5: dbd15192c1cb00102b107b1cd729a615
   size: 229018
   path: module11a1.dta
-  md5-dos2unix: dbd15192c1cb00102b107b1cd729a615
   hash: md5

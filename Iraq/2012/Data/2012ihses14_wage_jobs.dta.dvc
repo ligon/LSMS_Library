@@ -2,5 +2,4 @@ outs:
 - md5: 79b9cd4a62d44e3ad5d3787204d4facb
   size: 4283046
   path: 2012ihses14_wage_jobs.dta
-  md5-dos2unix: 79b9cd4a62d44e3ad5d3787204d4facb
   hash: md5

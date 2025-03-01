@@ -2,5 +2,4 @@ outs:
 - md5: e1701b815bbce4b4685ccc7f49af4c1d
   size: 985665
   path: HH_SEC_G.dta
-  md5-dos2unix: e1701b815bbce4b4685ccc7f49af4c1d
   hash: md5

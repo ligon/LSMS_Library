@@ -2,5 +2,4 @@ outs:
 - md5: 66bfbbd1e3c45168ac997db2026ec996
   size: 7555
   path: fs_mod_e2.dta
-  md5-dos2unix: 66bfbbd1e3c45168ac997db2026ec996
   hash: md5

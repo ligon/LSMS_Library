@@ -2,5 +2,4 @@ outs:
 - md5: 50f23ffcb946edbf105f45d31caf54be
   size: 31964
   path: csec4a.dta
-  md5-dos2unix: 50f23ffcb946edbf105f45d31caf54be
   hash: md5

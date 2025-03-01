@@ -1,5 +1,4 @@
 outs:
 - md5: 50ee6602f72ad88adee336f8896e03b3
   path: 15_GHA_2017_E_final.dta
-  md5-dos2unix: 50ee6602f72ad88adee336f8896e03b3
   hash: md5

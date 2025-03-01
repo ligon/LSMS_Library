@@ -1,5 +1,4 @@
 outs:
 - md5: 4a6f0481ed2dc547bffb07161d46904c
   path: COMM.DAT
-  md5-dos2unix: 4a6f0481ed2dc547bffb07161d46904c
   hash: md5

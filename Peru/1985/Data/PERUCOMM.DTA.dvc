@@ -2,5 +2,4 @@ outs:
 - md5: fc32e70da5498dc836e22fd977513931
   size: 1443404
   path: PERUCOMM.DTA
-  md5-dos2unix: fc32e70da5498dc836e22fd977513931
   hash: md5

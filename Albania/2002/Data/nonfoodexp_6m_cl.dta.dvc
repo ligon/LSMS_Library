@@ -2,5 +2,4 @@ outs:
 - md5: 878dabdac3a144bffdc2e8144bda2b7d
   size: 2269615
   path: nonfoodexp_6m_cl.dta
-  md5-dos2unix: 878dabdac3a144bffdc2e8144bda2b7d
   hash: md5

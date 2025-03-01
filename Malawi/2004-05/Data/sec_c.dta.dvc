@@ -2,5 +2,4 @@ outs:
 - md5: b21c0b5b6c81c25d5117cd7c93af58d5
   size: 14932969
   path: sec_c.dta
-  md5-dos2unix: b21c0b5b6c81c25d5117cd7c93af58d5
   hash: md5

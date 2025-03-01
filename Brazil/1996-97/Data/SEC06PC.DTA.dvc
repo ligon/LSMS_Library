@@ -2,5 +2,4 @@ outs:
 - md5: 9c3392628f12741f30942cc9348aa891
   size: 45318
   path: SEC06PC.DTA
-  md5-dos2unix: 9c3392628f12741f30942cc9348aa891
   hash: md5

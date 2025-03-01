@@ -2,5 +2,4 @@ outs:
 - md5: 02b8760ff00a335e5cb387f8a06c9365
   size: 402160
   path: PR_E15.DTA
-  md5-dos2unix: 02b8760ff00a335e5cb387f8a06c9365
   hash: md5

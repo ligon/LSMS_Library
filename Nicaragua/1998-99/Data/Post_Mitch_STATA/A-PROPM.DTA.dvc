@@ -2,5 +2,4 @@ outs:
 - md5: b9247e86856c2346a683286bad1a99c9
   size: 11022
   path: A-PROPM.DTA
-  md5-dos2unix: b9247e86856c2346a683286bad1a99c9
   hash: md5

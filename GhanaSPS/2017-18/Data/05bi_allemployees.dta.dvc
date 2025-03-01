@@ -2,5 +2,4 @@ outs:
 - md5: 2116a934565135388094513055afd97b
   size: 152607
   path: 05bi_allemployees.dta
-  md5-dos2unix: 2116a934565135388094513055afd97b
   hash: md5

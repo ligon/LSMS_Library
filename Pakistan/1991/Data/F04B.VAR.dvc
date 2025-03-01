@@ -2,5 +2,4 @@ outs:
 - md5: 052d6b59273c72c374133e345f396c14
   size: 306
   path: F04B.VAR
-  md5-dos2unix: 052d6b59273c72c374133e345f396c14
   hash: md5

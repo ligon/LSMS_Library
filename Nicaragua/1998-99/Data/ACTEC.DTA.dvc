@@ -2,5 +2,4 @@ outs:
 - md5: 71947b3b5f41abbb773b9296adb42e93
   size: 3049622
   path: ACTEC.DTA
-  md5-dos2unix: 71947b3b5f41abbb773b9296adb42e93
   hash: md5

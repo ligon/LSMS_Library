@@ -2,5 +2,4 @@ outs:
 - md5: f6cf51d402f7e7318276d3b1d2fc8868
   size: 420366
   path: labourA_cl.dta
-  md5-dos2unix: f6cf51d402f7e7318276d3b1d2fc8868
   hash: md5

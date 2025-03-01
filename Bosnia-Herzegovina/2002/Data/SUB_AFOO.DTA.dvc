@@ -2,5 +2,4 @@ outs:
 - md5: 0632d68fc0fe1ca54249918bd4db2507
   size: 9774375
   path: SUB_AFOO.DTA
-  md5-dos2unix: 0632d68fc0fe1ca54249918bd4db2507
   hash: md5

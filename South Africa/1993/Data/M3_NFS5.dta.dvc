@@ -2,5 +2,4 @@ outs:
 - md5: ee2028329f2cfa366ca56afbce11ba97
   size: 125793
   path: M3_NFS5.dta
-  md5-dos2unix: ee2028329f2cfa366ca56afbce11ba97
   hash: md5

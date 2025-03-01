@@ -2,5 +2,4 @@ outs:
 - md5: cd74206ff2942c162acb0c99381d0c71
   size: 201120
   path: social_capital_cl.dta
-  md5-dos2unix: cd74206ff2942c162acb0c99381d0c71
   hash: md5

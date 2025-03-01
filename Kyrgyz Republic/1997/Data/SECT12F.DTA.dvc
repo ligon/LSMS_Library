@@ -2,5 +2,4 @@ outs:
 - md5: 0b858a63b22f5b4c1188d8fb6f929ed4
   size: 39561
   path: SECT12F.DTA
-  md5-dos2unix: 0b858a63b22f5b4c1188d8fb6f929ed4
   hash: md5

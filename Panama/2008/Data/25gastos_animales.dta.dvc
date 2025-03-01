@@ -2,5 +2,4 @@ outs:
 - md5: 852453a309e30cddbc52b0f2e278eeb6
   size: 1055991
   path: 25gastos_animales.dta
-  md5-dos2unix: 852453a309e30cddbc52b0f2e278eeb6
   hash: md5

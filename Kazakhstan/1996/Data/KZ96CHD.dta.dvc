@@ -2,5 +2,4 @@ outs:
 - md5: 90a095999bef4d1a4eef9d74f583659e
   size: 415126
   path: KZ96CHD.dta
-  md5-dos2unix: 90a095999bef4d1a4eef9d74f583659e
   hash: md5

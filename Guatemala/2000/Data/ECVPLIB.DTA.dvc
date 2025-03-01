@@ -2,5 +2,4 @@ outs:
 - md5: 35cdfa54b2facbabae39988cf5eb0635
   size: 1783364
   path: ECVPLIB.DTA
-  md5-dos2unix: 35cdfa54b2facbabae39988cf5eb0635
   hash: md5

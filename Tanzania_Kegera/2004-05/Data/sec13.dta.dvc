@@ -2,5 +2,4 @@ outs:
 - md5: f851dd9a1d531514061163b1acba4699
   size: 256578
   path: sec13.dta
-  md5-dos2unix: f851dd9a1d531514061163b1acba4699
   hash: md5

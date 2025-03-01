@@ -2,5 +2,4 @@ outs:
 - md5: 7b00669174bb8faf4e70a8c565853e46
   size: 1269717
   path: anthro.dta
-  md5-dos2unix: 7b00669174bb8faf4e70a8c565853e46
   hash: md5

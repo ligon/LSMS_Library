@@ -2,5 +2,4 @@ outs:
 - md5: 83ab518a8109336a42f2f3153265fdd3
   size: 35722853
   path: m5_2_ne_hrana.dta
-  md5-dos2unix: 83ab518a8109336a42f2f3153265fdd3
   hash: md5

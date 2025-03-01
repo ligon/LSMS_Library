@@ -2,5 +2,4 @@ outs:
 - md5: 12a956d15659325baed0becdceca0f85
   size: 31748
   path: grappe_gps_gnb2018.dta
-  md5-dos2unix: 12a956d15659325baed0becdceca0f85
   hash: md5

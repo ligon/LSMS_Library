@@ -2,5 +2,4 @@ outs:
 - md5: fbb816035455527e68c68d719ed9cf2c
   size: 399386
   path: CFPRI03.dta
-  md5-dos2unix: fbb816035455527e68c68d719ed9cf2c
   hash: md5

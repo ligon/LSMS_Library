@@ -2,5 +2,4 @@ outs:
 - md5: 43fbb4c274210bad51cc86dec2af6b57
   size: 285
   path: REGIONS.TXT
-  md5-dos2unix: 43fbb4c274210bad51cc86dec2af6b57
   hash: md5

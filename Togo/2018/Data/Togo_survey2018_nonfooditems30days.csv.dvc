@@ -2,5 +2,4 @@ outs:
 - md5: 2158eaf455ed80549c52cc7b86b43773
   size: 1551901
   path: Togo_survey2018_nonfooditems30days.csv
-  md5-dos2unix: 2158eaf455ed80549c52cc7b86b43773
   hash: md5

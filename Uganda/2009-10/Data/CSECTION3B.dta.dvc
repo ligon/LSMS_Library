@@ -1,5 +1,4 @@
 outs:
 - md5: 47f66ec89c028fb5bc9661f48e699531
   path: CSECTION3B.dta
-  md5-dos2unix: 47f66ec89c028fb5bc9661f48e699531
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: 14f182fbc2f8963c2088daa33e9954e4
   size: 495016
   path: agr_f_cl.dta
-  md5-dos2unix: 14f182fbc2f8963c2088daa33e9954e4
   hash: md5

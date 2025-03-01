@@ -2,5 +2,4 @@ outs:
 - md5: a514b7c72cc026b2c330957bb80af97d
   size: 3452766
   path: 2012ihses13_jobs.dta
-  md5-dos2unix: a514b7c72cc026b2c330957bb80af97d
   hash: md5

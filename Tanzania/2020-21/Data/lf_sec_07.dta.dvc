@@ -2,5 +2,4 @@ outs:
 - md5: c37bc1360aa41484264ca30eeeb423f1
   size: 880328
   path: lf_sec_07.dta
-  md5-dos2unix: c37bc1360aa41484264ca30eeeb423f1
   hash: md5

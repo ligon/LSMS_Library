@@ -2,5 +2,4 @@ outs:
 - md5: 9462002f10814e4eee095baed90c68ac
   size: 130480
   path: N08B.SSP
-  md5-dos2unix: 9462002f10814e4eee095baed90c68ac
   hash: md5

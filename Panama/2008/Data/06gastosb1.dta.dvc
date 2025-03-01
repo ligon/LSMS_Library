@@ -2,5 +2,4 @@ outs:
 - md5: 2df7bd0fece6a697bd4175d82205c66d
   size: 5473136
   path: 06gastosb1.dta
-  md5-dos2unix: 2df7bd0fece6a697bd4175d82205c66d
   hash: md5

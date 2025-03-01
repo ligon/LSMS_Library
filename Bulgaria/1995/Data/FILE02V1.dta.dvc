@@ -2,5 +2,4 @@ outs:
 - md5: 460fedb510d4c40529c16501d1eb658e
   size: 126462
   path: FILE02V1.dta
-  md5-dos2unix: 460fedb510d4c40529c16501d1eb658e
   hash: md5

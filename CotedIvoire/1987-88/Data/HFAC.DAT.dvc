@@ -1,5 +1,4 @@
 outs:
 - md5: 2a988c7cc55d9b30fefb7829c4607fc6
   path: HFAC.DAT
-  md5-dos2unix: 2a988c7cc55d9b30fefb7829c4607fc6
   hash: md5

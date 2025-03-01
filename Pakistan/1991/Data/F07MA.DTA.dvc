@@ -2,5 +2,4 @@ outs:
 - md5: ea2f60ffe13c637ee795281ae18f44ce
   size: 115796
   path: F07MA.DTA
-  md5-dos2unix: ea2f60ffe13c637ee795281ae18f44ce
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: 590ee8ddb99fb12314142c3611e8d1e1
   size: 8893
   path: fs_mod_e2.dta
-  md5-dos2unix: 590ee8ddb99fb12314142c3611e8d1e1
   hash: md5

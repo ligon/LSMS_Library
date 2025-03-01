@@ -2,5 +2,4 @@ outs:
 - md5: 0657348317a4341258fef99a7748ccb4
   size: 856094
   path: Core household.dta
-  md5-dos2unix: 0657348317a4341258fef99a7748ccb4
   hash: md5

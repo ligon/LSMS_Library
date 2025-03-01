@@ -2,5 +2,4 @@ outs:
 - md5: 23844c810f06c42abaa280cfe3e9f143
   size: 1267241
   path: sect_cover_ph_w3.dta
-  md5-dos2unix: 23844c810f06c42abaa280cfe3e9f143
   hash: md5

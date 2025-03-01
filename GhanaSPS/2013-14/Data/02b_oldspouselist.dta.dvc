@@ -2,5 +2,4 @@ outs:
 - md5: 1cb61684340e23b31299a6340f96e4f8
   size: 21763
   path: 02b_oldspouselist.dta
-  md5-dos2unix: 1cb61684340e23b31299a6340f96e4f8
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: 96d76df4f3674129d76306dd297cb152
   size: 302750
   path: module4d.dta
-  md5-dos2unix: 96d76df4f3674129d76306dd297cb152
   hash: md5

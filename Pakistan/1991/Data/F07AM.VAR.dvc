@@ -2,5 +2,4 @@ outs:
 - md5: c3ddfa7ce6f5d61aeb8b27d5a7411925
   size: 158
   path: F07AM.VAR
-  md5-dos2unix: c3ddfa7ce6f5d61aeb8b27d5a7411925
   hash: md5

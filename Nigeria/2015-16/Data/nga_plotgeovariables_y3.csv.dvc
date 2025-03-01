@@ -2,5 +2,4 @@ outs:
 - md5: 6a6bc90b18f61b6559e345a34fe6949d
   size: 231401
   path: nga_plotgeovariables_y3.csv
-  md5-dos2unix: 6a6bc90b18f61b6559e345a34fe6949d
   hash: md5

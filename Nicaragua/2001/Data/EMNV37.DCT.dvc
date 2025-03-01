@@ -2,5 +2,4 @@ outs:
 - md5: 32612e61e9f4aadb15783757c155ecfe
   size: 500
   path: EMNV37.DCT
-  md5-dos2unix: 32612e61e9f4aadb15783757c155ecfe
   hash: md5

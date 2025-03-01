@@ -2,5 +2,4 @@ outs:
 - md5: 63989bb2f477bc9490a1ab4a75d0d5e7
   size: 86138
   path: KYGPOV.DTA
-  md5-dos2unix: 63989bb2f477bc9490a1ab4a75d0d5e7
   hash: md5

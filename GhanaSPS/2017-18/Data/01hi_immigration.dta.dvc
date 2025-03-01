@@ -2,5 +2,4 @@ outs:
 - md5: 9b06676b9018704f03ec36240e7073e4
   size: 3876811
   path: 01hi_immigration.dta
-  md5-dos2unix: 9b06676b9018704f03ec36240e7073e4
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: a0fcc266b2d86f762316860515e7ab9c
   size: 78375
   path: SECT_01C.DTA
-  md5-dos2unix: a0fcc266b2d86f762316860515e7ab9c
   hash: md5

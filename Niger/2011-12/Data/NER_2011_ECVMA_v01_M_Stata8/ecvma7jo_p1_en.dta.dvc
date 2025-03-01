@@ -2,5 +2,4 @@ outs:
 - md5: 6850d36249e8f0c1b51876e41a895f9b
   size: 1430895
   path: ecvma7jo_p1_en.dta
-  md5-dos2unix: 6850d36249e8f0c1b51876e41a895f9b
   hash: md5

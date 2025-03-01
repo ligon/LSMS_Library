@@ -2,5 +2,4 @@ outs:
 - md5: ff0564b086ed5941f0499640827ae644
   size: 1133104
   path: com_cj.dta
-  md5-dos2unix: ff0564b086ed5941f0499640827ae644
   hash: md5

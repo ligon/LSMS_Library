@@ -2,5 +2,4 @@ outs:
 - md5: e1083b26c41e1a4f6648ccb3dbbc026c
   size: 9334948
   path: 2012ihses02_migration.dta
-  md5-dos2unix: e1083b26c41e1a4f6648ccb3dbbc026c
   hash: md5

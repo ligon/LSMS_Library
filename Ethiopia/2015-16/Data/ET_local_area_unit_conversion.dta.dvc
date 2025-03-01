@@ -2,5 +2,4 @@ outs:
 - md5: f556b66e242e3c6d3f4584b686de2bcb
   size: 15573
   path: ET_local_area_unit_conversion.dta
-  md5-dos2unix: f556b66e242e3c6d3f4584b686de2bcb
   hash: md5

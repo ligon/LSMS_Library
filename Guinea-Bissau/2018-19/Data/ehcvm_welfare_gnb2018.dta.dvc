@@ -2,5 +2,4 @@ outs:
 - md5: a3646c72613625fa35258016b846a47a
   size: 550449
   path: ehcvm_welfare_gnb2018.dta
-  md5-dos2unix: a3646c72613625fa35258016b846a47a
   hash: md5

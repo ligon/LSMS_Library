@@ -2,5 +2,4 @@ outs:
 - md5: 92518253ca80c0139d6e03e2c32b271c
   size: 54939
   path: S09A4.DTA
-  md5-dos2unix: 92518253ca80c0139d6e03e2c32b271c
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: b0480c64c1ea108737af9ef8a9fc9416
   size: 81126
   path: M5_HEAL2.dta
-  md5-dos2unix: b0480c64c1ea108737af9ef8a9fc9416
   hash: md5

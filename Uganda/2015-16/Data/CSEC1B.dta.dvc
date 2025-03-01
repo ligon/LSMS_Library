@@ -1,5 +1,4 @@
 outs:
 - md5: 69dd0da834c17b696d1e94b97141b561
   path: CSEC1B.dta
-  md5-dos2unix: 69dd0da834c17b696d1e94b97141b561
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: 8b555ef42626846b3cda052876b2b07b
   size: 247307
   path: LivestockAggregate.dta
-  md5-dos2unix: 8b555ef42626846b3cda052876b2b07b
   hash: md5

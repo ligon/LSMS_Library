@@ -2,5 +2,4 @@ outs:
 - md5: 1cf7b1a4759e873a8ea4cc6d0a9f42f8
   size: 14125381
   path: 26equipos_agropecuarios.dta
-  md5-dos2unix: 1cf7b1a4759e873a8ea4cc6d0a9f42f8
   hash: md5

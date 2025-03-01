@@ -2,5 +2,4 @@ outs:
 - md5: 885b3a35f20c42e93a6ee19c0b07330e
   size: 17019
   path: CSEC6C_1.dta
-  md5-dos2unix: 885b3a35f20c42e93a6ee19c0b07330e
   hash: md5

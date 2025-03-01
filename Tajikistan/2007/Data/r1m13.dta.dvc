@@ -2,5 +2,4 @@ outs:
 - md5: 0a1dea22a492563d991fd40948250bfc
   size: 447130
   path: r1m13.dta
-  md5-dos2unix: 0a1dea22a492563d991fd40948250bfc
   hash: md5

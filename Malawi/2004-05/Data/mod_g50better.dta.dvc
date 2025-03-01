@@ -2,5 +2,4 @@ outs:
 - md5: 8e002c16be26054f4c0784844ad5beb3
   size: 36908
   path: mod_g50better.dta
-  md5-dos2unix: 8e002c16be26054f4c0784844ad5beb3
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: 2ec983bcbc01da5b65f964e64ef68125
   size: 1638787
   path: EACICOMALI1_p2.dta
-  md5-dos2unix: 2ec983bcbc01da5b65f964e64ef68125
   hash: md5

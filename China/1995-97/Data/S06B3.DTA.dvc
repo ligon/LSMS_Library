@@ -2,5 +2,4 @@ outs:
 - md5: fca188ce69de35763788fac8d57eec04
   size: 58760
   path: S06B3.DTA
-  md5-dos2unix: fca188ce69de35763788fac8d57eec04
   hash: md5

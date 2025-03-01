@@ -2,5 +2,4 @@ outs:
 - md5: efc60055bf266df594dfe9f66b6f4740
   size: 4360242
   path: S8H.DTA
-  md5-dos2unix: efc60055bf266df594dfe9f66b6f4740
   hash: md5

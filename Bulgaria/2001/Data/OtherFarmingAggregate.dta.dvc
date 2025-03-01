@@ -2,5 +2,4 @@ outs:
 - md5: f17f101b48a40607f7bf95bf9506b83f
   size: 90541
   path: OtherFarmingAggregate.dta
-  md5-dos2unix: f17f101b48a40607f7bf95bf9506b83f
   hash: md5

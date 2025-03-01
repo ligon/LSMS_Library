@@ -2,5 +2,4 @@ outs:
 - md5: a54e399f39d98642568e859a7c4b48ca
   size: 38494
   path: PublicPensionAggregate.dta
-  md5-dos2unix: a54e399f39d98642568e859a7c4b48ca
   hash: md5

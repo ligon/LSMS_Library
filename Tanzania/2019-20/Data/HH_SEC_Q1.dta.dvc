@@ -2,5 +2,4 @@ outs:
 - md5: 6e486e7127520f922d44fa6b636a8cf7
   size: 351070
   path: HH_SEC_Q1.dta
-  md5-dos2unix: 6e486e7127520f922d44fa6b636a8cf7
   hash: md5

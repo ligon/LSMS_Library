@@ -1,5 +1,4 @@
 outs:
 - md5: d16ab1a3b9e38b48a80d09e8ad2911ee
   path: INC_WAGE_PID.dta
-  md5-dos2unix: d16ab1a3b9e38b48a80d09e8ad2911ee
   hash: md5

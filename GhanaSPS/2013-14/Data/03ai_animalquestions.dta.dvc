@@ -2,5 +2,4 @@ outs:
 - md5: ae6edc7e40a36fc8f27f238e0b539d34
   size: 1823449
   path: 03ai_animalquestions.dta
-  md5-dos2unix: ae6edc7e40a36fc8f27f238e0b539d34
   hash: md5

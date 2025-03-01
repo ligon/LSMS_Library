@@ -2,5 +2,4 @@ outs:
 - md5: 1d3869766886a9ff0dab4e129a555dbc
   size: 246395
   path: CCPP9.DTA
-  md5-dos2unix: 1d3869766886a9ff0dab4e129a555dbc
   hash: md5

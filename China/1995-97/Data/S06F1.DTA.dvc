@@ -2,5 +2,4 @@ outs:
 - md5: 55c26038dc35e0e64f86153356662b1f
   size: 4743
   path: S06F1.DTA
-  md5-dos2unix: 55c26038dc35e0e64f86153356662b1f
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: ac90a7122c525d674b41d03a16b555a9
   size: 2477827
   path: ag_sec_3b.dta
-  md5-dos2unix: ac90a7122c525d674b41d03a16b555a9
   hash: md5

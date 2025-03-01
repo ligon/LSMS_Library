@@ -2,5 +2,4 @@ outs:
 - md5: e33cdbd3dcf8f2950e691a07308b4c25
   size: 32556
   path: FILE06V0.dta
-  md5-dos2unix: e33cdbd3dcf8f2950e691a07308b4c25
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: 3d3ac350fa03e20f617def95cba7c147
   size: 12636
   path: ihs_treeconversion_factor_2020.dta
-  md5-dos2unix: 3d3ac350fa03e20f617def95cba7c147
   hash: md5

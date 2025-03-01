@@ -1,5 +1,4 @@
 outs:
 - md5: fe6a2e24d99cf18c9b3d6032049ea8bf
   path: s8_farm_smallscale2.sav
-  md5-dos2unix: fe6a2e24d99cf18c9b3d6032049ea8bf
   hash: md5

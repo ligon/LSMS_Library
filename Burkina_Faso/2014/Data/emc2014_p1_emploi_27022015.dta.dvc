@@ -2,5 +2,4 @@ outs:
 - md5: 219072f123a813469dc12bb78e8c3a65
   size: 2965884
   path: emc2014_p1_emploi_27022015.dta
-  md5-dos2unix: 219072f123a813469dc12bb78e8c3a65
   hash: md5

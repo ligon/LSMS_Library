@@ -1,5 +1,4 @@
 outs:
 - md5: 6ca5678d5470bec911024ede96a43a5e
   path: CSEC3D.dta
-  md5-dos2unix: 6ca5678d5470bec911024ede96a43a5e
   hash: md5

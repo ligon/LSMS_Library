@@ -2,5 +2,4 @@ outs:
 - md5: 94a849395affbedfe243d335a202c0d8
   size: 227279
   path: S12AII.dta
-  md5-dos2unix: 94a849395affbedfe243d335a202c0d8
   hash: md5

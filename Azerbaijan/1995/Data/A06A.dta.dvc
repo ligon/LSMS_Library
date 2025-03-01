@@ -2,5 +2,4 @@ outs:
 - md5: 71fc59155a17fa295b53d1b3adc23999
   size: 106358
   path: A06A.dta
-  md5-dos2unix: 71fc59155a17fa295b53d1b3adc23999
   hash: md5

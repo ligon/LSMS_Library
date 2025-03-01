@@ -2,5 +2,4 @@ outs:
 - md5: 6ee8162fcc5af4ac9fce000eef43379f
   size: 9993749
   path: sect12_hh_w2.dta
-  md5-dos2unix: 6ee8162fcc5af4ac9fce000eef43379f
   hash: md5

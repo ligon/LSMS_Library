@@ -2,5 +2,4 @@ outs:
 - md5: 94ed0d9c36303fa9a29dae4a887b2401
   size: 100508
   path: ag_conv_w3.csv
-  md5-dos2unix: 94ed0d9c36303fa9a29dae4a887b2401
   hash: md5

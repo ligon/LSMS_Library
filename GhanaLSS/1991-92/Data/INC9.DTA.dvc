@@ -2,5 +2,4 @@ outs:
 - md5: 23f3313869221c6345bbae45e2298793
   size: 4485
   path: INC9.DTA
-  md5-dos2unix: 23f3313869221c6345bbae45e2298793
   hash: md5

@@ -1,5 +1,4 @@
 outs:
 - md5: cb5bf2e36beed31a4633670b38cbb416
   path: SEC05G2.DAT
-  md5-dos2unix: cb5bf2e36beed31a4633670b38cbb416
   hash: md5

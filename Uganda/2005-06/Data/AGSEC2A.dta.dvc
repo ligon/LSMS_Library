@@ -1,5 +1,4 @@
 outs:
 - md5: c61f1033b4c3bfb0f73287e5929b2c01
   path: AGSEC2A.dta
-  md5-dos2unix: c61f1033b4c3bfb0f73287e5929b2c01
   hash: md5

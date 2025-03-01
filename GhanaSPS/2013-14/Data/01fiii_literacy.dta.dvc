@@ -2,5 +2,4 @@ outs:
 - md5: a49c2bd9ca7c8dd42c9fe26345689c8b
   size: 5156225
   path: 01fiii_literacy.dta
-  md5-dos2unix: a49c2bd9ca7c8dd42c9fe26345689c8b
   hash: md5

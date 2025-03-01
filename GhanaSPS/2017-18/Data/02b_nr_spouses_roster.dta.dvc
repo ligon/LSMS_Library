@@ -2,5 +2,4 @@ outs:
 - md5: d90d7d089d2fa82d6d374d19685a7a5f
   size: 40187
   path: 02b_nr_spouses_roster.dta
-  md5-dos2unix: d90d7d089d2fa82d6d374d19685a7a5f
   hash: md5

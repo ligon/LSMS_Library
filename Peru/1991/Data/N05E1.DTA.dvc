@@ -2,5 +2,4 @@ outs:
 - md5: 7eed2704fb1090b357356af2deed15cd
   size: 405200
   path: N05E1.DTA
-  md5-dos2unix: 7eed2704fb1090b357356af2deed15cd
   hash: md5

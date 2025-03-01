@@ -2,5 +2,4 @@ outs:
 - md5: 5fadda05a520814e3dd86480205bb76b
   size: 149745
   path: mop_7_labor_actvity.dta
-  md5-dos2unix: 5fadda05a520814e3dd86480205bb76b
   hash: md5

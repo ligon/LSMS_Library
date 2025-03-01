@@ -2,5 +2,4 @@ outs:
 - md5: e5df2c2111147b748d059066bbf50ccc
   size: 2826486
   path: HH_MOD_Q.dta
-  md5-dos2unix: e5df2c2111147b748d059066bbf50ccc
   hash: md5

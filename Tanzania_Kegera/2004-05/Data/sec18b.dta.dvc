@@ -2,5 +2,4 @@ outs:
 - md5: ef642bf9d8b2dd64f995d5e7bf1e4b6c
   size: 200962
   path: sec18b.dta
-  md5-dos2unix: ef642bf9d8b2dd64f995d5e7bf1e4b6c
   hash: md5

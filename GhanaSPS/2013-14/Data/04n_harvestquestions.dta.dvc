@@ -2,5 +2,4 @@ outs:
 - md5: 40afbd8b45ce69111b2d5b2d4ad8e5af
   size: 1948912
   path: 04n_harvestquestions.dta
-  md5-dos2unix: 40afbd8b45ce69111b2d5b2d4ad8e5af
   hash: md5

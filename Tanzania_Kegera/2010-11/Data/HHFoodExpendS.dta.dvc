@@ -2,5 +2,4 @@ outs:
 - md5: 82884f8182c201e292f135a219562563
   size: 2088763
   path: HHFoodExpendS.dta
-  md5-dos2unix: 82884f8182c201e292f135a219562563
   hash: md5

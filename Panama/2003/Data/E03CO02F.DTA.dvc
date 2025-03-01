@@ -2,5 +2,4 @@ outs:
 - md5: 3f50719c2f360128d2fa45c54c4eef40
   size: 243624
   path: E03CO02F.DTA
-  md5-dos2unix: 3f50719c2f360128d2fa45c54c4eef40
   hash: md5

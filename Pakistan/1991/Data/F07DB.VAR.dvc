@@ -2,5 +2,4 @@ outs:
 - md5: e04bc0856d3d7f8c495edc24f105b776
   size: 179
   path: F07DB.VAR
-  md5-dos2unix: e04bc0856d3d7f8c495edc24f105b776
   hash: md5

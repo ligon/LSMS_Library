@@ -2,5 +2,4 @@ outs:
 - md5: 81da9247b46d60c017b31b2700d8f2da
   size: 28156
   path: N11A.DTA
-  md5-dos2unix: 81da9247b46d60c017b31b2700d8f2da
   hash: md5

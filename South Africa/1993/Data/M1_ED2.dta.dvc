@@ -2,5 +2,4 @@ outs:
 - md5: f838aacde91bf6bd76cfafa19605a555
   size: 205316
   path: M1_ED2.dta
-  md5-dos2unix: f838aacde91bf6bd76cfafa19605a555
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: fe0b12d0b8a9cc7c811610def1f7b52b
   size: 391307
   path: SEC8HID.DTA
-  md5-dos2unix: fe0b12d0b8a9cc7c811610def1f7b52b
   hash: md5

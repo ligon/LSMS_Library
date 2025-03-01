@@ -2,5 +2,4 @@ outs:
 - md5: 41837bcf3652fe8f6c0c4b5d9483dd81
   size: 215317
   path: GASTOSMB.DTA
-  md5-dos2unix: 41837bcf3652fe8f6c0c4b5d9483dd81
   hash: md5

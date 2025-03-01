@@ -2,5 +2,4 @@ outs:
 - md5: a5bbccbe572818cca8fd5cf1587d5466
   size: 41336
   path: ANTHRON.dta
-  md5-dos2unix: a5bbccbe572818cca8fd5cf1587d5466
   hash: md5

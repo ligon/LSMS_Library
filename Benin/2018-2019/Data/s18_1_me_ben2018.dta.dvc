@@ -2,5 +2,4 @@ outs:
 - md5: 44aceff42581501b934c802801532438
   size: 527785
   path: s18_1_me_ben2018.dta
-  md5-dos2unix: 44aceff42581501b934c802801532438
   hash: md5

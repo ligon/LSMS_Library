@@ -2,5 +2,4 @@ outs:
 - md5: abd33d06c25b1d9a9ebd3c1108d7e07f
   size: 2576
   path: sm8b.dta
-  md5-dos2unix: abd33d06c25b1d9a9ebd3c1108d7e07f
   hash: md5

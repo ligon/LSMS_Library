@@ -2,5 +2,4 @@ outs:
 - md5: a14405c85f0427c78e0e37a08c7ccb3f
   size: 95372
   path: A02B.dta
-  md5-dos2unix: a14405c85f0427c78e0e37a08c7ccb3f
   hash: md5

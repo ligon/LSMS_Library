@@ -2,5 +2,4 @@ outs:
 - md5: 5fb39ab38008189f5084c0bf1208e322
   size: 696412
   path: hh_core.dta
-  md5-dos2unix: 5fb39ab38008189f5084c0bf1208e322
   hash: md5

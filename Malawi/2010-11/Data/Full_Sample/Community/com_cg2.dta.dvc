@@ -2,5 +2,4 @@ outs:
 - md5: dd6cb7987130a653222a3eec0babb3c2
   size: 156430
   path: com_cg2.dta
-  md5-dos2unix: dd6cb7987130a653222a3eec0babb3c2
   hash: md5

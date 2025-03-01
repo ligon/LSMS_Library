@@ -2,5 +2,4 @@ outs:
 - md5: c1c9354cc8e3e4e3933dc9d342a20331
   size: 1568725
   path: SEC4F.DTA
-  md5-dos2unix: c1c9354cc8e3e4e3933dc9d342a20331
   hash: md5

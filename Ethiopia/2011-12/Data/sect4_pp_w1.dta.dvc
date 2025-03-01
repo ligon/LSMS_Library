@@ -2,5 +2,4 @@ outs:
 - md5: 7b5dfb6c20b6b8e1426f6b80ba052937
   size: 2881745
   path: sect4_pp_w1.dta
-  md5-dos2unix: 7b5dfb6c20b6b8e1426f6b80ba052937
   hash: md5

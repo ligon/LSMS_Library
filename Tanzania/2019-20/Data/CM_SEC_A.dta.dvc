@@ -2,5 +2,4 @@ outs:
 - md5: 0e82b7766705dd4f4c512794489af557
   size: 36275
   path: CM_SEC_A.dta
-  md5-dos2unix: 0e82b7766705dd4f4c512794489af557
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: db15ae793266a8b3bfb26891d743751a
   size: 719498
   path: EACIMEN_p1.dta
-  md5-dos2unix: db15ae793266a8b3bfb26891d743751a
   hash: md5

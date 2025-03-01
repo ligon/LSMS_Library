@@ -2,5 +2,4 @@ outs:
 - md5: d289aad256d33d91faecbe96cb7ed29d
   size: 66092
   path: F9M.DTA
-  md5-dos2unix: d289aad256d33d91faecbe96cb7ed29d
   hash: md5

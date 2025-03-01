@@ -2,5 +2,4 @@ outs:
 - md5: 49faaa0f636dd54ff5d2c063f6bc8a35
   size: 790679
   path: consumption_real_y4.dta
-  md5-dos2unix: 49faaa0f636dd54ff5d2c063f6bc8a35
   hash: md5

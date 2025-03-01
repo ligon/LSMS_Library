@@ -2,5 +2,4 @@ outs:
 - md5: 8ddd2e71ec92dcb8fe9d4862687e7959
   size: 1915155
   path: emc2014_p3_conso7nonalimjours_16032015.dta
-  md5-dos2unix: 8ddd2e71ec92dcb8fe9d4862687e7959
   hash: md5

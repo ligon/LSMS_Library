@@ -2,5 +2,4 @@ outs:
 - md5: cf6387ec328bc2220173edfae0be7c1c
   size: 61560
   path: S1GI0.dta
-  md5-dos2unix: cf6387ec328bc2220173edfae0be7c1c
   hash: md5

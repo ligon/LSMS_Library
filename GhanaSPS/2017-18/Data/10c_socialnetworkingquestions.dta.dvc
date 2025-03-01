@@ -2,5 +2,4 @@ outs:
 - md5: f22bdbdf3b870026d8417d040ee0cf92
   size: 8438949
   path: 10c_socialnetworkingquestions.dta
-  md5-dos2unix: f22bdbdf3b870026d8417d040ee0cf92
   hash: md5

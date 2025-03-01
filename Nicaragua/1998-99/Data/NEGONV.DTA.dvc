@@ -2,5 +2,4 @@ outs:
 - md5: 1b37d8bb6d6818118f2e3a271b361a28
   size: 1088780
   path: NEGONV.DTA
-  md5-dos2unix: 1b37d8bb6d6818118f2e3a271b361a28
   hash: md5

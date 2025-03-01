@@ -2,5 +2,4 @@ outs:
 - md5: ad8f306e96708049d9a604c34d57bd4b
   size: 467342
   path: r1m4b.dta
-  md5-dos2unix: ad8f306e96708049d9a604c34d57bd4b
   hash: md5

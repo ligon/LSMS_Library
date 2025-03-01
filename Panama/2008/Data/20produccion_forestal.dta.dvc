@@ -2,5 +2,4 @@ outs:
 - md5: 3121cbc35b5a349a4cc7c202b091b539
   size: 67145
   path: 20produccion_forestal.dta
-  md5-dos2unix: 3121cbc35b5a349a4cc7c202b091b539
   hash: md5

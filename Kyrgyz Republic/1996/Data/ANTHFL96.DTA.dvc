@@ -2,5 +2,4 @@ outs:
 - md5: da99bdc27f5752b07dbe7686adb1e155
   size: 121704
   path: ANTHFL96.DTA
-  md5-dos2unix: da99bdc27f5752b07dbe7686adb1e155
   hash: md5

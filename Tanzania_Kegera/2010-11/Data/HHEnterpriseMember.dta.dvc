@@ -2,5 +2,4 @@ outs:
 - md5: 1ef7be08cab7bbab018bd3c8787aed54
   size: 68318
   path: HHEnterpriseMember.dta
-  md5-dos2unix: 1ef7be08cab7bbab018bd3c8787aed54
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: e25088754a673b8d19b1ea1994a0bed4
   size: 15216978
   path: SEC11REN.DTA
-  md5-dos2unix: e25088754a673b8d19b1ea1994a0bed4
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: 8e823e6b50a82e41f51d6661455c2728
   size: 20442352
   path: ECVMA2_MS12P2.dta
-  md5-dos2unix: 8e823e6b50a82e41f51d6661455c2728
   hash: md5

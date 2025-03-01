@@ -2,5 +2,4 @@ outs:
 - md5: 7c13f04390ab149a6c44b0ea7d531430
   size: 4772
   path: S3_EDUC2.dta
-  md5-dos2unix: 7c13f04390ab149a6c44b0ea7d531430
   hash: md5

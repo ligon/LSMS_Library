@@ -2,5 +2,4 @@ outs:
 - md5: e52a8b1c97798f3932250973b69771ca
   size: 118143
   path: roma_6_education.dta
-  md5-dos2unix: e52a8b1c97798f3932250973b69771ca
   hash: md5

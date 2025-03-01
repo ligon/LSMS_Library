@@ -2,5 +2,4 @@ outs:
 - md5: 4800f17568fa29a5f0e022a394537026
   size: 3405806
   path: hh_sec_d.dta
-  md5-dos2unix: 4800f17568fa29a5f0e022a394537026
   hash: md5

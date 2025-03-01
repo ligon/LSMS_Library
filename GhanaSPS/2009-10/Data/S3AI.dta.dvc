@@ -2,5 +2,4 @@ outs:
 - md5: 8759080f0df59db89fb8b2023296989d
   size: 205573
   path: S3AI.dta
-  md5-dos2unix: 8759080f0df59db89fb8b2023296989d
   hash: md5

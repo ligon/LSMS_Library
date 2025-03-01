@@ -2,5 +2,4 @@ outs:
 - md5: ffbf9b34cfff9be7240182355ca6eaa2
   size: 73578
   path: FACIL.dta
-  md5-dos2unix: ffbf9b34cfff9be7240182355ca6eaa2
   hash: md5

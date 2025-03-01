@@ -2,5 +2,4 @@ outs:
 - md5: b3719ce228fa09e37764917111f6daac
   size: 2522285
   path: bchecklist_cl.dta
-  md5-dos2unix: b3719ce228fa09e37764917111f6daac
   hash: md5

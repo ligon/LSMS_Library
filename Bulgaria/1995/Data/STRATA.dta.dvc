@@ -2,5 +2,4 @@ outs:
 - md5: fb5ca46b0cd2d11dae0f4cb7c210ccaf
   size: 47523
   path: STRATA.dta
-  md5-dos2unix: fb5ca46b0cd2d11dae0f4cb7c210ccaf
   hash: md5

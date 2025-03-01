@@ -2,5 +2,4 @@ outs:
 - md5: 5da4453818008d954b73c709e369a16b
   size: 4631392
   path: SECA01.dta
-  md5-dos2unix: 5da4453818008d954b73c709e369a16b
   hash: md5

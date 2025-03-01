@@ -2,5 +2,4 @@ outs:
 - md5: 3e5833b2fa3296d7e133c5bdb6ca6d0d
   size: 170
   path: N12.VAR
-  md5-dos2unix: 3e5833b2fa3296d7e133c5bdb6ca6d0d
   hash: md5

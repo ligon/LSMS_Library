@@ -2,5 +2,4 @@ outs:
 - md5: d4ec697d3015237bdf9783430baca4f6
   size: 211169
   path: 03bii_lendingquestions.dta
-  md5-dos2unix: d4ec697d3015237bdf9783430baca4f6
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: b366f0e1a9859cab4314104e270bcd27
   size: 1193726
   path: ecvmarev_p1.dta
-  md5-dos2unix: b366f0e1a9859cab4314104e270bcd27
   hash: md5

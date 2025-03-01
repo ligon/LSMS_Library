@@ -2,5 +2,4 @@ outs:
 - md5: a24628d90309ec7067a83045cef6b12a
   size: 7074
   path: s18_4_me_tgo2018.dta
-  md5-dos2unix: a24628d90309ec7067a83045cef6b12a
   hash: md5

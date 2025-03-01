@@ -1,5 +1,4 @@
 outs:
 - md5: bbc03428a8747bd675f33a22027751ca
   path: s8_farm_plot_details.sav
-  md5-dos2unix: bbc03428a8747bd675f33a22027751ca
   hash: md5

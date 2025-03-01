@@ -2,5 +2,4 @@ outs:
 - md5: de24774796e4d9f2ca26f87063f7709a
   size: 150957
   path: sec10E2.dta
-  md5-dos2unix: de24774796e4d9f2ca26f87063f7709a
   hash: md5

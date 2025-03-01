@@ -2,5 +2,4 @@ outs:
 - md5: 93f8d22e06a4d24aa40228d1496b289b
   size: 8237
   path: women17_r2.dta
-  md5-dos2unix: 93f8d22e06a4d24aa40228d1496b289b
   hash: md5

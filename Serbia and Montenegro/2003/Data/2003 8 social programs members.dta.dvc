@@ -2,5 +2,4 @@ outs:
 - md5: a838ace77127d849cb9bd9b3d5df429d
   size: 870656
   path: 2003 8 social programs members.dta
-  md5-dos2unix: a838ace77127d849cb9bd9b3d5df429d
   hash: md5

@@ -1,5 +1,4 @@
 outs:
 - md5: f4353a5ed0e4b336ceba6e7a1a8510ba
   path: s8_own_cons.sav
-  md5-dos2unix: f4353a5ed0e4b336ceba6e7a1a8510ba
   hash: md5

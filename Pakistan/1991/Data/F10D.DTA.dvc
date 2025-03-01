@@ -2,5 +2,4 @@ outs:
 - md5: a1715fb0e48cf379267ca2f00fbd2d8f
   size: 102011
   path: F10D.DTA
-  md5-dos2unix: a1715fb0e48cf379267ca2f00fbd2d8f
   hash: md5

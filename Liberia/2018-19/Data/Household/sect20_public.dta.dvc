@@ -2,5 +2,4 @@ outs:
 - md5: a4b21966cd6afacc5a8c497b5f7088a6
   size: 1616598
   path: sect20_public.dta
-  md5-dos2unix: a4b21966cd6afacc5a8c497b5f7088a6
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: 4fe2329a04b6213c2b2413152d423f29
   size: 3838691
   path: EACINA30J_p1.dta
-  md5-dos2unix: 4fe2329a04b6213c2b2413152d423f29
   hash: md5

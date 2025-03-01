@@ -2,5 +2,4 @@ outs:
 - md5: b61968e26b2192afd7a61a3f9e375cae
   size: 2260676
   path: 2002 1 demography.dta
-  md5-dos2unix: b61968e26b2192afd7a61a3f9e375cae
   hash: md5

@@ -1,5 +1,4 @@
 outs:
 - md5: 409cafc7a0a1825b9041c7d938995d57
   path: SEC13C.DAT
-  md5-dos2unix: 409cafc7a0a1825b9041c7d938995d57
   hash: md5

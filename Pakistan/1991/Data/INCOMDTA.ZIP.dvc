@@ -2,5 +2,4 @@ outs:
 - md5: 8be07d82dc78b425d8f81b5cb133716c
   size: 326385
   path: INCOMDTA.ZIP
-  md5-dos2unix: 8be07d82dc78b425d8f81b5cb133716c
   hash: md5

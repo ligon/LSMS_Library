@@ -2,5 +2,4 @@ outs:
 - md5: 46149f56fd7fbeff94c95fb38e0b6f07
   size: 261126
   path: 02b_nr_spouses_questions.dta
-  md5-dos2unix: 46149f56fd7fbeff94c95fb38e0b6f07
   hash: md5

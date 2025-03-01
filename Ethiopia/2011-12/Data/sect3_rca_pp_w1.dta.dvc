@@ -2,5 +2,4 @@ outs:
 - md5: 4e76cd19c1d60d4aa3e38a7aefbf54c3
   size: 2566941
   path: sect3_rca_pp_w1.dta
-  md5-dos2unix: 4e76cd19c1d60d4aa3e38a7aefbf54c3
   hash: md5

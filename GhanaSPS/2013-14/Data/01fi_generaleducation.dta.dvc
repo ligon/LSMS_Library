@@ -2,5 +2,4 @@ outs:
 - md5: 54b61baff35eeac059f92051876490f0
   size: 6349154
   path: 01fi_generaleducation.dta
-  md5-dos2unix: 54b61baff35eeac059f92051876490f0
   hash: md5

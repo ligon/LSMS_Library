@@ -2,5 +2,4 @@ outs:
 - md5: dc303bf371389a67475c46818687002e
   size: 2840
   path: M1_CASW2.dta
-  md5-dos2unix: dc303bf371389a67475c46818687002e
   hash: md5

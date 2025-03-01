@@ -1,5 +1,4 @@
 outs:
 - md5: cfe249f55083b628ca923d97aea34e1c
   path: AGSEC8C.dta
-  md5-dos2unix: cfe249f55083b628ca923d97aea34e1c
   hash: md5

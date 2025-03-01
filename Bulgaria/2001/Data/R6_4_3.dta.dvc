@@ -2,5 +2,4 @@ outs:
 - md5: f1bdbbe9522dbc4f796fbaacdc279f21
   size: 808491
   path: R6_4_3.dta
-  md5-dos2unix: f1bdbbe9522dbc4f796fbaacdc279f21
   hash: md5

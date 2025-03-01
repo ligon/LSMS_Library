@@ -2,5 +2,4 @@ outs:
 - md5: 45782ec302a7df5507960e71becd0454
   size: 3953
   path: PP.dta
-  md5-dos2unix: 45782ec302a7df5507960e71becd0454
   hash: md5

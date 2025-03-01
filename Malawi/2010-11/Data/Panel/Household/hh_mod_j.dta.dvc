@@ -2,5 +2,4 @@ outs:
 - md5: be5b04f5f5b528cf459fdcb98375c478
   size: 4686730
   path: hh_mod_j.dta
-  md5-dos2unix: be5b04f5f5b528cf459fdcb98375c478
   hash: md5

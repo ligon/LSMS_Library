@@ -2,5 +2,4 @@ outs:
 - md5: 0973b98cc110b24d9b626d0018f99e5c
   size: 91169
   path: exphhpanel.dta
-  md5-dos2unix: 0973b98cc110b24d9b626d0018f99e5c
   hash: md5

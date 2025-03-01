@@ -1,5 +1,4 @@
 outs:
 - md5: 5a8d59e503213b5afca23e4aa9428851
   path: s11_tran_in.sav
-  md5-dos2unix: 5a8d59e503213b5afca23e4aa9428851
   hash: md5

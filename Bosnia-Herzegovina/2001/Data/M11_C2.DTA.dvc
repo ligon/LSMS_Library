@@ -2,5 +2,4 @@ outs:
 - md5: 198ad2ad18da8e0fc40c42776f5b2be9
   size: 4036
   path: M11_C2.DTA
-  md5-dos2unix: 198ad2ad18da8e0fc40c42776f5b2be9
   hash: md5

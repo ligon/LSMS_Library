@@ -2,5 +2,4 @@ outs:
 - md5: 501ab968c2dfa9f8930158ee0bb3f664
   size: 965320
   path: TIEMPO.DTA
-  md5-dos2unix: 501ab968c2dfa9f8930158ee0bb3f664
   hash: md5

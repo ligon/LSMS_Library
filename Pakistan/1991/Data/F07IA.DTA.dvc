@@ -2,5 +2,4 @@ outs:
 - md5: bb3396f719fe52987da9e0cb5bed619d
   size: 52891
   path: F07IA.DTA
-  md5-dos2unix: bb3396f719fe52987da9e0cb5bed619d
   hash: md5

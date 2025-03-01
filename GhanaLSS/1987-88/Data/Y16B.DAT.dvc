@@ -1,5 +1,4 @@
 outs:
 - md5: 790421e2b095d44dc2fb8353b2ade3f3
   path: Y16B.DAT
-  md5-dos2unix: 790421e2b095d44dc2fb8353b2ade3f3
   hash: md5

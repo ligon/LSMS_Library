@@ -2,5 +2,4 @@ outs:
 - md5: 3d0939985332f4b7ce301a233be8a2af
   size: 46167
   path: c_other.dta
-  md5-dos2unix: 3d0939985332f4b7ce301a233be8a2af
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: 3998886bc6ad31265e3d0051d984d577
   size: 11319427
   path: ehcvm_conso_bfa2018.dta
-  md5-dos2unix: 3998886bc6ad31265e3d0051d984d577
   hash: md5

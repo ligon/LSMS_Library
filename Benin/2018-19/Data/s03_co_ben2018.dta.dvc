@@ -2,5 +2,4 @@ outs:
 - md5: ed37d6ddbf44834b5fc82f942cd5e8f7
   size: 145254
   path: s03_co_ben2018.dta
-  md5-dos2unix: ed37d6ddbf44834b5fc82f942cd5e8f7
   hash: md5

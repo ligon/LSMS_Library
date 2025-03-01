@@ -2,5 +2,4 @@ outs:
 - md5: 49df414beba9484e5deea3dbe8dce969
   size: 1232
   path: SEC13PI.DTA
-  md5-dos2unix: 49df414beba9484e5deea3dbe8dce969
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: c57f4869071600b0dd3625f1a98c1db2
   size: 4745
   path: Serb_AGRICULTURE_1.dta
-  md5-dos2unix: c57f4869071600b0dd3625f1a98c1db2
   hash: md5

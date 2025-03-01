@@ -2,5 +2,4 @@ outs:
 - md5: 58b72f1394ef24d4afef9da45f93aeeb
   size: 417433
   path: ehcvm_menage_ben2018.dta
-  md5-dos2unix: 58b72f1394ef24d4afef9da45f93aeeb
   hash: md5

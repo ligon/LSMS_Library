@@ -2,5 +2,4 @@ outs:
 - md5: 860871c75efb45813d2e6bf2aa6517f4
   size: 62
   path: F11A.VAR
-  md5-dos2unix: 860871c75efb45813d2e6bf2aa6517f4
   hash: md5

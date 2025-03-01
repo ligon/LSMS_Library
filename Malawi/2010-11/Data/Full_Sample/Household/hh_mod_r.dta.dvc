@@ -2,5 +2,4 @@ outs:
 - md5: a7dd106bf6632db48e9ded34e4a47707
   size: 14999304
   path: hh_mod_r.dta
-  md5-dos2unix: a7dd106bf6632db48e9ded34e4a47707
   hash: md5

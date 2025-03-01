@@ -2,5 +2,4 @@ outs:
 - md5: 9641f79a541805cfdef41f59c26209b6
   size: 695064
   path: hh_sec_7b.dta
-  md5-dos2unix: 9641f79a541805cfdef41f59c26209b6
   hash: md5

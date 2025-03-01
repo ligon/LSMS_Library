@@ -2,5 +2,4 @@ outs:
 - md5: 005ae9e92471fd8882c4c6d87384d100
   size: 5480
   path: NER_EA_Offsets.dta
-  md5-dos2unix: 005ae9e92471fd8882c4c6d87384d100
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: aa245a35b894f8957cc1e2117aebd2bb
   size: 17558
   path: S4D.DTA
-  md5-dos2unix: aa245a35b894f8957cc1e2117aebd2bb
   hash: md5

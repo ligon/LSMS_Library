@@ -2,5 +2,4 @@ outs:
 - md5: 344d52648e697ac9b9e928a06c1ae1db
   size: 381232
   path: sect11j_plantingw4.csv
-  md5-dos2unix: 344d52648e697ac9b9e928a06c1ae1db
   hash: md5

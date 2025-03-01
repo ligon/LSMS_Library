@@ -2,5 +2,4 @@ outs:
 - md5: 977c95f6456f4990d94cc8f8acb37c92
   size: 1113098
   path: HH_MOD_G3.dta
-  md5-dos2unix: 977c95f6456f4990d94cc8f8acb37c92
   hash: md5

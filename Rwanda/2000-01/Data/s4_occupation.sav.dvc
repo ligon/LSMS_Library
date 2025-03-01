@@ -1,5 +1,4 @@
 outs:
 - md5: 1fc8ebea80bf3f8a507ebbeec210b225
   path: s4_occupation.sav
-  md5-dos2unix: 1fc8ebea80bf3f8a507ebbeec210b225
   hash: md5

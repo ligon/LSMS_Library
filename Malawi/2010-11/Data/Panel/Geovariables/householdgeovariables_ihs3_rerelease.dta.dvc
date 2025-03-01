@@ -2,5 +2,4 @@ outs:
 - md5: 8c3073e1b4d29131c80a1db4fe70bcbb
   size: 1040912
   path: householdgeovariables_ihs3_rerelease.dta
-  md5-dos2unix: 8c3073e1b4d29131c80a1db4fe70bcbb
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: 73c55c7015ce3049c24c57f4f5729f14
   size: 1177
   path: GITEMNF1.dta
-  md5-dos2unix: 73c55c7015ce3049c24c57f4f5729f14
   hash: md5

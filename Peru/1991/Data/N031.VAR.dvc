@@ -2,5 +2,4 @@ outs:
 - md5: 02e00e0e57958a11094e428d8ccd401e
   size: 167
   path: N031.VAR
-  md5-dos2unix: 02e00e0e57958a11094e428d8ccd401e
   hash: md5

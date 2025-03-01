@@ -2,5 +2,4 @@ outs:
 - md5: 14e7ec71185761bca93a6bda289cad63
   size: 238800
   path: FILE25V1.dta
-  md5-dos2unix: 14e7ec71185761bca93a6bda289cad63
   hash: md5

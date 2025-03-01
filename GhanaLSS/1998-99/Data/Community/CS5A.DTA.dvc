@@ -2,5 +2,4 @@ outs:
 - md5: 03c0fa9a20588d1672d81758a86bafb6
   size: 122715
   path: CS5A.DTA
-  md5-dos2unix: 03c0fa9a20588d1672d81758a86bafb6
   hash: md5

@@ -1,5 +1,4 @@
 outs:
 - md5: 4b5f83c367cb5846dcde5baad19bedb6
   path: ZSCOREH.DCT
-  md5-dos2unix: 4b5f83c367cb5846dcde5baad19bedb6
   hash: md5

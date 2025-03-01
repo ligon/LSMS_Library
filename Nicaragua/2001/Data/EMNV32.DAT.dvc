@@ -2,5 +2,4 @@ outs:
 - md5: 94f33d2f190c4e019056deaace3cb18f
   size: 59519
   path: EMNV32.DAT
-  md5-dos2unix: 94f33d2f190c4e019056deaace3cb18f
   hash: md5

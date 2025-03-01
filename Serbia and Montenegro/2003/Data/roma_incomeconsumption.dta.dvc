@@ -2,5 +2,4 @@ outs:
 - md5: e9a577c533acbb0835a146dfe9d91001
   size: 146921
   path: roma_incomeconsumption.dta
-  md5-dos2unix: e9a577c533acbb0835a146dfe9d91001
   hash: md5

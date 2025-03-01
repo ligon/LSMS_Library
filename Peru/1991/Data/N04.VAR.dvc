@@ -2,5 +2,4 @@ outs:
 - md5: da96301a1b4209efd5f37cfec3c47659
   size: 219
   path: N04.VAR
-  md5-dos2unix: da96301a1b4209efd5f37cfec3c47659
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: 38a908866234cf52a16cdaa8dd6d8598
   size: 324710
   path: mop_5_non_food_consumption.dta
-  md5-dos2unix: 38a908866234cf52a16cdaa8dd6d8598
   hash: md5

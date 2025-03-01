@@ -2,5 +2,4 @@ outs:
 - md5: f087368e24b9e399b66293b8e0973632
   size: 14695329
   path: GSEC15C.dta
-  md5-dos2unix: f087368e24b9e399b66293b8e0973632
   hash: md5

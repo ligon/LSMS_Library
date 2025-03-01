@@ -1,5 +1,4 @@
 outs:
 - md5: d033def8946a93c7ba8f7bbe968dd427
   path: gsec3.dta
-  md5-dos2unix: d033def8946a93c7ba8f7bbe968dd427
   hash: md5

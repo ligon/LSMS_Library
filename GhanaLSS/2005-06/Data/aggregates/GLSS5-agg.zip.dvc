@@ -2,5 +2,4 @@ outs:
 - md5: fe2787e7f71b7a65aad178741a0fd9fa
   size: 626186
   path: GLSS5-agg.zip
-  md5-dos2unix: fe2787e7f71b7a65aad178741a0fd9fa
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: 2cdd47e62e819b86ba1611732f690fb5
   size: 529916
   path: pop_point_1.dta
-  md5-dos2unix: 2cdd47e62e819b86ba1611732f690fb5
   hash: md5

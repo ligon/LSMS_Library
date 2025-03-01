@@ -2,5 +2,4 @@ outs:
 - md5: 68c590756899f9ab9876f64e8089509a
   size: 8866
   path: wb_section_4b.dta
-  md5-dos2unix: 68c590756899f9ab9876f64e8089509a
   hash: md5

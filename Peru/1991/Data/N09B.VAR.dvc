@@ -2,5 +2,4 @@ outs:
 - md5: 2d16a12b9caff544d79806bedf3f2c46
   size: 58
   path: N09B.VAR
-  md5-dos2unix: 2d16a12b9caff544d79806bedf3f2c46
   hash: md5

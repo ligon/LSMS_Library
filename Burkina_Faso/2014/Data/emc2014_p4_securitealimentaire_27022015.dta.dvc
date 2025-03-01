@@ -2,5 +2,4 @@ outs:
 - md5: 6a0f21c97206b6b4ab9d2856404059f4
   size: 198742
   path: emc2014_p4_securitealimentaire_27022015.dta
-  md5-dos2unix: 6a0f21c97206b6b4ab9d2856404059f4
   hash: md5

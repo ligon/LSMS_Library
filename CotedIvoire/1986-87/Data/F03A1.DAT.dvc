@@ -1,5 +1,4 @@
 outs:
 - md5: db488aa0665eadc9eb423f9b9fe07f77
   path: F03A1.DAT
-  md5-dos2unix: db488aa0665eadc9eb423f9b9fe07f77
   hash: md5

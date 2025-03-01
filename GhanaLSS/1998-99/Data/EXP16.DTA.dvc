@@ -2,5 +2,4 @@ outs:
 - md5: d11ebec5365b299cd51b3c2bb68b32ff
   size: 525317
   path: EXP16.DTA
-  md5-dos2unix: d11ebec5365b299cd51b3c2bb68b32ff
   hash: md5

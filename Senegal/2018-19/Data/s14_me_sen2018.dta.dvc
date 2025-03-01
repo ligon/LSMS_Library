@@ -2,5 +2,4 @@ outs:
 - md5: eee4d6497f95180e27aa39e78215adfa
   size: 6464597
   path: s14_me_sen2018.dta
-  md5-dos2unix: eee4d6497f95180e27aa39e78215adfa
   hash: md5

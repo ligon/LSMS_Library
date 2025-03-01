@@ -2,5 +2,4 @@ outs:
 - md5: 875dedb9f27c031107903a319ae443bb
   size: 452
   path: EMNV17.DCT
-  md5-dos2unix: 875dedb9f27c031107903a319ae443bb
   hash: md5

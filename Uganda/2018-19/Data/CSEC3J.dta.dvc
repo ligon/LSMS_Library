@@ -2,5 +2,4 @@ outs:
 - md5: a4da6cdc96c97b40d97dce959d3cdb5b
   size: 490032
   path: CSEC3J.dta
-  md5-dos2unix: a4da6cdc96c97b40d97dce959d3cdb5b
   hash: md5

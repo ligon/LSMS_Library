@@ -2,5 +2,4 @@ outs:
 - md5: b52f64e23e447ad99dc005b6f2afb46a
   size: 504947
   path: roma_5_non_food_consumption.dta
-  md5-dos2unix: b52f64e23e447ad99dc005b6f2afb46a
   hash: md5

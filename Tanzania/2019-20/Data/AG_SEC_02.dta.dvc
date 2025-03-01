@@ -2,5 +2,4 @@ outs:
 - md5: 27fb8742138ac15d70045ac539904396
   size: 544411
   path: AG_SEC_02.dta
-  md5-dos2unix: 27fb8742138ac15d70045ac539904396
   hash: md5

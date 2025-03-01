@@ -2,5 +2,4 @@ outs:
 - md5: fb04d64928a200a40f0fae5072879fe3
   size: 228728
   path: 09d_math.dta
-  md5-dos2unix: fb04d64928a200a40f0fae5072879fe3
   hash: md5

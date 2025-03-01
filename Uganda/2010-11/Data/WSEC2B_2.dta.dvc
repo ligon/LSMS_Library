@@ -1,5 +1,4 @@
 outs:
 - md5: 5eb0a0bebb9fb71caf68541e9b8f988a
   path: WSEC2B_2.dta
-  md5-dos2unix: 5eb0a0bebb9fb71caf68541e9b8f988a
   hash: md5

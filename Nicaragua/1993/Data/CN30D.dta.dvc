@@ -2,5 +2,4 @@ outs:
 - md5: 8f98c82427966e0686c7cce99dfb1c49
   size: 820992
   path: CN30D.dta
-  md5-dos2unix: 8f98c82427966e0686c7cce99dfb1c49
   hash: md5

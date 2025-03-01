@@ -1,5 +1,4 @@
 outs:
 - md5: 45c7c571b3eff5910c168d9c02cff062
   path: 14_GHA_2017_PINDEX.dta
-  md5-dos2unix: 45c7c571b3eff5910c168d9c02cff062
   hash: md5

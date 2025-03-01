@@ -2,5 +2,4 @@ outs:
 - md5: fbd72fd3a6b40740e4d3db1138de204d
   size: 9645
   path: ADJUST.dta
-  md5-dos2unix: fbd72fd3a6b40740e4d3db1138de204d
   hash: md5

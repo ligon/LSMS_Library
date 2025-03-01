@@ -2,5 +2,4 @@ outs:
 - md5: fda24846c6da196d4bf92811d7926c75
   size: 529905
   path: FILE47V0.dta
-  md5-dos2unix: fda24846c6da196d4bf92811d7926c75
   hash: md5

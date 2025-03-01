@@ -1,5 +1,4 @@
 outs:
 - md5: fe161a24117a8fabbbad20fe0f912f88
   path: Y01B.DAT
-  md5-dos2unix: fe161a24117a8fabbbad20fe0f912f88
   hash: md5

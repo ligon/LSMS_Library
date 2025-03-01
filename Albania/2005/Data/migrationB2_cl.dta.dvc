@@ -2,5 +2,4 @@ outs:
 - md5: f1a73a9def3d95d6f695a9630890a21c
   size: 62616
   path: migrationB2_cl.dta
-  md5-dos2unix: f1a73a9def3d95d6f695a9630890a21c
   hash: md5

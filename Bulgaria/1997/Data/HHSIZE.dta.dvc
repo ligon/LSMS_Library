@@ -2,5 +2,4 @@ outs:
 - md5: f8c4f5caedaccbe2b700a83460c6eae5
   size: 33286
   path: HHSIZE.dta
-  md5-dos2unix: f8c4f5caedaccbe2b700a83460c6eae5
   hash: md5

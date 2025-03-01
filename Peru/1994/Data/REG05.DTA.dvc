@@ -2,5 +2,4 @@ outs:
 - md5: 68067ab45bf378fe9324f764a407dafc
   size: 479564
   path: REG05.DTA
-  md5-dos2unix: 68067ab45bf378fe9324f764a407dafc
   hash: md5

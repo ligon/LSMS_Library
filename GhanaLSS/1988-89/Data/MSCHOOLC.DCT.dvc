@@ -1,5 +1,4 @@
 outs:
 - md5: 2abdd73f8cf35d7e04329b6abaae5975
   path: MSCHOOLC.DCT
-  md5-dos2unix: 2abdd73f8cf35d7e04329b6abaae5975
   hash: md5

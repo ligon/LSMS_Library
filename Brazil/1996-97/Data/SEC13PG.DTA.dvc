@@ -2,5 +2,4 @@ outs:
 - md5: f3403503c76d448298c5b9fb96e361b2
   size: 236867
   path: SEC13PG.DTA
-  md5-dos2unix: f3403503c76d448298c5b9fb96e361b2
   hash: md5

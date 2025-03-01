@@ -2,5 +2,4 @@ outs:
 - md5: dc72b78f02f22a484d95daf2831f8630
   size: 3922861
   path: social_assistance_cl.dta
-  md5-dos2unix: dc72b78f02f22a484d95daf2831f8630
   hash: md5

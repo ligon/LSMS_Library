@@ -2,5 +2,4 @@ outs:
 - md5: 0d1efc0e9be3d687d902a5c109906528
   size: 138573
   path: 10aii_subjectivesocialwelfare.dta
-  md5-dos2unix: 0d1efc0e9be3d687d902a5c109906528
   hash: md5

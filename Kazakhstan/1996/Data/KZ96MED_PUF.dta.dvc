@@ -2,5 +2,4 @@ outs:
 - md5: c061100592df221defeabf4c72eaad99
   size: 1191648
   path: KZ96MED_PUF.dta
-  md5-dos2unix: c061100592df221defeabf4c72eaad99
   hash: md5

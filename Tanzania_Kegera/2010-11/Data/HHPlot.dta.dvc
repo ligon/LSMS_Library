@@ -2,5 +2,4 @@ outs:
 - md5: 51fae41ec9bd86a3ca24f8773fcf142e
   size: 506804
   path: HHPlot.dta
-  md5-dos2unix: 51fae41ec9bd86a3ca24f8773fcf142e
   hash: md5

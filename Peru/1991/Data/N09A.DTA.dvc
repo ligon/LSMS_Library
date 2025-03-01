@@ -2,5 +2,4 @@ outs:
 - md5: c2ae20a014ce6394ed84f4d3054282b4
   size: 452664
   path: N09A.DTA
-  md5-dos2unix: c2ae20a014ce6394ed84f4d3054282b4
   hash: md5

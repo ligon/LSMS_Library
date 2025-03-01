@@ -2,5 +2,4 @@ outs:
 - md5: c8ee125241d0ae7ef7f90156b35ed3d8
   size: 491066
   path: E97BASE2.DTA
-  md5-dos2unix: c8ee125241d0ae7ef7f90156b35ed3d8
   hash: md5

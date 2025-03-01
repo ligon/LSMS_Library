@@ -2,5 +2,4 @@ outs:
 - md5: 2de46d21e61c135443c5cde08bffb67a
   size: 7672772
   path: ihs3fc2M_consumption.dta
-  md5-dos2unix: 2de46d21e61c135443c5cde08bffb67a
   hash: md5

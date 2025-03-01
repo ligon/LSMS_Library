@@ -2,5 +2,4 @@ outs:
 - md5: 8cf97d0a430ca09cd9d2dedbc55ba65a
   size: 43
   path: N08A.VAR
-  md5-dos2unix: 8cf97d0a430ca09cd9d2dedbc55ba65a
   hash: md5

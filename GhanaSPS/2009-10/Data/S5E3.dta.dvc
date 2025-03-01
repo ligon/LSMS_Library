@@ -2,5 +2,4 @@ outs:
 - md5: d98d2840a28716293478d3f7d7022508
   size: 177121
   path: S5E3.dta
-  md5-dos2unix: d98d2840a28716293478d3f7d7022508
   hash: md5

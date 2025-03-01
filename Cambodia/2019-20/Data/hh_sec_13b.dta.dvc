@@ -2,5 +2,4 @@ outs:
 - md5: a239b23c8c53666f495f240e59460911
   size: 2475135
   path: hh_sec_13b.dta
-  md5-dos2unix: a239b23c8c53666f495f240e59460911
   hash: md5

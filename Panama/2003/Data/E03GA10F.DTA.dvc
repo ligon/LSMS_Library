@@ -2,5 +2,4 @@ outs:
 - md5: f73c3eae44640d65d96d9c6aea5596f0
   size: 85930
   path: E03GA10F.DTA
-  md5-dos2unix: f73c3eae44640d65d96d9c6aea5596f0
   hash: md5

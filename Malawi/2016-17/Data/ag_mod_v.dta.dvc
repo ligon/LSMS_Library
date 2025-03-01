@@ -2,5 +2,4 @@ outs:
 - md5: 24fa13939da941e259e2a316fd314fd2
   size: 3373118
   path: ag_mod_v.dta
-  md5-dos2unix: 24fa13939da941e259e2a316fd314fd2
   hash: md5

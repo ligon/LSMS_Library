@@ -2,5 +2,4 @@ outs:
 - md5: 6292af8f5a1a30fce364a2994775b0c4
   size: 4582071
   path: s16a_me_tgo2018.dta
-  md5-dos2unix: 6292af8f5a1a30fce364a2994775b0c4
   hash: md5

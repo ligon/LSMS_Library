@@ -2,5 +2,4 @@ outs:
 - md5: c383e438aba1bd4d528ce47e5922fc14
   size: 1024302
   path: hh_mod_i1.dta
-  md5-dos2unix: c383e438aba1bd4d528ce47e5922fc14
   hash: md5

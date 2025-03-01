@@ -2,5 +2,4 @@ outs:
 - md5: 831ea1176a83246ca5d725086f4f2464
   size: 32708
   path: E03GA10A.DTA
-  md5-dos2unix: 831ea1176a83246ca5d725086f4f2464
   hash: md5

@@ -1,5 +1,4 @@
 outs:
 - md5: abc0bc7353531636494f78f1cf4e3d65
   path: CMHLTH87.FMT
-  md5-dos2unix: abc0bc7353531636494f78f1cf4e3d65
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: 8d57c217d6a9cb1c4bdfb552b3090aaa
   size: 149228
   path: EACICONTROLE_p1.dta
-  md5-dos2unix: 8d57c217d6a9cb1c4bdfb552b3090aaa
   hash: md5

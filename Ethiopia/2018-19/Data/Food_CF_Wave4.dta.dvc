@@ -2,5 +2,4 @@ outs:
 - md5: fc1bf7061c58778550fb97039f79cb50
   size: 144621
   path: Food_CF_Wave4.dta
-  md5-dos2unix: fc1bf7061c58778550fb97039f79cb50
   hash: md5

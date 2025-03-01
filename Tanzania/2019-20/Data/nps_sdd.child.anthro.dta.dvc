@@ -2,5 +2,4 @@ outs:
 - md5: 839ef7b91aa6f35a4e7b00b9514a8bdb
   size: 94991
   path: nps_sdd.child.anthro.dta
-  md5-dos2unix: 839ef7b91aa6f35a4e7b00b9514a8bdb
   hash: md5

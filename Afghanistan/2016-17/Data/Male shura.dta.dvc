@@ -2,5 +2,4 @@ outs:
 - md5: 66cafb6b36f933608f4bb00b99b131a8
   size: 570332
   path: Male shura.dta
-  md5-dos2unix: 66cafb6b36f933608f4bb00b99b131a8
   hash: md5

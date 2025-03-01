@@ -2,5 +2,4 @@ outs:
 - md5: 57cec790ac391110191ec372ea894e54
   size: 189354
   path: ag_implement.dta
-  md5-dos2unix: 57cec790ac391110191ec372ea894e54
   hash: md5

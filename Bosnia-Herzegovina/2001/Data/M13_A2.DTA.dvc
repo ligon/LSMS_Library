@@ -2,5 +2,4 @@ outs:
 - md5: 33051fcebaf1cab08356236a6e9dc506
   size: 41335
   path: M13_A2.DTA
-  md5-dos2unix: 33051fcebaf1cab08356236a6e9dc506
   hash: md5

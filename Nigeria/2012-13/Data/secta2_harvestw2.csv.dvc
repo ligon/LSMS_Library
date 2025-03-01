@@ -2,5 +2,4 @@ outs:
 - md5: a9919e4df690c570217a4864512feca5
   size: 484626
   path: secta2_harvestw2.csv
-  md5-dos2unix: a9919e4df690c570217a4864512feca5
   hash: md5

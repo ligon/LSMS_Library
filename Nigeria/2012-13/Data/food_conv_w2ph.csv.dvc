@@ -2,5 +2,4 @@ outs:
 - md5: 608e72cdd99972e0f587815ce082f8d9
   size: 6501
   path: food_conv_w2ph.csv
-  md5-dos2unix: 608e72cdd99972e0f587815ce082f8d9
   hash: md5

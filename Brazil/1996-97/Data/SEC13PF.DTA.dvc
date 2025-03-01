@@ -2,5 +2,4 @@ outs:
 - md5: 598a06e54e93d15dbef2af70409b49b0
   size: 179500
   path: SEC13PF.DTA
-  md5-dos2unix: 598a06e54e93d15dbef2af70409b49b0
   hash: md5

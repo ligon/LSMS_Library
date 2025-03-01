@@ -2,5 +2,4 @@ outs:
 - md5: 4f90c74e52af7923e784dbf72d8a4ab2
   size: 5649
   path: SEC14PC.DTA
-  md5-dos2unix: 4f90c74e52af7923e784dbf72d8a4ab2
   hash: md5

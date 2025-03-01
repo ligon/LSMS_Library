@@ -2,5 +2,4 @@ outs:
 - md5: deae202e223561f7dfb246979869b997
   size: 1619977
   path: hh_sec_o1.dta
-  md5-dos2unix: deae202e223561f7dfb246979869b997
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: b9482a73c90fbb0d1a3191520e78f711
   size: 42272377
   path: upd4_hh_l.dta
-  md5-dos2unix: b9482a73c90fbb0d1a3191520e78f711
   hash: md5

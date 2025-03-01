@@ -2,5 +2,4 @@ outs:
 - md5: ec3ec0699369c25f2461ce4f49b13df8
   size: 315744
   path: REG19.DTA
-  md5-dos2unix: ec3ec0699369c25f2461ce4f49b13df8
   hash: md5

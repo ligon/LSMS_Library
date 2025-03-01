@@ -2,5 +2,4 @@ outs:
 - md5: 91d44227264ddc134b73b1fc4df8c8c3
   size: 623261
   path: KPRICE3.DTA
-  md5-dos2unix: 91d44227264ddc134b73b1fc4df8c8c3
   hash: md5

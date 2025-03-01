@@ -2,5 +2,4 @@ outs:
 - md5: 4ed6ab48677fa5d176aca2b2cddb4217
   size: 37680
   path: EXPEND.SSP
-  md5-dos2unix: 4ed6ab48677fa5d176aca2b2cddb4217
   hash: md5

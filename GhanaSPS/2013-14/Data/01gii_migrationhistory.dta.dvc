@@ -2,5 +2,4 @@ outs:
 - md5: 4291226a74cf1c6f67a8abb0a304227d
   size: 1386376
   path: 01gii_migrationhistory.dta
-  md5-dos2unix: 4291226a74cf1c6f67a8abb0a304227d
   hash: md5

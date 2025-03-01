@@ -1,5 +1,4 @@
 outs:
 - md5: d106f1e4bc190c59667087df95e44086
   path: s9_expen_other.sav
-  md5-dos2unix: d106f1e4bc190c59667087df95e44086
   hash: md5

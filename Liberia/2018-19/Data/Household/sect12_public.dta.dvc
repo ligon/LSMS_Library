@@ -2,5 +2,4 @@ outs:
 - md5: a715e9ee717b7741b4c2caf81bc3409d
   size: 206483
   path: sect12_public.dta
-  md5-dos2unix: a715e9ee717b7741b4c2caf81bc3409d
   hash: md5

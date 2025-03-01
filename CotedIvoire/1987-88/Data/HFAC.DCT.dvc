@@ -1,5 +1,4 @@
 outs:
 - md5: ff4fd55306c84b8ded059a00412aee66
   path: HFAC.DCT
-  md5-dos2unix: ff4fd55306c84b8ded059a00412aee66
   hash: md5

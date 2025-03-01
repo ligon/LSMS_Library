@@ -1,5 +1,4 @@
 outs:
 - md5: f460108f16ae7eb46270bf5e219faced
   path: F16A.DCT
-  md5-dos2unix: f460108f16ae7eb46270bf5e219faced
   hash: md5

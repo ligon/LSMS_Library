@@ -2,5 +2,4 @@ outs:
 - md5: 375a58d760cead7b7ce1c67c707139ba
   size: 438
   path: GASHOG94.VAR
-  md5-dos2unix: 375a58d760cead7b7ce1c67c707139ba
   hash: md5

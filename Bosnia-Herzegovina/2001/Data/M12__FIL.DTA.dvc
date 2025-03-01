@@ -2,5 +2,4 @@ outs:
 - md5: 48d7c02a8ffd4946f34bf9d2c8807594
   size: 60533
   path: M12__FIL.DTA
-  md5-dos2unix: 48d7c02a8ffd4946f34bf9d2c8807594
   hash: md5

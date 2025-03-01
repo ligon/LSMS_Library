@@ -1,5 +1,4 @@
 outs:
 - md5: 3a3bac501e79f2df858e8bee1e6263da
   path: F07.DAT
-  md5-dos2unix: 3a3bac501e79f2df858e8bee1e6263da
   hash: md5

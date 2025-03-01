@@ -1,5 +1,4 @@
 outs:
 - md5: 415034d2823e93fdf40a113c18eb9810
   path: Y14A.DAT
-  md5-dos2unix: 415034d2823e93fdf40a113c18eb9810
   hash: md5

@@ -2,5 +2,4 @@ outs:
 - md5: 96eaa1bdd17249a051ad509cb85d79c3
   size: 44894
   path: S09G3.DTA
-  md5-dos2unix: 96eaa1bdd17249a051ad509cb85d79c3
   hash: md5

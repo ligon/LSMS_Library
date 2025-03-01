@@ -2,5 +2,4 @@ outs:
 - md5: 053ce479c4a44ac0992dcf8caa521d23
   size: 3812
   path: SocialProgramAggregate.dta
-  md5-dos2unix: 053ce479c4a44ac0992dcf8caa521d23
   hash: md5

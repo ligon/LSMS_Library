@@ -2,5 +2,4 @@ outs:
 - md5: e4cf27bfc805dffcb594b9d74cbb73aa
   size: 96
   path: SYS8C.VAR
-  md5-dos2unix: e4cf27bfc805dffcb594b9d74cbb73aa
   hash: md5

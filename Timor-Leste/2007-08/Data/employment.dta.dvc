@@ -2,5 +2,4 @@ outs:
 - md5: 71499f995cfc0f60092af10244229adc
   size: 498781
   path: employment.dta
-  md5-dos2unix: 71499f995cfc0f60092af10244229adc
   hash: md5

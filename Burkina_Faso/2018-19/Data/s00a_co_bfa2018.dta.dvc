@@ -2,5 +2,4 @@ outs:
 - md5: 1587f070b34dc0d46400a9a8682c10f3
   size: 11484
   path: s00a_co_bfa2018.dta
-  md5-dos2unix: 1587f070b34dc0d46400a9a8682c10f3
   hash: md5

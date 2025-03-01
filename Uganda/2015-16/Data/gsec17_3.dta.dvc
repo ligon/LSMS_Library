@@ -1,5 +1,4 @@
 outs:
 - md5: 46da232aaae61b87f1e67ad5ed674f25
   path: gsec17_3.dta
-  md5-dos2unix: 46da232aaae61b87f1e67ad5ed674f25
   hash: md5

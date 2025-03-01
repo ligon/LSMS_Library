@@ -2,5 +2,4 @@ outs:
 - md5: 77422860f101621ada96eb3c3209fae5
   size: 32875
   path: FECHAR2.DTA
-  md5-dos2unix: 77422860f101621ada96eb3c3209fae5
   hash: md5

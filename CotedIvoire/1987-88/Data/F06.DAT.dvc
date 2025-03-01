@@ -1,5 +1,4 @@
 outs:
 - md5: b671c45233e6039a391505e54365fd6b
   path: F06.DAT
-  md5-dos2unix: b671c45233e6039a391505e54365fd6b
   hash: md5

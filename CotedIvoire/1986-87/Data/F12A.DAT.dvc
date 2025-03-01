@@ -1,5 +1,4 @@
 outs:
 - md5: f8f92272b5574df78ed16ae0d60fa327
   path: F12A.DAT
-  md5-dos2unix: f8f92272b5574df78ed16ae0d60fa327
   hash: md5
