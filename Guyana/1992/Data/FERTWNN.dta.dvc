@@ -2,3 +2,4 @@ outs:
 - md5: 1e12650ba72c090959d3368de1f882d9
   size: 64144
   path: FERTWNN.dta
+  hash: md5

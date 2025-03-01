@@ -1,3 +1,4 @@
 outs:
 - md5: 4d6645e234a3a7f88e4d12a19e64e5ae
   path: GSEC16.dta
+  hash: md5

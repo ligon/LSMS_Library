@@ -2,3 +2,4 @@ outs:
 - md5: ca12515fbfc9629e1c9601f25700cea7
   size: 699433
   path: comprixcs08.dta
+  hash: md5

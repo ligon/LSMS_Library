@@ -1,3 +1,4 @@
 outs:
 - md5: 740022b3d1b476831c439f2726350696
   path: EXPEND.DCT
+  hash: md5

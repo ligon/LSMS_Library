@@ -2,3 +2,4 @@ outs:
 - md5: 509444ff54f0cc2c0db2166168dbe491
   size: 59133
   path: sm12c2.dta
+  hash: md5

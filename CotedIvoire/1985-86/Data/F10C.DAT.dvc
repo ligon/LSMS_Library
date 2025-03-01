@@ -1,3 +1,4 @@
 outs:
 - md5: a3c403eebcb3dab1300ef4ba0da0ca82
   path: F10C.DAT
+  hash: md5

@@ -1,3 +1,4 @@
 outs:
 - md5: 97195dfe0ba706b8e1e85c6540c2e1db
   path: Y09D3A.DAT
+  hash: md5

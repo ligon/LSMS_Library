@@ -2,3 +2,4 @@ outs:
 - md5: 0c80128fc3dc23f01419d794de153780
   size: 364836
   path: SEC8E.DTA
+  hash: md5

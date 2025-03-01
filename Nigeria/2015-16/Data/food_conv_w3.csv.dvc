@@ -2,3 +2,4 @@ outs:
 - md5: 513dea892f66c6a70f44b79102456f0f
   size: 147310
   path: food_conv_w3.csv
+  hash: md5

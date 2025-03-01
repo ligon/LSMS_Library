@@ -2,3 +2,4 @@ outs:
 - md5: b70ebc8a3a3ca52b437898e5eb6082db
   size: 399861
   path: KZ96SMP_PUF.dta
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: f80ba40b68a33f6d7b3f1799402f5731
   size: 40793
   path: grappe_gps_bfa2018.dta
+  hash: md5

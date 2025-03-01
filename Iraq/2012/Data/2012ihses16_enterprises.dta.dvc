@@ -2,3 +2,4 @@ outs:
 - md5: 013b04be23b2aa7a6e66e894ccf6f1cc
   size: 7201478
   path: 2012ihses16_enterprises.dta
+  hash: md5

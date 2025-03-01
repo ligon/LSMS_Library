@@ -2,3 +2,4 @@ outs:
 - md5: ce734ec4c77d4cc750cb9b8494483a15
   size: 25418
   path: savings.dta
+  hash: md5

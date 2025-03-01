@@ -2,3 +2,4 @@ outs:
 - md5: 508413b3979de38b5fec63e32293f4de
   size: 11624818
   path: 2012ihses12_p2_meals.dta
+  hash: md5

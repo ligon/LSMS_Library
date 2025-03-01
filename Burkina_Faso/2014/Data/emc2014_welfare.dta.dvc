@@ -2,3 +2,4 @@ outs:
 - md5: 0b0e21c43e914bb9d6c061a3cf70552b
   size: 923269
   path: emc2014_welfare.dta
+  hash: md5

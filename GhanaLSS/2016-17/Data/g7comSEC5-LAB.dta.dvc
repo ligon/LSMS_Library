@@ -1,3 +1,4 @@
 outs:
 - md5: 887cce3b99e7668dbdb40682725bdfc7
   path: g7comSEC5-LAB.dta
+  hash: md5

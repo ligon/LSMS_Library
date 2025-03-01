@@ -2,3 +2,4 @@ outs:
 - md5: ba12c0e2402c70947f79ed522087dc34
   size: 596
   path: EMNV02.DCT
+  hash: md5

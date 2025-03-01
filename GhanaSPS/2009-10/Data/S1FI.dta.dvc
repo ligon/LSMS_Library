@@ -2,3 +2,4 @@ outs:
 - md5: c9f434878a0872f5288f03ef4ad382c5
   size: 2074191
   path: S1FI.dta
+  hash: md5

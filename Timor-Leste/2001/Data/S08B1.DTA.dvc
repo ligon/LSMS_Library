@@ -2,3 +2,4 @@ outs:
 - md5: f588cae2118d3f753306c4a12e175a01
   size: 333118
   path: S08B1.DTA
+  hash: md5

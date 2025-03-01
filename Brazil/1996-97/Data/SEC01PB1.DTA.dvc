@@ -2,3 +2,4 @@ outs:
 - md5: 20e94a29c8d5f8f68d9045c03459926f
   size: 412532
   path: SEC01PB1.DTA
+  hash: md5

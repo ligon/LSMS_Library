@@ -2,3 +2,4 @@ outs:
 - md5: 5733e5fe346595093ec2d965a364fa96
   size: 11097859
   path: 2012ihses01_household_roster.dta
+  hash: md5

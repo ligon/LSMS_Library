@@ -2,3 +2,4 @@ outs:
 - md5: 3340f7efa6d482ed5107e9eb1c584c7c
   size: 334768
   path: BBHCFHH.DTA
+  hash: md5

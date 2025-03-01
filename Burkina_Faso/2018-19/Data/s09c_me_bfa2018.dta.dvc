@@ -2,3 +2,4 @@ outs:
 - md5: a7c288af07519fa72dc5cb26ae089425
   size: 377903
   path: s09c_me_bfa2018.dta
+  hash: md5

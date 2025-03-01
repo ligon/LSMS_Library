@@ -2,3 +2,4 @@ outs:
 - md5: 439013d5b58894d4258959045534a715
   size: 933652
   path: 03biv_intransfersquestions.dta
+  hash: md5

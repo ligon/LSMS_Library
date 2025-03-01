@@ -2,3 +2,4 @@ outs:
 - md5: 4d910283d04e69bb923d74582be0b9a1
   size: 16201
   path: M13_B1.DTA
+  hash: md5

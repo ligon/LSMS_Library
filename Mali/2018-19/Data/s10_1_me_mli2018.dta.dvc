@@ -2,3 +2,4 @@ outs:
 - md5: 6dc6cfa20dcec279ac7f4df0a2878193
   size: 300920
   path: s10_1_me_mli2018.dta
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: 97207d3855bed67a4dc7c1f532f9fcf7
   size: 96297
   path: assistance.dta
+  hash: md5

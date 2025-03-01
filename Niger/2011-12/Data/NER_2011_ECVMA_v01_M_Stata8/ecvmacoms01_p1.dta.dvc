@@ -2,3 +2,4 @@ outs:
 - md5: 7fcc0892dbeb9914cb4a326efb251dd0
   size: 327107
   path: ecvmacoms01_p1.dta
+  hash: md5

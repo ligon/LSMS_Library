@@ -2,3 +2,4 @@ outs:
 - md5: 22dab1c0e538169c03833cb51b201b8c
   size: 353120
   path: m5b.dta
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: c2f438ae08603db32142857d12d3c017
   size: 105947
   path: c_access.dta
+  hash: md5

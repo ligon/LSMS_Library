@@ -2,3 +2,4 @@ outs:
 - md5: f48366b2c47562bd0a20ae2bd9432c35
   size: 99461
   path: INC7.DTA
+  hash: md5

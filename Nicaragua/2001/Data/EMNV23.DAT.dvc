@@ -2,3 +2,4 @@ outs:
 - md5: 58cdb6a13e1ce445c50d46c30965c02f
   size: 58484
   path: EMNV23.DAT
+  hash: md5

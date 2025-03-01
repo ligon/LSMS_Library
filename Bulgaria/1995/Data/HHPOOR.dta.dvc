@@ -2,3 +2,4 @@ outs:
 - md5: 712ed12a8d3485cbcdc5ac138ca77b0a
   size: 198406
   path: HHPOOR.dta
+  hash: md5

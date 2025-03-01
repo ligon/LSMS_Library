@@ -2,3 +2,4 @@ outs:
 - md5: b2cf34551e981b99bb4f5c9b41afc393
   size: 20706
   path: R_ORGANIZATION_AND_DISPLACEMENT.dta
+  hash: md5

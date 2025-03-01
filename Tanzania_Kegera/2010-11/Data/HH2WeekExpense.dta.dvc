@@ -2,3 +2,4 @@ outs:
 - md5: 5ee2e84e5df75a64c22ce063530d7930
   size: 319263
   path: HH2WeekExpense.dta
+  hash: md5

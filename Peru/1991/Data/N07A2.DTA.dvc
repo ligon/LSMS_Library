@@ -2,3 +2,4 @@ outs:
 - md5: 8efe160b2e24deccb5fb64f3209f61a0
   size: 234944
   path: N07A2.DTA
+  hash: md5

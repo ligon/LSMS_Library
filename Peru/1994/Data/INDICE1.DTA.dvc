@@ -2,3 +2,4 @@ outs:
 - md5: 7d38ce39f3cd1e71c639cd2dd0062f54
   size: 1532
   path: INDICE1.DTA
+  hash: md5

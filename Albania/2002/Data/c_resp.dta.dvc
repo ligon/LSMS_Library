@@ -2,3 +2,4 @@ outs:
 - md5: 79bcd5329aaad83d519994f1a1ccc542
   size: 12290
   path: c_resp.dta
+  hash: md5

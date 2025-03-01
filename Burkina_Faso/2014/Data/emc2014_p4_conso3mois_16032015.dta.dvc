@@ -2,3 +2,4 @@ outs:
 - md5: a002baddec6dd0e241589e3a5c85204a
   size: 4778509
   path: emc2014_p4_conso3mois_16032015.dta
+  hash: md5

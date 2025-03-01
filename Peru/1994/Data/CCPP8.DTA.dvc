@@ -2,3 +2,4 @@ outs:
 - md5: 1bde062d51424cb937884dc02e8065b5
   size: 20233
   path: CCPP8.DTA
+  hash: md5

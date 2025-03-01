@@ -2,3 +2,4 @@ outs:
 - md5: 0564adafd1b7241239e672b69ef2e411
   size: 3290015
   path: 10dii_mediaextensionsquestions.dta
+  hash: md5

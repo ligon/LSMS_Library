@@ -1,3 +1,4 @@
 outs:
 - md5: 431b3e1e5a82e7f603330917400f4d9a
   path: F09D4B.DAT
+  hash: md5

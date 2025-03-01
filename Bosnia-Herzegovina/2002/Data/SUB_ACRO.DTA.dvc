@@ -2,3 +2,4 @@ outs:
 - md5: 5426ef6a19ac7463807e18f6edff5f0c
   size: 6825487
   path: SUB_ACRO.DTA
+  hash: md5

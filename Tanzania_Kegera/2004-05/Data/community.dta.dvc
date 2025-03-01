@@ -2,3 +2,4 @@ outs:
 - md5: c2f786fd999aff32daea30c5f28b397a
   size: 274588
   path: community.dta
+  hash: md5

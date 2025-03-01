@@ -2,3 +2,4 @@ outs:
 - md5: efa61cbb56ca88d47ee1503e71c9c6cf
   size: 7704275
   path: M10_FSC.dta
+  hash: md5

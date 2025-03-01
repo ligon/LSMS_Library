@@ -2,3 +2,4 @@ outs:
 - md5: ddd4803eb88325a0dbf317b170f1c089
   size: 1712610
   path: HHExpenditureInd2wks.dta
+  hash: md5

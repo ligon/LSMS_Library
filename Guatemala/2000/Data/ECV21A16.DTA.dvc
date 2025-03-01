@@ -2,3 +2,4 @@ outs:
 - md5: 50e1d0edaabe0676a8645994e7bc7845
   size: 380266
   path: ECV21A16.DTA
+  hash: md5

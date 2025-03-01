@@ -2,3 +2,4 @@ outs:
 - md5: 1f81402778b9395218fe01705db5e8f8
   size: 16018
   path: fs_mod_h2.dta
+  hash: md5

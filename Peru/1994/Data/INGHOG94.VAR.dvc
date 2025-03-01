@@ -2,3 +2,4 @@ outs:
 - md5: 209d23fc43cfa27b9208bc8b1317097d
   size: 460
   path: INGHOG94.VAR
+  hash: md5

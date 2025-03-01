@@ -2,3 +2,4 @@ outs:
 - md5: df83b952ea6c57944b6d851a98f83e43
   size: 425068
   path: SUB_AFER.DTA
+  hash: md5

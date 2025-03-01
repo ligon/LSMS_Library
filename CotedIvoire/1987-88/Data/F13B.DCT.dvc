@@ -1,3 +1,4 @@
 outs:
 - md5: 5e4fdcf28746ef99fdbbac604936cf03
   path: F13B.DCT
+  hash: md5

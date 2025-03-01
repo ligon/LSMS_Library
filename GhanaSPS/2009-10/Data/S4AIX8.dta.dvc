@@ -2,3 +2,4 @@ outs:
 - md5: f0f7a11898cc2544b3a872d9386e1be2
   size: 268001
   path: S4AIX8.dta
+  hash: md5

@@ -1,3 +1,4 @@
 outs:
 - md5: a3cba9f241e4b2db96512cd992d33707
   path: s6_housing.sav
+  hash: md5

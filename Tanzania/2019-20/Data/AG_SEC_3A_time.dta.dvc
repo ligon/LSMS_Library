@@ -2,3 +2,4 @@ outs:
 - md5: 73b2a1099e6bdf0ca9e0c02d1359fa41
   size: 337103
   path: AG_SEC_3A_time.dta
+  hash: md5

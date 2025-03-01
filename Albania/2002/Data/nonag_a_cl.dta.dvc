@@ -2,3 +2,4 @@ outs:
 - md5: 8e89446d83fbde7bf218a9e124f49188
   size: 8136
   path: nonag_a_cl.dta
+  hash: md5

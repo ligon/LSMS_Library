@@ -2,3 +2,4 @@ outs:
 - md5: 1dd232eb87e8e16dbe66cb932ca5c969
   size: 2524
   path: s00a_co_ben2018.dta
+  hash: md5

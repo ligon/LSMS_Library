@@ -2,3 +2,4 @@ outs:
 - md5: 824577f834e79831ef3b3ab3ef7f20a3
   size: 160808
   path: EACICONTROLE_p2.dta
+  hash: md5

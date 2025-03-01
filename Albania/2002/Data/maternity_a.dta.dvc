@@ -2,3 +2,4 @@ outs:
 - md5: 8ffc0b29db31bc8056cc305193676fdf
   size: 520445
   path: maternity_a.dta
+  hash: md5

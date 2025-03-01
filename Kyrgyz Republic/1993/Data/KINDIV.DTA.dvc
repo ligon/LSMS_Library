@@ -2,3 +2,4 @@ outs:
 - md5: 33ece5d3b8d07c09385173feae031864
   size: 326223
   path: KINDIV.DTA
+  hash: md5

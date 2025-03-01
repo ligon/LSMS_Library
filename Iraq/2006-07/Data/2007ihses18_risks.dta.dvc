@@ -2,3 +2,4 @@ outs:
 - md5: 5743614aa5051e347c94ee95a58c16e2
   size: 973787
   path: 2007ihses18_risks.dta
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: 887bf992bd0ab57afcd5960debed9a01
   size: 24161
   path: FORMAT.ZIP
+  hash: md5

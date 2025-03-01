@@ -2,3 +2,4 @@ outs:
 - md5: 8e7edf919c86fc6c4ce558118ff02721
   size: 4608
   path: MEMBA.dta
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: 0c786840cf2726e2ac560a0c89a9d09d
   size: 1276890
   path: 09_GHA_EXPRCRE.dta
+  hash: md5

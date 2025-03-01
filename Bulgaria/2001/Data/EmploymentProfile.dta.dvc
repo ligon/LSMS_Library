@@ -2,3 +2,4 @@ outs:
 - md5: b091872b90792d5ce1bcd8e78b70d4f0
   size: 67489
   path: EmploymentProfile.dta
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: df53518dc60f0969fc4450e6688455bf
   size: 5032522
   path: 01evii_anthropometry.dta
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: 7e5c92edcb480d2ac85085cad166f55a
   size: 536514
   path: HHINCTL.dta
+  hash: md5

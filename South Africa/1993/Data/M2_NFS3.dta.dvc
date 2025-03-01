@@ -2,3 +2,4 @@ outs:
 - md5: d0705dcf1c0612b705b0e75f82179e09
   size: 540872
   path: M2_NFS3.dta
+  hash: md5

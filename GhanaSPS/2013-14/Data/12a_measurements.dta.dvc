@@ -2,3 +2,4 @@ outs:
 - md5: 0e36df6156efa19df7958501a370ca6c
   size: 312408
   path: 12a_measurements.dta
+  hash: md5

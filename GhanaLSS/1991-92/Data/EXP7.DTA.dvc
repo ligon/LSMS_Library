@@ -2,3 +2,4 @@ outs:
 - md5: 4ca83c14c622073ad089452eee42bd58
   size: 1282470
   path: EXP7.DTA
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: dd36119aad2627fb78889feb96fe3516
   size: 1369071
   path: ECVMA2_MS11AP1.dta
+  hash: md5

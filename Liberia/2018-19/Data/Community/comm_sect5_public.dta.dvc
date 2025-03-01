@@ -2,3 +2,4 @@ outs:
 - md5: 0586bc1936d727e03134dae37bffae71
   size: 56568
   path: comm_sect5_public.dta
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: 86090856733248eb8806be5ea1aa566f
   size: 144188
   path: SUBAGG20.DTA
+  hash: md5

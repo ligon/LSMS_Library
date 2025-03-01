@@ -1,3 +1,4 @@
 outs:
 - md5: bbc11931b5ddb13ac88b5ffcc35510a3
   path: Y04.DCT
+  hash: md5

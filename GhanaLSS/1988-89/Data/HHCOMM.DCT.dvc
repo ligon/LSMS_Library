@@ -1,3 +1,4 @@
 outs:
 - md5: cce45b115a09f0f1a462fddd67e2cef6
   path: HHCOMM.DCT
+  hash: md5

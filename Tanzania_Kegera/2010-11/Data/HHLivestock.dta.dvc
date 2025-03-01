@@ -2,3 +2,4 @@ outs:
 - md5: 8d486702f88bc82e090c29f2b0dab702
   size: 657492
   path: HHLivestock.dta
+  hash: md5

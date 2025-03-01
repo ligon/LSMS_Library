@@ -2,3 +2,4 @@ outs:
 - md5: 835718667d24cf14687c90aa20365435
   size: 38340
   path: VILL01A2.DTA
+  hash: md5

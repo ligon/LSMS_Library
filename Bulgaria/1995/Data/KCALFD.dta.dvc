@@ -2,3 +2,4 @@ outs:
 - md5: 989eb6feb0213e28b6c61a476156d919
   size: 1538
   path: KCALFD.dta
+  hash: md5

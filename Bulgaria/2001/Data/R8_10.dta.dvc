@@ -2,3 +2,4 @@ outs:
 - md5: 907286c0ab1e45c26ac20b37b929a136
   size: 666119
   path: R8_10.dta
+  hash: md5

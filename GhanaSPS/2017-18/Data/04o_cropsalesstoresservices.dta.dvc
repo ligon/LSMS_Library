@@ -2,3 +2,4 @@ outs:
 - md5: 8d1a284ce647a4226e92fccb81891ddb
   size: 2207744
   path: 04o_cropsalesstoresservices.dta
+  hash: md5

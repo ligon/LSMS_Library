@@ -1,3 +1,4 @@
 outs:
 - md5: da8c3942f4a90ca35c8e4585997ff76d
   path: s11_tran_out.sav
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: 3311f1e31a4f36ce074738a260af9b31
   size: 394353
   path: AGSEC8A.dta
+  hash: md5

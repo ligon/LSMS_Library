@@ -2,3 +2,4 @@ outs:
 - md5: df6347c086042a7a306839e3b24c9e44
   size: 708302
   path: non_food.dta
+  hash: md5

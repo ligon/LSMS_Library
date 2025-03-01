@@ -2,3 +2,4 @@ outs:
 - md5: 49f771d5655ba453df7cdc200f346a09
   size: 622
   path: SEC13PE.DTA
+  hash: md5

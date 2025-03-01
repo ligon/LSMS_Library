@@ -2,3 +2,4 @@ outs:
 - md5: fdddb9f3a8525a7373d7fbf29e9c7914
   size: 393142
   path: FILE46V0.dta
+  hash: md5

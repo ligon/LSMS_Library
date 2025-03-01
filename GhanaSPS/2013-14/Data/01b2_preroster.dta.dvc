@@ -2,3 +2,4 @@ outs:
 - md5: 418a545c79aa18acae0bcc31d61e3a1e
   size: 7788898
   path: 01b2_preroster.dta
+  hash: md5

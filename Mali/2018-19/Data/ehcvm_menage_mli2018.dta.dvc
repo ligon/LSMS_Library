@@ -2,3 +2,4 @@ outs:
 - md5: 2359ef378cce556121f0c022330bd227
   size: 330591
   path: ehcvm_menage_mli2018.dta
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: b95fb0f995375571b9f31a6394d18f33
   size: 2043314
   path: sect_cover_cc_w3.dta
+  hash: md5

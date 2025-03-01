@@ -2,3 +2,4 @@ outs:
 - md5: 705f566edfc7af182b1824cb3dc447bc
   size: 5984055
   path: 22otros_gastos_agricolas.dta
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: d4be4d399da10183defb902a82810201
   size: 100322
   path: ag_sec_7b.dta
+  hash: md5

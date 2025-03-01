@@ -2,3 +2,4 @@ outs:
 - md5: 3e6ba23e91e1620f9d6e64dbcb2f06a3
   size: 30790
   path: csec4r.dta
+  hash: md5

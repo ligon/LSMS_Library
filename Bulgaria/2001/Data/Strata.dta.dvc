@@ -2,3 +2,4 @@ outs:
 - md5: 57858c30323c42c3c0f80ce6ca5979d7
   size: 57928
   path: Strata.dta
+  hash: md5

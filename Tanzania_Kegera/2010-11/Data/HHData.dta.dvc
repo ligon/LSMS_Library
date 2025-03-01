@@ -2,3 +2,4 @@ outs:
 - md5: 5312df75a8aea2428093592ffb879807
   size: 1252104
   path: HHData.dta
+  hash: md5

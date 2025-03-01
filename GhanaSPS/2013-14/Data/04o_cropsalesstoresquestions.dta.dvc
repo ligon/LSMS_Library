@@ -2,3 +2,4 @@ outs:
 - md5: 63db6971ac9ffe19fa9630be277ef246
   size: 4016757
   path: 04o_cropsalesstoresquestions.dta
+  hash: md5

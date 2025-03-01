@@ -2,3 +2,4 @@ outs:
 - md5: 07e072826b34bb5004b43286a94c98d5
   size: 25555
   path: UnemploymentBenefitsAggregate.dta
+  hash: md5

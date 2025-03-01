@@ -2,3 +2,4 @@ outs:
 - md5: b2452f167b11f0a9a171dda17a0f8dc8
   size: 12831551
   path: H_22-23.dta
+  hash: md5

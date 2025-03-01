@@ -1,3 +1,4 @@
 outs:
 - md5: a77334893c9f66a7c507a31305bbd050
   path: s10_enter_6.sav
+  hash: md5

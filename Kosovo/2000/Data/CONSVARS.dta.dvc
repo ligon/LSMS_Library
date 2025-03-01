@@ -2,3 +2,4 @@ outs:
 - md5: 4bbf71bf2d6c089ab786e75d5b5eb929
   size: 93572
   path: CONSVARS.dta
+  hash: md5

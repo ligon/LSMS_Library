@@ -1,3 +1,4 @@
 outs:
 - md5: dc13ae9042f97c9eece5c9fb032c5a2c
   path: 04_GHA_EXPHOUS.dta
+  hash: md5

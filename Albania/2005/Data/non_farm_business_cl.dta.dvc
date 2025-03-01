@@ -2,3 +2,4 @@ outs:
 - md5: ca86fb53b31a30c967db4ec6c27b0101
   size: 97807
   path: non_farm_business_cl.dta
+  hash: md5

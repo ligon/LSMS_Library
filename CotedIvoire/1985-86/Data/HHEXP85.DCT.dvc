@@ -1,3 +1,4 @@
 outs:
 - md5: 1e63416ff27b1658b72a68a070468681
   path: HHEXP85.DCT
+  hash: md5
