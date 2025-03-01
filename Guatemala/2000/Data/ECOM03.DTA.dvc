@@ -2,5 +2,3 @@ outs:
 - md5: 6a784782671d8cfdec307c32879b15d8
   size: 361171
   path: ECOM03.DTA
-  md5-dos2unix: 6a784782671d8cfdec307c32879b15d8
-  hash: md5

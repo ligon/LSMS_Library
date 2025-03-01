@@ -2,5 +2,3 @@ outs:
 - md5: 1f0e90910fe86acbd9695c5a872a0719
   size: 25533
   path: assetscore.dta
-  md5-dos2unix: 1f0e90910fe86acbd9695c5a872a0719
-  hash: md5

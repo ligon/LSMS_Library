@@ -2,5 +2,3 @@ outs:
 - md5: c1663788c92d38f0b1626275155c9605
   size: 355225
   path: SEC13PL.DTA
-  md5-dos2unix: c1663788c92d38f0b1626275155c9605
-  hash: md5

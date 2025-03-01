@@ -2,5 +2,3 @@ outs:
 - md5: d23df3ba4be4b1ce39d577ac8cf4b4cc
   size: 266709
   path: agr_a1_cl.dta
-  md5-dos2unix: d23df3ba4be4b1ce39d577ac8cf4b4cc
-  hash: md5

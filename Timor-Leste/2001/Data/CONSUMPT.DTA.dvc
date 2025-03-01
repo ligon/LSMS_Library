@@ -2,5 +2,3 @@ outs:
 - md5: ce35e985dc790353dbbfe840ef6b9b77
   size: 152536
   path: CONSUMPT.DTA
-  md5-dos2unix: ce35e985dc790353dbbfe840ef6b9b77
-  hash: md5

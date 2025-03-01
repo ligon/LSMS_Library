@@ -2,5 +2,3 @@ outs:
 - md5: 43ac571b77ad0fea87344c878c83bcd7
   size: 19853
   path: com_cf.dta
-  md5-dos2unix: 43ac571b77ad0fea87344c878c83bcd7
-  hash: md5

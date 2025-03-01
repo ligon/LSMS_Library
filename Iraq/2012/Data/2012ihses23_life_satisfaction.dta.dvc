@@ -2,5 +2,3 @@ outs:
 - md5: 58ff6ae3174d6272aad1b9d45946a031
   size: 10217308
   path: 2012ihses23_life_satisfaction.dta
-  md5-dos2unix: 58ff6ae3174d6272aad1b9d45946a031
-  hash: md5

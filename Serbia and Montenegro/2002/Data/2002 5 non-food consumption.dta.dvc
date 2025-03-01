@@ -2,5 +2,3 @@ outs:
 - md5: 71177572eb9ecac398c5e3343647aac2
   size: 4416368
   path: 2002 5 non-food consumption.dta
-  md5-dos2unix: 71177572eb9ecac398c5e3343647aac2
-  hash: md5

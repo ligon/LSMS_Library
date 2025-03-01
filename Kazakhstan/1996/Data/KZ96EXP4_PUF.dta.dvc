@@ -2,5 +2,3 @@ outs:
 - md5: 94ce8af9e678fed76e56aec7f062856e
   size: 634805
   path: KZ96EXP4_PUF.dta
-  md5-dos2unix: 94ce8af9e678fed76e56aec7f062856e
-  hash: md5

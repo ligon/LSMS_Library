@@ -2,5 +2,3 @@ outs:
 - md5: 2b90122a5e48996fdb39714a168224a7
   size: 3574796
   path: ehcvm_individu_ben2018.dta
-  md5-dos2unix: 2b90122a5e48996fdb39714a168224a7
-  hash: md5

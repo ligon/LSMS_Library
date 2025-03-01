@@ -2,5 +2,3 @@ outs:
 - md5: 047cb8142b5ab0493452813738e894cc
   size: 478734
   path: dbhcfhh_bih.dta
-  md5-dos2unix: 047cb8142b5ab0493452813738e894cc
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: 18c1beefa46093831ccf4d1491cdf3cd
   size: 3153465
   path: w3_hh_all.dta
-  md5-dos2unix: 18c1beefa46093831ccf4d1491cdf3cd
-  hash: md5

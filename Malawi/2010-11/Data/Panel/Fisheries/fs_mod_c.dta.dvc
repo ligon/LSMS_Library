@@ -2,5 +2,3 @@ outs:
 - md5: d3562b66c00e27ae720642f823c0c73f
   size: 6002
   path: fs_mod_c.dta
-  md5-dos2unix: d3562b66c00e27ae720642f823c0c73f
-  hash: md5

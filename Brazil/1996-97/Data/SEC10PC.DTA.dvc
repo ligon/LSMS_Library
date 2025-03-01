@@ -2,5 +2,3 @@ outs:
 - md5: f432dab379ea995a2b1b39c3df285f2a
   size: 1280022
   path: SEC10PC.DTA
-  md5-dos2unix: f432dab379ea995a2b1b39c3df285f2a
-  hash: md5

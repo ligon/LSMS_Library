@@ -2,5 +2,3 @@ outs:
 - md5: 0f0edcd5cb24a925f2cee224d525ea85
   size: 2348
   path: EXP20.DTA
-  md5-dos2unix: 0f0edcd5cb24a925f2cee224d525ea85
-  hash: md5

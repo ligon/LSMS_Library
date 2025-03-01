@@ -2,5 +2,3 @@ outs:
 - md5: 03877089ce86cb218d0ec0708ded3a5a
   size: 16330654
   path: SECT5A_K.DTA
-  md5-dos2unix: 03877089ce86cb218d0ec0708ded3a5a
-  hash: md5

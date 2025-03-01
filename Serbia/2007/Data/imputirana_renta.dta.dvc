@@ -2,5 +2,3 @@ outs:
 - md5: 0e1e43f51c2cb9341012b1fe33bdcb01
   size: 95651
   path: imputirana_renta.dta
-  md5-dos2unix: 0e1e43f51c2cb9341012b1fe33bdcb01
-  hash: md5

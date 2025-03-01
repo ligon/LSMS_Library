@@ -2,5 +2,3 @@ outs:
 - md5: be2d5ead02ae5ad9101e32e293eff0e6
   size: 50048
   path: A06B.dta
-  md5-dos2unix: be2d5ead02ae5ad9101e32e293eff0e6
-  hash: md5

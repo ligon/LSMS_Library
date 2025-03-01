@@ -1,5 +1,3 @@
 outs:
 - md5: 6031686d06ed881d9e7758d6c92a28a2
   path: 02_GHA_EXPALCH.dta
-  md5-dos2unix: 6031686d06ed881d9e7758d6c92a28a2
-  hash: md5

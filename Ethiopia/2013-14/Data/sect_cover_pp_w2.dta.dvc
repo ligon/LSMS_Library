@@ -2,5 +2,3 @@ outs:
 - md5: f7bb7fd9957b5ae20deadd4b4484d790
   size: 2009201
   path: sect_cover_pp_w2.dta
-  md5-dos2unix: f7bb7fd9957b5ae20deadd4b4484d790
-  hash: md5

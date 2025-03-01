@@ -1,5 +1,3 @@
 outs:
 - md5: 58781f6d703e0a497b266fd9575db206
   path: GSEC18.dta
-  md5-dos2unix: 58781f6d703e0a497b266fd9575db206
-  hash: md5

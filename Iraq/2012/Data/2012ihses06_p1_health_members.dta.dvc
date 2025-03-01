@@ -2,5 +2,3 @@ outs:
 - md5: 80bc739c4f8edc5ce6343f69ea5a3dd6
   size: 13390674
   path: 2012ihses06_p1_health_members.dta
-  md5-dos2unix: 80bc739c4f8edc5ce6343f69ea5a3dd6
-  hash: md5

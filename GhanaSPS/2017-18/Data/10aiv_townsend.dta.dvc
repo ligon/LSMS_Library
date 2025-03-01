@@ -2,5 +2,3 @@ outs:
 - md5: 86ccb9fe8f8afd782b94166a3224f033
   size: 454157
   path: 10aiv_townsend.dta
-  md5-dos2unix: 86ccb9fe8f8afd782b94166a3224f033
-  hash: md5

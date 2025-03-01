@@ -2,5 +2,3 @@ outs:
 - md5: cce30fbdf530f86232fe9216ba7369e8
   size: 185714
   path: sec42.dta
-  md5-dos2unix: cce30fbdf530f86232fe9216ba7369e8
-  hash: md5

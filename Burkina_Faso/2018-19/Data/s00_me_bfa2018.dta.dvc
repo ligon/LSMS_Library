@@ -2,5 +2,3 @@ outs:
 - md5: 0adebc92d8366c791dd6fe7151b17951
   size: 1403162
   path: s00_me_bfa2018.dta
-  md5-dos2unix: 0adebc92d8366c791dd6fe7151b17951
-  hash: md5

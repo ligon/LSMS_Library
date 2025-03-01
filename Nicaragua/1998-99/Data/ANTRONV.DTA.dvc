@@ -2,5 +2,3 @@ outs:
 - md5: 837cdaf1f1b8e7912e0ceb380e3e93f5
   size: 1131152
   path: ANTRONV.DTA
-  md5-dos2unix: 837cdaf1f1b8e7912e0ceb380e3e93f5
-  hash: md5

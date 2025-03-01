@@ -2,5 +2,3 @@ outs:
 - md5: 9340bd1c94308f09b504cc6e9bf4b58f
   size: 3633203
   path: FILE11V1.dta
-  md5-dos2unix: 9340bd1c94308f09b504cc6e9bf4b58f
-  hash: md5

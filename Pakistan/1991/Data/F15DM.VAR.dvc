@@ -2,5 +2,3 @@ outs:
 - md5: d84e27e12add50115334ba51c1d0a3bc
   size: 346
   path: F15DM.VAR
-  md5-dos2unix: d84e27e12add50115334ba51c1d0a3bc
-  hash: md5

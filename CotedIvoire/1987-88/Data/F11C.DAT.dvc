@@ -1,5 +1,3 @@
 outs:
 - md5: b0bed8f7993f81c815462b68e2cb7a11
   path: F11C.DAT
-  md5-dos2unix: b0bed8f7993f81c815462b68e2cb7a11
-  hash: md5

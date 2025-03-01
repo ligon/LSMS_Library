@@ -2,5 +2,3 @@ outs:
 - md5: e6ae02a03a713c4bc33fb575fa2e98e6
   size: 4015725
   path: SEC8D.DTA
-  md5-dos2unix: e6ae02a03a713c4bc33fb575fa2e98e6
-  hash: md5

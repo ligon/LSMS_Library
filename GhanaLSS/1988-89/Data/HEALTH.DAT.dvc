@@ -1,5 +1,3 @@
 outs:
 - md5: fa338ab4ffae8e7cc6cc2cc217c73927
   path: HEALTH.DAT
-  md5-dos2unix: fa338ab4ffae8e7cc6cc2cc217c73927
-  hash: md5

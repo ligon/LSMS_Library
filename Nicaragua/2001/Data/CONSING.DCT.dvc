@@ -2,5 +2,3 @@ outs:
 - md5: 45a0f74b71e9206bf8569dafe8b93462
   size: 834
   path: CONSING.DCT
-  md5-dos2unix: 45a0f74b71e9206bf8569dafe8b93462
-  hash: md5

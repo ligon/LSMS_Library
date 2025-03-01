@@ -2,5 +2,3 @@ outs:
 - md5: 6918f88be596ddafa09e04b768664d3e
   size: 62480
   path: N07A1.SSP
-  md5-dos2unix: 6918f88be596ddafa09e04b768664d3e
-  hash: md5

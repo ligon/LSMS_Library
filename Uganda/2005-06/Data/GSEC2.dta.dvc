@@ -1,5 +1,3 @@
 outs:
 - md5: ef630a290841d20923f2020c2e050ec8
   path: GSEC2.dta
-  md5-dos2unix: ef630a290841d20923f2020c2e050ec8
-  hash: md5

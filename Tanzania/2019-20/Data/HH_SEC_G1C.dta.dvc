@@ -2,5 +2,3 @@ outs:
 - md5: cb0d42a0582a779d503f0b7f5c2d865d
   size: 1484828
   path: HH_SEC_G1C.dta
-  md5-dos2unix: cb0d42a0582a779d503f0b7f5c2d865d
-  hash: md5

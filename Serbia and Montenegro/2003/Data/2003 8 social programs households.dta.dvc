@@ -2,5 +2,3 @@ outs:
 - md5: 866c0e1e6f9f57b9289f0d70d33fce35
   size: 210224
   path: 2003 8 social programs households.dta
-  md5-dos2unix: 866c0e1e6f9f57b9289f0d70d33fce35
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: 136947fd3a6d331a95746cfdbd0ee7c0
   size: 760611
   path: GASHOG94.DTA
-  md5-dos2unix: 136947fd3a6d331a95746cfdbd0ee7c0
-  hash: md5

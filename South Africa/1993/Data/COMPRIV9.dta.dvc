@@ -2,5 +2,3 @@ outs:
 - md5: e161b565d99d1aac7c8b7afac6e042f9
   size: 585052
   path: COMPRIV9.dta
-  md5-dos2unix: e161b565d99d1aac7c8b7afac6e042f9
-  hash: md5

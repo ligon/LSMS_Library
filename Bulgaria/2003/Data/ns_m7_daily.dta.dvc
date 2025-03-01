@@ -2,5 +2,3 @@ outs:
 - md5: 3229c4d4cc952d804b3ab2dcba67dc80
   size: 312512
   path: ns_m7_daily.dta
-  md5-dos2unix: 3229c4d4cc952d804b3ab2dcba67dc80
-  hash: md5

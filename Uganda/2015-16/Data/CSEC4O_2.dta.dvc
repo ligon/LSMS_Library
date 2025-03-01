@@ -1,5 +1,3 @@
 outs:
 - md5: 1907727aaf7001f14e72c82c1b642c11
   path: CSEC4O_2.dta
-  md5-dos2unix: 1907727aaf7001f14e72c82c1b642c11
-  hash: md5

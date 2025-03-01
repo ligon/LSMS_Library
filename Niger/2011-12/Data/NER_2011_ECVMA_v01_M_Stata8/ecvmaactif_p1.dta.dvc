@@ -2,5 +2,3 @@ outs:
 - md5: be2342e23e2cc267219dd72ba8b64653
   size: 6209508
   path: ecvmaactif_p1.dta
-  md5-dos2unix: be2342e23e2cc267219dd72ba8b64653
-  hash: md5

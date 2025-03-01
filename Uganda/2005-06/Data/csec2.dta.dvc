@@ -1,5 +1,3 @@
 outs:
 - md5: 8fa470bb088b8c8223702c284fa18016
   path: csec2.dta
-  md5-dos2unix: 8fa470bb088b8c8223702c284fa18016
-  hash: md5

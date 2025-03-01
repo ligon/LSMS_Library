@@ -1,5 +1,3 @@
 outs:
 - md5: bcd8079d7b6d0e37385ccf468e954d90
   path: F04.DCT
-  md5-dos2unix: bcd8079d7b6d0e37385ccf468e954d90
-  hash: md5

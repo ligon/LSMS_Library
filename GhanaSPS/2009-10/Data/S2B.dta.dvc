@@ -2,5 +2,3 @@ outs:
 - md5: 79b0ca8b8ac8f6492276a2dc3d91c2f8
   size: 46930
   path: S2B.dta
-  md5-dos2unix: 79b0ca8b8ac8f6492276a2dc3d91c2f8
-  hash: md5

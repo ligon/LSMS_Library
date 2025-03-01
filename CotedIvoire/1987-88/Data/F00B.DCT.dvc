@@ -1,5 +1,3 @@
 outs:
 - md5: 9e05fdd02c1e8b361efc9e3743549808
   path: F00B.DCT
-  md5-dos2unix: 9e05fdd02c1e8b361efc9e3743549808
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: 84eba386f8f734684c5b8bdf411f94de
   size: 15508865
   path: 2007ihses14_non_wage_earnings.dta
-  md5-dos2unix: 84eba386f8f734684c5b8bdf411f94de
-  hash: md5

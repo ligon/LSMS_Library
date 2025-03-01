@@ -2,5 +2,3 @@ outs:
 - md5: 488711f60df9a8b708489ad7d1c3e5c2
   size: 5985579
   path: emc2014_p1_conso3mois_16032015.dta
-  md5-dos2unix: 488711f60df9a8b708489ad7d1c3e5c2
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: c44fd6b15c2ae0a4a29eb9c3e89f32ac
   size: 6192
   path: ehcvm_ponderations_bfa2018.dta
-  md5-dos2unix: c44fd6b15c2ae0a4a29eb9c3e89f32ac
-  hash: md5

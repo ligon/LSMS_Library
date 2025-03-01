@@ -2,5 +2,3 @@ outs:
 - md5: 8aff16fce73853c22d200f72ecbd7290
   size: 349561
   path: WSEC1A.dta
-  md5-dos2unix: 8aff16fce73853c22d200f72ecbd7290
-  hash: md5

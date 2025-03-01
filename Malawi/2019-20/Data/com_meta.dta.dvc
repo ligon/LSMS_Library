@@ -2,5 +2,3 @@ outs:
 - md5: 76c69c1ea671cd4c1b46684d9fbfee40
   size: 112284
   path: com_meta.dta
-  md5-dos2unix: 76c69c1ea671cd4c1b46684d9fbfee40
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: 4f4ef881a838efa633e14e29958767b4
   size: 164004
   path: N08A.DTA
-  md5-dos2unix: 4f4ef881a838efa633e14e29958767b4
-  hash: md5

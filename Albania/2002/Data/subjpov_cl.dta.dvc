@@ -2,5 +2,3 @@ outs:
 - md5: d9a35b6f2bf2050790ed1a78d571bd7f
   size: 167459
   path: subjpov_cl.dta
-  md5-dos2unix: d9a35b6f2bf2050790ed1a78d571bd7f
-  hash: md5

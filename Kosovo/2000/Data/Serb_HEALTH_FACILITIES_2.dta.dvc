@@ -2,5 +2,3 @@ outs:
 - md5: ac4fa9842db93506d9bfa3be7740de02
   size: 2816
   path: Serb_HEALTH_FACILITIES_2.dta
-  md5-dos2unix: ac4fa9842db93506d9bfa3be7740de02
-  hash: md5

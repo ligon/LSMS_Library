@@ -2,5 +2,3 @@ outs:
 - md5: b4c0bcf76eb15aa24719be94d61be99a
   size: 95601
   path: data_for_imputting_rents.dta
-  md5-dos2unix: b4c0bcf76eb15aa24719be94d61be99a
-  hash: md5

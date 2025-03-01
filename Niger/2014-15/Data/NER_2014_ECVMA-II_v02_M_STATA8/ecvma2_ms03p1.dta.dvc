@@ -2,5 +2,3 @@ outs:
 - md5: 15bdb90baab0cd7c14f944c2d6faf021
   size: 29523492
   path: ecvma2_ms03p1.dta
-  md5-dos2unix: 15bdb90baab0cd7c14f944c2d6faf021
-  hash: md5

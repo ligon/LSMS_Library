@@ -2,5 +2,3 @@ outs:
 - md5: fbfe5e670999c078e286b332a0635765
   size: 5436650
   path: s02_me_sen2018.dta
-  md5-dos2unix: fbfe5e670999c078e286b332a0635765
-  hash: md5

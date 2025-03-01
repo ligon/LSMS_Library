@@ -2,5 +2,3 @@ outs:
 - md5: 3817dbe3c2306dd828e33d120678e5c7
   size: 33867
   path: FECHAR1.DTA
-  md5-dos2unix: 3817dbe3c2306dd828e33d120678e5c7
-  hash: md5

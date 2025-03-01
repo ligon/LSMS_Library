@@ -2,5 +2,3 @@ outs:
 - md5: 2d75fdbd8b19876cb4d7f47402beb14a
   size: 1631270
   path: POV_GH.DTA
-  md5-dos2unix: 2d75fdbd8b19876cb4d7f47402beb14a
-  hash: md5

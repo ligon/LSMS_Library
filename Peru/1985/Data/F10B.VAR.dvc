@@ -2,5 +2,3 @@ outs:
 - md5: e3990393e2a53264d02a866740428de3
   size: 113
   path: F10B.VAR
-  md5-dos2unix: e3990393e2a53264d02a866740428de3
-  hash: md5

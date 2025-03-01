@@ -2,5 +2,3 @@ outs:
 - md5: e421f5494a2af408248f552f873468a8
   size: 66192
   path: REG20.DTA
-  md5-dos2unix: e421f5494a2af408248f552f873468a8
-  hash: md5

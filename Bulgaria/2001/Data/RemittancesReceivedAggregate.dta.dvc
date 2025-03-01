@@ -2,5 +2,3 @@ outs:
 - md5: 1d113771d28ae3bbd952f827ab70c170
   size: 26863
   path: RemittancesReceivedAggregate.dta
-  md5-dos2unix: 1d113771d28ae3bbd952f827ab70c170
-  hash: md5

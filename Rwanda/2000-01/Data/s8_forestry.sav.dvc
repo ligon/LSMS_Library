@@ -1,5 +1,3 @@
 outs:
 - md5: e57dc7806a28c6894ebd56c1d22d1475
   path: s8_forestry.sav
-  md5-dos2unix: e57dc7806a28c6894ebd56c1d22d1475
-  hash: md5

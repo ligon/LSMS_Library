@@ -2,5 +2,3 @@ outs:
 - md5: 54aae2b8dd560473c3b01d50c6a4c212
   size: 8104953
   path: sect10_ph_w4.dta
-  md5-dos2unix: 54aae2b8dd560473c3b01d50c6a4c212
-  hash: md5

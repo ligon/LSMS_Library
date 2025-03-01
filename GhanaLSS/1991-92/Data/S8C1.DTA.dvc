@@ -2,5 +2,3 @@ outs:
 - md5: 68cfc5d304f1ca5ec20731d3cee2c572
   size: 1014617
   path: S8C1.DTA
-  md5-dos2unix: 68cfc5d304f1ca5ec20731d3cee2c572
-  hash: md5

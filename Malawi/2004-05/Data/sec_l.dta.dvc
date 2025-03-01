@@ -2,5 +2,3 @@ outs:
 - md5: f070f374e63dfc8a1f8bc1b2649b571e
   size: 15346329
   path: sec_l.dta
-  md5-dos2unix: f070f374e63dfc8a1f8bc1b2649b571e
-  hash: md5

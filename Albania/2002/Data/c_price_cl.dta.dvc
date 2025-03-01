@@ -2,5 +2,3 @@ outs:
 - md5: 1674989e1fed195f45d922b05b181296
   size: 1406396
   path: c_price_cl.dta
-  md5-dos2unix: 1674989e1fed195f45d922b05b181296
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: 6304672cc2123259a88fc2f02d4d9a55
   size: 252631
   path: interview.dta
-  md5-dos2unix: 6304672cc2123259a88fc2f02d4d9a55
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: 275404445faf7e569ab897d41df499b3
   size: 1242635
   path: 03bv_savingquestions.dta
-  md5-dos2unix: 275404445faf7e569ab897d41df499b3
-  hash: md5

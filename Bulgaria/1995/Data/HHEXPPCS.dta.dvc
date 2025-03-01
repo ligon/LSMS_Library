@@ -2,5 +2,3 @@ outs:
 - md5: 458552d693daa2248aefbc03994e16ae
   size: 145366
   path: HHEXPPCS.dta
-  md5-dos2unix: 458552d693daa2248aefbc03994e16ae
-  hash: md5

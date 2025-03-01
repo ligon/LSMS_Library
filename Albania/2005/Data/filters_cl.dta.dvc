@@ -2,5 +2,3 @@ outs:
 - md5: 70ef219d16312d0a8bb1aff6bacb09a1
   size: 56075
   path: filters_cl.dta
-  md5-dos2unix: 70ef219d16312d0a8bb1aff6bacb09a1
-  hash: md5

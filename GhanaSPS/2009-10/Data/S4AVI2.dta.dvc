@@ -2,5 +2,3 @@ outs:
 - md5: 88d8926df3c1ccb4ddb9885abeabe81a
   size: 194070
   path: S4AVI2.dta
-  md5-dos2unix: 88d8926df3c1ccb4ddb9885abeabe81a
-  hash: md5

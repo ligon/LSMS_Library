@@ -2,5 +2,3 @@ outs:
 - md5: 11ff21c19832c17e237fc79d6b3225a5
   size: 513427
   path: hh_sec_j4.dta
-  md5-dos2unix: 11ff21c19832c17e237fc79d6b3225a5
-  hash: md5

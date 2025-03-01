@@ -2,5 +2,3 @@ outs:
 - md5: 915c46961d564aa987acaa0a41dcc304
   size: 50726
   path: INCPRP.dta
-  md5-dos2unix: 915c46961d564aa987acaa0a41dcc304
-  hash: md5

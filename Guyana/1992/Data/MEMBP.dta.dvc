@@ -2,5 +2,3 @@ outs:
 - md5: cfbf9be09de113b9c8fd20e703498d8f
   size: 804154
   path: MEMBP.dta
-  md5-dos2unix: cfbf9be09de113b9c8fd20e703498d8f
-  hash: md5

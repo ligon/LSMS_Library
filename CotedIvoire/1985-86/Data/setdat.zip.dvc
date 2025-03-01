@@ -1,5 +1,3 @@
 outs:
 - md5: 5a27146ede84c0773fab5c531235ce05
   path: setdat.zip
-  md5-dos2unix: 5a27146ede84c0773fab5c531235ce05
-  hash: md5

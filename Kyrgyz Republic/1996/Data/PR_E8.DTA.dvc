@@ -2,5 +2,3 @@ outs:
 - md5: 0a8cadc61ee437dda145786e055655be
   size: 802648
   path: PR_E8.DTA
-  md5-dos2unix: 0a8cadc61ee437dda145786e055655be
-  hash: md5

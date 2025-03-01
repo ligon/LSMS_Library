@@ -2,5 +2,3 @@ outs:
 - md5: 7dcdd8a700de43a7ddd0901467b52fb5
   size: 771114
   path: SEC06PA.DTA
-  md5-dos2unix: 7dcdd8a700de43a7ddd0901467b52fb5
-  hash: md5

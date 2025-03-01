@@ -2,5 +2,3 @@ outs:
 - md5: 495f91a5528036753c27d8f505bc82c7
   size: 29735
   path: ns_m4_technika-r3_2-4.dta
-  md5-dos2unix: 495f91a5528036753c27d8f505bc82c7
-  hash: md5

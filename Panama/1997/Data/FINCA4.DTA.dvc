@@ -2,5 +2,3 @@ outs:
 - md5: d91f5879288e1159c158725c5ec0963b
   size: 3654706
   path: FINCA4.DTA
-  md5-dos2unix: d91f5879288e1159c158725c5ec0963b
-  hash: md5

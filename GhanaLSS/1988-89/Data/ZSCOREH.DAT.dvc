@@ -1,5 +1,3 @@
 outs:
 - md5: 9313d6c9ab7c2cdb958dd571b410a97b
   path: ZSCOREH.DAT
-  md5-dos2unix: 9313d6c9ab7c2cdb958dd571b410a97b
-  hash: md5

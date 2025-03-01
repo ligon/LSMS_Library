@@ -2,5 +2,3 @@ outs:
 - md5: 122addfa7cad73a429bfff98a65512b0
   size: 369044
   path: F2B2.DTA
-  md5-dos2unix: 122addfa7cad73a429bfff98a65512b0
-  hash: md5

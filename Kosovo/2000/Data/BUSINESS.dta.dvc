@@ -2,5 +2,3 @@ outs:
 - md5: a223783624d0795bfecf094cfce69255
   size: 95326
   path: BUSINESS.dta
-  md5-dos2unix: a223783624d0795bfecf094cfce69255
-  hash: md5

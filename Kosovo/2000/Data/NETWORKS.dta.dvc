@@ -2,5 +2,3 @@ outs:
 - md5: ee0413d6b3c1fe60e2e6c54df1ce7a8a
   size: 115753
   path: NETWORKS.dta
-  md5-dos2unix: ee0413d6b3c1fe60e2e6c54df1ce7a8a
-  hash: md5

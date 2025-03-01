@@ -2,5 +2,3 @@ outs:
 - md5: 36ccf241d2053dbc207f9ad4c74e4ec1
   size: 1486105
   path: rosterall.dta
-  md5-dos2unix: 36ccf241d2053dbc207f9ad4c74e4ec1
-  hash: md5

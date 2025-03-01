@@ -2,5 +2,3 @@ outs:
 - md5: 63ab45c903f8730a22772633ca2eab4a
   size: 43457
   path: transfer_a.dta
-  md5-dos2unix: 63ab45c903f8730a22772633ca2eab4a
-  hash: md5

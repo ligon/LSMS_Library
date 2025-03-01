@@ -2,5 +2,3 @@ outs:
 - md5: e029ebdcecc0d1d76e56ba24cff4b93b
   size: 1471696
   path: GASTOSB.DTA
-  md5-dos2unix: e029ebdcecc0d1d76e56ba24cff4b93b
-  hash: md5

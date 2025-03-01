@@ -2,5 +2,3 @@ outs:
 - md5: 6abf14263175663d78fc1f04a1589411
   size: 757081
   path: EMNV31.DAT
-  md5-dos2unix: 6abf14263175663d78fc1f04a1589411
-  hash: md5

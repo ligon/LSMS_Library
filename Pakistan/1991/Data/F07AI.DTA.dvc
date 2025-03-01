@@ -2,5 +2,3 @@ outs:
 - md5: be044aea678a651a31d88fba2666f3c4
   size: 1472
   path: F07AI.DTA
-  md5-dos2unix: be044aea678a651a31d88fba2666f3c4
-  hash: md5

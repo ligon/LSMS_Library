@@ -2,5 +2,3 @@ outs:
 - md5: 8787bf57f72e6c09ba3bf4daf4df605a
   size: 334849
   path: ECVMA2014welfare_T1c.dta
-  md5-dos2unix: 8787bf57f72e6c09ba3bf4daf4df605a
-  hash: md5

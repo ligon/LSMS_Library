@@ -2,5 +2,3 @@ outs:
 - md5: aac16bb662303ef3b9d5b45de3a7f2a0
   size: 1078787
   path: SEC8G.DTA
-  md5-dos2unix: aac16bb662303ef3b9d5b45de3a7f2a0
-  hash: md5

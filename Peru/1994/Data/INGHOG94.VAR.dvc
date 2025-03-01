@@ -2,5 +2,3 @@ outs:
 - md5: 209d23fc43cfa27b9208bc8b1317097d
   size: 460
   path: INGHOG94.VAR
-  md5-dos2unix: 209d23fc43cfa27b9208bc8b1317097d
-  hash: md5

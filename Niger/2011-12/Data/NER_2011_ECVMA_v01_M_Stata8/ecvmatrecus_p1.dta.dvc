@@ -2,5 +2,3 @@ outs:
 - md5: 4097ef0a752c1d35c3c2f51b0c137a52
   size: 78759
   path: ecvmatrecus_p1.dta
-  md5-dos2unix: 4097ef0a752c1d35c3c2f51b0c137a52
-  hash: md5

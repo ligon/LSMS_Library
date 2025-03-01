@@ -2,5 +2,3 @@ outs:
 - md5: e11f82191e0fa7151ee34ccc9d86f371
   size: 260220
   path: N02B.DTA
-  md5-dos2unix: e11f82191e0fa7151ee34ccc9d86f371
-  hash: md5

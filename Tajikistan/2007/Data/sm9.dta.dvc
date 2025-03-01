@@ -2,5 +2,3 @@ outs:
 - md5: 0d81442f35abe78a2a5ef34168ce1e91
   size: 54759
   path: sm9.dta
-  md5-dos2unix: 0d81442f35abe78a2a5ef34168ce1e91
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: 8ee630da87ba60a897facd48b2a81ec2
   size: 1464018
   path: EACINA7JO_p2.dta
-  md5-dos2unix: 8ee630da87ba60a897facd48b2a81ec2
-  hash: md5

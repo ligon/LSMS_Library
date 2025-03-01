@@ -2,5 +2,3 @@ outs:
 - md5: c310574d21fdcd8a91a7a97773560e71
   size: 722
   path: F07DC.DTA
-  md5-dos2unix: c310574d21fdcd8a91a7a97773560e71
-  hash: md5

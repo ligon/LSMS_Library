@@ -2,5 +2,3 @@ outs:
 - md5: 0796b05b7ac53b6a02725a83bde33b35
   size: 1873993
   path: dbhhhpos_bih.dta
-  md5-dos2unix: 0796b05b7ac53b6a02725a83bde33b35
-  hash: md5

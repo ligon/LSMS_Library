@@ -2,5 +2,3 @@ outs:
 - md5: 7c641c9b39f78a397fd38c60912c3787
   size: 47935
   path: CCPP7.DTA
-  md5-dos2unix: 7c641c9b39f78a397fd38c60912c3787
-  hash: md5

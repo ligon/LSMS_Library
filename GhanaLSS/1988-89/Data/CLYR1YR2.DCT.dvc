@@ -1,5 +1,3 @@
 outs:
 - md5: a48805d7b59ab27d378355dfc16356db
   path: CLYR1YR2.DCT
-  md5-dos2unix: a48805d7b59ab27d378355dfc16356db
-  hash: md5

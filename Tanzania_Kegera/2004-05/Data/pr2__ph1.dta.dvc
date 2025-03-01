@@ -2,5 +2,3 @@ outs:
 - md5: d581e38d1f5d4b93f42d1587eb4a70fe
   size: 14111
   path: pr2__ph1.dta
-  md5-dos2unix: d581e38d1f5d4b93f42d1587eb4a70fe
-  hash: md5

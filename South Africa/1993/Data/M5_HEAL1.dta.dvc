@@ -2,5 +2,3 @@ outs:
 - md5: 9d00d7cbd80e9bc2e6fc1b2fea8b5d88
   size: 28820
   path: M5_HEAL1.dta
-  md5-dos2unix: 9d00d7cbd80e9bc2e6fc1b2fea8b5d88
-  hash: md5

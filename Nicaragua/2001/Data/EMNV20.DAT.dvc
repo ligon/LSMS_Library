@@ -2,5 +2,3 @@ outs:
 - md5: e1fd90d4efd43a9e6ae04fcdf8cf3cee
   size: 94106
   path: EMNV20.DAT
-  md5-dos2unix: e1fd90d4efd43a9e6ae04fcdf8cf3cee
-  hash: md5

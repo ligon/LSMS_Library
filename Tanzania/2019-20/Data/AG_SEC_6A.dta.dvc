@@ -2,5 +2,3 @@ outs:
 - md5: e517bc7af9fe89fcae64bb9e4f48e3e9
   size: 203992
   path: AG_SEC_6A.dta
-  md5-dos2unix: e517bc7af9fe89fcae64bb9e4f48e3e9
-  hash: md5

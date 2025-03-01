@@ -2,5 +2,3 @@ outs:
 - md5: 1c88bb48d869243862dc321019a9d51d
   size: 110463
   path: HHLIST.DTA
-  md5-dos2unix: 1c88bb48d869243862dc321019a9d51d
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: ea788f471c1ebcd8e061c22268fe7933
   size: 25583
   path: durable.dta
-  md5-dos2unix: ea788f471c1ebcd8e061c22268fe7933
-  hash: md5

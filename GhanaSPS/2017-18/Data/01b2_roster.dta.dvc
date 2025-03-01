@@ -2,5 +2,3 @@ outs:
 - md5: cf7ad7e2cf98f81a48539fe0796a9f69
   size: 665527
   path: 01b2_roster.dta
-  md5-dos2unix: cf7ad7e2cf98f81a48539fe0796a9f69
-  hash: md5

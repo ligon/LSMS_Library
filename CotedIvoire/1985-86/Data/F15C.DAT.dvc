@@ -1,5 +1,3 @@
 outs:
 - md5: 8ad9d744091b3424c8983f481498ba4f
   path: F15C.DAT
-  md5-dos2unix: 8ad9d744091b3424c8983f481498ba4f
-  hash: md5

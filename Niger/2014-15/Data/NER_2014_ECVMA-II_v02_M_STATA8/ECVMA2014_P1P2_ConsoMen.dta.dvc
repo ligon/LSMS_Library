@@ -2,5 +2,3 @@ outs:
 - md5: 790b26c91198e0e67e1456ea46fab9be
   size: 506929
   path: ECVMA2014_P1P2_ConsoMen.dta
-  md5-dos2unix: 790b26c91198e0e67e1456ea46fab9be
-  hash: md5

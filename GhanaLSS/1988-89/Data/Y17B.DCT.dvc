@@ -1,5 +1,3 @@
 outs:
 - md5: d6ad355d90093a1eea3bd873b963f64c
   path: Y17B.DCT
-  md5-dos2unix: d6ad355d90093a1eea3bd873b963f64c
-  hash: md5

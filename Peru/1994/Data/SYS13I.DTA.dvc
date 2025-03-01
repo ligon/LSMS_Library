@@ -2,5 +2,3 @@ outs:
 - md5: c512b3753725419e72dc04df75c124a0
   size: 4074
   path: SYS13I.DTA
-  md5-dos2unix: c512b3753725419e72dc04df75c124a0
-  hash: md5

@@ -1,5 +1,3 @@
 outs:
 - md5: d2bb00954dbfba20c47761e1f8633b63
   path: WEIGHT86.DAT
-  md5-dos2unix: d2bb00954dbfba20c47761e1f8633b63
-  hash: md5

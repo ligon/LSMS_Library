@@ -2,5 +2,3 @@ outs:
 - md5: ad583a6d16433fd6e0b5ab6b50c760cf
   size: 17440506
   path: 11gastose.dta
-  md5-dos2unix: ad583a6d16433fd6e0b5ab6b50c760cf
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: 6057f51adc8474ebb6f1d78a5dd5f4b4
   size: 211430
   path: INC10.DTA
-  md5-dos2unix: 6057f51adc8474ebb6f1d78a5dd5f4b4
-  hash: md5

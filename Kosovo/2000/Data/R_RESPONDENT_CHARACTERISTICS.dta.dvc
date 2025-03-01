@@ -2,5 +2,3 @@ outs:
 - md5: 3d8220ac4ffb9ae1490e64c7d658f90a
   size: 8203
   path: R_RESPONDENT_CHARACTERISTICS.dta
-  md5-dos2unix: 3d8220ac4ffb9ae1490e64c7d658f90a
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: 38971dba3e6b9db42e70b3b05e59604b
   size: 361622
   path: 10av_trust.dta
-  md5-dos2unix: 38971dba3e6b9db42e70b3b05e59604b
-  hash: md5

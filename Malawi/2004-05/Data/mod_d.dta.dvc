@@ -2,5 +2,3 @@ outs:
 - md5: 9dfe72df2e6ce24c9cab21029b94054d
   size: 156320
   path: mod_d.dta
-  md5-dos2unix: 9dfe72df2e6ce24c9cab21029b94054d
-  hash: md5

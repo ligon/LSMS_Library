@@ -1,5 +1,3 @@
 outs:
 - md5: f5b46ab4c36f604d06c7d627162da034
   path: g7sec12b.dta
-  md5-dos2unix: f5b46ab4c36f604d06c7d627162da034
-  hash: md5

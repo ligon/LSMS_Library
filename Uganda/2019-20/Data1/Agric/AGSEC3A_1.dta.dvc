@@ -2,5 +2,3 @@ outs:
 - md5: fc9a668f54a37383f902c55394068c06
   size: 1498237
   path: AGSEC3A_1.dta
-  md5-dos2unix: fc9a668f54a37383f902c55394068c06
-  hash: md5

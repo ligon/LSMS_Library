@@ -2,5 +2,3 @@ outs:
 - md5: 30544a2440597bbd6f6a588fcdaf98e5
   size: 38126
   path: women_r2.dta
-  md5-dos2unix: 30544a2440597bbd6f6a588fcdaf98e5
-  hash: md5

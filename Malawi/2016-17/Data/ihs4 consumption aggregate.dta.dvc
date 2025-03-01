@@ -2,5 +2,3 @@ outs:
 - md5: dd2c45644a76e7968d9ba03900e2f845
   size: 5487354
   path: ihs4 consumption aggregate.dta
-  md5-dos2unix: dd2c45644a76e7968d9ba03900e2f845
-  hash: md5

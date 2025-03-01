@@ -2,5 +2,3 @@ outs:
 - md5: e0de1bbb7118c03d91caa918f8d69ab0
   size: 39935850
   path: m5_1_dnevnik.dta
-  md5-dos2unix: e0de1bbb7118c03d91caa918f8d69ab0
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: 9151608162018278921f68c718c19202
   size: 116643
   path: fs_mod_e1.dta
-  md5-dos2unix: 9151608162018278921f68c718c19202
-  hash: md5

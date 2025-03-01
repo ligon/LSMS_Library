@@ -2,5 +2,3 @@ outs:
 - md5: 7ff5736257338f466c2d345332ed1a6f
   size: 153674
   path: wb_section_10d.dta
-  md5-dos2unix: 7ff5736257338f466c2d345332ed1a6f
-  hash: md5

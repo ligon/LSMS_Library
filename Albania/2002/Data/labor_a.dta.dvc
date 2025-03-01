@@ -2,5 +2,3 @@ outs:
 - md5: 718e04088ed7cfabf63f8c807dda6221
   size: 401311
   path: labor_a.dta
-  md5-dos2unix: 718e04088ed7cfabf63f8c807dda6221
-  hash: md5

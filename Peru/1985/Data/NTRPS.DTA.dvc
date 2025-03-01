@@ -2,5 +2,3 @@ outs:
 - md5: c384d3f691258e89105cf2db0917b1d3
   size: 1213412
   path: NTRPS.DTA
-  md5-dos2unix: c384d3f691258e89105cf2db0917b1d3
-  hash: md5

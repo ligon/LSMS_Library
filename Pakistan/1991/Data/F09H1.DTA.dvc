@@ -2,5 +2,3 @@ outs:
 - md5: b70fc36bc2022a9e66f812303e1c3de8
   size: 57008
   path: F09H1.DTA
-  md5-dos2unix: b70fc36bc2022a9e66f812303e1c3de8
-  hash: md5

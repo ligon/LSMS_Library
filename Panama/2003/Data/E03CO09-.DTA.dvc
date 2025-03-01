@@ -2,5 +2,3 @@ outs:
 - md5: 38b5d71f624899d798d6b41d633afb68
   size: 59758
   path: E03CO09-.DTA
-  md5-dos2unix: 38b5d71f624899d798d6b41d633afb68
-  hash: md5

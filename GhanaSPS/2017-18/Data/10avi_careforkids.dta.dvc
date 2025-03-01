@@ -2,5 +2,3 @@ outs:
 - md5: d42ecfc858aa817b7b0b4b72c7ee000a
   size: 510506
   path: 10avi_careforkids.dta
-  md5-dos2unix: d42ecfc858aa817b7b0b4b72c7ee000a
-  hash: md5

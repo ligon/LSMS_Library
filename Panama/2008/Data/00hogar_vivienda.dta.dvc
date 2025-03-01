@@ -2,5 +2,3 @@ outs:
 - md5: a1627fbeb6efff2833bf6e91d5fa43c7
   size: 2843482
   path: 00hogar_vivienda.dta
-  md5-dos2unix: a1627fbeb6efff2833bf6e91d5fa43c7
-  hash: md5

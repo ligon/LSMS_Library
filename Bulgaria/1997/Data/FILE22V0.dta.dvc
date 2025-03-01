@@ -2,5 +2,3 @@ outs:
 - md5: c21037d919bfb3863c47ee67987cedcb
   size: 39543
   path: FILE22V0.dta
-  md5-dos2unix: c21037d919bfb3863c47ee67987cedcb
-  hash: md5

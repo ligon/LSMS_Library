@@ -2,5 +2,3 @@ outs:
 - md5: efe82c2c2a933086a509eec550e0ba89
   size: 336545
   path: livestock.dta
-  md5-dos2unix: efe82c2c2a933086a509eec550e0ba89
-  hash: md5

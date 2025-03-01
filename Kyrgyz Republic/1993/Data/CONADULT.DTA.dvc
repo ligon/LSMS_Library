@@ -2,5 +2,3 @@ outs:
 - md5: 33da529968f49c977a0e5cf29f9e1098
   size: 85485
   path: CONADULT.DTA
-  md5-dos2unix: 33da529968f49c977a0e5cf29f9e1098
-  hash: md5

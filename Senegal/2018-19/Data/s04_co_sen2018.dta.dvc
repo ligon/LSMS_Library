@@ -2,5 +2,3 @@ outs:
 - md5: c58393ecf93b347856727e28cefdda9a
   size: 401299
   path: s04_co_sen2018.dta
-  md5-dos2unix: c58393ecf93b347856727e28cefdda9a
-  hash: md5

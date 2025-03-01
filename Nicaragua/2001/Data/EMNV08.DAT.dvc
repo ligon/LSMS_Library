@@ -2,5 +2,3 @@ outs:
 - md5: 6c71d110be89eb0470c25f130798bd33
   size: 1036323
   path: EMNV08.DAT
-  md5-dos2unix: 6c71d110be89eb0470c25f130798bd33
-  hash: md5

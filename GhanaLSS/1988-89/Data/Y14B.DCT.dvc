@@ -1,5 +1,3 @@
 outs:
 - md5: d2fade974030594f1f04f8696dfd402e
   path: Y14B.DCT
-  md5-dos2unix: d2fade974030594f1f04f8696dfd402e
-  hash: md5

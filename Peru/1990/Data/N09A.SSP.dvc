@@ -2,5 +2,3 @@ outs:
 - md5: 0e49577069ebe3ee0074251c8141a197
   size: 365040
   path: N09A.SSP
-  md5-dos2unix: 0e49577069ebe3ee0074251c8141a197
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: 9efababde84ad30400af56fe4a9adf33
   size: 4556662
   path: EQUIPO.DTA
-  md5-dos2unix: 9efababde84ad30400af56fe4a9adf33
-  hash: md5

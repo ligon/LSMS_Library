@@ -1,5 +1,3 @@
 outs:
 - md5: 8df4cbf05350a3fdb44d02dd23d5f553
   path: GSEC11.dta
-  md5-dos2unix: 8df4cbf05350a3fdb44d02dd23d5f553
-  hash: md5

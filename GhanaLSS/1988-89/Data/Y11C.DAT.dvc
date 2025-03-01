@@ -1,5 +1,3 @@
 outs:
 - md5: 1fd647da947df2a84a8a2129793a79cc
   path: Y11C.DAT
-  md5-dos2unix: 1fd647da947df2a84a8a2129793a79cc
-  hash: md5

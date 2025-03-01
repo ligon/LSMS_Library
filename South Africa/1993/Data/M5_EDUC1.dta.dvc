@@ -2,5 +2,3 @@ outs:
 - md5: d291d51edaf681a860e4ab5549a3099a
   size: 107846
   path: M5_EDUC1.dta
-  md5-dos2unix: d291d51edaf681a860e4ab5549a3099a
-  hash: md5

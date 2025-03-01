@@ -2,5 +2,3 @@ outs:
 - md5: 8400c6157d4ddf38b6e932ec52dd1b91
   size: 855799
   path: M11_C1.DTA
-  md5-dos2unix: 8400c6157d4ddf38b6e932ec52dd1b91
-  hash: md5

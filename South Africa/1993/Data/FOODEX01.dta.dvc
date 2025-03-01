@@ -2,5 +2,3 @@ outs:
 - md5: 757bb09a3044657bba4e439cec393832
   size: 6226727
   path: FOODEX01.dta
-  md5-dos2unix: 757bb09a3044657bba4e439cec393832
-  hash: md5

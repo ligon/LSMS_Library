@@ -2,5 +2,3 @@ outs:
 - md5: f472098bdd994a3a73fc78c74c988f2f
   size: 5624856
   path: SECT9F_G.DTA
-  md5-dos2unix: f472098bdd994a3a73fc78c74c988f2f
-  hash: md5

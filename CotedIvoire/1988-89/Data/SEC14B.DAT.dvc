@@ -1,5 +1,3 @@
 outs:
 - md5: 0081c88de294310410c6f9e57adb8350
   path: SEC14B.DAT
-  md5-dos2unix: 0081c88de294310410c6f9e57adb8350
-  hash: md5

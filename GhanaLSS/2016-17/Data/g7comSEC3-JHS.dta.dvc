@@ -1,5 +1,3 @@
 outs:
 - md5: a7c0154effcded0e0eb33f6c4d797f8c
   path: g7comSEC3-JHS.dta
-  md5-dos2unix: a7c0154effcded0e0eb33f6c4d797f8c
-  hash: md5

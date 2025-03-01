@@ -2,5 +2,3 @@ outs:
 - md5: d8aa3aaed0c1004ac6e80a63e57782ed
   size: 946751
   path: DAILYEXP.dta
-  md5-dos2unix: d8aa3aaed0c1004ac6e80a63e57782ed
-  hash: md5

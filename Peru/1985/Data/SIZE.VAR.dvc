@@ -2,5 +2,3 @@ outs:
 - md5: 261e5426ab84c99fa6cc32222bda1693
   size: 29
   path: SIZE.VAR
-  md5-dos2unix: 261e5426ab84c99fa6cc32222bda1693
-  hash: md5

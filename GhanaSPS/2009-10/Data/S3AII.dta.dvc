@@ -2,5 +2,3 @@ outs:
 - md5: c40c96566d61f69d78e8255cf6475159
   size: 1144941
   path: S3AII.dta
-  md5-dos2unix: c40c96566d61f69d78e8255cf6475159
-  hash: md5

@@ -1,5 +1,3 @@
 outs:
 - md5: 1438929d4cc54bc6b4adbb92ca4bd567
   path: SEC09A2.DCT
-  md5-dos2unix: 1438929d4cc54bc6b4adbb92ca4bd567
-  hash: md5

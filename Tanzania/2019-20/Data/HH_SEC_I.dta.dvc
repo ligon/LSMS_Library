@@ -2,5 +2,3 @@ outs:
 - md5: bf81ce18995bdb9edc246215c9eeb958
   size: 479610
   path: HH_SEC_I.dta
-  md5-dos2unix: bf81ce18995bdb9edc246215c9eeb958
-  hash: md5

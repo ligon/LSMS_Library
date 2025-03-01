@@ -2,5 +2,3 @@ outs:
 - md5: b6a109d03c45ab2ad59cf4e6e794db10
   size: 148721
   path: 10_determine_respondents.dta
-  md5-dos2unix: b6a109d03c45ab2ad59cf4e6e794db10
-  hash: md5

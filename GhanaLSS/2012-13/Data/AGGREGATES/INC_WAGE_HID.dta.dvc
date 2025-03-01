@@ -2,5 +2,3 @@ outs:
 - md5: 4a62d936cea1c4a35bb49746ff4390b4
   size: 268728
   path: INC_WAGE_HID.dta
-  md5-dos2unix: 4a62d936cea1c4a35bb49746ff4390b4
-  hash: md5

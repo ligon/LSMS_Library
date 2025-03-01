@@ -2,5 +2,3 @@ outs:
 - md5: 64f10ed93609fb61ad085dd0a9e37388
   size: 100844
   path: FILE35V1.dta
-  md5-dos2unix: 64f10ed93609fb61ad085dd0a9e37388
-  hash: md5

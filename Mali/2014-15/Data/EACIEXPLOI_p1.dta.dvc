@@ -2,5 +2,3 @@ outs:
 - md5: 6e237c60784e8383c4b0a32a6bd02e74
   size: 1427776
   path: EACIEXPLOI_p1.dta
-  md5-dos2unix: 6e237c60784e8383c4b0a32a6bd02e74
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: b94b32ccbcc9eb9c7341e3e3f3b47501
   size: 95055
   path: s08a_me_gnb2018.dta
-  md5-dos2unix: b94b32ccbcc9eb9c7341e3e3f3b47501
-  hash: md5

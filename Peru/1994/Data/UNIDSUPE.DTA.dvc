@@ -2,5 +2,3 @@ outs:
 - md5: 11124ea49247073adbeb953a89ae0614
   size: 1259
   path: UNIDSUPE.DTA
-  md5-dos2unix: 11124ea49247073adbeb953a89ae0614
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: 6099c25c2ace025a10a4e68f19266faf
   size: 209443
   path: m4c.dta
-  md5-dos2unix: 6099c25c2ace025a10a4e68f19266faf
-  hash: md5

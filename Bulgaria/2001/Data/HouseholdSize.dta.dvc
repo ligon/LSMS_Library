@@ -2,5 +2,3 @@ outs:
 - md5: 1ec9cf1eed4e1601490261d459898a2d
   size: 32453
   path: HouseholdSize.dta
-  md5-dos2unix: 1ec9cf1eed4e1601490261d459898a2d
-  hash: md5

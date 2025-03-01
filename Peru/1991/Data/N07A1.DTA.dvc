@@ -2,5 +2,3 @@ outs:
 - md5: 44796edc3c124896b6b2d2726e052b1d
   size: 165356
   path: N07A1.DTA
-  md5-dos2unix: 44796edc3c124896b6b2d2726e052b1d
-  hash: md5

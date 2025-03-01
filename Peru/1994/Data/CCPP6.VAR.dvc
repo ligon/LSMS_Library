@@ -2,5 +2,3 @@ outs:
 - md5: c6874f5df08625be198331e5b4e0b4f8
   size: 226
   path: CCPP6.VAR
-  md5-dos2unix: c6874f5df08625be198331e5b4e0b4f8
-  hash: md5

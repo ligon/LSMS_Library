@@ -2,5 +2,3 @@ outs:
 - md5: 59d3a4952d6a6546411616abb547c60b
   size: 5587
   path: FILE43V0.dta
-  md5-dos2unix: 59d3a4952d6a6546411616abb547c60b
-  hash: md5

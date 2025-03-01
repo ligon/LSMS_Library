@@ -2,5 +2,3 @@ outs:
 - md5: add0749a59dc8b2c4c2a660c9db6f188
   size: 14097777
   path: sect8a_ls_w2.dta
-  md5-dos2unix: add0749a59dc8b2c4c2a660c9db6f188
-  hash: md5

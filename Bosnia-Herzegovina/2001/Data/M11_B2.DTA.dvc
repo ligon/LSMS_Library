@@ -2,5 +2,3 @@ outs:
 - md5: 7b77a2359b902903c2148ded8a9ddc13
   size: 6341543
   path: M11_B2.DTA
-  md5-dos2unix: 7b77a2359b902903c2148ded8a9ddc13
-  hash: md5

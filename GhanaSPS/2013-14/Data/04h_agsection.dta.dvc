@@ -2,5 +2,3 @@ outs:
 - md5: d9f556ad1598d1ca2756b2cd93ee5880
   size: 3540344
   path: 04h_agsection.dta
-  md5-dos2unix: d9f556ad1598d1ca2756b2cd93ee5880
-  hash: md5

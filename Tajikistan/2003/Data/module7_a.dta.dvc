@@ -2,5 +2,3 @@ outs:
 - md5: 27c0476855b94f1151ea22804a377e80
   size: 116486
   path: module7_a.dta
-  md5-dos2unix: 27c0476855b94f1151ea22804a377e80
-  hash: md5

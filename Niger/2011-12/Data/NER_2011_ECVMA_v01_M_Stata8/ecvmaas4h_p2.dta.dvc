@@ -2,5 +2,3 @@ outs:
 - md5: 3e2d001ea926e377747227f9cb76abbc
   size: 4436316
   path: ecvmaas4h_p2.dta
-  md5-dos2unix: 3e2d001ea926e377747227f9cb76abbc
-  hash: md5

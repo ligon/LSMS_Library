@@ -2,5 +2,3 @@ outs:
 - md5: c78336314ef86284c585481b6c5b0e34
   size: 283754
   path: cs4a.dta
-  md5-dos2unix: c78336314ef86284c585481b6c5b0e34
-  hash: md5

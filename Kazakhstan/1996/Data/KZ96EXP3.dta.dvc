@@ -2,5 +2,3 @@ outs:
 - md5: be3cb2dd538308b83972a83193a4cfd2
   size: 677802
   path: KZ96EXP3.dta
-  md5-dos2unix: be3cb2dd538308b83972a83193a4cfd2
-  hash: md5

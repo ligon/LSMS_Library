@@ -2,5 +2,3 @@ outs:
 - md5: f715b87450faefdf8106a97510debfb1
   size: 244364
   path: ecvmaas3d_p1.dta
-  md5-dos2unix: f715b87450faefdf8106a97510debfb1
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: 045fc0189a0e95656d34f2d83c94f8cb
   size: 3140961
   path: transfer_c_cl.dta
-  md5-dos2unix: 045fc0189a0e95656d34f2d83c94f8cb
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: e133e151aeac2975f694f2bef86e1270
   size: 43295
   path: 03aii_toolquestions_osp.dta
-  md5-dos2unix: e133e151aeac2975f694f2bef86e1270
-  hash: md5

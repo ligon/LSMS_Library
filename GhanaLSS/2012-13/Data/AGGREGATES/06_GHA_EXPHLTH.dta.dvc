@@ -2,5 +2,3 @@ outs:
 - md5: fde7ff9dc10825919787e79a267a48a5
   size: 537788
   path: 06_GHA_EXPHLTH.dta
-  md5-dos2unix: fde7ff9dc10825919787e79a267a48a5
-  hash: md5

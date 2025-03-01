@@ -2,5 +2,3 @@ outs:
 - md5: 717eaeaac4c7380ec740a896e91b734c
   size: 4537
   path: by_product.dta
-  md5-dos2unix: 717eaeaac4c7380ec740a896e91b734c
-  hash: md5

@@ -1,5 +1,3 @@
 outs:
 - md5: 3d8a25f39b6b530755bf413f0ef49aff
   path: 11_GHA_EXPHOTL.dta
-  md5-dos2unix: 3d8a25f39b6b530755bf413f0ef49aff
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: 2755f928cf70ccc0b75a401e7b7b32f3
   size: 1403366
   path: MISC_B.dta
-  md5-dos2unix: 2755f928cf70ccc0b75a401e7b7b32f3
-  hash: md5

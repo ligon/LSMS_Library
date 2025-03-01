@@ -2,5 +2,3 @@ outs:
 - md5: c51c24d3afaa81c2232f24d0d31e6cf0
   size: 8926
   path: sm4d.dta
-  md5-dos2unix: c51c24d3afaa81c2232f24d0d31e6cf0
-  hash: md5

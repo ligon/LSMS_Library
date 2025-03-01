@@ -2,5 +2,3 @@ outs:
 - md5: d1e5eeff40829d326e42f0bf073829eb
   size: 1259015
   path: roma_5_weekly_food_consumption.dta
-  md5-dos2unix: d1e5eeff40829d326e42f0bf073829eb
-  hash: md5

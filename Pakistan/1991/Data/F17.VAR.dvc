@@ -2,5 +2,3 @@ outs:
 - md5: f6f142693b7b55b1edf400cba684218f
   size: 48
   path: F17.VAR
-  md5-dos2unix: f6f142693b7b55b1edf400cba684218f
-  hash: md5

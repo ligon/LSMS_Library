@@ -2,5 +2,3 @@ outs:
 - md5: 91e475a07e0915612bd446dbcbd4648a
   size: 644235
   path: HouseholdInformation.dta
-  md5-dos2unix: 91e475a07e0915612bd446dbcbd4648a
-  hash: md5

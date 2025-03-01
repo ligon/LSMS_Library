@@ -2,5 +2,3 @@ outs:
 - md5: 72abccf667c1de81cce6d597178eac0c
   size: 4749164
   path: CROPS.DTA
-  md5-dos2unix: 72abccf667c1de81cce6d597178eac0c
-  hash: md5

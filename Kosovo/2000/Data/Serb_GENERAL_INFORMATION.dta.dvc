@@ -2,5 +2,3 @@ outs:
 - md5: e3fb8c69246f865a2e06d338853bffb9
   size: 6534
   path: Serb_GENERAL_INFORMATION.dta
-  md5-dos2unix: e3fb8c69246f865a2e06d338853bffb9
-  hash: md5

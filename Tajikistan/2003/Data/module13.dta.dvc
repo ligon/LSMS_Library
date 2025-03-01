@@ -2,5 +2,3 @@ outs:
 - md5: f313aedee2a05329a423312e3a635afb
   size: 437166
   path: module13.dta
-  md5-dos2unix: f313aedee2a05329a423312e3a635afb
-  hash: md5

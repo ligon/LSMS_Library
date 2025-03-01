@@ -2,5 +2,3 @@ outs:
 - md5: fc58be6ccfebbb1880604caeec4554d9
   size: 43299620
   path: hh_mod_u.dta
-  md5-dos2unix: fc58be6ccfebbb1880604caeec4554d9
-  hash: md5

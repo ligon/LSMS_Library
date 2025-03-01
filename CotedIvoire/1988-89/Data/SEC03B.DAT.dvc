@@ -1,5 +1,3 @@
 outs:
 - md5: d97266b54229b1b5c9be6ac9b41c7294
   path: SEC03B.DAT
-  md5-dos2unix: d97266b54229b1b5c9be6ac9b41c7294
-  hash: md5

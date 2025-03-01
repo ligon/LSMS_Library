@@ -1,5 +1,3 @@
 outs:
 - md5: 945fd6204c85fc50f6042c4737b5e0e5
   path: Y10C.DCT
-  md5-dos2unix: 945fd6204c85fc50f6042c4737b5e0e5
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: a47211b5230233078a23ac9bb0925299
   size: 527673
   path: sect7_hh_w3.dta
-  md5-dos2unix: a47211b5230233078a23ac9bb0925299
-  hash: md5

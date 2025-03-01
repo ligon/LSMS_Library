@@ -2,5 +2,3 @@ outs:
 - md5: 54c6ae4f9f2d660c23b5b71d01f11b17
   size: 2218673
   path: 09a_youngchildhealth.dta
-  md5-dos2unix: 54c6ae4f9f2d660c23b5b71d01f11b17
-  hash: md5

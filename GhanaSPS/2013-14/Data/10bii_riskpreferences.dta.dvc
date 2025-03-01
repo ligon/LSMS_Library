@@ -2,5 +2,3 @@ outs:
 - md5: 3dd6458a356fbbe6a1d9c9c00eebcbc5
   size: 282296
   path: 10bii_riskpreferences.dta
-  md5-dos2unix: 3dd6458a356fbbe6a1d9c9c00eebcbc5
-  hash: md5

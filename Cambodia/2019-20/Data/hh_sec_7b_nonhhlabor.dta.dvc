@@ -2,5 +2,3 @@ outs:
 - md5: 1e49e5962b094d4ed524612bb9376f23
   size: 140103
   path: hh_sec_7b_nonhhlabor.dta
-  md5-dos2unix: 1e49e5962b094d4ed524612bb9376f23
-  hash: md5

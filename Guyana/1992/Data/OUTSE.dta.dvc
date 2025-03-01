@@ -2,5 +2,3 @@ outs:
 - md5: f17ca58c2d66f4114f8871224d9bf193
   size: 129698
   path: OUTSE.dta
-  md5-dos2unix: f17ca58c2d66f4114f8871224d9bf193
-  hash: md5

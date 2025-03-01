@@ -1,5 +1,3 @@
 outs:
 - md5: b54aa8917bea52ec6216b2e1130d33ca
   path: MSCHOOLA.DAT
-  md5-dos2unix: b54aa8917bea52ec6216b2e1130d33ca
-  hash: md5

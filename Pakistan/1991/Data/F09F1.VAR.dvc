@@ -2,5 +2,3 @@ outs:
 - md5: 337a09febc2aef4a8842f8aa2811887f
   size: 41
   path: F09F1.VAR
-  md5-dos2unix: 337a09febc2aef4a8842f8aa2811887f
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: 96f56e4938be56dc2f65af72da41d916
   size: 36717
   path: COVERN.dta
-  md5-dos2unix: 96f56e4938be56dc2f65af72da41d916
-  hash: md5

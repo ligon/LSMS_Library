@@ -2,5 +2,3 @@ outs:
 - md5: 341b59472b781a621db491c772923603
   size: 97077735
   path: 05alimentos.dta
-  md5-dos2unix: 341b59472b781a621db491c772923603
-  hash: md5

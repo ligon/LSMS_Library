@@ -2,5 +2,3 @@ outs:
 - md5: 4bf4b6a7cf0f78e20787630fb833f060
   size: 599487
   path: S5AII.dta
-  md5-dos2unix: 4bf4b6a7cf0f78e20787630fb833f060
-  hash: md5

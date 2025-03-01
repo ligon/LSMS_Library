@@ -2,5 +2,3 @@ outs:
 - md5: 04ddee648101b6110d54413f80f592b4
   size: 3584297
   path: comunidad.dta
-  md5-dos2unix: 04ddee648101b6110d54413f80f592b4
-  hash: md5

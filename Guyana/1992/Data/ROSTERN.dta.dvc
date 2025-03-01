@@ -2,5 +2,3 @@ outs:
 - md5: 790e2a934fc59748c3d0b94ceb97803c
   size: 230987
   path: ROSTERN.dta
-  md5-dos2unix: 790e2a934fc59748c3d0b94ceb97803c
-  hash: md5

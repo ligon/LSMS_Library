@@ -2,5 +2,3 @@ outs:
 - md5: 5360fb9d5b1685d41d710f833562983c
   size: 1135998
   path: module11b.dta
-  md5-dos2unix: 5360fb9d5b1685d41d710f833562983c
-  hash: md5

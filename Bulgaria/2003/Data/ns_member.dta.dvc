@@ -2,5 +2,3 @@ outs:
 - md5: 10e6ae5f1849221d2093af1947ce0070
   size: 4674057
   path: ns_member.dta
-  md5-dos2unix: 10e6ae5f1849221d2093af1947ce0070
-  hash: md5

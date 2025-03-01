@@ -2,5 +2,3 @@ outs:
 - md5: 509a49eb57b194b4c1711bb44226c138
   size: 276566
   path: S3_HSV2.dta
-  md5-dos2unix: 509a49eb57b194b4c1711bb44226c138
-  hash: md5

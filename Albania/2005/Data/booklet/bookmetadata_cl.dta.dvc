@@ -2,5 +2,3 @@ outs:
 - md5: d78b274a79b6ca88293fed1635b74072
   size: 133763
   path: bookmetadata_cl.dta
-  md5-dos2unix: d78b274a79b6ca88293fed1635b74072
-  hash: md5

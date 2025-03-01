@@ -2,5 +2,3 @@ outs:
 - md5: c5beab3e5b10e61b02b124088f6170d0
   size: 116304
   path: mop_6_education.dta
-  md5-dos2unix: c5beab3e5b10e61b02b124088f6170d0
-  hash: md5

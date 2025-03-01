@@ -2,5 +2,3 @@ outs:
 - md5: 29feaaea005b3d77111353a2e8d4c395
   size: 65896
   path: 05bii_fourimportant.dta
-  md5-dos2unix: 29feaaea005b3d77111353a2e8d4c395
-  hash: md5

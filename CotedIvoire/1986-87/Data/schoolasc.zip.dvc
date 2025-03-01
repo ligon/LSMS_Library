@@ -1,5 +1,3 @@
 outs:
 - md5: 3455b3cb397ea23a5fdae528a793c8ce
   path: schoolasc.zip
-  md5-dos2unix: 3455b3cb397ea23a5fdae528a793c8ce
-  hash: md5

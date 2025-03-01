@@ -2,5 +2,3 @@ outs:
 - md5: 170a20ab8537d617cf1eea2befb954fa
   size: 96705
   path: ECVMA2_AS1P2.dta
-  md5-dos2unix: 170a20ab8537d617cf1eea2befb954fa
-  hash: md5

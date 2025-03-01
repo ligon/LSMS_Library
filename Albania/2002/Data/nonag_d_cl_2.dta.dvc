@@ -2,5 +2,3 @@ outs:
 - md5: 9366516fa836d04e77e1c61f1ba06a26
   size: 199217
   path: nonag_d_cl_2.dta
-  md5-dos2unix: 9366516fa836d04e77e1c61f1ba06a26
-  hash: md5

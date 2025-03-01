@@ -2,5 +2,3 @@ outs:
 - md5: 363197d8598ca51b7875e8e1ad263bac
   size: 847467
   path: emc2014_p2_transfert_verse_27022015.dta
-  md5-dos2unix: 363197d8598ca51b7875e8e1ad263bac
-  hash: md5

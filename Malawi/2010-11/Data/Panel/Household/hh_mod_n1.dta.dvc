@@ -2,5 +2,3 @@ outs:
 - md5: f2d8067d6c84158b6315608392451ce6
   size: 133096
   path: hh_mod_n1.dta
-  md5-dos2unix: f2d8067d6c84158b6315608392451ce6
-  hash: md5

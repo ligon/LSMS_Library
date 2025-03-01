@@ -2,5 +2,3 @@ outs:
 - md5: fae994b4c8e8d250eebb5a6b5dfe1258
   size: 108500
   path: EXP15.DTA
-  md5-dos2unix: fae994b4c8e8d250eebb5a6b5dfe1258
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: 941c3b1a7eb8af2aabfc8aa84d08b8dd
   size: 302705
   path: identification_cl.dta
-  md5-dos2unix: 941c3b1a7eb8af2aabfc8aa84d08b8dd
-  hash: md5

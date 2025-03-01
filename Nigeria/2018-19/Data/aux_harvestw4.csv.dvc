@@ -2,5 +2,3 @@ outs:
 - md5: 7b2618d5c32f56f3c7f636093ade18d6
   size: 3520643
   path: aux_harvestw4.csv
-  md5-dos2unix: 7b2618d5c32f56f3c7f636093ade18d6
-  hash: md5

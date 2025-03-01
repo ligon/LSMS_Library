@@ -2,5 +2,3 @@ outs:
 - md5: a85920656abcfd87a5485396d98607ec
   size: 569139
   path: BBHIHH.DTA
-  md5-dos2unix: a85920656abcfd87a5485396d98607ec
-  hash: md5

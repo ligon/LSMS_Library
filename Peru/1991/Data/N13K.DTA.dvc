@@ -2,5 +2,3 @@ outs:
 - md5: 841333bcae328b37b9dcb23a416f757f
   size: 31452
   path: N13K.DTA
-  md5-dos2unix: 841333bcae328b37b9dcb23a416f757f
-  hash: md5

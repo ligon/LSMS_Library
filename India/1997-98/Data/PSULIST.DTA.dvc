@@ -2,5 +2,3 @@ outs:
 - md5: 6d26b1da235f23f544f9b4d2a6d9f72c
   size: 4741
   path: PSULIST.DTA
-  md5-dos2unix: 6d26b1da235f23f544f9b4d2a6d9f72c
-  hash: md5

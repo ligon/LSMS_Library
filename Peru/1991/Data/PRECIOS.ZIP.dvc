@@ -2,5 +2,3 @@ outs:
 - md5: ee153879b1bd131790e22ef25b51b992
   size: 105916
   path: PRECIOS.ZIP
-  md5-dos2unix: ee153879b1bd131790e22ef25b51b992
-  hash: md5

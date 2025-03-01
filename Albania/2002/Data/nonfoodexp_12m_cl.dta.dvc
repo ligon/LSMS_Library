@@ -2,5 +2,3 @@ outs:
 - md5: 279e342ee639017baa31ac4c6814777e
   size: 1891559
   path: nonfoodexp_12m_cl.dta
-  md5-dos2unix: 279e342ee639017baa31ac4c6814777e
-  hash: md5

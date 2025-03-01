@@ -2,5 +2,3 @@ outs:
 - md5: 6e6373572a1f3531d7410147dffb9b20
   size: 166
   path: REG48.VAR
-  md5-dos2unix: 6e6373572a1f3531d7410147dffb9b20
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: ea04187dc240adb039976d4e57de3e92
   size: 369186
   path: comprixcs01.dta
-  md5-dos2unix: ea04187dc240adb039976d4e57de3e92
-  hash: md5

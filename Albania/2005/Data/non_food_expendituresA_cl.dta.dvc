@@ -2,5 +2,3 @@ outs:
 - md5: 08015147f6bbba97d36b2fba9213efb7
   size: 2478630
   path: non_food_expendituresA_cl.dta
-  md5-dos2unix: 08015147f6bbba97d36b2fba9213efb7
-  hash: md5

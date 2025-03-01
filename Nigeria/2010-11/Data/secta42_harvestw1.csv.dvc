@@ -2,5 +2,3 @@ outs:
 - md5: 060fd46a568f772cacbf7e8b518dae88
   size: 419075
   path: secta42_harvestw1.csv
-  md5-dos2unix: 060fd46a568f772cacbf7e8b518dae88
-  hash: md5

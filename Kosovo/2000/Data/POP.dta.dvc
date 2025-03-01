@@ -2,5 +2,3 @@ outs:
 - md5: a06895d794946da741769afe66325601
   size: 996253
   path: POP.dta
-  md5-dos2unix: a06895d794946da741769afe66325601
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: 7ce191a2952c25693823635356dedf4d
   size: 177
   path: PRICER.VAR
-  md5-dos2unix: 7ce191a2952c25693823635356dedf4d
-  hash: md5

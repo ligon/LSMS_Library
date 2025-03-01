@@ -2,5 +2,3 @@ outs:
 - md5: 70ec0ed6e1724113d6201410ae8d9da8
   size: 11112
   path: transfer_b.dta
-  md5-dos2unix: 70ec0ed6e1724113d6201410ae8d9da8
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: 83e8f119519d1db0ade4f91d97b69f31
   size: 72566
   path: 12a_measure.dta
-  md5-dos2unix: 83e8f119519d1db0ade4f91d97b69f31
-  hash: md5

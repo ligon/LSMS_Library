@@ -2,5 +2,3 @@ outs:
 - md5: e9ee98be804ef976b0cc1790f62ef93f
   size: 10136
   path: R_GENERAL_INFORMATION.dta
-  md5-dos2unix: e9ee98be804ef976b0cc1790f62ef93f
-  hash: md5

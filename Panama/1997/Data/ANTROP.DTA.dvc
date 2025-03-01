@@ -2,5 +2,3 @@ outs:
 - md5: f16648d85ea80f95b449f01840004c1c
   size: 959512
   path: ANTROP.DTA
-  md5-dos2unix: f16648d85ea80f95b449f01840004c1c
-  hash: md5

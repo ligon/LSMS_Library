@@ -2,5 +2,3 @@ outs:
 - md5: e1555a0ff48697857859610cc6670011
   size: 1864536
   path: SECT_13.DTA
-  md5-dos2unix: e1555a0ff48697857859610cc6670011
-  hash: md5

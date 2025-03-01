@@ -2,5 +2,3 @@ outs:
 - md5: 9ecb9255c8bb0df8cce6b28b6076cc40
   size: 7035159
   path: E03PE05.DTA
-  md5-dos2unix: 9ecb9255c8bb0df8cce6b28b6076cc40
-  hash: md5

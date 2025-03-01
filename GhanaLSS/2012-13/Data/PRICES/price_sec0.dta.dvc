@@ -2,5 +2,3 @@ outs:
 - md5: ec1cd7eb72ca3868b6230290c8ff2a58
   size: 177950
   path: price_sec0.dta
-  md5-dos2unix: ec1cd7eb72ca3868b6230290c8ff2a58
-  hash: md5

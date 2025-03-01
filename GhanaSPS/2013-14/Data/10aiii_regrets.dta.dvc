@@ -2,5 +2,3 @@ outs:
 - md5: f04859830026eab852aad3995f144bf3
   size: 154080
   path: 10aiii_regrets.dta
-  md5-dos2unix: f04859830026eab852aad3995f144bf3
-  hash: md5

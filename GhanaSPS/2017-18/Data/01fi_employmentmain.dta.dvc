@@ -2,5 +2,3 @@ outs:
 - md5: 5be0204b66382769e4d0786ec829ba21
   size: 1273246
   path: 01fi_employmentmain.dta
-  md5-dos2unix: 5be0204b66382769e4d0786ec829ba21
-  hash: md5

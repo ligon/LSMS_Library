@@ -2,5 +2,3 @@ outs:
 - md5: e4aa4f3ce53f48fb2d5b68cc23a5d05f
   size: 646604
   path: household_rosterA_cl.dta
-  md5-dos2unix: e4aa4f3ce53f48fb2d5b68cc23a5d05f
-  hash: md5

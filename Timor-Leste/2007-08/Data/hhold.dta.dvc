@@ -2,5 +2,3 @@ outs:
 - md5: d028bc9d3ec037a00283c5a9697d1475
   size: 1033589
   path: hhold.dta
-  md5-dos2unix: d028bc9d3ec037a00283c5a9697d1475
-  hash: md5

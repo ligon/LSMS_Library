@@ -2,5 +2,3 @@ outs:
 - md5: 8cb1f9033e8db44fce720b0da1a0e264
   size: 3113877
   path: part6_roster.dta
-  md5-dos2unix: 8cb1f9033e8db44fce720b0da1a0e264
-  hash: md5

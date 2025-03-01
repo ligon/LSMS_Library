@@ -2,5 +2,3 @@ outs:
 - md5: 83b3ca2aa144dd27737103a9cc1ffe8f
   size: 16296
   path: Serb_ORGANIZATION_AND_DISPLACEMENT.dta
-  md5-dos2unix: 83b3ca2aa144dd27737103a9cc1ffe8f
-  hash: md5

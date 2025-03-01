@@ -2,5 +2,3 @@ outs:
 - md5: 65e5ee30f3f0f46620f2cb2c0363275a
   size: 769493
   path: VIVIEND.DTA
-  md5-dos2unix: 65e5ee30f3f0f46620f2cb2c0363275a
-  hash: md5

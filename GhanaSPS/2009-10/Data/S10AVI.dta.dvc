@@ -2,5 +2,3 @@ outs:
 - md5: 7139421352e5c3b243e0b517213545c1
   size: 1216260
   path: S10AVI.dta
-  md5-dos2unix: 7139421352e5c3b243e0b517213545c1
-  hash: md5

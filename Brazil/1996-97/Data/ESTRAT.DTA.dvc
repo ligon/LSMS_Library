@@ -2,5 +2,3 @@ outs:
 - md5: 05781656776d17dbf0923778079dd1a2
   size: 193681
   path: ESTRAT.DTA
-  md5-dos2unix: 05781656776d17dbf0923778079dd1a2
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: 3e9b7596896d90af728e587b922ee46b
   size: 4102
   path: ehcvm_ponderations_sen2018.dta
-  md5-dos2unix: 3e9b7596896d90af728e587b922ee46b
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: 1e70db28682c17cffa4e5f71fa5100ce
   size: 66069
   path: A-PATIOM.DTA
-  md5-dos2unix: 1e70db28682c17cffa4e5f71fa5100ce
-  hash: md5

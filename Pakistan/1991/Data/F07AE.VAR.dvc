@@ -2,5 +2,3 @@ outs:
 - md5: 71f5a77dcdd05e369abfc61cf4a12e03
   size: 147
   path: F07AE.VAR
-  md5-dos2unix: 71f5a77dcdd05e369abfc61cf4a12e03
-  hash: md5

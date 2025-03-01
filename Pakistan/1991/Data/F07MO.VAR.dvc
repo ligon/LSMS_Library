@@ -2,5 +2,3 @@ outs:
 - md5: e1526be8e435af515201c7c31b4fe9cb
   size: 122
   path: F07MO.VAR
-  md5-dos2unix: e1526be8e435af515201c7c31b4fe9cb
-  hash: md5

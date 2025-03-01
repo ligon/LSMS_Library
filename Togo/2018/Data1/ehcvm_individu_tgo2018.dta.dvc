@@ -2,5 +2,3 @@ outs:
 - md5: 9b47df92a06e0d5c4b3d655bad0a255d
   size: 2215786
   path: ehcvm_individu_tgo2018.dta
-  md5-dos2unix: 9b47df92a06e0d5c4b3d655bad0a255d
-  hash: md5

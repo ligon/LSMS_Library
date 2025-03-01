@@ -2,5 +2,3 @@ outs:
 - md5: 06b06714b2d91d62a5c207fb5b385469
   size: 719436
   path: 04n_harvest.dta
-  md5-dos2unix: 06b06714b2d91d62a5c207fb5b385469
-  hash: md5

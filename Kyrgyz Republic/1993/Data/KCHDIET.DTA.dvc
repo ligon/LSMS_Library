@@ -2,5 +2,3 @@ outs:
 - md5: 4466292f08eb01cc9d289b5e17b25b60
   size: 850580
   path: KCHDIET.DTA
-  md5-dos2unix: 4466292f08eb01cc9d289b5e17b25b60
-  hash: md5

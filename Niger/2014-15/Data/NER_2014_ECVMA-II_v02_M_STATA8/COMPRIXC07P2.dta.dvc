@@ -2,5 +2,3 @@ outs:
 - md5: f859a98a39affe883b66bf9e97b7e395
   size: 1432546
   path: COMPRIXC07P2.dta
-  md5-dos2unix: f859a98a39affe883b66bf9e97b7e395
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: 283a415589b5717f1993dad7ac7f7340
   size: 57367
   path: grappe_gps_mli2018.dta
-  md5-dos2unix: 283a415589b5717f1993dad7ac7f7340
-  hash: md5

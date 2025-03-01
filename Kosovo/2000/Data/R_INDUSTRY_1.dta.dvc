@@ -2,5 +2,3 @@ outs:
 - md5: 5aa43d1d3565764e205bd4bbfdc965c0
   size: 11453
   path: R_INDUSTRY_1.dta
-  md5-dos2unix: 5aa43d1d3565764e205bd4bbfdc965c0
-  hash: md5

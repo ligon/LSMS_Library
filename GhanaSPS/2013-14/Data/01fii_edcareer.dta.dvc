@@ -2,5 +2,3 @@ outs:
 - md5: b7c2430c64f4a9aee24aa6d094579f8b
   size: 1672295
   path: 01fii_edcareer.dta
-  md5-dos2unix: b7c2430c64f4a9aee24aa6d094579f8b
-  hash: md5

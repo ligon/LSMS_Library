@@ -2,5 +2,3 @@ outs:
 - md5: 61e9cc52fe6da622d2cc5ac66dac5408
   size: 484753
   path: NER_HouseholdGeovars_Y1.dta
-  md5-dos2unix: 61e9cc52fe6da622d2cc5ac66dac5408
-  hash: md5

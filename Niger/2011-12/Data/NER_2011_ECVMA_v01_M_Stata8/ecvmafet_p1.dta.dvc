@@ -2,5 +2,3 @@ outs:
 - md5: ddd3a146a4e6afe7bf7c81a995014160
   size: 2106102
   path: ecvmafet_p1.dta
-  md5-dos2unix: ddd3a146a4e6afe7bf7c81a995014160
-  hash: md5

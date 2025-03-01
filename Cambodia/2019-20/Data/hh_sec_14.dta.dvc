@@ -2,5 +2,3 @@ outs:
 - md5: f457f91680c8d76a90ef076b4d8e3dab
   size: 5939024
   path: hh_sec_14.dta
-  md5-dos2unix: f457f91680c8d76a90ef076b4d8e3dab
-  hash: md5

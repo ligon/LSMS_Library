@@ -2,5 +2,3 @@ outs:
 - md5: fb478e937d989d17d01deb2872702abe
   size: 97561
   path: FILE34V1.dta
-  md5-dos2unix: fb478e937d989d17d01deb2872702abe
-  hash: md5

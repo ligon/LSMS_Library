@@ -2,5 +2,3 @@ outs:
 - md5: 1256326da8f2adb0f3f5ecc6034cd3b5
   size: 46042
   path: SUB_AHHB.DTA
-  md5-dos2unix: 1256326da8f2adb0f3f5ecc6034cd3b5
-  hash: md5

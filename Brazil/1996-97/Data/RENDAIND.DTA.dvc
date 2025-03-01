@@ -2,5 +2,3 @@ outs:
 - md5: 66d44f64154f2f5a594d6e402841440e
   size: 640952
   path: RENDAIND.DTA
-  md5-dos2unix: 66d44f64154f2f5a594d6e402841440e
-  hash: md5

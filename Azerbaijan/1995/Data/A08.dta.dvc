@@ -2,5 +2,3 @@ outs:
 - md5: 3b8450a41a4d6ce357c7d09844f33eab
   size: 200672
   path: A08.dta
-  md5-dos2unix: 3b8450a41a4d6ce357c7d09844f33eab
-  hash: md5

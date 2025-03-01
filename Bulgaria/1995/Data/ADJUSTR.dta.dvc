@@ -2,5 +2,3 @@ outs:
 - md5: 905008e8d61231caeadd18ef1f95d996
   size: 35584
   path: ADJUSTR.dta
-  md5-dos2unix: 905008e8d61231caeadd18ef1f95d996
-  hash: md5

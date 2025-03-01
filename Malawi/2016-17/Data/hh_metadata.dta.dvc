@@ -2,5 +2,3 @@ outs:
 - md5: f56e6cf3e338b28f4b615765d7fd1f99
   size: 4553795
   path: hh_metadata.dta
-  md5-dos2unix: f56e6cf3e338b28f4b615765d7fd1f99
-  hash: md5

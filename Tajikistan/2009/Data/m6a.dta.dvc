@@ -2,5 +2,3 @@ outs:
 - md5: df31767516edc93b1adc791461e879ce
   size: 380438
   path: m6a.dta
-  md5-dos2unix: df31767516edc93b1adc791461e879ce
-  hash: md5

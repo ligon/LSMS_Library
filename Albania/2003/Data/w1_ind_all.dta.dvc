@@ -2,5 +2,3 @@ outs:
 - md5: 4fd531c18f2963a5f7ff4ad2789c8ea2
   size: 7037956
   path: w1_ind_all.dta
-  md5-dos2unix: 4fd531c18f2963a5f7ff4ad2789c8ea2
-  hash: md5

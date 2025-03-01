@@ -2,5 +2,3 @@ outs:
 - md5: 33c05bceb2f14f60fb7f21994df45b03
   size: 59200
   path: N00B.SSP
-  md5-dos2unix: 33c05bceb2f14f60fb7f21994df45b03
-  hash: md5

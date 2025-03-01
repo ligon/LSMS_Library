@@ -1,5 +1,3 @@
 outs:
 - md5: a3cba9f241e4b2db96512cd992d33707
   path: s6_housing.sav
-  md5-dos2unix: a3cba9f241e4b2db96512cd992d33707
-  hash: md5

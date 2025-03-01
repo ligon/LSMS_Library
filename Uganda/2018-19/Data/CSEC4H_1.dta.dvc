@@ -2,5 +2,3 @@ outs:
 - md5: 73e345de466dca44dcd8c52abc1b7282
   size: 554667
   path: CSEC4H_1.dta
-  md5-dos2unix: 73e345de466dca44dcd8c52abc1b7282
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: ef125320f33eceb08a37bde41f62e08c
   size: 105472
   path: sect13_public.dta
-  md5-dos2unix: ef125320f33eceb08a37bde41f62e08c
-  hash: md5

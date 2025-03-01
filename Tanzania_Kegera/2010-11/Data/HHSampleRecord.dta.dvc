@@ -2,5 +2,3 @@ outs:
 - md5: 5ecadb9a216308b523bf05bba2883cfb
   size: 438925
   path: HHSampleRecord.dta
-  md5-dos2unix: 5ecadb9a216308b523bf05bba2883cfb
-  hash: md5

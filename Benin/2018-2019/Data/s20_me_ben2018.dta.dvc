@@ -2,5 +2,3 @@ outs:
 - md5: 71b76f4aa0d80a6f0af77f92b08c7af3
   size: 271455
   path: s20_me_ben2018.dta
-  md5-dos2unix: 71b76f4aa0d80a6f0af77f92b08c7af3
-  hash: md5

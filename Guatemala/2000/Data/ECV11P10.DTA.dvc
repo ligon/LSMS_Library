@@ -2,5 +2,3 @@ outs:
 - md5: 67241c01345aad14ea38b16211efba17
   size: 17785240
   path: ECV11P10.DTA
-  md5-dos2unix: 67241c01345aad14ea38b16211efba17
-  hash: md5

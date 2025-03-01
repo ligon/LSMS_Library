@@ -2,5 +2,3 @@ outs:
 - md5: 9246563ed9701b5319a707b904e72afc
   size: 374077
   path: s09b_me_ben2018.dta
-  md5-dos2unix: 9246563ed9701b5319a707b904e72afc
-  hash: md5

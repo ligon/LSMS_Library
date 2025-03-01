@@ -2,5 +2,3 @@ outs:
 - md5: 6919c2446062d4f548df8aeb71bc8fc7
   size: 15757
   path: 29compras_credito.dta
-  md5-dos2unix: 6919c2446062d4f548df8aeb71bc8fc7
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: 0b7d5d10e0e51871008a6857cf6a6293
   size: 2429900
   path: 11b_clothingquestions.dta
-  md5-dos2unix: 0b7d5d10e0e51871008a6857cf6a6293
-  hash: md5

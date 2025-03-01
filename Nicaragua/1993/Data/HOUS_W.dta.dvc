@@ -2,5 +2,3 @@ outs:
 - md5: 95c46c8e84626b89fb605acd5b9af977
   size: 777296
   path: HOUS_W.dta
-  md5-dos2unix: 95c46c8e84626b89fb605acd5b9af977
-  hash: md5

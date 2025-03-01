@@ -2,5 +2,3 @@ outs:
 - md5: 1afae253fcbfad1ab54cd2f93a2508c7
   size: 1160805
   path: EXP9.DTA
-  md5-dos2unix: 1afae253fcbfad1ab54cd2f93a2508c7
-  hash: md5

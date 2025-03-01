@@ -2,5 +2,3 @@ outs:
 - md5: a130f97ae051191570b8d3543252dda6
   size: 367514
   path: 01c_consentunder18.dta
-  md5-dos2unix: a130f97ae051191570b8d3543252dda6
-  hash: md5

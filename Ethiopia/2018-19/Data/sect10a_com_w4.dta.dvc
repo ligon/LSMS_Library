@@ -2,5 +2,3 @@ outs:
 - md5: 70ca9998ea970674fe8e3ceeefa5aad6
   size: 147250
   path: sect10a_com_w4.dta
-  md5-dos2unix: 70ca9998ea970674fe8e3ceeefa5aad6
-  hash: md5

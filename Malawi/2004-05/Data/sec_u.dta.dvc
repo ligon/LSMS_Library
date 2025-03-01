@@ -2,5 +2,3 @@ outs:
 - md5: 26166eeb73fd70763d1e6eccdf26c525
   size: 7479752
   path: sec_u.dta
-  md5-dos2unix: 26166eeb73fd70763d1e6eccdf26c525
-  hash: md5

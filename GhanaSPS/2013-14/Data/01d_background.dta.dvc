@@ -2,5 +2,3 @@ outs:
 - md5: d81b7f80ba1895405a55ec15e4acc7eb
   size: 9539120
   path: 01d_background.dta
-  md5-dos2unix: d81b7f80ba1895405a55ec15e4acc7eb
-  hash: md5

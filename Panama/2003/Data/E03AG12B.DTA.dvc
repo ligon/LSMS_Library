@@ -2,5 +2,3 @@ outs:
 - md5: 339ab60f7a199fb985b116dbd2789bbd
   size: 201903
   path: E03AG12B.DTA
-  md5-dos2unix: 339ab60f7a199fb985b116dbd2789bbd
-  hash: md5

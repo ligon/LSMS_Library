@@ -2,5 +2,3 @@ outs:
 - md5: cf78fa98555e2f633f83af5fa4ebe786
   size: 431212
   path: N08C.DTA
-  md5-dos2unix: cf78fa98555e2f633f83af5fa4ebe786
-  hash: md5

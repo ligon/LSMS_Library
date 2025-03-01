@@ -2,5 +2,3 @@ outs:
 - md5: 60fcb85aa2b1547c3e3ff520a1560e8c
   size: 47901
   path: F07AN.DTA
-  md5-dos2unix: 60fcb85aa2b1547c3e3ff520a1560e8c
-  hash: md5

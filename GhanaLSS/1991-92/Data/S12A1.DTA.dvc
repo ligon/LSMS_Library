@@ -2,5 +2,3 @@ outs:
 - md5: 522672f615fdfce14fb69c439b55a4b8
   size: 144581
   path: S12A1.DTA
-  md5-dos2unix: 522672f615fdfce14fb69c439b55a4b8
-  hash: md5

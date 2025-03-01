@@ -2,5 +2,3 @@ outs:
 - md5: 4c2c44ae0707a99e0f703909f50dd1ad
   size: 316320
   path: ns_m4_farm_exp-r4_2-4.dta
-  md5-dos2unix: 4c2c44ae0707a99e0f703909f50dd1ad
-  hash: md5

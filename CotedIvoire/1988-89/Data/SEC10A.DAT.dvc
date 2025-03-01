@@ -1,5 +1,3 @@
 outs:
 - md5: 7a726b10a24df753cf6ede189a788563
   path: SEC10A.DAT
-  md5-dos2unix: 7a726b10a24df753cf6ede189a788563
-  hash: md5

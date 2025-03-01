@@ -2,5 +2,3 @@ outs:
 - md5: ac4242f8ac41be706d072c420778fbfe
   size: 1082069
   path: S6C.dta
-  md5-dos2unix: ac4242f8ac41be706d072c420778fbfe
-  hash: md5

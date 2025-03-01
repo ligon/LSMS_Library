@@ -2,5 +2,3 @@ outs:
 - md5: ce13facfcfd2b78cb48d481bc714648f
   size: 741223
   path: M7.DTA
-  md5-dos2unix: ce13facfcfd2b78cb48d481bc714648f
-  hash: md5

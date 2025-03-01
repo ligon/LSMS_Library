@@ -2,5 +2,3 @@ outs:
 - md5: fcda746f5d00011526a2b56b1e691b8d
   size: 1290150
   path: 03biv_intransfersquestions.dta
-  md5-dos2unix: fcda746f5d00011526a2b56b1e691b8d
-  hash: md5

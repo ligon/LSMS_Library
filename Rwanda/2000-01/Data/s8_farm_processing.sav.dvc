@@ -1,5 +1,3 @@
 outs:
 - md5: 42f15e3871aacf1d6295ffe9c1b35bac
   path: s8_farm_processing.sav
-  md5-dos2unix: 42f15e3871aacf1d6295ffe9c1b35bac
-  hash: md5

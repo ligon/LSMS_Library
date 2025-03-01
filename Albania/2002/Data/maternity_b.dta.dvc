@@ -2,5 +2,3 @@ outs:
 - md5: 71a55b836154ab551ccabf65bf9b68d7
   size: 23311
   path: maternity_b.dta
-  md5-dos2unix: 71a55b836154ab551ccabf65bf9b68d7
-  hash: md5

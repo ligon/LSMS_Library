@@ -1,5 +1,3 @@
 outs:
 - md5: 084814127a821c94c0663708cecb930b
   path: Y13A1B.DAT
-  md5-dos2unix: 084814127a821c94c0663708cecb930b
-  hash: md5

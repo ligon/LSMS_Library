@@ -2,5 +2,3 @@ outs:
 - md5: fca98f64356c0ffa73db6d87f2110e8d
   size: 203955
   path: s20_me_tgo2018.dta
-  md5-dos2unix: fca98f64356c0ffa73db6d87f2110e8d
-  hash: md5

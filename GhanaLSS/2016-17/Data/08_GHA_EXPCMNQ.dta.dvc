@@ -1,5 +1,3 @@
 outs:
 - md5: 32772f84d6b80868e81f8a4f4b03b17d
   path: 08_GHA_EXPCMNQ.dta
-  md5-dos2unix: 32772f84d6b80868e81f8a4f4b03b17d
-  hash: md5

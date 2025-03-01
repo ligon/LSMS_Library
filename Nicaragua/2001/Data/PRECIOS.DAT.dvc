@@ -2,5 +2,3 @@ outs:
 - md5: 4339eb5d7acdbad712dc2670b9af085a
   size: 3236617
   path: PRECIOS.DAT
-  md5-dos2unix: 4339eb5d7acdbad712dc2670b9af085a
-  hash: md5

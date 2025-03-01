@@ -2,5 +2,3 @@ outs:
 - md5: 9cd745b6cbd9a443f1a64dc59660b4fe
   size: 10951172
   path: s04_me_sen2018.dta
-  md5-dos2unix: 9cd745b6cbd9a443f1a64dc59660b4fe
-  hash: md5

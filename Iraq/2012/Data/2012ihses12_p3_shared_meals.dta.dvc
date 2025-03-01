@@ -2,5 +2,3 @@ outs:
 - md5: 9f083e25d820a3517382989f2954283f
   size: 1640374
   path: 2012ihses12_p3_shared_meals.dta
-  md5-dos2unix: 9f083e25d820a3517382989f2954283f
-  hash: md5

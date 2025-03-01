@@ -2,5 +2,3 @@ outs:
 - md5: 5ce6dee895114626b2a6699cf36044b4
   size: 2224930
   path: bnonpurchased_cl.dta
-  md5-dos2unix: 5ce6dee895114626b2a6699cf36044b4
-  hash: md5

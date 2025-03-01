@@ -2,5 +2,3 @@ outs:
 - md5: bcbca27f210912349fe59abe74a0bd0b
   size: 309124
   path: s09c_me_tgo2018.dta
-  md5-dos2unix: bcbca27f210912349fe59abe74a0bd0b
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: c1b65b0d4c98c9ba521bf05fa21d2117
   size: 1981959
   path: hh_mod_s2.dta
-  md5-dos2unix: c1b65b0d4c98c9ba521bf05fa21d2117
-  hash: md5

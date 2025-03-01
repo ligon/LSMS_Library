@@ -2,5 +2,3 @@ outs:
 - md5: 2660d15628e65d94244a98bb43ba7c75
   size: 152215
   path: S10AV.dta
-  md5-dos2unix: 2660d15628e65d94244a98bb43ba7c75
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: ea030a4f6f594496d034f22ced1c209f
   size: 200198
   path: S13C.DTA
-  md5-dos2unix: ea030a4f6f594496d034f22ced1c209f
-  hash: md5

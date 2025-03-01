@@ -1,5 +1,3 @@
 outs:
 - md5: 627fc2a3d3492763fc3b5b058d3b1f0b
   path: s8_farm_largescale2.sav
-  md5-dos2unix: 627fc2a3d3492763fc3b5b058d3b1f0b
-  hash: md5

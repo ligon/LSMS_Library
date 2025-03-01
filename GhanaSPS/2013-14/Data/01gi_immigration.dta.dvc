@@ -2,5 +2,3 @@ outs:
 - md5: 910657c9b3c3b31f3b14d0904cd8b739
   size: 2655760
   path: 01gi_immigration.dta
-  md5-dos2unix: 910657c9b3c3b31f3b14d0904cd8b739
-  hash: md5

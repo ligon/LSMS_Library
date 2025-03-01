@@ -2,5 +2,3 @@ outs:
 - md5: 49d72f7a04d92193c20f2b4f5d26c234
   size: 10651
   path: NPT0302.DTA
-  md5-dos2unix: 49d72f7a04d92193c20f2b4f5d26c234
-  hash: md5

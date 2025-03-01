@@ -2,5 +2,3 @@ outs:
 - md5: bb28b050e7a515f6dd0e79609930e772
   size: 25656
   path: S1_EDUC3.dta
-  md5-dos2unix: bb28b050e7a515f6dd0e79609930e772
-  hash: md5

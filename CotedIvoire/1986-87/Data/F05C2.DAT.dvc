@@ -1,5 +1,3 @@
 outs:
 - md5: 395906524404460ac253fd776d47d547
   path: F05C2.DAT
-  md5-dos2unix: 395906524404460ac253fd776d47d547
-  hash: md5

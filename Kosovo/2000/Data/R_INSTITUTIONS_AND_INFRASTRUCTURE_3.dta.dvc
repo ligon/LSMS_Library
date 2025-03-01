@@ -2,5 +2,3 @@ outs:
 - md5: 4f09ac7e1ff5a41c1304baa258d3643b
   size: 19143
   path: R_INSTITUTIONS_AND_INFRASTRUCTURE_3.dta
-  md5-dos2unix: 4f09ac7e1ff5a41c1304baa258d3643b
-  hash: md5

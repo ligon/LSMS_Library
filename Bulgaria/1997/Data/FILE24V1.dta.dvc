@@ -2,5 +2,3 @@ outs:
 - md5: a8f176b863f238a413d677cd5f4c88f5
   size: 185977
   path: FILE24V1.dta
-  md5-dos2unix: a8f176b863f238a413d677cd5f4c88f5
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: 7ea5eb44219ca1df123e6f4c016d3cf0
   size: 101131
   path: EACIS2E_p2.dta
-  md5-dos2unix: 7ea5eb44219ca1df123e6f4c016d3cf0
-  hash: md5

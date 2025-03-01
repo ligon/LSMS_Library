@@ -2,5 +2,3 @@ outs:
 - md5: 2e7f88429fc99fa057695e920859450b
   size: 6539
   path: SelfEmploymentAggregate.dta
-  md5-dos2unix: 2e7f88429fc99fa057695e920859450b
-  hash: md5

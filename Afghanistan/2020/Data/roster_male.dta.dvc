@@ -2,5 +2,3 @@ outs:
 - md5: b6dac8c91b3704d0735da2dc37b41e37
   size: 7967677
   path: roster_male.dta
-  md5-dos2unix: b6dac8c91b3704d0735da2dc37b41e37
-  hash: md5

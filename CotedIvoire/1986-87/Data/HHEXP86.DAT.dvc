@@ -1,5 +1,3 @@
 outs:
 - md5: 15a83e35017d377e4b464bb4b4b5872f
   path: HHEXP86.DAT
-  md5-dos2unix: 15a83e35017d377e4b464bb4b4b5872f
-  hash: md5

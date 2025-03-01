@@ -2,5 +2,3 @@ outs:
 - md5: c220b671c8538cdc937bf367a5e05f2e
   size: 310438
   path: CATEG_1.dta
-  md5-dos2unix: c220b671c8538cdc937bf367a5e05f2e
-  hash: md5

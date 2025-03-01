@@ -2,5 +2,3 @@ outs:
 - md5: 959a932cf85a2cd5208bd9c50c75ed8e
   size: 3503247
   path: HLTH.dta
-  md5-dos2unix: 959a932cf85a2cd5208bd9c50c75ed8e
-  hash: md5

@@ -2,5 +2,3 @@ outs:
 - md5: 8f04a710512f67281efacb7402507c34
   size: 12555
   path: FILE21V0.dta
-  md5-dos2unix: 8f04a710512f67281efacb7402507c34
-  hash: md5

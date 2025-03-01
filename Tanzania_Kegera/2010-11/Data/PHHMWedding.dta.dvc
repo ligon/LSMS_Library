@@ -2,5 +2,3 @@ outs:
 - md5: 435ab4f631d531c9713aaff5f332472d
   size: 140822
   path: PHHMWedding.dta
-  md5-dos2unix: 435ab4f631d531c9713aaff5f332472d
-  hash: md5

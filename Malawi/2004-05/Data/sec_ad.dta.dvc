@@ -2,5 +2,3 @@ outs:
 - md5: 9b24975e39a7b22eb4845ee856d17760
   size: 4008384
   path: sec_ad.dta
-  md5-dos2unix: 9b24975e39a7b22eb4845ee856d17760
-  hash: md5

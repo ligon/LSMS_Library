@@ -2,5 +2,3 @@ outs:
 - md5: 960b50f7c3c2357c439d011ad893e7c1
   size: 9888
   path: HHInheritanceGroup.dta
-  md5-dos2unix: 960b50f7c3c2357c439d011ad893e7c1
-  hash: md5

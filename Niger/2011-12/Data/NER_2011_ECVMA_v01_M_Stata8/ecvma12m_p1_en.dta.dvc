@@ -2,5 +2,3 @@ outs:
 - md5: 6b30b8199b35e9b2179ede99682bd8c1
   size: 5082379
   path: ecvma12m_p1_en.dta
-  md5-dos2unix: 6b30b8199b35e9b2179ede99682bd8c1
-  hash: md5

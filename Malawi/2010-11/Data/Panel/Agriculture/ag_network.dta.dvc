@@ -2,5 +2,3 @@ outs:
 - md5: a190cab99816bb87a3e4cd8b9fb62f1a
   size: 613249
   path: ag_network.dta
-  md5-dos2unix: a190cab99816bb87a3e4cd8b9fb62f1a
-  hash: md5

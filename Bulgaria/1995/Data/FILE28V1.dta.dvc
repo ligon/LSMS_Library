@@ -2,5 +2,3 @@ outs:
 - md5: 522cee36ae924c60a5e5877223bd9e2c
   size: 12691
   path: FILE28V1.dta
-  md5-dos2unix: 522cee36ae924c60a5e5877223bd9e2c
-  hash: md5

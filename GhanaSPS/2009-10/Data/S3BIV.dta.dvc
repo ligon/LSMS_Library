@@ -2,5 +2,3 @@ outs:
 - md5: e337b2547d8852d9a82fce28e174b043
   size: 129850
   path: S3BIV.dta
-  md5-dos2unix: e337b2547d8852d9a82fce28e174b043
-  hash: md5

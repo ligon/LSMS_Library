@@ -2,5 +2,3 @@ outs:
 - md5: 235395652674b0ac9617cdff30c5f73a
   size: 112247
   path: fs_mod_j1.dta
-  md5-dos2unix: 235395652674b0ac9617cdff30c5f73a
-  hash: md5

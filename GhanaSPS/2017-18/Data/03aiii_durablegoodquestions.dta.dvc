@@ -2,5 +2,3 @@ outs:
 - md5: cdadd8b3c4108d0947d92ca94fe1da37
   size: 4597678
   path: 03aiii_durablegoodquestions.dta
-  md5-dos2unix: cdadd8b3c4108d0947d92ca94fe1da37
-  hash: md5
