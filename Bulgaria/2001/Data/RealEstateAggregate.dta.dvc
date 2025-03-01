@@ -2,3 +2,4 @@ outs:
 - md5: d9d5685a6ec10272e35875be53b83178
   size: 26863
   path: RealEstateAggregate.dta
+  hash: md5

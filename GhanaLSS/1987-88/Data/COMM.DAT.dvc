@@ -1,3 +1,4 @@
 outs:
 - md5: 4a6f0481ed2dc547bffb07161d46904c
   path: COMM.DAT
+  hash: md5

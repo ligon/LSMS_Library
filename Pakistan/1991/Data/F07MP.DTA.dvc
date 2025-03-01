@@ -2,3 +2,4 @@ outs:
 - md5: 7e3f1bec667a72bef0369ffcdef8ef6e
   size: 216899
   path: F07MP.DTA
+  hash: md5

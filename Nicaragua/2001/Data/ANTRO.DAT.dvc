@@ -2,3 +2,4 @@ outs:
 - md5: 17e1b1ba0d4f5e95eca8c5ed2eb657b2
   size: 750925
   path: ANTRO.DAT
+  hash: md5

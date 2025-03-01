@@ -1,3 +1,4 @@
 outs:
 - md5: dfd686ad25502a986ac49748e53f842f
   path: PSCHOOLB.DAT
+  hash: md5

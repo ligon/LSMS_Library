@@ -2,3 +2,4 @@ outs:
 - md5: 0d3e056deab55574ff52c5f90a65aa6f
   size: 6701
   path: price2004_cl.dta
+  hash: md5

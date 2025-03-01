@@ -2,3 +2,4 @@ outs:
 - md5: 8fa05e68f7694aafeef3b2cdcc875431
   size: 5895433
   path: 02a_nr_relatives_questions.dta
+  hash: md5

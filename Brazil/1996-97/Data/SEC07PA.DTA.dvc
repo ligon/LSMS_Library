@@ -2,3 +2,4 @@ outs:
 - md5: b79f30430ed1b7f9d66685821d083e45
   size: 338672
   path: SEC07PA.DTA
+  hash: md5

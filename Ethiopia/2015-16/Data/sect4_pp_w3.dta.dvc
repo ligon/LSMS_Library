@@ -2,3 +2,4 @@ outs:
 - md5: 57a02ce9db9acfe708d8ab6a8a5cc8bb
   size: 4810782
   path: sect4_pp_w3.dta
+  hash: md5

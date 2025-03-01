@@ -2,3 +2,4 @@ outs:
 - md5: 0caa16875d855265d76bd9f553818427
   size: 672126
   path: 02_GHA_EXPALCH.dta
+  hash: md5

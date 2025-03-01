@@ -2,3 +2,4 @@ outs:
 - md5: 75d72fa5b41787068e26070fc66f9678
   size: 4928991
   path: s19_me_ben2018.dta
+  hash: md5

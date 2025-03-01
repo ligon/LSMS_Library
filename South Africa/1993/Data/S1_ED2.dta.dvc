@@ -2,3 +2,4 @@ outs:
 - md5: e9bbf8383d41ce9d53576346cf42c086
   size: 120508
   path: S1_ED2.dta
+  hash: md5

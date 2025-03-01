@@ -2,3 +2,4 @@ outs:
 - md5: e18d02ae8db5edffe50dbab0d4053936
   size: 5942376
   path: 2007ihses03_housing.dta
+  hash: md5

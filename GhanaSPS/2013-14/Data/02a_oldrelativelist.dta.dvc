@@ -2,3 +2,4 @@ outs:
 - md5: 1122e0e084e287053fd17a360716df34
   size: 284704
   path: 02a_oldrelativelist.dta
+  hash: md5

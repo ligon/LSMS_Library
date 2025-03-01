@@ -2,3 +2,4 @@ outs:
 - md5: 3cf109d490144fdc7fde9a8155ad7ca8
   size: 301224
   path: PR_B.DTA
+  hash: md5

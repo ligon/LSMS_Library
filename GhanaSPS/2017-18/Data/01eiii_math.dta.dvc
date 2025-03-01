@@ -2,3 +2,4 @@ outs:
 - md5: c30db84e178fe459ec48a2a431ddb219
   size: 1245335
   path: 01eiii_math.dta
+  hash: md5

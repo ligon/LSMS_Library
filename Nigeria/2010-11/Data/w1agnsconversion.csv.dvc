@@ -2,3 +2,4 @@ outs:
 - md5: 09ddc4a4570ef4e5b424092564f6714c
   size: 52455
   path: w1agnsconversion.csv
+  hash: md5

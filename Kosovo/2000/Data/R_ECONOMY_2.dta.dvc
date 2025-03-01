@@ -2,3 +2,4 @@ outs:
 - md5: 9044ea48f28ad5da820ee5916c87667c
   size: 6665
   path: R_ECONOMY_2.dta
+  hash: md5

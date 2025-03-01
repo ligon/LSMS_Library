@@ -2,3 +2,4 @@ outs:
 - md5: 0508090c471a764e8d2473eeed0d71ce
   size: 204885
   path: S4B3.DTA
+  hash: md5

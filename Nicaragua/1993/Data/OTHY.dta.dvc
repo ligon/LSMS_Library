@@ -2,3 +2,4 @@ outs:
 - md5: 4eb1ab6f615940198d54f8568c35e737
   size: 521413
   path: OTHY.dta
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: ee2963dc5076bd6871b2de17a3fc2959
   size: 155564
   path: N05D.DTA
+  hash: md5

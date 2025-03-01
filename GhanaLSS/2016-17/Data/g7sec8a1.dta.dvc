@@ -1,3 +1,4 @@
 outs:
 - md5: f18efd3d25c36ec6a653f1779f91e568
   path: g7sec8a1.dta
+  hash: md5

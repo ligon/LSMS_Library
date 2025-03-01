@@ -2,3 +2,4 @@ outs:
 - md5: e723b1e66f643191358fcd65cbb00ad6
   size: 4449147
   path: EACIIND_p2.dta
+  hash: md5

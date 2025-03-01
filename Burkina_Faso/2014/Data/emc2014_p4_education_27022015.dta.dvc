@@ -2,3 +2,4 @@ outs:
 - md5: e26ffa6d1e724999bf6ec3032b0c3398
   size: 4715010
   path: emc2014_p4_education_27022015.dta
+  hash: md5

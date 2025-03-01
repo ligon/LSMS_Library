@@ -2,3 +2,4 @@ outs:
 - md5: 4b221ec4edd9f2c996bb14f903a014a7
   size: 48089
   path: rentaggregate.dta
+  hash: md5

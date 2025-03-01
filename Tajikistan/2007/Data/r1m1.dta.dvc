@@ -2,3 +2,4 @@ outs:
 - md5: 68cd1892f78a4e37ea19f9776a0cd2e7
   size: 846394
   path: r1m1.dta
+  hash: md5

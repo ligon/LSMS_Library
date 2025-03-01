@@ -2,3 +2,4 @@ outs:
 - md5: fd5b2d82417402f6bb2c627ff5dfb6a5
   size: 146081
   path: FILE24V1.dta
+  hash: md5

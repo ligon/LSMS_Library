@@ -2,3 +2,4 @@ outs:
 - md5: 46aa6c13e08d8bd4c22fd33be31a8a71
   size: 4848268
   path: 2012ihses00_cover_page.dta
+  hash: md5

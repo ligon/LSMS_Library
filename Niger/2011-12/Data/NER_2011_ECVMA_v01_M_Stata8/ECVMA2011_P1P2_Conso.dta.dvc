@@ -2,3 +2,4 @@ outs:
 - md5: a1606112d81cae039eda860276626acf
   size: 5831731
   path: ECVMA2011_P1P2_Conso.dta
+  hash: md5

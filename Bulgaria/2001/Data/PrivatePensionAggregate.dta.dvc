@@ -2,3 +2,4 @@ outs:
 - md5: cb1992d83e8893a8584875b79dafdc7f
   size: 906
   path: PrivatePensionAggregate.dta
+  hash: md5

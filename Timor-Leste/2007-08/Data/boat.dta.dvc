@@ -2,3 +2,4 @@ outs:
 - md5: db762b94a061982f5c3b2e27006f7816
   size: 2596
   path: boat.dta
+  hash: md5

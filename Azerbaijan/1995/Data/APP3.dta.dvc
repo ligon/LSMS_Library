@@ -2,3 +2,4 @@ outs:
 - md5: 0e28ab30530ba3132ce2d98dad28f1fc
   size: 2840
   path: APP3.dta
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: f13ead14a5673b319e7eadf65cdd5e42
   size: 654920
   path: 10ai_depression.dta
+  hash: md5

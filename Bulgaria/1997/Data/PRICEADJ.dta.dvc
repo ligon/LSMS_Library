@@ -2,3 +2,4 @@ outs:
 - md5: 6a6d22ad853c1a3949c018abbbfdd210
   size: 1505
   path: PRICEADJ.dta
+  hash: md5

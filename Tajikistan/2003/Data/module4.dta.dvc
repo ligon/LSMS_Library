@@ -2,3 +2,4 @@ outs:
 - md5: 6d4009634c99ed94497663774ad68571
   size: 6132434
   path: module4.dta
+  hash: md5

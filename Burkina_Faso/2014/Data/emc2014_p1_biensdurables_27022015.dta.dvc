@@ -2,3 +2,4 @@ outs:
 - md5: cef633853c1c3a7189cc1f480bee813b
   size: 6179709
   path: emc2014_p1_biensdurables_27022015.dta
+  hash: md5

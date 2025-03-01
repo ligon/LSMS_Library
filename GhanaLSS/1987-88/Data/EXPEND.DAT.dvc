@@ -1,3 +1,4 @@
 outs:
 - md5: b48a4ad6429468708869c254f606575d
   path: EXPEND.DAT
+  hash: md5

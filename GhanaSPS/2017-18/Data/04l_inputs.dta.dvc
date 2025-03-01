@@ -2,3 +2,4 @@ outs:
 - md5: 9af7ca37acca16c05b960cf13b9db865
   size: 416303
   path: 04l_inputs.dta
+  hash: md5

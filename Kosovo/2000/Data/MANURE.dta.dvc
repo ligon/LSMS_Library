@@ -2,3 +2,4 @@ outs:
 - md5: 4c985c21fab971154d6959fecfd9b33a
   size: 266549
   path: MANURE.dta
+  hash: md5

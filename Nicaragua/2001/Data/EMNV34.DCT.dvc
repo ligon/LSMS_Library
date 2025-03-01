@@ -2,3 +2,4 @@ outs:
 - md5: 95f90437daee4eb7a87acde030ac8aff
   size: 504
   path: EMNV34.DCT
+  hash: md5

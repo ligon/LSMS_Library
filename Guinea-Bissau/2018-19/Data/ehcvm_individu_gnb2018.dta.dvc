@@ -2,3 +2,4 @@ outs:
 - md5: 9bfcae301acab7da090bc4d37fc78fde
   size: 3272375
   path: ehcvm_individu_gnb2018.dta
+  hash: md5

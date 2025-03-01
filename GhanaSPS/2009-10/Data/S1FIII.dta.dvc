@@ -2,3 +2,4 @@ outs:
 - md5: 9e8e31e525a1f47ec4744d585736b533
   size: 1403648
   path: S1FIII.dta
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: 2199f8ad67c257be2a4f1c101edeace8
   size: 975414
   path: consumptionTL07.dta
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: d4650748e764be6c60a6432f0abd712d
   size: 66731
   path: S3BIV0.dta
+  hash: md5

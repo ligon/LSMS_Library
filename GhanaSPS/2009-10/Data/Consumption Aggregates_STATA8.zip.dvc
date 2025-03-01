@@ -2,3 +2,4 @@ outs:
 - md5: 85ff460ca1c303a88c7e409e62ee108b
   size: 11404756
   path: Consumption Aggregates_STATA8.zip
+  hash: md5

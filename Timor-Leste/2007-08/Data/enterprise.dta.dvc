@@ -2,3 +2,4 @@ outs:
 - md5: 756cce60e4fd23534fe548549009c15a
   size: 62070
   path: enterprise.dta
+  hash: md5

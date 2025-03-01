@@ -2,3 +2,4 @@ outs:
 - md5: 5e42f6f2d185ac72fcef6322d24f714b
   size: 136832
   path: mop_2_housing_and_durables.dta
+  hash: md5

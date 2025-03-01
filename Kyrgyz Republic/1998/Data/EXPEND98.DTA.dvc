@@ -2,3 +2,4 @@ outs:
 - md5: 00ce9f2174f1ccd758cd8b296b839892
   size: 1639772
   path: EXPEND98.DTA
+  hash: md5

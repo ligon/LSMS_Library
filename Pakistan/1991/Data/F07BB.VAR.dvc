@@ -2,3 +2,4 @@ outs:
 - md5: 7aaf931a3de4477782c2d0ae614d1da6
   size: 159
   path: F07BB.VAR
+  hash: md5

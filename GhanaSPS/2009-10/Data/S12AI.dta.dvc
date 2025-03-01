@@ -2,3 +2,4 @@ outs:
 - md5: 4e9e79975f605106fc611b67e17c07c7
   size: 748894
   path: S12AI.dta
+  hash: md5

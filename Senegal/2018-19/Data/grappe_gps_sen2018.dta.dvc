@@ -2,3 +2,4 @@ outs:
 - md5: a84088dacd7fa7a9c82e7e3aebb33c8b
   size: 41664
   path: grappe_gps_sen2018.dta
+  hash: md5

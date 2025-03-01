@@ -2,3 +2,4 @@ outs:
 - md5: 09380a17f59cecda6f2c6ee52b6dcf03
   size: 783279
   path: labor_c_cl.dta
+  hash: md5

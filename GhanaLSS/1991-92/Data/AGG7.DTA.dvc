@@ -2,3 +2,4 @@ outs:
 - md5: a46647006968b18e9f8ece768a746cf7
   size: 145989
   path: AGG7.DTA
+  hash: md5

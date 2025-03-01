@@ -1,3 +1,4 @@
 outs:
 - md5: cb26ef9a45aaea140553e1be32d58df8
   path: gsec15bb.dta
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: 67a06281d57ce07558c5dddd47f67aef
   size: 12151339
   path: 2012ihses07_anthropometrics.dta
+  hash: md5

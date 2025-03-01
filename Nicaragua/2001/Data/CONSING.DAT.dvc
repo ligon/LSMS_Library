@@ -2,3 +2,4 @@ outs:
 - md5: c6ec1da39b23d7ecea6d46e74067ee29
   size: 702587
   path: CONSING.DAT
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: 3098b939ebef5060977dd2b9533f27ff
   size: 14215
   path: R_BASIC_COMMUNITY_CHARACTERISTICS.dta
+  hash: md5

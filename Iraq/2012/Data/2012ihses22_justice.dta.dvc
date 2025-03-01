@@ -2,3 +2,4 @@ outs:
 - md5: 4e178098c884ffa8d92cc035ed64775a
   size: 26384513
   path: 2012ihses22_justice.dta
+  hash: md5

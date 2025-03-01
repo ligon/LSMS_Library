@@ -2,3 +2,4 @@ outs:
 - md5: a14e7e1e3080d509bd0a9f5872e789dd
   size: 1113943
   path: w3_roster_all.dta
+  hash: md5

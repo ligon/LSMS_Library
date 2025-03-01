@@ -2,3 +2,4 @@ outs:
 - md5: 8bb1bc78a4b8337b12c5bd6fcf4c0e51
   size: 2465916
   path: 2007ihses15_household_transfers.dta
+  hash: md5

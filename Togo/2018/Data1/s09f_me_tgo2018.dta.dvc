@@ -2,3 +2,4 @@ outs:
 - md5: b5df5b68f4c84b57c49b8dc86e5a184d
   size: 218265
   path: s09f_me_tgo2018.dta
+  hash: md5

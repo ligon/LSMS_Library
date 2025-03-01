@@ -2,3 +2,4 @@ outs:
 - md5: 7ecb101562c292ebb3762f8758197bc0
   size: 499878
   path: poverty.dta
+  hash: md5

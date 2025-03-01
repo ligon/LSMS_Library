@@ -1,3 +1,4 @@
 outs:
 - md5: c43b598bd7b5db46b330db3a4942a3e7
   path: 03_GHA_EXPCLTH.dta
+  hash: md5

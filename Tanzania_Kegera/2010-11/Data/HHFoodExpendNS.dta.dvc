@@ -2,3 +2,4 @@ outs:
 - md5: fa6dc7cc0f0193680be3f9f58ed52c21
   size: 1236375
   path: HHFoodExpendNS.dta
+  hash: md5

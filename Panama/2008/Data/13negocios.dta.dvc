@@ -2,3 +2,4 @@ outs:
 - md5: 270668e629fb2c9725d30b1f93ca7489
   size: 1461694
   path: 13negocios.dta
+  hash: md5

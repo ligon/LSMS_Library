@@ -2,3 +2,4 @@ outs:
 - md5: 188967a4da6ccfb721c47f5232a4db3b
   size: 334110
   path: CSEC6E.dta
+  hash: md5

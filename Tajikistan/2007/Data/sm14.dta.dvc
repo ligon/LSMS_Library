@@ -2,3 +2,4 @@ outs:
 - md5: bfa9fc551f432f5a00ba7ccaeef28a75
   size: 10118
   path: sm14.dta
+  hash: md5

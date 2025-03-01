@@ -2,3 +2,4 @@ outs:
 - md5: 71c9befcc730b423dc5a815578f4d7eb
   size: 6291
   path: PT0103.DTA
+  hash: md5

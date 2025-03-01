@@ -2,3 +2,4 @@ outs:
 - md5: af412dae469898ed72e0aaecac9de528
   size: 109508
   path: SUBAGG21.DTA
+  hash: md5

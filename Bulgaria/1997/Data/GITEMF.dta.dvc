@@ -2,3 +2,4 @@ outs:
 - md5: e432307158593740d9c2b102be186dab
   size: 1650
   path: GITEMF.dta
+  hash: md5

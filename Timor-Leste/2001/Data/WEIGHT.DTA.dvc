@@ -2,3 +2,4 @@ outs:
 - md5: a6fca768100b90255f5e7d73d5d4f3fc
   size: 5940
   path: WEIGHT.DTA
+  hash: md5

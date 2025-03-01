@@ -2,3 +2,4 @@ outs:
 - md5: fa85c7dcebd4d67c510c699a3e7a8d9c
   size: 1698587
   path: ihs2_individ.dta
+  hash: md5

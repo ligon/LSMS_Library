@@ -2,3 +2,4 @@ outs:
 - md5: 7387ebfc528c1c910522d98a5aedfea5
   size: 535413
   path: INCEXP.DTA
+  hash: md5

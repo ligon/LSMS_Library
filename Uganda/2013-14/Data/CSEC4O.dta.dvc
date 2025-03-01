@@ -1,3 +1,4 @@
 outs:
 - md5: 0a105f0cfd30565a4e3902df3e0fcbc9
   path: CSEC4O.dta
+  hash: md5

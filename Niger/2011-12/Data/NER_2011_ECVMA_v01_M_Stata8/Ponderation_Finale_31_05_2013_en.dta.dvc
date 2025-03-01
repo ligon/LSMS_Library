@@ -2,3 +2,4 @@ outs:
 - md5: 0a0a57723aa6dd3d4855a9dcbfbb72a4
   size: 5958
   path: Ponderation_Finale_31_05_2013_en.dta
+  hash: md5

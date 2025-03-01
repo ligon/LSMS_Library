@@ -2,3 +2,4 @@ outs:
 - md5: 4aaf9f5b61ee6f5be790ff09d11ba80e
   size: 44402
   path: M2_REM2.dta
+  hash: md5

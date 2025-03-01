@@ -2,3 +2,4 @@ outs:
 - md5: bf5ebb00d6207fa1ab30657487ff3315
   size: 1398106
   path: 01eviii_consumption.dta
+  hash: md5

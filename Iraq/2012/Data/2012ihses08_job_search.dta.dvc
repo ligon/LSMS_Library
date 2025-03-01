@@ -2,3 +2,4 @@ outs:
 - md5: 8714d0897ea4285f6197ea6c598f5d96
   size: 29230739
   path: 2012ihses08_job_search.dta
+  hash: md5

@@ -1,3 +1,4 @@
 outs:
 - md5: e4a90e4f5aaad7c9559f92892d61669c
   path: PRICE86.DCT
+  hash: md5

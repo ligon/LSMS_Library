@@ -2,3 +2,4 @@ outs:
 - md5: 37ac482f14e2d6d7ecfbe07bcd2f09a8
   size: 3325115
   path: ecvmachoc_p1_en.dta
+  hash: md5

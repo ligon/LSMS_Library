@@ -1,3 +1,4 @@
 outs:
 - md5: 4b5f83c367cb5846dcde5baad19bedb6
   path: ZSCOREH.DCT
+  hash: md5

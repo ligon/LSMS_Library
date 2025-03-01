@@ -2,3 +2,4 @@ outs:
 - md5: c95c6f30aff1ff1e67173a519f4518b8
   size: 9402
   path: R_INDUSTRY_2.dta
+  hash: md5

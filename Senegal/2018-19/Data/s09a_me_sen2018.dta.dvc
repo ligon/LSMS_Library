@@ -2,3 +2,4 @@ outs:
 - md5: d0099086a670d934af37e6dd8cadef72
   size: 2514541
   path: s09a_me_sen2018.dta
+  hash: md5

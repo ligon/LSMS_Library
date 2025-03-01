@@ -2,3 +2,4 @@ outs:
 - md5: 614b14976c4e94b8ee0d390eef043018
   size: 789123
   path: CN6M.dta
+  hash: md5

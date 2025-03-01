@@ -2,3 +2,4 @@ outs:
 - md5: 8be6228070f99944860e8e9a9cd11c5c
   size: 1051270
   path: INC_WAGE_PID.dta
+  hash: md5

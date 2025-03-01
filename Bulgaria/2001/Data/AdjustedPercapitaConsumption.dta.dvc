@@ -2,3 +2,4 @@ outs:
 - md5: e9a9b98ff9b17d2f8afe4557904be646
   size: 302095
   path: AdjustedPercapitaConsumption.dta
+  hash: md5

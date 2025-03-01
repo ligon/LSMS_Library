@@ -2,3 +2,4 @@ outs:
 - md5: 1040edea62916181a4a35e6ea09ec103
   size: 266447
   path: sect12_filter_public.dta
+  hash: md5

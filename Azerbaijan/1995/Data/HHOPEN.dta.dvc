@@ -2,3 +2,4 @@ outs:
 - md5: 6e8311b71b2f6df438fd4467a3a18fa2
   size: 11030
   path: HHOPEN.dta
+  hash: md5

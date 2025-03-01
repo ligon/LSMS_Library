@@ -1,3 +1,4 @@
 outs:
 - md5: fa338ab4ffae8e7cc6cc2cc217c73927
   path: HEALTH.DAT
+  hash: md5

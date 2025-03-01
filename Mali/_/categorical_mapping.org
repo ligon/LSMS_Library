@@ -1,0 +1,58 @@
+#+title: Categorical Mapping
+
+
+#+begin_src python :results output raw table
+import lsms_library as ll
+from lsms_library.local_tools import write_df_to_org
+mali = ll.Country('Mali')
+df = mali.ai_categorical_mapping(label_col = 'u')
+print(write_df_to_org(df, 'unit'))
+
+
+
+#+end_src
+
+#+RESULTS:
+#+NAME: unit
+|    | Original Label               | Preferred Label | Manual Update |
+|----+------------------------------+-----------------+---------------|
+|  0 | Alvéole                      | Alvéole         |               |
+|  1 | Avec os au Kg                | Kg              |               |
+|  2 | Avec os en tas               | Tas             |               |
+|  3 | Barre                        | Barre           |               |
+|  4 | Bidon                        | Bidon           |               |
+|  5 | Boite de lait concentré      | Boite           |               |
+|  6 | Boite de tomate              | Boite           |               |
+|  7 | Carcasse                     | Carcasse        |               |
+|  8 | Cuillere                     | Cuillere        |               |
+|  9 | Filet au Kg                  | Kg              |               |
+| 10 | Gigot                        | Gigot           |               |
+| 11 | Gobelet                      | Gobelet         |               |
+| 12 | Gousse                       | Gousse          |               |
+| 13 | Morceau                      | Morceau         |               |
+| 14 | Motte (boule)                | Boule           |               |
+| 15 | Moude (Moudé))               | Moude           |               |
+| 16 | Paani                        | Paani           |               |
+| 17 | Panier                       | Panier          |               |
+| 18 | Paquet                       | Paquet          |               |
+| 19 | Piece                        | Piece           |               |
+| 20 | Sac (25 Kg)                  | 25 Kg           |               |
+| 21 | Sans os au Kg                | Kg              |               |
+| 22 | Sans os au tas               | Tas             |               |
+| 23 | Seau (10 Kg)                 | 10 Kg           |               |
+| 24 | Seau (25 Kg)                 | 25 Kg           |               |
+| 25 | Seau (5 Kg )                 | 5 Kg            |               |
+| 26 | Tas                          | Tas             |               |
+| 27 | Tranche                      | Tranche         |               |
+| 28 | boite                        | Boite           |               |
+| 29 | bouteille                    | Bouteille       |               |
+| 30 | calebasse                    | Calebasse       |               |
+| 31 | cannette                     | Cannette        |               |
+| 32 | carton (brique)              | Carton          |               |
+| 33 | kg                           | Kg              |               |
+| 34 | litre                        | Litre           |               |
+| 35 | louche traditionnelle (cokk) | Louche          |               |
+| 36 | pot                          | Pot             |               |
+| 37 | sachet industriel            | Sachet          |               |
+| 38 | unité                        | Unité           |               |
+| 39 | verre                        | Verre           |               |

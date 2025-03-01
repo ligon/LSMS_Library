@@ -2,3 +2,4 @@ outs:
 - md5: 76d21215c02eacac7e960505b9f0348b
   size: 46028
   path: SUBAGG32.DTA
+  hash: md5

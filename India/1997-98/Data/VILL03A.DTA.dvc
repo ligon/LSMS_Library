@@ -2,3 +2,4 @@ outs:
 - md5: 463b2034569be4d43e721cfd3d0c05fd
   size: 22286
   path: VILL03A.DTA
+  hash: md5

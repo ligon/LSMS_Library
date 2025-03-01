@@ -2,3 +2,4 @@ outs:
 - md5: 0bb7fd53b0f41a369d6391f2567da2a3
   size: 282532
   path: public_services.dta
+  hash: md5

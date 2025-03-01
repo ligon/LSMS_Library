@@ -2,3 +2,4 @@ outs:
 - md5: fad30bac5fe4865c529b1a6319456371
   size: 26391
   path: secta5a_harvestw1.csv
+  hash: md5

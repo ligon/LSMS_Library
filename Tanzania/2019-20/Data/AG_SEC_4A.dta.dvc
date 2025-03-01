@@ -2,3 +2,4 @@ outs:
 - md5: 4ce0c2a61e460899192b464d26cda13e
   size: 473779
   path: AG_SEC_4A.dta
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: 276af1cf53a846cab0c2eefc54b36d54
   size: 31818
   path: ihs2_ea_data.dta
+  hash: md5

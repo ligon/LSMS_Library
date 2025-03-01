@@ -1,3 +1,4 @@
 outs:
 - md5: d16c24617ea8e7416766999390602166
   path: COMM86.DCT
+  hash: md5

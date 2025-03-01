@@ -2,3 +2,4 @@ outs:
 - md5: bc3ff897a0af138e1dd36dc48cdeb765
   size: 182
   path: REG20.VAR
+  hash: md5

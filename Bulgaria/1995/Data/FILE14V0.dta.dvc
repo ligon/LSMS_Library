@@ -2,3 +2,4 @@ outs:
 - md5: 78163a056237129e785393a61a2a4f1f
   size: 71124
   path: FILE14V0.dta
+  hash: md5

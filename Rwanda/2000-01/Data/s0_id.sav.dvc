@@ -1,3 +1,4 @@
 outs:
 - md5: 15cc1f45d361cbd6b36753718a0cf332
   path: s0_id.sav
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: 06aeef82d10547ce852135c710aa9089
   size: 341945
   path: 04nn_gatheringquestions.dta
+  hash: md5

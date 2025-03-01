@@ -2,3 +2,4 @@ outs:
 - md5: 500cae38312ba60385150a6e5d3bd89b
   size: 460060
   path: 01eiv_nepsy.dta
+  hash: md5

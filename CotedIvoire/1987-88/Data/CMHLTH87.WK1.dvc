@@ -1,3 +1,4 @@
 outs:
 - md5: 3e1ec2765750a3b3078f881e4fec26bb
   path: CMHLTH87.WK1
+  hash: md5

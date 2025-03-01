@@ -2,3 +2,4 @@ outs:
 - md5: cb56196017c543cf9062e98356da4577
   size: 238389
   path: s20_me_bfa2018.dta
+  hash: md5

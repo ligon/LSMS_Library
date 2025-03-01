@@ -1,3 +1,4 @@
 outs:
 - md5: 0b15fa6fce1b1feb51895c7a310ed487
   path: CSECTION3K.dta
+  hash: md5

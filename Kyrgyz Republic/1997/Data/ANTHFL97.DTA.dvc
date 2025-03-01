@@ -2,3 +2,4 @@ outs:
 - md5: 5dd83dcca7fdc40f38a6e3e399aec1d1
   size: 412670
   path: ANTHFL97.DTA
+  hash: md5

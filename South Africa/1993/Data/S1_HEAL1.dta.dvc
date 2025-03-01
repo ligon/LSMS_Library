@@ -2,3 +2,4 @@ outs:
 - md5: b7c319df14d58ae2fe83a6926b427d21
   size: 15104
   path: S1_HEAL1.dta
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: df11f839b2398561bf3967df60be6771
   size: 485824
   path: ANO_EST.DTA
+  hash: md5

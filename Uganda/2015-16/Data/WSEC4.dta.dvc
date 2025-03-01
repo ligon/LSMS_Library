@@ -1,3 +1,4 @@
 outs:
 - md5: 66d0fa9c77d6e28ccef5dba68b51fd61
   path: WSEC4.dta
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: 33da529968f49c977a0e5cf29f9e1098
   size: 85485
   path: CONADULT.DTA
+  hash: md5

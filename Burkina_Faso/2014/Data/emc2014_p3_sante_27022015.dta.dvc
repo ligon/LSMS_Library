@@ -2,3 +2,4 @@ outs:
 - md5: 92885f71e3db837d089b343220fc178b
   size: 7659688
   path: emc2014_p3_sante_27022015.dta
+  hash: md5

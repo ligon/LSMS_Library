@@ -2,3 +2,4 @@ outs:
 - md5: 0e99db9be9afcc5dcf264788bb02e9f6
   size: 99278
   path: 05bi_allemployees.dta
+  hash: md5

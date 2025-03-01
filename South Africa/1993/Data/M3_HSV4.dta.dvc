@@ -2,3 +2,4 @@ outs:
 - md5: ee3169f421d1edbe13f83523c86f39f8
   size: 162854
   path: M3_HSV4.dta
+  hash: md5

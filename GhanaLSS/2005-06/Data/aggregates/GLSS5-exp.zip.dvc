@@ -2,3 +2,4 @@ outs:
 - md5: f819d92c8e9d9a441955268037044b23
   size: 2640663
   path: GLSS5-exp.zip
+  hash: md5

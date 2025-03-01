@@ -2,3 +2,4 @@ outs:
 - md5: 3e5bf40e4b6a339e10462406b0bd4e7d
   size: 9595402
   path: w3_ind_allx.dta
+  hash: md5

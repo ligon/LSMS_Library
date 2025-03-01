@@ -2,3 +2,4 @@ outs:
 - md5: ed7bb2943a40b3c39ea1fd86a2cd7fa4
   size: 167874
   path: ns_m4_land-r1_1-12.dta
+  hash: md5

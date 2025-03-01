@@ -2,3 +2,4 @@ outs:
 - md5: 506cb8347dce8a82f08e0739e7137a14
   size: 519606
   path: ns_m6.dta
+  hash: md5

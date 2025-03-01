@@ -2,3 +2,4 @@ outs:
 - md5: 770bc8a830b32542fc2fd4ac1ac6d611
   size: 720093
   path: 06d_dailyliving.dta
+  hash: md5

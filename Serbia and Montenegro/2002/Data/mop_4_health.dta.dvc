@@ -2,3 +2,4 @@ outs:
 - md5: d3b1c00cd6ed50be66ea03c053342545
   size: 609676
   path: mop_4_health.dta
+  hash: md5

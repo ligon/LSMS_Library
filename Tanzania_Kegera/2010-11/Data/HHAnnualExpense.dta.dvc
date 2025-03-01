@@ -2,3 +2,4 @@ outs:
 - md5: f77d439ca17b02cd6983253f08c3147b
   size: 319389
   path: HHAnnualExpense.dta
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: b134a72a2dac3dca8f65b376b52d0433
   size: 57692
   path: SUBAGG18.DTA
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: 2d3947277378969414600d5d628f8bb3
   size: 69488
   path: A06C.dta
+  hash: md5

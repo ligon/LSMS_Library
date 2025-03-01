@@ -1,3 +1,4 @@
 outs:
 - md5: 19f40c659c92f6b6495ace028653613f
   path: F15B.DAT
+  hash: md5

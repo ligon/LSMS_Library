@@ -2,3 +2,4 @@ outs:
 - md5: 64ba32bd74899f373b48aa37ddc5dcb1
   size: 75393
   path: dbhjhist_bih.dta
+  hash: md5

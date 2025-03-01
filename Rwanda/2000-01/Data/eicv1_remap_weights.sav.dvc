@@ -1,3 +1,4 @@
 outs:
 - md5: b12c3b24e1450d1de06bac19da93810c
   path: eicv1_remap_weights.sav
+  hash: md5

@@ -12,6 +12,7 @@ import types
 from pyarrow.lib import ArrowInvalid
 from functools import lru_cache
 from pathlib import Path
+from cfe.df_utils import df_to_orgtbl
 
 def _to_numeric(x,coerce=False):
     try:
@@ -735,3 +736,27 @@ def panel_attrition(df, Waves, return_ids=False, waves = None,  split_households
         return foo,IDs
     else:
         return foo
+
+def write_df_to_org(df, table_name, filepath=None):
+    '''
+    Writes a DataFrame to an Org-mode table format.
+    Parameters:
+    df (pandas.DataFrame): The DataFrame to be converted and written.
+    table_name (str): The name to be assigned to the Org table.
+    filepath (str, optional): The file path where the Org table will be written. 
+                              If None, the function returns the Org table as a string, used in Emacs Python Block.
+    Returns:
+    str: The Org table as a string if filepath is None.
+    '''
+
+    if filepath is not None:
+        with open(filepath, "w", encoding="utf-8") as file:
+            # file.write("#+TITLE: Categorical Mapping\n\n")
+            file.write(f"#+NAME: {table_name}\n")
+            file.write(df_to_orgtbl(df))  # Convert label DataFrame to Org table
+            file.write("\n\n")  # Add spacing
+    else:
+        s = f"#+NAME: {table_name}\n"
+        s += df_to_orgtbl(df)
+        return s
+        

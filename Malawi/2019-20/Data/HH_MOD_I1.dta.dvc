@@ -2,3 +2,4 @@ outs:
 - md5: e1100a80bc498df6b6f36d3e823bbb99
   size: 5255754
   path: HH_MOD_I1.dta
+  hash: md5

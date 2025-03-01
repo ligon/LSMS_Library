@@ -2,3 +2,4 @@ outs:
 - md5: bfd87ebb75bd8ec05c83c5fa26733b8b
   size: 1271188
   path: upd4_hh_z1.dta
+  hash: md5

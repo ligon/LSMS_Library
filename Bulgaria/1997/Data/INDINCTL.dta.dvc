@@ -2,3 +2,4 @@ outs:
 - md5: 853ea4ec74f096082b015c3a33019f64
   size: 772570
   path: INDINCTL.dta
+  hash: md5

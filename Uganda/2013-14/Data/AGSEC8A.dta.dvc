@@ -1,3 +1,4 @@
 outs:
 - md5: 2926cdc5b324209c9a3d436a48c9a3f6
   path: AGSEC8A.dta
+  hash: md5

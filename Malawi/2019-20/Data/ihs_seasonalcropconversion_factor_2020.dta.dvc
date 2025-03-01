@@ -2,3 +2,4 @@ outs:
 - md5: 53bac3363761359c527b9567b408e473
   size: 38797
   path: ihs_seasonalcropconversion_factor_2020.dta
+  hash: md5

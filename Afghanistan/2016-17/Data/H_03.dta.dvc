@@ -2,3 +2,4 @@ outs:
 - md5: 56f85f9cd84f9bbe38175acbcc05dcd1
   size: 10903694
   path: H_03.dta
+  hash: md5

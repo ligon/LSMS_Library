@@ -2,3 +2,4 @@ outs:
 - md5: 7b956f681a8602462b436e086a55f2ba
   size: 12329634
   path: 2012ihses21_time_use.dta
+  hash: md5

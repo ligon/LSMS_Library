@@ -2,3 +2,4 @@ outs:
 - md5: d75b68e0301457b5e8cb6c8ed8321848
   size: 767797
   path: INGHOG94.DTA
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: d002d64b6f301087409824fdd533ad15
   size: 3639
   path: fish_exp.dta
+  hash: md5

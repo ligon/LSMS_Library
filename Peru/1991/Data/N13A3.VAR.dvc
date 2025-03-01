@@ -2,3 +2,4 @@ outs:
 - md5: f7376274822e4c0109a9f8509be56221
   size: 92
   path: N13A3.VAR
+  hash: md5

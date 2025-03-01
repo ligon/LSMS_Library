@@ -2,3 +2,4 @@ outs:
 - md5: c21037d919bfb3863c47ee67987cedcb
   size: 39543
   path: FILE22V0.dta
+  hash: md5

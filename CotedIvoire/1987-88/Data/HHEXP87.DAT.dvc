@@ -1,3 +1,4 @@
 outs:
 - md5: 297f125e3b63ac13d34479a7d206e88d
   path: HHEXP87.DAT
+  hash: md5

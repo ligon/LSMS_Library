@@ -1,3 +1,5 @@
 outs:
 - md5: 251aaebf2362404f6e4fa9dfbb4047b9
   path: Y01A.DCT
+  size: 499
+  hash: md5

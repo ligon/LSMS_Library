@@ -1,3 +1,4 @@
 outs:
 - md5: 07f3f63d3ed596710db9e297ee000d73
   path: CMHLTH88.FMT
+  hash: md5

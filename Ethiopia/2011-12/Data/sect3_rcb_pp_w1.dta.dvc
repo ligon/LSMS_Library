@@ -2,3 +2,4 @@ outs:
 - md5: 74951f8c29fe2208f0c39613cce3a296
   size: 8890051
   path: sect3_rcb_pp_w1.dta
+  hash: md5

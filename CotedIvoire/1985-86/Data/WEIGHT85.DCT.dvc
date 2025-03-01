@@ -1,3 +1,4 @@
 outs:
 - md5: 9c466743859db60d9cff3e1f8acb1102
   path: WEIGHT85.DCT
+  hash: md5

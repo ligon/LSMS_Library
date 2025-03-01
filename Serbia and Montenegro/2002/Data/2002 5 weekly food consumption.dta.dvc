@@ -2,3 +2,4 @@ outs:
 - md5: 8e531b3658cb0a80bed4a635a126d311
   size: 24631386
   path: 2002 5 weekly food consumption.dta
+  hash: md5

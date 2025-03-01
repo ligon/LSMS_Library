@@ -1,3 +1,4 @@
 outs:
 - md5: e57dc7806a28c6894ebd56c1d22d1475
   path: s8_forestry.sav
+  hash: md5

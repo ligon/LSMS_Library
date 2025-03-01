@@ -2,3 +2,4 @@ outs:
 - md5: efcda4a6071c9dc556db653a2db23d3a
   size: 57104
   path: A-CULTM.DTA
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: 114c50a08cb3b346aa5f32a646f164cd
   size: 687321
   path: 2003 1 demography.dta
+  hash: md5

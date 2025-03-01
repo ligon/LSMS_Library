@@ -2,3 +2,4 @@ outs:
 - md5: 763b88cda42d61b9a6e967978569cd95
   size: 1651899
   path: gps-sec13f.dta
+  hash: md5

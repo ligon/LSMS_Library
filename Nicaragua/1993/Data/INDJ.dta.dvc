@@ -2,3 +2,4 @@ outs:
 - md5: 7ed8d6c7aca12ebab0acc537ed73977c
   size: 689880
   path: INDJ.dta
+  hash: md5

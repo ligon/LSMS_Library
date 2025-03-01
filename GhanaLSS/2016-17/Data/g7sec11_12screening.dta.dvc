@@ -1,3 +1,4 @@
 outs:
 - md5: 2b532652579a094f4077c3d4e6b43c87
   path: g7sec11_12screening.dta
+  hash: md5

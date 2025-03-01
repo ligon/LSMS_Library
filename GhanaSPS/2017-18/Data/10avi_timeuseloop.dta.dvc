@@ -2,3 +2,4 @@ outs:
 - md5: b20283fed496eddeac49894e778c27b2
   size: 11862333
   path: 10avi_timeuseloop.dta
+  hash: md5

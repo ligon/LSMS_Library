@@ -2,3 +2,4 @@ outs:
 - md5: 5231220aeabc8d20abf0e10b143e24bc
   size: 145366
   path: HHEXPPC.dta
+  hash: md5

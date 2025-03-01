@@ -2,3 +2,4 @@ outs:
 - md5: 6df17a29269ecdcb9a50f65abc832a4c
   size: 5466829
   path: LABOR.dta
+  hash: md5

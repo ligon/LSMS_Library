@@ -2,3 +2,4 @@ outs:
 - md5: 869a0db57a5d5db278f0a1882e317733
   size: 10446071
   path: ECV08P04.DTA
+  hash: md5

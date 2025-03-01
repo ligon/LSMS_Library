@@ -2,3 +2,4 @@ outs:
 - md5: 8707c18e9dfdbc1c9ac25862be7405e9
   size: 25496
   path: F15DF.DTA
+  hash: md5

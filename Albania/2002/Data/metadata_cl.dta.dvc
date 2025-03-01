@@ -2,3 +2,4 @@ outs:
 - md5: 5f93c22255a474bc4c9e80062c0aeb96
   size: 209049
   path: metadata_cl.dta
+  hash: md5

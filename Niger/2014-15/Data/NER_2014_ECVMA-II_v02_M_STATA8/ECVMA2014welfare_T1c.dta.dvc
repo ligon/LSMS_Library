@@ -2,3 +2,4 @@ outs:
 - md5: 8787bf57f72e6c09ba3bf4daf4df605a
   size: 334849
   path: ECVMA2014welfare_T1c.dta
+  hash: md5

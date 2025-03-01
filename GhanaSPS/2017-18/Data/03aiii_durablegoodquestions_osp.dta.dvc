@@ -2,3 +2,4 @@ outs:
 - md5: 85b3b7c0a5bda181446e152a863c4d40
   size: 62928
   path: 03aiii_durablegoodquestions_osp.dta
+  hash: md5

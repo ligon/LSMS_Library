@@ -1,3 +1,4 @@
 outs:
 - md5: d22dc59c1cc261f478b77174e707efa9
   path: HEALTH.DCT
+  hash: md5

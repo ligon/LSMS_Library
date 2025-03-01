@@ -2,3 +2,4 @@ outs:
 - md5: bb0972cdb6ff6936af5d6db851f82518
   size: 1943263
   path: ECV19N15.DTA
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: 72b01c7bb3b18722149d89302980dff0
   size: 750190
   path: KZ96HLT.dta
+  hash: md5

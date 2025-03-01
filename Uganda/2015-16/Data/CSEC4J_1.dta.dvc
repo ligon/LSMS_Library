@@ -1,3 +1,4 @@
 outs:
 - md5: 6241566cf2079401cc9888762696f9e6
   path: CSEC4J_1.dta
+  hash: md5

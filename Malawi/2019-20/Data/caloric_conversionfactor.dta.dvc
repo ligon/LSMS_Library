@@ -2,3 +2,4 @@ outs:
 - md5: acc31a5820129ca9d11ee57a44ccb2c0
   size: 9363
   path: caloric_conversionfactor.dta
+  hash: md5

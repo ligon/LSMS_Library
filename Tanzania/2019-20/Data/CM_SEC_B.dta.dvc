@@ -2,3 +2,4 @@ outs:
 - md5: 5a962c7dbd7d31c41b4e326e8dac0fcc
   size: 282270
   path: CM_SEC_B.dta
+  hash: md5

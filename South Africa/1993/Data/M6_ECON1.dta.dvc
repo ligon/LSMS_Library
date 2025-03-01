@@ -2,3 +2,4 @@ outs:
 - md5: ff1f6098bdd12a4c926cebbb79a9c947
   size: 94486
   path: M6_ECON1.dta
+  hash: md5

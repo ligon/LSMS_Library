@@ -1,3 +1,4 @@
 outs:
 - md5: b9ae89fb63ae4126355b80f81225912f
   path: PANELC.DCT
+  hash: md5

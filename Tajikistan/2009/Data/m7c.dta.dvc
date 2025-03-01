@@ -2,3 +2,4 @@ outs:
 - md5: 75bceb42eb94a25a76cf7230390aeb8b
   size: 1325672
   path: m7c.dta
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: 75b603c4b76fff0a0e0925fc2a84ae0a
   size: 138645
   path: RENDADOM.DTA
+  hash: md5

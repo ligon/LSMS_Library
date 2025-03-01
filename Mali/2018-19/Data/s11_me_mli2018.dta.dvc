@@ -2,3 +2,4 @@ outs:
 - md5: 809f6e8c6ca65887a918505189c9ae05
   size: 1357336
   path: s11_me_mli2018.dta
+  hash: md5

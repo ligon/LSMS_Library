@@ -2,3 +2,4 @@ outs:
 - md5: 7ec1833d0be99ca6800ede868503f082
   size: 582433
   path: ECVMA2_AS2AP1.dta
+  hash: md5

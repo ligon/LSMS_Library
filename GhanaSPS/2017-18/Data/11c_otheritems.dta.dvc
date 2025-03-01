@@ -2,3 +2,4 @@ outs:
 - md5: fe7123bea4f35518817080d40f842de2
   size: 1544106
   path: 11c_otheritems.dta
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: a580fcb7b1a376a710d1a3c30a8a99a8
   size: 40837
   path: F16A2.DTA
+  hash: md5

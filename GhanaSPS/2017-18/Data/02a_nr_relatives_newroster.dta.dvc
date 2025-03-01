@@ -2,3 +2,4 @@ outs:
 - md5: de9191483c8e4a7609d4df9b2db1ab2c
   size: 436745
   path: 02a_nr_relatives_newroster.dta
+  hash: md5

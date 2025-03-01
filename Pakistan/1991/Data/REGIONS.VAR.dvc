@@ -2,3 +2,4 @@ outs:
 - md5: 67d2bada41b8c663a2e43817a2514a80
   size: 45
   path: REGIONS.VAR
+  hash: md5

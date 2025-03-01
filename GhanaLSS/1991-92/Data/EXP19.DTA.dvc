@@ -2,3 +2,4 @@ outs:
 - md5: 38735461c31097a9f8adbce4f3d37cab
   size: 45596
   path: EXP19.DTA
+  hash: md5

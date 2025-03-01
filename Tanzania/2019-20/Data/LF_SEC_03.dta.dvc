@@ -2,3 +2,4 @@ outs:
 - md5: 24af8aee0811cf850f34170037ef2cfa
   size: 1367800
   path: LF_SEC_03.dta
+  hash: md5

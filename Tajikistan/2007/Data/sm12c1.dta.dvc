@@ -2,3 +2,4 @@ outs:
 - md5: 192d7edc6edcf0dd22b3563172406906
   size: 52629
   path: sm12c1.dta
+  hash: md5

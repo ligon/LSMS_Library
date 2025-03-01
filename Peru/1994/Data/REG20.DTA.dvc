@@ -2,3 +2,4 @@ outs:
 - md5: e421f5494a2af408248f552f873468a8
   size: 66192
   path: REG20.DTA
+  hash: md5

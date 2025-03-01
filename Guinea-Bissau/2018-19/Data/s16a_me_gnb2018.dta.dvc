@@ -2,3 +2,4 @@ outs:
 - md5: 39a00532332e724fa9c50bf206c58334
   size: 6531988
   path: s16a_me_gnb2018.dta
+  hash: md5

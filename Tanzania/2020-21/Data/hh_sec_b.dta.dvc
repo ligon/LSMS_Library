@@ -2,3 +2,4 @@ outs:
 - md5: 435b2e4686055885d938b73a13b124a6
   size: 2875843
   path: hh_sec_b.dta
+  hash: md5

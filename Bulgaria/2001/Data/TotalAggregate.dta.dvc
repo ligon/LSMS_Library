@@ -2,3 +2,4 @@ outs:
 - md5: c6183f1ac8e194ae3c11cd0c006111a0
   size: 1321649
   path: TotalAggregate.dta
+  hash: md5

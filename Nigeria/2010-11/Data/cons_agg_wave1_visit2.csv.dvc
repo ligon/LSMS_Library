@@ -2,3 +2,4 @@ outs:
 - md5: 69351221e2e96f075f4ffa000b9c704f
   size: 2196941
   path: cons_agg_wave1_visit2.csv
+  hash: md5

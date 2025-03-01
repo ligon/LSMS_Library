@@ -2,3 +2,4 @@ outs:
 - md5: a76cdc1ddd5a1ea203076767ed590cd4
   size: 87759
   path: FILE18V0.dta
+  hash: md5

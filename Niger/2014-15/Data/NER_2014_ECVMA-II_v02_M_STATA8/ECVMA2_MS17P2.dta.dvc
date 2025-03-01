@@ -2,3 +2,4 @@ outs:
 - md5: d91a2e7072fa7db6c514013fc798348f
   size: 125504
   path: ECVMA2_MS17P2.dta
+  hash: md5

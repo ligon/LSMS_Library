@@ -2,3 +2,4 @@ outs:
 - md5: b9423334f98306803f0aae92902c7e5c
   size: 3709212
   path: 06f_past2weeks.dta
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: 806376f3e872cff81fa1f6804fe3ce71
   size: 1020496
   path: POVERTY1.DTA
+  hash: md5

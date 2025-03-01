@@ -2,3 +2,4 @@ outs:
 - md5: 3de38fbb09c3026bed9014dabddba873
   size: 470538
   path: 11_GHA_EXPHOTL.dta
+  hash: md5

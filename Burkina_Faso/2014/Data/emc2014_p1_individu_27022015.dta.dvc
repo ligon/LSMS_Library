@@ -2,3 +2,4 @@ outs:
 - md5: a496ac03487611c86e4d3f63f2d52ca7
   size: 3627820
   path: emc2014_p1_individu_27022015.dta
+  hash: md5

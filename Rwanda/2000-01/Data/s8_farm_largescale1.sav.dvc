@@ -1,3 +1,4 @@
 outs:
 - md5: d7ed938bf08adbf09cdca934baa189ba
   path: s8_farm_largescale1.sav
+  hash: md5

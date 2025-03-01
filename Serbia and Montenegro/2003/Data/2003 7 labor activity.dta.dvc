@@ -2,3 +2,4 @@ outs:
 - md5: 488509c4095a9a4580f834be4793fb7c
   size: 1187227
   path: 2003 7 labor activity.dta
+  hash: md5

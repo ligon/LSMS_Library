@@ -1,3 +1,4 @@
 outs:
 - md5: 4be3176473471b843be6b96bdc91d430
   path: F09D3A.DCT
+  hash: md5

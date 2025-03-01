@@ -3,3 +3,4 @@ outs:
   size: 4096
   path: FolderKey.bch
   isexec: true
+  hash: md5
