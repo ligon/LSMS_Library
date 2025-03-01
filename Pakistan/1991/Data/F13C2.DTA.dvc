@@ -2,3 +2,5 @@ outs:
 - md5: fc3a689b99d36b9bb2f1faffd042e8d6
   size: 557581
   path: F13C2.DTA
+  md5-dos2unix: fc3a689b99d36b9bb2f1faffd042e8d6
+  hash: md5

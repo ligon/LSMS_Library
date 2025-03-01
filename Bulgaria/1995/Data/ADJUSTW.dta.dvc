@@ -2,3 +2,5 @@ outs:
 - md5: ce57e5350a3d7f37889128039a34e11d
   size: 10318
   path: ADJUSTW.dta
+  md5-dos2unix: ce57e5350a3d7f37889128039a34e11d
+  hash: md5

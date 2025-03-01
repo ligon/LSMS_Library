@@ -2,3 +2,5 @@ outs:
 - md5: a7f52a0284ee37e737e4ed92dcf6c4a0
   size: 213598
   path: DWELLING.dta
+  md5-dos2unix: a7f52a0284ee37e737e4ed92dcf6c4a0
+  hash: md5

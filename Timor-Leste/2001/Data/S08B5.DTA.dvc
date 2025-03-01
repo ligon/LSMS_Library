@@ -2,3 +2,5 @@ outs:
 - md5: 278187ac592ed99ed3ccbb0cf957aa0a
   size: 14586
   path: S08B5.DTA
+  md5-dos2unix: 278187ac592ed99ed3ccbb0cf957aa0a
+  hash: md5

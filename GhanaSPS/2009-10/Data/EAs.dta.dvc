@@ -2,3 +2,5 @@ outs:
 - md5: 051292a414630b1258cc1ac984bc2841
   size: 1735
   path: EAs.dta
+  md5-dos2unix: 051292a414630b1258cc1ac984bc2841
+  hash: md5

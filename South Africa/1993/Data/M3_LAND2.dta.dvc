@@ -2,3 +2,5 @@ outs:
 - md5: 20cb95dcd6c7a9f2f8cce65acd6fffa8
   size: 18028
   path: M3_LAND2.dta
+  md5-dos2unix: 20cb95dcd6c7a9f2f8cce65acd6fffa8
+  hash: md5

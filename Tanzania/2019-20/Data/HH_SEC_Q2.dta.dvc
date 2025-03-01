@@ -2,3 +2,5 @@ outs:
 - md5: e0d7386466150f19a0fdae69c6b9e365
   size: 296282
   path: HH_SEC_Q2.dta
+  md5-dos2unix: e0d7386466150f19a0fdae69c6b9e365
+  hash: md5

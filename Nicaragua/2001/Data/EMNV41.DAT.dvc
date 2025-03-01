@@ -2,3 +2,5 @@ outs:
 - md5: 87ff26501331954b629ac69ce44bea77
   size: 500650
   path: EMNV41.DAT
+  md5-dos2unix: 87ff26501331954b629ac69ce44bea77
+  hash: md5

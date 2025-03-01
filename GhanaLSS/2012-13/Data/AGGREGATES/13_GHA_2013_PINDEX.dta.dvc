@@ -2,3 +2,5 @@ outs:
 - md5: 751923d3ea834cc7d9e6553e21ae656c
   size: 554884
   path: 13_GHA_2013_PINDEX.dta
+  md5-dos2unix: 751923d3ea834cc7d9e6553e21ae656c
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: bf4b2fd62a6ff31235f3e224bf10d997
   size: 463072
   path: SEEDS.dta
+  md5-dos2unix: bf4b2fd62a6ff31235f3e224bf10d997
+  hash: md5

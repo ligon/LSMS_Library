@@ -2,3 +2,5 @@ outs:
 - md5: ed11091de5aaf4db4ed0e35b10c5204a
   size: 18306693
   path: Togo_survey2018_fooditems_forEthan.dta
+  md5-dos2unix: ed11091de5aaf4db4ed0e35b10c5204a
+  hash: md5

@@ -1,3 +1,5 @@
 outs:
 - md5: c6b2f27f6393027ee54130ccc49d1a90
   path: Y03I.DCT
+  md5-dos2unix: c6b2f27f6393027ee54130ccc49d1a90
+  hash: md5

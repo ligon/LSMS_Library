@@ -2,3 +2,5 @@ outs:
 - md5: ff3466613e508629e7d8f3ba4ed1a2d0
   size: 747004
   path: ehcvm_welfare_sen2018.dta
+  md5-dos2unix: ff3466613e508629e7d8f3ba4ed1a2d0
+  hash: md5

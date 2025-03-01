@@ -2,3 +2,5 @@ outs:
 - md5: a72ce37cbb486cfbc7dbb4fa6fddd780
   size: 1970217
   path: EACINA3MO_p1.dta
+  md5-dos2unix: a72ce37cbb486cfbc7dbb4fa6fddd780
+  hash: md5

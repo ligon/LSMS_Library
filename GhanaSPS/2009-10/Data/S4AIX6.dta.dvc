@@ -2,3 +2,5 @@ outs:
 - md5: 4adb9c16e175f2593e4aa32b85c3b380
   size: 256643
   path: S4AIX6.dta
+  md5-dos2unix: 4adb9c16e175f2593e4aa32b85c3b380
+  hash: md5

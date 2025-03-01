@@ -2,3 +2,5 @@ outs:
 - md5: c50bb9cd5d7202bb6f7d0c151f8d906d
   size: 466423
   path: hh_sec_19b.dta
+  md5-dos2unix: c50bb9cd5d7202bb6f7d0c151f8d906d
+  hash: md5

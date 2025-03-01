@@ -1,3 +1,5 @@
 outs:
 - md5: e2976b706e9aaa4120181116dbe7e59b
   path: Y13A2.DAT
+  md5-dos2unix: e2976b706e9aaa4120181116dbe7e59b
+  hash: md5

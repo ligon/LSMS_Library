@@ -2,3 +2,5 @@ outs:
 - md5: bc32abd42088042286729e91ca0898d5
   size: 145220
   path: 09a_youngchildhealth.dta
+  md5-dos2unix: bc32abd42088042286729e91ca0898d5
+  hash: md5

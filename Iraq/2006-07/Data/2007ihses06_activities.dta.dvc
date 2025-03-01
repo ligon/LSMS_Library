@@ -2,3 +2,5 @@ outs:
 - md5: cdbd7c20d0d8b3a4d8096cb6d6f55b29
   size: 4842464
   path: 2007ihses06_activities.dta
+  md5-dos2unix: cdbd7c20d0d8b3a4d8096cb6d6f55b29
+  hash: md5

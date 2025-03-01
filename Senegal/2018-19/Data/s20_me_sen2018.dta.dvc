@@ -2,3 +2,5 @@ outs:
 - md5: caabaa59437ad4c27f8b6bfb1a5ff03e
   size: 257519
   path: s20_me_sen2018.dta
+  md5-dos2unix: caabaa59437ad4c27f8b6bfb1a5ff03e
+  hash: md5

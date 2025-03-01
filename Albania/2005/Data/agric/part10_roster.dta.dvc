@@ -2,3 +2,5 @@ outs:
 - md5: feb2befe8b6b74dbb09cd224cc494c29
   size: 536693
   path: part10_roster.dta
+  md5-dos2unix: feb2befe8b6b74dbb09cd224cc494c29
+  hash: md5

@@ -1,3 +1,5 @@
 outs:
 - md5: 734304ffb91a74bc6f3892b717f91d9d
   path: F09G.DAT
+  md5-dos2unix: 734304ffb91a74bc6f3892b717f91d9d
+  hash: md5

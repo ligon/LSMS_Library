@@ -2,3 +2,5 @@ outs:
 - md5: 3cfdef82db89945dc8a500a79898b340
   size: 340381
   path: cons_agg_w1.dta
+  md5-dos2unix: 3cfdef82db89945dc8a500a79898b340
+  hash: md5

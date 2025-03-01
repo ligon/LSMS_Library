@@ -2,3 +2,5 @@ outs:
 - md5: 33c4076cdd72d77a2d3171588e00e6ff
   size: 121745
   path: roma_3_agriculture.dta
+  md5-dos2unix: 33c4076cdd72d77a2d3171588e00e6ff
+  hash: md5

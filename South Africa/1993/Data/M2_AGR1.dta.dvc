@@ -2,3 +2,5 @@ outs:
 - md5: de56ba3043a5a8867e9387eb224fb041
   size: 69206
   path: M2_AGR1.dta
+  md5-dos2unix: de56ba3043a5a8867e9387eb224fb041
+  hash: md5

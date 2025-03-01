@@ -1,3 +1,5 @@
 outs:
 - md5: 69f5b6e7b71750d251ef5f57205bffdd
   path: EXPEND.DAT
+  md5-dos2unix: 69f5b6e7b71750d251ef5f57205bffdd
+  hash: md5

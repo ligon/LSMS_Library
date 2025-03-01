@@ -2,3 +2,5 @@ outs:
 - md5: 2eab15b1b3d3d7aed153a786ca38f14d
   size: 899432
   path: ETH_HouseholdGeovariables_Y4.dta
+  md5-dos2unix: 2eab15b1b3d3d7aed153a786ca38f14d
+  hash: md5

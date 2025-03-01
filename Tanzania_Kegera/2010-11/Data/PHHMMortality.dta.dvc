@@ -2,3 +2,5 @@ outs:
 - md5: d60a71e38598ee1fcd5e76c8a15bb39d
   size: 12992
   path: PHHMMortality.dta
+  md5-dos2unix: d60a71e38598ee1fcd5e76c8a15bb39d
+  hash: md5

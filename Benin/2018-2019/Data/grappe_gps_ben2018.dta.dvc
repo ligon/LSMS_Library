@@ -2,3 +2,5 @@ outs:
 - md5: e3e83a1c2c561177c8249a75453545cc
   size: 46488
   path: grappe_gps_ben2018.dta
+  md5-dos2unix: e3e83a1c2c561177c8249a75453545cc
+  hash: md5

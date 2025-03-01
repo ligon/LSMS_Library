@@ -2,3 +2,5 @@ outs:
 - md5: 2ca8842dda778a46c5897711a3b1a889
   size: 3449767
   path: 23existencia_animales.dta
+  md5-dos2unix: 2ca8842dda778a46c5897711a3b1a889
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: 0fa602c3f98c56d2228282659e76d2e2
   size: 6681703
   path: sect9_public.dta
+  md5-dos2unix: 0fa602c3f98c56d2228282659e76d2e2
+  hash: md5

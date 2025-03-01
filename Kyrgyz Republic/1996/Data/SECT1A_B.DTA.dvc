@@ -2,3 +2,5 @@ outs:
 - md5: 3b29643158d35ef3e8c5ff459cb38246
   size: 2160524
   path: SECT1A_B.DTA
+  md5-dos2unix: 3b29643158d35ef3e8c5ff459cb38246
+  hash: md5

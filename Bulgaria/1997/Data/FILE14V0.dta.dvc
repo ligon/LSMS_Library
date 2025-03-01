@@ -2,3 +2,5 @@ outs:
 - md5: 563e5a743e67244d579628468746ad17
   size: 72564
   path: FILE14V0.dta
+  md5-dos2unix: 563e5a743e67244d579628468746ad17
+  hash: md5

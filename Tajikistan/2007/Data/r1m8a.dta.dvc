@@ -2,3 +2,5 @@ outs:
 - md5: cb70f1b6657926ec3aeb418eb9f81ad6
   size: 21160
   path: r1m8a.dta
+  md5-dos2unix: cb70f1b6657926ec3aeb418eb9f81ad6
+  hash: md5

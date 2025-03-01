@@ -2,3 +2,5 @@ outs:
 - md5: cc1b2e039f943a16be001e3a1753f0ff
   size: 3074143
   path: 2002 6 education.dta
+  md5-dos2unix: cc1b2e039f943a16be001e3a1753f0ff
+  hash: md5

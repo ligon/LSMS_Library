@@ -2,3 +2,5 @@ outs:
 - md5: 1e682db2d5ea16ade102c50974a55f86
   size: 31256180
   path: ecvmaali_p2.dta
+  md5-dos2unix: 1e682db2d5ea16ade102c50974a55f86
+  hash: md5

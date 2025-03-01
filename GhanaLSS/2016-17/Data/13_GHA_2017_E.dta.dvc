@@ -1,3 +1,5 @@
 outs:
 - md5: 9af4b06fd29448acc009828abfba84ad
   path: 13_GHA_2017_E.dta
+  md5-dos2unix: 9af4b06fd29448acc009828abfba84ad
+  hash: md5

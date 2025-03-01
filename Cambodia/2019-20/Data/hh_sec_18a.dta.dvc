@@ -2,3 +2,5 @@ outs:
 - md5: 98d0d39dca1960b1390ebaad88c5a927
   size: 547996
   path: hh_sec_18a.dta
+  md5-dos2unix: 98d0d39dca1960b1390ebaad88c5a927
+  hash: md5

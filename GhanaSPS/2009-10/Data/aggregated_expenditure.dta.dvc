@@ -2,3 +2,5 @@ outs:
 - md5: 5d73bc4ce77068b516c8581b37bee6b6
   size: 603171
   path: aggregated_expenditure.dta
+  md5-dos2unix: 5d73bc4ce77068b516c8581b37bee6b6
+  hash: md5

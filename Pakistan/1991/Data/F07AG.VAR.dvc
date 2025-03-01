@@ -2,3 +2,5 @@ outs:
 - md5: bd9412f29f5a7461cde71384730e8adc
   size: 146
   path: F07AG.VAR
+  md5-dos2unix: bd9412f29f5a7461cde71384730e8adc
+  hash: md5

@@ -1,3 +1,5 @@
 outs:
 - md5: eeed6761e15a2f8ee9fc8993388f7459
   path: WSEC2B_1.dta
+  md5-dos2unix: eeed6761e15a2f8ee9fc8993388f7459
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: 3022b02170989ef949aa593013054e4b
   size: 60524
   path: EXP18.DTA
+  md5-dos2unix: 3022b02170989ef949aa593013054e4b
+  hash: md5

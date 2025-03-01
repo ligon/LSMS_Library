@@ -2,3 +2,5 @@ outs:
 - md5: a981e16c18c89a16799cbc3ad0d13b33
   size: 21593
   path: SUB_AFOR.DTA
+  md5-dos2unix: a981e16c18c89a16799cbc3ad0d13b33
+  hash: md5

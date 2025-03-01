@@ -2,3 +2,5 @@ outs:
 - md5: b88ad44e46f2034c09e87da8e61499f8
   size: 117575
   path: roma_1_demography_households.dta
+  md5-dos2unix: b88ad44e46f2034c09e87da8e61499f8
+  hash: md5

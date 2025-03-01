@@ -2,3 +2,5 @@ outs:
 - md5: da7da2ac10a4fd9d444545ae2e2e81ac
   size: 520584
   path: CM_SEC_C.dta
+  md5-dos2unix: da7da2ac10a4fd9d444545ae2e2e81ac
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: 71ad72ac61da3f90afbc0b31102c551a
   size: 811296
   path: ehcvm_welfare_ben2018.dta
+  md5-dos2unix: 71ad72ac61da3f90afbc0b31102c551a
+  hash: md5

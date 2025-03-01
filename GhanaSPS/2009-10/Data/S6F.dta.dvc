@@ -2,3 +2,5 @@ outs:
 - md5: 86b5321f2f1f8107fe1ef96cf6d0a9dd
   size: 1405445
   path: S6F.dta
+  md5-dos2unix: 86b5321f2f1f8107fe1ef96cf6d0a9dd
+  hash: md5

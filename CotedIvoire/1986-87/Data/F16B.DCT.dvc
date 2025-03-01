@@ -1,3 +1,5 @@
 outs:
 - md5: 816a78521508a0973537b3f19cd2ae9e
   path: F16B.DCT
+  md5-dos2unix: 816a78521508a0973537b3f19cd2ae9e
+  hash: md5

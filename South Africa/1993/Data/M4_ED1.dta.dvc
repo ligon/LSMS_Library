@@ -2,3 +2,5 @@ outs:
 - md5: b966a879abe833dbf824e1d9526baa21
   size: 1512440
   path: M4_ED1.dta
+  md5-dos2unix: b966a879abe833dbf824e1d9526baa21
+  hash: md5

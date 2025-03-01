@@ -1,3 +1,5 @@
 outs:
 - md5: 9daf3910a6b62755f250e7370cb11f64
   path: Y05B3.DAT
+  md5-dos2unix: 9daf3910a6b62755f250e7370cb11f64
+  hash: md5

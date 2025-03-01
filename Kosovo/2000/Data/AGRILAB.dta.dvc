@@ -2,3 +2,5 @@ outs:
 - md5: 83e33561441e914b1baaeb6e35d97a66
   size: 168532
   path: AGRILAB.dta
+  md5-dos2unix: 83e33561441e914b1baaeb6e35d97a66
+  hash: md5

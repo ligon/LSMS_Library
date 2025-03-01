@@ -2,3 +2,5 @@ outs:
 - md5: 09f4d3248bfbbff2e8071e02d6679f82
   size: 2257424
   path: Liberia_NHFS_HH_Income.dta
+  md5-dos2unix: 09f4d3248bfbbff2e8071e02d6679f82
+  hash: md5

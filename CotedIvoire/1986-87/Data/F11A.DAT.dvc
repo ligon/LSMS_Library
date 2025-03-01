@@ -1,3 +1,5 @@
 outs:
 - md5: e16270b66c806d7cfbb85c627ce51496
   path: F11A.DAT
+  md5-dos2unix: e16270b66c806d7cfbb85c627ce51496
+  hash: md5

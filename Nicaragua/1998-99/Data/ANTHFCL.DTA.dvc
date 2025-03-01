@@ -2,3 +2,5 @@ outs:
 - md5: 7ad2141374d0c5d62a4f0f160141f9fa
   size: 233247
   path: ANTHFCL.DTA
+  md5-dos2unix: 7ad2141374d0c5d62a4f0f160141f9fa
+  hash: md5

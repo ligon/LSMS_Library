@@ -2,3 +2,5 @@ outs:
 - md5: 89caffd11d1a89ccaf9c30eea8688db6
   size: 1739490
   path: FILE12V1.dta
+  md5-dos2unix: 89caffd11d1a89ccaf9c30eea8688db6
+  hash: md5

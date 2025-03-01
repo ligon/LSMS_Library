@@ -2,3 +2,5 @@ outs:
 - md5: 2f4f0db22ab21c8e35be12766b681b47
   size: 2116575
   path: food.dta
+  md5-dos2unix: 2f4f0db22ab21c8e35be12766b681b47
+  hash: md5

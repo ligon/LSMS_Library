@@ -2,3 +2,5 @@ outs:
 - md5: 664af97d3b9a55ab98d16c3607f59298
   size: 66666
   path: S90.dta
+  md5-dos2unix: 664af97d3b9a55ab98d16c3607f59298
+  hash: md5

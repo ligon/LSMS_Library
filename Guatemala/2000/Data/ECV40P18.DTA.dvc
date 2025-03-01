@@ -2,3 +2,5 @@ outs:
 - md5: 9fce514b14ddfa37a624ff5563a63f33
   size: 3479692
   path: ECV40P18.DTA
+  md5-dos2unix: 9fce514b14ddfa37a624ff5563a63f33
+  hash: md5

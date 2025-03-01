@@ -2,3 +2,5 @@ outs:
 - md5: 341c5b56fbe3d173cb36102881c5c89f
   size: 1328336
   path: F11B.DTA
+  md5-dos2unix: 341c5b56fbe3d173cb36102881c5c89f
+  hash: md5

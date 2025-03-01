@@ -2,3 +2,5 @@ outs:
 - md5: 211e53f7da2a9a6e0b922a953e3134a2
   size: 847675
   path: SECT_13A.DTA
+  md5-dos2unix: 211e53f7da2a9a6e0b922a953e3134a2
+  hash: md5

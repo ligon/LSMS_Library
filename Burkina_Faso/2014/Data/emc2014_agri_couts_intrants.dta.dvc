@@ -2,3 +2,5 @@ outs:
 - md5: be199cb415435688f2f2478e63fb8e3c
   size: 21302637
   path: emc2014_agri_couts_intrants.dta
+  md5-dos2unix: be199cb415435688f2f2478e63fb8e3c
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: 4431cb5b9c82a2dc29fe43ad98a05503
   size: 21399715
   path: individual.dta
+  md5-dos2unix: 4431cb5b9c82a2dc29fe43ad98a05503
+  hash: md5

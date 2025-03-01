@@ -2,3 +2,5 @@ outs:
 - md5: 742485a8181c9c83456bc5591290fe33
   size: 142727
   path: weights.dta
+  md5-dos2unix: 742485a8181c9c83456bc5591290fe33
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: 6706d6ead43626da23da695df3af7298
   size: 74333987
   path: 2012ihses12_p1_diary_expenditure.dta
+  md5-dos2unix: 6706d6ead43626da23da695df3af7298
+  hash: md5

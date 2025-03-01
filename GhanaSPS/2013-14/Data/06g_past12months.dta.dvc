@@ -2,3 +2,5 @@ outs:
 - md5: 01e8ad1c1220bb0383deae38e21da8c2
   size: 1258230
   path: 06g_past12months.dta
+  md5-dos2unix: 01e8ad1c1220bb0383deae38e21da8c2
+  hash: md5

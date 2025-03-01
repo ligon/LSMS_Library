@@ -1,3 +1,5 @@
 outs:
 - md5: c13484092c58783caf1c146f40e0cc53
   path: Y08.DCT
+  md5-dos2unix: c13484092c58783caf1c146f40e0cc53
+  hash: md5

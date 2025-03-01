@@ -2,3 +2,5 @@ outs:
 - md5: 78054c383f5fa748bddd39dba64f6e48
   size: 703970
   path: S1FII.dta
+  md5-dos2unix: 78054c383f5fa748bddd39dba64f6e48
+  hash: md5

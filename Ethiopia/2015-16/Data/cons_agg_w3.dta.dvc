@@ -2,3 +2,5 @@ outs:
 - md5: 79adc1e012341817ff4218036ee215e1
   size: 586520
   path: cons_agg_w3.dta
+  md5-dos2unix: 79adc1e012341817ff4218036ee215e1
+  hash: md5

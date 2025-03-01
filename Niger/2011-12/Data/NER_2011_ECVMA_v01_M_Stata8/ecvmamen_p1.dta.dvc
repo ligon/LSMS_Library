@@ -2,3 +2,5 @@ outs:
 - md5: b9baa8c66b6d4e965e52454d7f44e0a1
   size: 783421
   path: ecvmamen_p1.dta
+  md5-dos2unix: b9baa8c66b6d4e965e52454d7f44e0a1
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: f54bd6817bd95317841e7bde1d2576cc
   size: 5054805
   path: SUB_ABHI.DTA
+  md5-dos2unix: f54bd6817bd95317841e7bde1d2576cc
+  hash: md5

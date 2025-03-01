@@ -2,3 +2,5 @@ outs:
 - md5: 979efcc495af461f10212f683beb48b1
   size: 8700
   path: A-ALQUIM.DTA
+  md5-dos2unix: 979efcc495af461f10212f683beb48b1
+  hash: md5

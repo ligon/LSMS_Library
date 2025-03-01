@@ -2,3 +2,5 @@ outs:
 - md5: 8e0a8a384325de9e1838158ba056f7f3
   size: 10902038
   path: FINCA3.DTA
+  md5-dos2unix: 8e0a8a384325de9e1838158ba056f7f3
+  hash: md5

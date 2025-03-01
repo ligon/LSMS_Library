@@ -2,3 +2,5 @@ outs:
 - md5: f063bf56020f06e99c9707b8647764b5
   size: 1062980
   path: S5AI.dta
+  md5-dos2unix: f063bf56020f06e99c9707b8647764b5
+  hash: md5

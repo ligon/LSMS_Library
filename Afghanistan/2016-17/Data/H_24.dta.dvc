@@ -2,3 +2,5 @@ outs:
 - md5: f872376643fb00b932fcc6aa2b8dc985
   size: 11216462
   path: H_24.dta
+  md5-dos2unix: f872376643fb00b932fcc6aa2b8dc985
+  hash: md5

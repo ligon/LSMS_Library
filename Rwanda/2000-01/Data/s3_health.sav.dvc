@@ -1,3 +1,5 @@
 outs:
 - md5: 811466a93955b49304bfc4d3011fd9e4
   path: s3_health.sav
+  md5-dos2unix: 811466a93955b49304bfc4d3011fd9e4
+  hash: md5

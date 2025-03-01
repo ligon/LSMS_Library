@@ -2,3 +2,5 @@ outs:
 - md5: aa1dff5520fbc234c5d97f4c5f75ecfe
   size: 7530
   path: KCAL.DTA
+  md5-dos2unix: aa1dff5520fbc234c5d97f4c5f75ecfe
+  hash: md5

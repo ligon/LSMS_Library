@@ -2,3 +2,5 @@ outs:
 - md5: aba33e256c772d5ef3f7e4ec42d338ce
   size: 37778
   path: grappe_gps_tgo2018.dta
+  md5-dos2unix: aba33e256c772d5ef3f7e4ec42d338ce
+  hash: md5

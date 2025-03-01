@@ -2,3 +2,5 @@ outs:
 - md5: 5d4d969f4f6e2752fdaca750126fab21
   size: 50917
   path: INC15.DTA
+  md5-dos2unix: 5d4d969f4f6e2752fdaca750126fab21
+  hash: md5

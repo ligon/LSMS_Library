@@ -2,3 +2,5 @@ outs:
 - md5: 0690c094d4d1ff61fc544e1673f1555b
   size: 303183
   path: 02b_nr_spouses.dta
+  md5-dos2unix: 0690c094d4d1ff61fc544e1673f1555b
+  hash: md5

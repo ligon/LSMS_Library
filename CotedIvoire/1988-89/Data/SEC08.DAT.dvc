@@ -1,3 +1,5 @@
 outs:
 - md5: be946b9179475eff98cf912a1ae7d621
   path: SEC08.DAT
+  md5-dos2unix: be946b9179475eff98cf912a1ae7d621
+  hash: md5

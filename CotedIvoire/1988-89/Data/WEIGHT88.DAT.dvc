@@ -1,3 +1,5 @@
 outs:
 - md5: 4a56cb32b923dd484383d3ebace7b003
   path: WEIGHT88.DAT
+  md5-dos2unix: 4a56cb32b923dd484383d3ebace7b003
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: cfe2fdfdfc55aea186de5c6fa69b29f2
   size: 2265014
   path: EXPENDTA.ZIP
+  md5-dos2unix: cfe2fdfdfc55aea186de5c6fa69b29f2
+  hash: md5

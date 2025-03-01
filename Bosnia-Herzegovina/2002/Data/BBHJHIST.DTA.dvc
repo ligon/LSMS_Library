@@ -2,3 +2,5 @@ outs:
 - md5: 3cba4062a5ee00f1bf4b7c3d365ed593
   size: 12794
   path: BBHJHIST.DTA
+  md5-dos2unix: 3cba4062a5ee00f1bf4b7c3d365ed593
+  hash: md5

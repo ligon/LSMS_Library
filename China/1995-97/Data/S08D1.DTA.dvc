@@ -2,3 +2,5 @@ outs:
 - md5: 7036e64dd7205f36c7eb5fbc56f1ff4d
   size: 42614
   path: S08D1.DTA
+  md5-dos2unix: 7036e64dd7205f36c7eb5fbc56f1ff4d
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: 95426b2d08656857a38649144bcce408
   size: 209744
   path: VIVIENDM.DTA
+  md5-dos2unix: 95426b2d08656857a38649144bcce408
+  hash: md5

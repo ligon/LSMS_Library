@@ -2,3 +2,5 @@ outs:
 - md5: f99bf7dc0dd7020e5b3c64e442018aad
   size: 7675315
   path: EACINA12M_p1.dta
+  md5-dos2unix: f99bf7dc0dd7020e5b3c64e442018aad
+  hash: md5

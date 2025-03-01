@@ -2,3 +2,5 @@ outs:
 - md5: 172d19b74b20e4c53cc4eaf5e0bdafb2
   size: 15080231
   path: ehcvm_conso_ben2018.dta
+  md5-dos2unix: 172d19b74b20e4c53cc4eaf5e0bdafb2
+  hash: md5

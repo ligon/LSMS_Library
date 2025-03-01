@@ -2,3 +2,5 @@ outs:
 - md5: 6c25c97b2f865ec97741d0f85db12b77
   size: 578
   path: README.txt
+  md5-dos2unix: 6c25c97b2f865ec97741d0f85db12b77
+  hash: md5

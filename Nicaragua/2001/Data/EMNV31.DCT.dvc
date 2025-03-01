@@ -2,3 +2,5 @@ outs:
 - md5: a26cf1dd3727d9b53d847f0cfe40a368
   size: 551
   path: EMNV31.DCT
+  md5-dos2unix: a26cf1dd3727d9b53d847f0cfe40a368
+  hash: md5

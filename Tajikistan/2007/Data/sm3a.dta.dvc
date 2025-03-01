@@ -2,3 +2,5 @@ outs:
 - md5: 693cf43d7c6625a37d13b55bc5f35ed1
   size: 2262
   path: sm3a.dta
+  md5-dos2unix: 693cf43d7c6625a37d13b55bc5f35ed1
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: 762bace7dd1375120155d90fd28203b2
   size: 48003
   path: FILE08V0.dta
+  md5-dos2unix: 762bace7dd1375120155d90fd28203b2
+  hash: md5

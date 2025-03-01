@@ -2,3 +2,5 @@ outs:
 - md5: 989eb6feb0213e28b6c61a476156d919
   size: 1538
   path: KCALFD.dta
+  md5-dos2unix: 989eb6feb0213e28b6c61a476156d919
+  hash: md5

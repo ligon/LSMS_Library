@@ -2,3 +2,5 @@ outs:
 - md5: 6b46e3faf5f419ccad420b82ace5ae8f
   size: 172524
   path: M4_HEA2.dta
+  md5-dos2unix: 6b46e3faf5f419ccad420b82ace5ae8f
+  hash: md5

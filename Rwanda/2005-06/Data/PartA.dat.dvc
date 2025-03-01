@@ -2,3 +2,5 @@ outs:
 - md5: 4eb6ac6d3ea8d9393652c23702f9f6eb
   size: 30692690
   path: PartA.dat
+  md5-dos2unix: 4eb6ac6d3ea8d9393652c23702f9f6eb
+  hash: md5

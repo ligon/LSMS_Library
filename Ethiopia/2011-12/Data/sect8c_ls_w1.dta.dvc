@@ -2,3 +2,5 @@ outs:
 - md5: cc7d9cf6a056f0540743909a4db12eef
   size: 3961921
   path: sect8c_ls_w1.dta
+  md5-dos2unix: cc7d9cf6a056f0540743909a4db12eef
+  hash: md5

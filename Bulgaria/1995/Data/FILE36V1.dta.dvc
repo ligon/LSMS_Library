@@ -2,3 +2,5 @@ outs:
 - md5: 48c629c4d75f5e1ebfc1e3d9dcff345d
   size: 24164
   path: FILE36V1.dta
+  md5-dos2unix: 48c629c4d75f5e1ebfc1e3d9dcff345d
+  hash: md5

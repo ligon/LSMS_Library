@@ -2,3 +2,5 @@ outs:
 - md5: fe401d68b6f78ebb8022e21bc32285b6
   size: 291
   path: N02B.VAR
+  md5-dos2unix: fe401d68b6f78ebb8022e21bc32285b6
+  hash: md5

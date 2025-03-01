@@ -2,3 +2,5 @@ outs:
 - md5: c156fb288ad4990d59e5d8cc1c4fff17
   size: 1164430
   path: MIGR.dta
+  md5-dos2unix: c156fb288ad4990d59e5d8cc1c4fff17
+  hash: md5

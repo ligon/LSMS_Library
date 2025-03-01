@@ -2,3 +2,5 @@ outs:
 - md5: baafb3ef7a7896d991900dd8d107ff87
   size: 32169
   path: EMNV05.DAT
+  md5-dos2unix: baafb3ef7a7896d991900dd8d107ff87
+  hash: md5

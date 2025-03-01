@@ -2,3 +2,5 @@ outs:
 - md5: 51156fb22927b0d4670442387e366a48
   size: 29828101
   path: ECV09P05.DTA
+  md5-dos2unix: 51156fb22927b0d4670442387e366a48
+  hash: md5

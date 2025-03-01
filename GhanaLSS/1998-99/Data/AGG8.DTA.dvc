@@ -2,3 +2,5 @@ outs:
 - md5: 0fc0688f296e994302c4ddbdd9687551
   size: 144212
   path: AGG8.DTA
+  md5-dos2unix: 0fc0688f296e994302c4ddbdd9687551
+  hash: md5

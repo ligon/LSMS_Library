@@ -2,3 +2,5 @@ outs:
 - md5: 53a44e75957f905c8338d9b4c5a9454d
   size: 1430979
   path: ecvma7jo_p1.dta
+  md5-dos2unix: 53a44e75957f905c8338d9b4c5a9454d
+  hash: md5

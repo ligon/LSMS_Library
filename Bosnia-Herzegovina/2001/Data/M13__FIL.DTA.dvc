@@ -2,3 +2,5 @@ outs:
 - md5: 0c7e562c847ba7bda6fa1e881be67b38
   size: 122018
   path: M13__FIL.DTA
+  md5-dos2unix: 0c7e562c847ba7bda6fa1e881be67b38
+  hash: md5

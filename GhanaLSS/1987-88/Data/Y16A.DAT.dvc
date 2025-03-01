@@ -1,3 +1,5 @@
 outs:
 - md5: 5f2c1f145e37dc1e1b6dd93bbef1d82a
   path: Y16A.DAT
+  md5-dos2unix: 5f2c1f145e37dc1e1b6dd93bbef1d82a
+  hash: md5

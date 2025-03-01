@@ -2,3 +2,5 @@ outs:
 - md5: e5c242a6dd6be4135f711453be458430
   size: 121
   path: F07AL.VAR
+  md5-dos2unix: e5c242a6dd6be4135f711453be458430
+  hash: md5

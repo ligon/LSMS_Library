@@ -2,3 +2,5 @@ outs:
 - md5: 754bd205222a24af3a866576320ba543
   size: 644732
   path: PR_E2.DTA
+  md5-dos2unix: 754bd205222a24af3a866576320ba543
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: 58714a95376a6254b3190398159af6f4
   size: 2645253
   path: m2_durables.dta
+  md5-dos2unix: 58714a95376a6254b3190398159af6f4
+  hash: md5

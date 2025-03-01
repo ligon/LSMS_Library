@@ -2,3 +2,5 @@ outs:
 - md5: 39c6362895d6be4156c91d761eac3d38
   size: 185924
   path: REG39.DTA
+  md5-dos2unix: 39c6362895d6be4156c91d761eac3d38
+  hash: md5

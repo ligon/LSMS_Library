@@ -2,3 +2,5 @@ outs:
 - md5: 9d36278ad91d03743cbb58f2c6fcde8e
   size: 6685
   path: LANDRENT.dta
+  md5-dos2unix: 9d36278ad91d03743cbb58f2c6fcde8e
+  hash: md5

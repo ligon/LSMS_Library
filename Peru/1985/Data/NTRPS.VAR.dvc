@@ -2,3 +2,5 @@ outs:
 - md5: 934acc63c98f6441478c5ba22adb7c33
   size: 868
   path: NTRPS.VAR
+  md5-dos2unix: 934acc63c98f6441478c5ba22adb7c33
+  hash: md5

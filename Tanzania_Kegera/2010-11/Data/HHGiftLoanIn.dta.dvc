@@ -2,3 +2,5 @@ outs:
 - md5: 53b8636b6c8c7b2dbf45d957f14bcc9d
   size: 75367
   path: HHGiftLoanIn.dta
+  md5-dos2unix: 53b8636b6c8c7b2dbf45d957f14bcc9d
+  hash: md5

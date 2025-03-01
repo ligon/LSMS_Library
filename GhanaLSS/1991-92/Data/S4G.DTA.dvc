@@ -2,3 +2,5 @@ outs:
 - md5: 73ae84b642350874294cb4ab953733fe
   size: 1619254
   path: S4G.DTA
+  md5-dos2unix: 73ae84b642350874294cb4ab953733fe
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: beabdc52cd74fd5ecca0c14107fcddef
   size: 4459515
   path: 2007ihses07_job_search.dta
+  md5-dos2unix: beabdc52cd74fd5ecca0c14107fcddef
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: 98ba2073ac58e56731a6708944c74fe1
   size: 5495
   path: F07AL.DTA
+  md5-dos2unix: 98ba2073ac58e56731a6708944c74fe1
+  hash: md5

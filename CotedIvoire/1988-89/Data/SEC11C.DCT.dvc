@@ -1,3 +1,5 @@
 outs:
 - md5: ca258cc4b8a68e87b0840a630ba8190f
   path: SEC11C.DCT
+  md5-dos2unix: ca258cc4b8a68e87b0840a630ba8190f
+  hash: md5

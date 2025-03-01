@@ -2,3 +2,5 @@ outs:
 - md5: 178db6828cfb6be9eb5989f5f5d3bf22
   size: 497026
   path: new_inc.dta
+  md5-dos2unix: 178db6828cfb6be9eb5989f5f5d3bf22
+  hash: md5

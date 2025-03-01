@@ -1,3 +1,5 @@
 outs:
 - md5: 184ebaa7ac39b27865865545330bf1aa
   path: g7sec10b.dta
+  md5-dos2unix: 184ebaa7ac39b27865865545330bf1aa
+  hash: md5

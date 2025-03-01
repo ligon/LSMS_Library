@@ -2,3 +2,5 @@ outs:
 - md5: 762676d0a788278e54fd25b5bd59a6a9
   size: 775144
   path: INDINCTL.dta
+  md5-dos2unix: 762676d0a788278e54fd25b5bd59a6a9
+  hash: md5

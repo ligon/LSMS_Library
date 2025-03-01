@@ -1,3 +1,5 @@
 outs:
 - md5: 15465a971cf56050de93830c7eb92030
   path: GSEC10.dta
+  md5-dos2unix: 15465a971cf56050de93830c7eb92030
+  hash: md5

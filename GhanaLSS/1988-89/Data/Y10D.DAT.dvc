@@ -1,3 +1,5 @@
 outs:
 - md5: 57fc13a1b5ee28d62153bcf001ce3a21
   path: Y10D.DAT
+  md5-dos2unix: 57fc13a1b5ee28d62153bcf001ce3a21
+  hash: md5

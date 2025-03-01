@@ -2,3 +2,5 @@ outs:
 - md5: e1a53c73de0b0e9544ba2afbd872f817
   size: 1182
   path: Deflator.dta
+  md5-dos2unix: e1a53c73de0b0e9544ba2afbd872f817
+  hash: md5

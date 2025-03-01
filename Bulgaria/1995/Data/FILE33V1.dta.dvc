@@ -2,3 +2,5 @@ outs:
 - md5: d0e153d1804ad8c22fa631b1ee4c4f2c
   size: 12751
   path: FILE33V1.dta
+  md5-dos2unix: d0e153d1804ad8c22fa631b1ee4c4f2c
+  hash: md5

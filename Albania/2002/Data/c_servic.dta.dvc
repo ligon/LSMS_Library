@@ -2,3 +2,5 @@ outs:
 - md5: 7f6798131a677333963343e2879d1303
   size: 22665
   path: c_servic.dta
+  md5-dos2unix: 7f6798131a677333963343e2879d1303
+  hash: md5

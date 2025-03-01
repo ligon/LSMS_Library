@@ -1,3 +1,5 @@
 outs:
 - md5: c08f0343ba6479a0118ddef24453a753
   path: F02A.DAT
+  md5-dos2unix: c08f0343ba6479a0118ddef24453a753
+  hash: md5

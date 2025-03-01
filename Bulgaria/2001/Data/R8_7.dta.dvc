@@ -2,3 +2,5 @@ outs:
 - md5: 96609a89feb03e46721f86f0d5b82102
   size: 287129
   path: R8_7.dta
+  md5-dos2unix: 96609a89feb03e46721f86f0d5b82102
+  hash: md5

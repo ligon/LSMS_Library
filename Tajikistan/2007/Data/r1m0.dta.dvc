@@ -2,3 +2,5 @@ outs:
 - md5: 286f739dfadcd3cf08adb4e8bd5b75cf
   size: 367768
   path: r1m0.dta
+  md5-dos2unix: 286f739dfadcd3cf08adb4e8bd5b75cf
+  hash: md5

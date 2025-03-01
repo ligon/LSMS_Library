@@ -2,3 +2,5 @@ outs:
 - md5: c0aee71a4bd6c19249cd5209d0005636
   size: 812319
   path: s11_me_tgo2018.dta
+  md5-dos2unix: c0aee71a4bd6c19249cd5209d0005636
+  hash: md5

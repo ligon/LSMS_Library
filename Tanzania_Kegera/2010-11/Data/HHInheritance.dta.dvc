@@ -2,3 +2,5 @@ outs:
 - md5: 4f7259644443c4ef5b7f5c2f0a9835e7
   size: 97280
   path: HHInheritance.dta
+  md5-dos2unix: 4f7259644443c4ef5b7f5c2f0a9835e7
+  hash: md5

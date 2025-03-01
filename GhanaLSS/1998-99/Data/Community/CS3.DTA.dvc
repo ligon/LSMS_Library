@@ -2,3 +2,5 @@ outs:
 - md5: ab6cba03268e27d3f5dfc4849c7daf18
   size: 86968
   path: CS3.DTA
+  md5-dos2unix: ab6cba03268e27d3f5dfc4849c7daf18
+  hash: md5

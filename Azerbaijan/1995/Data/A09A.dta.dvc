@@ -2,3 +2,5 @@ outs:
 - md5: 22d19e754df099024ceb1f64ac6e64dc
   size: 120446
   path: A09A.dta
+  md5-dos2unix: 22d19e754df099024ceb1f64ac6e64dc
+  hash: md5

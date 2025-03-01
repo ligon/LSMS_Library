@@ -2,3 +2,5 @@ outs:
 - md5: 84fd9d17433492e8e17653e4c19b7e86
   size: 1287758
   path: 2012ihses06_p2_deceased.dta
+  md5-dos2unix: 84fd9d17433492e8e17653e4c19b7e86
+  hash: md5

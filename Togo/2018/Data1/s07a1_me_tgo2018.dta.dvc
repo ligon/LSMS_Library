@@ -2,3 +2,5 @@ outs:
 - md5: d76e91acba4d3b237fd5a8d3e3cb0090
   size: 212928
   path: s07a1_me_tgo2018.dta
+  md5-dos2unix: d76e91acba4d3b237fd5a8d3e3cb0090
+  hash: md5

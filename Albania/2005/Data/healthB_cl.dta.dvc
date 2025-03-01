@@ -2,3 +2,5 @@ outs:
 - md5: c2a69f992c504edad9d7b78d2d6f08e9
   size: 85729
   path: healthB_cl.dta
+  md5-dos2unix: c2a69f992c504edad9d7b78d2d6f08e9
+  hash: md5

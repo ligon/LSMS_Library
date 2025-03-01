@@ -2,3 +2,5 @@ outs:
 - md5: 0b838ec69fb311b87e4885ec89f2ef43
   size: 884
   path: CROPS.VAR
+  md5-dos2unix: 0b838ec69fb311b87e4885ec89f2ef43
+  hash: md5

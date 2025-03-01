@@ -2,3 +2,5 @@ outs:
 - md5: 47b6447514fb498ef458774da3b7885c
   size: 462490
   path: s03_co_bfa2018.dta
+  md5-dos2unix: 47b6447514fb498ef458774da3b7885c
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: 0797e5ed9a0a5602fd88f31fe53a8ffe
   size: 832281
   path: 01ei_ravens.dta
+  md5-dos2unix: 0797e5ed9a0a5602fd88f31fe53a8ffe
+  hash: md5

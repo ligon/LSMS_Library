@@ -2,3 +2,5 @@ outs:
 - md5: 7a15a219dea7c17d09086e114da5456f
   size: 1189930
   path: 01evi_english.dta
+  md5-dos2unix: 7a15a219dea7c17d09086e114da5456f
+  hash: md5

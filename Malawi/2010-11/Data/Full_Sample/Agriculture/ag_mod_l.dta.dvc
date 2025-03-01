@@ -2,3 +2,5 @@ outs:
 - md5: ae9511532092055100f8f4611549a07d
   size: 2110320
   path: ag_mod_l.dta
+  md5-dos2unix: ae9511532092055100f8f4611549a07d
+  hash: md5

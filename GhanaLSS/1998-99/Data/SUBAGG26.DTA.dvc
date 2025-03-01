@@ -2,3 +2,5 @@ outs:
 - md5: 03d55bfbeebf89a452eba7492093cb46
   size: 98612
   path: SUBAGG26.DTA
+  md5-dos2unix: 03d55bfbeebf89a452eba7492093cb46
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: e8c9d047d2b5f3b58e5a694362eebc4d
   size: 42446
   path: EACIPOIDS.dta
+  md5-dos2unix: e8c9d047d2b5f3b58e5a694362eebc4d
+  hash: md5

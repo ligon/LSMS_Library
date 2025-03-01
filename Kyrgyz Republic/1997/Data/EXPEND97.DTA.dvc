@@ -2,3 +2,5 @@ outs:
 - md5: b79426eada7e3739f45051f6297a2f22
   size: 5787144
   path: EXPEND97.DTA
+  md5-dos2unix: b79426eada7e3739f45051f6297a2f22
+  hash: md5

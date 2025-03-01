@@ -2,3 +2,5 @@ outs:
 - md5: 6b41d168e91e3391174c12955a6e7197
   size: 122654
   path: cs2.dta
+  md5-dos2unix: 6b41d168e91e3391174c12955a6e7197
+  hash: md5

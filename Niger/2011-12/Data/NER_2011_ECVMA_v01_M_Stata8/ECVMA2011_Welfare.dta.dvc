@@ -2,3 +2,5 @@ outs:
 - md5: b62f03ab897a12bf3460a54bf3c8181a
   size: 299267
   path: ECVMA2011_Welfare.dta
+  md5-dos2unix: b62f03ab897a12bf3460a54bf3c8181a
+  hash: md5

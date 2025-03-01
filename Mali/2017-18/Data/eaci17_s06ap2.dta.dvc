@@ -2,3 +2,5 @@ outs:
 - md5: e782476fd919ae78208184e219bed38f
   size: 2897331
   path: eaci17_s06ap2.dta
+  md5-dos2unix: e782476fd919ae78208184e219bed38f
+  hash: md5

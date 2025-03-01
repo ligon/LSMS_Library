@@ -2,3 +2,5 @@ outs:
 - md5: 5ecb181fa11f0abedf7dcb39e9b80a74
   size: 69206
   path: anthro2d.dta
+  md5-dos2unix: 5ecb181fa11f0abedf7dcb39e9b80a74
+  hash: md5

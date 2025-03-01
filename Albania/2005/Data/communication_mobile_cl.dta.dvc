@@ -2,3 +2,5 @@ outs:
 - md5: 89e82f43fa1192b4fd6f964c276be9e7
   size: 268579
   path: communication_mobile_cl.dta
+  md5-dos2unix: 89e82f43fa1192b4fd6f964c276be9e7
+  hash: md5

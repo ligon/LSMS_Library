@@ -2,3 +2,5 @@ outs:
 - md5: b62e1a23ea25c4fa93fe1f3c0aed5a66
   size: 134170
   path: NER_PlotGeovariables_Y1.dta
+  md5-dos2unix: b62e1a23ea25c4fa93fe1f3c0aed5a66
+  hash: md5

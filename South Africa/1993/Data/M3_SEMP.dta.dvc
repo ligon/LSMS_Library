@@ -2,3 +2,5 @@ outs:
 - md5: f06a31551591c1b27ffd5637951ec612
   size: 42920
   path: M3_SEMP.dta
+  md5-dos2unix: f06a31551591c1b27ffd5637951ec612
+  hash: md5

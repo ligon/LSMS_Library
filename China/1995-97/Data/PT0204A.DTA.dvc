@@ -2,3 +2,5 @@ outs:
 - md5: 1794934a5dd6a59347d7295eaae01524
   size: 5149
   path: PT0204A.DTA
+  md5-dos2unix: 1794934a5dd6a59347d7295eaae01524
+  hash: md5

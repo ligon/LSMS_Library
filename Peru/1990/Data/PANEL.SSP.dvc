@@ -2,3 +2,5 @@ outs:
 - md5: 272fd30c8111e498508aa29a116bb422
   size: 41200
   path: PANEL.SSP
+  md5-dos2unix: 272fd30c8111e498508aa29a116bb422
+  hash: md5

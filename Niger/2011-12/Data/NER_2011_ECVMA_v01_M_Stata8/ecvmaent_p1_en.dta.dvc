@@ -2,3 +2,5 @@ outs:
 - md5: ff502123f72daad59ff48e630b25ca68
   size: 476516
   path: ecvmaent_p1_en.dta
+  md5-dos2unix: ff502123f72daad59ff48e630b25ca68
+  hash: md5

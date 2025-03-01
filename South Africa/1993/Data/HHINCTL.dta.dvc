@@ -2,3 +2,5 @@ outs:
 - md5: 9d2f69f9d90c263dedc021a81a9cd296
   size: 1353392
   path: HHINCTL.dta
+  md5-dos2unix: 9d2f69f9d90c263dedc021a81a9cd296
+  hash: md5

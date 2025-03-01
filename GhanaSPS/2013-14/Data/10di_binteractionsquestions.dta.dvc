@@ -2,3 +2,5 @@ outs:
 - md5: 9decc37e9fa5856548e9a5566cf6a3d6
   size: 5453347
   path: 10di_binteractionsquestions.dta
+  md5-dos2unix: 9decc37e9fa5856548e9a5566cf6a3d6
+  hash: md5

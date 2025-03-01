@@ -1,3 +1,5 @@
 outs:
 - md5: 4fb74fc9e6932b99b47ef1c4a650d8ca
   path: WEIGHT85.DAT
+  md5-dos2unix: 4fb74fc9e6932b99b47ef1c4a650d8ca
+  hash: md5

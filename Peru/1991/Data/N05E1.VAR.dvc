@@ -2,3 +2,5 @@ outs:
 - md5: cdc35a0947fddad19265ffb877e668c7
   size: 188
   path: N05E1.VAR
+  md5-dos2unix: cdc35a0947fddad19265ffb877e668c7
+  hash: md5

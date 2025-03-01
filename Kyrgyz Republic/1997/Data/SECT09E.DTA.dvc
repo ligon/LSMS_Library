@@ -2,3 +2,5 @@ outs:
 - md5: 4f35db6f3e8abe5c973d4b20f08a7bcf
   size: 229113
   path: SECT09E.DTA
+  md5-dos2unix: 4f35db6f3e8abe5c973d4b20f08a7bcf
+  hash: md5

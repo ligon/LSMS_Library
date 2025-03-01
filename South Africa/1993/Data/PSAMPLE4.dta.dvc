@@ -2,3 +2,5 @@ outs:
 - md5: 7abf5e7c403767851c9a16398eea8485
   size: 33010
   path: PSAMPLE4.dta
+  md5-dos2unix: 7abf5e7c403767851c9a16398eea8485
+  hash: md5

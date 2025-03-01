@@ -2,3 +2,5 @@ outs:
 - md5: eac3e70d9c50e3c85ab8abe182c24f7c
   size: 204594
   path: comm_r7.dta
+  md5-dos2unix: eac3e70d9c50e3c85ab8abe182c24f7c
+  hash: md5

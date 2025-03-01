@@ -2,3 +2,5 @@ outs:
 - md5: 28a954f8fd2d03aa4d3a2c8edfa9debe
   size: 329826
   path: HHFEXPT.dta
+  md5-dos2unix: 28a954f8fd2d03aa4d3a2c8edfa9debe
+  hash: md5

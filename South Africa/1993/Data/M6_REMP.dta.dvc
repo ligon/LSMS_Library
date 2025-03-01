@@ -2,3 +2,5 @@ outs:
 - md5: 6a684ee35342aeda8d795effd063a4e0
   size: 521753
   path: M6_REMP.dta
+  md5-dos2unix: 6a684ee35342aeda8d795effd063a4e0
+  hash: md5

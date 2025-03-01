@@ -2,3 +2,5 @@ outs:
 - md5: a204c3777bcb313e617697ce6fbc7330
   size: 955727
   path: POV_FINAL & INCOME.dta
+  md5-dos2unix: a204c3777bcb313e617697ce6fbc7330
+  hash: md5

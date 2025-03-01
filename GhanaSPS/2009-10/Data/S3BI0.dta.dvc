@@ -2,3 +2,5 @@ outs:
 - md5: 51819777f523cf81b2f83e6d064320db
   size: 66731
   path: S3BI0.dta
+  md5-dos2unix: 51819777f523cf81b2f83e6d064320db
+  hash: md5

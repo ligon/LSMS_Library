@@ -2,3 +2,5 @@ outs:
 - md5: ba5f4edcc9f4487a75a7adf5e5adcafa
   size: 921692
   path: N032.DTA
+  md5-dos2unix: ba5f4edcc9f4487a75a7adf5e5adcafa
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: caec74a5ed37540d17e2297a953f4724
   size: 6608039
   path: EACIACT_p1.dta
+  md5-dos2unix: caec74a5ed37540d17e2297a953f4724
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: e3ba5602da256acb70707c58f329a9f4
   size: 14603
   path: U_INDUSTRY_1.dta
+  md5-dos2unix: e3ba5602da256acb70707c58f329a9f4
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: ba6e36b3044fa785b070145b913a6de1
   size: 301795
   path: s20_me_ner2018.dta
+  md5-dos2unix: ba6e36b3044fa785b070145b913a6de1
+  hash: md5

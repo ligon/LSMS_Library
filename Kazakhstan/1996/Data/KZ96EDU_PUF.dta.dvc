@@ -2,3 +2,5 @@ outs:
 - md5: 11354211b55391f66808aa575d304bd3
   size: 366963
   path: KZ96EDU_PUF.dta
+  md5-dos2unix: 11354211b55391f66808aa575d304bd3
+  hash: md5

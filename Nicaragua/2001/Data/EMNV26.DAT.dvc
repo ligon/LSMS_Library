@@ -2,3 +2,5 @@ outs:
 - md5: 78e3ec55a8cc0a546c4f65bff6d2fc28
   size: 685327
   path: EMNV26.DAT
+  md5-dos2unix: 78e3ec55a8cc0a546c4f65bff6d2fc28
+  hash: md5

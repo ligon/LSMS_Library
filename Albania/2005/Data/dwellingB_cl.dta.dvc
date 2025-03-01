@@ -2,3 +2,5 @@ outs:
 - md5: a1d06c84d435eae7a41bfee0e130fbc6
   size: 406698
   path: dwellingB_cl.dta
+  md5-dos2unix: a1d06c84d435eae7a41bfee0e130fbc6
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: b9af04be09e4e96a85e62d47b12172af
   size: 2385183
   path: KZ96HSG_PUF.dta
+  md5-dos2unix: b9af04be09e4e96a85e62d47b12172af
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: 1b29a7e46607383c045b6becb3ce31f9
   size: 4129750
   path: ecvma30j_p1_en.dta
+  md5-dos2unix: 1b29a7e46607383c045b6becb3ce31f9
+  hash: md5

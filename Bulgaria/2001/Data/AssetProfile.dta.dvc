@@ -2,3 +2,5 @@ outs:
 - md5: e9ce9b2bd592e1370e92dc0dd3198810
   size: 17193
   path: AssetProfile.dta
+  md5-dos2unix: e9ce9b2bd592e1370e92dc0dd3198810
+  hash: md5

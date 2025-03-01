@@ -2,3 +2,5 @@ outs:
 - md5: 0c8c714d0d2d0818da4c3c54586d6e3b
   size: 68926
   path: hh_sec_7b_hhlabor.dta
+  md5-dos2unix: 0c8c714d0d2d0818da4c3c54586d6e3b
+  hash: md5

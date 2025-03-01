@@ -1,3 +1,5 @@
 outs:
 - md5: 9549545afddf6ba5acb96c816118331b
   path: g7comSEC1.dta
+  md5-dos2unix: 9549545afddf6ba5acb96c816118331b
+  hash: md5

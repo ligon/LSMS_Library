@@ -2,3 +2,5 @@ outs:
 - md5: 68266452d21f43ef03e9e89fb8458cb0
   size: 17534
   path: SampleFrame.dta
+  md5-dos2unix: 68266452d21f43ef03e9e89fb8458cb0
+  hash: md5

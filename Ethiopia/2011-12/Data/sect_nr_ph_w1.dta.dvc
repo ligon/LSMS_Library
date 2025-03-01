@@ -2,3 +2,5 @@ outs:
 - md5: 1ea605ec77761fa1eb737f86a9b86c44
   size: 278311
   path: sect_nr_ph_w1.dta
+  md5-dos2unix: 1ea605ec77761fa1eb737f86a9b86c44
+  hash: md5

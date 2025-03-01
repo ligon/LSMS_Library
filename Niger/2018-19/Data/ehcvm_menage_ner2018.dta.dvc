@@ -2,3 +2,5 @@ outs:
 - md5: 705fa30e560e54cca551baaf12c86835
   size: 302269
   path: ehcvm_menage_ner2018.dta
+  md5-dos2unix: 705fa30e560e54cca551baaf12c86835
+  hash: md5

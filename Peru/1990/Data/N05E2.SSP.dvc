@@ -2,3 +2,5 @@ outs:
 - md5: 29999d008668599443fe71cdb11fae68
   size: 14800
   path: N05E2.SSP
+  md5-dos2unix: 29999d008668599443fe71cdb11fae68
+  hash: md5

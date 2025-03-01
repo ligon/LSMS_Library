@@ -2,3 +2,5 @@ outs:
 - md5: e9a0b7a145e5ee521ffa9d8efb181529
   size: 15407842
   path: 2007ihses05_health.dta
+  md5-dos2unix: e9a0b7a145e5ee521ffa9d8efb181529
+  hash: md5

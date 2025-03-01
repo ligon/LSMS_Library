@@ -2,3 +2,5 @@ outs:
 - md5: ffc70b76ffc982c24e471ffdd5060d20
   size: 5347404
   path: EACIS5_p2.dta
+  md5-dos2unix: ffc70b76ffc982c24e471ffdd5060d20
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: 2a01cadb3cc186e7fbdaa309b8f8c510
   size: 327777
   path: pov2019_20.dta
+  md5-dos2unix: 2a01cadb3cc186e7fbdaa309b8f8c510
+  hash: md5

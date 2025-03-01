@@ -1,3 +1,5 @@
 outs:
 - md5: e9275902e407c27be7d74350023266f9
   path: F11B.DAT
+  md5-dos2unix: e9275902e407c27be7d74350023266f9
+  hash: md5

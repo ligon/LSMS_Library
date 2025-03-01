@@ -2,3 +2,5 @@ outs:
 - md5: fbe7a2aa0e6e900370604230a3a20a1f
   size: 1058288
   path: PLOTS.DTA
+  md5-dos2unix: fbe7a2aa0e6e900370604230a3a20a1f
+  hash: md5

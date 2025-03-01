@@ -2,3 +2,5 @@ outs:
 - md5: f378bae059a859131656efdc533305c1
   size: 6922
   path: APP2.dta
+  md5-dos2unix: f378bae059a859131656efdc533305c1
+  hash: md5

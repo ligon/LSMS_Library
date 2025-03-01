@@ -2,3 +2,5 @@ outs:
 - md5: 43a759db02ccc49c0d00cf7bed2d70c6
   size: 242285
   path: sect10_filter_public.dta
+  md5-dos2unix: 43a759db02ccc49c0d00cf7bed2d70c6
+  hash: md5

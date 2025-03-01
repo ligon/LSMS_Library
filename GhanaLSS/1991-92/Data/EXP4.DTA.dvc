@@ -2,3 +2,5 @@ outs:
 - md5: 0e94c56df04c24e74b5741d5e707d03a
   size: 257221
   path: EXP4.DTA
+  md5-dos2unix: 0e94c56df04c24e74b5741d5e707d03a
+  hash: md5

@@ -1,3 +1,5 @@
 outs:
 - md5: d1fed76b5f450bf5200f0a43eea7e00e
   path: s8_farm_land.sav
+  md5-dos2unix: d1fed76b5f450bf5200f0a43eea7e00e
+  hash: md5

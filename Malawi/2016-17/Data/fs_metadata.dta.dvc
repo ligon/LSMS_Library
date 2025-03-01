@@ -2,3 +2,5 @@ outs:
 - md5: 6b40892ce2c20ad03257249e17618191
   size: 2146912
   path: fs_metadata.dta
+  md5-dos2unix: 6b40892ce2c20ad03257249e17618191
+  hash: md5

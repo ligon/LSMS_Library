@@ -1,3 +1,5 @@
 outs:
 - md5: 44fcdf669482751f63f2370d460c6bb1
   path: SEC09D4B.DAT
+  md5-dos2unix: 44fcdf669482751f63f2370d460c6bb1
+  hash: md5

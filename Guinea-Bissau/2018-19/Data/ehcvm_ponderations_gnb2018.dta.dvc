@@ -2,3 +2,5 @@ outs:
 - md5: 559d64bf5d692a42dd4134550dff2e73
   size: 4114
   path: ehcvm_ponderations_gnb2018.dta
+  md5-dos2unix: 559d64bf5d692a42dd4134550dff2e73
+  hash: md5

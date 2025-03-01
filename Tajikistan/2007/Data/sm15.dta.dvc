@@ -2,3 +2,5 @@ outs:
 - md5: de108165f820879abbb876ac5eec4b26
   size: 13328
   path: sm15.dta
+  md5-dos2unix: de108165f820879abbb876ac5eec4b26
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: 0be855d1ba1e6bf188e132c18464376a
   size: 149698
   path: agsec6a.dta
+  md5-dos2unix: 0be855d1ba1e6bf188e132c18464376a
+  hash: md5

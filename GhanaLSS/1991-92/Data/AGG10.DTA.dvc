@@ -2,3 +2,5 @@ outs:
 - md5: 72babc456e95a5b771e23625aa7e0c0d
   size: 145989
   path: AGG10.DTA
+  md5-dos2unix: 72babc456e95a5b771e23625aa7e0c0d
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: 4c860282c1cc394e97cdaecb50c5c013
   size: 1735122
   path: R5_2.dta
+  md5-dos2unix: 4c860282c1cc394e97cdaecb50c5c013
+  hash: md5

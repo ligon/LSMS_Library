@@ -2,3 +2,5 @@ outs:
 - md5: 5be892ebf19a0d480f009d3a39e72bea
   size: 1486750
   path: 03bi_borrowingquestions.dta
+  md5-dos2unix: 5be892ebf19a0d480f009d3a39e72bea
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: 90e5c6a6af822419aa6d5cdc82f5687c
   size: 946283
   path: 06e_miscellaneous.dta
+  md5-dos2unix: 90e5c6a6af822419aa6d5cdc82f5687c
+  hash: md5

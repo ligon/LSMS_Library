@@ -2,3 +2,5 @@ outs:
 - md5: e0bb73b0c16f06c0b6cb6325c924591e
   size: 114462
   path: ECV22A16.DTA
+  md5-dos2unix: e0bb73b0c16f06c0b6cb6325c924591e
+  hash: md5

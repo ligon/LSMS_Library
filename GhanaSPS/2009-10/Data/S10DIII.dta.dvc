@@ -2,3 +2,5 @@ outs:
 - md5: 2d4fab167af4051889ce6de528bde114
   size: 320772
   path: S10DIII.dta
+  md5-dos2unix: 2d4fab167af4051889ce6de528bde114
+  hash: md5

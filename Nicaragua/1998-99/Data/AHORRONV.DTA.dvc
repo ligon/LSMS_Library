@@ -2,3 +2,5 @@ outs:
 - md5: 04ede56d30e26f3ba24a5900c6185f8f
   size: 1684756
   path: AHORRONV.DTA
+  md5-dos2unix: 04ede56d30e26f3ba24a5900c6185f8f
+  hash: md5

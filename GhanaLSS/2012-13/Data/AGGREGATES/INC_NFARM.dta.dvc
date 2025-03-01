@@ -2,3 +2,5 @@ outs:
 - md5: 2506322eedccee6d25467a9894ca6c29
   size: 672222
   path: INC_NFARM.dta
+  md5-dos2unix: 2506322eedccee6d25467a9894ca6c29
+  hash: md5

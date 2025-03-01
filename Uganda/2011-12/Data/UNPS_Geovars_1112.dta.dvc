@@ -1,3 +1,5 @@
 outs:
 - md5: 79b9d4d86ccb4ca42d3071c077952797
   path: UNPS_Geovars_1112.dta
+  md5-dos2unix: 79b9d4d86ccb4ca42d3071c077952797
+  hash: md5

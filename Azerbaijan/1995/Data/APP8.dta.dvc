@@ -2,3 +2,5 @@ outs:
 - md5: b9c4c4ebf190805949c881d2ab90e201
   size: 43120
   path: APP8.dta
+  md5-dos2unix: b9c4c4ebf190805949c881d2ab90e201
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: bb1899f1bd0d864edf92e387639ce63b
   size: 9768063
   path: 2012ihses04_housing.dta
+  md5-dos2unix: bb1899f1bd0d864edf92e387639ce63b
+  hash: md5

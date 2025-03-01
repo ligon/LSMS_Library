@@ -2,3 +2,5 @@ outs:
 - md5: 4c1011bd900e2ff430c59c6aa7453184
   size: 90581
   path: ECV35D17.DTA
+  md5-dos2unix: 4c1011bd900e2ff430c59c6aa7453184
+  hash: md5

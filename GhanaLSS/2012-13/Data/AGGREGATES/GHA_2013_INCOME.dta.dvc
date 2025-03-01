@@ -2,3 +2,5 @@ outs:
 - md5: aaf8861978a9da4ba04b01fd91a7dd87
   size: 1145149
   path: GHA_2013_INCOME.dta
+  md5-dos2unix: aaf8861978a9da4ba04b01fd91a7dd87
+  hash: md5

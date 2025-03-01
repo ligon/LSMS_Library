@@ -1,3 +1,5 @@
 outs:
 - md5: 0e61be4f60cfbf7455d1e3caf1a2773b
   path: g7price.dta
+  md5-dos2unix: 0e61be4f60cfbf7455d1e3caf1a2773b
+  hash: md5

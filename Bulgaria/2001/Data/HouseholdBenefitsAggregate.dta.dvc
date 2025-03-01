@@ -2,3 +2,5 @@ outs:
 - md5: da078c3b9b98779674f3f6ac5f6e687e
   size: 26863
   path: HouseholdBenefitsAggregate.dta
+  md5-dos2unix: da078c3b9b98779674f3f6ac5f6e687e
+  hash: md5

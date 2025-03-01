@@ -2,3 +2,5 @@ outs:
 - md5: 6dbdb65d6a9e153b37d00a5b88e5b8fe
   size: 479
   path: EMNV44.DCT
+  md5-dos2unix: 6dbdb65d6a9e153b37d00a5b88e5b8fe
+  hash: md5

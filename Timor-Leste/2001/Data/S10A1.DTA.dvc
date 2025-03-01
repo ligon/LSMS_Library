@@ -2,3 +2,5 @@ outs:
 - md5: dff10f82c8949b6e648c1523f028d619
   size: 16873
   path: S10A1.DTA
+  md5-dos2unix: dff10f82c8949b6e648c1523f028d619
+  hash: md5

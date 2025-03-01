@@ -2,3 +2,5 @@ outs:
 - md5: f157c11272c7d2fd5f8898267e1eae51
   size: 10422
   path: c_credit.dta
+  md5-dos2unix: f157c11272c7d2fd5f8898267e1eae51
+  hash: md5

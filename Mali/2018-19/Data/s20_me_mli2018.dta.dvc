@@ -2,3 +2,5 @@ outs:
 - md5: 41a9c0a48c747b45e4718000b3b5ab06
   size: 218611
   path: s20_me_mli2018.dta
+  md5-dos2unix: 41a9c0a48c747b45e4718000b3b5ab06
+  hash: md5

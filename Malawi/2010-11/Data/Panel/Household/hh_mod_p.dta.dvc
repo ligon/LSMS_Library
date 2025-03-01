@@ -2,3 +2,5 @@ outs:
 - md5: b6f45849a737def4a2046a2a7ab00b94
   size: 3460219
   path: hh_mod_p.dta
+  md5-dos2unix: b6f45849a737def4a2046a2a7ab00b94
+  hash: md5

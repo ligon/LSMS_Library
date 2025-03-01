@@ -2,3 +2,5 @@ outs:
 - md5: 29dc7a7c5eae50517b295f47c7ba6d17
   size: 2219636
   path: ETH_PlotGeovariables_Y3.dta
+  md5-dos2unix: 29dc7a7c5eae50517b295f47c7ba6d17
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: 9bb64dff1a9f1c1abb1c0390ca4461f7
   size: 282967
   path: service.dta
+  md5-dos2unix: 9bb64dff1a9f1c1abb1c0390ca4461f7
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: d49aee6d28a3dad143ccbea9718d87d5
   size: 108329
   path: M2_REM1.dta
+  md5-dos2unix: d49aee6d28a3dad143ccbea9718d87d5
+  hash: md5

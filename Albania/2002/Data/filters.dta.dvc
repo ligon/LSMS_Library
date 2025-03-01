@@ -2,3 +2,5 @@ outs:
 - md5: 600f9d3f390e10e8a8e63611f80c5f2e
   size: 75307
   path: filters.dta
+  md5-dos2unix: 600f9d3f390e10e8a8e63611f80c5f2e
+  hash: md5

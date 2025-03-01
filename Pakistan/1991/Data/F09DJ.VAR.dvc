@@ -2,3 +2,5 @@ outs:
 - md5: 13a5038c023803c1d5b467559a091d15
   size: 41
   path: F09DJ.VAR
+  md5-dos2unix: 13a5038c023803c1d5b467559a091d15
+  hash: md5

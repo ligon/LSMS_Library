@@ -2,3 +2,5 @@ outs:
 - md5: 460d16c3c2888124bd0942425a17bd26
   size: 81621
   path: fs_mod_h3.dta
+  md5-dos2unix: 460d16c3c2888124bd0942425a17bd26
+  hash: md5

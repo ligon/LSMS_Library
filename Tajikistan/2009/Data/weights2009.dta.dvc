@@ -2,3 +2,5 @@ outs:
 - md5: 4435e2ee679d55d065176f6a6444cd43
   size: 97799
   path: weights2009.dta
+  md5-dos2unix: 4435e2ee679d55d065176f6a6444cd43
+  hash: md5

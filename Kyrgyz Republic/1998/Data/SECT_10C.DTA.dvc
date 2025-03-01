@@ -2,3 +2,5 @@ outs:
 - md5: db4475dfebe2717a2aa395e0fc859e96
   size: 657484
   path: SECT_10C.DTA
+  md5-dos2unix: db4475dfebe2717a2aa395e0fc859e96
+  hash: md5

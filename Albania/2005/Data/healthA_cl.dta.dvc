@@ -2,3 +2,5 @@ outs:
 - md5: f666b60b94c1beb41cceeda6556d94c2
   size: 3569633
   path: healthA_cl.dta
+  md5-dos2unix: f666b60b94c1beb41cceeda6556d94c2
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: 2587f5ba7ce6fd9f2e7a4adada1e8980
   size: 543
   path: EMNV19.DCT
+  md5-dos2unix: 2587f5ba7ce6fd9f2e7a4adada1e8980
+  hash: md5

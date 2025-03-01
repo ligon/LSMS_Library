@@ -2,3 +2,5 @@ outs:
 - md5: fa0b53625143f079de156324d4d9cabb
   size: 324993
   path: r1m4e.dta
+  md5-dos2unix: fa0b53625143f079de156324d4d9cabb
+  hash: md5

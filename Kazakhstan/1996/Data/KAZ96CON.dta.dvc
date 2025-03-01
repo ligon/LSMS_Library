@@ -2,3 +2,5 @@ outs:
 - md5: 2d7640de62707a38a65c4e227c511a29
   size: 233772
   path: KAZ96CON.dta
+  md5-dos2unix: 2d7640de62707a38a65c4e227c511a29
+  hash: md5

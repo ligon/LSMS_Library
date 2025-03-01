@@ -2,3 +2,5 @@ outs:
 - md5: 8ccfc794227e0a7c1a162279b5ec3571
   size: 3120964
   path: sec10C1.dta
+  md5-dos2unix: 8ccfc794227e0a7c1a162279b5ec3571
+  hash: md5

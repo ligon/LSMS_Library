@@ -2,3 +2,5 @@ outs:
 - md5: 0730d57990422ff8caf9804d10bdef2c
   size: 20724
   path: sm4e.dta
+  md5-dos2unix: 0730d57990422ff8caf9804d10bdef2c
+  hash: md5

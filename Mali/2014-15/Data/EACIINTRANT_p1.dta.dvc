@@ -2,3 +2,5 @@ outs:
 - md5: 28e00e0e7e2994c6451e2e307c8fffa8
   size: 292944
   path: EACIINTRANT_p1.dta
+  md5-dos2unix: 28e00e0e7e2994c6451e2e307c8fffa8
+  hash: md5

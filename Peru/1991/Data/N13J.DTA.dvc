@@ -2,3 +2,5 @@ outs:
 - md5: 1dbf6ebc5fe3c37a78a901500efc4b24
   size: 9996
   path: N13J.DTA
+  md5-dos2unix: 1dbf6ebc5fe3c37a78a901500efc4b24
+  hash: md5

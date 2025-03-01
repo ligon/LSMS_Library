@@ -2,3 +2,5 @@ outs:
 - md5: b316a37e9855bec8ab2962de7f000b46
   size: 9203071
   path: 2007ihses10_non_food_12_month.dta
+  md5-dos2unix: b316a37e9855bec8ab2962de7f000b46
+  hash: md5

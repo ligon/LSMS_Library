@@ -2,3 +2,5 @@ outs:
 - md5: e858a9ad9fcab8c57dadce9155c85586
   size: 109126
   path: SocialAssistanceProfile.dta
+  md5-dos2unix: e858a9ad9fcab8c57dadce9155c85586
+  hash: md5

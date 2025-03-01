@@ -2,3 +2,5 @@ outs:
 - md5: 817e9bb5bb3d79462c350fffb9f06c47
   size: 15038
   path: F07AP.DTA
+  md5-dos2unix: 817e9bb5bb3d79462c350fffb9f06c47
+  hash: md5

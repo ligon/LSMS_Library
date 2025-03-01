@@ -2,3 +2,5 @@ outs:
 - md5: 12277d0e690973d0e1aaa2ddfeeed5c7
   size: 1983346
   path: comprixcs07.dta
+  md5-dos2unix: 12277d0e690973d0e1aaa2ddfeeed5c7
+  hash: md5

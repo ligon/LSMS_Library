@@ -3,3 +3,5 @@ outs:
   size: 282368
   path: cropprice_W3.dta.bc
   isexec: true
+  md5-dos2unix: e7ea0641dd7eccdbfb073ea65eba9bea
+  hash: md5

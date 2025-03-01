@@ -2,3 +2,5 @@ outs:
 - md5: 129c930eb715e5c1c9f27d34a8b1eb41
   size: 2261233
   path: w1_hh_basic.dta
+  md5-dos2unix: 129c930eb715e5c1c9f27d34a8b1eb41
+  hash: md5

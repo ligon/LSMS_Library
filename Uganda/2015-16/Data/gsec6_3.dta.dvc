@@ -1,3 +1,5 @@
 outs:
 - md5: f1c66b200bd0edf9917331477ab9a127
   path: gsec6_3.dta
+  md5-dos2unix: f1c66b200bd0edf9917331477ab9a127
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: 77aa57b71a8948d8662bca679048ae1f
   size: 790008
   path: module8.dta
+  md5-dos2unix: 77aa57b71a8948d8662bca679048ae1f
+  hash: md5

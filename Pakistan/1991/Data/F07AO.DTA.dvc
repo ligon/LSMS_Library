@@ -2,3 +2,5 @@ outs:
 - md5: 11d090d41294a82d8f1dd2a7f55f87c6
   size: 182524
   path: F07AO.DTA
+  md5-dos2unix: 11d090d41294a82d8f1dd2a7f55f87c6
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: 8438027e4854306ede4b78058af23f4a
   size: 926526
   path: ECVMA2_AS4HP2.dta
+  md5-dos2unix: 8438027e4854306ede4b78058af23f4a
+  hash: md5

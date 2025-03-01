@@ -2,3 +2,5 @@ outs:
 - md5: 8707c18e9dfdbc1c9ac25862be7405e9
   size: 25496
   path: F15DF.DTA
+  md5-dos2unix: 8707c18e9dfdbc1c9ac25862be7405e9
+  hash: md5

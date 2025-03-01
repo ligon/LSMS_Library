@@ -2,3 +2,5 @@ outs:
 - md5: 1f2dd92391c75a17bf8421bbbf62a9f5
   size: 1585101
   path: ecvmaco1_p1_en.dta
+  md5-dos2unix: 1f2dd92391c75a17bf8421bbbf62a9f5
+  hash: md5

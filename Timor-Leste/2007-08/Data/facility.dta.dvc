@@ -2,3 +2,5 @@ outs:
 - md5: b8fe4ae88e5e4606241c99b6fe72b386
   size: 127541
   path: facility.dta
+  md5-dos2unix: b8fe4ae88e5e4606241c99b6fe72b386
+  hash: md5

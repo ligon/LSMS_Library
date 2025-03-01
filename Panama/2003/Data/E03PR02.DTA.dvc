@@ -2,3 +2,5 @@ outs:
 - md5: 79c32e48722552a64c9277fcc04166c7
   size: 1241459
   path: E03PR02.DTA
+  md5-dos2unix: 79c32e48722552a64c9277fcc04166c7
+  hash: md5

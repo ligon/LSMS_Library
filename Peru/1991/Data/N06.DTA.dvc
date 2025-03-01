@@ -2,3 +2,5 @@ outs:
 - md5: f637c905beb660efeebcbee51aedb946
   size: 401640
   path: N06.DTA
+  md5-dos2unix: f637c905beb660efeebcbee51aedb946
+  hash: md5

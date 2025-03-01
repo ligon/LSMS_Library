@@ -2,3 +2,5 @@ outs:
 - md5: f9098ae03a449ad0b22dd823e57f0db3
   size: 232
   path: REG07.VAR
+  md5-dos2unix: f9098ae03a449ad0b22dd823e57f0db3
+  hash: md5

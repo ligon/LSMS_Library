@@ -2,3 +2,5 @@ outs:
 - md5: 20f21a833f707440dc551e4ebfcb13e4
   size: 308434
   path: dwellingC3_cl.dta
+  md5-dos2unix: 20f21a833f707440dc551e4ebfcb13e4
+  hash: md5

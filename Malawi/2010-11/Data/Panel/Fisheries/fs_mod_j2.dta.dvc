@@ -2,3 +2,5 @@ outs:
 - md5: 52a542eb9622e80c556228444b03225d
   size: 8845
   path: fs_mod_j2.dta
+  md5-dos2unix: 52a542eb9622e80c556228444b03225d
+  hash: md5

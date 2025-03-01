@@ -1,3 +1,5 @@
 outs:
 - md5: 7095e00fcf287d39033541f0db33724c
   path: F13B.DAT
+  md5-dos2unix: 7095e00fcf287d39033541f0db33724c
+  hash: md5

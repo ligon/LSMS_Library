@@ -2,3 +2,5 @@ outs:
 - md5: ac3dcd1b59b2bb7ad3b91d6116f4fab1
   size: 775551
   path: agsec3a.dta
+  md5-dos2unix: ac3dcd1b59b2bb7ad3b91d6116f4fab1
+  hash: md5

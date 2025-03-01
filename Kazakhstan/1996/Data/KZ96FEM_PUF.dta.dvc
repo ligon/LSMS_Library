@@ -2,3 +2,5 @@ outs:
 - md5: 0106003df7d193aaba2fa6d2ba4128bd
   size: 187433
   path: KZ96FEM_PUF.dta
+  md5-dos2unix: 0106003df7d193aaba2fa6d2ba4128bd
+  hash: md5

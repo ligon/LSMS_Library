@@ -2,3 +2,5 @@ outs:
 - md5: 95276245dff4b4df2a34f3ae2c7c6c47
   size: 20734
   path: U_ORGANIZATION_AND_DISPLACEMENT.dta
+  md5-dos2unix: 95276245dff4b4df2a34f3ae2c7c6c47
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: 10c69501dc1278c06fb17816adcf9cdc
   size: 311185
   path: NF1X01.dta
+  md5-dos2unix: 10c69501dc1278c06fb17816adcf9cdc
+  hash: md5

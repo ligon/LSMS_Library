@@ -2,3 +2,5 @@ outs:
 - md5: dc15b34c7ceb472c258bb12be6b98dc6
   size: 192069
   path: SEC11B1.DTA
+  md5-dos2unix: dc15b34c7ceb472c258bb12be6b98dc6
+  hash: md5

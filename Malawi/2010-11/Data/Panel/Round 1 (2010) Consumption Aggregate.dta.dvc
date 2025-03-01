@@ -2,3 +2,5 @@ outs:
 - md5: 8a809ae6b21b0d35bb7cf888c9c81d4f
   size: 2454248
   path: Round 1 (2010) Consumption Aggregate.dta
+  md5-dos2unix: 8a809ae6b21b0d35bb7cf888c9c81d4f
+  hash: md5

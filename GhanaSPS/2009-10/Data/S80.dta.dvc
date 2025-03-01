@@ -2,3 +2,5 @@ outs:
 - md5: 543a9af08300391d8721cf3339ce37e6
   size: 61441
   path: S80.dta
+  md5-dos2unix: 543a9af08300391d8721cf3339ce37e6
+  hash: md5

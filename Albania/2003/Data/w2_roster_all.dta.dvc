@@ -2,3 +2,5 @@ outs:
 - md5: 9542c2bffeaecd8d859b2296a3e25d08
   size: 730438
   path: w2_roster_all.dta
+  md5-dos2unix: 9542c2bffeaecd8d859b2296a3e25d08
+  hash: md5

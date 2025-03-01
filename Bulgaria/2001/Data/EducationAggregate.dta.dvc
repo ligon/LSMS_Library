@@ -2,3 +2,5 @@ outs:
 - md5: 996afbaac8377298da152c9ecf620574
   size: 111767
   path: EducationAggregate.dta
+  md5-dos2unix: 996afbaac8377298da152c9ecf620574
+  hash: md5

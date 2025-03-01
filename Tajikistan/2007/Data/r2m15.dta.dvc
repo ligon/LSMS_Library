@@ -2,3 +2,5 @@ outs:
 - md5: 06f3bea712f556b4d385d81eb73c354d
   size: 101939
   path: r2m15.dta
+  md5-dos2unix: 06f3bea712f556b4d385d81eb73c354d
+  hash: md5

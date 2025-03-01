@@ -2,3 +2,5 @@ outs:
 - md5: 7abe813b6941bd6e2289e4623aa1cc6b
   size: 4826
   path: REMIT.dta
+  md5-dos2unix: 7abe813b6941bd6e2289e4623aa1cc6b
+  hash: md5

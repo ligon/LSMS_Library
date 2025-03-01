@@ -2,3 +2,5 @@ outs:
 - md5: 914dac49ce090b425770322b2f7d2830
   size: 9035894
   path: 04i_landtenure.dta
+  md5-dos2unix: 914dac49ce090b425770322b2f7d2830
+  hash: md5

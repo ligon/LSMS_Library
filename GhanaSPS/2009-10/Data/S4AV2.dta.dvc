@@ -2,3 +2,5 @@ outs:
 - md5: 739bec9f9a72d7a9cd20a2d45f00d8e6
   size: 867321
   path: S4AV2.dta
+  md5-dos2unix: 739bec9f9a72d7a9cd20a2d45f00d8e6
+  hash: md5

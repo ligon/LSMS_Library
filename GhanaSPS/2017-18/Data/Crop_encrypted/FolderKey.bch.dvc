@@ -3,3 +3,5 @@ outs:
   size: 4096
   path: FolderKey.bch
   isexec: true
+  md5-dos2unix: 4c306811ae31496e596cbfa5e7817b90
+  hash: md5

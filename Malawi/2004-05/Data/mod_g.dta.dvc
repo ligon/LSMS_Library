@@ -2,3 +2,5 @@ outs:
 - md5: fb0208a3391600fe8f0004cdf5d087ff
   size: 61196
   path: mod_g.dta
+  md5-dos2unix: fb0208a3391600fe8f0004cdf5d087ff
+  hash: md5

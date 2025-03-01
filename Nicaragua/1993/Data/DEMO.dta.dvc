@@ -2,3 +2,5 @@ outs:
 - md5: c5f06969d86f506b888f34811202ca33
   size: 1316726
   path: DEMO.dta
+  md5-dos2unix: c5f06969d86f506b888f34811202ca33
+  hash: md5

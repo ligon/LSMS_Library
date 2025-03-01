@@ -2,3 +2,5 @@ outs:
 - md5: ec6246edbfee37dffa00dcd9cee0bd9f
   size: 8207548
   path: fertility.dta
+  md5-dos2unix: ec6246edbfee37dffa00dcd9cee0bd9f
+  hash: md5

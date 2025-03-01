@@ -2,3 +2,5 @@ outs:
 - md5: 07657421c457cfa5e8cf6cf16378391e
   size: 66731
   path: S1GII0.dta
+  md5-dos2unix: 07657421c457cfa5e8cf6cf16378391e
+  hash: md5

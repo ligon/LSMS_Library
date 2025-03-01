@@ -2,3 +2,5 @@ outs:
 - md5: 2473cf75b74d0d700e9d9c4d40d5203e
   size: 778032
   path: N12.DTA
+  md5-dos2unix: 2473cf75b74d0d700e9d9c4d40d5203e
+  hash: md5

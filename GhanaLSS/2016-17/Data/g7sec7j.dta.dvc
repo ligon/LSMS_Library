@@ -1,3 +1,5 @@
 outs:
 - md5: 114d381d94a931ef8fd6d1f8ea802d6a
   path: g7sec7j.dta
+  md5-dos2unix: 114d381d94a931ef8fd6d1f8ea802d6a
+  hash: md5

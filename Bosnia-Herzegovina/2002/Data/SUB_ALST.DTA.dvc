@@ -2,3 +2,5 @@ outs:
 - md5: 93e1f02982d8f2633b4cc2f61f20e6a8
   size: 1194823
   path: SUB_ALST.DTA
+  md5-dos2unix: 93e1f02982d8f2633b4cc2f61f20e6a8
+  hash: md5

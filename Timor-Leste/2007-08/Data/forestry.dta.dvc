@@ -2,3 +2,5 @@ outs:
 - md5: a87f601051d0a2a53ba68b0e8fc4076b
   size: 7022
   path: forestry.dta
+  md5-dos2unix: a87f601051d0a2a53ba68b0e8fc4076b
+  hash: md5

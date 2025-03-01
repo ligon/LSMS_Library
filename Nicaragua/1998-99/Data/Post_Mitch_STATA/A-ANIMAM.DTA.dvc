@@ -2,3 +2,5 @@ outs:
 - md5: 895c69b0f5be91371b9230eddedd05f6
   size: 124525
   path: A-ANIMAM.DTA
+  md5-dos2unix: 895c69b0f5be91371b9230eddedd05f6
+  hash: md5

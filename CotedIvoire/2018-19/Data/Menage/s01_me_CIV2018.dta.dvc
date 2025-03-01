@@ -2,3 +2,5 @@ outs:
 - md5: 3068131cbd0c03ff98a24f9e657589b0
   size: 4821554
   path: s01_me_CIV2018.dta
+  md5-dos2unix: 3068131cbd0c03ff98a24f9e657589b0
+  hash: md5

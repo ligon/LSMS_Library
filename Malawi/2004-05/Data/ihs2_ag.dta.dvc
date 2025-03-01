@@ -2,3 +2,5 @@ outs:
 - md5: 610657fd556345b88d8ee8bfb3f74b5c
   size: 1690102
   path: ihs2_ag.dta
+  md5-dos2unix: 610657fd556345b88d8ee8bfb3f74b5c
+  hash: md5

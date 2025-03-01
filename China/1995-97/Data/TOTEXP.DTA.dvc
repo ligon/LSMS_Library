@@ -2,3 +2,5 @@ outs:
 - md5: f1ada3bd13524a1de91bea6596f5da36
   size: 40947
   path: TOTEXP.DTA
+  md5-dos2unix: f1ada3bd13524a1de91bea6596f5da36
+  hash: md5

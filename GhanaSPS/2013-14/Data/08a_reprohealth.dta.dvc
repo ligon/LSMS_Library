@@ -2,3 +2,5 @@ outs:
 - md5: 73d8963c5092e745e762aa87b0e3fa48
   size: 128568
   path: 08a_reprohealth.dta
+  md5-dos2unix: 73d8963c5092e745e762aa87b0e3fa48
+  hash: md5

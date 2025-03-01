@@ -2,3 +2,5 @@ outs:
 - md5: 204372d3dd6f16790f356d87ebca258b
   size: 483160
   path: KZ96GEN_PUF.dta
+  md5-dos2unix: 204372d3dd6f16790f356d87ebca258b
+  hash: md5

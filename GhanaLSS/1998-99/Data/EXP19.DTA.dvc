@@ -2,3 +2,5 @@ outs:
 - md5: b5d184dd717fa54a8ff7403f4de41cc0
   size: 52580
   path: EXP19.DTA
+  md5-dos2unix: b5d184dd717fa54a8ff7403f4de41cc0
+  hash: md5

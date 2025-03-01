@@ -2,3 +2,5 @@ outs:
 - md5: 69a57e46d6125887be4e1dab074adb90
   size: 263896
   path: HOGARES.DTA
+  md5-dos2unix: 69a57e46d6125887be4e1dab074adb90
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: ea5c7a5f251ab1677f30fbe950b80ac7
   size: 549701
   path: EXP1.DTA
+  md5-dos2unix: ea5c7a5f251ab1677f30fbe950b80ac7
+  hash: md5

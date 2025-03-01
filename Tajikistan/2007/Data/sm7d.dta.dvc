@@ -2,3 +2,5 @@ outs:
 - md5: bba3b745c7e5461465adec621613fe62
   size: 79843
   path: sm7d.dta
+  md5-dos2unix: bba3b745c7e5461465adec621613fe62
+  hash: md5

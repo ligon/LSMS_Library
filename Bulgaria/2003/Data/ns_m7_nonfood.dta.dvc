@@ -2,3 +2,5 @@ outs:
 - md5: ceac9d66daa95f9b8440ef818c0f47a5
   size: 4719528
   path: ns_m7_nonfood.dta
+  md5-dos2unix: ceac9d66daa95f9b8440ef818c0f47a5
+  hash: md5

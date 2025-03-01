@@ -1,3 +1,5 @@
 outs:
 - md5: 90bebe3a6ff971567cea2e9def3c971a
   path: HHEXP88.DCT
+  md5-dos2unix: 90bebe3a6ff971567cea2e9def3c971a
+  hash: md5

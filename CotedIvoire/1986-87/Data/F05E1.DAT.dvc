@@ -1,3 +1,5 @@
 outs:
 - md5: 96e32888818e2ab92018566d458ac27d
   path: F05E1.DAT
+  md5-dos2unix: 96e32888818e2ab92018566d458ac27d
+  hash: md5

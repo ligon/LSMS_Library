@@ -2,3 +2,5 @@ outs:
 - md5: f7129a5235e708657420082b120afa9a
   size: 495625
   path: 05aii_assetquestions.dta
+  md5-dos2unix: f7129a5235e708657420082b120afa9a
+  hash: md5

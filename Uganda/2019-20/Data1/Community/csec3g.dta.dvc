@@ -2,3 +2,5 @@ outs:
 - md5: 43c02bfdce11349a2db9546f67d21bff
   size: 64659
   path: csec3g.dta
+  md5-dos2unix: 43c02bfdce11349a2db9546f67d21bff
+  hash: md5

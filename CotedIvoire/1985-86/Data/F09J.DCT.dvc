@@ -1,3 +1,5 @@
 outs:
 - md5: d6785be030938f971d9581fcf4c92cc3
   path: F09J.DCT
+  md5-dos2unix: d6785be030938f971d9581fcf4c92cc3
+  hash: md5

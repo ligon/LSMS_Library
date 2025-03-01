@@ -2,3 +2,5 @@ outs:
 - md5: 319c142c1db5526faef21d440cfc3d85
   size: 170884
   path: s08b2_me_sen2018.dta
+  md5-dos2unix: 319c142c1db5526faef21d440cfc3d85
+  hash: md5

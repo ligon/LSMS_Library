@@ -2,3 +2,5 @@ outs:
 - md5: 3d10081acb86cf2129c261b6bc33f77e
   size: 30540209
   path: sect10b_harvestw2.csv
+  md5-dos2unix: 3d10081acb86cf2129c261b6bc33f77e
+  hash: md5

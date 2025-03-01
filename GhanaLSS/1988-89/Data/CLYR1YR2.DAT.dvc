@@ -1,3 +1,5 @@
 outs:
 - md5: a8c314215a3f0b323a5dfa703446d928
   path: CLYR1YR2.DAT
+  md5-dos2unix: a8c314215a3f0b323a5dfa703446d928
+  hash: md5

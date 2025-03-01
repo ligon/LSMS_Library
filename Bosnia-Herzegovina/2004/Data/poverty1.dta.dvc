@@ -2,3 +2,5 @@ outs:
 - md5: be3ef81202e99f7262622fa4f2591d3b
   size: 630364
   path: poverty1.dta
+  md5-dos2unix: be3ef81202e99f7262622fa4f2591d3b
+  hash: md5

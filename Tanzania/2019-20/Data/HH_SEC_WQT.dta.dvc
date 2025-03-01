@@ -2,3 +2,5 @@ outs:
 - md5: c3f6b96c8521650bdbbe7fc6dc9bef66
   size: 733858
   path: HH_SEC_WQT.dta
+  md5-dos2unix: c3f6b96c8521650bdbbe7fc6dc9bef66
+  hash: md5

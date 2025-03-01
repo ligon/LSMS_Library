@@ -2,3 +2,5 @@ outs:
 - md5: a28c7af81be1eb7f7cb2d7fb76ebcb24
   size: 107835
   path: CS4B.DTA
+  md5-dos2unix: a28c7af81be1eb7f7cb2d7fb76ebcb24
+  hash: md5

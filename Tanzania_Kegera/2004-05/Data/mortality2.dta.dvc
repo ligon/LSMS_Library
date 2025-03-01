@@ -2,3 +2,5 @@ outs:
 - md5: 4cffc6b59d66ef2069c9583fbaaed8c1
   size: 144590
   path: mortality2.dta
+  md5-dos2unix: 4cffc6b59d66ef2069c9583fbaaed8c1
+  hash: md5

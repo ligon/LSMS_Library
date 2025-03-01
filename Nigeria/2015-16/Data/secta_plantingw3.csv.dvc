@@ -2,3 +2,5 @@ outs:
 - md5: c477e22161febbdd23baf17787a63ede
   size: 613201
   path: secta_plantingw3.csv
+  md5-dos2unix: c477e22161febbdd23baf17787a63ede
+  hash: md5

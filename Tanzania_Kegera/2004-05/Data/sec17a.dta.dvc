@@ -2,3 +2,5 @@ outs:
 - md5: 6ebda547de1a7a94105002a1d016dff7
   size: 512126
   path: sec17a.dta
+  md5-dos2unix: 6ebda547de1a7a94105002a1d016dff7
+  hash: md5

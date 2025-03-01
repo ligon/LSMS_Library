@@ -2,3 +2,5 @@ outs:
 - md5: b92c53496468e1cb06ae2d4b0ea26cce
   size: 46710
   path: SUB_AFUE.DTA
+  md5-dos2unix: b92c53496468e1cb06ae2d4b0ea26cce
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: fcf0bf45f4271bf2c9936c4f26379454
   size: 85081
   path: s00b_co_sen2018.dta
+  md5-dos2unix: fcf0bf45f4271bf2c9936c4f26379454
+  hash: md5

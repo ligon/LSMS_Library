@@ -2,3 +2,5 @@ outs:
 - md5: 6f73011cee3d775e3da4311c2d347fa6
   size: 151666
   path: s18_4_me_mli2018.dta
+  md5-dos2unix: 6f73011cee3d775e3da4311c2d347fa6
+  hash: md5

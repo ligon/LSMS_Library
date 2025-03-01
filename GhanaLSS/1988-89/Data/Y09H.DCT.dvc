@@ -1,3 +1,5 @@
 outs:
 - md5: e110bc09e557741d2cd0b27fff27f935
   path: Y09H.DCT
+  md5-dos2unix: e110bc09e557741d2cd0b27fff27f935
+  hash: md5

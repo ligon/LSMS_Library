@@ -2,3 +2,5 @@ outs:
 - md5: dddb48028bbfc9d2c25ec00ee785926b
   size: 5053090
   path: SEC2c.dta
+  md5-dos2unix: dddb48028bbfc9d2c25ec00ee785926b
+  hash: md5

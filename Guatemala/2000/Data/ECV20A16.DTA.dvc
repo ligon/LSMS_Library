@@ -2,3 +2,5 @@ outs:
 - md5: f5b0a18da5ff5eabeb9a3d550a8fb7e8
   size: 365672
   path: ECV20A16.DTA
+  md5-dos2unix: f5b0a18da5ff5eabeb9a3d550a8fb7e8
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: 4e491afa8026d7d311544180cb3d8e47
   size: 2187759
   path: cons_agg_wave1_visit1.csv
+  md5-dos2unix: 4e491afa8026d7d311544180cb3d8e47
+  hash: md5

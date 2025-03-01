@@ -2,3 +2,5 @@ outs:
 - md5: b05bd41a470926a24ec251b8ee3ca625
   size: 7190532
   path: emc2014_p2_conso7jours_16032015.dta
+  md5-dos2unix: b05bd41a470926a24ec251b8ee3ca625
+  hash: md5

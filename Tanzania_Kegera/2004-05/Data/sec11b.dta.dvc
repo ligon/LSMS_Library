@@ -2,3 +2,5 @@ outs:
 - md5: ccb3a145bbdd0c2d7460734160694a9d
   size: 4881407
   path: sec11b.dta
+  md5-dos2unix: ccb3a145bbdd0c2d7460734160694a9d
+  hash: md5

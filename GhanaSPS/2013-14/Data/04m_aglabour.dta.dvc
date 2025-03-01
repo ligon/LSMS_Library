@@ -2,3 +2,5 @@ outs:
 - md5: 65c30448e2258dd57f886b3052cd7507
   size: 1072284
   path: 04m_aglabour.dta
+  md5-dos2unix: 65c30448e2258dd57f886b3052cd7507
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: fbd2cbdcb4f7d3423a71f94dfe19796e
   size: 62685
   path: price2004_hh.dta
+  md5-dos2unix: fbd2cbdcb4f7d3423a71f94dfe19796e
+  hash: md5

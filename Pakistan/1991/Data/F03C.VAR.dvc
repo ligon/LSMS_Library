@@ -2,3 +2,5 @@ outs:
 - md5: 2b24e9098e04abd91016607d19dbee19
   size: 78
   path: F03C.VAR
+  md5-dos2unix: 2b24e9098e04abd91016607d19dbee19
+  hash: md5

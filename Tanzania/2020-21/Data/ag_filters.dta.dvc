@@ -2,3 +2,5 @@ outs:
 - md5: b88c3769e657ce096de53e7b0fcbeb28
   size: 10058
   path: ag_filters.dta
+  md5-dos2unix: b88c3769e657ce096de53e7b0fcbeb28
+  hash: md5

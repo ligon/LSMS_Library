@@ -2,3 +2,5 @@ outs:
 - md5: db0beda0f747eca4cff784bdf70e83fe
   size: 1000840
   path: SEC08.DTA
+  md5-dos2unix: db0beda0f747eca4cff784bdf70e83fe
+  hash: md5

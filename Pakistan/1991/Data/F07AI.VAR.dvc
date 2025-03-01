@@ -2,3 +2,5 @@ outs:
 - md5: d4b9625201a780cfd7f2979541095023
   size: 145
   path: F07AI.VAR
+  md5-dos2unix: d4b9625201a780cfd7f2979541095023
+  hash: md5

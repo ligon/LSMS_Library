@@ -2,3 +2,5 @@ outs:
 - md5: 8a50e648f762d1bb2ade372f636ffc70
   size: 198005
   path: gsec19.dta
+  md5-dos2unix: 8a50e648f762d1bb2ade372f636ffc70
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: b6bb23570ac67043fa3c86711f24a26f
   size: 428866
   path: hh_mod_a_filt.dta
+  md5-dos2unix: b6bb23570ac67043fa3c86711f24a26f
+  hash: md5

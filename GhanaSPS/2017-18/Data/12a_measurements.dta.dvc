@@ -2,3 +2,5 @@ outs:
 - md5: 1797b40725c3de699977319220fdab9a
   size: 443141
   path: 12a_measurements.dta
+  md5-dos2unix: 1797b40725c3de699977319220fdab9a
+  hash: md5

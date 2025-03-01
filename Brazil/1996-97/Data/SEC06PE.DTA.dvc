@@ -2,3 +2,5 @@ outs:
 - md5: 27ce4fa89d4a934c7fc7e1468cbd17b7
   size: 736253
   path: SEC06PE.DTA
+  md5-dos2unix: 27ce4fa89d4a934c7fc7e1468cbd17b7
+  hash: md5

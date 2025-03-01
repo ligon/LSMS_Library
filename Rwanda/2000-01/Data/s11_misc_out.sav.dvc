@@ -1,3 +1,5 @@
 outs:
 - md5: db7a76866b2a47aa0de8cca95fae935b
   path: s11_misc_out.sav
+  md5-dos2unix: db7a76866b2a47aa0de8cca95fae935b
+  hash: md5

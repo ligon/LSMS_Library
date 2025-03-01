@@ -2,3 +2,5 @@ outs:
 - md5: 36c5dda18f59d050639bf02df16a7953
   size: 973662
   path: KZ96AGR1_PUF.dta
+  md5-dos2unix: 36c5dda18f59d050639bf02df16a7953
+  hash: md5

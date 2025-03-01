@@ -2,3 +2,5 @@ outs:
 - md5: d3e946627af446935fd811f31a537313
   size: 10900
   path: ECVMA2_MS18P2.dta
+  md5-dos2unix: d3e946627af446935fd811f31a537313
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: b21996f4531a652b10c7c766af1ec7fd
   size: 13888772
   path: s06_me_gnb2018.dta
+  md5-dos2unix: b21996f4531a652b10c7c766af1ec7fd
+  hash: md5

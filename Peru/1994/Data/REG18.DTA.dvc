@@ -2,3 +2,5 @@ outs:
 - md5: 57f6dcede28dbdb72421917fbfea3b5d
   size: 219872
   path: REG18.DTA
+  md5-dos2unix: 57f6dcede28dbdb72421917fbfea3b5d
+  hash: md5

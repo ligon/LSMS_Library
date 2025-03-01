@@ -1,3 +1,5 @@
 outs:
 - md5: c672554ea4ed369799f6930b536ffe66
   path: WSEC3.dta
+  md5-dos2unix: c672554ea4ed369799f6930b536ffe66
+  hash: md5

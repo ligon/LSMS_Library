@@ -2,3 +2,5 @@ outs:
 - md5: a2068239aef11abf0eecd9055104a5f3
   size: 9068607
   path: ecvmaind_p1p2.dta
+  md5-dos2unix: a2068239aef11abf0eecd9055104a5f3
+  hash: md5

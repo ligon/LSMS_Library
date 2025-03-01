@@ -2,3 +2,5 @@ outs:
 - md5: 689db3fca268d84942f4ab428b15caf7
   size: 106372
   path: basicvars.dta
+  md5-dos2unix: 689db3fca268d84942f4ab428b15caf7
+  hash: md5

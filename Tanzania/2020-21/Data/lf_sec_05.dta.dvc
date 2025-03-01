@@ -2,3 +2,5 @@ outs:
 - md5: fc2a5b53d2efc2050256bdffd05baa61
   size: 1020578
   path: lf_sec_05.dta
+  md5-dos2unix: fc2a5b53d2efc2050256bdffd05baa61
+  hash: md5

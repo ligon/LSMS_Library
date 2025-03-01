@@ -2,3 +2,5 @@ outs:
 - md5: 3194e5712c2cc6034fb3f1cdb58b87a5
   size: 4282820
   path: gps-sec13c.dta
+  md5-dos2unix: 3194e5712c2cc6034fb3f1cdb58b87a5
+  hash: md5

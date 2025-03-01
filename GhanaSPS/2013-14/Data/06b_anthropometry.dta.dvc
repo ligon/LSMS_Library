@@ -2,3 +2,5 @@ outs:
 - md5: 64719788b85a92207a8173bcc681c711
   size: 1311020
   path: 06b_anthropometry.dta
+  md5-dos2unix: 64719788b85a92207a8173bcc681c711
+  hash: md5

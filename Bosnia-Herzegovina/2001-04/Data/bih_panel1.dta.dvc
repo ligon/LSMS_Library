@@ -2,3 +2,5 @@ outs:
 - md5: b07d02b26d6090dad7ee21d521e16679
   size: 35339092
   path: bih_panel1.dta
+  md5-dos2unix: b07d02b26d6090dad7ee21d521e16679
+  hash: md5

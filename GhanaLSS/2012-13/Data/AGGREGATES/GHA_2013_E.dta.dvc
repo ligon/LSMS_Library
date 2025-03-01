@@ -2,3 +2,5 @@ outs:
 - md5: f279dbe4efe92b659b6748723fcae38e
   size: 2386996
   path: GHA_2013_E.dta
+  md5-dos2unix: f279dbe4efe92b659b6748723fcae38e
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: 14d6b251bdfe915dac69e19e72355ab2
   size: 531089
   path: HEALTHN.dta
+  md5-dos2unix: 14d6b251bdfe915dac69e19e72355ab2
+  hash: md5

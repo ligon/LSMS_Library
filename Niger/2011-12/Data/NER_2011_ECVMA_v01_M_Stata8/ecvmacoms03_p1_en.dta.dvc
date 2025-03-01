@@ -2,3 +2,5 @@ outs:
 - md5: d8b905d3ee212b9c1fd5f14877637bab
   size: 95522
   path: ecvmacoms03_p1_en.dta
+  md5-dos2unix: d8b905d3ee212b9c1fd5f14877637bab
+  hash: md5

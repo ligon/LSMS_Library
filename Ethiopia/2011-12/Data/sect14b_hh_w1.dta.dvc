@@ -2,3 +2,5 @@ outs:
 - md5: 845cd876343cafe03d2c69de9c1e8e85
   size: 261330
   path: sect14b_hh_w1.dta
+  md5-dos2unix: 845cd876343cafe03d2c69de9c1e8e85
+  hash: md5

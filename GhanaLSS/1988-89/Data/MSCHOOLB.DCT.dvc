@@ -1,3 +1,5 @@
 outs:
 - md5: d63cb9d2e515c1883a442d610e00be12
   path: MSCHOOLB.DCT
+  md5-dos2unix: d63cb9d2e515c1883a442d610e00be12
+  hash: md5

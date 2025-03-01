@@ -2,3 +2,5 @@ outs:
 - md5: ee19d2530144ea902d5f5fe79d7eea36
   size: 2885
   path: INC8.DTA
+  md5-dos2unix: ee19d2530144ea902d5f5fe79d7eea36
+  hash: md5

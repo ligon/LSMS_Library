@@ -2,3 +2,5 @@ outs:
 - md5: 0eb367b48192bb28ad788a53fed53618
   size: 61393
   path: S70.dta
+  md5-dos2unix: 0eb367b48192bb28ad788a53fed53618
+  hash: md5

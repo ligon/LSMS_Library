@@ -2,3 +2,5 @@ outs:
 - md5: ce7501036ab1e7d2b9ec11a5a8d59c77
   size: 909878
   path: ECV14G12.DTA
+  md5-dos2unix: ce7501036ab1e7d2b9ec11a5a8d59c77
+  hash: md5

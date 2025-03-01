@@ -2,3 +2,5 @@ outs:
 - md5: 2d4b130116a7af6bafb3fe737a0414a4
   size: 293786
   path: S4_HSV1.dta
+  md5-dos2unix: 2d4b130116a7af6bafb3fe737a0414a4
+  hash: md5

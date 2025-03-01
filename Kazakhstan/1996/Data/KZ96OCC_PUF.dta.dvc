@@ -2,3 +2,5 @@ outs:
 - md5: 542a6dd182eaed4812a6a4ce11914200
   size: 2965217
   path: KZ96OCC_PUF.dta
+  md5-dos2unix: 542a6dd182eaed4812a6a4ce11914200
+  hash: md5

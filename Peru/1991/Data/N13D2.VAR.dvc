@@ -2,3 +2,5 @@ outs:
 - md5: a2a9ae8014c518229af230f4d0a5508d
   size: 89
   path: N13D2.VAR
+  md5-dos2unix: a2a9ae8014c518229af230f4d0a5508d
+  hash: md5

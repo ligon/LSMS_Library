@@ -2,3 +2,5 @@ outs:
 - md5: 2918e4e4bc0de03ddc4a19eb5af26610
   size: 114963
   path: eaci_geovariables_2014.dta
+  md5-dos2unix: 2918e4e4bc0de03ddc4a19eb5af26610
+  hash: md5

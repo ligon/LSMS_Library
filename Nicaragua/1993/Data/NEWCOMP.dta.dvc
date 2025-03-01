@@ -2,3 +2,5 @@ outs:
 - md5: 2e37fae99dd13ea7ab1584425baa84f4
   size: 535235
   path: NEWCOMP.dta
+  md5-dos2unix: 2e37fae99dd13ea7ab1584425baa84f4
+  hash: md5

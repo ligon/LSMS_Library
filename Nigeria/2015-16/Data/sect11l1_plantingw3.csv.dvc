@@ -2,3 +2,5 @@ outs:
 - md5: c92d47dac97d369c50a1874b72916474
   size: 1794698
   path: sect11l1_plantingw3.csv
+  md5-dos2unix: c92d47dac97d369c50a1874b72916474
+  hash: md5

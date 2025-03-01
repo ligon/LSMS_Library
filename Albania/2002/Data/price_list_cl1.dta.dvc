@@ -2,3 +2,5 @@ outs:
 - md5: e2b2006964bc6e06ed6eaefa885f2e2c
   size: 1590140
   path: price_list_cl1.dta
+  md5-dos2unix: e2b2006964bc6e06ed6eaefa885f2e2c
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: 0a75ef52331f975aca40044b5949354a
   size: 1989009
   path: 2002 7 labor activity.dta
+  md5-dos2unix: 0a75ef52331f975aca40044b5949354a
+  hash: md5

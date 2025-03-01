@@ -2,3 +2,5 @@ outs:
 - md5: 55dd2997a51baddf94699f82f09432a4
   size: 87924
   path: CONSUMO9.DTA
+  md5-dos2unix: 55dd2997a51baddf94699f82f09432a4
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: 10f495d36f0c50cd3018459ba319f113
   size: 219041263
   path: consumption_expenditure.dta
+  md5-dos2unix: 10f495d36f0c50cd3018459ba319f113
+  hash: md5

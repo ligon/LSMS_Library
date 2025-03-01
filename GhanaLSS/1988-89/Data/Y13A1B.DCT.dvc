@@ -1,3 +1,5 @@
 outs:
 - md5: 18289056f7db651a5c079b693a8d3607
   path: Y13A1B.DCT
+  md5-dos2unix: 18289056f7db651a5c079b693a8d3607
+  hash: md5

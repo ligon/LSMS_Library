@@ -2,3 +2,5 @@ outs:
 - md5: 4edbe429da789719eebec440ea2ddf33
   size: 2267992
   path: sect10b_com_w4.dta
+  md5-dos2unix: 4edbe429da789719eebec440ea2ddf33
+  hash: md5

@@ -1,3 +1,5 @@
 outs:
 - md5: 9d28e5472aa841d5c1bb06acd32e2ab3
   path: Y16B.DCT
+  md5-dos2unix: 9d28e5472aa841d5c1bb06acd32e2ab3
+  hash: md5

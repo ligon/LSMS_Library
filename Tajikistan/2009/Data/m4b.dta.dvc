@@ -2,3 +2,5 @@ outs:
 - md5: fd7ebecea67017eb13a15500954a4ed0
   size: 1049725
   path: m4b.dta
+  md5-dos2unix: fd7ebecea67017eb13a15500954a4ed0
+  hash: md5

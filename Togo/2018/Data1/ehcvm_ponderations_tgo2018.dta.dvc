@@ -2,3 +2,5 @@ outs:
 - md5: 4620246257d8714e67d97946e44337f6
   size: 5914
   path: ehcvm_ponderations_tgo2018.dta
+  md5-dos2unix: 4620246257d8714e67d97946e44337f6
+  hash: md5

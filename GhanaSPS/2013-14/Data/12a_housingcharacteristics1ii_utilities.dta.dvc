@@ -2,3 +2,5 @@ outs:
 - md5: eebc0fa94a46b11a300b36c7c3acb34b
   size: 1102316
   path: 12a_housingcharacteristics1ii_utilities.dta
+  md5-dos2unix: eebc0fa94a46b11a300b36c7c3acb34b
+  hash: md5

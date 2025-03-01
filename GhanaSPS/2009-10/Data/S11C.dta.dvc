@@ -2,3 +2,5 @@ outs:
 - md5: cac0f73f4b8cd5e5e6655e1ed12e8fea
   size: 7526379
   path: S11C.dta
+  md5-dos2unix: cac0f73f4b8cd5e5e6655e1ed12e8fea
+  hash: md5

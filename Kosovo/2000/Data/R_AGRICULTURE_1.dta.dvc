@@ -2,3 +2,5 @@ outs:
 - md5: 19972df2c7b2114da632a6fa96de4ffb
   size: 6545
   path: R_AGRICULTURE_1.dta
+  md5-dos2unix: 19972df2c7b2114da632a6fa96de4ffb
+  hash: md5

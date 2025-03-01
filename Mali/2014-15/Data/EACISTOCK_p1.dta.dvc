@@ -2,3 +2,5 @@ outs:
 - md5: 545e2b0289b90633b4ce2b00875cb79e
   size: 1494816
   path: EACISTOCK_p1.dta
+  md5-dos2unix: 545e2b0289b90633b4ce2b00875cb79e
+  hash: md5

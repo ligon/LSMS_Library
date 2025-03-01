@@ -2,3 +2,5 @@ outs:
 - md5: ed44f1e973399b69b9cb6d16a45479e4
   size: 106023
   path: FILE22V0.dta
+  md5-dos2unix: ed44f1e973399b69b9cb6d16a45479e4
+  hash: md5

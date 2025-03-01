@@ -2,3 +2,5 @@ outs:
 - md5: 5ffc2b7158ac03b298b5dfa80750e662
   size: 508001
   path: 19sub_productos_agricolas.dta
+  md5-dos2unix: 5ffc2b7158ac03b298b5dfa80750e662
+  hash: md5

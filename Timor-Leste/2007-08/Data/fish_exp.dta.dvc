@@ -2,3 +2,5 @@ outs:
 - md5: d002d64b6f301087409824fdd533ad15
   size: 3639
   path: fish_exp.dta
+  md5-dos2unix: d002d64b6f301087409824fdd533ad15
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: ace290875ba33f2d4f37e3d3eccef8eb
   size: 3422865
   path: 09gastosc.dta
+  md5-dos2unix: ace290875ba33f2d4f37e3d3eccef8eb
+  hash: md5

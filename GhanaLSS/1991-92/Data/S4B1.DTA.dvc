@@ -2,3 +2,5 @@ outs:
 - md5: 7711effaebd49de8722081e7202d9090
   size: 1629525
   path: S4B1.DTA
+  md5-dos2unix: 7711effaebd49de8722081e7202d9090
+  hash: md5

@@ -1,3 +1,5 @@
 outs:
 - md5: 0a2edac9f8966a7beb3c0897aa1d106c
   path: 10_GHA_EXPEDUC.dta
+  md5-dos2unix: 0a2edac9f8966a7beb3c0897aa1d106c
+  hash: md5

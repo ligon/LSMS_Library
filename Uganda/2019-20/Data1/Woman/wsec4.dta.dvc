@@ -2,3 +2,5 @@ outs:
 - md5: e94f934a54186ce6b22be827e6b54405
   size: 5927147
   path: wsec4.dta
+  md5-dos2unix: e94f934a54186ce6b22be827e6b54405
+  hash: md5

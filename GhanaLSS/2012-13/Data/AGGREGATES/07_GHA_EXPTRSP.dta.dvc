@@ -2,3 +2,5 @@ outs:
 - md5: c3ee02124c2a91db9ed2210b17dcd67f
   size: 739376
   path: 07_GHA_EXPTRSP.dta
+  md5-dos2unix: c3ee02124c2a91db9ed2210b17dcd67f
+  hash: md5

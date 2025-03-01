@@ -2,3 +2,5 @@ outs:
 - md5: 599b626d30696cbe05d48137fceecdd5
   size: 1465701
   path: ANTH.dta
+  md5-dos2unix: 599b626d30696cbe05d48137fceecdd5
+  hash: md5

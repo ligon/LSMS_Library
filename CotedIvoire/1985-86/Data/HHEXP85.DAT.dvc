@@ -1,3 +1,5 @@
 outs:
 - md5: b777ad7c38e567e4711c19496db2520a
   path: HHEXP85.DAT
+  md5-dos2unix: b777ad7c38e567e4711c19496db2520a
+  hash: md5

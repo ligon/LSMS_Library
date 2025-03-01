@@ -2,3 +2,5 @@ outs:
 - md5: e7033c91102a59b41e3c011af08587ca
   size: 2267700
   path: 12a_housingcharacteristics1iii_structure.dta
+  md5-dos2unix: e7033c91102a59b41e3c011af08587ca
+  hash: md5

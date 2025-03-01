@@ -1,3 +1,5 @@
 outs:
 - md5: b98083bc0f6d6d000d2be971dac4ff79
   path: Y14B.DAT
+  md5-dos2unix: b98083bc0f6d6d000d2be971dac4ff79
+  hash: md5

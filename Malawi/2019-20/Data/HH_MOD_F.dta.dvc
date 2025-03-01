@@ -2,3 +2,5 @@ outs:
 - md5: 23c5f1eefe14dbce83a4cd96d1e2b4e1
   size: 11131517
   path: HH_MOD_F.dta
+  md5-dos2unix: 23c5f1eefe14dbce83a4cd96d1e2b4e1
+  hash: md5

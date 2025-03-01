@@ -2,3 +2,5 @@ outs:
 - md5: 74f246db765e8023dea387627ce6097b
   size: 389031
   path: bfoodeaten_cl.dta
+  md5-dos2unix: 74f246db765e8023dea387627ce6097b
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: d0a72eac3c06819ea25e3c7bff472567
   size: 182
   path: N05A.VAR
+  md5-dos2unix: d0a72eac3c06819ea25e3c7bff472567
+  hash: md5

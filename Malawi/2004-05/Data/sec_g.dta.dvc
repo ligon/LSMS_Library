@@ -2,3 +2,5 @@ outs:
 - md5: 4c40bb5414e501b9209560bbb3ab808f
   size: 3142812
   path: sec_g.dta
+  md5-dos2unix: 4c40bb5414e501b9209560bbb3ab808f
+  hash: md5

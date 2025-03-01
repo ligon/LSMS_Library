@@ -2,3 +2,5 @@ outs:
 - md5: 1377c94c7aa745648dd9883525c5ad98
   size: 456205
   path: g6loc_edt.dta
+  md5-dos2unix: 1377c94c7aa745648dd9883525c5ad98
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: 32ddba03979b55a98c29684d55e74a3a
   size: 555120
   path: HHEXPTL.dta
+  md5-dos2unix: 32ddba03979b55a98c29684d55e74a3a
+  hash: md5

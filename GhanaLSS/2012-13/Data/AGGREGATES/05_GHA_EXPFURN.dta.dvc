@@ -2,3 +2,5 @@ outs:
 - md5: 549d75c1c5431cc28e767a6bcd362f29
   size: 873876
   path: 05_GHA_EXPFURN.dta
+  md5-dos2unix: 549d75c1c5431cc28e767a6bcd362f29
+  hash: md5

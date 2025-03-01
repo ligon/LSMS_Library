@@ -2,3 +2,5 @@ outs:
 - md5: d988b2cc4dd74e31388cb80554c0d869
   size: 3813591
   path: ECV01H01.DTA
+  md5-dos2unix: d988b2cc4dd74e31388cb80554c0d869
+  hash: md5

@@ -2,3 +2,5 @@ outs:
 - md5: 35c3bf8ffe778546a23cda743db9a180
   size: 727557
   path: sectnr_pp_w3.dta
+  md5-dos2unix: 35c3bf8ffe778546a23cda743db9a180
+  hash: md5

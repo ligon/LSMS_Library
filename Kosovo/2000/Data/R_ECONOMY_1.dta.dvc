@@ -2,3 +2,5 @@ outs:
 - md5: cbcb69cfeb8a80a20e2b3296ca05bb37
   size: 11461
   path: R_ECONOMY_1.dta
+  md5-dos2unix: cbcb69cfeb8a80a20e2b3296ca05bb37
+  hash: md5

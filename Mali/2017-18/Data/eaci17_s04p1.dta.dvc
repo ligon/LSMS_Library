@@ -2,3 +2,5 @@ outs:
 - md5: 31bf2fbf93e89ca039bb5cb61c163a27
   size: 9449243
   path: eaci17_s04p1.dta
+  md5-dos2unix: 31bf2fbf93e89ca039bb5cb61c163a27
+  hash: md5

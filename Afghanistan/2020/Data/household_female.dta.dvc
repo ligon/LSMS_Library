@@ -2,3 +2,5 @@ outs:
 - md5: 428ec4cd40b9778843681c53a5e22650
   size: 19866502
   path: household_female.dta
+  md5-dos2unix: 428ec4cd40b9778843681c53a5e22650
+  hash: md5

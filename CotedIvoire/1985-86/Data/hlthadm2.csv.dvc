@@ -1,3 +1,5 @@
 outs:
 - md5: 15f5ea7e0925ec79c9d8149088825619
   path: hlthadm2.csv
+  md5-dos2unix: 15f5ea7e0925ec79c9d8149088825619
+  hash: md5
