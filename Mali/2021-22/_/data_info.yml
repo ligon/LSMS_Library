@@ -2,7 +2,8 @@ Country: Mali
 Wave: 2021-22
 
 cluster_features:
-    file: ehcvm_conso_mli2021.dta
+    file: 
+        - ehcvm_conso_mli2021.dta
     idxvars:
         w: grappe
         v: grappe
@@ -12,7 +13,8 @@ cluster_features:
 
 
 household_roster:
-    file: ehcvm_individu_mli2021.dta
+    file: 
+         - ehcvm_individu_mli2021.dta
     idxvars:
         w: grappe
         v: grappe
@@ -30,7 +32,8 @@ household_roster:
         Highest Education: 'educ_hi'
 
 food_acquired:
-    file: s07b_me_mli2021.dta
+    file: 
+        - s07b_me_mli2021.dta
     idxvars:
         w: grappe
         v: grappe

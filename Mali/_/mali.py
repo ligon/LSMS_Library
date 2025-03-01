@@ -20,7 +20,10 @@ def Sex(value):
     '''
     Formatting sex veriable
     '''
-    return value[0].upper()[0]
+    if pd.isna(value):
+        return np.nan
+    else:
+        return value[0].upper()[0]
 
 def Age(value):
     '''
@@ -36,6 +39,9 @@ def Relation(value):
     '''
     Formatting relationship variable
     '''
-    return value.title()
+    if pd.isna(value):
+        return np.nan
+    else:
+        return value.title()
 
 

@@ -67,34 +67,55 @@ class Wave:
         if data_info is None:
             raise KeyError(f"Data scheme does not contain {request} for {self.country}/{self.year}")
         
-        data_file = data_info["file"]
         formatting_functions = self.formatting_functions
 
-        def get_mapping(var_name, mappings, format_id_function = False):
+        def get_formatting_function(var_name, value, format_id_function = False):
             """Applies formatting functions if available, otherwise uses defaults."""
             if format_id_function:
                 return (
-                    (mappings[var_name], formatting_functions[var_name]) 
+                    (value, formatting_functions[var_name]) 
                     if var_name in formatting_functions else
-                    (mappings[var_name],format_id if var_name != 'w' else lambda x: self.year)
+                    (value,format_id if var_name != 'w' else lambda x: self.year)
                 )
             else:
-                return ((mappings[var_name], formatting_functions[var_name]) 
-                        if var_name in formatting_functions else
-                        (mappings[var_name], lambda x: self.year if var_name == 'w' else x))
-
-        idxvars = {key: get_mapping(key, data_info['idxvars'], format_id_function = True) for key in data_info['idxvars']}
-        myvars = {key: get_mapping(key, data_info['myvars']) for key in data_info['myvars']}
+                return ((value, formatting_functions[var_name]) 
+                        if var_name in formatting_functions else value)
         
-        return data_file, idxvars, myvars
+        files = data_info.get('file')
+        idxvars = data_info.get('idxvars')
+        myvars = data_info.get('myvars')
+        merge = data_info.get('merge')
+
+        final_mapping = dict()
+        final_mapping['merge'] = merge
+
+        idxvars_updated = {key: get_formatting_function(key,value, format_id_function = True) for key, value in idxvars.items()}
+        myvars_updated = {key: get_formatting_function(key, value) for key, value in myvars.items()}
+
+        # Overwrite default column mappings with provided new columns for each file if there is new mapping
+        for i in files:
+            if isinstance(i, dict):
+                idxvars_override = idxvars_updated.copy()
+                myvars_override = myvars_updated.copy()
+                for key, value in i.items():
+                    if key in idxvars.keys():
+                        idxvars_override[key] = get_formatting_function(key, value, format_id_function = True)
+                    else:
+                        myvars_override[key] = get_formatting_function(key, value)
+                final_mapping[i] = {'idxvars': idxvars_override, 'myvars': myvars_override}
+
+            else:
+                final_mapping[i] = {'idxvars': idxvars_updated, 'myvars': myvars_updated}
+            
+        return final_mapping
     
-    def categorical_mapping(self, table):
+    def categorical_mapping(self, table, idxvars_code = 'Original Label', label_code = 'Preferred Label' ):
         path = self.relative_path()
         mapping = get_categorical_mapping(fn = 'categorical_mapping.org',
                                           tablename=table,
-                                          idxvars={'Code': 'Original Label'},
+                                          idxvars={'Code': idxvars_code},
                                           dirs = [f'{path}/_', f'{path}/../_', f'{path}/../../_'],
-                                          **{'Label':'Preferred Label'})
+                                          **{'Label': label_code})
         
         return mapping
             
@@ -119,16 +140,27 @@ class Wave:
             df = module.df
             return df
         else:
-            file, idxvars,  myvars = self.column_mapping(request)
-            df = df_data_grabber(f'{self.relative_path()}/Data/{file}', idxvars, **myvars, convert_categoricals=True)
-            df = df.reset_index().drop_duplicates()
-            df = df.set_index(list(idxvars.keys()))
-            # Oddity with large number for missing code
-            na = df.select_dtypes(exclude='object').max().max()
-            if na>1e99:
-                warnings.warn(f"Large number used for missing?  Replacing {na} with NaN.")
-                df = df.replace(na,np.nan)
-            return df
+            mapping_details = self.column_mapping(request)
+            merge_way = mapping_details.get('merge')
+            files = {key: value for key, value in mapping_details.items() if key != 'merge'}
+            dfs = []
+            for file, mappings in files.items():
+                df = df_data_grabber(f'{self.relative_path()}/Data/{file}', mappings['idxvars'], **mappings['myvars'], convert_categoricals=True)
+                df = df.reset_index().drop_duplicates()
+                df = df.set_index(list(mappings['idxvars'].keys()))
+                # Oddity with large number for missing code
+                na = df.select_dtypes(exclude='object').max().max()
+                if na>1e99:
+                    warnings.warn(f"Large number used for missing?  Replacing {na} with NaN.")
+                    df = df.replace(na,np.nan)
+                dfs.append(df)
+            if merge_way is None:
+                final_df = dfs[0]
+            elif merge_way == 'horizontal':
+                final_df = pd.concat(dfs, axis=1)
+            else:
+                final_df = pd.concat(dfs)
+            return final_df
 
     def cluster_features(self):
         return self.grab_data('cluster_features')

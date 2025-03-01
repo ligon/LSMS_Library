@@ -2,7 +2,8 @@ Country: Mali
 Wave: 2017-18
 
 cluster_features:
-    file: eaci17_s00p1.dta
+    file: 
+        - eaci17_s00p1.dta
     idxvars:
         w: grappe
         v: grappe
@@ -11,7 +12,8 @@ cluster_features:
         Rural: s0q04
 
 household_roster:
-    file: eaci17_s01p1.dta
+    file: 
+        - eaci17_s01p1.dta
     idxvars:
         w: grappe
         v: grappe
