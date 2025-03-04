@@ -28,6 +28,21 @@ class Wave:
         return var
     
     @property
+    def relative_path(self, data_file = None):
+        '''
+        Get the relative path of the data file from the current working directory
+        Target: loading dvc file requires relative path
+                using categorical_mapping function requires relative path
+        '''
+        current_dir = Path(os.getcwd())  # Convert to Path object
+        data_file_path = Path(self.file_path)
+        rel_path = os.path.relpath(data_file_path, current_dir)
+        if data_file is not None:
+            return rel_path / data_file
+        else:
+            return rel_path
+    
+    @property
     def resources(self):
         var = self.file_path / "_" / "data_info.yml"
         try:
@@ -36,7 +51,6 @@ class Wave:
             return data
         except FileNotFoundError as e:
             warnings.warn(f"File not found: {var}")
-            # print(f"Need to build data_info.yml")
 
     @property
     def formatting_functions(self):
@@ -47,8 +61,8 @@ class Wave:
         module_filename = f"{self.year}.py" 
         var = self.file_path / "_" / module_filename 
         if not var.exists():
-            module_filename = f"{self.country}.py"
-            var = files("lsms_library") / "countries" / self.country/'_'/module_filename
+            module_filename = f"{self.country.lower()}.py"
+            var = Country(self.country).file_path/'_'/module_filename
         # Load module dynamically
         spec = importlib.util.spec_from_file_location(f"formatting_{self.year}", var)
         formatting_module = importlib.util.module_from_spec(spec)
@@ -71,15 +85,12 @@ class Wave:
 
         def get_formatting_function(var_name, value, format_id_function = False):
             """Applies formatting functions if available, otherwise uses defaults."""
-            if format_id_function:
-                return (
-                    (value, formatting_functions[var_name]) 
-                    if var_name in formatting_functions else
-                    (value,format_id if var_name != 'w' else lambda x: self.year)
-                )
-            else:
-                return ((value, formatting_functions[var_name]) 
-                        if var_name in formatting_functions else value)
+            return (
+                (value, formatting_functions[var_name]) 
+                if var_name in formatting_functions else
+                (value, format_id) if format_id_function else value
+            )
+   
         
         files = data_info.get('file')
         idxvars = data_info.get('idxvars')
@@ -110,7 +121,7 @@ class Wave:
         return final_mapping
     
     def categorical_mapping(self, table, idxvars_code = 'Original Label', label_code = 'Preferred Label' ):
-        path = self.relative_path()
+        path = self.relative_path
         mapping = get_categorical_mapping(fn = 'categorical_mapping.org',
                                           tablename=table,
                                           idxvars={'Code': idxvars_code},
@@ -119,17 +130,6 @@ class Wave:
         
         return mapping
             
-    def relative_path(self):
-        '''
-        Get the relative path of the data file from the current working directory
-        Target: loading dvc file requires relative path
-                using categorical_mapping function requires relative path
-        '''
-        current_dir = Path(os.getcwd())  # Convert to Path object
-        data_file_path = Path(self.file_path)
-        rel_path = os.path.relpath(data_file_path, current_dir)
-
-        return rel_path
 
     def grab_data(self, request):
         df_fn = self.file_path /f"_ /{request}.py"
@@ -145,9 +145,10 @@ class Wave:
             files = {key: value for key, value in mapping_details.items() if key != 'merge'}
             dfs = []
             for file, mappings in files.items():
-                df = df_data_grabber(f'{self.relative_path()}/Data/{file}', mappings['idxvars'], **mappings['myvars'], convert_categoricals=True)
+                df = df_data_grabber(self.relative_path(f'Data/{file}'), mappings['idxvars'], **mappings['myvars'], convert_categoricals=True)
                 df = df.reset_index().drop_duplicates()
-                df = df.set_index(list(mappings['idxvars'].keys()))
+                df['w'] = self.year
+                df = df.set_index(['w']+list(mappings['idxvars'].keys()))
                 # Oddity with large number for missing code
                 na = df.select_dtypes(exclude='object').max().max()
                 if na>1e99:
@@ -156,10 +157,9 @@ class Wave:
                 dfs.append(df)
             if merge_way is None:
                 final_df = dfs[0]
-            elif merge_way == 'horizontal':
-                final_df = pd.concat(dfs, axis=1)
             else:
-                final_df = pd.concat(dfs)
+                final_df = pd.concat(dfs, axis=merge_way)
+
             return final_df
 
     def cluster_features(self):
@@ -192,29 +192,33 @@ class Country:
         self.name = country_name
 
     @property
+    def file_path(self):
+        var = files("lsms_library") / "countries" / self.name
+        return var
+    
+    @property
     def resources(self):
-        var = files("lsms_library") / "countries" / self.name /"_"/ "data_info.yml"
+        var = self.file_path /"_"/ "data_info.yml"
         try:
             with open(var, 'r') as file:
                 data = yaml.safe_load(file)
             return data
         except FileNotFoundError as e:
             warnings.warn(e)
-            # print(f"Need to build data_info.yml")
     
     def waves(self):
         data = self.resources
         if 'Waves' in data:
             return data['Waves']
         else:
-            print(f"No waves found for {self.name}/_/data_info.yml")
+            warnings.warn(f"No waves found for {self.name}/_/data_info.yml")
         
     def data_scheme(self):
         data = self.resources
         if'Data Scheme' in data:
             return list(data['Data Scheme'].keys())
         else:
-            print(f"No data scheme found for {self.name}/_/data_info.yml")
+            warnings.warn(f"No data scheme found for {self.name}/_/data_info.yml")
     
     def __getitem__(self, year):
         # Ensure the year is one of the available waves
@@ -251,7 +255,7 @@ class Country:
                 continue
             file = data_info['file']
             col = data_info[label_col_type][label_col]
-            df = get_dataframe(f'{wave.relative_path()}/Data/{file}')
+            df = get_dataframe(wave.relative_path(f'Data/{file}'))
             label_ls.append(df[col])
     
         label_ls = [{k: v.strip() if isinstance(v, str) else v for k, v in d.items()} for d in label_ls]
