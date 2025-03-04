@@ -2,4 +2,3 @@ outs:
 - md5: dd71075fcf5897ff3df78bbcceff01c3
   size: 35936
   path: FILE31V0.dta
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: f657f5170ca272e91477631f369466ea
   size: 182008
   path: FEED.dta
-  hash: md5

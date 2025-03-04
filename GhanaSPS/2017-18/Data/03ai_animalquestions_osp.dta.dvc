@@ -2,4 +2,3 @@ outs:
 - md5: 04906d79505974b2187822f2da549411
   size: 56575
   path: 03ai_animalquestions_osp.dta
-  hash: md5

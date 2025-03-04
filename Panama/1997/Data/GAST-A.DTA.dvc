@@ -2,4 +2,3 @@ outs:
 - md5: 157fb5c5e9afe74752d9dd9d7c50bc44
   size: 55282154
   path: GAST-A.DTA
-  hash: md5

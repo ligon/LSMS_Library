@@ -2,4 +2,3 @@ outs:
 - md5: 3d2d7560aefcc310ce23e42a1dec39ea
   size: 78419
   path: r1m12a1.dta
-  hash: md5

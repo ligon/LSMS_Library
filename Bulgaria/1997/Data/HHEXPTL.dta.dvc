@@ -2,4 +2,3 @@ outs:
 - md5: 32ddba03979b55a98c29684d55e74a3a
   size: 555120
   path: HHEXPTL.dta
-  hash: md5

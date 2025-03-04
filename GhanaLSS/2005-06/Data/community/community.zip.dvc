@@ -2,4 +2,3 @@ outs:
 - md5: a7a2e2742d769bf8dfc185c8eaad470d
   size: 143779
   path: community.zip
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: 2aeb41131685e98c0e62a42ad1d3fcc4
   size: 295967
   path: REG04.DTA
-  hash: md5

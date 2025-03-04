@@ -2,4 +2,3 @@ outs:
 - md5: faf5decbcebda157d3cebe592043c922
   size: 1872440
   path: mop_5_weekly_food_consumption.dta
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: eb06fcde0bb4aa178ec834734d912738
   size: 91286
   path: FERTCNN.dta
-  hash: md5

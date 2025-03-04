@@ -2,4 +2,3 @@ outs:
 - md5: 6d84949e554f4c6c0c81ab3dc5ee64a5
   size: 272290
   path: ag_mod_a_filt.dta
-  hash: md5

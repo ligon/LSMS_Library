@@ -2,4 +2,3 @@ outs:
 - md5: e1c3f8dea4b4c294edf826ef21e0e9d2
   size: 8460017
   path: upd4_hh_i2.dta
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: f80fe373b407a08dc43a4d567aa9a888
   size: 364590
   path: module11f.dta
-  hash: md5

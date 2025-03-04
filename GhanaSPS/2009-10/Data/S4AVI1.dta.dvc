@@ -2,4 +2,3 @@ outs:
 - md5: 6f4c91e7d0e2ebb1cd28be76881f2e32
   size: 561351
   path: S4AVI1.dta
-  hash: md5

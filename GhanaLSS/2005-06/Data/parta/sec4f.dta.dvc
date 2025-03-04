@@ -2,4 +2,3 @@ outs:
 - md5: 7bb7dd28c63be784d1c20dcaa59b5bf2
   size: 589371
   path: sec4f.dta
-  hash: md5

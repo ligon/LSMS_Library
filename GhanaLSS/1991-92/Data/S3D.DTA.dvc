@@ -2,4 +2,3 @@ outs:
 - md5: 828c0ebaeb93bec37e29244990495cf6
   size: 1087295
   path: S3D.DTA
-  hash: md5

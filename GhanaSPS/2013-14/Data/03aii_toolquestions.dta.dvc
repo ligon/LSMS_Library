@@ -2,4 +2,3 @@ outs:
 - md5: b53a6adce03951abda976682b13e27cc
   size: 7311650
   path: 03aii_toolquestions.dta
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: 42f74a1bdc013d3a3f2d9d2359d656af
   size: 8678522
   path: NEGOCI.DTA
-  hash: md5

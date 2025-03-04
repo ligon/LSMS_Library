@@ -2,4 +2,3 @@ outs:
 - md5: 37ba09c5221a61f955a88321f814f974
   size: 559448
   path: R10.dta
-  hash: md5

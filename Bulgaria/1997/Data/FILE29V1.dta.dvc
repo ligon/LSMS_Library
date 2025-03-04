@@ -2,4 +2,3 @@ outs:
 - md5: 33343029495876e7139c87b8cdae4df2
   size: 101429
   path: FILE29V1.dta
-  hash: md5

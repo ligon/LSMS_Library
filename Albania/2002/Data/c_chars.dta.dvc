@@ -2,4 +2,3 @@ outs:
 - md5: 8f48f541c9ea5989dac0ac5f03af57b2
   size: 15676
   path: c_chars.dta
-  hash: md5

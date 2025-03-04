@@ -2,4 +2,3 @@ outs:
 - md5: 506b89d7101425f8dedce5f558d01a93
   size: 756684
   path: INC_OTHER.dta
-  hash: md5

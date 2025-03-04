@@ -2,4 +2,3 @@ outs:
 - md5: 3b992d303aab119c9529786b036c6e11
   size: 2409436
   path: CN7D.dta
-  hash: md5

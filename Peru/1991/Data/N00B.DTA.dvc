@@ -2,4 +2,3 @@ outs:
 - md5: 33c1b8589263478b7a42bcc0461c4751
   size: 86304
   path: N00B.DTA
-  hash: md5

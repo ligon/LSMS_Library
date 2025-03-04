@@ -2,4 +2,3 @@ outs:
 - md5: 9010587c3d49b7b8ee3267791f74add6
   size: 1212163
   path: cons_agg_w4.dta
-  hash: md5

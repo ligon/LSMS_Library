@@ -2,4 +2,3 @@ outs:
 - md5: 544af7743fdd2903409d6cfaeb746b30
   size: 478980
   path: FERT.dta
-  hash: md5

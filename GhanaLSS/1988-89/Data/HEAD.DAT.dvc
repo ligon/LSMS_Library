@@ -1,4 +1,3 @@
 outs:
 - md5: 7d7ce0eaa29fdbde4f55b9ca541fd8ae
   path: HEAD.DAT
-  hash: md5

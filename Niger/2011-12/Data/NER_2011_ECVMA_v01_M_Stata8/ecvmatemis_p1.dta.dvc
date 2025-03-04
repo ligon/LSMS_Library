@@ -2,4 +2,3 @@ outs:
 - md5: 772c04831b3f57e83e9a628dddb8e651
   size: 47151
   path: ecvmatemis_p1.dta
-  hash: md5

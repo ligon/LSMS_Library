@@ -2,4 +2,3 @@ outs:
 - md5: 4db50c355be71d94faa5736004365715
   size: 1375141
   path: emc2014_p1_prix_27022015.dta
-  hash: md5

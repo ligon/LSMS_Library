@@ -2,4 +2,3 @@ outs:
 - md5: 50722bf10c9d4273d29490456fe35b36
   size: 7524297
   path: ag_mod_g.dta
-  hash: md5

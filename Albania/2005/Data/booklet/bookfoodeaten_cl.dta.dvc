@@ -2,4 +2,3 @@ outs:
 - md5: 55b3e3da53e852a082380a0a9e2db667
   size: 1206267
   path: bookfoodeaten_cl.dta
-  hash: md5

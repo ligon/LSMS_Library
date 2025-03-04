@@ -2,4 +2,3 @@ outs:
 - md5: 30f69822c09b416d7a7839a8bb79582a
   size: 4043562
   path: VIVIENDA.DTA
-  hash: md5

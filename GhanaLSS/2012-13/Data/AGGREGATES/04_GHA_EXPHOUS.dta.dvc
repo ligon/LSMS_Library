@@ -2,4 +2,3 @@ outs:
 - md5: 4bf7aa676b14496ca683cfebac560056
   size: 1176876
   path: 04_GHA_EXPHOUS.dta
-  hash: md5

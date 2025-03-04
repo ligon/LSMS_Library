@@ -2,4 +2,3 @@ outs:
 - md5: 23010bad23a6f6f1634ad8e562edf4bc
   size: 24423441
   path: ECVMA2_MS12P1.dta
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: 7d5ba9c27a1bc86b315cf863df3daeb9
   size: 36120079
   path: 2012ihses18_durables.dta
-  hash: md5

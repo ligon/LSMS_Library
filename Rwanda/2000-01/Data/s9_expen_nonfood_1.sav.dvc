@@ -1,4 +1,3 @@
 outs:
 - md5: c6b3ea93d90eec474349b5819dedfa3a
   path: s9_expen_nonfood_1.sav
-  hash: md5

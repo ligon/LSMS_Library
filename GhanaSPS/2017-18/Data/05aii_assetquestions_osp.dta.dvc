@@ -2,4 +2,3 @@ outs:
 - md5: 61abe77e8cd1357e426ddb70933a6488
   size: 155921
   path: 05aii_assetquestions_osp.dta
-  hash: md5

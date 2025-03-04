@@ -2,4 +2,3 @@ outs:
 - md5: 2bd1c355617d98235d0245e44915a669
   size: 2653190
   path: child_labour.dta
-  hash: md5

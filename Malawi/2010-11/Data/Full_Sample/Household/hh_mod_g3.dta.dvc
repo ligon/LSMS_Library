@@ -2,4 +2,3 @@ outs:
 - md5: 4932d3514a494e7b7d992c23ef3b5214
   size: 1141370
   path: hh_mod_g3.dta
-  hash: md5

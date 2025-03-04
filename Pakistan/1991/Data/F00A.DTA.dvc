@@ -2,4 +2,3 @@ outs:
 - md5: b2b05f289542bfd997bc322114202410
   size: 200364
   path: F00A.DTA
-  hash: md5

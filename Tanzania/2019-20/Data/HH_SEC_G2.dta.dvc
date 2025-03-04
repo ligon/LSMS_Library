@@ -2,4 +2,3 @@ outs:
 - md5: c956533b7c7163bb43fbe9973e6b93a7
   size: 446831
   path: HH_SEC_G2.dta
-  hash: md5

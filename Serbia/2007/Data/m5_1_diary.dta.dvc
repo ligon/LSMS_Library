@@ -2,4 +2,3 @@ outs:
 - md5: 01a7adb992cd1395478642562d646597
   size: 39935885
   path: m5_1_diary.dta
-  hash: md5

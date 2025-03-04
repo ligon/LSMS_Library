@@ -2,4 +2,3 @@ outs:
 - md5: 3e433ed19eea6e429195fbd560ee7070
   size: 1116406
   path: Pov_final.dta
-  hash: md5

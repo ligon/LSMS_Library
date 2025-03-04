@@ -2,4 +2,3 @@ outs:
 - md5: 39e40a142199e4279accceb92b1c2e83
   size: 665815
   path: agr_d_cl_2.dta
-  hash: md5

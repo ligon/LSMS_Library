@@ -2,4 +2,3 @@ outs:
 - md5: d23b08ad18baaf6379fde76da7b7209d
   size: 125430
   path: A-AGRO1M.DTA
-  hash: md5

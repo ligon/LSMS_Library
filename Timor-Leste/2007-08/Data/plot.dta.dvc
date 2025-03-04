@@ -2,4 +2,3 @@ outs:
 - md5: 3370dbb8e5763a75d8c69a0bdedb0233
   size: 286788
   path: plot.dta
-  hash: md5

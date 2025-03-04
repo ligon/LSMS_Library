@@ -2,4 +2,3 @@ outs:
 - md5: 72e194acecc809a4703e39bf0577bb48
   size: 1088626
   path: r2m4b.dta
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: 98a216fd76af0aeb72ffa11fb100e774
   size: 45268
   path: sm4b.dta
-  hash: md5

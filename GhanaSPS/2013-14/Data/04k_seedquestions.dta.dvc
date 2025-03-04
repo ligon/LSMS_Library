@@ -2,4 +2,3 @@ outs:
 - md5: 87782739951e08be47d57257c0fee0a1
   size: 2209011
   path: 04k_seedquestions.dta
-  hash: md5

@@ -1,4 +1,3 @@
 outs:
 - md5: 8e616f918a77259be1d0c277931d8b7d
   path: CSEC4K_1.dta
-  hash: md5

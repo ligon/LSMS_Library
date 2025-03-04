@@ -2,4 +2,3 @@ outs:
 - md5: 70da3251fc7ad44cad4cb29ba98dc370
   size: 7818681
   path: H_12.dta
-  hash: md5

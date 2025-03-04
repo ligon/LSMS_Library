@@ -2,4 +2,3 @@ outs:
 - md5: fabf699029104c109206fc8a707c4007
   size: 140352
   path: DEFLSCL5.DTA
-  hash: md5

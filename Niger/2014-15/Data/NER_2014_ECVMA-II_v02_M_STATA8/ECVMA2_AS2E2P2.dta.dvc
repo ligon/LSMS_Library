@@ -2,4 +2,3 @@ outs:
 - md5: 2814e0cf3c9d245d0ced27bd57391826
   size: 839117
   path: ECVMA2_AS2E2P2.dta
-  hash: md5

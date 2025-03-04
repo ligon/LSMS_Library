@@ -2,4 +2,3 @@ outs:
 - md5: 140360e7090a12ac7f4dce73f718b67f
   size: 804716
   path: 03bi_borrowingquestions.dta
-  hash: md5

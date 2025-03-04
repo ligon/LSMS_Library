@@ -2,4 +2,3 @@ outs:
 - md5: 4baa7762f027773393c184332ed10581
   size: 26863
   path: durableaggregate.dta
-  hash: md5

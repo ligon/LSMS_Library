@@ -2,4 +2,3 @@ outs:
 - md5: e0098d36cb197225d222429126304af3
   size: 1327625
   path: SSEC3.DTA
-  hash: md5

@@ -1,4 +1,3 @@
 outs:
 - md5: d106f1e4bc190c59667087df95e44086
   path: s9_expen_avail.sav
-  hash: md5

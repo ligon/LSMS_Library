@@ -2,4 +2,3 @@ outs:
 - md5: 364d1d470208b40d5bf78891e0d2ccb8
   size: 264087
   path: SEC6q10.dta
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: 8925253ab9c8c6479fb927b8f6c7130e
   size: 510816
   path: emc2014_p1_logement_27022015.dta
-  hash: md5

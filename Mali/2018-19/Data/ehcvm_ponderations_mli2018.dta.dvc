@@ -2,4 +2,3 @@ outs:
 - md5: 39f91296d0596a72fd63d4b7eb094a66
   size: 3884
   path: ehcvm_ponderations_mli2018.dta
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: 0d147db28f969ca37d17d08370000f2a
   size: 455517
   path: secta_plantingw4.csv
-  hash: md5

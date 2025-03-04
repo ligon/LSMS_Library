@@ -2,4 +2,3 @@ outs:
 - md5: 8a663ea2da03642c6068842de246690f
   size: 1439466
   path: SEC3d.dta
-  hash: md5

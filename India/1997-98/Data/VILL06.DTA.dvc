@@ -2,4 +2,3 @@ outs:
 - md5: 8defe85f63b2e1365d492ea960802645
   size: 1164
   path: VILL06.DTA
-  hash: md5

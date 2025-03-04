@@ -2,4 +2,3 @@ outs:
 - md5: 8de180902e53a520188035c3b0f5cb28
   size: 35316
   path: HHSIZE.dta
-  hash: md5

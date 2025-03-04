@@ -2,4 +2,3 @@ outs:
 - md5: 263ee57fac46e2ea99a4c0a7baffd094
   size: 1140
   path: GITEMNF1.dta
-  hash: md5

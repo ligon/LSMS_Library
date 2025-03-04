@@ -2,4 +2,3 @@ outs:
 - md5: 8d5cd768870e7783c96f247f37230ea0
   size: 1262331
   path: 05ai_basicinfo.dta
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: 54a3cfc4ebb14596e9af2d14536094de
   size: 415052
   path: ecvmaco2_p2_en.dta
-  hash: md5

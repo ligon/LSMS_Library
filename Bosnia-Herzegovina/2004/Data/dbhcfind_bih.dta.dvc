@@ -2,4 +2,3 @@ outs:
 - md5: f2b620c3668f6119fc7921890a064569
   size: 704806
   path: dbhcfind_bih.dta
-  hash: md5

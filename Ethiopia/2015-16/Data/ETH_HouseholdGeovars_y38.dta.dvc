@@ -2,4 +2,3 @@ outs:
 - md5: 6a94f43408f77840a4ac64d06e419af7
   size: 663122
   path: ETH_HouseholdGeovars_y38.dta
-  hash: md5

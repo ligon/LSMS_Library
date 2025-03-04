@@ -2,4 +2,3 @@ outs:
 - md5: 89d0f11fd39af8c7f24b99d31789407d
   size: 146356
   path: S4AI.dta
-  hash: md5

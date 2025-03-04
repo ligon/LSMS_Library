@@ -2,4 +2,3 @@ outs:
 - md5: c0796dd49ffed5e5dfd34559302d4d63
   size: 480863
   path: KOMMU.dta
-  hash: md5

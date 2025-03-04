@@ -2,4 +2,3 @@ outs:
 - md5: dcb8690aaa3abfea8d5ccd6b3f42fb54
   size: 24567
   path: HH_SEC_G1AX.dta
-  hash: md5

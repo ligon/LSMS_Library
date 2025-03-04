@@ -2,4 +2,3 @@ outs:
 - md5: b2e70bf2234b194848f38c1436e57ed3
   size: 39123
   path: R9_2.dta
-  hash: md5

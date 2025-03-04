@@ -2,4 +2,3 @@ outs:
 - md5: 7d9826c71498d13077a605c23a2a0b8d
   size: 5171810
   path: FINCA2.DTA
-  hash: md5

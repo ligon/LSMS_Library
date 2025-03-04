@@ -2,4 +2,3 @@ outs:
 - md5: 92f85428198916d851a0aef2cbfcc751
   size: 7002891
   path: 2007ihses16_durable_goods.dta
-  hash: md5

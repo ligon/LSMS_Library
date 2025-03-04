@@ -2,4 +2,3 @@ outs:
 - md5: dc03f1832290d7a76db5c7d6d3f1438c
   size: 35366
   path: grappe_gps_ner2018.dta
-  hash: md5

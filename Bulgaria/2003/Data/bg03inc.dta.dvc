@@ -2,4 +2,3 @@ outs:
 - md5: 8c420ddc3f9dc75dfa403d49f8f6c428
   size: 479749
   path: bg03inc.dta
-  hash: md5

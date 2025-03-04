@@ -1,4 +1,3 @@
 outs:
 - md5: acacbe67d349007ea37ba2e3dc64a535
   path: MSCHOOLB.DAT
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: 36aaca6b2c4e0516e3d728b2ed3fa1ca
   size: 192069
   path: INC1.DTA
-  hash: md5

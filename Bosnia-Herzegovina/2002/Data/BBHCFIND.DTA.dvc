@@ -2,4 +2,3 @@ outs:
 - md5: 1d936e5ddc38ae7bd39d955dceeed68f
   size: 939676
   path: BBHCFIND.DTA
-  hash: md5

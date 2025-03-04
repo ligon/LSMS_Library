@@ -2,4 +2,3 @@ outs:
 - md5: fa87eb2c721152ed105a50e3b90e0e5b
   size: 383
   path: CCPP4.VAR
-  hash: md5

@@ -1,4 +1,3 @@
 outs:
 - md5: 78c0268f747638e582b8d12d8eafd72a
   path: SEC11C.DAT
-  hash: md5

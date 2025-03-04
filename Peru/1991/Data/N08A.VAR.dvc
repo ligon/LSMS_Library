@@ -2,4 +2,3 @@ outs:
 - md5: 8cf97d0a430ca09cd9d2dedbc55ba65a
   size: 43
   path: N08A.VAR
-  hash: md5

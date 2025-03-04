@@ -2,4 +2,3 @@ outs:
 - md5: 3bb104f12c39d8162e229cfba739cb44
   size: 1013333
   path: sect6_harvestw3.csv
-  hash: md5

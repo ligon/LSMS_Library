@@ -2,4 +2,3 @@ outs:
 - md5: 237cb922b7f20aeaa4fa6389e8d87ae4
   size: 342513
   path: hh_sec_q1.dta
-  hash: md5

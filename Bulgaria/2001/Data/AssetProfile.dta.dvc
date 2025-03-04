@@ -2,4 +2,3 @@ outs:
 - md5: e9ce9b2bd592e1370e92dc0dd3198810
   size: 17193
   path: AssetProfile.dta
-  hash: md5

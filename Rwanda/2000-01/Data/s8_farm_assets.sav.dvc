@@ -1,4 +1,3 @@
 outs:
 - md5: cccbdacfbc5605f58b49e9cce14e585a
   path: s8_farm_assets.sav
-  hash: md5

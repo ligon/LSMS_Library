@@ -2,4 +2,3 @@ outs:
 - md5: 8bc82da5af814a16a1a1da598b591c4f
   size: 130830
   path: SECT14B.DTA
-  hash: md5

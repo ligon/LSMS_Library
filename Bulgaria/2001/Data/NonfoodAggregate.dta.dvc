@@ -2,4 +2,3 @@ outs:
 - md5: d3728b47ef55ef8269a4777773f3a028
   size: 324027
   path: NonfoodAggregate.dta
-  hash: md5

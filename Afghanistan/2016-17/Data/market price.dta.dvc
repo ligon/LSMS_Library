@@ -2,4 +2,3 @@ outs:
 - md5: eb763ef4d056647c5fefa7321167bd41
   size: 323264
   path: market price.dta
-  hash: md5

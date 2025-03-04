@@ -2,4 +2,3 @@ outs:
 - md5: 75ce35abefe813d5e91972ab721cc64e
   size: 362080
   path: SUB_AFAR.DTA
-  hash: md5

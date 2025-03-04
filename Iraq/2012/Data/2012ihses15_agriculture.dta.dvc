@@ -2,4 +2,3 @@ outs:
 - md5: b25aca06eabd0995738e788a30d4f664
   size: 10715747
   path: 2012ihses15_agriculture.dta
-  hash: md5

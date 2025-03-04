@@ -2,4 +2,3 @@ outs:
 - md5: 590a981bda891d12e9655a9ea14f4f56
   size: 13223046
   path: sect8_2_ls_w3.dta
-  hash: md5

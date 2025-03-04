@@ -2,4 +2,3 @@ outs:
 - md5: 9c8c05fff742c93818f6ac2c2d436c76
   size: 82980156
   path: sect11_public.dta
-  hash: md5

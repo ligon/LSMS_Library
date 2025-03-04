@@ -2,4 +2,3 @@ outs:
 - md5: ba7fbd40e0e3aa44b3193d77478909b7
   size: 597737
   path: HHSeasonMonth.dta
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: 950fc7acefaa8978c588f3c7c9bb5dba
   size: 362
   path: PLOTS.VAR
-  hash: md5

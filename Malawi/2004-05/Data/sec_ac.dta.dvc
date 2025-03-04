@@ -2,4 +2,3 @@ outs:
 - md5: 1deb5e1f5c2f90af5238359886f8735e
   size: 248805
   path: sec_ac.dta
-  hash: md5

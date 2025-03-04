@@ -2,4 +2,3 @@ outs:
 - md5: 52fcde45197ba866c4472fff6d55c5f9
   size: 122563
   path: FILE09V0.dta
-  hash: md5

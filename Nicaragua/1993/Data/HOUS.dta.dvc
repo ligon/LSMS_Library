@@ -2,4 +2,3 @@ outs:
 - md5: a7a6919ad84ac345ae27f4a3f311dcb2
   size: 741502
   path: HOUS.dta
-  hash: md5

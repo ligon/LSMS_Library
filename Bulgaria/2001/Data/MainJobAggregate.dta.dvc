@@ -2,4 +2,3 @@ outs:
 - md5: 3b0883818c2677d68353f4d0c3172634
   size: 51200
   path: MainJobAggregate.dta
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: 7b924eddd5dda7c12358e4cc749ffd03
   size: 411938
   path: 02a_nr_relatives.dta
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: 97fccc2288ecae2ee0f9f6d3536d8a9e
   size: 69315
   path: ownconsumptionaggregate.dta
-  hash: md5

@@ -1,4 +1,3 @@
 outs:
 - md5: 2050575797fe45a4c64bc1e7e72e90f1
   path: s8_farm_smallscale1.sav
-  hash: md5

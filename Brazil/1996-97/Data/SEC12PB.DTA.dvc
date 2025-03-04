@@ -2,4 +2,3 @@ outs:
 - md5: 576a64271000c7fe380a857cc7c982db
   size: 716342
   path: SEC12PB.DTA
-  hash: md5

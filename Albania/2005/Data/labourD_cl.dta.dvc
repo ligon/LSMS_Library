@@ -2,4 +2,3 @@ outs:
 - md5: 8e293c123e81e2fef95d3215668c83b7
   size: 241508
   path: labourD_cl.dta
-  hash: md5

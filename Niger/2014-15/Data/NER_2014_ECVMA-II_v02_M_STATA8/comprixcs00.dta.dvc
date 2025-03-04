@@ -2,4 +2,3 @@ outs:
 - md5: b3c0a5015b78b363e72319599973029e
   size: 29428
   path: comprixcs00.dta
-  hash: md5

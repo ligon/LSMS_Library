@@ -2,4 +2,3 @@ outs:
 - md5: ecd48b8c47fc8bebfb8829d3fc17d947
   size: 239781
   path: INC13.DTA
-  hash: md5

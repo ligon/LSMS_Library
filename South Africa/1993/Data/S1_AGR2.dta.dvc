@@ -2,4 +2,3 @@ outs:
 - md5: ddf7c49d15532ac0440be839e45252c1
   size: 67112
   path: S1_AGR2.dta
-  hash: md5

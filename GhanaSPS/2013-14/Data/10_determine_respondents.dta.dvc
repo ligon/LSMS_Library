@@ -2,4 +2,3 @@ outs:
 - md5: 6e8af104abbf4338898e761da158c766
   size: 113952
   path: 10_determine_respondents.dta
-  hash: md5

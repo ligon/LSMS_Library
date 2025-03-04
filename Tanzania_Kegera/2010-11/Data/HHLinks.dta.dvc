@@ -2,4 +2,3 @@ outs:
 - md5: 999c713ec9473554ce48866284ac6947
   size: 2119423
   path: HHLinks.dta
-  hash: md5

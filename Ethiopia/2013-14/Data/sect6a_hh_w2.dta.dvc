@@ -2,4 +2,3 @@ outs:
 - md5: 25f451a3aa1f560b1d7fbf617a63a845
   size: 7645728
   path: sect6a_hh_w2.dta
-  hash: md5

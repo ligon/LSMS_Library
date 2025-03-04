@@ -2,4 +2,3 @@ outs:
 - md5: 46a8b1925d2afa1ec8d8f434120d514b
   size: 34298
   path: SAMPLE01.dta
-  hash: md5

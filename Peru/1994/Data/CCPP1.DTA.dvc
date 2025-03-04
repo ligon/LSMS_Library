@@ -2,4 +2,3 @@ outs:
 - md5: 4b86ae0f6f271b33662507e7a0497495
   size: 10537
   path: CCPP1.DTA
-  hash: md5

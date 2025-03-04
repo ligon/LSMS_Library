@@ -2,4 +2,3 @@ outs:
 - md5: 64ad8de63730d1c9f8275fc435dcf407
   size: 3293599
   path: INC_AGRI.dta
-  hash: md5

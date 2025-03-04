@@ -2,4 +2,3 @@ outs:
 - md5: ec6917fd1168523268749b65550f3bca
   size: 1270812
   path: sect12_ph_w3.dta
-  hash: md5

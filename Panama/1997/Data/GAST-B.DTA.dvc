@@ -2,4 +2,3 @@ outs:
 - md5: cd8489b646b7a6825d46df71b42604ec
   size: 6101842
   path: GAST-B.DTA
-  hash: md5

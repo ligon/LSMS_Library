@@ -2,4 +2,3 @@ outs:
 - md5: 09d20b1d52881e67db0d80af6d4f01b1
   size: 16555524
   path: ns_m7_food.dta
-  hash: md5

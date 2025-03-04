@@ -2,4 +2,3 @@ outs:
 - md5: f76e960295e485c98e2c3709cd4ddedf
   size: 10682492
   path: ehcvm_conso_ner2018.dta
-  hash: md5

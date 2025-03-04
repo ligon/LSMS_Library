@@ -2,4 +2,3 @@ outs:
 - md5: fa66e9e4548eb81561cf289ea57822f9
   size: 4772
   path: S4_EDUC1.dta
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: 71ef661b71c6c17efe1b6f7f4215f397
   size: 7121287
   path: ECV28A16.DTA
-  hash: md5

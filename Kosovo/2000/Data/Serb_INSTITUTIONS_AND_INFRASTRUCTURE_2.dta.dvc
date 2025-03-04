@@ -2,4 +2,3 @@ outs:
 - md5: 195dcaf68ab39585f6e6e0f0c87bd60b
   size: 5044
   path: Serb_INSTITUTIONS_AND_INFRASTRUCTURE_2.dta
-  hash: md5

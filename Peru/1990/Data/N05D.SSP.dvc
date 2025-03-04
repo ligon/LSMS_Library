@@ -2,4 +2,3 @@ outs:
 - md5: 600c08495d26ce72ecb3050d129054be
   size: 72560
   path: N05D.SSP
-  hash: md5

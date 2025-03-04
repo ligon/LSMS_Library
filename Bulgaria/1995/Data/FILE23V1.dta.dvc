@@ -2,4 +2,3 @@ outs:
 - md5: 91ac73095276d4b68febaf09d4cde28d
   size: 12826
   path: FILE23V1.dta
-  hash: md5

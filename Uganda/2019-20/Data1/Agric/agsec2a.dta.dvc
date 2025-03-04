@@ -2,4 +2,3 @@ outs:
 - md5: 19c4a752deffeb636b7de2ef9c37479d
   size: 490104
   path: agsec2a.dta
-  hash: md5

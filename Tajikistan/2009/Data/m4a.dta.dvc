@@ -2,4 +2,3 @@ outs:
 - md5: 02b6df4672f203d6c8d42c3e6ca6bda3
   size: 1049959
   path: m4a.dta
-  hash: md5

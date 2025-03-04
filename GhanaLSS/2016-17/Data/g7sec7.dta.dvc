@@ -1,4 +1,3 @@
 outs:
 - md5: 56cbc3960800b58bad4bd89c11916852
   path: g7sec7.dta
-  hash: md5

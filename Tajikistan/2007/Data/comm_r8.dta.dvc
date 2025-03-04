@@ -2,4 +2,3 @@ outs:
 - md5: 3f232df6448f0ed83cabf441ee66cea5
   size: 565034
   path: comm_r8.dta
-  hash: md5

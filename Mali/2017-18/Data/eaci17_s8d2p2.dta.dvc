@@ -2,4 +2,3 @@ outs:
 - md5: c19aefc8a5438d9ba73c478b7be9d5ee
   size: 2597468
   path: eaci17_s8d2p2.dta
-  hash: md5

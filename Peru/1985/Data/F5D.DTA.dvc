@@ -2,4 +2,3 @@ outs:
 - md5: 19d2080264b54e961747aef1602b2555
   size: 1011224
   path: F5D.DTA
-  hash: md5

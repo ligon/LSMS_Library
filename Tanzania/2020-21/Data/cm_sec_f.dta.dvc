@@ -2,4 +2,3 @@ outs:
 - md5: f3cb88d1f73820fb62b222beb8a8d869
   size: 107761
   path: cm_sec_f.dta
-  hash: md5

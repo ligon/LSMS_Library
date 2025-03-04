@@ -1,4 +1,3 @@
 outs:
 - md5: 82869033f1080e53393765e63e6f37d0
   path: DRUG.DAT
-  hash: md5

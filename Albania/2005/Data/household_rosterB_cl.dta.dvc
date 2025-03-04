@@ -2,4 +2,3 @@ outs:
 - md5: 265cffd9629474b6ea6de858cc1af68d
   size: 385465
   path: household_rosterB_cl.dta
-  hash: md5

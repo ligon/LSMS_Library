@@ -2,4 +2,3 @@ outs:
 - md5: de72ad032ec71c0a5e75760a2b945403
   size: 1342875
   path: AdjustedTotalAggregate.dta
-  hash: md5

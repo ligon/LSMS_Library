@@ -2,4 +2,3 @@ outs:
 - md5: 2ad0c76a1d0107b9849bb0c75f1dca1e
   size: 132421
   path: community_dups.dta
-  hash: md5

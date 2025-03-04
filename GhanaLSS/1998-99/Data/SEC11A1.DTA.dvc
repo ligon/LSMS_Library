@@ -2,4 +2,3 @@ outs:
 - md5: 818087447dc0b93a0f4ef91086182675
   size: 239950
   path: SEC11A1.DTA
-  hash: md5

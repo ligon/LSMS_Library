@@ -2,4 +2,3 @@ outs:
 - md5: 465701db182cf94ee6d39c9045e5c982
   size: 973300
   path: HHCHAR.dta
-  hash: md5

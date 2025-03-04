@@ -1,4 +1,3 @@
 outs:
 - md5: 9b0e6c70b799641bba15648b8cfe8a55
   path: SEC09A2.DAT
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: 50cf8b9eb3564365ff044a72ad8d495c
   size: 100
   path: REG30.VAR
-  hash: md5

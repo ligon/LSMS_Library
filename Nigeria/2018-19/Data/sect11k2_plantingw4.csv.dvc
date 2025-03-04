@@ -2,4 +2,3 @@ outs:
 - md5: fc4f9225f293c8b28530d6c2753b9b34
   size: 128393
   path: sect11k2_plantingw4.csv
-  hash: md5

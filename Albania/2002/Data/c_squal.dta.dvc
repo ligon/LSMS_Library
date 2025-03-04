@@ -2,4 +2,3 @@ outs:
 - md5: 2b608028e498d5cfa5edf1d4b9887c43
   size: 10550
   path: c_squal.dta
-  hash: md5

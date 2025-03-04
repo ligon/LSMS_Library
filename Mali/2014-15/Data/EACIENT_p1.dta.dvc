@@ -2,4 +2,3 @@ outs:
 - md5: 8136afdc9c011e0a7e81b214cbf6f386
   size: 767726
   path: EACIENT_p1.dta
-  hash: md5

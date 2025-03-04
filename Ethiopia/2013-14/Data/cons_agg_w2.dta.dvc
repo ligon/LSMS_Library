@@ -2,4 +2,3 @@ outs:
 - md5: 3c28f2d18a51e5bf870addc0f1b079b7
   size: 634834
   path: cons_agg_w2.dta
-  hash: md5

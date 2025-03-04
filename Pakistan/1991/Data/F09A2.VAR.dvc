@@ -2,4 +2,3 @@ outs:
 - md5: 8192fe5dd955fd385f77d4f923a8085f
   size: 542
   path: F09A2.VAR
-  hash: md5

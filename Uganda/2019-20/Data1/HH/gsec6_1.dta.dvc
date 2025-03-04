@@ -2,4 +2,3 @@ outs:
 - md5: 9c8f6c361fc98279a3ff4a89e3255a50
   size: 1267759
   path: gsec6_1.dta
-  hash: md5

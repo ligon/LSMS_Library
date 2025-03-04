@@ -1,5 +1,3 @@
 outs:
 - md5: cefadb197f168d941ae7a628699196a8
   path: AGSEC10.dta
-  size: 2248552
-  hash: md5

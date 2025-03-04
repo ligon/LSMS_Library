@@ -2,4 +2,3 @@ outs:
 - md5: a501967b57dd3bbdc64082dac8059311
   size: 16231153
   path: R5_1.dta
-  hash: md5

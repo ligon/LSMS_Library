@@ -2,4 +2,3 @@ outs:
 - md5: c5727b19ad933e8290f6b969e4b8838d
   size: 99138
   path: M12.DTA
-  hash: md5

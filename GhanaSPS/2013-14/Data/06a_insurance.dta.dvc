@@ -2,4 +2,3 @@ outs:
 - md5: 7fb2cc52d09793f71a2efbc709189aee
   size: 5403971
   path: 06a_insurance.dta
-  hash: md5

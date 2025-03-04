@@ -2,4 +2,3 @@ outs:
 - md5: 5dd9f0b32d37afd197be2caa3e789efb
   size: 48619
   path: mop_8_social_programs.dta
-  hash: md5

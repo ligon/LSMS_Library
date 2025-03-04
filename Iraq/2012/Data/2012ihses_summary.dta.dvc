@@ -2,4 +2,3 @@ outs:
 - md5: 79752f6fcbe4bf6330f3856d270b43bc
   size: 4669759
   path: 2012ihses_summary.dta
-  hash: md5

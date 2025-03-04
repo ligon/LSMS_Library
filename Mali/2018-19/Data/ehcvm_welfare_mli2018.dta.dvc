@@ -2,4 +2,3 @@ outs:
 - md5: f35d9e5977c7ec2ed056afa63855cb72
   size: 636890
   path: ehcvm_welfare_mli2018.dta
-  hash: md5

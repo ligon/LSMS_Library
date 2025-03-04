@@ -2,4 +2,3 @@ outs:
 - md5: 9cba05dc9e621e2af265b059be79f74e
   size: 153
   path: F14.VAR
-  hash: md5
