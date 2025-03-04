@@ -1,3 +1,4 @@
 outs:
 - md5: f58d9e0a2b88d7b3a47a516bc2f4a82c
   path: csec5.dta
+  hash: md5

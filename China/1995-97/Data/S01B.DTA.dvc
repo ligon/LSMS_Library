@@ -2,3 +2,4 @@ outs:
 - md5: 26e184d29254219c7e92f776a866a3ba
   size: 77363
   path: S01B.DTA
+  hash: md5

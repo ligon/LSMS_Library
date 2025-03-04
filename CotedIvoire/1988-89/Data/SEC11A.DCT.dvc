@@ -1,3 +1,4 @@
 outs:
 - md5: f4a5d364c2b6952421c74624d022985c
   path: SEC11A.DCT
+  hash: md5

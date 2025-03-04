@@ -2,3 +2,4 @@ outs:
 - md5: 525e4d4528c2a95751f0b08eb4f9a0f6
   size: 3159314
   path: 01fiii_unemployed.dta
+  hash: md5

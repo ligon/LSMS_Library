@@ -2,3 +2,4 @@ outs:
 - md5: 20de64da9918501b30cbd422b2f540a6
   size: 2211742
   path: EACISECURITE_p2.dta
+  hash: md5

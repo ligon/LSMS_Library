@@ -2,3 +2,4 @@ outs:
 - md5: 6b114fc9c99bd26b36667ae59f6ed4f7
   size: 19404
   path: ns_m3_firm.dta
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: a9760902c6a4a4dc654d5af1823c176b
   size: 3967380
   path: w2_ind_all.dta
+  hash: md5

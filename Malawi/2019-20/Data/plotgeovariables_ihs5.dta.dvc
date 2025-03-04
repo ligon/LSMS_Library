@@ -2,3 +2,4 @@ outs:
 - md5: 1aec45d9fd02c89a0debbba384a009f8
   size: 747809
   path: plotgeovariables_ihs5.dta
+  hash: md5

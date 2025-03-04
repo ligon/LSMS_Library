@@ -2,3 +2,4 @@ outs:
 - md5: 1f7d6dc5f8a11e4c55f6f8023245ebf7
   size: 3097883
   path: ag_mod_q.dta
+  hash: md5

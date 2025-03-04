@@ -1,3 +1,4 @@
 outs:
 - md5: 4a56cb32b923dd484383d3ebace7b003
   path: WEIGHT88.DAT
+  hash: md5

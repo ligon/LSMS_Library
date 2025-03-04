@@ -2,3 +2,4 @@ outs:
 - md5: 85d3896eb58495e698538021fd9c2e18
   size: 3455
   path: other_income.dta
+  hash: md5

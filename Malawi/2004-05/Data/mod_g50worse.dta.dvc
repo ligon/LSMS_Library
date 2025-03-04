@@ -2,3 +2,4 @@ outs:
 - md5: 277d03a6e4976e06400e02c7c432def1
   size: 75500
   path: mod_g50worse.dta
+  hash: md5

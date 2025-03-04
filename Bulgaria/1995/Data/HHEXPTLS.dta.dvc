@@ -2,3 +2,4 @@ outs:
 - md5: 78abad8581c11d0839a454ca57370aeb
   size: 632334
   path: HHEXPTLS.dta
+  hash: md5

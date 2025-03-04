@@ -2,3 +2,4 @@ outs:
 - md5: 2aa5ecd7d641363bbe1d67dfde889f97
   size: 9920
   path: 17fincas_vendidas.dta
+  hash: md5

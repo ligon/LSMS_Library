@@ -2,3 +2,4 @@ outs:
 - md5: 16d668eb26c60aebec93d18bfce30571
   size: 5949
   path: Serb_RESPONDENT_CHARACTERISTICS.dta
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: a9cfdf4b84de2e2a62a2ec4146fe2cea
   size: 10705
   path: Serb_BASIC_COMMUNITY_CHARACTERISTICS.dta
+  hash: md5

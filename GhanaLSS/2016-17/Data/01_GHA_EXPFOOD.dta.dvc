@@ -1,3 +1,4 @@
 outs:
 - md5: cceef10c0c44adbd84dc26bc946c991e
   path: 01_GHA_EXPFOOD.dta
+  hash: md5

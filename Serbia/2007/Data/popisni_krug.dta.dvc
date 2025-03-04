@@ -2,3 +2,4 @@ outs:
 - md5: 62d2c840a466e0cfd801308995de4067
   size: 184762
   path: popisni_krug.dta
+  hash: md5

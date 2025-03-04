@@ -2,3 +2,4 @@ outs:
 - md5: 22c850996be8decf7020b81316520fc7
   size: 715
   path: calorias_producto_pp.dta
+  hash: md5

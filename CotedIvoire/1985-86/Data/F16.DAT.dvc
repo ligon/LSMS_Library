@@ -1,3 +1,4 @@
 outs:
 - md5: fc6d3c80808eb925fad98992490280e2
   path: F16.DAT
+  hash: md5

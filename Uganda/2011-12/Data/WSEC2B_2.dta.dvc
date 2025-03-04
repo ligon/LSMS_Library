@@ -1,3 +1,4 @@
 outs:
 - md5: ed5e375174eb4dee3568bfc6ff641422
   path: WSEC2B_2.dta
+  hash: md5

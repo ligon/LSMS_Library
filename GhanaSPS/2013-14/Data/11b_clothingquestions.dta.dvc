@@ -2,3 +2,4 @@ outs:
 - md5: e4e810473c6ba7b8de9c3102f3b3659a
   size: 3892812
   path: 11b_clothingquestions.dta
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: aa4934c481c6243348447af2192a1fbb
   size: 168
   path: SYS13I.VAR
+  hash: md5

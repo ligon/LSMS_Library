@@ -1,3 +1,4 @@
 outs:
 - md5: 2cf8601c4cb135ec68be57476dcd1bd7
   path: SEC13A.DAT
+  hash: md5

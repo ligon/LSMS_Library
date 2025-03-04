@@ -2,3 +2,4 @@ outs:
 - md5: dea9b55b809569e8dd5296345df21013
   size: 2765834
   path: ndurables_cl.dta
+  hash: md5

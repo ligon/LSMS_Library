@@ -2,3 +2,4 @@ outs:
 - md5: b71d2388eb355d9511ad123deee6a732
   size: 66
   path: DEFLSCL5.VAR
+  hash: md5

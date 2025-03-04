@@ -2,3 +2,4 @@ outs:
 - md5: ec4c14b90f34b01cc7c55a6007d9c882
   size: 305548
   path: sect7_hh_w1.dta
+  hash: md5

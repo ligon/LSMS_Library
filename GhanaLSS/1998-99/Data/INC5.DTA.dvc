@@ -2,3 +2,4 @@ outs:
 - md5: dadac3104b8edeea86cbf8608ce36e6d
   size: 1703
   path: INC5.DTA
+  hash: md5

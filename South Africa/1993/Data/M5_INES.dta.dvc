@@ -2,3 +2,4 @@ outs:
 - md5: b647520f120158da4d372e48fa4809cf
   size: 44560
   path: M5_INES.dta
+  hash: md5

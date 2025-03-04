@@ -2,3 +2,4 @@ outs:
 - md5: 8750f60eba2243bb11a6ba0bf327e11f
   size: 260499
   path: com_cd.dta
+  hash: md5

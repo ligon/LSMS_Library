@@ -2,3 +2,4 @@ outs:
 - md5: 494cee684efbfb280cea5e567f7aea24
   size: 3550821
   path: EACICHOC_p2.dta
+  hash: md5

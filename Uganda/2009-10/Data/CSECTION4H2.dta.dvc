@@ -1,3 +1,4 @@
 outs:
 - md5: 4ae051b4e854b6cb81660fdf3615fe81
   path: CSECTION4H2.dta
+  hash: md5

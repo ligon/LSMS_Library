@@ -2,3 +2,4 @@ outs:
 - md5: e5966714cad05101739ac9d97aec17c5
   size: 49945
   path: Food_CF_Wave2.dta
+  hash: md5

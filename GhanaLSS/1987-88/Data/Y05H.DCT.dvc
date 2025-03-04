@@ -1,3 +1,4 @@
 outs:
 - md5: 25e9f196e039ed81bc47b6dc542f10c0
   path: Y05H.DCT
+  hash: md5

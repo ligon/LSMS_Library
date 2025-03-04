@@ -2,3 +2,4 @@ outs:
 - md5: 41eae5ce13fa1d5787afcd72cc1df101
   size: 2371374
   path: S4BII.dta
+  hash: md5

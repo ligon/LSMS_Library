@@ -2,3 +2,4 @@ outs:
 - md5: d9a1572d900121a4f67dacefc685d27e
   size: 994920
   path: health.dta
+  hash: md5

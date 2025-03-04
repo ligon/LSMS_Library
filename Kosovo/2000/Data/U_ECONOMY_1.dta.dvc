@@ -2,3 +2,4 @@ outs:
 - md5: 0c5d173d25e7019a1e372956ff4577a7
   size: 11161
   path: U_ECONOMY_1.dta
+  hash: md5

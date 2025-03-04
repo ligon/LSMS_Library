@@ -2,3 +2,4 @@ outs:
 - md5: 00cb9014a8e78afe55b51819d3ad943e
   size: 18544167
   path: dbhiind_bih.dta
+  hash: md5

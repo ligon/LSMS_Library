@@ -1,3 +1,4 @@
 outs:
 - md5: a3c0b777f2d1e7b9159d6c6d385edb19
   path: CMEDUC88.WK1
+  hash: md5

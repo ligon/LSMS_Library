@@ -2,3 +2,4 @@ outs:
 - md5: 46cb27d360aba4399019a16b2ad27c16
   size: 20661
   path: SEC13PH1.DTA
+  hash: md5

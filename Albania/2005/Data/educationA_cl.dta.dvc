@@ -2,3 +2,4 @@ outs:
 - md5: 52ffdf0a00412972c31f46534176401e
   size: 383620
   path: educationA_cl.dta
+  hash: md5

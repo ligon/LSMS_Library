@@ -2,3 +2,4 @@ outs:
 - md5: 615eb936fb9e1fd78a9c5905999e5557
   size: 99947
   path: U_SCHOOL_FACILITIES.dta
+  hash: md5

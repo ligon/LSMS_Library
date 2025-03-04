@@ -2,3 +2,4 @@ outs:
 - md5: 6504464080fc39e3eb7e23183764482f
   size: 1002537
   path: EACIS01_p1.dta
+  hash: md5

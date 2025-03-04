@@ -2,3 +2,4 @@ outs:
 - md5: e4f82efe812d848c1b3f249c41af0e0d
   size: 5440
   path: PT0502A.DTA
+  hash: md5

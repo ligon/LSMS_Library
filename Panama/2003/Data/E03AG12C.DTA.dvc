@@ -2,3 +2,4 @@ outs:
 - md5: 37fbd41ca2fd1ac3a6c5d368c7ab782e
   size: 8822
   path: E03AG12C.DTA
+  hash: md5

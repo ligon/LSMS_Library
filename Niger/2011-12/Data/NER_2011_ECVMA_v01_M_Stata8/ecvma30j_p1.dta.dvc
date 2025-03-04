@@ -2,3 +2,4 @@ outs:
 - md5: 9af26c771aa42267eb4393c257323cae
   size: 4130454
   path: ecvma30j_p1.dta
+  hash: md5

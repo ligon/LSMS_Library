@@ -2,3 +2,4 @@ outs:
 - md5: 5f08684aa8942d500bc274710227188f
   size: 1776799
   path: 24sub_productos_animal.dta
+  hash: md5

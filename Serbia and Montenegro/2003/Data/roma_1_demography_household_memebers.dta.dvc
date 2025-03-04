@@ -2,3 +2,4 @@ outs:
 - md5: a6c19faa47206db497534dd798bc5cc3
   size: 120314
   path: roma_1_demography_household_memebers.dta
+  hash: md5

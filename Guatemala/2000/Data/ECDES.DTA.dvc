@@ -2,3 +2,4 @@ outs:
 - md5: 0f8221871fbe3d3f59eaff455f783b6e
   size: 2605101
   path: ECDES.DTA
+  hash: md5

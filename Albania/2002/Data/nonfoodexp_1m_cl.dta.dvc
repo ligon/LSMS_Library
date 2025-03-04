@@ -2,3 +2,4 @@ outs:
 - md5: c6024b0f1d0217aec82ea0c741746b75
   size: 2431317
   path: nonfoodexp_1m_cl.dta
+  hash: md5

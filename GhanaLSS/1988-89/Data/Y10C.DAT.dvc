@@ -1,3 +1,4 @@
 outs:
 - md5: c14c861e11acd2c79068cce440818b68
   path: Y10C.DAT
+  hash: md5

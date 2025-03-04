@@ -1,3 +1,4 @@
 outs:
 - md5: 7f74826c08611800911106158e584e42
   path: F09A1.DAT
+  hash: md5

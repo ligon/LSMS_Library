@@ -2,3 +2,4 @@ outs:
 - md5: c42130032d7285a5babfec9876abccaa
   size: 20700
   path: MIGRATN.dta
+  hash: md5

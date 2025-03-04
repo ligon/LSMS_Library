@@ -2,3 +2,4 @@ outs:
 - md5: 50aa0a4b9af8c556223e26f1e22cf8f2
   size: 685270
   path: EACIMAINOUVRE_p1.dta
+  hash: md5

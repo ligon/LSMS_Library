@@ -2,3 +2,4 @@ outs:
 - md5: 9e58de66040fd778163c7fc19b229326
   size: 1226
   path: PRECIOS.DCT
+  hash: md5

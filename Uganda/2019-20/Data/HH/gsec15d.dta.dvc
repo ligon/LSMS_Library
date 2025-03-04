@@ -2,3 +2,4 @@ outs:
 - md5: 81931ac8d76c631989ebec6a04bc7ca2
   size: 6667198
   path: gsec15d.dta
+  hash: md5

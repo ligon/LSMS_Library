@@ -2,3 +2,4 @@ outs:
 - md5: 07523e1fee3c284487381ad297b96b9a
   size: 3505030
   path: emc2014_p3_chocs_27022015.dta
+  hash: md5

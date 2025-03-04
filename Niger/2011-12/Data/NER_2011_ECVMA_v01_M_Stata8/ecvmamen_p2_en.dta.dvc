@@ -2,3 +2,4 @@ outs:
 - md5: 90fe70ed58210ade22e96a98ce430966
   size: 613504
   path: ecvmamen_p2_en.dta
+  hash: md5

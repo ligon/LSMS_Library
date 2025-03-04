@@ -2,3 +2,4 @@ outs:
 - md5: 14948468e78f132723c122b4f1dc7026
   size: 266681
   path: 09_childrens.dta
+  hash: md5

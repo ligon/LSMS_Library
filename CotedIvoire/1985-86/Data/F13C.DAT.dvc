@@ -1,3 +1,4 @@
 outs:
 - md5: a01e37f25993f109ca177da012a8ca2c
   path: F13C.DAT
+  hash: md5

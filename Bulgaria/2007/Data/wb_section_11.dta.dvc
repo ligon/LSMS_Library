@@ -2,3 +2,4 @@ outs:
 - md5: 6bcb0c3ff7591e6843dc48eba4728b46
   size: 250220
   path: wb_section_11.dta
+  hash: md5

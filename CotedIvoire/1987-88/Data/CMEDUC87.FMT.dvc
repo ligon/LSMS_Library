@@ -1,3 +1,4 @@
 outs:
 - md5: e308bd185e6e5e660e537cb0dc22ab0f
   path: CMEDUC87.FMT
+  hash: md5

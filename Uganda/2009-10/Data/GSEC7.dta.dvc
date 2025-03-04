@@ -1,3 +1,4 @@
 outs:
 - md5: 2542ede0564567edb85262d21fe49f85
   path: GSEC7.dta
+  hash: md5

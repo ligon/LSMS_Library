@@ -2,3 +2,4 @@ outs:
 - md5: 115271b28c362b3adcc51f1e168175d0
   size: 2604300
   path: SEC8C2.DTA
+  hash: md5

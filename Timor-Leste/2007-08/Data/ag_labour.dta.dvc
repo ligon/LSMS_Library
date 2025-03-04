@@ -2,3 +2,4 @@ outs:
 - md5: 4285a8e468ce492e9b9bbbd117797053
   size: 22889
   path: ag_labour.dta
+  hash: md5

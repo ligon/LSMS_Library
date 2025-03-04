@@ -2,3 +2,4 @@ outs:
 - md5: e9da4a4d55cba9c25c74dc8b8c780602
   size: 65607
   path: primary.dta
+  hash: md5

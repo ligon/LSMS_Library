@@ -2,3 +2,4 @@ outs:
 - md5: d321a8f6ec0e4eb8741b7bbdae76fde1
   size: 1080
   path: N13G.DTA
+  hash: md5

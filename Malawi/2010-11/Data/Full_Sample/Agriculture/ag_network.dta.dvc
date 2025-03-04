@@ -2,3 +2,4 @@ outs:
 - md5: 0225beb1509191f104a6786f9289f6ae
   size: 1855699
   path: ag_network.dta
+  hash: md5

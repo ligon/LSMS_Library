@@ -2,3 +2,4 @@ outs:
 - md5: 9ee96fe61b538ca5335cc664d5046424
   size: 679112
   path: ag_input.dta
+  hash: md5

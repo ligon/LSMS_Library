@@ -2,3 +2,4 @@ outs:
 - md5: d1884cee17e0a2a0abe1657df4e7a72a
   size: 1167829
   path: MISC_C.dta
+  hash: md5

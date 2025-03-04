@@ -1,3 +1,4 @@
 outs:
 - md5: 563ae18970b810393f49dec216dbd3db
   path: COMM87.DAT
+  hash: md5

@@ -2,3 +2,4 @@ outs:
 - md5: d3c9d5ea0256563dbda487ca2c89c460
   size: 2400370
   path: EACIFETE_p1.dta
+  hash: md5

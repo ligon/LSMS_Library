@@ -2,3 +2,4 @@ outs:
 - md5: 2c1a029666e57c6a6000e206de8744b5
   size: 1075140
   path: 12_GHA_EXPMISC.dta
+  hash: md5

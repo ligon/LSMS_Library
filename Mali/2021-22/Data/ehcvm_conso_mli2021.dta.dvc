@@ -1,0 +1,5 @@
+outs:
+- md5: 892b70d59b131429e15a6f9fc52278c5
+  size: 14584102
+  hash: md5
+  path: ehcvm_conso_mli2021.dta

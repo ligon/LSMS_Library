@@ -1,3 +1,4 @@
 outs:
 - md5: e31b6b0c2e99d1931a4aae4da63f33ab
   path: F02.DCT
+  hash: md5

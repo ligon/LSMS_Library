@@ -2,3 +2,4 @@ outs:
 - md5: ea4c4532dbb2f4f7e91feba7e9125901
   size: 44243
   path: INPSE.dta
+  hash: md5

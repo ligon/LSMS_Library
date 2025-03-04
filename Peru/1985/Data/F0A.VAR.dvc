@@ -2,3 +2,4 @@ outs:
 - md5: dfb020282ddf38ccac9a0281ab6e2eca
   size: 131
   path: F0A.VAR
+  hash: md5

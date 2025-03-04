@@ -2,3 +2,4 @@ outs:
 - md5: f8d0a587e5c4013cffedb3ed9479858c
   size: 120818
   path: r1m14.dta
+  hash: md5

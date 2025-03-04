@@ -1,3 +1,4 @@
 outs:
 - md5: 6796dd6107f33e4f1038a778605102ad
   path: CLHLTH.DCT
+  hash: md5

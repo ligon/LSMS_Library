@@ -1,3 +1,4 @@
 outs:
 - md5: c32ca11ea078010e02f132376546059e
   path: UNPS_Geovars_1011.dta
+  hash: md5

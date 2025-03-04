@@ -2,3 +2,4 @@ outs:
 - md5: 74fe3a39d73674423cb5298ac48830c9
   size: 27600
   path: S03G.DTA
+  hash: md5

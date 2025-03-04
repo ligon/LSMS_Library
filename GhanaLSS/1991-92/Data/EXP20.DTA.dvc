@@ -2,3 +2,4 @@ outs:
 - md5: 3184c3af194328481a46aef189458941
   size: 1868
   path: EXP20.DTA
+  hash: md5
