@@ -28,7 +28,7 @@ class Wave:
         return var
     
     @property
-    def relative_path(self, data_file = None):
+    def relative_path(self):
         '''
         Get the relative path of the data file from the current working directory
         Target: loading dvc file requires relative path
@@ -37,21 +37,18 @@ class Wave:
         current_dir = Path(os.getcwd())  # Convert to Path object
         data_file_path = Path(self.file_path)
         rel_path = os.path.relpath(data_file_path, current_dir)
-        if data_file is not None:
-            return rel_path / data_file
-        else:
-            return rel_path
+        return rel_path
     
     @property
     def resources(self):
-        var = self.file_path / "_" / "data_info.yml"
-        try:
-            with open(var, 'r') as file:
-                data = yaml.safe_load(file)
-            return data
-        except FileNotFoundError as e:
-            warnings.warn(f"File not found: {var}")
-
+        """Load the data_info.yml that describes table structure, merges, etc."""
+        info_path = self.file_path / "_" / "data_info.yml"
+        if not info_path.exists():
+            warnings.warn(f"File not found: {info_path}")
+            return None
+        with open(info_path, 'r') as file:
+            return yaml.safe_load(file)
+    
     @property
     def formatting_functions(self):
         """
@@ -59,23 +56,35 @@ class Wave:
         Return a dictionary of functions
         """
         module_filename = f"{self.year}.py" 
-        var = self.file_path / "_" / module_filename 
-        if not var.exists():
+        mod_path = self.file_path / "_" / module_filename 
+        if not mod_path.exists():
             module_filename = f"{self.country.lower()}.py"
-            var = Country(self.country).file_path/'_'/module_filename
-        # Load module dynamically
-        spec = importlib.util.spec_from_file_location(f"formatting_{self.year}", var)
-        formatting_module = importlib.util.module_from_spec(spec)
+            mod_path = files("lsms_library")/ "countries"/ self.country/ "_"/ module_filename
 
+        # Load module dynamically
+        spec = importlib.util.spec_from_file_location(f"formatting_{self.year}", mod_path)
+        formatting_module = importlib.util.module_from_spec(spec)
         if spec.loader is not None:
             spec.loader.exec_module(formatting_module)
 
-        functions = {name: obj for name, obj in vars(formatting_module).items() if callable(obj)}
-
-        return functions
+        return {
+            name: func
+            for name, func in vars(formatting_module).items()
+            if callable(func)
+        }
     
     def column_mapping(self, request):
-        """Retrieve column mappings for a given dataset request."""
+        """
+        Retrieve column mappings for a given dataset request.
+        Input:
+            request: str, the request data name in data_scheme (e.g. 'cluster_features', 'household_roster', 'food_acquired', 'interview_date')
+        Output:
+            final_mapping: dict, {file_name: {'idxvars': idxvar_dic, 'myvars': myvars_dic}}
+        Example:
+            {'data_file.dta': {'idxvars': {'cluster': ('cluster', <function format_id at 0x7f7f5b3f6c10>)},
+                              'myvars': {'region': ('region', <function format_id at 0x7f7f5b3f6c10>),
+                                         'urban': ('urban', <function format_id at 0x7f7f5b3f6c10>)}}}
+        """
         data_scheme = self.resources
         data_info = data_scheme.get(request)
         if data_info is None:
@@ -85,53 +94,71 @@ class Wave:
 
         def get_formatting_function(var_name, value, format_id_function = False):
             """Applies formatting functions if available, otherwise uses defaults."""
-            return (
-                (value, formatting_functions[var_name]) 
-                if var_name in formatting_functions else
-                (value, format_id) if format_id_function else value
-            )
+            if var_name in formatting_functions:
+                return (value, formatting_functions[var_name])
+            if format_id_function:
+                return (value, format_id)
+            return value
    
-        
         files = data_info.get('file')
         idxvars = data_info.get('idxvars')
         myvars = data_info.get('myvars')
-        merge = data_info.get('merge')
-
         final_mapping = dict()
-        final_mapping['merge'] = merge
-
-        idxvars_updated = {key: get_formatting_function(key,value, format_id_function = True) for key, value in idxvars.items()}
+        idxvars_updated = {key: get_formatting_function(key, value, format_id_function = True) for key, value in idxvars.items()}
         myvars_updated = {key: get_formatting_function(key, value) for key, value in myvars.items()}
 
-        # Overwrite default column mappings with provided new columns for each file if there is new mapping
-        for i in files:
-            if isinstance(i, dict):
-                idxvars_override = idxvars_updated.copy()
-                myvars_override = myvars_updated.copy()
-                for key, value in i.items():
-                    if key in idxvars.keys():
-                        idxvars_override[key] = get_formatting_function(key, value, format_id_function = True)
-                    else:
-                        myvars_override[key] = get_formatting_function(key, value)
-                final_mapping[i] = {'idxvars': idxvars_override, 'myvars': myvars_override}
-
-            else:
-                final_mapping[i] = {'idxvars': idxvars_updated, 'myvars': myvars_updated}
-            
-        return final_mapping
+        if isinstance(files, str):
+            final_mapping[files] = {'idxvars': idxvars_updated, 'myvars': myvars_updated}
+            return final_mapping
+        
+        if isinstance(files, list):
+            for i in files:
+                if isinstance(i, dict):
+                    idxvars_override = idxvars_updated.copy()
+                    myvars_override = myvars_updated.copy()
+                    file_name, overrides = next(iter(i.items()))
+                    for key, val in overrides.items():
+                        if key in idxvars:
+                            idxvars_override[key] = get_formatting_function(key, val, format_id_function = True)
+                        else:
+                            myvars_override[key] = get_formatting_function(key, val)
+                    final_mapping[file_name] = {'idxvars': idxvars_override, 'myvars': myvars_override}
+                else:
+                    final_mapping[i] = {'idxvars': idxvars_updated, 'myvars': myvars_updated}
+                
+            return final_mapping
     
     def categorical_mapping(self, table, idxvars_code = 'Original Label', label_code = 'Preferred Label' ):
+        '''
+        Get the categorical mapping for the table by using get_categorical_mapping function from local_tools
+        Input:
+            table: str, the table name (e.g. 'unit', 'harmonize_food')
+            idxvars_code: str, the column name for the code in the idxvars
+            label_code: str, the column name for the label in the myvars
+        Output:
+            mapping: pd.DataFrame, the categorical mapping
+        '''
         path = self.relative_path
-        mapping = get_categorical_mapping(fn = 'categorical_mapping.org',
-                                          tablename=table,
-                                          idxvars={'Code': idxvars_code},
-                                          dirs = [f'{path}/_', f'{path}/../_', f'{path}/../../_'],
-                                          **{'Label': label_code})
-        
+        try:
+            mapping = get_categorical_mapping(fn='categorical_mapping.org',
+                              tablename=table,
+                              idxvars={'Code': idxvars_code},
+                              dirs=[f'{path}/_', f'{path}/../_', f'{path}/../../_'],
+                              **{'Label': label_code})
+        except Exception as e:
+            warnings.warn(f"Error in getting categorical mapping: {e}")
+            return None
         return mapping
             
 
     def grab_data(self, request):
+        '''
+        get data from the data file
+        Input:
+            request: str, the request data name (e.g. 'cluster_features', 'household_roster', 'food_acquired', 'interview_date')
+        Output:
+            df: pd.DataFrame, the data requested
+        '''
         df_fn = self.file_path /f"_ /{request}.py"
         if df_fn.exists():
             spec = importlib.util.spec_from_file_location(request, df_fn)
@@ -141,11 +168,9 @@ class Wave:
             return df
         else:
             mapping_details = self.column_mapping(request)
-            merge_way = mapping_details.get('merge')
-            files = {key: value for key, value in mapping_details.items() if key != 'merge'}
             dfs = []
-            for file, mappings in files.items():
-                df = df_data_grabber(self.relative_path(f'Data/{file}'), mappings['idxvars'], **mappings['myvars'], convert_categoricals=True)
+            for file, mappings in mapping_details.items():
+                df = df_data_grabber(f'{self.relative_path}/Data/{file}', mappings['idxvars'], **mappings['myvars'], convert_categoricals=True)
                 df = df.reset_index().drop_duplicates()
                 df['w'] = self.year
                 df = df.set_index(['w']+list(mappings['idxvars'].keys()))
@@ -155,12 +180,8 @@ class Wave:
                     warnings.warn(f"Large number used for missing?  Replacing {na} with NaN.")
                     df = df.replace(na,np.nan)
                 dfs.append(df)
-            if merge_way is None:
-                final_df = dfs[0]
-            else:
-                final_df = pd.concat(dfs, axis=merge_way)
 
-            return final_df
+            return pd.concat(dfs)
 
     def cluster_features(self):
         return self.grab_data('cluster_features')
@@ -177,8 +198,10 @@ class Wave:
         index = df.index.names
         variable = df.columns
         df = df.reset_index()
-        df['j'] = df['j'].map(food_mapping)
-        df['u'] = df['u'].map(unit_mapping)
+        if food_mapping is not None:
+            df['j'] = df['j'].map(food_mapping)
+        if unit_mapping is not None:
+            df['u'] = df['u'].map(unit_mapping)
         agg_func = {key: value for key, value in agg_functions.items() if key in variable}
         df = df.groupby(index).agg(agg_func)
         return df
@@ -255,7 +278,10 @@ class Country:
                 continue
             file = data_info['file']
             col = data_info[label_col_type][label_col]
-            df = get_dataframe(wave.relative_path(f'Data/{file}'))
+            # Assuming same waves survey use same code value for the same label
+            if isinstance(file, list):
+                file = file[0]
+            df = get_dataframe(f'{wave.relative_path}/Data/{file}')
             label_ls.append(df[col])
     
         label_ls = [{k: v.strip() if isinstance(v, str) else v for k, v in d.items()} for d in label_ls]
@@ -271,38 +297,34 @@ class Country:
         
         return result_df     
        
+    def _aggregate_wave_data(self, waves, method_name):
+        """
+        Helper to gather DataFrames across multiple waves using
+        a single wave-level method (e.g. 'food_acquired').
+        """
+        if waves is None:
+            waves = self.waves()
+        results = {}
+        for w in waves:
+            try:
+                results[w] = getattr(self[w], method_name)()
+            except KeyError as e:
+                warnings.warn(str(e))
+        if results:
+            return pd.concat(results.values(), axis=0, sort=False)
+        return pd.DataFrame()
+
     def cluster_features(self, waves=None):
-        if waves is None:
-            waves = self.waves()
-        w = {}
-        for i in waves:
-            try:
-                w[i] = self[i].cluster_features()
-            except KeyError as e:
-                 warnings.warn(e)
-        return pd.concat(w.values())
-    
+        return self._aggregate_wave_data(waves, 'cluster_features')
+
     def household_roster(self, waves=None):
-        if waves is None:
-            waves = self.waves()
-        w = {}
-        for i in waves:
-            try:
-                w[i] = self[i].household_roster()
-            except KeyError as e:
-                warnings.warn(e)
-        return pd.concat(w.values())
-    
+        return self._aggregate_wave_data(waves, 'household_roster')
+
     def food_acquired(self, waves=None):
-        if waves is None:
-            waves = self.waves()
-        w = {}
-        for i in waves:
-            try:
-                w[i] = self[i].food_acquired()
-            except KeyError as e:
-                warnings.warn(e)
-        return pd.concat(w.values())
+        return self._aggregate_wave_data(waves, 'food_acquired')
+
+    def interview_date(self, waves=None):
+        return self._aggregate_wave_data(waves, 'interview_date')
     
     # def id_walk():
         

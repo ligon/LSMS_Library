@@ -750,13 +750,14 @@ def write_df_to_org(df, table_name, filepath=None):
     '''
 
     if filepath is not None:
-        with open(filepath, "w", encoding="utf-8") as file:
-            # file.write("#+TITLE: Categorical Mapping\n\n")
+        mode = 'a' if Path(filepath).exists() else 'w'
+        with open(filepath, mode, encoding="utf-8") as file:
             file.write(f"#+NAME: {table_name}\n")
             file.write(df_to_orgtbl(df))  # Convert label DataFrame to Org table
             file.write("\n\n")  # Add spacing
     else:
         s = f"#+NAME: {table_name}\n"
         s += df_to_orgtbl(df)
+        s += "\n\n"
         return s
-        
+    
