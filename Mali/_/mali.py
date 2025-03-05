@@ -45,4 +45,11 @@ def Relation(value):
     else:
         return value.title()
 
-
+def Int_t(value):
+    '''
+    Formatting interview date
+    '''   
+    if pd.isna(value) or value == 'Manquant':
+        return np.nan
+    else:
+        return pd.to_datetime(value, errors='coerce').date()
