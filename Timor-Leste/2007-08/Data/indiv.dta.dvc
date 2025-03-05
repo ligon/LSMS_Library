@@ -2,4 +2,3 @@ outs:
 - md5: 4a131814fc97d3578f115ff104eeeb71
   size: 9770722
   path: indiv.dta
-  hash: md5

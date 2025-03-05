@@ -1,4 +1,3 @@
 outs:
 - md5: df61c53c5d2bb774f69bd514a9b4ed29
   path: g7sec4-reviewed.dta
-  hash: md5

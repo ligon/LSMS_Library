@@ -2,4 +2,3 @@ outs:
 - md5: 1ecace4f6e9db8f305faacd8dc01a284
   size: 527472
   path: ECOM01.DTA
-  hash: md5

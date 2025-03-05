@@ -1,4 +1,3 @@
 outs:
 - md5: c7044f084bcf22643c976eb866a97728
   path: g7loc_upd.dta
-  hash: md5

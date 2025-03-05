@@ -2,4 +2,3 @@ outs:
 - md5: c865458c0d2db39fee0b1a583ccc2a84
   size: 144212
   path: AGG6.DTA
-  hash: md5

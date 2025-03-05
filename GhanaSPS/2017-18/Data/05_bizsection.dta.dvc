@@ -2,4 +2,3 @@ outs:
 - md5: 4b5b69212eb26a88c5f510fe1c6e917f
   size: 764122
   path: 05_bizsection.dta
-  hash: md5

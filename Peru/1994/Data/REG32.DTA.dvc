@@ -2,4 +2,3 @@ outs:
 - md5: 42879618d1011427e3aff35be8bd882f
   size: 607585
   path: REG32.DTA
-  hash: md5

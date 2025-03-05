@@ -2,4 +2,3 @@ outs:
 - md5: bfc2bef623634816230c5596d95ea223
   size: 39139
   path: s18_3_me_CIV2018.dta
-  hash: md5

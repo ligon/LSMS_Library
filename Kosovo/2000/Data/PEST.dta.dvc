@@ -2,4 +2,3 @@ outs:
 - md5: ef76b13b0fda765d748085ae83ffa825
   size: 332418
   path: PEST.dta
-  hash: md5

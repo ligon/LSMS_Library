@@ -2,4 +2,3 @@ outs:
 - md5: a1c20266676e2268b5c08802c1cb9fa2
   size: 403612
   path: 08_GHA_EXPCMNQ.dta
-  hash: md5

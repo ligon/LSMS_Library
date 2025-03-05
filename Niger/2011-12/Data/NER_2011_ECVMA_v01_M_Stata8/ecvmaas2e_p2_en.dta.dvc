@@ -2,4 +2,3 @@ outs:
 - md5: ad83c6edbdb7bfd6069290381c11247a
   size: 1632549
   path: ecvmaas2e_p2_en.dta
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: 6221dd6f99d1f4a5f9034e9b7ab793db
   size: 97087
   path: Liberia_NHFS_HH_DistanceToForest.dta
-  hash: md5

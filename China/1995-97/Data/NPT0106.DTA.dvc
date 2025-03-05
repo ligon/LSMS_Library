@@ -2,4 +2,3 @@ outs:
 - md5: 2cf7e039b04d42a0df641a60e129f965
   size: 15375
   path: NPT0106.DTA
-  hash: md5

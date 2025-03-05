@@ -2,4 +2,3 @@ outs:
 - md5: 70b2bf219cafd5ffe4e0004d695a2b43
   size: 966152
   path: s11_me_ner2018.dta
-  hash: md5

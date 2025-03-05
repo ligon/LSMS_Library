@@ -2,4 +2,3 @@ outs:
 - md5: df4a698b5f132193ff807104fe19530b
   size: 328069
   path: 11a_foodconsumption_give.dta
-  hash: md5

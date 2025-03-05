@@ -2,4 +2,3 @@ outs:
 - md5: c9d5c83d472121948e04dd74ff554f54
   size: 1981532
   path: ihs2_pov.dta
-  hash: md5

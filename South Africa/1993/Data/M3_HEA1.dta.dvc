@@ -2,4 +2,3 @@ outs:
 - md5: c6ba07b304d445b76090b26a7c057c64
   size: 83576
   path: M3_HEA1.dta
-  hash: md5

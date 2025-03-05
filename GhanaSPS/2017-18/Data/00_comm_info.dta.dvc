@@ -2,4 +2,3 @@ outs:
 - md5: 853a290d8e68b7935462fd2602ad4376
   size: 20301
   path: 00_comm_info.dta
-  hash: md5

@@ -1,4 +1,3 @@
 outs:
 - md5: d39f5fb4f7e470e2db04f7488f3404d6
   path: 12_GHA_EXPMISC.dta
-  hash: md5

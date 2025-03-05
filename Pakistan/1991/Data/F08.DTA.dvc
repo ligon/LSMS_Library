@@ -2,4 +2,3 @@ outs:
 - md5: 8f8575fdbaa5bc6fdfc07e9629586a97
   size: 516486
   path: F08.DTA
-  hash: md5

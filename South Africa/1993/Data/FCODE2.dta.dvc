@@ -2,4 +2,3 @@ outs:
 - md5: 13f62c297fae0099d14df3cc1d9fae31
   size: 2397
   path: FCODE2.dta
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: 5fb1c35a8a1410ae1d25f344e860fafb
   size: 140947
   path: M10_1.DTA
-  hash: md5

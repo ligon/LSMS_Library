@@ -2,4 +2,3 @@ outs:
 - md5: 11fcae316e7b7384aba3b0543afa7f31
   size: 21436
   path: sm12d.dta
-  hash: md5

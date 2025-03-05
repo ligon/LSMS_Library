@@ -2,4 +2,3 @@ outs:
 - md5: a265ab5d15b3bd7bb61817f905625b22
   size: 1162805
   path: IndividualIncomeAggregate.dta
-  hash: md5

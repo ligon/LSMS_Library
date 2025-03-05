@@ -2,4 +2,3 @@ outs:
 - md5: 70dbac753141f67f52a68f8eeeba8de1
   size: 219744
   path: CONSUMO1.DTA
-  hash: md5

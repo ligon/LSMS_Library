@@ -2,4 +2,3 @@ outs:
 - md5: f23b93213dc9546a13d2f12e72de183e
   size: 87681
   path: health_b.dta
-  hash: md5

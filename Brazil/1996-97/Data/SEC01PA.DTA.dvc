@@ -2,4 +2,3 @@ outs:
 - md5: c105d7486397e3d793ff45ff744cd74c
   size: 219430
   path: SEC01PA.DTA
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: ed0271a1a638a7594fc77a60d59daefd
   size: 1055618
   path: EDUC.dta
-  hash: md5

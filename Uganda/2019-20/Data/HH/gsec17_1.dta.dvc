@@ -2,4 +2,3 @@ outs:
 - md5: ccf76d49e4bb3da7f49bbb39017f8110
   size: 321284
   path: gsec17_1.dta
-  hash: md5

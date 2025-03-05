@@ -2,4 +2,3 @@ outs:
 - md5: 3453fb418e7b78f6ee1319471b539080
   size: 1611348
   path: hh_mod_a_filt.dta
-  hash: md5

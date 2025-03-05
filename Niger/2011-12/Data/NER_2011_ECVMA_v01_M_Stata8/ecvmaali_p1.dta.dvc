@@ -2,4 +2,3 @@ outs:
 - md5: 7812287dd8ab2c8814e6c677fba37053
   size: 28279842
   path: ecvmaali_p1.dta
-  hash: md5

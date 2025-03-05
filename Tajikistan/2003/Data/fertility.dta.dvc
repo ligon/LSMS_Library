@@ -2,4 +2,3 @@ outs:
 - md5: ec6246edbfee37dffa00dcd9cee0bd9f
   size: 8207548
   path: fertility.dta
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: f5d01eb20e6debdbab740cbcc2559070
   size: 299547
   path: ECVMA2011_Welfare_en.dta
-  hash: md5

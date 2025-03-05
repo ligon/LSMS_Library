@@ -2,4 +2,3 @@ outs:
 - md5: ccac0431ca9b5ec409bc5236853733db
   size: 7586
   path: c_healtr.dta
-  hash: md5

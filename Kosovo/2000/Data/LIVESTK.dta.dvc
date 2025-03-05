@@ -2,4 +2,3 @@ outs:
 - md5: 342ed312e1a769e37d11ef4886e2e8ea
   size: 258657
   path: LIVESTK.dta
-  hash: md5

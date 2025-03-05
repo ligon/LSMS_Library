@@ -1,4 +1,3 @@
 outs:
 - md5: 3455b3cb397ea23a5fdae528a793c8ce
   path: schoolasc.zip
-  hash: md5

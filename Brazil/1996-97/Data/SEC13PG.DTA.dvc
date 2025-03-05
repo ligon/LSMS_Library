@@ -2,4 +2,3 @@ outs:
 - md5: f3403503c76d448298c5b9fb96e361b2
   size: 236867
   path: SEC13PG.DTA
-  hash: md5

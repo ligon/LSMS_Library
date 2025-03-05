@@ -2,4 +2,3 @@ outs:
 - md5: fa7d483a956a10c52b01297fa468c0ef
   size: 527744
   path: sect_cover_ph_w1.dta
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: a6efa15ef9ea992f5fb73aa5bccfc951
   size: 14106
   path: FILE36V0.dta
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: c5fda0e15057393062da5d07d2362c6f
   size: 61520
   path: SIZE.DTA
-  hash: md5

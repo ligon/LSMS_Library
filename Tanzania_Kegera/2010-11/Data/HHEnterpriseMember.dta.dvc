@@ -2,4 +2,3 @@ outs:
 - md5: 1ef7be08cab7bbab018bd3c8787aed54
   size: 68318
   path: HHEnterpriseMember.dta
-  hash: md5

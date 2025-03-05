@@ -2,4 +2,3 @@ outs:
 - md5: 90b707c0b96ec484059e776a3247704f
   size: 357737
   path: ehcvm_menage_sen2018.dta
-  hash: md5

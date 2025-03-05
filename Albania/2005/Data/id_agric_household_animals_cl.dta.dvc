@@ -2,4 +2,3 @@ outs:
 - md5: c29c54c1186fc798bd2046a6b1975390
   size: 427749
   path: id_agric_household_animals_cl.dta
-  hash: md5

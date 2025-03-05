@@ -2,4 +2,3 @@ outs:
 - md5: 501e0fe9fa06f59bf05075f82fa9596a
   size: 460370
   path: individual_cover.dta
-  hash: md5

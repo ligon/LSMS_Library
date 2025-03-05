@@ -2,4 +2,3 @@ outs:
 - md5: 0797d26edc6bef8658e247e4089ee997
   size: 311560
   path: com_cg.dta
-  hash: md5

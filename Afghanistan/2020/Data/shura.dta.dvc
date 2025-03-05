@@ -2,4 +2,3 @@ outs:
 - md5: f676e6a4d1a2a58a2ec4e31c95d14afc
   size: 1142656
   path: shura.dta
-  hash: md5

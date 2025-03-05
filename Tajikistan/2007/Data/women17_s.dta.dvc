@@ -2,4 +2,3 @@ outs:
 - md5: d8c1a65f3da7bc6a39d2d0d16fde4d72
   size: 35800
   path: women17_s.dta
-  hash: md5

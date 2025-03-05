@@ -2,4 +2,3 @@ outs:
 - md5: 227a9e54f919a744d3f67b00f98255b7
   size: 132430
   path: s10_1_me_sen2018.dta
-  hash: md5

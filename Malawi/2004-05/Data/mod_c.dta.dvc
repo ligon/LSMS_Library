@@ -2,4 +2,3 @@ outs:
 - md5: c526fc4aa0e47c44111d395ccf90f587
   size: 43163
   path: mod_c.dta
-  hash: md5

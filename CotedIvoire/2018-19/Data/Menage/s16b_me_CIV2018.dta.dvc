@@ -2,4 +2,3 @@ outs:
 - md5: 79f4599c28c96e7e8d57b5b23f717108
   size: 524306
   path: s16b_me_CIV2018.dta
-  hash: md5

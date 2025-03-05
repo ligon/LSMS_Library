@@ -2,4 +2,3 @@ outs:
 - md5: 5ae551874cd51de1c95732d6bc754b95
   size: 1987903
   path: S6G.dta
-  hash: md5

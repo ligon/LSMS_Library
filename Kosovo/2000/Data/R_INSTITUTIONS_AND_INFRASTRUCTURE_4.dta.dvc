@@ -2,4 +2,3 @@ outs:
 - md5: decb07938e4c0b856845db25cbe8db2c
   size: 11293
   path: R_INSTITUTIONS_AND_INFRASTRUCTURE_4.dta
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: d4586eccc0845ed22b3758ca84354bce
   size: 111070
   path: GSEC19.dta
-  hash: md5

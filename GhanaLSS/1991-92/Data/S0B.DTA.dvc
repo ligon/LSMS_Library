@@ -2,4 +2,3 @@ outs:
 - md5: 8a83ce5110c60c492ba3c21e7efecc2f
   size: 4566431
   path: S0B.DTA
-  hash: md5

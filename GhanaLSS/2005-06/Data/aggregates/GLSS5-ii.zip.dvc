@@ -2,4 +2,3 @@ outs:
 - md5: bb2a5b7a95b390c563a7ddb226b42736
   size: 627275
   path: GLSS5-ii.zip
-  hash: md5

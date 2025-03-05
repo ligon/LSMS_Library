@@ -2,4 +2,3 @@ outs:
 - md5: e0cf01e66436de87c062ca50ef638806
   size: 1227073
   path: sect6_public.dta
-  hash: md5

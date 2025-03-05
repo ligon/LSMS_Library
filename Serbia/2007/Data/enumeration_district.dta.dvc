@@ -2,4 +2,3 @@ outs:
 - md5: fcdb2cc919848d782313d0348baabb39
   size: 187723
   path: enumeration_district.dta
-  hash: md5

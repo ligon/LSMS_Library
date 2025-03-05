@@ -2,4 +2,3 @@ outs:
 - md5: 51ed0791295aac156873faac24294aa1
   size: 2568416
   path: wsec5.dta
-  hash: md5

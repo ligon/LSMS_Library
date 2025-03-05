@@ -2,4 +2,3 @@ outs:
 - md5: 49b14ed3f9701f82a7e15bc3bd815887
   size: 41699
   path: cs1.dta
-  hash: md5

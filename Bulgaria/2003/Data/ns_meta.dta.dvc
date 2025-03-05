@@ -2,4 +2,3 @@ outs:
 - md5: 4284fa0269b410e59f9074863bd9edaf
   size: 759692
   path: ns_meta.dta
-  hash: md5

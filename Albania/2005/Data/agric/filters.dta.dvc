@@ -2,4 +2,3 @@ outs:
 - md5: e825df1b06cbfd5d90a7cbae80d2ca6f
   size: 147699
   path: filters.dta
-  hash: md5

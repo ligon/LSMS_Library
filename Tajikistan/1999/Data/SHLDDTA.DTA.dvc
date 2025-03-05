@@ -2,4 +2,3 @@ outs:
 - md5: f8b7fe90235663bec62186636e3b040a
   size: 318674
   path: SHLDDTA.DTA
-  hash: md5

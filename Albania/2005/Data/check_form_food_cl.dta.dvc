@@ -2,4 +2,3 @@ outs:
 - md5: 3e02183a115377c73a24b6540e7938e8
   size: 47847
   path: check_form_food_cl.dta
-  hash: md5

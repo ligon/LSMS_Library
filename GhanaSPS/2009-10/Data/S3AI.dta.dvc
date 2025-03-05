@@ -2,4 +2,3 @@ outs:
 - md5: 8759080f0df59db89fb8b2023296989d
   size: 205573
   path: S3AI.dta
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: 2849c799f720c71d3eaf922ad04e8930
   size: 12082466
   path: SEC9B.DTA
-  hash: md5

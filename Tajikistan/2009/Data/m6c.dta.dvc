@@ -2,4 +2,3 @@ outs:
 - md5: 7696c68a388ec428524e46dc03a89c5a
   size: 4812690
   path: m6c.dta
-  hash: md5

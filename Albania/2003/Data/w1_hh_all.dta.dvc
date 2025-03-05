@@ -2,4 +2,3 @@ outs:
 - md5: 077687919a0d89612ec19c28745d84d9
   size: 7247009
   path: w1_hh_all.dta
-  hash: md5

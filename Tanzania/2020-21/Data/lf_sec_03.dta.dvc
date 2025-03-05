@@ -2,4 +2,3 @@ outs:
 - md5: 8cbb54cf363aa4457d3f53f9687ea1ad
   size: 1106733
   path: lf_sec_03.dta
-  hash: md5

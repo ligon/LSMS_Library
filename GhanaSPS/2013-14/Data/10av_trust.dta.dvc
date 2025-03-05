@@ -2,4 +2,3 @@ outs:
 - md5: 3371eb770dfaf5c8ce088003315d15aa
   size: 180288
   path: 10av_trust.dta
-  hash: md5

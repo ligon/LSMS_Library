@@ -2,4 +2,3 @@ outs:
 - md5: 200d5629a76454fc5571fbaa4d8df9a1
   size: 607977
   path: roma_4_health.dta
-  hash: md5

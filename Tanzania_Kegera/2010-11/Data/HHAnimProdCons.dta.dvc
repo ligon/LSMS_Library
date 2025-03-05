@@ -2,4 +2,3 @@ outs:
 - md5: 44db325791b0ad3faf91180eef768568
   size: 322038
   path: HHAnimProdCons.dta
-  hash: md5

@@ -1,4 +1,3 @@
 outs:
 - md5: f33aa6e471ecab630c4214f1c15c3e07
   path: Individual.Mapping.2005-06.2009-10.dta
-  hash: md5

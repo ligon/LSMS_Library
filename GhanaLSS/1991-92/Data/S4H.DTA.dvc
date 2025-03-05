@@ -2,4 +2,3 @@ outs:
 - md5: 3122a088794bf7f90c4c3f9144d7f6fa
   size: 2237267
   path: S4H.DTA
-  hash: md5

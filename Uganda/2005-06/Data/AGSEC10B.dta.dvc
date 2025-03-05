@@ -1,4 +1,3 @@
 outs:
 - md5: fb69159ac623cc2a903895f77fb71ae3
   path: AGSEC10B.dta
-  hash: md5

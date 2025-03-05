@@ -1,4 +1,3 @@
 outs:
 - md5: 797acb42a6c3d78550bdc8755d575372
   path: s2_education.sav
-  hash: md5

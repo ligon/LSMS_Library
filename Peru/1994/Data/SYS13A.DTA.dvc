@@ -2,4 +2,3 @@ outs:
 - md5: f791ffc7f8967fcc5395a943143c4a1d
   size: 541
   path: SYS13A.DTA
-  hash: md5

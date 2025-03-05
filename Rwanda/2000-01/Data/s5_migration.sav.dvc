@@ -1,4 +1,3 @@
 outs:
 - md5: d9e4d658fe7e5598450d688e1d058ac8
   path: s5_migration.sav
-  hash: md5

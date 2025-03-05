@@ -2,4 +2,3 @@ outs:
 - md5: c78d5315b09b9b577d8dd9ffe9853274
   size: 693231
   path: 03bv_savingquestions.dta
-  hash: md5

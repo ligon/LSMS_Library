@@ -2,4 +2,3 @@ outs:
 - md5: a6005ea490e324bdcf82f50fd9eb13a4
   size: 80
   path: N10.VAR
-  hash: md5

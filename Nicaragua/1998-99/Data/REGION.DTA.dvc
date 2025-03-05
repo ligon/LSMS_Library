@@ -2,4 +2,3 @@ outs:
 - md5: 6b1e893f14b4ee85a6d3c1e8cb77350b
   size: 21322
   path: REGION.DTA
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: f2cf3b86ee16a62edd9c588b4b063177
   size: 356535
   path: 12a_housingcharacteristics1i_rent.dta
-  hash: md5

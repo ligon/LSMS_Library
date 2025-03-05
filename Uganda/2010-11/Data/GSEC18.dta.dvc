@@ -1,4 +1,3 @@
 outs:
 - md5: 483db2da90ad9e43211d1ee3a919f4e0
   path: GSEC18.dta
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: f6c0ca2202d9bd4a4b62c08dc1b4b100
   size: 982374
   path: nga_householdgeovars_y2.csv
-  hash: md5

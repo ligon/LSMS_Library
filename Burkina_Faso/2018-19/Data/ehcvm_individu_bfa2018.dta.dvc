@@ -2,4 +2,3 @@ outs:
 - md5: 608b099a34ff7efae6fb7802ccdf3908
   size: 3464794
   path: ehcvm_individu_bfa2018.dta
-  hash: md5

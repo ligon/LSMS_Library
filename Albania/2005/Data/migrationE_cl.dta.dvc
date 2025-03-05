@@ -2,4 +2,3 @@ outs:
 - md5: d8950bd4014506f4c98d9f1f60fe7707
   size: 3346323
   path: migrationE_cl.dta
-  hash: md5

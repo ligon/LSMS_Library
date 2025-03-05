@@ -2,4 +2,3 @@ outs:
 - md5: a95bddc94b0e692b71ce04fe033efc5b
   size: 271083
   path: ecvma2_anthro.dta
-  hash: md5

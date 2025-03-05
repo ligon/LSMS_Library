@@ -2,4 +2,3 @@ outs:
 - md5: 8cede1e6e89ba59787aa5312e32f674c
   size: 8589
   path: SeasonalAdjustmentFactor.dta
-  hash: md5

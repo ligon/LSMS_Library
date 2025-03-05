@@ -1,4 +1,3 @@
 outs:
 - md5: 56b04f0f5de78d4742f16c470c10532a
   path: s8_farm_expense.sav
-  hash: md5

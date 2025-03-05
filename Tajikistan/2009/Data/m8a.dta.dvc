@@ -2,4 +2,3 @@ outs:
 - md5: 7b4162e249a428810675ff9540157eac
   size: 604042
   path: m8a.dta
-  hash: md5

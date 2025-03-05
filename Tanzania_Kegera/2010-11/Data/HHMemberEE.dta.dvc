@@ -2,4 +2,3 @@ outs:
 - md5: f8c415a77ec67b046531407a7b5fcc59
   size: 801038
   path: HHMemberEE.dta
-  hash: md5

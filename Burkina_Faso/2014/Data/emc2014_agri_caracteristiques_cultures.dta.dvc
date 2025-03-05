@@ -2,4 +2,3 @@ outs:
 - md5: d02097d373403f431ad563d548a0041d
   size: 6792751
   path: emc2014_agri_caracteristiques_cultures.dta
-  hash: md5

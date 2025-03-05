@@ -2,4 +2,3 @@ outs:
 - md5: 192b418c5a6cf4a3ee2612c3c2acd1ed
   size: 789055
   path: sect6_plantingw2.csv
-  hash: md5

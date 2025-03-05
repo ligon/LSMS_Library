@@ -2,4 +2,3 @@ outs:
 - md5: 12f69a7067514fcc5f75407f75c81466
   size: 35052
   path: S4BI0.dta
-  hash: md5

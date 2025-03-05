@@ -2,4 +2,3 @@ outs:
 - md5: e3afa300c7b74af8605fff5fcdb47c1d
   size: 5391808
   path: 2002 incomeconsumption.dta
-  hash: md5

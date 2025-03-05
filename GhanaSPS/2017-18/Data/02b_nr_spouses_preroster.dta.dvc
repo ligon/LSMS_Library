@@ -2,4 +2,3 @@ outs:
 - md5: d0ff8feabc725df0a772dbc3d54b4470
   size: 38797
   path: 02b_nr_spouses_preroster.dta
-  hash: md5

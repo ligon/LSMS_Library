@@ -2,4 +2,3 @@ outs:
 - md5: f378bae059a859131656efdc533305c1
   size: 6922
   path: APP2.dta
-  hash: md5

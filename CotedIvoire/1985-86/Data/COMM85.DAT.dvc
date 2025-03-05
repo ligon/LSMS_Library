@@ -1,4 +1,3 @@
 outs:
 - md5: 03e5bfd2e11d98c16d2e01c916f56d72
   path: COMM85.DAT
-  hash: md5

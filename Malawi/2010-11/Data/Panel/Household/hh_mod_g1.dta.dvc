@@ -2,4 +2,3 @@ outs:
 - md5: ddec7d1b74f06fee70c205ba9858e4c9
   size: 65212754
   path: hh_mod_g1.dta
-  hash: md5

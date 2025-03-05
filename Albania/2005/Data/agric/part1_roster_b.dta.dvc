@@ -2,4 +2,3 @@ outs:
 - md5: 3cf6d1a3d998a3ae385c7bca3b87bb9d
   size: 20982
   path: part1_roster_b.dta
-  hash: md5

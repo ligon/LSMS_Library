@@ -2,4 +2,3 @@ outs:
 - md5: 429a7502db115fb44fa4332b489007da
   size: 464581
   path: INC9.DTA
-  hash: md5

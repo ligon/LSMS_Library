@@ -2,4 +2,3 @@ outs:
 - md5: b15cd3cdf34a9bf677bfe5a165988286
   size: 860257
   path: STOR_FOOD.dta
-  hash: md5

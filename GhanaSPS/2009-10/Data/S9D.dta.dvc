@@ -2,4 +2,3 @@ outs:
 - md5: 311e65369ec347820df669c0fe098fe2
   size: 130381
   path: S9D.dta
-  hash: md5

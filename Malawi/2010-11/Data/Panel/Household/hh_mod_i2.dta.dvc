@@ -2,4 +2,3 @@ outs:
 - md5: a2bdf4f44807a00816e4ac6b2bb3e619
   size: 2404390
   path: hh_mod_i2.dta
-  hash: md5

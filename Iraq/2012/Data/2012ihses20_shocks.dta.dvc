@@ -2,4 +2,3 @@ outs:
 - md5: ad7d8837d6722781c3e7e1d31bcd4757
   size: 32974086
   path: 2012ihses20_shocks.dta
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: af0e13a36e7a7aacb9b4e9d04479dea4
   size: 807964
   path: S3B.DTA
-  hash: md5

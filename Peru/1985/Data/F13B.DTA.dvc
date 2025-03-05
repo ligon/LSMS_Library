@@ -2,4 +2,3 @@ outs:
 - md5: 395e1d571867a851b4aeff7d4f0f639f
   size: 85204
   path: F13B.DTA
-  hash: md5

@@ -1,4 +1,3 @@
 outs:
 - md5: 1a3f3742b46844423a75045e4e949144
   path: GSEC15BB.dta
-  hash: md5

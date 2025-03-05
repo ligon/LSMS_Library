@@ -2,4 +2,3 @@ outs:
 - md5: d04e77b0715999e4f0c9126d856de852
   size: 44260
   path: KZ96ANT_PUF.dta
-  hash: md5

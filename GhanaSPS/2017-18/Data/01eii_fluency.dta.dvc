@@ -2,4 +2,3 @@ outs:
 - md5: 6aea69cc512704a3ed98f29c4735f586
   size: 459882
   path: 01eii_fluency.dta
-  hash: md5

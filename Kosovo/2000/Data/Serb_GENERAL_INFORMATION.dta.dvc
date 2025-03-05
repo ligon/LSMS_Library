@@ -2,4 +2,3 @@ outs:
 - md5: e3fb8c69246f865a2e06d338853bffb9
   size: 6534
   path: Serb_GENERAL_INFORMATION.dta
-  hash: md5

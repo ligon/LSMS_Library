@@ -2,4 +2,3 @@ outs:
 - md5: 4db7e89f0e1feaceb3b9bbdc6687b92e
   size: 35090
   path: com_cc.dta
-  hash: md5

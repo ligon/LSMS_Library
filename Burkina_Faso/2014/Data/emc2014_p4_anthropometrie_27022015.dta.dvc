@@ -2,4 +2,3 @@ outs:
 - md5: cd4f038adebc6e691093e61e1683a7fc
   size: 816421
   path: emc2014_p4_anthropometrie_27022015.dta
-  hash: md5

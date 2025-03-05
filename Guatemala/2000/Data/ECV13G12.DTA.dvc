@@ -2,4 +2,3 @@ outs:
 - md5: 0e0d865eb0ade18e6e4c444e35c06474
   size: 83572137
   path: ECV13G12.DTA
-  hash: md5

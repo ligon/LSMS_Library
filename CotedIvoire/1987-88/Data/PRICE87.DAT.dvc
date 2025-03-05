@@ -1,4 +1,3 @@
 outs:
 - md5: ada1ffa069dddb082d7dda5bae7e3af4
   path: PRICE87.DAT
-  hash: md5

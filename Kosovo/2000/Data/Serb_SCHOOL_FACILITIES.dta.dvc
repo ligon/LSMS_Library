@@ -2,4 +2,3 @@ outs:
 - md5: 01dd4331d3be86cdd109c8989efec64e
   size: 17529
   path: Serb_SCHOOL_FACILITIES.dta
-  hash: md5

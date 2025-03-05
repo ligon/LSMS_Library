@@ -2,4 +2,3 @@ outs:
 - md5: 8bc507c2a7492dbdddc600cc1b73f583
   size: 936947
   path: S10B.DTA
-  hash: md5

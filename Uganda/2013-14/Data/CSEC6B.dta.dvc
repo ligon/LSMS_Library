@@ -1,4 +1,3 @@
 outs:
 - md5: 3876ed8c8454dd88f72155abfa83a728
   path: CSEC6B.dta
-  hash: md5

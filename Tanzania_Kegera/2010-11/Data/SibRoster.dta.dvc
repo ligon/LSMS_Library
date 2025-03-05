@@ -2,4 +2,3 @@ outs:
 - md5: b6879e786c95d89c6e18f566a7773be7
   size: 454390
   path: SibRoster.dta
-  hash: md5

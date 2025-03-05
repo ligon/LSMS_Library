@@ -2,4 +2,3 @@ outs:
 - md5: e54988b9d4ce7f0c80afa07fa67aa20a
   size: 33322913
   path: eaci17_s9p2.dta
-  hash: md5

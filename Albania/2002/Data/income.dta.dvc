@@ -2,4 +2,3 @@ outs:
 - md5: b12e2108c0e2077ee3acf4cd90cd3493
   size: 1189521
   path: income.dta
-  hash: md5

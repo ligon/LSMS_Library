@@ -1,4 +1,3 @@
 outs:
 - md5: 63769808a55c491910717d4c15c84d14
   path: SEC06.DCT
-  hash: md5

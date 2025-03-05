@@ -1,4 +1,3 @@
 outs:
 - md5: 5ef04ce32383c92f8d4e57ccb7c31f0f
   path: SEC16B.DCT
-  hash: md5

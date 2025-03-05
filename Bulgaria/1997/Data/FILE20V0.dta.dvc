@@ -2,4 +2,3 @@ outs:
 - md5: b99d94023532197f6eb1fdc199449486
   size: 7258
   path: FILE20V0.dta
-  hash: md5

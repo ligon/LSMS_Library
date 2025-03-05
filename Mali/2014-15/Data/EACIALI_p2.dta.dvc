@@ -2,4 +2,3 @@ outs:
 - md5: feaec780c9fb029a240bb5d6beb77881
   size: 34038840
   path: EACIALI_p2.dta
-  hash: md5

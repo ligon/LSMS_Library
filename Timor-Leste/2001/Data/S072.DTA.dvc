@@ -2,4 +2,3 @@ outs:
 - md5: d2db6e2c164471ffc8a0a3101b7f6916
   size: 61673
   path: S072.DTA
-  hash: md5

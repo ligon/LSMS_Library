@@ -2,4 +2,3 @@ outs:
 - md5: 90e5c6a6af822419aa6d5cdc82f5687c
   size: 946283
   path: 06e_miscellaneous.dta
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: c4b0754396358072325f8653a905b7c7
   size: 99069
   path: mop_3_agriculture.dta
-  hash: md5

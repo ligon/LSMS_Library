@@ -2,4 +2,3 @@ outs:
 - md5: 49c7a736079cdb1fffa8e98979fc5508
   size: 37361
   path: c_educa.dta
-  hash: md5

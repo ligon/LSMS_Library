@@ -2,4 +2,3 @@ outs:
 - md5: e4c605606ccf816ff0a98c28c99df707
   size: 6318
   path: serb_AGRICULTURE_2.dta
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: 854e7bdab5545966242f31f30cc6c900
   size: 120641
   path: S02.DTA
-  hash: md5

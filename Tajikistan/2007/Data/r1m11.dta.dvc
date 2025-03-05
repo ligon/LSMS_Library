@@ -2,4 +2,3 @@ outs:
 - md5: c1445c1e0d3253e505157a0406ed892f
   size: 2623062
   path: r1m11.dta
-  hash: md5

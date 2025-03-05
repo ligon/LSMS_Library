@@ -2,4 +2,3 @@ outs:
 - md5: 3ef63752f2796b33cbf733d7c2a54cdb
   size: 2654987
   path: PartC.dat
-  hash: md5

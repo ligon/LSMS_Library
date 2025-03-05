@@ -2,4 +2,3 @@ outs:
 - md5: 909f38ba1fd8af5780e22ea07b182807
   size: 48593321
   path: sec8h.dta
-  hash: md5

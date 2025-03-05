@@ -2,4 +2,3 @@ outs:
 - md5: 17f70bc2b3fef087a619b7a51dd65a32
   size: 1243551
   path: HHProdCons.dta
-  hash: md5

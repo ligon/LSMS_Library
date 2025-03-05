@@ -2,4 +2,3 @@ outs:
 - md5: b0eb8be2221636d7d29998b6f5aa7418
   size: 756817
   path: H_01.dta
-  hash: md5

@@ -2,4 +2,3 @@ outs:
 - md5: 70ec0ed6e1724113d6201410ae8d9da8
   size: 11112
   path: transfer_b.dta
-  hash: md5

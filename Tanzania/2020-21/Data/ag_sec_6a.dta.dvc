@@ -2,4 +2,3 @@ outs:
 - md5: aca5f147bea8f0c70b15b3838ea32e85
   size: 248047
   path: ag_sec_6a.dta
-  hash: md5

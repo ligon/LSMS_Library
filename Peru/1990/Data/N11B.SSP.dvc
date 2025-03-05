@@ -2,4 +2,3 @@ outs:
 - md5: 06aa7948b920e8386ec3839bae56060b
   size: 105200
   path: N11B.SSP
-  hash: md5

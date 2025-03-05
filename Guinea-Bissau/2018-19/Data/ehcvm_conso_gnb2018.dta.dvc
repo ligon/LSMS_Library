@@ -2,4 +2,3 @@ outs:
 - md5: 294b4e1cad72e7a247b2c143baa2cd99
   size: 13549052
   path: ehcvm_conso_gnb2018.dta
-  hash: md5

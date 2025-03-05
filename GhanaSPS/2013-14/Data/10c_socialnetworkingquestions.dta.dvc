@@ -2,4 +2,3 @@ outs:
 - md5: 739bab39f4430ddc2c9655df461cfb76
   size: 5700360
   path: 10c_socialnetworkingquestions.dta
-  hash: md5

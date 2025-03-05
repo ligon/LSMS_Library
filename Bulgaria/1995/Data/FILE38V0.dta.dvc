@@ -2,4 +2,3 @@ outs:
 - md5: d3777c4440b585a22784bf6c09e1b771
   size: 3332
   path: FILE38V0.dta
-  hash: md5
