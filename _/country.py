@@ -13,15 +13,17 @@ import warnings
 from pathlib import Path
 import warnings
 from .ai_agent import ai_process, gpt_agent
+warnings.filterwarnings('ignore', category=FutureWarning)
+warnings.filterwarnings('ignore', category=UnicodeWarning)
 
 
 class Wave:
-    def __init__(self, year, country_name, data_scheme):
+    def __init__(self, year, country_name, data_scheme, formatting_functions):
         self.year = year
         self.country = country_name
         self.name = f"{self.country}/{self.year}"
         self.data_scheme = data_scheme
-    
+        self.formatting_functions = self.update_formatting_functions(formatting_functions)
     @property
     def file_path(self):
         var = files("lsms_library") / "countries" / self.country/self.year
@@ -49,29 +51,28 @@ class Wave:
         with open(info_path, 'r') as file:
             return yaml.safe_load(file)
     
-    @property
-    def formatting_functions(self):
+    def update_formatting_functions(self, formatting_functions):
         """
         Properly import formmating functions from wave module
         Return a dictionary of functions
         """
         module_filename = f"{self.year}.py" 
         mod_path = self.file_path / "_" / module_filename 
-        if not mod_path.exists():
-            module_filename = f"{self.country.lower()}.py"
-            mod_path = files("lsms_library")/ "countries"/ self.country/ "_"/ module_filename
-
-        # Load module dynamically
-        spec = importlib.util.spec_from_file_location(f"formatting_{self.year}", mod_path)
-        formatting_module = importlib.util.module_from_spec(spec)
-        if spec.loader is not None:
-            spec.loader.exec_module(formatting_module)
-
-        return {
-            name: func
-            for name, func in vars(formatting_module).items()
-            if callable(func)
-        }
+        general__formatting_functions = formatting_functions
+    
+        if mod_path.exists():
+            # Load module dynamically
+                spec = importlib.util.spec_from_file_location(f"formatting_{self.year}", mod_path)
+                formatting_module = importlib.util.module_from_spec(spec)
+                if spec.loader is not None:
+                    spec.loader.exec_module(formatting_module)
+                general__formatting_functions.update({
+                    name: func
+                    for name, func in vars(formatting_module).items()
+                    if callable(func)
+                })
+        return general__formatting_functions
+        
     
     def column_mapping(self, request):
         """
@@ -168,9 +169,10 @@ class Wave:
             return df
         else:
             mapping_details = self.column_mapping(request)
+            convert_cat = (self.resources.get(request).get('converted_categoricals') is None)
             dfs = []
             for file, mappings in mapping_details.items():
-                df = df_data_grabber(f'{self.relative_path}/Data/{file}', mappings['idxvars'], **mappings['myvars'], convert_categoricals=True)
+                df = df_data_grabber(f'{self.relative_path}/Data/{file}', mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat)
                 df = df.reset_index().drop_duplicates()
                 df['w'] = self.year
                 df = df.set_index(['w']+list(mappings['idxvars'].keys()))
@@ -229,6 +231,26 @@ class Country:
         except FileNotFoundError as e:
             warnings.warn(e)
     
+    @property
+    def formatting_functions(self):
+        general__module_filename = f"{self.name.lower()}.py"
+        general_mod_path = files("lsms_library")/ "countries"/ self.name/ "_"/ general__module_filename
+
+        if not general_mod_path.exists():
+            return {}
+
+        # Load module dynamically
+        spec = importlib.util.spec_from_file_location(f"formatting_{self.name}", general_mod_path)
+        formatting_module = importlib.util.module_from_spec(spec)
+        if spec.loader is not None:
+            spec.loader.exec_module(formatting_module)
+
+        return {
+            name: func
+            for name, func in vars(formatting_module).items()
+            if callable(func)
+        }
+    
     def waves(self):
         data = self.resources
         if 'Waves' in data:
@@ -246,7 +268,7 @@ class Country:
     def __getitem__(self, year):
         # Ensure the year is one of the available waves
         if year in self.waves():
-            return Wave(year, self.name, self.data_scheme)
+            return Wave(year, self.name, self.data_scheme, self.formatting_functions)
         else:
             raise KeyError(f"{year} is not a valid wave for {self.name}")
     
