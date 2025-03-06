@@ -33,7 +33,7 @@ Data Scheme:
     Quantity: float
     Price: float
     Produced: float
-  intervirw_date:
+  interview_date:
     index: (w, v, visit, i)
     Int_t: str
 

@@ -6,7 +6,7 @@ from importlib.resources import files
 import importlib
 import cfe.regression as rgsn
 from collections import defaultdict
-from .local_tools import df_data_grabber, format_id, get_categorical_mapping, category_union, get_dataframe, fs
+from .local_tools import df_data_grabber, format_id, get_categorical_mapping, category_union, get_dataframe
 import importlib.util
 import os
 import warnings
@@ -28,17 +28,6 @@ class Wave:
     def file_path(self):
         var = files("lsms_library") / "countries" / self.name
         return var
-    
-    @property
-    def relative_path(self):
-        '''
-        Get the relative path of the data file from the current working directory
-        Target: using categorical_mapping function requires relative path
-        '''
-        current_dir = Path(os.getcwd())  # Convert to Path object
-        data_file_path = Path(self.file_path)
-        rel_path = os.path.relpath(data_file_path, current_dir)
-        return rel_path
     
     @property
     def resources(self):
@@ -138,7 +127,7 @@ class Wave:
         Output:
             mapping: pd.DataFrame, the categorical mapping
         '''
-        path = self.relative_path
+        path = self.file_path
         try:
             mapping = get_categorical_mapping(fn='categorical_mapping.org',
                               tablename=table,
@@ -160,7 +149,11 @@ class Wave:
             df: pd.DataFrame, the data requested
         '''
         df_fn = self.file_path /f"_ /{request}.py"
-        if df_fn.exists():
+        parquet_fn = self.file_path /f"_ /{request}.parquet"
+        if parquet_fn.exists():
+            df = pd.read_parquet(parquet_fn)
+            return df
+        elif df_fn.exists():
             spec = importlib.util.spec_from_file_location(request, df_fn)
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
@@ -222,13 +215,12 @@ class Country:
     
     @property
     def resources(self):
-        var = self.file_path /"_"/ "data_info.yml"
-        try:
-            with open(var, 'r') as file:
-                data = yaml.safe_load(file)
-            return data
-        except FileNotFoundError as e:
-            warnings.warn(e)
+        var = self.file_path / "_" / "data_info.yml"
+        if not var.exists():
+            warnings.warn(f"File not found: {var}")
+            return None
+        with open(var, 'r') as file:
+            return yaml.safe_load(file)
     
     @property
     def formatting_functions(self):
@@ -250,23 +242,35 @@ class Country:
             if callable(func)
         }
     
+    @property
     def waves(self):
-        data = self.resources
-        if 'Waves' in data:
-            return data['Waves']
-        else:
-            warnings.warn(f"No waves found for {self.name}/_/data_info.yml")
-        
+        waves = [f.name for f in self.file_path.iterdir() if f.is_dir()]
+        for item in ['var', '_']:
+            if item in waves:
+                waves.remove(item)
+        return waves
+    
+    @property
     def data_scheme(self):
-        data = self.resources
-        if'Data Scheme' in data:
-            return list(data['Data Scheme'].keys())
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            data_info = self.resources
+        if data_info is not None:
+            data_list = list(data_info['Data Scheme'].keys())
         else:
-            warnings.warn(f"No data scheme found for {self.name}/_/data_info.yml")
+            # return list of parquet files name in the var folder
+            data_list = [f.stem for f in (self.file_path / "var").iterdir() if f.suffix == '.parquet']
+            # EEP 153 solving demand equation required data
+            required_list = ['food_acquired', 'household_roster', 'household_characteristics', 
+             'cluster_features', 'interview_date']
+            # intersection of required data and available data
+            data_list = list(set(data_list).intersection(required_list))
+        
+        return data_list
     
     def __getitem__(self, year):
         # Ensure the year is one of the available waves
-        if year in self.waves():
+        if year in self.waves:
             return Wave(year, self.name, self.data_scheme, self.formatting_functions)
         else:
             raise KeyError(f"{year} is not a valid wave for {self.name}")
@@ -288,7 +292,7 @@ class Country:
         To conver to org file or org string, please use function write_df_to_org
         """
         label_ls = []
-        for i in self.waves():
+        for i in self.waves:
             wave = self[i]
             data_info = wave.resources
             if data_info is None:
@@ -316,16 +320,24 @@ class Country:
 
         result_df = ai_process(union_label, prompt_method, ai_agent = ai_agent)
         
-        return result_df     
+        return result_df    
+ 
        
     def _aggregate_wave_data(self, waves, method_name):
         """
         Helper to gather DataFrames across multiple waves using
         a single wave-level method (e.g. 'food_acquired').
         """
+        #if there is parquet already in var, then just read it
         if waves is None:
-            waves = self.waves()
+            waves = self.waves
         results = {}
+        
+        # parquet_fn = self.file_path /f"var/{method_name}.parquet"
+        # if parquet_fn.exists():
+        #     df = pd.read_parquet(parquet_fn)
+        #     return df.loc[df.index.get_level_values('w').isin(waves)]
+
         for w in waves:
             try:
                 results[w] = getattr(self[w], method_name)()
@@ -495,3 +507,19 @@ class Country:
 #         r = rgsn.Regression(y=np.log(x.replace(0,np.nan).dropna()),
 #                             d=z,**kwargs)
 #         return r
+
+
+# def map_index(df):
+#     """
+#     Map index from old to new index
+#     """
+#     mapping_rules = {
+#         'i': 'temp_j',
+#         'j': 'i',
+#         'temp_j': 'j',
+#         'm': 'm',
+#         't': 'w',
+#         'u': 'u'
+#     }
+#     df = df.rename_axis(mapping_rules, axis=0)
+#     return df
