@@ -6,7 +6,7 @@ from importlib.resources import files
 import importlib
 import cfe.regression as rgsn
 from collections import defaultdict
-from .local_tools import df_data_grabber, format_id, get_categorical_mapping, category_union, get_dataframe
+from .local_tools import df_data_grabber, format_id, get_categorical_mapping, category_union, get_dataframe, fs
 import importlib.util
 import os
 import warnings
@@ -26,15 +26,14 @@ class Wave:
         self.formatting_functions = self.update_formatting_functions(formatting_functions)
     @property
     def file_path(self):
-        var = files("lsms_library") / "countries" / self.country/self.year
+        var = files("lsms_library") / "countries" / self.name
         return var
     
     @property
     def relative_path(self):
         '''
         Get the relative path of the data file from the current working directory
-        Target: loading dvc file requires relative path
-                using categorical_mapping function requires relative path
+        Target: using categorical_mapping function requires relative path
         '''
         current_dir = Path(os.getcwd())  # Convert to Path object
         data_file_path = Path(self.file_path)
@@ -172,7 +171,7 @@ class Wave:
             convert_cat = (self.resources.get(request).get('converted_categoricals') is None)
             dfs = []
             for file, mappings in mapping_details.items():
-                df = df_data_grabber(f'{self.relative_path}/Data/{file}', mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat)
+                df = df_data_grabber(f'{self.name}/Data/{file}', mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat)
                 df = df.reset_index().drop_duplicates()
                 df['w'] = self.year
                 df = df.set_index(['w']+list(mappings['idxvars'].keys()))
@@ -303,7 +302,7 @@ class Country:
             # Assuming same waves survey use same code value for the same label
             if isinstance(file, list):
                 file = file[0]
-            df = get_dataframe(f'{wave.relative_path}/Data/{file}')
+            df = get_dataframe(f'{wave.name}/Data/{file}')
             label_ls.append(df[col])
     
         label_ls = [{k: v.strip() if isinstance(v, str) else v for k, v in d.items()} for d in label_ls]

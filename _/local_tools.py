@@ -13,6 +13,12 @@ from pyarrow.lib import ArrowInvalid
 from functools import lru_cache
 from pathlib import Path
 from cfe.df_utils import df_to_orgtbl
+from importlib.resources import files
+from dvc.api import DVCFileSystem
+
+# Initialize DVC filesystem once and reuse it
+path = files('lsms_library')/'countries'
+fs = DVCFileSystem(path)
 
 def _to_numeric(x,coerce=False):
     try:
@@ -22,7 +28,7 @@ def _to_numeric(x,coerce=False):
             return pd.to_numeric(x)
     except (ValueError,TypeError):
         return x
-
+    
 @lru_cache(maxsize=3)
 def get_dataframe(fn,convert_categoricals=True,encoding=None,categories_only=False):
     """From a file named fn, try  to return a dataframe.
@@ -82,7 +88,7 @@ def get_dataframe(fn,convert_categoricals=True,encoding=None,categories_only=Fal
         with open(fn,mode='rb') as f:
             df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
     else:
-        with dvc.api.open(fn,mode='rb') as f:
+        with fs.open(fn,mode='rb') as f:
             df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
 
     return df
