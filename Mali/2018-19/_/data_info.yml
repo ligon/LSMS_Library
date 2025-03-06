@@ -3,10 +3,8 @@ Wave: 2018-19
 
 
 cluster_features:
-    file: 
-        - ehcvm_conso_mli2018.dta
+    file: ehcvm_conso_mli2018.dta
     idxvars:
-        w: grappe
         v: grappe
     myvars:
         Region: region
@@ -14,10 +12,8 @@ cluster_features:
 
 
 household_roster:
-    file: 
-        - ehcvm_individu_mli2018.dta
+    file: ehcvm_individu_mli2018.dta
     idxvars:
-        w: grappe
         v: grappe
         i: 
             - grappe
@@ -30,14 +26,11 @@ household_roster:
         Sex: sexe
         Age: age
         Relation: lien
-        Highest Education: 'educ_hi'
 
 
 food_acquired:
-    file: 
-        - s07b_me_mli2018.dta
+    file: s07b_me_mli2018.dta
     idxvars:
-        w: grappe
         v: grappe
         visit: vague
         i: 
@@ -47,10 +40,33 @@ food_acquired:
         u: s07bq03b
     myvars:
         Quantity: s07bq03a
-        Price: s07bq08
+        Expenditure: s07bq08
         Produced: s07bq04
 
+individual_education:
+    file: ehcvm_individu_mli2018.dta
+    idxvars:
+        v: grappe
+        i: 
+            - grappe
+            - menage
+        pid:
+            - grappe
+            - menage 
+            - numind
+    myvars:
+        Highest Education: 'educ_hi'
 
 
+interview_date:
+    file: s00_me_mli2018.dta
+    idxvars:
+        v: grappe
+        visit: vague
+        i: 
+            - grappe
+            - menage
+    myvars:
+        Int_t: s00q23a
 
 

@@ -54,8 +54,6 @@ class gpt_agent:
             json_str = match.group(1)
             response_converted = json.loads(json_str)
             df = pd.DataFrame(list(response_converted.items()), columns=["Original Label", "Preferred Label"])
-            # add one column named 'manual Update'
-            df['Manual Update'] = ""
             return df
 
         else:
