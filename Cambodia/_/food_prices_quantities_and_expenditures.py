@@ -6,7 +6,7 @@ import numpy as np
 import json
 import sys
 sys.path.append('../../_/')
-from local_tools import to_parquet
+from lsms_library.local_tools import to_parquet
 
 df = pd.read_parquet('../var/food_acquired.parquet')
 

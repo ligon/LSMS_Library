@@ -8,7 +8,7 @@ import numpy as np
 from eep153_tools.sheets import read_sheets
 import sys
 sys.path.append('../../_/')
-from local_tools import df_from_orgfile
+from lsms_library.local_tools import df_from_orgfile
 
 fct = pd.read_parquet('../var/fct.parquet')
 q = pd.read_parquet('../var/food_quantities.parquet').squeeze()

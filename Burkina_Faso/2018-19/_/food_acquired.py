@@ -4,7 +4,7 @@ import sys
 sys.path.append('../../_/')
 from burkina_faso import age_sex_composition
 sys.path.append('../../../_')
-from local_tools import to_parquet
+from lsms_library.local_tools import to_parquet
 import pandas as pd
 import numpy as np
 import json

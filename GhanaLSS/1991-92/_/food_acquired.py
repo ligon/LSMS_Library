@@ -5,7 +5,7 @@ import pandas as pd
 sys.path.append('../../_')
 from ghana import split_by_visit
 sys.path.append('../../../_/')
-from local_tools import df_from_orgfile, get_categorical_mapping, format_id, df_data_grabber, _to_numeric, to_parquet
+from lsms_library.local_tools import df_from_orgfile, get_categorical_mapping, format_id, df_data_grabber, _to_numeric, to_parquet
 import warnings
 
 w = '1991-92'

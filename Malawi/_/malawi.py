@@ -8,7 +8,7 @@ from lsms import from_dta
 from lsms.tools import get_household_roster
 import sys
 sys.path.append('../../../_/')
-from local_tools import conversion_table_matching_global
+from lsms_library.local_tools import conversion_table_matching_global
 
 def age_sex_composition(df, sex, sex_converter, age, age_converter, hhid):
     Age_ints = ((0,4),(4,9),(9,14),(14,19),(19,31),(31,51),(51,100))

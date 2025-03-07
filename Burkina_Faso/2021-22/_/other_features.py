@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 import dvc.api
 from lsms import from_dta
-from local_tools import to_parquet
+from lsms_library.local_tools import to_parquet
 
 
 with dvc.api.open('../Data/s00_me_bfa2021.dta', mode='rb') as dta:

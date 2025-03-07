@@ -3,7 +3,7 @@ import sys
 sys.path.append('../../_/')
 from ethiopia import food_acquired
 sys.path.append('../../../_/')
-from local_tools import to_parquet
+from lsms_library.local_tools import to_parquet
 
 fn='../Data/sect6a_hh_w4.dta'
 

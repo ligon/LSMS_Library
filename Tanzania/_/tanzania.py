@@ -8,7 +8,7 @@ import json
 import sys
 sys.path.append('../../_')
 sys.path.append('../../../_')
-from local_tools import add_markets_from_other_features, format_id
+from lsms_library.local_tools import add_markets_from_other_features, format_id
 from collections import defaultdict
 
 country = 'Tanzania'

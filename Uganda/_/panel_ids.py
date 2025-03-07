@@ -3,7 +3,7 @@ import json
 from uganda import Waves
 import sys
 sys.path.append('../../_')
-from local_tools import panel_ids
+from lsms_library.local_tools import panel_ids
 
 D = panel_ids(Waves)
 
