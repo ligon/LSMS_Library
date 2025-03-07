@@ -45,6 +45,15 @@ def get_dataframe(fn,convert_categoricals=True,encoding=None,categories_only=Fal
             return True
         except FileNotFoundError:
             return False
+    
+    def file_system_path(fn):
+    # is the file a relative path or it's the full path from our fs (DVCFileSystem)?
+        try:
+            with fs.open(fn) as f:
+                pass
+            return True
+        except FileNotFoundError:
+            return False
 
     def read_file(f,convert_categoricals=convert_categoricals,encoding=encoding):
         try:
@@ -87,8 +96,11 @@ def get_dataframe(fn,convert_categoricals=True,encoding=None,categories_only=Fal
     if local_file(fn):
         with open(fn,mode='rb') as f:
             df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
-    else:
+    elif file_system_path(fn):
         with fs.open(fn,mode='rb') as f:
+            df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
+    else:
+        with dvc.api.open(fn,mode='rb') as f:
             df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
 
     return df

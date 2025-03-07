@@ -15,7 +15,7 @@ import warnings
 from .ai_agent import ai_process, gpt_agent
 warnings.filterwarnings('ignore', category=FutureWarning)
 warnings.filterwarnings('ignore', category=UnicodeWarning)
-
+import subprocess
 
 class Wave:
     def __init__(self, year, country_name, data_scheme, formatting_functions):
@@ -148,17 +148,24 @@ class Wave:
         Output:
             df: pd.DataFrame, the data requested
         '''
-        df_fn = self.file_path /f"_ /{request}.py"
-        parquet_fn = self.file_path /f"_ /{request}.parquet"
+        df_fn = self.file_path /f"_/{request}.py"
+        parquet_fn = self.file_path /f"_/{request}.parquet"
         if parquet_fn.exists():
             df = pd.read_parquet(parquet_fn)
             return df
+        # if in the upper directory Makefile exist: we should run Makefile
         elif df_fn.exists():
-            spec = importlib.util.spec_from_file_location(request, df_fn)
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-            df = module.df
-            return df
+            # spec = importlib.util.spec_from_file_location(request, df_fn)
+            # module = importlib.util.module_from_spec(spec)
+            # spec.loader.exec_module(module)
+            cwd_path = self.file_path / "_"
+            subprocess.run(['python', df_fn], cwd=cwd_path, check=True)
+            if parquet_fn.exists():
+                df = pd.read_parquet(parquet_fn)
+                return df
+            else:
+                warnings.warn(f"Failed to generate {request}.parquet")
+                return pd.DataFrame()
         else:
             mapping_details = self.column_mapping(request)
             convert_cat = (self.resources.get(request).get('converted_categoricals') is None)
@@ -184,11 +191,16 @@ class Wave:
         return self.grab_data('household_roster')
     
     def food_acquired(self):
+        df = self.grab_data('food_acquired')
+        parquet_fn = self.file_path /f"_/food_acquired.parquet"
+        
+        # Check if df is read from parquet file which is created by food_acquired.py, then it's already mapped categorical labels
+        if parquet_fn.exists():
+            return df
+        
         unit_mapping = self.categorical_mapping('unit')
         food_mapping = self.categorical_mapping('harmonize_food')
         agg_functions = {'Expenditure': 'sum', 'Quantity': 'sum', 'Produced': 'sum', 'Price': 'first'}
-
-        df = self.grab_data('food_acquired')
         index = df.index.names
         variable = df.columns
         df = df.reset_index()
@@ -202,6 +214,9 @@ class Wave:
     
     def interview_date(self):
         return self.grab_data('interview_date')
+    
+    def household_characteristics(self):
+        return self.grab_data('household_characteristics')
     
     
 class Country:
@@ -217,15 +232,15 @@ class Country:
     def resources(self):
         var = self.file_path / "_" / "data_info.yml"
         if not var.exists():
-            warnings.warn(f"File not found: {var}")
+            warnings.warn(f"File not found: {var}, consider read parquet file or running Makefile or single py file for data processing")
             return None
         with open(var, 'r') as file:
             return yaml.safe_load(file)
     
     @property
     def formatting_functions(self):
-        general__module_filename = f"{self.name.lower()}.py"
-        general_mod_path = files("lsms_library")/ "countries"/ self.name/ "_"/ general__module_filename
+        general_module_filename = f"{self.name.lower()}.py"
+        general_mod_path = self.file_path/ "_"/ general_module_filename
 
         if not general_mod_path.exists():
             return {}
@@ -259,7 +274,7 @@ class Country:
             data_list = list(data_info['Data Scheme'].keys())
         else:
             # return list of parquet files name in the var folder
-            data_list = [f.stem for f in (self.file_path / "var").iterdir() if f.suffix == '.parquet']
+            data_list = [f.stem for f in (self.file_path / "_").iterdir() if f.suffix == '.py']
             # EEP 153 solving demand equation required data
             required_list = ['food_acquired', 'household_roster', 'household_characteristics', 
              'cluster_features', 'interview_date']
@@ -321,31 +336,62 @@ class Country:
         result_df = ai_process(union_label, prompt_method, ai_agent = ai_agent)
         
         return result_df    
- 
-       
+
     def _aggregate_wave_data(self, waves, method_name):
         """
-        Helper to gather DataFrames across multiple waves using
-        a single wave-level method (e.g. 'food_acquired').
+        Aggregates data across multiple waves using a single dataset method.
+        If the required `.parquet` file is missing, it requests `Makefile` to generate only that file.
         """
-        #if there is parquet already in var, then just read it
+        if method_name not in self.data_scheme:
+            warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+            return pd.DataFrame()
+
         if waves is None:
             waves = self.waves
-        results = {}
-        
-        # parquet_fn = self.file_path /f"var/{method_name}.parquet"
-        # if parquet_fn.exists():
-        #     df = pd.read_parquet(parquet_fn)
-        #     return df.loc[df.index.get_level_values('w').isin(waves)]
 
-        for w in waves:
+        parquet_fn = self.file_path / "var" / f"{method_name}.parquet"
+
+        #Step 1: Check if it mapped by data_info.yml
+        if self.resources is not None:
+            results = {}
+            for w in waves:
+                try:
+                    results[w] = getattr(self[w], method_name)()
+                except KeyError as e:
+                    warnings.warn(str(e))
+            if results:
+                return pd.concat(results.values(), axis=0, sort=False)
+        
+        # Step 2: Check if parquet file exists
+        if not parquet_fn.exists():
+            warnings.warn(f"Required parquet file {parquet_fn} missing. Attempting to generate using Makefile...")
+
+            makefile_path = self.file_path /'_'/ "Makefile"
+            if not makefile_path.exists():
+                warnings.warn(f"Makefile not found in {self.file_path}. Unable to generate required data.")
+                return pd.DataFrame()
+
+            # Step 3: Run Makefile for the specific parquet file
             try:
-                results[w] = getattr(self[w], method_name)()
-            except KeyError as e:
-                warnings.warn(str(e))
-        if results:
-            return pd.concat(results.values(), axis=0, sort=False)
-        return pd.DataFrame()
+                cwd_path = self.file_path/"_"
+                relative_parquet_path = parquet_fn.relative_to(cwd_path.parent)  # Convert to relative path
+                subprocess.run(["make", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True)
+                warnings.warn(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...")
+            except subprocess.CalledProcessError as e:
+                warnings.warn(f"Failed to execute Makefile for {self.name}: {e}")
+                return pd.DataFrame()
+
+            # Step 4: Recheck if the parquet file was successfully generated
+            if not parquet_fn.exists():
+                warnings.warn(f"Parquet file {parquet_fn} still missing after running Makefile.")
+                return pd.DataFrame()
+
+        # Step 5: Read and return the parquet file
+        df = pd.read_parquet(parquet_fn)
+
+        df = map_index(df)
+
+        return df
 
     def cluster_features(self, waves=None):
         return self._aggregate_wave_data(waves, 'cluster_features')
@@ -359,10 +405,25 @@ class Country:
     def interview_date(self, waves=None):
         return self._aggregate_wave_data(waves, 'interview_date')
     
+    def household_characteristics(self, waves=None):
+        return self._aggregate_wave_data(waves, 'household_characteristics')
+    
     # def id_walk():
-        
 
-
+def map_index(df):
+    """
+    Map index from old to new index
+    """
+    mapping_rules = {
+        'i': 'temp_j',
+        'j': 'i',
+        'm': 'Region',
+        't': 'w',
+        'u': 'u'
+    }
+    df_renamed = df.rename_axis(index=mapping_rules)
+    df_renamed = df_renamed.rename_axis(index = {'temp_j': 'j'})
+    return df_renamed
 
 
 
@@ -509,17 +570,3 @@ class Country:
 #         return r
 
 
-# def map_index(df):
-#     """
-#     Map index from old to new index
-#     """
-#     mapping_rules = {
-#         'i': 'temp_j',
-#         'j': 'i',
-#         'temp_j': 'j',
-#         'm': 'm',
-#         't': 'w',
-#         'u': 'u'
-#     }
-#     df = df.rename_axis(mapping_rules, axis=0)
-#     return df
