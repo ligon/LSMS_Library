@@ -6,7 +6,7 @@ in particular checking whether indices and column labels are consistent.
 
 import pandas as pd
 import argparse
-from local_tools import add_markets_from_other_features
+from lsms_library.local_tools import add_markets_from_other_features
 import warnings
 
 

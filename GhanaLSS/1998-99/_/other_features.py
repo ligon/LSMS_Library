@@ -7,7 +7,7 @@ import json
 import dvc.api
 from lsms import from_dta
 sys.path.append('../../../_/')
-from local_tools import df_from_orgfile, format_id
+from lsms_library.local_tools import df_from_orgfile, format_id
 
 with dvc.api.open('../Data/SEC0A.DTA', mode='rb') as dta:
     df = from_dta(dta, convert_categoricals=True)

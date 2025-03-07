@@ -9,7 +9,7 @@ import json
 import dvc.api
 from lsms import from_dta
 from lsms.tools import get_household_identification_particulars
-from local_tools import other_features
+from lsms_library.local_tools import other_features
 
 fs = dvc.api.DVCFileSystem('../../')
 fs.get_file('/Guatemala/2000/Data/ECV09P05.DTA', '/tmp/ECV09P05.DTA')

@@ -9,7 +9,7 @@ sys.path.append('../../../_/')
 import pandas as pd
 import numpy as np
 from fct_addition import nutrient_df, harmonize_nutrient
-from local_tools import df_from_orgfile
+from lsms_library.local_tools import df_from_orgfile
 
 apikey = "hAkb5LsLAS1capOD60K6ILrZDkC29eK6ZmqCumXB"
 fct_add = df_from_orgfile('nutrition.org',name='fct_addition',encoding='ISO-8859-1')

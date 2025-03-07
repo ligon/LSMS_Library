@@ -31,11 +31,11 @@ food_acquired:
         visit: passage
         i: 
             - grappe
-             - menage
+            - menage
         j: s13q01
-        u: s07bq03b
+        u: s13q03b
     myvars:
-        Quantity: s07bq03a
+        Quantity: s13q02
         Expenditure: s13q03c
         Produced: s13q04a
     file:

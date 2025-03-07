@@ -4,7 +4,7 @@ Create a nutrition DataFrame for households based on food consumption quantities
 
 import sys
 sys.path.append('../../_/')
-from local_tools import df_from_orgfile
+from lsms_library.local_tools import df_from_orgfile
 from fct_tools import nutrient_df, harmonize_nutrient, fct_filter
 import pandas as pd
 import numpy as np

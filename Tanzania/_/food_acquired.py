@@ -3,7 +3,7 @@ different prices for different units.
 """
 import sys
 sys.path.append('../../_')
-from local_tools import df_from_orgfile
+from lsms_library.local_tools import df_from_orgfile
 import pandas as pd
 import numpy as np
 from tanzania import Waves, add_markets_from_other_features, country, id_walk, waves

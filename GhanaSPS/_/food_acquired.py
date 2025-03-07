@@ -8,7 +8,7 @@ from ghana_panel import change_id, Waves, harmonized_food_labels
 import warnings
 import sys
 sys.path.append('../../_/')
-from local_tools import df_from_orgfile
+from lsms_library.local_tools import df_from_orgfile
 
 def fix_food_labels():
     D = {}

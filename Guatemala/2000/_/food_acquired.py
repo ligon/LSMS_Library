@@ -6,7 +6,7 @@ import pyreadstat
 import numpy as np
 import dvc.api
 sys.path.append('../../../_/')
-from local_tools import df_from_orgfile
+from lsms_library.local_tools import df_from_orgfile
 
 fs = dvc.api.DVCFileSystem('../../')
 fs.get_file('/Guatemala/2000/Data/ECV13G12.DTA', '/tmp/ECV13G12.DTA')

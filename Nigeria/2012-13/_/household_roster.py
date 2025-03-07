@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import sys
 sys.path.append('../../../_/')
-from local_tools import df_data_grabber, to_parquet
+from lsms_library.local_tools import df_data_grabber, to_parquet
 
 def extract_number(x):
     """
@@ -29,7 +29,8 @@ idxvars = dict(j='hhid',
 
 myvars = dict(sex = ('s1q2', lambda s: extract_string(s).title()),
               age = 's1q6',
-              relation = ('s1q3', lambda s: extract_string(s).title()))
+              relation = ('s1q3', lambda s: extract_string(s).title()),
+              in_housing = ('s1q4', lambda s: extract_string(s).title()))
 
 pp = df_data_grabber('../Data/Post Planting Wave 2/Household/sect1_plantingw2.dta',idxvars,**myvars)
 
@@ -38,12 +39,13 @@ pp = df_data_grabber('../Data/Post Planting Wave 2/Household/sect1_plantingw2.dt
 idxvars = dict(j='hhid',
                t=('hhid', lambda x: "2013Q1"),
                m=('zone', extract_string),
-               indiv='indiv',
+               indiv='indiv'
                )
 
 myvars = dict(sex = ('s1q2', lambda s: extract_string(s).title()),
-              age = 's1q4',
-              relation = ('s1q3', lambda s: extract_string(s).title()),)
+              age = 's1q6',
+              relation = ('s1q3', lambda s: extract_string(s).title()),
+              in_housing = ('s1q14', lambda s: extract_string(s).title())) 
 
 ph = df_data_grabber('../Data/Post Harvest Wave 2/Household/sect1_harvestw2.dta',idxvars,**myvars)
 df = pd.concat([pp,ph])

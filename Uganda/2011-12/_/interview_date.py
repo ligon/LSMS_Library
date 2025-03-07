@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import sys
 sys.path.append('../../../_/')
-from local_tools import df_data_grabber, to_parquet
+from lsms_library.local_tools import df_data_grabber, to_parquet
 from datetime import datetime
 
 idxvars = dict(j = 'HHID',
