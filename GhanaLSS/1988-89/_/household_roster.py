@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import sys
 sys.path.append('../../../_/')
-from local_tools import df_data_grabber, to_parquet, df_from_orgfile, format_id
+from lsms_library.local_tools import df_data_grabber, to_parquet, df_from_orgfile, format_id
 
 relationship_mapping = df_from_orgfile('../../_/categorical_mapping.org',name='relationship',encoding='ISO-8859-1')
 relationship_mapping = relationship_mapping.set_index('Code').to_dict('dict')['Label']

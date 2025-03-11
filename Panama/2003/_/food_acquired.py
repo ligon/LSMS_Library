@@ -7,7 +7,7 @@ import dvc.api
 from lsms import from_dta
 import pyreadstat
 sys.path.append('../../../_/')
-from local_tools import to_parquet, df_from_orgfile, format_id
+from lsms_library.local_tools import to_parquet, df_from_orgfile, format_id
 
 t = '2003'
 

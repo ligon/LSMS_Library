@@ -8,7 +8,7 @@ from ghana import change_id, Waves, harmonized_food_labels
 import warnings
 import sys
 sys.path.append('../../_/')
-from local_tools import df_from_orgfile
+from lsms_library.local_tools import df_from_orgfile
 
 #harmonize food labels 
 labels = df_from_orgfile('./food_items.org',name='food_label',encoding='ISO-8859-1')

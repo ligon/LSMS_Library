@@ -13,7 +13,7 @@ except ImportError:
 import numpy as np
 import sys
 sys.path.append('../../_/')
-from local_tools import to_parquet
+from lsms_library.local_tools import to_parquet
 
 def id_walk(df,wave,waves):
     

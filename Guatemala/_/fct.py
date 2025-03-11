@@ -8,7 +8,7 @@ import numpy as np
 from eep153_tools.sheets import read_sheets
 import sys
 sys.path.append('../../_/')
-from local_tools import df_from_orgfile
+from lsms_library.local_tools import df_from_orgfile
 
 fct = read_sheets('https://docs.google.com/spreadsheets/d/1qljY2xrxbc37d9tLSyuFa9CnjEsh3Re2ufDQlBHzPEQ/',
                   sheet='FCT',nheaders=3)
