@@ -275,7 +275,7 @@ class Country:
         else:
             raise KeyError(f"{year} is not a valid wave for {self.name}")
     
-    def ai_categorical_mapping(self, label_col, label_col_type = 'idxvars', data_request = 'food_acquired', ai_agent=gpt_agent()):
+    def ai_categorical_mapping(self, label_col, label_col_type='idxvars', data_request='food_acquired', ai_agent=gpt_agent()):
         """
         Use AI to generalize original labels across all waves to be consistent for mapping, such as food labels or unit labels.
         
@@ -289,7 +289,7 @@ class Country:
         Returns:
         pd.DataFrame: A DataFrame containing three columns named Original Label, Preferred Label, and Manual Update.
 
-        To conver to org file or org string, please use function write_df_to_org
+        To convert to org file or org string, use function df_to_org
         """
         label_ls = []
         for i in self.waves:
