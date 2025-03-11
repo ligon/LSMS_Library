@@ -7,7 +7,7 @@ import pandas as pd
 import dvc.api
 from lsms import from_dta
 from burkina_faso import age_sex_composition
-from local_tools import to_parquet
+from lsms_library.local_tools import to_parquet
 
 
 with dvc.api.open('../Data/s01_me_bfa2021.dta', mode='rb') as dta:

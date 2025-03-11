@@ -4,7 +4,7 @@ sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
 sys.path.append('../../../_/')
-from local_tools import df_data_grabber, to_parquet, df_from_orgfile, format_id
+from lsms_library.local_tools import df_data_grabber, to_parquet, df_from_orgfile, format_id
 from collections import defaultdict
 
 #rural = df_from_orgfile('./categorical_mapping.org',name='rural',encoding='ISO-8859-1')

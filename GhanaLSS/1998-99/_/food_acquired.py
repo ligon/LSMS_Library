@@ -6,7 +6,7 @@ import dvc.api
 import pandas as pd
 from ghana import split_by_visit
 sys.path.append('../../../_/')
-from local_tools import df_from_orgfile
+from lsms_library.local_tools import df_from_orgfile
 
 t = '1998-99'
 

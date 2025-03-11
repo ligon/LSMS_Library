@@ -2,9 +2,9 @@ Country: GhanaLSS
 Wave: 2016-17
 
 cluster_features:
-    file: g7sec8h.dta
+    file: 
+        - g7sec8h.dta
     idxvars:
-        w: clust
         v: clust
     myvars:
         Region: region
@@ -12,9 +12,9 @@ cluster_features:
 
 
 household_roster:
-    file: g7sec1.dta
+    file: 
+        - g7sec1.dta
     idxvars:
-        w: clust
         v: clust
         i: 
             - clust
@@ -25,7 +25,5 @@ household_roster:
         Age: s1q5y
         Birthplace: s1q11
         Relation: s1q3
-
-
 
 

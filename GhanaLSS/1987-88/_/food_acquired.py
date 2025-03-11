@@ -6,7 +6,7 @@ import numpy as np
 import dvc.api
 import pandas as pd
 sys.path.append('../../../_/')
-from local_tools import df_from_orgfile
+from lsms_library.local_tools import df_from_orgfile
 
 t = '1987-88'
 #categorical mapping

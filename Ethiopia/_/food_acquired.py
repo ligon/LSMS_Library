@@ -3,7 +3,7 @@ different prices for different units.
 """
 import sys
 sys.path.append('../../_/')
-from local_tools import to_parquet
+from lsms_library.local_tools import to_parquet
 
 import pandas as pd
 import numpy as np
@@ -11,7 +11,7 @@ from ethiopia import change_id, Waves, harmonized_food_labels
 import warnings
 import sys
 sys.path.append('../../_/')
-from local_tools import to_parquet
+from lsms_library.local_tools import to_parquet
 
 
 def fix_food_labels():

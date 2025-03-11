@@ -4,7 +4,7 @@ from calendar import month
 from stat import SF_APPEND
 import sys
 sys.path.append('../../../_/')
-from local_tools import to_parquet
+from lsms_library.local_tools import to_parquet
 import pandas as pd
 import dvc.api
 from datetime import datetime
