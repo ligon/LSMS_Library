@@ -4,6 +4,7 @@
 A collection of mappings to transform dataframes.
 """
 import pandas as pd
+import numpy as np
 
 def age_intervals(age,age_cuts=(0,4,9,14,19,31,51)):
     """
