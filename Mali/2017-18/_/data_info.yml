@@ -1,0 +1,57 @@
+Country: Mali
+Wave: 2017-18
+
+cluster_features:
+    file: eaci17_s00p1.dta
+    idxvars:
+        v: grappe
+    myvars:
+        Region: s0q01
+        Rural: s0q04
+
+household_roster:
+    idxvars:
+        v: grappe
+        i: 
+            - grappe
+            - exploitation
+        pid:
+            - grappe
+            - exploitation 
+            - codeid
+    myvars:
+        Sex: s1q01
+        Age: s1q04a
+        Relation: s1q02
+    file: eaci17_s01p1.dta
+
+individual_education:
+    idxvars:
+        v: grappe
+        i: 
+            - grappe
+            - exploitation
+        pid:
+            - grappe
+            - exploitation 
+            - codeid
+    myvars:
+        Highest Education:  's1q07'
+    file: 'eaci17_s01p1.dta'
+
+interview_date:
+    file: 
+        - eaci17_s00p1.dta
+        - eaci17_s00p2.dta
+    idxvars:
+        v: grappe
+        visit: passage
+        i:
+            - grappe
+            - exploitation
+    myvars:
+        Int_t: 
+            - s0q21c
+            - s0q21b
+            - s0q21a
+    converted_categoricals: False

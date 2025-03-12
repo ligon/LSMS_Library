@@ -2,12 +2,12 @@ import numpy as np
 import pandas as pd
 import sys
 sys.path.append('../../../_/')
-from local_tools import df_data_grabber, to_parquet
+from lsms_library.local_tools import df_data_grabber, to_parquet
 
 
-##Planting 2016Q1
+##Planting 2015Q3
 idxvars = dict(j='hhid',
-                t=('sector', lambda x: "2016Q1"))
+                t=('sector', lambda x: "2015Q3"))
 myvars = dict(year='saq13y',
                 month='saq13m',
                 day='saq13d')
@@ -16,9 +16,9 @@ df_1['date'] = pd.to_datetime(df_1[['year', 'month', 'day']], errors='coerce')
 df_1=df_1.drop(columns=['year','month','day'])
 
 
-##Harvest(2015Q3)
+##Harvest(2016Q1)
 idxvars = dict(j='hhid',
-                t=('sector', lambda x: "2015Q3"))
+                t=('sector', lambda x: "2016Q1"))
 myvars = dict(year='saq13y',
                 month='saq13m',
                 day='saq13d')

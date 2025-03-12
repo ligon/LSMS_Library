@@ -19,4 +19,4 @@ x = x.rename(columns=lbl['Aggregated Label'])
 x.columns.name = 'i'
 x = x.groupby('i',axis=1).sum()
 
-x.to_parquet('./food_expenditures.parquet')
+x.to_parquet('../var/food_expenditures.parquet')

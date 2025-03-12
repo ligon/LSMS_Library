@@ -2,7 +2,7 @@
 import numpy as np
 import sys
 sys.path.append('../../../_/')
-from local_tools import df_data_grabber, to_parquet
+from lsms_library.local_tools import df_data_grabber, to_parquet
 
 round_match = {1:'2008-09', 2:'2010-11', 3:'2012-13', 4:'2014-15'}
 

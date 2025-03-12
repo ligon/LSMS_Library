@@ -7,7 +7,7 @@ import numpy as np
 import json
 import dvc.api
 from lsms import from_dta
-from local_tools import to_parquet
+from lsms_library.local_tools import to_parquet
 
 with dvc.api.open('../Data/hh_sec_5.dta', mode='rb') as dta:
     foods = from_dta(dta, convert_categoricals=True)

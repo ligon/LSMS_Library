@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import sys
 sys.path.append('../../../_/')
-from local_tools import df_data_grabber, to_parquet
+from lsms_library.local_tools import df_data_grabber, to_parquet
 
 def extract_number(x):
     """
@@ -22,7 +22,7 @@ def extract_string(x):
 # Post planting:
 
 idxvars = dict(j='hhid',
-               t=('hhid', lambda x: "2018"),
+               t=('hhid', lambda x: "2018Q3"),
                m=('zone', extract_string),
                indiv='indiv',
                )
@@ -36,7 +36,7 @@ pp = df_data_grabber('../Data/sect1_plantingw4.dta',idxvars,**myvars)
 # Post harvest
 #
 idxvars = dict(j='hhid',
-               t=('hhid', lambda x: "2019"),
+               t=('hhid', lambda x: "2019Q1"),
                m=('zone', extract_string),
                indiv='indiv',
                )

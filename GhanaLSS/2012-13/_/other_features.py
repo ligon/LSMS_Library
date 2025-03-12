@@ -24,6 +24,4 @@ of['j'] = of['j'].astype(str)
 of['t'] = '2012-13'
 of = of.set_index(['j','t','m'])
 
-of['Rural'] = of['Rural'].replace({'Rural':1, 'Urban':0}) #preserve NaNs
-
 of.to_parquet('other_features.parquet')

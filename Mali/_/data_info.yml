@@ -1,0 +1,40 @@
+Country: Mali
+
+Waves:
+  - '2014-15'
+  - '2017-18'
+  - '2018-19'
+  - '2021-22'
+
+Index Info:
+  note: no interview date (int_t), compared with global index info
+  index_info:
+    cluster_features: (w, v)
+    household_roster: (w, v, i, pid)
+    individual_education: (w, v, i, pid)
+    food_acquired: (w, v, visit, i, j, u)
+    interview_date: (w, v, visit, i)
+
+Data Scheme:
+  cluster_features:
+    index: (w, v)
+    Region: str
+    Rural: str
+  household_roster:
+    index: (w, v, i, pid)
+    Sex: str
+    Age: int
+    Relationship: str
+  individual_education:
+    index: (w, v, i, pid)
+    Highest Education: str
+  food_acquired:
+    index: (w, v, visit, i, j, u)
+    Quantity: float
+    Price: float
+    Produced: float
+  interview_date:
+    index: (w, v, visit, i)
+    Int_t: str
+
+

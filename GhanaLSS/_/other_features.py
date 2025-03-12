@@ -4,8 +4,16 @@ Concatenate data on other household features across rounds.
 """
 
 import pandas as pd
-from ghana import change_id, Waves
+
+try:
+    from .ghana import change_id, Waves  # Used as part of a package
+except ImportError:
+    from ghana import change_id, Waves # Running standalone
+
 import numpy as np
+import sys
+sys.path.append('../../_/')
+from lsms_library.local_tools import to_parquet
 
 def id_walk(df,wave,waves):
     
@@ -41,4 +49,5 @@ z = z.stack().unstack('k')
 z['Rural']= z['Rural'].replace('nan', np.nan)
 z = z.reset_index().set_index(['j','t','m'])
 
-z.to_parquet('../var/other_features.parquet')
+if __name__=='__main__':
+    to_parquet(z,'../var/other_features.parquet')

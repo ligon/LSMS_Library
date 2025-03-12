@@ -1,28 +1,21 @@
 #!/usr/bin/env python
 
 import sys
-sys.path.append('../../_/')
+sys.path.append('../../../_/')
 import pandas as pd
 import numpy as np
-import json
-import dvc.api
 from lsms import from_dta
+from lsms_library.local_tools import df_data_grabber, to_parquet, df_from_orgfile, format_id
 
-with dvc.api.open('../Data/parta/sec0.dta', mode='rb') as dta:
-    df = from_dta(dta, convert_categoricals=True)
+idxvars = dict(j=(['clust','nh'],lambda x: format_id(x.clust)+format_id(x.nh)),
+               m=('region',lambda s: s.title())
+               )
 
-of = df[['clust','nh','region']]
+myvars = dict(Rural=("loc2",lambda s: s.title()))
 
-of['j'] = of['clust'].astype(int).astype("string")+'/'+of['nh'].astype(int).astype("string")
+df = df_data_grabber('../Data/aggregates/pov_gh5.dta',idxvars,**myvars,convert_categoricals=True)
+df['t'] = '2005-06'
+df = df.reset_index().set_index(['j','t','m'])
 
-of = of.rename(columns = {'hhid': 'j',
-                          'region': 'm'})
-
-of['j'] = of['j'].astype(str)
-of['t'] = '2005-06'
-of['Rural'] = np.nan
-of['m'] = of.m.str.title()
-of = of.set_index(['j','t','m'])
-
-of = of[['Rural']]
-of.to_parquet('other_features.parquet')
+if __name__=='__main__':
+    to_parquet(df,'other_features.parquet')

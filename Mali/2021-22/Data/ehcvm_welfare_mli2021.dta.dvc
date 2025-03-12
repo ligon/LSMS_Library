@@ -1,0 +1,5 @@
+outs:
+- md5: 57211f006748ea3906aef470bf328794
+  size: 901604
+  hash: md5
+  path: ehcvm_welfare_mli2021.dta

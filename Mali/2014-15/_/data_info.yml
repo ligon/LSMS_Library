@@ -1,0 +1,78 @@
+Country: Mali
+Wave: 2014-15
+
+cluster_features:
+    file: eaci2014_agregatconso.dta
+    idxvars:
+        v: grappe
+    myvars:
+        Region: region
+        Rural: milieu
+
+household_roster:
+    file: EACIIND_p1.dta
+    idxvars:
+        v: grappe
+        i: 
+            - grappe
+            - menage
+        pid:
+            - grappe
+            - menage 
+            - s01q
+    myvars:
+        Sex: s01q01
+        Age: s01q04a
+        Relation: s01q02
+        
+food_acquired:
+    idxvars:
+        v: grappe
+        visit: passage
+        i: 
+            - grappe
+            - menage
+        j: s13q01
+        u: s13q03b
+    myvars:
+        Quantity: s13q02
+        Expenditure: s13q03c
+        Produced: s13q04a
+    file:
+        - EACIALI_p1.dta
+        - EACIALI_p2.dta
+
+individual_education:
+    file: EACIIND_p1.dta
+    idxvars:
+        v: grappe
+        i: 
+            - grappe
+            - menage
+        pid:
+            - grappe
+            - menage 
+            - s01q
+    myvars:
+        Highest Education: s01q06
+
+
+interview_date:
+    file: 
+        - EACICONTROLE_p1.dta
+    idxvars:
+        v: grappe
+        visit: s00q22y
+        i:
+            - grappe
+            - menage
+    myvars:
+        Int_t: 
+            - s00q22y
+            - s00q22m
+            - s00q22j
+    converted_categoricals: False
+
+
+
+

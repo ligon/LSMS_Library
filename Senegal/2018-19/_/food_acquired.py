@@ -8,7 +8,7 @@ import numpy as np
 import json
 import dvc.api
 from lsms import from_dta
-from local_tools import df_from_orgfile, to_parquet
+from lsms_library.local_tools import df_from_orgfile, to_parquet
 
 with dvc.api.open('../Data/s07b_me_sen2018.dta', mode='rb') as dta:
     df = from_dta(dta, convert_categoricals=True,encoding='ISO-8859-1')

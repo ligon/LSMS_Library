@@ -19,4 +19,4 @@ x = x.replace(np.inf,np.nan)
 x.columns.name = 'i'
 x = x.groupby('i',axis=1).sum()
 
-x.to_parquet('./nonfood_expenditures.parquet')
+x.to_parquet('../var/nonfood_expenditures.parquet')
