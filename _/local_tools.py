@@ -787,7 +787,6 @@ def map_index(df):
     mapping_rules = {
         'i': 'temp_j',
         'j': 'i',
-        'm': 'Region',
         't': 'w',
         'u': 'u'
     }
