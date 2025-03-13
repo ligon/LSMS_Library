@@ -2,8 +2,7 @@ Country: GhanaLSS
 Wave: 2016-17
 
 cluster_features:
-    file: 
-        - g7sec8h.dta
+    file: g7sec8h.dta
     idxvars:
         v: clust
     myvars:
@@ -12,8 +11,7 @@ cluster_features:
 
 
 household_roster:
-    file: 
-        - g7sec1.dta
+    file: g7sec1.dta
     idxvars:
         v: clust
         i: 

@@ -779,3 +779,18 @@ def write_df_to_org(df, table_name, filepath=None):
         s += "\n\n"
         return s
     
+def map_index(df):
+    """
+    Map index from old parquet file to new index used in data_info.yml
+    -- March 11, 2025
+    """
+    mapping_rules = {
+        'i': 'temp_j',
+        'j': 'i',
+        'm': 'Region',
+        't': 'w',
+        'u': 'u'
+    }
+    df_renamed = df.rename_axis(index=mapping_rules)
+    df_renamed = df_renamed.rename_axis(index = {'temp_j': 'j'})
+    return df_renamed

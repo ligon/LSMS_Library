@@ -9,32 +9,32 @@ Waves:
 Index Info:
   note: no interview date (int_t), compared with global index info
   index_info:
-    cluster_features: (w, v)
-    household_roster: (w, v, i, pid)
-    individual_education: (w, v, i, pid)
-    food_acquired: (w, v, visit, i, j, u)
-    interview_date: (w, v, visit, i)
+    cluster_features: (t, v)
+    household_roster: (t, v, i, pid)
+    individual_education: (t, v, i, pid)
+    food_acquired: (t, v, visit, i, j, u)
+    interview_date: (t, v, visit, i)
 
 Data Scheme:
   cluster_features:
-    index: (w, v)
+    index: (t, v)
     Region: str
     Rural: str
   household_roster:
-    index: (w, v, i, pid)
+    index: (t, v, i, pid)
     Sex: str
     Age: int
     Relationship: str
   individual_education:
-    index: (w, v, i, pid)
+    index: (t, v, i, pid)
     Highest Education: str
   food_acquired:
-    index: (w, v, visit, i, j, u)
+    index: (t, v, visit, i, j, u)
     Quantity: float
     Price: float
     Produced: float
   interview_date:
-    index: (w, v, visit, i)
+    index: (t, v, visit, i)
     Int_t: str
 
 
