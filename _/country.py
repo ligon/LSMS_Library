@@ -448,10 +448,19 @@ class Country:
         return self._aggregate_wave_data(waves, 'food_expenditures')
     
     def food_quantities(self, waves=None):
-        return self._aggregate_wave_data(waves, 'food_quantities')
-    
+        df = self._aggregate_wave_data(waves, 'food_quantities')
+        df = df.reset_index('u')
+        df['u'] = df['u'].replace(['<NA>','nan', np.nan],'unit')
+        df = df.set_index('u', append=True)
+        return df
+        
     def food_prices(self, waves=None):
-        return self._aggregate_wave_data(waves, 'food_prices')
+        df = self._aggregate_wave_data(waves, 'food_prices')
+        df = df.reset_index('u')
+        df['u'] = df['u'].replace(['<NA>','nan', np.nan],'unit')
+        df = df.set_index('u', append=True)
+        return df
+
 
 
     
