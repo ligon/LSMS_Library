@@ -204,8 +204,6 @@ def change_id(df, current_wave, id_update, trace_split_number, panel_ids=None):
     
     '''
     # Save the original index names for restoring later
-    original_index_names = df.index.names
-    df = df.reset_index()
     df['j'] = df['j'].apply(format_id)
 
     # Create a temporary DataFrame with the household ID and wave
@@ -249,8 +247,7 @@ def change_id(df, current_wave, id_update, trace_split_number, panel_ids=None):
     df = df.drop(columns=['new_household_id'])
     assert df.index.is_unique, "Non-unique index."
 
-    return df.set_index(original_index_names), id_update, trace_split_number
-
+    return df, id_update, trace_split_number
 
 def id_walk(df, waves, panel_ids):
     '''
@@ -260,9 +257,18 @@ def id_walk(df, waves, panel_ids):
     unique_id = df.index.get_level_values('j').unique()
     trace_split_number = defaultdict(int, {k: 0 for k in unique_id})
     use_waves = waves if isinstance(waves, list) else list(waves.keys())
+    
+    original_index_names = df.index.names
+    df_reset = df.reset_index()
+    df_reset = df_reset[['j', 't']].drop_duplicates()
+    df_reset['old_hhid'] = df_reset['j']
 
     for wave in use_waves:
-        df, id_update, trace_split_number = change_id(df, wave, id_update, trace_split_number, panel_ids)
+        df_reset, id_update, trace_split_number = change_id(df_reset, wave, id_update, trace_split_number, panel_ids)
+    
+    #df_reset is with columns ['j', 't', 'old_hhid'] and df is with original index names, I want to replace 'j' in df with 'j' in df_reset by 'old_hhid' and 't'
+    df = df.reset_index().merge(df_reset[['old_hhid', 't', 'j']], left_on=['j', 't'], right_on=['old_hhid', 't'],
+                                suffixes = ('_old', '') ,how='left').drop(columns=['old_hhid', 'j_old']).set_index(original_index_names)
 
     return df
 
