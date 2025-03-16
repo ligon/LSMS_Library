@@ -54,10 +54,12 @@ def dummies(df,cols,suffix=False):
 def format_interval(interval):
     if interval.right == np.inf:
         return f"{int(interval.left)}+"
+    elif interval.left == -np.inf:
+        return f'00-03'
     else:
         return f"{int(interval.left):02d}-{int(interval.right-1):02d}"
 
-def roster_to_characteristics(df, age_cuts=(0,4,9,14,19,31,51)):
+def roster_to_characteristics(df, age_cuts=(0,4,9,14,19,31,51), drop = 'pid', final_index = ['t','v','i']):
     roster_df = df.copy()
     roster_df.columns = roster_df.columns.str.lower()
     roster_df['age_interval'] = age_intervals(roster_df['age'], age_cuts)
@@ -66,8 +68,8 @@ def roster_to_characteristics(df, age_cuts=(0,4,9,14,19,31,51)):
         axis=1
     )
     roster_df = dummies(roster_df,['sex_age'])
-    roster_df.index = roster_df.index.droplevel('pid')
-    result = roster_df.groupby(level=['t', 'v', 'i']).sum()
+    roster_df.index = roster_df.index.droplevel(drop)
+    result = roster_df.groupby(level=final_index).sum()
     result['log HSize'] = np.log(result.sum(axis=1))
     result.columns = result.columns.get_level_values(0)
     return result

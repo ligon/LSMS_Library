@@ -43,7 +43,7 @@ idxvars = dict(j='hhid',
                )
 
 myvars = dict(sex = ('s1q2', lambda s: extract_string(s).title()),
-              age = 's1q6',
+              age = 's1q4',
               relation = ('s1q3', lambda s: extract_string(s).title()),
               in_housing = ('s1q14', lambda s: extract_string(s).title())) 
 

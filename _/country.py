@@ -163,7 +163,7 @@ class Wave:
             subprocess.run(['python', df_fn], cwd=cwd_path, check=True)
             if parquet_fn.exists():
                 df = pd.read_parquet(parquet_fn)
-                return map_index(df)
+                return df
             else:
                 warnings.warn(f"Failed to generate {request}")
                 return pd.DataFrame()
@@ -302,6 +302,8 @@ class Country:
             data_list = [f.stem for f in (self.file_path / "_").iterdir() if f.suffix == '.py']
             if 'food_prices_quantities_and_expenditures' in data_list:
                 data_list.extend(['food_expenditures', 'food_quantities', 'food_prices'])
+            elif 'unitvalues' in data_list:
+                data_list.extend(['food_prices'])
             if 'other_features' in data_list:
                 data_list.extend(['cluster_features'])
             # EEP 153 solving demand equation required data
@@ -391,7 +393,8 @@ class Country:
                 except KeyError as e:
                     warnings.warn(str(e))
             if results:
-                return pd.concat(results.values(), axis=0, sort=False)
+                df= pd.concat(results.values(), axis=0, sort=False)
+                return map_index(df)
         
         # Step 2: Check if parquet file exists
         if not parquet_fn.exists():
@@ -445,20 +448,26 @@ class Country:
         return self._aggregate_wave_data(waves, 'household_characteristics')
     
     def food_expenditures(self, waves=None):
-        return self._aggregate_wave_data(waves, 'food_expenditures')
-    
+        df = self._aggregate_wave_data(waves, 'food_expenditures')
+        if 'u' in df.index:
+            df = df.reset_index('u')
+            df['u'] = df['u'].replace(['<NA>','nan', np.nan],'unit')
+            df = df.set_index('u', append=True)
+        return df
     def food_quantities(self, waves=None):
         df = self._aggregate_wave_data(waves, 'food_quantities')
-        df = df.reset_index('u')
-        df['u'] = df['u'].replace(['<NA>','nan', np.nan],'unit')
-        df = df.set_index('u', append=True)
+        if 'u' in df.index:
+            df = df.reset_index('u')
+            df['u'] = df['u'].replace(['<NA>','nan', np.nan],'unit')
+            df = df.set_index('u', append=True)
         return df
         
     def food_prices(self, waves=None):
         df = self._aggregate_wave_data(waves, 'food_prices')
-        df = df.reset_index('u')
-        df['u'] = df['u'].replace(['<NA>','nan', np.nan],'unit')
-        df = df.set_index('u', append=True)
+        if 'u' in df.index:
+            df = df.reset_index('u')
+            df['u'] = df['u'].replace(['<NA>','nan', np.nan],'unit')
+            df = df.set_index('u', append=True)
         return df
 
 
