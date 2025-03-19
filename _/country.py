@@ -6,7 +6,7 @@ from importlib.resources import files
 import cfe.regression as rgsn
 
 
-pd.set_option('future.no_silent_downcasting', True)
+# pd.set_option('future.no_silent_downcasting', True)
 
 class Country:
     def __init__(self,country_name):

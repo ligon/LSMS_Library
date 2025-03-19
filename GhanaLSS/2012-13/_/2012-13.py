@@ -1,4 +1,4 @@
-# Formatting  Functions for Ghana 2012-13
+# Formatting  Functions for Ghana 2016-17
 import pandas as pd
 import numpy as np
 import lsms_library.local_tools as tools
@@ -8,7 +8,7 @@ def i(value):
     '''
     Formatting household id
     '''
-    return tools.format_id(value[0]) +tools.format_id(value[1],zeropadding=2)
+    return tools.format_id(value[0])+'/'+tools.format_id(value[1],zeropadding=2)
 
 
 def Sex(value):

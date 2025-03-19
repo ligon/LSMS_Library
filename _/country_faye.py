@@ -67,15 +67,24 @@ class Wave:
 
         formatting_functions = self.formatting_functions
 
-        def get_mapping(var_name, mappings):
+        def get_mapping(var_name, mappings, format_id_function = False):
             """Applies formatting functions if available, otherwise uses defaults."""
-            return (
-                (mappings[var_name], formatting_functions[var_name]) 
-                if var_name in formatting_functions else
-                (mappings[var_name], lambda x: self.year if var_name == 'w' else format_id)
-            )
+            if format_id_function:
+                return (
+                    (mappings[var_name], formatting_functions[var_name]) 
+                    if var_name in formatting_functions else
+                    (mappings[var_name], format_id if var_name != 'w' else lambda x: self.year)
+                )
+            else:
+                 return (
+                    (mappings[var_name], formatting_functions[var_name]) 
+                    if var_name in formatting_functions else
+                    (mappings[var_name], lambda x: self.year if var_name == 'w' else x)
+                )
 
-        idxvars = {key: get_mapping(key, data_info['idxvars']) for key in data_info['idxvars']}
+            
+
+        idxvars = {key: get_mapping(key, data_info['idxvars'], format_id_function=True) for key in data_info['idxvars']}
         myvars = {key: get_mapping(key, data_info['myvars']) for key in data_info['myvars']}
 
         return relative_path, idxvars, myvars

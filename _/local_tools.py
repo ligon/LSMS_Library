@@ -48,6 +48,7 @@ def get_dataframe(fn,convert_categoricals=True,encoding=None,categories_only=Fal
         try:
             f.seek(0)
             return from_dta(f,convert_categoricals=convert_categoricals,encoding=encoding,categories_only=categories_only)
+
         except ValueError:
             pass
 
@@ -144,7 +145,7 @@ def df_data_grabber(fn,idxvars,convert_categoricals=True,encoding=None,orgtbl=No
         out[k] = grabber(df,v)
 
     out = pd.DataFrame(out)
-
+    
     if len(kwargs):
         try:
             for k,v in kwargs.items():
