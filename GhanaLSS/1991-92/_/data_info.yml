@@ -1,0 +1,27 @@
+Country: GhanaLSS
+Wave: 1991-92
+
+cluster_features:
+    file: POV_GH.DTA
+    idxvars:
+        w: clust
+        v: clust
+    myvars:
+        Region: region
+        Rural: loc2
+
+
+household_roster:
+    file: S1.DTA
+    idxvars:
+        w: clust
+        v: clust
+        i: 
+            - clust
+            - nh
+        pid: pid
+    myvars:
+        Sex: sex
+        Age: agey
+        Birthplace: s1q10
+        Relation: rel
