@@ -1,0 +1,27 @@
+Country: GhanaLSS
+Wave: 1987-88
+
+cluster_features:
+    file: Y01A.DAT
+    idxvars:
+        w: CLUST
+        v: CLUST
+    myvars:
+        Region: REGION
+
+household_roster:
+    file: Y01A.DAT
+    idxvars:
+        w: CLUST
+        v: CLUST
+        i: HID
+        pid: PID
+    myvars:
+        Sex: SEX
+        Age: AGEY
+        Birthplace: REGION
+        Relation: REL
+
+
+
+
