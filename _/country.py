@@ -192,7 +192,8 @@ class Wave:
             df = self.grab_data('other_features')
             if df.empty:
                 return df
-            df = df.reset_index(level = 'm').rename(columns = {'m':'Region'})
+            if 'm' in df.index.names:
+                df = df.reset_index(level = 'm').rename(columns = {'m':'Region'})
             return df
     
     def household_roster(self):
@@ -394,7 +395,7 @@ class Country:
                     warnings.warn(str(e))
             if results:
                 df= pd.concat(results.values(), axis=0, sort=False)
-                return map_index(df)
+                return df
         
         # Step 2: Check if parquet file exists
         if not parquet_fn.exists():
@@ -432,7 +433,8 @@ class Country:
             df = self._aggregate_wave_data(waves, 'other_features')
             if df.empty:
                 return df
-            df = df.reset_index(level = 'm').rename(columns = {'m':'Region'})
+            if 'm' in df.index.names:
+                df = df.reset_index(level = 'm').rename(columns = {'m':'Region'})
             return df
 
     def household_roster(self, waves=None):

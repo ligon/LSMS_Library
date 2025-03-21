@@ -74,10 +74,39 @@ def roster_to_characteristics(df, age_cuts=(0,4,9,14,19,31,51), drop = 'pid', fi
     result.columns = result.columns.get_level_values(0)
     return result
 
-def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=['t','m','i']):
+# def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=['t','m','i']):
+#     v = df.copy()
+#     v = v.replace(0, np.nan)
+#     v['Kgs'] = np.where(v.index.get_level_values('u').str.lower() == 'kg', v[quantity], np.nan)
+#     pkg = v[price].divide(v['Kgs'], axis=0)
+#     pkg = pkg.groupby(index).median().median(axis=1)
+#     po = v[price].groupby(index + ['u']).median().median(axis=1)
+#     kgper = (po / pkg).dropna()
+#     kgper = kgper.groupby('u').median()
+#     #convert to dict
+#     kgper = kgper.to_dict()
+#     return kgper
+
+def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=['t','m','i'], unit_col = 'u'):
     v = df.copy()
     v = v.replace(0, np.nan)
-    v['Kgs'] = np.where(v.index.get_level_values('u').str.lower() == 'kg', v[quantity], np.nan)
+    unit_conversion = {
+        'kg': 1,
+        'kilogram': 1,
+        'gram': 1 / 1000,
+        'g': 1 / 1000,
+        'pound': 0.453592,
+        'lbs': 0.453592,
+        'kilogramme': 1,
+        'gramm': 1 / 1000
+    }
+    #convert the value type in index level 'u' to be string
+    v.reset_index(unit_col, inplace=True)
+    if unit_col != 'u':
+        v.rename(columns={unit_col: 'u'}, inplace=True)
+    v['u'] = v['u'].astype(str)
+    v['Kgs'] = v.apply(lambda row: row[quantity] * unit_conversion.get(row['u'].lower(), np.nan), axis=1)
+    v.set_index('u', append=True, inplace=True)
     pkg = v[price].divide(v['Kgs'], axis=0)
     pkg = pkg.groupby(index).median().median(axis=1)
     po = v[price].groupby(index + ['u']).median().median(axis=1)
