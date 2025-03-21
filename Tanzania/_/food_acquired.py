@@ -64,10 +64,10 @@ x = x.reset_index().set_index(['j','t','m','i'])
 idx = pd.MultiIndex.from_frame(pd.DataFrame(x.index.to_list(),columns=x.index.names).dropna())
 x = x.loc[idx].sort_index()
 
-with open('panel_ids.json','r') as f:
-    panel_id_json =json.load(f)
+# with open('panel_ids.json','r') as f:
+#     panel_id_json =json.load(f)
 
-x = id_walk(x, waves, panel_id_json)
+# x = id_walk(x, waves, panel_id_json)
 
 
 assert x.index.is_unique, "Non-unique index!  Fix me!"

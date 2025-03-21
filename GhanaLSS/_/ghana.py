@@ -15,7 +15,10 @@ def i(value):
     '''
     Formatting household id
     '''
-    return tools.format_id(value[0])+'/'+tools.format_id(value[1],zeropadding=2)
+    if type(value) == pd.Series:
+        return tools.format_id(value[0])+'/'+tools.format_id(value[1],zeropadding=2)
+    else:
+        return tools.format_id(value)
 
 
 def Sex(value):

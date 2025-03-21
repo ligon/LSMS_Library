@@ -27,10 +27,10 @@ except FileNotFoundError:
     s['m'] = 'Tanzania'
     s = s.reset_index().set_index(['j','t','m','Shock'])
 
-with open('panel_ids.json','r') as f:
-    panel_id_json =json.load(f)
+# with open('panel_ids.json','r') as f:
+#     panel_id_json =json.load(f)
 
-s = id_walk(s, waves, panel_id_json)
+# s = id_walk(s, waves, panel_id_json)
 
 
 s.to_parquet('../var/shocks.parquet')

@@ -163,7 +163,7 @@ class Wave:
             subprocess.run(['python', df_fn], cwd=cwd_path, check=True)
             if parquet_fn.exists():
                 df = pd.read_parquet(parquet_fn)
-                return map_index(df)
+                return df
             else:
                 warnings.warn(f"Failed to generate {request}")
                 return pd.DataFrame()
@@ -192,7 +192,8 @@ class Wave:
             df = self.grab_data('other_features')
             if df.empty:
                 return df
-            df = df.reset_index(level = 'm').rename(columns = {'m':'Region'})
+            if 'm' in df.index.names:
+                df = df.reset_index(level = 'm').rename(columns = {'m':'Region'})
             return df
     
     def household_roster(self):
@@ -302,6 +303,10 @@ class Country:
             data_list = [f.stem for f in (self.file_path / "_").iterdir() if f.suffix == '.py']
             if 'food_prices_quantities_and_expenditures' in data_list:
                 data_list.extend(['food_expenditures', 'food_quantities', 'food_prices'])
+            elif 'unitvalues' in data_list:
+                data_list.extend(['food_prices'])
+            if 'other_features' in data_list:
+                data_list.extend(['cluster_features'])
             # EEP 153 solving demand equation required data
             required_list = ['food_acquired', 'household_roster', 'household_characteristics', 
              'cluster_features', 'interview_date', 'food_expenditures', 'food_quantities', 'food_prices']
@@ -371,7 +376,7 @@ class Country:
         Aggregates data across multiple waves using a single dataset method.
         If the required `.parquet` file is missing, it requests `Makefile` to generate only that file.
         """
-        if method_name not in self.data_scheme:
+        if method_name not in self.data_scheme and method_name not in ['other_features', 'food_prices_quantities_and_expenditures']:
             warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
             return pd.DataFrame()
 
@@ -389,26 +394,24 @@ class Country:
                 except KeyError as e:
                     warnings.warn(str(e))
             if results:
-                return pd.concat(results.values(), axis=0, sort=False)
+                df= pd.concat(results.values(), axis=0, sort=False)
+                return df
         
         # Step 2: Check if parquet file exists
         if not parquet_fn.exists():
-            print(f"Required parquet file {parquet_fn} missing. Attempting to generate using Makefile...")
+            print(f"Attempting to generate using Makefile...")
 
             makefile_path = self.file_path /'_'/ "Makefile"
             if not makefile_path.exists():
-                print(f"Makefile not found in {self.file_path}. Unable to generate required data.")
-                return pd.DataFrame()
+                raise FileNotFoundError(f"Makefile not found in {self.file_path}. Unable to generate required data.")
+
 
             # Step 3: Run Makefile for the specific parquet file
-            try:
-                cwd_path = self.file_path/"_"
-                relative_parquet_path = parquet_fn.relative_to(cwd_path.parent)  # Convert to relative path
-                subprocess.run(["make", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True)
-                print(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...")
-            except subprocess.CalledProcessError as e:
-                print(f"Failed to execute Makefile for {self.name}: {e}")
-                return pd.DataFrame()
+
+            cwd_path = self.file_path/"_"
+            relative_parquet_path = parquet_fn.relative_to(cwd_path.parent)  # Convert to relative path
+            subprocess.run(["make", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True)
+            print(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...") 
 
             # Step 4: Recheck if the parquet file was successfully generated
             if not parquet_fn.exists():
@@ -423,7 +426,16 @@ class Country:
         return df
 
     def cluster_features(self, waves=None):
-        return self._aggregate_wave_data(waves, 'cluster_features')
+        try:
+            return self._aggregate_wave_data(waves, 'cluster_features')
+        except subprocess.CalledProcessError as e:
+            print('continue with other_features instead')
+            df = self._aggregate_wave_data(waves, 'other_features')
+            if df.empty:
+                return df
+            if 'm' in df.index.names:
+                df = df.reset_index(level = 'm').rename(columns = {'m':'Region'})
+            return df
 
     def household_roster(self, waves=None):
         return self._aggregate_wave_data(waves, 'household_roster')
@@ -438,13 +450,28 @@ class Country:
         return self._aggregate_wave_data(waves, 'household_characteristics')
     
     def food_expenditures(self, waves=None):
-        return self._aggregate_wave_data(waves, 'food_expenditures')
-    
+        df = self._aggregate_wave_data(waves, 'food_expenditures')
+        if 'u' in df.index.names:
+            df = df.reset_index('u')
+            df['u'] = df['u'].replace(['<NA>','nan', np.nan],'unit')
+            df = df.set_index('u', append=True)
+        return df
     def food_quantities(self, waves=None):
-        return self._aggregate_wave_data(waves, 'food_quantities')
-    
+        df = self._aggregate_wave_data(waves, 'food_quantities')
+        if 'u' in df.index.names:
+            df = df.reset_index('u')
+            df['u'] = df['u'].replace(['<NA>','nan', np.nan],'unit')
+            df = df.set_index('u', append=True)
+        return df
+        
     def food_prices(self, waves=None):
-        return self._aggregate_wave_data(waves, 'food_prices')
+        df = self._aggregate_wave_data(waves, 'food_prices')
+        if 'u' in df.index.names:
+            df = df.reset_index('u')
+            df['u'] = df['u'].replace(['<NA>','nan', np.nan],'unit')
+            df = df.set_index('u', append=True)
+        return df
+
 
 
     
