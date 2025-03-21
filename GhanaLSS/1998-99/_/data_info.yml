@@ -1,0 +1,25 @@
+Country: GhanaLSS
+Wave: 1998-99
+
+cluster_features:
+    file: SEC0A.DTA
+    idxvars:
+        v: clust
+    myvars:
+        Region: region
+        Rural: loc2
+
+
+household_roster:
+    file: SEC1.DTA
+    idxvars:
+        v: clust
+        i: 
+            - clust
+            - nh
+        pid: pid
+    myvars:
+        Sex: sex
+        Age: agey
+        Birthplace: s1q10
+        Relation: rel

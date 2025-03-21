@@ -1,0 +1,23 @@
+Country: GhanaLSS
+Wave: 2005-06
+
+cluster_features:
+    file: aggregates/pov_gh5.dta
+    idxvars:
+        v: clust
+    myvars:
+        Region: region
+        Rural: loc2
+
+
+household_roster:
+    file: parta/sec1.dta
+    idxvars:
+        v: clust
+        i: hhid
+        pid: pid
+    myvars:
+        Sex: s1q2
+        Age: s1q5y
+        Birthplace: s1q11
+        Relation: s1q3
