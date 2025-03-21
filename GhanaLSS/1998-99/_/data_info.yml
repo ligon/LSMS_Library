@@ -4,7 +4,6 @@ Wave: 1998-99
 cluster_features:
     file: SEC0A.DTA
     idxvars:
-        w: clust
         v: clust
     myvars:
         Region: region
@@ -14,7 +13,6 @@ cluster_features:
 household_roster:
     file: SEC1.DTA
     idxvars:
-        w: clust
         v: clust
         i: 
             - clust

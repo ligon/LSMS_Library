@@ -3,8 +3,10 @@ import pandas as pd
 import numpy as np
 import lsms_library.local_tools as tools
 from collections import defaultdict
+from importlib.resources import files
 
-region_dict = tools.get_categorical_mapping(tablename = 'region', dirs=['../../_/', '../_/', './_/'])
+path = files("lsms_library")/'countries'/'GhanaLSS'/'1987-88'
+region_dict = tools.get_categorical_mapping(fn='categorical_mapping.org', tablename = 'region', dirs=[f'{path}/_/', f'{path}/../_', f'{path}/../../_'])
 
 def i(value):
     '''
@@ -36,7 +38,7 @@ def Relation(value):
     Formatting relationship variable
     '''
     #needs mapping
-    relationship_dict = tools.get_categorical_mapping(tablename = 'relationship', dirs=['../../_/', '../_/', './_/', '.'])
+    relationship_dict = tools.get_categorical_mapping(fn='categorical_mapping.org', tablename = 'relationship', dirs=[f'{path}/_/', f'{path}/../_', f'{path}/../../_'])
 
     return relationship_dict.get(value, np.nan)
 
