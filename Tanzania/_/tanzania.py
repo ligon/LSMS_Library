@@ -283,6 +283,7 @@ from collections import defaultdict
 def id_walk(df, updated_ids, index ='j'):
     df =df.reset_index(index)
     df[index] = df[index].map(updated_ids).fillna(df[index])
+    df[index] = df[index].apply(format_id)
     df = df.set_index([index], append=True)
     df = df.reorder_levels([index] + [name for name in df.index.names if name != index])
     return df
