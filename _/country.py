@@ -6,7 +6,7 @@ from importlib.resources import files
 import importlib
 import cfe.regression as rgsn
 from collections import defaultdict
-from .local_tools import df_data_grabber, format_id, get_categorical_mapping, category_union, get_dataframe, map_index
+from .local_tools import df_data_grabber, format_id, get_categorical_mapping, category_union, get_dataframe, map_index, index_corrections
 import importlib.util
 import os
 import warnings
@@ -156,9 +156,6 @@ class Wave:
             return map_index(df)
         # if in the upper directory Makefile exist: we should run Makefile
         elif df_fn.exists():
-            # spec = importlib.util.spec_from_file_location(request, df_fn)
-            # module = importlib.util.module_from_spec(spec)
-            # spec.loader.exec_module(module)
             cwd_path = self.file_path / "_"
             subprocess.run(['python', df_fn], cwd=cwd_path, check=True)
             if parquet_fn.exists():
@@ -376,7 +373,7 @@ class Country:
         Aggregates data across multiple waves using a single dataset method.
         If the required `.parquet` file is missing, it requests `Makefile` to generate only that file.
         """
-        if method_name not in self.data_scheme and method_name not in ['other_features', 'food_prices_quantities_and_expenditures']:
+        if method_name not in self.data_scheme and method_name not in ['other_features']:
             warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
             return pd.DataFrame()
 
@@ -395,7 +392,7 @@ class Country:
                     warnings.warn(str(e))
             if results:
                 df= pd.concat(results.values(), axis=0, sort=False)
-                return df
+                return index_corrections(df)
         
         # Step 2: Check if parquet file exists
         if not parquet_fn.exists():
@@ -407,7 +404,6 @@ class Country:
 
 
             # Step 3: Run Makefile for the specific parquet file
-
             cwd_path = self.file_path/"_"
             relative_parquet_path = parquet_fn.relative_to(cwd_path.parent)  # Convert to relative path
             subprocess.run(["make", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True)
@@ -421,7 +417,7 @@ class Country:
         # Step 5: Read and return the parquet file
         df = pd.read_parquet(parquet_fn)
 
-        df = map_index(df)
+        df = index_corrections(map_index(df))
 
         return df
 
@@ -450,27 +446,13 @@ class Country:
         return self._aggregate_wave_data(waves, 'household_characteristics')
     
     def food_expenditures(self, waves=None):
-        df = self._aggregate_wave_data(waves, 'food_expenditures')
-        if 'u' in df.index.names:
-            df = df.reset_index('u')
-            df['u'] = df['u'].replace(['<NA>','nan', np.nan],'unit')
-            df = df.set_index('u', append=True)
-        return df
+        return self._aggregate_wave_data(waves, 'food_expenditures')
+    
     def food_quantities(self, waves=None):
-        df = self._aggregate_wave_data(waves, 'food_quantities')
-        if 'u' in df.index.names:
-            df = df.reset_index('u')
-            df['u'] = df['u'].replace(['<NA>','nan', np.nan],'unit')
-            df = df.set_index('u', append=True)
-        return df
+        return  self._aggregate_wave_data(waves, 'food_quantities')
         
     def food_prices(self, waves=None):
-        df = self._aggregate_wave_data(waves, 'food_prices')
-        if 'u' in df.index.names:
-            df = df.reset_index('u')
-            df['u'] = df['u'].replace(['<NA>','nan', np.nan],'unit')
-            df = df.set_index('u', append=True)
-        return df
+        return self._aggregate_wave_data(waves, 'food_prices')
 
 
 
