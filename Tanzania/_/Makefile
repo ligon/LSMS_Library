@@ -9,7 +9,11 @@ var = ../var/food_expenditures.parquet ../var/food_quantities.parquet ../var/foo
       ../var/shocks.parquet
 
 
-all: $(parquet) $(var)
+all: panel_ids.json updated_ids.json $(parquet) $(var)
+
+panel_ids.json updated_ids.json: panel_ids.py
+	python panel_ids.py
+	
 
 ../var/food_quantities.parquet ../var/food_expenditures.parquet ../var/food_prices.parquet &: ../var/food_acquired.parquet food_acquired.py
 	python food_prices_quantities_and_expenditures.py

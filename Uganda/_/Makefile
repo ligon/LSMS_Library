@@ -15,6 +15,11 @@ all: unitlabels.csv $(parquet) $(var)
 unitlabels.csv: unitlabels.py
 	python unitlabels.py
 
+panel_ids.json updated_ids.json: panel_ids.py
+	python panel_ids.py
+
+$(parquet) $(var): panel_ids.json updated_ids.json
+
 interview_date = $(shell find $(rounds) -name interview_date.py)
 interview_date_parquet := $(interview_date:.py=.parquet)
 

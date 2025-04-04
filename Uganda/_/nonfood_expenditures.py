@@ -33,7 +33,7 @@ x = x.reset_index().set_index(['j','t','m'])
 
 x = x.fillna(0)
 
-# updated_ids = json.load(open('updated_ids.json'))
-# x = id_walk(x, updated_ids)
+updated_ids = json.load(open('updated_ids.json'))
+x = id_walk(x, updated_ids)
 
-# x.to_parquet('../var/nonfood_expenditures.parquet')
+x.to_parquet('../var/nonfood_expenditures.parquet')
