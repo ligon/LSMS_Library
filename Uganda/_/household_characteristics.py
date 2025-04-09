@@ -21,6 +21,10 @@ z.columns.name = 't'
 
 z = z.stack().unstack('k')
 
+# with open('panel_ids.json','r') as f:
+#     panel_id_json =json.load(f)
+# z = id_walk(z, Waves, panel_id_json)
+
 try:
     of = pd.read_parquet('../var/other_features.parquet')
 
@@ -31,9 +35,5 @@ except FileNotFoundError:
 
 z = z.reset_index().set_index(['j','t','m'])
 
-
-with open('panel_ids.json','r') as f:
-    panel_id_json =json.load(f)
-z = id_walk(z, Waves, panel_id_json)
 
 z.to_parquet('../var/household_characteristics.parquet')

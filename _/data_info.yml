@@ -2,18 +2,19 @@ Single Index:
   v: cluster
   i: household id
   j: expenditure item
-  w: wave
+  t: wave
   pid: individual id
   plot_id: plot id
   int_t: interview date
   u: unit
+  m: region
 
 Index Info:
   note: global index info
   index_info:
-    cluster_features: (w, int_t, v)
-    household_roster: (w, int_t, v, i, pid)
-    household_features: (w, int_t, v, i)
-    plot_features: (w, int_t, v, i, plot_id)
-    food_acquired: (w, int_t, v, i, j, u)
-    nonfood_acquired: (w, int_t, v, i, j)
+    cluster_features: (t, int_t, v)
+    household_roster: (t, int_t, v, i, pid)
+    household_characteristics: (t, int_t, v, i, m)
+    plot_features: (t, int_t, v, i, plot_id)
+    food_acquired: (t, int_t, m, v, i, j, u)
+    nonfood_acquired: (t, int_t, v, i, j)

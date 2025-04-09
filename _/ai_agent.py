@@ -7,9 +7,11 @@ from cfe.df_utils import df_to_orgtbl
 import json
 import re
 
+api_key = "Type your API key here" 
+# self.api_key = authinfo.get_password_for_machine('api.openai.com')
 class gpt_agent:
-    def __init__(self):
-        self.api_key = authinfo.get_password_for_machine('api.openai.com')
+    def __init__(self, api_key=api_key):
+        self.api_key = api_key
         self.client = openai.OpenAI(api_key=self.api_key)
         self.open_ai_model = 'gpt-4o'
         self.max_tokens = 4096

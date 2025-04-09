@@ -6,7 +6,7 @@ from importlib.resources import files
 import importlib
 import cfe.regression as rgsn
 from collections import defaultdict
-from .local_tools import df_data_grabber, format_id, get_categorical_mapping, category_union, get_dataframe
+from .local_tools import df_data_grabber, format_id, get_categorical_mapping, category_union, get_dataframe, map_index
 import importlib.util
 import os
 import warnings
@@ -16,6 +16,7 @@ from .ai_agent import ai_process, gpt_agent
 warnings.filterwarnings('ignore', category=FutureWarning)
 warnings.filterwarnings('ignore', category=UnicodeWarning)
 import subprocess
+from .transformations import roster_to_characteristics
 
 class Wave:
     def __init__(self, year, country_name, data_scheme, formatting_functions):
@@ -152,7 +153,7 @@ class Wave:
         parquet_fn = self.file_path /f"_/{request}.parquet"
         if parquet_fn.exists():
             df = pd.read_parquet(parquet_fn)
-            return df
+            return map_index(df)
         # if in the upper directory Makefile exist: we should run Makefile
         elif df_fn.exists():
             # spec = importlib.util.spec_from_file_location(request, df_fn)
@@ -164,7 +165,7 @@ class Wave:
                 df = pd.read_parquet(parquet_fn)
                 return df
             else:
-                warnings.warn(f"Failed to generate {request}.parquet")
+                warnings.warn(f"Failed to generate {request}")
                 return pd.DataFrame()
         else:
             mapping_details = self.column_mapping(request)
@@ -173,8 +174,8 @@ class Wave:
             for file, mappings in mapping_details.items():
                 df = df_data_grabber(f'{self.name}/Data/{file}', mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat)
                 df = df.reset_index().drop_duplicates()
-                df['w'] = self.year
-                df = df.set_index(['w']+list(mappings['idxvars'].keys()))
+                df['t'] = self.year
+                df = df.set_index(['t']+list(mappings['idxvars'].keys()))
                 # Oddity with large number for missing code
                 na = df.select_dtypes(exclude='object').max().max()
                 if na>1e99:
@@ -185,7 +186,15 @@ class Wave:
             return pd.concat(dfs)
 
     def cluster_features(self):
-        return self.grab_data('cluster_features')
+        try:
+            return self.grab_data('cluster_features')
+        except KeyError as e:
+            df = self.grab_data('other_features')
+            if df.empty:
+                return df
+            if 'm' in df.index.names:
+                df = df.reset_index(level = 'm').rename(columns = {'m':'Region'})
+            return df
     
     def household_roster(self):
         return self.grab_data('household_roster')
@@ -193,8 +202,6 @@ class Wave:
     def food_acquired(self):
         df = self.grab_data('food_acquired')
         parquet_fn = self.file_path /f"_/food_acquired.parquet"
-        
-        # Check if df is read from parquet file which is created by food_acquired.py, then it's already mapped categorical labels
         if parquet_fn.exists():
             return df
         
@@ -209,6 +216,10 @@ class Wave:
         if unit_mapping is not None:
             df['u'] = df['u'].map(unit_mapping)
         agg_func = {key: value for key, value in agg_functions.items() if key in variable}
+        #replace not float value in Quantity, Expenditure, Produced with np.nan
+        for col in ['Quantity', 'Expenditure', 'Produced']:
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors='coerce')
         df = df.groupby(index).agg(agg_func)
         return df
     
@@ -216,7 +227,22 @@ class Wave:
         return self.grab_data('interview_date')
     
     def household_characteristics(self):
-        return self.grab_data('household_characteristics')
+        try:
+            return self.grab_data('household_characteristics')
+        except KeyError as e:
+            if 'household_roster' in self.resources:
+                roster = self.household_roster()
+                df = roster_to_characteristics(roster).reset_index()
+                cluster_features = self.cluster_features().reset_index()
+                df = df.merge(cluster_features, on=['t','v'])
+                df = df.rename(columns={'Region':'m'}).drop(columns=['v','Rural'])
+                df = df.set_index(['t','m','i'])
+                return df
+            else:
+                raise e
+
+    
+
     
     
 class Country:
@@ -232,14 +258,16 @@ class Country:
     def resources(self):
         var = self.file_path / "_" / "data_info.yml"
         if not var.exists():
-            warnings.warn(f"File not found: {var}, consider read parquet file or running Makefile or single py file for data processing")
             return None
         with open(var, 'r') as file:
             return yaml.safe_load(file)
     
     @property
     def formatting_functions(self):
-        general_module_filename = f"{self.name.lower()}.py"
+        if self.name == 'GhanaLSS':
+            general_module_filename = 'ghana.py'
+        else:
+            general_module_filename = f"{self.name.lower()}.py"
         general_mod_path = self.file_path/ "_"/ general_module_filename
 
         if not general_mod_path.exists():
@@ -267,20 +295,26 @@ class Country:
     
     @property
     def data_scheme(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            data_info = self.resources
+        data_info = self.resources
         if data_info is not None:
             data_list = list(data_info['Data Scheme'].keys())
         else:
             # return list of parquet files name in the var folder
             data_list = [f.stem for f in (self.file_path / "_").iterdir() if f.suffix == '.py']
+            if 'food_prices_quantities_and_expenditures' in data_list:
+                data_list.extend(['food_expenditures', 'food_quantities', 'food_prices'])
+            elif 'unitvalues' in data_list:
+                data_list.extend(['food_prices'])
+            if 'other_features' in data_list:
+                data_list.extend(['cluster_features'])
             # EEP 153 solving demand equation required data
             required_list = ['food_acquired', 'household_roster', 'household_characteristics', 
-             'cluster_features', 'interview_date']
+             'cluster_features', 'interview_date', 'food_expenditures', 'food_quantities', 'food_prices']
             # intersection of required data and available data
             data_list = list(set(data_list).intersection(required_list))
-        
+
+        if 'household_roster' in data_list and 'household_characteristics' not in data_list:
+            data_list.append('household_characteristics')
         return data_list
     
     def __getitem__(self, year):
@@ -290,7 +324,7 @@ class Country:
         else:
             raise KeyError(f"{year} is not a valid wave for {self.name}")
     
-    def ai_categorical_mapping(self, label_col, label_col_type='idxvars', data_request='food_acquired', ai_agent=gpt_agent()):
+    def get_categoricals(self, label_col, label_col_type = 'idxvars', data_request = 'food_acquired', ai_agent = gpt_agent()):
         """
         Use AI to generalize original labels across all waves to be consistent for mapping, such as food labels or unit labels.
         
@@ -304,7 +338,7 @@ class Country:
         Returns:
         pd.DataFrame: A DataFrame containing three columns named Original Label, Preferred Label, and Manual Update.
 
-        To convert to org file or org string, use function df_to_org
+        To conver to org file or org string, please use function write_df_to_org
         """
         label_ls = []
         for i in self.waves:
@@ -342,7 +376,7 @@ class Country:
         Aggregates data across multiple waves using a single dataset method.
         If the required `.parquet` file is missing, it requests `Makefile` to generate only that file.
         """
-        if method_name not in self.data_scheme:
+        if method_name not in self.data_scheme and method_name not in ['other_features', 'food_prices_quantities_and_expenditures']:
             warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
             return pd.DataFrame()
 
@@ -360,30 +394,28 @@ class Country:
                 except KeyError as e:
                     warnings.warn(str(e))
             if results:
-                return pd.concat(results.values(), axis=0, sort=False)
+                df= pd.concat(results.values(), axis=0, sort=False)
+                return df
         
         # Step 2: Check if parquet file exists
         if not parquet_fn.exists():
-            warnings.warn(f"Required parquet file {parquet_fn} missing. Attempting to generate using Makefile...")
+            print(f"Attempting to generate using Makefile...")
 
             makefile_path = self.file_path /'_'/ "Makefile"
             if not makefile_path.exists():
-                warnings.warn(f"Makefile not found in {self.file_path}. Unable to generate required data.")
-                return pd.DataFrame()
+                raise FileNotFoundError(f"Makefile not found in {self.file_path}. Unable to generate required data.")
+
 
             # Step 3: Run Makefile for the specific parquet file
-            try:
-                cwd_path = self.file_path/"_"
-                relative_parquet_path = parquet_fn.relative_to(cwd_path.parent)  # Convert to relative path
-                subprocess.run(["make", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True)
-                warnings.warn(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...")
-            except subprocess.CalledProcessError as e:
-                warnings.warn(f"Failed to execute Makefile for {self.name}: {e}")
-                return pd.DataFrame()
+
+            cwd_path = self.file_path/"_"
+            relative_parquet_path = parquet_fn.relative_to(cwd_path.parent)  # Convert to relative path
+            subprocess.run(["make", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True)
+            print(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...") 
 
             # Step 4: Recheck if the parquet file was successfully generated
             if not parquet_fn.exists():
-                warnings.warn(f"Parquet file {parquet_fn} still missing after running Makefile.")
+                print(f"Parquet file {parquet_fn} still missing after running Makefile.")
                 return pd.DataFrame()
 
         # Step 5: Read and return the parquet file
@@ -394,7 +426,16 @@ class Country:
         return df
 
     def cluster_features(self, waves=None):
-        return self._aggregate_wave_data(waves, 'cluster_features')
+        try:
+            return self._aggregate_wave_data(waves, 'cluster_features')
+        except subprocess.CalledProcessError as e:
+            print('continue with other_features instead')
+            df = self._aggregate_wave_data(waves, 'other_features')
+            if df.empty:
+                return df
+            if 'm' in df.index.names:
+                df = df.reset_index(level = 'm').rename(columns = {'m':'Region'})
+            return df
 
     def household_roster(self, waves=None):
         return self._aggregate_wave_data(waves, 'household_roster')
@@ -408,22 +449,35 @@ class Country:
     def household_characteristics(self, waves=None):
         return self._aggregate_wave_data(waves, 'household_characteristics')
     
+    def food_expenditures(self, waves=None):
+        df = self._aggregate_wave_data(waves, 'food_expenditures')
+        if 'u' in df.index.names:
+            df = df.reset_index('u')
+            df['u'] = df['u'].replace(['<NA>','nan', np.nan],'unit')
+            df = df.set_index('u', append=True)
+        return df
+    def food_quantities(self, waves=None):
+        df = self._aggregate_wave_data(waves, 'food_quantities')
+        if 'u' in df.index.names:
+            df = df.reset_index('u')
+            df['u'] = df['u'].replace(['<NA>','nan', np.nan],'unit')
+            df = df.set_index('u', append=True)
+        return df
+        
+    def food_prices(self, waves=None):
+        df = self._aggregate_wave_data(waves, 'food_prices')
+        if 'u' in df.index.names:
+            df = df.reset_index('u')
+            df['u'] = df['u'].replace(['<NA>','nan', np.nan],'unit')
+            df = df.set_index('u', append=True)
+        return df
+
+
+
+    
+    
     # def id_walk():
 
-def map_index(df):
-    """
-    Map index from old to new index
-    """
-    mapping_rules = {
-        'i': 'temp_j',
-        'j': 'i',
-        'm': 'Region',
-        't': 'w',
-        'u': 'u'
-    }
-    df_renamed = df.rename_axis(index=mapping_rules)
-    df_renamed = df_renamed.rename_axis(index = {'temp_j': 'j'})
-    return df_renamed
 
 
 
@@ -568,3 +622,5 @@ def map_index(df):
 #         r = rgsn.Regression(y=np.log(x.replace(0,np.nan).dropna()),
 #                             d=z,**kwargs)
 #         return r
+
+

@@ -1,4 +1,4 @@
-# Formatting  Functions for Ghana 2016-17
+# Formatting  Functions for Mali
 import pandas as pd
 import numpy as np
 import lsms_library.local_tools as tools

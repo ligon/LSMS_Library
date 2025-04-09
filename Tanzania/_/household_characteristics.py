@@ -26,6 +26,11 @@ ids = list(set(z.index.get_level_values('j')))
 f2s = {k:str(k).split('.')[0] for k in ids}
 z = z.rename(index=f2s,level='j')
 
+# with open('panel_ids.json','r') as f:
+#     panel_id_json =json.load(f)
+
+# z = id_walk(z, waves, panel_id_json)
+
 try:
     of = pd.read_parquet('../var/other_features.parquet')
     z = z.join(of.reset_index('m')[['m']],on=['j','t'])
@@ -37,9 +42,5 @@ except FileNotFoundError:
 
 z.columns.name = 'k'
 
-with open('panel_ids.json','r') as f:
-    panel_id_json =json.load(f)
-
-z = id_walk(z, waves, panel_id_json)
 
 z.to_parquet('../var/household_characteristics.parquet')

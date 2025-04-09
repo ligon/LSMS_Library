@@ -1,8 +1,8 @@
 Country: GhanaLSS
-Wave: 2016-17
+Wave: 1991-92
 
 cluster_features:
-    file: g7sec8h.dta
+    file: POV_GH.DTA
     idxvars:
         v: clust
     myvars:
@@ -11,7 +11,7 @@ cluster_features:
 
 
 household_roster:
-    file: g7sec1.dta
+    file: S1.DTA
     idxvars:
         v: clust
         i: 
@@ -19,9 +19,7 @@ household_roster:
             - nh
         pid: pid
     myvars:
-        Sex: s1q2
-        Age: s1q5y
-        Birthplace: s1q11
-        Relation: s1q3
-
-
+        Sex: sex
+        Age: agey
+        Birthplace: s1q10
+        Relation: rel

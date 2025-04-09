@@ -39,7 +39,8 @@ food_acquired:
         Expenditure: s13q03c
         Produced: s13q04a
     file:
-        - EACIALI_p1.dta
+        - EACIALI_p1.dta:
+            Quantity: s13q03a
         - EACIALI_p2.dta
 
 individual_education:
