@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 from pandas import concat, get_dummies, MultiIndex
 from cfe.df_utils import use_indices
-
+from .local_tools import format_id
 
 def age_intervals(age,age_cuts=(0,4,9,14,19,31,51)):
     """
@@ -74,19 +74,6 @@ def roster_to_characteristics(df, age_cuts=(0,4,9,14,19,31,51), drop = 'pid', fi
     result.columns = result.columns.get_level_values(0)
     return result
 
-# def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=['t','m','i']):
-#     v = df.copy()
-#     v = v.replace(0, np.nan)
-#     v['Kgs'] = np.where(v.index.get_level_values('u').str.lower() == 'kg', v[quantity], np.nan)
-#     pkg = v[price].divide(v['Kgs'], axis=0)
-#     pkg = pkg.groupby(index).median().median(axis=1)
-#     po = v[price].groupby(index + ['u']).median().median(axis=1)
-#     kgper = (po / pkg).dropna()
-#     kgper = kgper.groupby('u').median()
-#     #convert to dict
-#     kgper = kgper.to_dict()
-#     return kgper
-
 def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=['t','m','i'], unit_col = 'u'):
     v = df.copy()
     v = v.replace(0, np.nan)
@@ -115,3 +102,49 @@ def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=
     #convert to dict
     kgper = kgper.to_dict()
     return kgper
+
+
+def id_walk(df, panel_ids_df, waves, index ='j'):
+    def update_id(d):
+        D_inv = {}
+        for k, v in d.items():
+            if v not in D_inv:
+                D_inv[v] = [k]
+            else:
+                D_inv[v].append(k)
+        updated_id = {}
+        for k,v in D_inv.items():
+            if len(v)==1: updated_id[v[0]] = k
+            else:
+                for it,v_element in enumerate(v):
+                    updated_id[v_element] = '%s_%d' % (k,it)
+
+        return updated_id
+
+    def propagate_matches(d):
+        for k, v in d.items():
+            if v in d:
+                d[k] = d[v]
+        return d
+    
+    D = dict()
+    w = dict()
+    for t in waves:
+        df = panel_ids_df[panel_ids_df.index.get.level_values('t')== t].copy()
+        wave_dic = {}
+
+        wave_dic.update(df[['i', 'previous_i']].dropna().values.tolist())
+        D.update(wave_dic)
+        D = propagate_matches(D)
+        wave_dic = update_id( {key: D[key] for key in wave_dic if key in D})
+        D.update(wave_dic)
+        w.update(wave_dic)
+    
+    df =df.reset_index(index)
+    df[index] = df[index].map(w).fillna(df[index])
+    df[index] = df[index].apply(format_id)
+    df = df.set_index([index], append=True)
+    df = df.reorder_levels([index] + [name for name in df.index.names if name != index])
+    
+
+    return df
