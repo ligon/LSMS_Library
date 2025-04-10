@@ -656,6 +656,7 @@ def panel_ids(Waves):
     w = dict()
     recursive_D = RecursiveDict()
     for t,v in Waves.items():
+        wave_dic = {}
         if len(v):
             fn = f"../{t}/Data/{v[0]}"
             columns = v[1] if isinstance(v[1], list) else [v[1], v[2]]
@@ -666,7 +667,13 @@ def panel_ids(Waves):
 
             if isinstance(v[1], list):
                 df[v[1][0]]=df[v[1][0]].apply(format_id)
-                D = v[2](df,v[1], D) 
+                wave_dic = v[2](df,v[1], wave_dic) 
+                recursive_D.update(wave_dic)
+                D.update(wave_dic)
+                D = propagate_matches(D)
+                wave_dic = update_id( {key: D[key] for key in wave_dic if key in D})
+                D.update(wave_dic)
+                w.update(wave_dic)
             else:                  
                 # Clean-up ids
                 df[v[1]] = df[v[1]].apply(format_id)
@@ -674,10 +681,16 @@ def panel_ids(Waves):
 
                 if len(v)==4: # Remap id1
                     df[v[2]] = df[v[2]].apply(v[3])
+                wave_dic.update(df[[v[1],v[2]]].dropna().values.tolist())
+                recursive_D.update(wave_dic)
+                D.update(wave_dic)
+                D = propagate_matches(D)
+                wave_dic = update_id( {key: D[key] for key in wave_dic if key in D})
+                D.update(wave_dic)
+                w.update(wave_dic)
 
-                D.update(df[[v[1],v[2]]].dropna().values.tolist())
 
-    return D
+    return recursive_D, w
 
 def conversion_table_matching_global(df, conversions, conversion_label_name, num_matches=3, cutoff = 0.6):
     """
