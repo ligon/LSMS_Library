@@ -23,7 +23,9 @@ class Wave:
         self.country = country_name
         self.name = f"{self.country}/{self.year}"
         self.data_scheme = data_scheme
-        self.formatting_functions = self.update_formatting_functions(formatting_functions)
+        self.formatting_functions = get_formating_functions(mod_path=self.file_path / "_" / f"{self.year}.py",
+                                                             name=f"formatting_{self.year}",
+                                                             general__formatting_functions=formatting_functions)
     @property
     def file_path(self):
         var = files("lsms_library") / "countries" / self.name
@@ -39,28 +41,6 @@ class Wave:
         with open(info_path, 'r') as file:
             return yaml.safe_load(file)
     
-    def update_formatting_functions(self, formatting_functions):
-        """
-        Properly import formmating functions from wave module
-        Return a dictionary of functions
-        """
-        module_filename = f"{self.year}.py" 
-        mod_path = self.file_path / "_" / module_filename 
-        general__formatting_functions = formatting_functions
-    
-        if mod_path.exists():
-            # Load module dynamically
-                spec = importlib.util.spec_from_file_location(f"formatting_{self.year}", mod_path)
-                formatting_module = importlib.util.module_from_spec(spec)
-                if spec.loader is not None:
-                    spec.loader.exec_module(formatting_module)
-                general__formatting_functions.update({
-                    name: func
-                    for name, func in vars(formatting_module).items()
-                    if callable(func)
-                })
-        return general__formatting_functions
-        
     
     def column_mapping(self, request):
         """
@@ -81,7 +61,7 @@ class Wave:
         
         formatting_functions = self.formatting_functions
 
-        def get_formatting_function(var_name, value, format_id_function = False):
+        def map_formatting_function(var_name, value, format_id_function = False):
             """Applies formatting functions if available, otherwise uses defaults."""
             if var_name in formatting_functions:
                 return (value, formatting_functions[var_name])
@@ -93,8 +73,9 @@ class Wave:
         idxvars = data_info.get('idxvars')
         myvars = data_info.get('myvars')
         final_mapping = dict()
-        idxvars_updated = {key: get_formatting_function(key, value, format_id_function = True) for key, value in idxvars.items()}
-        myvars_updated = {key: get_formatting_function(key, value) for key, value in myvars.items()}
+        final_mapping['df_edit'] = formatting_functions.get(request)
+        idxvars_updated = {key: map_formatting_function(key, value, format_id_function = True) for key, value in idxvars.items()}
+        myvars_updated = {key: map_formatting_function(key, value) for key, value in myvars.items()}
 
         if isinstance(files, str):
             final_mapping[files] = {'idxvars': idxvars_updated, 'myvars': myvars_updated}
@@ -108,9 +89,9 @@ class Wave:
                     file_name, overrides = next(iter(i.items()))
                     for key, val in overrides.items():
                         if key in idxvars:
-                            idxvars_override[key] = get_formatting_function(key, val, format_id_function = True)
+                            idxvars_override[key] = map_formatting_function(key, val, format_id_function = True)
                         else:
-                            myvars_override[key] = get_formatting_function(key, val)
+                            myvars_override[key] = map_formatting_function(key, val)
                     final_mapping[file_name] = {'idxvars': idxvars_override, 'myvars': myvars_override}
                 else:
                     final_mapping[i] = {'idxvars': idxvars_updated, 'myvars': myvars_updated}
@@ -152,19 +133,18 @@ class Wave:
         parquet_fn = self.file_path /f"_/{request}.parquet"
         if parquet_fn.exists():
             df = pd.read_parquet(parquet_fn)
-        # if in the upper directory Makefile exist: we should run Makefile
         elif df_fn.exists():
             cwd_path = self.file_path / "_"
             subprocess.run(['python', df_fn], cwd=cwd_path, check=True)
             if parquet_fn.exists():
                 df = pd.read_parquet(parquet_fn)
-                return df
             else:
                 warnings.warn(f"Failed to generate {request}")
                 return pd.DataFrame()
         else:
             mapping_details = self.column_mapping(request)
             convert_cat = (self.resources.get(request).get('converted_categoricals') is None)
+            df_edit_function = mapping_details.pop('df_edit')
             dfs = []
             for file, mappings in mapping_details.items():
                 df = df_data_grabber(f'{self.name}/Data/{file}', mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat)
@@ -225,20 +205,10 @@ class Wave:
     def interview_date(self):
         return self.grab_data('interview_date')
     
-    def household_characteristics(self):
-        try:
-            return self.grab_data('household_characteristics')
-        except KeyError as e:
-            if 'household_roster' in self.resources:
-                roster = self.household_roster()
-                df = roster_to_characteristics(roster).reset_index()
-                cluster_features = self.cluster_features().reset_index()
-                df = df.merge(cluster_features, on=['t','v'])
-                df = df.rename(columns={'Region':'m'}).drop(columns=['v','Rural'])
-                df = df.set_index(['t','m','i'])
-                return df
-            else:
-                raise e
+    def panel_ids(self):
+        df = self.grab_data('panel_ids')
+        df = df.reset_index().loc[:,['i', 'previous_i']].drop_duplicates().set_index('i')
+        return df
 
     
 
@@ -269,27 +239,12 @@ class Country:
             general_module_filename = f"{self.name.lower()}.py"
         general_mod_path = self.file_path/ "_"/ general_module_filename
 
-        if not general_mod_path.exists():
-            return {}
-
-        # Load module dynamically
-        spec = importlib.util.spec_from_file_location(f"formatting_{self.name}", general_mod_path)
-        formatting_module = importlib.util.module_from_spec(spec)
-        if spec.loader is not None:
-            spec.loader.exec_module(formatting_module)
-
-        return {
-            name: func
-            for name, func in vars(formatting_module).items()
-            if callable(func)
-        }
+        return get_formating_functions(general_mod_path, f"formatting_{self.name}")
     
     @property
     def waves(self):
         waves = [f.name for f in self.file_path.iterdir() if f.is_dir()]
-        for item in ['var', '_']:
-            if item in waves:
-                waves.remove(item)
+
         return waves
     
     @property
@@ -373,7 +328,7 @@ class Country:
         Aggregates data across multiple waves using a single dataset method.
         If the required `.parquet` file is missing, it requests `Makefile` to generate only that file.
         """
-        if method_name not in self.data_scheme and method_name not in ['other_features']:
+        if method_name not in self.data_scheme and method_name not in ['other_features', 'food_prices_quantities_and_expenditures']:
             warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
             return pd.DataFrame()
 
@@ -392,35 +347,35 @@ class Country:
                     warnings.warn(str(e))
             if results:
                 df= pd.concat(results.values(), axis=0, sort=False)
-                return index_corrections(df)
+                return map_index(df, self.name)
         
-        # Step 2: Check if parquet file exists
+        # Step 2: Attempt to build using makefile
+        print(f"Attempting to generate using Makefile...")
+
+        makefile_path = self.file_path /'_'/ "Makefile"
+        if not makefile_path.exists():
+            raise FileNotFoundError(f"Makefile not found in {self.file_path}. Unable to generate required data.")
+
+
+        # Step 3: Run Makefile for the specific parquet file
+
+        cwd_path = self.file_path/"_"
+        relative_parquet_path = parquet_fn.relative_to(cwd_path.parent)  # Convert to relative path
+        subprocess.run(["make", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True)
+        print(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...")
+
+        # Step 4: Recheck if the parquet file was successfully generated
         if not parquet_fn.exists():
-            print(f"Attempting to generate using Makefile...")
-
-            makefile_path = self.file_path /'_'/ "Makefile"
-            if not makefile_path.exists():
-                raise FileNotFoundError(f"Makefile not found in {self.file_path}. Unable to generate required data.")
-
-
-            # Step 3: Run Makefile for the specific parquet file
-            cwd_path = self.file_path/"_"
-            relative_parquet_path = parquet_fn.relative_to(cwd_path.parent)  # Convert to relative path
-            subprocess.run(["make", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True)
-            print(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...") 
-
-            # Step 4: Recheck if the parquet file was successfully generated
-            if not parquet_fn.exists():
-                print(f"Parquet file {parquet_fn} still missing after running Makefile.")
-                return pd.DataFrame()
+            print(f"Parquet file {parquet_fn} still missing after running Makefile.")
+            return pd.DataFrame()
 
         # Step 5: Read and return the parquet file
         df = pd.read_parquet(parquet_fn)
 
-        df = index_corrections(map_index(df))
+        df = map_index(df, self.name)
 
         return df
-
+    
     def cluster_features(self, waves=None):
         try:
             return self._aggregate_wave_data(waves, 'cluster_features')
