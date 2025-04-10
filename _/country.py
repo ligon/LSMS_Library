@@ -6,7 +6,7 @@ from importlib.resources import files
 import importlib
 import cfe.regression as rgsn
 from collections import defaultdict
-from .local_tools import df_data_grabber, format_id, get_categorical_mapping, category_union, get_dataframe, map_index, index_corrections
+from .local_tools import df_data_grabber, format_id, get_categorical_mapping, category_union, get_dataframe, map_index, get_formating_functions
 import importlib.util
 import os
 import warnings
@@ -16,7 +16,6 @@ from .ai_agent import ai_process, gpt_agent
 warnings.filterwarnings('ignore', category=FutureWarning)
 warnings.filterwarnings('ignore', category=UnicodeWarning)
 import subprocess
-from .transformations import roster_to_characteristics
 
 class Wave:
     def __init__(self, year, country_name, data_scheme, formatting_functions):
@@ -153,7 +152,6 @@ class Wave:
         parquet_fn = self.file_path /f"_/{request}.parquet"
         if parquet_fn.exists():
             df = pd.read_parquet(parquet_fn)
-            return map_index(df)
         # if in the upper directory Makefile exist: we should run Makefile
         elif df_fn.exists():
             cwd_path = self.file_path / "_"
@@ -179,8 +177,12 @@ class Wave:
                     warnings.warn(f"Large number used for missing?  Replacing {na} with NaN.")
                     df = df.replace(na,np.nan)
                 dfs.append(df)
+            df = pd.concat(dfs, axis=0, sort=False)
 
-            return pd.concat(dfs)
+        if df_edit_function:
+            df = df_edit_function(df)
+        
+        return map_index(df, self.name)
 
     def cluster_features(self):
         try:
@@ -310,8 +312,6 @@ class Country:
             # intersection of required data and available data
             data_list = list(set(data_list).intersection(required_list))
 
-        if 'household_roster' in data_list and 'household_characteristics' not in data_list:
-            data_list.append('household_characteristics')
         return data_list
     
     def __getitem__(self, year):
@@ -447,18 +447,21 @@ class Country:
     
     def food_expenditures(self, waves=None):
         return self._aggregate_wave_data(waves, 'food_expenditures')
-    
+
     def food_quantities(self, waves=None):
-        return  self._aggregate_wave_data(waves, 'food_quantities')
+        return self._aggregate_wave_data(waves, 'food_quantities')
+
         
     def food_prices(self, waves=None):
         return self._aggregate_wave_data(waves, 'food_prices')
 
 
+    def panel_ids(self, waves=None):
+        return self._aggregate_wave_data(waves, 'panel_ids')
+
 
     
-    
-    # def id_walk():
+
 
 
 
