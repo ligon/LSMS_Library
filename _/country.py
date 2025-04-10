@@ -397,26 +397,25 @@ class Country:
                 df= pd.concat(results.values(), axis=0, sort=False)
                 return df
         
-        # Step 2: Check if parquet file exists
+        # Step 2: Attempt to build using makefile
+        print(f"Attempting to generate using Makefile...")
+
+        makefile_path = self.file_path /'_'/ "Makefile"
+        if not makefile_path.exists():
+            raise FileNotFoundError(f"Makefile not found in {self.file_path}. Unable to generate required data.")
+
+
+        # Step 3: Run Makefile for the specific parquet file
+
+        cwd_path = self.file_path/"_"
+        relative_parquet_path = parquet_fn.relative_to(cwd_path.parent)  # Convert to relative path
+        subprocess.run(["make", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True)
+        print(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...")
+
+        # Step 4: Recheck if the parquet file was successfully generated
         if not parquet_fn.exists():
-            print(f"Attempting to generate using Makefile...")
-
-            makefile_path = self.file_path /'_'/ "Makefile"
-            if not makefile_path.exists():
-                raise FileNotFoundError(f"Makefile not found in {self.file_path}. Unable to generate required data.")
-
-
-            # Step 3: Run Makefile for the specific parquet file
-
-            cwd_path = self.file_path/"_"
-            relative_parquet_path = parquet_fn.relative_to(cwd_path.parent)  # Convert to relative path
-            subprocess.run(["make", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True)
-            print(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...") 
-
-            # Step 4: Recheck if the parquet file was successfully generated
-            if not parquet_fn.exists():
-                print(f"Parquet file {parquet_fn} still missing after running Makefile.")
-                return pd.DataFrame()
+            print(f"Parquet file {parquet_fn} still missing after running Makefile.")
+            return pd.DataFrame()
 
         # Step 5: Read and return the parquet file
         df = pd.read_parquet(parquet_fn)
