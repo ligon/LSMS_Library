@@ -61,9 +61,9 @@ individual_education:
 interview_date:
     file: 
         - EACICONTROLE_p1.dta
+        - EACICONTROLE_p2.dta
     idxvars:
         v: grappe
-        visit: s00q22y
         i:
             - grappe
             - menage

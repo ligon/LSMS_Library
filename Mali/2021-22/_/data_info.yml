@@ -65,7 +65,20 @@ interview_date:
             - menage
     myvars:
         Int_t: s00q23a
+    
 
+panel_ids:
+    file: s00_me_mli2021.dta
+    idxvars:
+        v: grappe
+        visit: vague
+        i: 
+            - grappe
+            - menage
+    myvars:
+        previous_v: s00q07f1
+        previous_hid: s00q07f2
+        in_previous_wave: PanelHH
 
 
 
