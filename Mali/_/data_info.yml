@@ -36,5 +36,8 @@ Data Scheme:
   interview_date:
     index: (t, v, visit, i)
     Int_t: str
+  panel_ids:
+    index: (t, i)
+    previous_i: str
 
 

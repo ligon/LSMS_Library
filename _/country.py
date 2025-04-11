@@ -6,7 +6,7 @@ from importlib.resources import files
 import importlib
 import cfe.regression as rgsn
 from collections import defaultdict
-from .local_tools import df_data_grabber, format_id, get_categorical_mapping, category_union, get_dataframe, map_index, get_formating_functions
+from .local_tools import df_data_grabber, format_id, get_categorical_mapping, category_union, get_dataframe, map_index, get_formating_functions, panel_ids
 import importlib.util
 import os
 import warnings
@@ -16,6 +16,7 @@ from .ai_agent import ai_process, gpt_agent
 warnings.filterwarnings('ignore', category=FutureWarning)
 warnings.filterwarnings('ignore', category=UnicodeWarning)
 import subprocess
+import json
 
 class Wave:
     def __init__(self, year, country_name, data_scheme, formatting_functions):
@@ -129,19 +130,7 @@ class Wave:
         Output:
             df: pd.DataFrame, the data requested
         '''
-        df_fn = self.file_path /f"_/{request}.py"
-        parquet_fn = self.file_path /f"_/{request}.parquet"
-        if parquet_fn.exists():
-            df = pd.read_parquet(parquet_fn)
-        elif df_fn.exists():
-            cwd_path = self.file_path / "_"
-            subprocess.run(['python', df_fn], cwd=cwd_path, check=True)
-            if parquet_fn.exists():
-                df = pd.read_parquet(parquet_fn)
-            else:
-                warnings.warn(f"Failed to generate {request}")
-                return pd.DataFrame()
-        else:
+        if self.resources is not None:
             mapping_details = self.column_mapping(request)
             convert_cat = (self.resources.get(request).get('converted_categoricals') is None)
             df_edit_function = mapping_details.pop('df_edit')
@@ -159,8 +148,26 @@ class Wave:
                 dfs.append(df)
             df = pd.concat(dfs, axis=0, sort=False)
 
-        if df_edit_function:
-            df = df_edit_function(df)
+            if df_edit_function:
+                df = df_edit_function(df)
+        else:
+            print(f"Attempting to generate using Makefile...")
+            parquet_fn = self.file_path/"_"/ f"{request}.parquet"
+
+            makefile_path = self.file_path.parent /'_'/ "Makefile"
+            if not makefile_path.exists():
+                raise FileNotFoundError(f"Makefile not found in {makefile_path.parent}. Unable to generate required data.")
+
+            cwd_path = self.file_path.parent / "_"
+            relative_parquet_path = parquet_fn.relative_to(cwd_path.parent)  # Convert to relative path
+            subprocess.run(["make", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True)
+            print(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...")
+
+            if not parquet_fn.exists():
+                print(f"Parquet file {parquet_fn} still missing after running Makefile.")
+                return pd.DataFrame()
+            
+            df = pd.read_parquet(parquet_fn)
         
         return map_index(df, self.name)
 
@@ -207,7 +214,7 @@ class Wave:
     
     def panel_ids(self):
         df = self.grab_data('panel_ids')
-        df = df.reset_index().loc[:,['i', 'previous_i']].drop_duplicates().set_index('i')
+        df = df.reset_index().loc[:,['i', 't', 'previous_i']].drop_duplicates().set_index(['i', 't'])
         return df
 
     
@@ -217,6 +224,8 @@ class Wave:
 class Country:
     def __init__(self,country_name):
         self.name = country_name
+        self._panel_ids_cache = None
+        self._updated_ids_cache = None
 
     @property
     def file_path(self):
@@ -243,8 +252,8 @@ class Country:
     
     @property
     def waves(self):
-        waves = [f.name for f in self.file_path.iterdir() if f.is_dir()]
-
+        waves = [f.name for f in self.file_path.iterdir() if f.is_dir() and (self.file_path / f.name / 'Documentation' / 'Source').exists()]
+        waves = sorted(waves)
         return waves
     
     @property
@@ -263,7 +272,7 @@ class Country:
                 data_list.extend(['cluster_features'])
             # EEP 153 solving demand equation required data
             required_list = ['food_acquired', 'household_roster', 'household_characteristics', 
-             'cluster_features', 'interview_date', 'food_expenditures', 'food_quantities', 'food_prices']
+             'cluster_features', 'interview_date', 'food_expenditures', 'food_quantities', 'food_prices', 'nutrition', 'panel_ids']
             # intersection of required data and available data
             data_list = list(set(data_list).intersection(required_list))
 
@@ -328,15 +337,12 @@ class Country:
         Aggregates data across multiple waves using a single dataset method.
         If the required `.parquet` file is missing, it requests `Makefile` to generate only that file.
         """
-        if method_name not in self.data_scheme and method_name not in ['other_features', 'food_prices_quantities_and_expenditures']:
+        if method_name not in self.data_scheme and method_name not in ['other_features', 'food_prices_quantities_and_expenditures', 'updated_ids']:
             warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
             return pd.DataFrame()
 
         if waves is None:
             waves = self.waves
-
-        parquet_fn = self.file_path / "var" / f"{method_name}.parquet"
-
         #Step 1: Check if it mapped by data_info.yml
         if self.resources is not None:
             results = {}
@@ -356,26 +362,67 @@ class Country:
         if not makefile_path.exists():
             raise FileNotFoundError(f"Makefile not found in {self.file_path}. Unable to generate required data.")
 
+        # Step 3: Run Makefile for the specific parquet/json file
+        cwd_path = self.file_path / "_"
 
-        # Step 3: Run Makefile for the specific parquet file
+        if method_name in ['panel_ids', 'updated_ids']:
+            target_path = self.file_path / "_" / f"{method_name}.json"
+            relative_path = target_path.relative_to(cwd_path)
+            make_target = str(relative_path)
+        else:
+            target_path = self.file_path / "var" / f"{method_name}.parquet"
+            relative_path = target_path.relative_to(cwd_path.parent)
+            make_target = '../' + str(relative_path)
 
-        cwd_path = self.file_path/"_"
-        relative_parquet_path = parquet_fn.relative_to(cwd_path.parent)  # Convert to relative path
-        subprocess.run(["make", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True)
-        print(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...")
+        subprocess.run(["make", make_target], cwd=cwd_path, check=True)
+        print(f"Makefile executed successfully for {self.name}. Rechecking for {target_path.name}...")
 
         # Step 4: Recheck if the parquet file was successfully generated
-        if not parquet_fn.exists():
-            print(f"Parquet file {parquet_fn} still missing after running Makefile.")
+        if not target_path.exists():
+            print(f"Data file {target_path} still missing after running Makefile.")
             return pd.DataFrame()
 
-        # Step 5: Read and return the parquet file
-        df = pd.read_parquet(parquet_fn)
+        # Step 5: Read and return the parquet or JSON file
+        if target_path.suffix == '.json':
+            with open(target_path, 'r') as json_file:
+                dic = json.load(json_file)
+            return dic
+        else:
+            df = pd.read_parquet(target_path)
 
         df = map_index(df, self.name)
 
         return df
-    
+
+    def _compute_panel_ids(self):
+        """
+        Compute and cache both panel_ids and updated_ids.
+        """
+        panel_ids_dic = self._aggregate_wave_data(None, 'panel_ids')
+        if isinstance(panel_ids_dic, dict):
+            updated_ids_dic = self._aggregate_wave_data(None, 'updated_ids')
+        elif isinstance(panel_ids_dic, pd.DataFrame):
+            panel_ids_dic, updated_ids_dic = panel_ids(panel_ids_dic)
+            panel_ids_dic = panel_ids.data
+        else:
+            warnings.warn(f"Invalid data for panel_ids")
+            return None
+        self._panel_ids_cache = panel_ids_dic
+        self._updated_ids_cache = updated_ids_dic
+
+    @property
+    def panel_ids(self):
+        if self._panel_ids_cache is None or self._updated_ids_cache is None:
+            self._compute_panel_ids()
+        return self._panel_ids_cache
+
+    @property
+    def updated_ids(self):
+        if self._panel_ids_cache is None or self._updated_ids_cache is None:
+            self._compute_panel_ids()
+        return self._updated_ids_cache
+        
+
     def cluster_features(self, waves=None):
         try:
             return self._aggregate_wave_data(waves, 'cluster_features')
@@ -406,16 +453,12 @@ class Country:
     def food_quantities(self, waves=None):
         return self._aggregate_wave_data(waves, 'food_quantities')
 
-        
     def food_prices(self, waves=None):
         return self._aggregate_wave_data(waves, 'food_prices')
 
 
-    def panel_ids(self, waves=None):
-        return self._aggregate_wave_data(waves, 'panel_ids')
+        
 
-
-    
 
 
 

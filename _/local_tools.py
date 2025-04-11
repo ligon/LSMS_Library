@@ -628,69 +628,109 @@ def propagate_matches(d):
             d[k] = d[v]
     return d
 
+
 def panel_ids(Waves):
     """
-    Used to build panel_ids data. 
-    Return RecursiveDict of household identifiers to trace households(splited) across waves.
+    Build a recursive mapping of household identifiers across survey waves.
     
-    Waves: Dictionary of waves with the following structure:
-        The key of the dictionary is each wave year;
-        The value is a tuple in the maximum of 4 elements: (id_datafile, recent_id, old_id, function_to_transform_old_id)
-        
-        For example (Uganda example):
-        Waves = {'2011-12':(),
-        '2013-14':('GSEC1.dta','HHID','HHID_old'),
-        '2015-16':('gsec1.dta','HHID','hh',lambda s: s.replace('-05-','-04-')),
-        '2018-19':('GSEC1.dta','hhid','t0_hhid'),
-        '2019-20':('HH/gsec1.dta','hhid','hhidold')}
-
-        Waves include a list, example (Tanzania example), the list is used to map the ids by the function map_08_15:
-            Waves = {'2008-15':('upd4_hh_a.dta',['r_hhid','round','UPHI'], map_08_15),
-                    '2019-20':('HH_SEC_A.dta','sdd_hhid','y4_hhid'),
-                    '2020-21':('hh_sec_a.dta','y5_hhid','y4_hhid')}
+    This function reads panel data for each survey wave, formats and transforms
+    household identifiers, and then propagates identifier matches recursively in order
+    to trace households (which may have split IDs) across waves.
     
-    Faye Fang                                                                            Sept. 2024
-
+    Parameters
+    ----------
+    Waves : dict or DataFrame
+        Either:
+        - A dictionary where each key is a wave identifier (e.g., '2011-12') and 
+          the corresponding value is a tuple. For a typical wave, the tuple can be:
+              (data_filename, recent_id, old_id[, transform_fn])
+          If recent_id is provided as a list, then the tuple is of the form:
+              (data_filename, [recent_id, ...], mapping_fn)
+          For example (Uganda):
+              Waves = {
+                  '2011-12': ('GSEC1.dta', 'HHID', 'HHID_old'),
+                  '2015-16': ('gsec1.dta', 'HHID', 'hh', lambda s: s.replace('-05-', '-04-')),
+                  '2018-19': ('GSEC1.dta', 'hhid', 't0_hhid'),
+                  '2019-20': ('HH/gsec1.dta', 'hhid', 'hhidold')
+              }
+              
+        - A DataFrame with a MultiIndex that includes a level named 't' representing the wave.
+          In this case the DataFrame must have at least the columns 'i' (current identifier)
+          and 'previous_i' (the identifier from a previous wave) for the mapping.
+          
+    Returns
+    -------
+    recursive_D : RecursiveDict
+        A recursive dictionary containing the propagated household identifier mappings 
+        across waves.
+    wave_updates : dict
+        A dictionary with the updated household mapping for each wave.
+    
+    
+    Faye Fang, April. 2025
     """
-    D = dict()
-    w = dict()
+    
+    global_matches = {}
+    wave_updates = {}
     recursive_D = RecursiveDict()
-    for t,v in Waves.items():
-        wave_dic = {}
-        if len(v):
-            fn = f"../{t}/Data/{v[0]}"
-            columns = v[1] if isinstance(v[1], list) else [v[1], v[2]]
-            try:
-                df = from_dta(fn)[columns]
-            except FileNotFoundError:
-                with dvc.api.open(fn,mode='rb') as dta: df = from_dta(dta)[columns]
 
-            if isinstance(v[1], list):
-                df[v[1][0]]=df[v[1][0]].apply(format_id)
-                wave_dic = v[2](df,v[1], wave_dic) 
-                recursive_D.update(wave_dic)
-                D.update(wave_dic)
-                D = propagate_matches(D)
-                wave_dic = update_id( {key: D[key] for key in wave_dic if key in D})
-                D.update(wave_dic)
-                w.update(wave_dic)
-            else:                  
-                # Clean-up ids
-                df[v[1]] = df[v[1]].apply(format_id)
-                df[v[2]] = df[v[2]].apply(format_id)
+    def update_wave_matches(wave_matches, global_matches, recursive_matches):
+        """Helper to update the recursive and global mappings using current wave matches."""
+        recursive_matches.update(wave_matches)
+        global_matches.update(wave_matches)
+        global_matches = propagate_matches(global_matches)
+        updated_wave = update_id({key: global_matches[key] for key in wave_matches if key in global_matches})
+        global_matches.update(updated_wave)
+        return updated_wave, global_matches
 
-                if len(v)==4: # Remap id1
-                    df[v[2]] = df[v[2]].apply(v[3])
-                wave_dic.update(df[[v[1],v[2]]].dropna().values.tolist())
-                recursive_D.update(wave_dic)
-                D.update(wave_dic)
-                D = propagate_matches(D)
-                wave_dic = update_id( {key: D[key] for key in wave_dic if key in D})
-                D.update(wave_dic)
-                w.update(wave_dic)
+    # Process input when Waves is a dictionary
+    if isinstance(Waves, dict):
+        for wave_year, wave_info in Waves.items():
+            if not wave_info:
+                continue  # skip empty entries
+            wave_matches = {}
 
+            file_path = f"../{wave_year}/Data/{wave_info[0]}"
+            if isinstance(wave_info[1], list):
+                columns = wave_info[1]
+            else:
+                columns = [wave_info[1], wave_info[2]]
 
-    return recursive_D, w
+            df = get_dataframe(file_path)[columns]
+
+            # Process mapping when recent_id is a list (list-based mapping)
+            if isinstance(wave_info[1], list):
+                df[wave_info[1][0]] = df[wave_info[1][0]].apply(format_id)
+                wave_matches = wave_info[2](df, wave_info[1], wave_matches)
+            else:
+                df[wave_info[1]] = df[wave_info[1]].apply(format_id)
+                df[wave_info[2]] = df[wave_info[2]].apply(format_id)
+                # If a transformation function is provided (tuple length 4), apply it to the old_id column
+                if len(wave_info) == 4:
+                    df[wave_info[2]] = df[wave_info[2]].apply(wave_info[3])
+                wave_matches.update(df[[wave_info[1], wave_info[2]]].dropna().values.tolist())
+
+            updated_wave, global_matches = update_wave_matches(wave_matches, global_matches, recursive_D)
+            wave_updates.update(updated_wave)
+
+    else:
+        # Process input when Waves is a DataFrame with a MultiIndex (assumed to have level 't')
+        panel_ids_df = Waves.copy()
+        sorted_waves = sorted(panel_ids_df.index.get_level_values('t').unique())
+        for wave_year in sorted_waves:
+            df = panel_ids_df[panel_ids_df.index.get_level_values('t') == wave_year].copy().reset_index()
+            wave_matches = {}
+            wave_matches.update(df[['i', 'previous_i']].dropna().set_index('i')['previous_i'].to_dict())
+            updated_wave, global_matches = update_wave_matches(wave_matches, global_matches, recursive_D)
+            wave_updates.update(updated_wave)
+
+    return recursive_D, wave_updates
+
+def id_walk(df, updated_ids, index ='j'):
+    level_num = df.index.names.index(index)
+    new_level = df.index.get_level_values(index).map(lambda x: updated_ids.get(x, x))
+    df.index = df.index.set_levels(df.index.levels[:level_num] + [new_level] + df.index.levels[level_num + 1:])
+    return df
 
 def conversion_table_matching_global(df, conversions, conversion_label_name, num_matches=3, cutoff = 0.6):
     """
@@ -753,7 +793,7 @@ def category_remap(c,remaps):
 
     return c
 
-def panel_attrition(df, Waves, return_ids=False, waves = None,  split_households_new_sample=True):
+def panel_attrition(df, waves,  index = 'i', return_ids=False, split_households_new_sample=True):
     """
     Produce an upper-triangular) matrix showing the number of households (j) that
     transition between rounds (t) of df.
@@ -770,10 +810,8 @@ def panel_attrition(df, Waves, return_ids=False, waves = None,  split_households
     
     Note: First three rounds used same sample. Splits of the main households may happen in different rounds.
     """
-    idxs = df.reset_index().groupby('t')['j'].apply(list).to_dict()
-
-    if waves is None:
-        waves = list(Waves.keys())
+    waves = sorted(waves)
+    idxs = df.reset_index().groupby('t')[index].apply(list).to_dict()
 
     foo = pd.DataFrame(index=waves,columns=waves)
     IDs = {}
@@ -856,7 +894,6 @@ def get_formating_functions(mod_path, name, general__formatting_functions={} ):
             })
         return general__formatting_functions
     else:
-        warnings.warn(f"Module {mod_path} does not exist. Skipping loading of formatting functions.")
-        return {}
+        return general__formatting_functions.update({})
 
 
