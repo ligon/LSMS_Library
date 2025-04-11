@@ -189,11 +189,13 @@ def other_features(fn,urban=None,region=None,HHID='HHID',urban_converter=None):
 
     return df
 
+#def id_walk(df, updated_ids, index ='j'):
+#    level_num = df.index.names.index(index)
+#    new_level = df.index.get_level_values(index).map(lambda x: updated_ids.get(x, x))
+#    df.index = df.index.set_levels(df.index.levels[:level_num] + [new_level] + df.index.levels[level_num + 1:])
+#    return df
 def id_walk(df, updated_ids, index ='j'):
-    level_num = df.index.names.index(index)
-    new_level = df.index.get_level_values(index).map(lambda x: updated_ids.get(x, x))
-    df.index = df.index.set_levels(df.index.levels[:level_num] + [new_level] + df.index.levels[level_num + 1:])
-    return df
+    return df.rename(index=updated_ids,level=index)
 
 def panel_attrition(df, Waves, return_ids=False, waves = None,  split_households_new_sample=True):
     """
