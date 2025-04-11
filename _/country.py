@@ -252,7 +252,7 @@ class Country:
     
     @property
     def waves(self):
-        waves = [f.name for f in self.file_path.iterdir() if f.is_dir() and (self.file_path / f.name / 'Documentation' / 'Source').exists()]
+        waves = [f.name for f in self.file_path.iterdir() if f.is_dir() and (self.file_path / f.name / 'Documentation' / 'SOURCE').exists()]
         waves = sorted(waves)
         return waves
     
