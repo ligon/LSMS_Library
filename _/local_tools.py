@@ -897,3 +897,7 @@ def get_formating_functions(mod_path, name, general__formatting_functions={} ):
         return general__formatting_functions.update({})
 
 
+def id_walk(df, updated_ids, index ='i'):
+    df= df.rename(index=updated_ids,level=index)
+    df.attrs['id_converted'] = True
+    return df

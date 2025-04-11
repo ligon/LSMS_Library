@@ -6,7 +6,7 @@ from importlib.resources import files
 import importlib
 import cfe.regression as rgsn
 from collections import defaultdict
-from .local_tools import df_data_grabber, format_id, get_categorical_mapping, category_union, get_dataframe, map_index, get_formating_functions, panel_ids
+from .local_tools import df_data_grabber, format_id, get_categorical_mapping, category_union, get_dataframe, map_index, get_formating_functions, panel_ids, id_walk
 import importlib.util
 import os
 import warnings
@@ -168,8 +168,7 @@ class Wave:
                 return pd.DataFrame()
             
             df = pd.read_parquet(parquet_fn)
-        
-        return map_index(df, self.name)
+        return map_index(df, self.country)
 
     def cluster_features(self):
         try:
@@ -391,9 +390,12 @@ class Country:
         else:
             df = pd.read_parquet(target_path)
 
-        df = map_index(df, self.name)
+        if '_id_converted' not in df.columns or not df['_id_converted'].all():
+            df = id_walk(map_index(df, self.name), self.updated_ids)
+        else:
+            df = map_index(df, self.name)
+        return df.drop(columns=['_id_converted'], errors='ignore')
 
-        return df
 
     def _compute_panel_ids(self):
         """
