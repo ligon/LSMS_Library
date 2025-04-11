@@ -26,10 +26,10 @@ ids = list(set(z.index.get_level_values('j')))
 f2s = {k:str(k).split('.')[0] for k in ids}
 z = z.rename(index=f2s,level='j')
 
-# with open('panel_ids.json','r') as f:
-#     panel_id_json =json.load(f)
+with open('updated_ids.json','r') as f:
+    updated_ids =json.load(f)
 
-# z = id_walk(z, waves, panel_id_json)
+z = id_walk(z, updated_ids)
 
 try:
     of = pd.read_parquet('../var/other_features.parquet')
