@@ -380,6 +380,7 @@ class Country:
         # Step 4: Recheck if the parquet file was successfully generated
         if not target_path.exists():
             print(f"Data file {target_path} still missing after running Makefile.")
+            return pd.DataFrame()
 
 
         # Step 5: Read and return the parquet or JSON file
