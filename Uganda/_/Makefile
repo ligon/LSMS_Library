@@ -63,7 +63,7 @@ nonfood_expenditures_parquet := $(nonfood_expenditures:.py=.parquet)
 food_acquired = $(shell find $(rounds) -name food_acquired.py)
 food_acquired_parquet := $(food_acquired:.py=.parquet)
 
-../var/food_acquired.parquet: food_acquired.py $(food_acquired_parquet) ../var/other_features.parquet
+../var/food_acquired.parquet: unitlabels.csv food_acquired.py $(food_acquired_parquet) ../var/other_features.parquet
 	python food_acquired.py
 
 household_characteristics = $(shell find $(rounds) -name household_characteristics.py)
