@@ -4,7 +4,7 @@ different prices for different units.
 
 import pandas as pd
 import numpy as np
-from uganda import change_id, Waves, id_walk
+from uganda import Waves, id_walk
 import json
 p = []
 for t in ['2005-06','2009-10','2010-11','2011-12','2013-14','2015-16','2018-19','2019-20']:
@@ -18,8 +18,8 @@ for t in ['2005-06','2009-10','2010-11','2011-12','2013-14','2015-16','2018-19',
 
 p = pd.concat(p)
 
-# panel_id_json = json.load(open('panel_ids.json'))
-# p = id_walk(p, Waves, panel_id_json)
+updated_ids = json.load(open('updated_ids.json'))
+p = id_walk(p, updated_ids)
 
 of = pd.read_parquet('../var/other_features.parquet')
 
