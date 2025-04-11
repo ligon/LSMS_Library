@@ -6,7 +6,7 @@ import sys
 sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
-from uganda import change_id, Waves, id_walk
+from uganda import Waves, id_walk
 import json
 
 x = {}
@@ -29,7 +29,7 @@ except FileNotFoundError:
 
 x = x.reset_index().set_index(['j','t','m'])
 
-panel_id_json = json.load(open('panel_ids.json'))
-x = id_walk(x, Waves, panel_id_json)
+updated_ids = json.load(open('updated_ids.json'))
+x = id_walk(x, updated_ids)
 
 x.to_parquet('../var/interview_date.parquet')

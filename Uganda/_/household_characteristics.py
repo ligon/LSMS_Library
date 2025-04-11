@@ -4,7 +4,7 @@ Concatenate data on other household features across rounds.
 """
 
 import pandas as pd
-from uganda import change_id, id_walk, Waves
+from uganda import Waves, id_walk
 import json
 
 x = {}
@@ -21,19 +21,19 @@ z.columns.name = 't'
 
 z = z.stack().unstack('k')
 
+with open('updated_ids.json','r') as f:
+    updated_ids =json.load(f)
+
+z = id_walk(z, updated_ids)
+
 try:
     of = pd.read_parquet('../var/other_features.parquet')
-
-    z = z.join(of.reset_index('m')['m'],on=['j','t'])
+    z = z.join(of.reset_index('m')['m'], on=['j', 't'])
 
 except FileNotFoundError:
     z['m'] ='Uganda'
 
 z = z.reset_index().set_index(['j','t','m'])
 
-
-with open('panel_ids.json','r') as f:
-    panel_id_json =json.load(f)
-z = id_walk(z, Waves, panel_id_json)
 
 z.to_parquet('../var/household_characteristics.parquet')

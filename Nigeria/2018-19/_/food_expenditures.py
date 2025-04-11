@@ -5,8 +5,6 @@ import pandas as pd
 import json
 import dvc.api
 from cfe.df_utils import broadcast_binary_op
-
-sys.path.append('../../2015-16/_')
 from units import conv, unitcodes
 
 # Replace t

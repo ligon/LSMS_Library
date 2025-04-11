@@ -4,6 +4,7 @@ Pull nutrients info for the fct_addtion using fooddatacentral; harmonize structu
 
 import pandas as pd
 import fooddatacentral as fdc
+import warnings
 
 #create a DataFrame of nutritional contents of food items
 #Default portion: 100g

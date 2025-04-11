@@ -22,10 +22,10 @@ z = pd.concat(z.values())
 z = z.reset_index().set_index(['j','t','m'])
 z.columns.name = 'k'
 
-with open('panel_ids.json','r') as f:
-    panel_id_json =json.load(f)
+with open('updated_ids.json','r') as f:
+    updated_ids =json.load(f)
 
-z = id_walk(z, waves, panel_id_json)
+z = id_walk(z, updated_ids)
 
 assert z.index.is_unique, "Non-unique index!  Fix me!"
 

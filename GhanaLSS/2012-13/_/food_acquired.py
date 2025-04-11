@@ -77,7 +77,7 @@ y = pd.wide_to_long(y.reset_index(), stubnames=['Produced'], i=['v', 'i', 'j', '
 y = y.join(fe,how='outer')
 
 y['w'] = w
-y = y.reset_index().set_index(['w','v','i','j','u','visit'])
+y = y.reorder_levels(['w','v','i','j','visit', 'u'])
 
 # fa = y.groupby(['j','t','i','u']).sum()
 fa = y.replace(0,np.nan).dropna(how='all')

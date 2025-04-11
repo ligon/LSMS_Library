@@ -7,13 +7,14 @@ Single Index:
   plot_id: plot id
   int_t: interview date
   u: unit
+  m: region
 
 Index Info:
   note: global index info
   index_info:
     cluster_features: (t, int_t, v)
     household_roster: (t, int_t, v, i, pid)
-    household_features: (t, int_t, v, i)
+    household_characteristics: (t, int_t, v, i, m)
     plot_features: (t, int_t, v, i, plot_id)
-    food_acquired: (t, int_t, v, i, j, u)
+    food_acquired: (t, int_t, m, v, i, j, u)
     nonfood_acquired: (t, int_t, v, i, j)

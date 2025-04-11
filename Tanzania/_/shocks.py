@@ -16,7 +16,6 @@ import json
 s={}
 for t in Waves.keys():
     s[t] = pd.read_parquet('../'+t+'/_/shocks.parquet')
-    #s[t] = id_match(s[t],t,Waves)
 
 s = pd.concat(s.values())
 
@@ -27,10 +26,10 @@ except FileNotFoundError:
     s['m'] = 'Tanzania'
     s = s.reset_index().set_index(['j','t','m','Shock'])
 
-with open('panel_ids.json','r') as f:
-    panel_id_json =json.load(f)
+with open('updated_ids.json','r') as f:
+    updated_ids =json.load(f)
 
-s = id_walk(s, waves, panel_id_json)
+s = id_walk(s, updated_ids)
 
 
 s.to_parquet('../var/shocks.parquet')
