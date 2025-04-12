@@ -1,3 +1,4 @@
+from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python
 import sys
 sys.path.append('../../_')
@@ -39,4 +40,4 @@ x = x.set_index(['j','t','i'])
 x['unit'] = x['unit'].replace('', np.nan)
 x = x.dropna(how='all')
 
-x.to_parquet('food_acquired.parquet')
+to_parquet(x, 'food_acquired.parquet')

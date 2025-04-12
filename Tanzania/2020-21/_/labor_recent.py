@@ -4,6 +4,7 @@ import numpy as np
 import dvc.api
 from lsms import from_dta
 import sys
+from lsms_library.local_tools import to_parquet
 sys.path.append('../../_')
 
 with dvc.api.open('../Data/hh_sec_e1.dta',mode='rb') as dta:
@@ -84,4 +85,4 @@ labor = df[labels.keys()].rename(columns = labels).dropna(how = 'all')
 
 labor = labor.set_index(['HHID','pid'])
 
-labor.to_parquet('labor_recent.parquet')
+to_parquet(labor, 'labor_recent.parquet')

@@ -1,3 +1,4 @@
+from lsms_library.local_tools import get_dataframe
 """Calculate food prices for different items across rounds; allow
 different prices for different units.  
 """
@@ -8,7 +9,7 @@ import sys
 sys.path.append('../../_/')
 from lsms_library.local_tools import to_parquet
 
-v = pd.read_parquet('../var/food_acquired.parquet')
+v = get_dataframe('../var/food_acquired.parquet')
 
 # Drop expenditures
 prices = ['unitvalue']

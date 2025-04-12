@@ -1,3 +1,4 @@
+from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python
 
 import sys
@@ -19,4 +20,4 @@ regions['Rural'] = regions['Rural'].map({'Rural':1, 'Urbain':0})
 regions['t'] = '2013_Q4'
 regions = regions.set_index(['t','m'], append = True)
 
-regions.to_parquet('other_features.parquet')
+to_parquet(regions, 'other_features.parquet')

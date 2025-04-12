@@ -1,3 +1,5 @@
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 #!/usr/bin/env python
 
 import sys
@@ -13,7 +15,7 @@ with dvc.api.open('../Data/Full_Sample/Household/hh_mod_g1.dta', mode='rb') as d
     df = from_dta(dta, convert_categoricals=True)
 
 conversions = pd.read_csv('ihs3_conversions.csv')
-regions = pd.read_parquet('other_features.parquet').reset_index().set_index(['j'])['m']
+regions = get_dataframe('other_features.parquet').reset_index().set_index(['j'])['m']
 
 columns_dict = {'case_id': 'j', 'hh_g02' : 'i', 'hh_g03a': 'quantity_consumed', 'hh_g03b' : 'unitcode_consumed', 'hh_g03b_os': 'unitsdetail_consumed',
                 'hh_g05': 'expenditure', 'hh_g04a': 'quantity_bought', 'hh_g04b': 'unitcode_bought', 'hh_g04b_os': 'unitsdetail_bought',
@@ -71,4 +73,4 @@ df['t'] = '2010-11'
 df = df.reset_index().set_index(['j','t','i']).dropna(how='all')
 
 final = df.loc[:, ['quantity_consumed', 'u_consumed', 'quantity_bought', 'u_bought', 'price per unit', 'expenditure', 'cfactor_consumed', 'cfactor_bought']]
-final.to_parquet("food_acquired.parquet")
+to_parquet(final, "food_acquired.parquet")

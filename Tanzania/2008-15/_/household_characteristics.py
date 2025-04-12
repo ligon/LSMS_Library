@@ -1,3 +1,4 @@
+from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python
 
 import sys
@@ -54,4 +55,4 @@ hc = hc.loc[np.isfinite(hc.min(axis=1)),:]
 
 assert hc.index.is_unique, "Non-unique index!  Fix me!"
 
-hc.to_parquet('household_characteristics.parquet')
+to_parquet(hc, 'household_characteristics.parquet')

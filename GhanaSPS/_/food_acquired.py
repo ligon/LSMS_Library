@@ -1,3 +1,5 @@
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 """Calculate food prices for different items across rounds; allow
 different prices for different units.  
 """
@@ -37,7 +39,7 @@ for k in unitsd.keys():
 
 p = []
 for t in Waves.keys():
-    df = pd.read_parquet('../'+t+'/_/food_acquired.parquet').squeeze()
+    df = get_dataframe('../'+t+'/_/food_acquired.parquet').squeeze()
     print(t)
     df = df.replace({'unit': unitsd[t]})
     # There may be occasional repeated reports of purchases of same food
@@ -52,7 +54,7 @@ for t in Waves.keys():
 p = pd.concat(p)
 
 try:
-    of = pd.read_parquet('../var/other_features.parquet')
+    of = get_dataframe('../var/other_features.parquet')
 
     p = p.join(of.reset_index('m')['m'],on=['j','t']).reset_index()
     p['m'] = np.where(p['t'] == '2013-14', 'Ghana', p['m']) #unneeded once 2013-14 fix is found
@@ -64,4 +66,4 @@ except FileNotFoundError:
 
 p = p.rename(index=fix_food_labels(),level='i')
 
-p.to_parquet('../var/food_acquired.parquet')
+to_parquet(p, '../var/food_acquired.parquet')

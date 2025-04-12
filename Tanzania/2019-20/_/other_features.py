@@ -1,3 +1,4 @@
+from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python
 
 import sys
@@ -36,4 +37,4 @@ df = df.rename(index={k:k.title() for k in regions})
 
 assert df.index.is_unique, "Non-unique index!  Fix me!"
 
-df.to_parquet('other_features.parquet')
+to_parquet(df, 'other_features.parquet')

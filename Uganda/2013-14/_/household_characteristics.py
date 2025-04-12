@@ -1,3 +1,4 @@
+from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python
 
 import sys
@@ -18,4 +19,4 @@ df = df.filter(regex='ales ')
 
 df['log HSize'] = np.log(df.sum(axis=1))
 
-df.to_parquet('household_characteristics.parquet')
+to_parquet(df, 'household_characteristics.parquet')

@@ -1,3 +1,4 @@
+from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python3
 
 import pandas as pd
@@ -16,4 +17,4 @@ earnings = df.groupby('hhid')[earnings1+earnings2].sum().sum(axis=1)
 
 earnings.index.name = 'j'
 
-pd.DataFrame({"Earnings":earnings}).to_parquet('earnings.parquet')
+to_parquet(pd.DataFrame({"Earnings":earnings}), 'earnings.parquet')

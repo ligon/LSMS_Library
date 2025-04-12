@@ -1,3 +1,5 @@
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 #!/usr/bin/env python
 """
 Concatenate data on household characteristics across rounds.
@@ -15,7 +17,7 @@ import warnings
 
 y={}
 for t in Waves.keys():
-    y[t] = pd.read_parquet('../'+t+'/_/household_characteristics.parquet')
+    y[t] = get_dataframe('../'+t+'/_/household_characteristics.parquet')
 
 z = pd.concat(y.values())
 
@@ -32,7 +34,7 @@ with open('updated_ids.json','r') as f:
 z = id_walk(z, updated_ids)
 
 try:
-    of = pd.read_parquet('../var/other_features.parquet')
+    of = get_dataframe('../var/other_features.parquet')
     z = z.join(of.reset_index('m')[['m']],on=['j','t'])
     z = z.reset_index().set_index(['j','t','m'])
 except FileNotFoundError:
@@ -43,4 +45,4 @@ except FileNotFoundError:
 z.columns.name = 'k'
 
 
-z.to_parquet('../var/household_characteristics.parquet')
+to_parquet(z, '../var/household_characteristics.parquet')

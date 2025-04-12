@@ -1,3 +1,5 @@
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 """Calculate food prices for different items across rounds; allow
 different prices for different units.  
 """
@@ -36,7 +38,7 @@ def id_walk(df,wave,waves):
 
 dfs = []
 for t in Waves.keys():
-    df = pd.read_parquet('../'+t+'/_/food_acquired.parquet').squeeze()
+    df = get_dataframe('../'+t+'/_/food_acquired.parquet').squeeze()
     print(t)
     #df = df.replace({'unit': unitsd[t]})
     if 'purchased_value' in df.columns and 'purchased_quantity' in df.columns:
@@ -60,7 +62,7 @@ p['purchased_value'] = p.purchased_value.astype(float)
 p = p.drop('index',axis=1)
 
 try:
-    of = pd.read_parquet('../var/other_features.parquet')
+    of = get_dataframe('../var/other_features.parquet')
     p = p.reset_index()
     p = p.join(of.reset_index('m')['m'],on=['j','t'])
     p['t'] = p['t_temp']
@@ -77,4 +79,4 @@ except FileNotFoundError:
 
 #p = p.rename(index=fix_food_labels(),level='i')
 
-p.to_parquet('../var/food_acquired.parquet')
+to_parquet(p, '../var/food_acquired.parquet')

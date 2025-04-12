@@ -1,3 +1,5 @@
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 #!/usr/bin/env python
 
 import sys
@@ -16,10 +18,10 @@ with dvc.api.open('../Data/hh_sec_2.dta', mode='rb') as dta:
 df = age_sex_composition(df)
 df['t'] = "2019-20"
 
-regions = pd.read_parquet('other_features.parquet').reset_index().set_index('j')
+regions = get_dataframe('other_features.parquet').reset_index().set_index('j')
 df = df.join(regions, on=['j'])
 
 df = df.set_index(['t', 'm'], append = True)
 df.columns.name = 'k'
 
-df.to_parquet('household_characteristics.parquet')
+to_parquet(df, 'household_characteristics.parquet')

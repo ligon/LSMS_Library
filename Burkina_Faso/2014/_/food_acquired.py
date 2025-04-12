@@ -1,3 +1,4 @@
+from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python
 
 import sys
@@ -44,4 +45,4 @@ concatenated.columns.name = 'k'
 #inspect missing encoding for units
 concatenated = concatenated.replace('nan', np.nan).dropna(how = 'all')
 
-concatenated.to_parquet('food_acquired.parquet')
+to_parquet(concatenated, 'food_acquired.parquet')

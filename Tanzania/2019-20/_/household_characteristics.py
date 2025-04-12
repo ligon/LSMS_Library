@@ -1,3 +1,4 @@
+from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python
 
 #2019
@@ -28,4 +29,4 @@ df.set_index(['j','t'], inplace = True)
 
 assert df.index.is_unique, "Non-unique index!  Fix me!"
 
-df.to_parquet('household_characteristics.parquet')
+to_parquet(df, 'household_characteristics.parquet')

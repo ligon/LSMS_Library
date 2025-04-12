@@ -1,3 +1,5 @@
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 #!/usr/bin/env python
 """
 Create a nutrition DataFrame for households based on food consumption quantities
@@ -9,7 +11,7 @@ from eep153_tools.sheets import read_sheets
  
 #fct = read_sheets('https://docs.google.com/spreadsheets/d/1qljY2xrxbc37d9tLSyuFa9CnjEsh3Re2ufDQlBHzPEQ/')['FCT'].loc[3:]
 fct = pd.read_csv('central_american_fct - FCT.csv').loc[3:]
-q = pd.read_parquet('../var/food_quantities.parquet')
+q = get_dataframe('../var/food_quantities.parquet')
 
 q['q_sum'] = q.sum(axis=1)
 q = q[['q_sum']].droplevel('u').reset_index()
@@ -33,11 +35,11 @@ final_fct = final_fct.replace('', np.nan).drop_duplicates(subset='Food', keep='f
 for column in final_fct.columns:
     final_fct[column] = final_fct[column].astype(float)
 
-final_fct.to_parquet('../var/fct.parquet')
+to_parquet(final_fct, '../var/fct.parquet')
 
 print("Unmatched foods: ",final_q.columns.difference(final_fct.index))
 
 final_q = final_q.mask(~np.isfinite(final_q),0)
 
 n = final_q.reindex(columns=final_fct.index)@final_fct
-n.to_parquet('../var/nutrition.parquet')
+to_parquet(n, '../var/nutrition.parquet')

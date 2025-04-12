@@ -1,3 +1,5 @@
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 """Calculate food prices for different items across rounds; allow
 different prices for different units.  
 """
@@ -14,7 +16,7 @@ import warnings
 
 x={}
 for t in Waves.keys():
-    x[t] = pd.read_parquet('../'+t+'/_/food_acquired.parquet')
+    x[t] = get_dataframe('../'+t+'/_/food_acquired.parquet')
 
 x['2008-15'] = x['2008-15'].reset_index().rename(columns = {'UPHI':'j'}).set_index(['j','t','i'])
 
@@ -72,4 +74,4 @@ x = x.loc[idx].sort_index()
 
 assert x.index.is_unique, "Non-unique index!  Fix me!"
 
-x.to_parquet('../var/food_acquired.parquet')
+to_parquet(x, '../var/food_acquired.parquet')

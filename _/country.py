@@ -167,7 +167,7 @@ class Wave:
                 print(f"Parquet file {parquet_fn} still missing after running Makefile.")
                 return pd.DataFrame()
             
-            df = pd.read_parquet(parquet_fn)
+            df = get_dataframe(parquet_fn)
         return map_index(df, self.country)
 
     def cluster_features(self):
@@ -388,13 +388,13 @@ class Country:
                 dic = json.load(json_file)
             return dic
         else:
-            df = pd.read_parquet(target_path)
+            df = get_dataframe(target_path)
 
-        if '_id_converted' not in df.columns or not df['_id_converted'].all():
+        if df.attrs.get('converted_categoricals', False)==False:
             df = id_walk(map_index(df, self.name), self.updated_ids)
         else:
             df = map_index(df, self.name)
-        return df.drop(columns=['_id_converted'], errors='ignore')
+        return df
 
 
     def _compute_panel_ids(self):
