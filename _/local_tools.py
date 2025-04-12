@@ -58,7 +58,7 @@ def get_dataframe(fn,convert_categoricals=True,encoding=None,categories_only=Fal
 
     def read_file(f,convert_categoricals=convert_categoricals,encoding=encoding):
         try:
-            return pd.read_parquet(f)
+            return pd.read_parquet(f, engine='pyarrow')
         except (ArrowInvalid,):
             pass
 
@@ -452,7 +452,7 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
 
 
 def add_markets_from_other_features(country,df,additional_other_features=False):
-    of = pd.read_parquet(f"../{country}/var/other_features.parquet")
+    of = pd.read_parquet(f"../{country}/var/other_features.parquet", engine='pyarrow')
 
     df_idx = df.index.names
 
@@ -574,7 +574,7 @@ def to_parquet(df,fn):
             all[column] = all[column].astype(str).astype('str[pyarrow]').replace('nan',None)
     df = all.set_index(idxnames)
 
-    df.to_parquet(fn)
+    df.to_parquet(fn, engine='pyarrow')
 
     return df
 
@@ -725,12 +725,6 @@ def panel_ids(Waves):
             wave_updates.update(updated_wave)
 
     return recursive_D, wave_updates
-
-def id_walk(df, updated_ids, index ='j'):
-    level_num = df.index.names.index(index)
-    new_level = df.index.get_level_values(index).map(lambda x: updated_ids.get(x, x))
-    df.index = df.index.set_levels(df.index.levels[:level_num] + [new_level] + df.index.levels[level_num + 1:])
-    return df
 
 def conversion_table_matching_global(df, conversions, conversion_label_name, num_matches=3, cutoff = 0.6):
     """

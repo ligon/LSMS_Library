@@ -281,5 +281,5 @@ import json
 from collections import defaultdict
 def id_walk(df, updated_ids, index ='j'):
     df= df.rename(index=updated_ids,level=index)
-    df['_id_converted'] = True
+    df.attrs['id_converted'] = True
     return df
