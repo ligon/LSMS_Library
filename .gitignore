@@ -14,3 +14,4 @@ Uganda/var/*
 /Burkina_Faso/_/.mypy_cache/
 /LSMS_Library.egg-info/
 /dist/
+/poetry.lock
