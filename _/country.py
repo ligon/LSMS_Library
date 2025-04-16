@@ -252,10 +252,26 @@ class Country:
     
     @property
     def waves(self):
-        waves = [f.name for f in self.file_path.iterdir() if f.is_dir() and (self.file_path / f.name / 'Documentation' / 'SOURCE').exists()]
-        waves = sorted(waves)
-        return waves
-    
+        # Let's first check if there is a 'waves' or 'Waves' defined in {self.name}.py in the _ folder.
+        # If 'waves' exists, we will use it. If 'Waves' (usually a dictionary) exists, we will use its keys.
+        general_module_filename = f"{self.name.lower()}.py"
+        general_mod_path = self.file_path / "_" / general_module_filename
+
+        if general_mod_path.exists():
+            spec = importlib.util.spec_from_file_location(f"{self.name.lower()}", general_mod_path)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+
+            if hasattr(module, 'waves'):
+                return sorted(module.waves)
+            elif hasattr(module, 'Waves'):
+                return sorted(list(module.Waves.keys()))
+        waves = [
+            f.name for f in self.file_path.iterdir()
+            if f.is_dir() and (self.file_path / f.name / 'Documentation' / 'SOURCE').exists()
+        ]
+        return sorted(waves)
+
     @property
     def data_scheme(self):
         data_info = self.resources
