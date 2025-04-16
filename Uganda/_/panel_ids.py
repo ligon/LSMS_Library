@@ -5,7 +5,10 @@ import sys
 sys.path.append('../../_')
 from lsms_library.local_tools import panel_ids
 
-D = panel_ids(Waves)
+D, updated_ids= panel_ids(Waves)
 
 with open('panel_ids.json','w') as f:
     json.dump(D.data,f)
+
+with open('updated_ids.json', 'w') as f:
+    json.dump(updated_ids, f)

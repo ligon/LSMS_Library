@@ -4,7 +4,7 @@ Concatenate data on other household features across rounds.
 """
 
 import pandas as pd
-from uganda import change_id, Waves, id_walk
+from uganda import Waves, id_walk
 import json
 
     
@@ -41,7 +41,9 @@ z = z.stack().unstack('k')
 
 z = z.reset_index().set_index(['j','t','m'])
 
-# panel_id_json = json.load(open('panel_ids.json'))
-# z = id_walk(z, Waves, panel_id_json)
+with open('updated_ids.json','r') as f:
+    updated_ids =json.load(f)
+
+z = id_walk(z, updated_ids)
 
 z.to_parquet('../var/other_features.parquet')

@@ -189,89 +189,13 @@ def other_features(fn,urban=None,region=None,HHID='HHID',urban_converter=None):
 
     return df
 
-
-def change_id(df, current_wave, id_update, trace_split_number, panel_ids=None):
-    '''
-    Change the household ID based on the panel_ids (json file, previous round id if it can be traced) for the current wave. 
-    If split happens, add suffix to the traced household ID to indicate it's a numbered split household.
-
-    For example:
-    If there is no split happens, count_splits  = 1 (the same household transit from the previous wave to the current wave)
-    If there is a split happens, count_splits > 1, new_household_id = former_j + '_' + split_suffix
-                {'j': '0001-001', 'former_j': '1001', 'split_suffix': 1, 'count_splits': 1, 'new_household_id': '0001_1'}
-                {'j': '0001-002', 'former_j': '1001', 'split_suffix': 2, 'count_splits': 1, 'new_household_id': '0001_2'}
-                {'j': '0002-001', 'former_j': '1002', 'split_suffix': 1, 'count_splits': 0, 'new_household_id': '1002'}
-    
-    '''
-    # Save the original index names for restoring later
-    df['j'] = df['j'].apply(format_id)
-
-    # Create a temporary DataFrame with the household ID and wave
-    temp_df = df.loc[df['t'] == current_wave, ['j', 't']].copy()
-
-    # Get the former household ID from panel_ids and update based on id_update
-    temp_df['former_j'] = temp_df['j'].apply(lambda s: panel_ids.get(s, s))
-    temp_df['former_j'] = temp_df['former_j'].apply(lambda s: id_update.get(s, s))
-
-    # Fill missing 'former_j' values with the current household ID ('j')
-    temp_df['former_j'] = temp_df['former_j'].fillna(temp_df['j'])
-
-    # Create a helper column to count occurrences of each household in the same year
-    temp_df['split_suffix'] = temp_df.groupby(['former_j', 't']).cumcount() + 1
-    temp_df['count_split'] = temp_df.groupby(['former_j', 't'])['j'].transform('size') - 1
-
-    # Define new household ID using vectorized operations
-    mask = temp_df['split_suffix'] > 1
-    temp_df['new_household_id'] = temp_df['former_j'].astype(str)
-
-    # Add suffix value - 1 to the new household ID if split happens
-    temp_df.loc[mask, 'new_household_id'] = temp_df.loc[mask].apply(
-        lambda row: f"{row['new_household_id']}_{trace_split_number.get(row['new_household_id'], 0) + row['split_suffix'] - 1}",
-        axis=1
-    )
-
-    # Update the trace_split_number dictionary
-    trace_split_dict = temp_df[['former_j', 'count_split']].drop_duplicates().set_index('former_j')['count_split'].to_dict()
-    for key, value in trace_split_dict.items():
-        trace_split_number[key] += value
-
-    # Only update the DataFrame for the current wave
-    temp_df = temp_df[['new_household_id', 't', 'j']]
-
-    # Record the updated IDs in id_update dictionary for the next wave
-    id_update.update(dict(temp_df[['j', 'new_household_id']].values))
-
-    # Replace the original household ID in the current wave with the updated household ID
-    df = df.merge(temp_df, on=['j', 't'], how='left')
-    df['j'] = df['new_household_id'].fillna(df['j'])  # Retain original ID if no update
-    df = df.drop(columns=['new_household_id'])
-    assert df.index.is_unique, "Non-unique index."
-
-    return df, id_update, trace_split_number
-
-def id_walk(df, waves, panel_ids):
-    '''
-    Walk through the data and update the household IDs based on the panel_ids (json file).
-    '''
-    id_update = defaultdict(str)  # Initialize with default str to handle missing values
-    unique_id = df.index.get_level_values('j').unique()
-    trace_split_number = defaultdict(int, {k: 0 for k in unique_id})
-    use_waves = waves if isinstance(waves, list) else list(waves.keys())
-    
-    original_index_names = df.index.names
-    df_reset = df.reset_index()
-    df_reset = df_reset[['j', 't']].drop_duplicates()
-    df_reset['old_hhid'] = df_reset['j']
-
-    for wave in use_waves:
-        df_reset, id_update, trace_split_number = change_id(df_reset, wave, id_update, trace_split_number, panel_ids)
-    
-    #df_reset is with columns ['j', 't', 'old_hhid'] and df is with original index names, I want to replace 'j' in df with 'j' in df_reset by 'old_hhid' and 't'
-    df = df.reset_index().merge(df_reset[['old_hhid', 't', 'j']], left_on=['j', 't'], right_on=['old_hhid', 't'],
-                                suffixes = ('_old', '') ,how='left').drop(columns=['old_hhid', 'j_old']).set_index(original_index_names)
-
-    return df
-
+#def id_walk(df, updated_ids, index ='j'):
+#    level_num = df.index.names.index(index)
+#    new_level = df.index.get_level_values(index).map(lambda x: updated_ids.get(x, x))
+#    df.index = df.index.set_levels(df.index.levels[:level_num] + [new_level] + df.index.levels[level_num + 1:])
+#    return df
+def id_walk(df, updated_ids, index ='j'):
+    return df.rename(index=updated_ids,level=index)
 
 def panel_attrition(df, Waves, return_ids=False, waves = None,  split_households_new_sample=True):
     """

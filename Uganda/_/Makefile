@@ -9,11 +9,15 @@ var = ../var/food_expenditures.parquet ../var/food_quantities.parquet ../var/foo
 	  ../var/assets.parquet ../var/earnings.parquet ../var/housing.parquet ../var/income.parquet \
 	  ../var/fct.parquet ../var/nutrition.parquet
 
-
 all: unitlabels.csv $(parquet) $(var)
 
 unitlabels.csv: unitlabels.py
 	python unitlabels.py
+
+panel_ids.json updated_ids.json: panel_ids.py
+	python panel_ids.py
+
+$(parquet) $(var): panel_ids.json updated_ids.json
 
 interview_date = $(shell find $(rounds) -name interview_date.py)
 interview_date_parquet := $(interview_date:.py=.parquet)
@@ -58,7 +62,7 @@ nonfood_expenditures_parquet := $(nonfood_expenditures:.py=.parquet)
 food_acquired = $(shell find $(rounds) -name food_acquired.py)
 food_acquired_parquet := $(food_acquired:.py=.parquet)
 
-../var/food_acquired.parquet: food_acquired.py $(food_acquired_parquet) ../var/other_features.parquet
+../var/food_acquired.parquet: unitlabels.csv food_acquired.py $(food_acquired_parquet) ../var/other_features.parquet
 	python food_acquired.py
 
 household_characteristics = $(shell find $(rounds) -name household_characteristics.py)
@@ -82,7 +86,7 @@ housing_parquet := $(housing:.py=.parquet)
 ../var/income.parquet: income.py ../var/enterprise_income.parquet ../var/earnings.parquet
 	python income.py
 
-../var/nutrition.parquet, ../var/fct.parquet: nutrition.py ../var/food_quantities.parquet
+../var/nutrition.parquet ../var/fct.parquet: nutrition.py ../var/food_quantities.parquet
 	python nutrition.py
 
 %.parquet: %.py food_items.org uganda.py

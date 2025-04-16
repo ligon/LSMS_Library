@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 from pandas import concat, get_dummies, MultiIndex
 from cfe.df_utils import use_indices
-
+from .local_tools import format_id
 
 def age_intervals(age,age_cuts=(0,4,9,14,19,31,51)):
     """
@@ -73,19 +73,6 @@ def roster_to_characteristics(df, age_cuts=(0,4,9,14,19,31,51), drop = 'pid', fi
     result['log HSize'] = np.log(result.sum(axis=1))
     result.columns = result.columns.get_level_values(0)
     return result
-
-# def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=['t','m','i']):
-#     v = df.copy()
-#     v = v.replace(0, np.nan)
-#     v['Kgs'] = np.where(v.index.get_level_values('u').str.lower() == 'kg', v[quantity], np.nan)
-#     pkg = v[price].divide(v['Kgs'], axis=0)
-#     pkg = pkg.groupby(index).median().median(axis=1)
-#     po = v[price].groupby(index + ['u']).median().median(axis=1)
-#     kgper = (po / pkg).dropna()
-#     kgper = kgper.groupby('u').median()
-#     #convert to dict
-#     kgper = kgper.to_dict()
-#     return kgper
 
 def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=['t','m','i'], unit_col = 'u'):
     v = df.copy()

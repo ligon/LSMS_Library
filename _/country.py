@@ -6,7 +6,7 @@ from importlib.resources import files
 import importlib
 import cfe.regression as rgsn
 from collections import defaultdict
-from .local_tools import df_data_grabber, format_id, get_categorical_mapping, category_union, get_dataframe, map_index
+from .local_tools import df_data_grabber, format_id, get_categorical_mapping, category_union, get_dataframe, map_index, get_formating_functions, panel_ids
 import importlib.util
 import os
 import warnings
@@ -16,7 +16,7 @@ from .ai_agent import ai_process, gpt_agent
 warnings.filterwarnings('ignore', category=FutureWarning)
 warnings.filterwarnings('ignore', category=UnicodeWarning)
 import subprocess
-from .transformations import roster_to_characteristics
+import json
 
 class Wave:
     def __init__(self, year, country_name, data_scheme, formatting_functions):
@@ -24,7 +24,9 @@ class Wave:
         self.country = country_name
         self.name = f"{self.country}/{self.year}"
         self.data_scheme = data_scheme
-        self.formatting_functions = self.update_formatting_functions(formatting_functions)
+        self.formatting_functions = get_formating_functions(mod_path=self.file_path / "_" / f"{self.year}.py",
+                                                             name=f"formatting_{self.year}",
+                                                             general__formatting_functions=formatting_functions)
     @property
     def file_path(self):
         var = files("lsms_library") / "countries" / self.name
@@ -40,28 +42,6 @@ class Wave:
         with open(info_path, 'r') as file:
             return yaml.safe_load(file)
     
-    def update_formatting_functions(self, formatting_functions):
-        """
-        Properly import formmating functions from wave module
-        Return a dictionary of functions
-        """
-        module_filename = f"{self.year}.py" 
-        mod_path = self.file_path / "_" / module_filename 
-        general__formatting_functions = formatting_functions
-    
-        if mod_path.exists():
-            # Load module dynamically
-                spec = importlib.util.spec_from_file_location(f"formatting_{self.year}", mod_path)
-                formatting_module = importlib.util.module_from_spec(spec)
-                if spec.loader is not None:
-                    spec.loader.exec_module(formatting_module)
-                general__formatting_functions.update({
-                    name: func
-                    for name, func in vars(formatting_module).items()
-                    if callable(func)
-                })
-        return general__formatting_functions
-        
     
     def column_mapping(self, request):
         """
@@ -82,7 +62,7 @@ class Wave:
         
         formatting_functions = self.formatting_functions
 
-        def get_formatting_function(var_name, value, format_id_function = False):
+        def map_formatting_function(var_name, value, format_id_function = False):
             """Applies formatting functions if available, otherwise uses defaults."""
             if var_name in formatting_functions:
                 return (value, formatting_functions[var_name])
@@ -94,8 +74,9 @@ class Wave:
         idxvars = data_info.get('idxvars')
         myvars = data_info.get('myvars')
         final_mapping = dict()
-        idxvars_updated = {key: get_formatting_function(key, value, format_id_function = True) for key, value in idxvars.items()}
-        myvars_updated = {key: get_formatting_function(key, value) for key, value in myvars.items()}
+        final_mapping['df_edit'] = formatting_functions.get(request)
+        idxvars_updated = {key: map_formatting_function(key, value, format_id_function = True) for key, value in idxvars.items()}
+        myvars_updated = {key: map_formatting_function(key, value) for key, value in myvars.items()}
 
         if isinstance(files, str):
             final_mapping[files] = {'idxvars': idxvars_updated, 'myvars': myvars_updated}
@@ -109,9 +90,9 @@ class Wave:
                     file_name, overrides = next(iter(i.items()))
                     for key, val in overrides.items():
                         if key in idxvars:
-                            idxvars_override[key] = get_formatting_function(key, val, format_id_function = True)
+                            idxvars_override[key] = map_formatting_function(key, val, format_id_function = True)
                         else:
-                            myvars_override[key] = get_formatting_function(key, val)
+                            myvars_override[key] = map_formatting_function(key, val)
                     final_mapping[file_name] = {'idxvars': idxvars_override, 'myvars': myvars_override}
                 else:
                     final_mapping[i] = {'idxvars': idxvars_updated, 'myvars': myvars_updated}
@@ -149,27 +130,10 @@ class Wave:
         Output:
             df: pd.DataFrame, the data requested
         '''
-        df_fn = self.file_path /f"_/{request}.py"
-        parquet_fn = self.file_path /f"_/{request}.parquet"
-        if parquet_fn.exists():
-            df = pd.read_parquet(parquet_fn)
-            return map_index(df)
-        # if in the upper directory Makefile exist: we should run Makefile
-        elif df_fn.exists():
-            # spec = importlib.util.spec_from_file_location(request, df_fn)
-            # module = importlib.util.module_from_spec(spec)
-            # spec.loader.exec_module(module)
-            cwd_path = self.file_path / "_"
-            subprocess.run(['python', df_fn], cwd=cwd_path, check=True)
-            if parquet_fn.exists():
-                df = pd.read_parquet(parquet_fn)
-                return df
-            else:
-                warnings.warn(f"Failed to generate {request}")
-                return pd.DataFrame()
-        else:
+        if self.resources is not None:
             mapping_details = self.column_mapping(request)
             convert_cat = (self.resources.get(request).get('converted_categoricals') is None)
+            df_edit_function = mapping_details.pop('df_edit')
             dfs = []
             for file, mappings in mapping_details.items():
                 df = df_data_grabber(f'{self.name}/Data/{file}', mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat)
@@ -182,8 +146,30 @@ class Wave:
                     warnings.warn(f"Large number used for missing?  Replacing {na} with NaN.")
                     df = df.replace(na,np.nan)
                 dfs.append(df)
+            df = pd.concat(dfs, axis=0, sort=False)
 
-            return pd.concat(dfs)
+            if df_edit_function:
+                df = df_edit_function(df)
+        else:
+            print(f"Attempting to generate using Makefile...")
+            parquet_fn = self.file_path/"_"/ f"{request}.parquet"
+
+            makefile_path = self.file_path.parent /'_'/ "Makefile"
+            if not makefile_path.exists():
+                raise FileNotFoundError(f"Makefile not found in {makefile_path.parent}. Unable to generate required data.")
+
+            cwd_path = self.file_path.parent / "_"
+            relative_parquet_path = parquet_fn.relative_to(cwd_path.parent)  # Convert to relative path
+            subprocess.run(["make", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True)
+            print(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...")
+
+            if not parquet_fn.exists():
+                print(f"Parquet file {parquet_fn} still missing after running Makefile.")
+                return pd.DataFrame()
+            
+            df = pd.read_parquet(parquet_fn)
+        
+        return map_index(df, self.name)
 
     def cluster_features(self):
         try:
@@ -226,20 +212,10 @@ class Wave:
     def interview_date(self):
         return self.grab_data('interview_date')
     
-    def household_characteristics(self):
-        try:
-            return self.grab_data('household_characteristics')
-        except KeyError as e:
-            if 'household_roster' in self.resources:
-                roster = self.household_roster()
-                df = roster_to_characteristics(roster).reset_index()
-                cluster_features = self.cluster_features().reset_index()
-                df = df.merge(cluster_features, on=['t','v'])
-                df = df.rename(columns={'Region':'m'}).drop(columns=['v','Rural'])
-                df = df.set_index(['t','m','i'])
-                return df
-            else:
-                raise e
+    def panel_ids(self):
+        df = self.grab_data('panel_ids')
+        df = df.reset_index().loc[:,['i', 't', 'previous_i']].drop_duplicates().set_index(['i', 't'])
+        return df
 
     
 
@@ -248,6 +224,8 @@ class Wave:
 class Country:
     def __init__(self,country_name):
         self.name = country_name
+        self._panel_ids_cache = None
+        self._updated_ids_cache = None
 
     @property
     def file_path(self):
@@ -270,27 +248,12 @@ class Country:
             general_module_filename = f"{self.name.lower()}.py"
         general_mod_path = self.file_path/ "_"/ general_module_filename
 
-        if not general_mod_path.exists():
-            return {}
-
-        # Load module dynamically
-        spec = importlib.util.spec_from_file_location(f"formatting_{self.name}", general_mod_path)
-        formatting_module = importlib.util.module_from_spec(spec)
-        if spec.loader is not None:
-            spec.loader.exec_module(formatting_module)
-
-        return {
-            name: func
-            for name, func in vars(formatting_module).items()
-            if callable(func)
-        }
+        return get_formating_functions(general_mod_path, f"formatting_{self.name}")
     
     @property
     def waves(self):
-        waves = [f.name for f in self.file_path.iterdir() if f.is_dir()]
-        for item in ['var', '_']:
-            if item in waves:
-                waves.remove(item)
+        waves = [f.name for f in self.file_path.iterdir() if f.is_dir() and (self.file_path / f.name / 'Documentation' / 'SOURCE').exists()]
+        waves = sorted(waves)
         return waves
     
     @property
@@ -309,12 +272,10 @@ class Country:
                 data_list.extend(['cluster_features'])
             # EEP 153 solving demand equation required data
             required_list = ['food_acquired', 'household_roster', 'household_characteristics', 
-             'cluster_features', 'interview_date', 'food_expenditures', 'food_quantities', 'food_prices']
+             'cluster_features', 'interview_date', 'food_expenditures', 'food_quantities', 'food_prices', 'nutrition', 'panel_ids']
             # intersection of required data and available data
             data_list = list(set(data_list).intersection(required_list))
 
-        if 'household_roster' in data_list and 'household_characteristics' not in data_list:
-            data_list.append('household_characteristics')
         return data_list
     
     def __getitem__(self, year):
@@ -376,15 +337,12 @@ class Country:
         Aggregates data across multiple waves using a single dataset method.
         If the required `.parquet` file is missing, it requests `Makefile` to generate only that file.
         """
-        if method_name not in self.data_scheme and method_name not in ['other_features', 'food_prices_quantities_and_expenditures']:
+        if method_name not in self.data_scheme and method_name not in ['other_features', 'food_prices_quantities_and_expenditures', 'updated_ids']:
             warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
             return pd.DataFrame()
 
         if waves is None:
             waves = self.waves
-
-        parquet_fn = self.file_path / "var" / f"{method_name}.parquet"
-
         #Step 1: Check if it mapped by data_info.yml
         if self.resources is not None:
             results = {}
@@ -395,7 +353,7 @@ class Country:
                     warnings.warn(str(e))
             if results:
                 df= pd.concat(results.values(), axis=0, sort=False)
-                return df
+                return map_index(df, self.name)
         
         # Step 2: Attempt to build using makefile
         print(f"Attempting to generate using Makefile...")
@@ -404,25 +362,67 @@ class Country:
         if not makefile_path.exists():
             raise FileNotFoundError(f"Makefile not found in {self.file_path}. Unable to generate required data.")
 
+        # Step 3: Run Makefile for the specific parquet/json file
+        cwd_path = self.file_path / "_"
 
-        # Step 3: Run Makefile for the specific parquet file
+        if method_name in ['panel_ids', 'updated_ids']:
+            target_path = self.file_path / "_" / f"{method_name}.json"
+            relative_path = target_path.relative_to(cwd_path)
+            make_target = str(relative_path)
+        else:
+            target_path = self.file_path / "var" / f"{method_name}.parquet"
+            relative_path = target_path.relative_to(cwd_path.parent)
+            make_target = '../' + str(relative_path)
 
-        cwd_path = self.file_path/"_"
-        relative_parquet_path = parquet_fn.relative_to(cwd_path.parent)  # Convert to relative path
-        subprocess.run(["make", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True)
-        print(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...")
+        subprocess.run(["make", make_target], cwd=cwd_path, check=True)
+        print(f"Makefile executed successfully for {self.name}. Rechecking for {target_path.name}...")
 
         # Step 4: Recheck if the parquet file was successfully generated
-        if not parquet_fn.exists():
-            print(f"Parquet file {parquet_fn} still missing after running Makefile.")
+        if not target_path.exists():
+            print(f"Data file {target_path} still missing after running Makefile.")
             return pd.DataFrame()
 
-        # Step 5: Read and return the parquet file
-        df = pd.read_parquet(parquet_fn)
 
-        df = map_index(df)
+        # Step 5: Read and return the parquet or JSON file
+        if target_path.suffix == '.json':
+            with open(target_path, 'r') as json_file:
+                dic = json.load(json_file)
+            return dic
+        else:
+            df = pd.read_parquet(target_path)
+
+        df = map_index(df, self.name)
 
         return df
+
+    def _compute_panel_ids(self):
+        """
+        Compute and cache both panel_ids and updated_ids.
+        """
+        panel_ids_dic = self._aggregate_wave_data(None, 'panel_ids')
+        if isinstance(panel_ids_dic, dict):
+            updated_ids_dic = self._aggregate_wave_data(None, 'updated_ids')
+        elif isinstance(panel_ids_dic, pd.DataFrame):
+            panel_ids_dic, updated_ids_dic = panel_ids(panel_ids_dic)
+            panel_ids_dic = panel_ids.data
+        else:
+            warnings.warn(f"Invalid data for panel_ids")
+            return None
+        self._panel_ids_cache = panel_ids_dic
+        self._updated_ids_cache = updated_ids_dic
+
+    @property
+    def panel_ids(self):
+        if self._panel_ids_cache is None or self._updated_ids_cache is None:
+            self._compute_panel_ids()
+        return self._panel_ids_cache
+
+    @property
+    def updated_ids(self):
+        if self._panel_ids_cache is None or self._updated_ids_cache is None:
+            self._compute_panel_ids()
+        return self._updated_ids_cache
+        
 
     def cluster_features(self, waves=None):
         try:
@@ -449,33 +449,18 @@ class Country:
         return self._aggregate_wave_data(waves, 'household_characteristics')
     
     def food_expenditures(self, waves=None):
-        df = self._aggregate_wave_data(waves, 'food_expenditures')
-        if 'u' in df.index.names:
-            df = df.reset_index('u')
-            df['u'] = df['u'].replace(['<NA>','nan', np.nan],'unit')
-            df = df.set_index('u', append=True)
-        return df
+        return self._aggregate_wave_data(waves, 'food_expenditures')
+
     def food_quantities(self, waves=None):
-        df = self._aggregate_wave_data(waves, 'food_quantities')
-        if 'u' in df.index.names:
-            df = df.reset_index('u')
-            df['u'] = df['u'].replace(['<NA>','nan', np.nan],'unit')
-            df = df.set_index('u', append=True)
-        return df
-        
+        return self._aggregate_wave_data(waves, 'food_quantities')
+
     def food_prices(self, waves=None):
-        df = self._aggregate_wave_data(waves, 'food_prices')
-        if 'u' in df.index.names:
-            df = df.reset_index('u')
-            df['u'] = df['u'].replace(['<NA>','nan', np.nan],'unit')
-            df = df.set_index('u', append=True)
-        return df
+        return self._aggregate_wave_data(waves, 'food_prices')
 
 
+        
 
-    
-    
-    # def id_walk():
+
 
 
 
