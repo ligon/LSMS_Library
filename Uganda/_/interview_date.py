@@ -1,3 +1,5 @@
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 #!/usr/bin/env python
 """
 Compile data on interview dates.
@@ -13,14 +15,14 @@ x = {}
 for t in list(Waves.keys()):
     print(t)
     try: 
-        x[t] = pd.read_parquet('../'+t+'/_/interview_date.parquet')
+        x[t] = get_dataframe('../'+t+'/_/interview_date.parquet')
     except FileNotFoundError:
         print(f"No parquet foound for {t}")
 
 x = pd.concat(x.values())
 
 try:
-    of = pd.read_parquet('../var/other_features.parquet')
+    of = get_dataframe('../var/other_features.parquet')
 
     x = x.join(of.reset_index('m')['m'],on=['j','t'])
 
@@ -32,4 +34,4 @@ x = x.reset_index().set_index(['j','t','m'])
 updated_ids = json.load(open('updated_ids.json'))
 x = id_walk(x, updated_ids)
 
-x.to_parquet('../var/interview_date.parquet')
+to_parquet(x, '../var/interview_date.parquet')

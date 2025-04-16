@@ -1,3 +1,4 @@
+from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python
 import sys
 sys.path.append('../../_/')
@@ -23,4 +24,4 @@ myvars = {'units':'CEB03C',
 
 df = food_acquired(fn,myvars)
 
-df.to_parquet('food_acquired.parquet')
+to_parquet(df, 'food_acquired.parquet')

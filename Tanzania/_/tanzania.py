@@ -279,60 +279,7 @@ def new_harmonize_units(df, unit_conversion):
 
 import json
 from collections import defaultdict
-
 def id_walk(df, updated_ids, index ='j'):
-    df =df.reset_index(index)
-    df[index] = df[index].map(updated_ids).fillna(df[index])
-    df[index] = df[index].apply(format_id)
-    df = df.set_index([index], append=True)
-    df = df.reorder_levels([index] + [name for name in df.index.names if name != index])
+    df= df.rename(index=updated_ids,level=index)
+    df.attrs['id_converted'] = True
     return df
-
-def panel_attrition(df, Waves, return_ids=False, waves = None,  split_households_new_sample=True):
-    """
-    Produce an upper-triangular) matrix showing the number of households (j) that
-    transition between rounds (t) of df.
-
-        split_households_new_sample (bool): Determines how to count split households:
-                                - If True, we assume split_households as new sample. So we
-                                     do not count and trace splitted household, only counts 
-                                     the primary household in each split. The number represents
-                                     how many main (primary) households in previous waves have 
-                                     appeared in current round.
-                                - If False, counts all split households that can be traced 
-                                    back to previous wave households. The number represents how 
-                                    many households (including splitted households
-                                    round can be traced back to the previous round.
-
-
-    Notes：
-        2008-09, 2010-11, and 2012-13 rounds follow the same sample design.
-        In the 2014-15 round, the sample was revisited and refreshed, which consists a combination of 
-        the original NPS sample (Extended Panel) and a new sample (Refreshment Panel).
-        The 2019-20 round focuses on Extended Panel sample and the 2020-21 follows Refresh Panel cohort, 
-        and introduced an additional sample of households.
-        That is the reason why in our panel attrition result, the number of household intersections 
-        between 2019-20 and 2020-21 is very small.
-    """
-    idxs = df.reset_index().groupby('t')['j'].apply(list).to_dict()
-
-    if waves is None:
-        waves = list(Waves.keys())
-
-    foo = pd.DataFrame(index=waves,columns=waves)
-    IDs = {}
-    for m,s in enumerate(waves):
-        for t in waves[m:]:
-            pairs = set(idxs[s]).intersection(idxs[t])
-            list2_rest = set(idxs[t]) - pairs
-            if not split_households_new_sample:
-                new_paired = {i for i in list2_rest  if i.split('_')[0] in idxs[s]}
-                pairs.update(new_paired)   
-                
-            IDs[(s,t)] = pairs
-            foo.loc[s,t] = len(IDs[(s,t)])
-
-    if return_ids:
-        return foo,IDs
-    else:
-        return foo

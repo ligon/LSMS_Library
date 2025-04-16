@@ -1,3 +1,4 @@
+from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python
 import sys
 sys.path.append('../../_')
@@ -46,6 +47,6 @@ units['Code'] = units['Code'].astype('str')
 unitsd = units.set_index('Code').squeeze().to_dict()
 
 x = x.replace({'unit':unitsd})
-x.to_parquet('food_acquired.parquet')
+to_parquet(x, 'food_acquired.parquet')
 
 

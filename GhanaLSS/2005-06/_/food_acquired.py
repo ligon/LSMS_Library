@@ -1,3 +1,4 @@
+from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python
 import sys
 sys.path.append('../../_')
@@ -86,4 +87,4 @@ fa = fa.replace(0,np.nan).dropna(how='all')
 
 # Deal with non-string values in units
 fa.index = fa.index.set_levels(fa.index.levels[3].astype(str),level='u')
-fa.to_parquet('food_acquired.parquet')
+to_parquet(fa, 'food_acquired.parquet')

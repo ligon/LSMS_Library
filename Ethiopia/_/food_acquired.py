@@ -1,3 +1,4 @@
+from lsms_library.local_tools import get_dataframe
 """Calculate food prices for different items across rounds; allow
 different prices for different units.  
 """
@@ -35,7 +36,7 @@ def id_walk(df,wave,waves):
 
 p = []
 for t in Waves.keys():
-    df = pd.read_parquet('../'+t+'/_/food_acquired.parquet').squeeze()
+    df = get_dataframe('../'+t+'/_/food_acquired.parquet').squeeze()
     df['t'] = t
     # There may be occasional repeated reports of purchases of same food
     df0 = df.groupby(['j','t','i','units','units_purchased']).sum()
@@ -46,7 +47,7 @@ for t in Waves.keys():
 p = pd.concat(p)
 
 try:
-    of = pd.read_parquet('../var/other_features.parquet')
+    of = get_dataframe('../var/other_features.parquet')
 
     p = p.join(of.reset_index('m')['m'],on=['j','t'])
     p = p.reset_index()

@@ -1,3 +1,4 @@
+from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python
 import sys
 sys.path.append('../../_')
@@ -81,5 +82,5 @@ df.set_index(['j','t','m'],inplace=True)
 
 z = z.join(df['Rural'])
 
-z.to_parquet('household_characteristics.parquet')
+to_parquet(z, 'household_characteristics.parquet')
 

@@ -1,3 +1,5 @@
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 #!/usr/bin/env python
 """
 Concatenate household rosters across rounds.
@@ -25,7 +27,7 @@ x = []
 
 for t in Waves.keys():
     print(t)
-    df = pd.read_parquet('../'+t+'/_/household_roster.parquet')
+    df = get_dataframe('../'+t+'/_/household_roster.parquet')
     df1 = id_walk(df,t,Waves)
     df1.columns.name ='k'
     df2 = df1.stack('k').dropna()
@@ -41,7 +43,7 @@ z = pd.concat(x)
 z = z.unstack('k')
 
 try:
-    of = pd.read_parquet('../var/other_features.parquet')
+    of = get_dataframe('../var/other_features.parquet')
     z = z.join(of.reset_index('m')['m'],on=['j','t'])
     z = z.reset_index().set_index(['j','indiv','t','m'])
 except FileNotFoundError:
@@ -49,4 +51,4 @@ except FileNotFoundError:
     z['m'] = 'Ghana'
     z = z.reset_index().set_index(['j','indiv','t','m'])
 
-z.to_parquet('../var/household_roster.parquet')
+to_parquet(z, '../var/household_roster.parquet')

@@ -1,3 +1,4 @@
+from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python
 import sys
 sys.path.append('../../_/')
@@ -41,4 +42,4 @@ df = new_harmonize_units(df, unit_conversion)
 assert df.index.is_unique, "Non-unique index!  Fix me!"
 assert len(df[['quant_purchase','quant_own','quant_inkind']].dropna(how='all'))>0
 
-df.to_parquet('food_acquired.parquet')
+to_parquet(df, 'food_acquired.parquet')

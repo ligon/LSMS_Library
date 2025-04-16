@@ -1,9 +1,11 @@
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 #!/usr/bin/env python3
 
 import pandas as pd
 import numpy as np
 
-df = pd.read_parquet('../var/food_acquired.parquet')
+df = get_dataframe('../var/food_acquired.parquet')
 #df = df.reset_index()
 #df['m'] = df['m'].fillna('')
 #df = df.set_index(['j','t','m','i', 'u'])
@@ -17,11 +19,11 @@ expenditures = ['purchased_value'] #, 'produced_value']
                 #]
 
 x = df[expenditures].replace(np.nan, 0).groupby(['j','t','m','i']).sum().replace(0,np.nan)
-x.to_parquet('../var/food_expenditures.parquet')
+to_parquet(x, '../var/food_expenditures.parquet')
 
 
 p = df[prices].groupby(['t','m','i','u']).mean()
-p.unstack('t').to_parquet('../var/food_prices.parquet')
+to_parquet(p.unstack('t'), '../var/food_prices.parquet')
 
 
 #quantity to be updated once conversion_to_kg is created

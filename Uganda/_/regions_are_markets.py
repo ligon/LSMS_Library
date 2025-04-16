@@ -1,3 +1,5 @@
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 #!/usr/bin/env python
 
 """Pull region identifier from other_features and use as markets;
@@ -12,7 +14,7 @@ DFs = ['food_expenditures','household_characteristics','food_quantities']
 
 dir = '../var/%s.parquet'
 
-oc = pd.read_parquet(dir % 'other_features')
+oc = get_dataframe(dir % 'other_features')
 
 def m_regions(df,oc):
 
@@ -37,8 +39,8 @@ def m_regions(df,oc):
     return df
 
 for fn in DFs:
-    df = pd.read_parquet(dir % fn)
-    m_regions(df,oc).to_parquet(dir % fn)
+    df = get_dataframe(dir % fn)
+    to_parquet(m_regions(df,oc), dir % fn)
 
     
 

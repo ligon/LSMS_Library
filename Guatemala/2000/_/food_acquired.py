@@ -1,3 +1,4 @@
+from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python
 
 import sys
@@ -59,4 +60,4 @@ final['Total Quantity'] = final[['Purchased Amount']].sum(axis=1)
 final['Total Expenditure'] = final['Total Quantity']*final['Unit Value']
 
 final = final.reset_index().set_index(['j','i'])
-final.to_parquet('food_acquired.parquet')
+to_parquet(final, 'food_acquired.parquet')

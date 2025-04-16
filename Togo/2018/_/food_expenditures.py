@@ -1,3 +1,4 @@
+from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python
 import sys
 sys.path.append('../../_')
@@ -72,6 +73,6 @@ x = x.iloc[:,2:] # Drop two funky columns with numeric labels
 
 x = x.drop_duplicates()
 
-x.to_parquet('food_expenditures.parquet',compression='gzip')
+to_parquet(x, 'food_expenditures.parquet',compression='gzip')
 
 

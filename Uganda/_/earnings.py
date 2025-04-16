@@ -1,3 +1,5 @@
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 #!/usr/bin/env python
 """
 Compile data on reported labor earnings.
@@ -12,7 +14,7 @@ x = {}
 
 for t in list(Waves.keys()):
     print(t)
-    x[t] = pd.read_parquet('../'+t+'/_/earnings.parquet')
+    x[t] = get_dataframe('../'+t+'/_/earnings.parquet')
     x[t] = x[t].stack().squeeze()
 
 x = pd.DataFrame(x)
@@ -25,4 +27,4 @@ x = x.reset_index().set_index(['j','t','m'])
 updated_ids = json.load(open('updated_ids.json'))
 x = id_walk(x,updated_ids)
 
-x.to_parquet('../var/earnings.parquet')
+to_parquet(x, '../var/earnings.parquet')

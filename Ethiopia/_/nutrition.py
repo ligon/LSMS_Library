@@ -1,3 +1,5 @@
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 """
 Create a nutrition DataFrame for households based on food consumption quantities
 """
@@ -33,7 +35,7 @@ final_fct = pd.concat([fct, fct_add]).sort_index().T
 
 ##--Part 3: multiply consumption quantities to get the aggregate nutrition consumption
 #sum all quantities 
-q = pd.read_parquet('../var/food_quantities.parquet')
+q = get_dataframe('../var/food_quantities.parquet')
 q['q_sum'] = q.sum(axis=1)
 #q = q[['q_sum']].droplevel('units').reset_index()
 q = q[['q_sum']].reset_index()
@@ -47,4 +49,4 @@ final_q = final_q.filter(items=list2).replace(np.nan,0)
 final_fct = final_fct.filter(items=list1).replace(np.nan,0)
 
 n = final_q@final_fct.T
-n.to_parquet('../var/nutrition.parquet')
+to_parquet(n, '../var/nutrition.parquet')

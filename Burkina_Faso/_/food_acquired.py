@@ -1,3 +1,4 @@
+from lsms_library.local_tools import get_dataframe
 """Calculate food prices for different items across rounds; allow
 different prices for different units.
 """
@@ -9,7 +10,7 @@ import numpy as np
 
 x = []
 for t in ['2014', '2018-19', '2021-22']:
-    df = pd.read_parquet('../'+t+'/_/food_acquired.parquet').squeeze()
+    df = get_dataframe('../'+t+'/_/food_acquired.parquet').squeeze()
     df = df.reset_index()
     df['units'] = df['units'].astype(str)
     df = df.set_index(['j', 't', 'i', 'units'])
@@ -20,7 +21,7 @@ for t in ['2014', '2018-19', '2021-22']:
 
 fa = pd.concat(x)
 
-of = pd.read_parquet('../var/other_features.parquet')
+of = get_dataframe('../var/other_features.parquet')
 
 fa = fa.join(of)
 fa = fa.reset_index().set_index(['j','t','m','i','u'])

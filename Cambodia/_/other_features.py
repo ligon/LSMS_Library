@@ -1,3 +1,5 @@
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 #!/usr/bin/env python
 """
 Concatenate data on other household features across rounds.
@@ -7,7 +9,7 @@ import pandas as pd
 
 x = []
 for t in ['2019-20']:
-    df = pd.read_parquet('../'+t+'/_/other_features.parquet')
+    df = get_dataframe('../'+t+'/_/other_features.parquet')
     df = df.reset_index()
     df['t'] = t
     df = df.set_index(['j', 't'])
@@ -15,4 +17,4 @@ for t in ['2019-20']:
 
 concatenated = pd.concat(x)
 
-concatenated.to_parquet('../var/other_features.parquet')
+to_parquet(concatenated, '../var/other_features.parquet')
