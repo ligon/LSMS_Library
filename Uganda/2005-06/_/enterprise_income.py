@@ -1,3 +1,4 @@
+from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python3
 import numpy as np
 import pandas as pd
@@ -22,4 +23,4 @@ enterprise_income = enterprise_income.rename(columns={v:k for k,v in d.items()})
 enterprise_income['profits'] = np.maximum(enterprise_income['revenue'] - enterprise_income[['wagebill','materials','otherexpense']].sum(axis=1),0)
 enterprise_income['losses'] = -np.minimum(enterprise_income['revenue'] - enterprise_income[['wagebill','materials','otherexpense']].sum(axis=1),0)
 
-enterprise_income.to_parquet('enterprise_income.parquet')
+to_parquet(enterprise_income, 'enterprise_income.parquet')

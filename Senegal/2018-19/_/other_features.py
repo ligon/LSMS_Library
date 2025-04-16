@@ -1,3 +1,4 @@
+from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python
 
 import sys
@@ -26,4 +27,4 @@ of = of.reset_index().set_index(['j','t','m'])
 
 of['Rural'] = (of.Rural=='Rural') + 0.
 
-of.to_parquet('other_features.parquet')
+to_parquet(of, 'other_features.parquet')

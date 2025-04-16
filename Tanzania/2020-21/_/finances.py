@@ -4,6 +4,7 @@ import numpy as np
 import dvc.api
 from lsms import from_dta
 import sys
+from lsms_library.local_tools import to_parquet
 sys.path.append('../../_')
 
 with dvc.api.open('../Data/hh_sec_q1.dta',mode='rb') as dta:
@@ -55,4 +56,4 @@ for column in columns_to_convert:
     finance[column] = finance[column].apply(lambda x: 0 if str(x).strip().lower() == 'none' else x)
     finance[column] = pd.to_numeric(finance[column], errors='coerce')
 
-finance.to_parquet('finances.parquet')
+to_parquet(finance, 'finances.parquet')

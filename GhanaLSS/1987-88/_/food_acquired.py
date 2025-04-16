@@ -1,3 +1,4 @@
+from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python
 import sys
 sys.path.append('../../_')
@@ -63,4 +64,4 @@ f = xf.merge(yf, on = ['j','i'], how = 'outer')
 f['u'] = np.nan
 f['t'] = t
 f = f.set_index(['j','t','i', 'u'])
-f.to_parquet('food_acquired.parquet')
+to_parquet(f, 'food_acquired.parquet')

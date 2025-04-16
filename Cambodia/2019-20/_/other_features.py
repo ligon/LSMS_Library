@@ -1,3 +1,4 @@
+from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python
 
 import sys
@@ -18,4 +19,4 @@ df['Rural'] = df['Rural'].map({'Urban':0, 'Rural':1})
 df['m'] = df['m'].str.strip()
 df = df.set_index(['j', 'm'])
 
-df.to_parquet('other_features.parquet')
+to_parquet(df, 'other_features.parquet')

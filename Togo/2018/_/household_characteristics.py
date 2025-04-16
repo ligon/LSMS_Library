@@ -1,3 +1,5 @@
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 #!/usr/bin/env python
 import dvc.api
 import sys
@@ -37,7 +39,7 @@ region.name = 'm'
 df = df.join(region,how='left')
 
 # Add data on time
-food = pd.read_parquet('food_expenditures.parquet')
+food = get_dataframe('food_expenditures.parquet')
 t = food.groupby(['j','t']).count().reset_index('t')['t']
 df = df.join(t,on='j').reset_index()
 
@@ -45,4 +47,4 @@ df = df.reset_index().set_index(['j','t','m'])
 df = df.drop(columns=['index'])
 #df = df.drop_duplicates()
 
-df.to_parquet('household_characteristics.parquet')
+to_parquet(df, 'household_characteristics.parquet')

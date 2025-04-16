@@ -1,3 +1,4 @@
+from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python
 
 import sys
@@ -48,4 +49,4 @@ ed_expense = ed_expense.replace({0: np.nan}).dropna(how='all')
 
 #ed_expense = ed_expense.groupby('j').sum()
 
-ed_expense.to_parquet('education_expenses.parquet')
+to_parquet(ed_expense, 'education_expenses.parquet')

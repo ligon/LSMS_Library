@@ -1,3 +1,4 @@
+from lsms_library.local_tools import get_dataframe
 """Calculate food prices for different items across rounds; allow
 different prices for different units.
 """
@@ -8,14 +9,14 @@ import pandas as pd
 import numpy as np
 import json
 
-df = pd.read_parquet('../var/food_acquired.parquet')
+df = get_dataframe('../var/food_acquired.parquet')
 
 x = df[['total expenses']].rename({'total expenses': 'total expenditure'})
 x = x.replace(0,np.nan)
-x.droplevel('u').to_parquet('../var/food_expenditures.parquet')
+to_parquet(x.droplevel('u'), '../var/food_expenditures.parquet')
 
 p = df['price per unit'].groupby(['t','m','i','u']).median().replace(0, np.nan)
-p.unstack('t').to_parquet('../var/food_prices.parquet')
+to_parquet(p.unstack('t'), '../var/food_prices.parquet')
 
 q = x.join(p,on=['t','m','i','u'])
 q = q['total expenses']/q['price per unit']

@@ -1,3 +1,5 @@
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 #!/usr/bin/env python
 """
 Create a nutrition DataFrame for households based on food consumption quantities
@@ -17,7 +19,7 @@ apikey = "hAkb5LsLAS1capOD60K6ILrZDkC29eK6ZmqCumXB"
 fct_add = df_from_orgfile('nutrition.org',name='fct_addition',encoding='ISO-8859-1')
 fct = pd.read_csv('fct_part1.csv').set_index('i')
 
-q = pd.read_parquet('../var/food_quantities.parquet')
+q = get_dataframe('../var/food_quantities.parquet')
 
 #create and restructure fct for fdc food items; 
 n1 = nutrient_df(fct_add, apikey)
@@ -38,7 +40,7 @@ list2 = final_fct.columns.values.tolist()
 final_q = final_q.filter(items=list2).replace(np.nan,0)
 final_fct = final_fct.filter(items=list1).replace(np.nan,0)
 
-final_fct.to_parquet('../var/fct.parquet')
+to_parquet(final_fct, '../var/fct.parquet')
 
 n = final_q@final_fct.T
-n.to_parquet('../var/nutrition.parquet')
+to_parquet(n, '../var/nutrition.parquet')

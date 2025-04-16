@@ -1,3 +1,4 @@
+from lsms_library.local_tools import get_dataframe
 #!/usr/bin/env python3
 
 import pandas as pd
@@ -5,7 +6,7 @@ import sys
 sys.path.append('../../_/')
 from lsms_library.local_tools import to_parquet
 
-df = pd.read_parquet('../var/food_acquired.parquet')
+df = get_dataframe('../var/food_acquired.parquet')
 df.index = df.index.rename({'units':'u'})
 
 x = df[['last expenditure']].groupby(['j','t','m','i']).sum()

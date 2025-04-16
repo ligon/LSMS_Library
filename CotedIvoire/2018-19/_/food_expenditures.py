@@ -1,3 +1,4 @@
+from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python
 import sys
 sys.path.append('../../_')
@@ -64,5 +65,5 @@ X.append(x)
 
 df = pd.concat(X)
 
-df.to_parquet('food_expenditures.parquet')
+to_parquet(df, 'food_expenditures.parquet')
 

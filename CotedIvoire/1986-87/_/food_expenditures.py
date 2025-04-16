@@ -1,3 +1,4 @@
+from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python
 import sys
 sys.path.append('../../_')
@@ -15,5 +16,5 @@ x['m'] = "Cote d'Ivoire"
 
 x = x.reset_index().set_index(['j','t','m'])
 
-x.to_parquet('food_expenditures.parquet')
+to_parquet(x, 'food_expenditures.parquet')
 

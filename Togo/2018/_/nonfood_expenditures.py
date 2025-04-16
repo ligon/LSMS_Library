@@ -1,3 +1,5 @@
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 #!/usr/bin/env python
 import sys
 sys.path.append('../../_')
@@ -23,7 +25,7 @@ df = pd.concat(Dfs).rename(columns=vars)
 df['j'] = df['j'].astype(int).astype(str)
 df['i'] = df['i'].astype(int).astype(str)
 
-food = pd.read_parquet('food_expenditures.parquet')
+food = get_dataframe('food_expenditures.parquet')
 
 # Get time from food df
 t = food.groupby(['j','t']).count().reset_index('t')['t']
@@ -48,6 +50,6 @@ x = x.reset_index().set_index(['j','t','m'])
 
 x = x.drop_duplicates()
 
-x.to_parquet('nonfood_expenditures.parquet')
+to_parquet(x, 'nonfood_expenditures.parquet')
 
 

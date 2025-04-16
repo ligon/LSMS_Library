@@ -1,3 +1,5 @@
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 #!/usr/bin/env python
 
 import sys
@@ -14,11 +16,11 @@ df['j'] =  df["grappe"].astype(int).astype(str) + df["menage"].astype(int).astyp
 
 df  = df.groupby('j').agg({'s00q01' : 'first', 's00q04': 'first'}).rename({'s00q01': 'm', 's00q04':'Rural'}, axis =1)
 
-time = pd.read_parquet('household_characteristics.parquet').reset_index().groupby('j').agg({'t':'first'})
+time = get_dataframe('household_characteristics.parquet').reset_index().groupby('j').agg({'t':'first'})
 
 df = pd.merge(left = df, right = time, how = 'left', left_index = True, right_index = True)
 df['Rural'] = df['Rural'].map({'Rural':1, 'Urbain':0})
 
 df = df.set_index(['t','m'], append = True)
 
-df.to_parquet('other_features.parquet')
+to_parquet(df, 'other_features.parquet')
