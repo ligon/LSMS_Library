@@ -13,3 +13,4 @@ Uganda/var/*
 /.dvc/gdrive_creds.json
 /Burkina_Faso/_/.mypy_cache/
 /LSMS_Library.egg-info/
+/dist/
