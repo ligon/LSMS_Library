@@ -6,7 +6,7 @@ from importlib.resources import files
 import importlib
 import cfe.regression as rgsn
 from collections import defaultdict
-from .local_tools import df_data_grabber, format_id, get_categorical_mapping, category_union, get_dataframe, map_index, get_formating_functions, panel_ids
+from .local_tools import df_data_grabber, format_id, get_categorical_mapping, category_union, get_dataframe, map_index, get_formatting_functions, panel_ids
 import importlib.util
 import os
 import warnings
@@ -24,7 +24,7 @@ class Wave:
         self.country = country_name
         self.name = f"{self.country}/{self.year}"
         self.data_scheme = data_scheme
-        self.formatting_functions = get_formating_functions(mod_path=self.file_path / "_" / f"{self.year}.py",
+        self.formatting_functions = get_formatting_functions(mod_path=self.file_path / "_" / f"{self.year}.py",
                                                              name=f"formatting_{self.year}",
                                                              general__formatting_functions=formatting_functions)
     @property
@@ -248,7 +248,7 @@ class Country:
             general_module_filename = f"{self.name.lower()}.py"
         general_mod_path = self.file_path/ "_"/ general_module_filename
 
-        return get_formating_functions(general_mod_path, f"formatting_{self.name}")
+        return get_formatting_functions(general_mod_path, f"formatting_{self.name}")
     
     @property
     def waves(self):
