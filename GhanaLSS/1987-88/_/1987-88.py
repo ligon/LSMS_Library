@@ -49,4 +49,23 @@ def Region(value):
 
     return region_dict.get(str(value), np.nan)
 
+
+def cluster_features(df):
+
+    '''
+    Formatting dataframe for cluster features
+    
+    infers the region for each cluster via where most young kids have their birthplace as (less likely to move?)
+    '''
+
+    youngsters = df.query("Age<12")
+    foo = youngsters.reset_index().groupby(['t', 'v','Region']).count()
+
+    foo = foo.sort_values(by = "Age", ascending=False).reset_index().drop_duplicates(subset=['t', 'v'], keep='first', inplace = False)
+    foo = foo.sort_values(by = 'v')
+    foo = foo.set_index(['t', 'v'])
+    foo['Rural'] = np.nan
+
+    return foo[['Region', 'Rural']]
+
 Visits = range(1,7)
