@@ -405,8 +405,7 @@ class Country:
             return dic
         else:
             df = get_dataframe(target_path)
-
-        if df.attrs.get('converted_categoricals', False)==False:
+        if df.attrs.get('id_converted', False)==False and 'panel_ids' in self.data_scheme:
             df = id_walk(map_index(df, self.name), self.updated_ids)
         else:
             df = map_index(df, self.name)
