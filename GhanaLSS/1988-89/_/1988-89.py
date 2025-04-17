@@ -3,9 +3,10 @@ import pandas as pd
 import numpy as np
 import lsms_library.local_tools as tools
 from collections import defaultdict
-from pathlib import Path
+from importlib.resources import files
 
-region_dict = tools.get_categorical_mapping(tablename = 'region', dirs=['../../_/', '../_/', './_/', '.'])
+path = files('lsms_library')/'countries'/'GHANALSS'/'1988-89'
+region_dict = tools.get_categorical_mapping(tablename = 'region', dirs=[f'{path}/_', f'{path}/../_/', f'{path}/../../_/'])
 
 def i(value):
     '''
@@ -29,13 +30,18 @@ def Birthplace(value):
     '''
     Formatting birthplace variable
     '''
-    return region_dict.get(str(value), np.nan)
+
+    try:
+        value_key = int(value)
+    except ValueError:
+        value_key = None
+    return region_dict.get(value_key, np.nan)
 
 def Relation(value):
     '''
     Formatting relationship variable
     '''
-    relationship_dict = tools.get_categorical_mapping(tablename = 'relationship', dirs=['../../_/', '../_/', './_/', '.'])
+    relationship_dict = tools.get_categorical_mapping(tablename = 'relationship', dirs=[f'{path}/_', f'{path}/../../_/', f'{path}/../_/'])
 
     return relationship_dict.get(value, np.nan)
 
@@ -44,6 +50,10 @@ def Region(value):
     Formatting region variable
     '''
 
-    return region_dict.get(str(value), np.nan)
+    try:
+        value_key = int(value)
+    except ValueError:
+        value_key = None
+    return region_dict.get(value_key, np.nan)
 
 Visits = range(1,7)

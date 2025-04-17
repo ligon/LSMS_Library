@@ -3,9 +3,11 @@ import pandas as pd
 import numpy as np
 import lsms_library.local_tools as tools
 from collections import defaultdict
+from importlib.resources import files
 
-region_dict = tools.get_categorical_mapping(tablename = 'region', dirs=['../../_/', '../_/', './_/', '.'])
-rural_dict = tools.get_categorical_mapping(tablename = 'rural', dirs=['1991-92/_/', '../../1991-92/_/', '../1991-92/_/', '.', './_/'])
+path = files('lsms_library')/'countries'/'GHANALSS'/'1991-92'
+region_dict = tools.get_categorical_mapping(tablename = 'region', dirs=[f'{path}/_', f'{path}/../_/', f'{path}/../../_/'])
+rural_dict = tools.get_categorical_mapping(tablename = 'rural', dirs=[f'{path}/_', f'{path}/../_/', f'{path}/../../_/'])
 
 def i(value):
     '''
@@ -30,7 +32,6 @@ def Birthplace(value):
     Formatting birthplace variable
     '''
     if value > 1e99:
-        print('extremely large value warning?', value)
         return np.nan
     return (lambda x: region_dict[f"{x:3.0f}".strip()])(value)
 
@@ -38,7 +39,7 @@ def Relation(value):
     '''
     Formatting relationship variable
     '''
-    relationship_dict = tools.get_categorical_mapping(tablename = 'relationship', dirs=['../../_/', '../_/', './_/', '.'])
+    relationship_dict = tools.get_categorical_mapping(tablename = 'relationship', dirs=[f'{path}/_', f'{path}/../../_/', f'{path}/../_/'])
     return relationship_dict.get(value, np.nan)
 
 def Region(value):

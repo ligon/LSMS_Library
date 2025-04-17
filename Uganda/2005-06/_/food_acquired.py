@@ -1,8 +1,8 @@
-from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python
 import sys
 sys.path.append('../../_/')
 from uganda import food_acquired
+from lsms_library.local_tools import to_parquet
 
 fn='../Data/GSEC14A.dta'
 
