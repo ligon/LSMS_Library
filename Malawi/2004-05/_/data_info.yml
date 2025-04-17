@@ -1,0 +1,29 @@
+Country: Malawi
+Wave: 2004-05
+
+cluster_features:
+    file: mod_a.dta
+    idxvars:
+        v: ea_id
+    myvars:
+        Region: region
+        Rural: reside
+
+subjective_well_being:
+    file: mod_t.dta
+    idxvars:
+        i: hhid
+    myvars:
+        Own Step: hh_t05
+        Neighbors Step: hh_t06
+        Friends Step: hh_t07
+
+household_roster:
+    file: mod_b.dta
+    idxvars:
+        i: hhid
+        pid: pid
+    myvars:
+        Sex: hh_b03
+        Age: hh_b05a
+        Relation: hh_b04

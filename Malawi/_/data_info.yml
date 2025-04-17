@@ -1,0 +1,35 @@
+Country: Malawi
+
+Waves:
+  - '2004-05'
+  - '2010-11'
+  - '2016-17'
+  - '2019-20'
+
+Index Info:
+  note: no interview date (int_t), compared with global index info
+  index_info:
+    cluster_features: (t, v)
+    household_roster: (t, v, i, pid)
+    individual_education: (t, v, i, pid)
+    food_acquired: (t, v, visit, i, j, u)
+    interview_date: (t, v, visit, i)
+
+Data Scheme:
+  cluster_features:
+    index: (t, v)
+    Region: str
+    Rural: str
+  household_roster:
+    index: (t, i, pid)
+    Sex: str
+    Age: int
+    Relationship: str
+  interview_date:
+    index: (t, v, i)
+    Int_t: str
+  subjective_well_being:
+    index: (t,i)
+    Own Step: int
+    Neighbors Step: int
+    Friends Step: int
