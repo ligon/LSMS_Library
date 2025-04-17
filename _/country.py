@@ -6,7 +6,7 @@ from importlib.resources import files
 import importlib
 import cfe.regression as rgsn
 from collections import defaultdict
-from .local_tools import df_data_grabber, format_id, get_categorical_mapping, category_union, get_dataframe, map_index, get_formatting_functions, panel_ids
+from .local_tools import df_data_grabber, format_id, get_categorical_mapping, category_union, get_dataframe, map_index, get_formatting_functions, panel_ids, id_walk
 import importlib.util
 import os
 import warnings
@@ -405,10 +405,11 @@ class Country:
                 dic = json.load(json_file)
             return dic
         else:
-            df = pd.read_parquet(target_path)
-
-        df = map_index(df, self.name)
-
+            df = get_dataframe(target_path)
+        if df.attrs.get('id_converted', False)==False and 'panel_ids' in self.data_scheme:
+            df = id_walk(map_index(df, self.name), self.updated_ids)
+        else:
+            df = map_index(df, self.name)
         return df
 
     def _compute_panel_ids(self):
