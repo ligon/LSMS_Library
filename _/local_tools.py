@@ -874,7 +874,7 @@ def map_index(df, country):
 
 
 import importlib.util
-def get_formating_functions(mod_path, name, general__formatting_functions={} ):
+def get_formatting_functions(mod_path, name, general__formatting_functions={} ):
     if mod_path.exists():
     # Load module dynamically
         spec = importlib.util.spec_from_file_location(name, mod_path)
