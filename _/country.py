@@ -28,7 +28,7 @@ class Wave:
                                                              general__formatting_functions=self.country.formatting_functions)
 
     def __getattr__(self, method_name):
-        if method_name in self.data_scheme:
+        if method_name in self.country.data_scheme:
             def method():
                 return self.grab_data(method_name)
             return method
