@@ -9,12 +9,11 @@ cluster_features:
         Region: region
         Rural: reside
 
-
 household_roster:
     file: sec_b.dta
     idxvars:
         i: case_id
-        pid: pid
+        pid: memid
     myvars:
         Sex: b03
         Age: b05a

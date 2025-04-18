@@ -875,20 +875,22 @@ def map_index(df, country):
 
 import importlib.util
 def get_formatting_functions(mod_path, name, general__formatting_functions={} ):
+    formatting_function = general__formatting_functions.copy()
     if mod_path.exists():
     # Load module dynamically
         spec = importlib.util.spec_from_file_location(name, mod_path)
         formatting_module = importlib.util.module_from_spec(spec)
         if spec.loader is not None:
             spec.loader.exec_module(formatting_module)
-        general__formatting_functions.update({
+        formatting_function.update({
             name: func
             for name, func in vars(formatting_module).items()
             if callable(func)
             })
-        return general__formatting_functions
+        return formatting_function
     else:
-        return general__formatting_functions.update({})
+        formatting_function.update({})
+        return formatting_function
 
 
 def id_walk(df, updated_ids, index ='i'):
