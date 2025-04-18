@@ -1,20 +1,5 @@
 Country: Malawi
 
-Waves:
-  - '2004-05'
-  - '2010-11'
-  - '2016-17'
-  - '2019-20'
-
-Index Info:
-  note: no interview date (int_t), compared with global index info
-  index_info:
-    cluster_features: (t, v)
-    household_roster: (t, v, i, pid)
-    individual_education: (t, v, i, pid)
-    food_acquired: (t, v, visit, i, j, u)
-    interview_date: (t, v, visit, i)
-
 Data Scheme:
   cluster_features:
     index: (t, v)

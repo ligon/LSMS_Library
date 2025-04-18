@@ -1,6 +1,6 @@
-from lsms_library.local_tools import to_parquet
-from lsms_library.local_tools import get_dataframe
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet, get_categorical_mapping
+from lsms_library.local_tools import get_dataframe
 
 import sys
 sys.path.append('../../_/')
@@ -9,6 +9,8 @@ import numpy as np
 import json
 import dvc.api
 from lsms import from_dta
+
+wave = "2004-05"
 
 with dvc.api.open('../Data/sec_i.dta', mode='rb') as dta:
     df = from_dta(dta, convert_categoricals=True)
@@ -20,7 +22,7 @@ columns_dict = {'case_id': 'j', 'i0a' : 'i', 'i03a': 'quantity_consumed', 'i03b'
                 }
 regions = get_dataframe('other_features.parquet').reset_index().set_index(['j'])['m']
 
-df = df.astype(str).apply(lambda x: x.astype(str).str.lower()).replace('nan', np.NaN)
+df = df.astype(str).replace('nan', np.NaN)
 df = df.rename(columns_dict, axis=1)
 df = df.loc[:, list(columns_dict.values())]
 
@@ -54,8 +56,15 @@ df['u_bought'] = np.where(~df['cfactor_bought'].isna(), 'kg', df['u_bought'])
 #prices
 df['price per unit'] = df['expenditure']/df['quantity_bought']
 
-df['t'] = '2004-05'
+df['t'] = wave
 df = df.reset_index().set_index(['j','t','i']).dropna(how='all')
 
 final = df.loc[:, ['quantity_consumed', 'u_consumed', 'quantity_bought', 'u_bought', 'price per unit', 'expenditure', 'cfactor_consumed', 'cfactor_bought']]
+
+labelsd = get_categorical_mapping(tablename='harmonize_food',
+                                  idxvars={'i':wave},
+                                  **{'Label':'Preferred Label'})
+
+final = final.rename(index=labelsd,level='i')
+
 to_parquet(final, "food_acquired.parquet")

@@ -1,6 +1,6 @@
-from lsms_library.local_tools import to_parquet
-from lsms_library.local_tools import get_dataframe
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet, get_categorical_mapping
+from lsms_library.local_tools import get_dataframe
 
 import sys
 sys.path.append('../../_/')
@@ -10,6 +10,8 @@ import json
 import dvc.api
 from lsms import from_dta
 from malawi import handling_unusual_units, conversion_table_matching
+
+wave = '2016-17'
 
 with dvc.api.open('../Data/hh_mod_g1.dta', mode='rb') as dta:
     df = from_dta(dta, convert_categoricals=True)
@@ -49,8 +51,15 @@ df = df.set_index(['j', 'm', 'i'])
 df = handling_unusual_units(df)
 
 df['price per unit'] = df['expenditure']/df['quantity_bought']
-df['t'] = '2016-17'
+df['t'] = wave
 df = df.reset_index().set_index(['j','t', 'i']).dropna(how='all')
 
 final = df.loc[:, ['quantity_consumed', 'u_consumed', 'quantity_bought', 'u_bought', 'price per unit', 'expenditure', 'cfactor_consumed', 'cfactor_bought']]
+
+labelsd = get_categorical_mapping(tablename='harmonize_food',
+                                  idxvars={'j':wave},
+                                  **{'Label':'Preferred Label'})
+
+final = final.rename(index=labelsd,level='i')
+
 to_parquet(final, "food_acquired.parquet")

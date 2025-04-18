@@ -1,6 +1,6 @@
-from lsms_library.local_tools import to_parquet
-from lsms_library.local_tools import get_dataframe
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe, get_categorical_mapping
 
 import sys
 sys.path.append('../../_/')
@@ -73,4 +73,12 @@ df['t'] = '2010-11'
 df = df.reset_index().set_index(['j','t','i']).dropna(how='all')
 
 final = df.loc[:, ['quantity_consumed', 'u_consumed', 'quantity_bought', 'u_bought', 'price per unit', 'expenditure', 'cfactor_consumed', 'cfactor_bought']]
+
+# Fix food labels
+labelsd = get_categorical_mapping(tablename='harmonize_food',
+                                  idxvars={'j':'2010-11'},
+                                  **{'Label':'Preferred Label'})
+
+final = final.rename(index=labelsd,level='i')
+
 to_parquet(final, "food_acquired.parquet")
