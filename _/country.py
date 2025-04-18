@@ -28,6 +28,13 @@ class Wave:
                                                              general__formatting_functions=self.country.formatting_functions)
 
     def __getattr__(self, method_name):
+        '''
+        This method is triggered when an attribute is not found in the instance, but exists in the `data_scheme`. 
+        It dynamically generates a method to aggregate data for the requested attribute.
+
+        For example, if a user calls `country_instance.food_acquired()` and `food_acquired` is part of the `data_scheme` but not an existing method, 
+        the method will dynamically create a function to handle data aggregation for `food_acquired`.
+        '''
         if method_name in self.country.data_scheme:
             def method():
                 return self.grab_data(method_name)
@@ -68,7 +75,7 @@ class Wave:
     
     def column_mapping(self, request):
         """
-        Retrieve column mappings for a given dataset request.
+        Retrieve column mappings for a given dataset request.And map into dictionary to be ready for df_data_grabber
         Input:
             request: str, the request data name in data_scheme (e.g. 'cluster_features', 'household_roster', 'food_acquired', 'interview_date')
         Output:
@@ -199,6 +206,7 @@ class Wave:
         
         return map_index(df, self.name)
 
+    # This cluster_features method is explicitly defined because additional processing is required after calling grab_data.
     def cluster_features(self):
         df = self.grab_data('cluster_features')
         # if cluster_feature data is from old other_features.parquet file, region is called 'm' so we need to rename it
@@ -208,6 +216,7 @@ class Wave:
             df = df.rename(columns = {'m':'Region'})
         return df
     
+    # Food acquired method is explicitly defined because potentially categorical mapping is required after calling grab_data.
     def food_acquired(self):
         df = self.grab_data('food_acquired')
         parquet_fn = self.file_path / "_" / "food_acquired.parquet"
@@ -299,6 +308,7 @@ class Country:
                 return sorted(module.waves)
             elif hasattr(module, 'Waves'):
                 return sorted(list(module.Waves.keys()))
+        #Otherwise, we will check the directory for subdirectories that contain 'Documentation' and 'SOURCE'.
         waves = [
             f.name for f in self.file_path.iterdir()
             if f.is_dir() and (self.file_path / f.name / 'Documentation' / 'SOURCE').exists()
@@ -365,6 +375,10 @@ class Country:
         makefile_path = self.file_path /'_'/ "Makefile"
         if not makefile_path.exists():
             raise FileNotFoundError(f"Makefile not found in {self.file_path}. Unable to generate required data.")
+        
+        if method_name in ['cluster_features']:
+        # if cluster feature is not defined in yml file, we will use makefile and the variable name is 'other_features'
+            method_name = 'other_features' 
 
         # Step 3: Run Makefile for the specific parquet/json file
         cwd_path = self.file_path / "_"
@@ -430,6 +444,13 @@ class Country:
     
 
     def __getattr__(self, name):
+        '''
+        This method is triggered when an attribute is not found in the instance, but exists in the `data_scheme`. 
+        It dynamically generates a method to aggregate data for the requested attribute.
+
+        For example, if a user calls `country_instance.food_acquired()` and `food_acquired` is part of the `data_scheme` but not an existing method, 
+        the method will dynamically create a function to handle data aggregation for `food_acquired`.
+        '''
         if name in self.data_scheme:
             def method(waves=None):
                 return self._aggregate_wave_data(waves, name)
@@ -438,16 +459,13 @@ class Country:
 
 
     def cluster_features(self, waves=None):
-        try:
-            return self._aggregate_wave_data(waves, 'cluster_features')
-        except subprocess.CalledProcessError as e:
-            print('continue with other_features instead')
-            df = self._aggregate_wave_data(waves, 'other_features')
-            if df.empty:
-                return df
-            if 'm' in df.index.names:
-                df = df.reset_index(level = 'm').rename(columns = {'m':'Region'})
+        df = self._aggregate_wave_data(waves, 'cluster_features')
+        if df.empty:
             return df
+        if 'm' in df.index.names:
+        # if cluster_feature data is from old other_features.parquet file, region is called 'm' so we need to rename it
+            df = df.reset_index(level = 'm').rename(columns = {'m':'Region'})
+        return df
 
         
 
