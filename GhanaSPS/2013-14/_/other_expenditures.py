@@ -1,5 +1,5 @@
-from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
 import sys
 import dvc.api
 import pandas as pd
