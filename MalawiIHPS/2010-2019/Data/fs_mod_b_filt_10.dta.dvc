@@ -1,0 +1,5 @@
+outs:
+- md5: de704d6d86d56192f3bdb2e252ae5ab4
+  size: 8891
+  hash: md5
+  path: fs_mod_b_filt_10.dta

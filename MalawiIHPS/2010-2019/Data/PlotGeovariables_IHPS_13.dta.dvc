@@ -1,0 +1,5 @@
+outs:
+- md5: aaccf47402658de8ec169f43105aa5ee
+  size: 108204
+  hash: md5
+  path: PlotGeovariables_IHPS_13.dta

@@ -1,0 +1,5 @@
+outs:
+- md5: a7838d93ceb1956477890f05c94c3b75
+  size: 314324
+  hash: md5
+  path: PlotGeovariables_IHS3_Rerelease_10.dta

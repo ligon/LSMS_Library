@@ -1,0 +1,5 @@
+outs:
+- md5: ccc29e088bb7a9e06efcb15a3316733e
+  size: 219274
+  hash: md5
+  path: ihs_foodconversion_factor_2020.dta
