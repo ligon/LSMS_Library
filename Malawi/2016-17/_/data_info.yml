@@ -12,7 +12,7 @@ cluster_features:
 subjective_well_being:
     file: hh_mod_t.dta
     idxvars:
-        i: hhid
+        i: case_id
     myvars:
         Own Step: hh_t05
         Neighbors Step: hh_t06
@@ -22,7 +22,7 @@ subjective_well_being:
 household_roster:
     file: hh_mod_b.dta
     idxvars:
-        i: hhid
+        i: case_id
         pid: pid
     myvars:
         Sex: hh_b03
