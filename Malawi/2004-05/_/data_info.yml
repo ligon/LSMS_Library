@@ -4,19 +4,10 @@ Wave: 2004-05
 cluster_features:
     file: sec_a.dta
     idxvars:
-        v: ea 
+        v: ea
     myvars:
         Region: region
         Rural: reside
-
-# subjective_well_being:
-#     file: mod_t.dta
-#     idxvars:
-#         i: hhid
-#     myvars:
-#         Own Step: hh_t05
-#         Neighbors Step: hh_t06
-#         Friends Step: hh_t07
 
 household_roster:
     file: sec_b.dta

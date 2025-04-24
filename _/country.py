@@ -286,7 +286,6 @@ class Country:
     
     @property
     def resources(self):
-        # var = self.file_path / "_" / "data_info.yml"
         var = self.file_path / "_" / "data_scheme.yml"
         if not var.exists():
             return {}
