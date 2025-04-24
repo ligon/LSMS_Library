@@ -44,6 +44,7 @@ Waves = {'2008-15':('upd4_hh_a.dta',['r_hhid','round','UPHI'], map_08_15),
          '2020-21':('hh_sec_a.dta','y5_hhid','y4_hhid')}
 
 waves = ['2008-09', '2010-11', '2012-13', '2014-15', '2019-20', '2020-21']
+wave_folder_map = {'2008-09':'2008-15', '2010-11':'2008-15', '2012-13':'2008-15', '2014-15':'2008-15', '2019-20':'2019-20', '2020-21':'2020-21'}
 
 def harmonized_food_labels(fn='../../_/food_items.org'):
     # Harmonized food labels
