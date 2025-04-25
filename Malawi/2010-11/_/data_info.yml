@@ -7,6 +7,7 @@ cluster_features:
         v: ea_id
     myvars:
         Rural: reside
+        Region: hh_a01
 
 subjective_well_being:
     file: Full_Sample/Household/hh_mod_t.dta
@@ -26,3 +27,11 @@ household_roster:
         Sex: hh_b03
         Age: hh_b05a
         Relation: hh_b04
+
+
+# panel_ids:
+#     file: Full_Sample/Household/hh_mod_a_filt.dta
+#     idxvars:
+#         i: case_id
+#     myvars:
+#         previous_i: case_id

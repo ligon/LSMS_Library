@@ -18,3 +18,6 @@ Data Scheme:
     Own Step: int
     Neighbors Step: int
     Friends Step: int
+  panel_ids:
+    index: (t, i)
+    previous_i: str

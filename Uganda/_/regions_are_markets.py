@@ -1,6 +1,6 @@
+#!/usr/bin/env python
 from lsms_library.local_tools import to_parquet
 from lsms_library.local_tools import get_dataframe
-#!/usr/bin/env python
 
 """Pull region identifier from other_features and use as markets;
    concatenate other material in other features with

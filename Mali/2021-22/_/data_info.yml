@@ -80,9 +80,7 @@ panel_ids:
         previous_hid: s00q07f2
         #using df_data_grabber {new_col_name: (old_col_name, transformation)}, can direct mapping values by input a dictionary as transformation
         in_previous_wave: 
-            - PanelHH:
-                'Non': 0
-                'Oui': 1
+            - PanelHH
             - # A dictionary can be used to map values
                 'Non': 0
                 'Oui': 1 

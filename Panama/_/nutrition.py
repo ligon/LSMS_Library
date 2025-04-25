@@ -1,6 +1,6 @@
+#!/usr/bin/env python
 from lsms_library.local_tools import to_parquet
 from lsms_library.local_tools import get_dataframe
-#!/usr/bin/env python
 """
 Create a nutrition DataFrame for households based on food consumption quantities
 """
