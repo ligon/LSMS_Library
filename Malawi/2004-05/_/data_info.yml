@@ -6,7 +6,7 @@ cluster_features:
     idxvars:
         v: ea
     myvars:
-        Region: region
+        Region: dist
         Rural: reside
 
 household_roster:
@@ -18,3 +18,11 @@ household_roster:
         Sex: b03
         Age: b05a
         Relation: b04
+
+
+# panel_ids:
+#     file: sec_a.dta
+#     idxvars:
+#         i: case_id
+#     myvars:
+#         previous_i: case_id
