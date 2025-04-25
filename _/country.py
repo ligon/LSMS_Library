@@ -93,7 +93,9 @@ class Wave:
 
         def map_formatting_function(var_name, value, format_id_function = False):
             """Applies formatting functions if available, otherwise uses defaults."""
-            if isinstance(value, list) and isinstance(list[1], dict):
+            if isinstance(value, list) and isinstance(value[-1], dict):
+                if value[-1].get('function'):
+                    return (value[:-1], formatting_functions[value[-1]['function']])
                 return tuple(value)
             if var_name in formatting_functions:
                 return (value, formatting_functions[var_name])
@@ -276,7 +278,11 @@ class Country:
         self._updated_ids_cache = None
         self.wave_folder_map = {}
         if preload_panel_ids:
-            _ = self.panel_ids
+            print(f"Preloading panel_ids for {self.name}...")
+            #ignore all the warnings
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                _ = self._compute_panel_ids()
 
 
     @property
@@ -424,11 +430,10 @@ class Country:
                 return dic
             else:
                 df = get_dataframe(target_path)
-                
-        if not df.attrs.get('id_converted') and method_name not in ['panel_ids', 'updated_ids'] and 'panel_ids' in self.data_scheme:
-            df = id_walk(map_index(df, self.name), self.updated_ids)
-        else:
-            df = map_index(df, self.name)
+
+        df = map_index(df, self.name)
+        if 'i' in df.index.names and not df.attrs.get('id_converted') and method_name not in ['panel_ids', 'updated_ids'] and self._updated_ids_cache is not None:
+            df = id_walk(df, self.updated_ids)
         return df
 
     def _compute_panel_ids(self):
