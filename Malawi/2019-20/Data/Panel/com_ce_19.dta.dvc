@@ -1,0 +1,5 @@
+outs:
+- md5: e3e2a2d34953f384df8b99820653eb53
+  size: 42999
+  hash: md5
+  path: com_ce_19.dta
