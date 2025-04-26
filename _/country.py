@@ -270,7 +270,6 @@ class Country:
     #                 'household_characteristics.parquet', 'other_features.parquet', 'shocks.parquet',
     #                 'nonfood_expenditures.parquet', 'enterprise_income.parquet', 'assets.parquet',
     #                 'earnings.parquet', 'housing.parquet', 'income.parquet', 'fct.parquet', 'nutrition.parquet']
-    
 
     def __init__(self,country_name, preload_panel_ids = True):
         self.name = country_name
@@ -284,12 +283,11 @@ class Country:
                 warnings.simplefilter("ignore")
                 _ = self._compute_panel_ids()
 
-
     @property
     def file_path(self):
         var = files("lsms_library") / "countries" / self.name
         return var
-    
+
     @property
     def resources(self):
         var = self.file_path / "_" / "data_scheme.yml"
@@ -300,16 +298,15 @@ class Country:
     
     @property
     def formatting_functions(self):
-        if self.name == 'GhanaLSS':
-            general_module_filename = 'ghana.py'
-        else:
-            general_module_filename = f"{self.name.lower()}.py"
+        general_module_filename = f"{self.name.lower()}.py"
         general_mod_path = self.file_path/ "_"/ general_module_filename
 
         return get_formatting_functions(general_mod_path, f"formatting_{self.name}")
     
     @property
     def waves(self):
+        """List of names of waves available for country.
+        """
         # Let's first check if there is a 'waves' or 'Waves' defined in {self.name}.py in the _ folder.
         # If 'waves' exists, we will use it. If 'Waves' (usually a dictionary) exists, we will use its keys.
         general_module_filename = f"{self.name.lower()}.py"
@@ -337,7 +334,9 @@ class Country:
         return sorted(waves)
 
     @property
-    def data_scheme(self): 
+    def data_scheme(self):
+        """List of data objects available for country.
+        """
         data_info = self.resources
         data_list = list(data_info.get('Data Scheme', {}).keys()) if data_info else []
         
@@ -390,7 +389,7 @@ class Country:
             if results:
                 df= pd.concat(results.values(), axis=0, sort=False)
                 # return map_index(df, self.name)
-        else:        
+        else:
             # Step 2: Attempt to build using makefile
             print(f"Attempting to generate using Makefile...")
 
