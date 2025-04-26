@@ -9,7 +9,7 @@ Calculate food prices for different items across rounds; allow different prices 
 import pandas as pd
 import numpy as np
 
-years = ['2004-05', '2010-11', '2016-17', '2019-20']
+years = ['2004-05', '2010-11', '2013-14', '2016-17', '2019-20']
 fa = []
 
 for t in years:

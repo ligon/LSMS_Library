@@ -7,8 +7,12 @@ cluster_features:
         v: ea_id
         i: y2_hhid
     myvars:
-        Region: district
-        Rural: reside
+        Region: region
+        Rural: 
+            - reside
+            - 
+                rural: 0
+                urban: 1
 
 household_roster:
     file: HH_MOD_B_13.dta
@@ -19,25 +23,6 @@ household_roster:
         Sex: hh_b03
         Age: hh_b05a
         Relation: hh_b04
-        
-# food_acquired:
-#     idxvars:
-#         v: grappe
-#         visit: passage
-#         i: 
-#             - grappe
-#             - menage
-#         j: s13q01
-#         u: s13q03b
-#     myvars:
-#         Quantity: s13q02
-#         Expenditure: s13q03c
-#         Produced: s13q04a
-#     file:
-#         - EACIALI_p1.dta:
-#             Quantity: s13q03a
-#         - EACIALI_p2.dta
-#     concat_by: rows
 
 
 panel_ids:

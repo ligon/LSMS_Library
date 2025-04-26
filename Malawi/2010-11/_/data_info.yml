@@ -6,8 +6,12 @@ cluster_features:
     idxvars:
         v: ea_id
     myvars:
-        Rural: reside
-        Region: hh_a01
+        Rural: 
+            - reside
+            - 
+                rural: 0
+                urban: 1
+        # Region: hh_a01
 
 subjective_well_being:
     file: Full_Sample/Household/hh_mod_t.dta

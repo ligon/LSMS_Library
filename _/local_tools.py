@@ -879,29 +879,23 @@ def write_df_to_org(df, table_name, filepath=None):
         s += "\n\n"
         return s
     
-def map_index(df, country):
+def map_index(df):
     """
     Map index from old parquet file to new index used in data_info.yml
     -- March 11, 2025
     """
-    # country_list = ['Uganda','Tanzania','Panama', 'Ethiopia','Senegal','Malawi',
-    #                 'Guatemala', 'Serbia', 'Nigeria']
-    country_list = ['Uganda','Tanzania','Panama', 'Ethiopia','Senegal',
-                    'Guatemala', 'Serbia', 'Nigeria', 'Bangladesh']
     mapping_rules = {'w': 't'}
     if 'u' in df.index.names:
         df = df.rename(index={k: 'unit' for k in ['<NA>', 'nan', np.nan]}, level='u')
 
-    if country in country_list:
-        mapping_rules.update({
-            'i': 'temp_j',
-            'j': 'i',
-            'previous_j': 'previous_i'
-        })
-        df_renamed = df.rename_axis(index=mapping_rules)
-        df_renamed = df_renamed.rename_axis(index = {'temp_j': 'j'})
-    else:
-        df_renamed = df.rename_axis(index=mapping_rules)
+
+    mapping_rules.update({
+        'i': 'temp_j',
+        'j': 'i',
+        'previous_j': 'previous_i'
+    })
+    df_renamed = df.rename_axis(index=mapping_rules)
+    df_renamed = df_renamed.rename_axis(index = {'temp_j': 'j'})
     
     return df_renamed
 

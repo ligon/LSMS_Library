@@ -26,9 +26,9 @@ def sex_conv(x):
         return 'm'
 
 #household characteristic code for 2010-11, 2016-17, 2019-20
-def get_household_characteristics(df, year):
+def get_household_characteristics(df, year, hhid = 'case_id'):
     df = age_sex_composition(df, sex='hh_b03', sex_converter=sex_conv,
-                                age='hh_b05a', age_converter=None, hhid='case_id')
+                                age='hh_b05a', age_converter=None, hhid=hhid)
 
     df = df.reset_index()
     df['t'] = year
@@ -70,3 +70,9 @@ def handling_unusual_units(df):
 
 def conversion_table_matching(df, conversions, conversion_label_name, num_matches=3, cutoff = 0.6):
     return conversion_table_matching_global(df, conversions, conversion_label_name, num_matches=num_matches, cutoff = cutoff)
+
+def Sex(value):
+    if isinstance(value, str) and value.strip():
+        return value.strip().upper()[0]
+    else:
+        return np.nan
