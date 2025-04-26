@@ -66,5 +66,5 @@ labelsd = get_categorical_mapping(tablename='harmonize_food',
                                   **{'Label':'Preferred Label'})
 
 final = final.rename(index=labelsd,level='i')
-
+final = final.dropna(how='all')
 to_parquet(final, "food_acquired.parquet")

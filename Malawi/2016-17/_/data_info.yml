@@ -8,8 +8,14 @@ cluster_features:
     idxvars:
         v: ea_id
     myvars:
-        Region: district
-        Rural: reside
+        Region: region 
+        Rural: 
+            - reside
+            - 
+                rural: 0
+                urban: 1
+                RURAL: 1
+                URBAN: 0
 
 subjective_well_being:
     file: Cross_Sectional/hh_mod_t.dta

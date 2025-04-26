@@ -211,9 +211,10 @@ class Wave:
                 return pd.DataFrame()
             
             df = pd.read_parquet(parquet_fn)
+            df = map_index(df)
 
         df = df[df.index.get_level_values('t') == self.year]
-        return map_index(df, self.name)
+        return df
 
     # This cluster_features method is explicitly defined because additional processing is required after calling grab_data.
     def cluster_features(self):
@@ -431,7 +432,7 @@ class Country:
             else:
                 df = get_dataframe(target_path)
 
-        df = map_index(df, self.name)
+            df = map_index(df)
         if 'i' in df.index.names and not df.attrs.get('id_converted') and method_name not in ['panel_ids', 'updated_ids'] and self._updated_ids_cache is not None:
             df = id_walk(df, self.updated_ids)
         return df

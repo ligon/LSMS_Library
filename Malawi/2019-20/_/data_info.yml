@@ -8,8 +8,14 @@ cluster_features:
     idxvars:
         v: ea_id
     myvars:
-        Region: district
-        Rural: reside
+        Region: region
+        Rural: 
+            - reside
+            - #Value mapping dictionary
+                Rural: 0
+                Urban: 1
+                RURAL: 1
+                URBAN: 0
 
 subjective_well_being:
     file: Cross_Sectional/HH_MOD_T.dta
@@ -24,13 +30,13 @@ subjective_well_being:
 household_roster:
     file: 
         - Cross_Sectional/HH_MOD_B.dta
-        - Panel/hh_mod_b_19.dta:
-            i: y4_hhid
+        - Panel/hh_mod_b_19.dta: #override column mapping
+            i: y4_hhid 
             pid: id_code
     idxvars:
         i: 
-            - case_id
-            - function: cs_i
+            - case_id 
+            - function: cs_i #apply function to just case_id column for files using this column
         pid: PID
     myvars:
         Sex: hh_b03

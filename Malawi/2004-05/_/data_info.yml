@@ -6,8 +6,12 @@ cluster_features:
     idxvars:
         v: ea
     myvars:
-        Region: dist
-        Rural: reside
+        Region: region
+        Rural: 
+            - reside
+            - 
+                Rural: 1
+                Urban: 0    
 
 household_roster:
     file: sec_b.dta
