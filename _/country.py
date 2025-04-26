@@ -261,10 +261,11 @@ class Wave:
 class Country:
     #Customed: EEP 153 solving demand equation required data
     required_list = ['food_acquired', 'household_roster', 'cluster_features',
-                    'interview_date', 'household_characteristics',
-                    'food_expenditures', 'food_quantities', 'food_prices', 
-                    'fct', 'nutrition', 'panel_ids']
-    
+                 'interview_date', 'household_characteristics',
+                 'food_expenditures', 'food_quantities', 'food_prices',
+                 'fct', 'nutrition','name','_panel_ids_cache']
+
+
     # from uganda:
     # required_list = ['food_expenditures.parquet', 'food_quantities.parquet', 'food_prices.parquet',
     #                 'household_characteristics.parquet', 'other_features.parquet', 'shocks.parquet',
@@ -357,7 +358,7 @@ class Country:
         data_scheme = set(data_list).union(set(py_ls).intersection(required_list))
 
         return list(data_scheme)
-    
+
     def __getitem__(self, year):
         # Ensure the year is one of the available waves
         if year in self.waves:
@@ -477,20 +478,6 @@ class Country:
                 return self._aggregate_wave_data(waves, name)
             return method
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
-
-
-    def cluster_features(self, waves=None):
-        df = self._aggregate_wave_data(waves, 'cluster_features')
-        if df.empty:
-            return df
-        if 'm' in df.index.names:
-        # if cluster_feature data is from old other_features.parquet file, region is called 'm' so we need to rename it
-            df = df.reset_index(level = 'm').rename(columns = {'m':'Region'})
-        return df
-
-        
-
-
 
 
 
