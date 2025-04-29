@@ -78,7 +78,7 @@ df['u_bought'] = df['u_bought'].replace('nan', np.NaN)
 # prices
 df['price per unit'] = df['expenditure']/df['quantity_bought']
 
-df['t'] = '2010-11'
+df['t'] = '2013-14'
 df = df.reset_index().set_index(['j','t','i']).dropna(how='all')
 
 final = df.loc[:, ['quantity_consumed', 'u_consumed', 'quantity_bought', 'u_bought', 'price per unit', 'expenditure', 'cfactor_consumed', 'cfactor_bought']]

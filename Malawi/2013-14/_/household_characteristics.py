@@ -11,9 +11,9 @@ from lsms import from_dta
 from lsms.tools import get_household_roster
 from malawi import get_household_characteristics
 
-with dvc.api.open('../Data/Full_Sample/Household/hh_mod_b.dta', mode='rb') as dta:
+with dvc.api.open('../Data/HH_MOD_B_13.dta', mode='rb') as dta:
     df = from_dta(dta, convert_categoricals=True)
 
-final = get_household_characteristics(df, '2010-11')
+final = get_household_characteristics(df, '2013-14', hhid='y2_hhid')
 
 to_parquet(final, 'household_characteristics.parquet')
