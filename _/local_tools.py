@@ -16,6 +16,7 @@ from cfe.df_utils import df_to_orgtbl
 from importlib.resources import files
 from dvc.api import DVCFileSystem
 import pyreadstat
+import inspect
 
 # Initialize DVC filesystem once and reuse it
 path = files('lsms_library')/'countries'
@@ -57,6 +58,12 @@ def get_dataframe(fn,convert_categoricals=True,encoding=None,categories_only=Fal
             return False
 
     def read_file(f,convert_categoricals=convert_categoricals,encoding=encoding):
+        if isinstance(f,str):
+            try:
+                return pd.read_spss(f,convert_categoricals=convert_categoricals)
+            except (pd.errors.ParserError, UnicodeDecodeError):
+                pass
+
         try:
             return pd.read_parquet(f, engine='pyarrow')
         except (ArrowInvalid,):
@@ -77,29 +84,37 @@ def get_dataframe(fn,convert_categoricals=True,encoding=None,categories_only=Fal
         try:
             f.seek(0)
             return pd.read_excel(f)
-        except (pd.errors.ParserError, UnicodeDecodeError):
+        except (pd.errors.ParserError, UnicodeDecodeError, ValueError):
             pass
 
         try:
             f.seek(0)
             return pd.read_feather(f)
-        except (pd.errors.ParserError, UnicodeDecodeError):
+        except (pd.errors.ParserError, UnicodeDecodeError,ArrowInvalid) as e:
             pass
 
         try:
             f.seek(0)
             return pd.read_fwf(f)
         except (pd.errors.ParserError, UnicodeDecodeError):
-            pass        
+            pass
+
 
         raise ValueError(f"Unknown file type for {fn}.")
 
     if local_file(fn):
-        with open(fn,mode='rb') as f:
-            df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
+        try:
+            with open(fn,mode='rb') as f:
+                df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
+        except (TypeError,ValueError): # Needs filename?
+            df = read_file(fn,convert_categoricals=convert_categoricals,encoding=encoding)
     elif file_system_path(fn):
-        with fs.open(fn,mode='rb') as f:
-            df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
+        try:
+            with fs.open(fn,mode='rb') as f:
+                df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
+        except TypeError: # Needs filename?
+            df = read_file(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
     else:
         with dvc.api.open(fn,mode='rb') as f:
             df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
