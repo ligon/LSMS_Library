@@ -901,7 +901,7 @@ def age_handler(age = None, interview_date = None, interview_year = None, format
     a function to calculate ages with the best available information for age, prioritizes more precise estimates, in cases where day is unknown, the middle of the month is used
 
     Args:
-        interview_date : interview date, can be passed as a list in [y, m, d] format
+        interview_date : interview date, can be passed as a list in [y, m, d] format, supports dropping columns from right
         interview_year: year of interview; please enter an estimation in case an interview date is not found
         format_interv: argument to be passed into pd.to_datetime(, format=) for interview_date
         age : age in years
@@ -930,7 +930,7 @@ def age_handler(age = None, interview_date = None, interview_year = None, format
             elif len(interview_date) >= 2 and all(pd.notna([interview_date[0], interview_date[1]])):
                 interview_date = str(int(interview_date[1])) + '/15/' + str(int(interview_date[0]))
                 format_interv = "%m/%d/%Y"
-            elif len(interview_date) == 1 and pd.notna(interview_date[0]):
+            elif len(interview_date) >= 1 and pd.notna(interview_date[0]):
                 interview_yr = int(interview_date[0])
         if format_interv:
             final_interview_date = pd.to_datetime(interview_date, format = format_interv)
