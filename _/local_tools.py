@@ -896,4 +896,48 @@ def get_formating_functions(mod_path, name, general__formatting_functions={} ):
     else:
         return general__formatting_functions.update({})
 
+def age_handler(age = None, interview_date = None, interview_year = None, format_interv = None, dob = None, format_dob  = None, m = None, d = None, y = None):
+    '''
+    a function to calculate ages with the best available information for age, prioritizes more precise estimates
 
+    Args:
+        interview_date : interview date
+        interview_year: year of interview; please enter an estimation in case an interview date is not found
+        format_interv: argument to be passed into pd.to_datetime(, format=) for interview_date
+        age : age in years
+        dob: date of birth
+        format_dob: to be passed into pd.to_datetime(, format=) for date of birth
+        m, d, y: month, day, and year of birth respectively, if specified in separate columns
+
+    Returns:
+    an integer representing the best estimate of the age of an individual
+    '''
+
+    date_of_birth = None
+    interview_yr = interview_year
+    year_born = y
+
+    if age is not None and pd.notna(age):
+        return int(age)
+
+    #datetime conversions
+    if interview_date is not None :
+        interview_date = pd.to_datetime(interview_date, format = format_interv)
+        interview_yr = interview_date.year
+    if dob is not None:
+        date_of_birth = pd.to_datetime(dob, format = format_dob)
+        year_born = date_of_birth.year
+
+    #conversion to pd.datetime obj of the date of birth if we are given mdy or all values
+    if m is not None and d is not None and y is not None:
+        date_conv = str(int(m)) + '/' + str(int(d)) + '/' + str(int(y))
+        date_of_birth = pd.to_datetime(date_conv, format = "%m/%d/%Y")
+
+    if interview_date and date_of_birth:
+        return round((interview_date - date_of_birth).days / 365.25, 2)
+    
+    elif year_born and interview_yr:
+        return int(interview_yr) - int(year_born)
+
+    else:
+        return np.nan
