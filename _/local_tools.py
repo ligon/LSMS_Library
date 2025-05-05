@@ -892,7 +892,8 @@ def map_index(df):
     mapping_rules.update({
         'i': 'temp_j',
         'j': 'i',
-        'previous_j': 'previous_i'
+        'previous_j': 'previous_i',
+        'units': 'u'
     })
     df_renamed = df.rename_axis(index=mapping_rules)
     df_renamed = df_renamed.rename_axis(index = {'temp_j': 'j'})

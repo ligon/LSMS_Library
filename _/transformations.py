@@ -74,7 +74,7 @@ def roster_to_characteristics(df, age_cuts=(0,4,9,14,19,31,51), drop = 'pid', fi
     result.columns = result.columns.get_level_values(0)
     return result
 
-def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=['t','m','i'], unit_col = 'u'):
+def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=['t','m','j'], unit_col = 'u'):
     v = df.copy()
     v = v.replace(0, np.nan)
     unit_conversion = {
