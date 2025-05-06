@@ -42,7 +42,7 @@ food_acquired:
         - EACIALI_p1.dta:
             Quantity: s13q03a
         - EACIALI_p2.dta
-    concat_by: rows
+
 
 individual_education:
     file: EACIIND_p1.dta
@@ -75,27 +75,43 @@ interview_date:
             - s00q22j
     converted_categoricals: False
 
-household_education_interview:
-    df:
-        - household_roster
+household_education:
+    dfs:
         - individual_education
-        - foo
-    foo:
-        file: 
-            - EACICONTROLE_p1.dta
-            - EACICONTROLE_p2.dta
+        - household_roster
+    individual_education:
+        file: EACIIND_p1.dta
         idxvars:
             v: grappe
-            i:
+            i: 
                 - grappe
                 - menage
+            pid:
+                - grappe
+                - menage 
+                - s01q
         myvars:
-            Int_t: 
-                - s00q22y
-                - s00q22m
-                - s00q22j
-        converted_categoricals: False
-    merge_on: 
-    # concat_by: 
-
-
+            Highest Education: s01q06
+    household_roster:
+        file: EACIIND_p1.dta
+        idxvars:
+            v: grappe
+            i: 
+                - grappe
+                - menage
+            pid:
+                - grappe
+                - menage 
+                - s01q
+        myvars:
+            Sex: s01q01
+            Age: s01q04a
+            Relation: s01q02
+    merge_on:
+        - v
+        - i
+        - pid
+    final_index:
+        - v
+        - i
+        - pid

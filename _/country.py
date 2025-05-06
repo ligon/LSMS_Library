@@ -37,7 +37,7 @@ class Wave:
         For example, if a user calls `country_instance.food_acquired()` and `food_acquired` is part of the `data_scheme` but not an existing method, 
         the method will dynamically create a function to handle data aggregation for `food_acquired`.
         '''
-        if method_name in self.country.data_scheme:
+        if method_name in self.data_scheme or method_name in self.country.data_scheme:
             def method():
                 return self.grab_data(method_name)
             return method
@@ -72,10 +72,10 @@ class Wave:
         data_info = self.resources
         if data_info:
            wave_data.extend([key for key in data_info.keys() if key not in ['Wave', 'Country']])
-        return list(set(wave_data).intersection(self.country.data_scheme))
+        return list(set(wave_data))
     
     
-    def column_mapping(self, request):
+    def column_mapping(self, request, data_info = None):
         """
         Retrieve column mappings for a given dataset request.And map into dictionary to be ready for df_data_grabber
         Input:
@@ -87,7 +87,7 @@ class Wave:
                               'myvars': {'region': ('region', <function format_id at 0x7f7f5b3f6c10>),
                                          'urban': ('urban', <function format_id at 0x7f7f5b3f6c10>)}}}
         """
-        data_info = self.resources[request]
+        # data_info = self.resources[request]
         
         formatting_functions = self.formatting_functions
 
@@ -102,7 +102,8 @@ class Wave:
             if format_id_function:
                 return (value, format_id)
             return value
-   
+
+
         files = data_info.get('file')
         idxvars = data_info.get('idxvars')
         myvars = data_info.get('myvars')
@@ -169,28 +170,61 @@ class Wave:
             warnings.warn(f"Data scheme does not contain {request} for {self.name}")
             return pd.DataFrame()
         try:
-            mapping_details = self.column_mapping(request)
-            convert_cat = (self.resources.get(request).get('converted_categoricals') is None)
-            df_edit_function = mapping_details.pop('df_edit')
-            dfs = []
-            for file, mappings in mapping_details.items():
-                df = df_data_grabber(f'{self.folder}/Data/{file}', mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat)
-                if 't' not in mappings['idxvars']:
-                    df = df.reset_index().drop_duplicates()
-                    df['t'] = self.year
-                    df = df.set_index(['t']+list(mappings['idxvars'].keys()))
-                # Oddity with large number for missing code
-                na = df.select_dtypes(exclude='object').max().max()
-                if na>1e99:
-                    warnings.warn(f"Large number used for missing?  Replacing {na} with NaN.")
-                    df = df.replace(na,np.nan)
-                dfs.append(df)
-            df = pd.concat(dfs, axis=0, sort=False)
+            data_info = self.resources[request]
+            def check_adding_t(df):
+                index_list = df.index.names
+                if 't' not in index_list:
+                    if 't' not in df.columns:
+                        df['t'] = self.year
+                    final_index = ['t'] + index_list
+                    df = df.reset_index().set_index(final_index)
+                return df
+            def get_data(data_info_dic, mapping_info):
+                convert_cat = (data_info_dic.get('converted_categoricals') is None)
+                df_edit_function = mapping_info.pop('df_edit')
+                dfs = []
+                for file, mappings in mapping_info.items():
+                    df = df_data_grabber(f'{self.folder}/Data/{file}', mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat)
+                    df = check_adding_t(df)
+                    # Oddity with large number for missing code
+                    na = df.select_dtypes(exclude='object').max().max()
+                    if na>1e99:
+                        warnings.warn(f"Large number used for missing?  Replacing {na} with NaN.")
+                        df = df.replace(na,np.nan)
+                    dfs.append(df)
+                df = pd.concat(dfs, axis=0, sort=False)
 
-            if df_edit_function:
-                df = df_edit_function(df)
+                if df_edit_function:
+                    df = df_edit_function(df)
+                    
+                return df
+            
+            # Vertical Merge dfs
+            if data_info.get('dfs'):
+                merge_dfs = []
+                merge_on =list(set('t').union(data_info.get('merge_on')))#a list
+                df_edit_function = data_info.get('df_edit')
+                idxvars_list = list(dict.fromkeys(data_info.get('final_index')))
+                for i in data_info.get('dfs'):
+                    sub_data_info = data_info.get(i)
+                    sub_mapping_details = self.column_mapping(i, sub_data_info)
+                    sub_df = get_data(sub_data_info, sub_mapping_details)
+                    merge_dfs.append(sub_df.reset_index())
+                df = pd.merge(merge_dfs[0], merge_dfs[1], on=merge_on, how='outer')
+                if len(merge_dfs) > 2:
+                    for i in range(2, len(merge_dfs)):
+                        df = pd.merge(df, merge_dfs[i], on=merge_on, how='outer')
+                df = df.set_index(idxvars_list)
+                if df_edit_function:
+                    df = df_edit_function(df)
+
+            else:
+                mapping_details = self.column_mapping(request, data_info)
+                df = get_data(data_info, mapping_details)
+
         except KeyError as e:
             print(f'KeyError: {str(e)} in {self.name}', flush=True)
+            # The reason why not just simply run the python file is some data's python files have dependencies.
             print(f"Attempting to generate using Makefile...", flush=True)
             #cluster features in the old makefile is called 'other_features'
             if request =='cluster_features':
@@ -199,7 +233,8 @@ class Wave:
 
             makefile_path = self.file_path.parent /'_'/ "Makefile"
             if not makefile_path.exists():
-                raise FileNotFoundError(f"Makefile not found in {makefile_path.parent}. Unable to generate required data.")
+                warnings.warn(f"Makefile not found in {makefile_path.parent}. Unable to generate required data.")
+                return pd.DataFrame()
 
             cwd_path = self.file_path.parent / "_"
             relative_parquet_path = parquet_fn.relative_to(cwd_path.parent)  # Convert to relative path
@@ -212,7 +247,8 @@ class Wave:
             
             df = pd.read_parquet(parquet_fn)
             df = map_index(df)
-
+    
+        df = check_adding_t(df)
         df = df[df.index.get_level_values('t') == self.year]
         return df
 
