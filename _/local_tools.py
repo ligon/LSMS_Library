@@ -898,7 +898,7 @@ def get_formating_functions(mod_path, name, general__formatting_functions={} ):
 
 def age_handler(age = None, interview_date = None, interview_year = None, format_interv = None, dob = None, format_dob  = None, m = None, d = None, y = None):
     '''
-    a function to calculate ages with the best available information for age, prioritizes more precise estimates, in cases where day is unknown, the middle of the month is used
+    a function to calculate the age of an individual with the best available information, prioritizes more precise estimates, in cases where day is unknown, the middle of the month is used
 
     Args:
         interview_date : interview date, can be passed as a list in [y, m, d] format, supports dropping columns from right
@@ -955,3 +955,34 @@ def age_handler(age = None, interview_date = None, interview_year = None, format
         return int(interview_yr) - int(year_born)
     else:
         return np.nan
+
+def age_handler_wrapper(df, interview_date = None, interview_year = None, format_interv = None, age = None, dob = None, format_dob = None, m = None, d = None, y = None):
+    '''
+    a function that calculates ages for rows in a dataframe by calling age_handler 
+
+    Args:
+        df: the dataframe
+        interview_date : column interview date
+        interview_year: int year of interview or column, should exist for all rows
+        format_interv: argument to be passed into pd.to_datetime(, format=) for interview_date
+        age : column age
+        dob: column date of birth
+        format_dob: to be passed into pd.to_datetime(, format=) for date of birth
+        m, d, y: columns month, day, and year of birth respectively
+
+    Returns:
+    returns a new Series with the calculated ages
+    '''
+    
+    def row_funct(row):
+        r_age = row[age] if age else None
+        r_interview_date = row[interview_date] if interview_date else None
+        if not isinstance(interview_year, int):
+            interview_year = row[interview_year]
+        r_dob = row[dob] if dob else None
+        r_m = row[m] if m else None
+        r_d = row[d] if d else None
+        r_y = row[y] if y else None
+        return age_handler(age = r_age, interview_date = r_interview_date, interview_year = interview_year, format_interv = format_interv, dob = r_dob, format_dob  = format_dob, m = r_m, d = r_d, y = r_y)
+
+    return df.apply(row_funct, axis=1)
