@@ -4,17 +4,6 @@ from lsms_library.local_tools import format_id
 import numpy as np
 
 
-def in_previous_wave(value):
-    '''
-    Formatting in_previous_wave variable
-    '''
-    mapping = {
-        'Non': 0,
-        'Oui': 1,
-    }
-    return mapping.get(value)
-
-
 def panel_ids(df):
     '''
     filter the dataframe to only include the second visit
@@ -24,4 +13,5 @@ def panel_ids(df):
 
         return (format_id(value[0]) or '') + '0' + (format_id(value[1], zeropadding=2) or '')
     df['previous_i'] = df[['previous_v', 'previous_hid']].apply(previous_i, axis=1)
+    df = df.reset_index().loc[:, ['i', 'previous_i']].drop_duplicates().set_index('i')
     return df

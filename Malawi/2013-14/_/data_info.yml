@@ -1,0 +1,33 @@
+Country: MalawiIHPS
+Wave: 2013-14
+
+cluster_features:
+    file: HH_MOD_A_FILT_13.dta
+    idxvars:
+        v: ea_id
+        i: y2_hhid
+    myvars:
+        Region: region
+        Rural: 
+            - reside
+            - 
+                rural: 0
+                urban: 1
+
+household_roster:
+    file: HH_MOD_B_13.dta
+    idxvars:
+        i: y2_hhid
+        pid: hh_b01
+    myvars:
+        Sex: hh_b03
+        Age: hh_b05a
+        Relation: hh_b04
+
+
+panel_ids:
+    file: HH_MOD_A_FILT_13.dta
+    idxvars:
+        i: y2_hhid
+    myvars:
+        previous_i: case_id

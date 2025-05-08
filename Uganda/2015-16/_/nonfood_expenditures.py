@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
 import sys
 sys.path.append('../../_')
 from uganda import nonfood_expenditures
@@ -23,4 +24,4 @@ ids = ids.set_index('hh').squeeze().to_dict()
 
 x = x.reset_index().replace({'j':ids}).set_index('j')
 
-x.to_parquet('nonfood_expenditures.parquet')
+to_parquet(x, 'nonfood_expenditures.parquet')

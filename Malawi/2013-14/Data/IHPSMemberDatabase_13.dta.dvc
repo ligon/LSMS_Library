@@ -1,0 +1,5 @@
+outs:
+- md5: 7a66256c3d7414f9bc66e2c6cb2df2bb
+  size: 345590
+  hash: md5
+  path: IHPSMemberDatabase_13.dta

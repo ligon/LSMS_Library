@@ -1,0 +1,51 @@
+Country: Malawi
+Wave: 2016-17
+
+cluster_features:
+    file: 
+        - Cross_Sectional/hh_mod_a_filt.dta
+        - Panel/hh_mod_a_filt_16.dta
+    idxvars:
+        v: ea_id
+    myvars:
+        Region: region 
+        Rural: 
+            - reside
+            - 
+                rural: 0
+                urban: 1
+                RURAL: 1
+                URBAN: 0
+
+subjective_well_being:
+    file: Cross_Sectional/hh_mod_t.dta
+    idxvars:
+        i: case_id
+    myvars:
+        Own Step: hh_t05
+        Neighbors Step: hh_t06
+        Friends Step: hh_t07
+
+    
+household_roster:
+    file: 
+        - Cross_Sectional/hh_mod_b.dta
+        - Panel/hh_mod_b_16.dta:
+            i: y3_hhid
+            pid: id_code
+    idxvars:
+        i: 
+            - case_id
+            - function: cs_i
+        pid: pid
+    myvars:
+        Sex: hh_b03
+        Age: hh_b05a
+        Relation: hh_b04
+
+panel_ids:
+    file: Panel/hh_mod_a_filt_16.dta
+    idxvars:
+        i: y3_hhid
+    myvars:
+        previous_i: y2_hhid

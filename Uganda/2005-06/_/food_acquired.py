@@ -2,6 +2,7 @@
 import sys
 sys.path.append('../../_/')
 from uganda import food_acquired
+from lsms_library.local_tools import to_parquet
 
 fn='../Data/GSEC14A.dta'
 
@@ -21,4 +22,4 @@ myvars = dict(item='h14aq2',               # Code label uniquely identifying foo
 
 df = food_acquired(fn,myvars)
 
-df.to_parquet('food_acquired.parquet')
+to_parquet(df, 'food_acquired.parquet')

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
 
 from calendar import month
 import sys
@@ -59,4 +60,4 @@ shocks = shocks.astype({'Shock': 'category',
 shocks.insert(1, 't', '2015-16')
 shocks.set_index(['j','t','Shock'], inplace = True)
 
-shocks.to_parquet('shocks.parquet')
+to_parquet(shocks, 'shocks.parquet')

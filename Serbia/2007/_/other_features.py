@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
 
 import sys
 sys.path.append('../../_/')
@@ -20,4 +21,4 @@ df = df.rename({'region2': 'm',
                 'urban': 'Rural'}, axis=1)
 df.Rural = (df.Rural=='rural') + 0.
 
-df.to_parquet('other_features.parquet')
+to_parquet(df, 'other_features.parquet')

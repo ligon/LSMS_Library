@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
 
 import sys
 sys.path.append('../../_/')
@@ -27,4 +28,4 @@ of = of.set_index(['j','t','m'])
 
 #of['Rural'] = (of.Rural=='Rural') + 0.
 
-of.to_parquet('other_features.parquet')
+to_parquet(of, 'other_features.parquet')

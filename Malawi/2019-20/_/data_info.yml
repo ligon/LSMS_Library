@@ -1,0 +1,52 @@
+Country: Malawi
+Wave: 2019-20
+
+cluster_features:
+    file: 
+        - Cross_Sectional/hh_mod_a_filt.dta
+        - Panel/hh_mod_a_filt_19.dta
+    idxvars:
+        v: ea_id
+    myvars:
+        Region: region
+        Rural: 
+            - reside
+            - #Value mapping dictionary
+                Rural: 0
+                Urban: 1
+                RURAL: 1
+                URBAN: 0
+
+subjective_well_being:
+    file: Cross_Sectional/HH_MOD_T.dta
+    idxvars:
+        i: case_id
+    myvars:
+        Own Step: hh_t05
+        Neighbors Step: hh_t06
+        Friends Step: hh_t07
+
+    
+household_roster:
+    file: 
+        - Cross_Sectional/HH_MOD_B.dta
+        - Panel/hh_mod_b_19.dta: #override column mapping
+            i: y4_hhid 
+            pid: id_code
+    idxvars:
+        i: 
+            - case_id 
+            - function: cs_i #apply function to just case_id column for files using this column
+        pid: PID
+    myvars:
+        Sex: hh_b03
+        Age: hh_b05a
+        Relation: hh_b04
+
+
+panel_ids:
+    file: Panel/hh_mod_a_filt_19.dta
+    idxvars:
+        i: y4_hhid
+    myvars:
+        previous_i: y3_hhid

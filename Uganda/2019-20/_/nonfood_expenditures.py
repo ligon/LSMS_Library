@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
 import sys
 sys.path.append('../../_')
 from uganda import nonfood_expenditures
@@ -13,4 +14,4 @@ myvars = dict(fn='../Data/HH/gsec15c.dta',
 
 x = nonfood_expenditures(**myvars) 
 
-x.to_parquet('nonfood_expenditures.parquet')
+to_parquet(x, 'nonfood_expenditures.parquet')

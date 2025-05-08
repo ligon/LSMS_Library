@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
 import sys
 sys.path.append('../../_')
 from cotedivoire import household_characteristics
@@ -19,5 +20,5 @@ z['m'] = "Cote d'Ivoire"
 
 z = z.reset_index().set_index(['j','t','m'])
 
-z.to_parquet('household_characteristics.parquet')
+to_parquet(z, 'household_characteristics.parquet')
 

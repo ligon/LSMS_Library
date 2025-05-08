@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
 
 import sys
 sys.path.append('../../_/')
@@ -16,4 +17,4 @@ df = get_other_features(df, '2010-11', 'urban')
 
 df['Rural'] = df.Rural - 1
 
-df.to_parquet('other_features.parquet')
+to_parquet(df, 'other_features.parquet')

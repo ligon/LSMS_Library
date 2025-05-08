@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
 
 import sys
 sys.path.append('../../_/')
@@ -22,4 +23,4 @@ df = df.rename(columns = {'q_1_1a' : 'm'})
 df = df.set_index(['t', 'm'], append = True)
 df.columns.name = 'k'
 
-df.to_parquet('household_characteristics.parquet')
+to_parquet(df, 'household_characteristics.parquet')

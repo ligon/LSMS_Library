@@ -8,42 +8,30 @@ import json
 import sys
 sys.path.append('../../_')
 sys.path.append('../../../_')
-from lsms_library.local_tools import add_markets_from_other_features, format_id
+from lsms_library.local_tools import add_markets_from_other_features, format_id, id_walk, RecursiveDict, get_dataframe, update_id
 from collections import defaultdict
 
 country = 'Tanzania'
 
-def map_08_15(df, v1, D):
-    r_hhid_column, round_column, uphis_column = v1
-    # Group by household_id and round to a list of uphis
-    grouped = df.groupby([r_hhid_column, round_column])[uphis_column].apply(list).to_dict()
-
-    # Sort groups for orderly processing
-    sorted_keys = sorted(grouped.keys(), key=lambda x: x[1])  # Sort by round number
-    for key in sorted_keys:
-        hh_id, round_num = key
-        uphis = grouped[key]
-
-        # Loop through each previously processed group to find intersections of uphis
-        for prev_key in sorted_keys:
-            if prev_key[1] >= round_num:  # Skip the current and future entries
-                break
-            other_hh_id, other_round_num = prev_key
-            other_uphis = grouped[prev_key]
-
-            if set(uphis).intersection(other_uphis):
-                # Assign the hh_id to the identifier from the lowest intersecting round
-                D[hh_id] = other_hh_id
-                # End the loop early if processing the lowest possible round
-                if other_round_num == 1:
-                    break
-    return D
+def map_08_15(df, col):
+    # hhid index is defined as 'i' in this function to use panel_ids function in local_tools
+    hhid = df[col]
+    hhid_sorted = hhid.sort_values(['UPHI', 'round'])
+    hhid_sorted['previous_i'] = hhid_sorted.groupby('UPHI')['r_hhid'].shift(1)
+    map_round = {1: '2008-09', 2: '2010-11', 3: '2012-13', 4: '2014-15'}
+    hhid_sorted['round'] = hhid_sorted['round'].map(map_round)
+    hhid_sorted = hhid_sorted.dropna(how='any')
+    hhid_sorted.rename(columns={'r_hhid': 'i', 'round': 't'}, inplace=True)
+    hhid_sorted = hhid_sorted.set_index(['t', 'i'])[['previous_i']]
+    hhid_sorted = hhid_sorted.loc[~hhid_sorted.index.duplicated(keep='first')]
+    return hhid_sorted
 
 Waves = {'2008-15':('upd4_hh_a.dta',['r_hhid','round','UPHI'], map_08_15),
          '2019-20':('HH_SEC_A.dta','sdd_hhid','y4_hhid'),
          '2020-21':('hh_sec_a.dta','y5_hhid','y4_hhid')}
 
 waves = ['2008-09', '2010-11', '2012-13', '2014-15', '2019-20', '2020-21']
+wave_folder_map = {'2008-09':'2008-15', '2010-11':'2008-15', '2012-13':'2008-15', '2014-15':'2008-15', '2019-20':'2019-20', '2020-21':'2020-21'}
 
 def harmonized_food_labels(fn='../../_/food_items.org'):
     # Harmonized food labels
@@ -277,62 +265,106 @@ def new_harmonize_units(df, unit_conversion):
     return df
 
 
-import json
-from collections import defaultdict
+def id_walk(df, updated_ids, hh_index='j'):
+    '''
+    Updates household IDs in panel data across different waves separately.
 
-def id_walk(df, updated_ids, index ='j'):
-    df =df.reset_index(index)
-    df[index] = df[index].map(updated_ids).fillna(df[index])
-    df[index] = df[index].apply(format_id)
-    df = df.set_index([index], append=True)
-    df = df.reorder_levels([index] + [name for name in df.index.names if name != index])
-    return df
+    Parameters:
+        df (DataFrame): Panel data with a MultiIndex, including 't' for wave and 'i' (default) for household ID.
+        updated_ids (dict): A dictionary mapping each wave to another dictionary that maps original household IDs to updated IDs.
+            Format:
+                {wave_1: {original_id: new_id, ...},
+                 wave_2: {original_id: new_id, ...}, ...}
+        hh_index (str): Index name for the household ID level (default is 'i').
 
-def panel_attrition(df, Waves, return_ids=False, waves = None,  split_households_new_sample=True):
-    """
-    Produce an upper-triangular) matrix showing the number of households (j) that
-    transition between rounds (t) of df.
+    Example:
+        updated_ids = {
+            '2013-14': {'0001-001': '101012150028', '0009-001': '101015620053', '0005-001': '101012150022'},
+            '2016-17': {'0001-002': '0001-001', '0003-001': '0005-001', '0005-001': '0009-001'}
+        }
 
-        split_households_new_sample (bool): Determines how to count split households:
-                                - If True, we assume split_households as new sample. So we
-                                     do not count and trace splitted household, only counts 
-                                     the primary household in each split. The number represents
-                                     how many main (primary) households in previous waves have 
-                                     appeared in current round.
-                                - If False, counts all split households that can be traced 
-                                    back to previous wave households. The number represents how 
-                                    many households (including splitted households
-                                    round can be traced back to the previous round.
+        In this example, IDs are updated independently for each wave.
+        Because the same original household ID across different waves may not represent the same household.
+        Specifically, household '0005-001' in wave '2016-17' corresponds to household '0009-001' from wave '2013-14', not '0005-001' from '2013-14'.
+
+    The function handles these wave-specific mappings separately, ensuring accurate household identification over time.
+    '''
+    #seperate df into different waves:
+    dfs = {}
+    waves = df.index.get_level_values('t').unique()
+    for wave in waves:
+        dfs[wave] = df[df.index.get_level_values('t') == wave].copy()
+    #update ids for each wave
+    for wave, df_wave in dfs.items():
+        #update ids
+        if wave in updated_ids:
+            df_wave = df_wave.rename(index=updated_ids[wave], level=hh_index)
+            #update the dataframe with the new ids
+            dfs[wave] = df_wave
+        else:
+            continue
+    #combine the updated dataframes
+    df = pd.concat(dfs.values(), axis=0)
+
+    # df= df.rename(index=updated_ids,level=['t', hh_index])
+    df.attrs['id_converted'] = True
+    return df  
 
 
-    Notes：
-        2008-09, 2010-11, and 2012-13 rounds follow the same sample design.
-        In the 2014-15 round, the sample was revisited and refreshed, which consists a combination of 
-        the original NPS sample (Extended Panel) and a new sample (Refreshment Panel).
-        The 2019-20 round focuses on Extended Panel sample and the 2020-21 follows Refresh Panel cohort, 
-        and introduced an additional sample of households.
-        That is the reason why in our panel attrition result, the number of household intersections 
-        between 2019-20 and 2020-21 is very small.
-    """
-    idxs = df.reset_index().groupby('t')['j'].apply(list).to_dict()
 
-    if waves is None:
-        waves = list(Waves.keys())
+def panel_ids(Waves):
+    '''
+    Input: DataFrame with a MultiIndex that includes a level named 't' representing the wave and 'i' current househod ID'
+            And single 'previous_i' column as the previous household ID.
+    Output: Wave-specific panel id mapping dictionaires and a recursive dictionary of tuple of (wave, household identifiers)
+    '''
+    if isinstance(Waves, dict):
+        dfs = []
+        for wave_year, wave_info in Waves.items():
+            if not wave_info:
+                continue  # skip empty entries
 
-    foo = pd.DataFrame(index=waves,columns=waves)
-    IDs = {}
-    for m,s in enumerate(waves):
-        for t in waves[m:]:
-            pairs = set(idxs[s]).intersection(idxs[t])
-            list2_rest = set(idxs[t]) - pairs
-            if not split_households_new_sample:
-                new_paired = {i for i in list2_rest  if i.split('_')[0] in idxs[s]}
-                pairs.update(new_paired)   
-                
-            IDs[(s,t)] = pairs
-            foo.loc[s,t] = len(IDs[(s,t)])
+            file_path = f"../{wave_year}/Data/{wave_info[0]}"
+            if isinstance(wave_info[1], list):
+                columns = wave_info[1]
+            else:
+                columns = [wave_info[1], wave_info[2]]
 
-    if return_ids:
-        return foo,IDs
+            df = get_dataframe(file_path)[columns]
+
+            # Process mapping when recent_id is a list (list-based mapping)
+            if isinstance(wave_info[1], list): #tanzania
+                df = wave_info[2](df, wave_info[1])
+            else:
+                df[wave_info[1]] = df[wave_info[1]].apply(format_id)
+                df[wave_info[2]] = df[wave_info[2]].apply(format_id)
+                # If a transformation function is provided (tuple length 4), apply it to the old_id column
+                if len(wave_info) == 4:
+                    df[wave_info[2]] = df[wave_info[2]].apply(wave_info[3])
+                df['t'] = wave_year
+                df = df.rename(columns={wave_info[1]: 'i', wave_info[2]: 'previous_i'})
+                df = df.set_index(['t', 'i'])[['previous_i']]
+            dfs.append(df)
+        panel_ids_df = pd.concat(dfs, axis=0)
     else:
-        return foo
+        # If Waves is not a dictionary, assume it's a DataFrame
+        panel_ids_df = Waves.copy()
+
+    updated_wave = {}
+    check_id_split = {}
+    sorted_waves = sorted(panel_ids_df.index.get_level_values('t').unique())
+    recursive_D = RecursiveDict()
+    for wave_year in sorted_waves:
+        df = panel_ids_df[panel_ids_df.index.get_level_values('t') == wave_year].copy().reset_index()
+        wave_matches = df[['i', 'previous_i']].dropna().set_index('i')['previous_i'].to_dict()
+        previous_wave = sorted_waves[sorted_waves.index(wave_year) - 1] if sorted_waves.index(wave_year) > 0 else None
+        if wave_year == '2020-21':
+            previous_wave = '2014-15'
+        if previous_wave:
+            previous_wave_matches = updated_wave[previous_wave]
+            # update the current wave matches dictionary values to the previous wave matches
+            wave_matches = {k: previous_wave_matches.get(v, v)for k, v in wave_matches.items()}
+            recursive_D.update({(wave_year, k): (previous_wave, v) for k, v in wave_matches.items()})
+        wave_matches, check_id_split = update_id(wave_matches,  check_id_split)
+        updated_wave[wave_year] = wave_matches
+    return recursive_D, updated_wave

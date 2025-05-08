@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 """
 Compile data on reported household assets.
 """
@@ -11,7 +13,7 @@ x = {}
 
 for t in list(Waves.keys()):
     print(t)
-    x[t] = pd.read_parquet('../'+t+'/_/enterprise_income.parquet')
+    x[t] = get_dataframe('../'+t+'/_/enterprise_income.parquet')
     x[t].columns.name = 'k'
     x[t]= x[t].stack().squeeze()
 
@@ -26,4 +28,4 @@ x = x.reset_index().set_index(['j','t','m'])
 updated_ids = json.load(open('updated_ids.json'))
 x = id_walk(x, updated_ids)
 
-x.to_parquet('../var/enterprise_income.parquet')
+to_parquet(x, '../var/enterprise_income.parquet')

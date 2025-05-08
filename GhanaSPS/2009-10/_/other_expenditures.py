@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
 import sys
 import dvc.api
 import pandas as pd
@@ -29,5 +30,5 @@ x = x.reset_index().set_index(['j','t','m'])
 
 x = x.replace(0.,np.nan)
 
-x.to_parquet('other_expenditures.parquet')
+to_parquet(x, 'other_expenditures.parquet')
 

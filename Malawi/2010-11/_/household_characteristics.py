@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
 
 import sys
 sys.path.append('../../_/')
@@ -15,4 +16,4 @@ with dvc.api.open('../Data/Full_Sample/Household/hh_mod_b.dta', mode='rb') as dt
 
 final = get_household_characteristics(df, '2010-11')
 
-final.to_parquet('household_characteristics.parquet')
+to_parquet(final, 'household_characteristics.parquet')

@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 """Calculate food prices for different items across rounds; allow
 different prices for different units.  
 """
@@ -6,7 +8,7 @@ import pandas as pd
 import numpy as np
 import json
 
-v = pd.read_parquet('../var/food_acquired.parquet')
+v = get_dataframe('../var/food_acquired.parquet')
 
 # Drop expenditures
 prices = ['market', 'farmgate', 'unitvalue_home', 'unitvalue_away', 'unitvalue_own',
@@ -19,7 +21,7 @@ expenditures = ['value_home', 'value_away', 'value_own', 'value_inkind']
 x = v.groupby(['j','t','m','i'])[expenditures].sum()
 x = x.sum(axis=1).replace(0,np.nan).dropna()
 
-pd.DataFrame({'x':x}).to_parquet('../var/food_expenditures.parquet')
+to_parquet(pd.DataFrame({'x':x}), '../var/food_expenditures.parquet')
 
 v = v[prices + quantities]
 
@@ -47,7 +49,7 @@ p = p.rename(index=tokg,level='u')
 q = q.rename(index=tokg,level='u')
 
 p = p.replace(0,np.nan)
-p.to_parquet('../var/food_prices.parquet')
+to_parquet(p, '../var/food_prices.parquet')
 
 q = q.replace(0,np.nan)
-q.to_parquet('../var/food_quantities.parquet')
+to_parquet(q, '../var/food_quantities.parquet')

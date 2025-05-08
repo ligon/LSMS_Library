@@ -70,7 +70,6 @@ interview_date:
 panel_ids:
     file: s00_me_mli2021.dta
     idxvars:
-        v: grappe
         visit: vague
         i: 
             - grappe
@@ -78,7 +77,11 @@ panel_ids:
     myvars:
         previous_v: s00q07f1
         previous_hid: s00q07f2
-        in_previous_wave: PanelHH
-
+        #using df_data_grabber {new_col_name: (old_col_name, transformation)}, can direct mapping values by input a dictionary as transformation
+        in_previous_wave: 
+            - PanelHH
+            - # A dictionary can be used to map values
+                'Non': 0
+                'Oui': 1 
 
 

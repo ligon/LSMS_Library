@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 """
 Compile data on food quantities across all rounds, with harmonized units & food names.
 """
@@ -9,7 +11,7 @@ import json
 
 q={}
 for t in ['2008-09','2010-11','2012-13','2014-15']:
-    q[t] = pd.read_parquet('../'+t+'/_/food_quantities.parquet')
+    q[t] = get_dataframe('../'+t+'/_/food_quantities.parquet')
     q[t] = q[t].reset_index().set_index(['j','i','u']).squeeze()
     q[t] = q[t].replace(0,np.nan).dropna()
 
@@ -38,4 +40,4 @@ q = q.reset_index().apply(to_kgs,axis=1).set_index(['t','j','i','u'])
 
 q = q.groupby(['t','j','i','u']).sum()
 
-q.to_parquet('food_quantities.parquet')
+to_parquet(q, 'food_quantities.parquet')

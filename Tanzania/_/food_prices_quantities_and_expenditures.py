@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 """
 Calculate expenditures, prices, and quantities.
 
@@ -9,7 +11,7 @@ import pandas as pd
 import numpy as np
 import json
 
-fa = pd.read_parquet('../var/food_acquired.parquet')
+fa = get_dataframe('../var/food_acquired.parquet')
 
 # Distinguish expenditures, quantities, and prices Conception is somewhat
 # different from other LSMSs (e.g., Uganda). Focus is on quantities /consumed/
@@ -30,14 +32,14 @@ p = p.reset_index().set_index(['j','t','m','i','u'])
 
 assert p.index.is_unique, "Non-unique index!  Fix me!"
 
-p.to_parquet('../var/food_prices.parquet')
+to_parquet(p, '../var/food_prices.parquet')
 
 q = fa[quantities].rename(columns = {'unit_ttl_consume': 'u'})
 q = q.reset_index().set_index(['j','t','m','i','u'])
 
 assert q.index.is_unique, "Non-unique index!  Fix me!"
 
-q.to_parquet('../var/food_quantities.parquet')
+to_parquet(q, '../var/food_quantities.parquet')
 
 # Now, using median unit prices, value quantities consumed q
 
@@ -50,4 +52,4 @@ x = x.replace(0,np.nan).dropna()
 
 assert x.index.is_unique, "Non-unique index!  Fix me!"
 
-pd.DataFrame({'consumed value':x}).to_parquet('../var/food_expenditures.parquet')
+to_parquet(pd.DataFrame({'consumed value':x}), '../var/food_expenditures.parquet')

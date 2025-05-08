@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
 """
 Create a nutrition DataFrame for households based on food consumption quantities
 """
@@ -30,4 +31,4 @@ useful_fct = useful_fct.loc[~useful_fct.index.duplicated()]
 useful_fct.index.name = 'Food'
 useful_fct = useful_fct.fillna(0)
 
-useful_fct.to_parquet('../var/fct.parquet')
+to_parquet(useful_fct, '../var/fct.parquet')

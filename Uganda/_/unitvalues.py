@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 """
 Calculate unit values for different items across rounds.
 """
@@ -6,13 +8,13 @@ Calculate unit values for different items across rounds.
 import pandas as pd
 import numpy as np
 
-q = pd.read_parquet('../var/food_quantities.parquet').squeeze()
+q = get_dataframe('../var/food_quantities.parquet').squeeze()
 # Use_units turns out to almost always be kilograms...
 q = q.xs('Kg',level='u')
 q = q.replace(0.0,np.nan).dropna()
 
-x = pd.read_parquet('../var/food_expenditures.parquet').stack('i')
+x = get_dataframe('../var/food_expenditures.parquet').stack('i')
 
 unitvalues = (x/q).dropna().unstack('i')
 
-unitvalues.to_parquet('../var/unitvalues.parquet')
+to_parquet(unitvalues, '../var/unitvalues.parquet')

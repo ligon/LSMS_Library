@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
 
 import sys
 sys.path.append('../../_/')
@@ -25,4 +26,4 @@ final['t'] = '2000'
 final = final.set_index(['j','t'])
 final.columns.name = 'k'
 
-final.to_parquet('household_characteristics.parquet')
+to_parquet(final, 'household_characteristics.parquet')

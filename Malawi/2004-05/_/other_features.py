@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
 
 import sys
 sys.path.append('../../_/')
@@ -14,4 +15,4 @@ with dvc.api.open('../Data/sec_a.dta', mode='rb') as dta:
 
 df = get_other_features(df, '2004-05', 'reside')
 
-df.to_parquet('other_features.parquet')
+to_parquet(df, 'other_features.parquet')

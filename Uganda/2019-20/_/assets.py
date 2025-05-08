@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
 import numpy as np
 import pandas as pd
 import dvc.api
@@ -14,4 +15,4 @@ assets = df.groupby('hhid')['h14q05'].sum().replace(0,np.nan)
 assets.index.name = 'j'
 assets.name = 'assets'
 
-pd.DataFrame({"Assets":assets}).to_parquet('assets.parquet')
+to_parquet(pd.DataFrame({"Assets":assets}), 'assets.parquet')

@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 """
 Read and conglomerate housing data
 """
@@ -11,7 +13,7 @@ x = {}
 
 for t in list(Waves.keys()):
     print(t)
-    x[t] = pd.read_parquet('../'+t+'/_/housing.parquet')
+    x[t] = get_dataframe('../'+t+'/_/housing.parquet')
     x[t] = x[t].stack('k').dropna()
     x[t] = x[t].reset_index().set_index(['j','k']).squeeze()
     x[t] = x[t].replace(0,np.nan).dropna()
@@ -31,4 +33,4 @@ x = x.fillna(0)
 updated_ids = json.load(open('updated_ids.json'))
 x = id_walk(x, updated_ids)
 
-x.to_parquet('../var/housing.parquet')
+to_parquet(x, '../var/housing.parquet')

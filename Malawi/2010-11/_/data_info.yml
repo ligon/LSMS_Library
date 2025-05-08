@@ -1,0 +1,41 @@
+Country: Malawi
+Wave: 2010-11
+
+cluster_features:
+    file: Full_Sample/Household/hh_mod_a_filt.dta
+    idxvars:
+        v: ea_id
+    myvars:
+        Rural: 
+            - reside
+            - 
+                rural: 0
+                urban: 1
+        # Region: hh_a01
+
+subjective_well_being:
+    file: Full_Sample/Household/hh_mod_t.dta
+    idxvars:
+        i: case_id
+    myvars:
+        Own Step: hh_t05
+        Neighbors Step: hh_t06
+        Friends Step: hh_t07
+
+household_roster:
+    file: Full_Sample/Household/hh_mod_b.dta
+    idxvars:
+        i: case_id
+        pid: id_code
+    myvars:
+        Sex: hh_b03
+        Age: hh_b05a
+        Relation: hh_b04
+
+
+# panel_ids:
+#     file: Full_Sample/Household/hh_mod_a_filt.dta
+#     idxvars:
+#         i: case_id
+#     myvars:
+#         previous_i: case_id

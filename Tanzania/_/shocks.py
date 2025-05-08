@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 """
 Concatenate data on shocks across rounds.
 """
@@ -15,7 +17,7 @@ import json
 
 s={}
 for t in Waves.keys():
-    s[t] = pd.read_parquet('../'+t+'/_/shocks.parquet')
+    s[t] = get_dataframe('../'+t+'/_/shocks.parquet')
 
 s = pd.concat(s.values())
 
@@ -32,4 +34,4 @@ with open('updated_ids.json','r') as f:
 s = id_walk(s, updated_ids)
 
 
-s.to_parquet('../var/shocks.parquet')
+to_parquet(s, '../var/shocks.parquet')

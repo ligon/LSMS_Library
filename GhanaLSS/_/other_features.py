@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import get_dataframe
 """
 Concatenate data on other household features across rounds.
 """
@@ -30,7 +31,7 @@ def id_walk(df,wave,waves):
 x = {}
 
 for t in Waves.keys():
-    x[t] = pd.read_parquet('../'+t+'/_/other_features.parquet')
+    x[t] = get_dataframe('../'+t+'/_/other_features.parquet')
     if 't' in x[t].index.names:
         x[t] = x[t].droplevel('t')
     x[t] = id_walk(x[t],t,Waves)

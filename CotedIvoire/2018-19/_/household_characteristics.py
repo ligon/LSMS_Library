@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
 import sys
 sys.path.append('../../_')
 from lsms.tools import get_household_roster
@@ -81,5 +82,5 @@ df.set_index(['j','t','m'],inplace=True)
 
 z = z.join(df['Rural'])
 
-z.to_parquet('household_characteristics.parquet')
+to_parquet(z, 'household_characteristics.parquet')
 

@@ -1,0 +1,32 @@
+Country: Malawi
+Wave: 2004-05
+
+cluster_features:
+    file: sec_a.dta
+    idxvars:
+        v: ea
+    myvars:
+        Region: region
+        Rural: 
+            - reside
+            - 
+                Rural: 1
+                Urban: 0    
+
+household_roster:
+    file: sec_b.dta
+    idxvars:
+        i: case_id
+        pid: memid
+    myvars:
+        Sex: b03
+        Age: b05a
+        Relation: b04
+
+
+# panel_ids:
+#     file: sec_a.dta
+#     idxvars:
+#         i: case_id
+#     myvars:
+#         previous_i: case_id

@@ -1,10 +1,12 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 """
 Concatenate data on household characteristics across rounds.
 """
 
 import pandas as pd
 
-z = pd.read_parquet('../2019-20/_/household_characteristics.parquet')
+z = get_dataframe('../2019-20/_/household_characteristics.parquet')
 
-z.to_parquet('../var/household_characteristics.parquet')
+to_parquet(z, '../var/household_characteristics.parquet')

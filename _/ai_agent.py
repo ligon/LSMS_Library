@@ -8,7 +8,7 @@ import json
 import re
 
 api_key = "Type your API key here" 
-# self.api_key = authinfo.get_password_for_machine('api.openai.com')
+# api_key = authinfo.get_password_for_machine('api.openai.com')
 class gpt_agent:
     def __init__(self, api_key=api_key):
         self.api_key = api_key
@@ -23,7 +23,7 @@ class gpt_agent:
 
     def get_payload(self, prompt_text):
         payload={
-            'model':"gpt-4",
+            'model':"gpt-4o",
             'messages': [
                 {"role": "system", "content": self.agent_role},
                 {"role": "user", "content": prompt_text}

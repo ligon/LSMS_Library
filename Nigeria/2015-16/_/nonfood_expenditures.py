@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
 import sys
 import numpy as np
 import pandas as pd
@@ -71,4 +72,4 @@ x.set_index(['j','t','m','i'],inplace=True)
 
 x = x['value'].unstack('i')
 
-x.to_parquet('nonfood_expenditures.parquet',compression='gzip')
+to_parquet(x, 'nonfood_expenditures.parquet',compression='gzip')

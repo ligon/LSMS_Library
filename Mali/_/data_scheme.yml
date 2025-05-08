@@ -1,0 +1,28 @@
+Country: Mali
+
+Data Scheme:
+  cluster_features:
+    index: (t, v)
+    Region: str
+    Rural: str
+  household_roster:
+    index: (t, v, i, pid)
+    Sex: str
+    Age: int
+    Relationship: str
+  individual_education:
+    index: (t, v, i, pid)
+    Highest Education: str
+  food_acquired:
+    index: (t, v, visit, i, j, u)
+    Quantity: float
+    Price: float
+    Produced: float
+  interview_date:
+    index: (t, v, visit, i)
+    Int_t: str
+  panel_ids:
+    index: (t, i)
+    previous_i: str
+
+

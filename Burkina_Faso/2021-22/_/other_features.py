@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import get_dataframe
 
 import sys
 sys.path.append('../../_/')
@@ -16,7 +17,7 @@ with dvc.api.open('../Data/s00_me_bfa2021.dta', mode='rb') as dta:
 df['j'] = df["hhid"].astype(int).astype(str)
 df  = df.groupby('j').agg({'s00q01' : 'first', 's00q04': 'first'}).rename({'s00q01': 'm', 's00q04':'Rural'}, axis =1)
 
-time = pd.read_parquet('household_characteristics.parquet').reset_index().groupby('j').agg({'t':'first'})
+time = get_dataframe('household_characteristics.parquet').reset_index().groupby('j').agg({'t':'first'})
 
 df = pd.merge(left = df, right = time, how = 'left', left_index = True, right_index = True)
 df['Rural'] = df['Rural'].map({'Rural':1, 'Urbain':0})

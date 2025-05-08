@@ -1,3 +1,4 @@
+from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python3
 import pandas as pd
 import dvc.api
@@ -120,4 +121,4 @@ district_price = out[['price_d','w_d']].T.apply(lambda x: price_per_unit(x['pric
 
 vg = village_price.apply(lambda x: x.m).groupby(['i','m'])
 
-vg.median().unstack('m').to_parquet('community_prices.parquet')
+to_parquet(vg.median().unstack('m'), 'community_prices.parquet')

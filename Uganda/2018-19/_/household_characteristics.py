@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
 
 import sys
 sys.path.append('../../_/')
@@ -25,4 +26,4 @@ df['log HSize'] = np.log(N[N>0])
 #with dvc.api.open('../Data/GSEC1.dta',mode='rb') as dta:
  #   id = pd.read_stata(dta,convert_categoricals=False)
 
-df.to_parquet('household_characteristics.parquet')
+to_parquet(df, 'household_characteristics.parquet')

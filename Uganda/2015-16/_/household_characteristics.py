@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
 
 import sys
 sys.path.append('../../_/')
@@ -20,4 +21,4 @@ N = df.sum(axis=1)
 
 df['log HSize'] = np.log(N[N>0])
 
-df.to_parquet('household_characteristics.parquet')
+to_parquet(df, 'household_characteristics.parquet')

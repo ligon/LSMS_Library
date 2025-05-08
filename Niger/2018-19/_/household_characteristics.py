@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
 import sys
 sys.path.append('../../_/')
 import pandas as pd
@@ -36,4 +37,4 @@ hh = age_sex_composition(joined, sex='s01q01', sex_converter=(lambda x: 'm' if x
 final = pd.merge(hh, region, how= 'left', left_index=True, right_index=True).rename({'s00q01': 'm'}, axis = 1)
 final = final.set_index(['t', 'm'], append = True)
 
-final.to_parquet('household_characteristics.parquet')
+to_parquet(final, 'household_characteristics.parquet')

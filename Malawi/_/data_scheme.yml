@@ -1,0 +1,23 @@
+Country: Malawi
+
+Data Scheme:
+  cluster_features:
+    index: (t, v)
+    Region: str
+    Rural: str
+  household_roster:
+    index: (t, i, pid)
+    Sex: str
+    Age: int
+    Relationship: str
+  interview_date:
+    index: (t, v, i)
+    Int_t: str
+  subjective_well_being:
+    index: (t,i)
+    Own Step: int
+    Neighbors Step: int
+    Friends Step: int
+  panel_ids:
+    index: (t, i)
+    previous_i: str

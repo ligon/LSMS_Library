@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 
 import pandas as pd
 import numpy as np
@@ -6,7 +8,7 @@ import json
 
 P = []
 for t in ['2010-11','2012-13','2015-16']: #,'2018-19']:
-    P.append(pd.read_parquet('../%s/_/unitvalues.parquet' % t))
+    P.append(get_dataframe('../%s/_/unitvalues.parquet' % t))
 
 p = pd.concat(P,axis=0)
 
@@ -23,4 +25,4 @@ p = p.groupby('i',axis=1).sum()
 
 p = p.replace(0,np.nan)
 
-p.to_parquet('../var/unitvalues.parquet')
+to_parquet(p, '../var/unitvalues.parquet')

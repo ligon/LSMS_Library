@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 """
 Concatenate data on other household features across rounds.
 """
@@ -7,7 +9,7 @@ import pandas as pd
 
 x = []
 for t in ['1997', '2003', '2008']:
-    df = pd.read_parquet('../'+t+'/_/other_features.parquet')
+    df = get_dataframe('../'+t+'/_/other_features.parquet')
     df = df.reset_index()
     df['t'] = t
     df['j'] = t + df['j']
@@ -17,4 +19,4 @@ for t in ['1997', '2003', '2008']:
 concatenated = pd.concat(x)
 concatenated.replace({'Comarca de San Blas': 'Comarca Kuna Yala'})
 
-concatenated.to_parquet('../var/other_features.parquet')
+to_parquet(concatenated, '../var/other_features.parquet')

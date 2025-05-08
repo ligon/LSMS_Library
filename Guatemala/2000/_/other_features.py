@@ -1,3 +1,4 @@
+from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python3
 
 import sys
@@ -31,4 +32,4 @@ of = of.groupby(['j','t','m']).head(1)
 
 of = of.set_index(['j','t','m'])
 
-of.to_parquet('other_features.parquet')
+to_parquet(of, 'other_features.parquet')

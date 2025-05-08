@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
 
 import sys
 sys.path.append('../../_/')
@@ -22,4 +23,4 @@ regions['Rural'] = (regions.Rural!=1) + 0 # Includes rural, indigena, dificil
 regions['j'] = regions['j'].map(str)
 regions = regions.set_index(['j','m'])
 
-regions.to_parquet('other_features.parquet')
+to_parquet(regions, 'other_features.parquet')

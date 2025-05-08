@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
 
 import sys
 sys.path.append('../../_/')
@@ -29,4 +30,4 @@ df = df.rename(dict, axis = 1).reset_index()
 final = df.loc[:, ['j', 'i', 'Quantity', 'units', 'Total Expenditure', 'Price']]
 
 final = final.set_index(['j','i'])
-final.to_parquet('food_acquired.parquet')
+to_parquet(final, 'food_acquired.parquet')

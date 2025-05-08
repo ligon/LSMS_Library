@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
 
 import sys
 sys.path.append('../../_/')
@@ -50,4 +51,4 @@ concatenated = pd.concat(x)
 
 concatenated.columns.name = 'k'
 
-concatenated.to_parquet('household_characteristics.parquet')
+to_parquet(concatenated, 'household_characteristics.parquet')

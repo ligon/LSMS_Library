@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library.local_tools import to_parquet
 
 import sys
 sys.path.append('../../_/')
@@ -33,4 +34,4 @@ df['t'] = round
 
 df = df.reset_index().set_index(['j','t','m'])[['Rural']]
 
-df.to_parquet('other_features.parquet')
+to_parquet(df, 'other_features.parquet')

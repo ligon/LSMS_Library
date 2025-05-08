@@ -189,50 +189,48 @@ def other_features(fn,urban=None,region=None,HHID='HHID',urban_converter=None):
 
     return df
 
-#def id_walk(df, updated_ids, index ='j'):
-#    level_num = df.index.names.index(index)
-#    new_level = df.index.get_level_values(index).map(lambda x: updated_ids.get(x, x))
-#    df.index = df.index.set_levels(df.index.levels[:level_num] + [new_level] + df.index.levels[level_num + 1:])
-#    return df
-def id_walk(df, updated_ids, index ='j'):
-    return df.rename(index=updated_ids,level=index)
+def id_walk(df, updated_ids, hh_index='j'):
+    '''
+    Updates household IDs in panel data across different waves separately.
 
-def panel_attrition(df, Waves, return_ids=False, waves = None,  split_households_new_sample=True):
-    """
-    Produce an upper-triangular) matrix showing the number of households (j) that
-    transition between rounds (t) of df.
-            split_households_new_sample (bool): Determines how to count split households:
-                                - If True, we assume split_households as new sample. So we
-                                     do not count and trace splitted household, only counts 
-                                     the primary household in each split. The number represents
-                                     how many main (primary) households in previous waves have 
-                                     appeared in current round.
-                                - If False, counts all split households that can be traced 
-                                    back to previous wave households. The number represents how 
-                                    many households (including splitted households
-                                    round can be traced back to the previous round.
-    
-    Note: First three rounds used same sample. Splits of the main households may happen in different rounds.
-    """
-    idxs = df.reset_index().groupby('t')['j'].apply(list).to_dict()
+    Parameters:
+        df (DataFrame): Panel data with a MultiIndex, including 't' for wave and 'i' (default) for household ID.
+        updated_ids (dict): A dictionary mapping each wave to another dictionary that maps original household IDs to updated IDs.
+            Format:
+                {wave_1: {original_id: new_id, ...},
+                 wave_2: {original_id: new_id, ...}, ...}
+        hh_index (str): Index name for the household ID level (default is 'i').
 
-    if waves is None:
-        waves = list(Waves.keys())
+    Example:
+        updated_ids = {
+            '2013-14': {'0001-001': '101012150028', '0009-001': '101015620053', '0005-001': '101012150022'},
+            '2016-17': {'0001-002': '0001-001', '0003-001': '0005-001', '0005-001': '0009-001'}
+        }
 
-    foo = pd.DataFrame(index=waves,columns=waves)
-    IDs = {}
-    for m,s in enumerate(waves):
-        for t in waves[m:]:
-            pairs = set(idxs[s]).intersection(idxs[t])
-            list2_rest = set(idxs[t]) - pairs
-            if not split_households_new_sample:
-                new_paired = {i for i in list2_rest  if i.split('_')[0] in idxs[s]}
-                pairs.update(new_paired)   
-                
-            IDs[(s,t)] = pairs
-            foo.loc[s,t] = len(IDs[(s,t)])
+        In this example, IDs are updated independently for each wave.
+        Because the same original household ID across different waves may not represent the same household.
+        Specifically, household '0005-001' in wave '2016-17' corresponds to household '0009-001' from wave '2013-14', not '0005-001' from '2013-14'.
 
-    if return_ids:
-        return foo,IDs
-    else:
-        return foo
+    The function handles these wave-specific mappings separately, ensuring accurate household identification over time.
+    '''
+    #seperate df into different waves:
+    dfs = {}
+    waves = df.index.get_level_values('t').unique()
+    for wave in waves:
+        dfs[wave] = df[df.index.get_level_values('t') == wave].copy()
+    #update ids for each wave
+    for wave, df_wave in dfs.items():
+        #update ids
+        if wave in updated_ids:
+            df_wave = df_wave.rename(index=updated_ids[wave], level=hh_index)
+            #update the dataframe with the new ids
+            dfs[wave] = df_wave
+        else:
+            continue
+    #combine the updated dataframes
+    df = pd.concat(dfs.values(), axis=0)
+
+    # df= df.rename(index=updated_ids,level=['t', hh_index])
+    df.attrs['id_converted'] = True
+    return df  
+

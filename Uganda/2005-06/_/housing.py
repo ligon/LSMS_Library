@@ -1,3 +1,4 @@
+from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python3
 import numpy as np
 import pandas as pd
@@ -25,4 +26,4 @@ for k,v in d.items():
 housing.set_index('hhid', inplace=True)
 housing.index.name = 'j'
 
-housing.to_parquet('housing.parquet')
+to_parquet(housing, 'housing.parquet')
