@@ -70,7 +70,6 @@ interview_date:
 panel_ids:
     file: s00_me_mli2021.dta
     idxvars:
-        v: grappe
         visit: vague
         i: 
             - grappe
