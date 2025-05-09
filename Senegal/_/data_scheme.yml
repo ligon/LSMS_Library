@@ -1,0 +1,13 @@
+Country: Senegal
+
+Data Scheme:
+  cluster_features:
+    index: (t, v)
+    Region: str
+    Rural: str
+
+  household_roster:
+    index: (t, v, i, pid)
+    Sex: str
+    Age: int
+    Relationship: str
