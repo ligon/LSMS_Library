@@ -203,7 +203,7 @@ class Wave:
             if data_info.get('dfs'):
                 merge_dfs = []
                 merge_on =list(set('t').union(data_info.get('merge_on')))#a list
-                df_edit_function = data_info.get('df_edit')
+                df_edit_function = self.formatting_functions.get(request)
                 idxvars_list = list(dict.fromkeys(data_info.get('final_index')))
                 for i in data_info.get('dfs'):
                     sub_data_info = data_info.get(i)
