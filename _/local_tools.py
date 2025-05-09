@@ -956,40 +956,52 @@ def age_handler(age = None, interview_date = None, interview_year = None, format
     interview_yr = int(interview_year)
     year_born = y
 
+    def is_valid(x):
+        if isinstance(x, list):
+            return all(pd.notna(x)) and all([is_valid(i) for i in x])
+        elif pd.notna(x) and int(float(x)) < 2100:
+            return True
+        return False
+
     if age is not None and pd.notna(age):
-        return int(age)
+        if is_valid(int(age)):
+            return int(age)
 
     # interview handling
     if interview_date is not None and pd.notna(interview_date):
         if isinstance(interview_date, list):
-            if len(interview_date) == 3 and all(pd.notna(interview_date)):
+            if len(interview_date) == 3 and is_valid(interview_date):
                 interview_date = str(int(interview_date[1])) + '/' + str(int(interview_date[2])) + '/' + str(int(interview_date[0]))
                 format_interv = "%m/%d/%Y"
-            elif len(interview_date) >= 2 and all(pd.notna([interview_date[0], interview_date[1]])):
+            elif len(interview_date) >= 2 and is_valid(interview_date):
                 interview_date = str(int(interview_date[1])) + '/15/' + str(int(interview_date[0]))
                 format_interv = "%m/%d/%Y"
-            elif len(interview_date) >= 1 and pd.notna(interview_date[0]):
+            elif len(interview_date) >= 1 and is_valid(interview_date):
                 interview_yr = int(interview_date[0])
         if format_interv:
             final_interview_date = pd.to_datetime(interview_date, format = format_interv)
             interview_yr = interview_date.year
+        try:
+            final_interview_date = pd.to_datetime(interview_date)
+        except: 
+            final_interview_date = None
 
     # dob handling
     if dob is not None and pd.notna(dob):
         final_date_of_birth = pd.to_datetime(dob, format = format_dob)
         year_born = final_date_of_birth.year
     #conversion to pd.datetime obj of the date of birth if we are given mdy or all values
-    elif all(pd.notna([m, d, y])):
+    elif is_valid([m, d, y]):
         date_conv = str(int(m)) + '/' + str(int(d)) + '/' + str(int(y))
         final_date_of_birth = pd.to_datetime(date_conv, format = "%m/%d/%Y")
-    elif all(pd.notna([m, y])):
+    elif is_valid([m, y]):
         date_conv = str(int(m)) + '/15/' + str(int(y))
         final_date_of_birth = pd.to_datetime(date_conv, format = "%m/%d/%Y")
 
     #final calculations
     if final_interview_date and final_date_of_birth:
         return round((final_interview_date - final_date_of_birth).days / 365.25, 2)
-    elif pd.notna(year_born) and pd.notna(interview_yr):
+    elif is_valid([year_born, interview_yr]):
         return int(interview_yr) - int(year_born)
     else:
         return np.nan
