@@ -981,10 +981,11 @@ def age_handler(age = None, interview_date = None, interview_year = None, format
         if format_interv:
             final_interview_date = pd.to_datetime(interview_date, format = format_interv)
             interview_yr = interview_date.year
-        try:
-            final_interview_date = pd.to_datetime(interview_date)
-        except: 
-            final_interview_date = None
+        else:
+            try:
+                final_interview_date = pd.to_datetime(interview_date)
+            except: 
+                final_interview_date = None
 
     # dob handling
     if dob is not None and pd.notna(dob):
