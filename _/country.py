@@ -367,7 +367,7 @@ class Country:
         #Otherwise, we will check the directory for subdirectories that contain 'Documentation' and 'SOURCE'.
         waves = [
             f.name for f in self.file_path.iterdir()
-            if f.is_dir() and (self.file_path / f.name / 'Documentation' / 'SOURCE').exists()
+            if f.is_dir() and ((self.file_path / f.name / 'Documentation' / 'SOURCE.org').exists() or (self.file_path / f.name / 'Documentation' / 'SOURCE').exists())
         ]
         return sorted(waves)
 
@@ -412,7 +412,7 @@ class Country:
         """
         if method_name not in self.data_scheme and method_name not in ['other_features', 'food_prices_quantities_and_expenditures', 'updated_ids']:
             warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
-            return pd.DataFrame()
+            return None
 
         if waves is None:
             waves = self.waves
@@ -478,16 +478,18 @@ class Country:
         Compute and cache both panel_ids and updated_ids.
         """
         panel_ids_dic = self._aggregate_wave_data(None, 'panel_ids')
-        if isinstance(panel_ids_dic, dict):
-            updated_ids_dic = self._aggregate_wave_data(None, 'updated_ids')
-        elif isinstance(panel_ids_dic, pd.DataFrame):
-            panel_ids_dic, updated_ids_dic = panel_ids(panel_ids_dic)
-            # panel_ids_dic = panel_ids_dic.data
+        if panel_ids_dic:
+            if isinstance(panel_ids_dic, dict):
+                updated_ids_dic = self._aggregate_wave_data(None, 'updated_ids')
+            elif isinstance(panel_ids_dic, pd.DataFrame):
+                panel_ids_dic, updated_ids_dic = panel_ids(panel_ids_dic)
+                # panel_ids_dic = panel_ids_dic.data
+            self._panel_ids_cache = panel_ids_dic
+            self._updated_ids_cache = updated_ids_dic
         else:
-            warnings.warn(f"Invalid data for panel_ids")
-            return None
-        self._panel_ids_cache = panel_ids_dic
-        self._updated_ids_cache = updated_ids_dic
+            print(f"Panel IDs not found in {self.name}.")
+            self._panel_ids_cache = None
+            self._updated_ids_cache = None
 
     @property
     def panel_ids(self):
