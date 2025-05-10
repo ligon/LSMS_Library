@@ -3,6 +3,7 @@ import numpy as np
 import re
 import re
 import unicodedata
+from textblob import TextBlob
 
 def food_label_dict(data):
     if isinstance(data, dict):
@@ -20,10 +21,7 @@ def food_label_dict(data):
 
 def regularize_string(s):
     # Normalize and remove non-printable/non-UTF8-like characters
-    s = ''.join(
-        c for c in s
-        if (c.isprintable() and not unicodedata.category(c).startswith('C'))
-    )
+    s = ''.join(c for c in s if ord(c) < 128)
 
     # Trim whitespace
     s = s.strip()
@@ -57,13 +55,18 @@ def regularize_string(s):
     return ' '.join(words)
 
 def preprocess(label):
+    useless_term = ['etc.']
     # Remove leading and trailing whitespace
     label = regularize_string(label)
+    # label = str(TextBlob(label).correct())
     label = label.strip()
     label = label.lower()
+    # Remove useless terms
+    for term in useless_term:
+        label = label.replace(term, '')
+    label = re.sub(r'[^\w\s]', ' ', label)  # remove punctuation
     #remove more than one space
     label = re.sub(r'\s+', ' ', label)
-    label = re.sub(r'[^\w\s]', '', label)  # remove punctuation
     return label.split()
 
 
@@ -80,8 +83,6 @@ def get_label_vector(label, model):
     
 # Calculate cosine similarity between two labels based on a model
 def get_cosine_similarity(label1, label2, model):
-    label1 = preprocess(label1)
-    label2 = preprocess(label2)
     vector1 = get_label_vector(label1, model)
     vector2 = get_label_vector(label2, model)
     similarity = cosine_similarity([vector1], [vector2])[0][0]
