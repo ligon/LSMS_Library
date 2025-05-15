@@ -12,7 +12,6 @@ import os
 import warnings
 from pathlib import Path
 import warnings
-from .ai_agent import ai_process, gpt_agent
 warnings.filterwarnings('ignore', category=FutureWarning)
 warnings.filterwarnings('ignore', category=UnicodeWarning)
 import subprocess
@@ -203,7 +202,7 @@ class Wave:
             if data_info.get('dfs'):
                 merge_dfs = []
                 merge_on =list(set('t').union(data_info.get('merge_on')))#a list
-                df_edit_function = data_info.get('df_edit')
+                df_edit_function = self.formatting_functions.get(request)
                 idxvars_list = list(dict.fromkeys(data_info.get('final_index')))
                 for i in data_info.get('dfs'):
                     sub_data_info = data_info.get(i)
@@ -367,7 +366,7 @@ class Country:
         #Otherwise, we will check the directory for subdirectories that contain 'Documentation' and 'SOURCE'.
         waves = [
             f.name for f in self.file_path.iterdir()
-            if f.is_dir() and (self.file_path / f.name / 'Documentation' / 'SOURCE').exists()
+            if f.is_dir() and ((self.file_path / f.name / 'Documentation' / 'SOURCE.org').exists() or (self.file_path / f.name / 'Documentation' / 'SOURCE').exists())
         ]
         return sorted(waves)
 
@@ -478,16 +477,18 @@ class Country:
         Compute and cache both panel_ids and updated_ids.
         """
         panel_ids_dic = self._aggregate_wave_data(None, 'panel_ids')
+
         if isinstance(panel_ids_dic, dict):
             updated_ids_dic = self._aggregate_wave_data(None, 'updated_ids')
-        elif isinstance(panel_ids_dic, pd.DataFrame):
+        elif isinstance(panel_ids_dic, pd.DataFrame) and not panel_ids_dic.empty:
             panel_ids_dic, updated_ids_dic = panel_ids(panel_ids_dic)
             # panel_ids_dic = panel_ids_dic.data
+            self._panel_ids_cache = panel_ids_dic
+            self._updated_ids_cache = updated_ids_dic
         else:
-            warnings.warn(f"Invalid data for panel_ids")
-            return None
-        self._panel_ids_cache = panel_ids_dic
-        self._updated_ids_cache = updated_ids_dic
+            print(f"Panel IDs not found in {self.name}.")
+            self._panel_ids_cache = None
+            self._updated_ids_cache = None
 
     @property
     def panel_ids(self):

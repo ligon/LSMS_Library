@@ -15,4 +15,4 @@ df = df_data_grabber('../Data/gsec1.dta',idxvars,**myvars)
 df['date'] = pd.to_datetime(df[['year', 'month', 'day']])
 df=df.drop(columns=['year','month','day'])
 
-to_parquet(df,'other_interview_date.parquet')
+to_parquet(df,'interview_date.parquet')

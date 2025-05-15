@@ -12,7 +12,7 @@ myvars = dict(year='year',
                 day='day')
 
 df = df_data_grabber('../Data1/HH/gsec1.dta',idxvars,**myvars)
-df['interview_date'] = pd.to_datetime(df[['year', 'month', 'day']])
+df['date'] = pd.to_datetime(df[['year', 'month', 'day']])
 df=df.drop(columns=['year','month','day'])
 
 

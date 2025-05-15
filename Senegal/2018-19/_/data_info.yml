@@ -1,0 +1,55 @@
+Country: Senegal
+Wave: 2018-19
+
+cluster_features:
+  file: s00_me_sen2018.dta
+  idxvars:
+      v:
+        - vague
+        - grappe
+  myvars:
+      Region: s00q01
+      Rural: s00q04
+
+household_roster:
+  dfs:
+    - df_main
+    - df_temp
+  df_main:
+    file:  s01_me_sen2018.dta
+    idxvars:
+        v:
+          - vague
+          - grappe
+        i: 
+          - vague
+          - grappe
+          - menage
+        pid: s01q00a
+    myvars:
+        Sex: s01q01
+        Age: 
+          - s01q04a
+          - s01q03a
+          - s01q03b
+          - s01q03c
+        Relation: s01q02
+  df_temp:
+      file: s00_me_sen2018.dta
+      idxvars:
+          v:
+            - vague
+            - grappe
+          i: 
+            - vague
+            - grappe
+            - menage
+      myvars:
+          interview_date: s00q23a
+  merge_on: 
+    - v
+    - i
+  final_index:
+    - v
+    - i
+    - pid
