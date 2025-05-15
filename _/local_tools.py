@@ -33,7 +33,7 @@ def _to_numeric(x,coerce=False):
     
 @lru_cache(maxsize=3)
 def get_dataframe(fn,convert_categoricals=True,encoding=None,categories_only=False):
-    """From a file named fn, try  to return a dataframe.
+    """From a file named fn, try to return a dataframe.
 
     Hope is that caller can be agnostic about file type,
     or if file is local or on a dvc remote.
@@ -121,6 +121,8 @@ def get_dataframe(fn,convert_categoricals=True,encoding=None,categories_only=Fal
 
     return df
 
+#def regularize_string(s):
+
 def df_data_grabber(fn,idxvars,convert_categoricals=True,encoding=None,orgtbl=None,**kwargs):
     """From a file named fn, grab both index variables and additional variables
     specified in kwargs and construct a pandas dataframe.
@@ -141,7 +143,7 @@ def df_data_grabber(fn,idxvars,convert_categoricals=True,encoding=None,orgtbl=No
        as in "Simple", but where "transformation" is a function mapping the variables in
        listofexistingvarnames into the form desired for newvarname.
 
-    Options convert_categoricals and encoding are passed to lsms.from_dta, and
+    Options convert_categoricals and encoding are passed to get_dataframe, and
     are documented there.
 
     Ethan Ligon                                                      March 2024
@@ -813,6 +815,7 @@ def category_remap(c,remaps):
     """
     Return a "remapped" dictionary.
 
+    This is a composition of two dictionaries.
     A dictionary remaps values in dict c into other values in c.
     """
     cinv = {v:k for k,v in c.items()}
