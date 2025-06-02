@@ -21,10 +21,17 @@ x = pd.DataFrame(x)
 x.columns.names = ['t']
 x = pd.DataFrame({'earnings':x.stack()})
 
-x['m'] = 'Uganda'
-x = x.reset_index().set_index(['j','t','m'])
-
 updated_ids = json.load(open('updated_ids.json'))
 x = id_walk(x,updated_ids)
+
+try:
+    of = get_dataframe('../var/other_features.parquet')
+
+    x = x.join(of.reset_index('m')['m'],on=['j','t'])
+
+except FileNotFoundError:
+    x['m'] ='Uganda'
+
+x = x.reset_index().set_index(['j','t','m'])
 
 to_parquet(x, '../var/earnings.parquet')
