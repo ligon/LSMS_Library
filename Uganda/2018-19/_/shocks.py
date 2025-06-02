@@ -13,7 +13,9 @@ from lsms import from_dta
 #shock dataset
 with dvc.api.open('../Data/GSEC16.dta',mode='rb') as dta:
     df = from_dta(dta)
-df = df[df['s16q02y'].notna()] #filter for valid entry 
+
+    df = df[df['s16q02y'].notna()] #filter for valid entry
+
 df= df.replace(20018, 2018).loc[df['s16q02y'] != 1] #fix erroneous year entries 
 
 
