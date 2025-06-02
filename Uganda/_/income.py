@@ -1,10 +1,10 @@
-from lsms_library.local_tools import to_parquet
-from lsms_library.local_tools import get_dataframe
 #!/usr/bin/env python3
 """
 Combine income from different sources to make 'total' household income.
 """
 
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 import pandas as pd
 import numpy as np
 
