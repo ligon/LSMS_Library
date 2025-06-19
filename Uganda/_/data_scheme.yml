@@ -1,0 +1,12 @@
+Country: Uganda
+
+Data Scheme:
+  people_last7days:
+    index: (i, t, m)
+    Men : int
+    Women : int
+    Boys : int
+    Girls : int
+
+  cluster_features:
+    index: (i,t,v)

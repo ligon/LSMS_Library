@@ -1,0 +1,26 @@
+Country: Uganda
+Wave: 2009-10
+
+people_last7days:
+    file: GSEC15A.dta
+    idxvars:
+        i: HHID
+    myvars:
+        Men : h15a1
+        Women : h15a2
+        Boys : h15a3
+        Girls : h15a4
+
+cluster_features:
+    file: ../Data/GSEC1.dta
+    idxvars:
+        i: HHID
+        v: comm
+    myvars:
+        Rural: urban
+        District: h1aq1  # TODO: This is numeric codes; needs mapping to names.
+        Region:
+            - region
+            - # Fix some values
+              " Kampala": "Central"
+              "Central without Kampala": "Central"

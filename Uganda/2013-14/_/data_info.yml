@@ -1,0 +1,22 @@
+Country: Uganda
+Wave: 2013-14
+
+people_last7days:
+    file: GSEC15.dta
+    idxvars:
+        i: HHID
+    myvars:
+        Men : T6FQ01a
+        Women : T6FQ01b
+        Boys : T6FQ01c
+        Girls : T6FQ01d
+
+cluster_features:
+    file: ../Data/GSEC1.dta
+    idxvars:
+        i: HHID
+        v: h1aq4a # Docs identify this as "Parish"?
+    myvars:
+        Region: region
+        Rural: urban
+        District: h1aq1a  # TODO: 3 digit numeric code; map to string?

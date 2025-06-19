@@ -1,0 +1,17 @@
+#+title: Categorical Mappings
+
+#+name: districts
+| Alternate Spelling   | Preferred Label |
+|----------------------+-----------------|
+| Amolator             | Amolatar        |
+| Buduuda              | Bududa          |
+| Bugweri              | Bugiri          |
+| Kalanga              | Kalangala       |
+| Luwero               | Luweero         |
+| Miyana               | Mityana         |
+| Nakasangola          | Nakasongola     |
+| Namtumba             | Namutumba       |
+| Ntugamo              | Ntungamo        |
+| Palisa               | Pallisa         |
+| Rukingiri            | Rukungiri       |
+| Serere (From Soroti) | Serere          |

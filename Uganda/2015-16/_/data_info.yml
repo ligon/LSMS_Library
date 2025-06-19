@@ -1,0 +1,12 @@
+Country: Uganda
+Wave: 2015-16
+
+cluster_features:
+    file: gsec1.dta
+    idxvars:
+        i: HHID
+        v: parish_code
+    myvars:
+        Region: region
+        Rural: urban
+        District: district

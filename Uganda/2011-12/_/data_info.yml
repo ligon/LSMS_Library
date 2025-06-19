@@ -1,0 +1,12 @@
+Country: Uganda
+Wave: 2011-12
+
+cluster_features:
+    file: ../Data/GSEC1.dta
+    idxvars:
+        i: HHID
+        v: comm
+    myvars:
+        Region: region
+        Rural: urban
+        District: h1aq1

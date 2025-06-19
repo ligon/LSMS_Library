@@ -1,0 +1,23 @@
+Country: Uganda
+Wave: 2018-19
+
+people_last7days:
+    file: GSEC15A.dta
+    idxvars:
+        i: hhid
+        member: CEA01
+    myvars:
+        Men : CEA01A
+        Women : CEA01B
+        Boys : CEA01C
+        Girls : CEA01D
+
+cluster_features:
+    file: GSEC1.dta
+    idxvars:
+        i: hhid
+        v: parish_code  # TODO: Different codes than in previous years?
+    myvars:
+        Region: region
+        Rural: urban
+        District: distirct_name

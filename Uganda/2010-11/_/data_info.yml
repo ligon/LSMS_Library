@@ -1,0 +1,15 @@
+Country: Uganda
+Wave: 2010-11
+
+cluster_features:
+    file: ../Data/GSEC1.dta
+    idxvars:
+        i: HHID
+        v: comm
+    myvars:
+        Region:
+            - region
+            - # Kampala is Central
+              Kampala: Central
+        Rural: urban
+        District: h1aq1  # TODO: Needs string regularization
