@@ -151,7 +151,10 @@ def df_data_grabber(fn,idxvars,convert_categoricals=True,encoding=None,orgtbl=No
 
     def grabber(df,v):
         if isinstance(v,str): # Simple
-            return df[v]
+            if v in df.columns:
+                return df[v]
+            else:
+                raise KeyError(f"{v} not in columns of dataframe.")
         else:
             s,f = v
             if isinstance(f,types.FunctionType):  # Tricky & Trickier
