@@ -7,11 +7,11 @@ cluster_features:
         v: ea
     myvars:
         Region: region
-        Rural: 
+        Rural:
             - reside
-            - 
+            -
                 Rural: 1
-                Urban: 0    
+                Urban: 0
 
 household_roster:
     file: sec_b.dta

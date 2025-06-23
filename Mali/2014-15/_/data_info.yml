@@ -92,6 +92,7 @@ household_education:
                 - s01q
         myvars:
             Highest Education: s01q06
+
     household_roster:
         file: EACIIND_p1.dta
         idxvars:

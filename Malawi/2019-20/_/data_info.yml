@@ -9,7 +9,7 @@ cluster_features:
         v: ea_id
     myvars:
         Region: region
-        Rural: 
+        Rural:
             - reside
             - #Value mapping dictionary
                 Rural: 0
