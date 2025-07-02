@@ -10,3 +10,5 @@ Data Scheme:
 
   cluster_features:
     index: (i,t,v)
+
+  shocks: # USE_MAKEFILE
