@@ -392,7 +392,7 @@ class Country:
         required_list = self.required_list
         
         data_scheme = set(data_list).union(set(py_ls).intersection(required_list))
-        data_scheme = set(data_list).union(set(py_ls).union(required_list))
+        #data_scheme = set(data_list).union(set(py_ls).union(required_list))
 
         return list(data_scheme)
 
