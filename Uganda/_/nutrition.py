@@ -27,6 +27,10 @@ fct = pd.read_csv('fct_uganda.csv').set_index('i')  # Build in nutrition.org
 #create and restructure fct for fdc food items;
 try:
     fct_usda = pd.read_csv('fct_usda.csv')
+    if type(fct_usda.index)==pd.RangeIndex:
+        fct_usda = fct_usda.set_index(fct_usda.columns[0])
+        fct_usda.index.name = 'i'
+
 except FileNotFoundError:
     n1 = nutrient_df(fct_add, apikey,verbose=True)
     fct_usda = harmonize_nutrient(n1)
@@ -37,6 +41,10 @@ except FileNotFoundError:
 
 #combine two fcts
 final_fct = pd.concat([fct, fct_usda]).sort_index().T
+
+# But only keep columns common to both
+fct_cols = fct.columns.intersection(fct_usda.columns)
+final_fct = final_fct.loc[fct_cols]
 
 #sum all quantities
 q = q.xs('Kg',level='u').sum(axis=1)
