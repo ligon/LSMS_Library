@@ -1157,8 +1157,6 @@ are ignored.
 | Chicken (broiler)       |  171447 | Chicken, broilers or fryers, meat and skin, raw                 |
 | Coffee                  |  171881 | Beverages, coffee, brewed, breakfast blend                      |
 | Coffee (other)          |  171890 | Beverages, coffee, brewed, prepared with tap water              |
-| Cooking Oil (refined)   |  172370 | Oil, vegetable, soybean, refined                                |
-| Cooking Oil (unrefined) |  748608 | Oil, olive, extra virgin                                        |
 | Cornflakes              | 2343937 | Cereal, corn flakes, plain                                      |
 | Cucumber                | 2346406 | Cucumber, with peel, raw                                        |
 | Donuts                  |  174990 | Doughnuts, cake-type, plain (includes unsugared, old-fashioned) |
