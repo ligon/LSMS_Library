@@ -514,7 +514,7 @@ def df_from_orgfile(orgfn,name=None,set_columns=True,to_numeric=True,encoding=No
         contents = f.readlines()
 
     # Get indices of #+name: lines:
-    names = [i for i,s in enumerate(contents) if f'#+name: {name}'==s.strip().lower()]
+    names = [i for i,s in enumerate(contents) if f'#+name: {name}'.lower()==s.strip().lower()]
 
     if len(names)==0:
         #warnings.warn(f'No table {name} in {orgfn}.')
