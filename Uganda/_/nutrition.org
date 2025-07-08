@@ -2121,7 +2121,7 @@ print(agglabels.groupby('Preferred Label').head(1).squeeze().sort_values().to_ma
   | Tea (green)                    |  FDC171917 | Beverages, tea, green, brewed, regular                          |   |
   | Margarine, Butter, etc         |  FDC172339 | Margarine-like, margarine-butter blend, soybean oil and butter  |   |
   | Butter, etc.                   |  FDC172339 | Margarine-like, margarine-butter blend, soybean oil and butter  |   |
-  | Cooking Oil (refined)          |  FDC172370 | Oil, vegetable, soybean, refined                                |   |
+  | Cooking Oil (refined)          |     725001 | VEGETABLE OIL,UNSPECIFIED BRAND,RAW *COOKED*
   | Tea (leaves)                   |  FDC173227 | Beverages, tea, black, brewed, prepared with tap water          |   |
   | Tea (other)                    |  FDC173232 | Beverages, tea, herb, other than chamomile, brewed              |   |
   | Infant Formula                 |  FDC173554 | Infant formula, PBM PRODUCTS, store brand, powder               |   |
@@ -2138,7 +2138,7 @@ print(agglabels.groupby('Preferred Label').head(1).squeeze().sort_values().to_ma
   | Cucumber                       | FDC2346406 | Cucumber, with peel, raw                                        |   |
   | Cheese                         |  FDC746767 | Cheese, swiss                                                   |   |
   | Salt                           |  FDC746775 | Salt, table, iodized                                            |   |
-  | Cooking Oil (unrefined)        |  FDC748608 | Oil, olive, extra virgin                                        |   |
+  | Cooking Oil (unrefined)        |     725001 | VEGETABLE OIL,UNSPECIFIED BRAND,RAW *COOKED*
   | Butter                         |  FDC789828 | Butter, stick, unsalted                                         |   |
 
 
@@ -2339,6 +2339,9 @@ print(df_to_orgtbl(myfct,float_fmt='%6.2f',math_delimiters=False))
 | Milk (fresh)                   |  600.00 |   32.00 |   0.00 |   50.00 | 1130.00 |        45.00 |   0.00 |   1.07 |       1.83 |    0.44 |    280.00 |         4.40 |        0.36 |      0.00 |  4.00 |
 | Milk (powdered)                | 4960.00 |  263.00 |   0.00 |  370.00 | 9120.00 |       384.00 |   5.00 |   6.46 |      12.05 |    2.83 |   2570.00 |        32.50 |        3.02 |     86.00 | 33.00 |
 | Bongo                          |  640.00 |   33.00 |   0.00 |   50.00 | 1620.00 |        45.00 |   1.00 |   1.00 |       1.50 |    0.20 |    370.00 |         4.40 |        0.36 |      0.00 |  6.00 |
+| Cooking Oil (refined)          | 8840.00 |    0.00 |   0.00 |    0.00 |    0.00 |         0.00 |   0.00 |   0.00 |       0.00 |    0.00 |      0.00 |         0.00 |        0.00 |      0.00 |  0.00 |
+| Cooking Oil (unrefined)        | 8840.00 |    0.00 |   0.00 |    0.00 |    0.00 |         0.00 |   0.00 |   0.00 |       0.00 |    0.00 |      0.00 |         0.00 |        0.00 |      0.00 |  0.00 |
+
 
 
 
