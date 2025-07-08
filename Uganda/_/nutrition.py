@@ -1,15 +1,14 @@
 #!/usr/bin/env python
-from lsms_library.local_tools import to_parquet
-from lsms_library.local_tools import get_dataframe
-
 import sys
 sys.path.append('../../_/')
 sys.path.append('../../../_/')
 import pandas as pd
+import lsms_library as ll
+from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import get_dataframe
 import numpy as np
 from fct_addition import nutrient_df, harmonize_nutrient
 from lsms_library.local_tools import df_from_orgfile
-import lsms_library as ll
 
 """
 Create a nutrition DataFrame for households based on food consumption quantities
@@ -21,8 +20,9 @@ q = uga.food_quantities()
 
 apikey = "hAkb5LsLAS1capOD60K6ILrZDkC29eK6ZmqCumXB"
 fct_add = df_from_orgfile('nutrition.org',name='fct_addition',encoding='ISO-8859-1')
-#fct = df_from_orgfile('nutrition.org',name='fct',encoding='ISO-8859-1')
-fct = pd.read_csv('fct_uganda.csv').set_index('i')
+#fct = df_from_orgfile('nutrition.org',name='fct',encoding='ISO-8859-1').set_index('FCT Code')
+#fct.index.name = 'i'
+fct = pd.read_csv('fct_uganda.csv').set_index('i')  # Build in nutrition.org
 
 #create and restructure fct for fdc food items;
 try:
@@ -30,6 +30,9 @@ try:
 except FileNotFoundError:
     n1 = nutrient_df(fct_add, apikey,verbose=True)
     fct_usda = harmonize_nutrient(n1)
+    if type(fct_usda.index)==pd.RangeIndex:
+        fct_usda = fct_usda.set_index(fct_usda.columns[0])
+        fct_usda.index.name = 'i'
     fct_usda.to_csv('fct_usda.csv')
 
 #combine two fcts
