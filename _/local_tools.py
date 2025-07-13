@@ -164,6 +164,12 @@ def df_data_grabber(fn,idxvars,convert_categoricals=True,encoding=None,orgtbl=No
                     return df[s].apply(f,axis=1)
             elif isinstance(f,dict):
                 return df[s].apply(lambda x: f.get(x,x))
+            elif isinstance(f, tuple):
+                #  isinstance(f[0], types.FunctionType) and isinstance(f[1], dict):
+                if isinstance(s,str):
+                    return df[s].apply(f[0]).apply(lambda x: f[1].get(x,x))
+                else:
+                    return df[s].apply(f[0],axis=1).apply(lambda x: f[1].get(x,x))
 
         raise ValueError(df_data_grabber.__doc__)
 

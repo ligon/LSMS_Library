@@ -24,9 +24,7 @@ class Wave:
         self.name = f"{self.country.name}/{self.year}"
         self.folder = f"{self.country.name}/{wave_folder}"
         self.wave_folder = wave_folder
-        self.formatting_functions = get_formatting_functions(mod_path=self.file_path / "_" / f"{wave_folder}.py",
-                                                             name=f"formatting_{wave_folder}",
-                                                             general__formatting_functions=self.country.formatting_functions)
+
 
     def __getattr__(self, method_name):
         '''
@@ -93,14 +91,38 @@ class Wave:
         def map_formatting_function(var_name, value, format_id_function = False):
             """Applies formatting functions if available, otherwise uses defaults."""
             if isinstance(value, list) and isinstance(value[-1], dict):
-                if value[-1].get('function'):
-                    return (value[:-1], formatting_functions[value[-1]['function']])
-                return tuple(value)
+                if value[-1].get('mapping'):
+                    mapping_steps = value[-1].get('mapping')
+                    # given a direct mapping dictionary like {Male: M, Female: F}
+                    if isinstance(mapping_steps, dict):
+                        return (value[:-1], mapping_steps)
+                    # given a single string which is a function nuame:
+                    elif isinstance(mapping_steps, str):
+                        return (value[:-1], formatting_functions[mapping_steps])
+                    #given a list requiring a categorical_mapping table ['harmonize_food', 'original_key', 'mapped_key']
+                    elif isinstance(mapping_steps, list) and all(not isinstance(step, list) for step in mapping_steps):
+                        mapping_dic = self.categorical_mapping(mapping_steps[0], mapping_steps[1], mapping_steps[2])
+                        if var_name in formatting_functions:
+                            return (value[:-1], (formatting_functions[var_name], mapping_dic))
+                        else:
+                            return (value[:-1], mapping_dic)
+                    #give a list but include another list which means requiring applying function and then categorical_mapping table
+                    else:
+                        function = formatting_functions[mapping_steps[0]]
+                        mapping_details = mapping_steps[1]
+                        if isinstance(mapping_details, list):
+                            mapping_dic = self.categorical_mapping(mapping_steps[1][0], mapping_steps[1][1], mapping_steps[1][2])
+                        elif isinstance(mapping_details, dict):
+                            mapping_dic = mapping_details
+                        return (value[:-1], (function, mapping_dic))    
+                else:
+                    return tuple(value)
             if var_name in formatting_functions:
                 return (value, formatting_functions[var_name])
             if format_id_function:
                 return (value, format_id)
             return value
+            
 
 
         files = data_info.get('file')
@@ -155,8 +177,19 @@ class Wave:
             warnings.warn(f"Error in getting categorical mapping: {e}")
             return None
         return mapping
-            
-
+    
+    @property
+    def formatting_functions(self):
+        function_dic = {}
+        for file in {f"{self.wave_folder}.py", "mapping.py"}:
+            file_path = self.file_path / "_" / file
+            if file_path.exists():                                            
+                function_dic.append(
+                    get_formatting_functions(file_path,
+                                             name=f"formatting_{self.wave_folder}",
+                                             general__formatting_functions=self.country.formatting_functions))
+        return function_dic
+    
     def grab_data(self, request):
         '''
         get data from the data file
@@ -335,10 +368,12 @@ class Country:
     
     @property
     def formatting_functions(self):
-        general_module_filename = f"{self.name.lower()}.py"
-        general_mod_path = self.file_path/ "_"/ general_module_filename
+        function_dic = {}
+        for file in [f"{self.name.lower()}.py", 'mapping.py']:
+            general_mod_path = self.file_path/ "_"/ file
+            function_dic.append(get_formatting_functions(general_mod_path, f"formatting_{self.name}"))
 
-        return get_formatting_functions(general_mod_path, f"formatting_{self.name}")
+        return function_dic
     
     @property
     def waves(self):

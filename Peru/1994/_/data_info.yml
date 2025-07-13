@@ -1,13 +1,13 @@
-Country: Mali
-Wave: 2021-22
+Country: Peru
+Wave: 1994
 
 cluster_features:
-    file: ehcvm_conso_mli2021.dta
+    file: REG01.DTA
     idxvars:
-        v: grappe
+        v: segmento
     myvars:
-        Region: region
-        Rural: milieu
+        Region: a02
+        Rural: a06
 
 
 household_roster:
@@ -65,23 +65,7 @@ interview_date:
             - menage
     myvars:
         Int_t: s00q23a
-    
 
-panel_ids:
-    file: s00_me_mli2021.dta
-    idxvars:
-        visit: vague
-        i: 
-            - grappe
-            - menage
-    myvars:
-        previous_v: s00q07f1
-        previous_hid: s00q07f2
-        #using df_data_grabber {new_col_name: (old_col_name, transformation)}, can direct mapping values by input a dictionary as transformation
-        in_previous_wave: 
-            - PanelHH
-            - mapping:
-                'Non': 0
-                'Oui': 1 
+
 
 

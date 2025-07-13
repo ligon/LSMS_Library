@@ -10,7 +10,7 @@ cluster_features:
         Region: region
         Rural: 
             - reside
-            - 
+            - mapping:
                 rural: 0
                 urban: 1
 

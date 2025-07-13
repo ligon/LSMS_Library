@@ -147,9 +147,9 @@ myvars:
 myvars:
   in_previous_wave:
     - PanelHH
-    -           # Empty row is required here and the following should be in correct indention
-      'Oui': 1  # original_value: mapping_value
-      'Non': 0
+    - mapping:         
+            'Oui': 1  # original_value: mapping_value
+            'Non': 0
 #+end_src
 
 Note: The empty line after the variable name is *required* to separate it from the mapping dictionary.
@@ -265,14 +265,14 @@ merged_dfs:
             i: i_1
             j: j_1
         myvars:
-            var: var_1
+            var1: var_1
     df_2:
         file: file_2
         idxvars:
             i: i_2
             j: j_2
         myvars:
-            var: var_2
+            var2: var_2
     merged_on:  #list of variables to merge on
         - i 
         - j
