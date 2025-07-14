@@ -182,8 +182,7 @@ class Wave:
 
     @property
     def mapping(self):
-        return self.categorical_mapping.update(self.formatting_functions)
-    
+        return {**self.categorical_mapping, **self.formatting_functions}
     
     def grab_data(self, request):
         '''
@@ -380,7 +379,6 @@ class Country:
         '''
         for dir in dirs:
             org_fn = Path(self.file_path / dir/ "_" / "categorical_mapping.org")
-            print(org_fn)
             if not org_fn.exists():
                 warnings.warn(f"Categorical mapping file not found: {org_fn}")
                 return {}
@@ -389,7 +387,7 @@ class Country:
 
     @property
     def mapping(self):
-        return self.categorical_mapping.update(self.formatting_functions)
+        return {**self.categorical_mapping, **self.formatting_functions}
     
     @property
     def waves(self):
