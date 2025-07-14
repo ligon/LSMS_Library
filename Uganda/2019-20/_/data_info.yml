@@ -16,7 +16,7 @@ cluster_features:
     file: HH/gsec1.dta
     idxvars:
         i: hhid
-        v: pc_2018  # TODO: Different codes than in previous years?
+        v: s1aq04a  # String for parish name.  Parish codes broken as in 2018-19.
     myvars:
         Region: region
         Rural: urban

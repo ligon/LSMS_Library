@@ -16,7 +16,8 @@ cluster_features:
     file: GSEC1.dta
     idxvars:
         i: hhid
-        v: parish_code  # TODO: Different codes than in previous years?
+        #v: parish_code  # BROKEN: Different codes than in previous years, and only 19 values!
+        v: parish_name
     myvars:
         Region: region
         Rural: urban

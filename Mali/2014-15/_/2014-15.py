@@ -1,4 +1,3 @@
-# Formatting  Functions for Ghana 2016-17
 import pandas as pd
 from lsms_library.local_tools import format_id
 

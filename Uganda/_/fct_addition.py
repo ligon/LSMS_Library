@@ -8,11 +8,12 @@ import warnings
 
 #create a DataFrame of nutritional contents of food items
 #Default portion: 100g
-def nutrient_df(df, apikey):
+def nutrient_df(df, apikey,verbose=False):
     D = {}
     count = 0
     for food in df["Preferred Label"].tolist():
         try:
+            if verbose: print(f"Look up nutrients for {food}.")
             FDC = df.loc[df["Preferred Label"] ==food,:]["FDC ID"][count]
             count+=1
             D[food] = fdc.nutrients(apikey,FDC).Quantity

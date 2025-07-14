@@ -10,3 +10,14 @@ Data Scheme:
 
   cluster_features:
     index: (i,t,v)
+
+  shocks: # USE_MAKEFILE
+  food_acquired: # USE_MAKEFILE
+  nutrition: 
+  household_characteristics:
+  interview_date:
+  food_quantities:
+  food_expenditures: # USE_MAKEFILE
+  food_prices:
+  panel_ids:
+

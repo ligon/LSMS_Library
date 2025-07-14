@@ -32,8 +32,12 @@ food_acquired:
         i: 
             - grappe
             - menage
-        j: s13q01
-        u: s13q03b
+        j: 
+            - s13q01
+            - mappings: ['harmonize_food', 'Original Label', 'Preferred Label']
+        u:
+            - s13q03b
+            - mappings: ['unit', 'Original Label', 'Preferred Label']
     myvars:
         Quantity: s13q02
         Expenditure: s13q03c
@@ -43,24 +47,8 @@ food_acquired:
             Quantity: s13q03a
         - EACIALI_p2.dta
 
-
-individual_education:
-    file: EACIIND_p1.dta
-    idxvars:
-        v: grappe
-        i: 
-            - grappe
-            - menage
-        pid:
-            - grappe
-            - menage 
-            - s01q
-    myvars:
-        Highest Education: s01q06
-
-
 interview_date:
-    file: 
+    file:
         - EACICONTROLE_p1.dta
         - EACICONTROLE_p2.dta
     idxvars:
@@ -69,7 +57,7 @@ interview_date:
             - grappe
             - menage
     myvars:
-        Int_t: 
+        Int_t:
             - s00q22y
             - s00q22m
             - s00q22j

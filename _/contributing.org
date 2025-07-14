@@ -235,7 +235,7 @@ household_roster:
   idxvars:
     i:
       - case_id
-      - function: cs_i
+      - mapping: cs_i
     pid: pid
   myvars:
     Sex: hh_b03
@@ -243,7 +243,7 @@ household_roster:
     Relation: hh_b04
 #+end_src
 
-#+begin_src python
+src python
 # Malawi/2016-17/_/2016-17.py
 
 def cs_i(value):
@@ -265,14 +265,14 @@ merged_dfs:
             i: i_1
             j: j_1
         myvars:
-            var1: var_1
+            var: var
     df_2:
         file: file_2
         idxvars:
             i: i_2
             j: j_2
         myvars:
-            var2: var_2
+            var1: var
     merged_on:  #list of variables to merge on
         - i 
         - j
