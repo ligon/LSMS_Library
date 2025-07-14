@@ -147,9 +147,9 @@ myvars:
 myvars:
   in_previous_wave:
     - PanelHH
-    -           # Empty row is required here and the following should be in correct indention
-      'Oui': 1  # original_value: mapping_value
-      'Non': 0
+    - mapping:         
+            'Oui': 1  # original_value: mapping_value
+            'Non': 0
 #+end_src
 
 Note: The empty line after the variable name is *required* to separate it from the mapping dictionary.

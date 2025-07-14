@@ -163,7 +163,16 @@ def df_data_grabber(fn,idxvars,convert_categoricals=True,encoding=None,orgtbl=No
                 else:
                     return df[s].apply(f,axis=1)
             elif isinstance(f,dict):
-                return df[s].apply(lambda x: f.get(x,x))
+                    if isinstance(s, list) and len(s) > 1:
+                        # s refers to multiple columns, we should apply row-wise
+                        return df[s].apply(lambda row: f.get(tuple(row), row), axis=1)
+                    else:
+                        # s is a single column name (string) or single-element list
+                        col = s if isinstance(s, str) else s[0]
+                        return df[col].map(lambda x: f.get(x, x))
+            elif isinstance(f, tuple):
+                for i in f:
+                    return grabber(df, (s, i))
 
         raise ValueError(df_data_grabber.__doc__)
 
@@ -921,8 +930,8 @@ def map_index(df):
 
 
 import importlib.util
-def get_formatting_functions(mod_path, name, general__formatting_functions={} ):
-    formatting_function = general__formatting_functions.copy()
+def get_formatting_functions(mod_path, name, general_formatting_functions={} ):
+    formatting_function = general_formatting_functions.copy()
     if mod_path.exists():
     # Load module dynamically
         spec = importlib.util.spec_from_file_location(name, mod_path)
@@ -1042,3 +1051,63 @@ def age_handler_wrapper(df, interview_date = None, interview_year = None, format
         return age_handler(age = r_age, interview_date = r_interview_date, interview_year = interview_year, format_interv = format_interv, dob = r_dob, format_dob  = format_dob, m = r_m, d = r_d, y = r_y)
 
     return df.apply(row_funct, axis=1)
+
+
+
+
+def all_dfs_from_orgfile(orgfn, set_columns=True, to_numeric=True, encoding=None):
+    """
+    Read all named org-mode tables from a .org file and return as a dictionary of DataFrames.
+    
+    Parameters:
+        orgfn (str): Path to the org file.
+        set_columns (bool): Whether to use the first table row as column names.
+        to_numeric (bool): Attempt to convert all values to numeric.
+    
+    Returns:
+        dict: {table_name: DataFrame}
+    """
+    with open(orgfn, 'r', encoding=encoding) as f:
+        contents = f.readlines()
+
+    tables = {}
+    i = 0
+    while i < len(contents):
+        line = contents[i].strip()
+        
+        if line.lower().startswith('#+name:'):
+            table_name = line.split(':', 1)[1].strip()
+            i += 1
+            # Skip any extra #+ lines
+            while i < len(contents) and contents[i].strip().startswith('#+'):
+                i += 1
+            
+            # Start reading table
+            table_lines = []
+            header = None
+
+            if i < len(contents) and contents[i].strip().startswith('|'):
+                if set_columns:
+                    header = [s.strip() for s in contents[i].strip().split('|')[1:-1]]
+                    i += 1
+
+            while i < len(contents) and contents[i].strip().startswith('|'):
+                row = contents[i].strip()
+                if row.startswith('|-'):  # separator line
+                    i += 1
+                    continue
+                row_data = [s.strip() for s in row.split('|')[1:-1]]
+                table_lines.append(row_data)
+                i += 1
+
+            df = pd.DataFrame(table_lines, columns=header if set_columns else None)
+            df = df.replace({'---': np.nan})
+
+            if to_numeric:
+                df = df.apply(_to_numeric)
+
+            tables[table_name] = df
+        else:
+            i += 1
+
+    return tables

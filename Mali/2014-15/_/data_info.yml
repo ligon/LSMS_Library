@@ -32,8 +32,12 @@ food_acquired:
         i: 
             - grappe
             - menage
-        j: s13q01
-        u: s13q03b
+        j: 
+            - s13q01
+            - mappings: ['harmonize_food', 'Original Label', 'Preferred Label']
+        u:
+            - s13q03b
+            - mappings: ['unit', 'Original Label', 'Preferred Label']
     myvars:
         Quantity: s13q02
         Expenditure: s13q03c

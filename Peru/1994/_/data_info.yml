@@ -1,18 +1,17 @@
-Country: Mali
-Wave: 2018-19
-
+Country: Peru
+Wave: 1994
 
 cluster_features:
-    file: ehcvm_conso_mli2018.dta
+    file: REG01.DTA
     idxvars:
-        v: grappe
+        v: segmento
     myvars:
-        Region: region
-        Rural: milieu
+        Region: a02
+        Rural: a06
 
 
 household_roster:
-    file: ehcvm_individu_mli2018.dta
+    file: ehcvm_individu_mli2021.dta
     idxvars:
         v: grappe
         i: 
@@ -27,28 +26,23 @@ household_roster:
         Age: age
         Relation: lien
 
-
 food_acquired:
-    file: s07b_me_mli2018.dta
+    file: s07b_me_mli2021.dta
     idxvars:
         v: grappe
         visit: vague
         i: 
             - grappe
             - menage
-        j: 
-            - s07bq01
-            - mappings: ['harmonize_food', 'Original Label', 'Preferred Label']
-        u: 
-            - s07bq03b
-            - mappings: ['unit', 'Original Label', 'Preferred Label']
+        j: s07bq01
+        u: s07bq03b
     myvars:
         Quantity: s07bq03a
         Expenditure: s07bq08
         Produced: s07bq04
 
 individual_education:
-    file: ehcvm_individu_mli2018.dta
+    file: ehcvm_individu_mli2021.dta
     idxvars:
         v: grappe
         i: 
@@ -61,9 +55,8 @@ individual_education:
     myvars:
         Highest Education: 'educ_hi'
 
-
 interview_date:
-    file: s00_me_mli2018.dta
+    file: s00_me_mli2021.dta
     idxvars:
         v: grappe
         visit: vague
@@ -72,5 +65,7 @@ interview_date:
             - menage
     myvars:
         Int_t: s00q23a
+
+
 
 

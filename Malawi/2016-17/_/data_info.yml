@@ -11,7 +11,7 @@ cluster_features:
         Region: region 
         Rural: 
             - reside
-            - 
+            - mapping:
                 rural: 0
                 urban: 1
                 RURAL: 1
@@ -36,7 +36,7 @@ household_roster:
     idxvars:
         i: 
             - case_id
-            - function: cs_i
+            - mapping: cs_i
         pid: pid
     myvars:
         Sex: hh_b03
