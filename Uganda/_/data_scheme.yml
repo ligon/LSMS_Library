@@ -12,3 +12,5 @@ Data Scheme:
     index: (i,t,v)
 
   shocks: # USE_MAKEFILE
+
+  earnings: # USE_MAKEFILE
