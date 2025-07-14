@@ -34,8 +34,12 @@ food_acquired:
         i: 
             - grappe
             - menage
-        j: s07bq01
-        u: s07bq03b
+        j: 
+            - s07bq01
+            - mappings: ['harmonize_food', 'Original Label', 'Preferred Label']
+        u: 
+            - s07bq03b
+            - mappings: ['unit', 'Original Label', 'Preferred Label']
     myvars:
         Quantity: s07bq03a
         Expenditure: s07bq08
@@ -80,7 +84,7 @@ panel_ids:
         #using df_data_grabber {new_col_name: (old_col_name, transformation)}, can direct mapping values by input a dictionary as transformation
         in_previous_wave: 
             - PanelHH
-            - # A dictionary can be used to map values
+            - mapping:
                 'Non': 0
                 'Oui': 1 
 

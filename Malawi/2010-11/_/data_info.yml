@@ -8,7 +8,7 @@ cluster_features:
     myvars:
         Rural: 
             - reside
-            - 
+            - mapping:
                 rural: 0
                 urban: 1
         # Region: hh_a01

@@ -11,7 +11,7 @@ cluster_features:
         Region: region
         Rural:
             - reside
-            - #Value mapping dictionary
+            - mapping:
                 Rural: 0
                 Urban: 1
                 RURAL: 1

@@ -6,7 +6,7 @@ from importlib.resources import files
 import importlib
 import cfe.regression as rgsn
 from collections import defaultdict
-from .local_tools import df_data_grabber, format_id, get_categorical_mapping, get_dataframe, map_index, get_formatting_functions, panel_ids, id_walk, RecursiveDict
+from .local_tools import df_data_grabber, format_id, get_categorical_mapping, get_dataframe, map_index, get_formatting_functions, panel_ids, id_walk, all_dfs_from_orgfile
 import importlib.util
 import os
 import warnings
@@ -24,9 +24,7 @@ class Wave:
         self.name = f"{self.country.name}/{self.year}"
         self.folder = f"{self.country.name}/{wave_folder}"
         self.wave_folder = wave_folder
-        self.formatting_functions = get_formatting_functions(mod_path=self.file_path / "_" / f"{wave_folder}.py",
-                                                             name=f"formatting_{wave_folder}",
-                                                             general__formatting_functions=self.country.formatting_functions)
+
 
     def __getattr__(self, method_name):
         '''
@@ -73,6 +71,16 @@ class Wave:
            wave_data.extend([key for key in data_info.keys() if key not in ['Wave', 'Country']])
         return list(set(wave_data))
     
+    @property
+    def formatting_functions(self):
+        function_dic = self.country.formatting_functions
+        for file in {f"{self.wave_folder}.py", "mapping.py"}:
+            file_path = self.file_path / "_" / file
+            if file_path.exists():                                            
+                function_dic.update(
+                    get_formatting_functions(file_path,
+                                             name=f"formatting_{self.wave_folder}"))
+        return function_dic
     
     def column_mapping(self, request, data_info = None):
         """
@@ -93,14 +101,43 @@ class Wave:
         def map_formatting_function(var_name, value, format_id_function = False):
             """Applies formatting functions if available, otherwise uses defaults."""
             if isinstance(value, list) and isinstance(value[-1], dict):
-                if value[-1].get('function'):
-                    return (value[:-1], formatting_functions[value[-1]['function']])
-                return tuple(value)
+                if value[-1].get('mapping'):
+                    mapping_steps = value[-1].get('mapping')
+                    # given a direct mapping dictionary like {Male: M, Female: F}
+                    if isinstance(mapping_steps, dict):
+                        return (value[:-1], mapping_steps)
+                    # given a single string which is a function nuame:
+                    elif isinstance(mapping_steps, str):
+                        return (value[:-1], formatting_functions[mapping_steps])
+                    #given a list requiring a categorical_mapping table ['harmonize_food', 'original_key', 'mapped_key']
+                    elif isinstance(mapping_steps, list) and all(not isinstance(step, list) for step in mapping_steps):
+                        mapping_dic = self.categorical_mapping(mapping_steps[0]).loc[[mapping_steps[1], mapping_steps[2]]].to_dict()
+                        if var_name in formatting_functions:
+                            return (value[:-1], (formatting_functions[var_name], mapping_dic))
+                        else:
+                            return (value[:-1], mapping_dic)
+                    #give a list but include another list which means requiring applying function and then categorical_mapping table
+                    else:
+                        mapping = ()
+                        for i in mapping_steps:
+                            if isinstance(i, str) and i in formatting_functions:
+                                # If the first element is a function name, we apply it first
+                                mapping.append(formatting_functions[i])
+                                break
+                            elif isinstance(i, list) and len(i) == 3:
+                                # If the first element is a list, we apply categorical mapping
+                                mapping.append(self.categorical_mapping(i[0]).loc[[i[1], i[2]]].to_dict())
+                                break
+
+                        return (value[:-1], mapping)    
+                else:
+                    return tuple(value)
             if var_name in formatting_functions:
                 return (value, formatting_functions[var_name])
             if format_id_function:
                 return (value, format_id)
             return value
+            
 
 
         files = data_info.get('file')
@@ -133,30 +170,21 @@ class Wave:
                     final_mapping[i] = {'idxvars': idxvars_updated, 'myvars': myvars_updated}
                 
             return final_mapping
-    
-    def categorical_mapping(self, table, idxvars_code = 'Original Label', label_code = 'Preferred Label' ):
-        '''
-        Get the categorical mapping for the table by using get_categorical_mapping function from local_tools
-        Input:
-            table: str, the table name (e.g. 'unit', 'harmonize_food')
-            idxvars_code: str, the column name for the code in the idxvars
-            label_code: str, the column name for the label in the myvars
-        Output:
-            mapping: pd.DataFrame, the categorical mapping
-        '''
-        path = self.file_path
-        try:
-            mapping = get_categorical_mapping(fn='categorical_mapping.org',
-                              tablename=table,
-                              idxvars={'Code': idxvars_code},
-                              dirs=[f'{path}/_', f'{path}/../_', f'{path}/../../_'],
-                              **{'Label': label_code})
-        except Exception as e:
-            warnings.warn(f"Error in getting categorical mapping: {e}")
-            return None
-        return mapping
-            
+    @property
+    def categorical_mapping(self):
+        org_fn = self.file_path / "_" / "categorical_mapping.org"
+        dic = self.country.categorical_mapping
+        if not org_fn.exists():
+            warnings.warn(f"Categorical mapping file not found: {org_fn}")
+            return {}
+        else:
+            return dic.append(all_dfs_from_orgfile(org_fn))
 
+    @property
+    def mapping(self):
+        return self.categorical_mapping.update(self.formatting_functions)
+    
+    
     def grab_data(self, request):
         '''
         get data from the data file
@@ -264,23 +292,26 @@ class Wave:
     # Food acquired method is explicitly defined because potentially categorical mapping is required after calling grab_data.
     def food_acquired(self):
         df = self.grab_data('food_acquired')
+        if df.empty:
+            return df
         parquet_fn = self.file_path / "_" / "food_acquired.parquet"
         # if food_acquired data is load from parquet file, we assume its unit and food label are already mapped
         if parquet_fn.exists():
             return df
         
+        
         #If dataframe is mapped by yml file, we need to map the unit and food label, assuming columns are only ['Expenditure', 'Quantity', 'Produced', 'Price']
-        unit_mapping = self.categorical_mapping('unit')
-        food_mapping = self.categorical_mapping('harmonize_food')
+        # unit_mapping = self.categorical_mapping('unit').loc[['Original Label', 'Preferred Label']].to_dict()
+        # food_mapping = self.categorical_mapping('harmonize_food').loc[['Original Label', 'Preferred Label']].to_dict()
         #Customed
         agg_functions = {'Expenditure': 'sum', 'Quantity': 'sum', 'Produced': 'sum', 'Price': 'first'}
         index = df.index.names
         variable = df.columns
         df = df.reset_index()
-        if food_mapping is not None:
-            df['j'] = df['j'].map(food_mapping)
-        if unit_mapping is not None:
-            df['u'] = df['u'].map(unit_mapping)
+        # if food_mapping is not None:
+        #     df['j'] = df['j'].map(food_mapping)
+        # if unit_mapping is not None:
+        #     df['u'] = df['u'].map(unit_mapping)
         agg_func = {key: value for key, value in agg_functions.items() if key in variable}
         #replace not float value in Quantity, Expenditure, Produced with np.nan
         for col in ['Quantity', 'Expenditure', 'Produced']:
@@ -299,7 +330,7 @@ class Country:
     required_list = ['food_acquired', 'household_roster', 'cluster_features',
                  'interview_date', 'household_characteristics',
                  'food_expenditures', 'food_quantities', 'food_prices',
-                 'fct', 'nutrition','name','_panel_ids_cache']
+                 'fct', 'nutrition','name','_panel_ids_cache', 'panel_ids']
 
 
     # from uganda:
@@ -335,10 +366,29 @@ class Country:
     
     @property
     def formatting_functions(self):
-        general_module_filename = f"{self.name.lower()}.py"
-        general_mod_path = self.file_path/ "_"/ general_module_filename
+        function_dic = {}
+        for file in [f"{self.name.lower()}.py", 'mapping.py']:
+            general_mod_path = self.file_path/ "_"/ file
+            function_dic.update(get_formatting_functions(general_mod_path, f"formatting_{self.name}"))
 
-        return get_formatting_functions(general_mod_path, f"formatting_{self.name}")
+        return function_dic
+    
+    @property
+    def categorical_mapping(self, dirs = ['./, ../']):
+        '''
+        Get the categorical mapping for the country
+        '''
+        for dir in dirs:
+            org_fn = self.file_path / dir/ "_" / "categorical_mapping.org"
+            if not org_fn.exists():
+                warnings.warn(f"Categorical mapping file not found: {org_fn}")
+                return {}
+            else:
+                return all_dfs_from_orgfile(org_fn)
+
+    @property
+    def mapping(self):
+        return self.categorical_mapping.update(self.formatting_functions)
     
     @property
     def waves(self):
@@ -376,25 +426,25 @@ class Country:
         """
         data_info = self.resources
         data_list = list(data_info.get('Data Scheme', {}).keys()) if data_info else []
-        
-        # return list of python files in the _ folder
-        py_ls = [f.stem for f in (self.file_path / "_").iterdir() if f.suffix == '.py']
+        return data_list
+        # # return list of python files in the _ folder
+        # py_ls = [f.stem for f in (self.file_path / "_").iterdir() if f.suffix == '.py']
 
-        # Customed
-        replace_dic = {'food_prices_quantities_and_expenditures': ['food_expenditures', 'food_quantities', 'food_prices'],
-                        'unitvalues': ['food_prices'],
-                        'other_features': ['cluster_features']}
-        # replace the key with the value in the dictionary
-        for key, value in replace_dic.items():
-            if key in py_ls:
-                py_ls.remove(key)
-                py_ls.extend(value)
-        required_list = self.required_list
+        # # Customed
+        # replace_dic = {'food_prices_quantities_and_expenditures': ['food_expenditures', 'food_quantities', 'food_prices'],
+        #                 'unitvalues': ['food_prices'],
+        #                 'other_features': ['cluster_features']}
+        # # replace the key with the value in the dictionary
+        # for key, value in replace_dic.items():
+        #     if key in py_ls:
+        #         py_ls.remove(key)
+        #         py_ls.extend(value)
+        # required_list = self.required_list
         
-        data_scheme = set(data_list).union(set(py_ls).intersection(required_list))
-        #data_scheme = set(data_list).union(set(py_ls).union(required_list))
+        # data_scheme = set(data_list).union(set(py_ls).intersection(required_list))
+        # #data_scheme = set(data_list).union(set(py_ls).union(required_list))
 
-        return list(data_scheme)
+        # return list(data_scheme)
 
     def __getitem__(self, year):
         # Ensure the year is one of the available waves
@@ -416,8 +466,8 @@ class Country:
 
         if waves is None:
             waves = self.waves
-        #Step 1: Check if it mapped by data_info.yml
-        if method_name in self.resources.get('Data Scheme', {}):
+
+        def load_from_waves(waves):
             results = {}
             for w in waves:
                 try:
@@ -425,23 +475,17 @@ class Country:
                 except KeyError as e:
                     warnings.warn(str(e))
             if results:
-                df= pd.concat(results.values(), axis=0, sort=False)
-                # return map_index(df, self.name)
-        else:
-            # Step 2: Attempt to build using makefile
-            print(f"Attempting to generate using Makefile...")
+                return pd.concat(results.values(), axis=0, sort=False)
+            raise KeyError(f"No data found for {method_name} in any wave of {self.name}.")
 
-            makefile_path = self.file_path /'_'/ "Makefile"
-            if not makefile_path.exists():
-                raise FileNotFoundError(f"Makefile not found in {self.file_path}. Unable to generate required data.")
-            
-            if method_name in ['cluster_features']:
-            # if cluster feature is not defined in yml file, we will use makefile and the variable name is 'other_features'
-                method_name = 'other_features' 
+        makefile_path = self.file_path / "_" / "Makefile"
+        if makefile_path.exists():
+            print(f"Attempting to generate using Makefile for {method_name}...", flush=True)
 
-            # Step 3: Run Makefile for the specific parquet/json file
+            if method_name == 'cluster_features':
+                method_name = 'other_features'
+
             cwd_path = self.file_path / "_"
-
             if method_name in ['panel_ids', 'updated_ids']:
                 target_path = self.file_path / "_" / f"{method_name}.json"
                 relative_path = target_path.relative_to(cwd_path)
@@ -451,39 +495,100 @@ class Country:
                 relative_path = target_path.relative_to(cwd_path.parent)
                 make_target = '../' + str(relative_path)
 
-            subprocess.run(["make", make_target], cwd=cwd_path, check=True)
-            print(f"Makefile executed successfully for {self.name}. Rechecking for {target_path.name}...")
+            try:
+                subprocess.run(["make", make_target], cwd=cwd_path, check=True)
+                print(f"Makefile executed successfully for {self.name}. Rechecking for {target_path.name}...")
 
-            # Step 4: Recheck if the parquet file was successfully generated
-            if not target_path.exists():
-                print(f"Data file {target_path} still missing after running Makefile.")
-                return pd.DataFrame()
+                if not target_path.exists():
+                    print(f"Data file {target_path} still missing after running Makefile.")
+                    return pd.DataFrame()
 
+                if target_path.suffix == '.json':
+                    with open(target_path, 'r') as json_file:
+                        return json.load(json_file)
+                else:
+                    df = get_dataframe(target_path)
+                    df = map_index(df)
 
-            # Step 5: Read and return the parquet or JSON file
-            if target_path.suffix == '.json':
-                with open(target_path, 'r') as json_file:
-                    dic = json.load(json_file)
-                return dic
-            else:
-                df = get_dataframe(target_path)
+            except subprocess.CalledProcessError:
+                print(f"Makefile failed for {method_name}. Falling back to loading from waves...")
+                df = load_from_waves(waves)
 
-            df = map_index(df)
+        else:
+            df = load_from_waves(waves)
+
         if 'i' in df.index.names and not df.attrs.get('id_converted') and method_name not in ['panel_ids', 'updated_ids'] and self._updated_ids_cache is not None:
             df = id_walk(df, self.updated_ids)
+
         return df
+        # #Step 1: Check if it mapped by data_info.yml
+        # if method_name in self.resources.get('Data Scheme', {}):
+        #     results = {}
+        #     for w in waves:
+        #         try:
+        #             results[w] = getattr(self[w], method_name)()
+        #         except KeyError as e:
+        #             warnings.warn(str(e))
+        #     if results:
+        #         df= pd.concat(results.values(), axis=0, sort=False)
+        #         # return map_index(df, self.name)
+        # else:
+        #     # Step 2: Attempt to build using makefile
+        #     print(f"Attempting to generate using Makefile...")
+
+        #     makefile_path = self.file_path /'_'/ "Makefile"
+        #     if not makefile_path.exists():
+        #         raise FileNotFoundError(f"Makefile not found in {self.file_path}. Unable to generate required data.")
+            
+        #     if method_name in ['cluster_features']:
+        #     # if cluster feature is not defined in yml file, we will use makefile and the variable name is 'other_features'
+        #         method_name = 'other_features' 
+
+        #     # Step 3: Run Makefile for the specific parquet/json file
+        #     cwd_path = self.file_path / "_"
+
+        #     if method_name in ['panel_ids', 'updated_ids']:
+        #         target_path = self.file_path / "_" / f"{method_name}.json"
+        #         relative_path = target_path.relative_to(cwd_path)
+        #         make_target = str(relative_path)
+        #     else:
+        #         target_path = self.file_path / "var" / f"{method_name}.parquet"
+        #         relative_path = target_path.relative_to(cwd_path.parent)
+        #         make_target = '../' + str(relative_path)
+
+        #     subprocess.run(["make", make_target], cwd=cwd_path, check=True)
+        #     print(f"Makefile executed successfully for {self.name}. Rechecking for {target_path.name}...")
+
+        #     # Step 4: Recheck if the parquet file was successfully generated
+        #     if not target_path.exists():
+        #         print(f"Data file {target_path} still missing after running Makefile.")
+        #         return pd.DataFrame()
+
+
+        #     # Step 5: Read and return the parquet or JSON file
+        #     if target_path.suffix == '.json':
+        #         with open(target_path, 'r') as json_file:
+        #             dic = json.load(json_file)
+        #         return dic
+        #     else:
+        #         df = get_dataframe(target_path)
+
+        #     df = map_index(df)
+        # if 'i' in df.index.names and not df.attrs.get('id_converted') and method_name not in ['panel_ids', 'updated_ids'] and self._updated_ids_cache is not None:
+        #     df = id_walk(df, self.updated_ids)
+        # return df
 
     def _compute_panel_ids(self):
         """
         Compute and cache both panel_ids and updated_ids.
         """
         panel_ids_dic = self._aggregate_wave_data(None, 'panel_ids')
-
         if isinstance(panel_ids_dic, dict):
             updated_ids_dic = self._aggregate_wave_data(None, 'updated_ids')
+            self._panel_ids_cache = panel_ids_dic
+            self._updated_ids_cache = updated_ids_dic
         elif isinstance(panel_ids_dic, pd.DataFrame) and not panel_ids_dic.empty:
             panel_ids_dic, updated_ids_dic = panel_ids(panel_ids_dic)
-            # panel_ids_dic = panel_ids_dic.data
             self._panel_ids_cache = panel_ids_dic
             self._updated_ids_cache = updated_ids_dic
         else:
