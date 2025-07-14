@@ -122,11 +122,11 @@ class Wave:
                         for i in mapping_steps:
                             if isinstance(i, str) and i in formatting_functions:
                                 # If the first element is a function name, we apply it first
-                                mapping.append(formatting_functions[i])
+                                mapping = mapping+(formatting_functions[i])
                                 break
                             elif isinstance(i, list) and len(i) == 3:
                                 # If the first element is a list, we apply categorical mapping
-                                mapping.append(self.categorical_mapping(i[0]).loc[[i[1], i[2]]].to_dict())
+                                mapping = mapping + (self.categorical_mapping(i[0]).loc[[i[1], i[2]]].to_dict())
                                 break
 
                         return (value[:-1], mapping)    
@@ -178,7 +178,7 @@ class Wave:
             warnings.warn(f"Categorical mapping file not found: {org_fn}")
             return {}
         else:
-            return dic.append(all_dfs_from_orgfile(org_fn))
+            return dic.update(all_dfs_from_orgfile(org_fn))
 
     @property
     def mapping(self):
@@ -374,12 +374,13 @@ class Country:
         return function_dic
     
     @property
-    def categorical_mapping(self, dirs = ['./, ../']):
+    def categorical_mapping(self, dirs = ['./', '../']):
         '''
         Get the categorical mapping for the country
         '''
         for dir in dirs:
-            org_fn = self.file_path / dir/ "_" / "categorical_mapping.org"
+            org_fn = Path(self.file_path / dir/ "_" / "categorical_mapping.org")
+            print(org_fn)
             if not org_fn.exists():
                 warnings.warn(f"Categorical mapping file not found: {org_fn}")
                 return {}
