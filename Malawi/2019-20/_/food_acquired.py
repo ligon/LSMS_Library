@@ -43,12 +43,26 @@ conversions['item_name'] = conversions['item_name'].map(D)
 
 df = df.set_index(['j', 'i'])
 df = df.join(regions).set_index('m', append=True).replace(r'^\s*$', np.nan, regex=True)
-df['unitcode_consumed'], df['unitcode_bought'] = df['unitcode_consumed'].str.upper(), df['unitcode_bought'].str.upper()
+df['unitcode_consumed'] = df['unitcode_consumed'].str.upper()
+df['unitcode_bought'] = df['unitcode_bought'].str.upper()
+df['unitcode_produced'] = df['unitcode_produced'].str.upper()
+df['unitcode_gifted'] = df['unitcode_gifted'].str.upper()
 
 #handling conversion table
 conversions = conversions.replace({'South': 'Southern'}).groupby(['region', 'item_name', 'unit_code']).agg({'factor': 'mean'})
-df = df.reset_index().merge(conversions, how='left', left_on=['i', 'm', 'unitcode_consumed'], right_on=['item_name', 'region', 'unit_code']).rename({'factor' : 'cfactor_consumed'}, axis=1)
-df = df.merge(conversions, how='left', left_on=['i', 'm', 'unitcode_bought'], right_on=['item_name', 'region', 'unit_code']).rename({'factor' : 'cfactor_bought'}, axis = 1)
+df = df.reset_index().merge(conversions, how='left',
+                            left_on=['i', 'm', 'unitcode_consumed'],
+                            right_on=['item_name', 'region', 'unit_code']).rename({'factor' : 'cfactor_consumed'}, axis=1)
+df = df.merge(conversions, how='left',
+              left_on=['i', 'm', 'unitcode_bought'],
+              right_on=['item_name', 'region', 'unit_code']).rename({'factor' : 'cfactor_bought'}, axis = 1)
+df = df.merge(conversions, how='left',
+              left_on=['i', 'm', 'unitcode_produced'],
+              right_on=['item_name', 'region', 'unit_code']).rename({'factor' : 'cfactor_produced'}, axis = 1)
+df = df.merge(conversions, how='left',
+              left_on=['i', 'm', 'unitcode_gifted'],
+              right_on=['item_name', 'region', 'unit_code']).rename({'factor' : 'cfactor_gifted'}, axis = 1)
+
 df = df.set_index(['j', 'm', 'i'])
 df = handling_unusual_units(df)
 
@@ -57,7 +71,10 @@ df['price per unit'] = df['expenditure']/df['quantity_bought']
 df['t'] = wave
 df = df.reset_index().set_index(['j','t','i']).dropna(how='all')
 
-final = df.loc[:, ['quantity_consumed', 'u_consumed', 'quantity_bought', 'u_bought', 'price per unit', 'expenditure', 'cfactor_consumed', 'cfactor_bought']]
+final = df.loc[:, ['quantity_consumed', 'u_consumed', 'quantity_bought',
+                   'u_bought', 'price per unit', 'expenditure',
+                   'quantity_produced',
+                   'cfactor_consumed', 'cfactor_bought']]
 final['u_bought'] = final.u_bought.astype(str)
 
 labelsd = get_categorical_mapping(tablename='harmonize_food',
