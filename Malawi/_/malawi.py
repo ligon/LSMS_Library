@@ -66,6 +66,7 @@ def handling_unusual_units(df):
     df['u_consumed'] = df['u_consumed'].replace('nan', np.NaN).fillna(df['units_consumed'])
     df['u_bought'] = np.where(~df['cfactor_bought'].isna(), 'kg', df['unitsdetail_bought'])
     df['u_bought'] = df['u_bought'].replace('nan', np.NaN).fillna(df['units_bought'])
+
     return df
 
 def conversion_table_matching(df, conversions, conversion_label_name, num_matches=3, cutoff = 0.6):

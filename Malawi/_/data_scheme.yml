@@ -21,3 +21,14 @@ Data Scheme:
   panel_ids:
     index: (t, i)
     previous_i: str
+  food_acquired:
+    index: (t, v, visit, i, j, u)
+    Quantity: float
+    Price: float
+    Produced: float
+  interview_date:
+    index: (t, v, visit, i)
+    Int_t: str
+  food_expenditures:
+  household_characteristics:
+  food_prices:
