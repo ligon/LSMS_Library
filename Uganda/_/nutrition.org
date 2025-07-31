@@ -1149,32 +1149,32 @@ Central https://fdc.nal.usda.gov/fdc-app.html#/. Labels that starts with "Other"
 are ignored.
 
 #+name: fct_addition
-| Preferred Label         |  FDC ID | FDC Description                                                 |
-|-------------------------+---------+-----------------------------------------------------------------|
-| Apples                  | 1750339 | Apples, red delicious, with skin, raw                           |
-| Butter                  |  789828 | Butter, stick, unsalted                                         |
-| Cheese                  |  746767 | Cheese, swiss                                                   |
-| Chicken (broiler)       |  171447 | Chicken, broilers or fryers, meat and skin, raw                 |
-| Coffee                  |  171881 | Beverages, coffee, brewed, breakfast blend                      |
-| Coffee (other)          |  171890 | Beverages, coffee, brewed, prepared with tap water              |
-| Cornflakes              | 2343937 | Cereal, corn flakes, plain                                      |
-| Cucumber                | 2346406 | Cucumber, with peel, raw                                        |
-| Donuts                  |  174990 | Doughnuts, cake-type, plain (includes unsugared, old-fashioned) |
-| Ginger (fresh)          |  169231 | Ginger root, raw                                                |
-| Ginger (powder)         |  170926 | Spices, ginger, ground                                          |
-| Ice Cream               |  167575 | Ice creams, vanilla                                             |
-| Infant Formula          |  173554 | Infant formula, PBM PRODUCTS, store brand, powder               |
-| Jam/Marmalade           |  169641 | Jams and preserves                                              |
-| Margarine, Butter, etc  |  172339 | Margarine-like, margarine-butter blend, soybean oil and butter  |
-| Salt                    |  746775 | Salt, table, iodized                                            |
-| Sausages                |  174585 | Sausage, smoked link sausage, pork and beef                     |
-| Soybeans (fresh)        |  174270 | Soybeans, mature seeds, raw                                     |
-| Tea                     |  174144 | Beverages, tea, black, ready to drink                           |
-| Tea (green)             |  171917 | Beverages, tea, green, brewed, regular                          |
-| Tea (leaves)            |  173227 | Beverages, tea, black, brewed, prepared with tap water          |
-| Tea (other)             |  173232 | Beverages, tea, herb, other than chamomile, brewed              |
-| Water                   |  173647 | Beverages, water, tap, drinking                                 |
-| Yoghurt                 |  171284 | Yogurt, plain, whole milk                                       |
+| Preferred Label        |  FDC ID | FDC Description                                                 |
+|------------------------+---------+-----------------------------------------------------------------|
+| Apples                 | 1750339 | Apples, red delicious, with skin, raw                           |
+| Butter                 |  789828 | Butter, stick, unsalted                                         |
+| Cheese                 |  746767 | Cheese, swiss                                                   |
+| Chicken (broiler)      |  171447 | Chicken, broilers or fryers, meat and skin, raw                 |
+| Coffee                 |  171881 | Beverages, coffee, brewed, breakfast blend                      |
+| Coffee (other)         |  171890 | Beverages, coffee, brewed, prepared with tap water              |
+| Cornflakes             | 2343937 | Cereal, corn flakes, plain                                      |
+| Cucumber               | 2346406 | Cucumber, with peel, raw                                        |
+| Donuts                 |  174990 | Doughnuts, cake-type, plain (includes unsugared, old-fashioned) |
+| Ginger (fresh)         |  169231 | Ginger root, raw                                                |
+| Ginger (powder)        |  170926 | Spices, ginger, ground                                          |
+| Ice Cream              |  167575 | Ice creams, vanilla                                             |
+| Infant Formula         |  173554 | Infant formula, PBM PRODUCTS, store brand, powder               |
+| Jam/Marmalade          |  169641 | Jams and preserves                                              |
+| Margarine, Butter, etc |  172339 | Margarine-like, margarine-butter blend, soybean oil and butter  |
+| Salt                   |  746775 | Salt, table, iodized                                            |
+| Sausages               |  174585 | Sausage, smoked link sausage, pork and beef                     |
+| Soybeans (fresh)       |  174270 | Soybeans, mature seeds, raw                                     |
+| Tea                    |  174144 | Beverages, tea, black, ready to drink                           |
+| Tea (green)            |  171917 | Beverages, tea, green, brewed, regular                          |
+| Tea (leaves)           |  173227 | Beverages, tea, black, brewed, prepared with tap water          |
+| Tea (other)            |  173232 | Beverages, tea, herb, other than chamomile, brewed              |
+| Water                  |  173647 | Beverages, water, tap, drinking                                 |
+| Yoghurt                |  171284 | Yogurt, plain, whole milk                                       |
 
  #+begin_src python :var tab=fct_addition :colnames no :prologue "# -*- coding: utf-8 -*-" :tangle foo.py
 from cfe.df_utils import orgtbl_to_df
