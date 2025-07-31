@@ -24,5 +24,3 @@ Data Scheme:
   panel_ids:
     index: (t, i)
     previous_i: str
-
-
