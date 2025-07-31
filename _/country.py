@@ -253,8 +253,7 @@ class Wave:
             # The reason why not just simply run the python file is some data's python files have dependencies.
             print(f"Attempting to generate using Makefile...", flush=True)
             #cluster features in the old makefile is called 'other_features'
-            if request =='cluster_features':
-                request = 'other_features'
+            # if request =='cluster_features': request = 'other_features'
             parquet_fn = self.file_path/"_"/ f"{request}.parquet"
 
             makefile_path = self.file_path.parent /'_'/ "Makefile"
@@ -481,8 +480,8 @@ class Country:
         if makefile_path.exists():
             print(f"Attempting to generate using Makefile for {method_name}...", flush=True)
 
-            if method_name == 'cluster_features':
-                method_name = 'other_features'
+            #if method_name == 'cluster_features':
+            #    method_name = 'other_features'
 
             cwd_path = self.file_path / "_"
             if method_name in ['panel_ids', 'updated_ids']:
