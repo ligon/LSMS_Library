@@ -53,3 +53,6 @@ def Int_t(value):
         return np.nan
     else:
         return pd.to_datetime(value, errors='coerce').date()
+def interview_date(df):
+    df  = pd.to_datetime(df.squeeze())
+    return df

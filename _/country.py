@@ -195,8 +195,8 @@ class Wave:
         if request not in self.data_scheme:
             warnings.warn(f"Data scheme does not contain {request} for {self.name}")
             return pd.DataFrame()
-        try:
-            data_info = self.resources[request]
+        data_info = self.resources.get(request, None)
+        if data_info:
             def check_adding_t(df):
                 index_list = df.index.names
                 if 't' not in index_list:
@@ -213,7 +213,7 @@ class Wave:
                     df = df_data_grabber(f'{self.folder}/Data/{file}', mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat)
                     df = check_adding_t(df)
                     # Oddity with large number for missing code
-                    na = df.select_dtypes(exclude='object').max().max()
+                    na = df.select_dtypes(exclude=['object', 'datetime64[ns]']).max().max()
                     if na>1e99:
                         warnings.warn(f"Large number used for missing?  Replacing {na} with NaN.")
                         df = df.replace(na,np.nan)
@@ -248,8 +248,7 @@ class Wave:
                 mapping_details = self.column_mapping(request, data_info)
                 df = get_data(data_info, mapping_details)
 
-        except KeyError as e:
-            print(f'KeyError: {str(e)} in {self.name}', flush=True)
+        else:
             # The reason why not just simply run the python file is some data's python files have dependencies.
             print(f"Attempting to generate using Makefile...", flush=True)
             #cluster features in the old makefile is called 'other_features'
@@ -297,20 +296,11 @@ class Wave:
         # if food_acquired data is load from parquet file, we assume its unit and food label are already mapped
         if parquet_fn.exists():
             return df
-        
-        
-        #If dataframe is mapped by yml file, we need to map the unit and food label, assuming columns are only ['Expenditure', 'Quantity', 'Produced', 'Price']
-        # unit_mapping = self.categorical_mapping('unit').loc[['Original Label', 'Preferred Label']].to_dict()
-        # food_mapping = self.categorical_mapping('harmonize_food').loc[['Original Label', 'Preferred Label']].to_dict()
         #Customed
         agg_functions = {'Expenditure': 'sum', 'Quantity': 'sum', 'Produced': 'sum', 'Price': 'first'}
         index = df.index.names
         variable = df.columns
         df = df.reset_index()
-        # if food_mapping is not None:
-        #     df['j'] = df['j'].map(food_mapping)
-        # if unit_mapping is not None:
-        #     df['u'] = df['u'].map(unit_mapping)
         agg_func = {key: value for key, value in agg_functions.items() if key in variable}
         #replace not float value in Quantity, Expenditure, Produced with np.nan
         for col in ['Quantity', 'Expenditure', 'Produced']:
@@ -465,6 +455,20 @@ class Country:
 
         if waves is None:
             waves = self.waves
+        def safe_concat_dataframe_dict(df_dict):
+            # Get the target index name order from the first DataFrame
+            reference_order = next(iter(df_dict.values())).index.names
+
+            aligned_dfs = {}
+            for key, df in df_dict.items():
+                if list(df.index.names) != list(reference_order):
+                    try:
+                        df = df.reorder_levels(reference_order)
+                    except Exception as e:
+                        raise ValueError(f"Cannot reorder index levels for '{key}': {e}")
+                aligned_dfs[key] = df
+
+            return pd.concat(aligned_dfs.values(), axis=0, sort=False)  
 
         def load_from_waves(waves):
             results = {}
@@ -474,15 +478,22 @@ class Country:
                 except KeyError as e:
                     warnings.warn(str(e))
             if results:
-                return pd.concat(results.values(), axis=0, sort=False)
+                #using safe_concat_dataframe_dict only if more than 2 not empty DataFrames
+                non_empty_df = [df for df in results.values() if not df.empty]
+                if len(non_empty_df) > 1:
+                    return safe_concat_dataframe_dict(results)
+                else:
+                    return pd.concat(non_empty_df, axis=0, sort=False)
             raise KeyError(f"No data found for {method_name} in any wave of {self.name}.")
-
-        makefile_path = self.file_path / "_" / "Makefile"
-        if makefile_path.exists():
-            print(f"Attempting to generate using Makefile for {method_name}...", flush=True)
-
-            if method_name == 'cluster_features':
-                method_name = 'other_features'
+        
+        def load_from_makefile(method_name):
+            """
+            Load data from Makefile if it exists.
+            """
+            makefile_path = self.file_path / "_" / "Makefile"
+            if not makefile_path.exists():
+                warnings.warn(f"Makefile not found in {makefile_path}. Unable to generate required data.")
+                return pd.DataFrame()
 
             cwd_path = self.file_path / "_"
             if method_name in ['panel_ids', 'updated_ids']:
@@ -494,88 +505,33 @@ class Country:
                 relative_path = target_path.relative_to(cwd_path.parent)
                 make_target = '../' + str(relative_path)
 
-            try:
-                subprocess.run(["make", make_target], cwd=cwd_path, check=True)
-                print(f"Makefile executed successfully for {self.name}. Rechecking for {target_path.name}...")
+            subprocess.run(["make", make_target], cwd=cwd_path, check=True)
+            print(f"Makefile executed successfully for {self.name}. Rechecking for {target_path.name}...")
 
-                if not target_path.exists():
-                    print(f"Data file {target_path} still missing after running Makefile.")
-                    return pd.DataFrame()
+            if not target_path.exists():
+                print(f"Data file {target_path} still missing after running Makefile.")
+                return pd.DataFrame()
 
-                if target_path.suffix == '.json':
-                    with open(target_path, 'r') as json_file:
-                        return json.load(json_file)
-                else:
-                    df = get_dataframe(target_path)
-                    df = map_index(df)
-
-            except subprocess.CalledProcessError:
-                print(f"Makefile failed for {method_name}. Falling back to loading from waves...")
-                df = load_from_waves(waves)
-
-        else:
+            if target_path.suffix == '.json':
+                with open(target_path, 'r') as json_file:
+                    return json.load(json_file)
+            else:
+                df = get_dataframe(target_path)
+                df = map_index(df)
+            return df
+        
+        if self.resources.get('Data Scheme').get(method_name, None):
             df = load_from_waves(waves)
+        else:
+            df = load_from_makefile(method_name)
+        
+        if isinstance(df, dict):
+            return df
 
         if 'i' in df.index.names and not df.attrs.get('id_converted') and method_name not in ['panel_ids', 'updated_ids'] and self._updated_ids_cache is not None:
             df = id_walk(df, self.updated_ids)
 
         return df
-        # #Step 1: Check if it mapped by data_info.yml
-        # if method_name in self.resources.get('Data Scheme', {}):
-        #     results = {}
-        #     for w in waves:
-        #         try:
-        #             results[w] = getattr(self[w], method_name)()
-        #         except KeyError as e:
-        #             warnings.warn(str(e))
-        #     if results:
-        #         df= pd.concat(results.values(), axis=0, sort=False)
-        #         # return map_index(df, self.name)
-        # else:
-        #     # Step 2: Attempt to build using makefile
-        #     print(f"Attempting to generate using Makefile...")
-
-        #     makefile_path = self.file_path /'_'/ "Makefile"
-        #     if not makefile_path.exists():
-        #         raise FileNotFoundError(f"Makefile not found in {self.file_path}. Unable to generate required data.")
-            
-        #     if method_name in ['cluster_features']:
-        #     # if cluster feature is not defined in yml file, we will use makefile and the variable name is 'other_features'
-        #         method_name = 'other_features' 
-
-        #     # Step 3: Run Makefile for the specific parquet/json file
-        #     cwd_path = self.file_path / "_"
-
-        #     if method_name in ['panel_ids', 'updated_ids']:
-        #         target_path = self.file_path / "_" / f"{method_name}.json"
-        #         relative_path = target_path.relative_to(cwd_path)
-        #         make_target = str(relative_path)
-        #     else:
-        #         target_path = self.file_path / "var" / f"{method_name}.parquet"
-        #         relative_path = target_path.relative_to(cwd_path.parent)
-        #         make_target = '../' + str(relative_path)
-
-        #     subprocess.run(["make", make_target], cwd=cwd_path, check=True)
-        #     print(f"Makefile executed successfully for {self.name}. Rechecking for {target_path.name}...")
-
-        #     # Step 4: Recheck if the parquet file was successfully generated
-        #     if not target_path.exists():
-        #         print(f"Data file {target_path} still missing after running Makefile.")
-        #         return pd.DataFrame()
-
-
-        #     # Step 5: Read and return the parquet or JSON file
-        #     if target_path.suffix == '.json':
-        #         with open(target_path, 'r') as json_file:
-        #             dic = json.load(json_file)
-        #         return dic
-        #     else:
-        #         df = get_dataframe(target_path)
-
-        #     df = map_index(df)
-        # if 'i' in df.index.names and not df.attrs.get('id_converted') and method_name not in ['panel_ids', 'updated_ids'] and self._updated_ids_cache is not None:
-        #     df = id_walk(df, self.updated_ids)
-        # return df
 
     def _compute_panel_ids(self):
         """
@@ -621,7 +577,45 @@ class Country:
                 return self._aggregate_wave_data(waves, name)
             return method
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
+    
+    def test_all_data_schemes(self, waves=None):
+        """
+        Test whether all method_names in obj.data_scheme can be successfully built.
+        Falls back to Makefile if not in data_scheme.
+        """
+        all_methods = set(self.data_scheme)
+        print(f"Testing all methods in {self.name} data scheme: {sorted(all_methods)}")
 
+        failed_methods = {}
+        
+        for method_name in sorted(all_methods):
+            print(f"\n>>> Testing method: {method_name}")
+            try:
+                df = self._aggregate_wave_data(waves=waves, method_name=method_name)
+
+                # If it's JSON, it'll return a dict
+                if isinstance(df, dict):
+                    print(f"Loaded JSON for {method_name}: {len(df)} entries")
+                elif isinstance(df, pd.DataFrame):
+                    if df.empty:
+                        print(f"Empty DataFrame for {method_name}")
+                    else:
+                        print(f"DataFrame loaded for {method_name}: {df.shape}")
+                else:
+                    print(f"❓ Unexpected return type for {method_name}: {type(df)}")
+            except Exception as e:
+                print(f"Failed to load {method_name}: {str(e)}")
+                failed_methods[method_name] = str(e)
+
+        print("\n=== Summary ===")
+        if failed_methods:
+            print(f"{len(failed_methods)} methods failed:")
+            for method, error in failed_methods.items():
+                print(f" - {method}: {error}")
+        else:
+            print("All methods loaded successfully!")
+
+        return failed_methods
 
 
 
