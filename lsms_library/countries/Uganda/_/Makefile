@@ -46,7 +46,7 @@ earnings_parquet := $(earnings:.py=.parquet)
 shocks = $(shell find $(rounds) -name shocks.py)
 shocks_parquet := $(shocks:.py=.parquet)
 
-../var/shocks.parquet: shocks.py $(shocks_parquet)
+../var/shocks.parquet: shocks.py $(shocks_parquet) ../var/other_features.parquet
 	python shocks.py
 
 
