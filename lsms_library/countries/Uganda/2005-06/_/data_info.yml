@@ -12,7 +12,7 @@ people_last7days:
         Girls : h14q4
 
 cluster_features:
-    file: ../Data/GSEC1.dta
+    file: GSEC1.dta
     idxvars:
         i: HHID
         v: comm
