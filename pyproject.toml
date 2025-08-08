@@ -12,6 +12,7 @@ dependencies = [
 
 [tool-poetry]
 packages = [{include="_"}]
+exclude = ["**/.git/", ".git/"]
 
 [project-urls]
 repository = "https://github.com/ligon/LSMS_Library"
