@@ -1,0 +1,6 @@
+outs:
+- md5: 8e9e67949bec58b74f079811f5f91b35
+  size: 10918
+  isexec: true
+  hash: md5
+  path: s12a_housing1_panel_labels.xlsx

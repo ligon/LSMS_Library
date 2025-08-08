@@ -1,0 +1,6 @@
+outs:
+- md5: 825806ee9cfba64362e77062c76842cc
+  size: 15238
+  isexec: true
+  hash: md5
+  path: s7a_fertility_panel.xlsx

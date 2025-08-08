@@ -1,0 +1,5 @@
+outs:
+- md5: dca6ec20a4754e4437656caa443082be
+  size: 255756
+  hash: md5
+  path: GHA_1987_GLSS_Figures.pdf

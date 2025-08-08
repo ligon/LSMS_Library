@@ -1,0 +1,6 @@
+outs:
+- md5: 726ea49b874b1a053fda27a732850bcb
+  size: 9228
+  isexec: true
+  hash: md5
+  path: s2b_nrspouses_w2_labels.xlsx

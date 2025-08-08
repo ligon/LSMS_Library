@@ -1,0 +1,6 @@
+outs:
+- md5: 35db2e7d5aa3adf5a8b2d896d90c5804
+  size: 10360
+  isexec: true
+  hash: md5
+  path: s5f_services_w1.xlsx

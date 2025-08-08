@@ -1,0 +1,6 @@
+outs:
+- md5: 709e1bbddd21ca58c9f1a25d5423ff4c
+  size: 10228
+  isexec: true
+  hash: md5
+  path: s1fi_generaleducation_panel_labels.xlsx

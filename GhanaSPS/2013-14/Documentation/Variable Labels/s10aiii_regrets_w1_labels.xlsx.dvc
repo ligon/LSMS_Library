@@ -1,0 +1,6 @@
+outs:
+- md5: e5f29f254517bb5b6c42052abcdabd12
+  size: 8716
+  isexec: true
+  hash: md5
+  path: s10aiii_regrets_w1_labels.xlsx

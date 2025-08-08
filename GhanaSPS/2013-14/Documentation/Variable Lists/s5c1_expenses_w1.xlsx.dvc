@@ -1,0 +1,6 @@
+outs:
+- md5: 13b70e260097cdd470161c5a1d6402bf
+  size: 13826
+  isexec: true
+  hash: md5
+  path: s5c1_expenses_w1.xlsx

@@ -1,0 +1,6 @@
+outs:
+- md5: 5bdf160550a9cdda61d0d411c18a552c
+  size: 10041
+  isexec: true
+  hash: md5
+  path: s5e1_foodexpenses_w1_labels.xlsx

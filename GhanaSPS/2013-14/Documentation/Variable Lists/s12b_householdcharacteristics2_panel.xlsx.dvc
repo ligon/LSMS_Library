@@ -1,0 +1,6 @@
+outs:
+- md5: db822bc4e96e52f9649d77fb5273775d
+  size: 11914
+  isexec: true
+  hash: md5
+  path: s12b_householdcharacteristics2_panel.xlsx

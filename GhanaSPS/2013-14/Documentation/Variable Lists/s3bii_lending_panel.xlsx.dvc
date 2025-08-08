@@ -1,0 +1,6 @@
+outs:
+- md5: 0987a17b25d05fbbaa2527ecd9b8f203
+  size: 12840
+  isexec: true
+  hash: md5
+  path: s3bii_lending_panel.xlsx

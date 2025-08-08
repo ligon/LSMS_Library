@@ -1,0 +1,6 @@
+outs:
+- md5: 265aead829bb14550b149f43b7712427
+  size: 9330
+  isexec: true
+  hash: md5
+  path: s2a_nrrelatives_w2_labels.xlsx

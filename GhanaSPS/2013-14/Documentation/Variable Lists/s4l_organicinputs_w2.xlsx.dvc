@@ -1,0 +1,6 @@
+outs:
+- md5: 77bc9c10680ed68d8b5a83f3910b6a92
+  size: 11187
+  isexec: true
+  hash: md5
+  path: s4l_organicinputs_w2.xlsx

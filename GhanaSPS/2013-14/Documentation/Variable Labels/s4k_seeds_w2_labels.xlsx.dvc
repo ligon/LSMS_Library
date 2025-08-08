@@ -1,0 +1,6 @@
+outs:
+- md5: 48c6052530c033e6083e455c678bef35
+  size: 8741
+  isexec: true
+  hash: md5
+  path: s4k_seeds_w2_labels.xlsx

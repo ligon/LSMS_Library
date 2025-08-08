@@ -1,0 +1,6 @@
+outs:
+- md5: 4f5e191fb8b439635abb299b5027f5a0
+  size: 9868
+  isexec: true
+  hash: md5
+  path: s5d2_traderevenues_w1.xlsx

@@ -1,0 +1,6 @@
+outs:
+- md5: 5b26b13d958ac16bfd9175aef0b1d3d3
+  size: 9666
+  isexec: true
+  hash: md5
+  path: s10b_bigfive_w1_labels.xlsx

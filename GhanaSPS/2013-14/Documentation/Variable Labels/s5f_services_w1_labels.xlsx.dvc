@@ -1,0 +1,6 @@
+outs:
+- md5: e3e6c9d35820512eb07b9cfcd3976c5a
+  size: 10901
+  isexec: true
+  hash: md5
+  path: s5f_services_w1_labels.xlsx

@@ -1,0 +1,6 @@
+outs:
+- md5: 685298a0dc85f1fc3dee2956c8139351
+  size: 10469
+  isexec: true
+  hash: md5
+  path: s3ai_animals_panel.xlsx

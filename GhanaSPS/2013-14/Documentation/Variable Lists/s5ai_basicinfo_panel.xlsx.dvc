@@ -1,0 +1,6 @@
+outs:
+- md5: 30c5f1bb0760a0059d43d266dce90110
+  size: 14601
+  isexec: true
+  hash: md5
+  path: s5ai_basicinfo_panel.xlsx

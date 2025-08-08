@@ -1,0 +1,6 @@
+outs:
+- md5: a4147f3b2aafc9479721c072e590faf3
+  size: 9201
+  isexec: true
+  hash: md5
+  path: s2b_nrspouses_panel_labels.xlsx

@@ -1,0 +1,6 @@
+outs:
+- md5: 735f96b44a336094b43378d8754f7a45
+  size: 8357
+  isexec: true
+  hash: md5
+  path: s11d_fuelconsumption_panel_labels.xlsx

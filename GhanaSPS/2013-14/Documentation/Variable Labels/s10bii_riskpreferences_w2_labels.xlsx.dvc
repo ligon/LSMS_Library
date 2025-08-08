@@ -1,0 +1,6 @@
+outs:
+- md5: 192a549aa13b56bcbda25c9ca029a12d
+  size: 8498
+  isexec: true
+  hash: md5
+  path: s10bii_riskpreferences_w2_labels.xlsx

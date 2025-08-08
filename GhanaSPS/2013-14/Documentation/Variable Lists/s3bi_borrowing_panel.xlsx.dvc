@@ -1,0 +1,6 @@
+outs:
+- md5: 757e002dcfd7b2468c81c85d7bc66139
+  size: 11893
+  isexec: true
+  hash: md5
+  path: s3bi_borrowing_panel.xlsx

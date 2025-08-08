@@ -1,0 +1,6 @@
+outs:
+- md5: f12f25dd06af97e5106253db9440fee5
+  size: 13394
+  isexec: true
+  hash: md5
+  path: s5d1_tradepurchases_w1.xlsx

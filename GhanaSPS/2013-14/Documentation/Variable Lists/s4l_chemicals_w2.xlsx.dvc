@@ -1,0 +1,6 @@
+outs:
+- md5: 0afc9146595cec1d20c624af1e2777f5
+  size: 14255
+  isexec: true
+  hash: md5
+  path: s4l_chemicals_w2.xlsx

@@ -1,0 +1,6 @@
+outs:
+- md5: 48632b58173578093bb338bae4e1aed2
+  size: 12130
+  isexec: true
+  hash: md5
+  path: s6f_past2weeks_panel.xlsx

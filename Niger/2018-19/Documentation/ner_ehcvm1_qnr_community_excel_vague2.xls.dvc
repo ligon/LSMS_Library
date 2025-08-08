@@ -1,0 +1,5 @@
+outs:
+- md5: 78545c3e7c2cbe7c97c5a7f7e56496ec
+  size: 421888
+  hash: md5
+  path: ner_ehcvm1_qnr_community_excel_vague2.xls

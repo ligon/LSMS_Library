@@ -1,0 +1,6 @@
+outs:
+- md5: 5a6f6e352c34954a3a3953a6600baa31
+  size: 8778
+  isexec: true
+  hash: md5
+  path: s5e3_foodinvent_w1_labels.xlsx

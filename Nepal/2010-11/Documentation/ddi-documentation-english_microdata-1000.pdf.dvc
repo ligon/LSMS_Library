@@ -1,0 +1,5 @@
+outs:
+- md5: b083d2afecb722426d69fe76a9b0e2a9
+  size: 123029
+  hash: md5
+  path: ddi-documentation-english_microdata-1000.pdf

@@ -1,0 +1,5 @@
+outs:
+- md5: e0d9e61f65929a221169d98c35ecd1f3
+  size: 40542
+  hash: md5
+  path: EMNV05_Precios.pdf

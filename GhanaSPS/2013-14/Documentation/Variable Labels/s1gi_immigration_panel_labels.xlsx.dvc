@@ -1,0 +1,6 @@
+outs:
+- md5: 1bec273e8d49b815bc318ddacff62d6b
+  size: 9015
+  isexec: true
+  hash: md5
+  path: s1gi_immigration_panel_labels.xlsx

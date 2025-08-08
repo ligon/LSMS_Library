@@ -1,0 +1,5 @@
+outs:
+- md5: a051c370c83236c6b7b97a040ac1a049
+  size: 12228
+  hash: md5
+  path: precios.pdf

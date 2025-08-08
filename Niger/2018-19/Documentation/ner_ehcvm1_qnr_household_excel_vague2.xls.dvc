@@ -1,0 +1,5 @@
+outs:
+- md5: 9348df36d0dc436796baaf6f1bbfaf28
+  size: 868864
+  hash: md5
+  path: ner_ehcvm1_qnr_household_excel_vague2.xls

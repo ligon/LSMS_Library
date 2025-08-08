@@ -1,0 +1,5 @@
+outs:
+- md5: 71c89b4e3c5ec8b5b30bb75a1aa32130
+  size: 740315
+  hash: md5
+  path: GHA_1998_GLSS_Report_EN.pdf

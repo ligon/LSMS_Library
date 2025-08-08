@@ -1,0 +1,6 @@
+outs:
+- md5: df20e5a7f28f92b3dbf034f737a4a736
+  size: 10221
+  isexec: true
+  hash: md5
+  path: s11a_foodconsumption_panel.xlsx

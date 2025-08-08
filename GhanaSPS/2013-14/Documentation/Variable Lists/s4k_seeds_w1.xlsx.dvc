@@ -1,0 +1,6 @@
+outs:
+- md5: 513d8e74447bee9975c35b9282b99e6e
+  size: 11603
+  isexec: true
+  hash: md5
+  path: s4k_seeds_w1.xlsx

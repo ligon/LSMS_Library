@@ -1,0 +1,6 @@
+outs:
+- md5: 5220774632155c245762b3655a888e22
+  size: 9909
+  isexec: true
+  hash: md5
+  path: s10avi_timeuse_w1_labels.xlsx

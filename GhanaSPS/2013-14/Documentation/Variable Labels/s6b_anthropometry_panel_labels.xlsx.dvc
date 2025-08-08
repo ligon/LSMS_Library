@@ -1,0 +1,6 @@
+outs:
+- md5: 84327a0c48e8970673a36e8ea0004299
+  size: 8472
+  isexec: true
+  hash: md5
+  path: s6b_anthropometry_panel_labels.xlsx

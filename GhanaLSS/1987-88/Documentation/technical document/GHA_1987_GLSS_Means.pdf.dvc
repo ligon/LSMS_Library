@@ -1,0 +1,5 @@
+outs:
+- md5: 2df8802f3b618e7b030c5387fdb42cbb
+  size: 2392247
+  hash: md5
+  path: GHA_1987_GLSS_Means.pdf

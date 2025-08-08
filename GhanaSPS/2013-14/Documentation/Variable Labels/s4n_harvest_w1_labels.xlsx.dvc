@@ -1,0 +1,6 @@
+outs:
+- md5: 6a6f535fbbbd54a7e45e812b3c8dbcc6
+  size: 10910
+  isexec: true
+  hash: md5
+  path: s4n_harvest_w1_labels.xlsx

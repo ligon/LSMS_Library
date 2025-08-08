@@ -1,0 +1,6 @@
+outs:
+- md5: 1428844bbdef1210f17d709bc5cb3225
+  size: 9812
+  isexec: true
+  hash: md5
+  path: s11d_fuelconsumption_panel.xlsx

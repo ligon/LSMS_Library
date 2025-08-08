@@ -1,0 +1,6 @@
+outs:
+- md5: e3400b3d9b1034224fdcc1fe18c11307
+  size: 8422
+  isexec: true
+  hash: md5
+  path: s11b_clothing_panel_labels.xlsx

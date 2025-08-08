@@ -1,0 +1,6 @@
+outs:
+- md5: 52a2ba8ac5ba53ee8ca90c424acf7125
+  size: 12286
+  isexec: true
+  hash: md5
+  path: s5bi_allemployees_panel.xlsx

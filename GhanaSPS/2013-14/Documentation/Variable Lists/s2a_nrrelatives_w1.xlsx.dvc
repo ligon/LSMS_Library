@@ -1,0 +1,6 @@
+outs:
+- md5: adda00d74ae97425149f7eb2d0683325
+  size: 11007
+  isexec: true
+  hash: md5
+  path: s2a_nrrelatives_w1.xlsx

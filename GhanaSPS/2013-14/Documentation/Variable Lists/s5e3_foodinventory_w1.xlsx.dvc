@@ -1,0 +1,6 @@
+outs:
+- md5: 815830c54fe4227ed2fcd9dbac937652
+  size: 10258
+  isexec: true
+  hash: md5
+  path: s5e3_foodinventory_w1.xlsx

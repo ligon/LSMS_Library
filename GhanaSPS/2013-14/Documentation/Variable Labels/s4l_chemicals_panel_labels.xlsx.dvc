@@ -1,0 +1,6 @@
+outs:
+- md5: 740fd4de32a10a832d1b59eb25ce675b
+  size: 12885
+  isexec: true
+  hash: md5
+  path: s4l_chemicals_panel_labels.xlsx

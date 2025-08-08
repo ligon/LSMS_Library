@@ -1,0 +1,6 @@
+outs:
+- md5: bd3681f68fdd7086d17a76e30a67aaea
+  size: 13005
+  isexec: true
+  hash: md5
+  path: s10avi_timeuse_w1.xlsx

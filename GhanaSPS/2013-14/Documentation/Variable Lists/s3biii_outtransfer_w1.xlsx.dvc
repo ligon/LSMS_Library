@@ -1,0 +1,6 @@
+outs:
+- md5: bf447349ad88a65607fee63fde99450e
+  size: 10841
+  isexec: true
+  hash: md5
+  path: s3biii_outtransfer_w1.xlsx

@@ -1,0 +1,6 @@
+outs:
+- md5: 3f19e2b143378f41e14006ce3f914248
+  size: 9529
+  isexec: true
+  hash: md5
+  path: s9c_ravenspattern_panel.xlsx

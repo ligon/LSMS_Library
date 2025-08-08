@@ -1,0 +1,6 @@
+outs:
+- md5: a28aaaeb75a10369ea25ae5e918790c7
+  size: 9238
+  isexec: true
+  hash: md5
+  path: s11b_clothingquestions_panel.xlsx

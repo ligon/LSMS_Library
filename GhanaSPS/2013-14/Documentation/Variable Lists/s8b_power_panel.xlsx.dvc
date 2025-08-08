@@ -1,0 +1,6 @@
+outs:
+- md5: 3e11ecff13c762dfb0c536e38221ceb6
+  size: 13425
+  isexec: true
+  hash: md5
+  path: s8b_power_panel.xlsx

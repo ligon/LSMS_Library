@@ -1,0 +1,6 @@
+outs:
+- md5: a7d41636733ffd25ea343b48abe1701f
+  size: 14553
+  isexec: true
+  hash: md5
+  path: s1d_background_panel.xlsx

@@ -1,0 +1,6 @@
+outs:
+- md5: 6249201bdf1588876d25413c92c70151
+  size: 10486
+  isexec: true
+  hash: md5
+  path: s2b_nrspouses_w1.xlsx

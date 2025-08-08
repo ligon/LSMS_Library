@@ -1,0 +1,6 @@
+outs:
+- md5: 297278a2493ab3d9b4b7434dd8711484
+  size: 8339
+  isexec: true
+  hash: md5
+  path: s3aiii_durablegoods_panel_labels.xlsx

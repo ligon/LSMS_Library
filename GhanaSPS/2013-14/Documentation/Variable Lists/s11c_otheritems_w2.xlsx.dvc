@@ -1,0 +1,6 @@
+outs:
+- md5: 4cea3330339c39289b3fd7f626bab579
+  size: 12699
+  isexec: true
+  hash: md5
+  path: s11c_otheritems_w2.xlsx

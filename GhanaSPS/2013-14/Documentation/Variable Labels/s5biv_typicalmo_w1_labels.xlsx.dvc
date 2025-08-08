@@ -1,0 +1,6 @@
+outs:
+- md5: 7178164398149b41121e16405820c45d
+  size: 9020
+  isexec: true
+  hash: md5
+  path: s5biv_typicalmo_w1_labels.xlsx

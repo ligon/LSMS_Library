@@ -1,0 +1,6 @@
+outs:
+- md5: ddfb044cd7227d20ac3545b3b5011c04
+  size: 9487
+  isexec: true
+  hash: md5
+  path: s11c_otheritems_w2_labels.xlsx

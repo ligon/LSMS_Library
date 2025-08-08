@@ -1,0 +1,5 @@
+outs:
+- md5: abc78726e7fca9e1ed32b8f6fe64a589
+  size: 104582
+  hash: md5
+  path: chnbinfo.pdf

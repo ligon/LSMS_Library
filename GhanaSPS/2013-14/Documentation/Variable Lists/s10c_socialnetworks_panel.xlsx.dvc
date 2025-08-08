@@ -1,0 +1,6 @@
+outs:
+- md5: 62a1d1452d24e4105616d9545ff0cace
+  size: 12141
+  isexec: true
+  hash: md5
+  path: s10c_socialnetworks_panel.xlsx

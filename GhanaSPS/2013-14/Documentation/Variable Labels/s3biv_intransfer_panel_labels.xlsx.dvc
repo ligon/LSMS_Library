@@ -1,0 +1,6 @@
+outs:
+- md5: b2c79c98c39600eef6c85da4ec42eca0
+  size: 9100
+  isexec: true
+  hash: md5
+  path: s3biv_intransfer_panel_labels.xlsx

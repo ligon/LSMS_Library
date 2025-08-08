@@ -1,0 +1,6 @@
+outs:
+- md5: 50c2431539b5439d2ad7200763e7525b
+  size: 8595
+  isexec: true
+  hash: md5
+  path: s10dii_extension_panel_labels.xlsx

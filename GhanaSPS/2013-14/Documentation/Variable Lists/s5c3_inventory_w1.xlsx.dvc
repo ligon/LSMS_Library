@@ -1,0 +1,6 @@
+outs:
+- md5: 40f87d0ccf1d316fbbe0a7bfef26771e
+  size: 10786
+  isexec: true
+  hash: md5
+  path: s5c3_inventory_w1.xlsx

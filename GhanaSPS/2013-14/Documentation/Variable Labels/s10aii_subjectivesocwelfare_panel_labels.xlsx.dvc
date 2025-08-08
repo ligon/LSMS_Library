@@ -1,0 +1,6 @@
+outs:
+- md5: d4f247bb1b6d0039d43ef81a52955043
+  size: 8220
+  isexec: true
+  hash: md5
+  path: s10aii_subjectivesocwelfare_panel_labels.xlsx

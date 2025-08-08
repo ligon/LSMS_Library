@@ -1,0 +1,6 @@
+outs:
+- md5: 15b77daba3a7f7bfbcdb2c829264db11
+  size: 21746
+  isexec: true
+  hash: md5
+  path: s4i_landtenure_panel.xlsx

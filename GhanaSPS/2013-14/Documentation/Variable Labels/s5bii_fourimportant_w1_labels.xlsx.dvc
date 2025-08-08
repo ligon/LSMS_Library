@@ -1,0 +1,6 @@
+outs:
+- md5: b590e923047a642b09f7eabd5e055e5b
+  size: 8820
+  isexec: true
+  hash: md5
+  path: s5bii_fourimportant_w1_labels.xlsx

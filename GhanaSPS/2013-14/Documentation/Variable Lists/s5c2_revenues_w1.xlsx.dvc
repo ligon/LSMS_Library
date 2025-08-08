@@ -1,0 +1,6 @@
+outs:
+- md5: 77179bed972b26a375cde28a0b2b26c6
+  size: 9835
+  isexec: true
+  hash: md5
+  path: s5c2_revenues_w1.xlsx

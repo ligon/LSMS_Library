@@ -1,0 +1,6 @@
+outs:
+- md5: 26335301447020781714e5fc302aec06
+  size: 9514
+  isexec: true
+  hash: md5
+  path: s5c3_inventory_w1_labels.xlsx

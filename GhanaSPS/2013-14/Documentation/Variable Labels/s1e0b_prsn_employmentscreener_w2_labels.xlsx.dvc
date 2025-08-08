@@ -1,0 +1,6 @@
+outs:
+- md5: 37515716419dc7c01ca0478a6f67fe01
+  size: 8912
+  isexec: true
+  hash: md5
+  path: s1e0b_prsn_employmentscreener_w2_labels.xlsx

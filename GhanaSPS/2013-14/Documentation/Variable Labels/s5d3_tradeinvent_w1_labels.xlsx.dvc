@@ -1,0 +1,6 @@
+outs:
+- md5: 5f66874a9dff47a9313be021ad6449a3
+  size: 8621
+  isexec: true
+  hash: md5
+  path: s5d3_tradeinvent_w1_labels.xlsx

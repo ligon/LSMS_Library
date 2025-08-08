@@ -1,0 +1,6 @@
+outs:
+- md5: 525e1e91c12ff8d845e38774c8258e18
+  size: 10113
+  isexec: true
+  hash: md5
+  path: s6a_insurance_panel_labels.xlsx

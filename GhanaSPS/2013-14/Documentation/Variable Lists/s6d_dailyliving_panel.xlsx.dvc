@@ -1,0 +1,6 @@
+outs:
+- md5: 91cdf0a806dd902153a48213a9ea5636
+  size: 11569
+  isexec: true
+  hash: md5
+  path: s6d_dailyliving_panel.xlsx

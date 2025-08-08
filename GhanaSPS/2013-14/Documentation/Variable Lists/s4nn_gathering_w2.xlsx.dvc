@@ -1,0 +1,6 @@
+outs:
+- md5: fff19648c001e193705d84112ad78478
+  size: 10017
+  isexec: true
+  hash: md5
+  path: s4nn_gathering_w2.xlsx
