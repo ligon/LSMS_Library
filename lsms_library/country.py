@@ -443,17 +443,19 @@ class Country:
             raise KeyError(f"{year} is not a valid wave for {self.name}")
     
 
-    def _aggregate_wave_data(self,waves = None, method_name = None):
+    def _aggregate_wave_data(self, waves=None, method_name=None):
+        """Aggregates data across multiple waves using a single dataset method.
+
+        If the required `.parquet` file is missing, it requests `Makefile` to
+        generate only that file.
         """
-        Aggregates data across multiple waves using a single dataset method.
-        If the required `.parquet` file is missing, it requests `Makefile` to generate only that file.
-        """
-        if method_name not in self.data_scheme and method_name not in ['other_features', 'food_prices_quantities_and_expenditures', 'updated_ids']:
+        if method_name not in self.data_scheme+['other_features', 'food_prices_quantities_and_expenditures', 'updated_ids']:
             warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
             return pd.DataFrame()
 
         if waves is None:
             waves = self.waves
+
         def safe_concat_dataframe_dict(df_dict):
             # Get the target index name order from the first DataFrame
             reference_order = next(iter(df_dict.values())).index.names
@@ -478,11 +480,11 @@ class Country:
                     warnings.warn(str(e))
             if results:
                 #using safe_concat_dataframe_dict only if more than 2 not empty DataFrames
-                non_empty_df = [df for df in results.values() if not df.empty]
-                if len(non_empty_df) > 1:
-                    return safe_concat_dataframe_dict(results)
+                non_empty_df = {k:df for k,df in results.items() if not df.empty}
+                if len(non_empty_df) > 1: # Why not 2, per comment above?
+                    return safe_concat_dataframe_dict(non_empty_df)
                 else:
-                    return pd.concat(non_empty_df, axis=0, sort=False)
+                    return pd.concat(non_empty_df.values(), axis=0, sort=False)
             raise KeyError(f"No data found for {method_name} in any wave of {self.name}.")
 
         def load_from_makefile(method_name):
