@@ -1,12 +1,6 @@
 #!/usr/bin/env python
-from lsms_library.local_tools import to_parquet
-
-import sys
-sys.path.append('../../_/')
-import pandas as pd
+from lsms_library.local_tools import to_parquet, age_sex_composition
 import numpy as np
-from uganda import age_sex_composition
-import dvc.api
 
 myvars = dict(fn='../Data/GSEC2.dta',
               HHID='hhid',
