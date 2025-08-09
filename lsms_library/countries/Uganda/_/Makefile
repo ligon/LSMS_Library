@@ -28,7 +28,7 @@ interview_date_parquet := $(interview_date:.py=.parquet)
 enterprise_income = $(shell find $(rounds) -name enterprise_income.py)
 enterprise_income_parquet := $(enterprise_income:.py=.parquet)
 
-../var/enterprise_income.parquet: enterprise_income.py $(enterprise_income_parquet)
+../var/enterprise_income.parquet: enterprise_income.py $(enterprise_income_parquet) ../var/other_features.parquet
 	python enterprise_income.py
 
 assets = $(shell find $(rounds) -name assets.py)

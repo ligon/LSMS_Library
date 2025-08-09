@@ -21,3 +21,6 @@ Data Scheme:
   food_expenditures: # USE_MAKEFILE
   food_prices:
   panel_ids:
+  income:
+  enterprise_income:
+  other_features:
