@@ -696,11 +696,11 @@ def panel_ids(Waves):
             if isinstance(wave_info[1], list): #tanzania
                 df = wave_info[2](df, wave_info[1])
             else:
-                df[wave_info[1]] = df[wave_info[1]].apply(format_id)
-                df[wave_info[2]] = df[wave_info[2]].apply(format_id)
+                df.loc[:,wave_info[1]] = df[wave_info[1]].apply(format_id)
+                df.loc[:,wave_info[2]] = df[wave_info[2]].apply(format_id)
                 # If a transformation function is provided (tuple length 4), apply it to the old_id column
                 if len(wave_info) == 4:
-                    df[wave_info[2]] = df[wave_info[2]].apply(wave_info[3])
+                    df.loc[:,wave_info[2]] = df[wave_info[2]].apply(wave_info[3])
                 df['t'] = wave_year
                 df = df.rename(columns={wave_info[1]: 'i', wave_info[2]: 'previous_i'})
                 df = df.set_index(['t', 'i'])[['previous_i']]
