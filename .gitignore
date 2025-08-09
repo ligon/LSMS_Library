@@ -15,3 +15,4 @@ Uganda/var/*
 /LSMS_Library.egg-info/
 /dist/
 /poetry.lock
+/.dvc/cache/*
