@@ -16,6 +16,7 @@ warnings.filterwarnings('ignore', category=FutureWarning)
 warnings.filterwarnings('ignore', category=UnicodeWarning)
 import subprocess
 import json
+from sys import stderr
 
 class Wave:
     def __init__(self,  year, wave_folder, country: 'Country'):
@@ -196,35 +197,37 @@ class Wave:
             warnings.warn(f"Data scheme does not contain {request} for {self.name}")
             return pd.DataFrame()
         data_info = self.resources.get(request, None)
-        if data_info:
-            def check_adding_t(df):
-                index_list = df.index.names
-                if 't' not in index_list:
-                    if 't' not in df.columns:
-                        df['t'] = self.year
-                    final_index = ['t'] + index_list
-                    df = df.reset_index().set_index(final_index)
-                return df
-            def get_data(data_info_dic, mapping_info):
-                convert_cat = (data_info_dic.get('converted_categoricals') is None)
-                df_edit_function = mapping_info.pop('df_edit')
-                dfs = []
-                for file, mappings in mapping_info.items():
-                    df = df_data_grabber(f'lsms_library/countries/{self.folder}/Data/{file}', mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat)
-                    df = check_adding_t(df)
-                    # Oddity with large number for missing code
-                    na = df.select_dtypes(exclude=['object', 'datetime64[ns]']).max().max()
-                    if na>1e99:
-                        warnings.warn(f"Large number used for missing?  Replacing {na} with NaN.")
-                        df = df.replace(na,np.nan)
-                    dfs.append(df)
-                df = pd.concat(dfs, axis=0, sort=False)
 
-                if df_edit_function:
-                    df = df_edit_function(df)
-                    
-                return df
-            
+        def check_adding_t(df):
+            index_list = df.index.names
+            if 't' not in index_list:
+                if 't' not in df.columns:
+                    df['t'] = self.year
+                final_index = ['t'] + index_list
+                df = df.reset_index().set_index(final_index)
+            return df
+
+        def get_data(data_info_dic, mapping_info):
+            convert_cat = (data_info_dic.get('converted_categoricals') is None)
+            df_edit_function = mapping_info.pop('df_edit')
+            dfs = []
+            for file, mappings in mapping_info.items():
+                df = df_data_grabber(f'lsms_library/countries/{self.folder}/Data/{file}', mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat)
+                df = check_adding_t(df)
+                # Oddity with large number for missing code
+                na = df.select_dtypes(exclude=['object', 'datetime64[ns]']).max().max()
+                if na>1e99:
+                    warnings.warn(f"Large number used for missing?  Replacing {na} with NaN.")
+                    df = df.replace(na,np.nan)
+                dfs.append(df)
+            df = pd.concat(dfs, axis=0, sort=False)
+
+            if df_edit_function:
+                df = df_edit_function(df)
+
+            return df
+
+        if data_info:
             # Vertical Merge dfs
             if data_info.get('dfs'):
                 merge_dfs = []
@@ -249,8 +252,9 @@ class Wave:
                 df = get_data(data_info, mapping_details)
 
         else:
-            # The reason why not just simply run the python file is some data's python files have dependencies.
-            print(f"Attempting to generate using Makefile...", flush=True)
+            # The reason why not just simply run the python file is some
+            # python files have dependencies.
+            print(f"Attempting to generate using Makefile...", flush=True,file=stderr)
             #cluster features in the old makefile is called 'other_features'
             # if request =='cluster_features': request = 'other_features'
             parquet_fn = self.file_path/"_"/ f"{request}.parquet"
@@ -263,10 +267,10 @@ class Wave:
             cwd_path = self.file_path.parent / "_"
             relative_parquet_path = parquet_fn.relative_to(cwd_path.parent)  # Convert to relative path
             subprocess.run(["make", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True)
-            print(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...")
+            print(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...",file=stderr)
 
             if not parquet_fn.exists():
-                print(f"Parquet file {parquet_fn} still missing after running Makefile.")
+                print(f"Parquet file {parquet_fn} still missing after running Makefile.",file=stderr)
                 return pd.DataFrame()
             
             df = pd.read_parquet(parquet_fn)
@@ -333,7 +337,7 @@ class Country:
         self._updated_ids_cache = None
         self.wave_folder_map = {}
         if preload_panel_ids:
-            print(f"Preloading panel_ids for {self.name}...")
+            print(f"Preloading panel_ids for {self.name}...",file=stderr)
             #ignore all the warnings
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
@@ -507,10 +511,10 @@ class Country:
                 make_target = '../' + str(relative_path)
 
             subprocess.run(["make", make_target], cwd=cwd_path, check=True)
-            print(f"Makefile executed successfully for {self.name}. Rechecking for {target_path.name}...")
+            print(f"Makefile executed successfully for {self.name}. Rechecking for {target_path.name}...",file=stderr)
 
             if not target_path.exists():
-                print(f"Data file {target_path} still missing after running Makefile.")
+                print(f"Data file {target_path} still missing after running Makefile.",file=stderr)
                 return pd.DataFrame()
 
             if target_path.suffix == '.json':
@@ -548,7 +552,7 @@ class Country:
             self._panel_ids_cache = panel_ids_dic
             self._updated_ids_cache = updated_ids_dic
         else:
-            print(f"Panel IDs not found in {self.name}.")
+            print(f"Panel IDs not found in {self.name}.",file=stderr)
             self._panel_ids_cache = None
             self._updated_ids_cache = None
 
