@@ -212,7 +212,7 @@ class Wave:
             df_edit_function = mapping_info.pop('df_edit')
             dfs = []
             for file, mappings in mapping_info.items():
-                df = df_data_grabber(f'lsms_library/countries/{self.folder}/Data/{file}', mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat)
+                df = df_data_grabber(f'./{self.folder}/Data/{file}', mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat)
                 df = check_adding_t(df)
                 # Oddity with large number for missing code
                 na = df.select_dtypes(exclude=['object', 'datetime64[ns]']).max().max()
