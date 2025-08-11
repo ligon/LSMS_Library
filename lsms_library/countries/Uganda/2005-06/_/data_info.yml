@@ -29,6 +29,6 @@ cluster_features:
         District: h1aq1
         Rural:
             - urban
-            - #Value mapping dictionary
+            - # Value mapping dictionary
                 urban: Urban
                 0: Rural
