@@ -1,6 +1,6 @@
 [project]
 name = "LSMS_Library"
-version = "0.2.8"
+version = "0.2.9dev"
 description = "Abstraction layer for Living Standards Measurement Survey data"
 authors = [ {name = "Ethan Ligon", email = "ligon@berkeley.edu"}
     ]
