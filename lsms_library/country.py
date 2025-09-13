@@ -43,9 +43,8 @@ class Wave:
         
     @property
     def file_path(self):
-        var = files("lsms_library") / "countries" / self.folder
-        return var
-    
+        return files("lsms_library") / "countries" / self.folder
+
     @property
     def resources(self):
         """Load the data_info.yml that describes table structure, merges, etc."""
@@ -266,7 +265,7 @@ class Wave:
 
             cwd_path = self.file_path.parent / "_"
             relative_parquet_path = parquet_fn.relative_to(cwd_path.parent)  # Convert to relative path
-            subprocess.run(["make", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True)
+            subprocess.run(["make", "-s", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True)
             print(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...",file=stderr)
 
             if not parquet_fn.exists():
@@ -331,7 +330,7 @@ class Country:
     #                 'nonfood_expenditures.parquet', 'enterprise_income.parquet', 'assets.parquet',
     #                 'earnings.parquet', 'housing.parquet', 'income.parquet', 'fct.parquet', 'nutrition.parquet']
 
-    def __init__(self,country_name, preload_panel_ids = True):
+    def __init__(self, country_name, preload_panel_ids=True, verbose=False):
         self.name = country_name
         self._panel_ids_cache = None
         self._updated_ids_cache = None
@@ -510,7 +509,7 @@ class Country:
                 relative_path = target_path.relative_to(cwd_path.parent)
                 make_target = '../' + str(relative_path)
 
-            subprocess.run(["make", make_target], cwd=cwd_path, check=True)
+            subprocess.run(["make", "-s", make_target], cwd=cwd_path, check=True)
             print(f"Makefile executed successfully for {self.name}. Rechecking for {target_path.name}...",file=stderr)
 
             if not target_path.exists():
