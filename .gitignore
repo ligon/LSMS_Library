@@ -17,3 +17,5 @@ Uganda/var/*
 /poetry.lock
 /.dvc/cache/*
 /lsms_library/countries/.dvc/s3_creds
+/lsmsvenv/
+lsmsvenv/
