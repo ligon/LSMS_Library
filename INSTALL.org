@@ -50,14 +50,8 @@ The private key for accessing the data on google drive is found in the file =gdr
 
 Similarly, the private key for /accessing/ data on the s3 data store is found in =s3_reader_creds.gpg=.  This is encrypted using the same passphrase mentioned above. To learn the secret passphrase you'll need to ask
    =ligon@berkeley.edu=.  Once you have it:
-   #+begin_src sh
-   gpg -d gdrive_data_store.json.gpg > .dvc/gdrive_creds.json
-   gpg -d s3_reader_creds.gpg > .dvc/s3_creds
-   #+end_src
-   And supply the secret passphrase.
-
-   *Authentication via Python (Recommended)*   
-   Instead of manually decrypting the `.gpg` credential files using the `gpg` command-line tool, you can use the helper function provided in the LSMS Library:
+   *Authentication via Python*   
+   Use the helper function provided in the LSMS Library:
    
    #+begin_src python
    import lsms_library as ll
