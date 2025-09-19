@@ -49,9 +49,9 @@
 The private key for accessing the data on google drive is found in the file =gdrive_data_store.json.gpg=.  The =gpg= string indicates that this file is encrypted, in this case using a secret passphrase.
 
 Similarly, the private key for /accessing/ data on the s3 data store is found in =s3_reader_creds.gpg=.  This is encrypted using the same passphrase mentioned above. To learn the secret passphrase you'll need to ask
-   =ligon@berkeley.edu=.  Once you have it:
+   =ligon@berkeley.edu=.  Once you have it:  
    *Authentication via Python*   
-   Use the helper function provided in the LSMS Library:
+   Use the helper function provided in the LSMS Library:   
    
    #+begin_src python
    import lsms_library as ll
