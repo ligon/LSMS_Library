@@ -10,6 +10,4 @@ gpg_path = Path(__file__).resolve().parent / 'countries' / '.dvc'
 creds_file = gpg_path / 's3_creds'
 if not creds_file.exists():
     authenticate()
-else:
-    print("Already authenticated for s3 access.")
 
