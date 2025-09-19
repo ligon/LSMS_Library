@@ -1,0 +1,29 @@
+Country: India
+Wave: 1997-98
+
+cluster_features:
+
+household_roster:
+  file:
+      - ../Data/SECT01A.DTA
+  idxvars:
+      i: hh
+      pid: idcode
+  myvars:
+      Sex: v01a02
+      Age: v01a04
+      Relation: v01a03
+      Highest_education: v01a05
+employment:
+  file:
+      - ../Data/SECT02AD.DTA
+  idxvars:
+      i: hh
+      pid: idcode
+  myvars:
+      Cash_per_day: v02b02
+      Rural: v02a05b
+        
+
+
+
