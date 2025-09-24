@@ -1,0 +1,5 @@
+outs:
+- md5: a1151219b6fca72945421b89215684c9
+  size: 234165
+  hash: md5
+  path: cbh_ind_weighs.dta
