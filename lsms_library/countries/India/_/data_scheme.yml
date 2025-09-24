@@ -1,0 +1,13 @@
+Country: India
+
+Data Scheme:
+  household_roster:
+    index: (i, pid)
+    Sex: str
+    Age: int
+    Relation: str
+    Highest_education: str
+  employment:
+    index: (i, pid)
+    Cash_per_day: float
+    Rural: str
