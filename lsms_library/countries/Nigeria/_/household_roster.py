@@ -1,6 +1,4 @@
 import pandas as pd
-import json
-import numpy as np
 from lsms_library.local_tools import to_parquet
 from lsms_library.local_tools import get_dataframe
 
