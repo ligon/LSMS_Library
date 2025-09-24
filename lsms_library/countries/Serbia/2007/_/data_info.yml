@@ -1,0 +1,13 @@
+Country: Serbia
+
+household_roster:
+    file:
+        - "../Data/individual.dta"
+    idxvars:
+        municipality: opstina
+        enumeration_area: popkrug
+        i: dom
+    myvars:
+        Sex: pol
+        Relation: srodstvo
+        Age: starost
