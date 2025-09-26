@@ -1,0 +1,9 @@
+Country: China
+
+Data Scheme:
+  household_roster:
+    index: (i, pid, t)
+    Sex: str
+    Age: int
+    Relation: str
+    

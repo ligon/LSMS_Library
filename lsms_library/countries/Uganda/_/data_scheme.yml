@@ -10,6 +10,12 @@ Data Scheme:
 
   cluster_features:
     index: (i,t,v)
+  
+  household_roster:
+    index: (i, pid, t)
+    Sex: str
+    Age: int
+    Relation: str
 
   shocks: # USE_MAKEFILE
   earnings: # USE_MAKEFILE

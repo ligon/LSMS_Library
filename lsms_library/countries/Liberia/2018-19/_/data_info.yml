@@ -1,0 +1,13 @@
+Country: Liberia
+Wave: 2018-19
+
+household_roster:
+    file:
+        - "../Data/Household/sect2_public.dta"
+    idxvars:
+        i: hhid
+        pid: member_id
+    myvars:
+        Relation: S2_2
+        Sex: S2_3
+        Age: S2_5

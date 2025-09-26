@@ -1,0 +1,28 @@
+Country: China
+Wave: 1995-97
+
+household_roster:
+    file:
+        - ../Data/S01A2.DTA
+    idxvars:
+        i: hid
+        pid: pid
+    myvars:
+        Sex: 
+          - s01a202
+          - mapping:
+              1: Male
+              2: Female
+        Relation: 
+          - s01a203
+          - mapping:
+              1: Head
+              2: Spouse
+              3: Child
+              4: Grandchild
+              5: Parent
+              6: Sibling
+              7: Son/Daughter-in-law
+              8: Other relative
+              9: Non-relative
+        Age: s01a208

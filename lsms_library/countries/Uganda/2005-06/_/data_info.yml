@@ -1,6 +1,17 @@
 Country: Uganda
 Wave: 2005-06
 
+household_roster:
+    file:
+        - ../Data/GSEC2.dta
+    idxvars:
+        i: HHID
+        pid: PID
+    myvars:
+        Sex: h2q4
+        Relation: h2q5
+        Age: h2q9
+
 people_last7days:
     file: GSEC14.dta
     idxvars:
