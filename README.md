@@ -1,0 +1,277 @@
+### Exploring Available Data
+
+```python
+import lsms_library as ll
+
+uga = ll.Country('Uganda')
+
+# See all available survey waves
+print(uga.waves)
+# ['2005-06', '2009-10', '2010-11', '2011-12', '2013-14', '2015-16', '2018-19', '2019-20']
+
+# See all standardized data types available
+print(uga.data_scheme)
+# ['people_last7days', 'cluster_features', 'shocks', 'earnings',
+#  'food_acquired', 'nutrition', 'household_characteristics',
+#  'food_quantities', 'food_expenditures', 'food_prices',
+#  'panel_ids', 'income', 'enterprise_income', 'other_features']
+
+# Access any standardized data type using the same pattern
+household_chars = uga.household_characteristics()
+shocks = uga.shocks()
+earnings = uga.earnings()
+```# LSMS_Library
+
+A Python library providing a uniform interface to Living Standards Measurement Study (LSMS) household surveys from multiple countries and years, without the data loss typical of traditional harmonization approaches.
+
+## The Problem
+
+LSMS datasets are invaluable for studying poverty, consumption, and household welfare across developing countries. However, each country's survey uses different:
+- Variable names and encodings
+- Food classification systems
+- Questionnaire structures
+- File formats and organization
+
+Researchers typically spend weeks learning each new dataset's idiosyncrasies or use pre-harmonized datasets that sacrifice detail and comparability. Cross-country or longitudinal analyses become prohibitively time-consuming.
+
+## The Solution
+
+LSMS_Library provides an **abstraction layer** that gives you a consistent interface to work with any supported LSMS dataset. Instead of harmonizing the data itself (which loses information), we harmonize the *way you access* the data.
+
+This means you can:
+- Write analysis code once and apply it to multiple countries/years
+- Switch between datasets without rewriting your code
+- Preserve the full detail and structure of the original surveys
+- Extend support to new surveys by writing simple YAML configuration files
+
+## Quick Start
+
+```python
+import lsms_library as ll
+
+# Load a country's LSMS data
+uga = ll.Country('Uganda')
+
+# See available survey waves
+print(uga.waves)
+# ['2005-06', '2009-10', '2010-11', '2011-12', '2013-14', '2015-16', '2018-19', '2019-20']
+
+# See available standardized data types
+print(uga.data_scheme)
+# ['people_last7days', 'food_acquired', 'food_expenditures', 'food_prices', 
+#  'household_characteristics', 'income', 'nutrition', ...]
+
+# Access standardized food expenditure data across all waves
+food_exp = uga.food_expenditures()
+# Returns a multi-indexed DataFrame with household, time, region, and food item
+```
+
+## Key Features
+
+- **Uniform Interface**: Access variables using consistent names across countries (e.g., `food_expenditures()`, `household_characteristics()`)
+- **Multi-Wave Panel Support**: For countries with panel surveys, household IDs are automatically standardized across waves, enabling longitudinal analysis without manual matching
+- **Zero Data Loss**: Original data structure and detail preserved; access raw data through the same interface
+- **Standardized Data Schemes**: Common data types (`food_prices`, `nutrition`, `income`, etc.) mapped across all countries
+- **DVC Integration**: Stream data from remote storage without filling your disk
+- **Extensible**: Add new surveys by creating YAML configuration files (no Python required)
+- **Multiple Countries**: Supports LSMS surveys from Nigeria, Tanzania, Uganda, Ethiopia, Malawi, and more
+
+## Installation
+
+```bash
+pip install LSMS_Library
+```
+
+### Data Access
+
+The library uses DVC (Data Version Control) to manage data stored in remote S3 buckets. To access the data, you'll need credentials:
+
+- **Read access**: Contact ligon@berkeley.edu for read-only credentials to access the data
+- **Write access (contributors)**: To contribute new datasets, contact ligon@berkeley.edu for write credentials. You'll need to establish [GPG/PGP credentials](https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key) for secure access.
+
+Once you have credentials, the library will handle data streaming automatically.
+
+## Usage Examples
+
+### Working with Food Consumption Data
+
+```python
+import lsms_library as ll
+
+# Load country data
+uga = ll.Country('Uganda')
+tza = ll.Country('Tanzania')
+
+# Access food expenditure data with consistent structure
+uga_food = uga.food_expenditures()
+tza_food = tza.food_expenditures()
+
+# Both return DataFrames with the same multi-index structure:
+# Index: (household_id, time, region, food_item)
+# Even though the original surveys have completely different formats
+
+# Access other standardized data types
+prices = uga.food_prices()
+nutrition = uga.nutrition()
+income = uga.income()
+```
+
+### Cross-Country Comparison
+
+```python
+import lsms_library as ll
+import pandas as pd
+
+# Load multiple countries
+countries = {
+    'Uganda': ll.Country('Uganda'),
+    'Tanzania': ll.Country('Tanzania'),
+    'Nigeria': ll.Country('Nigeria')
+}
+
+# Collect food expenditure data from all countries
+expenditure_data = {}
+for name, country in countries.items():
+    df = country.food_expenditures()
+    df['country'] = name
+    expenditure_data[name] = df
+
+# Combine into a single DataFrame for analysis
+combined = pd.concat(expenditure_data.values(), ignore_index=False)
+
+# Now you can analyze across countries with consistent variable names
+# e.g., compare rice prices, consumption patterns, etc.
+```
+
+### Panel Data Analysis
+
+For countries with panel surveys, household IDs are already harmonized across waves:
+
+```python
+import lsms_library as ll
+
+# Load a country with panel data
+uga = ll.Country('Uganda')
+
+# Get food expenditures across all waves
+food_exp = uga.food_expenditures()
+
+# The multi-index includes time (wave), so you can track households over time
+# Index levels: (household_id, time, region, food_item)
+
+# Example: Track a specific household across waves
+household_id = '00c9353d8ebe42faabf5919b81d7fae7'
+household_over_time = food_exp.xs(household_id, level='i')
+
+# Or analyze changes between specific waves
+wave_2015 = food_exp.xs('2015-16', level='t')
+wave_2019 = food_exp.xs('2019-20', level='t')
+
+# Check panel structure and attrition patterns
+panel_structure = ll.local_tools.panel_attrition(
+    uga.household_characteristics(), 
+    uga.waves
+)
+# Returns a matrix showing number of households appearing in each wave pair:
+#         2005-06 2009-10 2010-11 2011-12 2013-14 2015-16 2018-19 2019-20
+# 2005-06    3122    2606    2386    2363    1566    1470    1358    1290
+# 2009-10     NaN    2974    2617    2581    1685    1578    1454    1379
+# ...
+# Diagonal shows total households per wave; off-diagonal shows panel overlap
+```
+
+```python
+import lsms_library as ll
+
+uga = ll.Country('Uganda')
+
+# See all available survey waves
+print(uga.waves)
+# ['2005-06', '2009-10', '2010-11', '2011-12', '2013-14', '2015-16', '2018-19', '2019-20']
+
+# See all standardized data types available
+print(uga.data_scheme)
+# ['people_last7days', 'cluster_features', 'shocks', 'earnings',
+#  'food_acquired', 'nutrition', 'household_characteristics',
+#  'food_quantities', 'food_expenditures', 'food_prices',
+#  'panel_ids', 'income', 'enterprise_income', 'other_features']
+
+# Access any standardized data type using the same pattern
+household_chars = uga.household_characteristics()
+shocks = uga.shocks()
+earnings = uga.earnings()
+```
+
+## Available Datasets
+
+The library currently supports LSMS surveys from:
+- **Ethiopia**: Multiple waves from the LSMS-ISA program
+- **Malawi**: Multiple waves including panel data
+- **Nigeria**: GHS-Panel surveys
+- **Tanzania**: NPS surveys
+- **Uganda**: UNPS surveys
+- And more...
+
+For a complete list of available surveys, see the country directories in the repository.
+
+## Adding New Surveys
+
+Adding a new LSMS survey requires no Python programming—just create YAML configuration files that map the survey's variables to the standardized interface. See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed instructions.
+
+Brief overview:
+1. Create directory structure: `Country/Year/Documentation` and `Country/Year/Data`
+2. Add source data using DVC
+3. Create YAML files mapping variables to standard names
+4. Submit a pull request
+
+## Documentation
+
+- **Food Classification**: Food items are standardized for spelling and format within each country. Note that food categories differ significantly across countries (e.g., what constitutes "Beans" in Uganda may not match Tanzania's classification), so cross-country food comparisons should be done carefully.
+- **Variable Mappings**: YAML files in each survey directory show how local variables map to standard names
+- **Panel IDs**: For countries with panel surveys, household identifiers are harmonized automatically across waves
+- **API Reference**: [Coming soon]
+
+## Contributing
+
+We welcome contributions! Whether you're:
+- Adding new survey datasets
+- Improving variable mappings
+- Fixing bugs
+- Improving documentation
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on adding new datasets using DVC.
+
+## Citation
+
+If you use LSMS_Library in your research, please cite:
+
+```bibtex
+@software{ligon19:lsms_library,
+  author =    {Ethan Ligon},
+  title =     {{\tt LSMS_Library}: Abstraction layer for working with Living Standards Measurement Surveys},
+  year =      2025,
+  url = {https://pypi.org/project/lsms_library/}
+}
+```
+
+## License
+
+See the [LICENSE](LICENSE) file in the repository for details.
+
+## Contact
+
+For questions, issues, or collaboration:
+- **Data Access**: Email ligon@berkeley.edu for read or write credentials
+- **GitHub Issues**: Report bugs or request features at the repository
+- **Contributing**: Contact ligon@berkeley.edu to discuss contributions (PGP credentials required for write access)
+
+## Acknowledgments
+
+This project builds on data collection efforts by:
+- The World Bank's Living Standards Measurement Study (LSMS) team
+- National statistical offices in participating countries
+- The LSMS-ISA initiative
+
+---
+
+**Note**: This library is under active development. APIs may change as we refine the abstraction layer based on user feedback.
