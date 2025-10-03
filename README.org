@@ -230,10 +230,11 @@ See [[file:CONTRIBUTING.org][CONTRIBUTING.org]] for detailed guidelines on addin
 If you use LSMS_Library in your research, please cite:
 
 #+begin_src bibtex
-@software{ligon19:lsms_library,
+@software{ligon25:lsms_library,
   author =    {Ethan Ligon},
   title =     {{\tt LSMS_Library}: Abstraction layer for working with Living Standards Measurement Surveys},
   year =      2025,
+  doi = {10.5281/zenodo.17258079},
   url = {https://pypi.org/project/lsms_library/}
 }
 #+end_src
