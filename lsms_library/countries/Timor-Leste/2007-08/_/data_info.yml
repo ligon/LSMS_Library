@@ -1,0 +1,13 @@
+Country: Timor-Leste
+Wave: 2007-08
+
+household_roster:
+    file:
+        - ../Data/indiv.dta
+    idxvars:
+        i: hh_id
+        pid: pid
+    myvars:
+        Sex: q01a01
+        Relation: q01a02
+        Age: q01a05y

@@ -1,0 +1,14 @@
+Country: Kosovo
+Wave: 2000
+
+household_roster:
+    file:
+        - "../Data/POP.dta"
+    idxvars:
+        i: hhid
+        pid: s1a_q00
+    myvars:
+        Sex: s1a_q02
+        Relation: s1a_q03
+        Age: s1a_q05
+        Marital_status: s1a_q06

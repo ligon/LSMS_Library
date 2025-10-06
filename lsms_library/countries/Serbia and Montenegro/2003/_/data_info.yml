@@ -1,0 +1,13 @@
+Country: Serbia and Montenegro
+Wave: 2003
+
+household_roster:
+    file:
+        - "../Data/2003 1 demography.dta"
+    idxvars:
+        i: rbd
+        pid: clan
+    myvars:
+        Age: brojgod
+        Reglation: a2
+        Sex: a1

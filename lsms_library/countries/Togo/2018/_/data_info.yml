@@ -1,0 +1,13 @@
+Country: Togo
+Wave: 2018
+
+household_roster:
+    file:
+        - ../Data1/s01_me_tgo2018.dta
+    idxvars:
+        i: menage
+        pid: s01q00a
+    myvars:
+        Sex: s01q01
+        Relation: s01q02
+        Age: s01q04a
