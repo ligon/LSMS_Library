@@ -1,0 +1,33 @@
+Country: Azerbaijan
+Wave: 1995
+household_roster:
+    file:
+        - ../Data/A01A.dta
+    idxvars:
+        i: hid
+        pid: pid
+    myvars:
+        Sex:
+            - sex
+            - mapping:
+                1: Male
+                2: Female
+        Age: agey
+        Marital: mar
+        Relation: 
+            - rel
+            - mapping:
+                1: head
+                2: spouse
+                3: son/daughter
+                4: father/mother
+                5: brother/sister
+                6: nephew/niece
+                7: aunt/uncle
+                8: grandchild
+                9: grandfather/grandmother
+                10: cousin
+                11: other relation
+                12: not related
+                13: lodger
+                14: other 
