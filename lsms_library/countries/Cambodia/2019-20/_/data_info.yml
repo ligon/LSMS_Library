@@ -1,0 +1,40 @@
+Country: Cambodia
+Wave: 2019-20
+household_roster:
+    file:
+        - ../Data/hh_sec_2.dta
+    idxvars:
+        i: HHID
+        pid: PID
+    myvars:
+        Sex:
+            - s02q03
+            - mapping:
+                1: Male
+                2: Female
+        Age: s02q05a
+        Marital:
+            - s02q09
+            - mapping:
+                1: Married/Living together
+                2: Divorced/Separated
+                3: Widowed
+                4: Never married/Never lived with a partner
+        Relation: 
+            - s02q06
+            - mapping:
+                1: head
+                2: spouse
+                3: son/daughter
+                4: stepchild
+                5: adopted child/foster child
+                6: parent
+                7: sibling
+                8: grand child
+                9: nephew/niece
+                10: son/daughter-in-law
+                11: brother/sister-in-law
+                12: parent-in-law
+                13: other relatives
+                14: servant
+                15: other non-relative including boarder

@@ -1,0 +1,9 @@
+Country: Cambodia
+
+Data Scheme:
+  household_roster:
+    index: (i, pid)
+    Sex: int
+    Age: int
+    Relation: int
+    Marital: int
