@@ -1,0 +1,8 @@
+Country: Guatemala 
+Data Scheme:
+  household_roster:
+    index: (i, pid)
+    Sex: int
+    Age: float
+    Relation: int
+    Marital: int

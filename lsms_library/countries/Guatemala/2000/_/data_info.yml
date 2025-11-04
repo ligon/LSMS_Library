@@ -1,0 +1,43 @@
+Country: Guatemala
+Wave: 2000
+household_roster:
+    file:
+        - ECV09P05.DTA
+    idxvars:
+        i: hogar
+        pid: thogar
+    myvars:
+        Sex:
+            - sexo
+            - mapping:
+                1: Male
+                2: Female
+        Age: edad
+        Marital:
+            - p05a03
+            - mapping:
+                1: united
+                2: married
+                3: separated from marriage
+                4: separated from union
+                5: divorced
+                6: widower
+                7: Married or Living together
+
+        Relation: 
+            - p05a02
+            - mapping:
+                1: boss
+                2: husband and wife or partner
+                3: son (daughter)
+                4: son-in-law or daughter-in-law
+                5: grandson (a)
+                6: father or mother
+                7: father-in-law
+                8: brother or sister
+                9: brother-in-law
+                10: another relative
+                11: domestic worker
+                12: pensioner or guest
+                13: other non-relative
+
