@@ -1,0 +1,42 @@
+Country: Pakistan
+Wave: 1991
+household_roster:
+    file:
+        - F01A.DTA
+    idxvars:
+        i: hid
+        pid: pid
+    myvars:
+        Sex:
+            - sex
+            - mapping:
+                1: Male
+                2: Female
+        Age: agey
+        Marital:
+            - mar
+            - mapping:
+                1: Married
+                2: Divorced
+                3: Separated
+                4: Widow/Widower
+                5: Never Married
+
+        Relation: 
+            - rel
+            - mapping:
+                1: Head
+                2: Wife or Husband
+                3: Son/Daughter
+                4: Grandchild
+                5: Father or Mother
+                6: Sister or Brother
+                7: Niece or Nephew
+                8: Son/Daughter-in-law
+                9: Brother/Sister-in-law
+                10: Father/Mother-in-law
+                11: Other Relative
+                12: Servant/Tenant
+                13: Other Not Related
+
+
