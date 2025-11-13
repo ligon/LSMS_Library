@@ -1,0 +1,39 @@
+Country: Guyana
+Wave: 1992
+household_roster:
+    file:
+        - ../Data/ROSTERN.dta
+    idxvars:
+        i: HH
+        pid: PID
+    myvars:
+        Sex:
+            - SX
+            - mapping:
+               1: Male
+               2: Female
+        Age: AG
+        Marital:
+            - UNS
+            - mapping:
+               1: Married
+               2: Common law
+               3: Visiting
+               4: Widowed
+               5: Divorced
+               6: Separated
+               7: Single
+               8: Others
+        Relation: 
+            - RLL
+            - mapping:
+               1: Head of Household
+               2: Spouse of HoH
+               3: Married child
+               4: Spouse of married child
+               5: Unmarried child
+               6: Grandchild
+               7: Father/Mother/T-in-law/M-in-law
+               8: Bro/Sis/B-in-law/S-in-law/Other relative
+               9: Servant/Employee/Other non-relative
+
