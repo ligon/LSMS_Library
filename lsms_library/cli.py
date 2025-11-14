@@ -49,6 +49,24 @@ def _dump_yaml(data: OrderedDict, path: Path) -> None:
     path.write_text(yaml.dump(data, Dumper=_OrderedDumper, sort_keys=False))
 
 
+def _available_country_dirs() -> List[str]:
+    countries_root = Path(__file__).resolve().parent / "countries"
+    names = [
+        path.name
+        for path in countries_root.iterdir()
+        if path.is_dir() and not path.name.startswith(".")
+    ]
+    return sorted(names)
+
+
+def _print_list(items: Sequence[str], as_csv: bool) -> None:
+    if as_csv:
+        print(",".join(items))
+    else:
+        for item in items:
+            print(item)
+
+
 def _load_table(country: str, table: str, waves: Sequence[str] | None) -> object:
     """Return the requested table, optionally aggregated across multiple waves."""
 
@@ -251,6 +269,38 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Path to the DVC lock file (defaults to countries/dvc.lock).",
     )
 
+    countries = subparsers.add_parser(
+        "countries",
+        help="List supported countries.",
+    )
+    countries.add_argument(
+        "--as-csv",
+        action="store_true",
+        help="Output comma-separated list instead of newline separated.",
+    )
+
+    waves = subparsers.add_parser(
+        "waves",
+        help="List waves available for a country.",
+    )
+    waves.add_argument("--country", required=True)
+    waves.add_argument(
+        "--as-csv",
+        action="store_true",
+        help="Output comma-separated list instead of newline separated.",
+    )
+
+    tables = subparsers.add_parser(
+        "tables",
+        help="List data tables (data scheme) for a country.",
+    )
+    tables.add_argument("--country", required=True)
+    tables.add_argument(
+        "--as-csv",
+        action="store_true",
+        help="Output comma-separated list instead of newline separated.",
+    )
+
     return parser
 
 
@@ -288,6 +338,14 @@ def main(argv: Iterable[str] | None = None) -> None:
                 stage_key, stage_key
             )
         )
+    elif args.command == "countries":
+        _print_list(_available_country_dirs(), args.as_csv)
+    elif args.command == "waves":
+        country_obj = Country(args.country, preload_panel_ids=False)
+        _print_list(country_obj.waves, args.as_csv)
+    elif args.command == "tables":
+        country_obj = Country(args.country, preload_panel_ids=False)
+        _print_list(country_obj.data_scheme, args.as_csv)
 
 
 if __name__ == "__main__":  # pragma: no cover
