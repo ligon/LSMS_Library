@@ -4,12 +4,18 @@
 
 .SILENT: help
 
+empty :=
+space := $(empty) $(empty)
+
 PYTHON ?= python3
 DVC ?= $(PYTHON) -m dvc
 format ?= parquet
 
 slug = $(shell printf '%s' "$(1)" | tr '[:upper:]' '[:lower:]' | tr ' -' '__')
-stage_name = $(call slug,$(country))_$(call slug,$(wave))_$(call slug,$(table))
+DEFAULT_WAVE_RAW := $(if $(strip $(wave)),$(firstword $(wave)),all_waves)
+DEFAULT_WAVE := $(subst $(space),_,$(strip $(DEFAULT_WAVE_RAW)))
+OUT_FILE ?= countries/build/$(country)/$(DEFAULT_WAVE)/$(table).$(format)
+stage_name = $(call slug,$(country))_$(call slug,$(DEFAULT_WAVE_RAW))_$(call slug,$(table))
 
 
 COUNTRIES := $(shell ls .. | grep -e ^[A-Z] | grep / | sed -e 's/\//,/g')
@@ -43,11 +49,11 @@ test:
 
 materialize:
 	$(PYTHON) -m lsms_library.cli materialize \
+		$(if $(strip $(wave)),$(foreach w,$(wave),--wave $(w) ),$(if $(strip $(all_waves)),--all-waves ,))\
 		--country $(country) \
-		--wave $(wave) \
 		--table $(table) \
 		--format $(format) \
-		--out countries/build/$(country)/$(wave)/$(table).$(format)
+		--out $(OUT_FILE)
 
 register:
 	$(PYTHON) -m lsms_library.cli register \
