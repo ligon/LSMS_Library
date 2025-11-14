@@ -134,6 +134,8 @@ Similarly, the private key for /accessing/ data on the s3 data store is found in
    When you add new tables, extend (or simply rerun =lsms-library register ...= to update) =lsms_library/countries/dvc.yaml= so contributors can regenerate all cached outputs with a single =dvc repro=.
 
    Both the CLI and the DVC stages stream source assets via DVC's API, so you do not need to "dvc pull" large datasets locally—ideal for light machines.
+   Tip: run =lsms-library --install-completion= to enable shell tab-completion (Typer/Click feature).
+
 
 * Adding New Data
 ** Additional S3 Credentials
