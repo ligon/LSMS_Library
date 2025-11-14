@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 from collections import OrderedDict
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, List, Sequence
 
 import yaml
 
@@ -49,10 +49,36 @@ def _dump_yaml(data: OrderedDict, path: Path) -> None:
     path.write_text(yaml.dump(data, Dumper=_OrderedDumper, sort_keys=False))
 
 
+def _load_table(country: str, table: str, waves: Sequence[str] | None) -> object:
+    """Return the requested table, optionally aggregated across multiple waves."""
+
+    country_obj = Country(country, preload_panel_ids=False)
+
+    try:
+        if waves is None:
+            loader = getattr(country_obj, table)
+            return loader()
+
+        wave_list: List[str] = list(waves)
+        if len(wave_list) == 1:
+            wave_obj = country_obj[wave_list[0]]
+            loader = getattr(wave_obj, table)
+            return loader()
+
+        loader = getattr(country_obj, table)
+        return loader(waves=wave_list)
+    except KeyError as exc:
+        raise ValueError(f"Wave {exc.args[0]!r} is not available for {country}.") from exc
+    except AttributeError as exc:
+        raise ValueError(
+            f"Table '{table}' is not available for {country}."
+        ) from exc
+
+
 def _materialize(
     *,
     country: str,
-    wave: str,
+    waves: Sequence[str] | None,
     table: str,
     output: Path,
     file_format: str = "parquet",
@@ -60,13 +86,7 @@ def _materialize(
 ) -> Path:
     """Load a table through the Country/Wave API and persist it."""
 
-    df_getter = Country(country, preload_panel_ids=False)[wave]
-    try:
-        df = getattr(df_getter, table)()
-    except AttributeError as exc:  # pragma: no cover - defensive guard
-        raise ValueError(
-            f"Table '{table}' not available for {country} {wave}."
-        ) from exc
+    df = _load_table(country, table, waves)
 
     output.parent.mkdir(parents=True, exist_ok=True)
 
@@ -174,8 +194,20 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Persist a table using the YAML-defined API.",
     )
     materialize.add_argument("--country", required=True)
-    materialize.add_argument("--wave", required=True)
     materialize.add_argument("--table", required=True)
+    wave_group = materialize.add_mutually_exclusive_group()
+    wave_group.add_argument(
+        "--wave",
+        dest="waves",
+        action="append",
+        metavar="WAVE",
+        help="Specify a survey wave (repeat flag to list multiple waves).",
+    )
+    wave_group.add_argument(
+        "--all-waves",
+        action="store_true",
+        help="Aggregate across every available wave for the country.",
+    )
     materialize.add_argument(
         "--out",
         type=Path,
@@ -227,9 +259,15 @@ def main(argv: Iterable[str] | None = None) -> None:
     args = parser.parse_args(argv)
 
     if args.command == "materialize":
+        if getattr(args, "waves", None):
+            waves: Sequence[str] | None = args.waves
+        elif getattr(args, "all_waves", False):
+            waves = None
+        else:
+            waves = None  # Default to stacking all waves when --wave is omitted
         output = _materialize(
             country=args.country,
-            wave=args.wave,
+            waves=waves,
             table=args.table,
             output=args.out,
             file_format=args.format,
