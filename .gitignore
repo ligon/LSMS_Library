@@ -26,6 +26,7 @@ env/
 # Python packaging 
 *.egg-info/
 /build/
+lsms_library/countries/build/
 /site/
 /poetry.lock
 # Mypy cache
