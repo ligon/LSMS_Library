@@ -1,5 +1,5 @@
 from . import country
-from . country import Country, Wave
+from .country import Country, Wave
 from . import local_tools as tools
 from .categorical_mapping import ai_agent
 from . import transformations
@@ -10,4 +10,3 @@ gpg_path = Path(__file__).resolve().parent / 'countries' / '.dvc'
 creds_file = gpg_path / 's3_creds'
 if not creds_file.exists():
     authenticate()
-
