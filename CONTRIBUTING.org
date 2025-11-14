@@ -126,12 +126,15 @@ Similarly, the private key for /accessing/ data on the s3 data store is found in
 
    - CLI (materialize): =python -m lsms_library.cli materialize --country Malawi --wave 2019-20 --table household_roster --format parquet --out lsms_library/countries/build/Malawi/2019-20/household_roster.parquet= (or use the installed script: =lsms-library materialize ...=). Repeat =--wave= to pull several waves, or omit it / pass =--all-waves= to stack every available wave into a single file (e.g., =lsms-library materialize --country Malawi --table household_roster --out lsms_library/countries/build/Malawi/all_waves/household_roster.parquet=).
    - CLI (register): =python -m lsms_library.cli register --country Uganda --wave 2023-24 --table household_roster= appends the appropriate entry to =lsms_library/countries/dvc.yaml= and clears any stale lock data.
+   - CLI (discovery): =lsms-library countries= lists supported countries; =lsms-library waves --country Malawi= shows available waves; =lsms-library tables --country Malawi= lists tables from the data scheme.
    - Makefile: =make materialize country=Malawi wave=2019-20 table=household_roster= writes to =lsms_library/countries/build/<country>/<wave>/<table>.parquet=. Provide multiple waves via =wave=\"2019-20 2021-22\"= or aggregate everything with =all_waves=true=; override =OUT_FILE= to customise the destination. =make register ...= invokes the helper above (still requires a specific wave to keep DVC stages reproducible).
    - DVC: reproducible stages live in =lsms_library/countries/dvc.yaml=. Run =cd lsms_library/countries= first, then =dvc repro materialize@malawi_2019_20_household_roster=. The Makefile target =make persist ...= wraps the same command from the project root.
 
    When you add new tables, extend (or simply rerun =lsms-library register ...= to update) =lsms_library/countries/dvc.yaml= so contributors can regenerate all cached outputs with a single =dvc repro=.
 
    Both the CLI and the DVC stages stream source assets via DVC's API, so you do not need to "dvc pull" large datasets locally—ideal for light machines.
+   Tip: run =lsms-library --install-completion= to enable shell tab-completion (Typer/Click feature).
+
 
 * Adding New Data
 ** Additional S3 Credentials

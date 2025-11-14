@@ -1,15 +1,17 @@
-"""Lightweight command-line helpers for lsms_library."""
+"""Typer-powered command-line helpers for lsms_library."""
 
 from __future__ import annotations
 
-import argparse
 from collections import OrderedDict
 from pathlib import Path
-from typing import Iterable, List, Sequence
+from typing import List, Optional, Sequence
 
+import typer
 import yaml
 
 from .country import Country
+
+app = typer.Typer(help="Command-line tools for interacting with LSMS Library data.")
 
 
 class _OrderedLoader(yaml.SafeLoader):
@@ -49,7 +51,25 @@ def _dump_yaml(data: OrderedDict, path: Path) -> None:
     path.write_text(yaml.dump(data, Dumper=_OrderedDumper, sort_keys=False))
 
 
-def _load_table(country: str, table: str, waves: Sequence[str] | None) -> object:
+def _available_country_dirs() -> List[str]:
+    countries_root = Path(__file__).resolve().parent / "countries"
+    names = [
+        path.name
+        for path in countries_root.iterdir()
+        if path.is_dir() and not path.name.startswith(".")
+    ]
+    return sorted(names)
+
+
+def _print_list(items: Sequence[str], as_csv: bool) -> None:
+    if as_csv:
+        print(",".join(items))
+    else:
+        for item in items:
+            print(item)
+
+
+def _load_table(country: str, table: str, waves: Optional[Sequence[str]]) -> object:
     """Return the requested table, optionally aggregated across multiple waves."""
 
     country_obj = Country(country, preload_panel_ids=False)
@@ -185,109 +205,130 @@ def _register_stage(
     return stage_key
 
 
-def _build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="lsms-library")
-    subparsers = parser.add_subparsers(dest="command", required=True)
-
-    materialize = subparsers.add_parser(
-        "materialize",
-        help="Persist a table using the YAML-defined API.",
-    )
-    materialize.add_argument("--country", required=True)
-    materialize.add_argument("--table", required=True)
-    wave_group = materialize.add_mutually_exclusive_group()
-    wave_group.add_argument(
+@app.command()
+def materialize(
+    country: str = typer.Option(..., "--country", help="Country name (e.g., Malawi)."),
+    table: str = typer.Option(..., "--table", help="Table name to materialize."),
+    wave: Optional[List[str]] = typer.Option(
+        None,
         "--wave",
-        dest="waves",
-        action="append",
-        metavar="WAVE",
-        help="Specify a survey wave (repeat flag to list multiple waves).",
-    )
-    wave_group.add_argument(
-        "--all-waves",
-        action="store_true",
-        help="Aggregate across every available wave for the country.",
-    )
-    materialize.add_argument(
+        help="Specify one or more waves (repeat flag). If omitted, all waves are aggregated.",
+    ),
+    all_waves: bool = typer.Option(
+        False,
+        "--all-waves/--no-all-waves",
+        help="Aggregate across every available wave.",
+    ),
+    format: str = typer.Option(
+        "parquet",
+        "--format",
+        case_sensitive=False,
+        help="Serialization format for the output (parquet or csv).",
+    ),
+    out: Path = typer.Option(
+        ...,
         "--out",
-        type=Path,
-        required=True,
-        help="Destination file (parquet or csv).",
-    )
-    materialize.add_argument(
-        "--format",
-        choices=("parquet", "csv"),
-        default="parquet",
-        help="Serialization format (default: parquet).",
-    )
-    materialize.add_argument(
+        help="Destination file path for the materialized data.",
+    ),
+    no_index: bool = typer.Option(
+        False,
         "--no-index",
-        action="store_true",
         help="Do not include the index when writing the file.",
-    )
+    ),
+) -> None:
+    """Persist a table using the YAML-defined API."""
 
-    register = subparsers.add_parser(
-        "register",
-        help="Register a DVC materialization stage for a table.",
+    if wave and all_waves:
+        raise typer.BadParameter("Use either --wave or --all-waves, not both.", param_hint=["--wave", "--all-waves"])
+
+    waves: Optional[Sequence[str]]
+    if wave:
+        waves = wave
+    elif all_waves:
+        waves = None
+    else:
+        waves = None  # default: aggregate all available waves
+
+    output_path = _materialize(
+        country=country,
+        waves=waves,
+        table=table,
+        output=out,
+        file_format=format,
+        include_index=not no_index,
     )
-    register.add_argument("--country", required=True)
-    register.add_argument("--wave", required=True)
-    register.add_argument("--table", required=True)
-    register.add_argument(
+    typer.echo(output_path)
+
+
+@app.command()
+def register(
+    country: str = typer.Argument(..., help="Country name (e.g., Uganda)."),
+    wave: str = typer.Option(..., "--wave", help="Wave identifier (e.g., 2023-24)."),
+    table: str = typer.Option(..., "--table", help="Table to register."),
+    format: str = typer.Option(
+        "parquet",
         "--format",
-        choices=("parquet", "csv"),
-        default="parquet",
-    )
-    register.add_argument(
+        case_sensitive=False,
+        help="Serialization format for the output (parquet or csv).",
+    ),
+    dvc_file: Path = typer.Option(
+        Path(__file__).resolve().parent / "countries" / "dvc.yaml",
         "--dvc-file",
-        type=Path,
-        default=Path(__file__).resolve().parent / "countries" / "dvc.yaml",
-        help="Path to the DVC YAML file (defaults to countries/dvc.yaml).",
-    )
-    register.add_argument(
+        help="Path to the DVC YAML file.",
+    ),
+    lock_file: Path = typer.Option(
+        Path(__file__).resolve().parent / "countries" / "dvc.lock",
         "--lock-file",
-        type=Path,
-        default=Path(__file__).resolve().parent / "countries" / "dvc.lock",
-        help="Path to the DVC lock file (defaults to countries/dvc.lock).",
+        help="Path to the DVC lock file.",
+    ),
+) -> None:
+    """Register a DVC materialization stage for a table."""
+
+    stage_key = _register_stage(
+        country=country,
+        wave=wave,
+        table=table,
+        file_format=format,
+        dvc_file=dvc_file,
+        lock_file=lock_file,
+    )
+    typer.echo(
+        f"Registered stage materialize@{stage_key}.\n"
+        f"Run 'cd lsms_library/countries && dvc repro materialize@{stage_key}' to materialize."
     )
 
-    return parser
+
+@app.command()
+def countries(as_csv: bool = typer.Option(False, "--as-csv", help="Emit comma-separated list.")) -> None:
+    """List supported countries."""
+
+    _print_list(_available_country_dirs(), as_csv)
 
 
-def main(argv: Iterable[str] | None = None) -> None:
-    parser = _build_parser()
-    args = parser.parse_args(argv)
+@app.command()
+def waves(
+    country: str = typer.Option(..., "--country", help="Country name (e.g., Malawi)."),
+    as_csv: bool = typer.Option(False, "--as-csv", help="Emit comma-separated list."),
+) -> None:
+    """List waves available for a country."""
 
-    if args.command == "materialize":
-        if getattr(args, "waves", None):
-            waves: Sequence[str] | None = args.waves
-        elif getattr(args, "all_waves", False):
-            waves = None
-        else:
-            waves = None  # Default to stacking all waves when --wave is omitted
-        output = _materialize(
-            country=args.country,
-            waves=waves,
-            table=args.table,
-            output=args.out,
-            file_format=args.format,
-            include_index=not args.no_index,
-        )
-        print(output)
-    elif args.command == "register":
-        stage_key = _register_stage(
-            country=args.country,
-            wave=args.wave,
-            table=args.table,
-            file_format=args.format,
-            dvc_file=args.dvc_file,
-            lock_file=args.lock_file,
-        )
-        print(
-            "Registered stage materialize@{} (run 'cd lsms_library/countries && dvc repro materialize@{}' to materialize).".format(
-                stage_key, stage_key
-            )
-        )
+    country_obj = Country(country, preload_panel_ids=False)
+    _print_list(country_obj.waves, as_csv)
+
+
+@app.command()
+def tables(
+    country: str = typer.Option(..., "--country", help="Country name (e.g., Malawi)."),
+    as_csv: bool = typer.Option(False, "--as-csv", help="Emit comma-separated list."),
+) -> None:
+    """List data tables (data scheme) for a country."""
+
+    country_obj = Country(country, preload_panel_ids=False)
+    _print_list(country_obj.data_scheme, as_csv)
+
+
+def main() -> None:  # pragma: no cover - Typer handles CLI invocation
+    app()
 
 
 if __name__ == "__main__":  # pragma: no cover
