@@ -307,24 +307,66 @@ def countries(as_csv: bool = typer.Option(False, "--as-csv", help="Emit comma-se
 
 @app.command()
 def waves(
-    country: str = typer.Option(..., "--country", help="Country name (e.g., Malawi)."),
+    country: Optional[str] = typer.Option(
+        None,
+        "--country",
+        help="Country name (e.g., Malawi). Omit to list waves for every country.",
+    ),
+    all_countries: bool = typer.Option(
+        False,
+        "--all-countries/--no-all-countries",
+        help="List all country/wave combinations.",
+    ),
     as_csv: bool = typer.Option(False, "--as-csv", help="Emit comma-separated list."),
 ) -> None:
     """List waves available for a country."""
 
-    country_obj = Country(country, preload_panel_ids=False)
-    _print_list(country_obj.waves, as_csv)
+    if not country and not all_countries:
+        raise typer.BadParameter(
+            "Provide --country or --all-countries.", param_hint=["--country", "--all-countries"]
+        )
+
+    if all_countries:
+        pairs = []
+        for name in _available_country_dirs():
+            waves = Country(name, preload_panel_ids=False).waves
+            pairs.extend(f"{name},{wave}" for wave in waves)
+        _print_list(pairs, as_csv)
+    else:
+        country_obj = Country(country, preload_panel_ids=False)  # type: ignore[arg-type]
+        _print_list(country_obj.waves, as_csv)
 
 
 @app.command()
 def tables(
-    country: str = typer.Option(..., "--country", help="Country name (e.g., Malawi)."),
+    country: Optional[str] = typer.Option(
+        None,
+        "--country",
+        help="Country name (e.g., Malawi). Omit to list tables for every country.",
+    ),
+    all_countries: bool = typer.Option(
+        False,
+        "--all-countries/--no-all-countries",
+        help="List all country/table combinations.",
+    ),
     as_csv: bool = typer.Option(False, "--as-csv", help="Emit comma-separated list."),
 ) -> None:
     """List data tables (data scheme) for a country."""
 
-    country_obj = Country(country, preload_panel_ids=False)
-    _print_list(country_obj.data_scheme, as_csv)
+    if not country and not all_countries:
+        raise typer.BadParameter(
+            "Provide --country or --all-countries.", param_hint=["--country", "--all-countries"]
+        )
+
+    if all_countries:
+        pairs = []
+        for name in _available_country_dirs():
+            tables = Country(name, preload_panel_ids=False).data_scheme
+            pairs.extend(f"{name},{table}" for table in tables)
+        _print_list(pairs, as_csv)
+    else:
+        country_obj = Country(country, preload_panel_ids=False)  # type: ignore[arg-type]
+        _print_list(country_obj.data_scheme, as_csv)
 
 
 def main() -> None:  # pragma: no cover - Typer handles CLI invocation
