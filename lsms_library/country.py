@@ -678,6 +678,7 @@ class Country:
         def load_json_cache(method_name):
             cache_path = self.file_path / "_" / f"{method_name}.json"
             if cache_path.exists():
+                print(f"Reading {method_name} from cache {cache_path}", file=stderr)
                 with open(cache_path, 'r') as json_file:
                     return json.load(json_file)
 
@@ -698,6 +699,7 @@ class Country:
                 cache_path.parent.mkdir(parents=True, exist_ok=True)
                 with open(cache_path, 'w') as json_file:
                     json.dump(result, json_file)
+                print(f"Writing {method_name} to cache {cache_path}", file=stderr)
             elif isinstance(result, pd.DataFrame):
                 parquet_path = self.file_path / "_" / f"{method_name}.parquet"
                 parquet_path.parent.mkdir(parents=True, exist_ok=True)
@@ -707,7 +709,7 @@ class Country:
                         cache_path.unlink()
                     except OSError:
                         pass
-                print(f"Cached {method_name} to {parquet_path}", file=stderr)
+                print(f"Writing {method_name} to cache {parquet_path}", file=stderr)
             return result
 
         def load_dataframe_with_dvc(method_name):
@@ -729,8 +731,8 @@ class Country:
                 df = load_from_waves(waves)
                 if isinstance(df, pd.DataFrame):
                     cache_path.parent.mkdir(parents=True, exist_ok=True)
-                    df.to_parquet(cache_path)
-                    print(f"Cached {method_name} to {cache_path}", file=stderr)
+                    to_parquet(df, cache_path)
+                    print(f"Writing {method_name} to cache {cache_path}", file=stderr)
                 return df
 
             # Determine if all stages are up-to-date
@@ -742,6 +744,7 @@ class Country:
                     break
 
             if cache_exists and stage_clean:
+                print(f"Reading {method_name} from cache {cache_path}", file=stderr)
                 df = get_dataframe(cache_path)
                 df = map_index(df)
                 return df
@@ -774,7 +777,7 @@ class Country:
 
             cache_path.parent.mkdir(parents=True, exist_ok=True)
             to_parquet(combined, cache_path)
-            print(f"Cached {method_name} to {cache_path}", file=stderr)
+            print(f"Writing {method_name} to cache {cache_path}", file=stderr)
             return combined
 
         def load_with_dvc_cache(method_name):
