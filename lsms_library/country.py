@@ -117,7 +117,13 @@ def _load_materialize_stage_map(dvc_root: str) -> dict[tuple[str, str | None, st
         outs = do_section.get("outs", [])
         if not outs:
             continue
-        out_template = outs[0]
+        out_entry = outs[0]
+        if isinstance(out_entry, dict):
+            out_template = out_entry.get("path")
+        else:
+            out_template = out_entry
+        if not out_template:
+            continue
 
         for stage_key, params in foreach.items():
             country = params.get("country")
@@ -746,78 +752,134 @@ class Country:
             Execute legacy Makefile targets either at the country level or for a specific wave.
             """
             base_path = self.file_path if wave is None else self[wave].file_path
-            makefile_path = base_path / "_" / "Makefile"
-            script_path = base_path / "_" / f"{method_name}.py"
-            if not makefile_path.exists():
-                warnings.warn(f"Makefile not found in {makefile_path}. Unable to generate required data.")
+            candidate_make_dirs: list[Path] = []
+            if wave is not None:
+                candidate_make_dirs.append(base_path / "_")
+            candidate_make_dirs.append(self.file_path / "_")
 
-            cwd_path = makefile_path.parent if makefile_path.exists() else script_path.parent
+            makefile_dir = next((d for d in candidate_make_dirs if (d / "Makefile").exists()), None)
+            makefile_path = makefile_dir / "Makefile" if makefile_dir else None
+
+            script_candidates: list[Path] = []
+            if wave is not None:
+                script_candidates.append(base_path / "_" / f"{method_name}.py")
+            script_candidates.append(self.file_path / "_" / f"{method_name}.py")
+            script_path = next((p for p in script_candidates if p.exists()), None)
+
+            output_candidates: list[Path] = []
             if method_name in json_cache_methods:
-                target_path = base_path / "_" / f"{method_name}.json"
+                if wave is not None:
+                    output_candidates.append(base_path / "_" / f"{method_name}.json")
+                output_candidates.append(self.file_path / "_" / f"{method_name}.json")
             else:
-                target_path = base_path / "var" / f"{method_name}.parquet"
+                if wave is not None:
+                    output_candidates.append(base_path / "var" / f"{method_name}.parquet")
+                    output_candidates.append(base_path / "_" / f"{method_name}.parquet")
+                output_candidates.append(self.file_path / "var" / f"{method_name}.parquet")
+                output_candidates.append(self.file_path / "_" / f"{method_name}.parquet")
+
+            # deduplicate while preserving order
+            unique_candidates: list[Path] = []
+            seen: set[Path] = set()
+            for cand in output_candidates:
+                if cand in seen:
+                    continue
+                seen.add(cand)
+                unique_candidates.append(cand)
+
+            if makefile_path is None and script_path is None:
+                warnings.warn(f"No Makefile or script found for {self.name}/{wave or '_'} {method_name}.")
+                return pd.DataFrame()
+
+            cwd_path = makefile_dir if makefile_dir is not None else script_path.parent
+            if method_name in json_cache_methods:
+                target_path = unique_candidates[0]
+            else:
+                target_path = unique_candidates[0]
 
             target_path.parent.mkdir(parents=True, exist_ok=True)
-            make_target = os.path.relpath(target_path, cwd_path)
 
-            jobs_flag = _make_jobs_flag()
-            make_cmd = ["make", "-s"]
-            if jobs_flag:
-                make_cmd.append(jobs_flag)
-            make_cmd.append(make_target)
-
-            def load_output():
-                if not target_path.exists():
+            def try_make(make_dir: Path) -> Path | None:
+                if make_dir is None or not (make_dir / "Makefile").exists():
                     return None
-                if target_path.suffix == '.json':
-                    with open(target_path, 'r', encoding='utf-8') as json_file:
-                        return json.load(json_file)
-                df_local = get_dataframe(str(target_path))
-                df_local = map_index(df_local)
-                return df_local
+                makefile = make_dir / "Makefile"
+                for candidate in unique_candidates:
+                    try:
+                        rel_target = os.path.relpath(candidate, make_dir)
+                    except ValueError:
+                        continue
+                    make_cmd = ["make", "-s"]
+                    jobs_flag = _make_jobs_flag()
+                    if jobs_flag:
+                        make_cmd.append(jobs_flag)
+                    make_cmd.append(rel_target)
+                    try:
+                        subprocess.run(make_cmd, cwd=make_dir, check=True)
+                        print(f"Makefile executed successfully for {self.name}/{wave or 'ALL'}. Rechecking for {candidate.name}...", file=stderr)
+                    except (subprocess.CalledProcessError, FileNotFoundError) as error:
+                        warnings.warn(f"Makefile execution failed for {self.name}/{wave or '_'} {method_name}: {error}")
+                        continue
+                    if candidate.exists():
+                        return candidate
+                return None
 
-            output = None
-            make_ran = False
-            if makefile_path.exists():
-                try:
-                    subprocess.run(make_cmd, cwd=makefile_path.parent, check=True)
-                    make_ran = True
-                    print(f"Makefile executed successfully for {base_path.name}. Rechecking for {target_path.name}...", file=stderr)
-                except (subprocess.CalledProcessError, FileNotFoundError) as error:
-                    warnings.warn(f"Makefile execution failed for {base_path.name}/{method_name}: {error}")
-
-                output = load_output()
-                if output is not None:
-                    return output
-
-            if script_path.exists():
+            def try_script(script: Path) -> Path | None:
+                if script is None or not script.exists():
+                    return None
                 python_bin = sys.executable or "python3"
-                subprocess.run([python_bin, str(script_path)], cwd=script_path.parent, check=True)
-                print(f"Python fallback executed for {base_path.name}.{method_name}.", file=stderr)
-                output = load_output()
-                if output is not None:
-                    return output
+                try:
+                    subprocess.run([python_bin, str(script)], cwd=script.parent, check=True)
+                    print(f"Python fallback executed for {script.parent.name}.{method_name}.", file=stderr)
+                except subprocess.CalledProcessError as error:
+                    warnings.warn(f"Python fallback failed for {script}: {error}")
+                    return None
+                for candidate in unique_candidates:
+                    if candidate.exists():
+                        return candidate
+                return None
 
-            if makefile_path.exists() or script_path.exists():
+            output_path: Path | None = None
+            if makefile_path is not None:
+                output_path = try_make(makefile_path.parent)
+
+            if output_path is None and script_path is not None:
+                output_path = try_script(script_path)
+
+            if output_path is None:
                 print(f"Data file {target_path} still missing after running fallbacks.", file=stderr)
+                return pd.DataFrame()
+
+            if output_path.suffix == ".json":
+                with open(output_path, "r", encoding="utf-8") as json_file:
+                    return json.load(json_file)
+
+            df_local = get_dataframe(str(output_path))
+            df_local = map_index(df_local)
+            return df_local
+
             return pd.DataFrame()
 
         def load_from_waves(waves):
             results = {}
             for w in waves:
+                wave_obj = self[w]
                 wave_result = None
                 try:
-                    wave_result = getattr(self[w], method_name)()
+                    wave_result = getattr(wave_obj, method_name)()
                 except (KeyError, AttributeError) as error:
                     warnings.warn(str(error))
 
-                use_legacy = wave_result is None
-                if isinstance(wave_result, pd.DataFrame) and wave_result.empty:
-                    use_legacy = True
+                wave_has_table = method_name in wave_obj.data_scheme
+                use_legacy = wave_has_table and (
+                    wave_result is None
+                    or (isinstance(wave_result, pd.DataFrame) and wave_result.empty)
+                )
 
                 if use_legacy:
                     wave_result = run_make_target(method_name, wave=w)
 
+                if wave_result is None and not wave_has_table:
+                    continue
                 if isinstance(wave_result, pd.DataFrame) and wave_result.empty:
                     continue
                 if wave_result is None:
@@ -837,14 +899,21 @@ class Country:
                     if not results:
                         return pd.DataFrame()
 
-                #using safe_concat_dataframe_dict only if more than 2 not empty DataFrames
                 non_empty_df = {k: df for k, df in results.items() if not df.empty}
                 if not non_empty_df:
                     return pd.DataFrame()
-                if len(non_empty_df) > 1: # Why not 2, per comment above?
+                if len(non_empty_df) > 1:
                     return safe_concat_dataframe_dict(non_empty_df)
-                else:
-                    return pd.concat(non_empty_df.values(), axis=0, sort=False)
+                return pd.concat(non_empty_df.values(), axis=0, sort=False)
+
+            country_fallback = run_make_target(method_name, wave=None)
+            if isinstance(country_fallback, dict):
+                if country_fallback:
+                    return country_fallback
+                return {}
+            if isinstance(country_fallback, pd.DataFrame):
+                return country_fallback
+
             raise KeyError(f"No data found for {method_name} in any wave of {self.name}.")
 
         json_cache_methods = {'panel_ids', 'updated_ids'}
@@ -917,7 +986,12 @@ class Country:
             # Determine if all stages are up-to-date
             stage_clean = True
             for info in stage_infos:
-                status = repo.status(targets=[info.stage_ref])
+                try:
+                    status = repo.status(targets=[info.stage_ref])
+                except Exception as status_error:
+                    print(f"DVC status check failed for {info.stage_ref}: {status_error}. Treating as stale.", file=stderr)
+                    stage_clean = False
+                    break
                 if status:
                     stage_clean = False
                     break
@@ -930,7 +1004,11 @@ class Country:
 
             # Run DVC stages for required waves
             for info in stage_infos:
-                repo.reproduce(info.stage_ref)
+                try:
+                    repo.reproduce(info.stage_ref)
+                except Exception as reproduce_error:
+                    print(f"DVC reproduce failed for {info.stage_ref}: {reproduce_error}. Falling back to legacy loaders.", file=stderr)
+                    return load_from_waves(waves)
 
             results = {}
             for info in stage_infos:

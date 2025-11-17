@@ -1,0 +1,89 @@
+stages:
+  materialize:
+    do:
+      cmd: cd _ && LSMS_USE_DVC_CACHE=false python3 -m lsms_library.cli materialize
+        --country "${item.country}" --all-waves --table "${item.table}" --format "${item.format}"
+        --out ../var/${item.table}.${item.format}
+      deps:
+      - ../../cli.py
+      - ../../country.py
+      - ../../local_tools.py
+      - _
+      outs:
+      - var/${item.table}.${item.format}
+    foreach:
+      uganda::::cluster_features:
+        country: Uganda
+        wave: null
+        table: cluster_features
+        format: parquet
+      uganda::::earnings:
+        country: Uganda
+        wave: null
+        table: earnings
+        format: parquet
+      uganda::::enterprise_income:
+        country: Uganda
+        wave: null
+        table: enterprise_income
+        format: parquet
+      uganda::::food_acquired:
+        country: Uganda
+        wave: null
+        table: food_acquired
+        format: parquet
+      uganda::::food_expenditures:
+        country: Uganda
+        wave: null
+        table: food_expenditures
+        format: parquet
+      uganda::::food_prices:
+        country: Uganda
+        wave: null
+        table: food_prices
+        format: parquet
+      uganda::::food_quantities:
+        country: Uganda
+        wave: null
+        table: food_quantities
+        format: parquet
+      uganda::::household_characteristics:
+        country: Uganda
+        wave: null
+        table: household_characteristics
+        format: parquet
+      uganda::::household_roster:
+        country: Uganda
+        wave: null
+        table: household_roster
+        format: parquet
+      uganda::::income:
+        country: Uganda
+        wave: null
+        table: income
+        format: parquet
+      uganda::::interview_date:
+        country: Uganda
+        wave: null
+        table: interview_date
+        format: parquet
+      uganda::::nutrition:
+        country: Uganda
+        wave: null
+        table: nutrition
+        format: parquet
+      uganda::::other_features:
+        country: Uganda
+        wave: null
+        table: other_features
+        format: parquet
+      uganda::::people_last7days:
+        country: Uganda
+        wave: null
+        table: people_last7days
+        format: parquet
+      uganda::::shocks:
+        country: Uganda
+        wave: null
+        table: shocks
+        format: parquet

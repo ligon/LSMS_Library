@@ -1,0 +1,30 @@
+schema: '2.0'
+stages:
+  materialize@uganda::::income:
+    cmd: cd _ && LSMS_USE_DVC_CACHE=false python3 -m lsms_library.cli 
+      materialize --country "Uganda" --all-waves --table "income" --format 
+      "parquet" --out ../var/income.parquet
+    deps:
+    - path: ../../cli.py
+      hash: md5
+      md5: 69304b146cc0667cf417008799a06399
+      size: 14255
+    - path: ../../country.py
+      hash: md5
+      md5: 7a0ddb4feec582000be39b4c38fe577f
+      size: 53559
+    - path: ../../local_tools.py
+      hash: md5
+      md5: 481bd686db5c040ad0a21664e8dad3f1
+      size: 41095
+      isexec: true
+    - path: _
+      hash: md5
+      md5: 89f249d530c8b7a6464dcb9318998fb3.dir
+      size: 3475862
+      nfiles: 38
+    outs:
+    - path: var/income.parquet
+      hash: md5
+      md5: 911401e8879c592a49bf9c1f9141c6a1
+      size: 62209
