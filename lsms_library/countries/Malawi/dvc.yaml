@@ -1,0 +1,58 @@
+stages:
+  materialize:
+    do:
+      cmd: python3 -m lsms_library.cli materialize --country {item.country} --all-waves
+        --table ${item.table} --format ${item.format} --out var/${item.table}.${item.format}
+      deps:
+      - ../../cli.py
+      - ../../country.py
+      - ../../local_tools.py
+      - _
+      outs:
+      - var/${item.table}.${item.format}
+    foreach:
+      malawi::::household_roster:
+        country: Malawi
+        wave: null
+        table: household_roster
+        format: parquet
+      malawi::::cluster_features:
+        country: Malawi
+        wave: null
+        table: cluster_features
+        format: parquet
+      malawi::::interview_date:
+        country: Malawi
+        wave: null
+        table: interview_date
+        format: parquet
+      malawi::::subjective_well_being:
+        country: Malawi
+        wave: null
+        table: subjective_well_being
+        format: parquet
+      malawi::::panel_ids:
+        country: Malawi
+        wave: null
+        table: panel_ids
+        format: parquet
+      malawi::::food_acquired:
+        country: Malawi
+        wave: null
+        table: food_acquired
+        format: parquet
+      malawi::::food_expenditures:
+        country: Malawi
+        wave: null
+        table: food_expenditures
+        format: parquet
+      malawi::::household_characteristics:
+        country: Malawi
+        wave: null
+        table: household_characteristics
+        format: parquet
+      malawi::::food_prices:
+        country: Malawi
+        wave: null
+        table: food_prices
+        format: parquet

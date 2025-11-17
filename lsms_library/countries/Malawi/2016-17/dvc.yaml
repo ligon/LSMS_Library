@@ -1,49 +1,49 @@
 stages:
   materialize:
     foreach:
-      malawi::2019_20::cluster_features:
+      malawi::2016_17::cluster_features:
         country: Malawi
-        wave: 2019-20
+        wave: 2016-17
         table: cluster_features
         format: parquet
-      malawi::2019_20::household_roster:
+      malawi::2016_17::household_roster:
         country: Malawi
-        wave: 2019-20
+        wave: 2016-17
         table: household_roster
         format: parquet
-      malawi::2019_20::interview_date:
+      malawi::2016_17::interview_date:
         country: Malawi
-        wave: 2019-20
+        wave: 2016-17
         table: interview_date
         format: parquet
-      malawi::2019_20::subjective_well_being:
+      malawi::2016_17::subjective_well_being:
         country: Malawi
-        wave: 2019-20
+        wave: 2016-17
         table: subjective_well_being
         format: parquet
-      malawi::2019_20::panel_ids:
+      malawi::2016_17::panel_ids:
         country: Malawi
-        wave: 2019-20
+        wave: 2016-17
         table: panel_ids
         format: parquet
-      malawi::2019_20::food_acquired:
+      malawi::2016_17::food_acquired:
         country: Malawi
-        wave: 2019-20
+        wave: 2016-17
         table: food_acquired
         format: parquet
-      malawi::2019_20::food_expenditures:
+      malawi::2016_17::food_expenditures:
         country: Malawi
-        wave: 2019-20
+        wave: 2016-17
         table: food_expenditures
         format: parquet
-      malawi::2019_20::household_characteristics:
+      malawi::2016_17::household_characteristics:
         country: Malawi
-        wave: 2019-20
+        wave: 2016-17
         table: household_characteristics
         format: parquet
-      malawi::2019_20::food_prices:
+      malawi::2016_17::food_prices:
         country: Malawi
-        wave: 2019-20
+        wave: 2016-17
         table: food_prices
         format: parquet
     do:
