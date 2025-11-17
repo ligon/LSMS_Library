@@ -55,6 +55,7 @@ food_exp = uga.food_expenditures()
 - *Zero Data Loss*: Original data structure and detail preserved; access raw data through the same interface
 - *Standardized Data Schemes*: Common data types (=food_prices=, =nutrition=, =income=, etc.) mapped across all countries
 - *DVC Integration*: Stream data from remote storage without filling your disk
+- *Intelligent Caching*: Automatic hash-based caching with DVC validation - first call builds data, subsequent calls read from cache; cache automatically invalidates when source data or configuration changes
 - *Extensible*: Add new surveys by creating YAML configuration files (no Python required)
 - *Multiple Countries*: Supports LSMS surveys from Nigeria, Tanzania, Uganda, Ethiopia, Malawi, and more
 
@@ -72,6 +73,29 @@ The library uses DVC (Data Version Control) to manage data stored in remote S3 b
 - *Write access (contributors)*: To contribute new datasets, contact ligon@berkeley.edu for write credentials. You'll need to establish [[https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key][GPG/PGP credentials]] for secure access.
 
 Once you have credentials, the library will handle data streaming automatically.
+
+** Performance and Caching
+
+The library includes intelligent caching to avoid rebuilding aggregated datasets:
+
+#+begin_src python
+uga = ll.Country('Uganda')
+
+# First call: builds from source data and creates cache
+hh_chars = uga.household_characteristics()  # Takes ~30 seconds
+
+# Subsequent calls: reads from cache
+hh_chars = uga.household_characteristics()  # Takes <1 second
+#+end_src
+
+*Cache Validation*: Caches are automatically validated using DVC's hash-based dependency tracking. If source data or configuration files change, the cache is automatically invalidated and rebuilt.
+
+*Cache Location*: Cached files are stored in ={country}/var/{dataset}.parquet= within the library installation.
+
+*Controlling Cache*: To disable caching (e.g., for debugging):
+#+begin_src bash
+export LSMS_USE_DVC_CACHE=false
+#+end_src
 
 * Usage Examples
 

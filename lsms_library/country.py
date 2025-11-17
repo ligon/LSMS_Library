@@ -17,6 +17,8 @@ warnings.filterwarnings('ignore', category=UnicodeWarning)
 import subprocess
 import json
 from sys import stderr
+from dvc.repo import Repo
+from dvc.exceptions import DvcException
 
 class Wave:
     def __init__(self,  year, wave_folder, country: 'Country'):
@@ -518,6 +520,66 @@ class Country:
                     return pd.concat(non_empty_df.values(), axis=0, sort=False)
             raise KeyError(f"No data found for {method_name} in any wave of {self.name}.")
 
+        def load_with_dvc_cache(method_name):
+            """
+            Load data using DVC-validated cache.
+
+            Checks if cached parquet exists and is valid according to DVC.
+            If cache is stale or missing, rebuilds from waves and caches.
+            """
+            # Determine cache path
+            if method_name in ['panel_ids', 'updated_ids']:
+                cache_path = self.file_path / "_" / f"{method_name}.json"
+            else:
+                cache_path = self.file_path / "var" / f"{method_name}.parquet"
+
+            # Check if cache exists and is valid via DVC
+            cache_valid = False
+            if cache_path.exists():
+                try:
+                    # Initialize DVC repo at countries directory
+                    dvc_root = self.file_path.parent
+                    repo = Repo(root_dir=str(dvc_root))
+
+                    # Check status of all materialize stages
+                    # Empty dict means all outputs are up-to-date
+                    status = repo.status(targets=["materialize"])
+
+                    # If our specific output is not in the status dict, it's valid
+                    cache_valid = str(cache_path.relative_to(dvc_root)) not in status.get("materialize", {})
+
+                except (DvcException, FileNotFoundError) as e:
+                    # No DVC repo or error - fall back to assuming valid if file exists
+                    print(f"DVC validation skipped for {method_name}: {e}", file=stderr)
+                    cache_valid = True
+
+            # Use cache if valid
+            if cache_valid and cache_path.exists():
+                print(f"Using cached {method_name} from {cache_path}", file=stderr)
+                if cache_path.suffix == '.json':
+                    with open(cache_path, 'r') as json_file:
+                        return json.load(json_file)
+                else:
+                    df = get_dataframe(cache_path)
+                    df = map_index(df)
+                    return df
+
+            # Cache invalid or missing - rebuild from waves
+            print(f"Building {method_name} from waves (cache {'stale' if cache_path.exists() else 'missing'})", file=stderr)
+            df = load_from_waves(waves)
+
+            # Save to cache for next time
+            if not isinstance(df, dict):  # Don't cache dict returns
+                cache_path.parent.mkdir(parents=True, exist_ok=True)
+                if cache_path.suffix == '.json':
+                    with open(cache_path, 'w') as json_file:
+                        json.dump(df, json_file)
+                else:
+                    df.to_parquet(cache_path)
+                print(f"Cached {method_name} to {cache_path}", file=stderr)
+
+            return df
+
         def load_from_makefile(method_name):
             """
             Load data from Makefile if it exists.
@@ -552,7 +614,13 @@ class Country:
                 df = map_index(df)
             return df
         
-        if self.resources.get('Data Scheme').get(method_name, None):
+        # Use DVC-validated cache for all datasets
+        # Falls back to load_from_makefile for special cases or if DVC fails
+        use_dvc_cache = os.getenv('LSMS_USE_DVC_CACHE', 'true').lower() == 'true'
+
+        if use_dvc_cache:
+            df = load_with_dvc_cache(method_name)
+        elif self.resources.get('Data Scheme').get(method_name, None):
             df = load_from_waves(waves)
         else:
             df = load_from_makefile(method_name)
