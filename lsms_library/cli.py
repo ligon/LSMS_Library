@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections import OrderedDict
+import os
 from pathlib import Path
 from typing import List, Optional, Sequence
 
@@ -196,11 +197,10 @@ def _register_stage(
     if has_wave:
         stage_key = f"{_slug(country)}::{_slug(wave_value)}::{_slug(table)}"
         cmd_wave_part = " --wave ${item.wave}"
-        out_template = "_/${item.table}.${item.format}"
     else:
         stage_key = f"{_slug(country)}::::{_slug(table)}"
         cmd_wave_part = " --all-waves"
-        out_template = "var/${item.table}.${item.format}"
+    out_template = "var/${item.table}.${item.format}"
 
     foreach[stage_key] = OrderedDict(
         (
@@ -215,6 +215,8 @@ def _register_stage(
 
     module_dir = Path(__file__).resolve().parent
     dvc_parent = dvc_file.parent
+
+    (dvc_parent / "var").mkdir(parents=True, exist_ok=True)
 
     cli_rel = os.path.relpath(module_dir / "cli.py", dvc_parent)
     country_rel = os.path.relpath(module_dir / "country.py", dvc_parent)
