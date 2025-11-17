@@ -728,6 +728,11 @@ class Country:
 
             stage_infos = self._resolve_materialize_stages(method_name, waves)
             if not stage_infos:
+                if cache_exists:
+                    print(f"Reading {method_name} from cache {cache_path}", file=stderr)
+                    df = get_dataframe(cache_path)
+                    df = map_index(df)
+                    return df
                 df = load_from_waves(waves)
                 if isinstance(df, pd.DataFrame):
                     cache_path.parent.mkdir(parents=True, exist_ok=True)
