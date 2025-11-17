@@ -12,12 +12,11 @@ stages:
         table: food_acquired
         format: parquet
     do:
-      cmd: python3 -m lsms_library.cli materialize --country ${item.country} --wave ${item.wave} --table ${item.table} --format ${item.format} --out build/${item.wave}/${item.table}.${item.format}
+      cmd: python3 -m lsms_library.cli materialize --country ${item.country} --wave ${item.wave} --table ${item.table} --format ${item.format} --out _/${item.table}.${item.format}
       deps:
-      - ../../cli.py
-      - ../../country.py
-      - ../../local_tools.py
+      - ../../../cli.py
+      - ../../../country.py
+      - ../../../local_tools.py
       - _
-      - ${item.wave}/_
       outs:
-      - build/${item.wave}/${item.table}.${item.format}
+      - _/${item.table}.${item.format}

@@ -172,28 +172,6 @@ def cache_clear(
         print("No cached files matched the provided filters.")
 
 
-_DEFAULT_CMD = (
-    "python3 -m lsms_library.cli materialize\n"
-    "        --country ${item.country}\n"
-    "        --wave ${item.wave}\n"
-    "        --table ${item.table}\n"
-    "        --format ${item.format}\n"
-    "        --out build/${item.country}/${item.wave}/${item.table}.${item.format}"
-)
-
-_DEFAULT_DEPS = [
-    "../cli.py",
-    "../country.py",
-    "../local_tools.py",
-    "${item.country}/_",
-    "${item.country}/${item.wave}/_",
-]
-
-_DEFAULT_OUTS = [
-    "build/${item.country}/${item.wave}/${item.table}.${item.format}",
-]
-
-
 def _slug(value: str) -> str:
     return value.lower().replace(" ", "_").replace("-", "_")
 
@@ -212,32 +190,52 @@ def _register_stage(
     materialize = stages.setdefault("materialize", OrderedDict())
     foreach = materialize.setdefault("foreach", OrderedDict())
 
-    if wave and wave.lower() not in {"", "all_waves"}:
-        stage_key = f"{_slug(country)}::{_slug(wave)}::{_slug(table)}"
+    has_wave = bool(wave and wave.lower() not in {"", "all_waves"})
+    wave_value = wave if has_wave else None
+
+    if has_wave:
+        stage_key = f"{_slug(country)}::{_slug(wave_value)}::{_slug(table)}"
+        cmd_wave_part = " --wave ${item.wave}"
+        out_template = "_/${item.table}.${item.format}"
     else:
         stage_key = f"{_slug(country)}::::{_slug(table)}"
+        cmd_wave_part = " --all-waves"
+        out_template = "var/${item.table}.${item.format}"
 
     foreach[stage_key] = OrderedDict(
         (
             ("country", country),
-            ("wave", wave),
+            ("wave", wave_value),
             ("table", table),
             ("format", file_format),
         )
     )
 
-    do = materialize.setdefault("do", OrderedDict())
-    do.setdefault("cmd", _DEFAULT_CMD)
-    deps = do.setdefault("deps", list(_DEFAULT_DEPS))
-    outs = do.setdefault("outs", list(_DEFAULT_OUTS))
+    import os
 
-    # Ensure defaults are present (handles older files without placeholders)
-    for item in _DEFAULT_DEPS:
-        if item not in deps:
-            deps.append(item)
-    for item in _DEFAULT_OUTS:
-        if item not in outs:
-            outs.append(item)
+    module_dir = Path(__file__).resolve().parent
+    dvc_parent = dvc_file.parent
+
+    cli_rel = os.path.relpath(module_dir / "cli.py", dvc_parent)
+    country_rel = os.path.relpath(module_dir / "country.py", dvc_parent)
+    tools_rel = os.path.relpath(module_dir / "local_tools.py", dvc_parent)
+
+    do = materialize.setdefault("do", OrderedDict())
+    cmd = (
+        "python3 -m lsms_library.cli materialize"
+        f" --country {{item.country}}{cmd_wave_part}"
+        " --table ${item.table} --format ${item.format}"
+        f" --out {out_template}"
+    )
+    do["cmd"] = cmd
+
+    deps = do.setdefault("deps", [])
+    deps[:] = []
+    deps.extend([cli_rel, country_rel, tools_rel, "_"])
+
+    outs = do.setdefault("outs", [])
+    outs[:] = []
+    outs.append(out_template)
 
     _dump_yaml(data, dvc_file)
 
@@ -339,8 +337,11 @@ def register(
 ) -> None:
     """Register a DVC materialization stage for a table."""
 
+    base_dir = Path(__file__).resolve().parent / "countries" / country
+    has_wave = bool(wave and wave.lower() not in {"", "all_waves"})
+
     if dvc_file is None:
-        dvc_file = Path(__file__).resolve().parent / "countries" / country / "dvc.yaml"
+        dvc_file = base_dir / (f"{wave}/dvc.yaml" if has_wave else "dvc.yaml")
     if lock_file is None:
         lock_file = dvc_file.with_name("dvc.lock")
 
@@ -356,7 +357,7 @@ def register(
     )
     typer.echo(
         f"Registered stage materialize@{stage_key}.\n"
-        f"Run 'cd {dvc_file.parent} && dvc repro {dvc_file.name}:materialize@{stage_key}' to materialize."
+        f"Run 'dvc repro {dvc_file}:materialize@{stage_key}' to materialize."
     )
 
 

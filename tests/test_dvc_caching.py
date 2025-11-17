@@ -211,10 +211,10 @@ class TestDVCCaching:
         rebuilt_df = pd.DataFrame({"col1": [99]})
 
         stage_key = "testcountry::2020_21::test_data"
-        build_output = mock_country_structure.parent / "build/TestCountry/2020-21/test_data.parquet"
+        build_output = mock_country_structure / "2020-21/_/test_data.parquet"
         stage_info = StageInfo(
             stage_key=stage_key,
-            stage_ref=f"TestCountry/dvc.yaml:materialize@{stage_key}",
+            stage_ref=f"TestCountry/2020-21/dvc.yaml:materialize@{stage_key}",
             country="TestCountry",
             wave="2020-21",
             table="test_data",
@@ -274,7 +274,7 @@ class TestDVCCaching:
         stage_key = "testcountry::2020_21::test_data"
         stage_info = StageInfo(
             stage_key=stage_key,
-            stage_ref=f"TestCountry/dvc.yaml:materialize@{stage_key}",
+            stage_ref=f"TestCountry/2020-21/dvc.yaml:materialize@{stage_key}",
             country="TestCountry",
             wave="2020-21",
             table="test_data",
@@ -408,7 +408,7 @@ class TestDVCCaching:
         build_output_path = mock_country_structure.parent / "build/TestCountry/2020-21/household_roster.parquet"
         stage_info = StageInfo(
             stage_key=stage_key,
-            stage_ref=f"TestCountry/dvc.yaml:materialize@{stage_key}",
+            stage_ref=f"TestCountry/2020-21/dvc.yaml:materialize@{stage_key}",
             country="TestCountry",
             wave="2020-21",
             table="household_roster",

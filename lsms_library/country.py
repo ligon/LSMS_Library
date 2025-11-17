@@ -89,17 +89,22 @@ def _load_materialize_stage_map(dvc_root: str) -> dict[tuple[str, str | None, st
     Load mapping from (country, wave, table) to StageInfo based on available dvc.yaml materialize foreach entries.
     """
     root_path = Path(dvc_root)
-    yaml_paths: list[Path] = []
+    yaml_paths: set[Path] = set()
 
     root_yaml = root_path / "dvc.yaml"
     if root_yaml.exists():
-        yaml_paths.append(root_yaml)
+        yaml_paths.add(root_yaml)
 
-    yaml_paths.extend(sorted(p for p in root_path.glob("*/dvc.yaml") if p.is_file()))
+    for path in root_path.glob("**/dvc.yaml"):
+        if ".dvc" in path.parts:
+            continue
+        yaml_paths.add(path)
 
     stage_map: dict[tuple[str, str | None, str], StageInfo] = {}
 
-    for yaml_path in yaml_paths:
+    for yaml_path in sorted(yaml_paths):
+        if not yaml_path.is_file():
+            continue
         with open(yaml_path, "r") as f:
             data = yaml.safe_load(f) or {}
 
