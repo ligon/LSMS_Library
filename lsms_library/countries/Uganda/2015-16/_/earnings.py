@@ -3,7 +3,7 @@ from lsms_library.local_tools import to_parquet
 
 import pandas as pd
 import dvc.api
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 
 # NB: Earnings here are for last seven days.
 fn = '../Data/gsec8.dta'

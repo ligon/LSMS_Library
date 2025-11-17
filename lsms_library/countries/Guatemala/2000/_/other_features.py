@@ -8,7 +8,7 @@ import pyreadstat
 import numpy as np
 import json
 import dvc.api
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 from lsms.tools import get_household_identification_particulars
 from lsms_library.local_tools import other_features
 

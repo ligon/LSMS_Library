@@ -10,7 +10,7 @@ import pandas as pd
 import numpy as np
 from tanzania import Waves, add_markets_from_other_features, country, id_walk, waves
 import dvc.api
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 import json
 import warnings
 

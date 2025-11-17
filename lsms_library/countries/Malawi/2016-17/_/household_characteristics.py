@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 import json
 import dvc.api
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 from malawi import get_household_characteristics
 
 with dvc.api.open('../Data/Cross_Sectional/hh_mod_b.dta', mode='rb') as dta:

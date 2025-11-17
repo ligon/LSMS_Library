@@ -1,5 +1,5 @@
 from lsms.tools import get_food_prices, get_food_expenditures, get_household_roster, get_household_identification_particulars
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 import numpy as np
 import pandas as pd
 import dvc.api

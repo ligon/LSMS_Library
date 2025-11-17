@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 import json
 import dvc.api
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 from malawi import handling_unusual_units, conversion_table_matching
 
 wave = '2019-20'

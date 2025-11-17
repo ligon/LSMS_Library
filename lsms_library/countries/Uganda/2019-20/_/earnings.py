@@ -3,7 +3,7 @@ from lsms_library.local_tools import to_parquet
 
 import pandas as pd
 import dvc.api
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 
 fn = '../Data/HH/gsec8.dta'
 earnings1 = 's8q78'  # Earnings from first job
