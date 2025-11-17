@@ -9,7 +9,7 @@ from typing import List, Optional, Sequence
 import typer
 import yaml
 
-from .country import Country
+from .country import Country, _log_issue
 from .local_tools import to_parquet
 
 app = typer.Typer(help="Command-line tools for interacting with LSMS Library data.")
@@ -414,11 +414,18 @@ def tables(
         pairs = []
         for name in _available_country_dirs():
             tables = Country(name, preload_panel_ids=False).data_scheme
+            if not tables:
+                _log_issue(name, "tables", None, ValueError("No tables defined in data scheme"))
             pairs.extend(f"{name},{table}" for table in tables)
         _print_list(pairs, as_csv)
     else:
         country_obj = Country(country, preload_panel_ids=False)  # type: ignore[arg-type]
-        _print_list(country_obj.data_scheme, as_csv)
+        tables = country_obj.data_scheme
+        if not tables:
+            _log_issue(country, "tables", None, ValueError("No tables defined in data scheme"))
+            typer.echo(f"No tables available for {country}.")
+            raise typer.Exit(1)
+        _print_list(tables, as_csv)
 
 
 def main() -> None:  # pragma: no cover - Typer handles CLI invocation
