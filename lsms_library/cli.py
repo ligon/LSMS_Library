@@ -3,16 +3,19 @@
 from __future__ import annotations
 
 from collections import OrderedDict
+import os
 from pathlib import Path
 from typing import List, Optional, Sequence
 
 import typer
 import yaml
 
-from .country import Country
+from .country import Country, _log_issue
 from .local_tools import to_parquet
 
 app = typer.Typer(help="Command-line tools for interacting with LSMS Library data.")
+cache_app = typer.Typer(help="Manage LSMS cache.")
+app.add_typer(cache_app, name="cache")
 
 
 class _OrderedLoader(yaml.SafeLoader):
@@ -121,26 +124,53 @@ def _materialize(
     return output
 
 
-_DEFAULT_CMD = (
-    "python3 -m lsms_library.cli materialize\n"
-    "        --country ${item.country}\n"
-    "        --wave ${item.wave}\n"
-    "        --table ${item.table}\n"
-    "        --format ${item.format}\n"
-    "        --out build/${item.country}/${item.wave}/${item.table}.${item.format}"
-)
+@cache_app.command("list")
+def cache_list(
+    country: Optional[str] = typer.Option(None, "--country", help="Country name to inspect."),
+) -> None:
+    """List cached datasets."""
+    countries = [country] if country else _available_country_dirs()
+    countries = [c for c in countries if (Path(__file__).resolve().parent / "countries" / c).exists()]
+    for name in countries:
+        country_obj = Country(name, preload_panel_ids=False)
+        datasets = country_obj.cached_datasets()
+        if datasets:
+            print(f"{name}: {', '.join(sorted(datasets))}")
+        else:
+            print(f"{name}: <no cache>")
 
-_DEFAULT_DEPS = [
-    "../cli.py",
-    "../country.py",
-    "../local_tools.py",
-    "${item.country}/_",
-    "${item.country}/${item.wave}/_",
-]
 
-_DEFAULT_OUTS = [
-    "build/${item.country}/${item.wave}/${item.table}.${item.format}",
-]
+@cache_app.command("clear")
+def cache_clear(
+    country: Optional[List[str]] = typer.Option(None, "--country", help="Country to clear (repeatable)."),
+    method: Optional[List[str]] = typer.Option(None, "--method", help="Dataset/method to clear (repeatable)."),
+    wave: Optional[List[str]] = typer.Option(None, "--wave", help="Wave identifier (repeatable)."),
+    all_countries: bool = typer.Option(False, "--all", help="Clear cache for all countries."),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Show files that would be removed without deleting."),
+) -> None:
+    """Clear cached datasets for one or more countries."""
+    if not all_countries and not country:
+        raise typer.BadParameter("Provide --country or use --all to target every country.")
+
+    target_countries = (
+        _available_country_dirs() if all_countries else list(dict.fromkeys(country))
+    )
+
+    any_output = False
+    for name in target_countries:
+        country_obj = Country(name, preload_panel_ids=False)
+        methods = list(dict.fromkeys(method)) if method else None
+        files = country_obj.clear_cache(methods=methods, waves=wave or None, dry_run=dry_run)
+        if files:
+            any_output = True
+            prefix = "[DRY RUN] " if dry_run else ""
+            action = "would remove" if dry_run else "removed"
+            print(f"{prefix}{name}: {action}")
+            for path in files:
+                print(f"  {path}")
+
+    if not any_output:
+        print("No cached files matched the provided filters.")
 
 
 def _slug(value: str) -> str:
@@ -161,29 +191,53 @@ def _register_stage(
     materialize = stages.setdefault("materialize", OrderedDict())
     foreach = materialize.setdefault("foreach", OrderedDict())
 
-    stage_key = f"{_slug(country)}_{_slug(wave)}_{_slug(table)}"
+    has_wave = bool(wave and wave.lower() not in {"", "all_waves"})
+    wave_value = wave if has_wave else None
+
+    if has_wave:
+        stage_key = f"{_slug(country)}::{_slug(wave_value)}::{_slug(table)}"
+        cmd_wave_part = " --wave ${item.wave}"
+    else:
+        stage_key = f"{_slug(country)}::::{_slug(table)}"
+        cmd_wave_part = " --all-waves"
+    out_template = "var/${item.table}.${item.format}"
 
     foreach[stage_key] = OrderedDict(
         (
             ("country", country),
-            ("wave", wave),
+            ("wave", wave_value),
             ("table", table),
             ("format", file_format),
         )
     )
 
-    do = materialize.setdefault("do", OrderedDict())
-    do.setdefault("cmd", _DEFAULT_CMD)
-    deps = do.setdefault("deps", list(_DEFAULT_DEPS))
-    outs = do.setdefault("outs", list(_DEFAULT_OUTS))
+    import os
 
-    # Ensure defaults are present (handles older files without placeholders)
-    for item in _DEFAULT_DEPS:
-        if item not in deps:
-            deps.append(item)
-    for item in _DEFAULT_OUTS:
-        if item not in outs:
-            outs.append(item)
+    module_dir = Path(__file__).resolve().parent
+    dvc_parent = dvc_file.parent
+
+    (dvc_parent / "var").mkdir(parents=True, exist_ok=True)
+
+    cli_rel = os.path.relpath(module_dir / "cli.py", dvc_parent)
+    country_rel = os.path.relpath(module_dir / "country.py", dvc_parent)
+    tools_rel = os.path.relpath(module_dir / "local_tools.py", dvc_parent)
+
+    do = materialize.setdefault("do", OrderedDict())
+    cmd = (
+        "python3 -m lsms_library.cli materialize"
+        f" --country {{item.country}}{cmd_wave_part}"
+        " --table ${item.table} --format ${item.format}"
+        f" --out {out_template}"
+    )
+    do["cmd"] = cmd
+
+    deps = do.setdefault("deps", [])
+    deps[:] = []
+    deps.extend([cli_rel, country_rel, tools_rel, "_"])
+
+    outs = do.setdefault("outs", [])
+    outs[:] = []
+    outs.append(out_template)
 
     _dump_yaml(data, dvc_file)
 
@@ -272,18 +326,28 @@ def register(
         case_sensitive=False,
         help="Serialization format for the output (parquet or csv).",
     ),
-    dvc_file: Path = typer.Option(
-        Path(__file__).resolve().parent / "countries" / "dvc.yaml",
+    dvc_file: Path | None = typer.Option(
+        None,
         "--dvc-file",
-        help="Path to the DVC YAML file.",
+        help="Path to the DVC YAML file (defaults to per-country file).",
     ),
-    lock_file: Path = typer.Option(
-        Path(__file__).resolve().parent / "countries" / "dvc.lock",
+    lock_file: Path | None = typer.Option(
+        None,
         "--lock-file",
-        help="Path to the DVC lock file.",
+        help="Path to the DVC lock file (defaults to per-country file).",
     ),
 ) -> None:
     """Register a DVC materialization stage for a table."""
+
+    base_dir = Path(__file__).resolve().parent / "countries" / country
+    has_wave = bool(wave and wave.lower() not in {"", "all_waves"})
+
+    if dvc_file is None:
+        dvc_file = base_dir / (f"{wave}/dvc.yaml" if has_wave else "dvc.yaml")
+    if lock_file is None:
+        lock_file = dvc_file.with_name("dvc.lock")
+
+    dvc_file.parent.mkdir(parents=True, exist_ok=True)
 
     stage_key = _register_stage(
         country=country,
@@ -295,7 +359,7 @@ def register(
     )
     typer.echo(
         f"Registered stage materialize@{stage_key}.\n"
-        f"Run 'cd lsms_library/countries && dvc repro materialize@{stage_key}' to materialize."
+        f"Run 'dvc repro {dvc_file}:materialize@{stage_key}' to materialize."
     )
 
 
@@ -363,11 +427,18 @@ def tables(
         pairs = []
         for name in _available_country_dirs():
             tables = Country(name, preload_panel_ids=False).data_scheme
+            if not tables:
+                _log_issue(name, "tables", None, ValueError("No tables defined in data scheme"))
             pairs.extend(f"{name},{table}" for table in tables)
         _print_list(pairs, as_csv)
     else:
         country_obj = Country(country, preload_panel_ids=False)  # type: ignore[arg-type]
-        _print_list(country_obj.data_scheme, as_csv)
+        tables = country_obj.data_scheme
+        if not tables:
+            _log_issue(country, "tables", None, ValueError("No tables defined in data scheme"))
+            typer.echo(f"No tables available for {country}.")
+            raise typer.Exit(1)
+        _print_list(tables, as_csv)
 
 
 def main() -> None:  # pragma: no cover - Typer handles CLI invocation

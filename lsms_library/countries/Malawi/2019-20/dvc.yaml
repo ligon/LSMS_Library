@@ -1,0 +1,57 @@
+stages:
+  materialize:
+    foreach:
+      malawi::2019_20::cluster_features:
+        country: Malawi
+        wave: 2019-20
+        table: cluster_features
+        format: parquet
+      malawi::2019_20::household_roster:
+        country: Malawi
+        wave: 2019-20
+        table: household_roster
+        format: parquet
+      malawi::2019_20::interview_date:
+        country: Malawi
+        wave: 2019-20
+        table: interview_date
+        format: parquet
+      malawi::2019_20::subjective_well_being:
+        country: Malawi
+        wave: 2019-20
+        table: subjective_well_being
+        format: parquet
+      malawi::2019_20::panel_ids:
+        country: Malawi
+        wave: 2019-20
+        table: panel_ids
+        format: parquet
+      malawi::2019_20::food_acquired:
+        country: Malawi
+        wave: 2019-20
+        table: food_acquired
+        format: parquet
+      malawi::2019_20::food_expenditures:
+        country: Malawi
+        wave: 2019-20
+        table: food_expenditures
+        format: parquet
+      malawi::2019_20::household_characteristics:
+        country: Malawi
+        wave: 2019-20
+        table: household_characteristics
+        format: parquet
+      malawi::2019_20::food_prices:
+        country: Malawi
+        wave: 2019-20
+        table: food_prices
+        format: parquet
+    do:
+      cmd: cd _ && LSMS_USE_DVC_CACHE=false python3 -m lsms_library.cli materialize --country "${item.country}" --wave "${item.wave}" --table "${item.table}" --format "${item.format}" --out ../var/${item.table}.${item.format}
+      deps:
+      - ../../../cli.py
+      - ../../../country.py
+      - ../../../local_tools.py
+      - _
+      outs:
+      - var/${item.table}.${item.format}

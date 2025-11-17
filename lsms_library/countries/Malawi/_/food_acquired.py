@@ -25,7 +25,7 @@ for t in years:
 
 fa = pd.concat(fa)
 fa = fa.replace(np.inf, 0)
-fa = fa.replace(0,np.NaN)
+fa = fa.replace(0,np.nan)
 
 of = get_dataframe('../var/other_features.parquet')
 

@@ -5,7 +5,6 @@ cluster_features:
     file: HH_MOD_A_FILT_13.dta
     idxvars:
         v: ea_id
-        i: y2_hhid
     myvars:
         Region: region
         Rural: 
