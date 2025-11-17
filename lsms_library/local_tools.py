@@ -576,7 +576,7 @@ def change_encoding(s,from_encoding,to_encoding='utf-8',errors='ignore'):
     """
     return bytes(s,encoding=from_encoding).decode(to_encoding,errors=errors)
 
-def to_parquet(df,fn):
+def to_parquet(df,fn,index=True):
     """
     Write df to parquet file fn.
 
@@ -600,9 +600,19 @@ def to_parquet(df,fn):
     for column in all:
         if all[column].dtype=='O':
             all[column] = all[column].astype(str).astype('string[pyarrow]').replace('nan',None)
-    df = all.set_index(idxnames)
+    if index:
+        resolved_idxnames = []
+        for i, name in enumerate(idxnames):
+            if name is not None:
+                resolved_idxnames.append(name)
+            else:
+                resolved_idxnames.append(all.columns[i])
+        df = all.set_index(resolved_idxnames)
+        df.index.names = idxnames
+    else:
+        df = all
 
-    df.to_parquet(fn, engine='pyarrow')
+    df.to_parquet(fn, engine='pyarrow', index=index)
 
     return df
 

@@ -6,7 +6,7 @@ from importlib.resources import files
 import importlib
 import cfe.regression as rgsn
 from collections import defaultdict
-from .local_tools import df_data_grabber, format_id, get_categorical_mapping, get_dataframe, map_index, get_formatting_functions, panel_ids, id_walk, all_dfs_from_orgfile
+from .local_tools import df_data_grabber, format_id, get_categorical_mapping, get_dataframe, map_index, get_formatting_functions, panel_ids, id_walk, all_dfs_from_orgfile, to_parquet
 import importlib.util
 import os
 import warnings
@@ -701,7 +701,7 @@ class Country:
             elif isinstance(result, pd.DataFrame):
                 parquet_path = self.file_path / "_" / f"{method_name}.parquet"
                 parquet_path.parent.mkdir(parents=True, exist_ok=True)
-                result.to_parquet(parquet_path)
+                to_parquet(result, parquet_path)
                 if cache_path.exists():
                     try:
                         cache_path.unlink()
@@ -773,7 +773,7 @@ class Country:
                 combined = next(iter(non_empty_df.values()))
 
             cache_path.parent.mkdir(parents=True, exist_ok=True)
-            combined.to_parquet(cache_path)
+            to_parquet(combined, cache_path)
             print(f"Cached {method_name} to {cache_path}", file=stderr)
             return combined
 

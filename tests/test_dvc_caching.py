@@ -28,6 +28,7 @@ if not hasattr(_ligon_dataframes, "from_dta"):
     _ligon_dataframes.from_dta = _dummy_from_dta
 
 from lsms_library.country import Country, StageInfo, _status_has_country_changes
+from lsms_library.local_tools import to_parquet as write_parquet
 
 
 @pytest.fixture
@@ -85,7 +86,7 @@ class TestDVCCaching:
         cache_path = mock_country_structure / "var" / "test_data.parquet"
 
         # Create a cache file
-        sample_dataframe.to_parquet(cache_path)
+        write_parquet(sample_dataframe, cache_path)
         assert cache_path.exists()
 
         # Mock DVC to say cache is valid
@@ -96,7 +97,7 @@ class TestDVCCaching:
 
             # Read the cached data
             df = pd.read_parquet(cache_path)
-            assert df.equals(sample_dataframe)
+            pd.testing.assert_frame_equal(df, sample_dataframe, check_dtype=False)
 
     def test_cache_invalidation_when_deps_change(self, mock_country_structure):
         """Test that cache is rebuilt when DVC detects changes."""
@@ -104,7 +105,7 @@ class TestDVCCaching:
 
         # Create an "old" cache file
         old_df = pd.DataFrame({'old': [1, 2, 3]})
-        old_df.to_parquet(cache_path)
+        write_parquet(old_df, cache_path)
 
         # Mock DVC to say cache is stale
         with patch('lsms_library.country.Repo') as mock_repo_class:
@@ -127,7 +128,7 @@ class TestDVCCaching:
     def test_fallback_when_dvc_unavailable(self, mock_country_structure, sample_dataframe):
         """Test that caching works even when DVC errors occur."""
         cache_path = mock_country_structure / "var" / "test_data.parquet"
-        sample_dataframe.to_parquet(cache_path)
+        write_parquet(sample_dataframe, cache_path)
 
         # Mock DVC to raise an exception
         with patch('lsms_library.country.Repo') as mock_repo_class:
@@ -189,14 +190,14 @@ class TestDVCCaching:
         cache_path = mock_country_structure / "var" / "new_data.parquet"
 
         # Save to cache
-        sample_dataframe.to_parquet(cache_path)
+        write_parquet(sample_dataframe, cache_path)
 
         # Verify it was saved
         assert cache_path.exists()
 
         # Verify it can be read back
         loaded_df = pd.read_parquet(cache_path)
-        pd.testing.assert_frame_equal(loaded_df, sample_dataframe)
+        pd.testing.assert_frame_equal(loaded_df, sample_dataframe, check_dtype=False)
 
     def test_stale_cache_triggers_rebuild(
         self,
@@ -205,7 +206,7 @@ class TestDVCCaching:
     ):
         """When DVC marks outputs stale, cache should be rebuilt from waves."""
         cache_path = mock_country_structure / "var" / "test_data.parquet"
-        sample_dataframe.to_parquet(cache_path)
+        write_parquet(sample_dataframe, cache_path)
 
         rebuilt_df = pd.DataFrame({"col1": [99]})
 
@@ -221,7 +222,7 @@ class TestDVCCaching:
 
         build_output = mock_country_structure.parent / stage_info.output_path
         build_output.parent.mkdir(parents=True, exist_ok=True)
-        rebuilt_df.to_parquet(build_output)
+        write_parquet(rebuilt_df, build_output)
 
         def get_dataframe_side_effect(path, *args, **kwargs):
             if Path(path) == build_output:
@@ -442,7 +443,7 @@ class TestDVCCaching:
             mock_scheme.return_value = ["household_roster"]
             build_output_path = mock_country_structure.parent / stage_info.output_path
             build_output_path.parent.mkdir(parents=True, exist_ok=True)
-            df.to_parquet(build_output_path)
+            write_parquet(df, build_output_path)
             mock_get_dataframe.side_effect = lambda path, *args, **kwargs: pd.read_parquet(path)
 
             country = Country("TestCountry", preload_panel_ids=False)
