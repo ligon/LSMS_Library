@@ -77,3 +77,4 @@ lsms_library/countries/*/var/*
 /Uganda/_/unitlabels.csv
 
 # Other ignored patterns
+.coder-session/
