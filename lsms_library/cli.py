@@ -10,6 +10,7 @@ import typer
 import yaml
 
 from .country import Country
+from .local_tools import to_parquet
 
 app = typer.Typer(help="Command-line tools for interacting with LSMS Library data.")
 
@@ -111,7 +112,7 @@ def _materialize(
     output.parent.mkdir(parents=True, exist_ok=True)
 
     if file_format == "parquet":
-        df.to_parquet(output, index=include_index)
+        to_parquet(df, output, index=include_index)
     elif file_format == "csv":
         df.to_csv(output, index=include_index)
     else:

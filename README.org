@@ -97,6 +97,8 @@ hh_chars = uga.household_characteristics()  # Takes <1 second
 export LSMS_USE_DVC_CACHE=false
 #+end_src
 
+*Build Parallelism*: Make-based fallbacks default to half of available CPU cores (`make -j`), capped at a minimum of one job. Override with `LSMS_MAKE_JOBS` to tune parallelism.
+
 * Usage Examples
 
 ** Working with Food Consumption Data
