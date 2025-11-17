@@ -212,7 +212,10 @@ def _register_stage(
     materialize = stages.setdefault("materialize", OrderedDict())
     foreach = materialize.setdefault("foreach", OrderedDict())
 
-    stage_key = f"{_slug(country)}_{_slug(wave)}_{_slug(table)}"
+    if wave and wave.lower() not in {"", "all_waves"}:
+        stage_key = f"{_slug(country)}::{_slug(wave)}::{_slug(table)}"
+    else:
+        stage_key = f"{_slug(country)}::::{_slug(table)}"
 
     foreach[stage_key] = OrderedDict(
         (
