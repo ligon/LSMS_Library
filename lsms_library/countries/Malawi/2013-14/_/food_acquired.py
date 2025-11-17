@@ -72,14 +72,14 @@ df["quantity_consumed"] = df['quantity_consumed'].mul(df['cfactor_consumed'].fil
 df["quantity_bought"] = df['quantity_bought'].mul(df['cfactor_bought'].fillna(1))
 
 df['u_consumed'] = np.where(~df['cfactor_consumed'].isna(), 'kg', df['unitsdetail_consumed'])
-df['u_consumed'] = df['u_consumed'].replace('nan', np.NaN)
+df['u_consumed'] = df['u_consumed'].replace('nan', np.nan)
 df['u_bought'] = np.where(~df['cfactor_bought'].isna(), 'kg', df['unitsdetail_bought'])
-df['u_bought'] = df['u_bought'].replace('nan', np.NaN)
+df['u_bought'] = df['u_bought'].replace('nan', np.nan)
 # prices
 df['price per unit'] = df['expenditure']/df['quantity_bought']
 
 df['t'] = '2013-14'
-df = df.reset_index().set_index(['j','t','i']).dropna(how='all')
+df = df.reset_index().set_index(['j','t','m','i']).dropna(how='all')
 
 final = df.loc[:, ['quantity_consumed', 'u_consumed', 'quantity_bought', 'u_bought', 'price per unit', 'expenditure', 'cfactor_consumed', 'cfactor_bought']]
 
@@ -89,5 +89,7 @@ labelsd = get_categorical_mapping(tablename='harmonize_food',
                                   **{'Label':'Preferred Label'})
 
 final = final.rename(index=labelsd,level='i')
+final = final.dropna(how='all')
+final = final.reorder_levels(['j','t','m','i']).sort_index()
 
 to_parquet(final, "food_acquired.parquet")

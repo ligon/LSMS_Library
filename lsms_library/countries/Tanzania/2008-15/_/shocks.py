@@ -15,7 +15,7 @@ with dvc.api.open('../Data/upd4_hh_r.dta',mode='rb') as dta:
     df = from_dta(dta)
 df = df[df['hr_01'] == 'YES'] #filter for valid entry
 
-df.hr_05_2 = df.hr_05_2.replace("DON'T KNOW",np.NaN)
+df.hr_05_2 = df.hr_05_2.replace("DON'T KNOW",np.nan)
 
 #general hh dataset 
 with dvc.api.open('../Data/upd4_hh_a.dta',mode='rb') as dta: 

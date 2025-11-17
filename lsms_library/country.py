@@ -19,9 +19,11 @@ import json
 from dataclasses import dataclass
 from functools import lru_cache
 from sys import stderr
+import sys
 from dvc.repo import Repo
-from dvc.exceptions import DvcException
+from dvc.exceptions import DvcException, PathMissingError
 from datetime import datetime
+from typing import Any
 
 
 def _slugify(value: str) -> str:
@@ -417,7 +419,35 @@ class Wave:
             df_edit_function = mapping_info.pop('df_edit')
             dfs = []
             for file, mappings in mapping_info.items():
-                df = df_data_grabber(f'./{self.folder}/Data/{file}', mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat)
+                data_path = self.file_path / "Data" / file
+                candidates: list[str] = []
+
+                try:
+                    candidates.append(os.path.relpath(data_path, Path.cwd()))
+                except ValueError:
+                    pass
+
+                try:
+                    dvc_root = self.file_path.parents[1]
+                    relative_path = data_path.relative_to(dvc_root)
+                    candidates.append(str(relative_path))
+                except ValueError:
+                    pass
+
+                candidates.append(str(data_path))
+
+                last_error: Exception | None = None
+                for candidate in dict.fromkeys(candidates):
+                    try:
+                        df = df_data_grabber(candidate, mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat)
+                        break
+                    except (FileNotFoundError, PathMissingError) as error:
+                        last_error = error
+                        continue
+                else:
+                    if last_error is not None:
+                        raise last_error
+                    raise FileNotFoundError(f"Unable to locate data file for {file} in {self.file_path}")
                 df = check_adding_t(df)
                 # Oddity with large number for missing code
                 na = df.select_dtypes(exclude=['object', 'datetime64[ns]']).max().max()
@@ -541,7 +571,9 @@ class Country:
         self._panel_ids_cache = None
         self._updated_ids_cache = None
         self.wave_folder_map = {}
-        if preload_panel_ids:
+        scheme_map = self.resources.get("Data Scheme") if isinstance(self.resources, dict) else {}
+        has_panel_ids = isinstance(scheme_map, dict) and "panel_ids" in scheme_map
+        if preload_panel_ids and has_panel_ids:
             print(f"Preloading panel_ids for {self.name}...",file=stderr)
             #ignore all the warnings
             with warnings.catch_warnings():
@@ -709,16 +741,106 @@ class Country:
 
             return pd.concat(aligned_dfs.values(), axis=0, sort=False)  
 
+        def run_make_target(method_name: str, wave: str | None = None):
+            """
+            Execute legacy Makefile targets either at the country level or for a specific wave.
+            """
+            base_path = self.file_path if wave is None else self[wave].file_path
+            makefile_path = base_path / "_" / "Makefile"
+            script_path = base_path / "_" / f"{method_name}.py"
+            if not makefile_path.exists():
+                warnings.warn(f"Makefile not found in {makefile_path}. Unable to generate required data.")
+
+            cwd_path = makefile_path.parent if makefile_path.exists() else script_path.parent
+            if method_name in json_cache_methods:
+                target_path = base_path / "_" / f"{method_name}.json"
+            else:
+                target_path = base_path / "var" / f"{method_name}.parquet"
+
+            target_path.parent.mkdir(parents=True, exist_ok=True)
+            make_target = os.path.relpath(target_path, cwd_path)
+
+            jobs_flag = _make_jobs_flag()
+            make_cmd = ["make", "-s"]
+            if jobs_flag:
+                make_cmd.append(jobs_flag)
+            make_cmd.append(make_target)
+
+            def load_output():
+                if not target_path.exists():
+                    return None
+                if target_path.suffix == '.json':
+                    with open(target_path, 'r', encoding='utf-8') as json_file:
+                        return json.load(json_file)
+                df_local = get_dataframe(str(target_path))
+                df_local = map_index(df_local)
+                return df_local
+
+            output = None
+            make_ran = False
+            if makefile_path.exists():
+                try:
+                    subprocess.run(make_cmd, cwd=makefile_path.parent, check=True)
+                    make_ran = True
+                    print(f"Makefile executed successfully for {base_path.name}. Rechecking for {target_path.name}...", file=stderr)
+                except (subprocess.CalledProcessError, FileNotFoundError) as error:
+                    warnings.warn(f"Makefile execution failed for {base_path.name}/{method_name}: {error}")
+
+                output = load_output()
+                if output is not None:
+                    return output
+
+            if script_path.exists():
+                python_bin = sys.executable or "python3"
+                subprocess.run([python_bin, str(script_path)], cwd=script_path.parent, check=True)
+                print(f"Python fallback executed for {base_path.name}.{method_name}.", file=stderr)
+                output = load_output()
+                if output is not None:
+                    return output
+
+            if makefile_path.exists() or script_path.exists():
+                print(f"Data file {target_path} still missing after running fallbacks.", file=stderr)
+            return pd.DataFrame()
+
         def load_from_waves(waves):
             results = {}
             for w in waves:
+                wave_result = None
                 try:
-                    results[w] = getattr(self[w], method_name)()
-                except KeyError as e:
-                    warnings.warn(str(e))
+                    wave_result = getattr(self[w], method_name)()
+                except (KeyError, AttributeError) as error:
+                    warnings.warn(str(error))
+
+                use_legacy = wave_result is None
+                if isinstance(wave_result, pd.DataFrame) and wave_result.empty:
+                    use_legacy = True
+
+                if use_legacy:
+                    wave_result = run_make_target(method_name, wave=w)
+
+                if isinstance(wave_result, pd.DataFrame) and wave_result.empty:
+                    continue
+                if wave_result is None:
+                    continue
+
+                results[w] = wave_result
+
             if results:
+                if method_name in json_cache_methods:
+                    dict_payloads = {k: v for k, v in results.items() if isinstance(v, dict)}
+                    df_payloads = {k: v for k, v in results.items() if isinstance(v, pd.DataFrame)}
+                    if dict_payloads and not df_payloads:
+                        combined: dict[str, Any] = {}
+                        combined.update(dict_payloads)
+                        return combined
+                    results = {k: v for k, v in df_payloads.items() if not v.empty}
+                    if not results:
+                        return pd.DataFrame()
+
                 #using safe_concat_dataframe_dict only if more than 2 not empty DataFrames
-                non_empty_df = {k:df for k,df in results.items() if not df.empty}
+                non_empty_df = {k: df for k, df in results.items() if not df.empty}
+                if not non_empty_df:
+                    return pd.DataFrame()
                 if len(non_empty_df) > 1: # Why not 2, per comment above?
                     return safe_concat_dataframe_dict(non_empty_df)
                 else:
@@ -846,41 +968,7 @@ class Country:
             """
             Load data from Makefile if it exists.
             """
-            makefile_path = self.file_path / "_" / "Makefile"
-            if not makefile_path.exists():
-                warnings.warn(f"Makefile not found in {makefile_path}. Unable to generate required data.")
-                return pd.DataFrame()
-
-            cwd_path = self.file_path / "_"
-            if method_name in ['panel_ids', 'updated_ids']:
-                target_path = self.file_path / "_" / f"{method_name}.json"
-                relative_path = target_path.relative_to(cwd_path)
-                make_target = str(relative_path)
-            else:
-                target_path = self.file_path / "var" / f"{method_name}.parquet"
-                relative_path = target_path.relative_to(cwd_path.parent)
-                make_target = '../' + str(relative_path)
-
-            jobs_flag = _make_jobs_flag()
-            make_cmd = ["make", "-s"]
-            if jobs_flag:
-                make_cmd.append(jobs_flag)
-            make_cmd.append(make_target)
-
-            subprocess.run(make_cmd, cwd=cwd_path, check=True)
-            print(f"Makefile executed successfully for {self.name}. Rechecking for {target_path.name}...",file=stderr)
-
-            if not target_path.exists():
-                print(f"Data file {target_path} still missing after running Makefile.",file=stderr)
-                return pd.DataFrame()
-
-            if target_path.suffix == '.json':
-                with open(target_path, 'r') as json_file:
-                    return json.load(json_file)
-            else:
-                df = get_dataframe(target_path)
-                df = map_index(df)
-            return df
+            return run_make_target(method_name)
         
         # Use DVC-validated cache for all datasets
         # Falls back to load_from_makefile for special cases or if DVC fails
@@ -889,18 +977,19 @@ class Country:
         data_scheme = resources.get('Data Scheme') if isinstance(resources, dict) else {}
         has_data_scheme_entry = isinstance(data_scheme, dict) and data_scheme.get(method_name) is not None
 
-        try:
-            if use_dvc_cache:
-                df = load_with_dvc_cache(method_name)
-            elif method_name in json_cache_methods:
-                df = load_from_makefile(method_name)
-            elif has_data_scheme_entry:
-                df = load_from_waves(waves)
-            else:
-                df = load_from_makefile(method_name)
-        except Exception as error:
-            _log_issue(self.name, method_name, waves, error)
-            raise
+        if not use_dvc_cache and method_name in json_cache_methods:
+            df = load_from_waves(waves)
+        else:
+            try:
+                if use_dvc_cache:
+                    df = load_with_dvc_cache(method_name)
+                elif has_data_scheme_entry:
+                    df = load_from_waves(waves)
+                else:
+                    df = load_from_makefile(method_name)
+            except Exception as error:
+                _log_issue(self.name, method_name, waves, error)
+                raise
         
         if isinstance(df, dict):
             return df

@@ -1,8 +1,7 @@
 stages:
   materialize:
     do:
-      cmd: python3 -m lsms_library.cli materialize --country {item.country} --all-waves
-        --table ${item.table} --format ${item.format} --out var/${item.table}.${item.format}
+      cmd: cd _ && LSMS_USE_DVC_CACHE=false python3 -m lsms_library.cli materialize --country "${item.country}" --all-waves --table "${item.table}" --format "${item.format}" --out ../var/${item.table}.${item.format}
       deps:
       - ../../cli.py
       - ../../country.py
@@ -30,11 +29,6 @@ stages:
         country: Malawi
         wave: null
         table: subjective_well_being
-        format: parquet
-      malawi::::panel_ids:
-        country: Malawi
-        wave: null
-        table: panel_ids
         format: parquet
       malawi::::food_acquired:
         country: Malawi

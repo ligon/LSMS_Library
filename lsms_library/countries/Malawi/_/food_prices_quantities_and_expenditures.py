@@ -22,4 +22,3 @@ q = df['quantity_consumed']
 q = q.replace(0,np.nan).dropna()
 
 to_parquet(pd.DataFrame({'Quantity':q}), '../var/food_quantities.parquet')
-q.squeeze().unstack('i').to_csv('~/Downloads/food_quantities.csv')
