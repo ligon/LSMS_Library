@@ -6,7 +6,7 @@ import subprocess
 import sys
 from pathlib import Path
 from types import SimpleNamespace, ModuleType
-from unittest.mock import Mock, patch, MagicMock, PropertyMock
+from unittest.mock import Mock, patch, PropertyMock
 import pandas as pd
 import pytest
 
@@ -27,7 +27,7 @@ if not hasattr(_ligon_dataframes, "from_dta"):
 
     _ligon_dataframes.from_dta = _dummy_from_dta
 
-from lsms_library.country import Country, _status_has_country_changes
+from lsms_library.country import Country, StageInfo, _status_has_country_changes
 
 
 @pytest.fixture
@@ -209,12 +209,31 @@ class TestDVCCaching:
 
         rebuilt_df = pd.DataFrame({"col1": [99]})
 
+        stage_info = StageInfo(
+            stage_key="testcountry_2020_21_test_data",
+            stage_ref="materialize@testcountry_2020_21_test_data",
+            country="TestCountry",
+            wave="2020-21",
+            table="test_data",
+            fmt="parquet",
+            output_path="build/TestCountry/2020-21/test_data.parquet",
+        )
+
+        build_output = mock_country_structure.parent / stage_info.output_path
+        build_output.parent.mkdir(parents=True, exist_ok=True)
+        rebuilt_df.to_parquet(build_output)
+
+        def get_dataframe_side_effect(path, *args, **kwargs):
+            if Path(path) == build_output:
+                return pd.read_parquet(path)
+            raise AssertionError(f"Unexpected get_dataframe path: {path}")
+
         with patch("lsms_library.country.files") as mock_files, \
             patch("lsms_library.country.Repo") as mock_repo_class, \
-            patch("lsms_library.country.get_dataframe") as mock_get_dataframe, \
+            patch("lsms_library.country.get_dataframe", side_effect=get_dataframe_side_effect) as mock_get_dataframe, \
             patch("lsms_library.country.map_index", side_effect=lambda df: df), \
-            patch.object(Country, "__getitem__", return_value=SimpleNamespace(test_data=lambda: rebuilt_df)), \
-            patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves:
+            patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
+            patch.object(Country, "_resolve_materialize_stages", return_value=[stage_info]):
 
             mock_files.return_value = mock_country_structure.parent.parent
             mock_repo = Mock()
@@ -227,16 +246,15 @@ class TestDVCCaching:
                     }
                 ]
             }
+            mock_repo.reproduce = Mock()
             mock_repo_class.return_value = mock_repo
-            mock_get_dataframe.side_effect = AssertionError("Should not read stale cache")
             mock_waves.return_value = ["2020-21"]
 
             country = Country("TestCountry", preload_panel_ids=False)
             result = country._aggregate_wave_data(method_name="test_data")
 
         pd.testing.assert_frame_equal(result, rebuilt_df)
-        assert not mock_get_dataframe.called, "Stale cache should not be read"
-
+        mock_repo.reproduce.assert_called_once_with(stage_info.stage_ref)
         refreshed = pd.read_parquet(cache_path)
         pd.testing.assert_frame_equal(refreshed, rebuilt_df)
 
@@ -251,16 +269,28 @@ class TestDVCCaching:
 
         cached_df = pd.DataFrame({"col1": [1, 2]})
 
+        stage_info = StageInfo(
+            stage_key="testcountry_2020_21_test_data",
+            stage_ref="materialize@testcountry_2020_21_test_data",
+            country="TestCountry",
+            wave="2020-21",
+            table="test_data",
+            fmt="parquet",
+            output_path="build/TestCountry/2020-21/test_data.parquet",
+        )
+
         with patch("lsms_library.country.files") as mock_files, \
             patch("lsms_library.country.Repo") as mock_repo_class, \
             patch("lsms_library.country.get_dataframe", return_value=cached_df) as mock_get_dataframe, \
             patch("lsms_library.country.map_index", side_effect=lambda df: df), \
             patch.object(Country, "__getitem__", side_effect=AssertionError("Should not load waves")), \
-            patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves:
+            patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
+            patch.object(Country, "_resolve_materialize_stages", return_value=[stage_info]):
 
             mock_files.return_value = mock_country_structure.parent.parent
             mock_repo = Mock()
             mock_repo.status.return_value = {}
+            mock_repo.reproduce = Mock()
             mock_repo_class.return_value = mock_repo
             mock_waves.return_value = ["2020-21"]
 
@@ -269,6 +299,7 @@ class TestDVCCaching:
 
         pd.testing.assert_frame_equal(result, cached_df)
         mock_get_dataframe.assert_called_once_with(cache_path)
+        mock_repo.reproduce.assert_not_called()
 
     def test_panel_ids_dict_cache_written_as_json(
         self,
@@ -356,13 +387,12 @@ class TestDVCCaching:
         assert panel_ids_parquet.exists()
         assert not panel_ids_json.exists()
 
-    def test_dvc_status_fingerprint_prevents_rebuild_loop(
+    def test_dvc_stage_dirty_then_clean(
         self,
         mock_country_structure,
     ):
-        """Cache should rebuild once when DVC reports changes and use cached data afterward."""
+        """Cache should rebuild once when DVC reports changes and reuse cache once clean."""
         cache_path = mock_country_structure / "var" / "household_roster.parquet"
-        status_record = cache_path.with_suffix(cache_path.suffix + ".dvcstatus")
 
         df = pd.DataFrame(
             {"col1": [1, 2]},
@@ -371,7 +401,17 @@ class TestDVCCaching:
             ),
         )
 
-        status_entry = {
+        stage_info = StageInfo(
+            stage_key="testcountry_2020_21_household_roster",
+            stage_ref="materialize@testcountry_2020_21_household_roster",
+            country="TestCountry",
+            wave="2020-21",
+            table="household_roster",
+            fmt="parquet",
+            output_path="build/TestCountry/2020-21/household_roster.parquet",
+        )
+
+        status_dirty = {
             "lsms_library/countries/dvc.yaml:materialize@testcountry_2020_21_household_roster": [
                 {
                     "changed deps": {
@@ -384,33 +424,38 @@ class TestDVCCaching:
 
         with patch("lsms_library.country.files") as mock_files, \
             patch("lsms_library.country.Repo") as mock_repo_class, \
-            patch("lsms_library.country.get_dataframe", side_effect=lambda path: df) as mock_get_dataframe, \
+            patch("lsms_library.country.get_dataframe") as mock_get_dataframe, \
             patch("lsms_library.country.map_index", side_effect=lambda frame: frame), \
             patch.object(Country, "__getitem__", return_value=SimpleNamespace(household_roster=lambda: df)) as mock_getitem, \
             patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
             patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources, \
-            patch.object(Country, "data_scheme", new_callable=PropertyMock) as mock_scheme:
+            patch.object(Country, "data_scheme", new_callable=PropertyMock) as mock_scheme, \
+            patch.object(Country, "_resolve_materialize_stages", return_value=[stage_info]):
 
             mock_files.return_value = mock_country_structure.parent.parent
             mock_repo = Mock()
-            mock_repo.status.side_effect = [status_entry, status_entry]
+            mock_repo.status.side_effect = [status_dirty, {}]
+            mock_repo.reproduce = Mock()
             mock_repo_class.return_value = mock_repo
             mock_waves.return_value = ["2020-21"]
             mock_resources.return_value = {"Data Scheme": {"household_roster": {}}}
             mock_scheme.return_value = ["household_roster"]
+            build_output_path = mock_country_structure.parent / stage_info.output_path
+            build_output_path.parent.mkdir(parents=True, exist_ok=True)
+            df.to_parquet(build_output_path)
+            mock_get_dataframe.side_effect = lambda path, *args, **kwargs: pd.read_parquet(path)
 
             country = Country("TestCountry", preload_panel_ids=False)
 
             first = country._aggregate_wave_data(method_name="household_roster")
             assert cache_path.exists()
-            assert status_record.exists()
             pd.testing.assert_frame_equal(first, df)
-            assert mock_get_dataframe.call_count == 0
+            mock_repo.reproduce.assert_called_once_with(stage_info.stage_ref)
 
             second = country._aggregate_wave_data(method_name="household_roster")
             pd.testing.assert_frame_equal(second, df)
-            assert mock_get_dataframe.call_count == 1, "Second call should reuse cached parquet"
-            assert mock_repo.status.call_count == 2
+            assert mock_repo.reproduce.call_count == 1, "Second call should not rerun DVC stage"
+            assert mock_get_dataframe.call_args_list[-1][0][0] == cache_path
 
 class TestCachePathGeneration:
     """Test cache path generation for different data types."""

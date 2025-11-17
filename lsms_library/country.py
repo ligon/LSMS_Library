@@ -16,7 +16,8 @@ warnings.filterwarnings('ignore', category=FutureWarning)
 warnings.filterwarnings('ignore', category=UnicodeWarning)
 import subprocess
 import json
-import hashlib
+from dataclasses import dataclass
+from functools import lru_cache
 from sys import stderr
 from dvc.repo import Repo
 from dvc.exceptions import DvcException
@@ -70,32 +71,68 @@ def _status_has_country_changes(status_map, country_name: str, cache_relative: s
     return False
 
 
-def _collect_dvc_status_entries(status_map, country_name: str, method_name: str):
+@dataclass(frozen=True)
+class StageInfo:
+    stage_key: str
+    stage_ref: str
+    country: str
+    wave: str
+    table: str
+    fmt: str
+    output_path: str
+
+
+@lru_cache(maxsize=4)
+def _load_materialize_stage_map(dvc_root: str) -> dict[tuple[str, str, str], StageInfo]:
     """
-    Collect DVC status entries relevant to a given country and dataset method.
-    Returns a dictionary of matching stage entries keyed by their stage identifiers.
+    Load mapping from (country, wave, table) to StageInfo based on dvc.yaml materialize foreach entries.
     """
-    if not status_map:
-        return {}
+    dvc_dir = Path(dvc_root)
+    dvc_yaml_path = dvc_dir / "dvc.yaml"
+    if not dvc_yaml_path.exists():
+        raise FileNotFoundError(f"dvc.yaml not found in {dvc_dir}")
 
-    country_slug = _slugify(country_name)
-    method_slug = _slugify(method_name)
+    with open(dvc_yaml_path, "r") as f:
+        data = yaml.safe_load(f) or {}
 
-    entries = {}
-    for key, value in status_map.items():
-        lower_key = str(key).lower()
-        if country_slug in lower_key and method_slug in lower_key:
-            entries[str(key)] = value
+    stages = data.get("stages", {})
+    materialize = stages.get("materialize", {})
+    foreach = materialize.get("foreach", {})
+    do_section = materialize.get("do", {})
+    outs = do_section.get("outs", [])
+    out_template = outs[0] if outs else "build/${item.country}/${item.wave}/${item.table}.${item.format}"
 
-    return entries
+    stage_map: dict[tuple[str, str, str], StageInfo] = {}
 
+    for stage_key, params in foreach.items():
+        country = params.get("country")
+        wave = params.get("wave")
+        table = params.get("table")
+        fmt = params.get("format", "parquet")
 
-def _status_fingerprint(entries: dict) -> str:
-    """Generate a deterministic fingerprint for collected DVC status entries."""
-    if not entries:
-        return ""
-    normalized = json.dumps(entries, sort_keys=True).encode("utf-8")
-    return hashlib.sha256(normalized).hexdigest()
+        if not all([country, wave, table]):
+            continue
+
+        output_path = (
+            out_template
+            .replace("${item.country}", country)
+            .replace("${item.wave}", wave)
+            .replace("${item.table}", table)
+            .replace("${item.format}", fmt)
+        )
+
+        info = StageInfo(
+            stage_key=stage_key,
+            stage_ref=f"materialize@{stage_key}",
+            country=country,
+            wave=wave,
+            table=table,
+            fmt=fmt,
+            output_path=output_path,
+        )
+        stage_map[(country, wave, table)] = info
+
+    return stage_map
 
 class Wave:
     def __init__(self,  year, wave_folder, country: 'Country'):
@@ -488,6 +525,25 @@ class Country:
     def mapping(self):
         return {**self.categorical_mapping, **self.formatting_functions}
     
+    def _resolve_materialize_stages(self, method_name: str, waves) -> list[StageInfo]:
+        """
+        Resolve materialize stage information for the given method and waves.
+        Returns an empty list if no matching stages are registered.
+        """
+        try:
+            stage_map = _load_materialize_stage_map(str(self.file_path.parent))
+        except FileNotFoundError:
+            return []
+
+        resolved = []
+        for wave in waves:
+            key = (self.name, wave, method_name)
+            info = stage_map.get(key)
+            if not info:
+                return []
+            resolved.append(info)
+        return resolved
+
     @property
     def waves(self):
         """List of names of waves available for country.
@@ -599,126 +655,105 @@ class Country:
 
         json_cache_methods = {'panel_ids', 'updated_ids'}
 
-        def load_with_dvc_cache(method_name):
-            """
-            Load data using DVC-validated cache.
-
-            Checks if cached parquet exists and is valid according to DVC.
-            If cache is stale or missing, rebuilds from waves and caches.
-            """
-            # Determine cache path and expected type
-            json_path = None
-            parquet_path = None
-            if method_name in json_cache_methods:
-                cache_dir = self.file_path / "_"
-                json_path = cache_dir / f"{method_name}.json"
-                parquet_path = cache_dir / f"{method_name}.parquet"
-                if json_path.exists():
-                    cache_path = json_path
-                    expected_format = "json"
-                elif parquet_path.exists():
-                    cache_path = parquet_path
-                    expected_format = "parquet"
-                else:
-                    cache_path = json_path
-                    expected_format = "json"
-            else:
-                cache_path = self.file_path / "var" / f"{method_name}.parquet"
-                expected_format = "parquet"
-                parquet_path = cache_path
-
-            status_record_base = json_path or parquet_path or cache_path
-            status_record_path = status_record_base.with_suffix(status_record_base.suffix + ".dvcstatus")
-
-            # Check if cache exists and is valid via DVC
-            cache_valid = False
-            status_entries = {}
-            fingerprint = ""
-            stored_fingerprint = status_record_path.read_text().strip() if status_record_path.exists() else ""
-            try:
-                # Initialize DVC repo at countries directory
-                dvc_root = self.file_path.parent
-                repo = Repo(root_dir=str(dvc_root))
-
-                status_map = repo.status()
-                status_entries = _collect_dvc_status_entries(status_map, self.name, method_name)
-                fingerprint = _status_fingerprint(status_entries)
-            except (DvcException, FileNotFoundError) as e:
-                # No DVC repo or error - fall back to assuming valid if file exists
-                print(f"DVC validation skipped for {method_name}: {e}", file=stderr)
-                cache_valid = cache_path.exists()
-                status_entries = {}
-                fingerprint = ""
-            else:
-                if cache_path.exists():
-                    if fingerprint and fingerprint != stored_fingerprint:
-                        cache_valid = False
-                    else:
-                        cache_valid = True
-                else:
-                    cache_valid = False
-
-            # Use cache if valid
-            if cache_valid and cache_path.exists():
-                print(f"Using cached {method_name} from {cache_path}", file=stderr)
-                if expected_format == "parquet":
-                    df = get_dataframe(cache_path)
-                    df = map_index(df)
-                    return df
+        def load_json_cache(method_name):
+            cache_path = self.file_path / "_" / f"{method_name}.json"
+            if cache_path.exists():
                 with open(cache_path, 'r') as json_file:
                     return json.load(json_file)
 
-            # Cache invalid or missing - rebuild from waves
-            print(f"Building {method_name} from waves (cache {'stale' if cache_path.exists() else 'missing'})", file=stderr)
-            if expected_format == "json":
-                try:
-                    df = load_from_makefile(method_name)
-                except (subprocess.CalledProcessError, FileNotFoundError) as error:
-                    print(f"Makefile build failed for {method_name}: {error}. Falling back to wave aggregation.", file=stderr)
-                    df = load_from_waves(waves)
-            else:
-                df = load_from_waves(waves)
+            try:
+                result = load_from_makefile(method_name)
+            except (subprocess.CalledProcessError, FileNotFoundError) as error:
+                print(f"Makefile build failed for {method_name}: {error}. Falling back to wave aggregation.", file=stderr)
+                result = load_from_waves(waves)
 
-            # Save to cache for next time
-            cache_path.parent.mkdir(parents=True, exist_ok=True)
-            if isinstance(df, pd.DataFrame):
-                if parquet_path is None:
-                    raise TypeError(f"Cannot cache DataFrame result for {method_name} without parquet path")
-                cache_path = parquet_path
-                df.to_parquet(cache_path)
-                # Remove stale JSON cache if switching formats
-                if json_path and json_path.exists():
-                    try:
-                        json_path.unlink()
-                    except OSError:
-                        pass
-            elif isinstance(df, dict):
-                if json_path is None:
-                    raise TypeError(f"Cannot cache dictionary result for {method_name} without json path")
-                cache_path = json_path
+            if isinstance(result, dict):
+                cache_path.parent.mkdir(parents=True, exist_ok=True)
                 with open(cache_path, 'w') as json_file:
-                    json.dump(df, json_file)
-                # Remove stale parquet cache if switching formats
-                if parquet_path and parquet_path.exists():
+                    json.dump(result, json_file)
+            elif isinstance(result, pd.DataFrame):
+                parquet_path = self.file_path / "_" / f"{method_name}.parquet"
+                parquet_path.parent.mkdir(parents=True, exist_ok=True)
+                result.to_parquet(parquet_path)
+                if cache_path.exists():
                     try:
-                        parquet_path.unlink()
+                        cache_path.unlink()
                     except OSError:
                         pass
+                print(f"Cached {method_name} to {parquet_path}", file=stderr)
+            return result
+
+        def load_dataframe_with_dvc(method_name):
+            """
+            Load data using DVC materialize stages. Falls back to load_from_waves if stages are missing.
+            """
+            cache_path = self.file_path / "var" / f"{method_name}.parquet"
+            cache_exists = cache_path.exists()
+
+            try:
+                dvc_root = self.file_path.parent
+                repo = Repo(root_dir=str(dvc_root))
+            except (DvcException, FileNotFoundError) as e:
+                print(f"DVC unavailable for {method_name}: {e}. Falling back to manual aggregation.", file=stderr)
+                return load_from_waves(waves)
+
+            stage_infos = self._resolve_materialize_stages(method_name, waves)
+            if not stage_infos:
+                df = load_from_waves(waves)
+                if isinstance(df, pd.DataFrame):
+                    cache_path.parent.mkdir(parents=True, exist_ok=True)
+                    df.to_parquet(cache_path)
+                    print(f"Cached {method_name} to {cache_path}", file=stderr)
+                return df
+
+            # Determine if all stages are up-to-date
+            stage_clean = True
+            for info in stage_infos:
+                status = repo.status(targets=[info.stage_ref])
+                if status:
+                    stage_clean = False
+                    break
+
+            if cache_exists and stage_clean:
+                df = get_dataframe(cache_path)
+                df = map_index(df)
+                return df
+
+            # Run DVC stages for required waves
+            for info in stage_infos:
+                repo.reproduce(info.stage_ref)
+
+            results = {}
+            for info in stage_infos:
+                if info.fmt != "parquet":
+                    raise ValueError(f"Unsupported format {info.fmt} for {method_name}")
+                output_path = (self.file_path.parent / info.output_path).resolve()
+                if not output_path.exists():
+                    raise FileNotFoundError(f"DVC output missing: {output_path}")
+                df_wave = get_dataframe(output_path)
+                df_wave = map_index(df_wave)
+                results[info.wave] = df_wave
+
+            if not results:
+                raise KeyError(f"No data produced for {method_name} via DVC.")
+
+            non_empty_df = {k: v for k, v in results.items() if not v.empty}
+            if not non_empty_df:
+                combined = pd.concat(results.values(), axis=0, sort=False)
+            elif len(non_empty_df) > 1:
+                combined = safe_concat_dataframe_dict(non_empty_df)
             else:
-                raise TypeError(f"Unsupported cache data type {type(df)} for {method_name}")
+                combined = next(iter(non_empty_df.values()))
+
+            cache_path.parent.mkdir(parents=True, exist_ok=True)
+            combined.to_parquet(cache_path)
             print(f"Cached {method_name} to {cache_path}", file=stderr)
+            return combined
 
-            # Persist DVC status fingerprint for future validation
-            if fingerprint:
-                status_record_path.write_text(fingerprint)
-            elif status_record_path.exists():
-                # No relevant status entries; remove previous record
-                try:
-                    status_record_path.unlink()
-                except OSError:
-                    pass
-
-            return df
+        def load_with_dvc_cache(method_name):
+            if method_name in json_cache_methods:
+                return load_json_cache(method_name)
+            return load_dataframe_with_dvc(method_name)
 
         def load_from_makefile(method_name):
             """
