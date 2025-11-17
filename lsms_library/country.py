@@ -16,6 +16,7 @@ warnings.filterwarnings('ignore', category=FutureWarning)
 warnings.filterwarnings('ignore', category=UnicodeWarning)
 import subprocess
 import json
+import hashlib
 from sys import stderr
 from dvc.repo import Repo
 from dvc.exceptions import DvcException
@@ -67,6 +68,34 @@ def _status_has_country_changes(status_map, country_name: str, cache_relative: s
         if contains_token(key) or contains_token(value):
             return True
     return False
+
+
+def _collect_dvc_status_entries(status_map, country_name: str, method_name: str):
+    """
+    Collect DVC status entries relevant to a given country and dataset method.
+    Returns a dictionary of matching stage entries keyed by their stage identifiers.
+    """
+    if not status_map:
+        return {}
+
+    country_slug = _slugify(country_name)
+    method_slug = _slugify(method_name)
+
+    entries = {}
+    for key, value in status_map.items():
+        lower_key = str(key).lower()
+        if country_slug in lower_key and method_slug in lower_key:
+            entries[str(key)] = value
+
+    return entries
+
+
+def _status_fingerprint(entries: dict) -> str:
+    """Generate a deterministic fingerprint for collected DVC status entries."""
+    if not entries:
+        return ""
+    normalized = json.dumps(entries, sort_keys=True).encode("utf-8")
+    return hashlib.sha256(normalized).hexdigest()
 
 class Wave:
     def __init__(self,  year, wave_folder, country: 'Country'):
@@ -598,21 +627,36 @@ class Country:
                 expected_format = "parquet"
                 parquet_path = cache_path
 
+            status_record_base = json_path or parquet_path or cache_path
+            status_record_path = status_record_base.with_suffix(status_record_base.suffix + ".dvcstatus")
+
             # Check if cache exists and is valid via DVC
             cache_valid = False
-            if cache_path.exists():
-                try:
-                    # Initialize DVC repo at countries directory
-                    dvc_root = self.file_path.parent
-                    repo = Repo(root_dir=str(dvc_root))
+            status_entries = {}
+            fingerprint = ""
+            stored_fingerprint = status_record_path.read_text().strip() if status_record_path.exists() else ""
+            try:
+                # Initialize DVC repo at countries directory
+                dvc_root = self.file_path.parent
+                repo = Repo(root_dir=str(dvc_root))
 
-                    status_map = repo.status()
-                    cache_relative = str(cache_path.relative_to(dvc_root))
-                    cache_valid = not _status_has_country_changes(status_map, self.name, cache_relative)
-                except (DvcException, FileNotFoundError) as e:
-                    # No DVC repo or error - fall back to assuming valid if file exists
-                    print(f"DVC validation skipped for {method_name}: {e}", file=stderr)
-                    cache_valid = True
+                status_map = repo.status()
+                status_entries = _collect_dvc_status_entries(status_map, self.name, method_name)
+                fingerprint = _status_fingerprint(status_entries)
+            except (DvcException, FileNotFoundError) as e:
+                # No DVC repo or error - fall back to assuming valid if file exists
+                print(f"DVC validation skipped for {method_name}: {e}", file=stderr)
+                cache_valid = cache_path.exists()
+                status_entries = {}
+                fingerprint = ""
+            else:
+                if cache_path.exists():
+                    if fingerprint and fingerprint != stored_fingerprint:
+                        cache_valid = False
+                    else:
+                        cache_valid = True
+                else:
+                    cache_valid = False
 
             # Use cache if valid
             if cache_valid and cache_path.exists():
@@ -663,6 +707,16 @@ class Country:
             else:
                 raise TypeError(f"Unsupported cache data type {type(df)} for {method_name}")
             print(f"Cached {method_name} to {cache_path}", file=stderr)
+
+            # Persist DVC status fingerprint for future validation
+            if fingerprint:
+                status_record_path.write_text(fingerprint)
+            elif status_record_path.exists():
+                # No relevant status entries; remove previous record
+                try:
+                    status_record_path.unlink()
+                except OSError:
+                    pass
 
             return df
 

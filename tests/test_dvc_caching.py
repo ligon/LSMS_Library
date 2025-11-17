@@ -356,6 +356,62 @@ class TestDVCCaching:
         assert panel_ids_parquet.exists()
         assert not panel_ids_json.exists()
 
+    def test_dvc_status_fingerprint_prevents_rebuild_loop(
+        self,
+        mock_country_structure,
+    ):
+        """Cache should rebuild once when DVC reports changes and use cached data afterward."""
+        cache_path = mock_country_structure / "var" / "household_roster.parquet"
+        status_record = cache_path.with_suffix(cache_path.suffix + ".dvcstatus")
+
+        df = pd.DataFrame(
+            {"col1": [1, 2]},
+            index=pd.MultiIndex.from_tuples(
+                [("2020-21", "A"), ("2020-21", "B")], names=["t", "i"]
+            ),
+        )
+
+        status_entry = {
+            "lsms_library/countries/dvc.yaml:materialize@testcountry_2020_21_household_roster": [
+                {
+                    "changed deps": {
+                        "/tmp/path/lsms_library/country.py": "modified",
+                        "TestCountry/_": "modified",
+                    }
+                }
+            ]
+        }
+
+        with patch("lsms_library.country.files") as mock_files, \
+            patch("lsms_library.country.Repo") as mock_repo_class, \
+            patch("lsms_library.country.get_dataframe", side_effect=lambda path: df) as mock_get_dataframe, \
+            patch("lsms_library.country.map_index", side_effect=lambda frame: frame), \
+            patch.object(Country, "__getitem__", return_value=SimpleNamespace(household_roster=lambda: df)) as mock_getitem, \
+            patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
+            patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources, \
+            patch.object(Country, "data_scheme", new_callable=PropertyMock) as mock_scheme:
+
+            mock_files.return_value = mock_country_structure.parent.parent
+            mock_repo = Mock()
+            mock_repo.status.side_effect = [status_entry, status_entry]
+            mock_repo_class.return_value = mock_repo
+            mock_waves.return_value = ["2020-21"]
+            mock_resources.return_value = {"Data Scheme": {"household_roster": {}}}
+            mock_scheme.return_value = ["household_roster"]
+
+            country = Country("TestCountry", preload_panel_ids=False)
+
+            first = country._aggregate_wave_data(method_name="household_roster")
+            assert cache_path.exists()
+            assert status_record.exists()
+            pd.testing.assert_frame_equal(first, df)
+            assert mock_get_dataframe.call_count == 0
+
+            second = country._aggregate_wave_data(method_name="household_roster")
+            pd.testing.assert_frame_equal(second, df)
+            assert mock_get_dataframe.call_count == 1, "Second call should reuse cached parquet"
+            assert mock_repo.status.call_count == 2
+
 class TestCachePathGeneration:
     """Test cache path generation for different data types."""
 
