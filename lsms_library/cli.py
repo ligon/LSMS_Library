@@ -326,18 +326,25 @@ def register(
         case_sensitive=False,
         help="Serialization format for the output (parquet or csv).",
     ),
-    dvc_file: Path = typer.Option(
-        Path(__file__).resolve().parent / "countries" / "dvc.yaml",
+    dvc_file: Path | None = typer.Option(
+        None,
         "--dvc-file",
-        help="Path to the DVC YAML file.",
+        help="Path to the DVC YAML file (defaults to per-country file).",
     ),
-    lock_file: Path = typer.Option(
-        Path(__file__).resolve().parent / "countries" / "dvc.lock",
+    lock_file: Path | None = typer.Option(
+        None,
         "--lock-file",
-        help="Path to the DVC lock file.",
+        help="Path to the DVC lock file (defaults to per-country file).",
     ),
 ) -> None:
     """Register a DVC materialization stage for a table."""
+
+    if dvc_file is None:
+        dvc_file = Path(__file__).resolve().parent / "countries" / country / "dvc.yaml"
+    if lock_file is None:
+        lock_file = dvc_file.with_name("dvc.lock")
+
+    dvc_file.parent.mkdir(parents=True, exist_ok=True)
 
     stage_key = _register_stage(
         country=country,
@@ -349,7 +356,7 @@ def register(
     )
     typer.echo(
         f"Registered stage materialize@{stage_key}.\n"
-        f"Run 'cd lsms_library/countries && dvc repro materialize@{stage_key}' to materialize."
+        f"Run 'cd {dvc_file.parent} && dvc repro {dvc_file.name}:materialize@{stage_key}' to materialize."
     )
 
 

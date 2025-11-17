@@ -23,3 +23,7 @@
 - Waves: 2004-05, 2009-10
 - Error: `RuntimeWarning: Categorical mapping missing for multiple variables`
 
+## 2025-11-17 15:17:43Z TestCountry – household_roster
+
+- Waves: 2020-21
+- Error: `AttributeError: 'str' object has no attribute 'exists'`

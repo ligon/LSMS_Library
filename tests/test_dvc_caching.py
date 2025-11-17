@@ -210,17 +210,18 @@ class TestDVCCaching:
 
         rebuilt_df = pd.DataFrame({"col1": [99]})
 
+        stage_key = "testcountry::2020_21::test_data"
+        build_output = mock_country_structure.parent / "build/TestCountry/2020-21/test_data.parquet"
         stage_info = StageInfo(
-            stage_key="testcountry_2020_21_test_data",
-            stage_ref="materialize@testcountry_2020_21_test_data",
+            stage_key=stage_key,
+            stage_ref=f"TestCountry/dvc.yaml:materialize@{stage_key}",
             country="TestCountry",
             wave="2020-21",
             table="test_data",
             fmt="parquet",
-            output_path="build/TestCountry/2020-21/test_data.parquet",
+            output_path=build_output,
         )
 
-        build_output = mock_country_structure.parent / stage_info.output_path
         build_output.parent.mkdir(parents=True, exist_ok=True)
         write_parquet(rebuilt_df, build_output)
 
@@ -239,10 +240,10 @@ class TestDVCCaching:
             mock_files.return_value = mock_country_structure.parent.parent
             mock_repo = Mock()
             mock_repo.status.return_value = {
-                "lsms_library/countries/dvc.yaml:materialize@testcountry_2020_21_test_data": [
+                stage_info.stage_ref: [
                     {
                         "changed outs": {
-                            "build/TestCountry/2020-21/test_data.parquet": "modified"
+                            str(build_output): "modified"
                         }
                     }
                 ]
@@ -270,14 +271,15 @@ class TestDVCCaching:
 
         cached_df = pd.DataFrame({"col1": [1, 2]})
 
+        stage_key = "testcountry::2020_21::test_data"
         stage_info = StageInfo(
-            stage_key="testcountry_2020_21_test_data",
-            stage_ref="materialize@testcountry_2020_21_test_data",
+            stage_key=stage_key,
+            stage_ref=f"TestCountry/dvc.yaml:materialize@{stage_key}",
             country="TestCountry",
             wave="2020-21",
             table="test_data",
             fmt="parquet",
-            output_path="build/TestCountry/2020-21/test_data.parquet",
+            output_path=cache_path,
         )
 
         with patch("lsms_library.country.files") as mock_files, \
@@ -402,18 +404,20 @@ class TestDVCCaching:
             ),
         )
 
+        stage_key = "testcountry::2020_21::household_roster"
+        build_output_path = mock_country_structure.parent / "build/TestCountry/2020-21/household_roster.parquet"
         stage_info = StageInfo(
-            stage_key="testcountry_2020_21_household_roster",
-            stage_ref="materialize@testcountry_2020_21_household_roster",
+            stage_key=stage_key,
+            stage_ref=f"TestCountry/dvc.yaml:materialize@{stage_key}",
             country="TestCountry",
             wave="2020-21",
             table="household_roster",
             fmt="parquet",
-            output_path="build/TestCountry/2020-21/household_roster.parquet",
+            output_path=build_output_path,
         )
 
         status_dirty = {
-            "lsms_library/countries/dvc.yaml:materialize@testcountry_2020_21_household_roster": [
+            stage_info.stage_ref: [
                 {
                     "changed deps": {
                         "/tmp/path/lsms_library/country.py": "modified",
@@ -441,7 +445,6 @@ class TestDVCCaching:
             mock_waves.return_value = ["2020-21"]
             mock_resources.return_value = {"Data Scheme": {"household_roster": {}}}
             mock_scheme.return_value = ["household_roster"]
-            build_output_path = mock_country_structure.parent / stage_info.output_path
             build_output_path.parent.mkdir(parents=True, exist_ok=True)
             write_parquet(df, build_output_path)
             mock_get_dataframe.side_effect = lambda path, *args, **kwargs: pd.read_parquet(path)

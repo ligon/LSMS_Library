@@ -77,61 +77,78 @@ class StageInfo:
     stage_key: str
     stage_ref: str
     country: str
-    wave: str
+    wave: str | None
     table: str
     fmt: str
-    output_path: str
+    output_path: Path
 
 
 @lru_cache(maxsize=4)
-def _load_materialize_stage_map(dvc_root: str) -> dict[tuple[str, str, str], StageInfo]:
+def _load_materialize_stage_map(dvc_root: str) -> dict[tuple[str, str | None, str], StageInfo]:
     """
-    Load mapping from (country, wave, table) to StageInfo based on dvc.yaml materialize foreach entries.
+    Load mapping from (country, wave, table) to StageInfo based on available dvc.yaml materialize foreach entries.
     """
-    dvc_dir = Path(dvc_root)
-    dvc_yaml_path = dvc_dir / "dvc.yaml"
-    if not dvc_yaml_path.exists():
-        raise FileNotFoundError(f"dvc.yaml not found in {dvc_dir}")
+    root_path = Path(dvc_root)
+    yaml_paths: list[Path] = []
 
-    with open(dvc_yaml_path, "r") as f:
-        data = yaml.safe_load(f) or {}
+    root_yaml = root_path / "dvc.yaml"
+    if root_yaml.exists():
+        yaml_paths.append(root_yaml)
 
-    stages = data.get("stages", {})
-    materialize = stages.get("materialize", {})
-    foreach = materialize.get("foreach", {})
-    do_section = materialize.get("do", {})
-    outs = do_section.get("outs", [])
-    out_template = outs[0] if outs else "build/${item.country}/${item.wave}/${item.table}.${item.format}"
+    yaml_paths.extend(sorted(p for p in root_path.glob("*/dvc.yaml") if p.is_file()))
 
-    stage_map: dict[tuple[str, str, str], StageInfo] = {}
+    stage_map: dict[tuple[str, str | None, str], StageInfo] = {}
 
-    for stage_key, params in foreach.items():
-        country = params.get("country")
-        wave = params.get("wave")
-        table = params.get("table")
-        fmt = params.get("format", "parquet")
+    for yaml_path in yaml_paths:
+        with open(yaml_path, "r") as f:
+            data = yaml.safe_load(f) or {}
 
-        if not all([country, wave, table]):
+        stages = data.get("stages", {})
+        materialize = stages.get("materialize", {})
+        foreach = materialize.get("foreach", {})
+        do_section = materialize.get("do", {})
+        outs = do_section.get("outs", [])
+        if not outs:
             continue
+        out_template = outs[0]
 
-        output_path = (
-            out_template
-            .replace("${item.country}", country)
-            .replace("${item.wave}", wave)
-            .replace("${item.table}", table)
-            .replace("${item.format}", fmt)
-        )
+        for stage_key, params in foreach.items():
+            country = params.get("country")
+            wave = params.get("wave")
+            table = params.get("table")
+            fmt = params.get("format", "parquet")
 
-        info = StageInfo(
-            stage_key=stage_key,
-            stage_ref=f"materialize@{stage_key}",
-            country=country,
-            wave=wave,
-            table=table,
-            fmt=fmt,
-            output_path=output_path,
-        )
-        stage_map[(country, wave, table)] = info
+            if not country or not table:
+                continue
+
+            wave_value = wave or None
+
+            output_rel = (
+                out_template
+                .replace("${item.country}", country)
+                .replace("${item.wave}", (wave or ""))
+                .replace("${item.table}", table)
+                .replace("${item.format}", fmt)
+            )
+            output_rel = output_rel.replace("//", "/").strip()
+            output_path = (yaml_path.parent / output_rel).resolve()
+
+            try:
+                rel_yaml = yaml_path.relative_to(root_path)
+            except ValueError:
+                rel_yaml = yaml_path
+
+            stage_ref = f"{rel_yaml}:materialize@{stage_key}"
+
+            stage_map[(country, wave_value, table)] = StageInfo(
+                stage_key=stage_key,
+                stage_ref=stage_ref,
+                country=country,
+                wave=wave_value,
+                table=table,
+                fmt=fmt,
+                output_path=output_path,
+            )
 
     return stage_map
 
@@ -575,13 +592,23 @@ class Country:
         except FileNotFoundError:
             return []
 
-        resolved = []
+        resolved: list[StageInfo] = []
+
         for wave in waves:
             key = (self.name, wave, method_name)
             info = stage_map.get(key)
             if not info:
+                key = (self.name, None, method_name)
+                info = stage_map.get(key)
+            if not info:
                 return []
             resolved.append(info)
+
+        if not resolved:
+            info = stage_map.get((self.name, None, method_name))
+            if info:
+                resolved.append(info)
+
         return resolved
 
     @property
@@ -782,12 +809,12 @@ class Country:
             for info in stage_infos:
                 if info.fmt != "parquet":
                     raise ValueError(f"Unsupported format {info.fmt} for {method_name}")
-                output_path = (self.file_path.parent / info.output_path).resolve()
+                output_path = info.output_path
                 if not output_path.exists():
                     raise FileNotFoundError(f"DVC output missing: {output_path}")
                 df_wave = get_dataframe(output_path)
                 df_wave = map_index(df_wave)
-                results[info.wave] = df_wave
+                results[info.wave or "ALL"] = df_wave
 
             if not results:
                 raise KeyError(f"No data produced for {method_name} via DVC.")
