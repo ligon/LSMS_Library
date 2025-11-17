@@ -20,6 +20,54 @@ from sys import stderr
 from dvc.repo import Repo
 from dvc.exceptions import DvcException
 
+
+def _slugify(value: str) -> str:
+    return value.lower().replace(" ", "_").replace("-", "_")
+
+
+def _status_has_country_changes(status_map, country_name: str, cache_relative: str | None = None) -> bool:
+    """
+    Determine whether a DVC status map indicates changes relevant to the country or cache.
+    Returns True when any status entry references the country slug/name or the specific cache path.
+    """
+    if not status_map:
+        return False
+
+    slug = _slugify(country_name)
+    tokens = {
+        slug,
+        f"/{slug}/",
+        f"@{slug}",
+    }
+
+    lowered_name = country_name.lower()
+    tokens.update(
+        {
+            lowered_name,
+            lowered_name.replace(" ", "/"),
+            lowered_name.replace(" ", "-"),
+        }
+    )
+
+    if cache_relative:
+        cache_lower = cache_relative.lower()
+        tokens.update({cache_lower, cache_lower.replace("\\", "/")})
+
+    def contains_token(value) -> bool:
+        if isinstance(value, str):
+            lowered = value.lower()
+            return any(token in lowered for token in tokens)
+        if isinstance(value, dict):
+            return any(contains_token(k) or contains_token(v) for k, v in value.items())
+        if isinstance(value, (list, tuple, set)):
+            return any(contains_token(item) for item in value)
+        return False
+
+    for key, value in status_map.items():
+        if contains_token(key) or contains_token(value):
+            return True
+    return False
+
 class Wave:
     def __init__(self,  year, wave_folder, country: 'Country'):
         self.year = year
@@ -541,13 +589,9 @@ class Country:
                     dvc_root = self.file_path.parent
                     repo = Repo(root_dir=str(dvc_root))
 
-                    # Check status of all materialize stages
-                    # Empty dict means all outputs are up-to-date
-                    status = repo.status(targets=["materialize"])
-
-                    # If our specific output is not in the status dict, it's valid
-                    cache_valid = str(cache_path.relative_to(dvc_root)) not in status.get("materialize", {})
-
+                    status_map = repo.status()
+                    cache_relative = str(cache_path.relative_to(dvc_root))
+                    cache_valid = not _status_has_country_changes(status_map, self.name, cache_relative)
                 except (DvcException, FileNotFoundError) as e:
                     # No DVC repo or error - fall back to assuming valid if file exists
                     print(f"DVC validation skipped for {method_name}: {e}", file=stderr)
@@ -617,10 +661,13 @@ class Country:
         # Use DVC-validated cache for all datasets
         # Falls back to load_from_makefile for special cases or if DVC fails
         use_dvc_cache = os.getenv('LSMS_USE_DVC_CACHE', 'true').lower() == 'true'
+        resources = self.resources
+        data_scheme = resources.get('Data Scheme') if isinstance(resources, dict) else {}
+        has_data_scheme_entry = isinstance(data_scheme, dict) and data_scheme.get(method_name) is not None
 
         if use_dvc_cache:
             df = load_with_dvc_cache(method_name)
-        elif self.resources.get('Data Scheme').get(method_name, None):
+        elif has_data_scheme_entry:
             df = load_from_waves(waves)
         else:
             df = load_from_makefile(method_name)
@@ -860,5 +907,3 @@ class Country:
 #         r = rgsn.Regression(y=np.log(x.replace(0,np.nan).dropna()),
 #                             d=z,**kwargs)
 #         return r
-
-

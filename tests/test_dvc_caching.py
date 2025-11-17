@@ -1,13 +1,32 @@
 """Unit tests for DVC-validated caching in Country class."""
 
 import os
+import sys
 import tempfile
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+from types import SimpleNamespace, ModuleType
+from unittest.mock import Mock, patch, MagicMock, PropertyMock
 import pandas as pd
 import pytest
 
-from lsms_library.country import Country
+try:
+    import ligonlibrary.dataframes as _ligon_dataframes
+except ImportError:
+    ligonlibrary_module = ModuleType("ligonlibrary")
+    _ligon_dataframes = ModuleType("ligonlibrary.dataframes")
+    ligonlibrary_module.dataframes = _ligon_dataframes
+    sys.modules["ligonlibrary"] = ligonlibrary_module
+    sys.modules["ligonlibrary.dataframes"] = _ligon_dataframes
+else:
+    ligonlibrary_module = sys.modules.get("ligonlibrary")
+
+if not hasattr(_ligon_dataframes, "from_dta"):
+    def _dummy_from_dta(*args, **kwargs):
+        return pd.DataFrame()
+
+    _ligon_dataframes.from_dta = _dummy_from_dta
+
+from lsms_library.country import Country, _status_has_country_changes
 
 
 @pytest.fixture
@@ -178,6 +197,77 @@ class TestDVCCaching:
         loaded_df = pd.read_parquet(cache_path)
         pd.testing.assert_frame_equal(loaded_df, sample_dataframe)
 
+    def test_stale_cache_triggers_rebuild(
+        self,
+        mock_country_structure,
+        sample_dataframe,
+    ):
+        """When DVC marks outputs stale, cache should be rebuilt from waves."""
+        cache_path = mock_country_structure / "var" / "test_data.parquet"
+        sample_dataframe.to_parquet(cache_path)
+
+        rebuilt_df = pd.DataFrame({"col1": [99]})
+
+        with patch("lsms_library.country.files") as mock_files, \
+            patch("lsms_library.country.Repo") as mock_repo_class, \
+            patch("lsms_library.country.get_dataframe") as mock_get_dataframe, \
+            patch("lsms_library.country.map_index", side_effect=lambda df: df), \
+            patch.object(Country, "__getitem__", return_value=SimpleNamespace(test_data=lambda: rebuilt_df)), \
+            patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves:
+
+            mock_files.return_value = mock_country_structure.parent.parent
+            mock_repo = Mock()
+            mock_repo.status.return_value = {
+                "lsms_library/countries/dvc.yaml:materialize@testcountry_2020_21_test_data": [
+                    {
+                        "changed outs": {
+                            "build/TestCountry/2020-21/test_data.parquet": "modified"
+                        }
+                    }
+                ]
+            }
+            mock_repo_class.return_value = mock_repo
+            mock_get_dataframe.side_effect = AssertionError("Should not read stale cache")
+            mock_waves.return_value = ["2020-21"]
+
+            country = Country("TestCountry", preload_panel_ids=False)
+            result = country._aggregate_wave_data(method_name="test_data")
+
+        pd.testing.assert_frame_equal(result, rebuilt_df)
+        assert not mock_get_dataframe.called, "Stale cache should not be read"
+
+        refreshed = pd.read_parquet(cache_path)
+        pd.testing.assert_frame_equal(refreshed, rebuilt_df)
+
+    def test_valid_cache_uses_cached_file(
+        self,
+        mock_country_structure,
+    ):
+        """When DVC status is clean, cached parquet should be used directly."""
+        cache_path = mock_country_structure / "var" / "test_data.parquet"
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        cache_path.touch()
+
+        cached_df = pd.DataFrame({"col1": [1, 2]})
+
+        with patch("lsms_library.country.files") as mock_files, \
+            patch("lsms_library.country.Repo") as mock_repo_class, \
+            patch("lsms_library.country.get_dataframe", return_value=cached_df) as mock_get_dataframe, \
+            patch("lsms_library.country.map_index", side_effect=lambda df: df), \
+            patch.object(Country, "__getitem__", side_effect=AssertionError("Should not load waves")), \
+            patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves:
+
+            mock_files.return_value = mock_country_structure.parent.parent
+            mock_repo = Mock()
+            mock_repo.status.return_value = {}
+            mock_repo_class.return_value = mock_repo
+            mock_waves.return_value = ["2020-21"]
+
+            country = Country("TestCountry", preload_panel_ids=False)
+            result = country._aggregate_wave_data(method_name="test_data")
+
+        pd.testing.assert_frame_equal(result, cached_df)
+        mock_get_dataframe.assert_called_once_with(cache_path)
 
 class TestCachePathGeneration:
     """Test cache path generation for different data types."""
@@ -200,6 +290,41 @@ class TestCachePathGeneration:
         assert cache_path.parent.name == "_"
         assert method_name in cache_path.name
 
+
+class TestStatusHelpers:
+    """Tests for DVC status helper utilities."""
+
+    def test_status_detects_country_stage(self):
+        status = {
+            "lsms_library/countries/dvc.yaml:materialize@testcountry_2020_21_test_data": [
+                {"changed outs": {"build/TestCountry/2020-21/test_data.parquet": "modified"}}
+            ]
+        }
+        assert _status_has_country_changes(status, "TestCountry")
+
+    def test_status_ignores_other_country(self):
+        status = {
+            "lsms_library/countries/dvc.yaml:materialize@other_2020_21_test_data": [
+                {"changed outs": {"build/Other/2020-21/test_data.parquet": "modified"}}
+            ]
+        }
+        assert not _status_has_country_changes(status, "TestCountry")
+
+    def test_status_detects_cache_path(self):
+        status = {
+            "something": [
+                {
+                    "changed outs": {
+                        "build/TestCountry/2020-21/test_data.parquet": "modified"
+                    }
+                }
+            ]
+        }
+        assert _status_has_country_changes(
+            status,
+            "TestCountry",
+            "build/TestCountry/2020-21/test_data.parquet",
+        )
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
