@@ -13,6 +13,8 @@ from .country import Country
 from .local_tools import to_parquet
 
 app = typer.Typer(help="Command-line tools for interacting with LSMS Library data.")
+cache_app = typer.Typer(help="Manage LSMS cache.")
+app.add_typer(cache_app, name="cache")
 
 
 class _OrderedLoader(yaml.SafeLoader):
@@ -119,6 +121,55 @@ def _materialize(
         raise ValueError(f"Unsupported format '{file_format}'.")
 
     return output
+
+
+@cache_app.command("list")
+def cache_list(
+    country: Optional[str] = typer.Option(None, "--country", help="Country name to inspect."),
+) -> None:
+    """List cached datasets."""
+    countries = [country] if country else _available_country_dirs()
+    countries = [c for c in countries if (Path(__file__).resolve().parent / "countries" / c).exists()]
+    for name in countries:
+        country_obj = Country(name, preload_panel_ids=False)
+        datasets = country_obj.cached_datasets()
+        if datasets:
+            print(f"{name}: {', '.join(sorted(datasets))}")
+        else:
+            print(f"{name}: <no cache>")
+
+
+@cache_app.command("clear")
+def cache_clear(
+    country: Optional[List[str]] = typer.Option(None, "--country", help="Country to clear (repeatable)."),
+    method: Optional[List[str]] = typer.Option(None, "--method", help="Dataset/method to clear (repeatable)."),
+    wave: Optional[List[str]] = typer.Option(None, "--wave", help="Wave identifier (repeatable)."),
+    all_countries: bool = typer.Option(False, "--all", help="Clear cache for all countries."),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Show files that would be removed without deleting."),
+) -> None:
+    """Clear cached datasets for one or more countries."""
+    if not all_countries and not country:
+        raise typer.BadParameter("Provide --country or use --all to target every country.")
+
+    target_countries = (
+        _available_country_dirs() if all_countries else list(dict.fromkeys(country))
+    )
+
+    any_output = False
+    for name in target_countries:
+        country_obj = Country(name, preload_panel_ids=False)
+        methods = list(dict.fromkeys(method)) if method else None
+        files = country_obj.clear_cache(methods=methods, waves=wave or None, dry_run=dry_run)
+        if files:
+            any_output = True
+            prefix = "[DRY RUN] " if dry_run else ""
+            action = "would remove" if dry_run else "removed"
+            print(f"{prefix}{name}: {action}")
+            for path in files:
+                print(f"  {path}")
+
+    if not any_output:
+        print("No cached files matched the provided filters.")
 
 
 _DEFAULT_CMD = (

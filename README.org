@@ -99,6 +99,16 @@ export LSMS_USE_DVC_CACHE=false
 
 *Build Parallelism*: Make-based fallbacks default to half of available CPU cores (`make -j`), capped at a minimum of one job. Override with `LSMS_MAKE_JOBS` to tune parallelism.
 
+*Managing Cache Size*: Cached parquet/JSON files are stored under `lsms_library/countries/<country>/var` (and `_` for JSON). Use the CLI to inspect or clear them:
+#+begin_src bash
+# list cached datasets
+lsms-library cache list --country Uganda
+# remove the shocks cache for Uganda
+lsms-library cache clear --country Uganda --method shocks
+# dry-run removal for everything
+lsms-library cache clear --all --dry-run
+#+end_src
+
 * Usage Examples
 
 ** Working with Food Consumption Data

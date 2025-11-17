@@ -878,6 +878,70 @@ class Country:
         if self._panel_ids_cache is None or self._updated_ids_cache is None:
             self._compute_panel_ids()
         return self._updated_ids_cache
+
+    def cached_datasets(self) -> list[str]:
+        """
+        List dataset names currently cached for this country.
+        """
+        cache_files = []
+        var_dir = self.file_path / "var"
+        underscore_dir = self.file_path / "_"
+
+        if var_dir.exists():
+            cache_files.extend(var_dir.glob("*.parquet"))
+        if underscore_dir.exists():
+            cache_files.extend(underscore_dir.glob("*.json"))
+            cache_files.extend(underscore_dir.glob("*.parquet"))
+
+        datasets = []
+        for path in cache_files:
+            datasets.append(path.stem)
+        return sorted(set(datasets))
+
+    def clear_cache(
+        self,
+        methods: list[str] | None = None,
+        waves: list[str] | None = None,
+        dry_run: bool = False,
+    ) -> list[Path]:
+        """
+        Remove cached files for this country.
+        If methods is None, all cached datasets are removed.
+        If waves is provided, removes only caches tied to those waves (for DVC outputs under build/).
+        Returns list of deleted file paths.
+        """
+        removed: list[Path] = []
+        targets = list(dict.fromkeys(methods or self.cached_datasets()))
+
+        for method in targets:
+            json_cache = self.file_path / "_" / f"{method}.json"
+            parquet_cache = self.file_path / "_" / f"{method}.parquet"
+            var_cache = self.file_path / "var" / f"{method}.parquet"
+
+            for candidate in (json_cache, parquet_cache, var_cache):
+                if candidate.exists():
+                    removed.append(candidate)
+                    if not dry_run:
+                        candidate.unlink()
+
+        build_removed: list[Path] = []
+        if waves:
+            try:
+                stage_map = _load_materialize_stage_map(str(self.file_path.parent))
+            except FileNotFoundError:
+                stage_map = {}
+            for method in targets:
+                for wave in waves:
+                    info = stage_map.get((self.name, wave, method))
+                    if info:
+                        build_path = (self.file_path.parent / info.output_path).resolve()
+                        if build_path.exists():
+                            build_removed.append(build_path)
+                            if not dry_run:
+                                build_path.unlink()
+
+        removed.extend(build_removed)
+        return removed
     
 
     def __getattr__(self, name):

@@ -455,8 +455,36 @@ class TestDVCCaching:
 
             second = country._aggregate_wave_data(method_name="household_roster")
             pd.testing.assert_frame_equal(second, df)
-            assert mock_repo.reproduce.call_count == 1, "Second call should not rerun DVC stage"
-            assert mock_get_dataframe.call_args_list[-1][0][0] == cache_path
+        assert mock_repo.reproduce.call_count == 1, "Second call should not rerun DVC stage"
+        assert mock_get_dataframe.call_args_list[-1][0][0] == cache_path
+
+    def test_clear_cache_removes_files(self, mock_country_structure, sample_dataframe):
+        """clear_cache should delete cached parquet files."""
+        cache_path = mock_country_structure / "var" / "test_data.parquet"
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        write_parquet(sample_dataframe, cache_path)
+
+        with patch("lsms_library.country.files") as mock_files:
+            mock_files.return_value = mock_country_structure.parent.parent
+            country = Country("TestCountry", preload_panel_ids=False)
+            removed = country.clear_cache(methods=["test_data"])
+
+        assert not cache_path.exists()
+        assert cache_path in removed
+
+    def test_clear_cache_dry_run_keeps_files(self, mock_country_structure, sample_dataframe):
+        """clear_cache dry-run should report but not delete files."""
+        cache_path = mock_country_structure / "var" / "dry_run.parquet"
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        write_parquet(sample_dataframe, cache_path)
+
+        with patch("lsms_library.country.files") as mock_files:
+            mock_files.return_value = mock_country_structure.parent.parent
+            country = Country("TestCountry", preload_panel_ids=False)
+            removed = country.clear_cache(methods=["dry_run"], dry_run=True)
+
+        assert cache_path.exists()
+        assert cache_path in removed
 
 class TestCachePathGeneration:
     """Test cache path generation for different data types."""
