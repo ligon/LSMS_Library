@@ -134,6 +134,26 @@ def _load_materialize_stage_map(dvc_root: str) -> dict[tuple[str, str, str], Sta
 
     return stage_map
 
+
+def _make_jobs_flag() -> str | None:
+    """
+    Determine an appropriate make -j flag based on environment or CPU count.
+    Returns the flag string (e.g. '-j4') or None if no parallelism is desired.
+    """
+    make_jobs = os.getenv("LSMS_MAKE_JOBS")
+    if make_jobs:
+        try:
+            jobs = int(make_jobs)
+        except ValueError:
+            jobs = None
+    else:
+        cpu_count = os.cpu_count() or 2
+        jobs = max(1, cpu_count // 2)
+
+    if jobs and jobs > 1:
+        return f"-j{jobs}"
+    return None
+
 class Wave:
     def __init__(self,  year, wave_folder, country: 'Country'):
         self.year = year
@@ -662,10 +682,17 @@ class Country:
                     return json.load(json_file)
 
             try:
-                result = load_from_makefile(method_name)
+                make_cmd = ["make", "-s"]
+                jobs_flag = _make_jobs_flag()
+                if jobs_flag:
+                    make_cmd.append(jobs_flag)
+                make_cmd.append(f"{method_name}.json")
+                subprocess.run(make_cmd, cwd=self.file_path / "_", check=True)
             except (subprocess.CalledProcessError, FileNotFoundError) as error:
                 print(f"Makefile build failed for {method_name}: {error}. Falling back to wave aggregation.", file=stderr)
                 result = load_from_waves(waves)
+            else:
+                result = load_from_makefile(method_name)
 
             if isinstance(result, dict):
                 cache_path.parent.mkdir(parents=True, exist_ok=True)
@@ -774,7 +801,13 @@ class Country:
                 relative_path = target_path.relative_to(cwd_path.parent)
                 make_target = '../' + str(relative_path)
 
-            subprocess.run(["make", "-s", make_target], cwd=cwd_path, check=True)
+            jobs_flag = _make_jobs_flag()
+            make_cmd = ["make", "-s"]
+            if jobs_flag:
+                make_cmd.append(jobs_flag)
+            make_cmd.append(make_target)
+
+            subprocess.run(make_cmd, cwd=cwd_path, check=True)
             print(f"Makefile executed successfully for {self.name}. Rechecking for {target_path.name}...",file=stderr)
 
             if not target_path.exists():
