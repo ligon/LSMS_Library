@@ -5,7 +5,7 @@ sys.path.append('../../_/')
 sys.path.append('../../../_')
 import pandas as pd
 import dvc.api
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 from burkina_faso import age_sex_composition
 from lsms_library.local_tools import to_parquet
 

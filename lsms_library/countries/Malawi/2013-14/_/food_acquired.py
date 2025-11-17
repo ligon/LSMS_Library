@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 import json
 import dvc.api
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 from malawi import conversion_table_matching
 
 with dvc.api.open('../Data/HH_MOD_G1_13.dta', mode='rb') as dta:

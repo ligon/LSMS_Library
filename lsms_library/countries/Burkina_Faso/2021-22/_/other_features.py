@@ -7,7 +7,7 @@ sys.path.append('../../../_')
 import pandas as pd
 import numpy as np
 import dvc.api
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 from lsms_library.local_tools import to_parquet
 
 

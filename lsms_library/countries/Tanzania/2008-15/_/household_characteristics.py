@@ -6,7 +6,7 @@ sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
 import dvc.api
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 import sys
 sys.path.append('../../_/')
 from tanzania import age_sex_composition, get_household_roster

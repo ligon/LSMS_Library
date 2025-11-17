@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import json
 import dvc.api
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 from lsms.tools import get_household_roster
 
 def age_sex_composition(df, sex, sex_converter, age, age_converter, hhid):

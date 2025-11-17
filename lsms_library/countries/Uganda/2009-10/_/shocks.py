@@ -8,7 +8,7 @@ from lsms_library.local_tools import to_parquet
 import pandas as pd
 import dvc.api
 from datetime import datetime
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 
 #shock dataset
 with dvc.api.open('../Data/GSEC16.dta',mode='rb') as dta:

@@ -2,7 +2,7 @@ from lsms_library.local_tools import to_parquet
 #!/usr/bin/env python3
 import pandas as pd
 import dvc.api
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 import numpy as np
 from pint import UnitRegistry, UndefinedUnitError, DimensionalityError
 

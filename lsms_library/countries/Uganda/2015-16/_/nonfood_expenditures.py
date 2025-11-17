@@ -4,7 +4,7 @@ import sys
 sys.path.append('../../_')
 from uganda import nonfood_expenditures
 import dvc.api
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 
 myvars = dict(fn='../Data/gsec15c.dta',
               item='itmcd',

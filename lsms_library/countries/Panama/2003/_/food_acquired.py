@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import json
 import dvc.api
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 import pyreadstat
 sys.path.append('../../../_/')
 from lsms_library.local_tools import to_parquet, df_from_orgfile, format_id
