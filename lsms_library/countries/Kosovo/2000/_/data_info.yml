@@ -8,7 +8,39 @@ household_roster:
         i: hhid
         pid: s1a_q00
     myvars:
-        Sex: s1a_q02
-        Relationship: s1a_q03
+        Sex:
+            - s1a_q02
+            - mapping:
+                  1: Male
+                  2: Female
+
+        Relationship:
+            - s1a_q03
+            - mapping:
+                  1: Head
+                  2: Wife/Husband
+                  3: Son/Daughter
+                  4: Grandchild
+                  5: Niece/Nephew
+                  6: Father/Mother
+                  7: Sister/Brother
+                  8: Son/Daughter-in-law
+                  9: Brother/Sister-in-law
+                  10: Grandfather/Grandmother
+                  11: Father/Mother-in-law
+                  12: Other relative
+                  13: Servant
+                  14: Tenant
+                  15: Other
+
+
         Age: s1a_q05
-        Marital_status: s1a_q06
+        Marital_status:
+            - s1a_q06
+            - mapping:
+                  1: Married
+                  2: Living t
+                  3: Living a
+                  4: Divorced
+                  5: Widow/er
+                  6: Never ma

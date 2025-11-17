@@ -1,0 +1,8 @@
+Country: Armenia
+
+Data Scheme:
+  household_roster:
+    index: (i, pid)
+    Sex: int
+    Age: int
+    Marital: int
