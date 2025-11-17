@@ -21,6 +21,7 @@ from functools import lru_cache
 from sys import stderr
 from dvc.repo import Repo
 from dvc.exceptions import DvcException
+from datetime import datetime
 
 
 def _slugify(value: str) -> str:
@@ -153,6 +154,25 @@ def _make_jobs_flag() -> str | None:
     if jobs and jobs > 1:
         return f"-j{jobs}"
     return None
+
+
+def _log_issue(country: str, method: str, waves, error: Exception) -> None:
+    """
+    Append an issue entry to ISSUES.md capturing failures during cache/materialization.
+    """
+    issues_path = Path(__file__).resolve().parent / "ISSUES.md"
+    timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%SZ")
+    wave_info = ", ".join(waves) if isinstance(waves, (list, tuple)) and waves else "All waves"
+    entry = [
+        f"## {timestamp} {country} – {method}",
+        "",
+        f"- Waves: {wave_info}",
+        f"- Error: `{type(error).__name__}: {error}`",
+        "",
+    ]
+    issues_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(issues_path, "a", encoding="utf-8") as handle:
+        handle.write("\n".join(entry))
 
 class Wave:
     def __init__(self,  year, wave_folder, country: 'Country'):
@@ -837,14 +857,18 @@ class Country:
         data_scheme = resources.get('Data Scheme') if isinstance(resources, dict) else {}
         has_data_scheme_entry = isinstance(data_scheme, dict) and data_scheme.get(method_name) is not None
 
-        if use_dvc_cache:
-            df = load_with_dvc_cache(method_name)
-        elif method_name in json_cache_methods:
-            df = load_from_makefile(method_name)
-        elif has_data_scheme_entry:
-            df = load_from_waves(waves)
-        else:
-            df = load_from_makefile(method_name)
+        try:
+            if use_dvc_cache:
+                df = load_with_dvc_cache(method_name)
+            elif method_name in json_cache_methods:
+                df = load_from_makefile(method_name)
+            elif has_data_scheme_entry:
+                df = load_from_waves(waves)
+            else:
+                df = load_from_makefile(method_name)
+        except Exception as error:
+            _log_issue(self.name, method_name, waves, error)
+            raise
         
         if isinstance(df, dict):
             return df
