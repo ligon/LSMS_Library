@@ -1,8 +1,9 @@
 """Unit tests for DVC-validated caching in Country class."""
 
+import json
 import os
+import subprocess
 import sys
-import tempfile
 from pathlib import Path
 from types import SimpleNamespace, ModuleType
 from unittest.mock import Mock, patch, MagicMock, PropertyMock
@@ -268,6 +269,92 @@ class TestDVCCaching:
 
         pd.testing.assert_frame_equal(result, cached_df)
         mock_get_dataframe.assert_called_once_with(cache_path)
+
+    def test_panel_ids_dict_cache_written_as_json(
+        self,
+        mock_country_structure,
+    ):
+        """panel_ids dictionary results should persist as JSON."""
+        panel_ids_json = mock_country_structure / "_" / "panel_ids.json"
+        panel_ids_parquet = mock_country_structure / "_" / "panel_ids.parquet"
+
+        def fake_make(cmd, cwd, check):
+            target = Path(cwd) / cmd[-1]
+            data = {"2020-21": {"A": "B"}}
+            target.write_text(json.dumps(data))
+
+        # Ensure Makefile exists so loader attempts to run it
+        makefile_path = mock_country_structure / "_" / "Makefile"
+        makefile_path.write_text("# dummy makefile\n")
+
+        with patch("lsms_library.country.files") as mock_files, \
+            patch("lsms_library.country.Repo") as mock_repo_class, \
+            patch("lsms_library.country.subprocess.run", side_effect=fake_make) as _mock_make, \
+            patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
+            patch.object(Country, "data_scheme", new_callable=PropertyMock) as mock_scheme, \
+            patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources:
+
+            mock_files.return_value = mock_country_structure.parent.parent
+
+            mock_repo = Mock()
+            mock_repo.status.return_value = {}
+            mock_repo_class.return_value = mock_repo
+
+            mock_waves.return_value = ["2020-21"]
+            mock_scheme.return_value = ["panel_ids"]
+            mock_resources.return_value = {"Data Scheme": {"panel_ids": {}}}
+
+            country = Country("TestCountry", preload_panel_ids=False)
+            result = country._aggregate_wave_data(method_name="panel_ids")
+
+        assert isinstance(result, dict)
+        assert panel_ids_json.exists()
+        assert not panel_ids_parquet.exists()
+
+    def test_panel_ids_dataframe_cache_written_as_parquet(
+        self,
+        mock_country_structure,
+    ):
+        """panel_ids DataFrame results should persist as parquet when Makefile fallback fails."""
+        panel_ids_json = mock_country_structure / "_" / "panel_ids.json"
+        panel_ids_parquet = mock_country_structure / "_" / "panel_ids.parquet"
+        if panel_ids_json.exists():
+            panel_ids_json.unlink()
+        if panel_ids_parquet.exists():
+            panel_ids_parquet.unlink()
+
+        dataframe_result = pd.DataFrame({"previous_i": ["foo"]}, index=pd.Index(["bar"], name="i"))
+        dataframe_result.index = dataframe_result.index.set_names(["i"])
+
+        def failing_make(*args, **kwargs):
+            cmd = args[0] if args else kwargs.get("args", [])
+            raise subprocess.CalledProcessError(returncode=1, cmd=cmd)
+
+        with patch("lsms_library.country.files") as mock_files, \
+            patch("lsms_library.country.Repo") as mock_repo_class, \
+            patch("lsms_library.country.subprocess.run", side_effect=failing_make) as _mock_make, \
+            patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
+            patch.object(Country, "data_scheme", new_callable=PropertyMock) as mock_scheme, \
+            patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources, \
+            patch.object(Country, "__getitem__", return_value=SimpleNamespace(panel_ids=lambda: dataframe_result)) as mock_getitem, \
+            patch("lsms_library.country.map_index", side_effect=lambda df: df):
+
+            mock_files.return_value = mock_country_structure.parent.parent
+
+            mock_repo = Mock()
+            mock_repo.status.return_value = {}
+            mock_repo_class.return_value = mock_repo
+
+            mock_waves.return_value = ["2020-21"]
+            mock_scheme.return_value = ["panel_ids"]
+            mock_resources.return_value = {"Data Scheme": {"panel_ids": {}}}
+
+            country = Country("TestCountry", preload_panel_ids=False)
+            result = country._aggregate_wave_data(method_name="panel_ids")
+
+        assert isinstance(result, pd.DataFrame)
+        assert panel_ids_parquet.exists()
+        assert not panel_ids_json.exists()
 
 class TestCachePathGeneration:
     """Test cache path generation for different data types."""

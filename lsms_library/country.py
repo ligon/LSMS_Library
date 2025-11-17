@@ -568,6 +568,8 @@ class Country:
                     return pd.concat(non_empty_df.values(), axis=0, sort=False)
             raise KeyError(f"No data found for {method_name} in any wave of {self.name}.")
 
+        json_cache_methods = {'panel_ids', 'updated_ids'}
+
         def load_with_dvc_cache(method_name):
             """
             Load data using DVC-validated cache.
@@ -575,11 +577,26 @@ class Country:
             Checks if cached parquet exists and is valid according to DVC.
             If cache is stale or missing, rebuilds from waves and caches.
             """
-            # Determine cache path
-            if method_name in ['panel_ids', 'updated_ids']:
-                cache_path = self.file_path / "_" / f"{method_name}.json"
+            # Determine cache path and expected type
+            json_path = None
+            parquet_path = None
+            if method_name in json_cache_methods:
+                cache_dir = self.file_path / "_"
+                json_path = cache_dir / f"{method_name}.json"
+                parquet_path = cache_dir / f"{method_name}.parquet"
+                if json_path.exists():
+                    cache_path = json_path
+                    expected_format = "json"
+                elif parquet_path.exists():
+                    cache_path = parquet_path
+                    expected_format = "parquet"
+                else:
+                    cache_path = json_path
+                    expected_format = "json"
             else:
                 cache_path = self.file_path / "var" / f"{method_name}.parquet"
+                expected_format = "parquet"
+                parquet_path = cache_path
 
             # Check if cache exists and is valid via DVC
             cache_valid = False
@@ -600,27 +617,52 @@ class Country:
             # Use cache if valid
             if cache_valid and cache_path.exists():
                 print(f"Using cached {method_name} from {cache_path}", file=stderr)
-                if cache_path.suffix == '.json':
-                    with open(cache_path, 'r') as json_file:
-                        return json.load(json_file)
-                else:
+                if expected_format == "parquet":
                     df = get_dataframe(cache_path)
                     df = map_index(df)
                     return df
+                with open(cache_path, 'r') as json_file:
+                    return json.load(json_file)
 
             # Cache invalid or missing - rebuild from waves
             print(f"Building {method_name} from waves (cache {'stale' if cache_path.exists() else 'missing'})", file=stderr)
-            df = load_from_waves(waves)
+            if expected_format == "json":
+                try:
+                    df = load_from_makefile(method_name)
+                except (subprocess.CalledProcessError, FileNotFoundError) as error:
+                    print(f"Makefile build failed for {method_name}: {error}. Falling back to wave aggregation.", file=stderr)
+                    df = load_from_waves(waves)
+            else:
+                df = load_from_waves(waves)
 
             # Save to cache for next time
-            if not isinstance(df, dict):  # Don't cache dict returns
-                cache_path.parent.mkdir(parents=True, exist_ok=True)
-                if cache_path.suffix == '.json':
-                    with open(cache_path, 'w') as json_file:
-                        json.dump(df, json_file)
-                else:
-                    df.to_parquet(cache_path)
-                print(f"Cached {method_name} to {cache_path}", file=stderr)
+            cache_path.parent.mkdir(parents=True, exist_ok=True)
+            if isinstance(df, pd.DataFrame):
+                if parquet_path is None:
+                    raise TypeError(f"Cannot cache DataFrame result for {method_name} without parquet path")
+                cache_path = parquet_path
+                df.to_parquet(cache_path)
+                # Remove stale JSON cache if switching formats
+                if json_path and json_path.exists():
+                    try:
+                        json_path.unlink()
+                    except OSError:
+                        pass
+            elif isinstance(df, dict):
+                if json_path is None:
+                    raise TypeError(f"Cannot cache dictionary result for {method_name} without json path")
+                cache_path = json_path
+                with open(cache_path, 'w') as json_file:
+                    json.dump(df, json_file)
+                # Remove stale parquet cache if switching formats
+                if parquet_path and parquet_path.exists():
+                    try:
+                        parquet_path.unlink()
+                    except OSError:
+                        pass
+            else:
+                raise TypeError(f"Unsupported cache data type {type(df)} for {method_name}")
+            print(f"Cached {method_name} to {cache_path}", file=stderr)
 
             return df
 
@@ -667,6 +709,8 @@ class Country:
 
         if use_dvc_cache:
             df = load_with_dvc_cache(method_name)
+        elif method_name in json_cache_methods:
+            df = load_from_makefile(method_name)
         elif has_data_scheme_entry:
             df = load_from_waves(waves)
         else:
