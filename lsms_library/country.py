@@ -7,6 +7,7 @@ import importlib
 import cfe.regression as rgsn
 from collections import defaultdict
 from .local_tools import df_data_grabber, format_id, get_categorical_mapping, get_dataframe, map_index, get_formatting_functions, panel_ids, id_walk, all_dfs_from_orgfile, to_parquet
+from .yaml_utils import load_yaml
 import importlib.util
 import os
 import warnings
@@ -234,7 +235,7 @@ class Wave:
             # warnings.warn(f"File not found: {info_path}")
             return {}
         with open(info_path, 'r') as file:
-            return yaml.safe_load(file)
+            return load_yaml(file)
     
     @property
     def data_scheme(self):
@@ -594,7 +595,22 @@ class Country:
         if not var.exists():
             return {}
         with open(var, 'r') as file:
-            return yaml.safe_load(file)
+            return load_yaml(file)
+
+    def _materialization_entry(self, method_name: str) -> dict[str, Any]:
+        """
+        Retrieve materialization metadata for a dataset from the country-level data scheme.
+        """
+        resources = self.resources
+        if not isinstance(resources, dict):
+            return {}
+        scheme_map = resources.get("Data Scheme")
+        if not isinstance(scheme_map, dict):
+            return {}
+        entry = scheme_map.get(method_name)
+        if isinstance(entry, dict):
+            return entry
+        return {}
     
     @property
     def formatting_functions(self):
@@ -728,6 +744,13 @@ class Country:
 
         if waves is None:
             waves = self.waves
+
+        scheme_entry = self._materialization_entry(method_name)
+        materialize_backend = None
+        if isinstance(scheme_entry, dict):
+            backend_value = scheme_entry.get("materialize")
+            if isinstance(backend_value, str):
+                materialize_backend = backend_value.lower()
 
         def safe_concat_dataframe_dict(df_dict):
             # Get the target index name order from the first DataFrame
@@ -1068,6 +1091,18 @@ class Country:
             Load data from Makefile if it exists.
             """
             return run_make_target(method_name)
+
+        if materialize_backend == "make":
+            result = run_make_target(method_name)
+            if isinstance(result, pd.DataFrame) and waves:
+                try:
+                    wave_filter = list(dict.fromkeys(waves))
+                    if "t" in result.index.names:
+                        mask = result.index.get_level_values("t").isin(wave_filter)
+                        result = result.loc[mask]
+                except (KeyError, AttributeError, IndexError):
+                    pass
+            return result
         
         # Use DVC-validated cache for all datasets
         # Falls back to load_from_makefile for special cases or if DVC fails

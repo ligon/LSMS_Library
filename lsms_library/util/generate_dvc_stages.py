@@ -15,9 +15,10 @@ from pathlib import Path
 from typing import Iterable
 import sys
 
-import yaml
-
 from lsms_library.country import _slugify as _country_slugify
+from lsms_library.yaml_utils import load_yaml as load_yaml_with_tags
+
+import yaml
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -54,16 +55,16 @@ def slugify(value: str | None) -> str:
     return _country_slugify(str(value))
 
 
-def load_yaml(path: Path) -> dict:
+def load_yaml_file(path: Path) -> dict:
     if not path.exists():
         return {}
-    with path.open("r", encoding="utf-8") as handle:
-        return yaml.safe_load(handle) or {}
+    data = load_yaml_with_tags(path)
+    return data if isinstance(data, dict) else {}
 
 
 def country_tables(country_dir: Path) -> list[str]:
     scheme_path = country_dir / "_" / "data_scheme.yml"
-    data = load_yaml(scheme_path)
+    data = load_yaml_file(scheme_path)
     if not isinstance(data, dict):
         return []
     scheme = data.get("Data Scheme")
@@ -74,7 +75,7 @@ def country_tables(country_dir: Path) -> list[str]:
 
 def wave_tables(wave_dir: Path) -> list[str]:
     info_path = wave_dir / "_" / "data_info.yml"
-    data = load_yaml(info_path)
+    data = load_yaml_file(info_path)
     if not isinstance(data, dict):
         return []
     skip = {"Country", "Wave"}
