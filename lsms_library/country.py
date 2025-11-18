@@ -992,6 +992,33 @@ class Country:
                     print(f"Writing {method_name} to cache {cache_path}", file=stderr)
                 return df
 
+            def collect_stage_outputs(stage_list):
+                stage_results: dict[str, pd.DataFrame] = {}
+                for stage in stage_list:
+                    if stage.fmt != "parquet":
+                        raise ValueError(f"Unsupported format {stage.fmt} for {method_name}")
+                    output_path = stage.output_path
+                    if output_path.exists():
+                        df_wave = get_dataframe(output_path)
+                        df_wave = map_index(df_wave)
+                        stage_results[stage.wave or "ALL"] = df_wave
+                return stage_results
+
+            def consolidate_stage_outputs(stage_results: dict[str, pd.DataFrame]) -> pd.DataFrame | None:
+                if not stage_results:
+                    return None
+                non_empty_df = {k: v for k, v in stage_results.items() if not v.empty}
+                if not non_empty_df:
+                    combined_df = pd.concat(stage_results.values(), axis=0, sort=False)
+                elif len(non_empty_df) > 1:
+                    combined_df = safe_concat_dataframe_dict(non_empty_df)
+                else:
+                    combined_df = next(iter(non_empty_df.values()))
+                cache_path.parent.mkdir(parents=True, exist_ok=True)
+                to_parquet(combined_df, cache_path)
+                print(f"Writing {method_name} to cache {cache_path}", file=stderr)
+                return combined_df
+
             # Determine if all stages are up-to-date
             stage_clean = True
             for info in stage_infos:
@@ -1017,34 +1044,17 @@ class Country:
                     repo.reproduce(info.stage_ref)
                 except Exception as reproduce_error:
                     print(f"DVC reproduce failed for {info.stage_ref}: {reproduce_error}. Falling back to legacy loaders.", file=stderr)
+                    stage_outputs = collect_stage_outputs(stage_infos)
+                    combined_outputs = consolidate_stage_outputs(stage_outputs)
+                    if combined_outputs is not None:
+                        return combined_outputs
                     return load_from_waves(waves)
 
-            results = {}
-            for info in stage_infos:
-                if info.fmt != "parquet":
-                    raise ValueError(f"Unsupported format {info.fmt} for {method_name}")
-                output_path = info.output_path
-                if not output_path.exists():
-                    raise FileNotFoundError(f"DVC output missing: {output_path}")
-                df_wave = get_dataframe(output_path)
-                df_wave = map_index(df_wave)
-                results[info.wave or "ALL"] = df_wave
-
-            if not results:
+            stage_outputs = collect_stage_outputs(stage_infos)
+            combined_outputs = consolidate_stage_outputs(stage_outputs)
+            if combined_outputs is None:
                 raise KeyError(f"No data produced for {method_name} via DVC.")
-
-            non_empty_df = {k: v for k, v in results.items() if not v.empty}
-            if not non_empty_df:
-                combined = pd.concat(results.values(), axis=0, sort=False)
-            elif len(non_empty_df) > 1:
-                combined = safe_concat_dataframe_dict(non_empty_df)
-            else:
-                combined = next(iter(non_empty_df.values()))
-
-            cache_path.parent.mkdir(parents=True, exist_ok=True)
-            to_parquet(combined, cache_path)
-            print(f"Writing {method_name} to cache {cache_path}", file=stderr)
-            return combined
+            return combined_outputs
 
         def load_with_dvc_cache(method_name):
             if method_name in json_cache_methods:
