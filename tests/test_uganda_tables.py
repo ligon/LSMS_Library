@@ -22,3 +22,5 @@ def test_uganda_makefile_backfill(table):
     assert result is not None
     if hasattr(result, "empty"):
         assert not result.empty, f"{table} should not be empty"
+    if hasattr(result, "index") and method.__name__ in {"household_characteristics", "food_expenditures", "food_quantities", "food_prices"}:
+        assert "m" in result.index.names, f"{table} missing 'm' index"

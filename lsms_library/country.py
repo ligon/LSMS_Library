@@ -747,6 +747,7 @@ class Country:
             Execute legacy Makefile targets either at the country level or for a specific wave.
             """
             base_path = self.file_path if wave is None else self[wave].file_path
+            repo_root = self.file_path.parent
             candidate_make_dirs: list[Path] = []
             if wave is not None:
                 candidate_make_dirs.append(base_path / "_")
@@ -794,6 +795,17 @@ class Country:
 
             target_path.parent.mkdir(parents=True, exist_ok=True)
 
+            def build_env() -> dict[str, str]:
+                env = os.environ.copy()
+                bin_dir = os.path.dirname(sys.executable)
+                env["PATH"] = bin_dir + os.pathsep + env.get("PATH", "")
+                pythonpath = env.get("PYTHONPATH", "")
+                if str(repo_root) not in pythonpath.split(os.pathsep):
+                    pythonpath = f"{repo_root}{os.pathsep}{pythonpath}" if pythonpath else str(repo_root)
+                env["PYTHONPATH"] = pythonpath
+                env.setdefault("PYTHON", sys.executable)
+                return env
+
             def try_make(make_dir: Path) -> Path | None:
                 if make_dir is None or not (make_dir / "Makefile").exists():
                     return None
@@ -809,7 +821,7 @@ class Country:
                         make_cmd.append(jobs_flag)
                     make_cmd.append(rel_target)
                     try:
-                        subprocess.run(make_cmd, cwd=make_dir, check=True)
+                        subprocess.run(make_cmd, cwd=make_dir, check=True, env=build_env())
                         print(f"Makefile executed successfully for {self.name}/{wave or 'ALL'}. Rechecking for {candidate.name}...", file=stderr)
                     except (subprocess.CalledProcessError, FileNotFoundError) as error:
                         warnings.warn(f"Makefile execution failed for {self.name}/{wave or '_'} {method_name}: {error}")
@@ -823,7 +835,7 @@ class Country:
                     return None
                 python_bin = sys.executable or "python3"
                 try:
-                    subprocess.run([python_bin, str(script)], cwd=script.parent, check=True)
+                    subprocess.run([python_bin, str(script)], cwd=script.parent, check=True, env=build_env())
                     print(f"Python fallback executed for {script.parent.name}.{method_name}.", file=stderr)
                 except subprocess.CalledProcessError as error:
                     warnings.warn(f"Python fallback failed for {script}: {error}")
@@ -858,13 +870,15 @@ class Country:
             results = {}
             for w in waves:
                 wave_obj = self[w]
-                wave_result = None
-                try:
-                    wave_result = getattr(wave_obj, method_name)()
-                except (KeyError, AttributeError) as error:
-                    warnings.warn(str(error))
-
                 wave_has_table = method_name in wave_obj.data_scheme
+                wave_result = None
+
+                if wave_has_table:
+                    try:
+                        wave_result = getattr(wave_obj, method_name)()
+                    except (KeyError, AttributeError) as error:
+                        warnings.warn(str(error))
+
                 use_legacy = wave_has_table and (
                     wave_result is None
                     or (isinstance(wave_result, pd.DataFrame) and wave_result.empty)
