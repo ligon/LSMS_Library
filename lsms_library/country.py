@@ -1120,14 +1120,16 @@ class Country:
         if isinstance(df, dict):
             return df
 
-        if isinstance(df, pd.DataFrame):
-            if isinstance(df.index, pd.MultiIndex) and 't' in df.index.names:
-                desired_order = ['t'] + [lvl for lvl in df.index.names if lvl != 't']
-                if list(df.index.names) != desired_order:
-                    try:
-                        df = df.reorder_levels(desired_order)
-                    except Exception:
-                        pass
+        if isinstance(df, pd.DataFrame) and isinstance(df.index, pd.MultiIndex):
+            index_names = list(df.index.names)
+            preferred = ['i', 't', 'm']
+            desired_order = [name for name in preferred if name in index_names]
+            desired_order += [name for name in index_names if name not in desired_order]
+            if desired_order != index_names:
+                try:
+                    df = df.reorder_levels(desired_order)
+                except Exception:
+                    pass
 
         if 'i' in df.index.names and not df.attrs.get('id_converted') and method_name not in ['panel_ids', 'updated_ids'] and self._updated_ids_cache is not None:
             df = id_walk(df, self.updated_ids)
