@@ -26,7 +26,9 @@ def test_uganda_makefile_backfill(table):
     if hasattr(result, "empty"):
         assert not result.empty, f"{table} should not be empty"
     if hasattr(result, "index") and method.__name__ in {"household_characteristics", "food_expenditures", "food_quantities", "food_prices"}:
-        assert "m" in result.index.names, f"{table} missing 'm' index"
+        required_levels = {"m", "i"}
+        missing = required_levels.difference(result.index.names or [])
+        assert not missing, f"{table} missing index levels {sorted(missing)}"
 
 
 def _backup_and_remove(path: Path, tmpdir: Path) -> Optional[Path]:
