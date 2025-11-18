@@ -146,12 +146,7 @@ def _load_materialize_stage_map(dvc_root: str) -> dict[tuple[str, str | None, st
             output_rel = output_rel.replace("//", "/").strip()
             output_path = (yaml_path.parent / output_rel).resolve()
 
-            try:
-                rel_yaml = yaml_path.relative_to(root_path)
-            except ValueError:
-                rel_yaml = yaml_path
-
-            stage_ref = f"{rel_yaml}:materialize@{stage_key}"
+            stage_ref = f"{yaml_path}:materialize@{stage_key}"
 
             stage_map[(country, wave_value, table)] = StageInfo(
                 stage_key=stage_key,
