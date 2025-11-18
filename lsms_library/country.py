@@ -510,8 +510,10 @@ class Wave:
                 return pd.DataFrame()
             
             df = pd.read_parquet(parquet_fn)
+
+        if isinstance(df, pd.DataFrame):
             df = map_index(df)
-    
+        
         df = check_adding_t(df)
         df = df[df.index.get_level_values('t') == self.year]
         return df
