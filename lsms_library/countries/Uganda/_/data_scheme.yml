@@ -20,13 +20,13 @@ Data Scheme:
   shocks: !make
   earnings: !make
   food_acquired: !make
-  nutrition: 
-  household_characteristics:
-  interview_date:
-  food_quantities:
+  nutrition: !make
+  household_characteristics: !make
+  interview_date: !make
+  food_quantities: !make
   food_expenditures: !make
-  food_prices:
-  panel_ids:
-  income:
-  enterprise_income:
-  other_features:
+  food_prices: !make
+  panel_ids: !make
+  income: !make
+  enterprise_income: !make
+  other_features: !make

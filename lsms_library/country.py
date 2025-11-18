@@ -1092,41 +1092,42 @@ class Country:
             """
             return run_make_target(method_name)
 
+        df: Any = None
         if materialize_backend == "make":
-            result = run_make_target(method_name)
-            if isinstance(result, pd.DataFrame) and waves:
-                try:
-                    wave_filter = list(dict.fromkeys(waves))
-                    if "t" in result.index.names:
-                        mask = result.index.get_level_values("t").isin(wave_filter)
-                        result = result.loc[mask]
-                except (KeyError, AttributeError, IndexError):
-                    pass
-            return result
-        
-        # Use DVC-validated cache for all datasets
-        # Falls back to load_from_makefile for special cases or if DVC fails
-        use_dvc_cache = os.getenv('LSMS_USE_DVC_CACHE', 'true').lower() == 'true'
-        resources = self.resources
-        data_scheme = resources.get('Data Scheme') if isinstance(resources, dict) else {}
-        has_data_scheme_entry = isinstance(data_scheme, dict) and data_scheme.get(method_name) is not None
-
-        if not use_dvc_cache and method_name in json_cache_methods:
-            df = load_from_waves(waves)
+            df = run_make_target(method_name)
         else:
-            try:
-                if use_dvc_cache:
-                    df = load_with_dvc_cache(method_name)
-                elif has_data_scheme_entry:
-                    df = load_from_waves(waves)
-                else:
-                    df = load_from_makefile(method_name)
-            except Exception as error:
-                _log_issue(self.name, method_name, waves, error)
-                raise
+            # Use DVC-validated cache for all datasets
+            # Falls back to load_from_makefile for special cases or if DVC fails
+            use_dvc_cache = os.getenv('LSMS_USE_DVC_CACHE', 'true').lower() == 'true'
+            resources = self.resources
+            data_scheme = resources.get('Data Scheme') if isinstance(resources, dict) else {}
+            has_data_scheme_entry = isinstance(data_scheme, dict) and data_scheme.get(method_name) is not None
+
+            if not use_dvc_cache and method_name in json_cache_methods:
+                df = load_from_waves(waves)
+            else:
+                try:
+                    if use_dvc_cache:
+                        df = load_with_dvc_cache(method_name)
+                    elif has_data_scheme_entry:
+                        df = load_from_waves(waves)
+                    else:
+                        df = load_from_makefile(method_name)
+                except Exception as error:
+                    _log_issue(self.name, method_name, waves, error)
+                    raise
         
         if isinstance(df, dict):
             return df
+
+        if isinstance(df, pd.DataFrame):
+            if isinstance(df.index, pd.MultiIndex) and 't' in df.index.names:
+                desired_order = ['t'] + [lvl for lvl in df.index.names if lvl != 't']
+                if list(df.index.names) != desired_order:
+                    try:
+                        df = df.reorder_levels(desired_order)
+                    except Exception:
+                        pass
 
         if 'i' in df.index.names and not df.attrs.get('id_converted') and method_name not in ['panel_ids', 'updated_ids'] and self._updated_ids_cache is not None:
             df = id_walk(df, self.updated_ids)
