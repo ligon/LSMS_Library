@@ -24,3 +24,15 @@ def age_sex_composition(df, sex, sex_converter, age, age_converter, hhid):
     testdf['log HSize'] = np.log(testdf[['girls', 'boys', 'men', 'women']].sum(axis=1))
     testdf.index.name = 'j'
     return testdf
+
+def i(x):
+    """Create hhid from grappe + menage concatenation (no separator)"""
+    if isinstance(x, pd.Series):
+        # x is a row with grappe and menage
+        return str(int(x.iloc[0])) + str(int(x.iloc[1]))
+    return str(int(x))
+
+def panel_ids(df):
+    """Construct previous_i from previous_v (grappe) and previous_hid (menage) like Mali does"""
+    df['previous_i'] = df['previous_v'].astype(str).str.replace('.0', '').str.strip() + df['previous_hid'].astype(str).str.replace('.0', '').str.strip()
+    return df[['previous_i']]

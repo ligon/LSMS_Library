@@ -1,6 +1,14 @@
 Country: Burkina Faso
 Wave: 2021-22
 
+panel_ids:
+    file: ../Data/s00_me_bfa2021.dta
+    idxvars:
+        i: hhid
+    myvars:
+        previous_v: grappe_EHCVM1
+        previous_hid: menage_EHCVM1
+
 household_roster:
     file: ehcvm_individu_bfa2021.dta
     idxvars:
