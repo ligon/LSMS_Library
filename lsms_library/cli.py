@@ -12,6 +12,8 @@ import yaml
 
 from .country import Country, _log_issue
 from .local_tools import to_parquet
+from .util.generate_dvc_stages import discover_countries as _discover_dvc_countries
+from .util.generate_dvc_stages import generate_country as _generate_dvc_country
 
 app = typer.Typer(help="Command-line tools for interacting with LSMS Library data.")
 cache_app = typer.Typer(help="Manage LSMS cache.")
@@ -361,6 +363,46 @@ def register(
         f"Registered stage materialize@{stage_key}.\n"
         f"Run 'dvc repro {dvc_file}:materialize@{stage_key}' to materialize."
     )
+
+
+@app.command("generate-dvc")
+def generate_dvc(
+    country: Optional[List[str]] = typer.Option(
+        None,
+        "--country",
+        help="Country to process (repeatable). Omit with --all to regenerate every country.",
+    ),
+    all_countries: bool = typer.Option(
+        False,
+        "--all/--no-all",
+        help="Regenerate DVC configs for every known country.",
+    ),
+    dry_run: bool = typer.Option(
+        False,
+        "--dry-run/--write",
+        help="Show pending changes without touching files.",
+    ),
+) -> None:
+    """Regenerate DVC stage definitions for one or more countries."""
+
+    if not country and not all_countries:
+        raise typer.BadParameter(
+            "Provide --country (repeatable) or use --all.", param_hint=["--country", "--all"]
+        )
+
+    targets = sorted(set(country)) if country else _discover_dvc_countries()
+    changed_any = False
+
+    for name in targets:
+        changed = _generate_dvc_country(name, dry_run)
+        changed_any |= changed
+        verb = "Updated" if changed else "Unchanged"
+        typer.echo(f"{verb} {name}")
+
+    if dry_run:
+        typer.echo("[DRY] No files were written.")
+    elif not changed_any:
+        typer.echo("[INFO] All dvc.yaml files already up to date.")
 
 
 @app.command()

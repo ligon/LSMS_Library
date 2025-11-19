@@ -25,8 +25,20 @@ from dvc.repo import Repo
 from dvc.exceptions import DvcException, PathMissingError
 from datetime import datetime
 from typing import Any
+from contextlib import contextmanager
 
 JSON_CACHE_METHODS = {'panel_ids', 'updated_ids'}
+
+
+@contextmanager
+def _working_directory(path: Path):
+    """Temporarily switch the process working directory."""
+    previous = Path.cwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(previous)
 
 
 def _slugify(value: str) -> str:
@@ -93,17 +105,17 @@ def _load_materialize_stage_map(dvc_root: str) -> dict[tuple[str, str | None, st
     """
     Load mapping from (country, wave, table) to StageInfo based on available dvc.yaml materialize foreach entries.
     """
-    root_path = Path(dvc_root)
+    root_path = Path(dvc_root).resolve()
     yaml_paths: set[Path] = set()
 
     root_yaml = root_path / "dvc.yaml"
     if root_yaml.exists():
-        yaml_paths.add(root_yaml)
+        yaml_paths.add(root_yaml.resolve())
 
     for path in root_path.glob("**/dvc.yaml"):
         if ".dvc" in path.parts:
             continue
-        yaml_paths.add(path)
+        yaml_paths.add(path.resolve())
 
     stage_map: dict[tuple[str, str | None, str], StageInfo] = {}
 
@@ -139,17 +151,20 @@ def _load_materialize_stage_map(dvc_root: str) -> dict[tuple[str, str | None, st
 
             wave_value = wave or None
 
-            output_rel = (
-                out_template
-                .replace("${item.country}", country)
-                .replace("${item.wave}", (wave or ""))
-                .replace("${item.table}", table)
-                .replace("${item.format}", fmt)
-            )
+            output_rel = params.get("output")
+            if not output_rel:
+                output_rel = (
+                    out_template
+                    .replace("${item.country}", country)
+                    .replace("${item.wave}", (wave or ""))
+                    .replace("${item.table}", table)
+                    .replace("${item.format}", fmt)
+                )
             output_rel = output_rel.replace("//", "/").strip()
             output_path = (yaml_path.parent / output_rel).resolve()
 
-            stage_ref = f"{yaml_path}:materialize@{stage_key}"
+            yaml_rel = yaml_path.relative_to(root_path)
+            stage_ref = f"{yaml_rel.as_posix()}:materialize@{stage_key}"
 
             stage_map[(country, wave_value, table)] = StageInfo(
                 stage_key=stage_key,
@@ -995,91 +1010,92 @@ class Country:
             """
             cache_path = self.file_path / "var" / f"{method_name}.parquet"
             cache_exists = cache_path.exists()
+            dvc_root = self.file_path.parent
 
             try:
-                dvc_root = self.file_path.parent
-                repo = Repo(root_dir=str(dvc_root))
+                with _working_directory(dvc_root):
+                    repo = Repo()
+                    stage_infos = self._resolve_materialize_stages(method_name, waves)
+                    if not stage_infos:
+                        if cache_exists:
+                            print(f"Reading {method_name} from cache {cache_path}", file=stderr)
+                            df = get_dataframe(cache_path)
+                            df = map_index(df)
+                            return df
+                        df = load_from_waves(waves)
+                        if isinstance(df, pd.DataFrame):
+                            cache_path.parent.mkdir(parents=True, exist_ok=True)
+                            to_parquet(df, cache_path)
+                            print(f"Writing {method_name} to cache {cache_path}", file=stderr)
+                        return df
+
+                    deduped_infos: list[StageInfo] = []
+                    seen_refs: set[str] = set()
+                    for info in stage_infos:
+                        if info.stage_ref in seen_refs:
+                            continue
+                        seen_refs.add(info.stage_ref)
+                        deduped_infos.append(info)
+                    stage_infos = deduped_infos
+
+                    def collect_stage_outputs(stage_list):
+                        stage_results: dict[str, pd.DataFrame] = {}
+                        for stage in stage_list:
+                            if stage.fmt != "parquet":
+                                raise ValueError(f"Unsupported format {stage.fmt} for {method_name}")
+                            output_path = stage.output_path
+                            if output_path.exists():
+                                df_wave = get_dataframe(output_path)
+                                df_wave = map_index(df_wave)
+                                stage_results[stage.wave or "ALL"] = df_wave
+                        return stage_results
+
+                    def consolidate_stage_outputs(stage_results: dict[str, pd.DataFrame]) -> pd.DataFrame | None:
+                        if not stage_results:
+                            return None
+                        non_empty_df = {k: v for k, v in stage_results.items() if not v.empty}
+                        if not non_empty_df:
+                            combined_df = pd.concat(stage_results.values(), axis=0, sort=False)
+                        elif len(non_empty_df) > 1:
+                            combined_df = safe_concat_dataframe_dict(non_empty_df)
+                        else:
+                            combined_df = next(iter(non_empty_df.values()))
+                        cache_path.parent.mkdir(parents=True, exist_ok=True)
+                        to_parquet(combined_df, cache_path)
+                        print(f"Writing {method_name} to cache {cache_path}", file=stderr)
+                        return combined_df
+
+                    # Run DVC stages for required waves
+                    for info in stage_infos:
+                        try:
+                            repo.reproduce(targets=[info.stage_ref])
+                        except Exception as reproduce_error:
+                            print(f"DVC reproduce failed for {info.stage_ref}: {reproduce_error}. Falling back to legacy loaders.", file=stderr)
+                            stage_outputs = collect_stage_outputs(stage_infos)
+                            combined_outputs = consolidate_stage_outputs(stage_outputs)
+                            if combined_outputs is not None:
+                                return combined_outputs
+                            return load_from_waves(waves)
+
+                    stage_outputs = collect_stage_outputs(stage_infos)
+                    if not stage_outputs:
+                        raise KeyError(f"No data produced for {method_name} via DVC.")
+
+                    single_stage = (
+                        len(stage_infos) == 1
+                        and stage_infos[0].wave is None
+                        and stage_infos[0].output_path == cache_path
+                    )
+                    if single_stage:
+                        return next(iter(stage_outputs.values()))
+
+                    combined_outputs = consolidate_stage_outputs(stage_outputs)
+                    if combined_outputs is None:
+                        raise KeyError(f"No data produced for {method_name} via DVC.")
+                    return combined_outputs
             except (DvcException, FileNotFoundError) as e:
                 print(f"DVC unavailable for {method_name}: {e}. Falling back to manual aggregation.", file=stderr)
                 return load_from_waves(waves)
-
-            stage_infos = self._resolve_materialize_stages(method_name, waves)
-            if not stage_infos:
-                if cache_exists:
-                    print(f"Reading {method_name} from cache {cache_path}", file=stderr)
-                    df = get_dataframe(cache_path)
-                    df = map_index(df)
-                    return df
-                df = load_from_waves(waves)
-                if isinstance(df, pd.DataFrame):
-                    cache_path.parent.mkdir(parents=True, exist_ok=True)
-                    to_parquet(df, cache_path)
-                    print(f"Writing {method_name} to cache {cache_path}", file=stderr)
-                return df
-
-            def collect_stage_outputs(stage_list):
-                stage_results: dict[str, pd.DataFrame] = {}
-                for stage in stage_list:
-                    if stage.fmt != "parquet":
-                        raise ValueError(f"Unsupported format {stage.fmt} for {method_name}")
-                    output_path = stage.output_path
-                    if output_path.exists():
-                        df_wave = get_dataframe(output_path)
-                        df_wave = map_index(df_wave)
-                        stage_results[stage.wave or "ALL"] = df_wave
-                return stage_results
-
-            def consolidate_stage_outputs(stage_results: dict[str, pd.DataFrame]) -> pd.DataFrame | None:
-                if not stage_results:
-                    return None
-                non_empty_df = {k: v for k, v in stage_results.items() if not v.empty}
-                if not non_empty_df:
-                    combined_df = pd.concat(stage_results.values(), axis=0, sort=False)
-                elif len(non_empty_df) > 1:
-                    combined_df = safe_concat_dataframe_dict(non_empty_df)
-                else:
-                    combined_df = next(iter(non_empty_df.values()))
-                cache_path.parent.mkdir(parents=True, exist_ok=True)
-                to_parquet(combined_df, cache_path)
-                print(f"Writing {method_name} to cache {cache_path}", file=stderr)
-                return combined_df
-
-            # Determine if all stages are up-to-date
-            stage_clean = True
-            for info in stage_infos:
-                try:
-                    status = repo.status(targets=[info.stage_ref])
-                except Exception as status_error:
-                    print(f"DVC status check failed for {info.stage_ref}: {status_error}. Treating as stale.", file=stderr)
-                    stage_clean = False
-                    break
-                if status:
-                    stage_clean = False
-                    break
-
-            if cache_exists and stage_clean:
-                print(f"Reading {method_name} from cache {cache_path}", file=stderr)
-                df = get_dataframe(cache_path)
-                df = map_index(df)
-                return df
-
-            # Run DVC stages for required waves
-            for info in stage_infos:
-                try:
-                    repo.reproduce(info.stage_ref)
-                except Exception as reproduce_error:
-                    print(f"DVC reproduce failed for {info.stage_ref}: {reproduce_error}. Falling back to legacy loaders.", file=stderr)
-                    stage_outputs = collect_stage_outputs(stage_infos)
-                    combined_outputs = consolidate_stage_outputs(stage_outputs)
-                    if combined_outputs is not None:
-                        return combined_outputs
-                    return load_from_waves(waves)
-
-            stage_outputs = collect_stage_outputs(stage_infos)
-            combined_outputs = consolidate_stage_outputs(stage_outputs)
-            if combined_outputs is None:
-                raise KeyError(f"No data produced for {method_name} via DVC.")
-            return combined_outputs
 
         def load_with_dvc_cache(method_name):
             if method_name in JSON_CACHE_METHODS:
