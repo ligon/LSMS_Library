@@ -7,9 +7,10 @@ stages:
       - ../../cli.py
       - ../../country.py
       - ../../local_tools.py
+      - ../../util/run_stage.py
       - _
       outs:
-      - var/${item.table}.${item.format}
+      - ${item.output}
     foreach:
       uganda::::cluster_features:
         country: Uganda
@@ -18,6 +19,7 @@ stages:
         format: parquet
         backend: cli
         target: ''
+        output: var/cluster_features.parquet
       uganda::::earnings:
         country: Uganda
         wave: null
@@ -25,6 +27,7 @@ stages:
         format: parquet
         backend: make
         target: ''
+        output: var/earnings.parquet
       uganda::::enterprise_income:
         country: Uganda
         wave: null
@@ -32,6 +35,7 @@ stages:
         format: parquet
         backend: make
         target: ''
+        output: var/enterprise_income.parquet
       uganda::::food_acquired:
         country: Uganda
         wave: null
@@ -39,6 +43,7 @@ stages:
         format: parquet
         backend: make
         target: ''
+        output: var/food_acquired.parquet
       uganda::::food_expenditures:
         country: Uganda
         wave: null
@@ -46,6 +51,7 @@ stages:
         format: parquet
         backend: make
         target: ''
+        output: var/food_expenditures.parquet
       uganda::::food_prices:
         country: Uganda
         wave: null
@@ -53,6 +59,7 @@ stages:
         format: parquet
         backend: make
         target: ''
+        output: var/food_prices.parquet
       uganda::::food_quantities:
         country: Uganda
         wave: null
@@ -60,6 +67,7 @@ stages:
         format: parquet
         backend: make
         target: ''
+        output: var/food_quantities.parquet
       uganda::::household_characteristics:
         country: Uganda
         wave: null
@@ -67,6 +75,7 @@ stages:
         format: parquet
         backend: make
         target: ''
+        output: var/household_characteristics.parquet
       uganda::::household_roster:
         country: Uganda
         wave: null
@@ -74,6 +83,7 @@ stages:
         format: parquet
         backend: cli
         target: ''
+        output: var/household_roster.parquet
       uganda::::income:
         country: Uganda
         wave: null
@@ -81,6 +91,7 @@ stages:
         format: parquet
         backend: make
         target: ''
+        output: var/income.parquet
       uganda::::interview_date:
         country: Uganda
         wave: null
@@ -88,6 +99,7 @@ stages:
         format: parquet
         backend: make
         target: ''
+        output: var/interview_date.parquet
       uganda::::nutrition:
         country: Uganda
         wave: null
@@ -95,6 +107,7 @@ stages:
         format: parquet
         backend: make
         target: ''
+        output: var/nutrition.parquet
       uganda::::other_features:
         country: Uganda
         wave: null
@@ -102,6 +115,7 @@ stages:
         format: parquet
         backend: make
         target: ''
+        output: var/other_features.parquet
       uganda::::people_last7days:
         country: Uganda
         wave: null
@@ -109,6 +123,7 @@ stages:
         format: parquet
         backend: cli
         target: ''
+        output: var/people_last7days.parquet
       uganda::::shocks:
         country: Uganda
         wave: null
@@ -116,3 +131,4 @@ stages:
         format: parquet
         backend: make
         target: ''
+        output: var/shocks.parquet

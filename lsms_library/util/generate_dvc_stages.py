@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import posixpath
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
@@ -32,6 +33,21 @@ CORE_DEPS = [
 ]
 
 JSON_ONLY_TABLES = {"panel_ids", "updated_ids"}
+
+
+def _default_target(table: str, fmt: str) -> str:
+    """Path (relative to _ directory) for the standard materialized file."""
+    return f"../var/{table}.{fmt}"
+
+
+def _output_from_target(target: str) -> str:
+    """Convert a target relative to `_` into a repo-relative path for DVC outs."""
+    normalized = posixpath.normpath(posixpath.join("_", target))
+    if normalized.startswith("_/"):
+        return normalized[2:]
+    if normalized == "_":
+        return "."
+    return normalized
 
 
 @dataclass(frozen=True)
@@ -134,6 +150,8 @@ def build_materialize_block(
 
     foreach: dict[str, dict[str, str | None]] = {}
     for entry in entries:
+        resolved_target = entry.target or _default_target(entry.table, entry.fmt)
+        output_path = _output_from_target(resolved_target)
         foreach_entry: dict[str, str | None] = {
             "country": entry.country,
             "wave": entry.wave,
@@ -141,6 +159,7 @@ def build_materialize_block(
             "format": entry.fmt,
             "backend": entry.backend,
             "target": entry.target or "",
+            "output": output_path,
         }
         foreach[entry.key] = foreach_entry
 
@@ -162,13 +181,14 @@ def build_materialize_block(
     )
 
     deps = [relative_path(dep, target_dir) for dep in CORE_DEPS]
+    deps.append(runner_path)
     deps.append("_")
 
     materialize = {
         "do": {
             "cmd": cmd,
             "deps": deps,
-            "outs": ["var/${item.table}.${item.format}"],
+            "outs": ["${item.output}"],
         },
         "foreach": foreach,
     }
