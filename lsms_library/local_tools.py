@@ -923,20 +923,39 @@ def map_index(df):
     Map index from old parquet file to new index used in data_info.yml
     -- March 11, 2025
     """
-    mapping_rules = {'w': 't'}
+    index_names = list(df.index.names) if isinstance(df.index, pd.MultiIndex) else [df.index.name]
+
+    mapping_rules = {}
+    if 'w' in index_names:
+        mapping_rules['w'] = 't'
+
     if 'u' in df.index.names:
         df = df.rename(index={k: 'unit' for k in ['<NA>', 'nan', np.nan]}, level='u')
 
+    if mapping_rules:
+        df = df.rename_axis(index=mapping_rules)
+        index_names = list(df.index.names) if isinstance(df.index, pd.MultiIndex) else [df.index.name]
 
-    mapping_rules.update({
-        'i': 'temp_j',
-        'j': 'i',
-        'previous_j': 'previous_i'
-    })
-    df_renamed = df.rename_axis(index=mapping_rules)
-    df_renamed = df_renamed.rename_axis(index = {'temp_j': 'j'})
-    
-    return df_renamed
+    needs_swap = False
+    if 'j' in index_names:
+        if 'i' not in index_names:
+            needs_swap = True
+        else:
+            try:
+                needs_swap = index_names.index('j') < index_names.index('i')
+            except ValueError:
+                needs_swap = True
+
+    if needs_swap:
+        swap_rules = {
+            'i': 'temp_j',
+            'j': 'i',
+            'previous_j': 'previous_i'
+        }
+        df = df.rename_axis(index=swap_rules)
+        df = df.rename_axis(index={'temp_j': 'j'})
+
+    return df
 
 
 import importlib.util

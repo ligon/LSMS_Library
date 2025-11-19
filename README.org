@@ -109,6 +109,33 @@ lsms-library cache clear --country Uganda --method shocks
 lsms-library cache clear --all --dry-run
 #+end_src
 
+** Materialization Backends
+
+Caching cooperates with two other build layers so you can pick the right tool for a task:
+- *DVC stages* live in =lsms_library/countries/<country>/**/dvc.yaml=. Each stage calls =lsms_library.cli materialize= with =LSMS_USE_DVC_CACHE=false= so a fresh dataset is written to =var/*.parquet= before the cache is revalidated. Regenerate these files any time you add a table by running =poetry run python -m lsms_library.util.generate_dvc_stages --countries <Country>=.
+- *Runtime cache loader* (the =Country.table()= API) consumes those =var/*.parquet= files when =LSMS_USE_DVC_CACHE=true= (default), and transparently falls back to the Makefile backend if DVC is unavailable or the data scheme requests it.
+- *Legacy Makefiles* remain available per country/wave under each =_/Makefile=. They are invoked automatically whenever a table is tagged with =materialize: make=, or you can call them directly for debugging.
+
+Typical workflows:
+#+begin_src bash
+# Refresh dvc.yaml definitions after editing metadata
+poetry run python -m lsms_library.util.generate_dvc_stages --countries Uganda
+
+# Regenerate or validate a single stage (updates dvc.lock + cache)
+cd lsms_library/countries
+poetry run dvc repro Uganda/2019-20/dvc.yaml:materialize@uganda::2019_20::household_roster
+
+# Force a one-off rebuild without touching DVC metadata
+LSMS_USE_DVC_CACHE=false lsms-library materialize \
+  --country Uganda --wave 2019-20 --table household_roster \
+  --out /tmp/household_roster.parquet
+
+# Fall back to the legacy rule if you need to inspect Make-only scripts
+make -C lsms_library/countries/Uganda/_ household_roster.parquet
+#+end_src
+
+Tune build parallelism globally with =LSMS_MAKE_JOBS=<n>= (defaults to half of your CPUs) so both DVC and Make invocations reuse the same limit.
+
 * Usage Examples
 
 ** Working with Food Consumption Data
@@ -197,6 +224,10 @@ panel_structure = ll.local_tools.panel_attrition(
 # ...
 # Diagonal shows total households per wave; off-diagonal shows panel overlap
 #+end_src
+
+*Lazy panel IDs*: `ll.Country(...)` now computes `panel_ids`/`updated_ids` only when first accessed,
+keeping instantiation fast for workflows that never touch panel methods. Pass
+`preload_panel_ids=True` if you want to materialize them eagerly (the previous default).
 
 ** Exploring Available Data
 

@@ -42,6 +42,7 @@ dist/*
 .dvc/cache/
 .dvc/tmp/
 .dvc/plots/
+lsms_library/.s3_creds
 
 # Except! Don't ignore specific files within lsms_library/countries/.dvc/
 !lsms_library/countries/.dvc/config

@@ -1,0 +1,28 @@
+stages:
+  materialize:
+    do:
+      cmd: python3 ../../../util/run_stage.py --backend "${item.backend}" --country
+        "${item.country}" --wave "${item.wave}" --table "${item.table}" --format "${item.format}"
+        --target "${item.target}"
+      deps:
+      - ../../../cli.py
+      - ../../../country.py
+      - ../../../local_tools.py
+      - _
+      outs:
+      - var/${item.table}.${item.format}
+    foreach:
+      uganda::2019_20::cluster_features:
+        country: Uganda
+        wave: 2019-20
+        table: cluster_features
+        format: parquet
+        backend: cli
+        target: ''
+      uganda::2019_20::people_last7days:
+        country: Uganda
+        wave: 2019-20
+        table: people_last7days
+        format: parquet
+        backend: cli
+        target: ''
