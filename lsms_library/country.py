@@ -572,7 +572,7 @@ class Country:
     #                 'nonfood_expenditures.parquet', 'enterprise_income.parquet', 'assets.parquet',
     #                 'earnings.parquet', 'housing.parquet', 'income.parquet', 'fct.parquet', 'nutrition.parquet']
 
-    def __init__(self, country_name, preload_panel_ids=True, verbose=False):
+    def __init__(self, country_name, preload_panel_ids=False, verbose=False):
         self.name = country_name
         self._panel_ids_cache = None
         self._updated_ids_cache = None
@@ -970,7 +970,7 @@ class Country:
                 print(f"Makefile build failed for {method_name}: {error}. Falling back to wave aggregation.", file=stderr)
                 result = load_from_waves(waves)
             else:
-                result = load_from_makefile(method_name)
+                result = run_make_target(method_name)
 
             if isinstance(result, dict):
                 cache_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1086,36 +1086,27 @@ class Country:
                 return load_json_cache(method_name)
             return load_dataframe_with_dvc(method_name)
 
-        def load_from_makefile(method_name):
-            """
-            Load data from Makefile if it exists.
-            """
-            return run_make_target(method_name)
-
         df: Any = None
-        if materialize_backend == "make":
-            df = run_make_target(method_name)
-        else:
-            # Use DVC-validated cache for all datasets
-            # Falls back to load_from_makefile for special cases or if DVC fails
-            use_dvc_cache = os.getenv('LSMS_USE_DVC_CACHE', 'true').lower() == 'true'
-            resources = self.resources
-            data_scheme = resources.get('Data Scheme') if isinstance(resources, dict) else {}
-            has_data_scheme_entry = isinstance(data_scheme, dict) and data_scheme.get(method_name) is not None
+        # Use DVC-validated cache for all datasets whenever enabled.
+        use_dvc_cache = os.getenv('LSMS_USE_DVC_CACHE', 'true').lower() == 'true'
+        prefer_make_backend = materialize_backend == "make"
+        resources = self.resources
+        data_scheme = resources.get('Data Scheme') if isinstance(resources, dict) else {}
+        has_data_scheme_entry = isinstance(data_scheme, dict) and data_scheme.get(method_name) is not None
 
-            if not use_dvc_cache and method_name in JSON_CACHE_METHODS:
-                df = load_from_waves(waves)
-            else:
-                try:
-                    if use_dvc_cache:
-                        df = load_with_dvc_cache(method_name)
-                    elif has_data_scheme_entry:
-                        df = load_from_waves(waves)
-                    else:
-                        df = load_from_makefile(method_name)
-                except Exception as error:
-                    _log_issue(self.name, method_name, waves, error)
-                    raise
+        if not use_dvc_cache and method_name in JSON_CACHE_METHODS:
+            df = load_from_waves(waves)
+        else:
+            try:
+                if use_dvc_cache:
+                    df = load_with_dvc_cache(method_name)
+                elif has_data_scheme_entry and not prefer_make_backend:
+                    df = load_from_waves(waves)
+                else:
+                    df = run_make_target(method_name)
+            except Exception as error:
+                _log_issue(self.name, method_name, waves, error)
+                raise
         
         if isinstance(df, dict):
             return df

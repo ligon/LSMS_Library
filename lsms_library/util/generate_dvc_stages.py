@@ -40,6 +40,8 @@ class StageEntry:
     wave: str | None
     table: str
     fmt: str = "parquet"
+    backend: str = "cli"
+    target: str | None = None
 
     @property
     def key(self) -> str:
@@ -62,7 +64,7 @@ def load_yaml_file(path: Path) -> dict:
     return data if isinstance(data, dict) else {}
 
 
-def country_tables(country_dir: Path) -> list[str]:
+def country_stage_entries(country: str, country_dir: Path) -> list[StageEntry]:
     scheme_path = country_dir / "_" / "data_scheme.yml"
     data = load_yaml_file(scheme_path)
     if not isinstance(data, dict):
@@ -70,7 +72,29 @@ def country_tables(country_dir: Path) -> list[str]:
     scheme = data.get("Data Scheme")
     if not isinstance(scheme, dict):
         return []
-    return sorted(k for k in scheme.keys() if isinstance(k, str))
+    entries: list[StageEntry] = []
+    for key, value in scheme.items():
+        if not isinstance(key, str):
+            continue
+        if key in JSON_ONLY_TABLES:
+            continue
+        info = value if isinstance(value, dict) else {}
+        backend = str(info.get("materialize", "cli")).lower()
+        backend = "make" if backend == "make" else "cli"
+        target = info.get("target")
+        fmt = info.get("format", "parquet")
+        entries.append(
+            StageEntry(
+                country=country,
+                wave=None,
+                table=key,
+                fmt=fmt,
+                backend=backend,
+                target=target,
+            )
+        )
+    entries.sort(key=lambda entry: entry.table)
+    return entries
 
 
 def wave_tables(wave_dir: Path) -> list[str]:
@@ -110,25 +134,32 @@ def build_materialize_block(
 
     foreach: dict[str, dict[str, str | None]] = {}
     for entry in entries:
-        foreach[entry.key] = {
+        foreach_entry: dict[str, str | None] = {
             "country": entry.country,
             "wave": entry.wave,
             "table": entry.table,
             "format": entry.fmt,
+            "backend": entry.backend,
+            "target": entry.target or "",
         }
+        foreach[entry.key] = foreach_entry
 
     if include_wave:
-        cmd = (
-            'cd _ && LSMS_USE_DVC_CACHE=false python3 -m lsms_library.cli materialize '
-            '--country "${item.country}" --wave "${item.wave}" --table "${item.table}" '
-            '--format "${item.format}" --out ../var/${item.table}.${item.format}'
-        )
+        wave_arg = '--wave "${item.wave}"'
     else:
-        cmd = (
-            'cd _ && LSMS_USE_DVC_CACHE=false python3 -m lsms_library.cli materialize '
-            '--country "${item.country}" --all-waves --table "${item.table}" '
-            '--format "${item.format}" --out ../var/${item.table}.${item.format}'
-        )
+        wave_arg = "--all-waves"
+
+    runner_path = relative_path(LSMS_ROOT / "util" / "run_stage.py", target_dir)
+
+    cmd = (
+        f"python3 {runner_path} "
+        '--backend "${item.backend}" '
+        '--country "${item.country}" '
+        f"{wave_arg} "
+        '--table "${item.table}" '
+        '--format "${item.format}" '
+        '--target "${item.target}"'
+    )
 
     deps = [relative_path(dep, target_dir) for dep in CORE_DEPS]
     deps.append("_")
@@ -178,14 +209,9 @@ def generate_country(country: str, dry_run: bool) -> bool:
 
     changed = False
     # Country-level stage
-    tables = country_tables(country_dir)
-    if tables:
+    entries = country_stage_entries(country, country_dir)
+    if entries:
         ensure_gitkeep(country_dir / "var", dry_run)
-        entries = [
-            StageEntry(country, None, t)
-            for t in tables
-            if t not in JSON_ONLY_TABLES
-        ]
         data = build_materialize_block(entries, country_dir, include_wave=False)
         changed |= dump_yaml(country_dir / "dvc.yaml", data, dry_run)
 

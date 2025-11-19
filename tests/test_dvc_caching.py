@@ -511,6 +511,23 @@ class TestDVCCaching:
         assert sentinel.exists()
         assert sentinel not in removed
 
+    def test_panel_ids_lazy_by_default(self, mock_country_structure):
+        """Country should not preload panel_ids unless explicitly requested."""
+        resources_payload = {"Data Scheme": {"panel_ids": {}}}
+
+        with patch("lsms_library.country.files") as mock_files, \
+            patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources, \
+            patch.object(Country, "_compute_panel_ids") as mock_compute:
+
+            mock_files.return_value = mock_country_structure.parent.parent
+            mock_resources.return_value = resources_payload
+
+            Country("TestCountry", verbose=False)
+            mock_compute.assert_not_called()
+
+            Country("TestCountry", preload_panel_ids=True, verbose=False)
+            assert mock_compute.call_count == 1
+
 class TestCachePathGeneration:
     """Test cache path generation for different data types."""
 

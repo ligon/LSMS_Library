@@ -225,6 +225,10 @@ panel_structure = ll.local_tools.panel_attrition(
 # Diagonal shows total households per wave; off-diagonal shows panel overlap
 #+end_src
 
+*Lazy panel IDs*: `ll.Country(...)` now computes `panel_ids`/`updated_ids` only when first accessed,
+keeping instantiation fast for workflows that never touch panel methods. Pass
+`preload_panel_ids=True` if you want to materialize them eagerly (the previous default).
+
 ** Exploring Available Data
 
 #+begin_src python
