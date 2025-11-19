@@ -27,6 +27,10 @@ Data Scheme:
     Distance: int
     Affinity: str
 
+  panel_ids:
+    index: (t, i)
+    previous_i: str
+
   assets:
     index: (t, i, j)
     Quantity: float

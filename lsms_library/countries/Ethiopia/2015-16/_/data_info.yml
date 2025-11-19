@@ -44,6 +44,14 @@ cluster_features:
         - t
         - v
 
+panel_ids:
+    file:
+        - ../Data/sect_cover_hh_w3.dta
+    idxvars:
+        i: saq08
+    myvars:
+        previous_i: household_id2
+
 household_roster:
     file: sect1_hh_w3.dta
     idxvars:
