@@ -8,9 +8,10 @@ stages:
       - ../../../cli.py
       - ../../../country.py
       - ../../../local_tools.py
+      - ../../../util/run_stage.py
       - _
       outs:
-      - var/${item.table}.${item.format}
+      - ${item.output}
     foreach:
       uganda::2013_14::cluster_features:
         country: Uganda
@@ -19,6 +20,7 @@ stages:
         format: parquet
         backend: cli
         target: ''
+        output: var/cluster_features.parquet
       uganda::2013_14::people_last7days:
         country: Uganda
         wave: 2013-14
@@ -26,3 +28,4 @@ stages:
         format: parquet
         backend: cli
         target: ''
+        output: var/people_last7days.parquet

@@ -8,9 +8,10 @@ stages:
       - ../../../cli.py
       - ../../../country.py
       - ../../../local_tools.py
+      - ../../../util/run_stage.py
       - _
       outs:
-      - var/${item.table}.${item.format}
+      - ${item.output}
     foreach:
       uganda::2011_12::cluster_features:
         country: Uganda
@@ -19,3 +20,4 @@ stages:
         format: parquet
         backend: cli
         target: ''
+        output: var/cluster_features.parquet
