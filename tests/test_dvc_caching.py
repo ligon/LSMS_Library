@@ -312,7 +312,7 @@ class TestDVCCaching:
         panel_ids_json = mock_country_structure / "_" / "panel_ids.json"
         panel_ids_parquet = mock_country_structure / "_" / "panel_ids.parquet"
 
-        def fake_make(cmd, cwd, check):
+        def fake_make(cmd, cwd, check, **kwargs):
             target = Path(cwd) / cmd[-1]
             data = {"2020-21": {"A": "B"}}
             target.write_text(json.dumps(data))
@@ -370,7 +370,14 @@ class TestDVCCaching:
             patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
             patch.object(Country, "data_scheme", new_callable=PropertyMock) as mock_scheme, \
             patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources, \
-            patch.object(Country, "__getitem__", return_value=SimpleNamespace(panel_ids=lambda: dataframe_result)) as mock_getitem, \
+            patch.object(
+                Country,
+                "__getitem__",
+                return_value=SimpleNamespace(
+                    panel_ids=lambda: dataframe_result,
+                    data_scheme=["panel_ids"],
+                ),
+            ) as mock_getitem, \
             patch("lsms_library.country.map_index", side_effect=lambda df: df):
 
             mock_files.return_value = mock_country_structure.parent.parent
@@ -403,6 +410,7 @@ class TestDVCCaching:
                 [("2020-21", "A"), ("2020-21", "B")], names=["t", "i"]
             ),
         )
+        expected_df = df.reorder_levels(["i", "t"])
 
         stage_key = "testcountry::2020_21::household_roster"
         build_output_path = mock_country_structure.parent / "build/TestCountry/2020-21/household_roster.parquet"
@@ -453,11 +461,11 @@ class TestDVCCaching:
 
             first = country._aggregate_wave_data(method_name="household_roster")
             assert cache_path.exists()
-            pd.testing.assert_frame_equal(first, df)
+            pd.testing.assert_frame_equal(first, expected_df)
             mock_repo.reproduce.assert_called_once_with(stage_info.stage_ref)
 
             second = country._aggregate_wave_data(method_name="household_roster")
-            pd.testing.assert_frame_equal(second, df)
+            pd.testing.assert_frame_equal(second, expected_df)
         assert mock_repo.reproduce.call_count == 1, "Second call should not rerun DVC stage"
         assert mock_get_dataframe.call_args_list[-1][0][0] == cache_path
 
@@ -488,6 +496,20 @@ class TestDVCCaching:
 
         assert cache_path.exists()
         assert cache_path in removed
+
+    def test_clear_cache_ignores_non_cache_json(self, mock_country_structure):
+        """clear_cache should not remove non-cache JSON helpers."""
+        sentinel = mock_country_structure / "_" / "conversion_to_kgs.json"
+        sentinel.parent.mkdir(parents=True, exist_ok=True)
+        sentinel.write_text("{}", encoding="utf-8")
+
+        with patch("lsms_library.country.files") as mock_files:
+            mock_files.return_value = mock_country_structure.parent.parent
+            country = Country("TestCountry", preload_panel_ids=False)
+            removed = country.clear_cache()
+
+        assert sentinel.exists()
+        assert sentinel not in removed
 
 class TestCachePathGeneration:
     """Test cache path generation for different data types."""

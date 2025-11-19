@@ -26,6 +26,8 @@ from dvc.exceptions import DvcException, PathMissingError
 from datetime import datetime
 from typing import Any
 
+JSON_CACHE_METHODS = {'panel_ids', 'updated_ids'}
+
 
 def _slugify(value: str) -> str:
     return value.lower().replace(" ", "_").replace("-", "_")
@@ -788,7 +790,7 @@ class Country:
             script_path = next((p for p in script_candidates if p.exists()), None)
 
             output_candidates: list[Path] = []
-            if method_name in json_cache_methods:
+            if method_name in JSON_CACHE_METHODS:
                 if wave is not None:
                     output_candidates.append(base_path / "_" / f"{method_name}.json")
                 output_candidates.append(self.file_path / "_" / f"{method_name}.json")
@@ -813,7 +815,7 @@ class Country:
                 return pd.DataFrame()
 
             cwd_path = makefile_dir if makefile_dir is not None else script_path.parent
-            if method_name in json_cache_methods:
+            if method_name in JSON_CACHE_METHODS:
                 target_path = unique_candidates[0]
             else:
                 target_path = unique_candidates[0]
@@ -922,7 +924,7 @@ class Country:
                 results[w] = wave_result
 
             if results:
-                if method_name in json_cache_methods:
+                if method_name in JSON_CACHE_METHODS:
                     dict_payloads = {k: v for k, v in results.items() if isinstance(v, dict)}
                     df_payloads = {k: v for k, v in results.items() if isinstance(v, pd.DataFrame)}
                     if dict_payloads and not df_payloads:
@@ -949,8 +951,6 @@ class Country:
                 return country_fallback
 
             raise KeyError(f"No data found for {method_name} in any wave of {self.name}.")
-
-        json_cache_methods = {'panel_ids', 'updated_ids'}
 
         def load_json_cache(method_name):
             cache_path = self.file_path / "_" / f"{method_name}.json"
@@ -1082,7 +1082,7 @@ class Country:
             return combined_outputs
 
         def load_with_dvc_cache(method_name):
-            if method_name in json_cache_methods:
+            if method_name in JSON_CACHE_METHODS:
                 return load_json_cache(method_name)
             return load_dataframe_with_dvc(method_name)
 
@@ -1103,7 +1103,7 @@ class Country:
             data_scheme = resources.get('Data Scheme') if isinstance(resources, dict) else {}
             has_data_scheme_entry = isinstance(data_scheme, dict) and data_scheme.get(method_name) is not None
 
-            if not use_dvc_cache and method_name in json_cache_methods:
+            if not use_dvc_cache and method_name in JSON_CACHE_METHODS:
                 df = load_from_waves(waves)
             else:
                 try:
@@ -1182,6 +1182,8 @@ class Country:
 
         datasets = []
         for path in cache_files:
+            if path.suffix == ".json" and path.stem not in JSON_CACHE_METHODS:
+                continue
             datasets.append(path.stem)
         return sorted(set(datasets))
 
@@ -1206,6 +1208,8 @@ class Country:
             var_cache = self.file_path / "var" / f"{method}.parquet"
 
             for candidate in (json_cache, parquet_cache, var_cache):
+                if candidate.suffix == ".json" and candidate.stem not in JSON_CACHE_METHODS:
+                    continue
                 if candidate.exists():
                     removed.append(candidate)
                     if not dry_run:
