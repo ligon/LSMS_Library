@@ -1,0 +1,10 @@
+
+Country: Albania
+
+Data Scheme:
+  household_roster:
+    index: (i, pid, t)
+    Sex: int
+    Age: float
+    Relation: int
+    Marital: int

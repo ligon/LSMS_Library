@@ -1,0 +1,45 @@
+Country: Albania
+Wave: 2003
+
+household_roster:
+    file:
+        - ../Data/w2_roster_all.dta
+
+    idxvars:
+        i: BHID
+        pid: B1_Q01
+
+    myvars:
+        Sex:
+            - B1_Q04
+            - mapping:
+                1: Male
+                2: Female
+
+        Age: B1_Q06
+
+        Marital:
+            - B1_Q18
+            - mapping:
+                1: Married
+                2: Divorced/Separated
+                3: Living together
+                4: Widow/er
+                5: Single
+
+        Relation:
+            - B1_Q17
+            - mapping:
+                1: Head
+                2: Spouse/Partner
+                3: Child/Adopted child
+                4: Grandchild
+                5: Niece/Nephew
+                6: Father/Mother
+                7: Sister/Brother
+                8: Son/Daughter in law
+                9: Brother/Sister in law
+                10: Grandfather/Mother
+                11: Father/Mother in law
+                12: Other relative
+                13: Not related
