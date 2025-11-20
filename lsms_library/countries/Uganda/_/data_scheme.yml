@@ -9,7 +9,7 @@ Data Scheme:
     Girls : int
 
   cluster_features:
-    index: (i,t,v)
+    index: (t,v)
   
   household_roster:
     index: (i, pid, t)
