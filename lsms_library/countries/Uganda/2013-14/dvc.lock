@@ -10,8 +10,8 @@ stages:
       size: 15679
     - path: ../../../country.py
       hash: md5
-      md5: 088f17b929cb103613a7e1b67c993099
-      size: 63517
+      md5: ebb0cbd7edb3c4a1e83de68337740318
+      size: 61034
     - path: ../../../local_tools.py
       hash: md5
       md5: 64b7664a0daadf52128d0da52cb11056
@@ -23,9 +23,9 @@ stages:
       size: 2502
     - path: _
       hash: md5
-      md5: a532e53fe792ddbe47fadf475b153a5c.dir
-      size: 624241
-      nfiles: 20
+      md5: b7db10678980319f94e0050a46cceb3e.dir
+      size: 598521
+      nfiles: 19
     outs:
     - path: var/cluster_features.parquet
       hash: md5

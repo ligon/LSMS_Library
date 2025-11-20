@@ -18,7 +18,7 @@
     to install dependencies which allow =dvc= to work with google
     drive and s3 buckets.  Provided you have a reasonably modern =python=
     installation (if you don't we recommend
-    https://www.anaconda.com/), a simple =pip install 'dvc[gdrive]'= and =pip install 'dvc[s3]'= may do the trick.  Some shells (e.g., the default zsh on Macs) may require you to escape the square brackets, e.g., =pip install dvc\[s3\]=.
+    https://www.anaconda.com/), a simple  =pip install 'dvc[s3]'= may do the trick.  Some shells (e.g., the default zsh on Macs) may require you to escape the square brackets, e.g., =pip install dvc\[s3\]=.
 
   - =gnupg=, for managing encryption.
 
@@ -46,7 +46,6 @@
    DVC manages the versioning of more-or-less static datasets.
    To install,
    #+begin_src sh
-   pip install dvc[gdrive]
    pip install dvc[s3]
    #+end_src
 The private key for accessing the data on google drive is found in the file =gdrive_data_store.json.gpg=.  The =gpg= string indicates that this file is encrypted, in this case using a secret passphrase.
@@ -93,7 +92,7 @@ Similarly, the private key for /accessing/ data on the s3 data store is found in
    authentication helpers work consistently inside the virtualenv.
 * Streaming dvc files
    A =dvc pull= will download dvc files to your local repository.
-   But this may not be the best way to proceed!  In particular, =dvc=
+   But this is usually not the best way to proceed!  In particular, =dvc=
    offers an api which permits one to "stream" or cache files, leaving
    your storage local to the working repository free of big data
    files.
@@ -291,7 +290,7 @@ Write access to the remote s3 repository requires additional credentials; contac
 
 This guide explains how to organize ~data_scheme.yml~, ~data_info.yml~, and optional Python helpers so the loader can build tidy DataFrames for each survey wave. Keep indentation consistent—YAML is picky, and a slipped space will raise a parsing error.
 
-** 1. Directory Layout
+** Directory Layout
 
 Every country lives under ~lsms_library/countries/<Country>~. Inside each country you’ll find a shared ~=_/= directory for cross-wave settings and one subdirectory per wave:
 
@@ -308,7 +307,7 @@ Malawi/
       … Stata/Parquet files tracked by DVC …
 #+end_example
 
-** 2. Describe Tables in ~data_scheme.yml~
+**  Describe Tables in ~data_scheme.yml~
 
 The country-level scheme names each standardized table, lists its multi-index, and defines column types. Use the same keys the Python API exposes (e.g., ~food_acquired~, ~household_roster~). A concise example from ~lsms_library/countries/Malawi/_/data_scheme.yml:1~:
 
@@ -330,7 +329,7 @@ Data Scheme:
 
 Keep index labels aligned with the loaders in ~lsms_library/local_tools.py~; ~t~ is the survey wave, ~i~ household id, ~v~ cluster, and so on.
 
-** 3. Author ~data_info.yml~ for Each Wave
+**  Author ~data_info.yml~ for Each Wave
 
 Each wave’s ~=_/data_info.yml~ maps survey files to the scheme. Begin with ~Country~ and ~Wave~, then add one top-level key per table listed in the scheme. For each table define:
 
@@ -338,7 +337,7 @@ Each wave’s ~=_/data_info.yml~ maps survey files to the scheme. Begin with ~Co
 - ~idxvars~: how to construct each index column.
 - ~myvars~: value columns.
 
-*** 3.1 Basic Structure
+***  Basic Structure
 
 From ~lsms_library/countries/Mali/2021-22/_/data_info.yml:4~:
 
@@ -362,7 +361,7 @@ household_roster:
 
 Lists inside ~idxvars~ signal a composite key. The loader passes that list into ~local_tools.df_data_grabber~ to build the final identifier.
 
-*** 3.2 Value Mappings and Inline Fixes
+*** Value Mappings and Inline Fixes
 
 You can normalise categorical labels or repair known errors inline. The Uganda 2005–06 roster (~lsms_library/countries/Uganda/2005-06/_/data_info.yml:32~) shows both comment style and a mapping dictionary:
 
@@ -376,7 +375,7 @@ cluster_features:
     Region:
       - region
       -
-        0: "Central"   # Kampala households coded as 0
+        0: "Central"   # Kampala households coded as 0, remap to "Central"
     Rural:
       - urban
       -
@@ -386,7 +385,7 @@ cluster_features:
 
 Leave a blank line between the column name and its dictionary so YAML treats the mapping as part of the list.
 
-*** 3.3 Referencing Categorical Mapping Tables
+*** Referencing Categorical Mapping Tables
 
 For large synonym lists, link to a pre-built mapping table instead of hard-coding values. The Mali food acquisition block (~lsms_library/countries/Mali/2021-22/_/data_info.yml:29~) uses the ~mappings~ helper to pull replacements from ~categorical_mapping/harmonize_food~:
 
@@ -403,7 +402,7 @@ food_acquired:
 
 The loader fetches the named table, then aligns the “Original Label” column to the canonical “Preferred Label”.
 
-*** 3.4 Multiple Source Files and Overrides
+*** Multiple Source Files and Overrides
 
 Use a list under ~file~ to stitch together cross-sectional and panel inputs. You can override column mappings for a specific file by supplying a dictionary. Malawi 2019–20 (~lsms_library/countries/Malawi/2019-20/_/data_info.yml:4~) illustrates both patterns:
 
@@ -421,20 +420,20 @@ household_roster:
     pid: PID
 #+end_src
 
-*** 3.5 Boolean Flags and Other Transformations
+*** Boolean Flags and Other Transformations
 
 Add a ~mapping: {<raw>: <clean>}~ block to coerce values, or point to a function when the built-ins are insufficient. In the previous example, ~function: cs_i~ calls a helper defined in ~lsms_library/countries/Malawi/_/malawi.py~. If every source file needs the same formatter, name the helper after the column (e.g., define ~def i(...):~) and skip the explicit ~function~ key.
 
-** 4. Python Helpers for Advanced Cases
+** Python Helpers for Advanced Cases
 
 Some datasets need more than simple mappings—row-level fixes, custom joins, or Makefile-driven builds. You can:
 
 - Create ~<Country>/_/<country>.py~ for helpers shared across waves.
 - Create ~<Country>/<Wave>/_/<Wave>.py~ for wave-specific logic.
 - Provide a function named after the table (e.g., ~def food_acquired(df):~) to post-process the assembled DataFrame.
-- For very custom builds, drop a ~Makefile~ into the wave or country directory; tables tagged ~# USE_MAKEFILE~ in ~data_scheme.yml~ will invoke it.
+- For very custom builds, drop (or add to) a ~Makefile~ into the wave or country directory; tables tagged ~# USE_MAKEFILE~ in ~data_scheme.yml~ will invoke it.
 
-** 5. Validate Your YAML
+** Validate Your YAML
 
 Before opening a pull request:
 

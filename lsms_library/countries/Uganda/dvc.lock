@@ -6,12 +6,12 @@ stages:
     deps:
     - path: ../../cli.py
       hash: md5
-      md5: b8258c9eec4a73a1df397f88ef8f9167
-      size: 19109
+      md5: 35168707be75b76a6f8d6d40e4e24bcf
+      size: 15679
     - path: ../../country.py
       hash: md5
-      md5: c553362d1d01df96b6722c42fcd8d8dc
-      size: 70180
+      md5: ebb0cbd7edb3c4a1e83de68337740318
+      size: 61034
     - path: ../../local_tools.py
       hash: md5
       md5: 64b7664a0daadf52128d0da52cb11056
@@ -23,9 +23,9 @@ stages:
       size: 2502
     - path: _
       hash: md5
-      md5: 77385a15ad717eb368063ffbe3f5e1a3.dir
-      size: 3482994
-      nfiles: 40
+      md5: 1b89c46685b2c9ceec9c148c3ecce0c7.dir
+      size: 3490075
+      nfiles: 39
     outs:
     - path: var/income.parquet
       hash: md5
@@ -38,12 +38,12 @@ stages:
     deps:
     - path: ../../cli.py
       hash: md5
-      md5: b8258c9eec4a73a1df397f88ef8f9167
-      size: 19109
+      md5: 35168707be75b76a6f8d6d40e4e24bcf
+      size: 15679
     - path: ../../country.py
       hash: md5
-      md5: c553362d1d01df96b6722c42fcd8d8dc
-      size: 70180
+      md5: ebb0cbd7edb3c4a1e83de68337740318
+      size: 61034
     - path: ../../local_tools.py
       hash: md5
       md5: 64b7664a0daadf52128d0da52cb11056
@@ -55,9 +55,9 @@ stages:
       size: 2502
     - path: _
       hash: md5
-      md5: 77385a15ad717eb368063ffbe3f5e1a3.dir
-      size: 3482994
-      nfiles: 40
+      md5: 1b89c46685b2c9ceec9c148c3ecce0c7.dir
+      size: 3490075
+      nfiles: 39
     outs:
     - path: var/household_characteristics.parquet
       hash: md5
@@ -69,12 +69,12 @@ stages:
     deps:
     - path: ../../cli.py
       hash: md5
-      md5: df6d6462ac6c2e1c53ae8c334fcb4a84
-      size: 19265
+      md5: 35168707be75b76a6f8d6d40e4e24bcf
+      size: 15679
     - path: ../../country.py
       hash: md5
-      md5: f2b23bf85d43446fc0a95e92d2da5e66
-      size: 65070
+      md5: ebb0cbd7edb3c4a1e83de68337740318
+      size: 61034
     - path: ../../local_tools.py
       hash: md5
       md5: 64b7664a0daadf52128d0da52cb11056
@@ -86,9 +86,9 @@ stages:
       size: 2502
     - path: _
       hash: md5
-      md5: 77385a15ad717eb368063ffbe3f5e1a3.dir
-      size: 3482994
-      nfiles: 40
+      md5: 1b89c46685b2c9ceec9c148c3ecce0c7.dir
+      size: 3490075
+      nfiles: 39
     outs:
     - path: var/food_expenditures.parquet
       hash: md5
@@ -100,12 +100,12 @@ stages:
     deps:
     - path: ../../cli.py
       hash: md5
-      md5: df6d6462ac6c2e1c53ae8c334fcb4a84
-      size: 19265
+      md5: 35168707be75b76a6f8d6d40e4e24bcf
+      size: 15679
     - path: ../../country.py
       hash: md5
-      md5: f2b23bf85d43446fc0a95e92d2da5e66
-      size: 65070
+      md5: ebb0cbd7edb3c4a1e83de68337740318
+      size: 61034
     - path: ../../local_tools.py
       hash: md5
       md5: 64b7664a0daadf52128d0da52cb11056
@@ -117,9 +117,9 @@ stages:
       size: 2502
     - path: _
       hash: md5
-      md5: 77385a15ad717eb368063ffbe3f5e1a3.dir
-      size: 3482994
-      nfiles: 40
+      md5: 1b89c46685b2c9ceec9c148c3ecce0c7.dir
+      size: 3490075
+      nfiles: 39
     outs:
     - path: var/shocks.parquet
       hash: md5
@@ -131,12 +131,12 @@ stages:
     deps:
     - path: ../../cli.py
       hash: md5
-      md5: df6d6462ac6c2e1c53ae8c334fcb4a84
-      size: 19265
+      md5: 69304b146cc0667cf417008799a06399
+      size: 14255
     - path: ../../country.py
       hash: md5
-      md5: f2b23bf85d43446fc0a95e92d2da5e66
-      size: 65070
+      md5: 04f276f98cf275236a3d7c26c8bc522f
+      size: 60025
     - path: ../../local_tools.py
       hash: md5
       md5: 64b7664a0daadf52128d0da52cb11056
@@ -148,26 +148,26 @@ stages:
       size: 2502
     - path: _
       hash: md5
-      md5: 77385a15ad717eb368063ffbe3f5e1a3.dir
-      size: 3482994
-      nfiles: 40
+      md5: 03087419806cb0b4e3b55a5461cc84d3.dir
+      size: 3479625
+      nfiles: 39
     outs:
     - path: var/cluster_features.parquet
       hash: md5
-      md5: 860797d091d12acf2297ea7d87ad8fff
-      size: 32429
+      md5: a651ce40ad273a4ca45350a1f0ff0576
+      size: 353876
   materialize@uganda::::food_quantities:
     cmd: python3 ../../util/run_stage.py --backend "make" --country "Uganda" 
       --all-waves --table "food_quantities" --format "parquet" --target ""
     deps:
     - path: ../../cli.py
       hash: md5
-      md5: df6d6462ac6c2e1c53ae8c334fcb4a84
-      size: 19265
+      md5: 35168707be75b76a6f8d6d40e4e24bcf
+      size: 15679
     - path: ../../country.py
       hash: md5
-      md5: f2b23bf85d43446fc0a95e92d2da5e66
-      size: 65070
+      md5: ebb0cbd7edb3c4a1e83de68337740318
+      size: 61034
     - path: ../../local_tools.py
       hash: md5
       md5: 64b7664a0daadf52128d0da52cb11056
@@ -179,9 +179,9 @@ stages:
       size: 2502
     - path: _
       hash: md5
-      md5: 77385a15ad717eb368063ffbe3f5e1a3.dir
-      size: 3482994
-      nfiles: 40
+      md5: 1b89c46685b2c9ceec9c148c3ecce0c7.dir
+      size: 3490075
+      nfiles: 39
     outs:
     - path: var/food_quantities.parquet
       hash: md5
@@ -193,12 +193,12 @@ stages:
     deps:
     - path: ../../cli.py
       hash: md5
-      md5: df6d6462ac6c2e1c53ae8c334fcb4a84
-      size: 19265
+      md5: 35168707be75b76a6f8d6d40e4e24bcf
+      size: 15679
     - path: ../../country.py
       hash: md5
-      md5: 0c5226080fccdc6289f763bfdda91dc3
-      size: 69601
+      md5: ebb0cbd7edb3c4a1e83de68337740318
+      size: 61034
     - path: ../../local_tools.py
       hash: md5
       md5: 64b7664a0daadf52128d0da52cb11056
@@ -210,9 +210,9 @@ stages:
       size: 2502
     - path: _
       hash: md5
-      md5: 77385a15ad717eb368063ffbe3f5e1a3.dir
-      size: 3482994
-      nfiles: 40
+      md5: 1b89c46685b2c9ceec9c148c3ecce0c7.dir
+      size: 3490075
+      nfiles: 39
     outs:
     - path: var/other_features.parquet
       hash: md5
@@ -224,12 +224,12 @@ stages:
     deps:
     - path: ../../cli.py
       hash: md5
-      md5: df6d6462ac6c2e1c53ae8c334fcb4a84
-      size: 19265
+      md5: 69304b146cc0667cf417008799a06399
+      size: 14255
     - path: ../../country.py
       hash: md5
-      md5: f2b23bf85d43446fc0a95e92d2da5e66
-      size: 65070
+      md5: 04f276f98cf275236a3d7c26c8bc522f
+      size: 60025
     - path: ../../local_tools.py
       hash: md5
       md5: 64b7664a0daadf52128d0da52cb11056
@@ -241,9 +241,9 @@ stages:
       size: 2502
     - path: _
       hash: md5
-      md5: 77385a15ad717eb368063ffbe3f5e1a3.dir
-      size: 3482994
-      nfiles: 40
+      md5: 03087419806cb0b4e3b55a5461cc84d3.dir
+      size: 3479625
+      nfiles: 39
     outs:
     - path: var/household_roster.parquet
       hash: md5
@@ -255,12 +255,12 @@ stages:
     deps:
     - path: ../../cli.py
       hash: md5
-      md5: df6d6462ac6c2e1c53ae8c334fcb4a84
-      size: 19265
+      md5: 35168707be75b76a6f8d6d40e4e24bcf
+      size: 15679
     - path: ../../country.py
       hash: md5
-      md5: f2b23bf85d43446fc0a95e92d2da5e66
-      size: 65070
+      md5: ebb0cbd7edb3c4a1e83de68337740318
+      size: 61034
     - path: ../../local_tools.py
       hash: md5
       md5: 64b7664a0daadf52128d0da52cb11056
@@ -272,9 +272,9 @@ stages:
       size: 2502
     - path: _
       hash: md5
-      md5: 77385a15ad717eb368063ffbe3f5e1a3.dir
-      size: 3482994
-      nfiles: 40
+      md5: 1b89c46685b2c9ceec9c148c3ecce0c7.dir
+      size: 3490075
+      nfiles: 39
     outs:
     - path: var/food_prices.parquet
       hash: md5
@@ -286,12 +286,12 @@ stages:
     deps:
     - path: ../../cli.py
       hash: md5
-      md5: df6d6462ac6c2e1c53ae8c334fcb4a84
-      size: 19265
+      md5: 69304b146cc0667cf417008799a06399
+      size: 14255
     - path: ../../country.py
       hash: md5
-      md5: f2b23bf85d43446fc0a95e92d2da5e66
-      size: 65070
+      md5: 04f276f98cf275236a3d7c26c8bc522f
+      size: 60025
     - path: ../../local_tools.py
       hash: md5
       md5: 64b7664a0daadf52128d0da52cb11056
@@ -303,9 +303,9 @@ stages:
       size: 2502
     - path: _
       hash: md5
-      md5: 77385a15ad717eb368063ffbe3f5e1a3.dir
-      size: 3482994
-      nfiles: 40
+      md5: 03087419806cb0b4e3b55a5461cc84d3.dir
+      size: 3479625
+      nfiles: 39
     outs:
     - path: var/interview_date.parquet
       hash: md5
@@ -348,12 +348,12 @@ stages:
     deps:
     - path: ../../cli.py
       hash: md5
-      md5: df6d6462ac6c2e1c53ae8c334fcb4a84
-      size: 19265
+      md5: 69304b146cc0667cf417008799a06399
+      size: 14255
     - path: ../../country.py
       hash: md5
-      md5: f2b23bf85d43446fc0a95e92d2da5e66
-      size: 65070
+      md5: 04f276f98cf275236a3d7c26c8bc522f
+      size: 60025
     - path: ../../local_tools.py
       hash: md5
       md5: 64b7664a0daadf52128d0da52cb11056
@@ -365,9 +365,9 @@ stages:
       size: 2502
     - path: _
       hash: md5
-      md5: 77385a15ad717eb368063ffbe3f5e1a3.dir
-      size: 3482994
-      nfiles: 40
+      md5: 03087419806cb0b4e3b55a5461cc84d3.dir
+      size: 3479625
+      nfiles: 39
     outs:
     - path: var/enterprise_income.parquet
       hash: md5
@@ -379,12 +379,12 @@ stages:
     deps:
     - path: ../../cli.py
       hash: md5
-      md5: df6d6462ac6c2e1c53ae8c334fcb4a84
-      size: 19265
+      md5: 69304b146cc0667cf417008799a06399
+      size: 14255
     - path: ../../country.py
       hash: md5
-      md5: f2b23bf85d43446fc0a95e92d2da5e66
-      size: 65070
+      md5: 04f276f98cf275236a3d7c26c8bc522f
+      size: 60025
     - path: ../../local_tools.py
       hash: md5
       md5: 64b7664a0daadf52128d0da52cb11056
@@ -396,9 +396,9 @@ stages:
       size: 2502
     - path: _
       hash: md5
-      md5: 77385a15ad717eb368063ffbe3f5e1a3.dir
-      size: 3482994
-      nfiles: 40
+      md5: 03087419806cb0b4e3b55a5461cc84d3.dir
+      size: 3479625
+      nfiles: 39
     outs:
     - path: var/food_acquired.parquet
       hash: md5
@@ -410,12 +410,12 @@ stages:
     deps:
     - path: ../../cli.py
       hash: md5
-      md5: df6d6462ac6c2e1c53ae8c334fcb4a84
-      size: 19265
+      md5: 35168707be75b76a6f8d6d40e4e24bcf
+      size: 15679
     - path: ../../country.py
       hash: md5
-      md5: f2b23bf85d43446fc0a95e92d2da5e66
-      size: 65070
+      md5: ebb0cbd7edb3c4a1e83de68337740318
+      size: 61034
     - path: ../../local_tools.py
       hash: md5
       md5: 64b7664a0daadf52128d0da52cb11056
@@ -427,26 +427,26 @@ stages:
       size: 2502
     - path: _
       hash: md5
-      md5: 77385a15ad717eb368063ffbe3f5e1a3.dir
-      size: 3482994
+      md5: f7114bc98611d4b9bf777336efc54fd0.dir
+      size: 3482996
       nfiles: 40
     outs:
     - path: var/nutrition.parquet
       hash: md5
-      md5: d6b19f06acfa9c116c0f35445ab54226
-      size: 3100569
+      md5: e4587d7d9dbec207d42fd6ef463ff540
+      size: 3100634
   materialize@uganda::::people_last7days:
     cmd: python3 ../../util/run_stage.py --backend "cli" --country "Uganda" 
       --all-waves --table "people_last7days" --format "parquet" --target ""
     deps:
     - path: ../../cli.py
       hash: md5
-      md5: b8258c9eec4a73a1df397f88ef8f9167
-      size: 19109
+      md5: 35168707be75b76a6f8d6d40e4e24bcf
+      size: 15679
     - path: ../../country.py
       hash: md5
-      md5: c553362d1d01df96b6722c42fcd8d8dc
-      size: 70180
+      md5: ebb0cbd7edb3c4a1e83de68337740318
+      size: 61034
     - path: ../../local_tools.py
       hash: md5
       md5: 64b7664a0daadf52128d0da52cb11056
@@ -458,11 +458,11 @@ stages:
       size: 2502
     - path: _
       hash: md5
-      md5: 77385a15ad717eb368063ffbe3f5e1a3.dir
-      size: 3482994
+      md5: f7114bc98611d4b9bf777336efc54fd0.dir
+      size: 3482996
       nfiles: 40
     outs:
     - path: var/people_last7days.parquet
       hash: md5
-      md5: fac4ffa053668e7dc0fcf558588a6001
-      size: 88570
+      md5: d2518799e3848023cfc3b4bbaec6cf22
+      size: 313145
