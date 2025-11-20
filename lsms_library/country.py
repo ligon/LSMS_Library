@@ -24,7 +24,7 @@ import sys
 from dvc.repo import Repo
 from dvc.exceptions import DvcException, PathMissingError
 from datetime import datetime
-from typing import Any
+from typing import Any, Iterable
 from contextlib import contextmanager
 
 JSON_CACHE_METHODS = {'panel_ids', 'updated_ids'}
@@ -929,6 +929,9 @@ class Country:
                 if use_legacy:
                     wave_result = run_make_target(method_name, wave=w)
 
+                if isinstance(wave_result, pd.DataFrame):
+                    wave_result = _normalize_dataframe_index(wave_result, scheme_entry, w)
+
                 if wave_result is None and not wave_has_table:
                     continue
                 if isinstance(wave_result, pd.DataFrame) and wave_result.empty:
@@ -1047,6 +1050,7 @@ class Country:
                             if output_path.exists():
                                 df_wave = get_dataframe(output_path)
                                 df_wave = map_index(df_wave)
+                                df_wave = _normalize_dataframe_index(df_wave, scheme_entry, stage.wave)
                                 stage_results[stage.wave or "ALL"] = df_wave
                         return stage_results
 
@@ -1126,6 +1130,9 @@ class Country:
         
         if isinstance(df, dict):
             return df
+
+        if isinstance(df, pd.DataFrame):
+            df = _normalize_dataframe_index(df, scheme_entry, None)
 
         if isinstance(df, pd.DataFrame) and isinstance(df.index, pd.MultiIndex):
             index_names = list(df.index.names)
@@ -1438,3 +1445,62 @@ class Country:
 #         r = rgsn.Regression(y=np.log(x.replace(0,np.nan).dropna()),
 #                             d=z,**kwargs)
 #         return r
+def _normalize_dataframe_index(
+    df: pd.DataFrame,
+    schema_entry: dict[str, Any],
+    wave: str | None,
+) -> pd.DataFrame:
+    """
+    Reorder and reduce a dataframe's MultiIndex to match the declared schema.
+
+    - Reorders index levels to match the declared order.
+    - Drops unexpected index levels.
+    - Synthesizes missing 't' levels for wave-specific tables.
+    - Collapses duplicate entries via first-observation aggregation.
+    """
+
+    if not isinstance(df, pd.DataFrame) or not isinstance(df.index, pd.MultiIndex):
+        return df
+
+    declared_levels: Iterable[str] | None = schema_entry.get("index")
+    if isinstance(declared_levels, str):
+        cleaned = declared_levels.strip()
+        if cleaned.startswith("(") and cleaned.endswith(")"):
+            cleaned = cleaned[1:-1]
+        declared_levels = [token.strip() for token in cleaned.split(",") if token.strip()]
+    if not declared_levels:
+        return df
+
+    declared = [str(level) for level in declared_levels]
+
+    current_names = list(df.index.names)
+
+    # Add synthetic levels when declared but missing (e.g., 't' for wave outputs)
+    missing_levels = [lvl for lvl in declared if lvl not in current_names]
+    if missing_levels:
+        df = df.reset_index()
+        for level in missing_levels:
+            if level == "t" and wave is not None:
+                df[level] = wave
+        df = df.set_index(declared)
+        current_names = list(df.index.names)
+
+    # Reorder levels to match declaration
+    present_declared = [lvl for lvl in declared if lvl in current_names]
+    if present_declared:
+        remaining = [lvl for lvl in current_names if lvl not in present_declared]
+        try:
+            df = df.reorder_levels(present_declared + remaining)
+        except Exception:
+            pass
+
+    # Drop any unexpected index levels
+    extra_levels = [lvl for lvl in df.index.names if lvl not in declared]
+    if extra_levels:
+        df = df.droplevel(extra_levels)
+
+    # Aggregate duplicates if any remain
+    if not df.index.is_unique:
+        df = df.groupby(level=declared).first()
+
+    return df
