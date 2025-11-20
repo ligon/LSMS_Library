@@ -23,8 +23,8 @@ stages:
       size: 2502
     - path: _
       hash: md5
-      md5: f7114bc98611d4b9bf777336efc54fd0.dir
-      size: 3482996
+      md5: 77385a15ad717eb368063ffbe3f5e1a3.dir
+      size: 3482994
       nfiles: 40
     outs:
     - path: var/income.parquet
@@ -55,8 +55,8 @@ stages:
       size: 2502
     - path: _
       hash: md5
-      md5: f7114bc98611d4b9bf777336efc54fd0.dir
-      size: 3482996
+      md5: 77385a15ad717eb368063ffbe3f5e1a3.dir
+      size: 3482994
       nfiles: 40
     outs:
     - path: var/household_characteristics.parquet
@@ -69,12 +69,12 @@ stages:
     deps:
     - path: ../../cli.py
       hash: md5
-      md5: 69304b146cc0667cf417008799a06399
-      size: 14255
+      md5: 35168707be75b76a6f8d6d40e4e24bcf
+      size: 15679
     - path: ../../country.py
       hash: md5
-      md5: ebb0cbd7edb3c4a1e83de68337740318
-      size: 61034
+      md5: 088f17b929cb103613a7e1b67c993099
+      size: 63517
     - path: ../../local_tools.py
       hash: md5
       md5: 64b7664a0daadf52128d0da52cb11056
@@ -86,9 +86,9 @@ stages:
       size: 2502
     - path: _
       hash: md5
-      md5: 03087419806cb0b4e3b55a5461cc84d3.dir
-      size: 3479625
-      nfiles: 39
+      md5: 77385a15ad717eb368063ffbe3f5e1a3.dir
+      size: 3482994
+      nfiles: 40
     outs:
     - path: var/food_expenditures.parquet
       hash: md5
@@ -100,12 +100,12 @@ stages:
     deps:
     - path: ../../cli.py
       hash: md5
-      md5: 69304b146cc0667cf417008799a06399
-      size: 14255
+      md5: 35168707be75b76a6f8d6d40e4e24bcf
+      size: 15679
     - path: ../../country.py
       hash: md5
-      md5: 04f276f98cf275236a3d7c26c8bc522f
-      size: 60025
+      md5: 088f17b929cb103613a7e1b67c993099
+      size: 63517
     - path: ../../local_tools.py
       hash: md5
       md5: 64b7664a0daadf52128d0da52cb11056
@@ -117,9 +117,9 @@ stages:
       size: 2502
     - path: _
       hash: md5
-      md5: 03087419806cb0b4e3b55a5461cc84d3.dir
-      size: 3479625
-      nfiles: 39
+      md5: 77385a15ad717eb368063ffbe3f5e1a3.dir
+      size: 3482994
+      nfiles: 40
     outs:
     - path: var/shocks.parquet
       hash: md5
@@ -166,8 +166,8 @@ stages:
       size: 15679
     - path: ../../country.py
       hash: md5
-      md5: ebb0cbd7edb3c4a1e83de68337740318
-      size: 61034
+      md5: 088f17b929cb103613a7e1b67c993099
+      size: 63517
     - path: ../../local_tools.py
       hash: md5
       md5: 64b7664a0daadf52128d0da52cb11056
@@ -179,9 +179,9 @@ stages:
       size: 2502
     - path: _
       hash: md5
-      md5: 03087419806cb0b4e3b55a5461cc84d3.dir
-      size: 3479625
-      nfiles: 39
+      md5: 77385a15ad717eb368063ffbe3f5e1a3.dir
+      size: 3482994
+      nfiles: 40
     outs:
     - path: var/food_quantities.parquet
       hash: md5
@@ -193,12 +193,12 @@ stages:
     deps:
     - path: ../../cli.py
       hash: md5
-      md5: 69304b146cc0667cf417008799a06399
-      size: 14255
+      md5: 35168707be75b76a6f8d6d40e4e24bcf
+      size: 15679
     - path: ../../country.py
       hash: md5
-      md5: 04f276f98cf275236a3d7c26c8bc522f
-      size: 60025
+      md5: 088f17b929cb103613a7e1b67c993099
+      size: 63517
     - path: ../../local_tools.py
       hash: md5
       md5: 64b7664a0daadf52128d0da52cb11056
@@ -210,9 +210,9 @@ stages:
       size: 2502
     - path: _
       hash: md5
-      md5: d8f7d6d4b7aa24a32a80bec4cab4384b.dir
-      size: 3475895
-      nfiles: 38
+      md5: 77385a15ad717eb368063ffbe3f5e1a3.dir
+      size: 3482994
+      nfiles: 40
     outs:
     - path: var/other_features.parquet
       hash: md5
@@ -255,12 +255,12 @@ stages:
     deps:
     - path: ../../cli.py
       hash: md5
-      md5: 69304b146cc0667cf417008799a06399
-      size: 14255
+      md5: 35168707be75b76a6f8d6d40e4e24bcf
+      size: 15679
     - path: ../../country.py
       hash: md5
-      md5: 04f276f98cf275236a3d7c26c8bc522f
-      size: 60025
+      md5: 088f17b929cb103613a7e1b67c993099
+      size: 63517
     - path: ../../local_tools.py
       hash: md5
       md5: 64b7664a0daadf52128d0da52cb11056
@@ -272,9 +272,9 @@ stages:
       size: 2502
     - path: _
       hash: md5
-      md5: d8f7d6d4b7aa24a32a80bec4cab4384b.dir
-      size: 3475895
-      nfiles: 38
+      md5: 77385a15ad717eb368063ffbe3f5e1a3.dir
+      size: 3482994
+      nfiles: 40
     outs:
     - path: var/food_prices.parquet
       hash: md5

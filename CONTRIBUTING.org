@@ -154,6 +154,58 @@ poetry run dvc repro Uganda/2019-20/dvc.yaml:materialize@uganda::2019_20::househ
 
 
 * Adding New Data
+** Capturing Household Location (undergrad workflow)
+   Several downstream analyses need household-level location metadata (rural/urban,
+   region, cluster id, coordinates). Undergrads can add this without touching any
+   Python code by editing only the YAML metadata and letting our existing generator
+   do the rest.
+
+   - Schema update ::
+     edit =lsms_library/countries/<Country>/_/data_scheme.yml= and add:
+     #+begin_src yaml
+     location:
+       index: (i, t)
+       cluster_id: str
+       Region: str
+       Rural: str
+       latitude: float
+       longitude: float
+     #+end_src
+     Adjust column names/types to match what that country actually has.
+
+   - Wave metadata ::
+     for each wave (=lsms_library/countries/<Country>/<wave>/_/data_info.yml=) add
+     a stanza describing the source columns, for example:
+     #+begin_src yaml
+     location:
+       source: household_characteristics.parquet
+       cluster_column: EA_ID
+       region_column: Region
+       rural_column: Rural
+     #+end_src
+     If a wave lacks some of these fields, leave the entry blank so the gap stays visible.
+
+   - Regenerate DVC ::
+     keep `dvc.yaml`/`dvc.lock` aligned with:
+     #+begin_src sh
+     poetry run python -m lsms_library.cli generate-dvc --country <Country>
+     #+end_src
+     Commit those updates along with your YAML changes.
+
+   - Optional sanity check ::
+     from =lsms_library/countries/= reproduce the DVC stage:
+     #+begin_src sh
+     cd lsms_library/countries
+     poetry run dvc repro <Country>/dvc.yaml:materialize@<country_slug>::location
+     #+end_src
+     This confirms the lock file and cache update cleanly.
+
+   These four steps keep the work scoped entirely to `data_scheme.yml` and
+   `data_info.yml`, which means contributors don’t need to touch the Python codebase.
+   If you notice that a wave lacks the required columns, record that fact in the
+   YAML (leave the fields blank) rather than inventing data—the generator will emit
+   empty columns until real mappings are added.
+
 ** Additional S3 Credentials
 Write access to the remote s3 repository requires additional credentials; contact =ligon@berkeley.edu= to obtain these.
 
