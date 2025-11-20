@@ -1,0 +1,39 @@
+
+Country: Benin
+Wave: 2018-19
+household_roster:
+    file:
+        - ../Data/s01_me_ben2018.dta
+    idxvars:
+        i: menage
+        pid: s01q00a
+    myvars:
+        Sex:
+            - s01q01
+            - mapping:
+                'Masculin': Male
+                'Féminin': Female
+        Age: s01q04a
+        Marital:
+            - s01q07
+            - mapping:
+                'Célibataire': Single
+                'Marié(e) monogame': Married monogamous
+                'Marié(e) polygame': Married polygamous
+                'Union libre': Living together
+                'Veuf(ve)': Widowed
+                'Divorcé(e)': Divorced
+                'Séparé(e)': Separated
+        Relation: 
+            - s01q02
+            - mapping:
+                'Chef de ménage': Head
+                'Conjoint ( e )': Spouse/Partner
+                'Fils, Fille': Child/Adopted child
+                'Père, Mère': Father/Mother
+                'Petit fils, petite fille': Grandchild
+                'Grand-parents': Grandparents
+                'Frère, sœur': Brother/Sister
+                'Autres Parents du CM/Conjoint': Other relative
+                'Personne non apparentée au CM/Conjoint': Not related
+                'Domestique ou parent du domestique': Servant/Employee

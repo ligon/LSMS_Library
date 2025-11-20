@@ -1,0 +1,41 @@
+Country: Tajikistan 
+Wave: 2009
+household_roster:
+    file:
+        - ../Data/m1.dta
+    idxvars:
+        i: HHID
+        pid: MEMID
+    myvars:
+        Sex:
+            - SEX
+            - mapping:
+                'MALE': male
+                'FEMALE': female
+        Age: AGE
+        Marital:
+            - M1Q8
+            - mapping:
+                'MARRIED': married
+                'MARRIED (polygamous union)': married (polygamous union)
+                'DIVORCED': divorced
+                'LIVING TOGETHER': living together
+                'SEPARATED': separated
+                'WIDOW/ER': widow/er
+                'SINGLE': single
+                'OTHER': other
+        Relation: 
+            - M1Q5
+            - mapping:
+                'HEAD': head
+                'SPOUSE/PARTNER': spouse/partner
+                'SON/DAUGHTER': son/daughter
+                'SON/DAUGHTER-IN-LAW': son/daughter-in-law
+                'FATHER/MOTHER': father/mother
+                'FATHER/MOTHER-IN-LAW': father/mother-in-law
+                'SISTER/BROTHER': sister/brother
+                'GRANDCHILD': grandchild
+                'GRANDPARENT': grandparent
+                'NIECE/NEPHEW': niece/nephew
+                'OTHER RELATIVE': other relative
+                'NOT RELATED': not related
