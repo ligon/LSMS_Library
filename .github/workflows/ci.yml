@@ -19,7 +19,5 @@ jobs:
         run: poetry install
       - name: Run tests
         run: poetry run pytest
-      - name: Check Uganda DVC status
-        run: |
-          cd lsms_library/countries
-          poetry run dvc status Uganda/dvc.yaml
+      - name: Verify DVC lockfiles
+        run: poetry run python -m lsms_library.cli refresh-dvc-locks --all --check

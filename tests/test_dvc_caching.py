@@ -27,7 +27,7 @@ if not hasattr(_ligon_dataframes, "from_dta"):
 
     _ligon_dataframes.from_dta = _dummy_from_dta
 
-from lsms_library.country import Country, StageInfo, _status_has_country_changes
+from lsms_library.country import Country, StageInfo, _status_has_country_changes, _normalize_dataframe_index
 from lsms_library.local_tools import to_parquet as write_parquet
 
 
@@ -256,7 +256,7 @@ class TestDVCCaching:
             result = country._aggregate_wave_data(method_name="test_data")
 
         pd.testing.assert_frame_equal(result, rebuilt_df)
-        mock_repo.reproduce.assert_called_once_with(stage_info.stage_ref)
+        mock_repo.reproduce.assert_called_once_with(targets=[stage_info.stage_ref])
         refreshed = pd.read_parquet(cache_path)
         pd.testing.assert_frame_equal(refreshed, rebuilt_df)
 
@@ -462,7 +462,7 @@ class TestDVCCaching:
             first = country._aggregate_wave_data(method_name="household_roster")
             assert cache_path.exists()
             pd.testing.assert_frame_equal(first, expected_df)
-            mock_repo.reproduce.assert_called_once_with(stage_info.stage_ref)
+            mock_repo.reproduce.assert_called_once_with(targets=[stage_info.stage_ref])
 
             second = country._aggregate_wave_data(method_name="household_roster")
             pd.testing.assert_frame_equal(second, expected_df)

@@ -121,9 +121,11 @@ Typical workflows:
 # Refresh dvc.yaml definitions after editing metadata
 poetry run python -m lsms_library.util.generate_dvc_stages --countries Uganda
 
-# Regenerate or validate a single stage (updates dvc.lock + cache)
-cd lsms_library/countries
-poetry run dvc repro Uganda/2019-20/dvc.yaml:materialize@uganda::2019_20::household_roster
+# Refresh lockfiles (runs dvc repro for every table in Uganda)
+poetry run python -m lsms_library.cli refresh-dvc-locks --country Uganda
+
+# Validate without touching the cache (fails if any lock is stale)
+poetry run python -m lsms_library.cli refresh-dvc-locks --all --check
 
 # Force a one-off rebuild without touching DVC metadata
 LSMS_USE_DVC_CACHE=false lsms-library materialize \
@@ -133,6 +135,10 @@ LSMS_USE_DVC_CACHE=false lsms-library materialize \
 # Fall back to the legacy rule if you need to inspect Make-only scripts
 make -C lsms_library/countries/Uganda/_ household_roster.parquet
 #+end_src
+
+Use =--dry-run= to preview which =dvc repro= calls would run or add =--force= whenever you need to
+rerun stages even if DVC believes they are current. The =--check= mode never mutates the workspace,
+making it safe for CI enforcement.
 
 Tune build parallelism globally with =LSMS_MAKE_JOBS=<n>= (defaults to half of your CPUs) so both DVC and Make invocations reuse the same limit.
 

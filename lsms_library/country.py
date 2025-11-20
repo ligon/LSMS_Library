@@ -747,6 +747,110 @@ class Country:
             return Wave(year, wave_folder, self)
         else:
             raise KeyError(f"{year} is not a valid wave for {self.name}")
+
+    def _location_lookup(self) -> pd.DataFrame:
+        """
+        Return a cached lookup table that maps (i, t) -> m so tables missing the
+        region index can inherit it from other_features.
+        """
+
+        cache = getattr(self, "_location_level_cache", None)
+        if isinstance(cache, pd.DataFrame):
+            return cache
+        if cache is False:
+            raise RuntimeError(getattr(self, "_location_lookup_error", "Location metadata unavailable."))
+
+        if getattr(self, "_location_lookup_inflight", False):
+            raise RuntimeError("Location lookup already in progress.")
+
+        location_path = self.file_path / "var" / "other_features.parquet"
+        if location_path.exists():
+            location_df = get_dataframe(location_path)
+        else:
+            self._location_lookup_inflight = True
+            try:
+                location_df = self.other_features()
+            finally:
+                self._location_lookup_inflight = False
+
+        if not isinstance(location_df, pd.DataFrame) or location_df.empty:
+            self._location_level_cache = False
+            self._location_lookup_error = "other_features returned no data."
+            raise RuntimeError(self._location_lookup_error)
+
+        if not isinstance(location_df.index, pd.MultiIndex) or "m" not in location_df.index.names:
+            self._location_level_cache = False
+            self._location_lookup_error = "other_features is missing the 'm' index."
+            raise RuntimeError(self._location_lookup_error)
+
+        index_frame = location_df.index.to_frame(index=False)
+        if "i" not in index_frame.columns:
+            if "j" in index_frame.columns:
+                index_frame = index_frame.rename(columns={"j": "i"})
+        if "i" not in index_frame.columns:
+            self._location_level_cache = False
+            self._location_lookup_error = "Unable to identify household id column in other_features index."
+            raise RuntimeError(self._location_lookup_error)
+
+        mapping = index_frame[["i", "t", "m"]].drop_duplicates(subset=["i", "t"])
+        self._location_level_cache = mapping
+        return mapping
+
+    def _augment_index_from_related_tables(
+        self,
+        df: pd.DataFrame,
+        scheme_entry: dict[str, Any] | None,
+        wave: str | None,
+    ) -> pd.DataFrame:
+        """
+        Attach missing index levels (currently 'm') by borrowing metadata from
+        related tables such as other_features.
+        """
+
+        declared = _declared_index_levels(scheme_entry)
+        if not declared or "m" not in declared:
+            return df
+
+        if not isinstance(df.index, pd.MultiIndex):
+            return df
+
+        current_names = [name for name in df.index.names if name is not None]
+        if "m" in current_names:
+            return df
+
+        df_reset = df.reset_index()
+        if "t" not in df_reset.columns:
+            if wave is None:
+                return df
+            df_reset["t"] = wave
+
+        household_col = next((candidate for candidate in ("i", "j", "household_id") if candidate in df_reset.columns), None)
+        if household_col is None:
+            return df
+
+        try:
+            lookup = self._location_lookup()
+        except RuntimeError as exc:
+            raise KeyError(f"Missing spatial index 'm' and unable to derive it: {exc}") from exc
+
+        join_lookup = lookup
+        if household_col != "i":
+            join_lookup = lookup.rename(columns={"i": household_col})
+
+        merged = df_reset.merge(
+            join_lookup[[household_col, "t", "m"]],
+            on=[household_col, "t"],
+            how="left",
+        )
+
+        if merged["m"].isna().any():
+            missing_pairs = merged.loc[merged["m"].isna(), [household_col, "t"]].drop_duplicates()
+            sample = missing_pairs.head().to_dict("records")
+            warnings.warn(
+                f"Missing region metadata for {len(missing_pairs)} households while materializing {household_col}/m; sample={sample}"
+            )
+
+        return merged.set_index(df.index.names)
     
 
     def _aggregate_wave_data(self, waves=None, method_name=None):
@@ -768,6 +872,15 @@ class Country:
             backend_value = scheme_entry.get("materialize")
             if isinstance(backend_value, str):
                 materialize_backend = backend_value.lower()
+
+        if (
+            self._updated_ids_cache is None
+            and method_name not in ("panel_ids", "updated_ids")
+        ):
+            try:
+                _ = self.updated_ids
+            except Exception:
+                pass
 
         def safe_concat_dataframe_dict(df_dict):
             # Get the target index name order from the first DataFrame
@@ -930,6 +1043,17 @@ class Country:
                     wave_result = run_make_target(method_name, wave=w)
 
                 if isinstance(wave_result, pd.DataFrame):
+                    if (
+                        'i' in wave_result.index.names
+                        and not wave_result.attrs.get('id_converted')
+                        and self._updated_ids_cache is not None
+                    ):
+                        wave_result = id_walk(wave_result, self.updated_ids)
+                    wave_result = self._augment_index_from_related_tables(
+                        wave_result,
+                        scheme_entry,
+                        w,
+                    )
                     wave_result = _normalize_dataframe_index(wave_result, scheme_entry, w)
 
                 if wave_result is None and not wave_has_table:
@@ -1068,6 +1192,37 @@ class Country:
                         to_parquet(combined_df, cache_path)
                         print(f"Writing {method_name} to cache {cache_path}", file=stderr)
                         return combined_df
+
+                    cache_relative = None
+                    try:
+                        cache_relative = cache_path.relative_to(dvc_root).as_posix()
+                    except ValueError:
+                        cache_relative = None
+
+                    try:
+                        status_map = repo.status()
+                        dirty = _status_has_country_changes(status_map, self.name, cache_relative)
+                    except Exception as status_error:
+                        print(
+                            f"DVC status failed for {method_name}: {status_error}. Assuming dirty outputs.",
+                            file=stderr,
+                        )
+                        dirty = True
+
+                    if cache_exists and not dirty:
+                        try:
+                            print(f"Reading {method_name} from cache {cache_path}", file=stderr)
+                            cached_df = get_dataframe(cache_path)
+                            cached_df = map_index(cached_df)
+                            wave_hint = stage_infos[0].wave if len(stage_infos) == 1 else None
+                            cached_df = _normalize_dataframe_index(
+                                cached_df,
+                                scheme_entry,
+                                wave_hint,
+                            )
+                            return cached_df
+                        except (FileNotFoundError, PathMissingError):
+                            dirty = True  # fall through to repro if cache missing unexpectedly
 
                     # Run DVC stages for required waves
                     for info in stage_infos:
@@ -1445,6 +1600,23 @@ class Country:
 #         r = rgsn.Regression(y=np.log(x.replace(0,np.nan).dropna()),
 #                             d=z,**kwargs)
 #         return r
+def _declared_index_levels(schema_entry: dict[str, Any] | None) -> list[str]:
+    """Parse the declared index metadata from a data scheme entry."""
+    if not schema_entry:
+        return []
+
+    declared_levels: Iterable[str] | None = schema_entry.get("index")
+    if isinstance(declared_levels, str):
+        cleaned = declared_levels.strip()
+        if cleaned.startswith("(") and cleaned.endswith(")"):
+            cleaned = cleaned[1:-1]
+        declared_levels = [token.strip() for token in cleaned.split(",") if token.strip()]
+    if not declared_levels:
+        return []
+
+    return [str(level) for level in declared_levels]
+
+
 def _normalize_dataframe_index(
     df: pd.DataFrame,
     schema_entry: dict[str, Any],
@@ -1462,16 +1634,9 @@ def _normalize_dataframe_index(
     if not isinstance(df, pd.DataFrame) or not isinstance(df.index, pd.MultiIndex):
         return df
 
-    declared_levels: Iterable[str] | None = schema_entry.get("index")
-    if isinstance(declared_levels, str):
-        cleaned = declared_levels.strip()
-        if cleaned.startswith("(") and cleaned.endswith(")"):
-            cleaned = cleaned[1:-1]
-        declared_levels = [token.strip() for token in cleaned.split(",") if token.strip()]
-    if not declared_levels:
+    declared = _declared_index_levels(schema_entry)
+    if not declared:
         return df
-
-    declared = [str(level) for level in declared_levels]
 
     current_names = list(df.index.names)
 

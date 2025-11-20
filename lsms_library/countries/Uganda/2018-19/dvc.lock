@@ -37,12 +37,12 @@ stages:
     deps:
     - path: ../../../cli.py
       hash: md5
-      md5: 35168707be75b76a6f8d6d40e4e24bcf
-      size: 15679
+      md5: b8258c9eec4a73a1df397f88ef8f9167
+      size: 19109
     - path: ../../../country.py
       hash: md5
-      md5: ebb0cbd7edb3c4a1e83de68337740318
-      size: 61034
+      md5: c553362d1d01df96b6722c42fcd8d8dc
+      size: 70180
     - path: ../../../local_tools.py
       hash: md5
       md5: 64b7664a0daadf52128d0da52cb11056
@@ -60,5 +60,5 @@ stages:
     outs:
     - path: var/people_last7days.parquet
       hash: md5
-      md5: 966be55d539d6eb2998efd3f2b07328c
-      size: 128513
+      md5: da358ea28a1272ab1b8cfecbc273ac9e
+      size: 29918

@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 from collections import OrderedDict
+import json
 import os
 from pathlib import Path
+import subprocess
+import sys
 from typing import List, Optional, Sequence
 
 import typer
@@ -57,6 +60,29 @@ def _dump_yaml(data: OrderedDict, path: Path) -> None:
     path.write_text(yaml.dump(data, Dumper=_OrderedDumper, sort_keys=False))
 
 
+def _countries_root() -> Path:
+    return Path(__file__).resolve().parent / "countries"
+
+
+def _dvc_cmd(*args: str) -> List[str]:
+    return [sys.executable, "-m", "dvc", *args]
+
+
+def _collect_dvc_status(target: str, cwd: Path) -> dict:
+    """Return parsed JSON from `dvc status --json target`."""
+    result = subprocess.run(
+        _dvc_cmd("status", "--json", target),
+        cwd=cwd,
+        capture_output=True,
+        check=True,
+        text=True,
+    )
+    payload = result.stdout.strip()
+    if not payload:
+        return {}
+    return json.loads(payload)
+
+
 def _available_country_dirs() -> List[str]:
     countries_root = Path(__file__).resolve().parent / "countries"
     names = [
@@ -86,11 +112,6 @@ def _load_table(country: str, table: str, waves: Optional[Sequence[str]]) -> obj
             return loader()
 
         wave_list: List[str] = list(waves)
-        if len(wave_list) == 1:
-            wave_obj = country_obj[wave_list[0]]
-            loader = getattr(wave_obj, table)
-            return loader()
-
         loader = getattr(country_obj, table)
         return loader(waves=wave_list)
     except KeyError as exc:
@@ -403,6 +424,101 @@ def generate_dvc(
         typer.echo("[DRY] No files were written.")
     elif not changed_any:
         typer.echo("[INFO] All dvc.yaml files already up to date.")
+
+
+@app.command("refresh-dvc-locks")
+def refresh_dvc_locks(
+    country: Optional[List[str]] = typer.Option(
+        None,
+        "--country",
+        help="Country to process (repeatable). Omit with --all to touch every DVC-enabled country.",
+    ),
+    all_countries: bool = typer.Option(
+        False,
+        "--all/--no-all",
+        help="Regenerate lockfiles for every country that has a dvc.yaml.",
+    ),
+    check: bool = typer.Option(
+        False,
+        "--check/--update",
+        help="Only verify that lockfiles are up to date (no repro runs).",
+    ),
+    dry_run: bool = typer.Option(
+        False,
+        "--dry-run/--execute",
+        help="Print the DVC commands that would run without executing them.",
+    ),
+    force: bool = typer.Option(
+        False,
+        "--force/--no-force",
+        help="Pass --force to dvc repro to rebuild even if nothing changed.",
+    ),
+) -> None:
+    """Regenerate (or validate) DVC lockfiles for one or more countries."""
+
+    if not country and not all_countries:
+        raise typer.BadParameter(
+            "Provide --country (repeatable) or use --all.", param_hint=["--country", "--all"]
+        )
+
+    requested = sorted(set(country)) if country else _available_country_dirs()
+    countries_dir = _countries_root()
+
+    targets = []
+    missing = []
+    for name in requested:
+        dvc_file = countries_dir / name / "dvc.yaml"
+        if dvc_file.exists():
+            targets.append((name, dvc_file))
+        else:
+            missing.append(name)
+
+    if country and missing:
+        raise typer.BadParameter(
+            f"No dvc.yaml found for: {', '.join(missing)}", param_hint=["--country"]
+        )
+
+    if not targets:
+        typer.echo("No DVC-enabled countries matched the provided filters.")
+        raise typer.Exit(0)
+
+    if check:
+        dirty = {}
+        for name, dvc_file in targets:
+            rel = dvc_file.relative_to(countries_dir).as_posix()
+            status = _collect_dvc_status(rel, countries_dir)
+            if status:
+                stages = list(status.keys())
+                preview = ", ".join(stages[:3])
+                extra = f", +{len(stages) - 3} more" if len(stages) > 3 else ""
+                typer.echo(f"[DIRTY] {name}: {preview}{extra}")
+                dirty[name] = stages
+            else:
+                typer.echo(f"[CLEAN] {name}")
+        if dirty:
+            raise typer.Exit(1)
+        typer.echo("All requested lockfiles are up to date.")
+        return
+
+    for name, dvc_file in targets:
+        rel = dvc_file.relative_to(countries_dir).as_posix()
+        stage_ref = f"{rel}:materialize"
+        cmd = ["repro"]
+        if force:
+            cmd.append("--force")
+        cmd.append(stage_ref)
+        preview = " ".join(["dvc", *cmd])
+        typer.echo(f"[RUN] {name}: {preview}")
+        if dry_run:
+            continue
+        subprocess.run(
+            _dvc_cmd(*cmd),
+            cwd=countries_dir,
+            check=True,
+            stdout=sys.stderr,
+            stderr=sys.stderr,
+        )
+        typer.echo(f"[DONE] {name}")
 
 
 @app.command()
