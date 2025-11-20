@@ -1,0 +1,40 @@
+Country: Tajikistan
+Wave: 1999
+household_roster:
+    file:
+        - ../Data/SSEC1.DTA
+    idxvars:
+        i: hhid
+        pid: iid
+    myvars:
+        Sex:
+            - s1q2
+            - mapping:
+                1.0: male
+                2.0: female
+        Age: s1q6
+        Marital:
+            - s1q7
+            - mapping:
+                1.0: married
+                2.0: nekared
+                3.0: divorced
+                4.0: living apart but not divorced
+                5.0: widow/widower
+                6.0: never married
+        Relation: 
+            - s1q3
+            - mapping:
+                1.0: head
+                2.0: spouse
+                3.0: son/daughter
+                4.0: son/daughter-in-law
+                5.0: father/mother
+                6.0: father/mother of the wife of head
+                7.0: father/mother of the husband of head
+                8.0: brother/sister
+                9.0: grandchild
+                10.0: grandparent
+                11.0: other relative
+                12.0: no relation
+                14.0: lodger
