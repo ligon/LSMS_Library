@@ -1,0 +1,40 @@
+Country: Tajikistan
+Wave: 2003
+household_roster:
+    file:
+        - ../Data/module1.dta
+    idxvars:
+        i: hhid
+        pid: hhlid
+    myvars:
+        Sex:
+            - m1q2
+            - mapping:
+                'Ìóæñêîé': male
+                'Æåíñêèé': female
+        Age: m1q3_1
+        Marital:
+            - m1q5
+            - mapping:
+                1.0: married
+                2.0: married (polygamous union)
+                3.0: divorced
+                4.0: living together
+                5.0: widow/widower
+                6.0: single
+                7.0: other
+        Relation: 
+            - m1q4
+            - mapping:
+                'Ãëàâà äîìîõîçÿéñòâà': head
+                'Ñóïðóã(à)/ïàðòíåð': spouse/partner
+                'Ñûí/äî÷ü': son/daughter
+                'Çÿòü/íåâåñòà': son/daughter-in-law
+                'Îòåö/ìàòü': father/mother
+                'Ðîäèòåëè ìóæà/æåíû': father/mother of husband
+                'Ñåñòðà/áðàò': father/mother of wife
+                'Âíóê(÷êà)': brother/sister
+                'Äåäóøêà(áàáóøêà)': grandchild
+                'Ïëåìÿííèöà/ïëåìÿííèê': grandparent
+                'Äðóãèå ðîäñòâåííèêè': other relatives
+                'Íå ðîäñòâåííèêè': no relation
