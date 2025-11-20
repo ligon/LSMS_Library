@@ -1,0 +1,13 @@
+Country: Niger
+Wave: 2011-12
+
+household_roster:
+  file:
+      - ../Data/NER_2011_ECVMA_v01_M_Stata8/ecvmaind_p1p2_en.dta
+  idxvars:
+      i: hid
+      pid: ms02q
+  myvars:
+      Sex: ms01q01
+      Relation: ms01q02
+      Age: ms01q06a
