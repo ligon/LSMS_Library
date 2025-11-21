@@ -27,7 +27,7 @@ if not hasattr(_ligon_dataframes, "from_dta"):
 
     _ligon_dataframes.from_dta = _dummy_from_dta
 
-from lsms_library.country import Country, StageInfo, _status_has_country_changes, _normalize_dataframe_index
+from lsms_library.country import Country, StageInfo, _normalize_dataframe_index
 from lsms_library.local_tools import to_parquet as write_parquet
 
 
@@ -549,41 +549,3 @@ class TestCachePathGeneration:
         assert cache_path.parent.name == "_"
         assert method_name in cache_path.name
 
-
-class TestStatusHelpers:
-    """Tests for DVC status helper utilities."""
-
-    def test_status_detects_country_stage(self):
-        status = {
-            "lsms_library/countries/dvc.yaml:materialize@testcountry_2020_21_test_data": [
-                {"changed outs": {"build/TestCountry/2020-21/test_data.parquet": "modified"}}
-            ]
-        }
-        assert _status_has_country_changes(status, "TestCountry")
-
-    def test_status_ignores_other_country(self):
-        status = {
-            "lsms_library/countries/dvc.yaml:materialize@other_2020_21_test_data": [
-                {"changed outs": {"build/Other/2020-21/test_data.parquet": "modified"}}
-            ]
-        }
-        assert not _status_has_country_changes(status, "TestCountry")
-
-    def test_status_detects_cache_path(self):
-        status = {
-            "something": [
-                {
-                    "changed outs": {
-                        "build/TestCountry/2020-21/test_data.parquet": "modified"
-                    }
-                }
-            ]
-        }
-        assert _status_has_country_changes(
-            status,
-            "TestCountry",
-            "build/TestCountry/2020-21/test_data.parquet",
-        )
-
-if __name__ == "__main__":
-    pytest.main([__file__, "-v"])

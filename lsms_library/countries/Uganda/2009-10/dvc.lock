@@ -6,12 +6,12 @@ stages:
     deps:
     - path: ../../../cli.py
       hash: md5
-      md5: 35168707be75b76a6f8d6d40e4e24bcf
-      size: 15679
+      md5: 72683c66f38ca88ac45ed5510f78c567
+      size: 19218
     - path: ../../../country.py
       hash: md5
-      md5: ebb0cbd7edb3c4a1e83de68337740318
-      size: 61034
+      md5: c553362d1d01df96b6722c42fcd8d8dc
+      size: 70180
     - path: ../../../local_tools.py
       hash: md5
       md5: 64b7664a0daadf52128d0da52cb11056
@@ -23,22 +23,22 @@ stages:
       size: 2502
     - path: _
       hash: md5
-      md5: 2b983b1e46e6fe11809a10894972ac63.dir
-      size: 504683
-      nfiles: 19
+      md5: c6d3102ec5d75f096cf4b339aa952444.dir
+      size: 530359
+      nfiles: 20
     outs:
     - path: var/cluster_features.parquet
       hash: md5
-      md5: cef9739781797d32ddca4dee020d0d0b
-      size: 26101
+      md5: 5a72fd3bcf8433d948f45070455320c2
+      size: 5856
   materialize@uganda::2009_10::people_last7days:
     cmd: python3 ../../../util/run_stage.py --backend "cli" --country "Uganda" 
       --wave "2009-10" --table "people_last7days" --format "parquet" --target ""
     deps:
     - path: ../../../cli.py
       hash: md5
-      md5: b8258c9eec4a73a1df397f88ef8f9167
-      size: 19109
+      md5: 72683c66f38ca88ac45ed5510f78c567
+      size: 19218
     - path: ../../../country.py
       hash: md5
       md5: c553362d1d01df96b6722c42fcd8d8dc

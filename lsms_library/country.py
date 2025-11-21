@@ -45,50 +45,6 @@ def _slugify(value: str) -> str:
     return value.lower().replace(" ", "_").replace("-", "_")
 
 
-def _status_has_country_changes(status_map, country_name: str, cache_relative: str | None = None) -> bool:
-    """
-    Determine whether a DVC status map indicates changes relevant to the country or cache.
-    Returns True when any status entry references the country slug/name or the specific cache path.
-    """
-    if not status_map:
-        return False
-
-    slug = _slugify(country_name)
-    tokens = {
-        slug,
-        f"/{slug}/",
-        f"@{slug}",
-    }
-
-    lowered_name = country_name.lower()
-    tokens.update(
-        {
-            lowered_name,
-            lowered_name.replace(" ", "/"),
-            lowered_name.replace(" ", "-"),
-        }
-    )
-
-    if cache_relative:
-        cache_lower = cache_relative.lower()
-        tokens.update({cache_lower, cache_lower.replace("\\", "/")})
-
-    def contains_token(value) -> bool:
-        if isinstance(value, str):
-            lowered = value.lower()
-            return any(token in lowered for token in tokens)
-        if isinstance(value, dict):
-            return any(contains_token(k) or contains_token(v) for k, v in value.items())
-        if isinstance(value, (list, tuple, set)):
-            return any(contains_token(item) for item in value)
-        return False
-
-    for key, value in status_map.items():
-        if contains_token(key) or contains_token(value):
-            return True
-    return False
-
-
 @dataclass(frozen=True)
 class StageInfo:
     stage_key: str
@@ -1193,15 +1149,10 @@ class Country:
                         print(f"Writing {method_name} to cache {cache_path}", file=stderr)
                         return combined_df
 
-                    cache_relative = None
                     try:
-                        cache_relative = cache_path.relative_to(dvc_root).as_posix()
-                    except ValueError:
-                        cache_relative = None
-
-                    try:
-                        status_map = repo.status()
-                        dirty = _status_has_country_changes(status_map, self.name, cache_relative)
+                        stage_refs = [info.stage_ref for info in stage_infos]
+                        status_map = repo.status(targets=stage_refs)
+                        dirty = bool(status_map)
                     except Exception as status_error:
                         print(
                             f"DVC status failed for {method_name}: {status_error}. Assuming dirty outputs.",
@@ -1224,21 +1175,27 @@ class Country:
                         except (FileNotFoundError, PathMissingError):
                             dirty = True  # fall through to repro if cache missing unexpectedly
 
-                    # Run DVC stages for required waves
-                    for info in stage_infos:
-                        try:
-                            repo.reproduce(targets=[info.stage_ref])
-                        except Exception as reproduce_error:
-                            print(f"DVC reproduce failed for {info.stage_ref}: {reproduce_error}. Falling back to legacy loaders.", file=stderr)
-                            stage_outputs = collect_stage_outputs(stage_infos)
-                            combined_outputs = consolidate_stage_outputs(stage_outputs)
-                            if combined_outputs is not None:
-                                return combined_outputs
-                            return load_from_waves(waves)
+                    stage_outputs: dict[str, pd.DataFrame] | None = None
+                    if not dirty:
+                        stage_outputs = collect_stage_outputs(stage_infos)
+                        if not stage_outputs:
+                            dirty = True
 
-                    stage_outputs = collect_stage_outputs(stage_infos)
-                    if not stage_outputs:
-                        raise KeyError(f"No data produced for {method_name} via DVC.")
+                    if dirty:
+                        for info in stage_infos:
+                            try:
+                                repo.reproduce(targets=[info.stage_ref])
+                            except Exception as reproduce_error:
+                                print(f"DVC reproduce failed for {info.stage_ref}: {reproduce_error}. Falling back to legacy loaders.", file=stderr)
+                                stage_outputs = collect_stage_outputs(stage_infos)
+                                combined_outputs = consolidate_stage_outputs(stage_outputs)
+                                if combined_outputs is not None:
+                                    return combined_outputs
+                                return load_from_waves(waves)
+
+                        stage_outputs = collect_stage_outputs(stage_infos)
+                        if not stage_outputs:
+                            raise KeyError(f"No data produced for {method_name} via DVC.")
 
                     single_stage = (
                         len(stage_infos) == 1
