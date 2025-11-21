@@ -304,6 +304,56 @@ class TestDVCCaching:
         mock_get_dataframe.assert_called_once_with(cache_path)
         mock_repo.reproduce.assert_not_called()
 
+    def test_dvc_cache_applies_location_index(
+        self,
+        mock_country_structure,
+    ):
+        """DVC cache loads should augment indices before normalization."""
+
+        cache_path = mock_country_structure / "var" / "test_data.parquet"
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        cache_path.touch()
+
+        cached_df = pd.DataFrame({"col1": [1]}).set_index(pd.Index([0], name="i"))
+
+        stage_key = "testcountry::::test_data"
+        stage_info = StageInfo(
+            stage_key=stage_key,
+            stage_ref=f"TestCountry/dvc.yaml:materialize@{stage_key}",
+            country="TestCountry",
+            wave=None,
+            table="test_data",
+            fmt="parquet",
+            output_path=cache_path,
+        )
+
+        with patch("lsms_library.country.files") as mock_files, \
+            patch("lsms_library.country.Repo") as mock_repo_class, \
+            patch("lsms_library.country.get_dataframe", return_value=cached_df) as mock_get_dataframe, \
+            patch("lsms_library.country.map_index", side_effect=lambda df: df), \
+            patch.object(
+                Country,
+                "_augment_index_from_related_tables",
+                side_effect=lambda df, *_args, **_kwargs: df,
+            ) as mock_augment, \
+            patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
+            patch.object(Country, "_resolve_materialize_stages", return_value=[stage_info]):
+
+            mock_files.return_value = mock_country_structure.parent.parent
+            mock_repo = Mock()
+            mock_repo.status.return_value = {}
+            mock_repo.reproduce = Mock()
+            mock_repo_class.return_value = mock_repo
+            mock_waves.return_value = ["ALL"]
+
+            country = Country("TestCountry", preload_panel_ids=False)
+            result = country._aggregate_wave_data(method_name="test_data")
+
+        pd.testing.assert_frame_equal(result, cached_df)
+        mock_get_dataframe.assert_called_once_with(cache_path)
+        mock_repo.reproduce.assert_not_called()
+        assert mock_augment.called
+
     def test_panel_ids_dict_cache_written_as_json(
         self,
         mock_country_structure,
@@ -548,4 +598,3 @@ class TestCachePathGeneration:
         assert cache_path.suffix == ".json"
         assert cache_path.parent.name == "_"
         assert method_name in cache_path.name
-
