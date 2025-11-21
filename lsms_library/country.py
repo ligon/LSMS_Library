@@ -1130,6 +1130,11 @@ class Country:
                             if output_path.exists():
                                 df_wave = get_dataframe(output_path)
                                 df_wave = map_index(df_wave)
+                                df_wave = self._augment_index_from_related_tables(
+                                    df_wave,
+                                    scheme_entry,
+                                    stage.wave,
+                                )
                                 df_wave = _normalize_dataframe_index(df_wave, scheme_entry, stage.wave)
                                 stage_results[stage.wave or "ALL"] = df_wave
                         return stage_results
@@ -1166,6 +1171,11 @@ class Country:
                             cached_df = get_dataframe(cache_path)
                             cached_df = map_index(cached_df)
                             wave_hint = stage_infos[0].wave if len(stage_infos) == 1 else None
+                            cached_df = self._augment_index_from_related_tables(
+                                cached_df,
+                                scheme_entry,
+                                wave_hint,
+                            )
                             cached_df = _normalize_dataframe_index(
                                 cached_df,
                                 scheme_entry,
@@ -1244,6 +1254,7 @@ class Country:
             return df
 
         if isinstance(df, pd.DataFrame):
+            df = self._augment_index_from_related_tables(df, scheme_entry, None)
             df = _normalize_dataframe_index(df, scheme_entry, None)
 
         if isinstance(df, pd.DataFrame) and isinstance(df.index, pd.MultiIndex):
