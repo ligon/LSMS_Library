@@ -68,6 +68,10 @@ Similarly, the private key for /accessing/ data on the s3 data store is found in
 
    (If this doesn't work, make sure you have =gpg= installed: https://gnupg.org/download/)
 
+   In non-interactive environments (e.g., CI) you can suppress the automatic authentication prompt by setting
+   =LSMS_SKIP_AUTH=1= in the environment. When this flag is set you are responsible for running =ll.authenticate()=
+   manually before attempting to access protected datasets.
+
 *** Local virtual environment
    Keep project dependencies isolated so you can experiment without colliding with
    system packages:

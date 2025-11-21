@@ -18,6 +18,10 @@ jobs:
       - name: Install dependencies
         run: poetry install
       - name: Run tests
+        env:
+          LSMS_SKIP_AUTH: "1"
         run: poetry run pytest
       - name: Verify DVC lockfiles
+        env:
+          LSMS_SKIP_AUTH: "1"
         run: poetry run python -m lsms_library.cli refresh-dvc-locks --all --check
