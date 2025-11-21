@@ -16,6 +16,7 @@ myvars = dict(fn='../Data/GSEC1.dta',
               HHID='hhid',
               urban='urban',
               region='region',
+              v = 'parish_name',
               urban_converter = lambda s: s.lower() == 'urban')
 
 df = other_features(**myvars)

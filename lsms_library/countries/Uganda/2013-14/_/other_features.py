@@ -16,6 +16,7 @@ myvars = dict(fn='../Data/GSEC1.dta',
               HHID='HHID',
               urban='urban',
               region='region',
+              v = 'h1aq4a',  # Docs identify this as "Parish"?
               urban_converter = lambda s: s.lower() == 'urban')
 
 

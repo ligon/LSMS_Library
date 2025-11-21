@@ -16,6 +16,7 @@ myvars = dict(fn='../Data/HH/gsec1.dta',
               HHID='hhid',
               urban='urban',
               region='region',
+              v = 's1aq04a',  # String for parish name.  Parish codes broken as in 2018-19.
               urban_converter = lambda s: False if ('%s' % s).lower()=='nan' else s.lower() == 'urban')
 
 df = other_features(**myvars)
