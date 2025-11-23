@@ -1,0 +1,5 @@
+outs:
+- md5: 0f5cfdddabd70a45ddb74da0ad772c0c
+  size: 48301052
+  hash: md5
+  path: lsms_ag.parquet

@@ -73,3 +73,7 @@
 
 - Waves: 2005-06, 2009-10, 2010-11, 2011-12, 2013-14, 2015-16, 2018-19, 2019-20
 - Error: `KeyError: "None of ['m'] are in the columns"`
+## 2025-11-22 15:57:36Z Uganda – household_characteristics
+
+- Waves: 2005-06, 2009-10, 2010-11, 2011-12, 2013-14, 2015-16, 2018-19, 2019-20
+- Error: `CalledProcessError: Command '['make', '-s', '../2005-06/_/household_characteristics.parquet']' returned non-zero exit status 2.`
