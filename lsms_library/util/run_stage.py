@@ -103,11 +103,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-def _pythonpath_env(env: dict[str, str]) -> dict[str, str]:
-    repo_root = Path(__file__).resolve().parents[2]
-    current = env.get("PYTHONPATH")
-    entries = [str(repo_root)]
-    if current:
-        entries.append(current)
-    env["PYTHONPATH"] = os.pathsep.join(entries)
-    return env
