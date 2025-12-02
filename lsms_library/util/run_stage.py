@@ -35,7 +35,8 @@ def _run_make(target: str) -> None:
     if jobs:
         cmd.append(f"-j{jobs}")
     cmd.append(target)
-    subprocess.run(cmd, cwd=Path("_"), check=True)
+    env = _pythonpath_env(os.environ.copy())
+    subprocess.run(cmd, cwd=Path("_"), check=True, env=env)
 
 
 def _run_cli(country: str, table: str, fmt: str, wave: str | None, all_waves: bool, target: str) -> None:
@@ -63,7 +64,7 @@ def _run_cli(country: str, table: str, fmt: str, wave: str | None, all_waves: bo
             target,
         ]
     )
-    env = os.environ.copy()
+    env = _pythonpath_env(os.environ.copy())
     env["LSMS_USE_DVC_CACHE"] = "false"
     subprocess.run(cmd, cwd=Path("_"), check=True, env=env)
 
@@ -92,3 +93,11 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+def _pythonpath_env(env: dict[str, str]) -> dict[str, str]:
+    repo_root = Path(__file__).resolve().parents[2]
+    current = env.get("PYTHONPATH")
+    entries = [str(repo_root)]
+    if current:
+        entries.append(current)
+    env["PYTHONPATH"] = os.pathsep.join(entries)
+    return env
