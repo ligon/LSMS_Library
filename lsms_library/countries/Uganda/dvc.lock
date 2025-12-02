@@ -104,8 +104,8 @@ stages:
       size: 19218
     - path: ../../country.py
       hash: md5
-      md5: c553362d1d01df96b6722c42fcd8d8dc
-      size: 70180
+      md5: 52fb1105284930bb6930629fa611e2e9
+      size: 69487
     - path: ../../local_tools.py
       hash: md5
       md5: 64b7664a0daadf52128d0da52cb11056

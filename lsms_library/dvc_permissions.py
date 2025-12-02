@@ -21,7 +21,7 @@ def is_git_repo(path='.'):
     except git.exc.InvalidGitRepositoryError:
         return False
 
-def authenticate(gpg_key_file='s3_reader_creds.gpg'):
+def authenticate(gpg_key_file='s3_reader_creds.gpg', max_attempts: int = 3):
     """
     Decrypt the specified GPG file and store the decrypted credentials securely.
 
@@ -45,24 +45,26 @@ def authenticate(gpg_key_file='s3_reader_creds.gpg'):
     # Initialize GPG
     gpg = gnupg.GPG()
 
-    # Prompt the user for the passphrase securely
-    passphrase = getpass.getpass(prompt='Enter passphrase for decryption: ')
+    for attempt in range(1, max_attempts + 1):
+        passphrase = getpass.getpass(prompt='Enter passphrase for decryption: ')
+        decrypted_data = gpg.decrypt(encrypted_data, passphrase=passphrase)
 
-    # Decrypt the data
-    decrypted_data = gpg.decrypt(encrypted_data, passphrase=passphrase)
+        if decrypted_data.ok:
+            creds_file = gpg_path / 's3_creds'
 
-    if decrypted_data.ok:
-        # Write the decrypted data to a temporary file securely
-        creds_file = gpg_path / 's3_creds'
+            if creds_file.exists():
+                user_input = input(f"The file {creds_file} already exists. Overwrite? (yes/no): ").strip().lower()
+                if user_input not in ['yes', 'y']:
+                    print("Operation aborted. Credentials were not written.")
+                    return
 
-        if creds_file.exists():
-            user_input = input(f"The file {creds_file} already exists. Overwrite? (yes/no): ").strip().lower()
-            if user_input not in ['yes', 'y']:
-                print("Operation aborted. Credentials were not written.")
-                return
+            with open(creds_file, 'w') as f:
+                f.write(str(decrypted_data))
+            print(f"Decryption successful; credentials written to {creds_file}")
+            return
 
-        with open(creds_file, 'w') as f:
-            f.write(str(decrypted_data))
-        print(f"Decryption successful; credentials written to {creds_file}")
-    else:
-        raise ValueError("Decryption failed: check the passphrase and try again")
+        remaining = max_attempts - attempt
+        if remaining > 0:
+            print("Decryption failed: incorrect passphrase. Please try again.")
+        else:
+            raise ValueError("Decryption failed after multiple attempts; check the passphrase and try again later.")
