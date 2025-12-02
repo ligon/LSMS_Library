@@ -7,15 +7,19 @@ import os
 import subprocess
 import sys
 from pathlib import Path
+import sys
 
 
-def _pythonpath_env(env: dict[str, str]) -> dict[str, str]:
+def _runtime_env() -> dict[str, str]:
+    env = os.environ.copy()
     repo_root = Path(__file__).resolve().parents[2]
     current = env.get("PYTHONPATH")
     parts = [str(repo_root)]
     if current:
         parts.append(current)
     env["PYTHONPATH"] = os.pathsep.join(parts)
+    bin_dir = Path(sys.executable).parent
+    env["PATH"] = os.pathsep.join([str(bin_dir), env.get("PATH", "")])
     return env
 
 
@@ -45,8 +49,7 @@ def _run_make(target: str) -> None:
     if jobs:
         cmd.append(f"-j{jobs}")
     cmd.append(target)
-    env = _pythonpath_env(os.environ.copy())
-    subprocess.run(cmd, cwd=Path("_"), check=True, env=env)
+    subprocess.run(cmd, cwd=Path("_"), check=True, env=_runtime_env())
 
 
 def _run_cli(country: str, table: str, fmt: str, wave: str | None, all_waves: bool, target: str) -> None:
@@ -74,7 +77,7 @@ def _run_cli(country: str, table: str, fmt: str, wave: str | None, all_waves: bo
             target,
         ]
     )
-    env = _pythonpath_env(os.environ.copy())
+    env = _runtime_env()
     env["LSMS_USE_DVC_CACHE"] = "false"
     subprocess.run(cmd, cwd=Path("_"), check=True, env=env)
 
@@ -103,11 +106,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-def _pythonpath_env(env: dict[str, str]) -> dict[str, str]:
-    repo_root = Path(__file__).resolve().parents[2]
-    current = env.get("PYTHONPATH")
-    entries = [str(repo_root)]
-    if current:
-        entries.append(current)
-    env["PYTHONPATH"] = os.pathsep.join(entries)
-    return env
