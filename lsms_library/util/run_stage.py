@@ -9,6 +9,16 @@ import sys
 from pathlib import Path
 
 
+def _pythonpath_env(env: dict[str, str]) -> dict[str, str]:
+    repo_root = Path(__file__).resolve().parents[2]
+    current = env.get("PYTHONPATH")
+    parts = [str(repo_root)]
+    if current:
+        parts.append(current)
+    env["PYTHONPATH"] = os.pathsep.join(parts)
+    return env
+
+
 def _compute_make_jobs() -> int | None:
     """Match the default Make parallelism used in Python helpers."""
     env_value = os.getenv("LSMS_MAKE_JOBS")
