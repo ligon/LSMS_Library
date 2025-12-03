@@ -559,8 +559,7 @@ class Country:
 
     @property
     def file_path(self):
-        var = files("lsms_library") / "countries" / self.name
-        return var
+        return Path(__file__).resolve().parent / "countries" / self.name
 
     @property
     def resources(self):
