@@ -10,6 +10,18 @@ from pathlib import Path
 import sys
 
 
+def _python_bin() -> Path:
+    repo_root = Path(__file__).resolve().parents[2]
+    if os.name == "nt":
+        bin_dir = repo_root / ".venv" / "Scripts"
+        python_name = "python.exe"
+    else:
+        bin_dir = repo_root / ".venv" / "bin"
+        python_name = "python"
+    candidate = bin_dir / python_name
+    return candidate if candidate.exists() else Path(sys.executable)
+
+
 def _runtime_env() -> dict[str, str]:
     env = os.environ.copy()
     repo_root = Path(__file__).resolve().parents[2]
@@ -18,8 +30,12 @@ def _runtime_env() -> dict[str, str]:
     if current:
         parts.append(current)
     env["PYTHONPATH"] = os.pathsep.join(parts)
-    bin_dir = Path(sys.executable).parent
+    python_bin = _python_bin()
+    bin_dir = python_bin.parent
     env["PATH"] = os.pathsep.join([str(bin_dir), env.get("PATH", "")])
+    env["PYTHON"] = str(python_bin)
+    if (bin_dir.parent / "pyvenv.cfg").exists():
+        env["VIRTUAL_ENV"] = str(bin_dir.parent)
     return env
 
 
@@ -54,7 +70,7 @@ def _run_make(target: str) -> None:
 
 def _run_cli(country: str, table: str, fmt: str, wave: str | None, all_waves: bool, target: str) -> None:
     cmd = [
-        sys.executable,
+        str(_python_bin()),
         "-m",
         "lsms_library.cli",
         "materialize",
