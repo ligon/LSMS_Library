@@ -12,6 +12,7 @@ import types
 from pyarrow.lib import ArrowInvalid
 from functools import lru_cache
 from pathlib import Path
+import os
 from cfe.df_utils import df_to_orgtbl
 from importlib.resources import files
 from dvc.api import DVCFileSystem
@@ -19,7 +20,9 @@ import pyreadstat
 import inspect
 
 # Initialize DVC filesystem once and reuse it
-DVCFS = DVCFileSystem(files('lsms_library')/'countries')
+_PACKAGE_ROOT = Path(__file__).resolve().parent
+_COUNTRIES_DIR = _PACKAGE_ROOT / "countries"
+DVCFS = DVCFileSystem(os.fspath(_COUNTRIES_DIR))
 
 def _to_numeric(x,coerce=False):
     try:
