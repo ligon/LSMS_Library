@@ -170,8 +170,9 @@ def build_materialize_block(
 
     runner_path = relative_path(LSMS_ROOT / "util" / "run_stage.py", target_dir)
 
+    python_cmd = os.environ.get("PYTHON_CMD", "python3")
     cmd = (
-        f"python3 {runner_path} "
+        f"{python_cmd} {runner_path} "
         '--backend "${item.backend}" '
         '--country "${item.country}" '
         f"{wave_arg} "
