@@ -1094,9 +1094,11 @@ class Country:
             cache_exists = cache_path.exists()
             dvc_root = self.file_path.parent
 
+            repo: Repo | None = None
             try:
                 with _working_directory(dvc_root):
-                    repo = Repo()
+                    repo = Repo(str(dvc_root))
+
                     stage_infos = self._resolve_materialize_stages(method_name, waves)
                     if not stage_infos:
                         if cache_exists:
@@ -1153,13 +1155,25 @@ class Country:
                         print(f"Writing {method_name} to cache {cache_path}", file=stderr)
                         return combined_df
 
+                    def _load_stage(stage_ref: str):
+                        file_part, stage_name = stage_ref.split(":", 1)
+                        return repo.stage.load_one(file_part, stage_name)
+
+                    loaded_stages = []
+                    dirty = True
                     try:
-                        stage_refs = [info.stage_ref for info in stage_infos]
-                        status_map = repo.status(targets=stage_refs)
-                        dirty = bool(status_map)
+                        for info in stage_infos:
+                            stage = _load_stage(info.stage_ref)
+                            loaded_stages.append(stage)
+                        with repo.lock:
+                            stage_status = [
+                                stage.status(check_updates=False)
+                                for stage in loaded_stages
+                            ]
+                        dirty = any(stage_status)
                     except Exception as status_error:
                         print(
-                            f"DVC status failed for {method_name}: {status_error}. Assuming dirty outputs.",
+                            f"DVC status failed for {method_name}: {status_error!r}. Assuming dirty outputs.",
                             file=stderr,
                         )
                         dirty = True
@@ -1191,16 +1205,18 @@ class Country:
                             dirty = True
 
                     if dirty:
-                        for info in stage_infos:
-                            try:
-                                repo.reproduce(targets=[info.stage_ref])
-                            except Exception as reproduce_error:
-                                print(f"DVC reproduce failed for {info.stage_ref}: {reproduce_error}. Falling back to legacy loaders.", file=stderr)
-                                stage_outputs = collect_stage_outputs(stage_infos)
-                                combined_outputs = consolidate_stage_outputs(stage_outputs)
-                                if combined_outputs is not None:
-                                    return combined_outputs
-                                return load_from_waves(waves)
+                        stage_iter = loaded_stages or [_load_stage(info.stage_ref) for info in stage_infos]
+                        with repo.lock:
+                            for stage in stage_iter:
+                                try:
+                                    stage.reproduce()
+                                except Exception as reproduce_error:
+                                    print(f"DVC reproduce failed for {stage.addressing}: {reproduce_error!r}. Falling back to legacy loaders.", file=stderr)
+                                    stage_outputs = collect_stage_outputs(stage_infos)
+                                    combined_outputs = consolidate_stage_outputs(stage_outputs)
+                                    if combined_outputs is not None:
+                                        return combined_outputs
+                                    return load_from_waves(waves)
 
                         stage_outputs = collect_stage_outputs(stage_infos)
                         if not stage_outputs:
@@ -1221,6 +1237,9 @@ class Country:
             except (DvcException, FileNotFoundError) as e:
                 print(f"DVC unavailable for {method_name}: {e}. Falling back to manual aggregation.", file=stderr)
                 return load_from_waves(waves)
+            finally:
+                if repo is not None:
+                    repo.close()
 
         def load_with_dvc_cache(method_name):
             if method_name in JSON_CACHE_METHODS:
