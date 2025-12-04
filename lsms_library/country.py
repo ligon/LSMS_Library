@@ -62,7 +62,6 @@ def _load_materialize_stage_map(dvc_root: str) -> dict[tuple[str, str | None, st
     Load mapping from (country, wave, table) to StageInfo based on available dvc.yaml materialize foreach entries.
     """
     root_path = Path(dvc_root).resolve()
-    project_root = Path(__file__).resolve().parents[1]
     yaml_paths: set[Path] = set()
 
     root_yaml = root_path / "dvc.yaml"
@@ -120,11 +119,8 @@ def _load_materialize_stage_map(dvc_root: str) -> dict[tuple[str, str | None, st
             output_rel = output_rel.replace("//", "/").strip()
             output_path = (yaml_path.parent / output_rel).resolve()
 
-            try:
-                yaml_rel_root = yaml_path.relative_to(project_root)
-            except ValueError:
-                yaml_rel_root = yaml_path.relative_to(root_path)
-            stage_ref = f"{yaml_rel_root.as_posix()}:materialize@{stage_key}"
+            yaml_rel = yaml_path.relative_to(root_path)
+            stage_ref = f"{yaml_rel.as_posix()}:materialize@{stage_key}"
 
             stage_map[(country, wave_value, table)] = StageInfo(
                 stage_key=stage_key,
