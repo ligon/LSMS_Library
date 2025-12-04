@@ -1096,128 +1096,144 @@ class Country:
 
             repo: Repo | None = None
             try:
-                repo = Repo(str(dvc_root))
-                stage_infos = self._resolve_materialize_stages(method_name, waves)
-                if not stage_infos:
-                    if cache_exists:
-                        print(f"Reading {method_name} from cache {cache_path}", file=stderr)
-                        df = get_dataframe(cache_path)
-                        df = map_index(df)
+                with _working_directory(dvc_root):
+                    repo = Repo(str(dvc_root))
+
+                    stage_infos = self._resolve_materialize_stages(method_name, waves)
+                    if not stage_infos:
+                        if cache_exists:
+                            print(f"Reading {method_name} from cache {cache_path}", file=stderr)
+                            df = get_dataframe(cache_path)
+                            df = map_index(df)
+                            return df
+                        df = load_from_waves(waves)
+                        if isinstance(df, pd.DataFrame):
+                            cache_path.parent.mkdir(parents=True, exist_ok=True)
+                            to_parquet(df, cache_path)
+                            print(f"Writing {method_name} to cache {cache_path}", file=stderr)
                         return df
-                    df = load_from_waves(waves)
-                    if isinstance(df, pd.DataFrame):
+
+                    deduped_infos: list[StageInfo] = []
+                    seen_refs: set[str] = set()
+                    for info in stage_infos:
+                        if info.stage_ref in seen_refs:
+                            continue
+                        seen_refs.add(info.stage_ref)
+                        deduped_infos.append(info)
+                    stage_infos = deduped_infos
+
+                    def collect_stage_outputs(stage_list):
+                        stage_results: dict[str, pd.DataFrame] = {}
+                        for stage in stage_list:
+                            if stage.fmt != "parquet":
+                                raise ValueError(f"Unsupported format {stage.fmt} for {method_name}")
+                            output_path = stage.output_path
+                            if output_path.exists():
+                                df_wave = get_dataframe(output_path)
+                                df_wave = map_index(df_wave)
+                                df_wave = self._augment_index_from_related_tables(
+                                    df_wave,
+                                    scheme_entry,
+                                    stage.wave,
+                                )
+                                df_wave = _normalize_dataframe_index(df_wave, scheme_entry, stage.wave)
+                                stage_results[stage.wave or "ALL"] = df_wave
+                        return stage_results
+
+                    def consolidate_stage_outputs(stage_results: dict[str, pd.DataFrame]) -> pd.DataFrame | None:
+                        if not stage_results:
+                            return None
+                        non_empty_df = {k: v for k, v in stage_results.items() if not v.empty}
+                        if not non_empty_df:
+                            combined_df = pd.concat(stage_results.values(), axis=0, sort=False)
+                        elif len(non_empty_df) > 1:
+                            combined_df = safe_concat_dataframe_dict(non_empty_df)
+                        else:
+                            combined_df = next(iter(non_empty_df.values()))
                         cache_path.parent.mkdir(parents=True, exist_ok=True)
-                        to_parquet(df, cache_path)
+                        to_parquet(combined_df, cache_path)
                         print(f"Writing {method_name} to cache {cache_path}", file=stderr)
-                    return df
+                        return combined_df
 
-                deduped_infos: list[StageInfo] = []
-                seen_refs: set[str] = set()
-                for info in stage_infos:
-                    if info.stage_ref in seen_refs:
-                        continue
-                    seen_refs.add(info.stage_ref)
-                    deduped_infos.append(info)
-                stage_infos = deduped_infos
+                    def _load_stage(stage_ref: str):
+                        file_part, stage_name = stage_ref.split(":", 1)
+                        return repo.stage.load_one(file_part, stage_name)
 
-                def collect_stage_outputs(stage_list):
-                    stage_results: dict[str, pd.DataFrame] = {}
-                    for stage in stage_list:
-                        if stage.fmt != "parquet":
-                            raise ValueError(f"Unsupported format {stage.fmt} for {method_name}")
-                        output_path = stage.output_path
-                        if output_path.exists():
-                            df_wave = get_dataframe(output_path)
-                            df_wave = map_index(df_wave)
-                            df_wave = self._augment_index_from_related_tables(
-                                df_wave,
-                                scheme_entry,
-                                stage.wave,
-                            )
-                            df_wave = _normalize_dataframe_index(df_wave, scheme_entry, stage.wave)
-                            stage_results[stage.wave or "ALL"] = df_wave
-                    return stage_results
-
-                def consolidate_stage_outputs(stage_results: dict[str, pd.DataFrame]) -> pd.DataFrame | None:
-                    if not stage_results:
-                        return None
-                    non_empty_df = {k: v for k, v in stage_results.items() if not v.empty}
-                    if not non_empty_df:
-                        combined_df = pd.concat(stage_results.values(), axis=0, sort=False)
-                    elif len(non_empty_df) > 1:
-                        combined_df = safe_concat_dataframe_dict(non_empty_df)
-                    else:
-                        combined_df = next(iter(non_empty_df.values()))
-                    cache_path.parent.mkdir(parents=True, exist_ok=True)
-                    to_parquet(combined_df, cache_path)
-                    print(f"Writing {method_name} to cache {cache_path}", file=stderr)
-                    return combined_df
-
-                try:
-                    stage_refs = [info.stage_ref for info in stage_infos]
-                    status_map = repo.status(targets=stage_refs)
-                    dirty = bool(status_map)
-                except Exception as status_error:
-                    print(
-                        f"DVC status failed for {method_name}: {status_error}. Assuming dirty outputs.",
-                        file=stderr,
-                    )
+                    loaded_stages = []
                     dirty = True
-
-                if cache_exists and not dirty:
                     try:
-                        print(f"Reading {method_name} from cache {cache_path}", file=stderr)
-                        cached_df = get_dataframe(cache_path)
-                        cached_df = map_index(cached_df)
-                        wave_hint = stage_infos[0].wave if len(stage_infos) == 1 else None
-                        cached_df = self._augment_index_from_related_tables(
-                            cached_df,
-                            scheme_entry,
-                            wave_hint,
+                        for info in stage_infos:
+                            stage = _load_stage(info.stage_ref)
+                            loaded_stages.append(stage)
+                        with repo.lock:
+                            stage_status = [
+                                stage.status(check_updates=False)
+                                for stage in loaded_stages
+                            ]
+                        dirty = any(stage_status)
+                    except Exception as status_error:
+                        print(
+                            f"DVC status failed for {method_name}: {status_error!r}. Assuming dirty outputs.",
+                            file=stderr,
                         )
-                        cached_df = _normalize_dataframe_index(
-                            cached_df,
-                            scheme_entry,
-                            wave_hint,
-                        )
-                        return cached_df
-                    except (FileNotFoundError, PathMissingError):
-                        dirty = True  # fall through to repro if cache missing unexpectedly
-
-                stage_outputs: dict[str, pd.DataFrame] | None = None
-                if not dirty:
-                    stage_outputs = collect_stage_outputs(stage_infos)
-                    if not stage_outputs:
                         dirty = True
 
-                if dirty:
-                    for info in stage_infos:
+                    if cache_exists and not dirty:
                         try:
-                            repo.reproduce(targets=[info.stage_ref])
-                        except Exception as reproduce_error:
-                            print(f"DVC reproduce failed for {info.stage_ref}: {reproduce_error}. Falling back to legacy loaders.", file=stderr)
-                            stage_outputs = collect_stage_outputs(stage_infos)
-                            combined_outputs = consolidate_stage_outputs(stage_outputs)
-                            if combined_outputs is not None:
-                                return combined_outputs
-                            return load_from_waves(waves)
+                            print(f"Reading {method_name} from cache {cache_path}", file=stderr)
+                            cached_df = get_dataframe(cache_path)
+                            cached_df = map_index(cached_df)
+                            wave_hint = stage_infos[0].wave if len(stage_infos) == 1 else None
+                            cached_df = self._augment_index_from_related_tables(
+                                cached_df,
+                                scheme_entry,
+                                wave_hint,
+                            )
+                            cached_df = _normalize_dataframe_index(
+                                cached_df,
+                                scheme_entry,
+                                wave_hint,
+                            )
+                            return cached_df
+                        except (FileNotFoundError, PathMissingError):
+                            dirty = True  # fall through to repro if cache missing unexpectedly
 
-                    stage_outputs = collect_stage_outputs(stage_infos)
-                    if not stage_outputs:
+                    stage_outputs: dict[str, pd.DataFrame] | None = None
+                    if not dirty:
+                        stage_outputs = collect_stage_outputs(stage_infos)
+                        if not stage_outputs:
+                            dirty = True
+
+                    if dirty:
+                        stage_iter = loaded_stages or [_load_stage(info.stage_ref) for info in stage_infos]
+                        with repo.lock:
+                            for stage in stage_iter:
+                                try:
+                                    stage.reproduce()
+                                except Exception as reproduce_error:
+                                    print(f"DVC reproduce failed for {stage.addressing}: {reproduce_error!r}. Falling back to legacy loaders.", file=stderr)
+                                    stage_outputs = collect_stage_outputs(stage_infos)
+                                    combined_outputs = consolidate_stage_outputs(stage_outputs)
+                                    if combined_outputs is not None:
+                                        return combined_outputs
+                                    return load_from_waves(waves)
+
+                        stage_outputs = collect_stage_outputs(stage_infos)
+                        if not stage_outputs:
+                            raise KeyError(f"No data produced for {method_name} via DVC.")
+
+                    single_stage = (
+                        len(stage_infos) == 1
+                        and stage_infos[0].wave is None
+                        and stage_infos[0].output_path == cache_path
+                    )
+                    if single_stage:
+                        return next(iter(stage_outputs.values()))
+
+                    combined_outputs = consolidate_stage_outputs(stage_outputs)
+                    if combined_outputs is None:
                         raise KeyError(f"No data produced for {method_name} via DVC.")
-
-                single_stage = (
-                    len(stage_infos) == 1
-                    and stage_infos[0].wave is None
-                    and stage_infos[0].output_path == cache_path
-                )
-                if single_stage:
-                    return next(iter(stage_outputs.values()))
-
-                combined_outputs = consolidate_stage_outputs(stage_outputs)
-                if combined_outputs is None:
-                    raise KeyError(f"No data produced for {method_name} via DVC.")
-                return combined_outputs
+                    return combined_outputs
             except (DvcException, FileNotFoundError) as e:
                 print(f"DVC unavailable for {method_name}: {e}. Falling back to manual aggregation.", file=stderr)
                 return load_from_waves(waves)
