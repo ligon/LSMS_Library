@@ -190,15 +190,26 @@ class Wave:
         For example, if a user calls `country_instance.food_acquired()` and `food_acquired` is part of the `data_scheme` but not an existing method,
         the method will dynamically create a function to handle data aggregation for `food_acquired`.
         '''
-        # Prevent infinite recursion: don't check data_scheme for internal properties
-        if method_name in ('resources', 'file_path', 'data_scheme', 'formatting_functions'):
-            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{method_name}'")
+        # Prevent infinite recursion: block access to these properties ONLY during recursive __getattr__ calls
+        # Check if we're already inside __getattr__ (recursive call)
+        # Use __dict__ directly to avoid triggering __getattr__ recursively
+        if '_in_getattr' in self.__dict__:
+            # We're inside __getattr__ - block access to prevent recursion
+            if method_name in ('resources', 'file_path', 'data_scheme', 'formatting_functions'):
+                raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{method_name}'")
 
-        if method_name in self.data_scheme or method_name in self.country.data_scheme:
-            def method():
-                return self.grab_data(method_name)
-            return method
-        raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{method_name}'")
+        # Set flag to track that we're inside __getattr__
+        self.__dict__['_in_getattr'] = True
+        try:
+            if method_name in self.data_scheme or method_name in self.country.data_scheme:
+                def method():
+                    return self.grab_data(method_name)
+                return method
+            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{method_name}'")
+        finally:
+            # Always clear flag when exiting, even if exception raised
+            # Use __dict__.pop() to avoid triggering __getattr__
+            self.__dict__.pop('_in_getattr', None)
         
     @property
     def file_path(self):
