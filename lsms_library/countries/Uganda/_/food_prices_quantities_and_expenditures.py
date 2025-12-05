@@ -18,7 +18,7 @@ quantities =  ['quantity_home', 'quantity_away', 'quantity_own', 'quantity_inkin
 
 expenditures = ['value_home', 'value_away', 'value_own', 'value_inkind']
 
-x = v.groupby(['j','t','m','i'])[expenditures].sum()
+x = v.groupby(['i','t','m','j'])[expenditures].sum()
 x = x.sum(axis=1).replace(0,np.nan).dropna()
 
 to_parquet(pd.DataFrame({'x':x}), '../var/food_expenditures.parquet')

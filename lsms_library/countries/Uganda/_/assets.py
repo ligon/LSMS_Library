@@ -23,7 +23,7 @@ x.columns.names = ['t']
 x = pd.DataFrame({'assets':x.stack()})
 
 x['m'] = 'Uganda'
-x = x.reset_index().set_index(['j','t','m'])
+x = x.reset_index().set_index(['i','t','m'])
 
 updated_ids = json.load(open('updated_ids.json'))
 x = id_walk(x, updated_ids)

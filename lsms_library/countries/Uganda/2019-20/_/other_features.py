@@ -32,6 +32,6 @@ df = df.rename(columns={'region':'m'})
 
 df['t'] = round
 
-df = df.reset_index().set_index(['j','t','m'])[['Rural']]
+df = df.reset_index().set_index(['i','t','m'])[['Rural']]
 
 to_parquet(df, 'other_features.parquet')

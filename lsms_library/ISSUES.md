@@ -77,3 +77,27 @@
 
 - Waves: 2005-06, 2009-10, 2010-11, 2011-12, 2013-14, 2015-16, 2018-19, 2019-20
 - Error: `CalledProcessError: Command '['make', '-s', '../2005-06/_/household_characteristics.parquet']' returned non-zero exit status 2.`
+## 2025-12-05 14:04:13Z TestCountry – household_roster
+
+- Waves: 2020-21
+- Error: `TypeError: 'Mock' object does not support the context manager protocol`
+## 2025-12-05 14:33:06Z TestCountry – test_data
+
+- Waves: 2020-21
+- Error: `FileNotFoundError: [Errno 2] No such file or directory: '/tmp/test/countries/TestCountry/2020-21/_'`
+## 2025-12-05 15:14:31Z TestCountry – test_data
+
+- Waves: 2020-21
+- Error: `TypeError: 'Mock' object does not support the context manager protocol`
+## 2025-12-05 15:18:37Z TestCountry – household_roster
+
+- Waves: 2020-21
+- Error: `TypeError: 'Mock' object does not support the context manager protocol`
+## 2025-12-05 15:22:56Z TestCountry – household_roster
+
+- Waves: 2020-21
+- Error: `TypeError: 'Mock' object does not support the context manager protocol`
+## 2025-12-05 15:23:22Z TestCountry – household_roster
+
+- Waves: 2020-21
+- Error: `TypeError: 'Mock' object does not support the context manager protocol`
