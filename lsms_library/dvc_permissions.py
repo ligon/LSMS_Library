@@ -45,6 +45,12 @@ def authenticate(gpg_key_file='s3_reader_creds.gpg', max_attempts: int = 3):
     # Initialize GPG
     gpg = gnupg.GPG()
 
+    print(
+        "\n*** LSMS_Library DVC authentication ***\n"
+        "Contact ligon@berkeley.edu to request access credentials.\n"
+        "Enter your passphrase to unlock the survey data stream.\n"
+    )
+
     for attempt in range(1, max_attempts + 1):
         passphrase = getpass.getpass(prompt='Enter passphrase for decryption: ')
         decrypted_data = gpg.decrypt(encrypted_data, passphrase=passphrase)
@@ -60,7 +66,7 @@ def authenticate(gpg_key_file='s3_reader_creds.gpg', max_attempts: int = 3):
 
             with open(creds_file, 'w') as f:
                 f.write(str(decrypted_data))
-            print(f"Decryption successful; credentials written to {creds_file}")
+            print("Decryption successful; LSMS_Library can now stream data.")
             return
 
         remaining = max_attempts - attempt
