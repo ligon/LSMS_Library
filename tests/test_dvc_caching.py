@@ -237,9 +237,11 @@ class TestDVCCaching:
             patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
             patch.object(Country, "data_scheme", new_callable=PropertyMock) as mock_scheme, \
             patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources, \
+            patch.object(Country, "file_path", new_callable=PropertyMock) as mock_file_path, \
             patch.object(Country, "_resolve_materialize_stages", return_value=[stage_info]):
 
             mock_files.return_value = mock_country_structure.parent.parent
+            mock_file_path.return_value = mock_country_structure
             mock_repo = Mock()
             mock_repo.status.return_value = {
                 stage_info.stage_ref: [
