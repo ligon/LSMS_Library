@@ -442,7 +442,8 @@ class TestDVCCaching:
             patch("lsms_library.country.subprocess.run", side_effect=fake_make) as _mock_make, \
             patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
             patch.object(Country, "data_scheme", new_callable=PropertyMock) as mock_scheme, \
-            patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources:
+            patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources, \
+            patch.object(Country, "file_path", new_callable=PropertyMock) as mock_file_path:
 
             mock_files.return_value = mock_country_structure.parent.parent
 
@@ -453,6 +454,7 @@ class TestDVCCaching:
             mock_waves.return_value = ["2020-21"]
             mock_scheme.return_value = ["panel_ids"]
             mock_resources.return_value = {"Data Scheme": {"panel_ids": {}}}
+            mock_file_path.return_value = mock_country_structure
 
             country = Country("TestCountry", preload_panel_ids=False)
             result = country._aggregate_wave_data(method_name="panel_ids")
@@ -486,6 +488,7 @@ class TestDVCCaching:
             patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
             patch.object(Country, "data_scheme", new_callable=PropertyMock) as mock_scheme, \
             patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources, \
+            patch.object(Country, "file_path", new_callable=PropertyMock) as mock_file_path, \
             patch.object(
                 Country,
                 "__getitem__",
@@ -505,6 +508,7 @@ class TestDVCCaching:
             mock_waves.return_value = ["2020-21"]
             mock_scheme.return_value = ["panel_ids"]
             mock_resources.return_value = {"Data Scheme": {"panel_ids": {}}}
+            mock_file_path.return_value = mock_country_structure
 
             country = Country("TestCountry", preload_panel_ids=False)
             result = country._aggregate_wave_data(method_name="panel_ids")
