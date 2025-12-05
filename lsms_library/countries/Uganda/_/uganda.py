@@ -173,9 +173,9 @@ def age_sex_composition(fn,sex='sex',sex_converter=None,age='age',months_spent='
                                   sex_converter=sex_converter,months_converter=months_converter,
                                   Age_ints=Age_ints)
 
-    df.index.name = 'j'
+    df.index.name = 'i'  # Household ID
     df.columns.name = 'k'
-    
+
     return df
 
 
