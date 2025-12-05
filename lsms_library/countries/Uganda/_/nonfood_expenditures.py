@@ -15,7 +15,7 @@ for t in list(Waves.keys()):
     print(t)
     x[t] = get_dataframe('../'+t+'/_/nonfood_expenditures.parquet')
     x[t] = x[t].stack('i').dropna()
-    x[t] = x[t].reset_index().set_index(['j','i']).squeeze()
+    x[t] = x[t].reset_index().set_index(['i','j']).squeeze()
     x[t] = x[t].replace(0,np.nan).dropna()
 
 df = pd.DataFrame(x)
@@ -31,7 +31,7 @@ agg_labels = harmonized_food_labels(fn='./nonfood_items.org',
 x = x.groupby('i',axis=1).sum()
 
 x['m'] = 'Uganda'
-x = x.reset_index().set_index(['j','t','m'])
+x = x.reset_index().set_index(['i','t','m'])
 
 x = x.fillna(0)
 

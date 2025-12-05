@@ -18,7 +18,7 @@ for t in Waves.keys():
     if 't' in x[t].index.names:
         x[t] = x[t].droplevel('t')
     x[t] = x[t].stack('k').dropna()
-    x[t] = x[t].reset_index().set_index(['j','m','k']).squeeze()
+    x[t] = x[t].reset_index().set_index(['i','m','k']).squeeze()
 
 z = pd.DataFrame(x)
 z.columns.name = 't'

@@ -26,14 +26,14 @@ def m_regions(df,oc):
     try:
         colnames = df.columns.names
         df = df.join(oc)
-        df = df.reset_index().set_index(['j','t','m'])
+        df = df.reset_index().set_index(['i','t','m'])
         df.columns.names = colnames
     except ValueError: # Already has variable?
         pass
 
     if not df.columns.name=='k':
         # Drop other characteristics
-        oc = oc.reset_index().set_index(['j','t','m'])
+        oc = oc.reset_index().set_index(['i','t','m'])
         df = df.drop(oc.columns,axis=1)
 
     return df
