@@ -214,6 +214,36 @@ def id_walk(df, updated_ids, hh_index='i'):
 
     The function handles these wave-specific mappings separately, ensuring accurate household identification over time.
     '''
+    index_names = list(df.index.names or [])
+    if not index_names:
+        raise ValueError("Dataframe must have a named MultiIndex for id_walk.")
+    if 't' not in index_names:
+        raise KeyError("Index must contain a 't' level for wave identifiers.")
+
+    household_level = hh_index
+    fallback_used = False
+    if household_level not in index_names:
+        for candidate in ('i', 'j'):
+            if candidate in index_names:
+                household_level = candidate
+                fallback_used = True
+                break
+        else:
+            # fallback to the first non-'t' level (or level 0)
+            non_wave_levels = [name for name in index_names if name != 't']
+            if not non_wave_levels:
+                raise KeyError("Cannot determine household index level for id_walk.")
+            household_level = non_wave_levels[0]
+            fallback_used = True
+
+    household_level_pos = index_names.index(household_level)
+
+    if fallback_used and household_level != hh_index:
+        warnings.warn(
+            f"id_walk expected index level '{hh_index}' but found '{household_level}'. "
+            "Proceeding with the detected household index."
+        )
+
     #seperate df into different waves:
     dfs = {}
     waves = df.index.get_level_values('t').unique()
@@ -223,7 +253,7 @@ def id_walk(df, updated_ids, hh_index='i'):
     for wave, df_wave in dfs.items():
         #update ids
         if wave in updated_ids:
-            df_wave = df_wave.rename(index=updated_ids[wave], level=hh_index)
+            df_wave = df_wave.rename(index=updated_ids[wave], level=household_level)
             #update the dataframe with the new ids
             dfs[wave] = df_wave
         else:
@@ -231,7 +261,9 @@ def id_walk(df, updated_ids, hh_index='i'):
     #combine the updated dataframes
     df = pd.concat(dfs.values(), axis=0)
 
-    # df= df.rename(index=updated_ids,level=['t', hh_index])
+    if 'i' not in df.index.names or household_level != 'i':
+        df.index = df.index.set_names('i', level=household_level_pos)
+
+    # df= df.rename(index=updated_ids,level=['t', household_level])
     df.attrs['id_converted'] = True
     return df  
-
