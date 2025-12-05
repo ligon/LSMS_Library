@@ -184,12 +184,16 @@ class Wave:
 
     def __getattr__(self, method_name):
         '''
-        This method is triggered when an attribute is not found in the instance, but exists in the `data_scheme`. 
+        This method is triggered when an attribute is not found in the instance, but exists in the `data_scheme`.
         It dynamically generates a method to aggregate data for the requested attribute.
 
-        For example, if a user calls `country_instance.food_acquired()` and `food_acquired` is part of the `data_scheme` but not an existing method, 
+        For example, if a user calls `country_instance.food_acquired()` and `food_acquired` is part of the `data_scheme` but not an existing method,
         the method will dynamically create a function to handle data aggregation for `food_acquired`.
         '''
+        # Prevent infinite recursion: don't check data_scheme for internal properties
+        if method_name in ('resources', 'file_path', 'data_scheme', 'formatting_functions'):
+            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{method_name}'")
+
         if method_name in self.data_scheme or method_name in self.country.data_scheme:
             def method():
                 return self.grab_data(method_name)
