@@ -61,7 +61,7 @@ df['start_date'] = pd.to_datetime(df.rename(columns={'shock_year': 'year', 'h16q
 df['Onset'] = (df.end_date.dt.to_period('M') - df.start_date.dt.to_period('M')).apply(lambda x: x.n)
 
 
-shocks = pd.DataFrame({"j": df.HHID.values.tolist(),
+shocks = pd.DataFrame({"i": df.HHID.values.tolist(),
                     "Shock":df.h16q00.values.tolist(), 
                     "Year": df.shock_year.tolist(),
                     "Onset":df.Onset.values.tolist(), 
@@ -88,6 +88,6 @@ shocks = shocks.astype({'Shock': 'category',
                         }) 
 
 shocks.insert(1, 't', '2010-11')
-shocks.set_index(['j','t','Shock'], inplace = True)
+shocks.set_index(['i','t','Shock'], inplace = True)
 
 to_parquet(shocks, 'shocks.parquet')

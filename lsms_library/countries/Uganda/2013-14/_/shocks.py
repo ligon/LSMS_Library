@@ -29,7 +29,7 @@ date = date[["HHID", "end_date"]]
 df = pd.merge(df, date, on='HHID')
 df['Onset'] = (df.end_date.dt.to_period('M') - df.start_date.dt.to_period('M')).dropna().apply(lambda x: x.n)
 
-shocks = pd.DataFrame({"j": df.HHID.values.tolist(),
+shocks = pd.DataFrame({"i": df.HHID.values.tolist(),
                     "Shock":df.h16q00.values.tolist(), 
                     "Year": df.h16q2y.values.tolist(),
                     "Onset":df.Onset.values.tolist(), 
@@ -56,6 +56,6 @@ shocks = shocks.astype({'Shock': 'category',
                         }) 
 
 shocks.insert(1, 't', '2013-14')
-shocks.set_index(['j','t','Shock'], inplace = True)
+shocks.set_index(['i','t','Shock'], inplace = True)
 
 to_parquet(shocks, 'shocks.parquet')

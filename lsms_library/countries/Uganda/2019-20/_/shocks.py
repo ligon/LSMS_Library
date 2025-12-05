@@ -29,7 +29,7 @@ df = pd.merge(df, date, on='hhid')
 df['Onset'] = (df.end_date.dt.to_period('M') - df.start_date.dt.to_period('M')).apply(lambda x: x.n)
 
 
-shocks = pd.DataFrame({"j": df.hhid.values.tolist(),
+shocks = pd.DataFrame({"i": df.hhid.values.tolist(),
                     "Shock":df.s16qa01.values.tolist(), 
                     "Year": df.s16q02y.values.tolist(), 
                     "Onset":df.Onset.values.tolist(), 
@@ -57,7 +57,7 @@ shocks = shocks.astype({'Shock': 'category',
 
 shocks.insert(1, 't', '2019-20')
 
-shocks.set_index(['j','t','Shock'], inplace = True)
+shocks.set_index(['i','t','Shock'], inplace = True)
 
 
 
