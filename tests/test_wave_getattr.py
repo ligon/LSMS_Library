@@ -12,8 +12,57 @@ Related issues:
 - Original recursion bug: ba8337d6
 - Regression fix: commit 0cdde86e
 """
+from dataclasses import dataclass, field
+
 import pytest
+
 import lsms_library as ll
+from lsms_library.country import Wave
+
+
+@dataclass
+class _DummyCountry:
+    """Minimal country stub for unit tests."""
+
+    name: str = "Dummy"
+    _scheme: list[str] = field(default_factory=lambda: ["foo"])
+
+    @property
+    def data_scheme(self):
+        return list(self._scheme)
+
+    @property
+    def formatting_functions(self):
+        return {}
+
+    resources = {}
+    wave_folder_map = {}
+
+
+def test_wave_getattr_returns_data_scheme_via_descriptor(monkeypatch):
+    """Calling __getattr__('data_scheme') should return the property value, not raise."""
+    dummy_country = _DummyCountry()
+    wave = Wave("2020-21", "2020-21", dummy_country)
+
+    # Provide a lightweight scheme to avoid filesystem access
+    monkeypatch.setattr(Wave, "data_scheme", property(lambda self: ["foo", "bar"]))
+    result = Wave.__getattr__(wave, "data_scheme")
+
+    assert result == ["foo", "bar"]
+
+
+def test_wave_getattr_dynamic_method_uses_scheme_without_recursion(monkeypatch):
+    """Dynamic methods should be built even when schemes are provided via properties."""
+    dummy_country = _DummyCountry(_scheme=["foo"])
+    wave = Wave("2020-21", "2020-21", dummy_country)
+
+    monkeypatch.setattr(Wave, "data_scheme", property(lambda self: ["foo"]))
+    monkeypatch.setattr(Wave, "resources", property(lambda self: {}))
+    monkeypatch.setattr(Wave, "grab_data", lambda self, name: f"built:{name}")
+
+    method = getattr(wave, "foo")
+    assert callable(method)
+    assert method() == "built:foo"
 
 
 def test_wave_data_scheme_external_access():

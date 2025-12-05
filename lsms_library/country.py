@@ -190,18 +190,33 @@ class Wave:
         For example, if a user calls `country_instance.food_acquired()` and `food_acquired` is part of the `data_scheme` but not an existing method,
         the method will dynamically create a function to handle data aggregation for `food_acquired`.
         '''
-        # Prevent infinite recursion: block access to these properties ONLY during recursive __getattr__ calls
-        # Check if we're already inside __getattr__ (recursive call)
-        # Use __dict__ directly to avoid triggering __getattr__ recursively
+        def _property_value(instance, prop_name):
+            """
+            Retrieve a property directly from the class descriptor to avoid
+            triggering __getattr__ on the instance.
+            """
+            prop = getattr(type(instance), prop_name, None)
+            if isinstance(prop, property):
+                return prop.__get__(instance, type(instance))
+            raise AttributeError(f"'{instance.__class__.__name__}' object has no attribute '{prop_name}'")
+
+        # Allow direct data_scheme access even if __getattr__ is re-entered for it.
+        if method_name == 'data_scheme':
+            return _property_value(self, 'data_scheme')
+
+        # Prevent infinite recursion for properties that themselves rely on __getattr__
         if '_in_getattr' in self.__dict__:
-            # We're inside __getattr__ - block access to prevent recursion
-            if method_name in ('resources', 'file_path', 'data_scheme', 'formatting_functions'):
+            if method_name in ('resources', 'file_path', 'formatting_functions'):
                 raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{method_name}'")
+
+        # Resolve scheme membership without triggering __getattr__
+        wave_scheme = _property_value(self, 'data_scheme')
+        country_scheme = _property_value(self.country, 'data_scheme')
 
         # Set flag to track that we're inside __getattr__
         self.__dict__['_in_getattr'] = True
         try:
-            if method_name in self.data_scheme or method_name in self.country.data_scheme:
+            if method_name in wave_scheme or method_name in country_scheme:
                 def method():
                     return self.grab_data(method_name)
                 return method
