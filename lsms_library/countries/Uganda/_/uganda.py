@@ -83,15 +83,15 @@ def food_acquired(fn,myvars):
 
     df = df.set_index(['HHID','item','units']).dropna(how='all')
 
-    df.index.names = ['j','i','u']
+    df.index.names = ['i','j','u']  # HHID='i', item='j', units='u'
 
 
     # Fix type of hhids if need be
-    if df.index.get_level_values('j').dtype ==float:
+    if df.index.get_level_values('i').dtype ==float:
         fix = dict(zip(df.index.levels[0],df.index.levels[0].astype(int).astype(str)))
         df = df.rename(index=fix,level=0)
 
-    df = df.rename(index=harmonized_food_labels(),level='i')
+    df = df.rename(index=harmonized_food_labels(),level='j')
     unitlabels = harmonized_unit_labels()
     df = df.rename(index=unitlabels,level='u')
 
@@ -184,13 +184,13 @@ def other_features(fn,urban=None,region=None,v=None,HHID='HHID',urban_converter=
     with dvc.api.open(fn,mode='rb') as dta:
         df = get_household_identification_particulars(fn=dta,HHID=HHID,urban=urban,region=region,urban_converter=urban_converter)
 
-    df.index.name = 'j'
+    df.index.name = 'i'  # Household ID
     df.columns.name = 'k'
 
     return df
 
 
-def id_walk(df, updated_ids, hh_index='j'):
+def id_walk(df, updated_ids, hh_index='i'):
     '''
     Updates household IDs in panel data across different waves separately.
 

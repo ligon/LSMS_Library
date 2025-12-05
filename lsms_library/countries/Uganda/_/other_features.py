@@ -41,7 +41,7 @@ z = z.rename(columns=regions)
 
 z = z.stack().unstack('k')
 
-z = z.reset_index().set_index(['j','t','m'])
+z = z.reset_index().set_index(['i','t','m'])
 
 with open('updated_ids.json','r') as f:
     updated_ids =json.load(f)
