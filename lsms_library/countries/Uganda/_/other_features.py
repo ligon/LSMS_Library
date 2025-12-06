@@ -4,7 +4,7 @@ Concatenate data on other household features across rounds.
 """
 from lsms_library.local_tools import to_parquet
 from lsms_library.local_tools import get_dataframe
-
+import sys
 import pandas as pd
 from uganda import Waves, id_walk
 import json
@@ -13,7 +13,7 @@ import json
 x = {}
 
 for t in Waves.keys():
-    print(t)
+    print(t, file=sys.stderr)
     x[t] = get_dataframe('../'+t+'/_/other_features.parquet')
     if 't' in x[t].index.names:
         x[t] = x[t].droplevel('t')
