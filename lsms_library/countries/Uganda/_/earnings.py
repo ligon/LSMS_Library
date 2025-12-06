@@ -4,6 +4,7 @@ from lsms_library.local_tools import get_dataframe
 """
 Compile data on reported labor earnings.
 """
+import sys
 import pandas as pd
 import numpy as np
 from uganda import Waves, id_walk
@@ -13,7 +14,7 @@ import json
 x = {}
 
 for t in list(Waves.keys()):
-    print(t)
+    print(t, file=sys.stderr)
     x[t] = get_dataframe('../'+t+'/_/earnings.parquet')
     x[t] = x[t].stack().squeeze()
 

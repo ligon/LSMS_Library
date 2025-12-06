@@ -13,11 +13,11 @@ import json
 
 x = {}
 for t in list(Waves.keys()):
-    print(t)
+    print(t, file=sys.stderr)
     try: 
         x[t] = get_dataframe('../'+t+'/_/interview_date.parquet')
     except FileNotFoundError:
-        print(f"No parquet foound for {t}")
+        print(f"No parquet foound for {t}", file=sys.stderr)
 
 x = pd.concat(x.values())
 

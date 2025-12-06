@@ -13,7 +13,7 @@ import json
 x = {}
 
 for t in list(Waves.keys()):
-    print(t)
+    print(t, file=sys.stderr)
     x[t] = get_dataframe('../'+t+'/_/shocks.parquet')
 
 x = pd.concat(x.values())

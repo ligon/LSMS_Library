@@ -25,7 +25,7 @@ from dvc.repo import Repo
 from dvc.exceptions import DvcException, PathMissingError
 from datetime import datetime
 from typing import Any, Iterable
-from contextlib import contextmanager
+from contextlib import contextmanager, redirect_stdout
 
 JSON_CACHE_METHODS = {'panel_ids', 'updated_ids'}
 
@@ -39,6 +39,13 @@ def _working_directory(path: Path):
         yield
     finally:
         os.chdir(previous)
+
+
+@contextmanager
+def _redirect_stdout_to_stderr():
+    """Silence DVC's stdout chatter by redirecting it to stderr."""
+    with redirect_stdout(stderr):
+        yield
 
 
 def _slugify(value: str) -> str:
@@ -1195,7 +1202,7 @@ class Country:
                         for info in stage_infos:
                             stage = _load_stage(info.stage_ref)
                             loaded_stages.append(stage)
-                        with repo.lock:
+                        with repo.lock, _redirect_stdout_to_stderr():
                             stage_status = [
                                 stage.status(check_updates=False)
                                 for stage in loaded_stages
@@ -1236,7 +1243,7 @@ class Country:
 
                     if dirty:
                         stage_iter = loaded_stages or [_load_stage(info.stage_ref) for info in stage_infos]
-                        with repo.lock:
+                        with repo.lock, _redirect_stdout_to_stderr():
                             for stage in stage_iter:
                                 try:
                                     stage.reproduce()

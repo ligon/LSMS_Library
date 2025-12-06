@@ -4,6 +4,7 @@ from lsms_library.local_tools import get_dataframe
 """
 Read non-food expenditures; use harmonized non-food labels.
 """
+import sys
 import pandas as pd
 import numpy as np
 from uganda import Waves, harmonized_food_labels, id_walk
@@ -12,7 +13,7 @@ import json
 x = {}
 
 for t in list(Waves.keys()):
-    print(t)
+    print(t, file=sys.stderr)
     x[t] = get_dataframe('../'+t+'/_/nonfood_expenditures.parquet')
     x[t] = x[t].stack('i').dropna()
     x[t] = x[t].reset_index().set_index(['i','j']).squeeze()
