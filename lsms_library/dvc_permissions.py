@@ -66,7 +66,8 @@ def authenticate(gpg_key_file='s3_reader_creds.gpg', max_attempts: int = 3):
 
             with open(creds_file, 'w') as f:
                 f.write(str(decrypted_data))
-            print("Decryption successful; LSMS_Library can now stream data.")
+            print("*** Decryption successful; LSMS_Library can now stream data. ***")
+            print()
             return
 
         remaining = max_attempts - attempt
