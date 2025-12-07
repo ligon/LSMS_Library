@@ -18,12 +18,12 @@ for t in Waves.keys():
     if 't' in x[t].index.names:
         x[t] = x[t].droplevel('t')
     x[t] = x[t].stack('k').dropna()
-    x[t] = x[t].reset_index().set_index(['i','m','k']).squeeze()
+    x[t] = x[t].reset_index().set_index(['i','m','k']).squeeze().unstack('k')
 
-z = pd.DataFrame(x)
-z.columns.name = 't'
+z = pd.concat(x)
+z.index.names = ['t','i','m']
 
-z = z.stack().unstack('m')
+z = z.reorder_levels(['i','t','m']).sort_index()
 
 #z['m'] = 'Uganda'
 
