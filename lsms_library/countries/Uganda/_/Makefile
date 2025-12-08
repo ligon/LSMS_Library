@@ -4,7 +4,7 @@ rounds := $(shell ls -d ../2*-*)
 source = $(shell find $(rounds) -name \*.py)
 parquet := $(source:.py=.parquet)
 var = ../var/food_expenditures.parquet ../var/food_quantities.parquet ../var/food_prices.parquet \
-	  ../var/household_characteristics.parquet ../var/other_features.parquet \
+	  ../var/household_characteristics.parquet ../var/other_features.parquet ../var/locality.parquet \
       ../var/shocks.parquet ../var/nonfood_expenditures.parquet ../var/enterprise_income.parquet \
 	  ../var/assets.parquet ../var/earnings.parquet ../var/housing.parquet ../var/income.parquet \
 	  ../var/fct.parquet ../var/nutrition.parquet
@@ -76,6 +76,12 @@ other_features_parquet := $(other_features:.py=.parquet)
 
 ../var/other_features.parquet: other_features.py $(other_features_parquet)
 	python other_features.py
+
+locality = $(shell find $(rounds) -name locality.py)
+locality_parquet := $(locality:.py=.parquet)
+
+../var/locality.parquet: locality.py $(locality_parquet)
+	python locality.py
 
 housing = $(shell find $(rounds) -name housing.py)
 housing_parquet := $(housing:.py=.parquet)
