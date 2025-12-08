@@ -30,3 +30,4 @@ Data Scheme:
   income: !make
   enterprise_income: !make
   other_features: !make
+  locality: !make
