@@ -37,7 +37,7 @@ regions = {' kampala':'Central',
            'northern':'Northern',
            'western':'Western'}
 
-z = z.rename(columns=regions)
+z = z.rename(index=regions, level='m')
 
 z = z.stack().unstack('k')
 
