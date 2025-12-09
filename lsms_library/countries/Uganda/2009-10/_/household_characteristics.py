@@ -12,6 +12,6 @@ df = age_sex_composition(**myvars)
 
 df = df.filter(regex='ales ')
 
-df['log HSize'] = np.log(df.sum(axis=1))
+df.loc[:,'log HSize'] = np.log(df.sum(axis=1))
 
 to_parquet(df, 'household_characteristics.parquet')

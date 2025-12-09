@@ -15,6 +15,6 @@ df = df.filter(regex='ales ')
 
 N = df.sum(axis=1)
 
-df['log HSize'] = np.log(N[N>0])
+df.loc[:,'log HSize'] = np.log(N[N>0])
 
 to_parquet(df, 'household_characteristics.parquet')
