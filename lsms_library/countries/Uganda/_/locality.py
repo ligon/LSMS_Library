@@ -23,6 +23,18 @@ z.index.names = ['t', 'i', 'm']
 
 z = z.reorder_levels(['i', 't', 'm']).sort_index()
 
+# Harmonize region labels, matching the other_features aggregation step
+regions = {' kampala': 'Central',
+           'central': 'Central',
+           'central without kampala': 'Central',
+           'eastern': 'Eastern',
+           'kampala': 'Central',
+           'nan': 'Central',
+           'northern': 'Northern',
+           'western': 'Western'}
+
+z = z.rename(index=regions, level='m')
+
 with open('updated_ids.json', 'r') as f:
     updated_ids = json.load(f)
 
