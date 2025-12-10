@@ -132,3 +132,11 @@ stages:
         backend: make
         target: ''
         output: var/shocks.parquet
+      uganda::::locality:
+        country: Uganda
+        wave: null
+        table: locality
+        format: parquet
+        backend: make
+        target: ''
+        output: var/locality.parquet
