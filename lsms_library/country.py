@@ -580,11 +580,12 @@ class Country:
     #                 'nonfood_expenditures.parquet', 'enterprise_income.parquet', 'assets.parquet',
     #                 'earnings.parquet', 'housing.parquet', 'income.parquet', 'fct.parquet', 'nutrition.parquet']
 
-    def __init__(self, country_name, preload_panel_ids=False, verbose=False):
+    def __init__(self, country_name, preload_panel_ids=False, verbose=False, use_parquet=False):
         self.name = country_name
         self._panel_ids_cache = None
         self._updated_ids_cache = None
         self.wave_folder_map = {}
+        self.use_parquet = use_parquet
         scheme_map = self.resources.get("Data Scheme") if isinstance(self.resources, dict) else {}
         has_panel_ids = isinstance(scheme_map, dict) and "panel_ids" in scheme_map
         if preload_panel_ids and has_panel_ids:
@@ -845,6 +846,39 @@ class Country:
         return merged.set_index(df.index.names)
     
 
+    def _finalize_result(self, df: Any, scheme_entry: dict[str, Any], method_name: str):
+        """
+        Apply final harmonization steps (index augmentation, normalization, id walk)
+        before returning a dataset to callers.
+        """
+        if isinstance(df, dict):
+            return df
+
+        if isinstance(df, pd.DataFrame):
+            df = self._augment_index_from_related_tables(df, scheme_entry, None)
+            df = _normalize_dataframe_index(df, scheme_entry, None)
+
+            if isinstance(df.index, pd.MultiIndex):
+                index_names = list(df.index.names)
+                preferred = ['i', 't', 'm']
+                desired_order = [name for name in preferred if name in index_names]
+                desired_order += [name for name in index_names if name not in desired_order]
+                if desired_order != index_names:
+                    try:
+                        df = df.reorder_levels(desired_order)
+                    except Exception:
+                        pass
+
+            if (
+                'i' in df.index.names
+                and not df.attrs.get('id_converted')
+                and method_name not in ['panel_ids', 'updated_ids']
+                and self._updated_ids_cache is not None
+            ):
+                df = id_walk(df, self.updated_ids)
+
+        return df
+
     def _aggregate_wave_data(self, waves=None, method_name=None):
         """Aggregates data across multiple waves using a single dataset method.
 
@@ -864,6 +898,14 @@ class Country:
             backend_value = scheme_entry.get("materialize")
             if isinstance(backend_value, str):
                 materialize_backend = backend_value.lower()
+
+        prefer_parquet_cache = bool(getattr(self, "use_parquet", False)) and method_name not in JSON_CACHE_METHODS
+        if prefer_parquet_cache:
+            parquet_path = self.file_path / "var" / f"{method_name}.parquet"
+            if parquet_path.exists():
+                df_cached = get_dataframe(parquet_path)
+                df_cached = map_index(df_cached)
+                return self._finalize_result(df_cached, scheme_entry, method_name)
 
         if (
             self._updated_ids_cache is None
@@ -1304,29 +1346,7 @@ class Country:
             except Exception as error:
                 _log_issue(self.name, method_name, waves, error)
                 raise
-        
-        if isinstance(df, dict):
-            return df
-
-        if isinstance(df, pd.DataFrame):
-            df = self._augment_index_from_related_tables(df, scheme_entry, None)
-            df = _normalize_dataframe_index(df, scheme_entry, None)
-
-        if isinstance(df, pd.DataFrame) and isinstance(df.index, pd.MultiIndex):
-            index_names = list(df.index.names)
-            preferred = ['i', 't', 'm']
-            desired_order = [name for name in preferred if name in index_names]
-            desired_order += [name for name in index_names if name not in desired_order]
-            if desired_order != index_names:
-                try:
-                    df = df.reorder_levels(desired_order)
-                except Exception:
-                    pass
-
-        if 'i' in df.index.names and not df.attrs.get('id_converted') and method_name not in ['panel_ids', 'updated_ids'] and self._updated_ids_cache is not None:
-            df = id_walk(df, self.updated_ids)
-
-        return df
+        return self._finalize_result(df, scheme_entry, method_name)
 
     def _compute_panel_ids(self):
         """

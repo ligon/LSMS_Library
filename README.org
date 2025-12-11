@@ -92,6 +92,8 @@ hh_chars = uga.household_characteristics()  # Takes <1 second
 
 *Cache Location*: Cached files are stored in ={country}/var/{dataset}.parquet= within the library installation.
 
+*Bypass DVC on clusters*: Pass =use_parquet=True= when constructing a =Country= (or =--use-parquet= on =lsms-library materialize=) to read the existing =var/*.parquet= files directly. If a requested parquet is missing, the usual DVC/materialize path runs automatically. This is handy on shared filesystems where DVC locks become contentious but the parquet outputs are already present.
+
 *Controlling Cache*: To disable caching (e.g., for debugging):
 #+begin_src bash
 export LSMS_USE_DVC_CACHE=false

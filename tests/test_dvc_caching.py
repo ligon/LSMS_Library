@@ -199,6 +199,51 @@ class TestDVCCaching:
         loaded_df = pd.read_parquet(cache_path)
         pd.testing.assert_frame_equal(loaded_df, sample_dataframe, check_dtype=False)
 
+    def test_use_parquet_short_circuit(self, tmp_path):
+        """use_parquet=True should load existing parquet without touching DVC."""
+        country_root = tmp_path / "countries" / "TestCountry"
+        var_dir = country_root / "var"
+        var_dir.mkdir(parents=True, exist_ok=True)
+
+        df = pd.DataFrame({"col1": [1, 2], "col2": ["a", "b"]})
+        cache_path = var_dir / "test_data.parquet"
+        write_parquet(df, cache_path)
+
+        country = Country.__new__(Country)
+        country.name = "TestCountry"
+        country.use_parquet = True
+        country._panel_ids_cache = {}
+        country._updated_ids_cache = {}
+        country.wave_folder_map = {}
+
+        def _augment_passthrough(self, dataframe, *args, **kwargs):
+            return dataframe
+
+        with patch.object(Country, "file_path", new_callable=PropertyMock) as mock_file_path, \
+            patch.object(Country, "data_scheme", new_callable=PropertyMock) as mock_scheme, \
+            patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources, \
+            patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
+            patch.object(Country, "_augment_index_from_related_tables", new=_augment_passthrough), \
+            patch("lsms_library.country.get_dataframe", side_effect=lambda path, *_, **__: pd.read_parquet(path)) as mock_get_df, \
+            patch("lsms_library.country.map_index", side_effect=lambda dataframe: dataframe) as mock_map_index, \
+            patch("lsms_library.country.Repo") as mock_repo:
+
+            mock_file_path.return_value = country_root
+            mock_scheme.return_value = ["test_data"]
+            mock_resources.return_value = {"Data Scheme": {"test_data": {}}}
+            mock_waves.return_value = ["2020-21"]
+
+            result = country._aggregate_wave_data(None, "test_data")
+
+        mock_repo.assert_not_called()
+        mock_get_df.assert_called_once_with(cache_path)
+        mock_map_index.assert_called_once()
+        pd.testing.assert_frame_equal(
+            result.reset_index(drop=True),
+            df.reset_index(drop=True),
+            check_dtype=False,
+        )
+
     def test_stale_cache_triggers_rebuild(
         self,
         mock_country_structure,
