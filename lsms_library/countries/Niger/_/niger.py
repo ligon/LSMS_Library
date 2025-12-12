@@ -6,6 +6,42 @@ from lsms import from_dta
 from lsms.tools import get_household_roster
 import pyreadstat
 
+def i(x):
+    """Create hhid from grappe + menage concatenation.
+    
+    Detects which wave based on column case:
+    - 2014-15 (ECVMA): uppercase columns (GRAPPE, MENAGE) -> no prefix
+    - 2018-19 (EHCVM): lowercase columns (grappe, menage) -> 'E_' prefix
+    """
+    if isinstance(x, pd.Series):
+        grappe = str(int(x.iloc[0])) if pd.notna(x.iloc[0]) else ''
+        menage = str(int(x.iloc[1])) if pd.notna(x.iloc[1]) else ''
+        
+        # Check column names to detect which wave
+        # 2018-19 uses lowercase 'grappe', 2014-15 uses uppercase 'GRAPPE'
+        col_names = x.index.tolist()
+        is_ehcvm_2018 = any(c.islower() for c in str(col_names[0]))
+        
+        if is_ehcvm_2018:
+            # 2018-19 EHCVM: add prefix to prevent matching with ECVMA panel
+            return 'E_' + grappe + menage
+        else:
+            # 2014-15 ECVMA: no prefix, may include EXTENSION
+            if len(x) > 2:
+                extension = str(int(x.iloc[2])) if pd.notna(x.iloc[2]) else '0'
+                return grappe + menage + extension
+            return grappe + menage
+    return str(int(x))
+
+def panel_ids(df):
+    """Construct previous_i from GRAPPE + MENAGE to match 2011-12 hid format"""
+    # previous_i is just GRAPPE + MENAGE (without EXTENSION) to match 2011's hid
+    df['previous_i'] = (
+        df['previous_grappe'].astype(str).str.replace('.0', '', regex=False).str.strip() + 
+        df['previous_menage'].astype(str).str.replace('.0', '', regex=False).str.strip()
+    )
+    return df[['previous_i']]
+
 def age_sex_composition(df, sex, sex_converter, age, age_converter, hhid):
     Age_ints = ((0,4),(4,9),(9,14),(14,19),(19,31),(31,51),(51,100))
     testdf = get_household_roster(df, sex=sex, sex_converter=sex_converter,

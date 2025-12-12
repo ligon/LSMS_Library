@@ -5,7 +5,9 @@ household_roster:
   file:
       - ../Data/s01_me_ner2018.dta
   idxvars:
-      i: menage
+      i:
+          - grappe
+          - menage
       pid: s01q00a
   myvars:
       Sex:
@@ -28,7 +30,7 @@ household_roster:
               Cousin, Cousine: Cousin
               Beau-frère, Belle sœur: Sibling-in-law
               Beau père, Belle mère: Parent-in-law
-              Autres Parents du CM ou du conjoint(e): Other parents of HH/Spouse
+              Autres Parents du CM/Conjoint: Other parents of HH/Spouse
               Personne non apparentée au CM ni à la conjointe (Sans lien): Not related
               Domestique ou parent du domestique: Domestic/household staff
       Age: s01q04a
