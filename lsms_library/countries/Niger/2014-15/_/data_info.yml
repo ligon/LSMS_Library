@@ -1,6 +1,17 @@
 Country: Niger
 Wave: 2014-15
 
+panel_ids:
+    file: ../Data/NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS00P1.dta
+    idxvars:
+        i:
+            - GRAPPE
+            - MENAGE
+            - EXTENSION
+    myvars:
+        previous_grappe: GRAPPE
+        previous_menage: MENAGE
+
 household_roster:
     file: NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS01P1.dta
     idxvars:
