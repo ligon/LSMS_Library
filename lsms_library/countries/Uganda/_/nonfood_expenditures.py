@@ -31,12 +31,10 @@ agg_labels = harmonized_food_labels(fn='./nonfood_items.org',
 
 x = x.groupby('i',axis=1).sum()
 
-x['m'] = 'Uganda'
-x = x.reset_index().set_index(['i','t','m'])
-
 x = x.fillna(0)
-
 updated_ids = json.load(open('updated_ids.json'))
-x = id_walk(x, updated_ids)
+x = id_walk(x, updated_ids)                    # ← renames j→i
+x['m'] = 'Uganda'
+x = x.reset_index().set_index(['i','t','m'])   # ← now 'i' exists
 
 to_parquet(x, '../var/nonfood_expenditures.parquet')

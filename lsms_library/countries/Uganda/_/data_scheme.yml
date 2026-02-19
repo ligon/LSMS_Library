@@ -32,3 +32,5 @@ Data Scheme:
   other_features: !make
   locality: !make
   assets: !make
+  housing: !make
+  nonfood_expenditures: !make

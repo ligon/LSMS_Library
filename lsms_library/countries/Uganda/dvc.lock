@@ -466,3 +466,34 @@ stages:
       hash: md5
       md5: fac4ffa053668e7dc0fcf558588a6001
       size: 88570
+  materialize@uganda::::housing:
+    cmd: python3 ../../util/run_stage.py --backend "make" --country "Uganda" 
+      --all-waves --table "housing" --format "parquet" --target ""
+    deps:
+    - path: ../../cli.py
+      hash: md5
+      md5: 3e4731361034c2a43c96e4d0ff952fc1
+      size: 19570
+    - path: ../../country.py
+      hash: md5
+      md5: b207c494ddd78e8f6d71ee9f3e931b25
+      size: 72989
+    - path: ../../local_tools.py
+      hash: md5
+      md5: 5226e2d913308969c639b8b80554786f
+      size: 41848
+      isexec: true
+    - path: ../../util/run_stage.py
+      hash: md5
+      md5: 54f35c87bd57e806838748f0191f71dc
+      size: 3479
+    - path: _
+      hash: md5
+      md5: 1e5117027be217e992172f42acd93dd1.dir
+      size: 3466624
+      nfiles: 38
+    outs:
+    - path: var/housing.parquet
+      hash: md5
+      md5: 4bf876c7e8b5842d2f8269618f4d0919
+      size: 68210

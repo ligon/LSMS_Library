@@ -16,7 +16,7 @@ for t in list(Waves.keys()):
     print(t, file=sys.stderr)
     x[t] = get_dataframe('../'+t+'/_/housing.parquet')
     x[t] = x[t].stack('k').dropna()
-    x[t] = x[t].reset_index().set_index(['i','k']).squeeze()
+    x[t] = x[t].reset_index().set_index(['j','k']).squeeze()
     x[t] = x[t].replace(0,np.nan).dropna()
 
 df = pd.DataFrame(x)
@@ -27,11 +27,10 @@ x = df.stack().unstack('k')
 
 x = x.groupby('k',axis=1).sum()
 
-x['m'] = 'Uganda'
-x = x.reset_index().set_index(['i','t','m'])
-
 x = x.fillna(0)
 updated_ids = json.load(open('updated_ids.json'))
-x = id_walk(x, updated_ids)
+x = id_walk(x, updated_ids)                    # ← renames j→i
+x['m'] = 'Uganda'
+x = x.reset_index().set_index(['i','t','m'])   # ← now 'i' exists
 
 to_parquet(x, '../var/housing.parquet')

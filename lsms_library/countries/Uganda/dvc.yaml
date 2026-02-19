@@ -148,3 +148,19 @@ stages:
         backend: make
         target: ''
         output: var/assets.parquet
+      uganda::::housing:
+        country: Uganda
+        wave: null
+        table: housing
+        format: parquet
+        backend: make
+        target: ''
+        output: var/housing.parquet
+      uganda::::nonfood_expenditures:
+        country: Uganda
+        wave: null
+        table: nonfood_expenditures
+        format: parquet
+        backend: make
+        target: ''
+        output: var/nonfood_expenditures.parquet
