@@ -140,3 +140,11 @@ stages:
         backend: make
         target: ''
         output: var/locality.parquet
+      uganda::::assets:
+        country: Uganda
+        wave: null
+        table: assets
+        format: parquet
+        backend: make
+        target: ''
+        output: var/assets.parquet

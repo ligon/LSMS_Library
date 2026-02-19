@@ -31,3 +31,4 @@ Data Scheme:
   enterprise_income: !make
   other_features: !make
   locality: !make
+  assets: !make
