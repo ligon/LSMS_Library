@@ -7,9 +7,9 @@ Concatenate household rosters across rounds.
 
 import pandas as pd
 try:
-    from .ghana import change_id, Waves  # Used as part of a package
+    from .ghanalss import change_id, Waves  # Used as part of a package
 except ImportError:
-    from ghana import change_id, Waves # Running standalone
+    from ghanalss import change_id, Waves # Running standalone
 
 def id_walk(df,wave,waves):
     

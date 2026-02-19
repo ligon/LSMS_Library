@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sys
 sys.path.append('../../_')
-from ghana import yearly_expenditure
+from ghanalss import yearly_expenditure
 import numpy as np
 import dvc.api
 import pandas as pd

@@ -47,7 +47,7 @@ other_features_parquet := $(other_features:.py=.parquet)
 ../var/other_features.parquet: other_features.py $(other_features_parquet)
 	python other_features.py
 
-%.parquet: %.py food_items.org malawi.py
+%.parquet: %.py food_items.org ghana.py
 	(cd $(@D) && python ./$(<F))
 
 clean:

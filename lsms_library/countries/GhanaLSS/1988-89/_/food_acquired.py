@@ -2,7 +2,7 @@
 from lsms_library.local_tools import to_parquet
 import sys
 sys.path.append('../../_')
-from ghana import yearly_expenditure
+from ghanalss import yearly_expenditure
 import numpy as np
 import dvc.api
 import pandas as pd

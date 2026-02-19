@@ -6,7 +6,7 @@ Concatenate data on other household features across rounds.
 """
 
 import pandas as pd
-from ghana import change_id, Waves
+from ghanalss import change_id, Waves
 
 def id_walk(df,wave,waves):
     

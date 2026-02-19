@@ -5,7 +5,7 @@ sys.path.append('../../_')
 import numpy as np
 import dvc.api
 import pandas as pd
-from ghana import split_by_visit
+from ghanalss import split_by_visit
 sys.path.append('../../../_/')
 from lsms_library.local_tools import df_from_orgfile
 
