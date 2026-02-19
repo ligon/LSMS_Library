@@ -50,3 +50,8 @@ stages:
         wave: null
         table: food_prices
         format: parquet
+      malawi::::other_features:
+        country: Malawi
+        wave: null
+        table: other_features
+        format: parquet

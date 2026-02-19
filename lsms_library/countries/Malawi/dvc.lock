@@ -197,3 +197,31 @@ stages:
       hash: md5
       md5: e29b4c36af963fd3d3d78df27fd13776
       size: 754041
+  materialize@malawi::::other_features:
+    cmd: cd _ && LSMS_USE_DVC_CACHE=false python3 -m lsms_library.cli 
+      materialize --country "Malawi" --all-waves --table "other_features" 
+      --format "parquet" --out ../var/other_features.parquet
+    deps:
+    - path: ../../cli.py
+      hash: md5
+      md5: 3e4731361034c2a43c96e4d0ff952fc1
+      size: 19570
+    - path: ../../country.py
+      hash: md5
+      md5: b207c494ddd78e8f6d71ee9f3e931b25
+      size: 72989
+    - path: ../../local_tools.py
+      hash: md5
+      md5: 5226e2d913308969c639b8b80554786f
+      size: 41848
+      isexec: true
+    - path: _
+      hash: md5
+      md5: ef5669bc857676f34e15adb0b98138f2.dir
+      size: 99523
+      nfiles: 10
+    outs:
+    - path: var/other_features.parquet
+      hash: md5
+      md5: 427f83801071b71a346337b0f8972b5c
+      size: 354717
