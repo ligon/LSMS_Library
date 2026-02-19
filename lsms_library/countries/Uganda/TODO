@@ -1,0 +1,33 @@
+Uganda: Unregistered features
+==============================
+
+nonfood_expenditures
+--------------------
+Registered and aggregator fix applied (id_walk ordering), but
+wave-level builds fail due to np.NaN removal in NumPy 2.0.
+
+The error is in the upstream lsms package (lsms/tools.py:153),
+specifically sum_food_expenditures_from_different_sources().
+
+Fix: update the lsms package to replace np.NaN with np.nan.
+
+plots
+-----
+Wave-level _/plots.py exists in all 8 waves. Needs:
+1. Country-level aggregator: Uganda/_/plots.py
+2. Makefile target for ../var/plots.parquet
+3. data_scheme.yml entry: plots: !make
+4. dvc.yaml foreach entry: uganda::::plots
+
+education_expenses
+------------------
+Wave-level _/education_expenses.py exists in 7 waves (missing 2015-16). Needs:
+1. Country-level aggregator: Uganda/_/education_expenses.py
+2. Makefile target for ../var/education_expenses.parquet
+3. data_scheme.yml entry: education_expenses: !make
+4. dvc.yaml foreach entry: uganda::::education_expenses
+
+Notes
+-----
+Both new aggregators should follow the assets.py pattern:
+call id_walk() BEFORE set_index(['i', ...]).
