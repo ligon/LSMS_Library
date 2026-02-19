@@ -1,40 +1,35 @@
-GhanaLSS: Not ready for DVC registration
-=========================================
+GhanaLSS: Partially registered
+================================
 
-Current state
--------------
-- data_scheme.yml defines: cluster_features, household_roster, food_acquired
-- No dvc.yaml exists
-- CLI materialize fails even for registered tables — multiple issues below
+Working (registered in dvc.yaml)
+---------------------------------
+- cluster_features — all 7 waves via API
+- household_roster — all 7 waves via API
 
 Bug fixes applied
 -----------------
-- Fixed imports: all scripts imported "from ghana import ..." but utility
+- Fixed imports: scripts imported "from ghana import ..." but utility
   module is ghanalss.py. Updated all imports to "from ghanalss import ..."
 - Fixed Makefile generic rule: referenced malawi.py (copy-paste error),
   now references ghanalss.py
+- Fixed case-sensitivity in mapping.py: GHANALSS -> GhanaLSS in
+  waves 1988-89, 1991-92, 1998-99
 
-Known issues blocking API/CLI
------------------------------
-1. Case sensitivity: Country class resolves paths as GHANALSS/ instead of
-   GhanaLSS/ (e.g., /countries/GHANALSS/1988-89/../../_/categorical_mapping.org)
-2. Missing categorical_mapping.org at expected path for mapping.py
-3. No wave-level other_features.py or household_characteristics.py scripts
-
-Unregistered country-level aggregator scripts
-----------------------------------------------
-- household_characteristics.py — no wave-level scripts exist
-- other_features.py — no wave-level scripts exist
-- food_prices_quantities_and_expenditures.py — produces food_expenditures,
-  food_prices, food_quantities from food_acquired; depends on
-  other_features.parquet via Makefile chain
-
-Wave-level scripts
-------------------
-food_acquired.py in all 7 waves; mapping.py in waves 1987-88 through 1998-99.
+Not yet registered (need Make backend + dependency fixes)
+---------------------------------------------------------
+- food_acquired — wave-level .py scripts exist for all 7 waves, but
+  Make depends on other_features.parquet via Makefile chain
+- other_features — country-level aggregator exists but no wave-level
+  scripts to produce wave parquets
+- household_characteristics — country-level aggregator exists but no
+  wave-level scripts
+- food_expenditures, food_prices, food_quantities — produced by
+  food_prices_quantities_and_expenditures.py from food_acquired
 
 Next steps
 ----------
-1. Fix case-sensitivity issue in Country class path resolution for GhanaLSS
-2. Create wave-level other_features.py and household_characteristics.py
-3. Then register all tables in data_scheme.yml and create dvc.yaml
+1. Create wave-level other_features.py for each wave (extracts region/
+   rural from the same data_info.yml sources used by cluster_features)
+2. Once other_features works, food_acquired Make chain should unblock
+3. Then household_characteristics and food_prices/quantities/expenditures
+   follow
