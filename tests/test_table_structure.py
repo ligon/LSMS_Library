@@ -168,6 +168,29 @@ class TestTableStructure:
 
 
 # ---------------------------------------------------------------------------
+# Diagnostics integration: is_this_feature_sane
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize(
+    "country,table,path",
+    CACHED,
+    ids=_cached_ids(),
+)
+class TestFeatureSanity:
+    def test_feature_is_sane(self, country, table, path):
+        """Each cached feature must pass is_this_feature_sane (no failures)."""
+        from lsms_library.diagnostics import is_this_feature_sane
+        df = pd.read_parquet(path, engine="pyarrow")
+        report = is_this_feature_sane(df, country, table)
+        if not report.ok:
+            report.summarize()
+            pytest.fail(
+                f"{country}/{table} failed sanity checks: "
+                + "; ".join(c.message for c in report.errors)
+            )
+
+
+# ---------------------------------------------------------------------------
 # Summary test: at least something is cached
 # ---------------------------------------------------------------------------
 
