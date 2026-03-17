@@ -505,9 +505,10 @@ class Wave:
             print(f"Attempting to generate using Makefile...", flush=True,file=stderr)
             #cluster features in the old makefile is called 'other_features'
             # if request =='cluster_features': request = 'other_features'
+            # Use in-tree path for Make target, but look for output at data_root too
+            intree_parquet = self.file_path / "_" / f"{request}.parquet"
             country_name = self.country.name
-            parquet_fn = data_root(country_name) / self.year / "_" / f"{request}.parquet"
-            parquet_fn.parent.mkdir(parents=True, exist_ok=True)
+            external_parquet = data_root(country_name) / self.year / "_" / f"{request}.parquet"
 
             makefile_path = self.file_path.parent /'_'/ "Makefile"
             if not makefile_path.exists():
@@ -515,15 +516,21 @@ class Wave:
                 return pd.DataFrame()
 
             cwd_path = self.file_path.parent / "_"
-            relative_parquet_path = parquet_fn.relative_to(cwd_path.parent)  # Convert to relative path
-            var_dir = str(data_root(country_name) / "var")
+            relative_parquet_path = intree_parquet.relative_to(cwd_path.parent)
             env = os.environ.copy()
             env["LSMS_DATA_DIR"] = str(data_root())
-            subprocess.run(["make", "-s", f"VAR_DIR={var_dir}", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True, env=env)
+            subprocess.run(["make", "-s", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True, env=env)
             print(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...",file=stderr)
 
-            if not parquet_fn.exists():
-                print(f"Parquet file {parquet_fn} still missing after running Makefile.",file=stderr)
+            # Check external data_root first, then in-tree fallback
+            parquet_fn = None
+            for candidate in [external_parquet, intree_parquet]:
+                if candidate.exists():
+                    parquet_fn = candidate
+                    break
+
+            if parquet_fn is None:
+                print(f"Parquet file for {request} still missing after running Makefile.",file=stderr)
                 return pd.DataFrame()
 
             df = pd.read_parquet(parquet_fn)
@@ -963,11 +970,14 @@ class Country:
                     output_candidates.append(base_path / "_" / f"{method_name}.json")
                 output_candidates.append(self.file_path / "_" / f"{method_name}.json")
             else:
+                # Check data_root (external) first, then in-tree as fallback
                 if wave is not None:
-                    output_candidates.append(data_root(self.name) / wave / "var" / f"{method_name}.parquet")
                     output_candidates.append(data_root(self.name) / wave / "_" / f"{method_name}.parquet")
+                    output_candidates.append(base_path / "var" / f"{method_name}.parquet")
+                    output_candidates.append(base_path / "_" / f"{method_name}.parquet")
                 output_candidates.append(data_root(self.name) / "var" / f"{method_name}.parquet")
-                output_candidates.append(data_root(self.name) / "_" / f"{method_name}.parquet")
+                output_candidates.append(self.file_path / "var" / f"{method_name}.parquet")
+                output_candidates.append(self.file_path / "_" / f"{method_name}.parquet")
 
             # deduplicate while preserving order
             unique_candidates: list[Path] = []
@@ -1007,25 +1017,39 @@ class Country:
                 if make_dir is None or not (make_dir / "Makefile").exists():
                     return None
                 makefile = make_dir / "Makefile"
-                var_dir = str(data_root(self.name) / "var")
-                for candidate in unique_candidates:
+                # Build Make targets using in-tree relative paths (Make's own rules
+                # reference $(VAR_DIR) which defaults to ../var).  The LSMS_DATA_DIR
+                # env var in build_env() causes to_parquet/get_dataframe inside the
+                # invoked scripts to redirect output to data_root().
+                intree_candidates = []
+                if method_name in JSON_CACHE_METHODS:
+                    intree_candidates.append(self.file_path / "_" / f"{method_name}.json")
+                else:
+                    if wave is not None:
+                        intree_candidates.append(base_path / "_" / f"{method_name}.parquet")
+                    intree_candidates.append(self.file_path / "var" / f"{method_name}.parquet")
+                    intree_candidates.append(self.file_path / "_" / f"{method_name}.parquet")
+
+                for intree in intree_candidates:
                     try:
-                        rel_target = os.path.relpath(candidate, make_dir)
+                        rel_target = os.path.relpath(intree, make_dir)
                     except ValueError:
                         continue
-                    make_cmd = ["make", "-s", f"VAR_DIR={var_dir}"]
+                    make_cmd = ["make", "-s"]
                     jobs_flag = _make_jobs_flag()
                     if jobs_flag:
                         make_cmd.append(jobs_flag)
                     make_cmd.append(rel_target)
                     try:
                         subprocess.run(make_cmd, cwd=make_dir, check=True, env=build_env())
-                        print(f"Makefile executed successfully for {self.name}/{wave or 'ALL'}. Rechecking for {candidate.name}...", file=stderr)
+                        print(f"Makefile executed successfully for {self.name}/{wave or 'ALL'}. Rechecking for {method_name}...", file=stderr)
                     except (subprocess.CalledProcessError, FileNotFoundError) as error:
                         warnings.warn(f"Makefile execution failed for {self.name}/{wave or '_'} {method_name}: {error}")
                         continue
-                    if candidate.exists():
-                        return candidate
+                    # Check all candidate locations (data_root + in-tree)
+                    for candidate in unique_candidates:
+                        if candidate.exists():
+                            return candidate
                 return None
 
             def try_script(script: Path) -> Path | None:

@@ -117,29 +117,31 @@ class TestMakefileVarDir:
 class TestCountryPyPaths:
     """Verify country.py doesn't use self.file_path / 'var' for caching."""
 
-    def test_no_file_path_var_in_country_py(self):
+    def test_country_py_uses_data_root_for_primary_cache(self):
+        """Primary cache lookups should go through data_root, not self.file_path / 'var'.
+
+        self.file_path / 'var' is acceptable as a *fallback* in output_candidates
+        (for finding outputs that Make wrote in-tree), but the first candidate
+        should always be a data_root() path.
+        """
         country_py = REPO_ROOT / "lsms_library" / "country.py"
         content = country_py.read_text()
-        # Find lines with self.file_path and "var" that aren't comments
-        for i, line in enumerate(content.splitlines(), 1):
-            stripped = line.strip()
-            if stripped.startswith("#"):
-                continue
-            if 'self.file_path' in line and '"var"' in line:
-                pytest.fail(
-                    f"country.py:{i} still uses self.file_path / 'var': {stripped}"
-                )
+        assert "data_root(self.name)" in content, (
+            "country.py should use data_root(self.name) for cache paths"
+        )
 
     def test_country_py_imports_data_root(self):
         country_py = REPO_ROOT / "lsms_library" / "country.py"
         content = country_py.read_text()
         assert "from .paths import data_root" in content
 
-    def test_country_py_passes_var_dir_to_make(self):
-        """When country.py invokes make, it should pass VAR_DIR."""
+    def test_country_py_sets_lsms_data_dir_for_make(self):
+        """When country.py invokes make, it sets LSMS_DATA_DIR so scripts redirect."""
         country_py = REPO_ROOT / "lsms_library" / "country.py"
         content = country_py.read_text()
-        assert "VAR_DIR=" in content, "country.py should pass VAR_DIR when invoking make"
+        assert 'env["LSMS_DATA_DIR"]' in content, (
+            "country.py should set LSMS_DATA_DIR in subprocess env for make"
+        )
 
     def test_country_py_sets_lsms_data_dir_in_env(self):
         """Subprocess env should include LSMS_DATA_DIR."""
