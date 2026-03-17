@@ -42,14 +42,8 @@ def _resolve_data_path(fn: str, stack_depth: int = 2) -> str:
       - ``../var/foo.parquet`` from country-level scripts (Uganda/_/)
       - bare ``foo.parquet`` from wave-level scripts (Uganda/2005-06/_/)
 
-    Path rewriting is **only active** when ``LSMS_DATA_DIR`` is explicitly
-    set.  Without it, paths are returned unchanged so that standalone
-    ``make`` (which tracks outputs at ``../var/``) keeps working.
+    Always active so that data is always written outside the package tree.
     """
-    # Only intercept when the user has opted in via LSMS_DATA_DIR
-    if not os.environ.get("LSMS_DATA_DIR", "").strip():
-        return str(fn)
-
     fn_str = str(fn)
     p = Path(fn_str)
 

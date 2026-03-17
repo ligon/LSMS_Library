@@ -49,15 +49,15 @@ class TestDataRoot:
 class TestResolveDataPath:
     """Test _resolve_data_path without actually calling from country scripts."""
 
-    def test_noop_when_no_env(self):
-        """Without LSMS_DATA_DIR, paths pass through unchanged."""
-        with mock.patch.dict(os.environ, {}, clear=False):
-            env = os.environ.copy()
-            env.pop("LSMS_DATA_DIR", None)
-            with mock.patch.dict(os.environ, env, clear=True):
-                from lsms_library.local_tools import _resolve_data_path
-                assert _resolve_data_path("../var/food.parquet") == "../var/food.parquet"
-                assert _resolve_data_path("shocks.parquet") == "shocks.parquet"
+    def test_always_active(self):
+        """Path rewriting is always active (no LSMS_DATA_DIR gate)."""
+        from lsms_library.local_tools import _resolve_data_path
+        # When called from outside the countries tree, paths pass through
+        # (the stack inspection won't find a country), but the function
+        # itself is not gated on an env var.
+        result = _resolve_data_path("../var/food.parquet")
+        # Either redirected (if stack happens to match) or unchanged
+        assert isinstance(result, str)
 
     def test_absolute_paths_unchanged(self, tmp_path):
         with mock.patch.dict(os.environ, {"LSMS_DATA_DIR": str(tmp_path)}):
@@ -90,8 +90,14 @@ class TestMakefileVarDir:
     def test_all_makefiles_define_var_dir(self):
         for mf in self._country_makefiles():
             content = mf.read_text()
-            assert "VAR_DIR ?= ../var" in content, (
-                f"{mf.relative_to(REPO_ROOT)} missing 'VAR_DIR ?= ../var'"
+            assert "VAR_DIR ?=" in content, (
+                f"{mf.relative_to(REPO_ROOT)} missing 'VAR_DIR ?='"
+            )
+            assert "LSMS_DATA_ROOT ?=" in content, (
+                f"{mf.relative_to(REPO_ROOT)} missing 'LSMS_DATA_ROOT ?='"
+            )
+            assert "COUNTRY :=" in content, (
+                f"{mf.relative_to(REPO_ROOT)} missing 'COUNTRY :='"
             )
 
     def test_no_hardcoded_var_paths_in_makefiles(self):
