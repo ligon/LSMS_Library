@@ -1017,29 +1017,30 @@ class Country:
                 if make_dir is None or not (make_dir / "Makefile").exists():
                     return None
                 makefile = make_dir / "Makefile"
-                # Build Make targets using in-tree relative paths (Make's own rules
-                # reference $(VAR_DIR) which defaults to ../var).  The LSMS_DATA_DIR
-                # env var in build_env() causes to_parquet/get_dataframe inside the
-                # invoked scripts to redirect output to data_root().
-                intree_candidates = []
+                # Build Make targets using data_root() paths (primary) since
+                # Makefiles now default VAR_DIR to data_root().  Fall back to
+                # in-tree paths only if needed.  Use absolute paths directly
+                # as Make handles them fine.
+                make_targets = []
                 if method_name in JSON_CACHE_METHODS:
-                    intree_candidates.append(self.file_path / "_" / f"{method_name}.json")
+                    make_targets.append(self.file_path / "_" / f"{method_name}.json")
                 else:
+                    # data_root() targets first (matches Makefile VAR_DIR default)
                     if wave is not None:
-                        intree_candidates.append(base_path / "_" / f"{method_name}.parquet")
-                    intree_candidates.append(self.file_path / "var" / f"{method_name}.parquet")
-                    intree_candidates.append(self.file_path / "_" / f"{method_name}.parquet")
+                        make_targets.append(data_root(self.name) / wave / "_" / f"{method_name}.parquet")
+                    make_targets.append(data_root(self.name) / "var" / f"{method_name}.parquet")
+                    # In-tree fallbacks
+                    if wave is not None:
+                        make_targets.append(base_path / "_" / f"{method_name}.parquet")
+                    make_targets.append(self.file_path / "var" / f"{method_name}.parquet")
+                    make_targets.append(self.file_path / "_" / f"{method_name}.parquet")
 
-                for intree in intree_candidates:
-                    try:
-                        rel_target = os.path.relpath(intree, make_dir)
-                    except ValueError:
-                        continue
+                for target in make_targets:
                     make_cmd = ["make", "-s"]
                     jobs_flag = _make_jobs_flag()
                     if jobs_flag:
                         make_cmd.append(jobs_flag)
-                    make_cmd.append(rel_target)
+                    make_cmd.append(str(target))
                     try:
                         subprocess.run(make_cmd, cwd=make_dir, check=True, env=build_env())
                         print(f"Makefile executed successfully for {self.name}/{wave or 'ALL'}. Rechecking for {method_name}...", file=stderr)

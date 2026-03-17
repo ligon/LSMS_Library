@@ -5,7 +5,7 @@ source = $(shell find $(rounds) -name \*.py)
 parquet := $(source:.py=.parquet)
 
 COUNTRY := $(shell basename "$$(cd .. && pwd)")
-LSMS_DATA_ROOT ?= $(or $(LSMS_DATA_DIR),$(if $(XDG_DATA_HOME),$(XDG_DATA_HOME),$(HOME)/.local/share))/lsms_library
+LSMS_DATA_ROOT ?= $(if $(LSMS_DATA_DIR),$(LSMS_DATA_DIR),$(if $(XDG_DATA_HOME),$(XDG_DATA_HOME),$(HOME)/.local/share)/lsms_library)
 VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 
 var = $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_quantities.parquet $(VAR_DIR)/unitvalues.parquet \
