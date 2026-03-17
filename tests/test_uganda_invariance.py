@@ -87,8 +87,15 @@ def test_parquet_matches_baseline(uganda_root, rel_path):
     if "error" in baseline_entry:
         pytest.skip(f"Baseline recorded an error for {rel_path}: {baseline_entry['error']}")
 
+    # Check both in-tree and data_root locations
     parquet_path = uganda_root / rel_path
-    assert parquet_path.exists(), f"Parquet file missing: {rel_path}"
+    if not parquet_path.exists():
+        from lsms_library.paths import data_root
+        data_root.cache_clear()
+        alt_path = data_root("Uganda") / rel_path
+        if alt_path.exists():
+            parquet_path = alt_path
+    assert parquet_path.exists(), f"Parquet file missing: {rel_path} (checked in-tree and data_root)"
 
     df = pd.read_parquet(parquet_path, engine="pyarrow")
     actual = _fingerprint(df)
