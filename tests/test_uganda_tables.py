@@ -5,6 +5,19 @@ from typing import Optional
 import pytest
 
 import lsms_library as ll
+from lsms_library.paths import data_root, COUNTRIES_ROOT
+
+
+def _has_cached_table(country_name: str, table: str) -> bool:
+    """Check if a table parquet exists at data_root or in-tree."""
+    for candidate in [
+        data_root(country_name) / "var" / f"{table}.parquet",
+        COUNTRIES_ROOT / country_name / "var" / f"{table}.parquet",
+    ]:
+        if candidate.exists():
+            return True
+    return False
+
 
 UGANDA_TABLES = [
     "household_characteristics",
@@ -18,6 +31,8 @@ UGANDA_TABLES = [
 
 @pytest.mark.parametrize("table", UGANDA_TABLES)
 def test_uganda_makefile_backfill(table):
+    if not _has_cached_table("Uganda", table):
+        pytest.skip(f"Uganda/{table} not cached (requires data build)")
     os.environ.setdefault("LSMS_USE_DVC_CACHE", "false")
     country = ll.Country("Uganda", preload_panel_ids=False, verbose=False)
     method = getattr(country, table)
