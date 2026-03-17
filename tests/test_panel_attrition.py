@@ -1,7 +1,21 @@
 import numpy as np
 import pandas as pd
+import pytest
 
 import lsms_library as ll
+from lsms_library.paths import data_root
+
+
+def _has_cached_table(country_name: str, table: str) -> bool:
+    """Check if a table is cached (either data_root or in-tree)."""
+    from lsms_library.paths import COUNTRIES_ROOT
+    for candidate in [
+        data_root(country_name) / "var" / f"{table}.parquet",
+        COUNTRIES_ROOT / country_name / "var" / f"{table}.parquet",
+    ]:
+        if candidate.exists():
+            return True
+    return False
 
 
 def _attrition_matrix(country_name: str, table: str) -> pd.DataFrame:
@@ -25,12 +39,21 @@ def _nonzero_adjacent(matrix: pd.DataFrame) -> bool:
     return True
 
 
+@pytest.mark.skipif(
+    not _has_cached_table("Uganda", "household_characteristics"),
+    reason="Requires cached Uganda household_characteristics (data build needed)",
+)
 def test_panel_attrition_household_characteristics_is_upper_triangular():
     matrix = _attrition_matrix("Uganda", "household_characteristics")
     assert _is_upper_triangular(matrix)
     assert _nonzero_adjacent(matrix)
 
 
+@pytest.mark.skipif(
+    not (_has_cached_table("Uganda", "household_characteristics")
+         and _has_cached_table("Uganda", "income")),
+    reason="Requires cached Uganda household_characteristics and income (data build needed)",
+)
 def test_panel_attrition_consistency_between_tables():
     hc_matrix = _attrition_matrix("Uganda", "household_characteristics")
     income_matrix = _attrition_matrix("Uganda", "income")
