@@ -31,4 +31,4 @@ New surveys are added via YAML config files under `lsms_library/countries/`, not
   Use `make -C lsms_library help` for details.
 
 ## Data Access
-Contact ligon@berkeley.edu for credentials. Contributors need GPG/PGP keys.
+Underlying microdata must be obtained from the [World Bank Microdata Library](https://microdata.worldbank.org/) under their terms of use. Contributors need GPG/PGP keys for repository write access.

@@ -67,12 +67,9 @@ pip install LSMS_Library
 
 ** Data Access
 
-The library uses DVC (Data Version Control) to manage data stored in remote S3 buckets. To access the data, you'll need credentials:
+This library provides code for working with LSMS survey data.  The underlying microdata must be obtained directly from the [[https://microdata.worldbank.org/][World Bank Microdata Library]] under their terms of use.  Users are responsible for complying with the World Bank's data access agreements.
 
-- *Read access*: Contact ligon@berkeley.edu for read-only credentials to access the data
-- *Write access (contributors)*: To contribute new datasets, contact ligon@berkeley.edu for write credentials. You'll need to establish [[https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key][GPG/PGP credentials]] for secure access.
-
-Once you have credentials, the library will handle data streaming automatically.
+Contributors who wish to add new surveys should contact ligon@berkeley.edu to discuss the workflow.  You will need to establish [[https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key][GPG/PGP credentials]] for repository write access.
 
 ** Performance and Caching
 
@@ -90,9 +87,9 @@ hh_chars = uga.household_characteristics()  # Takes <1 second
 
 *Cache Validation*: Caches are automatically validated using DVC's hash-based dependency tracking. If source data or configuration files change, the cache is automatically invalidated and rebuilt.
 
-*Cache Location*: Cached files are stored in ={country}/var/{dataset}.parquet= within the library installation.
+*Cache Location*: Cached files are stored under the user data directory (=~/.local/share/lsms_library/{country}/var/{dataset}.parquet= on Linux, or the platform equivalent).  Override with the =LSMS_DATA_DIR= environment variable.
 
-*Bypass DVC on clusters*: Pass =use_parquet=True= when constructing a =Country= (or =--use-parquet= on =lsms-library materialize=) to read the existing =var/*.parquet= files directly. If a requested parquet is missing, the usual DVC/materialize path runs automatically. This is handy on shared filesystems where DVC locks become contentious but the parquet outputs are already present.
+*Pre-built parquets*: Pass =use_parquet=True= when constructing a =Country= (or =--use-parquet= on =lsms-library materialize=) to read existing cached parquet files directly.  If a requested parquet is missing, the usual build path runs automatically.
 
 *Controlling Cache*: To disable caching (e.g., for debugging):
 #+begin_src bash
@@ -101,7 +98,7 @@ export LSMS_USE_DVC_CACHE=false
 
 *Build Parallelism*: Make-based fallbacks default to half of available CPU cores (`make -j`), capped at a minimum of one job. Override with `LSMS_MAKE_JOBS` to tune parallelism.
 
-*Managing Cache Size*: Cached parquet/JSON files are stored under `lsms_library/countries/<country>/var` (and `_` for JSON). Use the CLI to inspect or clear them:
+*Managing Cache Size*: Use the CLI to inspect or clear cached files:
 #+begin_src bash
 # list cached datasets
 lsms-library cache list --country Uganda
@@ -321,9 +318,8 @@ See the [[file:LICENSE][LICENSE]] file in the repository for details.
 * Contact
 
 For questions, issues, or collaboration:
-- *Data Access*: Email ligon@berkeley.edu for read or write credentials
 - *GitHub Issues*: Report bugs or request features at the repository
-- *Contributing*: Contact ligon@berkeley.edu to discuss contributions (GPG/PGP credentials required for write access)
+- *Contributing*: Contact ligon@berkeley.edu to discuss contributions
 
 * Acknowledgments
 
