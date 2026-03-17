@@ -7,6 +7,7 @@ import importlib
 import cfe.regression as rgsn
 from collections import defaultdict
 from .local_tools import df_data_grabber, format_id, get_categorical_mapping, get_dataframe, map_index, get_formatting_functions, panel_ids, id_walk, all_dfs_from_orgfile, to_parquet
+from .paths import data_root
 from .yaml_utils import load_yaml
 import importlib.util
 import os
@@ -504,7 +505,9 @@ class Wave:
             print(f"Attempting to generate using Makefile...", flush=True,file=stderr)
             #cluster features in the old makefile is called 'other_features'
             # if request =='cluster_features': request = 'other_features'
-            parquet_fn = self.file_path/"_"/ f"{request}.parquet"
+            country_name = self.country.name
+            parquet_fn = data_root(country_name) / self.year / "_" / f"{request}.parquet"
+            parquet_fn.parent.mkdir(parents=True, exist_ok=True)
 
             makefile_path = self.file_path.parent /'_'/ "Makefile"
             if not makefile_path.exists():
@@ -513,13 +516,16 @@ class Wave:
 
             cwd_path = self.file_path.parent / "_"
             relative_parquet_path = parquet_fn.relative_to(cwd_path.parent)  # Convert to relative path
-            subprocess.run(["make", "-s", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True)
+            var_dir = str(data_root(country_name) / "var")
+            env = os.environ.copy()
+            env["LSMS_DATA_DIR"] = str(data_root())
+            subprocess.run(["make", "-s", f"VAR_DIR={var_dir}", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True, env=env)
             print(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...",file=stderr)
 
             if not parquet_fn.exists():
                 print(f"Parquet file {parquet_fn} still missing after running Makefile.",file=stderr)
                 return pd.DataFrame()
-            
+
             df = pd.read_parquet(parquet_fn)
 
         if isinstance(df, pd.DataFrame):
@@ -756,7 +762,7 @@ class Country:
         if getattr(self, "_location_lookup_inflight", False):
             raise RuntimeError("Location lookup already in progress.")
 
-        location_path = self.file_path / "var" / "other_features.parquet"
+        location_path = data_root(self.name) / "var" / "other_features.parquet"
         if location_path.exists():
             location_df = get_dataframe(location_path)
         else:
@@ -901,7 +907,7 @@ class Country:
 
         prefer_parquet_cache = bool(getattr(self, "use_parquet", False)) and method_name not in JSON_CACHE_METHODS
         if prefer_parquet_cache:
-            parquet_path = self.file_path / "var" / f"{method_name}.parquet"
+            parquet_path = data_root(self.name) / "var" / f"{method_name}.parquet"
             if parquet_path.exists():
                 df_cached = get_dataframe(parquet_path)
                 df_cached = map_index(df_cached)
@@ -958,10 +964,10 @@ class Country:
                 output_candidates.append(self.file_path / "_" / f"{method_name}.json")
             else:
                 if wave is not None:
-                    output_candidates.append(base_path / "var" / f"{method_name}.parquet")
-                    output_candidates.append(base_path / "_" / f"{method_name}.parquet")
-                output_candidates.append(self.file_path / "var" / f"{method_name}.parquet")
-                output_candidates.append(self.file_path / "_" / f"{method_name}.parquet")
+                    output_candidates.append(data_root(self.name) / wave / "var" / f"{method_name}.parquet")
+                    output_candidates.append(data_root(self.name) / wave / "_" / f"{method_name}.parquet")
+                output_candidates.append(data_root(self.name) / "var" / f"{method_name}.parquet")
+                output_candidates.append(data_root(self.name) / "_" / f"{method_name}.parquet")
 
             # deduplicate while preserving order
             unique_candidates: list[Path] = []
@@ -993,18 +999,21 @@ class Country:
                     pythonpath = f"{repo_root}{os.pathsep}{pythonpath}" if pythonpath else str(repo_root)
                 env["PYTHONPATH"] = pythonpath
                 env.setdefault("PYTHON", sys.executable)
+                # Ensure subprocess scripts also redirect data paths
+                env["LSMS_DATA_DIR"] = str(data_root())
                 return env
 
             def try_make(make_dir: Path) -> Path | None:
                 if make_dir is None or not (make_dir / "Makefile").exists():
                     return None
                 makefile = make_dir / "Makefile"
+                var_dir = str(data_root(self.name) / "var")
                 for candidate in unique_candidates:
                     try:
                         rel_target = os.path.relpath(candidate, make_dir)
                     except ValueError:
                         continue
-                    make_cmd = ["make", "-s"]
+                    make_cmd = ["make", "-s", f"VAR_DIR={var_dir}"]
                     jobs_flag = _make_jobs_flag()
                     if jobs_flag:
                         make_cmd.append(jobs_flag)
@@ -1169,7 +1178,7 @@ class Country:
             """
             Load data using DVC materialize stages. Falls back to load_from_waves if stages are missing.
             """
-            cache_path = self.file_path / "var" / f"{method_name}.parquet"
+            cache_path = data_root(self.name) / "var" / f"{method_name}.parquet"
             cache_exists = cache_path.exists()
             dvc_root = self.file_path.parent
 
@@ -1383,8 +1392,8 @@ class Country:
         List dataset names currently cached for this country.
         """
         cache_files = []
-        var_dir = self.file_path / "var"
-        underscore_dir = self.file_path / "_"
+        var_dir = data_root(self.name) / "var"
+        underscore_dir = data_root(self.name) / "_"
 
         if var_dir.exists():
             cache_files.extend(var_dir.glob("*.parquet"))
@@ -1415,9 +1424,9 @@ class Country:
         targets = list(dict.fromkeys(methods or self.cached_datasets()))
 
         for method in targets:
-            json_cache = self.file_path / "_" / f"{method}.json"
-            parquet_cache = self.file_path / "_" / f"{method}.parquet"
-            var_cache = self.file_path / "var" / f"{method}.parquet"
+            json_cache = data_root(self.name) / "_" / f"{method}.json"
+            parquet_cache = data_root(self.name) / "_" / f"{method}.parquet"
+            var_cache = data_root(self.name) / "var" / f"{method}.parquet"
 
             for candidate in (json_cache, parquet_cache, var_cache):
                 if candidate.suffix == ".json" and candidate.stem not in JSON_CACHE_METHODS:

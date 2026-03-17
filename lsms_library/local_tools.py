@@ -18,6 +18,7 @@ from importlib.resources import files
 from dvc.api import DVCFileSystem
 import pyreadstat
 import inspect
+from .paths import data_root, var_path, wave_data_path, COUNTRIES_ROOT
 
 # Initialize DVC filesystem once and reuse it
 _PACKAGE_ROOT = Path(__file__).resolve().parent
@@ -34,12 +35,65 @@ def _to_numeric(x,coerce=False):
         return x
     
 @lru_cache(maxsize=3)
+def _resolve_data_path(fn: str, stack_depth: int = 2) -> str:
+    """Rewrite a relative path to land under data_root when appropriate.
+
+    Handles two patterns:
+      - ``../var/foo.parquet`` from country-level scripts (Uganda/_/)
+      - bare ``foo.parquet`` from wave-level scripts (Uganda/2005-06/_/)
+
+    Path rewriting is **only active** when ``LSMS_DATA_DIR`` is explicitly
+    set.  Without it, paths are returned unchanged so that standalone
+    ``make`` (which tracks outputs at ``../var/``) keeps working.
+    """
+    # Only intercept when the user has opted in via LSMS_DATA_DIR
+    if not os.environ.get("LSMS_DATA_DIR", "").strip():
+        return str(fn)
+
+    fn_str = str(fn)
+    p = Path(fn_str)
+
+    # Only rewrite relative paths
+    if p.is_absolute():
+        return fn_str
+
+    try:
+        caller_file = Path(inspect.stack()[stack_depth].filename).resolve()
+        rel = caller_file.relative_to(COUNTRIES_ROOT)
+    except (IndexError, ValueError, TypeError):
+        return fn_str
+
+    parts = rel.parts  # e.g. ('Uganda', '_', 'food_acquired.py')
+                        #   or ('Uganda', '2005-06', '_', 'shocks.py')
+    if len(parts) < 2:
+        return fn_str
+
+    country = parts[0]
+
+    # Pattern 1: ../var/foo.parquet  (country-level script)
+    if fn_str.startswith("../var/"):
+        name = fn_str[len("../var/"):]
+        resolved = data_root(country) / "var" / name
+        resolved.parent.mkdir(parents=True, exist_ok=True)
+        return str(resolved)
+
+    # Pattern 2: bare filename from a wave-level script
+    if len(parts) >= 3 and parts[1] != "_" and "/" not in fn_str:
+        wave = parts[1]
+        resolved = data_root(country) / wave / "_" / fn_str
+        resolved.parent.mkdir(parents=True, exist_ok=True)
+        return str(resolved)
+
+    return fn_str
+
+
 def get_dataframe(fn,convert_categoricals=True,encoding=None,categories_only=False):
     """From a file named fn, try to return a dataframe.
 
     Hope is that caller can be agnostic about file type,
     or if file is local or on a dvc remote.
     """
+    fn = _resolve_data_path(fn)
 
     def local_file(fn):
     # Is the file local?
@@ -586,6 +640,7 @@ def to_parquet(df,fn,index=True):
     Parquet (pyarrow) is slightly more picky about data types and layout than is pandas;
     here we fix some possible problems before calling pd.DataFrame.to_parquet.
     """
+    fn = _resolve_data_path(fn)
     if len(df.shape)==0: # A series?  Need a dataframe.
         df = pd.DataFrame(df)
 

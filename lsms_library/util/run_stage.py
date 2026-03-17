@@ -7,7 +7,8 @@ import os
 import subprocess
 import sys
 from pathlib import Path
-import sys
+
+from lsms_library.paths import data_root
 
 
 def _python_bin() -> Path:
@@ -55,8 +56,8 @@ def _compute_make_jobs() -> int | None:
     return None
 
 
-def _default_target(table: str, fmt: str) -> str:
-    return f"../var/{table}.{fmt}"
+def _default_target(country: str, table: str, fmt: str) -> str:
+    return str(data_root(country) / "var" / f"{table}.{fmt}")
 
 
 def _run_make(target: str) -> None:
@@ -112,7 +113,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    target = args.target or _default_target(args.table, args.format)
+    target = args.target or _default_target(args.country, args.table, args.format)
     if args.backend == "make":
         _run_make(target)
     else:

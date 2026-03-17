@@ -36,7 +36,11 @@ JSON_ONLY_TABLES = {"panel_ids", "updated_ids"}
 
 
 def _default_target(table: str, fmt: str) -> str:
-    """Path (relative to _ directory) for the standard materialized file."""
+    """Path (relative to _ directory) for the standard materialized file.
+
+    NOTE: DVC stages still use relative paths within the repo; the actual
+    data separation happens at runtime via lsms_library.paths.data_root().
+    """
     return f"../var/{table}.{fmt}"
 
 

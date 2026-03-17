@@ -3,12 +3,14 @@ rounds := $(shell ls -d ../19* ../2*-*)
 source = $(shell find $(rounds) -name \*.py)
 parquet := $(source:.py=.parquet)
 
-var = ../var/food_expenditures.parquet ../var/food_quantities.parquet ../var/food_prices.parquet \
-	  ../var/household_characteristics.parquet
+VAR_DIR ?= ../var
+
+var = $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_quantities.parquet $(VAR_DIR)/food_prices.parquet \
+	  $(VAR_DIR)/household_characteristics.parquet
 
 all: $(parquet) $(var)
 
-../var/food_quantities.parquet ../var/food_expenditures.parquet ../var/food_prices.parquet &: ../var/food_acquired.parquet food_acquired.py
+$(VAR_DIR)/food_quantities.parquet $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_prices.parquet &: $(VAR_DIR)/food_acquired.parquet food_acquired.py
 	python food_prices_quantities_and_expenditures.py
 
 food_acquired = $(shell find $(rounds) -name food_acquired.py)
@@ -17,7 +19,7 @@ food_acquired_parquet := $(food_acquired:.py=.parquet)
 ../%/_/food_acquired.parquet: $(food_acquired)
 	(cd $(@D) && python food_acquired.py)
 
-../var/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
+$(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
 	python food_acquired.py
 
 household_characteristics = $(shell find $(rounds) -name household_characteristics.py)
@@ -26,7 +28,7 @@ household_characteristics_parquet := $(household_characteristics:.py=.parquet)
 ../%/_/household_characteristics.parquet:
 	(cd $(@D) && python household_characteristics.py)
 
-../var/household_characteristics.parquet: household_characteristics.py $(household_characteristics_parquet)
+$(VAR_DIR)/household_characteristics.parquet: household_characteristics.py $(household_characteristics_parquet)
 	python household_characteristics.py
 
 household_roster = $(shell find $(rounds) -name household_roster.py)
@@ -35,7 +37,7 @@ household_roster_parquet := $(household_roster:.py=.parquet)
 ../%/_/household_roster.parquet: @D/household_roster.py
 	(cd $(@D) && python household_roster.py)
 
-../var/household_roster.parquet: household_roster.py $(household_roster_parquet)
+$(VAR_DIR)/household_roster.parquet: household_roster.py $(household_roster_parquet)
 	python household_roster.py
 
 
@@ -44,4 +46,4 @@ household_roster_parquet := $(household_roster:.py=.parquet)
 
 clean:
 	-rm $(parquet)
-	-rm ../var/*.parquet
+	-rm $(VAR_DIR)/*.parquet
