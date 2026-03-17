@@ -71,6 +71,15 @@ UGANDA_ROOT = _find_uganda_root()
 def uganda_root():
     if UGANDA_ROOT is None:
         pytest.skip("Uganda country directory not found")
+    # Skip if no parquets are built (e.g., CI without data access)
+    has_parquets = any(UGANDA_ROOT.rglob("*.parquet"))
+    if not has_parquets:
+        from lsms_library.paths import data_root
+        data_root.cache_clear()
+        ext = data_root("Uganda")
+        has_parquets = ext.exists() and any(ext.rglob("*.parquet"))
+    if not has_parquets:
+        pytest.skip("No Uganda parquets built (requires data access)")
     return UGANDA_ROOT
 
 
