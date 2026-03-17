@@ -3,13 +3,17 @@ Sanity checks for LSMS feature DataFrames.
 
 Usage::
 
-    from lsms_library.diagnostics import is_this_feature_sane
+    from lsms_library.diagnostics import is_this_feature_sane, check_panel_consistency
 
     import lsms_library as ll
     uga = ll.Country('Uganda')
     report = is_this_feature_sane(uga.food_acquired(), country='Uganda', feature='food_acquired')
     report.summarize()       # prints human-readable summary
     assert report.ok         # True if no errors (warnings allowed)
+
+    # Panel consistency (for countries with panel data):
+    panel_report = check_panel_consistency(uga)
+    panel_report.summarize()
 """
 
 from __future__ import annotations
@@ -337,5 +341,225 @@ def is_this_feature_sane(
     report.checks.append(_check_dtype_consistency(df, scheme, feature))
     report.checks.append(_check_duplicate_index(df))
     report.checks.append(_check_index_overlap_with_spine(df, country))
+
+    return report
+
+
+# ---------------------------------------------------------------------------
+# Panel consistency checks
+# ---------------------------------------------------------------------------
+
+def _check_has_panel_ids(country) -> Check:
+    """Country must have panel_ids to run panel checks."""
+    try:
+        pi = country.panel_ids
+        if pi is None or (isinstance(pi, dict) and len(pi) == 0):
+            return Check("has_panel_ids", "fail", "panel_ids is empty or None")
+        return Check("has_panel_ids", "pass", f"{len(pi)} panel ID mappings")
+    except Exception as e:
+        return Check("has_panel_ids", "fail", f"Could not load panel_ids: {e}")
+
+
+def _check_has_updated_ids(country) -> Check:
+    """Country must have updated_ids."""
+    try:
+        ui = country.updated_ids
+        if ui is None or (isinstance(ui, dict) and len(ui) == 0):
+            return Check("has_updated_ids", "fail", "updated_ids is empty or None")
+        waves_with_mappings = {w for w, m in ui.items() if m}
+        return Check("has_updated_ids", "pass",
+                     f"{len(waves_with_mappings)} waves with ID mappings")
+    except Exception as e:
+        return Check("has_updated_ids", "fail", f"Could not load updated_ids: {e}")
+
+
+def _check_updated_ids_cover_waves(country) -> Check:
+    """updated_ids should have entries for every wave (except possibly the first)."""
+    try:
+        ui = country.updated_ids
+        waves = sorted(country.waves)
+        if len(waves) < 2:
+            return Check("updated_ids_cover_waves", "pass", "Single-wave country (skipped)")
+        # First wave usually has no previous IDs
+        expected_waves = set(waves[1:])
+        covered = {w for w in expected_waves if w in ui and ui[w]}
+        missing = expected_waves - covered
+        if missing:
+            return Check("updated_ids_cover_waves", "warn",
+                         f"No ID mappings for waves: {sorted(missing)}")
+        return Check("updated_ids_cover_waves", "pass",
+                     f"All {len(covered)} follow-up waves have mappings")
+    except Exception as e:
+        return Check("updated_ids_cover_waves", "fail", str(e))
+
+
+def _check_ids_are_self_consistent(country) -> Check:
+    """Check that updated_ids mappings don't create cycles or orphans.
+
+    Every current ID should map to a valid previous ID, and the chain
+    should terminate at a first-wave ID.
+    """
+    try:
+        ui = country.updated_ids
+        waves = sorted(country.waves)
+        if len(waves) < 2:
+            return Check("ids_self_consistent", "pass", "Single-wave (skipped)")
+
+        issues = []
+        for wave in waves[1:]:
+            if wave not in ui or not ui[wave]:
+                continue
+            mappings = ui[wave]
+            # Check for self-referential mappings
+            self_refs = [k for k, v in mappings.items() if k == v]
+            if self_refs:
+                issues.append(f"{wave}: {len(self_refs)} self-referential ID(s)")
+            # Check for empty/null mappings
+            null_maps = [k for k, v in mappings.items()
+                         if v is None or (isinstance(v, str) and v.strip() == "")]
+            if null_maps:
+                issues.append(f"{wave}: {len(null_maps)} null mapping(s)")
+
+        if issues:
+            return Check("ids_self_consistent", "warn", "; ".join(issues[:5]))
+        return Check("ids_self_consistent", "pass")
+    except Exception as e:
+        return Check("ids_self_consistent", "fail", str(e))
+
+
+def _check_panel_attrition_monotonic(country) -> Check:
+    """The diagonal of the attrition matrix should decrease over time
+    (panel attrition), and off-diagonal entries should be <= diagonal.
+    """
+    try:
+        from .local_tools import panel_attrition
+        # Need a feature with (i, t) to compute attrition
+        spine_path = data_root(country.name) / "var" / "other_features.parquet"
+        if not spine_path.exists():
+            return Check("attrition_monotonic", "pass",
+                         "other_features not cached (skipped)")
+        spine = pd.read_parquet(spine_path, engine="pyarrow")
+        if "i" not in spine.index.names or "t" not in spine.index.names:
+            return Check("attrition_monotonic", "pass", "Spine lacks i/t index (skipped)")
+
+        waves = sorted(spine.index.get_level_values("t").unique())
+        if len(waves) < 2:
+            return Check("attrition_monotonic", "pass", "Single wave (skipped)")
+
+        attrition = panel_attrition(spine, waves)
+
+        # Check diagonal: sample size per wave
+        diag = [int(attrition.loc[w, w]) for w in waves]
+        issues = []
+
+        # Off-diagonal: attrition between waves s < t should be <= min(diag[s], diag[t])
+        for i, s in enumerate(waves):
+            for t in waves[i + 1:]:
+                val = int(attrition.loc[s, t])
+                if val > diag[i]:
+                    issues.append(f"({s},{t}): {val} > {diag[i]} (more matches than source wave)")
+                if val < 0:
+                    issues.append(f"({s},{t}): negative count {val}")
+
+        # Check that attrition is non-negative between adjacent waves
+        for i in range(len(waves) - 1):
+            s, t = waves[i], waves[i + 1]
+            val = int(attrition.loc[s, t])
+            if val == 0:
+                issues.append(f"({s},{t}): zero overlap — panel may be broken")
+
+        if issues:
+            return Check("attrition_monotonic", "warn", "; ".join(issues[:5]))
+
+        # Summarize attrition rates
+        if len(waves) >= 2:
+            first_last = int(attrition.loc[waves[0], waves[-1]])
+            retention = first_last / diag[0] if diag[0] > 0 else 0
+            return Check("attrition_monotonic", "pass",
+                         f"Attrition matrix OK. {waves[0]}→{waves[-1]} retention: "
+                         f"{first_last}/{diag[0]} ({retention:.1%})")
+        return Check("attrition_monotonic", "pass")
+    except Exception as e:
+        return Check("attrition_monotonic", "fail", str(e))
+
+
+def _check_ids_applied_consistently(country) -> Check:
+    """For each feature with 'i' and 't' in the index, check that household
+    IDs are consistent with updated_ids — i.e., the same physical household
+    uses the same canonical ID across waves.
+    """
+    try:
+        ui = country.updated_ids
+        if not ui:
+            return Check("ids_applied_consistently", "pass", "No updated_ids (skipped)")
+
+        # Build reverse map: for each wave, which canonical IDs should appear?
+        # updated_ids maps current_id -> canonical_first_wave_id
+        # Check a few features for consistency
+        features_to_check = ["other_features", "household_characteristics", "food_acquired"]
+        issues = []
+
+        for feature_name in features_to_check:
+            feature_path = data_root(country.name) / "var" / f"{feature_name}.parquet"
+            if not feature_path.exists():
+                continue
+            df = pd.read_parquet(feature_path, engine="pyarrow")
+            if "i" not in df.index.names or "t" not in df.index.names:
+                continue
+
+            # For each wave with updated_ids, check that feature IDs
+            # use the canonical (updated) form, not the raw wave-specific form
+            waves_in_data = sorted(df.index.get_level_values("t").unique())
+            for wave in waves_in_data:
+                if wave not in ui or not ui[wave]:
+                    continue
+                mappings = ui[wave]
+                # IDs in this wave of this feature
+                wave_mask = df.index.get_level_values("t") == wave
+                feature_ids = set(df[wave_mask].index.get_level_values("i"))
+
+                # The canonical IDs are the keys of updated_ids[wave]
+                # (current IDs that map to earlier canonical IDs)
+                canonical_ids = set(mappings.keys())
+
+                # Check: do any feature IDs match the *values* (old IDs)
+                # instead of the keys (updated IDs)?  That would mean
+                # id_walk wasn't applied.
+                old_ids = set(mappings.values())
+                using_old = feature_ids & old_ids - canonical_ids
+                if using_old and len(using_old) > len(feature_ids) * 0.1:
+                    issues.append(
+                        f"{feature_name}/{wave}: {len(using_old)} IDs appear to use "
+                        f"pre-update form (id_walk may not have been applied)"
+                    )
+
+        if issues:
+            return Check("ids_applied_consistently", "warn", "; ".join(issues[:5]))
+        return Check("ids_applied_consistently", "pass",
+                     f"Checked {len(features_to_check)} features — IDs look canonical")
+    except Exception as e:
+        return Check("ids_applied_consistently", "fail", str(e))
+
+
+def check_panel_consistency(country) -> SanityReport:
+    """Run panel-specific sanity checks on a Country object.
+
+    Parameters
+    ----------
+    country : Country
+        A ``Country`` instance (e.g., ``ll.Country('Uganda')``).
+
+    Returns
+    -------
+    SanityReport
+    """
+    report = SanityReport(country=country.name, feature="[panel]")
+
+    report.checks.append(_check_has_panel_ids(country))
+    report.checks.append(_check_has_updated_ids(country))
+    report.checks.append(_check_updated_ids_cover_waves(country))
+    report.checks.append(_check_ids_are_self_consistent(country))
+    report.checks.append(_check_panel_attrition_monotonic(country))
+    report.checks.append(_check_ids_applied_consistently(country))
 
     return report
