@@ -1204,6 +1204,14 @@ class Country:
             """
             cache_path = data_root(self.name) / "var" / f"{method_name}.parquet"
             cache_exists = cache_path.exists()
+
+            # Fast path: if a cached parquet exists at data_root, read it directly
+            if cache_exists:
+                print(f"Reading {method_name} from cache {cache_path}", file=stderr)
+                df = get_dataframe(cache_path)
+                df = map_index(df)
+                return df
+
             dvc_root = self.file_path.parent
 
             repo: Repo | None = None
@@ -1213,11 +1221,6 @@ class Country:
 
                     stage_infos = self._resolve_materialize_stages(method_name, waves)
                     if not stage_infos:
-                        if cache_exists:
-                            print(f"Reading {method_name} from cache {cache_path}", file=stderr)
-                            df = get_dataframe(cache_path)
-                            df = map_index(df)
-                            return df
                         df = load_from_waves(waves)
                         if isinstance(df, pd.DataFrame):
                             cache_path.parent.mkdir(parents=True, exist_ok=True)

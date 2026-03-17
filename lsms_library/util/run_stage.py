@@ -8,6 +8,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from lsms_library.paths import data_root
+
 
 def _python_bin() -> Path:
     repo_root = Path(__file__).resolve().parents[2]
@@ -54,12 +56,13 @@ def _compute_make_jobs() -> int | None:
     return None
 
 
-def _default_target(table: str, fmt: str) -> str:
-    return f"../var/{table}.{fmt}"
+def _default_target(country: str, table: str, fmt: str) -> str:
+    return str(data_root(country) / "var" / f"{table}.{fmt}")
 
 
-def _run_make(target: str) -> None:
-    cmd = ["make", "-s"]
+def _run_make(country: str, target: str) -> None:
+    var_dir = str(data_root(country) / "var")
+    cmd = ["make", "-s", f"VAR_DIR={var_dir}"]
     jobs = _compute_make_jobs()
     if jobs:
         cmd.append(f"-j{jobs}")
@@ -111,9 +114,9 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    target = args.target or _default_target(args.table, args.format)
+    target = args.target or _default_target(args.country, args.table, args.format)
     if args.backend == "make":
-        _run_make(target)
+        _run_make(args.country, target)
     else:
         _run_cli(args.country, args.table, args.format, args.wave, args.all_waves, target)
     return 0
