@@ -1162,11 +1162,26 @@ class Country:
             raise KeyError(f"No data found for {method_name} in any wave of {self.name}.")
 
         def load_json_cache(method_name):
-            cache_path = self.file_path / "_" / f"{method_name}.json"
-            if cache_path.exists():
-                print(f"Reading {method_name} from cache {cache_path}", file=stderr)
-                with open(cache_path, 'r') as json_file:
-                    return json.load(json_file)
+            cache_path = data_root(self.name) / "_" / f"{method_name}.json"
+            # Also check in-tree for legacy caches, and parquet variants
+            candidates = [
+                cache_path,
+                self.file_path / "_" / f"{method_name}.json",
+                data_root(self.name) / "_" / f"{method_name}.parquet",
+                self.file_path / "_" / f"{method_name}.parquet",
+            ]
+            for candidate in candidates:
+                if candidate.exists():
+                    print(f"Reading {method_name} from cache {candidate}", file=stderr)
+                    if candidate.suffix == ".json":
+                        with open(candidate, 'r') as json_file:
+                            return json.load(json_file)
+                    else:
+                        df = get_dataframe(candidate)
+                        # Convert back to dict format expected by panel_ids consumers
+                        if hasattr(df, 'to_dict'):
+                            return df
+                        return df
 
             try:
                 make_cmd = ["make", "-s"]
@@ -1187,7 +1202,7 @@ class Country:
                     json.dump(result, json_file)
                 print(f"Writing {method_name} to cache {cache_path}", file=stderr)
             elif isinstance(result, pd.DataFrame):
-                parquet_path = self.file_path / "_" / f"{method_name}.parquet"
+                parquet_path = data_root(self.name) / "_" / f"{method_name}.parquet"
                 parquet_path.parent.mkdir(parents=True, exist_ok=True)
                 to_parquet(result, parquet_path)
                 if cache_path.exists():
