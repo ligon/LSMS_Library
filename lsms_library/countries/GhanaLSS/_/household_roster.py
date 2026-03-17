@@ -51,4 +51,8 @@ except FileNotFoundError:
     z['m'] = 'Ghana'
     z = z.reset_index().set_index(['j','indiv','t','m'])
 
+z = z.rename(columns={'Relation': 'Relationship'})
+
+z['Age'] = pd.to_numeric(z['Age'], errors='coerce').astype('Int64')
+
 to_parquet(z, '../var/household_roster.parquet')
