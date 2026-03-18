@@ -7,7 +7,7 @@ sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
 import dvc.api
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 
 with dvc.api.open('../Data/s00_me_bfa2018.dta', mode='rb') as dta:
     df = from_dta(dta, convert_categoricals=True)

@@ -14,7 +14,7 @@ df = df.filter(regex='ales ')
 
 N = df.sum(axis=1)
 
-df['log HSize'] = np.log(N[N>0])
+df.loc[:,'log HSize'] = np.log(N[N>0])
 
 # Switch to hhid that is constant across waves...
 #with dvc.api.open('../Data/GSEC1.dta',mode='rb') as dta:

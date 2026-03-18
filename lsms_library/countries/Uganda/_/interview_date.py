@@ -13,11 +13,11 @@ import json
 
 x = {}
 for t in list(Waves.keys()):
-    print(t)
+    print(t, file=sys.stderr)
     try: 
         x[t] = get_dataframe('../'+t+'/_/interview_date.parquet')
     except FileNotFoundError:
-        print(f"No parquet foound for {t}")
+        print(f"No parquet foound for {t}", file=sys.stderr)
 
 x = pd.concat(x.values())
 
@@ -27,11 +27,11 @@ x = id_walk(x, updated_ids)
 try:
     of = get_dataframe('../var/other_features.parquet')
 
-    x = x.join(of.reset_index('m')['m'],on=['j','t'])
+    x = x.join(of.reset_index('m')['m'],on=['i','t'])
 
 except FileNotFoundError:
     x['m'] ='Uganda'
 
-x = x.reset_index().set_index(['j','t','m'])
+x = x.reset_index().set_index(['i','t','m'])
 
 to_parquet(x.dropna(), '../var/interview_date.parquet')

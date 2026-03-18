@@ -18,7 +18,7 @@
     to install dependencies which allow =dvc= to work with google
     drive and s3 buckets.  Provided you have a reasonably modern =python=
     installation (if you don't we recommend
-    https://www.anaconda.com/), a simple =pip install 'dvc[gdrive]'= and =pip install 'dvc[s3]'= may do the trick.  Some shells (e.g., the default zsh on Macs) may require you to escape the square brackets, e.g., =pip install dvc\[s3\]=.
+    https://www.anaconda.com/), a simple  =pip install 'dvc[s3]'= may do the trick.  Some shells (e.g., the default zsh on Macs) may require you to escape the square brackets, e.g., =pip install dvc\[s3\]=.
 
   - =gnupg=, for managing encryption.
 
@@ -46,7 +46,6 @@
    DVC manages the versioning of more-or-less static datasets.
    To install,
    #+begin_src sh
-   pip install dvc[gdrive]
    pip install dvc[s3]
    #+end_src
 The private key for accessing the data on google drive is found in the file =gdrive_data_store.json.gpg=.  The =gpg= string indicates that this file is encrypted, in this case using a secret passphrase.
@@ -68,9 +67,36 @@ Similarly, the private key for /accessing/ data on the s3 data store is found in
    If successful, this will unlock the credentials needed for DVC and allow you to access the data in the LSMS Library.
 
    (If this doesn't work, make sure you have =gpg= installed: https://gnupg.org/download/)
+
+   In non-interactive environments (e.g., CI) you can suppress the automatic authentication prompt by setting
+   =LSMS_SKIP_AUTH=1= in the environment. When this flag is set you are responsible for running =ll.authenticate()=
+   manually before attempting to access protected datasets.
+
+*** Local virtual environment
+   Keep project dependencies isolated so you can experiment without colliding with
+   system packages:
+
+   #+begin_src sh
+   cd LSMS_Library
+   python3 -m venv .venv
+   source .venv/bin/activate
+   pip install --upgrade pip
+   pip install -e .
+   pip install pytest ipython matplotlib   # developer conveniences
+   #+end_src
+
+   When running project tools (e.g., =make= targets), either activate the
+   environment first or prepend the virtualenv to your PATH, e.g.
+
+   #+begin_src sh
+   PATH="$(pwd)/.venv/bin:$PATH" make -C lsms_library test country=Malawi
+   #+end_src
+
+   The editable install exposes =lsms_library= so the import hooks and
+   authentication helpers work consistently inside the virtualenv.
 * Streaming dvc files
    A =dvc pull= will download dvc files to your local repository.
-   But this may not be the best way to proceed!  In particular, =dvc=
+   But this is usually not the best way to proceed!  In particular, =dvc=
    offers an api which permits one to "stream" or cache files, leaving
    your storage local to the working repository free of big data
    files.
@@ -97,7 +123,92 @@ Similarly, the private key for /accessing/ data on the s3 data store is found in
    and files should be added from the remote dvc data store to your
    working repository. 
 
+** Persisting harmonized tables
+   When you need reproducible Parquet/CSV artefacts, materialise them through the
+   public API instead of re-implementing transformations. There are three entry
+   points:
+
+   - CLI (materialize): =python -m lsms_library.cli materialize --country Malawi --wave 2019-20 --table household_roster --format parquet --out lsms_library/countries/build/Malawi/2019-20/household_roster.parquet= (or use the installed script: =lsms-library materialize ...=). Repeat =--wave= to pull several waves, or omit it / pass =--all-waves= to stack every available wave into a single file (e.g., =lsms-library materialize --country Malawi --table household_roster --out lsms_library/countries/build/Malawi/all_waves/household_roster.parquet=).
+   - CLI (register): =python -m lsms_library.cli register --country Uganda --wave 2023-24 --table household_roster= appends the appropriate entry to =lsms_library/countries/dvc.yaml= and clears any stale lock data.
+   - CLI (discovery): =lsms-library countries= lists supported countries; =lsms-library waves --country Malawi= shows available waves; =lsms-library tables --country Malawi= lists tables from the data scheme.
+   - Makefile: =make materialize country=Malawi wave=2019-20 table=household_roster= writes to =lsms_library/countries/build/<country>/<wave>/<table>.parquet=. Provide multiple waves via =wave=\"2019-20 2021-22\"= or aggregate everything with =all_waves=true=; override =OUT_FILE= to customise the destination. =make register ...= invokes the helper above (still requires a specific wave to keep DVC stages reproducible).
+   - DVC: reproducible stages live in =lsms_library/countries/dvc.yaml=. Run =cd lsms_library/countries= first, then =dvc repro materialize@malawi_2019_20_household_roster=. The Makefile target =make persist ...= wraps the same command from the project root.
+
+   When you add new tables, extend (or simply rerun =lsms-library register ...= to update) =lsms_library/countries/dvc.yaml= so contributors can regenerate all cached outputs with a single =dvc repro=.
+
+   Both the CLI and the DVC stages stream source assets via DVC's API, so you do not need to "dvc pull" large datasets locally—ideal for light machines.
+   Tip: run =lsms-library --install-completion= to enable shell tab-completion (Typer/Click feature).
+
+   Use =lsms-library waves --all-countries= or =lsms-library tables --all-countries= for CSV-friendly country combinations.
+
+   After editing metadata or adding YAML/Python loaders for a country, keep the DVC files in sync and ensure caches stay coherent:
+
+   - Regenerate the =dvc.yaml= definitions from the canonical metadata with:
+     #+begin_src bash
+poetry run python -m lsms_library.util.generate_dvc_stages --countries Uganda
+     #+end_src
+   - Refresh the matching lockfile (and therefore the validated cache) by reproing the specific stage:
+     #+begin_src bash
+cd lsms_library/countries
+poetry run dvc repro Uganda/2019-20/dvc.yaml:materialize@uganda::2019_20::household_roster
+     #+end_src
+   - If you only need to sanity-check a table without touching DVC metadata, set =LSMS_USE_DVC_CACHE=false= and call either =lsms-library materialize ...= or the per-country Makefile target; the environment variable keeps the runtime loader from reading stale caches.
+   - Use =lsms-library cache clear --country <Country>= (plus =--method= / =--wave= filters) before rerunning DVC stages when you want to guarantee that fresh parquet/JSON artefacts are produced.
+
+
 * Adding New Data
+** Capturing Household Location (undergrad workflow)
+   Several downstream analyses need household-level location metadata (rural/urban,
+   region, cluster id, coordinates). Undergrads can add this without touching any
+   Python code by editing only the YAML metadata and letting our existing generator
+   do the rest.
+
+   - Schema update ::
+     edit =lsms_library/countries/<Country>/_/data_scheme.yml= and add:
+     #+begin_src yaml
+     location:
+       index: (i, t)
+       cluster_id: str
+       Region: str
+       Rural: str
+       latitude: float
+       longitude: float
+     #+end_src
+     Adjust column names/types to match what that country actually has.
+
+   - Wave metadata ::
+     for each wave (=lsms_library/countries/<Country>/<wave>/_/data_info.yml=) add
+     a stanza describing the source columns, for example:
+     #+begin_src yaml
+     location:
+       source: household_characteristics.parquet
+       cluster_column: EA_ID
+       region_column: Region
+       rural_column: Rural
+     #+end_src
+     If a wave lacks some of these fields, leave the entry blank so the gap stays visible.
+
+   - Regenerate DVC ::
+     keep `dvc.yaml`/`dvc.lock` aligned with:
+     #+begin_src sh
+     poetry run python -m lsms_library.cli generate-dvc --country <Country>
+     #+end_src
+     Commit those updates along with your YAML changes.
+
+   - Optional sanity check ::
+     from =lsms_library/countries/= reproduce the DVC stage:
+     #+begin_src sh
+     cd lsms_library/countries
+     poetry run dvc repro <Country>/dvc.yaml:materialize@<country_slug>::location
+     #+end_src
+     This confirms the lock file and cache update cleanly.
+
+   These four steps keep the work scoped entirely to `data_scheme.yml` and
+   `data_info.yml`, which means contributors don’t need to touch the Python codebase.
+   If you notice that a wave lacks the required columns, record that fact in the
+   YAML (leave the fields blank) rather than inventing data—the generator will emit
+   empty columns until real mappings are added.
+
 ** Additional S3 Credentials
 Write access to the remote s3 repository requires additional credentials; contact =ligon@berkeley.edu= to obtain these.
 
@@ -181,74 +292,170 @@ Write access to the remote s3 repository requires additional credentials; contac
       #+end_src
 * Adding New Data Artifacts Using YAML
 
-This guide explains how to organize ~data_scheme.yml~, ~data_info.yml~, and optional Python transformation scripts to ensure proper functionality of the LSMS package. Maintaining correct indentation and formatting in ~data_info.yml~ is essential for the file to be processed correctly.
+This guide explains how to organize ~data_scheme.yml~, ~data_info.yml~, and optional Python helpers so the loader can build tidy DataFrames for each survey wave. Keep indentation consistent—YAML is picky, and a slipped space will raise a parsing error.
 
-** 1. Create the _/ Subdirectory and data_scheme.yml
+** Directory Layout
 
-In each *country directory*, create a subdirectory named _:
+Every country lives under ~lsms_library/countries/<Country>~. Inside each country you’ll find a shared ~=_/= directory for cross-wave settings and one subdirectory per wave:
 
-Inside the _/ folder, create a ~data_scheme.yml~ file to define the data structure and index for each table:
+#+begin_example
+Malawi/
+  _/
+    data_scheme.yml
+    malawi.py        # optional country-wide helpers
+  2019-20/
+    _/
+      data_info.yml
+      2019-20.py     # optional wave-specific helpers
+    Data/
+      … Stata/Parquet files tracked by DVC …
+#+end_example
 
-** 2. Create the _/ Subdirectory in Each Wave and Define data_info.yml
+**  Describe Tables in ~data_scheme.yml~
 
-In each *wave directory*, create an _ folder:
+The country-level scheme names each standardized table, lists its multi-index, and defines column types. Use the same keys the Python API exposes (e.g., ~food_acquired~, ~household_roster~). A concise example from ~lsms_library/countries/Malawi/_/data_scheme.yml:1~:
 
-Then, inside _/, create a ~data_info.yml~ file to describe the data files and mappings.
+#+begin_src yaml
+Country: Malawi
 
-*** 2.1 Basic Format
+Data Scheme:
+  household_roster:
+    index: (t, i, pid)
+    Sex: str
+    Age: int
+    Relationship: str
+  food_acquired:
+    index: (t, v, visit, i, j, u)
+    Quantity: float
+    Price: float
+    Produced: float
+#+end_src
 
-*** 2.2 Composite Index or Variables with Functions
+Keep index labels aligned with the loaders in ~lsms_library/local_tools.py~; ~t~ is the survey wave, ~i~ household id, ~v~ cluster, and so on.
 
-If a variable (e.g., i) requires multiple columns from the original dataset, list them together in a list format in YAML using hyphens (-). For example, if variable i maps to multiple source columns, define it as follows:
+**  Author ~data_info.yml~ for Each Wave
 
-** 3. Apply Transformation Functions in Python
+Each wave’s ~=_/data_info.yml~ maps survey files to the scheme. Begin with ~Country~ and ~Wave~, then add one top-level key per table listed in the scheme. For each table define:
 
-The `format_id` function from local_tools is automatically applied to all index variables by default.
+- ~file~: path(s) to source data relative to the wave directory. Provide a single string or a list. Use dictionaries inside the list to override column mappings for a specific file.
+- ~idxvars~: how to construct each index column.
+- ~myvars~: value columns.
 
-To apply a different formatting function to a specific index or column variable, you can define your own function and specify it in one of two ways:
-- Option 1: Name the function to match the variable name (e.g., i for variable i), and it will be recognized automatically.
-- Option 2: Add 'function: function_name' at the end of the mapping list (see bullet 7 for details). This explicitly assigns the function to mappings.
+***  Basic Structure
 
-This approach allows flexible customization of formatting logic for individual variables.
+From ~lsms_library/countries/Mali/2021-22/_/data_info.yml:4~:
 
-*** 3.1 Wave-Specific Column Transformation
+#+begin_src yaml
+household_roster:
+  file: ehcvm_individu_mli2021.dta
+  idxvars:
+    v: grappe
+    i:
+      - grappe
+      - menage
+    pid:
+      - grappe
+      - menage
+      - numind
+  myvars:
+    Sex: sexe
+    Age: age
+    Relation: lien
+#+end_src
 
-Create a Python file in the wave’s _ folder, e.g., ~Mali/2017-18/_/2017-18.py~:
+Lists inside ~idxvars~ signal a composite key. The loader passes that list into ~local_tools.df_data_grabber~ to build the final identifier.
 
-*** 3.2 Country-Wide Column Transformation
+*** Value Mappings and Inline Fixes
 
-To apply a transformation across all waves in a country, define the function in ~Mali/_/mali.py~.
+You can normalise categorical labels or repair known errors inline. The Uganda 2005–06 roster (~lsms_library/countries/Uganda/2005-06/_/data_info.yml:32~) shows both comment style and a mapping dictionary:
 
-** 4. Value Mapping Dictionaries
+#+begin_src yaml
+cluster_features:
+  file: GSEC1.dta
+  idxvars:
+    i: HHID
+    v: comm
+  myvars:
+    Region:
+      - region
+      -
+        0: "Central"   # Kampala households coded as 0, remap to "Central"
+    Rural:
+      - urban
+      -
+        urban: Urban
+        0: Rural
+#+end_src
 
-Define value mappings in ~data_info.yml~ for categorical variables.
+Leave a blank line between the column name and its dictionary so YAML treats the mapping as part of the list.
 
-Note: The empty line after the variable name is required to separate it from the mapping dictionary.
+*** Referencing Categorical Mapping Tables
 
-** 5. Row-Level DataFrame Transformation
+For large synonym lists, link to a pre-built mapping table instead of hard-coding values. The Mali food acquisition block (~lsms_library/countries/Mali/2021-22/_/data_info.yml:29~) uses the ~mappings~ helper to pull replacements from ~categorical_mapping/harmonize_food~:
 
-Define a function named after the dataframe in either the wave- or country-level Python file:
+#+begin_src yaml
+food_acquired:
+  idxvars:
+    j:
+      - s07bq01
+      - mappings: ['harmonize_food', 'Original Label', 'Preferred Label']
+    u:
+      - s07bq03b
+      - mappings: ['unit', 'Original Label', 'Preferred Label']
+#+end_src
 
-** 6. Multi-File DataFrames
+The loader fetches the named table, then aligns the “Original Label” column to the canonical “Preferred Label”.
 
-*** 6.1 Vertical Merge: Stacking Data Row-Wise (data from multiple files)
+*** Multiple Source Files and Overrides
 
-*** 6.2 File-Specific Overrides
+Use a list under ~file~ to stitch together cross-sectional and panel inputs. You can override column mappings for a specific file by supplying a dictionary. Malawi 2019–20 (~lsms_library/countries/Malawi/2019-20/_/data_info.yml:4~) illustrates both patterns:
 
-** 7. File-Specific Function Applications
+#+begin_src yaml
+household_roster:
+  file:
+    - Cross_Sectional/HH_MOD_B.dta
+    - Panel/hh_mod_b_19.dta:
+        i: y4_hhid
+        pid: id_code
+  idxvars:
+    i:
+      - case_id
+      - function: cs_i   # apply only when case_id is used
+    pid: PID
+#+end_src
 
-To apply a function to a specific column mapping, add 'function: function_name' at the end of the variable mapping list (as shown in the example for variable i). This function will be applied only to files that use this particular column mapping. If an override mapping is present, the function will not be applied.
+*** Boolean Flags and Other Transformations
 
-If you want the function to apply across all mappings for column i, refer to bullet point 3, where you can simply define the function name directly after the variable name i.
+Add a ~mapping: {<raw>: <clean>}~ block to coerce values, or point to a function when the built-ins are insufficient. In the previous example, ~function: cs_i~ calls a helper defined in ~lsms_library/countries/Malawi/_/malawi.py~. If every source file needs the same formatter, name the helper after the column (e.g., define ~def i(...):~) and skip the explicit ~function~ key.
 
-** 8. Horizontal Merge: Combining Data Column-Wise (adding columns side by side)
+** Python Helpers for Advanced Cases
 
-** 9. Hard-Coded Case
+Some datasets need more than simple mappings—row-level fixes, custom joins, or Makefile-driven builds. You can:
 
-In some cases where dataframes require more complex logic than simple mappings, create a Python file named after the dataframe in the wave's _ folder (e.g., ~Malawi/2004-05/_/food_acquired.py~). And create a Makefile in the country-level _ directory (e.g. ~Malawi/_/Makefile~). The system will automatically generate the dataframe by running =make=.
+- Create ~<Country>/_/<country>.py~ for helpers shared across waves.
+- Create ~<Country>/<Wave>/_/<Wave>.py~ for wave-specific logic.
+- Provide a function named after the table (e.g., ~def food_acquired(df):~) to post-process the assembled DataFrame.
+- For very custom builds, drop (or add to) a ~Makefile~ into the wave or country directory; tables tagged ~# USE_MAKEFILE~ in ~data_scheme.yml~ will invoke it.
 
-Note: The reason for not just simply running the Python file is because some data's Python files have dependencies.
+** Validate Your YAML
 
+Before opening a pull request:
 
+1. Confirm the YAML parses:
+   #+begin_src sh
+   python -c "import yaml, pathlib; yaml.safe_load(pathlib.Path('lsms_library/countries/Malawi/2019-20/_/data_info.yml').read_text())"
+   #+end_src
+2. Load the table via the library (replace ~Malawi~ and ~household_roster~ with your targets):
+   #+begin_src python
+   import lsms_library as ll
+   mw = ll.Country('Malawi')
+   df = mw.waves['2019-20'].household_roster()
+   print(df.head())
+   #+end_src
+3. Run ~make test country=<Country>~ from ~lsms_library~ to exercise the harmonizer.
 
+Capturing the exact commands you ran (and any gotchas) in your pull request keeps future maintainers out of the tall grass.
 
+Note: the ~make test~ target expects the relevant Parquet/Stata assets to be
+available through DVC. Ensure you've authenticated and pulled/streamed the
+required files before relying on the smoke test.

@@ -1,0 +1,35 @@
+Country: Kazakhstan
+Wave: 1996
+household_roster:
+    file:
+        - ../Data/KZ96REL.dta
+    idxvars:
+        i: rn
+        pid: personnr
+    myvars:
+        Sex:
+            - sex
+            - mapping:
+                1: M
+                2: F
+        Age: age
+        Relation: 
+            - relhead
+            - mapping:
+                1: husband/wife
+                2: father/mother
+                3: stepfather/stepmother
+                4: son/daughter
+                5: stepson/stepdaughter
+                6: brother/sister
+                7: stepbrother/stepsister
+                8: grandfather/grandmother
+                9: grandson/granddaughter
+                10: nephew/niece
+                11: father/mother-in-law
+                12: son/daughter-in-law 
+                13: other relative
+                14: nurse, assistant girl
+                15: other non-relative
+
+

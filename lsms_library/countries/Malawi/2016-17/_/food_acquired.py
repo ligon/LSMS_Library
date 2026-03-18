@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 import json
 import dvc.api
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 from malawi import handling_unusual_units, conversion_table_matching
 
 wave = '2016-17'
@@ -56,7 +56,7 @@ df = handling_unusual_units(df)
 
 df['price per unit'] = df['expenditure']/df['quantity_bought']
 df['t'] = wave
-df = df.reset_index().set_index(['j','t', 'i']).dropna(how='all')
+df = df.reset_index().set_index(['j','t','m','i']).dropna(how='all')
 
 final = df.loc[:, ['quantity_consumed', 'u_consumed', 'quantity_bought', 'u_bought', 'price per unit', 'expenditure', 'cfactor_consumed', 'cfactor_bought']]
 
@@ -66,4 +66,5 @@ labelsd = get_categorical_mapping(tablename='harmonize_food',
 
 final = final.rename(index=labelsd,level='i')
 final = final.dropna(how='all')
+final = final.reorder_levels(['j','t','m','i']).sort_index()
 to_parquet(final, "food_acquired.parquet")

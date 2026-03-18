@@ -1,0 +1,4046 @@
+{
+  "2005-06/_/assets.parquet": {
+    "columns": [
+      "Assets"
+    ],
+    "content_hash": "e968ff29be735d9eb220bb1d63d24ddbc8c05b85e356939ca711dc343a527a2d",
+    "dtypes": {
+      "Assets": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      3118,
+      1
+    ]
+  },
+  "2005-06/_/earnings.parquet": {
+    "columns": [
+      "Earnings"
+    ],
+    "content_hash": "5d1c980b0870543f43913450bb4fe2b6ca47c0d073d118e47f77c6c050c2a944",
+    "dtypes": {
+      "Earnings": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      1467,
+      1
+    ]
+  },
+  "2005-06/_/education_expenses.parquet": {
+    "columns": [
+      "Boarding Fee",
+      "Book Fee",
+      "Other Fee",
+      "School and Registration Fees",
+      "Total Education Expenditure",
+      "Uniform Fee"
+    ],
+    "content_hash": "be61c5cf5b0d3d4c897d29d47e6c7564316d036439285b75ed18084d1f66a633",
+    "dtypes": {
+      "Boarding Fee": "float64",
+      "Book Fee": "float64",
+      "Other Fee": "float64",
+      "School and Registration Fees": "float64",
+      "Total Education Expenditure": "float64",
+      "Uniform Fee": "float64"
+    },
+    "index_names": [
+      "j",
+      "pid"
+    ],
+    "shape": [
+      5815,
+      6
+    ]
+  },
+  "2005-06/_/enterprise_income.parquet": {
+    "columns": [
+      "losses",
+      "materials",
+      "otherexpense",
+      "profits",
+      "revenue",
+      "wagebill"
+    ],
+    "content_hash": "5d169c96c69bb85292174a91c94a39f2974575b7a047ab79e845c60d0dfce34b",
+    "dtypes": {
+      "losses": "float64",
+      "materials": "float64",
+      "otherexpense": "float64",
+      "profits": "float64",
+      "revenue": "float64",
+      "wagebill": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      1351,
+      6
+    ]
+  },
+  "2005-06/_/food_acquired.parquet": {
+    "columns": [
+      "Kgs",
+      "farmgate",
+      "market",
+      "quantity_away",
+      "quantity_home",
+      "quantity_inkind",
+      "quantity_own",
+      "unitvalue_away",
+      "unitvalue_home",
+      "unitvalue_inkind",
+      "unitvalue_own",
+      "value_away",
+      "value_home",
+      "value_inkind",
+      "value_own"
+    ],
+    "content_hash": "0f6a29c7123564be6f8ee3fd418d713009d7ca8d93654a123098cf03bfbeafcd",
+    "dtypes": {
+      "Kgs": "float64",
+      "farmgate": "float64",
+      "market": "float64",
+      "quantity_away": "float64",
+      "quantity_home": "float64",
+      "quantity_inkind": "float64",
+      "quantity_own": "float64",
+      "unitvalue_away": "float64",
+      "unitvalue_home": "float64",
+      "unitvalue_inkind": "float64",
+      "unitvalue_own": "float64",
+      "value_away": "float64",
+      "value_home": "float64",
+      "value_inkind": "float64",
+      "value_own": "float64"
+    },
+    "index_names": [
+      "i",
+      "j",
+      "u"
+    ],
+    "shape": [
+      40394,
+      15
+    ]
+  },
+  "2005-06/_/household_characteristics.parquet": {
+    "columns": [
+      "Females 00-03",
+      "Females 04-08",
+      "Females 09-13",
+      "Females 14-18",
+      "Females 19-30",
+      "Females 31-50",
+      "Females 51-99",
+      "Males 00-03",
+      "Males 04-08",
+      "Males 09-13",
+      "Males 14-18",
+      "Males 19-30",
+      "Males 31-50",
+      "Males 51-99",
+      "log HSize"
+    ],
+    "content_hash": "c8de70a0e86cb48c7c0414e085b169e74a1c0510ff800ca15f0b4279611c141a",
+    "dtypes": {
+      "Females 00-03": "int64",
+      "Females 04-08": "int64",
+      "Females 09-13": "int64",
+      "Females 14-18": "int64",
+      "Females 19-30": "int64",
+      "Females 31-50": "int64",
+      "Females 51-99": "int64",
+      "Males 00-03": "int64",
+      "Males 04-08": "int64",
+      "Males 09-13": "int64",
+      "Males 14-18": "int64",
+      "Males 19-30": "int64",
+      "Males 31-50": "int64",
+      "Males 51-99": "int64",
+      "log HSize": "float64"
+    },
+    "index_names": [
+      "i"
+    ],
+    "shape": [
+      3122,
+      15
+    ]
+  },
+  "2005-06/_/housing.parquet": {
+    "columns": [
+      "Earthen floor",
+      "Thatched roof"
+    ],
+    "content_hash": "51e685ca8024577270c9241227ab2634c46b39b1705ca1121e0e8e5f6c70daee",
+    "dtypes": {
+      "Earthen floor": "int64",
+      "Thatched roof": "int64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      3122,
+      2
+    ]
+  },
+  "2005-06/_/interview_date.parquet": {
+    "columns": [
+      "date"
+    ],
+    "content_hash": "b7d43ae3d1247c26243f089bb7476a5680e5f1772f3cd95cfcf579fc59469500",
+    "dtypes": {
+      "date": "datetime64[ns]"
+    },
+    "index_names": [
+      "j",
+      "t"
+    ],
+    "shape": [
+      3123,
+      1
+    ]
+  },
+  "2005-06/_/locality.parquet": {
+    "columns": [
+      "v"
+    ],
+    "content_hash": "6d5fc39dc67a871ec13ffb1145a287dabfadfd85b6f9e842578d4f024d841dde",
+    "dtypes": {
+      "v": "int32"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      3123,
+      1
+    ]
+  },
+  "2005-06/_/nonfood_expenditures.parquet": {
+    "columns": [
+      "Air Time/Services Fee (Owned Fixed/Mobile Phones)",
+      "Air Time/Services Fee (Phones not Owned)",
+      "Barber/Beauty Shops",
+      "Bathing Soap",
+      "Batteries (Dry cells)",
+      "Charcoal",
+      "Consultation Fees",
+      "Cosmetics (Body Lotion, Deodorant, etc)",
+      "Dry Cleaning/Laundry",
+      "Electricity",
+      "Firewood",
+      "Fuels (Generators/Lawn Mower)",
+      "Handbags, Travel Bags, etc",
+      "Hospital/Clinic Charges",
+      "Hotels, Lodging, etc",
+      "Houseboys/girls, Shamba Boys, etc",
+      "Imputed Rent of Free House",
+      "Imputed Rent of Owned House",
+      "Maintenance/Repair (House)",
+      "Matches",
+      "Medicines",
+      "Newspapers/Magazines",
+      "Other Non-Durable/Personal Goods",
+      "Other Rent/Fuel/Power",
+      "Other Transportation/Communication",
+      "Paraffin (Kerosene)",
+      "Petrol, Diesel, etc",
+      "Public Transport (Bodaboda/Bicycle)",
+      "Public Transport (Bus)",
+      "Public Transport (Taxi/Minibus)",
+      "Rent of Rented House",
+      "Sports, Theaters, etc",
+      "Stamps, Envelopes, etc",
+      "Tooth Paste",
+      "Total Health Expenditure",
+      "Traditional Doctors Fees/Medicines",
+      "Tyres, Tubes, Spares, Brake Pads, etc",
+      "Washing Soap",
+      "Water (Utility)"
+    ],
+    "content_hash": "34ab75425fd96e4d48d0ee7af92f4b568b27a0ed037bd78544c315661e6fa5eb",
+    "dtypes": {
+      "Air Time/Services Fee (Owned Fixed/Mobile Phones)": "float64",
+      "Air Time/Services Fee (Phones not Owned)": "float64",
+      "Barber/Beauty Shops": "float64",
+      "Bathing Soap": "float64",
+      "Batteries (Dry cells)": "float64",
+      "Charcoal": "float64",
+      "Consultation Fees": "float64",
+      "Cosmetics (Body Lotion, Deodorant, etc)": "float64",
+      "Dry Cleaning/Laundry": "float64",
+      "Electricity": "float64",
+      "Firewood": "float64",
+      "Fuels (Generators/Lawn Mower)": "float64",
+      "Handbags, Travel Bags, etc": "float64",
+      "Hospital/Clinic Charges": "float64",
+      "Hotels, Lodging, etc": "float64",
+      "Houseboys/girls, Shamba Boys, etc": "float64",
+      "Imputed Rent of Free House": "float64",
+      "Imputed Rent of Owned House": "float64",
+      "Maintenance/Repair (House)": "float64",
+      "Matches": "float64",
+      "Medicines": "float64",
+      "Newspapers/Magazines": "float64",
+      "Other Non-Durable/Personal Goods": "float64",
+      "Other Rent/Fuel/Power": "float64",
+      "Other Transportation/Communication": "float64",
+      "Paraffin (Kerosene)": "float64",
+      "Petrol, Diesel, etc": "float64",
+      "Public Transport (Bodaboda/Bicycle)": "float64",
+      "Public Transport (Bus)": "float64",
+      "Public Transport (Taxi/Minibus)": "float64",
+      "Rent of Rented House": "float64",
+      "Sports, Theaters, etc": "float64",
+      "Stamps, Envelopes, etc": "float64",
+      "Tooth Paste": "float64",
+      "Total Health Expenditure": "float64",
+      "Traditional Doctors Fees/Medicines": "float64",
+      "Tyres, Tubes, Spares, Brake Pads, etc": "float64",
+      "Washing Soap": "float64",
+      "Water (Utility)": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      3122,
+      39
+    ]
+  },
+  "2005-06/_/other_features.parquet": {
+    "columns": [
+      "Rural"
+    ],
+    "content_hash": "191bc5afe43f6e9adee3e6a79dc054e88ff998d58dbe30ed82d296a25ffd8e5e",
+    "dtypes": {
+      "Rural": "int64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      3123,
+      1
+    ]
+  },
+  "2005-06/_/plots.parquet": {
+    "columns": [
+      "acres",
+      "area_units",
+      "intercrop"
+    ],
+    "content_hash": "a544caa8051e077fd8561920c5957e780ac3d46fe128f15819f7a758c004b68a",
+    "dtypes": {
+      "acres": "float64",
+      "area_units": "string",
+      "intercrop": "string"
+    },
+    "index_names": [
+      "j",
+      "t",
+      "plt",
+      "crop"
+    ],
+    "shape": [
+      14468,
+      3
+    ]
+  },
+  "2005-06/_/shocks.parquet": {
+    "columns": [
+      "Duration",
+      "EffectedAssets",
+      "EffectedConsumption",
+      "EffectedIncome",
+      "EffectedProduction",
+      "HowCoped0",
+      "HowCoped1",
+      "HowCoped2",
+      "Onset",
+      "Year"
+    ],
+    "content_hash": "4c89e66ff297dc07ad1a4a47b52250c9913d620c4773f7c7757e0c0a79bc08ed",
+    "dtypes": {
+      "Duration": "float64",
+      "EffectedAssets": "float64",
+      "EffectedConsumption": "float64",
+      "EffectedIncome": "float64",
+      "EffectedProduction": "float64",
+      "HowCoped0": "string",
+      "HowCoped1": "string",
+      "HowCoped2": "string",
+      "Onset": "float64",
+      "Year": "float64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "Shock"
+    ],
+    "shape": [
+      3644,
+      10
+    ]
+  },
+  "2009-10/_/assets.parquet": {
+    "columns": [
+      "Assets"
+    ],
+    "content_hash": "441dfcf4926a213571e8c657086642e093891482eb73dc51051a0a21b731d9c0",
+    "dtypes": {
+      "Assets": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      2960,
+      1
+    ]
+  },
+  "2009-10/_/earnings.parquet": {
+    "columns": [
+      "Earnings"
+    ],
+    "content_hash": "568a879f2a7a3e238839557c7c2c55c19c777642efd76649157afb9aa7aea2b8",
+    "dtypes": {
+      "Earnings": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      2889,
+      1
+    ]
+  },
+  "2009-10/_/education_expenses.parquet": {
+    "columns": [
+      "Boarding Fee",
+      "Book Fee",
+      "Other Fee",
+      "School and Registration Fees",
+      "Total Education Expenditure",
+      "Transportation Fee",
+      "Uniform Fee"
+    ],
+    "content_hash": "58760f56004c8cd99f596e94cee0ec47004ab574351d4e54ace04588b92a86c3",
+    "dtypes": {
+      "Boarding Fee": "float64",
+      "Book Fee": "float64",
+      "Other Fee": "float64",
+      "School and Registration Fees": "float64",
+      "Total Education Expenditure": "float64",
+      "Transportation Fee": "float64",
+      "Uniform Fee": "float64"
+    },
+    "index_names": [
+      "j",
+      "pid"
+    ],
+    "shape": [
+      6191,
+      7
+    ]
+  },
+  "2009-10/_/enterprise_income.parquet": {
+    "columns": [
+      "losses",
+      "materials",
+      "otherexpense",
+      "profits",
+      "revenue",
+      "wagebill"
+    ],
+    "content_hash": "87ad5e91ac2cde43d5eeffbfcc2750fdbf321ab1b21f92666b3fea945086cc18",
+    "dtypes": {
+      "losses": "float64",
+      "materials": "float64",
+      "otherexpense": "float64",
+      "profits": "float64",
+      "revenue": "float64",
+      "wagebill": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      2917,
+      6
+    ]
+  },
+  "2009-10/_/food_acquired.parquet": {
+    "columns": [
+      "Kgs",
+      "farmgate",
+      "market",
+      "quantity_away",
+      "quantity_home",
+      "quantity_inkind",
+      "quantity_own",
+      "unitvalue_away",
+      "unitvalue_home",
+      "unitvalue_inkind",
+      "unitvalue_own",
+      "value_away",
+      "value_home",
+      "value_inkind",
+      "value_own"
+    ],
+    "content_hash": "26c887cd928d35eb347ed3cb3b3a6beaf9005c5beccca1539db7bbefb7694140",
+    "dtypes": {
+      "Kgs": "float64",
+      "farmgate": "float64",
+      "market": "float64",
+      "quantity_away": "float64",
+      "quantity_home": "float64",
+      "quantity_inkind": "float64",
+      "quantity_own": "float64",
+      "unitvalue_away": "float64",
+      "unitvalue_home": "float64",
+      "unitvalue_inkind": "float64",
+      "unitvalue_own": "float64",
+      "value_away": "float64",
+      "value_home": "float64",
+      "value_inkind": "float64",
+      "value_own": "float64"
+    },
+    "index_names": [
+      "i",
+      "j",
+      "u"
+    ],
+    "shape": [
+      37879,
+      15
+    ]
+  },
+  "2009-10/_/household_characteristics.parquet": {
+    "columns": [
+      "Females 00-03",
+      "Females 04-08",
+      "Females 09-13",
+      "Females 14-18",
+      "Females 19-30",
+      "Females 31-50",
+      "Females 51-99",
+      "Males 00-03",
+      "Males 04-08",
+      "Males 09-13",
+      "Males 14-18",
+      "Males 19-30",
+      "Males 31-50",
+      "Males 51-99",
+      "log HSize"
+    ],
+    "content_hash": "46cd86f86d4e249c130a469336c11641bfe906383173845751e2cb63d975d227",
+    "dtypes": {
+      "Females 00-03": "int64",
+      "Females 04-08": "int64",
+      "Females 09-13": "int64",
+      "Females 14-18": "int64",
+      "Females 19-30": "int64",
+      "Females 31-50": "int64",
+      "Females 51-99": "int64",
+      "Males 00-03": "int64",
+      "Males 04-08": "int64",
+      "Males 09-13": "int64",
+      "Males 14-18": "int64",
+      "Males 19-30": "int64",
+      "Males 31-50": "int64",
+      "Males 51-99": "int64",
+      "log HSize": "float64"
+    },
+    "index_names": [
+      "i"
+    ],
+    "shape": [
+      2974,
+      15
+    ]
+  },
+  "2009-10/_/housing.parquet": {
+    "columns": [
+      "Earthen floor",
+      "Thatched roof"
+    ],
+    "content_hash": "adc20d1fe93a1e0a46b46193448060f04a836a4aaea430b015c7c235e013b0e2",
+    "dtypes": {
+      "Earthen floor": "int64",
+      "Thatched roof": "int64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      2942,
+      2
+    ]
+  },
+  "2009-10/_/interview_date.parquet": {
+    "columns": [
+      "date"
+    ],
+    "content_hash": "eed18595afeeb808c233c65bcf85c89f1d5045a071c554f2c1294788a3e20c0a",
+    "dtypes": {
+      "date": "datetime64[ns]"
+    },
+    "index_names": [
+      "j",
+      "t"
+    ],
+    "shape": [
+      2975,
+      1
+    ]
+  },
+  "2009-10/_/locality.parquet": {
+    "columns": [
+      "v"
+    ],
+    "content_hash": "8cca389027257faf0d58191c8947e9815a66e70966af0d534013cc856316c07c",
+    "dtypes": {
+      "v": "string"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      2975,
+      1
+    ]
+  },
+  "2009-10/_/nonfood_expenditures.parquet": {
+    "columns": [
+      "Air Time/Services Fee (Owned Fixed/Mobile Phones)",
+      "Air Time/Services Fee (Phones not Owned)",
+      "Barber/Beauty Shops",
+      "Bathing Soap",
+      "Batteries (Dry cells)",
+      "Charcoal",
+      "Consultation Fees",
+      "Cosmetics (Body Lotion, Deodorant, etc)",
+      "Dry Cleaning/Laundry",
+      "Electricity",
+      "Firewood",
+      "Fuels (Generators/Lawn Mower)",
+      "Handbags, Travel Bags, etc",
+      "Hospital/Clinic Charges",
+      "Hotels, Lodging, etc",
+      "Houseboys/girls, Shamba Boys, etc",
+      "Imputed Rent of Free House",
+      "Imputed Rent of Owned House",
+      "Maintenance/Repair (House)",
+      "Matches",
+      "Medicines",
+      "Newspapers/Magazines",
+      "Other Health/Medical Care",
+      "Other Non-Durable/Personal Goods",
+      "Other Rent/Fuel/Power",
+      "Other Transportation/Communication",
+      "Paraffin (Kerosene)",
+      "Petrol, Diesel, etc",
+      "Public Transport (Bodaboda/Bicycle)",
+      "Public Transport (Bus)",
+      "Public Transport (Taxi/Minibus)",
+      "Rent of Rented House",
+      "Sports, Theaters, etc",
+      "Stamps, Envelopes, etc",
+      "Tooth Paste",
+      "Traditional Doctors Fees/Medicines",
+      "Tyres, Tubes, Spares, Brake Pads, etc",
+      "Washing Soap",
+      "Water (Utility)"
+    ],
+    "content_hash": "b2773538144a9e2e1e394328da8303a46ba65f8c078bfc2d0e9d27764e48bfae",
+    "dtypes": {
+      "Air Time/Services Fee (Owned Fixed/Mobile Phones)": "float64",
+      "Air Time/Services Fee (Phones not Owned)": "float64",
+      "Barber/Beauty Shops": "float64",
+      "Bathing Soap": "float64",
+      "Batteries (Dry cells)": "float64",
+      "Charcoal": "float64",
+      "Consultation Fees": "float64",
+      "Cosmetics (Body Lotion, Deodorant, etc)": "float64",
+      "Dry Cleaning/Laundry": "float64",
+      "Electricity": "float64",
+      "Firewood": "float64",
+      "Fuels (Generators/Lawn Mower)": "float64",
+      "Handbags, Travel Bags, etc": "float64",
+      "Hospital/Clinic Charges": "float64",
+      "Hotels, Lodging, etc": "float64",
+      "Houseboys/girls, Shamba Boys, etc": "float64",
+      "Imputed Rent of Free House": "float64",
+      "Imputed Rent of Owned House": "float64",
+      "Maintenance/Repair (House)": "float64",
+      "Matches": "float64",
+      "Medicines": "float64",
+      "Newspapers/Magazines": "float64",
+      "Other Health/Medical Care": "float64",
+      "Other Non-Durable/Personal Goods": "float64",
+      "Other Rent/Fuel/Power": "float64",
+      "Other Transportation/Communication": "float64",
+      "Paraffin (Kerosene)": "float64",
+      "Petrol, Diesel, etc": "float64",
+      "Public Transport (Bodaboda/Bicycle)": "float64",
+      "Public Transport (Bus)": "float64",
+      "Public Transport (Taxi/Minibus)": "float64",
+      "Rent of Rented House": "float64",
+      "Sports, Theaters, etc": "float64",
+      "Stamps, Envelopes, etc": "float64",
+      "Tooth Paste": "float64",
+      "Traditional Doctors Fees/Medicines": "float64",
+      "Tyres, Tubes, Spares, Brake Pads, etc": "float64",
+      "Washing Soap": "float64",
+      "Water (Utility)": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      2752,
+      39
+    ]
+  },
+  "2009-10/_/other_features.parquet": {
+    "columns": [
+      "Rural"
+    ],
+    "content_hash": "c5c22f492ef62f4f8ccb0432d61c431f48488ab5d44633fe52207d26da28610c",
+    "dtypes": {
+      "Rural": "int64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      2975,
+      1
+    ]
+  },
+  "2009-10/_/plots.parquet": {
+    "columns": [
+      "acres",
+      "area_units",
+      "intercrop"
+    ],
+    "content_hash": "0ffa9cfc4f8558b3d52fdb0cb556e1ab0bf39ccbccbd0476069633cf06dc9219",
+    "dtypes": {
+      "acres": "float64",
+      "area_units": "string",
+      "intercrop": "string"
+    },
+    "index_names": [
+      "j",
+      "t",
+      "plt",
+      "crop"
+    ],
+    "shape": [
+      12201,
+      3
+    ]
+  },
+  "2009-10/_/shocks.parquet": {
+    "columns": [
+      "Duration",
+      "EffectedAssets",
+      "EffectedConsumption",
+      "EffectedIncome",
+      "EffectedProduction",
+      "HowCoped0",
+      "HowCoped1",
+      "HowCoped2",
+      "Onset",
+      "Year"
+    ],
+    "content_hash": "fbc9bea3aab5c354fabb97f27bdd3746bc59eae4fdf4844248bcaf9c674c40cc",
+    "dtypes": {
+      "Duration": "float64",
+      "EffectedAssets": "boolean",
+      "EffectedConsumption": "boolean",
+      "EffectedIncome": "boolean",
+      "EffectedProduction": "boolean",
+      "HowCoped0": "category",
+      "HowCoped1": "category",
+      "HowCoped2": "category",
+      "Onset": "Int64",
+      "Year": "Int64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "Shock"
+    ],
+    "shape": [
+      2667,
+      10
+    ]
+  },
+  "2010-11/_/assets.parquet": {
+    "columns": [
+      "Assets"
+    ],
+    "content_hash": "269c22375f2dd44c2721555d07495f008c46f1628051f8301fbb458106f2f5fe",
+    "dtypes": {
+      "Assets": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      2709,
+      1
+    ]
+  },
+  "2010-11/_/earnings.parquet": {
+    "columns": [
+      "Earnings"
+    ],
+    "content_hash": "957ffd04b8b76c054f84bc5c077cbf0edaebed417cca7582a78b3ff21f0814b3",
+    "dtypes": {
+      "Earnings": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      2618,
+      1
+    ]
+  },
+  "2010-11/_/education_expenses.parquet": {
+    "columns": [
+      "Boarding Fee",
+      "Book Fee",
+      "Other Fee",
+      "School and Registration Fees",
+      "Total Education Expenditure",
+      "Transportation Fee",
+      "Uniform Fee"
+    ],
+    "content_hash": "9ed26aafc6432bd4a5e126d05d6885362e17fb8e8ec689c175cd6621f979967d",
+    "dtypes": {
+      "Boarding Fee": "float64",
+      "Book Fee": "float64",
+      "Other Fee": "float64",
+      "School and Registration Fees": "float64",
+      "Total Education Expenditure": "float64",
+      "Transportation Fee": "float64",
+      "Uniform Fee": "float64"
+    },
+    "index_names": [
+      "j",
+      "pid"
+    ],
+    "shape": [
+      5495,
+      7
+    ]
+  },
+  "2010-11/_/enterprise_income.parquet": {
+    "columns": [
+      "losses",
+      "materials",
+      "otherexpense",
+      "profits",
+      "revenue",
+      "wagebill"
+    ],
+    "content_hash": "a9fade275ae68370be930a20723418acb35a9363d86dced26b8b9d5bc3c2087e",
+    "dtypes": {
+      "losses": "float64",
+      "materials": "float64",
+      "otherexpense": "float64",
+      "profits": "float64",
+      "revenue": "float64",
+      "wagebill": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      1619,
+      6
+    ]
+  },
+  "2010-11/_/food_acquired.parquet": {
+    "columns": [
+      "Kgs",
+      "farmgate",
+      "market",
+      "quantity_away",
+      "quantity_home",
+      "quantity_inkind",
+      "quantity_own",
+      "unitvalue_away",
+      "unitvalue_home",
+      "unitvalue_inkind",
+      "unitvalue_own",
+      "value_away",
+      "value_home",
+      "value_inkind",
+      "value_own"
+    ],
+    "content_hash": "3a2acc45fe08dd4923267a14c7e56fb0a3c9f0e8551e523fe599d4afec341a33",
+    "dtypes": {
+      "Kgs": "float64",
+      "farmgate": "float64",
+      "market": "float64",
+      "quantity_away": "float64",
+      "quantity_home": "float64",
+      "quantity_inkind": "float64",
+      "quantity_own": "float64",
+      "unitvalue_away": "float64",
+      "unitvalue_home": "float64",
+      "unitvalue_inkind": "float64",
+      "unitvalue_own": "float64",
+      "value_away": "float64",
+      "value_home": "float64",
+      "value_inkind": "float64",
+      "value_own": "float64"
+    },
+    "index_names": [
+      "i",
+      "j",
+      "u"
+    ],
+    "shape": [
+      35232,
+      15
+    ]
+  },
+  "2010-11/_/household_characteristics.parquet": {
+    "columns": [
+      "Females 00-03",
+      "Females 04-08",
+      "Females 09-13",
+      "Females 14-18",
+      "Females 19-30",
+      "Females 31-50",
+      "Females 51-99",
+      "Males 00-03",
+      "Males 04-08",
+      "Males 09-13",
+      "Males 14-18",
+      "Males 19-30",
+      "Males 31-50",
+      "Males 51-99",
+      "log HSize"
+    ],
+    "content_hash": "1d9d51354dfdd6aa8824c3bc42613b1d83e456b7ffe803303b9ed654dfe1d271",
+    "dtypes": {
+      "Females 00-03": "int64",
+      "Females 04-08": "int64",
+      "Females 09-13": "int64",
+      "Females 14-18": "int64",
+      "Females 19-30": "int64",
+      "Females 31-50": "int64",
+      "Females 51-99": "int64",
+      "Males 00-03": "int64",
+      "Males 04-08": "int64",
+      "Males 09-13": "int64",
+      "Males 14-18": "int64",
+      "Males 19-30": "int64",
+      "Males 31-50": "int64",
+      "Males 51-99": "int64",
+      "log HSize": "float64"
+    },
+    "index_names": [
+      "i"
+    ],
+    "shape": [
+      2685,
+      15
+    ]
+  },
+  "2010-11/_/housing.parquet": {
+    "columns": [
+      "Earthen floor",
+      "Thatched roof"
+    ],
+    "content_hash": "74648b0ee749fc523109952fd0a823c7bf35109b7b829d828665b61d92e0f372",
+    "dtypes": {
+      "Earthen floor": "int64",
+      "Thatched roof": "int64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      2640,
+      2
+    ]
+  },
+  "2010-11/_/interview_date.parquet": {
+    "columns": [
+      "date"
+    ],
+    "content_hash": "88688f9691cc9c7bf3623f02e5fd6a54eff06fea274b41f2e7463bea711cb1d8",
+    "dtypes": {
+      "date": "datetime64[ns]"
+    },
+    "index_names": [
+      "j",
+      "t"
+    ],
+    "shape": [
+      2716,
+      1
+    ]
+  },
+  "2010-11/_/locality.parquet": {
+    "columns": [
+      "v"
+    ],
+    "content_hash": "740958df659fd8c5b8d7b43ac856509ce5c4f797056c0c269d5782ab7f13d41b",
+    "dtypes": {
+      "v": "string"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      2716,
+      1
+    ]
+  },
+  "2010-11/_/nonfood_expenditures.parquet": {
+    "columns": [
+      "Air Time/Services Fee (Owned Fixed/Mobile Phones)",
+      "Air Time/Services Fee (Phones not Owned)",
+      "Barber/Beauty Shops",
+      "Bathing Soap",
+      "Batteries (Dry cells)",
+      "Charcoal",
+      "Consultation Fees",
+      "Cosmetics (Body Lotion, Deodorant, etc)",
+      "Dry Cleaning/Laundry",
+      "Electricity",
+      "Firewood",
+      "Fuels (Generators/Lawn Mower)",
+      "Handbags, Travel Bags, etc",
+      "Hospital/Clinic Charges",
+      "Hotels, Lodging, etc",
+      "Houseboys/girls, Shamba Boys, etc",
+      "Imputed Rent of Free House",
+      "Imputed Rent of Owned House",
+      "Maintenance/Repair (House)",
+      "Matches",
+      "Medicines",
+      "Newspapers/Magazines",
+      "Other Non-Durable/Personal Goods",
+      "Other Rent/Fuel/Power",
+      "Other Transportation/Communication",
+      "Paraffin (Kerosene)",
+      "Petrol, Diesel, etc",
+      "Public Transport (Bodaboda/Bicycle)",
+      "Public Transport (Bus)",
+      "Public Transport (Taxi/Minibus)",
+      "Rent of Rented House",
+      "Sports, Theaters, etc",
+      "Stamps, Envelopes, etc",
+      "Tooth Paste",
+      "Traditional Doctors Fees/Medicines",
+      "Tyres, Tubes, Spares, Brake Pads, etc",
+      "Washing Soap",
+      "Water (Utility)"
+    ],
+    "content_hash": "e90a846a23b3dfa4de80bd9ad8851bb992ed48c3a63f61ea9535100e3150a405",
+    "dtypes": {
+      "Air Time/Services Fee (Owned Fixed/Mobile Phones)": "float64",
+      "Air Time/Services Fee (Phones not Owned)": "float64",
+      "Barber/Beauty Shops": "float64",
+      "Bathing Soap": "float64",
+      "Batteries (Dry cells)": "float64",
+      "Charcoal": "float64",
+      "Consultation Fees": "float64",
+      "Cosmetics (Body Lotion, Deodorant, etc)": "float64",
+      "Dry Cleaning/Laundry": "float64",
+      "Electricity": "float64",
+      "Firewood": "float64",
+      "Fuels (Generators/Lawn Mower)": "float64",
+      "Handbags, Travel Bags, etc": "float64",
+      "Hospital/Clinic Charges": "float64",
+      "Hotels, Lodging, etc": "float64",
+      "Houseboys/girls, Shamba Boys, etc": "float64",
+      "Imputed Rent of Free House": "float64",
+      "Imputed Rent of Owned House": "float64",
+      "Maintenance/Repair (House)": "float64",
+      "Matches": "float64",
+      "Medicines": "float64",
+      "Newspapers/Magazines": "float64",
+      "Other Non-Durable/Personal Goods": "float64",
+      "Other Rent/Fuel/Power": "float64",
+      "Other Transportation/Communication": "float64",
+      "Paraffin (Kerosene)": "float64",
+      "Petrol, Diesel, etc": "float64",
+      "Public Transport (Bodaboda/Bicycle)": "float64",
+      "Public Transport (Bus)": "float64",
+      "Public Transport (Taxi/Minibus)": "float64",
+      "Rent of Rented House": "float64",
+      "Sports, Theaters, etc": "float64",
+      "Stamps, Envelopes, etc": "float64",
+      "Tooth Paste": "float64",
+      "Traditional Doctors Fees/Medicines": "float64",
+      "Tyres, Tubes, Spares, Brake Pads, etc": "float64",
+      "Washing Soap": "float64",
+      "Water (Utility)": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      2639,
+      38
+    ]
+  },
+  "2010-11/_/other_features.parquet": {
+    "columns": [
+      "Rural"
+    ],
+    "content_hash": "d1cb1e1be699f95dba3319a1771f0328a682bd58e517e8d2885ea1f00132e8b6",
+    "dtypes": {
+      "Rural": "int64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      2716,
+      1
+    ]
+  },
+  "2010-11/_/plots.parquet": {
+    "columns": [
+      "acres",
+      "area_units",
+      "intercrop"
+    ],
+    "content_hash": "49a6510de116e774d3131d929eb704698c56679254efcdf8b77d8c16011db5e1",
+    "dtypes": {
+      "acres": "float64",
+      "area_units": "string",
+      "intercrop": "string"
+    },
+    "index_names": [
+      "j",
+      "t",
+      "plt",
+      "crop"
+    ],
+    "shape": [
+      12191,
+      3
+    ]
+  },
+  "2010-11/_/shocks.parquet": {
+    "columns": [
+      "Duration",
+      "EffectedAssets",
+      "EffectedConsumption",
+      "EffectedIncome",
+      "EffectedProduction",
+      "HowCoped0",
+      "HowCoped1",
+      "HowCoped2",
+      "Onset",
+      "Year"
+    ],
+    "content_hash": "13fd71e78c7e23335b756aaa8dad6f871d0f8ca5ab4a4a422630e167ffd1075c",
+    "dtypes": {
+      "Duration": "float64",
+      "EffectedAssets": "boolean",
+      "EffectedConsumption": "boolean",
+      "EffectedIncome": "boolean",
+      "EffectedProduction": "boolean",
+      "HowCoped0": "category",
+      "HowCoped1": "category",
+      "HowCoped2": "category",
+      "Onset": "Int64",
+      "Year": "Int64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "Shock"
+    ],
+    "shape": [
+      1541,
+      10
+    ]
+  },
+  "2011-12/_/assets.parquet": {
+    "columns": [
+      "Assets"
+    ],
+    "content_hash": "d0611e380d91a4a87fd455a7b953405b00232263dc6aa9410e32c004d09a0eb6",
+    "dtypes": {
+      "Assets": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      2806,
+      1
+    ]
+  },
+  "2011-12/_/earnings.parquet": {
+    "columns": [
+      "Earnings"
+    ],
+    "content_hash": "2ba1309a2b6e2c126e3216f03d6e34018e400d13a846cbe5ff354f721b5851c1",
+    "dtypes": {
+      "Earnings": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      2805,
+      1
+    ]
+  },
+  "2011-12/_/enterprise_income.parquet": {
+    "columns": [
+      "losses",
+      "materials",
+      "otherexpense",
+      "profits",
+      "revenue",
+      "wagebill"
+    ],
+    "content_hash": "c90d0f62507cd686a0acaebf3975a19f92e4781b1296c57f69a47bd9c27db0ed",
+    "dtypes": {
+      "losses": "float64",
+      "materials": "float64",
+      "otherexpense": "float64",
+      "profits": "float64",
+      "revenue": "float64",
+      "wagebill": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      1577,
+      6
+    ]
+  },
+  "2011-12/_/food_acquired.parquet": {
+    "columns": [
+      "Kgs",
+      "farmgate",
+      "market",
+      "quantity_away",
+      "quantity_home",
+      "quantity_inkind",
+      "quantity_own",
+      "unitvalue_away",
+      "unitvalue_home",
+      "unitvalue_inkind",
+      "unitvalue_own",
+      "value_away",
+      "value_home",
+      "value_inkind",
+      "value_own"
+    ],
+    "content_hash": "4d255f9216267677d0e7d92529527964385d035d0e3e8ba0bf893f0729bbf737",
+    "dtypes": {
+      "Kgs": "float64",
+      "farmgate": "float64",
+      "market": "float64",
+      "quantity_away": "float64",
+      "quantity_home": "float64",
+      "quantity_inkind": "float64",
+      "quantity_own": "float64",
+      "unitvalue_away": "float64",
+      "unitvalue_home": "float64",
+      "unitvalue_inkind": "float64",
+      "unitvalue_own": "float64",
+      "value_away": "float64",
+      "value_home": "float64",
+      "value_inkind": "float64",
+      "value_own": "float64"
+    },
+    "index_names": [
+      "i",
+      "j",
+      "u"
+    ],
+    "shape": [
+      38741,
+      15
+    ]
+  },
+  "2011-12/_/household_characteristics.parquet": {
+    "columns": [
+      "Females 00-03",
+      "Females 04-08",
+      "Females 09-13",
+      "Females 14-18",
+      "Females 19-30",
+      "Females 31-50",
+      "Females 51-99",
+      "Males 00-03",
+      "Males 04-08",
+      "Males 09-13",
+      "Males 14-18",
+      "Males 19-30",
+      "Males 31-50",
+      "Males 51-99",
+      "log HSize"
+    ],
+    "content_hash": "183adb5bda2486fbf0dba5628af16c366c9cd0711367add1278df5ee9c24f723",
+    "dtypes": {
+      "Females 00-03": "int64",
+      "Females 04-08": "int64",
+      "Females 09-13": "int64",
+      "Females 14-18": "int64",
+      "Females 19-30": "int64",
+      "Females 31-50": "int64",
+      "Females 51-99": "int64",
+      "Males 00-03": "int64",
+      "Males 04-08": "int64",
+      "Males 09-13": "int64",
+      "Males 14-18": "int64",
+      "Males 19-30": "int64",
+      "Males 31-50": "int64",
+      "Males 51-99": "int64",
+      "log HSize": "float64"
+    },
+    "index_names": [
+      "i"
+    ],
+    "shape": [
+      2843,
+      15
+    ]
+  },
+  "2011-12/_/housing.parquet": {
+    "columns": [
+      "Earthen floor",
+      "Thatched roof"
+    ],
+    "content_hash": "84af3c42f63fa59d23f25ede4baae3992edf4dfe2cec17180780f70dc537bcc2",
+    "dtypes": {
+      "Earthen floor": "int64",
+      "Thatched roof": "int64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      2835,
+      2
+    ]
+  },
+  "2011-12/_/interview_date.parquet": {
+    "columns": [
+      "date"
+    ],
+    "content_hash": "9e261a897bfe0825f6fff9ff2d433d37fef7a4618bd61a26c95cb11ee2601009",
+    "dtypes": {
+      "date": "datetime64[ns]"
+    },
+    "index_names": [
+      "j",
+      "t"
+    ],
+    "shape": [
+      2850,
+      1
+    ]
+  },
+  "2011-12/_/locality.parquet": {
+    "columns": [
+      "v"
+    ],
+    "content_hash": "0e77f093d906556bef549ce4172a14f6ddaa069715f4a6df15d693ecf24b8536",
+    "dtypes": {
+      "v": "int32"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      2850,
+      1
+    ]
+  },
+  "2011-12/_/nonfood_expenditures.parquet": {
+    "columns": [
+      "Air Time/Services Fee (Owned Fixed/Mobile Phones)",
+      "Air Time/Services Fee (Phones not Owned)",
+      "Barber/Beauty Shops",
+      "Bathing Soap",
+      "Batteries (Dry cells)",
+      "Charcoal",
+      "Consultation Fees",
+      "Cosmetics (Body Lotion, Deodorant, etc)",
+      "Dry Cleaning/Laundry",
+      "Electricity",
+      "Firewood",
+      "Fuels (Generators/Lawn Mower)",
+      "Handbags, Travel Bags, etc",
+      "Hospital/Clinic Charges",
+      "Hotels, Lodging, etc",
+      "Houseboys/girls, Shamba Boys, etc",
+      "Imputed Rent of Free House",
+      "Imputed Rent of Owned House",
+      "Maintenance/Repair (House)",
+      "Matches",
+      "Medicines",
+      "Newspapers/Magazines",
+      "Other Non-Durable/Personal Goods",
+      "Other Rent/Fuel/Power",
+      "Other Transportation/Communication",
+      "Paraffin (Kerosene)",
+      "Petrol, Diesel, etc",
+      "Public Transport (Bodaboda/Bicycle)",
+      "Public Transport (Bus)",
+      "Public Transport (Taxi/Minibus)",
+      "Rent of Rented House",
+      "Sports, Theaters, etc",
+      "Stamps, Envelopes, etc",
+      "Tooth Paste",
+      "Traditional Doctors Fees/Medicines",
+      "Tyres, Tubes, Spares, Brake Pads, etc",
+      "Washing Soap",
+      "Water (Utility)"
+    ],
+    "content_hash": "16681807087dfbef5abe7227ce2738325d63d3e637c3c2444bc4e1ce4f6bb2f5",
+    "dtypes": {
+      "Air Time/Services Fee (Owned Fixed/Mobile Phones)": "float64",
+      "Air Time/Services Fee (Phones not Owned)": "float64",
+      "Barber/Beauty Shops": "float64",
+      "Bathing Soap": "float64",
+      "Batteries (Dry cells)": "float64",
+      "Charcoal": "float64",
+      "Consultation Fees": "float64",
+      "Cosmetics (Body Lotion, Deodorant, etc)": "float64",
+      "Dry Cleaning/Laundry": "float64",
+      "Electricity": "float64",
+      "Firewood": "float64",
+      "Fuels (Generators/Lawn Mower)": "float64",
+      "Handbags, Travel Bags, etc": "float64",
+      "Hospital/Clinic Charges": "float64",
+      "Hotels, Lodging, etc": "float64",
+      "Houseboys/girls, Shamba Boys, etc": "float64",
+      "Imputed Rent of Free House": "float64",
+      "Imputed Rent of Owned House": "float64",
+      "Maintenance/Repair (House)": "float64",
+      "Matches": "float64",
+      "Medicines": "float64",
+      "Newspapers/Magazines": "float64",
+      "Other Non-Durable/Personal Goods": "float64",
+      "Other Rent/Fuel/Power": "float64",
+      "Other Transportation/Communication": "float64",
+      "Paraffin (Kerosene)": "float64",
+      "Petrol, Diesel, etc": "float64",
+      "Public Transport (Bodaboda/Bicycle)": "float64",
+      "Public Transport (Bus)": "float64",
+      "Public Transport (Taxi/Minibus)": "float64",
+      "Rent of Rented House": "float64",
+      "Sports, Theaters, etc": "float64",
+      "Stamps, Envelopes, etc": "float64",
+      "Tooth Paste": "float64",
+      "Traditional Doctors Fees/Medicines": "float64",
+      "Tyres, Tubes, Spares, Brake Pads, etc": "float64",
+      "Washing Soap": "float64",
+      "Water (Utility)": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      2824,
+      38
+    ]
+  },
+  "2011-12/_/other_features.parquet": {
+    "columns": [
+      "Rural"
+    ],
+    "content_hash": "f1ec526048f633ff00121ed53dc53f065a862a7ede10e8d324b04963ecce13b5",
+    "dtypes": {
+      "Rural": "int64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      2850,
+      1
+    ]
+  },
+  "2011-12/_/plots.parquet": {
+    "columns": [
+      "acres",
+      "area_units",
+      "intercrop"
+    ],
+    "content_hash": "9facaee98bf1967454005d0d9864308e669c35b8eade0c20c9c906edd7da9016",
+    "dtypes": {
+      "acres": "float64",
+      "area_units": "string",
+      "intercrop": "string"
+    },
+    "index_names": [
+      "j",
+      "t",
+      "plt",
+      "crop"
+    ],
+    "shape": [
+      10938,
+      3
+    ]
+  },
+  "2011-12/_/shocks.parquet": {
+    "columns": [
+      "Duration",
+      "EffectedAssets",
+      "EffectedConsumption",
+      "EffectedIncome",
+      "EffectedProduction",
+      "HowCoped0",
+      "HowCoped1",
+      "HowCoped2",
+      "Onset",
+      "Year"
+    ],
+    "content_hash": "5fe219c4602b63236624296ec8de1d5f2730ef5f388155e5f2eec8762f3fad5d",
+    "dtypes": {
+      "Duration": "float64",
+      "EffectedAssets": "boolean",
+      "EffectedConsumption": "boolean",
+      "EffectedIncome": "boolean",
+      "EffectedProduction": "boolean",
+      "HowCoped0": "category",
+      "HowCoped1": "category",
+      "HowCoped2": "category",
+      "Onset": "Int64",
+      "Year": "Int64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "Shock"
+    ],
+    "shape": [
+      1288,
+      10
+    ]
+  },
+  "2013-14/_/assets.parquet": {
+    "columns": [
+      "Assets"
+    ],
+    "content_hash": "cde262883e94d9f62f17285243e2c2567b76d51c460f43204563435a443b493d",
+    "dtypes": {
+      "Assets": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      3119,
+      1
+    ]
+  },
+  "2013-14/_/earnings.parquet": {
+    "columns": [
+      "Earnings"
+    ],
+    "content_hash": "6c190bf0132755a48198e55850acead1ebc72618ed802db5eb5d0197211d0176",
+    "dtypes": {
+      "Earnings": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      3119,
+      1
+    ]
+  },
+  "2013-14/_/education_expenses.parquet": {
+    "columns": [
+      "Boarding Fee",
+      "Book Fee",
+      "Other Fee",
+      "School and Registration Fees",
+      "Total Education Expenditure",
+      "Transportation Fee",
+      "Uniform Fee"
+    ],
+    "content_hash": "461235cbdce994778db0000fa77789c8eeeaf02114d8cc9f6d54afc1e48e7afe",
+    "dtypes": {
+      "Boarding Fee": "float64",
+      "Book Fee": "float64",
+      "Other Fee": "float64",
+      "School and Registration Fees": "float64",
+      "Total Education Expenditure": "float64",
+      "Transportation Fee": "float64",
+      "Uniform Fee": "float64"
+    },
+    "index_names": [
+      "j",
+      "pid"
+    ],
+    "shape": [
+      6853,
+      7
+    ]
+  },
+  "2013-14/_/enterprise_income.parquet": {
+    "columns": [
+      "losses",
+      "materials",
+      "otherexpense",
+      "profits",
+      "revenue",
+      "wagebill"
+    ],
+    "content_hash": "c7903d58f7f43cbcee9eac8739eb0d509705b51c7927203a89f87d31c6363cf9",
+    "dtypes": {
+      "losses": "float64",
+      "materials": "float64",
+      "otherexpense": "float64",
+      "profits": "float64",
+      "revenue": "float64",
+      "wagebill": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      3119,
+      6
+    ]
+  },
+  "2013-14/_/food_acquired.parquet": {
+    "columns": [
+      "Kgs",
+      "farmgate",
+      "market",
+      "quantity_away",
+      "quantity_home",
+      "quantity_inkind",
+      "quantity_own",
+      "unitvalue_away",
+      "unitvalue_home",
+      "unitvalue_inkind",
+      "unitvalue_own",
+      "value_away",
+      "value_home",
+      "value_inkind",
+      "value_own"
+    ],
+    "content_hash": "f4647ea8dd5f3c981d8175440a3ccecfae8c22c8c07912fd5b9039018c229337",
+    "dtypes": {
+      "Kgs": "float64",
+      "farmgate": "float64",
+      "market": "float64",
+      "quantity_away": "float64",
+      "quantity_home": "float64",
+      "quantity_inkind": "float64",
+      "quantity_own": "float64",
+      "unitvalue_away": "float64",
+      "unitvalue_home": "float64",
+      "unitvalue_inkind": "float64",
+      "unitvalue_own": "float64",
+      "value_away": "float64",
+      "value_home": "float64",
+      "value_inkind": "float64",
+      "value_own": "float64"
+    },
+    "index_names": [
+      "i",
+      "j",
+      "u"
+    ],
+    "shape": [
+      50396,
+      15
+    ]
+  },
+  "2013-14/_/household_characteristics.parquet": {
+    "columns": [
+      "Females 00-03",
+      "Females 04-08",
+      "Females 09-13",
+      "Females 14-18",
+      "Females 19-30",
+      "Females 31-50",
+      "Females 51-99",
+      "Males 00-03",
+      "Males 04-08",
+      "Males 09-13",
+      "Males 14-18",
+      "Males 19-30",
+      "Males 31-50",
+      "Males 51-99",
+      "log HSize"
+    ],
+    "content_hash": "8603d3523d74c68a41a04b345ee5d008c90f6624719fffcd0dba3b61ee4cdb0f",
+    "dtypes": {
+      "Females 00-03": "int64",
+      "Females 04-08": "int64",
+      "Females 09-13": "int64",
+      "Females 14-18": "int64",
+      "Females 19-30": "int64",
+      "Females 31-50": "int64",
+      "Females 51-99": "int64",
+      "Males 00-03": "int64",
+      "Males 04-08": "int64",
+      "Males 09-13": "int64",
+      "Males 14-18": "int64",
+      "Males 19-30": "int64",
+      "Males 31-50": "int64",
+      "Males 51-99": "int64",
+      "log HSize": "float64"
+    },
+    "index_names": [
+      "i"
+    ],
+    "shape": [
+      3117,
+      15
+    ]
+  },
+  "2013-14/_/housing.parquet": {
+    "columns": [
+      "Earthen floor",
+      "Thatched roof"
+    ],
+    "content_hash": "2a8463c18dab654b3f04d498d8caca3db99439ed9f904a9fa96bb682d61d3c11",
+    "dtypes": {
+      "Earthen floor": "int64",
+      "Thatched roof": "int64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      3119,
+      2
+    ]
+  },
+  "2013-14/_/interview_date.parquet": {
+    "columns": [
+      "date"
+    ],
+    "content_hash": "2e124e2388d2fe79b0f959c488c36ed9b5b7c64f4d9834910c0fe20136d41246",
+    "dtypes": {
+      "date": "datetime64[ns]"
+    },
+    "index_names": [
+      "j",
+      "t"
+    ],
+    "shape": [
+      3119,
+      1
+    ]
+  },
+  "2013-14/_/locality.parquet": {
+    "columns": [
+      "v"
+    ],
+    "content_hash": "c00e417b757d67710ba455ddb628c85cca1be0084a8d2f9629cc20cc35c8e6b2",
+    "dtypes": {
+      "v": "float64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      3119,
+      1
+    ]
+  },
+  "2013-14/_/nonfood_expenditures.parquet": {
+    "columns": [
+      "Air Time/Services Fee (Owned Fixed/Mobile Phones)",
+      "Air Time/Services Fee (Phones not Owned)",
+      "Barber/Beauty Shops",
+      "Bathing Soap",
+      "Batteries (Dry cells)",
+      "Charcoal",
+      "Consultation Fees",
+      "Cosmetics (Body Lotion, Deodorant, etc)",
+      "Diapers",
+      "Dry Cleaning/Laundry",
+      "Electricity",
+      "Firewood",
+      "Fuels (Generators/Lawn Mower)",
+      "Handbags, Travel Bags, etc",
+      "Hospital/Clinic Charges",
+      "Hotels, Lodging, etc",
+      "Houseboys/girls, Shamba Boys, etc",
+      "Imputed Rent of Free House",
+      "Imputed Rent of Owned House",
+      "Maintenance/Repair (House)",
+      "Matches",
+      "Medicines",
+      "Newspapers/Magazines",
+      "Other Health/Medical Care",
+      "Other Non-Durable/Personal Goods",
+      "Other Rent/Fuel/Power",
+      "Other Transportation/Communication",
+      "Paraffin (Kerosene)",
+      "Petrol, Diesel, etc",
+      "Public Transport (Bodaboda/Bicycle)",
+      "Public Transport (Bus)",
+      "Public Transport (Taxi/Minibus)",
+      "Rent of Rented House",
+      "Sanitary Towels",
+      "Sports, Theaters, etc",
+      "Stamps, Envelopes, etc",
+      "Tooth Paste",
+      "Traditional Doctors Fees/Medicines",
+      "Tyres, Tubes, Spares, Brake Pads, etc",
+      "Washing Soap",
+      "Water (Utility)"
+    ],
+    "content_hash": "7bf7ffb3d85584f5f6055cbf0fddf525c9e36581bafe35463147786c7755462c",
+    "dtypes": {
+      "Air Time/Services Fee (Owned Fixed/Mobile Phones)": "float64",
+      "Air Time/Services Fee (Phones not Owned)": "float64",
+      "Barber/Beauty Shops": "float64",
+      "Bathing Soap": "float64",
+      "Batteries (Dry cells)": "float64",
+      "Charcoal": "float64",
+      "Consultation Fees": "float64",
+      "Cosmetics (Body Lotion, Deodorant, etc)": "float64",
+      "Diapers": "float64",
+      "Dry Cleaning/Laundry": "float64",
+      "Electricity": "float64",
+      "Firewood": "float64",
+      "Fuels (Generators/Lawn Mower)": "float64",
+      "Handbags, Travel Bags, etc": "float64",
+      "Hospital/Clinic Charges": "float64",
+      "Hotels, Lodging, etc": "float64",
+      "Houseboys/girls, Shamba Boys, etc": "float64",
+      "Imputed Rent of Free House": "float64",
+      "Imputed Rent of Owned House": "float64",
+      "Maintenance/Repair (House)": "float64",
+      "Matches": "float64",
+      "Medicines": "float64",
+      "Newspapers/Magazines": "float64",
+      "Other Health/Medical Care": "float64",
+      "Other Non-Durable/Personal Goods": "float64",
+      "Other Rent/Fuel/Power": "float64",
+      "Other Transportation/Communication": "float64",
+      "Paraffin (Kerosene)": "float64",
+      "Petrol, Diesel, etc": "float64",
+      "Public Transport (Bodaboda/Bicycle)": "float64",
+      "Public Transport (Bus)": "float64",
+      "Public Transport (Taxi/Minibus)": "float64",
+      "Rent of Rented House": "float64",
+      "Sanitary Towels": "float64",
+      "Sports, Theaters, etc": "float64",
+      "Stamps, Envelopes, etc": "float64",
+      "Tooth Paste": "float64",
+      "Traditional Doctors Fees/Medicines": "float64",
+      "Tyres, Tubes, Spares, Brake Pads, etc": "float64",
+      "Washing Soap": "float64",
+      "Water (Utility)": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      3115,
+      41
+    ]
+  },
+  "2013-14/_/other_features.parquet": {
+    "columns": [
+      "Rural"
+    ],
+    "content_hash": "bae800d5d942c7257b06aeb5959e374b03f95bb55facc65442a04f000ae6ccd5",
+    "dtypes": {
+      "Rural": "int64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      3119,
+      1
+    ]
+  },
+  "2013-14/_/plots.parquet": {
+    "columns": [
+      "acres",
+      "area_units",
+      "intercrop"
+    ],
+    "content_hash": "43d1971503ac1a75d1aa27c8d8fb7843edf08ff3c10e83a159152c9d2019197f",
+    "dtypes": {
+      "acres": "float64",
+      "area_units": "string",
+      "intercrop": "string"
+    },
+    "index_names": [
+      "j",
+      "t",
+      "plt",
+      "crop"
+    ],
+    "shape": [
+      10550,
+      3
+    ]
+  },
+  "2013-14/_/shocks.parquet": {
+    "columns": [
+      "Duration",
+      "EffectedAssets",
+      "EffectedConsumption",
+      "EffectedIncome",
+      "EffectedProduction",
+      "HowCoped0",
+      "HowCoped1",
+      "HowCoped2",
+      "Onset",
+      "Year"
+    ],
+    "content_hash": "81438c5355ef475409342e0ee75b77c23bea85c6d9e917a756b338b523aedef7",
+    "dtypes": {
+      "Duration": "float64",
+      "EffectedAssets": "boolean",
+      "EffectedConsumption": "boolean",
+      "EffectedIncome": "boolean",
+      "EffectedProduction": "boolean",
+      "HowCoped0": "category",
+      "HowCoped1": "category",
+      "HowCoped2": "category",
+      "Onset": "Int64",
+      "Year": "Int64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "Shock"
+    ],
+    "shape": [
+      1572,
+      10
+    ]
+  },
+  "2015-16/_/assets.parquet": {
+    "columns": [
+      "Assets"
+    ],
+    "content_hash": "fcf59ba6c0855c519b19d3c1ec6cd0769104510d0bdd92d288a565ef290829fa",
+    "dtypes": {
+      "Assets": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      3303,
+      1
+    ]
+  },
+  "2015-16/_/earnings.parquet": {
+    "columns": [
+      "Earnings"
+    ],
+    "content_hash": "6189ac751e08a1b54d6851ce341a434680828ba48b9ba33b6060432d66929276",
+    "dtypes": {
+      "Earnings": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      3305,
+      1
+    ]
+  },
+  "2015-16/_/education_expenses.parquet": {
+    "columns": [
+      "Boarding Fee",
+      "Book Fee",
+      "Other Fee",
+      "School and Registration Fees",
+      "Total Education Expenditure",
+      "Transportation Fee",
+      "Uniform Fee"
+    ],
+    "content_hash": "7ba55d4a96b9f8cb3ea99189f218bf75543c545c305f1270d64395e28e042299",
+    "dtypes": {
+      "Boarding Fee": "float64",
+      "Book Fee": "float64",
+      "Other Fee": "float64",
+      "School and Registration Fees": "float64",
+      "Total Education Expenditure": "float64",
+      "Transportation Fee": "float64",
+      "Uniform Fee": "float64"
+    },
+    "index_names": [
+      "j",
+      "pid"
+    ],
+    "shape": [
+      6430,
+      7
+    ]
+  },
+  "2015-16/_/enterprise_income.parquet": {
+    "columns": [
+      "losses",
+      "materials",
+      "otherexpense",
+      "profits",
+      "revenue",
+      "wagebill"
+    ],
+    "content_hash": "343df81d485d0c04167821a6f8f1693c61d155a0d81dae6133a4b7b30df6f9ca",
+    "dtypes": {
+      "losses": "float64",
+      "materials": "float64",
+      "otherexpense": "float64",
+      "profits": "float64",
+      "revenue": "float64",
+      "wagebill": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      1659,
+      6
+    ]
+  },
+  "2015-16/_/food_acquired.parquet": {
+    "columns": [
+      "Kgs",
+      "farmgate",
+      "market",
+      "quantity_away",
+      "quantity_home",
+      "quantity_inkind",
+      "quantity_own",
+      "unitvalue_away",
+      "unitvalue_home",
+      "unitvalue_inkind",
+      "unitvalue_own",
+      "value_away",
+      "value_home",
+      "value_inkind",
+      "value_own"
+    ],
+    "content_hash": "c6e4c14f9515ebcf9378c40e1441f25d4abe57da7aa5111d3ec35b90df437bdf",
+    "dtypes": {
+      "Kgs": "float64",
+      "farmgate": "float64",
+      "market": "float64",
+      "quantity_away": "float64",
+      "quantity_home": "float64",
+      "quantity_inkind": "float64",
+      "quantity_own": "float64",
+      "unitvalue_away": "float64",
+      "unitvalue_home": "float64",
+      "unitvalue_inkind": "float64",
+      "unitvalue_own": "float64",
+      "value_away": "float64",
+      "value_home": "float64",
+      "value_inkind": "float64",
+      "value_own": "float64"
+    },
+    "index_names": [
+      "i",
+      "j",
+      "u"
+    ],
+    "shape": [
+      49751,
+      15
+    ]
+  },
+  "2015-16/_/household_characteristics.parquet": {
+    "columns": [
+      "Females 00-03",
+      "Females 04-08",
+      "Females 09-13",
+      "Females 14-18",
+      "Females 19-30",
+      "Females 31-50",
+      "Females 51-99",
+      "Males 00-03",
+      "Males 04-08",
+      "Males 09-13",
+      "Males 14-18",
+      "Males 19-30",
+      "Males 31-50",
+      "Males 51-99",
+      "log HSize"
+    ],
+    "content_hash": "17541f3620495f7a1e017f189333e761e1705e7d5075b13e0ce63de1d959d915",
+    "dtypes": {
+      "Females 00-03": "int64",
+      "Females 04-08": "int64",
+      "Females 09-13": "int64",
+      "Females 14-18": "int64",
+      "Females 19-30": "int64",
+      "Females 31-50": "int64",
+      "Females 51-99": "int64",
+      "Males 00-03": "int64",
+      "Males 04-08": "int64",
+      "Males 09-13": "int64",
+      "Males 14-18": "int64",
+      "Males 19-30": "int64",
+      "Males 31-50": "int64",
+      "Males 51-99": "int64",
+      "log HSize": "float64"
+    },
+    "index_names": [
+      "i"
+    ],
+    "shape": [
+      3305,
+      15
+    ]
+  },
+  "2015-16/_/housing.parquet": {
+    "columns": [
+      "Earthen floor",
+      "Thatched roof"
+    ],
+    "content_hash": "d8bd91179fc9448d20fed72dc08412a697a4ea882f3705c6ed8b3cd0f16a1f4d",
+    "dtypes": {
+      "Earthen floor": "int64",
+      "Thatched roof": "int64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      3312,
+      2
+    ]
+  },
+  "2015-16/_/interview_date.parquet": {
+    "columns": [
+      "date"
+    ],
+    "content_hash": "765745bd0a135fdc0d53e750488bf83ad80f947adbc8f6980bcfdcea8c4cfcfb",
+    "dtypes": {
+      "date": "datetime64[ns]"
+    },
+    "index_names": [
+      "j",
+      "t"
+    ],
+    "shape": [
+      3305,
+      1
+    ]
+  },
+  "2015-16/_/locality.parquet": {
+    "columns": [
+      "v"
+    ],
+    "content_hash": "fedf9d24ec1c31d195e9b8736bc70f4b8d8f11af4ed456510df2a8c661c038f9",
+    "dtypes": {
+      "v": "int32"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      3305,
+      1
+    ]
+  },
+  "2015-16/_/nonfood_expenditures.parquet": {
+    "columns": [
+      "Air Time/Services Fee (Owned Fixed/Mobile Phones)",
+      "Air Time/Services Fee (Phones not Owned)",
+      "Barber/Beauty Shops",
+      "Bathing Soap",
+      "Batteries (Dry cells)",
+      "Charcoal",
+      "Consultation Fees",
+      "Cosmetics (Body Lotion, Deodorant, etc)",
+      "Diapers",
+      "Dry Cleaning/Laundry",
+      "Electricity",
+      "Firewood",
+      "Fuels (Generators/Lawn Mower)",
+      "Handbags, Travel Bags, etc",
+      "Hospital/Clinic Charges",
+      "Hotels, Lodging, etc",
+      "Houseboys/girls, Shamba Boys, etc",
+      "Imputed Rent of Free House",
+      "Imputed Rent of Owned House",
+      "Maintenance/Repair (House)",
+      "Matches",
+      "Medicines",
+      "Newspapers/Magazines",
+      "Other Health/Medical Care",
+      "Other Non-Durable/Personal Goods",
+      "Other Rent/Fuel/Power",
+      "Other Transportation/Communication",
+      "Paraffin (Kerosene)",
+      "Petrol, Diesel, etc",
+      "Public Transport (Bodaboda/Bicycle)",
+      "Public Transport (Bus)",
+      "Public Transport (Taxi/Minibus)",
+      "Rent of Rented House",
+      "Sanitary Towels",
+      "Sports, Theaters, etc",
+      "Stamps, Envelopes, etc",
+      "Tooth Paste",
+      "Traditional Doctors Fees/Medicines",
+      "Tyres, Tubes, Spares, Brake Pads, etc",
+      "Washing Soap",
+      "Water (Utility)"
+    ],
+    "content_hash": "2e2ff7ad7e62ebfb81a98e388a356aa16921aa88424e884f9fa6cd4388346b80",
+    "dtypes": {
+      "Air Time/Services Fee (Owned Fixed/Mobile Phones)": "float64",
+      "Air Time/Services Fee (Phones not Owned)": "float64",
+      "Barber/Beauty Shops": "float64",
+      "Bathing Soap": "float64",
+      "Batteries (Dry cells)": "float64",
+      "Charcoal": "float64",
+      "Consultation Fees": "float64",
+      "Cosmetics (Body Lotion, Deodorant, etc)": "float64",
+      "Diapers": "float64",
+      "Dry Cleaning/Laundry": "float64",
+      "Electricity": "float64",
+      "Firewood": "float64",
+      "Fuels (Generators/Lawn Mower)": "float64",
+      "Handbags, Travel Bags, etc": "float64",
+      "Hospital/Clinic Charges": "float64",
+      "Hotels, Lodging, etc": "float64",
+      "Houseboys/girls, Shamba Boys, etc": "float64",
+      "Imputed Rent of Free House": "float64",
+      "Imputed Rent of Owned House": "float64",
+      "Maintenance/Repair (House)": "float64",
+      "Matches": "float64",
+      "Medicines": "float64",
+      "Newspapers/Magazines": "float64",
+      "Other Health/Medical Care": "float64",
+      "Other Non-Durable/Personal Goods": "float64",
+      "Other Rent/Fuel/Power": "float64",
+      "Other Transportation/Communication": "float64",
+      "Paraffin (Kerosene)": "float64",
+      "Petrol, Diesel, etc": "float64",
+      "Public Transport (Bodaboda/Bicycle)": "float64",
+      "Public Transport (Bus)": "float64",
+      "Public Transport (Taxi/Minibus)": "float64",
+      "Rent of Rented House": "float64",
+      "Sanitary Towels": "float64",
+      "Sports, Theaters, etc": "float64",
+      "Stamps, Envelopes, etc": "float64",
+      "Tooth Paste": "float64",
+      "Traditional Doctors Fees/Medicines": "float64",
+      "Tyres, Tubes, Spares, Brake Pads, etc": "float64",
+      "Washing Soap": "float64",
+      "Water (Utility)": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      3298,
+      41
+    ]
+  },
+  "2015-16/_/other_features.parquet": {
+    "columns": [
+      "Rural"
+    ],
+    "content_hash": "5d70a9bd504ec61028231254c99090cc1b3d4cd4d27e71e2ba364a60326db853",
+    "dtypes": {
+      "Rural": "int64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      3305,
+      1
+    ]
+  },
+  "2015-16/_/plots.parquet": {
+    "columns": [
+      "acres",
+      "area_units",
+      "intercrop"
+    ],
+    "content_hash": "a5dd5dbeb834d86a2690015c67d1addb37fa582850db163129add72dab702bc8",
+    "dtypes": {
+      "acres": "float64",
+      "area_units": "string",
+      "intercrop": "string"
+    },
+    "index_names": [
+      "j",
+      "t",
+      "plt",
+      "crop"
+    ],
+    "shape": [
+      10823,
+      3
+    ]
+  },
+  "2015-16/_/shocks.parquet": {
+    "columns": [
+      "Duration",
+      "EffectedAssets",
+      "EffectedConsumption",
+      "EffectedIncome",
+      "EffectedProduction",
+      "HowCoped0",
+      "HowCoped1",
+      "HowCoped2",
+      "Onset",
+      "Year"
+    ],
+    "content_hash": "2c103f35b6b798cdbabd2ced26f6605e9b3d519129b29b7e84edd5e2b407b57b",
+    "dtypes": {
+      "Duration": "float64",
+      "EffectedAssets": "boolean",
+      "EffectedConsumption": "boolean",
+      "EffectedIncome": "boolean",
+      "EffectedProduction": "boolean",
+      "HowCoped0": "category",
+      "HowCoped1": "category",
+      "HowCoped2": "category",
+      "Onset": "Int64",
+      "Year": "Int64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "Shock"
+    ],
+    "shape": [
+      1021,
+      10
+    ]
+  },
+  "2018-19/_/assets.parquet": {
+    "columns": [
+      "Assets"
+    ],
+    "content_hash": "0490b3a5436a88207f4a91619f4adb554ab3381f45c2950a9fed9f887d2d8ab6",
+    "dtypes": {
+      "Assets": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      3178,
+      1
+    ]
+  },
+  "2018-19/_/earnings.parquet": {
+    "columns": [
+      "Earnings"
+    ],
+    "content_hash": "fa6212c1437118dd4dce0b19cdc195ee5b80d7d075584e158e8da5443ab98c3a",
+    "dtypes": {
+      "Earnings": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      3180,
+      1
+    ]
+  },
+  "2018-19/_/education_expenses.parquet": {
+    "columns": [
+      "Boarding Fee",
+      "Book Fee",
+      "Day Care Facility Fee",
+      "Exam Fee",
+      "Fees that Cannot be Broken Down",
+      "Other Fee",
+      "Registration Fee",
+      "School Fee",
+      "Total Education Expenditure",
+      "Transportation Fee",
+      "Uniform Fee"
+    ],
+    "content_hash": "5a8cc9fdc97e5c67b447950566dbe969cab0bdc6032997e9abd70673c359dd61",
+    "dtypes": {
+      "Boarding Fee": "float64",
+      "Book Fee": "float64",
+      "Day Care Facility Fee": "float64",
+      "Exam Fee": "float64",
+      "Fees that Cannot be Broken Down": "float64",
+      "Other Fee": "float64",
+      "Registration Fee": "float64",
+      "School Fee": "float64",
+      "Total Education Expenditure": "float64",
+      "Transportation Fee": "float64",
+      "Uniform Fee": "float64"
+    },
+    "index_names": [
+      "j",
+      "pid"
+    ],
+    "shape": [
+      6463,
+      11
+    ]
+  },
+  "2018-19/_/enterprise_income.parquet": {
+    "columns": [
+      "losses",
+      "materials",
+      "otherexpense",
+      "profits",
+      "revenue",
+      "wagebill"
+    ],
+    "content_hash": "c42dc6a0388e58361090f83036e39d744590685183a546f39a4fe41c7a133475",
+    "dtypes": {
+      "losses": "float64",
+      "materials": "float64",
+      "otherexpense": "float64",
+      "profits": "float64",
+      "revenue": "float64",
+      "wagebill": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      543,
+      6
+    ]
+  },
+  "2018-19/_/food_acquired.parquet": {
+    "columns": [
+      "Kgs",
+      "farmgate",
+      "market",
+      "market_away",
+      "market_home",
+      "market_own",
+      "quantity_away",
+      "quantity_home",
+      "quantity_inkind",
+      "quantity_own",
+      "unitvalue_away",
+      "unitvalue_home",
+      "unitvalue_inkind",
+      "unitvalue_own",
+      "value_away",
+      "value_home",
+      "value_inkind",
+      "value_own"
+    ],
+    "content_hash": "a28f0638f8dceeb75dc983e9c0edc9f1c79c92d901aee012e59bce92df2ff500",
+    "dtypes": {
+      "Kgs": "float64",
+      "farmgate": "float64",
+      "market": "float64",
+      "market_away": "float64",
+      "market_home": "float64",
+      "market_own": "float64",
+      "quantity_away": "float64",
+      "quantity_home": "float64",
+      "quantity_inkind": "float64",
+      "quantity_own": "float64",
+      "unitvalue_away": "float64",
+      "unitvalue_home": "float64",
+      "unitvalue_inkind": "float64",
+      "unitvalue_own": "float64",
+      "value_away": "float64",
+      "value_home": "float64",
+      "value_inkind": "float64",
+      "value_own": "float64"
+    },
+    "index_names": [
+      "i",
+      "j",
+      "u"
+    ],
+    "shape": [
+      52783,
+      18
+    ]
+  },
+  "2018-19/_/household_characteristics.parquet": {
+    "columns": [
+      "Females 00-03",
+      "Females 04-08",
+      "Females 09-13",
+      "Females 14-18",
+      "Females 19-30",
+      "Females 31-50",
+      "Females 51-99",
+      "Males 00-03",
+      "Males 04-08",
+      "Males 09-13",
+      "Males 14-18",
+      "Males 19-30",
+      "Males 31-50",
+      "Males 51-99",
+      "log HSize"
+    ],
+    "content_hash": "16aa71ba5ccaacb0a5c450e00372623b570639f1527abec0f8751637b315d448",
+    "dtypes": {
+      "Females 00-03": "int64",
+      "Females 04-08": "int64",
+      "Females 09-13": "int64",
+      "Females 14-18": "int64",
+      "Females 19-30": "int64",
+      "Females 31-50": "int64",
+      "Females 51-99": "int64",
+      "Males 00-03": "int64",
+      "Males 04-08": "int64",
+      "Males 09-13": "int64",
+      "Males 14-18": "int64",
+      "Males 19-30": "int64",
+      "Males 31-50": "int64",
+      "Males 51-99": "int64",
+      "log HSize": "float64"
+    },
+    "index_names": [
+      "i"
+    ],
+    "shape": [
+      3241,
+      15
+    ]
+  },
+  "2018-19/_/housing.parquet": {
+    "columns": [
+      "Earthen floor",
+      "Thatched roof"
+    ],
+    "content_hash": "e42b6a7a8d9a9a17f1da630df8fc48da52281003f8c4270aef9f5fc75ceb8aad",
+    "dtypes": {
+      "Earthen floor": "int64",
+      "Thatched roof": "int64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      3242,
+      2
+    ]
+  },
+  "2018-19/_/interview_date.parquet": {
+    "columns": [
+      "date"
+    ],
+    "content_hash": "a377f4f4d82c731ef7480560ba5dcaa40c2bb4dcc19ced652393637f0881fb44",
+    "dtypes": {
+      "date": "datetime64[ns]"
+    },
+    "index_names": [
+      "j",
+      "t"
+    ],
+    "shape": [
+      3176,
+      1
+    ]
+  },
+  "2018-19/_/locality.parquet": {
+    "columns": [
+      "v"
+    ],
+    "content_hash": "e7d6d84300eb56cc966eb96b6cc06553eb104378b4483b80109149881dda9a25",
+    "dtypes": {
+      "v": "string"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      3176,
+      1
+    ]
+  },
+  "2018-19/_/nonfood_expenditures.parquet": {
+    "columns": [
+      "Air Time/Services Fee (Owned Fixed/Mobile Phones)",
+      "Air Time/Services Fee (Phones not Owned)",
+      "Barber/Beauty Shops",
+      "Bathing Soap",
+      "Batteries (Dry cells)",
+      "Candles",
+      "Charcoal",
+      "Consultation Fees",
+      "Cosmetics (Body Lotion, Deodorant, etc)",
+      "Diapers",
+      "Diesel",
+      "Dry Cleaning/Laundry",
+      "Electricity",
+      "Firewood",
+      "Fuels (Generators/Lawn Mower)",
+      "Handbags, Travel Bags, etc",
+      "Hospital/Clinic Charges",
+      "Hotels, Lodging, etc",
+      "Houseboys/girls, Shamba Boys, etc",
+      "Imputed Rent of Free House",
+      "Imputed Rent of Owned House",
+      "Lubricants (Engine oil, Grease, Coolant, etc)",
+      "Maintenance/Repair (House)",
+      "Maintenance/Repair (Vehicles, Motorcycles, Bicycles)",
+      "Matches",
+      "Medicines",
+      "Newspapers/Magazines",
+      "Other Health/Medical Care",
+      "Other Non-Durable/Personal Goods",
+      "Other Rent/Fuel/Power",
+      "Other Transportation/Communication",
+      "Paraffin (Kerosene)",
+      "Petrol",
+      "Postal Services",
+      "Refuse Collection",
+      "Rent of Rented House",
+      "Sanitary Towels",
+      "Security Fees (Guard, LC Defense, Community Security)",
+      "Sports, Theaters, etc",
+      "Stamps, Envelopes, etc",
+      "Toilet Paper",
+      "Tooth Brush",
+      "Tooth Paste",
+      "Total Health Expenditure",
+      "Toys, Games, etc",
+      "Traditional Doctors Fees/Medicines",
+      "Tyres, Tubes, Spares, Brake Pads, etc",
+      "Washing Soap",
+      "Water (NWSC)",
+      "Water (Other Sources)"
+    ],
+    "content_hash": "eb68f6cd838e7dc37ce5e5e41beb45778400a090c3937456f0b9bb26a82b6df3",
+    "dtypes": {
+      "Air Time/Services Fee (Owned Fixed/Mobile Phones)": "float64",
+      "Air Time/Services Fee (Phones not Owned)": "float64",
+      "Barber/Beauty Shops": "float64",
+      "Bathing Soap": "float64",
+      "Batteries (Dry cells)": "float64",
+      "Candles": "float64",
+      "Charcoal": "float64",
+      "Consultation Fees": "float64",
+      "Cosmetics (Body Lotion, Deodorant, etc)": "float64",
+      "Diapers": "float64",
+      "Diesel": "float64",
+      "Dry Cleaning/Laundry": "float64",
+      "Electricity": "float64",
+      "Firewood": "float64",
+      "Fuels (Generators/Lawn Mower)": "float64",
+      "Handbags, Travel Bags, etc": "float64",
+      "Hospital/Clinic Charges": "float64",
+      "Hotels, Lodging, etc": "float64",
+      "Houseboys/girls, Shamba Boys, etc": "float64",
+      "Imputed Rent of Free House": "float64",
+      "Imputed Rent of Owned House": "float64",
+      "Lubricants (Engine oil, Grease, Coolant, etc)": "float64",
+      "Maintenance/Repair (House)": "float64",
+      "Maintenance/Repair (Vehicles, Motorcycles, Bicycles)": "float64",
+      "Matches": "float64",
+      "Medicines": "float64",
+      "Newspapers/Magazines": "float64",
+      "Other Health/Medical Care": "float64",
+      "Other Non-Durable/Personal Goods": "float64",
+      "Other Rent/Fuel/Power": "float64",
+      "Other Transportation/Communication": "float64",
+      "Paraffin (Kerosene)": "float64",
+      "Petrol": "float64",
+      "Postal Services": "float64",
+      "Refuse Collection": "float64",
+      "Rent of Rented House": "float64",
+      "Sanitary Towels": "float64",
+      "Security Fees (Guard, LC Defense, Community Security)": "float64",
+      "Sports, Theaters, etc": "float64",
+      "Stamps, Envelopes, etc": "float64",
+      "Toilet Paper": "float64",
+      "Tooth Brush": "float64",
+      "Tooth Paste": "float64",
+      "Total Health Expenditure": "float64",
+      "Toys, Games, etc": "float64",
+      "Traditional Doctors Fees/Medicines": "float64",
+      "Tyres, Tubes, Spares, Brake Pads, etc": "float64",
+      "Washing Soap": "float64",
+      "Water (NWSC)": "float64",
+      "Water (Other Sources)": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      3176,
+      50
+    ]
+  },
+  "2018-19/_/other_features.parquet": {
+    "columns": [
+      "Rural"
+    ],
+    "content_hash": "3785f62919646c919e9e50caf8e5cfa62e6d221b8450d385e1673f94fa03aa7b",
+    "dtypes": {
+      "Rural": "int64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      3176,
+      1
+    ]
+  },
+  "2018-19/_/plots.parquet": {
+    "columns": [
+      "acres",
+      "area_units",
+      "intercrop"
+    ],
+    "content_hash": "f6e2df6e7459da189d90478ecbef1f1ad5729f7b555c2bc83c68fa60cc8aae38",
+    "dtypes": {
+      "acres": "float64",
+      "area_units": "string",
+      "intercrop": "string"
+    },
+    "index_names": [
+      "j",
+      "t",
+      "plt",
+      "crop"
+    ],
+    "shape": [
+      8776,
+      3
+    ]
+  },
+  "2018-19/_/shocks.parquet": {
+    "columns": [
+      "Duration",
+      "EffectedAssets",
+      "EffectedConsumption",
+      "EffectedIncome",
+      "EffectedProduction",
+      "HowCoped0",
+      "HowCoped1",
+      "HowCoped2",
+      "Onset",
+      "Year"
+    ],
+    "content_hash": "244c51e927d63caf4cd7958d621259f5a905a97e4112f3cb4396511235f879ee",
+    "dtypes": {
+      "Duration": "float64",
+      "EffectedAssets": "boolean",
+      "EffectedConsumption": "boolean",
+      "EffectedIncome": "boolean",
+      "EffectedProduction": "boolean",
+      "HowCoped0": "category",
+      "HowCoped1": "category",
+      "HowCoped2": "category",
+      "Onset": "Int64",
+      "Year": "Int64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "Shock"
+    ],
+    "shape": [
+      1472,
+      10
+    ]
+  },
+  "2019-20/_/assets.parquet": {
+    "columns": [
+      "Assets"
+    ],
+    "content_hash": "cc4794ee23dd0793fcacf5f60f4894027572b02a15a628c3a6c65b5ec09d15f1",
+    "dtypes": {
+      "Assets": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      3078,
+      1
+    ]
+  },
+  "2019-20/_/earnings.parquet": {
+    "columns": [
+      "Earnings"
+    ],
+    "content_hash": "d1e1b512b4764f0ce7c104660164f31c9b3a61b11a1338b48aeecab03d1fe23c",
+    "dtypes": {
+      "Earnings": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      3064,
+      1
+    ]
+  },
+  "2019-20/_/education_expenses.parquet": {
+    "columns": [
+      "Boarding Fee",
+      "Book Fee",
+      "Day Care Facility Fee",
+      "Exam Fee",
+      "Fees that Cannot be Broken Down",
+      "Other Fee",
+      "Registration Fee",
+      "School Fee",
+      "Total Education Expenditure",
+      "Transportation Fee",
+      "Uniform Fee"
+    ],
+    "content_hash": "e25d13e3a76b60bb361faf1a8cc2979cf4a9d755132003c6457ee8e9582d8537",
+    "dtypes": {
+      "Boarding Fee": "float64",
+      "Book Fee": "float64",
+      "Day Care Facility Fee": "float64",
+      "Exam Fee": "float64",
+      "Fees that Cannot be Broken Down": "float64",
+      "Other Fee": "float64",
+      "Registration Fee": "float64",
+      "School Fee": "float64",
+      "Total Education Expenditure": "float64",
+      "Transportation Fee": "float64",
+      "Uniform Fee": "float64"
+    },
+    "index_names": [
+      "j",
+      "pid"
+    ],
+    "shape": [
+      6094,
+      11
+    ]
+  },
+  "2019-20/_/enterprise_income.parquet": {
+    "columns": [
+      "losses",
+      "materials",
+      "otherexpense",
+      "profits",
+      "revenue",
+      "wagebill"
+    ],
+    "content_hash": "1f2c700445b430a7e140a39dab2d8e9471b3d1cd7c1212362e04637b8068f4cd",
+    "dtypes": {
+      "losses": "float64",
+      "materials": "float64",
+      "otherexpense": "float64",
+      "profits": "float64",
+      "revenue": "float64",
+      "wagebill": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      1150,
+      6
+    ]
+  },
+  "2019-20/_/food_acquired.parquet": {
+    "columns": [
+      "Kgs",
+      "farmgate",
+      "market",
+      "market_away",
+      "market_home",
+      "market_own",
+      "quantity_away",
+      "quantity_home",
+      "quantity_inkind",
+      "quantity_own",
+      "unitvalue_away",
+      "unitvalue_home",
+      "unitvalue_inkind",
+      "unitvalue_own",
+      "value_away",
+      "value_home",
+      "value_inkind",
+      "value_own"
+    ],
+    "content_hash": "cbb7ae584eea9419d86abe89c63ea40b12ee6a79188bdbea123d46c682a287c0",
+    "dtypes": {
+      "Kgs": "float64",
+      "farmgate": "float64",
+      "market": "float64",
+      "market_away": "float64",
+      "market_home": "float64",
+      "market_own": "float64",
+      "quantity_away": "float64",
+      "quantity_home": "float64",
+      "quantity_inkind": "float64",
+      "quantity_own": "float64",
+      "unitvalue_away": "float64",
+      "unitvalue_home": "float64",
+      "unitvalue_inkind": "float64",
+      "unitvalue_own": "float64",
+      "value_away": "float64",
+      "value_home": "float64",
+      "value_inkind": "float64",
+      "value_own": "float64"
+    },
+    "index_names": [
+      "i",
+      "j",
+      "u"
+    ],
+    "shape": [
+      47740,
+      18
+    ]
+  },
+  "2019-20/_/household_characteristics.parquet": {
+    "columns": [
+      "Females 00-03",
+      "Females 04-08",
+      "Females 09-13",
+      "Females 14-18",
+      "Females 19-30",
+      "Females 31-50",
+      "Females 51-99",
+      "Males 00-03",
+      "Males 04-08",
+      "Males 09-13",
+      "Males 14-18",
+      "Males 19-30",
+      "Males 31-50",
+      "Males 51-99",
+      "log HSize"
+    ],
+    "content_hash": "0144d435b1988b54d64df8f66da33f557d48d112ada2df52a5599ea4a50c9bd5",
+    "dtypes": {
+      "Females 00-03": "int64",
+      "Females 04-08": "int64",
+      "Females 09-13": "int64",
+      "Females 14-18": "int64",
+      "Females 19-30": "int64",
+      "Females 31-50": "int64",
+      "Females 51-99": "int64",
+      "Males 00-03": "int64",
+      "Males 04-08": "int64",
+      "Males 09-13": "int64",
+      "Males 14-18": "int64",
+      "Males 19-30": "int64",
+      "Males 31-50": "int64",
+      "Males 51-99": "int64",
+      "log HSize": "float64"
+    },
+    "index_names": [
+      "i"
+    ],
+    "shape": [
+      3076,
+      15
+    ]
+  },
+  "2019-20/_/housing.parquet": {
+    "columns": [
+      "Earthen floor",
+      "Thatched roof"
+    ],
+    "content_hash": "162891c88615770fcb08b6c04e697ef0eafd56247c0e1d7a21d7da8af9b7abab",
+    "dtypes": {
+      "Earthen floor": "int64",
+      "Thatched roof": "int64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      3078,
+      2
+    ]
+  },
+  "2019-20/_/interview_date.parquet": {
+    "columns": [
+      "date"
+    ],
+    "content_hash": "d5f6ad554014e698e3ed5f75d037ebd41c4c0e7bfeeb02d41d441da110d3e101",
+    "dtypes": {
+      "date": "datetime64[ns]"
+    },
+    "index_names": [
+      "j",
+      "t"
+    ],
+    "shape": [
+      3098,
+      1
+    ]
+  },
+  "2019-20/_/locality.parquet": {
+    "columns": [
+      "v"
+    ],
+    "content_hash": "f272cd22e109b00ee95387e7a2ea037929e4b0ed981d7a928e474d98eab5a5b1",
+    "dtypes": {
+      "v": "string"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      3098,
+      1
+    ]
+  },
+  "2019-20/_/nonfood_expenditures.parquet": {
+    "columns": [
+      "Air Time (Fixed Phones)",
+      "Air Time (Mobile Phones)",
+      "Air Time/Services Fee (Owned Fixed/Mobile Phones)",
+      "Air Time/Services Fee (Phones not Owned)",
+      "Barber/Beauty Shops",
+      "Bathing Soap",
+      "Batteries (Dry cells)",
+      "Candles",
+      "Charcoal",
+      "Consultation Fees",
+      "Cosmetics (Body Lotion, Deodorant, etc)",
+      "Detergent",
+      "Diapers",
+      "Diesel",
+      "Dry Cleaning/Laundry",
+      "Electricity",
+      "Firewood",
+      "Fuels (Generators/Lawn Mower)",
+      "Handbags, Travel Bags, etc",
+      "Hospital/Clinic Charges",
+      "Hotels, Lodging, etc",
+      "Houseboys/girls, Shamba Boys, etc",
+      "Imputed Rent of Free House",
+      "Imputed Rent of Owned House",
+      "Internet Fees",
+      "Lubricants (Engine oil, Grease, Coolant, etc)",
+      "Maintenance/Repair (House)",
+      "Maintenance/Repair (Vehicles, Motorcycles, Bicycles)",
+      "Matches",
+      "Medicines",
+      "Mobile Money Charges",
+      "Newspapers/Magazines",
+      "Other Health/Medical Care",
+      "Other Non-Durable/Personal Goods",
+      "Other Rent/Fuel/Power",
+      "Other Transportation/Communication",
+      "Paraffin (Kerosene)",
+      "Petrol",
+      "Petrol, Diesel, etc",
+      "Postal Services",
+      "Public Transport (Bodaboda/Bicycle)",
+      "Public Transport (Bus)",
+      "Public Transport (Others)",
+      "Public Transport (Taxi/Minibus)",
+      "Refuse Collection",
+      "Rent of Rented House",
+      "Sanitary Towels",
+      "Security Fees (Guard, LC Defense, Community Security)",
+      "Sports, Theaters, etc",
+      "Stamps, Envelopes, etc",
+      "Toilet Paper",
+      "Tooth Brush",
+      "Tooth Paste",
+      "Total Health Expenditure",
+      "Toys, Games, etc",
+      "Traditional Doctors Fees/Medicines",
+      "Transport to and From Health Facility",
+      "Tyres, Tubes, Spares, Brake Pads, etc",
+      "Washing Soap",
+      "Water (NWSC)",
+      "Water (Other Sources)"
+    ],
+    "content_hash": "2b534303f5e3800e611e9bee921f0dfcc30836e8e989eb0039c1823dab534e13",
+    "dtypes": {
+      "Air Time (Fixed Phones)": "float64",
+      "Air Time (Mobile Phones)": "float64",
+      "Air Time/Services Fee (Owned Fixed/Mobile Phones)": "float64",
+      "Air Time/Services Fee (Phones not Owned)": "float64",
+      "Barber/Beauty Shops": "float64",
+      "Bathing Soap": "float64",
+      "Batteries (Dry cells)": "float64",
+      "Candles": "float64",
+      "Charcoal": "float64",
+      "Consultation Fees": "float64",
+      "Cosmetics (Body Lotion, Deodorant, etc)": "float64",
+      "Detergent": "float64",
+      "Diapers": "float64",
+      "Diesel": "float64",
+      "Dry Cleaning/Laundry": "float64",
+      "Electricity": "float64",
+      "Firewood": "float64",
+      "Fuels (Generators/Lawn Mower)": "float64",
+      "Handbags, Travel Bags, etc": "float64",
+      "Hospital/Clinic Charges": "float64",
+      "Hotels, Lodging, etc": "float64",
+      "Houseboys/girls, Shamba Boys, etc": "float64",
+      "Imputed Rent of Free House": "float64",
+      "Imputed Rent of Owned House": "float64",
+      "Internet Fees": "float64",
+      "Lubricants (Engine oil, Grease, Coolant, etc)": "float64",
+      "Maintenance/Repair (House)": "float64",
+      "Maintenance/Repair (Vehicles, Motorcycles, Bicycles)": "float64",
+      "Matches": "float64",
+      "Medicines": "float64",
+      "Mobile Money Charges": "float64",
+      "Newspapers/Magazines": "float64",
+      "Other Health/Medical Care": "float64",
+      "Other Non-Durable/Personal Goods": "float64",
+      "Other Rent/Fuel/Power": "float64",
+      "Other Transportation/Communication": "float64",
+      "Paraffin (Kerosene)": "float64",
+      "Petrol": "float64",
+      "Petrol, Diesel, etc": "float64",
+      "Postal Services": "float64",
+      "Public Transport (Bodaboda/Bicycle)": "float64",
+      "Public Transport (Bus)": "float64",
+      "Public Transport (Others)": "float64",
+      "Public Transport (Taxi/Minibus)": "float64",
+      "Refuse Collection": "float64",
+      "Rent of Rented House": "float64",
+      "Sanitary Towels": "float64",
+      "Security Fees (Guard, LC Defense, Community Security)": "float64",
+      "Sports, Theaters, etc": "float64",
+      "Stamps, Envelopes, etc": "float64",
+      "Toilet Paper": "float64",
+      "Tooth Brush": "float64",
+      "Tooth Paste": "float64",
+      "Total Health Expenditure": "float64",
+      "Toys, Games, etc": "float64",
+      "Traditional Doctors Fees/Medicines": "float64",
+      "Transport to and From Health Facility": "float64",
+      "Tyres, Tubes, Spares, Brake Pads, etc": "float64",
+      "Washing Soap": "float64",
+      "Water (NWSC)": "float64",
+      "Water (Other Sources)": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      3066,
+      61
+    ]
+  },
+  "2019-20/_/other_features.parquet": {
+    "columns": [
+      "Rural"
+    ],
+    "content_hash": "571e549cac272b79718874c6befbb5f8611f845c70dc46e3ac16050db115ba5e",
+    "dtypes": {
+      "Rural": "int64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      3098,
+      1
+    ]
+  },
+  "2019-20/_/plots.parquet": {
+    "columns": [
+      "acres",
+      "area_units",
+      "intercrop"
+    ],
+    "content_hash": "0a6e4692ba519ba4fa43fd04b665debe441f7757c617e9fd55318439475cd80d",
+    "dtypes": {
+      "acres": "float64",
+      "area_units": "string",
+      "intercrop": "string"
+    },
+    "index_names": [
+      "j",
+      "t",
+      "plt",
+      "crop"
+    ],
+    "shape": [
+      8429,
+      3
+    ]
+  },
+  "2019-20/_/shocks.parquet": {
+    "columns": [
+      "Duration",
+      "EffectedAssets",
+      "EffectedConsumption",
+      "EffectedIncome",
+      "EffectedProduction",
+      "HowCoped0",
+      "HowCoped1",
+      "HowCoped2",
+      "Onset",
+      "Year"
+    ],
+    "content_hash": "b52e39129320da662048a04cc14d04d6da48499fdd381a95752814b74470aaee",
+    "dtypes": {
+      "Duration": "float64",
+      "EffectedAssets": "boolean",
+      "EffectedConsumption": "boolean",
+      "EffectedIncome": "boolean",
+      "EffectedProduction": "boolean",
+      "HowCoped0": "category",
+      "HowCoped1": "category",
+      "HowCoped2": "category",
+      "Onset": "Int64",
+      "Year": "Int64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "Shock"
+    ],
+    "shape": [
+      1252,
+      10
+    ]
+  },
+  "var/assets.parquet": {
+    "columns": [
+      "assets",
+      "level_1"
+    ],
+    "content_hash": "2713799929e50d9ff09bfc40de39ce2aae4e72dd6e866fbcc87b83ef36e0b5ae",
+    "dtypes": {
+      "assets": "float64",
+      "level_1": "string"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      24073,
+      2
+    ]
+  },
+  "var/earnings.parquet": {
+    "columns": [
+      "earnings",
+      "level_1"
+    ],
+    "content_hash": "af34762407e5cba75dbe5d4bc05307176d01a3102bb654fbfc190e65f58b1d54",
+    "dtypes": {
+      "earnings": "float64",
+      "level_1": "string"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      22447,
+      2
+    ]
+  },
+  "var/enterprise_income.parquet": {
+    "columns": [
+      "losses",
+      "materials",
+      "otherexpense",
+      "profits",
+      "revenue",
+      "wagebill"
+    ],
+    "content_hash": "625a11245b7306c9e6caf20290f1a7a9cd17e31cdfd87414fefb4632964a5206",
+    "dtypes": {
+      "losses": "float64",
+      "materials": "float64",
+      "otherexpense": "float64",
+      "profits": "float64",
+      "revenue": "float64",
+      "wagebill": "float64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      13935,
+      6
+    ]
+  },
+  "var/fct.parquet": {
+    "columns": [
+      "Apples",
+      "Avocado",
+      "Beans (dry)",
+      "Beans (fresh)",
+      "Beef",
+      "Beer",
+      "Biscuits",
+      "Bogoya",
+      "Bongo",
+      "Bread",
+      "Cabbages",
+      "Cakes",
+      "Carrots",
+      "Cassava (dry)",
+      "Cassava (dry/flour)",
+      "Cassava (flour)",
+      "Cassava (fresh)",
+      "Chapati",
+      "Chicken",
+      "Chicken (broiler)",
+      "Chicken (local)",
+      "Chicken (off-layer)",
+      "Coffee",
+      "Cooking Oil",
+      "Cooking Oil (refined)",
+      "Cooking Oil (unrefined)",
+      "Cornflakes",
+      "Dodo",
+      "Donuts",
+      "Dry/Smoked Fish",
+      "Eggplant",
+      "Eggs",
+      "Fresh Fish",
+      "Garlic",
+      "Ghee",
+      "Ginger (fresh)",
+      "Ginger (powder)",
+      "Goat Meat",
+      "Green Pepper",
+      "Ground Nuts (in shell)",
+      "Ground Nuts (paste)",
+      "Ground Nuts (pounded)",
+      "Ground Nuts (shelled)",
+      "Honey",
+      "Ice Cream",
+      "Infant Formula",
+      "Irish Potatoes",
+      "Jackfruit (fresh)",
+      "Jam/Marmalade",
+      "Kabalagala",
+      "Macaroni/Spaghetti",
+      "Maize (cobs)",
+      "Maize (flour)",
+      "Maize (grains)",
+      "Mangos",
+      "Margarine, Butter, etc",
+      "Matoke (??)",
+      "Matoke (bunch)",
+      "Matoke (cluster)",
+      "Matoke (heap)",
+      "Matoke (other)",
+      "Milk (fresh)",
+      "Milk (powdered)",
+      "Millet",
+      "Millet Flour",
+      "Mukene",
+      "Mushrooms",
+      "Ndiizi",
+      "Nkejje (dried)",
+      "Okra",
+      "Onions",
+      "Oranges",
+      "Other Juice (packed)",
+      "Passion Fruits",
+      "Peas",
+      "Peas (dry)",
+      "Perch (dried)",
+      "Perch (fresh)",
+      "Pineapple",
+      "Plantains",
+      "Pork",
+      "Pumpkins",
+      "Restaurant (beer)",
+      "Restaurant (soda)",
+      "Rice",
+      "Salt",
+      "Samosas",
+      "Sausages",
+      "Sim Sim",
+      "Sim Sim (paste)",
+      "Soda",
+      "Sorghum",
+      "Soybeans (dry)",
+      "Soybeans (fresh)",
+      "Sugar",
+      "Sugarcane",
+      "Sweet Bananas",
+      "Sweet Potatoes (dry)",
+      "Sweet Potatoes (flour)",
+      "Sweet Potatoes (fresh)",
+      "Sweet Potatoes (white, flour)",
+      "Tea",
+      "Tea (leaves)",
+      "Tea (other)",
+      "Tilapia (dried)",
+      "Tilapia (fresh)",
+      "Tomatoes",
+      "Waragi",
+      "Water",
+      "Watermelon",
+      "Wheat (flour)",
+      "Yams (arrowroot)",
+      "Yoghurt"
+    ],
+    "content_hash": "e95f77a8e060c5752a42bdded50579f13b73cd7fb2653c06930f942e2b0254a0",
+    "dtypes": {
+      "Apples": "float64",
+      "Avocado": "float64",
+      "Beans (dry)": "float64",
+      "Beans (fresh)": "float64",
+      "Beef": "float64",
+      "Beer": "float64",
+      "Biscuits": "float64",
+      "Bogoya": "float64",
+      "Bongo": "float64",
+      "Bread": "float64",
+      "Cabbages": "float64",
+      "Cakes": "float64",
+      "Carrots": "float64",
+      "Cassava (dry)": "float64",
+      "Cassava (dry/flour)": "float64",
+      "Cassava (flour)": "float64",
+      "Cassava (fresh)": "float64",
+      "Chapati": "float64",
+      "Chicken": "float64",
+      "Chicken (broiler)": "float64",
+      "Chicken (local)": "float64",
+      "Chicken (off-layer)": "float64",
+      "Coffee": "float64",
+      "Cooking Oil": "float64",
+      "Cooking Oil (refined)": "float64",
+      "Cooking Oil (unrefined)": "float64",
+      "Cornflakes": "float64",
+      "Dodo": "float64",
+      "Donuts": "float64",
+      "Dry/Smoked Fish": "float64",
+      "Eggplant": "float64",
+      "Eggs": "float64",
+      "Fresh Fish": "float64",
+      "Garlic": "float64",
+      "Ghee": "float64",
+      "Ginger (fresh)": "float64",
+      "Ginger (powder)": "float64",
+      "Goat Meat": "float64",
+      "Green Pepper": "float64",
+      "Ground Nuts (in shell)": "float64",
+      "Ground Nuts (paste)": "float64",
+      "Ground Nuts (pounded)": "float64",
+      "Ground Nuts (shelled)": "float64",
+      "Honey": "float64",
+      "Ice Cream": "float64",
+      "Infant Formula": "float64",
+      "Irish Potatoes": "float64",
+      "Jackfruit (fresh)": "float64",
+      "Jam/Marmalade": "float64",
+      "Kabalagala": "float64",
+      "Macaroni/Spaghetti": "float64",
+      "Maize (cobs)": "float64",
+      "Maize (flour)": "float64",
+      "Maize (grains)": "float64",
+      "Mangos": "float64",
+      "Margarine, Butter, etc": "float64",
+      "Matoke (??)": "float64",
+      "Matoke (bunch)": "float64",
+      "Matoke (cluster)": "float64",
+      "Matoke (heap)": "float64",
+      "Matoke (other)": "float64",
+      "Milk (fresh)": "float64",
+      "Milk (powdered)": "float64",
+      "Millet": "float64",
+      "Millet Flour": "float64",
+      "Mukene": "float64",
+      "Mushrooms": "float64",
+      "Ndiizi": "float64",
+      "Nkejje (dried)": "float64",
+      "Okra": "float64",
+      "Onions": "float64",
+      "Oranges": "float64",
+      "Other Juice (packed)": "float64",
+      "Passion Fruits": "float64",
+      "Peas": "float64",
+      "Peas (dry)": "float64",
+      "Perch (dried)": "float64",
+      "Perch (fresh)": "float64",
+      "Pineapple": "float64",
+      "Plantains": "float64",
+      "Pork": "float64",
+      "Pumpkins": "float64",
+      "Restaurant (beer)": "float64",
+      "Restaurant (soda)": "float64",
+      "Rice": "float64",
+      "Salt": "float64",
+      "Samosas": "float64",
+      "Sausages": "float64",
+      "Sim Sim": "float64",
+      "Sim Sim (paste)": "float64",
+      "Soda": "float64",
+      "Sorghum": "float64",
+      "Soybeans (dry)": "float64",
+      "Soybeans (fresh)": "float64",
+      "Sugar": "float64",
+      "Sugarcane": "float64",
+      "Sweet Bananas": "float64",
+      "Sweet Potatoes (dry)": "float64",
+      "Sweet Potatoes (flour)": "float64",
+      "Sweet Potatoes (fresh)": "float64",
+      "Sweet Potatoes (white, flour)": "float64",
+      "Tea": "float64",
+      "Tea (leaves)": "float64",
+      "Tea (other)": "float64",
+      "Tilapia (dried)": "float64",
+      "Tilapia (fresh)": "float64",
+      "Tomatoes": "float64",
+      "Waragi": "float64",
+      "Water": "float64",
+      "Watermelon": "float64",
+      "Wheat (flour)": "float64",
+      "Yams (arrowroot)": "float64",
+      "Yoghurt": "float64"
+    },
+    "index_names": [
+      "Nutrient"
+    ],
+    "shape": [
+      15,
+      113
+    ]
+  },
+  "var/food_acquired.parquet": {
+    "columns": [
+      "Kgs",
+      "farmgate",
+      "market",
+      "market_away",
+      "market_home",
+      "market_own",
+      "quantity_away",
+      "quantity_home",
+      "quantity_inkind",
+      "quantity_own",
+      "unitvalue_away",
+      "unitvalue_home",
+      "unitvalue_inkind",
+      "unitvalue_own",
+      "value_away",
+      "value_home",
+      "value_inkind",
+      "value_own"
+    ],
+    "content_hash": "b1064dfb68a66e8f60b5c4806627b8aed4007a991a49e3b8dcdf76bd73152242",
+    "dtypes": {
+      "Kgs": "float64",
+      "farmgate": "float64",
+      "market": "float64",
+      "market_away": "float64",
+      "market_home": "float64",
+      "market_own": "float64",
+      "quantity_away": "float64",
+      "quantity_home": "float64",
+      "quantity_inkind": "float64",
+      "quantity_own": "float64",
+      "unitvalue_away": "float64",
+      "unitvalue_home": "float64",
+      "unitvalue_inkind": "float64",
+      "unitvalue_own": "float64",
+      "value_away": "float64",
+      "value_home": "float64",
+      "value_inkind": "float64",
+      "value_own": "float64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m",
+      "j",
+      "u"
+    ],
+    "shape": [
+      352913,
+      18
+    ]
+  },
+  "var/food_expenditures.parquet": {
+    "columns": [
+      "x"
+    ],
+    "content_hash": "c31668d7935555675f4aa0865a834ee158f54dc9fab7b581cae5ac790f02c9a1",
+    "dtypes": {
+      "x": "float64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m",
+      "j"
+    ],
+    "shape": [
+      352722,
+      1
+    ]
+  },
+  "var/food_prices.parquet": {
+    "columns": [
+      "farmgate",
+      "market",
+      "market_away",
+      "market_home",
+      "market_own",
+      "unitvalue_away",
+      "unitvalue_home",
+      "unitvalue_inkind",
+      "unitvalue_own"
+    ],
+    "content_hash": "ba696a785ba285444fc01025ad7a2dc56772bda402336d5d0151e410dd7e43ea",
+    "dtypes": {
+      "farmgate": "float64",
+      "market": "float64",
+      "market_away": "float64",
+      "market_home": "float64",
+      "market_own": "float64",
+      "unitvalue_away": "float64",
+      "unitvalue_home": "float64",
+      "unitvalue_inkind": "float64",
+      "unitvalue_own": "float64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m",
+      "j",
+      "u"
+    ],
+    "shape": [
+      352913,
+      9
+    ]
+  },
+  "var/food_quantities.parquet": {
+    "columns": [
+      "quantity_away",
+      "quantity_home",
+      "quantity_inkind",
+      "quantity_own"
+    ],
+    "content_hash": "42d42f8c946ab809cc8eab4cf3684e9118e57909d3418a834878dfdf5d395b08",
+    "dtypes": {
+      "quantity_away": "float64",
+      "quantity_home": "float64",
+      "quantity_inkind": "float64",
+      "quantity_own": "float64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m",
+      "j",
+      "u"
+    ],
+    "shape": [
+      352913,
+      4
+    ]
+  },
+  "var/household_characteristics.parquet": {
+    "columns": [
+      "Females 00-03",
+      "Females 04-08",
+      "Females 09-13",
+      "Females 14-18",
+      "Females 19-30",
+      "Females 31-50",
+      "Females 51-99",
+      "Males 00-03",
+      "Males 04-08",
+      "Males 09-13",
+      "Males 14-18",
+      "Males 19-30",
+      "Males 31-50",
+      "Males 51-99",
+      "log HSize"
+    ],
+    "content_hash": "e4e608dde8a10a7489442afe9894e106c3fc6429b5c9f371034d7c60254f1e25",
+    "dtypes": {
+      "Females 00-03": "float64",
+      "Females 04-08": "float64",
+      "Females 09-13": "float64",
+      "Females 14-18": "float64",
+      "Females 19-30": "float64",
+      "Females 31-50": "float64",
+      "Females 51-99": "float64",
+      "Males 00-03": "float64",
+      "Males 04-08": "float64",
+      "Males 09-13": "float64",
+      "Males 14-18": "float64",
+      "Males 19-30": "float64",
+      "Males 31-50": "float64",
+      "Males 51-99": "float64",
+      "log HSize": "float64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      24363,
+      15
+    ]
+  },
+  "var/housing.parquet": {
+    "columns": [
+      "Earthen floor",
+      "Thatched roof"
+    ],
+    "content_hash": "946036bb6cd03a4fbfa6ff132ea505a721810fc4915c323d261fbcca5121f026",
+    "dtypes": {
+      "Earthen floor": "float64",
+      "Thatched roof": "float64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      16173,
+      2
+    ]
+  },
+  "var/income.parquet": {
+    "columns": [
+      "income"
+    ],
+    "content_hash": "aad18a8b1b51099f81f9cef2bfe81c3ceb0578156f98db7f966003b46be2a29f",
+    "dtypes": {
+      "income": "float64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      10193,
+      1
+    ]
+  },
+  "var/locality.parquet": {
+    "columns": [
+      "v"
+    ],
+    "content_hash": "a994f5b8b26dfe2f0f5536db32c0ce31586e147efcfced68ced37f26ea5e9f50",
+    "dtypes": {
+      "v": "string"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      24362,
+      1
+    ]
+  },
+  "var/nonfood_expenditures.parquet": {
+    "columns": [
+      "Air Time (Fixed Phones)",
+      "Air Time (Mobile Phones)",
+      "Air Time/Services Fee (Owned Fixed/Mobile Phones)",
+      "Air Time/Services Fee (Phones not Owned)",
+      "Barber/Beauty Shops",
+      "Bathing Soap",
+      "Batteries (Dry cells)",
+      "Candles",
+      "Charcoal",
+      "Consultation Fees",
+      "Cosmetics (Body Lotion, Deodorant, etc)",
+      "Detergent",
+      "Diapers",
+      "Diesel",
+      "Dry Cleaning/Laundry",
+      "Electricity",
+      "Firewood",
+      "Fuels (Generators/Lawn Mower)",
+      "Handbags, Travel Bags, etc",
+      "Hospital/Clinic Charges",
+      "Hotels, Lodging, etc",
+      "Houseboys/girls, Shamba Boys, etc",
+      "Imputed Rent of Free House",
+      "Imputed Rent of Owned House",
+      "Internet Fees",
+      "Lubricants (Engine oil, Grease, Coolant, etc)",
+      "Maintenance/Repair (House)",
+      "Maintenance/Repair (Vehicles, Motorcycles, Bicycles)",
+      "Matches",
+      "Medicines",
+      "Mobile Money Charges",
+      "Newspapers/Magazines",
+      "Other Health/Medical Care",
+      "Other Non-Durable/Personal Goods",
+      "Other Rent/Fuel/Power",
+      "Other Transportation/Communication",
+      "Paraffin (Kerosene)",
+      "Petrol",
+      "Petrol, Diesel, etc",
+      "Postal Services",
+      "Public Transport (Bodaboda/Bicycle)",
+      "Public Transport (Bus)",
+      "Public Transport (Others)",
+      "Public Transport (Taxi/Minibus)",
+      "Refuse Collection",
+      "Rent of Rented House",
+      "Sanitary Towels",
+      "Security Fees (Guard, LC Defense, Community Security)",
+      "Sports, Theaters, etc",
+      "Stamps, Envelopes, etc",
+      "Toilet Paper",
+      "Tooth Brush",
+      "Tooth Paste",
+      "Total Health Expenditure",
+      "Toys, Games, etc",
+      "Traditional Doctors Fees/Medicines",
+      "Tyres, Tubes, Spares, Brake Pads, etc",
+      "Washing Soap",
+      "Water (NWSC)",
+      "Water (Other Sources)",
+      "Water (Utility)"
+    ],
+    "content_hash": "afad9f8ddb18abe64b0d7e0e3836d6e0f58bfd7a60477027d893324f074bc732",
+    "dtypes": {
+      "Air Time (Fixed Phones)": "float64",
+      "Air Time (Mobile Phones)": "float64",
+      "Air Time/Services Fee (Owned Fixed/Mobile Phones)": "float64",
+      "Air Time/Services Fee (Phones not Owned)": "float64",
+      "Barber/Beauty Shops": "float64",
+      "Bathing Soap": "float64",
+      "Batteries (Dry cells)": "float64",
+      "Candles": "float64",
+      "Charcoal": "float64",
+      "Consultation Fees": "float64",
+      "Cosmetics (Body Lotion, Deodorant, etc)": "float64",
+      "Detergent": "float64",
+      "Diapers": "float64",
+      "Diesel": "float64",
+      "Dry Cleaning/Laundry": "float64",
+      "Electricity": "float64",
+      "Firewood": "float64",
+      "Fuels (Generators/Lawn Mower)": "float64",
+      "Handbags, Travel Bags, etc": "float64",
+      "Hospital/Clinic Charges": "float64",
+      "Hotels, Lodging, etc": "float64",
+      "Houseboys/girls, Shamba Boys, etc": "float64",
+      "Imputed Rent of Free House": "float64",
+      "Imputed Rent of Owned House": "float64",
+      "Internet Fees": "float64",
+      "Lubricants (Engine oil, Grease, Coolant, etc)": "float64",
+      "Maintenance/Repair (House)": "float64",
+      "Maintenance/Repair (Vehicles, Motorcycles, Bicycles)": "float64",
+      "Matches": "float64",
+      "Medicines": "float64",
+      "Mobile Money Charges": "float64",
+      "Newspapers/Magazines": "float64",
+      "Other Health/Medical Care": "float64",
+      "Other Non-Durable/Personal Goods": "float64",
+      "Other Rent/Fuel/Power": "float64",
+      "Other Transportation/Communication": "float64",
+      "Paraffin (Kerosene)": "float64",
+      "Petrol": "float64",
+      "Petrol, Diesel, etc": "float64",
+      "Postal Services": "float64",
+      "Public Transport (Bodaboda/Bicycle)": "float64",
+      "Public Transport (Bus)": "float64",
+      "Public Transport (Others)": "float64",
+      "Public Transport (Taxi/Minibus)": "float64",
+      "Refuse Collection": "float64",
+      "Rent of Rented House": "float64",
+      "Sanitary Towels": "float64",
+      "Security Fees (Guard, LC Defense, Community Security)": "float64",
+      "Sports, Theaters, etc": "float64",
+      "Stamps, Envelopes, etc": "float64",
+      "Toilet Paper": "float64",
+      "Tooth Brush": "float64",
+      "Tooth Paste": "float64",
+      "Total Health Expenditure": "float64",
+      "Toys, Games, etc": "float64",
+      "Traditional Doctors Fees/Medicines": "float64",
+      "Tyres, Tubes, Spares, Brake Pads, etc": "float64",
+      "Washing Soap": "float64",
+      "Water (NWSC)": "float64",
+      "Water (Other Sources)": "float64",
+      "Water (Utility)": "float64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      23991,
+      61
+    ]
+  },
+  "var/nutrition.parquet": {
+    "columns": [
+      "Calcium",
+      "Carbohydrate",
+      "Energy",
+      "Fiber",
+      "Folate",
+      "Iron",
+      "Niacin",
+      "Protein",
+      "Riboflavin",
+      "Thiamin",
+      "Vitamin A",
+      "Vitamin B-12",
+      "Vitamin B-6",
+      "Vitamin C",
+      "Zinc"
+    ],
+    "content_hash": "2dd84abc23d455c7f173651ba75113e830f46ecbe7f6b1734860780d6f58ba05",
+    "dtypes": {
+      "Calcium": "float64",
+      "Carbohydrate": "float64",
+      "Energy": "float64",
+      "Fiber": "float64",
+      "Folate": "float64",
+      "Iron": "float64",
+      "Niacin": "float64",
+      "Protein": "float64",
+      "Riboflavin": "float64",
+      "Thiamin": "float64",
+      "Vitamin A": "float64",
+      "Vitamin B-12": "float64",
+      "Vitamin B-6": "float64",
+      "Vitamin C": "float64",
+      "Zinc": "float64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      24166,
+      15
+    ]
+  },
+  "var/other_features.parquet": {
+    "columns": [
+      "Rural"
+    ],
+    "content_hash": "345f9346d6ae2abf821b41830287f5e4dcd9b4f7b48370fbdefba9a5c25a5b90",
+    "dtypes": {
+      "Rural": "int64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      24362,
+      1
+    ]
+  },
+  "var/shocks.parquet": {
+    "columns": [
+      "Duration",
+      "EffectedAssets",
+      "EffectedConsumption",
+      "EffectedIncome",
+      "EffectedProduction",
+      "HowCoped0",
+      "HowCoped1",
+      "HowCoped2",
+      "Onset",
+      "Shock",
+      "Year"
+    ],
+    "content_hash": "c8e438403607118ce89bb58bbb8aae767bc6ed89d276e40d1ed068f0ecfe853f",
+    "dtypes": {
+      "Duration": "float64",
+      "EffectedAssets": "boolean",
+      "EffectedConsumption": "boolean",
+      "EffectedIncome": "boolean",
+      "EffectedProduction": "boolean",
+      "HowCoped0": "string",
+      "HowCoped1": "string",
+      "HowCoped2": "string",
+      "Onset": "Int64",
+      "Shock": "string",
+      "Year": "Float64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "m"
+    ],
+    "shape": [
+      14457,
+      11
+    ]
+  }
+}

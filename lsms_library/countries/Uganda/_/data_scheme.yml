@@ -9,7 +9,7 @@ Data Scheme:
     Girls : int
 
   cluster_features:
-    index: (i,t,v)
+    index: (t,v)
   
   household_roster:
     index: (i, pid, t)
@@ -17,16 +17,20 @@ Data Scheme:
     Age: int
     Relation: str
 
-  shocks: # USE_MAKEFILE
-  earnings: # USE_MAKEFILE
-  food_acquired: # USE_MAKEFILE
-  nutrition: 
-  household_characteristics:
-  interview_date:
-  food_quantities:
-  food_expenditures: # USE_MAKEFILE
-  food_prices:
-  panel_ids:
-  income:
-  enterprise_income:
-  other_features:
+  shocks: !make
+  earnings: !make
+  food_acquired: !make
+  nutrition: !make
+  household_characteristics: !make
+  interview_date: !make
+  food_quantities: !make
+  food_expenditures: !make
+  food_prices: !make
+  panel_ids: !make
+  income: !make
+  enterprise_income: !make
+  other_features: !make
+  locality: !make
+  assets: !make
+  housing: !make
+  nonfood_expenditures: !make

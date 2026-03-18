@@ -1,5 +1,5 @@
 from lsms.tools import get_food_prices, get_food_expenditures, get_household_roster, get_household_identification_particulars
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 import numpy as np
 import pandas as pd
 import dvc.api
@@ -12,14 +12,18 @@ import types
 from pyarrow.lib import ArrowInvalid
 from functools import lru_cache
 from pathlib import Path
+import os
 from cfe.df_utils import df_to_orgtbl
 from importlib.resources import files
 from dvc.api import DVCFileSystem
 import pyreadstat
 import inspect
+from .paths import data_root, var_path, wave_data_path, COUNTRIES_ROOT
 
 # Initialize DVC filesystem once and reuse it
-DVCFS = DVCFileSystem(files('lsms_library')/'countries')
+_PACKAGE_ROOT = Path(__file__).resolve().parent
+_COUNTRIES_DIR = _PACKAGE_ROOT / "countries"
+DVCFS = DVCFileSystem(os.fspath(_COUNTRIES_DIR))
 
 def _to_numeric(x,coerce=False):
     try:
@@ -31,12 +35,59 @@ def _to_numeric(x,coerce=False):
         return x
     
 @lru_cache(maxsize=3)
+def _resolve_data_path(fn: str, stack_depth: int = 2) -> str:
+    """Rewrite a relative path to land under data_root when appropriate.
+
+    Handles two patterns:
+      - ``../var/foo.parquet`` from country-level scripts (Uganda/_/)
+      - bare ``foo.parquet`` from wave-level scripts (Uganda/2005-06/_/)
+
+    Always active so that data is always written outside the package tree.
+    """
+    fn_str = str(fn)
+    p = Path(fn_str)
+
+    # Only rewrite relative paths
+    if p.is_absolute():
+        return fn_str
+
+    try:
+        caller_file = Path(inspect.stack()[stack_depth].filename).resolve()
+        rel = caller_file.relative_to(COUNTRIES_ROOT)
+    except (IndexError, ValueError, TypeError):
+        return fn_str
+
+    parts = rel.parts  # e.g. ('Uganda', '_', 'food_acquired.py')
+                        #   or ('Uganda', '2005-06', '_', 'shocks.py')
+    if len(parts) < 2:
+        return fn_str
+
+    country = parts[0]
+
+    # Pattern 1: ../var/foo.parquet  (country-level script)
+    if fn_str.startswith("../var/"):
+        name = fn_str[len("../var/"):]
+        resolved = data_root(country) / "var" / name
+        resolved.parent.mkdir(parents=True, exist_ok=True)
+        return str(resolved)
+
+    # Pattern 2: bare filename from a wave-level script
+    if len(parts) >= 3 and parts[1] != "_" and "/" not in fn_str:
+        wave = parts[1]
+        resolved = data_root(country) / wave / "_" / fn_str
+        resolved.parent.mkdir(parents=True, exist_ok=True)
+        return str(resolved)
+
+    return fn_str
+
+
 def get_dataframe(fn,convert_categoricals=True,encoding=None,categories_only=False):
     """From a file named fn, try to return a dataframe.
 
     Hope is that caller can be agnostic about file type,
     or if file is local or on a dvc remote.
     """
+    fn = _resolve_data_path(fn)
 
     def local_file(fn):
     # Is the file local?
@@ -393,18 +444,18 @@ def age_sex_composition(fn,sex='sex',sex_converter=None,age='age',months_spent='
                                   sex_converter=sex_converter,months_converter=months_converter,
                                   Age_ints=Age_ints)
 
-    df.index.name = 'j'
+    df.index.name = 'i'  # Household ID
     df.columns.name = 'k'
-    
+
     return df
 
 
-def other_features(fn,urban=None,region=None,HHID='HHID',urban_converter=None):
+def other_features(fn,urban=None,region=None,v=None,HHID='HHID',urban_converter=None):
 
     with dvc.api.open(fn,mode='rb') as dta:
-        df = get_household_identification_particulars(fn=dta,HHID=HHID,urban=urban,region=region,urban_converter=urban_converter)
+        df = get_household_identification_particulars(fn=dta,HHID=HHID,urban=urban,region=region,v=v,urban_converter=urban_converter)
 
-    df.index.name = 'j'
+    df.index.name = 'i'  # Household ID
     df.columns.name = 'k'
 
     return df
@@ -576,13 +627,14 @@ def change_encoding(s,from_encoding,to_encoding='utf-8',errors='ignore'):
     """
     return bytes(s,encoding=from_encoding).decode(to_encoding,errors=errors)
 
-def to_parquet(df,fn):
+def to_parquet(df,fn,index=True):
     """
     Write df to parquet file fn.
 
     Parquet (pyarrow) is slightly more picky about data types and layout than is pandas;
     here we fix some possible problems before calling pd.DataFrame.to_parquet.
     """
+    fn = _resolve_data_path(fn)
     if len(df.shape)==0: # A series?  Need a dataframe.
         df = pd.DataFrame(df)
 
@@ -600,9 +652,19 @@ def to_parquet(df,fn):
     for column in all:
         if all[column].dtype=='O':
             all[column] = all[column].astype(str).astype('string[pyarrow]').replace('nan',None)
-    df = all.set_index(idxnames)
+    if index:
+        resolved_idxnames = []
+        for i, name in enumerate(idxnames):
+            if name is not None:
+                resolved_idxnames.append(name)
+            else:
+                resolved_idxnames.append(all.columns[i])
+        df = all.set_index(resolved_idxnames)
+        df.index.names = idxnames
+    else:
+        df = all
 
-    df.to_parquet(fn, engine='pyarrow')
+    df.to_parquet(fn, engine='pyarrow', index=index)
 
     return df
 
@@ -701,7 +763,7 @@ def panel_ids(Waves):
                 # If a transformation function is provided (tuple length 4), apply it to the old_id column
                 if len(wave_info) == 4:
                     df.loc[:,wave_info[2]] = df[wave_info[2]].apply(wave_info[3])
-                df['t'] = wave_year
+                df.loc[:,'t'] = wave_year
                 df = df.rename(columns={wave_info[1]: 'i', wave_info[2]: 'previous_i'})
                 df = df.set_index(['t', 'i'])[['previous_i']]
             dfs.append(df)
@@ -913,20 +975,39 @@ def map_index(df):
     Map index from old parquet file to new index used in data_info.yml
     -- March 11, 2025
     """
-    mapping_rules = {'w': 't'}
+    index_names = list(df.index.names) if isinstance(df.index, pd.MultiIndex) else [df.index.name]
+
+    mapping_rules = {}
+    if 'w' in index_names:
+        mapping_rules['w'] = 't'
+
     if 'u' in df.index.names:
         df = df.rename(index={k: 'unit' for k in ['<NA>', 'nan', np.nan]}, level='u')
 
+    if mapping_rules:
+        df = df.rename_axis(index=mapping_rules)
+        index_names = list(df.index.names) if isinstance(df.index, pd.MultiIndex) else [df.index.name]
 
-    mapping_rules.update({
-        'i': 'temp_j',
-        'j': 'i',
-        'previous_j': 'previous_i'
-    })
-    df_renamed = df.rename_axis(index=mapping_rules)
-    df_renamed = df_renamed.rename_axis(index = {'temp_j': 'j'})
-    
-    return df_renamed
+    needs_swap = False
+    if 'j' in index_names:
+        if 'i' not in index_names:
+            needs_swap = True
+        else:
+            try:
+                needs_swap = index_names.index('j') < index_names.index('i')
+            except ValueError:
+                needs_swap = True
+
+    if needs_swap:
+        swap_rules = {
+            'i': 'temp_j',
+            'j': 'i',
+            'previous_j': 'previous_i'
+        }
+        df = df.rename_axis(index=swap_rules)
+        df = df.rename_axis(index={'temp_j': 'j'})
+
+    return df
 
 
 import importlib.util

@@ -11,7 +11,7 @@ import pandas as pd
 import numpy as np
 from tanzania import Waves, waves, id_walk
 import dvc.api
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 import json
 
 z = {}

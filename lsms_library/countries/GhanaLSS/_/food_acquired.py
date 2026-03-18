@@ -6,7 +6,7 @@ different prices for different units.
 
 import pandas as pd
 import numpy as np
-from ghana import change_id, Waves, harmonized_food_labels
+from ghanalss import change_id, Waves, harmonized_food_labels
 import warnings
 import sys
 sys.path.append('../../_/')

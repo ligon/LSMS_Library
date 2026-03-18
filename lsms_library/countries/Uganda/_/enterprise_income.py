@@ -4,6 +4,7 @@ from lsms_library.local_tools import get_dataframe
 """
 Compile data on reported household assets.
 """
+import sys
 import pandas as pd
 import numpy as np
 from uganda import Waves, id_walk
@@ -12,7 +13,7 @@ import json
 x = {}
 
 for t in list(Waves.keys()):
-    print(t)
+    print(t, file=sys.stderr)
     x[t] = get_dataframe('../'+t+'/_/enterprise_income.parquet')
     x[t].columns.name = 'k'
     x[t]= x[t].stack().squeeze()
@@ -28,11 +29,11 @@ x = id_walk(x, updated_ids)
 try:
     of = get_dataframe('../var/other_features.parquet')
 
-    x = x.join(of.reset_index('m')['m'],on=['j','t'])
+    x = x.join(of.reset_index('m')['m'],on=['i','t'])
 
 except FileNotFoundError:
     x['m'] ='Uganda'
 
-x = x.reset_index().set_index(['j','t','m'])
+x = x.reset_index().set_index(['i','t','m'])
 
 to_parquet(x, '../var/enterprise_income.parquet')

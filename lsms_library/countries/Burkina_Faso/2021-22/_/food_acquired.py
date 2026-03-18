@@ -7,7 +7,7 @@ from lsms_library.local_tools import to_parquet
 import pandas as pd
 import numpy as np
 import dvc.api
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 
 #data recorded for two periods: seven days before the survey and thirty days before the survey.
 

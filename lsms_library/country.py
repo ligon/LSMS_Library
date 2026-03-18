@@ -6,7 +6,9 @@ from importlib.resources import files
 import importlib
 import cfe.regression as rgsn
 from collections import defaultdict
-from .local_tools import df_data_grabber, format_id, get_categorical_mapping, get_dataframe, map_index, get_formatting_functions, panel_ids, id_walk, all_dfs_from_orgfile
+from .local_tools import df_data_grabber, format_id, get_categorical_mapping, get_dataframe, map_index, get_formatting_functions, panel_ids, id_walk, all_dfs_from_orgfile, to_parquet
+from .paths import data_root
+from .yaml_utils import load_yaml
 import importlib.util
 import os
 import warnings
@@ -16,7 +18,168 @@ warnings.filterwarnings('ignore', category=FutureWarning)
 warnings.filterwarnings('ignore', category=UnicodeWarning)
 import subprocess
 import json
+from dataclasses import dataclass
+from functools import lru_cache
 from sys import stderr
+import sys
+from dvc.repo import Repo
+from dvc.exceptions import DvcException, PathMissingError
+from datetime import datetime
+from typing import Any, Iterable
+from contextlib import contextmanager, redirect_stdout
+
+JSON_CACHE_METHODS = {'panel_ids', 'updated_ids'}
+
+
+@contextmanager
+def _working_directory(path: Path):
+    """Temporarily switch the process working directory."""
+    previous = Path.cwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(previous)
+
+
+@contextmanager
+def _redirect_stdout_to_stderr():
+    """Silence DVC's stdout chatter by redirecting it to stderr."""
+    with redirect_stdout(stderr):
+        yield
+
+
+def _slugify(value: str) -> str:
+    return value.lower().replace(" ", "_").replace("-", "_")
+
+
+@dataclass(frozen=True)
+class StageInfo:
+    stage_key: str
+    stage_ref: str
+    country: str
+    wave: str | None
+    table: str
+    fmt: str
+    output_path: Path
+
+
+@lru_cache(maxsize=4)
+def _load_materialize_stage_map(dvc_root: str) -> dict[tuple[str, str | None, str], StageInfo]:
+    """
+    Load mapping from (country, wave, table) to StageInfo based on available dvc.yaml materialize foreach entries.
+    """
+    root_path = Path(dvc_root).resolve()
+    yaml_paths: set[Path] = set()
+
+    root_yaml = root_path / "dvc.yaml"
+    if root_yaml.exists():
+        yaml_paths.add(root_yaml.resolve())
+
+    for path in root_path.glob("**/dvc.yaml"):
+        if ".dvc" in path.parts:
+            continue
+        yaml_paths.add(path.resolve())
+
+    stage_map: dict[tuple[str, str | None, str], StageInfo] = {}
+
+    for yaml_path in sorted(yaml_paths):
+        if not yaml_path.is_file():
+            continue
+        with open(yaml_path, "r") as f:
+            data = yaml.safe_load(f) or {}
+
+        stages = data.get("stages", {})
+        materialize = stages.get("materialize", {})
+        foreach = materialize.get("foreach", {})
+        do_section = materialize.get("do", {})
+        outs = do_section.get("outs", [])
+        if not outs:
+            continue
+        out_entry = outs[0]
+        if isinstance(out_entry, dict):
+            out_template = out_entry.get("path")
+        else:
+            out_template = out_entry
+        if not out_template:
+            continue
+
+        for stage_key, params in foreach.items():
+            country = params.get("country")
+            wave = params.get("wave")
+            table = params.get("table")
+            fmt = params.get("format", "parquet")
+
+            if not country or not table:
+                continue
+
+            wave_value = wave or None
+
+            output_rel = params.get("output")
+            if not output_rel:
+                output_rel = (
+                    out_template
+                    .replace("${item.country}", country)
+                    .replace("${item.wave}", (wave or ""))
+                    .replace("${item.table}", table)
+                    .replace("${item.format}", fmt)
+                )
+            output_rel = output_rel.replace("//", "/").strip()
+            output_path = (yaml_path.parent / output_rel).resolve()
+
+            yaml_rel = yaml_path.relative_to(root_path)
+            stage_ref = f"{yaml_rel.as_posix()}:materialize@{stage_key}"
+
+            stage_map[(country, wave_value, table)] = StageInfo(
+                stage_key=stage_key,
+                stage_ref=stage_ref,
+                country=country,
+                wave=wave_value,
+                table=table,
+                fmt=fmt,
+                output_path=output_path,
+            )
+
+    return stage_map
+
+
+def _make_jobs_flag() -> str | None:
+    """
+    Determine an appropriate make -j flag based on environment or CPU count.
+    Returns the flag string (e.g. '-j4') or None if no parallelism is desired.
+    """
+    make_jobs = os.getenv("LSMS_MAKE_JOBS")
+    if make_jobs:
+        try:
+            jobs = int(make_jobs)
+        except ValueError:
+            jobs = None
+    else:
+        cpu_count = os.cpu_count() or 2
+        jobs = max(1, cpu_count // 2)
+
+    if jobs and jobs > 1:
+        return f"-j{jobs}"
+    return None
+
+
+def _log_issue(country: str, method: str, waves, error: Exception) -> None:
+    """
+    Append an issue entry to ISSUES.md capturing failures during cache/materialization.
+    """
+    issues_path = Path(__file__).resolve().parent / "ISSUES.md"
+    timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%SZ")
+    wave_info = ", ".join(waves) if isinstance(waves, (list, tuple)) and waves else "All waves"
+    entry = [
+        f"## {timestamp} {country} – {method}",
+        "",
+        f"- Waves: {wave_info}",
+        f"- Error: `{type(error).__name__}: {error}`",
+        "",
+    ]
+    issues_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(issues_path, "a", encoding="utf-8") as handle:
+        handle.write("\n".join(entry))
 
 class Wave:
     def __init__(self,  year, wave_folder, country: 'Country'):
@@ -29,17 +192,47 @@ class Wave:
 
     def __getattr__(self, method_name):
         '''
-        This method is triggered when an attribute is not found in the instance, but exists in the `data_scheme`. 
+        This method is triggered when an attribute is not found in the instance, but exists in the `data_scheme`.
         It dynamically generates a method to aggregate data for the requested attribute.
 
-        For example, if a user calls `country_instance.food_acquired()` and `food_acquired` is part of the `data_scheme` but not an existing method, 
+        For example, if a user calls `country_instance.food_acquired()` and `food_acquired` is part of the `data_scheme` but not an existing method,
         the method will dynamically create a function to handle data aggregation for `food_acquired`.
         '''
-        if method_name in self.data_scheme or method_name in self.country.data_scheme:
-            def method():
-                return self.grab_data(method_name)
-            return method
-        raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{method_name}'")
+        def _property_value(instance, prop_name):
+            """
+            Retrieve a property directly from the class descriptor to avoid
+            triggering __getattr__ on the instance.
+            """
+            prop = getattr(type(instance), prop_name, None)
+            if isinstance(prop, property):
+                return prop.__get__(instance, type(instance))
+            raise AttributeError(f"'{instance.__class__.__name__}' object has no attribute '{prop_name}'")
+
+        # Allow direct data_scheme access even if __getattr__ is re-entered for it.
+        if method_name == 'data_scheme':
+            return _property_value(self, 'data_scheme')
+
+        # Prevent infinite recursion for properties that themselves rely on __getattr__
+        if '_in_getattr' in self.__dict__:
+            if method_name in ('resources', 'file_path', 'formatting_functions'):
+                raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{method_name}'")
+
+        # Resolve scheme membership without triggering __getattr__
+        wave_scheme = _property_value(self, 'data_scheme')
+        country_scheme = _property_value(self.country, 'data_scheme')
+
+        # Set flag to track that we're inside __getattr__
+        self.__dict__['_in_getattr'] = True
+        try:
+            if method_name in wave_scheme or method_name in country_scheme:
+                def method():
+                    return self.grab_data(method_name)
+                return method
+            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{method_name}'")
+        finally:
+            # Always clear flag when exiting, even if exception raised
+            # Use __dict__.pop() to avoid triggering __getattr__
+            self.__dict__.pop('_in_getattr', None)
         
     @property
     def file_path(self):
@@ -53,7 +246,7 @@ class Wave:
             # warnings.warn(f"File not found: {info_path}")
             return {}
         with open(info_path, 'r') as file:
-            return yaml.safe_load(file)
+            return load_yaml(file)
     
     @property
     def data_scheme(self):
@@ -84,15 +277,24 @@ class Wave:
     
     def column_mapping(self, request, data_info = None):
         """
-        Retrieve column mappings for a given dataset request.And map into dictionary to be ready for df_data_grabber
+        Retrieve column mappings for a given dataset request and map into a 
+        dictionary to be ready for df_data_grabber.
+
         Input:
-            request: str, the request data name in data_scheme (e.g. 'cluster_features', 'household_roster', 'food_acquired', 'interview_date')
+                request: str, the request data name in data_scheme 
+                (e.g. 'cluster_features', 'household_roster', 'food_acquired', 
+                'interview_date')
+
         Output:
-            final_mapping: dict, {file_name: {'idxvars': idxvar_dic, 'myvars': myvars_dic}}
+                final_mapping: dict, {file_name: {'idxvars': idxvar_dic, 
+                'myvars': myvars_dic}}
+
         Example:
-            {'data_file.dta': {'idxvars': {'cluster': ('cluster', <function format_id at 0x7f7f5b3f6c10>)},
-                              'myvars': {'region': ('region', <function format_id at 0x7f7f5b3f6c10>),
-                                         'urban': ('urban', <function format_id at 0x7f7f5b3f6c10>)}}}
+                {'data_file.dta': {'idxvars': {'cluster': ('cluster', 
+                <function format_id at 0x7f7f5b3f6c10>)}), 
+                'myvars': {'region': ('region', <function format_id 
+                at 0x7f7f5b3f6c10>), 
+                'urban': ('urban', <function format_id at 0x7f7f5b3f6c10>)}}}
         """
         # data_info = self.resources[request]
         
@@ -170,6 +372,7 @@ class Wave:
                     final_mapping[i] = {'idxvars': idxvars_updated, 'myvars': myvars_updated}
                 
             return final_mapping
+        
     @property
     def categorical_mapping(self):
         org_fn = self.file_path / "_" / "categorical_mapping.org"
@@ -179,6 +382,24 @@ class Wave:
             return {}
         else:
             return dic.update(all_dfs_from_orgfile(org_fn))
+
+    @property
+    def license(self):
+        license_path = self.file_path / "Documentation" / "LICENSE.org"
+        if license_path.exists():
+            with open(license_path, 'r') as file:
+                return file.read()
+        warnings.warn(f"License file not found: {license_path}")
+        return ""
+
+    @property
+    def data_source(self):
+        source_path = self.file_path / "Documentation" / "SOURCE.org"
+        if source_path.exists():
+            with open(source_path, 'r') as file:
+                return file.read()
+        warnings.warn(f"Data source not found: {source_path}")
+        return ""
 
     @property
     def mapping(self):
@@ -211,7 +432,35 @@ class Wave:
             df_edit_function = mapping_info.pop('df_edit')
             dfs = []
             for file, mappings in mapping_info.items():
-                df = df_data_grabber(f'./{self.folder}/Data/{file}', mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat)
+                data_path = self.file_path / "Data" / file
+                candidates: list[str] = []
+
+                try:
+                    candidates.append(os.path.relpath(data_path, Path.cwd()))
+                except ValueError:
+                    pass
+
+                try:
+                    dvc_root = self.file_path.parents[1]
+                    relative_path = data_path.relative_to(dvc_root)
+                    candidates.append(str(relative_path))
+                except ValueError:
+                    pass
+
+                candidates.append(str(data_path))
+
+                last_error: Exception | None = None
+                for candidate in dict.fromkeys(candidates):
+                    try:
+                        df = df_data_grabber(candidate, mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat)
+                        break
+                    except (FileNotFoundError, PathMissingError) as error:
+                        last_error = error
+                        continue
+                else:
+                    if last_error is not None:
+                        raise last_error
+                    raise FileNotFoundError(f"Unable to locate data file for {file} in {self.file_path}")
                 df = check_adding_t(df)
                 # Oddity with large number for missing code
                 na = df.select_dtypes(exclude=['object', 'datetime64[ns]']).max().max()
@@ -256,7 +505,10 @@ class Wave:
             print(f"Attempting to generate using Makefile...", flush=True,file=stderr)
             #cluster features in the old makefile is called 'other_features'
             # if request =='cluster_features': request = 'other_features'
-            parquet_fn = self.file_path/"_"/ f"{request}.parquet"
+            # Use in-tree path for Make target, but look for output at data_root too
+            intree_parquet = self.file_path / "_" / f"{request}.parquet"
+            country_name = self.country.name
+            external_parquet = data_root(country_name) / self.year / "_" / f"{request}.parquet"
 
             makefile_path = self.file_path.parent /'_'/ "Makefile"
             if not makefile_path.exists():
@@ -264,17 +516,28 @@ class Wave:
                 return pd.DataFrame()
 
             cwd_path = self.file_path.parent / "_"
-            relative_parquet_path = parquet_fn.relative_to(cwd_path.parent)  # Convert to relative path
-            subprocess.run(["make", "-s", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True)
+            relative_parquet_path = intree_parquet.relative_to(cwd_path.parent)
+            env = os.environ.copy()
+            env["LSMS_DATA_DIR"] = str(data_root())
+            subprocess.run(["make", "-s", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True, env=env)
             print(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...",file=stderr)
 
-            if not parquet_fn.exists():
-                print(f"Parquet file {parquet_fn} still missing after running Makefile.",file=stderr)
+            # Check external data_root first, then in-tree fallback
+            parquet_fn = None
+            for candidate in [external_parquet, intree_parquet]:
+                if candidate.exists():
+                    parquet_fn = candidate
+                    break
+
+            if parquet_fn is None:
+                print(f"Parquet file for {request} still missing after running Makefile.",file=stderr)
                 return pd.DataFrame()
-            
+
             df = pd.read_parquet(parquet_fn)
+
+        if isinstance(df, pd.DataFrame):
             df = map_index(df)
-    
+        
         df = check_adding_t(df)
         df = df[df.index.get_level_values('t') == self.year]
         return df
@@ -330,12 +593,15 @@ class Country:
     #                 'nonfood_expenditures.parquet', 'enterprise_income.parquet', 'assets.parquet',
     #                 'earnings.parquet', 'housing.parquet', 'income.parquet', 'fct.parquet', 'nutrition.parquet']
 
-    def __init__(self, country_name, preload_panel_ids=True, verbose=False):
+    def __init__(self, country_name, preload_panel_ids=False, verbose=False, use_parquet=False):
         self.name = country_name
         self._panel_ids_cache = None
         self._updated_ids_cache = None
         self.wave_folder_map = {}
-        if preload_panel_ids:
+        self.use_parquet = use_parquet
+        scheme_map = self.resources.get("Data Scheme") if isinstance(self.resources, dict) else {}
+        has_panel_ids = isinstance(scheme_map, dict) and "panel_ids" in scheme_map
+        if preload_panel_ids and has_panel_ids:
             print(f"Preloading panel_ids for {self.name}...",file=stderr)
             #ignore all the warnings
             with warnings.catch_warnings():
@@ -344,8 +610,7 @@ class Country:
 
     @property
     def file_path(self):
-        var = files("lsms_library") / "countries" / self.name
-        return var
+        return Path(__file__).resolve().parent / "countries" / self.name
 
     @property
     def resources(self):
@@ -353,7 +618,22 @@ class Country:
         if not var.exists():
             return {}
         with open(var, 'r') as file:
-            return yaml.safe_load(file)
+            return load_yaml(file)
+
+    def _materialization_entry(self, method_name: str) -> dict[str, Any]:
+        """
+        Retrieve materialization metadata for a dataset from the country-level data scheme.
+        """
+        resources = self.resources
+        if not isinstance(resources, dict):
+            return {}
+        scheme_map = resources.get("Data Scheme")
+        if not isinstance(scheme_map, dict):
+            return {}
+        entry = scheme_map.get(method_name)
+        if isinstance(entry, dict):
+            return entry
+        return {}
     
     @property
     def formatting_functions(self):
@@ -381,6 +661,35 @@ class Country:
     def mapping(self):
         return {**self.categorical_mapping, **self.formatting_functions}
     
+    def _resolve_materialize_stages(self, method_name: str, waves) -> list[StageInfo]:
+        """
+        Resolve materialize stage information for the given method and waves.
+        Returns an empty list if no matching stages are registered.
+        """
+        try:
+            stage_map = _load_materialize_stage_map(str(self.file_path.parent))
+        except FileNotFoundError:
+            return []
+
+        resolved: list[StageInfo] = []
+
+        for wave in waves:
+            key = (self.name, wave, method_name)
+            info = stage_map.get(key)
+            if not info:
+                key = (self.name, None, method_name)
+                info = stage_map.get(key)
+            if not info:
+                return []
+            resolved.append(info)
+
+        if not resolved:
+            info = stage_map.get((self.name, None, method_name))
+            if info:
+                resolved.append(info)
+
+        return resolved
+
     @property
     def waves(self):
         """List of names of waves available for country.
@@ -444,7 +753,144 @@ class Country:
             return Wave(year, wave_folder, self)
         else:
             raise KeyError(f"{year} is not a valid wave for {self.name}")
+
+    def _location_lookup(self) -> pd.DataFrame:
+        """
+        Return a cached lookup table that maps (i, t) -> m so tables missing the
+        region index can inherit it from other_features.
+        """
+
+        cache = getattr(self, "_location_level_cache", None)
+        if isinstance(cache, pd.DataFrame):
+            return cache
+        if cache is False:
+            raise RuntimeError(getattr(self, "_location_lookup_error", "Location metadata unavailable."))
+
+        if getattr(self, "_location_lookup_inflight", False):
+            raise RuntimeError("Location lookup already in progress.")
+
+        location_path = data_root(self.name) / "var" / "other_features.parquet"
+        if location_path.exists():
+            location_df = get_dataframe(location_path)
+        else:
+            self._location_lookup_inflight = True
+            try:
+                location_df = self.other_features()
+            finally:
+                self._location_lookup_inflight = False
+
+        if not isinstance(location_df, pd.DataFrame) or location_df.empty:
+            self._location_level_cache = False
+            self._location_lookup_error = "other_features returned no data."
+            raise RuntimeError(self._location_lookup_error)
+
+        if not isinstance(location_df.index, pd.MultiIndex) or "m" not in location_df.index.names:
+            self._location_level_cache = False
+            self._location_lookup_error = "other_features is missing the 'm' index."
+            raise RuntimeError(self._location_lookup_error)
+
+        index_frame = location_df.index.to_frame(index=False)
+        if "i" not in index_frame.columns:
+            if "j" in index_frame.columns:
+                index_frame = index_frame.rename(columns={"j": "i"})
+        if "i" not in index_frame.columns:
+            self._location_level_cache = False
+            self._location_lookup_error = "Unable to identify household id column in other_features index."
+            raise RuntimeError(self._location_lookup_error)
+
+        mapping = index_frame[["i", "t", "m"]].drop_duplicates(subset=["i", "t"])
+        self._location_level_cache = mapping
+        return mapping
+
+    def _augment_index_from_related_tables(
+        self,
+        df: pd.DataFrame,
+        scheme_entry: dict[str, Any] | None,
+        wave: str | None,
+    ) -> pd.DataFrame:
+        """
+        Attach missing index levels (currently 'm') by borrowing metadata from
+        related tables such as other_features.
+        """
+
+        declared = _declared_index_levels(scheme_entry)
+        if not declared or "m" not in declared:
+            return df
+
+        if not isinstance(df.index, pd.MultiIndex):
+            return df
+
+        current_names = [name for name in df.index.names if name is not None]
+        if "m" in current_names:
+            return df
+
+        df_reset = df.reset_index()
+        if "t" not in df_reset.columns:
+            if wave is None:
+                return df
+            df_reset["t"] = wave
+
+        household_col = next((candidate for candidate in ("i", "j", "household_id") if candidate in df_reset.columns), None)
+        if household_col is None:
+            return df
+
+        try:
+            lookup = self._location_lookup()
+        except RuntimeError as exc:
+            raise KeyError(f"Missing spatial index 'm' and unable to derive it: {exc}") from exc
+
+        join_lookup = lookup
+        if household_col != "i":
+            join_lookup = lookup.rename(columns={"i": household_col})
+
+        merged = df_reset.merge(
+            join_lookup[[household_col, "t", "m"]],
+            on=[household_col, "t"],
+            how="left",
+        )
+
+        if merged["m"].isna().any():
+            missing_pairs = merged.loc[merged["m"].isna(), [household_col, "t"]].drop_duplicates()
+            sample = missing_pairs.head().to_dict("records")
+            warnings.warn(
+                f"Missing region metadata for {len(missing_pairs)} households while materializing {household_col}/m; sample={sample}"
+            )
+
+        return merged.set_index(df.index.names)
     
+
+    def _finalize_result(self, df: Any, scheme_entry: dict[str, Any], method_name: str):
+        """
+        Apply final harmonization steps (index augmentation, normalization, id walk)
+        before returning a dataset to callers.
+        """
+        if isinstance(df, dict):
+            return df
+
+        if isinstance(df, pd.DataFrame):
+            df = self._augment_index_from_related_tables(df, scheme_entry, None)
+            df = _normalize_dataframe_index(df, scheme_entry, None)
+
+            if isinstance(df.index, pd.MultiIndex):
+                index_names = list(df.index.names)
+                preferred = ['i', 't', 'm']
+                desired_order = [name for name in preferred if name in index_names]
+                desired_order += [name for name in index_names if name not in desired_order]
+                if desired_order != index_names:
+                    try:
+                        df = df.reorder_levels(desired_order)
+                    except Exception:
+                        pass
+
+            if (
+                'i' in df.index.names
+                and not df.attrs.get('id_converted')
+                and method_name not in ['panel_ids', 'updated_ids']
+                and self._updated_ids_cache is not None
+            ):
+                df = id_walk(df, self.updated_ids)
+
+        return df
 
     def _aggregate_wave_data(self, waves=None, method_name=None):
         """Aggregates data across multiple waves using a single dataset method.
@@ -458,6 +904,30 @@ class Country:
 
         if waves is None:
             waves = self.waves
+
+        scheme_entry = self._materialization_entry(method_name)
+        materialize_backend = None
+        if isinstance(scheme_entry, dict):
+            backend_value = scheme_entry.get("materialize")
+            if isinstance(backend_value, str):
+                materialize_backend = backend_value.lower()
+
+        prefer_parquet_cache = bool(getattr(self, "use_parquet", False)) and method_name not in JSON_CACHE_METHODS
+        if prefer_parquet_cache:
+            parquet_path = data_root(self.name) / "var" / f"{method_name}.parquet"
+            if parquet_path.exists():
+                df_cached = get_dataframe(parquet_path)
+                df_cached = map_index(df_cached)
+                return self._finalize_result(df_cached, scheme_entry, method_name)
+
+        if (
+            self._updated_ids_cache is None
+            and method_name not in ("panel_ids", "updated_ids")
+        ):
+            try:
+                _ = self.updated_ids
+            except Exception:
+                pass
 
         def safe_concat_dataframe_dict(df_dict):
             # Get the target index name order from the first DataFrame
@@ -474,68 +944,461 @@ class Country:
 
             return pd.concat(aligned_dfs.values(), axis=0, sort=False)  
 
+        def run_make_target(method_name: str, wave: str | None = None):
+            """
+            Execute legacy Makefile targets either at the country level or for a specific wave.
+            """
+            base_path = self.file_path if wave is None else self[wave].file_path
+            repo_root = self.file_path.parent
+            candidate_make_dirs: list[Path] = []
+            if wave is not None:
+                candidate_make_dirs.append(base_path / "_")
+            candidate_make_dirs.append(self.file_path / "_")
+
+            makefile_dir = next((d for d in candidate_make_dirs if (d / "Makefile").exists()), None)
+            makefile_path = makefile_dir / "Makefile" if makefile_dir else None
+
+            script_candidates: list[Path] = []
+            if wave is not None:
+                script_candidates.append(base_path / "_" / f"{method_name}.py")
+            script_candidates.append(self.file_path / "_" / f"{method_name}.py")
+            script_path = next((p for p in script_candidates if p.exists()), None)
+
+            output_candidates: list[Path] = []
+            if method_name in JSON_CACHE_METHODS:
+                if wave is not None:
+                    output_candidates.append(base_path / "_" / f"{method_name}.json")
+                output_candidates.append(self.file_path / "_" / f"{method_name}.json")
+            else:
+                # Check data_root (external) first, then in-tree as fallback
+                if wave is not None:
+                    output_candidates.append(data_root(self.name) / wave / "_" / f"{method_name}.parquet")
+                    output_candidates.append(base_path / "var" / f"{method_name}.parquet")
+                    output_candidates.append(base_path / "_" / f"{method_name}.parquet")
+                output_candidates.append(data_root(self.name) / "var" / f"{method_name}.parquet")
+                output_candidates.append(self.file_path / "var" / f"{method_name}.parquet")
+                output_candidates.append(self.file_path / "_" / f"{method_name}.parquet")
+
+            # deduplicate while preserving order
+            unique_candidates: list[Path] = []
+            seen: set[Path] = set()
+            for cand in output_candidates:
+                if cand in seen:
+                    continue
+                seen.add(cand)
+                unique_candidates.append(cand)
+
+            if makefile_path is None and script_path is None:
+                warnings.warn(f"No Makefile or script found for {self.name}/{wave or '_'} {method_name}.")
+                return pd.DataFrame()
+
+            cwd_path = makefile_dir if makefile_dir is not None else script_path.parent
+            if method_name in JSON_CACHE_METHODS:
+                target_path = unique_candidates[0]
+            else:
+                target_path = unique_candidates[0]
+
+            target_path.parent.mkdir(parents=True, exist_ok=True)
+
+            def build_env() -> dict[str, str]:
+                env = os.environ.copy()
+                bin_dir = os.path.dirname(sys.executable)
+                env["PATH"] = bin_dir + os.pathsep + env.get("PATH", "")
+                pythonpath = env.get("PYTHONPATH", "")
+                if str(repo_root) not in pythonpath.split(os.pathsep):
+                    pythonpath = f"{repo_root}{os.pathsep}{pythonpath}" if pythonpath else str(repo_root)
+                env["PYTHONPATH"] = pythonpath
+                env.setdefault("PYTHON", sys.executable)
+                # Ensure subprocess scripts also redirect data paths
+                env["LSMS_DATA_DIR"] = str(data_root())
+                return env
+
+            def try_make(make_dir: Path) -> Path | None:
+                if make_dir is None or not (make_dir / "Makefile").exists():
+                    return None
+                makefile = make_dir / "Makefile"
+                # Build Make targets using data_root() paths (primary) since
+                # Makefiles now default VAR_DIR to data_root().  Fall back to
+                # in-tree paths only if needed.  Use absolute paths directly
+                # as Make handles them fine.
+                make_targets = []
+                if method_name in JSON_CACHE_METHODS:
+                    make_targets.append(self.file_path / "_" / f"{method_name}.json")
+                else:
+                    # data_root() targets first (matches Makefile VAR_DIR default)
+                    if wave is not None:
+                        make_targets.append(data_root(self.name) / wave / "_" / f"{method_name}.parquet")
+                    make_targets.append(data_root(self.name) / "var" / f"{method_name}.parquet")
+                    # In-tree fallbacks
+                    if wave is not None:
+                        make_targets.append(base_path / "_" / f"{method_name}.parquet")
+                    make_targets.append(self.file_path / "var" / f"{method_name}.parquet")
+                    make_targets.append(self.file_path / "_" / f"{method_name}.parquet")
+
+                for target in make_targets:
+                    make_cmd = ["make", "-s"]
+                    jobs_flag = _make_jobs_flag()
+                    if jobs_flag:
+                        make_cmd.append(jobs_flag)
+                    make_cmd.append(str(target))
+                    try:
+                        subprocess.run(make_cmd, cwd=make_dir, check=True, env=build_env())
+                        print(f"Makefile executed successfully for {self.name}/{wave or 'ALL'}. Rechecking for {method_name}...", file=stderr)
+                    except (subprocess.CalledProcessError, FileNotFoundError) as error:
+                        warnings.warn(f"Makefile execution failed for {self.name}/{wave or '_'} {method_name}: {error}")
+                        continue
+                    # Check all candidate locations (data_root + in-tree)
+                    for candidate in unique_candidates:
+                        if candidate.exists():
+                            return candidate
+                return None
+
+            def try_script(script: Path) -> Path | None:
+                if script is None or not script.exists():
+                    return None
+                python_bin = sys.executable or "python3"
+                try:
+                    subprocess.run([python_bin, str(script)], cwd=script.parent, check=True, env=build_env())
+                    print(f"Python fallback executed for {script.parent.name}.{method_name}.", file=stderr)
+                except subprocess.CalledProcessError as error:
+                    warnings.warn(f"Python fallback failed for {script}: {error}")
+                    return None
+                for candidate in unique_candidates:
+                    if candidate.exists():
+                        return candidate
+                return None
+
+            output_path: Path | None = None
+            if makefile_path is not None:
+                output_path = try_make(makefile_path.parent)
+
+            if output_path is None and script_path is not None:
+                output_path = try_script(script_path)
+
+            if output_path is None:
+                print(f"Data file {target_path} still missing after running fallbacks.", file=stderr)
+                return pd.DataFrame()
+
+            if output_path.suffix == ".json":
+                with open(output_path, "r", encoding="utf-8") as json_file:
+                    return json.load(json_file)
+
+            df_local = get_dataframe(str(output_path))
+            df_local = map_index(df_local)
+            return df_local
+
+            return pd.DataFrame()
+
         def load_from_waves(waves):
             results = {}
             for w in waves:
-                try:
-                    results[w] = getattr(self[w], method_name)()
-                except KeyError as e:
-                    warnings.warn(str(e))
+                wave_obj = self[w]
+                wave_has_table = method_name in wave_obj.data_scheme
+                wave_result = None
+
+                if wave_has_table:
+                    try:
+                        wave_result = getattr(wave_obj, method_name)()
+                    except (KeyError, AttributeError) as error:
+                        warnings.warn(str(error))
+
+                use_legacy = wave_has_table and (
+                    wave_result is None
+                    or (isinstance(wave_result, pd.DataFrame) and wave_result.empty)
+                )
+
+                if use_legacy:
+                    wave_result = run_make_target(method_name, wave=w)
+
+                if isinstance(wave_result, pd.DataFrame):
+                    if (
+                        'i' in wave_result.index.names
+                        and not wave_result.attrs.get('id_converted')
+                        and self._updated_ids_cache is not None
+                    ):
+                        wave_result = id_walk(wave_result, self.updated_ids)
+                    wave_result = self._augment_index_from_related_tables(
+                        wave_result,
+                        scheme_entry,
+                        w,
+                    )
+                    wave_result = _normalize_dataframe_index(wave_result, scheme_entry, w)
+
+                if wave_result is None and not wave_has_table:
+                    continue
+                if isinstance(wave_result, pd.DataFrame) and wave_result.empty:
+                    continue
+                if wave_result is None:
+                    continue
+
+                results[w] = wave_result
+
             if results:
-                #using safe_concat_dataframe_dict only if more than 2 not empty DataFrames
-                non_empty_df = {k:df for k,df in results.items() if not df.empty}
-                if len(non_empty_df) > 1: # Why not 2, per comment above?
+                if method_name in JSON_CACHE_METHODS:
+                    dict_payloads = {k: v for k, v in results.items() if isinstance(v, dict)}
+                    df_payloads = {k: v for k, v in results.items() if isinstance(v, pd.DataFrame)}
+                    if dict_payloads and not df_payloads:
+                        combined: dict[str, Any] = {}
+                        combined.update(dict_payloads)
+                        return combined
+                    results = {k: v for k, v in df_payloads.items() if not v.empty}
+                    if not results:
+                        return pd.DataFrame()
+
+                non_empty_df = {k: df for k, df in results.items() if not df.empty}
+                if not non_empty_df:
+                    return pd.DataFrame()
+                if len(non_empty_df) > 1:
                     return safe_concat_dataframe_dict(non_empty_df)
-                else:
-                    return pd.concat(non_empty_df.values(), axis=0, sort=False)
+                return pd.concat(non_empty_df.values(), axis=0, sort=False)
+
+            country_fallback = run_make_target(method_name, wave=None)
+            if isinstance(country_fallback, dict):
+                if country_fallback:
+                    return country_fallback
+                return {}
+            if isinstance(country_fallback, pd.DataFrame):
+                return country_fallback
+
             raise KeyError(f"No data found for {method_name} in any wave of {self.name}.")
 
-        def load_from_makefile(method_name):
-            """
-            Load data from Makefile if it exists.
-            """
-            makefile_path = self.file_path / "_" / "Makefile"
-            if not makefile_path.exists():
-                warnings.warn(f"Makefile not found in {makefile_path}. Unable to generate required data.")
-                return pd.DataFrame()
+        def load_json_cache(method_name):
+            cache_path = data_root(self.name) / "_" / f"{method_name}.json"
+            # Also check in-tree for legacy caches, and parquet variants
+            candidates = [
+                cache_path,
+                self.file_path / "_" / f"{method_name}.json",
+                data_root(self.name) / "_" / f"{method_name}.parquet",
+                self.file_path / "_" / f"{method_name}.parquet",
+            ]
+            for candidate in candidates:
+                if candidate.exists():
+                    print(f"Reading {method_name} from cache {candidate}", file=stderr)
+                    if candidate.suffix == ".json":
+                        with open(candidate, 'r') as json_file:
+                            return json.load(json_file)
+                    else:
+                        df = get_dataframe(candidate)
+                        # Convert back to dict format expected by panel_ids consumers
+                        if hasattr(df, 'to_dict'):
+                            return df
+                        return df
 
-            cwd_path = self.file_path / "_"
-            if method_name in ['panel_ids', 'updated_ids']:
-                target_path = self.file_path / "_" / f"{method_name}.json"
-                relative_path = target_path.relative_to(cwd_path)
-                make_target = str(relative_path)
+            try:
+                make_cmd = ["make", "-s"]
+                jobs_flag = _make_jobs_flag()
+                if jobs_flag:
+                    make_cmd.append(jobs_flag)
+                make_cmd.append(f"{method_name}.json")
+                subprocess.run(make_cmd, cwd=self.file_path / "_", check=True)
+            except (subprocess.CalledProcessError, FileNotFoundError) as error:
+                print(f"Makefile build failed for {method_name}: {error}. Falling back to wave aggregation.", file=stderr)
+                result = load_from_waves(waves)
             else:
-                target_path = self.file_path / "var" / f"{method_name}.parquet"
-                relative_path = target_path.relative_to(cwd_path.parent)
-                make_target = '../' + str(relative_path)
+                result = run_make_target(method_name)
 
-            subprocess.run(["make", "-s", make_target], cwd=cwd_path, check=True)
-            print(f"Makefile executed successfully for {self.name}. Rechecking for {target_path.name}...",file=stderr)
+            if isinstance(result, dict):
+                cache_path.parent.mkdir(parents=True, exist_ok=True)
+                with open(cache_path, 'w') as json_file:
+                    json.dump(result, json_file)
+                print(f"Writing {method_name} to cache {cache_path}", file=stderr)
+            elif isinstance(result, pd.DataFrame):
+                parquet_path = data_root(self.name) / "_" / f"{method_name}.parquet"
+                parquet_path.parent.mkdir(parents=True, exist_ok=True)
+                to_parquet(result, parquet_path)
+                if cache_path.exists():
+                    try:
+                        cache_path.unlink()
+                    except OSError:
+                        pass
+                print(f"Writing {method_name} to cache {parquet_path}", file=stderr)
+            return result
 
-            if not target_path.exists():
-                print(f"Data file {target_path} still missing after running Makefile.",file=stderr)
-                return pd.DataFrame()
+        def load_dataframe_with_dvc(method_name):
+            """
+            Load data using DVC materialize stages. Falls back to load_from_waves if stages are missing.
+            """
+            cache_path = data_root(self.name) / "var" / f"{method_name}.parquet"
+            cache_exists = cache_path.exists()
 
-            if target_path.suffix == '.json':
-                with open(target_path, 'r') as json_file:
-                    return json.load(json_file)
-            else:
-                df = get_dataframe(target_path)
+            # Fast path: if a cached parquet exists at data_root, read it directly
+            if cache_exists:
+                print(f"Reading {method_name} from cache {cache_path}", file=stderr)
+                df = get_dataframe(cache_path)
                 df = map_index(df)
-            return df
-        
-        if self.resources.get('Data Scheme').get(method_name, None):
+                return df
+
+            dvc_root = self.file_path.parent
+
+            repo: Repo | None = None
+            try:
+                with _working_directory(dvc_root):
+                    repo = Repo(str(dvc_root))
+
+                    stage_infos = self._resolve_materialize_stages(method_name, waves)
+                    if not stage_infos:
+                        df = load_from_waves(waves)
+                        if isinstance(df, pd.DataFrame):
+                            cache_path.parent.mkdir(parents=True, exist_ok=True)
+                            to_parquet(df, cache_path)
+                            print(f"Writing {method_name} to cache {cache_path}", file=stderr)
+                        return df
+
+                    deduped_infos: list[StageInfo] = []
+                    seen_refs: set[str] = set()
+                    for info in stage_infos:
+                        if info.stage_ref in seen_refs:
+                            continue
+                        seen_refs.add(info.stage_ref)
+                        deduped_infos.append(info)
+                    stage_infos = deduped_infos
+
+                    def collect_stage_outputs(stage_list):
+                        stage_results: dict[str, pd.DataFrame] = {}
+                        for stage in stage_list:
+                            if stage.fmt != "parquet":
+                                raise ValueError(f"Unsupported format {stage.fmt} for {method_name}")
+                            output_path = stage.output_path
+                            if output_path.exists():
+                                df_wave = get_dataframe(output_path)
+                                df_wave = map_index(df_wave)
+                                df_wave = self._augment_index_from_related_tables(
+                                    df_wave,
+                                    scheme_entry,
+                                    stage.wave,
+                                )
+                                df_wave = _normalize_dataframe_index(df_wave, scheme_entry, stage.wave)
+                                stage_results[stage.wave or "ALL"] = df_wave
+                        return stage_results
+
+                    def consolidate_stage_outputs(stage_results: dict[str, pd.DataFrame]) -> pd.DataFrame | None:
+                        if not stage_results:
+                            return None
+                        non_empty_df = {k: v for k, v in stage_results.items() if not v.empty}
+                        if not non_empty_df:
+                            combined_df = pd.concat(stage_results.values(), axis=0, sort=False)
+                        elif len(non_empty_df) > 1:
+                            combined_df = safe_concat_dataframe_dict(non_empty_df)
+                        else:
+                            combined_df = next(iter(non_empty_df.values()))
+                        cache_path.parent.mkdir(parents=True, exist_ok=True)
+                        to_parquet(combined_df, cache_path)
+                        print(f"Writing {method_name} to cache {cache_path}", file=stderr)
+                        return combined_df
+
+                    def _load_stage(stage_ref: str):
+                        file_part, stage_name = stage_ref.split(":", 1)
+                        return repo.stage.load_one(file_part, stage_name)
+
+                    loaded_stages = []
+                    dirty = True
+                    try:
+                        for info in stage_infos:
+                            stage = _load_stage(info.stage_ref)
+                            loaded_stages.append(stage)
+                        with repo.lock, _redirect_stdout_to_stderr():
+                            stage_status = [
+                                stage.status(check_updates=False)
+                                for stage in loaded_stages
+                            ]
+                        dirty = any(stage_status)
+                    except Exception as status_error:
+                        print(
+                            f"DVC status failed for {method_name}: {status_error!r}. Assuming dirty outputs.",
+                            file=stderr,
+                        )
+                        dirty = True
+
+                    if cache_exists and not dirty:
+                        try:
+                            print(f"Reading {method_name} from cache {cache_path}", file=stderr)
+                            cached_df = get_dataframe(cache_path)
+                            cached_df = map_index(cached_df)
+                            wave_hint = stage_infos[0].wave if len(stage_infos) == 1 else None
+                            cached_df = self._augment_index_from_related_tables(
+                                cached_df,
+                                scheme_entry,
+                                wave_hint,
+                            )
+                            cached_df = _normalize_dataframe_index(
+                                cached_df,
+                                scheme_entry,
+                                wave_hint,
+                            )
+                            return cached_df
+                        except (FileNotFoundError, PathMissingError):
+                            dirty = True  # fall through to repro if cache missing unexpectedly
+
+                    stage_outputs: dict[str, pd.DataFrame] | None = None
+                    if not dirty:
+                        stage_outputs = collect_stage_outputs(stage_infos)
+                        if not stage_outputs:
+                            dirty = True
+
+                    if dirty:
+                        stage_iter = loaded_stages or [_load_stage(info.stage_ref) for info in stage_infos]
+                        with repo.lock, _redirect_stdout_to_stderr():
+                            for stage in stage_iter:
+                                try:
+                                    stage.reproduce()
+                                except Exception as reproduce_error:
+                                    print(f"DVC reproduce failed for {stage.addressing}: {reproduce_error!r}. Falling back to legacy loaders.", file=stderr)
+                                    stage_outputs = collect_stage_outputs(stage_infos)
+                                    combined_outputs = consolidate_stage_outputs(stage_outputs)
+                                    if combined_outputs is not None:
+                                        return combined_outputs
+                                    return load_from_waves(waves)
+
+                        stage_outputs = collect_stage_outputs(stage_infos)
+                        if not stage_outputs:
+                            raise KeyError(f"No data produced for {method_name} via DVC.")
+
+                    single_stage = (
+                        len(stage_infos) == 1
+                        and stage_infos[0].wave is None
+                        and stage_infos[0].output_path == cache_path
+                    )
+                    if single_stage:
+                        return next(iter(stage_outputs.values()))
+
+                    combined_outputs = consolidate_stage_outputs(stage_outputs)
+                    if combined_outputs is None:
+                        raise KeyError(f"No data produced for {method_name} via DVC.")
+                    return combined_outputs
+            except (DvcException, FileNotFoundError) as e:
+                print(f"DVC unavailable for {method_name}: {e}. Falling back to manual aggregation.", file=stderr)
+                return load_from_waves(waves)
+            finally:
+                if repo is not None:
+                    repo.close()
+
+        def load_with_dvc_cache(method_name):
+            if method_name in JSON_CACHE_METHODS:
+                return load_json_cache(method_name)
+            return load_dataframe_with_dvc(method_name)
+
+        df: Any = None
+        # Use DVC-validated cache for all datasets whenever enabled.
+        use_dvc_cache = os.getenv('LSMS_USE_DVC_CACHE', 'true').lower() == 'true'
+        prefer_make_backend = materialize_backend == "make"
+        resources = self.resources
+        data_scheme = resources.get('Data Scheme') if isinstance(resources, dict) else {}
+        has_data_scheme_entry = isinstance(data_scheme, dict) and data_scheme.get(method_name) is not None
+
+        if not use_dvc_cache and method_name in JSON_CACHE_METHODS:
             df = load_from_waves(waves)
         else:
-            df = load_from_makefile(method_name)
-        
-        if isinstance(df, dict):
-            return df
-
-        if 'i' in df.index.names and not df.attrs.get('id_converted') and method_name not in ['panel_ids', 'updated_ids'] and self._updated_ids_cache is not None:
-            df = id_walk(df, self.updated_ids)
-
-        return df
+            try:
+                if use_dvc_cache:
+                    df = load_with_dvc_cache(method_name)
+                elif has_data_scheme_entry and not prefer_make_backend:
+                    df = load_from_waves(waves)
+                else:
+                    df = run_make_target(method_name)
+            except Exception as error:
+                _log_issue(self.name, method_name, waves, error)
+                raise
+        return self._finalize_result(df, scheme_entry, method_name)
 
     def _compute_panel_ids(self):
         """
@@ -566,6 +1429,74 @@ class Country:
         if self._panel_ids_cache is None or self._updated_ids_cache is None:
             self._compute_panel_ids()
         return self._updated_ids_cache
+
+    def cached_datasets(self) -> list[str]:
+        """
+        List dataset names currently cached for this country.
+        """
+        cache_files = []
+        var_dir = data_root(self.name) / "var"
+        underscore_dir = data_root(self.name) / "_"
+
+        if var_dir.exists():
+            cache_files.extend(var_dir.glob("*.parquet"))
+        if underscore_dir.exists():
+            cache_files.extend(underscore_dir.glob("*.json"))
+            cache_files.extend(underscore_dir.glob("*.parquet"))
+
+        datasets = []
+        for path in cache_files:
+            if path.suffix == ".json" and path.stem not in JSON_CACHE_METHODS:
+                continue
+            datasets.append(path.stem)
+        return sorted(set(datasets))
+
+    def clear_cache(
+        self,
+        methods: list[str] | None = None,
+        waves: list[str] | None = None,
+        dry_run: bool = False,
+    ) -> list[Path]:
+        """
+        Remove cached files for this country.
+        If methods is None, all cached datasets are removed.
+        If waves is provided, removes only caches tied to those waves (for DVC outputs under build/).
+        Returns list of deleted file paths.
+        """
+        removed: list[Path] = []
+        targets = list(dict.fromkeys(methods or self.cached_datasets()))
+
+        for method in targets:
+            json_cache = data_root(self.name) / "_" / f"{method}.json"
+            parquet_cache = data_root(self.name) / "_" / f"{method}.parquet"
+            var_cache = data_root(self.name) / "var" / f"{method}.parquet"
+
+            for candidate in (json_cache, parquet_cache, var_cache):
+                if candidate.suffix == ".json" and candidate.stem not in JSON_CACHE_METHODS:
+                    continue
+                if candidate.exists():
+                    removed.append(candidate)
+                    if not dry_run:
+                        candidate.unlink()
+
+        build_removed: list[Path] = []
+        if waves:
+            try:
+                stage_map = _load_materialize_stage_map(str(self.file_path.parent))
+            except FileNotFoundError:
+                stage_map = {}
+            for method in targets:
+                for wave in waves:
+                    info = stage_map.get((self.name, wave, method))
+                    if info:
+                        build_path = (self.file_path.parent / info.output_path).resolve()
+                        if build_path.exists():
+                            build_removed.append(build_path)
+                            if not dry_run:
+                                build_path.unlink()
+
+        removed.extend(build_removed)
+        return removed
     
 
     def __getattr__(self, name):
@@ -764,5 +1695,72 @@ class Country:
 #         r = rgsn.Regression(y=np.log(x.replace(0,np.nan).dropna()),
 #                             d=z,**kwargs)
 #         return r
+def _declared_index_levels(schema_entry: dict[str, Any] | None) -> list[str]:
+    """Parse the declared index metadata from a data scheme entry."""
+    if not schema_entry:
+        return []
+
+    declared_levels: Iterable[str] | None = schema_entry.get("index")
+    if isinstance(declared_levels, str):
+        cleaned = declared_levels.strip()
+        if cleaned.startswith("(") and cleaned.endswith(")"):
+            cleaned = cleaned[1:-1]
+        declared_levels = [token.strip() for token in cleaned.split(",") if token.strip()]
+    if not declared_levels:
+        return []
+
+    return [str(level) for level in declared_levels]
 
 
+def _normalize_dataframe_index(
+    df: pd.DataFrame,
+    schema_entry: dict[str, Any],
+    wave: str | None,
+) -> pd.DataFrame:
+    """
+    Reorder and reduce a dataframe's MultiIndex to match the declared schema.
+
+    - Reorders index levels to match the declared order.
+    - Drops unexpected index levels.
+    - Synthesizes missing 't' levels for wave-specific tables.
+    - Collapses duplicate entries via first-observation aggregation.
+    """
+
+    if not isinstance(df, pd.DataFrame) or not isinstance(df.index, pd.MultiIndex):
+        return df
+
+    declared = _declared_index_levels(schema_entry)
+    if not declared:
+        return df
+
+    current_names = list(df.index.names)
+
+    # Add synthetic levels when declared but missing (e.g., 't' for wave outputs)
+    missing_levels = [lvl for lvl in declared if lvl not in current_names]
+    if missing_levels:
+        df = df.reset_index()
+        for level in missing_levels:
+            if level == "t" and wave is not None:
+                df[level] = wave
+        df = df.set_index(declared)
+        current_names = list(df.index.names)
+
+    # Reorder levels to match declaration
+    present_declared = [lvl for lvl in declared if lvl in current_names]
+    if present_declared:
+        remaining = [lvl for lvl in current_names if lvl not in present_declared]
+        try:
+            df = df.reorder_levels(present_declared + remaining)
+        except Exception:
+            pass
+
+    # Drop any unexpected index levels
+    extra_levels = [lvl for lvl in df.index.names if lvl not in declared]
+    if extra_levels:
+        df = df.droplevel(extra_levels)
+
+    # Aggregate duplicates if any remain
+    if not df.index.is_unique:
+        df = df.groupby(level=declared).first()
+
+    return df

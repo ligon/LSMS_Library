@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 import json
 import dvc.api
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 
 wave = "2004-05"
 
@@ -22,7 +22,7 @@ columns_dict = {'case_id': 'j', 'i0a' : 'i', 'i03a': 'quantity_consumed', 'i03b'
                 }
 regions = get_dataframe('other_features.parquet').reset_index().set_index(['j'])['m']
 
-df = df.astype(str).replace('nan', np.NaN)
+df = df.astype(str).replace('nan', np.nan)
 df = df.rename(columns_dict, axis=1)
 df = df.loc[:, list(columns_dict.values())]
 
@@ -33,7 +33,7 @@ df[cols] = df[cols].apply(pd.to_numeric, errors='coerce')
 df = df.set_index(['j', 'i'])
 df = df.join(regions).set_index('m', append=True).replace(r'^\s*$', np.nan, regex=True)
 
-df = df.reset_index().set_index(['j', 'm', 'i']).replace(r'^\s*$', np.NaN, regex=True)
+df = df.reset_index().set_index(['j', 'm', 'i']).replace(r'^\s*$', np.nan, regex=True)
 
 #custom convert some units in formats such as "300 grams" into kg, typically handled by handling_unusual_units in malawi.py for data with conversion tables
 grams = r'(\d+)\s*g(?:\s+|r)'
@@ -57,7 +57,7 @@ df['u_bought'] = np.where(~df['cfactor_bought'].isna(), 'kg', df['u_bought'])
 df['price per unit'] = df['expenditure']/df['quantity_bought']
 
 df['t'] = wave
-df = df.reset_index().set_index(['j','t','i']).dropna(how='all')
+df = df.reset_index().set_index(['j','t','m','i']).dropna(how='all')
 
 final = df.loc[:, ['quantity_consumed', 'u_consumed', 'quantity_bought', 'u_bought', 'price per unit', 'expenditure', 'cfactor_consumed', 'cfactor_bought']]
 
@@ -67,4 +67,5 @@ labelsd = get_categorical_mapping(tablename='harmonize_food',
 
 final = final.rename(index=labelsd,level='i')
 final = final.dropna(how='all')
+final = final.reorder_levels(['j','t','m','i']).sort_index()
 to_parquet(final, "food_acquired.parquet")

@@ -3,7 +3,7 @@ from lsms_library.local_tools import to_parquet
 import numpy as np
 import pandas as pd
 import dvc.api
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 
 fn = '../Data/GSEC9A.dta'
 d = {"hhid":['Hhid'],

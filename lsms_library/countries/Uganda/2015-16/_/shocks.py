@@ -7,7 +7,7 @@ sys.path.append('../../_/')
 import pandas as pd
 import dvc.api
 from datetime import datetime
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 
 #shock dataset
 with dvc.api.open('../Data/GSEC16.dta',mode='rb') as dta: 
@@ -31,15 +31,15 @@ date = date[["hh", "end_date","HHID"]].rename(columns={'hh': 'HHID', 'HHID': 'ma
 df = pd.merge(df, date, on='HHID')
 df['Onset'] = (df.end_date.dt.to_period('M') - df.start_date.dt.to_period('M')).apply(lambda x: x.n)
 
-shocks = pd.DataFrame({"j": df.master_hhid.values.tolist(),
-                    "Shock":df.h16q00.values.tolist(), 
+shocks = pd.DataFrame({"i": df.master_hhid.values.tolist(),
+                    "Shock":df.h16q00.values.tolist(),
                     "Year": df.h16q2y.values.tolist(),
-                    "Onset":df.Onset.values.tolist(), 
+                    "Onset":df.Onset.values.tolist(),
                     "Duration":df.h16q02b.values.tolist(),
-                    "EffectedIncome":df.h16q3a.values.tolist(), 
-                    "EffectedAssets":df.h16q3b.values.tolist(), 
-                    "EffectedProduction":df.h16q3c.values.tolist(), 
-                    "EffectedConsumption":df.h16q3d.values.tolist(), 
+                    "EffectedIncome":df.h16q3a.values.tolist(),
+                    "EffectedAssets":df.h16q3b.values.tolist(),
+                    "EffectedProduction":df.h16q3c.values.tolist(),
+                    "EffectedConsumption":df.h16q3d.values.tolist(),
                     "HowCoped0":df.h16q4a.values.tolist(),
                     "HowCoped1":df.h16q4b.values.tolist(),
                     "HowCoped2":df.h16q4c.values.tolist()})
@@ -58,6 +58,6 @@ shocks = shocks.astype({'Shock': 'category',
                         }) 
 
 shocks.insert(1, 't', '2015-16')
-shocks.set_index(['j','t','Shock'], inplace = True)
+shocks.set_index(['i','t','Shock'], inplace = True)
 
 to_parquet(shocks, 'shocks.parquet')

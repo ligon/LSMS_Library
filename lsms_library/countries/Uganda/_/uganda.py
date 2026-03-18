@@ -1,5 +1,5 @@
 from lsms.tools import get_food_prices, get_food_expenditures, get_household_roster, get_household_identification_particulars
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 import numpy as np
 import pandas as pd
 import dvc.api
@@ -83,15 +83,15 @@ def food_acquired(fn,myvars):
 
     df = df.set_index(['HHID','item','units']).dropna(how='all')
 
-    df.index.names = ['j','i','u']
+    df.index.names = ['i','j','u']  # HHID='i', item='j', units='u'
 
 
     # Fix type of hhids if need be
-    if df.index.get_level_values('j').dtype ==float:
+    if df.index.get_level_values('i').dtype ==float:
         fix = dict(zip(df.index.levels[0],df.index.levels[0].astype(int).astype(str)))
         df = df.rename(index=fix,level=0)
 
-    df = df.rename(index=harmonized_food_labels(),level='i')
+    df = df.rename(index=harmonized_food_labels(),level='j')
     unitlabels = harmonized_unit_labels()
     df = df.rename(index=unitlabels,level='u')
 
@@ -173,23 +173,24 @@ def age_sex_composition(fn,sex='sex',sex_converter=None,age='age',months_spent='
                                   sex_converter=sex_converter,months_converter=months_converter,
                                   Age_ints=Age_ints)
 
-    df.index.name = 'j'
+    df.index.name = 'i'  # Household ID
     df.columns.name = 'k'
-    
+
     return df
 
 
-def other_features(fn,urban=None,region=None,HHID='HHID',urban_converter=None):
+def other_features(fn,urban=None,region=None,v=None,HHID='HHID',urban_converter=None):
 
     with dvc.api.open(fn,mode='rb') as dta:
-        df = get_household_identification_particulars(fn=dta,HHID=HHID,urban=urban,region=region,urban_converter=urban_converter)
+        df = get_household_identification_particulars(fn=dta,HHID=HHID,urban=urban,region=region,urban_converter=urban_converter,v=v)
 
-    df.index.name = 'j'
+    df.index.name = 'i'  # Household ID
     df.columns.name = 'k'
 
     return df
 
-def id_walk(df, updated_ids, hh_index='j'):
+
+def id_walk(df, updated_ids, hh_index='i'):
     '''
     Updates household IDs in panel data across different waves separately.
 
@@ -213,6 +214,36 @@ def id_walk(df, updated_ids, hh_index='j'):
 
     The function handles these wave-specific mappings separately, ensuring accurate household identification over time.
     '''
+    index_names = list(df.index.names or [])
+    if not index_names:
+        raise ValueError("Dataframe must have a named MultiIndex for id_walk.")
+    if 't' not in index_names:
+        raise KeyError("Index must contain a 't' level for wave identifiers.")
+
+    household_level = hh_index
+    fallback_used = False
+    if household_level not in index_names:
+        for candidate in ('i', 'j'):
+            if candidate in index_names:
+                household_level = candidate
+                fallback_used = True
+                break
+        else:
+            # fallback to the first non-'t' level (or level 0)
+            non_wave_levels = [name for name in index_names if name != 't']
+            if not non_wave_levels:
+                raise KeyError("Cannot determine household index level for id_walk.")
+            household_level = non_wave_levels[0]
+            fallback_used = True
+
+    household_level_pos = index_names.index(household_level)
+
+    if fallback_used and household_level != hh_index:
+        warnings.warn(
+            f"id_walk expected index level '{hh_index}' but found '{household_level}'. "
+            "Proceeding with the detected household index."
+        )
+
     #seperate df into different waves:
     dfs = {}
     waves = df.index.get_level_values('t').unique()
@@ -222,7 +253,7 @@ def id_walk(df, updated_ids, hh_index='j'):
     for wave, df_wave in dfs.items():
         #update ids
         if wave in updated_ids:
-            df_wave = df_wave.rename(index=updated_ids[wave], level=hh_index)
+            df_wave = df_wave.rename(index=updated_ids[wave], level=household_level)
             #update the dataframe with the new ids
             dfs[wave] = df_wave
         else:
@@ -230,7 +261,9 @@ def id_walk(df, updated_ids, hh_index='j'):
     #combine the updated dataframes
     df = pd.concat(dfs.values(), axis=0)
 
-    # df= df.rename(index=updated_ids,level=['t', hh_index])
+    if 'i' not in df.index.names or household_level != 'i':
+        df.index = df.index.set_names('i', level=household_level_pos)
+
+    # df= df.rename(index=updated_ids,level=['t', household_level])
     df.attrs['id_converted'] = True
     return df  
-

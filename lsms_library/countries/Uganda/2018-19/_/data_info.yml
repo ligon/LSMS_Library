@@ -5,7 +5,7 @@ people_last7days:
     file: GSEC15A.dta
     idxvars:
         i: hhid
-        member: CEA01
+       # member: CEA01
     myvars:
         Men : CEA01A
         Women : CEA01B

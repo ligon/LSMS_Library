@@ -4,7 +4,7 @@ Concatenate data on other household features across rounds.
 """
 from lsms_library.local_tools import to_parquet
 from lsms_library.local_tools import get_dataframe
-
+import sys
 import pandas as pd
 from uganda import Waves, id_walk
 import json
@@ -13,17 +13,17 @@ import json
 x = {}
 
 for t in Waves.keys():
-    print(t)
+    print(t, file=sys.stderr)
     x[t] = get_dataframe('../'+t+'/_/other_features.parquet')
     if 't' in x[t].index.names:
         x[t] = x[t].droplevel('t')
     x[t] = x[t].stack('k').dropna()
-    x[t] = x[t].reset_index().set_index(['j','m','k']).squeeze()
+    x[t] = x[t].reset_index().set_index(['i','m','k']).squeeze().unstack('k')
 
-z = pd.DataFrame(x)
-z.columns.name = 't'
+z = pd.concat(x)
+z.index.names = ['t','i','m']
 
-z = z.stack().unstack('m')
+z = z.reorder_levels(['i','t','m']).sort_index()
 
 #z['m'] = 'Uganda'
 
@@ -37,11 +37,11 @@ regions = {' kampala':'Central',
            'northern':'Northern',
            'western':'Western'}
 
-z = z.rename(columns=regions)
+z = z.rename(index=regions, level='m')
 
 z = z.stack().unstack('k')
 
-z = z.reset_index().set_index(['j','t','m'])
+z = z.reset_index().set_index(['i','t','m'])
 
 with open('updated_ids.json','r') as f:
     updated_ids =json.load(f)

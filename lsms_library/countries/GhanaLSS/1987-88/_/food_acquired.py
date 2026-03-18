@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 import sys
 sys.path.append('../../_')
-from ghana import yearly_expenditure
+from ghanalss import yearly_expenditure
 import numpy as np
 import dvc.api
 import pandas as pd
 sys.path.append('../../../_/')
-from lsms_library.local_tools import df_from_orgfile
+from lsms_library.local_tools import df_from_orgfile, to_parquet
 
 t = '1987-88'
 #categorical mapping
@@ -63,4 +63,4 @@ f = xf.merge(yf, on = ['j','i'], how = 'outer')
 f['u'] = np.nan
 f['t'] = t
 f = f.set_index(['j','t','i', 'u'])
-f.to_parquet('food_acquired.parquet')
+to_parquet(f, 'food_acquired.parquet')

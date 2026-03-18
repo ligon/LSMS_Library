@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import json
 import dvc.api
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 from lsms.tools import get_household_roster
 import sys
 sys.path.append('../../../_/')
@@ -63,9 +63,9 @@ def handling_unusual_units(df):
     df["quantity_bought"] = df['quantity_bought'].mul(df['cfactor_bought'].fillna(1))
 
     df['u_consumed'] = np.where(~df['cfactor_consumed'].isna(), 'kg', df['unitsdetail_consumed'])
-    df['u_consumed'] = df['u_consumed'].replace('nan', np.NaN).fillna(df['units_consumed'])
+    df['u_consumed'] = df['u_consumed'].replace('nan', np.nan).fillna(df['units_consumed'])
     df['u_bought'] = np.where(~df['cfactor_bought'].isna(), 'kg', df['unitsdetail_bought'])
-    df['u_bought'] = df['u_bought'].replace('nan', np.NaN).fillna(df['units_bought'])
+    df['u_bought'] = df['u_bought'].replace('nan', np.nan).fillna(df['units_bought'])
 
     return df
 

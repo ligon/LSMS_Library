@@ -5,7 +5,7 @@ import lsms_library.local_tools as tools
 from collections import defaultdict
 from importlib.resources import files
 
-path = files('lsms_library')/'countries'/'GHANALSS'/'1988-89'
+path = files('lsms_library')/'countries'/'GhanaLSS'/'1988-89'
 region_dict = tools.get_categorical_mapping(tablename = 'region', dirs=[f'{path}/_', f'{path}/../_/', f'{path}/../../_/'])
 
 def i(value):

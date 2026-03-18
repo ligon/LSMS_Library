@@ -15,8 +15,8 @@ for t in ['2005-06','2009-10','2010-11','2011-12','2013-14','2015-16','2018-19',
     df['t'] = t
     df.index = df.index.rename({'units':'u'})
     # There may be occasional repeated reports of purchases of same food
-    df = df.groupby(['j','t','i','u']).sum()
-    df = df.reset_index().set_index(['j','t','i','u'])
+    df = df.groupby(['i','t','j','u']).sum()
+    df = df.reset_index().set_index(['i','t','j','u'])
     p.append(df)
 
 p = pd.concat(p)
@@ -26,7 +26,7 @@ p = id_walk(p, updated_ids)
 
 of = get_dataframe('../var/other_features.parquet')
 
-p = p.join(of.reset_index('m')['m'],on=['j','t'])
-p = p.reset_index().set_index(['j','t','m','i','u'])
+p = p.join(of.reset_index('m')['m'],on=['i','t'])
+p = p.reset_index().set_index(['i','t','m','j','u'])
 
 to_parquet(p, '../var/food_acquired.parquet')

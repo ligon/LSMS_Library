@@ -1,0 +1,499 @@
+schema: '2.0'
+stages:
+  materialize@uganda::::income:
+    cmd: python3 ../../util/run_stage.py --backend "make" --country "Uganda" 
+      --all-waves --table "income" --format "parquet" --target ""
+    deps:
+    - path: ../../cli.py
+      hash: md5
+      md5: 72683c66f38ca88ac45ed5510f78c567
+      size: 19218
+    - path: ../../country.py
+      hash: md5
+      md5: 52fb1105284930bb6930629fa611e2e9
+      size: 69487
+    - path: ../../local_tools.py
+      hash: md5
+      md5: fdbb098dff51db369418cb4b18c978fd
+      size: 41719
+      isexec: true
+    - path: ../../util/run_stage.py
+      hash: md5
+      md5: 1d0e09531bee7064d67a16c8ed485b59
+      size: 2502
+    - path: _
+      hash: md5
+      md5: c33ad3d6aa290a483c3ce4375ebed027.dir
+      size: 3490090
+      nfiles: 39
+    outs:
+    - path: var/income.parquet
+      hash: md5
+      md5: 177fc82197b4890a43fba070cb45cec2
+      size: 62209
+  materialize@uganda::::household_characteristics:
+    cmd: python3 ../../util/run_stage.py --backend "make" --country "Uganda" 
+      --all-waves --table "household_characteristics" --format "parquet" 
+      --target ""
+    deps:
+    - path: ../../cli.py
+      hash: md5
+      md5: 72683c66f38ca88ac45ed5510f78c567
+      size: 19218
+    - path: ../../country.py
+      hash: md5
+      md5: f1751815784ceaecb304856c48274bb3
+      size: 70327
+    - path: ../../local_tools.py
+      hash: md5
+      md5: f211bd5a675c4ba21514041ec7bc6a37
+      size: 41814
+      isexec: true
+    - path: ../../util/run_stage.py
+      hash: md5
+      md5: 54f35c87bd57e806838748f0191f71dc
+      size: 3479
+    - path: _
+      hash: md5
+      md5: 948f2b87e78251d29d9a396f59d0c1c3.dir
+      size: 3482993
+      nfiles: 40
+    outs:
+    - path: var/household_characteristics.parquet
+      hash: md5
+      md5: 2cf46cadeba3e341b9ed37224ae3f8e3
+      size: 216142
+  materialize@uganda::::food_expenditures:
+    cmd: python3 ../../util/run_stage.py --backend "make" --country "Uganda" 
+      --all-waves --table "food_expenditures" --format "parquet" --target ""
+    deps:
+    - path: ../../cli.py
+      hash: md5
+      md5: 72683c66f38ca88ac45ed5510f78c567
+      size: 19218
+    - path: ../../country.py
+      hash: md5
+      md5: 52fb1105284930bb6930629fa611e2e9
+      size: 69487
+    - path: ../../local_tools.py
+      hash: md5
+      md5: fdbb098dff51db369418cb4b18c978fd
+      size: 41719
+      isexec: true
+    - path: ../../util/run_stage.py
+      hash: md5
+      md5: 1d0e09531bee7064d67a16c8ed485b59
+      size: 2502
+    - path: _
+      hash: md5
+      md5: c33ad3d6aa290a483c3ce4375ebed027.dir
+      size: 3490090
+      nfiles: 39
+    outs:
+    - path: var/food_expenditures.parquet
+      hash: md5
+      md5: 1cf90b086153a0b3a7c893a998f01c69
+      size: 801882
+  materialize@uganda::::shocks:
+    cmd: python3 ../../util/run_stage.py --backend "make" --country "Uganda" 
+      --all-waves --table "shocks" --format "parquet" --target ""
+    deps:
+    - path: ../../cli.py
+      hash: md5
+      md5: 72683c66f38ca88ac45ed5510f78c567
+      size: 19218
+    - path: ../../country.py
+      hash: md5
+      md5: e5b430ebedc1333104df38ad1b8c1ff9
+      size: 70026
+    - path: ../../local_tools.py
+      hash: md5
+      md5: f211bd5a675c4ba21514041ec7bc6a37
+      size: 41814
+      isexec: true
+    - path: ../../util/run_stage.py
+      hash: md5
+      md5: 54f35c87bd57e806838748f0191f71dc
+      size: 3479
+    - path: _
+      hash: md5
+      md5: 948f2b87e78251d29d9a396f59d0c1c3.dir
+      size: 3482993
+      nfiles: 40
+    outs:
+    - path: var/shocks.parquet
+      hash: md5
+      md5: c91f4e8700d8e42113b25e4db55c67f9
+      size: 123469
+  materialize@uganda::::cluster_features:
+    cmd: python3 ../../util/run_stage.py --backend "cli" --country "Uganda" 
+      --all-waves --table "cluster_features" --format "parquet" --target ""
+    deps:
+    - path: ../../cli.py
+      hash: md5
+      md5: 72683c66f38ca88ac45ed5510f78c567
+      size: 19218
+    - path: ../../country.py
+      hash: md5
+      md5: f1751815784ceaecb304856c48274bb3
+      size: 70327
+    - path: ../../local_tools.py
+      hash: md5
+      md5: f211bd5a675c4ba21514041ec7bc6a37
+      size: 41814
+      isexec: true
+    - path: ../../util/run_stage.py
+      hash: md5
+      md5: 54f35c87bd57e806838748f0191f71dc
+      size: 3479
+    - path: _
+      hash: md5
+      md5: 948f2b87e78251d29d9a396f59d0c1c3.dir
+      size: 3482993
+      nfiles: 40
+    outs:
+    - path: var/cluster_features.parquet
+      hash: md5
+      md5: a7b82fafa1b4a08a92315744592c288e
+      size: 32556
+  materialize@uganda::::food_quantities:
+    cmd: python3 ../../util/run_stage.py --backend "make" --country "Uganda" 
+      --all-waves --table "food_quantities" --format "parquet" --target ""
+    deps:
+    - path: ../../cli.py
+      hash: md5
+      md5: 72683c66f38ca88ac45ed5510f78c567
+      size: 19218
+    - path: ../../country.py
+      hash: md5
+      md5: 52fb1105284930bb6930629fa611e2e9
+      size: 69487
+    - path: ../../local_tools.py
+      hash: md5
+      md5: fdbb098dff51db369418cb4b18c978fd
+      size: 41719
+      isexec: true
+    - path: ../../util/run_stage.py
+      hash: md5
+      md5: 1d0e09531bee7064d67a16c8ed485b59
+      size: 2502
+    - path: _
+      hash: md5
+      md5: c33ad3d6aa290a483c3ce4375ebed027.dir
+      size: 3490090
+      nfiles: 39
+    outs:
+    - path: var/food_quantities.parquet
+      hash: md5
+      md5: 7e8cfecc9254e797999f3424943f8b22
+      size: 986145
+  materialize@uganda::::other_features:
+    cmd: python3 ../../util/run_stage.py --backend "make" --country "Uganda" 
+      --all-waves --table "other_features" --format "parquet" --target ""
+    deps:
+    - path: ../../cli.py
+      hash: md5
+      md5: 72683c66f38ca88ac45ed5510f78c567
+      size: 19218
+    - path: ../../country.py
+      hash: md5
+      md5: 52fb1105284930bb6930629fa611e2e9
+      size: 69487
+    - path: ../../local_tools.py
+      hash: md5
+      md5: fdbb098dff51db369418cb4b18c978fd
+      size: 41719
+      isexec: true
+    - path: ../../util/run_stage.py
+      hash: md5
+      md5: 1d0e09531bee7064d67a16c8ed485b59
+      size: 2502
+    - path: _
+      hash: md5
+      md5: c33ad3d6aa290a483c3ce4375ebed027.dir
+      size: 3490090
+      nfiles: 39
+    outs:
+    - path: var/other_features.parquet
+      hash: md5
+      md5: 52edfddd69edc1ee7421f87906232f80
+      size: 84660
+  materialize@uganda::::household_roster:
+    cmd: python3 ../../util/run_stage.py --backend "cli" --country "Uganda" 
+      --all-waves --table "household_roster" --format "parquet" --target ""
+    deps:
+    - path: ../../cli.py
+      hash: md5
+      md5: 69304b146cc0667cf417008799a06399
+      size: 14255
+    - path: ../../country.py
+      hash: md5
+      md5: 04f276f98cf275236a3d7c26c8bc522f
+      size: 60025
+    - path: ../../local_tools.py
+      hash: md5
+      md5: 64b7664a0daadf52128d0da52cb11056
+      size: 41708
+      isexec: true
+    - path: ../../util/run_stage.py
+      hash: md5
+      md5: 1d0e09531bee7064d67a16c8ed485b59
+      size: 2502
+    - path: _
+      hash: md5
+      md5: 03087419806cb0b4e3b55a5461cc84d3.dir
+      size: 3479625
+      nfiles: 39
+    outs:
+    - path: var/household_roster.parquet
+      hash: md5
+      md5: 8f16f248d41b6845990b982925fa10b4
+      size: 284445
+  materialize@uganda::::food_prices:
+    cmd: python3 ../../util/run_stage.py --backend "make" --country "Uganda" 
+      --all-waves --table "food_prices" --format "parquet" --target ""
+    deps:
+    - path: ../../cli.py
+      hash: md5
+      md5: 72683c66f38ca88ac45ed5510f78c567
+      size: 19218
+    - path: ../../country.py
+      hash: md5
+      md5: 52fb1105284930bb6930629fa611e2e9
+      size: 69487
+    - path: ../../local_tools.py
+      hash: md5
+      md5: fdbb098dff51db369418cb4b18c978fd
+      size: 41719
+      isexec: true
+    - path: ../../util/run_stage.py
+      hash: md5
+      md5: 1d0e09531bee7064d67a16c8ed485b59
+      size: 2502
+    - path: _
+      hash: md5
+      md5: c33ad3d6aa290a483c3ce4375ebed027.dir
+      size: 3490090
+      nfiles: 39
+    outs:
+    - path: var/food_prices.parquet
+      hash: md5
+      md5: c92fcb47a2559ac529c136b7f93edf1c
+      size: 1712942
+  materialize@uganda::::interview_date:
+    cmd: python3 ../../util/run_stage.py --backend "make" --country "Uganda" 
+      --all-waves --table "interview_date" --format "parquet" --target ""
+    deps:
+    - path: ../../cli.py
+      hash: md5
+      md5: 69304b146cc0667cf417008799a06399
+      size: 14255
+    - path: ../../country.py
+      hash: md5
+      md5: 04f276f98cf275236a3d7c26c8bc522f
+      size: 60025
+    - path: ../../local_tools.py
+      hash: md5
+      md5: 64b7664a0daadf52128d0da52cb11056
+      size: 41708
+      isexec: true
+    - path: ../../util/run_stage.py
+      hash: md5
+      md5: 1d0e09531bee7064d67a16c8ed485b59
+      size: 2502
+    - path: _
+      hash: md5
+      md5: 03087419806cb0b4e3b55a5461cc84d3.dir
+      size: 3479625
+      nfiles: 39
+    outs:
+    - path: var/interview_date.parquet
+      hash: md5
+      md5: f02301cc21ae0495f6fb03b297afc2aa
+      size: 121673
+  materialize@uganda::::earnings:
+    cmd: python3 ../../util/run_stage.py --backend "make" --country "Uganda" 
+      --all-waves --table "earnings" --format "parquet" --target ""
+    deps:
+    - path: ../../cli.py
+      hash: md5
+      md5: 69304b146cc0667cf417008799a06399
+      size: 14255
+    - path: ../../country.py
+      hash: md5
+      md5: 04f276f98cf275236a3d7c26c8bc522f
+      size: 60025
+    - path: ../../local_tools.py
+      hash: md5
+      md5: 64b7664a0daadf52128d0da52cb11056
+      size: 41708
+      isexec: true
+    - path: ../../util/run_stage.py
+      hash: md5
+      md5: 1d0e09531bee7064d67a16c8ed485b59
+      size: 2502
+    - path: _
+      hash: md5
+      md5: 03087419806cb0b4e3b55a5461cc84d3.dir
+      size: 3479625
+      nfiles: 39
+    outs:
+    - path: var/earnings.parquet
+      hash: md5
+      md5: a320fac12d53e1982de6f573681ebd7d
+      size: 103522
+  materialize@uganda::::enterprise_income:
+    cmd: python3 ../../util/run_stage.py --backend "make" --country "Uganda" 
+      --all-waves --table "enterprise_income" --format "parquet" --target ""
+    deps:
+    - path: ../../cli.py
+      hash: md5
+      md5: 69304b146cc0667cf417008799a06399
+      size: 14255
+    - path: ../../country.py
+      hash: md5
+      md5: 04f276f98cf275236a3d7c26c8bc522f
+      size: 60025
+    - path: ../../local_tools.py
+      hash: md5
+      md5: 64b7664a0daadf52128d0da52cb11056
+      size: 41708
+      isexec: true
+    - path: ../../util/run_stage.py
+      hash: md5
+      md5: 1d0e09531bee7064d67a16c8ed485b59
+      size: 2502
+    - path: _
+      hash: md5
+      md5: 03087419806cb0b4e3b55a5461cc84d3.dir
+      size: 3479625
+      nfiles: 39
+    outs:
+    - path: var/enterprise_income.parquet
+      hash: md5
+      md5: 321e4228e0f28cafb099b98a0460cd28
+      size: 148740
+  materialize@uganda::::food_acquired:
+    cmd: python3 ../../util/run_stage.py --backend "make" --country "Uganda" 
+      --all-waves --table "food_acquired" --format "parquet" --target ""
+    deps:
+    - path: ../../cli.py
+      hash: md5
+      md5: 69304b146cc0667cf417008799a06399
+      size: 14255
+    - path: ../../country.py
+      hash: md5
+      md5: 04f276f98cf275236a3d7c26c8bc522f
+      size: 60025
+    - path: ../../local_tools.py
+      hash: md5
+      md5: 64b7664a0daadf52128d0da52cb11056
+      size: 41708
+      isexec: true
+    - path: ../../util/run_stage.py
+      hash: md5
+      md5: 1d0e09531bee7064d67a16c8ed485b59
+      size: 2502
+    - path: _
+      hash: md5
+      md5: 03087419806cb0b4e3b55a5461cc84d3.dir
+      size: 3479625
+      nfiles: 39
+    outs:
+    - path: var/food_acquired.parquet
+      hash: md5
+      md5: f8f9fe8b4addce0745e1ae445e402a3c
+      size: 3454627
+  materialize@uganda::::nutrition:
+    cmd: python3 ../../util/run_stage.py --backend "make" --country "Uganda" 
+      --all-waves --table "nutrition" --format "parquet" --target ""
+    deps:
+    - path: ../../cli.py
+      hash: md5
+      md5: 35168707be75b76a6f8d6d40e4e24bcf
+      size: 15679
+    - path: ../../country.py
+      hash: md5
+      md5: ebb0cbd7edb3c4a1e83de68337740318
+      size: 61034
+    - path: ../../local_tools.py
+      hash: md5
+      md5: 64b7664a0daadf52128d0da52cb11056
+      size: 41708
+      isexec: true
+    - path: ../../util/run_stage.py
+      hash: md5
+      md5: 1d0e09531bee7064d67a16c8ed485b59
+      size: 2502
+    - path: _
+      hash: md5
+      md5: f7114bc98611d4b9bf777336efc54fd0.dir
+      size: 3482996
+      nfiles: 40
+    outs:
+    - path: var/nutrition.parquet
+      hash: md5
+      md5: e4587d7d9dbec207d42fd6ef463ff540
+      size: 3100634
+  materialize@uganda::::people_last7days:
+    cmd: python3 ../../util/run_stage.py --backend "cli" --country "Uganda" 
+      --all-waves --table "people_last7days" --format "parquet" --target ""
+    deps:
+    - path: ../../cli.py
+      hash: md5
+      md5: 72683c66f38ca88ac45ed5510f78c567
+      size: 19218
+    - path: ../../country.py
+      hash: md5
+      md5: f1751815784ceaecb304856c48274bb3
+      size: 70327
+    - path: ../../local_tools.py
+      hash: md5
+      md5: f211bd5a675c4ba21514041ec7bc6a37
+      size: 41814
+      isexec: true
+    - path: ../../util/run_stage.py
+      hash: md5
+      md5: 54f35c87bd57e806838748f0191f71dc
+      size: 3479
+    - path: _
+      hash: md5
+      md5: 948f2b87e78251d29d9a396f59d0c1c3.dir
+      size: 3482993
+      nfiles: 40
+    outs:
+    - path: var/people_last7days.parquet
+      hash: md5
+      md5: fac4ffa053668e7dc0fcf558588a6001
+      size: 88570
+  materialize@uganda::::housing:
+    cmd: python3 ../../util/run_stage.py --backend "make" --country "Uganda" 
+      --all-waves --table "housing" --format "parquet" --target ""
+    deps:
+    - path: ../../cli.py
+      hash: md5
+      md5: 3e4731361034c2a43c96e4d0ff952fc1
+      size: 19570
+    - path: ../../country.py
+      hash: md5
+      md5: b207c494ddd78e8f6d71ee9f3e931b25
+      size: 72989
+    - path: ../../local_tools.py
+      hash: md5
+      md5: 5226e2d913308969c639b8b80554786f
+      size: 41848
+      isexec: true
+    - path: ../../util/run_stage.py
+      hash: md5
+      md5: 54f35c87bd57e806838748f0191f71dc
+      size: 3479
+    - path: _
+      hash: md5
+      md5: 1e5117027be217e992172f42acd93dd1.dir
+      size: 3466624
+      nfiles: 38
+    outs:
+    - path: var/housing.parquet
+      hash: md5
+      md5: 4bf876c7e8b5842d2f8269618f4d0919
+      size: 68210

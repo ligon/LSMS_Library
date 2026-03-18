@@ -8,7 +8,7 @@ import pyreadstat
 import numpy as np
 import json
 import dvc.api
-from lsms import from_dta
+from ligonlibrary.dataframes import from_dta
 
 with dvc.api.open('../Data/m5_1_diary.dta', mode='rb') as dta:
     df = from_dta(dta, convert_categoricals=False)

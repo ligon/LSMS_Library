@@ -1,0 +1,39 @@
+GhanaLSS: Partially registered
+================================
+
+Working (registered in dvc.yaml)
+---------------------------------
+- cluster_features — all 7 waves via API
+- household_roster — all 7 waves via API
+
+Bug fixes applied
+-----------------
+- Fixed imports: scripts imported "from ghana import ..." but utility
+  module is ghanalss.py. Updated all imports to "from ghanalss import ..."
+- Fixed Makefile generic rule: referenced malawi.py (copy-paste error),
+  now references ghanalss.py
+- Fixed case-sensitivity in mapping.py: GHANALSS -> GhanaLSS in
+  waves 1988-89, 1991-92, 1998-99
+- Removed other_features dependency from Makefile (cluster_features
+  is the modern replacement; other_features is no longer needed)
+
+Not yet registered
+------------------
+- food_acquired — wave-level .py scripts exist for all 7 waves.
+  Too complex for data_info.yml API path because:
+  (a) per-visit columns in wide format (need sum across s9bq1a..s9bq6a)
+  (b) two files per wave (sec9b for purchases, sec8h for production)
+      with different food code schemes (Code_9b vs Code_8h)
+  (c) different variable names and visit ranges across waves
+  Options: use Make backend with the existing wave .py scripts,
+  or extend the API to support wide-to-long transformations.
+- household_characteristics — no wave-level scripts exist
+- food_expenditures, food_prices, food_quantities — derived from
+  food_acquired via food_prices_quantities_and_expenditures.py
+
+Next steps
+----------
+1. Register food_acquired via Make backend (wave .py scripts +
+   Makefile already cleaned of other_features dependency)
+2. Then food_expenditures/prices/quantities follow from food_acquired
+3. household_characteristics needs wave-level scripts or API entries

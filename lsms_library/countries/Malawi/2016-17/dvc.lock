@@ -1,0 +1,257 @@
+schema: '2.0'
+stages:
+  materialize@malawi::2016_17::food_acquired:
+    cmd: cd _ && LSMS_USE_DVC_CACHE=false python3 -m lsms_library.cli 
+      materialize --country "Malawi" --wave "2016-17" --table "food_acquired" 
+      --format "parquet" --out ../var/food_acquired.parquet
+    deps:
+    - path: ../../../cli.py
+      hash: md5
+      md5: 69304b146cc0667cf417008799a06399
+      size: 14255
+    - path: ../../../country.py
+      hash: md5
+      md5: 37f96a4ca9272bb65b0a627793165836
+      size: 52208
+    - path: ../../../local_tools.py
+      hash: md5
+      md5: 481bd686db5c040ad0a21664e8dad3f1
+      size: 41095
+      isexec: true
+    - path: _
+      hash: md5
+      md5: 15441a294983b30afa64e36ac91a08b8.dir
+      size: 3968842
+      nfiles: 10
+    outs:
+    - path: var/food_acquired.parquet
+      hash: md5
+      md5: 529fb5d6d58c09c1c988c960056853aa
+      size: 3606962
+  materialize@malawi::2016_17::food_expenditures:
+    cmd: cd _ && LSMS_USE_DVC_CACHE=false python3 -m lsms_library.cli 
+      materialize --country "Malawi" --wave "2016-17" --table 
+      "food_expenditures" --format "parquet" --out 
+      ../var/food_expenditures.parquet
+    deps:
+    - path: ../../../cli.py
+      hash: md5
+      md5: 69304b146cc0667cf417008799a06399
+      size: 14255
+    - path: ../../../country.py
+      hash: md5
+      md5: 37f96a4ca9272bb65b0a627793165836
+      size: 52208
+    - path: ../../../local_tools.py
+      hash: md5
+      md5: 481bd686db5c040ad0a21664e8dad3f1
+      size: 41095
+      isexec: true
+    - path: _
+      hash: md5
+      md5: e2a39f6ad19b45f90c4e0c660a233b8e.dir
+      size: 3913072
+      nfiles: 10
+    outs:
+    - path: var/food_expenditures.parquet
+      hash: md5
+      md5: 5ab6a3683e726c28319a6ca5335072c4
+      size: 1349
+  materialize@malawi::2016_17::interview_date:
+    cmd: cd _ && LSMS_USE_DVC_CACHE=false python3 -m lsms_library.cli 
+      materialize --country "Malawi" --wave "2016-17" --table "interview_date" 
+      --format "parquet" --out ../var/interview_date.parquet
+    deps:
+    - path: ../../../cli.py
+      hash: md5
+      md5: 69304b146cc0667cf417008799a06399
+      size: 14255
+    - path: ../../../country.py
+      hash: md5
+      md5: 37f96a4ca9272bb65b0a627793165836
+      size: 52208
+    - path: ../../../local_tools.py
+      hash: md5
+      md5: 481bd686db5c040ad0a21664e8dad3f1
+      size: 41095
+      isexec: true
+    - path: _
+      hash: md5
+      md5: e2a39f6ad19b45f90c4e0c660a233b8e.dir
+      size: 3913072
+      nfiles: 10
+    outs:
+    - path: var/interview_date.parquet
+      hash: md5
+      md5: 5ab6a3683e726c28319a6ca5335072c4
+      size: 1349
+  materialize@malawi::2016_17::subjective_well_being:
+    cmd: cd _ && LSMS_USE_DVC_CACHE=false python3 -m lsms_library.cli 
+      materialize --country "Malawi" --wave "2016-17" --table 
+      "subjective_well_being" --format "parquet" --out 
+      ../var/subjective_well_being.parquet
+    deps:
+    - path: ../../../cli.py
+      hash: md5
+      md5: 69304b146cc0667cf417008799a06399
+      size: 14255
+    - path: ../../../country.py
+      hash: md5
+      md5: 37f96a4ca9272bb65b0a627793165836
+      size: 52208
+    - path: ../../../local_tools.py
+      hash: md5
+      md5: 481bd686db5c040ad0a21664e8dad3f1
+      size: 41095
+      isexec: true
+    - path: _
+      hash: md5
+      md5: e2a39f6ad19b45f90c4e0c660a233b8e.dir
+      size: 3913072
+      nfiles: 10
+    outs:
+    - path: var/subjective_well_being.parquet
+      hash: md5
+      md5: f04022063e2ba0ecf3828982f88058ce
+      size: 104444
+  materialize@malawi::2016_17::food_prices:
+    cmd: cd _ && LSMS_USE_DVC_CACHE=false python3 -m lsms_library.cli 
+      materialize --country "Malawi" --wave "2016-17" --table "food_prices" 
+      --format "parquet" --out ../var/food_prices.parquet
+    deps:
+    - path: ../../../cli.py
+      hash: md5
+      md5: 69304b146cc0667cf417008799a06399
+      size: 14255
+    - path: ../../../country.py
+      hash: md5
+      md5: 37f96a4ca9272bb65b0a627793165836
+      size: 52208
+    - path: ../../../local_tools.py
+      hash: md5
+      md5: 481bd686db5c040ad0a21664e8dad3f1
+      size: 41095
+      isexec: true
+    - path: _
+      hash: md5
+      md5: e2a39f6ad19b45f90c4e0c660a233b8e.dir
+      size: 3913072
+      nfiles: 10
+    outs:
+    - path: var/food_prices.parquet
+      hash: md5
+      md5: 5ab6a3683e726c28319a6ca5335072c4
+      size: 1349
+  materialize@malawi::2016_17::household_characteristics:
+    cmd: cd _ && LSMS_USE_DVC_CACHE=false python3 -m lsms_library.cli 
+      materialize --country "Malawi" --wave "2016-17" --table 
+      "household_characteristics" --format "parquet" --out 
+      ../var/household_characteristics.parquet
+    deps:
+    - path: ../../../cli.py
+      hash: md5
+      md5: 69304b146cc0667cf417008799a06399
+      size: 14255
+    - path: ../../../country.py
+      hash: md5
+      md5: 37f96a4ca9272bb65b0a627793165836
+      size: 52208
+    - path: ../../../local_tools.py
+      hash: md5
+      md5: 481bd686db5c040ad0a21664e8dad3f1
+      size: 41095
+      isexec: true
+    - path: _
+      hash: md5
+      md5: 15441a294983b30afa64e36ac91a08b8.dir
+      size: 3968842
+      nfiles: 10
+    outs:
+    - path: var/household_characteristics.parquet
+      hash: md5
+      md5: db011a3d044e733673e6bebc8f8bda44
+      size: 207493
+  materialize@malawi::2016_17::cluster_features:
+    cmd: cd _ && LSMS_USE_DVC_CACHE=false python3 -m lsms_library.cli 
+      materialize --country "Malawi" --wave "2016-17" --table "cluster_features"
+      --format "parquet" --out ../var/cluster_features.parquet
+    deps:
+    - path: ../../../cli.py
+      hash: md5
+      md5: 69304b146cc0667cf417008799a06399
+      size: 14255
+    - path: ../../../country.py
+      hash: md5
+      md5: 37f96a4ca9272bb65b0a627793165836
+      size: 52208
+    - path: ../../../local_tools.py
+      hash: md5
+      md5: 481bd686db5c040ad0a21664e8dad3f1
+      size: 41095
+      isexec: true
+    - path: _
+      hash: md5
+      md5: e2a39f6ad19b45f90c4e0c660a233b8e.dir
+      size: 3913072
+      nfiles: 10
+    outs:
+    - path: var/cluster_features.parquet
+      hash: md5
+      md5: 1c4d6d2d3dfc60bed8d302dd42719726
+      size: 32139
+  materialize@malawi::2016_17::household_roster:
+    cmd: cd _ && LSMS_USE_DVC_CACHE=false python3 -m lsms_library.cli 
+      materialize --country "Malawi" --wave "2016-17" --table "household_roster"
+      --format "parquet" --out ../var/household_roster.parquet
+    deps:
+    - path: ../../../cli.py
+      hash: md5
+      md5: 69304b146cc0667cf417008799a06399
+      size: 14255
+    - path: ../../../country.py
+      hash: md5
+      md5: 37f96a4ca9272bb65b0a627793165836
+      size: 52208
+    - path: ../../../local_tools.py
+      hash: md5
+      md5: 481bd686db5c040ad0a21664e8dad3f1
+      size: 41095
+      isexec: true
+    - path: _
+      hash: md5
+      md5: 15441a294983b30afa64e36ac91a08b8.dir
+      size: 3968842
+      nfiles: 10
+    outs:
+    - path: var/household_roster.parquet
+      hash: md5
+      md5: 03f09a7a992b1ab833a6720b00ec5f59
+      size: 298466
+  materialize@malawi::2016_17::panel_ids:
+    cmd: cd _ && LSMS_USE_DVC_CACHE=false python3 -m lsms_library.cli 
+      materialize --country "Malawi" --wave "2016-17" --table "panel_ids" 
+      --format "parquet" --out ../var/panel_ids.parquet
+    deps:
+    - path: ../../../cli.py
+      hash: md5
+      md5: 69304b146cc0667cf417008799a06399
+      size: 14255
+    - path: ../../../country.py
+      hash: md5
+      md5: 37f96a4ca9272bb65b0a627793165836
+      size: 52208
+    - path: ../../../local_tools.py
+      hash: md5
+      md5: 481bd686db5c040ad0a21664e8dad3f1
+      size: 41095
+      isexec: true
+    - path: _
+      hash: md5
+      md5: e2a39f6ad19b45f90c4e0c660a233b8e.dir
+      size: 3913072
+      nfiles: 10
+    outs:
+    - path: var/panel_ids.parquet
+      hash: md5
+      md5: 3c6b2be8bff2ea152bd60b624c068695
+      size: 27338

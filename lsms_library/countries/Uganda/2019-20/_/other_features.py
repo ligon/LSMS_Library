@@ -16,6 +16,7 @@ myvars = dict(fn='../Data/HH/gsec1.dta',
               HHID='hhid',
               urban='urban',
               region='region',
+              v = 's1aq04a',  # String for parish name.  Parish codes broken as in 2018-19.
               urban_converter = lambda s: False if ('%s' % s).lower()=='nan' else s.lower() == 'urban')
 
 df = other_features(**myvars)
@@ -31,6 +32,6 @@ df = df.rename(columns={'region':'m'})
 
 df['t'] = round
 
-df = df.reset_index().set_index(['j','t','m'])[['Rural']]
+df = df.reset_index().set_index(['i','t','m'])[['Rural']]
 
 to_parquet(df, 'other_features.parquet')

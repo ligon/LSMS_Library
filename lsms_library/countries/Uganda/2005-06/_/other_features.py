@@ -16,6 +16,7 @@ myvars = dict(fn='../Data/GSEC1.dta',
               HHID='HHID',
               urban='urban',
               region='region',
+              v = 'comm',
               urban_converter=lambda x: True if x=='urban' else False)
 
 df = other_features(**myvars)
@@ -32,6 +33,6 @@ df = df.rename(columns={'region':'m'})
 
 df['t'] = round
 
-df = df.reset_index().set_index(['j','t','m'])[['Rural']]
+df = df.reset_index().set_index(['i','t','m'])[['Rural']]
 
 to_parquet(df, 'other_features.parquet')

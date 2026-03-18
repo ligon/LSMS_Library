@@ -7,9 +7,9 @@ Concatenate household rosters across rounds.
 
 import pandas as pd
 try:
-    from .ghana import change_id, Waves  # Used as part of a package
+    from .ghanalss import change_id, Waves  # Used as part of a package
 except ImportError:
-    from ghana import change_id, Waves # Running standalone
+    from ghanalss import change_id, Waves # Running standalone
 
 def id_walk(df,wave,waves):
     
@@ -50,5 +50,9 @@ except FileNotFoundError:
     warnings.warn('No other_features.parquet found.')
     z['m'] = 'Ghana'
     z = z.reset_index().set_index(['j','indiv','t','m'])
+
+z = z.rename(columns={'Relation': 'Relationship'})
+
+z['Age'] = pd.to_numeric(z['Age'], errors='coerce').astype('Int64')
 
 to_parquet(z, '../var/household_roster.parquet')
