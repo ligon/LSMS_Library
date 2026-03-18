@@ -101,3 +101,7 @@
 
 - Waves: 2020-21
 - Error: `TypeError: 'Mock' object does not support the context manager protocol`
+## 2026-03-17 23:44:40Z Uganda – household_roster
+
+- Waves: 2005-06, 2009-10, 2010-11, 2011-12, 2013-14, 2015-16, 2018-19, 2019-20
+- Error: `ImportError: cannot import name '_DIR_MARK' from 'pathspec.patterns.gitwildmatch' (/home/ligon/miniforge3/envs/lab/lib/python3.13/site-packages/pathspec/patterns/gitwildmatch.py)`
