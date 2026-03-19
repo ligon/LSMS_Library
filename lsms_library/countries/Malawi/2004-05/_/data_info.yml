@@ -7,6 +7,7 @@ cluster_features:
         v: ea
     myvars:
         Region: region
+        District: dist
         Rural:
             - reside
             - mappings:

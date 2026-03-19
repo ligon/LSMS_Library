@@ -9,6 +9,7 @@ cluster_features:
         v: ea_id
     myvars:
         Region: region
+        District: district
         Rural:
             - reside
             - mapping:

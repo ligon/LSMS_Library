@@ -8,7 +8,8 @@ cluster_features:
     idxvars:
         v: ea_id
     myvars:
-        Region: region 
+        Region: region
+        District: district
         Rural: 
             - reside
             - mapping:
