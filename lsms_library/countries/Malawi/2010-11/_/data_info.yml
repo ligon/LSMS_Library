@@ -89,3 +89,15 @@ shocks:
         HowCoped0: hh_u04a
         HowCoped1: hh_u04b
         HowCoped2: hh_u04c
+
+assets:
+    file: Full_Sample/Household/hh_mod_l.dta
+    idxvars:
+        i: case_id
+        j: hh_l02
+    myvars:
+        Quantity: hh_l03
+        Age: hh_l04
+        Value: hh_l05
+        Purchased Recently: hh_l06
+        Purchase Price: hh_l07

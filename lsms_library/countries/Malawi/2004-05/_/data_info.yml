@@ -52,3 +52,14 @@ shocks:
         HowCoped0: ab07a
         HowCoped1: ab07b
         HowCoped2: ab07c
+
+assets:
+    file: sec_m1.dta
+    idxvars:
+        i: case_id
+        j: m0a
+    myvars:
+        Quantity: m03a
+        Age: m04a
+        Value: m05a
+        Purchased Recently: m06a
