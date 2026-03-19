@@ -118,6 +118,14 @@
 
 - Waves: 2005-06, 2009-10, 2010-11, 2011-12, 2013-14, 2015-16, 2018-19, 2019-20
 - Error: `ImportError: cannot import name '_DIR_MARK' from 'pathspec.patterns.gitwildmatch' (/home/ligon/miniforge3/envs/lab/lib/python3.13/site-packages/pathspec/patterns/gitwildmatch.py)`
+## 2026-03-19 – Tanzania panel_ids design problem
+
+- Tanzania's `panel_ids` mechanically works (6/6 checks pass, 11,347 mappings), but the design has a fundamental issue: household splits are handled by retroactively assigning new canonical IDs back to wave 1.  This inflates the baseline household count (9,785 "canonical" households vs ~3,200 actually surveyed).
+- The World Bank harmonised panel code (`Append_TZA.do`) uses a different, more intuitive approach: track the household **head** across waves, assign the canonical ID to whichever split-off contains the original head, and give split-offs that don't contain the head a new ID.  This keeps wave 1 counts accurate.
+- Additionally, 2019-20 and 2020-21 are **two separate panel branches** (extended panel vs refresh panel) sharing 2014-15 as a common ancestor.  The hardcoded `previous_wave = '2014-15'` for 2020-21 in `tanzania.py` handles this but it means zero household overlap between 2019-20 and 2020-21.
+- **Proposed fix:** Rewrite Tanzania's `map_08_15()` and panel_ids logic to follow the WB head-tracking approach.  Reference: `/var/tmp/lsms-isa-harmonised/reproduction/Reproduction_v2/Code/Cleaning_code/Append_TZA.do` lines 23-70.
+- **Scope:** `tanzania.py` (map_08_15, panel_ids functions), rebuild `panel_ids.json` and `updated_ids.json`.
+
 ## 2026-03-19 05:30:57Z Nigeria – shocks
 
 - Waves: 2010Q3, 2011Q1, 2012Q3, 2013Q1, 2015Q3, 2016Q1, 2018Q3, 2019Q1
