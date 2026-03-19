@@ -1,0 +1,18 @@
+Country: Tanzania
+
+Data Scheme:
+  shocks:
+    index: (t, i, Shock)
+    EffectedIncome: bool
+    EffectedAssets: bool
+    HowCoped0: str
+    HowCoped1: str
+    HowCoped2: str
+    materialize: make
+
+  food_expenditures: !make
+  food_quantities: !make
+  food_prices: !make
+  household_characteristics: !make
+  other_features: !make
+  panel_ids: !make
