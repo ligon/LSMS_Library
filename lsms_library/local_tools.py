@@ -8,6 +8,7 @@ from cfe.df_utils import use_indices
 import warnings
 import json
 import difflib
+import re
 import types
 from pyarrow.lib import ArrowInvalid
 from functools import lru_cache
@@ -38,9 +39,10 @@ def _to_numeric(x,coerce=False):
 def _resolve_data_path(fn: str, stack_depth: int = 2) -> str:
     """Rewrite a relative path to land under data_root when appropriate.
 
-    Handles two patterns:
+    Handles three patterns:
       - ``../var/foo.parquet`` from country-level scripts (Uganda/_/)
       - bare ``foo.parquet`` from wave-level scripts (Uganda/2005-06/_/)
+      - ``../2005-06/_/foo.parquet`` cross-wave refs from country-level scripts
 
     Always active so that data is always written outside the package tree.
     """
@@ -75,6 +77,15 @@ def _resolve_data_path(fn: str, stack_depth: int = 2) -> str:
     if len(parts) >= 3 and parts[1] != "_" and "/" not in fn_str:
         wave = parts[1]
         resolved = data_root(country) / wave / "_" / fn_str
+        resolved.parent.mkdir(parents=True, exist_ok=True)
+        return str(resolved)
+
+    # Pattern 3: ../{wave}/_/foo.parquet  (country-level script referencing wave output)
+    # Used by country-level food_acquired.py scripts that concat wave-level parquets.
+    m = re.match(r"^\.\./([^/]+)/_/(.+)$", fn_str)
+    if m and parts[1] == "_":  # caller is a country-level script
+        wave, name = m.group(1), m.group(2)
+        resolved = data_root(country) / wave / "_" / name
         resolved.parent.mkdir(parents=True, exist_ok=True)
         return str(resolved)
 
@@ -173,7 +184,7 @@ def get_dataframe(fn,convert_categoricals=True,encoding=None,categories_only=Fal
 
 #def regularize_string(s):
 
-def df_data_grabber(fn,idxvars,convert_categoricals=True,encoding=None,orgtbl=None,**kwargs):
+def df_data_grabber(fn,idxvars,convert_categoricals=True,encoding=None,orgtbl=None,missing_ok=False,**kwargs):
     """From a file named fn, grab both index variables and additional variables
     specified in kwargs and construct a pandas dataframe.
 
@@ -204,14 +215,25 @@ def df_data_grabber(fn,idxvars,convert_categoricals=True,encoding=None,orgtbl=No
         if isinstance(v,str): # Simple
             if v in df.columns:
                 return df[v]
+            elif missing_ok:
+                return pd.Series(np.nan, index=df.index)
             else:
                 raise KeyError(f"{v} not in columns of dataframe.")
         else:
             s,f = v
             if isinstance(f,types.FunctionType):  # Tricky & Trickier
                 if isinstance(s,str):
+                    if s not in df.columns:
+                        if missing_ok:
+                            return pd.Series(np.nan, index=df.index)
+                        raise KeyError(f"{s} not in columns of dataframe.")
                     return df[s].apply(f)
                 else:
+                    missing_cols = [c for c in s if c not in df.columns]
+                    if missing_cols:
+                        if missing_ok:
+                            return pd.Series(np.nan, index=df.index)
+                        raise KeyError(f"{missing_cols} not in columns of dataframe.")
                     return df[s].apply(f,axis=1)
             elif isinstance(f,dict):
                     if isinstance(s, list) and len(s) > 1:

@@ -13,8 +13,16 @@ Makefile works for current files in the folder.
 * Files in Burkina_Faso/<SOMEYEAR>/_/
 ** DONE other_features.py
 ** DONE household_characteristics.py
-** DONE food_acquired.py
-issue for 4 rounds (called passages in documentation) wherein following rounds contain no data for food quantities or units for some reason though documentation states it was surveyed. for now, only contains data on first round.
+** DONE food_acquired
+Converted from Python scripts to YAML =data_info.yml= entries for all three waves (2014, 2018-19, 2021-22).
 
-ISSUE: Categorical Mapping Missing for Units
-In both rounds, many units remain as numerical codes without categorical mappings, and they constitude a significant portion of the entries (e.g. 22% recorded units cannot be identified in 2014). The questionnaires claim to have lists of unit mapping but missing from the actual document.
+*** 2014 wave (EMC)
+The 2014 survey has 4 passages (=emc2014_p{1..4}_conso7jours_*.dta=).  Only passage 1 records food quantities (=qachat=), units (=uachat=), and auto-consumption quantities (=qautocons=).  Passages 2--4 record only monetary values: purchase expenditure (=achat=), auto-consumption value (=autocons=), and gifts (=cadeau=).  All 4 passages are included; =Quantity=, =Produced=, and =u= are NaN for passages 2--4.
+
+Variable names differ from EHCVM waves: cluster is =zd= (not =grappe=), food item is =product= (not =s07bq01=), etc.
+
+*** 2018-19 and 2021-22 waves (EHCVM)
+Standard EHCVM format, nearly identical to Mali.  Variable names: =s07bq01= (food item), =s07bq03a= (quantity), =s07bq03b= (unit), =s07bq08= (expenditure), =s07bq04= (produced), =vague= (visit/passage).
+
+*** Categorical mapping
+ISSUE: No harmonised =categorical_mapping.org= file yet.  Food labels and units come through as raw categoricals from the =.dta= files.  Many 2014 units remain as French text without standardisation.  The 2018-19/2021-22 unit codes are numeric without categorical labels in some entries.

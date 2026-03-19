@@ -303,8 +303,9 @@ class Wave:
         def map_formatting_function(var_name, value, format_id_function = False):
             """Applies formatting functions if available, otherwise uses defaults."""
             if isinstance(value, list) and isinstance(value[-1], dict):
-                if value[-1].get('mapping'):
-                    mapping_steps = value[-1].get('mapping')
+                # Accept both 'mapping' and 'mappings' (Mali uses the plural form)
+                if value[-1].get('mapping') or value[-1].get('mappings'):
+                    mapping_steps = value[-1].get('mapping') or value[-1].get('mappings')
                     # given a direct mapping dictionary like {Male: M, Female: F}
                     if isinstance(mapping_steps, dict):
                         return (value[:-1], mapping_steps)
@@ -313,7 +314,8 @@ class Wave:
                         return (value[:-1], formatting_functions[mapping_steps])
                     #given a list requiring a categorical_mapping table ['harmonize_food', 'original_key', 'mapped_key']
                     elif isinstance(mapping_steps, list) and all(not isinstance(step, list) for step in mapping_steps):
-                        mapping_dic = self.categorical_mapping[mapping_steps[0]].loc[[mapping_steps[1], mapping_steps[2]]].to_dict()
+                        cat_table = self.categorical_mapping[mapping_steps[0]]
+                        mapping_dic = cat_table.set_index(mapping_steps[1])[mapping_steps[2]].to_dict()
                         if var_name in formatting_functions:
                             return (value[:-1], (formatting_functions[var_name], mapping_dic))
                         else:
@@ -328,7 +330,8 @@ class Wave:
                                 break
                             elif isinstance(i, list) and len(i) == 3:
                                 # If the first element is a list, we apply categorical mapping
-                                mapping = mapping + (self.categorical_mapping[i[0]].loc[[i[1], i[2]]].to_dict())
+                                cat_table = self.categorical_mapping[i[0]]
+                                mapping = mapping + (cat_table.set_index(i[1])[i[2]].to_dict(),)
                                 break
 
                         return (value[:-1], mapping)    
@@ -430,6 +433,8 @@ class Wave:
         def get_data(data_info_dic, mapping_info):
             convert_cat = (data_info_dic.get('converted_categoricals') is None)
             df_edit_function = mapping_info.pop('df_edit')
+            # When multiple files are listed, allow missing columns (filled with NaN)
+            multiple_files = len(mapping_info) > 1
             dfs = []
             for file, mappings in mapping_info.items():
                 data_path = self.file_path / "Data" / file
@@ -452,7 +457,7 @@ class Wave:
                 last_error: Exception | None = None
                 for candidate in dict.fromkeys(candidates):
                     try:
-                        df = df_data_grabber(candidate, mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat)
+                        df = df_data_grabber(candidate, mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat, missing_ok=multiple_files)
                         break
                     except (FileNotFoundError, PathMissingError) as error:
                         last_error = error
@@ -557,9 +562,11 @@ class Wave:
         df = self.grab_data('food_acquired')
         if df.empty:
             return df
-        parquet_fn = self.file_path / "_" / "food_acquired.parquet"
-        # if food_acquired data is load from parquet file, we assume its unit and food label are already mapped
-        if parquet_fn.exists():
+        # if food_acquired data is loaded from a parquet file, we assume its unit and food label are already mapped.
+        # Check both in-tree and data_root locations (wave scripts write to data_root).
+        intree_parquet = self.file_path / "_" / "food_acquired.parquet"
+        external_parquet = data_root(self.country.name) / self.year / "_" / "food_acquired.parquet"
+        if intree_parquet.exists() or external_parquet.exists():
             return df
         #Customed
         agg_functions = {'Expenditure': 'sum', 'Quantity': 'sum', 'Produced': 'sum', 'Price': 'first'}
@@ -933,19 +940,32 @@ class Country:
                 pass
 
         def safe_concat_dataframe_dict(df_dict):
-            # Get the target index name order from the first DataFrame
-            reference_order = next(iter(df_dict.values())).index.names
+            # Use the superset of all index levels as the reference order,
+            # preserving declaration order from the first DataFrame.
+            all_names: list[str] = []
+            for df in df_dict.values():
+                for name in df.index.names:
+                    if name not in all_names:
+                        all_names.append(name)
+            reference_order = all_names
 
             aligned_dfs = {}
             for key, df in df_dict.items():
-                if list(df.index.names) != list(reference_order):
+                current = list(df.index.names)
+                missing = [lvl for lvl in reference_order if lvl not in current]
+                if missing:
+                    df = df.reset_index()
+                    for lvl in missing:
+                        df[lvl] = np.nan
+                    df = df.set_index(reference_order)
+                elif current != reference_order:
                     try:
                         df = df.reorder_levels(reference_order)
                     except Exception as e:
                         raise ValueError(f"Cannot reorder index levels for '{key}': {e}")
                 aligned_dfs[key] = df
 
-            return pd.concat(aligned_dfs.values(), axis=0, sort=False)  
+            return pd.concat(aligned_dfs.values(), axis=0, sort=False)
 
         def run_make_target(method_name: str, wave: str | None = None):
             """
@@ -1770,7 +1790,10 @@ def _normalize_dataframe_index(
         for level in missing_levels:
             if level == "t" and wave is not None:
                 df[level] = wave
-        df = df.set_index(declared)
+        # Only set_index with declared levels that actually exist in the DataFrame
+        available = [lvl for lvl in declared if lvl in df.columns]
+        if available:
+            df = df.set_index(available)
         current_names = list(df.index.names)
 
     # Reorder levels to match declaration
@@ -1789,6 +1812,7 @@ def _normalize_dataframe_index(
 
     # Aggregate duplicates if any remain
     if not df.index.is_unique:
-        df = df.groupby(level=declared).first()
+        present_levels = [lvl for lvl in declared if lvl in df.index.names]
+        df = df.groupby(level=present_levels).first()
 
     return df

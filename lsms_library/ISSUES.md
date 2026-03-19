@@ -145,3 +145,31 @@
 
 - Waves: 2004-05, 2010-11, 2013-14, 2016-17, 2019-20
 - Error: `ValueError: No objects to concatenate`
+## 2026-03-19 13:25:18Z Malawi – food_acquired
+
+- Waves: 2004-05
+- Error: `ValueError: No objects to concatenate`
+## 2026-03-19 13:28:15Z Malawi – food_acquired
+
+- Waves: 2004-05, 2010-11, 2013-14, 2016-17, 2019-20
+- Error: `ValueError: No objects to concatenate`
+## 2026-03-19 13:33:06Z Malawi – food_acquired
+
+- Waves: 2004-05
+- Error: `KeyError: "None of ['v', 'visit', 'u'] are in the columns"`
+## 2026-03-19 13:36:01Z Malawi – food_acquired
+
+- Waves: 2004-05, 2010-11, 2013-14, 2016-17, 2019-20
+- Error: `KeyError: "None of ['v', 'visit', 'u'] are in the columns"`
+## 2026-03-19 14:17:56Z Burkina_Faso – food_acquired
+
+- Waves: 2014, 2018-19, 2021-22
+- Error: `KeyError: "None of ['v', 'visit', 'u'] are in the columns"`
+## 2026-03-19 14:21:36Z Burkina_Faso – food_acquired
+
+- Waves: 2014, 2018-19, 2021-22
+- Error: `ValueError: Cannot reorder index levels for '2018-19': Length of order must be same as number of levels (6), got 3`
+## 2026-03-19 14:31:14Z Burkina_Faso – food_acquired
+
+- Waves: 2014, 2018-19, 2021-22
+- Error: `ValueError: Cannot reorder index levels for '2018-19': Length of order must be same as number of levels (6), got 5`

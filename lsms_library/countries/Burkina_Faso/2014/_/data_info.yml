@@ -30,3 +30,21 @@ cluster_features:
                 Urbain: Urban
                 urbain: Urban
                 URBAIN: Urban
+
+food_acquired:
+    idxvars:
+        v: zd
+        i:
+            - zd
+            - menage
+        j: product
+        u: uachat
+    myvars:
+        Quantity: qachat
+        Expenditure: achat
+        Produced: qautocons
+    file:
+        - emc2014_p1_conso7jours_16032015.dta
+        - emc2014_p2_conso7jours_16032015.dta
+        - emc2014_p3_conso7jours_16032015.dta
+        - emc2014_p4_conso7jours_16032015.dta
