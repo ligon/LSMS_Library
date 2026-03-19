@@ -6,6 +6,10 @@ from ligonlibrary.dataframes import from_dta
 from lsms.tools import get_household_roster
 import pyreadstat
 
+Waves = {'2011-12': (),
+         '2014-15': (),
+         '2018-19': ()}
+
 def age_sex_composition(df, sex, sex_converter, age, age_converter, hhid):
     Age_ints = ((0,4),(4,9),(9,14),(14,19),(19,31),(31,51),(51,100))
     testdf = get_household_roster(df, sex=sex, sex_converter=sex_converter,

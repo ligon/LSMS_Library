@@ -10,7 +10,10 @@ VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 var = $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_quantities.parquet $(VAR_DIR)/food_prices.parquet \
 	  $(VAR_DIR)/household_characteristics.parquet $(VAR_DIR)/other_features.parquet #$(VAR_DIR)/nutrition.parquet
 
-all: $(parquet) $(var)
+all: $(parquet) $(var) panel_ids.json
+
+panel_ids.json updated_ids.json: panel_ids.py
+	python panel_ids.py
 
 $(VAR_DIR)/food_quantities.parquet $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_prices.parquet &: $(VAR_DIR)/food_acquired.parquet food_acquired.py
 	python food_prices_quantities_and_expenditures.py
