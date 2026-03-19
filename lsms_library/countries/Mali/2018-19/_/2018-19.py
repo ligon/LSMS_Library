@@ -1,6 +1,4 @@
-# Formatting Functions for Mali 2021-22
 import pandas as pd
-from lsms_library.local_tools import format_id
 import numpy as np
 
 COPING_LABELS = {
@@ -8,7 +6,7 @@ COPING_LABELS = {
     2: "Aide de parents ou d'amis",
     3: "Aide du gouvernement/l'Etat",
     4: "Aide d'organisations religieuses ou d'ONG",
-    5: "Marier au moins une de ses filles",
+    5: "Marier les enfants",
     6: "Changement des habitudes de consommation",
     7: "Achat d'aliments moins chers",
     8: "Membres actifs ont pris des emplois supplémentaires",
@@ -36,41 +34,27 @@ COPING_LABELS = {
 def shocks(df):
     cope_cols = [c for c in df.columns if c.startswith('Cope')]
 
-    # For 2021-22: coping columns have ranked string values
-    # "Première stratégie", "Deuxième strategie", "Troisième stratégie", "Non"
-    rank_map = {
-        'Première stratégie': 0,
-        'Deuxième strategie': 1,
-        'Troisième stratégie': 2,
-    }
-
+    # For 2018-19 binary coping: values are numeric (0=No, 1=Yes)
+    # Convert to float for comparison; pick the first 3 strategies with value >= 1
     how_coped = {0: [], 1: [], 2: []}
     for _, row in df[cope_cols].iterrows():
-        ranked = [np.nan, np.nan, np.nan]
+        found = []
         for c in cope_cols:
             num = int(c.replace('Cope', ''))
             val = row[c]
-            if val in rank_map:
-                idx = rank_map[val]
-                ranked[idx] = COPING_LABELS.get(num, f'Strategy {num}')
+            try:
+                val = float(val)
+            except (ValueError, TypeError):
+                continue
+            if val >= 1:
+                found.append(COPING_LABELS.get(num, f'Strategy {num}'))
+            if len(found) == 3:
+                break
         for k in range(3):
-            how_coped[k].append(ranked[k])
+            how_coped[k].append(found[k] if k < len(found) else np.nan)
 
     df['HowCoped0'] = how_coped[0]
     df['HowCoped1'] = how_coped[1]
     df['HowCoped2'] = how_coped[2]
     df = df.drop(columns=cope_cols)
-    return df
-
-
-def panel_ids(df):
-    '''
-    filter the dataframe to only include the second visit
-    '''
-    df = df[(df.index.get_level_values('visit') == '2') & (df['in_previous_wave'] == 1)]
-    def previous_i(value):
-
-        return (format_id(value[0]) or '') + '0' + (format_id(value[1], zeropadding=2) or '')
-    df['previous_i'] = df[['previous_v', 'previous_hid']].apply(previous_i, axis=1)
-    df = df.reset_index().loc[:, ['i', 'previous_i']].drop_duplicates().set_index('i')
     return df

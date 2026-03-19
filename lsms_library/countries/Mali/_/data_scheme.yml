@@ -24,3 +24,12 @@ Data Scheme:
   panel_ids:
     index: (t, i)
     previous_i: str
+  shocks:
+    index: (t, i, Shock)
+    EffectedIncome: bool
+    EffectedAssets: bool
+    EffectedProduction: bool
+    EffectedConsumption: bool
+    HowCoped0: str
+    HowCoped1: str
+    HowCoped2: str

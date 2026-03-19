@@ -25,6 +25,46 @@ household_roster:
         Relation: s1q02
     file: eaci17_s01p1.dta
 
+shocks:
+    file: eaci17_s05p2.dta
+    idxvars:
+        i:
+            - grappe
+            - exploitation
+        Shock: choc
+    myvars:
+        EffectedIncome:
+            - s5q04a
+            - mapping:
+                ' Diminué': True
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+        EffectedAssets:
+            - s5q04b
+            - mapping:
+                ' Diminué': True
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+        EffectedProduction:
+            - s5q04c
+            - mapping:
+                ' Diminué': True
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+        EffectedConsumption:
+            - s5q04d
+            - mapping:
+                ' Diminué': True
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+        HowCoped0: s5q05a
+        HowCoped1: s5q05b
+        HowCoped2: s5q05c
+
 individual_education:
     idxvars:
         v: grappe

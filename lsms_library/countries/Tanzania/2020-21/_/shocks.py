@@ -1,40 +1,66 @@
 #!/usr/bin/env python
 from lsms_library.local_tools import to_parquet
 
-from calendar import month
 import sys
 sys.path.append('../../_/')
 import pandas as pd
 import dvc.api
-from datetime import datetime
 from ligonlibrary.dataframes import from_dta
-import numpy as np 
+import numpy as np
 
-#shock dataset
-with dvc.api.open('../Data/hh_sec_r.dta',mode='rb') as dta:
+# Shock dataset
+with dvc.api.open('../Data/hh_sec_r.dta', mode='rb') as dta:
     df = from_dta(dta)
-df = df[df['hh_r01'] == 'yes'] #filter for valid entry
 
-shocks = pd.DataFrame({"j": df.y5_hhid.values.tolist(),
-                       "Shock":df.shockid.values.tolist(),
-                       "EffectedIncome&/Assets":df.hh_r03.values.tolist(),
-                       "HowCoped0":df.hh_r04_1.values.tolist(),
-                       "HowCoped1":df.hh_r04_2.values.tolist()})
+# Filter for households that experienced the shock
+df = df[df['hh_r01'] == 'yes']
+
+# Map combined effect variable to separate EffectedIncome and EffectedAssets
+effect_income_map = {
+    'INCOME LOSS': True,
+    'Income loss': True,
+    'income loss': True,
+    'ASSET LOSS': False,
+    'Asset loss': False,
+    'asset loss': False,
+    'LOSS OF BOTH': True,
+    'Loss of both': True,
+    'loss of both': True,
+    'NEITHER': False,
+    'Neither': False,
+    'neither': False,
+}
+
+effect_assets_map = {
+    'INCOME LOSS': False,
+    'Income loss': False,
+    'income loss': False,
+    'ASSET LOSS': True,
+    'Asset loss': True,
+    'asset loss': True,
+    'LOSS OF BOTH': True,
+    'Loss of both': True,
+    'loss of both': True,
+    'NEITHER': False,
+    'Neither': False,
+    'neither': False,
+}
+
+shocks = pd.DataFrame({
+    'i': df.y5_hhid.values.tolist(),
+    'Shock': df.shockid.values.tolist(),
+    'EffectedIncome': df.hh_r03.map(effect_income_map).values.tolist(),
+    'EffectedAssets': df.hh_r03.map(effect_assets_map).values.tolist(),
+    'HowCoped0': df.hh_r04_1.values.tolist(),
+    'HowCoped1': df.hh_r04_2.values.tolist(),
+})
 
 shocks.insert(1, 't', '2020-21')
 
-#converting data types 
-shocks = shocks.astype({
-                       "j": 'object',
-                       "t": 'object',
-                       'Shock': 'category',
-                       "HowCoped0": 'category',
-                       "HowCoped1": 'category',
-                       "EffectedIncome&/Assets": 'category',
-                       })
+shocks = shocks.set_index(['t', 'i', 'Shock'])
 
-shocks.set_index(['j','t','Shock'], inplace = True)
-
-assert df.index.is_unique, "Non-unique index!  Fix me!"
+# Handle duplicates by keeping first occurrence
+if not shocks.index.is_unique:
+    shocks = shocks.groupby(level=shocks.index.names).first()
 
 to_parquet(shocks, 'shocks.parquet')
