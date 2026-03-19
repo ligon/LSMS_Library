@@ -14,7 +14,12 @@ from collections import defaultdict
 country = 'Tanzania'
 
 def map_08_15(df, col):
-    # hhid index is defined as 'i' in this function to use panel_ids function in local_tools
+    """Build panel linkage for the 2008-15 multi-round file.
+
+    Uses UPHI (Universal Panel Household Identifier) to link households
+    across the 4 rounds.  Within the UPD data there are no household
+    splits, so UPHI maps 1:1 to r_hhid per round.
+    """
     hhid = df[col]
     hhid_sorted = hhid.sort_values(['UPHI', 'round'])
     hhid_sorted['previous_i'] = hhid_sorted.groupby('UPHI')['r_hhid'].shift(1)
@@ -26,9 +31,63 @@ def map_08_15(df, col):
     hhid_sorted = hhid_sorted.loc[~hhid_sorted.index.duplicated(keep='first')]
     return hhid_sorted
 
-Waves = {'2008-15':('upd4_hh_a.dta',['r_hhid','round','UPHI'], map_08_15),
-         '2019-20':('HH_SEC_A.dta','sdd_hhid','y4_hhid'),
-         '2020-21':('hh_sec_a.dta','y5_hhid','y4_hhid')}
+
+def _map_with_head_tracking(cover_df, roster_df, current_id, previous_id,
+                            head_var='hh_b05', prev_member_var='hh_b06'):
+    """Map current-wave IDs to previous-wave IDs, using head-tracking for splits.
+
+    When multiple current-wave households link to the same previous-wave
+    household (a split), the household whose head was the head in the
+    previous round (prev_member_var == 1) inherits the canonical ID.
+    Split-offs get their own new IDs.
+
+    Returns a DataFrame indexed by (t=None, i=current_id) with column
+    'previous_i' = previous_id for the continuation household only.
+    Split-offs map to themselves (new canonical IDs, no backward link).
+    """
+    # Identify which current HH contains the previous-round head
+    heads = roster_df[roster_df[head_var] == 'HEAD'][[current_id, prev_member_var]].copy()
+    heads = heads.dropna(subset=[prev_member_var])
+
+    # Merge cover with head info
+    merged = pd.merge(cover_df[[current_id, previous_id]].dropna(),
+                      heads, on=current_id, how='left')
+
+    # For splits: previous_id appears multiple times
+    dup_mask = merged.duplicated(subset=[previous_id], keep=False)
+    non_splits = merged[~dup_mask]
+    splits = merged[dup_mask]
+
+    result_rows = []
+
+    # Non-split households: simple linkage
+    for _, row in non_splits.iterrows():
+        result_rows.append({'i': format_id(row[current_id]),
+                           'previous_i': format_id(row[previous_id])})
+
+    # Split households: head with prev_member_var == 1 inherits canonical ID
+    if not splits.empty:
+        for prev_val, group in splits.groupby(previous_id):
+            # The continuation household: head was member #1 in prev round
+            continuation = group[group[prev_member_var] == 1.0]
+            if continuation.empty:
+                # Fallback: if no member #1, pick the first one
+                continuation = group.head(1)
+
+            # Continuation inherits the backward link
+            for _, row in continuation.iterrows():
+                result_rows.append({'i': format_id(row[current_id]),
+                                   'previous_i': format_id(prev_val)})
+
+            # Split-offs are deliberately excluded from the linkage —
+            # they will appear as new households starting from this wave.
+
+    return pd.DataFrame(result_rows)
+
+
+Waves = {'2008-15': ('upd4_hh_a.dta', ['r_hhid', 'round', 'UPHI'], map_08_15),
+         '2019-20': ('HH_SEC_A.dta', 'sdd_hhid', 'y4_hhid'),
+         '2020-21': ('hh_sec_a.dta', 'y5_hhid', 'y4_hhid')}
 
 waves = ['2008-09', '2010-11', '2012-13', '2014-15', '2019-20', '2020-21']
 wave_folder_map = {'2008-09':'2008-15', '2010-11':'2008-15', '2012-13':'2008-15', '2014-15':'2008-15', '2019-20':'2019-20', '2020-21':'2020-21'}
