@@ -141,3 +141,7 @@
 
 - Waves: 2004-05, 2010-11, 2013-14, 2016-17, 2019-20
 - Error: `TypeError: 'dict' object is not callable`
+## 2026-03-19 13:08:01Z Malawi – food_acquired
+
+- Waves: 2004-05, 2010-11, 2013-14, 2016-17, 2019-20
+- Error: `ValueError: No objects to concatenate`
