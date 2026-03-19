@@ -147,21 +147,21 @@ class TestDVCCaching:
             # In implementation, this should still return the cached data
 
     def test_environment_variable_control(self):
-        """Test that LSMS_USE_DVC_CACHE environment variable works."""
-        # Test with caching disabled
-        with patch.dict(os.environ, {'LSMS_USE_DVC_CACHE': 'false'}):
-            use_cache = os.getenv('LSMS_USE_DVC_CACHE', 'true').lower() == 'true'
-            assert not use_cache
+        """Test that LSMS_BUILD_BACKEND environment variable works."""
+        # Test with Make backend
+        with patch.dict(os.environ, {'LSMS_BUILD_BACKEND': 'make'}):
+            backend = os.getenv('LSMS_BUILD_BACKEND', 'dvc').lower()
+            assert backend == 'make'
 
-        # Test with caching enabled (default)
-        with patch.dict(os.environ, {'LSMS_USE_DVC_CACHE': 'true'}):
-            use_cache = os.getenv('LSMS_USE_DVC_CACHE', 'true').lower() == 'true'
-            assert use_cache
+        # Test with DVC backend (explicit)
+        with patch.dict(os.environ, {'LSMS_BUILD_BACKEND': 'dvc'}):
+            backend = os.getenv('LSMS_BUILD_BACKEND', 'dvc').lower()
+            assert backend == 'dvc'
 
-        # Test default behavior (no env var)
+        # Test default behavior (no env var) — should default to DVC
         with patch.dict(os.environ, {}, clear=True):
-            use_cache = os.getenv('LSMS_USE_DVC_CACHE', 'true').lower() == 'true'
-            assert use_cache
+            backend = os.getenv('LSMS_BUILD_BACKEND', 'dvc').lower()
+            assert backend == 'dvc'
 
     def test_cache_path_for_json_files(self, mock_country_structure):
         """Test that JSON files (like panel_ids) use correct cache path."""
@@ -207,8 +207,8 @@ class TestDVCCaching:
         loaded_df = pd.read_parquet(cache_path)
         pd.testing.assert_frame_equal(loaded_df, sample_dataframe, check_dtype=False)
 
-    def test_use_parquet_short_circuit(self, tmp_path, monkeypatch):
-        """use_parquet=True should load existing parquet without touching DVC."""
+    def test_trust_cache_short_circuit(self, tmp_path, monkeypatch):
+        """trust_cache=True should load existing parquet without touching DVC."""
         # Point data_root to tmp_path so caches are found there
         monkeypatch.setenv("LSMS_DATA_DIR", str(tmp_path / "countries"))
         from lsms_library.paths import data_root
@@ -224,7 +224,7 @@ class TestDVCCaching:
 
         country = Country.__new__(Country)
         country.name = "TestCountry"
-        country.use_parquet = True
+        country.trust_cache = True
         country._panel_ids_cache = {}
         country._updated_ids_cache = {}
         country.wave_folder_map = {}
@@ -341,23 +341,11 @@ class TestDVCCaching:
             country = Country("TestCountry", preload_panel_ids=False)
             result = country._aggregate_wave_data(method_name="test_data")
 
-            # With fast-path caching, existing cache is returned immediately
-            # without checking DVC staleness.  DVC repo should not be opened.
-            mock_repo_class.assert_not_called()
-
-        # Result should be the existing cached data (not the rebuilt version)
-        pd.testing.assert_frame_equal(
-            result.reset_index(drop=True),
-            sample_dataframe.reset_index(drop=True),
-            check_dtype=False,
-        )
-        refreshed = pd.read_parquet(cache_path)
-        # Cache file should still contain the original data (fast-path returned it as-is)
-        pd.testing.assert_frame_equal(
-            refreshed.reset_index(drop=True),
-            sample_dataframe.reset_index(drop=True),
-            check_dtype=False,
-        )
+            # DVC should be consulted even when a cached parquet exists.
+            # The stage is dirty, so reproduce() should be called.
+            mock_repo_class.assert_called_once()
+            assert mock_stage_ref is not None
+            mock_stage_ref.reproduce.assert_called_once()
 
     def test_valid_cache_uses_cached_file(
         self,

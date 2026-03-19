@@ -101,10 +101,10 @@ def _print_list(items: Sequence[str], as_csv: bool) -> None:
             print(item)
 
 
-def _load_table(country: str, table: str, waves: Optional[Sequence[str]], use_parquet: bool = False) -> object:
+def _load_table(country: str, table: str, waves: Optional[Sequence[str]], trust_cache: bool = False) -> object:
     """Return the requested table, optionally aggregated across multiple waves."""
 
-    country_obj = Country(country, preload_panel_ids=False, use_parquet=use_parquet)
+    country_obj = Country(country, preload_panel_ids=False, trust_cache=trust_cache)
 
     try:
         if waves is None:
@@ -130,11 +130,11 @@ def _materialize(
     output: Path,
     file_format: str = "parquet",
     include_index: bool = True,
-    use_parquet: bool = False,
+    trust_cache: bool = False,
 ) -> Path:
     """Load a table through the Country/Wave API and persist it."""
 
-    df = _load_table(country, table, waves, use_parquet=use_parquet)
+    df = _load_table(country, table, waves, trust_cache=trust_cache)
 
     output.parent.mkdir(parents=True, exist_ok=True)
 
@@ -314,10 +314,10 @@ def materialize(
         "--no-index",
         help="Do not include the index when writing the file.",
     ),
-    use_parquet: bool = typer.Option(
+    trust_cache: bool = typer.Option(
         False,
-        "--use-parquet/--no-use-parquet",
-        help="Read existing var/<table>.parquet files directly when present, skipping DVC materialization.",
+        "--trust-cache/--no-trust-cache",
+        help="Read existing cached parquet files directly, skipping all validation.",
     ),
 ) -> None:
     """Persist a table using the YAML-defined API."""
@@ -340,7 +340,7 @@ def materialize(
         output=out,
         file_format=format,
         include_index=not no_index,
-        use_parquet=use_parquet,
+        trust_cache=trust_cache,
     )
     typer.echo(output_path)
 

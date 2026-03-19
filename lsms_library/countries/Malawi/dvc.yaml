@@ -1,7 +1,7 @@
 stages:
   materialize:
     do:
-      cmd: cd _ && LSMS_USE_DVC_CACHE=false python3 -m lsms_library.cli materialize --country "${item.country}" --all-waves --table "${item.table}" --format "${item.format}" --out ../var/${item.table}.${item.format}
+      cmd: cd _ && LSMS_BUILD_BACKEND=make python3 -m lsms_library.cli materialize --country "${item.country}" --all-waves --table "${item.table}" --format "${item.format}" --out ../var/${item.table}.${item.format}
       deps:
       - ../../cli.py
       - ../../country.py

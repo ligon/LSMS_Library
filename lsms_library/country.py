@@ -593,12 +593,12 @@ class Country:
     #                 'nonfood_expenditures.parquet', 'enterprise_income.parquet', 'assets.parquet',
     #                 'earnings.parquet', 'housing.parquet', 'income.parquet', 'fct.parquet', 'nutrition.parquet']
 
-    def __init__(self, country_name, preload_panel_ids=False, verbose=False, use_parquet=False):
+    def __init__(self, country_name, preload_panel_ids=False, verbose=False, trust_cache=False):
         self.name = country_name
         self._panel_ids_cache = None
         self._updated_ids_cache = None
         self.wave_folder_map = {}
-        self.use_parquet = use_parquet
+        self.trust_cache = trust_cache
         scheme_map = self.resources.get("Data Scheme") if isinstance(self.resources, dict) else {}
         has_panel_ids = isinstance(scheme_map, dict) and "panel_ids" in scheme_map
         if preload_panel_ids and has_panel_ids:
@@ -912,7 +912,7 @@ class Country:
             if isinstance(backend_value, str):
                 materialize_backend = backend_value.lower()
 
-        prefer_parquet_cache = bool(getattr(self, "use_parquet", False)) and method_name not in JSON_CACHE_METHODS
+        prefer_parquet_cache = bool(getattr(self, "trust_cache", False)) and method_name not in JSON_CACHE_METHODS
         if prefer_parquet_cache:
             parquet_path = data_root(self.name) / "var" / f"{method_name}.parquet"
             if parquet_path.exists():
@@ -1221,13 +1221,6 @@ class Country:
             cache_path = data_root(self.name) / "var" / f"{method_name}.parquet"
             cache_exists = cache_path.exists()
 
-            # Fast path: if a cached parquet exists at data_root, read it directly
-            if cache_exists:
-                print(f"Reading {method_name} from cache {cache_path}", file=stderr)
-                df = get_dataframe(cache_path)
-                df = map_index(df)
-                return df
-
             dvc_root = self.file_path.parent
 
             repo: Repo | None = None
@@ -1378,18 +1371,20 @@ class Country:
             return load_dataframe_with_dvc(method_name)
 
         df: Any = None
-        # Use DVC-validated cache for all datasets whenever enabled.
-        use_dvc_cache = os.getenv('LSMS_USE_DVC_CACHE', 'true').lower() == 'true'
+        # Select build backend: "dvc" (default) validates caches via DVC,
+        # "make" bypasses DVC and builds directly with Make/wave loaders.
+        build_backend = os.getenv('LSMS_BUILD_BACKEND', 'dvc').lower()
+        use_dvc = build_backend == 'dvc'
         prefer_make_backend = materialize_backend == "make"
         resources = self.resources
         data_scheme = resources.get('Data Scheme') if isinstance(resources, dict) else {}
         has_data_scheme_entry = isinstance(data_scheme, dict) and data_scheme.get(method_name) is not None
 
-        if not use_dvc_cache and method_name in JSON_CACHE_METHODS:
+        if not use_dvc and method_name in JSON_CACHE_METHODS:
             df = load_from_waves(waves)
         else:
             try:
-                if use_dvc_cache:
+                if use_dvc:
                     df = load_with_dvc_cache(method_name)
                 elif has_data_scheme_entry and not prefer_make_backend:
                     df = load_from_waves(waves)

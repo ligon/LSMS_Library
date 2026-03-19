@@ -33,7 +33,7 @@ UGANDA_TABLES = [
 def test_uganda_makefile_backfill(table):
     if not _has_cached_table("Uganda", table):
         pytest.skip(f"Uganda/{table} not cached (requires data build)")
-    os.environ.setdefault("LSMS_USE_DVC_CACHE", "false")
+    os.environ.setdefault("LSMS_BUILD_BACKEND", "make")
     country = ll.Country("Uganda", preload_panel_ids=False, verbose=False)
     method = getattr(country, table)
     result = method()

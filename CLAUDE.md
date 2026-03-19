@@ -19,8 +19,8 @@ Root-level symlinks (e.g., `Uganda → lsms_library/countries/Uganda`) are for c
 - First call builds from source, caches to `{country}/var/{dataset}.parquet`.
 - Subsequent calls read cache (<1 sec).
 - Caches auto-invalidate on source/config changes (hash-based).
-- `LSMS_USE_DVC_CACHE=false` disables caching for debugging.
-- On clusters: `use_parquet=True` in `Country()` reads existing parquets directly.
+- `LSMS_BUILD_BACKEND=make` bypasses DVC and builds directly with Make (useful for debugging).
+- On clusters: `trust_cache=True` in `Country()` reads existing parquets directly, skipping all validation.
 
 ## Adding New Surveys
 New surveys are added via YAML config files under `lsms_library/countries/`, not Python code.

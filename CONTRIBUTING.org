@@ -152,7 +152,7 @@ poetry run python -m lsms_library.util.generate_dvc_stages --countries Uganda
 cd lsms_library/countries
 poetry run dvc repro Uganda/2019-20/dvc.yaml:materialize@uganda::2019_20::household_roster
      #+end_src
-   - If you only need to sanity-check a table without touching DVC metadata, set =LSMS_USE_DVC_CACHE=false= and call either =lsms-library materialize ...= or the per-country Makefile target; the environment variable keeps the runtime loader from reading stale caches.
+   - If you only need to sanity-check a table without touching DVC metadata, set =LSMS_BUILD_BACKEND=make= and call either =lsms-library materialize ...= or the per-country Makefile target; the environment variable keeps the runtime loader from re-entering DVC.
    - Use =lsms-library cache clear --country <Country>= (plus =--method= / =--wave= filters) before rerunning DVC stages when you want to guarantee that fresh parquet/JSON artefacts are produced.
 
 

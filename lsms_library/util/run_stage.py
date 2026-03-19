@@ -96,7 +96,7 @@ def _run_cli(country: str, table: str, fmt: str, wave: str | None, all_waves: bo
         ]
     )
     env = _runtime_env()
-    env["LSMS_USE_DVC_CACHE"] = "false"
+    env["LSMS_BUILD_BACKEND"] = "make"
     subprocess.run(cmd, cwd=Path("_"), check=True, env=env)
 
 
