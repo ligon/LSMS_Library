@@ -889,6 +889,10 @@ class Country:
             ):
                 df = id_walk(df, self.updated_ids)
 
+            # Enforce declared dtypes from data_scheme.yml
+            if isinstance(scheme_entry, dict):
+                _enforce_declared_dtypes(df, scheme_entry)
+
         return df
 
     def _aggregate_wave_data(self, waves=None, method_name=None):
@@ -1704,6 +1708,36 @@ def _declared_index_levels(schema_entry: dict[str, Any] | None) -> list[str]:
         return []
 
     return [str(level) for level in declared_levels]
+
+
+_SCHEME_DTYPE_MAP = {
+    'bool': pd.BooleanDtype(),
+    'int': pd.Int64Dtype(),
+    'float': pd.Float64Dtype(),
+    'str': pd.StringDtype(),
+    'string': pd.StringDtype(),
+}
+
+_SCHEME_SKIP_KEYS = frozenset({'index', 'materialize', 'backend'})
+
+
+def _enforce_declared_dtypes(df: pd.DataFrame, scheme_entry: dict[str, Any]) -> None:
+    """Cast DataFrame columns to the types declared in data_scheme.yml.
+
+    Modifies *df* in place.  List declarations (e.g. ``[Male, Female]``)
+    are treated as constrained string columns and cast to ``StringDtype``;
+    validation of the actual values is left to ``diagnostics._check_value_constraints``.
+    """
+    for col, declared_type in scheme_entry.items():
+        if col in _SCHEME_SKIP_KEYS or col not in df.columns:
+            continue
+        try:
+            if isinstance(declared_type, list):
+                df[col] = df[col].astype(pd.StringDtype())
+            elif isinstance(declared_type, str) and declared_type in _SCHEME_DTYPE_MAP:
+                df[col] = df[col].astype(_SCHEME_DTYPE_MAP[declared_type])
+        except (ValueError, TypeError):
+            pass  # best-effort; don't break loading
 
 
 def _normalize_dataframe_index(

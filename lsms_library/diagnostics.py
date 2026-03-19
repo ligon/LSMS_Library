@@ -242,6 +242,11 @@ def _check_dtype_consistency(df: pd.DataFrame, scheme: dict, feature: str) -> Ch
         if col_name not in df.columns:
             continue
         actual = df[col_name].dtype
+        if isinstance(declared_type, list):
+            # List declaration = constrained string column
+            if not (pd.api.types.is_string_dtype(actual) or pd.api.types.is_object_dtype(actual)):
+                issues.append(f"{col_name}: expected string (constrained), got {actual}")
+            continue
         expected_kind = _DTYPE_MAP.get(str(declared_type), None)
         if expected_kind is None:
             continue
@@ -251,9 +256,36 @@ def _check_dtype_consistency(df: pd.DataFrame, scheme: dict, feature: str) -> Ch
             pd.api.types.is_string_dtype(actual) or pd.api.types.is_object_dtype(actual)
         ):
             issues.append(f"{col_name}: expected string, got {actual}")
+        elif expected_kind == "boolean" and not (
+            pd.api.types.is_bool_dtype(actual) or str(actual) == "boolean"
+        ):
+            issues.append(f"{col_name}: expected boolean, got {actual}")
     if issues:
         return Check("dtype_consistency", "warn", "; ".join(issues[:5]))
     return Check("dtype_consistency", "pass")
+
+
+def _check_value_constraints(df: pd.DataFrame, scheme: dict, feature: str) -> Check:
+    """Warn if column values fall outside a declared set (list declarations)."""
+    spec = scheme.get(feature, {})
+    expected_cols = spec.get("columns", {})
+    if not expected_cols:
+        return Check("value_constraints", "pass", "No value constraints declared (skipped)")
+    issues = []
+    for col_name, declared_type in expected_cols.items():
+        if not isinstance(declared_type, list) or col_name not in df.columns:
+            continue
+        unexpected = set(df[col_name].dropna().unique()) - set(declared_type)
+        if unexpected:
+            sample = sorted(str(v) for v in list(unexpected)[:5])
+            issues.append(f"{col_name}: {len(unexpected)} unexpected value(s): {sample}")
+    if issues:
+        return Check("value_constraints", "warn", "; ".join(issues))
+    constrained = [c for c, t in expected_cols.items() if isinstance(t, list) and c in df.columns]
+    if not constrained:
+        return Check("value_constraints", "pass", "No constrained columns (skipped)")
+    return Check("value_constraints", "pass",
+                 f"{len(constrained)} constrained column(s) — all values valid")
 
 
 def _check_duplicate_index(df: pd.DataFrame) -> Check:
@@ -339,6 +371,7 @@ def is_this_feature_sane(
     report.checks.append(_check_no_constant_columns(df))
     report.checks.append(_check_declared_columns(df, scheme, feature))
     report.checks.append(_check_dtype_consistency(df, scheme, feature))
+    report.checks.append(_check_value_constraints(df, scheme, feature))
     report.checks.append(_check_duplicate_index(df))
     report.checks.append(_check_index_overlap_with_spine(df, country))
 
