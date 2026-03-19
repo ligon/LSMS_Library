@@ -49,3 +49,53 @@ panel_ids:
         i: y3_hhid
     myvars:
         previous_i: y2_hhid
+
+shocks:
+    file: Cross_Sectional/hh_mod_u.dta
+    idxvars:
+        i: case_id
+        Shock: hh_u0a
+    myvars:
+        EffectedIncome:
+            - hh_u03a
+            - mapping:
+                Decrease: True
+                DECREASE: True
+                Did not change: False
+                Did Not Change: False
+                DID NOT CHANGE: False
+                Increase: True
+                INCREASE: True
+        EffectedAssets:
+            - hh_u03b
+            - mapping:
+                Decrease: True
+                DECREASE: True
+                Did not change: False
+                Did Not Change: False
+                DID NOT CHANGE: False
+                Increase: True
+                INCREASE: True
+        EffectedProduction:
+            - hh_u03c
+            - mapping:
+                Decrease: True
+                DECREASE: True
+                Did not change: False
+                Did Not Change: False
+                DID NOT CHANGE: False
+                Increase: True
+                INCREASE: True
+        EffectedConsumption:
+            - hh_u03d
+            - mapping:
+                Decrease: True
+                DECREASE: True
+                Did not change: False
+                Did Not Change: False
+                DID NOT CHANGE: False
+                Increase: True
+                INCREASE: True
+        HowCoped0: hh_u04a
+        HowCoped1: hh_u04b
+        HowCoped2: hh_u04c

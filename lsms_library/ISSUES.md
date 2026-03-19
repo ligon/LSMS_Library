@@ -101,6 +101,13 @@
 
 - Waves: 2020-21
 - Error: `TypeError: 'Mock' object does not support the context manager protocol`
+## 2026-03-18 – Enforce dtypes from data_scheme.yml
+
+- The `data_scheme.yml` declares column types (e.g., `EffectedIncome: bool`) but these are not enforced after loading.  YAML mappings that produce True/False mixed with NaN result in `object` dtype instead of pandas nullable `boolean`.
+- **Proposed fix:** After `grab_data()` or `load_from_waves()`, cast columns to the types declared in the scheme.  Use `pd.BooleanDtype()` for bool, `pd.Int64Dtype()` for int, etc. — these support `pd.NA`.
+- **Scope:** `country.py`, likely in `_finalize_result()` or `_aggregate_wave_data()`.
+- **Risk:** Low — only affects columns with explicit type declarations in the scheme.
+
 ## 2026-03-17 23:44:40Z Uganda – household_roster
 
 - Waves: 2005-06, 2009-10, 2010-11, 2011-12, 2013-14, 2015-16, 2018-19, 2019-20

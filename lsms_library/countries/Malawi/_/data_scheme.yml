@@ -29,6 +29,15 @@ Data Scheme:
   interview_date:
     index: (t, v, visit, i)
     Int_t: str
+  shocks:
+    index: (t, i, Shock)
+    EffectedIncome: bool
+    EffectedAssets: bool
+    EffectedProduction: bool
+    EffectedConsumption: bool
+    HowCoped0: str
+    HowCoped1: str
+    HowCoped2: str
   food_expenditures:
   household_characteristics:
   food_prices:

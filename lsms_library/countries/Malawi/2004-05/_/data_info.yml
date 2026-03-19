@@ -30,3 +30,25 @@ household_roster:
 #         i: case_id
 #     myvars:
 #         previous_i: case_id
+
+shocks:
+    file: sec_ab.dta
+    idxvars:
+        i: case_id
+        Shock: ab02
+    myvars:
+        EffectedIncome:
+            - ab04
+            - mapping:
+                Income loss: True
+                Asset loss: False
+                Loss of both: True
+        EffectedAssets:
+            - ab04
+            - mapping:
+                Income loss: False
+                Asset loss: True
+                Loss of both: True
+        HowCoped0: ab07a
+        HowCoped1: ab07b
+        HowCoped2: ab07c
