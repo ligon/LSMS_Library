@@ -108,7 +108,24 @@
 - **Scope:** `country.py`, likely in `_finalize_result()` or `_aggregate_wave_data()`.
 - **Risk:** Low — only affects columns with explicit type declarations in the scheme.
 
+## 2026-03-18 – categorical_mapping lookup broken for index variables
+
+- `Wave.categorical_mapping` is a property returning a dict, but `column_mapping()` at line 316 calls it as `self.categorical_mapping(table_name)` — `TypeError: 'dict' object is not callable`.
+- Also: `Wave.categorical_mapping` property returns `None` because `dict.update()` returns None (line 384).
+- Also: the `categorical_mapping.org` file is looked up at the **wave** level (`{wave}/_/categorical_mapping.org`) but typically lives at the **country** level (`_/categorical_mapping.org`).  The country-level dict is loaded via `self.country.categorical_mapping` but the wave-level lookup fails.
+- Additionally: Mali's `data_info.yml` files use `mappings:` (plural) but the code only handles `mapping:` (singular).  The plural form is silently ignored.
+- **Net effect:** The categorical mapping table reference from `data_info.yml` (`- mapping: ['table_name', 'key_col', 'value_col']`) does not work for index variables in `idxvars`.  It may work for `myvars` if the Country-level (not Wave-level) code path is used.
+- **Scope:** `country.py` lines 316, 376-384.
+
 ## 2026-03-17 23:44:40Z Uganda – household_roster
 
 - Waves: 2005-06, 2009-10, 2010-11, 2011-12, 2013-14, 2015-16, 2018-19, 2019-20
 - Error: `ImportError: cannot import name '_DIR_MARK' from 'pathspec.patterns.gitwildmatch' (/home/ligon/miniforge3/envs/lab/lib/python3.13/site-packages/pathspec/patterns/gitwildmatch.py)`
+## 2026-03-19 05:30:57Z Nigeria – shocks
+
+- Waves: 2010Q3, 2011Q1, 2012Q3, 2013Q1, 2015Q3, 2016Q1, 2018Q3, 2019Q1
+- Error: `FileNotFoundError: [Errno 2] No such file or directory: '/var/tmp/coder-mirrors/LSMS_Library/lsms_library/countries/Nigeria/2010Q3/_'`
+## 2026-03-19 05:37:51Z Malawi – shocks
+
+- Waves: 2004-05, 2010-11, 2013-14, 2016-17, 2019-20
+- Error: `TypeError: 'dict' object is not callable`

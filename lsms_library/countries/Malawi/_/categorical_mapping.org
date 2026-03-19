@@ -145,6 +145,81 @@
 | Groundnut Dried (Unshelled)                 | Legumes     | ---                        | ---                                              | ---                                              | Groundnut Dried (UnShelled)                         | ---                                              |
 
 
+#+name: harmonize_shocks
+| Original Label                                                                                              | Preferred Label                                          |
+|-------------------------------------------------------------------------------------------------------------+----------------------------------------------------------|
+| Drought                                                                                                     | Drought                                                  |
+| DROUGHT                                                                                                     | Drought                                                  |
+| Lower crop yields due to drought or floods                                                                  | Drought                                                  |
+| Floods                                                                                                      | Floods                                                   |
+| FLOODS                                                                                                      | Floods                                                   |
+| Irregular Rains                                                                                             | Irregular Rains                                          |
+| IRREGULAR RAINS                                                                                             | Irregular Rains                                          |
+| Drought/Irregular Rains                                                                                     | Drought                                                  |
+| Earthquakes                                                                                                 | Earthquakes                                              |
+| EARTHQUAKES                                                                                                 | Earthquakes                                              |
+| Landslides                                                                                                  | Landslides                                               |
+| LANDSLIDES                                                                                                  | Landslides                                               |
+| Floods/Landslides                                                                                           | Floods                                                   |
+| Unusually High Prices for Food                                                                              | High Food Prices                                         |
+| UNUSUALLY HIGH PRICES FOR FOOD                                                                              | High Food Prices                                         |
+| Large rise in price of food                                                                                 | High Food Prices                                         |
+| Unusually High Costs of Agricultural Inputs                                                                 | High Input Costs                                         |
+| UNUSUALLY HIGH COSTS OFAGRICULTURAL INPUTS                                                                  | High Input Costs                                         |
+| Unusually High Costs ofAgricultural Inputs                                                                  | High Input Costs                                         |
+| Rise in Farm Inputs Prices                                                                                  | High Input Costs                                         |
+| Unusually Low Prices for Agricultural Output                                                                | Low Crop Prices                                          |
+| UNUSUALLY LOW PRICES FORAGRICULTURAL OUTPUT                                                                 | Low Crop Prices                                          |
+| Unusually Low Prices forAgricultural Output                                                                 | Low Crop Prices                                          |
+| Large fall in sales prices for crops                                                                        | Low Crop Prices                                          |
+| Unusually High Level of Crop Pests or Disease                                                               | Crop Pests or Disease                                    |
+| UNUSUALLY HIGH LEVEL OF CROP PESTS OR DISEASE                                                               | Crop Pests or Disease                                    |
+| Crop disease of crop pests                                                                                  | Crop Pests or Disease                                    |
+| Unusually High Level of Livestock Disease                                                                   | Livestock Disease                                        |
+| UNUSUALLY HIGH LEVEL OF LIVESTOCK DISEASE                                                                   | Livestock Disease                                        |
+| Livestock died or were stolen                                                                               | Livestock Disease                                        |
+| Serious Ilness or Accident of Household Member(s)                                                           | Illness or Accident                                      |
+| SERIOUS ILNESS OR ACCIDENT OF HOUSEHOLD MEMBER(S)                                                          | Illness or Accident                                      |
+| Illness or accident of household member                                                                     | Illness or Accident                                      |
+| Death of Income Earner(s)                                                                                   | Death of Income Earner                                   |
+| DEATH OF INCOME EARNER(S)                                                                                   | Death of Income Earner                                   |
+| Death of working member of household                                                                        | Death of Income Earner                                   |
+| Death of Other Household Member(s)                                                                          | Death of Other Member                                    |
+| DEATH OF OTHER HOUSEHOLD MEMBER(S)                                                                         | Death of Other Member                                    |
+| Death of other family member                                                                                | Death of Other Member                                    |
+| Death of household head                                                                                     | Death of Other Member                                    |
+| Theft of Money/Valuables/Assets/Agricultural Output                                                         | Theft                                                    |
+| THEFT OF MONEY/VALUABLES/ASSETS/AGRICULTURAL OUTPUT                                                        | Theft                                                    |
+| Theft                                                                                                       | Theft                                                    |
+| Conflict/Violence                                                                                           | Conflict or Violence                                     |
+| CONFLICT/VIOLENCE                                                                                           | Conflict or Violence                                     |
+| Break-Up of Household                                                                                       | Household Breakup                                        |
+| BREAK-UP OF HOUSEHOLD                                                                                      | Household Breakup                                        |
+| Breakup of the household                                                                                    | Household Breakup                                        |
+| Birth in the Household                                                                                      | Birth in Household                                       |
+| BIRTH IN THE HOUSEHOLD                                                                                     | Birth in Household                                       |
+| Birth in the household                                                                                      | Birth in Household                                       |
+| Loss of Employment of Previously Salaried Household Member(s) (Not due to Illness or Accident)              | Loss of Employment                                       |
+| LOSS OF EMPLOYMENT OF PREVIOUSL SALARIED HOUSEHOLD MEMBER(S)(NOT DUE TO ILLNESS OR ACCIDENT)               | Loss of Employment                                       |
+| Loss of Employment of Previousl Salaried Household Member(s)(Not due to Illness                             | Loss of Employment                                       |
+| Loss of salaried employment or nonpayment of salaries                                                       | Loss of Employment                                       |
+| Reduction in the Earnings of Currently Salaried Household Member(s) (Not due to Illness or Accident)        | Reduced Earnings (Salaried)                              |
+| REDUCTION IN THE EARNINGS OF CURRENTLY SALARIED HOUSEHOLD MEMBER(S) (NOT DUE TO ILLNESS OR ACCIDENT)       | Reduced Earnings (Salaried)                              |
+| Reduction in the Earnings from Household (Non-Agricultural) Business (Not due to Illness or Accident)       | Reduced Earnings (Business)                              |
+| REDUCTION IN THE EARNINGS FROM HOUSEHOLD (NON-AGRICULTURAL) BUSINESS (NOT DUE TO ILLNESS OR ACCIDENT)      | Reduced Earnings (Business)                              |
+| Household (Non-Agricultural) Business Failure (Not due to Illness or Accident)                              | Business Failure                                         |
+| HOUSEHOLD (NON-AGRICULTURAL) BUSINESS FAILURE  (NOT DUE TO ILLNESS OR ACCIDENT)                            | Business Failure                                         |
+| Household (Non-Agricultural) Business Failure  (Not due to Illness or Accident)                             | Business Failure                                         |
+| Household business failure, non-agr                                                                         | Business Failure                                         |
+| End of Regular Assistance/Aid/Remittances From Outside Household                                            | End of Assistance                                        |
+| END OF REGULAR ASSISTANCE/AID/ REMITTANCES FROM OUTSIDE HOUSEHOLD                                          | End of Assistance                                        |
+| End of Regular Assistance/Aid/ Remittances From Outside Household                                           | End of Assistance                                        |
+| End of regular assistance/aid/remittances from outside HH                                                   | End of Assistance                                        |
+| Dwelling damaged, destroyed                                                                                 | Dwelling Damage                                          |
+| Other (Specify)                                                                                             | Other                                                    |
+| OTHER (SPECIFY)                                                                                             | Other                                                    |
+| Other                                                                                                       | Other                                                    |
+
 #+name: unit
 | Unit                      | Code |
 |---------------------------+------|

@@ -313,7 +313,7 @@ class Wave:
                         return (value[:-1], formatting_functions[mapping_steps])
                     #given a list requiring a categorical_mapping table ['harmonize_food', 'original_key', 'mapped_key']
                     elif isinstance(mapping_steps, list) and all(not isinstance(step, list) for step in mapping_steps):
-                        mapping_dic = self.categorical_mapping(mapping_steps[0]).loc[[mapping_steps[1], mapping_steps[2]]].to_dict()
+                        mapping_dic = self.categorical_mapping[mapping_steps[0]].loc[[mapping_steps[1], mapping_steps[2]]].to_dict()
                         if var_name in formatting_functions:
                             return (value[:-1], (formatting_functions[var_name], mapping_dic))
                         else:
@@ -328,7 +328,7 @@ class Wave:
                                 break
                             elif isinstance(i, list) and len(i) == 3:
                                 # If the first element is a list, we apply categorical mapping
-                                mapping = mapping + (self.categorical_mapping(i[0]).loc[[i[1], i[2]]].to_dict())
+                                mapping = mapping + (self.categorical_mapping[i[0]].loc[[i[1], i[2]]].to_dict())
                                 break
 
                         return (value[:-1], mapping)    
@@ -376,12 +376,12 @@ class Wave:
     @property
     def categorical_mapping(self):
         org_fn = self.file_path / "_" / "categorical_mapping.org"
-        dic = self.country.categorical_mapping
+        dic = dict(self.country.categorical_mapping)
         if not org_fn.exists():
-            warnings.warn(f"Categorical mapping file not found: {org_fn}")
-            return {}
+            return dic if dic else {}
         else:
-            return dic.update(all_dfs_from_orgfile(org_fn))
+            dic.update(all_dfs_from_orgfile(org_fn))
+            return dic
 
     @property
     def license(self):
@@ -645,17 +645,16 @@ class Country:
         return function_dic
     
     @property
-    def categorical_mapping(self, dirs = ['./', '../']):
+    def categorical_mapping(self):
         '''
-        Get the categorical mapping for the country
+        Get the categorical mapping for the country.
+        Searches current directory, then parent directory.
         '''
-        for dir in dirs:
-            org_fn = Path(self.file_path / dir/ "_" / "categorical_mapping.org")
-            if not org_fn.exists():
-                warnings.warn(f"Categorical mapping file not found: {org_fn}")
-                return {}
-            else:
+        for rel in ['./', '../']:
+            org_fn = Path(self.file_path / rel / "_" / "categorical_mapping.org")
+            if org_fn.exists():
                 return all_dfs_from_orgfile(org_fn)
+        return {}
 
     @property
     def mapping(self):
