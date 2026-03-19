@@ -1,0 +1,21 @@
+Country: Ethiopia
+
+Data Scheme:
+  shocks:
+    index: (t, i, Shock)
+    EffectedIncome: bool
+    EffectedAssets: bool
+    EffectedProduction: bool
+    EffectedConsumption: bool
+    HowCoped0: str
+    HowCoped1: str
+    HowCoped2: str
+
+  food_acquired: !make
+  food_expenditures: !make
+  food_prices: !make
+  food_quantities: !make
+  household_characteristics: !make
+  other_features: !make
+  nutrition: !make
+  panel_ids: !make

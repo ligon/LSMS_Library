@@ -12,7 +12,10 @@ var = $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_quantities.parquet $(
 	  $(VAR_DIR)/household_characteristics.parquet $(VAR_DIR)/other_features.parquet \
       $(VAR_DIR)/shocks.parquet $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet
 
-all: $(parquet) $(var)
+all: panel_ids.json updated_ids.json $(parquet) $(var)
+
+panel_ids.json updated_ids.json: panel_ids.py
+	python panel_ids.py
 
 $(VAR_DIR)/food_quantities.parquet $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_prices.parquet &: $(VAR_DIR)/food_acquired.parquet food_prices_quantities_and_expenditures.py
 	python food_prices_quantities_and_expenditures.py
