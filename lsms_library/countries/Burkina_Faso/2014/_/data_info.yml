@@ -1,0 +1,20 @@
+Country: Burkina Faso
+Wave: 2014
+
+cluster_features:
+    file: emc2014_p1_logement_27022015.dta
+    idxvars:
+        i: menage
+        v: zd
+    myvars:
+        Region: region
+        District: province
+        Rural:
+            - milieu
+            - mapping:
+                Rural: Rural
+                rural: Rural
+                RURAL: Rural
+                Urbain: Urban
+                urbain: Urban
+                URBAIN: Urban

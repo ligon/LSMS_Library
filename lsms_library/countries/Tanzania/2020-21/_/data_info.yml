@@ -1,0 +1,59 @@
+Country: Tanzania
+Wave: 2020-21
+
+cluster_features:
+    file: hh_sec_a.dta
+    idxvars:
+        i: y5_hhid
+        v: clusterid
+    myvars:
+        Region: hh_a01_1
+        District: hh_a02_1
+        Rural:
+            - y5_rural
+            - mapping:
+                RURAL: Rural
+                Rural: Rural
+                rural: Rural
+                URBAN: Urban
+                Urban: Urban
+                urban: Urban
+
+shocks:
+    file: hh_sec_r.dta
+    idxvars:
+        i: y5_hhid
+        Shock: shockid
+    myvars:
+        EffectedIncome:
+            - hh_r03
+            - mapping:
+                INCOME LOSS: True
+                Income loss: True
+                income loss: True
+                ASSET LOSS: False
+                Asset loss: False
+                asset loss: False
+                LOSS OF BOTH: True
+                Loss of both: True
+                loss of both: True
+                NEITHER: False
+                Neither: False
+                neither: False
+        EffectedAssets:
+            - hh_r03
+            - mapping:
+                INCOME LOSS: False
+                Income loss: False
+                income loss: False
+                ASSET LOSS: True
+                Asset loss: True
+                asset loss: True
+                LOSS OF BOTH: True
+                Loss of both: True
+                loss of both: True
+                NEITHER: False
+                Neither: False
+                neither: False
+        HowCoped0: hh_r04_1
+        HowCoped1: hh_r04_2

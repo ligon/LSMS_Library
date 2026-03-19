@@ -1,0 +1,61 @@
+Country: Ethiopia
+Wave: 2015-16
+
+cluster_features:
+    file: sect_cover_hh_w3.dta
+    idxvars:
+        i: household_id2
+        v: ea_id2
+    myvars:
+        Region: saq01
+        District: saq02
+        Rural:
+            - rural
+            - mapping:
+                rural: Rural
+                Rural: Rural
+                RURAL: Rural
+                small town: Urban
+                Small town: Urban
+                Small Town: Urban
+                SMALL TOWN: Urban
+                Small town (urban): Urban
+                urban: Urban
+                Urban: Urban
+                URBAN: Urban
+                Large town (urban): Urban
+                Meduim and large town: Urban
+
+shocks:
+    file: sect8_hh_w3.dta
+    idxvars:
+        i: household_id2
+        Shock: hh_s8q00
+    myvars:
+        EffectedIncome:
+            - hh_s8q03_a
+            - mapping:
+                Decrease: True
+                Did Not Change: False
+                Increase: True
+        EffectedAssets:
+            - hh_s8q03_b
+            - mapping:
+                Decrease: True
+                Did Not Change: False
+                Increase: True
+        EffectedProduction:
+            - hh_s8q03_c
+            - mapping:
+                Decrease: True
+                Did Not Change: False
+                Increase: True
+        EffectedConsumption:
+            - hh_s8q03_e
+            - mapping:
+                Decrease: True
+                Did Not Change: False
+                Increase: True
+        HowCoped0: hh_s8q04_a
+        HowCoped1: hh_s8q04_b
+        HowCoped2: hh_s8q04_c

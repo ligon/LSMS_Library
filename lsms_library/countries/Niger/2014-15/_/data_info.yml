@@ -1,0 +1,22 @@
+Country: Niger
+Wave: 2014-15
+
+cluster_features:
+    file: NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS00P1.dta
+    idxvars:
+        i: MENAGE
+        v: GRAPPE
+    myvars:
+        Region: MS00Q10
+        District: MS00Q11
+        Rural:
+            - MS00Q15
+            - mapping:
+                Rural: Rural
+                rural: Rural
+                RURAL: Rural
+                Urbain: Urban
+                urbain: Urban
+                URBAIN: Urban
+                "Communauté Urbaine": Urban
+                "Communauté urbaine": Urban

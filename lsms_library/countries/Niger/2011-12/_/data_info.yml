@@ -1,0 +1,20 @@
+Country: Niger
+Wave: 2011-12
+
+cluster_features:
+    file: NER_2011_ECVMA_v01_M_Stata8/ecvmamen_p1.dta
+    idxvars:
+        i: hid
+        v: grappe
+    myvars:
+        Region: region
+        District: strate
+        Rural:
+            - urbrur
+            - mapping:
+                Rural: Rural
+                rural: Rural
+                RURAL: Rural
+                Urbain: Urban
+                urbain: Urban
+                URBAIN: Urban

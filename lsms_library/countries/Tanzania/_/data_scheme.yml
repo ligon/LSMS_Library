@@ -1,6 +1,12 @@
 Country: Tanzania
 
 Data Scheme:
+  cluster_features:
+    index: (t, v)
+    Region: str
+    District: str
+    Rural: str
+
   shocks:
     index: (t, i, Shock)
     EffectedIncome: bool

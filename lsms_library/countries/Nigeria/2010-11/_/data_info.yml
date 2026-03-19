@@ -1,0 +1,30 @@
+Country: Nigeria
+Wave: 2010-11
+
+cluster_features:
+    file: Post Planting Wave 1/Household/secta_plantingw1.dta
+    idxvars:
+        i: hhid
+        v: ea
+    myvars:
+        Region: zone
+        District: state
+        Rural:
+            - sector
+            - mapping:
+                rural: Rural
+                Rural: Rural
+                RURAL: Rural
+                urban: Urban
+                Urban: Urban
+                URBAN: Urban
+
+shocks:
+    file: Post Harvest Wave 1/Household/sect15a_harvestw1.dta
+    idxvars:
+        i: hhid
+        Shock: shock_cd
+    myvars:
+        HowCoped0: s15aq5a
+        HowCoped1: s15aq5b
+        HowCoped2: s15aq5c
