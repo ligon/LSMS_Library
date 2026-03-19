@@ -103,10 +103,7 @@
 - Error: `TypeError: 'Mock' object does not support the context manager protocol`
 ## 2026-03-18 – Enforce dtypes from data_scheme.yml
 
-- The `data_scheme.yml` declares column types (e.g., `EffectedIncome: bool`) but these are not enforced after loading.  YAML mappings that produce True/False mixed with NaN result in `object` dtype instead of pandas nullable `boolean`.
-- **Proposed fix:** After `grab_data()` or `load_from_waves()`, cast columns to the types declared in the scheme.  Use `pd.BooleanDtype()` for bool, `pd.Int64Dtype()` for int, etc. — these support `pd.NA`.
-- **Scope:** `country.py`, likely in `_finalize_result()` or `_aggregate_wave_data()`.
-- **Risk:** Low — only affects columns with explicit type declarations in the scheme.
+- Status: **RESOLVED** — `_enforce_declared_dtypes()` added to `_finalize_result()`.  Uses nullable pandas dtypes (`BooleanDtype`, `Int64Dtype`, `Float64Dtype`, `StringDtype`).  List declarations (`Sex: [Male, Female]`) cast to `StringDtype` with value validation in `diagnostics._check_value_constraints`.
 
 ## 2026-03-18 – categorical_mapping lookup broken for index variables
 
