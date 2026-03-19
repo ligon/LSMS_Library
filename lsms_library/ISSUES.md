@@ -126,6 +126,13 @@
 - **Proposed fix:** Rewrite Tanzania's `map_08_15()` and panel_ids logic to follow the WB head-tracking approach.  Reference: `/var/tmp/lsms-isa-harmonised/reproduction/Reproduction_v2/Code/Cleaning_code/Append_TZA.do` lines 23-70.
 - **Scope:** `tanzania.py` (map_08_15, panel_ids functions), rebuild `panel_ids.json` and `updated_ids.json`.
 
+## 2026-03-19 – Housing schema inconsistency across countries
+
+- Malawi housing agent produced binary indicators (`Thatched roof: float`, `Earthen floor: float`) matching Uganda's legacy output.
+- Other country agents (Ethiopia, Tanzania, Mali, Niger, Burkina Faso) produced categorical columns (`Roof: str`, `Wall: str`, `Floor: str`, etc.) — richer data, consistent with "pass the detail" principle.
+- **Fix needed:** Malawi (and Uganda) housing should use categoricals like the other countries. The raw data has the material type labels; the binary indicators discard information.
+- **Scope:** Rewrite Malawi housing `data_info.yml` entries to extract `hh_f08` as `Roof: str` (categorical material) instead of mapping to binary. Update Uganda similarly.
+
 ## 2026-03-19 05:30:57Z Nigeria – shocks
 
 - Waves: 2010Q3, 2011Q1, 2012Q3, 2013Q1, 2015Q3, 2016Q1, 2018Q3, 2019Q1
