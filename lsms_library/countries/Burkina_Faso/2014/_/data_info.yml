@@ -1,6 +1,18 @@
 Country: Burkina Faso
 Wave: 2014
 
+household_roster:
+    file: emc2014_p1_individu_27022015.dta
+    idxvars:
+        i:
+            - zd
+            - menage
+        pid: numind
+    myvars:
+        Sex: B2
+        Age: B4
+        Relation: B5
+
 cluster_features:
     file: emc2014_p1_logement_27022015.dta
     idxvars:

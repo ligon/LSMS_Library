@@ -16,6 +16,13 @@ Data Scheme:
     HowCoped2: str
     materialize: make
 
+  household_roster:
+    index: (t, i, pid)
+    Sex: str
+    Age: int
+    Relation: str
+    materialize: make
+
   food_expenditures: !make
   food_quantities: !make
   food_prices: !make

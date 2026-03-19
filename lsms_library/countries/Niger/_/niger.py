@@ -5,6 +5,17 @@ import dvc.api
 from ligonlibrary.dataframes import from_dta
 from lsms.tools import get_household_roster
 import pyreadstat
+import lsms_library.local_tools as tools
+
+
+def i(value):
+    '''
+    Formatting household id. Handles both scalar (hid) and composite (grappe, menage) cases.
+    Matches existing convention: str(grappe) + str(menage) (no padding).
+    '''
+    if isinstance(value, (pd.Series, np.ndarray, list, tuple)):
+        return tools.format_id(value[0]) + tools.format_id(value[1])
+    return tools.format_id(value)
 
 Waves = {'2011-12': (),
          '2014-15': (),

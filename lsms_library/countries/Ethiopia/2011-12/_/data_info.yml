@@ -25,6 +25,16 @@ cluster_features:
                 Large town (urban): Urban
                 Meduim and large town: Urban
 
+household_roster:
+    file: sect1_hh_w1.dta
+    idxvars:
+        i: household_id
+        pid: individual_id
+    myvars:
+        Sex: hh_s1q03
+        Age: hh_s1q04_a
+        Relation: hh_s1q02
+
 shocks:
     file: sect8_hh_w1.dta
     idxvars:

@@ -17,6 +17,12 @@ Data Scheme:
     HowCoped1: str
     HowCoped2: str
 
+  household_roster:
+    index: (t, i, pid)
+    Sex: str
+    Age: int
+    Relation: str
+
   food_acquired: !make
   food_expenditures: !make
   food_prices: !make

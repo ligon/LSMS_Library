@@ -11,3 +11,9 @@ Data Scheme:
     Region: str
     District: str
     Rural: str
+
+  household_roster:
+    index: (t, i, pid)
+    Sex: str
+    Age: int
+    Relation: str

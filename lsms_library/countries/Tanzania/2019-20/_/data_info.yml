@@ -19,6 +19,16 @@ cluster_features:
                 Urban: Urban
                 urban: Urban
 
+household_roster:
+    file: HH_SEC_B.dta
+    idxvars:
+        i: sdd_hhid
+        pid: sdd_indid
+    myvars:
+        Sex: hh_b02
+        Age: hh_b04
+        Relation: hh_b05
+
 shocks:
     file: HH_SEC_R.dta
     idxvars:

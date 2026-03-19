@@ -1,6 +1,18 @@
 Country: Niger
 Wave: 2014-15
 
+household_roster:
+    file: NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS01P1.dta
+    idxvars:
+        i:
+            - GRAPPE
+            - MENAGE
+        pid: MS01Q00
+    myvars:
+        Sex: MS01Q01
+        Age: MS01Q06A
+        Relation: MS01Q02
+
 cluster_features:
     file: NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS00P1.dta
     idxvars:

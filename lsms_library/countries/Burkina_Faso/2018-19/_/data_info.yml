@@ -1,6 +1,18 @@
 Country: Burkina Faso
 Wave: 2018-19
 
+household_roster:
+    file: ehcvm_individu_bfa2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+        pid: numind
+    myvars:
+        Sex: sexe
+        Age: age
+        Relation: lien
+
 cluster_features:
     file: s00_me_bfa2018.dta
     idxvars:

@@ -6,6 +6,15 @@ import json
 import dvc.api
 from ligonlibrary.dataframes import from_dta
 from lsms.tools import get_household_roster
+import lsms_library.local_tools as tools
+
+
+def i(value):
+    '''
+    Formatting household id from composite (grappe/zd, menage).
+    Matches existing convention: str(grappe) + str(menage).rjust(3, '0')
+    '''
+    return tools.format_id(value[0]) + tools.format_id(value[1], zeropadding=3)
 
 def age_sex_composition(df, sex, sex_converter, age, age_converter, hhid):
     Age_ints = ((0,4),(4,9),(9,14),(14,19),(19,31),(31,51),(51,100))
