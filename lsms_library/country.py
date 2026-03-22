@@ -1522,16 +1522,47 @@ class Country:
         return removed
     
 
+    # Tables that can be derived from food_acquired via transformations
+    _FOOD_DERIVED = {
+        'food_expenditures': 'food_expenditures_from_acquired',
+        'food_prices': 'food_prices_from_acquired',
+        'food_quantities': 'food_quantities_from_acquired',
+    }
+
     def __getattr__(self, name):
         '''
-        This method is triggered when an attribute is not found in the instance, but exists in the `data_scheme`. 
+        This method is triggered when an attribute is not found in the instance, but exists in the `data_scheme`.
         It dynamically generates a method to aggregate data for the requested attribute.
 
-        For example, if a user calls `country_instance.food_acquired()` and `food_acquired` is part of the `data_scheme` but not an existing method, 
+        For example, if a user calls `country_instance.food_acquired()` and `food_acquired` is part of the `data_scheme` but not an existing method,
         the method will dynamically create a function to handle data aggregation for `food_acquired`.
+
+        For derived food tables (food_expenditures, food_prices, food_quantities),
+        if no parquet/script exists but food_acquired is available, the table is
+        derived automatically via transformations.
         '''
         if name in self.data_scheme:
             def method(waves=None):
+                # For derived food tables, try deriving from food_acquired first
+                # before falling back to wave-level scripts / make
+                if (name in self._FOOD_DERIVED
+                        and 'food_acquired' in self.data_scheme):
+                    from .transformations import (food_expenditures_from_acquired,
+                                                  food_prices_from_acquired,
+                                                  food_quantities_from_acquired)
+                    transform_fn = {
+                        'food_expenditures': food_expenditures_from_acquired,
+                        'food_prices': food_prices_from_acquired,
+                        'food_quantities': food_quantities_from_acquired,
+                    }[name]
+                    try:
+                        fa = self._aggregate_wave_data(waves, 'food_acquired')
+                        if isinstance(fa, pd.DataFrame) and not fa.empty:
+                            result = transform_fn(fa)
+                            scheme_entry = self._materialization_entry(name)
+                            return self._finalize_result(result, scheme_entry, name)
+                    except Exception:
+                        pass  # Fall through to normal aggregation
                 return self._aggregate_wave_data(waves, name)
             return method
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")

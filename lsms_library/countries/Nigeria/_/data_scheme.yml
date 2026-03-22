@@ -19,9 +19,15 @@ Data Scheme:
     Expenditure: float
     Produced: float
     materialize: make
-  food_expenditures: !make
-  food_prices: !make
-  food_quantities: !make
+  food_expenditures:
+    index: (t, v, i, j)
+    Expenditure: float
+  food_prices:
+    index: (t, v, j)
+    Price: float
+  food_quantities:
+    index: (t, v, i, j)
+    Quantity: float
   household_characteristics:
     index: (t, v, i)
     materialize: make

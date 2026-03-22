@@ -102,3 +102,113 @@ def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=
     #convert to dict
     kgper = kgper.to_dict()
     return kgper
+
+
+# ---------------------------------------------------------------------------
+# Derived food tables from food_acquired
+# ---------------------------------------------------------------------------
+
+KNOWN_METRIC = {
+    'kg': 1, 'kilogram': 1, 'kilogramme': 1,
+    'g': 1/1000, 'gram': 1/1000, 'gramm': 1/1000,
+    'l': 1, 'litre': 1, 'liter': 1,
+    'ml': 1/1000, 'cl': 1/100,
+    'pound': 0.453592, 'lbs': 0.453592,
+}
+
+
+def _get_kg_factors(df):
+    """Build a combined kg-per-unit mapping from known metric units
+    and price-ratio inference on the data."""
+    factors = dict(KNOWN_METRIC)
+
+    # Infer additional factors from price ratios where possible
+    if 'Expenditure' in df.columns and 'Quantity' in df.columns:
+        # Determine which index levels are available for grouping
+        idx_names = list(df.index.names)
+        group_levels = [n for n in ['t', 'm', 'i'] if n in idx_names]
+        if group_levels:
+            try:
+                inferred = conversion_to_kgs(df, index=group_levels)
+                # Inferred factors fill in where known metric doesn't cover
+                for unit, factor in inferred.items():
+                    if unit.lower() not in factors and np.isfinite(factor) and factor > 0:
+                        factors[unit.lower()] = factor
+            except Exception:
+                pass  # If inference fails, proceed with known metric only
+
+    return factors
+
+
+def _apply_kg_conversion(df, factors):
+    """Convert Quantity to kg using the factors dict.
+    Returns a copy with a 'Quantity_kg' column added."""
+    v = df.copy()
+    if 'u' in v.index.names:
+        units = v.index.get_level_values('u').astype(str).str.lower()
+    else:
+        return v
+
+    v['Quantity_kg'] = v['Quantity'] * units.map(factors)
+    return v
+
+
+def food_expenditures_from_acquired(df):
+    """Derive food expenditures from food_acquired.
+
+    Returns a DataFrame of total expenditure per household × item × period,
+    summed over units.
+    """
+    if 'Expenditure' not in df.columns:
+        raise ValueError("food_acquired must have an 'Expenditure' column")
+
+    idx_names = list(df.index.names)
+    group_by = [n for n in ['t', 'v', 'i', 'j'] if n in idx_names]
+
+    x = df[['Expenditure']].replace(0, np.nan).dropna()
+    x = x.groupby(group_by).sum()
+    return x
+
+
+def food_quantities_from_acquired(df):
+    """Derive food quantities (in kg) from food_acquired.
+
+    Uses known metric conversions and price-ratio inference to convert
+    local units to kg, then sums per household × item × period.
+    """
+    if 'Quantity' not in df.columns:
+        raise ValueError("food_acquired must have a 'Quantity' column")
+
+    factors = _get_kg_factors(df)
+    v = _apply_kg_conversion(df, factors)
+
+    idx_names = list(v.index.names)
+    group_by = [n for n in ['t', 'v', 'i', 'j'] if n in idx_names]
+
+    q = v[['Quantity_kg']].rename(columns={'Quantity_kg': 'Quantity'})
+    q = q.replace(0, np.nan).dropna()
+    q = q.groupby(group_by).sum()
+    return q
+
+
+def food_prices_from_acquired(df):
+    """Derive food prices (per kg) from food_acquired.
+
+    Unit values are computed as Expenditure / Quantity_kg, then
+    the median is taken across households within each item × period.
+    """
+    if 'Expenditure' not in df.columns or 'Quantity' not in df.columns:
+        raise ValueError("food_acquired must have 'Expenditure' and 'Quantity' columns")
+
+    factors = _get_kg_factors(df)
+    v = _apply_kg_conversion(df, factors)
+
+    v['price_per_kg'] = v['Expenditure'] / v['Quantity_kg']
+    v = v[['price_per_kg']].replace([0, np.inf, -np.inf], np.nan).dropna()
+
+    idx_names = list(v.index.names)
+    group_by = [n for n in ['t', 'v', 'j'] if n in idx_names]
+
+    p = v.groupby(group_by).median()
+    p = p.rename(columns={'price_per_kg': 'Price'})
+    return p
