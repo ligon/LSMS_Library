@@ -16,7 +16,17 @@ Data Scheme:
   food_expenditures: !make
   food_prices: !make
   food_quantities: !make
-  household_characteristics: !make
-  household_roster: !make
+  household_characteristics:
+    index: (t, v, i)
+    materialize: make
+  household_roster:
+    index: (t, v, i, pid)
+    Sex: str
+    Age: int
+    Relationship: str
+    materialize: make
+  panel_ids:
+    index: (t, i)
+    previous_i: str
   nonfood_expenditures: !make
   unitvalues: !make

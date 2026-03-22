@@ -21,29 +21,29 @@ def extract_string(x):
 
 # Post planting:
 
-idxvars = dict(j='hhid',
+idxvars = dict(i='hhid',
                t=('hhid', lambda x: "2015Q3"),
-               m=('zone', extract_string),
-               indiv='indiv',
+               v='ea',
+               pid='indiv',
                )
 
-myvars = dict(sex = ('s1q2', lambda s: extract_string(s).title()),
-              age = 's1q6',
-              relation = ('s1q3', lambda s: extract_string(s).title()))
+myvars = dict(Sex = ('s1q2', lambda s: extract_string(s).title()),
+              Age = 's1q6',
+              Relationship = ('s1q3', lambda s: extract_string(s).title()))
 
 pp = df_data_grabber('../Data/sect1_plantingw3.dta',idxvars,**myvars)
 
 # Post harvest
 #
-idxvars = dict(j='hhid',
+idxvars = dict(i='hhid',
                t=('hhid', lambda x: "2016Q1"),
-               m=('zone', extract_string),
-               indiv='indiv',
+               v='ea',
+               pid='indiv',
                )
 
-myvars = dict(sex = ('s1q2', lambda s: extract_string(s).title()),
-              age = 's1q4',
-              relation = ('s1q3', lambda s: extract_string(s).title()),)
+myvars = dict(Sex = ('s1q2', lambda s: extract_string(s).title()),
+              Age = 's1q4',
+              Relationship = ('s1q3', lambda s: extract_string(s).title()),)
 
 ph = df_data_grabber('../Data/sect1_harvestw3.dta',idxvars,**myvars)
 df = pd.concat([pp,ph])

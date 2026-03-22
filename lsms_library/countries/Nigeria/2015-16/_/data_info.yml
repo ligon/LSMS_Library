@@ -32,3 +32,10 @@ shocks:
         HowCoped0: s15aq5a
         HowCoped1: s15aq5b
         HowCoped2: s15aq5c
+
+panel_ids:
+    file: secta_plantingw3.dta
+    idxvars:
+        i: hhid
+    myvars:
+        previous_i: hhid
