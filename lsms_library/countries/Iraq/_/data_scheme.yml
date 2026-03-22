@@ -2,7 +2,7 @@ Country: Iraq
 
 Data Scheme:
   household_roster:
-    index: (i, pid) 
+    index: (t, v, i, pid)
     Relationship: str
     Sex: str
     Age: int

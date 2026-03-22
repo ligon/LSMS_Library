@@ -2,7 +2,7 @@ Country: Kosovo
 
 Data Scheme:
   household_roster:
-    index: (i, pid)
+    index: (t, v, i, pid)
     Sex: str
     Age: int
     Relationship: str

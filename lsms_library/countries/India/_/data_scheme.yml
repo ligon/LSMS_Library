@@ -2,12 +2,12 @@ Country: India
 
 Data Scheme:
   household_roster:
-    index: (i, pid)
+    index: (t, v, i, pid)
     Sex: str
     Age: int
     Relationship: str
     Highest_education: str
   employment:
-    index: (i, pid)
+    index: (t, v, i, pid)
     Cash_per_day: float
     Rural: str

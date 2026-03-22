@@ -12,9 +12,14 @@ Single Index:
 Index Info:
   note: global index info
   index_info:
-    cluster_features: (t, int_t, v)
-    household_roster: (t, int_t, v, i, pid)
-    household_characteristics: (t, int_t, v, i, m)
-    plot_features: (t, int_t, v, i, plot_id)
-    food_acquired: (t, int_t, m, v, i, j, u)
-    nonfood_acquired: (t, int_t, v, i, j)
+    cluster_features: (t, v)
+    household_roster: (t, v, i, pid)
+    household_characteristics: (t, v, i, m)
+    plot_features: (t, v, i, plot_id)
+    food_acquired: (t, m, v, i, j, u)
+    nonfood_acquired: (t, v, i, j)
+    interview_date: (t, v, i)
+    shocks: (t, i, Shock)
+    panel_ids: (t, i)
+    assets: (t, i, j)
+    individual_education: (t, v, i, pid)

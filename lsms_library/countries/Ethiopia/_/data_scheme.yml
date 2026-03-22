@@ -18,7 +18,7 @@ Data Scheme:
     HowCoped2: str
 
   household_roster:
-    index: (t, i, pid)
+    index: (t, v, i, pid)
     Sex: str
     Age: int
     Relationship: str

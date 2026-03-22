@@ -2,7 +2,7 @@ Country: Serbia
 
 Data Scheme:
   household_roster:
-    index: (municipality, enumeration_area, i)
+    index: (t, v, i, pid)
     Sex: str  
     Age: int
     Relationship: str
