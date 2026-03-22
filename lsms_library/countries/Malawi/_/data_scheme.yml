@@ -11,9 +11,6 @@ Data Scheme:
     Sex: str
     Age: int
     Relationship: str
-  interview_date:
-    index: (t, v, i)
-    Int_t: str
   subjective_well_being:
     index: (t,i)
     Own Step: int
