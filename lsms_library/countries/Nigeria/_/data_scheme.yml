@@ -13,6 +13,12 @@ Data Scheme:
     HowCoped1: str
     HowCoped2: str
 
+  food_acquired:
+    index: (t, v, i, j, u)
+    Quantity: float
+    Expenditure: float
+    Produced: float
+    materialize: make
   food_expenditures: !make
   food_prices: !make
   food_quantities: !make
