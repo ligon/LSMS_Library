@@ -139,3 +139,68 @@
 |  163 | Gin                                     | Gin                          | Gin                                           | Gin                                           | Gin                                           | Gin                                           | Gin                                           | Gin                                           | Gin                                           | Gin                                           |
 |  164 | Other alcoholic beverages               | Other alcoholic beverages    | Other alcoholic beverages                     | Other alcoholic beverages                     | Other alcoholic beverages                     | Other alcoholic beverages                     | Other alcoholic beverages                     | Other alcoholic beverages                     | Other alcoholic beverages                     | Other alcoholic beverages                     |
 |  601 | Guava                                   | Guava                        | ---                                           | ---                                           | ---                                           | ---                                           | Guava                                         | Guava                                         | Guava                                         | Guava                                         |
+
+* Units
+
+  Unit codes changed significantly across waves.  Wave 1 (2010-11) used
+  6 simple codes (Kg, g, l, ml, piece, other).  Wave 2 (2012-13) added
+  local unit names (mudu, derica, congo, etc.) with codes 1-16.
+  Waves 3-4 (2015-16, 2018-19) restructured to codes with size
+  modifiers (small/medium/large) using codes 1-122 and 900.
+
+  Note: the same code number can mean different things across waves
+  (e.g., code 10 = "medium derica" in wave 2 but "bin/basket" in
+  waves 3-4).  The per-wave columns record the wave-specific meaning.
+
+#+NAME: unit
+| Code | Preferred Label              | 2010-11                      | 2012-13                      | 2015-16                      | 2018-19                      |
+|------+------------------------------+------------------------------+------------------------------+------------------------------+------------------------------|
+|    1 | Kg                           | Kg                           | Kg                           | Kg                           | Kg                           |
+|    2 | g                            | g                            | g                            | g                            | g                            |
+|    3 | l                            | l                            | l                            | l                            | l                            |
+|    4 | cl                           | ml                           | ml                           | cl                           | cl                           |
+|    5 | mudu                         | piece                        | mudu                         | ---                          | ---                          |
+|    6 | olodo                        | other                        | olodo                        | ---                          | ---                          |
+|    7 | congo                        | ---                          | congo                        | ---                          | ---                          |
+|    8 | paint rubber                 | ---                          | paint rubber                 | ---                          | ---                          |
+|    9 | large derica                 | ---                          | large derica                 | ---                          | ---                          |
+|   10 | bin/basket                   | ---                          | medium derica                | bin/basket                   | bin/basket                   |
+|   11 | paint rubber                 | ---                          | small derica                 | paint rubber                 | paint rubber                 |
+|   12 | milk cup                     | ---                          | milk cup                     | milk cup                     | milk cup                     |
+|   13 | cigarette cup                | ---                          | cigarette cup                | cigarette cup                | cigarette cup                |
+|   14 | tin                          | ---                          | tiya                         | tin                          | tin                          |
+|   15 | kobiowu                      | ---                          | kobiowu                      | ---                          | ---                          |
+|   16 | piece                        | ---                          | piece                        | ---                          | ---                          |
+|   20 | small congo                  | ---                          | ---                          | small congo                  | small congo                  |
+|   21 | large congo                  | ---                          | ---                          | large congo                  | large congo                  |
+|   30 | small mudu                   | ---                          | ---                          | small mudu                   | small mudu                   |
+|   31 | large mudu                   | ---                          | ---                          | large mudu                   | large mudu                   |
+|   40 | small derica                 | ---                          | ---                          | small derica                 | small derica                 |
+|   41 | medium derica                | ---                          | ---                          | medium derica                | medium derica                |
+|   42 | large derica                 | ---                          | ---                          | large derica                 | large derica                 |
+|   43 | very large derica            | ---                          | ---                          | very large derica            | very large derica            |
+|   50 | small tiya                   | ---                          | ---                          | small tiya                   | small tiya                   |
+|   51 | medium tiya                  | ---                          | ---                          | medium tiya                  | medium tiya                  |
+|   52 | large tiya                   | ---                          | ---                          | large tiya                   | large tiya                   |
+|   60 | small kobiowu                | ---                          | ---                          | small kobiowu                | small kobiowu                |
+|   61 | medium kobiowu               | ---                          | ---                          | medium kobiowu               | medium kobiowu               |
+|   62 | large kobiowu                | ---                          | ---                          | large kobiowu                | large kobiowu                |
+|   70 | small bowl                   | ---                          | ---                          | small bowl                   | small bowl                   |
+|   71 | medium bowl                  | ---                          | ---                          | medium bowl                  | medium bowl                  |
+|   72 | large bowl                   | ---                          | ---                          | large bowl                   | large bowl                   |
+|   80 | small piece                  | ---                          | ---                          | small piece                  | small piece                  |
+|   81 | medium piece                 | ---                          | ---                          | medium piece                 | medium piece                 |
+|   82 | large piece                  | ---                          | ---                          | large piece                  | large piece                  |
+|   90 | small heap                   | ---                          | ---                          | small heap                   | small heap                   |
+|   91 | medium heap                  | ---                          | ---                          | medium heap                  | medium heap                  |
+|   92 | large heap                   | ---                          | ---                          | large heap                   | large heap                   |
+|  100 | small bunch                  | ---                          | ---                          | small bunch                  | small bunch                  |
+|  101 | medium bunch                 | ---                          | ---                          | medium bunch                 | medium bunch                 |
+|  102 | large bunch                  | ---                          | ---                          | large bunch                  | large bunch                  |
+|  110 | small stalk                  | ---                          | ---                          | small stalk                  | small stalk                  |
+|  111 | medium stalk                 | ---                          | ---                          | medium stalk                 | medium stalk                 |
+|  112 | large stalk                  | ---                          | ---                          | large stalk                  | large stalk                  |
+|  120 | small packet/sachet          | ---                          | ---                          | small packet/sachet          | small packet/sachet          |
+|  121 | medium packet/sachet         | ---                          | ---                          | medium packet/sachet         | medium packet/sachet         |
+|  122 | large packet/sachet          | ---                          | ---                          | large packet/sachet          | large packet/sachet          |
+|  900 | other specify                | ---                          | ---                          | other specify                | other specify                |

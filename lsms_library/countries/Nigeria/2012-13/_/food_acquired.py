@@ -12,11 +12,15 @@ import dvc.api
 
 sys.path.append('../../../_/')
 from lsms_library.local_tools import to_parquet, get_categorical_mapping
-from units import unitcodes
 
 food_labels = get_categorical_mapping(tablename='harmonize_food',
                                        idxvars='Code',
                                        **{'Preferred Label': 'Preferred Label'})
+
+_unit_raw = get_categorical_mapping(tablename='unit',
+                                     idxvars='Code',
+                                     **{'2012-13': '2012-13'})
+unitcodes = {k: v for k, v in _unit_raw.items() if isinstance(v, str)}
 
 zone_labels = {1: 'North central',
                2: 'North east',

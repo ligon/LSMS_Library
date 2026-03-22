@@ -16,17 +16,14 @@ import dvc.api
 sys.path.append('../../../_/')
 from lsms_library.local_tools import to_parquet, get_categorical_mapping
 
-# Wave 1 uses simple unit codes (1-6)
-unitcodes = {1: 'Kg',
-             2: 'g',
-             3: 'l',
-             4: 'ml',
-             5: 'piece',
-             6: 'other'}
-
 food_labels = get_categorical_mapping(tablename='harmonize_food',
                                        idxvars='Code',
                                        **{'Preferred Label': 'Preferred Label'})
+
+_unit_raw = get_categorical_mapping(tablename='unit',
+                                     idxvars='Code',
+                                     **{'2010-11': '2010-11'})
+unitcodes = {k: v for k, v in _unit_raw.items() if isinstance(v, str)}
 
 zone_labels = {1: 'North central',
                2: 'North east',
