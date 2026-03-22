@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from lsms.tools import get_food_prices, get_food_expenditures, get_household_roster, get_household_identification_particulars
 from ligonlibrary.dataframes import from_dta
 import numpy as np
@@ -19,6 +21,7 @@ from importlib.resources import files
 from dvc.api import DVCFileSystem
 import pyreadstat
 import inspect
+from typing import Any
 from .paths import data_root, var_path, wave_data_path, COUNTRIES_ROOT
 
 # Initialize DVC filesystem once and reuse it
@@ -92,7 +95,7 @@ def _resolve_data_path(fn: str, stack_depth: int = 2) -> str:
     return fn_str
 
 
-def get_dataframe(fn,convert_categoricals=True,encoding=None,categories_only=False):
+def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: str | None = None, categories_only: bool = False) -> pd.DataFrame:
     """From a file named fn, try to return a dataframe.
 
     Hope is that caller can be agnostic about file type,
@@ -184,7 +187,7 @@ def get_dataframe(fn,convert_categoricals=True,encoding=None,categories_only=Fal
 
 #def regularize_string(s):
 
-def df_data_grabber(fn,idxvars,convert_categoricals=True,encoding=None,orgtbl=None,missing_ok=False,**kwargs):
+def df_data_grabber(fn: str | Path, idxvars: dict[str, Any] | str, convert_categoricals: bool = True, encoding: str | None = None, orgtbl: str | None = None, missing_ok: bool = False, **kwargs: Any) -> pd.DataFrame:
     """From a file named fn, grab both index variables and additional variables
     specified in kwargs and construct a pandas dataframe.
 
@@ -283,8 +286,8 @@ def df_data_grabber(fn,idxvars,convert_categoricals=True,encoding=None,orgtbl=No
 
     return out
 
-def get_categorical_mapping(fn='categorical_mapping.org',tablename=None,idxvars='Code',
-                            dirs=['./','../../_/','../../../_/'],asdict=True,**kwargs):
+def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str | None = None, idxvars: str = 'Code',
+                            dirs: list[str] = ['./','../../_/','../../../_/'], asdict: bool = True, **kwargs: Any) -> dict[Any, Any] | pd.DataFrame | pd.Series:
     """Return mappings for categories.
 
     By default, searches for =tablename= in an orgfile
@@ -316,7 +319,7 @@ def get_categorical_mapping(fn='categorical_mapping.org',tablename=None,idxvars=
     raise exc
 
 
-def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Code',value='Preferred Label'):
+def harmonized_unit_labels(fn: str = '../../_/unitlabels.csv', key: str = 'Code', value: str = 'Preferred Label') -> dict[Any, str]:
     unitlabels = pd.read_csv(fn)
     unitlabels.columns = [s.strip() for s in unitlabels.columns]
     unitlabels = unitlabels[[key,value]].dropna()
@@ -325,7 +328,7 @@ def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Code',value='Preferr
     return unitlabels.squeeze().str.strip().to_dict()
 
 
-def harmonized_food_labels(fn='../../_/food_items.org',key='Code',value='Preferred Label'):
+def harmonized_food_labels(fn: str = '../../_/food_items.org', key: str = 'Code', value: str = 'Preferred Label') -> dict[Any, str]:
     # Harmonized food labels
     food_items = pd.read_csv(fn,delimiter='|',skipinitialspace=True,converters={1:int,2:lambda s: s.strip()})
     food_items.columns = [s.strip() for s in food_items.columns]
@@ -334,7 +337,7 @@ def harmonized_food_labels(fn='../../_/food_items.org',key='Code',value='Preferr
 
     return food_items.squeeze().str.strip().to_dict()
 
-def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market',farmgate='farmgate'):
+def prices_and_units(fn: str = '', units: str = 'units', item: str = 'item', HHID: str = 'HHID', market: str = 'market', farmgate: str = 'farmgate') -> pd.DataFrame:
 
     food_items = harmonized_food_labels(fn='../../_/food_items.org')
 
@@ -360,7 +363,7 @@ def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market'
 
     return prices
 
-def food_acquired(fn,myvars,convert_categoricals):
+def food_acquired(fn: str, myvars: dict[str, str], convert_categoricals: bool) -> pd.DataFrame:
 
     with dvc.api.open(fn,mode='rb') as dta:
         df = from_dta(dta,convert_categoricals=False)
@@ -417,7 +420,7 @@ def food_acquired(fn,myvars,convert_categoricals):
 
     return df
 
-def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,item='item',HHID='HHID'):
+def food_expenditures(fn: str = '', purchased: str | None = None, away: str | None = None, produced: str | None = None, given: str | None = None, item: str = 'item', HHID: str = 'HHID') -> pd.DataFrame:
     food_items = harmonized_food_labels(fn='../../_/food_items.org')
 
     with dvc.api.open(fn,mode='rb') as dta:
@@ -431,7 +434,7 @@ def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,it
     return expenditures
 
 
-def nonfood_expenditures(fn='',purchased=None,away=None,produced=None,given=None,item='item',HHID='HHID'):
+def nonfood_expenditures(fn: str = '', purchased: str | None = None, away: str | None = None, produced: str | None = None, given: str | None = None, item: str = 'item', HHID: str = 'HHID') -> pd.DataFrame:
     nonfood_items = harmonized_food_labels(fn='../../_/nonfood_items.org',key='Code',value='Preferred Label')
     with dvc.api.open(fn,mode='rb') as dta:
         expenditures,itemlabels=get_food_expenditures(dta,purchased,away,produced,given,itmcd=item,HHID=HHID,itemlabels=nonfood_items)
@@ -442,8 +445,8 @@ def nonfood_expenditures(fn='',purchased=None,away=None,produced=None,given=None
 
     return expenditures
 
-def food_quantities(fn='',item='item',HHID='HHID',
-                    purchased=None,away=None,produced=None,given=None,units=None):
+def food_quantities(fn: str = '', item: str = 'item', HHID: str = 'HHID',
+                    purchased: str | None = None, away: str | None = None, produced: str | None = None, given: str | None = None, units: str | None = None) -> pd.DataFrame:
     food_items = harmonized_food_labels(fn='../../_/food_items.org')
 
         # Prices
@@ -455,7 +458,7 @@ def food_quantities(fn='',item='item',HHID='HHID',
         
     return quantities
 
-def age_sex_composition(fn,sex='sex',sex_converter=None,age='age',months_spent='months_spent',HHID='HHID',months_converter=None, convert_categoricals=True,Age_ints=None,fn_type='stata'):
+def age_sex_composition(fn: str, sex: str = 'sex', sex_converter: dict[Any, str] | None = None, age: str = 'age', months_spent: str = 'months_spent', HHID: str = 'HHID', months_converter: dict[Any, float] | None = None, convert_categoricals: bool = True, Age_ints: tuple[tuple[int, int], ...] | None = None, fn_type: str = 'stata') -> pd.DataFrame:
 
     if Age_ints is None:
         # Match Uganda FCT categories
@@ -472,7 +475,7 @@ def age_sex_composition(fn,sex='sex',sex_converter=None,age='age',months_spent='
     return df
 
 
-def other_features(fn,urban=None,region=None,v=None,HHID='HHID',urban_converter=None):
+def other_features(fn: str, urban: str | None = None, region: str | None = None, v: str | None = None, HHID: str = 'HHID', urban_converter: dict[Any, Any] | None = None) -> pd.DataFrame:
 
     with dvc.api.open(fn,mode='rb') as dta:
         df = get_household_identification_particulars(fn=dta,HHID=HHID,urban=urban,region=region,v=v,urban_converter=urban_converter)
@@ -482,7 +485,7 @@ def other_features(fn,urban=None,region=None,v=None,HHID='HHID',urban_converter=
 
     return df
 
-def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
+def change_id(x: pd.DataFrame, fn: str | None = None, id0: str | None = None, id1: str | None = None, transform_id1: Any = None) -> pd.DataFrame:
     """Replace instances of id0 with id1.
 
     The identifier id0 is assumed to be unique.
@@ -552,7 +555,7 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
 
 
 
-def add_markets_from_other_features(country,df,additional_other_features=False):
+def add_markets_from_other_features(country: str, df: pd.DataFrame, additional_other_features: bool = False) -> pd.DataFrame:
     of = pd.read_parquet(f"../{country}/var/other_features.parquet", engine='pyarrow')
 
     df_idx = df.index.names
@@ -581,7 +584,7 @@ def add_markets_from_other_features(country,df,additional_other_features=False):
 
     return df
 
-def df_from_orgfile(orgfn,name=None,set_columns=True,to_numeric=True,encoding=None):
+def df_from_orgfile(orgfn: str | Path, name: str | None = None, set_columns: bool = True, to_numeric: bool = True, encoding: str | None = None) -> pd.DataFrame:
     """Extract the org table with name from the orgmode file named orgfn; return a pd.DataFrame.
 
     If name is None (the default), then we assume the orgtable is the very first
@@ -640,7 +643,7 @@ def df_from_orgfile(orgfn,name=None,set_columns=True,to_numeric=True,encoding=No
 
     return df
 
-def change_encoding(s,from_encoding,to_encoding='utf-8',errors='ignore'):
+def change_encoding(s: str, from_encoding: str, to_encoding: str = 'utf-8', errors: str = 'ignore') -> str:
     """
     Change encoding of a string s from_encoding to_encoding.
 
@@ -649,7 +652,7 @@ def change_encoding(s,from_encoding,to_encoding='utf-8',errors='ignore'):
     """
     return bytes(s,encoding=from_encoding).decode(to_encoding,errors=errors)
 
-def to_parquet(df,fn,index=True):
+def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True) -> pd.DataFrame:
     """
     Write df to parquet file fn.
 
@@ -703,7 +706,7 @@ class RecursiveDict(UserDict):
         except KeyError:
             return k
 
-def format_id(id,zeropadding=0):
+def format_id(id: Any, zeropadding: int = 0) -> str | None:
     """Nice string format for any id, string or numeric.
 
     Optional zeropadding parameter takes an integer
@@ -718,7 +721,7 @@ def format_id(id,zeropadding=0):
     except ValueError:
         return None
 
-def update_id(d, id_splits):
+def update_id(d: dict[str, str], id_splits: dict[str, int]) -> tuple[dict[str, str], dict[str, int]]:
     '''
     Update the dictionary d, which maps old ids to new ids, splits are followed by underscore ('_').
     For example:
@@ -756,7 +759,7 @@ def update_id(d, id_splits):
     return updated_id, id_splits
 
 
-def panel_ids(Waves):
+def panel_ids(Waves: dict[str, Any] | pd.DataFrame) -> tuple[RecursiveDict, dict[str, dict[str, str]]]:
     '''
     Input: DataFrame with a MultiIndex that includes a level named 't' representing the wave and 'i' current househod ID'
             And single 'previous_i' column as the previous household ID.
@@ -811,7 +814,7 @@ def panel_ids(Waves):
         updated_wave[wave_year] = wave_matches
     return recursive_D, updated_wave
 
-def id_walk(df, updated_ids, hh_index='i'):
+def id_walk(df: pd.DataFrame, updated_ids: dict[str, dict[str, str]], hh_index: str = 'i') -> pd.DataFrame:
     '''
     Updates household IDs in panel data across different waves separately.
 
@@ -857,7 +860,7 @@ def id_walk(df, updated_ids, hh_index='i'):
     return df      
 
         
-def conversion_table_matching_global(df, conversions, conversion_label_name, num_matches=3, cutoff = 0.6):
+def conversion_table_matching_global(df: pd.DataFrame, conversions: pd.DataFrame, conversion_label_name: str, num_matches: int = 3, cutoff: float = 0.6) -> tuple[pd.DataFrame, dict[str, str]]:
     """
     Returns a Dataframe containing matches and Dictionary mapping top choice
     from a conversion table's labels to item labels from a given df.
@@ -878,7 +881,7 @@ def conversion_table_matching_global(df, conversions, conversion_label_name, num
             all_matches.loc[len(all_matches.index)] = [l] + [np.nan] * num_matches
     return all_matches, D
 
-def category_union(dict_list):
+def category_union(dict_list: list[dict[Any, Any]]) -> tuple[dict[int, Any], ...]:
     """Construct union of a list of dictionaries, preserving unique *values*.
 
     Returns this union, as well as a list of dictionaries mapping the original
@@ -906,7 +909,7 @@ def category_union(dict_list):
 
     return c0,*tuple(t)
 
-def category_remap(c,remaps):
+def category_remap(c: dict[Any, Any], remaps: dict[Any, Any]) -> dict[Any, Any]:
     """
     Return a "remapped" dictionary.
 
@@ -919,7 +922,7 @@ def category_remap(c,remaps):
 
     return c
 
-def panel_attrition(df, waves, index='i', return_ids=False, split_households_new_sample=True):
+def panel_attrition(df: pd.DataFrame, waves: list[str], index: str = 'i', return_ids: bool = False, split_households_new_sample: bool = True) -> pd.DataFrame | tuple[pd.DataFrame, dict[tuple[str, str], set[str]]]:
     """
     Produce an upper-triangular) matrix showing the number of households (j) that
     transition between rounds (t) of df.
@@ -968,7 +971,7 @@ def panel_attrition(df, waves, index='i', return_ids=False, split_households_new
 
     return (foo, IDs) if return_ids else foo
 
-def write_df_to_org(df, table_name, filepath=None):
+def write_df_to_org(df: pd.DataFrame, table_name: str, filepath: str | Path | None = None) -> str | None:
     '''
     Writes a DataFrame to an Org-mode table format.
     Parameters:
@@ -992,7 +995,7 @@ def write_df_to_org(df, table_name, filepath=None):
         s += "\n\n"
         return s
     
-def map_index(df):
+def map_index(df: pd.DataFrame) -> pd.DataFrame:
     """
     Map index from old parquet file to new index used in data_info.yml
     -- March 11, 2025
@@ -1033,7 +1036,7 @@ def map_index(df):
 
 
 import importlib.util
-def get_formatting_functions(mod_path, name, general_formatting_functions={} ):
+def get_formatting_functions(mod_path: Path, name: str, general_formatting_functions: dict[str, Any] = {}) -> dict[str, Any]:
     formatting_function = general_formatting_functions.copy()
     if mod_path.exists():
     # Load module dynamically
@@ -1158,7 +1161,7 @@ def age_handler_wrapper(df, interview_date = None, interview_year = None, format
 
 
 
-def all_dfs_from_orgfile(orgfn, set_columns=True, to_numeric=True, encoding=None):
+def all_dfs_from_orgfile(orgfn: str | Path, set_columns: bool = True, to_numeric: bool = True, encoding: str | None = None) -> dict[str, pd.DataFrame]:
     """
     Read all named org-mode tables from a .org file and return as a dictionary of DataFrames.
     
