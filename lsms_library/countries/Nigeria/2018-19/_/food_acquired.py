@@ -10,17 +10,17 @@ Source files:
   - sect7b_plantingw4.csv  (post-planting, 2018Q3)
 """
 import sys
-import json
 import numpy as np
 import pandas as pd
 import dvc.api
 
 sys.path.append('../../../_/')
-from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import to_parquet, get_categorical_mapping
 from units import unitcodes
 
-with open('../../_/food_items.json') as f:
-    lbls = json.load(f)
+food_labels = get_categorical_mapping(tablename='harmonize_food',
+                                       idxvars='Code',
+                                       **{'Preferred Label': 'Preferred Label'})
 
 zone_labels = {1: 'North central',
                2: 'North east',
@@ -37,8 +37,8 @@ def extract_food(fn, varmap, t, food_labels):
 
     df = df.rename(columns=varmap)
 
-    # Apply food item labels
-    df['j'] = df['j'].replace({int(k): v for k, v in food_labels.items()})
+    # Apply food item labels from categorical_mapping.org
+    df['j'] = df['j'].replace(food_labels)
 
     # Apply unit labels and zone labels
     df['u'] = df['u'].replace(unitcodes).fillna('None')
@@ -73,7 +73,7 @@ harvest_vars = {
     'zone': 'm',
 }
 harvest = extract_food('../Data/sect10b_harvestw4.csv',
-                        harvest_vars, '2019Q1', lbls['2019Q1'])
+                        harvest_vars, '2019Q1', food_labels)
 
 # --- Planting (2018Q3) ---
 planting_vars = {
@@ -87,7 +87,7 @@ planting_vars = {
     'zone': 'm',
 }
 planting = extract_food('../Data/sect7b_plantingw4.csv',
-                         planting_vars, '2018Q3', lbls['2018Q3'])
+                         planting_vars, '2018Q3', food_labels)
 
 # --- Combine and index ---
 df = pd.concat([harvest, planting], ignore_index=True)
