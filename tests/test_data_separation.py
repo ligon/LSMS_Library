@@ -219,8 +219,8 @@ class TestEndToEndRedirect:
             assert result == str(tmp_path / "Uganda" / "2005-06" / "_" / "shocks.parquet")
             data_root.cache_clear()
 
-    def test_non_matching_path_unchanged(self, tmp_path):
-        """Paths like ../2018-19/_/foo.parquet should NOT be intercepted."""
+    def test_cross_wave_ref_resolved(self, tmp_path):
+        """Paths like ../2018-19/_/foo.parquet from country-level scripts are Pattern 3."""
         with mock.patch.dict(os.environ, {"LSMS_DATA_DIR": str(tmp_path)}):
             from lsms_library.paths import data_root
             data_root.cache_clear()
@@ -233,8 +233,8 @@ class TestEndToEndRedirect:
                 mock_stack.return_value = [mock.MagicMock(), mock.MagicMock(), mock_frame]
                 result = _resolve_data_path("../2018-19/_/other_features.parquet", stack_depth=2)
 
-            # Should pass through unchanged — not a ../var/ or bare filename pattern
-            assert result == "../2018-19/_/other_features.parquet"
+            # Cross-wave ref from country-level script → resolved via Pattern 3
+            assert result == str(tmp_path / "Uganda" / "2018-19" / "_" / "other_features.parquet")
             data_root.cache_clear()
 
 
