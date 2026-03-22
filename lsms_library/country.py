@@ -209,6 +209,10 @@ class Wave:
         For example, `wave.food_acquired()` will call `self.grab_data('food_acquired')`
         if 'food_acquired' is in the data scheme but not an existing method.
         '''
+        # Allow direct data_scheme access via the property descriptor
+        if method_name == 'data_scheme':
+            return _property_value(self, 'data_scheme')
+
         # Reentrancy guard: if we're already inside __getattr__, don't recurse
         if self.__dict__.get('_in_getattr'):
             raise AttributeError(f"'{type(self).__name__}' has no attribute '{method_name}'")
@@ -594,14 +598,13 @@ class Country:
     #                 'earnings.parquet', 'housing.parquet', 'income.parquet', 'fct.parquet', 'nutrition.parquet']
 
     def __init__(self, country_name: str, preload_panel_ids: bool = False, verbose: bool = False, trust_cache: bool = False) -> None:
-        # Validate country name: must be a simple name, not a path traversal
+        # Validate country name: reject path traversal attempts
         countries_dir = Path(__file__).resolve().parent / "countries"
         country_dir = (countries_dir / country_name).resolve()
-        if not country_dir.is_relative_to(countries_dir) or not country_dir.is_dir():
-            raise ValueError(
-                f"Unknown country {country_name!r}. "
-                f"Available: {sorted(p.name for p in countries_dir.iterdir() if p.is_dir())}"
-            )
+        if not country_dir.is_relative_to(countries_dir):
+            raise ValueError(f"Invalid country name {country_name!r}: path traversal not allowed")
+        if not country_dir.is_dir():
+            warnings.warn(f"Country directory not found for {country_name!r}")
         self.name = country_name
         self._panel_ids_cache = None
         self._updated_ids_cache = None
