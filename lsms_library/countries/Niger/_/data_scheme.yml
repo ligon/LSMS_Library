@@ -16,4 +16,4 @@ Data Scheme:
     index: (t, i, pid)
     Sex: str
     Age: int
-    Relation: str
+    Relationship: str

@@ -20,7 +20,7 @@ roster = pd.DataFrame({
     'pid': df.UPI.values.tolist(),
     'Sex': df.hb_02.values.tolist(),
     'Age': df.hb_04.values.tolist(),
-    'Relation': df.hb_05.values.tolist(),
+    'Relationship': df.hb_05.values.tolist(),
 })
 
 roster.replace({'t': round_match}, inplace=True)

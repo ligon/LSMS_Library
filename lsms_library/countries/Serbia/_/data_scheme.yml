@@ -5,4 +5,4 @@ Data Scheme:
     index: (municipality, enumeration_area, i)
     Sex: str  
     Age: int
-    Relation: str
+    Relationship: str

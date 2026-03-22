@@ -15,7 +15,7 @@ Data Scheme:
     index: (i, pid, t)
     Sex: str
     Age: int
-    Relation: str
+    Relationship: str
 
   shocks: !make
   earnings: !make
@@ -32,5 +32,8 @@ Data Scheme:
   other_features: !make
   locality: !make
   assets: !make
-  housing: !make
+  housing:
+    index: (j, t)
+    Roof: str
+    Floor: str
   nonfood_expenditures: !make
