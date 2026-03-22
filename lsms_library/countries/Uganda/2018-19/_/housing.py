@@ -8,8 +8,8 @@ from ligonlibrary.dataframes import from_dta
 fn = '../Data/GSEC9.dta'
 hhid = 'hhid'
 d = {"hhid":['hhid'],
-    "Thatched roof" : ['h9q04',lambda x: 0 + ('Thatch' in x)],
-     "Earthen floor" : ['h9q06',lambda x: 0 + ('earth' in x)]}
+    "Roof" : ['h9q04'],
+     "Floor" : ['h9q06']}
 
 with dvc.api.open(fn,mode='rb') as dta:
     df = from_dta(dta)
