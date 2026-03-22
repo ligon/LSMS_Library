@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import pandas as pd
 import numpy as np
 import yaml
@@ -10,6 +12,7 @@ from .local_tools import df_data_grabber, format_id, get_categorical_mapping, ge
 from .paths import data_root
 from .yaml_utils import load_yaml
 import importlib.util
+import logging
 import os
 import warnings
 from pathlib import Path
@@ -25,8 +28,10 @@ import sys
 from dvc.repo import Repo
 from dvc.exceptions import DvcException, PathMissingError
 from datetime import datetime
-from typing import Any, Iterable
+from typing import Any, Callable, Iterable
 from contextlib import contextmanager, redirect_stdout
+
+logger = logging.getLogger(__name__)
 
 JSON_CACHE_METHODS = {'panel_ids', 'updated_ids'}
 
@@ -181,8 +186,16 @@ def _log_issue(country: str, method: str, waves, error: Exception) -> None:
     with open(issues_path, "a", encoding="utf-8") as handle:
         handle.write("\n".join(entry))
 
+def _property_value(instance, prop_name):
+    """Retrieve a property directly from the class descriptor, bypassing __getattr__."""
+    prop = getattr(type(instance), prop_name, None)
+    if isinstance(prop, property):
+        return prop.__get__(instance, type(instance))
+    raise AttributeError(f"'{type(instance).__name__}' has no attribute '{prop_name}'")
+
+
 class Wave:
-    def __init__(self,  year, wave_folder, country: 'Country'):
+    def __init__(self, year: str, wave_folder: str, country: Country) -> None:
         self.year = year
         self.country = country
         self.name = f"{self.country.name}/{self.year}"
@@ -191,55 +204,35 @@ class Wave:
 
 
     def __getattr__(self, method_name):
+        '''Dynamically create data-access methods for attributes in the data_scheme.
+
+        For example, `wave.food_acquired()` will call `self.grab_data('food_acquired')`
+        if 'food_acquired' is in the data scheme but not an existing method.
         '''
-        This method is triggered when an attribute is not found in the instance, but exists in the `data_scheme`.
-        It dynamically generates a method to aggregate data for the requested attribute.
+        # Reentrancy guard: if we're already inside __getattr__, don't recurse
+        if self.__dict__.get('_in_getattr'):
+            raise AttributeError(f"'{type(self).__name__}' has no attribute '{method_name}'")
 
-        For example, if a user calls `country_instance.food_acquired()` and `food_acquired` is part of the `data_scheme` but not an existing method,
-        the method will dynamically create a function to handle data aggregation for `food_acquired`.
-        '''
-        def _property_value(instance, prop_name):
-            """
-            Retrieve a property directly from the class descriptor to avoid
-            triggering __getattr__ on the instance.
-            """
-            prop = getattr(type(instance), prop_name, None)
-            if isinstance(prop, property):
-                return prop.__get__(instance, type(instance))
-            raise AttributeError(f"'{instance.__class__.__name__}' object has no attribute '{prop_name}'")
-
-        # Allow direct data_scheme access even if __getattr__ is re-entered for it.
-        if method_name == 'data_scheme':
-            return _property_value(self, 'data_scheme')
-
-        # Prevent infinite recursion for properties that themselves rely on __getattr__
-        if '_in_getattr' in self.__dict__:
-            if method_name in ('resources', 'file_path', 'formatting_functions'):
-                raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{method_name}'")
-
-        # Resolve scheme membership without triggering __getattr__
+        # Resolve data_scheme via the property descriptor directly (avoids __getattr__)
         wave_scheme = _property_value(self, 'data_scheme')
         country_scheme = _property_value(self.country, 'data_scheme')
 
-        # Set flag to track that we're inside __getattr__
         self.__dict__['_in_getattr'] = True
         try:
             if method_name in wave_scheme or method_name in country_scheme:
                 def method():
                     return self.grab_data(method_name)
                 return method
-            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{method_name}'")
+            raise AttributeError(f"'{type(self).__name__}' has no attribute '{method_name}'")
         finally:
-            # Always clear flag when exiting, even if exception raised
-            # Use __dict__.pop() to avoid triggering __getattr__
             self.__dict__.pop('_in_getattr', None)
         
     @property
-    def file_path(self):
+    def file_path(self) -> Path:
         return files("lsms_library") / "countries" / self.folder
 
     @property
-    def resources(self):
+    def resources(self) -> dict[str, Any]:
         """Load the data_info.yml that describes table structure, merges, etc."""
         info_path = self.file_path / "_" / "data_info.yml"
         if not info_path.exists():
@@ -247,9 +240,9 @@ class Wave:
             return {}
         with open(info_path, 'r') as file:
             return load_yaml(file)
-    
+
     @property
-    def data_scheme(self):
+    def data_scheme(self) -> list[str]:
         wave_data = [f.stem for f in (self.file_path / "_").iterdir() if f.suffix == '.py' and f.stem not in [f'{self.wave_folder}']]
         # Customed
         replace_dic = { 'other_features': ['cluster_features']}
@@ -265,17 +258,17 @@ class Wave:
         return list(set(wave_data))
     
     @property
-    def formatting_functions(self):
+    def formatting_functions(self) -> dict[str, Callable[..., Any]]:
         function_dic = self.country.formatting_functions
         for file in {f"{self.wave_folder}.py", "mapping.py"}:
             file_path = self.file_path / "_" / file
-            if file_path.exists():                                            
+            if file_path.exists():
                 function_dic.update(
                     get_formatting_functions(file_path,
                                              name=f"formatting_{self.wave_folder}"))
         return function_dic
-    
-    def column_mapping(self, request, data_info = None):
+
+    def column_mapping(self, request: str, data_info: dict[str, Any] | None = None) -> dict[str, Any]:
         """
         Retrieve column mappings for a given dataset request and map into a 
         dictionary to be ready for df_data_grabber.
@@ -377,7 +370,7 @@ class Wave:
             return final_mapping
         
     @property
-    def categorical_mapping(self):
+    def categorical_mapping(self) -> dict[str, pd.DataFrame]:
         org_fn = self.file_path / "_" / "categorical_mapping.org"
         dic = dict(self.country.categorical_mapping)
         if not org_fn.exists():
@@ -387,7 +380,7 @@ class Wave:
             return dic
 
     @property
-    def license(self):
+    def license(self) -> str:
         license_path = self.file_path / "Documentation" / "LICENSE.org"
         if license_path.exists():
             with open(license_path, 'r') as file:
@@ -396,7 +389,7 @@ class Wave:
         return ""
 
     @property
-    def data_source(self):
+    def data_source(self) -> str:
         source_path = self.file_path / "Documentation" / "SOURCE.org"
         if source_path.exists():
             with open(source_path, 'r') as file:
@@ -405,10 +398,10 @@ class Wave:
         return ""
 
     @property
-    def mapping(self):
+    def mapping(self) -> dict[str, Any]:
         return {**self.categorical_mapping, **self.formatting_functions}
-    
-    def grab_data(self, request):
+
+    def grab_data(self, request: str) -> pd.DataFrame:
         '''
         get data from the data file
         Input:
@@ -507,7 +500,7 @@ class Wave:
         else:
             # The reason why not just simply run the python file is some
             # python files have dependencies.
-            print(f"Attempting to generate using Makefile...", flush=True,file=stderr)
+            logger.info("Attempting to generate using Makefile...")
             #cluster features in the old makefile is called 'other_features'
             # if request =='cluster_features': request = 'other_features'
             # Use in-tree path for Make target, but look for output at data_root too
@@ -525,7 +518,7 @@ class Wave:
             env = os.environ.copy()
             env["LSMS_DATA_DIR"] = str(data_root())
             subprocess.run(["make", "-s", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True, env=env)
-            print(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...",file=stderr)
+            logger.info(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...")
 
             # Check external data_root first, then in-tree fallback
             parquet_fn = None
@@ -535,7 +528,7 @@ class Wave:
                     break
 
             if parquet_fn is None:
-                print(f"Parquet file for {request} still missing after running Makefile.",file=stderr)
+                logger.warning(f"Parquet file for {request} still missing after running Makefile.")
                 return pd.DataFrame()
 
             df = pd.read_parquet(parquet_fn)
@@ -548,7 +541,7 @@ class Wave:
         return df
 
     # This cluster_features method is explicitly defined because additional processing is required after calling grab_data.
-    def cluster_features(self):
+    def cluster_features(self) -> pd.DataFrame:
         df = self.grab_data('cluster_features')
         # if cluster_feature data is from old other_features.parquet file, region is called 'm' so we need to rename it
         if 'm' in df.index.names:
@@ -558,7 +551,7 @@ class Wave:
         return df
     
     # Food acquired method is explicitly defined because potentially categorical mapping is required after calling grab_data.
-    def food_acquired(self):
+    def food_acquired(self) -> pd.DataFrame:
         df = self.grab_data('food_acquired')
         if df.empty:
             return df
@@ -600,7 +593,15 @@ class Country:
     #                 'nonfood_expenditures.parquet', 'enterprise_income.parquet', 'assets.parquet',
     #                 'earnings.parquet', 'housing.parquet', 'income.parquet', 'fct.parquet', 'nutrition.parquet']
 
-    def __init__(self, country_name, preload_panel_ids=False, verbose=False, trust_cache=False):
+    def __init__(self, country_name: str, preload_panel_ids: bool = False, verbose: bool = False, trust_cache: bool = False) -> None:
+        # Validate country name: must be a simple name, not a path traversal
+        countries_dir = Path(__file__).resolve().parent / "countries"
+        country_dir = (countries_dir / country_name).resolve()
+        if not country_dir.is_relative_to(countries_dir) or not country_dir.is_dir():
+            raise ValueError(
+                f"Unknown country {country_name!r}. "
+                f"Available: {sorted(p.name for p in countries_dir.iterdir() if p.is_dir())}"
+            )
         self.name = country_name
         self._panel_ids_cache = None
         self._updated_ids_cache = None
@@ -609,18 +610,18 @@ class Country:
         scheme_map = self.resources.get("Data Scheme") if isinstance(self.resources, dict) else {}
         has_panel_ids = isinstance(scheme_map, dict) and "panel_ids" in scheme_map
         if preload_panel_ids and has_panel_ids:
-            print(f"Preloading panel_ids for {self.name}...",file=stderr)
+            logger.info(f"Preloading panel_ids for {self.name}...")
             #ignore all the warnings
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
                 _ = self._compute_panel_ids()
 
     @property
-    def file_path(self):
+    def file_path(self) -> Path:
         return Path(__file__).resolve().parent / "countries" / self.name
 
     @property
-    def resources(self):
+    def resources(self) -> dict[str, Any]:
         var = self.file_path / "_" / "data_scheme.yml"
         if not var.exists():
             return {}
@@ -643,16 +644,16 @@ class Country:
         return {}
     
     @property
-    def formatting_functions(self):
+    def formatting_functions(self) -> dict[str, Callable[..., Any]]:
         function_dic = {}
         for file in [f"{self.name.lower()}.py", 'mapping.py']:
             general_mod_path = self.file_path/ "_"/ file
             function_dic.update(get_formatting_functions(general_mod_path, f"formatting_{self.name}"))
 
         return function_dic
-    
+
     @property
-    def categorical_mapping(self):
+    def categorical_mapping(self) -> dict[str, pd.DataFrame]:
         '''
         Get the categorical mapping for the country.
         Searches current directory, then parent directory.
@@ -664,10 +665,10 @@ class Country:
         return {}
 
     @property
-    def mapping(self):
+    def mapping(self) -> dict[str, Any]:
         return {**self.categorical_mapping, **self.formatting_functions}
-    
-    def _resolve_materialize_stages(self, method_name: str, waves) -> list[StageInfo]:
+
+    def _resolve_materialize_stages(self, method_name: str, waves: list[str]) -> list[StageInfo]:
         """
         Resolve materialize stage information for the given method and waves.
         Returns an empty list if no matching stages are registered.
@@ -697,7 +698,7 @@ class Country:
         return resolved
 
     @property
-    def waves(self):
+    def waves(self) -> list[str]:
         """List of names of waves available for country.
         """
         # Let's first check if there is a 'waves' or 'Waves' defined in {self.name}.py in the _ folder.
@@ -727,7 +728,7 @@ class Country:
         return sorted(waves)
 
     @property
-    def data_scheme(self):
+    def data_scheme(self) -> list[str]:
         """List of data objects available for country.
         """
         data_info = self.resources
@@ -752,7 +753,7 @@ class Country:
 
         # return list(data_scheme)
 
-    def __getitem__(self, year):
+    def __getitem__(self, year: str) -> Wave:
         # Ensure the year is one of the available waves
         if year in self.waves:
             wave_folder = self.wave_folder_map.get(year, year)
@@ -865,7 +866,7 @@ class Country:
         return merged.set_index(df.index.names)
     
 
-    def _finalize_result(self, df: Any, scheme_entry: dict[str, Any], method_name: str):
+    def _finalize_result(self, df: Any, scheme_entry: dict[str, Any], method_name: str) -> pd.DataFrame | dict[str, Any]:
         """
         Apply final harmonization steps (index augmentation, normalization, id walk)
         before returning a dataset to callers.
@@ -885,8 +886,10 @@ class Country:
                 if desired_order != index_names:
                     try:
                         df = df.reorder_levels(desired_order)
-                    except Exception:
-                        pass
+                    except ValueError as exc:
+                        warnings.warn(
+                            f"Could not reorder index levels for {method_name}: {exc}"
+                        )
 
             if (
                 'i' in df.index.names
@@ -902,7 +905,7 @@ class Country:
 
         return df
 
-    def _aggregate_wave_data(self, waves=None, method_name=None):
+    def _aggregate_wave_data(self, waves: list[str] | None = None, method_name: str | None = None) -> pd.DataFrame | dict[str, Any]:
         """Aggregates data across multiple waves using a single dataset method.
 
         If the required `.parquet` file is missing, it requests `Makefile` to
@@ -936,8 +939,8 @@ class Country:
         ):
             try:
                 _ = self.updated_ids
-            except Exception:
-                pass
+            except (FileNotFoundError, KeyError, ValueError):
+                pass  # updated_ids not available for this country
 
         def safe_concat_dataframe_dict(df_dict):
             # Use the superset of all index levels as the reference order,
@@ -1066,7 +1069,7 @@ class Country:
                     make_cmd.append(str(target))
                     try:
                         subprocess.run(make_cmd, cwd=make_dir, check=True, env=build_env())
-                        print(f"Makefile executed successfully for {self.name}/{wave or 'ALL'}. Rechecking for {method_name}...", file=stderr)
+                        logger.info(f"Makefile executed successfully for {self.name}/{wave or 'ALL'}. Rechecking for {method_name}...")
                     except (subprocess.CalledProcessError, FileNotFoundError) as error:
                         warnings.warn(f"Makefile execution failed for {self.name}/{wave or '_'} {method_name}: {error}")
                         continue
@@ -1082,7 +1085,7 @@ class Country:
                 python_bin = sys.executable or "python3"
                 try:
                     subprocess.run([python_bin, str(script)], cwd=script.parent, check=True, env=build_env())
-                    print(f"Python fallback executed for {script.parent.name}.{method_name}.", file=stderr)
+                    logger.info(f"Python fallback executed for {script.parent.name}.{method_name}.")
                 except subprocess.CalledProcessError as error:
                     warnings.warn(f"Python fallback failed for {script}: {error}")
                     return None
@@ -1099,7 +1102,7 @@ class Country:
                 output_path = try_script(script_path)
 
             if output_path is None:
-                print(f"Data file {target_path} still missing after running fallbacks.", file=stderr)
+                logger.warning(f"Data file {target_path} still missing after running fallbacks.")
                 return pd.DataFrame()
 
             if output_path.suffix == ".json":
@@ -1196,7 +1199,7 @@ class Country:
             ]
             for candidate in candidates:
                 if candidate.exists():
-                    print(f"Reading {method_name} from cache {candidate}", file=stderr)
+                    logger.debug(f"Reading {method_name} from cache {candidate}")
                     if candidate.suffix == ".json":
                         with open(candidate, 'r') as json_file:
                             return json.load(json_file)
@@ -1215,7 +1218,7 @@ class Country:
                 make_cmd.append(f"{method_name}.json")
                 subprocess.run(make_cmd, cwd=self.file_path / "_", check=True)
             except (subprocess.CalledProcessError, FileNotFoundError) as error:
-                print(f"Makefile build failed for {method_name}: {error}. Falling back to wave aggregation.", file=stderr)
+                logger.warning(f"Makefile build failed for {method_name}: {error}. Falling back to wave aggregation.")
                 result = load_from_waves(waves)
             else:
                 result = run_make_target(method_name)
@@ -1224,7 +1227,7 @@ class Country:
                 cache_path.parent.mkdir(parents=True, exist_ok=True)
                 with open(cache_path, 'w') as json_file:
                     json.dump(result, json_file)
-                print(f"Writing {method_name} to cache {cache_path}", file=stderr)
+                logger.debug(f"Writing {method_name} to cache {cache_path}")
             elif isinstance(result, pd.DataFrame):
                 parquet_path = data_root(self.name) / "_" / f"{method_name}.parquet"
                 parquet_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1234,7 +1237,7 @@ class Country:
                         cache_path.unlink()
                     except OSError:
                         pass
-                print(f"Writing {method_name} to cache {parquet_path}", file=stderr)
+                logger.debug(f"Writing {method_name} to cache {parquet_path}")
             return result
 
         def load_dataframe_with_dvc(method_name):
@@ -1257,7 +1260,7 @@ class Country:
                         if isinstance(df, pd.DataFrame):
                             cache_path.parent.mkdir(parents=True, exist_ok=True)
                             to_parquet(df, cache_path)
-                            print(f"Writing {method_name} to cache {cache_path}", file=stderr)
+                            logger.debug(f"Writing {method_name} to cache {cache_path}")
                         return df
 
                     deduped_infos: list[StageInfo] = []
@@ -1299,7 +1302,7 @@ class Country:
                             combined_df = next(iter(non_empty_df.values()))
                         cache_path.parent.mkdir(parents=True, exist_ok=True)
                         to_parquet(combined_df, cache_path)
-                        print(f"Writing {method_name} to cache {cache_path}", file=stderr)
+                        logger.debug(f"Writing {method_name} to cache {cache_path}")
                         return combined_df
 
                     def _load_stage(stage_ref: str):
@@ -1318,16 +1321,15 @@ class Country:
                                 for stage in loaded_stages
                             ]
                         dirty = any(stage_status)
-                    except Exception as status_error:
-                        print(
-                            f"DVC status failed for {method_name}: {status_error!r}. Assuming dirty outputs.",
-                            file=stderr,
+                    except (OSError, ValueError, KeyError) as status_error:
+                        warnings.warn(
+                            f"DVC status failed for {method_name}: {status_error!r}. Assuming dirty outputs."
                         )
                         dirty = True
 
                     if cache_exists and not dirty:
                         try:
-                            print(f"Reading {method_name} from cache {cache_path}", file=stderr)
+                            logger.debug(f"Reading {method_name} from cache {cache_path}")
                             cached_df = get_dataframe(cache_path)
                             cached_df = map_index(cached_df)
                             wave_hint = stage_infos[0].wave if len(stage_infos) == 1 else None
@@ -1357,8 +1359,8 @@ class Country:
                             for stage in stage_iter:
                                 try:
                                     stage.reproduce()
-                                except Exception as reproduce_error:
-                                    print(f"DVC reproduce failed for {stage.addressing}: {reproduce_error!r}. Falling back to legacy loaders.", file=stderr)
+                                except (OSError, ValueError, RuntimeError) as reproduce_error:
+                                    warnings.warn(f"DVC reproduce failed for {stage.addressing}: {reproduce_error!r}. Falling back to legacy loaders.")
                                     stage_outputs = collect_stage_outputs(stage_infos)
                                     combined_outputs = consolidate_stage_outputs(stage_outputs)
                                     if combined_outputs is not None:
@@ -1382,7 +1384,7 @@ class Country:
                         raise KeyError(f"No data produced for {method_name} via DVC.")
                     return combined_outputs
             except (DvcException, FileNotFoundError) as e:
-                print(f"DVC unavailable for {method_name}: {e}. Falling back to manual aggregation.", file=stderr)
+                logger.warning(f"DVC unavailable for {method_name}: {e}. Falling back to manual aggregation.")
                 return load_from_waves(waves)
             finally:
                 if repo is not None:
@@ -1418,7 +1420,7 @@ class Country:
                 raise
         return self._finalize_result(df, scheme_entry, method_name)
 
-    def _compute_panel_ids(self):
+    def _compute_panel_ids(self) -> None:
         """
         Compute and cache both panel_ids and updated_ids.
         """
@@ -1432,18 +1434,18 @@ class Country:
             self._panel_ids_cache = panel_ids_dic
             self._updated_ids_cache = updated_ids_dic
         else:
-            print(f"Panel IDs not found in {self.name}.",file=stderr)
+            logger.warning(f"Panel IDs not found in {self.name}.")
             self._panel_ids_cache = None
             self._updated_ids_cache = None
 
     @property
-    def panel_ids(self):
+    def panel_ids(self) -> dict[str, Any] | None:
         if self._panel_ids_cache is None or self._updated_ids_cache is None:
             self._compute_panel_ids()
         return self._panel_ids_cache
 
     @property
-    def updated_ids(self):
+    def updated_ids(self) -> dict[str, dict[str, str]] | None:
         if self._panel_ids_cache is None or self._updated_ids_cache is None:
             self._compute_panel_ids()
         return self._updated_ids_cache
@@ -1531,7 +1533,7 @@ class Country:
             return method
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
     
-    def test_all_data_schemes(self, waves=None):
+    def test_all_data_schemes(self, waves: list[str] | None = None) -> dict[str, str]:
         """
         Test whether all method_names in obj.data_scheme can be successfully built.
         Falls back to Makefile if not in data_scheme.
@@ -1556,8 +1558,8 @@ class Country:
                         print(f"DataFrame loaded for {method_name}: {df.shape}")
                 else:
                     print(f"❓ Unexpected return type for {method_name}: {type(df)}")
-            except Exception as e:
-                print(f"Failed to load {method_name}: {str(e)}")
+            except Exception as e:  # broad catch intentional: diagnostic method
+                print(f"Failed to load {method_name}: {e!r}")
                 failed_methods[method_name] = str(e)
 
         print("\n=== Summary ===")
@@ -1572,147 +1574,6 @@ class Country:
 
 
 
-
-
-# #!/usr/bin/env python3
-# import pandas as pd
-# import numpy as np
-# from eep153_tools.sheets import write_sheet
-# from importlib.resources import files
-# import cfe.regression as rgsn
-
-
-# # pd.set_option('future.no_silent_downcasting', True)
-
-# class Country:
-#     def __init__(self,country_name):
-#         self.name = country_name
-
-#     @property
-#     def resources(self):
-#         var = files("lsms_library") / "countries" / self.name / "var"
-
-#         return var
-
-#     def read_parquet(self,parquet):
-#         try:
-#             return pd.read_parquet((self.resources / f'{parquet}.parquet'))
-#         except FileNotFoundError:
-#             print(f"Need to build {parquet}")
-
-#     def food_expenditures(self):
-#         x = self.read_parquet('food_expenditures').squeeze().dropna()
-#         x.index.names = ['i','t','m','j']
-#         return x
-
-#     def other_features(self):
-#         x = self.read_parquet('other_features').squeeze()
-#         x.index.names = ['i','t','m']
-#         return x
-
-
-#     def household_characteristics(self,additional_other_features=False,agesex=False):
-#         x = self.read_parquet('household_characteristics')
-#         x.index.names = ['i','t','m']
-
-#         if 'log HSize' not in x.columns:
-#             x['log HSize'] = np.log(x.sum(axis=1).replace(0,np.nan))
-
-#         cols = x.columns
-#         if not agesex: # aggregate to girls,boys,women,men
-#             agesex_cols = x.filter(axis=1,regex=r' [0-9]')
-#             fcols = agesex_cols.filter(regex='^F').columns
-#             x['Girls'] = x[[c for c in fcols if int(c[-2:])<=18]].sum(axis=1)
-#             x['Women'] = x[[c for c in fcols if int(c[-2:])>18]].sum(axis=1)
-
-#             mcols = x.filter(regex='^M').columns
-#             x['Boys'] = x[[c for c in mcols if int(c[-2:])<=18]].sum(axis=1)
-#             x['Men'] = x[[c for c in mcols if int(c[-2:])>18]].sum(axis=1)
-
-#             x = x.drop(fcols.tolist()+mcols.tolist(),axis=1)
-
-#         if additional_other_features:
-#             of = self.other_features()
-#             x = x.join(of)
-
-#         return x
-
-#     def fct(self):
-#         x = self.read_parquet('fct')
-#         if x is None: return
-#         x.index.name = 'j'
-#         x.columns.name = 'n'
-#         return x
-
-#     def food_prices(self,drop_na_units=True):
-#         x = self.read_parquet('food_prices').squeeze()
-#         try:
-#             x = x.stack(x.columns.names,future_stack=True).dropna()
-#         except AttributeError: # Already a series?
-#             x = x.dropna()
-
-#         if len(x.index.names)==4:
-#             x = x.reorder_levels(['t','m','i','u'])
-#         elif len(x.index.names)==5: # Individual level?
-#             x = x.reorder_levels(['j','t','m','i','u'])
-#             x = x.groupby(['t','m','i','u']).median()
-
-#         x.index = x.index.rename({'i':'j'})
-#         if drop_na_units:
-#             u = x.reset_index('u')['u'].replace(['<NA>','nan'],np.nan)
-#             x = x.loc[~pd.isnull(u).values,:]
-#         x = x.reset_index().set_index(['t','m','j','u']).squeeze()
-#         x = x.unstack(['t','m'])
-
-#         return x
-
-#     def export_to_google_sheet(self,key=None,t=None,z=None):
-#         sheets = {"Food Expenditures":self.food_expenditures(),
-#                   'FCT':self.fct(),
-#                   'Food Prices':self.food_prices()}
-
-#         if z is None:
-#             sheets['Household Characteristics'] = self.household_characteristics(agesex=True,additional_other_features=True)
-#         else:
-#             sheets['Household Characteristics'] = z
-
-#         if t is not None:
-#             sheets['Food Expenditures'] = sheets['Food Expenditures'].xs(t,level='t',drop_level=False)
-#             sheets['Household Characteristics'] = sheets['Household Characteristics'].xs(t,level='t',drop_level=False)
-#             sheets['Food Prices'] = sheets['Food Prices'].xs(t,level='t',drop_level=False,axis=1)
-#             modifier = f' ({t})'
-#         else:
-#             modifier = ''
-
-#         k = 'Food Expenditures'
-#         v = sheets.pop(k)
-#         if key is None:
-#             key = write_sheet(v.unstack('j'),
-#                           'ligon@berkeley.edu',user_role='writer',
-#                           json_creds='/home/ligon/.eep153.service_accounts/instructors@eep153.iam.gserviceaccount.com',
-#                           sheet=k+modifier)
-#             print(f"Key={key}")
-#         else:
-#             write_sheet(v.unstack('j'),
-#                         'ligon@berkeley.edu',user_role='writer',
-#                         json_creds='/home/ligon/.eep153.service_accounts/instructors@eep153.iam.gserviceaccount.com',
-#                         sheet=k+modifier,key=key)
-
-#         for k,v in sheets.items():
-#             if v is not None:
-#                 write_sheet(v,
-#                             'ligon@berkeley.edu',user_role='writer',
-#                             json_creds='/home/ligon/.eep153.service_accounts/instructors@eep153.iam.gserviceaccount.com',
-#                             sheet=k+modifier,key=key)
-
-#         return key
-
-#     def cfe_regression(self,**kwargs):
-#         x = self.food_expenditures()
-#         z = self.household_characteristics(additional_other_features=True)
-#         r = rgsn.Regression(y=np.log(x.replace(0,np.nan).dropna()),
-#                             d=z,**kwargs)
-#         return r
 def _declared_index_levels(schema_entry: dict[str, Any] | None) -> list[str]:
     """Parse the declared index metadata from a data scheme entry."""
     if not schema_entry:
@@ -1802,8 +1663,8 @@ def _normalize_dataframe_index(
         remaining = [lvl for lvl in current_names if lvl not in present_declared]
         try:
             df = df.reorder_levels(present_declared + remaining)
-        except Exception:
-            pass
+        except ValueError:
+            pass  # level count mismatch; keep original order
 
     # Drop any unexpected index levels
     extra_levels = [lvl for lvl in df.index.names if lvl not in declared]
