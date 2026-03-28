@@ -7,7 +7,7 @@ authors = [ {name = "Ethan Ligon", email = "ligon@berkeley.edu"}
 license = {text = "CC-BY-4.0"}
 readme = "README.org"
 requires-python = ">=3.11, <4.0"
-dependencies = ["pandas >=2.2, <3.0",
+dependencies = ["pandas >=2.2",
              "CFEDemands>=0.7.0",
              "PyYAML >=6.0,<7.0",
              "python-gnupg >=0.5,<1.0",
