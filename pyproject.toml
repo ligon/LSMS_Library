@@ -1,6 +1,6 @@
 [project]
 name = "LSMS_Library"
-version = "0.0.0"  # placeholder; overwritten by poetry-dynamic-versioning
+dynamic = ["version"]
 description = "Abstraction layer for Living Standards Measurement Survey data"
 authors = [ {name = "Ethan Ligon", email = "ligon@berkeley.edu"}
     ]
@@ -27,11 +27,14 @@ dependencies = ["pandas >=2.2",
 [project.scripts]
 lsms-library = "lsms_library.cli:main"
 
-[tool-poetry]
-
-
-[project-urls]
+[project.urls]
 repository = "https://github.com/ligon/LSMS_Library"
+
+[tool.poetry]
+version = "0.0.0"
+
+[tool.poetry.requires-plugins]
+poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
 
 [tool.poetry.group.test.dependencies]
 pytest = "^6.0.0"
