@@ -16,9 +16,6 @@ import logging
 import os
 import warnings
 from pathlib import Path
-import warnings
-warnings.filterwarnings('ignore', category=FutureWarning)
-warnings.filterwarnings('ignore', category=UnicodeWarning)
 import subprocess
 import json
 from dataclasses import dataclass
