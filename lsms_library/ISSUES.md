@@ -173,3 +173,7 @@
 
 - Waves: 2014, 2018-19, 2021-22
 - Error: `ValueError: Cannot reorder index levels for '2018-19': Length of order must be same as number of levels (6), got 5`
+## 2026-03-28 14:25:01Z Nigeria – panel_ids
+
+- Waves: 2010Q3, 2011Q1, 2012Q3, 2013Q1, 2015Q3, 2016Q1, 2018Q3, 2019Q1
+- Error: `ImportError: cannot import name '_DIR_MARK' from 'pathspec.patterns.gitwildmatch' (/home/ligon/miniforge3/envs/lab/lib/python3.13/site-packages/pathspec/patterns/gitwildmatch.py)`
