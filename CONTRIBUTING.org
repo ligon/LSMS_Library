@@ -452,7 +452,7 @@ This means:
 
 *** How it works
 
-Per-wave ~data_info.yml~ files produce a ~Relationship~ string from source data (e.g., ~Relationship: lien~). The runtime automatically decomposes it into the three columns using a dictionary in ~lsms_library/categorical_mapping/spelling.yml~, under the ~Kinship:~ key:
+Per-wave ~data_info.yml~ files produce a ~Relationship~ string from source data (e.g., ~Relationship: lien~). The runtime automatically decomposes it into the three columns using a dictionary in ~lsms_library/categorical_mapping/kinship.yml~:
 
 #+begin_src yaml
 Kinship:
@@ -476,7 +476,7 @@ If a survey uses a relationship label not yet in the dictionary, the library emi
 UserWarning: Unknown relationship labels (add to spelling.yml Kinship): ['Beau-fils']
 #+end_example
 
-To fix: add the label to ~spelling.yml~ with its ~[Generation, Distance, Affinity]~ tuple:
+To fix: add the label to ~kinship.yml~ with its ~[Generation, Distance, Affinity]~ tuple:
 
 #+begin_src yaml
   Beau-fils:           [-1, 0, affinal]
@@ -512,7 +512,15 @@ The file ~lsms_library/data_info.yml~ defines the canonical schema for all cross
 
 The test suite (~tests/test_schema_consistency.py~) validates all country ~data_scheme.yml~ files against this canonical schema. When adding new tables or columns, update ~data_info.yml~ first, then the per-country files.
 
-The file ~lsms_library/categorical_mapping/spelling.yml~ handles cross-country value standardisation: spelling corrections and the kinship dictionary. Within-country value harmonisation uses ~categorical_mapping.org~ files per country.
+The file ~lsms_library/categorical_mapping/spelling.yml~ is an inverse dictionary for cross-country value normalisation. Each key is the canonical spelling; values are accepted variants that map to it:
+
+#+begin_src yaml
+Roasted:
+  - Rosted
+  - Raosted
+#+end_src
+
+The kinship decomposition dictionary lives separately in ~lsms_library/categorical_mapping/kinship.yml~. Within-country value harmonisation uses ~categorical_mapping.org~ files per country.
 
 ** Python Helpers for Advanced Cases
 

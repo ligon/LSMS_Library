@@ -1755,16 +1755,15 @@ _SCHEME_SKIP_KEYS = frozenset({'index', 'materialize', 'backend'})
 
 @lru_cache(maxsize=1)
 def _load_kinship_map() -> dict[str, tuple[int, int, str]]:
-    """Load the Kinship dictionary from spelling.yml.
+    """Load the kinship dictionary from kinship.yml.
 
     Returns a dict mapping relationship label strings to
     ``(Generation, Distance, Affinity)`` tuples.
     """
-    spelling_path = files("lsms_library") / "categorical_mapping" / "spelling.yml"
-    with open(spelling_path, "r", encoding="utf-8") as f:
+    kinship_path = files("lsms_library") / "categorical_mapping" / "kinship.yml"
+    with open(kinship_path, "r", encoding="utf-8") as f:
         data = yaml.safe_load(f)
-    raw = data.get("Kinship", {})
-    return {label: tuple(vals) for label, vals in raw.items()}
+    return {label: tuple(vals) for label, vals in data.items()}
 
 
 def _expand_kinship(df: pd.DataFrame) -> pd.DataFrame:

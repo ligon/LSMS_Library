@@ -51,16 +51,18 @@ Tests in `test_schema_consistency.py` read from this file — never hardcode sch
 | `Distance` | int | Collateral distance (0=lineal, 1=sibling line, 2=cousin) |
 | `Affinity` | str | `consanguineal`, `affinal`, `step`, `foster`, `unrelated`, `guest`, `servant` |
 
-The runtime automatically expands any `Relationship` column into these three via `_expand_kinship()` in `_finalize_result()`, using the dictionary in `lsms_library/categorical_mapping/spelling.yml`. Per-wave `data_info.yml` files continue to produce a `Relationship` string from raw data — the decomposition happens transparently.
+The runtime automatically expands any `Relationship` column into these three via `_expand_kinship()` in `_finalize_result()`, using the dictionary in `lsms_library/categorical_mapping/kinship.yml`. Per-wave `data_info.yml` files continue to produce a `Relationship` string from raw data — the decomposition happens transparently.
 
-**Adding new labels:** If a survey has an unrecognized relationship string, a warning is emitted. Add the label to `spelling.yml` under `Kinship:` with its `[Generation, Distance, Affinity]` tuple.
+**Adding new labels:** If a survey has an unrecognized relationship string, a warning is emitted. Add the label to `lsms_library/categorical_mapping/kinship.yml` with its `[Generation, Distance, Affinity]` tuple.
 
 ## Spelling Enforcement (`spelling.yml`)
-`lsms_library/categorical_mapping/spelling.yml` handles two things:
-1. **Spelling corrections** — canonical spelling with variant list (e.g., `Roasted: [Rosted]`)
-2. **Kinship dictionary** — relationship labels → `[Generation, Distance, Affinity]` tuples
-
-When adding new relationship labels encountered in survey data, add them here — not in per-country code.
+`lsms_library/categorical_mapping/spelling.yml` is an inverse dictionary for cross-country value normalisation. Each key is the canonical spelling; values are accepted variants that map to it:
+```yaml
+Roasted:
+  - Rosted
+  - Raosted
+```
+Within-country value harmonisation uses `categorical_mapping.org` files per country.
 
 ## Pandas Conventions (>=3.0)
 This codebase targets pandas 3.0+. Follow these rules in all new and modified code:

@@ -1,0 +1,81 @@
+# Kinship decomposition (Kroeber 1909; Romney & D'Andrade 1964).
+#
+# Maps relationship label strings to [Generation, Distance, Affinity].
+# Sex is already captured in a separate column, so gendered labels
+# (Brother/Sister, Son/Daughter, etc.) map to the same tuple.
+#
+# Generation : vertical distance from head (0 = same generation)
+# Distance   : collateral distance (0 = lineal, 1 = sibling line, 2 = cousin)
+# Affinity   : consanguineal | affinal | step | foster | unrelated | guest | servant
+#
+# Add new labels here as they are encountered in survey data.
+
+# --- Lineal consanguineal ---
+Head:                [0, 0, consanguineal]
+Child:               [-1, 0, consanguineal]
+Son:                 [-1, 0, consanguineal]
+Daughter:            [-1, 0, consanguineal]
+Parent:              [1, 0, consanguineal]
+Father:              [1, 0, consanguineal]
+Mother:              [1, 0, consanguineal]
+Grandchild:          [-2, 0, consanguineal]
+Grandson:            [-2, 0, consanguineal]
+Granddaughter:       [-2, 0, consanguineal]
+Grandparent:         [2, 0, consanguineal]
+Grandfather:         [2, 0, consanguineal]
+Grandmother:         [2, 0, consanguineal]
+Great-Grandchild:    [-3, 0, consanguineal]
+Great-Grandparent:   [3, 0, consanguineal]
+
+# --- Collateral consanguineal ---
+Sibling:             [0, 1, consanguineal]
+Brother:             [0, 1, consanguineal]
+Sister:              [0, 1, consanguineal]
+Niece/Nephew:        [-1, 1, consanguineal]
+Niece:               [-1, 1, consanguineal]
+Nephew:              [-1, 1, consanguineal]
+Uncle/Aunt:          [1, 1, consanguineal]
+Uncle:               [1, 1, consanguineal]
+Aunt:                [1, 1, consanguineal]
+Cousin:              [0, 2, consanguineal]
+
+# --- Affinal (by marriage) ---
+Spouse:              [0, 0, affinal]
+Husband:             [0, 0, affinal]
+Wife:                [0, 0, affinal]
+Son-In-Law:          [-1, 0, affinal]
+Daughter-In-Law:     [-1, 0, affinal]
+Son/Daughter In-Law: [-1, 0, affinal]
+Child-In-Law:        [-1, 0, affinal]
+Father-In-Law:       [1, 0, affinal]
+Mother-In-Law:       [1, 0, affinal]
+Parent-In-Law:       [1, 0, affinal]
+Brother-In-Law:      [0, 1, affinal]
+Sister-In-Law:       [0, 1, affinal]
+Sibling-In-Law:      [0, 1, affinal]
+
+# --- Step ---
+Stepchild:           [-1, 0, step]
+Stepson:             [-1, 0, step]
+Stepdaughter:        [-1, 0, step]
+Stepparent:          [1, 0, step]
+Stepfather:          [1, 0, step]
+Stepmother:          [1, 0, step]
+
+# --- Foster ---
+Foster Child:        [-1, 0, foster]
+
+# --- Other ---
+Servant:             [0, 0, servant]
+Domestic Worker:     [0, 0, servant]
+Household Help:      [0, 0, servant]
+Tenant:              [0, 0, guest]
+Lodger:              [0, 0, guest]
+Boarder:             [0, 0, guest]
+Pensioner:           [0, 0, guest]
+Guest:               [0, 0, guest]
+Non-Relative:        [0, 0, unrelated]
+Other Non-Relative:  [0, 0, unrelated]
+Other Relative:      [0, 0, consanguineal]
+Other Family:        [0, 0, consanguineal]
+Adopted Child:       [-1, 0, consanguineal]
