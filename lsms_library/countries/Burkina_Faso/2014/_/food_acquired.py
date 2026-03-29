@@ -43,6 +43,6 @@ concatenated = pd.concat(x)
 
 concatenated.columns.name = 'k'
 #inspect missing encoding for units
-concatenated = concatenated.replace('nan', np.nan).dropna(how = 'all')
+concatenated = concatenated.replace('nan', pd.NA).dropna(how = 'all')
 
 to_parquet(concatenated, 'food_acquired.parquet')

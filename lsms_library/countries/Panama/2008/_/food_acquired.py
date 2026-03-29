@@ -25,14 +25,14 @@ df = df.rename({'hogar': 'j', 'producto':'i', 's11a6a':'quantity bought', 's11a6
 cat_columns = df.iloc[:, 2:].select_dtypes(['category']).columns
 df[cat_columns] = df[cat_columns].apply(lambda x: x.cat.codes)
 df = df.replace({-1: np.nan})
-val = df._get_numeric_data()
-val[val >= 99999] = np.nan
-val[val == 0] = np.nan
+num_cols = df.select_dtypes(include=[np.number]).columns
+df[num_cols] = df[num_cols].where(df[num_cols] < 99999)
+df[num_cols] = df[num_cols].where(df[num_cols] != 0)
 
 food_items = df_from_orgfile('../../_/food_items.org')
 food_items = food_items.loc[:, ['Preferred Label', t]]
 food_items[t] = food_items[t].str.strip()
-food_items = food_items.replace(['','---'],np.nan).dropna()
+food_items = food_items.replace(['','---'],pd.NA).dropna()
 food_items = food_items.set_index(t).dropna()
 food_items = food_items.squeeze().str.strip().to_dict()
 

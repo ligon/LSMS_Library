@@ -41,7 +41,7 @@ match_df, D = conversion_table_matching(df, conversions, conversion_label_name =
 conversions['item_name'] = conversions['item_name'].map(D)
 
 df = df.set_index(['j', 'i'])
-df = df.join(regions).set_index('m', append=True).replace(r'^\s*$', np.nan, regex=True)
+df = df.join(regions).set_index('m', append=True).replace(r'^\s*$', pd.NA, regex=True)
 
 # Deal with some problematic units which are floats
 df['units_consumed'] = df.units_consumed.astype(str).str.upper()

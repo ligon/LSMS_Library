@@ -26,7 +26,7 @@ def Sex(value):
     Formatting sex veriable
     '''
     if pd.isna(value):
-        return np.nan
+        return pd.NA
     else:
         return value[0].upper()[0]
 
@@ -44,16 +44,16 @@ def Birthplace(value):
     Formatting birthplace variable
     '''
     if pd.isna(value):
-        return np.nan
+        return pd.NA
     else:
-        return value.title() if isinstance(value,str) else np.nan
+        return value.title() if isinstance(value,str) else pd.NA
 
 def Relation(value):
     '''
     Formatting relationship variable
     '''
     if pd.isna(value):
-        return np.nan
+        return pd.NA
     else:
         return value.title()
 
@@ -154,9 +154,9 @@ def harmonized_food_labels(fn='../../_/food_items.org',key=list(Waves.keys()),va
                     if len(myfoods.difference(set(food_items[k].values)))==0: # my foods all in key
                         break
 
-        food_items = food_items[key + [value]].replace('---', np.nan).dropna(how = 'all')
+        food_items = food_items[key + [value]].replace('---', pd.NA).dropna(how = 'all')
     else:
-        food_items = food_items[[key] + [value]].replace('---', np.nan).dropna(how = 'all')
+        food_items = food_items[[key] + [value]].replace('---', pd.NA).dropna(how = 'all')
         
     food_items = food_items.set_index(key)
 
@@ -245,11 +245,11 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
     if fn is None:
         x = x.reset_index()
         if x['j'].dtype==float:
-            x['j'] = x['j'].astype(str).apply(lambda s: s.split('.')[0]).replace('nan',np.nan)
+            x['j'] = x['j'].astype(str).apply(lambda s: s.split('.')[0]).replace('nan',pd.NA)
         elif x['j'].dtype==int:
             x['j'] = x['j'].astype(str)
         elif x['j'].dtype==str:
-            x['j'] = x['j'].replace('',np.nan)
+            x['j'] = x['j'].replace('',pd.NA)
 
         x = x.set_index(idx)
 
@@ -270,16 +270,16 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
         id1 = 'id1'
 
     id = id[[id0,id1]]
-    id[id1] = id[id1].replace('', np.nan).fillna(id[id0])
+    id[id1] = id[id1].replace('', pd.NA).fillna(id[id0])
 
     for column in id:
         if id[column].dtype==float:
-            id[column] = id[column].astype(str).apply(lambda s: s.split('.')[0]).replace('nan',np.nan)
+            id[column] = id[column].astype(str).apply(lambda s: s.split('.')[0]).replace('nan',pd.NA)
         elif id[column].dtype==int:
-            id[column] = id[column].astype(str).replace('nan',np.nan)
+            id[column] = id[column].astype(str).replace('nan',pd.NA)
         elif id[column].dtype==object:
-            id[column] = id[column].replace('nan',np.nan)
-            id[column] = id[column].replace('',np.nan)
+            id[column] = id[column].replace('nan',pd.NA)
+            id[column] = id[column].replace('',pd.NA)
 
     ids = dict(id[[id0,id1]].values.tolist())
 
@@ -292,7 +292,7 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
         d[v] += [k]
 
     try:
-        d.pop(np.nan)  # Get rid of nan key, if any
+        d.pop(pd.NA)  # Get rid of nan key, if any
     except KeyError: pass
 
     updated_id = {}
@@ -311,12 +311,13 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
     return x
 
 def concate_id(df, parta, partb, leading_zero = False, digit = None):
-    df = df.replace('', np.nan)
-    df.loc[df[parta].isna(), partb] = np.nan
-    df.loc[df[partb].isna(), parta] = np.nan
+    df = df.replace('', pd.NA)
+    df.loc[df[parta].isna(), partb] = pd.NA
+    df.loc[df[partb].isna(), parta] = pd.NA
     if leading_zero and digit != None:
         df['newid'] = df[parta].astype('Int64').astype(str) + df[partb].astype('Int64').astype(str).str.zfill(digit)
     else:
         df['newid'] = df[parta].astype('Int64').astype(str) + df[partb].astype('Int64').astype(str)
-    df['newid'] = df['newid'].replace(df[df[parta].isna()]['newid'][0], np.nan)
+    na_id = df.loc[df[parta].isna(), 'newid'].iloc[0]
+    df['newid'] = df['newid'].replace(na_id, pd.NA)
     return df['newid']

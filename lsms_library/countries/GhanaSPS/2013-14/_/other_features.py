@@ -19,9 +19,9 @@ of = of.rename(columns = {'FPrimary': 'j',
                           })
 
 of['t'] = '2013-14'
-of['m'] = of['m'].replace('', np.nan)
+of['m'] = of['m'].replace('', pd.NA)
 of = of.dropna(how = 'any')
-of['Rural'] = np.nan 
+of['Rural'] = pd.NA
 of = of.drop_duplicates()
 
 of = of.set_index(['j','t','m'])

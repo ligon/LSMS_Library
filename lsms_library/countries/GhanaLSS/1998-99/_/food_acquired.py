@@ -34,7 +34,7 @@ df['hhid'] = df.apply(lambda x:f"{int(x['clust']):d}/{int(x['nh']):02d}",axis=1)
 selector_pur.update({f's9bq{i}':f'purchased_value_v{i}' for i in range(1,7)})
 
 x = df.rename(columns=selector_pur)[[*selector_pur.values()]]
-x = x.replace({r'':np.nan, 0 : np.nan})
+x = x.replace({r'':pd.NA, 0 : np.nan})
 x = x.groupby(['j','i']).sum() # Deal with some cases with multiple records for purchases
 x = pd.wide_to_long(x.reset_index(),['purchased_value'],['j','i'],'visit',sep='_v')
 x = x.replace(0,np.nan).dropna()
@@ -73,7 +73,7 @@ y = prod.rename(columns=selector_pro)[[*selector_pro.values()]]
 y.index = y.index.map(str)
 
 #unstack by visits
-y = y.replace({r'':np.nan, 0 : np.nan})
+y = y.replace({r'':pd.NA, 0 : np.nan})
 y = y.groupby(['j','i','u']).sum() # Deal with some cases with multiple records for purchases
 y = pd.wide_to_long(y.reset_index(),['produced_quantity'],['j','i','u'],'visit',sep='_v')
 

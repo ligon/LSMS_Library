@@ -47,7 +47,7 @@ z = z.stack().unstack('m')
 
 z = z.stack().unstack('k')
 
-z['Rural']= z['Rural'].replace('nan', np.nan)
+z['Rural']= z['Rural'].replace('nan', pd.NA)
 z = z.reset_index().set_index(['j','t','m'])
 
 if __name__=='__main__':

@@ -36,7 +36,7 @@ x['price'] = x['purchased_value']/x['purchased_quantity']
 x['t'] = t
 x['j'] = x['j'].astype(str)
 x = x.set_index(['j','t','i'])
-x['unit'] = x['unit'].replace('', np.nan)
+x['unit'] = x['unit'].replace('', pd.NA)
 x = x.dropna(how='all')
 
 to_parquet(x, 'food_acquired.parquet')

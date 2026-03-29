@@ -22,7 +22,7 @@ columns_dict = {'case_id': 'j', 'i0a' : 'i', 'i03a': 'quantity_consumed', 'i03b'
                 }
 regions = get_dataframe('other_features.parquet').reset_index().set_index(['j'])['m']
 
-df = df.astype(str).replace('nan', np.nan)
+df = df.astype(str).replace('nan', pd.NA)
 df = df.rename(columns_dict, axis=1)
 df = df.loc[:, list(columns_dict.values())]
 
@@ -31,9 +31,9 @@ cols = df.loc[:, ['quantity_consumed', 'expenditure', 'quantity_bought',
 df[cols] = df[cols].apply(pd.to_numeric, errors='coerce')
 
 df = df.set_index(['j', 'i'])
-df = df.join(regions).set_index('m', append=True).replace(r'^\s*$', np.nan, regex=True)
+df = df.join(regions).set_index('m', append=True).replace(r'^\s*$', pd.NA, regex=True)
 
-df = df.reset_index().set_index(['j', 'm', 'i']).replace(r'^\s*$', np.nan, regex=True)
+df = df.reset_index().set_index(['j', 'm', 'i']).replace(r'^\s*$', pd.NA, regex=True)
 
 #custom convert some units in formats such as "300 grams" into kg, typically handled by handling_unusual_units in malawi.py for data with conversion tables
 grams = r'(\d+)\s*g(?:\s+|r)'

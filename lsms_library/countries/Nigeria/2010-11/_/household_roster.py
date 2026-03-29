@@ -11,7 +11,7 @@ def extract_number(x):
     try:
         return float(x.split('. ')[-1])
     except AttributeError:
-        return np.nan
+        return pd.NA
 
 def extract_string(x):
     try:
@@ -52,6 +52,6 @@ df = pd.concat([pp,ph])
 
 # Drop rows for individuals who are not in household any longer
 # (e.g., who were in hh at planting, but left or died before harvest)
-df = df.replace('',np.nan).sort_index().dropna(how='all')
+df = df.replace('',pd.NA).sort_index().dropna(how='all')
 
 to_parquet(df,'household_roster.parquet')
