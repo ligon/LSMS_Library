@@ -312,11 +312,12 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
 
 def concate_id(df, parta, partb, leading_zero = False, digit = None):
     df = df.replace('', pd.NA)
-    df.loc[df[parta].isna(), partb] = np.nan
-    df.loc[df[partb].isna(), parta] = np.nan
+    df.loc[df[parta].isna(), partb] = pd.NA
+    df.loc[df[partb].isna(), parta] = pd.NA
     if leading_zero and digit != None:
         df['newid'] = df[parta].astype('Int64').astype(str) + df[partb].astype('Int64').astype(str).str.zfill(digit)
     else:
         df['newid'] = df[parta].astype('Int64').astype(str) + df[partb].astype('Int64').astype(str)
-    df['newid'] = df['newid'].replace(df[df[parta].isna()]['newid'][0], pd.NA)
+    na_id = df.loc[df[parta].isna(), 'newid'].iloc[0]
+    df['newid'] = df['newid'].replace(na_id, pd.NA)
     return df['newid']

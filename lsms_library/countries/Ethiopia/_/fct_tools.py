@@ -14,7 +14,7 @@ def nutrient_df(df, apikey):
     count = 0
     for food in df["Preferred Label"].tolist():
         try:
-            FDC = df.loc[df["Preferred Label"] ==food,:]["FDC ID"][count]
+            FDC = df.loc[df["Preferred Label"] == food, "FDC ID"].iloc[0]
             count+=1
             D[food] = fdc.nutrients(apikey,FDC).Quantity
         except AttributeError:
@@ -23,14 +23,14 @@ def nutrient_df(df, apikey):
     D = pd.DataFrame(D,dtype=float)
 
     return D
-    
+
 #create a DataFrame of units of nutrients of food items
 def unit_df(df, apikey):
     D = {}
     count = 0
     for food in df["Preferred Label"].tolist():
         try:
-            FDC = df.loc[df["Preferred Label"] ==food,:]["FDC ID"][count]
+            FDC = df.loc[df["Preferred Label"] == food, "FDC ID"].iloc[0]
             count+=1
             D[food] = fdc.nutrients(apikey,FDC).Units
         except AttributeError:
