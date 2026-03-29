@@ -28,7 +28,7 @@ help:
 	echo "or"
 	echo "	make build country=Malawi"
 	echo "or"
-	echo "	make demands country=Malawi"
+	echo "	make demands country=Malawi market=Region"
 	echo "or"
 	echo "	make materialize country=Malawi wave=2019-20 table=household_roster"
 	echo "or"
@@ -65,8 +65,8 @@ register:
 persist:
 	cd countries && $(DVC) repro materialize@$(stage_name)
 
-demands: build test
-	./demands.py $(country)
+demands:
+	$(PYTHON) -m lsms_library.demands $(country) $(if $(market),--market $(market),)
 
 clean:
 	+make -C ../$(country)/_ clean
