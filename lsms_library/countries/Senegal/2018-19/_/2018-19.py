@@ -41,8 +41,8 @@ def Birthplace(value):
     '''
     Formatting birthplace variable
     '''
-    if isinstance(value, float) and np.isnan(value):
-        return np.nan
+    if pd.isna(value):
+        return value
     else:
         return value.title()
     
