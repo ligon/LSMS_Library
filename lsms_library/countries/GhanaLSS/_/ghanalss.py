@@ -135,7 +135,7 @@ def harmonized_food_labels2(fn='../../_/food_items.org'):
     food_items = pd.read_csv(fn,delimiter='|',skipinitialspace=True,converters={1:int,2:lambda s: s.strip()})
     food_items.columns = [s.strip() for s in food_items.columns]
     food_items = food_items[['Code','Preferred Label']].dropna()
-    food_items.set_index('Code',inplace=True)    
+    food_items = food_items.set_index('Code')
 
     return food_items.to_dict()['Preferred Label']
 
@@ -158,7 +158,7 @@ def harmonized_food_labels(fn='../../_/food_items.org',key=list(Waves.keys()),va
     else:
         food_items = food_items[[key] + [value]].replace('---', np.nan).dropna(how = 'all')
         
-    food_items.set_index(key,inplace=True)
+    food_items = food_items.set_index(key)
 
     return food_items.squeeze().str.strip().to_dict()
 

@@ -22,7 +22,7 @@ with dvc.api.open('../Data/s01_me_ner2018.dta', mode='rb') as dta:
 df['j'] = (df['grappe'].astype(str) + df['menage'].astype(str)).astype(str)
 joined = pd.merge(df, df_general, how = 'left', on ='j')
 
-joined.replace(9999, np.nan, inplace=True)
+joined = joined.replace(9999, np.nan)
 
 joined = age_handler(joined, interview_date = 's00q23a', age = 's01q04a',  m = 's01q03b', d= 's01q03a', y= 's01q03c', interview_year= '2018')
 

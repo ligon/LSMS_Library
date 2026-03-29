@@ -9,7 +9,7 @@ def harmonized_food_labels(fn='../../_/food_items.org'):
     food_items = pd.read_csv(fn,delimiter='|',skipinitialspace=True,converters={1:int,2:lambda s: s.strip()})
     food_items.columns = [s.strip() for s in food_items.columns]
     food_items = food_items[['Code','Preferred Label']].dropna()
-    food_items.set_index('Code',inplace=True)    
+    food_items = food_items.set_index('Code')
 
     return food_items.to_dict()['Preferred Label']
     
@@ -50,8 +50,8 @@ def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,it
 
     expenditures.columns.name = 'i'
     expenditures.index.name = 'j'
-    expenditures.replace(0, np.nan, inplace=True)
-    
+    expenditures = expenditures.replace(0, np.nan)
+
     return expenditures
 
 def food_quantities(fn='',item='item',HHID='HHID',
@@ -64,7 +64,7 @@ def food_quantities(fn='',item='item',HHID='HHID',
                                                     itmcd=item,HHID=HHID,units=units,itemlabels=food_items,fn_type='csv')
     quantities.columns.name = 'i'
     quantities.index.name = 'j'
-    quantities.replace(0, np.nan, inplace=True)
+    quantities = quantities.replace(0, np.nan)
 
     return quantities
 

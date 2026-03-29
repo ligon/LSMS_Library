@@ -24,7 +24,7 @@ df = df.rename({'hogar': 'j', 'producto':'i', 's11a6a':'quantity bought', 's11a6
 
 cat_columns = df.iloc[:, 2:].select_dtypes(['category']).columns
 df[cat_columns] = df[cat_columns].apply(lambda x: x.cat.codes)
-df.replace({-1: np.nan}, inplace=True)
+df = df.replace({-1: np.nan})
 val = df._get_numeric_data()
 val[val >= 99999] = np.nan
 val[val == 0] = np.nan

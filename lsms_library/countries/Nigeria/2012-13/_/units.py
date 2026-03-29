@@ -41,13 +41,13 @@ with dvc.api.open('../Data/food_conv_w2pp.csv') as csv:
 conv_pp = conv_pp.replace({'s7bq2b':unitcodes,
                      'item_cd':{int(k):v for k,v in foodlabels['2013Q1'].items()}})
 
-conv_ph.rename(columns={'item_cd':'i',
+conv_ph = conv_ph.rename(columns={'item_cd':'i',
                         'nsu_cd':'u',
-                        'conv':'Mapping'},inplace=True)
+                        'conv':'Mapping'})
 
-conv_pp.rename(columns={'item_cd':'i',
+conv_pp = conv_pp.rename(columns={'item_cd':'i',
                         's7bq2b':'u',
-                        'conv':'Mapping'},inplace=True)
+                        'conv':'Mapping'})
 
 conv_ph = conv_ph.set_index(['i','u'])
 conv_pp = conv_pp.set_index(['i','u'])

@@ -40,6 +40,6 @@ shocks = shocks.astype({'Shock': 'category',
                         }) 
 
 shocks.insert(1, 't', '2015-16')
-shocks.set_index(['j','t','Shock'], inplace = True)
+shocks = shocks.set_index(['j','t','Shock'])
 
 to_parquet(shocks,'shocks.parquet')

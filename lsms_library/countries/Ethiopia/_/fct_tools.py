@@ -45,7 +45,7 @@ def harmonize_nutrient(df, nutrient_labels_df):
     #fill NaNs in the "Energy" row with values in "Energy (Atwater General Factors)"
     e1 = "Energy"
     e2 = "Energy (Atwater General Factors)"
-    df.loc[[e1, e2]] = df.loc[[e1, e2]].fillna(method="bfill")
+    df.loc[[e1, e2]] = df.loc[[e1, e2]].bfill()
     
     #rename
     n_labels_fct = dict(zip(nutrient_labels_df['FDC Label'], nutrient_labels_df['Preferred Label'], ))

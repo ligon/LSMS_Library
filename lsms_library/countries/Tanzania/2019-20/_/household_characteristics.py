@@ -25,7 +25,7 @@ df = df.loc[np.isfinite(df.min(axis=1)),:]
 #reformat
 df = df.reset_index()
 df.insert(1, 't', '2019-20')
-df.set_index(['j','t'], inplace = True)
+df = df.set_index(['j','t'])
 
 assert df.index.is_unique, "Non-unique index!  Fix me!"
 

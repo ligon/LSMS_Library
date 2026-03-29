@@ -29,7 +29,7 @@ def rectify(food,units=unitcodes,conv=conv):
     food['gift unit'] = food['gift unit'].replace(units)
     food['gift unit'] = food['gift unit'].fillna('None')
 
-    food.set_index(['j','t','m','i','u'],inplace=True)
+    food = food.set_index(['j','t','m','i','u'])
 
     # Get prices implied by purchases
 
@@ -38,7 +38,7 @@ def rectify(food,units=unitcodes,conv=conv):
     purchases['unit value'] = purchases['purchased value']/purchases['purchased quantity']
 
     unit_values = purchases[['purchased unit','unit value']].dropna()
-    unit_values.rename(columns={'purchased unit':'u'},inplace=True)
+    unit_values = unit_values.rename(columns={'purchased unit':'u'})
     unit_values = unit_values.reset_index().set_index(['j','t','m','i','u']).squeeze()
 
 
