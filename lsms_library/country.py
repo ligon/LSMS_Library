@@ -1741,6 +1741,9 @@ _SCHEME_DTYPE_MAP = {
     'float': pd.Float64Dtype(),
     'str': pd.StringDtype(),
     'string': pd.StringDtype(),
+    'datetime': 'to_datetime',
+    'date': 'to_datetime',
+    'timestamp': 'to_datetime',
 }
 
 _SCHEME_SKIP_KEYS = frozenset({'index', 'materialize', 'backend'})
@@ -1760,7 +1763,11 @@ def _enforce_declared_dtypes(df: pd.DataFrame, scheme_entry: dict[str, Any]) -> 
             if isinstance(declared_type, list):
                 df[col] = df[col].astype(pd.StringDtype())
             elif isinstance(declared_type, str) and declared_type in _SCHEME_DTYPE_MAP:
-                df[col] = df[col].astype(_SCHEME_DTYPE_MAP[declared_type])
+                target = _SCHEME_DTYPE_MAP[declared_type]
+                if target == 'to_datetime':
+                    df[col] = pd.to_datetime(df[col], errors='coerce')
+                else:
+                    df[col] = df[col].astype(target)
         except (ValueError, TypeError):
             pass  # best-effort; don't break loading
 

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from lsms.tools import get_food_prices, get_food_expenditures, get_household_roster, get_household_identification_particulars
 from ligonlibrary.dataframes import from_dta
+import pyreadstat
+import struct
 import numpy as np
 import pandas as pd
 import dvc.api
@@ -136,7 +138,15 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         try:
             f.seek(0)
             return from_dta(f,convert_categoricals=convert_categoricals,encoding=encoding,categories_only=categories_only)
-        except ValueError:
+        except (ValueError, struct.error):
+            pass
+
+        try:
+            # pyreadstat handles older Stata formats that pandas StataReader cannot.
+            # pyreadstat requires a file path string, not a file handle.
+            df_pr, meta = pyreadstat.read_dta(fn, apply_value_formats=convert_categoricals, encoding=encoding)
+            return df_pr
+        except Exception:
             pass
 
         try:

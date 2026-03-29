@@ -46,26 +46,52 @@ def get_other_features(df, year, reside):
     df.columns.name = 'k'
     return df
 
-#food_acquired code; not comprehensive of all the units, but can handle some [insert number] kilograms and grams formatting
-def handling_unusual_units(df):
+def _extract_kg_conversion(series):
+    """Extract kilogram conversion factors from a unit-detail string series.
+
+    Parses patterns like '300 grams', '1kg', '2 kilo' and returns
+    a Series of conversion factors in kilograms.
+    """
     grams = r'(\d+)\s*g(?:\s+|r)'
-    kgs =r'(\d+)\s*k(?:g|ilo)'
+    kgs = r'(\d+)\s*k(?:g|ilo)'
 
-    conv_kgrams_consumed = pd.concat([df['unitsdetail_consumed'].str.lower().str.extract(grams).astype(float)*0.01,
-                                  df['unitsdetail_consumed'].str.lower().str.extract(kgs).astype(float)], axis= 0).dropna()
-    conv_kgrams_bought = pd.concat([df['unitsdetail_bought'].str.lower().str.extract(grams).astype(float)*0.01,
-                                df['unitsdetail_bought'].str.lower().str.extract(kgs).astype(float)], axis=0).dropna()
+    lower = series.str.lower()
+    conv = pd.concat([lower.str.extract(grams).astype(float) * 0.01,
+                      lower.str.extract(kgs).astype(float)], axis=0).dropna()
+    return conv
 
-    df['cfactor_consumed'] = df.apply(lambda x: x['cfactor_consumed'] or conv_kgrams_consumed, axis = 1)
-    df['cfactor_bought'] = df.apply(lambda x: x['cfactor_bought'] or conv_kgrams_bought, axis = 1)
 
-    df["quantity_consumed"] = df['quantity_consumed'].mul(df['cfactor_consumed'].fillna(1))
-    df["quantity_bought"] = df['quantity_bought'].mul(df['cfactor_bought'].fillna(1))
+def handling_unusual_units(df, suffixes=None):
+    """Convert unusual unit descriptions to kg-based quantities.
 
-    df['u_consumed'] = np.where(~df['cfactor_consumed'].isna(), 'kg', df['unitsdetail_consumed'])
-    df['u_consumed'] = df['u_consumed'].replace('nan', pd.NA).fillna(df['units_consumed'])
-    df['u_bought'] = np.where(~df['cfactor_bought'].isna(), 'kg', df['unitsdetail_bought'])
-    df['u_bought'] = df['u_bought'].replace('nan', pd.NA).fillna(df['units_bought'])
+    Parameters
+    ----------
+    df : DataFrame
+    suffixes : list[str], optional
+        Column suffixes to process (e.g. ``['consumed', 'bought']``).
+        For each suffix, expects columns ``unitsdetail_{suffix}``,
+        ``cfactor_{suffix}``, ``quantity_{suffix}``, and ``units_{suffix}``.
+        Defaults to ``['consumed', 'bought']`` for backward compatibility.
+    """
+    if suffixes is None:
+        suffixes = ['consumed', 'bought']
+
+    for suffix in suffixes:
+        detail_col = f'unitsdetail_{suffix}'
+        cfactor_col = f'cfactor_{suffix}'
+        quantity_col = f'quantity_{suffix}'
+        units_col = f'units_{suffix}'
+        u_col = f'u_{suffix}'
+
+        if detail_col not in df.columns:
+            continue
+
+        conv_kg = _extract_kg_conversion(df[detail_col])
+
+        df[cfactor_col] = df.apply(lambda x, c=cfactor_col: x[c] or conv_kg, axis=1)
+        df[quantity_col] = df[quantity_col].mul(df[cfactor_col].fillna(1))
+        df[u_col] = np.where(~df[cfactor_col].isna(), 'kg', df[detail_col])
+        df[u_col] = df[u_col].replace('nan', pd.NA).fillna(df[units_col])
 
     return df
 
