@@ -33,6 +33,35 @@ New surveys are added via YAML config files under `lsms_library/countries/`, not
 ## Data Access
 Underlying microdata must be obtained from the [World Bank Microdata Library](https://microdata.worldbank.org/) under their terms of use. Contributors need GPG/PGP keys for repository write access.
 
+## Canonical Schema (`data_info.yml`)
+`lsms_library/data_info.yml` is the single source of truth for cross-country conventions:
+- **Required columns** per table (e.g., `household_roster` requires `Sex`, `Age`, `Generation`, `Distance`, `Affinity`)
+- **Accepted values** (e.g., `Sex: [M, F]`, `Affinity: [consanguineal, affinal, step, foster, unrelated, guest, servant]`)
+- **Rejected spellings** (e.g., `Relation` → use `Generation, Distance, Affinity`; `Effected` → `Affected`)
+
+Tests in `test_schema_consistency.py` read from this file — never hardcode schema rules in tests.
+
+## Kinship Decomposition
+`household_roster` uses a decomposed representation of kinship (Kroeber 1909) instead of a single `Relationship` string. Four columns replace one:
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `Sex` | str | `M` or `F` |
+| `Generation` | int | Vertical distance from head (0=same, +1=parent, -1=child) |
+| `Distance` | int | Collateral distance (0=lineal, 1=sibling line, 2=cousin) |
+| `Affinity` | str | `consanguineal`, `affinal`, `step`, `foster`, `unrelated`, `guest`, `servant` |
+
+The runtime automatically expands any `Relationship` column into these three via `_expand_kinship()` in `_finalize_result()`, using the dictionary in `lsms_library/categorical_mapping/spelling.yml`. Per-wave `data_info.yml` files continue to produce a `Relationship` string from raw data — the decomposition happens transparently.
+
+**Adding new labels:** If a survey has an unrecognized relationship string, a warning is emitted. Add the label to `spelling.yml` under `Kinship:` with its `[Generation, Distance, Affinity]` tuple.
+
+## Spelling Enforcement (`spelling.yml`)
+`lsms_library/categorical_mapping/spelling.yml` handles two things:
+1. **Spelling corrections** — canonical spelling with variant list (e.g., `Roasted: [Rosted]`)
+2. **Kinship dictionary** — relationship labels → `[Generation, Distance, Affinity]` tuples
+
+When adding new relationship labels encountered in survey data, add them here — not in per-country code.
+
 ## Pandas Conventions (>=3.0)
 This codebase targets pandas 3.0+. Follow these rules in all new and modified code:
 
