@@ -17,15 +17,33 @@ def map_08_15(df, col):
     """Build panel linkage for the 2008-15 multi-round file.
 
     Uses UPHI (Universal Panel Household Identifier) to link households
-    across the 4 rounds.  Within the UPD data there are no household
-    splits, so UPHI maps 1:1 to r_hhid per round.
+    across the 4 rounds.  Multiple UPHIs can share the same r_hhid in
+    early rounds and diverge later (household splits).  Only primary
+    households (suffix '01' in round 2, '001' in rounds 3-4) are
+    linked backward; split-offs start as new households from their
+    first appearance.
     """
-    hhid = df[col]
+    hhid = df[col].copy()
     hhid_sorted = hhid.sort_values(['UPHI', 'round'])
     hhid_sorted['previous_i'] = hhid_sorted.groupby('UPHI')['r_hhid'].shift(1)
     map_round = {1: '2008-09', 2: '2010-11', 3: '2012-13', 4: '2014-15'}
     hhid_sorted['round'] = hhid_sorted['round'].map(map_round)
     hhid_sorted = hhid_sorted.dropna(how='any')
+
+    # Identify split-off households by their r_hhid suffix.
+    # Round 2 (16-digit): suffix '01' is primary, others are split-offs.
+    # Rounds 3-4 (NNNN-NNN): suffix '001' is primary, others are split-offs.
+    def is_primary(row):
+        rid = str(row['r_hhid'])
+        if len(rid) == 16:           # round 2
+            return rid.endswith('01')
+        elif '-' in rid:             # rounds 3-4
+            return rid.split('-')[1] == '001'
+        return True                  # round 1 (all primary)
+
+    mask = hhid_sorted.apply(is_primary, axis=1)
+    hhid_sorted = hhid_sorted[mask]
+
     hhid_sorted.rename(columns={'r_hhid': 'i', 'round': 't'}, inplace=True)
     hhid_sorted = hhid_sorted.set_index(['t', 'i'])[['previous_i']]
     hhid_sorted = hhid_sorted.loc[~hhid_sorted.index.duplicated(keep='first')]
