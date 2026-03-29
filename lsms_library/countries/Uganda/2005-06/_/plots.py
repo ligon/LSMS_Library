@@ -5,7 +5,7 @@ sys.path.append('../../../_/')
 from lsms_library.local_tools import df_data_grabber, to_parquet
     
 def intercrop_area(row):
-    if not np.isnan(row['area_percentage']):
+    if pd.notna(row['area_percentage']):
         return row['acres'] * row['area_percentage']/100
     else:
         return row['acres']
