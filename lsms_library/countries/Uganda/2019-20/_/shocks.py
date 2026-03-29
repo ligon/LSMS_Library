@@ -57,7 +57,7 @@ shocks = shocks.astype({'Shock': 'category',
 
 shocks.insert(1, 't', '2019-20')
 
-shocks.set_index(['i','t','Shock'], inplace = True)
+shocks = shocks.set_index(['i','t','Shock'])
 
 
 

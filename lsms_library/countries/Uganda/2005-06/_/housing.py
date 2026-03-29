@@ -23,7 +23,7 @@ for k,v in d.items():
         housing[k] = housing[k].apply(v[1])
     except IndexError:
         pass
-housing.set_index('hhid', inplace=True)
+housing = housing.set_index('hhid')
 housing.index.name = 'j'
 
 to_parquet(housing, 'housing.parquet')

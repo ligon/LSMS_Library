@@ -32,6 +32,6 @@ def harmonized_food_labels(fn='../../_/food_items.csv',key='Code',value='Preferr
                 break
 
     food_items = food_items[[key,value]].dropna()
-    food_items.set_index(key,inplace=True)
+    food_items = food_items.set_index(key)
 
     return food_items.squeeze().str.strip().to_dict()

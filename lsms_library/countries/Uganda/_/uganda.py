@@ -30,7 +30,7 @@ def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Code',value='Preferr
     unitlabels = pd.read_csv(fn)
     unitlabels.columns = [s.strip() for s in unitlabels.columns]
     unitlabels = unitlabels[[key,value]].dropna()
-    unitlabels.set_index(key,inplace=True)
+    unitlabels = unitlabels.set_index(key)
 
     unitlabels = unitlabels.squeeze().str.strip().to_dict()
 
@@ -41,7 +41,7 @@ def harmonized_food_labels(fn='../../_/food_items.org',key='Code',value='Preferr
     food_items = pd.read_csv(fn,delimiter='|',skipinitialspace=True,converters={1:int,2:lambda s: s.strip()})
     food_items.columns = [s.strip() for s in food_items.columns]
     food_items = food_items[[key,value]].dropna()
-    food_items.set_index(key,inplace=True)
+    food_items = food_items.set_index(key)
 
     return food_items.squeeze().str.strip().to_dict()
 
