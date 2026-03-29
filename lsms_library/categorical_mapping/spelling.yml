@@ -1,6 +1,0 @@
-# Global cross-country spelling corrections.
-# Each key is the canonical spelling; values are accepted variants
-# that should be mapped to the canonical form.
-
-Roasted:
-  - Rosted
