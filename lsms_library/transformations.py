@@ -88,12 +88,12 @@ def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=
         'gramm': 1 / 1000
     }
     #convert the value type in index level 'u' to be string
-    v.reset_index(unit_col, inplace=True)
+    v = v.reset_index(unit_col)
     if unit_col != 'u':
-        v.rename(columns={unit_col: 'u'}, inplace=True)
+        v = v.rename(columns={unit_col: 'u'})
     v['u'] = v['u'].astype(str)
     v['Kgs'] = v.apply(lambda row: row[quantity] * unit_conversion.get(row['u'].lower(), np.nan), axis=1)
-    v.set_index('u', append=True, inplace=True)
+    v = v.set_index('u', append=True)
     pkg = v[price].divide(v['Kgs'], axis=0)
     pkg = pkg.groupby(index).median().median(axis=1)
     po = v[price].groupby(index + ['u']).median().median(axis=1)

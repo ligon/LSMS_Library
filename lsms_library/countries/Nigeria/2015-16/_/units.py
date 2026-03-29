@@ -68,15 +68,14 @@ conv = conv0.replace({'unit_cd':unitcodes,
 conv = conv.drop(['item_name','unit_name','conv_national','note','unit_other'],axis=1)
 
 
-conv.rename(columns={'item_cd':'i',
+conv = conv.rename(columns={'item_cd':'i',
                      'unit_cd':'u',
                      'conv_NC_1':'North central',
                      'conv_NE_2':'North east',
                      'conv_NW_3':'North west',
                      'conv_SE_4':'South east',
                      'conv_SS_5':'South south',
-                     'conv_SW_6':'South west'},
-            inplace=True)
+                     'conv_SW_6':'South west'})
 
 conv = conv.set_index(['i','u'])
 conv.columns.name = 'm'

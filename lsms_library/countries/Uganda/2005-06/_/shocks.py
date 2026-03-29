@@ -81,6 +81,6 @@ shocks = pd.DataFrame({"i": df.HHID.values.tolist(),
                     "HowCoped1":df.h16q7b.values.tolist(),
                     "HowCoped2":df.h16q7c.values.tolist()})
 shocks.insert(1, 't', '2005-06')
-shocks.set_index(['i','t','Shock'], inplace = True)
+shocks = shocks.set_index(['i','t','Shock'])
 
 to_parquet(shocks, 'shocks.parquet')

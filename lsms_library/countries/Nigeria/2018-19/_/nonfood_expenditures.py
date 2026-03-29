@@ -67,7 +67,7 @@ x = x.drop_duplicates()
 
 x['j'] = x['j'].astype(int).astype(str)
 
-x.set_index(['j','t','m','i'],inplace=True)
+x = x.set_index(['j','t','m','i'])
 
 x = x['value'].unstack('i')
 

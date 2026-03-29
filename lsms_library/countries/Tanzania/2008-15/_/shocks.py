@@ -59,7 +59,7 @@ shocks = pd.DataFrame({
     'HowCoped2': df.hr_06_3.values.tolist(),
 })
 
-shocks.replace({'t': round_match}, inplace=True)
+shocks = shocks.replace({'t': round_match})
 
 # Convert household ID to string
 shocks['i'] = shocks['i'].astype(int).astype(str)

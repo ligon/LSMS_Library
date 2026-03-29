@@ -44,7 +44,7 @@ def map_08_15(df, col):
     mask = hhid_sorted.apply(is_primary, axis=1)
     hhid_sorted = hhid_sorted[mask]
 
-    hhid_sorted.rename(columns={'r_hhid': 'i', 'round': 't'}, inplace=True)
+    hhid_sorted = hhid_sorted.rename(columns={'r_hhid': 'i', 'round': 't'})
     hhid_sorted = hhid_sorted.set_index(['t', 'i'])[['previous_i']]
     hhid_sorted = hhid_sorted.loc[~hhid_sorted.index.duplicated(keep='first')]
     return hhid_sorted
@@ -115,7 +115,7 @@ def harmonized_food_labels(fn='../../_/food_items.org'):
     food_items = pd.read_csv(fn,delimiter='|',skipinitialspace=True,converters={1:int,2:lambda s: s.strip()})
     food_items.columns = [s.strip() for s in food_items.columns]
     food_items = food_items[['Code','Preferred Label']].dropna()
-    food_items.set_index('Code',inplace=True)    
+    food_items = food_items.set_index('Code')
 
     return food_items.to_dict()['Preferred Label']
     
@@ -193,7 +193,7 @@ def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Label',value='Prefer
     unitlabels = pd.read_csv(fn)
     unitlabels.columns = [s.strip() for s in unitlabels.columns]
     unitlabels = unitlabels[[key,value]].dropna()
-    unitlabels.set_index(key,inplace=True)
+    unitlabels = unitlabels.set_index(key)
     return unitlabels.squeeze().str.strip().to_dict()
 
     
@@ -205,7 +205,7 @@ def food_acquired(fn,myvars):
     if 'year' in myvars:
         #map round code to actual years
         dict = {1:'2008-09', 2:'2010-11', 3:'2012-13', 4:'2014-15'}
-        df.replace({"year": dict},inplace=True)
+        df = df.replace({"year": dict})
         df = df.set_index(['HHID','item','year']).dropna(how='all')
         df.index.names = ['j','i','t']
         try:
@@ -234,10 +234,10 @@ def food_acquired(fn,myvars):
     #df = df.rename(index=harmonized_food_labels(),level='i')
     unitlabels = {0: float("nan"), 'KILOGRAMS':'Kg', 'GRAMS':'Gram', 'LITRE':'Litre', 'MILLILITRE':'Millilitre', 'PIECES':'Piece'}
     unitcolumn = {'unit_ttl_consume': unitlabels, 'unit_purchase': unitlabels, 'unit_own': unitlabels, 'unit_inkind': unitlabels}
-    df.replace(unitcolumn,inplace=True)
+    df = df.replace(unitcolumn)
 
     #fix quantities that are read as categorical vars
-    df.replace(['none', 'NONE', 'hakuna'], 0, inplace = True)
+    df = df.replace(['none', 'NONE', 'hakuna'], 0)
     df = df.astype({"quant_purchase": 'float64',
                     "quant_own" : 'float64',
                     "quant_inkind" : 'float64'})
@@ -294,7 +294,7 @@ def id_match(df, wave, waves_dict):
             uphi = uphi[['UPHI', 'y4_hhid']].dropna()
             m = m.merge(uphi, how= 'left', on = 'y4_hhid')
 
-            m['UPHI'].replace('', np.nan, inplace=True)
+            m['UPHI'] = m['UPHI'].replace('', np.nan)
             m['UPHI'] = m['UPHI'].fillna(m.pop(waves_dict[wave][2]))
             m.j = m.UPHI
             m = m.drop(columns=['UPHI', 'y4_hhid'])
@@ -310,7 +310,7 @@ def id_match(df, wave, waves_dict):
             h = h[[waves_dict[wave][1], waves_dict[wave][2], waves_dict[wave][3]]]
             h[waves_dict[wave][1]] = h[waves_dict[wave][1]].astype(int).astype(str)
             dict = {1:'2008-09', 2:'2010-11', 3:'2012-13', 4:'2014-15'}
-            h.replace({"round": dict},inplace=True)
+            h = h.replace({"round": dict})
             m = df.merge(h.drop_duplicates(), how = 'left', left_on =['j','t'], right_on =[waves_dict[wave][2], waves_dict[wave][3]])
             m['UPHI'] = m['UPHI'].fillna(m.pop('j'))
             m = m.rename(columns={'UPHI': 'j'})
@@ -328,7 +328,7 @@ def new_harmonize_units(df, unit_conversion):
     pattern = r"[p+]"
     for i in range(4):
         df[pair['quant'][i]] = df[pair['quant'][i]].astype(np.int64) * df[pair['unit'][i]]
-        df[pair['quant'][i]].replace('', 0, inplace=True)
+        df[pair['quant'][i]] = df[pair['quant'][i]].replace('', 0)
         if df[pair['quant'][i]].dtype != 'O':
             df[pair['unit'][i]] = 'kg'
         else: 
@@ -338,7 +338,7 @@ def new_harmonize_units(df, unit_conversion):
     df['agg_u'] = df[pair['unit']].apply(lambda x: max(x) if min(x) == max(x) else min(x) + '+' + max(x), axis = 1)
 
     df['unitvalue_purchase'] = df['value_purchase']/df['quant_purchase']
-    df.replace([np.inf, -np.inf, 0], np.nan, inplace=True)
+    df = df.replace([np.inf, -np.inf, 0], np.nan)
     return df
 
 

@@ -23,7 +23,7 @@ roster = pd.DataFrame({
     'Relationship': df.hb_05.values.tolist(),
 })
 
-roster.replace({'t': round_match}, inplace=True)
+roster = roster.replace({'t': round_match})
 
 # Convert household ID and pid to string
 roster['i'] = roster['i'].astype(str)

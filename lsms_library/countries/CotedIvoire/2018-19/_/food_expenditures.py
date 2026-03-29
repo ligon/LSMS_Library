@@ -29,7 +29,7 @@ def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,it
 
     expenditures.columns.name = 'i'
     expenditures.index.name = 'j'
-    expenditures.replace(0, np.nan, inplace=True)
+    expenditures = expenditures.replace(0, np.nan)
     
     return expenditures
 

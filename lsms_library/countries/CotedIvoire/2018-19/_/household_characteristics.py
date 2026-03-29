@@ -78,7 +78,7 @@ df['t'] = df['vague'].apply(lambda r: ['2018','2019'][r==2])
 df['m'] = "Cote d'Ivoire"
 
 df['Rural'] = df['s00q04'] - 1
-df.set_index(['j','t','m'],inplace=True)
+df = df.set_index(['j','t','m'])
 
 z = z.join(df['Rural'])
 
