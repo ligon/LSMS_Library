@@ -33,7 +33,7 @@ for i in range(1, 7):
     dfs[i] = x.loc[:,columns].copy()
     dfs[i].columns = ['Expenditure']
     dfs[i]['visit'] = i
-    dfs[i] = dfs[i].reset_index().replace({r'':np.nan, 0 : np.nan})
+    dfs[i] = dfs[i].reset_index().replace({r'':pd.NA, 0 : np.nan})
 
 fe = pd.concat(dfs.values(),ignore_index=True)
 fe = fe.loc[fe['j'].isin(labelsd['Code_9b'].values())]
@@ -69,7 +69,7 @@ y = prod.rename(columns=selector_pro)[[*selector_pro.values()]]
 y.index = y.index.map(str)
 
 #unstack by visits
-y = y.replace({r'':np.nan, 0 : np.nan})
+y = y.replace({r'':pd.NA, 0 : np.nan})
 y = y.loc[y['j'].isin(labelsd['Code_8h'].values())]
 y = y.groupby(['v', 'i','j','u']).sum() # Deal with some cases with multiple records for purchases
 y = pd.wide_to_long(y.reset_index(), stubnames=['Produced'], i=['v', 'i', 'j', 'u'], j='visit', sep='_', suffix='\\d+')

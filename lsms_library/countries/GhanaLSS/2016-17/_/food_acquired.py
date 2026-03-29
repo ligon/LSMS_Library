@@ -10,7 +10,7 @@ visits = range(1,7)
 
 # categorical mapping
 labelsd = get_categorical_mapping(tablename='harmonize_food',idxvars={'Code':('Code_9b',format_id)},**{'Label':'Preferred Label'})
-unitsd = defaultdict(lambda:np.nan,get_categorical_mapping(tablename='units'))
+unitsd = defaultdict(lambda:pd.NA,get_categorical_mapping(tablename='units'))
 
 # food expenditure
 idxvars = dict(i=(['clust','nh'],lambda x: format_id(x.clust)+'/'+format_id(x.nh,zeropadding=2)),
@@ -33,7 +33,7 @@ for i in visits:
     dfs[i] = x.loc[:,columns].copy()
     dfs[i].columns = ['Expenditure','Quantity','u']
     dfs[i]['visit'] = i
-    dfs[i] = dfs[i].reset_index().replace({r'':np.nan, 0 : np.nan})
+    dfs[i] = dfs[i].reset_index().replace({r'':pd.NA, 0 : np.nan})
 fe = pd.concat(dfs.values(),ignore_index=True)
 fe = fe[fe['j'] != '']
 fe= fe.groupby(['w', 'v', 'i', 'j', 'visit', 'u']).sum() # Deal with some cases with multiple records for purchases
@@ -67,7 +67,7 @@ for i in Visits:
     dfs[i] = y.loc[:,columns].copy()
     dfs[i].columns = ['Price','Produced','u']
     dfs[i]['visit'] = i
-    dfs[i] = dfs[i].reset_index().replace({r'':np.nan, 0 : np.nan})
+    dfs[i] = dfs[i].reset_index().replace({r'':pd.NA, 0 : np.nan})
 
 hp = pd.concat(dfs.values(),ignore_index=True)
 hp = hp[hp['j'] != '']

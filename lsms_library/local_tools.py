@@ -499,7 +499,7 @@ def change_id(x: pd.DataFrame, fn: str | None = None, id0: str | None = None, id
     if fn is None:
         x = x.reset_index()
         if x['j'].dtype==float:
-            x['j'].astype(str).apply(lambda s: s.split('.')[0]).replace('nan',np.nan)
+            x['j'].astype(str).apply(lambda s: s.split('.')[0]).replace('nan',pd.NA)
         elif x['j'].dtype==int:
             x['j'] = x['j'].astype(str)
 
@@ -518,11 +518,11 @@ def change_id(x: pd.DataFrame, fn: str | None = None, id0: str | None = None, id
 
     for column in id:
         if id[column].dtype==float:
-            id[column] = id[column].astype(str).apply(lambda s: s.split('.')[0]).replace('nan',np.nan)
+            id[column] = id[column].astype(str).apply(lambda s: s.split('.')[0]).replace('nan',pd.NA)
         elif id[column].dtype==int:
-            id[column] = id[column].astype(str).replace('nan',np.nan)
+            id[column] = id[column].astype(str).replace('nan',pd.NA)
         elif id[column].dtype==object:
-            id[column] = id[column].replace('nan',np.nan)
+            id[column] = id[column].replace('nan',pd.NA)
 
     ids = dict(id[[id0,id1]].values.tolist())
 
@@ -635,7 +635,7 @@ def df_from_orgfile(orgfn: str | Path, name: str | None = None, set_columns: boo
 
     df = pd.DataFrame(table,columns=columns)
 
-    df = df.replace({'---':np.nan})
+    df = df.replace({'---':pd.NA})
 
     if to_numeric:
         # Try to convert columns to numeric types, but fail gracefully
@@ -1007,7 +1007,7 @@ def map_index(df: pd.DataFrame) -> pd.DataFrame:
         mapping_rules['w'] = 't'
 
     if 'u' in df.index.names:
-        df = df.rename(index={k: 'unit' for k in ['<NA>', 'nan', np.nan]}, level='u')
+        df = df.rename(index={k: 'unit' for k in ['<NA>', 'nan', pd.NA]}, level='u')
 
     if mapping_rules:
         df = df.rename_axis(index=mapping_rules)

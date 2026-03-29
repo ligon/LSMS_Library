@@ -32,22 +32,22 @@ def Birthplace(value):
     Formatting birthplace variable
     '''
     if value > 1e99:
-        return np.nan
-    return region_dict.get(int(value), np.nan)
+        return pd.NA
+    return region_dict.get(int(value), pd.NA)
 
 def Relation(value):
     '''
     Formatting relationship variable
     '''
     relationship_dict = tools.get_categorical_mapping(tablename = 'relationship', dirs=[f'{path}/_', f'{path}/../_/', f'{path}/../../_/'])
-    return relationship_dict.get(value, np.nan)
+    return relationship_dict.get(value, pd.NA)
 
 def Region(value):
     '''
     Formatting region variable
     '''
 
-    return region_dict.get((int(value)), np.nan)
+    return region_dict.get((int(value)), pd.NA)
     
 
 def Rural(value):

@@ -57,7 +57,7 @@ def extract_food(fn, varmap, t, food_labels):
 
     # Drop rows with no data
     value_cols = [c for c in ['Quantity', 'Expenditure', 'Produced'] if c in df.columns]
-    df = df.replace('', np.nan)
+    df = df.replace('', pd.NA)
     df = df.dropna(subset=value_cols, how='all')
 
     return df

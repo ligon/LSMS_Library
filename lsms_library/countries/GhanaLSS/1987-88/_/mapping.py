@@ -31,7 +31,7 @@ def Birthplace(value):
     Formatting birthplace variable
     '''
     #needs mapping
-    return region_dict.get(str(value), np.nan)
+    return region_dict.get(str(value), pd.NA)
 
 def Relation(value):
     '''
@@ -40,14 +40,14 @@ def Relation(value):
     #needs mapping
     relationship_dict = tools.get_categorical_mapping(fn='categorical_mapping.org', tablename = 'relationship', dirs=[f'{path}/_/', f'{path}/../_', f'{path}/../../_'])
 
-    return relationship_dict.get(value, np.nan)
+    return relationship_dict.get(value, pd.NA)
 
 def Region(value):
     '''
     Formatting region variable
     '''
 
-    return region_dict.get(str(value), np.nan)
+    return region_dict.get(str(value), pd.NA)
 
 
 def cluster_features(df):
@@ -64,7 +64,7 @@ def cluster_features(df):
     foo = foo.sort_values(by = "Age", ascending=False).reset_index().drop_duplicates(subset=['t', 'v'], keep='first', inplace = False)
     foo = foo.sort_values(by = 'v')
     foo = foo.set_index(['t', 'v'])
-    foo['Rural'] = np.nan
+    foo['Rural'] = pd.NA
 
     return foo[['Region', 'Rural']]
 

@@ -21,7 +21,7 @@ def Sex(value):
     Formatting sex veriable
     '''
     if pd.isna(value) or value == 'Manquant':
-        return np.nan
+        return pd.NA
     else:
         return value[0].upper()[0]
 
@@ -30,7 +30,7 @@ def Age(value):
     Formatting age variable
     '''
     if pd.isna(value) or value == 'Manquant' or value == 'NSP':
-        return np.nan
+        return pd.NA
     elif value =='95 ans & plus':
         return 95
     else:
@@ -41,7 +41,7 @@ def Relation(value):
     Formatting relationship variable
     '''
     if pd.isna(value) or value == 'Manquant':
-        return np.nan
+        return pd.NA
     else:
         return value.title()
 
@@ -50,7 +50,7 @@ def Int_t(value):
     Formatting interview date
     '''   
     if pd.isna(value) or value == 'Manquant':
-        return np.nan
+        return pd.NA
     else:
         return pd.to_datetime(value, errors='coerce').date()
 def interview_date(df):

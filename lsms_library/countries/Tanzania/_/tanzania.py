@@ -276,7 +276,7 @@ def id_match(df, wave, waves_dict):
             uphi = uphi[['UPHI', 'y4_hhid']].dropna()
             m = m.merge(uphi, how= 'left', on = 'y4_hhid')
 
-            m['UPHI'] = m['UPHI'].replace('', np.nan)
+            m['UPHI'] = m['UPHI'].replace('', pd.NA)
             m['UPHI'] = m['UPHI'].fillna(m.pop(waves_dict[wave][2]))
             m.j = m.UPHI
             m = m.drop(columns=['UPHI', 'y4_hhid'])

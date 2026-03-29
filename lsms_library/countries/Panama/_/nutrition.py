@@ -30,7 +30,7 @@ fct = fct.rename(columns = {fct.columns[0]: 'FCT ID'})
 final_fct = food_items.merge(fct, on='FCT ID')
 final_fct = final_fct.drop(['Nutrient', 'FCT ID'], axis = 1).fillna(0).rename(columns={'Preferred Label': 'Food'})
 final_fct.columns = final_fct.columns.str.replace('\\n%*', '', regex=True)
-final_fct = final_fct.replace('', np.nan).drop_duplicates(subset='Food', keep='first').set_index('Food').sort_index()
+final_fct = final_fct.replace('', pd.NA).drop_duplicates(subset='Food', keep='first').set_index('Food').sort_index()
 
 for column in final_fct.columns:
     final_fct[column] = final_fct[column].astype(float)

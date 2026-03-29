@@ -32,7 +32,7 @@ val[val == 0] = np.nan
 food_items = df_from_orgfile('../../_/food_items.org')
 food_items = food_items.loc[:, ['Preferred Label', t]]
 food_items[t] = food_items[t].str.strip()
-food_items = food_items.replace(['','---'],np.nan).dropna()
+food_items = food_items.replace(['','---'],pd.NA).dropna()
 food_items = food_items.set_index(t).dropna()
 food_items = food_items.squeeze().str.strip().to_dict()
 

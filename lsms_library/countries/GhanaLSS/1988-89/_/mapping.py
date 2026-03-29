@@ -35,7 +35,7 @@ def Birthplace(value):
         value_key = int(value)
     except ValueError:
         value_key = None
-    return region_dict.get(value_key, np.nan)
+    return region_dict.get(value_key, pd.NA)
 
 def Relation(value):
     '''
@@ -43,7 +43,7 @@ def Relation(value):
     '''
     relationship_dict = tools.get_categorical_mapping(tablename = 'relationship', dirs=[f'{path}/_', f'{path}/../../_/', f'{path}/../_/'])
 
-    return relationship_dict.get(value, np.nan)
+    return relationship_dict.get(value, pd.NA)
 
 def Region(value):
     '''
@@ -54,6 +54,6 @@ def Region(value):
         value_key = int(value)
     except ValueError:
         value_key = None
-    return region_dict.get(value_key, np.nan)
+    return region_dict.get(value_key, pd.NA)
 
 Visits = range(1,7)
