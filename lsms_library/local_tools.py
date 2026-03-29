@@ -4,6 +4,7 @@ from lsms.tools import get_food_prices, get_food_expenditures, get_household_ros
 from ligonlibrary.dataframes import from_dta
 import pyreadstat
 import struct
+import tempfile
 import numpy as np
 import pandas as pd
 import dvc.api
@@ -123,11 +124,38 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         except FileNotFoundError:
             return False
 
+    def _pyreadstat_via_tempfile(reader, f, suffix, **kwargs):
+        """Call a pyreadstat reader on a stream by writing to a temp file."""
+        f.seek(0)
+        with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+            tmp.write(f.read())
+            tmp_path = tmp.name
+        try:
+            df_pr, meta = reader(tmp_path, **kwargs)
+            return df_pr
+        finally:
+            os.unlink(tmp_path)
+
     def read_file(f,convert_categoricals=convert_categoricals,encoding=encoding):
         if isinstance(f,str):
             try:
                 return pd.read_spss(f,convert_categoricals=convert_categoricals)
-            except (pd.errors.ParserError, UnicodeDecodeError):
+            except (pd.errors.ParserError, UnicodeDecodeError, TypeError):
+                pass
+
+            # pyreadstat fallback for SAV/SPSS files that pd.read_spss can't handle
+            try:
+                df_pr, meta = pyreadstat.read_sav(f, apply_value_formats=convert_categoricals, encoding=encoding)
+                return df_pr
+            except Exception:
+                pass
+        elif Path(fn).suffix.lower() == '.sav':
+            # SAV file accessed as a stream (e.g. via DVC); pyreadstat needs a path
+            try:
+                return _pyreadstat_via_tempfile(
+                    pyreadstat.read_sav, f, '.sav',
+                    apply_value_formats=convert_categoricals, encoding=encoding)
+            except Exception:
                 pass
 
         try:
@@ -143,9 +171,13 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
 
         try:
             # pyreadstat handles older Stata formats that pandas StataReader cannot.
-            # pyreadstat requires a file path string, not a file handle.
-            df_pr, meta = pyreadstat.read_dta(fn, apply_value_formats=convert_categoricals, encoding=encoding)
-            return df_pr
+            if isinstance(f, str):
+                df_pr, meta = pyreadstat.read_dta(f, apply_value_formats=convert_categoricals, encoding=encoding)
+                return df_pr
+            else:
+                return _pyreadstat_via_tempfile(
+                    pyreadstat.read_dta, f, Path(fn).suffix or '.dta',
+                    apply_value_formats=convert_categoricals, encoding=encoding)
         except Exception:
             pass
 
