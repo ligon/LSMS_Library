@@ -13,6 +13,7 @@ Related issues:
 - Regression fix: commit 0cdde86e
 """
 from dataclasses import dataclass, field
+import os
 
 import pytest
 
@@ -154,6 +155,10 @@ def test_wave_recursion_flag_cleanup():
     assert '_in_getattr' not in wave.__dict__
 
 
+@pytest.mark.skipif(
+    os.getenv("LSMS_SKIP_AUTH", "").lower() in {"1", "true", "yes"},
+    reason="Requires DVC data access (LSMS_SKIP_AUTH is set)",
+)
 def test_fallback_path_uses_wave_data_scheme():
     """Test that the fallback path at country.py:987 works.
 
