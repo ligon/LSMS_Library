@@ -55,15 +55,6 @@ The runtime automatically expands any `Relationship` column into these three via
 
 **Adding new labels:** If a survey has an unrecognized relationship string, a warning is emitted. Add the label to `lsms_library/categorical_mapping/kinship.yml` with its `[Generation, Distance, Affinity]` tuple.
 
-## Spelling Enforcement (`spelling.yml`)
-`lsms_library/categorical_mapping/spelling.yml` is an inverse dictionary for cross-country value normalisation. Each key is the canonical spelling; values are accepted variants that map to it:
-```yaml
-Roasted:
-  - Rosted
-  - Raosted
-```
-Within-country value harmonisation uses `categorical_mapping.org` files per country.
-
 ## Cross-Country Value Normalisation (`data_info.yml` spellings)
 Columns in `data_info.yml` can declare a `spellings` inverse dictionary that the runtime enforces automatically. Each key is the canonical value; its list contains accepted variant spellings:
 ```yaml
