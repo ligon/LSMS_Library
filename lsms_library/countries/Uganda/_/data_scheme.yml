@@ -10,6 +10,9 @@ Data Scheme:
 
   cluster_features:
     index: (t,v)
+    Region: str
+    Rural: str
+    District: str
   
   household_roster:
     index: (i, pid, t)
