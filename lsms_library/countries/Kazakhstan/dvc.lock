@@ -1,0 +1,30 @@
+schema: '2.0'
+stages:
+  materialize@kazakhstan::::household_roster:
+    cmd: cd _ && LSMS_BUILD_BACKEND=make python3 -m lsms_library.cli materialize
+      --country "Kazakhstan" --all-waves --table "household_roster" --format 
+      "parquet" --out ../var/household_roster.parquet
+    deps:
+    - path: ../../cli.py
+      hash: md5
+      md5: 049c779121577873dd8c8b42c242e4a2
+      size: 19547
+    - path: ../../country.py
+      hash: md5
+      md5: aa03f6cd67dd916cef19f14ff9461360
+      size: 80894
+    - path: ../../local_tools.py
+      hash: md5
+      md5: cc454cfa14a80ebc13adb975c1d76dc6
+      size: 46845
+      isexec: true
+    - path: _
+      hash: md5
+      md5: 07ac116d445376c6ec960a360e3898a8.dir
+      size: 136
+      nfiles: 1
+    outs:
+    - path: var/household_roster.parquet
+      hash: md5
+      md5: f1385ff57267a540453e49643176d6de
+      size: 34028
