@@ -944,6 +944,53 @@ class Country:
         return merged.set_index(df.index.names)
     
 
+    def _apply_categorical_mappings(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Auto-apply categorical mappings where table names match columns or indices.
+
+        For each column or index level in *df*, check whether
+        ``self.categorical_mapping`` contains a table with the same name
+        (case-insensitive).  If the table has a ``Preferred Label``
+        column, build a replacement dictionary from the first other
+        column → ``Preferred Label`` and apply it.
+        """
+        cat_maps = self.categorical_mapping
+        if not cat_maps:
+            return df
+
+        # Build case-insensitive lookup
+        lower_lookup = {name.lower(): name for name in cat_maps}
+
+        def _build_replace_dict(table: pd.DataFrame) -> dict | None:
+            if "Preferred Label" not in table.columns:
+                return None
+            source_cols = [c for c in table.columns if c != "Preferred Label"]
+            if not source_cols:
+                return None
+            return table.set_index(source_cols[0])["Preferred Label"].to_dict()
+
+        # Apply to columns
+        for col in df.columns:
+            key = lower_lookup.get(col.lower())
+            if key is None:
+                continue
+            rdict = _build_replace_dict(cat_maps[key])
+            if rdict:
+                df[col] = df[col].replace(rdict)
+
+        # Apply to index levels
+        if isinstance(df.index, pd.MultiIndex):
+            for level_name in df.index.names:
+                if level_name is None:
+                    continue
+                key = lower_lookup.get(level_name.lower())
+                if key is None:
+                    continue
+                rdict = _build_replace_dict(cat_maps[key])
+                if rdict:
+                    df = df.rename(index=rdict, level=level_name)
+
+        return df
+
     def _finalize_result(self, df: Any, scheme_entry: dict[str, Any], method_name: str) -> pd.DataFrame | dict[str, Any]:
         """
         Apply final harmonization steps (index augmentation, normalization, id walk)
@@ -980,6 +1027,10 @@ class Country:
             # Expand Relationship -> Generation, Distance, Affinity
             if "Relationship" in df.columns:
                 df = _expand_kinship(df)
+
+            # Auto-apply categorical mappings where table name matches
+            # a column or index name (issue #49)
+            df = self._apply_categorical_mappings(df)
 
             # Normalise variant spellings to canonical forms
             if method_name:
