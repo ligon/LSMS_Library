@@ -1606,6 +1606,11 @@ class Country:
         'food_quantities': 'food_quantities_from_acquired',
     }
 
+    # Tables that can be derived from household_roster via transformations
+    _ROSTER_DERIVED = {
+        'household_characteristics': 'roster_to_characteristics',
+    }
+
     def __getattr__(self, name):
         '''
         This method is triggered when an attribute is not found in the instance, but exists in the `data_scheme`.
@@ -1616,7 +1621,8 @@ class Country:
 
         For derived food tables (food_expenditures, food_prices, food_quantities),
         if no parquet/script exists but food_acquired is available, the table is
-        derived automatically via transformations.
+        derived automatically via transformations.  Similarly, household_characteristics
+        can be derived from household_roster via roster_to_characteristics.
         '''
         if name in self.data_scheme:
             def method(waves=None, market=None):
@@ -1643,6 +1649,27 @@ class Country:
                             return result
                     except Exception:
                         pass  # Fall through to normal aggregation
+
+                # Derive household_characteristics from household_roster
+                if (name in self._ROSTER_DERIVED
+                        and 'household_roster' in self.data_scheme):
+                    from .transformations import roster_to_characteristics
+                    try:
+                        roster = self._aggregate_wave_data(waves, 'household_roster')
+                        if isinstance(roster, pd.DataFrame) and not roster.empty:
+                            # Determine final_index from available index levels
+                            idx = list(roster.index.names)
+                            final_index = [n for n in ['i', 't', 'm'] if n in idx]
+                            if not final_index:
+                                final_index = [n for n in idx if n != 'pid']
+                            result = roster_to_characteristics(
+                                roster, drop='pid', final_index=final_index)
+                            if market is not None:
+                                result = self._add_market_index(result, column=market)
+                            return result
+                    except Exception:
+                        pass  # Fall through to normal aggregation
+
                 result = self._aggregate_wave_data(waves, name)
                 if market is not None and isinstance(result, pd.DataFrame) and not result.empty:
                     result = self._add_market_index(result, column=market)
