@@ -23,3 +23,70 @@ Index Info:
     panel_ids: (t, i)
     assets: (t, i, j)
     individual_education: (t, v, i, pid)
+
+# Canonical column definitions for cross-country tables.
+# 'required: true' means every country declaring this table must include
+# the column.  'values' lists the only acceptable spellings for that
+# column's contents (enforced globally, not country-specific).
+Columns:
+  household_roster:
+    Sex:
+      type: str
+      required: true
+      values: [M, F]
+    Age:
+      type: int
+      required: true
+    Relationship:
+      type: str
+      required: true
+      values:
+        - Head
+        - Spouse
+        - Child
+        - Grandchild
+        - Parent
+        - Sibling
+        - In-law
+        - Other relative
+        - Non-relative
+  cluster_features:
+    Region:
+      type: str
+      required: true
+    Rural:
+      type: str
+      required: true
+    District:
+      type: str
+  shocks:
+    AffectedIncome:
+      type: bool
+    AffectedAssets:
+      type: bool
+    AffectedProduction:
+      type: bool
+    AffectedConsumption:
+      type: bool
+    HowCoped0:
+      type: str
+    HowCoped1:
+      type: str
+    HowCoped2:
+      type: str
+  interview_date:
+    Int_t:
+      type: datetime
+  individual_education:
+    Highest Education:
+      type: str
+  panel_ids:
+    previous_i:
+      type: str
+
+# Spellings that must never appear in column names.  Key is the rejected
+# spelling; value is the canonical replacement.
+Rejected Spellings:
+  Relation: Relationship
+  Effected: Affected
+  Highest_education: Highest Education
