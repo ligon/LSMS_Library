@@ -767,6 +767,78 @@ class Country:
         else:
             raise KeyError(f"{year} is not a valid wave for {self.name}")
 
+    def _market_lookup(self, column: str = 'Region') -> pd.Series:
+        """Return a cached (i, t) -> m mapping derived from cluster_features.
+
+        Parameters
+        ----------
+        column : str
+            Which cluster_features column to use as the market identifier
+            (e.g. ``'Region'``, ``'District'``).
+
+        Returns
+        -------
+        pd.Series
+            Indexed by ``(i, t)`` with values being the market label ``m``.
+        """
+        cache_key = f"_market_lookup_cache_{column}"
+        cached = getattr(self, cache_key, None)
+        if cached is not None:
+            return cached
+
+        cf_parts = []
+        for wave in self.waves:
+            try:
+                w = self[wave]
+                c = w.cluster_features()
+                if not c.empty:
+                    cf_parts.append(c.reset_index())
+            except Exception:
+                continue
+
+        if not cf_parts:
+            raise RuntimeError("cluster_features returned no data for any wave.")
+
+        cf = pd.concat(cf_parts, ignore_index=True)
+
+        if column not in cf.columns:
+            available = [c for c in cf.columns if c not in ('i', 't', 'v')]
+            raise KeyError(
+                f"'{column}' not in cluster_features columns. "
+                f"Available: {available}"
+            )
+
+        lookup = (cf[['i', 't', column]]
+                  .drop_duplicates(subset=['i', 't'])
+                  .set_index(['i', 't'])[column]
+                  .rename('m'))
+        # Normalize to uppercase/stripped strings
+        lookup = lookup.astype(str).str.upper().str.strip()
+
+        setattr(self, cache_key, lookup)
+        return lookup
+
+    def _add_market_index(self, df: pd.DataFrame, column: str = 'Region') -> pd.DataFrame:
+        """Join a market identifier ``m`` from cluster_features onto *df*.
+
+        *df* must have ``i`` and ``t`` in its index.  Returns *df* with
+        ``m`` added as an additional index level.
+        """
+        lookup = self._market_lookup(column)
+        idx_names = list(df.index.names)
+        flat = df.reset_index()
+        flat = flat.merge(lookup.reset_index(), on=['i', 't'], how='left')
+        flat = flat.dropna(subset=['m'])
+        # Insert m after t to match cfe convention (i, t, m, ...)
+        new_idx = []
+        for n in idx_names:
+            new_idx.append(n)
+            if n == 't':
+                new_idx.append('m')
+        if 'm' not in new_idx:
+            new_idx.append('m')
+        return flat.set_index(new_idx)
+
     def _location_lookup(self) -> pd.DataFrame:
         """
         Return a cached lookup table that maps (i, t) -> m so tables missing the
@@ -1547,7 +1619,7 @@ class Country:
         derived automatically via transformations.
         '''
         if name in self.data_scheme:
-            def method(waves=None):
+            def method(waves=None, market=None):
                 # For derived food tables, try deriving from food_acquired first
                 # before falling back to wave-level scripts / make
                 if (name in self._FOOD_DERIVED
@@ -1565,10 +1637,16 @@ class Country:
                         if isinstance(fa, pd.DataFrame) and not fa.empty:
                             result = transform_fn(fa)
                             scheme_entry = self._materialization_entry(name)
-                            return self._finalize_result(result, scheme_entry, name)
+                            result = self._finalize_result(result, scheme_entry, name)
+                            if market is not None:
+                                result = self._add_market_index(result, column=market)
+                            return result
                     except Exception:
                         pass  # Fall through to normal aggregation
-                return self._aggregate_wave_data(waves, name)
+                result = self._aggregate_wave_data(waves, name)
+                if market is not None and isinstance(result, pd.DataFrame) and not result.empty:
+                    result = self._add_market_index(result, column=market)
+                return result
             return method
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
     
