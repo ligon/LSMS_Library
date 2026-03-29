@@ -33,28 +33,28 @@ shocks:
             - exploitation
         Shock: choc
     myvars:
-        EffectedIncome:
+        AffectedIncome:
             - s5q04a
             - mapping:
                 ' Diminué': True
                 Diminué: True
                 Augmenté: True
                 Inchangé: False
-        EffectedAssets:
+        AffectedAssets:
             - s5q04b
             - mapping:
                 ' Diminué': True
                 Diminué: True
                 Augmenté: True
                 Inchangé: False
-        EffectedProduction:
+        AffectedProduction:
             - s5q04c
             - mapping:
                 ' Diminué': True
                 Diminué: True
                 Augmenté: True
                 Inchangé: False
-        EffectedConsumption:
+        AffectedConsumption:
             - s5q04d
             - mapping:
                 ' Diminué': True

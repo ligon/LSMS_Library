@@ -15,7 +15,7 @@ with dvc.api.open('../Data/hh_sec_r.dta', mode='rb') as dta:
 # Filter for households that experienced the shock
 df = df[df['hh_r01'] == 'yes']
 
-# Map combined effect variable to separate EffectedIncome and EffectedAssets
+# Map combined effect variable to separate AffectedIncome and AffectedAssets
 effect_income_map = {
     'INCOME LOSS': True,
     'Income loss': True,
@@ -49,8 +49,8 @@ effect_assets_map = {
 shocks = pd.DataFrame({
     'i': df.y5_hhid.values.tolist(),
     'Shock': df.shockid.values.tolist(),
-    'EffectedIncome': df.hh_r03.map(effect_income_map).values.tolist(),
-    'EffectedAssets': df.hh_r03.map(effect_assets_map).values.tolist(),
+    'AffectedIncome': df.hh_r03.map(effect_income_map).values.tolist(),
+    'AffectedAssets': df.hh_r03.map(effect_assets_map).values.tolist(),
     'HowCoped0': df.hh_r04_1.values.tolist(),
     'HowCoped1': df.hh_r04_2.values.tolist(),
 })

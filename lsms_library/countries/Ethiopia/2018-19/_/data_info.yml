@@ -57,25 +57,25 @@ shocks:
                 "19. LOCAL UNREST/VIOLENCE ": Local Unrest/Violence
                 "20. OTHER (SPECIFY)": Other (Specify)
     myvars:
-        EffectedIncome:
+        AffectedIncome:
             - s9q03a
             - mapping:
                 1. INCREASED: True
                 2. DECREASED: True
                 3. DID NOT CHANGE: False
-        EffectedAssets:
+        AffectedAssets:
             - s9q03b
             - mapping:
                 1. INCREASED: True
                 2. DECREASED: True
                 3. DID NOT CHANGE: False
-        EffectedProduction:
+        AffectedProduction:
             - s9q03c
             - mapping:
                 1. INCREASED: True
                 2. DECREASED: True
                 3. DID NOT CHANGE: False
-        EffectedConsumption:
+        AffectedConsumption:
             - s9q03e
             - mapping:
                 1. INCREASED: True

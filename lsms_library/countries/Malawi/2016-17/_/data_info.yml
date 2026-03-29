@@ -57,7 +57,7 @@ shocks:
         i: case_id
         Shock: hh_u0a
     myvars:
-        EffectedIncome:
+        AffectedIncome:
             - hh_u03a
             - mapping:
                 Decrease: True
@@ -67,7 +67,7 @@ shocks:
                 DID NOT CHANGE: False
                 Increase: True
                 INCREASE: True
-        EffectedAssets:
+        AffectedAssets:
             - hh_u03b
             - mapping:
                 Decrease: True
@@ -77,7 +77,7 @@ shocks:
                 DID NOT CHANGE: False
                 Increase: True
                 INCREASE: True
-        EffectedProduction:
+        AffectedProduction:
             - hh_u03c
             - mapping:
                 Decrease: True
@@ -87,7 +87,7 @@ shocks:
                 DID NOT CHANGE: False
                 Increase: True
                 INCREASE: True
-        EffectedConsumption:
+        AffectedConsumption:
             - hh_u03d
             - mapping:
                 Decrease: True

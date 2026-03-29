@@ -71,7 +71,7 @@ shocks:
             - menage
         Shock: s11q01
     myvars:
-        EffectedIncome:
+        AffectedIncome:
             - s11q04a
             - mapping:
                 Dimunié: True
@@ -79,7 +79,7 @@ shocks:
                 Augmenté: True
                 Inchangé: False
                 Manquant: False
-        EffectedAssets:
+        AffectedAssets:
             - s11q04b
             - mapping:
                 Dimunié: True
@@ -87,7 +87,7 @@ shocks:
                 Augmenté: True
                 Inchangé: False
                 Manquant: False
-        EffectedProduction:
+        AffectedProduction:
             - s11q04c
             - mapping:
                 Dimunié: True
@@ -95,7 +95,7 @@ shocks:
                 Augmenté: True
                 Inchangé: False
                 Manquant: False
-        EffectedConsumption:
+        AffectedConsumption:
             - s11q04d
             - mapping:
                 Dimunié: True

@@ -38,13 +38,13 @@ shocks:
         i: case_id
         Shock: ab02
     myvars:
-        EffectedIncome:
+        AffectedIncome:
             - ab04
             - mapping:
                 Income loss: True
                 Asset loss: False
                 Loss of both: True
-        EffectedAssets:
+        AffectedAssets:
             - ab04
             - mapping:
                 Income loss: False
