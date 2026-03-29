@@ -59,7 +59,7 @@ individual_education:
             - menage 
             - numind
     myvars:
-        Highest Education: 'educ_hi'
+        Educational Attainment: 'educ_hi'
 
 
 shocks:

@@ -27,7 +27,7 @@ Data Scheme:
     Affinity: str
   individual_education:
     index: (t, v, i, pid)
-    Highest Education: str
+    Educational Attainment: str
   food_acquired:
     index: (t, v, visit, i, j, u)
     Quantity: float

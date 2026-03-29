@@ -80,7 +80,7 @@ Columns:
     Int_t:
       type: datetime
   individual_education:
-    Highest Education:
+    Educational Attainment:
       type: str
   panel_ids:
     previous_i:
@@ -92,4 +92,5 @@ Rejected Spellings:
   Relation: Generation, Distance, Affinity
   Relationship: Generation, Distance, Affinity
   Effected: Affected
-  Highest_education: Highest Education
+  Highest_education: Educational Attainment
+  Highest Education: Educational Attainment

@@ -57,7 +57,7 @@ individual_education:
             - menage 
             - numind
     myvars:
-        Highest Education: 'educ_hi'
+        Educational Attainment: 'educ_hi'
 
 interview_date:
     file: s00_me_mli2021.dta

@@ -13,7 +13,7 @@ household_roster:
       Sex: v01a02
       Age: v01a04
       Relation: v01a03
-      Highest_education: v01a05
+      Educational Attainment: v01a05
 employment:
   file:
       - ../Data/SECT02AD.DTA

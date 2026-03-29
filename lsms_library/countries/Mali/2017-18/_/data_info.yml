@@ -76,7 +76,7 @@ individual_education:
             - exploitation 
             - codeid
     myvars:
-        Highest Education:  's1q07'
+        Educational Attainment:  's1q07'
     file: 'eaci17_s01p1.dta'
 
 interview_date:

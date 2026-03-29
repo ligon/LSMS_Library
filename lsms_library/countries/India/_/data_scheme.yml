@@ -8,7 +8,7 @@ Data Scheme:
     Generation: int
     Distance: int
     Affinity: str
-    Highest Education: str
+    Educational Attainment: str
   employment:
     index: (t, v, i, pid)
     Cash_per_day: float
