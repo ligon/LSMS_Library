@@ -51,7 +51,7 @@ Columns:
     Affinity:
       type: str
       required: true
-      values: [consanguineal, affinal, step, unrelated, guest, servant]
+      values: [consanguineal, affinal, step, foster, unrelated, guest, servant]
   cluster_features:
     Region:
       type: str

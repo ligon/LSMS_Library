@@ -84,4 +84,4 @@ Kinship:
   Other Relative:      [0, 0, consanguineal]
   Other Family:        [0, 0, consanguineal]
   Adopted Child:       [-1, 0, consanguineal]
-  Foster Child:        [-1, 0, step]
+  Foster Child:        [-1, 0, foster]

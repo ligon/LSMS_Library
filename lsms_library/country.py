@@ -977,6 +977,10 @@ class Country:
             ):
                 df = id_walk(df, self.updated_ids)
 
+            # Expand Relationship -> Generation, Distance, Affinity
+            if "Relationship" in df.columns:
+                df = _expand_kinship(df)
+
             # Enforce declared dtypes from data_scheme.yml
             if isinstance(scheme_entry, dict):
                 _enforce_declared_dtypes(df, scheme_entry)
@@ -1747,6 +1751,70 @@ _SCHEME_DTYPE_MAP = {
 }
 
 _SCHEME_SKIP_KEYS = frozenset({'index', 'materialize', 'backend'})
+
+
+@lru_cache(maxsize=1)
+def _load_kinship_map() -> dict[str, tuple[int, int, str]]:
+    """Load the Kinship dictionary from spelling.yml.
+
+    Returns a dict mapping relationship label strings to
+    ``(Generation, Distance, Affinity)`` tuples.
+    """
+    spelling_path = files("lsms_library") / "categorical_mapping" / "spelling.yml"
+    with open(spelling_path, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    raw = data.get("Kinship", {})
+    return {label: tuple(vals) for label, vals in raw.items()}
+
+
+def _expand_kinship(df: pd.DataFrame) -> pd.DataFrame:
+    """Expand a Relationship column into Generation, Distance, Affinity.
+
+    Uses the Kinship dictionary in spelling.yml.  Unrecognised labels
+    produce NA values and a warning listing the unknown strings so they
+    can be added to spelling.yml.
+    """
+    if "Relationship" not in df.columns:
+        return df
+
+    kinship = _load_kinship_map()
+
+    gen = []
+    dist = []
+    aff = []
+    unknown = set()
+
+    for val in df["Relationship"]:
+        if pd.isna(val):
+            gen.append(pd.NA)
+            dist.append(pd.NA)
+            aff.append(pd.NA)
+            continue
+        label = str(val).strip().title()
+        tup = kinship.get(label) or kinship.get(str(val).strip())
+        if tup is not None:
+            gen.append(tup[0])
+            dist.append(tup[1])
+            aff.append(tup[2])
+        else:
+            unknown.add(str(val).strip())
+            gen.append(pd.NA)
+            dist.append(pd.NA)
+            aff.append(pd.NA)
+
+    df["Generation"] = pd.array(gen, dtype=pd.Int64Dtype())
+    df["Distance"] = pd.array(dist, dtype=pd.Int64Dtype())
+    df["Affinity"] = pd.array(aff, dtype=pd.StringDtype())
+    df = df.drop(columns=["Relationship"])
+
+    if unknown:
+        warnings.warn(
+            f"Unknown relationship labels (add to spelling.yml Kinship): "
+            f"{sorted(unknown)}",
+            stacklevel=2,
+        )
+
+    return df
 
 
 def _enforce_declared_dtypes(df: pd.DataFrame, scheme_entry: dict[str, Any]) -> None:
