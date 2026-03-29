@@ -9,7 +9,7 @@ def title_string(x):
     try:
         return x.title()
     except AttributeError:
-        return np.nan
+        return pd.NA
     
 idxvars = dict(j='hhid',
                t=('hhid', lambda x: "2012-13"),

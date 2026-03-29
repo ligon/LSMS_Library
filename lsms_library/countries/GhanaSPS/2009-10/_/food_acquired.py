@@ -39,7 +39,7 @@ x['t'] = t
 x['j'] = x['j'].astype(str)
 x = x.set_index(['j','t','i'])
 null_cells = x['unit'].isnull()
-x['unit'] = x['unit'].astype('Int64').astype(str).mask(null_cells, np.nan)
+x['unit'] = x['unit'].astype('Int64').astype(str).mask(null_cells, pd.NA)
 x = x.dropna(how='all')
 
 units = df_from_orgfile('../../_/units.org',name='unit09',encoding='ISO-8859-1')

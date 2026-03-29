@@ -40,9 +40,9 @@ def harmonized_food_labels(fn='../../_/food_items.org',key=list(Waves.keys()),va
                     if len(myfoods.difference(set(food_items[k].values)))==0: # my foods all in key
                         break
 
-        food_items = food_items[key + [value]].replace('---', np.nan).dropna(how = 'all')
+        food_items = food_items[key + [value]].replace('---', pd.NA).dropna(how = 'all')
     else:
-        food_items = food_items[[key] + [value]].replace('---', np.nan).dropna(how = 'all')
+        food_items = food_items[[key] + [value]].replace('---', pd.NA).dropna(how = 'all')
         
     food_items = food_items.set_index(key)
 
@@ -215,11 +215,11 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
     if fn is None:
         x = x.reset_index()
         if x['j'].dtype==float:
-            x['j'] = x['j'].astype(str).apply(lambda s: s.split('.')[0]).replace('nan',np.nan)
+            x['j'] = x['j'].astype(str).apply(lambda s: s.split('.')[0]).replace('nan',pd.NA)
         elif x['j'].dtype==int:
             x['j'] = x['j'].astype(str)
         elif x['j'].dtype==str:
-            x['j'] = x['j'].replace('',np.nan)
+            x['j'] = x['j'].replace('',pd.NA)
 
         x = x.set_index(idx)
 
@@ -236,12 +236,12 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
 
     for column in id:
         if id[column].dtype==float:
-            id[column] = id[column].astype(str).apply(lambda s: s.split('.')[0]).replace('nan',np.nan)
+            id[column] = id[column].astype(str).apply(lambda s: s.split('.')[0]).replace('nan',pd.NA)
         elif id[column].dtype==int:
-            id[column] = id[column].astype(str).replace('nan',np.nan)
+            id[column] = id[column].astype(str).replace('nan',pd.NA)
         elif id[column].dtype==object:
-            id[column] = id[column].replace('nan',np.nan)
-            id[column] = id[column].replace('',np.nan)
+            id[column] = id[column].replace('nan',pd.NA)
+            id[column] = id[column].replace('',pd.NA)
 
     ids = dict(id[[id0,id1]].values.tolist())
 
@@ -253,9 +253,8 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
     for k,v in ids.items():
         d[v] += [k]
 
-    try:
-        d.pop(np.nan)  # Get rid of nan key, if any
-    except KeyError: pass
+    d.pop(np.nan, None)  # Get rid of nan key, if any
+    d.pop(pd.NA, None)
 
     updated_id = {}
     for k,v in d.items():

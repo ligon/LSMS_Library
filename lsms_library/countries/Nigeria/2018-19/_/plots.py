@@ -17,7 +17,7 @@ def extract_string(x):
     try:
         return x.split('. ')[1].title().replace(' ','-')
     except AttributeError:
-        return np.nan
+        return pd.NA
 
 
 

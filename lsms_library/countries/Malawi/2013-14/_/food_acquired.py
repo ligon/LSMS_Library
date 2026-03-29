@@ -31,10 +31,10 @@ unitsdetail_convertions = get_categorical_mapping(tablename='unit',
                                                   idxvars={'j':'Code'},
                                                 **{'Label':'Unit'})
 
-df['unitsdetail_consumed'] = df['unitcode_consumed'].astype(str).str.lower().map(unitsdetail_convertions).fillna(np.nan)
-df['unitsdetail_bought'] = df['unitcode_bought'].astype(str).str.lower().map(unitsdetail_convertions).fillna(np.nan)
-df['unitsdetail_produced'] = df['unitcode_produced'].astype(str).str.lower().map(unitsdetail_convertions).fillna(np.nan)
-df['unitsdetail_gifted'] = df['unitcode_gifted'].astype(str).str.lower().map(unitsdetail_convertions).fillna(np.nan)
+df['unitsdetail_consumed'] = df['unitcode_consumed'].astype(str).str.lower().map(unitsdetail_convertions).fillna(pd.NA)
+df['unitsdetail_bought'] = df['unitcode_bought'].astype(str).str.lower().map(unitsdetail_convertions).fillna(pd.NA)
+df['unitsdetail_produced'] = df['unitcode_produced'].astype(str).str.lower().map(unitsdetail_convertions).fillna(pd.NA)
+df['unitsdetail_gifted'] = df['unitcode_gifted'].astype(str).str.lower().map(unitsdetail_convertions).fillna(pd.NA)
 
 cols = df.loc[:, ['quantity_consumed', 'expenditure', 'quantity_bought',
                   'quantity_produced', 'quantity_gifted']].columns
@@ -45,7 +45,7 @@ match_df, D = conversion_table_matching(df, conversions, conversion_label_name =
 conversions['item_name'] = conversions['item_name'].map(D)
 
 df = df.set_index(['j', 'i'])
-df = df.join(regions).set_index('m', append=True).replace(r'^\s*$', np.nan, regex=True)
+df = df.join(regions).set_index('m', append=True).replace(r'^\s*$', pd.NA, regex=True)
 
 df['unitcode_consumed'] = df['unitcode_consumed'].str.upper()
 conversions = conversions.set_index(['region', 'item_name', 'unit_code'])
@@ -72,9 +72,9 @@ df["quantity_consumed"] = df['quantity_consumed'].mul(df['cfactor_consumed'].fil
 df["quantity_bought"] = df['quantity_bought'].mul(df['cfactor_bought'].fillna(1))
 
 df['u_consumed'] = np.where(~df['cfactor_consumed'].isna(), 'kg', df['unitsdetail_consumed'])
-df['u_consumed'] = df['u_consumed'].replace('nan', np.nan)
+df['u_consumed'] = df['u_consumed'].replace('nan', pd.NA)
 df['u_bought'] = np.where(~df['cfactor_bought'].isna(), 'kg', df['unitsdetail_bought'])
-df['u_bought'] = df['u_bought'].replace('nan', np.nan)
+df['u_bought'] = df['u_bought'].replace('nan', pd.NA)
 # prices
 df['price per unit'] = df['expenditure']/df['quantity_bought']
 

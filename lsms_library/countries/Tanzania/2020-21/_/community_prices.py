@@ -47,7 +47,7 @@ c = dict(int_key    = 'interview__key',  # interview__{key,id} both unique ident
 
 with dvc.api.open(fn,mode='rb') as dta: place = from_dta(dta,convert_categoricals=False)
 
-place = place.replace('**CONFIDENTIAL**',np.nan)
+place = place.replace('**CONFIDENTIAL**',pd.NA)
 place = place.loc[:,place.count()>0] # Drop columns with no data
 
 place = place[c.values()]
@@ -77,7 +77,7 @@ myvars = dict(HHID='y5_hhid',
 with dvc.api.open(fn,mode='rb') as dta: hhloc = from_dta(dta)
 
 
-hhloc = hhloc.replace('**CONFIDENTIAL**',np.nan)
+hhloc = hhloc.replace('**CONFIDENTIAL**',pd.NA)
 hhloc = hhloc.loc[:,hhloc.count()>0] # Drop columns with no data
 
 hhloc = hhloc[myvars.values()]

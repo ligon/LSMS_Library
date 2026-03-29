@@ -42,7 +42,7 @@ match_df, D = conversion_table_matching(df, conversions, conversion_label_name =
 conversions['item_name'] = conversions['item_name'].map(D)
 
 df = df.set_index(['j', 'i'])
-df = df.join(regions).set_index('m', append=True).replace(r'^\s*$', np.nan, regex=True)
+df = df.join(regions).set_index('m', append=True).replace(r'^\s*$', pd.NA, regex=True)
 df['unitcode_consumed'] = df['unitcode_consumed'].str.upper()
 df['unitcode_bought'] = df['unitcode_bought'].str.upper()
 df['unitcode_produced'] = df['unitcode_produced'].str.upper()

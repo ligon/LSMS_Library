@@ -62,7 +62,7 @@ yf = y.dropna(subset = y.columns.tolist()[2:], how ='all')
 xf['j'] = xf['j'].astype(str)
 yf['j'] = yf['j'].astype(str)
 f = xf.merge(yf, on = ['j','i'], how = 'outer')
-f['u'] = np.nan
+f['u'] = pd.NA
 f['t'] = t
 f = f.set_index(['j','t','i', 'u'])
 to_parquet(f, 'food_acquired.parquet')
