@@ -30,6 +30,9 @@ Index Info:
 # column's contents (enforced globally, not country-specific).
 Columns:
   household_roster:
+    # Kinship decomposition (Kroeber 1909; Romney & D'Andrade 1964).
+    # Sex x Generation x Distance x Affinity recovers all conventional
+    # relationship labels without redundancy.
     Sex:
       type: str
       required: true
@@ -37,19 +40,18 @@ Columns:
     Age:
       type: int
       required: true
-    Relationship:
+    Generation:
+      type: int
+      required: true
+      note: vertical distance from head (0=same, +1=parent, -1=child, etc.)
+    Distance:
+      type: int
+      required: true
+      note: collateral distance (0=lineal, 1=sibling line, 2=cousin line)
+    Affinity:
       type: str
       required: true
-      values:
-        - Head
-        - Spouse
-        - Child
-        - Grandchild
-        - Parent
-        - Sibling
-        - In-law
-        - Other relative
-        - Non-relative
+      values: [consanguineal, affinal, step, unrelated, guest, servant]
   cluster_features:
     Region:
       type: str
@@ -87,6 +89,7 @@ Columns:
 # Spellings that must never appear in column names.  Key is the rejected
 # spelling; value is the canonical replacement.
 Rejected Spellings:
-  Relation: Relationship
+  Relation: Generation, Distance, Affinity
+  Relationship: Generation, Distance, Affinity
   Effected: Affected
   Highest_education: Highest Education

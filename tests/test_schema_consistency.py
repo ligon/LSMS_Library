@@ -2,8 +2,9 @@
 Cross-country schema consistency tests.
 
 Validates that data_scheme.yml files across all countries follow shared
-conventions: consistent column naming, required columns for key tables,
-parsability, and no silent duplicate keys.
+conventions defined in the canonical schema (lsms_library/data_info.yml):
+required columns, rejected column-name spellings, parsability, and no
+silent duplicate keys.
 """
 
 import re
@@ -13,77 +14,148 @@ import pytest
 import yaml
 
 from lsms_library.paths import COUNTRIES_ROOT
-from lsms_library.yaml_utils import load_yaml
+
+# ---------------------------------------------------------------------------
+# Load canonical schema from data_info.yml
+# ---------------------------------------------------------------------------
+
+_DATA_INFO_PATH = Path(__file__).resolve().parent.parent / "lsms_library" / "data_info.yml"
+
+with open(_DATA_INFO_PATH, "r", encoding="utf-8") as _f:
+    _CANONICAL = yaml.safe_load(_f)
+
+_COLUMNS = _CANONICAL.get("Columns", {})
+_REJECTED = _CANONICAL.get("Rejected Spellings", {})
+
+_SKIP_KEYS = {"index", "materialize", "backend"}
+
+
+def _required_columns(table: str) -> set[str]:
+    """Return the set of required column names for a table."""
+    spec = _COLUMNS.get(table, {})
+    return {col for col, meta in spec.items()
+            if isinstance(meta, dict) and meta.get("required")}
 
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
+class _SchemeLoader(yaml.SafeLoader):
+    """SafeLoader that handles the !make tag used in data_scheme.yml."""
+
+_SchemeLoader.add_constructor(
+    "!make", lambda loader, node: {"__make__": True}
+)
+
+
+def _load_yaml(path: Path) -> dict:
+    """Load a YAML file, returning {} on empty."""
+    with open(path, "r", encoding="utf-8") as f:
+        data = yaml.load(f, Loader=_SchemeLoader)
+    return data or {}
+
+
 def _all_data_scheme_paths() -> list[Path]:
     """Return sorted list of all data_scheme.yml paths."""
     return sorted(COUNTRIES_ROOT.glob("*/_/data_scheme.yml"))
 
 
-def _schemes_with_household_roster() -> list[tuple[str, Path, dict]]:
-    """Return (country, path, roster_spec) for every scheme that declares household_roster."""
+def _schemes_with_table(table: str) -> list[tuple[str, Path, dict]]:
+    """Return (country, path, table_spec) for every scheme declaring *table*."""
     results = []
     for yml in _all_data_scheme_paths():
         country = yml.parent.parent.name
-        data = load_yaml(yml)
+        data = _load_yaml(yml)
         if not isinstance(data, dict):
             continue
         ds = data.get("Data Scheme")
         if not isinstance(ds, dict):
             continue
-        roster = ds.get("household_roster")
-        if roster is not None and isinstance(roster, dict):
-            results.append((country, yml, roster))
+        spec = ds.get(table)
+        if spec is not None and isinstance(spec, dict):
+            results.append((country, yml, spec))
     return results
 
 
-ROSTER_SCHEMES = _schemes_with_household_roster()
 ALL_SCHEME_PATHS = _all_data_scheme_paths()
+
+
+# ---------------------------------------------------------------------------
+# Build parametrized test data for every table that has required columns
+# ---------------------------------------------------------------------------
+
+_TABLES_WITH_REQUIREMENTS = [
+    table for table, cols in _COLUMNS.items()
+    if any(isinstance(m, dict) and m.get("required")
+           for m in cols.values())
+]
+
+_TABLE_SCHEMES: dict[str, list[tuple[str, Path, dict]]] = {
+    table: _schemes_with_table(table)
+    for table in _TABLES_WITH_REQUIREMENTS
+}
 
 
 # ---------------------------------------------------------------------------
 # Tests
 # ---------------------------------------------------------------------------
 
-class TestHouseholdRosterNaming:
-    """Ensure household_roster uses 'Relationship', never 'Relation'."""
+class TestRequiredColumns:
+    """Ensure every table declares its required columns per data_info.yml."""
+
+    @staticmethod
+    def _cases():
+        for table, schemes in _TABLE_SCHEMES.items():
+            required = _required_columns(table)
+            for country, path, spec in schemes:
+                yield pytest.param(
+                    country, path, spec, table, required,
+                    id=f"{country}:{table}",
+                )
 
     @pytest.mark.parametrize(
-        "country,path,roster",
-        ROSTER_SCHEMES,
-        ids=[c for c, _, _ in ROSTER_SCHEMES],
+        "country,path,spec,table,required", list(_cases.__func__())
     )
-    def test_household_roster_uses_relationship(self, country, path, roster):
-        """household_roster should use 'Relationship', not 'Relation'."""
-        columns = set(roster.keys()) - {"index", "materialize", "backend"}
-        assert "Relation" not in columns, (
-            f"{country}: household_roster uses 'Relation' instead of "
-            f"'Relationship'. Rename to 'Relationship' in {path}"
+    def test_required_columns_present(self, country, path, spec, table, required):
+        columns = set(spec.keys()) - _SKIP_KEYS
+        missing = required - columns
+        assert not missing, (
+            f"{country}: {table} is missing required columns "
+            f"{sorted(missing)} in {path}"
         )
 
 
-class TestHouseholdRosterRequiredColumns:
-    """Ensure household_roster declares the minimum required columns."""
-
-    REQUIRED = {"Sex", "Age", "Relationship"}
+class TestRejectedSpellings:
+    """Ensure no column name uses a rejected spelling."""
 
     @pytest.mark.parametrize(
-        "country,path,roster",
-        ROSTER_SCHEMES,
-        ids=[c for c, _, _ in ROSTER_SCHEMES],
+        "path",
+        ALL_SCHEME_PATHS,
+        ids=[p.parent.parent.name for p in ALL_SCHEME_PATHS],
     )
-    def test_household_roster_has_required_columns(self, country, path, roster):
-        """household_roster must declare Sex, Age, and Relationship columns."""
-        columns = set(roster.keys()) - {"index", "materialize", "backend"}
-        missing = self.REQUIRED - columns
-        assert not missing, (
-            f"{country}: household_roster is missing required columns "
-            f"{sorted(missing)} in {path}"
+    def test_no_rejected_column_spellings(self, path):
+        data = _load_yaml(path)
+        ds = data.get("Data Scheme")
+        if not isinstance(ds, dict):
+            pytest.skip("no Data Scheme section")
+
+        violations = []
+        for table_name, table_spec in ds.items():
+            if not isinstance(table_spec, dict):
+                continue
+            for col in table_spec:
+                if col in _SKIP_KEYS:
+                    continue
+                for rejected, canonical in _REJECTED.items():
+                    if col == rejected or rejected in col:
+                        violations.append(
+                            f"{table_name}.{col} -> use {canonical}"
+                        )
+
+        country = path.parent.parent.name
+        assert not violations, (
+            f"{country}: rejected column spellings found: {violations}"
         )
 
 
@@ -97,7 +169,7 @@ class TestDataSchemeParsing:
     )
     def test_all_data_scheme_files_parse(self, path):
         """data_scheme.yml should load without raising exceptions."""
-        data = load_yaml(path)
+        data = _load_yaml(path)
         assert isinstance(data, dict), (
             f"{path}: expected a dict at top level, got {type(data).__name__}"
         )

@@ -10,7 +10,9 @@ Data Scheme:
     index: (t, v, i, pid)
     Sex: str
     Age: int
-    Relationship: str
+    Generation: int
+    Distance: int
+    Affinity: str
   subjective_well_being:
     index: (t,i)
     Own Step: int
@@ -25,10 +27,10 @@ Data Scheme:
     Int_t: str
   shocks:
     index: (t, i, Shock)
-    EffectedIncome: bool
-    EffectedAssets: bool
-    EffectedProduction: bool
-    EffectedConsumption: bool
+    AffectedIncome: bool
+    AffectedAssets: bool
+    AffectedProduction: bool
+    AffectedConsumption: bool
     HowCoped0: str
     HowCoped1: str
     HowCoped2: str

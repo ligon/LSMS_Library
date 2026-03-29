@@ -22,7 +22,9 @@ Data Scheme:
     index: (t, v, i, pid)
     Sex: str
     Age: int
-    Relationship: str
+    Generation: int
+    Distance: int
+    Affinity: str
   individual_education:
     index: (t, v, i, pid)
     Highest Education: str

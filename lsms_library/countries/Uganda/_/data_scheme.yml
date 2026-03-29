@@ -15,7 +15,9 @@ Data Scheme:
     index: (i, pid, t)
     Sex: str
     Age: int
-    Relationship: str
+    Generation: int
+    Distance: int
+    Affinity: str
 
   shocks: !make
   earnings: !make

@@ -26,7 +26,9 @@ Data Scheme:
     Sex: str
     Age: int
     Birthplace: str
-    Relationship: str
+    Generation: int
+    Distance: int
+    Affinity: str
   food_acquired:
     index: (t, v, i, j)
     Expenditure: float
