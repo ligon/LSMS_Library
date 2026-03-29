@@ -64,6 +64,18 @@ Roasted:
 ```
 Within-country value harmonisation uses `categorical_mapping.org` files per country.
 
+## Cross-Country Value Normalisation (`data_info.yml` spellings)
+Columns in `data_info.yml` can declare a `spellings` inverse dictionary that the runtime enforces automatically. Each key is the canonical value; its list contains accepted variant spellings:
+```yaml
+Sex:
+  type: str
+  required: true
+  spellings:
+    M: [Male, male, Masculin, masculin, Homme, homme, m]
+    F: [Female, female, Féminin, feminin, Femme, femme, f]
+```
+The canonical values are simply `spellings.keys()`. The runtime replaces variants with canonical forms in `_finalize_result()` via `_enforce_canonical_spellings()`. This applies to both column values and index levels.
+
 ## Pandas Conventions (>=3.0)
 This codebase targets pandas 3.0+. Follow these rules in all new and modified code:
 

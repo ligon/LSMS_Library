@@ -26,8 +26,10 @@ Index Info:
 
 # Canonical column definitions for cross-country tables.
 # 'required: true' means every country declaring this table must include
-# the column.  'values' lists the only acceptable spellings for that
-# column's contents (enforced globally, not country-specific).
+# the column.  'spellings' is an inverse dictionary: each key is the
+# canonical value, its list contains accepted variant spellings that the
+# runtime maps to the canonical form.  The canonical values are simply
+# spellings.keys().
 Columns:
   household_roster:
     # Kinship decomposition (Kroeber 1909; Romney & D'Andrade 1964).
@@ -36,7 +38,9 @@ Columns:
     Sex:
       type: str
       required: true
-      values: [M, F]
+      spellings:
+        M: [Male, male, Masculin, masculin, Homme, homme, m, MALE]
+        F: [Female, female, Féminin, feminin, Femme, femme, f, FEMALE]
     Age:
       type: int
       required: true
@@ -51,7 +55,14 @@ Columns:
     Affinity:
       type: str
       required: true
-      values: [consanguineal, affinal, step, foster, unrelated, guest, servant]
+      spellings:
+        consanguineal: []
+        affinal: []
+        step: []
+        foster: []
+        unrelated: []
+        guest: []
+        servant: []
   cluster_features:
     Region:
       type: str

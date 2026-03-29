@@ -981,6 +981,10 @@ class Country:
             if "Relationship" in df.columns:
                 df = _expand_kinship(df)
 
+            # Normalise variant spellings to canonical forms
+            if method_name:
+                df = _enforce_canonical_spellings(df, method_name)
+
             # Enforce declared dtypes from data_scheme.yml
             if isinstance(scheme_entry, dict):
                 _enforce_declared_dtypes(df, scheme_entry)
@@ -1769,9 +1773,9 @@ def _load_kinship_map() -> dict[str, tuple[int, int, str]]:
 def _expand_kinship(df: pd.DataFrame) -> pd.DataFrame:
     """Expand a Relationship column into Generation, Distance, Affinity.
 
-    Uses the Kinship dictionary in spelling.yml.  Unrecognised labels
-    produce NA values and a warning listing the unknown strings so they
-    can be added to spelling.yml.
+    Uses the dictionary in ``categorical_mapping/kinship.yml``.
+    Unrecognised labels produce NA values and a warning listing the
+    unknown strings so they can be added to kinship.yml.
     """
     if "Relationship" not in df.columns:
         return df
@@ -1808,11 +1812,55 @@ def _expand_kinship(df: pd.DataFrame) -> pd.DataFrame:
 
     if unknown:
         warnings.warn(
-            f"Unknown relationship labels (add to spelling.yml Kinship): "
+            f"Unknown relationship labels (add to kinship.yml): "
             f"{sorted(unknown)}",
             stacklevel=2,
         )
 
+    return df
+
+
+@lru_cache(maxsize=1)
+def _load_canonical_spellings() -> dict[str, dict[str, dict[str, str]]]:
+    """Load spelling maps from data_info.yml Columns section.
+
+    Returns ``{table: {column: {variant: canonical}}}`` built from the
+    ``spellings`` inverse dictionaries.
+    """
+    info_path = files("lsms_library") / "data_info.yml"
+    with open(info_path, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+
+    result: dict[str, dict[str, dict[str, str]]] = {}
+    for table, cols in data.get("Columns", {}).items():
+        for col, meta in cols.items():
+            if not isinstance(meta, dict):
+                continue
+            spellings = meta.get("spellings")
+            if not spellings:
+                continue
+            variant_map: dict[str, str] = {}
+            for canonical, variants in spellings.items():
+                for v in (variants or []):
+                    variant_map[v] = canonical
+            if variant_map:
+                result.setdefault(table, {})[col] = variant_map
+    return result
+
+
+def _enforce_canonical_spellings(df: pd.DataFrame, method_name: str) -> pd.DataFrame:
+    """Replace variant spellings with canonical forms per data_info.yml.
+
+    Looks up the ``spellings`` dictionaries for the table being loaded
+    and applies them to matching columns.
+    """
+    all_spellings = _load_canonical_spellings()
+    table_spellings = all_spellings.get(method_name, {})
+    for col, variant_map in table_spellings.items():
+        if col in df.columns:
+            df[col] = df[col].replace(variant_map)
+        elif isinstance(df.index, pd.MultiIndex) and col in df.index.names:
+            df = df.rename(index=variant_map, level=col)
     return df
 
 

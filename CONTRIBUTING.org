@@ -512,15 +512,20 @@ The file ~lsms_library/data_info.yml~ defines the canonical schema for all cross
 
 The test suite (~tests/test_schema_consistency.py~) validates all country ~data_scheme.yml~ files against this canonical schema. When adding new tables or columns, update ~data_info.yml~ first, then the per-country files.
 
-The file ~lsms_library/categorical_mapping/spelling.yml~ is an inverse dictionary for cross-country value normalisation. Each key is the canonical spelling; values are accepted variants that map to it:
+Cross-country value normalisation is declared directly in ~data_info.yml~ using ~spellings~ inverse dictionaries on column definitions. Each key is the canonical value; its list contains accepted variant spellings that the runtime maps to the canonical form:
 
 #+begin_src yaml
-Roasted:
-  - Rosted
-  - Raosted
+Sex:
+  type: str
+  required: true
+  spellings:
+    M: [Male, male, Masculin, masculin, Homme, homme, m]
+    F: [Female, female, Féminin, feminin, Femme, femme, f]
 #+end_src
 
-The kinship decomposition dictionary lives separately in ~lsms_library/categorical_mapping/kinship.yml~. Within-country value harmonisation uses ~categorical_mapping.org~ files per country.
+The canonical values are simply the dictionary keys. The runtime replaces variants with canonical forms automatically when data is loaded.
+
+The kinship decomposition dictionary lives in ~lsms_library/categorical_mapping/kinship.yml~. Within-country value harmonisation uses ~categorical_mapping.org~ files per country.
 
 ** Python Helpers for Advanced Cases
 
