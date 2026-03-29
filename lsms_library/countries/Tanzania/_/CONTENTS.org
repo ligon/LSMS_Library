@@ -26,11 +26,59 @@ than a data collection failure.
 Currently for Tanzania we use "Value purchased" divided by "Quantity purchased" to obtain unit values at the level of (some) households, then multiply "Amount consumed" by this unit value to obtain a value of total consumption.  This fails in the last two rounds because we're missing data on "Quantity purchased", so we can't construct unit values.
 
 However, an alternative exists: there's "Community-level" data on prices collected on the same food items we want.   Data on prices seems decent for 2019-20.  Unfortunately, linking the /places/ these prices are observed to the location of the households seems difficult.
-** TODO Link  2019-20 and 2020-21 to panel
+** DONE Link  2019-20 and 2020-21 to panel
+CLOSED: [2026-03-29 Sat]
 According to docs this is possible; e.g., see p. 12 of [[../2019-20/Documentation/tznps_sdd_2019_20_basic_information_document_updated_november_2022.pdf][Basic Information Document]].
 
+Panel IDs and =id_walk= now work for all six waves via the
+=panel_ids.py= script and the Country API.
 
-** TODO Fix r_hhid & UPHI matching problem for 2008-15
+*** Panel design note
+:PROPERTIES:
+:CUSTOM_ID: panel-design
+:END:
+
+Starting in 2014-15 (NPS Round 4) the sample split into two disjoint
+sub-panels that are tracked separately:
+
+- Extended Panel :: ~20% sub-sample of the original 2008--13 NPS
+  cohort.  Followed in 2019-20 (NPS-SDD).
+- Refresh Panel :: Entirely new nationally representative sample drawn
+  in 2014-15 (3,352 households from 419 clusters).  Followed in
+  2020-21 (NPS Round 5), together with a 545-household urban "Booster
+  Sample."
+
+Consequences for the data:
+
+1. *2019-20 and 2020-21 have zero household overlap by design.*  They
+   track different sub-panels, so =panel_attrition= correctly shows no
+   shared IDs.
+2. The Extended Panel (2019-20) chains back to the 2008-09 base IDs
+   via =y4_hhid= $\to$ =r_hhid= $\to$ =UPHI=.
+3. The Refresh Panel (2020-21) chains back only to 2014-15.  The
+   =y4_hhid= values in the 2020-21 data (e.g. =1000-001=) match
+   =r_hhid= values that first appear in 2014-15 Round 4.  These
+   households have no predecessor before 2014-15.
+4. Of the 4,709 households in 2020-21, 4,164 are panel (found in both
+   2014-15 and 2020-21) and 545 are the urban booster with no
+   prior-wave data.
+5. The crosswalk files =npssdd.panel.key.dta= (2019-20) and
+   =npsy5.panel.key.dta= (2020-21) provide individual-level linkage
+   to prior waves.
+
+Source: NPS 2020/21 Basic Information Document, pp. 7--8.
+
+
+** WAITING Fix r_hhid & UPHI matching problem for 2008-15
+The current =panel_ids.py= uses =map_08_15()= for the 2008--15 waves,
+which maps every split-off household back to the parent's canonical
+UPHI-based ID.  After =id_walk= this collapses split-offs and
+originals into the same =(i, t, j)= index, producing ~33k duplicate
+rows in the aggregated =food_acquired= (2,094 affected household-wave
+pairs, concentrated in 2010-11 and 2012-13).  The proposed solution
+below---appending split suffixes to preserve uniqueness---has not yet
+been implemented.
+
 - Observed issue: Non unique index in food_acquired
   Unique pairs of ('round', 'r_hhid') as indices are found to be mapped to multiple UPHIs.
   Example:

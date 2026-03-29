@@ -108,6 +108,25 @@ def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=
 # Derived food tables from food_acquired
 # ---------------------------------------------------------------------------
 
+# Column aliases: map legacy (Tanzania, etc.) names to the canonical names
+# used by the transformation functions below.
+_COLUMN_ALIASES = {
+    'value_purchase': 'Expenditure',
+    'quant_ttl_consume': 'Quantity',
+    'quant_purchase': 'Quantity',  # fallback if quant_ttl_consume absent
+}
+
+
+def _normalize_columns(df):
+    """Rename legacy food_acquired columns to canonical names if needed."""
+    renames = {}
+    for old, new in _COLUMN_ALIASES.items():
+        if new not in df.columns and old in df.columns and new not in renames.values():
+            renames[old] = new
+    if renames:
+        df = df.rename(columns=renames)
+    return df
+
 KNOWN_METRIC = {
     'kg': 1, 'kilogram': 1, 'kilogramme': 1,
     'g': 1/1000, 'gram': 1/1000, 'gramm': 1/1000,
@@ -159,6 +178,7 @@ def food_expenditures_from_acquired(df):
     Returns a DataFrame of total expenditure per household × item × period,
     summed over units.
     """
+    df = _normalize_columns(df)
     if 'Expenditure' not in df.columns:
         raise ValueError("food_acquired must have an 'Expenditure' column")
 
@@ -176,6 +196,7 @@ def food_quantities_from_acquired(df):
     Uses known metric conversions and price-ratio inference to convert
     local units to kg, then sums per household × item × period.
     """
+    df = _normalize_columns(df)
     if 'Quantity' not in df.columns:
         raise ValueError("food_acquired must have a 'Quantity' column")
 
@@ -197,6 +218,7 @@ def food_prices_from_acquired(df):
     Unit values are computed as Expenditure / Quantity_kg, then
     the median is taken across households within each item × period.
     """
+    df = _normalize_columns(df)
     if 'Expenditure' not in df.columns or 'Quantity' not in df.columns:
         raise ValueError("food_acquired must have 'Expenditure' and 'Quantity' columns")
 

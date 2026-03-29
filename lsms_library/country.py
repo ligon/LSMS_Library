@@ -507,26 +507,32 @@ class Wave:
             # Use in-tree path for Make target, but look for output at data_root too
             intree_parquet = self.file_path / "_" / f"{request}.parquet"
             country_name = self.country.name
-            external_parquet = data_root(country_name) / self.year / "_" / f"{request}.parquet"
+            external_parquet = data_root(country_name) / self.wave_folder / "_" / f"{request}.parquet"
 
-            makefile_path = self.file_path.parent /'_'/ "Makefile"
-            if not makefile_path.exists():
-                warnings.warn(f"Makefile not found in {makefile_path.parent}. Unable to generate required data.")
-                return pd.DataFrame()
-
-            cwd_path = self.file_path.parent / "_"
-            relative_parquet_path = intree_parquet.relative_to(cwd_path.parent)
-            env = os.environ.copy()
-            env["LSMS_DATA_DIR"] = str(data_root())
-            subprocess.run(["make", "-s", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True, env=env)
-            logger.info(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...")
-
-            # Check external data_root first, then in-tree fallback
+            # Check if the parquet already exists before invoking Make
             parquet_fn = None
             for candidate in [external_parquet, intree_parquet]:
                 if candidate.exists():
                     parquet_fn = candidate
                     break
+
+            if parquet_fn is None:
+                makefile_path = self.file_path.parent /'_'/ "Makefile"
+                if not makefile_path.exists():
+                    warnings.warn(f"Makefile not found in {makefile_path.parent}. Unable to generate required data.")
+                    return pd.DataFrame()
+
+                cwd_path = self.file_path.parent / "_"
+                relative_parquet_path = intree_parquet.relative_to(cwd_path.parent)
+                env = os.environ.copy()
+                env["LSMS_DATA_DIR"] = str(data_root())
+                subprocess.run(["make", "-s", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True, env=env)
+                logger.info(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...")
+
+                for candidate in [external_parquet, intree_parquet]:
+                    if candidate.exists():
+                        parquet_fn = candidate
+                        break
 
             if parquet_fn is None:
                 logger.warning(f"Parquet file for {request} still missing after running Makefile.")
@@ -559,7 +565,7 @@ class Wave:
         # if food_acquired data is loaded from a parquet file, we assume its unit and food label are already mapped.
         # Check both in-tree and data_root locations (wave scripts write to data_root).
         intree_parquet = self.file_path / "_" / "food_acquired.parquet"
-        external_parquet = data_root(self.country.name) / self.year / "_" / "food_acquired.parquet"
+        external_parquet = data_root(self.country.name) / self.wave_folder / "_" / "food_acquired.parquet"
         if intree_parquet.exists() or external_parquet.exists():
             return df
         #Customed
@@ -975,6 +981,8 @@ class Country:
             Execute legacy Makefile targets either at the country level or for a specific wave.
             """
             base_path = self.file_path if wave is None else self[wave].file_path
+            # Resolve the wave folder for path construction (e.g. '2008-09' -> '2008-15')
+            wave_folder = self.wave_folder_map.get(wave, wave) if wave else None
             repo_root = self.file_path.parent
             candidate_make_dirs: list[Path] = []
             if wave is not None:
@@ -998,7 +1006,7 @@ class Country:
             else:
                 # Check data_root (external) first, then in-tree as fallback
                 if wave is not None:
-                    output_candidates.append(data_root(self.name) / wave / "_" / f"{method_name}.parquet")
+                    output_candidates.append(data_root(self.name) / wave_folder / "_" / f"{method_name}.parquet")
                     output_candidates.append(base_path / "var" / f"{method_name}.parquet")
                     output_candidates.append(base_path / "_" / f"{method_name}.parquet")
                 output_candidates.append(data_root(self.name) / "var" / f"{method_name}.parquet")
@@ -1053,7 +1061,7 @@ class Country:
                 else:
                     # data_root() targets first (matches Makefile VAR_DIR default)
                     if wave is not None:
-                        make_targets.append(data_root(self.name) / wave / "_" / f"{method_name}.parquet")
+                        make_targets.append(data_root(self.name) / wave_folder / "_" / f"{method_name}.parquet")
                     make_targets.append(data_root(self.name) / "var" / f"{method_name}.parquet")
                     # In-tree fallbacks
                     if wave is not None:
