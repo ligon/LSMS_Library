@@ -25,6 +25,28 @@ Root-level symlinks (e.g., `Uganda → lsms_library/countries/Uganda`) are for c
 ## Adding New Surveys
 New surveys are added via YAML config files under `lsms_library/countries/`, not Python code.
 
+## Two Build Paths: YAML vs Makefile/Script
+
+There are two ways a table gets built at the wave level:
+
+### YAML path (`data_info.yml`)
+The preferred path for simple cases. `Wave.grab_data()` reads `idxvars`/`myvars` from the wave's `data_info.yml`, calls `df_data_grabber()` to extract columns from the source `.dta` file, applies formatting functions, and returns a DataFrame. The Country class aggregates waves and caches to `data_root()`. **No parquet is written at the wave level.**
+
+### Makefile/script path (legacy Python scripts)
+Required for cases the YAML structure cannot express. Indicated by `materialize: make` or `!make` in `data_scheme.yml`. `Wave.grab_data()` falls back to running `make` in the wave's `_/` directory, which executes a standalone Python script (e.g., `household_roster.py`) that calls `to_parquet()` to write a `.parquet` file.
+
+**When the script path is necessary** (do not try to replace these with YAML):
+
+- **Multiple observations per wave**: Nigeria has post-planting and post-harvest rounds (`2018Q3`, `2019Q1`) in a single directory (`2018-19/`). The script loads two different source files, assigns different `t` values to each, concatenates, and deduplicates people who leave between rounds. YAML assumes one directory = one `t`.
+
+- **Multi-wave source files**: Tanzania `2008-15/` has a single `.dta` file covering rounds 1--4. The script reads a `round` column and maps it to wave labels. YAML assumes one file = one wave.
+
+- **Complex transformations**: Some tables (Nigeria `food_acquired`, GhanaLSS `food_acquired`) need elaborate unit conversions, label extraction, or cross-file joins that exceed what `df_data_grabber` supports.
+
+**Known issue**: These scripts write parquets to `_/` under the repo tree (e.g., `Uganda/2005-06/_/food_acquired.parquet`). The `data_root()` migration (March 2026) moved the *runtime cache* to `~/.local/share/lsms_library/` but did not update the legacy scripts. Making `to_parquet()` redirect to `data_root()` risks collisions between script outputs and runtime cache outputs (which apply different post-processing: kinship expansion, spelling normalisation, dtype enforcement). This separation is unresolved.
+
+**Rule of thumb**: If a table can be expressed as column mappings from a single source file per wave, use YAML. If it needs cross-file concatenation, per-row `t` assignment, or multi-wave source files, use a script with `materialize: make`.
+
 ## Two Makefiles
 - Top-level `Makefile`: Poetry setup, pytest, build.
 - `lsms_library/Makefile`: Country-specific operations (test, build, materialize, demands).

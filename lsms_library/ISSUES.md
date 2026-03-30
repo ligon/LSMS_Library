@@ -189,7 +189,19 @@
 
 - Waves: 2005-06, 2009-10, 2010-11, 2011-12, 2013-14, 2015-16, 2018-19, 2019-20
 - Error: `IgnoreInCollectedDirError: .dvcignore file should not be in collected dir path: '/home/ligon/Projects/LSMS_Library/lsms_library/countries/Uganda/2005-06/_'`
+- Status: RESOLVED 2026-03-30 -- Replaced 100 per-directory `.dvcignore` files with a single `lsms_library/countries/.dvcignore` using `**/_/*.parquet` pattern.
 ## 2026-03-30 12:33:44Z Uganda – household_roster
 
 - Waves: 2005-06, 2009-10, 2010-11, 2011-12, 2013-14, 2015-16, 2018-19, 2019-20
 - Error: `IgnoreInCollectedDirError: .dvcignore file should not be in collected dir path: '/home/ligon/Projects/LSMS_Library/lsms_library/countries/Uganda/2005-06/_'`
+- Status: RESOLVED 2026-03-30 -- Same `.dvcignore` fix; also added `household_roster` data_info.yml entries for waves 2010-11 through 2019-20.
+
+## 2026-03-30 – data_root() migration incomplete for Makefile/script build path
+
+- The March 2026 `data_root()` migration (`8cfa7157`) moved the Country-class runtime cache to `~/.local/share/lsms_library/`. But legacy wave-level Python scripts (invoked via `materialize: make`) still call `to_parquet(df, 'foo.parquet')` with bare relative paths, writing to `_/` under the repo tree.
+- ~110 stale parquet files currently exist under `_/` directories (Uganda, Malawi, GhanaLSS, Nigeria, Tanzania, etc.).
+- These scripts cannot simply be replaced with YAML configs because they handle edge cases: Nigeria (two obs per wave, different source files per round), Tanzania 2008-15 (four waves in one directory from one multi-round DTA file), and complex transformations (unit conversions, cross-file joins).
+- Naively redirecting `to_parquet()` to `data_root()` risks collisions: scripts produce raw output, but the runtime cache applies post-processing (kinship expansion, spelling normalisation, dtype enforcement). Both would write to the same path.
+- **Proposed approach**: Have `to_parquet()` check for `LSMS_DATA_DIR` env var (already set by `Wave.grab_data()` at country.py:547) and rebase relative paths under `data_root()` when present, writing to `data_root(Country)/wave/_/` to keep wave-level outputs separate from the country-level `var/` cache. Needs careful design to avoid collisions with `_finalize_result()` outputs.
+- **Scope**: `local_tools.to_parquet()`, `Wave.grab_data()` Makefile fallback (country.py:520-560), all `to_parquet()` calls in country scripts (see `CLAUDE.md` "Two Build Paths" section).
+- **Affected countries**: Uganda (all waves), Nigeria (all waves), Tanzania (2008-15, 2019-20, 2020-21), Malawi, GhanaLSS/GhanaSPS, Ethiopia, Burkina Faso, CotedIvoire, Cambodia, Senegal, Serbia, Guatemala, Panama, Rwanda, Togo, Afghanistan, Niger.
