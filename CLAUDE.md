@@ -15,8 +15,10 @@ food = uga.food_expenditures()  # Standardized DataFrame
 ## Country Symlinks
 Root-level symlinks (e.g., `Uganda → lsms_library/countries/Uganda`) are for convenience. Actual config is under `lsms_library/countries/`.
 
-## DVC Caching
-- First call builds from source, caches to `{country}/var/{dataset}.parquet`.
+## DVC Caching and `data_root()`
+- All materialized data (parquets, JSON caches) is written under `data_root()` (`lsms_library/paths.py`), **not** in the repo tree.
+- Default location: `~/.local/share/lsms_library/{Country}/var/{table}.parquet`. Override with `LSMS_DATA_DIR` env var.
+- First call builds from source, caches to `data_root(Country)/var/{table}.parquet`.
 - Subsequent calls read cache (<1 sec).
 - Caches auto-invalidate on source/config changes (hash-based).
 - `LSMS_BUILD_BACKEND=make` bypasses DVC and builds directly with Make (useful for debugging).
@@ -43,7 +45,12 @@ Required for cases the YAML structure cannot express. Indicated by `materialize:
 
 - **Complex transformations**: Some tables (Nigeria `food_acquired`, GhanaLSS `food_acquired`) need elaborate unit conversions, label extraction, or cross-file joins that exceed what `df_data_grabber` supports.
 
-**Known issue**: These scripts write parquets to `_/` under the repo tree (e.g., `Uganda/2005-06/_/food_acquired.parquet`). The `data_root()` migration (March 2026) moved the *runtime cache* to `~/.local/share/lsms_library/` but did not update the legacy scripts. Making `to_parquet()` redirect to `data_root()` risks collisions between script outputs and runtime cache outputs (which apply different post-processing: kinship expansion, spelling normalisation, dtype enforcement). This separation is unresolved.
+**Data separation**: All parquet writes go to `data_root()`, never the repo tree. `to_parquet()` calls `_resolve_data_path()` (in `local_tools.py`), which inspects the call stack to infer country/wave and rewrites relative paths under `data_root()`. This handles three patterns:
+- Bare `foo.parquet` from wave-level scripts → `data_root(Country)/wave/_/foo.parquet`
+- `../var/foo.parquet` from country-level scripts → `data_root(Country)/var/foo.parquet`
+- `../wave/_/foo.parquet` cross-wave refs → `data_root(Country)/wave/_/foo.parquet`
+
+Users can override the location via the `LSMS_DATA_DIR` env var, which `data_root()` reads. Some stale parquets from before this migration still exist in-tree under `_/` directories — they are harmless artifacts.
 
 **Rule of thumb**: If a table can be expressed as column mappings from a single source file per wave, use YAML. If it needs cross-file concatenation, per-row `t` assignment, or multi-wave source files, use a script with `materialize: make`.
 
