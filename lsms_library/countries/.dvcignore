@@ -1,0 +1,7 @@
+# Exclude build artifacts from DVC dependency hashing.
+# Wave-level builds land in _/ alongside config files; without
+# these patterns DVC hashes the parquets as part of deps and
+# triggers spurious stage invalidation.
+**/*.parquet
+**/__pycache__/
+**/*.pyc
