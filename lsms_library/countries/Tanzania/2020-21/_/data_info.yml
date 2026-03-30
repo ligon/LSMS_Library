@@ -35,7 +35,7 @@ shocks:
         i: y5_hhid
         Shock: shockid
     myvars:
-        EffectedIncome:
+        AffectedIncome:
             - hh_r03
             - mapping:
                 INCOME LOSS: True
@@ -50,7 +50,7 @@ shocks:
                 NEITHER: False
                 Neither: False
                 neither: False
-        EffectedAssets:
+        AffectedAssets:
             - hh_r03
             - mapping:
                 INCOME LOSS: False

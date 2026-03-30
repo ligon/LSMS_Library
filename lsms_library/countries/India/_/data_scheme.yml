@@ -5,8 +5,10 @@ Data Scheme:
     index: (t, v, i, pid)
     Sex: str
     Age: int
-    Relationship: str
-    Highest_education: str
+    Generation: int
+    Distance: int
+    Affinity: str
+    Educational Attainment: str
   employment:
     index: (t, v, i, pid)
     Cash_per_day: float

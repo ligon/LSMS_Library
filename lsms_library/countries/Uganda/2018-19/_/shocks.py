@@ -40,16 +40,16 @@ shocks = pd.DataFrame({"i": df.hhid.values.tolist(),
                     "Year": df.s16q02y.values.tolist(), 
                     "Onset":df.Onset.values.tolist(), 
                     "Duration":df.s16q02b.values.tolist(),
-                    "EffectedIncome":df.s10q03a.values.tolist(), 
-                    "EffectedAssets":df.s16q03b.values.tolist(), 
-                    "EffectedProduction":df.s16q03c.values.tolist(), 
-                    "EffectedConsumption":df.s16q03d.values.tolist(), 
+                    "AffectedIncome":df.s10q03a.values.tolist(), 
+                    "AffectedAssets":df.s16q03b.values.tolist(), 
+                    "AffectedProduction":df.s16q03c.values.tolist(), 
+                    "AffectedConsumption":df.s16q03d.values.tolist(), 
                     "HowCoped0":df.s16q04a.values.tolist(),
                     "HowCoped1":df.s16q04b.values.tolist(),
                     "HowCoped2":df.s16q04c.values.tolist()})
 
 #converting data types 
-for col in ["EffectedIncome",  "EffectedAssets",  "EffectedProduction", "EffectedConsumption"]:
+for col in ["AffectedIncome",  "AffectedAssets",  "AffectedProduction", "AffectedConsumption"]:
     shocks[col] = shocks[col].map({"Yes": True,"No": False})
     shocks[col] = shocks[col].astype('boolean')
 shocks = shocks.astype({'Shock': 'category',

@@ -22,6 +22,24 @@ jobs:
         env:
           LSMS_SKIP_AUTH: "1"
         run: poetry run pytest
+
+  # DVC lockfile freshness — runs on all branches but does not block PRs.
+  # Core library changes (country.py, local_tools.py) dirty every country's
+  # lockfile even when outputs are unchanged; a full rebuild requires S3
+  # data access and 20+ minutes.  Keep this advisory so it doesn't block
+  # routine development.
+  dvc-lock-check:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Poetry
+        run: pip install poetry
+      - name: Install dependencies
+        run: poetry install
       - name: Verify DVC lockfiles
         env:
           LSMS_SKIP_AUTH: "1"

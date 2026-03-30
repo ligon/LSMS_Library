@@ -33,7 +33,7 @@ individual_education:
         i: HID
         pid: PID
     myvars:
-        Highest_education: s2aq2
+        Educational Attainment: s2aq2
         Current_grade: s2aq7
 
 
