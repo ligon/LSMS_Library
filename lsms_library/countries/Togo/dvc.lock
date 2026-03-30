@@ -1,9 +1,9 @@
 schema: '2.0'
 stages:
-  materialize@kazakhstan::::household_roster:
+  materialize@togo::::household_roster:
     cmd: cd _ && LSMS_BUILD_BACKEND=make python3 -m lsms_library.cli materialize
-      --country "Kazakhstan" --all-waves --table "household_roster" --format 
-      "parquet" --out ../var/household_roster.parquet
+      --country "Togo" --all-waves --table "household_roster" --format "parquet"
+      --out ../var/household_roster.parquet
     deps:
     - path: ../../cli.py
       hash: md5
@@ -20,11 +20,11 @@ stages:
       isexec: true
     - path: _
       hash: md5
-      md5: 07ac116d445376c6ec960a360e3898a8.dir
-      size: 136
-      nfiles: 1
+      md5: daca3179fa5904892fd0521009d1f7d7.dir
+      size: 41472
+      nfiles: 5
     outs:
     - path: var/household_roster.parquet
       hash: md5
-      md5: f1385ff57267a540453e49643176d6de
-      size: 34028
+      md5: 984e74be9eac40d0e25df6414504917b
+      size: 5030
