@@ -9,7 +9,7 @@ household_roster:
     myvars:
         Sex: ms01q01
         Age: ms01q06a
-        Relation: ms01q02
+        Relationship: ms01q02
 
 cluster_features:
     file: NER_2011_ECVMA_v01_M_Stata8/ecvmamen_p1.dta

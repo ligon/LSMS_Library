@@ -13,7 +13,7 @@ household_roster:
                 1: M
                 2: F
         Age: age
-        Relation: 
+        Relationship: 
             - relhead
             - mapping:
                 1: husband/wife

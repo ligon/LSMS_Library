@@ -35,7 +35,7 @@ def Birthplace(value):
         return pd.NA
     return (lambda x: region_dict[f"{x:3.0f}".strip()])(value)
 
-def Relation(value):
+def Relationship(value):
     '''
     Formatting relationship variable
     '''

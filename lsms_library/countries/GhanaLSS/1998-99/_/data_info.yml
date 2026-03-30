@@ -22,4 +22,4 @@ household_roster:
         Sex: sex
         Age: agey
         Birthplace: s1q10
-        Relation: rel
+        Relationship: rel

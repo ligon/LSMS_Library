@@ -25,7 +25,7 @@ household_roster:
     myvars:
         Sex: sexe
         Age: age
-        Relation: lien
+        Relationship: lien
 
 
 food_acquired:

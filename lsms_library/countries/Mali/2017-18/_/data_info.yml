@@ -22,7 +22,7 @@ household_roster:
     myvars:
         Sex: s1q01
         Age: s1q04a
-        Relation: s1q02
+        Relationship: s1q02
     file: eaci17_s01p1.dta
 
 shocks:

@@ -46,7 +46,7 @@ def Birthplace(value):
     else:
         return value.title()
     
-def Relation(value):
+def Relationship(value):
     '''
     Formatting relationship variable
     '''

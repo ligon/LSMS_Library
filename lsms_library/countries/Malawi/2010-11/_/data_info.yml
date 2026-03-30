@@ -30,7 +30,7 @@ household_roster:
     myvars:
         Sex: hh_b03
         Age: hh_b05a
-        Relation: hh_b04
+        Relationship: hh_b04
 
 
 # panel_ids:
