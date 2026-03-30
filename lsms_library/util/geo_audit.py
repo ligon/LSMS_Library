@@ -15,9 +15,12 @@ Usage:
     python -m lsms_library.util.geo_audit download --all        # all missing
     python -m lsms_library.util.geo_audit ingest Uganda 2013-14 Data/UNPS_Geovars_1314.dta
 
-Environment variables:
-    MICRODATA_API_KEY   World Bank Microdata Library API key (required for download).
-                        Register at https://microdata.worldbank.org to obtain one.
+Configuration:
+    The API key can be set in any of these (checked in order):
+      1. --api-key command-line argument
+      2. MICRODATA_API_KEY environment variable
+      3. ~/.config/lsms_library/config.yml  →  microdata_api_key: YOUR_KEY
+    Register at https://microdata.worldbank.org to obtain a key.
 """
 
 from __future__ import annotations
@@ -413,9 +416,14 @@ def _find_missing_geo_waves() -> list[tuple[str, str, Path]]:
 
 def cmd_download(args: argparse.Namespace) -> None:
     """Download geovariables files from the World Bank Microdata Library."""
-    api_key = args.api_key or os.environ.get("MICRODATA_API_KEY")
+    try:
+        from lsms_library import config as _config
+        api_key = args.api_key or _config.microdata_api_key()
+    except ImportError:
+        api_key = args.api_key or os.environ.get("MICRODATA_API_KEY")
     if not api_key:
-        print("Error: API key required. Set MICRODATA_API_KEY or use --api-key.",
+        print("Error: API key required. Set MICRODATA_API_KEY in env, "
+              "~/.config/lsms_library/config.yml, or use --api-key.",
               file=sys.stderr)
         print("Register at https://microdata.worldbank.org to get an API key.",
               file=sys.stderr)
