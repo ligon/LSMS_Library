@@ -54,6 +54,44 @@ Users can override the location via the `LSMS_DATA_DIR` env var, which `data_roo
 
 **Rule of thumb**: If a table can be expressed as column mappings from a single source file per wave, use YAML. If it needs cross-file concatenation, per-row `t` assignment, or multi-wave source files, use a script with `materialize: make`.
 
+## Joining `v` (cluster) onto tables that lack it
+
+Many roster source files (e.g., Uganda's gsec2) don't carry a cluster column. Join `v` from the survey cover page (e.g., gsec1) using the `dfs:` merge in `data_info.yml`:
+
+```yaml
+household_roster:
+    dfs:
+        - df_roster
+        - df_cluster
+    df_roster:
+        file: ../Data/HH/gsec2.dta
+        idxvars:
+            i: hhid
+            pid: pid
+        myvars:
+            Sex: h2q3
+            Relationship: h2q4
+            Age: h2q8
+    df_cluster:
+        file: ../Data/HH/gsec1.dta
+        idxvars:
+            i: hhid
+        myvars:
+            v: s1aq04a        # <-- v as myvar, NOT idxvar
+    merge_on:
+        - i
+    final_index:
+        - t
+        - v
+        - i
+        - pid
+```
+
+Key details:
+- Put `v` in `myvars` of the sub-df, not `idxvars`. An `idxvars`-only sub-df with empty `myvars` fails in `df_data_grabber`.
+- The cluster column name changes across waves within a country (e.g., Uganda uses `comm`, `h1aq4a`, `parish_code`, `parish_name`, `s1aq04a` across its 8 waves) because sampling schemes evolve.
+- **The `data_scheme.yml` must include `v` in the index** (e.g., `index: (t, v, i, pid)`). If it doesn't, `_normalize_dataframe_index` silently drops `v` from the result.
+
 ## Two Makefiles
 - Top-level `Makefile`: Poetry setup, pytest, build.
 - `lsms_library/Makefile`: Country-specific operations (test, build, materialize, demands).

@@ -202,3 +202,11 @@
 - ~110 stale parquet files from before the migration still exist under `_/` directories in the repo tree. These are harmless — new runs write to `data_root()`. Can be deleted at any time.
 - The `env["LSMS_DATA_DIR"] = str(data_root())` plumbing at country.py:547 and 1233 is now redundant since `to_parquet()` calls `data_root()` directly; could be cleaned up.
 - These Makefile/script builds cannot be replaced with YAML configs — see CLAUDE.md "Two Build Paths" for why (Nigeria multi-obs, Tanzania multi-wave files, complex transformations).
+
+## 2026-03-30 – Vestigial wave-level dvc.yaml files in Uganda and Malawi
+
+- Uganda has wave-level `dvc.yaml` files (`2005-06/dvc.yaml` through `2019-20/dvc.yaml`) that invoke `run_stage.py`. These predate the `data_root()` migration and no longer work correctly: `run_stage.py` writes to `data_root()/var/` (the country-level cache path), but the DVC stage expects output at `wave/var/` in the repo tree. The output is never found, so DVC always falls back to manual aggregation.
+- Worse, the 2005-06 stage actively poisons the country-level cache: it runs `--wave 2005-06` and writes a single-wave result to `data_root("Uganda")/var/household_roster.parquet`, which the runtime then reads as if it were the full country aggregate.
+- Malawi has similar wave-level `dvc.yaml` files but uses the inline `cd _ && cli` pattern instead of `run_stage.py`, so they may behave differently.
+- The country-level `dvc.yaml` (which does `--all-waves`) and the runtime's on-demand build path both work correctly. The wave-level files are redundant.
+- **Recommended fix**: Remove all wave-level `dvc.yaml` files and their corresponding `var/` directories and `.gitkeep` files from Uganda. Audit Malawi for the same issue.
