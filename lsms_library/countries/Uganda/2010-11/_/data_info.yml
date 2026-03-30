@@ -2,14 +2,32 @@ Country: Uganda
 Wave: 2010-11
 
 cluster_features:
-    file: ../Data/GSEC1.dta
-    idxvars:
-        i: HHID
-        v: comm
-    myvars:
-        Region:
-            - region
-            - # Kampala is Central
-              Kampala: Central
-        Rural: urban
-        District: h1aq1  # TODO: Needs string regularization
+    dfs:
+        - df_main
+        - df_geo
+    df_main:
+        file: ../Data/GSEC1.dta
+        idxvars:
+            i: HHID
+            v: comm
+        myvars:
+            Region:
+                - region
+                - # Kampala is Central
+                  Kampala: Central
+            Rural: urban
+            District: h1aq1  # TODO: Needs string regularization
+    df_geo:
+        file: ../Data/UNPS_Geovars_1011.dta
+        idxvars:
+            i: HHID
+            v: comm
+        myvars:
+            Latitude: lat_mod
+            Longitude: lon_mod
+    merge_on:
+        - v
+        - i
+    final_index:
+        - t
+        - v

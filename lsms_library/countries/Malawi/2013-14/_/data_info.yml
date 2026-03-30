@@ -2,17 +2,33 @@ Country: MalawiIHPS
 Wave: 2013-14
 
 cluster_features:
-    file: HH_MOD_A_FILT_13.dta
-    idxvars:
-        v: ea_id
-    myvars:
-        Region: region
-        District: district
-        Rural: 
-            - reside
-            - mapping:
-                rural: 0
-                urban: 1
+    dfs:
+        - df_main
+        - df_geo
+    df_main:
+        file: HH_MOD_A_FILT_13.dta
+        idxvars:
+            v: ea_id
+        myvars:
+            Region: region
+            District: district
+            Rural:
+                - reside
+                - mapping:
+                    rural: 0
+                    urban: 1
+    df_geo:
+        file: HouseholdGeovariables_IHPS_13.dta
+        idxvars:
+            v: ea_id
+        myvars:
+            Latitude: lat_dd_mod
+            Longitude: lon_dd_mod
+    merge_on:
+        - v
+    final_index:
+        - t
+        - v
 
 household_roster:
     file: HH_MOD_B_13.dta

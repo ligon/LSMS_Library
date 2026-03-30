@@ -2,14 +2,32 @@ Country: Senegal
 Wave: 2018-19
 
 cluster_features:
-  file: s00_me_sen2018.dta
-  idxvars:
-      v:
-        - vague
-        - grappe
-  myvars:
-      Region: s00q01
-      Rural: s00q04
+  dfs:
+      - df_main
+      - df_geo
+  df_main:
+      file: s00_me_sen2018.dta
+      idxvars:
+          v:
+            - vague
+            - grappe
+      myvars:
+          Region: s00q01
+          Rural: s00q04
+  df_geo:
+      file: grappe_gps_sen2018.dta
+      idxvars:
+          v:
+            - vague
+            - grappe
+      myvars:
+          Latitude: lat_dd_mod
+          Longitude: lon_dd_mod
+  merge_on:
+      - v
+  final_index:
+      - t
+      - v
 
 household_roster:
   dfs:
