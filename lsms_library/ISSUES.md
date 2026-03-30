@@ -181,3 +181,15 @@
 
 - Waves: 2005-06, 2009-10, 2010-11, 2011-12, 2013-14, 2015-16, 2018-19, 2019-20
 - Error: `TypeError: Can only reorder levels on a hierarchical axis.`
+## 2026-03-30 12:32:33Z Togo – household_roster
+
+- Waves: 2018
+- Error: `IgnoreInCollectedDirError: .dvcignore file should not be in collected dir path: '/home/ligon/Projects/LSMS_Library/lsms_library/countries/Togo/_'`
+## 2026-03-30 12:32:33Z Uganda – household_roster
+
+- Waves: 2005-06, 2009-10, 2010-11, 2011-12, 2013-14, 2015-16, 2018-19, 2019-20
+- Error: `IgnoreInCollectedDirError: .dvcignore file should not be in collected dir path: '/home/ligon/Projects/LSMS_Library/lsms_library/countries/Uganda/2005-06/_'`
+## 2026-03-30 12:33:44Z Uganda – household_roster
+
+- Waves: 2005-06, 2009-10, 2010-11, 2011-12, 2013-14, 2015-16, 2018-19, 2019-20
+- Error: `IgnoreInCollectedDirError: .dvcignore file should not be in collected dir path: '/home/ligon/Projects/LSMS_Library/lsms_library/countries/Uganda/2005-06/_'`
