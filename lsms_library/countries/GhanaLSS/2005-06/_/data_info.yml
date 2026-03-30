@@ -20,4 +20,4 @@ household_roster:
         Sex: s1q2
         Age: s1q5y
         Birthplace: s1q11
-        Relation: s1q3
+        Relationship: s1q3

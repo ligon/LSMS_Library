@@ -11,7 +11,7 @@ household_roster:
     myvars:
         Sex: sexe
         Age: age
-        Relation: lien
+        Relationship: lien
 
 cluster_features:
     file: s00_me_bfa2021.dta

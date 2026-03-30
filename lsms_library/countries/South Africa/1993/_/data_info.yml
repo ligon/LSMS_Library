@@ -10,7 +10,7 @@ household_roster:
     myvars: 
         Sex: gender_c
         Age: age
-        Relation: 
+        Relationship: 
             - rel_head
             - mapping:
                 1: "Resident Head"

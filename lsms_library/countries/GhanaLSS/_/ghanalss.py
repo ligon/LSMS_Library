@@ -48,7 +48,7 @@ def Birthplace(value):
     else:
         return value.title() if isinstance(value,str) else pd.NA
 
-def Relation(value):
+def Relationship(value):
     '''
     Formatting relationship variable
     '''

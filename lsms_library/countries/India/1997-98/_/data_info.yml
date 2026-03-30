@@ -12,7 +12,7 @@ household_roster:
   myvars:
       Sex: v01a02
       Age: v01a04
-      Relation: v01a03
+      Relationship: v01a03
       Educational Attainment: v01a05
 employment:
   file:

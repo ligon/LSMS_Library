@@ -51,7 +51,7 @@ household_roster:
           - s01q03a
           - s01q03b
           - s01q03c
-        Relation: s01q02
+        Relationship: s01q02
   df_temp:
       file: s00_me_sen2018.dta
       idxvars:

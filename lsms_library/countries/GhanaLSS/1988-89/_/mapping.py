@@ -37,7 +37,7 @@ def Birthplace(value):
         value_key = None
     return region_dict.get(value_key, pd.NA)
 
-def Relation(value):
+def Relationship(value):
     '''
     Formatting relationship variable
     '''

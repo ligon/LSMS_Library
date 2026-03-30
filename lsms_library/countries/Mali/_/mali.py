@@ -36,7 +36,7 @@ def Age(value):
     else:
         return int(value)
 
-def Relation(value):
+def Relationship(value):
     '''
     Formatting relationship variable
     '''

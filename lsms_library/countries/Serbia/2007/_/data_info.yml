@@ -9,5 +9,5 @@ household_roster:
         i: dom
     myvars:
         Sex: pol
-        Relation: srodstvo
+        Relationship: srodstvo
         Age: starost

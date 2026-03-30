@@ -13,7 +13,7 @@ household_roster:
           - mapping:
               1: Male
               2: Female
-        Relation: 
+        Relationship: 
           - s01a203
           - mapping:
               1: Head

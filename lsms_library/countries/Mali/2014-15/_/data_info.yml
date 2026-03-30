@@ -39,7 +39,7 @@ household_roster:
     myvars:
         Sex: s01q01
         Age: s01q04a
-        Relation: s01q02
+        Relationship: s01q02
         
 food_acquired:
     idxvars:
@@ -155,7 +155,7 @@ household_education:
         myvars:
             Sex: s01q01
             Age: s01q04a
-            Relation: s01q02
+            Relationship: s01q02
     merge_on:
         - v
         - i

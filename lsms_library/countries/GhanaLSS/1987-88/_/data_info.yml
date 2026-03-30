@@ -19,7 +19,7 @@ household_roster:
         Sex: SEX
         Age: AGEY
         Birthplace: REGION
-        Relation: REL
+        Relationship: REL
 
 
 

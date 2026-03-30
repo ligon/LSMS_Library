@@ -8,6 +8,6 @@ household_roster:
         i: hhid
         pid: member_id
     myvars:
-        Relation: S2_2
+        Relationship: S2_2
         Sex: S2_3
         Age: S2_5

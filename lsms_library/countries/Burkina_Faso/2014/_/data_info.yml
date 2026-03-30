@@ -11,7 +11,7 @@ household_roster:
     myvars:
         Sex: B2
         Age: B4
-        Relation: B5
+        Relationship: B5
 
 cluster_features:
     dfs:

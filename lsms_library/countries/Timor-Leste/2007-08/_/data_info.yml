@@ -9,5 +9,5 @@ household_roster:
         pid: pid
     myvars:
         Sex: q01a01
-        Relation: q01a02
+        Relationship: q01a02
         Age: q01a05y

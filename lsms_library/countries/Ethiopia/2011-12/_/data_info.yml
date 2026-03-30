@@ -51,7 +51,7 @@ household_roster:
     myvars:
         Sex: hh_s1q03
         Age: hh_s1q04_a
-        Relation: hh_s1q02
+        Relationship: hh_s1q02
 
 shocks:
     file: sect8_hh_w1.dta
