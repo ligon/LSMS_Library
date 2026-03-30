@@ -80,6 +80,24 @@ Other Relative:      [0, 0, consanguineal]
 Other Family:        [0, 0, consanguineal]
 Adopted Child:       [-1, 0, consanguineal]
 
+# --- English variants (Uganda, etc.) ---
+# Lower-case and compound forms that .title() normalises.
+Son/Daughter:                [-1, 0, consanguineal]
+Step Child:                  [-1, 0, step]
+Stepchild:                   [-1, 0, step]
+Grand Child:                 [-2, 0, consanguineal]
+Nephew/Niece:                [-1, 1, consanguineal]
+Other Relatives:             [0, 0, consanguineal]
+Other (Specify):             [0, 0, unrelated]
+Other:                       [0, 0, unrelated]
+Parent Of Head Or Spouse:    [1, 0, consanguineal]
+Sister/Brother Of Head Or Spouse: [0, 1, consanguineal]
+Brother/Sister:              [0, 1, consanguineal]
+Son/Daughter-In-Law:         [-1, 0, affinal]
+Father/Mother-In-Law:        [1, 0, affinal]
+Brother/Sister-In-Law:       [0, 1, affinal]
+Head Of Household:           [0, 0, consanguineal]
+
 # --- French (EHCVM / LSMS-ISA francophone) ---
 # Labels appear in title case after .title() formatting.
 
@@ -179,3 +197,24 @@ Enfant Confie:           [-1, 0, foster]
 Enfant Adopté:           [-1, 0, consanguineal]
 Enfant Adopte:           [-1, 0, consanguineal]
 Enfant Adoptif:          [-1, 0, consanguineal]
+
+# --- French comma-separated variants (Togo EHCVM) ---
+# Togo uses ", " instead of "/" between gendered alternatives.
+"Conjoint ( E )":                        [0, 0, affinal]
+"Conjoint (E)":                          [0, 0, affinal]
+"Conjoint( E )":                         [0, 0, affinal]
+"Conjoint(E)":                           [0, 0, affinal]
+"Fils, Fille":                           [-1, 0, consanguineal]
+"Père, Mère":                            [1, 0, consanguineal]
+"Pere, Mere":                            [1, 0, consanguineal]
+"Frère, Sœur":                           [0, 1, consanguineal]
+"Frère, Soeur":                          [0, 1, consanguineal]
+"Frere, Soeur":                          [0, 1, consanguineal]
+"Frère, S\x9Cur":                        [0, 1, consanguineal]
+"Petit Fils, Petite Fille":              [-2, 0, consanguineal]
+"Autres Parents Du Cm/Conjoint":         [0, 0, consanguineal]
+"Autres Parents Du Cm":                  [0, 0, consanguineal]
+"Personne Non Apparentée Au Cm/Conjoint": [0, 0, unrelated]
+"Personne Non Apparentee Au Cm/Conjoint": [0, 0, unrelated]
+"Personne Non Apparentée Au Cm":         [0, 0, unrelated]
+"Personne Non Apparentee Au Cm":         [0, 0, unrelated]
