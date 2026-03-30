@@ -827,8 +827,21 @@ class Country:
         lookup = self._market_lookup(column)
         idx_names = list(df.index.names)
         flat = df.reset_index()
-        flat = flat.merge(lookup.reset_index(), on=['i', 't'], how='left')
+        # Ensure merge keys have compatible dtypes (library convention: string IDs)
+        for key in ['i', 't']:
+            if key in flat.columns:
+                flat[key] = flat[key].astype(str)
+        lkup = lookup.reset_index()
+        for key in ['i', 't']:
+            if key in lkup.columns:
+                lkup[key] = lkup[key].astype(str)
+        flat = flat.merge(lkup, on=['i', 't'], how='left')
         flat = flat.dropna(subset=['m'])
+        # Drop village/cluster index (v) since m supersedes it
+        if 'v' in idx_names:
+            idx_names = [n for n in idx_names if n != 'v']
+            if 'v' in flat.columns:
+                flat = flat.drop(columns=['v'])
         # Insert m after t to match cfe convention (i, t, m, ...)
         new_idx = []
         for n in idx_names:
