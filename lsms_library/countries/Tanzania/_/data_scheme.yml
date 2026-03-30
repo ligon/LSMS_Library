@@ -9,8 +9,8 @@ Data Scheme:
 
   shocks:
     index: (t, i, Shock)
-    EffectedIncome: bool
-    EffectedAssets: bool
+    AffectedIncome: bool
+    AffectedAssets: bool
     HowCoped0: str
     HowCoped1: str
     HowCoped2: str
@@ -20,7 +20,9 @@ Data Scheme:
     index: (t, v, i, pid)
     Sex: str
     Age: int
-    Relationship: str
+    Generation: int
+    Distance: int
+    Affinity: str
     materialize: make
 
   food_acquired: !make

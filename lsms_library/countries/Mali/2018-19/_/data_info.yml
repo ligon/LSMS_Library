@@ -59,7 +59,7 @@ individual_education:
             - menage 
             - numind
     myvars:
-        Highest Education: 'educ_hi'
+        Educational Attainment: 'educ_hi'
 
 
 shocks:
@@ -70,28 +70,28 @@ shocks:
             - menage
         Shock: s14q01
     myvars:
-        EffectedIncome:
+        AffectedIncome:
             - s14q04a
             - mapping:
                 Diminué: True
                 Augmenté: True
                 Inchangé: False
                 Non-concerné: False
-        EffectedAssets:
+        AffectedAssets:
             - s14q04b
             - mapping:
                 Diminué: True
                 Augmenté: True
                 Inchangé: False
                 Non-concerné: False
-        EffectedProduction:
+        AffectedProduction:
             - s14q04c
             - mapping:
                 Diminué: True
                 Augmenté: True
                 Inchangé: False
                 Non-concerné: False
-        EffectedConsumption:
+        AffectedConsumption:
             - s14q04d
             - mapping:
                 Diminué: True

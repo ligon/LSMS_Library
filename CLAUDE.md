@@ -33,6 +33,45 @@ New surveys are added via YAML config files under `lsms_library/countries/`, not
 ## Data Access
 Underlying microdata must be obtained from the [World Bank Microdata Library](https://microdata.worldbank.org/) under their terms of use. Contributors need GPG/PGP keys for repository write access.
 
+## Canonical Schema (`data_info.yml`)
+`lsms_library/data_info.yml` is the single source of truth for cross-country conventions:
+- **Required columns** per table (e.g., `household_roster` requires `Sex`, `Age`, `Generation`, `Distance`, `Affinity`)
+- **Accepted values** (e.g., `Sex: [M, F]`, `Affinity: [consanguineal, affinal, step, foster, unrelated, guest, servant]`)
+- **Rejected spellings** (e.g., `Relation` → use `Generation, Distance, Affinity`; `Effected` → `Affected`)
+
+Tests in `test_schema_consistency.py` read from this file — never hardcode schema rules in tests.
+
+## Kinship Decomposition
+`household_roster` uses a decomposed representation of kinship (Kroeber 1909) instead of a single `Relationship` string. Four columns replace one:
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `Sex` | str | `M` or `F` |
+| `Generation` | int | Vertical distance from head (0=same, +1=parent, -1=child) |
+| `Distance` | int | Collateral distance (0=lineal, 1=sibling line, 2=cousin) |
+| `Affinity` | str | `consanguineal`, `affinal`, `step`, `foster`, `unrelated`, `guest`, `servant` |
+
+The runtime automatically expands any `Relationship` column into these three via `_expand_kinship()` in `_finalize_result()`, using the dictionary in `lsms_library/categorical_mapping/kinship.yml`. Per-wave `data_info.yml` files continue to produce a `Relationship` string from raw data — the decomposition happens transparently.
+
+**Adding new labels:** If a survey has an unrecognized relationship string, a warning is emitted. Add the label to `lsms_library/categorical_mapping/kinship.yml` with its `[Generation, Distance, Affinity]` tuple.
+
+## Automatic Categorical Mappings
+If a column or index name in a returned DataFrame matches a table name in the country's `categorical_mapping.org` (case-insensitive), and that table has a `Preferred Label` column, the mapping is applied automatically. No YAML `mappings:` declaration needed.
+
+For tables whose names don't match column names (e.g., `harmonize_food` for index `j`), use the explicit `mappings:` syntax in `data_info.yml`.
+
+## Cross-Country Value Normalisation (`data_info.yml` spellings)
+Columns in `data_info.yml` can declare a `spellings` inverse dictionary that the runtime enforces automatically. Each key is the canonical value; its list contains accepted variant spellings:
+```yaml
+Sex:
+  type: str
+  required: true
+  spellings:
+    M: [Male, male, Masculin, masculin, Homme, homme, m]
+    F: [Female, female, Féminin, feminin, Femme, femme, f]
+```
+The canonical values are simply `spellings.keys()`. The runtime replaces variants with canonical forms in `_finalize_result()` via `_enforce_canonical_spellings()`. This applies to both column values and index levels.
+
 ## Pandas Conventions (>=3.0)
 This codebase targets pandas 3.0+. Follow these rules in all new and modified code:
 

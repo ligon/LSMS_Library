@@ -17,18 +17,18 @@ df = df[df['s9q01'] == '1. YES'] #filter for valid entry
 
 shocks = pd.DataFrame({"j": df.household_id.values.tolist(),
                     "Shock":df.shock_type.values.tolist(), 
-                    "EffectedIncome":df.s9q03a.values.tolist(), 
-                    "EffectedAssets":df.s9q03b.values.tolist(), 
-                    "EffectedProduction":df.s9q03c.values.tolist(), 
-                    "EffectedConsumption":df.s9q03e.values.tolist(), 
-                    "EffectedFoodStock":df.s9q03d.values.tolist(), 
+                    "AffectedIncome":df.s9q03a.values.tolist(), 
+                    "AffectedAssets":df.s9q03b.values.tolist(), 
+                    "AffectedProduction":df.s9q03c.values.tolist(), 
+                    "AffectedConsumption":df.s9q03e.values.tolist(), 
+                    "AffectedFoodStock":df.s9q03d.values.tolist(), 
                     "HowCoped0":df.s9q04_1.values.tolist(),
                     "HowCoped1":df.s9q04_2.values.tolist(),
                     "HowCoped2":df.s9q04_3.values.tolist(),
                     })
 
 #converting data types 
-for col in ["EffectedIncome",  "EffectedAssets",  "EffectedProduction", "EffectedConsumption", "EffectedFoodStock"]:
+for col in ["AffectedIncome",  "AffectedAssets",  "AffectedProduction", "AffectedConsumption", "AffectedFoodStock"]:
     shocks[col] = shocks[col].map({"2. DECREASED": True,"1. INCREASED": False, "3. DID NOT CHANGE": False})
     shocks[col] = shocks[col].fillna(False).astype('boolean')
 shocks = shocks.astype({'Shock': 'category',

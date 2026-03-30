@@ -23,3 +23,85 @@ Index Info:
     panel_ids: (t, i)
     assets: (t, i, j)
     individual_education: (t, v, i, pid)
+
+# Canonical column definitions for cross-country tables.
+# 'required: true' means every country declaring this table must include
+# the column.  'spellings' is an inverse dictionary: each key is the
+# canonical value, its list contains accepted variant spellings that the
+# runtime maps to the canonical form.  The canonical values are simply
+# spellings.keys().
+Columns:
+  household_roster:
+    # Kinship decomposition (Kroeber 1909; Romney & D'Andrade 1964).
+    # Sex x Generation x Distance x Affinity recovers all conventional
+    # relationship labels without redundancy.
+    Sex:
+      type: str
+      required: true
+      spellings:
+        M: [Male, male, Masculin, masculin, Homme, homme, m, MALE]
+        F: [Female, female, Féminin, feminin, Femme, femme, f, FEMALE]
+    Age:
+      type: int
+      required: true
+    Generation:
+      type: int
+      required: true
+      note: vertical distance from head (0=same, +1=parent, -1=child, etc.)
+    Distance:
+      type: int
+      required: true
+      note: collateral distance (0=lineal, 1=sibling line, 2=cousin line)
+    Affinity:
+      type: str
+      required: true
+      spellings:
+        consanguineal: []
+        affinal: []
+        step: []
+        foster: []
+        unrelated: []
+        guest: []
+        servant: []
+  cluster_features:
+    Region:
+      type: str
+      required: true
+    Rural:
+      type: str
+      required: true
+    District:
+      type: str
+  shocks:
+    AffectedIncome:
+      type: bool
+    AffectedAssets:
+      type: bool
+    AffectedProduction:
+      type: bool
+    AffectedConsumption:
+      type: bool
+    HowCoped0:
+      type: str
+    HowCoped1:
+      type: str
+    HowCoped2:
+      type: str
+  interview_date:
+    Int_t:
+      type: datetime
+  individual_education:
+    Educational Attainment:
+      type: str
+  panel_ids:
+    previous_i:
+      type: str
+
+# Spellings that must never appear in column names.  Key is the rejected
+# spelling; value is the canonical replacement.
+Rejected Spellings:
+  Relation: Generation, Distance, Affinity
+  Relationship: Generation, Distance, Affinity
+  Effected: Affected
+  Highest_education: Educational Attainment
+  Highest Education: Educational Attainment

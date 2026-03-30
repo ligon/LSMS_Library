@@ -35,7 +35,9 @@ Data Scheme:
     index: (t, v, i, pid)
     Sex: str
     Age: int
-    Relationship: str
+    Generation: int
+    Distance: int
+    Affinity: str
     materialize: make
   panel_ids:
     index: (t, i)

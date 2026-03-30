@@ -48,7 +48,7 @@ if list(idx_names) != target_idx:
     s = s.reset_index()
     # Drop any extra index columns
     for col in s.columns:
-        if col not in target_idx and col not in ['EffectedIncome', 'EffectedAssets',
+        if col not in target_idx and col not in ['AffectedIncome', 'AffectedAssets',
                                                    'HowCoped0', 'HowCoped1', 'HowCoped2']:
             s = s.drop(columns=[col], errors='ignore')
     s = s.set_index(target_idx)

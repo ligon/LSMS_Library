@@ -957,6 +957,53 @@ class Country:
         return merged.set_index(df.index.names)
     
 
+    def _apply_categorical_mappings(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Auto-apply categorical mappings where table names match columns or indices.
+
+        For each column or index level in *df*, check whether
+        ``self.categorical_mapping`` contains a table with the same name
+        (case-insensitive).  If the table has a ``Preferred Label``
+        column, build a replacement dictionary from the first other
+        column → ``Preferred Label`` and apply it.
+        """
+        cat_maps = self.categorical_mapping
+        if not cat_maps:
+            return df
+
+        # Build case-insensitive lookup
+        lower_lookup = {name.lower(): name for name in cat_maps}
+
+        def _build_replace_dict(table: pd.DataFrame) -> dict | None:
+            if "Preferred Label" not in table.columns:
+                return None
+            source_cols = [c for c in table.columns if c != "Preferred Label"]
+            if not source_cols:
+                return None
+            return table.set_index(source_cols[0])["Preferred Label"].to_dict()
+
+        # Apply to columns
+        for col in df.columns:
+            key = lower_lookup.get(col.lower())
+            if key is None:
+                continue
+            rdict = _build_replace_dict(cat_maps[key])
+            if rdict:
+                df[col] = df[col].replace(rdict)
+
+        # Apply to index levels
+        if isinstance(df.index, pd.MultiIndex):
+            for level_name in df.index.names:
+                if level_name is None:
+                    continue
+                key = lower_lookup.get(level_name.lower())
+                if key is None:
+                    continue
+                rdict = _build_replace_dict(cat_maps[key])
+                if rdict:
+                    df = df.rename(index=rdict, level=level_name)
+
+        return df
+
     def _finalize_result(self, df: Any, scheme_entry: dict[str, Any], method_name: str) -> pd.DataFrame | dict[str, Any]:
         """
         Apply final harmonization steps (index augmentation, normalization, id walk)
@@ -989,6 +1036,18 @@ class Country:
                 and self._updated_ids_cache is not None
             ):
                 df = id_walk(df, self.updated_ids)
+
+            # Expand Relationship -> Generation, Distance, Affinity
+            if "Relationship" in df.columns:
+                df = _expand_kinship(df)
+
+            # Auto-apply categorical mappings where table name matches
+            # a column or index name (issue #49)
+            df = self._apply_categorical_mappings(df)
+
+            # Normalise variant spellings to canonical forms
+            if method_name:
+                df = _enforce_canonical_spellings(df, method_name)
 
             # Enforce declared dtypes from data_scheme.yml
             if isinstance(scheme_entry, dict):
@@ -1754,9 +1813,119 @@ _SCHEME_DTYPE_MAP = {
     'float': pd.Float64Dtype(),
     'str': pd.StringDtype(),
     'string': pd.StringDtype(),
+    'datetime': 'to_datetime',
+    'date': 'to_datetime',
+    'timestamp': 'to_datetime',
 }
 
 _SCHEME_SKIP_KEYS = frozenset({'index', 'materialize', 'backend'})
+
+
+@lru_cache(maxsize=1)
+def _load_kinship_map() -> dict[str, tuple[int, int, str]]:
+    """Load the kinship dictionary from kinship.yml.
+
+    Returns a dict mapping relationship label strings to
+    ``(Generation, Distance, Affinity)`` tuples.
+    """
+    kinship_path = files("lsms_library") / "categorical_mapping" / "kinship.yml"
+    with open(kinship_path, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    return {label: tuple(vals) for label, vals in data.items()}
+
+
+def _expand_kinship(df: pd.DataFrame) -> pd.DataFrame:
+    """Expand a Relationship column into Generation, Distance, Affinity.
+
+    Uses the dictionary in ``categorical_mapping/kinship.yml``.
+    Unrecognised labels produce NA values and a warning listing the
+    unknown strings so they can be added to kinship.yml.
+    """
+    if "Relationship" not in df.columns:
+        return df
+
+    kinship = _load_kinship_map()
+
+    gen = []
+    dist = []
+    aff = []
+    unknown = set()
+
+    for val in df["Relationship"]:
+        if pd.isna(val):
+            gen.append(pd.NA)
+            dist.append(pd.NA)
+            aff.append(pd.NA)
+            continue
+        label = str(val).strip().title()
+        tup = kinship.get(label) or kinship.get(str(val).strip())
+        if tup is not None:
+            gen.append(tup[0])
+            dist.append(tup[1])
+            aff.append(tup[2])
+        else:
+            unknown.add(str(val).strip())
+            gen.append(pd.NA)
+            dist.append(pd.NA)
+            aff.append(pd.NA)
+
+    df["Generation"] = pd.array(gen, dtype=pd.Int64Dtype())
+    df["Distance"] = pd.array(dist, dtype=pd.Int64Dtype())
+    df["Affinity"] = pd.array(aff, dtype=pd.StringDtype())
+    df = df.drop(columns=["Relationship"])
+
+    if unknown:
+        warnings.warn(
+            f"Unknown relationship labels (add to kinship.yml): "
+            f"{sorted(unknown)}",
+            stacklevel=2,
+        )
+
+    return df
+
+
+@lru_cache(maxsize=1)
+def _load_canonical_spellings() -> dict[str, dict[str, dict[str, str]]]:
+    """Load spelling maps from data_info.yml Columns section.
+
+    Returns ``{table: {column: {variant: canonical}}}`` built from the
+    ``spellings`` inverse dictionaries.
+    """
+    info_path = files("lsms_library") / "data_info.yml"
+    with open(info_path, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+
+    result: dict[str, dict[str, dict[str, str]]] = {}
+    for table, cols in data.get("Columns", {}).items():
+        for col, meta in cols.items():
+            if not isinstance(meta, dict):
+                continue
+            spellings = meta.get("spellings")
+            if not spellings:
+                continue
+            variant_map: dict[str, str] = {}
+            for canonical, variants in spellings.items():
+                for v in (variants or []):
+                    variant_map[v] = canonical
+            if variant_map:
+                result.setdefault(table, {})[col] = variant_map
+    return result
+
+
+def _enforce_canonical_spellings(df: pd.DataFrame, method_name: str) -> pd.DataFrame:
+    """Replace variant spellings with canonical forms per data_info.yml.
+
+    Looks up the ``spellings`` dictionaries for the table being loaded
+    and applies them to matching columns.
+    """
+    all_spellings = _load_canonical_spellings()
+    table_spellings = all_spellings.get(method_name, {})
+    for col, variant_map in table_spellings.items():
+        if col in df.columns:
+            df[col] = df[col].replace(variant_map)
+        elif isinstance(df.index, pd.MultiIndex) and col in df.index.names:
+            df = df.rename(index=variant_map, level=col)
+    return df
 
 
 def _enforce_declared_dtypes(df: pd.DataFrame, scheme_entry: dict[str, Any]) -> None:
@@ -1773,7 +1942,11 @@ def _enforce_declared_dtypes(df: pd.DataFrame, scheme_entry: dict[str, Any]) -> 
             if isinstance(declared_type, list):
                 df[col] = df[col].astype(pd.StringDtype())
             elif isinstance(declared_type, str) and declared_type in _SCHEME_DTYPE_MAP:
-                df[col] = df[col].astype(_SCHEME_DTYPE_MAP[declared_type])
+                target = _SCHEME_DTYPE_MAP[declared_type]
+                if target == 'to_datetime':
+                    df[col] = pd.to_datetime(df[col], errors='coerce')
+                else:
+                    df[col] = df[col].astype(target)
         except (ValueError, TypeError):
             pass  # best-effort; don't break loading
 

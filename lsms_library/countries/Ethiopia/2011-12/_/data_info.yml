@@ -41,25 +41,25 @@ shocks:
         i: household_id
         Shock: hh_s8q00
     myvars:
-        EffectedIncome:
+        AffectedIncome:
             - hh_s8q03_a
             - mapping:
                 Decrease: True
                 Did Not Change: False
                 Increase: True
-        EffectedAssets:
+        AffectedAssets:
             - hh_s8q03_b
             - mapping:
                 Decrease: True
                 Did Not Change: False
                 Increase: True
-        EffectedProduction:
+        AffectedProduction:
             - hh_s8q03_c
             - mapping:
                 Decrease: True
                 Did Not Change: False
                 Increase: True
-        EffectedConsumption:
+        AffectedConsumption:
             - hh_s8q03_e
             - mapping:
                 Decrease: True

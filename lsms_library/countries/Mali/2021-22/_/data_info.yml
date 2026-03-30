@@ -57,7 +57,7 @@ individual_education:
             - menage 
             - numind
     myvars:
-        Highest Education: 'educ_hi'
+        Educational Attainment: 'educ_hi'
 
 interview_date:
     file: s00_me_mli2021.dta
@@ -79,28 +79,28 @@ shocks:
             - menage
         Shock: s14bq01
     myvars:
-        EffectedIncome:
+        AffectedIncome:
             - s14bq04a
             - mapping:
                 Diminué: True
                 Augmenté: True
                 Inchangé: False
                 Non-concerné: False
-        EffectedAssets:
+        AffectedAssets:
             - s14bq04b
             - mapping:
                 Diminué: True
                 Augmenté: True
                 Inchangé: False
                 Non-concerné: False
-        EffectedProduction:
+        AffectedProduction:
             - s14bq04c
             - mapping:
                 Diminué: True
                 Augmenté: True
                 Inchangé: False
                 Non-concerné: False
-        EffectedConsumption:
+        AffectedConsumption:
             - s14bq04d
             - mapping:
                 Diminué: True
