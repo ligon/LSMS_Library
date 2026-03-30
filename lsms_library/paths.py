@@ -38,9 +38,10 @@ def data_root(country: str | None = None) -> Path:
     -------
     Path
     """
-    env = os.environ.get("LSMS_DATA_DIR", "").strip()
-    if env:
-        base = Path(env)
+    from . import config as _config
+    _override = _config.data_dir()
+    if _override:
+        base = Path(_override)
     else:
         try:
             import platformdirs
