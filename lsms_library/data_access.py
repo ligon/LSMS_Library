@@ -35,6 +35,8 @@ from enum import Enum, auto
 from pathlib import Path
 from urllib.parse import urlparse
 
+from . import config
+
 logger = logging.getLogger(__name__)
 
 _COUNTRIES_DIR = Path(__file__).resolve().parent / "countries"
@@ -67,7 +69,7 @@ def _has_s3_write_creds() -> bool:
 
 def _has_wb_api_key() -> bool:
     """Check whether a World Bank Microdata API key is set."""
-    return bool(os.environ.get("MICRODATA_API_KEY"))
+    return bool(config.microdata_api_key())
 
 
 def _validate_wb_api_key(api_key: str) -> bool:
@@ -117,7 +119,7 @@ def permission_to_read(path: str | Path | None = None) -> AccessTier:
         return AccessTier.S3_READ
 
     # WB API key — validates on first check, caches result
-    api_key = os.environ.get("MICRODATA_API_KEY")
+    api_key = config.microdata_api_key()
     if api_key:
         if _wb_key_validated is None:
             _wb_key_validated = _validate_wb_api_key(api_key)
@@ -376,7 +378,7 @@ def get_data_file(path: str | Path,
             logger.debug("DVC/S3 fetch failed: %s", e)
 
     # 3. Try World Bank download (requires WB_API or higher)
-    api_key = os.environ.get("MICRODATA_API_KEY")
+    api_key = config.microdata_api_key()
     if not api_key:
         logger.warning("No MICRODATA_API_KEY set; cannot fetch from World Bank.")
         return None
