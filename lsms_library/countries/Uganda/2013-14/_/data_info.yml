@@ -2,15 +2,31 @@ Country: Uganda
 Wave: 2013-14
 
 household_roster:
-    file:
-        - ../Data/GSEC2.dta
-    idxvars:
-        i: HHID
-        pid: PID
-    myvars:
-        Sex: h2q3
-        Relationship: h2q4
-        Age: h2q8
+    dfs:
+        - df_roster
+        - df_cluster
+    df_roster:
+        file: ../Data/GSEC2.dta
+        idxvars:
+            i: HHID
+            pid: PID
+        myvars:
+            Sex: h2q3
+            Relationship: h2q4
+            Age: h2q8
+    df_cluster:
+        file: ../Data/GSEC1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            v: h1aq4a
+    merge_on:
+        - i
+    final_index:
+        - t
+        - v
+        - i
+        - pid
 
 people_last7days:
     file: GSEC15.dta

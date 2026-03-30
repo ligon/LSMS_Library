@@ -17,7 +17,7 @@ Data Scheme:
     Longitude: float
   
   household_roster:
-    index: (i, pid, t)
+    index: (t, v, i, pid)
     Sex: str
     Age: int
     Generation: int
