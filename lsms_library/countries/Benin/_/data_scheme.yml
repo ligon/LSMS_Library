@@ -1,4 +1,4 @@
-Country: Togo
+Country: Benin
 
 Data Scheme:
   cluster_features:
@@ -7,6 +7,7 @@ Data Scheme:
     Rural: str
     Latitude: float
     Longitude: float
+
   household_roster:
     index: (t, v, i, pid)
     Sex: str

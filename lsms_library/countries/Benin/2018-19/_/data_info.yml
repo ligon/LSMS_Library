@@ -1,30 +1,19 @@
-Country: Niger
-Wave: 2011-12
-
-household_roster:
-    file: NER_2011_ECVMA_v01_M_Stata8/ecvmaind_p1p2_en.dta
-    idxvars:
-        i: hid
-        pid: ms01q00
-    myvars:
-        Sex: ms01q01
-        Age: ms01q06a
-        Relationship: ms01q02
+Country: Benin
+Wave: 2018-19
 
 cluster_features:
     dfs:
         - df_main
         - df_geo
     df_main:
-        file: NER_2011_ECVMA_v01_M_Stata8/ecvmamen_p1.dta
+        file: s00_me_ben2018.dta
         idxvars:
-            i: hid
+            i: menage
             v: grappe
         myvars:
-            Region: region
-            District: strate
+            Region: s00q01
             Rural:
-                - urbrur
+                - s00q04
                 - mapping:
                     Rural: Rural
                     rural: Rural
@@ -33,16 +22,26 @@ cluster_features:
                     urbain: Urban
                     URBAIN: Urban
     df_geo:
-        file: NER_2011_ECVMA_v01_M_Stata8/NER_HouseholdGeovars_Y1.dta
+        file: grappe_gps_ben2018.dta
         idxvars:
-            i: hid
             v: grappe
         myvars:
             Latitude: lat_dd_mod
             Longitude: lon_dd_mod
     merge_on:
         - v
-        - i
     final_index:
         - t
         - v
+
+household_roster:
+    file: ehcvm_individu_ben2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+        pid: numind
+    myvars:
+        Sex: sexe
+        Age: age
+        Relation: lien

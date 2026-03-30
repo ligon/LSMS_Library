@@ -1,0 +1,5 @@
+outs:
+- md5: f6ef3db3c71683fcb5d621eda597d137
+  size: 64855
+  hash: md5
+  path: unps_geovars_2013_14.dta

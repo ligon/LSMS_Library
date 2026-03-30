@@ -22,15 +22,33 @@ people_last7days:
         Girls : h15a4
 
 cluster_features:
-    file: ../Data/GSEC1.dta
-    idxvars:
-        i: HHID
-        v: comm
-    myvars:
-        Rural: urban
-        District: h1aq1  # TODO: This is numeric codes; needs mapping to names.
-        Region:
-            - region
-            - # Fix some values
-              " Kampala": "Central"
-              "Central without Kampala": "Central"
+    dfs:
+        - df_main
+        - df_geo
+    df_main:
+        file: ../Data/GSEC1.dta
+        idxvars:
+            i: HHID
+            v: comm
+        myvars:
+            Rural: urban
+            District: h1aq1  # TODO: This is numeric codes; needs mapping to names.
+            Region:
+                - region
+                - # Fix some values
+                  " Kampala": "Central"
+                  "Central without Kampala": "Central"
+    df_geo:
+        file: ../Data/UNPS_Geovars_0910.dta
+        idxvars:
+            i: HHID
+            v: comm
+        myvars:
+            Latitude: lat_mod
+            Longitude: lon_mod
+    merge_on:
+        - v
+        - i
+    final_index:
+        - t
+        - v

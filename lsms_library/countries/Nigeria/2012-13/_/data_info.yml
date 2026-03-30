@@ -2,22 +2,40 @@ Country: Nigeria
 Wave: 2012-13
 
 cluster_features:
-    file: Post Planting Wave 2/Household/secta_plantingw2.dta
-    idxvars:
-        i: hhid
-        v: ea
-    myvars:
-        Region: zone
-        District: state
-        Rural:
-            - sector
-            - mapping:
-                rural: Rural
-                Rural: Rural
-                RURAL: Rural
-                urban: Urban
-                Urban: Urban
-                URBAN: Urban
+    dfs:
+        - df_main
+        - df_geo
+    df_main:
+        file: Post Planting Wave 2/Household/secta_plantingw2.dta
+        idxvars:
+            i: hhid
+            v: ea
+        myvars:
+            Region: zone
+            District: state
+            Rural:
+                - sector
+                - mapping:
+                    rural: Rural
+                    Rural: Rural
+                    RURAL: Rural
+                    urban: Urban
+                    Urban: Urban
+                    URBAN: Urban
+    df_geo:
+        file: nga_householdgeovars_y2.csv
+        idxvars:
+            i: hhid
+            v: ea
+        myvars:
+            Latitude: LAT_DD_MOD
+            Longitude: LON_DD_MOD
+    merge_on:
+        - v
+        - i
+    final_index:
+        - t
+        - v
 
 shocks:
     file: Post Harvest Wave 2/Household/sect15a_harvestw2.dta

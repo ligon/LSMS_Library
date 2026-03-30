@@ -2,16 +2,32 @@ Country: Malawi
 Wave: 2010-11
 
 cluster_features:
-    file: Full_Sample/Household/hh_mod_a_filt.dta
-    idxvars:
-        v: ea_id
-    myvars:
-        Rural: 
-            - reside
-            - mapping:
-                rural: 0
-                urban: 1
-        # Region: hh_a01
+    dfs:
+        - df_main
+        - df_geo
+    df_main:
+        file: Full_Sample/Household/hh_mod_a_filt.dta
+        idxvars:
+            v: ea_id
+        myvars:
+            Rural:
+                - reside
+                - mapping:
+                    rural: 0
+                    urban: 1
+            # Region: hh_a01
+    df_geo:
+        file: Full_Sample/Geovariables/HH_level/householdgeovariables.dta
+        idxvars:
+            v: ea_id
+        myvars:
+            Latitude: lat_dd_mod
+            Longitude: lon_dd_mod
+    merge_on:
+        - v
+    final_index:
+        - t
+        - v
 
 subjective_well_being:
     file: Full_Sample/Household/hh_mod_t.dta

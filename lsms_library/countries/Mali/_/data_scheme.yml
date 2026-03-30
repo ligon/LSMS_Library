@@ -5,6 +5,8 @@ Data Scheme:
     index: (t, v)
     Region: str
     Rural: str
+    Latitude: float
+    Longitude: float
   household_roster:
     index: (t, v, i, pid)
     Sex: str

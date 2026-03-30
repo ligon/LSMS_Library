@@ -14,19 +14,35 @@ household_roster:
         Relationship: lien
 
 cluster_features:
-    file: s00_me_ner2018.dta
-    idxvars:
-        i: menage
-        v: grappe
-    myvars:
-        Region: s00q01
-        District: s00q02
-        Rural:
-            - s00q04
-            - mapping:
-                Rural: Rural
-                rural: Rural
-                RURAL: Rural
-                Urbain: Urban
-                urbain: Urban
-                URBAIN: Urban
+    dfs:
+        - df_main
+        - df_geo
+    df_main:
+        file: s00_me_ner2018.dta
+        idxvars:
+            i: menage
+            v: grappe
+        myvars:
+            Region: s00q01
+            District: s00q02
+            Rural:
+                - s00q04
+                - mapping:
+                    Rural: Rural
+                    rural: Rural
+                    RURAL: Rural
+                    Urbain: Urban
+                    urbain: Urban
+                    URBAIN: Urban
+    df_geo:
+        file: grappe_gps_ner2018.dta
+        idxvars:
+            v: grappe
+        myvars:
+            Latitude: lat_dd_mod
+            Longitude: lon_dd_mod
+    merge_on:
+        - v
+    final_index:
+        - t
+        - v

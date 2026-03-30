@@ -3,12 +3,28 @@ Wave: 2018-19
 
 
 cluster_features:
-    file: ehcvm_conso_mli2018.dta
-    idxvars:
-        v: grappe
-    myvars:
-        Region: region
-        Rural: milieu
+    dfs:
+        - df_main
+        - df_geo
+    df_main:
+        file: ehcvm_conso_mli2018.dta
+        idxvars:
+            v: grappe
+        myvars:
+            Region: region
+            Rural: milieu
+    df_geo:
+        file: grappe_gps_mli2018.dta
+        idxvars:
+            v: grappe
+        myvars:
+            Latitude: lat_dd_mod
+            Longitude: lon_dd_mod
+    merge_on:
+        - v
+    final_index:
+        - t
+        - v
 
 
 household_roster:

@@ -13,11 +13,29 @@ household_roster:
         Age: h2q8
 
 cluster_features:
-    file: ../Data/GSEC1.dta
-    idxvars:
-        i: HHID
-        v: comm
-    myvars:
-        Region: region
-        Rural: urban
-        District: h1aq1
+    dfs:
+        - df_main
+        - df_geo
+    df_main:
+        file: ../Data/GSEC1.dta
+        idxvars:
+            i: HHID
+            v: comm
+        myvars:
+            Region: region
+            Rural: urban
+            District: h1aq1
+    df_geo:
+        file: ../Data/UNPS_Geovars_1112.dta
+        idxvars:
+            i: HHID
+            v: comm
+        myvars:
+            Latitude: lat_mod
+            Longitude: lon_mod
+    merge_on:
+        - v
+        - i
+    final_index:
+        - t
+        - v

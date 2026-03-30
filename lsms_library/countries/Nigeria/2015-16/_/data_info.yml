@@ -2,26 +2,44 @@ Country: Nigeria
 Wave: 2015-16
 
 cluster_features:
-    file: secta_plantingw3.dta
-    idxvars:
-        i: hhid
-        v: ea
-    myvars:
-        Region: zone
-        District: state
-        Rural:
-            - sector
-            - mapping:
-                1. URBAN: Urban
-                2. RURAL: Rural
-                1. Urban: Urban
-                2. Rural: Rural
-                rural: Rural
-                Rural: Rural
-                RURAL: Rural
-                urban: Urban
-                Urban: Urban
-                URBAN: Urban
+    dfs:
+        - df_main
+        - df_geo
+    df_main:
+        file: secta_plantingw3.dta
+        idxvars:
+            i: hhid
+            v: ea
+        myvars:
+            Region: zone
+            District: state
+            Rural:
+                - sector
+                - mapping:
+                    1. URBAN: Urban
+                    2. RURAL: Rural
+                    1. Urban: Urban
+                    2. Rural: Rural
+                    rural: Rural
+                    Rural: Rural
+                    RURAL: Rural
+                    urban: Urban
+                    Urban: Urban
+                    URBAN: Urban
+    df_geo:
+        file: NGA_HouseholdGeovars_Y3.dta
+        idxvars:
+            i: hhid
+            v: ea
+        myvars:
+            Latitude: lat_dd_mod
+            Longitude: lon_dd_mod
+    merge_on:
+        - v
+        - i
+    final_index:
+        - t
+        - v
 
 shocks:
     file: sect15a_harvestw3.dta
