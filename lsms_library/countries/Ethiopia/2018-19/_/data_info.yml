@@ -2,22 +2,40 @@ Country: Ethiopia
 Wave: 2018-19
 
 cluster_features:
-    file: sect_cover_hh_w4.dta
-    idxvars:
-        i: household_id
-        v: ea_id
-    myvars:
-        Region: saq01
-        District: saq02
-        Rural:
-            - saq14
-            - mapping:
-                RURAL: Rural
-                Rural: Rural
-                rural: Rural
-                URBAN: Urban
-                Urban: Urban
-                urban: Urban
+    dfs:
+        - df_main
+        - df_geo
+    df_main:
+        file: sect_cover_hh_w4.dta
+        idxvars:
+            i: household_id
+            v: ea_id
+        myvars:
+            Region: saq01
+            District: saq02
+            Rural:
+                - saq14
+                - mapping:
+                    RURAL: Rural
+                    Rural: Rural
+                    rural: Rural
+                    URBAN: Urban
+                    Urban: Urban
+                    urban: Urban
+    df_geo:
+        file: ETH_HouseholdGeovariables_Y4.dta
+        idxvars:
+            i: household_id
+            v: ea_id
+        myvars:
+            Latitude: lat_dd_mod
+            Longitude: lon_dd_mod
+    merge_on:
+        - v
+        - i
+    final_index:
+        - t
+        - v
 
 household_roster:
     file: sect1_hh_w4.dta

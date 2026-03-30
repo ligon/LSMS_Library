@@ -1,0 +1,5 @@
+outs:
+- md5: 51c9982eba21ca6d2cb7e4a20c15cffc
+  size: 55355
+  hash: md5
+  path: unps_geovars_2015_16.dta

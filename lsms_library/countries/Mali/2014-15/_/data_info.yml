@@ -2,12 +2,28 @@ Country: Mali
 Wave: 2014-15
 
 cluster_features:
-    file: eaci2014_agregatconso.dta
-    idxvars:
-        v: grappe
-    myvars:
-        Region: region
-        Rural: milieu
+    dfs:
+        - df_main
+        - df_geo
+    df_main:
+        file: eaci2014_agregatconso.dta
+        idxvars:
+            v: grappe
+        myvars:
+            Region: region
+            Rural: milieu
+    df_geo:
+        file: eaci_geovariables_2014.dta
+        idxvars:
+            v: grappe
+        myvars:
+            Latitude: lat_dd_mod
+            Longitude: lon_dd_mod
+    merge_on:
+        - v
+    final_index:
+        - t
+        - v
 
 household_roster:
     file: EACIIND_p1.dta

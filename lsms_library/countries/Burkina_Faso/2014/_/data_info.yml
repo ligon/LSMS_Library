@@ -14,22 +14,38 @@ household_roster:
         Relation: B5
 
 cluster_features:
-    file: emc2014_p1_logement_27022015.dta
-    idxvars:
-        i: menage
-        v: zd
-    myvars:
-        Region: region
-        District: province
-        Rural:
-            - milieu
-            - mapping:
-                Rural: Rural
-                rural: Rural
-                RURAL: Rural
-                Urbain: Urban
-                urbain: Urban
-                URBAIN: Urban
+    dfs:
+        - df_main
+        - df_geo
+    df_main:
+        file: emc2014_p1_logement_27022015.dta
+        idxvars:
+            i: menage
+            v: zd
+        myvars:
+            Region: region
+            District: province
+            Rural:
+                - milieu
+                - mapping:
+                    Rural: Rural
+                    rural: Rural
+                    RURAL: Rural
+                    Urbain: Urban
+                    urbain: Urban
+                    URBAIN: Urban
+    df_geo:
+        file: emc2014_agri_gps.dta
+        idxvars:
+            v: zd
+        myvars:
+            Latitude: lat_dd_mod
+            Longitude: lon_dd_mod
+    merge_on:
+        - v
+    final_index:
+        - t
+        - v
 
 food_acquired:
     idxvars:

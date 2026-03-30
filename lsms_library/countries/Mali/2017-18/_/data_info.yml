@@ -2,12 +2,28 @@ Country: Mali
 Wave: 2017-18
 
 cluster_features:
-    file: eaci17_s00p1.dta
-    idxvars:
-        v: grappe
-    myvars:
-        Region: s0q01
-        Rural: s0q04
+    dfs:
+        - df_main
+        - df_geo
+    df_main:
+        file: eaci17_s00p1.dta
+        idxvars:
+            v: grappe
+        myvars:
+            Region: s0q01
+            Rural: s0q04
+    df_geo:
+        file: eaci_geovariables_2017.dta
+        idxvars:
+            v: grappe
+        myvars:
+            Latitude: lat_dd_mod
+            Longitude: lon_dd_mod
+    merge_on:
+        - v
+    final_index:
+        - t
+        - v
 
 household_roster:
     idxvars:

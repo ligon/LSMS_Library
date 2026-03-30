@@ -2,29 +2,47 @@ Country: Ethiopia
 Wave: 2015-16
 
 cluster_features:
-    file: sect_cover_hh_w3.dta
-    idxvars:
-        i: household_id2
-        v: ea_id2
-    myvars:
-        Region: saq01
-        District: saq02
-        Rural:
-            - rural
-            - mapping:
-                rural: Rural
-                Rural: Rural
-                RURAL: Rural
-                small town: Urban
-                Small town: Urban
-                Small Town: Urban
-                SMALL TOWN: Urban
-                Small town (urban): Urban
-                urban: Urban
-                Urban: Urban
-                URBAN: Urban
-                Large town (urban): Urban
-                Meduim and large town: Urban
+    dfs:
+        - df_main
+        - df_geo
+    df_main:
+        file: sect_cover_hh_w3.dta
+        idxvars:
+            i: household_id2
+            v: ea_id2
+        myvars:
+            Region: saq01
+            District: saq02
+            Rural:
+                - rural
+                - mapping:
+                    rural: Rural
+                    Rural: Rural
+                    RURAL: Rural
+                    small town: Urban
+                    Small town: Urban
+                    Small Town: Urban
+                    SMALL TOWN: Urban
+                    Small town (urban): Urban
+                    urban: Urban
+                    Urban: Urban
+                    URBAN: Urban
+                    Large town (urban): Urban
+                    Meduim and large town: Urban
+    df_geo:
+        file: ETH_HouseholdGeovars_y3.dta
+        idxvars:
+            i: household_id2
+            v: ea_id2
+        myvars:
+            Latitude: lat_dd_mod
+            Longitude: lon_dd_mod
+    merge_on:
+        - v
+        - i
+    final_index:
+        - t
+        - v
 
 household_roster:
     file: sect1_hh_w3.dta

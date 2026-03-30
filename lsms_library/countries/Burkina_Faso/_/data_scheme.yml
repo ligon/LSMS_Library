@@ -6,6 +6,8 @@ Data Scheme:
     Region: str
     District: str
     Rural: str
+    Latitude: float
+    Longitude: float
 
   household_roster:
     index: (t, v, i, pid)

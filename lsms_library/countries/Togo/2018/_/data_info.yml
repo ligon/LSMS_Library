@@ -1,6 +1,39 @@
 Country: Togo
 Wave: 2018
 
+cluster_features:
+    dfs:
+        - df_main
+        - df_geo
+    df_main:
+        file: ../Data1/s00_me_tgo2018.dta
+        idxvars:
+            i: menage
+            v: grappe
+        myvars:
+            Region: s00q01
+            Rural:
+                - s00q04
+                - mapping:
+                    Rural: Rural
+                    rural: Rural
+                    RURAL: Rural
+                    Urbain: Urban
+                    urbain: Urban
+                    URBAIN: Urban
+    df_geo:
+        file: ../Data1/grappe_gps_tgo2018.dta
+        idxvars:
+            v: grappe
+        myvars:
+            Latitude: lat_dd_mod
+            Longitude: lon_dd_mod
+    merge_on:
+        - v
+    final_index:
+        - t
+        - v
+
 household_roster:
     file:
         - ../Data1/s01_me_tgo2018.dta

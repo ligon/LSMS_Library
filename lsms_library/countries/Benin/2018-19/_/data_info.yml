@@ -1,30 +1,17 @@
-Country: Burkina Faso
+Country: Benin
 Wave: 2018-19
-
-household_roster:
-    file: ehcvm_individu_bfa2018.dta
-    idxvars:
-        i:
-            - grappe
-            - menage
-        pid: numind
-    myvars:
-        Sex: sexe
-        Age: age
-        Relation: lien
 
 cluster_features:
     dfs:
         - df_main
         - df_geo
     df_main:
-        file: s00_me_bfa2018.dta
+        file: s00_me_ben2018.dta
         idxvars:
             i: menage
             v: grappe
         myvars:
             Region: s00q01
-            District: s00q02
             Rural:
                 - s00q04
                 - mapping:
@@ -35,7 +22,7 @@ cluster_features:
                     urbain: Urban
                     URBAIN: Urban
     df_geo:
-        file: grappe_gps_bfa2018.dta
+        file: grappe_gps_ben2018.dta
         idxvars:
             v: grappe
         myvars:
@@ -47,17 +34,14 @@ cluster_features:
         - t
         - v
 
-food_acquired:
-    file: s07b_me_bfa2018.dta
+household_roster:
+    file: ehcvm_individu_ben2018.dta
     idxvars:
-        v: grappe
-        visit: vague
         i:
             - grappe
             - menage
-        j: s07bq01
-        u: s07bq03b
+        pid: numind
     myvars:
-        Quantity: s07bq03a
-        Expenditure: s07bq08
-        Produced: s07bq04
+        Sex: sexe
+        Age: age
+        Relation: lien

@@ -72,6 +72,10 @@ Columns:
       required: true
     District:
       type: str
+    Latitude:
+      type: float
+    Longitude:
+      type: float
   shocks:
     AffectedIncome:
       type: bool
