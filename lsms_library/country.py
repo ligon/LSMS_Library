@@ -192,6 +192,25 @@ def _property_value(instance, prop_name):
 
 
 class Wave:
+    """A single survey wave within a country.
+
+    Typically obtained via bracket notation on a
+    :class:`Country`::
+
+        wave = uga['2019-20']
+        df = wave.household_roster()
+
+    Parameters
+    ----------
+    year : str
+        Wave label (e.g. ``'2019-20'``).
+    wave_folder : str
+        Subdirectory name on disk (may differ from *year* for
+        multi-round surveys).
+    country : Country
+        Parent country instance.
+    """
+
     def __init__(self, year: str, wave_folder: str, country: Country) -> None:
         self.year = year
         self.country = country
@@ -587,18 +606,41 @@ class Wave:
     
     
 class Country:
-    #Customed: EEP 153 solving demand equation required data
+    """Primary interface to a single country's LSMS survey data.
+
+    Provides access to all survey waves, standardized tables, and panel data.
+    Tables listed in ``data_scheme`` are available as callable attributes
+    (e.g. ``country.food_expenditures()``).
+
+    Parameters
+    ----------
+    country_name : str
+        Directory name under ``lsms_library/countries/``
+        (e.g. ``'Uganda'``, ``'Tanzania'``).
+    preload_panel_ids : bool
+        If True, compute panel ID mappings eagerly at construction time.
+        Default is False (lazy).
+    verbose : bool
+        Enable verbose logging.
+    trust_cache : bool
+        If True, read existing cached Parquet files directly without
+        validating their hashes.  Useful on clusters with pre-built data.
+
+    Examples
+    --------
+    >>> import lsms_library as ll
+    >>> uga = ll.Country('Uganda')
+    >>> uga.waves
+    ['2005-06', '2009-10', ...]
+    >>> uga.data_scheme
+    ['food_acquired', 'household_roster', ...]
+    >>> food = uga.food_expenditures()
+    """
+
     required_list = ['food_acquired', 'household_roster', 'cluster_features',
                  'interview_date', 'household_characteristics',
                  'food_expenditures', 'food_quantities', 'food_prices',
                  'fct', 'nutrition','name','_panel_ids_cache', 'panel_ids']
-
-
-    # from uganda:
-    # required_list = ['food_expenditures.parquet', 'food_quantities.parquet', 'food_prices.parquet',
-    #                 'household_characteristics.parquet', 'other_features.parquet', 'shocks.parquet',
-    #                 'nonfood_expenditures.parquet', 'enterprise_income.parquet', 'assets.parquet',
-    #                 'earnings.parquet', 'housing.parquet', 'income.parquet', 'fct.parquet', 'nutrition.parquet']
 
     def __init__(self, country_name: str, preload_panel_ids: bool = False, verbose: bool = False, trust_cache: bool = False) -> None:
         # Validate country name: reject path traversal attempts
@@ -1592,12 +1634,14 @@ class Country:
 
     @property
     def panel_ids(self) -> dict[str, Any] | None:
+        """Raw panel-ID tables keyed by wave.  Computed lazily on first access."""
         if self._panel_ids_cache is None or self._updated_ids_cache is None:
             self._compute_panel_ids()
         return self._panel_ids_cache
 
     @property
     def updated_ids(self) -> dict[str, dict[str, str]] | None:
+        """Mapping ``{old_id: new_id}`` per wave for ID harmonization.  Computed lazily."""
         if self._panel_ids_cache is None or self._updated_ids_cache is None:
             self._compute_panel_ids()
         return self._updated_ids_cache

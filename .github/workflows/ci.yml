@@ -45,6 +45,34 @@ jobs:
           LSMS_SKIP_AUTH: "1"
         run: poetry run python -m lsms_library.cli refresh-dvc-locks --all --check
 
+  # Build and deploy documentation to GitHub Pages
+  docs:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install mkdocs-material 'mkdocstrings[python]'
+      - name: Build docs
+        env:
+          LSMS_SKIP_AUTH: "1"
+        run: mkdocs build --strict
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
+
   # Full data tests — builds Uganda tables and runs invariance checks
   data-tests:
     runs-on: ubuntu-latest
