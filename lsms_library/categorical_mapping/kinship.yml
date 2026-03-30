@@ -97,6 +97,13 @@ Son/Daughter-In-Law:         [-1, 0, affinal]
 Father/Mother-In-Law:        [1, 0, affinal]
 Brother/Sister-In-Law:       [0, 1, affinal]
 Head Of Household:           [0, 0, consanguineal]
+Son/Daughter Of Head:        [-1, 0, consanguineal]
+Son/Daughter Of Head Or Spouse: [-1, 0, consanguineal]
+Son / Daughter Of Head Or Spouse: [-1, 0, consanguineal]
+Sister/Brother Of Head Or Spouse: [0, 1, consanguineal]
+Sister / Brother Of Head Or Spouse: [0, 1, consanguineal]
+Nephew / Niece:              [-1, 1, consanguineal]
+Non Relative:                [0, 0, unrelated]
 
 # --- French (EHCVM / LSMS-ISA francophone) ---
 # Labels appear in title case after .title() formatting.
