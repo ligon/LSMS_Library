@@ -365,36 +365,33 @@ stages:
       md5: ccce8fb8a7f14eb757bc937b73103afe
       size: 3533892
   materialize@uganda::::nutrition:
-    cmd: python3 ../../util/run_stage.py --backend "make" --country "Uganda" 
-      --all-waves --table "nutrition" --format "parquet" --target ""
+    cmd: cd _ && LSMS_BUILD_BACKEND=make python3 -m lsms_library.cli materialize
+      --country "Uganda" --all-waves --table "nutrition" --format "parquet" 
+      --out ../var/nutrition.parquet
     deps:
     - path: ../../cli.py
       hash: md5
-      md5: 35168707be75b76a6f8d6d40e4e24bcf
-      size: 15679
+      md5: 049c779121577873dd8c8b42c242e4a2
+      size: 19547
     - path: ../../country.py
       hash: md5
-      md5: ebb0cbd7edb3c4a1e83de68337740318
-      size: 61034
+      md5: a734fc4028a3329e652568ae96d47e4d
+      size: 88290
     - path: ../../local_tools.py
       hash: md5
-      md5: 64b7664a0daadf52128d0da52cb11056
-      size: 41708
+      md5: 0139aa1c244e3b3de2a891246a4ff1a5
+      size: 48579
       isexec: true
-    - path: ../../util/run_stage.py
-      hash: md5
-      md5: 1d0e09531bee7064d67a16c8ed485b59
-      size: 2502
     - path: _
       hash: md5
-      md5: f7114bc98611d4b9bf777336efc54fd0.dir
-      size: 3482996
-      nfiles: 40
+      md5: ca60d7e0a17917367645c8db3fe287c0.dir
+      size: 3470797
+      nfiles: 39
     outs:
     - path: var/nutrition.parquet
       hash: md5
-      md5: e4587d7d9dbec207d42fd6ef463ff540
-      size: 3100634
+      md5: 493c662db03a0979e671e4d06c2f9cee
+      size: 1391
   materialize@uganda::::people_last7days:
     cmd: cd _ && LSMS_BUILD_BACKEND=make python3 -m lsms_library.cli materialize
       --country "Uganda" --all-waves --table "people_last7days" --format 
