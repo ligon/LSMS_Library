@@ -98,6 +98,34 @@ def _resolve_data_path(fn: str, stack_depth: int = 2) -> str:
     return fn_str
 
 
+def _try_get_data_file(fn: str | Path) -> Path | None:
+    """Try to obtain *fn* via :func:`data_access.get_data_file`.
+
+    Translates the various path forms used by :func:`get_dataframe`
+    into a path relative to the countries directory (which is what
+    ``get_data_file`` expects).
+
+    Returns the local ``Path`` on success, or ``None``.
+    """
+    try:
+        from .data_access import get_data_file
+    except Exception:
+        return None
+
+    p = Path(fn)
+    # Already relative to countries dir (e.g. "Uganda/2013-14/Data/GSEC1.dta")
+    if not p.is_absolute():
+        rel = p
+    else:
+        # Absolute path — try to strip the countries prefix
+        try:
+            rel = p.relative_to(_COUNTRIES_DIR)
+        except ValueError:
+            return None
+
+    return get_data_file(rel)
+
+
 def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: str | None = None, categories_only: bool = False) -> pd.DataFrame:
     """From a file named fn, try to return a dataframe.
 
@@ -222,8 +250,18 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
             df = read_file(fn,convert_categoricals=convert_categoricals,encoding=encoding)
 
     else:
-        with dvc.api.open(fn,mode='rb') as f:
-            df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
+        try:
+            with dvc.api.open(fn,mode='rb') as f:
+                df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
+        except Exception:
+            # Last resort: try get_data_file() which can download from
+            # the World Bank Microdata Library (requires MICRODATA_API_KEY).
+            local_path = _try_get_data_file(fn)
+            if local_path is not None:
+                with open(local_path, mode='rb') as f:
+                    df = read_file(f, convert_categoricals=convert_categoricals, encoding=encoding)
+            else:
+                raise
 
     return df
 

@@ -60,10 +60,20 @@ creds_file = gpg_path / 's3_creds'
 SKIP_AUTH = os.getenv("LSMS_SKIP_AUTH", "").lower() in {"1", "true", "yes"}
 
 if not SKIP_AUTH and not creds_file.exists():
+    # Try non-interactive unlock first (WB API key → auto-decrypt S3 creds).
+    # Falls back to interactive passphrase prompt if no API key is set.
     try:
-        authenticate()
-    except Exception as exc:
-        warnings.warn(
-            f"Automatic DVC authentication failed: {exc}. "
-            "Set LSMS_SKIP_AUTH=1 to suppress this in non-interactive environments."
-        )
+        from .data_access import permissions as _check_permissions
+        _perms = _check_permissions()
+        if not creds_file.exists():
+            # Auto-unlock didn't produce creds — fall back to interactive
+            raise RuntimeError("auto-unlock did not produce S3 credentials")
+    except Exception:
+        try:
+            authenticate()
+        except Exception as exc:
+            warnings.warn(
+                f"Automatic DVC authentication failed: {exc}. "
+                "Set LSMS_SKIP_AUTH=1 to suppress, or set "
+                "MICRODATA_API_KEY for non-interactive access."
+            )
