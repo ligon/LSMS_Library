@@ -1,166 +1,88 @@
 stages:
   materialize:
     do:
-      cmd: python3 ../../util/run_stage.py --backend "${item.backend}" --country "${item.country}"
-        --all-waves --table "${item.table}" --format "${item.format}" --target "${item.target}"
+      cmd: cd _ && LSMS_BUILD_BACKEND=make python3 -m lsms_library.cli materialize --country "${item.country}" --all-waves --table "${item.table}" --format "${item.format}" --out ../var/${item.table}.${item.format}
       deps:
       - ../../cli.py
       - ../../country.py
       - ../../local_tools.py
-      - ../../util/run_stage.py
       - _
       outs:
-      - ${item.output}
+      - var/${item.table}.${item.format}
     foreach:
-      uganda::::cluster_features:
-        country: Uganda
-        wave: null
-        table: cluster_features
-        format: parquet
-        backend: cli
-        target: ''
-        output: var/cluster_features.parquet
-      uganda::::earnings:
-        country: Uganda
-        wave: null
-        table: earnings
-        format: parquet
-        backend: make
-        target: ''
-        output: var/earnings.parquet
-      uganda::::enterprise_income:
-        country: Uganda
-        wave: null
-        table: enterprise_income
-        format: parquet
-        backend: make
-        target: ''
-        output: var/enterprise_income.parquet
-      uganda::::food_acquired:
-        country: Uganda
-        wave: null
-        table: food_acquired
-        format: parquet
-        backend: make
-        target: ''
-        output: var/food_acquired.parquet
-      uganda::::food_expenditures:
-        country: Uganda
-        wave: null
-        table: food_expenditures
-        format: parquet
-        backend: make
-        target: ''
-        output: var/food_expenditures.parquet
-      uganda::::food_prices:
-        country: Uganda
-        wave: null
-        table: food_prices
-        format: parquet
-        backend: make
-        target: ''
-        output: var/food_prices.parquet
-      uganda::::food_quantities:
-        country: Uganda
-        wave: null
-        table: food_quantities
-        format: parquet
-        backend: make
-        target: ''
-        output: var/food_quantities.parquet
-      uganda::::household_characteristics:
-        country: Uganda
-        wave: null
-        table: household_characteristics
-        format: parquet
-        backend: make
-        target: ''
-        output: var/household_characteristics.parquet
-      uganda::::household_roster:
-        country: Uganda
-        wave: null
-        table: household_roster
-        format: parquet
-        backend: cli
-        target: ''
-        output: var/household_roster.parquet
-      uganda::::income:
-        country: Uganda
-        wave: null
-        table: income
-        format: parquet
-        backend: make
-        target: ''
-        output: var/income.parquet
-      uganda::::interview_date:
-        country: Uganda
-        wave: null
-        table: interview_date
-        format: parquet
-        backend: make
-        target: ''
-        output: var/interview_date.parquet
-      uganda::::nutrition:
-        country: Uganda
-        wave: null
-        table: nutrition
-        format: parquet
-        backend: make
-        target: ''
-        output: var/nutrition.parquet
-      uganda::::other_features:
-        country: Uganda
-        wave: null
-        table: other_features
-        format: parquet
-        backend: make
-        target: ''
-        output: var/other_features.parquet
-      uganda::::people_last7days:
-        country: Uganda
-        wave: null
-        table: people_last7days
-        format: parquet
-        backend: cli
-        target: ''
-        output: var/people_last7days.parquet
-      uganda::::shocks:
-        country: Uganda
-        wave: null
-        table: shocks
-        format: parquet
-        backend: make
-        target: ''
-        output: var/shocks.parquet
-      uganda::::locality:
-        country: Uganda
-        wave: null
-        table: locality
-        format: parquet
-        backend: make
-        target: ''
-        output: var/locality.parquet
       uganda::::assets:
         country: Uganda
-        wave: null
         table: assets
         format: parquet
-        backend: make
-        target: ''
-        output: var/assets.parquet
+      uganda::::cluster_features:
+        country: Uganda
+        table: cluster_features
+        format: parquet
+      uganda::::earnings:
+        country: Uganda
+        table: earnings
+        format: parquet
+      uganda::::enterprise_income:
+        country: Uganda
+        table: enterprise_income
+        format: parquet
+      uganda::::food_acquired:
+        country: Uganda
+        table: food_acquired
+        format: parquet
+      uganda::::food_expenditures:
+        country: Uganda
+        table: food_expenditures
+        format: parquet
+      uganda::::food_prices:
+        country: Uganda
+        table: food_prices
+        format: parquet
+      uganda::::food_quantities:
+        country: Uganda
+        table: food_quantities
+        format: parquet
+      uganda::::household_characteristics:
+        country: Uganda
+        table: household_characteristics
+        format: parquet
+      uganda::::household_roster:
+        country: Uganda
+        table: household_roster
+        format: parquet
       uganda::::housing:
         country: Uganda
-        wave: null
         table: housing
         format: parquet
-        backend: make
-        target: ''
-        output: var/housing.parquet
+      uganda::::income:
+        country: Uganda
+        table: income
+        format: parquet
+      uganda::::interview_date:
+        country: Uganda
+        table: interview_date
+        format: parquet
+      uganda::::locality:
+        country: Uganda
+        table: locality
+        format: parquet
       uganda::::nonfood_expenditures:
         country: Uganda
-        wave: null
         table: nonfood_expenditures
         format: parquet
-        backend: make
-        target: ''
-        output: var/nonfood_expenditures.parquet
+      uganda::::nutrition:
+        country: Uganda
+        table: nutrition
+        format: parquet
+      uganda::::other_features:
+        country: Uganda
+        table: other_features
+        format: parquet
+      uganda::::people_last7days:
+        country: Uganda
+        table: people_last7days
+        format: parquet
+      uganda::::shocks:
+        country: Uganda
+        table: shocks
+        format: parquet
