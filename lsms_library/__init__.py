@@ -13,6 +13,7 @@ import logging
 from sys import stderr
 from . import country
 from .country import Country, Wave
+from .feature import Feature
 from . import local_tools as tools
 from .categorical_mapping import ai_agent
 from . import transformations
