@@ -2,6 +2,17 @@ from lsms.tools import get_food_prices, get_food_expenditures, get_household_ros
 import pandas as pd
 import dvc.api
 import numpy as np
+import lsms_library.local_tools as tools
+
+
+def i(value):
+    '''Formatting household id from (grappe, menage).'''
+    return tools.format_id(value.iloc[0]) + '0' + tools.format_id(value.iloc[1], zeropadding=2)
+
+
+def pid(value):
+    '''Formatting person id from (grappe, menage, individual).'''
+    return tools.format_id(value.iloc[0]) + '0' + tools.format_id(value.iloc[1], zeropadding=2) + '0' + tools.format_id(value.iloc[2], zeropadding=2)
 
 def harmonized_food_labels(fn='../../_/food_items.org'):
     # Harmonized food labels
