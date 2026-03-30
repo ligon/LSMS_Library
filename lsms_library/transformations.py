@@ -112,19 +112,39 @@ def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=
 # used by the transformation functions below.
 _COLUMN_ALIASES = {
     'value_purchase': 'Expenditure',
+    'expenditure': 'Expenditure',
     'quant_ttl_consume': 'Quantity',
+    'quantity_consumed': 'Quantity',
     'quant_purchase': 'Quantity',  # fallback if quant_ttl_consume absent
 }
 
+# Column names that should be promoted to the 'u' index level
+_UNIT_COLUMN_ALIASES = ['u', 'units', 'u_consumed', 'unit']
+
 
 def _normalize_columns(df):
-    """Rename legacy food_acquired columns to canonical names if needed."""
+    """Rename legacy food_acquired columns to canonical names if needed.
+
+    Also promotes a unit column to the 'u' index level when 'u' is not
+    already in the index.
+    """
     renames = {}
     for old, new in _COLUMN_ALIASES.items():
         if new not in df.columns and old in df.columns and new not in renames.values():
             renames[old] = new
     if renames:
         df = df.rename(columns=renames)
+
+    # Promote unit column to 'u' index level if not already present
+    if 'u' not in df.index.names:
+        for col in _UNIT_COLUMN_ALIASES:
+            if col in df.columns:
+                df = df.rename(columns={col: 'u'}).set_index('u', append=True)
+                break
+            elif col in df.index.names and col != 'u':
+                df.index = df.index.rename({col: 'u'})
+                break
+
     return df
 
 KNOWN_METRIC = {
@@ -229,7 +249,7 @@ def food_prices_from_acquired(df):
     v = v[['price_per_kg']].replace([0, np.inf, -np.inf], np.nan).dropna()
 
     idx_names = list(v.index.names)
-    group_by = [n for n in ['t', 'v', 'j'] if n in idx_names]
+    group_by = [n for n in ['t', 'v', 'm', 'i'] if n in idx_names]
 
     p = v.groupby(group_by).median()
     p = p.rename(columns={'price_per_kg': 'Price'})
