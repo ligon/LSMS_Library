@@ -1,12 +1,12 @@
-Country: Togo
-Wave: 2018
+Country: Benin
+Wave: 2018-19
 
 cluster_features:
     dfs:
         - df_main
         - df_geo
     df_main:
-        file: ../Data1/s00_me_tgo2018.dta
+        file: s00_me_ben2018.dta
         idxvars:
             i: menage
             v: grappe
@@ -22,7 +22,7 @@ cluster_features:
                     urbain: Urban
                     URBAIN: Urban
     df_geo:
-        file: ../Data1/grappe_gps_tgo2018.dta
+        file: grappe_gps_ben2018.dta
         idxvars:
             v: grappe
         myvars:
@@ -35,12 +35,13 @@ cluster_features:
         - v
 
 household_roster:
-    file:
-        - ../Data1/s01_me_tgo2018.dta
+    file: ehcvm_individu_ben2018.dta
     idxvars:
-        i: menage
-        pid: s01q00a
+        i:
+            - grappe
+            - menage
+        pid: numind
     myvars:
-        Sex: s01q01
-        Relation: s01q02
-        Age: s01q04a
+        Sex: sexe
+        Age: age
+        Relation: lien
