@@ -13,6 +13,7 @@ Related issues:
 - Regression fix: commit 0cdde86e
 """
 from dataclasses import dataclass, field
+import os
 
 import pytest
 
@@ -152,6 +153,26 @@ def test_wave_recursion_flag_cleanup():
 
     # Flag should not be present in __dict__
     assert '_in_getattr' not in wave.__dict__
+
+
+@pytest.mark.skipif(
+    os.getenv("LSMS_SKIP_AUTH", "").lower() in {"1", "true", "yes"},
+    reason="Requires DVC data access (LSMS_SKIP_AUTH is set)",
+)
+def test_fallback_path_uses_wave_data_scheme():
+    """Test that the fallback path at country.py:987 works.
+
+    The load_from_waves function accesses wave_obj.data_scheme, which
+    was broken by the aggressive recursion guard.
+    """
+    country = ll.Country('Uganda', preload_panel_ids=False, verbose=False)
+
+    # This triggers load_from_waves which accesses wave.data_scheme at line 987
+    result = country.food_expenditures()
+
+    assert len(result) > 0
+    assert 'i' in result.index.names  # household ID
+    assert 'j' in result.index.names  # food item
 
 
 def test_wave_nested_access_patterns():
