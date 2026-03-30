@@ -262,13 +262,32 @@ def _nada_api_base(url: str) -> str:
     return f"{parsed.scheme}://{parsed.netloc}/index.php/api"
 
 
-def _find_geo_resources(api_base: str, catalog_id: str,
-                        api_key: str) -> list[dict]:
-    """Query the NADA API for geovariables resources in a catalog entry."""
+def _resolve_idno(api_base: str, catalog_id: str,
+                  api_key: str) -> str | None:
+    """Resolve a numeric catalog ID to the NADA string idno via search."""
     import urllib.request
     import json
 
-    url = f"{api_base}/catalog/{catalog_id}/resources"
+    # Search with enough results and filter by id
+    url = f"{api_base}/catalog/search?ps=500&collection=lsms"
+    req = urllib.request.Request(url)
+    req.add_header("X-API-KEY", api_key)
+    req.add_header("Accept", "application/json")
+
+    try:
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            data = json.loads(resp.read())
+    except Exception as e:
+        print(f"  Search API error: {e}", file=sys.stderr)
+        return None
+
+    rows = data.get("result", {}).get("rows", [])
+    for row in rows:
+        if str(row.get("id")) == str(catalog_id):
+            return row.get("idno")
+
+    # If not found in lsms collection, try a broader search
+    url = f"{api_base}/catalog/search?ps=50&id={catalog_id}"
     req = urllib.request.Request(url)
     req.add_header("X-API-KEY", api_key)
     req.add_header("Accept", "application/json")
@@ -277,10 +296,81 @@ def _find_geo_resources(api_base: str, catalog_id: str,
         with urllib.request.urlopen(req, timeout=30) as resp:
             data = json.loads(resp.read())
     except Exception as e:
-        print(f"  API error for catalog {catalog_id}: {e}", file=sys.stderr)
+        print(f"  Broader search API error: {e}", file=sys.stderr)
+        return None
+
+    rows = data.get("result", {}).get("rows", [])
+    for row in rows:
+        if str(row.get("id")) == str(catalog_id):
+            return row.get("idno")
+
+    return None
+
+
+# Cache for idno lookups (populated once per session)
+_idno_cache: dict[str, str] = {}
+
+
+def _get_idno(api_base: str, catalog_id: str, api_key: str) -> str | None:
+    """Get idno for a catalog ID, with caching."""
+    if catalog_id in _idno_cache:
+        return _idno_cache[catalog_id]
+
+    # On first call, populate cache from LSMS collection search
+    if not _idno_cache:
+        import urllib.request
+        import json
+
+        print("  Fetching LSMS catalog index...", end=" ", flush=True)
+        # Paginate to get all entries
+        offset = 0
+        while True:
+            url = (f"{api_base}/catalog/search"
+                   f"?ps=500&collection=lsms&offset={offset}")
+            req = urllib.request.Request(url)
+            req.add_header("X-API-KEY", api_key)
+            req.add_header("Accept", "application/json")
+            try:
+                with urllib.request.urlopen(req, timeout=60) as resp:
+                    data = json.loads(resp.read())
+            except Exception as e:
+                print(f"error: {e}")
+                break
+            rows = data.get("result", {}).get("rows", [])
+            if not rows:
+                break
+            for row in rows:
+                _idno_cache[str(row.get("id"))] = row.get("idno", "")
+            found = data.get("result", {}).get("found", 0)
+            offset += len(rows)
+            if offset >= found:
+                break
+        print(f"{len(_idno_cache)} entries.")
+
+    return _idno_cache.get(catalog_id)
+
+
+def _find_geo_resources(api_base: str, idno: str,
+                        api_key: str) -> list[dict]:
+    """Query the NADA API for geovariables resources in a catalog entry."""
+    import urllib.request
+    import json
+
+    url = f"{api_base}/catalog/{idno}/resources"
+    req = urllib.request.Request(url)
+    req.add_header("X-API-KEY", api_key)
+    req.add_header("Accept", "application/json")
+
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = json.loads(resp.read())
+    except Exception as e:
+        print(f"  API error for {idno}: {e}", file=sys.stderr)
         return []
 
-    resources = data if isinstance(data, list) else data.get("resources", [])
+    resources = data.get("resources", [])
+    if not resources:
+        resources = data if isinstance(data, list) else []
     geo_resources = []
     geo_keywords = ["geovars", "geovariable", "gps", "geo_"]
     for r in resources:
@@ -292,17 +382,19 @@ def _find_geo_resources(api_base: str, catalog_id: str,
     return geo_resources
 
 
-def _download_resource(api_base: str, catalog_id: str, resource: dict,
+def _download_resource(api_base: str, idno: str, resource: dict,
                        dest_dir: Path, api_key: str) -> Path | None:
     """Download a single resource file from the NADA catalog."""
     import urllib.request
 
     resource_id = resource.get("resource_id") or resource.get("id")
-    filename = resource.get("filename", f"geovars_{catalog_id}.dta")
+    filename = resource.get("filename", f"geovars_{idno}.dta")
 
-    # NADA download endpoint
-    download_url = (f"{api_base}/catalog/{catalog_id}"
-                    f"/download/{resource_id}")
+    # NADA download endpoint — uses the numeric survey_id, not idno
+    survey_id = resource.get("survey_id", "")
+    download_url = (f"{api_base.rsplit('/api', 1)[0]}"
+                    f"/catalog/{survey_id}/download/{resource_id}/"
+                    f"{filename}")
 
     dest_dir.mkdir(parents=True, exist_ok=True)
     dest = dest_dir / filename
@@ -403,15 +495,22 @@ def cmd_download(args: argparse.Namespace) -> None:
             print(f"  Non-World Bank source ({api_base}), skipping.")
             continue
 
-        resources = _find_geo_resources(api_base, catalog_id, api_key)
+        # Resolve numeric catalog ID to string idno
+        idno = _get_idno(api_base, catalog_id, api_key)
+        if not idno:
+            print(f"  Could not resolve catalog {catalog_id} to idno, skipping.")
+            continue
+        print(f"  idno: {idno}")
+
+        resources = _find_geo_resources(api_base, idno, api_key)
         if not resources:
-            print(f"  No geovariables resources found in catalog {catalog_id}.")
+            print(f"  No geovariables resources found for {idno}.")
             continue
 
         wave_dir = country_dir / wave
         data_dir = wave_dir / "Data"
         for resource in resources:
-            result = _download_resource(api_base, catalog_id, resource,
+            result = _download_resource(api_base, idno, resource,
                                         data_dir, api_key)
             if result:
                 downloaded.append((country, wave, result))
