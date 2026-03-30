@@ -90,3 +90,20 @@ def test_uganda_household_characteristics_has_m_index(tmp_path):
     assert hasattr(df, "index")
     assert not df.empty, "household_characteristics returned an empty dataframe"
     assert "m" in (df.index.names or []), "household_characteristics missing 'm' index"
+
+
+def test_fallback_path_uses_wave_data_scheme():
+    """Test that the fallback path at country.py:987 works.
+
+    The load_from_waves function accesses wave_obj.data_scheme, which
+    was broken by the aggressive recursion guard.
+    """
+    if not _has_cached_table("Uganda", "food_expenditures"):
+        pytest.skip("Uganda/food_expenditures not cached (requires data build)")
+
+    country = ll.Country('Uganda', preload_panel_ids=False, verbose=False)
+    result = country.food_expenditures()
+
+    assert len(result) > 0
+    assert 'i' in result.index.names
+    assert 'j' in result.index.names
