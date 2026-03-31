@@ -84,16 +84,6 @@ def data_dir() -> str | None:
     return get("data_dir", env_var="LSMS_DATA_DIR") or None
 
 
-def s3_write_key() -> str | None:
-    """Return the S3 write secret access key, or None."""
-    return get("s3_write_key", env_var="LSMS_S3_WRITE_KEY") or None
-
-
-def s3_write_key_id() -> str | None:
-    """Return the S3 write access key ID, or None."""
-    return get("s3_write_key_id", env_var="LSMS_S3_WRITE_KEY_ID") or None
-
-
 def config_path() -> Path:
     """Return the path to the config file (may not exist yet)."""
     return _config_file()
