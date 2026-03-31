@@ -50,10 +50,12 @@ def dvc_dir(tmp_path):
 
 
 @pytest.fixture(autouse=True)
-def _reset_caches():
-    """Reset module-level caches before each test."""
+def _reset_caches(tmp_path, monkeypatch):
+    """Reset module-level caches and isolate HOME so ~/.aws/credentials
+    on the host machine doesn't leak write access into tests."""
     from lsms_library.data_access import reset_permissions_cache
     reset_permissions_cache()
+    monkeypatch.setenv("HOME", str(tmp_path))
     yield
     reset_permissions_cache()
 
