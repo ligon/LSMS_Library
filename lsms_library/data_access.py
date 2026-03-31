@@ -156,7 +156,7 @@ def _check_remote_access(remote_name: str, remote_cfg: dict[str, str],
             return None
 
         # Check for write credentials (several forms)
-        if os.environ.get("LSMS_S3_WRITE_KEY"):
+        if config.s3_write_key():
             return "write"
         if (os.environ.get("AWS_ACCESS_KEY_ID")
                 and os.environ.get("AWS_SECRET_ACCESS_KEY")):
@@ -555,6 +555,29 @@ def _extract_all_from_zip(download_url: str, zip_filename: str,
 # Push to cache
 # ---------------------------------------------------------------------------
 
+def _s3_write_env() -> dict[str, str] | None:
+    """Build an environment dict with S3 write credentials for subprocesses.
+
+    Returns a copy of ``os.environ`` with ``AWS_ACCESS_KEY_ID`` and
+    ``AWS_SECRET_ACCESS_KEY`` set from the config file / env vars, or
+    ``None`` if no write credentials are available.
+    """
+    key = config.s3_write_key()
+    key_id = config.s3_write_key_id()
+    if key and key_id:
+        env = os.environ.copy()
+        env["AWS_ACCESS_KEY_ID"] = key_id
+        env["AWS_SECRET_ACCESS_KEY"] = key
+        return env
+
+    # Already in the environment?
+    if (os.environ.get("AWS_ACCESS_KEY_ID")
+            and os.environ.get("AWS_SECRET_ACCESS_KEY")):
+        return None  # None means "use inherited env as-is"
+
+    return None
+
+
 def _check_write_access(remote: str | None = None) -> bool:
     """Verify write access to at least one DVC remote.
 
@@ -613,6 +636,8 @@ def push_to_cache(path: str | Path,
     if not _check_write_access(remote):
         return False
 
+    write_env = _s3_write_env()
+
     try:
         if dvc_add:
             result = subprocess.run(
@@ -632,6 +657,7 @@ def push_to_cache(path: str | Path,
             push_cmd,
             cwd=str(_COUNTRIES_DIR),
             capture_output=True, text=True, timeout=600,
+            env=write_env,
         )
         if result.returncode != 0:
             logger.error("dvc push failed: %s", result.stderr.strip())
@@ -677,6 +703,8 @@ def push_to_cache_batch(paths: list[str | Path],
     if not _check_write_access(remote):
         return []
 
+    write_env = _s3_write_env()
+
     # Resolve and validate all paths
     abs_paths: list[Path] = []
     for p in paths:
@@ -718,6 +746,7 @@ def push_to_cache_batch(paths: list[str | Path],
             cwd=str(_COUNTRIES_DIR),
             capture_output=True, text=True,
             timeout=600 + 60 * len(abs_paths),
+            env=write_env,
         )
         if result.returncode != 0:
             logger.error("dvc push (batch) failed: %s",
