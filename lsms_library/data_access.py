@@ -52,6 +52,38 @@ logger = logging.getLogger(__name__)
 
 _COUNTRIES_DIR = Path(__file__).resolve().parent / "countries"
 
+# WB LSMS collection: ISO-3166 alpha-3 codes for countries we track.
+# Used by discover_waves() to query the WB Microdata Library catalog.
+_COUNTRY_CODES: dict[str, str] = {
+    "Afghanistan": "AFG", "Albania": "ALB", "Armenia": "ARM",
+    "Azerbaijan": "AZE", "Benin": "BEN", "Bosnia-Herzegovina": "BIH",
+    "Brazil": "BRA", "Bulgaria": "BGR", "Burkina_Faso": "BFA",
+    "Cambodia": "KHM", "China": "CHN", "CotedIvoire": "CIV",
+    "Ethiopia": "ETH", "GhanaLSS": "GHA", "GhanaSPS": "GHA",
+    "Guatemala": "GTM", "Guinea-Bissau": "GNB", "Guyana": "GUY",
+    "India": "IND", "Iraq": "IRQ", "Kazakhstan": "KAZ",
+    "Kosovo": "XKX", "Kyrgyz Republic": "KGZ", "Liberia": "LBR",
+    "Malawi": "MWI", "Mali": "MLI", "Nepal": "NPL",
+    "Nicaragua": "NIC", "Niger": "NER", "Nigeria": "NGA",
+    "Pakistan": "PAK", "Panama": "PAN", "Peru": "PER",
+    "Rwanda": "RWA", "Senegal": "SEN", "Serbia": "SRB",
+    "South Africa": "ZAF", "Tajikistan": "TJK", "Tanzania": "TZA",
+    "Timor-Leste": "TLS", "Togo": "TGO", "Uganda": "UGA",
+}
+
+
+def _dvc_cmd() -> str:
+    """Return path to the ``dvc`` executable in the current venv.
+
+    Falls back to bare ``"dvc"`` if no venv-local binary is found.
+    """
+    import sys
+    venv_dvc = Path(sys.executable).parent / "dvc"
+    if venv_dvc.exists():
+        return str(venv_dvc)
+    return "dvc"
+
+
 # Base64-obfuscated passphrase for s3_reader_creds.gpg.
 # The real access gate is WB API key validation; this just keeps the
 # passphrase from being grep-able as a plaintext string.
@@ -519,6 +551,28 @@ def _extract_all_from_zip(download_url: str, zip_filename: str,
 # Push to cache
 # ---------------------------------------------------------------------------
 
+def _check_write_access(remote: str | None = None) -> bool:
+    """Verify write access to at least one DVC remote.
+
+    Returns ``True`` if credentials are available, ``False`` otherwise
+    (with an error logged).
+    """
+    perms = permissions()
+    if remote:
+        if perms.get(remote) != "write":
+            logger.error("No write access to remote %r (have: %s)",
+                         remote, perms.get(remote))
+            return False
+    else:
+        writable = [r for r, lvl in perms.items()
+                    if r != "wb_api" and lvl == "write"]
+        if not writable:
+            logger.error("No writable DVC remotes. Set LSMS_S3_WRITE_KEY "
+                         "or provide write credentials.")
+            return False
+    return True
+
+
 def push_to_cache(path: str | Path,
                   remote: str | None = None,
                   dvc_add: bool = True) -> bool:
@@ -552,34 +606,22 @@ def push_to_cache(path: str | Path,
         logger.error("Cannot push non-existent file: %s", abs_path)
         return False
 
-    # Check write permission on at least one DVC remote
-    perms = permissions()
-    if remote:
-        if perms.get(remote) != "write":
-            logger.error("No write access to remote %r (have: %s)",
-                         remote, perms.get(remote))
-            return False
-    else:
-        writable = [r for r, lvl in perms.items()
-                    if r != "wb_api" and lvl == "write"]
-        if not writable:
-            logger.error("No writable DVC remotes. Set LSMS_S3_WRITE_KEY "
-                         "or provide write credentials.")
-            return False
+    if not _check_write_access(remote):
+        return False
 
     try:
         if dvc_add:
             result = subprocess.run(
-                ["dvc", "add", str(abs_path)],
+                [_dvc_cmd(), "add", str(abs_path)],
                 cwd=str(_COUNTRIES_DIR),
-                capture_output=True, text=True, timeout=120,
+                capture_output=True, text=True, timeout=600,
             )
             if result.returncode != 0:
                 logger.error("dvc add failed: %s", result.stderr.strip())
                 return False
             logger.info("dvc add: %s", abs_path)
 
-        push_cmd = ["dvc", "push", str(abs_path) + ".dvc"]
+        push_cmd = [_dvc_cmd(), "push", str(abs_path) + ".dvc"]
         if remote:
             push_cmd.extend(["-r", remote])
         result = subprocess.run(
@@ -598,14 +640,104 @@ def push_to_cache(path: str | Path,
         return False
 
 
+def push_to_cache_batch(paths: list[str | Path],
+                        remote: str | None = None,
+                        dvc_add: bool = True) -> list[Path]:
+    """Push multiple local data files to a DVC remote in batch.
+
+    Unlike :func:`push_to_cache`, this runs a single ``dvc add`` and a
+    single ``dvc push`` for all files, which is dramatically faster.
+    Follows the procedure in CONTRIBUTING.org steps 8--9:
+    ``dvc add *.dta`` then ``dvc push``.
+
+    Parameters
+    ----------
+    paths : list of str or Path
+        Relative paths like ``Uganda/2013-14/Data/GSEC1.dta``.
+        Interpreted relative to the countries directory.
+    remote : str, optional
+        DVC remote name to push to.  Defaults to the ``core.remote``
+        configured in ``.dvc/config``.
+    dvc_add : bool
+        If True (default), run ``dvc add`` before pushing.  Set to
+        False if the files are already DVC-tracked.
+
+    Returns
+    -------
+    list[Path]
+        Absolute paths of files that were successfully added and pushed.
+    """
+    if not paths:
+        return []
+
+    if not _check_write_access(remote):
+        return []
+
+    # Resolve and validate all paths
+    abs_paths: list[Path] = []
+    for p in paths:
+        ap = _COUNTRIES_DIR / Path(p)
+        if not ap.exists():
+            logger.warning("Skipping non-existent file: %s", ap)
+            continue
+        abs_paths.append(ap)
+
+    if not abs_paths:
+        logger.error("No valid files to push.")
+        return []
+
+    try:
+        # --- Batched dvc add -----------------------------------------------
+        if dvc_add:
+            add_cmd = [_dvc_cmd(), "add"] + [str(p) for p in abs_paths]
+            logger.info("dvc add: %d files ...", len(abs_paths))
+            result = subprocess.run(
+                add_cmd,
+                cwd=str(_COUNTRIES_DIR),
+                capture_output=True, text=True,
+                timeout=600 + 30 * len(abs_paths),
+            )
+            if result.returncode != 0:
+                logger.error("dvc add (batch) failed: %s",
+                             result.stderr.strip())
+                return []
+            logger.info("dvc add: %d files done.", len(abs_paths))
+
+        # --- Batched dvc push ----------------------------------------------
+        dvc_files = [str(p) + ".dvc" for p in abs_paths]
+        push_cmd = [_dvc_cmd(), "push"] + dvc_files
+        if remote:
+            push_cmd.extend(["-r", remote])
+        logger.info("dvc push: %d files ...", len(abs_paths))
+        result = subprocess.run(
+            push_cmd,
+            cwd=str(_COUNTRIES_DIR),
+            capture_output=True, text=True,
+            timeout=600 + 60 * len(abs_paths),
+        )
+        if result.returncode != 0:
+            logger.error("dvc push (batch) failed: %s",
+                         result.stderr.strip())
+            return []
+        logger.info("dvc push: %d files done.", len(abs_paths))
+
+        return abs_paths
+    except Exception as exc:
+        logger.error("push_to_cache_batch error: %s", exc)
+        return []
+
+
 def populate_and_push(country: str, wave: str,
                       remote: str | None = None) -> list[Path]:
     """Download all data files for a wave from WB and push to DVC cache.
 
-    Convenience wrapper: downloads the full Stata zip via the WB NADA
-    API, extracts all data files, then ``dvc add`` + ``dvc push`` each
-    one.  Requires both ``wb_api`` read access and write access to a
-    DVC remote.
+    Convenience wrapper that follows the procedure in CONTRIBUTING.org:
+    downloads the full Stata zip via the WB NADA API, extracts all data
+    files into the ``Data/`` directory, runs a single batched
+    ``dvc add`` on all files, then a single batched ``dvc push``.
+
+    Requires both ``wb_api`` read access and write access to a DVC
+    remote.
 
     Parameters
     ----------
@@ -631,18 +763,233 @@ def populate_and_push(country: str, wave: str,
         logger.warning("No Data directory after download: %s", data_dir)
         return []
 
-    pushed: list[Path] = []
     data_suffixes = {".dta", ".csv", ".sav"}
-    for f in sorted(data_dir.iterdir()):
-        if f.suffix.lower() not in data_suffixes:
-            continue
-        rel = f.relative_to(_COUNTRIES_DIR)
-        if push_to_cache(rel, remote=remote, dvc_add=True):
-            pushed.append(f)
-        else:
-            logger.warning("Failed to push %s", rel)
+    data_files = sorted(
+        f for f in data_dir.iterdir()
+        if f.suffix.lower() in data_suffixes
+    )
+    if not data_files:
+        logger.warning("No data files found in %s", data_dir)
+        return []
 
-    return pushed
+    rel_paths = [f.relative_to(_COUNTRIES_DIR) for f in data_files]
+    logger.info("Downloaded %d data files for %s/%s; adding to DVC ...",
+                len(rel_paths), country, wave)
+
+    return push_to_cache_batch(rel_paths, remote=remote, dvc_add=True)
+
+
+# ---------------------------------------------------------------------------
+# Wave discovery and setup
+# ---------------------------------------------------------------------------
+
+def _wb_catalog_search(country_code: str,
+                       collection: str = "lsms",
+                       ) -> list[dict]:
+    """Query the WB Microdata Library catalog for a country.
+
+    Returns a list of dicts with keys: ``id``, ``idno``, ``title``,
+    ``year_start``, ``year_end``, ``url``.
+    """
+    import json
+    import urllib.request
+
+    api_key = config.microdata_api_key()
+    if not api_key:
+        logger.error("No MICRODATA_API_KEY; cannot search WB catalog.")
+        return []
+
+    url = ("https://microdata.worldbank.org/index.php/api/catalog/search"
+           f"?ps=100&collection={collection}&country={country_code}")
+    req = urllib.request.Request(url)
+    req.add_header("X-API-KEY", api_key)
+    req.add_header("Accept", "application/json")
+
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = json.loads(resp.read())
+    except Exception as exc:
+        logger.error("WB catalog search failed: %s", exc)
+        return []
+
+    results = []
+    for row in data.get("result", {}).get("rows", []):
+        sid = str(row.get("id", ""))
+        results.append({
+            "id": sid,
+            "idno": row.get("idno", ""),
+            "title": row.get("title", ""),
+            "year_start": row.get("year_start", ""),
+            "year_end": row.get("year_end", ""),
+            "url": (f"https://microdata.worldbank.org"
+                    f"/index.php/catalog/{sid}"),
+        })
+    return results
+
+
+def _local_waves(country: str) -> list[str]:
+    """Return the list of wave directories that already exist locally."""
+    country_dir = _COUNTRIES_DIR / country
+    if not country_dir.is_dir():
+        return []
+    return sorted(
+        d.name for d in country_dir.iterdir()
+        if d.is_dir() and re.match(r"\d{4}", d.name)
+    )
+
+
+def _catalog_to_wave_label(entry: dict) -> str:
+    """Convert a WB catalog entry to our wave label convention.
+
+    E.g. year_start=2021, year_end=2022 -> ``"2021-22"``.
+    """
+    ys = str(entry.get("year_start", ""))
+    ye = str(entry.get("year_end", ""))
+    if ys and ye and ys != ye:
+        return f"{ys}-{ye[-2:]}"
+    return ys
+
+
+def discover_waves(country: str,
+                   collection: str = "lsms",
+                   ) -> list[dict]:
+    """Find WB catalog entries for *country* that we don't have locally.
+
+    Each returned dict has the WB catalog fields plus ``"wave"`` (our
+    directory-name convention) and ``"local"`` (bool, True if we
+    already have it).
+
+    Parameters
+    ----------
+    country : str
+        Country directory name, e.g. ``"Ethiopia"``.
+    collection : str
+        WB Microdata Library collection to search (default ``"lsms"``).
+
+    Returns
+    -------
+    list[dict]
+        Catalog entries sorted by year, annotated with local status.
+    """
+    code = _COUNTRY_CODES.get(country)
+    if not code:
+        logger.error("No ISO country code for %r. Add it to "
+                     "_COUNTRY_CODES in data_access.py.", country)
+        return []
+
+    entries = _wb_catalog_search(code, collection)
+    local = set(_local_waves(country))
+
+    for e in entries:
+        e["wave"] = _catalog_to_wave_label(e)
+        e["local"] = e["wave"] in local
+
+    return sorted(entries, key=lambda e: e.get("year_start", ""))
+
+
+def add_wave(country: str, catalog_id: str,
+             wave: str | None = None,
+             confirm: bool = True,
+             push: bool = True,
+             remote: str | None = None) -> list[Path]:
+    """Download a new survey wave from the WB and register it locally.
+
+    Creates the directory structure (``Data/``, ``Documentation/``,
+    ``_/``), writes ``SOURCE.org``, downloads the Stata zip, extracts
+    all data files, and optionally pushes to the DVC remote.
+
+    Parameters
+    ----------
+    country : str
+        Country directory name, e.g. ``"Ethiopia"``.
+    catalog_id : str
+        WB Microdata Library catalog ID (the numeric id or the full
+        URL).
+    wave : str, optional
+        Wave label for the directory name, e.g. ``"2021-22"``.  If
+        omitted, derived from the catalog entry's year range.
+    confirm : bool
+        If True (default), print a summary and ask for user
+        confirmation before downloading.
+    push : bool
+        If True (default), run ``dvc add`` + ``dvc push`` after
+        extracting the data files.
+    remote : str, optional
+        DVC remote to push to.
+
+    Returns
+    -------
+    list[Path]
+        Paths of data files that were downloaded (and pushed, if
+        *push* is True).
+    """
+    # Normalise catalog_id: accept full URLs or bare numbers
+    m = re.search(r'(\d+)', str(catalog_id))
+    if not m:
+        logger.error("Cannot parse catalog ID from %r", catalog_id)
+        return []
+    cat_id = m.group(1)
+    catalog_url = (f"https://microdata.worldbank.org"
+                   f"/index.php/catalog/{cat_id}")
+
+    # Resolve the IDNO (needed for API calls)
+    idno = _get_catalog_idno(catalog_url)
+    if not idno:
+        logger.error("Could not resolve IDNO for catalog %s", cat_id)
+        return []
+
+    # Derive wave label from the IDNO if not given
+    if wave is None:
+        # Try the catalog search to get years
+        code = _COUNTRY_CODES.get(country)
+        if code:
+            for e in _wb_catalog_search(code):
+                if str(e["id"]) == cat_id:
+                    wave = _catalog_to_wave_label(e)
+                    break
+        if not wave:
+            logger.error("Cannot derive wave label; pass wave= explicitly.")
+            return []
+
+    wave_dir = _COUNTRIES_DIR / country / wave
+
+    # --- Confirmation -------------------------------------------------------
+    if confirm:
+        exists = wave_dir.exists()
+        status = " (directory already exists)" if exists else ""
+        print(f"\n  Country:    {country}")
+        print(f"  Wave:       {wave}{status}")
+        print(f"  Catalog:    {catalog_url}")
+        print(f"  IDNO:       {idno}")
+        print(f"  Push to S3: {'yes' if push else 'no'}")
+        resp = input("\n  Proceed? [y/N] ").strip().lower()
+        if resp not in ("y", "yes"):
+            print("  Aborted.")
+            return []
+
+    # --- Create directory structure -----------------------------------------
+    (wave_dir / "Data").mkdir(parents=True, exist_ok=True)
+    (wave_dir / "Documentation").mkdir(parents=True, exist_ok=True)
+    (wave_dir / "_").mkdir(parents=True, exist_ok=True)
+
+    source_file = wave_dir / "Documentation" / "SOURCE.org"
+    if not source_file.exists():
+        source_file.write_text(f"SOURCE\n\n{catalog_url}\n")
+        logger.info("Wrote %s", source_file)
+
+    # --- Download and optionally push ---------------------------------------
+    if push:
+        return populate_and_push(country, wave, remote=remote)
+    else:
+        # Download only (no DVC)
+        dummy = f"{country}/{wave}/Data/_probe_.dta"
+        get_data_file(dummy, populate_cache=True)
+        data_dir = wave_dir / "Data"
+        data_suffixes = {".dta", ".csv", ".sav"}
+        return sorted(
+            f for f in data_dir.iterdir()
+            if f.suffix.lower() in data_suffixes
+        ) if data_dir.exists() else []
 
 
 # ---------------------------------------------------------------------------
