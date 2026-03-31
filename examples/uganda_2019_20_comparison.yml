@@ -1,0 +1,229 @@
+# ============================================================================
+# COMPARISON: Current vs YAML Tags Approach
+# File: Uganda 2019-20 data_info.yml
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# CURRENT APPROACH (No explicit typing)
+# ----------------------------------------------------------------------------
+CURRENT:
+  Country: Uganda
+  Wave: 2019-20
+
+  people_last7days:
+      file: HH/gsec15a.dta
+      idxvars:
+          i: hhid
+          member: CEA01
+      myvars:
+          Men : CEA01A          # Type unknown - probably int
+          Women : CEA01B        # Type unknown
+          Boys : CEA01C         # Type unknown
+          Girls : CEA01D        # Type unknown
+
+  cluster_features:
+      file: HH/gsec1.dta
+      idxvars:
+          i: hhid
+          v: s1aq04a  # String for parish name
+      myvars:
+          Region: region        # Type unknown - category?
+          Rural: urban          # CRITICAL: Column named "urban" assigned to "Rural"
+                               # Is this inverted? Need to check data!
+          District: district    # Type unknown
+
+  # Note: Missing explicit date handling - would be in separate Python file
+
+# ----------------------------------------------------------------------------
+# PROPOSED APPROACH (With YAML tags)
+# ----------------------------------------------------------------------------
+PROPOSED:
+  Country: Uganda
+  Wave: 2019-20
+
+  people_last7days:
+      file: HH/gsec15a.dta
+      idxvars:
+          i: hhid
+          member: !int CEA01
+      myvars:
+          Men: !int CEA01A           # Explicit: integer count
+          Women: !int CEA01B         # Explicit: integer count
+          Boys: !int CEA01C          # Explicit: integer count
+          Girls: !int CEA01D         # Explicit: integer count
+
+  cluster_features:
+      file: HH/gsec1.dta
+      idxvars:
+          i: hhid
+          v: !str s1aq04a            # Explicit: string (parish name)
+      myvars:
+          Region: !category region   # Explicit: categorical variable
+          Rural: !urban urban        # EXPLICIT: Source "urban" is inverted
+                                    # Will be corrected to Rural=1, Urban=0
+          District: !category district  # Explicit: categorical
+
+  interview_date:
+      file: HH/gsec1.dta
+      idxvars:
+          i: hhid
+      myvars:
+          date: !datetime interview_start  # Explicit: parse as datetime
+
+
+# ============================================================================
+# COMPARISON METRICS
+# ============================================================================
+
+METRICS:
+  Clarity:
+    Current: "Need to inspect data to understand types"
+    Proposed: "Types visible at a glance in YAML"
+
+  Correctness:
+    Current: "Rural: urban - Is this inverted? Ambiguous!"
+    Proposed: "Rural: !urban urban - Explicit inversion, will be corrected"
+
+  Maintainability:
+    Current: "Type handling scattered across Python files"
+    Proposed: "All type info in one place (YAML)"
+
+  Lines_of_Code:
+    Current: ~15 lines YAML + ~20 lines Python (interview_date.py)
+    Proposed: ~20 lines YAML, 0 lines Python
+
+  Documentation:
+    Current: "Comments needed to explain types"
+    Proposed: "Self-documenting via tags"
+
+
+# ============================================================================
+# MIGRATION ANALYSIS: What Would Change?
+# ============================================================================
+
+FILES_AFFECTED:
+  - /countries/Uganda/2019-20/_/data_info.yml  (MODIFIED)
+  - /countries/Uganda/2019-20/_/interview_date.py  (POTENTIALLY REMOVED)
+
+BACKWARD_COMPATIBILITY:
+  Breaking_Changes: NONE
+  Reason: "Tags are processed at load time, output format unchanged"
+  Mixed_Files: "Can mix tagged and untagged entries in same file"
+
+TESTING_STRATEGY:
+  1. Load data with current approach → Save output
+  2. Load data with tagged approach → Save output
+  3. Compare outputs (should be identical)
+  4. Run existing tests (should all pass)
+
+
+# ============================================================================
+# REAL WORLD EXAMPLE: Malawi Rural Variable Bug
+# ============================================================================
+
+MALAWI_RURAL_BUG:
+  Problem: |
+    Malawi waves have inconsistent Rural encoding:
+      - 2004-05: Rural=1, Urban=0
+      - 2010-11: rural=0, urban=1  (INVERTED!)
+      - 2013-14: rural=0, urban=1  (INVERTED!)
+      - 2016-17: rural=0, urban=1 BUT ALSO Rural=0, RURAL=1 (MIXED!)
+
+    A researcher merging these waves would get:
+      Wave 2004-05: "Rural=1" means countryside ✓
+      Wave 2010-11: "Rural=1" means CITY ✗✗✗
+
+    This is SILENT DATA CORRUPTION - no error, just wrong results!
+
+  Current_Solution:
+    "Read all YAML files, inspect mappings, hope you notice the inversion"
+
+  Tagged_Solution: |
+    Malawi/2004-05/_/data_info.yml:
+      Rural: !rural reside    # Rural=1 standard encoding
+
+    Malawi/2010-11/_/data_info.yml:
+      Rural: !urban reside    # EXPLICIT: inverted, will be corrected
+
+    Malawi/2016-17/_/data_info.yml:
+      Rural: !urban reside    # EXPLICIT: inverted, will be corrected
+
+    Now the inversion is VISIBLE and CORRECTED automatically.
+
+  Impact:
+    Before: "Silent bug affecting research results"
+    After: "Explicit, corrected, documented"
+
+
+# ============================================================================
+# EXTENDED EXAMPLE: Complete Interview Date Handling
+# ============================================================================
+
+INTERVIEW_DATE_COMPARISON:
+
+  # Current approach (separate Python file required)
+  # File: /countries/Uganda/2019-20/_/interview_date.py
+  Current_Python_File: |
+    import pandas as pd
+
+    def interview_date(df):
+        """
+        Process interview dates from year/month/day components
+        """
+        # Read the data file
+        df = pd.read_stata('HH/gsec1.dta')
+
+        # Extract date components
+        df['date'] = pd.to_datetime(df[['year', 'month', 'day']])
+
+        # Drop component columns
+        df = df.drop(columns=['year', 'month', 'day'])
+
+        # Set index
+        df = df.set_index(['hhid'])
+
+        return df
+
+  # Proposed approach (all in YAML)
+  Proposed_YAML_Only: |
+    interview_date:
+        file: HH/gsec1.dta
+        idxvars:
+            i: hhid
+        myvars:
+            # Future extension: component dates
+            date: !datetime{components: [year, month, day]}
+
+            # Or if single column:
+            # date: !datetime interview_start
+
+  Comparison:
+    Current: "35 lines of Python + YAML maintenance"
+    Proposed: "3 lines of YAML"
+    Reduction: "91%"
+
+
+# ============================================================================
+# QUESTIONS THAT TAGS ANSWER IMMEDIATELY
+# ============================================================================
+
+QUESTIONS:
+  Q1: "What type is the Age variable?"
+    Without_Tags: "Need to read data file or inspect Python code"
+    With_Tags: "Age: !int age_col → It's an integer"
+
+  Q2: "Is the Rural variable inverted?"
+    Without_Tags: "Need to read mapping dict, check encoding"
+    With_Tags: "Rural: !urban src → Yes, inverted (and will be corrected)"
+
+  Q3: "What date format does this use?"
+    Without_Tags: "Need to read interview_date.py code"
+    With_Tags: "date: !datetime{format: '%Y-%m-%d'} → ISO format"
+
+  Q4: "What does Sex code 1 mean?"
+    Without_Tags: "Need to check Stata file or guess"
+    With_Tags: "Sex: !sex sex_code → Standard Male=1, Female=2"
+
+  Q5: "Can I merge this with other countries?"
+    Without_Tags: "Need to check all YAMLs for compatibility"
+    With_Tags: "If both use !rural, they're compatible by design"
