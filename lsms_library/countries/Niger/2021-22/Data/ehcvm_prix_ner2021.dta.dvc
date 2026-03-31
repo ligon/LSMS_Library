@@ -1,0 +1,5 @@
+outs:
+- md5: 498ad71818dc00f592cab8f1bf18a2da
+  size: 9311820
+  hash: md5
+  path: ehcvm_prix_ner2021.dta

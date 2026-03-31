@@ -1,0 +1,5 @@
+outs:
+- md5: c244f67903fa2856025aef01317f9c5e
+  size: 260955
+  hash: md5
+  path: ehcvm_nsu_ner2021.dta

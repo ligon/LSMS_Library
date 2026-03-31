@@ -1,0 +1,5 @@
+outs:
+- md5: e814dd861b5f6747fc88fb02bfa2f4fe
+  size: 3755
+  hash: md5
+  path: ehcvm_ihpcreg_ner2021.dta

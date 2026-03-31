@@ -136,8 +136,12 @@ def _check_remote_access(remote_name: str, remote_cfg: dict[str, str],
       paired with ``LSMS_S3_WRITE_KEY_ID`` for the access key id), or
     - ``AWS_ACCESS_KEY_ID`` / ``AWS_SECRET_ACCESS_KEY`` env vars
       (standard boto3 credentials), or
-    - A ``s3_write_creds`` file alongside ``s3_creds`` in the DVC dir, or
-    - ``~/.aws/credentials`` (standard boto3 shared credentials file).
+    - A ``s3_write_creds`` file alongside ``s3_creds`` in the DVC dir.
+
+    Note: ``~/.aws/credentials`` is *not* checked for write access
+    because there is no way to distinguish reader vs writer keys from
+    the file alone (that depends on the IAM policy attached to the key).
+    To grant write access, set ``LSMS_S3_WRITE_KEY`` explicitly.
     """
     url = remote_cfg.get("url", "")
 
@@ -160,18 +164,6 @@ def _check_remote_access(remote_name: str, remote_cfg: dict[str, str],
         write_creds = dvc_dir / "s3_write_creds"
         if write_creds.exists() and write_creds.stat().st_size > 0:
             return "write"
-        # Standard boto3 shared credentials file (~/.aws/credentials).
-        # We check for aws_access_key_id to avoid false positives from
-        # empty or unrelated credential files.
-        aws_creds = Path.home() / ".aws" / "credentials"
-        if aws_creds.exists():
-            try:
-                text = aws_creds.read_text()
-                if "aws_access_key_id" in text.lower():
-                    return "write"
-            except OSError:
-                pass
-
         return "read"
 
     if url.startswith("gdrive://"):

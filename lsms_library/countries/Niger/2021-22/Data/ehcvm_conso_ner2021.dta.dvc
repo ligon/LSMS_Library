@@ -1,0 +1,5 @@
+outs:
+- md5: 3d70b4ef4861ece4dbc0a739ae9aab65
+  size: 11681661
+  hash: md5
+  path: ehcvm_conso_ner2021.dta

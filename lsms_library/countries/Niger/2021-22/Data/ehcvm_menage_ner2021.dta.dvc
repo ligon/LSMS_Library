@@ -1,0 +1,5 @@
+outs:
+- md5: a9b5efc4e98ebfdc7b3a160013437ef6
+  size: 389510
+  hash: md5
+  path: ehcvm_menage_ner2021.dta

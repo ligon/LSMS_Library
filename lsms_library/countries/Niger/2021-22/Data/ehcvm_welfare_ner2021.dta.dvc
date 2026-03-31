@@ -1,0 +1,5 @@
+outs:
+- md5: f4f967ba0b672e1bd47c86e82f632efe
+  size: 915740
+  hash: md5
+  path: ehcvm_welfare_ner2021.dta

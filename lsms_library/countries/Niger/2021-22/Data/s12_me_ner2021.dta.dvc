@@ -1,0 +1,5 @@
+outs:
+- md5: c0b3e23f39f35483dc5326278b23422c
+  size: 7753810
+  hash: md5
+  path: s12_me_ner2021.dta

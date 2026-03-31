@@ -1,0 +1,5 @@
+outs:
+- md5: c7f6830ed15a959a700933982cd92b79
+  size: 152932
+  hash: md5
+  path: s00_co_ner2021.dta
