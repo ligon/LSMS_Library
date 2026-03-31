@@ -1,0 +1,5 @@
+outs:
+- md5: ac226a80d23b81a6ec7a220e747639ca
+  size: 561498
+  hash: md5
+  path: cons_agg_w5.dta

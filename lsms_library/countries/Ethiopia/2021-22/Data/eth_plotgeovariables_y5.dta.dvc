@@ -1,0 +1,5 @@
+outs:
+- md5: 329854352aeab5196ff48a7535bfe92f
+  size: 813299
+  hash: md5
+  path: eth_plotgeovariables_y5.dta

@@ -1,0 +1,5 @@
+outs:
+- md5: 299c2700fe8d96822d8e803b202fa431
+  size: 127820
+  hash: md5
+  path: crop_cf_wave5.dta
