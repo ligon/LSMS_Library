@@ -887,11 +887,23 @@ def discover_waves(country: str,
     return sorted(entries, key=lambda e: e.get("year_start", ""))
 
 
+def _get_console(verbose: bool):
+    """Return a ``rich.console.Console`` if *verbose*, else ``None``."""
+    if not verbose:
+        return None
+    try:
+        from rich.console import Console
+        return Console()
+    except ImportError:
+        return None
+
+
 def add_wave(country: str, catalog_id: str,
              wave: str | None = None,
              confirm: bool = True,
              push: bool = True,
-             remote: str | None = None) -> list[Path]:
+             remote: str | None = None,
+             verbose: bool = True) -> list[Path]:
     """Download a new survey wave from the WB and register it locally.
 
     Creates the directory structure (``Data/``, ``Documentation/``,
@@ -916,6 +928,9 @@ def add_wave(country: str, catalog_id: str,
         extracting the data files.
     remote : str, optional
         DVC remote to push to.
+    verbose : bool
+        If True (default), show progress spinners and a summary table.
+        Requires ``rich`` (degrades to plain logging if unavailable).
 
     Returns
     -------
@@ -923,7 +938,24 @@ def add_wave(country: str, catalog_id: str,
         Paths of data files that were downloaded (and pushed, if
         *push* is True).
     """
-    # Normalise catalog_id: accept full URLs or bare numbers
+    import time
+
+    con = _get_console(verbose)
+
+    def status(msg):
+        """Context manager: rich spinner when verbose, no-op otherwise."""
+        if con is not None:
+            return con.status(msg, spinner="dots")
+        import contextlib
+        return contextlib.nullcontext()
+
+    def log(msg, style=""):
+        if con is not None:
+            con.print(f"  {msg}", style=style)
+        else:
+            logger.info(msg)
+
+    # --- Resolve catalog ID -------------------------------------------------
     m = re.search(r'(\d+)', str(catalog_id))
     if not m:
         logger.error("Cannot parse catalog ID from %r", catalog_id)
@@ -932,21 +964,22 @@ def add_wave(country: str, catalog_id: str,
     catalog_url = (f"https://microdata.worldbank.org"
                    f"/index.php/catalog/{cat_id}")
 
-    # Resolve the IDNO (needed for API calls)
-    idno = _get_catalog_idno(catalog_url)
+    with status(f"Resolving catalog {cat_id} ..."):
+        idno = _get_catalog_idno(catalog_url)
     if not idno:
         logger.error("Could not resolve IDNO for catalog %s", cat_id)
         return []
+    log(f"IDNO: [bold]{idno}[/bold]")
 
-    # Derive wave label from the IDNO if not given
+    # --- Derive wave label --------------------------------------------------
     if wave is None:
-        # Try the catalog search to get years
-        code = _COUNTRY_CODES.get(country)
-        if code:
-            for e in _wb_catalog_search(code):
-                if str(e["id"]) == cat_id:
-                    wave = _catalog_to_wave_label(e)
-                    break
+        with status("Looking up wave years ..."):
+            code = _COUNTRY_CODES.get(country)
+            if code:
+                for e in _wb_catalog_search(code):
+                    if str(e["id"]) == cat_id:
+                        wave = _catalog_to_wave_label(e)
+                        break
         if not wave:
             logger.error("Cannot derive wave label; pass wave= explicitly.")
             return []
@@ -956,16 +989,29 @@ def add_wave(country: str, catalog_id: str,
     # --- Confirmation -------------------------------------------------------
     if confirm:
         exists = wave_dir.exists()
-        status = " (directory already exists)" if exists else ""
-        print(f"\n  Country:    {country}")
-        print(f"  Wave:       {wave}{status}")
-        print(f"  Catalog:    {catalog_url}")
-        print(f"  IDNO:       {idno}")
-        print(f"  Push to S3: {'yes' if push else 'no'}")
+        status_note = " (directory already exists)" if exists else ""
+        if con is not None:
+            from rich.panel import Panel
+            from rich.text import Text
+            lines = Text()
+            lines.append(f"  Country:    {country}\n")
+            lines.append(f"  Wave:       {wave}{status_note}\n")
+            lines.append(f"  Catalog:    {catalog_url}\n")
+            lines.append(f"  IDNO:       {idno}\n")
+            lines.append(f"  Push to S3: {'yes' if push else 'no'}")
+            con.print(Panel(lines, title="Add Wave", border_style="blue"))
+        else:
+            print(f"\n  Country:    {country}")
+            print(f"  Wave:       {wave}{status_note}")
+            print(f"  Catalog:    {catalog_url}")
+            print(f"  IDNO:       {idno}")
+            print(f"  Push to S3: {'yes' if push else 'no'}")
         resp = input("\n  Proceed? [y/N] ").strip().lower()
         if resp not in ("y", "yes"):
-            print("  Aborted.")
+            log("Aborted.", style="yellow")
             return []
+
+    t0 = time.time()
 
     # --- Create directory structure -----------------------------------------
     (wave_dir / "Data").mkdir(parents=True, exist_ok=True)
@@ -975,21 +1021,69 @@ def add_wave(country: str, catalog_id: str,
     source_file = wave_dir / "Documentation" / "SOURCE.org"
     if not source_file.exists():
         source_file.write_text(f"SOURCE\n\n{catalog_url}\n")
-        logger.info("Wrote %s", source_file)
+    log(f"Created {country}/{wave}/ directory structure")
 
-    # --- Download and optionally push ---------------------------------------
-    if push:
-        return populate_and_push(country, wave, remote=remote)
-    else:
-        # Download only (no DVC)
+    # --- Download -----------------------------------------------------------
+    with status(f"Downloading Stata zip from World Bank ..."):
         dummy = f"{country}/{wave}/Data/_probe_.dta"
         get_data_file(dummy, populate_cache=True)
-        data_dir = wave_dir / "Data"
-        data_suffixes = {".dta", ".csv", ".sav"}
-        return sorted(
-            f for f in data_dir.iterdir()
-            if f.suffix.lower() in data_suffixes
-        ) if data_dir.exists() else []
+
+    data_dir = wave_dir / "Data"
+    data_suffixes = {".dta", ".csv", ".sav"}
+    data_files = sorted(
+        f for f in data_dir.iterdir()
+        if f.suffix.lower() in data_suffixes
+    ) if data_dir.exists() else []
+
+    if not data_files:
+        logger.warning("No data files found in %s", data_dir)
+        return []
+
+    total_bytes = sum(f.stat().st_size for f in data_files)
+    log(f"Extracted {len(data_files)} files "
+        f"({total_bytes / 1e6:.1f} MB)")
+
+    # --- DVC add + push -----------------------------------------------------
+    if push:
+        rel_paths = [f.relative_to(_COUNTRIES_DIR) for f in data_files]
+
+        with status(f"dvc add ({len(data_files)} files) ..."):
+            pushed = push_to_cache_batch(
+                rel_paths, remote=remote, dvc_add=True)
+
+        elapsed = time.time() - t0
+
+        if pushed:
+            log(f"Pushed {len(pushed)} files to S3 "
+                f"in {elapsed:.0f}s", style="bold green")
+        else:
+            log("Push failed -- see log for details", style="bold red")
+        result = pushed
+    else:
+        elapsed = time.time() - t0
+        log(f"Downloaded {len(data_files)} files "
+            f"(push=False) in {elapsed:.0f}s")
+        result = data_files
+
+    # --- Summary table ------------------------------------------------------
+    if con is not None and result:
+        from rich.table import Table
+        tbl = Table(title=f"{country} {wave}", show_lines=False)
+        tbl.add_column("File", style="cyan")
+        tbl.add_column("Size", justify="right")
+        for f in result:
+            size = f.stat().st_size
+            if size > 1e6:
+                sz = f"{size / 1e6:.1f} MB"
+            else:
+                sz = f"{size / 1e3:.0f} KB"
+            tbl.add_row(f.name, sz)
+        tbl.add_section()
+        tbl.add_row(f"{len(result)} files",
+                    f"{total_bytes / 1e6:.1f} MB total")
+        con.print(tbl)
+
+    return result
 
 
 # ---------------------------------------------------------------------------
