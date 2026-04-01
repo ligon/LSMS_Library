@@ -504,14 +504,7 @@ class Wave:
                     sub_data_info = data_info.get(i)
                     sub_mapping_details = self.column_mapping(i, sub_data_info)
                     sub_df = get_data(sub_data_info, sub_mapping_details)
-                    # Coerce merge keys to string so int-vs-string
-                    # mismatches (e.g. grappe read as int from one file,
-                    # str from another) don't break the merge.
-                    sub_df_reset = sub_df.reset_index()
-                    for col in merge_on:
-                        if col in sub_df_reset.columns:
-                            sub_df_reset[col] = sub_df_reset[col].astype(str)
-                    merge_dfs.append(sub_df_reset)
+                    merge_dfs.append(sub_df.reset_index())
                 df = pd.merge(merge_dfs[0], merge_dfs[1], on=merge_on, how='outer')
                 if len(merge_dfs) > 2:
                     for i in range(2, len(merge_dfs)):
