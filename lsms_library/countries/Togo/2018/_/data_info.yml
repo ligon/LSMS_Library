@@ -51,6 +51,19 @@ household_roster:
         Relationship: s01q02
         Age: s01q04a
 
+assets:
+    file: ../Data1/s12_me_tgo2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+        j: s12q01
+    myvars:
+        Quantity: s12q03
+        Age: s12q07
+        Value: s12q09
+        Purchase Price: s12q08
+
 shocks:
     file: ../Data1/s14_me_tgo2018.dta
     idxvars:
