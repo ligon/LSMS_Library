@@ -146,6 +146,24 @@ add_wave("Ethiopia", "6161")        # Download, dvc add, dvc push
 
 `push_to_cache_batch()` handles batched `dvc add` + `dvc push` (dramatically faster than per-file). See CONTRIBUTING.org for the manual workflow.
 
+## Cross-Country Feature Class
+The `Feature` class assembles a single harmonized DataFrame across all countries that declare a given table:
+
+```python
+import lsms_library as ll
+
+roster = ll.Feature('household_roster')
+roster.countries          # ['Ethiopia', 'Mali', 'Niger', 'Uganda', ...]
+roster.columns            # required columns from global data_info.yml
+
+df = roster()                       # all countries
+df = roster(['Ethiopia', 'Niger'])  # specific countries
+```
+
+The returned DataFrame has a `country` index level prepended. `Feature` discovers countries by scanning each `data_scheme.yml` for the table name, then calls `Country(name).{table}()` for each.
+
+This is the preferred way to do cross-country comparisons, validation, and diagnostics.
+
 ## Canonical Schema (`data_info.yml`)
 `lsms_library/data_info.yml` is the single source of truth for cross-country conventions:
 - **Required columns** per table (e.g., `household_roster` requires `Sex`, `Age`, `Generation`, `Distance`, `Affinity`)
