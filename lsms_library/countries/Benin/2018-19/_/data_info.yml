@@ -45,3 +45,16 @@ household_roster:
         Sex: sexe
         Age: age
         Relation: lien
+
+assets:
+    file: s12_me_ben2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+        j: s12q01
+    myvars:
+        Quantity: s12q03
+        Age: s12q07
+        Value: s12q09
+        Purchase Price: s12q08
