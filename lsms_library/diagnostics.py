@@ -143,9 +143,14 @@ def _check_index_levels(df: pd.DataFrame, scheme: dict, feature: str) -> Check:
         return Check("index_levels_match_scheme", "pass", "No index declared in scheme (skipped)")
     actual = list(df.index.names)
     missing = [e for e in expected if e not in actual]
+    extra = [a for a in actual if a not in expected]
     if missing:
         return Check("index_levels_match_scheme", "fail",
                      f"Missing declared levels {missing}; actual: {actual}")
+    if extra:
+        return Check("index_levels_match_scheme", "warn",
+                     f"Extra index levels not in scheme: {extra}; "
+                     f"expected: {expected}, actual: {actual}")
     return Check("index_levels_match_scheme", "pass",
                  f"All declared levels present: {expected}")
 
@@ -400,6 +405,39 @@ def _check_columns_match_reference(df: pd.DataFrame, ref_df: pd.DataFrame,
                  f"Columns match {ref_country}")
 
 
+def _check_string_consistency(df: pd.DataFrame) -> Check:
+    """Flag string columns with inconsistent casing that suggests missing normalization."""
+    issues = []
+    for col in df.columns:
+        if not (pd.api.types.is_string_dtype(df[col])
+                or pd.api.types.is_object_dtype(df[col])):
+            continue
+        vals = df[col].dropna().unique()
+        if len(vals) < 2:
+            continue
+        # Group by case-folded version; if the same concept appears in
+        # multiple casings, that's a normalization problem
+        from collections import Counter
+        folded = Counter()
+        examples = {}
+        for v in vals:
+            key = str(v).strip().casefold()
+            folded[key] += 1
+            if key not in examples:
+                examples[key] = []
+            examples[key].append(str(v))
+        dupes = {k: examples[k] for k, c in folded.items()
+                 if c > 1 and len(set(examples[k])) > 1}
+        if dupes:
+            sample = list(dupes.values())[:3]
+            issues.append(f"{col}: {len(dupes)} label(s) with inconsistent "
+                          f"casing (e.g., {sample[0][:3]})")
+    if issues:
+        return Check("string_consistency", "warn", "; ".join(issues[:3]))
+    return Check("string_consistency", "pass",
+                 "No inconsistent string casing detected")
+
+
 def _check_index_structure_matches(df: pd.DataFrame, ref_df: pd.DataFrame,
                                    ref_country: str) -> Check:
     """Index level names should match the reference."""
@@ -573,6 +611,9 @@ def validate_feature(
 
     # --- Unmapped labels ----------------------------------------------------
     report.checks.append(_check_unmapped_labels(df, feature))
+
+    # --- String consistency -------------------------------------------------
+    report.checks.append(_check_string_consistency(df))
 
     # --- Cross-country comparison -------------------------------------------
     if reference_country != country:
