@@ -21,6 +21,7 @@ Data Scheme:
     Quantity: float
     Expenditure: float
     Produced: float
+
   assets:
     index: (t, i, j)
     Quantity: float

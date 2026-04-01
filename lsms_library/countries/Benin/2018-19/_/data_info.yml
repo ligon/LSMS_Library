@@ -60,6 +60,7 @@ food_acquired:
         Quantity: s07bq03a
         Expenditure: s07bq08
         Produced: s07bq04
+
 assets:
     file: s12_me_ben2018.dta
     idxvars:
