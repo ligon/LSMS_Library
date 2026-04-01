@@ -1,0 +1,428 @@
+#+title: Categorical Mapping for Tanzania
+
+* Regions
+
+#+NAME: Region
+| Original Label                           | Preferred Label                          |
+|------------------------------------------+------------------------------------------|
+| ARUSHA                                   | Arusha                                   |
+| arusha                                   | Arusha                                   |
+| DAR ES SALAAM                            | Dar Es Salaam                            |
+| DODOMA                                   | Dodoma                                   |
+| dodoma                                   | Dodoma                                   |
+| GEITA                                    | Geita                                    |
+| geita                                    | Geita                                    |
+| IRINGA                                   | Iringa                                   |
+| iringa                                   | Iringa                                   |
+| KAGERA                                   | Kagera                                   |
+| kagera                                   | Kagera                                   |
+| KASKAZINI PEMBA                          | Kaskazini Pemba                          |
+| KASKAZINI UNGUJA                         | Kaskazini Unguja                         |
+| KATAVI                                   | Katavi                                   |
+| katavi                                   | Katavi                                   |
+| KIGOMA                                   | Kigoma                                   |
+| kigoma                                   | Kigoma                                   |
+| KILIMANJARO                              | Kilimanjaro                              |
+| kilimanjaro                              | Kilimanjaro                              |
+| KUSINI PEMBA                             | Kusini Pemba                             |
+| KUSINI UNGUJA                            | Kusini Unguja                            |
+| LINDI                                    | Lindi                                    |
+| lindi                                    | Lindi                                    |
+| MANYARA                                  | Manyara                                  |
+| manyara                                  | Manyara                                  |
+| MARA                                     | Mara                                     |
+| mara                                     | Mara                                     |
+| MBEYA                                    | Mbeya                                    |
+| mbeya                                    | Mbeya                                    |
+| MJINI MAGHARIBI UNGUJA                   | Mjini/Magharibi Unguja                   |
+| MOROGORO                                 | Morogoro                                 |
+| morogoro                                 | Morogoro                                 |
+| MTWARA                                   | Mtwara                                   |
+| mtwara                                   | Mtwara                                   |
+| MWANZA                                   | Mwanza                                   |
+| mwanza                                   | Mwanza                                   |
+| NJOMBE                                   | Njombe                                   |
+| njombe                                   | Njombe                                   |
+| PWANI                                    | Pwani                                    |
+| pwani                                    | Pwani                                    |
+| RUKWA                                    | Rukwa                                    |
+| rukwa                                    | Rukwa                                    |
+| RUVUMA                                   | Ruvuma                                   |
+| ruvuma                                   | Ruvuma                                   |
+| SHINYANGA                                | Shinyanga                                |
+| shinyanga                                | Shinyanga                                |
+| SIMIYU                                   | Simiyu                                   |
+| simiyu                                   | Simiyu                                   |
+| SINGIDA                                  | Singida                                  |
+| singida                                  | Singida                                  |
+| songwe                                   | Songwe                                   |
+| TABORA                                   | Tabora                                   |
+| tabora                                   | Tabora                                   |
+| TANGA                                    | Tanga                                    |
+| tanga                                    | Tanga                                    |
+
+* Districts
+
+#+NAME: District
+| Original Label                           | Preferred Label                          |
+|------------------------------------------+------------------------------------------|
+| ARUMERU                                  | Arumeru                                  |
+| ARUSHA                                   | Arusha                                   |
+| ARUSHA MJINI                             | Arusha Mjini                             |
+| ARUSHA RURAL                             | Arusha Rural                             |
+| ARUSHA URBAN                             | Arusha Urban                             |
+| BABATI                                   | Babati                                   |
+| BABATI MJI                               | Babati Mji                               |
+| BABATI RURAL                             | Babati Rural                             |
+| BABATI TOWN                              | Babati Town                              |
+| BAGAMOYO                                 | Bagamoyo                                 |
+| bagamoyo                                 | Bagamoyo                                 |
+| BAHI                                     | Bahi                                     |
+| bahi                                     | Bahi                                     |
+| BARIADI                                  | Bariadi                                  |
+| bariadi                                  | Bariadi                                  |
+| BIHARAMULO                               | Biharamulo                               |
+| biharamulo                               | Biharamulo                               |
+| BUHIGWE                                  | Buhigwe                                  |
+| buhigwe                                  | Buhigwe                                  |
+| BUKOBA                                   | Bukoba                                   |
+| BUKOBA MANISPAA                          | Bukoba Manispaa                          |
+| BUKOBA MJINI                             | Bukoba Mjini                             |
+| BUKOBA RURAL                             | Bukoba Rural                             |
+| BUKOBA URBAN                             | Bukoba Urban                             |
+| BUKOBA VIJIJINI                          | Bukoba Vijijini                          |
+| BUKOMBE                                  | Bukombe                                  |
+| bukombe                                  | Bukombe                                  |
+| BUNDA                                    | Bunda                                    |
+| bunda                                    | Bunda                                    |
+| BUSEGA                                   | Busega                                   |
+| busega                                   | Busega                                   |
+| busokelo                                 | Busokelo                                 |
+| BUTIAMA                                  | Butiama                                  |
+| butiama                                  | Butiama                                  |
+| CHAKE CHAKE                              | Chake Chake                              |
+| CHAKECHAKE                               | Chakechake                               |
+| chakechake                               | Chakechake                               |
+| chalinze                                 | Chalinze                                 |
+| CHAMWINO                                 | Chamwino                                 |
+| chamwino                                 | Chamwino                                 |
+| CHATO                                    | Chato                                    |
+| chato                                    | Chato                                    |
+| CHEMBA                                   | Chemba                                   |
+| chemba                                   | Chemba                                   |
+| CHUNYA                                   | Chunya                                   |
+| DODOMA MJINI                             | Dodoma Mjini                             |
+| DODOMA RURAL                             | Dodoma Rural                             |
+| DODOMA URBAN                             | Dodoma Urban                             |
+| GAIRO                                    | Gairo                                    |
+| gairo                                    | Gairo                                    |
+| GEITA                                    | Geita                                    |
+| geita                                    | Geita                                    |
+| GEITA TOWN                               | Geita Town                               |
+| HAI                                      | Hai                                      |
+| hai                                      | Hai                                      |
+| HANANG                                   | Hanang                                   |
+| hanang                                   | Hanang                                   |
+| HANDENI                                  | Handeni                                  |
+| handeni                                  | Handeni                                  |
+| HANDENI URBAN                            | Handeni Urban                            |
+| IFAKARA URBAN                            | Ifakara Urban                            |
+| IGUNGA                                   | Igunga                                   |
+| igunga                                   | Igunga                                   |
+| IKUNGI                                   | Ikungi                                   |
+| ikungi                                   | Ikungi                                   |
+| ILALA                                    | Ilala                                    |
+| ilala                                    | Ilala                                    |
+| ILEJE                                    | Ileje                                    |
+| ileje                                    | Ileje                                    |
+| ILEMELA                                  | Ilemela                                  |
+| ilemela                                  | Ilemela                                  |
+| ILEMELA MANISPAA                         | Ilemela Manispaa                         |
+| IRAMBA                                   | Iramba                                   |
+| IRINGA                                   | Iringa                                   |
+| IRINGA MANISPAA                          | Iringa Manispaa                          |
+| IRINGA MJINI                             | Iringa Mjini                             |
+| IRINGA MJINI1                            | Iringa Mjini                             |
+| IRINGA RURAL                             | Iringa Rural                             |
+| IRINGA URBAN                             | Iringa Urban                             |
+| ITILIMA                                  | Itilima                                  |
+| itilima                                  | Itilima                                  |
+| KAHAMA                                   | Kahama                                   |
+| KAHAMA MJI                               | Kahama Mji                               |
+| KAHAMA RURAL                             | Kahama Rural                             |
+| KAHAMA TOWN                              | Kahama Town                              |
+| KAKONKO                                  | Kakonko                                  |
+| kakonko                                  | Kakonko                                  |
+| KALAMBO                                  | Kalambo                                  |
+| kalambo                                  | Kalambo                                  |
+| KALIUA                                   | Kaliua                                   |
+| kaliua                                   | Kaliua                                   |
+| KARAGWE                                  | Karagwe                                  |
+| karagwe                                  | Karagwe                                  |
+| KARATU                                   | Karatu                                   |
+| KASKAZINI A                              | Kaskazini A                              |
+| KASKAZINI B                              | Kaskazini B                              |
+| KASULU                                   | Kasulu                                   |
+| KASULU MJI                               | Kasulu Mji                               |
+| KASULU RURAL                             | Kasulu Rural                             |
+| KASULU TOWN                              | Kasulu Town                              |
+| KASULU VIJIJINI                          | Kasulu Vijijini                          |
+| KATI                                     | Kati                                     |
+| kati                                     | Kati                                     |
+| KIBAHA                                   | Kibaha                                   |
+| KIBAHA MJI                               | Kibaha Mji                               |
+| KIBAHA RURAL                             | Kibaha Rural                             |
+| KIBAHA URBAN                             | Kibaha Urban                             |
+| KIBONDO                                  | Kibondo                                  |
+| kibondo                                  | Kibondo                                  |
+| KIGAMBONI                                | Kigamboni                                |
+| kigamboni                                | Kigamboni                                |
+| KIGOMA                                   | Kigoma                                   |
+| KIGOMA MANISPAA                          | Kigoma Manispaa                          |
+| KIGOMA RURAL                             | Kigoma Rural                             |
+| KIGOMA UJIJI URBAN                       | Kigoma Ujiji Urban                       |
+| KIGOMA URBAN                             | Kigoma Urban                             |
+| KILINDI                                  | Kilindi                                  |
+| kilindi                                  | Kilindi                                  |
+| KILOLO                                   | Kilolo                                   |
+| kilolo                                   | Kilolo                                   |
+| KILOMBERO                                | Kilombero                                |
+| kilombero                                | Kilombero                                |
+| KILOSA                                   | Kilosa                                   |
+| kilosa                                   | Kilosa                                   |
+| KILWA                                    | Kilwa                                    |
+| kilwa                                    | Kilwa                                    |
+| KINONDONI                                | Kinondoni                                |
+| kinondoni                                | Kinondoni                                |
+| KISARAWE                                 | Kisarawe                                 |
+| kisarawe                                 | Kisarawe                                 |
+| KISHAPU                                  | Kishapu                                  |
+| kishapu                                  | Kishapu                                  |
+| KITETO                                   | Kiteto                                   |
+| kiteto                                   | Kiteto                                   |
+| KONDOA                                   | Kondoa                                   |
+| kondoa                                   | Kondoa                                   |
+| KONGWA                                   | Kongwa                                   |
+| kongwa                                   | Kongwa                                   |
+| KOROGWE                                  | Korogwe                                  |
+| KOROGWE RURAL                            | Korogwe Rural                            |
+| KOROGWE URBAN                            | Korogwe Urban                            |
+| KUSINI                                   | Kusini                                   |
+| kusini                                   | Kusini                                   |
+| KWIMBA                                   | Kwimba                                   |
+| kwimba                                   | Kwimba                                   |
+| KYELA                                    | Kyela                                    |
+| kyela                                    | Kyela                                    |
+| KYERWA                                   | Kyerwa                                   |
+| kyerwa                                   | Kyerwa                                   |
+| LINDI                                    | Lindi                                    |
+| LINDI MANISPAA                           | Lindi Manispaa                           |
+| LINDI RURAL                              | Lindi Rural                              |
+| LINDI URBAN                              | Lindi Urban                              |
+| LIWALE                                   | Liwale                                   |
+| liwale                                   | Liwale                                   |
+| LONGIDO                                  | Longido                                  |
+| longido                                  | Longido                                  |
+| LUDEWA                                   | Ludewa                                   |
+| ludewa                                   | Ludewa                                   |
+| LUSHOTO                                  | Lushoto                                  |
+| lushoto                                  | Lushoto                                  |
+| MAFIA                                    | Mafia                                    |
+| MAFINGA                                  | Mafinga                                  |
+| MAFINGA MJI                              | Mafinga Mji                              |
+| MAFINGA TOWN                             | Mafinga Town                             |
+| MAGHARIBI                                | Magharibi                                |
+| magharibi                                | Magharibi                                |
+| MAGU                                     | Magu                                     |
+| magu                                     | Magu                                     |
+| MAKAMBAKO MJI                            | Makambako Mji                            |
+| MAKAMBAKO TOWN                           | Makambako Town                           |
+| MAKETE                                   | Makete                                   |
+| MANYONI                                  | Manyoni                                  |
+| manyoni                                  | Manyoni                                  |
+| MASASI                                   | Masasi                                   |
+| MASASI (M)                               | Masasi (M)                               |
+| MASASI MJI                               | Masasi Mji                               |
+| MASASI MJINI                             | Masasi Mjini                             |
+| MASASI RURAL                             | Masasi Rural                             |
+| MASASI URBAN                             | Masasi Urban                             |
+| MASWA                                    | Maswa                                    |
+| maswa                                    | Maswa                                    |
+| mbalali                                  | Mbalali                                  |
+| MBARALI                                  | Mbarali                                  |
+| MBEYA                                    | Mbeya                                    |
+| MBEYA JIJI                               | Mbeya Jiji                               |
+| MBEYA RURAL                              | Mbeya Rural                              |
+| MBEYA URBAN                              | Mbeya Urban                              |
+| MBEYA VIJIJINI                           | Mbeya Vijijini                           |
+| MBINGA                                   | Mbinga                                   |
+| mbinga                                   | Mbinga                                   |
+| MBOGWE                                   | Mbogwe                                   |
+| mbogwe                                   | Mbogwe                                   |
+| MBOZI                                    | Mbozi                                    |
+| mbozi                                    | Mbozi                                    |
+| MBULU                                    | Mbulu                                    |
+| mbulu                                    | Mbulu                                    |
+| MEATU                                    | Meatu                                    |
+| meatu                                    | Meatu                                    |
+| MERU                                     | Meru                                     |
+| meru                                     | Meru                                     |
+| MICHEWENI                                | Micheweni                                |
+| micheweni                                | Micheweni                                |
+| MISSENYI                                 | Missenyi                                 |
+| missenyi                                 | Missenyi                                 |
+| MISUNGWI                                 | Misungwi                                 |
+| misungwi                                 | Misungwi                                 |
+| MJINI                                    | Mjini                                    |
+| mjini                                    | Mjini                                    |
+| MKALAMA                                  | Mkalama                                  |
+| mkalama                                  | Mkalama                                  |
+| MKOANI                                   | Mkoani                                   |
+| mkoani                                   | Mkoani                                   |
+| MKURANGA                                 | Mkuranga                                 |
+| mkuranga                                 | Mkuranga                                 |
+| MLELE                                    | Mlele                                    |
+| mlele                                    | Mlele                                    |
+| MOMBA                                    | Momba                                    |
+| MONDULI                                  | Monduli                                  |
+| monduli                                  | Monduli                                  |
+| MOROGORO                                 | Morogoro                                 |
+| MOROGORO MANISPAA                        | Morogoro Manispaa                        |
+| MOROGORO MJINI                           | Morogoro Mjini                           |
+| MOROGORO RURAL                           | Morogoro Rural                           |
+| MOROGORO URBAN                           | Morogoro Urban                           |
+| MOSHI                                    | Moshi                                    |
+| MOSHI MANISPAA                           | Moshi Manispaa                           |
+| MOSHI RURAL                              | Moshi Rural                              |
+| MOSHI URBAN                              | Moshi Urban                              |
+| MPANDA                                   | Mpanda                                   |
+| MPANDA MJI                               | Mpanda Mji                               |
+| MPANDA RURAL                             | Mpanda Rural                             |
+| MPANDA URBAN                             | Mpanda Urban                             |
+| mpimbwe                                  | Mpimbwe                                  |
+| MPWAPWA                                  | Mpwapwa                                  |
+| mpwapwa                                  | Mpwapwa                                  |
+| MSALALA                                  | Msalala                                  |
+| msalala                                  | Msalala                                  |
+| MTWARA MANISPAA                          | Mtwara Manispaa                          |
+| MTWARA MIKINDANI                         | Mtwara Mikindani                         |
+| MTWARA RURAL                             | Mtwara Rural                             |
+| MTWARA URBAN                             | Mtwara Urban                             |
+| MTWARA VIJIJINI                          | Mtwara Vijijini                          |
+| MUFINDI                                  | Mufindi                                  |
+| mufindi                                  | Mufindi                                  |
+| MUHEZA                                   | Muheza                                   |
+| muheza                                   | Muheza                                   |
+| MULEBA                                   | Muleba                                   |
+| muleba                                   | Muleba                                   |
+| MUSOMA                                   | Musoma                                   |
+| MUSOMA MANISPAA                          | Musoma Manispaa                          |
+| MUSOMA RURAL                             | Musoma Rural                             |
+| MUSOMA URBAN                             | Musoma Urban                             |
+| MVOMERO                                  | Mvomero                                  |
+| mvomero                                  | Mvomero                                  |
+| MWANGA                                   | Mwanga                                   |
+| mwanga                                   | Mwanga                                   |
+| MWANZA URBAN                             | Mwanza Urban                             |
+| NACHINGWEA                               | Nachingwea                               |
+| nachingwea                               | Nachingwea                               |
+| NAMTUMBO                                 | Namtumbo                                 |
+| namtumbo                                 | Namtumbo                                 |
+| NANYUMBU                                 | Nanyumbu                                 |
+| nanyumbu                                 | Nanyumbu                                 |
+| NEWALA                                   | Newala                                   |
+| newala                                   | Newala                                   |
+| NGARA                                    | Ngara                                    |
+| ngara                                    | Ngara                                    |
+| NGORONGORO                               | Ngorongoro                               |
+| ngorongoro                               | Ngorongoro                               |
+| NJOMBE                                   | Njombe                                   |
+| NJOMBE MJI                               | Njombe Mji                               |
+| NJOMBE RURAL                             | Njombe Rural                             |
+| NJOMBE TOWN                              | Njombe Town                              |
+| NJOMBE URBAN                             | Njombe Urban                             |
+| NKASI                                    | Nkasi                                    |
+| nkasi                                    | Nkasi                                    |
+| NYAMAGANA                                | Nyamagana                                |
+| NYAMAGANA MANISPAA                       | Nyamagana Manispaa                       |
+| NYANG'HWALE                              | Nyang'hwale                              |
+| NYASA                                    | Nyasa                                    |
+| nyasa                                    | Nyasa                                    |
+| NZEGA                                    | Nzega                                    |
+| nzega                                    | Nzega                                    |
+| PANGANI                                  | Pangani                                  |
+| pangani                                  | Pangani                                  |
+| ROMBO                                    | Rombo                                    |
+| rombo                                    | Rombo                                    |
+| RORYA                                    | Rorya                                    |
+| rorya                                    | Rorya                                    |
+| RUANGWA                                  | Ruangwa                                  |
+| ruangwa                                  | Ruangwa                                  |
+| RUFIJI                                   | Rufiji                                   |
+| rufiji                                   | Rufiji                                   |
+| RUNGWE                                   | Rungwe                                   |
+| rungwe                                   | Rungwe                                   |
+| SAME                                     | Same                                     |
+| same                                     | Same                                     |
+| SENGEREMA                                | Sengerema                                |
+| sengerema                                | Sengerema                                |
+| SERENGETI                                | Serengeti                                |
+| serengeti                                | Serengeti                                |
+| SHINYANGA MANISPAA                       | Shinyanga Manispaa                       |
+| SHINYANGA RURAL                          | Shinyanga Rural                          |
+| SHINYANGA URBAN                          | Shinyanga Urban                          |
+| SIHA                                     | Siha                                     |
+| siha                                     | Siha                                     |
+| SIKONGE                                  | Sikonge                                  |
+| sikonge                                  | Sikonge                                  |
+| SIMANJIRO                                | Simanjiro                                |
+| simanjiro                                | Simanjiro                                |
+| SINGIDA                                  | Singida                                  |
+| SINGIDA MJINI                            | Singida Mjini                            |
+| SINGIDA RURAL                            | Singida Rural                            |
+| SINGIDA URBAN                            | Singida Urban                            |
+| SINYANGA                                 | Sinyanga                                 |
+| SONGEA                                   | Songea                                   |
+| SONGEA MANISPAA                          | Songea Manispaa                          |
+| SONGEA RURAL                             | Songea Rural                             |
+| SONGEA URBAN                             | Songea Urban                             |
+| SONGEA VIJIJINI                          | Songea Vijijini                          |
+| songwe                                   | Songwe                                   |
+| SUMBAWANGA                               | Sumbawanga                               |
+| SUMBAWANGA MANISPAA                      | Sumbawanga Manispaa                      |
+| SUMBAWANGA MJINI                         | Sumbawanga Mjini                         |
+| SUMBAWANGA RURAL                         | Sumbawanga Rural                         |
+| SUMBAWANGA URBAN                         | Sumbawanga Urban                         |
+| TABORA MANISPAA                          | Tabora Manispaa                          |
+| TABORA MJINI                             | Tabora Mjini                             |
+| TABORA URBAN                             | Tabora Urban                             |
+| TANDAHIMBA                               | Tandahimba                               |
+| tandahimba                               | Tandahimba                               |
+| TANGA                                    | Tanga                                    |
+| TANGA URBAN                              | Tanga Urban                              |
+| TARIME                                   | Tarime                                   |
+| tarime                                   | Tarime                                   |
+| TARIME TOWN                              | Tarime Town                              |
+| TEMEKE                                   | Temeke                                   |
+| temeke                                   | Temeke                                   |
+| TUNDURU                                  | Tunduru                                  |
+| tunduru                                  | Tunduru                                  |
+| UBUNGO                                   | Ubungo                                   |
+| ubungo                                   | Ubungo                                   |
+| UKEREWE                                  | Ukerewe                                  |
+| ukerewe                                  | Ukerewe                                  |
+| ULANGA                                   | Ulanga                                   |
+| ulanga                                   | Ulanga                                   |
+| URAMBO                                   | Urambo                                   |
+| urambo                                   | Urambo                                   |
+| USHETU                                   | Ushetu                                   |
+| ushetu                                   | Ushetu                                   |
+| USHETU KAHAMA                            | Ushetu Kahama                            |
+| UVINZA                                   | Uvinza                                   |
+| uvinza                                   | Uvinza                                   |
+| UYUI                                     | Uyui                                     |
+| uyui                                     | Uyui                                     |
+| WANG'ING'OMBE                            | Wanging'ombe                             |
+| WANGING'OMBE                             | Wanging'ombe                             |
+| WETE                                     | Wete                                     |
+| wete                                     | Wete                                     |
