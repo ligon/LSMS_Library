@@ -34,56 +34,48 @@ cluster_features:
                 "Communauté urbaine": Urban
 
 shocks:
-    file: NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS14P1.dta
+    file: NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS10P1.dta
     idxvars:
         i:
             - GRAPPE
             - MENAGE
-        Shock: MS14Q01
+        Shock: MS10Q01
     myvars:
         AffectedIncome:
-            - MS14Q04A
+            - MS10Q04A
             - mapping:
-                Diminué: True
                 Dimunié: True
+                Diminué: True
                 Augmenté: True
                 Inchangé: False
-                drop: True
-                Increase: True
-                Unchanged: False
+                Manquant: False
         AffectedAssets:
-            - MS14Q04B
+            - MS10Q04B
             - mapping:
-                Diminué: True
                 Dimunié: True
+                Diminué: True
                 Augmenté: True
                 Inchangé: False
-                drop: True
-                Increase: True
-                Unchanged: False
+                Manquant: False
         AffectedProduction:
-            - MS14Q04C
+            - MS10Q04C
             - mapping:
-                Diminué: True
                 Dimunié: True
+                Diminué: True
                 Augmenté: True
                 Inchangé: False
-                drop: True
-                Increase: True
-                Unchanged: False
+                Manquant: False
         AffectedConsumption:
-            - MS14Q04D
+            - MS10Q04D
             - mapping:
-                Diminué: True
                 Dimunié: True
+                Diminué: True
                 Augmenté: True
                 Inchangé: False
-                drop: True
-                Increase: True
-                Unchanged: False
-        HowCoped0: MS14Q05A
-        HowCoped1: MS14Q05B
-        HowCoped2: MS14Q05C
+                Manquant: False
+        HowCoped0: MS10Q05A
+        HowCoped1: MS10Q05B
+        HowCoped2: MS10Q05C
 
 assets:
     file: NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS07P1.dta
