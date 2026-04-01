@@ -34,6 +34,21 @@ cluster_features:
         - t
         - v
 
+food_acquired:
+    file: s07b_me_gnb2018.dta
+    idxvars:
+        v: grappe
+        visit: vague
+        i:
+            - grappe
+            - menage
+        j: s07bq01
+        u: s07bq03b
+    myvars:
+        Quantity: s07bq03a
+        Expenditure: s07bq08
+        Produced: s07bq04
+
 household_roster:
     file: ehcvm_individu_gnb2018.dta
     idxvars:
@@ -45,3 +60,74 @@ household_roster:
         Sex: sexe
         Age: age
         Relation: lien
+
+shocks:
+    file: s14_me_gnb2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+        Shock: s14q01
+    myvars:
+        AffectedIncome:
+            - s14q04a
+            - mapping:
+                Diminuiu: True
+                Aumentou: True
+                Não se alterou: False
+                Não abrangido: False
+        AffectedAssets:
+            - s14q04b
+            - mapping:
+                Diminuiu: True
+                Aumentou: True
+                Não se alterou: False
+                Não abrangido: False
+        AffectedProduction:
+            - s14q04c
+            - mapping:
+                Diminuiu: True
+                Aumentou: True
+                Não se alterou: False
+                Não abrangido: False
+        AffectedConsumption:
+            - s14q04d
+            - mapping:
+                Diminuiu: True
+                Aumentou: True
+                Não se alterou: False
+                Não abrangido: False
+        Cope1: s14q05__1
+        Cope2: s14q05__2
+        Cope3: s14q05__3
+        Cope4: s14q05__4
+        Cope5: s14q05__5
+        Cope6: s14q05__6
+        Cope7: s14q05__7
+        Cope8: s14q05__8
+        Cope9: s14q05__9
+        Cope10: s14q05__10
+        Cope11: s14q05__11
+        Cope12: s14q05__12
+        Cope13: s14q05__13
+        Cope14: s14q05__14
+        Cope15: s14q05__15
+        Cope16: s14q05__16
+        Cope17: s14q05__17
+        Cope18: s14q05__18
+        Cope19: s14q05__19
+        Cope20: s14q05__20
+        Cope21: s14q05__21
+        Cope22: s14q05__22
+        Cope23: s14q05__23
+        Cope24: s14q05__24
+        Cope25: s14q05__25
+
+interview_date:
+    file: s00_me_gnb2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        int_t: s00q23a

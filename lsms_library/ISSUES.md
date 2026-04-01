@@ -210,3 +210,7 @@
 - Malawi has similar wave-level `dvc.yaml` files but uses the inline `cd _ && cli` pattern instead of `run_stage.py`, so they may behave differently.
 - The country-level `dvc.yaml` (which does `--all-waves`) and the runtime's on-demand build path both work correctly. The wave-level files are redundant.
 - **Recommended fix**: Remove all wave-level `dvc.yaml` files and their corresponding `var/` directories and `.gitkeep` files from Uganda. Audit Malawi for the same issue.
+## 2026-04-01 12:37:42Z Benin – assets
+
+- Waves: 2018-19
+- Error: `ValueError: The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().`

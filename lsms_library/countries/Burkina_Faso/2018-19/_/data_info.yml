@@ -110,6 +110,19 @@ shocks:
         Cope25: s14q05__25
         Cope26: s14q05__26
 
+assets:
+    file: s12_me_bfa2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+        j: s12q01
+    myvars:
+        Quantity: s12q03
+        Age: s12q07
+        Value: s12q09
+        Purchase Price: s12q08
+
 food_acquired:
     file: s07b_me_bfa2018.dta
     idxvars:
@@ -124,3 +137,12 @@ food_acquired:
         Quantity: s07bq03a
         Expenditure: s07bq08
         Produced: s07bq04
+
+interview_date:
+    file: s00_me_bfa2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        int_t: s00q23a

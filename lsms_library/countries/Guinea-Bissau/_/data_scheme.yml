@@ -15,3 +15,22 @@ Data Scheme:
     Generation: int
     Distance: int
     Affinity: str
+
+  shocks:
+    index: (t, i, Shock)
+    AffectedIncome: bool
+    AffectedAssets: bool
+    AffectedProduction: bool
+    AffectedConsumption: bool
+    HowCoped0: str
+    HowCoped1: str
+    HowCoped2: str
+  food_acquired:
+    index: (t, v, visit, i, j, u)
+    Quantity: float
+    Expenditure: float
+    Produced: float
+
+  interview_date:
+    index: (t, i)
+    int_t: datetime

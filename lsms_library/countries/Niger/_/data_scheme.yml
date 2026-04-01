@@ -28,3 +28,24 @@ Data Scheme:
     Quantity: float
     Expenditure: float
     Produced: float
+
+  shocks:
+    index: (t, i, Shock)
+    AffectedIncome: bool
+    AffectedAssets: bool
+    AffectedProduction: bool
+    AffectedConsumption: bool
+    HowCoped0: str
+    HowCoped1: str
+    HowCoped2: str
+
+  assets:
+    index: (t, i, j)
+    Quantity: float
+    Age: float
+    Value: float
+    Purchase Price: float
+
+  interview_date:
+    index: (t, i)
+    int_t: datetime

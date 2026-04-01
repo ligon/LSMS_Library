@@ -1,71 +1,4 @@
-# Formatting  Functions for Senegal 2018-19
-import pandas as pd
 import numpy as np
-import lsms_library.local_tools as tools
-from collections import defaultdict
-
-def v(value):
-    '''
-    Formatting cluster id
-    '''
-    id = value[0].astype(str) + value[1].astype(str)
-
-    return tools.format_id(id)
-
-def i(value):
-    '''
-    Formatting household id
-    '''
-    id = value[0].astype(str) + value[1].astype(str) + value[2].astype(str)
-
-    return tools.format_id(id)
-
-def Sex(value):
-    '''
-    Formatting sex veriable
-    '''
-    if value == 'Féminin':
-        return 'f'
-    if value == 'Masculin':
-        return 'm'
-
-def Age(value):
-    '''
-    Formatting birthplace variable
-    '''
-    
-    value[2] = {'Janvier': 1, 'Février': 2, 'Mars': 3, 'Avril':4, 'Mai': 5, 'Juin': 6, 'Juillet': 7, 'Août': 8, 'Septembre': 9, 'Octobre': 10, 'Novembre': 11, 'Décembre': 12}.get(value[2])
-    return list(value)
-
-def Birthplace(value):
-    '''
-    Formatting birthplace variable
-    '''
-    if pd.isna(value):
-        return value
-    else:
-        return value.title()
-    
-def Relationship(value):
-    '''
-    Formatting relationship variable
-    '''
-    if value:
-        return str(value).title()
-
-def Region(value):
-    '''
-    Formatting region variable
-    '''
-    return value
-
-def Rural(value):
-    '''
-    Formatting rural variable
-    '''
-    return (value =='Rural') + 0.
-
-
 
 COPING_LABELS = {
     1: "Utilisation de son épargne",
@@ -100,7 +33,7 @@ COPING_LABELS = {
 def shocks(df):
     cope_cols = [c for c in df.columns if c.startswith('Cope')]
 
-    how_coped = {0: [], 1: [], 2: []}
+    how_coped = {0: [], 1: []}
     for _, row in df[cope_cols].iterrows():
         found = []
         for c in cope_cols:
@@ -112,24 +45,12 @@ def shocks(df):
                 continue
             if val >= 1:
                 found.append(COPING_LABELS.get(num, f'Strategy {num}'))
-            if len(found) == 3:
+            if len(found) == 2:
                 break
-        for k in range(3):
+        for k in range(2):
             how_coped[k].append(found[k] if k < len(found) else np.nan)
 
     df['HowCoped0'] = how_coped[0]
     df['HowCoped1'] = how_coped[1]
-    df['HowCoped2'] = how_coped[2]
     df = df.drop(columns=cope_cols)
-    return df
-
-
-def household_roster(df):
-    '''
-    Formatting dataframe to calculate ages
-    '''
-
-    df["Age"] = df.apply(lambda x: tools.age_handler(age = x["Age"][0], d = x["Age"][1], m = x["Age"][2], y = x["Age"][3], interview_date=x["interview_date"], interview_year=2018), axis = 1)
-    df = df.drop('interview_date', axis = 'columns')
-    
     return df

@@ -2009,7 +2009,7 @@ def _normalize_dataframe_index(
     - Collapses duplicate entries via first-observation aggregation.
     """
 
-    if not isinstance(df, pd.DataFrame) or not isinstance(df.index, pd.MultiIndex):
+    if not isinstance(df, pd.DataFrame):
         return df
 
     declared = _declared_index_levels(schema_entry)
@@ -2037,8 +2037,8 @@ def _normalize_dataframe_index(
         remaining = [lvl for lvl in current_names if lvl not in present_declared]
         try:
             df = df.reorder_levels(present_declared + remaining)
-        except ValueError:
-            pass  # level count mismatch; keep original order
+        except (ValueError, TypeError):
+            pass  # level count mismatch or non-hierarchical index; keep original order
 
     # Drop any unexpected index levels
     extra_levels = [lvl for lvl in df.index.names if lvl not in declared]

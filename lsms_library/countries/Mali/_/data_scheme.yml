@@ -28,6 +28,12 @@ Data Scheme:
   panel_ids:
     index: (t, i)
     previous_i: str
+  assets:
+    index: (t, i, j)
+    Quantity: float
+    Age: float
+    Value: float
+    Purchase Price: float
   shocks:
     index: (t, i, Shock)
     AffectedIncome: bool

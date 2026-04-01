@@ -182,7 +182,27 @@ Same org-table format as per-country `categorical_mapping.org`:
 | Flood           | Flood       | Inondation    | Inondation   | Flood           |
 ```
 
-**API:** `Feature('shocks').harmonized()` or `Feature('shocks')(harmonize=True)` would apply the mapping after concatenation. Raw labels preserved by default; harmonization is opt-in.
+**API:** The `harmonize` parameter selects which column from the mapping table to use:
+
+```python
+import lsms_library as ll
+
+# Raw labels (default) — each country's own labels preserved
+shocks = ll.Feature('shocks')()
+
+# Harmonize to canonical English
+shocks = ll.Feature('shocks')(harmonize='Preferred')
+
+# Harmonize to French
+shocks = ll.Feature('shocks')(harmonize='French')
+
+# Harmonize to aggregate categories (coarser grouping)
+food = ll.Feature('food_acquired')(harmonize='Aggregate')
+```
+
+This mirrors the within-country `categorical_mapping.org` pattern: the org table has multiple named columns (``Preferred Label``, ``Aggregate``, ``French``, etc.) and the caller chooses which mapping to apply. Uganda's food item tables already use ``Preferred`` vs ``Aggregate`` columns for different granularities.
+
+The mapping table determines what columns are available. If a table has only ``Preferred Label``, that's the only option. A richer table might offer ``Preferred``, ``Aggregate``, ``French``, ``FAO Code``, etc.
 
 **Principle:** The library preserves what the survey says. Cross-country label harmonization is a form of aggregation — the analyst's decision, not the pipeline's. These mappings are convenience tools, not data transformations.
 

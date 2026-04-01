@@ -1,0 +1,116 @@
+#+title: Categorical Mappings
+
+#+NAME: Region
+| Original Label                 | Preferred Label                |
+|--------------------------------+--------------------------------|
+| Agadez                         | Agadez                         |
+| gadez                          | Agadez                         |
+| Communauté urbaine de Niamey   | Niamey                         |
+| Niamey                         | Niamey                         |
+| Diffa                          | Diffa                          |
+| Dosso                          | Dosso                          |
+| Maradi                         | Maradi                         |
+| Tahoua                         | Tahoua                         |
+| Tillabéri                      | Tillabéri                      |
+| Tillaberi                      | Tillabéri                      |
+| Zinder                         | Zinder                         |
+
+#+NAME: District
+| Original Label                 | Preferred Label                |
+|--------------------------------+--------------------------------|
+| abala                          | Abala                          |
+| abalak                         | Abalak                         |
+| aderbissinat                   | Aderbissinat                   |
+| Aguié                          | Aguié                          |
+| aguie                          | Aguié                          |
+| Arlit                          | Arlit                          |
+| arlit                          | Arlit                          |
+| ayerou                         | Ayérou                         |
+| bagaroua                       | Bagaroua                       |
+| balleyara                      | Balleyara                      |
+| belbedji                       | Belbédji                       |
+| bermo                          | Bermo                          |
+| Birni N'Konni                  | Birni N'Konni                  |
+| BIRNI N'KONNI                  | Birni N'Konni                  |
+| Boboye                         | Boboye                         |
+| boboye                         | Boboye                         |
+| Bouza                          | Bouza                          |
+| bouza                          | Bouza                          |
+| Dakoro                         | Dakoro                         |
+| dakoro                         | Dakoro                         |
+| DAMAGARAM TAKAYA               | Damagaram Takaya               |
+| Diffa                          | Diffa                          |
+| diffa                          | Diffa                          |
+| dioundiou                      | Dioundiou                      |
+| Dogondoutchi                   | Dogondoutchi                   |
+| dogondoutchi                   | Dogondoutchi                   |
+| Dosso                          | Dosso                          |
+| dosso                          | Dosso                          |
+| dungass                        | Dungass                        |
+| falmey                         | Falmey                         |
+| Filingué                       | Filingué                       |
+| filingue                       | Filingué                       |
+| Gaya {added May/04, 07}        | Gaya                           |
+| gaya                           | Gaya                           |
+| gazaoua                        | Gazaoua                        |
+| gotheye                        | Gothèye                        |
+| goudoumaria                    | Goudoumaria                    |
+| Gouré                          | Gouré                          |
+| goure                          | Gouré                          |
+| Guidan-Roumdji                 | Guidan-Roumdji                 |
+| GUIDAN-ROUMDJI                 | Guidan-Roumdji                 |
+| iferouane                      | Iférouane                      |
+| Illéla                         | Illéla                         |
+| illela                         | Illéla                         |
+| ingall                         | Ingall                         |
+| kantche                        | Kantché                        |
+| Keita                          | Keïta                          |
+| keita                          | Keïta                          |
+| Kollo                          | Kollo                          |
+| kollo                          | Kollo                          |
+| Loga                           | Loga                           |
+| loga                           | Loga                           |
+| Madaoua                        | Madaoua                        |
+| madaoua                        | Madaoua                        |
+| Madarounfa                     | Madarounfa                     |
+| madarounfa                     | Madarounfa                     |
+| Magaria                        | Magaria                        |
+| magaria                        | Magaria                        |
+| Maïné-Soroa                    | Maïné-Soroa                    |
+| MAINE-SOROA                    | Maïné-Soroa                    |
+| malbaza                        | Malbaza                        |
+| Matamèye                       | Matamèye                       |
+| Mayahi                         | Mayahi                         |
+| mayahi                         | Mayahi                         |
+| Mirriah                        | Mirriah                        |
+| mirriah                        | Mirriah                        |
+| N'Guigmi                       | N'Guigmi                       |
+| N'GUIGMI                       | N'Guigmi                       |
+| N'GOURTI                       | N'Gourti                       |
+| Niamey1                        | Niamey                         |
+| Ouallam                        | Ouallam                        |
+| ouallam                        | Ouallam                        |
+| Say                            | Say                            |
+| say                            | Say                            |
+| Tahoua                         | Tahoua                         |
+| tahoua                         | Tahoua                         |
+| takeita                        | Takéita                        |
+| Tanout                         | Tanout                         |
+| tanout                         | Tanout                         |
+| Tchin-Tabaraden                | Tchin-Tabaraden                |
+| tchintabaraden                 | Tchin-Tabaraden                |
+| Tchirozérine                   | Tchirozérine                   |
+| tchirozerine                   | Tchirozérine                   |
+| Téra                           | Téra                           |
+| tera                           | Téra                           |
+| tesker                         | Tesker                         |
+| Tessaoua                       | Tessaoua                       |
+| tessaoua                       | Tessaoua                       |
+| TIBIRI (DOUTCHI)               | Tibiri                         |
+| Tillaberi                      | Tillabéri                      |
+| tillaberi                      | Tillabéri                      |
+| torodi                         | Torodi                         |
+| VILLE DE MARADI                | Ville de Maradi                |
+| VILLE DE NIAMEY                | Ville de Niamey                |
+| VILLE DE TAHOUA                | Ville de Tahoua                |
+| VILLE DE ZINDER                | Ville de Zinder                |

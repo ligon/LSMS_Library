@@ -71,6 +71,19 @@ interview_date:
         Int_t: s00q23a
     
 
+assets:
+    file: s12_me_mli2021.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+        j: s12q01
+    myvars:
+        Quantity: s12q03
+        Age: s12q07
+        Value: s12q09
+        Purchase Price: s12q08
+
 shocks:
     file: s14b_me_mli2021.dta
     idxvars:

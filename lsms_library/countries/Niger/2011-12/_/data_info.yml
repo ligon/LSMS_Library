@@ -46,3 +46,48 @@ cluster_features:
     final_index:
         - t
         - v
+
+shocks:
+    file: NER_2011_ECVMA_v01_M_Stata8/ecvmachoc_p1_en.dta
+    idxvars:
+        i: hid
+        Shock: ms11q01
+    myvars:
+        AffectedIncome:
+            - ms11q04a
+            - mapping:
+                drop: True
+                Increase: True
+                Unchanged: False
+        AffectedAssets:
+            - ms11q04b
+            - mapping:
+                drop: True
+                Increase: True
+                Unchanged: False
+        AffectedProduction:
+            - ms11q04c
+            - mapping:
+                drop: True
+                Increase: True
+                Unchanged: False
+        AffectedConsumption:
+            - ms11q04d
+            - mapping:
+                drop: True
+                Increase: True
+                Unchanged: False
+        HowCoped0: ms11q05a
+        HowCoped1: ms11q05b
+        HowCoped2: ms11q05c
+
+assets:
+    file: NER_2011_ECVMA_v01_M_Stata8/ecvmaactif_p1_en.dta
+    idxvars:
+        i: hid
+        j: ms07q01
+    myvars:
+        Quantity: ms07q03
+        Age: ms07q04
+        Value: ms07q06
+        Purchase Price: ms07q05

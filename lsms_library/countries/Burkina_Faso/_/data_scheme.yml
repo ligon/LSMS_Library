@@ -22,6 +22,13 @@ Data Scheme:
     Quantity: float
     Expenditure: float
     Produced: float
+  assets:
+    index: (t, i, j)
+    Quantity: float
+    Age: float
+    Value: float
+    Purchase Price: float
+
   shocks:
     index: (t, i, Shock)
     AffectedIncome: bool
@@ -31,6 +38,10 @@ Data Scheme:
     HowCoped0: str
     HowCoped1: str
     HowCoped2: str
+
+  interview_date:
+    index: (t, i)
+    int_t: datetime
 
   food_expenditures: !make
   food_prices: !make
