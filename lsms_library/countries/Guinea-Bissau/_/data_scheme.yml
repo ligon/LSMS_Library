@@ -25,3 +25,8 @@ Data Scheme:
     HowCoped0: str
     HowCoped1: str
     HowCoped2: str
+  food_acquired:
+    index: (t, v, visit, i, j, u)
+    Quantity: float
+    Expenditure: float
+    Produced: float
