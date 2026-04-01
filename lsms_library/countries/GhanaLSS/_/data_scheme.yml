@@ -29,6 +29,9 @@ Data Scheme:
     Generation: int
     Distance: int
     Affinity: str
+  household_characteristics:
+    index: (t, i)
+
   food_acquired:
     index: (t, v, i, j)
     Expenditure: float
