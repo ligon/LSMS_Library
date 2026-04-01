@@ -19,7 +19,8 @@ def i(value):
 
 Waves = {'2011-12': (),
          '2014-15': (),
-         '2018-19': ()}
+         '2018-19': (),
+         '2021-22': ()}
 
 def age_sex_composition(df, sex, sex_converter, age, age_converter, hhid):
     Age_ints = ((0,4),(4,9),(9,14),(14,19),(19,31),(31,51),(51,100))
