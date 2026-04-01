@@ -87,6 +87,19 @@ shocks:
         HowCoped1: CS4B
         HowCoped2: CS4C
 
+assets:
+    file: emc2014_p1_biensdurables_27022015.dta
+    idxvars:
+        i:
+            - zd
+            - menage
+        j: code_article
+    myvars:
+        Quantity: pm2
+        Age: pm3
+        Value: pm5
+        Purchase Price: pm4
+
 food_acquired:
     idxvars:
         v: zd

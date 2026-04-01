@@ -45,3 +45,79 @@ cluster_features:
                 Urbain: Urban
                 urbain: Urban
                 URBAIN: Urban
+
+shocks:
+    file: s14b_me_ner2021.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+        Shock: s14bq01
+    myvars:
+        AffectedIncome:
+            - s14bq04a
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        AffectedAssets:
+            - s14bq04b
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        AffectedProduction:
+            - s14bq04c
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        AffectedConsumption:
+            - s14bq04d
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        Cope1: s14bq05__1
+        Cope2: s14bq05__2
+        Cope3: s14bq05__3
+        Cope4: s14bq05__4
+        Cope5: s14bq05__5
+        Cope6: s14bq05__6
+        Cope7: s14bq05__7
+        Cope8: s14bq05__8
+        Cope9: s14bq05__9
+        Cope10: s14bq05__10
+        Cope11: s14bq05__11
+        Cope12: s14bq05__12
+        Cope13: s14bq05__13
+        Cope14: s14bq05__14
+        Cope15: s14bq05__15
+        Cope16: s14bq05__16
+        Cope17: s14bq05__17
+        Cope18: s14bq05__18
+        Cope19: s14bq05__19
+        Cope20: s14bq05__20
+        Cope21: s14bq05__21
+        Cope22: s14bq05__22
+        Cope23: s14bq05__23
+        Cope24: s14bq05__24
+        Cope25: s14bq05__25
+        Cope26: s14bq05__26
+
+assets:
+    file: s12_me_ner2021.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+        j: s12q01
+    myvars:
+        Quantity: s12q03
+        Age: s12q07
+        Value: s12q09
+        Purchase Price: s12q08

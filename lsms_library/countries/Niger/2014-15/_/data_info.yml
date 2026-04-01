@@ -32,3 +32,68 @@ cluster_features:
                 URBAIN: Urban
                 "Communauté Urbaine": Urban
                 "Communauté urbaine": Urban
+
+shocks:
+    file: NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS14P1.dta
+    idxvars:
+        i:
+            - GRAPPE
+            - MENAGE
+        Shock: MS14Q01
+    myvars:
+        AffectedIncome:
+            - MS14Q04A
+            - mapping:
+                Diminué: True
+                Dimunié: True
+                Augmenté: True
+                Inchangé: False
+                drop: True
+                Increase: True
+                Unchanged: False
+        AffectedAssets:
+            - MS14Q04B
+            - mapping:
+                Diminué: True
+                Dimunié: True
+                Augmenté: True
+                Inchangé: False
+                drop: True
+                Increase: True
+                Unchanged: False
+        AffectedProduction:
+            - MS14Q04C
+            - mapping:
+                Diminué: True
+                Dimunié: True
+                Augmenté: True
+                Inchangé: False
+                drop: True
+                Increase: True
+                Unchanged: False
+        AffectedConsumption:
+            - MS14Q04D
+            - mapping:
+                Diminué: True
+                Dimunié: True
+                Augmenté: True
+                Inchangé: False
+                drop: True
+                Increase: True
+                Unchanged: False
+        HowCoped0: MS14Q05A
+        HowCoped1: MS14Q05B
+        HowCoped2: MS14Q05C
+
+assets:
+    file: NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS07P1.dta
+    idxvars:
+        i:
+            - GRAPPE
+            - MENAGE
+        j: MS07Q01
+    myvars:
+        Quantity: MS07Q03
+        Age: MS07Q04
+        Value: MS07Q06
+        Purchase Price: MS07Q05

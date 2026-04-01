@@ -22,6 +22,13 @@ Data Scheme:
     Quantity: float
     Expenditure: float
     Produced: float
+  assets:
+    index: (t, i, j)
+    Quantity: float
+    Age: float
+    Value: float
+    Purchase Price: float
+
   shocks:
     index: (t, i, Shock)
     AffectedIncome: bool
