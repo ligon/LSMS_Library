@@ -1,0 +1,10 @@
+assets:
+    file: ../Data/R2_Z06C_Durables.dta
+    idxvars:
+        i: WWWHH
+        j: r2_durcode
+    myvars:
+        Quantity: r2_durbl_nm
+        Age: r2_durbl_yr
+        Value: r2_durbl_vn
+        Purchase Price: r2_durbl_vt

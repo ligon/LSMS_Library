@@ -1,0 +1,12 @@
+assets:
+    file: ../Data/S06C.dta
+    idxvars:
+        i:
+            - xhpsu
+            - xhnum
+        j: v06c_itm
+    myvars:
+        Quantity: v06_06
+        Age: v06_07
+        Value: v06_10
+        Purchase Price: v06_09
