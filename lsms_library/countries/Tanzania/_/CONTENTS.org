@@ -362,8 +362,41 @@ min          0.340000
 max     450000.000000
 #+end_example
 
-** TODO Food Conversion Table
+** TODO Food Conversion Table (FCT) -- GitHub Issue #118
 See https://www.fao.org/3/X6877E/X6877E00.htm
+
+- What is missing :: A Food Composition Table (FCT) mapping food items to
+  nutritional content (calories, protein, fat, etc.) has not been assembled
+  for Tanzania. No =nutrition.py= or FCT pipeline exists.
+- What exists :: =conversion_to_kgs.json= is complete, providing unit-to-kg
+  conversion factors (95 entries covering standard and local units like
+  Akendo, sacks, jerricans, tins, basins, bottles, cups, plates, etc.).
+  The conversion data was built from Tanzania wave-specific conversion
+  factor files referenced in the source block above. =food_items.org=
+  provides harmonized food item labels across all three wave groups
+  (2008-15, 2019-20, 2020-21).
+- Survey documentation :: Household questionnaires (DVC-tracked PDFs in
+  each wave's =Documentation/=) include food consumption modules. The
+  2020-21 wave has a detailed report (=nps_wave_5_report.pdf=). None of
+  these embed nutritional composition data. The 2008-15 multi-wave data
+  file (=upd4_hh_j1.dta=) covers rounds 1-4 but does not include
+  nutrient information.
+- Additional context :: The 2019-20 and 2020-21 waves are missing food
+  quantity data (see the WAITING item above on "Missing food quantities"),
+  which affects the utility of both the existing =conversion_to_kgs.json=
+  and any future FCT for those waves.
+- What is needed to fix ::
+  1. Assemble an FCT mapping each "Preferred Label" from =food_items.org=
+     to nutrient values (kcal, protein, fat, carbohydrate per 100g).
+  2. The FAO resource above provides East African food composition data
+     that could serve as a primary source (same as Ethiopia).
+  3. Alternatively, use USDA FoodData Central with appropriate food
+     matches for Tanzanian food items.
+  4. Create =nutrition.py= in =Tanzania/_/= and add a =nutrition: !make=
+     entry to =data_scheme.yml= (following Ethiopia's pattern).
+  5. Note: The missing food quantities in recent waves (issue documented
+     above) will limit FCT usefulness until that upstream data gap is
+     resolved.
 ** DONE shocks.py
 CLOSED: [2023-03-23 Thu 15:59]
 

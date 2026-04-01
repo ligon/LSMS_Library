@@ -219,11 +219,43 @@ Missing dependencies for OracleDemands.
 | Kalongonda (Mucuna)                         | ---                        | ---                                              | ---                                              | KALONGONDA (Mucuna)                                 |   |
 | Groundnut Dried (Unshelled)                 | ---                        | ---                                              | ---                                              | Groundnut Dried (UnShelled)                         |   |
 
-** TODO conversion_to_kgs.json
+** TODO conversion_to_kgs.json -- GitHub Issue #116
 IHS3-IHS5 have conversion tables provided to convert various item units into kilograms. Values for conversion factors were broken down by region and source type, and there is a unique table for ISH3 and ISH5. Documentation indicates that similar methods were used for ISH4, so unit conversions were taken from ISH3--the factors can be found in the csv file /2013/_. Please see IHS3’s document entitled “Malawi_IHS3_Food_Item_Conversion_Factors.pdf” for more information on how this was conducted. For the intents of conversion to kg for ISH5 as it contains several conservation factors for each food/unit/region combination, the mean of conversion factors was taken to populate the factors column. There are some minor issues where item naming does not match up perfectly between the conversion table and the food acquired ones. Names from the conversion table were slightly cleaned, but using a similar method as the one for constructing food_items.org may be better. ISH2 does not have any information on food conversion.
 
 Some items have additionally specified unit names found under “unitsdetail_” because they were not among the standard units. Some of these have names such as ‘200 GRAMS’ that indicate the units in a manner that can be converted easily to kg. Conversion factors were additionally updated with information from these columns. Only consumption and expenditure quantities were converted for now.
 For items that have such unit conversions already done, they were scaled by the conversion factor given or otherwise specified.
+
+*** Known gaps and issues
+- No =conversion_to_kgs.json= file has been generated :: Despite the
+  conversion factor data being available in wave-specific =.dta= files,
+  the final JSON file used by the pipeline has not been created.
+- IHS2 (2004-05) has no conversion information :: The earliest wave
+  lacks any unit-to-kg conversion factors entirely.
+- Item name mismatches :: Food item names in the conversion tables do
+  not perfectly align with labels in =food_acquired=. A fuzzy-matching
+  approach (similar to =food_items.org= construction) is needed.
+- Incomplete quantity coverage :: Only consumption and expenditure
+  quantities were converted; production and in-kind receipt quantities
+  are not yet handled.
+- Source data available in DVC ::
+  - =2016-17/Data/Cross_Sectional/com_cf1.dta=, =com_cf2.dta= (community
+    conversion factors)
+  - =2019-20/Data/Cross_Sectional/ihs_foodconversion_factor_2020.dta=
+    (dedicated food conversion table)
+  - =2019-20/Data/Cross_Sectional/caloric_conversionfactor.dta= (caloric
+    conversion factors)
+  - =2010-11/Documentation/Malawi_IHS3_Food_Item_Conversion_Factors.pdf=
+    (methodology documentation)
+- What is needed to fix ::
+  1. Build =conversion_to_kgs.json= by reading the wave-specific
+     conversion factor =.dta= files and computing median factors per
+     unit, similar to the Ethiopia and Tanzania approach.
+  2. Harmonize item names between conversion tables and =food_items.org=
+     using fuzzy matching.
+  3. For IHS2, consider using IHS3 factors as a proxy, or use FAO
+     standard conversion factors.
+  4. Extend conversion to cover all quantity columns (production,
+     in-kind receipt), not just consumption and expenditure.
 
 ** DONE other_features.py
 ** DONE household_characteristics.py
@@ -250,8 +282,24 @@ print(pd.read_parquet('../var/food_quantities.parquet').describe())
 print(pd.read_parquet('../var/food_expenditures.parquet').describe())
 #+end_src
 
-** TODO Food Conversion Table
-Malawi data also contains caloric data
+** TODO Food Conversion Table (FCT) -- GitHub Issue #116
+- What is missing :: A Food Composition Table mapping food items to
+  nutritional content (calories, protein, fat, etc.) has not been
+  assembled for Malawi.
+- What exists :: The IHS5 (2019-20) wave includes
+  =caloric_conversionfactor.dta= which contains caloric data that
+  could be leveraged. No =nutrition.py= or FCT pipeline exists yet.
+- Survey documentation :: IHS5 documentation includes a "Household Food
+  Consumption Aid" (DVC-tracked in =2019-20/Documentation/=) which may
+  contain relevant nutritional reference data.
+- What is needed to fix ::
+  1. Extract caloric conversion factors from
+     =2019-20/Data/Cross_Sectional/caloric_conversionfactor.dta=.
+  2. Map food items to a standard FCT (e.g., FAO or USDA FoodData
+     Central) using "Preferred Labels" from =food_items.org=.
+  3. Create =nutrition.py= and a structured FCT file in =Malawi/_/=.
+  4. Note: The caloric data in the survey itself provides a head start
+     that Ethiopia and Tanzania lack.
 
 * Files in Malawi/<SOMEYEAR>/_/
 ** DONE household_characteristics.py
