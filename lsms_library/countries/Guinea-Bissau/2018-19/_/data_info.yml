@@ -34,6 +34,21 @@ cluster_features:
         - t
         - v
 
+food_acquired:
+    file: s07b_me_gnb2018.dta
+    idxvars:
+        v: grappe
+        visit: vague
+        i:
+            - grappe
+            - menage
+        j: s07bq01
+        u: s07bq03b
+    myvars:
+        Quantity: s07bq03a
+        Expenditure: s07bq08
+        Produced: s07bq04
+
 household_roster:
     file: ehcvm_individu_gnb2018.dta
     idxvars:
