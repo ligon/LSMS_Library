@@ -1,5 +1,14 @@
 #+title: Categorical Mapping
 
+* Regions
+
+#+NAME: Region
+| Original Label                 | Preferred Label                |
+|--------------------------------+--------------------------------|
+| Segou                          | Ségou                          |
+| Tomboctou                      | Tombouctou                     |
+
+* Food Units
 
 #+begin_src python :results output raw table
 import lsms_library as ll
