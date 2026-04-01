@@ -122,3 +122,12 @@ shocks:
         Cope23: s14q05__23
         Cope24: s14q05__24
         Cope25: s14q05__25
+
+interview_date:
+    file: s00_me_gnb2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        int_t: s00q23a

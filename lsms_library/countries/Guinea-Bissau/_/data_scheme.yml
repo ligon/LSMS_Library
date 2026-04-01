@@ -30,3 +30,7 @@ Data Scheme:
     Quantity: float
     Expenditure: float
     Produced: float
+
+  interview_date:
+    index: (t, i)
+    int_t: datetime

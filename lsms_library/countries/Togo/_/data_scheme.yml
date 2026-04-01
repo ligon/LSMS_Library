@@ -57,3 +57,7 @@ Data Scheme:
     Cope24: float
     Cope25: float
     Cope26: float
+
+  interview_date:
+    index: (t, i)
+    int_t: datetime

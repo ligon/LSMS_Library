@@ -78,3 +78,10 @@ assets:
         Age: hh_m02
         Value: hh_m04
         Purchase Price: hh_m03
+
+interview_date:
+    file: HH_SEC_A.dta
+    idxvars:
+        i: sdd_hhid
+    myvars:
+        int_t: hh_a18

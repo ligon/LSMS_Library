@@ -45,3 +45,7 @@ Data Scheme:
     Age: float
     Value: float
     Purchase Price: float
+
+  interview_date:
+    index: (t, i)
+    int_t: datetime

@@ -10,7 +10,6 @@ Waves:
   - '2016-17'
 
 Index Info:
-  note: no interview date (int_t), compared with global index info
   index_info:
     cluster_features: (t, v)
     household_roster: (t, v, i, pid)
@@ -35,5 +34,9 @@ Data Scheme:
     Quantity: float
     Price: float
     Produced: float
+
+  interview_date:
+    index: (t, i)
+    int_t: datetime
 
 

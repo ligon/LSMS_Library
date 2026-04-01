@@ -39,6 +39,10 @@ Data Scheme:
     HowCoped1: str
     HowCoped2: str
 
+  interview_date:
+    index: (t, i)
+    int_t: datetime
+
   food_expenditures: !make
   food_prices: !make
   food_quantities: !make
