@@ -137,3 +137,12 @@ food_acquired:
         Quantity: s07bq03a
         Expenditure: s07bq08
         Produced: s07bq04
+
+interview_date:
+    file: s00_me_bfa2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        int_t: s00q23a

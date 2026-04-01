@@ -113,3 +113,12 @@ shocks:
         Cope24: s14q05__24
         Cope25: s14q05__25
         Cope26: s14q05__26
+
+interview_date:
+    file: ../Data1/s00_me_tgo2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        int_t: s00q23a

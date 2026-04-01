@@ -31,6 +31,10 @@ Data Scheme:
     index: (t, i, j)
     Quantity: float
 
+  interview_date:
+    index: (t, i)
+    int_t: datetime
+
   food_acquired: !make
   food_expenditures: !make
   food_prices: !make

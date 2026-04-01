@@ -159,3 +159,13 @@ assets:
             - mapping: {}
         Value: s12q09
         Purchase Price: s12q08
+
+interview_date:
+    file: s00_me_sen2018.dta
+    idxvars:
+        i:
+            - vague
+            - grappe
+            - menage
+    myvars:
+        int_t: s00q23a

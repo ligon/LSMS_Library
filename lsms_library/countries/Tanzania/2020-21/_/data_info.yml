@@ -67,3 +67,10 @@ shocks:
                 neither: False
         HowCoped0: hh_r04_1
         HowCoped1: hh_r04_2
+
+interview_date:
+    file: hh_sec_a.dta
+    idxvars:
+        i: y5_hhid
+    myvars:
+        int_t: hh_a18

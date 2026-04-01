@@ -137,3 +137,12 @@ assets:
         Age: s12q07
         Value: s12q09
         Purchase Price: s12q08
+
+interview_date:
+    file: s00_me_ner2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        int_t: s00q23a

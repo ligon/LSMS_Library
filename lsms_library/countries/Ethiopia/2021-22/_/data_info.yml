@@ -111,3 +111,10 @@ assets:
         j: asset_cd
     myvars:
         Quantity: s11q01
+
+interview_date:
+    file: sect_cover_ph_w5.dta
+    idxvars:
+        i: household_id
+    myvars:
+        int_t: InterviewDate
