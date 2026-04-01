@@ -346,6 +346,10 @@ def df_data_grabber(fn: str | Path, idxvars: dict[str, Any] | str, convert_categ
 
     for k,v in idxvars.items():
         out[k] = grabber(df,v)
+        # All index variables are identifiers, not quantities.
+        # Coerce to string via format_id to prevent float/int IDs
+        # (e.g., grappe=1114002.0) and ensure consistent merge keys.
+        out[k] = out[k].apply(format_id)
 
     out = pd.DataFrame(out)
 
