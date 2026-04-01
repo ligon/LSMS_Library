@@ -64,10 +64,26 @@ household_roster:
             - menage
       myvars:
           interview_date: s00q23a
-  merge_on: 
+  merge_on:
     - v
     - i
   final_index:
     - v
     - i
     - pid
+
+assets:
+    file: s12_me_sen2018.dta
+    idxvars:
+        i:
+            - vague
+            - grappe
+            - menage
+        j: s12q01
+    myvars:
+        Quantity: s12q03
+        Age:
+            - s12q07
+            - mapping: {}
+        Value: s12q09
+        Purchase Price: s12q08
