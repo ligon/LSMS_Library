@@ -35,7 +35,6 @@ Data Scheme:
     Quantity: float
     Price: float
     Produced: float
-  household_characteristics: !make
   interview_date:
     index: (t, v, visit, i)
     Int_t: str

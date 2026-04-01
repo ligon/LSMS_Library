@@ -30,9 +30,6 @@ Data Scheme:
   food_quantities:
     index: (t, v, i, j)
     Quantity: float
-  household_characteristics:
-    index: (t, v, i)
-    materialize: make
   household_roster:
     index: (t, v, i, pid)
     Sex: str

@@ -28,7 +28,6 @@ Data Scheme:
   earnings: !make
   food_acquired: !make
   nutrition: !make
-  household_characteristics: !make
   interview_date: !make
   food_quantities: !make
   food_expenditures: !make

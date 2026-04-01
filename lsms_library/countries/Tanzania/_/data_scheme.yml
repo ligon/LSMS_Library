@@ -33,7 +33,6 @@ Data Scheme:
   food_expenditures: !make
   food_quantities: !make
   food_prices: !make
-  household_characteristics: !make
   other_features: !make
   panel_ids: !make
 
