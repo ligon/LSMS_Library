@@ -41,6 +41,16 @@ cluster_features:
         - t
         - v
 
+assets:
+    file: sect5_plantingw4.dta
+    idxvars:
+        i: hhid
+        j: item_cd
+    myvars:
+        Quantity: s5q1
+        Age: s5q3
+        Value: s5q4
+
 shocks:
     file: sect15a_harvestw4.dta
     idxvars:

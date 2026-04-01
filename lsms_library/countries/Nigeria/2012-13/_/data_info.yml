@@ -37,6 +37,33 @@ cluster_features:
         - t
         - v
 
+assets:
+    dfs:
+        - df_qty
+        - df_detail
+    df_qty:
+        file: Post Planting Wave 2/Household/sect5a_plantingw2.dta
+        idxvars:
+            i: hhid
+            j: item_cd
+        myvars:
+            Quantity: s5q1
+    df_detail:
+        file: Post Planting Wave 2/Household/sect5b_plantingw2.dta
+        idxvars:
+            i: hhid
+            j: item_cd
+        myvars:
+            Age: s5q3
+            Value: s5q4
+    merge_on:
+        - i
+        - j
+    final_index:
+        - t
+        - i
+        - j
+
 shocks:
     file: Post Harvest Wave 2/Household/sect15a_harvestw2.dta
     idxvars:
