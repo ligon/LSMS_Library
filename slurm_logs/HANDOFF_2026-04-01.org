@@ -1,0 +1,116 @@
+#+title: Session Handoff — 2026-03-30 through 2026-04-01
+#+date: <2026-04-01 Tue>
+
+* What happened
+
+Two-day session building infrastructure for WB data acquisition, autonomous
+feature generation, and Slurm-based agent dispatch.
+
+** Infrastructure built
+- =data_access.py=: =discover_waves()=, =add_wave()=, =push_to_cache_batch()=, =_dvc_cmd()=
+- =diagnostics.py=: =validate_feature()= gate (21 checks incl. cross-country, string consistency, extra index levels)
+- =dispatch_feature.sh=: Slurm dispatch with git worktree isolation
+- S3 push working from compute nodes via =.dvc/config.local= + =s3_write_creds=
+
+** New data on S3
+- Ethiopia 2021-22 (ESS W5): 68 .dta files
+- Niger 2021-22 (EHCVM): 53 .dta files
+
+** Feature coverage (before -> after)
+| Feature          | Before | After |
+|------------------+--------+-------|
+| assets           |      2 |    11 |
+| shocks           |      6 |    12 |
+| food_acquired    |      7 |    14 |
+| interview_date   |      3 |    14 |
+| hh_characteristics |    5 |    10 |
+
+** Bug fixes committed
+- =format_id= applied to all idxvars in =df_data_grabber= (#121) — fixes float/int IDs systemically
+- =reorder_levels= guard for non-MultiIndex DataFrames (#100)
+- Niger =age_handler= Stata missing code handling
+- French kinship labels for EHCVM surveys
+
+** Skills created/updated (in sucoder-skills repo)
+- =add-wave/SKILL.md= (new top-level skill)
+- =add-feature/SKILL.md=: survey program filename table, EHCVM ID pattern, =get_dataframe()= anti-pattern table, =validate_feature()= as mandatory gate, CONTENTS.org guidance, issue filing guidance
+
+** GitHub issues
+- Closed: #79, #100, #101, #103
+- Filed: #105-121 (panel gaps, food conversion tables, broken builds, district normalization, idxvar typing)
+
+* Still in flight
+** Slurm agents (check branches)
+- =claude/fix-uga-cluster= — fixing Uganda cluster_features per-wave column names (#120)
+- =claude/district-audit= — creating =categorical_mapping.org= for Region/District normalization across countries
+
+To merge when done:
+#+begin_src sh
+git log claude/fix-uga-cluster --oneline -2
+git merge claude/fix-uga-cluster --no-edit
+git log claude/district-audit --oneline -2
+git merge claude/district-audit --no-edit
+#+end_src
+
+** Worktree cleanup
+#+begin_src sh
+for wt in worktrees/*/; do git worktree remove "$wt" --force 2>/dev/null; done
+git worktree prune
+#+end_src
+
+* Next priorities
+
+** Easy wins
+- Guinea-Bissau assets (EHCVM, dispatch with fixed script)
+- Nepal assets/shocks
+- GhanaLSS assets
+- Peru #28 investigation (timed out, needs 2h re-dispatch)
+- Re-run =validate_feature= for everything with the new string consistency check
+
+** Medium
+- =individual_education= across countries (Mali/Nepal have reference impls)
+- Cross-country =categorical_mapping= for shocks labels (design doc in CLAUDE.md)
+- Nigeria features need =!make= scripts for multi-round pp/ph structure
+
+** Hard
+- =nonfood_acquired= — no reference impl exists, needs schema design
+- =plot_features= — agricultural plots, =!make= for pp/ph countries
+- Tanzania panel_ids redesign (ISSUES.md, #114)
+- Uganda vestigial wave-level dvc.yaml cleanup
+
+* Key patterns for next session
+
+** Dispatch features
+#+begin_src sh
+bash slurm_logs/dispatch_feature.sh <Country> <feature> [wave]
+#+end_src
+
+** Check coverage
+#+begin_src python
+import lsms_library as ll
+f = ll.Feature('shocks')
+print(f.countries)
+df = f(['Ethiopia', 'Niger'])
+#+end_src
+
+** Validate
+#+begin_src python
+from lsms_library.diagnostics import validate_feature
+report = validate_feature('Niger', 'shocks', new_wave='2021-22')
+report.summarize()
+#+end_src
+
+** Monitor Slurm
+#+begin_src sh
+squeue -u ligon --format="%.10i %.22j %.8T %.10M" | grep -v no-shell
+#+end_src
+
+* Lessons learned
+- DVC lock contention kills parallel agents sharing one repo; worktrees fix this
+- =get_dataframe()= is the only acceptable data access pattern; agents kept reinventing dvc.api.open
+- Agents need explicit "do NOT pip install" instruction
+- 1h Slurm limit too short for complex features; use 2h
+- Dispatch one agent per country (not per feature) to avoid merge conflicts
+- Validation gate needs to catch warnings, not just errors
+- File GitHub issues for every problem discovered — discovering is half the battle
+- Update CONTENTS.org with country-specific quirks as you find them
