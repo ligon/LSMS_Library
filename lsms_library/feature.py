@@ -48,6 +48,9 @@ class Feature:
     ----------
     table_name : str
         The table to load (e.g. ``'household_roster'``, ``'cluster_features'``).
+    trust_cache : bool, optional
+        If *True*, read existing cached parquets without validation (fast).
+        Can be overridden per-call. Default ``False``.
 
     Examples
     --------
@@ -56,10 +59,12 @@ class Feature:
     >>> roster.countries          # which countries have this table
     >>> df = roster(['Mali', 'Uganda'])  # load specific countries
     >>> df = roster()                    # load all available countries
+    >>> df = roster(trust_cache=True)    # fast read from cache
     """
 
-    def __init__(self, table_name: str) -> None:
+    def __init__(self, table_name: str, trust_cache: bool = False) -> None:
         self.table_name = table_name
+        self.trust_cache = trust_cache
         self._countries: list[str] | None = None
 
     def __repr__(self) -> str:
@@ -82,13 +87,16 @@ class Feature:
             if isinstance(meta, dict) and meta.get("required", False)
         ]
 
-    def __call__(self, countries: list[str] | None = None) -> pd.DataFrame:
+    def __call__(self, countries: list[str] | None = None, trust_cache: bool | None = None) -> pd.DataFrame:
         """Load and concatenate data across countries.
 
         Parameters
         ----------
         countries : list of str, optional
             Countries to include. Defaults to all available countries.
+        trust_cache : bool, optional
+            If *True*, read existing cached parquets without validation.
+            Defaults to the instance-level setting from ``__init__``.
 
         Returns
         -------
@@ -97,12 +105,13 @@ class Feature:
         """
         from . import Country
 
+        effective_trust_cache = trust_cache if trust_cache is not None else self.trust_cache
         targets = countries if countries is not None else self.countries
         frames: list[pd.DataFrame] = []
 
         for name in targets:
             try:
-                c = Country(name)
+                c = Country(name, trust_cache=effective_trust_cache)
                 method = getattr(c, self.table_name)
                 df = method()
                 if not isinstance(df, pd.DataFrame) or df.empty:
