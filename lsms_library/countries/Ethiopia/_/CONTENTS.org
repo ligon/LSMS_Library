@@ -243,8 +243,34 @@ min           0.050000
 max       70000.000000
 #+end_example
 
-** TODO Food Conversion Table
+** TODO Food Conversion Table (FCT) -- GitHub Issue #115
 See https://www.fao.org/3/X6877E/X6877E00.htm
+
+- What is missing :: A Food Composition Table (FCT) mapping food items to
+  nutritional content (calories, protein, fat, etc.) has not been assembled
+  for Ethiopia. The =fct_tools.py= module exists and can pull nutrients from
+  USDA FoodData Central, but a complete FCT keyed to Ethiopia's food item
+  labels has not been built.
+- What exists :: =conversion_to_kgs.json= is complete, built from
+  wave-specific =Food_CF_Wave{1..5}.dta= files (present for all five waves
+  2011-12 through 2021-22). This handles unit-to-kilogram conversion.
+  =fct_tools.py= provides helper functions for pulling nutrient data from
+  USDA FoodData Central. =nutrition.py= and a =!make= entry in
+  =data_scheme.yml= indicate the pipeline skeleton exists.
+- Survey documentation :: Household questionnaires (DVC-tracked PDFs in
+  each wave's =Documentation/=) include food consumption modules but do
+  not embed conversion factors for nutritional content. The
+  =Food_CF_Wave*.dta= files only provide weight conversion factors
+  (units to kg), not nutritional composition.
+- What is needed to fix ::
+  1. Assemble an FCT mapping each "Preferred Label" from =food_items.org=
+     to nutrient values (kcal, protein, fat, carbohydrate per 100g).
+  2. The FAO resource above provides East African food composition data
+     that could serve as a primary source.
+  3. Alternatively, use =fct_tools.py= with USDA FoodData Central API keys
+     to pull nutrient data, matching FDC IDs to each food item.
+  4. The resulting table should be stored as a structured file (CSV or JSON)
+     in =Ethiopia/_/= and integrated with =nutrition.py=.
 
 * Files in Ethiopia/<SOMEYEAR>/_/
 ** DONE household_characteristics.py

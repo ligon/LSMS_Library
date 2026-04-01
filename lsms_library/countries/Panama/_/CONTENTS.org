@@ -244,7 +244,34 @@ print(df_to_orgtbl(df))
 | Otros                                                  | otros                                                  | Cocos                     | ---  |
 
 
-** TODO conversion_to_kgs.json
+** TODO conversion_to_kgs.json -- GitHub Issue #117
+- What is missing :: A =conversion_to_kgs.json= file mapping survey
+  measurement units to kilograms has not been created. The nutrition
+  pipeline (=nutrition.py=) is complete and uses the Central America
+  FCT, but unit-to-kg conversion factors needed for quantity analysis
+  are missing.
+- What exists :: =units.json= contains a list of measurement units with
+  partial "Conversion to Pounds" factors. Some units have known
+  conversions (e.g., gram, kilogram, ounce, quintal, 25-pound can),
+  but many survey-specific units (e.g., arroba, botella, cuartillo,
+  bandeja sizes, barra) have =null= conversion factors. =units.py=
+  exists but has not been used to generate a =conversion_to_kgs.json=.
+- Survey documentation :: Questionnaires (=hogar_V2.pdf=,
+  =precios.pdf= in =2008/Documentation/=) define the unit codes used
+  in the food consumption module. The Central America FCT
+  (=central_american_fct - FCT.csv=) provides nutritional data but not
+  weight conversion factors for local units.
+- What is needed to fix ::
+  1. Complete the =null= entries in =units.json= by researching
+     standard measures for Panama (e.g., arroba = 25 lbs, botella
+     sizes, bandeja sizes).
+  2. Convert the "Conversion to Pounds" factors to kg (divide by
+     2.20462) and generate =conversion_to_kgs.json=.
+  3. For item-specific units (e.g., "unidad" varies by food item),
+     item-level conversion factors may be needed, similar to the
+     Ethiopia and Tanzania approach.
+  4. The existing =units.py= script should be extended to produce the
+     final JSON file.
 ** DONE nutrition
 A food conversion table, with foods keyed to the "Preferred Labels" of food_items.org.   See https://docs.google.com/spreadsheets/d/1YwfdL0LMPVl3UGo-KfyvpC7S7KR_jDL54rsVLUQOCVE/, prepared by Kaylee Vu, which indexes the FCT at http://www.incap.int/mesocaribefoods/dmdocuments/TablaCAlimentos.pdf.
 
