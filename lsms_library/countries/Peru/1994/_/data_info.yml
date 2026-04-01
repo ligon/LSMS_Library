@@ -6,66 +6,44 @@ cluster_features:
     idxvars:
         v: segmento
     myvars:
-        Region: a02
+        Region: a01
         Rural: a06
-
+    mappings:
+        Region: DPTO
+        Rural: AREA
 
 household_roster:
-    file: ehcvm_individu_mli2021.dta
-    idxvars:
-        v: grappe
-        i: 
-            - grappe
-            - menage
-        pid:
-            - grappe
-            - menage 
-            - numind
-    myvars:
-        Sex: sexe
-        Age: age
-        Relationship: lien
-
-food_acquired:
-    file: s07b_me_mli2021.dta
-    idxvars:
-        v: grappe
-        visit: vague
-        i: 
-            - grappe
-            - menage
-        j: s07bq01
-        u: s07bq03b
-    myvars:
-        Quantity: s07bq03a
-        Expenditure: s07bq08
-        Produced: s07bq04
-
-individual_education:
-    file: ehcvm_individu_mli2021.dta
-    idxvars:
-        v: grappe
-        i: 
-            - grappe
-            - menage
-        pid:
-            - grappe
-            - menage 
-            - numind
-    myvars:
-        Educational Attainment: 'educ_hi'
-
-interview_date:
-    file: s00_me_mli2021.dta
-    idxvars:
-        v: grappe
-        visit: vague
-        i: 
-            - grappe
-            - menage
-    myvars:
-        Int_t: s00q23a
-
-
-
-
+    dfs:
+        - df_roster
+        - df_cluster
+    df_roster:
+        file: REG02.DTA
+        idxvars:
+            i:
+                - segmento
+                - vivienda
+                - hogar
+            pid: b00
+        myvars:
+            Sex: b02
+            Age: b03
+            Relationship: b01
+    df_cluster:
+        file: REG01.DTA
+        idxvars:
+            i:
+                - segmento
+                - vivienda
+                - hogar
+        myvars:
+            v: segmento
+    merge_on:
+        - i
+    final_index:
+        - t
+        - v
+        - i
+        - pid
+    mappings:
+        Sex: Sex
+        Relationship: Relationship
