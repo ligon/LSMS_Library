@@ -164,6 +164,28 @@ The returned DataFrame has a `country` index level prepended. `Feature` discover
 
 This is the preferred way to do cross-country comparisons, validation, and diagnostics.
 
+### Cross-Country Label Harmonization (design intent, not yet implemented)
+
+Within a country, `categorical_mapping.org` maps wave-specific labels to a "Preferred Label" so that the same concept has a consistent name across survey rounds. The cross-country analogue would map country-specific labels (e.g., French `"Sécheresse"` vs English `"Drought"`) to a global canonical label.
+
+**Design:** Top-level mapping tables in `lsms_library/categorical_mapping/`:
+- `shocks.yml` — shock type labels across countries
+- `food_items.yml` — food item names across countries/languages
+- `units.yml` — measurement unit names across countries/languages
+
+Same org-table format as per-country `categorical_mapping.org`:
+```
+#+NAME: harmonize_shocks
+| Preferred Label | Ethiopia    | Niger (EHCVM) | Mali (EHCVM) | Uganda          |
+|-----------------+-------------+---------------+--------------+-----------------|
+| Drought         | Drought     | Sécheresse    | Sécheresse   | Drought         |
+| Flood           | Flood       | Inondation    | Inondation   | Flood           |
+```
+
+**API:** `Feature('shocks').harmonized()` or `Feature('shocks')(harmonize=True)` would apply the mapping after concatenation. Raw labels preserved by default; harmonization is opt-in.
+
+**Principle:** The library preserves what the survey says. Cross-country label harmonization is a form of aggregation — the analyst's decision, not the pipeline's. These mappings are convenience tools, not data transformations.
+
 ## Canonical Schema (`data_info.yml`)
 `lsms_library/data_info.yml` is the single source of truth for cross-country conventions:
 - **Required columns** per table (e.g., `household_roster` requires `Sex`, `Age`, `Generation`, `Distance`, `Affinity`)
