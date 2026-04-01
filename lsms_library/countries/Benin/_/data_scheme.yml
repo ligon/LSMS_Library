@@ -32,3 +32,11 @@ Data Scheme:
   interview_date:
     index: (t, i)
     int_t: datetime
+  shocks:
+    index: (t, i, Shock)
+    AffectedIncome: bool
+    AffectedAssets: bool
+    AffectedProduction: bool
+    AffectedConsumption: bool
+    HowCoped0: str
+    HowCoped1: str
