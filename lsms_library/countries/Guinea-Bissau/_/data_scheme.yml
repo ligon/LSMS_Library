@@ -16,6 +16,9 @@ Data Scheme:
     Distance: int
     Affinity: str
 
+  household_characteristics:
+    index: (t, i)
+
   shocks:
     index: (t, i, Shock)
     AffectedIncome: bool
