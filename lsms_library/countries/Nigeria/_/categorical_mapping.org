@@ -204,3 +204,144 @@
 |  121 | medium packet/sachet         | ---                          | ---                          | medium packet/sachet         | medium packet/sachet         |
 |  122 | large packet/sachet          | ---                          | ---                          | large packet/sachet          | large packet/sachet          |
 |  900 | other specify                | ---                          | ---                          | other specify                | other specify                |
+
+* Geopolitical Zones
+
+#+NAME: Region
+| Original Label                           | Preferred Label                          |
+|------------------------------------------+------------------------------------------|
+| 1. North Central                         | North Central                            |
+| NORTH CENTRAL                            | North Central                            |
+| north central                            | North Central                            |
+| 2. North East                            | North East                               |
+| NORTH EAST                               | North East                               |
+| north east                               | North East                               |
+| 3. North West                            | North West                               |
+| NORTH WEST                               | North West                               |
+| north west                               | North West                               |
+| 4. South East                            | South East                               |
+| SOUTH EAST                               | South East                               |
+| south east                               | South East                               |
+| 5. South South                           | South South                              |
+| SOUTH SOUTH                              | South South                              |
+| south south                              | South South                              |
+| 6. South West                            | South West                               |
+| SOUTH WEST                               | South West                               |
+| south west                               | South West                               |
+
+* States
+
+#+NAME: District
+| Original Label                           | Preferred Label                          |
+|------------------------------------------+------------------------------------------|
+| 1. Abia                                  | Abia                                     |
+| Abia                                     | Abia                                     |
+| abia                                     | Abia                                     |
+| 2. Adamawa                               | Adamawa                                  |
+| Adamawa                                  | Adamawa                                  |
+| adamawa                                  | Adamawa                                  |
+| 3. Akwa Ibom                             | Akwa Ibom                                |
+| Akwa Ibom                                | Akwa Ibom                                |
+| akwa ibom                                | Akwa Ibom                                |
+| 4. Anambra                               | Anambra                                  |
+| Anambra                                  | Anambra                                  |
+| anambra                                  | Anambra                                  |
+| 5. Bauchi                                | Bauchi                                   |
+| Bauchi                                   | Bauchi                                   |
+| bauchi                                   | Bauchi                                   |
+| 6. Bayelsa                               | Bayelsa                                  |
+| Bayelsa                                  | Bayelsa                                  |
+| bayelsa                                  | Bayelsa                                  |
+| 7. Benue                                 | Benue                                    |
+| Benue                                    | Benue                                    |
+| benue                                    | Benue                                    |
+| 8. Borno                                 | Borno                                    |
+| Borno                                    | Borno                                    |
+| borno                                    | Borno                                    |
+| 9. Cross River                           | Cross River                              |
+| Cross River                              | Cross River                              |
+| cross river                              | Cross River                              |
+| 10. Delta                                | Delta                                    |
+| Delta                                    | Delta                                    |
+| delta                                    | Delta                                    |
+| 11. Ebonyi                               | Ebonyi                                   |
+| Ebonyi                                   | Ebonyi                                   |
+| ebonyi                                   | Ebonyi                                   |
+| 12. Edo                                  | Edo                                      |
+| Edo                                      | Edo                                      |
+| edo                                      | Edo                                      |
+| 13. Ekiti                                | Ekiti                                    |
+| Ekiti                                    | Ekiti                                    |
+| ekiti                                    | Ekiti                                    |
+| 14. Enugu                                | Enugu                                    |
+| Enugu                                    | Enugu                                    |
+| enugu                                    | Enugu                                    |
+| 37. FCT                                  | FCT Abuja                                |
+| FCT Abuja                                | FCT Abuja                                |
+| fct abuja                                | FCT Abuja                                |
+| 15. Gombe                                | Gombe                                    |
+| Gombe                                    | Gombe                                    |
+| gombe                                    | Gombe                                    |
+| 16. Imo                                  | Imo                                      |
+| Imo                                      | Imo                                      |
+| imo                                      | Imo                                      |
+| 17. Jigawa                               | Jigawa                                   |
+| Jigawa                                   | Jigawa                                   |
+| jigawa                                   | Jigawa                                   |
+| 18. Kaduna                               | Kaduna                                   |
+| Kaduna                                   | Kaduna                                   |
+| kaduna                                   | Kaduna                                   |
+| 19. Kano                                 | Kano                                     |
+| Kano                                     | Kano                                     |
+| kano                                     | Kano                                     |
+| 20. Katsina                              | Katsina                                  |
+| Katsina                                  | Katsina                                  |
+| katsina                                  | Katsina                                  |
+| 21. Kebbi                                | Kebbi                                    |
+| Kebbi                                    | Kebbi                                    |
+| kebbi                                    | Kebbi                                    |
+| 22. Kogi                                 | Kogi                                     |
+| Kogi                                     | Kogi                                     |
+| kogi                                     | Kogi                                     |
+| 23. Kwara                                | Kwara                                    |
+| Kwara                                    | Kwara                                    |
+| kwara                                    | Kwara                                    |
+| 24. Lagos                                | Lagos                                    |
+| Lagos                                    | Lagos                                    |
+| lagos                                    | Lagos                                    |
+| 25. Nasarawa                             | Nasarawa                                 |
+| Nasarawa                                 | Nasarawa                                 |
+| nasarawa                                 | Nasarawa                                 |
+| 26. Niger                                | Niger                                    |
+| Niger                                    | Niger                                    |
+| niger                                    | Niger                                    |
+| 27. Ogun                                 | Ogun                                     |
+| Ogun                                     | Ogun                                     |
+| ogun                                     | Ogun                                     |
+| 28. Ondo                                 | Ondo                                     |
+| Ondo                                     | Ondo                                     |
+| ondo                                     | Ondo                                     |
+| 29. Osun                                 | Osun                                     |
+| Osun                                     | Osun                                     |
+| osun                                     | Osun                                     |
+| 30. Oyo                                  | Oyo                                      |
+| Oyo                                      | Oyo                                      |
+| oyo                                      | Oyo                                      |
+| 31. Plateau                              | Plateau                                  |
+| Plateau                                  | Plateau                                  |
+| plateau                                  | Plateau                                  |
+| 32. Rivers                               | Rivers                                   |
+| Rivers                                   | Rivers                                   |
+| rivers                                   | Rivers                                   |
+| 33. Sokoto                               | Sokoto                                   |
+| Sokoto                                   | Sokoto                                   |
+| sokoto                                   | Sokoto                                   |
+| 34. Taraba                               | Taraba                                   |
+| Taraba                                   | Taraba                                   |
+| taraba                                   | Taraba                                   |
+| 35. Yobe                                 | Yobe                                     |
+| Yobe                                     | Yobe                                     |
+| yobe                                     | Yobe                                     |
+| 36. Zamfara                              | Zamfara                                  |
+| Zamfara                                  | Zamfara                                  |
+| zamfara                                  | Zamfara                                  |
