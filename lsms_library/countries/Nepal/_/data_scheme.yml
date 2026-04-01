@@ -1,9 +1,11 @@
 Country: Nepal 
 
-Waves: 
+Waves:
   - '1995-96'
   - '2003-04'
   - '2010-11'
+
+wave_folder_map: {}
 
 Index Info:
   index_info:
@@ -33,8 +35,14 @@ Data Scheme:
     Quantity: float
     Price: float
     Produced: float
+  household_characteristics: !make
   interview_date:
     index: (t, v, visit, i)
     Int_t: str
-
-
+  assets:
+    index: (t, i, j)
+    Quantity: float
+    Age: float
+    Value: float
+    Purchased Recently: str
+    Purchase Price: float

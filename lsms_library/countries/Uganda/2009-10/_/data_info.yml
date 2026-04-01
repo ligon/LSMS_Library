@@ -59,12 +59,10 @@ cluster_features:
         file: ../Data/UNPS_Geovars_0910.dta
         idxvars:
             i: HHID
-            v: comm
         myvars:
             Latitude: lat_mod
             Longitude: lon_mod
     merge_on:
-        - v
         - i
     final_index:
         - t

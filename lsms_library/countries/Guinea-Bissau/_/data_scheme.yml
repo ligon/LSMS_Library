@@ -28,6 +28,14 @@ Data Scheme:
     HowCoped0: str
     HowCoped1: str
     HowCoped2: str
+
+  assets:
+    index: (t, i, j)
+    Quantity: float
+    Age: float
+    Value: float
+    Purchase Price: float
+
   food_acquired:
     index: (t, v, visit, i, j, u)
     Quantity: float

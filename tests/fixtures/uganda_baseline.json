@@ -176,13 +176,13 @@
   },
   "2005-06/_/housing.parquet": {
     "columns": [
-      "Earthen floor",
-      "Thatched roof"
+      "Floor",
+      "Roof"
     ],
-    "content_hash": "51e685ca8024577270c9241227ab2634c46b39b1705ca1121e0e8e5f6c70daee",
+    "content_hash": "878b4bfb3a14e29dee5ba1089dadd25fdd29fe3dc4a9b66dc2c7f3a422aa92e9",
     "dtypes": {
-      "Earthen floor": "int64",
-      "Thatched roof": "int64"
+      "Floor": "string",
+      "Roof": "string"
     },
     "index_names": [
       "j"
@@ -375,11 +375,11 @@
     ],
     "content_hash": "4c89e66ff297dc07ad1a4a47b52250c9913d620c4773f7c7757e0c0a79bc08ed",
     "dtypes": {
-      "Duration": "float64",
       "AffectedAssets": "float64",
       "AffectedConsumption": "float64",
       "AffectedIncome": "float64",
       "AffectedProduction": "float64",
+      "Duration": "float64",
       "HowCoped0": "string",
       "HowCoped1": "string",
       "HowCoped2": "string",
@@ -575,13 +575,13 @@
   },
   "2009-10/_/housing.parquet": {
     "columns": [
-      "Earthen floor",
-      "Thatched roof"
+      "Floor",
+      "Roof"
     ],
-    "content_hash": "adc20d1fe93a1e0a46b46193448060f04a836a4aaea430b015c7c235e013b0e2",
+    "content_hash": "cf72e844f4b0e59bf05061ea3d0a534f245349ed039bd244ee34619b17422b48",
     "dtypes": {
-      "Earthen floor": "int64",
-      "Thatched roof": "int64"
+      "Floor": "string",
+      "Roof": "string"
     },
     "index_names": [
       "j"
@@ -774,11 +774,11 @@
     ],
     "content_hash": "fbc9bea3aab5c354fabb97f27bdd3746bc59eae4fdf4844248bcaf9c674c40cc",
     "dtypes": {
-      "Duration": "float64",
       "AffectedAssets": "boolean",
       "AffectedConsumption": "boolean",
       "AffectedIncome": "boolean",
       "AffectedProduction": "boolean",
+      "Duration": "float64",
       "HowCoped0": "category",
       "HowCoped1": "category",
       "HowCoped2": "category",
@@ -974,13 +974,13 @@
   },
   "2010-11/_/housing.parquet": {
     "columns": [
-      "Earthen floor",
-      "Thatched roof"
+      "Floor",
+      "Roof"
     ],
-    "content_hash": "74648b0ee749fc523109952fd0a823c7bf35109b7b829d828665b61d92e0f372",
+    "content_hash": "5be6a1698d3de778a1cad897d9e0b75b1912625f4bdbee61bcfec4f445068fdf",
     "dtypes": {
-      "Earthen floor": "int64",
-      "Thatched roof": "int64"
+      "Floor": "string",
+      "Roof": "string"
     },
     "index_names": [
       "j"
@@ -1171,11 +1171,11 @@
     ],
     "content_hash": "13fd71e78c7e23335b756aaa8dad6f871d0f8ca5ab4a4a422630e167ffd1075c",
     "dtypes": {
-      "Duration": "float64",
       "AffectedAssets": "boolean",
       "AffectedConsumption": "boolean",
       "AffectedIncome": "boolean",
       "AffectedProduction": "boolean",
+      "Duration": "float64",
       "HowCoped0": "category",
       "HowCoped1": "category",
       "HowCoped2": "category",
@@ -1342,13 +1342,13 @@
   },
   "2011-12/_/housing.parquet": {
     "columns": [
-      "Earthen floor",
-      "Thatched roof"
+      "Floor",
+      "Roof"
     ],
-    "content_hash": "84af3c42f63fa59d23f25ede4baae3992edf4dfe2cec17180780f70dc537bcc2",
+    "content_hash": "d588f920aa85cdc14ebd982a417bedbb412cd7f2ab2292751e24962d2c9209b3",
     "dtypes": {
-      "Earthen floor": "int64",
-      "Thatched roof": "int64"
+      "Floor": "string",
+      "Roof": "string"
     },
     "index_names": [
       "j"
@@ -1539,11 +1539,11 @@
     ],
     "content_hash": "5fe219c4602b63236624296ec8de1d5f2730ef5f388155e5f2eec8762f3fad5d",
     "dtypes": {
-      "Duration": "float64",
       "AffectedAssets": "boolean",
       "AffectedConsumption": "boolean",
       "AffectedIncome": "boolean",
       "AffectedProduction": "boolean",
+      "Duration": "float64",
       "HowCoped0": "category",
       "HowCoped1": "category",
       "HowCoped2": "category",
@@ -1739,13 +1739,13 @@
   },
   "2013-14/_/housing.parquet": {
     "columns": [
-      "Earthen floor",
-      "Thatched roof"
+      "Floor",
+      "Roof"
     ],
-    "content_hash": "2a8463c18dab654b3f04d498d8caca3db99439ed9f904a9fa96bb682d61d3c11",
+    "content_hash": "662e4510b29b819d052123edc4f0ff304226a1d47098939460b05db167a09fb3",
     "dtypes": {
-      "Earthen floor": "int64",
-      "Thatched roof": "int64"
+      "Floor": "string",
+      "Roof": "string"
     },
     "index_names": [
       "j"
@@ -1942,11 +1942,11 @@
     ],
     "content_hash": "81438c5355ef475409342e0ee75b77c23bea85c6d9e917a756b338b523aedef7",
     "dtypes": {
-      "Duration": "float64",
       "AffectedAssets": "boolean",
       "AffectedConsumption": "boolean",
       "AffectedIncome": "boolean",
       "AffectedProduction": "boolean",
+      "Duration": "float64",
       "HowCoped0": "category",
       "HowCoped1": "category",
       "HowCoped2": "category",
@@ -2142,13 +2142,13 @@
   },
   "2015-16/_/housing.parquet": {
     "columns": [
-      "Earthen floor",
-      "Thatched roof"
+      "Floor",
+      "Roof"
     ],
-    "content_hash": "d8bd91179fc9448d20fed72dc08412a697a4ea882f3705c6ed8b3cd0f16a1f4d",
+    "content_hash": "129ad4c3cd0d45a75393a0e46abc9c17ec35c4e3c51992b4879c6a7ef8ec41f3",
     "dtypes": {
-      "Earthen floor": "int64",
-      "Thatched roof": "int64"
+      "Floor": "string",
+      "Roof": "string"
     },
     "index_names": [
       "j"
@@ -2345,11 +2345,11 @@
     ],
     "content_hash": "2c103f35b6b798cdbabd2ced26f6605e9b3d519129b29b7e84edd5e2b407b57b",
     "dtypes": {
-      "Duration": "float64",
       "AffectedAssets": "boolean",
       "AffectedConsumption": "boolean",
       "AffectedIncome": "boolean",
       "AffectedProduction": "boolean",
+      "Duration": "float64",
       "HowCoped0": "category",
       "HowCoped1": "category",
       "HowCoped2": "category",
@@ -2559,13 +2559,13 @@
   },
   "2018-19/_/housing.parquet": {
     "columns": [
-      "Earthen floor",
-      "Thatched roof"
+      "Floor",
+      "Roof"
     ],
-    "content_hash": "e42b6a7a8d9a9a17f1da630df8fc48da52281003f8c4270aef9f5fc75ceb8aad",
+    "content_hash": "fa151fc7ff4fa006c3ce5aec31b6995e004c580bfa4d0299e5cbf8b6e07e55d8",
     "dtypes": {
-      "Earthen floor": "int64",
-      "Thatched roof": "int64"
+      "Floor": "string",
+      "Roof": "string"
     },
     "index_names": [
       "j"
@@ -2780,11 +2780,11 @@
     ],
     "content_hash": "244c51e927d63caf4cd7958d621259f5a905a97e4112f3cb4396511235f879ee",
     "dtypes": {
-      "Duration": "float64",
       "AffectedAssets": "boolean",
       "AffectedConsumption": "boolean",
       "AffectedIncome": "boolean",
       "AffectedProduction": "boolean",
+      "Duration": "float64",
       "HowCoped0": "category",
       "HowCoped1": "category",
       "HowCoped2": "category",
@@ -2994,13 +2994,13 @@
   },
   "2019-20/_/housing.parquet": {
     "columns": [
-      "Earthen floor",
-      "Thatched roof"
+      "Floor",
+      "Roof"
     ],
-    "content_hash": "162891c88615770fcb08b6c04e697ef0eafd56247c0e1d7a21d7da8af9b7abab",
+    "content_hash": "d295ecf5f630033b46daa2a4e0d6988bc2977f7184fc76df7391472b535a6001",
     "dtypes": {
-      "Earthen floor": "int64",
-      "Thatched roof": "int64"
+      "Floor": "string",
+      "Roof": "string"
     },
     "index_names": [
       "j"
@@ -3237,11 +3237,11 @@
     ],
     "content_hash": "b52e39129320da662048a04cc14d04d6da48499fdd381a95752814b74470aaee",
     "dtypes": {
-      "Duration": "float64",
       "AffectedAssets": "boolean",
       "AffectedConsumption": "boolean",
       "AffectedIncome": "boolean",
       "AffectedProduction": "boolean",
+      "Duration": "float64",
       "HowCoped0": "category",
       "HowCoped1": "category",
       "HowCoped2": "category",
@@ -3749,22 +3749,22 @@
   },
   "var/housing.parquet": {
     "columns": [
-      "Earthen floor",
-      "Thatched roof"
+      "Floor",
+      "Roof",
+      "i"
     ],
-    "content_hash": "946036bb6cd03a4fbfa6ff132ea505a721810fc4915c323d261fbcca5121f026",
+    "content_hash": "b8059957095317e611168d6bc0bfe35f8535f05d8b2d99a6df172838d247c004",
     "dtypes": {
-      "Earthen floor": "float64",
-      "Thatched roof": "float64"
+      "Floor": "string",
+      "Roof": "string",
+      "i": "string"
     },
     "index_names": [
-      "i",
-      "t",
-      "m"
+      "t"
     ],
     "shape": [
-      16173,
-      2
+      8,
+      3
     ]
   },
   "var/income.parquet": {
@@ -3959,7 +3959,7 @@
       "Vitamin C",
       "Zinc"
     ],
-    "content_hash": "2dd84abc23d455c7f173651ba75113e830f46ecbe7f6b1734860780d6f58ba05",
+    "content_hash": "8dea7ec41da5bcd8740f28f507207d97883cef907c1863fb29cea177c2fde0bc",
     "dtypes": {
       "Calcium": "float64",
       "Carbohydrate": "float64",
@@ -4021,11 +4021,11 @@
     ],
     "content_hash": "c8e438403607118ce89bb58bbb8aae767bc6ed89d276e40d1ed068f0ecfe853f",
     "dtypes": {
-      "Duration": "float64",
       "AffectedAssets": "boolean",
       "AffectedConsumption": "boolean",
       "AffectedIncome": "boolean",
       "AffectedProduction": "boolean",
+      "Duration": "float64",
       "HowCoped0": "string",
       "HowCoped1": "string",
       "HowCoped2": "string",
