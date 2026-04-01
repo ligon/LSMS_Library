@@ -1,31 +1,103 @@
 #+title: Contents
 
 * Issues
-** WAITING Missing food quantities!!
+** WAITING Missing food quantities in 2019-20 and 2020-21 (#112)
 :LOGBOOK:
+- Note taken on [2026-04-01 Tue] \\
+  Documented as GitHub issue #112.
 - Note taken on [2023-03-24 Fri 05:28] \\
   Emailed lsms@worldbank.org regarding this.
 :END:
-In rounds 2019-20 and 2020-21 there is critical data missing from the files
-provided by the World Bank on food acquisition. See for example
+
+- GitHub :: [[https://github.com/ligon/LSMS_Library/issues/112][#112]]
+- Waves affected :: 2019-20 (NPS-SDD), 2020-21 (NPS Y5)
+- Severity :: Critical --- blocks =food_prices= and =food_quantities= pipelines for these waves
+
+*** Description
+
+In rounds 2019-20 and 2020-21 the World Bank microdata files for food
+acquisition (=HH_SEC_J1.dta= / =hh_sec_j1.dta=) are missing the
+quantity columns needed to compute unit values.  See
 https://microdata.worldbank.org/index.php/catalog/3885/data-dictionary/F23?file_name=HH_SEC_J1
-which records food acquisition for 2019-2o.
 
-The structure of this module for Tanzania elicits for both of these waves:
-- Amount consumed (hh_j02_2) :: Okay
-- Value purchased (hh_j04) :: Okay
-- Quantity purchased (hh_j03_2) :: MISSING
-- Quantity consumed from own production (hh_j05_2) :: MISSING
-- Quantity received in kind (hh_j06_2) :: MISSING
+The wave-level scripts (=Tanzania/2019-20/_/food_acquired.py= and
+=Tanzania/2020-21/_/food_acquired.py=) declare these variables in
+their =myvars= dictionaries, but the columns are absent from the
+source =.dta= files:
 
-An interesting point is that the /units/ seem to be recorded (e.g., hh_02_1,
-hh_03_1, hh_05_1, hh_06_1), suggesting this is some data processing issue rather
-than a data collection failure.
+| Variable        | Description                         | Present? |
+|-----------------+-------------------------------------+----------|
+| =hh_j02_2=      | Amount consumed (total)             | OK       |
+| =hh_j04=        | Value purchased (TZS)              | OK       |
+| =hh_j03_2=      | Quantity purchased                  | MISSING  |
+| =hh_j05_2=      | Quantity consumed from own prod.    | MISSING  |
+| =hh_j06_2=      | Quantity received in kind           | MISSING  |
 
-** TODO Get Community Level Prices
-Currently for Tanzania we use "Value purchased" divided by "Quantity purchased" to obtain unit values at the level of (some) households, then multiply "Amount consumed" by this unit value to obtain a value of total consumption.  This fails in the last two rounds because we're missing data on "Quantity purchased", so we can't construct unit values.
+The corresponding /unit/ columns (=hh_j02_1=, =hh_j03_1=, =hh_j05_1=,
+=hh_j06_1=) /are/ present, suggesting a data-processing error on the
+World Bank side rather than a data-collection failure.
 
-However, an alternative exists: there's "Community-level" data on prices collected on the same food items we want.   Data on prices seems decent for 2019-20.  Unfortunately, linking the /places/ these prices are observed to the location of the households seems difficult.
+*** Impact
+
+Without quantity data, the pipeline cannot compute:
+- Unit values (=value_purchase / quant_purchase=), which are essential
+  for =food_prices=.
+- Kilogram quantities via =new_harmonize_units()=, which multiplies
+  quantity by a unit-to-kg conversion factor.
+
+The =food_expenditures= table (value-based) is unaffected.
+
+*** Status
+
+Email sent to =lsms@worldbank.org= on 2023-03-24; no resolution
+received.
+
+** TODO Use community-level prices as fallback (#113)
+:LOGBOOK:
+- Note taken on [2026-04-01 Tue] \\
+  Documented as GitHub issue #113.
+:END:
+
+- GitHub :: [[https://github.com/ligon/LSMS_Library/issues/113][#113]]
+- Waves affected :: 2019-20, 2020-21 (any wave where household-level quantities are missing)
+- Depends on :: #112 (this is a workaround for the missing quantity data)
+
+*** Description
+
+Currently Tanzania uses =Value purchased / Quantity purchased= to
+obtain household-level unit values, then multiplies =Amount consumed=
+by this unit value to get total consumption value.  This approach
+fails in 2019-20 and 2020-21 because the quantity columns are missing
+(see #112).
+
+An alternative exists: the NPS includes "Community-level" price data
+collected for the same food items at the enumeration area (EA) level.
+The community questionnaire price data appears decent for 2019-20.
+
+*** Proposed fix strategy
+
+1. Load community-level price data from the Community questionnaire
+   files (e.g., =COM_SEC_CF.dta= or similar in each wave’s =Data/=
+   directory).
+2. Match community prices to households via EA/cluster identifiers.
+   - Blocker :: Linking the /places/ where community prices are
+     observed to household locations is not straightforward.  The
+     =clusterid= in =HH_SEC_A.dta= should in principle match the
+     community survey’s EA identifier, but this linkage has not been
+     verified.
+3. Use community prices as a fallback when household-level unit values
+   cannot be constructed (i.e., when =quant_purchase= is missing).
+4. Merge with existing =food_prices_quantities_and_expenditures.py=
+   logic so that household-level unit values take priority where
+   available, and community prices fill the gaps.
+
+*** Relevant files
+
+- =Tanzania/2019-20/Data/= --- community questionnaire files (DVC-tracked)
+- =Tanzania/2020-21/Data/= --- community questionnaire files (DVC-tracked)
+- =Tanzania/_/food_prices_quantities_and_expenditures.py= --- current price pipeline
+- =Tanzania/_/food_acquired.py= --- country-level aggregation
+
 ** DONE Link  2019-20 and 2020-21 to panel
 CLOSED: [2026-03-29 Sat]
 According to docs this is possible; e.g., see p. 12 of [[../2019-20/Documentation/tznps_sdd_2019_20_basic_information_document_updated_november_2022.pdf][Basic Information Document]].
@@ -69,21 +141,80 @@ Consequences for the data:
 Source: NPS 2020/21 Basic Information Document, pp. 7--8.
 
 
-** WAITING Fix r_hhid & UPHI matching problem for 2008-15
-The current =panel_ids.py= uses =map_08_15()= for the 2008--15 waves,
-which maps every split-off household back to the parent's canonical
-UPHI-based ID.  After =id_walk= this collapses split-offs and
-originals into the same =(i, t, j)= index, producing ~33k duplicate
-rows in the aggregated =food_acquired= (2,094 affected household-wave
-pairs, concentrated in 2010-11 and 2012-13).  The proposed solution
-below---appending split suffixes to preserve uniqueness---has not yet
-been implemented.
+** WAITING Duplicate rows in food_acquired from r_hhid/UPHI matching in 2008-15 (#114)
+:LOGBOOK:
+- Note taken on [2026-04-01 Tue] \\
+  Documented as GitHub issue #114.  Root cause analysis added below.
+:END:
 
-- Observed issue: Non unique index in food_acquired
-  Unique pairs of ('round', 'r_hhid') as indices are found to be mapped to multiple UPHIs.
-  Example:
-|                |       |   UPHI |
-|         r_hhid | round |        |
+- GitHub :: [[https://github.com/ligon/LSMS_Library/issues/114][#114]]
+- Waves affected :: 2008-15 (all four rounds: 2008-09, 2010-11, 2012-13, 2014-15), concentrated in rounds 2 and 3
+- Severity :: Data integrity --- ~33k duplicate rows in aggregated =food_acquired=
+
+*** Description
+
+The 2008-15 multi-round file (=upd4_hh_j1.dta=) uses three
+identifiers per observation: =r_hhid= (round-specific household ID),
+=round= (1--4), and =UPHI= (Universal Panel Household Identifier).
+The relationship between =r_hhid= and =UPHI= is many-to-many in the
+early rounds because:
+
+1. A single =r_hhid= in round 1 (a 14-digit enumeration area +
+   household number) can correspond to /multiple/ UPHIs.  This happens
+   because the UPD4 retrospectively assigned individual-level panel
+   identifiers (UPHIs) to household members, and when household splits
+   occurred in later rounds, the original =r_hhid= was associated
+   with all resulting UPHIs.
+
+2. Conversely, a single UPHI traces through different =r_hhid= values
+   across rounds as the ID format changes (14-digit in R1, 16-digit
+   in R2, =NNNN-NNN= in R3--R4).
+
+*** Root cause (code-level)
+
+The =food_acquired()= function in =Tanzania/_/tanzania.py= (line 200)
+reads =upd4_hh_j1.dta= and indexes by =(HHID, item, year)= which
+maps to =(j, i, t)=.  At this stage, UPHI is /not/ part of the index.
+Since multiple UPHIs share the same =(r_hhid, round)= pair, the raw
+data contains duplicate rows that differ only in the implicit UPHI
+association.
+
+The =food_acquired()= function (lines 213--219) catches the
+=AssertionError= [sic] on non-unique index and attempts a fix by
+calling =df[~df.index.duplicated()]= --- dropping all but the first
+occurrence.  This works at the wave level because the food acquisition
+data (quantities, values) is identical across the duplicate rows (only
+UPHI differs).
+
+The problem resurfaces at the country level in
+=Tanzania/_/food_acquired.py= (line 21), which reads the 2008-15
+parquet and renames =UPHI= to =j= (the household ID index level).
+After =id_walk= applies =updated_ids= to remap household IDs to their
+canonical panel forms, split-off households and their parent
+households collapse onto the same canonical ID.  This produces
+duplicate =(j, t, i)= indices --- approximately 33,000 duplicate rows
+across 2,094 affected household-wave pairs.
+
+The country-level script handles this with a blunt
+=x.loc[~x.index.duplicated(),:]= on line 65, which silently drops
+duplicates.  Row counts halve from 408,707 to 228,281.
+
+*** Observed data
+
+After deduplication (excluding UPHI), per-round household counts
+roughly match official reports:
+
+| round   | r_hhid count |
+|---------+--------------|
+| 2008-09 |       44,771 |
+| 2010-11 |       54,465 |
+| 2012-13 |       67,439 |
+| 2014-15 |       61,606 |
+
+Example of the many-to-many mapping problem:
+
+|         r_hhid | round |   UPHI |
+|----------------+-------+--------|
 | 19030070580080 |   1.0 | 4866.0 |
 |                |   1.0 | 4865.0 |
 |                |   1.0 | 4872.0 |
@@ -96,35 +227,54 @@ been implemented.
 |                |   1.0 | 4868.0 |
 |                |   1.0 | 4867.0 |
 
-   If excluding UPHIs, after performing drop_duplicates(), the indices become unique (technically meaning that the data across rows, except for the UPHI, is the same for the same round & r_hhid pair), and valid row number halves (from 408707 to 228281). When grouping the r_hhid in resulted df by round, the number of households recorded each year roughly lines up with the number recorded in the corresponding year's report.
-| round | r_hhid count |
-|   1.0 |        44771 |
-|   2.0 |        54465 |
-|   3.0 |        67439 |
-|   4.0 |        61606 |
+*** Proposed fix strategy
 
-- steps of proposed solution (similar to id_walk in other countries's dataset):
-  1. map each r_hhid & round pair to a list of its corresponding UPHIs in a dictionary.
-  2. for round 1, append 001 to the original 14-digit r_hhid to indicate primary household with the lowest individual id
+Append split-off suffixes to =r_hhid= to preserve uniqueness, similar
+to =id_walk= in other countries.  The scheme tracks household lineage
+through all four rounds:
 
-     id = r_hhid-001
+1. For round 1, append =-001= to the original 14-digit =r_hhid= to
+   indicate the primary household.
 
-  3. for round 2, match to previous round's r_hhid by checking if current r_hhid's UPHI is in any list of UPHI of a previous r_hhid, and append the last 2 digit of the current 16-digit r_hhid to previous round's r_hhid, indicating primary or split-off households
+   =id = r_hhid-001=
 
-     id = previous_hhid-0[r_hhid[-2:]]
+2. For round 2, match to the previous round’s =r_hhid= by checking
+   whether the current =r_hhid=’s UPHI appears in the UPHI list of
+   any previous =r_hhid=.  Append the last 2 digits of the current
+   16-digit =r_hhid= (where =01= = primary, =02=+ = split-off):
 
-  4. for round 3 and 4, match to earliest previous round's r_hhid by  checking if current r_hhid's UPHI is in any list of UPHI of a previous r_hhid, and append the last 3 digit of the current 7-digit r_hhid to, indicating primary or split-off households
-     - note:  last three digits of the split-off HHID in R3 are in the 100’s to indicate uncollected data in R2
+   =id = previous_hhid-0[r_hhid[-2:]]=
 
+3. For rounds 3 and 4, match to the earliest previous round’s
+   =r_hhid= via the same UPHI lookup.  Append the last 3 digits of
+   the =NNNN-NNN= format =r_hhid= (where =001= = primary, others =
+   split-off).  Note: split-off HHIDs in R3 use the 100s to indicate
+   data not collected in R2.
 
-     id = previous_hhid-0[r_hhid[-3:]]
+   =id = previous_hhid-0[r_hhid[-3:]]=
 
-     example:
-     | UPHI | round |           r_hhid |                 id |
-     |  273 |     1 |   02040010010327 | 02040010010327-001 |
-     |  273 |     2 | 0204001001032701 | 02040010010327-001 |
-     |  273 |     3 |         0187-001 | 02040010010327-001 |
-     |  273 |     4 |         0041-004 | 02040010010327-004 |
+   Example:
+
+   | UPHI | round |           r_hhid |                 id |
+   |------+-------+------------------+--------------------|
+   |  273 |     1 |   02040010010327 | 02040010010327-001 |
+   |  273 |     2 | 0204001001032701 | 02040010010327-001 |
+   |  273 |     3 |         0187-001 | 02040010010327-001 |
+   |  273 |     4 |         0041-004 | 02040010010327-004 |
+
+This approach preserves split-off households as distinct entities
+rather than collapsing them into their parent’s canonical ID.  The
+current =map_08_15()= function in =Tanzania/_/tanzania.py= already
+filters to primary households only (lines 36--44), but the upstream
+data still contains the many-to-many UPHI mapping that causes
+duplicates.
+
+*** Relevant files
+
+- =Tanzania/2008-15/_/food_acquired.py= --- wave-level script; reads =upd4_hh_j1.dta=
+- =Tanzania/_/tanzania.py= --- =food_acquired()= function (line 200), =map_08_15()= (line 16)
+- =Tanzania/_/food_acquired.py= --- country-level aggregation; applies =id_walk= and deduplicates
+- =Tanzania/_/panel_ids.py= --- builds =updated_ids.json= via =map_08_15()=
 
 
 
