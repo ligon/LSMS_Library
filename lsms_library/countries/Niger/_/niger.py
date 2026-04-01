@@ -53,16 +53,27 @@ def age_handler(df, interview_date = None, format_interv = None, age = None, dob
     if dob:
         df[dob] = pd.to_datetime(df[dob], format = format_dob)
 
+    def _safe_int(val):
+        """Convert to int, returning None for Stata missing codes ('.')."""
+        try:
+            return int(val)
+        except (ValueError, TypeError):
+            return None
+
     def fill_func(x):
         if age and pd.notna(x[age]):
-            return int(x[age])
+            v = _safe_int(x[age])
+            return v if v is not None else pd.NA
 
         #conversion to pd.datetime obj of the date of birth if we are given mdy
         date_of_birth = None
         year_born = None
         if (m and d and y) and (x[[m, d, y]].notna().all()):
-            date_conv = str(int(x[m])) + '/' + str(int(x[d])) + '/' + str(int(x[y]))
-            date_of_birth = pd.to_datetime(date_conv, format = '%m/%d/%Y')
+            mi, di, yi = _safe_int(x[m]), _safe_int(x[d]), _safe_int(x[y])
+            if mi is not None and di is not None and yi is not None:
+                date_conv = f'{mi}/{di}/{yi}'
+                date_of_birth = pd.to_datetime(date_conv, format='%m/%d/%Y',
+                                               errors='coerce')
 
         if dob and pd.notna(x[dob]):
             date_of_birth = x[dob]
@@ -73,14 +84,17 @@ def age_handler(df, interview_date = None, format_interv = None, age = None, dob
                 return (x[interview_date] - date_of_birth).days / 365.25
 
         elif (y and pd.notna(x[y])) or pd.notna(year_born):
-            used_year = year_born or x[y]
+            used_year = year_born or _safe_int(x[y])
+            if used_year is None:
+                return pd.NA
             if interview_date and pd.notna(x[interview_date]):
-                return x[interview_date].year - int(used_year)
+                return x[interview_date].year - used_year
             elif interview_year and pd.notna(x[interview_year]):
-                return int(x[interview_year]) - int(used_year)
+                iy = _safe_int(x[interview_year])
+                return (iy - used_year) if iy is not None else pd.NA
 
         else:
-            return np.nan
+            return pd.NA
 
     df['age'] = df.apply(fill_func, axis = 1)
 

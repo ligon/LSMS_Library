@@ -103,3 +103,11 @@ shocks:
         HowCoped0: s9q04_1
         HowCoped1: s9q04_2
         HowCoped2: s9q04_3
+
+assets:
+    file: sect11_hh_w5.dta
+    idxvars:
+        i: household_id
+        j: asset_cd
+    myvars:
+        Quantity: s11q01

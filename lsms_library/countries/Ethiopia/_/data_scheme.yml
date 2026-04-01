@@ -27,6 +27,10 @@ Data Scheme:
     Distance: int
     Affinity: str
 
+  assets:
+    index: (t, i, j)
+    Quantity: float
+
   food_acquired: !make
   food_expenditures: !make
   food_prices: !make

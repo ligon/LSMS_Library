@@ -47,6 +47,46 @@ cluster_features:
         - t
         - v
 
+shocks:
+    file: emc2014_p3_chocs_27022015.dta
+    idxvars:
+        i:
+            - zd
+            - menage
+        Shock: CS0
+    myvars:
+        AffectedIncome:
+            - CS3A
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                NA: False
+        AffectedAssets:
+            - CS3B
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                NA: False
+        AffectedProduction:
+            - CS3C
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                NA: False
+        AffectedConsumption:
+            - CS3D
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                NA: False
+        HowCoped0: CS4A
+        HowCoped1: CS4B
+        HowCoped2: CS4C
+
 food_acquired:
     idxvars:
         v: zd

@@ -37,6 +37,14 @@ cluster_features:
         - t
         - v
 
+assets:
+    file: Post Planting Wave 1/Household/sect5_plantingw1.dta
+    idxvars:
+        i: hhid
+        j: item_cd
+    myvars:
+        Quantity: s5q1
+
 shocks:
     file: Post Harvest Wave 1/Household/sect15a_harvestw1.dta
     idxvars:

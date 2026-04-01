@@ -87,3 +87,11 @@ shocks:
         HowCoped0: hh_s8q04_a
         HowCoped1: hh_s8q04_b
         HowCoped2: hh_s8q04_c
+
+assets:
+    file: sect10_hh_w3.dta
+    idxvars:
+        i: household_id2
+        j: hh_s10q0a
+    myvars:
+        Quantity: hh_s10q01

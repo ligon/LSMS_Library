@@ -100,6 +100,92 @@ Key details:
 ## Data Access
 Underlying microdata must be obtained from the [World Bank Microdata Library](https://microdata.worldbank.org/) under their terms of use. Contributors need GPG/PGP keys for repository write access.
 
+### Reading data files: `get_dataframe()`
+
+**Always use `get_dataframe()` from `local_tools` to read `.dta`/`.csv`/`.parquet` files.** It is the single entry point for reading data and handles all access modes transparently:
+
+```python
+from lsms_library.local_tools import get_dataframe
+
+df = get_dataframe('../Data/sect1_hh_w5.dta')
+```
+
+The fallback chain is:
+1. **Local file** on disk
+2. **DVC filesystem** (`DVCFileSystem`) --- streams from the configured DVC remote
+3. **`dvc.api.open()`** --- legacy DVC streaming
+4. **`get_data_file()`** from `data_access.py` --- downloads from the World Bank Microdata Library NADA API as a last resort (requires `MICRODATA_API_KEY`)
+
+This means a script written with `get_dataframe('../Data/file.dta')` works whether the file is already on disk, cached in DVC, or has never been downloaded at all.
+
+### Anti-patterns (do not use)
+
+| Anti-pattern | Why it's wrong |
+|---|---|
+| `dvc.api.open(fn, mode='rb')` + `from_dta(f)` | Couples to DVC internals, skips the WB fallback |
+| `pd.read_stata('/absolute/path/to/file.dta')` | Breaks on other machines, no DVC/WB fallback |
+| `pyreadstat.read_dta(path)` directly | Same --- bypasses all access layers |
+| `from_dta('lsms_library/countries/...')` with absolute path | Non-portable; use relative `../Data/` paths |
+
+Scripts in `{Country}/{wave}/_/` run from that directory, so `../Data/file.dta` is the standard relative path convention. `get_dataframe` (via `_resolve_data_path`) knows how to resolve these.
+
+### Writing data files: `to_parquet()`
+
+Use `to_parquet(df, 'feature_name.parquet')` from `local_tools`. It writes to `data_root()` (not the repo tree) via `_resolve_data_path()`, which infers country/wave from the call stack.
+
+### Adding new waves: `data_access` module
+
+The `data_access` module provides functions for discovering and downloading new survey waves:
+
+```python
+from lsms_library.data_access import discover_waves, add_wave
+
+discover_waves("Ethiopia")          # What's new on the WB?
+add_wave("Ethiopia", "6161")        # Download, dvc add, dvc push
+```
+
+`push_to_cache_batch()` handles batched `dvc add` + `dvc push` (dramatically faster than per-file). See CONTRIBUTING.org for the manual workflow.
+
+## Cross-Country Feature Class
+The `Feature` class assembles a single harmonized DataFrame across all countries that declare a given table:
+
+```python
+import lsms_library as ll
+
+roster = ll.Feature('household_roster')
+roster.countries          # ['Ethiopia', 'Mali', 'Niger', 'Uganda', ...]
+roster.columns            # required columns from global data_info.yml
+
+df = roster()                       # all countries
+df = roster(['Ethiopia', 'Niger'])  # specific countries
+```
+
+The returned DataFrame has a `country` index level prepended. `Feature` discovers countries by scanning each `data_scheme.yml` for the table name, then calls `Country(name).{table}()` for each.
+
+This is the preferred way to do cross-country comparisons, validation, and diagnostics.
+
+### Cross-Country Label Harmonization (design intent, not yet implemented)
+
+Within a country, `categorical_mapping.org` maps wave-specific labels to a "Preferred Label" so that the same concept has a consistent name across survey rounds. The cross-country analogue would map country-specific labels (e.g., French `"Sécheresse"` vs English `"Drought"`) to a global canonical label.
+
+**Design:** Top-level mapping tables in `lsms_library/categorical_mapping/`:
+- `shocks.yml` — shock type labels across countries
+- `food_items.yml` — food item names across countries/languages
+- `units.yml` — measurement unit names across countries/languages
+
+Same org-table format as per-country `categorical_mapping.org`:
+```
+#+NAME: harmonize_shocks
+| Preferred Label | Ethiopia    | Niger (EHCVM) | Mali (EHCVM) | Uganda          |
+|-----------------+-------------+---------------+--------------+-----------------|
+| Drought         | Drought     | Sécheresse    | Sécheresse   | Drought         |
+| Flood           | Flood       | Inondation    | Inondation   | Flood           |
+```
+
+**API:** `Feature('shocks').harmonized()` or `Feature('shocks')(harmonize=True)` would apply the mapping after concatenation. Raw labels preserved by default; harmonization is opt-in.
+
+**Principle:** The library preserves what the survey says. Cross-country label harmonization is a form of aggregation — the analyst's decision, not the pipeline's. These mappings are convenience tools, not data transformations.
+
 ## Canonical Schema (`data_info.yml`)
 `lsms_library/data_info.yml` is the single source of truth for cross-country conventions:
 - **Required columns** per table (e.g., `household_roster` requires `Sex`, `Age`, `Generation`, `Distance`, `Affinity`)

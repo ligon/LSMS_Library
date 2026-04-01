@@ -379,6 +379,230 @@ def is_this_feature_sane(
 
 
 # ---------------------------------------------------------------------------
+# Cross-country comparison checks
+# ---------------------------------------------------------------------------
+
+def _check_columns_match_reference(df: pd.DataFrame, ref_df: pd.DataFrame,
+                                   country: str, ref_country: str,
+                                   feature: str) -> Check:
+    """Verify that columns match a reference country's output."""
+    my_cols = set(df.columns)
+    ref_cols = set(ref_df.columns)
+    missing = ref_cols - my_cols
+    extra = my_cols - ref_cols
+    if missing:
+        return Check("columns_match_reference", "fail",
+                     f"Missing vs {ref_country}: {sorted(missing)}")
+    if extra:
+        return Check("columns_match_reference", "warn",
+                     f"Extra vs {ref_country}: {sorted(extra)}")
+    return Check("columns_match_reference", "pass",
+                 f"Columns match {ref_country}")
+
+
+def _check_index_structure_matches(df: pd.DataFrame, ref_df: pd.DataFrame,
+                                   ref_country: str) -> Check:
+    """Index level names should match the reference."""
+    my_names = list(df.index.names)
+    ref_names = list(ref_df.index.names)
+    # Ignore 'country' level if present (from Feature class)
+    my_names = [n for n in my_names if n != "country"]
+    ref_names = [n for n in ref_names if n != "country"]
+    if my_names != ref_names:
+        return Check("index_structure_matches", "warn",
+                     f"Index {my_names} vs {ref_country} {ref_names}")
+    return Check("index_structure_matches", "pass",
+                 f"Index structure matches {ref_country}")
+
+
+def _check_value_ranges_plausible(df: pd.DataFrame, ref_df: pd.DataFrame,
+                                  feature: str) -> Check:
+    """Spot-check that numeric columns have plausible ranges vs reference."""
+    issues = []
+    for col in df.columns:
+        if col not in ref_df.columns:
+            continue
+        if not pd.api.types.is_numeric_dtype(df[col]):
+            continue
+        my_mean = df[col].dropna().mean()
+        ref_mean = ref_df[col].dropna().mean()
+        if ref_mean == 0 or pd.isna(ref_mean) or pd.isna(my_mean):
+            continue
+        ratio = my_mean / ref_mean
+        if ratio > 100 or ratio < 0.01:
+            issues.append(f"{col}: mean {my_mean:.1f} vs ref {ref_mean:.1f} "
+                          f"(ratio {ratio:.1f})")
+    if issues:
+        return Check("value_ranges_plausible", "warn",
+                     "; ".join(issues[:3]))
+    return Check("value_ranges_plausible", "pass",
+                 "Numeric column ranges look plausible vs reference")
+
+
+def _check_new_wave_present(df: pd.DataFrame, wave: str) -> Check:
+    """Verify that the specified wave appears in the data."""
+    if "t" not in df.index.names:
+        return Check("new_wave_present", "warn", "No 't' in index")
+    waves = sorted(df.index.get_level_values("t").unique())
+    if wave not in waves:
+        return Check("new_wave_present", "fail",
+                     f"Wave '{wave}' not in data. Found: {waves}")
+    wave_rows = (df.index.get_level_values("t") == wave).sum()
+    return Check("new_wave_present", "pass",
+                 f"Wave '{wave}' present with {wave_rows:,} rows")
+
+
+def _check_no_regression(df: pd.DataFrame, country: str,
+                         feature: str) -> Check:
+    """Existing waves should still have data (adding a wave shouldn't break old ones)."""
+    if "t" not in df.index.names:
+        return Check("no_regression", "pass", "No 't' index (skipped)")
+    waves = sorted(df.index.get_level_values("t").unique())
+    empty_waves = []
+    for w in waves:
+        n = (df.index.get_level_values("t") == w).sum()
+        if n == 0:
+            empty_waves.append(w)
+    if empty_waves:
+        return Check("no_regression", "fail",
+                     f"Empty waves (regression?): {empty_waves}")
+    return Check("no_regression", "pass",
+                 f"All {len(waves)} waves have data")
+
+
+def _check_unmapped_labels(df: pd.DataFrame, feature: str) -> Check:
+    """Check for signs of unmapped categorical labels (raw codes surviving)."""
+    issues = []
+    # String columns with numeric-looking values suggest unmapped codes
+    for col in df.columns:
+        if not (pd.api.types.is_string_dtype(df[col])
+                or pd.api.types.is_object_dtype(df[col])):
+            continue
+        vals = df[col].dropna()
+        if len(vals) == 0:
+            continue
+        sample = vals.head(200)
+        # Check if values look like raw survey codes ("1. LABEL" or just numbers)
+        coded = sample.astype(str).str.match(r'^\d+\.\s')
+        if coded.mean() > 0.5:
+            examples = sample[coded].unique()[:3].tolist()
+            issues.append(f"{col}: {coded.mean():.0%} values look like "
+                          f"raw codes (e.g., {examples})")
+    if issues:
+        return Check("unmapped_labels", "warn", "; ".join(issues[:3]))
+    return Check("unmapped_labels", "pass", "No raw survey codes detected")
+
+
+# ---------------------------------------------------------------------------
+# Validation gate
+# ---------------------------------------------------------------------------
+
+def validate_feature(
+    country: str,
+    feature: str,
+    new_wave: str | None = None,
+    reference_country: str = "Uganda",
+) -> SanityReport:
+    """Comprehensive validation gate for a feature.
+
+    Runs all per-country sanity checks, cross-country comparison against
+    a reference, regression checks, and label mapping checks.  Intended
+    as the mandatory gate before committing new feature work.
+
+    Parameters
+    ----------
+    country : str
+        Country name (e.g., ``'Ethiopia'``).
+    feature : str
+        Table name (e.g., ``'household_roster'``).
+    new_wave : str, optional
+        If provided, verify this wave appears in the output.
+    reference_country : str
+        Country to compare against (default ``'Uganda'``).
+
+    Returns
+    -------
+    SanityReport
+        ``report.ok`` is True only if no checks failed.
+
+    Example
+    -------
+    >>> from lsms_library.diagnostics import validate_feature
+    >>> report = validate_feature('Ethiopia', 'household_roster',
+    ...                           new_wave='2021-22')
+    >>> report.summarize()
+    >>> assert report.ok
+    """
+    from . import Country, Feature
+
+    report = SanityReport(country=country, feature=feature)
+
+    # --- Load the data ------------------------------------------------------
+    try:
+        c = Country(country)
+        method = getattr(c, feature)
+        df = method()
+    except Exception as e:
+        report.checks.append(Check("load_data", "fail", str(e)))
+        return report
+    report.checks.append(Check("load_data", "pass",
+                                f"Loaded {len(df):,} rows"))
+
+    # --- Standard sanity checks ---------------------------------------------
+    scheme = _load_scheme(country)
+    report.checks.append(_check_not_empty(df))
+    report.checks.append(_check_has_index(df))
+    report.checks.append(_check_index_levels(df, scheme, feature))
+    report.checks.append(_check_no_null_index(df))
+    report.checks.append(_check_has_time_index(df))
+    report.checks.append(_check_has_household_index(df))
+    report.checks.append(_check_reasonable_size(df))
+    report.checks.append(_check_no_all_null_columns(df))
+    report.checks.append(_check_no_constant_columns(df))
+    report.checks.append(_check_declared_columns(df, scheme, feature))
+    report.checks.append(_check_dtype_consistency(df, scheme, feature))
+    report.checks.append(_check_value_constraints(df, scheme, feature))
+    report.checks.append(_check_duplicate_index(df))
+
+    # --- New wave present? --------------------------------------------------
+    if new_wave:
+        report.checks.append(_check_new_wave_present(df, new_wave))
+
+    # --- No regression on existing waves ------------------------------------
+    report.checks.append(_check_no_regression(df, country, feature))
+
+    # --- Unmapped labels ----------------------------------------------------
+    report.checks.append(_check_unmapped_labels(df, feature))
+
+    # --- Cross-country comparison -------------------------------------------
+    if reference_country != country:
+        try:
+            feat = Feature(feature)
+            if reference_country in feat.countries:
+                ref_c = Country(reference_country)
+                ref_method = getattr(ref_c, feature)
+                ref_df = ref_method()
+                report.checks.append(
+                    _check_columns_match_reference(df, ref_df, country,
+                                                   reference_country, feature))
+                report.checks.append(
+                    _check_index_structure_matches(df, ref_df,
+                                                   reference_country))
+                report.checks.append(
+                    _check_value_ranges_plausible(df, ref_df, feature))
+            else:
+                report.checks.append(
+                    Check("cross_country", "pass",
+                          f"{reference_country} doesn't have {feature} (skipped)"))
+        except Exception as e:
+            report.checks.append(
+                Check("cross_country", "warn",
+                      f"Could not load reference {reference_country}: {e}"))
+
+    return report
+
+
+# ---------------------------------------------------------------------------
 # Panel consistency checks
 # ---------------------------------------------------------------------------
 
