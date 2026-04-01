@@ -500,16 +500,38 @@ class Wave:
                 merge_on =list(set('t').union(data_info.get('merge_on')))#a list
                 df_edit_function = self.formatting_functions.get(request)
                 idxvars_list = list(dict.fromkeys(data_info.get('final_index')))
-                for i in data_info.get('dfs'):
+                dfs_list = data_info.get('dfs')
+                for idx, i in enumerate(dfs_list):
                     sub_data_info = data_info.get(i)
                     sub_mapping_details = self.column_mapping(i, sub_data_info)
-                    sub_df = get_data(sub_data_info, sub_mapping_details)
-                    merge_dfs.append(sub_df.reset_index())
-                df = pd.merge(merge_dfs[0], merge_dfs[1], on=merge_on, how='outer')
-                if len(merge_dfs) > 2:
-                    for i in range(2, len(merge_dfs)):
-                        df = pd.merge(df, merge_dfs[i], on=merge_on, how='outer')
-                df = df.set_index(idxvars_list)
+                    try:
+                        sub_df = get_data(sub_data_info, sub_mapping_details)
+                        merge_dfs.append(sub_df.reset_index())
+                    except (FileNotFoundError, PathMissingError, DvcException) as exc:
+                        if idx == 0:
+                            # The primary sub-df is required; re-raise
+                            raise
+                        # Secondary sub-dfs (e.g. geo files) are optional
+                        sub_file = sub_data_info.get('file', i)
+                        warnings.warn(
+                            f"{self.name}/{request}: could not load "
+                            f"sub-df '{i}' (file: {sub_file}); "
+                            f"proceeding without it. ({exc})"
+                        )
+                if not merge_dfs:
+                    warnings.warn(f"No data loaded for {request} in {self.name}")
+                    df = pd.DataFrame()
+                elif len(merge_dfs) == 1:
+                    df = merge_dfs[0]
+                    # Use only the index columns that are present
+                    available_idx = [c for c in idxvars_list if c in df.columns]
+                    df = df.set_index(available_idx)
+                else:
+                    df = pd.merge(merge_dfs[0], merge_dfs[1], on=merge_on, how='outer')
+                    if len(merge_dfs) > 2:
+                        for i in range(2, len(merge_dfs)):
+                            df = pd.merge(df, merge_dfs[i], on=merge_on, how='outer')
+                    df = df.set_index(idxvars_list)
                 if df_edit_function:
                     df = df_edit_function(df)
 
