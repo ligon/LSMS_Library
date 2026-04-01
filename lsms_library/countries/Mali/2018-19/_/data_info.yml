@@ -78,6 +78,19 @@ individual_education:
         Educational Attainment: 'educ_hi'
 
 
+assets:
+    file: s12_me_mli2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+        j: s12q01
+    myvars:
+        Quantity: s12q03
+        Age: s12q07
+        Value: s12q09
+        Purchase Price: s12q08
+
 shocks:
     file: s14_me_mli2018.dta
     idxvars:
