@@ -1,20 +1,162 @@
 #+title: Contents
 
-Brief table of contents and todo list.
+Serbia LSMS survey coverage and status.
+
+Source: [[https://doi.org/10.48529/rg2s-9v14][World Bank, DOI 10.48529/rg2s-9v14]]
+(see also [[https://microdata.worldbank.org/index.php/catalog/2291][Microdata Catalog #2291]])
+
+Note: A related =Serbia and Montenegro= country exists with waves
+2002 and 2003 (pre-independence surveys).
+
+* Overview
+
+Serbia has a single wave (2007) from the Living Standards Measurement
+Study.  The survey data includes files in both Serbian (=domacinstva=,
+=lica=, =m5_1_dnevnik=, etc.) and English (=household=, =individual=,
+=m5_1_diary=, etc.).
+
+Three wave-level features are implemented (=other_features=,
+=household_characteristics=, =food_acquired=).  A =data_scheme.yml=
+exists declaring =household_roster= with the standard kinship index
+=(t, v, i, pid)=, and DVC is configured to materialize
+=household_roster= via the CLI.  However, the full Makefile-based build
+is broken.
+
+* Build status: BROKEN
+
+The build fails for two reasons:
+
+1. The Makefile's generic =%.parquet= rule (line 45) depends on
+   =food_items.org= and =panama.py=, neither of which exists.  The
+   =panama.py= reference is a copy-paste error from Panama.  This rule
+   governs any parquet target that does not match a more specific rule.
+
+2. The country-level =food_acquired.py= depends on
+   =var/other_features.parquet= and wave-level =food_acquired.parquet=.
+   These in turn require running the wave-level scripts, which use
+   deprecated APIs (=dvc.api.open()=, =ligonlibrary=).
+
+The DVC-managed =household_roster= pipeline (=dvc.yaml=) may work
+independently since it uses the CLI materializer, but the legacy
+Makefile pipeline for food and other features is non-functional.
+
+* Known issues
+- Makefile :: Generic rule references =food_items.org= and =panama.py=
+  (copy-paste error from Panama).  Should reference =serbia.py= and
+  a to-be-created =food_items.org=.
+- =serbia.py= :: Nearly empty---imports deprecated =ligonlibrary= and
+  =lsms.tools= but defines no functions.  Contrast with =cambodia.py=
+  which at least defines =age_sex_composition()=.
+- No =categorical_mapping.org= :: No label harmonization for any
+  variables.
+- Anti-pattern usage :: All wave-level scripts use =dvc.api.open()= and
+  =from ligonlibrary.dataframes import from_dta= instead of
+  =get_dataframe()=.  The =food_acquired.py= script additionally
+  imports =pyreadstat= directly.
 
 * Files in Serbia/_/
-** DONE food_items.org
-** TODO food_items.org
-** TODO Food Conversion
-** TODO Nutrition
-** TODO Makefile
-code does not currently run due to lacking food_items.org and FCT table
+** DONE data_scheme.yml
+Declares =household_roster= with index =(t, v, i, pid)= and columns
+=Sex=, =Age=, =Generation=, =Distance=, =Affinity=.  Does not declare
+=food_acquired=, =household_characteristics=, or =other_features=.
 
-* Files in Serbia/<SOMEYEAR>/_/
+** TODO food_items.org
+Not yet created.  This is the primary blocker for the food pipeline.
+The 2007 survey uses numeric food codes (=nsifra= in =m5_1_diary.dta=)
+that need mapping to human-readable labels.  With only one wave, the
+table would be simple.
+
+The existing CONTENTS.org had a contradictory status (both DONE and
+TODO) for this item.  It is definitively missing from the directory.
+
+** TODO Food Conversion Table
+Not yet created.  Needed to convert food quantities into nutritional
+content.  The FAO Food Composition Tables for Eastern Europe may be a
+useful starting point.
+
+** TODO nutrition.py
+Not yet implemented.  Blocked by missing =food_items.org= and Food
+Conversion Table.
+
+** TODO Makefile
+Currently broken.  The generic rule references =food_items.org= and
+=panama.py= (copy-paste from Panama).  Needs:
+1. Replace =panama.py= with =serbia.py= in the generic rule.
+2. Create =food_items.org= (or remove the dependency if not needed).
+3. Populate =serbia.py= with any country-specific helper functions, or
+   remove the dependency from the Makefile.
+
 ** DONE other_features.py
-CLOSED: [2023-07-24 Mon 10:32]
+CLOSED: [2023-07-24 Mon]
+Concatenates wave-level =other_features.parquet= files, adding =t= and
+=m= indices.
+
 ** DONE household_characteristics.py
-CLOSED: [2023-07-24 Mon 10:32]
+CLOSED: [2023-07-24 Mon]
+Concatenates wave-level =household_characteristics.parquet= and joins
+with =other_features= to obtain the market (=m=) index.
+
 ** DONE food_acquired.py
-CLOSED: [2023-08-04 Tues 12:45]
-The data provided contains daily recall for each food product. Therefore, for "Total Expenditure" and "Quantity", the daily values are summed. For "Price", the daily expenditure is divided by the the quantity purchased that day, then the median is taken over all the prices of the week.
+CLOSED: [2023-08-04 Fri]
+Concatenates wave-level =food_acquired.parquet=, joins with
+=other_features= for market (=m=), and writes to
+=var/food_acquired.parquet=.
+
+** DONE food_prices_quantities_and_expenditures.py
+Derives =food_expenditures=, =food_prices=, and =food_quantities=
+from =var/food_acquired.parquet=.
+
+** DONE serbia.py
+Country-level helper.  Currently nearly empty: imports deprecated
+=ligonlibrary=, =dvc.api=, and =lsms.tools= but defines no functions.
+Needs either substantive content or removal.
+
+* Files in Serbia/2007/_/
+** DONE data_info.yml
+Declares =household_roster= mapping from =individual.dta=:
+- Index: =opstina= (municipality), =popkrug= (enumeration area),
+  =dom= (household)
+- Variables: =pol= (Sex), =srodstvo= (Relationship), =starost= (Age)
+
+** DONE other_features.py
+CLOSED: [2023-07-24 Mon]
+Reads =household.dta= via =dvc.api.open()=.  Extracts region (=m=) and
+urban/rural status.  Constructs household ID =j= by concatenating
+=opstina=, =popkrug=, =dom=.
+
+** DONE household_characteristics.py
+CLOSED: [2023-07-24 Mon]
+Reads =individual.dta= via =dvc.api.open()=.  Uses =lsms.tools='s
+=get_household_roster()= to compute age-sex demographic bins.
+Constructs household ID =j= by concatenating =opstina=, =popkrug=,
+=dom=.
+
+** DONE food_acquired.py
+CLOSED: [2023-08-04 Fri]
+Reads =m5_1_diary.dta= via =dvc.api.open()=.  This is a daily food
+diary with columns =kol1= through =kol7= (daily quantities) and =din1=
+through =din7= (daily expenditures).  The script sums daily values for
+=Quantity= and =Total Expenditure=, and takes the median daily unit
+price for =Price=.
+
+Constructs household ID =j= by concatenating =opstina=, =popkrug=,
+=dom=.  Food item code is =nsifra=; unit of measure is =mera=.
+
+* Available source data
+The 2007 wave includes data files in both Serbian and English:
+- =household.dta= / =domacinstva.dta= :: Household-level data
+- =individual.dta= / =lica.dta= :: Individual demographics
+- =m5_1_diary.dta= / =m5_1_dnevnik.dta= :: Food consumption diary
+- =m5_2_nonfoodconsumption.dta= / =m5_2_ne_hrana.dta= :: Non-food consumption
+- =m2_durables.dta= / =m2_trajna_dobra.dta= :: Durable goods
+- =section3_ed.dta= / =pk_s3.dta= :: Education
+- =enumeration_district.dta= / =popisni_krug.dta= :: Enumeration districts
+- =data_for_imputting_rents.dta= :: Imputed rent data
+- =imputirana_renta.dta= :: Imputed rent (Serbian)
+
+** TODO Migrate anti-patterns
+All wave-level scripts use =dvc.api.open()= and
+=from ligonlibrary.dataframes import from_dta= instead of
+=get_dataframe()=.  The =food_acquired.py= script also imports
+=pyreadstat= directly.  These should be migrated to the standard
+=get_dataframe()= pattern per CLAUDE.md.
