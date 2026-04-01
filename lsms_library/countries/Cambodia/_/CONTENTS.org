@@ -1,8 +1,133 @@
+#+title: Contents
 
-* Files in Cambodia/<SOMEYEAR>/_/
+Cambodia LSMS+ survey coverage and status.
+
+Source: [[https://microdata.worldbank.org/index.php/catalog/4045][World Bank Microdata Library, Catalog #4045]]
+(Cambodia Living Standards Measurement Study - Plus 2019-2020)
+
+* Overview
+
+Cambodia currently has a single wave (2019-20) from the LSMS-Plus
+program.  The survey includes 33 data files (=hh_sec_1.dta= through
+=hh_sec_20b.dta=, plus =individual_cover.dta=), covering household
+demographics, food consumption, agriculture, health, education,
+employment, assets, and more.
+
+Three country-level features are implemented (=other_features=,
+=household_characteristics=, =food_acquired=).  The build uses the
+legacy Makefile/script path exclusively---there is no =data_scheme.yml=
+and no =data_info.yml= at the country level, so Cambodia is not yet
+accessible via the =Country()= API.
+
+* Known issues
+- Makefile :: The generic =%.parquet= rule references =food_items.org=
+  and =malawi.py= (copy-paste error from Malawi).  Neither file exists
+  in this country.  The rule will fail for any target that falls through
+  to it.
+- =cambodia.py= :: Uses deprecated =from ligonlibrary.dataframes import from_dta=
+  and =dvc.api.open()= anti-patterns instead of =get_dataframe()=.
+- No =data_scheme.yml= :: Cambodia cannot be loaded via
+  =ll.Country('Cambodia')= because there is no data scheme definition.
+- No =categorical_mapping.org= :: No food-item label harmonization
+  exists.
+- No =food_items.org= :: Food item labels are not documented or
+  harmonized.
+
+* Files in Cambodia/_/
+** DONE cambodia.py
+Country-level helper defining =age_sex_composition()=.  Called by
+=2019-20/_/household_characteristics.py=.
+
+Uses deprecated imports (=ligonlibrary=, =dvc.api=, =lsms.tools=).
+Would need migration to =get_dataframe()=.
+
+** DONE other_features.py
+CLOSED: [2023-07-24 Mon]
+Concatenates wave-level =other_features.parquet= files, adding =t=
+index.  Only the 2019-20 wave is included.
+
 ** DONE household_characteristics.py
+CLOSED: [2023-07-24 Mon]
+Reads =2019-20/_/household_characteristics.parquet= and writes to
+=var/household_characteristics.parquet=.
+
 ** DONE food_acquired.py
-** DONE household_characteristics.py
+CLOSED: [2023-08-04 Fri]
+Concatenates wave-level =food_acquired.parquet=, joins with
+=other_features= for market (=m=) index, and writes to
+=var/food_acquired.parquet=.
+
+** DONE food_prices_quantities_and_expenditures.py
+Derives =food_expenditures=, =food_prices=, and =food_quantities=
+parquets from =var/food_acquired.parquet=.
+
+Note: writes CSV files to =~/Downloads/=, which is a side effect that
+should be removed.
+
+** TODO food_items.org
+No food item label mapping exists.  A =food_items.org= table is needed
+to harmonize the food codes from =hh_sec_5.dta= (variable
+=food_consumption_roster_1__id=) into preferred labels.  Since there is
+only one wave, the table would be simple (one column plus preferred
+label).
+
 ** TODO nutrition.py
+Not yet implemented.  Requires:
+- A Food Conversion Table (FCT) mapping Cambodian food items to
+  nutritional content (calories, protein, fat, etc.).
+- The FAO Food Composition Tables for Southeast Asia or the SMILING
+  project database may be useful starting points.
+- =food_items.org= must be completed first to establish canonical item
+  names.
+
 ** TODO food_prices_and_expenditures.py
-** TODO other_features.py
+The existing =food_prices_quantities_and_expenditures.py= covers this
+functionality.  The TODO from the original CONTENTS.org may refer to a
+differently-structured version, or is redundant with the existing file.
+Clarify whether additional work is needed beyond what
+=food_prices_quantities_and_expenditures.py= already provides.
+
+** TODO data_scheme.yml
+Needed to integrate Cambodia into the =Country()= API.  Should declare
+at minimum =other_features=, =household_characteristics=, and
+=food_acquired= with =materialize: make=.
+
+** TODO Migrate anti-patterns
+All wave-level scripts use =dvc.api.open()= and
+=from ligonlibrary.dataframes import from_dta= instead of
+=get_dataframe()=.  These should be migrated to the standard
+=get_dataframe()= pattern per CLAUDE.md.
+
+* Files in Cambodia/2019-20/_/
+** DONE other_features.py
+CLOSED: [2023-07-24 Mon]
+Reads =hh_sec_1.dta= via =dvc.api.open()=.  Extracts province (=m=)
+and urban/rural status.  Source variables: =s01q02= (province),
+=s01q06b= (urban/rural).
+
+** DONE household_characteristics.py
+CLOSED: [2023-07-24 Mon]
+Reads =hh_sec_2.dta= via =dvc.api.open()=.  Uses =cambodia.py='s
+=age_sex_composition()= to compute age-sex demographic bins.  Joins
+=other_features= for the market (=m=) index.
+
+** DONE food_acquired.py
+CLOSED: [2023-08-04 Fri]
+Reads =hh_sec_5.dta= (food consumption module).  Extracts quantity,
+total spent, value obtained, and computes price per unit.  Food item
+labels come from the categorical version of
+=food_consumption_roster_1__id=.
+
+* Available source data (not yet used)
+The 2019-20 wave has many =.dta= files that could support additional
+features:
+- =hh_sec_3.dta= :: Education
+- =hh_sec_4.dta= :: Health
+- =hh_sec_6.dta= :: Labor, possibly relevant for income
+- =hh_sec_7a.dta= through =hh_sec_7d.dta= :: Agriculture/livestock
+- =hh_sec_8.dta= :: Non-food expenditures
+- =hh_sec_9.dta= :: Housing
+- =hh_sec_10.dta= through =hh_sec_12.dta= :: Assets, savings, credit
+- =hh_sec_13a.dta=, =hh_sec_13b.dta= :: Shocks
+- =hh_sec_14.dta= through =hh_sec_20b.dta= :: Various additional modules
+- =individual_cover.dta= :: Individual-level cover page
