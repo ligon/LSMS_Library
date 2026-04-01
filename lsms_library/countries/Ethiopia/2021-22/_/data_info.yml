@@ -1,0 +1,105 @@
+Country: Ethiopia
+Wave: 2021-22
+
+cluster_features:
+    dfs:
+        - df_main
+        - df_geo
+    df_main:
+        file: sect_cover_hh_w5.dta
+        idxvars:
+            i: household_id
+            v: ea_id
+        myvars:
+            Region: saq01
+            District: saq02
+            Rural:
+                - saq14
+                - mapping:
+                    RURAL: Rural
+                    Rural: Rural
+                    rural: Rural
+                    1. RURAL: Rural
+                    URBAN: Urban
+                    Urban: Urban
+                    urban: Urban
+                    2. URBAN: Urban
+    df_geo:
+        file: eth_householdgeovariables_y5.dta
+        idxvars:
+            i: household_id
+            v: ea_id
+        myvars:
+            Latitude: lat_dd_mod
+            Longitude: lon_dd_mod
+    merge_on:
+        - v
+        - i
+    final_index:
+        - t
+        - v
+
+household_roster:
+    file: sect1_hh_w5.dta
+    idxvars:
+        i: household_id
+        pid: individual_id
+    myvars:
+        Sex: s1q02
+        Age: s1q03a
+        Relationship: s1q01
+
+shocks:
+    file: sect9_hh_w5.dta
+    idxvars:
+        i: household_id
+        Shock:
+            - shock_type
+            - mapping:
+                "1. DEATH OF HH MEMBER (MAIN BREAD EARNER)": Death Of Hh Member (Main Bread Earner)
+                "2. DEATH OF A CHILD UNDER 5 INCLUDING MISCARRIAGE OR STILLBIRTH": Death/Abortion/Still Birth Of Children Under 5
+                "3. DEATH OF OTHER HH MEMBER": Death Of Other Hh Member
+                "4. ILLNESS OF HOUSEHOLD MEMBER": Illness Of Household Member
+                "5. LOSS OF NON-FARM JOBS OF HH MEMBER": Loss Of Non-Farm Jobs Of Hh Member
+                "6. DROUGHT": Drought
+                "7. FLOOD": Flood
+                "8. LANDSLIDES/ AVALANCHES": Landslides/Avalanches
+                "9. HEAVY RAINS PREVENTING WORK": Heavy Rains Preventing Work
+                "10. OTHER CROP DAMAGE": Other Crop Damage
+                "11. UNUSUAL PRICE FALL  OF FOOD ITEMS AGRICULTURE PRODUCES": Price Fall Of Food Items
+                "12. UNUSUAL PRICE RISE OF FOOD ITEMS AGRICULTURE PRODUCES": Price Raise Of Food Item
+                "13. UNUSUAL INCREASE IN PRICE OF INPUTS (SEED, FERTILIZER)": Price Raise Of Inputs
+                "14. GREAT LOSS/DEATH OF LIVESTOCK": Great Loss/Death Of Livestock
+                "15. FIRE": Fire
+                "16. THEFT/ROBBERY AND OTHER VIOLENCE": Theft/Robbery And Other Violence
+                "17. DISPLACEMENT (DUE TO GOVERNMENT DEVELOPMENT PROJECTS)": Displacement (Due To Gov Dev Project)
+                "18. LOCAL UNREST/VIOLENCE": Local Unrest/Violence
+                "19. OTHER (SPECIFY)": Other (Specify)
+    myvars:
+        AffectedIncome:
+            - s9q03a
+            - mapping:
+                1. INCREASED: True
+                2. DECREASED: True
+                3. DID NOT CHANGE: False
+        AffectedAssets:
+            - s9q03b
+            - mapping:
+                1. INCREASED: True
+                2. DECREASED: True
+                3. DID NOT CHANGE: False
+        AffectedProduction:
+            - s9q03c
+            - mapping:
+                1. INCREASED: True
+                2. DECREASED: True
+                3. DID NOT CHANGE: False
+        AffectedConsumption:
+            - s9q03e
+            - mapping:
+                1. INCREASED: True
+                2. DECREASED: True
+                3. DID NOT CHANGE: False
+        HowCoped0: s9q04_1
+        HowCoped1: s9q04_2
+        HowCoped2: s9q04_3
