@@ -32,3 +32,10 @@ Data Scheme:
   household_characteristics: !make
   other_features: !make
   panel_ids: !make
+
+  assets:
+    index: (t, i, j)
+    Quantity: float
+    Age: float
+    Value: float
+    Purchase Price: float

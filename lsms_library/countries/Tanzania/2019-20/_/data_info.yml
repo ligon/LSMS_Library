@@ -67,3 +67,14 @@ shocks:
                 neither: False
         HowCoped0: hh_r04_1
         HowCoped1: hh_r04_2
+
+assets:
+    file: HH_SEC_M.dta
+    idxvars:
+        i: sdd_hhid
+        j: itemcode
+    myvars:
+        Quantity: hh_m01
+        Age: hh_m02
+        Value: hh_m04
+        Purchase Price: hh_m03
