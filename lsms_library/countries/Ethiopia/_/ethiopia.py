@@ -12,7 +12,8 @@ import json
 Waves = {'2011-12':(),
          '2013-14':('sect_cover_hh_w2.dta','household_id2','household_id'),
          '2015-16':('sect_cover_hh_w3.dta','household_id2','household_id'),
-         '2018-19':() #'sect_cover_hh_w4.dta','household_id','household_id2'),  # But entirely new sample drawn in 2018-19!
+         '2018-19':(), #'sect_cover_hh_w4.dta','household_id','household_id2'),  # But entirely new sample drawn in 2018-19!
+         '2021-22':(),
          }
 
 
