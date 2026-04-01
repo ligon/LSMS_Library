@@ -50,3 +50,18 @@ household_roster:
         Sex: s01q01
         Relationship: s01q02
         Age: s01q04a
+
+food_acquired:
+    file: ../Data1/s07b_me_tgo2018.dta
+    idxvars:
+        v: grappe
+        visit: vague
+        i:
+            - grappe
+            - menage
+        j: s07bq01
+        u: s07bq03b
+    myvars:
+        Quantity: s07bq03a
+        Expenditure: s07bq08
+        Produced: s07bq04
