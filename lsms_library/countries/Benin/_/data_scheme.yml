@@ -28,3 +28,12 @@ Data Scheme:
     Age: float
     Value: float
     Purchase Price: float
+
+  shocks:
+    index: (t, i, Shock)
+    AffectedIncome: bool
+    AffectedAssets: bool
+    AffectedProduction: bool
+    AffectedConsumption: bool
+    HowCoped0: str
+    HowCoped1: str
