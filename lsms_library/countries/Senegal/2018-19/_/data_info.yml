@@ -64,10 +64,28 @@ household_roster:
             - menage
       myvars:
           interview_date: s00q23a
-  merge_on: 
+  merge_on:
     - v
     - i
   final_index:
     - v
     - i
     - pid
+
+food_acquired:
+    file: s07b_me_sen2018.dta
+    idxvars:
+        v:
+            - vague
+            - grappe
+        visit: vague
+        i:
+            - vague
+            - grappe
+            - menage
+        j: s07bq01
+        u: s07bq03b
+    myvars:
+        Quantity: s07bq03a
+        Expenditure: s07bq08
+        Produced: s07bq04
