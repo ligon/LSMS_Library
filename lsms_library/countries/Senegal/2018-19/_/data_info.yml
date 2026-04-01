@@ -75,6 +75,13 @@ household_roster:
 shocks:
     file: s14_me_sen2018.dta
     idxvars:
+food_acquired:
+    file: s07b_me_sen2018.dta
+    idxvars:
+        v:
+            - vague
+            - grappe
+        visit: vague
         i:
             - vague
             - grappe
@@ -135,3 +142,9 @@ shocks:
         Cope24: s14q05__24
         Cope25: s14q05__25
         Cope26: s14q05__26
+        j: s07bq01
+        u: s07bq03b
+    myvars:
+        Quantity: s07bq03a
+        Expenditure: s07bq08
+        Produced: s07bq04
