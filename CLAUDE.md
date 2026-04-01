@@ -15,6 +15,9 @@ food = uga.food_expenditures()  # Standardized DataFrame
 ## Country Symlinks
 Root-level symlinks (e.g., `Uganda → lsms_library/countries/Uganda`) are for convenience. Actual config is under `lsms_library/countries/`.
 
+## DVC Repository Root
+**The DVC repository is rooted at `lsms_library/countries/`, NOT the top-level repo.** DVC config, remotes, and credentials all live under `lsms_library/countries/.dvc/`. All `dvc` CLI commands (pull, push, status) must be run from `lsms_library/countries/` or they will fail with missing-remote/credential errors. The `get_dataframe()` fallback chain handles this automatically when scripts run from their normal `{Country}/{wave}/_/` working directory.
+
 ## DVC Caching and `data_root()`
 - All materialized data (parquets, JSON caches) is written under `data_root()` (`lsms_library/paths.py`), **not** in the repo tree.
 - Default location: `~/.local/share/lsms_library/{Country}/var/{table}.parquet`. Override with `LSMS_DATA_DIR` env var.
@@ -23,6 +26,9 @@ Root-level symlinks (e.g., `Uganda → lsms_library/countries/Uganda`) are for c
 - Caches auto-invalidate on source/config changes (hash-based).
 - `LSMS_BUILD_BACKEND=make` bypasses DVC and builds directly with Make (useful for debugging).
 - On clusters: `trust_cache=True` in `Country()` reads existing parquets directly, skipping all validation.
+
+## Roster-Derived Tables
+`household_characteristics` is **auto-derived from `household_roster`** via `roster_to_characteristics()` in `transformations.py`. It should NOT be registered in `data_scheme.yml` --- the `Country` class detects it via `_ROSTER_DERIVED` and applies the transformation automatically when `household_roster` exists. Adding `household_characteristics: !make` to a data_scheme bypasses this and forces legacy scripts to run instead.
 
 ## Adding New Surveys
 New surveys are added via YAML config files under `lsms_library/countries/`, not Python code.
