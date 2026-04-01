@@ -351,7 +351,13 @@ class Wave:
                 else:
                     return tuple(value)
             if var_name in formatting_functions:
-                return (value, formatting_functions[var_name])
+                # Named formatting functions for idxvars (e.g., Benin's `i()`)
+                # expect composite keys (list values like [grappe, menage]).
+                # When the value is a simple string (single column), use
+                # format_id instead to avoid passing scalars to a function
+                # that expects a Series row.
+                if not (format_id_function and isinstance(value, str)):
+                    return (value, formatting_functions[var_name])
             if format_id_function:
                 return (value, format_id)
             return value
