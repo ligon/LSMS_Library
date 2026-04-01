@@ -47,6 +47,69 @@ cluster_features:
         - t
         - v
 
+shocks:
+    file: s14_me_bfa2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+        Shock: s14q01
+    myvars:
+        AffectedIncome:
+            - s14q04a
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        AffectedAssets:
+            - s14q04b
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        AffectedProduction:
+            - s14q04c
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        AffectedConsumption:
+            - s14q04d
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        Cope1: s14q05__1
+        Cope2: s14q05__2
+        Cope3: s14q05__3
+        Cope4: s14q05__4
+        Cope5: s14q05__5
+        Cope6: s14q05__6
+        Cope7: s14q05__7
+        Cope8: s14q05__8
+        Cope9: s14q05__9
+        Cope10: s14q05__10
+        Cope11: s14q05__11
+        Cope12: s14q05__12
+        Cope13: s14q05__13
+        Cope14: s14q05__14
+        Cope15: s14q05__15
+        Cope16: s14q05__16
+        Cope17: s14q05__17
+        Cope18: s14q05__18
+        Cope19: s14q05__19
+        Cope20: s14q05__20
+        Cope21: s14q05__21
+        Cope22: s14q05__22
+        Cope23: s14q05__23
+        Cope24: s14q05__24
+        Cope25: s14q05__25
+        Cope26: s14q05__26
+
 food_acquired:
     file: s07b_me_bfa2018.dta
     idxvars:
