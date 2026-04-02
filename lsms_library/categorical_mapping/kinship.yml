@@ -261,3 +261,61 @@ Enfant Adoptif:          [-1, 0, consanguineal]
 "Other non related person(not related)":         [0, 0, unrelated]
 "Other Relative Of Head Or Spouse":              [0, 0, consanguineal]
 "Other relative of head or spouse":              [0, 0, consanguineal]
+
+# --- Gendered-pair slash/comma variants (Iraq, Kazakhstan, Kosovo, South Africa) ---
+# These use "X/Y" or "X, Y" or "X Or Y" patterns for gendered pairs.
+
+# Affinal (spouse variants)
+Wife/Husband:                    [0, 0, affinal]
+Husband/Wife:                    [0, 0, affinal]
+Wife Or Husband Or Partner:      [0, 0, affinal]
+
+# Lineal consanguineal (child variants)
+Daughter/Son:                    [-1, 0, consanguineal]
+"Son, Daughter":                 [-1, 0, consanguineal]
+Son Or Daughter:                 [-1, 0, consanguineal]
+
+# Lineal consanguineal (parent variants)
+Father/Mother:                   [1, 0, consanguineal]
+Mother Or Father:                [1, 0, consanguineal]
+"Father, Mother":                [1, 0, consanguineal]
+Father Or Mother:                [1, 0, consanguineal]
+
+# Collateral consanguineal (sibling variants)
+Sister/Brother:                  [0, 1, consanguineal]
+Sister Or Brother:               [0, 1, consanguineal]
+"Brother, Sister":               [0, 1, consanguineal]
+
+# Grandparent/grandchild variants
+Grandfather/Grandmother:         [2, 0, consanguineal]
+Grandson/Granddaughter:          [-2, 0, consanguineal]
+Grandson/Grandaughter:           [-2, 0, consanguineal]
+
+# Niece/nephew, aunt/uncle variants
+Niece Or Nephew:                 [-1, 1, consanguineal]
+Aunt Or Uncle:                   [1, 1, consanguineal]
+
+# Affinal in-law variants (slash, dash-or, "in law")
+"Son/Daughter In Law":           [-1, 0, affinal]
+"Mother- Or Father-In-Law":      [1, 0, affinal]
+"Son- Or Daughter-In-Law":       [-1, 0, affinal]
+"Brother- Or Sister-In-Law":     [0, 1, affinal]
+
+# Step variants (Kazakhstan)
+Stepfather/Stepmother:           [1, 0, step]
+Stepson/Stepdaughter:            [-1, 0, step]
+Stepbrother/Stepsister:          [0, 1, step]
+
+# Head variants (South Africa)
+Resident Head:                   [0, 0, consanguineal]
+Absent Head:                     [0, 0, consanguineal]
+
+# Other / non-relative variants
+Not Relative:                    [0, 0, unrelated]
+Unrelated To Household:          [0, 0, unrelated]
+Other Non-Family:                [0, 0, unrelated]
+
+# Servant/lodger variants (South Africa, Kazakhstan)
+"Household Help (Or Relative Of)":   [0, 0, servant]
+"Lodger Or Relative Of Lodgers":     [0, 0, guest]
+"Nurse, Assistant Girl":             [0, 0, servant]
