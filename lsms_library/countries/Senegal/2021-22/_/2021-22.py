@@ -15,7 +15,7 @@ def i(value):
     Formatting household id.
     Handles both 2-component (grappe+menage) and 3-component (vague+grappe+menage).
     '''
-    parts = [value[k].astype(str) for k in range(len(value))]
+    parts = [value.iloc[k].astype(str) for k in range(len(value))]
     id = parts[0]
     for p in parts[1:]:
         id = id + p
@@ -24,7 +24,7 @@ def i(value):
 
 def Sex(value):
     '''
-    Formatting sex veriable
+    Formatting sex variable
     '''
     if value == 'Féminin':
         return 'f'
@@ -33,11 +33,14 @@ def Sex(value):
 
 def Age(value):
     '''
-    Formatting birthplace variable
+    Formatting age from date components
     '''
-
-    value[2] = {'Janvier': 1, 'Février': 2, 'Mars': 3, 'Avril':4, 'Mai': 5, 'Juin': 6, 'Juillet': 7, 'Août': 8, 'Septembre': 9, 'Octobre': 10, 'Novembre': 11, 'Décembre': 12}.get(value[2])
-    return list(value)
+    month_map = {'Janvier': 1, 'Février': 2, 'Mars': 3, 'Avril': 4, 'Mai': 5,
+                 'Juin': 6, 'Juillet': 7, 'Août': 8, 'Septembre': 9,
+                 'Octobre': 10, 'Novembre': 11, 'Décembre': 12}
+    result = list(value)
+    result[2] = month_map.get(value.iloc[2])
+    return result
 
 def Birthplace(value):
     '''
@@ -67,7 +70,7 @@ def previous_i(value):
     '''
     Formatting previous household id from grappe+menage.
     '''
-    parts = [value[k].astype(str) for k in range(len(value))]
+    parts = [value.iloc[k].astype(str) for k in range(len(value))]
     id = parts[0]
     for p in parts[1:]:
         id = id + p
