@@ -24,14 +24,6 @@ x = pd.concat(x.values())
 updated_ids = json.load(open('updated_ids.json'))
 x = id_walk(x, updated_ids)
 
-try:
-    of = get_dataframe('../var/other_features.parquet')
-
-    x = x.join(of.reset_index('m')['m'],on=['i','t'])
-
-except FileNotFoundError:
-    x['m'] ='Uganda'
-
-x = x.reset_index().set_index(['i','t','m'])
+x = x.reset_index().set_index(['i','t'])
 
 to_parquet(x.dropna(), '../var/interview_date.parquet')

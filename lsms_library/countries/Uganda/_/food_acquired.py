@@ -24,9 +24,4 @@ p = pd.concat(p)
 updated_ids = json.load(open('updated_ids.json'))
 p = id_walk(p, updated_ids)
 
-of = get_dataframe('../var/other_features.parquet')
-
-p = p.join(of.reset_index('m')['m'],on=['i','t'])
-p = p.reset_index().set_index(['i','t','m','j','u'])
-
 to_parquet(p, '../var/food_acquired.parquet')

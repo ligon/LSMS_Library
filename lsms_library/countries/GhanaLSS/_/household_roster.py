@@ -32,24 +32,13 @@ for t in Waves.keys():
     df1.columns.name ='k'
     df2 = df1.stack('k').dropna()
     df2 = df2.reset_index().set_index(['j','indiv','t','k']).squeeze()
-    try:
-        df2 = df2.drop(columns = 'm')
-    except KeyError:
-        pass
     x.append(df2)
 
 z = pd.concat(x)
 
 z = z.unstack('k')
 
-try:
-    of = get_dataframe('../var/other_features.parquet')
-    z = z.join(of.reset_index('m')['m'],on=['j','t'])
-    z = z.reset_index().set_index(['j','indiv','t','m'])
-except FileNotFoundError:
-    warnings.warn('No other_features.parquet found.')
-    z['m'] = 'Ghana'
-    z = z.reset_index().set_index(['j','indiv','t','m'])
+z = z.reset_index().set_index(['j', 'indiv', 't'])
 
 z['Age'] = pd.to_numeric(z['Age'], errors='coerce').astype('Int64')
 

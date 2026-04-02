@@ -9,7 +9,7 @@ LSMS_DATA_ROOT ?= $(if $(LSMS_DATA_DIR),$(LSMS_DATA_DIR),$(if $(XDG_DATA_HOME),$
 VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 
 var = $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_quantities.parquet $(VAR_DIR)/food_prices.parquet \
-	  $(VAR_DIR)/household_characteristics.parquet $(VAR_DIR)/other_features.parquet $(VAR_DIR)/locality.parquet \
+	  $(VAR_DIR)/household_characteristics.parquet $(VAR_DIR)/locality.parquet \
       $(VAR_DIR)/shocks.parquet $(VAR_DIR)/nonfood_expenditures.parquet $(VAR_DIR)/enterprise_income.parquet \
 	  $(VAR_DIR)/assets.parquet $(VAR_DIR)/earnings.parquet $(VAR_DIR)/housing.parquet $(VAR_DIR)/income.parquet \
 	  $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet
@@ -33,7 +33,7 @@ $(VAR_DIR)/interview_date.parquet: interview_date.py $(interview_date_parquet)
 enterprise_income = $(shell find $(rounds) -name enterprise_income.py)
 enterprise_income_parquet := $(enterprise_income:.py=.parquet)
 
-$(VAR_DIR)/enterprise_income.parquet: enterprise_income.py $(enterprise_income_parquet) $(VAR_DIR)/other_features.parquet
+$(VAR_DIR)/enterprise_income.parquet: enterprise_income.py $(enterprise_income_parquet)
 	python enterprise_income.py
 
 assets = $(shell find $(rounds) -name assets.py)
@@ -45,13 +45,13 @@ $(VAR_DIR)/assets.parquet: assets.py $(assets_parquet)
 earnings = $(shell find $(rounds) -name earnings.py)
 earnings_parquet := $(earnings:.py=.parquet)
 
-$(VAR_DIR)/earnings.parquet: earnings.py $(earnings_parquet) $(VAR_DIR)/other_features.parquet
+$(VAR_DIR)/earnings.parquet: earnings.py $(earnings_parquet)
 	python earnings.py
 
 shocks = $(shell find $(rounds) -name shocks.py)
 shocks_parquet := $(shocks:.py=.parquet)
 
-$(VAR_DIR)/shocks.parquet: shocks.py $(shocks_parquet) $(VAR_DIR)/other_features.parquet
+$(VAR_DIR)/shocks.parquet: shocks.py $(shocks_parquet)
 	python shocks.py
 
 
@@ -67,20 +67,14 @@ $(VAR_DIR)/food_quantities.parquet $(VAR_DIR)/food_expenditures.parquet $(VAR_DI
 food_acquired = $(shell find $(rounds) -name food_acquired.py)
 food_acquired_parquet := $(food_acquired:.py=.parquet)
 
-$(VAR_DIR)/food_acquired.parquet: unitlabels.csv food_acquired.py $(food_acquired_parquet) $(VAR_DIR)/other_features.parquet
+$(VAR_DIR)/food_acquired.parquet: unitlabels.csv food_acquired.py $(food_acquired_parquet)
 	python food_acquired.py
 
 household_characteristics = $(shell find $(rounds) -name household_characteristics.py)
 household_characteristics_parquet := $(household_characteristics:.py=.parquet)
 
-$(VAR_DIR)/household_characteristics.parquet: household_characteristics.py $(household_characteristics_parquet) $(VAR_DIR)/other_features.parquet
+$(VAR_DIR)/household_characteristics.parquet: household_characteristics.py $(household_characteristics_parquet)
 	python household_characteristics.py
-
-other_features = $(shell find $(rounds) -name other_features.py)
-other_features_parquet := $(other_features:.py=.parquet)
-
-$(VAR_DIR)/other_features.parquet: other_features.py $(other_features_parquet)
-	python other_features.py
 
 locality = $(shell find $(rounds) -name locality.py)
 locality_parquet := $(locality:.py=.parquet)

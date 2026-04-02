@@ -7,7 +7,6 @@ different prices for different units.
 import pandas as pd
 import numpy as np
 from ghana_panel import change_id, Waves, harmonized_food_labels
-import warnings
 import sys
 sys.path.append('../../_/')
 from lsms_library.local_tools import df_from_orgfile
@@ -53,16 +52,7 @@ for t in Waves.keys():
 
 p = pd.concat(p)
 
-try:
-    of = get_dataframe('../var/other_features.parquet')
-
-    p = p.join(of.reset_index('m')['m'],on=['j','t']).reset_index()
-    p['m'] = np.where(p['t'] == '2013-14', 'Ghana', p['m']) #unneeded once 2013-14 fix is found
-    p = p.set_index(['j','t','m','i','unit'])
-except FileNotFoundError:
-    warnings.warn('No other_features.parquet found.')
-    p['m'] = 'Ghana'
-    p = p.reset_index().set_index(['j','t','m','i','unit'])
+p = p.reset_index().set_index(['j', 't', 'i', 'unit'])
 
 p = p.rename(index=fix_food_labels(),level='i')
 

@@ -9,7 +9,6 @@ sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
 from ethiopia import change_id, Waves
-import warnings
 
 def id_walk(df,wave,waves):
     
@@ -32,16 +31,8 @@ for t in list(Waves.keys()):
 
 x = pd.concat(x.values())
 
-try:
-    of = get_dataframe('../var/other_features.parquet')
-
-    x = x.join(of.reset_index('m')['m'],on=['j','t'])
-
-except FileNotFoundError:
-    warnings.warn('No other_features.parquet found.')
-    x['m'] ='Ethiopia'
-
-x = x.reset_index().set_index(['j','t','m'])
+# Reset index so Shock is a column for harmonization
+x = x.reset_index()
 
 def harmonize_shocks(df_column):
     df_column = df_column.str.title()
@@ -63,7 +54,9 @@ category_labels = {'Death Of Household Member' : 'Death Of Hh Member (Main Bread
 #harmonize shocks and coping strategies labels
 x.loc[:, ['Shock', 'HowCoped0', 'HowCoped1','HowCoped2']] = x.loc[:, ['Shock', 'HowCoped0', 'HowCoped1','HowCoped2']].apply(harmonize_shocks)
 x = x.replace(category_labels)
-x.Occurrence = x.Occurrence.fillna(0)
+x.loc[:, 'Occurrence'] = x['Occurrence'].fillna(0)
+
+x = x.set_index(['j','t','Shock'])
 
 
 to_parquet(x, '../var/shocks.parquet')

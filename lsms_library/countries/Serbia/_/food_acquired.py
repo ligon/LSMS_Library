@@ -18,13 +18,8 @@ for t in ['2007']:
 
 fa = pd.concat(fa)
 
-of = get_dataframe('../var/other_features.parquet')
-
-fa = fa.reset_index().merge(of.reset_index(), how='left', on=['j','t'])
-fa = fa.reset_index().set_index(['j','t','m','i','u'])
-
 fa = fa.replace(0,np.nan)
-fa = fa.groupby(['j','m','t','i','u']).sum()
+fa = fa.groupby(['j','t','i','u']).sum()
 fa = fa.replace(0,np.nan)
 
 to_parquet(fa, '../var/food_acquired.parquet')
