@@ -7,7 +7,7 @@ household_roster:
     idxvars:
         v: xcluster
         i: xhhkey
-        pid: idcode
+        pid: xpers
     myvars:
         Relationship: q0105
         Sex: q0102
