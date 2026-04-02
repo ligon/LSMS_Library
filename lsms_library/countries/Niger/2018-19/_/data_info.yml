@@ -55,8 +55,8 @@ cluster_features:
         idxvars:
             v: grappe
         myvars:
-            Latitude: lat_dd_mod
-            Longitude: lon_dd_mod
+            Latitude: coordonnes_gps__Latitude
+            Longitude: coordonnes_gps__Longitude
     merge_on:
         - v
     final_index:
