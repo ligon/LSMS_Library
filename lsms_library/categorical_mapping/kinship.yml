@@ -319,3 +319,12 @@ Other Non-Family:                [0, 0, unrelated]
 "Household Help (Or Relative Of)":   [0, 0, servant]
 "Lodger Or Relative Of Lodgers":     [0, 0, guest]
 "Nurse, Assistant Girl":             [0, 0, servant]
+
+# --- Timor-Leste variants ---
+Child/Adopted Child:             [-1, 0, consanguineal]
+"Brother/Sister In Law":         [0, 1, affinal]
+"Father/Mother In Law":          [1, 0, affinal]
+Grandfather/Mother:              [2, 0, consanguineal]
+"Servant'S Relative":            [0, 0, servant]
+Adopted/Stepchild:               [-1, 0, step]
+"Tenant Or Tenant'S Relative":   [0, 0, guest]
