@@ -1107,6 +1107,10 @@ class Country:
             ):
                 df = id_walk(df, self.updated_ids)
 
+            # Normalise "Relation" -> "Relationship" so kinship expansion fires
+            if "Relation" in df.columns and "Relationship" not in df.columns:
+                df = df.rename(columns={"Relation": "Relationship"})
+
             # Expand Relationship -> Generation, Distance, Affinity
             if "Relationship" in df.columns:
                 df = _expand_kinship(df)
