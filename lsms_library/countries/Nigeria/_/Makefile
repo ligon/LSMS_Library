@@ -9,7 +9,8 @@ LSMS_DATA_ROOT ?= $(if $(LSMS_DATA_DIR),$(LSMS_DATA_DIR),$(if $(XDG_DATA_HOME),$
 VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 
 var = $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_quantities.parquet \
-	  $(VAR_DIR)/household_roster.parquet $(VAR_DIR)/household_characteristics.parquet
+	  $(VAR_DIR)/household_roster.parquet $(VAR_DIR)/household_characteristics.parquet \
+	  $(VAR_DIR)/interview_date.parquet
 
 all: $(var)
 
@@ -88,3 +89,21 @@ $(VAR_DIR)/food_quantities.parquet: food_quantities.py $(food_quantities_parquet
 
 ../2018-19/_/food_quantities.parquet: ../2018-19/_/food_expenditures.py
 	(cd ../2018-19/_; python food_expenditures.py)
+
+../2010-11/_/interview_date.parquet: ../2010-11/_/interview_date.py
+	(cd ../2010-11/_; python interview_date.py)
+
+../2012-13/_/interview_date.parquet: ../2012-13/_/interview_date.py
+	(cd ../2012-13/_; python interview_date.py)
+
+../2015-16/_/interview_date.parquet: ../2015-16/_/interview_date.py
+	(cd ../2015-16/_; python interview_date.py)
+
+../2018-19/_/interview_date.parquet: ../2018-19/_/interview_date.py
+	(cd ../2018-19/_; python interview_date.py)
+
+interview_date = $(shell find $(rounds) -name interview_date.py)
+interview_date_parquet := $(interview_date:.py=.parquet)
+
+$(VAR_DIR)/interview_date.parquet: interview_date.py $(interview_date_parquet)
+	python interview_date.py

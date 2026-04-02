@@ -12,7 +12,7 @@ myvars = dict(year='saq13y',
                 month='saq13m',
                 day='saq13d')
 df_1 = df_data_grabber('../Data/secta_plantingw3.dta',idxvars,**myvars)
-df_1['date'] = pd.to_datetime(df_1[['year', 'month', 'day']], errors='coerce')
+df_1['int_t'] = pd.to_datetime(df_1[['year', 'month', 'day']], errors='coerce')
 df_1=df_1.drop(columns=['year','month','day'])
 
 
@@ -25,7 +25,7 @@ myvars = dict(year='saq13y',
 
 df = df_data_grabber('../Data/secta_harvestw3.dta',idxvars,**myvars)
 
-df['date'] = pd.to_datetime(df[['year', 'month', 'day']], errors='coerce')
+df['int_t'] = pd.to_datetime(df[['year', 'month', 'day']], errors='coerce')
 df=df.drop(columns=['year','month','day'])
 
 

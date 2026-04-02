@@ -49,5 +49,6 @@ Data Scheme:
   interview_date:
     index: (t, i)
     int_t: datetime
+    materialize: make
 
   nonfood_expenditures: !make

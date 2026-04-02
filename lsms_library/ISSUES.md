@@ -99,3 +99,8 @@ you can use .as_ordered() to change the Categorical to an ordered one
 - Error: `TypeError: Categorical is not ordered for operation max
 you can use .as_ordered() to change the Categorical to an ordered one
 `
+## 2026-04-02 03:53:10Z Nigeria – interview_date
+
+- Waves: 2010Q3, 2011Q1, 2012Q3, 2013Q1, 2015Q3, 2016Q1, 2018Q3, 2019Q1
+- Error: `CalledProcessError: Command '['make', '-s', '../2010-11/_/interview_date.parquet']' returned non-zero exit status 2.`
+- **Status:** FIXED in commit 183681dc (column rename + Makefile rules + venv PATH fix)

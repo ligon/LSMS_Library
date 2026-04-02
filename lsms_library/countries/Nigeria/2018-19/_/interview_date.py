@@ -9,7 +9,7 @@ idxvars = dict(j='hhid',
                t=('hhid', lambda x: "2018Q3"),
                )
 
-myvars = dict(date=('InterviewStart', lambda x: pd.to_datetime(x).date))
+myvars = dict(int_t=('InterviewStart', lambda x: pd.to_datetime(x).date))
 
 df_planting = df_data_grabber('../Data/secta_plantingw4.dta',idxvars,**myvars)
 
@@ -20,7 +20,7 @@ idxvars = dict(j='hhid',
                t=('hhid', lambda x: "2019Q1"),
                )
 
-myvars = dict(date=('InterviewStart', lambda x: pd.to_datetime(x).date))
+myvars = dict(int_t=('InterviewStart', lambda x: pd.to_datetime(x).date))
 
 df = df_data_grabber('../Data/secta_harvestw4.dta',idxvars,**myvars)
 
