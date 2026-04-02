@@ -884,8 +884,8 @@ class Country:
                   .drop_duplicates(subset=['i', 't'])
                   .set_index(['i', 't'])[column]
                   .rename('m'))
-        # Normalize to uppercase/stripped strings
-        lookup = lookup.astype(str).str.upper().str.strip()
+        # Strip whitespace; trust upstream casing from cluster_features
+        lookup = lookup.astype(str).str.strip()
 
         setattr(self, cache_key, lookup)
         return lookup
