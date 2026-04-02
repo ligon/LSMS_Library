@@ -55,3 +55,7 @@ you can use .as_ordered() to change the Categorical to an ordered one
 
 - Waves: 2018-19
 - Error: `IndexError: index 2 is out of bounds for axis 0 with size 2`
+## 2026-04-02 07:16:28Z Albania – household_roster
+
+- Waves: 2002, 2003, 2004, 2005, 2008, 2012
+- Error: `AttributeError: 'NoneType' object has no attribute 'get'`

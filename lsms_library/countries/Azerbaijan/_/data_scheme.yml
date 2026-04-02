@@ -1,9 +1,17 @@
 Country: Azerbaijan
 
+Waves:
+  - '1995'
+
 Data Scheme:
+  cluster_features:
+    index: (t, v)
+    Rural: str
+
   household_roster:
     index: (t, v, i, pid)
-    Sex: int
+    Sex: str
     Age: int
-    Relation: float
-    Marital: float
+    Generation: int
+    Distance: int
+    Affinity: str

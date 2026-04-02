@@ -1,35 +1,63 @@
 Country: Kazakhstan
 Wave: 1996
 household_roster:
-    file:
-        - ../Data/KZ96REL.dta
+    dfs:
+        - df_roster
+        - df_cluster
+    df_roster:
+        file: ../Data/KZ96REL.dta
+        idxvars:
+            i: rn
+            pid: personnr
+        myvars:
+            Sex:
+                - sex
+                - mapping:
+                    1: M
+                    2: F
+            Age: age
+            Relationship:
+                - relhead
+                - mapping:
+                    1: Head
+                    2: Spouse
+                    3: Father/Mother
+                    4: Son/Daughter
+                    5: Stepson/Stepdaughter
+                    6: Brother/Sister
+                    7: Stepbrother/Stepsister
+                    8: Grandfather/Grandmother
+                    9: Grandson/Granddaughter
+                    10: Nephew/Niece
+                    11: Father/Mother-In-Law
+                    12: Son/Daughter-In-Law
+                    13: Other relative
+                    14: Servant
+                    15: Other non-relative
+    df_cluster:
+        file: ../Data/KZ96SMP_PUF.dta
+        idxvars:
+            i: rn
+        myvars:
+            v: loc_nr
+    merge_on:
+        - i
+    final_index:
+        - t
+        - v
+        - i
+        - pid
+
+cluster_features:
+    file: ../Data/KZ96SMP_PUF.dta
     idxvars:
         i: rn
-        pid: personnr
+        v: loc_nr
     myvars:
-        Sex:
-            - sex
+        Region: oblast
+        Rural:
+            - type_loc
             - mapping:
-                1: M
-                2: F
-        Age: age
-        Relationship: 
-            - relhead
-            - mapping:
-                1: husband/wife
-                2: father/mother
-                3: stepfather/stepmother
-                4: son/daughter
-                5: stepson/stepdaughter
-                6: brother/sister
-                7: stepbrother/stepsister
-                8: grandfather/grandmother
-                9: grandson/granddaughter
-                10: nephew/niece
-                11: father/mother-in-law
-                12: son/daughter-in-law 
-                13: other relative
-                14: nurse, assistant girl
-                15: other non-relative
-
-
+                urban: Urban
+                rural: Rural
+                small town: Urban

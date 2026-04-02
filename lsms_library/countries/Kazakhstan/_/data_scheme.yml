@@ -1,9 +1,14 @@
 Country: Kazakhstan
-Data Scheme:  
-  household_roster:  
+Data Scheme:
+  cluster_features:
+    index: (t, v)
+    Region: str
+    Rural: str
+
+  household_roster:
     index: (t, v, i, pid)
-    Sex: str  
-    Age: int  
+    Sex: str
+    Age: int
     Generation: int
     Distance: int
     Affinity: str

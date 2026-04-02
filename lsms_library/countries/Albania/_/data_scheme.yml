@@ -5,12 +5,12 @@ Country: Albania
 # Data hosted externally at INSTAT (Albanian statistical office);
 # never downloaded into this repository.  No Data/ directory exists.
 Waves:
-  - 2002
-  - 2003
-  - 2004
-  - 2005
-  - 2008
-  - 2012
+  - '2002'
+  - '2003'
+  - '2004'
+  - '2005'
+  - '2008'
+  - '2012'
 
 Data Scheme:
   household_roster:

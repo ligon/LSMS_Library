@@ -94,6 +94,8 @@ Domestic Help:               [0, 0, servant]
 # --- English variants (Uganda, etc.) ---
 # Lower-case and compound forms that .title() normalises.
 Son/Daughter:                [-1, 0, consanguineal]
+Aunt/Uncle:                  [1, 1, consanguineal]
+Not Related:                 [0, 0, unrelated]
 Step Child:                  [-1, 0, step]
 Stepchild:                   [-1, 0, step]
 Grand Child:                 [-2, 0, consanguineal]

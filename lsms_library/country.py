@@ -796,7 +796,7 @@ class Country:
                 return sorted(list(module.Waves.keys()))
         # Or if waves is defined in the data_scheme.yml file
         elif self.resources.get('Waves'):
-            self.wave_folder_map = self.resources.get('wave_folder_map')
+            self.wave_folder_map = self.resources.get('wave_folder_map') or {}
             return sorted(self.resources.get('Waves'))
         #Otherwise, we will check the directory for subdirectories that contain 'Documentation' and 'SOURCE'.
         waves = [

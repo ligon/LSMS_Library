@@ -11,24 +11,36 @@ household_roster:
         Sex:
             - sex
             - mapping:
-                1: Male
-                2: Female
+                1: M
+                2: F
         Age: agey
-        Marital: mar
-        Relation: 
+        Relationship:
             - rel
             - mapping:
-                1: head
-                2: spouse
-                3: son/daughter
-                4: father/mother
-                5: brother/sister
-                6: nephew/niece
-                7: aunt/uncle
-                8: grandchild
-                9: grandfather/grandmother
-                10: cousin
-                11: other relation
-                12: not related
-                13: lodger
-                14: other 
+                1: Head
+                2: Spouse
+                3: Son/Daughter
+                4: Father/Mother
+                5: Brother/Sister
+                6: Nephew/Niece
+                7: Aunt/Uncle
+                8: Grandchild
+                9: Grandfather/Grandmother
+                10: Cousin
+                11: Other relative
+                12: Not related
+                13: Lodger
+                14: Other
+
+cluster_features:
+    file: ../Data/APP1.dta
+    idxvars:
+        v: ppid
+    myvars:
+        Rural:
+            - inout
+            - mapping:
+                1.0: Urban
+                2.0: Urban
+                3.0: Urban
+                4.0: Rural
