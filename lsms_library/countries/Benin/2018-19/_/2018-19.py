@@ -33,7 +33,7 @@ COPING_LABELS = {
 def shocks(df):
     cope_cols = [c for c in df.columns if c.startswith('Cope')]
 
-    how_coped = {0: [], 1: []}
+    how_coped = {0: [], 1: [], 2: []}
     for _, row in df[cope_cols].iterrows():
         found = []
         for c in cope_cols:
@@ -45,12 +45,13 @@ def shocks(df):
                 continue
             if val >= 1:
                 found.append(COPING_LABELS.get(num, f'Strategy {num}'))
-            if len(found) == 2:
+            if len(found) == 3:
                 break
-        for k in range(2):
+        for k in range(3):
             how_coped[k].append(found[k] if k < len(found) else np.nan)
 
     df['HowCoped0'] = how_coped[0]
     df['HowCoped1'] = how_coped[1]
+    df['HowCoped2'] = how_coped[2]
     df = df.drop(columns=cope_cols)
     return df

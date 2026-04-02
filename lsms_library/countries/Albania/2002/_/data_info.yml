@@ -6,6 +6,7 @@ household_roster:
         - ../Data/hhroster_cl.dta
 
     idxvars:
+        v: psu
         i: hh
         pid: m1_q00
 

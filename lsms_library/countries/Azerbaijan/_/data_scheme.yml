@@ -2,7 +2,7 @@ Country: Azerbaijan
 
 Data Scheme:
   household_roster:
-    index: (i, pid)
+    index: (t, v, i, pid)
     Sex: int
     Age: int
     Relation: float

@@ -1,41 +1,66 @@
 Country: Tajikistan
 Wave: 2007
 household_roster:
-    file:
-        - ../Data/r1m1.dta
+    dfs:
+        - df_roster
+        - df_cluster
+    df_roster:
+        file: ../Data/r1m1.dta
+        idxvars:
+            i: hhid
+            pid: memid
+        myvars:
+            Sex:
+                - m1q2
+                - mapping:
+                    'male': male
+                    'female': female
+            Age: m1q3
+            Marital:
+                - m1q7
+                - mapping:
+                    'married': married
+                    'married (polygamous union)': married (polygamous union)
+                    'divorced': divorced
+                    'living together': living together
+                    'separated': separated
+                    'widow/er': widow/er
+                    'single': single
+                    'other': other
+            Relationship:
+                - m1q5
+                - mapping:
+                    'head': head
+                    'spouse/partner': spouse/partner
+                    'son/daughter': son/daughter
+                    'son/daughter-in-law': son/daughter-in-law
+                    'father/mother': father/mother
+                    'father/mother-in-law': father/mother-in-law
+                    'sister/brother': sister/brother
+                    'grandchild': grandchild
+                    'grandparent': grandparent
+                    'niece/nephew': niece/nephew
+                    'other relative': other relative
+                    'not related': not related
+    df_cluster:
+        file: ../Data/r1m0.dta
+        idxvars:
+            i: hhid
+        myvars:
+            v: psuid
+    merge_on:
+        - i
+    final_index:
+        - t
+        - v
+        - i
+        - pid
+
+cluster_features:
+    file: ../Data/r1m0.dta
     idxvars:
         i: hhid
-        pid: memid
+        v: psuid
     myvars:
-        Sex:
-            - m1q2
-            - mapping:
-                'male': male
-                'female': female
-        Age: m1q3
-        Marital:
-            - m1q7
-            - mapping:
-                'married': married
-                'married (polygamous union)': married (polygamous union)
-                'divorced': divorced
-                'living together': living together
-                'separated': separated
-                'widow/er': widow/er
-                'single': single
-                'other': other
-        Relationship: 
-            - m1q5
-            - mapping:
-                'head': head
-                'spouse/partner': spouse/partner
-                'son/daughter': son/daughter
-                'son/daughter-in-law': son/daughter-in-law
-                'father/mother': father/mother
-                'father/mother-in-law': father/mother-in-law
-                'sister/brother': sister/brother
-                'grandchild': grandchild
-                'grandparent': grandparent
-                'niece/nephew': niece/nephew
-                'other relative': other relative
-                'not related': not related
+        Region: h_q7
+        Rural: location

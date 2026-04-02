@@ -1,41 +1,66 @@
-Country: Tajikistan 
+Country: Tajikistan
 Wave: 2009
 household_roster:
-    file:
-        - ../Data/m1.dta
+    dfs:
+        - df_roster
+        - df_cluster
+    df_roster:
+        file: ../Data/m1.dta
+        idxvars:
+            i: HHID
+            pid: MEMID
+        myvars:
+            Sex:
+                - SEX
+                - mapping:
+                    'MALE': male
+                    'FEMALE': female
+            Age: AGE
+            Marital:
+                - M1Q8
+                - mapping:
+                    'MARRIED': married
+                    'MARRIED (polygamous union)': married (polygamous union)
+                    'DIVORCED': divorced
+                    'LIVING TOGETHER': living together
+                    'SEPARATED': separated
+                    'WIDOW/ER': widow/er
+                    'SINGLE': single
+                    'OTHER': other
+            Relationship:
+                - M1Q5
+                - mapping:
+                    'HEAD': head
+                    'SPOUSE/PARTNER': spouse/partner
+                    'SON/DAUGHTER': son/daughter
+                    'SON/DAUGHTER-IN-LAW': son/daughter-in-law
+                    'FATHER/MOTHER': father/mother
+                    'FATHER/MOTHER-IN-LAW': father/mother-in-law
+                    'SISTER/BROTHER': sister/brother
+                    'GRANDCHILD': grandchild
+                    'GRANDPARENT': grandparent
+                    'NIECE/NEPHEW': niece/nephew
+                    'OTHER RELATIVE': other relative
+                    'NOT RELATED': not related
+    df_cluster:
+        file: ../Data/m0.dta
+        idxvars:
+            i: HHID
+        myvars:
+            v: psuid
+    merge_on:
+        - i
+    final_index:
+        - t
+        - v
+        - i
+        - pid
+
+cluster_features:
+    file: ../Data/m0.dta
     idxvars:
         i: HHID
-        pid: MEMID
+        v: psuid
     myvars:
-        Sex:
-            - SEX
-            - mapping:
-                'MALE': male
-                'FEMALE': female
-        Age: AGE
-        Marital:
-            - M1Q8
-            - mapping:
-                'MARRIED': married
-                'MARRIED (polygamous union)': married (polygamous union)
-                'DIVORCED': divorced
-                'LIVING TOGETHER': living together
-                'SEPARATED': separated
-                'WIDOW/ER': widow/er
-                'SINGLE': single
-                'OTHER': other
-        Relationship: 
-            - M1Q5
-            - mapping:
-                'HEAD': head
-                'SPOUSE/PARTNER': spouse/partner
-                'SON/DAUGHTER': son/daughter
-                'SON/DAUGHTER-IN-LAW': son/daughter-in-law
-                'FATHER/MOTHER': father/mother
-                'FATHER/MOTHER-IN-LAW': father/mother-in-law
-                'SISTER/BROTHER': sister/brother
-                'GRANDCHILD': grandchild
-                'GRANDPARENT': grandparent
-                'NIECE/NEPHEW': niece/nephew
-                'OTHER RELATIVE': other relative
-                'NOT RELATED': not related
+        Region: Oblast
+        Rural: Location

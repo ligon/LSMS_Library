@@ -4,6 +4,7 @@ household_roster:
     file:
         - ../Data/A01A.dta
     idxvars:
+        v: ppid
         i: hid
         pid: pid
     myvars:

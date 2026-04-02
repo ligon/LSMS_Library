@@ -6,6 +6,7 @@ household_roster:
         - ../Data/Modul_1A_household_roster.dta
 
     idxvars:
+        v: psu
         i: hh
         pid: id
 

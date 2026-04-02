@@ -4,6 +4,7 @@ household_roster:
     file:
         - ../Data/ROSTERN.dta
     idxvars:
+        v: ED
         i: HH
         pid: PID
     myvars:

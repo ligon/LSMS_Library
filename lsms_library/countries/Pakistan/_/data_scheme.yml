@@ -2,7 +2,7 @@ Country: Pakistan
 
 Data Scheme:
   household_roster:
-    index: (t, i, pid)
+    index: (t, v, i, pid)
     Sex: str
     Age: float
     Relationship: str

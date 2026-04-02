@@ -6,6 +6,7 @@ household_roster:
         - ../Data/w2_roster_all.dta
 
     idxvars:
+        v: PSU
         i: BHID
         pid: B1_Q01
 

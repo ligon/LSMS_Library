@@ -31,32 +31,9 @@ Data Scheme:
     AffectedAssets: bool
     AffectedProduction: bool
     AffectedConsumption: bool
-    Cope1: float
-    Cope2: float
-    Cope3: float
-    Cope4: float
-    Cope5: float
-    Cope6: float
-    Cope7: float
-    Cope8: float
-    Cope9: float
-    Cope10: float
-    Cope11: float
-    Cope12: float
-    Cope13: float
-    Cope14: float
-    Cope15: float
-    Cope16: float
-    Cope17: float
-    Cope18: float
-    Cope19: float
-    Cope20: float
-    Cope21: float
-    Cope22: float
-    Cope23: float
-    Cope24: float
-    Cope25: float
-    Cope26: float
+    HowCoped0: str
+    HowCoped1: str
+    HowCoped2: str
 
   interview_date:
     index: (t, i)

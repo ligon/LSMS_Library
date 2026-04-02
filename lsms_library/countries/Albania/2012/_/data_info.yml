@@ -6,6 +6,7 @@ household_roster:
         - ../Data/Modul_1A_householdroster.dta
 
     idxvars:
+        v: psu
         i: hhid
         pid: idcode
 

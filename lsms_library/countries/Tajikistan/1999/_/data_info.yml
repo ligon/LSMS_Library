@@ -4,6 +4,7 @@ household_roster:
     file:
         - ../Data/SSEC1.DTA
     idxvars:
+        v: pop_pt
         i: hhid
         pid: iid
     myvars:
@@ -38,3 +39,23 @@ household_roster:
                 11.0: other relative
                 12.0: no relation
                 14.0: lodger
+
+cluster_features:
+    file: ../Data/SHLDDTA.DTA
+    idxvars:
+        i: hhid
+        v: pop_pt
+    myvars:
+        Region:
+            - region
+            - mapping:
+                1.0: Dushanbe
+                2.0: GBAO
+                3.0: Khatlon
+                4.0: RRS
+                5.0: Sogd
+        Rural:
+            - settlm
+            - mapping:
+                1.0: Urban
+                2.0: Rural

@@ -4,6 +4,7 @@ household_roster:
     file:
         - F01A.DTA
     idxvars:
+        v: clust
         i: hid
         pid: pid
     myvars:

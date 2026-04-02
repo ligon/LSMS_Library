@@ -6,6 +6,7 @@ household_roster:
         - ../Data/household_rosterA_cl.dta
 
     idxvars:
+        v: m0_q00
         i: m0_q01
         pid: m1a_q00
 

@@ -40,3 +40,4 @@ Data Scheme:
     AffectedConsumption: bool
     HowCoped0: str
     HowCoped1: str
+    HowCoped2: str

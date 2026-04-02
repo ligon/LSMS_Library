@@ -4,6 +4,7 @@ household_roster:
     file:
         - ../Data/module1.dta
     idxvars:
+        v: tlss_psu
         i: hhid
         pid: hhlid
     myvars:
@@ -38,3 +39,12 @@ household_roster:
                 'Ïëåìÿííèöà/ïëåìÿííèê': grandparent
                 'Äðóãèå ðîäñòâåííèêè': other relatives
                 'Íå ðîäñòâåííèêè': no relation
+
+cluster_features:
+    file: ../Data/interview.dta
+    idxvars:
+        i: hhid
+        v: tlss_psu
+    myvars:
+        Region: oblast
+        Rural: type_reg

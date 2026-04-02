@@ -29,3 +29,14 @@ household_roster:
         - v
         - i
         - pid
+
+cluster_features:
+    file:
+        - "../Data/Household/sect1_public.dta"
+    idxvars:
+        i: hhid
+        v: ea_code
+    myvars:
+        Region: region
+        Rural: locality
+        County: county_code
