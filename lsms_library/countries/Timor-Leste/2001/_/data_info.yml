@@ -1,0 +1,13 @@
+Country: Timor-Leste
+Wave: 2001
+
+household_roster:
+    file:
+        - ../Data/S01A1.DTA
+    idxvars:
+        i: identif
+        pid: idperson
+    myvars:
+        Sex: s01a02
+        Relationship: s01a03
+        Age: s01a06a
