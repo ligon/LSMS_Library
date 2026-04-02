@@ -1985,7 +1985,8 @@ def _expand_kinship(df: pd.DataFrame) -> pd.DataFrame:
     df["Generation"] = pd.array(gen, dtype=pd.Int64Dtype())
     df["Distance"] = pd.array(dist, dtype=pd.Int64Dtype())
     df["Affinity"] = pd.array(aff, dtype=pd.StringDtype())
-    df = df.drop(columns=["Relationship"])
+    # Keep Relationship alongside the decomposed columns — the analyst
+    # can see both the original survey label and the structured kinship.
 
     if unknown:
         warnings.warn(

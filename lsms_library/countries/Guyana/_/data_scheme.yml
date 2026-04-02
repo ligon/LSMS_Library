@@ -11,3 +11,6 @@ Data Scheme:
     Sex: str
     Age: float
     Relationship: str
+    Generation: int
+    Distance: int
+    Affinity: str
