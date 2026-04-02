@@ -4,7 +4,6 @@ Wave: 2014
 household_roster:
     file: emc2014_p1_individu_27022015.dta
     idxvars:
-        v: zd
         i:
             - zd
             - menage
@@ -101,25 +100,18 @@ assets:
         Value: pm5
         Purchase Price: pm4
 
-individual_education:
-    file: emc2014_p1_individu_27022015.dta
-    idxvars:
-        v: zd
-        i:
-            - zd
-            - menage
-        pid: numind
-    myvars:
-        Educational Attainment: 'B14'
-
 food_acquired:
     idxvars:
         v: zd
         i:
             - zd
             - menage
-        j: product
-        u: uachat
+        j:
+            - product
+            - mappings: ['harmonize_food', 'Original Label', 'Preferred Label']
+        u:
+            - uachat
+            - mappings: ['unit', 'Original Label', 'Preferred Label']
     myvars:
         Quantity: qachat
         Expenditure: achat

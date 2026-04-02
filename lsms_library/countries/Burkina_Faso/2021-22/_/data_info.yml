@@ -1,18 +1,9 @@
 Country: Burkina Faso
 Wave: 2021-22
 
-panel_ids:
-    file: ../Data/s00_me_bfa2021.dta
-    idxvars:
-        i: hhid
-    myvars:
-        previous_v: grappe_EHCVM1
-        previous_hid: menage_EHCVM1
-
 household_roster:
     file: ehcvm_individu_bfa2021.dta
     idxvars:
-        v: grappe
         i:
             - grappe
             - menage
@@ -124,23 +115,16 @@ food_acquired:
         i:
             - grappe
             - menage
-        j: s07bq01
-        u: s07bq03b
+        j:
+            - s07bq01
+            - mappings: ['harmonize_food', 'Original Label', 'Preferred Label']
+        u:
+            - s07bq03b
+            - mappings: ['unit', 'Original Label', 'Preferred Label']
     myvars:
         Quantity: s07bq03a
         Expenditure: s07bq08
         Produced: s07bq04
-
-individual_education:
-    file: ehcvm_individu_bfa2021.dta
-    idxvars:
-        v: grappe
-        i:
-            - grappe
-            - menage
-        pid: pid
-    myvars:
-        Educational Attainment: 'educ_hi'
 
 interview_date:
     file: s00_me_bfa2021.dta
