@@ -398,6 +398,20 @@ Other Not Related:               [0, 0, unrelated]
 "No Relation":                           [0, 0, unrelated]
 Lodger:                                  [0, 0, guest]
 
+# --- French Burkina Faso EMC/EHCVM variants ---
+# These use longer descriptive forms or different punctuation than the
+# labels already covered above.
+"Fils ou fille":                         [-1, 0, consanguineal]
+"Fils Ou Fille":                         [-1, 0, consanguineal]
+"Père / mère":                           [1, 0, consanguineal]
+"Père / Mère":                           [1, 0, consanguineal]
+"Frère/s\x9cur":                         [0, 1, consanguineal]
+"Frère/sœur":                            [0, 1, consanguineal]
+"Petit fils/fille":                      [-2, 0, consanguineal]
+"Petit Fils/Fille":                      [-2, 0, consanguineal]
+"Domestique/personnel de maison":        [0, 0, servant]
+"Domestique/Personnel De Maison":        [0, 0, servant]
+
 # --- Portuguese variants (Guinea-Bissau EHCVM) ---
 "Chefe do agregado familiar":            [0, 0, consanguineal]
 "Cônjuge":                               [0, 0, affinal]
