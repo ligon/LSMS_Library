@@ -39,7 +39,6 @@ Data Scheme:
   panel_ids: !make
   income: !make
   enterprise_income: !make
-  other_features: !make
   locality: !make
   assets: !make
   housing:

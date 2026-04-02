@@ -54,5 +54,4 @@ Data Scheme:
   food_expenditures: !make
   food_prices: !make
   food_quantities: !make
-  other_features: !make
   panel_ids: !make
