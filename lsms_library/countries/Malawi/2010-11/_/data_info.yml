@@ -66,6 +66,31 @@ household_roster:
         - pid
 
 
+individual_education:
+    dfs:
+        - df_educ
+        - df_cluster
+    df_educ:
+        file: Full_Sample/Household/hh_mod_c.dta
+        idxvars:
+            i: case_id
+            pid: id_code
+        myvars:
+            Educational Attainment: hh_c09
+    df_cluster:
+        file: Full_Sample/Household/hh_mod_a_filt.dta
+        idxvars:
+            i: case_id
+        myvars:
+            v: ea_id
+    merge_on:
+        - i
+    final_index:
+        - t
+        - v
+        - i
+        - pid
+
 # panel_ids:
 #     file: Full_Sample/Household/hh_mod_a_filt.dta
 #     idxvars:

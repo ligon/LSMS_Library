@@ -2113,6 +2113,6 @@ def _normalize_dataframe_index(
         for col in df.columns:
             if hasattr(df[col], 'cat') and not df[col].cat.ordered:
                 df[col] = df[col].astype(str).replace('nan', pd.NA)
-        df = df.groupby(level=present_levels).first()
+        df = df.groupby(level=present_levels, observed=True).first()
 
     return df

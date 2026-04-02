@@ -58,6 +58,31 @@ household_roster:
         - pid
 
 
+individual_education:
+    dfs:
+        - df_educ
+        - df_cluster
+    df_educ:
+        file: HH_MOD_C_13.dta
+        idxvars:
+            i: y2_hhid
+            pid: PID
+        myvars:
+            Educational Attainment: hh_c09
+    df_cluster:
+        file: HH_MOD_A_FILT_13.dta
+        idxvars:
+            i: y2_hhid
+        myvars:
+            v: ea_id
+    merge_on:
+        - i
+    final_index:
+        - t
+        - v
+        - i
+        - pid
+
 panel_ids:
     file: HH_MOD_A_FILT_13.dta
     idxvars:
