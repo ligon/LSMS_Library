@@ -9,5 +9,5 @@ household_roster:
         pid: clan
     myvars:
         Age: starost
-        Reglation: a2
+        Relationship: a2
         Sex: a1
