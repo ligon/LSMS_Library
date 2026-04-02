@@ -1,0 +1,5 @@
+outs:
+- md5: 3a3fd86a8adfaa4783d5e86f440f5cd1
+  size: 146155
+  hash: md5
+  path: ehcvm_ponderations_sen2021.dta
