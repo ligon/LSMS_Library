@@ -101,6 +101,17 @@ assets:
         Value: pm5
         Purchase Price: pm4
 
+individual_education:
+    file: emc2014_p1_individu_27022015.dta
+    idxvars:
+        v: zd
+        i:
+            - zd
+            - menage
+        pid: numind
+    myvars:
+        Educational Attainment: 'B14'
+
 food_acquired:
     idxvars:
         v: zd

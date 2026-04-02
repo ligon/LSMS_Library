@@ -487,7 +487,7 @@ class Wave:
                     raise FileNotFoundError(f"Unable to locate data file for {file} in {self.file_path}")
                 df = check_adding_t(df)
                 # Oddity with large number for missing code
-                na = df.select_dtypes(exclude=['object', 'datetime64[ns]']).max().max()
+                na = df.select_dtypes(exclude=['object', 'datetime64[ns]', 'category']).max().max()
                 if na>1e99:
                     warnings.warn(f"Large number used for missing?  Replacing {na} with NaN.")
                     df = df.replace(na,np.nan)

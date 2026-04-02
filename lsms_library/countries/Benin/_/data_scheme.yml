@@ -16,6 +16,10 @@ Data Scheme:
     Distance: int
     Affinity: str
 
+  individual_education:
+    index: (t, v, i, pid)
+    Educational Attainment: str
+
   food_acquired:
     index: (t, v, visit, i, j, u)
     Quantity: float

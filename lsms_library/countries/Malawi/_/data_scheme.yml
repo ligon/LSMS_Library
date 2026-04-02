@@ -15,6 +15,9 @@ Data Scheme:
     Generation: int
     Distance: int
     Affinity: str
+  individual_education:
+    index: (t, v, i, pid)
+    Educational Attainment: str
   subjective_well_being:
     index: (t,i)
     Own Step: int

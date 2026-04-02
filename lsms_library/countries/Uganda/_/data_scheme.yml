@@ -24,6 +24,10 @@ Data Scheme:
     Distance: int
     Affinity: str
 
+  individual_education:
+    index: (t, v, i, pid)
+    Educational Attainment: str
+
   shocks: !make
   earnings: !make
   food_acquired: !make

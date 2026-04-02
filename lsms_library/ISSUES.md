@@ -87,3 +87,15 @@ you can use .as_ordered() to change the Categorical to an ordered one
 - Error: `TypeError: Categorical is not ordered for operation max
 you can use .as_ordered() to change the Categorical to an ordered one
 `
+## 2026-04-02 07:52:16Z Guatemala – household_roster
+
+- Waves: 2000
+- Error: `TypeError: Categorical is not ordered for operation max
+you can use .as_ordered() to change the Categorical to an ordered one
+`
+## 2026-04-02 07:53:55Z Guatemala – cluster_features
+
+- Waves: 2000
+- Error: `TypeError: Categorical is not ordered for operation max
+you can use .as_ordered() to change the Categorical to an ordered one
+`

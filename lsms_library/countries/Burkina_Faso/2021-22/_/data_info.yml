@@ -131,6 +131,17 @@ food_acquired:
         Expenditure: s07bq08
         Produced: s07bq04
 
+individual_education:
+    file: ehcvm_individu_bfa2021.dta
+    idxvars:
+        v: grappe
+        i:
+            - grappe
+            - menage
+        pid: pid
+    myvars:
+        Educational Attainment: 'educ_hi'
+
 interview_date:
     file: s00_me_bfa2021.dta
     idxvars:

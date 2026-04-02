@@ -169,6 +169,20 @@ assets:
         Value: s12q09
         Purchase Price: s12q08
 
+individual_education:
+    file: ehcvm_individu_sen2018.dta
+    idxvars:
+        v:
+            - vague
+            - grappe
+        i:
+            - vague
+            - grappe
+            - menage
+        pid: numind
+    myvars:
+        Educational Attainment: 'educ_hi'
+
 interview_date:
     file: s00_me_sen2018.dta
     idxvars:

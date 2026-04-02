@@ -140,6 +140,17 @@ panel_ids:
                 'Ménage panel': 1
                 'Ménage non-panel': 0
 
+individual_education:
+    file: ehcvm_individu_ner2021.dta
+    idxvars:
+        v: grappe
+        i:
+            - grappe
+            - menage
+        pid: numind
+    myvars:
+        Educational Attainment: 'educ_hi'
+
 interview_date:
     file: s00_me_ner2021.dta
     idxvars:
