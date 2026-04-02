@@ -16,10 +16,11 @@ $(VAR_DIR)/food_quantities.parquet $(VAR_DIR)/food_expenditures.parquet $(VAR_DI
 	python food_prices_quantities_and_expenditures.py
 
 food_acquired = $(shell find $(rounds) -name food_acquired.py)
-food_acquired_parquet := $(food_acquired:.py=.parquet)
+# Wave-level parquets live in data_root, not in-tree
+food_acquired_parquet := $(foreach r,$(rounds),$(LSMS_DATA_ROOT)/$(COUNTRY)/$(notdir $(r))/_/food_acquired.parquet)
 
-../%/_/food_acquired.parquet: $(food_acquired)  $(VAR_DIR)/other_features.parquet
-	(cd $(@D) && python food_acquired.py)
+$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/food_acquired.parquet:
+	(cd ../$(*)/_/ && python food_acquired.py)
 
 $(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
 	python food_acquired.py
