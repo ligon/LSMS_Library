@@ -4,6 +4,7 @@ Wave: 2018-19
 household_roster:
     file: ehcvm_individu_bfa2018.dta
     idxvars:
+        v: grappe
         i:
             - grappe
             - menage

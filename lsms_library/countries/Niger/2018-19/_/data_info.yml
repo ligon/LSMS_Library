@@ -19,6 +19,7 @@ food_acquired:
 household_roster:
     file: ehcvm_individu_ner2018.dta
     idxvars:
+        v: grappe
         i:
             - grappe
             - menage

@@ -7,6 +7,7 @@ household_roster:
   file:
       - ../Data/SECT01A.DTA
   idxvars:
+      v: village
       i: hh
       pid: idcode
   myvars:

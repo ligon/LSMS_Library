@@ -12,6 +12,7 @@ panel_ids:
 household_roster:
     file: ehcvm_individu_bfa2021.dta
     idxvars:
+        v: grappe
         i:
             - grappe
             - menage

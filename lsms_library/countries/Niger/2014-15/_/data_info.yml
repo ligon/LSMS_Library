@@ -15,6 +15,7 @@ panel_ids:
 household_roster:
     file: NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS01P1.dta
     idxvars:
+        v: GRAPPE
         i:
             - GRAPPE
             - MENAGE

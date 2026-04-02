@@ -4,6 +4,7 @@ Wave: 2021-22
 household_roster:
     file: ehcvm_individu_ner2021.dta
     idxvars:
+        v: grappe
         i:
             - grappe
             - menage

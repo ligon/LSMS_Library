@@ -5,6 +5,7 @@ household_roster:
     file:
         - "../Data/2007ihses01_household_roster.dta"
     idxvars:
+        v: xcluster
         i: xhhkey
         pid: idcode
     myvars:

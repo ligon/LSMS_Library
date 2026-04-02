@@ -45,20 +45,42 @@ subjective_well_being:
 
     
 household_roster:
-    file: 
-        - Cross_Sectional/HH_MOD_B.dta
-        - Panel/hh_mod_b_19.dta: #override column mapping
-            i: y4_hhid 
-            pid: id_code
-    idxvars:
-        i: 
-            - case_id 
-            - function: cs_i #apply function to just case_id column for files using this column
-        pid: PID
-    myvars:
-        Sex: hh_b03
-        Age: hh_b05a
-        Relationship: hh_b04
+    dfs:
+        - df_roster
+        - df_cluster
+    df_roster:
+        file:
+            - Cross_Sectional/HH_MOD_B.dta
+            - Panel/hh_mod_b_19.dta: #override column mapping
+                i: y4_hhid
+                pid: id_code
+        idxvars:
+            i:
+                - case_id
+                - function: cs_i #apply function to just case_id column for files using this column
+            pid: PID
+        myvars:
+            Sex: hh_b03
+            Age: hh_b05a
+            Relationship: hh_b04
+    df_cluster:
+        file:
+            - Cross_Sectional/hh_mod_a_filt.dta
+            - Panel/hh_mod_a_filt_19.dta:
+                i: y4_hhid
+        idxvars:
+            i:
+                - case_id
+                - function: cs_i
+        myvars:
+            v: ea_id
+    merge_on:
+        - i
+    final_index:
+        - t
+        - v
+        - i
+        - pid
 
 
 panel_ids:

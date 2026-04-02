@@ -2,12 +2,30 @@ Country: Liberia
 Wave: 2018-19
 
 household_roster:
-    file:
-        - "../Data/Household/sect2_public.dta"
-    idxvars:
-        i: hhid
-        pid: member_id
-    myvars:
-        Relationship: S2_2
-        Sex: S2_3
-        Age: S2_5
+    dfs:
+        - df_roster
+        - df_cluster
+    df_roster:
+        file:
+            - "../Data/Household/sect2_public.dta"
+        idxvars:
+            i: hhid
+            pid: member_id
+        myvars:
+            Relationship: S2_2
+            Sex: S2_3
+            Age: S2_5
+    df_cluster:
+        file:
+            - "../Data/Household/sect1_public.dta"
+        idxvars:
+            i: hhid
+        myvars:
+            v: ea_code
+    merge_on:
+        - i
+    final_index:
+        - t
+        - v
+        - i
+        - pid

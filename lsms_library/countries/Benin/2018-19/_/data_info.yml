@@ -37,6 +37,7 @@ cluster_features:
 household_roster:
     file: ehcvm_individu_ben2018.dta
     idxvars:
+        v: grappe
         i:
             - grappe
             - menage
