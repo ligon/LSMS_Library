@@ -44,6 +44,10 @@ Columns:
     Age:
       type: int
       required: true
+    Relationship:
+      type: str
+      required: true
+      note: original survey label for relationship to household head
     Generation:
       type: int
       required: true
