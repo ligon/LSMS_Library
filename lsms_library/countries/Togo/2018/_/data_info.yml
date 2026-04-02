@@ -51,6 +51,20 @@ household_roster:
         Relationship: s01q02
         Age: s01q04a
 
+individual_education:
+    file: ../Data1/ehcvm_individu_tgo2018.dta
+    idxvars:
+        v: grappe
+        i:
+            - grappe
+            - menage
+        pid:
+            - grappe
+            - menage
+            - s01q00a
+    myvars:
+        Educational Attainment: 'educ_hi'
+
 assets:
     file: ../Data1/s12_me_tgo2018.dta
     idxvars:
