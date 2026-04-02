@@ -21,8 +21,24 @@ def _load_global_columns() -> dict[str, dict[str, Any]]:
     return data.get("Columns", {})
 
 
+# Derived tables and the source table they require in data_scheme.yml
+_DERIVED_SOURCE = {
+    'household_characteristics': 'household_roster',
+    'food_expenditures': 'food_acquired',
+    'food_prices': 'food_acquired',
+    'food_quantities': 'food_acquired',
+}
+
+
 def _discover_countries_for_table(table_name: str) -> list[str]:
-    """Find all countries whose data_scheme.yml declares the given table."""
+    """Find all countries whose data_scheme.yml declares the given table.
+
+    For derived tables (e.g. household_characteristics), discovers
+    countries that have the source table (e.g. household_roster).
+    """
+    # If this is a derived table, look for its source instead
+    lookup_name = _DERIVED_SOURCE.get(table_name, table_name)
+
     countries_dir = files("lsms_library") / "countries"
     result = []
     for entry in sorted(Path(countries_dir).iterdir()):
@@ -36,7 +52,7 @@ def _discover_countries_for_table(table_name: str) -> list[str]:
         if not isinstance(data, dict):
             continue
         scheme = data.get("Data Scheme", {})
-        if isinstance(scheme, dict) and table_name in scheme:
+        if isinstance(scheme, dict) and (table_name in scheme or lookup_name in scheme):
             result.append(entry.name)
     return result
 
