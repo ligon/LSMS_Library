@@ -354,3 +354,23 @@ This codebase targets pandas 3.0+. Follow these rules in all new and modified co
 - **Use `.bfill()` / `.ffill()`, not `.fillna(method=...)`**: The `method` parameter was removed in pandas 2.0.
 - **No chained indexing for writes**: Copy-on-Write (CoW) is default in pandas 3.0. `df[mask]['col'] = val` silently fails. Use `df.loc[mask, 'col'] = val` instead. For reads, prefer `df.loc[mask, 'col'].iloc[0]` over `df.loc[mask, :]['col'][0]`.
 - **No mutating views**: Do not modify DataFrames obtained from `_get_numeric_data()`, `select_dtypes()`, or `groupby()` and expect changes to propagate. Work on `df` directly or assign results back explicitly.
+
+## Dispatching Subagents
+
+When using the Agent tool to dispatch work to subagents (especially with `isolation: "worktree"`):
+
+- **Subagents do NOT inherit `.claude/skills/`**. They only see what's in their prompt. Tell agents to read the relevant skill files as their first step: e.g., "Read `.claude/skills/add-feature/SKILL.md` before starting."
+- **Subagents share the parquet cache** at `~/.local/share/lsms_library/` --- each country writes to its own directory, so concurrent agents building different countries won't conflict.
+- **Subagents should stay in their worktree**. Do not modify the main checkout. If a cross-cutting change is needed, document it and let the manager merge.
+- **Prefix heavy Python with `nice -n 10`** to keep the node responsive for interactive work.
+- **The Python venv is at the repo root** (`/path/to/LSMS_Library/.venv/bin/python`), not in the worktree. Set `PYTHONPATH` to the worktree so development-branch code is picked up.
+- **Use the message channel** (`slurm_logs/build_{date}/MESSAGES.txt`) for steering instructions. Agents should check it periodically.
+
+## Cache vs API Transformations
+
+The cached parquets under `data_root()` store **pre-transformation** data. Kinship expansion (`_expand_kinship`), canonical spelling enforcement (`_enforce_canonical_spellings`), and dtype coercion (`_enforce_declared_dtypes`) all happen in `_finalize_result()` at API read time, not at cache write time. This means:
+
+- `Country('X').household_roster()` returns clean, decomposed data (Sex as M/F, kinship as Generation/Distance/Affinity)
+- Reading `~/.local/share/lsms_library/X/var/household_roster.parquet` directly gives raw data with `Relationship` strings and unnormalized values
+
+The cache is closer to the source data; the API applies the harmonization layer.
