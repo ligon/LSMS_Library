@@ -12,9 +12,8 @@ idxvars = dict(j='r_hhid',
                v='clusterid',
                uphi='UPHI')
 
-myvars = dict(Rural=('urb_rur',lambda x: 'Rural' if x.lower()!='urban' else 'Urban'),
-              Region=('ha_01_1', lambda s: s.title()),
-              District='ha_02_2')
+# other_features: only Rural (Region/District belong in cluster_features)
+myvars = dict(Rural=('urb_rur',lambda x: 'Rural' if x.lower()!='urban' else 'Urban'))
 
 df = df_data_grabber('../Data/upd4_hh_a.dta',idxvars,**myvars)
 
@@ -30,7 +29,13 @@ assert df.index.is_unique, "Non-unique index!  Fix me!"
 # Save backward-compatible other_features with m index (domain as region)
 to_parquet(df,'other_features.parquet')
 
-# Save cluster_features version: drop m, keep Region/District/Rural columns
-cf = df.droplevel('m')
+# cluster_features: Rural + Region + District (Region/District normalized
+# via categorical_mapping.org at API read time)
+cf_myvars = dict(Rural=('urb_rur',lambda x: 'Rural' if x.lower()!='urban' else 'Urban'),
+                 Region='ha_01_1',
+                 District='ha_02_2')
+
+cf = df_data_grabber('../Data/upd4_hh_a.dta',idxvars,**cf_myvars)
+cf = cf.sort_index().droplevel('uphi').droplevel('m')
 cf = cf.loc[~cf.index.duplicated(keep='first')]
 to_parquet(cf, 'cluster_features.parquet')
