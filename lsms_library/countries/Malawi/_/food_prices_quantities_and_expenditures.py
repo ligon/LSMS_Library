@@ -8,14 +8,14 @@ import numpy as np
 df = get_dataframe('../var/food_acquired.parquet')
 df.index = df.index.rename({'units':'u'})
 
-x = df[['expenditure']].groupby(['j','t','m','i']).sum()
+x = df[['expenditure']].groupby(['j','t','i']).sum()
 x = x.replace(0,np.nan).dropna()
 to_parquet(x, '../var/food_expenditures.parquet')
 
-p = df['price per unit'].groupby(['t','m','i','u']).median()
+p = df['price per unit'].groupby(['t','i','u']).median()
 p = p.reset_index()
 p['t'] = p['t'].astype(str)
-p = p.set_index(['t','m','i','u'])
+p = p.set_index(['t','i','u'])
 to_parquet(p.unstack('t'), '../var/food_prices.parquet')
 
 q = df['quantity_consumed']

@@ -8,6 +8,7 @@ cluster_features:
     df_main:
         file: Full_Sample/Household/hh_mod_a_filt.dta
         idxvars:
+            i: case_id
             v: ea_id
         myvars:
             Rural:
@@ -15,7 +16,40 @@ cluster_features:
                 - mapping:
                     rural: 0
                     urban: 1
-            # Region: hh_a01
+            Region:
+                - hh_a01
+                - mapping:
+                    Chitipa: North
+                    Karonga: North
+                    Nkhatabay: North
+                    Rumphi: North
+                    Mzimba: North
+                    Mzuzu City: North
+                    Kasungu: Central
+                    Nkhota kota: Central
+                    Ntchisi: Central
+                    Dowa: Central
+                    Salima: Central
+                    Lilongwe: Central
+                    Mchinji: Central
+                    Dedza: Central
+                    Ntcheu: Central
+                    Lilongwe City: Central
+                    Mangochi: Southern
+                    Machinga: Southern
+                    Zomba: Southern
+                    Chiradzulu: Southern
+                    Blanytyre: Southern
+                    Mwanza: Southern
+                    Thyolo: Southern
+                    Mulanje: Southern
+                    Phalombe: Southern
+                    Chikwawa: Southern
+                    Nsanje: Southern
+                    Balaka: Southern
+                    Neno: Southern
+                    Zomba City: Southern
+                    Blantyre City: Southern
     df_geo:
         file: Full_Sample/Geovariables/HH_level/householdgeovariables.dta
         idxvars:
@@ -28,6 +62,7 @@ cluster_features:
     final_index:
         - t
         - v
+        - i
 
 subjective_well_being:
     file: Full_Sample/Household/hh_mod_t.dta

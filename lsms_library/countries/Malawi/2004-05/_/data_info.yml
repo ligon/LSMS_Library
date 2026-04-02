@@ -4,9 +4,15 @@ Wave: 2004-05
 cluster_features:
     file: sec_a.dta
     idxvars:
+        i: case_id
         v: ea
     myvars:
-        Region: region
+        Region:
+            - region
+            - mapping:
+                North: North
+                Centre: Central
+                South: Southern
         District: dist
         Rural:
             - reside

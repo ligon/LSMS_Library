@@ -2,8 +2,8 @@
 """
 Concatenate wave-level food_acquired parquets into a single country-level file.
 
-Each wave-level parquet already has index (j, t, m, i) with region 'm' included,
-so no join with other_features is needed.
+Wave-level parquets have index (j, t, i); the market index 'm' is added at the
+API level by _add_market_index() via cluster_features.
 """
 from lsms_library.local_tools import to_parquet, get_dataframe
 
@@ -18,7 +18,7 @@ for t in years:
     df = df.rename({'u_consumed': 'units'}, axis=1).reset_index()
     df['units'] = df['units'].str.lower()
     # There may be occasional repeated reports of purchases of same food
-    df = df.groupby(['j', 't', 'm', 'i', 'units']).agg({
+    df = df.groupby(['j', 't', 'i', 'units']).agg({
         'quantity_consumed': 'sum',
         'expenditure': 'sum',
         'quantity_bought': 'sum',
@@ -30,6 +30,6 @@ fa = pd.concat(fa)
 fa = fa.replace(np.inf, 0)
 fa = fa.replace(0, np.nan)
 
-fa = fa.reset_index().set_index(['j', 't', 'm', 'i', 'units'])
+fa = fa.reset_index().set_index(['j', 't', 'i', 'units'])
 
 to_parquet(fa, '../var/food_acquired.parquet')

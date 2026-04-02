@@ -8,11 +8,21 @@ cluster_features:
     df_main:
         file:
             - Cross_Sectional/hh_mod_a_filt.dta
-            - Panel/hh_mod_a_filt_19.dta
+            - Panel/hh_mod_a_filt_19.dta:
+                i: y4_hhid
         idxvars:
+            i:
+                - case_id
+                - function: cs_i
             v: ea_id
         myvars:
-            Region: region
+            Region:
+                - region
+                - mapping:
+                    North: North
+                    Central: Central
+                    Southern: Southern
+                    South: Southern
             District: district
             Rural:
                 - reside
@@ -33,6 +43,7 @@ cluster_features:
     final_index:
         - t
         - v
+        - i
 
 subjective_well_being:
     file: Cross_Sectional/HH_MOD_T.dta

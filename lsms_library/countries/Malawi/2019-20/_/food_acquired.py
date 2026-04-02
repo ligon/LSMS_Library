@@ -20,7 +20,15 @@ with dvc.api.open('../Data/Cross_Sectional/ihs_foodconversion_factor_2020.dta', 
     conversions = from_dta(dta, convert_categoricals=True)
 
 panel_df = get_dataframe('../Data/Panel/hh_mod_g1_19.dta',convert_categoricals=True)
-regions = get_dataframe('other_features.parquet').reset_index().set_index(['j'])['m']
+
+# Read region directly from household modules for conversion table merge
+hh_cs = get_dataframe('../Data/Cross_Sectional/hh_mod_a_filt.dta', convert_categoricals=True)
+hh_pn = get_dataframe('../Data/Panel/hh_mod_a_filt_19.dta', convert_categoricals=True)
+regions_cs = hh_cs[['case_id', 'region']].rename(columns={'case_id': 'j'})
+regions_pn = hh_pn[['y4_hhid', 'region']].rename(columns={'y4_hhid': 'j'})
+regions = pd.concat([regions_cs, regions_pn]).drop_duplicates().set_index('j')['region']
+regions = regions.replace({'South': 'Southern'})
+regions.name = 'm'
 
 columns_dict = {'case_id': 'j', 'y4_hhid': 'j',  'hh_g02' : 'i', 'hh_g03a': 'quantity_consumed', 'hh_g03b' : 'unitcode_consumed', 'hh_g03b_label': 'units_consumed', 'hh_g03b_oth': 'unitsdetail_consumed',
                 'hh_g05': 'expenditure', 'hh_g04a': 'quantity_bought', 'hh_g04b': 'unitcode_bought', 'hh_g04b_label': 'units_bought', 'hh_g04b_oth': 'unitsdetail_bought',
@@ -42,7 +50,7 @@ match_df, D = conversion_table_matching(df, conversions, conversion_label_name =
 conversions['item_name'] = conversions['item_name'].map(D)
 
 df = df.set_index(['j', 'i'])
-df = df.join(regions).set_index('m', append=True).replace(r'^\s*$', pd.NA, regex=True)
+df = df.join(regions).replace(r'^\s*$', pd.NA, regex=True)
 df['unitcode_consumed'] = df['unitcode_consumed'].str.upper()
 df['unitcode_bought'] = df['unitcode_bought'].str.upper()
 df['unitcode_produced'] = df['unitcode_produced'].str.upper()
@@ -63,13 +71,13 @@ df = df.merge(conversions, how='left',
               left_on=['i', 'm', 'unitcode_gifted'],
               right_on=['item_name', 'region', 'unit_code']).rename({'factor' : 'cfactor_gifted'}, axis = 1)
 
-df = df.set_index(['j', 'm', 'i'])
+df = df.set_index(['j', 'i'])
 df = handling_unusual_units(df)
 
 df['price per unit'] = df['expenditure']/df['quantity_bought']
 
 df['t'] = wave
-df = df.reset_index().set_index(['j','t','m','i']).dropna(how='all')
+df = df.reset_index().drop(columns=['m']).set_index(['j','t','i']).dropna(how='all')
 
 final = df.loc[:, ['quantity_consumed', 'u_consumed', 'quantity_bought',
                    'u_bought', 'price per unit', 'expenditure',
@@ -84,5 +92,5 @@ labelsd = get_categorical_mapping(tablename='harmonize_food',
 final = final.rename(index=labelsd,level='i')
 
 final = final.dropna(how='all')
-final = final.reorder_levels(['j','t','m','i']).sort_index()
+final = final.reorder_levels(['j','t','i']).sort_index()
 to_parquet(final, "food_acquired.parquet")

@@ -15,7 +15,15 @@ with dvc.api.open('../Data/Full_Sample/Household/hh_mod_g1.dta', mode='rb') as d
     df = from_dta(dta, convert_categoricals=True)
 
 conversions = pd.read_csv('ihs3_conversions.csv')
-regions = get_dataframe('other_features.parquet').reset_index().set_index(['j'])['m']
+
+# Read region directly from household module for conversion table merge
+# 2010-11 has no 'region' column; derive from district code hh_a01 (1xx=North, 2xx=Central, 3xx=Southern)
+hh = get_dataframe('../Data/Full_Sample/Household/hh_mod_a_filt.dta')
+_region_map = {1: 'North', 2: 'Central', 3: 'Southern'}
+regions = hh[['case_id', 'hh_a01']].drop_duplicates().set_index('case_id')['hh_a01']
+regions = (pd.to_numeric(regions, errors='coerce') // 100).map(_region_map)
+regions.index.name = 'j'
+regions.name = 'm'
 
 columns_dict = {'case_id': 'j', 'hh_g02' : 'i', 'hh_g03a': 'quantity_consumed', 'hh_g03b' : 'unitcode_consumed', 'hh_g03b_os': 'unitsdetail_consumed',
                 'hh_g05': 'expenditure', 'hh_g04a': 'quantity_bought', 'hh_g04b': 'unitcode_bought', 'hh_g04b_os': 'unitsdetail_bought',
@@ -36,7 +44,7 @@ match_df, D = conversion_table_matching(df, conversions, conversion_label_name =
 conversions['item_name'] = conversions['item_name'].map(D)
 
 df = df.set_index(['j', 'i'])
-df = df.join(regions).set_index('m', append=True).replace(r'^\s*$', pd.NA, regex=True)
+df = df.join(regions).replace(r'^\s*$', pd.NA, regex=True)
 
 df['unitcode_consumed'] = df['unitcode_consumed'].str.upper()
 conversions = conversions.set_index(['region', 'item_name', 'unit_code'])
@@ -44,7 +52,7 @@ conversions = conversions.set_index(['region', 'item_name', 'unit_code'])
 df['unitcode_consumed'], df['unitcode_bought'] = df['unitcode_consumed'].str.upper(), df['unitcode_bought'].str.upper()
 df = df.reset_index().merge(conversions, how='left', left_on=['i', 'm', 'unitcode_consumed'], right_on=['item_name', 'region', 'unit_code']).rename({'factor' : 'cfactor_consumed'}, axis=1)
 df = df.merge(conversions, how='left', left_on=['i', 'm', 'unitcode_bought'], right_on=['item_name', 'region', 'unit_code']).rename({'factor' : 'cfactor_bought'}, axis = 1)
-df = df.set_index(['j', 'm', 'i'])
+df = df.set_index(['j', 'i'])
 
 # custom convert some units in formats such as "300 grams" into kg, typically handled by handling_unusual_units in malawi.py for data with conversion tables
 grams = r'(\d+)\s*g(?:\s+|r)'
@@ -70,7 +78,7 @@ df['u_bought'] = df['u_bought'].replace('nan', pd.NA).fillna(df['unitcode_bought
 df['price per unit'] = df['expenditure']/df['quantity_bought']
 
 df['t'] = '2010-11'
-df = df.reset_index().set_index(['j','t','m','i']).dropna(how='all')
+df = df.reset_index().drop(columns=['m']).set_index(['j','t','i']).dropna(how='all')
 
 final = df.loc[:, ['quantity_consumed', 'u_consumed', 'quantity_bought', 'u_bought', 'price per unit', 'expenditure', 'cfactor_consumed', 'cfactor_bought']]
 
@@ -81,5 +89,5 @@ labelsd = get_categorical_mapping(tablename='harmonize_food',
 
 final = final.rename(index=labelsd,level='i')
 final = final.dropna(how='all')
-final = final.reorder_levels(['j','t','m','i']).sort_index()
+final = final.reorder_levels(['j','t','i']).sort_index()
 to_parquet(final, "food_acquired.parquet")

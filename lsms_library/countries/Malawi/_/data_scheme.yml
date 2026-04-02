@@ -2,7 +2,7 @@ Country: Malawi
 
 Data Scheme:
   cluster_features:
-    index: (t, v)
+    index: (t, v, i)
     Region: str
     District: str
     Rural: str

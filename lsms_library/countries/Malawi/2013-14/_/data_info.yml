@@ -8,9 +8,15 @@ cluster_features:
     df_main:
         file: HH_MOD_A_FILT_13.dta
         idxvars:
+            i: y2_hhid
             v: ea_id
         myvars:
-            Region: region
+            Region:
+                - region
+                - mapping:
+                    North: North
+                    Central: Central
+                    South: Southern
             District: district
             Rural:
                 - reside
@@ -29,6 +35,7 @@ cluster_features:
     final_index:
         - t
         - v
+        - i
 
 household_roster:
     dfs:
