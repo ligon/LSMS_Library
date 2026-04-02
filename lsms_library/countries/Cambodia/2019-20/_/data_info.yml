@@ -20,7 +20,7 @@ household_roster:
                 2: Divorced/Separated
                 3: Widowed
                 4: Never married/Never lived with a partner
-        Relation: 
+        Relationship:
             - s02q06
             - mapping:
                 1: head

@@ -2,8 +2,7 @@ Country: Tajikistan
 
 Data Scheme:
   household_roster:
-    index: (i, pid, t)
+    index: (t, i, pid)
     Sex: str
     Age: float
-    Relation: str
-    Marital: str
+    Relationship: str

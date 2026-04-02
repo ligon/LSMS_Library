@@ -2,8 +2,7 @@ Country: Guyana
 
 Data Scheme:
   household_roster:
-    index: (i, pid)
-    Sex: int
+    index: (t, i, pid)
+    Sex: str
     Age: float
-    Relation: int
-    Marital: int
+    Relationship: str

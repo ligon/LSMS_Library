@@ -22,7 +22,7 @@ household_roster:
                 4: Widow/Widower
                 5: Never Married
 
-        Relation: 
+        Relationship: 
             - rel
             - mapping:
                 1: Head

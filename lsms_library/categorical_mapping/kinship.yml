@@ -361,3 +361,39 @@ Grandfather/Mother:              [2, 0, consanguineal]
 "Servant'S Relative":            [0, 0, servant]
 Adopted/Stepchild:               [-1, 0, step]
 "Tenant Or Tenant'S Relative":   [0, 0, guest]
+
+# --- Cambodia variants ---
+"adopted child/foster child":    [-1, 0, foster]
+"Adopted Child/Foster Child":    [-1, 0, foster]
+"other non-relative including boarder": [0, 0, guest]
+"Other Non-Relative Including Boarder": [0, 0, guest]
+
+# --- Guyana variants ---
+Spouse Of Hoh:                           [0, 0, affinal]
+"Spouse of HoH":                         [0, 0, affinal]
+Married Child:                           [-1, 0, consanguineal]
+Spouse Of Married Child:                 [-1, 0, affinal]
+"Spouse of Married Child":               [-1, 0, affinal]
+Unmarried Child:                         [-1, 0, consanguineal]
+"Father/Mother/T-In-Law/M-In-Law":       [1, 0, consanguineal]
+"Father/Mother/T-in-law/M-in-law":       [1, 0, consanguineal]
+"Bro/Sis/B-In-Law/S-In-Law/Other Relative": [0, 1, consanguineal]
+"Bro/Sis/B-in-law/S-in-law/Other relative": [0, 1, consanguineal]
+"Servant/Employee/Other Non-Relative":   [0, 0, servant]
+"Servant/Employee/Other non-relative":   [0, 0, servant]
+
+# --- Pakistan variants ---
+Wife Or Husband:                 [0, 0, affinal]
+"Wife or Husband":               [0, 0, affinal]
+"Servant/Tenant":                [0, 0, servant]
+Other Not Related:               [0, 0, unrelated]
+"Other Not Related":             [0, 0, unrelated]
+
+# --- Tajikistan variants ---
+"father/mother of the wife of head":     [1, 0, affinal]
+"Father/Mother Of The Wife Of Head":     [1, 0, affinal]
+"father/mother of the husband of head":  [1, 0, affinal]
+"Father/Mother Of The Husband Of Head":  [1, 0, affinal]
+"no relation":                           [0, 0, unrelated]
+"No Relation":                           [0, 0, unrelated]
+Lodger:                                  [0, 0, guest]

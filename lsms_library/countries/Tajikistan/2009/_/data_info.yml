@@ -24,7 +24,7 @@ household_roster:
                 'WIDOW/ER': widow/er
                 'SINGLE': single
                 'OTHER': other
-        Relation: 
+        Relationship: 
             - M1Q5
             - mapping:
                 'HEAD': head

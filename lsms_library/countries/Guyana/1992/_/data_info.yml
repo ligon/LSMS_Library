@@ -24,7 +24,7 @@ household_roster:
                6: Separated
                7: Single
                8: Others
-        Relation: 
+        Relationship: 
             - RLL
             - mapping:
                1: Head of Household

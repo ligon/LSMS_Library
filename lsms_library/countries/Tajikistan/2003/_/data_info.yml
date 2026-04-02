@@ -23,7 +23,7 @@ household_roster:
                 5.0: widow/widower
                 6.0: single
                 7.0: other
-        Relation: 
+        Relationship: 
             - m1q4
             - mapping:
                 'Ãëàâà äîìîõîçÿéñòâà': head
