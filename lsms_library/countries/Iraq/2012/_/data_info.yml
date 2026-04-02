@@ -2,30 +2,13 @@ Country: Iraq
 Wave: 2012
 
 household_roster:
-    dfs:
-        - df_roster
-        - df_cluster
-    df_roster:
-        file:
-            - "../Data/2012ihses01_household_roster.dta"
-        idxvars:
-            i: hh
-            pid: idcode
-        myvars:
-            Sex: q0102
-            Relationship: q0105
-            Age: q0104
-    df_cluster:
-        file:
-            - "../Data/2012ihses00_cover_page.dta"
-        idxvars:
-            i: hh
-        myvars:
-            v: cluster
-    merge_on:
-        - i
-    final_index:
-        - t
-        - v
-        - i
-        - pid
+    file:
+        - "../Data/2012ihses01_household_roster.dta"
+    idxvars:
+        v: cluster
+        i: hh
+        pid: idcode
+    myvars:
+        Sex: q0102
+        Relationship: q0105
+        Age: q0104
