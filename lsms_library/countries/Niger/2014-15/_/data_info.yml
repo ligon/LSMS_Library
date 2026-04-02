@@ -2,7 +2,7 @@ Country: Niger
 Wave: 2014-15
 
 panel_ids:
-    file: ../Data/NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS00P1.dta
+    file: NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS00P1.dta
     idxvars:
         i:
             - GRAPPE

@@ -125,6 +125,21 @@ assets:
         Value: s12q09
         Purchase Price: s12q08
 
+panel_ids:
+    file: s00_me_ner2021.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        previous_grappe: s00q07f1
+        previous_menage: s00q07f2
+        in_panel:
+            - PanelHH
+            - mapping:
+                'Ménage panel': 1
+                'Ménage non-panel': 0
+
 interview_date:
     file: s00_me_ner2021.dta
     idxvars:

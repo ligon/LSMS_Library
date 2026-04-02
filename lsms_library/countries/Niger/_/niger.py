@@ -8,38 +8,31 @@ import pyreadstat
 import lsms_library.local_tools as tools
 
 
-def i(value):
-    '''
-    Formatting household id. Handles both scalar (hid) and composite (grappe, menage) cases.
-    Matches existing convention: str(grappe) + str(menage) (no padding).
-    '''
-    if isinstance(value, (pd.Series, np.ndarray, list, tuple)):
-        return tools.format_id(value[0]) + tools.format_id(value[1])
-    return tools.format_id(value)
-
 Waves = {'2011-12': (),
          '2014-15': (),
          '2018-19': (),
          '2021-22': ()}
 
+
 def i(x):
     """Create hhid from grappe + menage concatenation.
-    
+
     Detects which wave based on column case:
     - 2014-15 (ECVMA): uppercase columns (GRAPPE, MENAGE) -> no prefix
-    - 2018-19 (EHCVM): lowercase columns (grappe, menage) -> 'E_' prefix
+    - 2018-19/2021-22 (EHCVM): lowercase columns (grappe, menage) -> 'E_' prefix
+
+    For scalar inputs (2011-12 hid), returns str(int(x)).
     """
     if isinstance(x, pd.Series):
         grappe = str(int(x.iloc[0])) if pd.notna(x.iloc[0]) else ''
         menage = str(int(x.iloc[1])) if pd.notna(x.iloc[1]) else ''
-        
+
         # Check column names to detect which wave
-        # 2018-19 uses lowercase 'grappe', 2014-15 uses uppercase 'GRAPPE'
         col_names = x.index.tolist()
-        is_ehcvm_2018 = any(c.islower() for c in str(col_names[0]))
-        
-        if is_ehcvm_2018:
-            # 2018-19 EHCVM: add prefix to prevent matching with ECVMA panel
+        is_ehcvm = any(c.islower() for c in str(col_names[0]))
+
+        if is_ehcvm:
+            # 2018-19/2021-22 EHCVM: add prefix to prevent matching with ECVMA panel
             return 'E_' + grappe + menage
         else:
             # 2014-15 ECVMA: no prefix, may include EXTENSION
@@ -49,14 +42,41 @@ def i(x):
             return grappe + menage
     return str(int(x))
 
+
 def panel_ids(df):
-    """Construct previous_i from GRAPPE + MENAGE to match 2011-12 hid format"""
-    # previous_i is just GRAPPE + MENAGE (without EXTENSION) to match 2011's hid
-    df['previous_i'] = (
-        df['previous_grappe'].astype(str).str.replace('.0', '', regex=False).str.strip() + 
-        df['previous_menage'].astype(str).str.replace('.0', '', regex=False).str.strip()
-    )
+    """Construct previous_i for Niger panel linkage.
+
+    Handles two survey programs:
+    - ECVMA (2014-15 -> 2011-12): previous_i = str(grappe*100 + menage)
+      to match 2011-12's hid = grappe*100+menage format.
+    - EHCVM (2021-22 -> 2018-19): previous_i = 'E_' + str(grappe) + str(menage)
+      to match 2018-19's EHCVM composite ID format.
+
+    For EHCVM waves, filter to panel households only (in_panel == 1).
+
+    Note: Because ECVMA and EHCVM use different ID namespaces (no prefix vs 'E_'
+    prefix), the two programs' panel linkage is independent even though
+    local_tools.panel_ids() processes them sequentially.
+    """
+    if 'in_panel' in df.columns:
+        # EHCVM wave (2021-22): filter to panel HHs with valid previous IDs
+        df = df[df['in_panel'] == 1]
+        df = df[df['previous_grappe'].notna() & df['previous_menage'].notna()]
+        df['previous_i'] = (
+            'E_'
+            + df['previous_grappe'].astype(float).astype(int).astype(str)
+            + df['previous_menage'].astype(float).astype(int).astype(str)
+        )
+    else:
+        # ECVMA wave (2014-15): previous_i matches 2011-12 hid = grappe*100+menage
+        df = df[df['previous_grappe'].notna() & df['previous_menage'].notna()]
+        df['previous_i'] = (
+            (df['previous_grappe'].astype(float).astype(int) * 100
+             + df['previous_menage'].astype(float).astype(int)).astype(str)
+        )
+
     return df[['previous_i']]
+
 
 def age_sex_composition(df, sex, sex_converter, age, age_converter, hhid):
     Age_ints = ((0,4),(4,9),(9,14),(14,19),(19,31),(31,51),(51,100))
