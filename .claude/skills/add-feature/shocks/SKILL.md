@@ -182,3 +182,20 @@ Key lessons from this implementation:
 3. File paths change: flat in early waves, `Cross_Sectional/` subdirectory in later waves
 4. All 5 waves handled purely via `data_info.yml` — no Python scripts needed
 5. The raw data includes rows for all possible shock types per household (experienced or not); rows where the shock was not experienced have NaN effect values
+
+## EHCVM Cope1-26 binary → HowCoped0-2 text conversion
+
+EHCVM surveys (Benin, Togo, Guinea-Bissau, Senegal, Burkina Faso, Mali, Niger) store coping strategies as **26 binary indicator columns** (`s14q05__1` through `s14q05__26`) rather than the 3 text labels (HowCoped0/1/2) used by other LSMS-ISA countries.
+
+**This cannot be handled by YAML alone.** A formatting function `shocks(df)` is required in the wave's Python file (e.g., `2018-19.py`) to:
+1. Iterate over Cope1-Cope26 columns for each row
+2. Collect the first 3 strategies where the value is ≥ 1
+3. Map strategy numbers to French text labels via a `COPING_LABELS` dict
+4. Assign to HowCoped0, HowCoped1, HowCoped2 columns
+5. Drop the original Cope columns
+
+Reference implementations: `Senegal/2018-19/_/2018-19.py`, `Benin/2018-19/_/2018-19.py`, `Togo/2018/_/2018.py`, `Burkina_Faso/2018-19/_/2018-19.py`.
+
+The `data_info.yml` declares all 26 Cope columns as myvars; the formatting function transforms them post-extraction. The `data_scheme.yml` declares only `HowCoped0/1/2: str` (not the 26 Cope columns).
+
+**Note on Affected* columns**: EHCVM surveys DO have effect data (s14q04a-d with French labels: Diminué, Augmenté, Inchangé, Non-concerné). The mapping dicts must use French labels. If these columns appear all-null, the most likely cause is stale cached parquets — purge the cache and rebuild.

@@ -374,3 +374,34 @@ The cached parquets under `data_root()` store **pre-transformation** data. Kinsh
 - Reading `~/.local/share/lsms_library/X/var/household_roster.parquet` directly gives raw data with `Relationship` strings and unnormalized values
 
 The cache is closer to the source data; the API applies the harmonization layer.
+
+**`trust_cache=True` skips `_finalize_result()`** and reads raw parquets directly. This is fast but returns un-transformed data (no kinship expansion, no spelling normalization, no dtype coercion). Use only on clusters where caches were built by the full pipeline. When diagnosing data quality, always use `trust_cache=False` (default) to see what the API actually returns.
+
+## Derived Tables
+
+`household_characteristics` and the food-derived tables (`food_expenditures`, `food_prices`, `food_quantities`) are **not registered in `data_scheme.yml`**. They are auto-derived at runtime from `household_roster` and `food_acquired` respectively, via `_ROSTER_DERIVED` and `_FOOD_DERIVED` in `country.py`. The `__getattr__` dispatch handles them alongside `data_scheme` entries.
+
+Do NOT add these to `data_scheme.yml` — doing so would bypass the derivation logic and try to load them as standalone features (which will fail unless legacy `!make` scripts exist).
+
+## `panel_ids` Is a Property, Not a Method
+
+`panel_ids` and `updated_ids` are `@property` attributes on `Country`, not dynamic methods. They return dicts, not DataFrames. Code that iterates over `data_scheme` entries and calls `getattr(c, name)()` must special-case these. Use `diagnostics.load_feature(c, name)` which handles both.
+
+## Categorical Columns from `.dta` and `.sav` Files
+
+`get_dataframe()` returns categorical columns from Stata/SPSS files. These can cause issues:
+
+- **`select_dtypes(exclude=['object']).max()`** crashes on unordered categoricals. Exclude `'category'` dtype too.
+- **`groupby().first()`** crashes on unordered categoricals. Convert to string with `.astype(str).replace('nan', pd.NA)` first.
+- **YAML mapping keys**: when `get_dataframe()` returns categorical labels as strings, mapping dicts must use string keys (e.g., `'urbana': Urban`) not numeric keys (e.g., `1: Urban`).
+
+## Countries Without Microdata
+
+Some countries have configs but no source `.dta` files in the repository:
+
+| Country | Reason | Data source |
+|---------|--------|-------------|
+| Nepal | NSO hosts data, not WB | https://microdata.nsonepal.gov.np/ (free registration) |
+| Armenia | No data files downloaded | WB catalog, external hosting |
+| Timor-Leste 2001 | No `_/` config for this wave | WB catalog |
+| Guatemala | No PSU/cluster variable in data | ENCOVI 2000 design |
