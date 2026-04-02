@@ -2109,6 +2109,10 @@ def _normalize_dataframe_index(
     # Aggregate duplicates if any remain
     if not df.index.is_unique:
         present_levels = [lvl for lvl in declared if lvl in df.index.names]
+        # Convert unordered categoricals to strings so groupby.first() works
+        for col in df.columns:
+            if hasattr(df[col], 'cat') and not df[col].cat.ordered:
+                df[col] = df[col].astype(str).replace('nan', pd.NA)
         df = df.groupby(level=present_levels).first()
 
     return df
