@@ -60,13 +60,21 @@ def Relationship(value):
 
 
 # Data to link household ids across waves
+# PANELC.DAT in 1988-89 maps HID1 (GLSS1) -> HID2 (GLSS2) at person level;
+# panel_ids() deduplicates to household level.  714 panel households.
+#
+# Waves 1991-92 through 2016-17: cluster numbering changes between rounds
+# (3xxx, 4xxx, 5xxx, 6xxxx, 7xxxx) and no explicit prior-wave HH ID column
+# exists in the available data files, so cross-wave linkage cannot be
+# established.  The 2005-06 and 2012-13 hints ('rhhno') referred to
+# within-wave replacement households, not cross-wave panel linkage.
 Waves = {'1987-88':(),
-         '1988-89':(),
-         '1991-92':(),
-         '1998-99':(),
-         '2005-06':(), #'parta/sec0.dta', 'hhid', ['clust','rhhno']
-         '2012-13':(), #'PARTA/SEC0.dta', 'HID', ['clust', 'rhhno']
-         '2016-17':()
+         '1988-89':('PANELC.DAT', 'HID2', 'HID1'),
+         '1991-92':(),  # No linkage file; cluster scheme changed (2xxxx -> 3xxx)
+         '1998-99':(),  # No linkage file; cluster scheme changed (3xxx -> 4xxx)
+         '2005-06':(),  # No linkage file; cluster scheme changed (4xxx -> 5xxx)
+         '2012-13':(),  # reint marks 1476 panel HHs but no prior-wave ID column
+         '2016-17':()   # No linkage fields
          }
 
 def yearly_expenditure(row, cost = 'CFOODB', freq = 'TFOODB', freq_unit = 'UTFOODB', months = 'MFOODBLY'):

@@ -39,4 +39,4 @@ Data Scheme:
     index: (t, i)
     int_t: datetime
 
-
+  panel_ids: !make
