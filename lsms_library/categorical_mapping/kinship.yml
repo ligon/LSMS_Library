@@ -408,6 +408,21 @@ Other Not Related:               [0, 0, unrelated]
 "No Relation":                           [0, 0, unrelated]
 Lodger:                                  [0, 0, guest]
 
+# --- Spanish variants (Guatemala ENCOVI) ---
+"Jefe (A)":                              [0, 0, consanguineal]
+"Esposo (A) O CompaÑero (A)":           [0, 0, affinal]
+"Hijo (A)":                              [-1, 0, consanguineal]
+"Padre - Madre":                         [1, 0, consanguineal]
+"Hermano (A)":                           [0, 1, consanguineal]
+"Nieto (A)":                             [-2, 0, consanguineal]
+"Suegro (A)":                            [1, 0, affinal]
+"Yerno - Nuera":                         [-1, 0, affinal]
+"CuÑado (A)":                           [0, 1, affinal]
+"Otro Pariente":                         [0, 0, consanguineal]
+"Otro No Pariente":                      [0, 0, unrelated]
+"Empleada Domestica":                    [0, 0, servant]
+"Pensionista - Huesped":                 [0, 0, guest]
+
 # --- French Burkina Faso EMC/EHCVM variants ---
 # These use longer descriptive forms or different punctuation than the
 # labels already covered above.
