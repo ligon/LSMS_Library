@@ -56,6 +56,7 @@ household_roster:
     file: sect1_hh_w2.dta
     idxvars:
         i: household_id2
+        v: ea_id2
         pid: individual_id2
     myvars:
         Sex: hh_s1q03
