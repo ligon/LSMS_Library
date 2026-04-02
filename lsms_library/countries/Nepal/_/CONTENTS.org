@@ -1,0 +1,33 @@
+#+title: Contents
+
+* Data Acquisition Status
+
+Nepal has three NLSS (Nepal Living Standards Survey) waves:
+- 1995-96 (NLSS I) -- WB catalog 2301
+- 2003-04 (NLSS II) -- WB catalog 1000
+- 2010-11 (NLSS III) -- WB catalog (check SOURCE.org)
+
+** No .dta files in repository
+As of 2026-04-02, no source data files have been DVC-tracked or
+downloaded.  The =data_info.yml= and =data_scheme.yml= configs exist
+(household_roster, cluster_features, individual_education,
+food_acquired, interview_date, assets) but all features return empty
+DataFrames because the source .dta files are missing.
+
+** Data sources
+- World Bank Microdata Library: https://microdata.worldbank.org/index.php/catalog/2301 (NLSS I) and catalog/1000 (NLSS II)
+- Nepal Central Bureau of Statistics / National Statistics Office: https://nsonepal.gov.np/
+  The NSO may host data not available through the WB catalog.
+
+** Next steps
+1. Download .dta files from WB or NSO
+2. =dvc add= and =dvc push= to cache
+3. Rebuild features and validate with =is_this_feature_sane()=
+
+* Features configured (pending data)
+** household_roster
+** cluster_features
+** individual_education
+** food_acquired
+** interview_date
+** assets
