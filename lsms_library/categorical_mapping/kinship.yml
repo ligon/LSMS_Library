@@ -80,6 +80,17 @@ Other Relative:      [0, 0, consanguineal]
 Other Family:        [0, 0, consanguineal]
 Adopted Child:       [-1, 0, consanguineal]
 
+# --- Nigeria GHS/LSMS-ISA variants ---
+Own Child:                   [-1, 0, consanguineal]
+Parent In Law:               [1, 0, affinal]
+Brother/Sister Inlaw:        [0, 1, affinal]
+Domestic Help:               [0, 0, servant]
+"Domestic Help (Resident)":  [0, 0, servant]
+"Domestic Help (Non Resident)": [0, 0, servant]
+"Other Relation (Specify)":  [0, 0, consanguineal]
+"Other Non Relation (Specify)": [0, 0, unrelated]
+"Other Non-Relation (Specify)": [0, 0, unrelated]
+
 # --- English variants (Uganda, etc.) ---
 # Lower-case and compound forms that .title() normalises.
 Son/Daughter:                [-1, 0, consanguineal]
