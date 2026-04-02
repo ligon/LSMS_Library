@@ -55,6 +55,7 @@
 | simiyu                                   | Simiyu                                   |
 | SINGIDA                                  | Singida                                  |
 | singida                                  | Singida                                  |
+| SONGWE                                   | Songwe                                   |
 | songwe                                   | Songwe                                   |
 | TABORA                                   | Tabora                                   |
 | tabora                                   | Tabora                                   |
@@ -387,6 +388,7 @@
 | SONGEA RURAL                             | Songea Rural                             |
 | SONGEA URBAN                             | Songea Urban                             |
 | SONGEA VIJIJINI                          | Songea Vijijini                          |
+| SONGWE                                   | Songwe                                   |
 | songwe                                   | Songwe                                   |
 | SUMBAWANGA                               | Sumbawanga                               |
 | SUMBAWANGA MANISPAA                      | Sumbawanga Manispaa                      |

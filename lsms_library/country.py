@@ -875,6 +875,23 @@ class Country:
 
         cf = pd.concat(cf_parts, ignore_index=True)
 
+        # Wave-level cluster_features() returns raw data that has not
+        # been through _apply_categorical_mappings().  Apply the
+        # country's categorical mapping here so that market labels are
+        # normalised (e.g. "DODOMA" -> "Dodoma") before the lookup is
+        # cached and joined onto every downstream table.
+        cat_maps = self.categorical_mapping
+        if cat_maps:
+            lower_lookup_cm = {name.lower(): name for name in cat_maps}
+            key = lower_lookup_cm.get(column.lower())
+            if key is not None:
+                table = cat_maps[key]
+                if "Preferred Label" in table.columns:
+                    source_cols = [c for c in table.columns if c != "Preferred Label"]
+                    if source_cols:
+                        rdict = table.set_index(source_cols[0])["Preferred Label"].to_dict()
+                        cf[column] = cf[column].replace(rdict)
+
         if column not in cf.columns:
             available = [c for c in cf.columns if c not in ('i', 't', 'v')]
             raise KeyError(
@@ -883,11 +900,14 @@ class Country:
             )
 
         lookup = (cf[['i', 't', column]]
+                  .dropna(subset=[column])
                   .drop_duplicates(subset=['i', 't'])
                   .set_index(['i', 't'])[column]
                   .rename('m'))
         # Strip whitespace; trust upstream casing from cluster_features
         lookup = lookup.astype(str).str.strip()
+        # Drop any residual 'nan' strings from stringification of missing values
+        lookup = lookup[lookup != 'nan']
 
         setattr(self, cache_key, lookup)
         return lookup
