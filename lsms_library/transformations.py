@@ -62,6 +62,12 @@ def format_interval(interval):
 def roster_to_characteristics(df, age_cuts=(0,4,9,14,19,31,51), drop = 'pid', final_index = ['t','v','i']):
     roster_df = df.copy()
     roster_df.columns = roster_df.columns.str.lower()
+    # Clean stringified NA sentinels that leak through from to_parquet/astype(str)
+    _na_strings = {'<NA>', 'None', 'nan', ''}
+    for col in ('sex', 'age'):
+        if col in roster_df.columns:
+            roster_df[col] = roster_df[col].replace({s: pd.NA for s in _na_strings})
+    roster_df = roster_df.dropna(subset=['sex', 'age'])
     roster_df['age_interval'] = age_intervals(roster_df['age'], age_cuts)
     roster_df['sex_age'] = roster_df.apply(
         lambda x: f"{x['sex']} {format_interval(x['age_interval'])}" if not pd.isna(x['age_interval']) else f"{x['sex']} NA",
