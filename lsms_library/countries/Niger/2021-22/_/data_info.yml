@@ -46,6 +46,8 @@ cluster_features:
                 Urbain: Urban
                 urbain: Urban
                 URBAIN: Urban
+        Latitude: GPS__Latitude
+        Longitude: GPS__Longitude
 
 shocks:
     file: s14b_me_ner2021.dta

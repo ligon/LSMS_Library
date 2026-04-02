@@ -2,12 +2,28 @@ Country: Mali
 Wave: 2021-22
 
 cluster_features:
-    file: ehcvm_conso_mli2021.dta
-    idxvars:
-        v: grappe
-    myvars:
-        Region: region
-        Rural: milieu
+    dfs:
+        - df_main
+        - df_geo
+    df_main:
+        file: ehcvm_conso_mli2021.dta
+        idxvars:
+            v: grappe
+        myvars:
+            Region: region
+            Rural: milieu
+    df_geo:
+        file: s00_me_mli2021.dta
+        idxvars:
+            v: grappe
+        myvars:
+            Latitude: GPS__Latitude
+            Longitude: GPS__Longitude
+    merge_on:
+        - v
+    final_index:
+        - t
+        - v
 
 
 household_roster:
