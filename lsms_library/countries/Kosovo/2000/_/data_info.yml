@@ -1,6 +1,19 @@
 Country: Kosovo
 Wave: 2000
 
+cluster_features:
+    file: "../Data/ID.dta"
+    idxvars:
+        v: psu
+        i: hhid
+    myvars:
+        Region: s0i_q07
+        Rural:
+            - s0i_q09
+            - mapping:
+                Rural: Rural
+                Urban: Urban
+
 household_roster:
     file:
         - "../Data/POP.dta"

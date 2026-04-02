@@ -28,7 +28,7 @@ household_roster:
                 4: Widow/er
                 5: Single
 
-        Relation:
+        Relationship:
             - m1a_q03
             - mapping:
                 1: Head

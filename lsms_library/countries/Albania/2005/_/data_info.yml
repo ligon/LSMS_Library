@@ -1,6 +1,15 @@
 Country: Albania
 Wave: 2005
 
+cluster_features:
+    file: ../Data/identification_cl.dta
+    idxvars:
+        v: m0_q00
+        i: m0_q01
+    myvars:
+        Region: m0_stratum
+        Rural: m0_ur
+
 household_roster:
     file:
         - ../Data/household_rosterA_cl.dta
@@ -28,7 +37,7 @@ household_roster:
                 4: Widow/er
                 5: Single
 
-        Relation:
+        Relationship:
             - m1a_q03
             - mapping:
                 1: Head

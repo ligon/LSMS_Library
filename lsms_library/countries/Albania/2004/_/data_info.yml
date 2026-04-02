@@ -1,44 +1,67 @@
 Country: Albania
 Wave: 2004
 
-household_roster:
-    file:
-        - ../Data/w3_roster_all.dta
+cluster_features:
+    file: ../Data/w3_hh_basic.dta
     idxvars:
-        i: per_num
-        pid: pid
-
+        v: m0_q01
+        i: chid
     myvars:
-        Sex:
-            - m1_q04
-            - mapping:
-                1: Male
-                2: Female
+        Region: m0_distr
 
-        Age: m1_q06
+household_roster:
+    dfs:
+        - df_roster
+        - df_cluster
+    df_roster:
+        file: ../Data/w3_roster_all.dta
+        idxvars:
+            i: chid
+            pid: pid
+        myvars:
+            Sex:
+                - m1_q04
+                - mapping:
+                    1: Male
+                    2: Female
 
-        Marital:
-            - m1_q17
-            - mapping:
-                1: Married
-                2: Divorced/Separated
-                3: Living together
-                4: Widow/er
-                5: Single
+            Age: m1_q06
 
-        Relation:
-            - m1_q16
-            - mapping:
-                1: Head
-                2: Spouse/Partner
-                3: Child/Adopted child
-                4: Grandchild
-                5: Niece/Nephew
-                6: Father/Mother
-                7: Sister/Brother
-                8: Son/Daughter in law
-                9: Brother/Sister in law
-                10: Grandfather/Mother
-                11: Father/Mother in law
-                12: Other relative
-                13: Not related
+            Marital:
+                - m1_q17
+                - mapping:
+                    1: Married
+                    2: Divorced/Separated
+                    3: Living together
+                    4: Widow/er
+                    5: Single
+
+            Relationship:
+                - m1_q16
+                - mapping:
+                    1: Head
+                    2: Spouse/Partner
+                    3: Child/Adopted child
+                    4: Grandchild
+                    5: Niece/Nephew
+                    6: Father/Mother
+                    7: Sister/Brother
+                    8: Son/Daughter in law
+                    9: Brother/Sister in law
+                    10: Grandfather/Mother
+                    11: Father/Mother in law
+                    12: Other relative
+                    13: Not related
+    df_cluster:
+        file: ../Data/w3_hh_basic.dta
+        idxvars:
+            i: chid
+        myvars:
+            v: m0_q01
+    merge_on:
+        - i
+    final_index:
+        - t
+        - v
+        - i
+        - pid

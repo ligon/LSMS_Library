@@ -1,10 +1,24 @@
 Country: Serbia and Montenegro
 Wave: 2003
 
+cluster_features:
+    file: "../Data/2003 1 demography.dta"
+    idxvars:
+        v: mesto
+        i: rbd
+    myvars:
+        Region: stratum
+        Rural:
+            - tip
+            - mapping:
+                Urban: Urban
+                Other: Rural
+
 household_roster:
     file:
         - "../Data/2003 1 demography.dta"
     idxvars:
+        v: mesto
         i: rbd
         pid: clan
     myvars:

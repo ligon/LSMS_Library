@@ -1,6 +1,14 @@
 Country: Albania
 Wave: 2003
 
+cluster_features:
+    file: ../Data/w2_roster_all.dta
+    idxvars:
+        v: PSU
+        i: BHID
+    myvars:
+        Region: STRATUM
+
 household_roster:
     file:
         - ../Data/w2_roster_all.dta
@@ -14,33 +22,33 @@ household_roster:
         Sex:
             - B1_Q04
             - mapping:
-                1: Male
-                2: Female
+                male: Male
+                female: Female
 
         Age: B1_Q06
 
         Marital:
             - B1_Q18
             - mapping:
-                1: Married
-                2: Divorced/Separated
-                3: Living together
-                4: Widow/er
-                5: Single
+                married: Married
+                divorced/separated: Divorced/Separated
+                living together: Living together
+                widower: Widow/er
+                single: Single
 
-        Relation:
+        Relationship:
             - B1_Q17
             - mapping:
-                1: Head
-                2: Spouse/Partner
-                3: Child/Adopted child
-                4: Grandchild
-                5: Niece/Nephew
-                6: Father/Mother
-                7: Sister/Brother
-                8: Son/Daughter in law
-                9: Brother/Sister in law
-                10: Grandfather/Mother
-                11: Father/Mother in law
-                12: Other relative
-                13: Not related
+                head: Head
+                spouse -partner: Spouse/Partner
+                child - adopted child: Child/Adopted child
+                grandchild: Grandchild
+                niece - nephew: Niece/Nephew
+                father - mother: Father/Mother
+                sister - brother: Sister/Brother
+                son - daughter in law: Son/Daughter in law
+                brother - sister in law: Brother/Sister in law
+                grandfather - mother: Grandfather/Mother
+                father - mother in law: Father/Mother in law
+                other relative: Other relative
+                not related: Not related

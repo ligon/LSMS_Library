@@ -1,5 +1,17 @@
 Country: Serbia
 
+cluster_features:
+    file: "../Data/enumeration_district.dta"
+    idxvars:
+        v: popkrug
+    myvars:
+        Region: region2
+        Rural:
+            - tip
+            - mapping:
+                urban: Urban
+                rural: Rural
+
 household_roster:
     file:
         - "../Data/individual.dta"

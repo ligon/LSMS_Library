@@ -13,9 +13,14 @@ Waves:
   - '2012'
 
 Data Scheme:
+  cluster_features:
+    index: (t, v)
+    Region: str
+    Rural: str
+
   household_roster:
     index: (t, v, i, pid)
-    Sex: int
+    Sex: str
     Age: float
-    Relation: int
-    Marital: int
+    Relationship: str
+    Marital: str
