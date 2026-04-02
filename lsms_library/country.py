@@ -2048,6 +2048,8 @@ def _enforce_declared_dtypes(df: pd.DataFrame, scheme_entry: dict[str, Any]) -> 
                 target = _SCHEME_DTYPE_MAP[declared_type]
                 if target == 'to_datetime':
                     df[col] = pd.to_datetime(df[col], errors='coerce')
+                elif target in (pd.Int64Dtype(), pd.Float64Dtype(), pd.BooleanDtype()):
+                    df[col] = pd.to_numeric(df[col], errors='coerce').astype(target)
                 else:
                     df[col] = df[col].astype(target)
         except (ValueError, TypeError):
