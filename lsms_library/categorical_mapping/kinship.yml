@@ -355,6 +355,17 @@ Other Non-Family:                [0, 0, unrelated]
 "Lodger Or Relative Of Lodgers":     [0, 0, guest]
 "Nurse, Assistant Girl":             [0, 0, servant]
 
+# --- Kosovo variants (truncated .dta labels) ---
+Wife/Hus:                        [0, 0, affinal]
+Father/M:                        [1, 0, consanguineal]
+Son/Daug:                        [-1, 0, consanguineal]
+"Brother/":                      [0, 1, consanguineal]
+"Sister/B":                      [0, 1, consanguineal]
+Grandchi:                        [-2, 0, consanguineal]
+Grandfat:                        [2, 0, consanguineal]
+Niece/Ne:                        [-1, 2, consanguineal]
+Other Re:                        [0, 0, unrelated]
+
 # --- Timor-Leste variants ---
 Child/Adopted Child:             [-1, 0, consanguineal]
 "Brother/Sister In Law":         [0, 1, affinal]
