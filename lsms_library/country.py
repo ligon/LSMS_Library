@@ -1801,6 +1801,16 @@ class Country:
         '''
         if name in self.data_scheme or name in self._FOOD_DERIVED or name in self._ROSTER_DERIVED:
             def method(waves=None, market=None):
+                f"""Return {name} as a DataFrame, aggregated across *waves*.
+
+                Parameters
+                ----------
+                waves : list of str, optional
+                    Subset of waves to include.  Defaults to all available.
+                market : str, optional
+                    Column from cluster_features (e.g. 'Region') to add as
+                    an ``m`` index level for demand estimation.
+                """
                 # For derived food tables, try deriving from food_acquired first
                 # before falling back to wave-level scripts / make
                 if (name in self._FOOD_DERIVED
