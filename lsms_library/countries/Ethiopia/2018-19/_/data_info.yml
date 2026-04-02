@@ -25,14 +25,12 @@ cluster_features:
     df_geo:
         file: ETH_HouseholdGeovariables_Y4.dta
         idxvars:
-            i: household_id
             v: ea_id
         myvars:
             Latitude: lat_dd_mod
             Longitude: lon_dd_mod
     merge_on:
         - v
-        - i
     final_index:
         - t
         - v
