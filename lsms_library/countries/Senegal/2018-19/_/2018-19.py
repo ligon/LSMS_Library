@@ -8,9 +8,7 @@ def v(value):
     '''
     Formatting cluster id
     '''
-    id = value[0].astype(str) + value[1].astype(str)
-
-    return tools.format_id(id)
+    return tools.format_id(value)
 
 def i(value):
     '''
@@ -62,12 +60,6 @@ def Region(value):
     Formatting region variable
     '''
     return value
-
-def Rural(value):
-    '''
-    Formatting rural variable
-    '''
-    return (value =='Rural') + 0.
 
 
 

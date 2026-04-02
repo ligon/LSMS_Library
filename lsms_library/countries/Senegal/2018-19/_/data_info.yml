@@ -8,18 +8,21 @@ cluster_features:
   df_main:
       file: s00_me_sen2018.dta
       idxvars:
-          v:
-            - vague
-            - grappe
+          v: grappe
       myvars:
-          Region: s00q01
-          Rural: s00q04
+          Region:
+              - s00q01
+              - mapping:
+                  SAINT-LOUIS: Saint-Louis
+          Rural:
+              - s00q04
+              - mapping:
+                  Rural: Rural
+                  Urbain: Urban
   df_geo:
       file: grappe_gps_sen2018.dta
       idxvars:
-          v:
-            - vague
-            - grappe
+          v: grappe
       myvars:
           Latitude: coordonnes_gps__Latitude
           Longitude: coordonnes_gps__Longitude
@@ -36,11 +39,8 @@ household_roster:
   df_main:
     file:  s01_me_sen2018.dta
     idxvars:
-        v:
-          - vague
-          - grappe
+        v: grappe
         i:
-          - vague
           - grappe
           - menage
         pid: s01q00a
@@ -55,11 +55,8 @@ household_roster:
   df_temp:
       file: s00_me_sen2018.dta
       idxvars:
-          v:
-            - vague
-            - grappe
+          v: grappe
           i:
-            - vague
             - grappe
             - menage
       myvars:
@@ -138,12 +135,9 @@ shocks:
 food_acquired:
     file: s07b_me_sen2018.dta
     idxvars:
-        v:
-            - vague
-            - grappe
+        v: grappe
         visit: vague
         i:
-            - vague
             - grappe
             - menage
         j: s07bq01
@@ -157,7 +151,6 @@ assets:
     file: s12_me_sen2018.dta
     idxvars:
         i:
-            - vague
             - grappe
             - menage
         j: s12q01
@@ -172,11 +165,8 @@ assets:
 individual_education:
     file: ehcvm_individu_sen2018.dta
     idxvars:
-        v:
-            - vague
-            - grappe
+        v: grappe
         i:
-            - vague
             - grappe
             - menage
         pid: numind
@@ -187,7 +177,6 @@ interview_date:
     file: s00_me_sen2018.dta
     idxvars:
         i:
-            - vague
             - grappe
             - menage
     myvars:
