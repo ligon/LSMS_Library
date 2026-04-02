@@ -355,6 +355,13 @@ Other Non-Family:                [0, 0, unrelated]
 "Lodger Or Relative Of Lodgers":     [0, 0, guest]
 "Nurse, Assistant Girl":             [0, 0, servant]
 
+# --- India IHDS variants (truncated 8-char .dta labels) ---
+"B/S In-L":                      [0, 1, affinal]
+"F/M In-L":                      [1, 0, affinal]
+"Servant/":                      [0, 0, servant]
+"Spouse S":                      [-1, 0, affinal]
+"Spouse O":                      [0, 0, affinal]
+
 # --- Kosovo variants (truncated .dta labels) ---
 Wife/Hus:                        [0, 0, affinal]
 Father/M:                        [1, 0, consanguineal]
