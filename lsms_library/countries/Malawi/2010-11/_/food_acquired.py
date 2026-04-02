@@ -21,9 +21,10 @@ conversions = pd.read_csv('ihs3_conversions.csv')
 hh = get_dataframe('../Data/Full_Sample/Household/hh_mod_a_filt.dta')
 _region_map = {1: 'North', 2: 'Central', 3: 'Southern'}
 regions = hh[['case_id', 'hh_a01']].drop_duplicates().set_index('case_id')['hh_a01']
-regions = (pd.to_numeric(regions, errors='coerce') // 100).map(_region_map)
+regions = (pd.to_numeric(regions, errors='coerce') // 100).map(_region_map).dropna()
 regions.index.name = 'j'
 regions.name = 'm'
+regions = regions.astype(str)
 
 columns_dict = {'case_id': 'j', 'hh_g02' : 'i', 'hh_g03a': 'quantity_consumed', 'hh_g03b' : 'unitcode_consumed', 'hh_g03b_os': 'unitsdetail_consumed',
                 'hh_g05': 'expenditure', 'hh_g04a': 'quantity_bought', 'hh_g04b': 'unitcode_bought', 'hh_g04b_os': 'unitsdetail_bought',
