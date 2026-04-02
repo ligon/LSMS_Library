@@ -2,8 +2,6 @@
 Country: Albania
 
 # 1996 excluded: Employment and Welfare Survey (EWS), not LSMS.
-# Data hosted externally at INSTAT (Albanian statistical office);
-# never downloaded into this repository.  No Data/ directory exists.
 Waves:
   - '2002'
   - '2003'
@@ -22,6 +20,7 @@ Data Scheme:
     index: (t, v, i, pid)
     Sex: str
     Age: float
+    Relationship: str
     Generation: int
     Distance: int
     Affinity: str
