@@ -2,14 +2,31 @@ Country: Niger
 Wave: 2011-12
 
 household_roster:
-    file: NER_2011_ECVMA_v01_M_Stata8/ecvmaind_p1p2_en.dta
-    idxvars:
-        i: hid
-        pid: ms01q00
-    myvars:
-        Sex: ms01q01
-        Age: ms01q06a
-        Relationship: ms01q02
+    dfs:
+        - df_roster
+        - df_cluster
+    df_roster:
+        file: NER_2011_ECVMA_v01_M_Stata8/ecvmaind_p1p2_en.dta
+        idxvars:
+            i: hid
+            pid: ms01q00
+        myvars:
+            Sex: ms01q01
+            Age: ms01q06a
+            Relationship: ms01q02
+    df_cluster:
+        file: NER_2011_ECVMA_v01_M_Stata8/ecvmamen_p1.dta
+        idxvars:
+            i: hid
+        myvars:
+            v: grappe
+    merge_on:
+        - i
+    final_index:
+        - t
+        - v
+        - i
+        - pid
 
 cluster_features:
     dfs:
