@@ -760,7 +760,7 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True) -> pd.DataF
     all = df.reset_index()
     for column in all:
         if all[column].dtype=='O':
-            all[column] = all[column].astype(str).astype('string[pyarrow]').replace('nan',None)
+            all[column] = all[column].astype(str).astype('string[pyarrow]').replace({'nan': None, 'None': None, '<NA>': None})
     if index:
         resolved_idxnames = []
         for i, name in enumerate(idxnames):

@@ -2112,7 +2112,7 @@ def _normalize_dataframe_index(
         # Convert unordered categoricals to strings so groupby.first() works
         for col in df.columns:
             if hasattr(df[col], 'cat') and not df[col].cat.ordered:
-                df[col] = df[col].astype(str).replace('nan', pd.NA)
+                df[col] = df[col].astype(str).replace({'nan': pd.NA, 'None': pd.NA, '<NA>': pd.NA})
         df = df.groupby(level=present_levels, observed=True).first()
 
     return df
