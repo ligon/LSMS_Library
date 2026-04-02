@@ -2101,9 +2101,9 @@ def _normalize_dataframe_index(
         except (ValueError, TypeError):
             pass  # level count mismatch or non-hierarchical index; keep original order
 
-    # Drop any unexpected index levels
+    # Drop any unexpected index levels (but keep at least one)
     extra_levels = [lvl for lvl in df.index.names if lvl not in declared]
-    if extra_levels:
+    if extra_levels and len(df.index.names) > len(extra_levels):
         df = df.droplevel(extra_levels)
 
     # Aggregate duplicates if any remain
