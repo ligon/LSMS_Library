@@ -5,6 +5,7 @@ household_roster:
     file:
         - ../Data/M8_HROST.dta
     idxvars:
+        v: clustnum
         i: hhid
         pid: pcode
     myvars: 

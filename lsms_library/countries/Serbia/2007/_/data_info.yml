@@ -4,9 +4,9 @@ household_roster:
     file:
         - "../Data/individual.dta"
     idxvars:
-        municipality: opstina
-        enumeration_area: popkrug
+        v: popkrug
         i: dom
+        pid: lice
     myvars:
         Sex: pol
         Relationship: srodstvo

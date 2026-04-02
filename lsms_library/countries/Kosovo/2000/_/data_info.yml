@@ -5,6 +5,7 @@ household_roster:
     file:
         - "../Data/POP.dta"
     idxvars:
+        v: psu
         i: hhid
         pid: s1a_q00
     myvars:
