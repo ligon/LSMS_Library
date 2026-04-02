@@ -2,30 +2,13 @@ Country: Iraq
 Wave: 2006-07
 
 household_roster:
-    dfs:
-        - df_roster
-        - df_cluster
-    df_roster:
-        file:
-            - "../Data/2007ihses01_household_roster.dta"
-        idxvars:
-            i: xhhkey
-            pid: idcode
-        myvars:
-            Relationship: q0105
-            Sex: q0102
-            Age: q0103
-    df_cluster:
-        file:
-            - "../Data/2007ihses00_cover_page.dta"
-        idxvars:
-            i: xhhkey
-        myvars:
-            v: xcluster
-    merge_on:
-        - i
-    final_index:
-        - t
-        - v
-        - i
-        - pid
+    file:
+        - "../Data/2007ihses01_household_roster.dta"
+    idxvars:
+        v: xcluster
+        i: xhhkey
+        pid: idcode
+    myvars:
+        Relationship: q0105
+        Sex: q0102
+        Age: q0103
