@@ -20,7 +20,7 @@ Root-level symlinks (e.g., `Uganda → lsms_library/countries/Uganda`) are for c
 
 ## DVC Caching and `data_root()`
 - All materialized data (parquets, JSON caches) is written under `data_root()` (`lsms_library/paths.py`), **not** in the repo tree.
-- Default location: `~/.local/share/lsms_library/{Country}/var/{table}.parquet`. Override with `LSMS_DATA_DIR` env var.
+- Default location: `~/.local/share/lsms_library/{Country}/var/{table}.parquet`. Override with `data_dir` in `~/.config/lsms_library/config.yml` or `LSMS_DATA_DIR` env var (env var takes precedence).
 - First call builds from source, caches to `data_root(Country)/var/{table}.parquet`.
 - Subsequent calls read cache (<1 sec).
 - Caches auto-invalidate on source/config changes (hash-based).
@@ -189,6 +189,17 @@ Key details:
 ## Data Access
 Underlying microdata must be obtained from the [World Bank Microdata Library](https://microdata.worldbank.org/) under their terms of use. Contributors need GPG/PGP keys for repository write access.
 
+### User configuration (`~/.config/lsms_library/config.yml`)
+
+Library settings live in a YAML file at the platform-appropriate user config directory (on Linux: `~/.config/lsms_library/config.yml`):
+
+```yaml
+microdata_api_key: your_key_here
+# data_dir: /path/to/override   # same as LSMS_DATA_DIR env var
+```
+
+**Lookup order** for each setting: environment variable → config file → None. For example, `MICRODATA_API_KEY` env var takes precedence over `microdata_api_key` in the config file. The `lsms_library.config` module handles this transparently; see `config.get()` for details.
+
 ### Reading data files: `get_dataframe()`
 
 **Always use `get_dataframe()` from `local_tools` to read `.dta`/`.csv`/`.parquet` files.** It is the single entry point for reading data and handles all access modes transparently:
@@ -203,7 +214,7 @@ The fallback chain is:
 1. **Local file** on disk
 2. **DVC filesystem** (`DVCFileSystem`) --- streams from the configured DVC remote
 3. **`dvc.api.open()`** --- legacy DVC streaming
-4. **`get_data_file()`** from `data_access.py` --- downloads from the World Bank Microdata Library NADA API as a last resort (requires `MICRODATA_API_KEY`)
+4. **`get_data_file()`** from `data_access.py` --- downloads from the World Bank Microdata Library NADA API as a last resort (requires `microdata_api_key` in the config file, or `MICRODATA_API_KEY` env var)
 
 This means a script written with `get_dataframe('../Data/file.dta')` works whether the file is already on disk, cached in DVC, or has never been downloaded at all.
 
