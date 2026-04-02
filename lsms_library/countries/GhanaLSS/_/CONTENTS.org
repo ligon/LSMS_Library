@@ -81,6 +81,15 @@ https://docs.google.com/spreadsheets/d/1Ar88nD6jQl4u8iCIsAIkLxOjHpfvi6ZBVJlwf91H
 Ghana Food Expenditure Data with Aggregate Labels and FTC Codes:
 https://docs.google.com/spreadsheets/d/1qZhbq5gpAmCsYH1ixUn0Ix_Cb5YKSIpU-Pc2_hh2lhU/edit?usp=sharing
 
+* Features NOT available in GhanaLSS
+
+** Shocks
+The GLSS (Ghana Living Standards Survey) does not include a household shocks module in any wave (GLSS1 through GLSS7, covering 1987--2017).  Unlike the LSMS-ISA surveys (Uganda, Malawi, Tanzania, Ethiopia, Nigeria), the GLSS questionnaire has no section asking households whether they experienced specific shocks, the effect on income/assets/production/consumption, or coping strategies employed.
+
+The only tangentially related content is in GLSS7 Section 13E (governance module), which asks three perception questions about whether flooding, health hazards, and natural disasters are "threats of concern."  These are subjective perception questions, not experienced-shock data, and cannot be mapped to the standard =shocks= schema.
+
+Ghana's LSMS-ISA participation is through the GhanaSPS (Social Panel Survey), not the GLSS.  Shocks data for Ghana should be sought in GhanaSPS if available.
+
 * Files in GhanaLSS/<SOMEYEAR>/_/
 ** TODO household_characteristics.py
 ** TODO food_acquired.py

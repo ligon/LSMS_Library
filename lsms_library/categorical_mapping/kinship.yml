@@ -362,6 +362,14 @@ Grandfather/Mother:              [2, 0, consanguineal]
 Adopted/Stepchild:               [-1, 0, step]
 "Tenant Or Tenant'S Relative":   [0, 0, guest]
 
+# --- Liberia variants ---
+"Live-In Maid/Domestic Help":            [0, 0, servant]
+"live-in maid/domestic help":            [0, 0, servant]
+"Live-In Maid'S / Domestic Help'S Relative": [0, 0, servant]
+"live-in maid's / domestic help's relative": [0, 0, servant]
+"Other Non Relatives":                   [0, 0, unrelated]
+"other non relatives":                   [0, 0, unrelated]
+
 # --- Cambodia variants ---
 "adopted child/foster child":    [-1, 0, foster]
 "Adopted Child/Foster Child":    [-1, 0, foster]
