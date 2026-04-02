@@ -242,6 +242,8 @@ class Wave:
             if method_name in wave_scheme or method_name in country_scheme:
                 def method():
                     return self.grab_data(method_name)
+                method.__doc__ = f"Return {method_name} for wave {self.year}."
+                method.__name__ = method_name
                 return method
             raise AttributeError(f"'{type(self).__name__}' has no attribute '{method_name}'")
         finally:
@@ -1801,16 +1803,6 @@ class Country:
         '''
         if name in self.data_scheme or name in self._FOOD_DERIVED or name in self._ROSTER_DERIVED:
             def method(waves=None, market=None):
-                f"""Return {name} as a DataFrame, aggregated across *waves*.
-
-                Parameters
-                ----------
-                waves : list of str, optional
-                    Subset of waves to include.  Defaults to all available.
-                market : str, optional
-                    Column from cluster_features (e.g. 'Region') to add as
-                    an ``m`` index level for demand estimation.
-                """
                 # For derived food tables, try deriving from food_acquired first
                 # before falling back to wave-level scripts / make
                 if (name in self._FOOD_DERIVED
@@ -1859,6 +1851,16 @@ class Country:
                 if market is not None and isinstance(result, pd.DataFrame) and not result.empty:
                     result = self._add_market_index(result, column=market)
                 return result
+            method.__doc__ = (
+                f"Return {name} as a DataFrame, aggregated across *waves*.\n\n"
+                "Parameters\n----------\n"
+                "waves : list of str, optional\n"
+                "    Subset of waves to include.  Defaults to all available.\n"
+                "market : str, optional\n"
+                "    Column from cluster_features (e.g. 'Region') to add as\n"
+                "    an ``m`` index level for demand estimation.\n"
+            )
+            method.__name__ = name
             return method
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
     
