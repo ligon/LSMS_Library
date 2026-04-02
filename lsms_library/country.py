@@ -1955,7 +1955,7 @@ def _expand_kinship(df: pd.DataFrame) -> pd.DataFrame:
     unknown = set()
 
     for val in df["Relationship"]:
-        if pd.isna(val):
+        if pd.isna(val) or str(val).strip() in ('', '<NA>', 'nan', 'None'):
             gen.append(pd.NA)
             dist.append(pd.NA)
             aff.append(pd.NA)
