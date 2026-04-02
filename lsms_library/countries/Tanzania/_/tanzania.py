@@ -13,41 +13,89 @@ from collections import defaultdict
 
 country = 'Tanzania'
 
+def _is_primary_hhid(rid):
+    """Check whether an r_hhid represents a primary (non-split-off) household.
+
+    Round 2 (16-digit): suffix '01' is primary, '02'+ is split-off.
+    Rounds 3-4 (NNNN-NNN): suffix '001' is primary, others are split-offs.
+    Round 1 (14-digit): all primary (no splits yet).
+    """
+    rid = str(rid)
+    if len(rid) == 16:           # round 2
+        return rid.endswith('01')
+    elif '-' in rid:             # rounds 3-4
+        return rid.split('-')[1] == '001'
+    return True                  # round 1 (all primary)
+
+
 def map_08_15(df, col):
     """Build panel linkage for the 2008-15 multi-round file.
 
     Uses UPHI (Universal Panel Household Identifier) to link households
     across the 4 rounds.  Multiple UPHIs can share the same r_hhid in
-    early rounds and diverge later (household splits).  Only primary
-    households (suffix '01' in round 2, '001' in rounds 3-4) are
-    linked backward; split-offs start as new households from their
-    first appearance.
+    early rounds and diverge later (household splits).
+
+    To avoid many-to-one collisions (GitHub #114), this function builds
+    composite R1-based IDs.  When multiple primary r_hhid values in rounds
+    3-4 trace back to the same R1 r_hhid (because the original household
+    split), the continuation household (lowest UPHI) keeps the bare R1
+    r_hhid; split-offs get a suffix (e.g., ``01010140020171-s02``).
+
+    Returns a DataFrame indexed by ``(t, i)`` with column ``previous_i``
+    mapping each round's r_hhid to its R1-based composite ID.
     """
     hhid = df[col].copy()
-    hhid_sorted = hhid.sort_values(['UPHI', 'round'])
-    hhid_sorted['previous_i'] = hhid_sorted.groupby('UPHI')['r_hhid'].shift(1)
     map_round = {1: '2008-09', 2: '2010-11', 3: '2012-13', 4: '2014-15'}
-    hhid_sorted['round'] = hhid_sorted['round'].map(map_round)
-    hhid_sorted = hhid_sorted.dropna(how='any')
 
-    # Identify split-off households by their r_hhid suffix.
-    # Round 2 (16-digit): suffix '01' is primary, others are split-offs.
-    # Rounds 3-4 (NNNN-NNN): suffix '001' is primary, others are split-offs.
-    def is_primary(row):
-        rid = str(row['r_hhid'])
-        if len(rid) == 16:           # round 2
-            return rid.endswith('01')
-        elif '-' in rid:             # rounds 3-4
-            return rid.split('-')[1] == '001'
-        return True                  # round 1 (all primary)
+    # --- Step 1: canonical UPHI per (r_hhid, round) -----------------------
+    # Food data is at (r_hhid, round) level, not UPHI level.  Pick the
+    # minimum UPHI per (r_hhid, round) as the representative for lineage
+    # tracing.
+    canonical = hhid.groupby(['round', 'r_hhid'])['UPHI'].min().reset_index()
+    canonical.columns = ['round', 'r_hhid', 'min_UPHI']
 
-    mask = hhid_sorted.apply(is_primary, axis=1)
-    hhid_sorted = hhid_sorted[mask]
+    # --- Step 2: map each canonical UPHI to its R1 r_hhid -----------------
+    r1_hhid_map = hhid[hhid['round'] == 1].drop_duplicates('UPHI').set_index('UPHI')['r_hhid'].to_dict()
+    canonical['r1_hhid'] = canonical['min_UPHI'].map(r1_hhid_map)
 
-    hhid_sorted = hhid_sorted.rename(columns={'r_hhid': 'i', 'round': 't'})
-    hhid_sorted = hhid_sorted.set_index(['t', 'i'])[['previous_i']]
-    hhid_sorted = hhid_sorted.loc[~hhid_sorted.index.duplicated(keep='first')]
-    return hhid_sorted
+    # Entries without R1 mapping (e.g., households first appearing in R4
+    # refresh panel) cannot be chained; they keep their own r_hhid.
+    has_r1 = canonical.dropna(subset=['r1_hhid']).copy()
+
+    # --- Step 3: assign composite IDs within each (round, r1_hhid) group --
+    # Sort by min_UPHI so the lowest UPHI (continuation household) gets
+    # rank 0 and keeps the bare R1 r_hhid; higher ranks are split-offs.
+    has_r1 = has_r1.sort_values(['round', 'r1_hhid', 'min_UPHI'])
+    has_r1['rank'] = has_r1.groupby(['round', 'r1_hhid']).cumcount()
+
+    def _make_composite(row):
+        r1 = str(row['r1_hhid'])
+        if row['rank'] == 0:
+            return r1
+        return f'{r1}-s{int(row["rank"]) + 1:02d}'
+
+    has_r1['composite_id'] = has_r1.apply(_make_composite, axis=1)
+
+    # --- Step 4: filter to primary households only -------------------------
+    has_r1 = has_r1[has_r1['r_hhid'].apply(_is_primary_hhid)]
+
+    # --- Step 5: build (t, i) -> previous_i linkage -----------------------
+    # For rounds > 1, map r_hhid -> composite_id (R1-based).
+    rows = []
+    for rnd in [2, 3, 4]:
+        sub = has_r1[has_r1['round'] == rnd]
+        for _, row in sub.iterrows():
+            rows.append({
+                't': map_round[rnd],
+                'i': str(row['r_hhid']),
+                'previous_i': row['composite_id'],
+            })
+
+    result = pd.DataFrame(rows)
+    result = result.set_index(['t', 'i'])[['previous_i']]
+    # Safety: drop any residual duplicate linkage entries
+    result = result.loc[~result.index.duplicated(keep='first')]
+    return result
 
 
 def _map_with_head_tracking(cover_df, roster_df, current_id, previous_id,
