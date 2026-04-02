@@ -20,7 +20,7 @@ Data Scheme:
   food_acquired:
     index: (t, v, visit, i, j, u)
     Quantity: float
-    Price: float
+    Expenditure: float
     Produced: float
   interview_date:
     index: (t, v, visit, i)

@@ -76,18 +76,21 @@ shocks:
                 drop: True
                 Increase: True
                 Unchanged: False
+                9.0: False
         AffectedAssets:
             - ms11q04b
             - mapping:
                 drop: True
                 Increase: True
                 Unchanged: False
+                9.0: False
         AffectedProduction:
             - ms11q04c
             - mapping:
                 drop: True
                 Increase: True
                 Unchanged: False
+                9.0: False
         AffectedConsumption:
             - ms11q04d
             - mapping:

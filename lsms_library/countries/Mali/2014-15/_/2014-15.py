@@ -12,5 +12,5 @@ def Int_t(value):
 def interview_date(df):
     df['visit'] = df.groupby(level='i')['Int_t'].rank(method='first').astype(int).astype(str)
     df = df.set_index('visit', append=True)
-    df  = pd.to_datetime(df.squeeze())
+    df['Int_t'] = pd.to_datetime(df['Int_t'])
     return df
