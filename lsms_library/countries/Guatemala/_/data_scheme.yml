@@ -1,8 +1,12 @@
-Country: Guatemala 
+Country: Guatemala
 Data Scheme:
+  cluster_features:
+    index: (t, v)
+    Rural: str
+
   household_roster:
-    index: (i, pid)
-    Sex: int
+    index: (t, v, i, pid)
+    Sex: str
     Age: float
-    Relation: int
-    Marital: int
+    Relation: str
+    Marital: str
