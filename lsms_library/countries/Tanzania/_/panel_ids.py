@@ -22,7 +22,7 @@ from tanzania import map_08_15, _map_with_head_tracking
 
 # --- Phase 1: Build raw linkage per wave ---
 
-# 2008-15: UPHI-based, no splits
+# 2008-15: UPHI-based with composite IDs for household splits (#114)
 with dvc.api.open('../2008-15/Data/upd4_hh_a.dta', mode='rb') as dta:
     cover_08 = from_dta(dta)
 linkage_08 = map_08_15(cover_08[['r_hhid', 'round', 'UPHI']], ['r_hhid', 'round', 'UPHI'])
