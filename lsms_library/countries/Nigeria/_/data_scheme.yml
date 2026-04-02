@@ -51,4 +51,3 @@ Data Scheme:
     int_t: datetime
 
   nonfood_expenditures: !make
-  unitvalues: !make
