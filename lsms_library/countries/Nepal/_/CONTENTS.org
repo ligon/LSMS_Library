@@ -15,14 +15,25 @@ food_acquired, interview_date, assets) but all features return empty
 DataFrames because the source .dta files are missing.
 
 ** Data sources
-- World Bank Microdata Library: https://microdata.worldbank.org/index.php/catalog/2301 (NLSS I) and catalog/1000 (NLSS II)
-- Nepal Central Bureau of Statistics / National Statistics Office: https://nsonepal.gov.np/
-  The NSO may host data not available through the WB catalog.
+The World Bank does NOT host Nepal microdata directly.  Both WB
+catalog pages redirect to the Nepal NSO.  Data must be obtained from
+the NSO NADA portal.
+
+- *NSO NADA Catalog*: https://microdata.nsonepal.gov.np/index.php/catalog
+  - NLSS I (1995-96): catalog id 7, 77 .dta files, 942 variables
+  - NLSS II (2003-04): catalog id 9, 79 .dta files, 896 variables
+  - NLSS III (2010-11): catalog id 37, 48 .dta files, 999 variables
+- Access type: "Licensed" --- free registration required at the NSO portal
+- File formats: Stata (.dta)
+- File naming: =z*= (NLSS I), =Z*= (NLSS II), =xh*_s*= (NLSS III)
+- WB catalog 2301 and 1000 redirect to =nsonepal.gov.np= (no direct download)
 
 ** Next steps
-1. Download .dta files from WB or NSO
-2. =dvc add= and =dvc push= to cache
-3. Rebuild features and validate with =is_this_feature_sane()=
+1. Register at https://microdata.nsonepal.gov.np/ and request access
+2. Download .dta files for each wave
+3. Place under =Nepal/{wave}/Data/=
+4. =dvc add= and =dvc push= to cache
+5. Rebuild features and validate with =is_this_feature_sane()=
 
 * Features configured (pending data)
 ** household_roster
