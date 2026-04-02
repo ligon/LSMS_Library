@@ -137,6 +137,17 @@ assets:
         Value: s12q09
         Purchase Price: s12q08
 
+individual_education:
+    file: ehcvm_individu_gnb2018.dta
+    idxvars:
+        v: grappe
+        i:
+            - grappe
+            - menage
+        pid: numind
+    myvars:
+        Educational Attainment: 'educ_hi'
+
 interview_date:
     file: s00_me_gnb2018.dta
     idxvars:

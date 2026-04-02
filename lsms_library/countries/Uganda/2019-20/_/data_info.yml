@@ -28,6 +28,31 @@ household_roster:
         - i
         - pid
 
+individual_education:
+    dfs:
+        - df_educ
+        - df_cluster
+    df_educ:
+        file: HH/gsec4.dta
+        idxvars:
+            i: hhid
+            pid: pid
+        myvars:
+            Educational Attainment: s4q07
+    df_cluster:
+        file: HH/gsec1.dta
+        idxvars:
+            i: hhid
+        myvars:
+            v: s1aq04a
+    merge_on:
+        - i
+    final_index:
+        - t
+        - v
+        - i
+        - pid
+
 people_last7days:
     file: HH/gsec15a.dta
     idxvars:

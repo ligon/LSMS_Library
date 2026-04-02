@@ -58,10 +58,7 @@ individual_education:
         i:
             - grappe
             - menage
-        pid:
-            - grappe
-            - menage
-            - s01q00a
+        pid: numind
     myvars:
         Educational Attainment: 'educ_hi'
 

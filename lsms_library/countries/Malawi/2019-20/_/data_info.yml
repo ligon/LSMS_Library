@@ -83,6 +83,42 @@ household_roster:
         - pid
 
 
+individual_education:
+    dfs:
+        - df_educ
+        - df_cluster
+    df_educ:
+        file:
+            - Cross_Sectional/HH_MOD_C.dta
+            - Panel/hh_mod_c_19.dta:
+                i: y4_hhid
+                pid: id_code
+        idxvars:
+            i:
+                - case_id
+                - function: cs_i
+            pid: PID
+        myvars:
+            Educational Attainment: hh_c09
+    df_cluster:
+        file:
+            - Cross_Sectional/hh_mod_a_filt.dta
+            - Panel/hh_mod_a_filt_19.dta:
+                i: y4_hhid
+        idxvars:
+            i:
+                - case_id
+                - function: cs_i
+        myvars:
+            v: ea_id
+    merge_on:
+        - i
+    final_index:
+        - t
+        - v
+        - i
+        - pid
+
 panel_ids:
     file: Panel/hh_mod_a_filt_19.dta
     idxvars:
