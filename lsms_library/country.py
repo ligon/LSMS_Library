@@ -573,6 +573,8 @@ class Wave:
                 relative_parquet_path = intree_parquet.relative_to(cwd_path.parent)
                 env = os.environ.copy()
                 env["LSMS_DATA_DIR"] = str(data_root())
+                bin_dir = os.path.dirname(sys.executable)
+                env["PATH"] = bin_dir + os.pathsep + env.get("PATH", "")
                 subprocess.run(["make", "-s", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True, env=env)
                 logger.info(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...")
 
