@@ -28,7 +28,7 @@ food_acquired_parquet := $(food_acquired:.py=.parquet)
 ../%/_/food_acquired.parquet: $(food_acquired)
 	(cd $(@D) && python food_acquired.py)
 
-$(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
+$(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet) $(VAR_DIR)/cluster_features.parquet
 	python food_acquired.py
 
 household_characteristics = $(shell find $(rounds) -name household_characteristics.py)
