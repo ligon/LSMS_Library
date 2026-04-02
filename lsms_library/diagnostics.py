@@ -310,6 +310,39 @@ def _check_duplicate_index(df: pd.DataFrame) -> Check:
                  f"{dup_count}/{total} duplicates ({pct:.1%}) — within tolerance")
 
 
+def _check_float_stringified_index(df: pd.DataFrame) -> Check:
+    """Flag index levels with values that look like float-stringified integers (.0 suffix).
+
+    This catches a common bug where numeric IDs pass through a float
+    stage (e.g., due to NaN promotion) and end up as '12345.0' instead
+    of '12345', breaking joins with tables that store the clean form.
+    """
+    import re
+    if not isinstance(df.index, pd.MultiIndex):
+        return Check("no_float_stringified_index", "pass", "Single index (skipped)")
+
+    bad_levels = []
+    for level_name in df.index.names:
+        if level_name is None:
+            continue
+        vals = df.index.get_level_values(level_name)
+        # Only check string-like levels
+        if not (pd.api.types.is_string_dtype(vals)
+                or pd.api.types.is_object_dtype(vals)):
+            continue
+        sample = vals.dropna().unique()[:500]
+        float_count = sum(1 for v in sample
+                          if isinstance(v, str) and re.fullmatch(r'-?\d+\.0', v))
+        if float_count > len(sample) * 0.5 and float_count > 5:
+            bad_levels.append(f"{level_name} ({float_count}/{len(sample)} "
+                              f"values have .0 suffix)")
+    if bad_levels:
+        return Check("no_float_stringified_index", "warn",
+                     f"Float-stringified index values: {'; '.join(bad_levels)}")
+    return Check("no_float_stringified_index", "pass",
+                 "No float-stringified index values")
+
+
 def _check_index_overlap_with_spine(df: pd.DataFrame, country: str) -> Check:
     """Check that household IDs overlap with other_features (the 'spine')."""
     if "i" not in df.index.names:
@@ -398,6 +431,7 @@ def is_this_feature_sane(
     report.checks.append(_check_dtype_consistency(df, scheme, feature))
     report.checks.append(_check_value_constraints(df, scheme, feature))
     report.checks.append(_check_duplicate_index(df))
+    report.checks.append(_check_float_stringified_index(df))
     report.checks.append(_check_index_overlap_with_spine(df, country))
 
     return report
