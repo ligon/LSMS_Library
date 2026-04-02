@@ -1,6 +1,11 @@
 Country: India
 
 Data Scheme:
+  cluster_features:
+    index: (t, v)
+    Region: str
+    District: str
+
   household_roster:
     index: (t, v, i, pid)
     Sex: str

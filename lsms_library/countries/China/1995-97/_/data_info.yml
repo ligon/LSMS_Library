@@ -7,22 +7,35 @@ household_roster:
     idxvars:
         i: hid
         pid: pid
+        v:
+            - hid
     myvars:
-        Sex: 
-          - s01a202
-          - mapping:
-              1: Male
-              2: Female
-        Relationship: 
-          - s01a203
-          - mapping:
-              1: Head
-              2: Spouse
-              3: Child
-              4: Grandchild
-              5: Parent
-              6: Sibling
-              7: Son/Daughter-in-law
-              8: Other relative
-              9: Non-relative
+        Sex:
+            - s01a202
+            - mapping:
+                1: M
+                2: F
+        Relationship:
+            - s01a203
+            - mapping:
+                1: Head
+                2: Spouse
+                3: Child
+                4: Grandchild
+                5: Parent
+                6: Sibling
+                7: Son/Daughter-in-law
+                8: Other relative
+                9: Non-relative
         Age: s01a208
+
+cluster_features:
+    file:
+        - ../Data/S01A2.DTA
+    idxvars:
+        i: hid
+        v:
+            - hid
+    myvars:
+        Region:
+            - hid

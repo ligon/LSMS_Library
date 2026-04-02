@@ -1,6 +1,21 @@
 Country: South Africa
 Wave: 1993
 
+cluster_features:
+    file:
+        - ../Data/STRATA2.dta
+    idxvars:
+        v: clustnum
+        i: hhid
+    myvars:
+        Region: newprov
+        Rural:
+            - type
+            - mapping:
+                0: Urban
+                1: Rural
+                3: Informal
+
 household_roster:
     file:
         - ../Data/M8_HROST.dta

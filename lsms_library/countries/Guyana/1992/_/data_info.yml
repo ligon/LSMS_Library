@@ -1,5 +1,19 @@
 Country: Guyana
 Wave: 1992
+cluster_features:
+    file:
+        - ../Data/COVERN.dta
+    idxvars:
+        v: ED
+        i: HH
+    myvars:
+        Region: RGN
+        Rural:
+            - SECTOR
+            - mapping:
+                1: Urban
+                2: Rural
+
 household_roster:
     file:
         - ../Data/ROSTERN.dta

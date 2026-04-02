@@ -1,5 +1,15 @@
 Country: Pakistan
 Wave: 1991
+cluster_features:
+    file:
+        - F00A.DTA
+    idxvars:
+        v: clust
+        i: hid
+    myvars:
+        Region: religion
+        Language: langint
+
 household_roster:
     file:
         - F01A.DTA

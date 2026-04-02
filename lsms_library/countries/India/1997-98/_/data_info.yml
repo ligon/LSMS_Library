@@ -2,6 +2,13 @@ Country: India
 Wave: 1997-98
 
 cluster_features:
+  file:
+      - ../Data/PSULIST.DTA
+  idxvars:
+      v: village
+  myvars:
+      Region: state
+      District: district
 
 household_roster:
   file:

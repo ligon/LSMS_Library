@@ -59,3 +59,7 @@ you can use .as_ordered() to change the Categorical to an ordered one
 
 - Waves: 2002, 2003, 2004, 2005, 2008, 2012
 - Error: `AttributeError: 'NoneType' object has no attribute 'get'`
+## 2026-04-02 07:35:52Z Albania – household_roster
+
+- Waves: 2002, 2003, 2004, 2005, 2008, 2012
+- Error: `PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Albania/2008/Data/../Data/Modul_1A_household_roster.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Albania/2008/Data/../Data/Modul_1A_household_roster.dta' neither as a DVC output nor as a Git-tracked file.`

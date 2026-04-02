@@ -1,6 +1,11 @@
 Country: Pakistan
 
 Data Scheme:
+  cluster_features:
+    index: (t, v)
+    Region: str
+    Language: str
+
   household_roster:
     index: (t, v, i, pid)
     Sex: str
