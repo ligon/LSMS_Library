@@ -15,3 +15,19 @@ def age_sex_composition(df, sex, sex_converter, age, age_converter, hhid):
     testdf['log HSize'] = np.log(testdf[['girls', 'boys', 'men', 'women']].sum(axis=1))
     testdf.index.name = 'j'
     return testdf
+
+
+def panel_ids(df):
+    """Construct previous_i for Senegal EHCVM panel linkage.
+
+    The same grappe+menage identifies the same household across rounds.
+    For panel households (in_panel == 1), previous_i equals the current i
+    (same vague+grappe+menage composite ID from the prior wave).
+    New replacement households (Nouveau Menage) are filtered out.
+    """
+    if 'in_panel' in df.columns:
+        df = df[df['in_panel'] == 1]
+        df = df.drop(columns=['in_panel'])
+
+    df = df[df['previous_i'].notna()]
+    return df[['previous_i']]

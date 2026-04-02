@@ -1,0 +1,185 @@
+Country: Senegal
+Wave: 2021-22
+
+cluster_features:
+  file: s00_me_sen2021.dta
+  idxvars:
+      v: grappe
+  myvars:
+      Region:
+          - s00q01
+          - mapping:
+              SAINT-LOUIS: Saint-Louis
+      Rural:
+          - s00q04
+          - mapping:
+              Rural: Rural
+              Urbain: Urban
+      Latitude: GPS__Latitude
+      Longitude: GPS__Longitude
+
+household_roster:
+  dfs:
+    - df_main
+    - df_temp
+  df_main:
+    file:  s01_me_sen2021.dta
+    idxvars:
+        v: grappe
+        i:
+          - grappe
+          - menage
+        pid: membres__id
+    myvars:
+        Sex: s01q01
+        Age:
+          - s01q04a
+          - s01q03a
+          - s01q03b
+          - s01q03c
+        Relationship: s01q02
+  df_temp:
+      file: s00_me_sen2021.dta
+      idxvars:
+          v: grappe
+          i:
+            - grappe
+            - menage
+      myvars:
+          interview_date: s00q23a
+  merge_on:
+    - v
+    - i
+  final_index:
+    - v
+    - i
+    - pid
+
+shocks:
+    file: s14b_me_sen2021.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+        Shock: s14bq01
+    myvars:
+        AffectedIncome:
+            - s14bq04a
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        AffectedAssets:
+            - s14bq04b
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        AffectedProduction:
+            - s14bq04c
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        AffectedConsumption:
+            - s14bq04d
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        Cope1: s14bq05__1
+        Cope2: s14bq05__2
+        Cope3: s14bq05__3
+        Cope4: s14bq05__4
+        Cope5: s14bq05__5
+        Cope6: s14bq05__6
+        Cope7: s14bq05__7
+        Cope8: s14bq05__8
+        Cope9: s14bq05__9
+        Cope10: s14bq05__10
+        Cope11: s14bq05__11
+        Cope12: s14bq05__12
+        Cope13: s14bq05__13
+        Cope14: s14bq05__14
+        Cope15: s14bq05__15
+        Cope16: s14bq05__16
+        Cope17: s14bq05__17
+        Cope18: s14bq05__18
+        Cope19: s14bq05__19
+        Cope20: s14bq05__20
+        Cope21: s14bq05__21
+        Cope22: s14bq05__22
+        Cope23: s14bq05__23
+        Cope24: s14bq05__24
+        Cope25: s14bq05__25
+        Cope26: s14bq05__26
+
+food_acquired:
+    file: s07b_me_sen2021.dta
+    idxvars:
+        v: grappe
+        visit: vague
+        i:
+            - grappe
+            - menage
+        j: s07bq01
+        u: s07bq03b
+    myvars:
+        Quantity: s07bq03a
+        Expenditure: s07bq08
+        Produced: s07bq04
+
+assets:
+    file: s12_me_sen2021.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+        j: s12q01
+    myvars:
+        Quantity: s12q03
+        Age:
+            - s12q07
+            - mapping: {}
+        Value: s12q09
+        Purchase Price: s12q08
+
+individual_education:
+    file: ehcvm_individu_sen2021.dta
+    idxvars:
+        v: grappe
+        i:
+            - grappe
+            - menage
+        pid: numind
+    myvars:
+        Educational Attainment: 'educ_hi'
+
+interview_date:
+    file: s00_me_sen2021.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        int_t: s00q23a
+
+panel_ids:
+    file: s00_me_sen2021.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        previous_i:
+            - grappe
+            - menage
+        in_panel:
+            - PanelHH
+            - mapping:
+                'Menage Panel': 1
+                'Nouveau Ménage': 0
