@@ -14,9 +14,13 @@ def v(value):
 
 def i(value):
     '''
-    Formatting household id
+    Formatting household id.
+    Handles both 2-component (grappe+menage) and 3-component (vague+grappe+menage).
     '''
-    id = value[0].astype(str) + value[1].astype(str) + value[2].astype(str)
+    parts = [value[k].astype(str) for k in range(len(value))]
+    id = parts[0]
+    for p in parts[1:]:
+        id = id + p
 
     return tools.format_id(id)
 
