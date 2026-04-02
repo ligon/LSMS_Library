@@ -4,24 +4,14 @@ cluster_features:
     file:
         - ECV01H01.DTA
     idxvars:
-        v:
-            - region
-            - mapping:
-                1: Metropolitana
-                2: Norte
-                3: Nororiente
-                4: Suroriente
-                5: Central
-                6: Suroccidente
-                7: Noroccidente
-                8: Peten
+        v: region
         i: hogar
     myvars:
         Rural:
             - area
             - mapping:
-                1: Urban
-                2: Rural
+                urbana: Urban
+                rural: Rural
 
 household_roster:
     dfs:
@@ -31,7 +21,7 @@ household_roster:
         file: ECV09P05.DTA
         idxvars:
             i: hogar
-            pid: thogar
+            pid: caso
         myvars:
             Sex:
                 - sexo
@@ -70,17 +60,7 @@ household_roster:
         idxvars:
             i: hogar
         myvars:
-            v:
-                - region
-                - mapping:
-                    1: Metropolitana
-                    2: Norte
-                    3: Nororiente
-                    4: Suroriente
-                    5: Central
-                    6: Suroccidente
-                    7: Noroccidente
-                    8: Peten
+            v: region
     merge_on:
         - i
     final_index:
@@ -88,4 +68,3 @@ household_roster:
         - v
         - i
         - pid
-
