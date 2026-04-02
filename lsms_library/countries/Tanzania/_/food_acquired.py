@@ -8,9 +8,7 @@ sys.path.append('../../_')
 from lsms_library.local_tools import df_from_orgfile
 import pandas as pd
 import numpy as np
-from tanzania import Waves, add_markets_from_other_features, country, id_walk, waves
-import dvc.api
-from ligonlibrary.dataframes import from_dta
+from tanzania import Waves, id_walk, waves
 import json
 import warnings
 
@@ -31,13 +29,6 @@ x = id_walk(x, updated_ids)
 
 if 'm' in x.columns:
     x = x.drop('m',axis=1)
-
-try:
-    x = add_markets_from_other_features('',x)
-except FileNotFoundError:
-    warnings.warn('No other_features.parquet found.')
-    x['m'] = country
-    x = x.reset_index().set_index(['j','t','m','i'])
 
 # Fix food labels
 fl = df_from_orgfile('CONTENTS.org','food_labels')
@@ -64,7 +55,7 @@ if len(xtra_labels):
 
 x = x.loc[~x.index.duplicated(),:]
 x = x.rename(index=fl,level='i')
-x = x.reset_index().set_index(['j','t','m','i'])
+x = x.reset_index().set_index(['j','t','i'])
 
 # Drop any observations with NaN in the index
 idx = pd.MultiIndex.from_frame(pd.DataFrame(x.index.to_list(),columns=x.index.names).dropna())
