@@ -27,3 +27,7 @@ Actionable items should also be filed on GitHub (`gh issue list --repo ligon/LSM
 - Wave-level `dvc.yaml` files predate the `data_root()` migration and no longer work correctly.
 - The 2005-06 stage poisons the country-level cache with single-wave results.
 - **Recommended fix:** Remove wave-level `dvc.yaml` files and `var/` directories. See GitHub #120.
+## 2026-04-01 22:19:00Z GhanaLSS – cluster_features
+
+- Waves: 1987-88, 1988-89, 1991-92, 1998-99, 2005-06, 2012-13, 2016-17
+- Error: `StageFileDoesNotExistError: '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.claude/worktrees/agent-af33830a/lsms_library/countries/CotedIvoire/1986-87/Data/F09D1C.DAT.dvc' does not exist`
