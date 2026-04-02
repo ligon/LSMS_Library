@@ -77,14 +77,19 @@ assets:
 
 interview_date:
     file: s00_me_ben2018.dta
-shocks:
-    file: s14_me_ben2018.dta
     idxvars:
         i:
             - grappe
             - menage
     myvars:
         int_t: s00q23a
+
+shocks:
+    file: s14_me_ben2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
         Shock: s14q01
     myvars:
         AffectedIncome:

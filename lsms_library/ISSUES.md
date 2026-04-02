@@ -31,3 +31,27 @@ Actionable items should also be filed on GitHub (`gh issue list --repo ligon/LSM
 
 - Waves: 1987-88, 1988-89, 1991-92, 1998-99, 2005-06, 2012-13, 2016-17
 - Error: `StageFileDoesNotExistError: '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.claude/worktrees/agent-af33830a/lsms_library/countries/CotedIvoire/1986-87/Data/F09D1C.DAT.dvc' does not exist`
+## 2026-04-02 06:11:01Z Albania – household_roster
+
+- Waves: 1996, 2002, 2003, 2004, 2005, 2008, 2012
+- Error: `FileNotFoundError: [Errno 2] No such file or directory: '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Albania/1996/_'`
+## 2026-04-02 06:13:01Z Armenia – household_roster
+
+- Waves: 1996
+- Error: `TimeoutError: Timed out after 120 seconds`
+## 2026-04-02 06:13:40Z Guatemala – household_roster
+
+- Waves: 2000
+- Error: `TypeError: Categorical is not ordered for operation max
+you can use .as_ordered() to change the Categorical to an ordered one
+`
+## 2026-04-02 06:21:54Z Guatemala – household_roster
+
+- Waves: 2000
+- Error: `TypeError: Categorical is not ordered for operation max
+you can use .as_ordered() to change the Categorical to an ordered one
+`
+## 2026-04-02 06:32:07Z Senegal – food_acquired
+
+- Waves: 2018-19
+- Error: `IndexError: index 2 is out of bounds for axis 0 with size 2`

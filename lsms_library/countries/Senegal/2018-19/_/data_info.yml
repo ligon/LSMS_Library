@@ -39,14 +39,14 @@ household_roster:
         v:
           - vague
           - grappe
-        i: 
+        i:
           - vague
           - grappe
           - menage
         pid: s01q00a
     myvars:
         Sex: s01q01
-        Age: 
+        Age:
           - s01q04a
           - s01q03a
           - s01q03b
@@ -58,7 +58,7 @@ household_roster:
           v:
             - vague
             - grappe
-          i: 
+          i:
             - vague
             - grappe
             - menage
@@ -75,18 +75,7 @@ household_roster:
 shocks:
     file: s14_me_sen2018.dta
     idxvars:
-food_acquired:
-    file: s07b_me_sen2018.dta
-    idxvars:
-        v:
-            - vague
-            - grappe
-        visit: vague
-assets:
-    file: s12_me_sen2018.dta
-    idxvars:
         i:
-            - vague
             - grappe
             - menage
         Shock: s14q01
@@ -145,12 +134,32 @@ assets:
         Cope24: s14q05__24
         Cope25: s14q05__25
         Cope26: s14q05__26
+
+food_acquired:
+    file: s07b_me_sen2018.dta
+    idxvars:
+        v:
+            - vague
+            - grappe
+        visit: vague
+        i:
+            - vague
+            - grappe
+            - menage
         j: s07bq01
         u: s07bq03b
     myvars:
         Quantity: s07bq03a
         Expenditure: s07bq08
         Produced: s07bq04
+
+assets:
+    file: s12_me_sen2018.dta
+    idxvars:
+        i:
+            - vague
+            - grappe
+            - menage
         j: s12q01
     myvars:
         Quantity: s12q03
