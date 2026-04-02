@@ -365,6 +365,7 @@ When using the Agent tool to dispatch work to subagents (especially with `isolat
 - **Prefix heavy Python with `nice -n 10`** to keep the node responsive for interactive work.
 - **The Python venv is at the repo root** (`/path/to/LSMS_Library/.venv/bin/python`), not in the worktree. Set `PYTHONPATH` to the worktree so development-branch code is picked up.
 - **Use the message channel** (`slurm_logs/build_{date}/MESSAGES.txt`) for steering instructions. Agents should check it periodically.
+- **DVC lock contention**: Parallel agents sharing the DVC root (`lsms_library/countries/.dvc/`) can leave stale locks. If you see "Unable to acquire lock", check `lsms_library/countries/.dvc/tmp/lock` — if no `dvc` process is running (`ps aux | grep dvc`), delete the lock file. The library gracefully falls back to manual aggregation but is slower.
 
 ## Cache vs API Transformations
 
