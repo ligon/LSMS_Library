@@ -1834,7 +1834,7 @@ class Country:
                         if isinstance(roster, pd.DataFrame) and not roster.empty:
                             # Determine final_index from available index levels
                             idx = list(roster.index.names)
-                            final_index = [n for n in ['i', 't', 'm'] if n in idx]
+                            final_index = [n for n in ['t', 'v', 'i', 'm'] if n in idx]
                             if not final_index:
                                 final_index = [n for n in idx if n != 'pid']
                             result = roster_to_characteristics(
