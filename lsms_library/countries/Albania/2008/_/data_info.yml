@@ -3,7 +3,7 @@ Wave: 2008
 
 household_roster:
     file:
-        - ../Data/Modul_1A_household_roster.dta
+        - ../Data/Modul_1A_household_roster.sav
 
     idxvars:
         v: psu
