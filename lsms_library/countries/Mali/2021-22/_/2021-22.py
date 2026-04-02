@@ -70,7 +70,7 @@ def panel_ids(df):
     df = df[(df.index.get_level_values('visit') == '2') & (df['in_previous_wave'] == 1)]
     def previous_i(value):
 
-        return (format_id(value[0]) or '') + '0' + (format_id(value[1], zeropadding=2) or '')
+        return (format_id(value.iloc[0]) or '') + '0' + (format_id(value.iloc[1], zeropadding=2) or '')
     df['previous_i'] = df[['previous_v', 'previous_hid']].apply(previous_i, axis=1)
     df = df.reset_index().loc[:, ['i', 'previous_i']].drop_duplicates().set_index('i')
     return df

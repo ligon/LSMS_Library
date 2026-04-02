@@ -16,7 +16,7 @@ def i(value):
     Formatting household id
     '''
     if type(value) == pd.Series:
-        return tools.format_id(value[0])+'/'+tools.format_id(value[1],zeropadding=2)
+        return tools.format_id(value.iloc[0])+'/'+tools.format_id(value.iloc[1],zeropadding=2)
     else:
         return tools.format_id(value)
 
@@ -28,7 +28,7 @@ def Sex(value):
     if pd.isna(value):
         return pd.NA
     else:
-        return value[0].upper()[0]
+        return str(value).upper()[0]
 
 def Age(value):
     '''

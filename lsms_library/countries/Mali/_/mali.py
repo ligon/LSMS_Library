@@ -8,22 +8,22 @@ def i(value):
     '''
     Formatting household id
     '''
-    return tools.format_id(value[0])+'0'+tools.format_id(value[1],zeropadding=2)
+    return tools.format_id(value.iloc[0])+'0'+tools.format_id(value.iloc[1],zeropadding=2)
 
 def pid(value):
     '''
     Formatting person id
     '''
-    return tools.format_id(value[0])+'0'+tools.format_id(value[1],zeropadding=2)+'0'+tools.format_id(value[2],zeropadding=2)
+    return tools.format_id(value.iloc[0])+'0'+tools.format_id(value.iloc[1],zeropadding=2)+'0'+tools.format_id(value.iloc[2],zeropadding=2)
 
 def Sex(value):
     '''
-    Formatting sex veriable
+    Formatting sex variable
     '''
     if pd.isna(value) or value == 'Manquant':
         return pd.NA
     else:
-        return value[0].upper()[0]
+        return str(value).upper()[0]
 
 def Age(value):
     '''
