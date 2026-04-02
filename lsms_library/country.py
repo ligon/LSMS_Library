@@ -1799,7 +1799,7 @@ class Country:
         derived automatically via transformations.  Similarly, household_characteristics
         can be derived from household_roster via roster_to_characteristics.
         '''
-        if name in self.data_scheme:
+        if name in self.data_scheme or name in self._FOOD_DERIVED or name in self._ROSTER_DERIVED:
             def method(waves=None, market=None):
                 # For derived food tables, try deriving from food_acquired first
                 # before falling back to wave-level scripts / make
