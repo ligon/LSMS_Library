@@ -23,6 +23,7 @@ Data Scheme:
     index: (t, v, i, pid)
     Sex: str
     Age: int
+    Relationship: str
     Generation: int
     Distance: int
     Affinity: str
@@ -30,6 +31,7 @@ Data Scheme:
   panel_ids:
     index: (t, i)
     previous_i: str
+    materialize: make
 
   assets:
     index: (t, i, j)
@@ -44,4 +46,3 @@ Data Scheme:
   food_prices: !make
   food_quantities: !make
   nutrition: !make
-  panel_ids: !make

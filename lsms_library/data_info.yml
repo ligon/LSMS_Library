@@ -108,8 +108,6 @@ Columns:
 # Spellings that must never appear in column names.  Key is the rejected
 # spelling; value is the canonical replacement.
 Rejected Spellings:
-  Relation: Generation, Distance, Affinity
-  Relationship: Generation, Distance, Affinity
   Effected: Affected
   Highest_education: Educational Attainment
   Highest Education: Educational Attainment

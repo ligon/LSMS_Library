@@ -78,6 +78,15 @@ def panel_ids(df):
     return df[['previous_i']]
 
 
+def Age(value):
+    '''
+    Formatting age variable to numeric.
+    '''
+    try:
+        return float(value)
+    except (ValueError, TypeError):
+        return np.nan
+
 def age_sex_composition(df, sex, sex_converter, age, age_converter, hhid):
     Age_ints = ((0,4),(4,9),(9,14),(14,19),(19,31),(31,51),(51,100))
     testdf = get_household_roster(df, sex=sex, sex_converter=sex_converter,

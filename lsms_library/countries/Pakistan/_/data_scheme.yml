@@ -4,6 +4,7 @@ Data Scheme:
   cluster_features:
     index: (t, v)
     Region: str
+    Rural: str
     Language: str
 
   household_roster:

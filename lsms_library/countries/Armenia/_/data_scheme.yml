@@ -5,4 +5,8 @@ Data Scheme:
     index: (i, pid)
     Sex: int
     Age: int
+    Relationship: str
+    Generation: int
+    Distance: int
+    Affinity: str
     Marital: int
