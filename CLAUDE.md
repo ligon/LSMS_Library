@@ -354,11 +354,40 @@ This codebase targets pandas 3.0+. Follow these rules in all new and modified co
 - **Use `.bfill()` / `.ffill()`, not `.fillna(method=...)`**: The `method` parameter was removed in pandas 2.0.
 - **No chained indexing for writes**: Copy-on-Write (CoW) is default in pandas 3.0. `df[mask]['col'] = val` silently fails. Use `df.loc[mask, 'col'] = val` instead. For reads, prefer `df.loc[mask, 'col'].iloc[0]` over `df.loc[mask, :]['col'][0]`.
 - **No mutating views**: Do not modify DataFrames obtained from `_get_numeric_data()`, `select_dtypes()`, or `groupby()` and expect changes to propagate. Work on `df` directly or assign results back explicitly.
+- **Use `.iloc[]` for positional Series access**: `value[0]` is deprecated for integer keys on Series. Use `value.iloc[0]`. This affects all formatting functions that receive multi-column composite values (e.g., `i()`, `pid()`, `Age()` in EHCVM countries).
+
+## `other_features` Is Obsolete --- Use `cluster_features`
+
+Legacy scripts used `other_features.parquet` to join market/region (`m`) into food and shocks data. This is **fully replaced** by `cluster_features` + `_add_market_index()` at query time. Do not read `other_features.parquet` in new code. The `m` index should NOT be baked into cached parquets --- it is added on demand when the user passes `market='Region'` to a table method.
+
+If a wave-level script genuinely needs region for data processing (e.g., Malawi's region-specific unit conversion factors), read from the cover page `.dta` file directly, not from `other_features.parquet`.
+
+## EHCVM Countries: `v` Is Just `grappe`
+
+In EHCVM surveys (Senegal, Mali, Niger, Burkina Faso, Benin, Togo, Guinea-Bissau), each `grappe` (cluster) is visited in exactly one passage (`vague`). The split-sample design means `vague` is redundant for identifying clusters. Use `v: grappe` (not `v: [vague, grappe]`). Similarly, household IDs are `i: [grappe, menage]` (not `[vague, grappe, menage]`).
+
+## `format_id` and Numeric myvars
+
+`format_id` is auto-applied to `idxvars` but **NOT to `myvars`**. If a numeric column (like a cluster ID) comes through as a myvar, it will retain float type and get `.0` suffixes when stringified. Fix by adding a formatting function:
+
+```python
+# In {wave}.py
+from lsms_library.local_tools import format_id
+def v(value):
+    return format_id(value)
+```
+
+The `is_this_feature_sane()` diagnostic now checks for this via `_check_float_stringified_index`.
 
 ## Dispatching Subagents
 
 When using the Agent tool to dispatch work to subagents (especially with `isolation: "worktree"`):
 
+- **Run tests first.** Before dispatching any agents, run `pytest tests/` to establish a baseline. Know what's passing.
+- **Worktree agents run stale code.** Worktrees snapshot the branch at creation time. If you commit a fix and then dispatch a worktree agent, it won't have the fix. Either: (a) commit all fixes before dispatching, or (b) don't use worktrees for build-only tasks --- use `LSMS_BUILD_BACKEND=make` to avoid DVC lock contention instead.
+- **Non-worktree agents can overwrite committed changes.** After agent work completes, always verify with `git diff HEAD` that the working tree matches what's committed. Restore with `git checkout HEAD -- path/` if needed.
+- **S3 credentials don't propagate to worktrees.** The decrypted `s3_creds` file is `.gitignore`d. Agents that need DVC data access must copy it: `cp /main/repo/lsms_library/countries/.dvc/s3_creds $WORKTREE/lsms_library/countries/.dvc/s3_creds`
+- **Clean up worktrees promptly.** Remove worktrees and their branches as soon as the agent's work is merged. Stale worktrees accumulate and confuse git operations.
 - **Subagents do NOT inherit `.claude/skills/`**. They only see what's in their prompt. Tell agents to read the relevant skill files as their first step: e.g., "Read `.claude/skills/add-feature/SKILL.md` before starting."
 - **Subagents share the parquet cache** at `~/.local/share/lsms_library/` --- each country writes to its own directory, so concurrent agents building different countries won't conflict.
 - **Subagents should stay in their worktree**. Do not modify the main checkout. If a cross-cutting change is needed, document it and let the manager merge.
