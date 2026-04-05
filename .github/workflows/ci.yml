@@ -23,14 +23,15 @@ jobs:
           LSMS_SKIP_AUTH: "1"
         run: poetry run pytest
 
-  # DVC lockfile freshness — runs on all branches but does not block PRs.
+  # DVC lockfile freshness — detect stale lockfiles and auto-commit fixes.
   # Core library changes (country.py, local_tools.py) dirty every country's
-  # lockfile even when outputs are unchanged; a full rebuild requires S3
-  # data access and 20+ minutes.  Keep this advisory so it doesn't block
-  # routine development.
+  # lockfile even when outputs are unchanged.  The refresh job uses
+  # `dvc commit` to update dep hashes without re-running pipelines.
   dvc-lock-check:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
+    outputs:
+      is_dirty: ${{ steps.check.outputs.is_dirty }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -41,9 +42,52 @@ jobs:
       - name: Install dependencies
         run: poetry install
       - name: Verify DVC lockfiles
+        id: check
         env:
           LSMS_SKIP_AUTH: "1"
-        run: poetry run python -m lsms_library.cli refresh-dvc-locks --all --check
+        run: |
+          if poetry run python -m lsms_library.cli refresh-dvc-locks --all --check; then
+            echo "is_dirty=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_dirty=true" >> "$GITHUB_OUTPUT"
+          fi
+        # Don't fail the job — the refresh job below will fix it
+        continue-on-error: true
+
+  # Auto-refresh stale DVC lockfiles by updating dep hashes (no pipeline re-run).
+  refresh-dvc-locks:
+    runs-on: ubuntu-latest
+    needs: dvc-lock-check
+    if: needs.dvc-lock-check.outputs.is_dirty == 'true'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Need a token that can push back to the repo
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Poetry
+        run: pip install poetry
+      - name: Install dependencies
+        run: poetry install
+      - name: Refresh lockfile hashes
+        env:
+          LSMS_SKIP_AUTH: "1"
+        run: poetry run python -m lsms_library.cli refresh-dvc-locks --all --commit-only
+      - name: Commit and push updated lockfiles
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add lsms_library/countries/*/dvc.lock
+          if git diff --cached --quiet; then
+            echo "No lockfile changes to commit."
+          else
+            git commit -m "ci: refresh DVC lockfiles (dep hashes only)"
+            git push
+          fi
 
   # Build and deploy documentation to GitHub Pages
   docs:
