@@ -39,6 +39,30 @@ people_last7days:
         Boys : CEA01C
         Girls : CEA01D
 
+housing:
+    dfs:
+        - df_housing
+        - df_cluster
+    df_housing:
+        file: ../Data/GSEC9.dta
+        idxvars:
+            i: hhid
+        myvars:
+            Roof: h9q04
+            Floor: h9q06
+    df_cluster:
+        file: GSEC1.dta
+        idxvars:
+            i: hhid
+        myvars:
+            v: parish_name
+    merge_on:
+        - i
+    final_index:
+        - t
+        - v
+        - i
+
 cluster_features:
     file: GSEC1.dta
     idxvars:

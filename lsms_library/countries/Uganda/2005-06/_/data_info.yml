@@ -38,6 +38,30 @@ people_last7days:
         Boys : h14q3
         Girls : h14q4
 
+housing:
+    dfs:
+        - df_housing
+        - df_cluster
+    df_housing:
+        file: ../Data/GSEC11.dta
+        idxvars:
+            i: HHID
+        myvars:
+            Roof: h11q4a
+            Floor: h11q6a
+    df_cluster:
+        file: GSEC1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            v: comm
+    merge_on:
+        - i
+    final_index:
+        - t
+        - v
+        - i
+
 cluster_features:
     file: GSEC1.dta
     idxvars:
