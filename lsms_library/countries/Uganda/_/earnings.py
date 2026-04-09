@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 from uganda import Waves, id_walk
 import json
+import lsms_library as ll
 
 
 x = {}
@@ -25,6 +26,12 @@ x = pd.DataFrame({'earnings':x.stack()})
 updated_ids = json.load(open('updated_ids.json'))
 x = id_walk(x,updated_ids)
 
-x = x.reset_index().set_index(['i','t'])
+# Join v from cluster_features
+uga = ll.Country('Uganda', preload_panel_ids=False, verbose=False)
+cf = uga.cluster_features()
+v_lookup = cf.reset_index()[['i', 't', 'v']].drop_duplicates(['i', 't']).set_index(['i', 't'])['v']
+x = x.join(v_lookup)
+
+x = x.reset_index().set_index(['t', 'v', 'i'])
 
 to_parquet(x, '../var/earnings.parquet')

@@ -38,6 +38,30 @@ people_last7days:
         Boys : T6FQ01c
         Girls : T6FQ01d
 
+housing:
+    dfs:
+        - df_housing
+        - df_cluster
+    df_housing:
+        file: ../Data/GSEC9_1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            Roof: h9q4
+            Floor: h9q6
+    df_cluster:
+        file: ../Data/GSEC1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            v: h1aq4a
+    merge_on:
+        - i
+    final_index:
+        - t
+        - v
+        - i
+
 cluster_features:
     file: ../Data/GSEC1.dta
     idxvars:

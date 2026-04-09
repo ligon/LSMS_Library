@@ -30,7 +30,10 @@ Data Scheme:
     Educational Attainment: str
 
   shocks: !make
-  earnings: !make
+  earnings:
+    materialize: make
+    index: (t, v, i)
+    earnings: float
   food_acquired: !make
   nutrition: !make
   interview_date: !make
@@ -38,12 +41,17 @@ Data Scheme:
   food_expenditures: !make
   food_prices: !make
   panel_ids: !make
-  income: !make
-  enterprise_income: !make
+  income:
+    materialize: make
+    index: (t, v, i)
+    income: float
+  enterprise_income:
+    materialize: make
+    index: (t, v, i)
   locality: !make
   assets: !make
   housing:
-    index: (j, t)
+    index: (t, v, i)
     Roof: str
     Floor: str
   nonfood_expenditures: !make
