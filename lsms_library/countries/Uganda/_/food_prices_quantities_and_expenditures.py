@@ -2,15 +2,24 @@
 from lsms_library.local_tools import to_parquet
 from lsms_library.local_tools import get_dataframe
 """Calculate food prices for different items across rounds; allow
-different prices for different units.  
+different prices for different units.
 """
 import pandas as pd
 import numpy as np
 import json
+import lsms_library as ll
 
-v = get_dataframe('../var/food_acquired.parquet')
+fa = get_dataframe('../var/food_acquired.parquet')
 
-# Drop expenditures
+# Join cluster (v) from household_roster (which carries v per household)
+uga = ll.Country('Uganda', preload_panel_ids=False, verbose=False)
+roster = uga.household_roster()
+v_lookup = roster.reset_index()[['i', 't', 'v']].drop_duplicates(['i', 't']).set_index(['i', 't'])['v']
+fa = fa.join(v_lookup)
+fa = fa.dropna(subset=['v'])
+fa = fa.reset_index().set_index(['i', 't', 'v', 'j', 'u'])
+
+# Column groups
 prices = ['market', 'farmgate', 'unitvalue_home', 'unitvalue_away', 'unitvalue_own',
           'unitvalue_inkind', 'market_home', 'market_away', 'market_own']
 
@@ -18,12 +27,12 @@ quantities =  ['quantity_home', 'quantity_away', 'quantity_own', 'quantity_inkin
 
 expenditures = ['value_home', 'value_away', 'value_own', 'value_inkind']
 
-x = v.groupby(['i','t','m','j'])[expenditures].sum()
+x = fa.groupby(['i','t','v','j'])[expenditures].sum()
 x = x.sum(axis=1).replace(0,np.nan).dropna()
 
 to_parquet(pd.DataFrame({'x':x}), '../var/food_expenditures.parquet')
 
-v = v[prices + quantities]
+pq = fa[prices + quantities]
 
 with open('kgs_per_other_units.json','r') as f:
     d = json.load(f)
@@ -32,18 +41,18 @@ kgs = pd.Series(d)
 kgs.index.name = 'u'
 kgs.name = 'Kgs/unit'
 
-kgs = kgs.reindex(v.index,level='u')
+kgs = kgs.reindex(pq.index,level='u')
 kgs = kgs[kgs!=0]
 
 # Convert other units to kilograms, where possible
-p = v[prices]
+p = pq[prices]
 p = p.divide(kgs,axis=0)
 
-q = v[quantities]
+q = pq[quantities]
 q = q.multiply(kgs,axis=0)
 
 # What units were converted?
-tokg = {k:'Kg' for k,v in d.items() if np.isreal(v)}
+tokg = {k:'Kg' for k,val in d.items() if np.isreal(val)}
 
 p = p.rename(index=tokg,level='u')
 q = q.rename(index=tokg,level='u')

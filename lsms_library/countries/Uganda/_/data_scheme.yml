@@ -38,7 +38,10 @@ Data Scheme:
   nutrition: !make
   interview_date: !make
   food_quantities: !make
-  food_expenditures: !make
+  food_expenditures:
+    materialize: make
+    index: (i, t, v, j)
+    x: float
   food_prices: !make
   panel_ids: !make
   income:
