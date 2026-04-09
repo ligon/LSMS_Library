@@ -841,8 +841,8 @@ class Country:
         else:
             raise KeyError(f"{year} is not a valid wave for {self.name}")
 
-    def _market_lookup(self, column: str = 'Region') -> pd.Series:
-        """Return a cached (i, t) -> m mapping derived from cluster_features.
+    def _market_lookup(self, column: str = 'Region') -> pd.DataFrame:
+        """Return a cached (t, v) -> m mapping derived from cluster_features.
 
         Parameters
         ----------
@@ -852,8 +852,8 @@ class Country:
 
         Returns
         -------
-        pd.Series
-            Indexed by ``(i, t)`` with values being the market label ``m``.
+        pd.DataFrame
+            With columns ``t``, ``v``, ``m``.
         """
         cache_key = f"_market_lookup_cache_{column}"
         cached = getattr(self, cache_key, None)
@@ -899,15 +899,12 @@ class Country:
                 f"Available: {available}"
             )
 
-        lookup = (cf[['i', 't', column]]
+        lookup = (cf[['t', 'v', column]]
                   .dropna(subset=[column])
-                  .drop_duplicates(subset=['i', 't'])
-                  .set_index(['i', 't'])[column]
-                  .rename('m'))
-        # Strip whitespace; trust upstream casing from cluster_features
-        lookup = lookup.astype(str).str.strip()
-        # Drop any residual 'nan' strings from stringification of missing values
-        lookup = lookup[lookup != 'nan']
+                  .drop_duplicates(subset=['t', 'v']))
+        lookup = lookup.rename(columns={column: 'm'})
+        lookup['m'] = lookup['m'].astype(str).str.strip()
+        lookup = lookup[lookup['m'] != 'nan']
 
         setattr(self, cache_key, lookup)
         return lookup
@@ -915,21 +912,56 @@ class Country:
     def _add_market_index(self, df: pd.DataFrame, column: str = 'Region') -> pd.DataFrame:
         """Join a market identifier ``m`` from cluster_features onto *df*.
 
-        *df* must have ``i`` and ``t`` in its index.  Returns *df* with
-        ``m`` added as an additional index level.
+        When *df* has ``v`` (cluster) in its index the join goes through
+        ``(t, v)`` — this is the preferred path and avoids panel-ID
+        mismatches.  Falls back to ``(i, t)`` via household_roster when
+        ``v`` is not available.
+
+        Returns *df* with ``m`` added and ``v`` removed from the index.
         """
         lookup = self._market_lookup(column)
         idx_names = list(df.index.names)
         flat = df.reset_index()
-        # Ensure merge keys have compatible dtypes (library convention: string IDs)
-        for key in ['i', 't']:
-            if key in flat.columns:
-                flat[key] = flat[key].astype(str)
-        lkup = lookup.reset_index()
-        for key in ['i', 't']:
-            if key in lkup.columns:
-                lkup[key] = lkup[key].astype(str)
-        flat = flat.merge(lkup, on=['i', 't'], how='left')
+
+        def _normalize_v(series):
+            """Normalize cluster IDs to strings, stripping .0 from floats."""
+            def _norm(x):
+                if pd.isna(x) or x == '':
+                    return pd.NA
+                try:
+                    return str(int(float(x)))
+                except (ValueError, OverflowError):
+                    return str(x).strip()
+            return series.map(_norm)
+
+        if 'v' in flat.columns:
+            # Preferred path: join on (t, v) directly
+            flat['t'] = flat['t'].astype(str)
+            flat['v'] = _normalize_v(flat['v'])
+            lkup = lookup.copy()
+            lkup['t'] = lkup['t'].astype(str)
+            lkup['v'] = _normalize_v(lkup['v'])
+            flat = flat.merge(lkup, on=['t', 'v'], how='left')
+        else:
+            # Fallback: get v from household_roster, then join
+            roster = self.household_roster()
+            v_map = (roster.reset_index()[['i', 't', 'v']]
+                     .drop_duplicates(['i', 't']))
+            v_map['v'] = _normalize_v(v_map['v'])
+            for key in ['i', 't']:
+                if key in flat.columns:
+                    flat[key] = flat[key].astype(str)
+            v_map['i'] = v_map['i'].astype(str)
+            v_map['t'] = v_map['t'].astype(str)
+            flat = flat.merge(v_map, on=['i', 't'], how='left')
+            flat['v'] = _normalize_v(flat['v'])
+            lkup = lookup.copy()
+            lkup['t'] = lkup['t'].astype(str)
+            lkup['v'] = _normalize_v(lkup['v'])
+            flat = flat.merge(lkup, on=['t', 'v'], how='left')
+            if 'v' not in idx_names and 'v' in flat.columns:
+                flat = flat.drop(columns=['v'])
+
         flat = flat.dropna(subset=['m'])
         # Drop village/cluster index (v) since m supersedes it
         if 'v' in idx_names:
