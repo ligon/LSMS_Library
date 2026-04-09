@@ -12,10 +12,10 @@ This skill provides domain-specific guidance for adding the `shocks` table to an
 ```yaml
 shocks:
     index: (t, i, Shock)
-    EffectedIncome: bool
-    EffectedAssets: bool
-    EffectedProduction: bool
-    EffectedConsumption: bool
+    AffectedIncome: bool
+    AffectedAssets: bool
+    AffectedProduction: bool
+    AffectedConsumption: bool
     HowCoped0: str
     HowCoped1: str
     HowCoped2: str
@@ -51,10 +51,10 @@ Most LSMS-ISA shocks modules follow this structure:
 |--------|-----------------|-------------|
 | Shock (index) | `hh_u0a` | Shock type (categorical) |
 | — (filter) | `hh_u01` | Whether experienced (Yes/No) |
-| EffectedIncome | `hh_u03a` | Effect on income |
-| EffectedAssets | `hh_u03b` | Effect on assets |
-| EffectedProduction | `hh_u03c` | Effect on food production |
-| EffectedConsumption | `hh_u03d` | Effect on food consumption |
+| AffectedIncome | `hh_u03a` | Effect on income |
+| AffectedAssets | `hh_u03b` | Effect on assets |
+| AffectedProduction | `hh_u03c` | Effect on food production |
+| AffectedConsumption | `hh_u03d` | Effect on food consumption |
 | HowCoped0 | `hh_u04a` | First coping strategy |
 | HowCoped1 | `hh_u04b` | Second coping strategy |
 | HowCoped2 | `hh_u04c` | Third coping strategy |
@@ -62,7 +62,7 @@ Most LSMS-ISA shocks modules follow this structure:
 The effect variables typically have three values that must be mapped to boolean:
 
 ```yaml
-EffectedIncome:
+AffectedIncome:
     - hh_u03a
     - mapping:
         Decrease: True
@@ -80,7 +80,7 @@ EffectedIncome:
 
 Some earlier surveys (e.g., Malawi 2004-05) combine income and asset effects into a single variable:
 
-| Value | EffectedIncome | EffectedAssets |
+| Value | AffectedIncome | AffectedAssets |
 |-------|---------------|---------------|
 | "Income loss" | True | False |
 | "Asset loss" | False | True |
@@ -89,13 +89,13 @@ Some earlier surveys (e.g., Malawi 2004-05) combine income and asset effects int
 Handle by referencing the same source column twice with different mappings:
 
 ```yaml
-EffectedIncome:
+AffectedIncome:
     - ab04
     - mapping:
         Income loss: True
         Asset loss: False
         Loss of both: True
-EffectedAssets:
+AffectedAssets:
     - ab04
     - mapping:
         Income loss: False
@@ -103,7 +103,7 @@ EffectedAssets:
         Loss of both: True
 ```
 
-Columns not available in the older instrument (e.g., `EffectedProduction`, `EffectedConsumption`) will naturally be NaN — this is expected and correct.
+Columns not available in the older instrument (e.g., `AffectedProduction`, `AffectedConsumption`) will naturally be NaN — this is expected and correct.
 
 ### Uganda pattern (derived fields)
 
