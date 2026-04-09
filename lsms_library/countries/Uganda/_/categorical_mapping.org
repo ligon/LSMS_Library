@@ -194,3 +194,61 @@
 | 1743 | Jackfruit (fresh)              | Jackfruit          |
 | 1761 | Soybeans (fresh)               | Soybean            |
 | 1762 | Soybeans (dry)                 | Soybean            |
+
+#+name: Roof
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| Iron sheets        | Iron Sheets     |
+| iron sheets        | Iron Sheets     |
+| Tin                | Iron Sheets     |
+| tin                | Iron Sheets     |
+| Thatch             | Thatch          |
+| Thatch, Straw      | Thatch          |
+| Thatch, straw      | Thatch          |
+| thatch,straw       | Thatch          |
+| Tiles              | Tiles           |
+| tiles              | Tiles           |
+| Cement             | Cement          |
+| cement             | Cement          |
+| Cement screed      | Cement          |
+| Concrete           | Concrete        |
+| Concrete/ Cement   | Concrete        |
+| Concrete/cement    | Concrete        |
+| Asbestos           | Asbestos        |
+| asbestos           | Asbestos        |
+| Earth              | Earth           |
+| earth              | Earth           |
+| Mud                | Mud             |
+| mud                | Mud             |
+| Wood, Planks       | Wood            |
+| wood,planks        | Wood            |
+| Other              | Other           |
+| other              | Other           |
+| Other (specify)    | Other           |
+
+#+name: Floor
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| Earth              | Earth           |
+| earth              | Earth           |
+| Rammed earth       | Earth           |
+| Earth and cow dung | Earth           |
+| earth and cow dung | Earth           |
+| Cement             | Cement          |
+| cement             | Cement          |
+| Cement screed      | Cement          |
+| Concrete           | Concrete        |
+| Concrete/ Cement   | Concrete        |
+| Concrete/cement    | Concrete        |
+| Tiles              | Tiles           |
+| tiles              | Tiles           |
+| Mosaic or tiles    | Tiles           |
+| mosaic or tiles    | Tiles           |
+| Stone              | Stone           |
+| stone              | Stone           |
+| Bricks             | Bricks          |
+| bricks             | Bricks          |
+| Wood               | Wood            |
+| Other              | Other           |
+| other              | Other           |
+| Other (specify)    | Other           |
