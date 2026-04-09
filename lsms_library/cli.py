@@ -450,6 +450,12 @@ def refresh_dvc_locks(
         "--check/--update",
         help="Only verify that lockfiles are up to date (no repro runs).",
     ),
+    commit_only: bool = typer.Option(
+        False,
+        "--commit-only",
+        help="Update lockfile hashes with `dvc commit` (no pipeline re-run). "
+        "Use when deps changed but outputs are still valid.",
+    ),
     dry_run: bool = typer.Option(
         False,
         "--dry-run/--execute",
@@ -505,6 +511,29 @@ def refresh_dvc_locks(
         if dirty:
             raise typer.Exit(1)
         typer.echo("All requested lockfiles are up to date.")
+        return
+
+    if commit_only:
+        for name, dvc_file in targets:
+            rel = dvc_file.relative_to(countries_dir).as_posix()
+            status = _collect_dvc_status(rel, countries_dir)
+            if not status:
+                typer.echo(f"[CLEAN] {name}")
+                continue
+            stage_ref = f"{rel}:materialize"
+            cmd = ["commit", "--force", stage_ref]
+            preview = " ".join(["dvc", *cmd])
+            typer.echo(f"[COMMIT] {name}: {preview}")
+            if dry_run:
+                continue
+            subprocess.run(
+                _dvc_cmd(*cmd),
+                cwd=countries_dir,
+                check=True,
+                stdout=sys.stderr,
+                stderr=sys.stderr,
+            )
+            typer.echo(f"[DONE] {name}")
         return
 
     for name, dvc_file in targets:
