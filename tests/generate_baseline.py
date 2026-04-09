@@ -42,12 +42,16 @@ def fingerprint(df: pd.DataFrame) -> dict:
     }
 
 
-def build_manifest(uganda_root: Path) -> dict:
-    """Walk all parquets under uganda_root and fingerprint each."""
-    manifest = {}
-    parquets = sorted(uganda_root.rglob("*.parquet"))
+def build_manifest(uganda_root: Path, data_root_path: Path | None = None) -> dict:
+    """Walk all parquets under uganda_root (and optionally data_root) and fingerprint each.
 
-    for pq in parquets:
+    Mirrors the test's search logic: in-tree first, data_root as fallback.
+    For each unique relative path, the in-tree version takes precedence.
+    """
+    manifest = {}
+
+    # First pass: in-tree parquets (take precedence)
+    for pq in sorted(uganda_root.rglob("*.parquet")):
         rel = str(pq.relative_to(uganda_root))
         try:
             df = pd.read_parquet(pq, engine="pyarrow")
@@ -56,12 +60,24 @@ def build_manifest(uganda_root: Path) -> dict:
             print(f"WARNING: Could not read {rel}: {e}", file=sys.stderr)
             manifest[rel] = {"error": str(e)}
 
+    # Second pass: data_root parquets (only for paths not already in manifest)
+    if data_root_path and data_root_path.is_dir():
+        for pq in sorted(data_root_path.rglob("*.parquet")):
+            rel = str(pq.relative_to(data_root_path))
+            if rel not in manifest:
+                try:
+                    df = pd.read_parquet(pq, engine="pyarrow")
+                    manifest[rel] = fingerprint(df)
+                except Exception as e:
+                    print(f"WARNING: Could not read {rel}: {e}", file=sys.stderr)
+                    manifest[rel] = {"error": str(e)}
+
     return manifest
 
 
 def main():
     if len(sys.argv) < 2:
-        print(f"Usage: {sys.argv[0]} /path/to/countries/Uganda", file=sys.stderr)
+        print(f"Usage: {sys.argv[0]} /path/to/countries/Uganda [/path/to/data_root/Uganda]", file=sys.stderr)
         sys.exit(1)
 
     uganda_root = Path(sys.argv[1]).resolve()
@@ -69,7 +85,19 @@ def main():
         print(f"Not a directory: {uganda_root}", file=sys.stderr)
         sys.exit(1)
 
-    manifest = build_manifest(uganda_root)
+    # Optional second arg: data_root path for wave-level parquets
+    data_root_path = None
+    if len(sys.argv) >= 3:
+        data_root_path = Path(sys.argv[2]).resolve()
+    else:
+        # Auto-detect data_root if lsms_library is importable
+        try:
+            from lsms_library.paths import data_root
+            data_root_path = data_root("Uganda")
+        except Exception:
+            pass
+
+    manifest = build_manifest(uganda_root, data_root_path)
 
     fixtures_dir = Path(__file__).resolve().parent / "fixtures"
     fixtures_dir.mkdir(exist_ok=True)
