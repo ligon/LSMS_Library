@@ -526,13 +526,17 @@ def refresh_dvc_locks(
             typer.echo(f"[COMMIT] {name}: {preview}")
             if dry_run:
                 continue
-            subprocess.run(
-                _dvc_cmd(*cmd),
-                cwd=countries_dir,
-                check=True,
-                stdout=sys.stderr,
-                stderr=sys.stderr,
-            )
+            try:
+                subprocess.run(
+                    _dvc_cmd(*cmd),
+                    cwd=countries_dir,
+                    check=True,
+                    stdout=sys.stderr,
+                    stderr=sys.stderr,
+                )
+            except subprocess.CalledProcessError:
+                typer.echo(f"[SKIP] {name}: dvc commit failed (missing outputs?)", err=True)
+                continue
             typer.echo(f"[DONE] {name}")
         return
 
