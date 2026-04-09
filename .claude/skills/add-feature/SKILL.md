@@ -139,7 +139,7 @@ HowCoped0: hh_u04a
 
 **Value mapping (recode categories):**
 ```yaml
-EffectedIncome:
+AffectedIncome:
     - hh_u03a
     - mapping:
         Decrease: True
@@ -154,13 +154,13 @@ EffectedIncome:
 **Dual-column mapping (derive two target columns from one source):**
 Reference the same source variable twice with different mappings:
 ```yaml
-EffectedIncome:
+AffectedIncome:
     - ab04
     - mapping:
         Income loss: True
         Asset loss: False
         Loss of both: True
-EffectedAssets:
+AffectedAssets:
     - ab04
     - mapping:
         Income loss: False
