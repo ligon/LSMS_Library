@@ -1147,6 +1147,9 @@ class Country:
             if method_name:
                 df = _enforce_canonical_spellings(df, method_name)
 
+            # Enforce rejected column-name spellings (e.g. Effected→Affected)
+            df = _enforce_rejected_column_spellings(df)
+
             # Enforce declared dtypes from data_scheme.yml
             if isinstance(scheme_entry, dict):
                 _enforce_declared_dtypes(df, scheme_entry)
@@ -1479,6 +1482,7 @@ class Country:
                     json.dump(result, json_file)
                 logger.debug(f"Writing {method_name} to cache {cache_path}")
             elif isinstance(result, pd.DataFrame):
+                result = _enforce_rejected_column_spellings(result)
                 parquet_path = data_root(self.name) / "_" / f"{method_name}.parquet"
                 parquet_path.parent.mkdir(parents=True, exist_ok=True)
                 to_parquet(result, parquet_path)
@@ -1508,6 +1512,7 @@ class Country:
                     if not stage_infos:
                         df = load_from_waves(waves)
                         if isinstance(df, pd.DataFrame):
+                            df = _enforce_rejected_column_spellings(df)
                             cache_path.parent.mkdir(parents=True, exist_ok=True)
                             to_parquet(df, cache_path)
                             logger.debug(f"Writing {method_name} to cache {cache_path}")
@@ -1550,6 +1555,7 @@ class Country:
                             combined_df = safe_concat_dataframe_dict(non_empty_df)
                         else:
                             combined_df = next(iter(non_empty_df.values()))
+                        combined_df = _enforce_rejected_column_spellings(combined_df)
                         cache_path.parent.mkdir(parents=True, exist_ok=True)
                         to_parquet(combined_df, cache_path)
                         logger.debug(f"Writing {method_name} to cache {cache_path}")
@@ -2061,6 +2067,41 @@ def _enforce_canonical_spellings(df: pd.DataFrame, method_name: str) -> pd.DataF
             df[col] = df[col].replace(variant_map)
         elif isinstance(df.index, pd.MultiIndex) and col in df.index.names:
             df = df.rename(index=variant_map, level=col)
+    return df
+
+
+@lru_cache(maxsize=1)
+def _load_rejected_column_spellings() -> dict[str, str]:
+    """Load the ``Rejected Spellings`` table from ``data_info.yml``.
+
+    Returns ``{rejected_substring: canonical_substring}`` — e.g.
+    ``{"Effected": "Affected"}``.  Applied to **column names**, not values.
+    """
+    info_path = files("lsms_library") / "data_info.yml"
+    with open(info_path, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    return data.get("Rejected Spellings", {}) or {}
+
+
+def _enforce_rejected_column_spellings(df: pd.DataFrame) -> pd.DataFrame:
+    """Rename DataFrame columns that contain a rejected spelling substring.
+
+    Uses the ``Rejected Spellings`` section of ``data_info.yml`` to replace
+    substrings in column names — e.g. ``EffectedIncome`` → ``AffectedIncome``.
+    """
+    rejected = _load_rejected_column_spellings()
+    if not rejected:
+        return df
+    rename_map: dict[str, str] = {}
+    for col in df.columns:
+        new_col = col
+        for bad, good in rejected.items():
+            if bad in new_col:
+                new_col = new_col.replace(bad, good)
+        if new_col != col:
+            rename_map[col] = new_col
+    if rename_map:
+        df = df.rename(columns=rename_map)
     return df
 
 

@@ -8,7 +8,7 @@ license = {text = "CC-BY-4.0"}
 readme = "README.org"
 requires-python = ">=3.11, <4.0"
 dependencies = ["pandas >=2.2",
-             "CFEDemands>=0.7.0",
+             "CFEDemands>=0.8.2",
              "PyYAML >=6.0,<7.0",
              "python-gnupg >=0.5,<1.0",
              "scikit-learn (>=1.7.0,<2.0.0)",
