@@ -285,6 +285,37 @@ Add a **Sampling Design** section to the country's `CONTENTS.org` documenting:
 
 See `lsms_library/countries/Uganda/_/CONTENTS.org` for the reference.
 
-## Reference implementation
+## Multi-country dispatch
 
-Uganda is the reference: `lsms_library/countries/Uganda/` on the `feature/sample-table` branch. All 8 waves configured via YAML, no scripts. Both cross-sectional and panel weight variable names mapped per wave, strata harmonized via `categorical_mapping.org`. Design documented in `CONTENTS.org`.
+When adding `sample` to many countries at once, **dispatch one agent per country**, never batch multiple countries into a single agent. Each country requires data inspection, BID reading, and testing --- these are independent tasks that should run in parallel on separate cores.
+
+```python
+# Good: one agent per country, all launched in one message
+for country in countries_needing_sample:
+    Agent(f"Add sample to {country}", ...)
+
+# Bad: one agent doing 11 countries sequentially
+Agent("Add sample to Armenia, Azerbaijan, ..., Timor-Leste", ...)
+```
+
+To avoid re-doing work, check which countries already have `sample` before dispatching:
+
+```python
+import lsms_library as ll
+from lsms_library.yaml_utils import load_yaml
+
+for yml in ll.paths.COUNTRIES_ROOT.glob('*/_/data_scheme.yml'):
+    ds = load_yaml(yml).get('Data Scheme', {})
+    if 'sample' not in ds:
+        print(f'{yml.parent.parent.name}: needs sample')
+```
+
+Some countries (CLAUDE.md notes Armenia, some Timor-Leste waves) have configs but no microdata on disk. Agents should detect this and skip gracefully rather than failing.
+
+## Reference implementations
+
+- **Uganda**: 8-wave panel with rotating refreshment sample, dual weights. `lsms_library/countries/Uganda/`
+- **Tanzania**: Multi-round file (2008-15 script), booster sample (2020-21), panel-only phone survey (2019-20). `lsms_library/countries/Tanzania/`
+- **GhanaLSS**: 7-wave repeated cross-section spanning 30 years, evolving weight types (self-weighting to expansion). `lsms_library/countries/GhanaLSS/`
+- **Niger**: EHCVM multi-file pattern with varying weight sources per wave. `lsms_library/countries/Niger/`
+- **Burkina Faso**: EHCVM with genuine dual weights in 2021-22 panel ponderation. `lsms_library/countries/Burkina_Faso/`
