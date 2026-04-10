@@ -1,0 +1,263 @@
+#+title: Armenia Integration Plan
+#+date: <2026-04-10 Thu>
+#+author: investigation agent (claude-sonnet-4-6)
+
+* 1. Status Summary
+
+Armenia has a partial stub configuration in the LSMS Library: a country-level
+=data_scheme.yml= declaring a single feature (=household_roster=), a wave
+directory =1996/= with =_/data_info.yml= referencing =../Data/INDSECA.dta=,
+and a =Documentation/= folder with four WB PDFs tracked via DVC. However, no
+=Data/= directory exists, no =.dta= files are present or DVC-tracked, and
+=var/= is empty. The integration is blocked by a data access problem: WB
+catalog entry 2324 is tagged as "data available from external repository"
+rather than directly downloadable via the WB Microdata Library API. The data
+lives on the Armenian Statistical Committee (ARMSTAT) portal at
+=armstat.am=, not in the WB NADA system. This means =add_wave("Armenia",
+"2324")= will not work as-is. Armenia is the only LSMS entry for Armenia in
+the WB catalog (just the 1996 HBS); there are no later ILCS waves in the WB
+LSMS collection. A human must manually obtain the data from ARMSTAT.
+
+* 2. Data Availability
+
+| WB Catalog ID | IDNO                | Year         | Title                                    | Access Mode             | Notes                                              |
+|---------------+---------------------+--------------+------------------------------------------+-------------------------+----------------------------------------------------|
+| 2324          | ARM_1996_HBS_v01_M  | Nov-Dec 1996 | Household Budget Survey 1996             | External repository     | Data hosted at armstat.am, not WB NADA; "Get Microdata" button redirects to armstat.am |
+| (none)        | n/a                 | 1998-99      | ILCS (Integrated Living Conditions Survey) | Unknown (ARMSTAT)      | Not in WB LSMS collection; ARMSTAT portal mentions IDs 205,206,207,208,716 for ILCS waves |
+| (none)        | n/a                 | 2001         | ILCS (likely)                            | Unknown (ARMSTAT)       | Not in WB catalog                                  |
+| (none)        | n/a                 | 2004+        | ILCS subsequent rounds                   | Unknown (ARMSTAT)       | Not in WB catalog                                  |
+
+The WB LSMS search for =country=ARM= returns exactly one entry: catalog 2324.
+No other Armenia surveys appear under the LSMS collection filter. ARMSTAT's
+microdata page (=armstat.am/?nid=171=) lists ILCS databases with IDs 205-208
+and 716, covering multiple waves, but their exact years and download formats
+are not exposed in the HTML without navigating further. ARMSTAT requires
+following a "Procedure for providing microdata" (PDF, Armenian only) to access
+data -- suggesting a registration or request process rather than free download.
+
+** WB catalog 2324 data files (confirmed available once data is obtained)
+
+22 files total:
+- Household-level: HHSECA through HHSECZ (13 files)
+- Individual-level: INDSECA, INDSECB, INDSECC, INDSECD, INDSECL (5 files)
+- Derived: POVLINE, SOCDRY, AGGV_HH, AGGV_IND (4 files)
+
+The data dictionary is publicly readable on the WB site; variable names and
+labels are confirmed.
+
+* 3. Config Assessment
+
+** =data_scheme.yml= (country level)
+
+Declares one feature, =household_roster=, with index =(i, pid)= and columns:
+=Sex= (int), =Age= (int), =Relationship= (str), =Generation= (int),
+=Distance= (int), =Affinity= (str), =Marital= (int).
+
+Issues:
+1. The index lacks =t= (time) and =v= (cluster). All other countries include
+   =t= at minimum. Without =t=, cross-wave stacking fails.
+2. The index lacks =v=. Per CLAUDE.md, =data_scheme.yml= must include =v= in the
+   index if the YAML path joins a cluster column.
+3. =Relationship= and the kinship decomposition columns (=Generation=,
+   =Distance=, =Affinity=) should not both appear in =data_scheme.yml=. Per
+   CLAUDE.md, =Relationship= is the raw source and kinship decomposition is
+   auto-applied at API read time via =_expand_kinship()=. Only =Relationship=
+   should be declared.
+4. =Sex= declared as =int= but the global schema expects string (=M= / =F=).
+   The =data_info.yml= mapping (1→Male, 2→Female) handles conversion, but the
+   scheme declaration should say =str=.
+5. There is no =sample= entry -- needed to participate in the =v=-migration
+   and cross-country sampling analysis.
+6. There is no =Marital= in the canonical =data_info.yml= schema for
+   =household_roster=. It may be fine as an extra column (the library
+   preserves non-canonical columns), but it should be verified.
+
+Recommended fix: revise =data_scheme.yml= to:
+#+begin_example yaml
+Country: Armenia
+Data Scheme:
+  household_roster:
+    index: (t, v, i, pid)
+    materialize: !
+    Sex: str
+    Age: int
+    Relationship: str
+    Marital: str
+  sample:
+    index: (i, t)
+#+end_example
+
+** =1996/_/data_info.yml= (wave level)
+
+The INDSECA variable mapping is verified against the WB public data dictionary:
+
+| data_info.yml reference | WB DDI variable | WB label                       | Match? |
+|-------------------------+-----------------+--------------------------------+--------|
+| i: code                 | code            | Household identification number | YES    |
+| pid: numb               | numb            | ID code for individual members | YES    |
+| Sex: a1_2               | a1_2            | Sex of household members       | YES    |
+| Age: a1_3               | a1_3            | Age of household members       | YES    |
+| Marital: a1_4           | a1_4            | Marital status                 | YES    |
+
+The variable names match. The mapping values (1→Male, 2→Female for Sex; 0-6
+coding for Marital) are plausible for a 1996 ex-Soviet survey. This config is
+*believable* and likely correct (it was probably written by someone who could
+see the data dictionary, which is public on the WB site).
+
+Gaps in =data_info.yml=:
+1. No =Relationship= (head, spouse, child, etc.) mapping, despite =data_scheme.yml=
+   declaring it. The INDSECA DDI shows no explicit =a1_1= relationship variable
+   in the excerpt, but the file has 30 variables total -- relationship may exist
+   as an unnumbered variable or in a different section file.
+2. No =v= (cluster) join. The household-level file HHSECA likely contains the
+   cluster/village identifier. A =dfs:= merge would be needed (same pattern as
+   Uganda gsec1/gsec2 join).
+3. No =t= assignment. The YAML path will auto-assign =t= from the wave
+   directory name (="1996"=), which is fine.
+4. No =sample= table config (none expected for a stub).
+
+** Bottom line on config reusability
+
+The =data_info.yml= is a solid starting point --- the household ID, individual
+ID, sex, age, and marital status variables are verified. Rework required:
+- Add =Relationship= variable (find the column name from the actual Stata file
+  or the full DDI).
+- Add =v= via a =dfs:= merge from a household-level file (HHSECA or similar).
+- Fix =data_scheme.yml= index to include =t= and =v=.
+- Add =sample= table (requires weight and cluster variables from HHSECA).
+
+* 4. Recommended Path Forward
+
+*Option (b): The data is effectively NSO-only; treat Armenia like Nepal.*
+
+Specific steps:
+
+1. *Human obtains data manually.* Navigate to
+   =https://www.armstat.am/en/?nid=171= (or follow the "Procedure for
+   providing microdata" PDF from ARMSTAT). Register and request the 1996 HBS
+   microdata. The expected files are the 22 =.dta= files listed in the WB DDI
+   (INDSECA, HHSECA, etc.). If ARMSTAT no longer distributes 1996 data,
+   contact =ligon@berkeley.edu= for alternatives.
+
+2. *Once files are on disk*, run:
+   #+begin_src sh
+   cd lsms_library/countries
+   dvc add Armenia/1996/Data/*.dta
+   dvc push
+   #+end_src
+   Use =.venv/bin/dvc= and ensure =.dvc/config.local= has write credentials.
+
+3. *Fix =data_scheme.yml=* per the issues in §3 above (add =t=, =v=,
+   correct =Sex= type, remove redundant kinship decomposition columns).
+
+4. *Extend =data_info.yml=* to add =Relationship= and the =dfs:= merge for =v=.
+   Inspect the actual =HHSECA.dta= to find the PSU/cluster variable name.
+
+5. *Add =sample= table.* Look for sampling weight in HHSECA or HHSECZ
+   (aggregate file). The 1996 HBS used stratified multi-stage sampling across
+   ~128 PSUs (100 villages + 28 towns). Weight variable name is unknown without
+   the data.
+
+6. *Test:*
+   #+begin_src python
+   import lsms_library as ll
+   c = ll.Country('Armenia')
+   print(c.waves)          # should show ['1996']
+   df = c.household_roster()
+   print(df.head())
+   #+end_src
+
+7. *Decide on scope.* The 1996 HBS is the only Armenia entry in the WB LSMS
+   collection, but ARMSTAT has multiple ILCS waves (1998-99 onwards). If
+   later waves are in scope, contact ARMSTAT for each. The library can support
+   multiple waves once the country infrastructure is set up.
+
+** Why not Option (a) (=add_wave= via API)?
+
+The WB catalog page for 2324 explicitly says "Data available from external
+repository" and the "Get Microdata" button redirects to =armstat.am=, not the
+WB NADA download endpoint. The =add_wave()= function calls the WB NADA API
+(=https://microdata.worldbank.org/index.php/api/catalog/{id}/datafiles=),
+which will return no downloadable files for catalog 2324. Running it would
+result in an empty Data/ directory.
+
+** Why not Option (c) (remove the stub)?
+
+The config is not dead code. It represents real work (someone consulted the
+DDI and wrote correct variable mappings). It should be kept and completed once
+the data question is resolved.
+
+* 5. Open Questions
+
+1. *API key and S3 write access*: The =~/.config/lsms_library/config.yml= on
+   this machine has a =microdata_api_key=, but it will not help for Armenia
+   since the data is external. S3 write credentials (=.dvc/s3_write_creds=)
+   are needed to push the data files once obtained. Confirm availability.
+
+2. *Is Armenia in scope?* The 1996 HBS predates the formal LSMS-ISA program.
+   It is tagged as LSMS in the WB catalog but is not a Living Standards
+   Measurement Study in the strict sense (it's a Household Budget Survey). A
+   human decision is needed on whether this warrants integration effort.
+
+3. *ARMSTAT registration process*: ARMSTAT's data access procedure is
+   described only in an Armenian-language PDF. Someone who reads Armenian, or
+   who has institutional contact with ARMSTAT, is needed to obtain the data.
+
+4. *Relationship variable*: The current =data_info.yml= lacks =Relationship=.
+   The full INDSECA DDI (30 variables) was not entirely visible from the public
+   data dictionary page. Once the data is on disk, run =get_dataframe=,
+   inspect column names, and find the head-of-household relationship variable
+   (likely =a1_1= by pattern analogy with other HBS surveys).
+
+5. *Later ILCS waves*: If post-1996 waves are desired (1998-99, 2001, 2004,
+   ongoing), the file structure will differ. The 1996 =data_info.yml= will not
+   apply to later waves; each wave needs its own config. ARMSTAT's ILCS
+   databases have different IDs (205-208, 716) and likely different variable
+   naming conventions.
+
+6. *Cluster/village variable in HHSECA*: Unknown without seeing the file.
+   Needed for =v= and for =sample= table. The survey documentation mentions
+   ~128 PSUs; the variable name is likely something like =village= or =psu=.
+
+* 6. Estimated Effort
+
+| Task                                              | Effort        |
+|---------------------------------------------------+---------------|
+| Navigate ARMSTAT, register, request 1996 HBS data | 2-4 hours     |
+| Wait for ARMSTAT response (if approval required)  | 1-5 days      |
+| dvc add + push of 22 .dta files                   | 30 minutes    |
+| Fix data_scheme.yml                               | 15 minutes    |
+| Extend data_info.yml (add Relationship, v join)   | 1-2 hours     |
+| Add sample table config                           | 1-2 hours     |
+| Test and verify                                   | 30 minutes    |
+| **Total (human time, excluding wait)**            | **4-9 hours** |
+| **Total elapsed (including wait)**                | **1-6 days**  |
+
+If ARMSTAT has a streamlined download (no approval wait), this is a half-day
+of work. If the approval queue is slow or the 1996 data is no longer
+distributed, it could stall indefinitely. The 1996 HBS is ~28 years old; data
+availability should be confirmed before investing time in config work.
+
+* 7. References
+
+** Files consulted
+
+- =/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/_/data_scheme.yml=
+- =/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/_/data_info.yml=
+- =/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Documentation/SOURCE.org=
+- =/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/data_access.py= (lines 1-400)
+- =/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/CONTRIBUTING.org= (lines 1-150)
+- =/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/CLAUDE.md= (all sections)
+- =/global/scratch/fsa/fc_jevons/ligon/mirrors/sucoder-skills/add-wave/SKILL.md=
+- =/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/slurm_logs/PLAN_ghanasps_cleanup.org= (format reference)
+- =/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/slurm_logs/HANDOFF_2026-04-09.org= (context)
+
+** URLs consulted
+
+- =https://microdata.worldbank.org/index.php/catalog/2324= -- main catalog page
+- =https://microdata.worldbank.org/index.php/catalog/2324/related-materials= -- source URL in repo
+- =https://microdata.worldbank.org/index.php/catalog/2324/data-dictionary/F14?file_name=INDSECA= -- INDSECA variable DDI
+- =https://microdata.worldbank.org/index.php/catalog/2324/get-microdata= -- confirms external repository redirect
+- =https://microdata.worldbank.org/index.php/catalog/search?country[]=ARM&collection[]=lsms= -- WB LSMS Armenia search (one result: 2324)
+- =https://www.armstat.am/en/?nid=82= -- ARMSTAT publications/microdata page
+- =https://www.armstat.am/en/?nid=171= -- ARMSTAT ILCS databases (IDs 205-208, 716)
