@@ -1,0 +1,111 @@
+#+title: Design: sample() as single source of truth for v
+#+date: <2026-04-09 Wed>
+
+* Motivation
+
+The user story: "I want a dataframe on food expenditures with a
+markets index that is selectable to be something like country or
+like region or district."
+
+#+begin_src python
+uga.food_expenditures()                    # (i, t, v, j)
+uga.food_expenditures(market='Region')     # (i, t, m, j)
+uga.food_expenditures(market='District')   # (i, t, m, j)
+#+end_src
+
+Currently =v= is either baked into the parquet by each feature's
+build script (fragile, redundant) or joined from =household_roster=
+at API time (conceptually wrong --- the roster is demographics, not
+sampling design).  The =sample()= feature is the right source.
+
+* Design
+
+** Principle: one source of truth
+
+=sample()= owns the =(i, t) -> v= mapping.  No other feature
+stores =v= in its parquet.  The framework joins =v= transparently
+at API time.
+
+** Parquet storage
+
+Feature parquets store only their natural index:
+- =food_expenditures=: =(i, t, j)= --- no =v=
+- =earnings=: =(i, t)= --- no =v=
+- =household_roster=: =(i, t, pid)= --- no =v=
+
+The =v= in the roster's current YAML configs (the =dfs:= merge
+with the cover page) would be removed.  The roster's YAML would
+become a simple single-file extraction.
+
+** API-time join chain
+
+In =_finalize_result()= or in the =__getattr__= dispatch:
+
+1. Build the table from waves (parquet has =(i, t, ...)=)
+2. If =sample= is in =data_scheme=, join =v= from =sample()= on =(i, t)=
+3. Reorder index to put =v= after =t=: =(i, t, v, ...)=
+4. If =market= parameter is passed, continue to =_add_market_index()=
+   which joins =(t, v) -> m= from =cluster_features= and drops =v=
+
+** =_add_market_index= simplification
+
+With =v= always present (from step 2), the fallback path in
+=_add_market_index= (currently: join =v= from roster) is
+eliminated.  The method just does =(t, v) -> m= from
+=cluster_features=.
+
+** =market='Country'= convenience
+
+If =market='Country'=, set =m = self.name= for all rows.  No join
+needed.  This gives the "single national market" case.
+
+* Migration path
+
+** Phase 1 (done): Build =sample()= for all countries
+YAML configs extracting =v=, =weight=, =panel_weight=, =strata=,
+=Rural= from cover pages.  Tests passing.
+
+** Phase 2: Framework joins =v= from =sample=
+- Add =_join_cluster_from_sample()= to =Country=
+- Call it in =_finalize_result()= when =sample= exists and =v= is
+  in the table's declared index but not in the DataFrame
+- Cache =sample()= on the =Country= instance (like =_market_lookup=)
+
+** Phase 3: Remove =v= from feature parquets
+- Remove =v= from =data_scheme.yml= index declarations
+- Remove =dfs:= merge blocks that join =v= from cover pages
+  in =household_roster=, =housing=, =individual_education=, etc.
+- Remove =v= join from legacy scripts (=food_prices_quantities_and_expenditures.py=,
+  =earnings.py=, =enterprise_income.py=)
+- Parquets become leaner; =v= comes from one place
+
+** Phase 4: Simplify =_add_market_index=
+- Remove the roster fallback path
+- Always join on =(t, v)= since =v= is guaranteed present
+- Add =market='Country'= shortcut
+
+* Open questions
+
+** Should =cluster_features= also use =sample= for its =v=?
+Currently =cluster_features= defines its own =v= via =idxvars= in
+the YAML.  With =sample= as the source of truth, should
+=cluster_features= derive its =v= set from =sample()= instead?
+Probably not --- =cluster_features= is cluster-level =(t, v)= and
+=sample= is household-level =(i, t)=.  They're complementary.
+
+** Performance: caching =sample()=
+=sample()= will be called for every feature.  It must be cached on
+the =Country= instance.  The current pattern (=_market_lookup= with
+=setattr=) works.  Consider lazy loading: only build =sample()=
+when the first feature needs =v=.
+
+** What about tables that don't need =v=?
+Some tables (=panel_ids=, =interview_date=) don't declare =v= in
+their index.  The framework should only join =v= when the
+=data_scheme= declares it.  This is the same logic that
+=_augment_index_from_related_tables= uses for =m=.
+
+** Backward compatibility
+Existing cached parquets at =data_root()= have =v= baked in.
+Phase 3 would invalidate them.  The hash-based cache invalidation
+should handle this automatically, but a cache clear may be needed.
