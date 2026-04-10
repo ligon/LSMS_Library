@@ -85,6 +85,25 @@ shocks:
         HowCoped0: hh_r04_1
         HowCoped1: hh_r04_2
 
+sample:
+    file: hh_sec_a.dta
+    idxvars:
+        i: y5_hhid
+    myvars:
+        v: clusterid
+        weight: y5_crossweight  # cross-sectional (panel + booster)
+        panel_weight: y5_panelweight  # NaN for 545 booster households
+        strata: strataid
+        Rural:
+            - y5_rural
+            - mapping:
+                RURAL: Rural
+                Rural: Rural
+                rural: Rural
+                URBAN: Urban
+                Urban: Urban
+                urban: Urban
+
 interview_date:
     file: hh_sec_a.dta
     idxvars:

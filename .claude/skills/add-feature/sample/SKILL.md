@@ -153,13 +153,47 @@ sample:
         - t
 ```
 
+### Multi-round files (Tanzania 2008-15 pattern)
+
+When a single `.dta` file contains multiple survey rounds with a `round` column, the YAML path cannot handle it --- use a Python script. The script reads the file, maps round numbers to wave labels, and splits panel vs refresh households for `panel_weight`:
+
+```python
+from lsms_library.local_tools import get_dataframe, format_id, to_parquet
+import pandas as pd
+
+round_match = {1: '2008-09', 2: '2010-11', 3: '2012-13', 4: '2014-15'}
+df = get_dataframe('../Data/upd4_hh_a.dta')
+
+sample = pd.DataFrame({
+    'i': df['r_hhid'], 'round': df['round'],
+    'v': df['clusterid'], 'weight': df['weight'],
+    'strata': df['strataid'], 'Rural': df['urb_rur'],
+})
+sample['panel_weight'] = sample['weight']
+
+# Round 4 refresh households get NaN panel_weight
+if 'ha_07_1' in df.columns:
+    is_refresh = (df['round'] == 4) & (df['ha_07_1'].astype(str).str.upper() == 'NO')
+    sample.loc[is_refresh.values, 'panel_weight'] = pd.NA
+
+sample['t'] = sample['round'].map(round_match)
+sample = sample.drop(columns=['round']).set_index(['i', 't'])
+to_parquet(sample, 'sample.parquet')
+```
+
+### `materialize: make` in data_scheme.yml
+
+**Do NOT set `materialize: make`** on the `sample` entry in `data_scheme.yml` unless ALL waves require scripts. If some waves use YAML and one uses a script, leave the data_scheme entry without `materialize: make` --- the framework will use YAML for waves that have `data_info.yml` entries and fall back to Make for waves that have `.py` scripts writing parquets.
+
 ### Missing variables
 
 Not all waves have all columns. Simply omit a `myvars` line and the column will be NaN in the aggregated output. Common cases:
 
 - A wave provides only one weight: put it in both `weight` and `panel_weight`.
+- A **panel-only wave** (no booster or refresh, e.g., Tanzania 2019-20 phone survey): the sole weight variable goes in both columns.
 - A wave provides no weight at all: omit both lines (rare --- check the BID before assuming a weight doesn't exist; Uganda 2005-06 turned out to have `hmult` despite initial appearances).
 - A wave has no explicit strata variable: omit `strata` or construct it from region x urban/rural if that's what the sampling documentation specifies.
+- **Numeric strata IDs** (e.g., Tanzania's `strataid`): add a `strata()` formatting function in the wave's `.py` file to strip `.0` via `format_id`, or let the framework's `_normalize_v` handle it.
 
 ## Label harmonization
 

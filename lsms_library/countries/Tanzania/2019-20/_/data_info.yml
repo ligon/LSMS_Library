@@ -96,6 +96,25 @@ assets:
         Value: hh_m04
         Purchase Price: hh_m03
 
+sample:
+    file: HH_SEC_A.dta
+    idxvars:
+        i: sdd_hhid
+    myvars:
+        v: clusterid
+        weight: sdd_weights  # panel-only wave; same variable for both
+        panel_weight: sdd_weights
+        strata: strataid
+        Rural:
+            - sdd_rural
+            - mapping:
+                RURAL: Rural
+                Rural: Rural
+                rural: Rural
+                URBAN: Urban
+                Urban: Urban
+                urban: Urban
+
 interview_date:
     file: HH_SEC_A.dta
     idxvars:
