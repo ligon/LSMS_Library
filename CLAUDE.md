@@ -401,10 +401,16 @@ When using the Agent tool to dispatch work to subagents (especially with `isolat
 
 The `sample` table (`index: (i, t)`, columns: `v`, `weight`, `panel_weight`, `strata`, `Rural`) is the single source of truth for mapping households to their sampling cluster. It encodes the survey's sampling design: which PSU each household was drawn from, the household's sampling weight (cross-sectional and panel), stratification domain, and urban/rural classification.
 
-- **`v` should come from `sample`**, not from `household_roster` or baked into feature parquets. See `slurm_logs/DESIGN_sample_as_v_source.org` for the migration plan.
-- **`_add_market_index(market='Region')`** joins `(t, v) → Region` from `cluster_features`. When `v` is in the DataFrame, it joins directly. When absent, it currently falls back to `household_roster` — this should be updated to use `sample` instead.
+**As of 2026-04-10, `v` is joined from `sample()` at API time, not baked into feature parquets.** The framework hook is `_join_v_from_sample()` in `country.py`, called from `_finalize_result()` for any household-level table (features indexed by `(i, t, ...)` except `sample`, `cluster_features`, `panel_ids`, `updated_ids`) when the country has `sample` in its `data_scheme` and `v` is not already present. The sample lookup is cached per Country instance to amortize across feature calls.
+
+- **Do NOT put `v` in feature `data_scheme.yml` indexes** other than `cluster_features` (which legitimately owns `v`). The framework adds it at API time.
+- **Do NOT bake `v` into feature parquets**. Wave-level scripts that previously wrote `(t, v, i, ...)` indexes should write `(t, i, ...)` and let the framework join `v`.
+- **Do NOT use `dfs:` merge blocks just to join `v` from a cover page** in `data_info.yml`. Collapse the table to a simple single-file extraction.
+- **`_add_market_index(market='Region')`** joins `(t, v) → Region` from `cluster_features`. With Phase 2 in place, `v` is guaranteed present; the method joins directly on `(t, v)`. If a caller hits `_add_market_index` with a DataFrame lacking `v` (e.g., a derived table that bypassed `_finalize_result`), it calls `_join_v_from_sample()` as a backup.
 - **Two weight types**: `weight` (cross-sectional, positive for all interviewed HH including refreshment) and `panel_weight` (longitudinal, NaN/zero for refreshment sample). Pre-refreshment waves have the same value in both columns.
 - **Skill**: `.claude/skills/add-feature/sample/SKILL.md` documents the full process for adding `sample` to a new country.
+- **Migration history**: See `slurm_logs/PLAN_sample_v_migration.org` for the Phase 2/3/4 migration plan and `slurm_logs/DESIGN_sample_as_v_source.org` for the original design intent.
+- **Country caveat**: `Country(name).household_roster()` requires that the country has `sample` in its `data_scheme.yml` to get `v` in the index. Countries without `sample` (e.g., GhanaSPS at time of writing) return `(i, t, pid)` without `v`.
 
 ## Cache vs API Transformations
 
