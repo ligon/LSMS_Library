@@ -18,15 +18,31 @@ sample:
     index: (i, t)
     v: str
     weight: float
+    panel_weight: float
     strata: str
     Rural: str
 ```
 
 - **Index:** household (`i`) x wave (`t`) --- one row per household per wave
 - **`v`:** cluster/PSU identifier (EA code, parish code, or parish name depending on wave)
-- **`weight`:** household sampling weight (cross-sectional weight preferred; NaN if unavailable)
+- **`weight`:** cross-sectional household sampling weight (positive for all interviewed households including refreshment sample)
+- **`panel_weight`:** longitudinal/panel weight (positive only for continuing panel households; zero or NaN for refreshment sample and non-response)
 - **`strata`:** stratification domain (sub-region label, harmonized via `categorical_mapping.org`)
 - **`Rural`:** urban/rural classification
+
+## Two weight types
+
+Many LSMS panel surveys provide two distinct weights:
+
+1. **Cross-sectional weight** (`weight`) --- positive for every interviewed household in that wave, including both continuing panel households and newly drawn refreshment households. Use for analysis within a single wave.
+
+2. **Panel/longitudinal weight** (`panel_weight`) --- positive only for households that have been tracked from a prior wave. Zero or NaN for refreshment sample households and non-response. Use for analysis across waves (panel regressions, etc.).
+
+For waves before a rotating panel was introduced (e.g., Uganda 2005--2012), or where only one weight is provided, the same variable goes in both columns. For waves with a refreshment sample (e.g., Uganda 2013-14 onward), the two weights diverge: `weight` covers everyone, `panel_weight` excludes new entrants.
+
+**How to tell them apart:** Look for a `rotate` variable (0 = refreshment, 1 = continuing panel). Cross-tab `rotate` against NaN/zero patterns in each weight variable. The cross-sectional weight will have near-complete coverage; the panel weight will have NaN or zeros concentrated among `rotate=0` households.
+
+The BID (Basic Information Document) for each wave describes the weight construction. These are available from the World Bank Microdata Library under "Related Materials" for each catalog entry.
 
 ## Finding the source variables
 
@@ -36,14 +52,14 @@ All variables typically live in the **cover page / Section 1 / household identif
 
 Weight variable names change across waves and countries. There is no standard.
 
-| Country | Weight variable pattern | File | Notes |
-|---------|----------------------|------|-------|
-| **Uganda** | `wgt09`, `wgt10`, `mult`, `wgt`, `hwgt_W5` | GSEC1 | Changes every wave; 2005-06 has none |
-| **Nigeria** | `wt_wave{N}` | `secta_plantingw{N}` | Wave 5 adds `wt_longpanel`, `wt_cross` |
-| **Tanzania** | `weight`, `sdd_weights`, `y5_crossweight` | `hh_sec_a` / `upd4_hh_a` | 2020-21 has panel + cross-section weights |
-| **Ethiopia** | `pw_w{N}` | `sect_cover_hh_w{N}` | |
-| **Malawi** | `hh_wgt` | `hh_mod_a_filt` | |
-| **EHCVM** | `hhweight` | `ehcvm_ponderations_{cc}{yr}.dta` | **Separate file** from cover page |
+| Country | Cross-section weight | Panel weight | File | Notes |
+|---------|---------------------|-------------|------|-------|
+| **Uganda** | `hmult`/`wgt09`/`wgt10`/`mult`/`wgt_X`/`h_xwgt_W5`/`wgt` | `hmult`/`wgt09`/`wgt10`/`mult`/`wgt`/`hwgt_W5`/`hwgt_W7`/`wgt` | GSEC1 | Both weights change name every wave |
+| **Nigeria** | `wt_wave{N}` | `wt_longpanel` (wave 5) | `secta_plantingw{N}` | Wave 5 adds explicit panel/cross distinction |
+| **Tanzania** | `weight`/`y5_crossweight` | `sdd_weights`/`y5_panelweight` | `hh_sec_a` | 2020-21 has both; earlier waves may have one |
+| **Ethiopia** | `pw_w{N}` | (check BID) | `sect_cover_hh_w{N}` | |
+| **Malawi** | `hh_wgt` | (check BID) | `hh_mod_a_filt` | |
+| **EHCVM** | `hhweight` | (check BID) | `ehcvm_ponderations_{cc}{yr}.dta` | **Separate file** from cover page |
 
 **Always inspect the actual data** to confirm variable names --- they are not documented consistently.
 
@@ -77,7 +93,7 @@ The cluster identifier is what becomes `v` in the library's index convention.
 
 ### Single-file pattern (most countries)
 
-When weight, strata, cluster, and urban/rural are all in the cover page:
+When both weights, strata, cluster, and urban/rural are all in the cover page:
 
 ```yaml
 sample:
@@ -86,7 +102,23 @@ sample:
         i: HHID
     myvars:
         v: comm
-        weight: wgt09
+        weight: wgt_X       # cross-sectional
+        panel_weight: wgt   # longitudinal
+        strata: stratum
+        Rural: urban
+```
+
+When only one weight exists (pre-refreshment waves, or baseline):
+
+```yaml
+sample:
+    file: GSEC1.dta
+    idxvars:
+        i: HHID
+    myvars:
+        v: comm
+        weight: hmult        # same variable for both
+        panel_weight: hmult
         strata: stratum
         Rural: urban
 ```
@@ -123,7 +155,11 @@ sample:
 
 ### Missing variables
 
-Not all waves have all columns. For example, Uganda 2005-06 has no weight variable. Simply omit the `weight:` line from that wave's config --- the column will be NaN in the aggregated output.
+Not all waves have all columns. Simply omit a `myvars` line and the column will be NaN in the aggregated output. Common cases:
+
+- A wave provides only one weight: put it in both `weight` and `panel_weight`.
+- A wave provides no weight at all: omit both lines (rare --- check the BID before assuming a weight doesn't exist; Uganda 2005-06 turned out to have `hmult` despite initial appearances).
+- A wave has no explicit strata variable: omit `strata` or construct it from region x urban/rural if that's what the sampling documentation specifies.
 
 ## Label harmonization
 
@@ -176,20 +212,39 @@ s = uga.sample()
 
 # Basic checks
 assert s.index.names == ['i', 't']
-assert set(s.columns) >= {'v', 'weight'}
+assert set(s.columns) >= {'v', 'weight', 'panel_weight'}
 assert sorted(s.index.get_level_values('t').unique()) == uga.waves
 
-# Coverage
-print(s.groupby('t').size())           # ~2700--3300 per wave
-print(s['weight'].isna().sum(), '/', len(s))  # NaN only for waves without weights
+# Coverage per wave
+for wave in uga.waves:
+    ws = s.xs(wave, level='t')
+    w_na = ws['weight'].isna().sum()
+    pw_na = ws['panel_weight'].isna().sum()
+    print(f'{wave}: n={len(ws)}, weight_NaN={w_na}, panel_weight_NaN={pw_na}')
+
+# v should be nearly complete
 print(s['v'].isna().sum(), '/', len(s))       # Should be ~0
 
-# Strata labels clean
+# Strata labels clean (no trailing spaces, consistent case)
 for wave in uga.waves:
     vals = s.xs(wave, level='t')['strata'].dropna().unique()
     print(f'{wave}: {sorted(str(v) for v in vals)}')
 ```
 
+There is also a dedicated test file `tests/test_sample.py` that auto-discovers countries with `sample` in their `data_scheme.yml` and runs 8 structural checks (index, columns, coverage, duplicates, weight non-negativity).
+
+## Documenting what you learn
+
+Add a **Sampling Design** section to the country's `CONTENTS.org` documenting:
+- The stratification scheme and how it changed across waves
+- The cluster/PSU identifier and how it changed
+- Which weight variable is cross-sectional vs panel, per wave
+- Coverage counts (non-null / total) for each weight
+- The rotating panel / refreshment sample design if applicable
+- References to BIDs with URLs
+
+See `lsms_library/countries/Uganda/_/CONTENTS.org` for the reference.
+
 ## Reference implementation
 
-Uganda is the reference: `lsms_library/countries/Uganda/` on the `feature/sample-table` branch. All 8 waves configured via YAML, no scripts. Weight variable names mapped per wave, strata harmonized via `categorical_mapping.org`.
+Uganda is the reference: `lsms_library/countries/Uganda/` on the `feature/sample-table` branch. All 8 waves configured via YAML, no scripts. Both cross-sectional and panel weight variable names mapped per wave, strata harmonized via `categorical_mapping.org`. Design documented in `CONTENTS.org`.
