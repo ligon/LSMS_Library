@@ -1,6 +1,86 @@
 #+title: Contents
 
 The Ghana Living Standards Survey (Ghana LSS) is one of two major surveys we have for Ghana, the other being the Ghana Social Panel Survey (GhanaSPS).
+
+* Survey Program
+
+The GLSS is conducted by the Ghana Statistical Service (GSS).  Seven
+rounds span 1987--2017.  Each round is designed as an independent
+nationally representative cross-section; there is no rotating panel
+or refreshment sample mechanism.
+
+- [[https://microdata.worldbank.org/index.php/catalog/2313][GLSS1 (1987-88)]]
+- [[https://microdata.worldbank.org/index.php/catalog/2314][GLSS2 (1988-89)]]
+- [[https://microdata.worldbank.org/index.php/catalog/2315][GLSS3 (1991-92)]]
+- [[https://microdata.worldbank.org/index.php/catalog/2331][GLSS4 (1998-99)]]
+- [[https://microdata.worldbank.org/index.php/catalog/1064][GLSS5 (2005-06)]]
+- [[https://microdata.statsghana.gov.gh/index.php/catalog/72][GLSS6 (2012-13)]]
+- [[https://microdata.statsghana.gov.gh/index.php/catalog/97][GLSS7 (2016-17)]]
+
+* Sampling Design
+
+** Overview
+
+Two-stage stratified cluster sample.  Enumeration Areas (EAs) from
+the national census serve as the PSU, with a fixed take of
+households per EA.
+
+** Strata
+
+The stratification scheme evolved across rounds:
+
+| Rounds      | Strata definition                                     | Count |
+|-------------+-------------------------------------------------------+-------|
+| GLSS1--GLSS2 | Ecological zone (Coastal, Forest, Savannah)          |     9 |
+|             | x Urban classification (Urban, Semi-urban, Rural)     |       |
+| GLSS3+      | Region-based (10 administrative regions from GLSS3;   | ~10   |
+|             | possibly finer in later rounds)                       |       |
+
+** Weights
+
+GLSS1 and GLSS2 are *self-weighting* (equal probability of selection;
+no weight variable in the data).  Starting from GLSS4 (1998-99), a
+=weight= variable is provided.  In GLSS5 (2005-06) and later, the
+sample is explicitly non-self-weighting due to disproportionate
+sampling of smaller regions.
+
+Since every round is an independent cross-section, there is no
+panel weight.  The single =weight= serves for both cross-sectional
+and (to the extent they exist) panel analyses.
+
+** Cluster (PSU) variable
+
+=clust= in all rounds, but the numbering scheme changes:
+
+| Rounds    | Cluster ID range | Notes                             |
+|-----------+------------------+-----------------------------------|
+| GLSS1     | 1xxx             | 200 EAs from 1984 census frame    |
+| GLSS2     | 2xxx             | 200 EAs, fresh draw               |
+| GLSS3     | 3xxx             |                                   |
+| GLSS4     | 4xxx             |                                   |
+| GLSS5     | 5xxxx            | 5-digit codes                     |
+| GLSS6     | 6xxxx            |                                   |
+| GLSS7     | 7xxxx            |                                   |
+
+The changing prefix makes cross-wave cluster linkage impossible
+without an explicit mapping file.
+
+* Panel Linkage (GLSS1 to GLSS2)
+
+Despite being designed as independent cross-sections, a sub-sample
+of GLSS1 households was re-interviewed in GLSS2.  The linkage is in
+=PANELC.DAT= (present in both the 1987-88 and 1988-89 Data
+directories), mapping =HID1= (GLSS1) to =HID2= (GLSS2) at the
+person level.  Deduplicating to household level yields 714 panel
+households.
+
+No cross-wave linkage exists for GLSS3 onward --- cluster numbering
+schemes changed between rounds and no prior-wave household ID
+columns are available.  The =reint= variable in GLSS6 flags 1,476
+"re-interview" households but provides no prior-wave ID for matching.
+
+The =panel_ids= feature in =ghanalss.py= handles the GLSS1--GLSS2
+linkage via the =Waves= dictionary.
 We have tried to make it possible to compare food expenditures not only across rounds within one of these surveys, but also across surveys.  The main tool needed for harmonization is a set of consistent food labels.  Those consistent labels are the "Aggregate Labels" found in https://docs.google.com/spreadsheets/d/1qZhbq5gpAmCsYH1ixUn0Ix_Cb5YKSIpU-Pc2_hh2lhU/.
 
 
