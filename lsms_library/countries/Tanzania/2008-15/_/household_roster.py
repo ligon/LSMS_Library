@@ -1,17 +1,14 @@
 #!/usr/bin/env python
 """Household roster for Tanzania 2008-15 (multi-round file covering rounds 1-4).
 
-Joins cluster ID (v) from the cover page (upd4_hh_a.dta) onto the roster
-so the final index is (t, v, i, pid).
+Produces (t, i, pid) indexed roster.  Cluster identity (v) is joined
+from sample() at API time, not baked into this parquet.
 """
-from lsms_library.local_tools import get_dataframe, format_id, to_parquet
+from lsms_library.local_tools import get_dataframe, to_parquet
 import pandas as pd
 
 # Household roster (multi-round file covering rounds 1-4)
 df = get_dataframe('../Data/upd4_hh_b.dta')
-
-# Cover page — contains cluster ID
-cover = get_dataframe('../Data/upd4_hh_a.dta')
 
 round_match = {1: '2008-09', 2: '2010-11', 3: '2012-13', 4: '2014-15'}
 
@@ -24,13 +21,6 @@ roster = pd.DataFrame({
     'Relationship': df.hb_05.values.tolist(),
 })
 
-# Extract cluster mapping from cover page, keyed by (r_hhid, round)
-cluster_map = cover[['r_hhid', 'round', 'clusterid']].drop_duplicates()
-cluster_map = cluster_map.rename(columns={'r_hhid': 'i', 'clusterid': 'v'})
-
-# Merge cluster ID onto roster using household ID and round
-roster = roster.merge(cluster_map, left_on=['i', 'round'], right_on=['i', 'round'], how='left')
-
 # Map round numbers to wave labels
 roster['t'] = roster['round'].map(round_match)
 roster = roster.drop(columns=['round'])
@@ -38,9 +28,8 @@ roster = roster.drop(columns=['round'])
 # Convert IDs to clean strings
 roster['i'] = roster['i'].astype(str)
 roster['pid'] = roster['pid'].astype(float).astype(int).astype(str)
-roster['v'] = roster['v'].apply(format_id)
 
-roster = roster.set_index(['t', 'v', 'i', 'pid'])
+roster = roster.set_index(['t', 'i', 'pid'])
 
 # Handle duplicates by keeping first occurrence
 if not roster.index.is_unique:

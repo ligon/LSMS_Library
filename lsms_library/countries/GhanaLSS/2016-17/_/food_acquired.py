@@ -15,7 +15,6 @@ unitsd = defaultdict(lambda:pd.NA,get_categorical_mapping(tablename='units'))
 # food expenditure
 idxvars = dict(i=(['clust','nh'],lambda x: format_id(x.clust)+'/'+format_id(x.nh,zeropadding=2)),
                w=('nh',lambda x: w),
-               v=('clust',format_id),
                j=('freqcd',lambda x: labelsd[format_id(x)]))
 
 myvars = dict()
@@ -36,7 +35,7 @@ for i in visits:
     dfs[i] = dfs[i].reset_index().replace({r'':pd.NA, 0 : np.nan})
 fe = pd.concat(dfs.values(),ignore_index=True)
 fe = fe[fe['j'] != '']
-fe= fe.groupby(['w', 'v', 'i', 'j', 'visit', 'u']).sum() # Deal with some cases with multiple records for purchases
+fe= fe.groupby(['w', 'i', 'j', 'visit', 'u']).sum() # Deal with some cases with multiple records for purchases
 
 
 ####################
@@ -49,7 +48,6 @@ labelsd = get_categorical_mapping(tablename='harmonize_food',idxvars={'Code':('C
 # food quantities
 idxvars = dict(i=(['clust','nh'],lambda x: format_id(x.clust)+'/'+format_id(x.nh,zeropadding=2)),
                w=('nh',lambda x: w),
-               v=('clust',format_id),
                j=('foodcd',lambda x: labelsd[format_id(x)]))
 
 myvars = {}
@@ -71,7 +69,7 @@ for i in Visits:
 
 hp = pd.concat(dfs.values(),ignore_index=True)
 hp = hp[hp['j'] != '']
-hp= hp.groupby(['w', 'v', 'i', 'j', 'visit', 'u']).sum() # Deal with some cases with multiple records for purchases
+hp= hp.groupby(['w', 'i', 'j', 'visit', 'u']).sum() # Deal with some cases with multiple records for purchases
 
 df = hp.join(fe,how='outer')
 

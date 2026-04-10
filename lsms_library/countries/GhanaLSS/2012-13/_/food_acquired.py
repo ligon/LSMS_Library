@@ -17,7 +17,6 @@ for column in ['Code_9b', 'Code_8h']:
 
 # food expenditure
 idxvars = dict(i='hid',
-               v=('clust',format_id),
                j=('freqcd',lambda x: labelsd['Code_9b'][format_id(x)]))
 
 myvars = dict()
@@ -37,7 +36,7 @@ for i in range(1, 7):
 
 fe = pd.concat(dfs.values(),ignore_index=True)
 fe = fe.loc[fe['j'].isin(labelsd['Code_9b'].values())]
-fe= fe.groupby(['v', 'i', 'j', 'visit']).sum() # Deal with some cases with multiple records for purchases
+fe= fe.groupby(['i', 'j', 'visit']).sum() # Deal with some cases with multiple records for purchases
 
 
 
@@ -56,8 +55,7 @@ with dvc.api.open('../Data/PARTB/sec8h.dta',mode='rb') as dta:
 prod = prod[prod['s8hq1'] == 'yes'] #select only if hh consumed any own produced food in the past 12 months
 #create produced column labels for each visit -- 3-day recall starting from the 2nd to 7th visit
 
-selector_pro = {'clust': 'v',
-                'hid': 'i',
+selector_pro = {'hid': 'i',
                 'foodcd': 'j',
                 's8hq9': 'u',
                 's8hq10': 'Price'}
@@ -71,18 +69,17 @@ y.index = y.index.map(str)
 #unstack by visits
 y = y.replace({r'':pd.NA, 0 : np.nan})
 y = y.loc[y['j'].isin(labelsd['Code_8h'].values())]
-y = y.groupby(['v', 'i','j','u']).sum() # Deal with some cases with multiple records for purchases
-y = pd.wide_to_long(y.reset_index(), stubnames=['Produced'], i=['v', 'i', 'j', 'u'], j='visit', sep='_', suffix='\\d+')
+y = y.groupby(['i','j','u']).sum() # Deal with some cases with multiple records for purchases
+y = pd.wide_to_long(y.reset_index(), stubnames=['Produced'], i=['i', 'j', 'u'], j='visit', sep='_', suffix='\\d+')
 
 y = y.join(fe,how='outer')
 
 y['w'] = w
-y = y.reorder_levels(['w','v','i','j','visit', 'u'])
+y = y.reorder_levels(['w','i','j','visit', 'u'])
 
-# fa = y.groupby(['j','t','i','u']).sum()
 fa = y.replace(0,np.nan).dropna(how='all')
 
 # Deal with non-string values in units
-fa.index = fa.index.set_levels(fa.index.levels[5].astype(str),level='u')
+fa.index = fa.index.set_levels(fa.index.levels[-1].astype(str),level='u')
 if __name__=='__main__':
     to_parquet(fa,'food_acquired.parquet')

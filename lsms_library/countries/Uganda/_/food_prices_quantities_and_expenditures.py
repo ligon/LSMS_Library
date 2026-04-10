@@ -7,17 +7,14 @@ different prices for different units.
 import pandas as pd
 import numpy as np
 import json
-import lsms_library as ll
 
 fa = get_dataframe('../var/food_acquired.parquet')
 
-# Join cluster (v) from household_roster (which carries v per household)
-uga = ll.Country('Uganda', preload_panel_ids=False, verbose=False)
-roster = uga.household_roster()
-v_lookup = roster.reset_index()[['i', 't', 'v']].drop_duplicates(['i', 't']).set_index(['i', 't'])['v']
-fa = fa.join(v_lookup)
-fa = fa.dropna(subset=['v'])
-fa = fa.reset_index().set_index(['i', 't', 'v', 'j', 'u'])
+# Ensure expected index order: (i, t, j, u).  v is joined from sample()
+# at API time — we don't bake it into the parquet.
+if isinstance(fa.index, pd.MultiIndex):
+    want = [n for n in ['i', 't', 'j', 'u'] if n in fa.index.names]
+    fa = fa.reorder_levels(want)
 
 # Column groups
 prices = ['market', 'farmgate', 'unitvalue_home', 'unitvalue_away', 'unitvalue_own',
@@ -27,7 +24,7 @@ quantities =  ['quantity_home', 'quantity_away', 'quantity_own', 'quantity_inkin
 
 expenditures = ['value_home', 'value_away', 'value_own', 'value_inkind']
 
-x = fa.groupby(['i','t','v','j'])[expenditures].sum()
+x = fa.groupby(['i','t','j'])[expenditures].sum()
 x = x.sum(axis=1).replace(0,np.nan).dropna()
 
 to_parquet(pd.DataFrame({'x':x}), '../var/food_expenditures.parquet')

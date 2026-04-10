@@ -50,7 +50,7 @@ def extract_food(fn, varmap, t, food_labels):
     df['t'] = t
 
     # Keep relevant columns
-    keep = ['t', 'v', 'i', 'j', 'u', 'm',
+    keep = ['t', 'i', 'j', 'u', 'm',
             'Quantity', 'Expenditure', 'Produced']
     keep = [c for c in keep if c in df.columns]
     df = df[keep]
@@ -66,7 +66,6 @@ def extract_food(fn, varmap, t, food_labels):
 # --- Harvest (2011Q1) ---
 harvest_vars = {
     'hhid': 'i',
-    'ea': 'v',
     'item_cd': 'j',
     's10bq2a': 'Quantity',
     's10bq2b': 'u',
@@ -80,7 +79,6 @@ harvest = extract_food('../Data/sect10b_harvestw1.csv',
 # --- Planting (2010Q3) ---
 planting_vars = {
     'hhid': 'i',
-    'ea': 'v',
     'item_cd': 'j',
     's7bq2a': 'Quantity',
     's7bq2b': 'u',
@@ -96,7 +94,7 @@ df = pd.concat([harvest, planting], ignore_index=True)
 
 df['i'] = df['i'].astype(int).astype(str)
 
-df = df.set_index(['t', 'v', 'i', 'j', 'u'])
+df = df.set_index(['t', 'i', 'j', 'u'])
 df = df.sort_index()
 
 to_parquet(df, 'food_acquired.parquet')
