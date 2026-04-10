@@ -1,0 +1,33 @@
+Country: Nigeria
+Wave: 2023-24
+
+sample:
+    file: Post Planting Wave 5/Household/secta_plantingw5.dta
+    idxvars:
+        i: hhid
+    myvars:
+        v: ea
+        weight: wt_cross_wave5
+        panel_weight: wt_longpanel_wave5
+        strata:
+            - strata
+            - mapping:
+                1: North Central
+                2: North East
+                3: North West
+                4: South East
+                5: South South
+                6: South West
+        Rural:
+            - sector
+            - mapping:
+                1. URBAN: Urban
+                2. RURAL: Rural
+                1. Urban: Urban
+                2. Rural: Rural
+                rural: Rural
+                Rural: Rural
+                RURAL: Rural
+                urban: Urban
+                Urban: Urban
+                URBAN: Urban

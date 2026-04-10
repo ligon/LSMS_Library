@@ -1,6 +1,25 @@
 Country: Nigeria
 Wave: 2012-13
 
+sample:
+    file: Post Planting Wave 2/Household/secta_plantingw2.dta
+    idxvars:
+        i: hhid
+    myvars:
+        v: ea
+        weight: wt_wave2
+        panel_weight: wt_combined
+        strata: zone
+        Rural:
+            - sector
+            - mapping:
+                rural: Rural
+                Rural: Rural
+                RURAL: Rural
+                urban: Urban
+                Urban: Urban
+                URBAN: Urban
+
 cluster_features:
     dfs:
         - df_main

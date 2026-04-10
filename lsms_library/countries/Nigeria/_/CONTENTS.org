@@ -1,3 +1,66 @@
 #+title: Contents
 * Food Conversion Table
 A food conversion table can be found at https://docs.google.com/spreadsheets/d/1whE_EW5x-jxrsKvYWfefdBppzp_TZhPP61bdEN-FEJ4/
+
+* Sampling Design
+
+** Overview
+
+The Nigeria General Household Survey--Panel (GHS-Panel) is an LSMS-ISA
+panel survey with a two-stage stratified cluster design.  Six
+geopolitical zones serve as strata; within each zone, enumeration areas
+(EAs) are the primary sampling units (PSUs/clusters).  Households are
+drawn within EAs.
+
+Each wave collects data in two rounds: post-planting (PP, ~Q3) and
+post-harvest (PH, ~Q1 of the following year).  The same households are
+visited in both rounds.  The library uses the post-planting cover page
+(=secta_plantingw{N}.dta=) as the sample frame because it comes first
+and defines the household universe for the wave.
+
+Starting with wave 4 (2018-19), a refreshment sample of new households
+was drawn alongside the continuing panel.  Wave 5 (2023-24) continues
+this rotating panel design.
+
+** Cluster (PSU) identifier
+
+=ea= is consistent across all five waves.
+
+** Strata
+
+| Wave    | Variable  | Values                        | Notes                       |
+|---------+-----------+-------------------------------+-----------------------------|
+| 2010-11 | =zone=    | 6 geo-political zones         | No explicit strata variable |
+| 2012-13 | =zone=    | 6 geo-political zones         | No explicit strata variable |
+| 2015-16 | =zone=    | 6 geo-political zones         | No explicit strata variable |
+| 2018-19 | =strata=  | 6 labeled zones               | Matches =zone=              |
+| 2023-24 | =strata=  | 6 numeric codes (1--6)        | Mapped to zone labels       |
+
+** Weight variables
+
+| Wave    | Cross-sectional (=weight=) | Panel (=panel_weight=)     | Notes                                           |
+|---------+----------------------------+----------------------------+-------------------------------------------------|
+| 2010-11 | =wt_wave1=                 | =wt_wave1=                 | Baseline; no refreshment; same weight for both   |
+| 2012-13 | =wt_wave2=                 | =wt_combined=              | =wt_combined= covers waves 1--2 panel            |
+| 2015-16 | =wt_wave3=                 | =wt_w1_w2_w3=             | =wt_w1_w2_w3= covers waves 1--3 panel            |
+| 2018-19 | =wt_wave4=                 | =wt_longpanel=             | Refreshment sample begins; panel wt NaN for new  |
+| 2023-24 | =wt_cross_wave5=           | =wt_longpanel_wave5=       | Also has =wt_wave5= (general wave weight)        |
+
+** Coverage counts (non-null weight / total rows)
+
+| Wave    | weight         | panel_weight   |
+|---------+----------------+----------------|
+| 2010-11 | 5000/5000      | 5000/5000      |
+| 2012-13 | 4716/4859      | 4671/4859      |
+| 2015-16 | 4581/4696      | 4407/4696      |
+| 2018-19 | 4976/5263      | 1425/5263      |
+| 2023-24 | 4715/5067      | 1358/5067      |
+
+The large NaN count in =panel_weight= for waves 4--5 reflects the
+refreshment sample: new panel households receive cross-sectional
+weights but not longitudinal panel weights.
+
+** BID references
+
+- Wave 5: =ghs_panel_wave_5_basic_information_document_v1.pdf=
+  (in =2023-24/Documentation/=)

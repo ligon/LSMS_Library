@@ -229,6 +229,36 @@
 | SOUTH WEST                               | South West                               |
 | south west                               | South West                               |
 
+* Strata (Geopolitical Zones as sampling strata)
+
+#+NAME: strata
+| Original Label                           | Preferred Label                          |
+|------------------------------------------+------------------------------------------|
+| 1. North Central                         | North Central                            |
+| NORTH CENTRAL                            | North Central                            |
+| north central                            | North Central                            |
+| North Central                            | North Central                            |
+| 2. North East                            | North East                               |
+| NORTH EAST                               | North East                               |
+| north east                               | North East                               |
+| North East                               | North East                               |
+| 3. North West                            | North West                               |
+| NORTH WEST                               | North West                               |
+| north west                               | North West                               |
+| North West                               | North West                               |
+| 4. South East                            | South East                               |
+| SOUTH EAST                               | South East                               |
+| south east                               | South East                               |
+| South East                               | South East                               |
+| 5. South South                           | South South                              |
+| SOUTH SOUTH                              | South South                              |
+| south south                              | South South                              |
+| South South                              | South South                              |
+| 6. South West                            | South West                               |
+| SOUTH WEST                               | South West                               |
+| south west                               | South West                               |
+| South West                               | South West                               |
+
 * States
 
 #+NAME: District
