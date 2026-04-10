@@ -42,6 +42,12 @@ def Relationship(value):
 
     return relationship_dict.get(value, pd.NA)
 
+def v(value):
+    '''
+    Formatting cluster variable
+    '''
+    return tools.format_id(value)
+
 def Region(value):
     '''
     Formatting region variable

@@ -10,6 +10,16 @@ cluster_features:
         Rural: loc2
 
 
+sample:
+    file: parta/sec0.dta
+    idxvars:
+        i: hhid
+    myvars:
+        v: clust
+        weight: weight
+        panel_weight: weight
+        strata: region
+
 household_roster:
     file: parta/sec1.dta
     idxvars:

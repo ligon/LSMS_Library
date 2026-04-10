@@ -38,6 +38,18 @@ def Relationship(value):
 
     return value.title()
 
+def v(value):
+    '''
+    Formatting cluster variable
+    '''
+    return tools.format_id(value)
+
+def strata(value):
+    '''
+    Formatting strata variable (region)
+    '''
+    return value.title()
+
 def Region(value):
     '''
     Formatting region variable

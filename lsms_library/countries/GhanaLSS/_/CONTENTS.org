@@ -39,14 +39,23 @@ The stratification scheme evolved across rounds:
 ** Weights
 
 GLSS1 and GLSS2 are *self-weighting* (equal probability of selection;
-no weight variable in the data).  Starting from GLSS4 (1998-99), a
-=weight= variable is provided.  In GLSS5 (2005-06) and later, the
-sample is explicitly non-self-weighting due to disproportionate
-sampling of smaller regions.
+no weight variable in the data).  GLSS3 (1991-92) has a =weight=
+variable in =POV_GH.DTA= but it is constant 1.0 (self-weighting).
+GLSS4 (1998-99) =POV_GH.DTA= has probability weights normalised
+to mean ~1 (sum ~ n), which are a different type from the expansion
+weights in later rounds.
+
+GLSS5 (2005-06) onward provides *expansion weights* in the cover
+page or location file: =weight= in =sec0.dta= (GLSS5), =weight= in
+=g6loc_edt.dta= (GLSS6), =WTA_S= in =g7sec0.dta= (GLSS7).  These
+sum to the national population.
+
+The =sample= feature only includes expansion weights (GLSS5--GLSS7)
+to avoid mixing weight types.  GLSS1--GLSS4 have =weight= and
+=panel_weight= as NaN.
 
 Since every round is an independent cross-section, there is no
-panel weight.  The single =weight= serves for both cross-sectional
-and (to the extent they exist) panel analyses.
+panel weight.  =panel_weight= equals =weight= for all waves.
 
 ** Cluster (PSU) variable
 
@@ -64,6 +73,34 @@ and (to the extent they exist) panel analyses.
 
 The changing prefix makes cross-wave cluster linkage impossible
 without an explicit mapping file.
+
+** Urban/Rural (=Rural=)
+
+| Round  | Source file        | Variable | Values                           |
+|--------+--------------------+----------+----------------------------------|
+| GLSS1  | ---                | ---      | Not available                    |
+| GLSS2  | ---                | ---      | Not available                    |
+| GLSS3  | =POV_GH.DTA=      | =loc2=   | 1=Semi-urban, 2=Rural (numeric)  |
+| GLSS4  | =SEC0A.DTA=        | =loc2=   | 1=Urban, 2=Rural (numeric)       |
+| GLSS5  | ---                | ---      | Not in cover page; in =pov_gh5=  |
+| GLSS6  | =g6loc_edt.dta=    | =loc2=   | Rural, Urban (string)            |
+| GLSS7  | =g7sec0.dta=       | =urbrur= | Rural, Urban (string)            |
+
+GLSS5 cover page (=sec0.dta=) has no urban/rural variable; =Rural= is
+NaN for that wave.  The cluster-level =loc2= is available in
+=pov_gh5.dta= and in =cluster_features= for GLSS5.
+
+** =sample= feature source variables
+
+| Round | File             | i        | v     | weight   | strata | Rural  |
+|-------+------------------+----------+-------+----------+--------+--------|
+| GLSS1 | =Y00A.DAT=       | =HID=    | =CLUST= | ---    | ---    | ---    |
+| GLSS2 | =Y00A.DAT=       | =HID=    | =CLUST= | ---    | ---    | ---    |
+| GLSS3 | =POV_GH.DTA=     | =[clust,nh]= | =clust= | --- | =region= | =loc2= |
+| GLSS4 | =SEC0A.DTA=      | =[clust,nh]= | =clust= | --- | =region= | =loc2= |
+| GLSS5 | =parta/sec0.dta= | =hhid=   | =clust= | =weight= | =region= | --- |
+| GLSS6 | =PARTA/g6loc_edt.dta= | =HID= | =clust= | =weight= | =region= | =loc2= |
+| GLSS7 | =g7sec0.dta=     | =[clust,nh]= | =clust= | =WTA_S= | =region= | =urbrur= |
 
 * Panel Linkage (GLSS1 to GLSS2)
 

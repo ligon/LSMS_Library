@@ -12,6 +12,18 @@ cluster_features:
         Ecological_zone: ez
 
 
+sample:
+    file:
+        - PARTA/g6loc_edt.dta
+    idxvars:
+        i: HID
+    myvars:
+        v: clust
+        weight: weight
+        panel_weight: weight
+        strata: region
+        Rural: loc2
+
 household_roster:
     file: 
         - PARTA/SEC1.dta

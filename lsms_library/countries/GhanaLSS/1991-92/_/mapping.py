@@ -50,6 +50,18 @@ def Region(value):
     return (lambda x: region_dict[f"{x:3.0f}".strip()])(value)
     
 
+def v(value):
+    '''
+    Formatting cluster variable
+    '''
+    return tools.format_id(value)
+
+def strata(value):
+    '''
+    Formatting strata variable (region code to label)
+    '''
+    return region_dict.get(f"{value:3.0f}".strip(), pd.NA)
+
 def Rural(value):
     '''
     Formatting rural variable

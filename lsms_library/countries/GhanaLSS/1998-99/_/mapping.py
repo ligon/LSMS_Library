@@ -50,11 +50,23 @@ def Region(value):
     return region_dict.get((int(value)), pd.NA)
     
 
+def v(value):
+    '''
+    Formatting cluster variable
+    '''
+    return tools.format_id(value)
+
+def strata(value):
+    '''
+    Formatting strata variable (region code to label)
+    '''
+    return region_dict.get(int(value), pd.NA)
+
 def Rural(value):
     '''
     Formatting rural variable
     '''
 
-    return rural_dict.get(value)
+    return rural_dict.get(value, pd.NA)
 
 Visits = range(1,7)

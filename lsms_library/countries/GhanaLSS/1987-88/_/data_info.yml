@@ -9,6 +9,13 @@ cluster_features:
         Region: REGION
         Age: AGEY
 
+sample:
+    file: Y00A.DAT
+    idxvars:
+        i: HID
+    myvars:
+        v: CLUST
+
 household_roster:
     file: Y01A.DAT
     idxvars:

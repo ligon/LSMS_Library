@@ -10,6 +10,19 @@ cluster_features:
         Rural: loc2
 
 
+sample:
+    file: g7sec0.dta
+    idxvars:
+        i:
+            - clust
+            - nh
+    myvars:
+        v: clust
+        weight: WTA_S
+        panel_weight: WTA_S
+        strata: region
+        Rural: urbrur
+
 household_roster:
     file: g7sec1.dta
     idxvars:

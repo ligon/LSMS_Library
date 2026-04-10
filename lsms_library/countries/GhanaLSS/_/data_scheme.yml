@@ -36,6 +36,14 @@ Data Scheme:
     Price: float
     Produced: float
 
+  sample:
+    index: (i, t)
+    v: str
+    weight: float
+    panel_weight: float
+    strata: str
+    Rural: str
+
   interview_date:
     index: (t, i)
     int_t: datetime

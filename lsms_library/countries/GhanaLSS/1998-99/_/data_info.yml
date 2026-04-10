@@ -10,6 +10,17 @@ cluster_features:
         Rural: loc2
 
 
+sample:
+    file: SEC0A.DTA
+    idxvars:
+        i:
+            - clust
+            - nh
+    myvars:
+        v: clust
+        strata: region
+        Rural: loc2
+
 household_roster:
     file: SEC1.DTA
     idxvars:
