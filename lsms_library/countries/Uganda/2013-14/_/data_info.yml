@@ -68,7 +68,7 @@ sample:
         i: HHID
     myvars:
         v: h1aq4a
-        weight: wgt
+        weight: wgt_X  # cross-sectional weight (covers both panel and refreshment sample)
         strata: sregion
         Rural: urban
 
