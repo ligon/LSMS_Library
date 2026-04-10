@@ -68,6 +68,9 @@ sample:
         i: HHID
     myvars:
         v: comm
+        weight: hmult
+        strata: stratum
+        Rural: urban
 
 cluster_features:
     file: GSEC1.dta
