@@ -2,55 +2,22 @@ Country: Uganda
 Wave: 2011-12
 
 household_roster:
-    dfs:
-        - df_roster
-        - df_cluster
-    df_roster:
-        file: ../Data/GSEC2.dta
-        idxvars:
-            i: HHID
-            pid: PID
-        myvars:
-            Sex: h2q3
-            Relationship: h2q4
-            Age: h2q8
-    df_cluster:
-        file: ../Data/GSEC1.dta
-        idxvars:
-            i: HHID
-        myvars:
-            v: comm
-    merge_on:
-        - i
-    final_index:
-        - t
-        - v
-        - i
-        - pid
+    file: ../Data/GSEC2.dta
+    idxvars:
+        i: HHID
+        pid: PID
+    myvars:
+        Sex: h2q3
+        Relationship: h2q4
+        Age: h2q8
 
 housing:
-    dfs:
-        - df_housing
-        - df_cluster
-    df_housing:
-        file: ../Data/GSEC9A.dta
-        idxvars:
-            i: HHID
-        myvars:
-            Roof: h9q4
-            Floor: h9q6
-    df_cluster:
-        file: ../Data/GSEC1.dta
-        idxvars:
-            i: HHID
-        myvars:
-            v: comm
-    merge_on:
-        - i
-    final_index:
-        - t
-        - v
-        - i
+    file: ../Data/GSEC9A.dta
+    idxvars:
+        i: HHID
+    myvars:
+        Roof: h9q4
+        Floor: h9q6
 
 sample:
     file: ../Data/GSEC1.dta

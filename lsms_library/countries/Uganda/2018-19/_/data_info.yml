@@ -2,31 +2,14 @@ Country: Uganda
 Wave: 2018-19
 
 household_roster:
-    dfs:
-        - df_roster
-        - df_cluster
-    df_roster:
-        file: GSEC2.dta
-        idxvars:
-            i: hhid
-            pid: PID
-        myvars:
-            Sex: h2q3
-            Relationship: h2q4
-            Age: h2q8
-    df_cluster:
-        file: GSEC1.dta
-        idxvars:
-            i: hhid
-        myvars:
-            v: parish_name
-    merge_on:
-        - i
-    final_index:
-        - t
-        - v
-        - i
-        - pid
+    file: GSEC2.dta
+    idxvars:
+        i: hhid
+        pid: PID
+    myvars:
+        Sex: h2q3
+        Relationship: h2q4
+        Age: h2q8
 
 people_last7days:
     file: GSEC15A.dta
@@ -40,28 +23,12 @@ people_last7days:
         Girls : CEA01D
 
 housing:
-    dfs:
-        - df_housing
-        - df_cluster
-    df_housing:
-        file: ../Data/GSEC9.dta
-        idxvars:
-            i: hhid
-        myvars:
-            Roof: h9q04
-            Floor: h9q06
-    df_cluster:
-        file: GSEC1.dta
-        idxvars:
-            i: hhid
-        myvars:
-            v: parish_name
-    merge_on:
-        - i
-    final_index:
-        - t
-        - v
-        - i
+    file: ../Data/GSEC9.dta
+    idxvars:
+        i: hhid
+    myvars:
+        Roof: h9q04
+        Floor: h9q06
 
 sample:
     file: GSEC1.dta

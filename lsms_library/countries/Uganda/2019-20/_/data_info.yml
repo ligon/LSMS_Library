@@ -2,56 +2,22 @@ Country: Uganda
 Wave: 2019-20
 
 household_roster:
-    dfs:
-        - df_roster
-        - df_cluster
-    df_roster:
-        file: HH/gsec2.dta
-        idxvars:
-            i: hhid
-            pid: pid
-        myvars:
-            Sex: h2q3
-            Relationship: h2q4
-            Age: h2q8
-    df_cluster:
-        file: HH/gsec1.dta
-        idxvars:
-            i: hhid
-        myvars:
-            v: s1aq04a
-    merge_on:
-        - i
-    final_index:
-        - t
-        - v
-        - i
-        - pid
+    file: HH/gsec2.dta
+    idxvars:
+        i: hhid
+        pid: pid
+    myvars:
+        Sex: h2q3
+        Relationship: h2q4
+        Age: h2q8
 
 individual_education:
-    dfs:
-        - df_educ
-        - df_cluster
-    df_educ:
-        file: HH/gsec4.dta
-        idxvars:
-            i: hhid
-            pid: pid
-        myvars:
-            Educational Attainment: s4q07
-    df_cluster:
-        file: HH/gsec1.dta
-        idxvars:
-            i: hhid
-        myvars:
-            v: s1aq04a
-    merge_on:
-        - i
-    final_index:
-        - t
-        - v
-        - i
-        - pid
+    file: HH/gsec4.dta
+    idxvars:
+        i: hhid
+        pid: pid
+    myvars:
+        Educational Attainment: s4q07
 
 people_last7days:
     file: HH/gsec15a.dta
@@ -65,28 +31,12 @@ people_last7days:
         Girls : CEA01D
 
 housing:
-    dfs:
-        - df_housing
-        - df_cluster
-    df_housing:
-        file: HH/gsec9.dta
-        idxvars:
-            i: hhid
-        myvars:
-            Roof: h9q04
-            Floor: h9q06
-    df_cluster:
-        file: HH/gsec1.dta
-        idxvars:
-            i: hhid
-        myvars:
-            v: s1aq04a
-    merge_on:
-        - i
-    final_index:
-        - t
-        - v
-        - i
+    file: HH/gsec9.dta
+    idxvars:
+        i: hhid
+    myvars:
+        Roof: h9q04
+        Floor: h9q06
 
 sample:
     file: HH/gsec1.dta

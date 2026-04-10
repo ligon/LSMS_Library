@@ -27,12 +27,6 @@ x = x.stack('t').unstack('k')
 updated_ids = json.load(open('updated_ids.json'))
 x = id_walk(x, updated_ids)
 
-# Join v from cluster_features
-uga = ll.Country('Uganda', preload_panel_ids=False, verbose=False)
-cf = uga.cluster_features()
-v_lookup = cf.reset_index()[['i', 't', 'v']].drop_duplicates(['i', 't']).set_index(['i', 't'])['v']
-x = x.join(v_lookup)
-
-x = x.reset_index().set_index(['t', 'v', 'i'])
+x = x.reset_index().set_index(['t', 'i'])
 
 to_parquet(x, '../var/enterprise_income.parquet')
