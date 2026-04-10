@@ -47,6 +47,12 @@ shocks_parquet := $(shocks:.py=.parquet)
 $(VAR_DIR)/shocks.parquet: shocks.py $(shocks_parquet)
 	python shocks.py
 
+sample = $(shell find $(rounds) -name sample.py)
+sample_parquet := $(sample:.py=.parquet)
+
+../%/_/sample.parquet:
+	(cd $(@D) && python sample.py)
+
 $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet: nutrition.py food_items.org $(VAR_DIR)/food_quantities.parquet
 	python nutrition.py
 
