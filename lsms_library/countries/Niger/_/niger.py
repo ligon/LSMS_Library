@@ -15,17 +15,22 @@ Waves = {'2011-12': (),
 
 
 def i(x):
-    """Create hhid from grappe + menage concatenation.
+    """Create hhid from grappe + menage with '0' separator + zero-padded menage.
 
     Detects which wave based on column case:
     - 2014-15 (ECVMA): uppercase columns (GRAPPE, MENAGE) -> no prefix
     - 2018-19/2021-22 (EHCVM): lowercase columns (grappe, menage) -> 'E_' prefix
 
+    Uses '0' separator and zero-padded menage (2 digits) to prevent ID
+    collisions (e.g., grappe=1,menage=23 vs grappe=12,menage=3).
+
     For scalar inputs (2011-12 hid), returns str(int(x)).
     """
     if isinstance(x, pd.Series):
-        grappe = str(int(x.iloc[0])) if pd.notna(x.iloc[0]) else ''
-        menage = str(int(x.iloc[1])) if pd.notna(x.iloc[1]) else ''
+        grappe = tools.format_id(x.iloc[0])
+        menage = tools.format_id(x.iloc[1], zeropadding=2)
+        if grappe is None or menage is None:
+            return None
 
         # Check column names to detect which wave
         col_names = x.index.tolist()
@@ -33,13 +38,13 @@ def i(x):
 
         if is_ehcvm:
             # 2018-19/2021-22 EHCVM: add prefix to prevent matching with ECVMA panel
-            return 'E_' + grappe + menage
+            return 'E_' + grappe + '0' + menage
         else:
             # 2014-15 ECVMA: no prefix, may include EXTENSION
             if len(x) > 2:
                 extension = str(int(x.iloc[2])) if pd.notna(x.iloc[2]) else '0'
-                return grappe + menage + extension
-            return grappe + menage
+                return grappe + '0' + menage + extension
+            return grappe + '0' + menage
     return str(int(x))
 
 
@@ -60,15 +65,15 @@ def panel_ids(df):
     """
     if 'in_panel' in df.columns:
         # EHCVM wave (2021-22): filter to panel HHs with valid previous IDs
+        # Must match i() format: 'E_' + format_id(grappe) + '0' + format_id(menage, zp=2)
         df = df[df['in_panel'] == 1]
         df = df[df['previous_grappe'].notna() & df['previous_menage'].notna()]
-        df['previous_i'] = (
-            'E_'
-            + df['previous_grappe'].astype(float).astype(int).astype(str)
-            + df['previous_menage'].astype(float).astype(int).astype(str)
-        )
+        grappe = df['previous_grappe'].apply(tools.format_id)
+        menage = df['previous_menage'].apply(lambda x: tools.format_id(x, zeropadding=2))
+        df['previous_i'] = 'E_' + grappe + '0' + menage
     else:
         # ECVMA wave (2014-15): previous_i matches 2011-12 hid = grappe*100+menage
+        # 2011-12 uses scalar hid (not composite), so this format is correct as-is
         df = df[df['previous_grappe'].notna() & df['previous_menage'].notna()]
         df['previous_i'] = (
             (df['previous_grappe'].astype(float).astype(int) * 100

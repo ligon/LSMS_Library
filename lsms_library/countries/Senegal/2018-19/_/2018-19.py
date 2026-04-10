@@ -12,15 +12,11 @@ def v(value):
 
 def i(value):
     '''
-    Formatting household id.
-    Handles both 2-component (grappe+menage) and 3-component (vague+grappe+menage).
+    Formatting household id from (grappe, menage).
+    Uses '0' separator + zero-padded menage to prevent collisions
+    (e.g., grappe=1,menage=23 vs grappe=12,menage=3).
     '''
-    parts = [value.iloc[k].astype(str) for k in range(len(value))]
-    id = parts[0]
-    for p in parts[1:]:
-        id = id + p
-
-    return tools.format_id(id)
+    return tools.format_id(value.iloc[0]) + '0' + tools.format_id(value.iloc[1], zeropadding=2)
 
 def Sex(value):
     '''

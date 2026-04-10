@@ -25,14 +25,12 @@ def age_sex_composition(df, sex, sex_converter, age, age_converter, hhid):
     testdf.index.name = 'j'
     return testdf
 
-def i(x):
-    """Create hhid from grappe + menage concatenation (no separator)"""
-    if isinstance(x, pd.Series):
-        # x is a row with grappe and menage
-        return str(int(x.iloc[0])) + str(int(x.iloc[1]))
-    return str(int(x))
-
 def panel_ids(df):
-    """Construct previous_i from previous_v (grappe) and previous_hid (menage) like Mali does"""
-    df['previous_i'] = df['previous_v'].astype(str).str.replace('.0', '').str.strip() + df['previous_hid'].astype(str).str.replace('.0', '').str.strip()
+    """Construct previous_i from previous_v (grappe) and previous_hid (menage).
+
+    Must match the i() format above: format_id(grappe) + format_id(menage, zeropadding=3).
+    """
+    grappe = df['previous_v'].apply(tools.format_id)
+    menage = df['previous_hid'].apply(lambda x: tools.format_id(x, zeropadding=3))
+    df['previous_i'] = grappe + menage
     return df[['previous_i']]
