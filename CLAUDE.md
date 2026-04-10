@@ -395,6 +395,16 @@ When using the Agent tool to dispatch work to subagents (especially with `isolat
 - **The Python venv is at the repo root** (`/path/to/LSMS_Library/.venv/bin/python`), not in the worktree. Set `PYTHONPATH` to the worktree so development-branch code is picked up.
 - **Use the message channel** (`slurm_logs/build_{date}/MESSAGES.txt`) for steering instructions. Agents should check it periodically.
 - **DVC lock contention**: Parallel agents sharing the DVC root (`lsms_library/countries/.dvc/`) can leave stale locks. If you see "Unable to acquire lock", check `lsms_library/countries/.dvc/tmp/lock` — if no `dvc` process is running (`ps aux | grep dvc`), delete the lock file. The library gracefully falls back to manual aggregation but is slower.
+- **Scatter-gather for multi-country work**: When applying the same feature to many countries, dispatch **one agent per country** in a single message (all launch in parallel). Never batch multiple countries into one agent — that forces sequential processing on one core while others sit idle. The coordinator commits results as notifications arrive and re-dispatches failures with more context.
+
+## `sample()` and Cluster Identity
+
+The `sample` table (`index: (i, t)`, columns: `v`, `weight`, `panel_weight`, `strata`, `Rural`) is the single source of truth for mapping households to their sampling cluster. It encodes the survey's sampling design: which PSU each household was drawn from, the household's sampling weight (cross-sectional and panel), stratification domain, and urban/rural classification.
+
+- **`v` should come from `sample`**, not from `household_roster` or baked into feature parquets. See `slurm_logs/DESIGN_sample_as_v_source.org` for the migration plan.
+- **`_add_market_index(market='Region')`** joins `(t, v) → Region` from `cluster_features`. When `v` is in the DataFrame, it joins directly. When absent, it currently falls back to `household_roster` — this should be updated to use `sample` instead.
+- **Two weight types**: `weight` (cross-sectional, positive for all interviewed HH including refreshment) and `panel_weight` (longitudinal, NaN/zero for refreshment sample). Pre-refreshment waves have the same value in both columns.
+- **Skill**: `.claude/skills/add-feature/sample/SKILL.md` documents the full process for adding `sample` to a new country.
 
 ## Cache vs API Transformations
 
