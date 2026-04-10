@@ -1,0 +1,223 @@
+#+title: Notes: Project naming and positioning
+#+date: <2026-04-10 Fri>
+#+author: ligon + claude (scrum master)
+
+Discussion notes on renaming =LSMS_Library= and positioning the
+project relative to the Penn World Table (PWT) precedent.  These are
+notes for later reflection, not decisions.
+
+* Framing: a microdata PWT
+
+One way to think about this project is as a microdata version of the
+Penn World Table.
+
+- PWT = cross-country comparable *macro* data (GDP, TFP, human capital)
+- BSD (working name) = cross-country comparable *household micro* data
+
+The parallel is useful because it sets expectations: a small, durable,
+institutionally-hosted, lightly-updated resource that becomes the
+default cite in its domain.  Not a platform, not a framework, not
+a statistical agency — a consistent resource that lowers the friction
+of cross-country empirical work by an order of magnitude.
+
+* What the PWT got right (lessons)
+
+** The Summers-Heston (1991, QJE) paper
+The single biggest lesson.  Before the paper, ICP-based PPP work was
+scattered across UN technical reports.  Summers & Heston consolidated
+it into one citable artifact with a memorable title, explained the
+methodology in enough detail that skeptics could engage, and gave
+every subsequent user a paper to cite.  ~14k citations later, every
+cross-country growth regression uses PWT.
+
+*Implication:* the project needs a high-profile paper before or
+alongside its relaunch.  Candidate venues, in rough order of leverage:
+
+- QJE or JEP (methods-adjacent, broad audience)
+- AER (possible if tied to a substantive analysis, à la
+  Feenstra-Inklaar-Timmer 2015's PWT 8 relaunch)
+- JAE or Economic Journal (methods-focused, lower impact but doable)
+- JOSS or Scientific Data (fallback, lower leverage)
+
+The Feenstra-Inklaar-Timmer 2015 AER paper is the exact precedent for
+"relaunch an existing useful thing with a better methodological
+foundation and a high-profile venue."  It updated PWT from 7.x to 8.0
+with a rethink of the expenditure/output distinction, and now every
+post-2015 PWT user cites that paper.
+
+** A single memorable noun
+"PWT" is a noun.  You download /the file/, you load /the table/, you
+reference variables by short names.  The learning curve is ~30
+minutes.  The project's short name becomes the thing people say in
+seminar rooms, not the formal title.
+
+** Versioning with stable identity
+PWT 5 → 6 → 7 → 8 → 9 → 10.  Each version has known defects, each is
+supersessable without invalidating the brand.  Papers cite "PWT 8.1"
+and reviewers accept it.  The project gets to improve without each
+improvement being a new project.
+
+*Implication:* the project needs explicit release tags and a
+versioning story, ideally before first external adoption.  Users should
+be able to pin to a specific release the way PWT users pin to "PWT
+10.01".
+
+** A small, durable team at an institutional host
+Initially Penn, then Groningen.  Never more than a handful of
+maintainers.  Funding is modest but steady — not grant-cycle-dependent.
+The PWT transitioned from Summers (d. 2012) and Heston (retired) to
+Feenstra, Inklaar, and Timmer without losing identity.  The transition
+only worked because Groningen was already a co-home before the
+founders left.
+
+*Implication:* long-term, the project needs an institutional home
+beyond any single individual.  Berkeley (ARE or CEGA) is the obvious
+starting point.  A Groningen-analog co-home elsewhere would be
+insurance.  Not this year's problem, but worth seeding now.
+
+** Strict scope discipline
+PWT does not try to be a microdata archive, a statistical agency, or a
+harmonization platform.  It takes existing price and national-accounts
+data, does PPP conversion carefully, and ships a clean table.
+
+*Implication:* BSD should stay out of the data-publication business.
+The World Bank owns the microdata; BSD owns the harmonized
+interface and canonical release artifacts.  Don't become a competitor
+to the Microdata Library.
+
+** Methodological honesty about tradeoffs
+The Feenstra-Inklaar-Timmer paper distinguished =rgdpe= from =rgdpo=
+rather than hiding the tension.  Users appreciate being treated as
+adults.
+
+*Implication:* the paper should be honest about what the project does
+NOT solve.  Cross-country food item harmonization is still an
+analyst's judgment call, not a canonical mapping.  The project
+preserves detail; it does not pretend to eliminate difference.
+
+** Canonical output products users can merge on
+PWT's killer artifact is "one CSV I can merge on."  Everyone who uses
+PWT does =pd.merge(my_data, pwt, on=['country', 'year'])=.
+
+*Implication:* BSD needs an analogous artifact.  The =Feature= class
+is the runtime equivalent, but a release-based canonical-parquet
+artifact ("=bsd_2026_04/roster.parquet=", "=bsd_2026_04/food_expenditures.parquet=")
+is the marketing artifact.  Users who don't care about the
+harmonization machinery and just want harmonized data should be able
+to =pd.read_parquet('https://...')= without installing anything.
+
+* Naming discussion
+
+** Current name
+=LSMS_Library= — descriptive but wrong.  The LSMS project (as in the
+World Bank's Living Standards Measurement Study) is effectively dead,
+and the scope of this repo extends well beyond LSMS surveys (includes
+GhanaLSS, Nicaragua, Cambodia, Peru, Panama, etc., some of which are
+not LSMS products at all).
+
+** Working candidate: "Berkeley Survey Data" (BSD)
+
+Berkeley — institutional signal, parallel to PWT's "Penn".
+Survey — correctly narrows the scope to household surveys.
+Data — modest, does not overclaim.
+
+Spells BSD, which lands two jokes simultaneously:
+1. Berkeley Software Distribution (the Unix lineage)
+2. The BSD license (permissive, open, reproducible)
+
+The audience this project wants — reproducibility-minded economists
+who willingly use =git= and =python= — grins at the callback.  The
+joke is a signal of the community the project wants to attract.
+
+*Honest worry:* BSD (Unix) is legendary for portability, clean
+architecture, and engineering discipline.  Adopting the moniker
+creates expectation pressure the project has to earn.  The good news
+is the core principles (/harmonize the interface, not the data/;
+data/code separation; progressive disclosure) are actually cousin to
+the BSD ethos.  The claim can be earned.
+
+** The tension: "comparable" or "consistent"
+The project's actual contribution is making microdata /comparable/
+across countries (and /consistent/ in access patterns).  Neither
+"comparable" nor "consistent" is in "BSD" as it stands.  Working one
+of those words into the title might be worth dropping the BSD
+wittiness.
+
+*Counter-argument:* you do not have to choose.  The Summers-Heston
+1991 paper's formal title was:
+
+"The Penn World Table (Mark 5): An Expanded Set of International
+Comparisons, 1950–1988"
+
+The short noun (PWT) is the marketing.  The subtitle (An Expanded Set
+of International Comparisons) is the description.  Everyday use just
+says "PWT"; the paper's first-mention cites both.  Apply the same
+pattern:
+
+"Berkeley Survey Data (BSD): A Comparable Household Microdata Resource"
+
+or
+
+"Berkeley Survey Data (BSD): Consistent Household Microdata Across Countries and Time"
+
+This preserves the BSD joke AND puts "comparable" or "consistent"
+where it does real explanatory work.
+
+** "Comparable" vs "consistent" (if choosing one)
+
+- *"Comparable"* echoes PWT's own framing directly and positions BSD
+  as "PWT for microdata".  Describes what the user gets.  Honest
+  about the limits: makes things comparable, not identical.  Has a
+  clear opposite ("non-comparable").
+- *"Consistent"* is technically more modest and can mean consistent
+  API, naming, index structure — all true of BSD.  Risk: "consistent"
+  is overloaded in statistics (estimator consistency) and may
+  mislead.
+
+Weak preference for "Comparable" because it directly echoes the PWT
+lineage framing.
+
+** Alternative names (not BSD) considered and rejected
+
+- =CEGA Household Surveys= — ties to Berkeley's CEGA but loses the
+  acronym magic and sounds like a CEGA product
+- =Berkeley Household Data (BHD)= — accurate, lacks the BSD joke, less
+  distinctive
+- =Comparable Household Microdata (CHM)= — short, descriptive, no
+  institutional anchor
+- =Berkeley Comparable Microdata (BCM)= — has Berkeley and comparable,
+  loses the survey specificity and the joke
+- =Berkeley Structured Microdata= — too technical, does not read aloud
+
+None of these land as well as BSD + subtitle.
+
+** Sleep-on-it question
+Is the BSD wittiness worth keeping, or is accuracy in the short name
+itself more important?  The hybrid path (BSD + descriptive subtitle)
+probably resolves this without a real trade.
+
+* Next steps (if the framing resonates)
+
+1. *Sketch a paper outline* — 1 page, section structure, 3 proposed
+   killer analyses.  The paper is the keystone; everything else is
+   downstream.
+2. *Lock in a name* — decide on BSD or an alternative.  Trivially
+   cheap now, expensive after adoption.
+3. *Design the versioning story* — how does a user pin to a specific
+   release?  Hash-based? Semantic version? Date?
+4. *Identify an institutional co-home* — even informally.  PWT needed
+   Penn before Groningen took over.
+5. *Plan the first named release (e.g. BSD 2026.04)* — canonical
+   parquets, version tag, changelog, documentation site.
+
+The paper and the first release should be coupled.  Don't rename,
+then wait six months, then publish; do both at once so the paper
+announces the name.
+
+* References
+
+- Summers & Heston (1991), "The Penn World Table (Mark 5): An
+  Expanded Set of International Comparisons, 1950–1988", QJE 106(2):
+  327–368.
+- Feenstra, Inklaar, Timmer (2015), "The Next Generation of the Penn
+  World Table", AER 105(10): 3150–3182.

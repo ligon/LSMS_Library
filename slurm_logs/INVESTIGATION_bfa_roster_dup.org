@@ -1,0 +1,80 @@
+#+TITLE: Investigation: Burkina Faso household_roster ~0.3% Duplicate Index Rate
+#+DATE: 2026-04-10
+
+* Reproduction
+
+Running =Country('Burkina_Faso').household_roster()= (LSMS_BUILD_BACKEND=make):
+- Total rows: 146,517
+- Duplicate (i, t, v, pid) tuples: 392 unique pairs, 784 total rows
+- Rate: 784 / 146517 = 0.535%
+
+All 784 duplicated rows are in t='2021-22'. The 2014 and 2018-19 waves have zero duplicates.
+
+* Root Cause: Double Application of id_walk via Attr Loss
+
+The bug is a three-part interaction in =lsms_library/country.py=:
+
+** Part 1: Per-wave id_walk in =load_from_waves=
+=load_from_waves= calls =id_walk= on each wave's data individually. For the 2021-22 wave, =updated_ids['2021-22']= maps ~3,227 source IDs (2021-22 raw grappe-menage IDs) to target IDs (the corresponding 2018-19 canonical IDs). This sets =df.attrs['id_converted'] = True=. Example: i='4065' → '4026', i='4021' → '4065'.
+
+After concatenating all three waves, =pd.concat= preserves attrs because all inputs share the same attrs dict, so the combined df still has =attrs={'id_converted': True}=.
+
+** Part 2: =_join_v_from_sample= loses attrs
+Inside =_finalize_result=, =_join_v_from_sample= is called. Its implementation (=country.py=, line 946-956) does:
+#+begin_src python
+flat = flat.merge(v_lookup, on=['i', 't'], how='left')
+return flat.set_index(new_idx)
+#+end_src
+Both =.merge()= and =.set_index()= discard =attrs=. The returned DataFrame has =attrs={}=.
+
+** Part 3: Second id_walk causes collisions
+
+After the v-join, =_finalize_result= checks:
+#+begin_src python
+if ('i' in df.index.names and not df.attrs.get('id_converted') ...):
+    df = id_walk(df, self.updated_ids)
+#+end_src
+Since =attrs= is now empty, this condition is True and =id_walk= runs a **second time** on the fully-combined (all-wave) data.
+
+The second =id_walk= processes the 2021-22 slice with =updated_ids['2021-22']=. But the 2021-22 slice's i values are already the canonical 2018-19 IDs — some of which are themselves sources in =updated_ids['2021-22']=. This creates chaining collisions:
+
+- After first id_walk: i='4021' → '4065'; i='4065' → '4026'
+- 2021-22 slice now has i='4065' (was '4021') and i='4026' (was '4065')
+- Second id_walk: sees i='4065' in uid_21 → renames it to '4026'
+- Now 2021-22 has **two** households with i='4026' → duplicate index entries
+
+There are **95 such 2-step chains** (A→B→C, A≠B≠C) in =updated_ids['2021-22']=, producing 392 unique duplicate (i, t, v, pid) tuples (households have ~4 members on average).
+
+* Verification
+
+To confirm: manual simulation that preserves =attrs={'id_converted': True}= after the v-join produces **0 duplicates**. The original code without the fix produces **392 duplicates**.
+
+The attr loss happens specifically in =_join_v_from_sample= at =country.py= lines 946-956.
+
+* Source vs Cross-Wave Analysis
+
+- **Not** a source-data issue: =ehcvm_individu_bfa2021.dta= has no duplicate (grappe, menage, pid) rows.
+- **Not** a vague/split-sample issue: vague 1 and vague 2 households have disjoint grappes.
+- **Not** a format_id collision: no two (grappe, menage) pairs produce the same i string.
+- **Not** a sample() issue: sample() has unique (i, t) rows.
+- **Is** a framework bug: =_join_v_from_sample= silently drops the =id_converted= flag.
+
+* Recommended Fix
+
+In =_join_v_from_sample= (=lsms_library/country.py=, line 956), preserve attrs after set_index:
+
+#+begin_src python
+# Before (line 956):
+return flat.set_index(new_idx)
+
+# After:
+result = flat.set_index(new_idx)
+result.attrs = df.attrs   # preserve id_converted flag (and any other attrs)
+return result
+#+end_src
+
+This is the minimal, targeted fix. The root issue is that =pandas.DataFrame.merge()= discards =attrs= (a known pandas behavior), and the code relies on =attrs= surviving through a merge. Preserving attrs explicitly after the merge+set_index makes the behavior correct.
+
+**Alternative (more robust):** Move the =id_walk= call in =_finalize_result= to run *before* the v-join, so the flag-checking order doesn't depend on attr survival. But this changes the order of operations and could have other side effects.
+
+**Do not fix upstream:** The =updated_ids['2021-22']= data itself is correct — it encodes the panel linkage from 2021-22 grappe-menage IDs back to 2018-19 canonical IDs.
