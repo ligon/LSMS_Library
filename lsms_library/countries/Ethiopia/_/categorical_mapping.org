@@ -1,0 +1,49 @@
+#+title: Categorical Mappings for Ethiopia
+
+* Strata
+Strata are constructed as Region x Rural/Urban. Region names vary across
+waves in casing and spelling. This table harmonizes them.
+
+#+name: strata
+| Alternate Spelling          | Preferred Label          |
+|-----------------------------+--------------------------|
+| Afar Rural                  | Afar Rural               |
+| Afar Urban                  | Afar Urban               |
+| AFAR Rural                  | Afar Rural               |
+| AFAR Urban                  | Afar Urban               |
+| Amhara Rural                | Amhara Rural             |
+| Amhara Urban                | Amhara Urban             |
+| AMHARA Rural                | Amhara Rural             |
+| AMHARA Urban                | Amhara Urban             |
+| Benshagul Gumuz Rural       | Benishangul Gumuz Rural  |
+| Benshagul Gumuz Urban       | Benishangul Gumuz Urban  |
+| BENISHANGUL GUMUZ Rural     | Benishangul Gumuz Rural  |
+| BENISHANGUL GUMUZ Urban     | Benishangul Gumuz Urban  |
+| Diredwa Rural               | Dire Dawa Rural          |
+| Diredwa Urban               | Dire Dawa Urban          |
+| DIRE DAWA Rural             | Dire Dawa Rural          |
+| DIRE DAWA Urban             | Dire Dawa Urban          |
+| Gambelia Rural              | Gambela Rural            |
+| Gambelia Urban              | Gambela Urban            |
+| GAMBELA Rural               | Gambela Rural            |
+| GAMBELA Urban               | Gambela Urban            |
+| Harari Rural                | Harar Rural              |
+| Harari Urban                | Harar Urban              |
+| HARAR Rural                 | Harar Rural              |
+| HARAR Urban                 | Harar Urban              |
+| Oromia Rural                | Oromia Rural             |
+| Oromia Urban                | Oromia Urban             |
+| OROMIA Rural                | Oromia Rural             |
+| OROMIA Urban                | Oromia Urban             |
+| SNNP Rural                  | SNNP Rural               |
+| SNNP Urban                  | SNNP Urban               |
+| Somalie Rural               | Somali Rural             |
+| Somalie Urban               | Somali Urban             |
+| SOMALI Rural                | Somali Rural             |
+| SOMALI Urban                | Somali Urban             |
+| Tigray Rural                | Tigray Rural             |
+| Tigray Urban                | Tigray Urban             |
+| TIGRAY Rural                | Tigray Rural             |
+| TIGRAY Urban                | Tigray Urban             |
+| Addis Ababa Urban           | Addis Ababa Urban        |
+| ADDIS ABABA Urban           | Addis Ababa Urban        |
