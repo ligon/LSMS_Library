@@ -1,5 +1,17 @@
 POETRY = poetry
 
+# Pytest worker count.
+#
+# Prefer $SLURM_CPUS_ON_NODE if set: it's the Slurm-authoritative,
+# cgroup-correct count of cores actually allocated to this job.
+# Otherwise use `nproc`, which is cgroup-aware on modern Linux.
+# Both beat xdist's `-n auto`, which calls `os.cpu_count()` — that
+# reads /sys/devices/system/cpu/ and reports the **physical node**
+# count regardless of any cgroup affinity restriction.  On a 56-core
+# node where Slurm gave us 8 logical CPUs, `os.cpu_count()` still
+# returns 56, and `pytest -n auto` would oversubscribe by 7×.
+PYTEST_WORKERS ?= $(or $(SLURM_CPUS_ON_NODE),$(shell nproc 2>/dev/null || echo 1))
+
 # Default pytest args: run in parallel (requires pytest-xdist, in the
 # test-group dependencies) and group tests from the same file into a
 # single worker so file-scoped caches (e.g. test_sample.py's
@@ -9,7 +21,8 @@ POETRY = poetry
 # Override via env or command-line to fall back to serial:
 #   make test PYTEST_ARGS=""
 #   make release v=0.6.0 PYTEST_ARGS="--tb=short"
-PYTEST_ARGS ?= -n auto --dist=loadfile
+#   make test PYTEST_WORKERS=4
+PYTEST_ARGS ?= -n $(PYTEST_WORKERS) --dist=loadfile
 
 .PHONY: setup test build release clean help
 
