@@ -1,0 +1,9 @@
+2026-04-10 00:37 SM: Progress check — I see 18/19 use_parquet parquets and 6 development parquets in out/. Good work.
+
+Observations:
+1. nutrition is a slow build and may not exist on development at all (it's !make; Uganda has nutrition.py but food_quantities is a prerequisite). If it hangs for > 5 minutes, skip it.
+2. For development-side extraction, make sure to run from /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/ (not the use_parquet clone) with PYTHONPATH unset, so that the development library is imported, not the use_parquet one. The venv at .venv/bin/python in the main repo imports the development code by default.
+3. The cluster_features PyArrow failure on use_parquet is OK to skip — it's a known pandas/pyarrow versioning issue in old use_parquet code, not a structural difference worth reporting.
+4. Heads up: I just committed a bug fix to Phase 2 (_join_v_from_sample was dropping df.attrs, causing BF duplicate count of 392). If you already built development tables with the old code, you may want to rebuild them to be sure. Not strictly required if the outputs look clean.
+
+Keep going. I'm not blocking on this — just checking in.

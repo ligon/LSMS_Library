@@ -411,6 +411,55 @@ The `sample` table (`index: (i, t)`, columns: `v`, `weight`, `panel_weight`, `st
 - **Skill**: `.claude/skills/add-feature/sample/SKILL.md` documents the full process for adding `sample` to a new country.
 - **Migration history**: See `slurm_logs/PLAN_sample_v_migration.org` for the Phase 2/3/4 migration plan and `slurm_logs/DESIGN_sample_as_v_source.org` for the original design intent.
 - **Country caveat**: `Country(name).household_roster()` requires that the country has `sample` in its `data_scheme.yml` to get `v` in the index. Countries without `sample` (e.g., GhanaSPS at time of writing) return `(i, t, pid)` without `v`.
+- **Legacy scripts with `v` as a non-index column**: `_join_v_from_sample()` skips when `v` is already in `df.columns`, not just when it's in `df.index.names`. This handles legacy features like `locality` that write `v` alongside other columns. The check was added after a use_parquet regression comparison surfaced a name-collision crash. If you write a new legacy-style script, prefer putting `v` in the index (or nowhere) rather than as a non-index column, so the framework can do its job cleanly.
+
+## Panel ID Transitive Chains and the `attrs` Flag
+
+`_finalize_result()` runs `id_walk()` to apply the country's
+`updated_ids` mapping, and sets `df.attrs['id_converted'] = True`
+to mark the DataFrame as already-converted. Any step between
+`id_walk` and the downstream consumers that touches the DataFrame
+must **preserve `attrs`** or the flag is lost. Two operations that
+drop `attrs` in pandas 2.x are `merge()` and `set_index()` — both
+of which appear in `_join_v_from_sample()`.
+
+When `attrs` is dropped, `_finalize_result` sees no flag and runs
+`id_walk` a second time on already-converted data. For countries
+whose `updated_ids` contain transitive chains (A → B → C, where
+intermediate IDs are themselves keys in the mapping), the second
+pass produces household-level ID collisions and duplicate index
+entries. The most visible case is Burkina Faso 2021-22, whose 95
+two-step chains produced 392 duplicate `(i, t, v, pid)` tuples
+(~0.5% of rows) before the fix landed in commit `4db41a27`.
+
+**Rule**: any framework method that touches a DataFrame in
+`_finalize_result()` downstream of `id_walk()` must explicitly
+copy `attrs`:
+
+```python
+result = flat.set_index(new_idx)
+result.attrs = dict(df.attrs)  # preserve id_converted flag
+return result
+```
+
+Do not rely on `merge()` or `set_index()` to preserve metadata.
+They don't.
+
+## Housing Schema: Categorical, Not Binary
+
+Historically, Uganda (and Malawi) `housing` tables carried binary
+indicator columns like `Thatched roof` and `Earthen floor`. As of
+the 2026-04-10 overhaul, housing is now categorical: the columns
+are `Roof` and `Floor`, and the values are the material names as
+reported in the survey (`Thatch`, `Iron Sheets`, `Cement`,
+`Concrete`, `Tiles`, `Earth`, etc.), mapped through
+`categorical_mapping.org` for cross-wave consistency.
+
+This follows the "preserve the detail" principle. Consumers who
+want binary indicators can derive them trivially
+(`df['Roof'] == 'Thatch'`) but the reverse is not possible. If
+your code relies on the old binary columns, update it to use the
+categorical strings.
 
 ## Cache vs API Transformations
 

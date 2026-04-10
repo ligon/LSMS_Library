@@ -40,7 +40,7 @@ difference and applies an incorrect Sex value map.  After manual inspection of r
 | interview_date         | COSMETIC     | 98 extra rows in dev (0.4%); m index in up only                   |
 | locality               | MATCH        | 24362 rows, v column 100% match                                   |
 | assets                 | COSMETIC     | 198 extra rows in dev (0.8%); column rename level_1/assets->Assets|
-| housing                | COSMETIC*    | 8117 extra rows in dev; values 100% match on 16173 overlap        |
+| housing                | IMPROVEMENT  | Dev: categorical Roof/Floor strings; use_parquet: binary indicators.  See corrected note below. |
 | nonfood_expenditures   | MATCH        | 23991 rows, all 61 expenditure columns 100% exact                 |
 | other_features         | EXPECTED     | Obsolete on development; replaced by cluster_features             |
 | panel_ids              | MATCH        | Dict with 9510 keys on development                                |
@@ -258,18 +258,39 @@ use_parquet: columns=['level_1', 'assets']; dev: columns=['Assets'].
 level_1 is a stacking artifact from the use_parquet script.
 Values: 100% exact on 24073 overlapping rows.
 
-** housing [COSMETIC*]
+** housing [SUBSTANTIVE IMPROVEMENT, NOT A REGRESSION]
 
-Shape: (16173, 2) use_parquet vs (24290, 2) dev -- 8117 row difference (50.2%).
-Columns: ['Thatched roof', 'Earthen floor'] binary 0/1 on both.
+*Note added 2026-04-10 after agent report:* the original agent
+finding here was based on stale parquets in =/local/=.  A fresh
+rebuild after the full Phase 3 edits landed shows a richer schema
+on development than use_parquet had.
 
-Wave-level parquets have the same sizes (3122+2942+... = 24290) on both branches.
-The use_parquet country-level housing.py script applies .dropna() and drops all-zero rows.
-Development YAML path retains all households.
+| Branch       | shape         | index           | columns                          | dtype             |
+|--------------+---------------+-----------------+----------------------------------+-------------------|
+| use_parquet  | (16173, 2)    | (i, t, m)       | [Earthen floor, Thatched roof]   | float64 (0/1/NaN) |
+| development  | (24290, 2)    | (i, t, v)       | [Roof, Floor]                    | string[python]    |
 
-For the 16173 overlapping rows: Thatched roof 100% match, Earthen floor 100% match.
+On development, the =Roof= and =Floor= columns carry /categorical
+values/ (e.g., ~Thatch~, ~Iron Sheets~, ~Cement~, ~Earth~,
+~Concrete~, ~Tiles~) rather than binary indicators for a single
+material.  This is a substantive improvement: downstream consumers
+can dichotomize to a binary (e.g. ~(Roof == 'Thatch')~) but they
+can no longer go from use_parquet's output back to the underlying
+material.
 
-This is a build-strategy difference, not a data error, and predates the v-migration.
+The 8117 extra rows are /not/ dropped by any =.dropna()= in the old
+script --- they are households lost in the old pipeline's column
+construction that are now preserved by the YAML extraction path.
+
+This honours the project design principle "preserve the detail".
+Consumers of use_parquet who relied on the binary indicators can
+reproduce them with a trivial one-liner; consumers who want the
+material categories can now get them without touching the library.
+
+Not a regression.  Filed as a note in CHANGELOG, not as an issue.
+
+(The original stale-parquet finding was documented in commit
+~1b0abbb0~ and corrected here in ~a2a4a531~-adjacent.)
 
 ** nonfood_expenditures [MATCH]
 
@@ -293,8 +314,29 @@ consumers.  Every table that can be compared on a per-row basis shows 100% value
 Structural differences (index level names, presence/absence of =m=, column renames) are all
 expected architectural changes documented in CLAUDE.md.
 
-Three pre-existing bugs identified (nutrition.py, locality API, housing dropna) should be tracked
-separately; none are regressions from the v-migration.
+Three pre-existing issues identified during the comparison, all handled:
+
+- =nutrition.py= KeyError on 'm': filed as GH #141.  Pre-existing
+  (consequence of the earlier =other_features= removal, not the
+  sample v-migration).
+- =locality()= API crash from =_join_v_from_sample= conflicting
+  with a legacy script that wrote =v= as a column: fixed in
+  ~a2a4a531~.
+- =housing= schema difference: initially flagged as "use_parquet
+  dropna vs dev keep-all", but on re-verification the correct
+  framing is that development produces a richer categorical
+  Roof/Floor schema (values like ~Thatch~, ~Iron Sheets~, etc.)
+  compared to use_parquet's binary indicators.  This is a
+  substantive improvement in line with the "preserve the detail"
+  principle and is not a regression.  See housing section.
+
+The original stale-parquet observation for housing illustrates an
+important lesson: when running a regression comparison against
+cached outputs, always clear the cache on both sides before
+building or rebuild on the side under test before comparing.
+Stale parquets can produce misleading "differences" that look
+like old behavior vs new behavior when they are actually
+old-code-cached vs new-code-cached.
 
 The migration can be considered safe to release from a data-correctness standpoint.
 
