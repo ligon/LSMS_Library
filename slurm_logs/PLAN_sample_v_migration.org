@@ -1,0 +1,257 @@
+#+title: Plan: Migrate v to sample() --- Phases 3, 2, 4
+#+date: <2026-04-10 Thu>
+
+* Overview
+
+Replace redundant per-feature =v= (cluster) storage with a single
+API-time join from =sample()=.  The cache was cleared on 2026-04-10,
+so there are no stale parquets to worry about.
+
+All work happens on the =development= branch.
+
+Phases are numbered to match the original design doc
+(=slurm_logs/DESIGN_sample_as_v_source.org=), but the execution
+order is reversed: cleanup first, then framework change.
+
+* Phase 3 --- Remove =v= from feature configs (do first)
+
+** Goal
+
+Features that currently bake =v= into their index stop doing so.
+Parquets will be built with only their natural index (=(i, t, ...)=
+without =v=).
+
+** Scope: data_scheme.yml changes
+
+For every country that has =sample= in its =data_scheme.yml=,
+remove =v= from the =index:= declaration of all features *except*
+=cluster_features= and =sample= (which legitimately own =v=).
+
+Example --- Uganda before:
+#+begin_example
+  household_roster:
+    index: (t, v, i, pid)
+#+end_example
+
+After:
+#+begin_example
+  household_roster:
+    index: (t, i, pid)
+#+end_example
+
+** Scope: data_info.yml changes
+
+Remove =dfs:= merge blocks that exist solely to join =v= from cover
+pages.  The pattern (from CLAUDE.md) is:
+
+#+begin_example
+household_roster:
+    dfs:
+        - df_roster
+        - df_cluster        # <-- delete this sub-df
+    df_roster: ...
+    df_cluster:
+        file: ../Data/HH/gsec1.dta
+        idxvars:
+            i: hhid
+        myvars:
+            v: s1aq04a      # <-- only purpose is to provide v
+    merge_on:
+        - i
+    final_index:
+        - t
+        - v                 # <-- remove v
+        - i
+        - pid
+#+end_example
+
+After: the =dfs:= structure collapses to a simple single-file entry,
+or the =df_cluster= sub-df is deleted and =final_index= drops =v=.
+
+** Scope: legacy .py scripts
+
+Scripts like Uganda's =earnings.py=, =enterprise_income.py=, and
+=food_prices_quantities_and_expenditures.py= that manually join =v=
+from =household_roster()= or =cluster_features()= --- remove those
+join blocks and the corresponding =.set_index(['t', 'v', 'i'])=
+calls.  The script should write parquets indexed by =(t, i, ...)=.
+
+** What NOT to change
+
+- =cluster_features= --- legitimately indexed by =(t, v)=
+- =sample= --- legitimately has =v= as a column
+- Countries without =sample= in =data_scheme.yml= --- leave alone
+- =!make= features that only declare the tag (no explicit index) ---
+  these need their scripts inspected individually
+
+** Execution
+
+This is mechanical, country-by-country work.  Dispatch one agent per
+country (in worktrees), each with:
+1. The country name and list of features to modify
+2. Instructions to read the skill doc (=.claude/skills/add-feature/SKILL.md=)
+3. Instructions to modify =data_scheme.yml=, =data_info.yml= files,
+   and any =.py= scripts
+4. NO data builds --- just config changes
+
+Commit per-country changes to =development=.
+
+** Verification (deferred to after Phase 2)
+
+Features won't have =v= in their output until Phase 2 adds the
+API-time join.  That's fine --- we verify the full pipeline after
+both phases land.
+
+* Phase 2 --- Framework joins =v= from =sample()= (do second)
+
+** Goal
+
+When a feature's =data_scheme= declares =v= in its index, and the
+built DataFrame doesn't have =v=, the framework transparently joins
+it from =sample()= at API time.
+
+** Implementation: =_join_v_from_sample()=
+
+New method on =Country=:
+
+#+begin_src python
+def _join_v_from_sample(self, df: pd.DataFrame) -> pd.DataFrame:
+    """Join cluster identity (v) from sample() onto df.
+
+    Only fires when sample is in data_scheme and df has (i, t) but
+    not v in its index.
+    """
+    cache = getattr(self, '_sample_v_cache', None)
+    if cache is None:
+        try:
+            s = self.sample()
+            cache = s[['v']].copy()
+            self._sample_v_cache = cache
+        except Exception:
+            self._sample_v_cache = False
+            return df
+    if cache is False:
+        return df
+
+    idx_names = list(df.index.names)
+    flat = df.reset_index()
+    # Coerce join keys to string for safe matching
+    for key in ['i', 't']:
+        if key in flat.columns:
+            flat[key] = flat[key].astype(str)
+    v_lookup = cache.reset_index()
+    v_lookup['i'] = v_lookup['i'].astype(str)
+    v_lookup['t'] = v_lookup['t'].astype(str)
+
+    flat = flat.merge(v_lookup, on=['i', 't'], how='left')
+
+    # Insert v after t in the index
+    new_idx = []
+    for n in idx_names:
+        new_idx.append(n)
+        if n == 't':
+            new_idx.append('v')
+    if 'v' not in new_idx:
+        new_idx.append('v')
+    return flat.set_index(new_idx)
+#+end_src
+
+** Implementation: insert in =_finalize_result()=
+
+After =_augment_index_from_related_tables= (line ~1144) and before
+index reordering (line ~1147):
+
+#+begin_src python
+# Join v from sample() if declared but missing
+declared = _declared_index_levels(scheme_entry)
+if (declared
+    and 'v' in declared
+    and 'v' not in (df.index.names if isinstance(df.index, pd.MultiIndex) else [])
+    and 'sample' in self.data_scheme):
+    df = self._join_v_from_sample(df)
+#+end_src
+
+** Implementation: =market='Country'= convenience
+
+In =Country.__getattr__=, before calling =_add_market_index=:
+
+#+begin_src python
+if market == 'Country':
+    flat = result.reset_index()
+    flat['m'] = self.name
+    idx = list(result.index.names)
+    new_idx = []
+    for n in idx:
+        new_idx.append(n)
+        if n == 't':
+            new_idx.append('m')
+    if 'v' in new_idx:
+        new_idx.remove('v')
+        flat = flat.drop(columns=['v'], errors='ignore')
+    return flat.set_index(new_idx)
+#+end_src
+
+** Execution
+
+This is ~30 lines in =country.py=.  I (the SM) do this directly ---
+not delegated.
+
+* Phase 4 --- Simplify =_add_market_index()= (do third)
+
+** Goal
+
+With =v= guaranteed present from =_finalize_result()=, the roster
+fallback in =_add_market_index()= (lines 946--963) is dead code.
+Remove it.
+
+** Implementation
+
+Delete the =else:= branch at line 945 that joins =v= from
+=household_roster()=.  The method becomes:
+
+1. Get =_market_lookup(column)= --- returns =(t, v) -> m=
+2. Assert =v= is in =df= (it always is now)
+3. Merge on =(t, v)=, drop =v=, add =m=
+
+** Execution
+
+Small change, I do it directly after Phase 2 is verified.
+
+* Verification plan
+
+After all three phases land on =development=:
+
+1. Run structural tests: =pytest tests/test_schema_consistency.py tests/test_table_structure.py=
+2. For Uganda (reference country), build and verify:
+   #+begin_src python
+   import lsms_library as ll
+   uga = ll.Country('Uganda')
+   r = uga.household_roster()
+   assert 'v' in r.index.names
+   fe = uga.food_expenditures(market='Region')
+   assert 'm' in fe.index.names
+   assert 'v' not in fe.index.names
+   #+end_src
+3. Run =is_this_feature_sane()= on roster and food_expenditures
+4. Spot-check 2--3 other countries with =sample=
+
+* Risk register
+
+| Risk                                    | Mitigation                                   |
+|-----------------------------------------+----------------------------------------------|
+| Country without =sample= loses =v=     | Phase 3 only touches countries with =sample= |
+| =!make= scripts write =v= anyway       | Inspect each script; update index in script   |
+| =_add_market_index= called before       | Guard: if =v= not present, warn and return    |
+| =_finalize_result= (e.g., derived       | unchanged rather than crashing                |
+| tables)                                 |                                               |
+| =cluster_features= index changes        | Not touched --- =(t, v)= is correct           |
+| Performance: =sample()= called often    | Cached on =Country= instance via =setattr=    |
+
+* Timeline
+
+| Phase | Effort    | Who          | Dependencies |
+|-------+-----------+--------------+--------------|
+|     3 | ~2 hours  | Agents (||)  | Inventory    |
+|     2 | ~30 min   | SM (direct)  | Phase 3      |
+|     4 | ~15 min   | SM (direct)  | Phase 2      |
+| Verify | ~30 min  | SM + agents  | All phases   |
