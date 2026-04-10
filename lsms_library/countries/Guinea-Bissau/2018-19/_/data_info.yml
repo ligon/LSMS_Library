@@ -1,6 +1,41 @@
 Country: Guinea-Bissau
 Wave: 2018-19
 
+sample:
+    dfs:
+        - df_cover
+        - df_weights
+    df_cover:
+        file: s00_me_gnb2018.dta
+        idxvars:
+            v: grappe
+            i:
+                - grappe
+                - menage
+        myvars:
+            strata: s00q01
+            Rural:
+                - s00q04
+                - mapping:
+                    Rural: Rural
+                    rural: Rural
+                    RURAL: Rural
+                    Urbano: Urban
+                    urbain: Urban
+                    URBAIN: Urban
+    df_weights:
+        file: ehcvm_ponderations_gnb2018.dta
+        idxvars:
+            v: grappe
+        myvars:
+            weight: hhweight
+            panel_weight: hhweight
+    merge_on:
+        - v
+    final_index:
+        - i
+        - t
+
 cluster_features:
     dfs:
         - df_main

@@ -1,0 +1,12 @@
+#+NAME: strata
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| BOLAMA_BIJAGOS     | Bolama-Bijagos  |
+| bafata             | Bafata          |
+| biombo             | Biombo          |
+| cacheu             | Cacheu          |
+| gabu               | Gabu            |
+| oio                | Oio             |
+| quinara            | Quinara         |
+| sab                | SAB             |
+| tombali            | Tombali         |
