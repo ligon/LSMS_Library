@@ -1,0 +1,72 @@
+#+title: Session log: use_parquet regression check
+#+date: <2026-04-09 Thu>
+#+author: ligon / claude (scrum master)
+
+* Purpose
+
+Regression-test ~development~ branch against ~use_parquet~ branch to
+verify the sample() v-migration didn't break observable outputs for
+downstream consumers (who consume ~use_parquet~).
+
+* Session identity (for recovery)
+
+| Field            | Value                                                           |
+|------------------+-----------------------------------------------------------------|
+| Hostname         | =n0065.savio2=                                                  |
+| SLURM_JOB_ID     | =33328009=                                                      |
+| Started          | [2026-04-09 Thu 21:00]                                          |
+| Main repo        | =/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library= (development branch) |
+| Comparison clone | =/local/use_parquet_check/= (ephemeral to node)                 |
+| Output location  | =/local/use_parquet_check/out/= (copy back to slurm_logs/ when done) |
+
+* To resume after session loss
+
+1. SSH back to Savio, check if the Slurm job is still running:
+   #+begin_src sh
+   squeue -u ligon | grep 33328009
+   #+end_src
+2. If the job is still running, ~srun --jobid=33328009 --pty bash~ gets
+   you back on =n0065.savio2= with access to =/local/=.
+3. If the job has ended, the node's =/local/= is gone.  You'd need to
+   restart from scratch --- re-clone the repo, re-run the comparisons.
+4. Any committed comparison results should have been copied to
+   =/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/slurm_logs/=
+   as a backup before the session ended.
+
+* Branches being compared
+
+| Branch          | HEAD commit  | Notes                             |
+|-----------------+--------------+-----------------------------------|
+| =development=   | =1c1ae618=   | Phases 2/3/4 of sample migration  |
+| =use_parquet=   | =990a6bee=   | Downstream consumer baseline      |
+
+* Tables to compare (from use_parquet Uganda data_scheme)
+
+18 entries total.  For tables that are market-indexed, compare
+~development~ with ~market='Region'~ vs ~use_parquet~ default output.
+
+| Table                       | use_parquet returns | dev equivalent              |
+|-----------------------------+---------------------+-----------------------------|
+| =people_last7days=          | (i, t, m)           | =people_last7days(market='Region')= |
+| =cluster_features=          | (t, v)              | =cluster_features()=        |
+| =household_roster=          | (i, pid, t)         | =household_roster()= --- has (i,t,v,pid) with v from sample; index names differ |
+| =household_characteristics= | (probably t,m,i)    | =household_characteristics(market='Region')= |
+| =food_acquired=             | !make               | =food_acquired()= or =food_acquired(market='Region')= |
+| =food_expenditures=         | !make               | =food_expenditures(market='Region')= |
+| =food_prices=               | !make               | =food_prices(market='Region')= |
+| =food_quantities=           | !make               | =food_quantities(market='Region')= |
+| =nutrition=                 | !make               | =nutrition()=               |
+| =shocks=                    | !make               | =shocks()=                  |
+| =earnings=                  | !make               | =earnings()=                |
+| =income=                    | !make               | =income()=                  |
+| =enterprise_income=         | !make               | =enterprise_income()=       |
+| =interview_date=            | !make               | =interview_date()=          |
+| =panel_ids=                 | !make               | =panel_ids= (property, not method) |
+| =locality=                  | !make               | =locality()=                |
+| =assets=                    | !make               | =assets()=                  |
+| =housing=                   | !make               | =housing()=                 |
+| =nonfood_expenditures=      | !make               | =nonfood_expenditures()=    |
+| =other_features=            | !make               | OBSOLETE --- replaced by cluster_features |
+
+The =other_features= table is no longer on development.  Its role is
+now played by =cluster_features= + =_add_market_index=.
