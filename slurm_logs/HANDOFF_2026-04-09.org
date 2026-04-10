@@ -46,21 +46,43 @@ indexed by =(i, t)=, with columns =v= (cluster), =weight= (cross-sectional),
 | GhanaLSS      |     7 | Repeated cross-sections, 30 years    | Weight type incompatibility GLSS4 vs 5+  |
 | Albania       |     6 | All scripts (varied file formats)    | 2002 baseline + 2003-04 panel sub-samples |
 
-** Agents still in flight
+** Countries completed (continued --- all agents finished)
 
-| Agent             | Countries                                                | Status  |
-|-------------------+----------------------------------------------------------+---------|
-| Ethiopia          | Ethiopia (PP/PH)                                         | Running |
-| Batch 1           | Cambodia, India, Iraq, South Africa, Guatemala           | Running |
-| Batch 2           | Armenia, Azerbaijan, Guyana, Kazakhstan, Kosovo, Liberia, | Running |
-|                   | Pakistan, Serbia, Serbia and Montenegro, Tajikistan,     |         |
-|                   | Timor-Leste                                              |         |
-| Nepal + China     | Nepal, China                                             | Running |
+| Country         | Waves | Pattern                              | Key finding                              |
+|-----------------+-------+--------------------------------------+------------------------------------------|
+| Ethiopia        |     5 | All scripts (construct strata)       | 42-entry categorical mapping for regions |
+| Cambodia        |     1 | YAML, single file                    | finalhhweight, province strata           |
+| India           |     1 | YAML, single file                    | 4 strata: urban/rural x poor/non-poor    |
+| Iraq            |     2 | YAML, single file                    | 57-strata in 2006-07, 118 in 2012       |
+| South Africa    |     1 | YAML, single file                    | 3-category Rural (Urban/Rural/Informal)  |
+| Guatemala       |     1 | YAML, single file                    | 8 regions                                |
+| Azerbaijan      |     1 | Script (composite i)                 | PSU-level weight merge                   |
+| Guyana          |     1 | Script (composite i)                 | ED-level weight merge                    |
+| Kazakhstan      |     1 | YAML                                 | No weights in data                       |
+| Kosovo          |     1 | YAML, single file                    | Straightforward                          |
+| Liberia         |     1 | YAML, single file                    | Straightforward                          |
+| Pakistan        |     1 | YAML                                 | No weights (F14 weight = body weight!)   |
+| Serbia          |     1 | Script (composite i, multi-file)     | hhweight + popweight                     |
+| Serbia and Mont.|     2 | Script (composite i)                 | 2003 has genuine panel_weight (ponderl)  |
+| Tajikistan      |     4 | YAML/script mix                      | 1999 has no weight; 2003+ do             |
+| Timor-Leste     |     2 | YAML/script                          | 2001 requires EA-level merge             |
+| Nepal           |     3 | YAML (no data on disk)               | Configs ready for when data downloaded   |
+| China           |     1 | YAML                                 | Non-probability sample, no weights       |
+| Armenia         |   --- | Skipped                              | No data on disk                          |
 
-When these complete, review their output, commit good results, and
-re-dispatch any failures individually.
+** Final test results
 
-** Tests
+=tests/test_sample.py=: *257 passed, 3 failed (expected), 50 skipped*
+
+The 3 failures are =test_has_weight_column= for China, Kazakhstan,
+and Pakistan --- countries where no sampling weights exist in the
+data.  This is a genuine data limitation, not a configuration error.
+
+The 50 skips are: single-wave countries skipping cross-wave tests,
+countries with no data on disk, and countries where =panel_weight=
+never diverges from =weight=.
+
+** Tests (10 checks)
 
 =tests/test_sample.py= auto-discovers countries with =sample= in
 =data_scheme.yml= and runs 10 checks:
