@@ -35,7 +35,44 @@ the NSO NADA portal.
 4. =dvc add= and =dvc push= to cache
 5. Rebuild features and validate with =is_this_feature_sane()=
 
+* Sampling Design
+
+All three NLSS waves use a two-stage stratified cluster sample.
+PSUs are wards (=WWW= in waves I--II, =xhpsu= in wave III).
+
+** Strata and PSU identifiers
+
+| Wave    | PSU var | Strata var | Urban/Rural var | HH weight var |
+|---------+---------+------------+-----------------+---------------|
+| 1995-96 | WWW     | stratum    | urbrural        | weight        |
+| 2003-04 | WWW     | stratum    | urbrural        | weight        |
+| 2010-11 | xhpsu   | stratum    | urbrur          | wt_hh         |
+
+** Weight types
+
+NLSS I and II provide a single household weight (raising factor).
+NLSS III provides both =wt_hh= (household weight) and =wt_ind=
+(individual weight = hh weight * hh size).  Since =sample= is
+household-level, both =weight= and =panel_weight= map to =wt_hh=.
+There is no rotating panel or refreshment sample in the NLSS series.
+
+** Source files
+
+- NLSS I (1995-96): =c1_nlss_public.dta= (HH-level, has WWWHH + weight)
+  joined with =sample_hh.dta= (PSU-level, has stratum + urbrural)
+- NLSS II (2003-04): =c2_nlss_public.dta= (HH-level) joined with
+  =sample.dta= (PSU-level)
+- NLSS III (2010-11): =sample.dta= (HH-level, 7180 cases, has all
+  sampling variables)
+
+** BID references
+
+- NLSS I: https://microdata.worldbank.org/index.php/catalog/2301
+- NLSS II: https://microdata.worldbank.org/index.php/catalog/74
+- NLSS III: https://microdata.worldbank.org/index.php/catalog/1000
+
 * Features configured (pending data)
+** sample
 ** household_roster
 ** cluster_features
 ** individual_education

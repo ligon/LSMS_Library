@@ -1,3 +1,16 @@
+sample:
+    file: ../Data/sample.dta
+    idxvars:
+        i:
+            - xhpsu
+            - xhnum
+    myvars:
+        v: xhpsu
+        weight: wt_hh
+        panel_weight: wt_hh
+        strata: stratum
+        Rural: urbrur
+
 assets:
     file: ../Data/S06C.dta
     idxvars:

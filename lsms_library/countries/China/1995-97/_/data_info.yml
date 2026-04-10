@@ -1,6 +1,15 @@
 Country: China
 Wave: 1995-97
 
+sample:
+    file:
+        - ../Data/TOTEXP.DTA
+    idxvars:
+        i: hid
+    myvars:
+        v:
+            - hid
+
 household_roster:
     file:
         - ../Data/S01A2.DTA

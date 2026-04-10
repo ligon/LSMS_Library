@@ -1,3 +1,28 @@
+sample:
+    dfs:
+        - df_hh
+        - df_psu
+    df_hh:
+        file: ../Data/c1_nlss_public.dta
+        idxvars:
+            i: WWWHH
+        myvars:
+            v: WWW
+            weight: weight
+            panel_weight: weight
+    df_psu:
+        file: ../Data/sample_hh.dta
+        idxvars:
+            v: WWW
+        myvars:
+            strata: stratum
+            Rural: urbrural
+    merge_on:
+        - v
+    final_index:
+        - i
+        - t
+
 assets:
     file: ../Data/R1_Z06C_Durables.dta
     idxvars:

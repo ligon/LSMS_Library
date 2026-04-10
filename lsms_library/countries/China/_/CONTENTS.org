@@ -1,0 +1,53 @@
+#+title: Contents
+
+* Overview
+
+China Living Standards Survey (CLSS) conducted in Hebei and Liaoning
+Provinces in July 1995 and July 1997.  One wave: 1995-97.
+
+Source: https://doi.org/10.48529/ymjj-w136
+
+* Sampling Design
+
+** Not a probability sample
+
+The BID states: "The CLSS sample is not a rigorous random sample
+drawn from a well-defined population."
+
+County and village selection was purposive (based on 1930s Japanese
+survey sites), not random.  Only within-village household selection
+used systematic random sampling from a household list.
+
+Because the sample is non-probabilistic, *no sampling weights exist*
+in the data files.  The =sample= table provides village-level PSU
+identity (=v=) for clustering but weight/strata/Rural columns are
+absent.
+
+** PSU identification
+
+Villages are the PSUs.  The household ID (=hid=) encodes geography:
+- Digit 1: county (1--6)
+- Digit 2: town within county (always 0)
+- Digit 3: village within county (1--5)
+- Digits 4--5: household within village
+
+=v= is derived as =hid // 100= (3-digit village code, 30 villages).
+Counties 1--3 map to Province 7 (Hebei); counties 4--6 to Province 8
+(Liaoning).
+
+** Structure
+
+- 2 provinces, 6 counties, 31 villages (one county had an extra)
+- ~880 farm households (787 in final data)
+- 50 HH in each "main village" (1930s survey site), 20 HH in others
+- Intended sample size: 780 (130 per county)
+
+** BID reference
+
+- https://microdata.worldbank.org/index.php/catalog/study/CHN_1995_LSS_v01_M
+- BID: =Documentation/chnbinfo.pdf= (Section 3 "Sample")
+
+* Features configured
+** sample
+** cluster_features
+** household_roster
