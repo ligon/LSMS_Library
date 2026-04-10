@@ -350,8 +350,13 @@ class TestDVCCaching:
     def test_valid_cache_uses_cached_file(
         self,
         mock_country_structure,
+        monkeypatch,
     ):
         """When DVC status is clean, cached parquet should be used directly."""
+        # Force DVC backend so the DVC cache path is exercised regardless of
+        # what LSMS_BUILD_BACKEND is set to in the test runner environment.
+        monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
+
         cache_path = mock_country_structure / "var" / "test_data.parquet"
         cache_path.parent.mkdir(parents=True, exist_ok=True)
         cache_path.touch()
@@ -373,6 +378,8 @@ class TestDVCCaching:
             patch("lsms_library.country.Repo") as mock_repo_class, \
             patch("lsms_library.country.get_dataframe", return_value=cached_df) as mock_get_dataframe, \
             patch("lsms_library.country.map_index", side_effect=lambda df: df), \
+            patch("lsms_library.country._load_canonical_spellings", return_value={}), \
+            patch("lsms_library.country._load_rejected_column_spellings", return_value={}), \
             patch.object(Country, "__getitem__", side_effect=AssertionError("Should not load waves")), \
             patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
             patch.object(Country, "data_scheme", new_callable=PropertyMock) as mock_scheme, \
@@ -414,8 +421,12 @@ class TestDVCCaching:
     def test_dvc_cache_applies_location_index(
         self,
         mock_country_structure,
+        monkeypatch,
     ):
         """DVC cache loads should augment indices before normalization."""
+        # Force DVC backend so the DVC cache path is exercised regardless of
+        # what LSMS_BUILD_BACKEND is set to in the test runner environment.
+        monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
 
         cache_path = mock_country_structure / "var" / "test_data.parquet"
         cache_path.parent.mkdir(parents=True, exist_ok=True)
@@ -438,6 +449,8 @@ class TestDVCCaching:
             patch("lsms_library.country.Repo") as mock_repo_class, \
             patch("lsms_library.country.get_dataframe", return_value=cached_df) as mock_get_dataframe, \
             patch("lsms_library.country.map_index", side_effect=lambda df: df), \
+            patch("lsms_library.country._load_canonical_spellings", return_value={}), \
+            patch("lsms_library.country._load_rejected_column_spellings", return_value={}), \
             patch.object(
                 Country,
                 "_augment_index_from_related_tables",
@@ -526,8 +539,13 @@ class TestDVCCaching:
     def test_panel_ids_dataframe_cache_written_as_parquet(
         self,
         mock_country_structure,
+        monkeypatch,
     ):
         """panel_ids DataFrame results should persist as parquet when Makefile fallback fails."""
+        # Force DVC backend so load_json_cache is exercised and the parquet
+        # cache-write path is triggered after the Makefile fallback fails.
+        monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
+
         panel_ids_json = mock_country_structure / "_" / "panel_ids.json"
         panel_ids_parquet = mock_country_structure / "_" / "panel_ids.parquet"
         if panel_ids_json.exists():
@@ -545,6 +563,8 @@ class TestDVCCaching:
         with patch("lsms_library.country.files") as mock_files, \
             patch("lsms_library.country.Repo") as mock_repo_class, \
             patch("lsms_library.country.subprocess.run", side_effect=failing_make) as _mock_make, \
+            patch("lsms_library.country._load_canonical_spellings", return_value={}), \
+            patch("lsms_library.country._load_rejected_column_spellings", return_value={}), \
             patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
             patch.object(Country, "data_scheme", new_callable=PropertyMock) as mock_scheme, \
             patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources, \
@@ -580,8 +600,13 @@ class TestDVCCaching:
     def test_dvc_stage_dirty_then_clean(
         self,
         mock_country_structure,
+        monkeypatch,
     ):
         """Cache should rebuild once when DVC reports changes and reuse cache once clean."""
+        # Force DVC backend so the DVC cache path is exercised regardless of
+        # what LSMS_BUILD_BACKEND is set to in the test runner environment.
+        monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
+
         cache_path = mock_country_structure / "var" / "household_roster.parquet"
 
         df = pd.DataFrame(
@@ -619,7 +644,9 @@ class TestDVCCaching:
             patch("lsms_library.country.Repo") as mock_repo_class, \
             patch("lsms_library.country.get_dataframe") as mock_get_dataframe, \
             patch("lsms_library.country.map_index", side_effect=lambda frame: frame), \
-            patch.object(Country, "__getitem__", return_value=SimpleNamespace(household_roster=lambda: df)) as mock_getitem, \
+            patch("lsms_library.country._load_canonical_spellings", return_value={}), \
+            patch("lsms_library.country._load_rejected_column_spellings", return_value={}), \
+            patch.object(Country, "__getitem__", return_value=SimpleNamespace(household_roster=lambda: df, data_scheme=["household_roster"])) as mock_getitem, \
             patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
             patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources, \
             patch.object(Country, "data_scheme", new_callable=PropertyMock) as mock_scheme, \
