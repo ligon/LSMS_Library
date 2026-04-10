@@ -1,0 +1,605 @@
+#+title: Paper outline: Berkeley Survey Data (working draft)
+#+date: <2026-04-10 Fri>
+#+author: ligon + claude (first draft for reaction)
+
+This is a first-draft outline of the paper that would announce the
+project in the Summers-Heston (1991) mould.  It's meant to provoke
+reaction, not to be the final structure.  The title, the target
+venue, and the lead application are the most important things to
+argue about first --- section-by-section word counts are tentative.
+
+* Title candidates
+
+Ordered by my preference, most substantive framing first:
+
+1. *A Microdata Approach to Purchasing Power Parity: The Berkeley
+   Survey Data*
+2. *Consumption PPPs from Household Microdata: The Berkeley Survey
+   Data and Its Application to Cross-Country Real Income Comparison*
+3. *Comparable Preferences Across Countries: The Berkeley Survey
+   Data and an Application to Cross-Country Welfare Analysis*
+4. *Berkeley Survey Data (BSD): A Comparable Household Microdata
+   Resource*
+
+Option 1 is the strongest framing --- it pitches directly against
+PWT (which is about PPP) using the medium PWT cannot use (microdata
+quantities and implicit prices).  The target audience for Option 1
+is exactly the audience that cites PWT: development economists,
+macro-development researchers, welfare economists, and statistical
+agencies.
+
+Option 3 (formerly my top pick) foregrounds the CFE estimation
+exercise.  It is still substantive but positions the paper as a
+methods contribution to demand estimation rather than as a
+competitor/complement to PWT.  Much narrower audience.  Demote to
+backup.
+
+Option 1 leads with substance (comparable preferences), which is
+what AER/QJE reviewers respond to.  Option 2 is the conservative
+methods-paper framing, fits better at JAE or Scientific Data.
+Option 3 if we want to reinforce "consistent" in the title.
+
+My recommendation: draft with Option 1 as the working title, with
+an understanding that we may scale back to Option 2 if the venue
+target drops.  The aggressive title forces the draft to actually
+deliver a substantive result, which is good discipline.
+
+* Target venue
+
+Primary: *AER* (following Feenstra-Inklaar-Timmer 2015's precedent
+for a methods-plus-application paper).  Requires a substantive lead
+analysis with a genuinely novel finding.
+
+Secondary: *JEP* (fits the framing "here's a new tool that changes
+how we think about cross-country welfare analysis") if we can get
+an invited piece.
+
+Fallback: *JAE* (methods-friendly, lower bar for the application
+component) or *Journal of Development Economics* (natural home for
+the substantive application).
+
+Companion: a short *JOSS* or *Scientific Data* paper describing the
+software, submitted in parallel, so users have a lightweight cite
+alternative for software-only uses.
+
+* Abstract (200 words, placeholder)
+
+We introduce the Berkeley Survey Data (BSD), a Python library
+providing a consistent interface to harmonized household microdata
+from approximately 25 developing countries, spanning 1987 to 2022
+and more than 2 million households.  Unlike prior harmonization
+efforts that impose a common schema on heterogeneous surveys
+(LIS, IPUMS) or distribute raw data without standardization (the
+World Bank Microdata Library), BSD harmonizes the /interface/
+rather than the data: users get uniform access patterns across
+countries while retaining the ability to drill down to source
+variables when their questions require it.
+
+Using BSD, we construct a new set of cross-country purchasing
+power parities from household expenditure and implicit price data
+--- an alternative to the International Comparison Program (ICP)
+PPPs consumed by the Penn World Table.  Because our consumption
+PPPs are derived from the same household microdata being deflated,
+they are internally consistent with downstream analysis, available
+annually rather than at 3-6-year ICP benchmarks, and computable at
+sub-national resolution.  We validate the BSD consumption PPPs
+against ICP at benchmark years, document systematic divergences,
+and demonstrate their use for regional real-income comparisons
+that ICP cannot support.  The library is open source and is
+distributed as versioned releases for reproducibility.
+
+* Section 1: Introduction (~1500 words)
+
+** Motivation
+
+Cross-country welfare comparisons require household-level data.
+Aggregate data (GDP per capita, national accounts) cannot answer
+questions about distribution, composition, or heterogeneity of
+welfare.  Researchers who want to compare how families in Uganda
+and Nigeria respond to food price shocks, or to decompose
+cross-country consumption inequality into within- and
+between-country components, need microdata from both countries
+that can be merged, compared, and analyzed as a single panel.
+
+** The "last-mile" problem in microdata
+
+A researcher today who wants to add a second country to their
+analysis faces weeks of work: learning the survey instrument,
+decoding value labels, matching variables across waves, building
+deflators, handling cluster and weight structures.  This cost
+scales linearly with the number of countries.  For a 10-country
+analysis, that is easily six months of setup before any substantive
+analysis begins.  Most researchers rationally stop at one or two
+countries.
+
+** Prior art and its limits
+
+Three existing approaches:
+
+1. *Full harmonization* (LIS, IPUMS).  Produce a dataset in a
+   common schema.  Strength: the output file is uniform, and
+   cross-country analysis is as simple as a group-by.  Weakness:
+   the harmonization process discards information.  Questions that
+   require survey-specific detail cannot be answered.
+
+2. *Raw distribution* (WB Microdata Library, country statistical
+   agencies).  Make the original files available; leave
+   harmonization to the user.  Strength: nothing is lost.
+   Weakness: the last-mile problem persists.
+
+3. *Macro aggregation* (PWT, WDI, PovcalNet).  Compute aggregates
+   country by country and distribute the results.  Strength:
+   immediately comparable.  Weakness: microdata-level analysis is
+   impossible.
+
+BSD proposes a fourth approach: harmonize the /interface/ rather
+than the data.  Users get uniform access patterns --- every
+country's ~household_roster()~ returns a DataFrame with the same
+column names and index structure --- while the underlying data
+retains its full detail.  When a question requires it, the user
+can drill down to the source ~.dta~ file.
+
+** Paper contributions
+
+1. The BSD library and its release 2026.04, covering N countries
+   and 2M+ households, distributed under a permissive license with
+   reproducible versioning.
+2. Architectural principles for interface harmonization, including
+   progressive disclosure, sampling-design-based cluster identity,
+   and a kinship decomposition that properly represents polygynous
+   and blended households.
+3. *A microdata-based alternative to ICP/PWT consumption PPPs*
+   constructed from household expenditure and implicit price data,
+   internally consistent with the microdata being deflated, updated
+   annually, and computable at sub-national resolution.  We validate
+   against ICP at benchmark years and document the divergences.
+
+The central intellectual argument is the principle of
+/harmonizing the interface, not the data/.  When primary sources
+are heterogeneous by design, the right response is a uniform
+programming interface layered over preserved source detail, not a
+forced common schema.  BSD is the first systematic application of
+this principle to cross-country household microdata.  We argue
+the principle generalizes beyond household surveys to any domain
+where comparable analysis across heterogeneous primary sources is
+needed.
+
+** Roadmap
+
+Section 2 reviews related work in detail.  Section 3 describes the
+architecture.  Section 4 documents coverage.  Section 5 presents
+the CFE application.  Sections 6-7 discuss limitations and
+conclude.  Code and data are available at the project repository.
+
+* Section 2: Related work (~1500 words)
+
+Discuss each of LIS, IPUMS, WDI, DHS, PWT, PovcalNet, the WB
+Microdata Library, and any academic harmonization efforts (e.g.
+Deaton-Zaidi 2002 on consumption aggregate construction).  For
+each, note the tradeoffs and identify what the gap is that BSD
+fills.
+
+Short paragraph positioning BSD as the microdata analog of PWT,
+using similar architectural principles (small team, strict scope,
+versioned releases, canonical output artifacts) but focused on
+household-level rather than national-accounts data.
+
+* Section 3: Architecture (~3000 words --- the technical heart)
+
+** 3.1 Core abstractions
+
+Introduce the ~Country~ class and the ~Feature~ class.  Show a
+10-line example that loads Uganda food expenditures and Nigeria
+food expenditures and concatenates them.  The reader should see
+the uniform API immediately.
+
+** 3.2 Interface vs. data harmonization
+
+Define precisely what BSD does and does not harmonize:
+
+- Uniform: table names, column names, index structure, canonical
+  values for constrained columns (e.g. Sex ∈ {M, F}).
+- Not uniform: food item categories, measurement units, regional
+  administrative boundaries, survey-specific variables outside
+  the declared schema.
+
+Describe the layered harmonization:
+
+1. Column renaming (YAML ~data_info.yml~ per wave)
+2. Value-level canonical spellings (inverse-dict in the global
+   ~data_info.yml~)
+3. Categorical mapping tables (org-mode tables per country for
+   cross-wave harmonization)
+4. Kinship decomposition (global dictionary in ~kinship.yml~)
+5. Sampling design join (~sample()~ → ~v~ at API time)
+
+Each layer is transparent to users who need to bypass it.  The
+architecture supports drilling down.
+
+** 3.3 The kinship decomposition
+
+The novel technical contribution worth foregrounding.  Traditional
+household rosters carry a single ~Relationship~ column (values like
+"Head", "Spouse", "Child").  This is fundamentally inadequate:
+polygynous households have multiple wives (all "Spouse"), blended
+families have foster children and step children collapsed together,
+and cross-country comparison of household structure requires finer
+distinctions.
+
+Building on Kroeber (1909) and Romney-D'Andrade (1964), we
+decompose kinship into four columns:
+
+- ~Sex~: M/F (no longer redundant with Relationship string)
+- ~Generation~: vertical distance from head (0=same, +1=parent)
+- ~Distance~: collateral distance (0=lineal, 1=sibling, 2=cousin)
+- ~Affinity~: consanguineal, affinal, step, foster, unrelated,
+  guest, servant
+
+Show examples: polygynous wives all as (0, 0, affinal); foster
+children as (-1, 0, foster), distinguishable from step children
+(-1, 0, step) and adopted children (-1, 0, consanguineal).
+
+** 3.4 Sampling design as a single source of truth
+
+The ~sample()~ table encodes the survey's sampling design
+(household cluster, weight, strata, urban/rural).  Cluster identity
+(~v~) is joined from ~sample()~ at API time, not stored redundantly
+in feature parquets.  Describe the architectural benefits:
+correctness, extensibility, lineage tracking.
+
+Brief aside: this is a good example of the paper-worthy move of
+making explicit what every household-survey analyst implicitly does
+manually (join cluster identity onto every analysis).
+
+** 3.5 Cross-wave categorical harmonization
+
+org-mode tables in ~categorical_mapping.org~ map variant labels to
+canonical forms across waves within a country.  Automatic
+application via column-name matching.  Show Uganda food items
+across 8 waves as an example.
+
+Important caveat: we explicitly do /not/ harmonize across
+countries.  "Maize" in Uganda and "Maize" in Nigeria may or may not
+refer to the same preparation; the analyst decides whether to
+treat them as the same.
+
+** 3.6 Caching, reproducibility, and versioning
+
+- Data/code separation: parquets live under ~data_root()~, not
+  in the repo tree
+- Hash-based cache invalidation
+- Pinning to a BSD release version:
+  #+begin_src python
+  import bsd
+  uga = bsd.Country('Uganda', version='2026.04')
+  #+end_src
+- Implications for replication: a paper citing BSD 2026.04 can be
+  exactly reproduced five years later
+
+* Section 4: Coverage and description (~1000 words)
+
+- Summary table: country x wave x sample size (main table, to be
+  generated programmatically from the library itself)
+- Temporal span: 1987 to 2022
+- Programs represented: LSMS-ISA, LSMS, EHCVM, GLSS, DHS-adjacent,
+  national HH surveys
+- Standardized tables: household_roster, food_acquired (+ derived
+  tables), cluster_features, sample, shocks, assets, panel_ids,
+  etc.
+- Known limitations by country (GhanaSPS flagged as incomplete)
+- Data source acknowledgments
+
+* Section 5: Lead application --- A consumption PPP from household microdata (~4000 words)
+
+The headline substantive contribution.  BSD enables a
+microdata-based alternative to the International Comparison
+Program's purchasing power parity exchange rates.  Instead of
+periodic benchmark price surveys conducted by statistical agencies
+every 3-6 years (the ICP approach that PWT consumes), we construct
+consumption PPPs directly from the expenditure and implicit price
+data in household surveys.
+
+** 5.1 The problem: ICP/PWT PPPs have known limitations
+
+Brief review of ICP/PWT methodology and its pain points:
+
+1. *Infrequent updates*: ICP benchmarks are expensive and happen
+   every 3-6 years.  Between benchmarks, PPPs are interpolated or
+   held fixed.  This introduces measurement error in cross-country
+   real income comparisons at non-benchmark years.
+
+2. *The revision problem*: when PPPs are updated at a new
+   benchmark, historical PWT series change.  Papers written
+   against PWT 8.0 do not reproduce against PWT 10.0.  The
+   Feenstra-Inklaar-Timmer (2015) relaunch paper openly
+   acknowledges this.
+
+3. *External basket*: ICP uses a basket of goods and services
+   defined externally (by the ICP methodology) rather than derived
+   from what households actually purchase.  This matters for
+   welfare interpretations.
+
+4. *No sub-national variation*: ICP produces one PPP per country.
+   But regional price levels vary enormously within countries
+   (urban vs. rural, capital vs. hinterland), and the single
+   national PPP obscures this.
+
+5. *Consistency with deflated data*: the PPPs PWT distributes are
+   based on a different data generating process than the household
+   expenditure data that development economists typically deflate
+   with them.  There is no guarantee of internal consistency.
+
+** 5.2 The insight: household surveys already contain prices
+
+Every household survey that records food acquisition captures
+/two/ things per purchase: an expenditure (in local currency) and
+a quantity (in local units).  The ratio is an implicit price that
+the household actually faced in the market, for the specific item
+and the specific region, at the specific time of interview.
+
+Aggregating these implicit prices across households within a
+country-wave-item cell yields a country-level price index for that
+item.  Repeating across all food items gives a country-level
+consumption-basket price level.  Comparing country-level price
+levels gives a bilateral PPP.  Aggregating bilaterals via standard
+multilateral methods (Geary-Khamis, GEKS) gives a full multilateral
+PPP matrix.
+
+This is methodologically straightforward /if you have harmonized
+cross-country household microdata with unit-converted quantities/.
+BSD provides exactly that.  The ~food_acquired~ feature delivers
+expenditure and quantity data per household × item × unit; the
+unit-conversion layer (kg_per_other_units) converts to a common
+metric; the sampling weights from ~sample()~ make the aggregation
+population-representative.
+
+** 5.3 Methodology
+
+*** Step 1: Unit values from the microdata
+
+For each household /h/ in country /c/ at wave /t/, and each food
+item /j/, compute the implicit price:
+
+$$p_{hcjt} = \frac{\text{expenditure}_{hcjt}}{\text{quantity in kg}_{hcjt}}$$
+
+using BSD's unit-to-kg conversion for non-metric units.  Discard
+transactions with zero quantity or zero expenditure.  Winsorize
+tails to manage outliers.
+
+*** Step 2: Country-wave-item price level
+
+Aggregate unit values within each (country, wave, item) cell to a
+single price, weighted by sampling weights and optionally by
+quantity purchased.  Consider the median (robust) vs. the
+weighted mean (efficient) trade-off.
+
+*** Step 3: Consumption basket
+
+Construct a representative consumption basket in several ways:
+
+- *Own-basket (Paasche-like)*: each country's basket
+- *Common basket (Laspeyres-like)*: world-average shares
+- *Geometric average*: Fisher or Törnqvist indices
+- *Reference-country basket*: e.g. Uganda as base
+
+Report multiple variants to demonstrate robustness.
+
+*** Step 4: Bilateral PPPs
+
+For each country pair (/c/, /c'/), compute the cost of the
+reference basket in each country and take the ratio.  This gives
+the bilateral PPP between /c/ and /c'/, directly comparable to
+ICP's bilateral PPPs for the same country pair.
+
+*** Step 5: Multilateral PPPs
+
+Apply standard multilateral aggregation (Geary-Khamis or GEKS) to
+the bilaterals to produce a full multilateral PPP matrix suitable
+for cross-country real income comparison.
+
+*** Step 6: Validation against ICP/PWT
+
+Compare the BSD consumption PPPs with ICP/PWT's published
+consumption PPPs at benchmark years.  Interesting questions:
+  - Do they agree at benchmark years?
+  - Where do they diverge?  Are the divergences systematic (e.g.,
+    BSD undervalues rural consumption because households
+    substitute toward home production)?
+  - How does the BSD series behave at non-benchmark years, when
+    ICP is interpolating?
+
+Report correlations, rank correlations, and bilateral
+scatterplots.  The analytical story is not that BSD is "right" and
+ICP is "wrong" --- it is that BSD provides an /independent and
+annually-updated/ alternative that can be used as a consistency
+check on ICP and as a primary deflator for microdata-based
+analyses.
+
+** 5.4 Results
+
+- *Headline figure*: a scatterplot of log BSD consumption PPP vs.
+  log ICP consumption PPP at benchmark years, with 45-degree line.
+  A priori I expect these to line up reasonably well but with some
+  systematic drift.
+- *Table*: bilateral PPPs for N countries in a canonical reference
+  year, BSD vs. ICP columns, with ratio.
+- *Time series*: plot BSD PPPs at annual/biannual frequency and
+  show that between-benchmark drift is non-negligible for several
+  countries.
+- *Sub-national PPPs*: demonstrate BSD's ability to compute
+  region-level PPPs within a country.  Figure: map of real
+  consumption per capita by region for 2-3 countries, using BSD
+  sub-national PPPs to deflate.  This is something ICP/PWT cannot
+  do at all.
+- *Decomposition*: of real consumption differences into price
+  (PPP) and nominal (income) components, with proper confidence
+  intervals.
+
+** 5.5 Discussion
+
+- What this changes: papers that currently deflate African
+  household surveys using a single national PPP are implicitly
+  assuming no within-country price variation.  BSD provides
+  the machinery to relax this assumption.
+- Caveats: the food-PPP is not a full-consumption PPP (services,
+  rent, durables are underrepresented in LSMS food modules).
+  Combine with non-food modules where available.
+- Caveats: self-reported quantities have measurement error.  Some
+  of the BSD/ICP divergence is attributable to differences in what
+  is measured, not differences in what is correct.
+- Caveats: aggregation of food items across countries is an
+  analytical choice, not a canonical one.  Report robustness to
+  different aggregation schemes.
+- *The big argument*: for microdata-based welfare analysis, a
+  consistent PPP derived from the same data being deflated is
+  preferable to an external PPP derived from a different
+  measurement system, even if the external one has better coverage
+  of non-food consumption.
+
+** 5.6 Relation to other microdata PPP efforts
+
+Short lit review.  The idea is not entirely new --- there have
+been country-specific exercises using household surveys to
+construct price indices (e.g., Deaton's spatial price indices for
+India, Ravallion's regional price adjustments).  The contribution
+here is doing this /at scale and consistently/ across ~25
+countries, enabled by BSD's harmonized interface.  Cite the
+precedents honestly.
+
+* Section 5b (optional): Cross-country CFE demand estimation (~1500 words)
+
+Brief demonstration showing that BSD also enables other analyses.
+Keep the 10-line code example.  The CFE application is here
+because it is the second-best demonstration of what BSD enables.
+Can be moved to an appendix if the paper runs long.
+
+Show the code:
+#+begin_src python
+import bsd
+from cfe.regression import Regression
+import numpy as np
+
+results = {}
+for country in ['Uganda', 'Nigeria', 'Tanzania', 'Mali', ...]:
+    c = bsd.Country(country)
+    x = c.food_expenditures(market='Region')
+    d = c.household_characteristics(market='Region')
+    y = np.log(x['Expenditure'].replace(0, np.nan)).dropna()
+    r = Regression(y=y, d=d)
+    results[country] = r.get_beta()
+#+end_src
+
+Report the preference parameters and one summary finding (the
+cross-country heterogeneity result from the original Section 5
+draft).  Use this as a teaser for a follow-up paper on cross-
+country demand systems rather than as the lead contribution of
+this paper.
+
+* Section 6: Limitations and future work (~500 words)
+
+- Known gaps: GhanaSPS incomplete, some countries have pre-release
+  data, no coverage of several high-priority countries (India's
+  NSS, Indonesia's SUSENAS, Mexico's ENIGH)
+- Areas where BSD explicitly does not harmonize: cross-country
+  food item categories, administrative boundary equivalences,
+  exchange rate vs. PPP deflation
+- Roadmap: nutrition analysis, cross-country shocks panel,
+  community contributions
+- Long-term stewardship: the project needs an institutional home
+  that outlives any single maintainer (cf. PWT Penn → Groningen
+  transition)
+
+* Section 7: Conclusion (~500 words)
+
+- Recap the principle: harmonize the interface, not the data
+- Recap the technical contributions
+- Recap the empirical finding
+- Broader argument: this principle applies beyond household
+  surveys to any domain where heterogeneous primary sources need
+  to be compared (administrative data, firm-level microdata,
+  clinical trial aggregation, etc.)
+- Call to action: cite BSD, contribute to BSD, consider applying
+  the interface-harmonization principle to your own domain
+
+* Appendices (length TBD)
+
+** A. Code examples
+Installation, first query, cross-country analysis template,
+materialization to parquet for non-Python users.
+
+** B. Detailed coverage table
+Country × wave × standardized table × sample size.
+
+** C. Kinship decomposition dictionary
+The 58-entry table from ~kinship.yml~, with brief commentary on
+edge cases.
+
+** D. Architecture diagram
+Schematic showing the layers: raw data → YAML config → framework
+layer → derived tables → user API.  One figure.
+
+** E. Replication code for Section 5
+Self-contained script that reproduces all tables and figures from
+the CFE analysis.
+
+* Open questions for Ligon before writing starts
+
+1. *The substantive finding*: the paper is structured around the
+   microdata PPP application.  Before committing to this framing,
+   we need to do a preliminary calculation on 3-4 countries to
+   confirm: (a) the BSD PPPs are reasonable (agree with ICP within
+   a sensible band), (b) the divergences are interesting (i.e.,
+   not just noise), (c) sub-national variation is real and large
+   enough to matter.  This preliminary analysis is effectively a
+   "does the paper have legs" test and should happen before
+   section drafts are written.  Estimated effort: 1-2 weeks of a
+   graduate student.
+
+1b. *Precedents and prior art for microdata PPPs*: Deaton has
+   done spatial price indices for India; Ravallion has work on
+   regional price adjustments; there may be others (World Bank
+   poverty measurement teams?).  Lit review needed before framing
+   the contribution.  The risk is that a paper exists that makes
+   BSD's PPP contribution incremental rather than novel; the
+   mitigation is that even if the methodology is known, the
+   cross-country scale and consistency BSD enables may still be
+   novel.
+
+2. *Coauthor structure*: solo? Ligon + Claude-as-software-author?
+   Ligon + grad students who contributed to the library?  Ligon +
+   a methods collaborator (e.g. someone from Deaton/Zaidi lineage)?
+   This affects the voice and the venue.
+
+3. *Target submission date*: tied to the first named BSD release.
+   Suggested: draft by Q3 2026, submit by end of 2026.  This
+   implies an aggressive rename + release timeline.
+
+4. *Companion JOSS paper*: submit in parallel to the main paper, or
+   hold?  Submitting in parallel means the software has a cite
+   even if the main paper takes time.
+
+5. *Pre-publication distribution*: NBER working paper first, then
+   submission?  Or direct submission?  Most development economists
+   find papers via NBER / RePEc; this matters for adoption.
+
+6. *The nutrition extension*: the paper's Section 5 is the CFE
+   application, but a nutrition-focused analysis (using
+   food_acquired + conversion factors) is the more development-
+   oriented framing.  Is that a second paper, or an alternative
+   Section 5?
+
+* Writing plan (very tentative)
+
+| Phase                    | Owner         | Target           |
+|--------------------------+---------------+------------------|
+| Outline reaction         | Ligon         | 1 week           |
+| Introduction draft       | Ligon + claude | 2 weeks         |
+| Architecture section     | Ligon + claude | 3 weeks         |
+| Application section 5    | Ligon + student | 6 weeks        |
+| First full draft         | Ligon         | Q3 2026          |
+| Internal review          | collaborators | Q3-Q4 2026       |
+| NBER working paper       | Ligon         | end 2026         |
+| Journal submission       | Ligon         | Q1 2027          |
+
+Aggressive but not insane, and aligned with a release cadence that
+ships BSD 2026.04 as the paper's companion artifact.
