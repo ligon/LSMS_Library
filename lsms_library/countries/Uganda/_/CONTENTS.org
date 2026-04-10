@@ -1,0 +1,140 @@
+#+title: Contents
+
+* Survey Program
+
+The Uganda National Panel Survey (UNPS) is conducted by the Uganda
+Bureau of Statistics (UBOS) with support from the World Bank
+Living Standards Measurement Study (LSMS).  It builds on the
+Uganda National Household Survey (UNHS) 2005/06 baseline.
+
+- World Bank catalog :: https://microdata.worldbank.org/index.php/catalog/1001
+
+* Sampling Design
+** Overview
+
+Two-stage stratified cluster sample.  Enumeration Areas (EAs) are
+the primary sampling unit (PSU), drawn from the 783 EAs visited in
+the UNHS 2005/06.  The UNPS selected 322 EAs covering 3,123
+households.
+
+The UNPS uses two visits per year (six months apart) to capture
+both agricultural seasons.
+
+** Strata
+
+The stratification scheme changed across waves:
+
+| Waves          | Variable  | Strata                                                       | Count |
+|----------------+-----------+--------------------------------------------------------------+-------|
+| 2005-06        | =stratum= | Kampala, Central Rural, East Rural, North Rural, West Rural, | 6     |
+|                |           | Other Urban                                                  |       |
+| 2009-10        | =stratum= | Same as 2005-06                                              | 6     |
+| 2010-11        | =stratum= | Same as 2005-06                                              | 6     |
+| 2011-12        | =sregion= | Central1, Central2, East Central, Eastern, Kampala, Mid-North, | 10  |
+|                |           | Mid-West, North East, South Western, West Nile               |       |
+| 2013-14        | =sregion= | Same as 2011-12                                              | 10    |
+| 2015-16        | =sregion= | Same as 2011-12                                              | 10    |
+| 2018-19        | =subreg=  | Acholi, Ankole, Buganda South, Bukedi, Bunyoro, Busoga,     | 13    |
+|                |           | Elgon, Kampala, Karamoja, Kigezi, Lango, Toro, West Nile    |       |
+| 2019-20        | =subreg=  | Same as 2018-19 plus Buganda North, Teso                    | 15    |
+
+Strata labels are harmonized via =categorical_mapping.org= (fixes
+case, whitespace, and the =South-westrn= typo in 2011-12).
+
+** Cluster (PSU) identifier
+
+The cluster identifier (=v= in the library's index convention) also
+changed:
+
+| Waves       | Variable      | Type    | Description            |
+|-------------+---------------+---------+------------------------|
+| 2005--2012  | =comm=        | numeric | Community/EA code      |
+| 2013-14     | =h1aq4a=      | numeric | Parish code (8 digits) |
+| 2015-16     | =parish_code= | numeric | Parish code            |
+| 2018-19     | =parish_name= | string  | Parish name            |
+| 2019-20     | =s1aq04a=     | string  | Parish name            |
+
+All are drawn from GSEC1 (the household cover page).  The shift
+from numeric EA codes to parish names occurred around 2015-16 as
+the sampling frame evolved from strict EA boundaries to parish-level
+clusters to accommodate split-off households.
+
+** Rotating panel and refreshment sample
+
+Beginning in 2013-14, one-third of the original sample is refreshed
+each wave.  Households participate for three consecutive waves, then
+rotate out.  This creates two sub-populations within each wave:
+
+- Continuing panel :: Households tracked from a prior wave.  These
+  receive a /longitudinal/ (panel) weight.
+- Refreshment sample :: Newly drawn households entering the sample.
+  These receive a /cross-sectional/ weight but no panel weight (or
+  a zero/NaN panel weight).
+
+The =rotate= variable in GSEC1 distinguishes the two groups (=rotate=1=
+for continuing panel, =rotate=0= for refreshment) in waves that
+have it (2013-14, 2015-16).
+
+** Sampling Weights
+*** Weight variables per wave
+
+All weights are in GSEC1 (the cover page file).
+
+| Wave    | Cross-sectional         | Panel/longitudinal      | Notes                     |
+|---------+-------------------------+-------------------------+---------------------------|
+| 2005-06 | =hmult=                 | =hmult=                 | UNHS baseline weight      |
+| 2009-10 | =wgt09=                 | =wgt09=                 | Pre-refreshment; same     |
+| 2010-11 | =wgt10=                 | =wgt10=                 | Pre-refreshment; same     |
+| 2011-12 | =mult=                  | =mult=                  | Pre-refreshment; same     |
+| 2013-14 | =wgt_X= (3119/3119)    | =wgt= (1974/3119)      | 1145 NaN in panel weight  |
+| 2015-16 | =h_xwgt_W5= (3256/3305) | =hwgt_W5= (1756/3305) | 1547 zeros in panel weight |
+| 2018-19 | =wgt= (3176/3176)      | =hwgt_W7= (2990/3176)  | 186 NaN in panel weight   |
+| 2019-20 | =wgt= (3098/3098)      | =wgt= (3098/3098)      | Panel-only wave (no refresh) |
+
+Coverage shown as (non-null positive / total).
+
+*** Weight construction (from BID)
+
+The panel weight construction follows an 8-step procedure
+(BID Section 6, available at catalog 1001):
+
+1. Begin with 2005 UNHS base weights (=hmult=: inverse probability
+   of selection with EA-level non-response correction).
+2. Incorporate probability of sub-selection from UNHS into UNPS
+   (varies by stratum: 100% for Kampala, 36--43% for others).
+3. Incorporate probability of selection into tracking (for split-offs).
+4. Fair-share correction for composition changes (factor of 1/2 for
+   households receiving new members from other households).
+5. Pool the component weights.
+6. Derive attrition-adjusted weights via logistic model on individual
+   covariates (gender, age, marital status, education, etc.).
+7. Trim extreme weights.
+8. Post-stratify to known population totals.
+
+The cross-sectional weight (=wgt_X=, =h_xwgt_W5=) is a positive
+weight for all sample and non-sample members of interviewed UNPS
+households, including refreshment sample households that have no
+panel history.  The panel weight is zero or NaN for non-sample
+individuals and refreshment households.
+
+For cross-sectional analysis within a single wave, use =weight=.
+For longitudinal/panel analysis across waves, use =panel_weight=
+(and restrict to households where it is non-null and positive).
+
+* Known Issues
+** TODO Missing panel weight for 2019-20
+:LOGBOOK:
+- Note taken on [2026-04-09 Wed] \\
+  Wave 8 (2019-20) provides only a single =wgt= variable.
+  No =rotate= column either.  Appears to be panel-only (no
+  refreshment sample), so =wgt= is used for both weight columns.
+  Confirm with UBOS documentation.
+:END:
+
+** TODO Investigate 2005-06 strata vs later sub-regions
+
+The 2005-06 baseline uses 6 strata (Kampala + 4 regions x
+urban/rural) while 2011-12 onward uses 10--15 sub-regions.
+These are genuinely different stratification schemes.  For
+pooled analysis across waves, analysts may need to aggregate
+the finer sub-regions back to the 4-region level.
