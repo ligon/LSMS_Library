@@ -1,0 +1,156 @@
+#+title: Session Handoff -- 2026-04-09
+#+date: <2026-04-09 Wed 19:40>
+
+* Summary
+
+Long session focused on Uganda data quality, then designed and
+implemented the =sample()= feature across the library.  Three
+commits on master, 28 commits on =feature/sample-table=.
+
+* Master branch commits
+
+| Hash     | Description                                            |
+|----------+--------------------------------------------------------|
+| bd0fde2d | Add Roof and Floor categorical mappings for Uganda housing |
+| f85c29f4 | Fix Uganda food tables: join v from roster, drop obsolete m |
+| f1230d37 | Fix =_add_market_index= to join on (t, v) instead of (i, t) |
+
+- Closed GitHub issues: #130 (Uganda housing), #134 (Uganda income m index)
+- The =_add_market_index= fix is framework-level: joins on =(t, v)= from
+  =cluster_features= instead of the broken =(i, t)= path.  Normalizes =v=
+  values with =int(float(x))= to handle float/string mismatches.
+- Uganda =food_expenditures= now returns =(i, t, v, j)= with =v= from
+  =household_roster=.  =market='Region'= gives 100% coverage across all waves.
+
+* Feature branch: =feature/sample-table=
+
+28 commits.  New =sample()= feature: one row per household per wave,
+indexed by =(i, t)=, with columns =v= (cluster), =weight= (cross-sectional),
+=panel_weight= (longitudinal), =strata=, =Rural=.
+
+** Countries completed (13, committed)
+
+| Country       | Waves | Pattern                              | Key finding                              |
+|---------------+-------+--------------------------------------+------------------------------------------|
+| Uganda        |     8 | YAML, all from GSEC1                 | Dual weights from 2013-14 (rotating panel) |
+| Tanzania      |     6 | Script (2008-15) + YAML              | Booster sample trap (y5_cluster vs clusterid) |
+| Malawi        |     5 | YAML, CS/Panel subdirectories        | panelweight from 2013-14 onward          |
+| Niger         |     4 | EHCVM multi-file, varied sources     | Weight source changes every wave         |
+| Guinea-Bissau |     1 | EHCVM multi-file                     | Cluster-level ponderation                |
+| Togo          |     1 | EHCVM multi-file, Data1/ path        |                                          |
+| Benin         |     1 | EHCVM multi-file                     | 12 department strata                     |
+| Burkina Faso  |     3 | EHCVM, dual weights in 2021-22       | First EHCVM with genuine panel weights   |
+| Senegal       |     2 | EHCVM, cluster-level then HH-level   | Pre-existing ID collision bug noted      |
+| Mali          |     4 | EHCVM, varied weight file formats    | poids_leger vs poids_lourd distinction   |
+| Nigeria       |     5 | PP/PH via YAML, wave 5 added         | wt_cross_wave5 vs wt_longpanel_wave5     |
+| GhanaLSS      |     7 | Repeated cross-sections, 30 years    | Weight type incompatibility GLSS4 vs 5+  |
+| Albania       |     6 | All scripts (varied file formats)    | 2002 baseline + 2003-04 panel sub-samples |
+
+** Agents still in flight
+
+| Agent             | Countries                                                | Status  |
+|-------------------+----------------------------------------------------------+---------|
+| Ethiopia          | Ethiopia (PP/PH)                                         | Running |
+| Batch 1           | Cambodia, India, Iraq, South Africa, Guatemala           | Running |
+| Batch 2           | Armenia, Azerbaijan, Guyana, Kazakhstan, Kosovo, Liberia, | Running |
+|                   | Pakistan, Serbia, Serbia and Montenegro, Tajikistan,     |         |
+|                   | Timor-Leste                                              |         |
+| Nepal + China     | Nepal, China                                             | Running |
+
+When these complete, review their output, commit good results, and
+re-dispatch any failures individually.
+
+** Tests
+
+=tests/test_sample.py= auto-discovers countries with =sample= in
+=data_scheme.yml= and runs 10 checks:
+1. Index is =(i, t)=
+2. =v= column present
+3. =v= mostly non-null (<5%, warn >1%)
+4. =weight= column present
+5. All waves covered
+6. No duplicate indices
+7. Reasonable row count per wave
+8. Non-negative weights (both columns)
+9. Weighted population stable across adjacent waves (0.2x--5x ratio)
+10. Refreshment HH have positive cross-sectional weight
+
+** Skill documentation
+
+=.claude/skills/add-feature/sample/SKILL.md= covers:
+- Dual weight types (cross-sectional vs panel)
+- Per-country weight/strata/cluster variable tables
+- YAML patterns (single-file, multi-file, multi-round script)
+- BID-first guidance (always read the Basic Information Document)
+- Booster/refreshment sample variable trap
+- =materialize: make= warning
+- Dispatch guidance (one agent per country, never batch)
+
+** Design note: =sample()= as single source of truth for =v=
+
+=slurm_logs/DESIGN_sample_as_v_source.org= documents the 4-phase
+migration plan:
+1. Build =sample= for all countries (Phase 1 --- this session)
+2. Framework joins =v= from =sample= at API time (Phase 2 --- next)
+3. Remove =v= from feature parquets and YAML configs (Phase 3)
+4. Simplify =_add_market_index= (Phase 4)
+
+This is the key architectural change: parquets store =(i, t, ...)=
+without =v=, and the framework joins =v= transparently from =sample()=.
+=market='Region'= then chains =(t, v) -> Region= from =cluster_features=.
+
+* Framework changes on feature branch
+
+- =country.py=: =.str.strip()= before categorical mapping (fixes
+  whitespace-padded strata labels from Stata)
+- =data_scheme.yml= for Uganda: =sample= and =food_expenditures= schemas
+- =CONTENTS.org= for Uganda and GhanaLSS: sampling design documentation
+
+* Stashed changes (NOT committed)
+
+The =earnings.py= and =enterprise_income.py= fixes (roster join -> v)
+were stashed when switching to the feature branch.  They're on master's
+stash.  These should be superseded by Phase 2 (framework joins v from
+sample) so they may not be needed.
+
+* Known issues found this session
+
+- Senegal/Mali: =i()= formatter concatenates grappe+menage without
+  separator, causing ~100 ID collisions per wave.  Pre-existing,
+  affects all features.
+- Uganda 2013-14: =v= (=h1aq4a=) is float64 in roster but string in
+  cluster_features, causing join failures.  Fixed by =_normalize_v()=
+  in =_add_market_index=.
+- =rescue/2026-04-09= branch: contains regressions (reverted
+  =_enforce_rejected_column_spellings=, =dvc_permissions.py= non-interactive
+  auth, Uganda housing scripts using anti-patterns).  Do not merge.
+
+* Lessons learned
+
+** BID first
+Always read the Basic Information Document before inspecting data.
+Albania turned out to have a panel component (2003-04) despite
+appearing to be independent cross-sections.  GhanaLSS had
+incompatible weight types across rounds (probability vs expansion).
+
+** One agent per country
+Never batch multiple countries into one agent.  Each country requires
+independent data inspection, BID reading, and testing.  Batching
+means sequential processing on one core while others sit idle.
+
+** Scatter-gather orchestration
+The manual pattern this session (dispatch N agents, commit as results
+arrive) should be codified.  A coordinator agent could: discover
+countries needing work, dispatch one agent per country in a single
+message, process notifications, commit/redispatch.
+
+** Cross-sectional vs panel weights
+Surveys with rotating panels provide two distinct weights.  The BID
+documents the construction.  Look for =rotate= variable to identify
+refreshment households.  The cross-sectional weight covers everyone;
+the panel weight is NaN/zero for new entrants.
+
+** =format_id= for numeric cluster/strata IDs
+Numeric IDs passing through =myvars= (not =idxvars=) retain float
+type and get =.0= suffixes.  Use =format_id= or the framework's
+=_normalize_v()= to strip these before joins.
