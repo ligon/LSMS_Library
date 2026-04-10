@@ -1,6 +1,38 @@
 Country: Senegal
 Wave: 2021-22
 
+sample:
+    dfs:
+        - df_cover
+        - df_weights
+    df_cover:
+        file: s00_me_sen2021.dta
+        idxvars:
+            v: grappe
+            i:
+                - grappe
+                - menage
+        myvars:
+            Rural:
+                - s00q04
+                - mapping:
+                    Rural: Rural
+                    Urbain: Urban
+    df_weights:
+        file: ehcvm_ponderations_sen2021.dta
+        idxvars:
+            i:
+                - grappe
+                - menage
+        myvars:
+            weight: poids
+            panel_weight: poids
+    merge_on:
+        - i
+    final_index:
+        - i
+        - t
+
 cluster_features:
   file: s00_me_sen2021.dta
   idxvars:

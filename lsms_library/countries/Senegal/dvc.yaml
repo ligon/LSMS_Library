@@ -20,3 +20,8 @@ stages:
         wave: null
         table: household_roster
         format: parquet
+      senegal::::sample:
+        country: Senegal
+        wave: null
+        table: sample
+        format: parquet

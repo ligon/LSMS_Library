@@ -1,5 +1,9 @@
 Country: Senegal
 
+Waves:
+  - 2018-19
+  - 2021-22
+
 Data Scheme:
   cluster_features:
     index: (t, v)
@@ -45,6 +49,14 @@ Data Scheme:
   interview_date:
     index: (t, i)
     int_t: datetime
+
+  sample:
+    index: (i, t)
+    v: str
+    weight: float
+    panel_weight: float
+    strata: str
+    Rural: str
 
   panel_ids:
     index: (t, i)
