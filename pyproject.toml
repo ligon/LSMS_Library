@@ -38,6 +38,7 @@ poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.0.0"
+pytest-xdist = "^3.6.0"
 ipython = "^9.4.0"
 matplotlib = "^3.10.0"
 

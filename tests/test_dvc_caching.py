@@ -262,8 +262,14 @@ class TestDVCCaching:
         self,
         mock_country_structure,
         sample_dataframe,
+        monkeypatch,
     ):
         """When DVC marks outputs stale, cache should be rebuilt from waves."""
+        # Force DVC backend so the DVC code path is exercised regardless of
+        # what LSMS_BUILD_BACKEND is set to in the test runner environment.
+        # (Matches the pattern used by the sibling tests in this class.)
+        monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
+
         cache_path = mock_country_structure / "var" / "test_data.parquet"
         write_parquet(sample_dataframe, cache_path)
 
