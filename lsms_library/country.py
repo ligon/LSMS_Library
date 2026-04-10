@@ -1188,10 +1188,15 @@ class Country:
             df = self._augment_index_from_related_tables(df, scheme_entry, None)
             df = _normalize_dataframe_index(df, scheme_entry, None)
 
-            # Join v from sample() for household-level tables that lack it
+            # Join v from sample() for household-level tables that lack it.
+            # Skip if v is already in the index OR already present as a
+            # column (a legacy script may have written v alongside other
+            # columns; joining again would create v_x/v_y name conflicts).
             current_names = list(df.index.names) if isinstance(df.index, pd.MultiIndex) else [df.index.name]
+            v_already_present = ('v' in current_names
+                                 or (isinstance(df, pd.DataFrame) and 'v' in df.columns))
             _no_v_join = {'sample', 'cluster_features', 'panel_ids', 'updated_ids'}
-            if ('v' not in current_names
+            if (not v_already_present
                     and 'i' in current_names
                     and 't' in current_names
                     and method_name not in _no_v_join
