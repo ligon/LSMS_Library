@@ -1,0 +1,208 @@
+#+title: GhanaSPS Cleanup Plan
+#+date: <2026-04-09>
+#+author: investigation agent (claude-sonnet-4-6)
+
+* 1. Current State
+
+** Wave inventory
+
+| Wave    | Data/ exists? | .dta on disk? | _/ scripts              | data_info.yml | data_scheme.yml |
+|---------+---------------+---------------+-------------------------+---------------+-----------------|
+| 2009-10 | YES           | YES (fully)   | food_acquired.py, other_expenditures.py | NO | NO (none anywhere) |
+| 2013-14 | YES           | YES (fully)   | food_acquired.py, other_expenditures.py | NO | NO |
+| 2017-18 | YES           | YES (fully)   | food_acquired.py, other_expenditures.py | NO | NO |
+
+Country-level =_/= files:
+| File                                    | Status              |
+|-----------------------------------------+---------------------|
+| =_/food_acquired.py=                    | Broken (see §4)     |
+| =_/food_prices_quantities_and_expenditures.py= | Broken (see §4) |
+| =_/ghanasps.py=                         | Broken (see §4)     |
+| =_/Makefile=                            | Stale legacy        |
+| =_/CONTENTS.org=                        | All items are TODOs |
+| =_/README.org=                          | Stale (GhanaLSS content) |
+| =_/food_items.org=                      | Present, useful     |
+| =_/units.org=                           | Present, useful     |
+| =_/notes.org=                           | Has food-label harmonization table |
+
+No =data_scheme.yml= exists at any level. No =data_info.yml= exists at any wave level.
+GhanaSPS is not registered in the library at all -- the Country class cannot discover it.
+
+** Declared features (GhanaSPS)
+
+None -- there is no =data_scheme.yml=.
+
+** Data structure summary (from inspection)
+
+| Wave    | HH ID var       | Cluster var      | # EAs | Weight vars               | Rural var  | Region var     |
+|---------+-----------------+------------------+-------+---------------------------+------------+----------------|
+| 2009-10 | =hhno= (int)    | =id3= (EA code)  | 334   | =hhweight3=, =ppweight3=  | =urbrur=   | =id1= (10 regions) |
+| 2013-14 | =FPrimary= (str)| FPrimary[:6] ≈ EA| 583*  | NOT FOUND in any .dta     | NOT FOUND  | FPrimary[:2]*  |
+| 2017-18 | =FPrimary= (str)| =comm_code=**    | 704   | NOT FOUND in any .dta     | NOT FOUND  | =region= (str) |
+
+Notes:
+- (*) 2013-14: No explicit EA column; the 9-digit FPrimary encodes region+district+EA+HH as 2+2+2+3
+  digits. 583 unique 6-digit prefixes; 52 unique 4-digit (region+district) prefixes.
+  CONTENTS.org explicitly warns: "2013-14 has no regions or urban/rural data."
+- (**) 2017-18: =comm_code= is -666 for 828 of 5,669 households (15%). =d_code= + =comm_code=
+  gives 712 unique district-community combinations. =region= (string) is complete.
+- 2009-10: =ppweight3= appears to be a per-person weight (mean ~3.8x larger than =hhweight3=),
+  not a panel weight. Wave 1 is a fresh cross-section; no panel weight applies.
+
+* 2. Feature Gap Analysis
+
+Benchmark: Uganda (=data_scheme.yml=).
+
+| Feature                   | Uganda | GhanaSPS | Notes |
+|---------------------------+--------+----------+-------|
+| =data_scheme.yml=         | YES    | NO       | Blocking -- nothing works without this |
+| =sample=                  | YES    | NO       | Missing from the v-migration sweep |
+| =cluster_features=        | YES    | NO       | No YAML config |
+| =household_roster=        | YES    | NO       | Data exists; no config |
+| =individual_education=    | YES    | NO       | Data exists (01fi_, 01fii_, etc.) |
+| =food_acquired=           | YES    | Partial  | Scripts exist but broken |
+| =food_expenditures=       | YES    | Partial  | Derived; broken pipeline |
+| =food_prices=             | YES    | Partial  | Derived; broken pipeline |
+| =food_quantities=         | YES    | NO       | No kg-conversion table |
+| =shocks=                  | YES    | NO       | Data likely in 06f/06g sections |
+| =assets=                  | YES    | NO       | Data in 03a sections |
+| =housing=                 | YES    | NO       | Data in 12a sections |
+| =earnings=                | YES    | NO       | Data in 01e/01ei sections |
+| =panel_ids=               | YES    | NO       | 00_hh_info.dta has FPrimary_original (2017-18) |
+| =nonfood_expenditures=    | YES    | NO       | =other_expenditures.py= covers this; broken |
+| =people_last7days=        | YES    | NO       | Not investigated |
+
+Malawi additionally has =subjective_well_being= and =interview_date=.
+GhanaSPS has rich subjective-wellbeing (section 10) and anthropometry (section 6b/01evii) data
+that would be unique among the LSMS library.
+
+* 3. Data Availability
+
+All three waves have their =.dta= files fully materialized on disk (not merely DVC pointers).
+Confirmed: =S100.dta= (2009-10), =01a_consent.dta= (2013-14), =00_hh_info.dta= (2017-18) all
+have file sizes and modification dates consistent with real data.
+
+World Bank catalog URL (Wave 1 / 2009-10): https://microdata.worldbank.org/index.php/catalog/2534
+Additional data info: https://egc.yale.edu/data/egc-isser-northwestern-ghana-panel-survey
+
+2013-14 and 2017-18 appear to be the same survey's second and third waves but have no SOURCE.org
+or LICENSE.org files. The 2013-14 documentation lists a World Bank catalog URL indirectly in the
+DDI file =ddi-documentation-english_microdata-2534.pdf= (same catalog ID as Wave 1 -- likely same
+study with different sub-IDs). This needs human verification.
+
+* 4. Broken Scripts
+
+| Script                                       | Anti-patterns / Bugs | Severity |
+|----------------------------------------------+----------------------+----------|
+| =_/ghanasps.py=                              | Imports =from lsms.tools= (obsolete), =from ligonlibrary.dataframes import from_dta= (gone), =import dvc.api= (anti-pattern), =dvc.api.open(fn,mode='rb')= throughout | FATAL |
+| =_/food_acquired.py=                         | Imports =from ghana_panel import ...= (module doesn't exist), =import dvc.api=; drops =v=; uses obsolete =from_dta=; reads from per-wave parquets that don't exist yet | FATAL |
+| =_/food_prices_quantities_and_expenditures.py= | Uses =m= index (=other_features= pattern, now obsolete); references =../var/food_acquired.parquet= which doesn't exist; =np.nan= on string columns | FATAL |
+| =2009-10/_/food_acquired.py=                 | Uses =dvc.api.open= (anti-pattern); does not use =get_dataframe()= | HIGH |
+| =2013-14/_/food_acquired.py=                 | Uses =dvc.api.open= (anti-pattern) | HIGH |
+| =2017-18/_/food_acquired.py=                 | Uses =dvc.api.open= (anti-pattern) | HIGH |
+| =2009-10/_/other_expenditures.py=            | Uses =dvc.api.open=; bakes in =m='Ghana'= (=other_features= pattern) | HIGH |
+| =2013-14/_/other_expenditures.py=            | Same as above | HIGH |
+| =2017-18/_/other_expenditures.py=            | Same; also has buggy =x.drop('interviewedid',axis=1)= with no assignment | MEDIUM |
+
+Root cause: All scripts were written against obsolete libraries (=lsms.tools=, =ligonlibrary=,
+=ghana_panel=, =dvc.api.open=) and the pre-=data_root()= parquet path convention. None of these
+will run as-is.
+
+* 5. Proposed Plan
+
+** P0 -- Blocking (must land before anything else)
+
+| # | Task                                      | Effort | Dependencies | Agent? |
+|---+-------------------------------------------+--------+--------------+--------|
+| 1 | Create =_/data_scheme.yml= with Country, waves, and feature stubs | Small | None | YES |
+| 2 | Fix wave-level =food_acquired.py= (2009-10, 2013-14, 2017-18): replace =dvc.api.open= with =get_dataframe()=; fix index | Small/wave | None | YES |
+
+** P1 -- Important (core features for cross-country analysis)
+
+| # | Task                                                     | Effort | Dependencies | Agent? |
+|---+----------------------------------------------------------+--------+--------------+--------|
+| 3 | Add =household_roster= via YAML (=data_info.yml=) for each wave | Medium | P0.1 | YES |
+| 4 | Add =cluster_features= via YAML for each wave (region, district, EA code) | Medium | P0.1 | YES |
+| 5 | Add =sample= feature -- see §6 for wave-by-wave details | Medium | P0.1, 4 | YES |
+| 6 | Fix =food_acquired= pipeline: rewrite =_/food_acquired.py= without obsolete imports; verify food-label harmonization still works | Medium | P0.2 | YES |
+| 7 | Fix =food_prices_quantities_and_expenditures.py=: remove =m= index, use =data_root()= paths | Small | 6 | YES |
+| 8 | Verify World Bank catalog IDs for 2013-14 and 2017-18; add SOURCE.org and LICENSE.org | Small | Human decision | NO |
+
+** P2 -- Nice-to-have (parity with Uganda/Malawi)
+
+| # | Task                                               | Effort | Dependencies | Agent? |
+|---+----------------------------------------------------+--------+--------------+--------|
+| 9 | Add =panel_ids= (2017-18 has =FPrimary_original=; 2013-14 linkage less clear) | Medium | P0.1 | YES |
+| 10 | Add =shocks= from section 06f/06g (2013-14, 2017-18) | Medium | P0.1 | YES |
+| 11 | Add =assets= from section 03a | Medium | P0.1 | YES |
+| 12 | Add =housing= from section 12a | Medium | P0.1 | YES |
+| 13 | Add =nonfood_expenditures= (supersedes =other_expenditures.py=) | Small | 7 | YES |
+| 14 | Add =individual_education= from sections 01fi/01fii | Medium | P0.1, 3 | YES |
+| 15 | Add =categorical_mapping.org= for strata labels, region labels | Small | 5 | YES |
+| 16 | Update =CONTENTS.org= with Sampling Design section | Small | 5 | YES |
+
+* 6. Sample Feature: Wave-by-Wave Analysis
+
+** 2009-10
+- Source file: =key_hhld_info.dta=
+- =i=: =hhno= (integer; apply =format_id=)
+- =v=: =id3= (EA code, integer; 334 EAs)
+- =weight=: =hhweight3= (complete, 0 NaN)
+- =panel_weight=: =hhweight3= (same as weight; this is Wave 1, no panel component)
+- =strata=: =loc7= (7-zone locality: Accra + 6 urban/rural x ecological-zone combos)
+- =Rural=: =urbrur= (labels: 1=Urban, 2=Rural)
+- NOTE: =ppweight3= is a per-person expansion weight, not a panel weight. Put =hhweight3= in both columns.
+
+** 2013-14
+- No explicit weight variable found in any =.dta= file. CONTENTS.org warns that "2013-14 has no
+  regions or urban/rural data."
+- =i=: =FPrimary= (9-digit string)
+- =v=: Constructable from =FPrimary[:6]= (583 unique region+district+EA combos); no named EA column
+- =weight=: UNKNOWN -- BID must be checked. Likely exists in a separate file or is missing entirely.
+- =strata=, =Rural=: NOT in any =.dta= on disk
+- ACTION NEEDED: Read the BID (=Documentation/Basic_Information_Dec_2015.pdf= -- on disk via DVC).
+  This may document a weight variable and clarify the EA coding scheme.
+
+** 2017-18
+- Source file: =00_hh_info.dta=
+- =i=: =FPrimary= (9-digit string)
+- =v=: =comm_code= (integer; 828 of 5,669 HHs have code = -666, possibly new/relocated HHs)
+- =weight=: NOT FOUND in any =.dta= file inspected
+- =strata=: No explicit strata variable; use =region= (string, 10 regions) as proxy
+- =Rural=: Not found explicitly; =communitytype= in =00_comm_info.dta= (1=Rural, 2=Urban?) -- needs verification
+- =round= variable in =00_hh_info.dta= takes values 0, 1, 2 (likely Wave 0=new, 1=returning, 2=?)
+- ACTION NEEDED: Read the 2017-18 BID (may be in Documentation/Questionnaire folder) to locate
+  weight variable and clarify the panel structure.
+
+* 7. Open Questions (require human decision before execution)
+
+1. *Weight variables for 2013-14 and 2017-18*: No sampling weight variable was found in any
+   on-disk =.dta= file for these two waves. The BID PDFs (accessible via DVC) may document where
+   they are. An agent should pull and read them before attempting the =sample= feature. Alternatively,
+   the wave may not have been designed with published expansion weights (common in academic panels).
+
+2. *2013-14 EA coding*: The FPrimary 9-digit structure encodes EA implicitly. Is it safe to use
+   =FPrimary[:6]= as the cluster identifier, or is there a canonical EA code in a file we haven't
+   found? (The =01ea_employmentscreener.dta= file has =eacode= and =regioncode= columns but they
+   are all empty strings.)
+
+3. *Panel structure across waves*: =ghanasps.py= documents that 2013-14 uses =FPrimary= and 2017-18
+   tracks returning households via =FPrimary_original=. What fraction of 2009-10 households were
+   re-interviewed in 2013-14 and 2017-18? This affects whether =panel_weight= is meaningful vs.
+   identical to =weight=.
+
+4. *Catalog IDs for 2013-14 and 2017-18*: The 2009-10 catalog ID is 2534. The 2013-14 DDI file
+   references the same ID, but the 2017-18 wave has no documentation or LICENSE.org at all. A human
+   must verify the correct WB catalog entry for each wave before adding SOURCE.org files.
+
+5. *Library registration*: There is no =data_scheme.yml= and therefore no library registration.
+   When GhanaSPS is added, it should be confirmed whether it should appear in the =Feature=
+   cross-country API alongside Uganda, Nigeria, Tanzania, etc. (it currently doesn't).
+
+6. *Wave-1 =ppweight3= interpretation*: Is =ppweight3= a per-person expansion weight or a panel
+   weight? The ratio to =hhweight3= equals approximately household size (mean ratio = 3.8). If
+   it is indeed per-person, both =weight= and =panel_weight= should map to =hhweight3=.
+
+7. *food_quantities=*: The CONTENTS.org notes a =conversion_to_kgs.json= as TODO. The West Africa
+   Food Conversion Table is referenced by URL (Google Sheets). An agent would need human help to
+   materialize this table before =food_quantities= can be built.
