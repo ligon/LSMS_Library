@@ -954,14 +954,25 @@ class Country:
     def _add_market_index(self, df: pd.DataFrame, column: str = 'Region') -> pd.DataFrame:
         """Join a market identifier ``m`` from cluster_features onto *df*.
 
-        When *df* has ``v`` (cluster) in its index the join goes through
-        ``(t, v)`` — this is the preferred path and avoids panel-ID
-        mismatches.  Falls back to ``(i, t)`` via household_roster when
-        ``v`` is not available.
+        Joins on ``(t, v)`` from ``_market_lookup(column)``.  If *df*
+        lacks ``v`` in its index (e.g. a derived table that bypassed
+        ``_finalize_result``), join ``v`` from ``sample()`` first.
 
         Returns *df* with ``m`` added and ``v`` removed from the index.
         """
         lookup = self._market_lookup(column)
+
+        # Ensure v is present before doing the (t, v) -> m join
+        if 'v' not in (df.index.names if isinstance(df.index, pd.MultiIndex) else [df.index.name]):
+            if 'sample' in self.data_scheme:
+                df = self._join_v_from_sample(df)
+            else:
+                warnings.warn(
+                    f"_add_market_index: cannot join market {column!r} — "
+                    f"v not in index and no sample() table available for {self.name}"
+                )
+                return df
+
         idx_names = list(df.index.names)
         flat = df.reset_index()
 
@@ -976,33 +987,13 @@ class Country:
                     return str(x).strip()
             return series.map(_norm)
 
-        if 'v' in flat.columns:
-            # Preferred path: join on (t, v) directly
-            flat['t'] = flat['t'].astype(str)
-            flat['v'] = _normalize_v(flat['v'])
-            lkup = lookup.copy()
-            lkup['t'] = lkup['t'].astype(str)
-            lkup['v'] = _normalize_v(lkup['v'])
-            flat = flat.merge(lkup, on=['t', 'v'], how='left')
-        else:
-            # Fallback: get v from household_roster, then join
-            roster = self.household_roster()
-            v_map = (roster.reset_index()[['i', 't', 'v']]
-                     .drop_duplicates(['i', 't']))
-            v_map['v'] = _normalize_v(v_map['v'])
-            for key in ['i', 't']:
-                if key in flat.columns:
-                    flat[key] = flat[key].astype(str)
-            v_map['i'] = v_map['i'].astype(str)
-            v_map['t'] = v_map['t'].astype(str)
-            flat = flat.merge(v_map, on=['i', 't'], how='left')
-            flat['v'] = _normalize_v(flat['v'])
-            lkup = lookup.copy()
-            lkup['t'] = lkup['t'].astype(str)
-            lkup['v'] = _normalize_v(lkup['v'])
-            flat = flat.merge(lkup, on=['t', 'v'], how='left')
-            if 'v' not in idx_names and 'v' in flat.columns:
-                flat = flat.drop(columns=['v'])
+        # Join on (t, v) — v is now guaranteed present
+        flat['t'] = flat['t'].astype(str)
+        flat['v'] = _normalize_v(flat['v'])
+        lkup = lookup.copy()
+        lkup['t'] = lkup['t'].astype(str)
+        lkup['v'] = _normalize_v(lkup['v'])
+        flat = flat.merge(lkup, on=['t', 'v'], how='left')
 
         flat = flat.dropna(subset=['m'])
         # Drop village/cluster index (v) since m supersedes it
