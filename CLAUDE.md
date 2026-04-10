@@ -500,3 +500,85 @@ Some countries have configs but no source `.dta` files in the repository:
 | Armenia | No data files downloaded | WB catalog, external hosting |
 | Timor-Leste 2001 | No `_/` config for this wave | WB catalog |
 | Guatemala | No PSU/cluster variable in data | ENCOVI 2000 design |
+
+## Three-Tier Credential Model
+
+The library's data access is gated in three tiers, with **the World Bank Microdata API key as the sole real gate**. The S3 bucket is a *cache* over the authoritative WB NADA downloads, not an independent access layer.
+
+| User has | Gets |
+|---|---|
+| Nothing | Library warns on import; data-access calls raise `RuntimeError` |
+| Valid WB Microdata API key (via `MICRODATA_API_KEY` env var or `microdata_api_key` in `~/.config/lsms_library/config.yml`) | (a) Direct WB NADA downloads; (b) S3 read cache (auto-unlocked on import because having the WB key = having accepted the ToU) |
+| WB API key + S3 write creds (`LSMS_S3_WRITE_KEY` + `LSMS_S3_WRITE_KEY_ID`, or `AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY`, or a `s3_write_creds` file) | (a) + (b) + push access to the S3 cache, for RAs materializing new waves |
+
+The obfuscated passphrase at `data_access.py` (`_S3_UNLOCK_PASSPHRASE = "QnVubnkgbXVmZmlu"` = base64 for `"Bunny muffin"`) is **cosmetic anti-grep**, not a real gate. The source comment is honest about this: *"The real access gate is WB API key validation; this just keeps the passphrase from being trivially discoverable via grep."* Future maintainers should not try to "fix" the obfuscation by strengthening it — it is intentionally weak because the WB API key check in `_validate_wb_api_key` is the authoritative policy gate.
+
+When `MICRODATA_API_KEY` is present and valid, `_auto_unlock_s3` decrypts `s3_reader_creds.gpg` with the obfuscated passphrase and writes the plaintext creds to the configured location (historically `countries/.dvc/s3_creds`, moving to `~/.config/lsms_library/s3_creds` in v0.7.0). This happens at `import lsms_library` time via `__init__.py`. The interactive `ll.authenticate()` path is a rarely-needed fallback for users without a WB account.
+
+## DVCFileSystem Runtime Config Override
+
+`DVCFileSystem` accepts `config` and `remote_config` kwargs at construction time that override the on-disk `.dvc/config` without modifying any files. This is what makes pip-install scenarios possible: the bundled `.dvc/config` can have placeholder relative paths, and `local_tools.DVCFS` patches them to user-writable absolute paths at import time.
+
+```python
+from dvc.api import DVCFileSystem
+
+fs = DVCFileSystem(
+    countries_dir,
+    config={
+        "remote": {"ligonresearch_s3": {"credentialpath": "/home/user/.config/lsms_library/s3_creds"}},
+        "cache":  {"dir": "/home/user/.cache/lsms_library/dvc-cache"},
+    },
+)
+```
+
+Two important properties of this override verified empirically (2026-04-10):
+
+1. **DVC is lazy about credential validation.** The credential file does not need to exist at `DVCFileSystem` construction time; DVC only reads it when you actually open a file backed by the remote. This enables the import-time sequencing in `__init__.py`: `DVCFS` can be constructed before `_auto_unlock_s3` has written the plaintext creds, and the subsequent data access still works.
+
+2. **DVC does not require a git ancestor.** A `.dvc/` directory in a `/tmp/...` scratch dir with no `.git/` anywhere above it is a valid DVC repo root. This is what makes the `site-packages/lsms_library/countries/.dvc/` layout work in pip installs.
+
+## `_log_issue` Pollutes the Working Tree
+
+`lsms_library/country.py:168` defines `_log_issue()`, which appends an entry to `lsms_library/ISSUES.md` whenever a cache/materialization build fails. **The file is tracked in git**, has no deduplication, and has no rotation. Any test run or interactive session that encounters an expected data-unavailability condition (e.g., Nepal has no `.dta` files on disk) appends an entry, which makes the working tree dirty as a side effect.
+
+Mitigations until this is actually fixed (tracked in GH #148):
+
+- When committing mid-session, use explicit `git add <specific files>` rather than `git add -A`/`git add .`
+- If `ISSUES.md` shows as modified after a test run and the entries are just duplicates of known "no data on disk" conditions (Nepal, Armenia, etc.), revert with `git checkout HEAD -- lsms_library/ISSUES.md`
+- The curated entries in the file (with `**Status:** FIXED` markers) are human-written; the auto-appended entries from `_log_issue` are not. Don't conflate them when editing by hand.
+
+## Release Tooling Gotchas
+
+### `poetry-dynamic-versioning` must be installed as a poetry plugin
+
+The `[tool.poetry.requires-plugins]` declaration in `pyproject.toml` is **not enough** in Poetry 2.x. Without the plugin actually installed, `poetry version` reports the static `0.0.0` from `pyproject.toml` and `poetry build` produces a mis-versioned wheel that looks like it worked.
+
+Install once per machine:
+
+```sh
+poetry self add "poetry-dynamic-versioning[plugin]>=1.0.0,<2.0.0"
+```
+
+If that fails with `Permission denied: 'INSTALLER'` (which happened on the 2026-04-10 session's Savio login node due to a read-only system `pycparser`), fall back to:
+
+```sh
+python3 -m pip install --user --ignore-installed "poetry-dynamic-versioning[plugin]>=1.0.0,<2.0.0"
+```
+
+Verify with `poetry self show plugins` — the plugin should be listed. Then `poetry version` should report the dynamic version from the latest git tag, not `0.0.0`.
+
+### `poetry build` hangs on Linux keyring without a TTY
+
+Poetry 2.x pulls in `keyring` + `SecretStorage` as transitive dependencies, and on Linux hosts without a graphical session (e.g., Slurm compute nodes, CI containers, headless login sessions), `poetry build` can hang indefinitely on an internal keyring lookup. The subprocess never makes progress and never errors out.
+
+Workaround: set `PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring` in the environment before calling `poetry build`:
+
+```sh
+PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring poetry build
+```
+
+Slurm submission scripts for release builds should export this env var unconditionally.
+
+### Compute nodes have no outbound internet (Savio)
+
+`poetry build` reaches out to `pypi.org` during the build (for build-isolation dependency fetching, even for a simple library). On Savio compute nodes this fails with DNS resolution errors and the build aborts. Release builds should run on the login node or from a system with outbound internet. Regular `pytest` runs do not need internet and can run on compute nodes via Slurm.

@@ -1,0 +1,543 @@
+#+TITLE: v0.7.0 Implementation Handoff -- Option C (Bundle DVC metadata in wheel)
+#+DATE: <2026-04-10 Fri>
+#+AUTHOR: Session that planned it (handing off to fresh context)
+
+* Purpose
+
+Fix the =pip install git+https://github.com/...= case so the
+library is self-sufficient at runtime: bundle the =.dvc/=
+metadata inside the wheel, move the decrypted plaintext
+credentials to a user-writable location, and document the data
+access flow in README so users can go from =pip install= to
+=Country('Uganda').food_expenditures()= without cloning the
+source tree.
+
+Tagged =v0.6.0= already ships; silent-failure fix landed as
+=984d57b4= on master on 2026-04-10.  This work becomes v0.7.0.
+
+* Branch state at handoff
+
+- =origin/master= HEAD: =984d57b4= (silent-failure fix, 2026-04-10)
+- =origin/v0.6.0= tag: =1829595b= (the v-migration release)
+- Working tree is clean at session end.
+
+Start here.  Nothing to rebase, nothing to merge.
+
+* The three-tier credential model (the policy this implements)
+
+Confirmed with Ligon 2026-04-10.  This is /what/ the implementation
+must preserve.
+
+| User has                                     | Gets                                                                                                                    |
+|----------------------------------------------+-------------------------------------------------------------------------------------------------------------------------|
+| Nothing                                      | Nothing; library warns on import and raises on first data access                                                       |
+| Valid WB Microdata API key                   | (a) Direct WB NADA downloads for most countries; (b) S3 read cache (unlocked automatically because having the WB key = having accepted the ToU) |
+| WB API key + S3 write creds                  | (a) + (b) + push access to the S3 cache                                                                                 |
+
+The S3 bucket is /a cache over/ the authoritative WB Microdata
+downloads, not an independent access layer.  That's why the
+obfuscated passphrase (=Bunny muffin=, base64 as
+=QnVubnkgbXVmZmlu= in =data_access.py:90=) is only cosmetic --- the
+real gate is WB API key validation in
+=data_access._validate_wb_api_key=.
+
+* Verified DVC override mechanism (probe run 2026-04-10)
+
+=DVCFileSystem= accepts =config= and =remote_config= kwargs at
+construction time.  Both work, both override the on-disk
+=.dvc/config= without touching the file.  /DVC is also lazy about
+credential validation/ --- the credential file does not need to
+exist at =DVCFileSystem= construction time, only at first S3
+access.  This enables the import-time sequencing in
+=lsms_library/__init__.py=.
+
+=DVCFileSystem= also works without a git ancestor: a =.dvc/=
+directory in a =/tmp/...= scratch dir (no =.git/= anywhere above
+it) was successfully opened and queried.  That is the
+site-packages scenario.
+
+Probe script lives at
+=slurm_logs/v0.7.0_handoff.probe.py= if you want to re-run it.
+(If that file doesn't exist, the probe is trivially inlined
+below.)
+
+#+begin_src python
+# Re-verify:
+from dvc.api import DVCFileSystem
+fs = DVCFileSystem(
+    os.fspath(countries_dir),
+    config={
+        "remote": {"ligonresearch_s3": {"credentialpath": "/tmp/fake"}},
+        "cache": {"dir": "/tmp/fake_cache"},
+    },
+)
+assert fs.repo.config["remote"]["ligonresearch_s3"]["credentialpath"] == "/tmp/fake"
+assert fs.repo.config["cache"]["dir"] == "/tmp/fake_cache"
+#+end_src
+
+* Files to change (8 files)
+
+** 1. =pyproject.toml=
+
+Add a =[tool.poetry] include= directive (or extend an existing
+=[tool.poetry]= section) to bundle the git-tracked portion of
+=.dvc/= in the wheel.  Currently poetry ignores dotfiles by
+default.
+
+#+begin_src toml
+[tool.poetry]
+include = [
+    "lsms_library/countries/.dvc/config",
+    "lsms_library/countries/.dvc/s3_config",
+    "lsms_library/countries/.dvc/.gitignore",
+    "lsms_library/countries/.dvc/plots/*.json",
+    "lsms_library/countries/.dvc/s3_reader_creds.gpg",
+]
+#+end_src
+
+Do NOT bundle =.dvc/s3_creds= (plaintext reader creds, gitignored),
+=.dvc/s3_write_creds= (plaintext writer creds, gitignored), or
+=.dvc/config.local= (gitignored overrides).
+
+** 2. =lsms_library/config.py= (add two helpers)
+
+At the bottom of the file, add:
+
+#+begin_src python
+def s3_creds_path() -> Path:
+    """Return the user-writable path for decrypted S3 credentials.
+
+    Precedence: $LSMS_S3_CREDS env var > ~/.config/lsms_library/s3_creds.
+    Does NOT create the file or parent directory.
+    """
+    override = os.environ.get("LSMS_S3_CREDS", "").strip()
+    if override:
+        return Path(override)
+    return _config_dir() / "s3_creds"
+
+
+def dvc_cache_dir() -> Path:
+    """Return the user-writable DVC cache directory for LSMS data.
+
+    Precedence: $LSMS_DVC_CACHE_DIR env var > platformdirs user_cache_path.
+    Does NOT create the directory.
+    """
+    override = os.environ.get("LSMS_DVC_CACHE_DIR", "").strip()
+    if override:
+        return Path(override)
+    try:
+        import platformdirs
+        return platformdirs.user_cache_path("lsms_library") / "dvc-cache"
+    except ImportError:
+        return Path.home() / ".cache" / "lsms_library" / "dvc-cache"
+#+end_src
+
+** 3. =lsms_library/local_tools.py:30-33= (DVCFS construction)
+
+Replace the current block:
+
+#+begin_src python
+# Initialize DVC filesystem once and reuse it
+_PACKAGE_ROOT = Path(__file__).resolve().parent
+_COUNTRIES_DIR = _PACKAGE_ROOT / "countries"
+DVCFS = DVCFileSystem(os.fspath(_COUNTRIES_DIR))
+#+end_src
+
+with:
+
+#+begin_src python
+from .config import s3_creds_path, dvc_cache_dir
+
+# Initialize DVC filesystem once and reuse it.
+# The credentialpath and cache.dir are overridden at construction
+# time to point at user-writable locations, so the library works
+# correctly when installed from a wheel into a read-only
+# site-packages directory.  DVC is lazy about credential
+# validation --- the files at these paths do not need to exist
+# yet; auto-unlock populates s3_creds a few lines later in
+# __init__.py.
+_PACKAGE_ROOT = Path(__file__).resolve().parent
+_COUNTRIES_DIR = _PACKAGE_ROOT / "countries"
+DVCFS = DVCFileSystem(
+    os.fspath(_COUNTRIES_DIR),
+    config={
+        "remote": {
+            "ligonresearch_s3": {
+                "credentialpath": str(s3_creds_path()),
+            },
+        },
+        "cache": {"dir": str(dvc_cache_dir())},
+    },
+)
+#+end_src
+
+** 4. =lsms_library/data_access.py=
+
+Three edits:
+
+*** 4a.  =_auto_unlock_s3= write target
+
+Currently at around line 267-287.  Replace:
+
+#+begin_src python
+    if dvc_dir is None:
+        dvc_dir = _COUNTRIES_DIR / ".dvc"
+
+    creds_file = dvc_dir / "s3_creds"
+#+end_src
+
+with (import =config= at the top of the file if not already):
+
+#+begin_src python
+    from . import config as _cfg
+    if dvc_dir is None:
+        dvc_dir = _COUNTRIES_DIR / ".dvc"
+
+    creds_file = _cfg.s3_creds_path()
+    creds_file.parent.mkdir(parents=True, exist_ok=True)
+#+end_src
+
+Leave the rest of the function unchanged; it already handles the
+write-failure case by catching =OSError=.
+
+*** 4b.  =_check_remote_access= credential discovery
+
+At around line 148-156, the current code checks
+=dvc_dir / cred_path=.  Extend it to ALSO check
+=config.s3_creds_path()= for backward compat (option (a): check
+both locations, prefer new):
+
+#+begin_src python
+    if url.startswith("s3://"):
+        cred_path = remote_cfg.get("credentialpath")
+        has_read = False
+
+        # Check user-writable location first (new path in v0.7.0+)
+        from . import config as _cfg
+        user_creds = _cfg.s3_creds_path()
+        if user_creds.exists() and user_creds.stat().st_size > 0:
+            has_read = True
+        # Fall back to legacy location (relative to .dvc/)
+        elif cred_path:
+            cred_file = dvc_dir / cred_path
+            has_read = cred_file.exists() and cred_file.stat().st_size > 0
+
+        if not has_read:
+            return None
+        # ... rest unchanged
+#+end_src
+
+*** 4c.  Update the module docstring
+
+Around lines 1-34 the docstring describes the auth flow.  Update
+it to reflect that decrypted creds now land at
+=~/.config/lsms_library/s3_creds=, not inside the source tree.
+
+** 5. =lsms_library/dvc_permissions.py=
+
+Two edits:
+
+*** 5a.  =_write_creds= target
+
+Around line 53-67, replace:
+
+#+begin_src python
+    def _write_creds(decrypted_data, interactive: bool = True):
+        """Write decrypted credentials to disk."""
+        creds_file = gpg_path / 's3_creds'
+#+end_src
+
+with:
+
+#+begin_src python
+    def _write_creds(decrypted_data, interactive: bool = True):
+        """Write decrypted credentials to disk."""
+        from lsms_library import config as _cfg
+        creds_file = _cfg.s3_creds_path()
+        creds_file.parent.mkdir(parents=True, exist_ok=True)
+#+end_src
+
+*** 5b.  Update =authenticate= user messaging
+
+Around lines 78-82, the printed message currently says
+"Contact ligon@berkeley.edu to request access credentials."
+That is misleading --- the preferred path is to register for a
+WB Microdata API key and set it in
+=~/.config/lsms_library/config.yml=.  Replace with:
+
+#+begin_src python
+    print(
+        "\n*** LSMS_Library DVC authentication (interactive fallback) ***\n"
+        "The preferred way to authenticate is to obtain a free World\n"
+        "Bank Microdata Library API key and set it in\n"
+        "  ~/.config/lsms_library/config.yml   (key: microdata_api_key)\n"
+        "or as the MICRODATA_API_KEY environment variable.  With a valid\n"
+        "WB API key, the library auto-unlocks S3 credentials on import.\n"
+        "\n"
+        "If you cannot use a WB API key, you can enter the shared\n"
+        "passphrase below.  See README.org for details.\n"
+    )
+#+end_src
+
+** 6. =lsms_library/__init__.py:57-79= (import-time auth flow)
+
+Currently line 58 has:
+
+#+begin_src python
+creds_file = gpg_path / 's3_creds'
+#+end_src
+
+Replace with:
+
+#+begin_src python
+from .config import s3_creds_path as _s3_creds_path
+creds_file = _s3_creds_path()
+#+end_src
+
+And in the =if not SKIP_AUTH and not creds_file.exists():= block
+below, the logic is already correct --- it will try the
+auto-unlock path, which now writes to the user-writable location.
+
+Verify that the whole block still makes sense after the edit.
+
+** 7. =README.org= --- new "Installation and Data Access" section
+
+Add a new top-level section after the blurb (around line 46-48
+where the current single-sentence data-access note lives).
+Replace that note with something like:
+
+#+begin_src org
+* Installation
+
+From PyPI (when available):
+
+#+begin_src sh
+pip install lsms-library
+#+end_src
+
+From github (current release):
+
+#+begin_src sh
+pip install git+https://github.com/ligon/LSMS_Library.git@v0.7.0
+#+end_src
+
+From a source checkout (for contributors):
+
+#+begin_src sh
+git clone https://github.com/ligon/LSMS_Library.git
+cd LSMS_Library
+poetry install
+#+end_src
+
+* Data Access
+
+This library abstracts over Living Standards Measurement Study
+(LSMS) survey data.  The underlying microdata belongs to the
+respective national statistics offices and the World Bank; users
+must accept the World Bank Microdata Library's terms of use
+before accessing it.
+
+** Authentication: the WB Microdata API key
+
+1. Register at https://microdata.worldbank.org/ (free).
+2. Accept the terms of use for the LSMS collections you want to
+   access.
+3. Get your API key from your account dashboard.
+4. Create =~/.config/lsms_library/config.yml= with:
+
+   #+begin_src yaml
+   microdata_api_key: your_key_here
+   # data_dir: /path/to/override   # same as LSMS_DATA_DIR env var
+   #+end_src
+
+   or set =MICRODATA_API_KEY= as an environment variable.
+5. On =import lsms_library=, the library validates your key
+   against the WB catalog and automatically unlocks access to the
+   S3 read cache.  No further setup is required.
+
+** The S3 cache
+
+Once your WB API key is validated, the library unlocks a
+read-only S3 cache that mirrors the WB Microdata downloads.
+This is a convenience --- the S3 cache is faster than the
+WB NADA API and reduces load on the WB service --- but it is
+not a separate access layer.  The WB ToU is the authoritative
+gate; the S3 cache just provides the same data faster.
+
+** Non-interactive environments
+
+In CI, Docker builds, or other non-interactive contexts, set
+=LSMS_SKIP_AUTH=1= to suppress the import-time authentication
+flow.  In that mode you are responsible for ensuring
+=~/.config/lsms_library/s3_creds= exists (e.g. via a CI secret
+mount) before the first data access.
+
+** Data cache location
+
+Parquet caches materialize under the platform-appropriate user
+data directory:
+
+- Linux: =~/.local/share/lsms_library/= by default
+- Override with =LSMS_DATA_DIR= env var or =data_dir= in
+  =config.yml=
+
+See the API documentation for details on =trust_cache=, the
+=Country= and =Feature= classes, and per-country build
+methods.
+
+* Contributing
+
+See [[file:CONTRIBUTING.org][CONTRIBUTING.org]] for the full workflow, including
+write access to the S3 cache for adding new waves.
+#+end_src
+
+Adjust tone/length as needed to match existing README.org style.
+Keep it concise --- the goal is to get a pip-install user from
+zero to working in five paragraphs.
+
+** 8. =CONTRIBUTING.org:62-88= --- reframe as write-path doc
+
+Currently the example shows =ll.authenticate()= as the primary
+entry point.  Reframe so that:
+
+- The WB API key flow is presented as the canonical path for
+  both read and write (reader creds come automatically; writer
+  creds via =LSMS_S3_WRITE_KEY= or =AWS_ACCESS_KEY_ID= /
+  =AWS_SECRET_ACCESS_KEY= or a =s3_write_creds= file).
+- =ll.authenticate()= is framed as a rarely-needed interactive
+  fallback for contributors who don't have a WB API key.
+- Add a small paragraph on write-access setup for RAs
+  (=LSMS_S3_WRITE_KEY= and its key-id partner, or pointing at a
+  shared credential distribution channel).
+
+* Commit structure (planned)
+
+Break into 4 commits for reviewability:
+
+| # | Scope                                                     | Files                                                       |
+|---+-----------------------------------------------------------+-------------------------------------------------------------|
+| 1 | Config helpers + pyproject include + DVCFS override       | =pyproject.toml=, =config.py=, =local_tools.py=             |
+| 2 | Move credential write target + backward compat            | =data_access.py=, =dvc_permissions.py=, =__init__.py=       |
+| 3 | Docs                                                      | =README.org=, =CONTRIBUTING.org=                            |
+| 4 | Tag =v0.7.0=                                              | (pure git tag)                                              |
+
+After commit 1: verify the wheel contains =.dvc/config= and
+friends via =poetry build= + =unzip -l=.
+
+After commit 2: verify in a scratch venv that =Country('Uganda')=
+can at least instantiate and report =.waves= without hitting S3
+(trust_cache path).
+
+After commit 3: proofread README section.
+
+* Verification plan (before tagging v0.7.0)
+
+1. =poetry build= produces a wheel with =.dvc/config=,
+   =.dvc/s3_config=, =.dvc/s3_reader_creds.gpg=,
+   =.dvc/plots/*.json=, =.dvc/.gitignore= present.  Verify with
+   =unzip -l dist/lsms_library-*-py3-none-any.whl | grep '\.dvc/'=.
+2. In a /fresh, empty venv/ (e.g. =python3.11 -m venv /tmp/v07_test=),
+   =pip install /path/to/dist/lsms_library-*.whl=, then:
+
+   #+begin_src python
+   import lsms_library as ll
+   uga = ll.Country('Uganda', trust_cache=False)
+   print(uga.waves)   # should list 8 waves without crashing
+   # Don't call a data-materializing method unless you have creds.
+   #+end_src
+
+   This verifies import + WB-API-key flow + lazy DVC discovery.
+3. Targeted pytest subset: =pytest tests/test_dvc_caching.py
+   tests/test_wave_getattr.py tests/test_schema_consistency.py
+   tests/test_feature.py -x --tb=short=.  Should be clean.
+4. Verify that =check_usage.sh= isn't spiking during the session
+   (not expected to --- this is all local work).
+
+Skip the full pytest suite --- the test fixtures use trust_cache
+or mocked DVC, and the silent-failure fix from =984d57b4= already
+validated the clean-run baseline today.
+
+* Backward compatibility
+
+/Option (a)/ chosen: check both the new user-writable location
+AND the legacy =countries/.dvc/s3_creds= location.  Prefer new.
+Auto-unlock always writes to new.  Legacy users keep working
+without intervention; new installs use the new path.
+
+Concretely this means =_check_remote_access= must check both
+locations before returning =None=.  See edit 4b.
+
+* Open decisions (for the fresh session OR Ligon)
+
+1. *Key rotation*: the current =s3_creds= plaintext was printed
+   into the 2026-04-10 session's chat stream at around the
+   "Ligon asks me to investigate the auth mechanism" point,
+   which means the AWS access key pair has been re-disclosed to
+   Anthropic's infrastructure.  Ligon's call whether to rotate
+   before or after v0.7.0 ships.  Not a blocker either way.
+
+2. *Whether to delete =dvc_permissions.authenticate()= entirely*
+   in this release, or keep it as a softly-deprecated fallback.
+   The handoff above assumes "keep as fallback, reframe
+   messaging."  If Ligon wants to delete it, do so in commit 2
+   and note it as a breaking change in the v0.7.0 release notes.
+
+3. *Whether CONTRIBUTING.org should also document the exact
+   shape of =s3_write_creds=*.  Currently it's not documented;
+   contributors ask Ligon out-of-band.  This is a judgment call
+   about how much to publish.
+
+4. *Cache-dir migration*: if users have an existing
+   =lsms_library/countries/.dvc/cache= from editable installs,
+   the new =dvc_cache_dir()= location will be different.  DVC's
+   content-addressed storage means nothing actually breaks ---
+   cached content just gets re-fetched --- but it's worth a
+   brief note.
+
+* Acceptance criteria
+
+v0.7.0 ships when:
+
+- Wheel built from master contains the =.dvc/= metadata files
+  listed in edit 1.
+- A fresh-venv =pip install wheel.whl= followed by
+  =import lsms_library= does not crash, even on a system
+  without any DVC credentials configured (the library should
+  warn and continue).
+- With a valid =MICRODATA_API_KEY= configured,
+  =import lsms_library= silently auto-unlocks S3 credentials
+  into =~/.config/lsms_library/s3_creds=.
+- =Country('Uganda').household_roster()= on a fresh install
+  (no prior parquet cache, with WB API key set) successfully
+  reaches S3 or WB NADA and returns a non-empty DataFrame.
+- README.org has a complete "Installation and Data Access"
+  section that walks a new user through the setup.
+- CONTRIBUTING.org's auth section no longer leads with
+  =ll.authenticate()=; it leads with the WB API key.
+- Silent-failure fix from =984d57b4= is preserved (the
+  =_rebuild_failure_error= helper still exists and is called
+  from all three sites).
+
+* Context and rationale
+
+Yesterday's session (2026-04-10) went deep on the customer bug
+that motivated this work: a downstream user installed via
+=pip install git+https://...= and got silent empty DataFrames
+instead of clear errors.  The fix for /that/ specific pain
+point landed as =984d57b4= (returns None on exhausted
+fallbacks, raises =RuntimeError= with an actionable message).
+The customer is unblocked.
+
+This v0.7.0 work is the /complete/ fix: not just "fail loudly"
+but "actually work end-to-end from a pip install."  The silent
+failure that was the immediate pain point is already solved;
+this is about making the github install self-sufficient so
+users don't hit the failure at all.
+
+Everything in this handoff has been verified (DVC probe results,
+three-tier credential model with Ligon, file locations,
+backward-compat strategy).  No re-discovery should be needed.
+The fresh session's job is to execute, not to re-think.
+
+Estimated total time: 30-60 minutes of focused work, plus wheel-build
+verification.
