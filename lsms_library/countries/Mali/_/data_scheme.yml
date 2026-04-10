@@ -1,6 +1,13 @@
 Country: Mali
 
 Data Scheme:
+  sample:
+    index: (i, t)
+    v: str
+    weight: float
+    panel_weight: float
+    strata: str
+    Rural: str
   cluster_features:
     index: (t, v)
     Region: str

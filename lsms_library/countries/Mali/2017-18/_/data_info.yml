@@ -1,6 +1,40 @@
 Country: Mali
 Wave: 2017-18
 
+sample:
+    dfs:
+        - df_cover
+        - df_weights
+    df_cover:
+        file: eaci17_s00p1.dta
+        idxvars:
+            v: grappe
+            i:
+                - grappe
+                - exploitation
+        myvars:
+            Rural:
+                - s0q04
+                - mapping:
+                    Rural: Rural
+                    Urbain (District de Bamako): Urban
+                    Autre urbain: Urban
+    df_weights:
+        file: EACI17_ECHANTILLON.dta
+        idxvars:
+            i:
+                - grappe
+                - exploitation
+        myvars:
+            weight: poids_leger
+            panel_weight: poids_leger
+            strata: strate
+    merge_on:
+        - i
+    final_index:
+        - i
+        - t
+
 cluster_features:
     dfs:
         - df_main

@@ -3,6 +3,9 @@ import pandas as pd
 from lsms_library.local_tools import format_id
 
 
+def strata(value):
+    return format_id(value)
+
 def Int_t(value):
     '''
     Formatting interview date

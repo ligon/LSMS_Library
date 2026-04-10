@@ -1,6 +1,38 @@
 Country: Mali
 Wave: 2014-15
 
+sample:
+    dfs:
+        - df_cover
+        - df_weights
+    df_cover:
+        file: EACICONTROLE_p1.dta
+        idxvars:
+            v: grappe
+            i:
+                - grappe
+                - menage
+        myvars:
+            Rural:
+                - s00q04
+                - mapping:
+                    Rural: Rural
+                    Urbain: Urban
+    df_weights:
+        file: EACIPOIDS.dta
+        idxvars:
+            i:
+                - grappe
+                - menage
+        myvars:
+            weight: poids_menage
+            panel_weight: poids_menage
+    merge_on:
+        - i
+    final_index:
+        - i
+        - t
+
 cluster_features:
     dfs:
         - df_main
