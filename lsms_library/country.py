@@ -191,6 +191,27 @@ def _property_value(instance, prop_name):
     raise AttributeError(f"'{type(instance).__name__}' has no attribute '{prop_name}'")
 
 
+def _rebuild_failure_error(country_name: str, method_name: str) -> RuntimeError:
+    """Construct a clear RuntimeError for exhausted build fallbacks.
+
+    Used at every site where the library could not materialize a
+    table via any path.  Message enumerates the common root causes
+    so callers can diagnose without reading the library source.
+    """
+    var_path = data_root(country_name) / "var" / f"{method_name}.parquet"
+    return RuntimeError(
+        f"Could not materialize {country_name}/{method_name}: no wave-level "
+        f"build succeeded and no cached parquet was found at {var_path}.\n\n"
+        f"Common causes:\n"
+        f"  - installed via `pip install git+https://...` without the .dvc "
+        f"metadata needed to rebuild from source;\n"
+        f"  - LSMS_DATA_DIR points to an empty or stale cache location;\n"
+        f"  - DVC credentials are missing or misconfigured;\n"
+        f"  - the raw .dta source files have not been dvc-pulled.\n\n"
+        f"See README.org for supported install and data-access patterns."
+    )
+
+
 class Wave:
     """A single survey wave within a country.
 
@@ -1449,7 +1470,7 @@ class Country:
 
             if output_path is None:
                 logger.warning(f"Data file {target_path} still missing after running fallbacks.")
-                return pd.DataFrame()
+                return None
 
             if output_path.suffix == ".json":
                 with open(output_path, "r", encoding="utf-8") as json_file:
@@ -1458,8 +1479,6 @@ class Country:
             df_local = get_dataframe(str(output_path))
             df_local = map_index(df_local)
             return df_local
-
-            return pd.DataFrame()
 
         def load_from_waves(waves):
             results = {}
@@ -1529,10 +1548,10 @@ class Country:
                 if country_fallback:
                     return country_fallback
                 return {}
-            if isinstance(country_fallback, pd.DataFrame):
+            if isinstance(country_fallback, pd.DataFrame) and not country_fallback.empty:
                 return country_fallback
 
-            raise KeyError(f"No data found for {method_name} in any wave of {self.name}.")
+            raise _rebuild_failure_error(self.name, method_name)
 
         def load_json_cache(method_name):
             cache_path = data_root(self.name) / "_" / f"{method_name}.json"
@@ -1568,6 +1587,8 @@ class Country:
                 result = load_from_waves(waves)
             else:
                 result = run_make_target(method_name)
+                if result is None:
+                    raise _rebuild_failure_error(self.name, method_name)
 
             if isinstance(result, dict):
                 cache_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1764,6 +1785,8 @@ class Country:
                     df = load_from_waves(waves)
                 else:
                     df = run_make_target(method_name)
+                    if df is None:
+                        raise _rebuild_failure_error(self.name, method_name)
             except Exception as error:
                 _log_issue(self.name, method_name, waves, error)
                 raise
