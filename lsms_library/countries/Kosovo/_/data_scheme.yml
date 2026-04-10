@@ -15,3 +15,11 @@ Data Scheme:
     Distance: int
     Affinity: str
     Marital_status: str
+
+  sample:
+    index: (i, t)
+    v: str
+    weight: float
+    panel_weight: float
+    strata: str
+    Rural: str

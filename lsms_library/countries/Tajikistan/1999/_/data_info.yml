@@ -59,3 +59,15 @@ cluster_features:
             - mapping:
                 1.0: Urban
                 2.0: Rural
+
+sample:
+    file: ../Data/SHLDDTA.DTA
+    idxvars:
+        i: [pop_pt, hhid]
+    myvars:
+        v: pop_pt
+        Rural:
+            - settlm
+            - mapping:
+                1.0: Urban
+                2.0: Rural

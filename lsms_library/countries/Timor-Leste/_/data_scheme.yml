@@ -9,3 +9,11 @@ Data Scheme:
     Generation: int
     Distance: int
     Affinity: str
+
+  sample:
+    index: (i, t)
+    v: str
+    weight: float
+    panel_weight: float
+    strata: str
+    Rural: str

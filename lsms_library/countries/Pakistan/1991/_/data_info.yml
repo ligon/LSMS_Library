@@ -10,6 +10,33 @@ cluster_features:
         Region: religion
         Language: langint
 
+sample:
+    dfs:
+        - df_cover
+        - df_region
+    df_cover:
+        file: F00A.DTA
+        idxvars:
+            i: hid
+        myvars:
+            v: clust
+    df_region:
+        file: REGIONS.DTA
+        idxvars:
+            i: hhcode
+        myvars:
+            Rural:
+                - urbrural
+                - mapping:
+                    1.0: Urban
+                    2.0: Rural
+            strata: province
+    merge_on:
+        - i
+    final_index:
+        - i
+        - t
+
 household_roster:
     file:
         - F01A.DTA

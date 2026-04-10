@@ -11,3 +11,32 @@ household_roster:
         Sex: s01a02
         Relationship: s01a03
         Age: s01a06a
+
+sample:
+    dfs:
+        - df_cover
+        - df_weights
+    df_cover:
+        file: ../Data/S00.DTA
+        idxvars:
+            i: identif
+            v: id4
+        myvars:
+            int_t: s00_vis1
+    df_weights:
+        file: ../Data/WEIGHT.DTA
+        idxvars:
+            v: id4
+        myvars:
+            weight: hhweight
+            strata: strata
+            Rural:
+                - urbrural
+                - mapping:
+                    1: Urban
+                    2: Rural
+    merge_on:
+        - v
+    final_index:
+        - i
+        - t

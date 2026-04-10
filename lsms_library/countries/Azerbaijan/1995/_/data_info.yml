@@ -44,3 +44,26 @@ cluster_features:
                 2.0: Urban
                 3.0: Urban
                 4.0: Rural
+
+sample:
+    dfs:
+        - df_cover
+        - df_weights
+    df_cover:
+        file: ../Data/A00.dta
+        idxvars:
+            i: [ppid, hid]
+            v: ppid
+        myvars:
+            int_t: dayint
+    df_weights:
+        file: ../Data/PP.dta
+        idxvars:
+            v: ppid
+        myvars:
+            weight: w
+    merge_on:
+        - v
+    final_index:
+        - i
+        - t

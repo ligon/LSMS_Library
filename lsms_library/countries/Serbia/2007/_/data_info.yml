@@ -23,3 +23,32 @@ household_roster:
         Sex: pol
         Relationship: srodstvo
         Age: starost
+
+sample:
+    dfs:
+        - df_hh
+        - df_ed
+    df_hh:
+        file: "../Data/domacinstva.dta"
+        idxvars:
+            i: [popkrug, naselje, dom]
+        myvars:
+            v: popkrug
+            weight: hhweight
+            panel_weight: popweight
+    df_ed:
+        file: "../Data/enumeration_district.dta"
+        idxvars:
+            v: popkrug
+        myvars:
+            Rural:
+                - tip
+                - mapping:
+                    urban: Urban
+                    rural: Rural
+            strata: region2
+    merge_on:
+        - v
+    final_index:
+        - i
+        - t

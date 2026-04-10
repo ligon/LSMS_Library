@@ -64,3 +64,27 @@ cluster_features:
     myvars:
         Region: Oblast
         Rural: Location
+
+sample:
+    dfs:
+        - df_weights
+        - df_pov
+    df_weights:
+        file: ../Data/weights2009.dta
+        idxvars:
+            i: HHID
+        myvars:
+            v: psuid
+            weight: Weight
+            Rural: location
+    df_pov:
+        file: "../Data/POV_FINAL & INCOME.dta"
+        idxvars:
+            i: hhid
+        myvars:
+            strata: strata
+    merge_on:
+        - i
+    final_index:
+        - i
+        - t

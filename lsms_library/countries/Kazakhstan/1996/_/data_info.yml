@@ -61,3 +61,16 @@ cluster_features:
                 urban: Urban
                 rural: Rural
                 small town: Urban
+
+sample:
+    file: ../Data/KZ96SMP_PUF.dta
+    idxvars:
+        i: rn
+    myvars:
+        v: loc_nr
+        Rural:
+            - type_loc
+            - mapping:
+                urban: Urban
+                rural: Rural
+                small town: Urban

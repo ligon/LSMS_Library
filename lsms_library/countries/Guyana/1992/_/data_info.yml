@@ -14,6 +14,34 @@ cluster_features:
                 1: Urban
                 2: Rural
 
+sample:
+    dfs:
+        - df_cover
+        - df_weights
+    df_cover:
+        file: ../Data/COVERN.dta
+        idxvars:
+            i: [ED, HH]
+            v: ED
+        myvars:
+            strata: STNO
+            Rural:
+                - SECTOR
+                - mapping:
+                    1: Urban
+                    2: Rural
+    df_weights:
+        file: ../Data/WEIGHT.dta
+        idxvars:
+            v: ED
+        myvars:
+            weight: WEIGHT
+    merge_on:
+        - v
+    final_index:
+        - i
+        - t
+
 household_roster:
     file:
         - ../Data/ROSTERN.dta

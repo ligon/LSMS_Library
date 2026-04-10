@@ -48,3 +48,26 @@ cluster_features:
     myvars:
         Region: oblast
         Rural: type_reg
+
+sample:
+    dfs:
+        - df_cover
+        - df_weights
+    df_cover:
+        file: ../Data/interview.dta
+        idxvars:
+            i: hhid
+        myvars:
+            v: tlss_psu
+            Rural: type_reg
+    df_weights:
+        file: ../Data/new_expend.dta
+        idxvars:
+            i: hhid
+        myvars:
+            weight: wgt_nat
+    merge_on:
+        - i
+    final_index:
+        - i
+        - t

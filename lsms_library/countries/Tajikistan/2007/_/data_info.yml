@@ -64,3 +64,27 @@ cluster_features:
     myvars:
         Region: h_q7
         Rural: location
+
+sample:
+    dfs:
+        - df_weights
+        - df_pov
+    df_weights:
+        file: ../Data/weights.dta
+        idxvars:
+            i: hhid
+        myvars:
+            v: psuid
+            weight: weight
+    df_pov:
+        file: ../Data/Pov_final.dta
+        idxvars:
+            i: hhid
+        myvars:
+            strata: strata
+            Rural: location
+    merge_on:
+        - i
+    final_index:
+        - i
+        - t

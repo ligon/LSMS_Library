@@ -58,3 +58,16 @@ household_roster:
                   4: Divorced
                   5: Widow/er
                   6: Never ma
+
+sample:
+    file: "../Data/ID.dta"
+    idxvars:
+        i: hhid
+    myvars:
+        v: psu
+        weight: weight
+        Rural:
+            - s0i_q09
+            - mapping:
+                Rural: Rural
+                Urban: Urban

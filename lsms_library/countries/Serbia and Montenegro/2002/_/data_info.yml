@@ -25,3 +25,17 @@ household_roster:
         Age: starost
         Relationship: a2
         Sex: a1
+
+sample:
+    file: "../Data/2002 incomeconsumption.dta"
+    idxvars:
+        i: [mesto, rbd]
+    myvars:
+        v: mesto
+        weight: pobder
+        strata: stratum
+        Rural:
+            - tip
+            - mapping:
+                Urban: Urban
+                Other: Rural

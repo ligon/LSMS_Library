@@ -25,3 +25,18 @@ household_roster:
         Age: brojgod
         Relationship: a2
         Sex: a1
+
+sample:
+    file: "../Data/2003 incomeconsumption.dta"
+    idxvars:
+        i: [mesto, rbd]
+    myvars:
+        v: mesto
+        weight: ponder
+        panel_weight: ponderl
+        strata: stratum
+        Rural:
+            - tip
+            - mapping:
+                Urban: Urban
+                Other: Rural

@@ -29,3 +29,17 @@ household_roster:
         - v
         - i
         - pid
+
+sample:
+    file: ../Data/basicvars.dta
+    idxvars:
+        i: hh_id
+    myvars:
+        v: cluster
+        weight: hhweight
+        strata: strata
+        Rural:
+            - urban
+            - mapping:
+                0: Rural
+                1: Urban

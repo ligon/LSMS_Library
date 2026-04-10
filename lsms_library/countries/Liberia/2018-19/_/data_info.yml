@@ -40,3 +40,17 @@ cluster_features:
         Region: region
         Rural: locality
         County: county_code
+
+sample:
+    file:
+        - "../Data/Household/sect1_public.dta"
+    idxvars:
+        i: hhid
+    myvars:
+        v: ea_code
+        weight: hhweight
+        Rural:
+            - locality
+            - mapping:
+                rural: Rural
+                urban: Urban
