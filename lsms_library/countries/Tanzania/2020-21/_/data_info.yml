@@ -90,10 +90,10 @@ sample:
     idxvars:
         i: y5_hhid
     myvars:
-        v: clusterid
+        v: y5_cluster  # string cluster ID; clusterid is NaN for booster HH
         weight: y5_crossweight  # cross-sectional (panel + booster)
         panel_weight: y5_panelweight  # NaN for 545 booster households
-        strata: strataid
+        strata: strataid  # NaN for 545 booster HH (no legacy strata assignment)
         Rural:
             - y5_rural
             - mapping:
