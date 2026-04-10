@@ -953,7 +953,14 @@ class Country:
                 new_idx.append('v')
         if 'v' not in new_idx:
             new_idx.append('v')
-        return flat.set_index(new_idx)
+        result = flat.set_index(new_idx)
+        # pandas merge() and set_index() both drop DataFrame.attrs.
+        # Preserve them so flags like id_converted survive the v-join —
+        # otherwise _finalize_result runs id_walk a second time on
+        # already-converted data, causing ID-chain collisions in
+        # countries with transitive panel linkage (#140 BF case).
+        result.attrs = dict(df.attrs)
+        return result
 
     def _add_market_index(self, df: pd.DataFrame, column: str = 'Region') -> pd.DataFrame:
         """Join a market identifier ``m`` from cluster_features onto *df*.
