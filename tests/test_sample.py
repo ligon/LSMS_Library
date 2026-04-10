@@ -108,11 +108,48 @@ class TestSample:
     def test_weight_nonnegative_where_present(self, country_name, sample_df):
         """Non-null weights should be non-negative (zero is allowed for
         non-response or dropped households)."""
+        for col in ["weight", "panel_weight"]:
+            if col not in sample_df.columns:
+                continue
+            weights = sample_df[col].dropna()
+            if weights.empty:
+                continue
+            assert (weights >= 0).all(), (
+                f"{country_name} has {(weights < 0).sum()} negative values in {col}"
+            )
+
+    def test_weighted_population_stable_across_waves(self, country_name, sample_df):
+        """Weighted population (sum of cross-sectional weights) should not
+        jump more than 5x between adjacent waves — catches miscoded weights
+        or wrong variable assignments."""
         if "weight" not in sample_df.columns:
             pytest.skip("no weight column")
-        weights = sample_df["weight"].dropna()
-        if weights.empty:
-            pytest.skip("all weights are null (may be expected for some waves)")
-        assert (weights >= 0).all(), (
-            f"{country_name} has {(weights < 0).sum()} negative weights"
+        pop = sample_df.groupby("t")["weight"].sum().sort_index()
+        pop = pop[pop > 0]
+        if len(pop) < 2:
+            pytest.skip("fewer than 2 waves with positive weights")
+        ratios = pop / pop.shift(1)
+        ratios = ratios.dropna()
+        for wave, r in ratios.items():
+            assert 0.2 < r < 5.0, (
+                f"{country_name}: weighted population ratio {wave} vs prior = {r:.2f} "
+                f"(sum={pop[wave]:,.0f}). Possible weight variable error."
+            )
+
+    def test_cross_section_weight_positive_when_panel_null(self, country_name, sample_df):
+        """Refreshment-sample households (panel_weight NaN but weight present)
+        should have a positive cross-sectional weight — they were interviewed.
+        Rows where BOTH weights are NaN are non-response, not refreshment."""
+        if "panel_weight" not in sample_df.columns or "weight" not in sample_df.columns:
+            pytest.skip("need both weight columns")
+        # Refreshment = panel_weight NaN but cross-sectional weight exists
+        refresh = sample_df[
+            sample_df["panel_weight"].isna() & sample_df["weight"].notna()
+        ]
+        if refresh.empty:
+            pytest.skip("no refreshment-sample households identified")
+        bad = refresh["weight"] <= 0
+        assert not bad.any(), (
+            f"{country_name}: {bad.sum()} refreshment households have "
+            f"non-positive cross-sectional weight"
         )
