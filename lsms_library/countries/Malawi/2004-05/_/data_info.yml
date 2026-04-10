@@ -32,57 +32,23 @@ cluster_features:
                 Urban: 0
 
 household_roster:
-    dfs:
-        - df_roster
-        - df_cluster
-    df_roster:
-        file: sec_b.dta
-        idxvars:
-            i: case_id
-            pid: memid
-        myvars:
-            Sex: b03
-            Age: b05a
-            Relationship: b04
-    df_cluster:
-        file: sec_a.dta
-        idxvars:
-            i: case_id
-        myvars:
-            v: ea
-    merge_on:
-        - i
-    final_index:
-        - t
-        - v
-        - i
-        - pid
+    file: sec_b.dta
+    idxvars:
+        i: case_id
+        pid: memid
+    myvars:
+        Sex: b03
+        Age: b05a
+        Relationship: b04
 
 
 individual_education:
-    dfs:
-        - df_educ
-        - df_cluster
-    df_educ:
-        file: sec_c.dta
-        idxvars:
-            i: case_id
-            pid: memid
-        myvars:
-            Educational Attainment: c13
-    df_cluster:
-        file: sec_a.dta
-        idxvars:
-            i: case_id
-        myvars:
-            v: ea
-    merge_on:
-        - i
-    final_index:
-        - t
-        - v
-        - i
-        - pid
+    file: sec_c.dta
+    idxvars:
+        i: case_id
+        pid: memid
+    myvars:
+        Educational Attainment: c13
 
 # panel_ids:
 #     file: sec_a.dta
