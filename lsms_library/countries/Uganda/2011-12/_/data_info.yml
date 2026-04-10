@@ -59,6 +59,7 @@ sample:
     myvars:
         v: comm
         weight: mult
+        panel_weight: mult  # pre-refreshment — same as cross-sectional
         strata: sregion
         Rural: urban
 

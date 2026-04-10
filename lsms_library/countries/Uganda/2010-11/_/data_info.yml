@@ -59,6 +59,7 @@ sample:
     myvars:
         v: comm
         weight: wgt10
+        panel_weight: wgt10  # pre-refreshment — same as cross-sectional
         strata: stratum
         Rural: urban
 

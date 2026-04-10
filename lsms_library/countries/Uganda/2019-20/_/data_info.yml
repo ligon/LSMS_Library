@@ -94,7 +94,8 @@ sample:
         i: hhid
     myvars:
         v: s1aq04a
-        weight: wgt
+        weight: wgt  # only weight provided; wave 8 appears to be panel-only (no refreshment)
+        panel_weight: wgt
         strata: subreg
         Rural: urban
 

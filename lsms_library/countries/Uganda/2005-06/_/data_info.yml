@@ -69,6 +69,7 @@ sample:
     myvars:
         v: comm
         weight: hmult
+        panel_weight: hmult  # baseline wave — same as cross-sectional
         strata: stratum
         Rural: urban
 
