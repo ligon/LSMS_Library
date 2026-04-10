@@ -26,3 +26,17 @@ Standard EHCVM format, nearly identical to Mali.  Variable names: =s07bq01= (foo
 
 *** Categorical mapping
 ISSUE: No harmonised =categorical_mapping.org= file yet.  Food labels and units come through as raw categoricals from the =.dta= files.  Many 2014 units remain as French text without standardisation.  The 2018-19/2021-22 unit codes are numeric without categorical labels in some entries.
+
+** DONE sample
+Sampling design table: cluster, weights, strata, and Rural classification.
+
+*** Waves
+- *2014 (EMC)*: Single file =emc2014_welfare.dta=.  Weight variable =hhweight= (cross-sectional); no distinct panel weight (same variable used for both).  Numeric =strate= column (1--26, Region x Milieu).  10,224 households across 900 clusters.
+- *2018-19 (EHCVM)*: Two-file merge: cover page =s00_me_bfa2018.dta= (cluster, Rural) + =ehcvm_ponderations_bfa2018.dta= (cluster-level =hhweight=, same for both weight columns).  6,961 households across 585 clusters.  No explicit strata variable.
+- *2021-22 (EHCVM)*: Two-file merge: cover page =s00_me_bfa2021.dta= + =ehcvm_panel_ponderations_bfa2021.dta=.  Distinct weights: =hhweight2021= (cross-sectional) and =hhweight_panel= (panel/longitudinal).  Both weights are cluster-level (same value for all households in a grappe).  3,218 households across 550 clusters.  No explicit strata variable.
+
+*** Notes
+- 2014 uses =grappe= (equivalent to =zd= in other 2014 files) as the cluster identifier.
+- EHCVM ponderation files are cluster-level, merged on =v= (grappe).
+- Strata are available only for 2014 (numeric 1--26); EHCVM waves lack an explicit strata variable.  Region x Milieu could be reconstructed from =cluster_features= if needed.
+- Weighted population sums: 2014 ~2.4M, 2018-19 ~3.1M, 2021-22 ~3.1M.

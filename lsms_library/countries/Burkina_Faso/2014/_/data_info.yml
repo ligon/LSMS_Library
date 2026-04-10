@@ -1,6 +1,27 @@
 Country: Burkina Faso
 Wave: 2014
 
+sample:
+    file: emc2014_welfare.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        v: grappe
+        weight: hhweight
+        panel_weight: hhweight
+        strata: strate
+        Rural:
+            - milieu
+            - mapping:
+                Rural: Rural
+                rural: Rural
+                RURAL: Rural
+                Urbain: Urban
+                urbain: Urban
+                URBAIN: Urban
+
 household_roster:
     file: emc2014_p1_individu_27022015.dta
     idxvars:

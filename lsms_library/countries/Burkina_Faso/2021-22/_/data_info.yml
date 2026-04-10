@@ -1,6 +1,40 @@
 Country: Burkina Faso
 Wave: 2021-22
 
+sample:
+    dfs:
+        - df_cover
+        - df_weights
+    df_cover:
+        file: s00_me_bfa2021.dta
+        idxvars:
+            v: grappe
+            i:
+                - grappe
+                - menage
+        myvars:
+            Rural:
+                - s00q04
+                - mapping:
+                    Rural: Rural
+                    rural: Rural
+                    RURAL: Rural
+                    Urbain: Urban
+                    urbain: Urban
+                    URBAIN: Urban
+    df_weights:
+        file: ehcvm_panel_ponderations_bfa2021.dta
+        idxvars:
+            v: grappe
+        myvars:
+            weight: hhweight2021
+            panel_weight: hhweight_panel
+    merge_on:
+        - v
+    final_index:
+        - i
+        - t
+
 household_roster:
     file: ehcvm_individu_bfa2021.dta
     idxvars:
