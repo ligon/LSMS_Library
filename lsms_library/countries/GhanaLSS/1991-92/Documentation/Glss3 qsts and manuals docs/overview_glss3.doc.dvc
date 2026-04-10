@@ -1,0 +1,5 @@
+outs:
+- md5: ffc935b55dd56fef9bdbe2cab53bbabd
+  size: 25600
+  hash: md5
+  path: overview_glss3.doc
