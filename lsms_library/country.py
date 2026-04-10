@@ -909,6 +909,48 @@ class Country:
         setattr(self, cache_key, lookup)
         return lookup
 
+    def _join_v_from_sample(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Join cluster identity ``v`` from sample() onto *df*.
+
+        Only call when ``sample`` is in ``data_scheme`` and *df* has
+        ``i`` and ``t`` in its index but not ``v``.  The sample()
+        result is cached on the Country instance for reuse across
+        features.
+        """
+        cache = getattr(self, '_sample_v_cache', None)
+        if cache is None:
+            try:
+                s = self.sample()
+                cache = s[['v']].copy()
+                self._sample_v_cache = cache
+            except Exception:
+                self._sample_v_cache = False
+                return df
+        if cache is False:
+            return df
+
+        idx_names = list(df.index.names)
+        flat = df.reset_index()
+        # Coerce join keys to string for safe matching
+        for key in ['i', 't']:
+            if key in flat.columns:
+                flat[key] = flat[key].astype(str)
+        v_lookup = cache.reset_index()
+        v_lookup['i'] = v_lookup['i'].astype(str)
+        v_lookup['t'] = v_lookup['t'].astype(str)
+
+        flat = flat.merge(v_lookup, on=['i', 't'], how='left')
+
+        # Insert v after t in the index
+        new_idx = []
+        for n in idx_names:
+            new_idx.append(n)
+            if n == 't':
+                new_idx.append('v')
+        if 'v' not in new_idx:
+            new_idx.append('v')
+        return flat.set_index(new_idx)
+
     def _add_market_index(self, df: pd.DataFrame, column: str = 'Region') -> pd.DataFrame:
         """Join a market identifier ``m`` from cluster_features onto *df*.
 
@@ -1144,9 +1186,19 @@ class Country:
             df = self._augment_index_from_related_tables(df, scheme_entry, None)
             df = _normalize_dataframe_index(df, scheme_entry, None)
 
+            # Join v from sample() for household-level tables that lack it
+            current_names = list(df.index.names) if isinstance(df.index, pd.MultiIndex) else [df.index.name]
+            _no_v_join = {'sample', 'cluster_features', 'panel_ids', 'updated_ids'}
+            if ('v' not in current_names
+                    and 'i' in current_names
+                    and 't' in current_names
+                    and method_name not in _no_v_join
+                    and 'sample' in self.data_scheme):
+                df = self._join_v_from_sample(df)
+
             if isinstance(df.index, pd.MultiIndex):
                 index_names = list(df.index.names)
-                preferred = ['i', 't', 'm']
+                preferred = ['i', 't', 'v', 'm']
                 desired_order = [name for name in preferred if name in index_names]
                 desired_order += [name for name in index_names if name not in desired_order]
                 if desired_order != index_names:
