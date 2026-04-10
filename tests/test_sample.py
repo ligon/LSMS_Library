@@ -73,6 +73,12 @@ class TestSample:
         assert v_null_rate < 0.05, (
             f"{country_name} sample has {v_null_rate:.1%} null v values"
         )
+        if v_null_rate > 0.01:
+            import warnings
+            warnings.warn(
+                f"{country_name} sample has {v_null_rate:.1%} null v values "
+                f"({sample_df['v'].isna().sum()} rows) — investigate per-wave"
+            )
 
     def test_has_weight_column(self, country_name, sample_df):
         """sample() must have a weight column."""
