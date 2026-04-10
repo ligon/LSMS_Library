@@ -252,3 +252,15 @@
 | Other              | Other           |
 | other              | Other           |
 | Other (specify)    | Other           |
+
+#+name: strata
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| East rural         | East Rural      |
+| North rural        | North Rural     |
+| West rural         | West Rural      |
+| Central rural      | Central Rural   |
+| Other urban        | Other Urban     |
+| South-westrn       | South Western   |
+| KAMPALA            | Kampala         |
+| kampala            | Kampala         |

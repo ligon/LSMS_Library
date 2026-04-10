@@ -8,6 +8,13 @@ Data Scheme:
     Boys : int
     Girls : int
 
+  sample:
+    index: (i, t)
+    v: str
+    weight: float
+    strata: str
+    Rural: str
+
   cluster_features:
     index: (t,v)
     Region: str

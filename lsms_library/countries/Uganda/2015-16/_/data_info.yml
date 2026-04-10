@@ -52,6 +52,16 @@ housing:
         - v
         - i
 
+sample:
+    file: gsec1.dta
+    idxvars:
+        i: HHID
+    myvars:
+        v: parish_code
+        weight: hwgt_W5
+        strata: sregion
+        Rural: urban
+
 cluster_features:
     file: gsec1.dta
     idxvars:

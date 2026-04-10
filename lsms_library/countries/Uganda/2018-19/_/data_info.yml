@@ -63,6 +63,16 @@ housing:
         - v
         - i
 
+sample:
+    file: GSEC1.dta
+    idxvars:
+        i: hhid
+    myvars:
+        v: parish_name
+        weight: wgt
+        strata: subreg
+        Rural: urban
+
 cluster_features:
     file: GSEC1.dta
     idxvars:

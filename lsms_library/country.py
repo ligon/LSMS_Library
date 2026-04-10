@@ -1114,6 +1114,8 @@ class Country:
                 continue
             rdict = _build_replace_dict(cat_maps[key])
             if rdict:
+                if hasattr(df[col], 'str'):
+                    df[col] = df[col].str.strip()
                 df[col] = df[col].replace(rdict)
 
         # Apply to index levels

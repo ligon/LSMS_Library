@@ -62,6 +62,16 @@ housing:
         - v
         - i
 
+sample:
+    file: ../Data/GSEC1.dta
+    idxvars:
+        i: HHID
+    myvars:
+        v: comm
+        weight: wgt09
+        strata: stratum
+        Rural: urban
+
 cluster_features:
     dfs:
         - df_main

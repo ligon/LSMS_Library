@@ -62,6 +62,13 @@ housing:
         - v
         - i
 
+sample:
+    file: GSEC1.dta
+    idxvars:
+        i: HHID
+    myvars:
+        v: comm
+
 cluster_features:
     file: GSEC1.dta
     idxvars:
