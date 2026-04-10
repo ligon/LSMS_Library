@@ -301,6 +301,46 @@ print(pd.read_parquet('../var/food_expenditures.parquet').describe())
   4. Note: The caloric data in the survey itself provides a head start
      that Ethiopia and Tanzania lack.
 
+* Sampling Design
+** Overview
+Malawi has five waves from two survey programs:
+- IHS2 (2004-05): cross-sectional, 11,280 households
+- IHS3 (2010-11): cross-sectional, 12,271 households
+- IHPS (2013-14): panel only (tracked from IHS3), 4,000 households
+- IHS4 (2016-17): cross-sectional (12,447) + panel (2,508) = 14,955 households
+- IHS5 (2019-20): cross-sectional (11,434) + panel (3,178) = 14,552 households
+
+** Strata
+District serves as the stratification variable across all waves (~30-32
+districts). The 2013-14 IHPS file also has an explicit =stratum= column
+with 6 Region x Rural values, but we use =district= for consistency.
+District names vary slightly across waves (e.g., "Blanytyre" vs
+"Blantyre", "Nkhatabay" vs "Nkhata Bay"); these are harmonized via the
+=strata= table in =categorical_mapping.org=.
+
+** Cluster (PSU)
+- 2004-05: =ea= (numeric, 110 unique EAs)
+- 2010-11 onward: =ea_id= (string, 200--800 unique EAs per wave)
+
+** Weights
+| Wave    | Cross-section weight | Panel weight       | Source file                                |
+|---------+----------------------+--------------------+--------------------------------------------|
+| 2004-05 | =hhwght=             | same (baseline)    | =sec_a.dta=                                |
+| 2010-11 | =hh_wgt=             | same (IHS3 CS)     | =Full_Sample/Household/hh_mod_a_filt.dta=  |
+| 2013-14 | =hh_wgt=             | =panelweight=      | =HH_MOD_A_FILT_13.dta=                    |
+| 2016-17 | =hh_wgt= (both)      | =panelweight_2016= | CS + =Panel/hh_mod_a_filt_16.dta=          |
+| 2019-20 | =hh_wgt= (both)      | =panelweight_2019= | CS + =Panel/hh_mod_a_filt_19.dta=          |
+
+For 2016-17 and 2019-20, the cross-sectional file provides =hh_wgt= for
+all CS households; the panel file provides both =hh_wgt= and the
+wave-specific =panelweight_YYYY=. Cross-sectional households have
+=panel_weight= = NaN since they are not tracked longitudinally.
+
+** Urban/Rural
+The =reside= column appears in all cover page files but with varying
+case: "Rural"/"Urban", "rural"/"urban", "RURAL"/"URBAN". Harmonized to
+"Rural"/"Urban" via the =Rural= table in =categorical_mapping.org=.
+
 * Files in Malawi/<SOMEYEAR>/_/
 ** DONE household_characteristics.py
 ** DONE food_acquired.py

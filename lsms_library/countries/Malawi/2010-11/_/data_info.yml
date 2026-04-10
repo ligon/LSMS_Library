@@ -1,6 +1,17 @@
 Country: Malawi
 Wave: 2010-11
 
+sample:
+    file: Full_Sample/Household/hh_mod_a_filt.dta
+    idxvars:
+        i: case_id
+    myvars:
+        v: ea_id
+        weight: hh_wgt
+        panel_weight: hh_wgt
+        strata: hh_a01
+        Rural: reside
+
 cluster_features:
     dfs:
         - df_main

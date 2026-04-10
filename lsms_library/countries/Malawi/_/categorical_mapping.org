@@ -253,3 +253,25 @@
 | Satchet/Tube (Medium)     | 22b  |
 | Satchet/Tube (Large)      | 22c  |
 | Other (Specify)           | 23   |
+
+#+name: strata
+| Alternate Spelling   | Preferred Label |
+|----------------------+-----------------|
+| Blanytyre            | Blantyre        |
+| Blanytyre Non-City   | Blantyre        |
+| Blantyre, non-city   | Blantyre        |
+| Lilongwe,non-city    | Lilongwe        |
+| Lilonge Non-City     | Lilongwe        |
+| Lilongewe            | Lilongwe        |
+| Nkhatabay            | Nkhata Bay      |
+| Nkhota kota          | Nkhotakota      |
+| Zomba, non-city      | Zomba           |
+| Zomba Non-City       | Zomba           |
+
+#+name: Rural
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| rural              | Rural           |
+| RURAL              | Rural           |
+| urban              | Urban           |
+| URBAN              | Urban           |

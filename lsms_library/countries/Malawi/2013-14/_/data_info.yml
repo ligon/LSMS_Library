@@ -1,6 +1,17 @@
 Country: MalawiIHPS
 Wave: 2013-14
 
+sample:
+    file: HH_MOD_A_FILT_13.dta
+    idxvars:
+        i: y2_hhid
+    myvars:
+        v: ea_id
+        weight: hh_wgt
+        panel_weight: panelweight
+        strata: district
+        Rural: reside
+
 cluster_features:
     dfs:
         - df_main

@@ -1,6 +1,17 @@
 Country: Malawi
 Wave: 2004-05
 
+sample:
+    file: sec_a.dta
+    idxvars:
+        i: case_id
+    myvars:
+        v: ea
+        weight: hhwght
+        panel_weight: hhwght
+        strata: strata
+        Rural: reside
+
 cluster_features:
     file: sec_a.dta
     idxvars:

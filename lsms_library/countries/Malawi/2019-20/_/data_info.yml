@@ -1,6 +1,22 @@
 Country: Malawi
 Wave: 2019-20
 
+sample:
+    file:
+        - Cross_Sectional/hh_mod_a_filt.dta
+        - Panel/hh_mod_a_filt_19.dta:
+            i: y4_hhid
+    idxvars:
+        i:
+            - case_id
+            - function: cs_i
+    myvars:
+        v: ea_id
+        weight: hh_wgt
+        panel_weight: panelweight_2019
+        strata: district
+        Rural: reside
+
 cluster_features:
     dfs:
         - df_main
