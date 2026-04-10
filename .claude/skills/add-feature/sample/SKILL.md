@@ -63,6 +63,12 @@ Weight variable names change across waves and countries. There is no standard.
 
 **Always inspect the actual data** to confirm variable names --- they are not documented consistently.
 
+**Read the BID first.** Each wave has a Basic Information Document (BID) available from the World Bank Microdata Library under "Related Materials" for the catalog entry. The BID describes the sampling design, weight construction methodology, and often names the variables. Start here before inspecting data. For example, the Tanzania 2020-21 BID (Appendix A) documents the panel vs cross-section weight calculations in detail.
+
+### Booster/refreshment sample trap
+
+When a wave includes a booster or refreshment sample, **legacy ID variables may be NaN for the new households.** For example, Tanzania 2020-21 has both `clusterid` (numeric, legacy) and `y5_cluster` (string, current wave). The 545 booster urban households have `clusterid = NaN` and `strataid = NaN` because those are panel-frame IDs. The wave-specific `y5_cluster` covers everyone. Always verify coverage of each candidate variable by cross-tabbing against the booster/refresh indicator (e.g., `tracking_class`, `rotate`).
+
 ### Strata variable names
 
 Strata are often implicit (Region x Urban/Rural) rather than explicit.
