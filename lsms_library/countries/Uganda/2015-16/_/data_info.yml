@@ -59,6 +59,7 @@ sample:
     myvars:
         v: parish_code
         weight: h_xwgt_W5  # cross-sectional weight (covers both panel and refreshment sample)
+        panel_weight: hwgt_W5  # longitudinal weight (zero for refreshment sample)
         strata: sregion
         Rural: urban
 

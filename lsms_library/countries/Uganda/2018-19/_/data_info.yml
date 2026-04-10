@@ -69,7 +69,8 @@ sample:
         i: hhid
     myvars:
         v: parish_name
-        weight: wgt
+        weight: wgt  # cross-sectional weight
+        panel_weight: hwgt_W7  # longitudinal weight (NaN for refreshment sample)
         strata: subreg
         Rural: urban
 

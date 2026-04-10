@@ -69,6 +69,7 @@ sample:
     myvars:
         v: h1aq4a
         weight: wgt_X  # cross-sectional weight (covers both panel and refreshment sample)
+        panel_weight: wgt  # longitudinal weight (zero for non-sample, NaN for refreshment)
         strata: sregion
         Rural: urban
 
