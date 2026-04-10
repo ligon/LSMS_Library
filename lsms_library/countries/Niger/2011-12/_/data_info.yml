@@ -1,6 +1,25 @@
 Country: Niger
 Wave: 2011-12
 
+sample:
+    file: NER_2011_ECVMA_v01_M_Stata8/ecvmamen_p1_en.dta
+    idxvars:
+        i: hid
+    myvars:
+        v: grappe
+        weight: hhweight
+        panel_weight: hhweight
+        strata: strate
+        Rural:
+            - urbrur
+            - mapping:
+                Rural: Rural
+                rural: Rural
+                RURAL: Rural
+                Urbain: Urban
+                urbain: Urban
+                URBAIN: Urban
+
 household_roster:
     dfs:
         - df_roster

@@ -1,6 +1,42 @@
 Country: Niger
 Wave: 2021-22
 
+sample:
+    dfs:
+        - df_cover
+        - df_weights
+    df_cover:
+        file: s00_me_ner2021.dta
+        idxvars:
+            v: grappe
+            i:
+                - grappe
+                - menage
+        myvars:
+            Rural:
+                - s00q04
+                - mapping:
+                    Rural: Rural
+                    rural: Rural
+                    RURAL: Rural
+                    Urbain: Urban
+                    urbain: Urban
+                    URBAIN: Urban
+    df_weights:
+        file: ehcvm_ponderations_ner2021.dta
+        idxvars:
+            i:
+                - grappe
+                - menage
+        myvars:
+            weight: poids
+            panel_weight: poids
+    merge_on:
+        - i
+    final_index:
+        - i
+        - t
+
 household_roster:
     file: ehcvm_individu_ner2021.dta
     idxvars:
