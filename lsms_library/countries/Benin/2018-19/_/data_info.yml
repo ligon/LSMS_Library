@@ -70,35 +70,16 @@ cluster_features:
         - v
 
 household_roster:
-    dfs:
-        - df_roster
-        - df_cluster
-    df_roster:
-        file: ehcvm_individu_ben2018.dta
-        idxvars:
-            i:
-                - grappe
-                - menage
-            pid: numind
-        myvars:
-            Sex: sexe
-            Age: age
-            Relation: lien
-    df_cluster:
-        file: s00_me_ben2018.dta
-        idxvars:
-            i:
-                - grappe
-                - menage
-        myvars:
-            v: grappe
-    merge_on:
-        - i
-    final_index:
-        - t
-        - v
-        - i
-        - pid
+    file: ehcvm_individu_ben2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+        pid: numind
+    myvars:
+        Sex: sexe
+        Age: age
+        Relation: lien
 
 food_acquired:
     file: s07b_me_ben2018.dta

@@ -2,33 +2,15 @@ Country: Timor-Leste
 Wave: 2007-08
 
 household_roster:
-    dfs:
-        - df_roster
-        - df_cluster
-    df_roster:
-        file:
-            - ../Data/indiv.dta
-        idxvars:
-            i: hh_id
-            pid: pid
-        myvars:
-            Sex: q01a01
-            Relationship: q01a02
-            Age: q01a05y
-    df_cluster:
-        file:
-            - ../Data/basicvars.dta
-        idxvars:
-            i: hh_id
-        myvars:
-            v: cluster
-    merge_on:
-        - i
-    final_index:
-        - t
-        - v
-        - i
-        - pid
+    file:
+        - ../Data/indiv.dta
+    idxvars:
+        i: hh_id
+        pid: pid
+    myvars:
+        Sex: q01a01
+        Relationship: q01a02
+        Age: q01a05y
 
 sample:
     file: ../Data/basicvars.dta

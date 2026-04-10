@@ -13,37 +13,17 @@ cluster_features:
         Rural: AREA
 
 household_roster:
-    dfs:
-        - df_roster
-        - df_cluster
-    df_roster:
-        file: REG02.DTA
-        idxvars:
-            i:
-                - segmento
-                - vivienda
-                - hogar
-            pid: b00
-        myvars:
-            Sex: b02
-            Age: b03
-            Relationship: b01
-    df_cluster:
-        file: REG01.DTA
-        idxvars:
-            i:
-                - segmento
-                - vivienda
-                - hogar
-        myvars:
-            v: segmento
-    merge_on:
-        - i
-    final_index:
-        - t
-        - v
-        - i
-        - pid
+    file: REG02.DTA
+    idxvars:
+        i:
+            - segmento
+            - vivienda
+            - hogar
+        pid: b00
+    myvars:
+        Sex: b02
+        Age: b03
+        Relationship: b01
     mappings:
         Sex: Sex
         Relationship: Relationship

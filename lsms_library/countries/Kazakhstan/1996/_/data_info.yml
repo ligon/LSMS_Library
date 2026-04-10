@@ -1,52 +1,35 @@
 Country: Kazakhstan
 Wave: 1996
 household_roster:
-    dfs:
-        - df_roster
-        - df_cluster
-    df_roster:
-        file: ../Data/KZ96REL.dta
-        idxvars:
-            i: rn
-            pid: personnr
-        myvars:
-            Sex:
-                - sex
-                - mapping:
-                    1: M
-                    2: F
-            Age: age
-            Relationship:
-                - relhead
-                - mapping:
-                    1: Head
-                    2: Spouse
-                    3: Father/Mother
-                    4: Son/Daughter
-                    5: Stepson/Stepdaughter
-                    6: Brother/Sister
-                    7: Stepbrother/Stepsister
-                    8: Grandfather/Grandmother
-                    9: Grandson/Granddaughter
-                    10: Nephew/Niece
-                    11: Father/Mother-In-Law
-                    12: Son/Daughter-In-Law
-                    13: Other relative
-                    14: Servant
-                    15: Other non-relative
-    df_cluster:
-        file: ../Data/KZ96SMP_PUF.dta
-        idxvars:
-            i: rn
-        myvars:
-            v: loc_nr
-    merge_on:
-        - i
-    final_index:
-        - t
-        - v
-        - i
-        - pid
+    file: ../Data/KZ96REL.dta
+    idxvars:
+        i: rn
+        pid: personnr
+    myvars:
+        Sex:
+            - sex
+            - mapping:
+                1: M
+                2: F
+        Age: age
+        Relationship:
+            - relhead
+            - mapping:
+                1: Head
+                2: Spouse
+                3: Father/Mother
+                4: Son/Daughter
+                5: Stepson/Stepdaughter
+                6: Brother/Sister
+                7: Stepbrother/Stepsister
+                8: Grandfather/Grandmother
+                9: Grandson/Granddaughter
+                10: Nephew/Niece
+                11: Father/Mother-In-Law
+                12: Son/Daughter-In-Law
+                13: Other relative
+                14: Servant
+                15: Other non-relative
 
 cluster_features:
     file: ../Data/KZ96SMP_PUF.dta

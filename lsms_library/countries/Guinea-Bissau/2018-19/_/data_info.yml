@@ -85,35 +85,16 @@ food_acquired:
         Produced: s07bq04
 
 household_roster:
-    dfs:
-        - df_roster
-        - df_cluster
-    df_roster:
-        file: ehcvm_individu_gnb2018.dta
-        idxvars:
-            i:
-                - grappe
-                - menage
-            pid: numind
-        myvars:
-            Sex: sexe
-            Age: age
-            Relation: lien
-    df_cluster:
-        file: s00_me_gnb2018.dta
-        idxvars:
-            i:
-                - grappe
-                - menage
-        myvars:
-            v: grappe
-    merge_on:
-        - i
-    final_index:
-        - t
-        - v
-        - i
-        - pid
+    file: ehcvm_individu_gnb2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+        pid: numind
+    myvars:
+        Sex: sexe
+        Age: age
+        Relation: lien
 
 shocks:
     file: s14_me_gnb2018.dta

@@ -20,31 +20,14 @@ cluster_features:
                 urban: Urban
 
 household_roster:
-    dfs:
-        - df_roster
-        - df_cluster
-    df_roster:
-        file: HH_SEC_B.dta
-        idxvars:
-            i: sdd_hhid
-            pid: sdd_indid
-        myvars:
-            Sex: hh_b02
-            Age: hh_b04
-            Relationship: hh_b05
-    df_cluster:
-        file: HH_SEC_A.dta
-        idxvars:
-            i: sdd_hhid
-        myvars:
-            v: clusterid
-    merge_on:
-        - i
-    final_index:
-        - t
-        - v
-        - i
-        - pid
+    file: HH_SEC_B.dta
+    idxvars:
+        i: sdd_hhid
+        pid: sdd_indid
+    myvars:
+        Sex: hh_b02
+        Age: hh_b04
+        Relationship: hh_b05
 
 shocks:
     file: HH_SEC_R.dta
