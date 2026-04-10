@@ -1,6 +1,30 @@
 Country: India
 Wave: 1997-98
 
+sample:
+    file:
+        - ../Data/HHLIST.DTA
+    idxvars:
+        i: hhcode
+    myvars:
+        v: village
+        weight: weight
+        panel_weight: weight
+        strata:
+            - stratum
+            - mapping:
+                1.0: Urban Poor
+                2.0: Urban Non-Poor
+                3.0: Rural Poor
+                4.0: Rural Non-Poor
+        Rural:
+            - stratum
+            - mapping:
+                1.0: Urban
+                2.0: Urban
+                3.0: Rural
+                4.0: Rural
+
 cluster_features:
   file:
       - ../Data/PSULIST.DTA

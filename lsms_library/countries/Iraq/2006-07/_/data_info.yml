@@ -1,6 +1,77 @@
 Country: Iraq
 Wave: 2006-07
 
+sample:
+    file:
+        - "../Data/2007ihses00_cover_page.dta"
+    idxvars:
+        i: xhhkey
+    myvars:
+        v: xcluster
+        weight: weight
+        panel_weight: weight
+        strata: xstrat
+        Rural:
+            - xstrat
+            - mapping:
+                anbar - other urban: Urban
+                anbar - rural: Rural
+                anbar - urban center: Urban
+                babylon - other urban: Urban
+                babylon - rural: Rural
+                babylon - urban center: Urban
+                baghdad - al-karekh: Urban
+                baghdad - al-rasafah: Urban
+                baghdad - al-sader: Urban
+                baghdad - other urban: Urban
+                baghdad - rural: Rural
+                basrah - other urban: Urban
+                basrah - rural: Rural
+                basrah - urban center: Urban
+                diyala - other urban: Urban
+                diyala - rural: Rural
+                diyala - urban center: Urban
+                duhok - other urban: Urban
+                duhok - rural: Rural
+                duhok - urban center: Urban
+                erbil - other urban: Urban
+                erbil - rural: Rural
+                erbil - urban center: Urban
+                kerbela - other urban: Urban
+                kerbela - rural: Rural
+                kerbela - urban center: Urban
+                kirkuk - other urban: Urban
+                kirkuk - rural: Rural
+                kirkuk - urban center: Urban
+                maysan - other urban: Urban
+                maysan - rural: Rural
+                maysan - urban center: Urban
+                mosul - other urban: Urban
+                mosul - rural: Rural
+                mosul - urban center: Urban
+                muthanna - other urban: Urban
+                muthanna - rural: Rural
+                muthanna - urban center: Urban
+                najaf - other urban: Urban
+                najaf - rural: Rural
+                najaf - urban center: Urban
+                qadisiya - other urban: Urban
+                qadisiya - rural: Rural
+                qadisiya - urban center: Urban
+                salah al-deen - other urban: Urban
+                salah al-deen - rural: Rural
+                salah al-deen - urban center: Urban
+                sulaimaniya - other urban: Urban
+                sulaimaniya - rural: Rural
+                sulaimaniya - urban center: Urban
+                sulaimaniya - urban center - extra: Urban
+                thi-qar - other urban: Urban
+                thi-qar - rural: Rural
+                thi-qar - urban center: Urban
+                wasit - other urban: Urban
+                wasit - rural: Rural
+                wasit - urban center: Urban
+
 household_roster:
     file:
         - "../Data/2007ihses01_household_roster.dta"

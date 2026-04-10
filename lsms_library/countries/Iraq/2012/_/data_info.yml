@@ -1,6 +1,22 @@
 Country: Iraq
 Wave: 2012
 
+sample:
+    file:
+        - "../Data/2012ihses00_cover_page.dta"
+    idxvars:
+        i: questid
+    myvars:
+        v: cluster
+        weight: weight
+        panel_weight: weight
+        strata: stratum
+        Rural:
+            - q00_16
+            - mapping:
+                URBAN: Urban
+                RURAL: Rural
+
 household_roster:
     file:
         - "../Data/2012ihses01_household_roster.dta"

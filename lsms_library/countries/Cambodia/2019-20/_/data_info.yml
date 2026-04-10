@@ -1,5 +1,17 @@
 Country: Cambodia
 Wave: 2019-20
+
+sample:
+    file: ../Data/hh_sec_1.dta
+    idxvars:
+        i: HHID
+    myvars:
+        v: s01q01
+        weight: finalhhweight
+        panel_weight: finalhhweight
+        strata: s01q02
+        Rural: s01q06b
+
 household_roster:
     dfs:
         - df_roster

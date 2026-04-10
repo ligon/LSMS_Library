@@ -1,5 +1,22 @@
 Country: Guatemala
 Wave: 2000
+
+sample:
+    file:
+        - ECV01H01.DTA
+    idxvars:
+        i: hogar
+    myvars:
+        v: region
+        weight: factor
+        panel_weight: factor
+        strata: region
+        Rural:
+            - area
+            - mapping:
+                urbana: Urban
+                rural: Rural
+
 cluster_features:
     file:
         - ECV01H01.DTA

@@ -1,6 +1,23 @@
 Country: South Africa
 Wave: 1993
 
+sample:
+    file:
+        - ../Data/STRATA2.dta
+    idxvars:
+        i: hhid
+    myvars:
+        v: clustnum
+        weight: rcweight
+        panel_weight: rcweight
+        strata: newprov
+        Rural:
+            - type
+            - mapping:
+                0: Urban
+                1: Rural
+                3: Informal
+
 cluster_features:
     file:
         - ../Data/STRATA2.dta

@@ -1,6 +1,14 @@
 Country: Iraq
 
 Data Scheme:
+  sample:
+    index: (i, t)
+    v: str
+    weight: float
+    panel_weight: float
+    strata: str
+    Rural: str
+
   household_roster:
     index: (t, v, i, pid)
     Sex: str
