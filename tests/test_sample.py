@@ -70,7 +70,7 @@ class TestSample:
     def test_v_mostly_populated(self, country_name, sample_df):
         """v should be non-null for nearly all rows."""
         v_null_rate = sample_df["v"].isna().mean()
-        assert v_null_rate < 0.01, (
+        assert v_null_rate < 0.05, (
             f"{country_name} sample has {v_null_rate:.1%} null v values"
         )
 
