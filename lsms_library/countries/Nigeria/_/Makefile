@@ -8,11 +8,29 @@ COUNTRY := $(shell basename "$$(cd .. && pwd)")
 LSMS_DATA_ROOT ?= $(if $(LSMS_DATA_DIR),$(LSMS_DATA_DIR),$(if $(XDG_DATA_HOME),$(XDG_DATA_HOME),$(HOME)/.local/share)/lsms_library)
 VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 
-var = $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_quantities.parquet \
+var = $(VAR_DIR)/food_acquired.parquet $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_quantities.parquet \
 	  $(VAR_DIR)/household_roster.parquet $(VAR_DIR)/household_characteristics.parquet \
 	  $(VAR_DIR)/interview_date.parquet
 
 all: $(var)
+
+food_acquired = $(shell find $(rounds) -name food_acquired.py)
+food_acquired_parquet := $(food_acquired:.py=.parquet)
+
+$(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
+	python food_acquired.py
+
+../2010-11/_/food_acquired.parquet: ../2010-11/_/food_acquired.py
+	(cd ../2010-11/_; python food_acquired.py)
+
+../2012-13/_/food_acquired.parquet: ../2012-13/_/food_acquired.py
+	(cd ../2012-13/_; python food_acquired.py)
+
+../2015-16/_/food_acquired.parquet: ../2015-16/_/food_acquired.py
+	(cd ../2015-16/_; python food_acquired.py)
+
+../2018-19/_/food_acquired.parquet: ../2018-19/_/food_acquired.py
+	(cd ../2018-19/_; python food_acquired.py)
 
 $(VAR_DIR)/household_characteristics.parquet: $(VAR_DIR)/household_roster.parquet household_roster.py household_characteristics.py
 	python household_characteristics.py 
