@@ -488,11 +488,15 @@ class Wave:
                         raise last_error
                     raise FileNotFoundError(f"Unable to locate data file for {file} in {self.file_path}")
                 df = check_adding_t(df)
-                # Oddity with large number for missing code
-                na = df.select_dtypes(exclude=['object', 'datetime64[ns]', 'category']).max().max()
-                if na>1e99:
-                    warnings.warn(f"Large number used for missing?  Replacing {na} with NaN.")
-                    df = df.replace(na,np.nan)
+                # Oddity with large number for missing code.
+                # Some Stata files use a huge sentinel like 1.7e100 to mark
+                # missing.  Detect and replace with NaN.  Wrap in errstate to
+                # suppress numpy's cast warning on the >1e99 comparison.
+                with np.errstate(over='ignore'):
+                    na = df.select_dtypes(exclude=['object', 'datetime64[ns]', 'category']).max().max()
+                    if pd.notna(na) and float(na) > 1e99:
+                        warnings.warn(f"Large number used for missing?  Replacing {na} with NaN.")
+                        df = df.replace(na, np.nan)
                 dfs.append(df)
             df = pd.concat(dfs, axis=0, sort=False)
 
