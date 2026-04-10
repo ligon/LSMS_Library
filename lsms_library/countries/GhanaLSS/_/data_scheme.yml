@@ -21,7 +21,7 @@ Data Scheme:
     Region: str
     Rural: str
   household_roster:
-    index: (t, v, i, pid)
+    index: (t, i, pid)
     Sex: str
     Age: int
     Relationship: str
@@ -30,7 +30,7 @@ Data Scheme:
     Distance: int
     Affinity: str
   food_acquired:
-    index: (t, v, i, j)
+    index: (t, i, j)
     Expenditure: float
     Quantity: float
     Price: float

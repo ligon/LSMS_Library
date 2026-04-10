@@ -25,7 +25,7 @@ Data Scheme:
     materialize: make
 
   household_roster:
-    index: (t, v, i, pid)
+    index: (t, i, pid)
     Sex: str
     Age: int
     Relationship: str

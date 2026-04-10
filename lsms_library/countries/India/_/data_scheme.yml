@@ -16,7 +16,7 @@ Data Scheme:
     District: str
 
   household_roster:
-    index: (t, v, i, pid)
+    index: (t, i, pid)
     Sex: str
     Age: int
     Relationship: str
@@ -25,6 +25,6 @@ Data Scheme:
     Affinity: str
     Educational Attainment: str
   employment:
-    index: (t, v, i, pid)
+    index: (t, i, pid)
     Cash_per_day: float
     Rural: str

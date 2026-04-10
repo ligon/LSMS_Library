@@ -24,7 +24,7 @@ Data Scheme:
     Longitude: float
 
   household_roster:
-    index: (t, v, i, pid)
+    index: (t, i, pid)
     Sex: str
     Age: int
     Relationship: str
@@ -33,7 +33,7 @@ Data Scheme:
     Affinity: str
 
   individual_education:
-    index: (t, v, i, pid)
+    index: (t, i, pid)
     Educational Attainment: str
 
   panel_ids:
@@ -41,7 +41,7 @@ Data Scheme:
     previous_i: str
 
   food_acquired:
-    index: (t, v, visit, i, j, u)
+    index: (t, visit, i, j, u)
     Quantity: float
     Expenditure: float
     Produced: float

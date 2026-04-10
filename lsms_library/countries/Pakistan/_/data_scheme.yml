@@ -8,7 +8,7 @@ Data Scheme:
     Language: str
 
   household_roster:
-    index: (t, v, i, pid)
+    index: (t, i, pid)
     Sex: str
     Age: float
     Relationship: str

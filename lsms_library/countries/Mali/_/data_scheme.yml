@@ -15,7 +15,7 @@ Data Scheme:
     Latitude: float
     Longitude: float
   household_roster:
-    index: (t, v, i, pid)
+    index: (t, i, pid)
     Sex: str
     Age: int
     Relationship: str
@@ -23,15 +23,15 @@ Data Scheme:
     Distance: int
     Affinity: str
   individual_education:
-    index: (t, v, i, pid)
+    index: (t, i, pid)
     Educational Attainment: str
   food_acquired:
-    index: (t, v, visit, i, j, u)
+    index: (t, visit, i, j, u)
     Quantity: float
     Expenditure: float
     Produced: float
   interview_date:
-    index: (t, v, visit, i)
+    index: (t, visit, i)
     Int_t: str
   panel_ids:
     index: (t, i)

@@ -2,7 +2,7 @@ Country: Timor-Leste
 
 Data Scheme:
   household_roster:
-    index: (t, v, i, pid)
+    index: (t, i, pid)
     Sex: str
     Age: int
     Relationship: str
