@@ -1,4 +1,3 @@
-from lsms.tools import get_food_prices, get_food_expenditures, get_household_roster
 from ligonlibrary.dataframes import from_dta
 import numpy as np
 import pandas as pd
@@ -45,31 +44,6 @@ def harmonized_food_labels(fn='../../_/food_items.org',key='Code',value='Preferr
 
     return food_items.squeeze().str.strip().to_dict()
 
-def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market',farmgate='farmgate'):
-
-    food_items = harmonized_food_labels(fn='../../_/food_items.org')
-
-    # Unit labels
-    with dvc.api.open(fn,mode='rb') as dta:
-        sr = pd.io.stata.StataReader(dta)
-        try:
-            unitlabels = sr.value_labels()[units]
-        except KeyError: # No guarantee that keys for labels match variables!?
-            foo = sr.value_labels()
-            key = [k for k,v in foo.items() if 'Kilogram' in [u[:8] for l,u in v.items()]][0]
-            unitlabels = sr.value_labels()[key]
-
-    with dvc.api.open(fn,mode='rb') as dta:
-        # Prices
-        prices,itemlabels=get_food_prices(dta,itmcd=item,HHID=HHID, market=market,
-                                          farmgate=farmgate,units=units,itemlabels=food_items)
-
-    prices = prices.replace({'units':unitlabels})
-    prices.units = prices.units.astype(str)
-
-    pd.Series(unitlabels).to_csv('unitlabels.csv')
-
-    return prices
 
 def food_acquired(fn,myvars):
 
@@ -124,59 +98,75 @@ def food_acquired(fn,myvars):
 
     return df
 
-def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,item='item',HHID='HHID'):
-    food_items = harmonized_food_labels(fn='../../_/food_items.org')
 
-    with dvc.api.open(fn,mode='rb') as dta:
-        expenditures,itemlabels=get_food_expenditures(dta,purchased,away,produced,given,itmcd=item,HHID=HHID,itemlabels=food_items)
+def nonfood_expenditures(fn='', purchased=None, away=None, produced=None,
+                         given=None, item='item', HHID='HHID'):
+    """Uganda non-food expenditures from a single .dta file.
 
-    expenditures.index.name = 'j'
-    expenditures.columns.name = 'i'
+    Aggregates across three or four source columns (purchased, away,
+    produced, given) at the (HHID, item) level and returns a wide
+    matrix (HHID rows x item columns) of total expenditures.
 
-    expenditures = expenditures[expenditures.columns.intersection(food_items.values())]
-        
-    return expenditures
+    Replaces the prior lsms.tools.get_food_expenditures-based
+    implementation with an inline pandas groupby+sum; the upstream
+    lsms dependency is being retired.
+    """
+    if __name__ == '__main__':
+        from local_tools import get_dataframe
+    else:
+        from lsms_library.local_tools import get_dataframe
 
+    nonfood_items = harmonized_food_labels(
+        fn='../../_/nonfood_items.org', key='Code', value='Preferred Label')
 
-def nonfood_expenditures(fn='',purchased=None,away=None,produced=None,given=None,item='item',HHID='HHID'):
-    nonfood_items = harmonized_food_labels(fn='../../_/nonfood_items.org',key='Code',value='Preferred Label')
-    with dvc.api.open(fn,mode='rb') as dta:
-        expenditures,itemlabels=get_food_expenditures(dta,purchased,away,produced,given,itmcd=item,HHID=HHID,itemlabels=nonfood_items)
+    # Read source file via the repo's standard entry point.
+    df = get_dataframe(fn, convert_categoricals=False)
 
-    expenditures.index.name = 'j'
-    expenditures.columns.name = 'i'
-    expenditures = expenditures[expenditures.columns.intersection(nonfood_items.values())]
+    # Gather source columns (skip None entries).
+    source_cols = {
+        'purchased': purchased,
+        'away':      away,
+        'produced':  produced,
+        'given':     given,
+    }
+    source_cols = {k: v for k, v in source_cols.items() if v is not None}
 
-    return expenditures
+    # Project down to the columns we need and rename.
+    keep = [HHID, item] + list(source_cols.values())
+    df = df[keep].copy()
+    rename_map = {HHID: 'HHID', item: 'itmcd'}
+    rename_map.update({v: k for k, v in source_cols.items()})
+    df = df.rename(columns=rename_map)
 
-def food_quantities(fn='',item='item',HHID='HHID',
-                    purchased=None,away=None,produced=None,given=None,units=None):
-    food_items = harmonized_food_labels(fn='../../_/food_items.org')
+    # Coerce itmcd to numeric, drop missing item codes, cast to int.
+    df['itmcd'] = pd.to_numeric(df['itmcd'], errors='coerce')
+    df = df.dropna(subset=['itmcd'])
+    df['itmcd'] = df['itmcd'].astype(int)
 
-        # Prices
-    with dvc.api.open(fn,mode='rb') as dta:
-        quantities,itemlabels=get_food_expenditures(dta,purchased,away,produced,given,itmcd=item,HHID=HHID,units=units,itemlabels=food_items)
+    # Handle HHID-as-float-string (see upstream lsms.tools lines 101-108).
+    try:
+        first = df['HHID'].iloc[0]
+        if isinstance(first, str) and first.split('.')[-1] == '0':
+            df['HHID'] = df['HHID'].apply(lambda x: '%d' % int(float(x)))
+    except (ValueError, AttributeError, IndexError):
+        pass
 
-    quantities.index.names = ['j','u']
-    quantities.columns.name = 'i'
-        
-    return quantities
+    # Replace itmcd codes with preferred labels BEFORE groupby so that
+    # items sharing a label are merged naturally by the groupby.
+    # Keep only rows with a recognized item code.
+    df['itmcd'] = df['itmcd'].replace(nonfood_items)
+    df = df[df['itmcd'].isin(nonfood_items.values())]
 
-def age_sex_composition(fn,sex='sex',sex_converter=None,age='age',months_spent='months_spent',HHID='HHID',months_converter=None, convert_categoricals=True,Age_ints=None,fn_type='stata'):
+    # Sum source columns, groupby HHID+itmcd (now label names).
+    active_sources = list(source_cols.keys())
+    df['total'] = df[active_sources].sum(axis=1, min_count=1)
+    wide = df.groupby(['HHID', 'itmcd'])['total'].sum().unstack('itmcd')
+    wide = wide.fillna(0)
 
-    if Age_ints is None:
-        # Match Uganda FCT categories
-        Age_ints = ((0,4),(4,9),(9,14),(14,19),(19,31),(31,51),(51,100))
-        
-    with dvc.api.open(fn,mode='rb') as dta:
-        df = get_household_roster(fn=dta,HHID=HHID,sex=sex,age=age,months_spent=months_spent,
-                                  sex_converter=sex_converter,months_converter=months_converter,
-                                  Age_ints=Age_ints)
-
-    df.index.name = 'i'  # Household ID
-    df.columns.name = 'k'
-
-    return df
+    # Match the old output's index/column names.
+    wide.index.name = 'j'
+    wide.columns.name = 'i'
+    return wide
 
 
 def id_walk(df, updated_ids, hh_index='i'):
