@@ -1047,7 +1047,9 @@ class TestLayer1Caching:
     automatically when ``info.cache`` is wired up correctly.  Pieces 1
     and 2 land both halves of the round-trip: Piece 1 pins ``cache.dir``
     via runtime config override, Piece 2 populates the cache via
-    explicit ``Repo.pull`` from inside ``get_dataframe``.
+    explicit ``Repo.fetch`` from inside ``get_dataframe`` (NOT ``Repo.pull``,
+    which would also check the file out into the package tree -- a
+    structural rule discovered in this same session).
 
     See ``slurm_logs/DESIGN_dvc_layer1_caching.md`` for the empirical
     investigation that led to this design.
@@ -1088,10 +1090,10 @@ class TestLayer1Caching:
         target.write_bytes(b"")
         with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
             local_tools._ensure_dvc_pulled(str(target))
-            mock_dvcfs.repo.pull.assert_not_called()
+            mock_dvcfs.repo.fetch.assert_not_called()
 
     def test_ensure_dvc_pulled_noop_when_blob_cached_legacy_layout(self, tmp_path, monkeypatch):
-        """Sidecar + blob in legacy DVC 2.x flat layout -> no ``Repo.pull``.
+        """Sidecar + blob in legacy DVC 2.x flat layout -> no ``Repo.fetch``.
 
         This is the dominant hit path for the LSMS repo today: the
         ``.dvc`` sidecars carry ``md5-dos2unix`` hashes from the
@@ -1118,10 +1120,10 @@ class TestLayer1Caching:
 
         with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
             local_tools._ensure_dvc_pulled(str(target))
-            mock_dvcfs.repo.pull.assert_not_called()
+            mock_dvcfs.repo.fetch.assert_not_called()
 
     def test_ensure_dvc_pulled_noop_when_blob_cached_dvc3_layout(self, tmp_path, monkeypatch):
-        """Sidecar + blob in DVC 3.0 ``files/md5/`` layout -> no ``Repo.pull``.
+        """Sidecar + blob in DVC 3.0 ``files/md5/`` layout -> no ``Repo.fetch``.
 
         Future-proofing for after the LSMS repo migrates to DVC 3.0
         hashes via ``dvc cache migrate`` (separate workstream).  Once
@@ -1149,12 +1151,12 @@ class TestLayer1Caching:
 
         with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
             local_tools._ensure_dvc_pulled(str(target))
-            mock_dvcfs.repo.pull.assert_not_called()
+            mock_dvcfs.repo.fetch.assert_not_called()
 
     def test_ensure_dvc_pulled_calls_pull_on_miss(self, tmp_path, monkeypatch):
-        """Sidecar present + blob NOT in cache -> ``Repo.pull`` is called.
+        """Sidecar present + blob NOT in cache -> ``Repo.fetch`` is called.
 
-        Verifies the target passed to ``Repo.pull`` is the
+        Verifies the target passed to ``Repo.fetch`` is the
         countries-relative path, not the absolute path or the
         script-relative path.
         """
@@ -1180,12 +1182,12 @@ class TestLayer1Caching:
 
         with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
             local_tools._ensure_dvc_pulled(str(target))
-            mock_dvcfs.repo.pull.assert_called_once()
-            call = mock_dvcfs.repo.pull.call_args
+            mock_dvcfs.repo.fetch.assert_called_once()
+            call = mock_dvcfs.repo.fetch.call_args
             assert call.kwargs.get("targets") == ["TestC/wave/Data/foo.dta"]
 
     def test_ensure_dvc_pulled_swallows_pull_errors(self, tmp_path, monkeypatch):
-        """If ``Repo.pull`` raises, ``_ensure_dvc_pulled`` returns silently.
+        """If ``Repo.fetch`` raises, ``_ensure_dvc_pulled`` returns silently.
 
         Layer-1 warming is best-effort; the streaming fallback in
         ``get_dataframe`` should still run.
@@ -1207,13 +1209,13 @@ class TestLayer1Caching:
         monkeypatch.setattr(local_tools, "_COUNTRIES_DIR", countries_dir)
 
         with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
-            mock_dvcfs.repo.pull.side_effect = RuntimeError("simulated S3 failure")
+            mock_dvcfs.repo.fetch.side_effect = RuntimeError("simulated S3 failure")
             # Should NOT raise
             local_tools._ensure_dvc_pulled(str(target))
-            mock_dvcfs.repo.pull.assert_called_once()
+            mock_dvcfs.repo.fetch.assert_called_once()
 
     def test_ensure_dvc_pulled_changes_cwd_to_countries(self, tmp_path, monkeypatch):
-        """``Repo.pull`` is invoked from inside ``_COUNTRIES_DIR``.
+        """``Repo.fetch`` is invoked from inside ``_COUNTRIES_DIR``.
 
         Cwd-independence regression test for the footgun discovered in
         Probe 2 of the 2026-04-11 session: ``Repo.pull(targets=[X])``
@@ -1251,7 +1253,7 @@ class TestLayer1Caching:
 
         try:
             with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
-                mock_dvcfs.repo.pull.side_effect = record_cwd
+                mock_dvcfs.repo.fetch.side_effect = record_cwd
                 local_tools._ensure_dvc_pulled(str(target))
         finally:
             os.chdir(original_cwd)
@@ -1282,7 +1284,7 @@ class TestLayer1Caching:
 
         with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
             local_tools._ensure_dvc_pulled(str(target))
-            mock_dvcfs.repo.pull.assert_not_called()
+            mock_dvcfs.repo.fetch.assert_not_called()
 
     def test_ensure_dvc_pulled_handles_malformed_sidecar(self, tmp_path, monkeypatch):
         """A sidecar with unexpected shape -> bail silently, no pull."""
@@ -1300,7 +1302,7 @@ class TestLayer1Caching:
 
         with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
             local_tools._ensure_dvc_pulled(str(target))
-            mock_dvcfs.repo.pull.assert_not_called()
+            mock_dvcfs.repo.fetch.assert_not_called()
 
     def test_ensure_dvc_pulled_handles_countries_relative_path(self, tmp_path, monkeypatch):
         """Interactive callers can pass countries-relative paths.
@@ -1337,8 +1339,8 @@ class TestLayer1Caching:
             with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
                 # Pass the countries-relative path, not an absolute path
                 local_tools._ensure_dvc_pulled("TestC/wave/Data/foo.dta")
-                mock_dvcfs.repo.pull.assert_called_once()
-                call = mock_dvcfs.repo.pull.call_args
+                mock_dvcfs.repo.fetch.assert_called_once()
+                call = mock_dvcfs.repo.fetch.call_args
                 assert call.kwargs.get("targets") == ["TestC/wave/Data/foo.dta"]
         finally:
             os.chdir(original_cwd)

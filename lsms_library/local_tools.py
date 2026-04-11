@@ -78,9 +78,21 @@ def _ensure_dvc_pulled(fn) -> None:
     YAML parse -- no DVC Python API, no ``DVCFS.repo``, no index walk,
     no minutes-long lazy index build.
 
-    Only on a cache miss does this fall through to ``DVCFS.repo.pull``,
+    Only on a cache miss does this fall through to ``DVCFS.repo.fetch``,
     which is wrapped in ``_dvc_working_directory(_COUNTRIES_DIR)``
-    because ``Repo.pull`` resolves targets against ``os.getcwd()``.
+    because ``Repo.fetch`` resolves targets against ``os.getcwd()``.
+
+    **Why fetch and not pull**: ``Repo.pull = Repo.fetch + Repo.checkout``.
+    The ``checkout`` step materializes the file in the workspace at its
+    DVC-tracked path -- which is **inside the package tree**
+    (``_COUNTRIES_DIR``).  We do not want DVC-tracked data files
+    materializing in the package tree under any circumstances; the
+    package tree is for code and ``.dvc`` sidecars only, and data lives
+    under ``data_root()``.  ``Repo.fetch`` populates the local DVC cache
+    (which is under ``data_root()`` thanks to the ``cache.dir`` override
+    on ``DVCFS``) without touching the workspace at all.  After the
+    fetch, ``DVCFS.open`` serves reads from the cache via
+    ``DataFileSystem._get_fs_path``'s ``typ == "cache"`` branch.
 
     Every error is swallowed.  This function is best-effort warming
     glue; the caller's ``DVCFS.open`` streaming fallback handles any
@@ -131,13 +143,14 @@ def _ensure_dvc_pulled(fn) -> None:
         try:
             rel_path = abs_path.relative_to(_COUNTRIES_DIR)
         except ValueError:
-            return  # outside the countries dir, can't pull
+            return  # outside the countries dir, can't fetch
+
     except Exception:
         return  # bad sidecar shape, missing key, OS error: bail to streaming
 
     try:
         with _dvc_working_directory(_COUNTRIES_DIR):
-            DVCFS.repo.pull(targets=[str(rel_path)], jobs=1)
+            DVCFS.repo.fetch(targets=[str(rel_path)], jobs=1)
     except Exception:
         pass
 
@@ -361,9 +374,11 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         # fallback).  This restores the Layer-1 caching that
         # ``slurm_logs/DESIGN_dvc_layer1_caching.md`` originally
         # diagnosed as dormant -- the working approach uses
-        # ``Repo.pull`` and a runtime ``cache.dir`` config override
-        # at ``DVCFS`` construction (see _DVC_CACHE_DIR above), not
-        # the ``cache_remote_stream`` kwarg the prior session tried.
+        # ``Repo.fetch`` (NOT ``Repo.pull``, which would also check
+        # the file out into the package tree) plus a runtime
+        # ``cache.dir`` config override at ``DVCFS`` construction
+        # (see _DVC_CACHE_DIR above), not the ``cache_remote_stream``
+        # kwarg the prior session tried.
         _ensure_dvc_pulled(fn)
         try:
             with DVCFS.open(fn,mode='rb') as f:
