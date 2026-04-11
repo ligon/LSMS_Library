@@ -243,24 +243,20 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         except (TypeError,ValueError): # Needs filename?
             df = read_file(fn,convert_categoricals=convert_categoricals,encoding=encoding)
     elif file_system_path(fn):
-        # Layer-1 caching: pass cache_remote_stream=True so DVC writes
-        # the streamed blob to its local cache as a side effect of the
-        # open.  This was added in iterative/dvc#9183 and is opt-in;
-        # without it, every cold call streams from S3 again, even when
-        # the identical content-addressed blob was just streamed by a
-        # sibling call (or a sibling process).  See
-        # slurm_logs/DESIGN_dvc_layer1_caching.md for the full design.
-        #
-        # The two-step open lets us catch a TypeError raised by an
-        # older-than-3.x DVC that doesn't recognize the kwarg, while
-        # keeping the existing TypeError fallback for read_file()
-        # needing a filename rather than a file handle.
+        # NOTE: Layer-1 (raw .dta blob) caching is currently dormant.
+        # An earlier attempt passed cache_remote_stream=True per
+        # slurm_logs/DESIGN_dvc_layer1_caching.md, but empirical
+        # testing on DVC 3.67.0 (Niger Run A, 2026-04-11) showed the
+        # kwarg is silently dropped: 363s S3 stream, zero bytes
+        # written to /global/scratch/users/ligon/.dvc/cache.  Both
+        # `cache_remote_stream=True` and the actual 3.67.0 kwarg name
+        # `cache=True` were tried; neither populated the cache.
+        # The dormant Layer-1 path is reverted here pending a real
+        # fix (likely DVCFS.get_file() or Repo.pull, see follow-up
+        # in the design doc).  See country.py:1611-1812 for the
+        # working Layer-2 (parquet) cache that landed in v0.7.0.
         try:
-            fh = DVCFS.open(fn, mode='rb', cache_remote_stream=True)
-        except TypeError:
-            fh = DVCFS.open(fn, mode='rb')
-        try:
-            with fh as f:
+            with DVCFS.open(fn,mode='rb') as f:
                 df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
         except TypeError: # Needs filename?
             df = read_file(fn,convert_categoricals=convert_categoricals,encoding=encoding)

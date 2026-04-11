@@ -929,136 +929,14 @@ class TestDVCCaching:
             check_dtype=False,
         )
 
-    # ------------------------------------------------------------------
-    # Layer-1 (raw .dta blob) caching coverage
-    #
-    # The test below pins the get_dataframe() → DVCFS.open() open site
-    # to pass cache_remote_stream=True, the opt-in flag added in
-    # iterative/dvc#9183 that makes DVC actually populate its local
-    # cache as a side effect of streaming.  Without it, every cold
-    # call re-downloads the same content-addressed blob.
-    # See slurm_logs/DESIGN_dvc_layer1_caching.md for the full design.
-    # ------------------------------------------------------------------
-
-    def test_layer1_get_dataframe_passes_cache_remote_stream(self, monkeypatch, tmp_path):
-        """get_dataframe() must pass cache_remote_stream=True to DVCFS.open
-        when reading via the file_system_path branch.
-
-        This is the headline Layer-1 fix from
-        slurm_logs/DESIGN_dvc_layer1_caching.md: without the kwarg,
-        DVC streams the .dta blob from S3 every time without
-        populating the local DVC cache.  With it, the next cold read
-        of the same blob hits the cache.
-
-        The local_file() and file_system_path() helpers are nested
-        inside get_dataframe() so we can't patch them directly.
-        Instead, we patch DVCFS.open to record every call's kwargs
-        and return a stub file handle, then short-circuit
-        pd.read_parquet to return a marker DataFrame so the read_file
-        chain stops on the first attempt.  We use a path that does
-        NOT exist locally so local_file() naturally returns False and
-        the function dispatches into the file_system_path branch.
-        """
-        from lsms_library import local_tools
-
-        fake_path = "/nonexistent/path/for/test/file.dta"
-        open_calls: list[dict] = []
-
-        class FakeFileHandle:
-            def __enter__(self):
-                return self
-            def __exit__(self, *exc):
-                return False
-            def read(self, *a, **k):
-                return b""
-            def seek(self, *a, **k):
-                return 0
-
-        def fake_open(fn, mode='rb', **kwargs):
-            open_calls.append(dict(kwargs))
-            return FakeFileHandle()
-
-        monkeypatch.setattr(local_tools.DVCFS, "open", fake_open)
-
-        # Short-circuit read_file's first reader so it doesn't try
-        # to parse our empty FakeFileHandle as a real file.
-        marker_df = pd.DataFrame({"sentinel": [1]})
-        monkeypatch.setattr(
-            local_tools.pd, "read_parquet", lambda f, **kw: marker_df
-        )
-
-        result = local_tools.get_dataframe(fake_path)
-
-        # The file_system_path() probe makes one open call with no
-        # kwargs (just `with DVCFS.open(fn) as f`), and the actual
-        # read path makes a second open call with cache_remote_stream=True.
-        cached_calls = [c for c in open_calls if c.get("cache_remote_stream") is True]
-        assert len(cached_calls) == 1, (
-            f"Expected exactly one DVCFS.open call with "
-            f"cache_remote_stream=True, got {len(cached_calls)}.\n"
-            f"All calls: {open_calls}"
-        )
-        pd.testing.assert_frame_equal(result, marker_df)
-
-    def test_layer1_falls_back_when_kwarg_unsupported(self, monkeypatch, tmp_path):
-        """If DVCFS.open raises TypeError on cache_remote_stream (older DVC
-        versions that don't recognize the kwarg), get_dataframe should
-        retry without the kwarg rather than fail.
-
-        The pyproject pin (`dvc[s3] >=3.67.0,<4.0.0`) guarantees the
-        kwarg is supported today, but the fallback is defensive in
-        case the pin loosens or someone runs against a vendored DVC.
-        """
-        from lsms_library import local_tools
-
-        fake_path = "/nonexistent/path/for/test/file.dta"
-        call_log: list[dict] = []
-
-        class FakeFileHandle:
-            def __enter__(self):
-                return self
-            def __exit__(self, *exc):
-                return False
-            def read(self, *a, **k):
-                return b""
-            def seek(self, *a, **k):
-                return 0
-
-        def fake_open(fn, mode='rb', **kwargs):
-            call_log.append(dict(kwargs))
-            if "cache_remote_stream" in kwargs:
-                # Simulate old DVC: reject the kwarg
-                raise TypeError(
-                    "open() got an unexpected keyword argument 'cache_remote_stream'"
-                )
-            return FakeFileHandle()
-
-        monkeypatch.setattr(local_tools.DVCFS, "open", fake_open)
-
-        marker_df = pd.DataFrame({"sentinel": [1]})
-        monkeypatch.setattr(
-            local_tools.pd, "read_parquet", lambda f, **kw: marker_df
-        )
-
-        # Should NOT raise -- the TypeError on the cache_remote_stream
-        # call should be caught and the open retried without it.
-        result = local_tools.get_dataframe(fake_path)
-
-        # Expected sequence: one probe call (file_system_path),
-        # one cache_remote_stream call (raises TypeError),
-        # one fallback call (no kwarg).
-        cached_attempt_calls = [c for c in call_log if c.get("cache_remote_stream") is True]
-        assert len(cached_attempt_calls) == 1, (
-            f"Expected exactly one open call with cache_remote_stream=True; "
-            f"got {len(cached_attempt_calls)}.  All calls: {call_log}"
-        )
-        # And at least one call without the kwarg succeeded (the fallback).
-        plain_calls = [c for c in call_log if "cache_remote_stream" not in c]
-        assert len(plain_calls) >= 1, (
-            f"Expected at least one fallback open call without kwarg; "
-            f"got {len(plain_calls)}.  All calls: {call_log}"
-        )
-        pd.testing.assert_frame_equal(result, marker_df)
+    # NOTE: A previous revision of this file had two test_layer1_*
+    # tests pinning a `cache_remote_stream=True` kwarg on DVCFS.open.
+    # They were removed when empirical testing (Niger Run A,
+    # 2026-04-11) showed DVC 3.67.0 silently drops the kwarg without
+    # populating the local cache.  See the revert commit for details
+    # and slurm_logs/DESIGN_dvc_layer1_caching.md for the open
+    # follow-up question of which DVC API actually triggers Layer-1
+    # caching.
 
     def test_clear_cache_removes_files(self, mock_country_structure, sample_dataframe):
         """clear_cache should delete cached parquet files."""
