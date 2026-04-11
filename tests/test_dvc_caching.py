@@ -264,11 +264,25 @@ class TestDVCCaching:
         sample_dataframe,
         monkeypatch,
     ):
-        """When DVC marks outputs stale, cache should be rebuilt from waves."""
+        """LSMS_NO_CACHE=1 forces a rebuild even when a cached parquet exists.
+
+        Historical context: pre-v0.7.0 this test asserted that DVC's
+        stage.status() dirty-check would auto-trigger a rebuild when source
+        deps changed.  v0.7.0 deliberately removed that auto-invalidation in
+        favor of a single best-effort cache read at the top of
+        load_dataframe_with_dvc, so contributors editing source data must
+        explicitly clear the cache or set LSMS_NO_CACHE=1.  This test was
+        rewritten to assert the v0.7.0 contract: with LSMS_NO_CACHE=1 set,
+        the rebuild path is taken and DVC is consulted even though
+        cache_path exists on disk.
+        """
         # Force DVC backend so the DVC code path is exercised regardless of
         # what LSMS_BUILD_BACKEND is set to in the test runner environment.
         # (Matches the pattern used by the sibling tests in this class.)
         monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
+        # v0.7.0: explicitly bypass the top-of-function cache read so the
+        # stage layer logic below is exercised.
+        monkeypatch.setenv("LSMS_NO_CACHE", "1")
 
         cache_path = mock_country_structure / "var" / "test_data.parquet"
         write_parquet(sample_dataframe, cache_path)
@@ -300,6 +314,8 @@ class TestDVCCaching:
             patch("lsms_library.country.Repo") as mock_repo_class, \
             patch("lsms_library.country.get_dataframe", side_effect=get_dataframe_side_effect) as mock_get_dataframe, \
             patch("lsms_library.country.map_index", side_effect=lambda df: df), \
+            patch("lsms_library.country._load_canonical_spellings", return_value={}), \
+            patch("lsms_library.country._load_rejected_column_spellings", return_value={}), \
             patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
             patch.object(Country, "data_scheme", new_callable=PropertyMock) as mock_scheme, \
             patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources, \
@@ -712,6 +728,206 @@ class TestDVCCaching:
         # Second call should use cache without reproducing - first stage reproduce count should still be 1
         assert mock_stages[0].reproduce.call_count == 1, "Second call should not rerun DVC stage"
         assert mock_get_dataframe.call_args_list[-1][0][0] == cache_path
+
+    # ------------------------------------------------------------------
+    # v0.7.0 cache-read fix coverage
+    #
+    # The three tests below pin the v0.7.0 contract for the
+    # `load_dataframe_with_dvc` function:
+    #
+    #   1. Top-of-function cache read returns the cached parquet
+    #      without ever opening DVC, regardless of whether the country
+    #      has materialize stages.
+    #   2. LSMS_NO_CACHE=1 explicitly bypasses the top read.
+    #   3. When the DVC stage layer raises DvcException, the outer
+    #      exception handler writes the load_from_waves result to
+    #      cache_path so the next call hits (1).
+    #
+    # See SkunkWorks/dvc_object_management.org for the full design
+    # rationale and bench/results/ for the empirical motivation.
+    # ------------------------------------------------------------------
+
+    def test_v070_top_cache_read_returns_without_dvc(
+        self,
+        mock_country_structure,
+        sample_dataframe,
+        monkeypatch,
+    ):
+        """When cache_path exists and LSMS_NO_CACHE is unset, the top-of-function
+        cache read returns the parquet without consulting DVC."""
+        monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
+        monkeypatch.delenv("LSMS_NO_CACHE", raising=False)
+
+        cache_path = mock_country_structure / "var" / "test_data.parquet"
+        write_parquet(sample_dataframe, cache_path)
+        assert cache_path.exists()
+
+        with patch("lsms_library.country.files") as mock_files, \
+            patch("lsms_library.country.Repo") as mock_repo_class, \
+            patch("lsms_library.country.get_dataframe", side_effect=lambda path, *_, **__: pd.read_parquet(path)) as mock_get_df, \
+            patch("lsms_library.country.map_index", side_effect=lambda df: df), \
+            patch("lsms_library.country._load_canonical_spellings", return_value={}), \
+            patch("lsms_library.country._load_rejected_column_spellings", return_value={}), \
+            patch.object(Country, "__getitem__", side_effect=AssertionError("Should not load waves")), \
+            patch.object(Country, "_resolve_materialize_stages", side_effect=AssertionError("Should not consult stages")), \
+            patch.object(Country, "_augment_index_from_related_tables", side_effect=lambda df, *a, **k: df), \
+            patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
+            patch.object(Country, "data_scheme", new_callable=PropertyMock) as mock_scheme, \
+            patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources, \
+            patch.object(Country, "file_path", new_callable=PropertyMock) as mock_file_path:
+
+            mock_files.return_value = mock_country_structure.parent.parent
+            mock_file_path.return_value = mock_country_structure
+            mock_waves.return_value = ["2020-21"]
+            mock_scheme.return_value = ["test_data"]
+            mock_resources.return_value = {"Data Scheme": {"test_data": {}}}
+
+            country = Country("TestCountry", preload_panel_ids=False)
+            result = country._aggregate_wave_data(method_name="test_data")
+
+        # The top read should have returned without ever opening Repo or
+        # asking for stages.
+        mock_repo_class.assert_not_called()
+        # get_dataframe should have been called exactly once on cache_path
+        # (the top read).  No subsequent rebuild.
+        assert mock_get_df.call_count == 1
+        assert mock_get_df.call_args[0][0] == cache_path
+        pd.testing.assert_frame_equal(
+            result.reset_index(drop=True),
+            sample_dataframe.reset_index(drop=True),
+            check_dtype=False,
+        )
+
+    def test_v070_lsms_no_cache_skips_top_read(
+        self,
+        mock_country_structure,
+        sample_dataframe,
+        monkeypatch,
+    ):
+        """LSMS_NO_CACHE=1 forces the rebuild path even when cache_path exists.
+
+        This is the escape hatch contributors use after editing source
+        data so they don't get a stale cached result.
+        """
+        monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
+        monkeypatch.setenv("LSMS_NO_CACHE", "1")
+
+        cache_path = mock_country_structure / "var" / "test_data.parquet"
+        write_parquet(sample_dataframe, cache_path)
+
+        rebuilt_df = pd.DataFrame({"col1": [42]})
+
+        with patch("lsms_library.country.files") as mock_files, \
+            patch("lsms_library.country.Repo") as mock_repo_class, \
+            patch("lsms_library.country.get_dataframe", side_effect=lambda path, *_, **__: pd.read_parquet(path)), \
+            patch("lsms_library.country.map_index", side_effect=lambda df: df), \
+            patch("lsms_library.country._load_canonical_spellings", return_value={}), \
+            patch("lsms_library.country._load_rejected_column_spellings", return_value={}), \
+            patch.object(Country, "__getitem__", return_value=SimpleNamespace(test_data=lambda: rebuilt_df, data_scheme=["test_data"])), \
+            patch.object(Country, "_resolve_materialize_stages", return_value=[]), \
+            patch.object(Country, "_augment_index_from_related_tables", side_effect=lambda df, *a, **k: df), \
+            patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
+            patch.object(Country, "data_scheme", new_callable=PropertyMock) as mock_scheme, \
+            patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources, \
+            patch.object(Country, "file_path", new_callable=PropertyMock) as mock_file_path:
+
+            mock_files.return_value = mock_country_structure.parent.parent
+            mock_file_path.return_value = mock_country_structure
+            mock_waves.return_value = ["2020-21"]
+            mock_scheme.return_value = ["test_data"]
+            mock_resources.return_value = {"Data Scheme": {"test_data": {}}}
+
+            mock_repo = Mock()
+            mock_repo.lock = Mock()
+            mock_repo.lock.__enter__ = Mock(return_value=None)
+            mock_repo.lock.__exit__ = Mock(return_value=None)
+            mock_repo_class.return_value = mock_repo
+
+            country = Country("TestCountry", preload_panel_ids=False)
+            result = country._aggregate_wave_data(method_name="test_data")
+
+        # Top read was skipped because LSMS_NO_CACHE=1, so DVC must
+        # have been opened.
+        mock_repo_class.assert_called_once()
+        # Result should be the rebuilt df (the wave loader's output),
+        # not the stale parquet that was written to cache_path.
+        pd.testing.assert_frame_equal(
+            result.reset_index(drop=True),
+            rebuilt_df.reset_index(drop=True),
+            check_dtype=False,
+        )
+
+    def test_v070_dvc_fallback_writes_cache(
+        self,
+        mock_country_structure,
+        monkeypatch,
+    ):
+        """When DVC raises DvcException, the outer exception handler
+        runs load_from_waves AND writes the result to cache_path so
+        the next call hits the top-of-function cache read.
+
+        This pins the v0.7.0 fix that closes the write-only gap for
+        dvc.yaml countries whose stages fail at reproduce.
+        """
+        from dvc.exceptions import DvcException
+
+        monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
+        monkeypatch.delenv("LSMS_NO_CACHE", raising=False)
+
+        cache_path = mock_country_structure / "var" / "test_data.parquet"
+        # Important: cache_path does NOT exist initially.  The top read
+        # is a no-op; we want to exercise the rebuild + write path of
+        # the exception handler.
+        assert not cache_path.exists()
+
+        rebuilt_df = pd.DataFrame({"col1": [7, 8, 9]})
+
+        with patch("lsms_library.country.files") as mock_files, \
+            patch("lsms_library.country.Repo") as mock_repo_class, \
+            patch("lsms_library.country.get_dataframe", side_effect=lambda path, *_, **__: pd.read_parquet(path)), \
+            patch("lsms_library.country.map_index", side_effect=lambda df: df), \
+            patch("lsms_library.country._load_canonical_spellings", return_value={}), \
+            patch("lsms_library.country._load_rejected_column_spellings", return_value={}), \
+            patch.object(Country, "__getitem__", return_value=SimpleNamespace(test_data=lambda: rebuilt_df, data_scheme=["test_data"])), \
+            patch.object(Country, "_augment_index_from_related_tables", side_effect=lambda df, *a, **k: df), \
+            patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
+            patch.object(Country, "data_scheme", new_callable=PropertyMock) as mock_scheme, \
+            patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources, \
+            patch.object(Country, "file_path", new_callable=PropertyMock) as mock_file_path:
+
+            mock_files.return_value = mock_country_structure.parent.parent
+            mock_file_path.return_value = mock_country_structure
+            mock_waves.return_value = ["2020-21"]
+            mock_scheme.return_value = ["test_data"]
+            mock_resources.return_value = {"Data Scheme": {"test_data": {}}}
+
+            # Make Repo() raise DvcException -- the exception handler
+            # at the bottom of load_dataframe_with_dvc should catch it
+            # and call the v0.7.0 rebuild+write path.
+            mock_repo_class.side_effect = DvcException("simulated DVC unavailable")
+
+            country = Country("TestCountry", preload_panel_ids=False)
+            result = country._aggregate_wave_data(method_name="test_data")
+
+        # The exception handler should have written the rebuild result
+        # to cache_path.
+        assert cache_path.exists(), (
+            "v0.7.0 contract: DVC fallback must write cache so the next "
+            "call hits the top-of-function read"
+        )
+        # And the returned df should be the rebuild output.
+        pd.testing.assert_frame_equal(
+            result.reset_index(drop=True),
+            rebuilt_df.reset_index(drop=True),
+            check_dtype=False,
+        )
+        # Sanity: the parquet on disk matches what was returned.
+        on_disk = pd.read_parquet(cache_path)
+        pd.testing.assert_frame_equal(
+            on_disk.reset_index(drop=True),
+            rebuilt_df.reset_index(drop=True),
+            check_dtype=False,
+        )
 
     def test_clear_cache_removes_files(self, mock_country_structure, sample_dataframe):
         """clear_cache should delete cached parquet files."""

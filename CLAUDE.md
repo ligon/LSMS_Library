@@ -18,23 +18,40 @@ Root-level symlinks (e.g., `Uganda → lsms_library/countries/Uganda`) are for c
 ## DVC Repository Root
 **The DVC repository is rooted at `lsms_library/countries/`, NOT the top-level repo.** DVC config, remotes, and credentials all live under `lsms_library/countries/.dvc/`. All `dvc` CLI commands (pull, push, status) must be run from `lsms_library/countries/` or they will fail with missing-remote/credential errors. The `get_dataframe()` fallback chain handles this automatically when scripts run from their normal `{Country}/{wave}/_/` working directory.
 
-## Cache Behavior (Current State, 2026-04-10)
+## Cache Behavior (v0.7.0+)
 
-**Writes** are redirected to `data_root()` by `_resolve_data_path` in `local_tools.py`. Default location `~/.local/share/lsms_library/{Country}/var/{table}.parquet`; override with `data_dir` in `~/.config/lsms_library/config.yml` or `LSMS_DATA_DIR` env var (env var wins). **Reads** back from that cache are inconsistent across code paths, and the library is mid-migration. As of commit `ff018c76`:
+**Writes** are redirected to `data_root()` by `_resolve_data_path` in `local_tools.py`. Default location `~/.local/share/lsms_library/{Country}/var/{table}.parquet`; override with `data_dir` in `~/.config/lsms_library/config.yml` or `LSMS_DATA_DIR` env var (env var wins).
 
-- **`trust_cache=True`** (set on `Country(...)`) reads the cache file directly with **no staleness check**. Intended for clusters where a full pipeline built the caches; use only when you know the cache is fresh for your query.
+**Reads** as of v0.7.0: `load_dataframe_with_dvc` in `country.py` does a **best-effort cache read at the top of the function**, before consulting DVC at all. If `cache_path.exists()` and `LSMS_NO_CACHE` is not set, it returns the cached parquet directly. This applies uniformly to all 40 countries: the `if not stage_infos:` branch, the stage-layer branch, and the DvcException fallback all populate the same cache that the top-of-function read picks up next time.
 
-- **Countries with a populated `dvc.yaml` (7 countries: Uganda, Senegal, Malawi, Togo, Kazakhstan, Serbia, GhanaLSS)** run through `load_dataframe_with_dvc` in `country.py`, which uses DVC's `stage.status()` to hash the declared deps (`cli.py`, `country.py`, `local_tools.py`, the country's `_/` directory) and reads the cache only if the stage is clean. **Source `.dta` files are NOT in the deps**, so editing an upstream `.dta` does not invalidate the stage — only edits to the three central Python files or the country's `_/` configuration do.
+Empirical numbers on Savio/Lustre with `.dta` files local (see `bench/results/`):
 
-- **Countries without a `dvc.yaml` (~33)** take the `if not stage_infos:` branch in the same function. **The cache is write-only in this branch.** Every call runs `load_from_waves()` from scratch, re-reads source files, rewrites the parquet to `data_root()`, and returns the in-memory DataFrame. The cached file on disk is never read back. Within a single Python process, a second call is faster because Country-instance ancillary caches (`_sample_v_cache`, `_updated_ids_cache`, `_market_lookup_cache_*`, `_location_level_cache`) are warm and the OS page cache helps repeat reads of the same `.dta` files — but across processes nothing persists. Empirically on Savio/Lustre, a fresh `ipython` session rebuilds Niger's `household_roster` in ~22s every time (plus ~30s Python import overhead).
+| Phase | Pre-v0.7.0 (write-only bug) | v0.7.0+ |
+|---|---|---|
+| Niger `household_roster` cold rebuild | ~16s | ~14s |
+| Niger second call same process | ~7s | **~0.5s** |
+| Niger second call fresh subprocess | ~16s (no speedup) | **~0.9s** |
+| Uganda `household_roster` second call fresh subprocess | ~12s (no speedup) | **~1.2s** |
 
-- **`LSMS_BUILD_BACKEND=make`** bypasses the DVC stage layer and calls `run_make_target` / `load_from_waves` directly. The write-only behavior still applies for countries without `dvc.yaml`.
+The 10–17× cross-process speedup is the headline win. Python import of `lsms_library` (~22s on Lustre, ~30s on first cold filesystem) is now the dominant cost of any fresh-session call.
 
-**Historical note**: an earlier revision of this file claimed "Caches auto-invalidate on source/config changes (hash-based)" and "Subsequent calls read cache (<1 sec)". Neither is true for the majority of countries as of the v-migration. The claim was based on how the DVC stage layer works for the 7 countries that have it, generalized incorrectly to the whole library. Do not rely on those claims in the current codebase.
+**No staleness check.** v0.7.0 deliberately ships *without* automatic invalidation. Editing a wave's `data_info.yml`, a `_/{table}.py` script, or an upstream `.dta` file does *not* trigger a rebuild on the next call. Contributors must:
 
-**v0.7.0 (in progress)** will add a minimum-viable "read cache if present" layer to the `if not stage_infos:` branch so all countries get a read path, plus `LSMS_NO_CACHE=1` as an escape hatch for contributors editing source files. **v0.8.0** will add content-hash invalidation (hashing source `.dta` files + relevant YAML/scripts) so editing a wave's config correctly invalidates only the affected tables, at which point the `dvc.yaml` stage layer can be retired. See `SkunkWorks/dvc_object_management.org` for the full plan.
+- set `LSMS_NO_CACHE=1` in the environment to bypass the top read for that session, OR
+- run `lsms-library cache clear --country {Country}` to remove the parquet, OR
+- pass `trust_cache=False` (the default; this still hits the v0.7.0 top read — see below).
 
-**Practical rule for contributors**: when editing a wave's `data_info.yml` or a `_/{table}.py` script, run `lsms-library cache clear --country {Country}` before rebuilding so the next call actually reads your new source rather than an older cached parquet. Or set `trust_cache=False` (the default) and accept the slower rebuild-every-time path for affected tables.
+**`trust_cache=True`** is a separate, narrower short-circuit at the top of `_aggregate_wave_data` that reads the parquet and then **still calls `_finalize_result`** (so kinship expansion, spelling normalization, and the `_join_v_from_sample` augmentation all apply on the way out). It bypasses the DVC stage check, the in-process ancillary caches, and the entire `load_dataframe_with_dvc` flow including the v0.7.0 top read. Effectively a stricter version of the v0.7.0 behavior for users who *know* the cache is fresh and don't want any cache existence checks beyond the parquet itself.
+
+**`LSMS_BUILD_BACKEND=make`** dispatches `_aggregate_wave_data` directly to `load_from_waves` (`country.py:1830`), bypassing both the v0.7.0 top read and the DVC stage layer. **It does not write to or read from the data_root cache at all.** Every call rebuilds from source. The only writes that happen under `LSMS_BUILD_BACKEND=make` are via the CLI's explicit `--out` path when invoked from a stage's `cmd:` (which is itself currently broken on most Savio nodes — see "Stage layer python3 mismatch" below).
+
+**Stage layer python3 mismatch.** The `dvc.yaml` files for the 7 stage-layer countries (Uganda, Senegal, Malawi, Togo, Kazakhstan, Serbia, GhanaLSS) declare a `cmd:` like `cd _ && LSMS_BUILD_BACKEND=make python3 -m lsms_library.cli materialize ...`. The bare `python3` resolves to system Python, which on Savio is 3.6.8 — too old for `from importlib.metadata import ...` in `lsms_library/__init__.py`. Every `stage.reproduce()` therefore fails with `ModuleNotFoundError`, and `load_dataframe_with_dvc` falls into its outer `except (DvcException, FileNotFoundError)` handler. With the v0.7.0 fix, that handler now writes the `load_from_waves` result to the cache, so the failure is benign for warm-cache reads but still costs a wasted subprocess on cold rebuilds. Fix is to substitute `${PYTHON:-python3}` or `sys.executable` in the dvc.yaml templates; deferred because v0.8.0 retires the stage layer entirely.
+
+**Historical note**: a pre-v0.7.0 revision of this file claimed "Caches auto-invalidate on source/config changes (hash-based)" and "Subsequent calls read cache (<1 sec)". Neither was true for the majority of countries as of the v-migration. The claim was based on how the DVC stage layer works for the 7 countries that have it, generalized incorrectly to the whole library. v0.7.0 makes the second claim true for all 40 countries (via the top-of-function read), but the first claim — auto-invalidation — is still false and is deferred to v0.8.0.
+
+**v0.8.0 (planned)** will add content-hash invalidation: a sidecar `.hash` file recording the MD5 of the country's relevant `data_info.yml` files plus any `_/{table}.py` scripts. On mismatch, rebuild and rewrite both parquet and hash. Contributors editing source data will then no longer need `LSMS_NO_CACHE=1` or `cache clear`. Once that lands, the `dvc.yaml` stage layer becomes redundant and can be retired. See `SkunkWorks/dvc_object_management.org` for the full plan.
+
+**Practical rule for contributors**: when editing a wave's `data_info.yml` or a `_/{table}.py` script, set `LSMS_NO_CACHE=1` for the session OR run `lsms-library cache clear --country {Country}` once before rebuilding. The parquet at `~/.local/share/lsms_library/{Country}/var/{table}.parquet` is the single source of truth for the v0.7.0 top read; deleting it forces a rebuild on the next call.
 
 ## Roster-Derived Tables
 `household_characteristics` is **auto-derived from `household_roster`** via `roster_to_characteristics()` in `transformations.py`. It should NOT be registered in `data_scheme.yml` --- the `Country` class detects it via `_ROSTER_DERIVED` and applies the transformation automatically when `household_roster` exists. Adding `household_characteristics: !make` to a data_scheme bypasses this and forces legacy scripts to run instead.
@@ -475,11 +492,21 @@ categorical strings.
 The cached parquets under `data_root()` store **pre-transformation** data. Kinship expansion (`_expand_kinship`), canonical spelling enforcement (`_enforce_canonical_spellings`), and dtype coercion (`_enforce_declared_dtypes`) all happen in `_finalize_result()` at API read time, not at cache write time. This means:
 
 - `Country('X').household_roster()` returns clean, decomposed data (Sex as M/F, kinship as Generation/Distance/Affinity)
-- Reading `~/.local/share/lsms_library/X/var/household_roster.parquet` directly gives raw data with `Relationship` strings and unnormalized values
+- Reading `~/.local/share/lsms_library/X/var/household_roster.parquet` directly with `pd.read_parquet` gives raw data with `Relationship` strings and unnormalized values
 
-The cache is closer to the source data; the API applies the harmonization layer.
+The cache is closer to the source data; the API applies the harmonization layer on every read.
 
-**`trust_cache=True` skips `_finalize_result()`** and reads raw parquets directly. This is fast but returns un-transformed data (no kinship expansion, no spelling normalization, no dtype coercion). Use only on clusters where caches were built by the full pipeline. When diagnosing data quality, always use `trust_cache=False` (default) to see what the API actually returns.
+**`trust_cache=True` does NOT skip `_finalize_result`.** A pre-v0.7.0 revision of this section claimed it did. The actual code at `country.py:1293-1299` reads the cache via `get_dataframe`, runs `map_index`, then ends with `return self._finalize_result(df_cached, scheme_entry, method_name)` — so kinship expansion, spelling normalization, dtype coercion, and the `_join_v_from_sample` augmentation all still apply. The difference between `trust_cache=True` and the v0.7.0 default top read is narrower than the old wording suggested:
+
+| | `trust_cache=False` (default) | `trust_cache=True` |
+|---|---|---|
+| Where the read happens | `load_dataframe_with_dvc` top-of-function | `_aggregate_wave_data` short-circuit before any DVC code |
+| Skips DVC stage layer | yes | yes |
+| Skips ancillary caches setup | no | yes (constructor doesn't preload) |
+| Honors `LSMS_NO_CACHE=1` | yes | no |
+| Calls `_finalize_result` | yes (via `_aggregate_wave_data`) | yes (explicit `return self._finalize_result(...)` inside the short-circuit) |
+
+In short: `trust_cache=True` is a more aggressive bypass for clusters where the caches are known fresh and the user doesn't even want the existence check of `LSMS_NO_CACHE` to fire. For diagnosing data quality, use `trust_cache=False` (the default) so any debug instrumentation in the stage layer or finalize chain actually runs.
 
 ## Derived Tables
 

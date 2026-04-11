@@ -1615,6 +1615,42 @@ class Country:
             cache_path = data_root(self.name) / "var" / f"{method_name}.parquet"
             cache_exists = cache_path.exists()
 
+            # v0.7.0: best-effort cache read.  If a parquet exists at
+            # cache_path, read it and return without consulting DVC, the
+            # stage layer, or the wave loaders.  No staleness check is
+            # performed -- contributors editing source data are expected
+            # to clear the cache (`lsms-library cache clear --country X`)
+            # or set LSMS_NO_CACHE=1 in the environment.  Hash-based
+            # invalidation is deferred to v0.8.0.
+            #
+            # This block fixes the write-only-cache bug at the
+            # `if not stage_infos:` branch below (which wrote a parquet
+            # but never read it back) AND closes the same gap for the
+            # outer exception handler that catches DvcException, which
+            # also writes through `load_from_waves` after the v0.7.0
+            # cache-write fix in the `except` block at the bottom of
+            # this function.  See SkunkWorks/dvc_object_management.org
+            # for the full design and bench/results/ for empirical
+            # confirmation.  The returned DataFrame is intentionally
+            # pre-finalize: `_aggregate_wave_data` calls
+            # `_finalize_result` on it before returning to the user, so
+            # kinship expansion, spelling normalization, and the
+            # `_join_v_from_sample` augmentation still apply.
+            no_cache = os.environ.get("LSMS_NO_CACHE", "").lower() in {"1", "true", "yes"}
+            if cache_exists and not no_cache:
+                try:
+                    cached_df = get_dataframe(cache_path)
+                    cached_df = map_index(cached_df)
+                    logger.debug(
+                        f"v0.7.0 cache read: {method_name} from {cache_path}"
+                    )
+                    return cached_df
+                except Exception as cache_read_error:
+                    logger.debug(
+                        f"v0.7.0 cache read failed for {method_name} "
+                        f"({cache_read_error!r}); rebuilding from source"
+                    )
+
             dvc_root = self.file_path.parent
 
             repo: Repo | None = None
@@ -1755,7 +1791,22 @@ class Country:
                     return combined_outputs
             except (DvcException, FileNotFoundError) as e:
                 logger.warning(f"DVC unavailable for {method_name}: {e}. Falling back to manual aggregation.")
-                return load_from_waves(waves)
+                # v0.7.0: write the rebuild result to cache_path so the
+                # next call hits the top-of-function cache read above.
+                # Mirrors the `if not stage_infos:` branch that already
+                # writes after load_from_waves.  Without this, dvc.yaml
+                # countries (Uganda, Senegal, etc.) whose stages fail at
+                # reproduce never populate the cache and rebuild from
+                # source on every call.
+                df = load_from_waves(waves)
+                if isinstance(df, pd.DataFrame):
+                    df = _enforce_rejected_column_spellings(df)
+                    cache_path.parent.mkdir(parents=True, exist_ok=True)
+                    to_parquet(df, cache_path)
+                    logger.debug(
+                        f"v0.7.0 cache write (DVC fallback): {method_name} to {cache_path}"
+                    )
+                return df
             finally:
                 if repo is not None:
                     repo.close()
