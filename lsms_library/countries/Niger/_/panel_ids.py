@@ -91,16 +91,38 @@ ecvma_14_to_11: dict[str, str] = {}
 # declares idxvars as [GRAPPE, MENAGE] only (extensions are collapsed
 # with their parent), so the linkage is at the (grappe, menage) level.
 uniq_gm = cover14[['GRAPPE', 'MENAGE']].dropna().drop_duplicates()
+
+# First pass: build the set of 2014-15 current IDs (post-niger.i).
+# We need this to detect transitive-chain collisions in the second pass.
+cur_ids_14: set[str] = set()
 for _, row in uniq_gm.iterrows():
     g, m = int(row['GRAPPE']), int(row['MENAGE'])
-    # Build the roster-level current ID via niger.i() (no EXTENSION).
+    cur_i = niger_i(pd.Series([g, m], index=['GRAPPE', 'MENAGE']))
+    if cur_i is not None:
+        cur_ids_14.add(cur_i)
+
+# Second pass: build the linkage, skipping transitive-chain collisions.
+# niger.i(g, m) = format_id(g) + '0' + format_id(m, zp=2) and the
+# theoretical 2011-12 hid = g*100+m share a namespace: e.g.
+# (g=10, m=2) gives cur_i='10002' and prev_i='1002', and (g=1, m=2)
+# gives cur_i='1002'. If we add both linkages, updated_ids['2014-15']
+# would form a transitive chain '10002'->'1002'->'102' — and id_walk's
+# single-pass .replace() applied twice would collapse both households
+# into the single canonical '102', destroying one of them. We skip
+# any linkage whose prev_i also appears as another HH's cur_i.
+for _, row in uniq_gm.iterrows():
+    g, m = int(row['GRAPPE']), int(row['MENAGE'])
     cur_i = niger_i(pd.Series([g, m], index=['GRAPPE', 'MENAGE']))
     if cur_i is None:
         continue
-    # Build the theoretical 2011-12 hid
     prev_i = str(g * 100 + m)
-    if prev_i in hid11_set:
-        ecvma_14_to_11[cur_i] = prev_i
+    if prev_i not in hid11_set:
+        continue
+    if prev_i in cur_ids_14:
+        # prev_i collides with another HH's cur_i — ambiguous. Leave
+        # this household unlinked rather than produce a phantom chain.
+        continue
+    ecvma_14_to_11[cur_i] = prev_i
 
 
 # -----------------------------------------------------------------------

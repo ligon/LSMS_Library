@@ -183,9 +183,56 @@ report.summarize()
 assert report.ok
 ```
 
-Expected warnings:
-- "No ID mappings for wave X" — expected for baseline waves and new-sample waves
-- Panel attrition checks may be skipped if `other_features` is not cached
+`check_panel_consistency` runs 8 checks grouped in three tiers. Every
+check uses `household_roster` as the spine — the obsolete
+`other_features` code path has been removed.
+
+### Existence
+
+| Check                 | What it inspects                                               |
+|-----------------------|----------------------------------------------------------------|
+| `has_panel_ids`       | `Country(X).panel_ids` is non-None and non-empty.              |
+| `has_updated_ids`     | `Country(X).updated_ids` is non-None and non-empty.            |
+
+### Structural consistency
+
+| Check                       | What it inspects                                                                                                                                                                                                              |
+|-----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `updated_ids_cover_waves`   | Every follow-up wave has a non-empty mapping. Disjoint-panel-aware: infers baselines from the `panel_ids` chain structure so Niger's ECVMA + EHCVM (two baselines: 2011-12 and 2018-19) both report as covered.               |
+| `ids_self_consistent`       | Flags orphaned self-referential (`k == v`) mappings or null values. Cross-references `panel_ids`: a self-ref backed by a `(wave, id) → (prev_wave, id)` chain entry is legitimate (common in EHCVM countries where the ID construction is identity across waves). |
+| `panel_ids_targets_exist`   | **Every `panel_ids` chain endpoint must exist in `household_roster` after canonicalisation.** Walks both endpoints through `updated_ids` and verifies the canonical ID appears in the spine. This is the check that catches Niger-style construction bugs where the script built current IDs that didn't match the roster's actual ID form. |
+
+### Runtime correctness
+
+| Check                       | What it inspects                                                                                                                                                                                                         |
+|-----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `attrition_monotonic`       | For each chain in `panel_ids` (one per program in a disjoint-panel country), consecutive-wave overlap on `household_roster` should be non-zero. Also flags off-diagonal counts that exceed the source wave's HH count.   |
+| `ids_applied_consistently`  | For each follow-up wave, checks that the spine's IDs are in the canonical post-`id_walk` form (values of `updated_ids[wave]`), not the pre-update raw form (keys). 10% tolerance for minor mismatches.                   |
+| `id_walk_idempotent`        | Re-applies `id_walk` to the spine and asserts no duplicate `(i, t)` tuples appear. Catches two bug classes: (1) the `attrs['id_converted']` preservation bug (see Burkina Faso commit `4db41a27`); (2) transitive-chain collisions in `updated_ids` where a pre-walk ID happens to collide with another household's canonical ID (Niger's `'10002' → '1002' → '102'` case). |
+
+### Interpreting the output
+
+- **`ok: True`** means every check passed or merely warned — the panel
+  is usable.
+- **A warning** is worth investigating but does not block use.
+- **A failure** usually means the `panel_ids` construction is wrong
+  and needs the script/YAML revised — `Country(X).panel_ids` will
+  still return a dict, but downstream `panel_attrition` and
+  cross-wave joins will silently give wrong answers.
+
+### Common false-positive-turned-real
+
+`panel_ids_targets_exist` at 40% miss rate on a first run is almost
+always a sign that the script built pre-walk IDs that don't match the
+roster's construction convention. Look at the sample IDs in the
+failure message and compare them against
+`Country(X).household_roster()`'s index for the named wave.
+
+`id_walk_idempotent` catching "disappeared" rows usually means the
+`updated_ids` dict contains a transitive chain `A → B → C` where `B`
+is both a key and a value. Resolve the chain in the script before
+writing `updated_ids.json`, or skip any entry whose `prev_i` appears
+as another household's `cur_i` in the same wave.
 
 ## Common pitfalls
 
