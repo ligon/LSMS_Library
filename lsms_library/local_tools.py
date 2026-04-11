@@ -1,3 +1,55 @@
+"""Low-level tooling shared by wave-level scripts and the Country class.
+
+This is the catch-all utility module that backs the library's data
+access, ID handling, categorical-mapping lookup, and wave-level feature
+extraction helpers. Most user-facing scripts only need a small slice of
+it; the library's public-facing alias ``lsms_library.tools`` points
+here.
+
+Key functions
+-------------
+- :func:`get_dataframe` — the single entry point for reading
+  ``.dta``/``.csv``/``.parquet`` files. Fallback chain: local file on
+  disk → DVC filesystem → World Bank NADA download. Wave-level scripts
+  should always use this over :func:`pd.read_stata` or
+  :func:`dvc.api.open` directly.
+- :func:`to_parquet` — the single entry point for writing parquet
+  caches. Redirects relative paths to ``data_root()`` via
+  :func:`_resolve_data_path`, which infers country/wave from the call
+  stack so a wave-level script writing ``foo.parquet`` lands under
+  ``~/.local/share/lsms_library/{Country}/{wave}/_/foo.parquet``.
+- :func:`df_data_grabber` — the YAML path's extraction engine. Given a
+  source ``.dta`` file and ``idxvars``/``myvars`` mappings (with
+  optional formatting functions), returns a DataFrame with the
+  canonical index and columns.
+- :func:`format_id` — canonical string-format helper for household,
+  cluster, and person IDs. Handles both numeric and string inputs with
+  optional zero-padding. Auto-applied to ``idxvars`` by
+  :func:`df_data_grabber`, but NOT to ``myvars`` — see ``CLAUDE.md``.
+- :func:`id_walk` — applies a country's ``updated_ids`` mapping to
+  rewrite household IDs into a canonical wave's coordinates. Idempotent
+  when the ``df.attrs['id_converted']`` flag is preserved; see the
+  panel-ID section of ``CLAUDE.md`` for the :meth:`.set_index` caveat.
+- :func:`panel_ids` — returns households observed in at least two
+  waves after applying ``id_walk``.
+- :func:`map_index` — remaps an old parquet's index structure to the
+  new scheme declared in ``data_info.yml``.
+- :func:`get_categorical_mapping` — reads a named org-mode table
+  (typically ``harmonize_food``, ``unit``, ``shocks``) from the
+  country's ``categorical_mapping.org`` and returns it as a dict.
+- :func:`get_formatting_functions` — loads the per-wave Python module
+  of formatting helpers referenced by ``data_info.yml``.
+
+Conventions
+-----------
+Scripts in ``{Country}/{wave}/_/`` run from that directory, so
+``../Data/file.dta`` is the standard relative path. :func:`get_dataframe`
+and :func:`to_parquet` both rely on :func:`_resolve_data_path` to
+translate such paths to either a source location or a cache location
+under ``data_root()``.
+
+See ``CLAUDE.md`` for the full anti-pattern list and data-access rules.
+"""
 from __future__ import annotations
 
 from lsms.tools import get_food_prices, get_food_expenditures, get_household_roster, get_household_identification_particulars
@@ -792,6 +844,15 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True) -> pd.DataF
 from collections import UserDict
 
 class RecursiveDict(UserDict):
+    """Dict whose ``__getitem__`` transitively dereferences chained values.
+
+    Used to collapse household-ID rewrite chains like ``A → B → C`` into
+    a single lookup: ``RecursiveDict({'A': 'B', 'B': 'C'})['A'] == 'C'``.
+    Keys that are not themselves values are returned unchanged. Backs
+    :func:`id_walk` when applying a country's ``updated_ids`` mapping
+    across waves. See the "Panel ID Transitive Chains" section of
+    ``CLAUDE.md`` for the downstream consequences of getting this wrong.
+    """
     def __init__(self,*arg,**kw):
       super(RecursiveDict, self).__init__(*arg, **kw)
 

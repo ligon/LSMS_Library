@@ -60,6 +60,36 @@ def format_interval(interval):
         return f"{int(interval.left):02d}-{int(interval.right-1):02d}"
 
 def roster_to_characteristics(df, age_cuts=(0,4,9,14,19,31,51), drop = 'pid', final_index = ['t','v','i']):
+    """Collapse a household roster into household-level sex × age counts.
+
+    Drives the derived ``household_characteristics`` table: takes a
+    person-level roster indexed by (at least) ``('t', 'v', 'i', 'pid')``,
+    buckets each person into a ``sex_age`` category, and returns a
+    household-level DataFrame with one integer column per bucket plus a
+    ``log HSize`` column (log of household size). Called automatically
+    via :data:`lsms_library.country._ROSTER_DERIVED` when a user asks
+    ``Country(name).household_characteristics()``.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Household roster with ``Sex`` and ``Age`` columns (case-insensitive).
+    age_cuts : tuple[int, ...]
+        Upper bounds for age buckets; ``(0, 4, 9, 14, 19, 31, 51)`` by
+        default, producing the buckets ``00-03``, ``04-08``, …, ``51+``.
+    drop : str
+        Index level to drop before aggregation (typically ``'pid'``).
+    final_index : list[str]
+        Final groupby level; defaults to the household key ``('t', 'v',
+        'i')`` but ``Country._finalize_result`` can pass a different
+        tuple when the roster's actual index differs.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Household-level counts with one column per sex × age bucket and
+        a ``log HSize`` column.
+    """
     roster_df = df.copy()
     roster_df.columns = roster_df.columns.str.lower()
     # Clean stringified NA sentinels that leak through from to_parquet/astype(str)
@@ -81,6 +111,41 @@ def roster_to_characteristics(df, age_cuts=(0,4,9,14,19,31,51), drop = 'pid', fi
     return result
 
 def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=['t','m','i'], unit_col = 'u'):
+    """Infer local-unit → kg conversion factors from price ratios.
+
+    For each unit that does not appear in :data:`KNOWN_METRIC`, this
+    function computes a factor by assuming the *price per kilogram*
+    should be roughly constant across units for the same item/market.
+    That is: if a "bunch" of item j trades at roughly 2× the unit value
+    of a kg of item j, the inferred factor is 2 kg per bunch.
+
+    The mechanics: expenditure is divided by quantity to get a per-unit
+    price, grouped to the ``index`` level (default ``('t','m','i')``),
+    then the median across rows is compared to the unit-wise median to
+    back out kg per unit. Used by :func:`_get_kg_factors` as a fallback
+    when a survey doesn't ship its own conversion table.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Food-acquired frame with ``Expenditure`` and ``Quantity``
+        columns and ``u`` (or ``unit_col``) in the index.
+    price : list[str]
+        Column(s) interpreted as expenditure for the ratio calculation.
+    quantity : str
+        Column interpreted as quantity.
+    index : list[str]
+        Groupby levels for the per-item/period median step.
+    unit_col : str
+        Name of the unit index level; renamed to ``u`` if different.
+
+    Returns
+    -------
+    dict[str, float]
+        Mapping of (lowercased) unit label → inferred kg factor.
+        Units already in :data:`KNOWN_METRIC` or that cannot be inferred
+        are absent from the output.
+    """
     v = df.copy()
     v = v.replace(0, np.nan)
     unit_conversion = {

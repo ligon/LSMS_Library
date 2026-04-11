@@ -1,4 +1,21 @@
 #!/usr/bin/env python3
+"""Interactive DVC credential unlock for the library's S3 read cache.
+
+This is the fallback path for users who don't have a World Bank
+Microdata API key but still want access to the S3-cached ``.dta``
+files. It prompts for a shared passphrase, decrypts
+``s3_reader_creds.gpg`` with ``gnupg``, and writes the plaintext
+credentials to the DVC config's expected location.
+
+The preferred (non-interactive) path runs automatically at import time
+via :mod:`lsms_library.data_access` when a valid ``MICRODATA_API_KEY``
+is present — that path uses an obfuscated passphrase baked into source
+(cosmetic anti-grep, not a security gate). :func:`authenticate` in this
+module is only reached when auto-unlock fails or is explicitly
+requested via ``lsms_library.authenticate()``.
+
+See ``CLAUDE.md`` "Three-Tier Credential Model" for the full rationale.
+"""
 import git
 from pathlib import Path
 import getpass

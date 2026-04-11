@@ -1,4 +1,17 @@
-# AI Agent
+"""GPT-based helper for suggesting categorical harmonization mappings.
+
+Experimental tooling that sends a DataFrame of raw survey labels to an
+OpenAI chat model and asks it to propose canonical "Preferred Label"
+matches. Used as a drafting aid for maintainers filling out the
+``#+NAME: harmonize_food`` and ``#+NAME: unit`` tables in a country's
+``categorical_mapping.org``. Output is always reviewed by a human before
+being committed — the library itself never calls this module at runtime.
+
+Requires the ``openai`` package and an API key (set via the ``api_key``
+module-level variable or looked up from ``authinfo``). Not part of the
+public API and not loaded by :mod:`lsms_library.__init__` unless
+explicitly imported.
+"""
 import pandas as pd
 from ligonlibrary import authinfo
 import openai

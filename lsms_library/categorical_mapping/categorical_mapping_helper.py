@@ -1,3 +1,22 @@
+"""String-similarity helpers for drafting categorical mapping tables.
+
+Lightweight NLP utilities used when bootstrapping a country's
+``categorical_mapping.org`` from raw survey labels. The main operations
+are:
+
+- :func:`regularize_string` — strip accents, lowercase, and spell-check
+  via TextBlob so that "Sécheresse" and "secheresse" land in the same
+  bucket before similarity scoring.
+- :func:`preprocess` / :func:`get_label_vector` — turn a list of raw
+  labels into feature vectors keyed on cleaned tokens.
+- :func:`get_cosine_similarity` — score two label vectors so the
+  maintainer can propose the highest-ranked canonical label for each
+  raw variant.
+
+Like :mod:`.ai_agent`, this is a drafting aid for maintainers — the
+library does not call these functions at runtime, and the output is
+always reviewed by a human before being committed.
+"""
 import pandas as pd
 import numpy as np
 import re

@@ -36,6 +36,13 @@ from .yaml_utils import load_yaml
 
 @dataclass
 class Check:
+    """A single named sanity-check result.
+
+    Produced by the individual check functions in this module and
+    collected into a :class:`SanityReport`. ``status`` is one of
+    ``"pass"``, ``"warn"``, or ``"fail"``; :attr:`ok` is true for
+    anything except ``"fail"``.
+    """
     name: str
     status: str          # "pass", "warn", "fail"
     message: str = ""
@@ -47,6 +54,13 @@ class Check:
 
 @dataclass
 class SanityReport:
+    """Aggregated result of running a feature's sanity checks.
+
+    Returned by :func:`is_this_feature_sane`. Holds the country and
+    feature name, the ordered list of :class:`Check` results, and
+    helpers for filtering / printing. :attr:`ok` is true when every
+    check passed or merely warned.
+    """
     country: str
     feature: str
     checks: list[Check] = field(default_factory=list)

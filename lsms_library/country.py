@@ -1,4 +1,32 @@
 #!/usr/bin/env python3
+"""Country-level aggregation of LSMS-ISA survey data.
+
+This module defines the library's two core runtime classes:
+
+- :class:`Country` — the primary user-facing interface. Exposes the
+  country's waves, data scheme, and one method per table registered in
+  ``{Country}/_/data_scheme.yml`` (plus derived tables dispatched via
+  ``__getattr__`` using :data:`_ROSTER_DERIVED` / :data:`_FOOD_DERIVED`).
+  Table methods aggregate across waves, consult the parquet cache under
+  ``data_root()``, and return a DataFrame through :meth:`_finalize_result`
+  — which applies kinship expansion, canonical spelling enforcement,
+  dtype coercion, and the :meth:`_join_v_from_sample` cluster-index
+  augmentation.
+
+- :class:`Wave` — a view into a single wave of a single country. Used
+  internally by :class:`Country` to drive wave-level extraction via
+  :func:`~lsms_library.local_tools.df_data_grabber`.
+
+The module also defines :class:`StageInfo`, a small dataclass describing
+a single DVC stage entry discovered from the stage layer's ``dvc.yaml``
+files (Uganda, Senegal, Malawi, Togo, Kazakhstan, Serbia, GhanaLSS).
+
+Cache behavior is documented in ``CLAUDE.md`` — in brief, v0.7.0+ does a
+best-effort cache read at the top of :func:`load_dataframe_with_dvc`
+before consulting DVC; set ``LSMS_NO_CACHE=1`` to bypass it. The cache
+stores pre-transformation data, and all harmonization happens at API
+read time inside :meth:`Country._finalize_result`.
+"""
 from __future__ import annotations
 
 import pandas as pd
@@ -57,6 +85,28 @@ def _slugify(value: str) -> str:
 
 @dataclass(frozen=True)
 class StageInfo:
+    """Pointer to a single materialize stage in a country's ``dvc.yaml``.
+
+    Collected by :func:`_load_materialize_stage_map` from every
+    ``dvc.yaml`` under the countries directory. Drives the legacy stage
+    layer used by the 7 stage-layer countries (Uganda, Senegal, Malawi,
+    Togo, Kazakhstan, Serbia, GhanaLSS); retires with v0.8.0.
+
+    Attributes
+    ----------
+    stage_key : str
+        Unique key within the ``materialize.foreach`` block.
+    stage_ref : str
+        Fully qualified stage reference
+        (``{yaml_rel}:materialize@{stage_key}``) usable with
+        ``dvc repro``.
+    country, wave, table : str | None
+        Identifiers extracted from the stage's parameters.
+    fmt : str
+        Output format, usually ``parquet``.
+    output_path : Path
+        Resolved absolute path where the stage writes its output.
+    """
     stage_key: str
     stage_ref: str
     country: str
