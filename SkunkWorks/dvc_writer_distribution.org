@@ -1,0 +1,199 @@
+#+TITLE: DVC Writer Access — Design Notes
+#+filetags: skunkworks dvc lsms_library
+
+* Background
+
+The LSMS_Library DVC remote is an S3 bucket. Read access is broadly
+available (see ~lsms_library.data_access~ and the auto-unlock
+mechanism in ~_auto_unlock_s3~); write access is more restricted
+and is the subject of these notes.
+
+** Read access (existing)
+
+Read access is granted via a service-account IAM user whose
+credentials are bundled with the package in encrypted form
+(GPG-symmetric, with an obfuscated passphrase) and decrypted at
+runtime by ~_auto_unlock_s3~. The intent is "anyone using the
+~lsms-library~ package can pull data without manual setup", with
+the encryption serving as a speed-bump against credential scrapers
+rather than as real protection. The bucket contents are public-ish
+research data (LSMS-ISA survey data, mostly already available via
+the World Bank Microdata Library) so the threat model is benign.
+
+** Write access (the design question)
+
+For writing, the choice is between:
+
+1. /A single shared service-account credential/, distributed to
+   anyone who needs to ~dvc push~. Loses per-person accountability
+   in CloudTrail; rotation requires re-distributing to everyone.
+2. /Per-person IAM users/, each with their own access key, all
+   members of a single ~dvc_writer~ IAM group. Lifecycle is
+   create-on-onboarding, delete-on-offboarding.
+3. /SSO via Berkeley's AWS Identity Center/. Modern, no long-term
+   keys, but Berkeley's IdC is wired exclusively to CalNet, so it
+   only works for Berkeley-affiliated people.
+
+We use option 2. SSO covers internal Berkeley collaborators who
+have CalNet identities (and is preferred for them); per-person IAM
+users cover everyone else, including external collaborators at
+other institutions and short-term RAs who don't want to deal with
+sponsored CalNet provisioning.
+
+* The dvc_writer group
+
+There is a ~dvc_writer~ IAM group in the relevant AWS account,
+with a custom policy attached. The policy is narrowly scoped to
+~s3://dvcbucket0~ only:
+
+#+begin_src json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    { "Effect": "Allow",
+      "Action": ["s3:ListBucket"],
+      "Resource": "arn:aws:s3:::dvcbucket0" },
+    { "Effect": "Allow",
+      "Action": ["s3:PutObject", "s3:GetObject"],
+      "Resource": "arn:aws:s3:::dvcbucket0/*" }
+  ]
+}
+#+end_src
+
+Notable design choices:
+
+- *Bucket-scoped:* writers cannot touch any other bucket in the
+  same AWS account.
+- *No DeleteObject:* writers can put new objects (or overwrite
+  existing ones), but not delete. This makes the bucket
+  semi-append-only — destructive cleanup requires admin
+  permissions.
+- *No bucket-policy or CORS modification:* writers cannot change
+  the bucket's own access policy, only its contents.
+
+These limits make it relatively safe to distribute write
+credentials to short-term collaborators without worrying about
+collateral damage.
+
+* Tooling: scripts/dvc_writer
+
+A single helper script in [[file:../scripts/dvc_writer]] automates
+the full lifecycle of write-access IAM users via subcommands:
+
+#+begin_src sh
+dvc_writer add    USERNAME    # provision a new writer
+dvc_writer remove USERNAME    # tear down an existing writer
+dvc_writer ls                 # list current writers + key status
+dvc_writer help               # show usage and current config
+#+end_src
+
+Aliases: ~remove~ → ~rm~ / ~delete~; ~ls~ → ~list~;
+~help~ → ~-h~ / ~--help~.
+
+The script reads ~LSMS_AWS_ACCOUNT~ and ~LSMS_AWS_ADMIN_PROFILE~
+either from the environment or from a shell-sourceable file at
+~$LSMS_CONFIG_DIR/env.sh~ (defaulting to ~~/.config/lsms_library/env.sh~,
+matching the convention in ~lsms_library/config.py~). Set those
+secrets in your dotfiles repo / git-crypted location, NOT in any
+file tracked here.
+
+** add USERNAME
+
+- Validates the username against the lab convention
+  (~^[a-z][a-z0-9_]+$~)
+- Confirms the SSO admin profile is authenticated and pointed at
+  the configured account
+- Refuses if a user with that name already exists
+- Creates the IAM user, adds to ~dvc_writer~, generates an access
+  key
+- Saves the credentials to a per-invocation mode-600 file under
+  ~$XDG_CACHE_HOME/lsms-library/~ — never to stdout, so the
+  secret stays out of terminal scrollback
+- Prints the file path and clear next steps: open the file in an
+  editor, copy the credential block into a secure delivery
+  channel, then ~shred -u~ the file
+
+** remove USERNAME
+
+- Pre-flight: profile + account check
+- Confirms the user exists
+- Displays current state: groups, access keys with last-used
+  dates, attached and inline policies
+- Prompts for explicit ~yes~ confirmation
+- Detaches policies, removes from groups, deletes keys, deletes
+  any console login profile, deletes the user
+- Verifies the user is gone before exiting
+
+** ls
+
+Lists every member of the ~dvc_writer~ group along with each
+member's access key ID, status (Active / Inactive), and last-used
+date. Useful for periodic audits ("does anyone in here look like
+they haven't touched the bucket in a year?") and for quickly
+answering "who has write access right now?"
+
+** help
+
+Prints the subcommand summary plus the *current* values of
+~LSMS_AWS_ACCOUNT~, ~AWS_PROFILE~, and ~LSMS_CONFIG_DIR~ as the
+script sees them — useful when debugging "why isn't this finding
+my account."
+
+** Setting up your environment to use this script
+
+Before running ~dvc_writer~, the following must be true:
+
+1. ~LSMS_AWS_ACCOUNT~ resolves to the 12-digit AWS account ID
+   containing the dvc_writer group. Either set it directly in
+   your environment, or write it (along with
+   ~LSMS_AWS_ADMIN_PROFILE~) into ~$LSMS_CONFIG_DIR/env.sh~ — the
+   script sources that file at startup if it exists. Keep this
+   file out of any public repo.
+2. You have an SSO profile with IAM admin permissions in that
+   account, set up via ~aws configure sso~ pointed at the
+   relevant Identity Center start URL.
+3. ~aws sso login --profile <your-admin-profile>~ has been run
+   recently enough that the SSO session token hasn't expired.
+4. ~AWS_PROFILE~ or ~LSMS_AWS_ADMIN_PROFILE~ is set to that admin
+   profile (~AWS_PROFILE~ wins if both are set). Or pass an
+   override inline: ~AWS_PROFILE=... dvc_writer add alice_oxford~.
+
+* Distribution channels for the access key
+
+Acceptable secure channels for delivering the new credential to
+the recipient:
+
+- *Google Keep* shared note (the same channel Berkeley IST uses
+  for faculty S3 credential distribution — proven to work
+  institutionally for this use case)
+- *Signal*
+- *GPG-encrypted email*, if the recipient has a known PGP key
+- *1Password / Bitwarden secure share*, if the recipient has an
+  account on the same service
+
+Not acceptable:
+
+- Plain email
+- Plain Slack/Teams DM
+- SMS
+- Leaving the credentials file on disk after distribution
+  (always ~shred -u~ when done)
+
+* Open questions / TODO
+
+** TODO Decide whether dvc_reader credentials warrant their own rotation
+The current "obfuscated public read" model works as long as
+~dvcbucket0~'s contents stay non-sensitive. If that assumption
+ever changes, the dvc_reader scheme should be reconsidered:
+either move to truly anonymous bucket policy (and accept that
+the data is then explicitly public), or move to a per-user read
+model (with the same per-person IAM user pattern as writes).
+
+** TODO Tighten the s3_bucket_readers policy scope (low priority)
+The reader-side IAM group uses the AWS-managed
+~AmazonS3ReadOnlyAccess~ policy, which grants read on /every/
+S3 bucket in the account, not just ~dvcbucket0~. For the
+current set of readers this is probably fine, but a tighter
+custom policy mirroring ~s3_bucket_writer~ would be cleaner if
+the account ever holds anything in other buckets that some
+readers shouldn't see.

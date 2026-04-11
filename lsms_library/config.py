@@ -24,7 +24,18 @@ from typing import Any
 
 
 def _config_dir() -> Path:
-    """Return the user config directory for lsms_library."""
+    """Return the user config directory for lsms_library.
+
+    Honors the ``LSMS_CONFIG_DIR`` environment variable if set, allowing
+    users to relocate the config directory (e.g. into a synced /
+    git-crypted dotfiles repo) without changing global ``XDG_CONFIG_HOME``.
+    Falls back to ``platformdirs.user_config_path()`` (which itself
+    honors ``XDG_CONFIG_HOME``), or a hardcoded default if platformdirs
+    is unavailable.
+    """
+    override = os.environ.get("LSMS_CONFIG_DIR", "").strip()
+    if override:
+        return Path(override).expanduser()
     try:
         import platformdirs
         return platformdirs.user_config_path("lsms_library")
