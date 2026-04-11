@@ -863,3 +863,69 @@ Tests in `TestLayer1Caching`:
   the new-data add cases the user pointed out)
 - `test_is_polluted_workspace_copy_false_on_bad_input`
 - `test_get_dataframe_warns_and_falls_through_on_polluted_workspace`
+
+## 2026-04-11 follow-up #4: Probe 7 end-to-end validation + docs reconciliation
+
+End-to-end measurements on the user's Linux workstation, after Pieces
+1+2 + change #1 + change #3 had landed and the workspace was clean:
+
+| Scenario | Time | Notes |
+|---|---|---|
+| Truly cold (~10 min in user's first run) | ~600 s | First-ever fetch, no caches anywhere |
+| Cold-cold (empty L1 + L2, two runs) | 464 s, 504 s | ~10 sequential `Repo.fetch` calls × ~11 s each + harmonization. ~10% variance is bigger than the cost of any individual checkout step would have been -- confirms that change #1 (`Repo.pull` -> `Repo.fetch`) is a correctness fix, not a cold-case performance fix |
+| **L2-cold L1-warm** | **71.6 s** | The headline measurement. ~7× speedup vs cold-cold. Sidecar pre-check in `_ensure_dvc_pulled` finds blobs in `~/.local/share/lsms_library/dvc-cache/` and short-circuits before `Repo.fetch` -- evidenced by the absence of any `Collecting / Fetching` progress lines |
+| All-warm (v0.7.0 Layer 2 hit) | 0.5 s | Unchanged from baseline. No regression |
+
+Workspace pollution check after cold-cold:
+`find lsms_library/countries -type f -name '*.dta'` returns nothing.
+`Repo.fetch` does not check files out to the package tree.
+
+Cache directory after cold-cold:
+`~/.local/share/lsms_library/dvc-cache/` = 19 MB, with both layouts
+populated (top-level prefix dirs `1e/`, `59/`, ... for legacy
+`md5-dos2unix` blobs and a `files/` subdir for DVC 3.x raw-md5 blobs).
+The dual-layout pre-check correctly handles both.
+
+### Piece 3 — docs reconciliation (this commit)
+
+Probe 7's validation unblocked the docs rewrite that was originally
+deferred from the v0.7.0 plan.  Three files updated:
+
+- **`docs/guide/caching.md`** -- substantive rewrite. New "Two Cache
+  Layers" table at the top, accurate cross-session-behavior section
+  reflecting v0.7.0 (no "v0.6.0 inconsistent" framing), new "package
+  tree never contains DVC-tracked data" section explaining the
+  architectural rule and the cleanup warning, new "Adding new data
+  files" section covering both the manual and the WB-fallback
+  workflows, fixed Build Backends table (removed obsolete "write-only
+  until v0.7.0" claim, added the make backend's bypass-everything
+  caveat, added the Savio Python 3.6.8 footnote on the DVC stage
+  layer).
+- **`docs/index.md`** line 55 -- updated bullet from "Parquet Cache"
+  (single layer) to "Two-Layer Cache" (DVC blob + harmonized
+  parquet), with a note about the v0.7.0 0.5 s warm number.
+- **`slurm_logs/DESIGN_dvc_layer1_caching.md`** -- this follow-up #4
+  appendix recording the Probe 7 numbers and the docs commit.
+
+### Optional follow-ups (not in this branch)
+
+1. **Batched fetch at the Country level**: collapse the ~10 sequential
+   `Repo.fetch` calls in the cold case to one batched call. ~80 s
+   savings on cold runs. Worth doing if cold runs become a frequent
+   user complaint; the cold case is a one-time cost per
+   `(country, machine)` pair so it may not be worth the complexity.
+2. **Migrate `.dvc` sidecars to DVC 3.0 hashes**: `dvc cache migrate`
+   + regenerate every sidecar under `countries/` to use raw `md5`
+   instead of `md5-dos2unix`. Eliminates the legacy hash code path
+   entirely. Significant git churn, S3 cleanup via `dvc gc -c`,
+   coordinated with anyone working on the data side. Decoupled from
+   this branch by the dual-layout pre-check.
+3. **One-time operational cleanup** for hosts with prior workspace
+   pollution from old `Repo.pull`-based versions or manual
+   `dvc pull` invocations:
+
+       find lsms_library/countries -type f -name '*.dta' \
+           -execdir test -e '{}.dvc' \; -delete
+
+   The library will warn until the user runs this; the warnings are
+   the intended signal.
