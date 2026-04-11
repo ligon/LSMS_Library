@@ -243,8 +243,24 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         except (TypeError,ValueError): # Needs filename?
             df = read_file(fn,convert_categoricals=convert_categoricals,encoding=encoding)
     elif file_system_path(fn):
+        # Layer-1 caching: pass cache_remote_stream=True so DVC writes
+        # the streamed blob to its local cache as a side effect of the
+        # open.  This was added in iterative/dvc#9183 and is opt-in;
+        # without it, every cold call streams from S3 again, even when
+        # the identical content-addressed blob was just streamed by a
+        # sibling call (or a sibling process).  See
+        # slurm_logs/DESIGN_dvc_layer1_caching.md for the full design.
+        #
+        # The two-step open lets us catch a TypeError raised by an
+        # older-than-3.x DVC that doesn't recognize the kwarg, while
+        # keeping the existing TypeError fallback for read_file()
+        # needing a filename rather than a file handle.
         try:
-            with DVCFS.open(fn,mode='rb') as f:
+            fh = DVCFS.open(fn, mode='rb', cache_remote_stream=True)
+        except TypeError:
+            fh = DVCFS.open(fn, mode='rb')
+        try:
+            with fh as f:
                 df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
         except TypeError: # Needs filename?
             df = read_file(fn,convert_categoricals=convert_categoricals,encoding=encoding)

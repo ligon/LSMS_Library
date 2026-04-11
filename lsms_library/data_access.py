@@ -1143,8 +1143,13 @@ def get_data_file(path: str | Path,
     )
     if dvc_readable:
         try:
-            from dvc.api import DVCFileSystem
-            fs = DVCFileSystem(os.fspath(_COUNTRIES_DIR))
+            # Reuse the module-level DVCFS singleton from local_tools
+            # rather than constructing a fresh DVCFileSystem here.
+            # Same root, same config; the singleton avoids paying the
+            # ~0.5-2s DVC handle construction cost on every WB-API
+            # fallback fetch.  See slurm_logs/DESIGN_dvc_layer1_caching.md
+            # ("Hot spot 2") for the full rationale.
+            from .local_tools import DVCFS as fs
             dvc_path = str(path)
             if fs.exists(dvc_path):
                 abs_path.parent.mkdir(parents=True, exist_ok=True)
