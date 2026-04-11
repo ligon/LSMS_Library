@@ -495,3 +495,142 @@ Re-run the Section 3 diagnostic. Expected changes:
 - [iterative/dvc#9030 — dvc does not cache stream opened files](https://github.com/iterative/dvc/issues/9030)
 - [iterative/dvc#9183 — add `cache_remote_stream` kwarg](https://github.com/iterative/dvc/pull/9183)
 - [iterative/dvc#9382 — `dvc.api.open` disregards cache folder from config](https://github.com/iterative/dvc/issues/9382)
+
+## Empirical verification (added 2026-04-11)
+
+**Status update:** Change 1 above (`cache_remote_stream=True`) was
+implemented in commit `3ad235f0` and **reverted in commit `e203a430`**
+because it does not work in our installed DVC 3.67.0.  The diagnostic
+this design proposes is correct about *what* is broken (Layer 1 is
+dormant, S3 fetches are not cached) but **wrong about the fix**.
+
+What we found by running the diagnostic recipe end-to-end:
+
+### 1. The cache.dir on this system is not `~/.cache/dvc/`
+
+`~/.config/dvc/config` (the global DVC config) overrides `cache.dir`:
+
+```ini
+[cache]
+    dir = /global/scratch/users/ligon/.dvc/cache
+    type = copy
+```
+
+That cache exists, is 80 GB, and was last meaningfully populated on
+2026-04-02 — presumably from someone running `dvc pull` historically.
+The Section 2 diagnostic ("inspect `~/.cache/dvc`") will report the
+location as missing on this host, but that's because DVC is using a
+different directory entirely; it isn't evidence that nothing has ever
+been cached.
+
+### 2. The kwarg name is `cache`, not `cache_remote_stream`
+
+In DVC 3.67.0, `dvc/fs/dvc.py:355-369` reads:
+
+```python
+def _open(self, path, mode="rb", **kwargs):
+    ...
+    return dvc_fs.open(dvc_path, mode=mode, cache=kwargs.get("cache", False))
+```
+
+The `cache_remote_stream` kwarg referred to in iterative/dvc#9183
+either was renamed before merging or refers to a different DVC
+version path.  Our 3.67.0 silently accepts and drops
+`cache_remote_stream` via `**kwargs` — no `TypeError`, no warning,
+no cache write.
+
+### 3. Even the correct kwarg name (`cache=True`) does not populate the cache
+
+Direct probe with the actual 3.67 kwarg name:
+
+```
+file: Niger/2018-19/Data/grappe_gps_ner2018.dta  (35 KB)
+DVCFS.open(fn, mode='rb', cache=True)
+  open+read: 116.85s, size=35366
+  expected cache: /global/scratch/users/ligon/.dvc/cache/files/md5/dc/03f1832290d7a76db5c7d6d3f1438c
+  exists after open: False
+```
+
+So `cache=True` is forwarded by `_DVCFileSystem._open` to
+`DataFileSystem.open(..., cache=True)`, but the inner method does
+not trigger a write to the local cache directory in this version.
+
+### 4. `DVCFileSystem.get_file()` also does not populate the cache
+
+The "use the explicit download API" alternative also failed:
+
+```
+file: Niger/2018-19/Data/s00a_co_ner2018.dta  (2026 bytes)
+DVCFS.get_file(remote, local_temp)
+  111.41s, downloaded 2026 bytes (correct content)
+  expected cache file at /global/scratch/users/ligon/.dvc/cache/
+    files/md5/9f/0b129c17e66a7f5b36dc68660683fb
+  exists after get_file: False
+```
+
+So neither `DVCFileSystem.open()` nor `DVCFileSystem.get_file()` writes
+to the local DVC cache in 3.67.0, regardless of kwargs.  The
+DVCFileSystem class genuinely has no stream-and-cache mode in this
+version.
+
+### 5. End-to-end Niger run from a fresh clone
+
+The `bench/run_bench.sh Niger household_roster` benchmark from a fresh
+`git clone` (no local `.dta` files, no cached parquets):
+
+```
+RUN 1 (cold-cache subprocess):
+  import lsms_library                          22.948s
+  Country('Niger')                              0.013s
+  household_roster() #1 (cold)                363.410s   <-- S3 stream
+  household_roster() #2 (warm in-proc)          0.784s
+
+RUN 2 (fresh subprocess, data_root populated by RUN 1):
+  household_roster() #1 (cold)                  1.103s   <-- v0.7.0 layer-2 fix
+  household_roster() #2 (warm in-proc)          0.498s
+
+dvc cache state after the run:
+  /global/scratch/users/ligon/.dvc/cache: unchanged (no new md5 files)
+```
+
+Confirms (a) the v0.7.0 layer-2 fix at `country.py:1611-1812` works as
+designed even from a clean state (363s cold → 1.1s cross-process), and
+(b) layer 1 is genuinely dormant because the kwarg-based approach is a
+no-op.  **The 363-second cold S3 cost is unavoidable on every fresh
+layer-2 cache miss until layer 1 is fixed by other means.**
+
+### What still might work for Layer 1
+
+The path that definitely populates the cache is **`Repo.pull()`** (or
+the equivalent CLI `dvc pull`).  The 80 GB existing cache is evidence
+of this — it was built that way over many months.  An eventual layer-1
+fix would call `Repo.pull(targets=[remote_path])` programmatically
+inside `get_dataframe`, before the fall-through to `DVCFS.open()`,
+when the file is dvc-tracked but not locally present.  Heavier than
+streaming-with-side-effect-caching but it actually populates the
+cache.  Deferred to a future session.
+
+### Status of the proposed Changes 1-5
+
+| # | Description | Status |
+|---|---|---|
+| 1 | `cache_remote_stream=True` at `local_tools.py:247` | **Reverted in `e203a430`** — kwarg silently dropped, doesn't populate cache.  Both `cache_remote_stream` and the actual 3.67 kwarg `cache` are no-ops. |
+| 2 | Co-locate DVC cache under `data_root()` | Not needed: existing `~/.config/dvc/config` already overrides `cache.dir` to scratch.  Changing it would orphan the existing 80 GB cache. |
+| 3 | Memoize `Repo` per `Country` | Not yet implemented.  Lower priority because the v0.7.0 layer-2 cache read at `country.py:1611-1638` bypasses the `Repo` construction entirely on warm-cache reads, which is the dominant path. |
+| 4 | Reuse `DVCFS` singleton in `data_access.get_data_file()` | **Implemented in `3ad235f0`** and kept (the revert in `e203a430` only reverted Change 1).  Saves the per-call DVC handle construction cost on every WB-API fallback fetch. |
+| 5 | Route all `dvc.api.open()` through `DVCFS` | Not implemented.  Defer with the rest of layer 1.  No urgency given that layer 2 is the dominant fast path. |
+
+### Bottom line
+
+- The Layer 2 (parquet) v0.7.0 fix in `country.py:1611-1812` is the
+  user-visible win.  Empirically validated end-to-end on Niger
+  (17× cross-process speedup) and Tanzania (4:26 → 163ms).
+- The Layer 1 (DVC blob) caching path proposed in this doc does
+  **not** work in DVC 3.67.0 via kwargs on `DVCFileSystem.open()` or
+  `DVCFileSystem.get_file()`.  A real layer-1 fix needs `Repo.pull()`,
+  deferred to a future session.
+- The `data_access.get_data_file()` singleton-reuse cleanup
+  (Change 4) is in and works as expected.
+- The `~/.cache/dvc/` location referenced earlier in this doc is
+  misleading on this host — the real cache lives at
+  `/global/scratch/users/ligon/.dvc/cache/` per the global DVC config.
