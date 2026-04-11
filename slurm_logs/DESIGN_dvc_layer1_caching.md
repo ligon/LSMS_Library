@@ -634,3 +634,298 @@ cache.  Deferred to a future session.
 - The `~/.cache/dvc/` location referenced earlier in this doc is
   misleading on this host — the real cache lives at
   `/global/scratch/users/ligon/.dvc/cache/` per the global DVC config.
+
+## 2026-04-11 follow-up: Layer 1 caching restored via runtime config override + Repo.pull
+
+The "deferred to a future session" item above landed in the same
+afternoon.  The breakthrough was reframing the question: instead of
+asking "how do we make `DVCFileSystem.open()` populate the cache",
+ask "how do we make `DVCFileSystem.open()` *read* from a populated
+cache".  Reading from a populated cache is automatic in DVC 3.67.0
+via `DataFileSystem._get_fs_path` iterating
+`["cache", "remote", "data"]`; the only thing needed is to wire up
+`info.cache` correctly via a runtime `config={"cache": {"dir": X}}`
+override on the `DVCFileSystem` constructor.
+
+### Probes that landed it
+
+- **Probe 1 (storage_map inspection)**: confirmed the runtime config
+  override propagates from `DVCFileSystem(..., config=...)` through
+  `fs.repo` to every index entry's `storage_map[key].cache`.  The
+  `info.cache` is a real `LocalHashFileDB` rooted at the override
+  directory.
+- **Probe 2 (cwd footgun)**: first attempt at `Repo.pull(targets=[X])`
+  failed with `NoOutputOrStageError` because `Repo.pull` resolves
+  targets against `os.getcwd()`, not against the repo root.  Fix:
+  wrap the call in a chdir context manager (the same idiom
+  `country.py:1658` uses).
+- **Probe 2 (multi-MB end-to-end)**: cold S3 stream of a 7 MB Niger
+  file took **17.465 s**; warm cache read of the same file took
+  **0.010 s**.  ~1750× speedup, same order of magnitude as the
+  Layer 2 numbers reported above.
+- **Probe 2 (side-effect caching disproof)**: `DVCFileSystem.open()`
+  does **not** populate the cache as a side effect of streaming; the
+  empty cache stayed empty after the 17 s cold read.  This means
+  Layer 1 warming requires explicit `Repo.pull`, not a clever
+  `DVCFS.open` flag.
+
+### Critical correction to the layout discussion above
+
+The "two cache layouts coexist" interpretation in earlier versions of
+this doc was wrong.  The flat
+`{cache_dir}/{md5[:2]}/{md5[2:]}` layout we observed via `Repo.pull`
+is the **DVC 2.x cache layout**, used because the LSMS `countries/`
+sidecars carry `md5-dos2unix` hashes from the original DVC 2.x
+`dvc add`-s.  The DVC 3.0 cache layout is
+`{cache_dir}/files/md5/{md5[:2]}/{md5[2:]}`, used for sidecars with
+raw `md5` hashes.  DVC 3.x is backward-compatible and reads from
+both; `dvc cache migrate` is the explicit consolidation path.  See
+https://dvc.org/doc/user-guide/upgrade.
+
+`repo.cache.local.path` reports the DVC-3.x-native subpath
+(`{cache_dir}/files/md5`) regardless of which layout is in actual
+use; this is misleading diagnostic noise but not a bug.  The
+storage_map's `info.cache.odb.path` reports the legacy root, which
+is what `Repo.pull` actually writes to for legacy-hash sidecars.
+
+### What landed
+
+- `lsms_library/local_tools.py:33` — `DVCFS` now constructed with
+  `config={"cache": {"dir": data_root() / "dvc-cache"}}`.
+- `lsms_library/local_tools.py` — new `_ensure_dvc_pulled(fn)` helper
+  with sidecar pre-check (cache hit = two `os.path.exists` calls,
+  no DVC API), `_dvc_working_directory` cwd wrapper, dual-layout
+  blob lookup (DVC 2.x flat + DVC 3.0 `files/md5/`), full exception
+  swallowing.
+- `lsms_library/local_tools.py:get_dataframe` — calls
+  `_ensure_dvc_pulled(fn)` in the `file_system_path` branch before
+  the `DVCFS.open(fn)` stream.
+- `tests/test_dvc_caching.py` — new `TestLayer1Caching` class with
+  unit tests for: Piece 1 cache.dir override, sidecar pre-check
+  cache-hit short-circuit (both layouts), cache-miss falling
+  through to `Repo.pull`, error swallowing, cwd-independence
+  regression test, countries-relative path handling.
+
+### Follow-ups (separate workstreams)
+
+- **Migrate `.dvc` sidecars to DVC 3.0 hash algorithm**.  Run
+  `dvc cache migrate` and regenerate every sidecar under
+  `countries/`.  Eliminates the legacy hash code path entirely.
+  Significant git churn (every tracked `.dta`'s md5 changes), needs
+  `dvc gc -c` to clean orphaned legacy blobs from S3, needs CI
+  rebaseline if any tests hardcode hash values.  Decoupled from
+  this fix by the dual-layout pre-check.
+- **Probe 6 — `Repo.pull` cost characterization**.  Time cold and
+  warm `Repo.pull` calls for small/medium/large files; verify the
+  warm-pull cost is acceptable for the cache-miss fallback path.
+- **Probe 7 — End-to-end payoff measurement**.  Re-run the Niger
+  cold-rebuild benchmark with Pieces 1+2 in place; expected drop
+  from 363 s to ~10-30 s for the L2-cold / L1-warm case.
+- **Cache migration UX**.  When LSMS users on hosts with prior
+  `~/.cache/dvc/` populated by `dvc pull` CLI install this version,
+  they don't automatically benefit from those blobs because the
+  override pins the cache elsewhere.  Document the migration in
+  `docs/guide/caching.md` (Piece 3 of the plan).
+
+## 2026-04-11 follow-up #2: structural correction — `Repo.fetch` not `Repo.pull`
+
+After the initial fix landed (commit `8d333f8`), end-to-end smoke tests
+on the user's dev workstation revealed that the `_ensure_dvc_pulled`
+helper had a structural problem: it called `DVCFS.repo.pull(...)`,
+which is `Repo.fetch + Repo.checkout`.  The `checkout` step
+materializes the file in the workspace at its DVC-tracked path --
+**inside the package tree**.
+
+The user's hard architectural rule: *"we definitely don't want those
+dta files materializing in the package tree, regardless of who's
+responsible"*.  The package tree is for code and `.dvc` sidecars; data
+lives under `data_root()`.
+
+### Why this matters
+
+`Repo.pull`'s workspace-checkout side effect created a hidden coupling:
+
+1. First `get_dataframe` call on a fresh clone -> `Repo.pull` -> blob
+   in cache **and** file in workspace.
+2. Subsequent `get_dataframe` calls -> `local_file()` returns True
+   (workspace file exists) -> reads directly from disk -> the entire
+   DVC code path is short-circuited -> the cache (which we worked so
+   hard to populate correctly) is never read.
+
+The 1750x speedup from the multi-MB Probe 2 was measuring the right
+primitive in isolation but didn't reflect production behavior, because
+the production hot path never reached the `DVCFS.open` cache-read
+branch.  The user's "L2-cold L1-warm" timing of 43.1 s vs cold-cold
+of 41.4 s was the smoking gun: identical timings because both runs
+were going through the local-file path, with our Layer 1 helper
+silently bypassed.
+
+### The fix
+
+`Repo.pull` -> `Repo.fetch` in `_ensure_dvc_pulled`.  `Repo.fetch`
+populates the local cache without checking out to the workspace.
+After this change:
+
+1. First `get_dataframe` call on a fresh clone -> `Repo.fetch` -> blob
+   in cache, workspace untouched.
+2. Subsequent `get_dataframe` calls -> `local_file()` returns False
+   (no workspace file) -> falls into `file_system_path` ->
+   `_ensure_dvc_pulled` finds blob in cache (sidecar pre-check hit) ->
+   no fetch needed -> `DVCFS.open` reads from cache via the
+   `_get_fs_path[typ='cache']` branch.  The 1750x cache-read speedup
+   is now actually exercised in production.
+
+### Coordinated changes still needed (gated by probes)
+
+This commit lands change #1 (the fetch fix) only.  Two related
+changes are gated on a probe and a future commit:
+
+**Change #2: Path normalization at the `get_dataframe` boundary.**
+With workspace files no longer being materialized, `local_file()`
+returns False for DVC-tracked paths and we fall into
+`DVCFS.open('../Data/foo.dta')`.  But `DVCFS` is rooted at
+`_COUNTRIES_DIR` and its path normalization is fs-root-relative, so
+`'../Data/...'` may not resolve correctly.  **Probe needed**: from
+a wave-script-style cwd, call `DVCFS.open('../Data/foo.dta').read()`
+and see whether it works.  If yes, no change needed.  If no, add a
+canonicalizer in `_resolve_data_path` (or a sibling helper) to
+convert cwd-relative paths to fs-root-relative form before passing
+to DVCFS.
+
+**Change #3: Harden `local_file()` with a sister-sidecar check.**
+The right rule is "a file in the workspace is pollution iff it has
+a sister `.dvc` sidecar".  If yes, refuse to use it (force the DVC
+path so reads go through the cache).  If no, the file is either
+freshly downloaded new data being prepped for `dvc add`, or scratch
+data the user is supplying directly, or output from the
+WB-fallback auto-add path -- all legitimate uses.  Pure Python
+check at the call site, no filesystem permission tricks needed.
+The user considered (and rejected) a more aggressive read-only
+approach because the legitimate add-new-data workflows (manual
+per CONTRIBUTING.org, WB-fallback auto-add in
+`data_access.get_data_file`) need write access to those
+directories.
+
+**Cleanup task (separate one-time op)**: existing dev checkouts
+have `.dta` files under `lsms_library/countries/` from the prior
+`Repo.pull` behavior or from manual `dvc pull` invocations.
+Clean up with a safe filter that only deletes files where a sister
+`.dvc` sidecar exists:
+
+    find lsms_library/countries -type f -name '*.dta' \
+        -execdir test -e '{}.dvc' \; -print -delete
+
+Worth running on every dev workstation that's been used with the
+old behavior.
+
+### What landed in this commit
+
+- `lsms_library/local_tools.py:_ensure_dvc_pulled` -- one-line change:
+  `DVCFS.repo.pull(...)` -> `DVCFS.repo.fetch(...)`.  Plus updated
+  docstring explaining why fetch and not pull.
+- `lsms_library/local_tools.py:get_dataframe` -- comment update at
+  the call site to reflect the fetch rationale.
+- `tests/test_dvc_caching.py:TestLayer1Caching` -- 12 mock references
+  updated from `repo.pull` to `repo.fetch`.  Test docstrings updated.
+- `slurm_logs/DESIGN_dvc_layer1_caching.md` -- this follow-up #2
+  appendix.
+
+## 2026-04-11 follow-up #3: path-normalization probe and `local_file` hardening
+
+Two changes were originally gated on the path-normalization probe:
+
+**Probe result (this session)**: from a wave-script-style cwd
+(`cd lsms_library/countries/Niger/2018-19/_/`), calling
+`DVCFS.open('../Data/grappe_gps_ner2018.dta', mode='rb').read()`
+returned `35366` bytes -- the correct file content.  fsspec /
+DVCFileSystem already handles cwd-relative paths in this form.
+**Change #2 (path canonicalizer in `_resolve_data_path`) is not
+needed.**
+
+**Change #3 landed in this commit**: `_is_polluted_workspace_copy`
+helper + `local_file()` hardening.  The new helper returns True iff a
+file exists on disk *and* has a sister `.dvc` sidecar; `local_file()`
+calls it after a successful `open()` and, if True, emits a
+`UserWarning` and returns False to force the read through the DVC
+cache path.  Files without sidecars are still legitimate fast paths
+(new data being prepped for `dvc add`, scratch data, WB-fallback
+downloads).  The warning includes the cleanup command so users can
+fix their workspace.
+
+The hardening is opt-out only via the cleanup itself: until users
+remove the polluted workspace files under `lsms_library/countries/`,
+they will see warnings on every read.  That's the intended UX --
+the warnings are the symptom that signals the cleanup is needed.
+
+Tests in `TestLayer1Caching`:
+- `test_is_polluted_workspace_copy_true_when_sidecar_exists`
+- `test_is_polluted_workspace_copy_false_when_no_sidecar` (covers
+  the new-data add cases the user pointed out)
+- `test_is_polluted_workspace_copy_false_on_bad_input`
+- `test_get_dataframe_warns_and_falls_through_on_polluted_workspace`
+
+## 2026-04-11 follow-up #4: Probe 7 end-to-end validation + docs reconciliation
+
+End-to-end measurements on the user's Linux workstation, after Pieces
+1+2 + change #1 + change #3 had landed and the workspace was clean:
+
+| Scenario | Time | Notes |
+|---|---|---|
+| Truly cold (~10 min in user's first run) | ~600 s | First-ever fetch, no caches anywhere |
+| Cold-cold (empty L1 + L2, two runs) | 464 s, 504 s | ~10 sequential `Repo.fetch` calls × ~11 s each + harmonization. ~10% variance is bigger than the cost of any individual checkout step would have been -- confirms that change #1 (`Repo.pull` -> `Repo.fetch`) is a correctness fix, not a cold-case performance fix |
+| **L2-cold L1-warm** | **71.6 s** | The headline measurement. ~7× speedup vs cold-cold. Sidecar pre-check in `_ensure_dvc_pulled` finds blobs in `~/.local/share/lsms_library/dvc-cache/` and short-circuits before `Repo.fetch` -- evidenced by the absence of any `Collecting / Fetching` progress lines |
+| All-warm (v0.7.0 Layer 2 hit) | 0.5 s | Unchanged from baseline. No regression |
+
+Workspace pollution check after cold-cold:
+`find lsms_library/countries -type f -name '*.dta'` returns nothing.
+`Repo.fetch` does not check files out to the package tree.
+
+Cache directory after cold-cold:
+`~/.local/share/lsms_library/dvc-cache/` = 19 MB, with both layouts
+populated (top-level prefix dirs `1e/`, `59/`, ... for legacy
+`md5-dos2unix` blobs and a `files/` subdir for DVC 3.x raw-md5 blobs).
+The dual-layout pre-check correctly handles both.
+
+### Piece 3 — docs reconciliation (this commit)
+
+Probe 7's validation unblocked the docs rewrite that was originally
+deferred from the v0.7.0 plan.  Three files updated:
+
+- **`docs/guide/caching.md`** -- substantive rewrite. New "Two Cache
+  Layers" table at the top, accurate cross-session-behavior section
+  reflecting v0.7.0 (no "v0.6.0 inconsistent" framing), new "package
+  tree never contains DVC-tracked data" section explaining the
+  architectural rule and the cleanup warning, new "Adding new data
+  files" section covering both the manual and the WB-fallback
+  workflows, fixed Build Backends table (removed obsolete "write-only
+  until v0.7.0" claim, added the make backend's bypass-everything
+  caveat, added the Savio Python 3.6.8 footnote on the DVC stage
+  layer).
+- **`docs/index.md`** line 55 -- updated bullet from "Parquet Cache"
+  (single layer) to "Two-Layer Cache" (DVC blob + harmonized
+  parquet), with a note about the v0.7.0 0.5 s warm number.
+- **`slurm_logs/DESIGN_dvc_layer1_caching.md`** -- this follow-up #4
+  appendix recording the Probe 7 numbers and the docs commit.
+
+### Optional follow-ups (not in this branch)
+
+1. **Batched fetch at the Country level**: collapse the ~10 sequential
+   `Repo.fetch` calls in the cold case to one batched call. ~80 s
+   savings on cold runs. Worth doing if cold runs become a frequent
+   user complaint; the cold case is a one-time cost per
+   `(country, machine)` pair so it may not be worth the complexity.
+2. **Migrate `.dvc` sidecars to DVC 3.0 hashes**: `dvc cache migrate`
+   + regenerate every sidecar under `countries/` to use raw `md5`
+   instead of `md5-dos2unix`. Eliminates the legacy hash code path
+   entirely. Significant git churn, S3 cleanup via `dvc gc -c`,
+   coordinated with anyone working on the data side. Decoupled from
+   this branch by the dual-layout pre-check.
+3. **One-time operational cleanup** for hosts with prior workspace
+   pollution from old `Repo.pull`-based versions or manual
+   `dvc pull` invocations:
+
+       find lsms_library/countries -type f -name '*.dta' \
+           -execdir test -e '{}.dvc' \; -delete
+
+   The library will warn until the user runs this; the warnings are
+   the intended signal.
