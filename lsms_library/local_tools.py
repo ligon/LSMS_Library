@@ -154,6 +154,35 @@ def _ensure_dvc_pulled(fn) -> None:
     except Exception:
         pass
 
+
+def _is_polluted_workspace_copy(fn) -> bool:
+    """True if *fn* exists on disk AND has a sister ``.dvc`` sidecar.
+
+    A workspace copy of a DVC-tracked file is pollution from a checkout
+    side effect (e.g., ``dvc pull`` from the package tree, or a third-
+    party tool that did the equivalent).  The DVC cache (under
+    ``data_root()``) is the canonical location for tracked data; the
+    package tree is for code and ``.dvc`` sidecars only.
+
+    This helper is used by ``local_file`` inside ``get_dataframe`` to
+    refuse the workspace copy and force the read through the DVC cache
+    path instead.
+
+    A file *without* a sister sidecar is **not** pollution -- it could
+    be freshly downloaded new data being prepped for ``dvc add``,
+    scratch data the user supplied directly, output from the
+    WB-fallback auto-add path in ``data_access.get_data_file``, or any
+    other legitimate non-tracked use.  Returns False in all of those
+    cases.
+    """
+    try:
+        p = Path(fn).resolve()
+        sidecar = p.parent / f"{p.name}.dvc"
+        return sidecar.exists()
+    except Exception:
+        return False
+
+
 def _to_numeric(x,coerce=False):
     try:
         if coerce:
@@ -261,9 +290,28 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         try:
             with open(fn) as f:
                 pass
-            return True
         except FileNotFoundError:
             return False
+        # Hardening: a workspace copy of a DVC-tracked file is pollution
+        # from a checkout side effect (manual ``dvc pull``, third-party
+        # tool, etc.), not a legitimate fast path.  Refuse to use it so
+        # the read goes through the DVC cache (under ``data_root()``)
+        # via ``file_system_path`` -> ``_ensure_dvc_pulled`` ->
+        # ``DVCFS.open``.  Files without a sister sidecar are fine
+        # (new data being prepped for ``dvc add``, user scratch data,
+        # WB-fallback downloads).
+        if _is_polluted_workspace_copy(fn):
+            warnings.warn(
+                f"Refusing workspace copy of DVC-tracked file {fn} "
+                f"(sister .dvc sidecar exists). The package tree must "
+                f"not contain DVC-tracked data; falling through to the "
+                f"DVC cache path. Clean up with: "
+                f"find lsms_library/countries -type f -name '*.dta' "
+                f"-execdir test -e '{{}}.dvc' \\; -print -delete",
+                stacklevel=3,
+            )
+            return False
+        return True
     
     def file_system_path(fn):
     # is the file a relative path or it's the full path from our fs (DVCFileSystem)?

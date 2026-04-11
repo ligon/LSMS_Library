@@ -829,3 +829,37 @@ old behavior.
   updated from `repo.pull` to `repo.fetch`.  Test docstrings updated.
 - `slurm_logs/DESIGN_dvc_layer1_caching.md` -- this follow-up #2
   appendix.
+
+## 2026-04-11 follow-up #3: path-normalization probe and `local_file` hardening
+
+Two changes were originally gated on the path-normalization probe:
+
+**Probe result (this session)**: from a wave-script-style cwd
+(`cd lsms_library/countries/Niger/2018-19/_/`), calling
+`DVCFS.open('../Data/grappe_gps_ner2018.dta', mode='rb').read()`
+returned `35366` bytes -- the correct file content.  fsspec /
+DVCFileSystem already handles cwd-relative paths in this form.
+**Change #2 (path canonicalizer in `_resolve_data_path`) is not
+needed.**
+
+**Change #3 landed in this commit**: `_is_polluted_workspace_copy`
+helper + `local_file()` hardening.  The new helper returns True iff a
+file exists on disk *and* has a sister `.dvc` sidecar; `local_file()`
+calls it after a successful `open()` and, if True, emits a
+`UserWarning` and returns False to force the read through the DVC
+cache path.  Files without sidecars are still legitimate fast paths
+(new data being prepped for `dvc add`, scratch data, WB-fallback
+downloads).  The warning includes the cleanup command so users can
+fix their workspace.
+
+The hardening is opt-out only via the cleanup itself: until users
+remove the polluted workspace files under `lsms_library/countries/`,
+they will see warnings on every read.  That's the intended UX --
+the warnings are the symptom that signals the cleanup is needed.
+
+Tests in `TestLayer1Caching`:
+- `test_is_polluted_workspace_copy_true_when_sidecar_exists`
+- `test_is_polluted_workspace_copy_false_when_no_sidecar` (covers
+  the new-data add cases the user pointed out)
+- `test_is_polluted_workspace_copy_false_on_bad_input`
+- `test_get_dataframe_warns_and_falls_through_on_polluted_workspace`
