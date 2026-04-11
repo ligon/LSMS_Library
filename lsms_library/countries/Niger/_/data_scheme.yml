@@ -36,9 +36,7 @@ Data Scheme:
     index: (t, i, pid)
     Educational Attainment: str
 
-  panel_ids:
-    index: (t, i)
-    previous_i: str
+  panel_ids: !make
 
   food_acquired:
     index: (t, visit, i, j, u)
