@@ -9,8 +9,10 @@ import numpy as np
 import pandas as pd
 import dvc.api
 from collections import defaultdict
+from contextlib import contextmanager
 from cfe.df_utils import use_indices
 import warnings
+import yaml
 import json
 import difflib
 import re
@@ -27,10 +29,117 @@ import inspect
 from typing import Any
 from .paths import data_root, var_path, wave_data_path, COUNTRIES_ROOT
 
-# Initialize DVC filesystem once and reuse it
+# Initialize DVC filesystem once and reuse it.
+#
+# The runtime ``config={"cache": {"dir": ...}}`` override pins the
+# DVC object cache to a user-writable location under ``data_root()``,
+# so the same ``LSMS_DATA_DIR`` controls both the parquet cache (Layer 2)
+# and the DVC blob cache (Layer 1).  Without this override, the cache
+# falls back to ``{_COUNTRIES_DIR}/.dvc/cache`` which is unwritable in
+# pip-installed layouts.
+#
+# The override also makes the DVCFileSystem cache-read fast path
+# (``DataFileSystem._get_fs_path`` iterating ``["cache", "remote", "data"]``)
+# resolve into a populated directory, so any blob present at
+# ``{_DVC_CACHE_DIR}/{md5[:2]}/{md5[2:]}`` is served from local disk
+# instead of streaming from S3.  See ``_ensure_dvc_pulled`` below for
+# the warming side of the round-trip.
 _PACKAGE_ROOT = Path(__file__).resolve().parent
 _COUNTRIES_DIR = _PACKAGE_ROOT / "countries"
-DVCFS = DVCFileSystem(os.fspath(_COUNTRIES_DIR))
+_DVC_CACHE_DIR = data_root() / "dvc-cache"
+_DVC_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+DVCFS = DVCFileSystem(
+    os.fspath(_COUNTRIES_DIR),
+    config={"cache": {"dir": os.fspath(_DVC_CACHE_DIR)}},
+)
+
+
+@contextmanager
+def _dvc_working_directory(path):
+    """Temporarily switch the process working directory.
+
+    ``Repo.pull(targets=[...])`` resolves targets against ``os.getcwd()``,
+    not against the repo root, so callers must change directory before
+    invoking it.  ``country.py`` has its own copy at module level; this
+    one is duplicated here to avoid a circular import.
+    """
+    previous = Path.cwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(previous)
+
+
+def _ensure_dvc_pulled(fn) -> None:
+    """Best-effort warm of the local DVC cache for a tracked path.
+
+    The hot path (cache hit) is two ``os.path.exists`` calls and a tiny
+    YAML parse -- no DVC Python API, no ``DVCFS.repo``, no index walk,
+    no minutes-long lazy index build.
+
+    Only on a cache miss does this fall through to ``DVCFS.repo.pull``,
+    which is wrapped in ``_dvc_working_directory(_COUNTRIES_DIR)``
+    because ``Repo.pull`` resolves targets against ``os.getcwd()``.
+
+    Every error is swallowed.  This function is best-effort warming
+    glue; the caller's ``DVCFS.open`` streaming fallback handles any
+    failure to populate the cache.
+
+    See ``slurm_logs/DESIGN_dvc_layer1_caching.md`` for the empirical
+    investigation that landed this design.
+    """
+    try:
+        # Try several interpretations of fn to find the .dvc sidecar.
+        # Wave scripts pass cwd-relative paths like '../Data/foo.dta'.
+        # Interactive callers may pass countries-relative paths like
+        # 'Niger/2018-19/Data/foo.dta'.  Both forms must work.
+        fn_path = Path(fn)
+        candidates = []
+        if fn_path.is_absolute():
+            candidates.append(fn_path)
+        else:
+            candidates.append((Path.cwd() / fn_path).resolve())
+            candidates.append((_COUNTRIES_DIR / fn_path).resolve())
+
+        abs_path = None
+        for c in candidates:
+            if (c.parent / f"{c.name}.dvc").exists():
+                abs_path = c
+                break
+        if abs_path is None:
+            return  # no sidecar found at any interpretation; not DVC-tracked
+
+        sidecar = abs_path.parent / f"{abs_path.name}.dvc"
+        with sidecar.open() as fh:
+            sidecar_data = yaml.safe_load(fh)
+        md5 = sidecar_data["outs"][0]["md5"]
+        # Check both DVC 2.x and DVC 3.0 cache layouts.  DVC 3.x is
+        # backward-compatible and reads from both.  Most blobs in the
+        # LSMS countries repo land in the legacy flat layout because
+        # the existing .dvc sidecars carry md5-dos2unix hashes from
+        # the original DVC 2.x dvc-adds; new sidecars (post-migration)
+        # would use the DVC-3.0 files/md5/ subpath layout.  See
+        # https://dvc.org/doc/user-guide/upgrade for the version
+        # history.
+        cache_layouts = (
+            _DVC_CACHE_DIR / md5[:2] / md5[2:],                  # DVC 2.x
+            _DVC_CACHE_DIR / "files" / "md5" / md5[:2] / md5[2:], # DVC 3.x
+        )
+        if any(p.exists() for p in cache_layouts):
+            return  # cache hit -- DVCFS.open() will serve from local
+        try:
+            rel_path = abs_path.relative_to(_COUNTRIES_DIR)
+        except ValueError:
+            return  # outside the countries dir, can't pull
+    except Exception:
+        return  # bad sidecar shape, missing key, OS error: bail to streaming
+
+    try:
+        with _dvc_working_directory(_COUNTRIES_DIR):
+            DVCFS.repo.pull(targets=[str(rel_path)], jobs=1)
+    except Exception:
+        pass
 
 def _to_numeric(x,coerce=False):
     try:
@@ -243,18 +352,19 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         except (TypeError,ValueError): # Needs filename?
             df = read_file(fn,convert_categoricals=convert_categoricals,encoding=encoding)
     elif file_system_path(fn):
-        # NOTE: Layer-1 (raw .dta blob) caching is currently dormant.
-        # An earlier attempt passed cache_remote_stream=True per
-        # slurm_logs/DESIGN_dvc_layer1_caching.md, but empirical
-        # testing on DVC 3.67.0 (Niger Run A, 2026-04-11) showed the
-        # kwarg is silently dropped: 363s S3 stream, zero bytes
-        # written to /global/scratch/users/ligon/.dvc/cache.  Both
-        # `cache_remote_stream=True` and the actual 3.67.0 kwarg name
-        # `cache=True` were tried; neither populated the cache.
-        # The dormant Layer-1 path is reverted here pending a real
-        # fix (likely DVCFS.get_file() or Repo.pull, see follow-up
-        # in the design doc).  See country.py:1611-1812 for the
-        # working Layer-2 (parquet) cache that landed in v0.7.0.
+        # Layer-1 (raw .dta blob) caching: best-effort warm the local
+        # DVC object cache before streaming.  ``_ensure_dvc_pulled``
+        # is a no-op when the blob is already cached (cache hit ->
+        # ``DVCFS.open`` below serves it from local disk via
+        # ``_get_fs_path``'s ``typ == "cache"`` branch) and a no-op
+        # on any failure (streaming via ``DVCFS.open`` is the
+        # fallback).  This restores the Layer-1 caching that
+        # ``slurm_logs/DESIGN_dvc_layer1_caching.md`` originally
+        # diagnosed as dormant -- the working approach uses
+        # ``Repo.pull`` and a runtime ``cache.dir`` config override
+        # at ``DVCFS`` construction (see _DVC_CACHE_DIR above), not
+        # the ``cache_remote_stream`` kwarg the prior session tried.
+        _ensure_dvc_pulled(fn)
         try:
             with DVCFS.open(fn,mode='rb') as f:
                 df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)

@@ -1033,3 +1033,312 @@ class TestCachePathGeneration:
         assert cache_path.suffix == ".json"
         assert cache_path.parent.name == "_"
         assert method_name in cache_path.name
+
+
+class TestLayer1Caching:
+    """Tests for the Layer-1 (DVC blob) caching restored in Pieces 1+2.
+
+    Background: an earlier session at 2026-04-11 concluded that Layer-1
+    caching was dormant in DVC 3.67.0 because the ``cache=True`` /
+    ``cache_remote_stream=True`` kwargs on ``DVCFileSystem.open()`` are
+    no-ops.  That conclusion was correct as far as it went but missed
+    the actual mechanism: ``DataFileSystem._get_fs_path`` iterates
+    ``["cache", "remote", "data"]`` and reads from a populated cache
+    automatically when ``info.cache`` is wired up correctly.  Pieces 1
+    and 2 land both halves of the round-trip: Piece 1 pins ``cache.dir``
+    via runtime config override, Piece 2 populates the cache via
+    explicit ``Repo.pull`` from inside ``get_dataframe``.
+
+    See ``slurm_logs/DESIGN_dvc_layer1_caching.md`` for the empirical
+    investigation that led to this design.
+    """
+
+    def test_module_dvcfs_uses_data_root(self):
+        """Piece 1: the module-level ``DVCFS`` picks up the
+        ``data_root() / "dvc-cache"`` override.
+
+        Note: the absolute path of ``_DVC_CACHE_DIR`` is captured at
+        module import time and may not match a freshly-evaluated
+        ``data_root()`` if a prior test in the same session mutated
+        ``LSMS_DATA_DIR``.  We therefore check the *shape* of the
+        path (suffix == "dvc-cache" + directory was created) and the
+        propagation through ``DVCFS.repo`` rather than identity with
+        a freshly evaluated ``data_root()``.
+        """
+        from lsms_library.local_tools import DVCFS, _DVC_CACHE_DIR
+
+        assert _DVC_CACHE_DIR.name == "dvc-cache"
+        assert _DVC_CACHE_DIR.exists()
+
+        # The cache.local.path may include a "files/md5" subpath in
+        # some DVC versions; the operative path the storage_map cache
+        # uses is the override root.  Either form is acceptable as
+        # long as it starts with the override root.
+        cache_path = Path(DVCFS.repo.cache.local.path)
+        assert str(cache_path).startswith(str(_DVC_CACHE_DIR)), (
+            f"DVCFS cache.dir override not propagating: "
+            f"expected prefix {_DVC_CACHE_DIR}, got {cache_path}"
+        )
+
+    def test_ensure_dvc_pulled_noop_when_no_sidecar(self, tmp_path):
+        """No ``.dvc`` sidecar -> ``_ensure_dvc_pulled`` is a no-op."""
+        from lsms_library import local_tools
+
+        target = tmp_path / "no_sidecar.dta"
+        target.write_bytes(b"")
+        with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
+            local_tools._ensure_dvc_pulled(str(target))
+            mock_dvcfs.repo.pull.assert_not_called()
+
+    def test_ensure_dvc_pulled_noop_when_blob_cached_legacy_layout(self, tmp_path, monkeypatch):
+        """Sidecar + blob in legacy DVC 2.x flat layout -> no ``Repo.pull``.
+
+        This is the dominant hit path for the LSMS repo today: the
+        ``.dvc`` sidecars carry ``md5-dos2unix`` hashes from the
+        original DVC 2.x ``dvc add``-s, so the blobs land in the flat
+        layout under the cache root.
+        """
+        from lsms_library import local_tools
+
+        target = tmp_path / "data" / "foo.dta"
+        target.parent.mkdir()
+        target.write_bytes(b"")
+        sidecar = target.parent / "foo.dta.dvc"
+        md5 = "abcdef0123456789abcdef0123456789"
+        sidecar.write_text(
+            f"outs:\n- md5: {md5}\n  size: 0\n  path: foo.dta\n"
+        )
+
+        cache_dir = tmp_path / "cache"
+        cache_dir.mkdir()
+        # Legacy DVC 2.x layout: {cache_dir}/{md5[:2]}/{md5[2:]}
+        (cache_dir / md5[:2]).mkdir()
+        (cache_dir / md5[:2] / md5[2:]).write_bytes(b"")
+        monkeypatch.setattr(local_tools, "_DVC_CACHE_DIR", cache_dir)
+
+        with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
+            local_tools._ensure_dvc_pulled(str(target))
+            mock_dvcfs.repo.pull.assert_not_called()
+
+    def test_ensure_dvc_pulled_noop_when_blob_cached_dvc3_layout(self, tmp_path, monkeypatch):
+        """Sidecar + blob in DVC 3.0 ``files/md5/`` layout -> no ``Repo.pull``.
+
+        Future-proofing for after the LSMS repo migrates to DVC 3.0
+        hashes via ``dvc cache migrate`` (separate workstream).  Once
+        the sidecars are regenerated, blobs land at
+        ``{cache_dir}/files/md5/{md5[:2]}/{md5[2:]}``; the pre-check
+        must still recognize them.
+        """
+        from lsms_library import local_tools
+
+        target = tmp_path / "data" / "foo.dta"
+        target.parent.mkdir()
+        target.write_bytes(b"")
+        sidecar = target.parent / "foo.dta.dvc"
+        md5 = "fedcba9876543210fedcba9876543210"
+        sidecar.write_text(
+            f"outs:\n- md5: {md5}\n  size: 0\n  path: foo.dta\n"
+        )
+
+        cache_dir = tmp_path / "cache"
+        cache_dir.mkdir()
+        # DVC 3.0 layout: {cache_dir}/files/md5/{md5[:2]}/{md5[2:]}
+        (cache_dir / "files" / "md5" / md5[:2]).mkdir(parents=True)
+        (cache_dir / "files" / "md5" / md5[:2] / md5[2:]).write_bytes(b"")
+        monkeypatch.setattr(local_tools, "_DVC_CACHE_DIR", cache_dir)
+
+        with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
+            local_tools._ensure_dvc_pulled(str(target))
+            mock_dvcfs.repo.pull.assert_not_called()
+
+    def test_ensure_dvc_pulled_calls_pull_on_miss(self, tmp_path, monkeypatch):
+        """Sidecar present + blob NOT in cache -> ``Repo.pull`` is called.
+
+        Verifies the target passed to ``Repo.pull`` is the
+        countries-relative path, not the absolute path or the
+        script-relative path.
+        """
+        from lsms_library import local_tools
+
+        countries_dir = tmp_path / "countries"
+        target_dir = countries_dir / "TestC" / "wave" / "Data"
+        target_dir.mkdir(parents=True)
+        # Note: the .dta file itself does NOT exist on disk; only the
+        # sidecar.  This matches the typical fresh-checkout state.
+        target = target_dir / "foo.dta"
+        sidecar = target.parent / "foo.dta.dvc"
+        md5 = "0123456789abcdef0123456789abcdef"
+        sidecar.write_text(
+            f"outs:\n- md5: {md5}\n  size: 0\n  path: foo.dta\n"
+        )
+
+        cache_dir = tmp_path / "cache"
+        cache_dir.mkdir()
+        # Note: blob NOT placed in cache_dir
+        monkeypatch.setattr(local_tools, "_DVC_CACHE_DIR", cache_dir)
+        monkeypatch.setattr(local_tools, "_COUNTRIES_DIR", countries_dir)
+
+        with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
+            local_tools._ensure_dvc_pulled(str(target))
+            mock_dvcfs.repo.pull.assert_called_once()
+            call = mock_dvcfs.repo.pull.call_args
+            assert call.kwargs.get("targets") == ["TestC/wave/Data/foo.dta"]
+
+    def test_ensure_dvc_pulled_swallows_pull_errors(self, tmp_path, monkeypatch):
+        """If ``Repo.pull`` raises, ``_ensure_dvc_pulled`` returns silently.
+
+        Layer-1 warming is best-effort; the streaming fallback in
+        ``get_dataframe`` should still run.
+        """
+        from lsms_library import local_tools
+
+        countries_dir = tmp_path / "countries"
+        target_dir = countries_dir / "TestC" / "Data"
+        target_dir.mkdir(parents=True)
+        target = target_dir / "foo.dta"
+        sidecar = target.parent / "foo.dta.dvc"
+        sidecar.write_text(
+            "outs:\n- md5: 0123456789abcdef0123456789abcdef\n"
+            "  size: 0\n  path: foo.dta\n"
+        )
+        cache_dir = tmp_path / "cache"
+        cache_dir.mkdir()
+        monkeypatch.setattr(local_tools, "_DVC_CACHE_DIR", cache_dir)
+        monkeypatch.setattr(local_tools, "_COUNTRIES_DIR", countries_dir)
+
+        with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
+            mock_dvcfs.repo.pull.side_effect = RuntimeError("simulated S3 failure")
+            # Should NOT raise
+            local_tools._ensure_dvc_pulled(str(target))
+            mock_dvcfs.repo.pull.assert_called_once()
+
+    def test_ensure_dvc_pulled_changes_cwd_to_countries(self, tmp_path, monkeypatch):
+        """``Repo.pull`` is invoked from inside ``_COUNTRIES_DIR``.
+
+        Cwd-independence regression test for the footgun discovered in
+        Probe 2 of the 2026-04-11 session: ``Repo.pull(targets=[X])``
+        resolves ``X`` against ``os.getcwd()``, not against the repo
+        root, so without an explicit chdir the call fails with
+        ``NoOutputOrStageError`` from any cwd that isn't already
+        ``lsms_library/countries/``.
+        """
+        from lsms_library import local_tools
+
+        countries_dir = (tmp_path / "countries").resolve()
+        target_dir = countries_dir / "TestC" / "Data"
+        target_dir.mkdir(parents=True)
+        target = target_dir / "foo.dta"
+        sidecar = target.parent / "foo.dta.dvc"
+        sidecar.write_text(
+            "outs:\n- md5: 0123456789abcdef0123456789abcdef\n"
+            "  size: 0\n  path: foo.dta\n"
+        )
+        cache_dir = tmp_path / "cache"
+        cache_dir.mkdir()
+        monkeypatch.setattr(local_tools, "_DVC_CACHE_DIR", cache_dir)
+        monkeypatch.setattr(local_tools, "_COUNTRIES_DIR", countries_dir)
+
+        # Start from a cwd that is NOT countries_dir.
+        elsewhere = tmp_path / "elsewhere"
+        elsewhere.mkdir()
+        original_cwd = Path.cwd()
+        os.chdir(elsewhere)
+
+        observed = []
+
+        def record_cwd(*args, **kwargs):
+            observed.append(Path.cwd())
+
+        try:
+            with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
+                mock_dvcfs.repo.pull.side_effect = record_cwd
+                local_tools._ensure_dvc_pulled(str(target))
+        finally:
+            os.chdir(original_cwd)
+
+        assert len(observed) == 1
+        assert observed[0] == countries_dir
+        # And the original cwd is restored after the helper returns
+        assert Path.cwd() == original_cwd
+
+    def test_ensure_dvc_pulled_bails_on_path_outside_countries(self, tmp_path, monkeypatch):
+        """A sidecar at a path outside _COUNTRIES_DIR -> no pull (no error)."""
+        from lsms_library import local_tools
+
+        countries_dir = (tmp_path / "countries").resolve()
+        countries_dir.mkdir()
+        outside = tmp_path / "outside" / "Data"
+        outside.mkdir(parents=True)
+        target = outside / "foo.dta"
+        sidecar = outside / "foo.dta.dvc"
+        sidecar.write_text(
+            "outs:\n- md5: 0123456789abcdef0123456789abcdef\n"
+            "  size: 0\n  path: foo.dta\n"
+        )
+        cache_dir = tmp_path / "cache"
+        cache_dir.mkdir()
+        monkeypatch.setattr(local_tools, "_DVC_CACHE_DIR", cache_dir)
+        monkeypatch.setattr(local_tools, "_COUNTRIES_DIR", countries_dir)
+
+        with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
+            local_tools._ensure_dvc_pulled(str(target))
+            mock_dvcfs.repo.pull.assert_not_called()
+
+    def test_ensure_dvc_pulled_handles_malformed_sidecar(self, tmp_path, monkeypatch):
+        """A sidecar with unexpected shape -> bail silently, no pull."""
+        from lsms_library import local_tools
+
+        target = tmp_path / "foo.dta"
+        target.write_bytes(b"")
+        sidecar = tmp_path / "foo.dta.dvc"
+        # Missing 'outs' key entirely
+        sidecar.write_text("not a real dvc sidecar\n")
+
+        cache_dir = tmp_path / "cache"
+        cache_dir.mkdir()
+        monkeypatch.setattr(local_tools, "_DVC_CACHE_DIR", cache_dir)
+
+        with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
+            local_tools._ensure_dvc_pulled(str(target))
+            mock_dvcfs.repo.pull.assert_not_called()
+
+    def test_ensure_dvc_pulled_handles_countries_relative_path(self, tmp_path, monkeypatch):
+        """Interactive callers can pass countries-relative paths.
+
+        e.g. ``get_dataframe('Niger/2018-19/Data/foo.dta')`` from an
+        ipython session whose cwd is unrelated to ``countries/``.  The
+        helper must find the sidecar by trying ``_COUNTRIES_DIR / fn``
+        as one of the candidate interpretations.
+        """
+        from lsms_library import local_tools
+
+        countries_dir = (tmp_path / "countries").resolve()
+        target_dir = countries_dir / "TestC" / "wave" / "Data"
+        target_dir.mkdir(parents=True)
+        # Sidecar exists at the countries-relative location
+        sidecar = target_dir / "foo.dta.dvc"
+        md5 = "0123456789abcdef0123456789abcdef"
+        sidecar.write_text(
+            f"outs:\n- md5: {md5}\n  size: 0\n  path: foo.dta\n"
+        )
+
+        cache_dir = tmp_path / "cache"
+        cache_dir.mkdir()
+        monkeypatch.setattr(local_tools, "_DVC_CACHE_DIR", cache_dir)
+        monkeypatch.setattr(local_tools, "_COUNTRIES_DIR", countries_dir)
+
+        # Start from a cwd unrelated to countries_dir
+        elsewhere = tmp_path / "elsewhere"
+        elsewhere.mkdir()
+        original_cwd = Path.cwd()
+        os.chdir(elsewhere)
+
+        try:
+            with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
+                # Pass the countries-relative path, not an absolute path
+                local_tools._ensure_dvc_pulled("TestC/wave/Data/foo.dta")
+                mock_dvcfs.repo.pull.assert_called_once()
+                call = mock_dvcfs.repo.pull.call_args
+                assert call.kwargs.get("targets") == ["TestC/wave/Data/foo.dta"]
+        finally:
+            os.chdir(original_cwd)

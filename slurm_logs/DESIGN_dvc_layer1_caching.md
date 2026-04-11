@@ -634,3 +634,95 @@ cache.  Deferred to a future session.
 - The `~/.cache/dvc/` location referenced earlier in this doc is
   misleading on this host — the real cache lives at
   `/global/scratch/users/ligon/.dvc/cache/` per the global DVC config.
+
+## 2026-04-11 follow-up: Layer 1 caching restored via runtime config override + Repo.pull
+
+The "deferred to a future session" item above landed in the same
+afternoon.  The breakthrough was reframing the question: instead of
+asking "how do we make `DVCFileSystem.open()` populate the cache",
+ask "how do we make `DVCFileSystem.open()` *read* from a populated
+cache".  Reading from a populated cache is automatic in DVC 3.67.0
+via `DataFileSystem._get_fs_path` iterating
+`["cache", "remote", "data"]`; the only thing needed is to wire up
+`info.cache` correctly via a runtime `config={"cache": {"dir": X}}`
+override on the `DVCFileSystem` constructor.
+
+### Probes that landed it
+
+- **Probe 1 (storage_map inspection)**: confirmed the runtime config
+  override propagates from `DVCFileSystem(..., config=...)` through
+  `fs.repo` to every index entry's `storage_map[key].cache`.  The
+  `info.cache` is a real `LocalHashFileDB` rooted at the override
+  directory.
+- **Probe 2 (cwd footgun)**: first attempt at `Repo.pull(targets=[X])`
+  failed with `NoOutputOrStageError` because `Repo.pull` resolves
+  targets against `os.getcwd()`, not against the repo root.  Fix:
+  wrap the call in a chdir context manager (the same idiom
+  `country.py:1658` uses).
+- **Probe 2 (multi-MB end-to-end)**: cold S3 stream of a 7 MB Niger
+  file took **17.465 s**; warm cache read of the same file took
+  **0.010 s**.  ~1750× speedup, same order of magnitude as the
+  Layer 2 numbers reported above.
+- **Probe 2 (side-effect caching disproof)**: `DVCFileSystem.open()`
+  does **not** populate the cache as a side effect of streaming; the
+  empty cache stayed empty after the 17 s cold read.  This means
+  Layer 1 warming requires explicit `Repo.pull`, not a clever
+  `DVCFS.open` flag.
+
+### Critical correction to the layout discussion above
+
+The "two cache layouts coexist" interpretation in earlier versions of
+this doc was wrong.  The flat
+`{cache_dir}/{md5[:2]}/{md5[2:]}` layout we observed via `Repo.pull`
+is the **DVC 2.x cache layout**, used because the LSMS `countries/`
+sidecars carry `md5-dos2unix` hashes from the original DVC 2.x
+`dvc add`-s.  The DVC 3.0 cache layout is
+`{cache_dir}/files/md5/{md5[:2]}/{md5[2:]}`, used for sidecars with
+raw `md5` hashes.  DVC 3.x is backward-compatible and reads from
+both; `dvc cache migrate` is the explicit consolidation path.  See
+https://dvc.org/doc/user-guide/upgrade.
+
+`repo.cache.local.path` reports the DVC-3.x-native subpath
+(`{cache_dir}/files/md5`) regardless of which layout is in actual
+use; this is misleading diagnostic noise but not a bug.  The
+storage_map's `info.cache.odb.path` reports the legacy root, which
+is what `Repo.pull` actually writes to for legacy-hash sidecars.
+
+### What landed
+
+- `lsms_library/local_tools.py:33` — `DVCFS` now constructed with
+  `config={"cache": {"dir": data_root() / "dvc-cache"}}`.
+- `lsms_library/local_tools.py` — new `_ensure_dvc_pulled(fn)` helper
+  with sidecar pre-check (cache hit = two `os.path.exists` calls,
+  no DVC API), `_dvc_working_directory` cwd wrapper, dual-layout
+  blob lookup (DVC 2.x flat + DVC 3.0 `files/md5/`), full exception
+  swallowing.
+- `lsms_library/local_tools.py:get_dataframe` — calls
+  `_ensure_dvc_pulled(fn)` in the `file_system_path` branch before
+  the `DVCFS.open(fn)` stream.
+- `tests/test_dvc_caching.py` — new `TestLayer1Caching` class with
+  unit tests for: Piece 1 cache.dir override, sidecar pre-check
+  cache-hit short-circuit (both layouts), cache-miss falling
+  through to `Repo.pull`, error swallowing, cwd-independence
+  regression test, countries-relative path handling.
+
+### Follow-ups (separate workstreams)
+
+- **Migrate `.dvc` sidecars to DVC 3.0 hash algorithm**.  Run
+  `dvc cache migrate` and regenerate every sidecar under
+  `countries/`.  Eliminates the legacy hash code path entirely.
+  Significant git churn (every tracked `.dta`'s md5 changes), needs
+  `dvc gc -c` to clean orphaned legacy blobs from S3, needs CI
+  rebaseline if any tests hardcode hash values.  Decoupled from
+  this fix by the dual-layout pre-check.
+- **Probe 6 — `Repo.pull` cost characterization**.  Time cold and
+  warm `Repo.pull` calls for small/medium/large files; verify the
+  warm-pull cost is acceptable for the cache-miss fallback path.
+- **Probe 7 — End-to-end payoff measurement**.  Re-run the Niger
+  cold-rebuild benchmark with Pieces 1+2 in place; expected drop
+  from 363 s to ~10-30 s for the L2-cold / L1-warm case.
+- **Cache migration UX**.  When LSMS users on hosts with prior
+  `~/.cache/dvc/` populated by `dvc pull` CLI install this version,
+  they don't automatically benefit from those blobs because the
+  override pins the cache elsewhere.  Document the migration in
+  `docs/guide/caching.md` (Piece 3 of the plan).
