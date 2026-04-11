@@ -52,7 +52,7 @@ df = roster()      # Load all countries into one DataFrame
 - **Cross-Country Analysis** -- `Feature` class concatenates harmonized data
   across countries
 - **DVC Integration** -- stream data from remote storage
-- **Intelligent Caching** -- hash-based cache with automatic invalidation
+- **Parquet Cache** -- materialize once, reuse within a session; cross-session read path and content-hash invalidation land in v0.7.0 and v0.8.0 (see the [Caching guide](guide/caching.md))
 - **Extensible** -- add new surveys via YAML configuration files
 
 ## Next Steps

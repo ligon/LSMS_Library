@@ -18,14 +18,23 @@ Root-level symlinks (e.g., `Uganda → lsms_library/countries/Uganda`) are for c
 ## DVC Repository Root
 **The DVC repository is rooted at `lsms_library/countries/`, NOT the top-level repo.** DVC config, remotes, and credentials all live under `lsms_library/countries/.dvc/`. All `dvc` CLI commands (pull, push, status) must be run from `lsms_library/countries/` or they will fail with missing-remote/credential errors. The `get_dataframe()` fallback chain handles this automatically when scripts run from their normal `{Country}/{wave}/_/` working directory.
 
-## DVC Caching and `data_root()`
-- All materialized data (parquets, JSON caches) is written under `data_root()` (`lsms_library/paths.py`), **not** in the repo tree.
-- Default location: `~/.local/share/lsms_library/{Country}/var/{table}.parquet`. Override with `data_dir` in `~/.config/lsms_library/config.yml` or `LSMS_DATA_DIR` env var (env var takes precedence).
-- First call builds from source, caches to `data_root(Country)/var/{table}.parquet`.
-- Subsequent calls read cache (<1 sec).
-- Caches auto-invalidate on source/config changes (hash-based).
-- `LSMS_BUILD_BACKEND=make` bypasses DVC and builds directly with Make (useful for debugging).
-- On clusters: `trust_cache=True` in `Country()` reads existing parquets directly, skipping all validation.
+## Cache Behavior (Current State, 2026-04-10)
+
+**Writes** are redirected to `data_root()` by `_resolve_data_path` in `local_tools.py`. Default location `~/.local/share/lsms_library/{Country}/var/{table}.parquet`; override with `data_dir` in `~/.config/lsms_library/config.yml` or `LSMS_DATA_DIR` env var (env var wins). **Reads** back from that cache are inconsistent across code paths, and the library is mid-migration. As of commit `ff018c76`:
+
+- **`trust_cache=True`** (set on `Country(...)`) reads the cache file directly with **no staleness check**. Intended for clusters where a full pipeline built the caches; use only when you know the cache is fresh for your query.
+
+- **Countries with a populated `dvc.yaml` (7 countries: Uganda, Senegal, Malawi, Togo, Kazakhstan, Serbia, GhanaLSS)** run through `load_dataframe_with_dvc` in `country.py`, which uses DVC's `stage.status()` to hash the declared deps (`cli.py`, `country.py`, `local_tools.py`, the country's `_/` directory) and reads the cache only if the stage is clean. **Source `.dta` files are NOT in the deps**, so editing an upstream `.dta` does not invalidate the stage — only edits to the three central Python files or the country's `_/` configuration do.
+
+- **Countries without a `dvc.yaml` (~33)** take the `if not stage_infos:` branch in the same function. **The cache is write-only in this branch.** Every call runs `load_from_waves()` from scratch, re-reads source files, rewrites the parquet to `data_root()`, and returns the in-memory DataFrame. The cached file on disk is never read back. Within a single Python process, a second call is faster because Country-instance ancillary caches (`_sample_v_cache`, `_updated_ids_cache`, `_market_lookup_cache_*`, `_location_level_cache`) are warm and the OS page cache helps repeat reads of the same `.dta` files — but across processes nothing persists. Empirically on Savio/Lustre, a fresh `ipython` session rebuilds Niger's `household_roster` in ~22s every time (plus ~30s Python import overhead).
+
+- **`LSMS_BUILD_BACKEND=make`** bypasses the DVC stage layer and calls `run_make_target` / `load_from_waves` directly. The write-only behavior still applies for countries without `dvc.yaml`.
+
+**Historical note**: an earlier revision of this file claimed "Caches auto-invalidate on source/config changes (hash-based)" and "Subsequent calls read cache (<1 sec)". Neither is true for the majority of countries as of the v-migration. The claim was based on how the DVC stage layer works for the 7 countries that have it, generalized incorrectly to the whole library. Do not rely on those claims in the current codebase.
+
+**v0.7.0 (in progress)** will add a minimum-viable "read cache if present" layer to the `if not stage_infos:` branch so all countries get a read path, plus `LSMS_NO_CACHE=1` as an escape hatch for contributors editing source files. **v0.8.0** will add content-hash invalidation (hashing source `.dta` files + relevant YAML/scripts) so editing a wave's config correctly invalidates only the affected tables, at which point the `dvc.yaml` stage layer can be retired. See `SkunkWorks/dvc_object_management.org` for the full plan.
+
+**Practical rule for contributors**: when editing a wave's `data_info.yml` or a `_/{table}.py` script, run `lsms-library cache clear --country {Country}` before rebuilding so the next call actually reads your new source rather than an older cached parquet. Or set `trust_cache=False` (the default) and accept the slower rebuild-every-time path for affected tables.
 
 ## Roster-Derived Tables
 `household_characteristics` is **auto-derived from `household_roster`** via `roster_to_characteristics()` in `transformations.py`. It should NOT be registered in `data_scheme.yml` --- the `Country` class detects it via `_ROSTER_DERIVED` and applies the transformation automatically when `household_roster` exists. Adding `household_characteristics: !make` to a data_scheme bypasses this and forces legacy scripts to run instead.
