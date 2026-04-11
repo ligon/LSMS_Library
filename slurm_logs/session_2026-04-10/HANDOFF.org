@@ -163,20 +163,19 @@ committed as of 2da62445).
 
 Two commits this session, both on =master=:
 
-1. =<HASH1>=: "Docs: correct misleading cache invalidation
-   claims (CLAUDE.md + docs/)"
+1. =c093f128=: "Docs: correct misleading cache invalidation
+   claims"
    - =CLAUDE.md=: rewrite "DVC Caching and =data_root()=" section
    - =docs/index.md=: fix "Intelligent Caching" bullet
    - =docs/guide/caching.md=: rewrite cache guide
 
-2. =<HASH2>=: "Session 2026-04-10 (pm): DVC object management
+2. =0d3d8ab4=: "Session 2026-04-10 (pm): DVC object management
    plan + audit + handoff"
    - =SkunkWorks/dvc_object_management.org= (new)
-   - =slurm_logs/session_2026-04-10/HANDOFF.org= (new, this file)
+   - =slurm_logs/session_2026-04-10/HANDOFF.org= (new, this file —
+     this hash amended in a follow-up commit to record itself;
+     see the tip of =master= for the exact commit-graph shape)
    - =slurm_logs/session_2026-04-10/PLAN_dvc_intree_parquet_audit.org= (audit agent output)
-
-Hashes will be recorded in the commit objects themselves; not
-manually updated here.
 
 * Decisions made this session
 
