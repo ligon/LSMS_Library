@@ -1,0 +1,611 @@
+#+TITLE: DVC Object Management — Plan
+#+filetags: skunkworks dvc lsms_library plan
+#+DATE: <2026-04-10 Fri>
+#+AUTHOR: Ethan Ligon + Claude (planning session)
+
+* Purpose
+
+A sensible, end-to-end plan for managing the DVC-tracked objects in
+LSMS_Library: raw microdata, documentation binaries, materialized
+cross-country tables, local caches, and the stage pipelines that tie
+them together.  The session that produced this document was a
+planning session, not an execution session.  All the file edits and
+commits described under [[#v070-execution-recipe][v0.7.0 execution recipe]] are deferred to a
+follow-up session that can start fresh from this plan.
+
+This plan absorbs and extends =SkunkWorks/dvc_writer_distribution.org=
+(which is the executed design for write-access credential
+provisioning) and cross-references =slurm_logs/v0.7.0_handoff.org=
+(which is the already-scoped credential-path-and-wheel-bundling work).
+
+* Scope and Principles
+
+** DVC's role in this library
+
+DVC has one job: *serve raw input data* (mostly =.dta=, some =.sav=
+and =.csv=, plus the 2026-04-10 documentation migration) from a
+central S3 bucket to any machine that holds a valid World Bank
+Microdata API key.  Derived outputs --- harmonized cross-wave
+parquets, panel-id JSON tables, cross-country aggregates --- are
+*not* DVC's business.  They live in the user's =data_root()=
+directory and are rebuilt on demand from inputs + library code.
+
+The one exception to this historically was
+=lsms_library/countries/Harmonized_LSMS-ISA_Ag/lsms_ag.parquet.dvc=,
+a DVC-tracked derivative.  That exception is being dropped (see
+[[#harmonized-lsms-isa-ag-drop][Harmonized_LSMS-ISA_Ag drop]] below) because the underlying project's
+source is on GitHub and shouldn't be mirrored through our data
+access layer.
+
+** Guiding principles (restated and reaffirmed)
+
+1. *DVC tracks heavy inputs, not derived outputs.*  If a file can
+   be rebuilt from other files the library already knows about,
+   don't DVC-track it.
+
+2. *=data_root()= owns all user-visible derived artifacts.*  The
+   repo tree is for source code, YAML configs, and a small set of
+   .dvc pointer files.  Nothing the library materializes at runtime
+   should land in the repo tree.
+
+3. *Credential distribution is per-person IAM for writers, service
+   account for readers.*  Readers get the S3 cache auto-unlocked on
+   import via the WB API key + obfuscated GPG passphrase path.
+   Writers go through =scripts/dvc_writer add USERNAME=, which
+   provisions a per-person IAM user in the =dvc_writer= group.
+   The real access gate is the WB Microdata Library ToU; the S3
+   bucket is a cache over it, not an independent access layer.
+
+4. *The repo tree stays small and grep-able.*  The 2026-04-10
+   documentation migration (=10cd975c=) moved 35 large documentation
+   binaries from git to DVC (~27 MB → 2.1 MB sdist, 4.9 MB wheel).
+   Future heavy documents follow the same rule.
+
+* Object Categories + Lifecycle
+
+** 1. Raw microdata sources (=.dta=, =.sav=, =.csv=)
+
+Status: *working, canonical*.
+
+- Location: =lsms_library/countries/{Country}/{Wave}/Data/...=
+- Tracked via: =.dvc= pointer files, one per source file, committed
+  to git
+- Blobs stored: S3 bucket =s3://dvcbucket0/LSMS=
+- Consumed via: =get_dataframe()= in =local_tools.py=, which tries
+  in order: local file → =DVCFileSystem.open()= → =dvc.api.open()= →
+  =data_access.get_data_file()= (WB NADA API fallback)
+- Write workflow (for RAs adding new waves):
+  =data_access.add_wave(country, catalog_id)= OR manual
+  =dvc add= + =dvc push= per =CONTRIBUTING.org:283=
+- Count as of 2026-04-10: ~7,237 .dvc pointer files under =Data/=
+  subdirectories across 40 countries
+
+*No changes planned for this category in v0.7.0 or v0.8.0.*  It
+works, it's the core of the library, don't touch it.
+
+** 2. Documentation binaries
+
+Status: *recently migrated, working*.
+
+- Location: =lsms_library/countries/{Country}/{Wave}/Documentation/...=
+- Migrated 2026-04-10 (=10cd975c=) for files ≥ 5 KB that aren't
+  =LICENSE*=, =SOURCE*=, =.org=, or =.do=
+- 544 Documentation/ =.dvc= pointers as of 2026-04-10
+- Same storage, credentials, and consumption path as raw microdata
+- Small documentation files (LICENSE, SOURCE, .org notes, .do
+  scripts) remain in git for grep-ability
+
+*No further migration planned.*  The 5 KB threshold was the
+judgment call and further sweeping isn't worth the churn.
+
+** 3. Materialized cross-wave / cross-country tables
+
+Status: *inconsistent, mid-migration, subject of v0.7.0 and v0.8.0*.
+
+This is the main subject of this plan.
+
+*** What the library currently produces
+
+For each =(country, table)= pair the library produces a Parquet
+file like =household_roster.parquet= that stacks the country's
+waves and applies harmonization.  The write path routes through
+=_resolve_data_path= to =data_root(Country)/var/{table}.parquet=.
+
+*** Three different code paths decide whether to *read* that cache
+
+| Path                                              | Active when                                                                               | Invalidation                                                              |
+|---------------------------------------------------+-------------------------------------------------------------------------------------------+---------------------------------------------------------------------------|
+| =trust_cache=True=                                | Set explicitly on =Country(...)=                                                          | *None.*  Reads the file if present, no staleness check                    |
+| =load_dataframe_with_dvc= (DVC stage layer)       | Country has a populated =dvc.yaml= (7 countries)                                          | DVC =stage.status()= hashes declared deps (.py files + country =_/= dir) |
+| =load_from_waves= (fallback)                      | All other countries (~33)                                                                 | *None.*  Cache is *write-only*; every call rebuilds from source           |
+
+The third row is the critical bug: for the majority of countries,
+the =data_root()= parquet is written but never read back.  Every
+call to =Country('Niger').household_roster()= re-runs
+=load_from_waves()=, re-reads source =.dta= files, re-harmonizes,
+rewrites the parquet, and returns.  Within a single Python process
+a second call is faster because Country-instance ancillary caches
+(=_sample_v_cache=, =_updated_ids_cache=, etc.) and the OS page
+cache are warm, but across processes nothing persists.
+
+Empirically verified 2026-04-10 on Savio n0065:
+- Python import of =lsms_library= on Lustre: ~30s (dominates cold
+  ipython UX)
+- Niger =household_roster()= first call in a fresh process: ~22s
+- Niger =household_roster()= second call, same process: ~8s (3x
+  speedup from in-process state, not from parquet cache read)
+- Two consecutive fresh processes: first call is ~22s *both
+  times*; Lustre client cache doesn't persist across processes
+- All reads go through the =local_file()= branch; zero =DVCFS=
+  involvement (because =dvc pull= was run on this mirror)
+
+Branch count on the second in-process call drops from 11 to 4,
+confirming that ancillary lookups (panel_ids, sample, market
+index) are cached but the four wave-level source files are
+re-read and re-parsed every call.
+
+*** The fresh-clone scenario is qualitatively different
+
+The ~22s figure above is for a mirror with all =.dta= files already
+on disk.  A fresh =pip install git+https://...@v0.7.0= user has no
+=.dta= files locally and no =.dvc/cache/=.  Their flow:
+
+1. =local_file()= → fails
+2. =DVCFileSystem.open()= → streams from S3 (real network bandwidth)
+3. Parse + harmonize + concat
+4. Write to =data_root()= (write-only for the 33 countries)
+
+First call: minutes (S3 bandwidth + parse).  Second call in a new
+process: minutes again, because =data_root()= isn't being read
+back.  This is the scenario v0.7.0 is supposed to enable, and
+without a fix the user experience is "library works but is slow
+on every single call."
+
+*** Known incorrect documentation
+
+=CLAUDE.md= previously claimed "Subsequent calls read cache (<1
+sec). Caches auto-invalidate on source/config changes
+(hash-based)."  Neither is true for the majority of countries as
+of the v-migration.  =docs/guide/caching.md= had similar claims.
+Both have been corrected in this session (see [[#doc-corrections][Doc corrections]]).
+
+*** Audit of in-tree leftovers
+
+An automated audit agent scanned =lsms_library/countries/= for
+=.parquet= files and classified them.  Full report:
+[[file:../slurm_logs/session_2026-04-10/PLAN_dvc_intree_parquet_audit.org]]
+
+Headlines:
+
+- 2 files SAFE to delete: Uganda =food_acquired.parquet=,
+  Uganda =food_expenditures.parquet= — both have fresher
+  =data_root()= counterparts
+- 4 files NEED CARE: Uganda =household_roster.parquet=,
+  Uganda =cluster_features.parquet=, Senegal =household_roster.parquet=,
+  Senegal =cluster_features.parquet= — these exist only in-tree
+  because =country.py:1372= falls back to the in-tree path when
+  =data_root()= is empty.  *Callers on this machine are
+  currently silently getting pre-sample-migration data.*  Fix:
+  rebuild each into =data_root()= first, then delete the in-tree
+  copy, then remove the in-tree fallback so it can't happen again.
+- All 6 plain parquets are stale relative to =dvc.lock=; Uganda
+  =household_roster= is 3.7× larger than the lock expects,
+  consistent with a pre-sample-migration build.
+- A single =rm= sweep is NOT safe.  Per-file care required.
+
+** 4. =Harmonized_LSMS-ISA_Ag/lsms_ag.parquet.dvc= (special, being dropped)
+:PROPERTIES:
+:CUSTOM_ID: harmonized-lsms-isa-ag-drop
+:END:
+
+Status: *dropping in v0.7.0*.
+
+This is the one materialized derivative that was DVC-tracked.
+Ligon's decision 2026-04-10: drop it.  Rationale:
+
+- It's reference harmonization data, not a library input.  The
+  underlying project's source lives on GitHub and is downloadable
+  independently.
+- It functions more like Documentation than like an input — useful
+  for cross-checks, not as something the library should mirror.
+- Its =.dvc= pointer (99 bytes, MD5 matches the on-disk blob) has
+  *zero references* anywhere in the codebase according to the
+  audit agent's grep sweep.
+
+Cleanup recipe (to execute in v0.7.0 session):
+1. =dvc remove lsms_library/countries/Harmonized_LSMS-ISA_Ag/lsms_ag.parquet.dvc=
+2. =rm lsms_library/countries/Harmonized_LSMS-ISA_Ag/lsms_ag.parquet= (if present)
+3. =git rm lsms_library/countries/Harmonized_LSMS-ISA_Ag/lsms_ag.parquet.dvc=
+4. =rmdir lsms_library/countries/Harmonized_LSMS-ISA_Ag= (if empty after)
+5. Grep for any lingering references (audit says zero, verify)
+
+Note: S3 blob GC happens lazily via =dvc gc --cloud= which is
+admin-only; not part of the v0.7.0 scope.
+
+** 5. Local parquet cache (=data_root()=)
+
+Status: *write path works, read path broken for 33 countries*.
+
+- Default location: =~/.local/share/lsms_library/{Country}/var/{table}.parquet=
+- Override: =LSMS_DATA_DIR= env var or =data_dir= in
+  =~/.config/lsms_library/config.yml=
+- Write path: =_resolve_data_path= in =local_tools.py:45=
+  rewrites relative paths by inspecting the call stack
+- Read path: broken as described above; being fixed in v0.7.0
+
+** 6. DVC stage layer (=dvc.yaml= materialize stages)
+
+Status: *partial, inconsistent, retiring in v0.8.0*.
+
+Countries with a populated =dvc.yaml=: Uganda, Senegal, Malawi (plus
+5 wave-specific files under Malawi/), Togo, Kazakhstan, Serbia,
+GhanaLSS.  7 total.  The root =lsms_library/countries/dvc.yaml= is
+empty (={stages: {}}=).
+
+For these 7 countries, =load_dataframe_with_dvc= in =country.py=
+opens the country-level DVC repo, resolves the relevant stage,
+calls =stage.status()= to check dirtiness, and either reads the
+cached parquet or calls =stage.reproduce()=.  The =outs:= of these
+stages point at in-tree =var/{table}.parquet=, which is why stale
+in-tree parquets exist for Uganda and Senegal.
+
+Problems:
+1. Only 7 of ~40 countries.  Not a library-wide contract.
+2. =outs:= in-tree contradicts the =data_root()= policy.
+3. ~150 lines of =country.py= dedicated to the DVC path that
+   mostly falls through to =load_from_waves= anyway.
+4. Source =.dta= files are *not* in the stage deps, so editing
+   raw data doesn't invalidate the stage.  Invalidation only
+   triggers on edits to =cli.py=, =country.py=, =local_tools.py=,
+   or the country's =_/= directory.
+
+Plan:
+- *v0.7.0*: leave the stage layer alone.  Removing it would cause
+  a perf regression for the 7 countries that use it, because their
+  current read-back only works through the stage layer.
+- *v0.8.0*: once the in-house cache has proper hash-based
+  invalidation, the stage layer becomes redundant.  Delete
+  =load_dataframe_with_dvc=, delete =generate_dvc_stages.py=,
+  delete the 7 =dvc.yaml= files, delete =run_stage.py=.
+  Alternatively, keep =generate_dvc_stages.py= as a standalone
+  reproducibility tool for generating =dvc.lock= files on demand
+  (the "path iv" from the planning conversation) — TBD based on
+  whether anyone is actually using it.
+
+* v0.7.0 Execution Recipe
+:PROPERTIES:
+:CUSTOM_ID: v070-execution-recipe
+:END:
+
+This is the concrete work for the v0.7.0 execution session.  Each
+numbered item is roughly one commit, ordered by logical
+dependency.  Estimated total effort: 2-3 hours focused work plus
+test runs.
+
+*Preconditions*:
+- Start from =master= HEAD (=2da62445= or later)
+- Branch clean
+- =poetry install= done, =.venv/= populated
+- Running on a node with Python import + test capacity (the login
+  node is fine for everything except tests that trigger country
+  rebuilds, which should go to a Slurm job per
+  =slurm_logs/test_2026-04-10/run_pytest_xdist.sbatch=)
+
+** 1. Remove the in-tree fallback in =run_make_target=
+
+=country.py= has three lines that tell the fallback chain to read
+stale in-tree =var/{table}.parquet= files if =data_root()= is
+empty:
+
+- =country.py:1372= — =base_path / "var" / f"{method_name}.parquet"=
+  in the country-level candidate list
+- =country.py:1428-1429= — the Makefile target builder's in-tree
+  fallbacks
+- =country.py:1563= — =load_json_cache= in-tree fallback
+
+Delete these lines.  Verify the immediate test suite still passes
+(=pytest tests/test_schema_consistency.py tests/test_wave_getattr.py=).
+
+This commit alone closes the silent-stale-data correctness bug
+for Uganda/Senegal =household_roster= + =cluster_features= on
+mirrors with stale in-tree parquets.
+
+** 2. Add the minimum-viable cache read path
+
+In =country.py:1626-1633=, the =if not stage_infos:= branch, add a
+"read if present" check before calling =load_from_waves=:
+
+#+begin_src python
+stage_infos = self._resolve_materialize_stages(method_name, waves)
+if not stage_infos:
+    # v0.7.0: trust the cache if present.  Contributors editing
+    # source data should clear caches explicitly via
+    # `lsms-library cache clear --country X` or set LSMS_NO_CACHE=1.
+    no_cache = os.environ.get("LSMS_NO_CACHE", "").lower() in {"1", "true", "yes"}
+    if cache_path.exists() and not no_cache:
+        try:
+            df = get_dataframe(cache_path)
+            df = map_index(df)
+            logger.debug(f"Reading {method_name} from cache {cache_path}")
+            return df
+        except Exception as exc:
+            logger.debug(f"Cache read failed ({exc}); rebuilding")
+    df = load_from_waves(waves)
+    if isinstance(df, pd.DataFrame):
+        df = _enforce_rejected_column_spellings(df)
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        to_parquet(df, cache_path)
+    return df
+#+end_src
+
+Add a unit test that exercises both the cache-hit path (seed a
+parquet, call, verify no rebuild) and the =LSMS_NO_CACHE= escape
+hatch.
+
+** 3. Execute the v0.7.0 handoff (8 files, credential + wheel work)
+
+See =slurm_logs/v0.7.0_handoff.org= for the full file-by-file
+scoped diff.  Summary:
+
+- =pyproject.toml=: add =[tool.poetry] include= for =.dvc/= metadata
+- =lsms_library/config.py=: add =s3_creds_path()= and =dvc_cache_dir()= helpers
+- =lsms_library/local_tools.py=: override =DVCFileSystem= config at construction
+- =lsms_library/data_access.py=: write creds to new user-writable location, check both old and new paths for backward compat
+- =lsms_library/dvc_permissions.py=: write target, update user messaging
+- =lsms_library/__init__.py=: use =s3_creds_path()= helper
+- =README.org=: new "Installation and Data Access" section
+- =CONTRIBUTING.org=: reframe as write-path doc, add =scripts/dvc_writer= reference
+
+One commit per logical group (4 commits per the handoff plan).
+
+** 4. Rebuild Uganda + Senegal stale tables into =data_root()=
+
+After commits 1-3 land:
+
+1. Start a fresh Python process (or invalidate the in-process DVC state)
+2. =trust_cache=False= (default) =Country('Uganda').household_roster()=
+3. Verify the new parquet appears under =data_root(Uganda)/var/household_roster.parquet=
+   and has sane size (per the audit, should be ~1 MB not 3.7 MB)
+4. Repeat for Uganda =cluster_features=, Senegal =household_roster=, Senegal =cluster_features=
+5. Only after all four =data_root()= parquets are verified: delete the in-tree copies
+
+Commit message should explicitly note this was a cache rebuild
+after the v-migration (#135 is the related issue).
+
+** 5. Delete the 2 SAFE Uganda in-tree parquets
+
+Per the audit report:
+
+#+begin_src sh
+rm lsms_library/countries/Uganda/var/food_acquired.parquet
+rm lsms_library/countries/Uganda/var/food_expenditures.parquet
+#+end_src
+
+These have fresher =data_root()= counterparts already.  Single
+=rm=, no rebuild needed first.
+
+Commit message: cite the audit report path.
+
+** 6. Drop =Harmonized_LSMS-ISA_Ag=
+
+Per [[#harmonized-lsms-isa-ag-drop][Harmonized_LSMS-ISA_Ag drop]] above.
+
+** 7. Doc updates (already done in this planning session, but
+   verify no bit-rot)
+
+The planning session (commit =TBD=) already fixed:
+- =CLAUDE.md= "Cache Behavior" section (honest description of
+  the 7-vs-33 split and the write-only cache bug)
+- =docs/index.md= "Parquet Cache" bullet
+- =docs/guide/caching.md= full rewrite of the caching guide
+
+In the execution session, verify those edits still reflect the
+*post*-v0.7.0 state after commits 1-2 land, and update the "(in
+progress)" language to past tense.  The "Historical note" block
+in CLAUDE.md can stay as-is --- it's a warning to future
+maintainers.
+
+** 8. Verification
+
+Run the v0.7.0 handoff's verification plan (section 6 of
+=slurm_logs/v0.7.0_handoff.org=):
+
+1. =poetry build= produces a wheel; verify =.dvc/config= etc. are
+   present via =unzip -l=
+2. Fresh venv install, =import lsms_library=, =Country('Uganda', trust_cache=False)=
+3. Targeted pytest:
+   =pytest tests/test_dvc_caching.py tests/test_wave_getattr.py tests/test_schema_consistency.py tests/test_feature.py -x --tb=short=
+4. New: Niger timing test with the probe script from
+   =/tmp/niger_probe.py= (save it to
+   =slurm_logs/session_2026-04-10/niger_probe.py= if we want to
+   keep it).  Expected after v0.7.0:
+   - First call: ~22s (unchanged; S3/parse dominated)
+   - Second call in same process: ~8s (unchanged)
+   - Second call in fresh process: *sub-second* (NEW — cache hit)
+
+If the fresh-process second-call improvement is visible, v0.7.0
+has delivered on its main user-visible promise.
+
+** 9. Tag =v0.7.0=
+
+Per the project's Makefile:
+
+#+begin_src sh
+PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring make release v=0.7.0
+#+end_src
+
+(The keyring workaround is per the 2026-04-10 handoff's release
+tooling notes.)
+
+* v0.8.0 Roadmap
+
+** Proper content-hash cache invalidation
+
+Add a hash-based staleness check to =data_root()= cache reads.
+Hash inputs should include:
+
+- Content hash of source =.dta= / =.sav= / =.csv= files referenced
+  from the wave's =data_info.yml= (via DVC pointer if present, via
+  file content otherwise)
+- Content hash of the wave's =data_info.yml=
+- Content hash of any =_/{table}.py= scripts for that wave
+- Maybe: content hash of =country.py=, =local_tools.py= (the
+  library code that interprets the config) — or pin these by
+  library version instead
+
+Store the hash alongside the parquet, e.g. as
+=data_root(Country)/var/{table}.parquet.hash=, check on read, fall
+back to rebuild if mismatched.
+
+** Retire the =dvc.yaml= materialize stage layer
+
+Once hash-based invalidation is in place, the DVC stage layer
+adds nothing that the in-house cache doesn't also provide, and
+its inconsistency (7 vs 33 countries) becomes a net negative.
+
+Delete:
+- =load_dataframe_with_dvc= (country.py:1611-1761)
+- The =_resolve_materialize_stages= method and =StageInfo= dataclass
+- =_load_materialize_stage_map= and its =lru_cache=
+- The 7 country-level =dvc.yaml= files
+- =lsms_library/util/run_stage.py=
+- Possibly =lsms_library/util/generate_dvc_stages.py= — or keep
+  as opt-in reproducibility tool (see "path iv" decision below)
+- The =LSMS_BUILD_BACKEND= env var handling, or keep as a no-op
+  for backward compat for one release
+
+Keep:
+- =data_access.py= and the full raw-data fallback chain
+- The =_/{table}.py= legacy script path (still needed for PP/PH
+  countries and other irreducibly complex cases)
+
+** Decision deferred: =generate_dvc_stages.py= disposition
+
+Two positions from the planning conversation:
+
+- *Delete*: it's legacy bookkeeping; nothing uses it at runtime
+  after v0.8.0.
+- *Keep as opt-in reproducibility tool*: contributors preparing a
+  paper can generate =dvc.yaml= + =dvc.lock= on demand and commit
+  it as a reproducibility artifact alongside the paper.  The
+  runtime library ignores it.
+
+Recommendation: keep-as-opt-in unless nobody wants it.  It's
+~300 lines in =util/= and has no maintenance burden if not called
+at runtime.
+
+** Rethink =trust_cache=
+
+After v0.7.0's simple "read if present" and v0.8.0's hash
+invalidation, =trust_cache=True= becomes strictly weaker than the
+default (reads without invalidation vs reads with invalidation).
+Consider deprecating in v0.8.0 or v0.9.0 with a clear upgrade
+path.
+
+** Tooling gaps worth closing
+
+- *CI check*: scan every =Country/Wave/Data/= directory for =.dta=
+  files lacking a matching =.dvc= pointer (orphan source files
+  are a common contributor mistake).  Fail the PR.
+- *Periodic writer audit*: run =scripts/dvc_writer ls= monthly and
+  prune stale members (anyone who hasn't touched the bucket in
+  a year).  Could be a cron via =schedule= skill.
+- *S3 bucket size monitoring*: no current visibility into
+  =dvcbucket0= size and growth rate.  Add a weekly report.
+- *=_log_issue= pollution (#148)*: =country.py:168= appends to
+  =lsms_library/ISSUES.md= on every build failure, polluting the
+  working tree.  Either redirect to =slurm_logs/= or gitignore
+  the file.
+
+* Credential Distribution
+
+The write-access provisioning is already done as of commit
+=2da62445=.  See [[file:dvc_writer_distribution.org]] for the design
+notes, IAM policy, and =scripts/dvc_writer= CLI reference.
+
+Summary (not duplicated here):
+- =dvc_writer= IAM group with bucket-scoped policy (no
+  =DeleteObject=)
+- Per-person IAM users provisioned via
+  =scripts/dvc_writer add USERNAME=
+- Credential delivery via Google Keep / Signal / GPG-encrypted email
+- Admin needs =LSMS_AWS_ACCOUNT= + SSO admin profile in env or
+  =$LSMS_CONFIG_DIR/env.sh=
+
+Open TODOs from =dvc_writer_distribution.org=:
+- Decide reader credential rotation policy (currently: rotate
+  only if bucket contents become sensitive)
+- Tighten the =s3_bucket_readers= policy scope from
+  =AmazonS3ReadOnlyAccess= (all buckets) to a bucket-scoped custom
+  policy.  Low priority.
+
+* Doc Corrections
+:PROPERTIES:
+:CUSTOM_ID: doc-corrections
+:END:
+
+This planning session also corrected misleading documentation
+claims about caching behavior.  Files touched:
+
+- =CLAUDE.md=: "DVC Caching and =data_root()=" section rewritten
+  as "Cache Behavior (Current State, 2026-04-10)" with honest
+  description of the 7-vs-33 split, the write-only bug, the
+  v0.7.0/v0.8.0 roadmap, and a historical note explaining the
+  old (wrong) claims.
+- =docs/index.md=: "Intelligent Caching" bullet replaced with
+  honest "Parquet Cache (v0.7.0+)" language pointing at the
+  caching guide.
+- =docs/guide/caching.md=: rewritten to distinguish within-session
+  vs cross-session behavior, flag the inconsistency across
+  countries, and explain the v0.7.0/v0.8.0 roadmap.
+
+The two files NOT touched:
+- =slurm_logs/= historical handoffs (session logs, not current
+  documentation)
+- =lsms_library/README.org= (only had a link to the caching guide,
+  no misleading content)
+
+* Cleanup Backlog
+
+Tracked so nothing falls through the cracks during v0.7.0 execution:
+
+** In this session's session dir (already on disk)
+- [X] =slurm_logs/session_2026-04-10/PLAN_dvc_intree_parquet_audit.org=
+  — audit agent output
+- [X] =SkunkWorks/dvc_object_management.org= — this file
+- [X] =slurm_logs/session_2026-04-10/HANDOFF.org= — session handoff
+
+** To execute in the v0.7.0 session
+- [ ] Remove =country.py= in-tree fallback (items 1 in the recipe above)
+- [ ] Add cache read path + =LSMS_NO_CACHE= (item 2)
+- [ ] Execute v0.7.0 handoff 8-file work (item 3)
+- [ ] Rebuild stale Uganda/Senegal tables (item 4)
+- [ ] Delete 2 SAFE Uganda parquets (item 5)
+- [ ] Drop Harmonized_LSMS-ISA_Ag (item 6)
+- [ ] Verify + tag v0.7.0 (items 8, 9)
+
+** Later / v0.8.0
+- [ ] Hash-based invalidation
+- [ ] Retire DVC stage layer
+- [ ] =generate_dvc_stages.py= disposition decision
+- [ ] Deprecate =trust_cache=
+- [ ] CI check for orphan =.dta= files
+- [ ] =_log_issue= pollution (#148)
+- [ ] Uganda vestigial wave-level =dvc.yaml= cleanup (per HANDOFF_2026-04-01.org)
+- [ ] Tighten =s3_bucket_readers= policy scope
+- [ ] Periodic writer audit automation
+
+* References
+
+- =CLAUDE.md= — project instructions, now corrected
+- =CONTRIBUTING.org= — contributor workflow
+- =slurm_logs/v0.7.0_handoff.org= — execution-ready 8-file handoff
+- =slurm_logs/HANDOFF_2026-04-10.org= — session that produced v0.6.0
+- =slurm_logs/session_2026-04-10/PLAN_dvc_intree_parquet_audit.org= — in-tree parquet audit
+- =slurm_logs/session_2026-04-10/HANDOFF.org= — planning session handoff
+- =SkunkWorks/dvc_writer_distribution.org= — writer provisioning design
+- =scripts/dvc_writer= — writer IAM management CLI
+- =lsms_library/country.py:1611-1761= — the DVC stage layer
+- =lsms_library/country.py:1626-1633= — the write-only cache bug
+- =lsms_library/local_tools.py:45-98= — =_resolve_data_path=
+- =lsms_library/data_access.py= — credential probing, WB NADA fallback

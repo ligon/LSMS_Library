@@ -1,0 +1,250 @@
+#+TITLE: In-Tree DVC/Parquet Audit
+#+DATE: 2026-04-10
+#+AUTHOR: Claude (automated audit, read-only)
+
+* Summary
+
+** Scope
+Total parquet files found under =lsms_library/countries/=: *7*
+DVC pointer (=.dvc=) files: *1* (=Harmonized_LSMS-ISA_Ag/lsms_ag.parquet.dvc=, git-tracked)
+
+All 6 plain =.parquet= files are *not* tracked by git (=git ls-files= returns empty for each);
+they are excluded by the top-level =.gitignore= rule =*.parquet=.
+The =lsms_ag.parquet= is additionally managed as a standalone DVC pointer.
+
+** Category counts and sizes
+
+| Category             | Count | Total size |
+|----------------------+-------+------------|
+| SAFE TO DELETE       |     2 | ~4.3 MB    |
+| KEEP, NOT REGENERABLE|     0 |            |
+| NEEDS HUMAN DECISION |     4 | ~1.9 MB    |
+| Harmonized (special) |     1 | ~47 MB     |
+| .dvc pointer only    |     1 | 99 bytes   |
+
+** Key question: safe to run a single =rm= sweep?
+
+*No.* A blanket =rm lsms_library/countries/**/*.parquet= is NOT safe.
+
+- Four files (Uganda =household_roster=, Uganda =cluster_features=, Senegal
+  =household_roster=, Senegal =cluster_features=) exist *only in-tree* — neither
+  country has a corresponding file under =~/.local/share/lsms_library/=.  The
+  =country.py= fallback chain (line 1372) would fall through to these in-tree
+  files if =data_root()= lacks a copy.  Deleting them without first rebuilding
+  under =data_root= would make those tables unresolvable.
+
+- The =lsms_ag.parquet= requires a specific DVC pointer cleanup, not just =rm=.
+
+- The two Uganda food files (=food_acquired=, =food_expenditures=) ARE safe because
+  fresher copies exist in =data_root()= (Apr 10 vs Apr 9).
+
+** All 6 plain parquets are stale relative to =dvc.lock=
+
+Every in-tree =.parquet= has a different MD5 from the hash recorded in its
+country's =dvc.lock=.  They were written by earlier pipeline runs and were
+never cleaned.  They do not match the DVC remote.
+
+* SAFE TO DELETE
+
+Both files have fresher counterparts under =~/.local/share/lsms_library/Uganda/var/=
+(Apr 10 10:30 vs Apr 9 23:44 for =food_acquired=; Apr 10 10:32 vs Apr 9 23:46 for
+=food_expenditures=).  =country.py= checks =data_root()= first (line 1371) before
+the in-tree fallback (line 1372), so the in-tree files are already shadowed.
+
+| Path                                                               | Size  | Country | Table             | Regenerable via                              | Cache exists?                                      | Cache size |
+|--------------------------------------------------------------------+-------+---------+-------------------+----------------------------------------------+----------------------------------------------------+------------|
+| lsms_library/countries/Uganda/var/food_acquired.parquet            | 3.4 M | Uganda  | food_acquired     | =!make= script: Uganda/_/food_acquired.py    | YES: ~/.local/share/lsms_library/Uganda/var/ Apr10 | 3.3 M      |
+| lsms_library/countries/Uganda/var/food_expenditures.parquet        | 870 K | Uganda  | food_expenditures | =!make= script: Uganda/_/food_prices_quantities_and_expenditures.py | YES: ~/.local/share/lsms_library/Uganda/var/ Apr10 | 782 K |
+
+Notes:
+- Both are DVC stage outputs listed in =Uganda/dvc.yaml= (stage
+  =materialize@uganda::::food_acquired= / =food_expenditures=).
+- No test, fixture, or Python script references the literal in-tree path;
+  =test_uganda_invariance.py= lists both under =KNOWN_BASELINE_DRIFT= (xfail,
+  GH #135) and already falls back to =data_root()=.
+- MD5 mismatch vs =dvc.lock=: in-tree food_acquired is =0b2ddd5c=
+  (size 3,502,494) vs lock's =ccce8fb8= (size 3,533,892).
+
+* KEEP, NOT REGENERABLE
+
+No files in this category.  Every in-tree parquet can be regenerated via the
+pipeline (either YAML path or script path) given the source =.dta= files.
+
+* NEEDS HUMAN DECISION
+
+These four files have *no corresponding entry under =data_root()=*.  Country.py
+line 1372 would use them as the last-resort fallback.  Before they can be
+deleted, the operator must either (a) run the pipeline to build fresh copies
+under =data_root()=, or (b) accept that the tables will need to be rebuilt on
+next access.  All four are stale vs =dvc.lock=.
+
+| Path                                                              | Size  | Country | Table            | Ambiguity                                                             |
+|-------------------------------------------------------------------+-------+---------+------------------+-----------------------------------------------------------------------|
+| lsms_library/countries/Uganda/var/household_roster.parquet        | 1.1 M | Uganda  | household_roster | Not in data_root. country.py line 1372 fallback. Stale vs dvc.lock.  |
+| lsms_library/countries/Uganda/var/cluster_features.parquet        | 48 K  | Uganda  | cluster_features | Not in data_root. country.py line 1372 fallback. Stale vs dvc.lock.  |
+| lsms_library/countries/Senegal/var/household_roster.parquet       | 712 K | Senegal | household_roster | Senegal has NO data_root entry at all. Stale vs dvc.lock.            |
+| lsms_library/countries/Senegal/var/cluster_features.parquet       | 24 K  | Senegal | cluster_features | Senegal has NO data_root entry at all. Stale vs dvc.lock.            |
+
+Notes on regenerability:
+- Uganda =household_roster=: YAML path, =Uganda/2018-19/_/data_info.yml= has
+  full =household_roster:= block with =GSEC2.dta= source.  All waves have similar
+  YAML entries.  Regenerable via =ll.Country('Uganda').household_roster()= once
+  source =.dta= files are accessible.
+- Uganda =cluster_features=: YAML path, same =data_info.yml= (=cluster_features:=
+  block).  Regenerable.
+- Senegal =household_roster=: YAML path, =Senegal/2018-19/_/data_info.yml= has
+  full =household_roster:= block with =s01_me_sen2018.dta= source.  2021-22 wave
+  presumably analogous.  Regenerable.
+- Senegal =cluster_features=: YAML path, same =data_info.yml=.  Regenerable.
+
+Hash detail (in-tree vs dvc.lock expected):
+| File                           | in-tree md5      | in-tree size | dvc.lock md5     | dvc.lock size |
+|--------------------------------+------------------+--------------+------------------+---------------|
+| Uganda/household_roster        | 5e369fc748...    | 1,071,004    | 88381cdebf...    | 285,783       |
+| Uganda/cluster_features        | ea26cf8859...    | 45,514       | 254405eb88...    | 32,084        |
+| Senegal/household_roster       | 190819a017...    | 727,499      | f49e96e2d8...    | 322,341       |
+| Senegal/cluster_features       | cd009007f5...    | 20,518       | 66b200233...     | 6,554         |
+
+The in-tree files are *larger* than the dvc.lock versions — consistent with a
+build that included =v= in the index (pre-sample-migration) or included
+pre-transformation data.
+
+* Harmonized_LSMS-ISA_Ag
+
+** Files in directory
+
+| File                                                                        | Git tracked? | Size  | Notes                             |
+|-----------------------------------------------------------------------------+--------------+-------+-----------------------------------|
+| lsms_library/countries/Harmonized_LSMS-ISA_Ag/lsms_ag.parquet.dvc         | YES          | 99 B  | Standalone DVC pointer            |
+| lsms_library/countries/Harmonized_LSMS-ISA_Ag/lsms_ag.parquet             | NO           | 47 MB | DVC-materialized; MD5 matches .dvc |
+
+The =lsms_ag.parquet= MD5 (=0f5cfdddabd70a45ddb74da0ad772c0c=) matches the
+=.dvc= pointer exactly — this is a genuine DVC-tracked artifact (pulled from
+the S3 remote), not a stale local build.
+
+** References found in repo
+
+Grep for =Harmonized_LSMS-ISA_Ag=, =lsms_ag=, and =lsms_ag.parquet= across all
+=.py=, =.yml=, =.yaml=, =.org=, and =.md= files (excluding =__pycache__= and the
+=.dvc= file itself) found *zero matches*.
+
+- =lsms_library/__init__.py=: no mention
+- =lsms_library/country.py=: no mention
+- =lsms_library/local_tools.py=: no mention (the word "Harmonized" appears as a
+  comment in food-label functions but refers to generic label harmonization,
+  not this directory)
+- =CLAUDE.md=: no mention
+- =CONTRIBUTING.org=: no mention
+- =tests/=: no mention
+- =slurm_logs/=: no mention
+- =lsms_library/countries/dvc.yaml= and =dvc.lock=: no reference to
+  =Harmonized_LSMS-ISA_Ag=
+- The top-level =countries/= directory only has this subdirectory via
+  filesystem; no other country's YAML or script reads from it
+
+** Clean removal: exact file sequence
+
+To fully remove =Harmonized_LSMS-ISA_Ag= from the repo and DVC tracking,
+the operator must touch exactly these files *in this order*:
+
+1. *Remove the physical parquet* (local only, not git-tracked):
+   =rm lsms_library/countries/Harmonized_LSMS-ISA_Ag/lsms_ag.parquet=
+
+2. *Remove the DVC pointer from git tracking*:
+   =git rm lsms_library/countries/Harmonized_LSMS-ISA_Ag/lsms_ag.parquet.dvc=
+   This removes the pointer from both git and the DVC tracking graph.
+
+3. *Remove the now-empty directory*:
+   =rmdir lsms_library/countries/Harmonized_LSMS-ISA_Ag/=
+
+4. *Optionally purge from DVC cache* (saves ~47 MB in
+   =lsms_library/countries/.dvc/cache/=):
+   Run =dvc gc --workspace= from =lsms_library/countries/= after committing
+   the above changes.  This is safe because nothing else references the MD5.
+
+5. *Remove the root-level convenience symlink* if it exists:
+   =ls -la /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/Harmonized_LSMS-ISA_Ag=
+   (not checked; most country symlinks live at repo root — verify before removing)
+
+6. *Commit*: =git commit -m "Remove Harmonized_LSMS-ISA_Ag: no Python references; source on GitHub"=
+
+No other YAML, Python import, test, or =dvc.yaml= stage references this
+directory.  The removal is self-contained.
+
+* Recommended cleanup commands
+
+The following commands delete only the SAFE TO DELETE category.
+*Do not run these until reviewed by a human.*
+
+#+BEGIN_SRC bash
+# Step 1: Verify data_root copies still exist before deleting in-tree versions
+ls -lh ~/.local/share/lsms_library/Uganda/var/food_acquired.parquet
+ls -lh ~/.local/share/lsms_library/Uganda/var/food_expenditures.parquet
+
+# Step 2: Delete stale in-tree parquets (Uganda food tables only)
+rm lsms_library/countries/Uganda/var/food_acquired.parquet
+rm lsms_library/countries/Uganda/var/food_expenditures.parquet
+#+END_SRC
+
+For the NEEDS HUMAN DECISION files, first rebuild under data_root, then delete:
+
+#+BEGIN_SRC bash
+# Rebuild Uganda household_roster and cluster_features under data_root
+# (requires source .dta files accessible via DVC or local)
+python3 -c "
+import lsms_library as ll
+c = ll.Country('Uganda')
+c.household_roster()    # builds and caches to data_root
+c.cluster_features()    # builds and caches to data_root
+"
+
+# Verify they landed in data_root
+ls -lh ~/.local/share/lsms_library/Uganda/var/household_roster.parquet
+ls -lh ~/.local/share/lsms_library/Uganda/var/cluster_features.parquet
+
+# Then delete the in-tree staleness
+rm lsms_library/countries/Uganda/var/household_roster.parquet
+rm lsms_library/countries/Uganda/var/cluster_features.parquet
+
+# Analogous steps for Senegal (no data_root at all currently):
+python3 -c "
+import lsms_library as ll
+c = ll.Country('Senegal')
+c.household_roster()
+c.cluster_features()
+"
+ls -lh ~/.local/share/lsms_library/Senegal/var/household_roster.parquet
+ls -lh ~/.local/share/lsms_library/Senegal/var/cluster_features.parquet
+rm lsms_library/countries/Senegal/var/household_roster.parquet
+rm lsms_library/countries/Senegal/var/cluster_features.parquet
+#+END_SRC
+
+For the Harmonized_LSMS-ISA_Ag cleanup, see the sequence in the section above.
+
+* Surprises
+
+- *All 6 plain in-tree parquets are stale vs dvc.lock*.  The size mismatches
+  are large: Uganda =household_roster= is 1.07 MB in-tree vs 285 KB expected by
+  dvc.lock — a 3.7x bloat, consistent with the pre-sample-migration index
+  including extra levels (=v=, wave-level =_/ = artifacts folded in, etc.).
+
+- *country.py still has an in-tree fallback at line 1372*.  The CLAUDE.md says
+  "writes go to data_root, not the repo tree," but reading still falls back to
+  =self.file_path / "var"=.  For Uganda and Senegal, the stale in-tree parquets
+  are the ONLY available cache for =household_roster= and =cluster_features= —
+  the pipeline would silently serve stale data to any caller that lacks a
+  data_root build.
+
+- *lsms_ag.parquet MD5 matches its .dvc pointer exactly*.  Unlike the other 6
+  files, this one is the genuine DVC-tracked artifact (pulled from S3).  It is
+  not a stale local build; it just has zero Python references in the codebase.
+
+- *Senegal has no data_root directory at all*.  =~/.local/share/lsms_library/Senegal/=
+  does not exist on this machine.  Any call to =Country('Senegal').household_roster()=
+  will use the stale in-tree file (or rebuild from scratch if source files are
+  available).
+
+- *The Uganda =var/README= says "one should not add files in this to git or dvc"*,
+  yet the =Uganda/dvc.yaml= and =dvc.lock= explicitly list =var/*.parquet= as DVC
+  stage outputs.  The README is outdated advice that predates the DVC pipeline
+  setup; it conflicts with the current workflow and should be updated or removed.
