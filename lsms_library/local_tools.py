@@ -864,10 +864,55 @@ class RecursiveDict(UserDict):
             return k
 
 def format_id(id: Any, zeropadding: int = 0) -> str | None:
-    """Nice string format for any id, string or numeric.
+    """Canonical string form for a household, cluster, or person ID.
 
-    Optional zeropadding parameter takes an integer
-    formats as {id:0z} where
+    Accepts either a numeric value (int, float, numpy scalar) or a
+    string and returns a clean string suitable for use as a DataFrame
+    index level. Used pervasively by :func:`df_data_grabber` when
+    building the canonical ``(t, v, i, pid)`` index, and applied
+    automatically to every ``idxvars`` entry (but NOT to ``myvars`` —
+    see ``CLAUDE.md`` "``format_id`` and Numeric myvars").
+
+    Rules:
+
+    - Missing or empty input (``NaN``, ``None``, ``""``, ``"."``)
+      returns ``None``.
+    - Numeric input is cast to int then formatted as a decimal string.
+      Float inputs lose their ``.0`` suffix; ``123.0`` → ``"123"``.
+    - String input has any trailing ``.xxx`` decimal suffix stripped
+      (e.g. Stata sometimes stringifies floats), surrounding
+      whitespace removed, and leading zeros preserved.
+    - The result is left-padded with zeros to ``zeropadding`` width,
+      so ``format_id(1, zeropadding=3)`` returns ``"001"``. Pass
+      ``0`` (the default) to skip padding.
+
+    Parameters
+    ----------
+    id : Any
+        The raw identifier. Typical inputs: a Stata numeric variable
+        that should end up as a string index, or a pandas Series
+        value during row-wise formatting.
+    zeropadding : int, optional
+        Target width for zero-padding. Defaults to 0 (no padding).
+
+    Returns
+    -------
+    str or None
+        The canonical string form, or ``None`` for missing/empty
+        input.
+
+    Examples
+    --------
+    >>> format_id(123)
+    '123'
+    >>> format_id(1, zeropadding=3)
+    '001'
+    >>> format_id("456.0")
+    '456'
+    >>> format_id("  007 ")
+    '007'
+    >>> format_id(float("nan"))
+    >>> format_id("")
     """
     if pd.isnull(id) or id in ['','.']: return None
 
