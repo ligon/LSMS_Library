@@ -1,0 +1,70 @@
+#+TITLE: Cross-Country Label Harmonization (Design, Not Yet Implemented)
+#+DATE: 2026-04-11
+#+AUTHOR: Moved out of CLAUDE.md for slim-down
+
+* Context
+
+Within a country, =categorical_mapping.org= maps wave-specific
+labels to a "Preferred Label" so that the same concept has a
+consistent name across survey rounds.  The cross-country analogue
+would map country-specific labels (e.g. French /Sécheresse/ vs.
+English /Drought/) to a global canonical label.
+
+This file is a design sketch.  Nothing here is implemented yet.
+
+* Proposed layout
+
+Top-level mapping tables under =lsms_library/categorical_mapping/=:
+
+- =shocks.yml=     :: shock type labels across countries
+- =food_items.yml= :: food item names across countries / languages
+- =units.yml=      :: measurement unit names across countries / languages
+
+Same org-table format as per-country =categorical_mapping.org=:
+
+#+BEGIN_EXAMPLE
+#+NAME: harmonize_shocks
+| Preferred Label | Ethiopia | Niger (EHCVM) | Mali (EHCVM) | Uganda  |
+|-----------------+----------+---------------+--------------+---------|
+| Drought         | Drought  | Sécheresse    | Sécheresse   | Drought |
+| Flood           | Flood    | Inondation    | Inondation   | Flood   |
+#+END_EXAMPLE
+
+* Proposed API
+
+The =harmonize= parameter selects which column from the mapping
+table to use:
+
+#+BEGIN_SRC python
+import lsms_library as ll
+
+# Raw labels (default) — each country's own labels preserved
+shocks = ll.Feature('shocks')()
+
+# Harmonize to canonical English
+shocks = ll.Feature('shocks')(harmonize='Preferred')
+
+# Harmonize to French
+shocks = ll.Feature('shocks')(harmonize='French')
+
+# Harmonize to aggregate categories (coarser grouping)
+food = ll.Feature('food_acquired')(harmonize='Aggregate')
+#+END_SRC
+
+This mirrors the within-country =categorical_mapping.org= pattern:
+the org table has multiple named columns (=Preferred Label=,
+=Aggregate=, =French=, ...) and the caller chooses which mapping to
+apply.  Uganda's food item tables already use =Preferred= vs.
+=Aggregate= columns for different granularities.
+
+The mapping table determines what columns are available.  If a
+table has only =Preferred Label=, that's the only option.  A
+richer table might offer =Preferred=, =Aggregate=, =French=, =FAO
+Code=, etc.
+
+* Principle
+
+The library preserves what the survey says.  Cross-country label
+harmonization is a form of aggregation — the analyst's decision,
+not the pipeline's.  These mappings are convenience tools, not
+data transformations.

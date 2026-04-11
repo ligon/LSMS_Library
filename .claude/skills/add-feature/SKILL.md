@@ -16,6 +16,7 @@ For domain-specific guidance on particular features, load the relevant sub-skill
 - `add-feature/panel-ids` — Panel household ID linkage across waves. Covers ID stability patterns, composite IDs, household splits, cross-survey-program limitations, and the World Bank harmonised panel as a reference.
 - `add-feature/food-acquired` — Food acquisition data with unit conversions. The most complex feature — covers two approaches to unit-to-kg conversion: price-ratio inference from the data itself, and survey-provided conversion factor tables.
 - `add-feature/sample` — Sampling design (cluster/PSU assignment, household weights, strata, urban/rural). Covers weight variable discovery across countries, single-file vs multi-file YAML patterns (EHCVM ponderation files), and strata label harmonization.
+- `add-feature/pp-ph` — Post-planting / post-harvest countries (Nigeria, Ethiopia, GhanaSPS, Tanzania `2008-15/`). Covers the canonical duplicate-index bug, distinct-`t`-value script pattern, and attrition handling for people who appear in only one round.
 
 ## World Bank reference code
 
