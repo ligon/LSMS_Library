@@ -59,7 +59,6 @@ Data Scheme:
   enterprise_income:
     materialize: make
     index: (t, i)
-  locality: !make
   assets: !make
   housing:
     index: (t, i)

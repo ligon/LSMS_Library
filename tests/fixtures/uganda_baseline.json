@@ -2072,24 +2072,6 @@
       1
     ]
   },
-  "var/locality.parquet": {
-    "columns": [
-      "v"
-    ],
-    "content_hash": "a994f5b8b26dfe2f0f5536db32c0ce31586e147efcfced68ced37f26ea5e9f50",
-    "dtypes": {
-      "v": "string"
-    },
-    "index_names": [
-      "i",
-      "t",
-      "m"
-    ],
-    "shape": [
-      24362,
-      1
-    ]
-  },
   "var/nonfood_expenditures.parquet": {
     "columns": [
       "Air Time (Fixed Phones)",

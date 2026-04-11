@@ -78,7 +78,6 @@ KNOWN_BASELINE_DRIFT = {
     "var/food_prices.parquet",
     "var/food_quantities.parquet",
     "var/household_roster.parquet",
-    "var/locality.parquet",
 }
 
 

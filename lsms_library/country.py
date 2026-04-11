@@ -61,6 +61,15 @@ logger = logging.getLogger(__name__)
 JSON_CACHE_METHODS = {'panel_ids', 'updated_ids'}
 
 
+class DeprecatedFeatureError(AttributeError):
+    """Raised when a removed or deprecated table method is called on Country.
+
+    Subclasses AttributeError so that hasattr()-based probes and generic
+    try/except AttributeError patterns degrade gracefully; callers who need
+    migration guidance get the full message in the exception's args.
+    """
+
+
 @contextmanager
 def _working_directory(path: Path):
     """Temporarily switch the process working directory."""
@@ -2031,6 +2040,22 @@ class Country:
         'household_characteristics': 'roster_to_characteristics',
     }
 
+    # Deprecated table names: name -> deprecation message
+    _DEPRECATED = {
+        'locality': (
+            "Country('Uganda').locality() is deprecated and will be removed "
+            "in a future release. The data it carries is now first-class in "
+            "two separate tables:\n\n"
+            "  * (i, t) -> v  (household -> cluster)     via  Country(X).sample()\n"
+            "  * (t, v) -> Region, Rural, District, ... via  Country(X).cluster_features()\n\n"
+            "For callers who need the legacy (i, t, m) -> v shape, a "
+            "compatibility shim is available:\n\n"
+            "    from lsms_library.transformations import legacy_locality\n"
+            "    loc = legacy_locality(Country('Uganda'))\n\n"
+            "See docs/migration/locality.md for details."
+        ),
+    }
+
     def __getattr__(self, name):
         '''
         This method is triggered when an attribute is not found in the instance, but exists in the `data_scheme`.
@@ -2043,7 +2068,35 @@ class Country:
         if no parquet/script exists but food_acquired is available, the table is
         derived automatically via transformations.  Similarly, household_characteristics
         can be derived from household_roster via roster_to_characteristics.
+
+        Deprecated tables (listed in _DEPRECATED) emit a DeprecationWarning and
+        return the compatibility shim output rather than raising AttributeError.
+        The deprecation check fires before the data_scheme check so it takes
+        effect even if the entry was accidentally left in data_scheme.yml.
         '''
+        # Deprecated tables: warn and delegate to shim before anything else
+        if name in self._DEPRECATED:
+            dep_msg = self._DEPRECATED[name]
+
+            def method(*args, **kwargs):
+                warnings.warn(dep_msg, DeprecationWarning, stacklevel=2)
+                from .transformations import legacy_locality
+                _shims = {'locality': legacy_locality}
+                return _shims[name](self)
+
+            method.__name__ = name
+            method.__qualname__ = f"Country.{name}"
+            method.__module__ = self.__class__.__module__
+            method.__doc__ = (
+                f"[DEPRECATED] {dep_msg}\n\n"
+                "This method will be removed in a future release."
+            )
+            try:
+                object.__setattr__(self, name, method)
+            except (AttributeError, TypeError):
+                pass
+            return method
+
         if name in self.data_scheme or name in self._FOOD_DERIVED or name in self._ROSTER_DERIVED:
             def method(waves=None, market=None):
                 # For derived food tables, try deriving from food_acquired first
@@ -2128,6 +2181,7 @@ class Country:
             list(self.data_scheme)
             + list(self._FOOD_DERIVED.keys())
             + list(self._ROSTER_DERIVED.keys())
+            + list(self._DEPRECATED.keys())
         )
         return base + [n for n in dynamic if n not in base]
     
@@ -2142,6 +2196,11 @@ class Country:
         failed_methods = {}
         
         for method_name in sorted(all_methods):
+            # Skip deprecated tables: they are handled by the _DEPRECATED shim
+            # and should not be built as normal data_scheme entries.
+            if method_name in self._DEPRECATED:
+                print(f"\n>>> Skipping deprecated method: {method_name}")
+                continue
             print(f"\n>>> Testing method: {method_name}")
             try:
                 df = self._aggregate_wave_data(waves=waves, method_name=method_name)

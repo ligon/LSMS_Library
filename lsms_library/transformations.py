@@ -325,3 +325,35 @@ def food_prices_from_acquired(df):
     p = v.groupby(group_by).median()
     p = p.rename(columns={'price_per_kg': 'Price'})
     return p
+
+
+def legacy_locality(country):
+    """Reproduce the pre-deprecation output of Country(X).locality().
+
+    Returns a DataFrame indexed by (i, t, m) with a single column v,
+    where m is the region label and v is the parish/cluster identifier.
+    Implemented by joining sample() and cluster_features() — both
+    first-class tables that carry the same information.
+
+    This exists as a compatibility shim for callers migrating off the
+    deprecated locality() method. New code should use sample() and
+    cluster_features() directly.
+
+    Parameters
+    ----------
+    country : Country
+        The Country instance (e.g., ``ll.Country('Uganda')``).
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with MultiIndex (i, t, m) and a single column 'v'.
+    """
+    sample = country.sample().reset_index()
+    cluster = country.cluster_features().reset_index()
+    # Take only the columns needed for the legacy shape
+    cluster_subset = cluster[['t', 'v', 'Region']]
+    loc = sample.merge(cluster_subset, on=['t', 'v'], how='left')
+    # Rename Region -> m to match legacy output shape
+    loc = loc.rename(columns={'Region': 'm'})
+    return loc.set_index(['i', 't', 'm'])[['v']].sort_index()

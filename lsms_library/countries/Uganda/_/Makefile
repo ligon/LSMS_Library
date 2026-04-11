@@ -9,7 +9,7 @@ LSMS_DATA_ROOT ?= $(if $(LSMS_DATA_DIR),$(LSMS_DATA_DIR),$(if $(XDG_DATA_HOME),$
 VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 
 var = $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_quantities.parquet $(VAR_DIR)/food_prices.parquet \
-	  $(VAR_DIR)/household_characteristics.parquet $(VAR_DIR)/locality.parquet \
+	  $(VAR_DIR)/household_characteristics.parquet \
       $(VAR_DIR)/shocks.parquet $(VAR_DIR)/nonfood_expenditures.parquet $(VAR_DIR)/enterprise_income.parquet \
 	  $(VAR_DIR)/assets.parquet $(VAR_DIR)/earnings.parquet $(VAR_DIR)/housing.parquet $(VAR_DIR)/income.parquet \
 	  $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet
@@ -75,12 +75,6 @@ household_characteristics_parquet := $(household_characteristics:.py=.parquet)
 
 $(VAR_DIR)/household_characteristics.parquet: household_characteristics.py $(household_characteristics_parquet)
 	python household_characteristics.py
-
-locality = $(shell find $(rounds) -name locality.py)
-locality_parquet := $(locality:.py=.parquet)
-
-$(VAR_DIR)/locality.parquet: locality.py $(locality_parquet)
-	python locality.py
 
 housing = $(shell find $(rounds) -name housing.py)
 housing_parquet := $(housing:.py=.parquet)
