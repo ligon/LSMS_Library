@@ -62,7 +62,16 @@ def _parse_index_tuple(raw: str) -> list[str]:
 def _load_all_schemes() -> dict[str, dict]:
     """Load data_scheme.yml for every country that has one.
 
-    Returns {country_name: {table_name: {index: [...], col: type, ...}}}
+    Returns {country_name: {table_name: {index: [...], columns: {...}, optional: set}}}
+
+    Column declarations support an extended dict syntax::
+
+        panel_weight:
+          type: float
+          optional: true
+
+    Columns declared with ``optional: true`` are collected in the ``optional``
+    set so that ``test_declared_columns_present`` can skip them when absent.
     """
     schemes = {}
     for yml in sorted(COUNTRIES_ROOT.glob("*/_/data_scheme.yml")):
@@ -79,19 +88,29 @@ def _load_all_schemes() -> dict[str, dict]:
                 continue
             if spec is None or (isinstance(spec, str) and spec.strip() == ""):
                 # Table declared but no schema details (e.g., food_expenditures:)
-                tables[table_name] = {"index": [], "columns": {}}
+                tables[table_name] = {"index": [], "columns": {}, "optional": set()}
                 continue
             if not isinstance(spec, dict):
                 # Could be a !make tag or other non-dict
-                tables[table_name] = {"index": [], "columns": {}}
+                tables[table_name] = {"index": [], "columns": {}, "optional": set()}
                 continue
             idx_raw = spec.get("index", "")
             idx = _parse_index_tuple(str(idx_raw)) if idx_raw else []
             # Skip non-column keys: 'index', 'materialize' (from !make tag), etc.
             skip_keys = {"index", "materialize", "backend"}
-            columns = {k: v for k, v in spec.items()
-                       if k not in skip_keys and isinstance(k, str)}
-            tables[table_name] = {"index": idx, "columns": columns}
+            columns = {}
+            optional_cols: set[str] = set()
+            for k, v in spec.items():
+                if k in skip_keys or not isinstance(k, str):
+                    continue
+                if isinstance(v, dict):
+                    # Extended syntax: {type: float, optional: true}
+                    columns[k] = v.get("type", "str")
+                    if v.get("optional"):
+                        optional_cols.add(k)
+                else:
+                    columns[k] = v
+            tables[table_name] = {"index": idx, "columns": columns, "optional": optional_cols}
         schemes[country] = tables
     return schemes
 
@@ -167,6 +186,10 @@ class TestTableStructure:
         Columns marked ``api_derived`` in data_info.yml are skipped: they are
         added by ``_finalize_result()`` at API read time and are intentionally
         absent from the raw cached parquets.
+
+        Columns declared with ``optional: true`` in data_scheme.yml are also
+        skipped when absent — they represent data that is genuinely unavailable
+        for some countries (e.g., ``panel_weight`` in cross-sectional surveys).
         """
         spec = ALL_SCHEMES[country][table]
         expected_cols = spec["columns"]
@@ -175,6 +198,8 @@ class TestTableStructure:
 
         # Columns produced at API time (e.g., kinship decomposition).
         api_derived = _API_DERIVED.get(table, set())
+        # Columns declared optional in data_scheme.yml (genuinely unavailable data).
+        optional_cols = spec.get("optional", set())
 
         df = pd.read_parquet(path, engine="pyarrow")
         all_names = set(df.columns.tolist() + list(df.index.names))
@@ -182,6 +207,8 @@ class TestTableStructure:
         for col_name in expected_cols:
             if col_name in api_derived:
                 continue  # present in API output, not in raw parquet
+            if col_name in optional_cols:
+                continue  # genuinely absent from this country's source data
             assert col_name in all_names, (
                 f"{country}/{table}: declared column '{col_name}' "
                 f"not found in {sorted(all_names)}"

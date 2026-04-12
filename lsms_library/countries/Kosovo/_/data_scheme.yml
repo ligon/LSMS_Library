@@ -20,6 +20,10 @@ Data Scheme:
     index: (i, t)
     v: str
     weight: float
-    panel_weight: float
-    strata: str
+    panel_weight:
+      type: float
+      optional: true
+    strata:
+      type: str
+      optional: true
     Rural: str

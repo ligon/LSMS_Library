@@ -60,7 +60,9 @@ Data Scheme:
     v: str
     weight: float
     panel_weight: float
-    strata: str
+    strata:
+      type: str
+      optional: true
     Rural: str
 
   panel_ids: !make

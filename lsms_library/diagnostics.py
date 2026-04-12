@@ -131,7 +131,20 @@ class SanityReport:
 # ---------------------------------------------------------------------------
 
 def _load_scheme(country: str) -> dict:
-    """Load data_scheme.yml for a country, return {table: {index, columns}}."""
+    """Load data_scheme.yml for a country, return {table: {index, columns, optional}}.
+
+    Column declarations support an extended dict syntax::
+
+        panel_weight:
+          type: float
+          optional: true
+
+    Columns declared with ``optional: true`` are included in ``columns`` for
+    dtype and value-constraint checks (when the column IS present), but are
+    collected separately in the ``optional`` set so that ``_check_declared_columns``
+    can skip them when they are absent from the DataFrame.  The shorthand scalar
+    syntax (``panel_weight: float``) is still supported and implies required.
+    """
     yml = COUNTRIES_ROOT / country / "_" / "data_scheme.yml"
     if not yml.exists():
         return {}
@@ -146,13 +159,25 @@ def _load_scheme(country: str) -> dict:
         if not isinstance(name, str):
             continue
         if not isinstance(spec, dict):
-            result[name] = {"index": [], "columns": {}}
+            result[name] = {"index": [], "columns": {}, "optional": set()}
             continue
         idx_raw = spec.get("index", "")
         idx = [s.strip() for s in str(idx_raw).strip("()").split(",") if s.strip()] if idx_raw else []
         skip = {"index", "materialize", "backend"}
-        cols = {k: v for k, v in spec.items() if k not in skip and isinstance(k, str)}
-        result[name] = {"index": idx, "columns": cols}
+        cols = {}
+        optional_cols: set[str] = set()
+        for k, v in spec.items():
+            if k in skip or not isinstance(k, str):
+                continue
+            if isinstance(v, dict):
+                # Extended syntax: {type: float, optional: true}
+                dtype = v.get("type", "str")
+                cols[k] = dtype
+                if v.get("optional"):
+                    optional_cols.add(k)
+            else:
+                cols[k] = v
+        result[name] = {"index": idx, "columns": cols, "optional": optional_cols}
     return result
 
 
@@ -273,16 +298,21 @@ def _check_declared_columns(df: pd.DataFrame, scheme: dict, feature: str) -> Che
     Columns marked ``api_derived`` in data_info.yml are skipped when not
     present: they are added by ``_finalize_result()`` at API read time and are
     intentionally absent from raw cached parquets.
+
+    Columns declared with ``optional: true`` in data_scheme.yml are also
+    skipped when absent — they represent data that is genuinely unavailable
+    for some countries (e.g., ``panel_weight`` in cross-sectional surveys).
     """
     spec = scheme.get(feature, {})
     expected_cols = spec.get("columns", {})
     if not expected_cols:
         return Check("declared_columns_present", "pass", "No columns declared (skipped)")
     api_derived = _API_DERIVED_COLUMNS.get(feature, set())
+    optional_cols = spec.get("optional", set())
     all_names = set(df.columns.tolist() + list(df.index.names))
     missing = [
         c for c in expected_cols
-        if c not in all_names and c not in api_derived
+        if c not in all_names and c not in api_derived and c not in optional_cols
     ]
     if missing:
         return Check("declared_columns_present", "fail",

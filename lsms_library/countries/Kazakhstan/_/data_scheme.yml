@@ -17,8 +17,14 @@ Data Scheme:
   sample:
     index: (i, t)
     v: str
-    weight: float
-    panel_weight: float
-    strata: str
+    weight:
+      type: float
+      optional: true
+    panel_weight:
+      type: float
+      optional: true
+    strata:
+      type: str
+      optional: true
     Rural: str
 
