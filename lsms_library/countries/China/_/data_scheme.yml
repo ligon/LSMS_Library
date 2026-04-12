@@ -4,10 +4,18 @@ Data Scheme:
   sample:
     index: (i, t)
     v: str
-    weight: float
-    panel_weight: float
-    strata: str
-    Rural: str
+    weight:
+      type: float
+      optional: true
+    panel_weight:
+      type: float
+      optional: true
+    strata:
+      type: str
+      optional: true
+    Rural:
+      type: str
+      optional: true
 
   cluster_features:
     index: (t, v)

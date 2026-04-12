@@ -139,11 +139,10 @@ def _load_scheme(country: str) -> dict:
           type: float
           optional: true
 
-    Columns declared with ``optional: true`` are included in ``columns`` for
-    dtype and value-constraint checks (when the column IS present), but are
-    collected separately in the ``optional`` set so that ``_check_declared_columns``
-    can skip them when they are absent from the DataFrame.  The shorthand scalar
-    syntax (``panel_weight: float``) is still supported and implies required.
+    Columns declared with ``optional: true`` are collected in the ``optional``
+    set so that ``_check_declared_columns`` can skip them when absent — they
+    represent data that is genuinely unavailable for some countries (e.g.,
+    ``panel_weight`` in cross-sectional surveys).
     """
     yml = COUNTRIES_ROOT / country / "_" / "data_scheme.yml"
     if not yml.exists():
@@ -171,8 +170,7 @@ def _load_scheme(country: str) -> dict:
                 continue
             if isinstance(v, dict):
                 # Extended syntax: {type: float, optional: true}
-                dtype = v.get("type", "str")
-                cols[k] = dtype
+                cols[k] = v.get("type", "str")
                 if v.get("optional"):
                     optional_cols.add(k)
             else:
