@@ -1,0 +1,62 @@
+Country: CotedIvoire
+
+Data Scheme:
+  sample:
+    index: (i, t)
+    v: str
+    weight: float
+    panel_weight: float
+    strata: str
+    Rural: str
+
+  cluster_features:
+    index: (t, v)
+    Region: str
+    Rural: str
+    Latitude: float
+    Longitude: float
+
+  household_roster:
+    index: (t, i, pid)
+    Sex: str
+    Age: int
+    Relationship: str
+    Generation: int
+    Distance: int
+    Affinity: str
+
+  individual_education:
+    index: (t, i, pid)
+    Educational Attainment: str
+
+  shocks:
+    index: (t, i, Shock)
+    AffectedIncome: bool
+    AffectedAssets: bool
+    AffectedProduction: bool
+    AffectedConsumption: bool
+    HowCoped0: str
+    HowCoped1: str
+    HowCoped2: str
+
+  assets:
+    index: (t, i, j)
+    Quantity: float
+    Age: float
+    Value: float
+    Purchase Price: float
+
+  food_acquired:
+    index: (t, visit, i, j, u)
+    Quantity: float
+    Expenditure: float
+    Produced: float
+
+  housing:
+    index: (t, i)
+    Roof: str
+    Floor: str
+
+  interview_date:
+    index: (t, i)
+    int_t: datetime
