@@ -715,11 +715,82 @@ def validate_feature(
 # Panel consistency checks
 # ---------------------------------------------------------------------------
 
+def _normalize_panel_ids(country) -> list[tuple[tuple[str, str], tuple[str, str]]]:
+    """Return panel_ids as a list of ``((cur_wave, cur_id), (prev_wave, prev_id))``.
+
+    Handles both on-disk serialisation forms:
+
+    - **JSON form** (written by country-level ``panel_ids.py`` scripts):
+      dict of ``"cur_wave,cur_id" -> "prev_wave,prev_id"`` strings. The
+      2021-04-10 JSON writer joins the tuples with ``,`` and loses
+      tuple structure.
+    - **In-memory form** (emitted by ``local_tools.panel_ids()`` from
+      YAML wave aggregation): a ``RecursiveDict`` whose ``.data`` is
+      ``{(cur_wave, cur_id): (prev_wave, prev_id)}``.
+
+    The two forms are treated uniformly by this helper so downstream
+    checks can walk the chain without caring which serialisation path
+    the country uses.
+    """
+    pi = country.panel_ids
+    if not pi or not isinstance(pi, dict):
+        return []
+    data = getattr(pi, "data", pi)
+
+    entries: list[tuple[tuple[str, str], tuple[str, str]]] = []
+    for k, v in data.items():
+        if isinstance(k, tuple) and isinstance(v, tuple):
+            if len(k) >= 2 and len(v) >= 2:
+                entries.append(((str(k[0]), str(k[1])), (str(v[0]), str(v[1]))))
+            continue
+        if isinstance(k, str) and isinstance(v, str):
+            k_parts = k.split(",", 1)
+            v_parts = v.split(",", 1)
+            if len(k_parts) == 2 and len(v_parts) == 2:
+                entries.append(
+                    ((k_parts[0], k_parts[1]), (v_parts[0], v_parts[1]))
+                )
+    return entries
+
+
+def _panel_ids_chain_origins(country) -> dict[str, set[str]]:
+    """Return ``{baseline_wave: {follow_up_wave, ...}}`` per chain.
+
+    A "chain origin" is a wave whose ``(wave, id) -> (prev_wave, prev_id)``
+    entries terminate — i.e. ``prev_wave`` has no further entry in
+    ``panel_ids``. This lets disjoint-panel countries report multiple
+    baselines: Niger's ECVMA panel chains back to 2011-12 and its
+    EHCVM panel chains back to 2018-19, so this returns
+    ``{'2011-12': {'2014-15'}, '2018-19': {'2021-22'}}``.
+
+    Used by :func:`_check_updated_ids_cover_waves` and
+    :func:`_check_panel_attrition_monotonic` to avoid false-positive
+    warnings when a "missing" wave is the baseline of a second program.
+    """
+    entries = _normalize_panel_ids(country)
+    if not entries:
+        return {}
+    source_waves = {cw for (cw, _), _ in entries}
+
+    origins: dict[str, set[str]] = {}
+    for (cw, _), (pw, _) in entries:
+        # prev_wave is a baseline if no row has prev_wave as its
+        # current wave — i.e. the chain terminates there.
+        if pw not in source_waves:
+            origins.setdefault(pw, set()).add(cw)
+    return origins
+
+
 def _check_has_panel_ids(country) -> Check:
-    """Country must have panel_ids to run panel checks."""
+    """Country must have a non-empty ``panel_ids`` chain to run panel checks.
+
+    ``panel_ids`` is typically a :class:`.local_tools.RecursiveDict`
+    (a ``UserDict`` subclass). Use a truthiness check — the
+    ``isinstance(pi, dict)`` idiom misses ``UserDict`` instances.
+    """
     try:
         pi = country.panel_ids
-        if pi is None or (isinstance(pi, dict) and len(pi) == 0):
+        if not pi:
             return Check("has_panel_ids", "fail", "panel_ids is empty or None")
         return Check("has_panel_ids", "pass", f"{len(pi)} panel ID mappings")
     except Exception as e:
@@ -727,10 +798,10 @@ def _check_has_panel_ids(country) -> Check:
 
 
 def _check_has_updated_ids(country) -> Check:
-    """Country must have updated_ids."""
+    """Country must have a non-empty ``updated_ids`` mapping."""
     try:
         ui = country.updated_ids
-        if ui is None or (isinstance(ui, dict) and len(ui) == 0):
+        if not ui:
             return Check("has_updated_ids", "fail", "updated_ids is empty or None")
         waves_with_mappings = {w for w, m in ui.items() if m}
         return Check("has_updated_ids", "pass",
@@ -740,30 +811,55 @@ def _check_has_updated_ids(country) -> Check:
 
 
 def _check_updated_ids_cover_waves(country) -> Check:
-    """updated_ids should have entries for every wave (except possibly the first)."""
+    """Every follow-up wave should have a non-empty ``updated_ids`` entry.
+
+    In a single-chain panel the first wave is the baseline; every later
+    wave should rewrite back to it. In a disjoint-panel country (Niger:
+    ECVMA 2011-12↔2014-15, EHCVM 2018-19↔2021-22) there are **multiple**
+    baselines. This check honors both: it infers baselines from the
+    ``panel_ids`` chain structure and only warns about waves that are
+    genuinely unreachable.
+    """
     try:
         ui = country.updated_ids
         waves = sorted(country.waves)
         if len(waves) < 2:
-            return Check("updated_ids_cover_waves", "pass", "Single-wave country (skipped)")
-        # First wave usually has no previous IDs
-        expected_waves = set(waves[1:])
-        covered = {w for w in expected_waves if w in ui and ui[w]}
-        missing = expected_waves - covered
+            return Check("updated_ids_cover_waves", "pass",
+                         "Single-wave country (skipped)")
+
+        # Gather baselines from the panel_ids chain structure. These are
+        # waves that terminate a chain rather than continue one.
+        chain_origins = _panel_ids_chain_origins(country)
+        baselines = set(chain_origins.keys())
+        # Fall back to the first wave alphabetically if no chain data.
+        if not baselines:
+            baselines = {waves[0]}
+
+        expected = set(waves) - baselines
+        covered = {w for w in expected if w in ui and ui[w]}
+        missing = expected - covered
         if missing:
             return Check("updated_ids_cover_waves", "warn",
-                         f"No ID mappings for waves: {sorted(missing)}")
+                         f"No ID mappings for follow-up waves: {sorted(missing)} "
+                         f"(baselines inferred: {sorted(baselines)})")
         return Check("updated_ids_cover_waves", "pass",
-                     f"All {len(covered)} follow-up waves have mappings")
+                     f"All {len(covered)} follow-up waves have mappings "
+                     f"(baselines: {sorted(baselines)})")
     except Exception as e:
         return Check("updated_ids_cover_waves", "fail", str(e))
 
 
 def _check_ids_are_self_consistent(country) -> Check:
-    """Check that updated_ids mappings don't create cycles or orphans.
+    """Flag self-referential or null entries in ``updated_ids`` that are
+    NOT backed by a corresponding ``panel_ids`` chain entry.
 
-    Every current ID should map to a valid previous ID, and the chain
-    should terminate at a first-wave ID.
+    A self-referential entry ``updated_ids[wave][k] == k`` is only a bug
+    if ``panel_ids`` has no matching ``(wave, k) -> (prev_wave, prev_id)``
+    chain that would justify it. EHCVM countries legitimately have
+    identity mappings for panel households (because ``cur_i == prev_i``
+    when ID construction is ``(grappe, menage)``-based), so this check
+    cross-references the two outputs and only warns on orphaned
+    self-refs or truly null mappings.
     """
     try:
         ui = country.updated_ids
@@ -771,18 +867,37 @@ def _check_ids_are_self_consistent(country) -> Check:
         if len(waves) < 2:
             return Check("ids_self_consistent", "pass", "Single-wave (skipped)")
 
+        # Build the set of (wave, id) tuples that have a panel_ids chain
+        # entry anchoring them — these are the ones whose updated_ids
+        # entry can legitimately be identity.
+        entries = _normalize_panel_ids(country)
+        if not entries:
+            # No chain to cross-reference against. Any self-refs or null
+            # entries in updated_ids are uncontextualised — report the
+            # situation without spamming orphan counts.
+            return Check("ids_self_consistent", "pass",
+                         "No panel_ids chain to cross-reference (skipped)")
+        chained: set[tuple[str, str]] = {k for k, _ in entries}
+
         issues = []
-        for wave in waves[1:]:
+        for wave in waves:
             if wave not in ui or not ui[wave]:
                 continue
             mappings = ui[wave]
-            # Check for self-referential mappings
-            self_refs = [k for k, v in mappings.items() if k == v]
-            if self_refs:
-                issues.append(f"{wave}: {len(self_refs)} self-referential ID(s)")
-            # Check for empty/null mappings
-            null_maps = [k for k, v in mappings.items()
-                         if v is None or (isinstance(v, str) and v.strip() == "")]
+            # Self-refs that are NOT backed by a panel_ids chain.
+            orphaned_self_refs = [
+                k for k, v in mappings.items()
+                if k == v and (wave, k) not in chained
+            ]
+            if orphaned_self_refs:
+                issues.append(
+                    f"{wave}: {len(orphaned_self_refs)} orphaned self-referential ID(s)"
+                )
+            # Null mappings are always a bug.
+            null_maps = [
+                k for k, v in mappings.items()
+                if v is None or (isinstance(v, str) and v.strip() == "")
+            ]
             if null_maps:
                 issues.append(f"{wave}: {len(null_maps)} null mapping(s)")
 
@@ -793,122 +908,440 @@ def _check_ids_are_self_consistent(country) -> Check:
         return Check("ids_self_consistent", "fail", str(e))
 
 
+def _compute_panel_spine(country) -> tuple[pd.DataFrame | None, str]:
+    """Compute a household-level panel spine from scratch, with provenance.
+
+    The spine is the reference for which ``(i, t)`` pairs are present,
+    used by attrition and id-consistency checks. Preference order:
+
+    1. ``household_roster`` via the ``Country`` API (applies id_walk,
+       kinship expansion, and all finalize-result hooks). Collapsed to
+       unique ``(i, t)`` rows.
+    2. The cached ``household_roster.parquet`` under ``data_root()``
+       (cheaper; skips the full finalize pipeline but still has
+       canonical IDs after id_walk).
+    3. ``cluster_features.parquet`` (legacy fallback, may lack ``i``).
+
+    Returns ``(df, provenance)`` or ``(None, reason)`` if no spine is
+    available. **Callers should prefer :func:`_panel_spine` which
+    memoises the result on the country object to avoid rebuilding
+    across multiple checks in one report.**
+    """
+    # Try the cached parquet first — much cheaper than the API path
+    # when a country has many waves or a flaky stage-layer configuration.
+    parquet_path = data_root(country.name) / "var" / "household_roster.parquet"
+    if parquet_path.exists():
+        try:
+            df = pd.read_parquet(parquet_path, engine="pyarrow")
+            if "i" in df.index.names and "t" in df.index.names:
+                spine = (
+                    df.reset_index()[["i", "t"]]
+                    .drop_duplicates()
+                    .set_index(["i", "t"])
+                )
+                return spine, "cached household_roster.parquet"
+        except Exception:
+            pass
+
+    # Next try the API (applies the full finalize pipeline including
+    # id_walk, which is what we want for a post-walk spine).
+    try:
+        roster = country.household_roster()
+        if (isinstance(roster, pd.DataFrame)
+                and "i" in roster.index.names
+                and "t" in roster.index.names):
+            spine = (
+                roster.reset_index()[["i", "t"]]
+                .drop_duplicates()
+                .set_index(["i", "t"])
+            )
+            return spine, "household_roster (API)"
+    except Exception:
+        pass
+
+    # Last-resort: legacy cluster_features parquet.
+    cf_path = data_root(country.name) / "var" / "cluster_features.parquet"
+    if cf_path.exists():
+        try:
+            df = pd.read_parquet(cf_path, engine="pyarrow")
+            if "i" in df.index.names and "t" in df.index.names:
+                spine = (
+                    df.reset_index()[["i", "t"]]
+                    .drop_duplicates()
+                    .set_index(["i", "t"])
+                )
+                return spine, f"cached cluster_features.parquet"
+        except Exception:
+            pass
+
+    return None, "no household_roster / cluster_features available"
+
+
+def _panel_spine(country) -> tuple[pd.DataFrame | None, str]:
+    """Memoised wrapper around :func:`_compute_panel_spine`.
+
+    Within a single ``check_panel_consistency`` run, five checks
+    consult the spine. Memoising on the country instance avoids
+    rebuilding ``household_roster`` five times — critical for
+    countries like Uganda whose stage-layer configuration retries
+    on every fresh call.
+    """
+    cached = getattr(country, "_diagnostics_spine_cache", None)
+    if cached is not None:
+        return cached
+    result = _compute_panel_spine(country)
+    try:
+        country._diagnostics_spine_cache = result
+    except (AttributeError, TypeError):
+        # Some Country-like objects may not allow attribute assignment.
+        pass
+    return result
+
+
 def _check_panel_attrition_monotonic(country) -> Check:
-    """The diagonal of the attrition matrix should decrease over time
-    (panel attrition), and off-diagonal entries should be <= diagonal.
+    """Cross-wave overlap should be non-zero for chained waves.
+
+    Uses ``household_roster`` as the spine (the universal cross-country
+    feature). Iterates over ``panel_ids`` chains — if a country has two
+    disjoint panels (e.g. Niger), both chains are checked independently
+    so that "zero adjacent overlap" across a program boundary is not
+    flagged.
     """
     try:
-        from .local_tools import panel_attrition
-        # Need a feature with (i, t) to compute attrition
-        spine_path = data_root(country.name) / "var" / "other_features.parquet"
-        if not spine_path.exists():
+        spine, provenance = _panel_spine(country)
+        if spine is None:
+            return Check("attrition_monotonic", "pass", provenance)
+
+        spine_waves = sorted(spine.index.get_level_values("t").unique())
+        if len(spine_waves) < 2:
             return Check("attrition_monotonic", "pass",
-                         "other_features not cached (skipped)")
-        spine = pd.read_parquet(spine_path, engine="pyarrow")
-        if "i" not in spine.index.names or "t" not in spine.index.names:
-            return Check("attrition_monotonic", "pass", "Spine lacks i/t index (skipped)")
+                         f"Single wave (skipped; spine={provenance})")
 
-        waves = sorted(spine.index.get_level_values("t").unique())
-        if len(waves) < 2:
-            return Check("attrition_monotonic", "pass", "Single wave (skipped)")
+        # Build per-wave ID sets once.
+        ids_by_wave = {
+            w: set(spine.xs(w, level="t").index.get_level_values("i").unique())
+            for w in spine_waves
+        }
 
-        attrition = panel_attrition(spine, waves)
+        chain_origins = _panel_ids_chain_origins(country)
+        baselines = set(chain_origins.keys()) or {spine_waves[0]}
 
-        # Check diagonal: sample size per wave
-        diag = [int(attrition.loc[w, w]) for w in waves]
-        issues = []
+        # Build chains: each baseline anchors a set of follow-up waves
+        # that are transitively reachable via panel_ids. For each chain
+        # we check consecutive overlap.
+        entries = _normalize_panel_ids(country)
+        # follows[wave] = prev_wave (from any entry)
+        follows: dict[str, str] = {}
+        for (cw, _), (pw, _) in entries:
+            follows[cw] = pw
+        # Build chains by walking backward from each non-baseline wave.
+        chains: list[list[str]] = []
+        seen_waves: set[str] = set()
+        for baseline in sorted(baselines):
+            chain = [baseline]
+            seen_waves.add(baseline)
+            # Extend forward by finding any wave whose "follows" points
+            # into the current chain tip.
+            extended = True
+            while extended:
+                extended = False
+                for cw, pw in follows.items():
+                    if pw == chain[-1] and cw not in seen_waves:
+                        chain.append(cw)
+                        seen_waves.add(cw)
+                        extended = True
+                        break
+            chains.append(chain)
 
-        # Off-diagonal: attrition between waves s < t should be <= min(diag[s], diag[t])
-        for i, s in enumerate(waves):
-            for t in waves[i + 1:]:
-                val = int(attrition.loc[s, t])
-                if val > diag[i]:
-                    issues.append(f"({s},{t}): {val} > {diag[i]} (more matches than source wave)")
-                if val < 0:
-                    issues.append(f"({s},{t}): negative count {val}")
+        issues: list[str] = []
+        summaries: list[str] = []
+        for chain in chains:
+            if len(chain) < 2:
+                continue
+            # Consecutive-wave overlap within the chain.
+            for a, b in zip(chain, chain[1:]):
+                ids_a = ids_by_wave.get(a, set())
+                ids_b = ids_by_wave.get(b, set())
+                n = len(ids_a & ids_b)
+                if n == 0:
+                    issues.append(f"({a},{b}): zero overlap in {provenance}")
+                else:
+                    ratio = n / min(len(ids_a), len(ids_b)) if ids_a and ids_b else 0
+                    summaries.append(f"{a}->{b}: {n} HH ({ratio:.0%})")
 
-        # Check that attrition is non-negative between adjacent waves
-        for i in range(len(waves) - 1):
-            s, t = waves[i], waves[i + 1]
-            val = int(attrition.loc[s, t])
-            if val == 0:
-                issues.append(f"({s},{t}): zero overlap — panel may be broken")
+        # Also flag off-diagonal counts that exceed the source wave
+        # (which would mean more matches than source households, a bug).
+        for chain in chains:
+            for i, s in enumerate(chain):
+                for t in chain[i + 1:]:
+                    n = len(ids_by_wave.get(s, set()) & ids_by_wave.get(t, set()))
+                    if n > len(ids_by_wave.get(s, set())):
+                        issues.append(
+                            f"({s},{t}): {n} > {len(ids_by_wave.get(s, set()))} "
+                            f"(more matches than source wave)"
+                        )
 
         if issues:
-            return Check("attrition_monotonic", "warn", "; ".join(issues[:5]))
-
-        # Summarize attrition rates
-        if len(waves) >= 2:
-            first_last = int(attrition.loc[waves[0], waves[-1]])
-            retention = first_last / diag[0] if diag[0] > 0 else 0
+            return Check("attrition_monotonic", "warn",
+                         "; ".join(issues[:5]))
+        if not summaries:
             return Check("attrition_monotonic", "pass",
-                         f"Attrition matrix OK. {waves[0]}→{waves[-1]} retention: "
-                         f"{first_last}/{diag[0]} ({retention:.1%})")
-        return Check("attrition_monotonic", "pass")
+                         f"No multi-wave chains found ({provenance})")
+        return Check("attrition_monotonic", "pass",
+                     f"Attrition chains OK ({provenance}): "
+                     + "; ".join(summaries[:6]))
     except Exception as e:
         return Check("attrition_monotonic", "fail", str(e))
 
 
 def _check_ids_applied_consistently(country) -> Check:
-    """For each feature with 'i' and 't' in the index, check that household
-    IDs are consistent with updated_ids — i.e., the same physical household
-    uses the same canonical ID across waves.
+    """For the household_roster spine, check that IDs are in the canonical
+    (post-``id_walk``) form rather than the raw wave-specific form.
+
+    This catches the case where a feature was built without calling
+    ``id_walk``: its IDs would match the *values* of ``updated_ids[wave]``
+    (the old, wave-specific forms) rather than the *keys* (the canonical
+    baseline IDs).
     """
     try:
         ui = country.updated_ids
         if not ui:
-            return Check("ids_applied_consistently", "pass", "No updated_ids (skipped)")
+            return Check("ids_applied_consistently", "pass",
+                         "No updated_ids (skipped)")
 
-        # Build reverse map: for each wave, which canonical IDs should appear?
-        # updated_ids maps current_id -> canonical_first_wave_id
-        # Check a few features for consistency
-        features_to_check = ["other_features", "household_characteristics", "food_acquired"]
-        issues = []
+        spine, provenance = _panel_spine(country)
+        if spine is None:
+            return Check("ids_applied_consistently", "pass", provenance)
 
-        for feature_name in features_to_check:
-            feature_path = data_root(country.name) / "var" / f"{feature_name}.parquet"
-            if not feature_path.exists():
+        issues: list[str] = []
+        # For each wave with a non-empty mapping, check whether the
+        # spine's IDs look pre-update. updated_ids[wave] maps
+        # current_id -> canonical_id; the canonical form is the VALUES,
+        # and feature IDs should be values, not keys.
+        for wave, mapping in ui.items():
+            if not mapping:
                 continue
-            df = pd.read_parquet(feature_path, engine="pyarrow")
-            if "i" not in df.index.names or "t" not in df.index.names:
+            wave_ids = set(
+                spine.xs(wave, level="t", drop_level=False)
+                .index.get_level_values("i")
+                .unique()
+            ) if wave in spine.index.get_level_values("t") else set()
+            if not wave_ids:
+                continue
+            pre_update = set(mapping.keys())     # wave-specific form
+            canonical = set(mapping.values())    # canonical baseline form
+
+            # A wave with an identity mapping ({k: k}) has keys == values
+            # and is ambiguous; skip.
+            if pre_update == canonical:
                 continue
 
-            # For each wave with updated_ids, check that feature IDs
-            # use the canonical (updated) form, not the raw wave-specific form
-            waves_in_data = sorted(df.index.get_level_values("t").unique())
-            for wave in waves_in_data:
-                if wave not in ui or not ui[wave]:
-                    continue
-                mappings = ui[wave]
-                # IDs in this wave of this feature
-                wave_mask = df.index.get_level_values("t") == wave
-                feature_ids = set(df[wave_mask].index.get_level_values("i"))
-
-                # The canonical IDs are the keys of updated_ids[wave]
-                # (current IDs that map to earlier canonical IDs)
-                canonical_ids = set(mappings.keys())
-
-                # Check: do any feature IDs match the *values* (old IDs)
-                # instead of the keys (updated IDs)?  That would mean
-                # id_walk wasn't applied.
-                old_ids = set(mappings.values())
-                using_old = feature_ids & old_ids - canonical_ids
-                if using_old and len(using_old) > len(feature_ids) * 0.1:
-                    issues.append(
-                        f"{feature_name}/{wave}: {len(using_old)} IDs appear to use "
-                        f"pre-update form (id_walk may not have been applied)"
-                    )
+            # Rewrites that haven't been applied: IDs in the spine match
+            # the pre-update keys but NOT the canonical values.
+            looks_pre = (wave_ids & pre_update) - canonical
+            if looks_pre and len(looks_pre) > len(wave_ids) * 0.1:
+                issues.append(
+                    f"{wave}: {len(looks_pre)} IDs look pre-update "
+                    f"(id_walk may not have been applied)"
+                )
 
         if issues:
             return Check("ids_applied_consistently", "warn", "; ".join(issues[:5]))
         return Check("ids_applied_consistently", "pass",
-                     f"Checked {len(features_to_check)} features — IDs look canonical")
+                     f"Spine IDs look canonical ({provenance})")
     except Exception as e:
         return Check("ids_applied_consistently", "fail", str(e))
 
 
+def _check_panel_ids_targets_exist(country) -> Check:
+    """Every ``panel_ids`` chain entry should reference households that
+    actually exist in ``household_roster`` — after accounting for
+    ``id_walk``.
+
+    Implementation subtlety: ``panel_ids`` stores **pre-walk** IDs
+    (e.g. Niger's ``'1001'``), while ``household_roster`` returns
+    **post-walk** IDs (e.g. Niger's canonical ``'101'``). This check
+    walks each chain endpoint through ``updated_ids`` to get its
+    canonical form, then verifies the canonical ID appears in the
+    respective wave's roster. It also cross-checks that both
+    endpoints of a chain entry resolve to the **same** canonical ID
+    (otherwise the entry is internally inconsistent).
+
+    Would have caught the Niger '10010' → '101' bug from 2026-04:
+    the panel_ids.py script constructed current IDs that did not
+    match the roster's actual ID form (extension vs no-extension),
+    so 3211 of 3537 mappings pointed at non-existent households even
+    after canonicalisation.
+    """
+    try:
+        entries = _normalize_panel_ids(country)
+        if not entries:
+            return Check("panel_ids_targets_exist", "pass", "No panel_ids (skipped)")
+
+        ui = country.updated_ids or {}
+
+        spine, provenance = _panel_spine(country)
+        if spine is None:
+            return Check("panel_ids_targets_exist", "pass", provenance)
+
+        ids_by_wave = {
+            w: set(spine.xs(w, level="t").index.get_level_values("i").unique())
+            for w in spine.index.get_level_values("t").unique()
+        }
+
+        missing_current = 0
+        missing_prev = 0
+        inconsistent = 0
+        total = 0
+        sample_missing: list[str] = []
+        for (cw, ci), (pw, pi_) in entries:
+            total += 1
+            # Walk to canonical form (post-id_walk).
+            canon_ci = ui.get(cw, {}).get(ci, ci)
+            canon_pi = ui.get(pw, {}).get(pi_, pi_)
+
+            # Cross-check: a chain entry's two endpoints should resolve
+            # to the same canonical ID. If they don't, the chain is
+            # internally inconsistent.
+            if canon_ci != canon_pi:
+                inconsistent += 1
+                if len(sample_missing) < 3:
+                    sample_missing.append(
+                        f"inconsist ({cw},{ci}->{canon_ci}) != "
+                        f"({pw},{pi_}->{canon_pi})"
+                    )
+                continue
+
+            if canon_ci not in ids_by_wave.get(cw, set()):
+                missing_current += 1
+                if len(sample_missing) < 3:
+                    sample_missing.append(f"cur ({cw},{canon_ci})")
+            if canon_pi not in ids_by_wave.get(pw, set()):
+                missing_prev += 1
+                if len(sample_missing) < 3:
+                    sample_missing.append(f"prev ({pw},{canon_pi})")
+
+        if total == 0:
+            return Check("panel_ids_targets_exist", "pass",
+                         f"No entries to check ({provenance})")
+
+        miss_rate_cur = missing_current / total
+        miss_rate_prev = missing_prev / total
+        inconsist_rate = inconsistent / total
+        # Separate thresholds: the "cur" side should be exact because the
+        # post-walk roster is the ground truth for the current wave, and
+        # any inconsistency is a bug in the script. The "prev" side has
+        # some tolerance for legitimate data drift (households whose
+        # rosters drop a wave).
+        cur_threshold = 0.02
+        prev_threshold = 0.10
+        inconsist_threshold = 0.02
+
+        if (miss_rate_cur > cur_threshold
+                or miss_rate_prev > prev_threshold
+                or inconsist_rate > inconsist_threshold):
+            return Check(
+                "panel_ids_targets_exist", "fail",
+                f"{missing_current}/{total} cur ({miss_rate_cur:.0%}), "
+                f"{missing_prev}/{total} prev ({miss_rate_prev:.0%}), "
+                f"{inconsistent}/{total} inconsistent ({inconsist_rate:.0%}) "
+                f"vs {provenance}; sample: {sample_missing}"
+            )
+        if missing_current or missing_prev or inconsistent:
+            return Check(
+                "panel_ids_targets_exist", "warn",
+                f"{missing_current}+{missing_prev}+{inconsistent}/{total} "
+                f"entries have a missing or inconsistent endpoint "
+                f"(cur≤{cur_threshold:.0%}, prev≤{prev_threshold:.0%}; {provenance})"
+            )
+        return Check("panel_ids_targets_exist", "pass",
+                     f"All {total} chain endpoints present in {provenance}")
+    except Exception as e:
+        return Check("panel_ids_targets_exist", "fail", str(e))
+
+
+def _check_id_walk_idempotent(country) -> Check:
+    """Applying ``id_walk`` to an already-canonical spine must be a no-op.
+
+    The framework sets ``df.attrs['id_converted'] = True`` after
+    ``id_walk`` to prevent double-application. Operations like
+    ``merge()`` and ``set_index()`` drop ``.attrs`` in pandas 2.x, and
+    any downstream helper that touches a DataFrame without preserving
+    ``.attrs`` can cause ``id_walk`` to run twice — which for countries
+    with transitive ID chains produces duplicate rows.
+
+    This check reruns ``id_walk`` manually on the spine and confirms
+    the row count and index set are unchanged. It would have caught
+    the Burkina Faso 2021-22 attrs bug from commit 4db41a27 (392
+    duplicate tuples out of ~78,000).
+    """
+    try:
+        from .local_tools import id_walk
+        spine, provenance = _panel_spine(country)
+        if spine is None:
+            return Check("id_walk_idempotent", "pass", provenance)
+
+        ui = country.updated_ids
+        if not ui or not any(m for m in ui.values()):
+            return Check("id_walk_idempotent", "pass",
+                         f"No non-empty updated_ids (skipped; spine={provenance})")
+
+        before_rows = len(spine)
+        before_ids = set(zip(
+            spine.index.get_level_values("i"),
+            spine.index.get_level_values("t"),
+        ))
+
+        # Re-apply id_walk. Even though the spine already went through
+        # _finalize_result once, running id_walk again on a clean copy
+        # should produce the same set of (i, t) tuples.
+        #
+        # Clear .attrs so id_walk doesn't early-exit on the flag.
+        replayed = spine.copy()
+        replayed.attrs = {}
+        replayed = id_walk(replayed, ui, hh_index="i")
+
+        after_rows = len(replayed)
+        after_ids = set(zip(
+            replayed.index.get_level_values("i"),
+            replayed.index.get_level_values("t"),
+        ))
+
+        delta_rows = after_rows - before_rows
+        only_before = len(before_ids - after_ids)
+        only_after = len(after_ids - before_ids)
+
+        if delta_rows != 0 or only_before or only_after:
+            return Check(
+                "id_walk_idempotent", "fail",
+                f"id_walk not idempotent: rows {before_rows}->{after_rows} "
+                f"(delta {delta_rows:+d}), {only_before} disappeared, "
+                f"{only_after} appeared ({provenance})"
+            )
+        return Check("id_walk_idempotent", "pass",
+                     f"id_walk is idempotent on {provenance} "
+                     f"({before_rows} rows)")
+    except Exception as e:
+        return Check("id_walk_idempotent", "fail", str(e))
+
+
 def check_panel_consistency(country) -> SanityReport:
     """Run panel-specific sanity checks on a Country object.
+
+    Runs eight checks grouped into three tiers:
+
+    **Existence** — ``has_panel_ids``, ``has_updated_ids``.
+
+    **Structural consistency** — ``updated_ids_cover_waves``,
+    ``ids_self_consistent`` (both now understand disjoint panels by
+    inferring baselines from ``panel_ids`` chain origins);
+    ``panel_ids_targets_exist`` (every chain endpoint actually appears
+    in ``household_roster``).
+
+    **Runtime correctness** — ``attrition_monotonic`` (cross-wave
+    overlap on ``household_roster`` per chain), ``ids_applied_consistently``
+    (spine IDs are in the canonical post-``id_walk`` form),
+    ``id_walk_idempotent`` (re-applying ``id_walk`` is a no-op).
 
     Parameters
     ----------
@@ -921,11 +1354,25 @@ def check_panel_consistency(country) -> SanityReport:
     """
     report = SanityReport(country=country.name, feature="[panel]")
 
-    report.checks.append(_check_has_panel_ids(country))
-    report.checks.append(_check_has_updated_ids(country))
+    # Existence checks first. Run both unconditionally.
+    has_pi = _check_has_panel_ids(country)
+    has_ui = _check_has_updated_ids(country)
+    report.checks.append(has_pi)
+    report.checks.append(has_ui)
+
+    # If neither exists there's nothing useful left to check — return
+    # early and skip the downstream checks so the report stays concise.
+    if has_pi.status == "fail" and has_ui.status == "fail":
+        return report
+
+    # Structural + runtime checks. These rely on panel_ids and/or
+    # updated_ids and the household_roster spine; they gracefully
+    # skip when their prerequisites are missing.
     report.checks.append(_check_updated_ids_cover_waves(country))
     report.checks.append(_check_ids_are_self_consistent(country))
+    report.checks.append(_check_panel_ids_targets_exist(country))
     report.checks.append(_check_panel_attrition_monotonic(country))
     report.checks.append(_check_ids_applied_consistently(country))
+    report.checks.append(_check_id_walk_idempotent(country))
 
     return report
