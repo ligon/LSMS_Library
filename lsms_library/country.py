@@ -1066,6 +1066,22 @@ class Country:
 
         flat = flat.merge(v_lookup, on=['i', 't'], how='left')
 
+        # Normalize v to canonical pd.StringDtype.  sample() may return v as
+        # int64, float64 (left-merge with NaN converts int→float), or plain
+        # object; mixed dtypes across waves cause pyarrow serialisation failures
+        # when the caller does df.to_parquet().  Enforce a uniform string dtype
+        # here so Feature('housing')([...]) concatenation is always clean.
+        # Fixes GH #142.
+        if 'v' in flat.columns:
+            def _v_to_str(x):
+                if pd.isna(x) or x == '':
+                    return pd.NA
+                try:
+                    return str(int(float(x)))
+                except (ValueError, OverflowError):
+                    return str(x).strip()
+            flat['v'] = flat['v'].map(_v_to_str).astype(pd.StringDtype())
+
         # Insert v after t in the index
         new_idx = []
         for n in idx_names:
