@@ -53,7 +53,7 @@ myvars.update({f"Produced_v{i}":(f"s8hq{i}",_to_numeric) for i in range(3,13)})
 prod = df_data_grabber('../Data/S8H.DTA',idxvars,**myvars)
 
 # Oddity with large number for missing code
-na = prod.select_dtypes(exclude='object').max().max()
+na = prod.select_dtypes(exclude=['object', 'category']).max().max()
 
 if na>1e99:  # Missing values?
     warnings.warn(f"Large number used for missing?  Replacing {na} with NaN.")
