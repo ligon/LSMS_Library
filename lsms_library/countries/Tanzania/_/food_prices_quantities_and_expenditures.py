@@ -28,14 +28,14 @@ quantities =  ['quant_ttl_consume', 'unit_ttl_consume']
 # Now prices and quantitites; unit conversion already handled in food_acquired
 
 p = fa[prices].rename(columns = {'unit_purchase': 'u'})
-p = p.reset_index().set_index(['j','t','m','i','u'])
+p = p.reset_index().set_index(['j','t','i','u'])
 
 assert p.index.is_unique, "Non-unique index!  Fix me!"
 
 to_parquet(p, '../var/food_prices.parquet')
 
 q = fa[quantities].rename(columns = {'unit_ttl_consume': 'u'})
-q = q.reset_index().set_index(['j','t','m','i','u'])
+q = q.reset_index().set_index(['j','t','i','u'])
 
 assert q.index.is_unique, "Non-unique index!  Fix me!"
 
@@ -43,10 +43,10 @@ to_parquet(q, '../var/food_quantities.parquet')
 
 # Now, using median unit prices, value quantities consumed q
 
-pbar = p.groupby(['t','m','i','u']).median()
+pbar = p.groupby(['t','i','u']).median()
 
 x = (pbar.squeeze()*q.squeeze()) # Value of consumption
-x = x.groupby(['j','t','m','i']).sum() # Sum over different units
+x = x.groupby(['j','t','i']).sum() # Sum over different units
 
 x = x.replace(0,np.nan).dropna()
 
