@@ -46,6 +46,11 @@ Data Scheme:
     HowCoped1: str
     HowCoped2: str
 
+  housing:
+    index: (t, i)
+    Roof: str
+    Floor: str
+
   interview_date:
     index: (t, i)
     int_t: datetime
