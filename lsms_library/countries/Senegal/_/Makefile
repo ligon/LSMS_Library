@@ -9,8 +9,13 @@ VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 
 var = $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_quantities.parquet $(VAR_DIR)/food_prices.parquet \
 	  $(VAR_DIR)/household_characteristics.parquet
-      
-all: $(parquet) $(var)
+
+all: $(parquet) $(var) panel_ids.json
+
+# Panel IDs are constructed from raw 2018-19 and 2021-22 cover sheets.
+# See panel_ids.py for the EHCVM PanelHH-based linkage.
+panel_ids.json updated_ids.json: panel_ids.py senegal.py
+	python panel_ids.py
 
 $(VAR_DIR)/food_quantities.parquet $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_prices.parquet &: $(VAR_DIR)/food_acquired.parquet food_acquired.py
 	python food_prices_quantities_and_expenditures.py
