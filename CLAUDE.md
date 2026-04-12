@@ -41,10 +41,10 @@ The returned DataFrame prepends a `country` index level.
 
 - **Default cache location**: `~/.local/share/lsms_library/{Country}/var/{table}.parquet`. Override with `data_dir` in `~/.config/lsms_library/config.yml` or the `LSMS_DATA_DIR` env var (env var wins).
 - **No automatic staleness check.** Editing a wave's `data_info.yml`, a `_/{table}.py` script, or an upstream `.dta` file does NOT trigger a rebuild. Force one with `LSMS_NO_CACHE=1` in the session, `lsms-library cache clear --country {Country}`, or by deleting the parquet.
-- **`LSMS_BUILD_BACKEND=make`** bypasses both the top read and the DVC stage layer entirely — every call rebuilds from source, with no cache writes or reads.
+- **`LSMS_BUILD_BACKEND=make`** bypasses the cache entirely — every call rebuilds from source, with no cache writes or reads.
 - **`assume_cache_fresh=True`** is a narrower in-process short-circuit at the top of `_aggregate_wave_data` that still calls `_finalize_result` (so kinship expansion, spelling normalization, and `_join_v_from_sample` still apply). Use when the cache is known fresh to skip all DVC / existence checks. It ignores `LSMS_NO_CACHE`. (`trust_cache=True` is a deprecated alias; removed in v0.8.0.)
 - **Cache vs. API**: cached parquets store pre-transformation data. Kinship expansion, canonical spelling enforcement, and dtype coercion happen in `_finalize_result()` on every read — not at cache write time. So `pd.read_parquet(cache_path)` shows raw `Relationship` strings; the Country API shows decomposed `(Sex, Generation, Distance, Affinity)`.
-- **Stage-layer countries** (Uganda, Senegal, Malawi, Togo, Kazakhstan, Serbia, GhanaLSS) declare a `dvc.yaml` with a bare `python3` cmd. On Savio that resolves to system Python 3.6.8 and fails; v0.7.0 turns the failure into a benign fallback via cache. v0.8.0 will retire the stage layer entirely. See `SkunkWorks/dvc_object_management.org`.
+- **DVC stage layer is retired (v0.7.0).** Country-level `dvc.yaml` files are now `stages: {}`. All data loading goes through the cache + `load_from_waves` path. The `reproduce()` code path in `country.py` is dead code pending removal. See `SkunkWorks/dvc_object_management.org`.
 
 ## Two Build Paths: YAML vs. Makefile/Script
 
@@ -185,6 +185,6 @@ Some countries have configs but no source `.dta` in the repository:
 
 ## Design / Skunkworks References
 
-- `SkunkWorks/dvc_object_management.org` — v0.8.0 content-hash cache invalidation plan; retires the stage layer.
+- `SkunkWorks/dvc_object_management.org` — content-hash cache invalidation plan (stage layer retired in v0.7.0; hash-based invalidation deferred to v0.8.0).
 - `SkunkWorks/dvcfilesystem_runtime_override.org` — how the pip-install scenario works (runtime config override, lazy credential validation, no git ancestor required).
 - `SkunkWorks/cross_country_label_harmonization.org` — design sketch for `Feature(...)(harmonize=...)`.
