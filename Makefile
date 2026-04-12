@@ -24,7 +24,7 @@ PYTEST_WORKERS ?= $(or $(SLURM_CPUS_ON_NODE),$(shell nproc 2>/dev/null || echo 1
 #   make test PYTEST_WORKERS=4
 PYTEST_ARGS ?= -n $(PYTEST_WORKERS) --dist=loadfile
 
-.PHONY: setup test test-full build release clean help
+.PHONY: setup test test-full retest test-ff build release clean help
 
 setup: .venv/pyvenv.cfg
 
@@ -37,6 +37,21 @@ test: setup
 
 test-full: setup
 	LSMS_NO_CACHE=1 $(POETRY) run pytest $(PYTEST_ARGS) --rebuild
+
+# Iterative-development test targets.  Both use pytest's cache at
+# .pytest_cache/ to remember which tests failed on the previous run.
+#
+#   retest   — run ONLY last-failed tests, stop on the first failure.
+#              Fast feedback loop when fixing a specific failure.
+#   test-ff  — run last-failed tests first, then the rest.
+#              Verify the fix and keep going.
+#
+# Both inherit PYTEST_ARGS for worker count + distribution.
+retest: setup
+	$(POETRY) run pytest $(PYTEST_ARGS) --lf -x
+
+test-ff: setup
+	$(POETRY) run pytest $(PYTEST_ARGS) --ff -x
 
 build: setup
 	$(POETRY) build
@@ -81,9 +96,11 @@ clean:
 help:
 	@echo "Top-level targets:"
 	@echo "  setup    Install dependencies via Poetry"
-	@echo "  test     Run pytest suite (fast tier, uses L2 parquet cache)"
+	@echo "  test       Run pytest suite (fast tier, uses L2 parquet cache)"
 	@echo "  test-full  Run pytest with cold cache (LSMS_NO_CACHE=1 --rebuild)"
-	@echo "  build    Build distribution"
+	@echo "  retest     Re-run only last-failed tests, stop on first failure"
+	@echo "  test-ff    Run last-failed first, stop on first failure"
+	@echo "  build      Build distribution"
 	@echo "  release  Tag & build a release (make release v=0.6.0)"
 	@echo "  clean    Remove build artifacts"
 	@echo ""
