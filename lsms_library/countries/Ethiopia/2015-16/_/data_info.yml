@@ -104,3 +104,34 @@ assets:
         j: hh_s10q0a
     myvars:
         Quantity: hh_s10q01
+
+housing:
+    file: sect9_hh_w3.dta
+    idxvars:
+        i: household_id2
+    myvars:
+        Roof:
+            - hh_s9q06
+            - mapping:
+                Corrugated iron sheet: Corrugated Iron Sheet
+                Thatch: Thatch
+                Wood and mud: Wood And Mud
+                Plastic canvas: Plastic Canvas
+                Others: Other
+                Reed / bamboo: Reed/Bamboo
+                Concrete / Cement: Concrete/Cement
+                Asbestos: Asbestos
+                Bricks: Bricks
+        Floor:
+            - hh_s9q07
+            - mapping:
+                Mud / dung: Mud/Dung
+                Cement screed: Cement Screed
+                Cement tiles: Cement Tiles
+                Ceramic / marble tiles: Ceramic/Marble Tiles
+                Brick Tiles: Brick Tiles
+                Reed / bamboo: Reed/Bamboo
+                Wood planks: Wood Planks
+                Plastic tiles: Plastic Tiles
+                Others: Other
+                Parquet of polished wood: Parquet Of Polished Wood

@@ -45,6 +45,11 @@ Data Scheme:
     index: (t, i, j)
     Quantity: float
 
+  housing:
+    index: (t, i)
+    Roof: str
+    Floor: str
+
   interview_date:
     index: (t, i)
     int_t: datetime

@@ -118,6 +118,37 @@ assets:
     myvars:
         Quantity: s11q01
 
+housing:
+    file: sect10a_hh_w5.dta
+    idxvars:
+        i: household_id
+    myvars:
+        Roof:
+            - s10aq08
+            - mapping:
+                "1. Corrugated iron sheet": Corrugated Iron Sheet
+                "2. Concrete / Cement": Concrete/Cement
+                "3. Thatch": Thatch
+                "4. Wood and mud": Wood And Mud
+                "5. Reed / bamboo": Reed/Bamboo
+                "6. Plastic canvas": Plastic Canvas
+                "7. Asbestos": Asbestos
+                "8. Bricks": Bricks
+                "9. Others": Other
+        Floor:
+            - s10aq09
+            - mapping:
+                "1. Mud / dung": Mud/Dung
+                "2. Reed / bamboo": Reed/Bamboo
+                "3. Wood planks": Wood Planks
+                "4. Parquet of polished wood": Parquet Of Polished Wood
+                "5. Cement screed": Cement Screed
+                "6. Plastic tiles": Plastic Tiles
+                "7. Cement tiles": Cement Tiles
+                "8. Brick Tiles": Brick Tiles
+                "9. Ceramic / marble tiles": Ceramic/Marble Tiles
+                "10. Others": Other
+
 interview_date:
     file: sect_cover_ph_w5.dta
     idxvars:
