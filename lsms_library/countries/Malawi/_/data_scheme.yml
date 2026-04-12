@@ -34,6 +34,10 @@ Data Scheme:
   panel_ids:
     index: (t, i)
     previous_i: str
+  housing:
+    index: (t, i)
+    Roof: str
+    Floor: str
   food_acquired: !make
   interview_date:
     index: (t, visit, i)

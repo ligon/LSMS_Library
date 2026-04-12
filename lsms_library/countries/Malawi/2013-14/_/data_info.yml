@@ -67,6 +67,30 @@ individual_education:
     myvars:
         Educational Attainment: hh_c09
 
+housing:
+    file: HH_MOD_F_13.dta
+    idxvars:
+        i: y2_hhid
+    myvars:
+        Roof:
+            - hh_f08
+            - mapping:
+                GRASS: Grass
+                IRON SHEETS: Iron Sheets
+                CLAY TILES: Clay Tiles
+                PLASTIC SHEETING: Plastic Sheeting
+                CONCRETE: Concrete
+                OTHER (SPECIFY): Other
+        Floor:
+            - hh_f09
+            - mapping:
+                SMOOTHED MUD: Smoothed Mud
+                SMOOTH CEMENT: Smooth Cement
+                SAND: Sand
+                TILE: Tile
+                WOOD: Wood
+                OTHER(SPECIFY): Other
+
 panel_ids:
     file: HH_MOD_A_FILT_13.dta
     idxvars:

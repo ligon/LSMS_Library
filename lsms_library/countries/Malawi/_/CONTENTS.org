@@ -1,6 +1,23 @@
 #+title: Contents
 
-Brief table of contents and todo list. Malawi has 4 rounds of data, corresponding to IHS2-IHS5.
+Brief table of contents and todo list. Malawi has 5 rounds of data, corresponding to IHS2-IHS5 plus IHPS.
+
+* Housing feature (added 2026-04-12)
+
+Schema: =(t, i)= index, =Roof: str=, =Floor: str=.  Categorical material
+names normalized to Title Case.
+
+| Wave    | Module | File                                 | i       | Roof   | Floor  |
+|---------+--------+--------------------------------------+---------+--------+--------|
+| 2004-05 | G      | sec_g.dta                            | case_id | g09    | g10    |
+| 2010-11 | F      | Full_Sample/Household/hh_mod_f.dta   | case_id | hh_f08 | hh_f09 |
+| 2013-14 | F      | HH_MOD_F_13.dta                      | y2_hhid | hh_f08 | hh_f09 |
+| 2016-17 | F      | Cross_Sectional/hh_mod_f.dta + Panel | case_id | hh_f08 | hh_f09 |
+| 2019-20 | F      | Cross_Sectional/HH_MOD_F.dta + Panel | case_id | hh_f08 | hh_f09 |
+
+Module letter changed from G (IHS2) to F (IHS3+).  Walls data (=hh_f07= /
+=g08=) also available but excluded to match Uganda schema.  See
+=.claude/skills/add-feature/housing/SKILL.md= for cross-country guidance.
 
 * Files in Malawi/_/
 ** DONE malawi.py

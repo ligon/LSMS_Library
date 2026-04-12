@@ -150,7 +150,7 @@ result.attrs = dict(df.attrs)  # preserve id_converted flag
 
 - **Joining `v` via `dfs:` is legacy**. Since Phase 2 (2026-04-10) you should not add a cover-page sub-df just to pick up `v` — let `_join_v_from_sample()` do it. Existing `dfs:` merges are grandfathered but should be collapsed when touched.
 
-- **Housing schema is categorical, not binary.** Since 2026-04-10, Uganda `housing` has `Roof` and `Floor` columns with material-name values (`Thatch`, `Iron Sheets`, `Cement`, …), mapped through `categorical_mapping.org`. Malawi does not yet have a `housing` table (tracked in #155). Consumers who want binary indicators derive them trivially (`df['Roof'] == 'Thatch'`); the reverse is not possible.
+- **Housing schema is categorical, not binary.** Uganda and Malawi `housing` have `Roof` and `Floor` columns with material-name values (`Grass`, `Iron Sheets`, `Smoothed Mud`, …). Uganda maps via `categorical_mapping.org`; Malawi normalizes case via inline `mapping:` dicts in each wave's `data_info.yml`. Consumers who want binary indicators derive them trivially (`df['Roof'] == 'Grass'`); the reverse is not possible.
 
 - **Categorical columns from `.dta` / `.sav`**. `get_dataframe()` returns pandas categoricals from Stata/SPSS. `select_dtypes(exclude=['object']).max()` crashes on unordered categoricals — exclude `'category'` too. `groupby().first()` crashes similarly — convert to string with `.astype(str).replace('nan', pd.NA)` first. YAML mapping keys must be string keys (`'urbana': Urban`) not numeric (`1: Urban`) when the raw labels are strings.
 
