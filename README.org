@@ -95,7 +95,7 @@ Parquet caches materialize under the platform-appropriate user data directory:
 - Linux: =~/.local/share/lsms_library/= by default
 - Override with =LSMS_DATA_DIR= env var or =data_dir= in =config.yml=
 
-See the [[https://ligon.github.io/LSMS_Library/guide/caching/][caching guide]] for details on =trust_cache=, the =Country= and =Feature= classes, and per-country build methods.
+See the [[https://ligon.github.io/LSMS_Library/guide/caching/][caching guide]] for details on =assume_cache_fresh=, the =Country= and =Feature= classes, and per-country build methods.
 
 * Documentation
 

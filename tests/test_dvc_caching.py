@@ -4,6 +4,7 @@ import json
 import os
 import subprocess
 import sys
+import warnings
 from pathlib import Path
 from types import SimpleNamespace, ModuleType
 from unittest.mock import Mock, patch, PropertyMock
@@ -207,8 +208,8 @@ class TestDVCCaching:
         loaded_df = pd.read_parquet(cache_path)
         pd.testing.assert_frame_equal(loaded_df, sample_dataframe, check_dtype=False)
 
-    def test_trust_cache_short_circuit(self, tmp_path, monkeypatch):
-        """trust_cache=True should load existing parquet without touching DVC."""
+    def test_assume_cache_fresh_short_circuit(self, tmp_path, monkeypatch):
+        """assume_cache_fresh=True should load existing parquet without touching DVC."""
         # Point data_root to tmp_path so caches are found there
         monkeypatch.setenv("LSMS_DATA_DIR", str(tmp_path / "countries"))
         from lsms_library.paths import data_root
@@ -224,7 +225,7 @@ class TestDVCCaching:
 
         country = Country.__new__(Country)
         country.name = "TestCountry"
-        country.trust_cache = True
+        country.assume_cache_fresh = True
         country._panel_ids_cache = {}
         country._updated_ids_cache = {}
         country.wave_folder_map = {}
@@ -256,6 +257,30 @@ class TestDVCCaching:
             df.reset_index(drop=True),
             check_dtype=False,
         )
+        data_root.cache_clear()
+
+    def test_trust_cache_deprecated_alias(self, tmp_path, monkeypatch):
+        """trust_cache=True emits DeprecationWarning and behaves like assume_cache_fresh=True."""
+        monkeypatch.setenv("LSMS_DATA_DIR", str(tmp_path / "countries"))
+        from lsms_library.paths import data_root
+        data_root.cache_clear()
+
+        country_root = tmp_path / "countries" / "Uganda"
+        var_dir = country_root / "var"
+        var_dir.mkdir(parents=True, exist_ok=True)
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            with patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources, \
+                 patch.object(Country, "data_scheme", new_callable=PropertyMock):
+                mock_resources.return_value = {"Data Scheme": {}}
+                country = Country("Uganda", trust_cache=True)
+
+        dep_warnings = [w for w in caught if issubclass(w.category, DeprecationWarning)]
+        assert dep_warnings, "Expected a DeprecationWarning when trust_cache=True is used"
+        assert "trust_cache" in str(dep_warnings[0].message)
+        assert "assume_cache_fresh" in str(dep_warnings[0].message)
+        assert country.assume_cache_fresh is True
         data_root.cache_clear()
 
     def test_stale_cache_triggers_rebuild(
