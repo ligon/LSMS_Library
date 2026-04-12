@@ -195,33 +195,6 @@ individual_education:
     myvars:
         Educational Attainment: 'educ_hi'
 
-housing:
-    file: s11_me_sen2021.dta
-    idxvars:
-        i:
-            - grappe
-            - menage
-    myvars:
-        Roof:
-            - s11q19
-            - mapping:
-                Dalle en ciment: Concrete Slab
-                Tuile: Clay Tiles
-                Tôles: Iron Sheets
-                Paille: Thatch
-                Banco: Adobe
-                Chaume: Thatch
-                Nattes: Woven Mats
-                'Autre (à préciser)': Other
-        Floor:
-            - s11q20
-            - mapping:
-                Carreaux/Marbre: Tiles
-                Ciment/Béton: Cement
-                Terre battue/Sable: Earth
-                "Bouse d'animaux": Dung
-                Autre: Other
-
 interview_date:
     file: s00_me_sen2021.dta
     idxvars:
