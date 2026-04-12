@@ -33,6 +33,7 @@ before invoking.  See bench/run_bench.sh which automates the pattern.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import os
 import socket
@@ -40,6 +41,54 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
+
+
+PROFILE_CHOICES = ("none", "pyinstrument", "cprofile")
+
+
+@contextlib.contextmanager
+def _profile_context(mode: str, out_path: Path | None):
+    """Run the body under the requested profiler and write results to out_path.
+
+    ``mode`` is one of PROFILE_CHOICES.  Profiler imports are lazy so the
+    default ``none`` path never requires the optional ``profile`` poetry
+    group to be installed.
+    """
+    if mode == "none" or out_path is None:
+        yield
+        return
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    if mode == "pyinstrument":
+        try:
+            from pyinstrument import Profiler
+            from pyinstrument.renderers import HTMLRenderer
+        except ImportError as exc:
+            raise SystemExit(
+                "pyinstrument not installed.  Run: poetry install --with profile"
+            ) from exc
+        profiler = Profiler()
+        profiler.start()
+        try:
+            yield
+        finally:
+            profiler.stop()
+            out_path.write_text(HTMLRenderer().render(profiler.last_session))
+        return
+
+    if mode == "cprofile":
+        import cProfile
+        profiler = cProfile.Profile()
+        profiler.enable()
+        try:
+            yield
+        finally:
+            profiler.disable()
+            profiler.dump_stats(str(out_path))
+        return
+
+    raise ValueError(f"unknown profile mode: {mode!r}")
 
 
 def _emit(label: str, seconds: float, extra: str = "") -> None:
@@ -96,9 +145,41 @@ def main(argv: list[str]) -> int:
         default=None,
         help="Free-form label written into the JSON record (e.g. 'cold' or 'warm')",
     )
+    parser.add_argument(
+        "--profile",
+        choices=PROFILE_CHOICES,
+        default="none",
+        help=(
+            "Profile phases 3 and 4 (the feature calls).  "
+            "pyinstrument emits HTML; cprofile emits a pstats .prof file "
+            "(open with `snakeviz foo.prof`).  Default: none."
+        ),
+    )
+    parser.add_argument(
+        "--profile-dir",
+        default=None,
+        help=(
+            "Directory for profile artifacts.  "
+            "Default: bench/results/{YYYY-MM-DD}/"
+        ),
+    )
     args = parser.parse_args(argv)
 
     measurements: list[tuple[str, float]] = []
+    profile_paths: dict[str, str] = {}
+
+    # Resolve where profile artifacts land.  We compute paths even when
+    # --profile none is set so that the JSON record is structurally stable.
+    if args.profile_dir:
+        profile_dir = Path(args.profile_dir)
+    else:
+        profile_dir = (
+            Path(__file__).resolve().parent
+            / "results"
+            / datetime.utcnow().strftime("%Y-%m-%d")
+        )
+    profile_ext = {"pyinstrument": "html", "cprofile": "prof", "none": None}[args.profile]
+    label_suffix = f"-{args.label}" if args.label else ""
 
     # 1. import lsms_library
     label, elapsed, result = time_step(
@@ -123,24 +204,36 @@ def main(argv: list[str]) -> int:
         print(f"FAILED at Country construction: {country!r}", file=sys.stderr)
         return 1
 
-    # 3. First feature call (cold)
-    label, elapsed, df1 = time_step(
-        f"{args.feature}() #1 (cold)",
-        lambda: getattr(country, args.feature)(),
-    )
+    # 3. First feature call (cold) — optionally profiled
+    if profile_ext:
+        p1 = profile_dir / f"{args.country}-{args.feature}-phase3-cold{label_suffix}.{profile_ext}"
+        profile_paths["phase3_cold"] = str(p1)
+    else:
+        p1 = None
+    with _profile_context(args.profile, p1):
+        label, elapsed, df1 = time_step(
+            f"{args.feature}() #1 (cold)",
+            lambda: getattr(country, args.feature)(),
+        )
     measurements.append((label, elapsed))
-    _emit(label, elapsed)
+    _emit(label, elapsed, extra=f"profile: {p1.name}" if p1 else "")
     if isinstance(df1, BaseException):
         print(f"FAILED at {args.feature}() #1: {df1!r}", file=sys.stderr)
         return 1
 
-    # 4. Second feature call (warm in-process)
-    label, elapsed, df2 = time_step(
-        f"{args.feature}() #2 (warm in-proc)",
-        lambda: getattr(country, args.feature)(),
-    )
+    # 4. Second feature call (warm in-process) — optionally profiled
+    if profile_ext:
+        p2 = profile_dir / f"{args.country}-{args.feature}-phase4-warm{label_suffix}.{profile_ext}"
+        profile_paths["phase4_warm"] = str(p2)
+    else:
+        p2 = None
+    with _profile_context(args.profile, p2):
+        label, elapsed, df2 = time_step(
+            f"{args.feature}() #2 (warm in-proc)",
+            lambda: getattr(country, args.feature)(),
+        )
     measurements.append((label, elapsed))
-    _emit(label, elapsed)
+    _emit(label, elapsed, extra=f"profile: {p2.name}" if p2 else "")
     if isinstance(df2, BaseException):
         print(f"FAILED at {args.feature}() #2: {df2!r}", file=sys.stderr)
         return 1
@@ -170,6 +263,8 @@ def main(argv: list[str]) -> int:
         ],
         "total_seconds": round(total, 6),
         "result": df_summary(df1),
+        "profile": args.profile,
+        "profile_paths": profile_paths,
     }
 
     if args.json:

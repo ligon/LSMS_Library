@@ -56,6 +56,13 @@ optional = true
 mkdocs-material = ">=9.0"
 mkdocstrings = {extras = ["python"], version = ">=0.28"}
 
+[tool.poetry.group.profile]
+optional = true
+
+[tool.poetry.group.profile.dependencies]
+pyinstrument = ">=4.6,<6.0"
+snakeviz = "^2.2"
+
 [tool.poetry-dynamic-versioning]
 enable = true
 vcs = "git"
