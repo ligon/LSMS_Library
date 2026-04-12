@@ -121,6 +121,32 @@ assets:
         Value: pm5
         Purchase Price: pm4
 
+housing:
+    file: emc2014_p1_logement_27022015.dta
+    idxvars:
+        i:
+            - zd
+            - menage
+    myvars:
+        Roof:
+            - L06
+            - mapping:
+                Paille/chaume: Thatch
+                Terre: Earth
+                Tôle: Iron Sheets
+                Dale: Concrete Slab
+                Tuile: Clay Tiles
+                'Autre à préciser': Other
+        Floor:
+            - L07
+            - mapping:
+                Terre battue: Earth
+                Sable: Sand
+                Chape de ciment: Cement
+                Carreau: Tiles
+                Moquette: Carpet
+                'Autre à préciser': Other
+
 food_acquired:
     idxvars:
         v: zd

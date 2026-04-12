@@ -47,6 +47,11 @@ Data Scheme:
     Value: float
     Purchase Price: float
 
+  housing:
+    index: (t, i)
+    Roof: str
+    Floor: str
+
   shocks:
     index: (t, i, Shock)
     AffectedIncome: bool
