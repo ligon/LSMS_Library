@@ -5,13 +5,13 @@
 
 Côte d'Ivoire has five survey waves in the LSMS Library spanning 1985–2019:
 
-| Wave    | Survey Program                  | Catalog ID | Format   | Status              |
-|---------+---------------------------------+------------+----------+---------------------|
-| 1985-86 | CILSS / EPAM (LSMS wave 1)      | 83         | DAT/DCT  | Legacy only         |
-| 1986-87 | CILSS / EPAM (LSMS wave 2)      | 84         | DAT/DCT  | Legacy only         |
-| 1987-88 | CILSS / EPAM (LSMS wave 3)      | 85         | DAT/DCT  | Legacy only         |
-| 1988-89 | CILSS / EPAM (LSMS wave 4)      | 82         | DAT/DCT  | Legacy only         |
-| 2018-19 | EHCVM (Enquête Harmonisée)      | 4292       | Stata DTA| Fully integrated    |
+| Wave    | Survey Program                  | Catalog ID | Format   | Status                                  |
+|---------+---------------------------------+------------+----------+-----------------------------------------|
+| 1985-86 | CILSS / EPAM (LSMS wave 1)      | 83         | DAT/DCT  | sample, cluster_features, roster        |
+| 1986-87 | CILSS / EPAM (LSMS wave 2)      | 84         | DAT/DCT  | sample, cluster_features, roster        |
+| 1987-88 | CILSS / EPAM (LSMS wave 3)      | 85         | DAT/DCT  | sample, cluster_features, roster        |
+| 1988-89 | CILSS / EPAM (LSMS wave 4)      | 82         | DAT/DCT  | sample, cluster_features, roster        |
+| 2018-19 | EHCVM (Enquête Harmonisée)      | 4292       | Stata DTA| Fully integrated                        |
 
 * 2018-19 Wave (EHCVM)
 
@@ -64,41 +64,63 @@ For =individual_education=, the =ehcvm_individu_CIV2018.dta= file is still refer
 because it contains the harmonized =educ_hi= variable. This file must be downloaded via
 WB API; it is not DVC-cached.
 
-* 1985-89 Waves (CILSS EPAM — Legacy)
+* 1985-89 Waves (CILSS EPAM)
 
-** Blocked Status
+** Implementation Status (2026-04-12)
 
-These waves use ASCII fixed-width data files in Stata =.DAT/.DCT= dictionary format, not
-Stata =.dta= binary format. The =get_dataframe()= function and YAML data grabber cannot
-read this format. Implementation of YAML-based features (=household_roster=, =sample=,
-=housing=, etc.) is blocked until one of the following is done:
+The =.DAT/.DCT= files are readable by =get_dataframe()= from =local_tools=. The prior
+agent incorrectly concluded they were not. Three features are now YAML-path implemented:
 
-1. Convert the =.DAT= files to =.dta= format and re-add to DVC
-2. Write a custom =.py= script for each feature that uses a DAT/DCT parser
-3. Use the WB download to obtain Stata-format files (catalog 83/84/85/82 may not offer
-   Stata DTA format — the original 1985-89 data predates Stata's binary format)
+| Feature          | Source File          | Notes                                   |
+|------------------+----------------------+-----------------------------------------|
+| sample           | WEIGHT{85,86,87,88}  | i=[CLUST,NH], v=CLUST, Rural from REGION|
+| cluster_features | WEIGHT{85,86,87,88}  | 100 clusters, Region + Rural columns    |
+| household_roster | F01A / SEC01A        | SEX, AGEY, REL (codes 1-13 mapped)      |
 
-** Known Variable Structure (from WB data dictionary)
+Note: The 1988-89 wave uses =SEC0*= prefix instead of =F0*= prefix for all files.
+The roster file is =SEC01A.DAT= (same variable names as F01A).
 
-Key variables identified for household_roster (F01A file):
-| Variable | Description                  |
-|----------+------------------------------|
-| clust    | Cluster (PSU identifier)     |
-| nh       | Household number             |
-| pid      | Person ID                    |
-| sex      | Sex (1=Male, 2=Female)       |
-| rel      | Relationship to head         |
-| agey     | Age in years                 |
+** Household ID Convention
 
-Key variables for sample (WEIGHT85 file):
-| Variable | Description                       |
-|----------+-----------------------------------|
-| clust    | Cluster                           |
-| nh       | Household number                  |
-| allwait  | All-household weight              |
-| allwaitn | Normalized all-household weight   |
-| region   | Region                            |
-| type_    | Urban/rural type                  |
+All 1985-89 waves use =i = [CLUST, NH]= formatted via the =cotedivoire.i()= function
+(CLUST zero-padded + NH zero-padded to 3 digits). This matches the existing
+=2018-19= convention for the =i= formatter.
+
+** Sampling Design
+
+- 100 clusters (PSUs), ~16 households per cluster
+- 5 regions: ABIDJAN, OTHER CITIES, EAST FOREST, WEST FOREST, SAVANNA
+- Urban = ABIDJAN + OTHER CITIES; Rural = EAST/WEST FOREST + SAVANNA
+- Weight variable: ALLWAITN (normalized all-household weight)
+- Panels: these are longitudinal (same households followed across 4 waves)
+  but household IDs may change — no panel_ids implemented yet
+
+** Key Variable Mapping (1985-89 roster)
+
+REL codes (F01A / SEC01A):
+| Code | Label                      | Kinship tuple              |
+|------+----------------------------+----------------------------|
+|    1 | Head                       | [0, 0, consanguineal]      |
+|    2 | Spouse                     | [0, 0, affinal]            |
+|    3 | Son/Daughter               | [-1, 0, consanguineal]     |
+|    4 | Son/Daughter-In-Law        | [-1, 0, affinal]           |
+|    5 | Grandchild                 | [-2, 0, consanguineal]     |
+|    6 | Parent Of Head Or Spouse   | [1, 0, consanguineal]      |
+|    7 | Sibling                    | [0, 1, consanguineal]      |
+|    8 | Other Relative             | [0, 0, consanguineal]      |
+|    9 | Visitor                    | [0, 0, guest]              |
+|   10 | Foster Child               | [-1, 0, foster]            |
+|   11 | Servant                    | [0, 0, servant]            |
+|   12 | Nephew/Niece               | [-1, 1, consanguineal]     |
+|   13 | Other Relative             | [0, 0, consanguineal]      |
+
+** What Is NOT Available for 1985-89
+
+- GPS coordinates (Latitude/Longitude): predates GPS surveys
+- Housing (Roof/Floor): F02A has dwelling type (DOMICILE) but not material
+- interview_date: date split across DAY1/MO1/YR1 — YAML path can't construct datetime
+  (would need a Python script; not yet implemented)
+- shocks, assets, food_acquired: not attempted yet (complex multi-file modules)
 
 ** Legacy food_expenditures
 
@@ -106,20 +128,3 @@ Wave-level =_/food_expenditures.py= scripts exist for 1985-86, 1986-87 using the
 =cotedivoire.food_expenditures()= function from =_/cotedivoire.py=. These read =F12A.DAT=
 files as CSV format via =dvc.api.open=. They are legacy scripts and use the retired
 =lsms.tools= package — do not extend them.
-
-** Future Work
-
-To add 1985-89 features:
-1. Determine if WB provides Stata-format downloads for catalogs 82-85
-2. If yes: use =data_access.push_to_cache_batch()= to pull Stata zips
-3. Write Python scripts for each feature wave × feature
-4. Variable naming convention: use =[clust, nh]= as =i= index
-5. Household roster: F01A, F01B files
-6. Sample/weights: WEIGHT85 file (or similar per-wave)
-7. Housing: F02A (type/rooms) and F02B (utilities) — no direct roof/floor variable
-   confirmed; check questionnaire PDFs in Documentation/
-8. Community/cluster features: COMM85 file (=cluster= variable, infrastructure vars)
-
-Note: The 1985-89 surveys were the original LSMS instrument (not EHCVM), so variable
-names, module structure, and questionnaire design differ substantially from 2018-19.
-Do not assume EHCVM variable names apply.
