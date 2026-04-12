@@ -158,7 +158,7 @@ result.attrs = dict(df.attrs)  # preserve id_converted flag
 
 - **`locality` is deprecated.** `Country('Uganda').locality()` emits `DeprecationWarning` and returns via `legacy_locality(country)` from `transformations.py`, which joins `sample()` and `cluster_features()` to reproduce the legacy `(i, t, m) -> v` shape. The 9 wave-level `locality.py` scripts and `uganda.other_features()` have been deleted. See `docs/migration/locality.md`.
 
-- **`_log_issue` pollutes the working tree.** `lsms_library/country.py:168` appends to `lsms_library/ISSUES.md` on any cache/materialization failure. The file is tracked in git with no dedup or rotation, so expected data-unavailability conditions (Nepal has no `.dta` on disk, etc.) dirty the tree. Commit mid-session with explicit `git add <files>`, and revert spurious diffs with `git checkout HEAD -- lsms_library/ISSUES.md`. Tracked in GH #148.
+- **`_log_issue` writes to the user cache, not the source tree.** Materialization failures are appended to `~/.cache/lsms_library/issues.log` (via `platformdirs.user_cache_path`), keeping `lsms_library/ISSUES.md` as a human-maintained tracker that is never auto-modified. Override the log path with `LSMS_ISSUES_LOG=/path/to/file`. Fixed in GH #148.
 
 ## Pandas 3.0 Targets
 

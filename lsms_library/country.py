@@ -224,11 +224,36 @@ def _make_jobs_flag() -> str | None:
     return None
 
 
+def _issues_log_path() -> Path:
+    """Return the path for the auto-generated issues log.
+
+    Resolution order:
+      1. ``LSMS_ISSUES_LOG`` environment variable (absolute path override).
+      2. ``platformdirs.user_cache_path("lsms_library") / "issues.log"``
+         (per-user default, outside the source tree).
+      3. Hardcoded fallback ``~/.cache/lsms_library/issues.log`` when
+         ``platformdirs`` is not installed.
+    """
+    override = os.environ.get("LSMS_ISSUES_LOG", "").strip()
+    if override:
+        return Path(override).expanduser()
+    try:
+        import platformdirs
+        return platformdirs.user_cache_path("lsms_library") / "issues.log"
+    except ImportError:
+        return Path.home() / ".cache" / "lsms_library" / "issues.log"
+
+
 def _log_issue(country: str, method: str, waves, error: Exception) -> None:
     """
-    Append an issue entry to ISSUES.md capturing failures during cache/materialization.
+    Append an issue entry to the user-cache issues log.
+
+    Writes to ``~/.cache/lsms_library/issues.log`` (or the path returned by
+    ``_issues_log_path()``) so that the source-tree ``lsms_library/ISSUES.md``
+    is never auto-modified.  Set the ``LSMS_ISSUES_LOG`` environment variable
+    to redirect to a different file.
     """
-    issues_path = Path(__file__).resolve().parent / "ISSUES.md"
+    log_path = _issues_log_path()
     timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%SZ")
     wave_info = ", ".join(waves) if isinstance(waves, (list, tuple)) and waves else "All waves"
     entry = [
@@ -238,8 +263,8 @@ def _log_issue(country: str, method: str, waves, error: Exception) -> None:
         f"- Error: `{type(error).__name__}: {error}`",
         "",
     ]
-    issues_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(issues_path, "a", encoding="utf-8") as handle:
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(log_path, "a", encoding="utf-8") as handle:
         handle.write("\n".join(entry))
 
 def _property_value(instance, prop_name):
