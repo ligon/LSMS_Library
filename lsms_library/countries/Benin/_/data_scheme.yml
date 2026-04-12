@@ -41,6 +41,11 @@ Data Scheme:
     Value: float
     Purchase Price: float
 
+  housing:
+    index: (t, i)
+    Roof: str
+    Floor: str
+
   interview_date:
     index: (t, i)
     int_t: datetime
