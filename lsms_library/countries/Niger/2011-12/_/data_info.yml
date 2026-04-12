@@ -113,3 +113,30 @@ assets:
         Age: ms07q04
         Value: ms07q06
         Purchase Price: ms07q05
+
+housing:
+    file: NER_2011_ECVMA_v01_M_Stata8/ecvmamen_p1.dta
+    idxvars:
+        i: hid
+    myvars:
+        Roof:
+            - ms06q11
+            - mapping:
+                'tôle en métal': Iron Sheets
+                tuile: Clay Tiles
+                béton: Concrete Slab
+                peau: Hide
+                bois: Wood
+                terre: Earth
+                paille: Thatch
+                autre: Other
+                manquant: Other
+        Floor:
+            - ms06q12
+            - mapping:
+                'terre/sable': Earth
+                'ciment/béton': Cement
+                'carreaux/marbre': Tiles
+                'moquette/ parquet ciré': Parquet
+                autre: Other
+                manquant: Other
