@@ -136,26 +136,29 @@ remove them. The cache under `data_root()` already has the same
 content; the warnings will stop and reads will use the canonical
 cache path.
 
-## Trust Cache Mode
+## Assume Cache Fresh Mode
 
 ```python
-uga = ll.Country('Uganda', trust_cache=True)
+uga = ll.Country('Uganda', assume_cache_fresh=True)
 ```
 
-With v0.7.0 in place, `trust_cache=True` is mostly redundant with the
+With v0.7.0 in place, `assume_cache_fresh=True` is mostly redundant with the
 default behavior. It remains useful as a stricter bypass that skips even
 the `LSMS_NO_CACHE` check.
 
-What `trust_cache=True` does **not** skip: `_finalize_result`. Kinship
+What `assume_cache_fresh=True` does **not** skip: `_finalize_result`. Kinship
 expansion, canonical spelling normalization, dtype coercion, and the
 `_join_v_from_sample` augmentation all still apply on read. The returned
 DataFrame is **not** byte-identical to the on-disk parquet — the parquet
 is closer to the raw source data, and `_finalize_result` is the
 harmonization layer applied at every read.
 
-**Do not use `trust_cache=True`** after editing source data or a wave's
+**Do not use `assume_cache_fresh=True`** after editing source data or a wave's
 configuration unless you have cleared the affected caches first — you
 will silently get stale results.
+
+> **Deprecated**: `trust_cache=True` is a legacy alias for `assume_cache_fresh=True`.
+> It still works but emits a `DeprecationWarning` and will be removed in v0.8.0.
 
 ## Managing Cache
 

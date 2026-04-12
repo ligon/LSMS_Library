@@ -763,9 +763,17 @@ class Country:
         Default is False (lazy).
     verbose : bool
         Enable verbose logging.
+    assume_cache_fresh : bool
+        If True, read existing cached Parquet files directly, bypassing DVC
+        and the normal build pipeline.  Use this when you know the cache is
+        up-to-date and want to skip all existence / staleness checks.
+        ``_finalize_result`` (kinship expansion, canonical spelling, dtype
+        coercion, ``_join_v_from_sample``) still runs on every read — only
+        the cache-lookup / DVC layer is bypassed.  Useful on clusters where
+        the parquet cache has been pre-built.  Ignores ``LSMS_NO_CACHE``.
     trust_cache : bool
-        If True, read existing cached Parquet files directly without
-        validating their hashes.  Useful on clusters with pre-built data.
+        Deprecated alias for ``assume_cache_fresh``.  Will be removed in
+        v0.8.0.
 
     Examples
     --------
@@ -783,7 +791,7 @@ class Country:
                  'food_expenditures', 'food_quantities', 'food_prices',
                  'fct', 'nutrition','name','_panel_ids_cache', 'panel_ids']
 
-    def __init__(self, country_name: str, preload_panel_ids: bool = False, verbose: bool = False, trust_cache: bool = False) -> None:
+    def __init__(self, country_name: str, preload_panel_ids: bool = False, verbose: bool = False, assume_cache_fresh: bool = False, trust_cache: bool = False) -> None:
         # Validate country name: reject path traversal attempts
         countries_dir = Path(__file__).resolve().parent / "countries"
         country_dir = (countries_dir / country_name).resolve()
@@ -795,7 +803,15 @@ class Country:
         self._panel_ids_cache = None
         self._updated_ids_cache = None
         self.wave_folder_map = {}
-        self.trust_cache = trust_cache
+        if trust_cache:
+            warnings.warn(
+                "trust_cache is deprecated and will be removed in v0.8.0. "
+                "Use assume_cache_fresh=True instead.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            assume_cache_fresh = True
+        self.assume_cache_fresh = assume_cache_fresh
         scheme_map = self.resources.get("Data Scheme") if isinstance(self.resources, dict) else {}
         has_panel_ids = isinstance(scheme_map, dict) and "panel_ids" in scheme_map
         if preload_panel_ids and has_panel_ids:
@@ -1374,7 +1390,7 @@ class Country:
             if isinstance(backend_value, str):
                 materialize_backend = backend_value.lower()
 
-        prefer_parquet_cache = bool(getattr(self, "trust_cache", False)) and method_name not in JSON_CACHE_METHODS
+        prefer_parquet_cache = bool(getattr(self, "assume_cache_fresh", False)) and method_name not in JSON_CACHE_METHODS
         if prefer_parquet_cache:
             parquet_path = data_root(self.name) / "var" / f"{method_name}.parquet"
             if parquet_path.exists():
