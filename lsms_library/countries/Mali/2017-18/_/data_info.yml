@@ -129,8 +129,34 @@ individual_education:
         Educational Attainment:  's1q07'
     file: 'eaci17_s01p1.dta'
 
+housing:
+    file: eaci17_s06p1.dta
+    idxvars:
+        i:
+            - grappe
+            - exploitation
+    myvars:
+        Roof:
+            - s6q05
+            - mapping:
+                Dalle en ciment: Concrete Slab
+                Tuile: Clay Tiles
+                Tôles: Iron Sheets
+                Paille/Chaume: Thatch
+                Banco: Adobe
+                Nattes: Mats
+                Autres: Other
+        Floor:
+            - s6q06
+            - mapping:
+                Carreaux/Marbre: Tiles
+                Ciment/Béton: Cement
+                Terre battue/Sable: Earth
+                Bouse d'animaux: Dung
+                Autres: Other
+
 interview_date:
-    file: 
+    file:
         - eaci17_s00p1.dta
         - eaci17_s00p2.dta
     idxvars:
@@ -140,7 +166,7 @@ interview_date:
             - grappe
             - exploitation
     myvars:
-        Int_t: 
+        Int_t:
             - s0q21c
             - s0q21b
             - s0q21a
