@@ -24,7 +24,18 @@ from typing import Any
 
 
 def _config_dir() -> Path:
-    """Return the user config directory for lsms_library."""
+    """Return the user config directory for lsms_library.
+
+    Honors the ``LSMS_CONFIG_DIR`` environment variable if set, allowing
+    users to relocate the config directory (e.g. into a synced /
+    git-crypted dotfiles repo) without changing global ``XDG_CONFIG_HOME``.
+    Falls back to ``platformdirs.user_config_path()`` (which itself
+    honors ``XDG_CONFIG_HOME``), or a hardcoded default if platformdirs
+    is unavailable.
+    """
+    override = os.environ.get("LSMS_CONFIG_DIR", "").strip()
+    if override:
+        return Path(override).expanduser()
     try:
         import platformdirs
         return platformdirs.user_config_path("lsms_library")
@@ -87,3 +98,23 @@ def data_dir() -> str | None:
 def config_path() -> Path:
     """Return the path to the config file (may not exist yet)."""
     return _config_file()
+
+
+def s3_creds_path() -> Path:
+    """Return the user-writable path for decrypted S3 credentials.
+
+    Precedence: ``$LSMS_S3_CREDS`` env var → ``<config_dir>/s3_creds``.
+    Does NOT create the file or its parent directory.
+
+    This path is where :func:`lsms_library.data_access._auto_unlock_s3`
+    writes the plaintext S3 reader credentials after decrypting
+    ``s3_reader_creds.gpg`` with the obfuscated passphrase, and where
+    :func:`lsms_library.dvc_permissions.authenticate` writes them in
+    the interactive fallback.  Moving the write target out of the
+    package tree makes the library safe to install into a read-only
+    site-packages directory (e.g. a pip-installed wheel).
+    """
+    override = os.environ.get("LSMS_S3_CREDS", "").strip()
+    if override:
+        return Path(override).expanduser()
+    return _config_dir() / "s3_creds"

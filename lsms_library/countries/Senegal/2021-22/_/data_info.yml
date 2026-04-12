@@ -204,18 +204,6 @@ interview_date:
     myvars:
         int_t: s00q23a
 
-panel_ids:
-    file: s00_me_sen2021.dta
-    idxvars:
-        i:
-            - grappe
-            - menage
-    myvars:
-        previous_i:
-            - grappe
-            - menage
-        in_panel:
-            - PanelHH
-            - mapping:
-                'Menage Panel': 1
-                'Nouveau Ménage': 0
+# panel_ids is constructed at the country level by
+# Senegal/_/panel_ids.py (declared as !make in data_scheme.yml).
+# Do not reintroduce a wave-level block here.

@@ -1,4 +1,32 @@
 #!/usr/bin/env python3
+"""Country-level aggregation of LSMS-ISA survey data.
+
+This module defines the library's two core runtime classes:
+
+- :class:`Country` — the primary user-facing interface. Exposes the
+  country's waves, data scheme, and one method per table registered in
+  ``{Country}/_/data_scheme.yml`` (plus derived tables dispatched via
+  ``__getattr__`` using :data:`_ROSTER_DERIVED` / :data:`_FOOD_DERIVED`).
+  Table methods aggregate across waves, consult the parquet cache under
+  ``data_root()``, and return a DataFrame through :meth:`_finalize_result`
+  — which applies kinship expansion, canonical spelling enforcement,
+  dtype coercion, and the :meth:`_join_v_from_sample` cluster-index
+  augmentation.
+
+- :class:`Wave` — a view into a single wave of a single country. Used
+  internally by :class:`Country` to drive wave-level extraction via
+  :func:`~lsms_library.local_tools.df_data_grabber`.
+
+The module also defines :class:`StageInfo`, a small dataclass describing
+a single DVC stage entry discovered from the stage layer's ``dvc.yaml``
+files (Uganda, Senegal, Malawi, Togo, Kazakhstan, Serbia, GhanaLSS).
+
+Cache behavior is documented in ``CLAUDE.md`` — in brief, v0.7.0+ does a
+best-effort cache read at the top of :func:`load_dataframe_with_dvc`
+before consulting DVC; set ``LSMS_NO_CACHE=1`` to bypass it. The cache
+stores pre-transformation data, and all harmonization happens at API
+read time inside :meth:`Country._finalize_result`.
+"""
 from __future__ import annotations
 
 import pandas as pd
@@ -33,6 +61,15 @@ logger = logging.getLogger(__name__)
 JSON_CACHE_METHODS = {'panel_ids', 'updated_ids'}
 
 
+class DeprecatedFeatureError(AttributeError):
+    """Raised when a removed or deprecated table method is called on Country.
+
+    Subclasses AttributeError so that hasattr()-based probes and generic
+    try/except AttributeError patterns degrade gracefully; callers who need
+    migration guidance get the full message in the exception's args.
+    """
+
+
 @contextmanager
 def _working_directory(path: Path):
     """Temporarily switch the process working directory."""
@@ -57,6 +94,28 @@ def _slugify(value: str) -> str:
 
 @dataclass(frozen=True)
 class StageInfo:
+    """Pointer to a single materialize stage in a country's ``dvc.yaml``.
+
+    Collected by :func:`_load_materialize_stage_map` from every
+    ``dvc.yaml`` under the countries directory. Drives the legacy stage
+    layer used by the 7 stage-layer countries (Uganda, Senegal, Malawi,
+    Togo, Kazakhstan, Serbia, GhanaLSS); retires with v0.8.0.
+
+    Attributes
+    ----------
+    stage_key : str
+        Unique key within the ``materialize.foreach`` block.
+    stage_ref : str
+        Fully qualified stage reference
+        (``{yaml_rel}:materialize@{stage_key}``) usable with
+        ``dvc repro``.
+    country, wave, table : str | None
+        Identifiers extracted from the stage's parameters.
+    fmt : str
+        Output format, usually ``parquet``.
+    output_path : Path
+        Resolved absolute path where the stage writes its output.
+    """
     stage_key: str
     stage_ref: str
     country: str
@@ -189,6 +248,27 @@ def _property_value(instance, prop_name):
     if isinstance(prop, property):
         return prop.__get__(instance, type(instance))
     raise AttributeError(f"'{type(instance).__name__}' has no attribute '{prop_name}'")
+
+
+def _rebuild_failure_error(country_name: str, method_name: str) -> RuntimeError:
+    """Construct a clear RuntimeError for exhausted build fallbacks.
+
+    Used at every site where the library could not materialize a
+    table via any path.  Message enumerates the common root causes
+    so callers can diagnose without reading the library source.
+    """
+    var_path = data_root(country_name) / "var" / f"{method_name}.parquet"
+    return RuntimeError(
+        f"Could not materialize {country_name}/{method_name}: no wave-level "
+        f"build succeeded and no cached parquet was found at {var_path}.\n\n"
+        f"Common causes:\n"
+        f"  - installed via `pip install git+https://...` without the .dvc "
+        f"metadata needed to rebuild from source;\n"
+        f"  - LSMS_DATA_DIR points to an empty or stale cache location;\n"
+        f"  - DVC credentials are missing or misconfigured;\n"
+        f"  - the raw .dta source files have not been dvc-pulled.\n\n"
+        f"See README.org for supported install and data-access patterns."
+    )
 
 
 class Wave:
@@ -1449,7 +1529,7 @@ class Country:
 
             if output_path is None:
                 logger.warning(f"Data file {target_path} still missing after running fallbacks.")
-                return pd.DataFrame()
+                return None
 
             if output_path.suffix == ".json":
                 with open(output_path, "r", encoding="utf-8") as json_file:
@@ -1458,8 +1538,6 @@ class Country:
             df_local = get_dataframe(str(output_path))
             df_local = map_index(df_local)
             return df_local
-
-            return pd.DataFrame()
 
         def load_from_waves(waves):
             results = {}
@@ -1529,10 +1607,10 @@ class Country:
                 if country_fallback:
                     return country_fallback
                 return {}
-            if isinstance(country_fallback, pd.DataFrame):
+            if isinstance(country_fallback, pd.DataFrame) and not country_fallback.empty:
                 return country_fallback
 
-            raise KeyError(f"No data found for {method_name} in any wave of {self.name}.")
+            raise _rebuild_failure_error(self.name, method_name)
 
         def load_json_cache(method_name):
             cache_path = data_root(self.name) / "_" / f"{method_name}.json"
@@ -1568,6 +1646,8 @@ class Country:
                 result = load_from_waves(waves)
             else:
                 result = run_make_target(method_name)
+                if result is None:
+                    raise _rebuild_failure_error(self.name, method_name)
 
             if isinstance(result, dict):
                 cache_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1593,6 +1673,42 @@ class Country:
             """
             cache_path = data_root(self.name) / "var" / f"{method_name}.parquet"
             cache_exists = cache_path.exists()
+
+            # v0.7.0: best-effort cache read.  If a parquet exists at
+            # cache_path, read it and return without consulting DVC, the
+            # stage layer, or the wave loaders.  No staleness check is
+            # performed -- contributors editing source data are expected
+            # to clear the cache (`lsms-library cache clear --country X`)
+            # or set LSMS_NO_CACHE=1 in the environment.  Hash-based
+            # invalidation is deferred to v0.8.0.
+            #
+            # This block fixes the write-only-cache bug at the
+            # `if not stage_infos:` branch below (which wrote a parquet
+            # but never read it back) AND closes the same gap for the
+            # outer exception handler that catches DvcException, which
+            # also writes through `load_from_waves` after the v0.7.0
+            # cache-write fix in the `except` block at the bottom of
+            # this function.  See SkunkWorks/dvc_object_management.org
+            # for the full design and bench/results/ for empirical
+            # confirmation.  The returned DataFrame is intentionally
+            # pre-finalize: `_aggregate_wave_data` calls
+            # `_finalize_result` on it before returning to the user, so
+            # kinship expansion, spelling normalization, and the
+            # `_join_v_from_sample` augmentation still apply.
+            no_cache = os.environ.get("LSMS_NO_CACHE", "").lower() in {"1", "true", "yes"}
+            if cache_exists and not no_cache:
+                try:
+                    cached_df = get_dataframe(cache_path)
+                    cached_df = map_index(cached_df)
+                    logger.debug(
+                        f"v0.7.0 cache read: {method_name} from {cache_path}"
+                    )
+                    return cached_df
+                except Exception as cache_read_error:
+                    logger.debug(
+                        f"v0.7.0 cache read failed for {method_name} "
+                        f"({cache_read_error!r}); rebuilding from source"
+                    )
 
             dvc_root = self.file_path.parent
 
@@ -1734,7 +1850,22 @@ class Country:
                     return combined_outputs
             except (DvcException, FileNotFoundError) as e:
                 logger.warning(f"DVC unavailable for {method_name}: {e}. Falling back to manual aggregation.")
-                return load_from_waves(waves)
+                # v0.7.0: write the rebuild result to cache_path so the
+                # next call hits the top-of-function cache read above.
+                # Mirrors the `if not stage_infos:` branch that already
+                # writes after load_from_waves.  Without this, dvc.yaml
+                # countries (Uganda, Senegal, etc.) whose stages fail at
+                # reproduce never populate the cache and rebuild from
+                # source on every call.
+                df = load_from_waves(waves)
+                if isinstance(df, pd.DataFrame):
+                    df = _enforce_rejected_column_spellings(df)
+                    cache_path.parent.mkdir(parents=True, exist_ok=True)
+                    to_parquet(df, cache_path)
+                    logger.debug(
+                        f"v0.7.0 cache write (DVC fallback): {method_name} to {cache_path}"
+                    )
+                return df
             finally:
                 if repo is not None:
                     repo.close()
@@ -1764,6 +1895,8 @@ class Country:
                     df = load_from_waves(waves)
                 else:
                     df = run_make_target(method_name)
+                    if df is None:
+                        raise _rebuild_failure_error(self.name, method_name)
             except Exception as error:
                 _log_issue(self.name, method_name, waves, error)
                 raise
@@ -1907,6 +2040,22 @@ class Country:
         'household_characteristics': 'roster_to_characteristics',
     }
 
+    # Deprecated table names: name -> deprecation message
+    _DEPRECATED = {
+        'locality': (
+            "Country('Uganda').locality() is deprecated and will be removed "
+            "in a future release. The data it carries is now first-class in "
+            "two separate tables:\n\n"
+            "  * (i, t) -> v  (household -> cluster)     via  Country(X).sample()\n"
+            "  * (t, v) -> Region, Rural, District, ... via  Country(X).cluster_features()\n\n"
+            "For callers who need the legacy (i, t, m) -> v shape, a "
+            "compatibility shim is available:\n\n"
+            "    from lsms_library.transformations import legacy_locality\n"
+            "    loc = legacy_locality(Country('Uganda'))\n\n"
+            "See docs/migration/locality.md for details."
+        ),
+    }
+
     def __getattr__(self, name):
         '''
         This method is triggered when an attribute is not found in the instance, but exists in the `data_scheme`.
@@ -1919,7 +2068,35 @@ class Country:
         if no parquet/script exists but food_acquired is available, the table is
         derived automatically via transformations.  Similarly, household_characteristics
         can be derived from household_roster via roster_to_characteristics.
+
+        Deprecated tables (listed in _DEPRECATED) emit a DeprecationWarning and
+        return the compatibility shim output rather than raising AttributeError.
+        The deprecation check fires before the data_scheme check so it takes
+        effect even if the entry was accidentally left in data_scheme.yml.
         '''
+        # Deprecated tables: warn and delegate to shim before anything else
+        if name in self._DEPRECATED:
+            dep_msg = self._DEPRECATED[name]
+
+            def method(*args, **kwargs):
+                warnings.warn(dep_msg, DeprecationWarning, stacklevel=2)
+                from .transformations import legacy_locality
+                _shims = {'locality': legacy_locality}
+                return _shims[name](self)
+
+            method.__name__ = name
+            method.__qualname__ = f"Country.{name}"
+            method.__module__ = self.__class__.__module__
+            method.__doc__ = (
+                f"[DEPRECATED] {dep_msg}\n\n"
+                "This method will be removed in a future release."
+            )
+            try:
+                object.__setattr__(self, name, method)
+            except (AttributeError, TypeError):
+                pass
+            return method
+
         if name in self.data_scheme or name in self._FOOD_DERIVED or name in self._ROSTER_DERIVED:
             def method(waves=None, market=None):
                 # For derived food tables, try deriving from food_acquired first
@@ -2004,6 +2181,7 @@ class Country:
             list(self.data_scheme)
             + list(self._FOOD_DERIVED.keys())
             + list(self._ROSTER_DERIVED.keys())
+            + list(self._DEPRECATED.keys())
         )
         return base + [n for n in dynamic if n not in base]
     
@@ -2018,6 +2196,11 @@ class Country:
         failed_methods = {}
         
         for method_name in sorted(all_methods):
+            # Skip deprecated tables: they are handled by the _DEPRECATED shim
+            # and should not be built as normal data_scheme entries.
+            if method_name in self._DEPRECATED:
+                print(f"\n>>> Skipping deprecated method: {method_name}")
+                continue
             print(f"\n>>> Testing method: {method_name}")
             try:
                 df = self._aggregate_wave_data(waves=waves, method_name=method_name)
@@ -2107,26 +2290,39 @@ def _expand_kinship(df: pd.DataFrame) -> pd.DataFrame:
     gen = []
     dist = []
     aff = []
+    rel = []
     unknown = set()
 
+    # Exact-match NA sentinels.  Do NOT lowercase-fold: "Nan" is British
+    # English for grandmother in some contexts.  Explicit kinship.yml
+    # mappings are checked FIRST, so if a survey legitimately uses "Nan"
+    # as a label, adding it to kinship.yml overrides this sentinel list.
+    _NA_SENTINELS = ('', '<NA>', 'nan', 'Nan', 'NaN', 'NAN', 'None', 'NaT')
     for val in df["Relationship"]:
-        if pd.isna(val) or str(val).strip() in ('', '<NA>', 'nan', 'None'):
-            gen.append(pd.NA)
-            dist.append(pd.NA)
-            aff.append(pd.NA)
+        # True NA (not a string): always NA.
+        if pd.isna(val):
+            gen.append(pd.NA); dist.append(pd.NA); aff.append(pd.NA)
+            rel.append(pd.NA)
             continue
         label = str(val).strip().title()
-        tup = kinship.get(label) or kinship.get(str(val).strip())
+        stripped = str(val).strip()
+        # Explicit mapping wins over sentinel list.
+        tup = kinship.get(label) or kinship.get(stripped)
         if tup is not None:
-            gen.append(tup[0])
-            dist.append(tup[1])
-            aff.append(tup[2])
-        else:
-            unknown.add(str(val).strip())
-            gen.append(pd.NA)
-            dist.append(pd.NA)
-            aff.append(pd.NA)
+            gen.append(tup[0]); dist.append(tup[1]); aff.append(tup[2])
+            rel.append(val)
+            continue
+        # Unmapped and matches an NA sentinel: treat as NA silently.
+        if stripped in _NA_SENTINELS:
+            gen.append(pd.NA); dist.append(pd.NA); aff.append(pd.NA)
+            rel.append(pd.NA)
+            continue
+        # Unmapped and not a sentinel: warn and NA.
+        unknown.add(stripped)
+        gen.append(pd.NA); dist.append(pd.NA); aff.append(pd.NA)
+        rel.append(val)
 
+    df["Relationship"] = pd.array(rel, dtype=pd.StringDtype())
     df["Generation"] = pd.array(gen, dtype=pd.Int64Dtype())
     df["Distance"] = pd.array(dist, dtype=pd.Int64Dtype())
     df["Affinity"] = pd.array(aff, dtype=pd.StringDtype())

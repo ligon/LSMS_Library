@@ -74,7 +74,7 @@ hp= hp.groupby(['w', 'i', 'j', 'visit', 'u']).sum() # Deal with some cases with 
 df = hp.join(fe,how='outer')
 
 # Oddity with large number for missing code
-na = df.select_dtypes(exclude='object').max().max()
+na = df.select_dtypes(exclude=['object', 'category']).max().max()
 
 if na>1e99:  # Missing values?
     warnings.warn(f"Large number used for missing?  Replacing {na} with NaN.")

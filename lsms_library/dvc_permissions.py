@@ -1,4 +1,21 @@
 #!/usr/bin/env python3
+"""Interactive DVC credential unlock for the library's S3 read cache.
+
+This is the fallback path for users who don't have a World Bank
+Microdata API key but still want access to the S3-cached ``.dta``
+files. It prompts for a shared passphrase, decrypts
+``s3_reader_creds.gpg`` with ``gnupg``, and writes the plaintext
+credentials to the DVC config's expected location.
+
+The preferred (non-interactive) path runs automatically at import time
+via :mod:`lsms_library.data_access` when a valid ``MICRODATA_API_KEY``
+is present — that path uses an obfuscated passphrase baked into source
+(cosmetic anti-grep, not a security gate). :func:`authenticate` in this
+module is only reached when auto-unlock fails or is explicitly
+requested via ``lsms_library.authenticate()``.
+
+See ``CLAUDE.md`` "Three-Tier Credential Model" for the full rationale.
+"""
 import git
 from pathlib import Path
 import getpass
@@ -52,7 +69,12 @@ def authenticate(gpg_key_file='s3_reader_creds.gpg', max_attempts: int = 3,
 
     def _write_creds(decrypted_data, interactive: bool = True):
         """Write decrypted credentials to disk."""
-        creds_file = gpg_path / 's3_creds'
+        # Deferred import: dvc_permissions is imported very early by
+        # lsms_library/__init__.py, and we don't want a top-level
+        # `from . import config` edge during that bootstrap.
+        from lsms_library import config as _cfg
+        creds_file = _cfg.s3_creds_path()
+        creds_file.parent.mkdir(parents=True, exist_ok=True)
 
         if creds_file.exists() and interactive:
             user_input = input(f"The file {creds_file} already exists. Overwrite? (yes/no): ").strip().lower()
@@ -76,9 +98,15 @@ def authenticate(gpg_key_file='s3_reader_creds.gpg', max_attempts: int = 3,
 
     # Interactive path: prompt on TTY
     print(
-        "\n*** LSMS_Library DVC authentication ***\n"
-        "Contact ligon@berkeley.edu to request access credentials.\n"
-        "Enter your passphrase to unlock the survey data stream.\n"
+        "\n*** LSMS_Library DVC authentication (interactive fallback) ***\n"
+        "The preferred way to authenticate is to obtain a free World\n"
+        "Bank Microdata Library API key and set it in\n"
+        "  ~/.config/lsms_library/config.yml   (key: microdata_api_key)\n"
+        "or as the MICRODATA_API_KEY environment variable.  With a valid\n"
+        "WB API key, the library auto-unlocks S3 credentials on import.\n"
+        "\n"
+        "If you cannot use a WB API key, you can enter the shared\n"
+        "passphrase below.  See README.org for details.\n"
     )
 
     for attempt in range(1, max_attempts + 1):

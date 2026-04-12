@@ -1,0 +1,282 @@
+#+TITLE: Session Handoff — 2026-04-10 (evening, DVC planning)
+#+DATE: <2026-04-10 Fri>
+#+AUTHOR: Ethan Ligon + Claude (scrum master)
+
+* Summary
+
+Planning session, not an execution session.  Goal was to produce
+a sensible plan for managing DVC objects in the library.  Session
+converged on a plan document at =SkunkWorks/dvc_object_management.org=
+plus documentation corrections to =CLAUDE.md= and =docs/=.
+
+The session also surfaced a correctness bug that had been hiding
+in plain sight: for ~33 of ~40 countries, the =data_root()= parquet
+cache is *write-only* — every =Country('X').table()= call
+rebuilds from source, writes the parquet, returns the in-memory
+DataFrame, and never reads the parquet back.  Documented in the
+plan.
+
+No code changes.  Two commits this session (see "Commits" below):
+one for the doc corrections, one for the plan + handoff +
+audit report.
+
+* Branch state at session end
+
+- =origin/master= HEAD before session: =2da62445=
+  ("Add scripts/dvc_writer for managing write-access IAM users")
+- =master= HEAD after session: two new commits ahead (see below)
+- Working tree clean after the two commits.
+
+* Context at session start
+
+The user (Ligon) opened the session with:
+"we've gone around some, but I think you're okay on context?"
+(checking context budget) and "plan a sensible [way] to manage
+dvc objects; there's a plan of sorts in SkunkWorks, and there
+may be some relevant material in slurm-logs.  But start with the
+org files, the Makefile, the code, etc."
+
+Preconditions:
+- Node: =n0065.savio2= (Savio2 login-ish node, 24 cores, 62G)
+- Two existing background =no-shell= Slurm jobs belonging to
+  Ligon (JobIDs =33337266=, =33342628=) running since earlier in
+  the day, unrelated to this session, not touched
+- =fc_jevons= account usage unknown for this session (Savio2
+  login node can't reach the =check_usage_mylrc.conf= config)
+
+* What the session did
+
+** Investigation phase
+
+Read the following to understand the DVC landscape:
+- =CLAUDE.md= (via system prompt; very rich DVC context)
+- =CONTRIBUTING.org= (data-adding workflow)
+- =SkunkWorks/dvc_writer_distribution.org= (writer provisioning
+  design — the "plan of sorts" referenced in the user's ask)
+- =slurm_logs/v0.7.0_handoff.org= (execution-ready 8-file
+  credential + wheel work)
+- =slurm_logs/HANDOFF_2026-04-10.org= (previous session's handoff)
+- =scripts/dvc_writer= (the already-landed writer CLI)
+- =lsms_library/=: =__init__.py=, =dvc_permissions.py=, large
+  portions of =data_access.py= (~700 lines), =local_tools.py=
+  (the =get_dataframe=, =_resolve_data_path=, =to_parquet=
+  sections), and ~500 lines of =country.py= including
+  =_aggregate_wave_data=, =load_dataframe_with_dvc=,
+  =run_make_target=, =load_from_waves=, =load_json_cache=
+- =lsms_library/countries/dvc.yaml= (empty) and the 7 populated
+  ones (Uganda read fully)
+- =lsms_library/util/generate_dvc_stages.py= (partial read)
+- =.gitignore= and =.dvc/config= to understand what's tracked
+  where
+- The audit agent's report (see below)
+
+** In-tree parquet audit (background agent)
+
+Dispatched a general-purpose subagent with the instruction to
+enumerate all =lsms_library/countries/**/*.parquet= files and
+classify them into SAFE-TO-DELETE / KEEP / NEEDS-HUMAN-DECISION.
+Read-only, no mutations.
+
+Agent ran for ~18 min, produced
+=slurm_logs/session_2026-04-10/PLAN_dvc_intree_parquet_audit.org=.
+Key findings:
+- 7 in-tree parquets + 1 DVC pointer =.dvc=
+- 2 SAFE to delete (Uganda =food_acquired= and =food_expenditures=
+  — both have fresher =data_root()= counterparts)
+- 0 KEEP, NOT REGENERABLE
+- 4 NEEDS HUMAN DECISION (Uganda + Senegal =household_roster=,
+  =cluster_features= — exist *only in-tree*, so the fallback
+  chain at =country.py:1372= silently serves them as
+  pre-sample-migration stale data)
+- =Harmonized_LSMS-ISA_Ag/lsms_ag.parquet.dvc= — DVC-tracked,
+  zero references anywhere in the codebase, safe to drop
+- All 6 plain parquets are stale relative to =dvc.lock=; Uganda
+  =household_roster= is 3.7× larger than the lock expects,
+  consistent with a pre-sample-migration build
+
+** Cache behavior empirical verification
+
+The planning conversation surfaced a mismatch between what
+=CLAUDE.md= claimed about caching ("Subsequent calls read cache
+(<1 sec). Caches auto-invalidate on source/config changes
+(hash-based).") and what the code actually does.
+
+Ligon ran a two-call =ipython= test on =niger.household_roster()=
+and reported: first call slow, second fast, but *exiting ipython
+and re-running* gives the same slow-first-call pattern.
+
+Claude then ran a minimal controlled probe script
+(=/tmp/niger_probe.py= — not committed) twice in fresh Python
+subprocesses.  Results:
+
+| Phase                                 | RUN 1 | RUN 2 |
+|---------------------------------------+-------+-------|
+| Python import =lsms_library=          | 29.5s | 36.3s |
+| =Country('Niger')=                    | 0.03s | 0.03s |
+| First =household_roster()=            | 21.0s | 21.9s |
+| Second =household_roster()= same proc | 7.5s  | 8.4s  |
+
+Branch counts from monkey-patched =get_dataframe=: ALL reads via
+=local_file()=, zero =DVCFS= calls (the mirror has all =.dta=
+files on disk from a historical =dvc pull=).  First call: 11 reads.
+Second call: 4 reads (only the four wave-level source files;
+the 7 "missing" calls are ancillary lookups cached on the Country
+instance via =_sample_v_cache=, =_updated_ids_cache=, etc.)
+
+Also verified: =.dvc/cache/= does *not* exist on disk.  The
+initial hypothesis that DVC's on-disk content-addressed cache
+was doing the within-process speedup was wrong.  The speedup
+comes from (a) Country-instance ancillary caches and (b) OS page
+cache for the source =.dta= files.
+
+The plan document has full details in the "Object Categories"
+section.
+
+** Documentation corrections
+
+Three files had demonstrably wrong claims about caching; all
+corrected in this session (see commit below):
+
+- =CLAUDE.md= section "DVC Caching and =data_root()="
+  (lines 21-28 before the edit) → rewritten as "Cache Behavior
+  (Current State, 2026-04-10)" with honest 7-vs-33 split,
+  write-only bug, v0.7.0/v0.8.0 roadmap, historical note
+- =docs/index.md= line 55 "Intelligent Caching -- hash-based
+  cache with automatic invalidation" → "Parquet Cache" bullet
+  that honestly names the cross-session gap and points at the
+  caching guide
+- =docs/guide/caching.md= (almost the whole file) → rewritten
+  with within-session vs cross-session distinction, the
+  country inconsistency, and the roadmap
+
+** Plan document
+
+Wrote =SkunkWorks/dvc_object_management.org= as the primary
+session deliverable.  It's a playbook, not just a strategy
+document: it has a concrete v0.7.0 execution recipe (9 numbered
+items) that a fresh-context session can pick up and execute
+without re-deriving anything.  Absorbs the existing
+=dvc_writer_distribution.org= by reference (since that's already
+committed as of 2da62445).
+
+* Commits
+
+Two commits this session, both on =master=:
+
+1. =c093f128=: "Docs: correct misleading cache invalidation
+   claims"
+   - =CLAUDE.md=: rewrite "DVC Caching and =data_root()=" section
+   - =docs/index.md=: fix "Intelligent Caching" bullet
+   - =docs/guide/caching.md=: rewrite cache guide
+
+2. =0d3d8ab4=: "Session 2026-04-10 (pm): DVC object management
+   plan + audit + handoff"
+   - =SkunkWorks/dvc_object_management.org= (new)
+   - =slurm_logs/session_2026-04-10/HANDOFF.org= (new, this file —
+     this hash amended in a follow-up commit to record itself;
+     see the tip of =master= for the exact commit-graph shape)
+   - =slurm_logs/session_2026-04-10/PLAN_dvc_intree_parquet_audit.org= (audit agent output)
+
+* Decisions made this session
+
+- *DVC's role*: storage for raw inputs + documentation binaries,
+  nothing else.  Derived tables live in =data_root()=.
+- *=Harmonized_LSMS-ISA_Ag=*: drop entirely (not library input,
+  source is on GitHub, zero code references)
+- *v0.7.0 scope*: the existing 8-file handoff work, PLUS a
+  ~10-line cache read path in =country.py=, PLUS
+  =LSMS_NO_CACHE=1= escape hatch, PLUS removal of the in-tree
+  fallback bug in =run_make_target=, PLUS cleanup of audited
+  in-tree parquets (2 delete, 4 rebuild-then-delete), PLUS
+  =Harmonized_LSMS-ISA_Ag= removal.  ~2-3h focused work.
+- *v0.8.0 scope*: proper content-hash cache invalidation;
+  retire the DVC stage layer; =generate_dvc_stages.py=
+  disposition (TBD: delete or keep as opt-in reproducibility tool)
+- *The DVC stage layer stays in v0.7.0*.  Removing it would be a
+  perf regression for the 7 countries that use it; retire it
+  only after the in-house cache has proper invalidation.
+
+* Open questions deferred to future sessions
+
+- *Is v0.7.0 time-critical?* Ligon did not explicitly answer; I
+  asked before he went offline.  Default assumption: ship when
+  ready, not by a specific date.  The v0.7.0 handoff itself names
+  no deadline.
+- *=generate_dvc_stages.py= disposition*: delete vs keep-as-tool
+  in v0.8.0.  Recommendation: keep unless nobody uses it.
+- *Reader credential rotation policy*: TODO item from
+  =dvc_writer_distribution.org=, still deferred.
+- *Tighten =s3_bucket_readers= policy scope*: also deferred.
+
+* What the next session should do
+
+Start here:
+1. Read =SkunkWorks/dvc_object_management.org= end to end.  The
+   "v0.7.0 Execution Recipe" section is a numbered playbook.
+2. Read =slurm_logs/v0.7.0_handoff.org= for the 8-file
+   credential/wheel detail (referenced from the recipe's item 3).
+3. Read =slurm_logs/session_2026-04-10/PLAN_dvc_intree_parquet_audit.org=
+   for the specific files to delete/rebuild in recipe items 4-5.
+4. Execute recipe items 1-9 as commits in order.  Each item is
+   one or a few commits.  Run targeted pytest between logical
+   groups (=test_dvc_caching=, =test_wave_getattr=,
+   =test_schema_consistency=, =test_feature=).
+5. Do NOT run the full pytest suite on the login node — it
+   triggers country rebuilds that saturate the node.  Use a
+   Slurm job per =slurm_logs/test_2026-04-10/run_pytest_xdist.sbatch=.
+6. Don't retroactively fix the historical mis-documentation
+   note in =CLAUDE.md= — leave the "Historical note" block as a
+   warning to future maintainers.
+
+Don't touch:
+- The two long-running =no-shell= Slurm jobs belonging to Ligon
+- The DVC stage layer (deferred to v0.8.0)
+- Anything under =slurm_logs/= older than today (historical
+  records, not current docs)
+
+* Lessons learned
+
+** Default claims in CLAUDE.md need empirical verification
+
+The "hash-based auto-invalidation" claim in =CLAUDE.md= had
+persisted through multiple sessions and multiple handoffs
+without anyone checking it against what =country.py= actually
+does.  It was mentally accurate for the 7 countries with
+=dvc.yaml= (which is where Ligon's own interactive work happens)
+and got generalized incorrectly to the whole library.  The lesson
+is the same one from 2026-04-10's whole-node-allocation check:
+*probe before codifying*.
+
+** The in-tree fallback at =country.py:1372= is a silent-failure vector
+
+It's the reason stale pre-sample-migration parquets for Uganda
+and Senegal =household_roster= are currently being served to
+callers on this mirror.  Removing it is a 3-line delete in the
+v0.7.0 session and closes a correctness bug.
+
+** A "cache" that writes without reading isn't a cache
+
+The =data_root()= parquet write from the =if not stage_infos:=
+branch looks like caching but isn't.  The shim that moved writes
+out of the repo tree (commit unknown, probably in the v0.5.x
+range) fixed the write side of the separation without fixing
+the read side.  Future caching work needs both.
+
+** DVC's on-disk content cache is not automatic
+
+=DVCFileSystem.open()= does NOT populate =.dvc/cache/= as a side
+effect of reads.  You have to =dvc pull= (or a subagent must do
+it) for the persistent on-disk cache to exist.  The "fresh pip
+install" scenario has no such cache and will stream from S3 on
+every read until v0.7.0's cache read path lands.
+
+* Reference files this session
+
+- =CLAUDE.md= (corrected)
+- =docs/index.md= (corrected)
+- =docs/guide/caching.md= (corrected)
+- =SkunkWorks/dvc_object_management.org= (new)
+- =slurm_logs/session_2026-04-10/PLAN_dvc_intree_parquet_audit.org= (new, from agent)
+- =slurm_logs/session_2026-04-10/HANDOFF.org= (this file)
+- =slurm_logs/v0.7.0_handoff.org= (referenced, not modified)
+- =SkunkWorks/dvc_writer_distribution.org= (referenced, not modified)

@@ -1,0 +1,44 @@
+#+TITLE: DVCFileSystem Runtime Config Override (pip-install enablement)
+#+DATE: 2026-04-11
+#+AUTHOR: Moved out of CLAUDE.md for slim-down
+
+* Summary
+
+=DVCFileSystem= accepts =config= and =remote_config= kwargs at
+construction time that override the on-disk =.dvc/config= without
+modifying any files.  This is what makes pip-install scenarios
+possible: the bundled =.dvc/config= can have placeholder relative
+paths, and =local_tools.DVCFS= patches them to user-writable
+absolute paths at import time.
+
+* Example
+
+#+BEGIN_SRC python
+from dvc.api import DVCFileSystem
+
+fs = DVCFileSystem(
+    countries_dir,
+    config={
+        "remote": {"ligonresearch_s3": {"credentialpath":
+            "/home/user/.config/lsms_library/s3_creds"}},
+        "cache":  {"dir":
+            "/home/user/.cache/lsms_library/dvc-cache"},
+    },
+)
+#+END_SRC
+
+* Empirically verified properties (2026-04-10)
+
+1. *DVC is lazy about credential validation.*  The credential file
+   does not need to exist at =DVCFileSystem= construction time;
+   DVC only reads it when you actually open a file backed by the
+   remote.  This enables the import-time sequencing in
+   =__init__.py=: =DVCFS= can be constructed before
+   =_auto_unlock_s3= has written the plaintext creds, and the
+   subsequent data access still works.
+
+2. *DVC does not require a git ancestor.*  A =.dvc/= directory in
+   a =/tmp/...= scratch dir with no =.git/= anywhere above it is a
+   valid DVC repo root.  This is what makes the
+   =site-packages/lsms_library/countries/.dvc/= layout work in pip
+   installs.

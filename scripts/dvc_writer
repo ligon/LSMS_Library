@@ -1,0 +1,363 @@
+#!/usr/bin/env bash
+# dvc_writer — manage write-access IAM users for the LSMS_Library DVC remote
+#
+# Subcommands:
+#   dvc_writer add    USERNAME   Provision a new IAM user with write access
+#   dvc_writer remove USERNAME   Tear down a previously-provisioned IAM user
+#   dvc_writer ls                List current dvc_writer group members
+#   dvc_writer help              Show this help
+#
+# Required configuration (set in environment or in $LSMS_CONFIG_DIR/env.sh):
+#   LSMS_AWS_ACCOUNT         The 12-digit AWS account ID containing the
+#                            dvc_writer IAM group.
+#   LSMS_AWS_ADMIN_PROFILE   (optional) An SSO profile name with admin/IAM
+#                            permissions in that account, already
+#                            authenticated via `aws sso login`.
+#
+# The lsms_library config directory defaults to ~/.config/lsms_library/ but
+# honors LSMS_CONFIG_DIR (matching lsms_library/config.py:_config_dir).
+# Secrets in env.sh should be git-crypt-protected in your dotfiles repo so
+# they never end up in this public repo.
+
+set -euo pipefail
+
+# ----- Config / pre-flight (shared across subcommands) ---------------
+
+LSMS_CONFIG_DIR="${LSMS_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/lsms_library}"
+if [[ -f "$LSMS_CONFIG_DIR/env.sh" ]]; then
+    # shellcheck source=/dev/null
+    . "$LSMS_CONFIG_DIR/env.sh"
+fi
+
+PROFILE="${AWS_PROFILE:-${LSMS_AWS_ADMIN_PROFILE:-default}}"
+GROUP="dvc_writer"
+BUCKET="dvcbucket0"
+ACCOUNT="${LSMS_AWS_ACCOUNT:-}"
+
+usage() {
+    cat <<EOF
+usage: $(basename "$0") <subcommand> [args]
+
+Subcommands:
+  add    USERNAME    Provision a new IAM user with write access to s3://$BUCKET
+  remove USERNAME    Tear down a previously-provisioned IAM user
+  ls                 List current $GROUP group members and their key status
+  help               Show this help
+
+Configuration (environment or \$LSMS_CONFIG_DIR/env.sh):
+  LSMS_AWS_ACCOUNT         12-digit AWS account ID (currently: ${ACCOUNT:-unset})
+  LSMS_AWS_ADMIN_PROFILE   SSO profile with IAM admin permissions
+                           (currently: \$AWS_PROFILE='${AWS_PROFILE:-unset}',
+                            falling back to '${PROFILE}')
+  LSMS_CONFIG_DIR          override for the lsms_library config dir
+                           (currently: $LSMS_CONFIG_DIR)
+
+Examples:
+  $(basename "$0") add    alice_oxford
+  $(basename "$0") remove alice_oxford
+  $(basename "$0") ls
+EOF
+}
+
+require_account() {
+    if [[ -z "$ACCOUNT" ]]; then
+        echo "error: LSMS_AWS_ACCOUNT is not set." >&2
+        echo "       Either set it in the environment, or define it in:" >&2
+        echo "         $LSMS_CONFIG_DIR/env.sh" >&2
+        echo "       Example contents:" >&2
+        echo "         export LSMS_AWS_ACCOUNT=123456789012" >&2
+        echo "         export LSMS_AWS_ADMIN_PROFILE=my-admin-profile" >&2
+        exit 1
+    fi
+    if ! [[ "$ACCOUNT" =~ ^[0-9]{12}$ ]]; then
+        echo "error: LSMS_AWS_ACCOUNT must be a 12-digit AWS account ID, got: $ACCOUNT" >&2
+        exit 1
+    fi
+}
+
+require_profile() {
+    local caller_account
+    caller_account=$(aws sts get-caller-identity --profile "$PROFILE" \
+                         --output text --query 'Account' 2>&1) || {
+        echo "error: profile '$PROFILE' is not authenticated." >&2
+        echo "       Run: aws sso login --profile $PROFILE" >&2
+        exit 1
+    }
+    if [[ "$caller_account" != "$ACCOUNT" ]]; then
+        echo "error: profile '$PROFILE' is in account $caller_account, expected $ACCOUNT" >&2
+        exit 1
+    fi
+}
+
+# ----- Subcommands ----------------------------------------------------
+
+cmd_add() {
+    if [[ $# -ne 1 ]]; then
+        echo "usage: $(basename "$0") add USERNAME" >&2
+        exit 2
+    fi
+    require_account
+
+    local username="$1"
+
+    # Validate username against the lab's convention: lowercase starting
+    # with a letter, then letters/digits/underscores (e.g. alice_oxford,
+    # bob_uchicago). IAM permits more characters; matching the convention
+    # keeps the user list grep-able.
+    if ! [[ "$username" =~ ^[a-z][a-z0-9_]+$ ]]; then
+        echo "error: USERNAME must match [a-z][a-z0-9_]+ (lowercase, e.g. alice_oxford)" >&2
+        exit 2
+    fi
+
+    require_profile
+
+    if aws iam get-user --user-name "$username" --profile "$PROFILE" >/dev/null 2>&1; then
+        echo "error: IAM user '$username' already exists in account $ACCOUNT" >&2
+        exit 1
+    fi
+
+    echo "Creating IAM user '$username' in account $ACCOUNT..."
+    aws iam create-user --user-name "$username" --profile "$PROFILE" >/dev/null
+
+    echo "Adding to group '$GROUP'..."
+    aws iam add-user-to-group --user-name "$username" \
+        --group-name "$GROUP" --profile "$PROFILE"
+
+    echo "Generating access key..."
+    local access_key_id secret
+    read -r access_key_id secret < <(
+        aws iam create-access-key --user-name "$username" --profile "$PROFILE" \
+            --query '[AccessKey.AccessKeyId,AccessKey.SecretAccessKey]' --output text
+    )
+
+    if [[ -z "${access_key_id:-}" || -z "${secret:-}" ]]; then
+        echo "error: failed to capture new access key for $username" >&2
+        exit 1
+    fi
+
+    local out_dir out_file
+    out_dir="${XDG_CACHE_HOME:-$HOME/.cache}/lsms-library"
+    mkdir -p "$out_dir"
+    chmod 700 "$out_dir"
+    out_file="$out_dir/dvc-writer-${username}-$(date +%Y%m%d-%H%M%S).txt"
+    touch "$out_file"
+    chmod 600 "$out_file"
+    cat > "$out_file" <<EOF
+IAM user:       $username
+Group:          $GROUP
+AWS Account:    $ACCOUNT
+Bucket scope:   s3://$BUCKET
+                (PutObject + GetObject + ListBucket; NO DeleteObject)
+Created:        $(date '+%Y-%m-%d %H:%M:%S %Z')
+
+# Paste the [lsms_dvc] block below into the recipient's
+# ~/.aws/credentials (or equivalent for whichever S3 client they use).
+# The profile name is a suggestion; they can rename it.
+
+[lsms_dvc]
+aws_access_key_id = $access_key_id
+aws_secret_access_key = $secret
+
+# Recipient verifies with:
+#   aws s3 ls s3://$BUCKET/ --profile lsms_dvc
+#
+# Or, if using DVC against the LSMS_Library project, set
+# 'profile = lsms_dvc' in their .dvc/config.local for the
+# dvcbucket0 remote and run 'dvc pull' or 'dvc push'.
+EOF
+
+    cat <<EOF
+
+================================================================
+  Created IAM user:  $username
+  Access key ID:     $access_key_id
+  Credentials file:  $out_file
+================================================================
+
+Next steps:
+  1. Open the credentials file (mode 600, owner-only):
+       \$EDITOR "$out_file"
+  2. Copy the [lsms_dvc] block into a Google Keep note (or other
+     secure channel: Signal, GPG-encrypted email, 1Password share)
+     and share with $username. Do NOT use plain email or Slack DM.
+  3. Shred the credentials file:
+       shred -u "$out_file"
+
+When $username no longer needs access, run:
+  $(basename "$0") remove $username
+EOF
+}
+
+cmd_remove() {
+    if [[ $# -ne 1 ]]; then
+        echo "usage: $(basename "$0") remove USERNAME" >&2
+        exit 2
+    fi
+    require_account
+
+    local username="$1"
+
+    require_profile
+
+    if ! aws iam get-user --user-name "$username" --profile "$PROFILE" >/dev/null 2>&1; then
+        echo "error: IAM user '$username' does not exist in account $ACCOUNT" >&2
+        exit 1
+    fi
+
+    echo "About to retire IAM user: $username (account $ACCOUNT)"
+    echo
+    echo "--- groups ---"
+    aws iam list-groups-for-user --user-name "$username" --profile "$PROFILE" \
+        --query 'Groups[].GroupName' --output table
+    echo
+    echo "--- access keys (with last-used) ---"
+    local keys k last_used
+    keys=$(aws iam list-access-keys --user-name "$username" --profile "$PROFILE" \
+           --query 'AccessKeyMetadata[].AccessKeyId' --output text)
+    if [[ -z "$keys" ]]; then
+        echo "  (none)"
+    else
+        for k in $keys; do
+            last_used=$(aws iam get-access-key-last-used --access-key-id "$k" \
+                            --profile "$PROFILE" \
+                            --query 'AccessKeyLastUsed' --output json 2>/dev/null || echo '{}')
+            echo "  $k  $last_used"
+        done
+    fi
+    echo
+    echo "--- attached policies ---"
+    aws iam list-attached-user-policies --user-name "$username" --profile "$PROFILE" \
+        --query 'AttachedPolicies[].PolicyName' --output table
+    echo
+    echo "--- inline policies ---"
+    aws iam list-user-policies --user-name "$username" --profile "$PROFILE" \
+        --query 'PolicyNames' --output table
+    echo
+
+    local confirm
+    read -r -p "Proceed with deletion of user '$username'? Type 'yes' to confirm: " confirm
+    if [[ "$confirm" != "yes" ]]; then
+        echo "Aborted."
+        exit 0
+    fi
+
+    # IAM requires the user to have no attachments before deletion.
+    local arn name g
+    for arn in $(aws iam list-attached-user-policies --user-name "$username" \
+                     --profile "$PROFILE" \
+                     --query 'AttachedPolicies[].PolicyArn' --output text); do
+        [[ -z "$arn" ]] && continue
+        echo "Detaching policy: $arn"
+        aws iam detach-user-policy --user-name "$username" \
+            --policy-arn "$arn" --profile "$PROFILE"
+    done
+    for name in $(aws iam list-user-policies --user-name "$username" \
+                      --profile "$PROFILE" \
+                      --query 'PolicyNames' --output text); do
+        [[ -z "$name" ]] && continue
+        echo "Deleting inline policy: $name"
+        aws iam delete-user-policy --user-name "$username" \
+            --policy-name "$name" --profile "$PROFILE"
+    done
+    for g in $(aws iam list-groups-for-user --user-name "$username" \
+                   --profile "$PROFILE" \
+                   --query 'Groups[].GroupName' --output text); do
+        [[ -z "$g" ]] && continue
+        echo "Removing from group: $g"
+        aws iam remove-user-from-group --user-name "$username" \
+            --group-name "$g" --profile "$PROFILE"
+    done
+    for k in $keys; do
+        echo "Deleting access key: $k"
+        aws iam delete-access-key --user-name "$username" \
+            --access-key-id "$k" --profile "$PROFILE"
+    done
+
+    if aws iam get-login-profile --user-name "$username" \
+           --profile "$PROFILE" >/dev/null 2>&1; then
+        echo "Deleting console login profile"
+        aws iam delete-login-profile --user-name "$username" --profile "$PROFILE"
+    fi
+
+    echo "Deleting user: $username"
+    aws iam delete-user --user-name "$username" --profile "$PROFILE"
+
+    if aws iam get-user --user-name "$username" --profile "$PROFILE" >/dev/null 2>&1; then
+        echo "WARNING: user still exists after delete!" >&2
+        exit 1
+    fi
+    echo
+    echo "Done. IAM user '$username' removed from account $ACCOUNT."
+}
+
+cmd_ls() {
+    require_account
+    require_profile
+
+    echo "Members of '$GROUP' in account $ACCOUNT:"
+    echo
+
+    local members
+    members=$(aws iam get-group --group-name "$GROUP" --profile "$PROFILE" \
+              --query 'Users[].UserName' --output text)
+
+    if [[ -z "$members" ]]; then
+        echo "  (none)"
+        return
+    fi
+
+    printf "  %-20s  %-22s  %-9s  %s\n" "USER" "ACCESS KEY ID" "STATUS" "LAST USED"
+    printf "  %-20s  %-22s  %-9s  %s\n" \
+        "--------------------" "----------------------" "---------" "----------------------"
+
+    local u keys key_id status last_used
+    for u in $members; do
+        # Each user can have up to 2 access keys; print one row per key,
+        # or one row with "(no keys)" if none.
+        keys=$(aws iam list-access-keys --user-name "$u" --profile "$PROFILE" \
+               --query 'AccessKeyMetadata[].[AccessKeyId,Status]' --output text)
+        if [[ -z "$keys" ]]; then
+            printf "  %-20s  %-22s  %-9s  %s\n" "$u" "(no keys)" "" ""
+            continue
+        fi
+        while read -r key_id status; do
+            [[ -z "$key_id" ]] && continue
+            last_used=$(aws iam get-access-key-last-used --access-key-id "$key_id" \
+                            --profile "$PROFILE" \
+                            --query 'AccessKeyLastUsed.LastUsedDate' --output text 2>/dev/null)
+            [[ "$last_used" == "None" || -z "$last_used" ]] && last_used="(never)"
+            printf "  %-20s  %-22s  %-9s  %s\n" "$u" "$key_id" "$status" "$last_used"
+        done <<< "$keys"
+    done
+}
+
+# ----- Dispatch -------------------------------------------------------
+
+if [[ $# -lt 1 ]]; then
+    usage >&2
+    exit 2
+fi
+
+subcommand="$1"
+shift
+
+case "$subcommand" in
+    add)
+        cmd_add "$@"
+        ;;
+    remove|rm|delete)
+        cmd_remove "$@"
+        ;;
+    ls|list)
+        cmd_ls "$@"
+        ;;
+    help|-h|--help)
+        usage
+        ;;
+    *)
+        echo "error: unknown subcommand: $subcommand" >&2
+        echo >&2
+        usage >&2
+        exit 2
+        ;;
+esac

@@ -101,6 +101,41 @@ individual_education:
     myvars:
         Educational Attainment: hh_c09
 
+housing:
+    file:
+        - Cross_Sectional/hh_mod_f.dta
+        - Panel/hh_mod_f_16.dta:
+            i: y3_hhid
+    idxvars:
+        i:
+            - case_id
+            - mapping: cs_i
+    myvars:
+        Roof:
+            - hh_f08
+            - mapping:
+                grass: Grass
+                GRASS: Grass
+                IRON SHEETS: Iron Sheets
+                Iron sheets: Iron Sheets
+                CLAY TILES: Clay Tiles
+                PLASTIC SHEETING: Plastic Sheeting
+                concrete: Concrete
+                CONCRETE: Concrete
+                OTHER (SPECIFY): Other
+        Floor:
+            - hh_f09
+            - mapping:
+                SMOOTHED MUD: Smoothed Mud
+                SMOOTH CEMENT: Smooth Cement
+                sand: Sand
+                SAND: Sand
+                tile: Tile
+                TILE: Tile
+                wood: Wood
+                WOOD: Wood
+                OTHER(SPECIFY): Other
+
 panel_ids:
     file: Panel/hh_mod_a_filt_16.dta
     idxvars:

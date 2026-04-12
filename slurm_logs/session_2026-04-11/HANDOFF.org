@@ -1,0 +1,550 @@
+#+TITLE: Session Handoff -- 2026-04-10 evening through 2026-04-11 (caching investigation + v0.7.0 layer-2 fix)
+#+DATE: <2026-04-11 Sat>
+#+AUTHOR: Ethan Ligon + Claude (Sue, scrum master)
+
+* Summary
+
+Sue acted as scrum master for an investigation-then-implementation
+session on the LSMS_Library caching stack.  Headline outcomes:
+
+- *Layer 2 (parquet) cache-read fix* shipped at =country.py:1611-1812=
+  via the v0.7.0 path.  Empirically validated end-to-end on Niger
+  (16.4s → 0.93s, 17×) and Tanzania (4:26 → 163ms in Ligon's own
+  ipython session).  The headline win.
+- A parallel agent's design doc on Layer 1 (raw =.dta= blob) caching
+  was cherry-picked, partially implemented, partially reverted after
+  empirical disproof.  The honest version of the story is now in
+  =slurm_logs/DESIGN_dvc_layer1_caching.md= "Empirical verification"
+  appendix.
+- Working-tree reset: the active mirror was renamed to =LSMS_Library-=
+  and a fresh =git clone= taken to escape accumulated cruft (stale
+  in-tree parquets, ISSUES.md pollution, .venv path-baking, leftover
+  .claude state).  All work landed in the new clone.
+- Local commits from yesterday afternoon (=c093f128=, =0d3d8ab4=,
+  =31a34d88=) that had never been pushed are now on GitHub master
+  alongside today's work.
+- Bench infrastructure (=bench/build_feature.py=, =bench/run_bench.sh=,
+  results JSONL) committed and used for verification.
+- Test count: 202 → 207 → 205 (added 3 v0.7.0 layer-2 tests + 2
+  layer-1 tests, then removed the 2 layer-1 tests in the revert).
+
+* Branch state at session end
+
+- =origin/master= HEAD before session: =2da62445=
+  ("Add scripts/dvc_writer for managing write-access IAM users")
+- =origin/master= HEAD after session: =bf391b0a=
+  ("bench: archive Niger fresh-clone Layer-1 verification jsonl")
+- 10 commits delivered (5 from yesterday afternoon that were
+  local-only, 5 net from this session after counting the revert).
+- Working tree clean.  Branch up to date with origin/master.
+- Active mirror: =/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library=
+  (fresh clone).  Old mirror preserved as =LSMS_Library-= for
+  reference, sans =.venv= (which was moved into the new clone).
+- Remote branches at session end: only =master= and =development=.
+  The agent investigation branch
+  =claude/dvc-caching-investigation-LMjwZ= was deleted via
+  =git push origin --delete= after its sole commit was cherry-picked.
+
+* Context at session start
+
+Ligon opened with: "you're in a position of responsibility.  You're
+the scrum master and responsible for managing other agents as we
+work through better understanding and fixes of caching and related
+issues on this project."
+
+Then immediately: "We have a comprehensive view of the project; read
+the docs and code carefully.  There's a recent hand-off doc in
+slurm-logs that I hope will be helpful, but we should carefully
+investigate the claims made there before proceeding with a fix."
+
+The "recent hand-off doc" turned out to be three docs:
+- =slurm_logs/v0.7.0_handoff.org= (the wheel/credential 8-file plan)
+- =slurm_logs/session_2026-04-10/HANDOFF.org= (last night's planning)
+- =SkunkWorks/dvc_object_management.org= (the playbook, with the
+  cache-read recipe items 1-9 that became this session's main code
+  work)
+
+Preconditions:
+- Node: =n0065.savio2=, 24 cores, 62G
+- Two background =no-shell= Slurm jobs (=33337266= on n0091,
+  =33342628=->=33348802= on n0065) -- "communication infrastructure",
+  not touched
+- Stale DVC locks at =lsms_library/countries/.dvc/tmp/{lock,rwlock,*.lock}=
+  with mtime "Apr 10 2027" (filesystem clock skew, no live dvc
+  process) -- cleared at session start
+- check_usage.sh config missing on this login node -- session SU
+  delta NOT recorded (could not query)
+
+* What the session did
+
+** Phase 1 -- Verification of handoff claims (no code yet)
+
+Read the docs end to end, then verified each handoff claim with a
+mix of direct code reads and dispatched Explore agents:
+
+- *Write-only cache bug at country.py:1626-1633* -- VERIFIED.
+  Direct code read confirmed the =if not stage_infos:= branch calls
+  =load_from_waves= → =to_parquet= → return, with no read-back.
+- *Exactly 7 countries with populated dvc.yaml* (Uganda, Senegal,
+  Malawi, Togo, Kazakhstan, Serbia, GhanaLSS) -- VERIFIED via
+  Explore agent enumerating all 14 dvc.yaml files under
+  =lsms_library/countries/=.
+- *Two SAFE-to-delete in-tree parquets and four NEEDS-CARE ones*
+  per the audit at =slurm_logs/session_2026-04-10/PLAN_dvc_intree_parquet_audit.org=
+  -- VERIFIED on disk.
+- *No other write-only-cache sites in the hot path* -- VERIFIED via
+  Explore agent sweeping all =to_parquet= and =data_root()= writes
+  in the library.
+
+But also surfaced two CLAUDE.md bugs that needed correcting:
+- *=trust_cache=True= skips =_finalize_result()=* -- WRONG.  The
+  short-circuit at =country.py:1293-1299= ends with
+  =return self._finalize_result(df_cached, ...)=, so kinship
+  expansion, spelling normalization, and dtype coercion still
+  apply.  Someone correcting an old wrong claim introduced a new
+  wrong one.
+- *=LSMS_BUILD_BACKEND=make= has "write-only behavior" for non-dvc.yaml
+  countries* -- WRONG.  The make backend dispatches directly to
+  =load_from_waves= (=country.py:1830=) which never writes to
+  data_root.  It has *no* cache behavior at all, not "write-only"
+  behavior.
+
+And one finding the audit MIS-LOCATED:
+- The audit pointed at =country.py:1372= as the silent-stale-data
+  vector for Uganda/Senegal household_roster.  Direct trace showed
+  line 1372 is unreachable for those features (no country-level
+  =_/household_roster.py= exists).  The actual silent-stale-data
+  path is =collect_stage_outputs= at line 1734 inside the stage
+  layer's exception handler.
+
+** Phase 2 -- Mirror reset
+
+Ligon's idea: =mv LSMS_Library LSMS_Library- && git clone LSMS_Library- LSMS_Library=.
+Cleanest way to escape accumulated untracked cruft.
+
+Executed at =/global/scratch/fsa/fc_jevons/ligon/mirrors/=:
+1. cd to scratch mirrors parent (the home-dir path is bind-mounted,
+   verified by inode comparison)
+2. =mv LSMS_Library LSMS_Library-=
+3. =git clone LSMS_Library- LSMS_Library=
+4. Reset =origin= to GitHub URL (clone defaulted to local source)
+5. Carried forward: =lsms_library/countries/.dvc/s3_creds=,
+   =.claude/settings.local.json=, =.claude/skills/scrum-master-hpc=
+6. Moved =LSMS_Library-/.venv= → =LSMS_Library/.venv= -- the venv's
+   hashbangs were path-baked to =.../LSMS_Library/.venv/bin/python=,
+   so the rename had broken them in the OLD location and the move
+   restored them in the NEW location.  Saved a =poetry install=.
+7. Established baseline: =pytest tests/test_dvc_caching.py
+   tests/test_wave_getattr.py tests/test_schema_consistency.py
+   tests/test_feature.py= -- 202/202 pass.
+
+** Phase 3 -- Bench infrastructure (commit =6bf43359=)
+
+Wrote =bench/build_feature.py= and =bench/run_bench.sh= to time the
+four phases of building one feature: import, Country construction,
+first call, second call.  JSONL output for cross-run aggregation.
+
+Ground-truth Niger run from the OLD mirror (with local =.dta= files,
+PYTHONPATH=OLD):
+
+| Phase                  | RUN 1 | RUN 2 |
+|------------------------+-------+-------|
+| import lsms_library    | 21.8s | 23.2s |
+| Country('Niger')       | 0.03s | 0.02s |
+| household_roster() #1  | 16.1s | 16.4s |
+| household_roster() #2  |  6.8s |  7.2s |
+
+Critical observation: RUN 2's #1 (cross-process cold call) is the
+SAME as RUN 1's #1.  The parquet written to =data_root()/Niger/var/
+household_roster.parquet= after RUN 1 is never read back by RUN 2.
+Direct empirical confirmation of the write-only bug.
+
+Side observation: =panel_ids= is NOT subject to the same bug because
+=load_json_cache= at =country.py:1556= already has a candidates-check
+read path before the make subprocess.  That's the template the
+broken Layer 2 path needed.
+
+** Phase 4 -- v0.7.0 cache-read fix (commit =6538407a=)
+
+Two changes to =country.py:load_dataframe_with_dvc=:
+
+(A) Best-effort cache read at the top of the function.  If
+=cache_path.exists()= and =LSMS_NO_CACHE= is not set, read the
+parquet via =get_dataframe + map_index= and return.  No staleness
+check.  Pre-finalize df is returned so =_aggregate_wave_data='s
+=_finalize_result= still applies kinship expansion, spelling
+normalization, and the =_join_v_from_sample= augmentation on the
+way out.  This closes the bug for the ~33 countries without a
+populated =dvc.yaml= (the =if not stage_infos:= branch).
+
+(B) Cache write in the outer DvcException handler.  Mirrors what
+the =if not stage_infos:= branch already does: call
+=load_from_waves=, write to =cache_path=, return.  This closes the
+bug for the 7 dvc.yaml countries whose =stage.reproduce()= currently
+fails on Savio because of a =python3= version mismatch in the
+dvc.yaml =cmd:= template (system Python 3.6.8 vs library's required
+3.11+).  The exception handler now writes the load_from_waves
+fallback result to cache so the next call hits (A).
+
+Test changes:
+- Updated =test_stale_cache_triggers_rebuild= to set =LSMS_NO_CACHE=1=
+  so the rebuild path is exercised under the new contract.  Also
+  patched =_load_canonical_spellings= and =_load_rejected_column_spellings=
+  to make the test self-contained -- it was passing pre-fix only
+  due to lru_cache cross-contamination from a sibling test.
+- Added 3 new tests pinning the v0.7.0 paths:
+  =test_v070_top_cache_read_returns_without_dvc=,
+  =test_v070_lsms_no_cache_skips_top_read=,
+  =test_v070_dvc_fallback_writes_cache=.
+
+CLAUDE.md updates: rewrote "Cache Behavior" section with v0.7.0
+reality + the empirical bench table; added the trust_cache and
+LSMS_BUILD_BACKEND=make corrections.
+
+Test count: 202 → 205 passed.
+
+Empirical post-fix bench, dispatched as parallel background tasks
+per Ligon's "we could be dispatching these benchmark jobs" comment:
+
+|         | Pre-fix RUN 2 cold call | Post-fix RUN 2 cold call | Speedup |
+|---------+-------------------------+--------------------------+---------|
+| Niger   | 16.4s                   | *0.93s*                  | 17×     |
+| Uganda  | 11.9s                   | *1.23s*                  | 10×     |
+
+In-process warm calls also improved: ~7s → ~0.5s for both, because
+the second call in the same process now hits the new top read.
+
+** Phase 5 -- Layer 1 (DVC blob) caching false start
+
+Ligon: "I think there are some changes over on github we should
+pull."  =git fetch origin= revealed a parallel investigation branch:
+=origin/claude/dvc-caching-investigation-LMjwZ= with a single
+commit =55fb27d2= adding =slurm_logs/DESIGN_dvc_layer1_caching.md=
+(497 lines).  Another agent had investigated *Layer 1* (raw .dta
+blob caching) while we'd been working on *Layer 2* (parquet cache).
+Orthogonal layers in the same stack.
+
+Ligon: "I particularly like the dvc caching because we really don't
+expect those files to change" -- correct: DVC content-addressing
+makes Layer 1 caching invalidation-free by construction.
+
+Plan: cherry-pick the design doc, implement Changes 1 + 4 from it
+(skipping 2/3/5), verify with a test, push.
+
+Cherry-picked at =bf75b834=.  Implemented at =3ad235f0=:
+- Change 1: =cache_remote_stream=True= kwarg on =DVCFS.open= at
+  =local_tools.py:247= with =TypeError= fallback for older DVC
+- Change 4: reuse =DVCFS= singleton in =data_access.py:1144= instead
+  of constructing a fresh =DVCFileSystem= per WB-API fallback fetch
+- Two unit tests pinning the kwarg pass-through
+
+207 passed, pushed to GitHub.
+
+** Phase 6 -- Brute-force cache delete: empirical falsification
+
+Ligon: "On 6, we could just delete the cache like brutes."
+
+Ran the diagnostic recipe end-to-end from the FRESH clone (no
+local .dta files, only =.dvc= pointers):
+
+1. Cleared =~/.local/share/lsms_library/Niger/= and verified
+   =~/.cache/dvc= didn't exist at all
+2. Ran =bench/run_bench.sh Niger household_roster= with PYTHONPATH=NEW
+
+Result:
+#+begin_example
+RUN 1 (cold-cache subprocess):
+  import lsms_library                          22.948s
+  Country('Niger')                              0.013s
+  household_roster() #1 (cold)                363.410s   <-- S3 stream
+  household_roster() #2 (warm in-proc)          0.784s
+
+RUN 2 (fresh subprocess, data_root populated by RUN 1):
+  household_roster() #1 (cold)                  1.103s   <-- v0.7.0 layer-2 fix
+  household_roster() #2 (warm in-proc)          0.498s
+#+end_example
+
+The 363s cold call is the real cost of streaming Niger's wave-level
+=.dta= files from S3.  The 1.1s cross-process call is the v0.7.0
+layer-2 fix delivering even from a clean state.
+
+But: Ligon asked "What does data_root() point to?" and the trail
+unraveled.
+
+*** Finding 1: The DVC cache is at =/global/scratch/users/ligon/.dvc/cache=, not =~/.cache/dvc/=
+
+=~/.config/dvc/config= overrides =cache.dir=:
+#+begin_example
+[cache]
+    dir = /global/scratch/users/ligon/.dvc/cache
+    type = copy
+#+end_example
+80 GB cache, last meaningfully populated 2026-04-02 (presumably
+from a historical =dvc pull=).  The design doc's check on
+=~/.cache/dvc= was misleading on this host.
+
+*** Finding 2: The kwarg name is =cache=, not =cache_remote_stream=
+
+In DVC 3.67.0, =dvc/fs/dvc.py:355-369= reads:
+#+begin_src python
+def _open(self, path, mode="rb", **kwargs):
+    ...
+    return dvc_fs.open(dvc_path, mode=mode, cache=kwargs.get("cache", False))
+#+end_src
+
+The PR cited in the design doc (iterative/dvc#9183) used a different
+name.  Our 3.67.0 silently accepts and drops =cache_remote_stream=
+via =**kwargs=.  No TypeError, no warning, no cache write.
+
+*** Finding 3: Even =cache=True= doesn't populate the cache
+
+Direct probe: =DVCFS.open(grappe_gps_ner2018.dta, mode='rb', cache=True)=
+took 117s to download a 35KB file from S3 and wrote *zero bytes* to
+=/global/scratch/users/ligon/.dvc/cache/files/md5/dc/=.
+
+*** Finding 4: =DVCFileSystem.get_file()= also fails
+
+Dispatched a small Python probe in background (Ligon: "we have many
+many idle cpus") that called =DVCFS.get_file(remote, tmp)= on a
+2 KB Niger file (=s00a_co_ner2018.dta=).  111s to download, correct
+content delivered, *zero* cache writes.
+
+*The DVCFileSystem class genuinely has no stream-and-cache mode in
+DVC 3.67.0.*  The design doc's premise was wrong at a deeper level
+than just kwarg names.
+
+** Phase 7 -- Revert (commit =e203a430=)
+
+- Reverted =local_tools.py:247-265= to the simple
+  =with DVCFS.open(fn, mode='rb') as f:= block.  Added a NOTE
+  comment recording the failed attempt and pointing at the design
+  doc.
+- Removed the two =test_layer1_*= unit tests from
+  =tests/test_dvc_caching.py= -- they only tested that the kwarg
+  was passed, not that DVC honored it, and pinning a contract that
+  the dependency silently violates is worse than no test.
+- *KEPT* the Change 4 portion of =3ad235f0= (DVCFS singleton reuse
+  in =data_access.py=).  That's real cleanup with no relation to
+  the broken kwarg.
+- *KEPT* the design doc cherry-pick (=bf75b834=) -- still useful
+  as an investigation record.
+
+Test count: 207 → 205 passed.
+
+** Phase 8 -- Honest documentation (commit =d0131318= + =bf391b0a=)
+
+Appended an "Empirical verification (added 2026-04-11)" section to
+=slurm_logs/DESIGN_dvc_layer1_caching.md= with all four findings,
+the bench output, and a status table for Changes 1-5.
+
+Archived =bench/results/2026-04-10_layer1.jsonl= with the Niger
+fresh-clone bench data so the empirical record is reproducible.
+
+Pushed everything to GitHub.
+
+* Commits this session
+
+Listed in reverse chronological order on master:
+
+| Hash       | Subject                                                        |
+|------------+----------------------------------------------------------------|
+| =bf391b0a= | bench: archive Niger fresh-clone Layer-1 verification jsonl    |
+| =d0131318= | DESIGN doc: append empirical findings from 2026-04-11          |
+| =e203a430= | Revert broken Change 1 from 3ad235f0 (no-op)                   |
+| =3ad235f0= | Layer-1 DVC caching: cache_remote_stream + DVCFS singleton reuse |
+| =bf75b834= | Add DVC layer-1 caching investigation design doc (cherry-pick) |
+| =6538407a= | v0.7.0: cache-read fix for load_dataframe_with_dvc             |
+| =6bf43359= | Add bench/ for measuring (country, feature) build cost         |
+| =31a34d88= | HANDOFF: record commit hashes for 2026-04-10 pm session        |
+| =0d3d8ab4= | Session 2026-04-10 (pm): DVC object management plan + audit + handoff |
+| =c093f128= | Docs: correct misleading cache invalidation claims             |
+
+The bottom three (=c093f128=, =0d3d8ab4=, =31a34d88=) were yesterday
+afternoon's work that had never been pushed to GitHub.  The top
+seven are this session's.
+
+* Decisions made this session
+
+- *Mirror reset over in-place cleanup*.  Cleaner baseline for the
+  fix work, accumulated cruft (stale parquets, ISSUES.md pollution,
+  worktrees) left behind in =LSMS_Library-=.
+- *v0.7.0 fix scope*: Top-of-function cache read in
+  =load_dataframe_with_dvc= covers the =if not stage_infos:= branch
+  AND the DvcException handler.  Single insertion point + a
+  matching write in the exception handler, ~25 lines including the
+  =LSMS_NO_CACHE= dance.
+- *Defer hash-based invalidation to v0.8.0*.  Sidecar =.hash= file
+  approach (Ligon's suggestion).  Notes in CLAUDE.md.
+- *Defer the v0.7.0 wheel/credential work* to a separate session.
+  =slurm_logs/v0.7.0_handoff.org= covers it; this session focused
+  on the cache-read fix only.
+- *Cherry-pick the parallel agent's design doc, implement Changes
+  1 + 4 only*.  Ligon: "I particularly like the dvc caching."
+  Skipped Changes 2 (cache co-location, has migration risk),
+  3 (Repo memoization, stateful), 5 (full refactor).
+- *Revert Change 1 after empirical falsification*.  Don't ship a
+  no-op fix.  Keep Change 4.
+- *Document the revert publicly* in the design doc with full
+  empirical evidence.  Don't quietly delete.
+
+* Open questions deferred to future sessions
+
+- *Real Layer 1 fix*: try =Repo.pull(targets=[remote_path])=
+  programmatically inside =get_dataframe= for the file_system_path
+  branch.  That's how the existing 80 GB scratch cache was built
+  and is known to populate the cache.  Heavier than streaming-with-
+  side-effect-caching but it actually works.  Highest leverage for
+  pip-install users who have no local .dta files.
+- *v0.7.0 wheel/credential work* per =slurm_logs/v0.7.0_handoff.org=.
+  Eight files, ~hour or two of focused work.  Distribution side;
+  needed before tagging a real v0.7.0 release.
+- *Memoize Repo per Country* (Change 3 from the design doc).
+  Saves cold-rebuild time for the 7 dvc.yaml countries.  Lower
+  priority because the v0.7.0 layer-2 cache read bypasses Repo
+  construction entirely on warm-cache reads, which is the dominant
+  path.
+- *Hash-based cache invalidation* (the simple-hash plan from Ligon's
+  earlier comment).  Sidecar =.hash= file recording MD5 of relevant
+  =data_info.yml= and =_/{table}.py= scripts.  ~20 LOC.  Removes
+  the =LSMS_NO_CACHE=1= papercut for contributors editing source
+  data.  Deferred to v0.8.0.
+- *Fix the python3 mismatch in the 7 dvc.yaml files*: =python3= →
+  =${PYTHON:-python3}= or =sys.executable=.  Low priority because
+  v0.8.0 retires the stage layer entirely, AND because the v0.7.0
+  exception-handler write closes the data correctness issue.
+- *Rebuild Uganda/Senegal household_roster + cluster_features*
+  into =data_root()= and delete the in-tree stale parquets.  The
+  fresh-clone reset already removed the in-tree files from the
+  active mirror, so this is mainly a cleanup item for users still
+  on the OLD-mirror state.
+- *Tag v0.7.0* once the wheel/credential work lands.
+
+* What the next session should do
+
+Start here:
+1. Read this handoff plus =slurm_logs/DESIGN_dvc_layer1_caching.md=
+   (the "Empirical verification" section at the bottom is the new
+   ground truth).
+2. Pick one of the three highest-leverage open items:
+   - *Real Layer 1 fix* via =Repo.pull(targets=[...])=.  Probe
+     script first: try it on a small Niger file, verify the cache
+     populates, then wrap in =get_dataframe='s file_system_path
+     branch.  Re-run the Niger fresh-clone bench to verify the
+     RUN 2 first call drops dramatically when the parquet is
+     cleared but the .dta blob stays in cache.
+   - *v0.7.0 wheel/credential work* per =slurm_logs/v0.7.0_handoff.org=.
+     8 files, well-scoped.
+   - *Hash-based invalidation* per the simple-hash plan.  ~20 LOC.
+
+* Don't touch
+
+- The two long-running =no-shell= Slurm jobs (=33337266=, =33348802=
+  -- "communication infrastructure" per Ligon, leave alone).
+- =/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library-= (the
+  preserved old mirror).  Reference only; no =.venv=, can't run
+  Python from it directly.
+- =~/.config/dvc/config= -- it overrides =cache.dir= to scratch.
+  Changing this would orphan the existing 80 GB cache.
+- Anything under =slurm_logs/= older than today (historical
+  records, not current docs).  Including:
+  - =HANDOFF_2026-04-10.org=
+  - =session_2026-04-10/HANDOFF.org= (last night's planning)
+  - =session_2026-04-10/PLAN_dvc_intree_parquet_audit.org= (audit
+    agent output that informed this session's work)
+
+* Lessons learned
+
+** Empirical verification beats design doc trust
+
+The parallel agent's design doc was confidently specific about
+the fix (=cache_remote_stream=True=), cited a PR (iterative/dvc#9183),
+and laid out a clean diagnostic recipe.  Almost everything in it
+was right *except the actual fix*.  When I read the installed DVC
+3.67.0 source after the empirical disproof, the kwarg name was
+different (=cache= not =cache_remote_stream=), and even the
+correct kwarg name didn't trigger the cache write the doc claimed.
+The doc was working from the PR text, not from the running
+version.
+
+Always:
+1. Read the actual installed library source for the version pinned
+   in =pyproject.toml=, not the upstream PR description.
+2. After implementing a fix, run an empirical test that observes
+   the *side effect* the fix is supposed to produce, not just the
+   surface behavior.  Our unit tests passed because they verified
+   the kwarg was passed, not that DVC honored it.
+
+** "Brute force is fine" was the right call
+
+Ligon's "we could just delete the cache like brutes" was
+methodologically perfect.  Without it I would have shipped the
+broken Change 1 without noticing.  The cost was about an hour of
+wasted work; the benefit was preventing a no-op fix from sitting
+in master indefinitely.
+
+** Mirror reset is high-value when working tree gets crufty
+
+The =mv LSMS_Library LSMS_Library- && git clone LSMS_Library- LSMS_Library=
+pattern took about 5 minutes including .venv migration and ate ZERO
+risk because the old state was preserved as =LSMS_Library-=.  Saved
+multiple debug detours that would otherwise have come from stale
+in-tree parquets, polluted ISSUES.md, and accidental ancillary
+state interactions.
+
+** Tests that mock the boundary they're testing are worse than useless
+
+The two =test_layer1_*= tests pinned that =DVCFS.open= was called
+with =cache_remote_stream=True=.  They passed.  But DVC silently
+dropped the kwarg, so the tests pinned a contract the dependency
+violated.  The tests gave false confidence.
+
+When the assertion is "we passed kwarg X to method Y", the test is
+testing the test harness, not the system.  The right test is
+either an integration test against the real dependency, or
+verification that the *side effect* of the call matches expectation.
+
+** Background dispatch saves wall time AND keeps the shell responsive
+
+Ligon's "we could be dispatching these benchmark jobs, I suppose"
+was a fair criticism of running both Niger and Uganda benches
+sequentially in foreground.  After the prompt, every subsequent
+expensive bench / probe / verification run went background, and
+the scrum master shell stayed available for judgment work while
+the compute happened in parallel.
+
+** lru_cache cross-test contamination is a real test smell
+
+=test_stale_cache_triggers_rebuild= was passing pre-session because
+=test_trust_cache_short_circuit= happened to populate
+=_load_rejected_column_spellings='s lru_cache with real package
+data.  The second test relied on the first to set up its mock
+state.  When my v0.7.0 fix changed the call ordering, the test
+broke.  The fix was to make the second test self-contained by
+patching the loaders explicitly -- the same pattern several other
+tests in the file already use.  Worth a separate pass to find
+other instances of this pattern.
+
+* Reference files
+
+- =CLAUDE.md= -- updated with v0.7.0 cache behavior + the
+  trust_cache and LSMS_BUILD_BACKEND=make corrections
+- =SkunkWorks/dvc_object_management.org= -- the playbook this session
+  partially executed
+- =slurm_logs/DESIGN_dvc_layer1_caching.md= -- design doc + empirical
+  verification appendix (the new bottom)
+- =slurm_logs/v0.7.0_handoff.org= -- the wheel/credential 8-file plan,
+  unchanged this session, still pending
+- =bench/build_feature.py= + =bench/run_bench.sh= -- the bench
+  infrastructure (committed this session)
+- =bench/results/2026-04-10.jsonl= -- pre-fix and post-fix Niger and
+  Uganda runs, all from the OLD mirror with local .dta files
+- =bench/results/2026-04-10_layer1.jsonl= -- the Niger fresh-clone run
+  showing the 363s cold S3 cost and the 1.1s post-fix cross-process
+  read
+- =lsms_library/country.py:1611-1812= -- the v0.7.0 cache-read fix
+- =lsms_library/local_tools.py:245-261= -- the (now reverted) Layer-1
+  open path, with a NOTE comment recording the failed attempt
+- =lsms_library/data_access.py:1144= -- the kept Change 4 (DVCFS
+  singleton reuse)
+- =tests/test_dvc_caching.py= -- includes the 3 v0.7.0 layer-2 tests
+  and a NOTE comment where the 2 deleted layer-1 tests used to live

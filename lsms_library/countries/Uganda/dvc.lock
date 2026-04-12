@@ -479,34 +479,6 @@ stages:
       hash: md5
       md5: 46480654e9d5c9f5e5d94404c0362ba6
       size: 175794
-  materialize@uganda::::locality:
-    cmd: cd _ && LSMS_BUILD_BACKEND=make python3 -m lsms_library.cli materialize
-      --country "Uganda" --all-waves --table "locality" --format "parquet" --out
-      ../var/locality.parquet
-    deps:
-    - path: ../../cli.py
-      hash: md5
-      md5: 049c779121577873dd8c8b42c242e4a2
-      size: 19547
-    - path: ../../country.py
-      hash: md5
-      md5: a734fc4028a3329e652568ae96d47e4d
-      size: 88290
-    - path: ../../local_tools.py
-      hash: md5
-      md5: 0139aa1c244e3b3de2a891246a4ff1a5
-      size: 48579
-      isexec: true
-    - path: _
-      hash: md5
-      md5: 41e46afbb44217827d9e958bb7520637.dir
-      size: 3467098
-      nfiles: 38
-    outs:
-    - path: var/locality.parquet
-      hash: md5
-      md5: 5615e00839f25c269470d18bae6dd27e
-      size: 126362
   materialize@uganda::::nonfood_expenditures:
     cmd: cd _ && LSMS_BUILD_BACKEND=make python3 -m lsms_library.cli materialize
       --country "Uganda" --all-waves --table "nonfood_expenditures" --format 

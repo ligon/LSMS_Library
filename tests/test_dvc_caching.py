@@ -264,11 +264,25 @@ class TestDVCCaching:
         sample_dataframe,
         monkeypatch,
     ):
-        """When DVC marks outputs stale, cache should be rebuilt from waves."""
+        """LSMS_NO_CACHE=1 forces a rebuild even when a cached parquet exists.
+
+        Historical context: pre-v0.7.0 this test asserted that DVC's
+        stage.status() dirty-check would auto-trigger a rebuild when source
+        deps changed.  v0.7.0 deliberately removed that auto-invalidation in
+        favor of a single best-effort cache read at the top of
+        load_dataframe_with_dvc, so contributors editing source data must
+        explicitly clear the cache or set LSMS_NO_CACHE=1.  This test was
+        rewritten to assert the v0.7.0 contract: with LSMS_NO_CACHE=1 set,
+        the rebuild path is taken and DVC is consulted even though
+        cache_path exists on disk.
+        """
         # Force DVC backend so the DVC code path is exercised regardless of
         # what LSMS_BUILD_BACKEND is set to in the test runner environment.
         # (Matches the pattern used by the sibling tests in this class.)
         monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
+        # v0.7.0: explicitly bypass the top-of-function cache read so the
+        # stage layer logic below is exercised.
+        monkeypatch.setenv("LSMS_NO_CACHE", "1")
 
         cache_path = mock_country_structure / "var" / "test_data.parquet"
         write_parquet(sample_dataframe, cache_path)
@@ -300,6 +314,8 @@ class TestDVCCaching:
             patch("lsms_library.country.Repo") as mock_repo_class, \
             patch("lsms_library.country.get_dataframe", side_effect=get_dataframe_side_effect) as mock_get_dataframe, \
             patch("lsms_library.country.map_index", side_effect=lambda df: df), \
+            patch("lsms_library.country._load_canonical_spellings", return_value={}), \
+            patch("lsms_library.country._load_rejected_column_spellings", return_value={}), \
             patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
             patch.object(Country, "data_scheme", new_callable=PropertyMock) as mock_scheme, \
             patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources, \
@@ -713,6 +729,215 @@ class TestDVCCaching:
         assert mock_stages[0].reproduce.call_count == 1, "Second call should not rerun DVC stage"
         assert mock_get_dataframe.call_args_list[-1][0][0] == cache_path
 
+    # ------------------------------------------------------------------
+    # v0.7.0 cache-read fix coverage
+    #
+    # The three tests below pin the v0.7.0 contract for the
+    # `load_dataframe_with_dvc` function:
+    #
+    #   1. Top-of-function cache read returns the cached parquet
+    #      without ever opening DVC, regardless of whether the country
+    #      has materialize stages.
+    #   2. LSMS_NO_CACHE=1 explicitly bypasses the top read.
+    #   3. When the DVC stage layer raises DvcException, the outer
+    #      exception handler writes the load_from_waves result to
+    #      cache_path so the next call hits (1).
+    #
+    # See SkunkWorks/dvc_object_management.org for the full design
+    # rationale and bench/results/ for the empirical motivation.
+    # ------------------------------------------------------------------
+
+    def test_v070_top_cache_read_returns_without_dvc(
+        self,
+        mock_country_structure,
+        sample_dataframe,
+        monkeypatch,
+    ):
+        """When cache_path exists and LSMS_NO_CACHE is unset, the top-of-function
+        cache read returns the parquet without consulting DVC."""
+        monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
+        monkeypatch.delenv("LSMS_NO_CACHE", raising=False)
+
+        cache_path = mock_country_structure / "var" / "test_data.parquet"
+        write_parquet(sample_dataframe, cache_path)
+        assert cache_path.exists()
+
+        with patch("lsms_library.country.files") as mock_files, \
+            patch("lsms_library.country.Repo") as mock_repo_class, \
+            patch("lsms_library.country.get_dataframe", side_effect=lambda path, *_, **__: pd.read_parquet(path)) as mock_get_df, \
+            patch("lsms_library.country.map_index", side_effect=lambda df: df), \
+            patch("lsms_library.country._load_canonical_spellings", return_value={}), \
+            patch("lsms_library.country._load_rejected_column_spellings", return_value={}), \
+            patch.object(Country, "__getitem__", side_effect=AssertionError("Should not load waves")), \
+            patch.object(Country, "_resolve_materialize_stages", side_effect=AssertionError("Should not consult stages")), \
+            patch.object(Country, "_augment_index_from_related_tables", side_effect=lambda df, *a, **k: df), \
+            patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
+            patch.object(Country, "data_scheme", new_callable=PropertyMock) as mock_scheme, \
+            patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources, \
+            patch.object(Country, "file_path", new_callable=PropertyMock) as mock_file_path:
+
+            mock_files.return_value = mock_country_structure.parent.parent
+            mock_file_path.return_value = mock_country_structure
+            mock_waves.return_value = ["2020-21"]
+            mock_scheme.return_value = ["test_data"]
+            mock_resources.return_value = {"Data Scheme": {"test_data": {}}}
+
+            country = Country("TestCountry", preload_panel_ids=False)
+            result = country._aggregate_wave_data(method_name="test_data")
+
+        # The top read should have returned without ever opening Repo or
+        # asking for stages.
+        mock_repo_class.assert_not_called()
+        # get_dataframe should have been called exactly once on cache_path
+        # (the top read).  No subsequent rebuild.
+        assert mock_get_df.call_count == 1
+        assert mock_get_df.call_args[0][0] == cache_path
+        pd.testing.assert_frame_equal(
+            result.reset_index(drop=True),
+            sample_dataframe.reset_index(drop=True),
+            check_dtype=False,
+        )
+
+    def test_v070_lsms_no_cache_skips_top_read(
+        self,
+        mock_country_structure,
+        sample_dataframe,
+        monkeypatch,
+    ):
+        """LSMS_NO_CACHE=1 forces the rebuild path even when cache_path exists.
+
+        This is the escape hatch contributors use after editing source
+        data so they don't get a stale cached result.
+        """
+        monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
+        monkeypatch.setenv("LSMS_NO_CACHE", "1")
+
+        cache_path = mock_country_structure / "var" / "test_data.parquet"
+        write_parquet(sample_dataframe, cache_path)
+
+        rebuilt_df = pd.DataFrame({"col1": [42]})
+
+        with patch("lsms_library.country.files") as mock_files, \
+            patch("lsms_library.country.Repo") as mock_repo_class, \
+            patch("lsms_library.country.get_dataframe", side_effect=lambda path, *_, **__: pd.read_parquet(path)), \
+            patch("lsms_library.country.map_index", side_effect=lambda df: df), \
+            patch("lsms_library.country._load_canonical_spellings", return_value={}), \
+            patch("lsms_library.country._load_rejected_column_spellings", return_value={}), \
+            patch.object(Country, "__getitem__", return_value=SimpleNamespace(test_data=lambda: rebuilt_df, data_scheme=["test_data"])), \
+            patch.object(Country, "_resolve_materialize_stages", return_value=[]), \
+            patch.object(Country, "_augment_index_from_related_tables", side_effect=lambda df, *a, **k: df), \
+            patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
+            patch.object(Country, "data_scheme", new_callable=PropertyMock) as mock_scheme, \
+            patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources, \
+            patch.object(Country, "file_path", new_callable=PropertyMock) as mock_file_path:
+
+            mock_files.return_value = mock_country_structure.parent.parent
+            mock_file_path.return_value = mock_country_structure
+            mock_waves.return_value = ["2020-21"]
+            mock_scheme.return_value = ["test_data"]
+            mock_resources.return_value = {"Data Scheme": {"test_data": {}}}
+
+            mock_repo = Mock()
+            mock_repo.lock = Mock()
+            mock_repo.lock.__enter__ = Mock(return_value=None)
+            mock_repo.lock.__exit__ = Mock(return_value=None)
+            mock_repo_class.return_value = mock_repo
+
+            country = Country("TestCountry", preload_panel_ids=False)
+            result = country._aggregate_wave_data(method_name="test_data")
+
+        # Top read was skipped because LSMS_NO_CACHE=1, so DVC must
+        # have been opened.
+        mock_repo_class.assert_called_once()
+        # Result should be the rebuilt df (the wave loader's output),
+        # not the stale parquet that was written to cache_path.
+        pd.testing.assert_frame_equal(
+            result.reset_index(drop=True),
+            rebuilt_df.reset_index(drop=True),
+            check_dtype=False,
+        )
+
+    def test_v070_dvc_fallback_writes_cache(
+        self,
+        mock_country_structure,
+        monkeypatch,
+    ):
+        """When DVC raises DvcException, the outer exception handler
+        runs load_from_waves AND writes the result to cache_path so
+        the next call hits the top-of-function cache read.
+
+        This pins the v0.7.0 fix that closes the write-only gap for
+        dvc.yaml countries whose stages fail at reproduce.
+        """
+        from dvc.exceptions import DvcException
+
+        monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
+        monkeypatch.delenv("LSMS_NO_CACHE", raising=False)
+
+        cache_path = mock_country_structure / "var" / "test_data.parquet"
+        # Important: cache_path does NOT exist initially.  The top read
+        # is a no-op; we want to exercise the rebuild + write path of
+        # the exception handler.
+        assert not cache_path.exists()
+
+        rebuilt_df = pd.DataFrame({"col1": [7, 8, 9]})
+
+        with patch("lsms_library.country.files") as mock_files, \
+            patch("lsms_library.country.Repo") as mock_repo_class, \
+            patch("lsms_library.country.get_dataframe", side_effect=lambda path, *_, **__: pd.read_parquet(path)), \
+            patch("lsms_library.country.map_index", side_effect=lambda df: df), \
+            patch("lsms_library.country._load_canonical_spellings", return_value={}), \
+            patch("lsms_library.country._load_rejected_column_spellings", return_value={}), \
+            patch.object(Country, "__getitem__", return_value=SimpleNamespace(test_data=lambda: rebuilt_df, data_scheme=["test_data"])), \
+            patch.object(Country, "_augment_index_from_related_tables", side_effect=lambda df, *a, **k: df), \
+            patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
+            patch.object(Country, "data_scheme", new_callable=PropertyMock) as mock_scheme, \
+            patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources, \
+            patch.object(Country, "file_path", new_callable=PropertyMock) as mock_file_path:
+
+            mock_files.return_value = mock_country_structure.parent.parent
+            mock_file_path.return_value = mock_country_structure
+            mock_waves.return_value = ["2020-21"]
+            mock_scheme.return_value = ["test_data"]
+            mock_resources.return_value = {"Data Scheme": {"test_data": {}}}
+
+            # Make Repo() raise DvcException -- the exception handler
+            # at the bottom of load_dataframe_with_dvc should catch it
+            # and call the v0.7.0 rebuild+write path.
+            mock_repo_class.side_effect = DvcException("simulated DVC unavailable")
+
+            country = Country("TestCountry", preload_panel_ids=False)
+            result = country._aggregate_wave_data(method_name="test_data")
+
+        # The exception handler should have written the rebuild result
+        # to cache_path.
+        assert cache_path.exists(), (
+            "v0.7.0 contract: DVC fallback must write cache so the next "
+            "call hits the top-of-function read"
+        )
+        # And the returned df should be the rebuild output.
+        pd.testing.assert_frame_equal(
+            result.reset_index(drop=True),
+            rebuilt_df.reset_index(drop=True),
+            check_dtype=False,
+        )
+        # Sanity: the parquet on disk matches what was returned.
+        on_disk = pd.read_parquet(cache_path)
+        pd.testing.assert_frame_equal(
+            on_disk.reset_index(drop=True),
+            rebuilt_df.reset_index(drop=True),
+            check_dtype=False,
+        )
+
+    # NOTE: A previous revision of this file had two test_layer1_*
+    # tests pinning a `cache_remote_stream=True` kwarg on DVCFS.open.
+    # They were removed when empirical testing (Niger Run A,
+    # 2026-04-11) showed DVC 3.67.0 silently drops the kwarg without
+    # populating the local cache.  See the revert commit for details
+    # and slurm_logs/DESIGN_dvc_layer1_caching.md for the open
+    # follow-up question of which DVC API actually triggers Layer-1
+    # caching.
+
     def test_clear_cache_removes_files(self, mock_country_structure, sample_dataframe):
         """clear_cache should delete cached parquet files."""
         cache_path = mock_country_structure / "var" / "test_data.parquet"
@@ -808,3 +1033,405 @@ class TestCachePathGeneration:
         assert cache_path.suffix == ".json"
         assert cache_path.parent.name == "_"
         assert method_name in cache_path.name
+
+
+class TestLayer1Caching:
+    """Tests for the Layer-1 (DVC blob) caching restored in Pieces 1+2.
+
+    Background: an earlier session at 2026-04-11 concluded that Layer-1
+    caching was dormant in DVC 3.67.0 because the ``cache=True`` /
+    ``cache_remote_stream=True`` kwargs on ``DVCFileSystem.open()`` are
+    no-ops.  That conclusion was correct as far as it went but missed
+    the actual mechanism: ``DataFileSystem._get_fs_path`` iterates
+    ``["cache", "remote", "data"]`` and reads from a populated cache
+    automatically when ``info.cache`` is wired up correctly.  Pieces 1
+    and 2 land both halves of the round-trip: Piece 1 pins ``cache.dir``
+    via runtime config override, Piece 2 populates the cache via
+    explicit ``Repo.fetch`` from inside ``get_dataframe`` (NOT ``Repo.pull``,
+    which would also check the file out into the package tree -- a
+    structural rule discovered in this same session).
+
+    See ``slurm_logs/DESIGN_dvc_layer1_caching.md`` for the empirical
+    investigation that led to this design.
+    """
+
+    def test_module_dvcfs_uses_data_root(self):
+        """Piece 1: the module-level ``DVCFS`` picks up the
+        ``data_root() / "dvc-cache"`` override.
+
+        Note: the absolute path of ``_DVC_CACHE_DIR`` is captured at
+        module import time and may not match a freshly-evaluated
+        ``data_root()`` if a prior test in the same session mutated
+        ``LSMS_DATA_DIR``.  We therefore check the *shape* of the
+        path (suffix == "dvc-cache" + directory was created) and the
+        propagation through ``DVCFS.repo`` rather than identity with
+        a freshly evaluated ``data_root()``.
+        """
+        from lsms_library.local_tools import DVCFS, _DVC_CACHE_DIR
+
+        assert _DVC_CACHE_DIR.name == "dvc-cache"
+        assert _DVC_CACHE_DIR.exists()
+
+        # The cache.local.path may include a "files/md5" subpath in
+        # some DVC versions; the operative path the storage_map cache
+        # uses is the override root.  Either form is acceptable as
+        # long as it starts with the override root.
+        cache_path = Path(DVCFS.repo.cache.local.path)
+        assert str(cache_path).startswith(str(_DVC_CACHE_DIR)), (
+            f"DVCFS cache.dir override not propagating: "
+            f"expected prefix {_DVC_CACHE_DIR}, got {cache_path}"
+        )
+
+    def test_ensure_dvc_pulled_noop_when_no_sidecar(self, tmp_path):
+        """No ``.dvc`` sidecar -> ``_ensure_dvc_pulled`` is a no-op."""
+        from lsms_library import local_tools
+
+        target = tmp_path / "no_sidecar.dta"
+        target.write_bytes(b"")
+        with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
+            local_tools._ensure_dvc_pulled(str(target))
+            mock_dvcfs.repo.fetch.assert_not_called()
+
+    def test_ensure_dvc_pulled_noop_when_blob_cached_legacy_layout(self, tmp_path, monkeypatch):
+        """Sidecar + blob in legacy DVC 2.x flat layout -> no ``Repo.fetch``.
+
+        This is the dominant hit path for the LSMS repo today: the
+        ``.dvc`` sidecars carry ``md5-dos2unix`` hashes from the
+        original DVC 2.x ``dvc add``-s, so the blobs land in the flat
+        layout under the cache root.
+        """
+        from lsms_library import local_tools
+
+        target = tmp_path / "data" / "foo.dta"
+        target.parent.mkdir()
+        target.write_bytes(b"")
+        sidecar = target.parent / "foo.dta.dvc"
+        md5 = "abcdef0123456789abcdef0123456789"
+        sidecar.write_text(
+            f"outs:\n- md5: {md5}\n  size: 0\n  path: foo.dta\n"
+        )
+
+        cache_dir = tmp_path / "cache"
+        cache_dir.mkdir()
+        # Legacy DVC 2.x layout: {cache_dir}/{md5[:2]}/{md5[2:]}
+        (cache_dir / md5[:2]).mkdir()
+        (cache_dir / md5[:2] / md5[2:]).write_bytes(b"")
+        monkeypatch.setattr(local_tools, "_DVC_CACHE_DIR", cache_dir)
+
+        with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
+            local_tools._ensure_dvc_pulled(str(target))
+            mock_dvcfs.repo.fetch.assert_not_called()
+
+    def test_ensure_dvc_pulled_noop_when_blob_cached_dvc3_layout(self, tmp_path, monkeypatch):
+        """Sidecar + blob in DVC 3.0 ``files/md5/`` layout -> no ``Repo.fetch``.
+
+        Future-proofing for after the LSMS repo migrates to DVC 3.0
+        hashes via ``dvc cache migrate`` (separate workstream).  Once
+        the sidecars are regenerated, blobs land at
+        ``{cache_dir}/files/md5/{md5[:2]}/{md5[2:]}``; the pre-check
+        must still recognize them.
+        """
+        from lsms_library import local_tools
+
+        target = tmp_path / "data" / "foo.dta"
+        target.parent.mkdir()
+        target.write_bytes(b"")
+        sidecar = target.parent / "foo.dta.dvc"
+        md5 = "fedcba9876543210fedcba9876543210"
+        sidecar.write_text(
+            f"outs:\n- md5: {md5}\n  size: 0\n  path: foo.dta\n"
+        )
+
+        cache_dir = tmp_path / "cache"
+        cache_dir.mkdir()
+        # DVC 3.0 layout: {cache_dir}/files/md5/{md5[:2]}/{md5[2:]}
+        (cache_dir / "files" / "md5" / md5[:2]).mkdir(parents=True)
+        (cache_dir / "files" / "md5" / md5[:2] / md5[2:]).write_bytes(b"")
+        monkeypatch.setattr(local_tools, "_DVC_CACHE_DIR", cache_dir)
+
+        with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
+            local_tools._ensure_dvc_pulled(str(target))
+            mock_dvcfs.repo.fetch.assert_not_called()
+
+    def test_ensure_dvc_pulled_calls_pull_on_miss(self, tmp_path, monkeypatch):
+        """Sidecar present + blob NOT in cache -> ``Repo.fetch`` is called.
+
+        Verifies the target passed to ``Repo.fetch`` is the
+        countries-relative path, not the absolute path or the
+        script-relative path.
+        """
+        from lsms_library import local_tools
+
+        countries_dir = tmp_path / "countries"
+        target_dir = countries_dir / "TestC" / "wave" / "Data"
+        target_dir.mkdir(parents=True)
+        # Note: the .dta file itself does NOT exist on disk; only the
+        # sidecar.  This matches the typical fresh-checkout state.
+        target = target_dir / "foo.dta"
+        sidecar = target.parent / "foo.dta.dvc"
+        md5 = "0123456789abcdef0123456789abcdef"
+        sidecar.write_text(
+            f"outs:\n- md5: {md5}\n  size: 0\n  path: foo.dta\n"
+        )
+
+        cache_dir = tmp_path / "cache"
+        cache_dir.mkdir()
+        # Note: blob NOT placed in cache_dir
+        monkeypatch.setattr(local_tools, "_DVC_CACHE_DIR", cache_dir)
+        monkeypatch.setattr(local_tools, "_COUNTRIES_DIR", countries_dir)
+
+        with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
+            local_tools._ensure_dvc_pulled(str(target))
+            mock_dvcfs.repo.fetch.assert_called_once()
+            call = mock_dvcfs.repo.fetch.call_args
+            assert call.kwargs.get("targets") == ["TestC/wave/Data/foo.dta"]
+
+    def test_ensure_dvc_pulled_swallows_pull_errors(self, tmp_path, monkeypatch):
+        """If ``Repo.fetch`` raises, ``_ensure_dvc_pulled`` returns silently.
+
+        Layer-1 warming is best-effort; the streaming fallback in
+        ``get_dataframe`` should still run.
+        """
+        from lsms_library import local_tools
+
+        countries_dir = tmp_path / "countries"
+        target_dir = countries_dir / "TestC" / "Data"
+        target_dir.mkdir(parents=True)
+        target = target_dir / "foo.dta"
+        sidecar = target.parent / "foo.dta.dvc"
+        sidecar.write_text(
+            "outs:\n- md5: 0123456789abcdef0123456789abcdef\n"
+            "  size: 0\n  path: foo.dta\n"
+        )
+        cache_dir = tmp_path / "cache"
+        cache_dir.mkdir()
+        monkeypatch.setattr(local_tools, "_DVC_CACHE_DIR", cache_dir)
+        monkeypatch.setattr(local_tools, "_COUNTRIES_DIR", countries_dir)
+
+        with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
+            mock_dvcfs.repo.fetch.side_effect = RuntimeError("simulated S3 failure")
+            # Should NOT raise
+            local_tools._ensure_dvc_pulled(str(target))
+            mock_dvcfs.repo.fetch.assert_called_once()
+
+    def test_ensure_dvc_pulled_changes_cwd_to_countries(self, tmp_path, monkeypatch):
+        """``Repo.fetch`` is invoked from inside ``_COUNTRIES_DIR``.
+
+        Cwd-independence regression test for the footgun discovered in
+        Probe 2 of the 2026-04-11 session: ``Repo.pull(targets=[X])``
+        resolves ``X`` against ``os.getcwd()``, not against the repo
+        root, so without an explicit chdir the call fails with
+        ``NoOutputOrStageError`` from any cwd that isn't already
+        ``lsms_library/countries/``.
+        """
+        from lsms_library import local_tools
+
+        countries_dir = (tmp_path / "countries").resolve()
+        target_dir = countries_dir / "TestC" / "Data"
+        target_dir.mkdir(parents=True)
+        target = target_dir / "foo.dta"
+        sidecar = target.parent / "foo.dta.dvc"
+        sidecar.write_text(
+            "outs:\n- md5: 0123456789abcdef0123456789abcdef\n"
+            "  size: 0\n  path: foo.dta\n"
+        )
+        cache_dir = tmp_path / "cache"
+        cache_dir.mkdir()
+        monkeypatch.setattr(local_tools, "_DVC_CACHE_DIR", cache_dir)
+        monkeypatch.setattr(local_tools, "_COUNTRIES_DIR", countries_dir)
+
+        # Start from a cwd that is NOT countries_dir.
+        elsewhere = tmp_path / "elsewhere"
+        elsewhere.mkdir()
+        original_cwd = Path.cwd()
+        os.chdir(elsewhere)
+
+        observed = []
+
+        def record_cwd(*args, **kwargs):
+            observed.append(Path.cwd())
+
+        try:
+            with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
+                mock_dvcfs.repo.fetch.side_effect = record_cwd
+                local_tools._ensure_dvc_pulled(str(target))
+        finally:
+            os.chdir(original_cwd)
+
+        assert len(observed) == 1
+        assert observed[0] == countries_dir
+        # And the original cwd is restored after the helper returns
+        assert Path.cwd() == original_cwd
+
+    def test_ensure_dvc_pulled_bails_on_path_outside_countries(self, tmp_path, monkeypatch):
+        """A sidecar at a path outside _COUNTRIES_DIR -> no pull (no error)."""
+        from lsms_library import local_tools
+
+        countries_dir = (tmp_path / "countries").resolve()
+        countries_dir.mkdir()
+        outside = tmp_path / "outside" / "Data"
+        outside.mkdir(parents=True)
+        target = outside / "foo.dta"
+        sidecar = outside / "foo.dta.dvc"
+        sidecar.write_text(
+            "outs:\n- md5: 0123456789abcdef0123456789abcdef\n"
+            "  size: 0\n  path: foo.dta\n"
+        )
+        cache_dir = tmp_path / "cache"
+        cache_dir.mkdir()
+        monkeypatch.setattr(local_tools, "_DVC_CACHE_DIR", cache_dir)
+        monkeypatch.setattr(local_tools, "_COUNTRIES_DIR", countries_dir)
+
+        with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
+            local_tools._ensure_dvc_pulled(str(target))
+            mock_dvcfs.repo.fetch.assert_not_called()
+
+    def test_ensure_dvc_pulled_handles_malformed_sidecar(self, tmp_path, monkeypatch):
+        """A sidecar with unexpected shape -> bail silently, no pull."""
+        from lsms_library import local_tools
+
+        target = tmp_path / "foo.dta"
+        target.write_bytes(b"")
+        sidecar = tmp_path / "foo.dta.dvc"
+        # Missing 'outs' key entirely
+        sidecar.write_text("not a real dvc sidecar\n")
+
+        cache_dir = tmp_path / "cache"
+        cache_dir.mkdir()
+        monkeypatch.setattr(local_tools, "_DVC_CACHE_DIR", cache_dir)
+
+        with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
+            local_tools._ensure_dvc_pulled(str(target))
+            mock_dvcfs.repo.fetch.assert_not_called()
+
+    def test_ensure_dvc_pulled_handles_countries_relative_path(self, tmp_path, monkeypatch):
+        """Interactive callers can pass countries-relative paths.
+
+        e.g. ``get_dataframe('Niger/2018-19/Data/foo.dta')`` from an
+        ipython session whose cwd is unrelated to ``countries/``.  The
+        helper must find the sidecar by trying ``_COUNTRIES_DIR / fn``
+        as one of the candidate interpretations.
+        """
+        from lsms_library import local_tools
+
+        countries_dir = (tmp_path / "countries").resolve()
+        target_dir = countries_dir / "TestC" / "wave" / "Data"
+        target_dir.mkdir(parents=True)
+        # Sidecar exists at the countries-relative location
+        sidecar = target_dir / "foo.dta.dvc"
+        md5 = "0123456789abcdef0123456789abcdef"
+        sidecar.write_text(
+            f"outs:\n- md5: {md5}\n  size: 0\n  path: foo.dta\n"
+        )
+
+        cache_dir = tmp_path / "cache"
+        cache_dir.mkdir()
+        monkeypatch.setattr(local_tools, "_DVC_CACHE_DIR", cache_dir)
+        monkeypatch.setattr(local_tools, "_COUNTRIES_DIR", countries_dir)
+
+        # Start from a cwd unrelated to countries_dir
+        elsewhere = tmp_path / "elsewhere"
+        elsewhere.mkdir()
+        original_cwd = Path.cwd()
+        os.chdir(elsewhere)
+
+        try:
+            with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
+                # Pass the countries-relative path, not an absolute path
+                local_tools._ensure_dvc_pulled("TestC/wave/Data/foo.dta")
+                mock_dvcfs.repo.fetch.assert_called_once()
+                call = mock_dvcfs.repo.fetch.call_args
+                assert call.kwargs.get("targets") == ["TestC/wave/Data/foo.dta"]
+        finally:
+            os.chdir(original_cwd)
+
+    # ----------- _is_polluted_workspace_copy / local_file hardening -----------
+
+    def test_is_polluted_workspace_copy_true_when_sidecar_exists(self, tmp_path):
+        """A workspace file with a sister .dvc sidecar is pollution."""
+        from lsms_library import local_tools
+
+        target = tmp_path / "foo.dta"
+        target.write_bytes(b"data")
+        sidecar = tmp_path / "foo.dta.dvc"
+        sidecar.write_text("outs:\n- md5: 0123\n  size: 4\n  path: foo.dta\n")
+
+        assert local_tools._is_polluted_workspace_copy(str(target)) is True
+
+    def test_is_polluted_workspace_copy_false_when_no_sidecar(self, tmp_path):
+        """A workspace file without a sister sidecar is legitimate.
+
+        Covers the new-data-being-added cases: manual ``cp + dvc add``,
+        WB-fallback auto-add, user scratch data.  ``local_file()`` should
+        happily use these.
+        """
+        from lsms_library import local_tools
+
+        target = tmp_path / "freshly_downloaded.dta"
+        target.write_bytes(b"data")
+        # No sidecar created
+
+        assert local_tools._is_polluted_workspace_copy(str(target)) is False
+
+    def test_is_polluted_workspace_copy_false_on_bad_input(self):
+        """Bad input -> False, no exception."""
+        from lsms_library import local_tools
+
+        # None, empty string, missing file -- all should return False quietly
+        assert local_tools._is_polluted_workspace_copy("/nonexistent/path/foo") is False
+
+    def test_get_dataframe_warns_and_falls_through_on_polluted_workspace(self, tmp_path, monkeypatch):
+        """When local_file finds a polluted workspace copy, it should warn
+        and fall through to the DVC code path instead of using the file.
+
+        We mock DVCFS.open and observe both the warning and the fall-through.
+        """
+        from lsms_library import local_tools
+        import warnings
+
+        # Create a fake .dta + sister sidecar
+        target = tmp_path / "polluted.dta"
+        target.write_bytes(b"workspace data")
+        sidecar = tmp_path / "polluted.dta.dvc"
+        sidecar.write_text(
+            "outs:\n- md5: deadbeefcafebabe0123456789abcdef\n"
+            "  size: 14\n  path: polluted.dta\n"
+        )
+
+        # Stub DVCFS.open to return a sentinel BytesIO so we can detect
+        # whether the fall-through path was taken
+        import io
+        dvcfs_mock = patch.object(
+            local_tools.DVCFS, "open",
+            return_value=io.BytesIO(b"from cache")
+        )
+        # Stub _ensure_dvc_pulled to a no-op so we don't try real DVC ops
+        ensure_mock = patch.object(local_tools, "_ensure_dvc_pulled", return_value=None)
+        # Stub read_file (via the inner closure) -- this is harder; instead
+        # we'll just make sure the warning fires and trust that the rest of
+        # get_dataframe will do its thing.  We test the warning here and
+        # the fall-through behavior is covered by the
+        # _is_polluted_workspace_copy unit tests above plus the
+        # local_file logic.
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            with dvcfs_mock, ensure_mock:
+                try:
+                    local_tools.get_dataframe(str(target))
+                except Exception:
+                    # We don't care if read_file fails on the BytesIO --
+                    # what matters is whether the warning fired before
+                    # we got there.
+                    pass
+
+        polluted_warnings = [
+            w for w in caught
+            if "Refusing workspace copy" in str(w.message)
+        ]
+        assert len(polluted_warnings) == 1, (
+            f"Expected exactly one 'Refusing workspace copy' warning, "
+            f"got {[str(w.message) for w in caught]}"
+        )
+        assert "polluted.dta" in str(polluted_warnings[0].message)
+        assert ".dvc sidecar" in str(polluted_warnings[0].message)

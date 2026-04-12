@@ -54,9 +54,43 @@ panel_df = pd.concat([dummy, panel_df])
 
 D, updated_ids = panel_ids(panel_df)
 
+# Skip transitive-chain collisions. Burkina's 2021-22 cur_i is an
+# integer hhid, while the 2018-19 prev_i is a composite
+# grappe+menage.zfill(3). Because both live in the same numeric-
+# string namespace, 95 of 3227 entries end up with prev_i values
+# that coincide with other households' cur_i values (e.g.
+# 4021->4065 where 4065 is also a cur_i). If left in, id_walk
+# applied twice collapses the chain and 91 post-walk (i,t) tuples
+# disappear due to collision. Drop the non-endpoint entries so
+# id_walk stays idempotent. Caught by
+# check_panel_consistency's id_walk_idempotent check
+# (diagnostics.py).
+cur_set = set(updated_ids.get('2021-22', {}).keys())
+filtered_21 = {}
+skipped_chains = 0
+for cur, prev in updated_ids.get('2021-22', {}).items():
+    if prev in cur_set and cur != prev:
+        skipped_chains += 1
+        continue
+    filtered_21[cur] = prev
+updated_ids['2021-22'] = filtered_21
+
+# Rebuild the RecursiveDict with the skipped entries removed.
+from lsms_library.local_tools import RecursiveDict  # noqa: E402
+D_filtered = RecursiveDict()
+for k, v in D.data.items():
+    # k = (wave, cur_id), v = (prev_wave, prev_id)
+    if k[0] == '2021-22' and k[1] not in filtered_21:
+        continue
+    D_filtered[k] = v
+D = D_filtered
+
 with open('panel_ids.json', 'w') as f:
     json_ready = {','.join(k): ','.join(v) for k, v in D.data.items()}
     json.dump(json_ready, f)
 
 with open('updated_ids.json', 'w') as f:
     json.dump(updated_ids, f)
+
+print(f"Burkina Faso 2021-22 -> 2018-19: {len(filtered_21)} linked "
+      f"({skipped_chains} transitive-chain entries skipped)")

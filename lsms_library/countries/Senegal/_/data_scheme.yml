@@ -58,6 +58,4 @@ Data Scheme:
     strata: str
     Rural: str
 
-  panel_ids:
-    index: (t, i)
-    previous_i: str
+  panel_ids: !make

@@ -21,16 +21,9 @@ sample:
                 urbain: Urban
                 URBAIN: Urban
 
-panel_ids:
-    file: NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS00P1.dta
-    idxvars:
-        i:
-            - GRAPPE
-            - MENAGE
-            - EXTENSION
-    myvars:
-        previous_grappe: GRAPPE
-        previous_menage: MENAGE
+# panel_ids is constructed at the country level by
+# Niger/_/panel_ids.py (declared as !make in data_scheme.yml).
+# Do not reintroduce a wave-level block here.
 
 household_roster:
     file: NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS01P1.dta

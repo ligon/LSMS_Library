@@ -16,6 +16,8 @@ For domain-specific guidance on particular features, load the relevant sub-skill
 - `add-feature/panel-ids` — Panel household ID linkage across waves. Covers ID stability patterns, composite IDs, household splits, cross-survey-program limitations, and the World Bank harmonised panel as a reference.
 - `add-feature/food-acquired` — Food acquisition data with unit conversions. The most complex feature — covers two approaches to unit-to-kg conversion: price-ratio inference from the data itself, and survey-provided conversion factor tables.
 - `add-feature/sample` — Sampling design (cluster/PSU assignment, household weights, strata, urban/rural). Covers weight variable discovery across countries, single-file vs multi-file YAML patterns (EHCVM ponderation files), and strata label harmonization.
+- `add-feature/pp-ph` — Post-planting / post-harvest countries (Nigeria, Ethiopia, GhanaSPS, Tanzania `2008-15/`). Covers the canonical duplicate-index bug, distinct-`t`-value script pattern, and attrition handling for people who appear in only one round.
+- `add-feature/housing` — Dwelling material characteristics (roof, floor). Covers module-letter instability across surveys, case normalization of Stata labels, and the Cross_Sectional + Panel merge pattern.
 
 ## World Bank reference code
 
@@ -35,6 +37,10 @@ Before writing any code, **read the `.org` files** in the country's `_/` directo
 - **`{Country}/_/categorical_mapping.org`** — centralized cross-wave category harmonization
 
 Also check wave-level org files: `{Country}/{wave}/_/*.org`
+
+## Dependencies — do NOT use `lsms.tools`
+
+The upstream `lsms` package (`lsms >=0.4.13,<0.5.0`) has been **retired** as a dependency. Do not write `from lsms.tools import get_food_prices, get_food_expenditures, get_household_roster` or any other `lsms.tools` import in new code. Use `get_dataframe` and `df_data_grabber` from `lsms_library.local_tools` instead. ~15 legacy country-level files still carry dead `lsms.tools` imports; ignore them as templates.
 
 ## Prerequisites
 

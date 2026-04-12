@@ -161,20 +161,9 @@ assets:
         Value: s12q09
         Purchase Price: s12q08
 
-panel_ids:
-    file: s00_me_ner2021.dta
-    idxvars:
-        i:
-            - grappe
-            - menage
-    myvars:
-        previous_grappe: s00q07f1
-        previous_menage: s00q07f2
-        in_panel:
-            - PanelHH
-            - mapping:
-                'Ménage panel': 1
-                'Ménage non-panel': 0
+# panel_ids is constructed at the country level by
+# Niger/_/panel_ids.py (declared as !make in data_scheme.yml).
+# Do not reintroduce a wave-level block here.
 
 individual_education:
     file: ehcvm_individu_ner2021.dta

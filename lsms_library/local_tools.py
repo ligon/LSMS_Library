@@ -1,6 +1,57 @@
+"""Low-level tooling shared by wave-level scripts and the Country class.
+
+This is the catch-all utility module that backs the library's data
+access, ID handling, categorical-mapping lookup, and wave-level feature
+extraction helpers. Most user-facing scripts only need a small slice of
+it; the library's public-facing alias ``lsms_library.tools`` points
+here.
+
+Key functions
+-------------
+- :func:`get_dataframe` — the single entry point for reading
+  ``.dta``/``.csv``/``.parquet`` files. Fallback chain: local file on
+  disk → DVC filesystem → World Bank NADA download. Wave-level scripts
+  should always use this over :func:`pd.read_stata` or
+  :func:`dvc.api.open` directly.
+- :func:`to_parquet` — the single entry point for writing parquet
+  caches. Redirects relative paths to ``data_root()`` via
+  :func:`_resolve_data_path`, which infers country/wave from the call
+  stack so a wave-level script writing ``foo.parquet`` lands under
+  ``~/.local/share/lsms_library/{Country}/{wave}/_/foo.parquet``.
+- :func:`df_data_grabber` — the YAML path's extraction engine. Given a
+  source ``.dta`` file and ``idxvars``/``myvars`` mappings (with
+  optional formatting functions), returns a DataFrame with the
+  canonical index and columns.
+- :func:`format_id` — canonical string-format helper for household,
+  cluster, and person IDs. Handles both numeric and string inputs with
+  optional zero-padding. Auto-applied to ``idxvars`` by
+  :func:`df_data_grabber`, but NOT to ``myvars`` — see ``CLAUDE.md``.
+- :func:`id_walk` — applies a country's ``updated_ids`` mapping to
+  rewrite household IDs into a canonical wave's coordinates. Idempotent
+  when the ``df.attrs['id_converted']`` flag is preserved; see the
+  panel-ID section of ``CLAUDE.md`` for the :meth:`.set_index` caveat.
+- :func:`panel_ids` — returns households observed in at least two
+  waves after applying ``id_walk``.
+- :func:`map_index` — remaps an old parquet's index structure to the
+  new scheme declared in ``data_info.yml``.
+- :func:`get_categorical_mapping` — reads a named org-mode table
+  (typically ``harmonize_food``, ``unit``, ``shocks``) from the
+  country's ``categorical_mapping.org`` and returns it as a dict.
+- :func:`get_formatting_functions` — loads the per-wave Python module
+  of formatting helpers referenced by ``data_info.yml``.
+
+Conventions
+-----------
+Scripts in ``{Country}/{wave}/_/`` run from that directory, so
+``../Data/file.dta`` is the standard relative path. :func:`get_dataframe`
+and :func:`to_parquet` both rely on :func:`_resolve_data_path` to
+translate such paths to either a source location or a cache location
+under ``data_root()``.
+
+See ``CLAUDE.md`` for the full anti-pattern list and data-access rules.
+"""
 from __future__ import annotations
 
-from lsms.tools import get_food_prices, get_food_expenditures, get_household_roster, get_household_identification_particulars
 from ligonlibrary.dataframes import from_dta
 import pyreadstat
 import struct
@@ -9,8 +60,10 @@ import numpy as np
 import pandas as pd
 import dvc.api
 from collections import defaultdict
+from contextlib import contextmanager
 from cfe.df_utils import use_indices
 import warnings
+import yaml
 import json
 import difflib
 import re
@@ -26,11 +79,176 @@ import pyreadstat
 import inspect
 from typing import Any
 from .paths import data_root, var_path, wave_data_path, COUNTRIES_ROOT
+from .config import s3_creds_path as _s3_creds_path
 
-# Initialize DVC filesystem once and reuse it
+# Initialize DVC filesystem once and reuse it.
+#
+# The runtime ``config={"cache": {"dir": ...}}`` override pins the
+# DVC object cache to a user-writable location under ``data_root()``,
+# so the same ``LSMS_DATA_DIR`` controls both the parquet cache (Layer 2)
+# and the DVC blob cache (Layer 1).  Without this override, the cache
+# falls back to ``{_COUNTRIES_DIR}/.dvc/cache`` which is unwritable in
+# pip-installed layouts.
+#
+# The override also makes the DVCFileSystem cache-read fast path
+# (``DataFileSystem._get_fs_path`` iterating ``["cache", "remote", "data"]``)
+# resolve into a populated directory, so any blob present at
+# ``{_DVC_CACHE_DIR}/{md5[:2]}/{md5[2:]}`` is served from local disk
+# instead of streaming from S3.  See ``_ensure_dvc_pulled`` below for
+# the warming side of the round-trip.
+#
+# Similarly, the ``credentialpath`` override on the ``ligonresearch_s3``
+# remote redirects DVC's S3 credential lookup away from the packaged
+# (and in pip-installed layouts, read-only) ``.dvc/s3_creds`` path to
+# the user-writable ``s3_creds_path()``.  DVC is lazy about credential
+# validation: the file at this path does not need to exist at
+# ``DVCFileSystem`` construction time.  The auto-unlock pass later in
+# ``lsms_library/__init__.py`` populates it before the first S3 access.
 _PACKAGE_ROOT = Path(__file__).resolve().parent
 _COUNTRIES_DIR = _PACKAGE_ROOT / "countries"
-DVCFS = DVCFileSystem(os.fspath(_COUNTRIES_DIR))
+_DVC_CACHE_DIR = data_root() / "dvc-cache"
+_DVC_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+DVCFS = DVCFileSystem(
+    os.fspath(_COUNTRIES_DIR),
+    config={
+        "remote": {
+            "ligonresearch_s3": {
+                "credentialpath": str(_s3_creds_path()),
+            },
+        },
+        "cache": {"dir": os.fspath(_DVC_CACHE_DIR)},
+    },
+)
+
+
+@contextmanager
+def _dvc_working_directory(path):
+    """Temporarily switch the process working directory.
+
+    ``Repo.pull(targets=[...])`` resolves targets against ``os.getcwd()``,
+    not against the repo root, so callers must change directory before
+    invoking it.  ``country.py`` has its own copy at module level; this
+    one is duplicated here to avoid a circular import.
+    """
+    previous = Path.cwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(previous)
+
+
+def _ensure_dvc_pulled(fn) -> None:
+    """Best-effort warm of the local DVC cache for a tracked path.
+
+    The hot path (cache hit) is two ``os.path.exists`` calls and a tiny
+    YAML parse -- no DVC Python API, no ``DVCFS.repo``, no index walk,
+    no minutes-long lazy index build.
+
+    Only on a cache miss does this fall through to ``DVCFS.repo.fetch``,
+    which is wrapped in ``_dvc_working_directory(_COUNTRIES_DIR)``
+    because ``Repo.fetch`` resolves targets against ``os.getcwd()``.
+
+    **Why fetch and not pull**: ``Repo.pull = Repo.fetch + Repo.checkout``.
+    The ``checkout`` step materializes the file in the workspace at its
+    DVC-tracked path -- which is **inside the package tree**
+    (``_COUNTRIES_DIR``).  We do not want DVC-tracked data files
+    materializing in the package tree under any circumstances; the
+    package tree is for code and ``.dvc`` sidecars only, and data lives
+    under ``data_root()``.  ``Repo.fetch`` populates the local DVC cache
+    (which is under ``data_root()`` thanks to the ``cache.dir`` override
+    on ``DVCFS``) without touching the workspace at all.  After the
+    fetch, ``DVCFS.open`` serves reads from the cache via
+    ``DataFileSystem._get_fs_path``'s ``typ == "cache"`` branch.
+
+    Every error is swallowed.  This function is best-effort warming
+    glue; the caller's ``DVCFS.open`` streaming fallback handles any
+    failure to populate the cache.
+
+    See ``slurm_logs/DESIGN_dvc_layer1_caching.md`` for the empirical
+    investigation that landed this design.
+    """
+    try:
+        # Try several interpretations of fn to find the .dvc sidecar.
+        # Wave scripts pass cwd-relative paths like '../Data/foo.dta'.
+        # Interactive callers may pass countries-relative paths like
+        # 'Niger/2018-19/Data/foo.dta'.  Both forms must work.
+        fn_path = Path(fn)
+        candidates = []
+        if fn_path.is_absolute():
+            candidates.append(fn_path)
+        else:
+            candidates.append((Path.cwd() / fn_path).resolve())
+            candidates.append((_COUNTRIES_DIR / fn_path).resolve())
+
+        abs_path = None
+        for c in candidates:
+            if (c.parent / f"{c.name}.dvc").exists():
+                abs_path = c
+                break
+        if abs_path is None:
+            return  # no sidecar found at any interpretation; not DVC-tracked
+
+        sidecar = abs_path.parent / f"{abs_path.name}.dvc"
+        with sidecar.open() as fh:
+            sidecar_data = yaml.safe_load(fh)
+        md5 = sidecar_data["outs"][0]["md5"]
+        # Check both DVC 2.x and DVC 3.0 cache layouts.  DVC 3.x is
+        # backward-compatible and reads from both.  Most blobs in the
+        # LSMS countries repo land in the legacy flat layout because
+        # the existing .dvc sidecars carry md5-dos2unix hashes from
+        # the original DVC 2.x dvc-adds; new sidecars (post-migration)
+        # would use the DVC-3.0 files/md5/ subpath layout.  See
+        # https://dvc.org/doc/user-guide/upgrade for the version
+        # history.
+        cache_layouts = (
+            _DVC_CACHE_DIR / md5[:2] / md5[2:],                  # DVC 2.x
+            _DVC_CACHE_DIR / "files" / "md5" / md5[:2] / md5[2:], # DVC 3.x
+        )
+        if any(p.exists() for p in cache_layouts):
+            return  # cache hit -- DVCFS.open() will serve from local
+        try:
+            rel_path = abs_path.relative_to(_COUNTRIES_DIR)
+        except ValueError:
+            return  # outside the countries dir, can't fetch
+
+    except Exception:
+        return  # bad sidecar shape, missing key, OS error: bail to streaming
+
+    try:
+        with _dvc_working_directory(_COUNTRIES_DIR):
+            DVCFS.repo.fetch(targets=[str(rel_path)], jobs=1)
+    except Exception:
+        pass
+
+
+def _is_polluted_workspace_copy(fn) -> bool:
+    """True if *fn* exists on disk AND has a sister ``.dvc`` sidecar.
+
+    A workspace copy of a DVC-tracked file is pollution from a checkout
+    side effect (e.g., ``dvc pull`` from the package tree, or a third-
+    party tool that did the equivalent).  The DVC cache (under
+    ``data_root()``) is the canonical location for tracked data; the
+    package tree is for code and ``.dvc`` sidecars only.
+
+    This helper is used by ``local_file`` inside ``get_dataframe`` to
+    refuse the workspace copy and force the read through the DVC cache
+    path instead.
+
+    A file *without* a sister sidecar is **not** pollution -- it could
+    be freshly downloaded new data being prepped for ``dvc add``,
+    scratch data the user supplied directly, output from the
+    WB-fallback auto-add path in ``data_access.get_data_file``, or any
+    other legitimate non-tracked use.  Returns False in all of those
+    cases.
+    """
+    try:
+        p = Path(fn).resolve()
+        sidecar = p.parent / f"{p.name}.dvc"
+        return sidecar.exists()
+    except Exception:
+        return False
+
 
 def _to_numeric(x,coerce=False):
     try:
@@ -139,9 +357,28 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         try:
             with open(fn) as f:
                 pass
-            return True
         except FileNotFoundError:
             return False
+        # Hardening: a workspace copy of a DVC-tracked file is pollution
+        # from a checkout side effect (manual ``dvc pull``, third-party
+        # tool, etc.), not a legitimate fast path.  Refuse to use it so
+        # the read goes through the DVC cache (under ``data_root()``)
+        # via ``file_system_path`` -> ``_ensure_dvc_pulled`` ->
+        # ``DVCFS.open``.  Files without a sister sidecar are fine
+        # (new data being prepped for ``dvc add``, user scratch data,
+        # WB-fallback downloads).
+        if _is_polluted_workspace_copy(fn):
+            warnings.warn(
+                f"Refusing workspace copy of DVC-tracked file {fn} "
+                f"(sister .dvc sidecar exists). The package tree must "
+                f"not contain DVC-tracked data; falling through to the "
+                f"DVC cache path. Clean up with: "
+                f"find lsms_library/countries -type f -name '*.dta' "
+                f"-execdir test -e '{{}}.dvc' \\; -print -delete",
+                stacklevel=3,
+            )
+            return False
+        return True
     
     def file_system_path(fn):
     # is the file a relative path or it's the full path from our fs (DVCFileSystem)?
@@ -243,6 +480,21 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         except (TypeError,ValueError): # Needs filename?
             df = read_file(fn,convert_categoricals=convert_categoricals,encoding=encoding)
     elif file_system_path(fn):
+        # Layer-1 (raw .dta blob) caching: best-effort warm the local
+        # DVC object cache before streaming.  ``_ensure_dvc_pulled``
+        # is a no-op when the blob is already cached (cache hit ->
+        # ``DVCFS.open`` below serves it from local disk via
+        # ``_get_fs_path``'s ``typ == "cache"`` branch) and a no-op
+        # on any failure (streaming via ``DVCFS.open`` is the
+        # fallback).  This restores the Layer-1 caching that
+        # ``slurm_logs/DESIGN_dvc_layer1_caching.md`` originally
+        # diagnosed as dormant -- the working approach uses
+        # ``Repo.fetch`` (NOT ``Repo.pull``, which would also check
+        # the file out into the package tree) plus a runtime
+        # ``cache.dir`` config override at ``DVCFS`` construction
+        # (see _DVC_CACHE_DIR above), not the ``cache_remote_stream``
+        # kwarg the prior session tried.
+        _ensure_dvc_pulled(fn)
         try:
             with DVCFS.open(fn,mode='rb') as f:
                 df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
@@ -420,154 +672,6 @@ def harmonized_food_labels(fn: str = '../../_/food_items.org', key: str = 'Code'
     food_items = food_items.set_index(key)
 
     return food_items.squeeze().str.strip().to_dict()
-
-def prices_and_units(fn: str = '', units: str = 'units', item: str = 'item', HHID: str = 'HHID', market: str = 'market', farmgate: str = 'farmgate') -> pd.DataFrame:
-
-    food_items = harmonized_food_labels(fn='../../_/food_items.org')
-
-    # Unit labels
-    with dvc.api.open(fn,mode='rb') as dta:
-        sr = pd.io.stata.StataReader(dta)
-        try:
-            unitlabels = sr.value_labels()[units]
-        except KeyError: # No guarantee that keys for labels match variables!?
-            foo = sr.value_labels()
-            key = [k for k,v in foo.items() if 'Kilogram' in [u[:8] for l,u in v.items()]][0]
-            unitlabels = sr.value_labels()[key]
-
-    with dvc.api.open(fn,mode='rb') as dta:
-        # Prices
-        prices,itemlabels=get_food_prices(dta,itmcd=item,HHID=HHID, market=market,
-                                          farmgate=farmgate,units=units,itemlabels=food_items)
-
-    prices = prices.replace({'units':unitlabels})
-    prices.units = prices.units.astype(str)
-
-    pd.Series(unitlabels).to_csv('unitlabels.csv')
-
-    return prices
-
-def food_acquired(fn: str, myvars: dict[str, str], convert_categoricals: bool) -> pd.DataFrame:
-
-    with dvc.api.open(fn,mode='rb') as dta:
-        df = from_dta(dta,convert_categoricals=False)
-
-    df = df.loc[:,[v for v in myvars.values()]].rename(columns={v:k for k,v in myvars.items()})
-
-    df = df.set_index(['HHID','item','units']).dropna(how='all')
-
-    df.index.names = ['j','i','units']
-
-
-    # Fix type of hhids if need be
-    if df.index.get_level_values('j').dtype ==float:
-        fix = dict(zip(df.index.levels[0],df.index.levels[0].astype(int).astype(str)))
-        df = df.rename(index=fix,level=0)
-
-    df = df.rename(index=harmonized_food_labels(),level='i')
-    unitlabels = harmonized_unit_labels()
-    df = df.rename(index=unitlabels,level='units')
-
-    if not 'market' in df.columns:
-        df['market'] = df.filter(regex='^market').median(axis=1)
-
-    # Compute unit values
-    df['unitvalue_home'] = df['value_home']/df['quantity_home']
-    df['unitvalue_away'] = df['value_away']/df['quantity_away']
-    df['unitvalue_own'] = df['value_own']/df['quantity_own']
-    df['unitvalue_inkind'] = df['value_inkind']/df['quantity_inkind']
-
-    # Deal with possible zeros in quantities
-    df['unitvalue_home'] = df['unitvalue_home'].where(np.isfinite(df['unitvalue_home']))
-    df['unitvalue_away'] = df['unitvalue_away'].where(np.isfinite(df['unitvalue_away']))
-    df['unitvalue_own'] = df['unitvalue_own'].where(np.isfinite(df['unitvalue_own']))
-    df['unitvalue_inkind'] = df['unitvalue_inkind'].where(np.isfinite(df['unitvalue_inkind']))
-
-
-    # Get list of units used in current survey
-    units = list(set(df.index.get_level_values('units').tolist()))
-
-    unknown_units = set(units).difference(unitlabels.values())
-    if len(unknown_units):
-        warnings.warn("Dropping some unknown unit codes!")
-        print(unknown_units)
-        df = df.loc[df.index.isin(unitlabels.values(),level='units')]
-
-    with open('../../_/conversion_to_kgs.json','r') as f:
-        conversion_to_kgs = pd.Series(json.load(f))
-
-    conversion_to_kgs.name='Kgs'
-    conversion_to_kgs.index.name='units'
-
-    df = df.join(conversion_to_kgs,on='units')
-    df = df.astype(float)
-
-    return df
-
-def food_expenditures(fn: str = '', purchased: str | None = None, away: str | None = None, produced: str | None = None, given: str | None = None, item: str = 'item', HHID: str = 'HHID') -> pd.DataFrame:
-    food_items = harmonized_food_labels(fn='../../_/food_items.org')
-
-    with dvc.api.open(fn,mode='rb') as dta:
-        expenditures,itemlabels=get_food_expenditures(dta,purchased,away,produced,given,itmcd=item,HHID=HHID,itemlabels=food_items)
-
-    expenditures.index.name = 'j'
-    expenditures.columns.name = 'i'
-
-    expenditures = expenditures[expenditures.columns.intersection(food_items.values())]
-        
-    return expenditures
-
-
-def nonfood_expenditures(fn: str = '', purchased: str | None = None, away: str | None = None, produced: str | None = None, given: str | None = None, item: str = 'item', HHID: str = 'HHID') -> pd.DataFrame:
-    nonfood_items = harmonized_food_labels(fn='../../_/nonfood_items.org',key='Code',value='Preferred Label')
-    with dvc.api.open(fn,mode='rb') as dta:
-        expenditures,itemlabels=get_food_expenditures(dta,purchased,away,produced,given,itmcd=item,HHID=HHID,itemlabels=nonfood_items)
-
-    expenditures.index.name = 'j'
-    expenditures.columns.name = 'i'
-    expenditures = expenditures[expenditures.columns.intersection(nonfood_items.values())]
-
-    return expenditures
-
-def food_quantities(fn: str = '', item: str = 'item', HHID: str = 'HHID',
-                    purchased: str | None = None, away: str | None = None, produced: str | None = None, given: str | None = None, units: str | None = None) -> pd.DataFrame:
-    food_items = harmonized_food_labels(fn='../../_/food_items.org')
-
-        # Prices
-    with dvc.api.open(fn,mode='rb') as dta:
-        quantities,itemlabels=get_food_expenditures(dta,purchased,away,produced,given,itmcd=item,HHID=HHID,units=units,itemlabels=food_items)
-
-    quantities.index.names = ['j','u']
-    quantities.columns.name = 'i'
-        
-    return quantities
-
-def age_sex_composition(fn: str, sex: str = 'sex', sex_converter: dict[Any, str] | None = None, age: str = 'age', months_spent: str = 'months_spent', HHID: str = 'HHID', months_converter: dict[Any, float] | None = None, convert_categoricals: bool = True, Age_ints: tuple[tuple[int, int], ...] | None = None, fn_type: str = 'stata') -> pd.DataFrame:
-
-    if Age_ints is None:
-        # Match Uganda FCT categories
-        Age_ints = ((0,4),(4,9),(9,14),(14,19),(19,31),(31,51),(51,100))
-        
-    with dvc.api.open(fn,mode='rb') as dta:
-        df = get_household_roster(fn=dta,HHID=HHID,sex=sex,age=age,months_spent=months_spent,
-                                  sex_converter=sex_converter,months_converter=months_converter,
-                                  Age_ints=Age_ints)
-
-    df.index.name = 'i'  # Household ID
-    df.columns.name = 'k'
-
-    return df
-
-
-def other_features(fn: str, urban: str | None = None, region: str | None = None, v: str | None = None, HHID: str = 'HHID', urban_converter: dict[Any, Any] | None = None) -> pd.DataFrame:
-
-    with dvc.api.open(fn,mode='rb') as dta:
-        df = get_household_identification_particulars(fn=dta,HHID=HHID,urban=urban,region=region,v=v,urban_converter=urban_converter)
-
-    df.index.name = 'i'  # Household ID
-    df.columns.name = 'k'
-
-    return df
 
 def change_id(x: pd.DataFrame, fn: str | None = None, id0: str | None = None, id1: str | None = None, transform_id1: Any = None) -> pd.DataFrame:
     """Replace instances of id0 with id1.
@@ -780,6 +884,15 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True) -> pd.DataF
 from collections import UserDict
 
 class RecursiveDict(UserDict):
+    """Dict whose ``__getitem__`` transitively dereferences chained values.
+
+    Used to collapse household-ID rewrite chains like ``A → B → C`` into
+    a single lookup: ``RecursiveDict({'A': 'B', 'B': 'C'})['A'] == 'C'``.
+    Keys that are not themselves values are returned unchanged. Backs
+    :func:`id_walk` when applying a country's ``updated_ids`` mapping
+    across waves. See the "Panel ID Transitive Chains" section of
+    ``CLAUDE.md`` for the downstream consequences of getting this wrong.
+    """
     def __init__(self,*arg,**kw):
       super(RecursiveDict, self).__init__(*arg, **kw)
 
@@ -791,10 +904,55 @@ class RecursiveDict(UserDict):
             return k
 
 def format_id(id: Any, zeropadding: int = 0) -> str | None:
-    """Nice string format for any id, string or numeric.
+    """Canonical string form for a household, cluster, or person ID.
 
-    Optional zeropadding parameter takes an integer
-    formats as {id:0z} where
+    Accepts either a numeric value (int, float, numpy scalar) or a
+    string and returns a clean string suitable for use as a DataFrame
+    index level. Used pervasively by :func:`df_data_grabber` when
+    building the canonical ``(t, v, i, pid)`` index, and applied
+    automatically to every ``idxvars`` entry (but NOT to ``myvars`` —
+    see ``CLAUDE.md`` "``format_id`` and Numeric myvars").
+
+    Rules:
+
+    - Missing or empty input (``NaN``, ``None``, ``""``, ``"."``)
+      returns ``None``.
+    - Numeric input is cast to int then formatted as a decimal string.
+      Float inputs lose their ``.0`` suffix; ``123.0`` → ``"123"``.
+    - String input has any trailing ``.xxx`` decimal suffix stripped
+      (e.g. Stata sometimes stringifies floats), surrounding
+      whitespace removed, and leading zeros preserved.
+    - The result is left-padded with zeros to ``zeropadding`` width,
+      so ``format_id(1, zeropadding=3)`` returns ``"001"``. Pass
+      ``0`` (the default) to skip padding.
+
+    Parameters
+    ----------
+    id : Any
+        The raw identifier. Typical inputs: a Stata numeric variable
+        that should end up as a string index, or a pandas Series
+        value during row-wise formatting.
+    zeropadding : int, optional
+        Target width for zero-padding. Defaults to 0 (no padding).
+
+    Returns
+    -------
+    str or None
+        The canonical string form, or ``None`` for missing/empty
+        input.
+
+    Examples
+    --------
+    >>> format_id(123)
+    '123'
+    >>> format_id(1, zeropadding=3)
+    '001'
+    >>> format_id("456.0")
+    '456'
+    >>> format_id("  007 ")
+    '007'
+    >>> format_id(float("nan"))
+    >>> format_id("")
     """
     if pd.isnull(id) or id in ['','.']: return None
 
