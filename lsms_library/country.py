@@ -34,7 +34,6 @@ import numpy as np
 import yaml
 from importlib.resources import files
 import importlib
-import cfe.regression as rgsn
 from collections import defaultdict
 from .local_tools import df_data_grabber, format_id, get_categorical_mapping, get_dataframe, map_index, get_formatting_functions, panel_ids, id_walk, all_dfs_from_orgfile, to_parquet
 from .paths import data_root
@@ -827,11 +826,10 @@ class Country:
 
     @property
     def resources(self) -> dict[str, Any]:
-        var = self.file_path / "_" / "data_scheme.yml"
-        if not var.exists():
-            return {}
-        with open(var, 'r') as file:
-            return load_yaml(file)
+        if '_resources_cache' not in self.__dict__:
+            var = self.file_path / "_" / "data_scheme.yml"
+            self.__dict__['_resources_cache'] = load_yaml(open(var)) if var.exists() else {}
+        return self.__dict__['_resources_cache']
 
     def _materialization_entry(self, method_name: str) -> dict[str, Any]:
         """
@@ -863,11 +861,15 @@ class Country:
         Get the categorical mapping for the country.
         Searches current directory, then parent directory.
         '''
-        for rel in ['./', '../']:
-            org_fn = Path(self.file_path / rel / "_" / "categorical_mapping.org")
-            if org_fn.exists():
-                return all_dfs_from_orgfile(org_fn)
-        return {}
+        if '_categorical_mapping_cache' not in self.__dict__:
+            for rel in ['./', '../']:
+                org_fn = Path(self.file_path / rel / "_" / "categorical_mapping.org")
+                if org_fn.exists():
+                    self.__dict__['_categorical_mapping_cache'] = all_dfs_from_orgfile(org_fn)
+                    break
+            else:
+                self.__dict__['_categorical_mapping_cache'] = {}
+        return self.__dict__['_categorical_mapping_cache']
 
     @property
     def mapping(self) -> dict[str, Any]:
@@ -2338,54 +2340,49 @@ def _expand_kinship(df: pd.DataFrame) -> pd.DataFrame:
     Uses the dictionary in ``categorical_mapping/kinship.yml``.
     Unrecognised labels produce NA values and a warning listing the
     unknown strings so they can be added to kinship.yml.
+
+    Vectorized implementation: uses pd.Series.map() over the whole column
+    instead of a row-by-row Python loop.
     """
     if "Relationship" not in df.columns:
         return df
 
     kinship = _load_kinship_map()
 
-    gen = []
-    dist = []
-    aff = []
-    rel = []
-    unknown = set()
-
     # Exact-match NA sentinels.  Do NOT lowercase-fold: "Nan" is British
     # English for grandmother in some contexts.  Explicit kinship.yml
     # mappings are checked FIRST, so if a survey legitimately uses "Nan"
     # as a label, adding it to kinship.yml overrides this sentinel list.
-    _NA_SENTINELS = ('', '<NA>', 'nan', 'Nan', 'NaN', 'NAN', 'None', 'NaT')
-    for val in df["Relationship"]:
-        # True NA (not a string): always NA.
-        if pd.isna(val):
-            gen.append(pd.NA); dist.append(pd.NA); aff.append(pd.NA)
-            rel.append(pd.NA)
-            continue
-        label = str(val).strip().title()
-        stripped = str(val).strip()
-        # Explicit mapping wins over sentinel list.
-        tup = kinship.get(label) or kinship.get(stripped)
-        if tup is not None:
-            gen.append(tup[0]); dist.append(tup[1]); aff.append(tup[2])
-            rel.append(val)
-            continue
-        # Unmapped and matches an NA sentinel: treat as NA silently.
-        if stripped in _NA_SENTINELS:
-            gen.append(pd.NA); dist.append(pd.NA); aff.append(pd.NA)
-            rel.append(pd.NA)
-            continue
-        # Unmapped and not a sentinel: warn and NA.
-        unknown.add(stripped)
-        gen.append(pd.NA); dist.append(pd.NA); aff.append(pd.NA)
-        rel.append(val)
+    _NA_SENTINELS = frozenset(('', '<NA>', 'nan', 'Nan', 'NaN', 'NAN', 'None', 'NaT'))
 
-    df["Relationship"] = pd.array(rel, dtype=pd.StringDtype())
-    df["Generation"] = pd.array(gen, dtype=pd.Int64Dtype())
-    df["Distance"] = pd.array(dist, dtype=pd.Int64Dtype())
-    df["Affinity"] = pd.array(aff, dtype=pd.StringDtype())
+    # Cast to nullable string so pd.NA propagates through .str accessors.
+    rel_str = df["Relationship"].astype("string")
+
+    stripped = rel_str.str.strip()
+    titled = stripped.str.title()
+
+    # Try title-case first, fall back to raw stripped (mirrors original logic).
+    mapped = titled.map(kinship).fillna(stripped.map(kinship))
+
+    def _component(series, i):
+        return series.map(lambda x: x[i] if isinstance(x, (list, tuple)) else pd.NA)
+
+    df = df.copy()
+    df["Generation"] = pd.array(_component(mapped, 0), dtype=pd.Int64Dtype())
+    df["Distance"]   = pd.array(_component(mapped, 1), dtype=pd.Int64Dtype())
+    df["Affinity"]   = pd.array(_component(mapped, 2), dtype=pd.StringDtype())
+
+    # Preserve original Relationship string for mapped rows; NA for sentinels
+    # and true NAs; original value for unknowns (consistent with old behaviour).
+    is_sentinel = stripped.isin(_NA_SENTINELS) & mapped.isna()
+    rel_out = rel_str.where(~is_sentinel, pd.NA)
+    df["Relationship"] = pd.array(rel_out, dtype=pd.StringDtype())
     # Keep Relationship alongside the decomposed columns — the analyst
     # can see both the original survey label and the structured kinship.
 
+    # Warn on unknowns (non-sentinel, unmapped, non-NA).
+    unknown_mask = mapped.isna() & ~is_sentinel & rel_str.notna()
+    unknown = set(stripped[unknown_mask].dropna().unique().tolist())
     if unknown:
         warnings.warn(
             f"Unknown relationship labels (add to kinship.yml): "
