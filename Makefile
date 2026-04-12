@@ -24,7 +24,8 @@ PYTEST_WORKERS ?= $(or $(SLURM_CPUS_ON_NODE),$(shell nproc 2>/dev/null || echo 1
 #   make test PYTEST_WORKERS=4
 PYTEST_ARGS ?= -n $(PYTEST_WORKERS) --dist=loadfile
 
-.PHONY: setup test test-full retest test-ff build release clean help
+.PHONY: setup test test-full retest test-ff build release clean help \
+        profile profile-cold profile-cprofile
 
 setup: .venv/pyvenv.cfg
 
@@ -89,6 +90,43 @@ endif
 country-%: setup
 	$(MAKE) -C lsms_library $* country=$(country)
 
+# ── Profiling ─────────────────────────────────────────────
+# Attribute CPU / I/O cost inside Country.<feature>() calls.  Requires the
+# optional 'profile' poetry group: `poetry install --with profile`.
+# See .claude/skills/profiling/SKILL.md for recipes and interpretation.
+#
+# Usage:
+#   make profile           country=Niger feature=household_roster  # pyinstrument, whatever cache state
+#   make profile-cold      country=Niger feature=household_roster  # force cold (LSMS_NO_CACHE=1)
+#   make profile-cprofile  country=Niger feature=food_acquired     # deterministic, view with snakeviz
+#
+# Output: bench/results/{YYYY-MM-DD}/{Country}-{feature}-phase{3,4}-*.{html,prof}
+# and an appended JSON record in bench/results/{YYYY-MM-DD}.jsonl
+PROFILE_JSON = bench/results/$(shell date -u +%Y-%m-%d).jsonl
+
+# Guard: fire a parse-time error BEFORE `setup` runs if the user invoked
+# a profile target without supplying country=... feature=...
+ifneq (,$(filter profile profile-cold profile-cprofile,$(MAKECMDGOALS)))
+ifndef country
+$(error Usage: make $(firstword $(filter profile profile-cold profile-cprofile,$(MAKECMDGOALS))) country=Niger feature=household_roster)
+endif
+ifndef feature
+$(error Usage: make $(firstword $(filter profile profile-cold profile-cprofile,$(MAKECMDGOALS))) country=Niger feature=household_roster)
+endif
+endif
+
+profile: setup
+	$(POETRY) run python bench/build_feature.py $(country) $(feature) \
+	    --profile pyinstrument --json $(PROFILE_JSON)
+
+profile-cold: setup
+	LSMS_NO_CACHE=1 $(POETRY) run python bench/build_feature.py $(country) $(feature) \
+	    --profile pyinstrument --json $(PROFILE_JSON) --label cold
+
+profile-cprofile: setup
+	$(POETRY) run python bench/build_feature.py $(country) $(feature) \
+	    --profile cprofile --json $(PROFILE_JSON)
+
 clean:
 	rm -rf dist/ build/ *.egg-info
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
@@ -113,3 +151,9 @@ help:
 	@echo "  make country-build country=Uganda"
 	@echo ""
 	@echo "Or work directly:  make -C lsms_library help"
+	@echo ""
+	@echo "Profiling (requires: poetry install --with profile):"
+	@echo "  make profile          country=Niger feature=household_roster"
+	@echo "  make profile-cold     country=Niger feature=household_roster  # LSMS_NO_CACHE=1"
+	@echo "  make profile-cprofile country=Niger feature=food_acquired     # open with snakeviz"
+	@echo "  See .claude/skills/profiling/SKILL.md for recipes."

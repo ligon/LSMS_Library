@@ -27,6 +27,7 @@ The returned DataFrame prepends a `country` index level.
 - `.claude/skills/tanzania-panel-design.md` — NPS sub-panel split (extended vs. refresh).
 - `.claude/skills/demand-estimation.md` — running CFE demands via the Country API.
 - `.claude/skills/release/SKILL.md` — poetry build gotchas when cutting a wheel.
+- `.claude/skills/profiling/SKILL.md` — attributing CPU / memory cost inside Country / Feature / Wave hot paths (pyinstrument, cProfile + snakeviz, tracemalloc). Adds `make profile …` targets and a `--profile` flag on `bench/build_feature.py`.
 - `scrum-master-hpc` (shared sucoder skill at `/home/ligon/Projects/sucoder-skills/scrum-master-hpc/SKILL.md`) — dispatching subagents, worktrees, DVC lock hygiene. Read this before using the Agent tool for multi-country work. Two library-specific addenda: (1) subagents share the parquet cache at `~/.local/share/lsms_library/`, so concurrent agents building different countries don't conflict; (2) the venv is at `{repo_root}/.venv/bin/python` (not in worktrees) — set `PYTHONPATH` to the worktree so development-branch code is picked up.
 
 ## Repository Layout
