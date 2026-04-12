@@ -117,7 +117,6 @@ from . import country
 from .country import Country, Wave
 from .feature import Feature
 from . import local_tools as tools
-from .categorical_mapping import ai_agent
 from . import transformations
 from .dvc_permissions import authenticate
 try:
@@ -162,13 +161,17 @@ creds_file = _s3_creds_path()
 SKIP_AUTH = os.getenv("LSMS_SKIP_AUTH", "").lower() in {"1", "true", "yes"}
 
 if not SKIP_AUTH and not creds_file.exists():
-    # Try non-interactive unlock first (WB API key → auto-decrypt S3 creds).
-    # Falls back to interactive passphrase prompt if no API key is set.
+    # Try non-interactive S3 unlock first.  This only decrypts the local
+    # s3_reader_creds.gpg — no network call required.  WB API key validation
+    # (which requires a network round-trip to microdata.worldbank.org) is
+    # deferred until the first actual data access via permissions() in
+    # data_access.py.  This keeps ``import lsms_library`` fast.
     try:
-        from .data_access import permissions as _check_permissions
-        _perms = _check_permissions()
-        if not creds_file.exists():
-            # Auto-unlock didn't produce creds — fall back to interactive
+        from .data_access import _auto_unlock_s3 as _unlock
+        _unlocked = _unlock()
+        if not _unlocked:
+            # Local GPG decryption failed or no .gpg file — fall back to
+            # interactive passphrase prompt.
             raise RuntimeError("auto-unlock did not produce S3 credentials")
     except Exception:
         try:

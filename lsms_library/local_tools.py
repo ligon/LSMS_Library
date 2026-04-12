@@ -61,7 +61,6 @@ import pandas as pd
 import dvc.api
 from collections import defaultdict
 from contextlib import contextmanager
-from cfe.df_utils import use_indices
 import warnings
 import yaml
 import json
@@ -72,7 +71,6 @@ from pyarrow.lib import ArrowInvalid
 from functools import lru_cache
 from pathlib import Path
 import os
-from cfe.df_utils import df_to_orgtbl
 from importlib.resources import files
 from dvc.api import DVCFileSystem
 import pyreadstat
@@ -1225,6 +1223,7 @@ def write_df_to_org(df: pd.DataFrame, table_name: str, filepath: str | Path | No
     str: The Org table as a string if filepath is None.
     '''
 
+    from cfe.df_utils import df_to_orgtbl  # lazy: heavy import deferred to first use
     if filepath is not None:
         mode = 'a' if Path(filepath).exists() else 'w'
         with open(filepath, mode, encoding="utf-8") as file:
