@@ -93,3 +93,28 @@ interview_date:
         i: y5_hhid
     myvars:
         int_t: hh_a18
+
+housing:
+    file: hh_sec_i.dta
+    idxvars:
+        i: y5_hhid
+    myvars:
+        Roof:
+            - hh_i09
+            - mapping:
+                GRASS, LEAVES,  BAMBOO, THATCH: Grass/Leaves/Bamboo
+                MUD AND GRASS: Mud And Grass
+                CONCRETE SLAB (FLAT ROOF): Concrete/Cement
+                IRON SHEET: Metal Sheets
+                ASBESTOS SHEETS: Asbestos Sheets
+                tiles: Tiles
+                OTHER, SPECIFY: Other
+        Floor:
+            - hh_i10
+            - mapping:
+                earth: Earth
+                CONCRETE SLAB: Concrete Slab
+                SAND/CEMENT: Sand/Cement
+                tiles: Tiles
+                timber: Timber
+                OTHER, SPECIFY: Other
