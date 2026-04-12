@@ -1,0 +1,224 @@
+Country: CotedIvoire
+Wave: 2018-19
+
+sample:
+    dfs:
+        - df_cover
+        - df_weights
+    df_cover:
+        file: Menage/s00_me_CIV2018.dta
+        idxvars:
+            v: grappe
+            i:
+                - grappe
+                - menage
+        myvars:
+            strata: s00q01
+            Rural:
+                - s00q04
+                - mapping:
+                    Rural: Rural
+                    rural: Rural
+                    RURAL: Rural
+                    Urbain: Urban
+                    urbain: Urban
+                    URBAIN: Urban
+    df_weights:
+        file: Menage/ehcvm_ponderations_CIV2018.dta
+        idxvars:
+            v: grappe
+        myvars:
+            weight: hhweight
+            panel_weight: hhweight
+    merge_on:
+        - v
+    final_index:
+        - i
+        - t
+
+cluster_features:
+    dfs:
+        - df_main
+        - df_geo
+    df_main:
+        file: Menage/s00_me_CIV2018.dta
+        idxvars:
+            i: menage
+            v: grappe
+        myvars:
+            Region: s00q01
+            Rural:
+                - s00q04
+                - mapping:
+                    Rural: Rural
+                    rural: Rural
+                    RURAL: Rural
+                    Urbain: Urban
+                    urbain: Urban
+                    URBAIN: Urban
+    df_geo:
+        file: Menage/grappe_gps_CIV2018.dta
+        idxvars:
+            v: grappe
+        myvars:
+            Latitude: coordonnes_gps__Latitude
+            Longitude: coordonnes_gps__Longitude
+    merge_on:
+        - v
+    final_index:
+        - t
+        - v
+
+household_roster:
+    file: Menage/s01_me_CIV2018.dta
+    idxvars:
+        v: grappe
+        i:
+            - grappe
+            - menage
+        pid:
+            - grappe
+            - menage
+            - s01q00a
+    myvars:
+        Sex: s01q01
+        Age: s01q04a
+        Relationship: s01q02
+
+individual_education:
+    file: Menage/ehcvm_individu_CIV2018.dta
+    idxvars:
+        v: grappe
+        i:
+            - grappe
+            - menage
+        pid: numind
+    myvars:
+        Educational Attainment: educ_hi
+
+assets:
+    file: Menage/s12_me_CIV2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+        j: s12q01
+    myvars:
+        Quantity: s12q03
+        Age: s12q07
+        Value: s12q09
+        Purchase Price: s12q08
+
+shocks:
+    file: Menage/s14_me_CIV2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+        Shock: s14q01
+    myvars:
+        AffectedIncome:
+            - s14q04a
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        AffectedAssets:
+            - s14q04b
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        AffectedProduction:
+            - s14q04c
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        AffectedConsumption:
+            - s14q04d
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        Cope1: s14q05__1
+        Cope2: s14q05__2
+        Cope3: s14q05__3
+        Cope4: s14q05__4
+        Cope5: s14q05__5
+        Cope6: s14q05__6
+        Cope7: s14q05__7
+        Cope8: s14q05__8
+        Cope9: s14q05__9
+        Cope10: s14q05__10
+        Cope11: s14q05__11
+        Cope12: s14q05__12
+        Cope13: s14q05__13
+        Cope14: s14q05__14
+        Cope15: s14q05__15
+        Cope16: s14q05__16
+        Cope17: s14q05__17
+        Cope18: s14q05__18
+        Cope19: s14q05__19
+        Cope20: s14q05__20
+        Cope21: s14q05__21
+        Cope22: s14q05__22
+        Cope23: s14q05__23
+        Cope24: s14q05__24
+        Cope25: s14q05__25
+        Cope26: s14q05__26
+
+food_acquired:
+    file: Menage/s07b_me_CIV2018.dta
+    idxvars:
+        v: grappe
+        visit: vague
+        i:
+            - grappe
+            - menage
+        j: s07bq01
+        u: s07bq03b
+    myvars:
+        Quantity: s07bq03a
+        Expenditure: s07bq08
+        Produced: s07bq04
+
+housing:
+    file: Menage/s11_me_CIV2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        Roof:
+            - s11q20
+            - mapping:
+                Dalle en ciment: Concrete Slab
+                Tuile: Clay Tiles
+                Tôles: Iron Sheets
+                Paille: Thatch
+                Banco: Adobe
+                Chaume: Straw
+                Nattes: Woven Mats
+                'Autre (à préciser)': Other
+        Floor:
+            - s11q21
+            - mapping:
+                Carreaux/Marbre: Tiles
+                Ciment/Béton: Cement
+                Terre battue/Sable: Earth
+                Bouse d'animaux: Dung
+                Autre: Other
+
+interview_date:
+    file: Menage/s00_me_CIV2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        int_t: s00q23a
