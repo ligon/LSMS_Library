@@ -79,6 +79,7 @@ import pyreadstat
 import inspect
 from typing import Any
 from .paths import data_root, var_path, wave_data_path, COUNTRIES_ROOT
+from .config import s3_creds_path as _s3_creds_path
 
 # Initialize DVC filesystem once and reuse it.
 #
@@ -95,13 +96,28 @@ from .paths import data_root, var_path, wave_data_path, COUNTRIES_ROOT
 # ``{_DVC_CACHE_DIR}/{md5[:2]}/{md5[2:]}`` is served from local disk
 # instead of streaming from S3.  See ``_ensure_dvc_pulled`` below for
 # the warming side of the round-trip.
+#
+# Similarly, the ``credentialpath`` override on the ``ligonresearch_s3``
+# remote redirects DVC's S3 credential lookup away from the packaged
+# (and in pip-installed layouts, read-only) ``.dvc/s3_creds`` path to
+# the user-writable ``s3_creds_path()``.  DVC is lazy about credential
+# validation: the file at this path does not need to exist at
+# ``DVCFileSystem`` construction time.  The auto-unlock pass later in
+# ``lsms_library/__init__.py`` populates it before the first S3 access.
 _PACKAGE_ROOT = Path(__file__).resolve().parent
 _COUNTRIES_DIR = _PACKAGE_ROOT / "countries"
 _DVC_CACHE_DIR = data_root() / "dvc-cache"
 _DVC_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 DVCFS = DVCFileSystem(
     os.fspath(_COUNTRIES_DIR),
-    config={"cache": {"dir": os.fspath(_DVC_CACHE_DIR)}},
+    config={
+        "remote": {
+            "ligonresearch_s3": {
+                "credentialpath": str(_s3_creds_path()),
+            },
+        },
+        "cache": {"dir": os.fspath(_DVC_CACHE_DIR)},
+    },
 )
 
 

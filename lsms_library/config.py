@@ -98,3 +98,23 @@ def data_dir() -> str | None:
 def config_path() -> Path:
     """Return the path to the config file (may not exist yet)."""
     return _config_file()
+
+
+def s3_creds_path() -> Path:
+    """Return the user-writable path for decrypted S3 credentials.
+
+    Precedence: ``$LSMS_S3_CREDS`` env var → ``<config_dir>/s3_creds``.
+    Does NOT create the file or its parent directory.
+
+    This path is where :func:`lsms_library.data_access._auto_unlock_s3`
+    writes the plaintext S3 reader credentials after decrypting
+    ``s3_reader_creds.gpg`` with the obfuscated passphrase, and where
+    :func:`lsms_library.dvc_permissions.authenticate` writes them in
+    the interactive fallback.  Moving the write target out of the
+    package tree makes the library safe to install into a read-only
+    site-packages directory (e.g. a pip-installed wheel).
+    """
+    override = os.environ.get("LSMS_S3_CREDS", "").strip()
+    if override:
+        return Path(override).expanduser()
+    return _config_dir() / "s3_creds"
