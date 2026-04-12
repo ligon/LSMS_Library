@@ -97,6 +97,14 @@ class TestParseDvcRemotes:
 # ---------------------------------------------------------------------------
 
 class TestCheckRemoteAccess:
+    @pytest.fixture(autouse=True)
+    def _patch_creds_path(self, dvc_dir, monkeypatch):
+        """Redirect s3_creds_path() to the temp dvc_dir so the real
+        ~/.config/lsms_library/s3_creds doesn't leak into tests."""
+        import lsms_library.config as _cfg
+        monkeypatch.setattr(_cfg, "s3_creds_path",
+                            lambda: dvc_dir / "s3_creds")
+
     def test_s3_read_when_creds_exist(self, dvc_dir):
         from lsms_library.data_access import _check_remote_access
 
@@ -289,6 +297,14 @@ class TestAutoUnlockS3:
 # ---------------------------------------------------------------------------
 
 class TestPermissions:
+    @pytest.fixture(autouse=True)
+    def _patch_creds_path(self, dvc_dir, monkeypatch):
+        """Redirect s3_creds_path() to the temp dvc_dir so the real
+        ~/.config/lsms_library/s3_creds doesn't leak into tests."""
+        import lsms_library.config as _cfg
+        monkeypatch.setattr(_cfg, "s3_creds_path",
+                            lambda: dvc_dir / "s3_creds")
+
     def test_s3_read_without_wb_key(self, dvc_dir, monkeypatch):
         """RA scenario: S3 creds exist but no WB API key."""
         from lsms_library import data_access
