@@ -41,12 +41,21 @@ SAMPLE_COUNTRIES = _countries_with_sample()
 # xfailed for these.
 NO_WEIGHT_COUNTRIES = {"China", "Kazakhstan", "Pakistan"}
 
-# Countries whose microdata is not available in this checkout.  Nepal is
-# NSO-hosted (https://microdata.nsonepal.gov.np/) and requires free
-# registration; Armenia's .dta files haven't been downloaded.  See the
-# "Countries Without Microdata" table in CLAUDE.md.  Calling sample()
-# on these takes ~6 minutes to fail on the fallback path — skip instead.
-NO_DATA_COUNTRIES = {"Nepal", "Armenia"}
+# Countries whose microdata is not available in this checkout — marked
+# with `data_available: false` in their data_scheme.yml.  Calling sample()
+# on these takes ~6 minutes to fail on the fallback path; skip instead.
+# When data lands, the country's data_scheme.yml flips the flag and
+# tests re-enable automatically with no change here.
+def _countries_without_data() -> set[str]:
+    unavailable = set()
+    for yml in sorted(COUNTRIES_ROOT.glob("*/_/data_scheme.yml")):
+        data = load_yaml(yml)
+        if isinstance(data, dict) and data.get("data_available") is False:
+            unavailable.add(yml.parent.parent.name)
+    return unavailable
+
+
+NO_DATA_COUNTRIES = _countries_without_data()
 
 
 _sample_cache: dict[str, pd.DataFrame | None] = {}

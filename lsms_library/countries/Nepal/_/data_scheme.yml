@@ -1,4 +1,10 @@
-Country: Nepal 
+Country: Nepal
+
+# Microdata not present in this checkout.  Nepal is NSO-hosted
+# (https://microdata.nsonepal.gov.np/) and requires free registration;
+# .dta files are not bundled.  Tests that build features should skip.
+# Flip to true when data is added and the waves are materialized.
+data_available: false
 
 Waves:
   - '1995-96'

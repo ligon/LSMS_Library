@@ -1,5 +1,11 @@
 Country: Armenia
 
+# Microdata not present in this checkout.  Armenia is in the WB catalog
+# but its .dta files have not been downloaded.  Tests that build features
+# should skip.  Flip to true when data is added and materialized.
+# See GH #146 for the integration plan.
+data_available: false
+
 Data Scheme:
   household_roster:
     index: (i, pid)
