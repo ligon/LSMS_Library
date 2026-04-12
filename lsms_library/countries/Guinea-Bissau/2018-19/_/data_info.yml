@@ -94,7 +94,7 @@ household_roster:
     myvars:
         Sex: sexe
         Age: age
-        Relation: lien
+        Relationship: lien
 
 shocks:
     file: s14_me_gnb2018.dta

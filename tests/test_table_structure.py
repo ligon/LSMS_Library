@@ -13,9 +13,42 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
+import yaml
 
 from lsms_library.paths import data_root, COUNTRIES_ROOT
 from lsms_library.yaml_utils import load_yaml
+
+
+def _load_api_derived_columns() -> dict[str, set[str]]:
+    """Load columns marked api_derived in data_info.yml.
+
+    These columns are added by _finalize_result() at API read time and are
+    NOT stored in the raw parquets.  Tests that read raw parquets must skip
+    them when checking declared columns.
+
+    Returns {table_name: {col_name, ...}}.
+    """
+    data_info_path = (
+        Path(__file__).resolve().parent.parent / "lsms_library" / "data_info.yml"
+    )
+    with open(data_info_path, "r", encoding="utf-8") as f:
+        info = yaml.safe_load(f)
+    columns = info.get("Columns", {})
+    result: dict[str, set[str]] = {}
+    for table, cols in columns.items():
+        if not isinstance(cols, dict):
+            continue
+        derived = {
+            col
+            for col, meta in cols.items()
+            if isinstance(meta, dict) and meta.get("api_derived")
+        }
+        if derived:
+            result[table] = derived
+    return result
+
+
+_API_DERIVED = _load_api_derived_columns()
 
 
 def _parse_index_tuple(raw: str) -> list[str]:
@@ -129,16 +162,26 @@ class TestTableStructure:
             )
 
     def test_declared_columns_present(self, country, table, path):
-        """Columns declared in data_scheme exist in the DataFrame."""
+        """Columns declared in data_scheme exist in the DataFrame.
+
+        Columns marked ``api_derived`` in data_info.yml are skipped: they are
+        added by ``_finalize_result()`` at API read time and are intentionally
+        absent from the raw cached parquets.
+        """
         spec = ALL_SCHEMES[country][table]
         expected_cols = spec["columns"]
         if not expected_cols:
             pytest.skip(f"{country}/{table} has no declared columns")
 
+        # Columns produced at API time (e.g., kinship decomposition).
+        api_derived = _API_DERIVED.get(table, set())
+
         df = pd.read_parquet(path, engine="pyarrow")
         all_names = set(df.columns.tolist() + list(df.index.names))
 
         for col_name in expected_cols:
+            if col_name in api_derived:
+                continue  # present in API output, not in raw parquet
             assert col_name in all_names, (
                 f"{country}/{table}: declared column '{col_name}' "
                 f"not found in {sorted(all_names)}"

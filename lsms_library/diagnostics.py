@@ -25,9 +25,41 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
+import yaml as _yaml
 
 from .paths import data_root, COUNTRIES_ROOT
 from .yaml_utils import load_yaml
+
+
+# ---------------------------------------------------------------------------
+# API-derived column registry
+# ---------------------------------------------------------------------------
+
+def _load_api_derived() -> dict[str, set[str]]:
+    """Return {table: {col, ...}} for columns marked api_derived in data_info.yml.
+
+    These columns are produced by ``_finalize_result()`` at API read time and
+    are intentionally absent from raw cached parquets.  Sanity checks that
+    operate on raw parquets must skip them.
+    """
+    from importlib.resources import files
+    try:
+        info_path = files("lsms_library") / "data_info.yml"
+        with open(info_path, "r", encoding="utf-8") as f:
+            info = _yaml.safe_load(f)
+    except Exception:
+        return {}
+    result: dict[str, set[str]] = {}
+    for table, cols in info.get("Columns", {}).items():
+        if not isinstance(cols, dict):
+            continue
+        derived = {c for c, m in cols.items() if isinstance(m, dict) and m.get("api_derived")}
+        if derived:
+            result[table] = derived
+    return result
+
+
+_API_DERIVED_COLUMNS: dict[str, set[str]] = _load_api_derived()
 
 
 # ---------------------------------------------------------------------------
@@ -236,13 +268,22 @@ def _check_no_constant_columns(df: pd.DataFrame) -> Check:
 
 
 def _check_declared_columns(df: pd.DataFrame, scheme: dict, feature: str) -> Check:
-    """Declared columns in data_scheme should exist."""
+    """Declared columns in data_scheme should exist.
+
+    Columns marked ``api_derived`` in data_info.yml are skipped when not
+    present: they are added by ``_finalize_result()`` at API read time and are
+    intentionally absent from raw cached parquets.
+    """
     spec = scheme.get(feature, {})
     expected_cols = spec.get("columns", {})
     if not expected_cols:
         return Check("declared_columns_present", "pass", "No columns declared (skipped)")
+    api_derived = _API_DERIVED_COLUMNS.get(feature, set())
     all_names = set(df.columns.tolist() + list(df.index.names))
-    missing = [c for c in expected_cols if c not in all_names]
+    missing = [
+        c for c in expected_cols
+        if c not in all_names and c not in api_derived
+    ]
     if missing:
         return Check("declared_columns_present", "fail",
                      f"Missing: {missing}")
