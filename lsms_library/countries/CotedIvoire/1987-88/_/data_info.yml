@@ -1,0 +1,88 @@
+Country: CotedIvoire
+Wave: 1987-88
+
+sample:
+    file: ../Data/WEIGHT87.DAT
+    idxvars:
+        i:
+            - CLUST
+            - NH
+    myvars:
+        v: CLUST
+        weight: ALLWAITN
+        panel_weight: ALLWAITN
+        strata: REGION
+        Rural:
+            - REGION
+            - mapping:
+                '1: ABIDJAN': Urban
+                '2: OTHER CITIES': Urban
+                '3: EAST FOREST': Rural
+                '4: WEST FOREST': Rural
+                '5: SAVANNA': Rural
+
+cluster_features:
+    file: ../Data/WEIGHT87.DAT
+    idxvars:
+        v: CLUST
+    myvars:
+        Region: REGION
+        Rural:
+            - REGION
+            - mapping:
+                '1: ABIDJAN': Urban
+                '2: OTHER CITIES': Urban
+                '3: EAST FOREST': Rural
+                '4: WEST FOREST': Rural
+                '5: SAVANNA': Rural
+    final_index:
+        - t
+        - v
+
+household_roster:
+    file: ../Data/F01A.DAT
+    idxvars:
+        i:
+            - CLUST
+            - NH
+        pid: PID
+    myvars:
+        Sex:
+            - SEX
+            - mapping:
+                '.': null
+                '1': M
+                '2': F
+                1: M
+                2: F
+        Age: AGEY
+        Relationship:
+            - REL
+            - mapping:
+                '.': null
+                '1': Head
+                '2': Spouse
+                '3': Son/Daughter
+                '4': Son/Daughter-In-Law
+                '5': Grandchild
+                '6': Parent Of Head Or Spouse
+                '7': Sibling
+                '8': Other Relative
+                '9': Visitor
+                '10': Foster Child
+                '11': Servant
+                '12': Nephew/Niece
+                '13': Other Relative
+                1: Head
+                2: Spouse
+                3: Son/Daughter
+                4: Son/Daughter-In-Law
+                5: Grandchild
+                6: Parent Of Head Or Spouse
+                7: Sibling
+                8: Other Relative
+                9: Visitor
+                10: Foster Child
+                11: Servant
+                12: Nephew/Niece
+                13: Other Relative
