@@ -330,8 +330,12 @@ def food_prices_from_acquired(df):
 def legacy_locality(country):
     """Reproduce the pre-deprecation output of Country(X).locality().
 
-    Returns a DataFrame indexed by (i, t, m) with a single column v,
-    where m is the region label and v is the parish/cluster identifier.
+    Returns a DataFrame indexed by (i, t, m) with a single column
+    ``Parish``, where m is the region label and ``Parish`` is the
+    parish/cluster identifier (formerly named ``v`` in the deprecated
+    interface, renamed in GH #151 to avoid collision with the cluster
+    ``v`` used everywhere else in the API).
+
     Implemented by joining sample() and cluster_features() — both
     first-class tables that carry the same information.
 
@@ -347,13 +351,14 @@ def legacy_locality(country):
     Returns
     -------
     pd.DataFrame
-        DataFrame with MultiIndex (i, t, m) and a single column 'v'.
+        DataFrame with MultiIndex (i, t, m) and a single column 'Parish'.
     """
     sample = country.sample().reset_index()
     cluster = country.cluster_features().reset_index()
     # Take only the columns needed for the legacy shape
     cluster_subset = cluster[['t', 'v', 'Region']]
     loc = sample.merge(cluster_subset, on=['t', 'v'], how='left')
-    # Rename Region -> m to match legacy output shape
-    loc = loc.rename(columns={'Region': 'm'})
-    return loc.set_index(['i', 't', 'm'])[['v']].sort_index()
+    # Rename Region -> m to match legacy output shape; rename v -> Parish to
+    # avoid semantic collision with the cluster 'v' used elsewhere in the API.
+    loc = loc.rename(columns={'Region': 'm', 'v': 'Parish'})
+    return loc.set_index(['i', 't', 'm'])[['Parish']].sort_index()

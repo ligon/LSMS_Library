@@ -11,6 +11,12 @@ a single column `v`, where `m` was a harmonised region label
 (Central / Eastern / Northern / Western / Kampala) and `v` was the
 parish/cluster identifier.
 
+> **Column rename in compatibility shim**: `legacy_locality()` now returns
+> the column as `Parish` (not `v`) to avoid semantic collision with the
+> cluster `v` joined into all other household-level tables by
+> `_join_v_from_sample()` (GH #151). Update `loc['v']` to `loc['Parish']`
+> if you use the shim.
+
 As of the 2026-04-10 architecture migration, all of that information is
 already present in two first-class tables:
 
@@ -41,8 +47,8 @@ analysis:
 s = c.sample().reset_index()
 cf = c.cluster_features().reset_index()[['t', 'v', 'Region']]
 loc = s.merge(cf, on=['t', 'v'], how='left')
-loc = loc.rename(columns={'Region': 'm'})
-loc = loc.set_index(['i', 't', 'm'])[['v']].sort_index()
+loc = loc.rename(columns={'Region': 'm', 'v': 'Parish'})
+loc = loc.set_index(['i', 't', 'm'])[['Parish']].sort_index()
 ```
 
 ### Compatibility shim (temporary)
@@ -57,7 +63,8 @@ c = ll.Country('Uganda')
 loc = legacy_locality(c)   # same shape as the old locality() output
 ```
 
-The shim performs the join described above and returns `(i, t, m) -> v`.
+The shim performs the join described above and returns `(i, t, m) -> Parish`
+(formerly `v`; renamed in GH #151 to avoid collision with the cluster `v`).
 It is intended only as a bridge during migration; it will be removed when
 `locality()` itself is removed.
 
