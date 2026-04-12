@@ -45,7 +45,7 @@ def test_locality_in_dir():
 
 
 def test_legacy_locality_shape():
-    """legacy_locality() must return a DataFrame indexed by (i, t, m) with column v."""
+    """legacy_locality() must return a DataFrame indexed by (i, t, m) with column Parish."""
     import lsms_library as ll
     from lsms_library.transformations import legacy_locality
     c = ll.Country('Uganda')
@@ -55,8 +55,8 @@ def test_legacy_locality_shape():
         pytest.skip(f"Uganda data unavailable: {e}")
     assert list(loc.index.names) == ['i', 't', 'm'], \
         f"Expected (i, t, m), got {list(loc.index.names)}"
-    assert list(loc.columns) == ['v'], \
-        f"Expected ['v'], got {list(loc.columns)}"
+    assert list(loc.columns) == ['Parish'], \
+        f"Expected ['Parish'], got {list(loc.columns)}"
     assert len(loc) > 0, "legacy_locality() returned empty DataFrame"
 
 
