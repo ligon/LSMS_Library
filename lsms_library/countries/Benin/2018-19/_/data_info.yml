@@ -79,7 +79,7 @@ household_roster:
     myvars:
         Sex: sexe
         Age: age
-        Relation: lien
+        Relationship: lien
 
 food_acquired:
     file: s07b_me_ben2018.dta
