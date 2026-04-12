@@ -51,14 +51,17 @@ Columns:
     Generation:
       type: int
       required: true
+      api_derived: true
       note: vertical distance from head (0=same, +1=parent, -1=child, etc.)
     Distance:
       type: int
       required: true
+      api_derived: true
       note: collateral distance (0=lineal, 1=sibling line, 2=cousin line)
     Affinity:
       type: str
       required: true
+      api_derived: true
       spellings:
         consanguineal: []
         affinal: []

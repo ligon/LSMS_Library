@@ -452,10 +452,29 @@ Lodger:                                  [0, 0, guest]
 "Frère/sœur":                            [0, 1, consanguineal]
 "Frère/s\ufffdr":                       [0, 1, consanguineal]
 "Frère/s\ufffdur":                       [0, 1, consanguineal]
+"Frère/s?ur":                            [0, 1, consanguineal]
 "Petit fils/fille":                      [-2, 0, consanguineal]
 "Petit Fils/Fille":                      [-2, 0, consanguineal]
 "Domestique/personnel de maison":        [0, 0, servant]
 "Domestique/Personnel De Maison":        [0, 0, servant]
+
+# --- Mali EHCVM 2017-18 variants (different punctuation/spelling) ---
+"Beau fils/ Belle fille":               [-1, 0, affinal]
+"Beau Fils/ Belle Fille":               [-1, 0, affinal]
+"Beau-frère, Belle soeur":              [0, 1, affinal]
+"Beau-Frère, Belle Soeur":              [0, 1, affinal]
+"Personne non apparentée au CM ni au conjoint": [0, 0, unrelated]
+"Personne Non Apparentée Au Cm Ni Au Conjoint": [0, 0, unrelated]
+"Cousin, Cousine":                      [0, 2, consanguineal]
+"Neveu, Nièce":                         [-1, 1, consanguineal]
+
+# --- Mali EHCVM 2018-19 encoding artifacts (truncated UTF-8 labels) ---
+# These appear when Stata labels are read with a fallback latin-1 encoding,
+# producing truncated strings from multi-byte UTF-8 sequences.
+"Chef de m":                            [0, 0, consanguineal]
+"Fr":                                   [0, 1, consanguineal]
+"Personne non apparent":                [0, 0, unrelated]
+"p":                                    [1, 0, consanguineal]
 
 # --- Portuguese variants (Guinea-Bissau EHCVM) ---
 "Chefe do agregado familiar":            [0, 0, consanguineal]
