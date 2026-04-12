@@ -19,7 +19,11 @@ World Bank Microdata Library, and access levels are ``"read"`` or
 When a valid ``MICRODATA_API_KEY`` is detected, the module automatically
 decrypts the S3 read credentials (``s3_reader_creds.gpg``) so that DVC
 can stream data without the user having to run ``ll.authenticate()``
-interactively.
+interactively.  The decrypted plaintext is written to the user-writable
+path returned by :func:`lsms_library.config.s3_creds_path` (defaulting
+to ``~/.config/lsms_library/s3_creds``), not into the package tree —
+this is what makes the library safe to install into a read-only
+site-packages directory.
 
 Environment variables
 ---------------------
@@ -28,6 +32,9 @@ MICRODATA_API_KEY
     the WB terms of use.
 LSMS_S3_WRITE_KEY
     If set, grants write access to S3 remotes.
+LSMS_S3_CREDS
+    Override path for the decrypted S3 reader credentials.  Defaults
+    to ``<config_dir>/s3_creds`` (see :func:`lsms_library.config.s3_creds_path`).
 LSMS_SKIP_AUTH
     If ``"1"``/``"true"``/``"yes"``, skip the interactive GPG passphrase
     prompt on import.
@@ -148,7 +155,14 @@ def _check_remote_access(remote_name: str, remote_cfg: dict[str, str],
     if url.startswith("s3://"):
         cred_path = remote_cfg.get("credentialpath")
         has_read = False
-        if cred_path:
+
+        # Prefer the user-writable location (new in v0.7.0).
+        user_creds = config.s3_creds_path()
+        if user_creds.exists() and user_creds.stat().st_size > 0:
+            has_read = True
+        # Fall back to the legacy in-tree location for users who
+        # already have countries/.dvc/s3_creds from an editable install.
+        elif cred_path:
             cred_file = dvc_dir / cred_path
             has_read = cred_file.exists() and cred_file.stat().st_size > 0
 
@@ -264,7 +278,8 @@ def _auto_unlock_s3(dvc_dir: Path | None = None) -> bool:
     if dvc_dir is None:
         dvc_dir = _COUNTRIES_DIR / ".dvc"
 
-    creds_file = dvc_dir / "s3_creds"
+    creds_file = config.s3_creds_path()
+    creds_file.parent.mkdir(parents=True, exist_ok=True)
     if creds_file.exists() and creds_file.stat().st_size > 0:
         return True
 

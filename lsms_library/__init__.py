@@ -156,8 +156,8 @@ except Exception:
     # DVC optional; if missing, proceed without UI tweaks
     pass
 
-gpg_path = Path(__file__).resolve().parent / 'countries' / '.dvc'
-creds_file = gpg_path / 's3_creds'
+from .config import s3_creds_path as _s3_creds_path
+creds_file = _s3_creds_path()
 
 SKIP_AUTH = os.getenv("LSMS_SKIP_AUTH", "").lower() in {"1", "true", "yes"}
 
