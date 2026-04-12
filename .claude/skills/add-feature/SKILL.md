@@ -37,6 +37,10 @@ Before writing any code, **read the `.org` files** in the country's `_/` directo
 
 Also check wave-level org files: `{Country}/{wave}/_/*.org`
 
+## Dependencies — do NOT use `lsms.tools`
+
+The upstream `lsms` package (`lsms >=0.4.13,<0.5.0`) has been **retired** as a dependency. Do not write `from lsms.tools import get_food_prices, get_food_expenditures, get_household_roster` or any other `lsms.tools` import in new code. Use `get_dataframe` and `df_data_grabber` from `lsms_library.local_tools` instead. ~15 legacy country-level files still carry dead `lsms.tools` imports; ignore them as templates.
+
 ## Prerequisites
 
 - The reference implementation (usually Uganda) already has the feature

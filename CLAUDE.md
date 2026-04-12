@@ -112,6 +112,8 @@ Auto-unlock decrypts `s3_reader_creds.gpg` with an obfuscated passphrase at impo
 
 `household_characteristics`, `food_expenditures`, `food_prices`, and `food_quantities` are **auto-derived at runtime** via `_ROSTER_DERIVED` and `_FOOD_DERIVED` in `country.py` (source transforms live in `transformations.py`). **Do NOT register them in `data_scheme.yml`** — doing so bypasses the derivation path and forces legacy `!make` scripts to run.
 
+`Country._DEPRECATED` maps removed/deprecated table names to deprecation messages. `__getattr__` checks it before `data_scheme`, returning a method that emits `DeprecationWarning` and calls a compatibility shim. Currently contains `locality` only. See `docs/migration/locality.md`.
+
 ## `sample()` and Cluster Identity
 
 The `sample` table (index `(i, t)`, columns `v`, `weight`, `panel_weight`, `strata`, `Rural`) is the single source of truth for mapping households to their sampling cluster. **As of 2026-04-10, `v` is joined from `sample()` at API time** by `_join_v_from_sample()` in `country.py`, called from `_finalize_result()` for any household-level table when the country has `sample` in its `data_scheme` and `v` isn't already present.
@@ -151,6 +153,10 @@ result.attrs = dict(df.attrs)  # preserve id_converted flag
 - **Housing schema is categorical, not binary.** Since 2026-04-10, Uganda and Malawi `housing` have `Roof` and `Floor` columns with material-name values (`Thatch`, `Iron Sheets`, `Cement`, …), mapped through `categorical_mapping.org`. Consumers who want binary indicators derive them trivially (`df['Roof'] == 'Thatch'`); the reverse is not possible. Update any code that reads the old binary columns.
 
 - **Categorical columns from `.dta` / `.sav`**. `get_dataframe()` returns pandas categoricals from Stata/SPSS. `select_dtypes(exclude=['object']).max()` crashes on unordered categoricals — exclude `'category'` too. `groupby().first()` crashes similarly — convert to string with `.astype(str).replace('nan', pd.NA)` first. YAML mapping keys must be string keys (`'urbana': Urban`) not numeric (`1: Urban`) when the raw labels are strings.
+
+- **`lsms` upstream dependency has been retired.** `lsms (>=0.4.13,<0.5.0)` is no longer in `pyproject.toml`. ~15 country-level `_/country.py` files still carry dead `from lsms.tools import` at module top; on a fresh install + cold cache, rebuilds of Ethiopia/Tanzania/GhanaLSS `food_acquired` will crash with `ModuleNotFoundError`. Clean up when the file is next touched. Full file list in commit `05cd1ec7`'s message. **Do not use `from lsms.tools import` in new code** — use `get_dataframe` and `df_data_grabber` from `local_tools` instead.
+
+- **`locality` is deprecated.** `Country('Uganda').locality()` emits `DeprecationWarning` and returns via `legacy_locality(country)` from `transformations.py`, which joins `sample()` and `cluster_features()` to reproduce the legacy `(i, t, m) -> v` shape. The 9 wave-level `locality.py` scripts and `uganda.other_features()` have been deleted. See `docs/migration/locality.md`.
 
 - **`_log_issue` pollutes the working tree.** `lsms_library/country.py:168` appends to `lsms_library/ISSUES.md` on any cache/materialization failure. The file is tracked in git with no dedup or rotation, so expected data-unavailability conditions (Nepal has no `.dta` on disk, etc.) dirty the tree. Commit mid-session with explicit `git add <files>`, and revert spurious diffs with `git checkout HEAD -- lsms_library/ISSUES.md`. Tracked in GH #148.
 
