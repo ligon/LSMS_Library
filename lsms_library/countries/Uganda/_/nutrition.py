@@ -50,7 +50,7 @@ final_fct = final_fct.loc[fct_cols]
 q = q.xs('Kg',level='u').sum(axis=1)
 
 # Deal with any dupes
-q = q.groupby(['i','t','m','j']).sum()
+q = q.groupby(['i','t','j']).sum()
 
 common_cols = q.index.unique(level='j').intersection(final_fct.columns)
 
