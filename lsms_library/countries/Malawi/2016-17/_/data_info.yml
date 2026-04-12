@@ -52,8 +52,8 @@ cluster_features:
         idxvars:
             v: ea_id
         myvars:
-            Latitude: lat_dd_mod
-            Longitude: lon_dd_mod
+            Latitude: lat_modified
+            Longitude: lon_modified
     merge_on:
         - v
     final_index:
