@@ -49,3 +49,8 @@ Data Scheme:
     Age: float
     Value: float
     Purchase Price: float
+
+  housing:
+    index: (t, i)
+    Roof: str
+    Floor: str

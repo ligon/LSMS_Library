@@ -104,3 +104,25 @@ interview_date:
         i: sdd_hhid
     myvars:
         int_t: hh_a18
+
+housing:
+    file: HH_SEC_I.dta
+    idxvars:
+        i: sdd_hhid
+    myvars:
+        Roof:
+            - hh_i09
+            - mapping:
+                GRASS, LEAVES, BAMBOO: Grass/Leaves/Bamboo
+                MUD AND GRASS: Mud And Grass
+                CONCRETE, CEMENT: Concrete/Cement
+                METAL SHEETS (GCI): Metal Sheets
+                ASBESTOS SHEETS: Asbestos Sheets
+                TILES: Tiles
+                OTHER (SPECIFY): Other
+        Floor:
+            - hh_i10
+            - mapping:
+                EARTH: Earth
+                CONCRETE, CEMENT, TILES, TIMBER: Concrete/Cement/Tiles/Timber
+                OTHER (SPECIFY): Other
