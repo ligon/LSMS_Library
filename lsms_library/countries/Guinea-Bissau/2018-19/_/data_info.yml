@@ -182,6 +182,33 @@ individual_education:
     myvars:
         Educational Attainment: 'educ_hi'
 
+housing:
+    file: s11_me_gnb2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        Roof:
+            - s11q20
+            - mapping:
+                Zinco: Iron Sheets
+                Telha: Clay Tiles
+                Palha: Thatch
+                Adobe: Adobe
+                Restolho (Palha de cibe): Straw
+                Laje de cimento: Concrete Slab
+                Esteiras: Mats
+                Outro: Other
+        Floor:
+            - s11q21
+            - mapping:
+                Cimento/betão: Cement
+                Terra batida/areia: Earth
+                Ladrilhos/mármore: Tiles
+                Excrementos de animais: Dung
+                Outro: Other
+
 interview_date:
     file: s00_me_gnb2018.dta
     idxvars:
