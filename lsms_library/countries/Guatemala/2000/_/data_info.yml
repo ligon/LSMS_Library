@@ -52,7 +52,7 @@ household_roster:
                 5: divorced
                 6: widower
                 7: Married or Living together
-        Relation:
+        Relationship:
             - p05a02
             - mapping:
                 1: boss

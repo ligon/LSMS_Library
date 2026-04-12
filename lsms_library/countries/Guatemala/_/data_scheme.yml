@@ -11,7 +11,9 @@ Data Scheme:
 
   cluster_features:
     index: (t, v)
-    Region: str
+    Region:
+      type: str
+      optional: true  # ENCOVI 2000: region is used as the v-index itself; no separate Region column (CLAUDE.md: "No PSU/cluster variable in data")
     Rural: str
 
   household_roster:
