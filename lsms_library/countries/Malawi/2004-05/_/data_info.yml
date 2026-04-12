@@ -50,6 +50,30 @@ individual_education:
     myvars:
         Educational Attainment: c13
 
+housing:
+    file: sec_g.dta
+    idxvars:
+        i: case_id
+    myvars:
+        Roof:
+            - g09
+            - mapping:
+                Grass/Palm leaves: Grass
+                Iron sheets: Iron Sheets
+                Clay tiles: Clay Tiles
+                Plastic sheeting: Plastic Sheeting
+                Concrete: Concrete
+                Other: Other
+        Floor:
+            - g10
+            - mapping:
+                Smoothed mud: Smoothed Mud
+                Smooth cement: Smooth Cement
+                Sand: Sand
+                Tile: Tile
+                Wood: Wood
+                Other: Other
+
 # panel_ids:
 #     file: sec_a.dta
 #     idxvars:

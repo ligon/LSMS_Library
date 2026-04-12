@@ -1,0 +1,71 @@
+#+TITLE: Housing Feature Implementation Notes
+#+DATE: 2026-04-12
+
+* Design decisions
+
+- Schema matches Uganda: =(t, i)= index, =Roof: str=, =Floor: str=.
+- Categorical string values (material names), not binary indicators.
+  Consumers wanting binary derive trivially: =df['Roof'] == 'Grass'=.
+- Labels normalized to Title Case for cross-wave consistency.
+
+* Malawi variable mapping
+
+| Wave    | Module | File                                    | i        | Roof   | Floor  |
+|---------+--------+-----------------------------------------+----------+--------+--------|
+| 2004-05 | G      | sec_g.dta                               | case_id  | g09    | g10    |
+| 2010-11 | F      | Full_Sample/Household/hh_mod_f.dta      | case_id  | hh_f08 | hh_f09 |
+| 2013-14 | F      | HH_MOD_F_13.dta                         | y2_hhid  | hh_f08 | hh_f09 |
+| 2016-17 | F      | Cross_Sectional/hh_mod_f.dta + Panel    | case_id  | hh_f08 | hh_f09 |
+| 2019-20 | F      | Cross_Sectional/HH_MOD_F.dta + Panel    | case_id  | hh_f08 | hh_f09 |
+
+Walls (=hh_f07= / =g08=) also available but excluded to match Uganda schema.
+
+* Canonical label mapping
+
+** Roof
+| Canonical        | 2004-05           | 2010-11          | 2013-14          | 2016-17          | 2019-20          |
+|------------------+-------------------+------------------+------------------+------------------+------------------|
+| Grass            | Grass/Palm leaves | Grass            | GRASS            | grass            | GRASS            |
+| Iron Sheets      | Iron sheets       | Iron sheets      | IRON SHEETS      | IRON SHEETS      | IRON SHEETS      |
+| Clay Tiles       | Clay tiles        | Clay tiles       | CLAY TILES       | CLAY TILES       | CLAY TILES       |
+| Plastic Sheeting | Plastic sheeting  | Plastic sheeting | ---              | PLASTIC SHEETING | PLASTIC SHEETING |
+| Concrete         | Concrete          | Concrete         | ---              | concrete         | CONCRETE         |
+| Other            | Other             | Other (specify)  | OTHER (SPECIFY)  | OTHER (SPECIFY)  | OTHER (SPECIFY)  |
+
+** Floor
+| Canonical     | 2004-05      | 2010-11        | 2013-14      | 2016-17       | 2019-20       |
+|---------------+--------------+----------------+--------------+---------------+---------------|
+| Smoothed Mud  | Smoothed mud | Smoothed mud   | SMOOTHED MUD | SMOOTHED MUD  | SMOOTHED MUD  |
+| Smooth Cement | Smooth cement| Smooth cement  | SMOOTH CEMENT| SMOOTH CEMENT | SMOOTH CEMENT |
+| Sand          | Sand         | Sand           | SAND         | sand          | SAND          |
+| Tile          | Tile         | Tile           | TILE         | tile          | TILE          |
+| Wood          | Wood         | Wood           | WOOD         | wood          | WOOD          |
+| Other         | Other        | Other (Specify)| ---          | OTHER(SPECIFY)| OTHER(SPECIFY)|
+
+* Notes for extending to other countries
+
+** Module letter is NOT stable across surveys
+   - Malawi: Module G (IHS2 2004-05), Module F (IHS3+ 2010--)
+   - Uganda: GSEC9 / GSEC11 (varies by wave)
+   - ALWAYS check the WB data dictionary: replace =get-microdata= with
+     =data-dictionary= in the catalog URL from =Documentation/SOURCE.org=.
+
+** Common Stata variables
+   Housing materials are typically 3 questions (walls, roof, floor) in one
+   module. Variable names follow the module prefix.
+
+** Case normalization
+   Label casing varies across waves even within the same country.
+   Use inline =mapping:= dicts in =data_info.yml= to normalize to Title Case.
+   Could consolidate into =categorical_mapping.org= tables named =Roof= and
+   =Floor= if the mapping grows unwieldy.
+
+** Cross_Sectional + Panel merge (Malawi 2016-17, 2019-20)
+   IHS4/IHS5 have separate CS and Panel files. Follow the =household_roster=
+   pattern: list both files with Panel overriding =i:= to the panel ID
+   (=y3_hhid=, =y4_hhid=).
+
+** Walls column
+   Data is available (=hh_f07= / =g08= in Malawi) but excluded from the
+   current schema to match Uganda. If added later, update =data_scheme.yml=
+   and add =Walls:= to each wave's =data_info.yml=.
