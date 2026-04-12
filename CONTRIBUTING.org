@@ -42,50 +42,79 @@
    This step will set up all the files managed by git in the local
    directory =LSMS_Library= on your machine.
 
-*** DVC Setup
-   DVC manages the versioning of more-or-less static datasets.
-   To install,
-   #+begin_src sh
-   pip install dvc[s3]
-   #+end_src
-The private key for accessing the data on google drive is found in the file =gdrive_data_store.json.gpg=.  The =gpg= string indicates that this file is encrypted, in this case using a secret passphrase.
+*** Read access: the WB Microdata API key
 
-Similarly, the private key for /accessing/ data on the s3 data store is found in =s3_reader_creds.gpg=.  This is encrypted using the same passphrase mentioned above. To learn the secret passphrase you'll need to ask
-   =ligon@berkeley.edu=.  Once you have it:    
+   The canonical path for contributors -- same as for end users -- is
+   a free World Bank Microdata Library API key.  A valid key both
+   proves acceptance of the WB terms of use and unlocks the S3 read
+   cache, so you only need to set up one credential:
 
+   1. Register at https://microdata.worldbank.org/ (free).
+   2. Accept the terms of use for the LSMS collections you need.
+   3. Get your API key from your account dashboard.
+   4. Create =~/.config/lsms_library/config.yml= with:
 
-   *Authentication via Python*   
-   
-   Use the helper function provided in the LSMS Library:   
-   
+      #+begin_src yaml
+      microdata_api_key: your_key_here
+      # data_dir: /path/to/override   # same as LSMS_DATA_DIR env var
+      #+end_src
+
+      or set =MICRODATA_API_KEY= as an environment variable.
+   5. On =import lsms_library=, the library validates the key and
+      auto-unlocks =~/.config/lsms_library/s3_creds= from the
+      bundled =s3_reader_creds.gpg=.  No further setup is required.
+
+   For each setting, an environment variable (e.g., =MICRODATA_API_KEY=,
+   =LSMS_DATA_DIR=, =LSMS_S3_CREDS=) takes precedence over the config
+   file.
+
+   In non-interactive environments (CI, Docker builds) set
+   =LSMS_SKIP_AUTH=1= to suppress the import-time authentication flow.
+   In that mode you are responsible for ensuring
+   =~/.config/lsms_library/s3_creds= exists (e.g. via a CI secret
+   mount) before the first data access.
+
+*** Write access for RAs
+
+   Contributors who need to push new materialized parquets or new
+   wave metadata to the S3 cache need writer credentials in addition
+   to the API key above.  The library detects write access via three
+   mechanisms, checked in order (see =lsms_library/data_access.py=,
+   function =_check_remote_access=):
+
+   1. =LSMS_S3_WRITE_KEY= / =LSMS_S3_WRITE_KEY_ID= environment
+      variables.  Preferred for shared machines: the writer-key pair
+      is scoped to this library and does not collide with any
+      workstation-global AWS credentials.
+   2. =AWS_ACCESS_KEY_ID= / =AWS_SECRET_ACCESS_KEY= environment
+      variables.  Standard boto3-style credentials, picked up if the
+      LSMS-specific vars are not set.
+   3. A =s3_write_creds= file alongside =s3_creds= in
+      =~/.config/lsms_library/=.  Legacy, kept for compatibility.
+
+   To request writer credentials, contact =ligon@berkeley.edu=.
+   Reader credentials come automatically from the WB API key flow
+   above; you only need to request the writer pair if you will be
+   materializing new waves.
+
+*** Interactive fallback: =ll.authenticate()=
+
+   The =ll.authenticate()= helper is a rarely-needed interactive
+   fallback for contributors who cannot register for a WB Microdata
+   API key.  It prompts for the shared passphrase that decrypts
+   =s3_reader_creds.gpg= and writes the plaintext to
+   =~/.config/lsms_library/s3_creds=.
+
    #+begin_src python
    import lsms_library as ll
    ll.authenticate()
    #+end_src
-   
-   You’ll be prompted to enter the secret passphrase (which you can request from =ligon@berkeley.edu=).  
-   If successful, this will unlock the credentials needed for DVC and allow you to access the data in the LSMS Library.
 
-   (If this doesn't work, make sure you have =gpg= installed: https://gnupg.org/download/)
+   To get the passphrase, contact =ligon@berkeley.edu=.  Make sure
+   you have =gpg= installed: https://gnupg.org/download/
 
-   *User configuration*
-
-   Library settings (including the World Bank Microdata API key) live in
-   =~/.config/lsms_library/config.yml=:
-
-   #+begin_src yaml
-   microdata_api_key: your_key_here
-   # data_dir: /path/to/override   # same as LSMS_DATA_DIR env var
-   #+end_src
-
-   For each setting, an environment variable (e.g., =MICRODATA_API_KEY=,
-   =LSMS_DATA_DIR=) takes precedence over the config file.  The
-   =ll.authenticate()= helper sets up DVC credentials; the config file
-   handles everything else.
-
-   In non-interactive environments (e.g., CI) you can suppress the automatic authentication prompt by setting
-   =LSMS_SKIP_AUTH=1= in the environment. When this flag is set you are responsible for running =ll.authenticate()=
-   manually before attempting to access protected datasets.
+   This path exists primarily for historical reasons; the
+   WB-API-key flow is the supported path for new users.
 
 *** Local virtual environment
    Keep project dependencies isolated so you can experiment without colliding with

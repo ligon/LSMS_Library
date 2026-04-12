@@ -20,11 +20,29 @@ Researchers typically spend weeks learning each new dataset's idiosyncrasies or 
 
 LSMS_Library provides an *abstraction layer* that gives you a consistent interface to work with any supported LSMS dataset. Instead of harmonizing the data itself (which loses information), we harmonize the /way you access/ the data.
 
-* Quick Start
+* Installation
+
+From PyPI (when available):
 
 #+begin_src bash
 pip install LSMS_Library
 #+end_src
+
+From github (current release):
+
+#+begin_src bash
+pip install git+https://github.com/ligon/LSMS_Library.git@v0.7.0
+#+end_src
+
+From a source checkout (for contributors):
+
+#+begin_src bash
+git clone https://github.com/ligon/LSMS_Library.git
+cd LSMS_Library
+poetry install
+#+end_src
+
+* Quick Start
 
 #+begin_src python
 import lsms_library as ll
@@ -41,11 +59,43 @@ roster.countries   # ['Burkina_Faso', 'Ethiopia', 'Mali', 'Uganda', ...]
 df = roster()      # Harmonized DataFrame across all countries
 #+end_src
 
-** Data Access
+* Data Access
 
-This library provides code for working with LSMS survey data.  The underlying microdata must be obtained directly from the [[https://microdata.worldbank.org/][World Bank Microdata Library]] under their terms of use.  Users are responsible for complying with the World Bank's data access agreements.
+This library abstracts over Living Standards Measurement Study (LSMS) survey data.  The underlying microdata belongs to the respective national statistics offices and the World Bank; users must accept the [[https://microdata.worldbank.org/][World Bank Microdata Library]]'s terms of use before accessing it.
 
-Contributors who wish to add new surveys should contact ligon@berkeley.edu to discuss the workflow.  You will need to establish [[https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key][GPG/PGP credentials]] for repository write access.
+** Authentication: the WB Microdata API key
+
+1. Register at https://microdata.worldbank.org/ (free).
+2. Accept the terms of use for the LSMS collections you want to access.
+3. Get your API key from your account dashboard.
+4. Create =~/.config/lsms_library/config.yml= with:
+
+   #+begin_src yaml
+   microdata_api_key: your_key_here
+   # data_dir: /path/to/override   # same as LSMS_DATA_DIR env var
+   #+end_src
+
+   or set =MICRODATA_API_KEY= as an environment variable.
+5. On =import lsms_library=, the library validates your key against the WB catalog and automatically unlocks access to the S3 read cache.  No further setup is required.
+
+** The S3 cache
+
+Once your WB API key is validated, the library unlocks a read-only S3 cache that mirrors the WB Microdata downloads.  This is a convenience -- the S3 cache is faster than the WB NADA API and reduces load on the WB service -- but it is not a separate access layer.  The WB terms of use are the authoritative gate; the S3 cache just provides the same data faster.
+
+Decrypted plaintext credentials are written to =~/.config/lsms_library/s3_creds= (or the path in the =LSMS_S3_CREDS= environment variable), not into the package tree -- so the library is safe to install from a wheel into a read-only site-packages directory.
+
+** Non-interactive environments
+
+In CI, Docker builds, or other non-interactive contexts, set =LSMS_SKIP_AUTH=1= to suppress the import-time authentication flow.  In that mode you are responsible for ensuring =~/.config/lsms_library/s3_creds= exists (e.g. via a CI secret mount) before the first data access.
+
+** Data cache location
+
+Parquet caches materialize under the platform-appropriate user data directory:
+
+- Linux: =~/.local/share/lsms_library/= by default
+- Override with =LSMS_DATA_DIR= env var or =data_dir= in =config.yml=
+
+See the [[https://ligon.github.io/LSMS_Library/guide/caching/][caching guide]] for details on =trust_cache=, the =Country= and =Feature= classes, and per-country build methods.
 
 * Documentation
 
