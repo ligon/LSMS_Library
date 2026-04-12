@@ -9,8 +9,11 @@ import os
 import pytest
 import pandas as pd
 
-# Allow overriding build backend via env; default to make to avoid DVC locks
-os.environ.setdefault("LSMS_BUILD_BACKEND", "make")
+# NOTE: pre-v0.7.0 this set LSMS_BUILD_BACKEND=make "to avoid DVC locks".
+# That advice is now harmful: it bypasses the L2 parquet cache and forces
+# a full .dta rebuild on every sample() call, turning the 310-test suite
+# into hours of work.  Since v0.7.0 the default "dvc" backend short-
+# circuits on warm cache (country.py:1758) without touching DVC locks.
 
 import lsms_library as ll
 from lsms_library.paths import COUNTRIES_ROOT
@@ -38,6 +41,13 @@ SAMPLE_COUNTRIES = _countries_with_sample()
 # xfailed for these.
 NO_WEIGHT_COUNTRIES = {"China", "Kazakhstan", "Pakistan"}
 
+# Countries whose microdata is not available in this checkout.  Nepal is
+# NSO-hosted (https://microdata.nsonepal.gov.np/) and requires free
+# registration; Armenia's .dta files haven't been downloaded.  See the
+# "Countries Without Microdata" table in CLAUDE.md.  Calling sample()
+# on these takes ~6 minutes to fail on the fallback path — skip instead.
+NO_DATA_COUNTRIES = {"Nepal", "Armenia"}
+
 
 _sample_cache: dict[str, pd.DataFrame | None] = {}
 
@@ -63,6 +73,8 @@ class TestSample:
     @pytest.fixture()
     def sample_df(self, country_name):
         """Build sample() once per country (cached across tests)."""
+        if country_name in NO_DATA_COUNTRIES:
+            pytest.skip(f"{country_name}: microdata not available (see CLAUDE.md)")
         df = _get_sample(country_name)
         if df is None:
             pytest.skip(f"{country_name}.sample() could not be built (missing data or DVC error)")
