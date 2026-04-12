@@ -168,3 +168,30 @@ individual_education:
             - s01q
     myvars:
         Educational Attainment: s01q06
+
+housing:
+    file: EACIMEN_p1.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        Roof:
+            - s07q11
+            - mapping:
+                Tôle: Iron Sheets
+                Banco: Adobe
+                Dalle en ciment: Concrete Slab
+                Paille: Thatch
+                Nattes: Mats
+                Chaume: Straw
+                Tuile: Clay Tiles
+                Autre: Other
+        Floor:
+            - s07q12
+            - mapping:
+                Terre battue/Sable: Earth
+                Carreaux/Béton: Tiles
+                Ciment/Marbre: Cement
+                Bouse d'animaux: Dung
+                Autre: Other

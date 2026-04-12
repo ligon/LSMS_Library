@@ -119,6 +119,33 @@ interview_date:
         Int_t: s00q23a
     
 
+housing:
+    file: s11_me_mli2021.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        Roof:
+            - s11q19
+            - mapping:
+                Dalle en ciment: Concrete Slab
+                Tuile: Clay Tiles
+                Tôles: Iron Sheets
+                Paille: Thatch
+                Banco: Adobe
+                Chaume: Straw
+                Nattes: Mats
+                'Autre (à préciser)': Other
+        Floor:
+            - s11q20
+            - mapping:
+                Carreaux/Marbre: Tiles
+                Ciment/Béton: Cement
+                Terre battue/Sable: Earth
+                Bouse d'animaux: Dung
+                Autre: Other
+
 assets:
     file: s12_me_mli2021.dta
     idxvars:
