@@ -24,7 +24,7 @@ PYTEST_WORKERS ?= $(or $(SLURM_CPUS_ON_NODE),$(shell nproc 2>/dev/null || echo 1
 #   make test PYTEST_WORKERS=4
 PYTEST_ARGS ?= -n $(PYTEST_WORKERS) --dist=loadfile
 
-.PHONY: setup test build release clean help
+.PHONY: setup test test-full build release clean help
 
 setup: .venv/pyvenv.cfg
 
@@ -34,6 +34,9 @@ setup: .venv/pyvenv.cfg
 
 test: setup
 	$(POETRY) run pytest $(PYTEST_ARGS)
+
+test-full: setup
+	LSMS_NO_CACHE=1 $(POETRY) run pytest $(PYTEST_ARGS) --rebuild
 
 build: setup
 	$(POETRY) build
@@ -78,7 +81,8 @@ clean:
 help:
 	@echo "Top-level targets:"
 	@echo "  setup    Install dependencies via Poetry"
-	@echo "  test     Run pytest suite (parallel; override with PYTEST_ARGS)"
+	@echo "  test     Run pytest suite (fast tier, uses L2 parquet cache)"
+	@echo "  test-full  Run pytest with cold cache (LSMS_NO_CACHE=1 --rebuild)"
 	@echo "  build    Build distribution"
 	@echo "  release  Tag & build a release (make release v=0.6.0)"
 	@echo "  clean    Remove build artifacts"
