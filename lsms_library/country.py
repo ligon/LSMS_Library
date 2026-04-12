@@ -2290,26 +2290,39 @@ def _expand_kinship(df: pd.DataFrame) -> pd.DataFrame:
     gen = []
     dist = []
     aff = []
+    rel = []
     unknown = set()
 
+    # Exact-match NA sentinels.  Do NOT lowercase-fold: "Nan" is British
+    # English for grandmother in some contexts.  Explicit kinship.yml
+    # mappings are checked FIRST, so if a survey legitimately uses "Nan"
+    # as a label, adding it to kinship.yml overrides this sentinel list.
+    _NA_SENTINELS = ('', '<NA>', 'nan', 'Nan', 'NaN', 'NAN', 'None', 'NaT')
     for val in df["Relationship"]:
-        if pd.isna(val) or str(val).strip() in ('', '<NA>', 'nan', 'None'):
-            gen.append(pd.NA)
-            dist.append(pd.NA)
-            aff.append(pd.NA)
+        # True NA (not a string): always NA.
+        if pd.isna(val):
+            gen.append(pd.NA); dist.append(pd.NA); aff.append(pd.NA)
+            rel.append(pd.NA)
             continue
         label = str(val).strip().title()
-        tup = kinship.get(label) or kinship.get(str(val).strip())
+        stripped = str(val).strip()
+        # Explicit mapping wins over sentinel list.
+        tup = kinship.get(label) or kinship.get(stripped)
         if tup is not None:
-            gen.append(tup[0])
-            dist.append(tup[1])
-            aff.append(tup[2])
-        else:
-            unknown.add(str(val).strip())
-            gen.append(pd.NA)
-            dist.append(pd.NA)
-            aff.append(pd.NA)
+            gen.append(tup[0]); dist.append(tup[1]); aff.append(tup[2])
+            rel.append(val)
+            continue
+        # Unmapped and matches an NA sentinel: treat as NA silently.
+        if stripped in _NA_SENTINELS:
+            gen.append(pd.NA); dist.append(pd.NA); aff.append(pd.NA)
+            rel.append(pd.NA)
+            continue
+        # Unmapped and not a sentinel: warn and NA.
+        unknown.add(stripped)
+        gen.append(pd.NA); dist.append(pd.NA); aff.append(pd.NA)
+        rel.append(val)
 
+    df["Relationship"] = pd.array(rel, dtype=pd.StringDtype())
     df["Generation"] = pd.array(gen, dtype=pd.Int64Dtype())
     df["Distance"] = pd.array(dist, dtype=pd.Int64Dtype())
     df["Affinity"] = pd.array(aff, dtype=pd.StringDtype())
