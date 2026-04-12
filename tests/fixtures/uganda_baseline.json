@@ -2019,21 +2019,20 @@
   },
   "var/housing.parquet": {
     "columns": [
-      "Earthen floor",
-      "Thatched roof"
+      "Floor",
+      "Roof"
     ],
-    "content_hash": "946036bb6cd03a4fbfa6ff132ea505a721810fc4915c323d261fbcca5121f026",
+    "content_hash": "aa027a50167a6f2c6570c2f73d4dcd78a2a2c95f6b0f6fecc366455dce14f815",
     "dtypes": {
-      "Earthen floor": "float64",
-      "Thatched roof": "float64"
+      "Floor": "object",
+      "Roof": "object"
     },
     "index_names": [
-      "i",
       "t",
-      "m"
+      "i"
     ],
     "shape": [
-      16173,
+      24290,
       2
     ]
   },
