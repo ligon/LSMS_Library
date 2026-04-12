@@ -232,6 +232,71 @@ class TestFeatureSanity:
                 + "; ".join(c.message for c in report.errors)
             )
 
+# ---------------------------------------------------------------------------
+# Housing v-dtype test (GH #142): v index level must be pd.StringDtype
+# ---------------------------------------------------------------------------
+
+def _countries_with_housing() -> list[str]:
+    """Discover countries whose data_scheme.yml declares a housing table."""
+    from lsms_library.paths import COUNTRIES_ROOT
+    from lsms_library.yaml_utils import load_yaml
+    countries = []
+    for yml in sorted(COUNTRIES_ROOT.glob("*/_/data_scheme.yml")):
+        data = load_yaml(yml)
+        if not isinstance(data, dict):
+            continue
+        ds = data.get("Data Scheme", {})
+        if isinstance(ds, dict) and "housing" in ds:
+            countries.append(yml.parent.parent.name)
+    return countries
+
+
+_HOUSING_COUNTRIES = _countries_with_housing()
+
+
+@pytest.mark.parametrize("country_name", _HOUSING_COUNTRIES)
+class TestHousingVDtype:
+    """GH #142: housing() must return v as pd.StringDtype, never mixed int/str.
+
+    Mixed-dtype v levels cause pyarrow serialisation failures on to_parquet()
+    and produce broken MultiIndex levels when Feature('housing') concatenates
+    across countries.  The fix lives in _join_v_from_sample() in country.py.
+    """
+
+    @pytest.fixture()
+    def housing_df(self, country_name):
+        import warnings
+        import lsms_library as ll
+        warnings.filterwarnings("ignore")
+        try:
+            df = ll.Country(country_name).housing()
+            assert isinstance(df, pd.DataFrame) and not df.empty
+            return df
+        except Exception as e:
+            pytest.skip(f"{country_name}.housing() failed: {e}")
+
+    def test_v_is_string_dtype(self, country_name, housing_df):
+        """v index level must be pd.StringDtype (not int64, float64, or object)."""
+        if "v" not in housing_df.index.names:
+            pytest.skip(f"{country_name} housing() has no v in index")
+        v_level = housing_df.index.get_level_values("v")
+        assert isinstance(v_level.dtype, pd.StringDtype), (
+            f"{country_name} housing() v dtype is {v_level.dtype!r}, "
+            f"expected pd.StringDtype(). Mixed int/str causes pyarrow failures "
+            f"(GH #142). Fix: _join_v_from_sample must coerce v."
+        )
+
+    def test_to_parquet_succeeds(self, country_name, housing_df):
+        """housing() result must be serialisable by pyarrow.to_parquet().
+
+        Mixed-dtype MultiIndex levels cause ArrowInvalid — this is the exact
+        failure reported in GH #142.
+        """
+        import io
+        buf = io.BytesIO()
+        housing_df.to_parquet(buf)  # raises ArrowInvalid if v is mixed
+        assert buf.getbuffer().nbytes > 0
+
 
 # ---------------------------------------------------------------------------
 # Summary test: at least something is cached

@@ -80,6 +80,20 @@ class TestSample:
             f"{country_name} sample missing 'v' column; has {list(sample_df.columns)}"
         )
 
+    def test_v_is_string_dtype(self, country_name, sample_df):
+        """v must be pd.StringDtype so that _join_v_from_sample produces a
+        uniform string index level regardless of source wave encoding.
+        Mixed int/str in the v index level causes pyarrow failures when
+        the caller does df.to_parquet() — GH #142.
+        """
+        if "v" not in sample_df.columns:
+            pytest.skip(f"{country_name} has no v column")
+        actual = sample_df["v"].dtype
+        assert isinstance(actual, pd.StringDtype), (
+            f"{country_name} sample 'v' dtype is {actual!r}, expected pd.StringDtype(). "
+            f"Fix the wave-level extraction script to use format_id() on idxvars."
+        )
+
     def test_v_mostly_populated(self, country_name, sample_df):
         """v should be non-null for nearly all rows."""
         v_null_rate = sample_df["v"].isna().mean()
