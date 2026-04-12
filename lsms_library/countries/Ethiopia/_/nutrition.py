@@ -40,7 +40,7 @@ q['q_sum'] = q.sum(axis=1)
 #q = q[['q_sum']].droplevel('units').reset_index()
 q = q[['q_sum']].reset_index()
 
-final_q = q.pivot_table(index = ['j','t','m'], columns = 'i', values = 'q_sum')
+final_q = q.pivot_table(index = ['j','t'], columns = 'i', values = 'q_sum')
 
 #cross-filter two dfs to align matrices; replace NaN values with 0 
 list1 = final_q.columns.values.tolist()
