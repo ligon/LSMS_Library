@@ -487,3 +487,80 @@ Lodger:                                  [0, 0, guest]
 "Outros parentes do CAF/cônjuge":        [0, 0, consanguineal]
 "Pessoa não aparentada com o CAF/cônjuge": [0, 0, unrelated]
 "Empregado(a) doméstico(a) ou parente do empregado(a) doméstico(a)": [0, 0, servant]
+
+# --- Stata numbered value labels (unknown country; likely Serbia/Kazakhstan/South Africa) ---
+# Labels include a numeric prefix from the Stata value-label numbering.
+"1. Head":                               [0, 0, consanguineal]
+"2. Spouse":                             [0, 0, affinal]
+"3. Son/Daughter":                       [-1, 0, consanguineal]
+"4. Grandchild":                         [-2, 0, consanguineal]
+"5. Father/Mother":                      [1, 0, consanguineal]
+"6. Sister/Brother":                     [0, 1, consanguineal]
+"7. Niece/Nephew":                       [-1, 1, consanguineal]
+"8. Uncle/Aunt":                         [1, 1, consanguineal]
+"9. Son/Daughter-in-Law":               [-1, 0, affinal]
+"10. Father/month-in-Law":               [1, 0, affinal]   # "month" is a typo for "mother" in source data
+"11. Brother/Sister-in-Law":             [0, 1, affinal]
+"12. Grandparent":                       [2, 0, consanguineal]
+"13. Other Relative":                    [0, 0, consanguineal]
+"14. Servant":                           [0, 0, servant]
+"15. Non Relative":                      [0, 0, unrelated]
+Father/month-in-Law:                     [1, 0, affinal]   # same typo without numeric prefix
+
+# --- Punctuation / spacing variants (Kazakhstan, Tajikistan, South Africa) ---
+"Adopted / Foster/ Step Child":          [-1, 0, step]
+"Brother/sister in-law":                 [0, 1, affinal]
+"Brother / sister-in-law":              [0, 1, affinal]
+"Brother/Sister in-law":                 [0, 1, affinal]
+"brother /sister-in-law":               [0, 1, affinal]
+"Child (Son/Daughter)":                  [-1, 0, consanguineal]
+"Child / Adopted Child":                 [-1, 0, consanguineal]
+"Child / adopted child":                 [-1, 0, consanguineal]
+"child - adopted child":                 [-1, 0, consanguineal]
+"child / adopted child":                 [-1, 0, consanguineal]
+"Father / Mother":                       [1, 0, consanguineal]
+"father - mother":                       [1, 0, consanguineal]
+"Father/mother in-law":                  [1, 0, affinal]
+"grandfather /mother":                   [2, 0, consanguineal]
+"House Help (Non-Relative)":             [0, 0, servant]
+Househelp:                               [0, 0, servant]
+"Househelp (Other Relative)":            [0, 0, servant]
+"Niece / Nephew":                        [-1, 1, consanguineal]
+"niece - nephew":                        [-1, 1, consanguineal]
+Non_Relative:                            [0, 0, unrelated]
+"Others not related":                    [0, 0, unrelated]
+"Parent/Parent-In-Law":                  [1, 0, consanguineal]
+Parent/Parentlaw:                        [1, 0, consanguineal]
+Partner:                                 [0, 0, affinal]
+"Sister / Brother":                      [0, 1, consanguineal]
+"sister - brother":                      [0, 1, consanguineal]
+"Son / Daugheter-in-law":               [-1, 0, affinal]   # "Daugheter" is a typo in source data
+Son/Daughterlaw:                         [-1, 0, affinal]
+"son-daughter in law":                   [-1, 0, affinal]
+"Spouse / Partner":                      [0, 0, affinal]
+Spouse/Partner:                          [0, 0, affinal]
+"Spouse (Wife/Husband)":                 [0, 0, affinal]
+"spouse -partner":                       [0, 0, affinal]
+
+# --- "of head of household" patterns (Tajikistan) ---
+"brother/sister or brother/sister-in-law of head of household": [0, 1, consanguineal]
+"child of head of household/spouse, partner":                   [-1, 0, consanguineal]
+"grandson/daughter of head of household/spouse, partner":       [-2, 0, consanguineal]
+"parent of head of household/spouse, partner":                  [1, 0, consanguineal]
+"spouse, partner":                                              [0, 0, affinal]
+"spouse/partner":                                               [0, 0, affinal]
+"other relation":                                               [0, 0, consanguineal]
+unrelated:                                                      [0, 0, unrelated]
+"father/mother of husband":                                     [1, 0, affinal]
+"father/mother of wife":                                        [1, 0, affinal]
+
+# --- Spanish lowercase variants (Guatemala ENCOVI) ---
+# Lowercase ñ / Ñ encoding variants of labels already present in the Spanish section.
+"cuÑado (a)":                            [0, 1, affinal]
+"esposo (a) o compaÑero (a)":           [0, 0, affinal]
+
+# --- Mali EHCVM encoding artifacts (title-case truncated labels) ---
+# Consistent with lowercase "Chef de m", "p", "Personne non apparent" already mapped above.
+"Chef De M":                             [0, 0, consanguineal]
+P:                                       [1, 0, consanguineal]   # low-confidence: "Père" or "Personne"; see lowercase "p" above
+"Personne Non Apparent":                 [0, 0, unrelated]
