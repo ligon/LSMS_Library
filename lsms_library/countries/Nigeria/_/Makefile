@@ -125,3 +125,24 @@ interview_date_parquet := $(interview_date:.py=.parquet)
 
 $(VAR_DIR)/interview_date.parquet: interview_date.py $(interview_date_parquet)
 	python interview_date.py
+
+housing = $(shell find $(rounds) -name housing.py)
+housing_parquet := $(housing:.py=.parquet)
+
+$(VAR_DIR)/housing.parquet: housing.py $(housing_parquet)
+	python housing.py
+
+../2010-11/_/housing.parquet: ../2010-11/_/housing.py
+	(cd ../2010-11/_; python housing.py)
+
+../2012-13/_/housing.parquet: ../2012-13/_/housing.py
+	(cd ../2012-13/_; python housing.py)
+
+../2015-16/_/housing.parquet: ../2015-16/_/housing.py
+	(cd ../2015-16/_; python housing.py)
+
+../2018-19/_/housing.parquet: ../2018-19/_/housing.py
+	(cd ../2018-19/_; python housing.py)
+
+../2023-24/_/housing.parquet: ../2023-24/_/housing.py
+	(cd ../2023-24/_; python housing.py)

@@ -60,4 +60,10 @@ Data Scheme:
     int_t: datetime
     materialize: make
 
+  housing:
+    index: (t, i)
+    Roof: str
+    Floor: str
+    materialize: make
+
   nonfood_expenditures: !make
