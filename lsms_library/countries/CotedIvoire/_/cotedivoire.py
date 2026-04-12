@@ -1,84 +1,73 @@
-from lsms.tools import get_food_prices, get_food_expenditures, get_household_roster
-
-import pandas as pd
-import dvc.api
+# Formatting Functions for CotedIvoire
 import numpy as np
-
-def harmonized_food_labels(fn='../../_/food_items.org'):
-    # Harmonized food labels
-    food_items = pd.read_csv(fn,delimiter='|',skipinitialspace=True,converters={1:int,2:lambda s: s.strip()})
-    food_items.columns = [s.strip() for s in food_items.columns]
-    food_items = food_items[['Code','Preferred Label']].dropna()
-    food_items = food_items.set_index('Code')
-
-    return food_items.to_dict()['Preferred Label']
-    
-
-def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market',farmgate='farmgate'):
-
-    food_items = harmonized_food_labels(fn='../../_/food_items.org')
-
-    # Unit labels
-    with dvc.api.open(fn,mode='rb') as dta:
-        sr = pd.io.stata.StataReader(dta)
-        try:
-            unitlabels = sr.value_labels()[units]
-        except KeyError: # No guarantee that keys for labels match variables!?
-            foo = sr.value_labels()
-            key = [k for k,v in foo.items() if 'Kilogram' in [u[:8] for l,u in v.items()]][0]
-            unitlabels = sr.value_labels()[key]
-
-    # Prices
-    with dvc.api.open(fn,mode='rb') as dta:
-        prices,itemlabels=get_food_prices(dta,itmcd=item,HHID=HHID, market=market,
-                                          farmgate=farmgate,units=units,itemlabels=food_items)
-
-    prices = prices.replace({'units':unitlabels})
-    prices.units = prices.units.astype(str)
-
-    pd.Series(unitlabels).to_csv('unitlabels.csv')
-
-    return prices
+import lsms_library.local_tools as tools
 
 
-def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,item='item',HHID='HHID'):
-    food_items = harmonized_food_labels(fn='../../_/food_items.org')
+def i(value):
+    '''
+    Formatting household id: concatenate grappe + zero-padded menage.
+    Compound key [grappe, menage] -> string like "1001001".
+    '''
+    return tools.format_id(value.iloc[0]) + tools.format_id(value.iloc[1], zeropadding=3)
 
-    # expenditures
-    with dvc.api.open(fn,mode='r') as f:
-        expenditures,itemlabels=get_food_expenditures(f,purchased,away,produced,given,itmcd=item,HHID=HHID,itemlabels=food_items,fn_type='csv')
 
-    expenditures.columns.name = 'i'
-    expenditures.index.name = 'j'
-    expenditures = expenditures.replace(0, np.nan)
+# Coping strategy labels (EHCVM standard for CotedIvoire)
+_COPING_LABELS = {
+    1: "Utilisation de son épargne",
+    2: "Aide de parents ou d'amis",
+    3: "Aide du gouvernement/l'Etat",
+    4: "Aide d'organisations religieuses ou d'ONG",
+    5: "Marier les enfants",
+    6: "Changement des habitudes de consommation",
+    7: "Achat d'aliments moins chers",
+    8: "Membres actifs ont pris des emplois supplémentaires",
+    9: "Membres adultes inactifs/chômeurs ont pris des emplois",
+    10: "Enfants de moins de 15 ans amenés à travailler",
+    11: "Les enfants ont été déscolarisés",
+    12: "Migration de membres du ménage",
+    13: "Réduction des dépenses de santé/d'éducation",
+    14: "Obtention d'un crédit",
+    15: "Vente des actifs agricoles",
+    16: "Vente des biens durables du ménage",
+    17: "Vente de terrain/immeubles/Maisons",
+    18: "Louer/mettre ses terres en gages",
+    19: "Vente du stock de vivres",
+    20: "Pratique plus importante des activités de pêche",
+    21: "Vente de bétail",
+    22: "Confiage des enfants à d'autres ménages",
+    23: "Engagé dans des activités spirituelles",
+    24: "Pratique de la culture de contre saison",
+    25: "Autre stratégie",
+    26: "Aucune stratégie",
+}
 
-    return expenditures
 
-def food_quantities(fn='',item='item',HHID='HHID',
-                    purchased=None,away=None,produced=None,given=None,units=None):
-    food_items = harmonized_food_labels(fn='../../_/food_items.org')
+def shocks(df):
+    '''
+    Post-process shocks DataFrame: collapse Cope1..Cope26 binary columns into
+    HowCoped0, HowCoped1, HowCoped2 (top-3 coping strategies per shock-HH row).
+    '''
+    cope_cols = [c for c in df.columns if c.startswith('Cope')]
 
-        # Prices
-    with dvc.api.open(fn,mode='rb') as dta:
-        quantities,itemlabels=get_food_expenditures(dta,purchased,away,produced,given,
-                                                    itmcd=item,HHID=HHID,units=units,itemlabels=food_items,fn_type='csv')
-    quantities.columns.name = 'i'
-    quantities.index.name = 'j'
-    quantities = quantities.replace(0, np.nan)
+    how_coped = {0: [], 1: [], 2: []}
+    for _, row in df[cope_cols].iterrows():
+        found = []
+        for c in cope_cols:
+            num = int(c.replace('Cope', ''))
+            val = row[c]
+            try:
+                val = float(val)
+            except (ValueError, TypeError):
+                continue
+            if val >= 1:
+                found.append(_COPING_LABELS.get(num, f'Strategy {num}'))
+            if len(found) == 3:
+                break
+        for k in range(3):
+            how_coped[k].append(found[k] if k < len(found) else np.nan)
 
-    return quantities
-
-def household_characteristics(fn='',sex='',age='',HHID='HHID',months_spent='months_spent'):
-
-    if type(sex) in [list,tuple]:
-        sex,sex_converter = sex
-    else:
-        sex_converter = None
-
-    with dvc.api.open(fn,mode='rb') as dta:
-        df = get_household_roster(dta,sex=sex,sex_converter=sex_converter,age=age,HHID=HHID,months_spent=months_spent,fn_type='csv')
-
+    df['HowCoped0'] = how_coped[0]
+    df['HowCoped1'] = how_coped[1]
+    df['HowCoped2'] = how_coped[2]
+    df = df.drop(columns=cope_cols)
     return df
-
-    
-    
