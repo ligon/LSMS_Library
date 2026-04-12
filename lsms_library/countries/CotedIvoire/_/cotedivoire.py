@@ -1,5 +1,6 @@
 # Formatting Functions for CotedIvoire
 import numpy as np
+import pandas as pd
 import lsms_library.local_tools as tools
 
 
@@ -46,10 +47,14 @@ def shocks(df):
     '''
     Post-process shocks DataFrame: collapse Cope1..Cope26 binary columns into
     HowCoped0, HowCoped1, HowCoped2 (top-3 coping strategies per shock-HH row).
+
+    HowCoped2 is omitted from the output when no household used 3+ strategies
+    (all-null column), since it would fail structural sanity checks and provides
+    no information.  It is declared optional in data_scheme.yml.
     '''
     cope_cols = [c for c in df.columns if c.startswith('Cope')]
 
-    how_coped = {0: [], 1: [], 2: []}
+    how_coped: dict[int, list] = {0: [], 1: [], 2: []}
     for _, row in df[cope_cols].iterrows():
         found = []
         for c in cope_cols:
@@ -64,10 +69,15 @@ def shocks(df):
             if len(found) == 3:
                 break
         for k in range(3):
-            how_coped[k].append(found[k] if k < len(found) else np.nan)
+            how_coped[k].append(found[k] if k < len(found) else pd.NA)
 
-    df['HowCoped0'] = how_coped[0]
-    df['HowCoped1'] = how_coped[1]
-    df['HowCoped2'] = how_coped[2]
+    df['HowCoped0'] = pd.array(how_coped[0], dtype='string')
+    df['HowCoped1'] = pd.array(how_coped[1], dtype='string')
+    hc2 = pd.array(how_coped[2], dtype='string')
+    if hc2.isna().all():
+        # No household used 3+ strategies — omit rather than write an all-null column.
+        pass
+    else:
+        df['HowCoped2'] = hc2
     df = df.drop(columns=cope_cols)
     return df
