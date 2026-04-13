@@ -40,8 +40,11 @@ household_roster:
         v: clustnum
         i: hhid
         pid: pcode
-    myvars: 
-        Sex: gender_c
+    myvars:
+        Sex:
+            - gender_c
+            - mapping:
+                '-1': ~      # sentinel for missing — null out
         Age: age
         Relationship: 
             - rel_head
