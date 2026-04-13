@@ -15,7 +15,8 @@ env/
 /.virtualenv/
 
 # Poetry specific
-.venv/
+.venv
+.venv.lustre/
 
 # Others
 .DS_Store
