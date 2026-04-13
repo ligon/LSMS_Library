@@ -4,8 +4,16 @@ import sys
 sys.path.append('../../../_/')
 from lsms_library.local_tools import df_data_grabber, to_parquet
 
-idxvars = dict(j='r_hhid',
-                t=('round', lambda x: "2008-15"))
+# Round-to-wave mapping matches the convention in 2008-15/_/shocks.py
+# and 2008-15/_/sample.py: each integer round becomes the corresponding
+# year-string wave label so that (i, t) is unique per (household, round).
+# Without this map every round collapses onto t='2008-15' and 4 visits
+# of the same household end up under one (i, t) key — a 68% duplicate
+# rate, breaking test_no_duplicate_rows[Tanzania/interview_date].
+round_match = {1: '2008-09', 2: '2010-11', 3: '2012-13', 4: '2014-15'}
+
+idxvars = dict(i='r_hhid',
+                t=('round', lambda x: round_match.get(x, x)))
 
 
 myvars = dict(year=('ha_18_3', lambda x: pd.to_numeric(x, errors='coerce')),

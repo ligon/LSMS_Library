@@ -4,7 +4,7 @@ import sys
 sys.path.append('../../../_/')
 from lsms_library.local_tools import df_data_grabber, to_parquet
 
-idxvars = dict(j='y5_hhid',
+idxvars = dict(i='y5_hhid',
                 t=('y5_rural', lambda x: "2020-21"))
 #myvars = dict(date='Int_End')
 myvars=dict(date='hh_a18') #start date
