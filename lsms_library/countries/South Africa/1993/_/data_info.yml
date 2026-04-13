@@ -45,10 +45,16 @@ household_roster:
             - gender_c
             - mapping:
                 '-1': ~      # sentinel for missing — null out
-        Age: age
-        Relationship: 
+        Age:
+            - age
+            - mapping:
+                -4: ~          # sentinel for missing — null out
+                -3: ~          # sentinel for missing — null out
+                -1: ~          # sentinel for missing — null out
+        Relationship:
             - rel_head
             - mapping:
+                '-1': ~        # sentinel for missing — null out
                 1: "Resident Head"
                 2: "Absent Head"
                 3: "Wife or husband or partner"
