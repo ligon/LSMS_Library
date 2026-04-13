@@ -17,7 +17,6 @@ Index Info:
     household_characteristics: (t, v, i, m)
     plot_features: (t, v, i, plot_id)
     food_acquired: (t, m, v, i, j, u)
-    nonfood_acquired: (t, v, i, j)
     interview_date: (t, v, i)
     shocks: (t, i, Shock)
     panel_ids: (t, i)
