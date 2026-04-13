@@ -78,6 +78,7 @@ UGANDA_ROOT = _find_uganda_root()
 # differ in ways that DO matter (NaN handling, arithmetic behavior).
 _DTYPE_EQUIVALENCE = {
     'object': 'string',
+    'str': 'string',          # some extraction paths write bare 'str'
     'string[python]': 'string',
     'string[pyarrow]': 'string',
 }
