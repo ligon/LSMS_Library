@@ -38,8 +38,14 @@ Columns:
       type: str
       required: true
       spellings:
-        M: [Male, male, Masculin, masculin, Homme, homme, m, MALE]
-        F: [Female, female, Féminin, feminin, Femme, femme, f, FEMALE]
+        # English / French covered by the original list; Portuguese
+        # (Masculino / Feminino) added for Guinea-Bissau; Spanish
+        # (masculino / femenino, lowercase) for Guatemala; bare
+        # 'Feminin' (capital, no accent) for Burkina_Faso.
+        M: [Male, male, Masculin, masculin, Homme, homme, m, MALE,
+            Masculino, masculino]
+        F: [Female, female, Féminin, feminin, Femme, femme, f, FEMALE,
+            Feminin, Feminino, femenino]
     Age:
       type: int
       required: true
