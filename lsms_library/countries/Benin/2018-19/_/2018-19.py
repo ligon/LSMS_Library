@@ -31,9 +31,13 @@ COPING_LABELS = {
 
 
 def shocks(df):
+    # Benin 2018-19 records at most 2 coping strategies per household.
+    # (A probe over the full survey shows no household with a third
+    # strategy flagged; HowCoped2 would be all-NaN and is therefore
+    # not declared in data_scheme.yml.)
     cope_cols = [c for c in df.columns if c.startswith('Cope')]
 
-    how_coped = {0: [], 1: [], 2: []}
+    how_coped = {0: [], 1: []}
     for _, row in df[cope_cols].iterrows():
         found = []
         for c in cope_cols:
@@ -45,13 +49,12 @@ def shocks(df):
                 continue
             if val >= 1:
                 found.append(COPING_LABELS.get(num, f'Strategy {num}'))
-            if len(found) == 3:
+            if len(found) == 2:
                 break
-        for k in range(3):
+        for k in range(2):
             how_coped[k].append(found[k] if k < len(found) else np.nan)
 
     df['HowCoped0'] = how_coped[0]
     df['HowCoped1'] = how_coped[1]
-    df['HowCoped2'] = how_coped[2]
     df = df.drop(columns=cope_cols)
     return df
