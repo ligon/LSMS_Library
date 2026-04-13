@@ -42,9 +42,14 @@ UGANDA_TABLES = [
 
 @pytest.mark.parametrize("table", UGANDA_TABLES)
 def test_uganda_makefile_backfill(table):
+    # Exercise the default (cache + YAML) build path, not LSMS_BUILD_BACKEND=make.
+    # The Makefile backfill path is legacy; as of v0.7.0 all data loading goes
+    # through the cache + load_from_waves path, and the DVC stage layer is
+    # retired (see CLAUDE.md).  Invoking it here silently hangs Uganda's
+    # cluster_features rebuild, and also leaks LSMS_BUILD_BACKEND into later
+    # tests in the same xdist worker (breaking test_fallback_path_uses_wave_data_scheme).
     if not _has_cached_table("Uganda", table):
         pytest.skip(f"Uganda/{table} not cached (requires data build)")
-    os.environ.setdefault("LSMS_BUILD_BACKEND", "make")
     country = ll.Country("Uganda", preload_panel_ids=False, verbose=False)
     method = getattr(country, table)
     result = method()

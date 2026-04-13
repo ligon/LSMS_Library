@@ -66,6 +66,26 @@ def _fingerprint(df: pd.DataFrame) -> dict:
 BASELINE = _load_baseline()
 UGANDA_ROOT = _find_uganda_root()
 
+
+# Canonical dtype equivalence for invariance comparison.  pandas 3.0 is
+# migrating string-holding columns from 'object' (generic Python object
+# storage) to explicit 'string' dtype; both spellings represent the same
+# logical type for our purposes, and baselines captured at different
+# points in that migration should not be treated as divergent.
+#
+# Conservative on purpose: we deliberately do NOT collapse int64↔Int64
+# or float64↔Float64, since nullable vs. non-nullable numeric semantics
+# differ in ways that DO matter (NaN handling, arithmetic behavior).
+_DTYPE_EQUIVALENCE = {
+    'object': 'string',
+    'string[python]': 'string',
+    'string[pyarrow]': 'string',
+}
+
+
+def _canonical_dtypes(d: dict) -> dict:
+    return {k: _DTYPE_EQUIVALENCE.get(v, v) for k, v in d.items()}
+
 # Baselines known to drift after the sample() v-migration (Phases 2/3/4).
 # These fixtures were captured before v was joined at API time and m was
 # removed from baked parquets, so the recorded index_names / shape / dtype
@@ -150,8 +170,9 @@ def test_parquet_matches_baseline(uganda_root, rel_path):
         f"  expected: {baseline_entry['index_names']}"
     )
 
-    # Check dtypes
-    assert actual["dtypes"] == baseline_entry["dtypes"], (
+    # Check dtypes (after canonicalizing string-family equivalence —
+    # see _DTYPE_EQUIVALENCE above).
+    assert _canonical_dtypes(actual["dtypes"]) == _canonical_dtypes(baseline_entry["dtypes"]), (
         f"{rel_path}: dtype mismatch:\n"
         f"  actual:   {actual['dtypes']}\n"
         f"  expected: {baseline_entry['dtypes']}"
