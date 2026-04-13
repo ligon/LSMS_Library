@@ -1334,7 +1334,11 @@ class Country:
             current_names = list(df.index.names) if isinstance(df.index, pd.MultiIndex) else [df.index.name]
             v_already_present = ('v' in current_names
                                  or (isinstance(df, pd.DataFrame) and 'v' in df.columns))
-            _no_v_join = {'sample', 'cluster_features', 'panel_ids', 'updated_ids'}
+            # Tables whose canonical index in data_info.yml does NOT include
+            # v; joining v from sample() would produce a non-canonical shape.
+            # See SkunkWorks/audits/framework_diagnosis.md for the schema survey.
+            _no_v_join = {'sample', 'cluster_features', 'panel_ids', 'updated_ids',
+                          'shocks', 'assets'}
             if (not v_already_present
                     and 'i' in current_names
                     and 't' in current_names
