@@ -306,8 +306,12 @@ def food_quantities_from_acquired(df):
 def food_prices_from_acquired(df):
     """Derive food prices (per kg) from food_acquired.
 
-    Unit values are computed as Expenditure / Quantity_kg, then
-    the median is taken across households within each item × period.
+    Unit values are computed as Expenditure / Quantity_kg and returned
+    at the natural grain of the input (typically ``(t, v, i, j, u)`` or
+    a subset).  It is the analyst's responsibility to compute medians /
+    means across whatever dimension they care about — returning the raw
+    per-observation prices preserves information and lets the downstream
+    analysis choose its own aggregation.
     """
     df = _normalize_columns(df)
     if 'Expenditure' not in df.columns or 'Quantity' not in df.columns:
@@ -319,12 +323,7 @@ def food_prices_from_acquired(df):
     v['price_per_kg'] = v['Expenditure'] / v['Quantity_kg']
     v = v[['price_per_kg']].replace([0, np.inf, -np.inf], np.nan).dropna()
 
-    idx_names = list(v.index.names)
-    group_by = [n for n in ['t', 'v', 'm', 'i'] if n in idx_names]
-
-    p = v.groupby(group_by).median()
-    p = p.rename(columns={'price_per_kg': 'Price'})
-    return p
+    return v.rename(columns={'price_per_kg': 'Price'})
 
 
 def legacy_locality(country):
