@@ -6,7 +6,9 @@ Waves:
 Data Scheme:
   cluster_features:
     index: (t, v)
-    Region: str
+    Region:
+      type: str
+      optional: true
     Rural: str
 
   household_roster:

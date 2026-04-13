@@ -20,7 +20,9 @@ Data Scheme:
   cluster_features:
     index: (t, v)
     Region: str
-    Rural: str
+    Rural:
+      type: str
+      optional: true
 
   household_roster:
     index: (t, i, pid)

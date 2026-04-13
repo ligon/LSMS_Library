@@ -14,8 +14,12 @@ Data Scheme:
     Region: str
     District: str
     Rural: str
-    Latitude: float
-    Longitude: float
+    Latitude:
+      type: float
+      optional: true
+    Longitude:
+      type: float
+      optional: true
 
   household_roster:
     index: (t, i, pid)
