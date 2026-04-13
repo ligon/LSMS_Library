@@ -1,0 +1,55 @@
+#+title: Contents
+
+* Overview
+
+Benin EHCVM (Enquête Harmonisée sur les Conditions de Vie des
+Ménages), the harmonized West African household-conditions survey
+template.  One wave configured: =2018-19=.
+
+Source: https://doi.org/10.48529/rn3k-z374
+
+A second directory =Benin/2018-2019/= contains a =Data/=
+sub-directory only — appears to be a duplicate-wave staging area.
+The configured wave is =2018-19=; the =2018-2019= folder is not
+referenced by any extractor and may be safely ignored or removed
+by a future cleanup pass.
+
+* Sampling Design
+
+Standard EHCVM convention: =grappe= is the cluster identifier
+(=v=); each grappe is visited in exactly one =vague=, so household
+identifier is =(grappe, menage)= without a vague level.  See
+CLAUDE.md "EHCVM countries" for the cross-country pattern.
+
+* Files configured
+
+(Per =data_scheme.yml=: sample, cluster_features, household_roster,
+individual_education, food_acquired, assets, housing,
+interview_date, shocks, food_expenditures, food_prices,
+food_quantities.)
+
+* Data Quality Notes
+
+** shocks: at most 2 coping strategies per household in 2018-19
+
+The 2018-19 instrument's shock module captures up to 26 distinct
+coping strategies per household (=Cope1...Cope26= binary
+indicators), but inspection across all 8,012 households finds
+**no household with more than 2 strategies marked**.  Accordingly:
+
+- =data_scheme.yml= declares only =HowCoped0= and =HowCoped1=
+  (not =HowCoped2=).
+- =2018-19/_/2018-19.py= ranks the marked strategies by code and
+  emits the first 2 into =HowCoped0= / =HowCoped1=.
+
+This is honest — the survey's underlying form allows 26 entries
+per shock, but Benin households simply did not report a third
+coping strategy in this wave.  If a future Benin wave shows
+households reporting 3+ strategies, the script (loop range) and
+the scheme (add =HowCoped2=) need to be extended in tandem.
+
+History: prior to the 2026-04-12 cleanup (commit =9d677f25=),
+=HowCoped2= was declared in the scheme and emitted by the script,
+but every row was =NaN=, breaking the cross-country
+=test_no_fully_null_columns[Benin/shocks]= sanity test.  The fix
+removed the column from both the scheme and the extractor.

@@ -1,0 +1,50 @@
+#+title: Contents
+
+* Overview
+
+Azerbaijan Survey of Living Conditions (SLC), conducted in 1995.
+One wave: =1995=.
+
+Source: https://doi.org/10.48529/z7ee-4p39
+
+* Sampling Design
+
+** Geographic coverage
+
+The microdata exposes only one geographic axis: =inout= in
+=APP1.dta= (the cluster file), encoding settlement type
+(1--3 = various urban; 4 = rural).  Mapped to the canonical =Rural=
+column.
+
+The 1995 SLC microdata does **not** include any region / oblast /
+rayon variable at any grain (verified against APP1.dta, A00.dta,
+HHOPEN.dta).  =cluster_features.Region= is therefore declared
+=optional: true= at country level.
+
+** PSU identification
+
+Cluster identifier =v= = =ppid= (primary-place ID, 92 distinct
+values).  Household identifier =i= = =(ppid, hid)=.
+
+* Files configured
+
+** sample
+** cluster_features
+** household_roster
+
+* Data Quality Notes
+
+** sample.weight has only 3 distinct values
+
+The =weight= column on the =sample= table has just 3 unique values
+(min 0.694, max 1.258) across all 2,016 households.  Confirmed via
+the cross-country =Feature('sample')= audit
+(=SkunkWorks/audits/=, 2026-04-12).  This is far too uniform to be
+a true survey weight; it is more likely a normalising / fallback
+weight.  Consumers expecting genuine sampling weights for inference
+should treat Azerbaijan as effectively unweighted.
+
+The original questionnaires (=queshhe.pdf=, =quespope.pdf= under
+=1995/Documentation/=) are DVC-tracked but not yet read into this
+note; if a future maintainer pulls them and confirms the sampling
+plan, please update.

@@ -1,0 +1,47 @@
+#+title: Contents
+
+* Overview
+
+Mali EHCVM (Enquête Harmonisée sur les Conditions de Vie des
+Ménages) — the harmonized West African household-conditions survey
+template, run jointly under WAEMU coordination.  Four waves are
+configured:
+
+| Wave    | WB catalog                                              |
+|---------+---------------------------------------------------------|
+| 2014-15 | https://microdata.worldbank.org/index.php/catalog/2583  |
+| 2017-18 | https://microdata.worldbank.org/index.php/catalog/3409  |
+| 2018-19 | https://microdata.worldbank.org/index.php/catalog/4295  |
+| 2021-22 | https://microdata.worldbank.org/index.php/catalog/6275  |
+
+* Sampling Design
+
+EHCVM convention: each =grappe= (cluster) is visited in exactly
+one =vague= (round); the cluster identifier therefore is just
+=grappe= and the household identifier is =(grappe, menage)= — no
+need for =vague= in the index.  See CLAUDE.md "EHCVM countries"
+note for the wider pattern across Senegal, Niger, Burkina Faso,
+Benin, Togo, and Guinea-Bissau.
+
+* Files configured
+
+(Per =data_scheme.yml=: sample, cluster_features, household_roster,
+food_acquired, shocks, individual_education, panel_ids, ...)
+
+* Data Quality Notes
+
+** individual_education mixes numeric grade codes with French text
+
+The cross-country =Feature('individual_education')= audit
+(=SkunkWorks/audits/individual_education.md=, 2026-04-12) found
+Mali's =Educational Attainment= column carries numeric grade codes
+(=1.0=, =2.0=, ..., =45.0=) intermingled with French text labels
+across waves.  The numeric codes are likely raw class-level / grade
+indicators that survived the extraction without label-decoding.
+
+This makes Mali's =Educational Attainment= incomparable with
+countries that ship pre-labeled categorical strings.  A future
+fix should map the numeric codes to canonical labels via Mali's
+=categorical_mapping.org= (or by adding a per-wave =mapping:= dict
+in each wave's =data_info.yml=); pending that, downstream
+consumers should treat Mali separately.
