@@ -41,7 +41,11 @@ household_roster:
         i: household_id
         pid: individual_id
     myvars:
-        Sex: s1q02
+        Sex:
+            - s1q02
+            - mapping:
+                '1. Male': M
+                '2. Female': F
         Age: s1q03a
         Relationship: s1q01
 
