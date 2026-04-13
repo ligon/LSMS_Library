@@ -11,4 +11,4 @@ x = p*q
 x = x.groupby(['j','t','i']).sum()
 x = x.replace(0,np.nan).dropna()
 
-to_parquet(pd.DataFrame({'x':x}), 'food_expenditures.parquet')
+to_parquet(pd.DataFrame({'Expenditure': x}), 'food_expenditures.parquet')
