@@ -572,3 +572,18 @@ unrelated:                                                      [0, 0, unrelated
 "Chef De M":                             [0, 0, consanguineal]
 P:                                       [1, 0, consanguineal]   # low-confidence: "Père" or "Personne"; see lowercase "p" above
 "Personne Non Apparent":                 [0, 0, unrelated]
+
+# --- Serbia and Montenegro (2003 long-phrase labels) ---
+# Title-case form (after .title()) is the primary lookup; raw form added as fallback.
+"Head Of The Household":                 [0, 0, consanguineal]
+"Head of the household":                 [0, 0, consanguineal]
+"Child Of The Head / Spouse":            [-1, 0, consanguineal]
+"Child of the head / spouse":            [-1, 0, consanguineal]
+"Grandchild Of The Head / Spouse":       [-2, 0, consanguineal]
+"Grandchild of the head / spouse":       [-2, 0, consanguineal]
+"Husband/Wife, Spouse":                  [0, 0, affinal]
+"Husband/wife, spouse":                  [0, 0, affinal]
+"Son/Daug. In Law Of The Head/Spouse":   [-1, 0, affinal]
+"Son/daug. in law of the head/spouse":   [-1, 0, affinal]
+"Parents Of The Head / Spouse":          [1, 0, consanguineal]
+"Parents of the head / spouse":          [1, 0, consanguineal]
