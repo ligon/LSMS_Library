@@ -19,6 +19,8 @@ def extract_string(x):
     except AttributeError:
         return ''
 
+_clean_age = lambda a: a if pd.notna(a) and 0 <= a <= 120 else pd.NA
+
 # Post planting:
 
 idxvars = dict(i='hhid',
@@ -28,7 +30,7 @@ idxvars = dict(i='hhid',
                )
 
 myvars = dict(Sex = ('s1q2', lambda s: extract_string(s).title()),
-              Age = 's1q6',
+              Age = ('s1q6', _clean_age),
               Relationship = ('s1q3', lambda s: extract_string(s).title()))
 
 pp = df_data_grabber('../Data/sect1_plantingw4.dta',idxvars,**myvars)
@@ -42,7 +44,7 @@ idxvars = dict(i='hhid',
                )
 
 myvars = dict(Sex = ('s1q2', lambda s: extract_string(s).title()),
-              Age = 's1q4',
+              Age = ('s1q4', _clean_age),
               Relationship = ('s1q3', lambda s: extract_string(s).title()),)
 
 ph = df_data_grabber('../Data/sect1_harvestw4.dta',idxvars,**myvars)
