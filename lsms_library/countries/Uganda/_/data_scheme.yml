@@ -49,7 +49,7 @@ Data Scheme:
   food_expenditures:
     materialize: make
     index: (i, t, j)
-    x: float
+    Expenditure: float
   food_prices: !make
   panel_ids: !make
   income:
