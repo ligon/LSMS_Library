@@ -15,6 +15,8 @@ household_roster:
         Relationship:
             - relhead
             - mapping:
+                0: ~
+                '0': ~
                 1: Head
                 2: Spouse
                 3: Father/Mother
