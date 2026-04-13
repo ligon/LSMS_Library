@@ -27,7 +27,7 @@ expenditures = ['value_home', 'value_away', 'value_own', 'value_inkind']
 x = fa.groupby(['i','t','j'])[expenditures].sum()
 x = x.sum(axis=1).replace(0,np.nan).dropna()
 
-to_parquet(pd.DataFrame({'x':x}), '../var/food_expenditures.parquet')
+to_parquet(pd.DataFrame({'Expenditure': x}), '../var/food_expenditures.parquet')
 
 pq = fa[prices + quantities]
 
