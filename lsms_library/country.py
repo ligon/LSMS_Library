@@ -2435,7 +2435,10 @@ def _enforce_canonical_spellings(df: pd.DataFrame, method_name: str) -> pd.DataF
     table_spellings = all_spellings.get(method_name, {})
     for col, variant_map in table_spellings.items():
         if col in df.columns:
-            df[col] = df[col].replace(variant_map)
+            if hasattr(df[col], "cat"):
+                df[col] = df[col].astype("string").replace(variant_map)
+            else:
+                df[col] = df[col].replace(variant_map)
         elif isinstance(df.index, pd.MultiIndex) and col in df.index.names:
             df = df.rename(index=variant_map, level=col)
     return df
