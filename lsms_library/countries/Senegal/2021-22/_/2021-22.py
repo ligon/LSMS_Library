@@ -154,4 +154,11 @@ def household_roster(df):
     df["Age"] = df.apply(_age_from_row, axis=1)
     df = df.drop('interview_date', axis='columns')
 
+    # Drop CAPI preload ghost rows: Survey Solutions pre-populates a fixed
+    # roster grid from a prior enumeration round (s01qpreload_* columns).
+    # Rows where the interviewer did not fill in Section-1 live columns
+    # (s01q01-s01q04a) remain as blank entries.  Drop any row where all
+    # three of Sex, Age, and Relationship are null.
+    df = df.dropna(subset=['Sex', 'Age', 'Relationship'], how='all')
+
     return df
