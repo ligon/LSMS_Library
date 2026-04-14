@@ -47,6 +47,12 @@ def _countries_with_household_roster() -> list[str]:
 
 _ROSTER_COUNTRIES = _countries_with_household_roster()
 
+# Countries listed in CLAUDE.md §Countries Without Microdata: their
+# household_roster build either stalls on DVC/WB fallback retries or
+# raises.  Skip them unconditionally — the dtype-coercion pipeline is
+# not meaningfully exercised by a no-data country.
+_NO_MICRODATA = {"Armenia", "Nepal"}
+
 
 # ---------------------------------------------------------------------------
 # Tests
@@ -57,6 +63,9 @@ _ROSTER_COUNTRIES = _countries_with_household_roster()
 def test_age_dtype_is_int64(country):
     """household_roster().Age must be nullable Int64 (or compatible integer dtype)."""
     import lsms_library as ll
+
+    if country in _NO_MICRODATA:
+        pytest.skip(f"{country}: no microdata (CLAUDE.md §Countries Without Microdata)")
 
     c = ll.Country(country)
     try:
@@ -96,6 +105,9 @@ def test_age_dtype_is_int64(country):
 def test_age_no_negative_values(country):
     """All non-NA Age values must be >= 0 after coercion."""
     import lsms_library as ll
+
+    if country in _NO_MICRODATA:
+        pytest.skip(f"{country}: no microdata (CLAUDE.md §Countries Without Microdata)")
 
     c = ll.Country(country)
     try:
