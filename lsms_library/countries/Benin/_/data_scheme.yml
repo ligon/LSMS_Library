@@ -48,7 +48,7 @@ Data Scheme:
 
   interview_date:
     index: (t, i)
-    int_t: datetime
+    Int_t: datetime
   shocks:
     index: (t, i, Shock)
     AffectedIncome: bool
