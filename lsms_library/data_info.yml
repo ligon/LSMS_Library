@@ -82,6 +82,12 @@ Columns:
     Rural:
       type: str
       required: true
+      spellings:
+        # Canonical values are 'Rural' / 'Urban' (capitalised).  Some
+        # wave-level extractions emit lowercase; normalise here via the
+        # standard spellings path.  GH #163.
+        Rural: [rural, RURAL]
+        Urban: [urban, URBAN]
     District:
       type: str
     Latitude:
