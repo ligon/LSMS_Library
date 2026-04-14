@@ -1,5 +1,72 @@
 # Formatting Functions for Guinea-Bissau 2018-19
+import pandas as pd
 import numpy as np
+import lsms_library.local_tools as tools
+
+def Sex(value):
+    '''
+    Map Portuguese sex labels from s01_me_gnb2018.dta to canonical M/F.
+    Stata labels: 1=Masculino, 2=Feminino.
+    '''
+    if value in ('Masculino', '1'):
+        return 'M'
+    if value in ('Feminino', '2'):
+        return 'F'
+    return pd.NA
+
+
+# Portuguese month names used in s01q03b Stata labels.
+_MONTH_MAP_PT = {
+    'Janeiro': 1, 'Fevereiro': 2, 'Março': 3, 'Marco': 3, 'Abril': 4,
+    'Maio': 5, 'Junho': 6, 'Julho': 7, 'Agosto': 8, 'Setembro': 9,
+    'Outubro': 10, 'Novembro': 11, 'Dezembro': 12,
+}
+
+
+def Age(value):
+    '''
+    Convert DOB list [s01q04a, s01q03a, s01q03b, s01q03c] so that month
+    (index 2) is a plain integer 1-12.
+
+    s01q03b Stata labels are Portuguese month names (Janeiro…Dezembro).
+    get_dataframe() returns the label strings as categoricals.
+    The sentinel 9999 is left as-is; household_roster() handles it.
+    '''
+    result = list(value)
+    raw_month = value.iloc[2]
+    if isinstance(raw_month, str):
+        result[2] = _MONTH_MAP_PT.get(raw_month)
+    # if already numeric (int/float), keep as-is; household_roster will
+    # null it out if it equals 9999
+    return result
+
+
+def household_roster(df):
+    '''
+    Recover Age from date-of-birth components (s01q03a/b/c) when s01q04a
+    is missing or 9999.
+
+    Age list in data_info.yml: [s01q04a, s01q03a(day), s01q03b(month), s01q03c(year)].
+    The Age() formatter above has already converted month to int 1-12 (or None).
+    The 9999 sentinel marks unknown age / DOB components.
+    '''
+    def _age_from_row(x):
+        age_raw = x["Age"][0]
+        # 9999 is the sentinel for unknown age; treat as missing
+        age_val = None if (pd.notna(age_raw) and int(float(age_raw)) == 9999) else age_raw
+        # day sentinel
+        raw_day = x["Age"][1]
+        day = None if (pd.notna(raw_day) and int(float(raw_day)) == 9999) else raw_day
+        # month — Age() may have returned None for unrecognised strings
+        month = x["Age"][2]
+        result = tools.age_handler(age=age_val, d=day, m=month, y=x["Age"][3],
+                                   interview_date=x["interview_date"], interview_year=2018)
+        return np.nan if (pd.notna(result) and result < 0) else result
+
+    df["Age"] = df.apply(_age_from_row, axis=1)
+    df = df.drop('interview_date', axis='columns')
+    return df
+
 
 COPING_LABELS = {
     1: "Utilisation de son épargne",
