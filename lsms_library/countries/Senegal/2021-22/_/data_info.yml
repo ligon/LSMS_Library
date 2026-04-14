@@ -229,7 +229,7 @@ interview_date:
             - grappe
             - menage
     myvars:
-        int_t: s00q23a
+        Int_t: s00q23a
 
 # panel_ids is constructed at the country level by
 # Senegal/_/panel_ids.py (declared as !make in data_scheme.yml).
