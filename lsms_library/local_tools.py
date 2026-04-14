@@ -1341,7 +1341,7 @@ def age_handler(age = None, interview_date = None, interview_year = None, format
                 interview_yr = int(interview_date[0])
         if format_interv:
             final_interview_date = pd.to_datetime(interview_date, format = format_interv)
-            interview_yr = interview_date.year
+            interview_yr = final_interview_date.year
         else:
             try:
                 final_interview_date = pd.to_datetime(interview_date)
@@ -1389,13 +1389,15 @@ def age_handler_wrapper(df, interview_date = None, interview_year = None, format
     def row_funct(row):
         r_age = row[age] if age else None
         r_interview_date = row[interview_date] if interview_date else None
-        if not isinstance(interview_year, int):
-            interview_year = row[interview_year]
+        if isinstance(interview_year, str):
+            iy = row[interview_year]
+        else:
+            iy = interview_year
         r_dob = row[dob] if dob else None
         r_m = row[m] if m else None
         r_d = row[d] if d else None
         r_y = row[y] if y else None
-        return age_handler(age = r_age, interview_date = r_interview_date, interview_year = interview_year, format_interv = format_interv, dob = r_dob, format_dob  = format_dob, m = r_m, d = r_d, y = r_y)
+        return age_handler(age = r_age, interview_date = r_interview_date, interview_year = iy, format_interv = format_interv, dob = r_dob, format_dob  = format_dob, m = r_m, d = r_d, y = r_y)
 
     return df.apply(row_funct, axis=1)
 
