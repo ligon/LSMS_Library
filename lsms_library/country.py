@@ -2327,6 +2327,43 @@ _SCHEME_DTYPE_MAP = {
     'timestamp': 'to_datetime',
 }
 
+# Maps string representations of booleans to Python booleans.
+# Needed because pyarrow serialises Python bool values in object-dtype
+# Series as the strings 'True' / 'False', so cached parquets that were
+# written before an explicit BooleanDtype was enforced at write time
+# arrive back as string columns.  pd.to_numeric('True') returns NaN,
+# so naive numeric coercion silently wipes every value.
+_STR_TO_BOOL: dict[str, bool] = {
+    'True': True, 'False': False,
+    'true': True, 'false': False,
+    '1': True,    '0': False,
+    'yes': True,  'no': False,
+    'Yes': True,  'No': False,
+    'YES': True,  'NO': False,
+}
+
+
+def _coerce_to_boolean(series: pd.Series) -> pd.Series:
+    """Safely cast *series* to nullable BooleanDtype.
+
+    Handles three source formats produced by the YAML build path:
+
+    * Object-dtype with Python bool or string values  (``'True'``/``'False'``)
+      — these are what pyarrow writes when a YAML mapping returns Python
+      booleans into an ``object`` column.
+    * Numeric (int/float 0/1) — legacy scripts that stored 0/1 integers.
+    * Already-boolean — passthrough with a cheap re-cast.
+    """
+    if pd.api.types.is_bool_dtype(series) or isinstance(series.dtype, pd.BooleanDtype):
+        return series.astype(pd.BooleanDtype())
+    if pd.api.types.is_object_dtype(series) or pd.api.types.is_string_dtype(series):
+        mapped = series.map(
+            lambda x: _STR_TO_BOOL.get(str(x), None) if pd.notna(x) else None
+        )
+        return mapped.astype(pd.BooleanDtype())
+    # numeric (int/float) path
+    return pd.to_numeric(series, errors='coerce').astype(pd.BooleanDtype())
+
 _SCHEME_SKIP_KEYS = frozenset({'index', 'materialize', 'backend'})
 
 
@@ -2505,7 +2542,9 @@ def _enforce_declared_dtypes(df: pd.DataFrame, scheme_entry: dict[str, Any]) -> 
                     # Round before casting so float values (e.g. 59.41 from
                     # age_handler) survive the safe-cast check.
                     df[col] = pd.to_numeric(df[col], errors='coerce').round().astype(target)
-                elif target in (pd.Float64Dtype(), pd.BooleanDtype()):
+                elif target == pd.BooleanDtype():
+                    df[col] = _coerce_to_boolean(df[col])
+                elif target == pd.Float64Dtype():
                     df[col] = pd.to_numeric(df[col], errors='coerce').astype(target)
                 else:
                     df[col] = df[col].astype(target)
@@ -2563,7 +2602,9 @@ def _enforce_canonical_dtypes(df: pd.DataFrame, method_name: str) -> None:
                 # age_handler's date-arithmetic path) survive the safe-cast
                 # check in pandas' IntegerArray.__from_sequence__.
                 df[col] = pd.to_numeric(df[col], errors='coerce').round().astype(target)
-            elif target in (pd.Float64Dtype(), pd.BooleanDtype()):
+            elif target == pd.BooleanDtype():
+                df[col] = _coerce_to_boolean(df[col])
+            elif target == pd.Float64Dtype():
                 df[col] = pd.to_numeric(df[col], errors='coerce').astype(target)
             else:
                 df[col] = df[col].astype(target)
