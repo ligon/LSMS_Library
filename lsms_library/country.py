@@ -828,7 +828,11 @@ class Country:
     def resources(self) -> dict[str, Any]:
         if '_resources_cache' not in self.__dict__:
             var = self.file_path / "_" / "data_scheme.yml"
-            self.__dict__['_resources_cache'] = load_yaml(open(var)) if var.exists() else {}
+            if var.exists():
+                with open(var) as f:
+                    self.__dict__['_resources_cache'] = load_yaml(f)
+            else:
+                self.__dict__['_resources_cache'] = {}
         return self.__dict__['_resources_cache']
 
     def _materialization_entry(self, method_name: str) -> dict[str, Any]:
