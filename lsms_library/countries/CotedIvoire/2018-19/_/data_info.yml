@@ -70,17 +70,44 @@ cluster_features:
         - v
 
 household_roster:
-    file: Menage/ehcvm_individu_CIV2018.dta
-    idxvars:
-        v: grappe
-        i:
-            - grappe
-            - menage
-        pid: numind
-    myvars:
-        Sex: sexe
-        Age: age
-        Relationship: lien
+    dfs:
+        - df_main
+        - df_cover
+    df_main:
+        file: Menage/s01_me_CIV2018.dta
+        idxvars:
+            v: grappe
+            i:
+                - grappe
+                - menage
+            pid:
+                - grappe
+                - menage
+                - s01q00a
+        myvars:
+            Sex: s01q01
+            Relationship: s01q02
+            Age:
+                - s01q04a
+                - s01q03a
+                - s01q03b
+                - s01q03c
+    df_cover:
+        file: Menage/s00_me_CIV2018.dta
+        idxvars:
+            v: grappe
+            i:
+                - grappe
+                - menage
+        myvars:
+            interview_date: s00q23a
+    merge_on:
+        - v
+        - i
+    final_index:
+        - v
+        - i
+        - pid
 
 individual_education:
     file: Menage/ehcvm_individu_CIV2018.dta
@@ -218,4 +245,4 @@ interview_date:
             - grappe
             - menage
     myvars:
-        int_t: s00q23a
+        Int_t: s00q23a
