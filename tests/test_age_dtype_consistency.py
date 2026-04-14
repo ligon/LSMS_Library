@@ -68,6 +68,15 @@ def test_age_dtype_is_int64(country):
         pytest.fail(f"{country}: 'Age' column missing from household_roster()")
 
     age = df["Age"]
+
+    # Countries without microdata (CLAUDE.md §Countries Without Microdata)
+    # may return an empty or all-NA Age column without raising.  Treat the
+    # same as the raising case: skip rather than fail, since dtype on an
+    # empty column is determined by pandas defaults, not by the coercion
+    # pipeline under test.
+    if len(df) == 0 or age.dropna().empty:
+        pytest.skip(f"{country}: household_roster() returned empty or all-NA Age")
+
     dtype = age.dtype
 
     # Accept Int64 (pandas nullable integer) or any integer dtype that also
@@ -98,6 +107,12 @@ def test_age_no_negative_values(country):
         pytest.fail(f"{country}: 'Age' column missing from household_roster()")
 
     age = df["Age"]
+
+    # Same empty-result guard as the dtype test — skip rather than fail on
+    # countries without microdata that return an empty DataFrame.
+    if len(df) == 0 or age.dropna().empty:
+        pytest.skip(f"{country}: household_roster() returned empty or all-NA Age")
+
     # Use pd.notna to handle both np.nan and pd.NA
     non_na = age[pd.notna(age)]
     negatives = non_na[non_na < 0]
