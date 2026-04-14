@@ -124,7 +124,16 @@ def household_roster(df):
     Formatting dataframe to calculate ages
     '''
 
-    df["Age"] = df.apply(lambda x: tools.age_handler(age = x["Age"][0], d = x["Age"][1], m = x["Age"][2], y = x["Age"][3], interview_date=x["interview_date"], interview_year=2018), axis = 1)
-    df = df.drop('interview_date', axis = 'columns')
-    
+    def _age_from_row(x):
+        age_raw = x["Age"][0]
+        # -1 is a sentinel for missing age; pass None so age_handler falls through to dob columns
+        age_val = None if (pd.notna(age_raw) and int(float(age_raw)) < 0) else age_raw
+        result = tools.age_handler(age=age_val, d=x["Age"][1], m=x["Age"][2], y=x["Age"][3],
+                                   interview_date=x["interview_date"], interview_year=2018)
+        # Null out any negative result (e.g. dob slightly after interview date → rounds to 0 or negative)
+        return np.nan if (pd.notna(result) and result < 0) else result
+
+    df["Age"] = df.apply(_age_from_row, axis=1)
+    df = df.drop('interview_date', axis='columns')
+
     return df
