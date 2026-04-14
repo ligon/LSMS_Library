@@ -1,0 +1,161 @@
+# Formatting functions for Niger 2021-22
+import pandas as pd
+import numpy as np
+import lsms_library.local_tools as tools
+from collections import defaultdict
+
+
+def v(value):
+    '''
+    Formatting cluster id (grappe is a single column).
+    '''
+    return tools.format_id(value)
+
+
+def i(value):
+    '''
+    Formatting household id from (grappe, menage).
+    Uses '0' separator + zero-padded menage to prevent collisions.
+    Prefixed with 'E_' to distinguish from ECVMA waves.
+    '''
+    grappe = tools.format_id(value.iloc[0])
+    menage = tools.format_id(value.iloc[1], zeropadding=2)
+    if grappe is None or menage is None:
+        return None
+    return 'E_' + grappe + '0' + menage
+
+
+def Sex(value):
+    '''
+    Formatting sex variable from numeric Stata label.
+    '''
+    if value == 'Masculin' or value == 1:
+        return 'M'
+    if value == 'Féminin' or value == 2:
+        return 'F'
+
+
+def Age(value):
+    '''
+    Pass through Age list; numeric coercion of "." sentinels is done in
+    household_roster() before age_handler is called.
+    '''
+    return list(value)
+
+
+def Relationship(value):
+    '''
+    Formatting relationship variable from numeric Stata label.
+    '''
+    if pd.isna(value):
+        return value
+    return str(value).title()
+
+
+COPING_LABELS = {
+    1: "Utilisation de son épargne",
+    2: "Aide de parents ou d'amis",
+    3: "Aide du gouvernement/l'Etat",
+    4: "Aide d'organisations religieuses ou d'ONG",
+    5: "Marier les enfants",
+    6: "Changement des habitudes de consommation",
+    7: "Achat d'aliments moins chers",
+    8: "Membres actifs ont pris des emplois supplémentaires",
+    9: "Membres adultes inactifs/chômeurs ont pris des emplois",
+    10: "Enfants de moins de 15 ans amenés à travailler",
+    11: "Les enfants ont été déscolarisés",
+    12: "Migration de membres du ménage",
+    13: "Réduction des dépenses de santé/d'éducation",
+    14: "Obtention d'un crédit",
+    15: "Vente des actifs agricoles",
+    16: "Vente des biens durables du ménage",
+    17: "Vente de terrain/immeubles/Maisons",
+    18: "Louer/mettre ses terres en gages",
+    19: "Vente du stock de vivres",
+    20: "Pratique plus importante des activités de pêche",
+    21: "Vente de bétail",
+    22: "Confiage des enfants à d'autres ménages",
+    23: "Engagé dans des activités spirituelles",
+    24: "Pratique de la culture de contre saison",
+    25: "Autre stratégie",
+    26: "Aucune stratégie",
+}
+
+# Mapping from 2021-22 string values to strategy rank (1-indexed)
+_STRATEGY_RANK = {
+    'Première stratégie': 1,
+    'Deuxième strategie': 2,
+    'Troisième stratégie': 3,
+}
+
+
+def shocks(df):
+    cope_cols = [c for c in df.columns if c.startswith('Cope')]
+
+    how_coped = {0: [], 1: [], 2: []}
+    for _, row in df[cope_cols].iterrows():
+        # In 2021-22, cope columns contain rank strings instead of binary indicators.
+        # Collect (rank, label) pairs and sort by rank to get ordered coping strategies.
+        ranked = []
+        for c in cope_cols:
+            num = int(c.replace('Cope', ''))
+            val = row[c]
+            if pd.isna(val):
+                continue
+            rank = _STRATEGY_RANK.get(str(val))
+            if rank is not None:
+                ranked.append((rank, COPING_LABELS.get(num, f'Strategy {num}')))
+
+        ranked.sort(key=lambda x: x[0])
+        found = [label for _, label in ranked]
+
+        for k in range(3):
+            how_coped[k].append(found[k] if k < len(found) else np.nan)
+
+    df['HowCoped0'] = how_coped[0]
+    df['HowCoped1'] = how_coped[1]
+    df['HowCoped2'] = how_coped[2]
+    df = df.drop(columns=cope_cols)
+    return df
+
+
+def household_roster(df):
+    '''
+    Compute Age from birth-date components and interview_date.
+
+    Niger 2021-22 uses s01_me_ner2021.dta where:
+      - Age[0] = s01q04a  (stated age in years; object dtype, all valid or NaN)
+      - Age[1] = s01q03a  (birth day;  string with "." as missing sentinel)
+      - Age[2] = s01q03b  (birth month; numeric strings, no "." sentinel)
+      - Age[3] = s01q03c  (birth year; string with "." as missing sentinel)
+
+    "." sentinels are coerced to NaN via pd.to_numeric(errors='coerce')
+    before passing to the canonical tools.age_handler.
+    '''
+
+    def _age_from_row(x):
+        age_list = x["Age"]
+        # age_list is [stated_age, birth_day, birth_month, birth_year]
+        # Coerce string "." sentinels to NaN for day and year columns
+        age_raw  = pd.to_numeric(age_list[0], errors='coerce')
+        birth_d  = pd.to_numeric(age_list[1], errors='coerce')
+        birth_m  = pd.to_numeric(age_list[2], errors='coerce')
+        birth_y  = pd.to_numeric(age_list[3], errors='coerce')
+
+        # Pass None for age if it is NaN so age_handler falls through to dob columns
+        age_val = None if pd.isna(age_raw) else age_raw
+
+        result = tools.age_handler(
+            age=age_val,
+            d=birth_d,
+            m=birth_m,
+            y=birth_y,
+            interview_date=x["interview_date"],
+            interview_year=2021,
+        )
+        # Null out any negative result (dob slightly after interview date)
+        return np.nan if (pd.notna(result) and result < 0) else result
+
+    df["Age"] = df.apply(_age_from_row, axis=1)
+    df = df.drop('interview_date', axis='columns')
+    return df
