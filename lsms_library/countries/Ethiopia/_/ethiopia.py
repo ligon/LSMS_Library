@@ -1,4 +1,3 @@
-from lsms.tools import get_food_prices, get_food_expenditures, get_household_roster, get_household_identification_particulars
 from ligonlibrary.dataframes import from_dta
 import numpy as np
 import pandas as pd
@@ -7,6 +6,7 @@ from collections import defaultdict
 from cfe.df_utils import use_indices
 import warnings
 import json
+from lsms_library.local_tools import get_dataframe
 
 # Wave list used by harmonized_food_labels() and other helpers.
 # NB: panel_ids no longer uses this dict -- see panel_ids.py for the
@@ -51,26 +51,134 @@ def harmonized_food_labels(fn='../../_/food_items.org',key=list(Waves.keys()),va
 
     return food_items.squeeze().str.strip().to_dict()
 
+def _sum_expenditures_from_file(fn, purchased, away, produced, given, itmcd, HHID,
+                                 units=None, itemlabels=None, convert_categoricals=False):
+    """Inline replacement for lsms.tools.get_food_expenditures (file-opening path)."""
+    df = get_dataframe(fn, convert_categoricals=convert_categoricals)
+    sources = {'purchased': purchased, 'away': away, 'produced': produced, 'given': given}
+    varnames = {v: k for k, v in sources.items() if v is not None}
+    varnames[HHID] = 'HHID'
+    varnames[itmcd] = 'itmcd'
+    if units is not None:
+        varnames[units] = 'units'
+    df = df.rename(columns=varnames)
+    value_cols = [k for k, v in sources.items() if v is not None]
+    for col in value_cols:
+        df[col] = df[col].astype(np.float64)
+    try:
+        df['itmcd'] = df['itmcd'].astype(float)
+        df = df.loc[~np.isnan(df['itmcd'])]
+        df['itmcd'] = df['itmcd'].astype(int)
+    except (ValueError, TypeError):
+        pass
+    if itemlabels is not None:
+        df = df.replace({'itmcd': itemlabels})
+    valvars = ['HHID', 'itmcd'] + value_cols
+    if units is not None:
+        df['units'] = df['units'].fillna(0).astype(int)
+        g = df.loc[:, valvars + ['units']].groupby(['HHID', 'units', 'itmcd'])
+        x = g.sum().sum(axis=1).unstack('itmcd')
+    else:
+        g = df.loc[:, valvars].groupby(['HHID', 'itmcd'])
+        x = g.sum().sum(axis=1).unstack('itmcd')
+    x = x.fillna(0)
+    if itemlabels is not None:
+        x = x.loc[:, x.columns.isin(itemlabels.values())]
+    return x
+
+
+def _household_identification_from_file(fn, HHID='HHID', urban='urban', region='region',
+                                         urban_converter=None, region_converter=None,
+                                         convert_categoricals=True, **kwargs):
+    """Inline replacement for lsms.tools.get_household_identification_particulars."""
+    df = get_dataframe(fn, convert_categoricals=convert_categoricals)
+    df = df.rename(columns={HHID: 'HHID', urban: 'urban', region: 'region'})
+    if kwargs:
+        df = df.rename(columns={v: k for k, v in kwargs.items()})
+    if urban_converter is not None:
+        df['urban'] = df['urban'].apply(urban_converter)
+    if region_converter is not None:
+        df['region'] = df['region'].apply(region_converter)
+    df['region'] = df['region'].apply(lambda s: str(s).lower())
+    df['urban'] = df['urban'].apply(lambda x: x == 1)
+    try:
+        if df['HHID'].iloc[0].split('.')[-1] == '0':
+            df['HHID'] = df['HHID'].apply(lambda x: '%d' % int(float(x)))
+    except (ValueError, AttributeError):
+        pass
+    columns = ['urban', 'region'] + list(kwargs.keys())
+    df = df.loc[:, ['HHID'] + columns]
+    df = df.set_index('HHID')
+    return df.loc[:, columns]
+
+
+def _household_roster_from_file(fn, sex='sex', age='age', HHID='HHID',
+                                  months_spent='months_spent', sex_converter=None,
+                                  months_converter=None, Age_ints=None,
+                                  convert_categoricals=True):
+    """Inline replacement for lsms.tools.get_household_roster (file-opening path)."""
+    df = get_dataframe(fn, convert_categoricals=convert_categoricals)
+    cols = [c for c in [HHID, sex, age, months_spent] if c in df.columns]
+    df = df.loc[:, cols].rename(columns={HHID: 'HHID', sex: 'sex', age: 'age',
+                                          months_spent: 'months_spent'})
+    if months_converter is not None:
+        df['months_spent'] = df['months_spent'].apply(months_converter)
+    if sex_converter is not None:
+        df['sex'] = df['sex'].apply(sex_converter)
+    df = df.dropna(how='any')
+    df['sex'] = df['sex'].apply(lambda s: str(s[0]).lower())
+    df['boys']  = (df['sex'] == 'm') & (df['age'] < 18)
+    df['girls'] = (df['sex'] == 'f') & (df['age'] < 18)
+    df['men']   = (df['sex'] == 'm') & (df['age'] >= 18)
+    df['women'] = (df['sex'] == 'f') & (df['age'] >= 18)
+    if Age_ints is None:
+        Age_ints = ((0,1),(1,5),(5,10),(10,15),(15,20),(20,30),(30,50),(50,60),(60,100))
+    valvars = list({'HHID','girls','boys','men','women'}.intersection(df.columns))
+    for lo, hi in Age_ints:
+        s, e = lo, hi - 1
+        df['Males %02d-%02d' % (s, e)]   = (df['sex'] == 'm') & (df['age'] >= lo) & (df['age'] < hi)
+        df['Females %02d-%02d' % (s, e)] = (df['sex'] == 'f') & (df['age'] >= lo) & (df['age'] < hi)
+        valvars += ['Males %02d-%02d' % (s, e), 'Females %02d-%02d' % (s, e)]
+    try:
+        if df['HHID'].iloc[0].split('.')[-1] == '0':
+            df['HHID'] = df['HHID'].apply(lambda x: '%d' % int(float(x)))
+    except (ValueError, AttributeError):
+        pass
+    if 'months_spent' in df.columns and df['months_spent'].count() > 0:
+        g = df.loc[df['months_spent'] > 0, valvars].groupby('HHID')
+    else:
+        g = df[valvars].groupby('HHID')
+    return g.sum()
+
+
 def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market',farmgate='farmgate'):
 
     food_items = harmonized_food_labels(fn='../../_/food_items.org')
 
-    # Unit labels
+    df = get_dataframe(fn, convert_categoricals=True)
+
+    # Unit labels from Stata value labels
     with dvc.api.open(fn,mode='rb') as dta:
         sr = pd.io.stata.StataReader(dta)
         try:
             unitlabels = sr.value_labels()[units]
-        except KeyError: # No guarantee that keys for labels match variables!?
+        except KeyError:
             foo = sr.value_labels()
             key = [k for k,v in foo.items() if 'Kilogram' in [u[:8] for l,u in v.items()]][0]
             unitlabels = sr.value_labels()[key]
 
-    with dvc.api.open(fn,mode='rb') as dta:
-        # Prices
-        prices,itemlabels=get_food_prices(dta,itmcd=item,HHID=HHID, market=market,
-                                          farmgate=farmgate,units=units,itemlabels=food_items)
-
-    prices = prices.replace({'units':unitlabels})
+    df = df.rename(columns={HHID: 'HHID', item: 'itmcd', farmgate: 'farmgate',
+                             market: 'market', units: 'units'})
+    if food_items is not None:
+        df = df.replace({'itmcd': food_items})
+    try:
+        df['itmcd'] = df['itmcd'].astype(float)
+        df = df.loc[~np.isnan(df['itmcd'])]
+        df['itmcd'] = df['itmcd'].astype(int)
+    except (ValueError, TypeError):
+        pass
+    prices = df.loc[:, ['HHID', 'itmcd', 'farmgate', 'market', 'units']].set_index(['HHID', 'itmcd'])
+    prices = prices.replace({'units': unitlabels})
     prices.units = prices.units.astype(str)
 
     pd.Series(unitlabels).to_csv('unitlabels.csv')
@@ -143,21 +251,22 @@ def food_acquired(fn,myvars):
 def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,item='item',HHID='HHID'):
     food_items = harmonized_food_labels(fn='../../_/food_items.org')
 
-    with dvc.api.open(fn,mode='rb') as dta:
-        expenditures,itemlabels=get_food_expenditures(dta,purchased,away,produced,given,itmcd=item,HHID=HHID,itemlabels=food_items)
+    expenditures = _sum_expenditures_from_file(fn, purchased, away, produced, given,
+                                                itmcd=item, HHID=HHID, itemlabels=food_items)
 
     expenditures.index.name = 'j'
     expenditures.columns.name = 'i'
 
     expenditures = expenditures[expenditures.columns.intersection(food_items.values())]
-        
+
     return expenditures
 
 
 def nonfood_expenditures(fn='',purchased=None,away=None,produced=None,given=None,item='item',HHID='HHID'):
     nonfood_items = harmonized_food_labels(fn='../../_/nonfood_items.org',key='Code',value='Preferred Label')
-    with dvc.api.open(fn,mode='rb') as dta:
-        expenditures,itemlabels=get_food_expenditures(dta,purchased,away,produced,given,itmcd=item,HHID=HHID,itemlabels=nonfood_items)
+
+    expenditures = _sum_expenditures_from_file(fn, purchased, away, produced, given,
+                                                itmcd=item, HHID=HHID, itemlabels=nonfood_items)
 
     expenditures.index.name = 'j'
     expenditures.columns.name = 'i'
@@ -169,13 +278,13 @@ def food_quantities(fn='',item='item',HHID='HHID',
                     purchased=None,away=None,produced=None,given=None,units=None):
     food_items = harmonized_food_labels(fn='../../_/food_items.org')
 
-        # Prices
-    with dvc.api.open(fn,mode='rb') as dta:
-        quantities,itemlabels=get_food_expenditures(dta,purchased,away,produced,given,itmcd=item,HHID=HHID,units=units,itemlabels=food_items)
+    quantities = _sum_expenditures_from_file(fn, purchased, away, produced, given,
+                                              itmcd=item, HHID=HHID, units=units,
+                                              itemlabels=food_items)
 
     quantities.index.names = ['j','u']
     quantities.columns.name = 'i'
-        
+
     return quantities
 
 def age_sex_composition(fn,sex='sex',sex_converter=None,age='age',months_spent='months_spent',HHID='HHID',months_converter=None, convert_categoricals=True,Age_ints=None,fn_type='stata'):
@@ -183,22 +292,23 @@ def age_sex_composition(fn,sex='sex',sex_converter=None,age='age',months_spent='
     if Age_ints is None:
         # Match Uganda FCT categories
         Age_ints = ((0,4),(4,9),(9,14),(14,19),(19,31),(31,51),(51,100))
-        
-    with dvc.api.open(fn,mode='rb') as dta:
-        df = get_household_roster(fn=dta,HHID=HHID,sex=sex,age=age,months_spent=months_spent,
-                                  sex_converter=sex_converter,months_converter=months_converter,
-                                  Age_ints=Age_ints)
 
+    df = _household_roster_from_file(fn, sex=sex, age=age, HHID=HHID,
+                                      months_spent=months_spent,
+                                      sex_converter=sex_converter,
+                                      months_converter=months_converter,
+                                      Age_ints=Age_ints,
+                                      convert_categoricals=convert_categoricals)
     df.index.name = 'j'
     df.columns.name = 'k'
-    
+
     return df
 
 
 def other_features(fn,urban=None,region=None,HHID='HHID',urban_converter=None):
 
-    with dvc.api.open(fn,mode='rb') as dta:
-        df = get_household_identification_particulars(fn=dta,HHID=HHID,urban=urban,region=region,urban_converter=urban_converter)
+    df = _household_identification_from_file(fn, HHID=HHID, urban=urban, region=region,
+                                              urban_converter=urban_converter)
     df.index.name = 'j'
     df.columns.name = 'k'
 
