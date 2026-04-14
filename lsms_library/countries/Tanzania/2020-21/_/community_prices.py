@@ -60,8 +60,6 @@ out = pd.merge(df.reset_index('i'),place,on='int_key',how='outer')
 
 # Get regions for households
 
-from lsms.tools import from_dta
-
 fn = '../Data/hh_sec_a.dta'
 
 myvars = dict(HHID='y5_hhid',
