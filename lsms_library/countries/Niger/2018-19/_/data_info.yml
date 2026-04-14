@@ -51,17 +51,41 @@ food_acquired:
         Produced: s07bq04
 
 household_roster:
-    file: ehcvm_individu_ner2018.dta
+  dfs:
+    - df_main
+    - df_temp
+  df_main:
+    file: s01_me_ner2018.dta
     idxvars:
         v: grappe
         i:
+          - grappe
+          - menage
+        pid: s01q00a
+    myvars:
+        Sex: s01q01
+        Age:
+          - s01q04a
+          - s01q03a
+          - s01q03b
+          - s01q03c
+        Relationship: s01q02
+  df_temp:
+      file: s00_me_ner2018.dta
+      idxvars:
+          v: grappe
+          i:
             - grappe
             - menage
-        pid: numind
-    myvars:
-        Sex: sexe
-        Age: age
-        Relationship: lien
+      myvars:
+          interview_date: s00q23a
+  merge_on:
+    - v
+    - i
+  final_index:
+    - v
+    - i
+    - pid
 
 cluster_features:
     dfs:
