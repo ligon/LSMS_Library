@@ -70,6 +70,19 @@ def sample_dataframe():
 class TestDVCCaching:
     """Test suite for DVC caching functionality."""
 
+    # Commit aec6aedb introduced _load_canonical_dtypes() with @lru_cache,
+    # called from _finalize_result().  It resolves data_info.yml via
+    # files("lsms_library") — which the tests in this class mock to a tmp dir
+    # with no data_info.yml.  Patch it uniformly here so every test that
+    # triggers _finalize_result() doesn't hit a FileNotFoundError on the cold
+    # lru_cache path.  cache_clear() in teardown prevents cross-test pollution.
+    @pytest.fixture(autouse=True)
+    def _patch_canonical_dtypes(self):
+        with patch("lsms_library.country._load_canonical_dtypes", return_value={}):
+            yield
+        from lsms_library.country import _load_canonical_dtypes
+        _load_canonical_dtypes.cache_clear()
+
     def test_cache_creation_on_first_call(self, mock_country_structure, sample_dataframe, tmp_path):
         """Test that first call creates cache file."""
         with patch('lsms_library.country.files') as mock_files:
