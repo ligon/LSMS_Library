@@ -34,7 +34,7 @@ pq = fa[prices + quantities]
 with open('kgs_per_other_units.json','r') as f:
     d = json.load(f)
 
-kgs = pd.Series(d)
+kgs = pd.to_numeric(pd.Series(d), errors='coerce')
 kgs.index.name = 'u'
 kgs.name = 'Kgs/unit'
 
