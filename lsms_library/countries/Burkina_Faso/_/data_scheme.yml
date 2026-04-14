@@ -68,7 +68,7 @@ Data Scheme:
 
   interview_date:
     index: (t, i)
-    int_t: datetime
+    Int_t: datetime
 
   food_expenditures: !make
   food_prices: !make

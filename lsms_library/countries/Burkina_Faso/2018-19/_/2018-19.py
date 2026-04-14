@@ -1,5 +1,80 @@
 # Formatting Functions for Burkina Faso 2018-19
+import pandas as pd
 import numpy as np
+import lsms_library.local_tools as tools
+
+def v(value):
+    '''
+    Formatting cluster id
+    '''
+    return tools.format_id(value)
+
+
+def i(value):
+    '''
+    Formatting household id from (grappe, menage).
+    Uses '0' separator + zero-padded menage to prevent collisions.
+    '''
+    return tools.format_id(value.iloc[0]) + '0' + tools.format_id(value.iloc[1], zeropadding=2)
+
+
+def pid(value):
+    '''
+    Formatting person id from (grappe, menage, s01q00a).
+    '''
+    return (tools.format_id(value.iloc[0]) + '0'
+            + tools.format_id(value.iloc[1], zeropadding=2) + '0'
+            + tools.format_id(value.iloc[2], zeropadding=2))
+
+
+def Sex(value):
+    '''
+    Formatting sex variable from Stata labels.
+    '''
+    if value == 'Féminin':
+        return 'F'
+    if value == 'Masculin':
+        return 'M'
+
+
+def Age(value):
+    '''
+    Formatting age from date components.
+    s01q03b (month) uses French month names in this file.
+    Mask 9999 sentinels on day and month before passing to age_handler.
+    '''
+    month_map = {'Janvier': 1, 'Février': 2, 'Mars': 3, 'Avril': 4, 'Mai': 5,
+                 'Juin': 6, 'Juillet': 7, 'Août': 8, 'Septembre': 9,
+                 'Octobre': 10, 'Novembre': 11, 'Décembre': 12}
+    result = list(value)
+    # day sentinel: 9999 → None
+    if pd.notna(result[1]) and result[1] == 9999:
+        result[1] = None
+    # month: French text → int; 'Ne sait pas' / unknown → None
+    result[2] = month_map.get(value.iloc[2])
+    return result
+
+
+def household_roster(df):
+    '''
+    Recover Age from date-of-birth components when s01q04a (declared age) is null.
+
+    Age list from data_info.yml: [s01q04a, s01q03a(day), s01q03b(month), s01q03c(year)].
+    s01q03a carries 9999 sentinel (masked in Age() above).
+    s01q03b is French text months; 'Ne sait pas' maps to None via month_map.
+    '''
+    def _age_from_row(x):
+        age_raw = x["Age"][0]
+        # -1 is a sentinel for missing age; pass None so age_handler falls through to DOB columns
+        age_val = None if (pd.notna(age_raw) and int(float(age_raw)) < 0) else age_raw
+        result = tools.age_handler(age=age_val, d=x["Age"][1], m=x["Age"][2], y=x["Age"][3],
+                                   interview_date=x["interview_date"], interview_year=2018)
+        return np.nan if (pd.notna(result) and result < 0) else result
+
+    df["Age"] = df.apply(_age_from_row, axis=1)
+    df = df.drop('interview_date', axis='columns')
+    return df
+
 
 COPING_LABELS = {
     1: "Utilisation de son épargne",
