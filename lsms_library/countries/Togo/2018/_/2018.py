@@ -1,5 +1,7 @@
 # Formatting Functions for Togo 2018
+import pandas as pd
 import numpy as np
+import lsms_library.local_tools as tools
 
 COPING_LABELS = {
     1: "Utilisation de son épargne",
@@ -31,6 +33,26 @@ COPING_LABELS = {
 }
 
 
+def Age(value):
+    '''
+    Convert French month names to integers for the DOB components.
+
+    Togo s01q03b (month) uses French month names (Janvier, Février, ...)
+    identical to Senegal 2018-19 — the audit incorrectly described them as
+    plain integers.  Convert month to int so tools.age_handler() can
+    compute age from DOB.
+
+    The list [s01q04a, s01q03a(day), s01q03b(month), s01q03c(year)] is
+    passed to household_roster() via tools.age_handler().
+    '''
+    month_map = {'Janvier': 1, 'Février': 2, 'Mars': 3, 'Avril': 4, 'Mai': 5,
+                 'Juin': 6, 'Juillet': 7, 'Août': 8, 'Septembre': 9,
+                 'Octobre': 10, 'Novembre': 11, 'Décembre': 12}
+    result = list(value)
+    result[2] = month_map.get(value.iloc[2])
+    return result
+
+
 def shocks(df):
     cope_cols = [c for c in df.columns if c.startswith('Cope')]
 
@@ -55,4 +77,24 @@ def shocks(df):
     df['HowCoped1'] = how_coped[1]
     df['HowCoped2'] = how_coped[2]
     df = df.drop(columns=cope_cols)
+    return df
+
+
+def household_roster(df):
+    '''
+    Recover Age from date-of-birth components when s01q04a is null.
+
+    Age list in data_info.yml: [s01q04a, s01q03a(day), s01q03b(month), s01q03c(year)].
+    Togo s01q03b is a numeric integer month (1-12), not French text — no month_map needed.
+    DOB columns use true NaN (no 9999 sentinel), so no additional sentinel handling required.
+    '''
+    def _age_from_row(x):
+        age_raw = x["Age"][0]
+        # -1 is a sentinel for missing age; pass None so age_handler falls through to DOB columns
+        age_val = None if (pd.notna(age_raw) and int(float(age_raw)) < 0) else age_raw
+        return tools.age_handler(age=age_val, d=x["Age"][1], m=x["Age"][2], y=x["Age"][3],
+                                 interview_date=x["interview_date"], interview_year=2018)
+
+    df["Age"] = df.apply(_age_from_row, axis=1)
+    df = df.drop('interview_date', axis='columns')
     return df
