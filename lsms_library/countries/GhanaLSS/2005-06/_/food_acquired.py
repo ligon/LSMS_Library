@@ -2,12 +2,11 @@
 from lsms_library.local_tools import to_parquet
 import sys
 sys.path.append('../../_')
-from lsms.tools import from_dta
 import numpy as np
 import dvc.api
 import pandas as pd
 sys.path.append('../../../_/')
-from lsms_library.local_tools import df_from_orgfile
+from lsms_library.local_tools import df_from_orgfile, get_dataframe
 
 t = '2005-06'
 
@@ -22,11 +21,9 @@ for column in ['Code_9b', 'Code_8h']:
 #units = df_from_orgfile('./categorical_mapping.org',name='s8hq9',encoding='ISO-8859-1')
 #unitsd = units.set_index('Code').to_dict('dict')
 
-#food expenditure 
-with dvc.api.open('../Data/partb/sec9b.dta',mode='rb') as dta:
-    df = from_dta(dta, convert_categoricals=False)
-    #harmonize food labels
-    df['freqcd'] = df['freqcd'].replace(labelsd['Code_9b']['Preferred Label'])
+#food expenditure
+df = get_dataframe('../Data/partb/sec9b.dta', convert_categoricals=False)
+df['freqcd'] = df['freqcd'].replace(labelsd['Code_9b']['Preferred Label'])
 
 df['hhid'] = df.apply(lambda x:f"{int(x['clust']):d}/{int(x['nh']):02d}",axis=1)
 
@@ -47,11 +44,10 @@ x['u'] = 'Value'
 x = x.reset_index().set_index(['j','i','u','visit'])
 
 #home produced amounts
-with dvc.api.open('../Data/partb/sec8h.dta',mode='rb') as dta:
-    prod = from_dta(dta, convert_categoricals=True)
-    #harmonize food labels and map unit labels:
-    prod['foodcd'] = prod['foodcd'].replace(labelsd['Code_8h']['Preferred Label'])
-    #prod['s8hq13'] = prod['s8hq13'].replace(unitsd['Label'])
+prod = get_dataframe('../Data/partb/sec8h.dta', convert_categoricals=True)
+#harmonize food labels and map unit labels:
+prod['foodcd'] = prod['foodcd'].replace(labelsd['Code_8h']['Preferred Label'])
+#prod['s8hq13'] = prod['s8hq13'].replace(unitsd['Label'])
 
 # Some bizarre garbage in dta masquerading as extremely large numbers.
 #prod['s8hq14'] = prod.s8hq14.where(prod.s8hq14!=prod.s8hq14.max())

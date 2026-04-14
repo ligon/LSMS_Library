@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 import sys
-from lsms.tools import from_dta
 import numpy as np
 import dvc.api
 import pandas as pd
 sys.path.append('../../../_/')
-from lsms_library.local_tools import df_from_orgfile, get_categorical_mapping, df_data_grabber, format_id, _to_numeric, to_parquet
+from lsms_library.local_tools import df_from_orgfile, get_categorical_mapping, df_data_grabber, format_id, _to_numeric, to_parquet, get_dataframe
 w = '2012-13'
 
 #categorical mapping
@@ -44,10 +43,9 @@ fe= fe.groupby(['i', 'j', 'visit']).sum() # Deal with some cases with multiple r
 # Home produced
 ####################
 
-with dvc.api.open('../Data/PARTB/sec8h.dta',mode='rb') as dta:
-    prod = from_dta(dta, convert_categoricals=True)
-    #harmonize food labels and map unit labels:
-    prod['foodcd'] = prod['foodcd'].replace(labelsd['Code_8h'])
+prod = get_dataframe('../Data/PARTB/sec8h.dta', convert_categoricals=True)
+#harmonize food labels and map unit labels:
+prod['foodcd'] = prod['foodcd'].replace(labelsd['Code_8h'])
 
 # Some bizarre garbage in dta masquerading as extremely large numbers.
 #prod['s8hq14'] = prod.s8hq14.where(prod.s8hq14!=prod.s8hq14.max())
