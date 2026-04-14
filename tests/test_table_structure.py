@@ -215,9 +215,13 @@ class TestTableStructure:
             )
 
     def test_no_fully_null_columns(self, country, table, path):
-        """No column should be entirely null."""
+        """No non-optional column should be entirely null."""
+        spec = ALL_SCHEMES[country][table]
+        optional_cols = spec.get("optional", set())
         df = pd.read_parquet(path, engine="pyarrow")
         for col in df.columns:
+            if col in optional_cols:
+                continue  # genuinely absent data is allowed to be all-null
             assert not df[col].isna().all(), (
                 f"{country}/{table}: column '{col}' is entirely null"
             )
