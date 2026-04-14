@@ -61,23 +61,45 @@ def interview_date(value):
     return value
 
 
+_MONTH_MAP = {
+    'Janvier': 1, 'F\xe9vrier': 2, 'f': 2, 'Mars': 3, 'Avril': 4, 'Mai': 5,
+    'Juin': 6, 'Juillet': 7, 'Ao\xfbt': 8, 'Ao': 8, 'Septembre': 9,
+    'Octobre': 10, 'Novembre': 11, 'D\xe9cembre': 12, 'd': 12,
+}
+
+
 def household_roster(df):
     '''
     Compute Age from DOB components when s01q04a is absent.
 
     Age list in data_info.yml: [s01q04a, s01q03a(day), s01q03b(month), s01q03c(year)].
-    s01q03b is an integer month (1-12); 9999 sentinels in DOB columns are handled by
-    age_handler's is_valid() check (9999 >= 2100 is False, so they are treated as missing).
+    s01q03b is a French month string (sometimes truncated due to latin-1 encoding);
+    converted via _MONTH_MAP. 9999 sentinels in numeric DOB columns are passed through
+    (age_handler treats values >= 2100 as invalid).
     No negative age sentinel in s01q04a — it is simply NaN when absent.
     '''
     def _age_from_row(x):
         age_raw = x["Age"][0]
-        result = tools.age_handler(
-            age=age_raw,
-            d=x["Age"][1], m=x["Age"][2], y=x["Age"][3],
-            interview_date=x["interview_date"],
-            interview_year=2018,
-        )
+        d_raw = x["Age"][1]
+        d_val = None if (pd.notna(d_raw) and float(d_raw) >= 9999) else d_raw
+        m_raw = x["Age"][2]
+        m_val = _MONTH_MAP.get(str(m_raw)) if pd.notna(m_raw) else None
+        y_raw = x["Age"][3]
+        y_val = None if (pd.notna(y_raw) and float(y_raw) >= 9999) else y_raw
+        try:
+            result = tools.age_handler(
+                age=age_raw,
+                d=d_val, m=m_val, y=y_val,
+                interview_date=x["interview_date"],
+                interview_year=2018,
+            )
+        except (ValueError, OverflowError):
+            # Invalid DOB combination (e.g. day > days-in-month); fall back to year only
+            result = tools.age_handler(
+                age=age_raw, y=y_val,
+                interview_date=x["interview_date"],
+                interview_year=2018,
+            )
         return np.nan if (pd.notna(result) and result < 0) else result
 
     df["Age"] = df.apply(_age_from_row, axis=1)

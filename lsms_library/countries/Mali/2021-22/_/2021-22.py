@@ -2,6 +2,7 @@
 import pandas as pd
 from lsms_library.local_tools import format_id
 import numpy as np
+import lsms_library.local_tools as tools
 
 COPING_LABELS = {
     1: "Utilisation de son épargne",
@@ -31,6 +32,81 @@ COPING_LABELS = {
     25: "Autre stratégie",
     26: "Aucune stratégie",
 }
+
+
+def pid(value):
+    '''
+    Formatting person id from single membres__id column.
+    Overrides the country-level pid() which expects 3 components.
+    '''
+    return tools.format_id(value)
+
+
+def interview_date(value):
+    '''
+    Pass through interview_date as a scalar.
+    Overrides the country-level interview_date(df) which expects a DataFrame.
+    '''
+    return value
+
+
+def Sex(value):
+    '''
+    Formatting sex variable (numeric codes: 1=Masculin, 2=Féminin)
+    '''
+    if value == 1 or value == 'Masculin':
+        return 'm'
+    if value == 2 or value == 'Féminin':
+        return 'f'
+
+
+_MONTH_MAP = {
+    'Janvier': 1, 'Février': 2, 'Mars': 3, 'Avril': 4, 'Mai': 5,
+    'Juin': 6, 'Juillet': 7, 'Août': 8, 'Septembre': 9,
+    'Octobre': 10, 'Novembre': 11, 'Décembre': 12,
+}
+
+
+def Age(value):
+    '''
+    Convert 4-element Age list [s01q04a, s01q03a, s01q03b, s01q03c].
+    s01q03b is a French month string (or 'Ne sait pas'); convert to integer.
+    Numeric sentinel masking (9999) and age_handler call happen in household_roster(df).
+    '''
+    result = list(value)
+    m_raw = value.iloc[2]
+    if pd.isna(m_raw):
+        result[2] = None
+    else:
+        result[2] = _MONTH_MAP.get(str(m_raw))
+    return result
+
+
+def household_roster(df):
+    '''
+    Formatting dataframe to calculate ages.
+    Sentinel 9999 masks missing day/year components before passing to age_handler.
+    s01q03b was converted to int by Age(); 'Ne sait pas' becomes None via _MONTH_MAP miss.
+    '''
+
+    def _age_from_row(x):
+        age_raw = x["Age"][0]
+        # 9999 is the sentinel for unknown age; pass None so age_handler falls through to dob columns
+        age_val = None if (pd.notna(age_raw) and float(age_raw) >= 9999) else age_raw
+        d_raw = x["Age"][1]
+        d_val = None if (pd.notna(d_raw) and float(d_raw) >= 9999) else d_raw
+        m_val = x["Age"][2]  # already None if 'Ne sait pas' or missing
+        y_raw = x["Age"][3]
+        y_val = None if (pd.notna(y_raw) and float(y_raw) >= 9999) else y_raw
+        result = tools.age_handler(age=age_val, d=d_val, m=m_val, y=y_val,
+                                   interview_date=x["interview_date"], interview_year=2021)
+        # Null out any negative result (e.g. dob slightly after interview date)
+        return np.nan if (pd.notna(result) and result < 0) else result
+
+    df["Age"] = df.apply(_age_from_row, axis=1)
+    df = df.drop('interview_date', axis='columns')
+
+    return df
 
 
 def shocks(df):
