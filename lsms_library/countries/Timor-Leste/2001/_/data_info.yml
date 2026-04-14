@@ -21,8 +21,8 @@ sample:
         idxvars:
             i: identif
             v: id4
-        myvars:
-            int_t: s00_vis1
+        myvars: {}  # interview_date is not declared in data_scheme; stray
+                    # `int_t: s00_vis1` removed (GH #163 item 1).
     df_weights:
         file: ../Data/WEIGHT.DTA
         idxvars:

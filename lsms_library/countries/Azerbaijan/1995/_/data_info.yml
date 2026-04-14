@@ -54,8 +54,8 @@ sample:
         idxvars:
             i: [ppid, hid]
             v: ppid
-        myvars:
-            int_t: dayint
+        myvars: {}  # interview_date is not declared in data_scheme; stray
+                    # `int_t: dayint` removed (GH #163 item 1).
     df_weights:
         file: ../Data/PP.dta
         idxvars:

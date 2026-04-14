@@ -38,7 +38,14 @@ sample:
         weight: hmult
         panel_weight: hmult  # baseline wave — same as cross-sectional
         strata: stratum
-        Rural: urban
+        Rural:
+            - urban
+            - # Raw `urban` column is string-typed: '0' means rural, 'urban'
+              # means urban.  String keys required (see CLAUDE.md: "YAML
+              # mapping keys must be string keys when the raw labels are
+              # strings").  GH #163 item 3.
+                '0': Rural
+                urban: Urban
 
 cluster_features:
     file: GSEC1.dta
