@@ -1390,6 +1390,11 @@ class Country:
             if isinstance(scheme_entry, dict):
                 _enforce_declared_dtypes(df, scheme_entry)
 
+            # Enforce canonical dtypes from data_info.yml (wins over country-level
+            # declarations; e.g. Albania's Age: float → Int64 per canonical schema)
+            if method_name:
+                _enforce_canonical_dtypes(df, method_name)
+
         return df
 
     def _aggregate_wave_data(self, waves: list[str] | None = None, method_name: str | None = None) -> pd.DataFrame | dict[str, Any]:
@@ -2496,10 +2501,72 @@ def _enforce_declared_dtypes(df: pd.DataFrame, scheme_entry: dict[str, Any]) -> 
                 target = _SCHEME_DTYPE_MAP[declared_type]
                 if target == 'to_datetime':
                     df[col] = pd.to_datetime(df[col], errors='coerce')
-                elif target in (pd.Int64Dtype(), pd.Float64Dtype(), pd.BooleanDtype()):
+                elif target == pd.Int64Dtype():
+                    # Round before casting so float values (e.g. 59.41 from
+                    # age_handler) survive the safe-cast check.
+                    df[col] = pd.to_numeric(df[col], errors='coerce').round().astype(target)
+                elif target in (pd.Float64Dtype(), pd.BooleanDtype()):
                     df[col] = pd.to_numeric(df[col], errors='coerce').astype(target)
                 else:
                     df[col] = df[col].astype(target)
+        except (ValueError, TypeError):
+            pass  # best-effort; don't break loading
+
+
+@lru_cache(maxsize=1)
+def _load_canonical_dtypes() -> dict[str, dict[str, str]]:
+    """Load column type declarations from data_info.yml Columns section.
+
+    Returns ``{table: {column: type_str}}`` built from the ``type`` field of
+    each column entry.  Only columns with an explicit ``type`` declaration are
+    included.
+    """
+    info_path = files("lsms_library") / "data_info.yml"
+    with open(info_path, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+
+    result: dict[str, dict[str, str]] = {}
+    for table, cols in data.get("Columns", {}).items():
+        for col, meta in cols.items():
+            if not isinstance(meta, dict):
+                continue
+            type_decl = meta.get("type")
+            if type_decl and isinstance(type_decl, str):
+                result.setdefault(table, {})[col] = type_decl
+    return result
+
+
+def _enforce_canonical_dtypes(df: pd.DataFrame, method_name: str) -> None:
+    """Cast DataFrame columns to the types declared in data_info.yml Columns.
+
+    Modifies *df* in place.  This runs after ``_enforce_declared_dtypes`` so
+    the canonical schema (data_info.yml) wins over any country-level override
+    (e.g. ``Age: float`` in Albania's data_scheme.yml is overridden to Int64
+    because data_info.yml declares ``Age: type: int``).
+
+    Non-numeric strings in int/float columns are coerced to ``pd.NA`` via
+    ``pd.to_numeric(..., errors='coerce')`` before the dtype cast.
+    """
+    all_dtypes = _load_canonical_dtypes()
+    table_dtypes = all_dtypes.get(method_name, {})
+    for col, type_decl in table_dtypes.items():
+        if col not in df.columns:
+            continue
+        if type_decl not in _SCHEME_DTYPE_MAP:
+            continue
+        target = _SCHEME_DTYPE_MAP[type_decl]
+        try:
+            if target == 'to_datetime':
+                df[col] = pd.to_datetime(df[col], errors='coerce')
+            elif target == pd.Int64Dtype():
+                # Round before casting so that float ages like 59.41 (from
+                # age_handler's date-arithmetic path) survive the safe-cast
+                # check in pandas' IntegerArray.__from_sequence__.
+                df[col] = pd.to_numeric(df[col], errors='coerce').round().astype(target)
+            elif target in (pd.Float64Dtype(), pd.BooleanDtype()):
+                df[col] = pd.to_numeric(df[col], errors='coerce').astype(target)
+            else:
+                df[col] = df[col].astype(target)
         except (ValueError, TypeError):
             pass  # best-effort; don't break loading
 
