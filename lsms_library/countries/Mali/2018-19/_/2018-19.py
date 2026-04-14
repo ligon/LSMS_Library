@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import lsms_library.local_tools as tools
 
 COPING_LABELS = {
     1: "Utilisation de son épargne",
@@ -29,6 +30,59 @@ COPING_LABELS = {
     25: "Autre stratégie",
     26: "Aucune stratégie",
 }
+
+
+def Sex(value):
+    '''
+    Map numeric sex codes to canonical M/F.
+    Mali s01q01: 1=Masculin, 2=Féminin
+    '''
+    if value == 1 or value == 'Masculin':
+        return 'M'
+    if value == 2 or value == 'Féminin':
+        return 'F'
+
+
+def Age(value):
+    '''
+    Pass Age list [s01q04a, s01q03a, s01q03b, s01q03c] through unchanged.
+    s01q03b is integer month (1-12); 9999 sentinels handled by age_handler.
+    Override country-level mali.py Age() which expects a scalar.
+    '''
+    return list(value)
+
+
+def interview_date(value):
+    '''
+    Column-level pass-through for interview_date.
+    Overrides mali.py's df-level interview_date(df) which expects a DataFrame.
+    The household_roster(df) function handles date parsing via age_handler.
+    '''
+    return value
+
+
+def household_roster(df):
+    '''
+    Compute Age from DOB components when s01q04a is absent.
+
+    Age list in data_info.yml: [s01q04a, s01q03a(day), s01q03b(month), s01q03c(year)].
+    s01q03b is an integer month (1-12); 9999 sentinels in DOB columns are handled by
+    age_handler's is_valid() check (9999 >= 2100 is False, so they are treated as missing).
+    No negative age sentinel in s01q04a — it is simply NaN when absent.
+    '''
+    def _age_from_row(x):
+        age_raw = x["Age"][0]
+        result = tools.age_handler(
+            age=age_raw,
+            d=x["Age"][1], m=x["Age"][2], y=x["Age"][3],
+            interview_date=x["interview_date"],
+            interview_year=2018,
+        )
+        return np.nan if (pd.notna(result) and result < 0) else result
+
+    df["Age"] = df.apply(_age_from_row, axis=1)
+    df = df.drop('interview_date', axis='columns')
+    return df
 
 
 def shocks(df):
