@@ -37,7 +37,6 @@ cluster_features:
     df_main:
         file: NER_2011_ECVMA_v01_M_Stata8/ecvmamen_p1.dta
         idxvars:
-            i: hid
             v: grappe
         myvars:
             Region: region
@@ -54,14 +53,12 @@ cluster_features:
     df_geo:
         file: NER_2011_ECVMA_v01_M_Stata8/NER_HouseholdGeovars_Y1.dta
         idxvars:
-            i: hid
             v: grappe
         myvars:
             Latitude: lat_dd_mod
             Longitude: lon_dd_mod
     merge_on:
         - v
-        - i
     final_index:
         - t
         - v
