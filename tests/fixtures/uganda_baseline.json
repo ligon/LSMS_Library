@@ -1501,12 +1501,10 @@
   },
   "var/assets.parquet": {
     "columns": [
-      "Assets",
       "Value"
     ],
-    "content_hash": "e6d07e1438970fee838c97e22426b91cd6885cafcb1c7e89e3499d78ba6a61f8",
+    "content_hash": "2c0055cfe17c1908f10e24a55c6a7b498ce9773a450647accbe8431cd1021d7f",
     "dtypes": {
-      "Assets": "float64",
       "Value": "float64"
     },
     "index_names": [
@@ -1515,8 +1513,8 @@
       "j"
     ],
     "shape": [
-      87631,
-      2
+      116808,
+      1
     ]
   },
   "var/earnings.parquet": {

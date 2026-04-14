@@ -2,7 +2,7 @@ Country: Uganda
 
 Data Scheme:
   people_last7days:
-    index: (i, t, m)
+    index: (i, t)
     Men : int
     Women : int
     Boys : int
@@ -43,6 +43,7 @@ Data Scheme:
     index: (t, i)
     earnings: float
   food_acquired: !make
+  fct: !make
   nutrition: !make
   interview_date: !make
   food_quantities: !make

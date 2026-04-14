@@ -828,7 +828,11 @@ class Country:
     def resources(self) -> dict[str, Any]:
         if '_resources_cache' not in self.__dict__:
             var = self.file_path / "_" / "data_scheme.yml"
-            self.__dict__['_resources_cache'] = load_yaml(open(var)) if var.exists() else {}
+            if var.exists():
+                with open(var) as f:
+                    self.__dict__['_resources_cache'] = load_yaml(f)
+            else:
+                self.__dict__['_resources_cache'] = {}
         return self.__dict__['_resources_cache']
 
     def _materialization_entry(self, method_name: str) -> dict[str, Any]:
@@ -860,15 +864,32 @@ class Country:
         '''
         Get the categorical mapping for the country.
         Searches current directory, then parent directory.
+        Also merges global .org files from lsms_library/categorical_mapping/ (GH #168).
+        Global tables are loaded first; per-country tables override on name collision.
         '''
         if '_categorical_mapping_cache' not in self.__dict__:
+            # Load global mappings from lsms_library/categorical_mapping/*.org
+            global_maps: dict[str, pd.DataFrame] = {}
+            global_cm_dir = files("lsms_library") / "categorical_mapping"
+            try:
+                global_cm_path = Path(str(global_cm_dir))
+                for org_file in sorted(global_cm_path.glob("*.org")):
+                    try:
+                        global_maps.update(all_dfs_from_orgfile(org_file))
+                    except Exception:
+                        pass
+            except Exception:
+                pass
+
+            # Load per-country mappings (override global on name collision)
+            country_maps: dict[str, pd.DataFrame] = {}
             for rel in ['./', '../']:
                 org_fn = Path(self.file_path / rel / "_" / "categorical_mapping.org")
                 if org_fn.exists():
-                    self.__dict__['_categorical_mapping_cache'] = all_dfs_from_orgfile(org_fn)
+                    country_maps = all_dfs_from_orgfile(org_fn)
                     break
-            else:
-                self.__dict__['_categorical_mapping_cache'] = {}
+
+            self.__dict__['_categorical_mapping_cache'] = {**global_maps, **country_maps}
         return self.__dict__['_categorical_mapping_cache']
 
     @property
@@ -1378,6 +1399,20 @@ class Country:
             # Auto-apply categorical mappings where table name matches
             # a column or index name (issue #49)
             df = self._apply_categorical_mappings(df)
+
+            # Apply harmonize_assets mapping to the j index level for
+            # the assets feature (GH #168).  Runs after _apply_categorical_mappings
+            # because the table name (harmonize_assets) does not match the index
+            # level name (j) so the auto-dispatch above cannot fire.
+            if (method_name == 'assets'
+                    and isinstance(df.index, pd.MultiIndex)
+                    and 'j' in df.index.names):
+                ha_table = self.categorical_mapping.get('harmonize_assets')
+                if ha_table is not None and 'Preferred Label' in ha_table.columns:
+                    src_cols = [c for c in ha_table.columns if c != 'Preferred Label']
+                    if src_cols:
+                        rdict = ha_table.set_index(src_cols[0])['Preferred Label'].to_dict()
+                        df = df.rename(index=rdict, level='j')
 
             # Normalise variant spellings to canonical forms
             if method_name:

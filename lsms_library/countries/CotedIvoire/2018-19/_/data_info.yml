@@ -43,7 +43,6 @@ cluster_features:
     df_main:
         file: Menage/s00_me_CIV2018.dta
         idxvars:
-            i: menage
             v: grappe
         myvars:
             Region: s00q01

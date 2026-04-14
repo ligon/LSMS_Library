@@ -8,7 +8,6 @@ cluster_features:
     df_main:
         file: sect_cover_hh_w2.dta
         idxvars:
-            i: household_id2
             v: ea_id2
         myvars:
             Region: saq01

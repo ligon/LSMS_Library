@@ -27,7 +27,6 @@ cluster_features:
     df_main:
         file: Post Planting Wave 1/Household/secta_plantingw1.dta
         idxvars:
-            i: hhid
             v: ea
         myvars:
             Region: zone
@@ -44,14 +43,12 @@ cluster_features:
     df_geo:
         file: nga_householdgeovariables_y1.csv
         idxvars:
-            i: hhid
             v: ea
         myvars:
             Latitude: LAT_DD_MOD
             Longitude: LON_DD_MOD
     merge_on:
         - v
-        - i
     final_index:
         - t
         - v
