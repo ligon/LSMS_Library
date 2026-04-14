@@ -81,6 +81,12 @@ _DTYPE_EQUIVALENCE = {
     'str': 'string',          # some extraction paths write bare 'str'
     'string[python]': 'string',
     'string[pyarrow]': 'string',
+    # pandas 3.0 changed the default datetime resolution from [ns] to [us];
+    # collapse so baselines captured on the old default still match.
+    # Sub-microsecond precision is never meaningful for survey interview
+    # timestamps, so treating [ns] == [us] is semantically safe.  Uganda
+    # interview_date baseline tripped this on 2026-04-13.
+    'datetime64[ns]': 'datetime64[us]',
 }
 
 
