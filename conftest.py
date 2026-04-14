@@ -34,5 +34,9 @@ def pytest_configure(config):
         "markers",
         "rebuild: mark test as requiring a cold-cache rebuild from source.",
     )
+    config.addinivalue_line(
+        "markers",
+        "slow: mark test as slow (requires network or full data loading).",
+    )
     if config.getoption("--rebuild", default=False):
         os.environ["LSMS_NO_CACHE"] = "1"
