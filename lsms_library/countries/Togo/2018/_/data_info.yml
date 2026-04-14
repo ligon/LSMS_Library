@@ -70,21 +70,44 @@ cluster_features:
         - v
 
 household_roster:
-    file:
-        - ../Data1/s01_me_tgo2018.dta
-    idxvars:
-        v: grappe
-        i:
-            - grappe
-            - menage
-        pid:
-            - grappe
-            - menage
-            - s01q00a
-    myvars:
-        Sex: s01q01
-        Relationship: s01q02
-        Age: s01q04a
+    dfs:
+        - df_main
+        - df_cover
+    df_main:
+        file: ../Data1/s01_me_tgo2018.dta
+        idxvars:
+            v: grappe
+            i:
+                - grappe
+                - menage
+            pid:
+                - grappe
+                - menage
+                - s01q00a
+        myvars:
+            Sex: s01q01
+            Relationship: s01q02
+            Age:
+                - s01q04a
+                - s01q03a
+                - s01q03b
+                - s01q03c
+    df_cover:
+        file: ../Data1/s00_me_tgo2018.dta
+        idxvars:
+            v: grappe
+            i:
+                - grappe
+                - menage
+        myvars:
+            interview_date: s00q23a
+    merge_on:
+        - v
+        - i
+    final_index:
+        - v
+        - i
+        - pid
 
 individual_education:
     file: ../Data1/ehcvm_individu_tgo2018.dta
