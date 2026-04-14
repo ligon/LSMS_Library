@@ -1,5 +1,7 @@
 # Formatting Functions for Burkina Faso 2021-22
+import pandas as pd
 import numpy as np
+import lsms_library.local_tools as tools
 
 COPING_LABELS = {
     1: "Utilisation de son épargne",
@@ -29,6 +31,48 @@ COPING_LABELS = {
     25: "Autre stratégie",
     26: "Aucune stratégie",
 }
+
+
+def Age(value):
+    '''
+    Convert French month names to integers for the DOB components.
+
+    Burkina Faso s01q03b (month) uses French month names when loaded via DVC
+    with convert_categoricals=True (e.g. 'Janvier', 'Février', ..., 'Décembre').
+    'Ne sait pas' ('don't know') is the sentinel for unknown month; it maps to
+    None so age_handler falls back to year-only age computation.
+    Returns a list [s01q04a, s01q03a(day), s01q03b(month int), s01q03c(year)].
+    '''
+    month_map = {'Janvier': 1, 'Février': 2, 'Mars': 3, 'Avril': 4, 'Mai': 5,
+                 'Juin': 6, 'Juillet': 7, 'Août': 8, 'Septembre': 9,
+                 'Octobre': 10, 'Novembre': 11, 'Décembre': 12}
+    result = list(value)
+    result[2] = month_map.get(value.iloc[2])
+    return result
+
+
+def household_roster(df):
+    '''
+    Recover Age from date-of-birth components when s01q04a is null.
+
+    Age list in data_info.yml: [s01q04a, s01q03a(day), s01q03b(month), s01q03c(year)].
+    s01q03b uses French month names (Janvier…Décembre) after categorical conversion;
+    the Age() function above maps them to integers.  'Ne sait pas' maps to None, so
+    age_handler falls back to year-only computation.
+    Negative results (birth year recorded after interview) are nulled out.
+    '''
+    def _age_from_row(x):
+        age_raw = x["Age"][0]
+        # Pass None for missing/negative direct-age so age_handler falls through to DOB columns
+        age_val = None if (pd.notna(age_raw) and int(float(age_raw)) < 0) else age_raw
+        result = tools.age_handler(age=age_val, d=x["Age"][1], m=x["Age"][2], y=x["Age"][3],
+                                   interview_date=x["interview_date"], interview_year=2021)
+        # Null out any negative result (e.g. DOB slightly after interview date)
+        return np.nan if (pd.notna(result) and result < 0) else result
+
+    df["Age"] = df.apply(_age_from_row, axis=1)
+    df = df.drop('interview_date', axis='columns')
+    return df
 
 
 def shocks(df):

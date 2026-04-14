@@ -36,16 +36,41 @@ sample:
         - t
 
 household_roster:
-    file: ehcvm_individu_bfa2021.dta
-    idxvars:
-        i:
-            - grappe
-            - menage
-        pid: pid
-    myvars:
-        Sex: sexe
-        Age: age
-        Relationship: lien
+    dfs:
+        - df_main
+        - df_cover
+    df_main:
+        file: s01_me_bfa2021.dta
+        idxvars:
+            v: grappe
+            i:
+                - grappe
+                - menage
+            pid: pid
+        myvars:
+            Sex: s01q01
+            Relationship: s01q02
+            Age:
+                - s01q04a
+                - s01q03a
+                - s01q03b
+                - s01q03c
+    df_cover:
+        file: s00_me_bfa2021.dta
+        idxvars:
+            v: grappe
+            i:
+                - grappe
+                - menage
+        myvars:
+            interview_date: s00q23a
+    merge_on:
+        - v
+        - i
+    final_index:
+        - v
+        - i
+        - pid
 
 cluster_features:
     file: s00_me_bfa2021.dta
@@ -194,4 +219,4 @@ interview_date:
             - grappe
             - menage
     myvars:
-        int_t: s00q23a
+        Int_t: s00q23a
