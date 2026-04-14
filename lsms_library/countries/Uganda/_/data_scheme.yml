@@ -43,6 +43,7 @@ Data Scheme:
     index: (t, i)
     earnings: float
   food_acquired: !make
+  fct: !make
   nutrition: !make
   interview_date: !make
   food_quantities: !make
