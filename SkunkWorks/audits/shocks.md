@@ -184,3 +184,17 @@ Each country's shocks declaration matches its wave coverage. No ghost waves (dec
 ---
 
 **Audit Status**: ⚠️ Minor issues (Cope* leakage, Affected* nullity, Shock non-harmonization) do not prevent use but indicate schema drift and cleanup opportunities.
+
+---
+
+## Status 2026-04-13
+
+**Niger Cope→HowCoped — RESOLVED.** Commit `f3075884` rolls Niger's `Cope1`–`Cope26` raw flags into `HowCoped0`/`HowCoped1`/`HowCoped2`. The 26-column leakage documented in §3 for Niger is eliminated for 2026-onwards builds.
+
+**Togo HowCoped2 — RESOLVED.** Commit `d77448d6` marks `HowCoped2` optional in Togo and skips optional cols from the all-null check, fixing a false-failure gate.
+
+**Affected* boolean columns — STILL 100% NULL cross-country.** The finding from §4 (all 4.6M rows null in AffectedIncome/AffectedAssets/AffectedProduction/AffectedConsumption) is an active investigation (severity-264). No fix landed in this session. Root cause hypothesis: these columns are present in the canonical schema but not populated by any country's extraction scripts.
+
+**Cope* leakage for other countries** (Ethiopia, Mali, Nigeria) — still open pending per-country follow-ups analogous to the Niger fix.
+
+**Shock label harmonization** (numeric codes for Ethiopia/Nigeria, case inconsistency for Malawi) — still open; no cross-country mapping work commenced.

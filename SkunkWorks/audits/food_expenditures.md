@@ -169,6 +169,20 @@ Benin's food_acquired has a `visit` index level. The derivation drops it (not in
 
 5. **Document visit-level behavior**: If Benin's `visit` index level is intentionally dropped in derivation, document this in the function docstring with rationale.
 
+---
+
+## Status 2026-04-13
+
+**Tanzania `'x'` column bug — RESOLVED.** Commit `51d545d7` renames `'x'` → `'Expenditure'` in `countries/Tanzania/_/food_expenditures.py`. The rogue column described in §1 and §8 is eliminated.
+
+**Uganda `'x'` column — RESOLVED.** Commit `4dc0b351` applies the same rename in `Uganda/food_expenditures`. Commit `0245c17a` updates Uganda's `food_expenditures` column declaration in its schema to `'Expenditure'`.
+
+**`lsms.tools` dependency in CotedIvoire** — RESOLVED (commit `4a59e418`).
+
+**`v` injection scoping** (commit `3e050a5f`) — `food_expenditures` derivation produces index `(t, v, i, j)` which includes `v`; scoping fix keeps `v` present as before.
+
+**Outstanding**: Schema validation to catch naming errors at parquet write time (Recommendation 2) — not yet implemented. Legacy script deprecation for Tanzania/CotedIvoire — still open.
+
 ## Conclusion
 
 The `'x'` column is **not a framework bug** but a **data entry error in Tanzania's custom script**. The canonical derivation path (`transformations.food_expenditures_from_acquired`) works correctly and produces the expected `'Expenditure'` column. A one-line fix to Tanzania's `_/food_expenditures.py` will resolve the issue. Follow-on enhancements (schema validation, legacy script deprecation) will prevent similar issues in the future.

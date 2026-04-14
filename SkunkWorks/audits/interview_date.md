@@ -200,3 +200,22 @@ The canonical schema (`data_info.yml`) specifies:
 - **Medium-term**: Extract and add `v` (cluster) to all interview_date parquets where available in source data.
 - **Medium-term**: Convert string dates to datetime64[ns] or datetime64[ms] for efficiency and type safety.
 - **Long-term**: Audit all countries' interview_date.py scripts to ensure canonical compliance from the start.
+
+---
+
+## Status 2026-04-13
+
+**`int_t` → `Int_t` canonicalisation — RESOLVED.** A two-part fix lands:
+
+1. Commit `ec600dbe` adds `int_t` to `data_info.yml` Rejected Spellings, so `_enforce_canonical_spellings()` renames the column at API time for all countries, no wave-script edits required.
+2. Commit `702ef37a` renames `int_t` → `Int_t` in the `myvars` declarations across 6 countries (Benin, Burkina Faso, CotedIvoire, Ethiopia, Guinea-Bissau, Niger) to emit the correct name from the start.
+3. Commit `08939f4e` applies the same rename in Togo and Senegal `data_info.yml` files.
+4. Commit `2dca104b` rewrites Tanzania `interview_date` to use `round_match` and canonical `i` index.
+
+The `int_t`-vs-`Int_t` case-sensitivity finding from §3 and §8 is resolved. Mali was already canonical; the other 10 countries are now normalized at source and/or via Rejected Spellings enforcement.
+
+**Missing `v` index level** — still open; no framework change to inject `v` into interview_date parquets in this session. Index duplication issue from §5 is unchanged.
+
+**String-typed dates** (10 countries stored as StringDtype instead of datetime64) — still open; dtype coercion not addressed in this session.
+
+**Tanzania dual-source** (`date` + `int_t` columns) — partially improved by commit `2dca104b`; full unification deferred.

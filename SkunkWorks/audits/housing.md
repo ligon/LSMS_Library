@@ -171,3 +171,15 @@ Both columns correctly use the string dtype (not object), which is appropriate p
 
 5. **No data integrity issues:** Duplicated row check returns 0; all index tuples are unique. Each household-wave-country triplet appears exactly once.
 
+---
+
+## Status 2026-04-13
+
+**Feature scan: CLEAN.** The 2026-04-13 feature rescan confirms housing remains structurally sound:
+- No rogue columns; `Roof` and `Floor` still the only output columns.
+- All 13 countries contributing; no new silent absences.
+- Index `(country, i, t, v)` unique with 0 duplicates.
+- `v` injection scoping fix (commit `3e050a5f`) does not affect housing because housing's canonical index includes `v`.
+
+**No action required.** The minor outstanding items from §8 (Côte d'Ivoire `"Autre"` / Mali `"Manquant"` variant spellings; no housing schema in global `data_info.yml`) remain low-priority and unchanged.
+

@@ -123,3 +123,17 @@ Max value of 4,000 plausible for asset count in rare cases (e.g., livestock) but
 3. **Harmonize column definitions** across Malawi, Nepal, Ethiopia, Nigeria to match canonical set.
 4. **Add currency metadata** or document that cross-country value comparisons require country-specific conversion.
 
+---
+
+## Status 2026-04-13
+
+**Uganda assets rewritten — RESOLVED.** Commit `7ea65981` rewrites Uganda assets to emit per-item rows with canonical `(i, t, j)` index and a `Value` column, matching the cross-country schema. Commit `edd5aa72` regenerates the Uganda test baseline after this rewrite.
+
+**Index `v` injection — RESOLVED framework-wide.** Commit `3e050a5f` scopes `_join_v_from_sample` to tables whose canonical index declares `v`; assets canonical index `(t, i, j)` does not include `v`, so the spurious `v` level documented in §1 and §5 is no longer injected. The index mismatch `(country, i, t, v, j)` vs. expected `(country, t, i, j)` is fixed.
+
+**Value/Assets column split across Uganda waves** — follow-up item noted. Earlier Uganda waves may surface an `Assets` column name vs `Value` naming inconsistency; to be confirmed in next Uganda assets rescan.
+
+**Missing global column schema** (§8 Issue 2) — still open; no `Columns:` block added to `data_info.yml` for assets in this session.
+
+**Currency inconsistency** (§8 Issue 4) — still open by design; no harmonization work commenced.
+

@@ -248,3 +248,19 @@ The `food_acquired` Feature aggregation exhibits **class-A framework issues**:
 
 **Root cause**: The aggregation layer does not enforce the canonical schema before merging country tables. Country-specific decompositions (e.g., Nigeria's market breakdown, Mali's purchased/own/inkind splits) are exposed as rogue columns rather than being normalized or filtered. This breaks composability and API consistency.
 
+---
+
+## Status 2026-04-13
+
+**GhanaLSS `lsms.tools` dependency — RESOLVED.** Commit `c5e2d726` replaces the retired `lsms.tools.from_dta` in `GhanaLSS/food_acquired` with `local_tools.get_dataframe`, fixing the `ModuleNotFoundError` on cold cache for GhanaLSS.
+
+**CotedIvoire expenditures `lsms.tools` dependency — RESOLVED.** Commit `4a59e418` fixes the retired `lsms.tools.get_food_expenditures` call in CotedIvoire expenditures path.
+
+**83 extra non-canonical columns (§3) — STILL OPEN.** The 51-column leakage (country-specific decompositions, stringified numerics, corrupt item columns for GhanaLSS/Tanzania) has not been addressed. No canonicalisation layer was added in this session. This remains the primary structural finding requiring follow-up work.
+
+**Index structure mismatch** (unnamed MultiIndex, `m` demoted to column, `hh_id` in index) — still open; no framework change to food_acquired index handling.
+
+**Nigeria numeric item codes** and **item/unit vocabulary harmonization** — still open.
+
+**Follow-up**: The 83-column leakage is a blocking issue for cross-country food_acquired use and should be the top priority for the next food_acquired sprint.
+

@@ -132,3 +132,11 @@ The presence of plot_features in the canonical schema indicates **planned future
 `plot_features` is **architecturally reserved but entirely unimplemented**. The Feature aggregation correctly returns zero rows because zero countries have declared it. This is not a data quality issue or a missing cache; it is a **schema-implementation mismatch** that should be resolved by either implementing the table or deferring its schema declaration to the next major version.
 
 **Recommendation**: File a GitHub issue to clarify intent and assign implementation priority (this report documents that the table is on the roadmap but not yet available).
+
+---
+
+## Status 2026-04-13
+
+**Still unimplemented.** No country has added `plot_features` to its `data_scheme.yml` and no extraction scripts have been written. The `Feature('plot_features')()` call still returns 0 rows.
+
+No analyst has flagged this as a near-term priority. The finding from §2 and §8 is unchanged: this is a planned-but-unstarted feature. If agricultural plot-level analysis becomes a project need, the Uganda or Ethiopia wave series are the recommended pilot targets given their long LSMS-ISA coverage. Until then, this audit memo serves as the roadmap reference.

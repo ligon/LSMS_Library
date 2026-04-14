@@ -180,3 +180,15 @@ Benin's derived prices come out with index (t, v, i) from the transformation (as
 
 6. **Add unit provenance column**: Store the unit conversion method used (`KNOWN_METRIC` vs. `inferred`) so consumers can assess data reliability downstream.
 
+---
+
+## Status 2026-04-13
+
+**`food_prices_from_acquired` returns raw per-observation prices — RESOLVED.** Commit `5f5c2692` rewrites `food_prices_from_acquired()` in `transformations.py` to return raw per-observation unit prices rather than the household-level median price index that was documented in §8 Issue 1. The aggregation behavior (median across all items per household) that was confusing "food prices" semantics is replaced by per-record price output.
+
+**Index structure** (§8 Issue 5: `(i, t, v)` reordering) — behaviour may be affected by the `5f5c2692` rewrite; to be confirmed in a follow-up probe.
+
+**Uganda incompatible output path** (§8 Issue 2: 9-column legacy vs 1-column `Price`) — still open; Uganda's legacy `food_prices_quantities_and_expenditures.py` not touched in this session.
+
+**Unit conversion uncertainty** (§8 Issue 4) and **no canonical schema for food_prices columns** (§8 Issue 3) — still open.
+

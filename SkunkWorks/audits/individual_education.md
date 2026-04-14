@@ -177,3 +177,16 @@ The `individual_education` feature is **structurally sound** and **correctly ass
 
 **Coverage**: 9 countries, 841,044 records, up to 5 waves per country (Malawi). Two countries (Burkina_Faso, Nepal) missing due to DVC/build failures unrelated to schema.
 
+---
+
+## Status 2026-04-13
+
+**Feature scan: CLEAN.** The 2026-04-13 feature rescan confirms `individual_education` is structurally unchanged and sound:
+- Single `Educational Attainment` column (string dtype) — no rogue columns.
+- Unique MultiIndex with 0 duplicates.
+- All 9 contributing countries present; Burkina_Faso and Nepal still absent (DVC/build, not schema issue).
+
+**`v` injection scoping** (commit `3e050a5f`) — individual_education canonical index includes `v`, so `_join_v_from_sample()` continues to apply correctly; no regression.
+
+**Outstanding data quality items unchanged**: Mali numeric grade codes (1.0–45.0 mixed with French labels), Malawi case inconsistencies (NONE/none, MSCE/msce), Uganda elevated null rate (56%). None of these were addressed in the 2026-04-13 session.
+

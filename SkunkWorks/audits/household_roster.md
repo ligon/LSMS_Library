@@ -184,3 +184,34 @@ These extreme cases are plausible in multi-generational extended households (com
 4. **Validate Age range** (0–130) and emit warnings for negative or > 120.
 5. **Document or remove rogue columns** (Birthplace, in_housing, duplicate Marital variants).
 6. **Investigate scope gap**: Senegal, Togo, Armenia, Nepal, Serbia and Montenegro declared but not built; clarify build status or update data_scheme.yml.
+
+---
+
+## Status 2026-04-13
+
+**Sex canonicalisation — RESOLVED.** Commits `0a83768d` (extend canonical Sex spellings), `cbacd969` (handle Categorical columns in `_enforce_canonical_spellings`), `d65a2b63` (Ethiopia Stata-label form), `bf976126` (SouthAfrica `-1` sentinel), and related fixes bring the Sex column to canonical `{M, F}` across all 30 countries with cached parquets. The 16 non-canonical variants documented in §6 are eliminated at API time; the `spellings` map in `data_info.yml` is now applied correctly.
+
+**Age sentinels — RESOLVED for 5 countries (GH #165 + #164).**
+
+| Country | Fix | Commit |
+|---------|-----|--------|
+| SouthAfrica | Negative Age / `Relationship '-1'` → NA | `bfa66533` |
+| Nigeria | Clip sentinels −1, 130, 150, 999 → NA | `aadb6744` |
+| Senegal | Nullify Age −1 sentinel and negative age_handler results | `2b6196c2` |
+| Niger (both waves) | `age_handler` via raw EHCVM source | `5d31e7c2`, `03ef8c0d` |
+| Mali (both waves) | `age_handler` via raw EHCVM source | `3a872e86`, `bb621bd0` |
+| Burkina Faso (both waves) | `age_handler` via raw EHCVM source | `e8165b20`, `2508d4c5` |
+| Benin | `age_handler` via raw EHCVM source | `7ce6fde8` |
+| CotedIvoire | `age_handler` via raw EHCVM source | `a750ec0b` |
+| Guinea-Bissau | `age_handler` via raw EHCVM source | `cdde8113` |
+| Togo | Age recovered from DOB via `age_handler()` | `7e889ed4` |
+
+**Age dtype — RESOLVED.** Framework now coerces Age to `Int64` in `_enforce_canonical_dtypes` (commit `87fbd7a6`, GH #173). The `object`-dtype issue from §4 and the 1,086 non-numeric values are handled by the new `age_handler` pipeline.
+
+**Kinship labels — RESOLVED for Serbia and Montenegro.** Commit `cf04866e` adds 6 long-phrase labels for Serbia and Montenegro 2003; unknown-label warnings for those entries are eliminated.
+
+**Scope gap — PARTIALLY RESOLVED.** Senegal and Togo now have cached parquets (EHCVM raw-source rewrite landed). Armenia, Nepal remain absent (no microdata); Serbia and Montenegro now has kinship labels but minimal data (131 rows).
+
+**Kroeber decomposition** (Generation, Distance, Affinity absent from Feature output) — still open; the `api_derived` mechanism applies at Country level, not Feature aggregation level. No change in 2026-04-13 session.
+
+**Rogue columns** (Birthplace, Marital, Marital_status, in_housing) — still open; no cleanup commits observed.

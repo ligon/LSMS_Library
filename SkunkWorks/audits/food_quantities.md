@@ -158,3 +158,17 @@ The `food_quantities` feature successfully derives normalized (kg) quantities fo
 
 The core Quantity column is correctly typed (Float64) and contains valid numeric data.
 
+---
+
+## Status 2026-04-13
+
+**`lsms.tools` dependency (GhanaLSS path)** — RESOLVED upstream (commit `c5e2d726` fixes GhanaLSS `food_acquired`). GhanaLSS may now contribute to `food_quantities` where it previously failed silently on cold cache.
+
+**`v` injection scoping** (commit `3e050a5f`) — `food_quantities` derivation index `(t, v, i, j)` includes `v`; scoping fix retains correct behaviour; no regression.
+
+**Stray string columns** (`quant_ttl_consume`, `quantity_home`, `quantity_away`, `quantity_own`, `quantity_inkind`) — still open; no cleanup of the derivation output filter in this session.
+
+**Ethiopia build failure** (`KeyError: 'm'` in `food_prices_quantities_and_expenditures.py`) — still open; not addressed in 2026-04-13 session.
+
+**Extreme outlier (281,843 kg Benin)** and **99.4% apparent-duplicate index rate** — unchanged; follow-up investigation deferred.
+

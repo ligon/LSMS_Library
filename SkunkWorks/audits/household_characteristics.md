@@ -207,3 +207,15 @@ Custom bucketing via `age_cuts=` parameter is supported (line 62) but requires C
 **household_characteristics is fundamentally sound** as a derived feature: index is clean, shape is correct, no obvious data corruption. **The main quality issue is inherited from roster: sex-spelling variance cascades directly into fragmented column names**, breaking cross-country demographic comparisons unless users manually recombine variants. This is not a bug in the derivation logic but a **schema compliance issue upstream** in roster finalization.
 
 **Status**: Safe for use within a single country; **requires caution for cross-country analysis** of age-sex composition.
+
+---
+
+## Status 2026-04-13
+
+**Sex-spelling fragmentation — LARGELY RESOLVED upstream.** The Sex canonicalisation fixes landed in `household_roster` (commits `0a83768d`, `cbacd969`, `d65a2b63`, `bf976126`, and EHCVM raw-source rewrites) propagate into `household_characteristics` at derivation time because `roster_to_characteristics()` consumes the post-`_finalize_result()` roster output where canonical `{M, F}` spellings are now enforced. The column-name proliferation documented in §6 (`Feminin 00-03`, `Masculino 04-08`, `2. Female 04-08`, etc.) should no longer appear for countries whose Sex spelling was fixed.
+
+**Countries still potentially fragmented**: Armenia, Nepal (no microdata), Guyana (silent derivation failure), and any country not yet reached by the EHCVM age_handler sprint. Recommend a targeted re-probe of `household_characteristics` to confirm column-name cleanup.
+
+**Age-bucketing quality improvement**: The `age_handler` pipeline (GH #165) and `Int64` dtype coercion (commit `87fbd7a6`) mean that the "non-numeric Age → silent undercount" pathway documented in §6 is substantially reduced. Households in fixed countries now contribute full counts rather than deflated ones.
+
+**Remaining open items**: `log HSize` edge case (sum=0 → −inf), `m` index via `market=` parameter unverified, and Armenia/Guyana/Nepal scope gap — unchanged.
