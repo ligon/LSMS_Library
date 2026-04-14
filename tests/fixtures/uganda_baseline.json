@@ -1501,21 +1501,21 @@
   },
   "var/assets.parquet": {
     "columns": [
-      "assets",
-      "level_1"
+      "Assets",
+      "Value"
     ],
-    "content_hash": "2713799929e50d9ff09bfc40de39ce2aae4e72dd6e866fbcc87b83ef36e0b5ae",
+    "content_hash": "e6d07e1438970fee838c97e22426b91cd6885cafcb1c7e89e3499d78ba6a61f8",
     "dtypes": {
-      "assets": "float64",
-      "level_1": "string"
+      "Assets": "float64",
+      "Value": "float64"
     },
     "index_names": [
-      "i",
       "t",
-      "m"
+      "i",
+      "j"
     ],
     "shape": [
-      24073,
+      87631,
       2
     ]
   },
