@@ -57,7 +57,7 @@ Data Scheme:
     Value: float
   interview_date:
     index: (t, i)
-    int_t: datetime
+    Int_t: datetime
     materialize: make
 
   housing:
