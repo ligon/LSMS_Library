@@ -268,9 +268,12 @@ def _check_reasonable_size(df: pd.DataFrame) -> Check:
     return Check("reasonable_size", "pass", f"{n:,} rows")
 
 
-def _check_no_all_null_columns(df: pd.DataFrame) -> Check:
-    """No column should be entirely null."""
-    bad = [col for col in df.columns if df[col].isna().all()]
+def _check_no_all_null_columns(
+    df: pd.DataFrame, optional: set[str] | None = None
+) -> Check:
+    """No non-optional column should be entirely null."""
+    skip = optional or set()
+    bad = [col for col in df.columns if col not in skip and df[col].isna().all()]
     if bad:
         return Check("no_all_null_columns", "fail",
                      f"{len(bad)} all-null column(s): {bad[:5]}")
@@ -500,6 +503,7 @@ def is_this_feature_sane(
     """
     scheme = _load_scheme(country)
     report = SanityReport(country=country, feature=feature)
+    optional = scheme.get(feature, {}).get("optional", set())
 
     report.checks.append(_check_not_empty(df))
     report.checks.append(_check_has_index(df))
@@ -508,7 +512,7 @@ def is_this_feature_sane(
     report.checks.append(_check_has_time_index(df))
     report.checks.append(_check_has_household_index(df))
     report.checks.append(_check_reasonable_size(df))
-    report.checks.append(_check_no_all_null_columns(df))
+    report.checks.append(_check_no_all_null_columns(df, optional))
     report.checks.append(_check_no_constant_columns(df))
     report.checks.append(_check_declared_columns(df, scheme, feature))
     report.checks.append(_check_dtype_consistency(df, scheme, feature))
@@ -725,6 +729,7 @@ def validate_feature(
 
     # --- Standard sanity checks ---------------------------------------------
     scheme = _load_scheme(country)
+    optional = scheme.get(feature, {}).get("optional", set())
     report.checks.append(_check_not_empty(df))
     report.checks.append(_check_has_index(df))
     report.checks.append(_check_index_levels(df, scheme, feature))
@@ -732,7 +737,7 @@ def validate_feature(
     report.checks.append(_check_has_time_index(df))
     report.checks.append(_check_has_household_index(df))
     report.checks.append(_check_reasonable_size(df))
-    report.checks.append(_check_no_all_null_columns(df))
+    report.checks.append(_check_no_all_null_columns(df, optional))
     report.checks.append(_check_no_constant_columns(df))
     report.checks.append(_check_declared_columns(df, scheme, feature))
     report.checks.append(_check_dtype_consistency(df, scheme, feature))
