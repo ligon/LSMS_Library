@@ -1522,18 +1522,17 @@
       "earnings",
       "level_1"
     ],
-    "content_hash": "af34762407e5cba75dbe5d4bc05307176d01a3102bb654fbfc190e65f58b1d54",
+    "content_hash": "9b4d9b06382bd9ed3ef5491babbb987de10a5c49dc860e78d83e52ea36d0c3cc",
     "dtypes": {
       "earnings": "float64",
-      "level_1": "string"
+      "level_1": "str"
     },
     "index_names": [
-      "i",
       "t",
-      "m"
+      "i"
     ],
     "shape": [
-      22447,
+      129160,
       2
     ]
   },
@@ -1546,7 +1545,7 @@
       "revenue",
       "wagebill"
     ],
-    "content_hash": "625a11245b7306c9e6caf20290f1a7a9cd17e31cdfd87414fefb4632964a5206",
+    "content_hash": "1f03ec635b2d8c0b8312b5aecc0406b36e3981eb44c05210d4d5054c6cdd5638",
     "dtypes": {
       "losses": "float64",
       "materials": "float64",
@@ -1556,12 +1555,11 @@
       "wagebill": "float64"
     },
     "index_names": [
-      "i",
       "t",
-      "m"
+      "i"
     ],
     "shape": [
-      13935,
+      78040,
       6
     ]
   },
@@ -1826,7 +1824,7 @@
       "value_inkind",
       "value_own"
     ],
-    "content_hash": "b1064dfb68a66e8f60b5c4806627b8aed4007a991a49e3b8dcdf76bd73152242",
+    "content_hash": "0ad436fad253bb47c26b2a798884684d4138ecf8815502c971756befb1e9f121",
     "dtypes": {
       "Kgs": "float64",
       "farmgate": "float64",
@@ -1850,7 +1848,6 @@
     "index_names": [
       "i",
       "t",
-      "m",
       "j",
       "u"
     ],
@@ -1861,20 +1858,19 @@
   },
   "var/food_expenditures.parquet": {
     "columns": [
-      "x"
+      "Expenditure"
     ],
-    "content_hash": "c31668d7935555675f4aa0865a834ee158f54dc9fab7b581cae5ac790f02c9a1",
+    "content_hash": "7190c97259d34abb4f627d957cbde62a24908dcbabfae8cc62bc6fb0e6975953",
     "dtypes": {
-      "x": "float64"
+      "Expenditure": "float64"
     },
     "index_names": [
       "i",
       "t",
-      "m",
       "j"
     ],
     "shape": [
-      352722,
+      352772,
       1
     ]
   },
@@ -1890,7 +1886,7 @@
       "unitvalue_inkind",
       "unitvalue_own"
     ],
-    "content_hash": "ba696a785ba285444fc01025ad7a2dc56772bda402336d5d0151e410dd7e43ea",
+    "content_hash": "1a5e34d39c8f0b763f66c0599bc1ccc538aa6407f2c59318a38359a57d82d612",
     "dtypes": {
       "farmgate": "float64",
       "market": "float64",
@@ -1905,7 +1901,6 @@
     "index_names": [
       "i",
       "t",
-      "m",
       "j",
       "u"
     ],
@@ -1921,7 +1916,7 @@
       "quantity_inkind",
       "quantity_own"
     ],
-    "content_hash": "42d42f8c946ab809cc8eab4cf3684e9118e57909d3418a834878dfdf5d395b08",
+    "content_hash": "0ebbd5c2eeed8ba02bc688a694339cec282f12b70362476ac0b0181f56a5af01",
     "dtypes": {
       "quantity_away": "float64",
       "quantity_home": "float64",
@@ -1931,7 +1926,6 @@
     "index_names": [
       "i",
       "t",
-      "m",
       "j",
       "u"
     ],
@@ -1988,31 +1982,24 @@
   },
   "var/household_roster.parquet": {
     "columns": [
-      "Affinity",
       "Age",
-      "Distance",
-      "Generation",
       "Relationship",
       "Sex"
     ],
-    "content_hash": "fecda0150bbd5294c61848018dca3c1bfc824d7ad8ace6d8efab4c07ea8d32e6",
+    "content_hash": "1d2cb9b61cda4641ea0879384c910ca00caccce48f3390c8fafa1772fa653ca4",
     "dtypes": {
-      "Affinity": "string",
-      "Age": "Int64",
-      "Distance": "Int64",
-      "Generation": "Int64",
+      "Age": "float64",
       "Relationship": "string",
       "Sex": "string"
     },
     "index_names": [
-      "i",
       "t",
-      "v",
+      "i",
       "pid"
     ],
     "shape": [
-      147634,
-      6
+      147612,
+      3
     ]
   },
   "var/housing.parquet": {
@@ -2038,16 +2025,16 @@
     "columns": [
       "income"
     ],
-    "content_hash": "396214925f292e87defa57d23fa0f27cf8eee6046712325804dd87dca6b59225",
+    "content_hash": "56b8f3ccc8a14eea61742cd5b6a0580a4e96c50f29f9a659ee47fd964a92d889",
     "dtypes": {
       "income": "float64"
     },
     "index_names": [
-      "i",
-      "t"
+      "t",
+      "i"
     ],
     "shape": [
-      10193,
+      13931,
       1
     ]
   },
@@ -2269,6 +2256,29 @@
       1
     ]
   },
+  "var/people_last7days.parquet": {
+    "columns": [
+      "Boys",
+      "Girls",
+      "Men",
+      "Women"
+    ],
+    "content_hash": "437a69109d796095f15baab42f904755dbb1e76a36a7f2c8e7f97c3ab69821c2",
+    "dtypes": {
+      "Boys": "float64",
+      "Girls": "float64",
+      "Men": "float64",
+      "Women": "float64"
+    },
+    "index_names": [
+      "i",
+      "t"
+    ],
+    "shape": [
+      15471,
+      4
+    ]
+  },
   "var/shocks.parquet": {
     "columns": [
       "AffectedAssets",
@@ -2280,31 +2290,29 @@
       "HowCoped1",
       "HowCoped2",
       "Onset",
-      "Shock",
       "Year"
     ],
-    "content_hash": "c8e438403607118ce89bb58bbb8aae767bc6ed89d276e40d1ed068f0ecfe853f",
+    "content_hash": "53c53cb3645f4bfbf5d56ae33e6140258aaa2f8b3d84cd40e2d039761a96b4f1",
     "dtypes": {
-      "AffectedAssets": "boolean",
-      "AffectedConsumption": "boolean",
-      "AffectedIncome": "boolean",
-      "AffectedProduction": "boolean",
+      "AffectedAssets": "string",
+      "AffectedConsumption": "string",
+      "AffectedIncome": "string",
+      "AffectedProduction": "string",
       "Duration": "float64",
-      "HowCoped0": "string",
-      "HowCoped1": "string",
-      "HowCoped2": "string",
-      "Onset": "Int64",
-      "Shock": "string",
+      "HowCoped0": "str",
+      "HowCoped1": "str",
+      "HowCoped2": "str",
+      "Onset": "Float64",
       "Year": "Float64"
     },
     "index_names": [
       "i",
       "t",
-      "m"
+      "Shock"
     ],
     "shape": [
       14457,
-      11
+      10
     ]
   }
 }
