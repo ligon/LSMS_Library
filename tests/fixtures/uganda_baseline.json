@@ -2057,17 +2057,16 @@
     "columns": [
       "date"
     ],
-    "content_hash": "dabcc37172d360ce5d126c4e4e4c6d351dc4286b47bfbcf373ec2875a7269245",
+    "content_hash": "f60e9b7fd205ecbf352d6f7d1e978867e6790d9719d1b21010cb318f9f9f5166",
     "dtypes": {
-      "date": "datetime64[ns]"
+      "date": "datetime64[us]"
     },
     "index_names": [
       "i",
-      "t",
-      "m"
+      "t"
     ],
     "shape": [
-      24264,
+      24362,
       1
     ]
   },
