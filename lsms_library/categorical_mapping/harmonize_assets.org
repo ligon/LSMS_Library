@@ -1,0 +1,145 @@
+#+title: Harmonized Asset Labels (Global)
+#+author: LSMS Library
+#+description: Global mapping from raw survey asset labels to canonical Preferred Labels.
+#+  One row per raw-label variant.  Phase 1 canonical vocabulary; Phase 2 Uganda labels added.
+#+  See GitHub issue #168.
+
+#+name: harmonize_assets
+| Original Label                                              | Preferred Label   |
+|-------------------------------------------------------------+-------------------|
+| biycle                                                      | Bicycle           |
+| Bicycle                                                     | Bicycle           |
+| bicycle                                                     | Bicycle           |
+| Motor cycle                                                 | Motorcycle        |
+| Motor Cycle                                                 | Motorcycle        |
+| motor cycle                                                 | Motorcycle        |
+| Motorcycle                                                  | Motorcycle        |
+| motorcycle                                                  | Motorcycle        |
+| Motor vehicle                                               | Car               |
+| Motor Vehicle                                               | Car               |
+| Car                                                         | Car               |
+| car                                                         | Car               |
+| Truck                                                       | Truck/Van         |
+| Van                                                         | Truck/Van         |
+| truck                                                       | Truck/Van         |
+| Boat                                                        | Boat              |
+| boat                                                        | Boat              |
+| Boat /Canoe                                                 | Boat              |
+| Boat/Canoe                                                  | Boat              |
+| Other Transport equipment                                   | Other Transport   |
+| Other transport equipment                                   | Other Transport   |
+| other transport equiptment                                  | Other Transport   |
+| transport equipment for enterprise                          | Other Transport   |
+| House                                                       | House             |
+| house                                                       | House             |
+| Owner occupied House                                        | House             |
+| Owner Occupied House                                        | House             |
+| Other Buildings                                             | OtherBuilding     |
+| Other buildings                                             | OtherBuilding     |
+| other buildings                                             | OtherBuilding     |
+| Land                                                        | Land              |
+| land                                                        | Land              |
+| Non-Agricultural Land                                       | Land              |
+| Non-agricultural land                                       | Land              |
+| Furniture/Furnishings                                       | Furniture         |
+| Furniture/furnishigs                                        | Furniture         |
+| furniture                                                   | Furniture         |
+| furnishings                                                 | Furniture         |
+| Furnishings                                                 | Furniture         |
+| Mattress                                                    | Mattress          |
+| mattress                                                    | Mattress          |
+| Bed                                                         | Bed               |
+| bed                                                         | Bed               |
+| bednets                                                     | Bednet            |
+| Bednet                                                      | Bednet            |
+| bednet                                                      | Bednet            |
+| Mosquito net                                                | Bednet            |
+| Radio                                                       | Radio             |
+| radio                                                       | Radio             |
+| Radio/ Cassette                                             | Radio             |
+| Radio/Cassette                                              | Radio             |
+| Cassette/DVD/CD                                             | DVD/CD Player     |
+| DVD Player                                                  | DVD/CD Player     |
+| CD Player                                                   | DVD/CD Player     |
+| Television                                                  | TV                |
+| Televsion                                                   | TV                |
+| television                                                  | TV                |
+| TV                                                          | TV                |
+| Home theatre / music system                                 | TV                |
+| electronic equipment                                        | Electronics       |
+| Other electronic equipment                                  | Electronics       |
+| Internet Access                                             | Electronics       |
+| Computer                                                    | Computer          |
+| computer                                                    | Computer          |
+| Computer - Desktop/Laptop/Tablet/iPad                       | Computer          |
+| Mobile phone                                                | Phone (Mobile)    |
+| mobile phone                                                | Phone (Mobile)    |
+| Fixed phone                                                 | Phone (Landline)  |
+| fixed phone                                                 | Phone (Landline)  |
+| Camera                                                      | Camera            |
+| camera                                                      | Camera            |
+| Refrigerator                                                | Refrigerator      |
+| refrigerator                                                | Refrigerator      |
+| Freezer                                                     | Freezer           |
+| freezer                                                     | Freezer           |
+| Cooker                                                      | Cooker            |
+| cooker                                                      | Cooker            |
+| Gas Cooker                                                  | Gas Cooker        |
+| gas cooker                                                  | Gas Cooker        |
+| Kerosene Cooker                                             | Kerosene Cooker   |
+| kerosene cooker                                             | Kerosene Cooker   |
+| Iron (clothes)                                              | Iron              |
+| iron                                                        | Iron              |
+| Household Appliances e.g. Kettle, Flat iron, etc           | Appliances        |
+| Household Appliances e.g. Kettle, Flat iron, etc.          | Appliances        |
+| Household appliances                                        | Appliances        |
+| hh appliances                                               | Appliances        |
+| Other household assets e.g. lawn mowers, etc               | Appliances        |
+| Other household assets e.g. lawn mowers, etc.              | Appliances        |
+| other hh assets                                             | Appliances        |
+| Sewing Machine                                              | Sewing Machine    |
+| sewing machine                                             | Sewing Machine    |
+| Washing Machine                                             | Washing Machine   |
+| washing machine                                             | Washing Machine   |
+| Fan                                                         | Fan               |
+| fan                                                         | Fan               |
+| Generators                                                  | Generator         |
+| generators                                                  | Generator         |
+| Generator                                                   | Generator         |
+| generator                                                   | Generator         |
+| Solar panel/electric inverters                              | Solar Panel       |
+| solar panel/electric inverters                              | Solar Panel       |
+| Solar Panel                                                 | Solar Panel       |
+| solar panel                                                 | Solar Panel       |
+| Water Tank                                                  | Water Tank        |
+| water tank                                                  | Water Tank        |
+| Well/Pump                                                   | Well/Pump         |
+| well/pump                                                   | Well/Pump         |
+| Jewelry and Watches                                         | Jewelry           |
+| jewelry and watches                                         | Jewelry           |
+| Jewelry                                                     | Jewelry           |
+| jewelly watches                                             | Jewelry           |
+| Jewellery                                                   | Jewelry           |
+| hoe                                                         | Hoe               |
+| Hoe                                                         | Hoe               |
+| pangas                                                      | Panga/Machete     |
+| Panga                                                       | Panga/Machete     |
+| ploughs                                                     | Plough            |
+| Plough                                                      | Plough            |
+| plough                                                      | Plough            |
+| Cart                                                        | Cart              |
+| cart                                                        | Cart              |
+| wheel barrows                                               | Wheelbarrow       |
+| Wheelbarrow                                                 | Wheelbarrow       |
+| other agricultural equipment                                | Agricultural Tools |
+| Agricultural equipment                                      | Agricultural Tools |
+| other enterprise equipment                                  | Enterprise Equipment |
+| Bank Account                                                | Bank Account      |
+| bank account                                                | Bank Account      |
+| 113.0                                                       | Other             |
+| 114.0                                                       | Other             |
+| 115.0                                                       | Other             |
+| Other 1 (specify)                                           | Other             |
+| Other 2 (specify)                                           | Other             |
+| other                                                       | Other             |
+| Other                                                       | Other             |
