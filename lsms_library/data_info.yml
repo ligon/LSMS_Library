@@ -119,3 +119,8 @@ Rejected Spellings:
   Effected: Affected
   Highest_education: Educational Attainment
   Highest Education: Educational Attainment
+  # interview_date canonical column is Int_t (see Columns.interview_date
+  # above); 10/11 countries emit lowercase 'int_t' (2026-04-13 feature
+  # scan).  Substring rewrite is case-sensitive, so this matches 'int_t'
+  # exactly without touching 'Int_t' or unrelated columns.
+  int_t: Int_t
