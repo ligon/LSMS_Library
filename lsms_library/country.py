@@ -546,6 +546,25 @@ class Wave:
             return pd.DataFrame()
         data_info = self.resources.get(request, None)
 
+        # --- Wave-level L2 cache check (YAML-path only) ---
+        # Script-path tables (data_info is None) already get wave parquets
+        # from their _/<table>.py scripts via local_tools.to_parquet().  The
+        # YAML path returns in-memory DataFrames without writing, so every
+        # per-wave iterator (e.g. Country._market_lookup) pays the full
+        # df_data_grabber cost on every call.  Cache the extracted+formatted
+        # wave frame the first time it's produced.  Stored pre-transform:
+        # categorical mapping, kinship expansion, and _finalize_result all
+        # run downstream on every read.  Staleness semantics match the
+        # country-level L2 (see CLAUDE.md "Cache Behavior"): no automatic
+        # invalidation; force a rebuild with LSMS_NO_CACHE=1 or by deleting
+        # the parquet.
+        cache_path = None
+        if data_info:
+            cache_path = (data_root(self.country.name) / self.year / '_'
+                          / f'{request}.parquet')
+            if cache_path.exists() and not os.environ.get('LSMS_NO_CACHE'):
+                return pd.read_parquet(cache_path)
+
         def check_adding_t(df):
             index_list = df.index.names
             if 't' not in index_list:
@@ -701,9 +720,27 @@ class Wave:
 
         if isinstance(df, pd.DataFrame):
             df = map_index(df)
-        
+
         df = check_adding_t(df)
         df = df[df.index.get_level_values('t') == self.year]
+
+        # --- Wave-level L2 cache write (YAML-path only) ---
+        # See the matching read at the top of this method for rationale.
+        # Write failures warn but don't propagate — the caller gets a
+        # correct DataFrame either way.
+        if (cache_path is not None
+                and not os.environ.get('LSMS_NO_CACHE')
+                and isinstance(df, pd.DataFrame)
+                and not df.empty):
+            try:
+                cache_path.parent.mkdir(parents=True, exist_ok=True)
+                df = to_parquet(df, cache_path, absolute_path=True)
+            except Exception as exc:
+                warnings.warn(
+                    f'wave-level L2 cache write failed for '
+                    f'{self.country.name}/{self.year}/{request}: {exc}'
+                )
+
         return df
 
     # This cluster_features method is explicitly defined because additional processing is required after calling grab_data.

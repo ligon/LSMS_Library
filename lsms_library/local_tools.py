@@ -838,14 +838,23 @@ def change_encoding(s: str, from_encoding: str, to_encoding: str = 'utf-8', erro
     """
     return bytes(s,encoding=from_encoding).decode(to_encoding,errors=errors)
 
-def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True) -> pd.DataFrame:
+def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_path: bool = False) -> pd.DataFrame:
     """
     Write df to parquet file fn.
 
     Parquet (pyarrow) is slightly more picky about data types and layout than is pandas;
     here we fix some possible problems before calling pd.DataFrame.to_parquet.
+
+    Parameters
+    ----------
+    absolute_path : bool, default False
+        If True, skip the call-stack-inspecting :func:`_resolve_data_path`
+        rewrite and use ``fn`` verbatim.  Intended for library callers
+        (not wave/country scripts) that build an absolute path themselves
+        and don't want the caller-inference heuristic to run.
     """
-    fn = _resolve_data_path(fn)
+    if not absolute_path:
+        fn = _resolve_data_path(fn)
     if len(df.shape)==0: # A series?  Need a dataframe.
         df = pd.DataFrame(df)
 
