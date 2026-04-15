@@ -1,0 +1,130 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.6, pytest-8.4.2, pluggy-1.6.0 -- /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library
+configfile: pyproject.toml
+plugins: anyio-4.13.0, instafail-0.5.0, timeout-2.4.0, xdist-3.8.0, hydra-core-1.3.2
+created: 15/15 workers
+15 workers [15 items]
+
+scheduling tests via LoadScheduling
+
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[earnings] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[household_characteristics] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[household_roster] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[enterprise_income] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[income] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[shocks] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[fct] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_acquired] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_prices] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[interview_date] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[nutrition] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_quantities] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[locality] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[people_last7days] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_expenditures] 
+[gw12] [  6%] PASSED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[locality] 
+[gw2] [ 13%] FAILED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[fct] 
+[gw8] [ 20%] FAILED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[household_roster] 
+[gw7] [ 26%] FAILED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[household_characteristics] 
+[gw1] [ 33%] PASSED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[enterprise_income] 
+[gw0] [ 40%] PASSED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[earnings] 
+[gw13] [ 46%] FAILED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[shocks] 
+[gw3] [ 53%] PASSED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_acquired] 
+[gw14] [ 60%] PASSED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[people_last7days] 
+[gw11] [ 66%] FAILED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[nutrition] 
+[gw4] [ 73%] PASSED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_expenditures] 
+[gw5] [ 80%] FAILED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_prices] 
+[gw10] [ 86%] PASSED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[interview_date] 
+[gw6] [ 93%] FAILED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_quantities] 
+[gw9] [100%] PASSED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[income] 
+
+=================================== FAILURES ===================================
+______________________ test_api_matches_replication[fct] _______________________
+[gw2] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+tests/test_uganda_api_vs_replication.py:293: in test_api_matches_replication
+    _compare_column(base, merged[f"{base}_api"], merged[f"{base}_repl"], atol)
+tests/test_uganda_api_vs_replication.py:231: in _compare_column
+    raise AssertionError(
+E   AssertionError: column 'Donuts': max |Δ| = 7.10543e-15 > atol 0; mean |Δ| = 7.40149e-16; 3/15 rows out of tolerance
+________________ test_api_matches_replication[household_roster] ________________
+[gw8] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+tests/test_uganda_api_vs_replication.py:293: in test_api_matches_replication
+    _compare_column(base, merged[f"{base}_api"], merged[f"{base}_repl"], atol)
+tests/test_uganda_api_vs_replication.py:240: in _compare_column
+    assert mismatch == 0, (
+E   AssertionError: column 'Sex': 35493/35493 rows differ (non-numeric)
+E   assert np.int64(35493) == 0
+___________ test_api_matches_replication[household_characteristics] ____________
+[gw7] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+tests/test_uganda_api_vs_replication.py:293: in test_api_matches_replication
+    _compare_column(base, merged[f"{base}_api"], merged[f"{base}_repl"], atol)
+tests/test_uganda_api_vs_replication.py:216: in _compare_column
+    assert not only_one_na.any(), (
+E   AssertionError: column 'log HSize': 1 rows have NaN in one side but not the other
+E   assert not np.True_
+E    +  where np.True_ = any()
+E    +    where any = 0        False\n1        False\n2        False\n3        False\n4        False\n         ...  \n23570    False\n23571    False\n23572    False\n23573    False\n23574    False\nLength: 23575, dtype: bool.any
+_____________________ test_api_matches_replication[shocks] _____________________
+[gw13] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+tests/test_uganda_api_vs_replication.py:293: in test_api_matches_replication
+    _compare_column(base, merged[f"{base}_api"], merged[f"{base}_repl"], atol)
+tests/test_uganda_api_vs_replication.py:216: in _compare_column
+    assert not only_one_na.any(), (
+E   AssertionError: column 'Shock': 6 rows have NaN in one side but not the other
+E   assert not np.True_
+E    +  where np.True_ = any()
+E    +    where any = 0        False\n1        False\n2        False\n3        False\n4        False\n         ...  \n26664    False\n26665    False\n26666    False\n26667    False\n26668    False\nLength: 26669, dtype: bool.any
+___________________ test_api_matches_replication[nutrition] ____________________
+[gw11] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+tests/test_uganda_api_vs_replication.py:293: in test_api_matches_replication
+    _compare_column(base, merged[f"{base}_api"], merged[f"{base}_repl"], atol)
+tests/test_uganda_api_vs_replication.py:231: in _compare_column
+    raise AssertionError(
+E   AssertionError: column 'Energy': max |Δ| = 8200 > atol 0.1; mean |Δ| = 0.380928; 2/23679 rows out of tolerance
+__________________ test_api_matches_replication[food_prices] ___________________
+[gw5] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+tests/test_uganda_api_vs_replication.py:293: in test_api_matches_replication
+    _compare_column(base, merged[f"{base}_api"], merged[f"{base}_repl"], atol)
+tests/test_uganda_api_vs_replication.py:216: in _compare_column
+    assert not only_one_na.any(), (
+E   AssertionError: column 'market': 4 rows have NaN in one side but not the other
+E   assert not np.True_
+E    +  where np.True_ = any()
+E    +    where any = 0         False\n1         False\n2         False\n3         False\n4         False\n          ...  \n346112    False\n346113    False\n346114    False\n346115    False\n346116    False\nLength: 346117, dtype: bool.any
+________________ test_api_matches_replication[food_quantities] _________________
+[gw6] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+tests/test_uganda_api_vs_replication.py:293: in test_api_matches_replication
+    _compare_column(base, merged[f"{base}_api"], merged[f"{base}_repl"], atol)
+tests/test_uganda_api_vs_replication.py:216: in _compare_column
+    assert not only_one_na.any(), (
+E   AssertionError: column 'quantity_home': 10 rows have NaN in one side but not the other
+E   assert not np.True_
+E    +  where np.True_ = any()
+E    +    where any = 0         False\n1         False\n2         False\n3         False\n4         False\n          ...  \n346112    False\n346113    False\n346114    False\n346115    False\n346116    False\nLength: 346117, dtype: bool.any
+============================= slowest 15 durations =============================
+2577.17s call     tests/test_uganda_api_vs_replication.py::test_api_matches_replication[income]
+2204.37s call     tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_quantities]
+2203.74s call     tests/test_uganda_api_vs_replication.py::test_api_matches_replication[interview_date]
+2203.69s call     tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_prices]
+2203.58s call     tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_expenditures]
+2203.48s call     tests/test_uganda_api_vs_replication.py::test_api_matches_replication[people_last7days]
+2203.48s call     tests/test_uganda_api_vs_replication.py::test_api_matches_replication[nutrition]
+2203.08s call     tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_acquired]
+2203.07s call     tests/test_uganda_api_vs_replication.py::test_api_matches_replication[shocks]
+2202.84s call     tests/test_uganda_api_vs_replication.py::test_api_matches_replication[earnings]
+2202.39s call     tests/test_uganda_api_vs_replication.py::test_api_matches_replication[enterprise_income]
+2201.87s call     tests/test_uganda_api_vs_replication.py::test_api_matches_replication[household_characteristics]
+4.77s call     tests/test_uganda_api_vs_replication.py::test_api_matches_replication[household_roster]
+3.82s call     tests/test_uganda_api_vs_replication.py::test_api_matches_replication[locality]
+3.73s call     tests/test_uganda_api_vs_replication.py::test_api_matches_replication[fct]
+=========================== short test summary info ============================
+FAILED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[fct]
+FAILED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[household_roster]
+FAILED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[household_characteristics]
+FAILED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[shocks]
+FAILED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[nutrition]
+FAILED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_prices]
+FAILED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_quantities]
+=================== 7 failed, 8 passed in 2582.94s (0:43:02) ===================
