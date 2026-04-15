@@ -1,0 +1,125 @@
+{
+  "country": "Togo",
+  "feature": "cluster_features",
+  "status": "ok",
+  "rows": 540,
+  "columns": [
+    "i",
+    "Region",
+    "Rural",
+    "Latitude",
+    "Longitude"
+  ],
+  "index_names": [
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "i": "string",
+    "Region": "string",
+    "Rural": "string",
+    "Latitude": "Float64",
+    "Longitude": "Float64"
+  },
+  "canonical_columns": {
+    "Region": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 540,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 6,
+      "sample_unique": [
+        "Centrale",
+        "Kara",
+        "Lom\u00e9 commune",
+        "Maritime",
+        "Plateaux",
+        "Savanes"
+      ]
+    },
+    "Rural": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 540,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 2,
+      "sample_unique": [
+        "Rural",
+        "Urban"
+      ]
+    },
+    "District": {
+      "present": false
+    },
+    "Latitude": {
+      "present": true,
+      "dtype": "Float64",
+      "n_non_null": 535,
+      "n_null": 5,
+      "non_null_rate": 0.9907407407407407,
+      "n_unique": 532,
+      "sample_unique": [
+        "10.0041777",
+        "10.0222564",
+        "10.0530838",
+        "10.105929",
+        "10.1137401",
+        "10.1273389",
+        "10.1379925",
+        "10.1784739",
+        "10.2560916",
+        "10.2673023",
+        "10.2775114",
+        "10.3507734",
+        "10.3536008",
+        "10.3542962",
+        "10.3565774",
+        "10.371459",
+        "10.3952497",
+        "10.4089025",
+        "10.4282247",
+        "10.5001511"
+      ]
+    },
+    "Longitude": {
+      "present": true,
+      "dtype": "Float64",
+      "n_non_null": 535,
+      "n_null": 5,
+      "non_null_rate": 0.9907407407407407,
+      "n_unique": 532,
+      "sample_unique": [
+        "-0.0349474",
+        "-0.0371828",
+        "-0.0494468",
+        "0.014418",
+        "0.016637",
+        "0.0273711",
+        "0.0394259",
+        "0.0437123",
+        "0.0449902",
+        "0.0484087",
+        "0.078573",
+        "0.1033151",
+        "0.1390624",
+        "0.1415139",
+        "0.1449868",
+        "0.152351",
+        "0.1568788",
+        "0.1655856",
+        "0.176294",
+        "0.1819947"
+      ]
+    }
+  },
+  "extra_columns": [
+    "i"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Togo/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "UserWarning: Data scheme does not contain panel_ids for Togo"
+  ],
+  "elapsed_s": 0.1
+}

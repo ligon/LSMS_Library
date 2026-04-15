@@ -1,0 +1,69 @@
+{
+  "country": "Kazakhstan",
+  "status": "ok",
+  "rows": 7221,
+  "columns": [
+    "Sex",
+    "Age",
+    "Relationship",
+    "Generation",
+    "Distance",
+    "Affinity"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "v",
+    "pid"
+  ],
+  "sex": {
+    "n_non_null": 7202,
+    "n_null": 19,
+    "unique": [
+      "F",
+      "M"
+    ],
+    "non_canonical": [],
+    "non_canonical_counts": {}
+  },
+  "age": {
+    "dtype": "Int64",
+    "n_non_null": 7164,
+    "n_null": 57,
+    "n_non_numeric": 0,
+    "min": 1.0,
+    "max": 99.0,
+    "n_negative": 0,
+    "n_gt_120": 0
+  },
+  "relationship": {
+    "n_non_null": 7221,
+    "n_null": 0,
+    "n_unique": 12,
+    "unknown_labels": [
+      "0"
+    ],
+    "unknown_label_counts": {
+      "0": 9
+    }
+  },
+  "kinship_derived": {
+    "Generation_present": true,
+    "Distance_present": true,
+    "Affinity_present": true,
+    "Affinity_unique": [
+      "affinal",
+      "consanguineal",
+      "step"
+    ],
+    "Affinity_null_rate": 0.0012463647694225177
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Kazakhstan/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "UserWarning: Data scheme does not contain panel_ids for Kazakhstan",
+    "UserWarning: Data scheme does not contain panel_ids for Kazakhstan",
+    "UserWarning: Unknown relationship labels (add to kinship.yml): ['0']"
+  ],
+  "elapsed_s": 4.12
+}

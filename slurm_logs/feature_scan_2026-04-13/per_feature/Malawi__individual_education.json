@@ -1,0 +1,55 @@
+{
+  "country": "Malawi",
+  "feature": "individual_education",
+  "status": "ok",
+  "rows": 260255,
+  "columns": [
+    "Educational Attainment"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "v",
+    "pid"
+  ],
+  "dtypes": {
+    "Educational Attainment": "string"
+  },
+  "canonical_columns": {
+    "Educational Attainment": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 128722,
+      "n_null": 131533,
+      "non_null_rate": 0.4945995273866016,
+      "n_unique": 23,
+      "sample_unique": [
+        "A-LEVEL",
+        "DEGREE",
+        "DIPLOMA",
+        "JCE",
+        "MASTERS",
+        "MSCE",
+        "MSCE/GCSE",
+        "NON-UNIV DIPLOMA",
+        "NON-UNIVERSITY DIPLOMA",
+        "NONE",
+        "Non-Univ Diploma",
+        "POST-GRAD DEGREE",
+        "POST-GRADUATE DEGREE",
+        "PSLC",
+        "PhD",
+        "Postgrad degree",
+        "UNIVER DIPLOMA, DEGREE",
+        "UNIVERSITY DIPLOMA",
+        "Univer Diploma",
+        "jce"
+      ]
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 0.88
+}

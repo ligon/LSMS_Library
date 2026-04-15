@@ -1,0 +1,30 @@
+{
+  "country": "Benin",
+  "feature": "housing",
+  "status": "ok",
+  "rows": 8012,
+  "columns": [
+    "Roof",
+    "Floor"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "Roof": "string",
+    "Floor": "string"
+  },
+  "canonical_columns": {},
+  "extra_columns": [
+    "Roof",
+    "Floor"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Benin/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "UserWarning: Data scheme does not contain panel_ids for Benin",
+    "UserWarning: Data scheme does not contain panel_ids for Benin"
+  ],
+  "elapsed_s": 0.09
+}

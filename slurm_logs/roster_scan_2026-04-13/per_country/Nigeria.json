@@ -1,0 +1,67 @@
+{
+  "country": "Nigeria",
+  "status": "ok",
+  "rows": 234547,
+  "columns": [
+    "Sex",
+    "Age",
+    "Relationship",
+    "in_housing",
+    "Generation",
+    "Distance",
+    "Affinity"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "v",
+    "pid"
+  ],
+  "sex": {
+    "n_non_null": 234536,
+    "n_null": 11,
+    "unique": [
+      "F",
+      "M"
+    ],
+    "non_canonical": [],
+    "non_canonical_counts": {}
+  },
+  "age": {
+    "dtype": "Int64",
+    "n_non_null": 218855,
+    "n_null": 15692,
+    "n_non_numeric": 0,
+    "min": -1.0,
+    "max": 999.0,
+    "n_negative": 7,
+    "n_gt_120": 11
+  },
+  "relationship": {
+    "n_non_null": 234515,
+    "n_null": 32,
+    "n_unique": 19,
+    "unknown_labels": [],
+    "unknown_label_counts": {}
+  },
+  "kinship_derived": {
+    "Generation_present": true,
+    "Distance_present": true,
+    "Affinity_present": true,
+    "Affinity_unique": [
+      "affinal",
+      "consanguineal",
+      "servant",
+      "step",
+      "unrelated"
+    ],
+    "Affinity_null_rate": 0.00013643320954861925
+  },
+  "extra_columns": [
+    "in_housing"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nigeria/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 1.79
+}

@@ -1,0 +1,162 @@
+{
+  "country": "Ethiopia",
+  "feature": "shocks",
+  "status": "ok",
+  "rows": 500121,
+  "columns": [
+    "AffectedIncome",
+    "AffectedAssets",
+    "AffectedProduction",
+    "AffectedConsumption",
+    "HowCoped0",
+    "HowCoped1",
+    "HowCoped2"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "Shock"
+  ],
+  "dtypes": {
+    "AffectedIncome": "boolean",
+    "AffectedAssets": "boolean",
+    "AffectedProduction": "boolean",
+    "AffectedConsumption": "boolean",
+    "HowCoped0": "string",
+    "HowCoped1": "string",
+    "HowCoped2": "string"
+  },
+  "canonical_columns": {
+    "AffectedIncome": {
+      "present": true,
+      "dtype": "boolean",
+      "n_non_null": 0,
+      "n_null": 500121,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    },
+    "AffectedAssets": {
+      "present": true,
+      "dtype": "boolean",
+      "n_non_null": 0,
+      "n_null": 500121,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    },
+    "AffectedProduction": {
+      "present": true,
+      "dtype": "boolean",
+      "n_non_null": 0,
+      "n_null": 500121,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    },
+    "AffectedConsumption": {
+      "present": true,
+      "dtype": "boolean",
+      "n_non_null": 0,
+      "n_null": 500121,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    },
+    "HowCoped0": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 21617,
+      "n_null": 478504,
+      "non_null_rate": 0.04322353990334339,
+      "n_unique": 42,
+      "sample_unique": [
+        "1. RELIED ON OWN-SAVINGS",
+        "10. OBTAINED CREDIT",
+        "11. SOLD AGRICULTURAL ASSETS",
+        "12. SOLD DURABLE ASSESTS",
+        "13. SOLD LAND / BUILDINGS",
+        "14. SOLD CROP STOCK",
+        "15. SOLD LIVESTOCK",
+        "16. INTENSIFY FISHING",
+        "17. SENT CHILDREN TO LIVE ELSEWHERE",
+        "18. ENGAGED IN SPIRITUAL EFFORTS",
+        "19. DID NOT DO ANYTHING",
+        "2. RECEIVED UNCONDITIONAL HELP FROM RELATIVES/FRIENDS",
+        "20. OTHER (SPECIFY)",
+        "25.0",
+        "3. RECEIVED UNCONDITIONAL HELP FROM GOVERNMENT",
+        "4. RECEIVED UNCONDITIONAL HELP FROM NGO/RELIGIOUS INSTITUTION",
+        "5. CHANGED EATING PATTERNS",
+        "6. TOOK ON MORE EMPLOYMENT",
+        "60.0",
+        "7. ADULT MEMBER PREVIOUSLY NOT WORKING FOUND WORK"
+      ]
+    },
+    "HowCoped1": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 9523,
+      "n_null": 490598,
+      "non_null_rate": 0.01904139198314008,
+      "n_unique": 41,
+      "sample_unique": [
+        "0.0",
+        "1. RELIED ON OWN-SAVINGS",
+        "10. OBTAINED CREDIT",
+        "11. SOLD AGRICULTURAL ASSETS",
+        "12. SOLD DURABLE ASSESTS",
+        "13. SOLD LAND / BUILDINGS",
+        "14. SOLD CROP STOCK",
+        "15. SOLD LIVESTOCK",
+        "16. INTENSIFY FISHING",
+        "17. SENT CHILDREN TO LIVE ELSEWHERE",
+        "18. ENGAGED IN SPIRITUAL EFFORTS",
+        "2. RECEIVED UNCONDITIONAL HELP FROM RELATIVES/FRIENDS",
+        "20. OTHER (SPECIFY)",
+        "21.0",
+        "3. RECEIVED UNCONDITIONAL HELP FROM GOVERNMENT",
+        "4. RECEIVED UNCONDITIONAL HELP FROM NGO/RELIGIOUS INSTITUTION",
+        "5. CHANGED EATING PATTERNS",
+        "6. TOOK ON MORE EMPLOYMENT",
+        "7. ADULT MEMBER PREVIOUSLY NOT WORKING FOUND WORK",
+        "8. HOUSEHOLD MEMBERS MIGRATED"
+      ]
+    },
+    "HowCoped2": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 4096,
+      "n_null": 496025,
+      "non_null_rate": 0.008190018015640215,
+      "n_unique": 42,
+      "sample_unique": [
+        "0.0",
+        "1. RELIED ON OWN-SAVINGS",
+        "10. OBTAINED CREDIT",
+        "11. SOLD AGRICULTURAL ASSETS",
+        "12. SOLD DURABLE ASSESTS",
+        "13. SOLD LAND / BUILDINGS",
+        "14. SOLD CROP STOCK",
+        "15. SOLD LIVESTOCK",
+        "16. INTENSIFY FISHING",
+        "17. SENT CHILDREN TO LIVE ELSEWHERE",
+        "18. ENGAGED IN SPIRITUAL EFFORTS",
+        "19. DID NOT DO ANYTHING",
+        "2. RECEIVED UNCONDITIONAL HELP FROM RELATIVES/FRIENDS",
+        "20. OTHER (SPECIFY)",
+        "24.0",
+        "3. RECEIVED UNCONDITIONAL HELP FROM GOVERNMENT",
+        "4. RECEIVED UNCONDITIONAL HELP FROM NGO/RELIGIOUS INSTITUTION",
+        "5. CHANGED EATING PATTERNS",
+        "6. TOOK ON MORE EMPLOYMENT",
+        "7. ADULT MEMBER PREVIOUSLY NOT WORKING FOUND WORK"
+      ]
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Ethiopia/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 1.12
+}

@@ -1,0 +1,172 @@
+bringing up nodes...
+bringing up nodes...
+
+ss...................................................................... [  4%]
+...................................s.s.................................. [  8%]
+.s....................................................s..............s.. [ 12%]
+............x..........................s..............s...........s..s.. [ 17%]
+ss.............s..sss...s.s.s......s...s.sss....................s.....x. [ 21%]
+.s.............s....................................................s... [ 25%]
+........x..............ss................................s.............. [ 29%]
+................s..........................s..s.................s....... [ 34%]
+.....s............s.ss.s.x...........s......................s.....ss..ss [ 38%]
+ss..sss...............s...s........................s.................... [ 42%]
+.......s...........................................sss.................. [ 46%]
+..................................................................s..... [ 51%]
+...................................................s.s.................. [ 55%]
+.......................ss............................s.................. [ 59%]
+..............................................................s......... [ 64%]
+.ss........................s............................................ [ 68%]
+........................................................................ [ 72%]
+........................................................................ [ 76%]
+...........s............................................................ [ 81%]
+........................................................................ [ 85%]
+........................................................................ [ 89%]
+.........sssss......sss.......sssssssssss.ss..sssss...s.s.ss.sssssssss.. [ 93%]
+ss.ssss.s..ss.........s....s...........xxxxFsxsx...s.................... [ 98%]
+..............................                                           [100%]
+=================================== FAILURES ===================================
+______________ test_parquet_matches_baseline[var/assets.parquet] _______________
+[gw14] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv.lustre/bin/python
+tests/test_uganda_invariance.py:162: in test_parquet_matches_baseline
+    assert actual["shape"] == baseline_entry["shape"], (
+E   AssertionError: var/assets.parquet: shape mismatch: [116808, 1] != [87631, 2]
+E   assert [116808, 1] == [87631, 2]
+E     
+E     At index 0 diff: 116808 != 87631
+E     Use -v to get more diff
+=============================== warnings summary ===============================
+tests/test_dvc_caching.py: 13 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:800: UserWarning: Country directory not found for 'TestCountry'
+    warnings.warn(f"Country directory not found for {country_name!r}")
+
+tests/test_sample.py: 10 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1442: UserWarning: Data scheme does not contain panel_ids for Kosovo
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 10 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1442: UserWarning: Data scheme does not contain panel_ids for Togo
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 11 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1442: UserWarning: Data scheme does not contain panel_ids for Cambodia
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 10 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1442: UserWarning: Data scheme does not contain panel_ids for Benin
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 10 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1442: UserWarning: Data scheme does not contain panel_ids for Liberia
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_dvc_caching.py::TestDVCCaching::test_stale_cache_triggers_rebuild
+tests/test_dvc_caching.py::TestDVCCaching::test_valid_cache_uses_cached_file
+tests/test_dvc_caching.py::TestDVCCaching::test_dvc_cache_applies_location_index
+tests/test_dvc_caching.py::TestDVCCaching::test_dvc_stage_dirty_then_clean
+tests/test_dvc_caching.py::TestDVCCaching::test_dvc_stage_dirty_then_clean
+tests/test_dvc_caching.py::TestDVCCaching::test_v070_top_cache_read_returns_without_dvc
+tests/test_dvc_caching.py::TestDVCCaching::test_v070_lsms_no_cache_skips_top_read
+tests/test_dvc_caching.py::TestDVCCaching::test_v070_dvc_fallback_writes_cache
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1442: UserWarning: Data scheme does not contain panel_ids for TestCountry
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 10 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1442: UserWarning: Data scheme does not contain panel_ids for Albania
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 11 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1442: UserWarning: Data scheme does not contain panel_ids for CotedIvoire
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 9 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1442: UserWarning: Data scheme does not contain panel_ids for Iraq
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 10 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1442: UserWarning: Data scheme does not contain panel_ids for Azerbaijan
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 11 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1442: UserWarning: Data scheme does not contain panel_ids for Serbia
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 11 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1442: UserWarning: Data scheme does not contain panel_ids for Serbia and Montenegro
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 10 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1442: UserWarning: Data scheme does not contain panel_ids for Kazakhstan
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 11 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1442: UserWarning: Data scheme does not contain panel_ids for China
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 9 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1442: UserWarning: Data scheme does not contain panel_ids for Guatemala
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 11 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1442: UserWarning: Data scheme does not contain panel_ids for South Africa
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 9 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1442: UserWarning: Data scheme does not contain panel_ids for Guinea-Bissau
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 9 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1442: UserWarning: Data scheme does not contain panel_ids for Guyana
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 11 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1442: UserWarning: Data scheme does not contain panel_ids for Tajikistan
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 9 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1442: UserWarning: Data scheme does not contain panel_ids for India
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 11 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1442: UserWarning: Data scheme does not contain panel_ids for Timor-Leste
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 11 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1442: UserWarning: Data scheme does not contain panel_ids for Pakistan
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_int64[Senegal]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Senegal]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:586: UserWarning: Refusing workspace copy of DVC-tracked file Senegal/2018-19/Data/s01_me_sen2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_int64[South Africa]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[South Africa]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1397: UserWarning: Unknown relationship labels (add to kinship.yml): ['-1']
+    df = _expand_kinship(df)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_uganda_invariance.py::test_parquet_matches_baseline[var/assets.parquet]
+1 failed, 1552 passed, 123 skipped, 10 xfailed, 323 warnings in 237.58s (0:03:57)

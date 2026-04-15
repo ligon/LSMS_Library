@@ -1,0 +1,163 @@
+{
+  "country": "Niger",
+  "feature": "cluster_features",
+  "status": "ok",
+  "rows": 1329,
+  "columns": [
+    "Region",
+    "District",
+    "Rural",
+    "i",
+    "Latitude",
+    "Longitude"
+  ],
+  "index_names": [
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "Region": "string",
+    "District": "string",
+    "Rural": "string",
+    "i": "str",
+    "Latitude": "Float64",
+    "Longitude": "Float64"
+  },
+  "canonical_columns": {
+    "Region": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 1329,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 16,
+      "sample_unique": [
+        "Agadez",
+        "Diffa",
+        "Dosso",
+        "Maradi",
+        "Niamey",
+        "Tahoua",
+        "Tillab\u00e9ri",
+        "Zinder",
+        "agadez",
+        "diffa",
+        "dosso",
+        "maradi",
+        "niamey",
+        "tahoua",
+        "tillaberi",
+        "zinder"
+      ]
+    },
+    "Rural": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 1329,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 2,
+      "sample_unique": [
+        "Rural",
+        "Urban"
+      ]
+    },
+    "District": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 1329,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 64,
+      "sample_unique": [
+        "Abala",
+        "Abalak",
+        "Aderbissinat",
+        "Agui\u00e9",
+        "Arlit",
+        "Ay\u00e9rou",
+        "Bagaroua",
+        "Balleyara",
+        "Belb\u00e9dji",
+        "Bermo",
+        "Birni N'Konni",
+        "Boboye",
+        "Bouza",
+        "Dakoro",
+        "Damagaram Takaya",
+        "Diffa",
+        "Dioundiou",
+        "Dogondoutchi",
+        "Dosso",
+        "Dungass"
+      ]
+    },
+    "Latitude": {
+      "present": true,
+      "dtype": "Float64",
+      "n_non_null": 1048,
+      "n_null": 281,
+      "non_null_rate": 0.7885628291948834,
+      "n_unique": 566,
+      "sample_unique": [
+        "11.8042701529339",
+        "11.883684158325195",
+        "11.8857620749623",
+        "11.889090538024902",
+        "11.891691207885742",
+        "11.8919016933069",
+        "11.9358804496005",
+        "11.983486097306",
+        "12.2210177499801",
+        "12.2470147",
+        "12.3026291560382",
+        "12.4013224",
+        "12.46544288937",
+        "12.4732485366985",
+        "12.531614",
+        "12.5321860983968",
+        "12.595529556274414",
+        "12.617431640625",
+        "12.7382685627756",
+        "12.7586863"
+      ]
+    },
+    "Longitude": {
+      "present": true,
+      "dtype": "Float64",
+      "n_non_null": 1048,
+      "n_null": 281,
+      "non_null_rate": 0.7885628291948834,
+      "n_unique": 566,
+      "sample_unique": [
+        "0.2778706",
+        "0.7328215",
+        "0.753772987042503",
+        "0.754800208660641",
+        "0.755911963060498",
+        "0.7584089040756226",
+        "0.7590402364730835",
+        "0.762298750624372",
+        "0.7626177668571472",
+        "0.7657608985900879",
+        "0.844838339835405",
+        "0.882895868271589",
+        "0.9241740107536316",
+        "0.94398907608722",
+        "1.00032239627614",
+        "1.00347587624889",
+        "1.02760557085276",
+        "1.0710751",
+        "1.09863299989078",
+        "1.20830124734498"
+      ]
+    }
+  },
+  "extra_columns": [
+    "i"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Niger/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 4.44
+}

@@ -1,0 +1,64 @@
+{
+  "country": "Serbia and Montenegro",
+  "feature": "cluster_features",
+  "status": "ok",
+  "rows": 919,
+  "columns": [
+    "Region",
+    "Rural"
+  ],
+  "index_names": [
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "Region": "string",
+    "Rural": "string"
+  },
+  "canonical_columns": {
+    "Region": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 919,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 7,
+      "sample_unique": [
+        "Belgrade",
+        "East Serbia",
+        "South-east Serbia",
+        "Vojvodina",
+        "West Serbia",
+        "\u008aumadija and Pomoravlje",
+        "\u008aumadija i Pomoravlje"
+      ]
+    },
+    "Rural": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 919,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 2,
+      "sample_unique": [
+        "Rural",
+        "Urban"
+      ]
+    },
+    "District": {
+      "present": false
+    },
+    "Latitude": {
+      "present": false
+    },
+    "Longitude": {
+      "present": false
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Serbia and Montenegro/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "UserWarning: Data scheme does not contain panel_ids for Serbia and Montenegro"
+  ],
+  "elapsed_s": 0.06
+}

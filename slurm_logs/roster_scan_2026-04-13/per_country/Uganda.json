@@ -1,0 +1,64 @@
+{
+  "country": "Uganda",
+  "status": "ok",
+  "rows": 147612,
+  "columns": [
+    "Sex",
+    "Relationship",
+    "Age",
+    "Generation",
+    "Distance",
+    "Affinity"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "v",
+    "pid"
+  ],
+  "sex": {
+    "n_non_null": 144704,
+    "n_null": 2908,
+    "unique": [
+      "F",
+      "M"
+    ],
+    "non_canonical": [],
+    "non_canonical_counts": {}
+  },
+  "age": {
+    "dtype": "Int64",
+    "n_non_null": 135836,
+    "n_null": 11776,
+    "n_non_numeric": 0,
+    "min": 0.0,
+    "max": 110.0,
+    "n_negative": 0,
+    "n_gt_120": 0
+  },
+  "relationship": {
+    "n_non_null": 144576,
+    "n_null": 3036,
+    "n_unique": 30,
+    "unknown_labels": [],
+    "unknown_label_counts": {}
+  },
+  "kinship_derived": {
+    "Generation_present": true,
+    "Distance_present": true,
+    "Affinity_present": true,
+    "Affinity_unique": [
+      "affinal",
+      "consanguineal",
+      "servant",
+      "step",
+      "unrelated"
+    ],
+    "Affinity_null_rate": 0.020567433541988457
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 120.31
+}

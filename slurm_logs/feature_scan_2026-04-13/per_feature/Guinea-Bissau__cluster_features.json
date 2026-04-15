@@ -1,0 +1,128 @@
+{
+  "country": "Guinea-Bissau",
+  "feature": "cluster_features",
+  "status": "ok",
+  "rows": 450,
+  "columns": [
+    "i",
+    "Region",
+    "Rural",
+    "Latitude",
+    "Longitude"
+  ],
+  "index_names": [
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "i": "str",
+    "Region": "string",
+    "Rural": "string",
+    "Latitude": "Float64",
+    "Longitude": "Float64"
+  },
+  "canonical_columns": {
+    "Region": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 450,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 9,
+      "sample_unique": [
+        "BOLAMA_BIJAGOS",
+        "bafata",
+        "biombo",
+        "cacheu",
+        "gabu",
+        "oio",
+        "quinara",
+        "sab",
+        "tombali"
+      ]
+    },
+    "Rural": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 450,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 2,
+      "sample_unique": [
+        "Rural",
+        "Urbano"
+      ]
+    },
+    "District": {
+      "present": false
+    },
+    "Latitude": {
+      "present": true,
+      "dtype": "Float64",
+      "n_non_null": 439,
+      "n_null": 11,
+      "non_null_rate": 0.9755555555555555,
+      "n_unique": 439,
+      "sample_unique": [
+        "11.02570691",
+        "11.02879601",
+        "11.03429205",
+        "11.04096745",
+        "11.05994235",
+        "11.10256047",
+        "11.11090852",
+        "11.12557098",
+        "11.13118629",
+        "11.1348069",
+        "11.15874921",
+        "11.15879663",
+        "11.16783225",
+        "11.16808811",
+        "11.19542768",
+        "11.20052072",
+        "11.20165688",
+        "11.21108509",
+        "11.21322296",
+        "11.22188462"
+      ]
+    },
+    "Longitude": {
+      "present": true,
+      "dtype": "Float64",
+      "n_non_null": 439,
+      "n_null": 11,
+      "non_null_rate": 0.9755555555555555,
+      "n_unique": 439,
+      "sample_unique": [
+        "-13.63302951",
+        "-13.6579875",
+        "-13.88285454",
+        "-13.88417161",
+        "-13.93387272",
+        "-13.93620058",
+        "-13.95831326",
+        "-13.98718458",
+        "-14.02793484",
+        "-14.07514335",
+        "-14.07688588",
+        "-14.08492558",
+        "-14.09697663",
+        "-14.12431866",
+        "-14.14419562",
+        "-14.15071952",
+        "-14.1550567",
+        "-14.19026466",
+        "-14.20222984",
+        "-14.20361178"
+      ]
+    }
+  },
+  "extra_columns": [
+    "i"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Guinea-Bissau/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "UserWarning: Data scheme does not contain panel_ids for Guinea-Bissau"
+  ],
+  "elapsed_s": 4.4
+}

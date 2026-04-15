@@ -1,0 +1,77 @@
+{
+  "country": "Kazakhstan",
+  "feature": "cluster_features",
+  "status": "ok",
+  "rows": 135,
+  "columns": [
+    "Region",
+    "Rural"
+  ],
+  "index_names": [
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "Region": "string",
+    "Rural": "string"
+  },
+  "canonical_columns": {
+    "Region": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 135,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 20,
+      "sample_unique": [
+        "Akmolins",
+        "Aktobink",
+        "Almatins",
+        "Almaty/C",
+        "Atyrausk",
+        "Eastern",
+        "Karagand",
+        "Kokcheta",
+        "Kostanay",
+        "Kzyl-Ord",
+        "Mangysta",
+        "Northern",
+        "Pavlodar",
+        "Semipala",
+        "Shambyls",
+        "Shezkazg",
+        "Southern",
+        "Taldykor",
+        "Torgaysk",
+        "Western"
+      ]
+    },
+    "Rural": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 135,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 2,
+      "sample_unique": [
+        "Rural",
+        "Urban"
+      ]
+    },
+    "District": {
+      "present": false
+    },
+    "Latitude": {
+      "present": false
+    },
+    "Longitude": {
+      "present": false
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Kazakhstan/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "UserWarning: Data scheme does not contain panel_ids for Kazakhstan"
+  ],
+  "elapsed_s": 4.29
+}

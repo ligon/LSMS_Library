@@ -1,0 +1,78 @@
+{
+  "country": "Serbia and Montenegro",
+  "status": "ok",
+  "rows": 201,
+  "columns": [
+    "Age",
+    "Relationship",
+    "Sex",
+    "Generation",
+    "Distance",
+    "Affinity"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "v",
+    "pid"
+  ],
+  "sex": {
+    "n_non_null": 201,
+    "n_null": 0,
+    "unique": [
+      "F",
+      "M"
+    ],
+    "non_canonical": [],
+    "non_canonical_counts": {}
+  },
+  "age": {
+    "dtype": "Int64",
+    "n_non_null": 201,
+    "n_null": 0,
+    "n_non_numeric": 0,
+    "min": 0.0,
+    "max": 91.0,
+    "n_negative": 0,
+    "n_gt_120": 0
+  },
+  "relationship": {
+    "n_non_null": 201,
+    "n_null": 0,
+    "n_unique": 8,
+    "unknown_labels": [
+      "Child of the head / spouse",
+      "Grandchild of the head / spouse",
+      "Head of the household",
+      "Husband/wife, spouse",
+      "Parents of the head / spouse",
+      "Son/daug. in law of the head/spouse"
+    ],
+    "unknown_label_counts": {
+      "Grandchild of the head / spouse": 64,
+      "Child of the head / spouse": 55,
+      "Head of the household": 22,
+      "Husband/wife, spouse": 15,
+      "Son/daug. in law of the head/spouse": 7,
+      "Parents of the head / spouse": 3
+    }
+  },
+  "kinship_derived": {
+    "Generation_present": true,
+    "Distance_present": true,
+    "Affinity_present": true,
+    "Affinity_unique": [
+      "consanguineal",
+      "unrelated"
+    ],
+    "Affinity_null_rate": 0.8258706467661692
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Serbia and Montenegro/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "UserWarning: Data scheme does not contain panel_ids for Serbia and Montenegro",
+    "UserWarning: Data scheme does not contain panel_ids for Serbia and Montenegro",
+    "UserWarning: Unknown relationship labels (add to kinship.yml): ['Child of the head / spouse', 'Grandchild of the head / spouse', 'Head of the household', 'Husband/wife, spouse', 'Parents of the head / spouse', 'Son/daug. in law of the head/spouse']"
+  ],
+  "elapsed_s": 0.21
+}

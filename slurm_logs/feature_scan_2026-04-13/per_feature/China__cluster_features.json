@@ -1,0 +1,48 @@
+{
+  "country": "China",
+  "feature": "cluster_features",
+  "status": "ok",
+  "rows": 30,
+  "columns": [
+    "Region"
+  ],
+  "index_names": [
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "Region": "string"
+  },
+  "canonical_columns": {
+    "Region": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 30,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 2,
+      "sample_unique": [
+        "7",
+        "8"
+      ]
+    },
+    "Rural": {
+      "present": false
+    },
+    "District": {
+      "present": false
+    },
+    "Latitude": {
+      "present": false
+    },
+    "Longitude": {
+      "present": false
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/China/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "UserWarning: Data scheme does not contain panel_ids for China"
+  ],
+  "elapsed_s": 4.17
+}

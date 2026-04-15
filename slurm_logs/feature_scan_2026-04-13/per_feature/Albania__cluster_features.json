@@ -1,0 +1,77 @@
+{
+  "country": "Albania",
+  "feature": "cluster_features",
+  "status": "ok",
+  "rows": 1829,
+  "columns": [
+    "Region",
+    "Rural"
+  ],
+  "index_names": [
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "Region": "string",
+    "Rural": "string"
+  },
+  "canonical_columns": {
+    "Region": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 1829,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 77,
+      "sample_unique": [
+        "1",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16",
+        "17",
+        "18",
+        "19",
+        "2",
+        "20",
+        "21",
+        "22",
+        "23",
+        "24",
+        "25",
+        "26",
+        "27"
+      ]
+    },
+    "Rural": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 930,
+      "n_null": 899,
+      "non_null_rate": 0.5084745762711864,
+      "n_unique": 2,
+      "sample_unique": [
+        "Rural",
+        "Urban"
+      ]
+    },
+    "District": {
+      "present": false
+    },
+    "Latitude": {
+      "present": false
+    },
+    "Longitude": {
+      "present": false
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Albania/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "UserWarning: Data scheme does not contain panel_ids for Albania"
+  ],
+  "elapsed_s": 4.33
+}

@@ -1,0 +1,441 @@
+bringing up nodes...
+bringing up nodes...
+
+
+==================================== ERRORS ====================================
+____________________________ ERROR collecting gw18 _____________________________
+Different tests were collected between gw8 and gw18. The difference is:
+--- gw8
+
++++ gw18
+
+@@ -844,6 +844,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_readable[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_readable[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/food_acquired]
+@@ -983,6 +984,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/food_acquired]
+@@ -1122,6 +1124,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/food_acquired]
+@@ -1261,6 +1264,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/food_acquired]
+@@ -1400,6 +1404,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/food_acquired]
+@@ -1539,6 +1544,7 @@
+
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Timor-Leste/sample]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/sample]
++tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/cluster_features]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/household_roster]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/individual_education]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/food_acquired]
+To see why this happens see 'Known limitations' in documentation for pytest-xdist
+____________________________ ERROR collecting gw16 _____________________________
+Different tests were collected between gw8 and gw16. The difference is:
+--- gw8
+
++++ gw16
+
+@@ -844,6 +844,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_readable[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_readable[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/food_acquired]
+@@ -983,6 +984,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/food_acquired]
+@@ -1122,6 +1124,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/food_acquired]
+@@ -1261,6 +1264,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/food_acquired]
+@@ -1400,6 +1404,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/food_acquired]
+@@ -1539,6 +1544,7 @@
+
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Timor-Leste/sample]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/sample]
++tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/cluster_features]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/household_roster]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/individual_education]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/food_acquired]
+To see why this happens see 'Known limitations' in documentation for pytest-xdist
+____________________________ ERROR collecting gw22 _____________________________
+Different tests were collected between gw8 and gw22. The difference is:
+--- gw8
+
++++ gw22
+
+@@ -844,6 +844,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_readable[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_readable[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/food_acquired]
+@@ -983,6 +984,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/food_acquired]
+@@ -1122,6 +1124,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/food_acquired]
+@@ -1261,6 +1264,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/food_acquired]
+@@ -1400,6 +1404,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/food_acquired]
+@@ -1539,6 +1544,7 @@
+
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Timor-Leste/sample]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/sample]
++tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/cluster_features]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/household_roster]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/individual_education]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/food_acquired]
+To see why this happens see 'Known limitations' in documentation for pytest-xdist
+____________________________ ERROR collecting gw20 _____________________________
+Different tests were collected between gw8 and gw20. The difference is:
+--- gw8
+
++++ gw20
+
+@@ -844,6 +844,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_readable[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_readable[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/food_acquired]
+@@ -983,6 +984,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/food_acquired]
+@@ -1122,6 +1124,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/food_acquired]
+@@ -1261,6 +1264,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/food_acquired]
+@@ -1400,6 +1404,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/food_acquired]
+@@ -1539,6 +1544,7 @@
+
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Timor-Leste/sample]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/sample]
++tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/cluster_features]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/household_roster]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/individual_education]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/food_acquired]
+To see why this happens see 'Known limitations' in documentation for pytest-xdist
+____________________________ ERROR collecting gw21 _____________________________
+Different tests were collected between gw8 and gw21. The difference is:
+--- gw8
+
++++ gw21
+
+@@ -844,6 +844,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_readable[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_readable[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/food_acquired]
+@@ -983,6 +984,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/food_acquired]
+@@ -1122,6 +1124,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/food_acquired]
+@@ -1261,6 +1264,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/food_acquired]
+@@ -1400,6 +1404,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/food_acquired]
+@@ -1539,6 +1544,7 @@
+
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Timor-Leste/sample]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/sample]
++tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/cluster_features]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/household_roster]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/individual_education]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/food_acquired]
+To see why this happens see 'Known limitations' in documentation for pytest-xdist
+____________________________ ERROR collecting gw19 _____________________________
+Different tests were collected between gw8 and gw19. The difference is:
+--- gw8
+
++++ gw19
+
+@@ -844,6 +844,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_readable[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_readable[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/food_acquired]
+@@ -983,6 +984,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/food_acquired]
+@@ -1122,6 +1124,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/food_acquired]
+@@ -1261,6 +1264,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/food_acquired]
+@@ -1400,6 +1404,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/food_acquired]
+@@ -1539,6 +1544,7 @@
+
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Timor-Leste/sample]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/sample]
++tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/cluster_features]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/household_roster]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/individual_education]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/food_acquired]
+To see why this happens see 'Known limitations' in documentation for pytest-xdist
+____________________________ ERROR collecting gw23 _____________________________
+Different tests were collected between gw8 and gw23. The difference is:
+--- gw8
+
++++ gw23
+
+@@ -844,6 +844,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_readable[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_readable[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_readable[Togo/food_acquired]
+@@ -983,6 +984,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_index_levels[Togo/food_acquired]
+@@ -1122,6 +1124,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/food_acquired]
+@@ -1261,6 +1264,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_no_fully_null_columns[Togo/food_acquired]
+@@ -1400,6 +1404,7 @@
+
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Timor-Leste/sample]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/sample]
++tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/cluster_features]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/household_roster]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/individual_education]
+ tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Togo/food_acquired]
+@@ -1539,6 +1544,7 @@
+
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Timor-Leste/household_roster]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Timor-Leste/sample]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/sample]
++tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/cluster_features]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/household_roster]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/individual_education]
+ tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/food_acquired]
+To see why this happens see 'Known limitations' in documentation for pytest-xdist
+=========================== short test summary info ============================
+ERROR gw18
+ERROR gw16
+ERROR gw22
+ERROR gw20
+ERROR gw21
+ERROR gw19
+ERROR gw23
+7 errors in 37.87s

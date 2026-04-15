@@ -1,0 +1,142 @@
+{
+  "country": "Togo",
+  "feature": "shocks",
+  "status": "ok",
+  "rows": 135762,
+  "columns": [
+    "AffectedIncome",
+    "AffectedAssets",
+    "AffectedProduction",
+    "AffectedConsumption",
+    "HowCoped0",
+    "HowCoped1",
+    "HowCoped2"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "Shock"
+  ],
+  "dtypes": {
+    "AffectedIncome": "boolean",
+    "AffectedAssets": "boolean",
+    "AffectedProduction": "boolean",
+    "AffectedConsumption": "boolean",
+    "HowCoped0": "string",
+    "HowCoped1": "string",
+    "HowCoped2": "string"
+  },
+  "canonical_columns": {
+    "AffectedIncome": {
+      "present": true,
+      "dtype": "boolean",
+      "n_non_null": 0,
+      "n_null": 135762,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    },
+    "AffectedAssets": {
+      "present": true,
+      "dtype": "boolean",
+      "n_non_null": 0,
+      "n_null": 135762,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    },
+    "AffectedProduction": {
+      "present": true,
+      "dtype": "boolean",
+      "n_non_null": 0,
+      "n_null": 135762,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    },
+    "AffectedConsumption": {
+      "present": true,
+      "dtype": "boolean",
+      "n_non_null": 0,
+      "n_null": 135762,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    },
+    "HowCoped0": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 7230,
+      "n_null": 128532,
+      "non_null_rate": 0.053254960887435365,
+      "n_unique": 24,
+      "sample_unique": [
+        "Achat d'aliments moins chers",
+        "Aide d'organisations religieuses ou d'ONG",
+        "Aide de parents ou d'amis",
+        "Aide du gouvernement/l'Etat",
+        "Aucune strat\u00e9gie",
+        "Autre strat\u00e9gie",
+        "Changement des habitudes de consommation",
+        "Confiage des enfants \u00e0 d'autres m\u00e9nages",
+        "Enfants de moins de 15 ans amen\u00e9s \u00e0 travailler",
+        "Engag\u00e9 dans des activit\u00e9s spirituelles",
+        "Les enfants ont \u00e9t\u00e9 d\u00e9scolaris\u00e9s",
+        "Louer/mettre ses terres en gages",
+        "Membres actifs ont pris des emplois suppl\u00e9mentaires",
+        "Membres adultes inactifs/ch\u00f4meurs ont pris des emplois",
+        "Migration de membres du m\u00e9nage",
+        "Obtention d'un cr\u00e9dit",
+        "Pratique de la culture de contre saison",
+        "R\u00e9duction des d\u00e9penses de sant\u00e9/d'\u00e9ducation",
+        "Utilisation de son \u00e9pargne",
+        "Vente de b\u00e9tail"
+      ]
+    },
+    "HowCoped1": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 599,
+      "n_null": 135163,
+      "non_null_rate": 0.004412132997451423,
+      "n_unique": 23,
+      "sample_unique": [
+        "Achat d'aliments moins chers",
+        "Aide d'organisations religieuses ou d'ONG",
+        "Aide de parents ou d'amis",
+        "Aide du gouvernement/l'Etat",
+        "Autre strat\u00e9gie",
+        "Changement des habitudes de consommation",
+        "Confiage des enfants \u00e0 d'autres m\u00e9nages",
+        "Enfants de moins de 15 ans amen\u00e9s \u00e0 travailler",
+        "Engag\u00e9 dans des activit\u00e9s spirituelles",
+        "Les enfants ont \u00e9t\u00e9 d\u00e9scolaris\u00e9s",
+        "Louer/mettre ses terres en gages",
+        "Marier les enfants",
+        "Membres actifs ont pris des emplois suppl\u00e9mentaires",
+        "Membres adultes inactifs/ch\u00f4meurs ont pris des emplois",
+        "Migration de membres du m\u00e9nage",
+        "Obtention d'un cr\u00e9dit",
+        "Pratique de la culture de contre saison",
+        "R\u00e9duction des d\u00e9penses de sant\u00e9/d'\u00e9ducation",
+        "Vente de b\u00e9tail",
+        "Vente de terrain/immeubles/Maisons"
+      ]
+    },
+    "HowCoped2": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 0,
+      "n_null": 135762,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Togo/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "UserWarning: Data scheme does not contain panel_ids for Togo"
+  ],
+  "elapsed_s": 0.43
+}

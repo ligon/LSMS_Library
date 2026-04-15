@@ -1,0 +1,162 @@
+{
+  "country": "Malawi",
+  "feature": "shocks",
+  "status": "ok",
+  "rows": 1090918,
+  "columns": [
+    "AffectedIncome",
+    "AffectedAssets",
+    "HowCoped0",
+    "HowCoped1",
+    "HowCoped2",
+    "AffectedProduction",
+    "AffectedConsumption"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "Shock"
+  ],
+  "dtypes": {
+    "AffectedIncome": "boolean",
+    "AffectedAssets": "boolean",
+    "HowCoped0": "string",
+    "HowCoped1": "string",
+    "HowCoped2": "string",
+    "AffectedProduction": "boolean",
+    "AffectedConsumption": "boolean"
+  },
+  "canonical_columns": {
+    "AffectedIncome": {
+      "present": true,
+      "dtype": "boolean",
+      "n_non_null": 0,
+      "n_null": 1090918,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    },
+    "AffectedAssets": {
+      "present": true,
+      "dtype": "boolean",
+      "n_non_null": 0,
+      "n_null": 1090918,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    },
+    "AffectedProduction": {
+      "present": true,
+      "dtype": "boolean",
+      "n_non_null": 0,
+      "n_null": 1090918,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    },
+    "AffectedConsumption": {
+      "present": true,
+      "dtype": "boolean",
+      "n_non_null": 0,
+      "n_null": 1090918,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    },
+    "HowCoped0": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 104671,
+      "n_null": 986247,
+      "non_null_rate": 0.09594763309432973,
+      "n_unique": 68,
+      "sample_unique": [
+        "ADULT HOUSEHOLD MEMBERS WHO WERE PREVIOUSLY NOT WORKING HAD TO FIND WORK",
+        "Adult household members who were previously not working had to find work",
+        "Applying Manure/Chemicals",
+        "Borrowed money from institution",
+        "Borrowed money from money lender",
+        "Borrowed money from relatives",
+        "CHANGED DIETARY PATTERNS INVOLUNTARILY",
+        "CHANGED EATING PATTERNS (RELIED ON LESS PREFERRED FOOD OPTIONS, REDUCED THE PROPORTION OR NUMBER OF MEALS PER DAY, OR HOUSEHOLD MEMBERS SKIPPED DAYS OF EATING, ETC)",
+        "Changed dietary patterns involuntarily",
+        "Consumed lower cost but less preferred foods",
+        "DID NOT DO ANYTHING",
+        "Did not do anything",
+        "Dont know",
+        "EMPLOYED HOUSEHOLD MEMBERS TOOK ON MORE EMPLOYMENT",
+        "ENGAGED IN SPIRITUAL EFFORTS - PRAYER, SACRIFICES, DIVINER CONSULTATIONS",
+        "ENGAGED IN SPIRITUAL EFFORTS -PRAYER, SACRIFICES, DIVINER CONSULTATIONS",
+        "Employed household members took on more employment",
+        "Engaged in spiritual efforts - prayer, sacrifices, diviner consultations",
+        "HOUSEHOLD MEMBERS MIGRATED",
+        "Household members migrated"
+      ]
+    },
+    "HowCoped1": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 44497,
+      "n_null": 1046421,
+      "non_null_rate": 0.04078858355990093,
+      "n_unique": 67,
+      "sample_unique": [
+        "ADULT HOUSEHOLD MEMBERS WHO WERE PREVIOUSLY NOT WORKING HAD TO FIND WORK",
+        "Adult household members who were previously not working had to find work",
+        "Borrowed money from institution",
+        "Borrowed money from money lender",
+        "Borrowed money from relatives",
+        "CHANGED DIETARY PATTERNS INVOLUNTARILY",
+        "CHANGED EATING PATTERNS (RELIED ON LESS PREFERRED FOOD OPTIONS, REDUCED THE PROPORTION OR NUMBER OF MEALS PER DAY, OR HOUSEHOLD MEMBERS SKIPPED DAYS OF EATING, ETC)",
+        "Changed dietary patterns involuntarily",
+        "Consumed lower cost but less preferred foods",
+        "DID NOT DO ANYTHING",
+        "Did not do anything",
+        "EMPLOYED HOUSEHOLD MEMBERS TOOK ON MORE EMPLOYMENT",
+        "ENGAGED IN SPIRITUAL EFFORTS - PRAYER, SACRIFICES, DIVINER CONSULTATIONS",
+        "ENGAGED IN SPIRITUAL EFFORTS -PRAYER, SACRIFICES, DIVINER CONSULTATIONS",
+        "Employed household members took on more employment",
+        "Engaged in spiritual efforts - prayer, sacrifices, diviner consultations",
+        "HOUSEHOLD MEMBERS MIGRATED",
+        "Household members migrated",
+        "INTENSIFY FISHING",
+        "Intensify fishing"
+      ]
+    },
+    "HowCoped2": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 31945,
+      "n_null": 1058973,
+      "non_null_rate": 0.029282677524800214,
+      "n_unique": 63,
+      "sample_unique": [
+        "ADULT HOUSEHOLD MEMBERS WHO WERE PREVIOUSLY NOT WORKING HAD TO FIND WORK",
+        "Adult household members who were previously not working had to find work",
+        "Borrowed money from money lender",
+        "Borrowed money from relatives",
+        "CHANGED DIETARY PATTERNS INVOLUNTARILY",
+        "CHANGED EATING PATTERNS (RELIED ON LESS PREFERRED FOOD OPTIONS, REDUCED THE PROPORTION OR NUMBER OF MEALS PER DAY, OR HOUSEHOLD MEMBERS SKIPPED DAYS OF EATING, ETC)",
+        "Changed dietary patterns involuntarily",
+        "Consumed lower cost but less preferred foods",
+        "DID NOT DO ANYTHING",
+        "Did not do anything",
+        "EMPLOYED HOUSEHOLD MEMBERS TOOK ON MORE EMPLOYMENT",
+        "ENGAGED IN SPIRITUAL EFFORTS - PRAYER, SACRIFICES, DIVINER CONSULTATIONS",
+        "ENGAGED IN SPIRITUAL EFFORTS -PRAYER, SACRIFICES, DIVINER CONSULTATIONS",
+        "Engaged in spiritual efforts - prayer, sacrifices, diviner consultations",
+        "HOUSEHOLD MEMBERS MIGRATED",
+        "INTENSIFY FISHING",
+        "Intensify fishing",
+        "No other response given",
+        "OBTAINED CREDIT",
+        "OTHER (SPECIFY)"
+      ]
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 2.83
+}

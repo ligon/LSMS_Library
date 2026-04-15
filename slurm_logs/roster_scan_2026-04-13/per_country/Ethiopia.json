@@ -1,0 +1,64 @@
+{
+  "country": "Ethiopia",
+  "status": "ok",
+  "rows": 127890,
+  "columns": [
+    "Sex",
+    "Age",
+    "Relationship",
+    "Generation",
+    "Distance",
+    "Affinity"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "v",
+    "pid"
+  ],
+  "sex": {
+    "n_non_null": 126082,
+    "n_null": 1808,
+    "unique": [
+      "F",
+      "M"
+    ],
+    "non_canonical": [],
+    "non_canonical_counts": {}
+  },
+  "age": {
+    "dtype": "Int64",
+    "n_non_null": 120121,
+    "n_null": 7769,
+    "n_non_numeric": 0,
+    "min": 0.0,
+    "max": 100.0,
+    "n_negative": 0,
+    "n_gt_120": 0
+  },
+  "relationship": {
+    "n_non_null": 124332,
+    "n_null": 3558,
+    "n_unique": 30,
+    "unknown_labels": [],
+    "unknown_label_counts": {}
+  },
+  "kinship_derived": {
+    "Generation_present": true,
+    "Distance_present": true,
+    "Affinity_present": true,
+    "Affinity_unique": [
+      "affinal",
+      "consanguineal",
+      "servant",
+      "unrelated"
+    ],
+    "Affinity_null_rate": 0.027820783485808118
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Ethiopia/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "RuntimeWarning: Issue with categorical mapping: s1q06"
+  ],
+  "elapsed_s": 136.62
+}

@@ -1,0 +1,105 @@
+{
+  "country": "Tanzania",
+  "feature": "cluster_features",
+  "status": "ok",
+  "rows": 2389,
+  "columns": [
+    "Rural",
+    "Region",
+    "District"
+  ],
+  "index_names": [
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "Rural": "string",
+    "Region": "string",
+    "District": "string"
+  },
+  "canonical_columns": {
+    "Region": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 2343,
+      "n_null": 46,
+      "non_null_rate": 0.9807450816241106,
+      "n_unique": 32,
+      "sample_unique": [
+        "Arusha",
+        "Dar Es Salaam",
+        "Dodoma",
+        "Geita",
+        "Iringa",
+        "Kagera",
+        "Kaskazini Pemba",
+        "Kaskazini Unguja",
+        "Katavi",
+        "Kigoma",
+        "Kilimanjaro",
+        "Kusini Pemba",
+        "Kusini Unguja",
+        "Lindi",
+        "MJINI/MAGHARIBI UNGUJA",
+        "Manyara",
+        "Mara",
+        "Mbeya",
+        "Mjini/Magharibi Unguja",
+        "Morogoro"
+      ]
+    },
+    "Rural": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 2389,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 2,
+      "sample_unique": [
+        "Rural",
+        "Urban"
+      ]
+    },
+    "District": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 2343,
+      "n_null": 46,
+      "non_null_rate": 0.9807450816241106,
+      "n_unique": 253,
+      "sample_unique": [
+        "",
+        "Arumeru",
+        "Arusha",
+        "Arusha Mjini",
+        "Arusha Rural",
+        "Arusha Urban",
+        "Babati",
+        "Babati Mji",
+        "Babati Rural",
+        "Babati Town",
+        "Bagamoyo",
+        "Bahi",
+        "Bariadi",
+        "Biharamulo",
+        "Buhigwe",
+        "Bukoba",
+        "Bukoba Manispaa",
+        "Bukoba Mjini",
+        "Bukoba Rural",
+        "Bukoba Urban"
+      ]
+    },
+    "Latitude": {
+      "present": false
+    },
+    "Longitude": {
+      "present": false
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Tanzania/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 0.29
+}

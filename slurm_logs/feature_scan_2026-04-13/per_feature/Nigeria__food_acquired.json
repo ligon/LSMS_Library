@@ -1,0 +1,36 @@
+{
+  "country": "Nigeria",
+  "feature": "food_acquired",
+  "status": "ok",
+  "rows": 646185,
+  "columns": [
+    "m",
+    "Quantity",
+    "Expenditure",
+    "Produced"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "v",
+    "j",
+    "u"
+  ],
+  "dtypes": {
+    "m": "string",
+    "Quantity": "Float64",
+    "Expenditure": "Float64",
+    "Produced": "Float64"
+  },
+  "canonical_columns": {},
+  "extra_columns": [
+    "m",
+    "Quantity",
+    "Expenditure",
+    "Produced"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nigeria/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 2.13
+}

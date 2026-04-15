@@ -1,0 +1,139 @@
+{
+  "country": "CotedIvoire",
+  "feature": "cluster_features",
+  "status": "ok",
+  "rows": 1484,
+  "columns": [
+    "Region",
+    "Rural",
+    "i",
+    "Latitude",
+    "Longitude"
+  ],
+  "index_names": [
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "Region": "string",
+    "Rural": "string",
+    "i": "str",
+    "Latitude": "Float64",
+    "Longitude": "Float64"
+  },
+  "canonical_columns": {
+    "Region": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 1484,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 38,
+      "sample_unique": [
+        "1: ABIDJAN",
+        "2: OTHER CITIES",
+        "3: EAST FOREST",
+        "4: WEST FOREST",
+        "5: SAVANNA",
+        "AGNEBY-TIASSA",
+        "AUTONOME D'ABIDJAN",
+        "BAFING",
+        "BAGOUE",
+        "BELIER",
+        "BERE",
+        "BOUNKANI",
+        "CAVALLY",
+        "FOLON",
+        "GBEKE",
+        "GB\u00d4KLE",
+        "GONTOUGO",
+        "GRANDS-PONTS",
+        "GUEMON",
+        "G\u00d4H"
+      ]
+    },
+    "Rural": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 1484,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 2,
+      "sample_unique": [
+        "Rural",
+        "Urban"
+      ]
+    },
+    "District": {
+      "present": false
+    },
+    "Latitude": {
+      "present": true,
+      "dtype": "Float64",
+      "n_non_null": 967,
+      "n_null": 517,
+      "non_null_rate": 0.6516172506738545,
+      "n_unique": 962,
+      "sample_unique": [
+        "10.0141452",
+        "10.0177165",
+        "10.0211078",
+        "10.0703353481367",
+        "10.0724502",
+        "10.1060997135937",
+        "10.1160971",
+        "10.129693",
+        "10.1320125767961",
+        "10.1504348684102",
+        "10.1533256610855",
+        "10.1942872",
+        "10.1962586073205",
+        "10.2051368",
+        "10.2234798",
+        "10.2289127418771",
+        "10.2346907649189",
+        "10.2385126",
+        "10.2430474",
+        "10.2452427"
+      ]
+    },
+    "Longitude": {
+      "present": true,
+      "dtype": "Float64",
+      "n_non_null": 967,
+      "n_null": 517,
+      "non_null_rate": 0.6516172506738545,
+      "n_unique": 962,
+      "sample_unique": [
+        "-2.67553936690092",
+        "-2.7085735",
+        "-2.7198884",
+        "-2.75852750055492",
+        "-2.7855585",
+        "-2.7972019",
+        "-2.79792278073728",
+        "-2.8000453",
+        "-2.81216422095895",
+        "-2.81426246277988",
+        "-2.8600209",
+        "-2.8938465",
+        "-2.8994842",
+        "-2.90985999628901",
+        "-2.91033416055143",
+        "-2.94814861379564",
+        "-2.9485089",
+        "-2.9720919",
+        "-2.9729045",
+        "-2.9742575"
+      ]
+    }
+  },
+  "extra_columns": [
+    "i"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/CotedIvoire/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "UserWarning: Data scheme does not contain panel_ids for CotedIvoire"
+  ],
+  "elapsed_s": 4.14
+}

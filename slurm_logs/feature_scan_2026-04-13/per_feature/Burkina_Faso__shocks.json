@@ -1,0 +1,162 @@
+{
+  "country": "Burkina_Faso",
+  "feature": "shocks",
+  "status": "ok",
+  "rows": 419426,
+  "columns": [
+    "AffectedIncome",
+    "AffectedAssets",
+    "AffectedProduction",
+    "AffectedConsumption",
+    "HowCoped0",
+    "HowCoped1",
+    "HowCoped2"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "Shock"
+  ],
+  "dtypes": {
+    "AffectedIncome": "boolean",
+    "AffectedAssets": "boolean",
+    "AffectedProduction": "boolean",
+    "AffectedConsumption": "boolean",
+    "HowCoped0": "string",
+    "HowCoped1": "string",
+    "HowCoped2": "string"
+  },
+  "canonical_columns": {
+    "AffectedIncome": {
+      "present": true,
+      "dtype": "boolean",
+      "n_non_null": 0,
+      "n_null": 419426,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    },
+    "AffectedAssets": {
+      "present": true,
+      "dtype": "boolean",
+      "n_non_null": 0,
+      "n_null": 419426,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    },
+    "AffectedProduction": {
+      "present": true,
+      "dtype": "boolean",
+      "n_non_null": 0,
+      "n_null": 419426,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    },
+    "AffectedConsumption": {
+      "present": true,
+      "dtype": "boolean",
+      "n_non_null": 0,
+      "n_null": 419426,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    },
+    "HowCoped0": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 24790,
+      "n_null": 394636,
+      "non_null_rate": 0.059104585791057304,
+      "n_unique": 33,
+      "sample_unique": [
+        ". Engag\u00e9 dans des activit\u00e9s spirituelles (pri\u00e8res, sacrifices, consultation de marabout, ...)",
+        "Achat d'aliments moins chers",
+        "Aide d'organisations religieuses ou d'ONG",
+        "Aide de parents ou d'amis",
+        "Aide du gouvernement/l'Etat",
+        "Aucune strat\u00e9gie",
+        "Autre strat\u00e9gie",
+        "Autre strat\u00e9gie.(\u00e0 pr\u00e9ciser)",
+        "Changement des habitudes de consommation",
+        "Changement des habitudes de consommation  (Achat d'aliments moins chers, r\u00e9duction du nombre de repas par jour, R\u00e9ductio",
+        "Confiage des enfants \u00e0 d'autres m\u00e9nages",
+        "Enfants de moins de 15 ans amen\u00e9s \u00e0 travailler",
+        "Engag\u00e9 dans des activit\u00e9s spirituelles",
+        "Les enfants de moins de 15 ans ont \u00e9t\u00e9 amen\u00e9s \u00e0 travailler",
+        "Les enfants ont \u00e9t\u00e9 d\u00e9scolaris\u00e9s",
+        "Les membres actifs occup\u00e9s du m\u00e9nage ont pris des emplois suppl\u00e9mentaires",
+        "Les membres adultes (au moins 15 ans) inactifs ou ch\u00f4meurs ont pris des emplois",
+        "Louer/mettre ses terres en gages",
+        "Marier les enfants",
+        "Membres actifs ont pris des emplois suppl\u00e9mentaires"
+      ]
+    },
+    "HowCoped1": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 7044,
+      "n_null": 412382,
+      "non_null_rate": 0.016794380891980945,
+      "n_unique": 33,
+      "sample_unique": [
+        ". Engag\u00e9 dans des activit\u00e9s spirituelles (pri\u00e8res, sacrifices, consultation de marabout, ...)",
+        "Achat d'aliments moins chers",
+        "Aide d'organisations religieuses ou d'ONG",
+        "Aide de parents ou d'amis",
+        "Aide du gouvernement/l'Etat",
+        "Aucune strat\u00e9gie",
+        "Autre strat\u00e9gie",
+        "Autre strat\u00e9gie.(\u00e0 pr\u00e9ciser)",
+        "Changement des habitudes de consommation",
+        "Changement des habitudes de consommation  (Achat d'aliments moins chers, r\u00e9duction du nombre de repas par jour, R\u00e9ductio",
+        "Confiage des enfants \u00e0 d'autres m\u00e9nages",
+        "Enfants de moins de 15 ans amen\u00e9s \u00e0 travailler",
+        "Engag\u00e9 dans des activit\u00e9s spirituelles",
+        "Les enfants de moins de 15 ans ont \u00e9t\u00e9 amen\u00e9s \u00e0 travailler",
+        "Les enfants ont \u00e9t\u00e9 d\u00e9scolaris\u00e9s",
+        "Les membres actifs occup\u00e9s du m\u00e9nage ont pris des emplois suppl\u00e9mentaires",
+        "Les membres adultes (au moins 15 ans) inactifs ou ch\u00f4meurs ont pris des emplois",
+        "Louer/mettre ses terres en gages",
+        "Marier les enfants",
+        "Membres actifs ont pris des emplois suppl\u00e9mentaires"
+      ]
+    },
+    "HowCoped2": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 1364,
+      "n_null": 418062,
+      "non_null_rate": 0.003252063534449462,
+      "n_unique": 30,
+      "sample_unique": [
+        ". Engag\u00e9 dans des activit\u00e9s spirituelles (pri\u00e8res, sacrifices, consultation de marabout, ...)",
+        "Achat d'aliments moins chers",
+        "Aide d'organisations religieuses ou d'ONG",
+        "Aide de parents ou d'amis",
+        "Aide du gouvernement/l'Etat",
+        "Aucune strat\u00e9gie",
+        "Autre strat\u00e9gie",
+        "Autre strat\u00e9gie.(\u00e0 pr\u00e9ciser)",
+        "Changement des habitudes de consommation",
+        "Changement des habitudes de consommation  (Achat d'aliments moins chers, r\u00e9duction du nombre de repas par jour, R\u00e9ductio",
+        "Confiage des enfants \u00e0 d'autres m\u00e9nages",
+        "Engag\u00e9 dans des activit\u00e9s spirituelles",
+        "Les enfants de moins de 15 ans ont \u00e9t\u00e9 amen\u00e9s \u00e0 travailler",
+        "Les enfants ont \u00e9t\u00e9 d\u00e9scolaris\u00e9s",
+        "Les membres actifs occup\u00e9s du m\u00e9nage ont pris des emplois suppl\u00e9mentaires",
+        "Les membres adultes (au moins 15 ans) inactifs ou ch\u00f4meurs ont pris des emplois",
+        "Membres actifs ont pris des emplois suppl\u00e9mentaires",
+        "Membres adultes inactifs/ch\u00f4meurs ont pris des emplois",
+        "Migration d'un ou plusieurs membres du m\u00e9nage",
+        "Migration de membres du m\u00e9nage"
+      ]
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Burkina_Faso/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 1.04
+}

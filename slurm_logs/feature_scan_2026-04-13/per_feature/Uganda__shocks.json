@@ -1,0 +1,10 @@
+{
+  "country": "Uganda",
+  "feature": "shocks",
+  "status": "error",
+  "error": "TimeoutError: probe exceeded 120s (Makefile !make path hangs without DVC infrastructure)",
+  "rows": null,
+  "elapsed_s": 120.0,
+  "warnings": [],
+  "notes": "Uganda uses !make for this feature; DVC not available on this node; same pattern as Armenia in roster_scan."
+}

@@ -1,0 +1,68 @@
+{
+  "country": "GhanaLSS",
+  "status": "ok",
+  "rows": 246594,
+  "columns": [
+    "Sex",
+    "Age",
+    "Birthplace",
+    "Relationship",
+    "Generation",
+    "Distance",
+    "Affinity"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "v",
+    "pid"
+  ],
+  "sex": {
+    "n_non_null": 246594,
+    "n_null": 0,
+    "unique": [
+      "F",
+      "M"
+    ],
+    "non_canonical": [],
+    "non_canonical_counts": {}
+  },
+  "age": {
+    "dtype": "Int64",
+    "n_non_null": 246593,
+    "n_null": 1,
+    "n_non_numeric": 0,
+    "min": 0.0,
+    "max": 99.0,
+    "n_negative": 0,
+    "n_gt_120": 0
+  },
+  "relationship": {
+    "n_non_null": 246594,
+    "n_null": 0,
+    "n_unique": 29,
+    "unknown_labels": [],
+    "unknown_label_counts": {}
+  },
+  "kinship_derived": {
+    "Generation_present": true,
+    "Distance_present": true,
+    "Affinity_present": true,
+    "Affinity_unique": [
+      "affinal",
+      "consanguineal",
+      "guest",
+      "servant",
+      "step",
+      "unrelated"
+    ],
+    "Affinity_null_rate": 0.0
+  },
+  "extra_columns": [
+    "Birthplace"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/GhanaLSS/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 5.34
+}

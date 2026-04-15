@@ -1,0 +1,158 @@
+{
+  "country": "Ethiopia",
+  "feature": "cluster_features",
+  "status": "ok",
+  "rows": 866,
+  "columns": [
+    "i",
+    "Region",
+    "District",
+    "Rural",
+    "Latitude",
+    "Longitude"
+  ],
+  "index_names": [
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "i": "str",
+    "Region": "string",
+    "District": "string",
+    "Rural": "string",
+    "Latitude": "Float64",
+    "Longitude": "Float64"
+  },
+  "canonical_columns": {
+    "Region": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 865,
+      "n_null": 1,
+      "non_null_rate": 0.9988452655889145,
+      "n_unique": 11,
+      "sample_unique": [
+        "Addis Ababa",
+        "Afar",
+        "Amhara",
+        "Benshagul Gumuz",
+        "Diredwa",
+        "Gambelia",
+        "Harari",
+        "Oromia",
+        "SNNP",
+        "Somalie",
+        "Tigray"
+      ]
+    },
+    "Rural": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 865,
+      "n_null": 1,
+      "non_null_rate": 0.9988452655889145,
+      "n_unique": 2,
+      "sample_unique": [
+        "Rural",
+        "Urban"
+      ]
+    },
+    "District": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 865,
+      "n_null": 1,
+      "non_null_rate": 0.9988452655889145,
+      "n_unique": 22,
+      "sample_unique": [
+        "1.0",
+        "10.0",
+        "11.0",
+        "12.0",
+        "13.0",
+        "14.0",
+        "15.0",
+        "16.0",
+        "17.0",
+        "18.0",
+        "19.0",
+        "2.0",
+        "20.0",
+        "21.0",
+        "22.0",
+        "3.0",
+        "4.0",
+        "5.0",
+        "6.0",
+        "7.0"
+      ]
+    },
+    "Latitude": {
+      "present": true,
+      "dtype": "Float64",
+      "n_non_null": 866,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 438,
+      "sample_unique": [
+        "10.0165864149",
+        "10.0245110384",
+        "10.081237992",
+        "10.1249269842",
+        "10.1255685035",
+        "10.1771510236",
+        "10.1813677297",
+        "10.3526409665",
+        "10.4180717415",
+        "10.4376029071",
+        "10.4624101433",
+        "10.4822087828",
+        "10.4981528016",
+        "10.5023759921",
+        "10.5281537836",
+        "10.5345284745",
+        "10.5635333752",
+        "10.5685626516",
+        "10.5738928409",
+        "10.5773759639"
+      ]
+    },
+    "Longitude": {
+      "present": true,
+      "dtype": "Float64",
+      "n_non_null": 866,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 438,
+      "sample_unique": [
+        "33.4683567701",
+        "33.938508848",
+        "33.980758515",
+        "34.2016617219",
+        "34.2562839247",
+        "34.4209015528",
+        "34.5080541478",
+        "34.5342648788",
+        "34.5566341877",
+        "34.5963960166",
+        "34.6514363264",
+        "34.6831901825",
+        "34.7285555289",
+        "34.7861778123",
+        "34.7872968911",
+        "34.9150151529",
+        "35.046540828",
+        "35.1983637711",
+        "35.2563379766",
+        "35.2645547968"
+      ]
+    }
+  },
+  "extra_columns": [
+    "i"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Ethiopia/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 4.21
+}

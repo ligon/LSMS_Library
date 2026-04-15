@@ -1,0 +1,423 @@
+[16:08:39] probing 33 countries:
+  - Albania
+  - Armenia
+  - Azerbaijan
+  - Benin
+  - Burkina_Faso
+  - Cambodia
+  - China
+  - CotedIvoire
+  - Ethiopia
+  - GhanaLSS
+  - Guatemala
+  - Guinea-Bissau
+  - Guyana
+  - India
+  - Iraq
+  - Kazakhstan
+  - Kosovo
+  - Liberia
+  - Malawi
+  - Mali
+  - Nepal
+  - Niger
+  - Nigeria
+  - Pakistan
+  - Senegal
+  - Serbia
+  - Serbia and Montenegro
+  - South Africa
+  - Tajikistan
+  - Tanzania
+  - Timor-Leste
+  - Togo
+  - Uganda
+[16:08:39] pool size = 20
+Panel IDs not found in Guinea-Bissau.
+Panel IDs not found in Azerbaijan.
+Panel IDs not found in Guyana.
+Panel IDs not found in CotedIvoire.
+Panel IDs not found in Liberia.
+Panel IDs not found in Kosovo.
+Panel IDs not found in Cambodia.
+Panel IDs not found in Armenia.
+Panel IDs not found in Azerbaijan.
+Panel IDs not found in Albania.
+Panel IDs not found in Benin.
+Panel IDs not found in India.
+Panel IDs not found in China.
+Panel IDs not found in Liberia.
+Panel IDs not found in Guatemala.
+Panel IDs not found in Kazakhstan.
+Panel IDs not found in Guyana.
+Panel IDs not found in Kosovo.
+Panel IDs not found in Cambodia.
+Panel IDs not found in China.
+Panel IDs not found in Guinea-Bissau.
+Panel IDs not found in India.
+Panel IDs not found in Iraq.
+Panel IDs not found in Benin.
+Panel IDs not found in Kazakhstan.
+Panel IDs not found in CotedIvoire.
+Panel IDs not found in Albania.
+Panel IDs not found in Guatemala.
+[16:08:43] Azerbaijan                       ok rows=       319 elapsed=  4.01s
+Panel IDs not found in Iraq.
+[16:08:43] Guyana                           ok rows=       150 elapsed=  4.04s
+[16:08:43] India                            ok rows=       545 elapsed=  4.07s
+[16:08:44] China                            ok rows=      2998 elapsed=  4.07s
+[16:08:44] Liberia                          ok rows=     12263 elapsed=  4.08s
+[16:08:44] Cambodia                         ok rows=      6351 elapsed=  4.12s
+[16:08:44] Kazakhstan                       ok rows=      7221 elapsed=  4.14s
+[16:08:44] Kosovo                           ok rows=     17917 elapsed=  4.14s
+Panel IDs not found in Nepal.
+Panel IDs not found in Pakistan.
+Panel IDs not found in Pakistan.
+[16:08:44] Benin                            ok rows=     42343 elapsed=  4.26s
+Panel IDs not found in Serbia.
+[16:08:44] Guinea-Bissau                    ok rows=     42839 elapsed=  4.26s
+Panel IDs not found in South Africa.
+Panel IDs not found in Serbia and Montenegro.
+Panel IDs not found in Serbia and Montenegro.
+Panel IDs not found in Serbia.
+[16:08:44] Guatemala                     error rows=      None elapsed=  4.31s
+[16:08:44] Albania                          ok rows=     42465 elapsed=  4.32s
+[16:08:44] Serbia                           ok rows=       131 elapsed=  0.23s
+[16:08:44] Serbia and Montenegro            ok rows=       201 elapsed=  0.21s
+Panel IDs not found in Tajikistan.
+Panel IDs not found in Timor-Leste.
+Panel IDs not found in Togo.
+[16:08:44] Pakistan                         ok rows=     36079 elapsed=  0.39s
+Panel IDs not found in Tajikistan.
+Panel IDs not found in Timor-Leste.
+Panel IDs not found in Togo.
+[16:08:44] CotedIvoire                      ok rows=    111789 elapsed=  4.69s
+[16:08:44] Togo                             ok rows=     27480 elapsed=  0.37s
+[16:08:44] Timor-Leste                      ok rows=     34113 elapsed=  0.39s
+[16:08:44] Iraq                             ok rows=    127506 elapsed=   4.8s
+[16:08:44] Tajikistan                       ok rows=     79309 elapsed=  0.62s
+[16:08:44] Burkina_Faso                     ok rows=    146517 elapsed=  4.95s
+[16:08:44] Niger                            ok rows=    125653 elapsed=  0.91s
+[16:08:45] Senegal                          ok rows=    144851 elapsed=  1.09s
+[16:08:45] Tanzania                         ok rows=    112885 elapsed=  0.91s
+[16:08:45] GhanaLSS                         ok rows=    246594 elapsed=  5.34s
+[16:08:45] Malawi                           ok rows=    260447 elapsed=  5.68s
+[16:08:45] Mali                             ok rows=    188706 elapsed=  5.83s
+[16:08:45] Nigeria                          ok rows=    234547 elapsed=   1.8s
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Nepal/var/household_roster.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/household_roster.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/household_roster.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Nepal/var/household_roster.parquet still missing after running fallbacks.
+[16:08:47] Nepal                         error rows=      None elapsed=  3.32s
+Panel IDs not found in South Africa.
+[16:10:34] South Africa                     ok rows=     43687 elapsed=110.02s
+[16:10:44] Uganda                           ok rows=    147612 elapsed=120.32s
+[16:10:56] Ethiopia                         ok rows=    127890 elapsed=136.62s
+No Stata zip found for ARM_1996_HBS_v01_M (https://microdata.worldbank.org/index.php/catalog/2324/related-materials)
+Process ForkPoolWorker-9:
+Process ForkPoolWorker-18:
+Process ForkPoolWorker-16:
+Process ForkPoolWorker-6:
+Process ForkPoolWorker-11:
+Process ForkPoolWorker-3:
+Process ForkPoolWorker-7:
+Process ForkPoolWorker-4:
+Process ForkPoolWorker-15:
+Process ForkPoolWorker-8:
+Process ForkPoolWorker-12:
+Process ForkPoolWorker-20:
+Process ForkPoolWorker-13:
+Process ForkPoolWorker-1:
+Process ForkPoolWorker-5:
+Process ForkPoolWorker-19:
+Process ForkPoolWorker-21:
+Process ForkPoolWorker-10:
+Process ForkPoolWorker-17:
+Process ForkPoolWorker-14:
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/pool.py", line 114, in worker
+    task = get()
+           ^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+Traceback (most recent call last):
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/pool.py", line 114, in worker
+    task = get()
+           ^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/pool.py", line 114, in worker
+    task = get()
+           ^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/pool.py", line 114, in worker
+    task = get()
+           ^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/pool.py", line 114, in worker
+    task = get()
+           ^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/pool.py", line 114, in worker
+    task = get()
+           ^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/pool.py", line 114, in worker
+    task = get()
+           ^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/pool.py", line 114, in worker
+    task = get()
+           ^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/pool.py", line 114, in worker
+    task = get()
+           ^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/pool.py", line 114, in worker
+    task = get()
+           ^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/pool.py", line 114, in worker
+    task = get()
+           ^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/pool.py", line 114, in worker
+    task = get()
+           ^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/pool.py", line 114, in worker
+    task = get()
+           ^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/queues.py", line 364, in get
+    with self._rlock:
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/pool.py", line 114, in worker
+    task = get()
+           ^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/queues.py", line 364, in get
+    with self._rlock:
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/queues.py", line 364, in get
+    with self._rlock:
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/pool.py", line 114, in worker
+    task = get()
+           ^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/queues.py", line 364, in get
+    with self._rlock:
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/pool.py", line 114, in worker
+    task = get()
+           ^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/queues.py", line 364, in get
+    with self._rlock:
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/pool.py", line 114, in worker
+    task = get()
+           ^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/queues.py", line 364, in get
+    with self._rlock:
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/pool.py", line 114, in worker
+    task = get()
+           ^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/queues.py", line 364, in get
+    with self._rlock:
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/queues.py", line 364, in get
+    with self._rlock:
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/queues.py", line 364, in get
+    with self._rlock:
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/queues.py", line 364, in get
+    with self._rlock:
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/queues.py", line 364, in get
+    with self._rlock:
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/queues.py", line 364, in get
+    with self._rlock:
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/queues.py", line 364, in get
+    with self._rlock:
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/synchronize.py", line 95, in __enter__
+    return self._semlock.__enter__()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/queues.py", line 364, in get
+    with self._rlock:
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/synchronize.py", line 95, in __enter__
+    return self._semlock.__enter__()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/synchronize.py", line 95, in __enter__
+    return self._semlock.__enter__()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/synchronize.py", line 95, in __enter__
+    return self._semlock.__enter__()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/queues.py", line 364, in get
+    with self._rlock:
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/synchronize.py", line 95, in __enter__
+    return self._semlock.__enter__()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/queues.py", line 364, in get
+    with self._rlock:
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/synchronize.py", line 95, in __enter__
+    return self._semlock.__enter__()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/queues.py", line 364, in get
+    with self._rlock:
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/synchronize.py", line 95, in __enter__
+    return self._semlock.__enter__()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/queues.py", line 364, in get
+    with self._rlock:
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/synchronize.py", line 95, in __enter__
+    return self._semlock.__enter__()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/synchronize.py", line 95, in __enter__
+    return self._semlock.__enter__()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/synchronize.py", line 95, in __enter__
+    return self._semlock.__enter__()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/synchronize.py", line 95, in __enter__
+    return self._semlock.__enter__()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/synchronize.py", line 95, in __enter__
+    return self._semlock.__enter__()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/synchronize.py", line 95, in __enter__
+    return self._semlock.__enter__()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/synchronize.py", line 95, in __enter__
+    return self._semlock.__enter__()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+KeyboardInterrupt
+KeyboardInterrupt
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/synchronize.py", line 95, in __enter__
+    return self._semlock.__enter__()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+KeyboardInterrupt
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/synchronize.py", line 95, in __enter__
+    return self._semlock.__enter__()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/pool.py", line 114, in worker
+    task = get()
+           ^^^^^
+KeyboardInterrupt
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/queues.py", line 365, in get
+    res = self._reader.recv_bytes()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/connection.py", line 216, in recv_bytes
+    buf = self._recv_bytes(maxlength)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/connection.py", line 430, in _recv_bytes
+    buf = self._recv(4)
+          ^^^^^^^^^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/synchronize.py", line 95, in __enter__
+    return self._semlock.__enter__()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/connection.py", line 395, in _recv
+    chunk = read(handle, remaining)
+            ^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+KeyboardInterrupt
+KeyboardInterrupt
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/synchronize.py", line 95, in __enter__
+    return self._semlock.__enter__()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+KeyboardInterrupt
+KeyboardInterrupt
+KeyboardInterrupt
+KeyboardInterrupt
+KeyboardInterrupt
+KeyboardInterrupt
+KeyboardInterrupt
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/pool.py", line 114, in worker
+    task = get()
+           ^^^^^
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/queues.py", line 364, in get
+    with self._rlock:
+  File "/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/multiprocessing/synchronize.py", line 95, in __enter__
+    return self._semlock.__enter__()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

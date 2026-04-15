@@ -1,0 +1,153 @@
+{
+  "country": "Uganda",
+  "feature": "cluster_features",
+  "status": "ok",
+  "rows": 4409,
+  "columns": [
+    "Region",
+    "Rural",
+    "District",
+    "i",
+    "Latitude",
+    "Longitude"
+  ],
+  "index_names": [
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "Region": "string",
+    "Rural": "string",
+    "District": "string",
+    "i": "str",
+    "Latitude": "Float64",
+    "Longitude": "Float64"
+  },
+  "canonical_columns": {
+    "Region": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 4408,
+      "n_null": 1,
+      "non_null_rate": 0.9997731911998186,
+      "n_unique": 4,
+      "sample_unique": [
+        "Central",
+        "Eastern",
+        "Northern",
+        "Western"
+      ]
+    },
+    "Rural": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 4406,
+      "n_null": 3,
+      "non_null_rate": 0.9993195735994557,
+      "n_unique": 2,
+      "sample_unique": [
+        "Rural",
+        "Urban"
+      ]
+    },
+    "District": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 4409,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 431,
+      "sample_unique": [
+        "",
+        "101",
+        "101.0",
+        "102",
+        "102.0",
+        "103",
+        "103.0",
+        "104",
+        "104.0",
+        "105",
+        "105.0",
+        "106",
+        "106.0",
+        "107",
+        "107.0",
+        "108",
+        "108.0",
+        "109",
+        "109.0",
+        "110"
+      ]
+    },
+    "Latitude": {
+      "present": true,
+      "dtype": "Float64",
+      "n_non_null": 961,
+      "n_null": 3448,
+      "non_null_rate": 0.2179632569743706,
+      "n_unique": 642,
+      "sample_unique": [
+        "-0.07957098633050919",
+        "-0.07957100123167038",
+        "-0.10503800213336945",
+        "-0.10503817349672318",
+        "-0.10799911618232727",
+        "-0.13256295025348663",
+        "-0.13256299495697021",
+        "-0.14214757084846497",
+        "-0.1421480029821396",
+        "-0.15101900696754456",
+        "-0.15113799273967743",
+        "-0.1511382758617401",
+        "-0.15598033368587494",
+        "-0.16504748165607452",
+        "-0.19768300652503967",
+        "-0.19768302142620087",
+        "-0.20546399056911469",
+        "-0.22739599645137787",
+        "-0.2273964136838913",
+        "-0.24854299426078796"
+      ]
+    },
+    "Longitude": {
+      "present": true,
+      "dtype": "Float64",
+      "n_non_null": 961,
+      "n_null": 3448,
+      "non_null_rate": 0.2179632569743706,
+      "n_unique": 394,
+      "sample_unique": [
+        "29.653026580810547",
+        "29.67283821105957",
+        "29.733909606933594",
+        "29.76825714111328",
+        "29.778324127197266",
+        "29.794294357299805",
+        "29.80122947692871",
+        "29.80598258972168",
+        "29.85223960876465",
+        "29.943525314331055",
+        "29.9493350982666",
+        "29.949390411376953",
+        "29.954179763793945",
+        "29.959688186645508",
+        "29.961166381835938",
+        "30.01063346862793",
+        "30.05050277709961",
+        "30.056819915771484",
+        "30.062450408935547",
+        "30.067520141601562"
+      ]
+    }
+  },
+  "extra_columns": [
+    "i"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "RuntimeWarning: Issue with categorical mapping: h1bq1",
+    "RuntimeWarning: Issue with categorical mapping: h1bq3"
+  ],
+  "elapsed_s": 94.93
+}

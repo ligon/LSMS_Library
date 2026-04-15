@@ -1,0 +1,37 @@
+{
+  "country": "Malawi",
+  "feature": "assets",
+  "status": "ok",
+  "rows": 1534498,
+  "columns": [
+    "Quantity",
+    "Age",
+    "Value",
+    "Purchased Recently",
+    "Purchase Price"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "j"
+  ],
+  "dtypes": {
+    "Quantity": "Float64",
+    "Age": "Float64",
+    "Value": "Float64",
+    "Purchased Recently": "string",
+    "Purchase Price": "Float64"
+  },
+  "canonical_columns": {},
+  "extra_columns": [
+    "Quantity",
+    "Age",
+    "Value",
+    "Purchased Recently",
+    "Purchase Price"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 1.1
+}

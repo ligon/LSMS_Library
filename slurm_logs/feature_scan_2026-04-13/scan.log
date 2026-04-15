@@ -1,0 +1,230 @@
+[16:34:32] feature coverage:
+  cluster_features         :  30 countries
+  shocks                   :  13 countries
+  food_acquired            :  15 countries
+  interview_date           :  15 countries
+  assets                   :  14 countries
+  housing                  :  13 countries
+  individual_education     :  11 countries
+  plot_features            :   0 countries
+[16:34:32] total (country x feature) pairs: 111
+[16:34:32] pool size = 20
+Panel IDs not found in Benin.
+Panel IDs not found in CotedIvoire.
+Panel IDs not found in Guyana.
+Panel IDs not found in Liberia.
+Panel IDs not found in China.
+[16:34:36] Guyana                   cluster_features                    ok rows=       130 elapsed=  4.12s
+Panel IDs not found in Guatemala.
+Panel IDs not found in Cambodia.
+[16:34:36] Benin                    cluster_features                    ok rows=       670 elapsed=  4.15s
+[16:34:36] CotedIvoire              cluster_features                    ok rows=      1484 elapsed=  4.15s
+[16:34:36] Liberia                  cluster_features                    ok rows=        32 elapsed=  4.15s
+Panel IDs not found in Kosovo.
+Panel IDs not found in India.
+[16:34:36] China                    cluster_features                    ok rows=        30 elapsed=  4.18s
+Panel IDs not found in Serbia.
+Panel IDs not found in Pakistan.
+Panel IDs not found in Kazakhstan.
+[16:34:36] Mali                     cluster_features                    ok rows=      3006 elapsed=  4.19s
+[16:34:36] Ethiopia                 cluster_features                    ok rows=       866 elapsed=  4.23s
+[16:34:36] Pakistan                 cluster_features                    ok rows=       301 elapsed=  0.08s
+[16:34:36] Guatemala                cluster_features                    ok rows=         8 elapsed=  4.22s
+[16:34:36] Cambodia                 cluster_features                    ok rows=       252 elapsed=  4.23s
+Panel IDs not found in Serbia and Montenegro.
+[16:34:36] Kosovo                   cluster_features                    ok rows=       360 elapsed=  4.23s
+[16:34:36] Serbia                   cluster_features                    ok rows=       328 elapsed=  0.08s
+Panel IDs not found in Azerbaijan.
+[16:34:36] India                    cluster_features                    ok rows=       120 elapsed=  4.25s
+Panel IDs not found in Albania.
+[16:34:36] Serbia and Montenegro    cluster_features                    ok rows=       919 elapsed=  0.09s
+Panel IDs not found in Benin.
+Panel IDs not found in South Africa.
+[16:34:36] Senegal                  cluster_features                    ok rows=      1194 elapsed=  0.13s
+Panel IDs not found in Tajikistan.
+Panel IDs not found in Togo.
+Panel IDs not found in Guinea-Bissau.
+[16:34:36] Kazakhstan               cluster_features                    ok rows=       135 elapsed=   4.3s
+Panel IDs not found in CotedIvoire.
+[16:34:36] Azerbaijan               cluster_features                    ok rows=        92 elapsed=  4.33s
+[16:34:36] South Africa             cluster_features                    ok rows=       355 elapsed=  0.13s
+[16:34:36] Tajikistan               cluster_features                    ok rows=       767 elapsed=  0.11s
+[16:34:36] Albania                  cluster_features                    ok rows=      1829 elapsed=  4.34s
+Panel IDs not found in Guinea-Bissau.
+Panel IDs not found in Nepal.
+[16:34:36] Togo                     cluster_features                    ok rows=       540 elapsed=  0.12s
+[16:34:36] Guinea-Bissau            cluster_features                    ok rows=       450 elapsed=   4.4s
+[16:34:36] Nigeria                  cluster_features                    ok rows=       820 elapsed=   0.3s
+[16:34:36] Niger                    cluster_features                    ok rows=      1329 elapsed=  4.45s
+Panel IDs not found in Togo.
+Panel IDs not found in Benin.
+[16:34:36] Tanzania                 cluster_features                    ok rows=      2389 elapsed=   0.3s
+[16:34:36] GhanaLSS                 cluster_features                    ok rows=      3791 elapsed=  4.53s
+Panel IDs not found in CotedIvoire.
+[16:34:36] Burkina_Faso             cluster_features                    ok rows=       550 elapsed=  4.61s
+[16:34:36] Guinea-Bissau            shocks                              ok rows=    117722 elapsed=   0.4s
+[16:34:36] Benin                    shocks                              ok rows=    176264 elapsed=  0.46s
+[16:34:36] Malawi                   cluster_features                    ok rows=     38103 elapsed=  4.75s
+Panel IDs not found in Guinea-Bissau.
+[16:34:37] Togo                     shocks                              ok rows=    135762 elapsed=  0.45s
+[16:34:37] Tanzania                 shocks                              ok rows=    162928 elapsed=  0.55s
+[16:34:37] CotedIvoire              shocks                              ok rows=    285824 elapsed=  0.67s
+Panel IDs not found in Nepal.
+Panel IDs not found in Benin.
+Panel IDs not found in Guinea-Bissau.
+[16:34:37] Senegal                  shocks                              ok rows=    314072 elapsed=  0.72s
+[16:34:37] Nigeria                  shocks                              ok rows=    636256 elapsed=  0.76s
+Panel IDs not found in CotedIvoire.
+[16:34:37] Burkina_Faso             shocks                              ok rows=    419426 elapsed=  1.05s
+[16:34:37] Guinea-Bissau            food_acquired                       ok rows=    125484 elapsed=  0.59s
+[16:34:37] Benin                    food_acquired                       ok rows=    187672 elapsed=  0.83s
+Panel IDs not found in Togo.
+[16:34:37] Mali                     shocks                              ok rows=    375481 elapsed=  1.03s
+Panel IDs not found in Benin.
+[16:34:37] Niger                    shocks                              ok rows=    424764 elapsed=  1.06s
+[16:34:37] Ethiopia                 shocks                              ok rows=    500121 elapsed=  1.13s
+Panel IDs not found in Benin.
+Panel IDs not found in CotedIvoire.
+[16:34:37] Benin                    interview_date                      ok rows=      8012 elapsed=  0.14s
+Panel IDs not found in CotedIvoire.
+Panel IDs not found in Togo.
+[16:34:37] Burkina_Faso             interview_date                      ok rows=     10237 elapsed=   0.2s
+[16:34:37] CotedIvoire              interview_date                      ok rows=     12992 elapsed=  0.19s
+Panel IDs not found in Guinea-Bissau.
+Panel IDs not found in Guinea-Bissau.
+[16:34:37] Ethiopia                 interview_date                      ok rows=      8351 elapsed=   0.2s
+[16:34:37] Guinea-Bissau            interview_date                      ok rows=      5351 elapsed=  0.17s
+[16:34:37] Togo                     food_acquired                       ok rows=    112087 elapsed=  0.48s
+[16:34:37] CotedIvoire              food_acquired                       ok rows=    292741 elapsed=  1.23s
+[16:34:37] Ethiopia                 food_acquired                       ok rows=    264418 elapsed=  1.15s
+Panel IDs not found in Nepal.
+[16:34:38] Niger                    food_acquired                       ok rows=    237733 elapsed=  0.93s
+[16:34:38] Burkina_Faso             food_acquired                       ok rows=    331165 elapsed=  1.37s
+[16:34:38] Niger                    interview_date                      ok rows=     12646 elapsed=  0.15s
+[16:34:38] Tanzania                 food_acquired                       ok rows=    250302 elapsed=  0.64s
+Panel IDs not found in Togo.
+[16:34:38] Mali                     interview_date                      ok rows=     37125 elapsed=   0.2s
+Panel IDs not found in Togo.
+[16:34:38] Senegal                  interview_date                      ok rows=     14276 elapsed=  0.15s
+Panel IDs not found in Benin.
+[16:34:38] Togo                     interview_date                      ok rows=      6171 elapsed=  0.11s
+Panel IDs not found in CotedIvoire.
+[16:34:38] Tanzania                 interview_date                      ok rows=     22433 elapsed=  0.18s
+[16:34:38] Benin                    assets                              ok rows=    360540 elapsed=  0.25s
+Panel IDs not found in Guinea-Bissau.
+[16:34:38] Nigeria                  interview_date                      ok rows=     39228 elapsed=  0.59s
+[16:34:38] Guinea-Bissau            assets                              ok rows=    240795 elapsed=  0.22s
+[16:34:38] CotedIvoire              assets                              ok rows=    584640 elapsed=   0.4s
+Panel IDs not found in Nepal.
+[16:34:38] Mali                     food_acquired                       ok rows=    433779 elapsed=  1.67s
+[16:34:38] Burkina_Faso             assets                              ok rows=    741440 elapsed=  0.54s
+[16:34:38] Uganda                   food_acquired                       ok rows=    352916 elapsed=  1.39s
+[16:34:38] Ethiopia                 assets                              ok rows=    916908 elapsed=  0.59s
+[16:34:38] Senegal                  food_acquired                       ok rows=    433871 elapsed=  1.59s
+Panel IDs not found in Togo.
+[16:34:39] Tanzania                 assets                              ok rows=     62752 elapsed=  0.13s
+[16:34:39] Togo                     assets                              ok rows=    277695 elapsed=   0.2s
+Panel IDs not found in Benin.
+Panel IDs not found in Benin.
+[16:34:39] Uganda                   assets                              ok rows=    116808 elapsed=  0.12s
+[16:34:39] Benin                    housing                             ok rows=      8012 elapsed=  0.09s
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Nepal/var/cluster_features.parquet'.  Stop.
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Nepal/var/interview_date.parquet'.  Stop.
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_acquired.parquet'.  Stop.
+Panel IDs not found in CotedIvoire.
+Panel IDs not found in CotedIvoire.
+[16:34:39] Mali                     assets                              ok rows=    573145 elapsed=  0.61s
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/cluster_features.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/interview_date.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/food_acquired.parquet'.  Stop.
+[16:34:39] CotedIvoire              housing                             ok rows=     12992 elapsed=  0.13s
+[16:34:39] Senegal                  assets                              ok rows=    642420 elapsed=  0.43s
+[16:34:39] Niger                    assets                              ok rows=    824619 elapsed=  0.56s
+[16:34:39] Burkina_Faso             housing                             ok rows=     21037 elapsed=   0.2s
+[16:34:39] Malawi                   shocks                              ok rows=   1090918 elapsed=  2.83s
+Panel IDs not found in Guinea-Bissau.
+Panel IDs not found in Guinea-Bissau.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/interview_date.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Nepal/var/interview_date.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/cluster_features.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Nepal/var/cluster_features.parquet still missing after running fallbacks.
+[16:34:39] Nepal                    interview_date                   error rows=         — elapsed=  1.42s
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/food_acquired.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_acquired.parquet still missing after running fallbacks.
+[16:34:39] Nepal                    cluster_features                 error rows=         — elapsed=  7.18s
+[16:34:39] Guinea-Bissau            housing                             ok rows=      5351 elapsed=  0.11s
+[16:34:39] Nepal                    food_acquired                    error rows=         — elapsed=  2.31s
+[16:34:39] Nigeria                  food_acquired                       ok rows=    646185 elapsed=  2.15s
+Panel IDs not found in Togo.
+Panel IDs not found in Togo.
+[16:34:39] Niger                    housing                             ok rows=      3968 elapsed=  0.12s
+Panel IDs not found in Benin.
+[16:34:39] Mali                     housing                             ok rows=     24931 elapsed=  0.17s
+[16:34:39] Togo                     housing                             ok rows=      6171 elapsed=  0.09s
+[16:34:39] Ethiopia                 housing                             ok rows=     25914 elapsed=  0.24s
+Panel IDs not found in Benin.
+Panel IDs not found in CotedIvoire.
+[16:34:39] Senegal                  housing                             ok rows=      7156 elapsed=  0.12s
+Panel IDs not found in Guinea-Bissau.
+Panel IDs not found in CotedIvoire.
+Panel IDs not found in Guinea-Bissau.
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Malawi/var/interview_date.parquet'.  Stop.
+[16:34:39] Benin                    individual_education                ok rows=     42343 elapsed=  0.19s
+[16:34:39] Tanzania                 housing                             ok rows=     22433 elapsed=  0.23s
+make: *** No rule to make target '../2010-11/_/food_acquired.parquet'.  Stop.
+Panel IDs not found in Nepal.
+[16:34:39] Guinea-Bissau            individual_education                ok rows=     42839 elapsed=  0.17s
+[16:34:39] Malawi                   assets                              ok rows=   1534498 elapsed=  1.11s
+[16:34:39] CotedIvoire              individual_education                ok rows=     61116 elapsed=  0.21s
+Panel IDs not found in Togo.
+Panel IDs not found in Togo.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/var/interview_date.parquet'.  Stop.
+[16:34:39] Malawi                   food_acquired                    error rows=         — elapsed=  2.78s
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/GhanaLSS/var/interview_date.parquet'.  Stop.
+[16:34:39] Malawi                   housing                             ok rows=     57058 elapsed=  0.48s
+[16:34:39] Togo                     individual_education                ok rows=     27482 elapsed=  0.14s
+[16:34:39] Niger                    individual_education                ok rows=     74159 elapsed=  0.25s
+[16:34:39] Nigeria                  housing                             ok rows=     24006 elapsed=  0.55s
+[16:34:39] GhanaLSS                 food_acquired                       ok rows=   1459786 elapsed=  3.04s
+[16:34:40] Senegal                  individual_education                ok rows=    129650 elapsed=  0.32s
+[16:34:40] Nigeria                  assets                              ok rows=   1140682 elapsed=   1.3s
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/_/interview_date.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Malawi/var/interview_date.parquet still missing after running fallbacks.
+[16:34:40] Mali                     individual_education                ok rows=    188706 elapsed=  0.63s
+[16:34:40] Malawi                   interview_date                   error rows=         — elapsed=  2.24s
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/var/individual_education.parquet'.  Stop.
+[16:34:40] Malawi                   individual_education                ok rows=    260255 elapsed=  0.89s
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Nepal/var/individual_education.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Burkina_Faso/var/individual_education.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/individual_education.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/GhanaLSS/var/interview_date.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/individual_education.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Nepal/var/individual_education.parquet still missing after running fallbacks.
+[16:34:40] Nepal                    individual_education             error rows=         — elapsed=   1.1s
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Burkina_Faso/_/individual_education.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/var/individual_education.parquet still missing after running fallbacks.
+[16:34:40] Burkina_Faso             individual_education             error rows=         — elapsed=  1.38s
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/GhanaLSS/_/interview_date.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/var/interview_date.parquet still missing after running fallbacks.
+[16:34:41] GhanaLSS                 interview_date                   error rows=         — elapsed=  3.63s
+[16:36:11] Uganda                   cluster_features                    ok rows=      4409 elapsed= 94.93s
+[16:36:15] Uganda                   individual_education                ok rows=     14494 elapsed= 95.89s
+[16:36:20] Uganda                   housing                             ok rows=     24290 elapsed= 100.6s
+No Stata zip found for NPL_1995_LSS-I_v01_M (https://microdata.worldbank.org/index.php/catalog/2301/get-microdata)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq1
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+No Stata zip found for NPL_1995_LSS-I_v01_M (https://microdata.worldbank.org/index.php/catalog/2301/get-microdata)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq1
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+No Stata zip found for NPL_1995_LSS-I_v01_M (https://microdata.worldbank.org/index.php/catalog/2301/get-microdata)
+DVC unavailable for assets: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' neither as a DVC output nor as a Git-tracked file.. Falling back to manual aggregation.
+No SOURCE.org found for lsms_library/countries
+No Stata zip found for NPL_1995_LSS-I_v01_M (https://microdata.worldbank.org/index.php/catalog/2301/get-microdata)
+No Stata zip found for NPL_1995_LSS-I_v01_M (https://microdata.worldbank.org/index.php/catalog/2301/get-microdata)
+[16:42:23] Nepal                    assets                           error rows=         — elapsed=464.84s
+make: *** [Makefile:92: ../2011-12/_/shocks.parquet] Terminated
+make: *** [Makefile:92: ../2018-19/_/interview_date.parquet] Terminated

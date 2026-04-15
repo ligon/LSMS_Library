@@ -1,0 +1,153 @@
+{
+  "country": "Nigeria",
+  "feature": "cluster_features",
+  "status": "ok",
+  "rows": 820,
+  "columns": [
+    "i",
+    "Region",
+    "District",
+    "Rural",
+    "Latitude",
+    "Longitude"
+  ],
+  "index_names": [
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "i": "str",
+    "Region": "string",
+    "District": "string",
+    "Rural": "string",
+    "Latitude": "Float64",
+    "Longitude": "Float64"
+  },
+  "canonical_columns": {
+    "Region": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 816,
+      "n_null": 4,
+      "non_null_rate": 0.9951219512195122,
+      "n_unique": 6,
+      "sample_unique": [
+        "North Central",
+        "North East",
+        "North West",
+        "South East",
+        "South South",
+        "South West"
+      ]
+    },
+    "Rural": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 816,
+      "n_null": 4,
+      "non_null_rate": 0.9951219512195122,
+      "n_unique": 2,
+      "sample_unique": [
+        "Rural",
+        "Urban"
+      ]
+    },
+    "District": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 816,
+      "n_null": 4,
+      "non_null_rate": 0.9951219512195122,
+      "n_unique": 37,
+      "sample_unique": [
+        "Abia",
+        "Adamawa",
+        "Akwa Ibom",
+        "Anambra",
+        "Bauchi",
+        "Bayelsa",
+        "Benue",
+        "Borno",
+        "Cross River",
+        "Delta",
+        "Ebonyi",
+        "Edo",
+        "Ekiti",
+        "Enugu",
+        "FCT Abuja",
+        "Gombe",
+        "Imo",
+        "Jigawa",
+        "Kaduna",
+        "Kano"
+      ]
+    },
+    "Latitude": {
+      "present": true,
+      "dtype": "Float64",
+      "n_non_null": 818,
+      "n_null": 2,
+      "non_null_rate": 0.9975609756097561,
+      "n_unique": 408,
+      "sample_unique": [
+        "10.0746622967",
+        "10.1581945175",
+        "10.1941516025",
+        "10.2374167796",
+        "10.2669058861",
+        "10.2686739218",
+        "10.2772898378",
+        "10.2832908043",
+        "10.2960624391",
+        "10.3043968777",
+        "10.3056619439",
+        "10.3715897296",
+        "10.4307765955",
+        "10.4677191255",
+        "10.4839449376",
+        "10.484650388",
+        "10.5412424269",
+        "10.5770578857",
+        "10.6546031992",
+        "10.7394632837"
+      ]
+    },
+    "Longitude": {
+      "present": true,
+      "dtype": "Float64",
+      "n_non_null": 818,
+      "n_null": 2,
+      "non_null_rate": 0.9975609756097561,
+      "n_unique": 408,
+      "sample_unique": [
+        "10.0246378001",
+        "10.0322812644",
+        "10.0555037438",
+        "10.0675409929",
+        "10.0713191817",
+        "10.1316668985",
+        "10.1621259421",
+        "10.2957219264",
+        "10.423477946",
+        "10.4580051735",
+        "10.4600436913",
+        "10.4737639515",
+        "10.5657037996",
+        "10.567237298",
+        "10.760756183",
+        "10.8149500964",
+        "10.8239952908",
+        "10.9268915237",
+        "11.1451709661",
+        "11.1688801061"
+      ]
+    }
+  },
+  "extra_columns": [
+    "i"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nigeria/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 0.3
+}

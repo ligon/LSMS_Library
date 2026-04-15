@@ -1,0 +1,52 @@
+{
+  "country": "Burkina_Faso",
+  "feature": "food_acquired",
+  "status": "ok",
+  "rows": 331165,
+  "columns": [
+    "quantity",
+    "units",
+    "total expenses",
+    "quantity obtained",
+    "units obtained",
+    "price per unit",
+    "Quantity",
+    "Expenditure",
+    "Produced"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "v",
+    "visit",
+    "j",
+    "u"
+  ],
+  "dtypes": {
+    "quantity": "float64",
+    "units": "str",
+    "total expenses": "string",
+    "quantity obtained": "string",
+    "units obtained": "str",
+    "price per unit": "string",
+    "Quantity": "Float64",
+    "Expenditure": "Float64",
+    "Produced": "Float64"
+  },
+  "canonical_columns": {},
+  "extra_columns": [
+    "quantity",
+    "units",
+    "total expenses",
+    "quantity obtained",
+    "units obtained",
+    "price per unit",
+    "Quantity",
+    "Expenditure",
+    "Produced"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Burkina_Faso/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 1.37
+}

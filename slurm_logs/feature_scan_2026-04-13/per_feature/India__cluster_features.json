@@ -1,0 +1,77 @@
+{
+  "country": "India",
+  "feature": "cluster_features",
+  "status": "ok",
+  "rows": 120,
+  "columns": [
+    "Region",
+    "District"
+  ],
+  "index_names": [
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "Region": "string",
+    "District": "string"
+  },
+  "canonical_columns": {
+    "Region": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 120,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 2,
+      "sample_unique": [
+        "Bihar",
+        "UP"
+      ]
+    },
+    "Rural": {
+      "present": false
+    },
+    "District": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 120,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 25,
+      "sample_unique": [
+        "Allahaba",
+        "Araria",
+        "Bahraich",
+        "Banda",
+        "Basti",
+        "Bhagalpu",
+        "Bhojpur",
+        "Faizabad",
+        "Gaya",
+        "Ghazipur",
+        "Gorakhpu",
+        "Hamirpur",
+        "Jaunpur",
+        "Jehanaba",
+        "Madhepur",
+        "Mau",
+        "Mirzapur",
+        "Mungher",
+        "Muzaffar",
+        "Saharsa"
+      ]
+    },
+    "Latitude": {
+      "present": false
+    },
+    "Longitude": {
+      "present": false
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/India/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "UserWarning: Data scheme does not contain panel_ids for India"
+  ],
+  "elapsed_s": 4.24
+}

@@ -1,0 +1,25 @@
+{
+  "country": "Ethiopia",
+  "feature": "assets",
+  "status": "ok",
+  "rows": 916908,
+  "columns": [
+    "Quantity"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "j"
+  ],
+  "dtypes": {
+    "Quantity": "Float64"
+  },
+  "canonical_columns": {},
+  "extra_columns": [
+    "Quantity"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Ethiopia/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 0.59
+}

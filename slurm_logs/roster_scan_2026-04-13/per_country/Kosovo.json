@@ -1,0 +1,68 @@
+{
+  "country": "Kosovo",
+  "status": "ok",
+  "rows": 17917,
+  "columns": [
+    "Sex",
+    "Relationship",
+    "Age",
+    "Marital_status",
+    "Generation",
+    "Distance",
+    "Affinity"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "v",
+    "pid"
+  ],
+  "sex": {
+    "n_non_null": 17917,
+    "n_null": 0,
+    "unique": [
+      "F",
+      "M"
+    ],
+    "non_canonical": [],
+    "non_canonical_counts": {}
+  },
+  "age": {
+    "dtype": "Int64",
+    "n_non_null": 17917,
+    "n_null": 0,
+    "n_non_numeric": 0,
+    "min": 0.0,
+    "max": 105.0,
+    "n_negative": 0,
+    "n_gt_120": 0
+  },
+  "relationship": {
+    "n_non_null": 17917,
+    "n_null": 0,
+    "n_unique": 12,
+    "unknown_labels": [],
+    "unknown_label_counts": {}
+  },
+  "kinship_derived": {
+    "Generation_present": true,
+    "Distance_present": true,
+    "Affinity_present": true,
+    "Affinity_unique": [
+      "affinal",
+      "consanguineal",
+      "guest",
+      "unrelated"
+    ],
+    "Affinity_null_rate": 0.0
+  },
+  "extra_columns": [
+    "Marital_status"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Kosovo/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "UserWarning: Data scheme does not contain panel_ids for Kosovo",
+    "UserWarning: Data scheme does not contain panel_ids for Kosovo"
+  ],
+  "elapsed_s": 4.12
+}

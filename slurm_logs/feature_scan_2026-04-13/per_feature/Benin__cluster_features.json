@@ -1,0 +1,131 @@
+{
+  "country": "Benin",
+  "feature": "cluster_features",
+  "status": "ok",
+  "rows": 670,
+  "columns": [
+    "i",
+    "Region",
+    "Rural",
+    "Latitude",
+    "Longitude"
+  ],
+  "index_names": [
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "i": "str",
+    "Region": "string",
+    "Rural": "string",
+    "Latitude": "Float64",
+    "Longitude": "Float64"
+  },
+  "canonical_columns": {
+    "Region": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 670,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 12,
+      "sample_unique": [
+        "alibori",
+        "atacora",
+        "atlantique",
+        "borgou",
+        "collines",
+        "couffo",
+        "donga",
+        "littoral",
+        "mono",
+        "oueme",
+        "plateau",
+        "zou"
+      ]
+    },
+    "Rural": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 670,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 2,
+      "sample_unique": [
+        "Rural",
+        "Urban"
+      ]
+    },
+    "District": {
+      "present": false
+    },
+    "Latitude": {
+      "present": true,
+      "dtype": "Float64",
+      "n_non_null": 670,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 667,
+      "sample_unique": [
+        "10.0002647330984",
+        "10.0623631943017",
+        "10.1320556",
+        "10.1553904",
+        "10.1567140873522",
+        "10.1831500651315",
+        "10.1976631628349",
+        "10.2024180907756",
+        "10.2088575297967",
+        "10.2223780844361",
+        "10.2255929",
+        "10.2298519",
+        "10.2371975",
+        "10.2473531803116",
+        "10.2542528",
+        "10.2737793512642",
+        "10.2937169",
+        "10.303574167192",
+        "10.3258429",
+        "10.3295456618071"
+      ]
+    },
+    "Longitude": {
+      "present": true,
+      "dtype": "Float64",
+      "n_non_null": 670,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 667,
+      "sample_unique": [
+        "0.8127798",
+        "0.897754300385714",
+        "0.9442507",
+        "0.951479868963361",
+        "0.960779674351215",
+        "0.962485307827592",
+        "0.991017306223512",
+        "0.9927377",
+        "0.9972652",
+        "1.02136155590415",
+        "1.05651022866368",
+        "1.0605705",
+        "1.0770462",
+        "1.07705662027001",
+        "1.0878556",
+        "1.09830784611404",
+        "1.11697065643966",
+        "1.14060577936471",
+        "1.1970113",
+        "1.2134211"
+      ]
+    }
+  },
+  "extra_columns": [
+    "i"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Benin/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "UserWarning: Data scheme does not contain panel_ids for Benin"
+  ],
+  "elapsed_s": 4.14
+}

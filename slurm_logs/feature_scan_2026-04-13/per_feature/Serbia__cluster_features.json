@@ -1,0 +1,63 @@
+{
+  "country": "Serbia",
+  "feature": "cluster_features",
+  "status": "ok",
+  "rows": 328,
+  "columns": [
+    "Region",
+    "Rural"
+  ],
+  "index_names": [
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "Region": "string",
+    "Rural": "string"
+  },
+  "canonical_columns": {
+    "Region": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 328,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 6,
+      "sample_unique": [
+        "belgrade",
+        "east serbia",
+        "south-east serbia",
+        "sumadija",
+        "vojvodina",
+        "west serbia"
+      ]
+    },
+    "Rural": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 328,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 2,
+      "sample_unique": [
+        "Rural",
+        "Urban"
+      ]
+    },
+    "District": {
+      "present": false
+    },
+    "Latitude": {
+      "present": false
+    },
+    "Longitude": {
+      "present": false
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Serbia/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "UserWarning: Data scheme does not contain panel_ids for Serbia"
+  ],
+  "elapsed_s": 0.05
+}

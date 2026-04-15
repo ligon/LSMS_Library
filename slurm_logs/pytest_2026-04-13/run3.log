@@ -1,0 +1,619 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.6, pytest-8.4.2, pluggy-1.6.0
+rootdir: /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library
+configfile: pyproject.toml
+plugins: anyio-4.13.0, instafail-0.5.0, timeout-2.4.0, xdist-3.8.0, hydra-core-1.3.2
+timeout: 180.0s
+timeout method: signal
+timeout func_only: False
+created: 20/20 workers
+20 workers [1614 items]
+
+........................................................................ [  4%]
+..........................s................s............................ [  8%]
+....sssx...s....s...........F....................s.F.................... [ 13%]
+.................F.....................F...........................s...s [ 17%]
+..s.......s...s....s...s....s.sF............s............s.............. [ 22%]
+.............................s..........s.s......s...s........s......s.. [ 26%]
+........F............................................................... [ 31%]
+........................................................................ [ 35%]
+..........................s............................................. [ 40%]
+.............ss.......................s................................. [ 44%]
+........................................................................ [ 49%]
+s...........s.sss.....sss............................................... [ 53%]
+.......................F.............................................F.. [ 57%]
+........................................................................ [ 62%]
+........................................................................ [ 66%]
+.....................................s.................................. [ 71%]
+....................................................F................... [ 75%]
+...............F.............................................ss.ss.ss.ss [ 80%]
+.ss.ss.ss.sssss.sssss.sssss.sssss.sss.sssxxxxsx.sFxssssssss.sss......... [ 84%]
+......................................................................ss [ 89%]
+..ss.s.s........ss.s..s.........s..ss.................x.s......s.s.ssx.. [ 93%]
+ss.ss.s..ss.s........s.........s..x...................................s. [ 98%]
+.....F..................F.....                                           [100%]
+=================================== FAILURES ===================================
+_____________ TestDVCCaching.test_dvc_cache_applies_location_index _____________
+[gw8] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+tests/test_dvc_caching.py:537: in test_dvc_cache_applies_location_index
+    result = country._aggregate_wave_data(method_name="test_data")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:1971: in _aggregate_wave_data
+    return self._finalize_result(df, scheme_entry, method_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:1396: in _finalize_result
+    _enforce_canonical_dtypes(df, method_name)
+lsms_library/country.py:2550: in _enforce_canonical_dtypes
+    all_dtypes = _load_canonical_dtypes()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:2525: in _load_canonical_dtypes
+    with open(info_path, "r", encoding="utf-8") as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-ligon/pytest-2/popen-gw8/test_dvc_cache_applies_locatio0/data_info.yml'
+------------------------------ Captured log call -------------------------------
+WARNING  lsms_library.country:country.py:1987 Panel IDs not found in TestCountry.
+_______ TestDVCCaching.test_panel_ids_dataframe_cache_written_as_parquet _______
+[gw8] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+tests/test_dvc_caching.py:641: in test_panel_ids_dataframe_cache_written_as_parquet
+    result = country._aggregate_wave_data(method_name="panel_ids")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:1971: in _aggregate_wave_data
+    return self._finalize_result(df, scheme_entry, method_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:1396: in _finalize_result
+    _enforce_canonical_dtypes(df, method_name)
+lsms_library/country.py:2550: in _enforce_canonical_dtypes
+    all_dtypes = _load_canonical_dtypes()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:2525: in _load_canonical_dtypes
+    with open(info_path, "r", encoding="utf-8") as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-ligon/pytest-2/popen-gw8/test_panel_ids_dataframe_cache0/data_info.yml'
+------------------------------ Captured log call -------------------------------
+WARNING  lsms_library.country:country.py:1713 Makefile build failed for panel_ids: Command '['make', '-s', '-j12', 'panel_ids.json']' returned non-zero exit status 1.. Falling back to wave aggregation.
+________________ TestDVCCaching.test_dvc_stage_dirty_then_clean ________________
+[gw8] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+tests/test_dvc_caching.py:744: in test_dvc_stage_dirty_then_clean
+    first = country._aggregate_wave_data(method_name="household_roster")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:1971: in _aggregate_wave_data
+    return self._finalize_result(df, scheme_entry, method_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:1396: in _finalize_result
+    _enforce_canonical_dtypes(df, method_name)
+lsms_library/country.py:2550: in _enforce_canonical_dtypes
+    all_dtypes = _load_canonical_dtypes()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:2525: in _load_canonical_dtypes
+    with open(info_path, "r", encoding="utf-8") as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-ligon/pytest-2/popen-gw8/test_dvc_stage_dirty_then_clea0/data_info.yml'
+------------------------------ Captured log call -------------------------------
+WARNING  lsms_library.country:country.py:1987 Panel IDs not found in TestCountry.
+_________ TestDVCCaching.test_v070_top_cache_read_returns_without_dvc __________
+[gw8] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+tests/test_dvc_caching.py:811: in test_v070_top_cache_read_returns_without_dvc
+    result = country._aggregate_wave_data(method_name="test_data")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:1971: in _aggregate_wave_data
+    return self._finalize_result(df, scheme_entry, method_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:1396: in _finalize_result
+    _enforce_canonical_dtypes(df, method_name)
+lsms_library/country.py:2550: in _enforce_canonical_dtypes
+    all_dtypes = _load_canonical_dtypes()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:2525: in _load_canonical_dtypes
+    with open(info_path, "r", encoding="utf-8") as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-ligon/pytest-2/popen-gw8/test_v070_top_cache_read_retur0/data_info.yml'
+------------------------------ Captured log call -------------------------------
+WARNING  lsms_library.country:country.py:1987 Panel IDs not found in TestCountry.
+____________ TestDVCCaching.test_v070_lsms_no_cache_skips_top_read _____________
+[gw8] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+tests/test_dvc_caching.py:872: in test_v070_lsms_no_cache_skips_top_read
+    result = country._aggregate_wave_data(method_name="test_data")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:1971: in _aggregate_wave_data
+    return self._finalize_result(df, scheme_entry, method_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:1396: in _finalize_result
+    _enforce_canonical_dtypes(df, method_name)
+lsms_library/country.py:2550: in _enforce_canonical_dtypes
+    all_dtypes = _load_canonical_dtypes()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:2525: in _load_canonical_dtypes
+    with open(info_path, "r", encoding="utf-8") as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-ligon/pytest-2/popen-gw8/test_v070_lsms_no_cache_skips_0/data_info.yml'
+------------------------------ Captured log call -------------------------------
+WARNING  lsms_library.country:country.py:1987 Panel IDs not found in TestCountry.
+______________ TestDVCCaching.test_v070_dvc_fallback_writes_cache ______________
+[gw8] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+tests/test_dvc_caching.py:935: in test_v070_dvc_fallback_writes_cache
+    result = country._aggregate_wave_data(method_name="test_data")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:1971: in _aggregate_wave_data
+    return self._finalize_result(df, scheme_entry, method_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:1396: in _finalize_result
+    _enforce_canonical_dtypes(df, method_name)
+lsms_library/country.py:2550: in _enforce_canonical_dtypes
+    all_dtypes = _load_canonical_dtypes()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:2525: in _load_canonical_dtypes
+    with open(info_path, "r", encoding="utf-8") as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-ligon/pytest-2/popen-gw8/test_v070_dvc_fallback_writes_0/data_info.yml'
+------------------------------ Captured log call -------------------------------
+WARNING  lsms_library.country:country.py:1987 Panel IDs not found in TestCountry.
+WARNING  lsms_library.country:country.py:1920 DVC unavailable for test_data: simulated DVC unavailable. Falling back to manual aggregation.
+____ TestTableStructure.test_declared_columns_present[Togo/interview_date] _____
+[gw3] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+tests/test_table_structure.py:212: in test_declared_columns_present
+    assert col_name in all_names, (
+E   AssertionError: Togo/interview_date: declared column 'Int_t' not found in ['i', 'int_t', 't']
+E   assert 'Int_t' in {'i', 'int_t', 't'}
+___ TestTableStructure.test_declared_columns_present[Senegal/interview_date] ___
+[gw8] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+tests/test_table_structure.py:212: in test_declared_columns_present
+    assert col_name in all_names, (
+E   AssertionError: Senegal/interview_date: declared column 'Int_t' not found in ['i', 'int_t', 't']
+E   assert 'Int_t' in {'i', 'int_t', 't'}
+________ TestFeatureSanity.test_feature_is_sane[Senegal/interview_date] ________
+[gw5] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+tests/test_table_structure.py:261: in test_feature_is_sane
+    pytest.fail(
+E   Failed: Senegal/interview_date failed sanity checks: Missing: ['Int_t']
+----------------------------- Captured stdout call -----------------------------
+Sanity report: Senegal/interview_date
+  15 checks: 14 pass, 0 warn, 1 fail
+  [+] not_empty: 14276 rows
+  [+] has_named_index: Index levels: ['t', 'i']
+  [+] index_levels_match_scheme: All declared levels present: ['t', 'i']
+  [+] no_null_index_levels
+  [+] has_time_index: 2 distinct periods
+  [+] has_household_index: 7844 distinct households
+  [+] reasonable_size: 14,276 rows
+  [+] no_all_null_columns: 1 columns, none all-null
+  [+] no_constant_columns
+  [!] declared_columns_present: Missing: ['Int_t']
+  [+] dtype_consistency
+  [+] value_constraints: No constrained columns (skipped)
+  [+] low_duplicate_rate: No duplicate indices
+  [+] no_float_stringified_index: No float-stringified index values
+  [+] index_overlap_with_spine: other_features not cached (skipped)
+_________ TestFeatureSanity.test_feature_is_sane[Togo/interview_date] __________
+[gw19] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+tests/test_table_structure.py:261: in test_feature_is_sane
+    pytest.fail(
+E   Failed: Togo/interview_date failed sanity checks: Missing: ['Int_t']
+----------------------------- Captured stdout call -----------------------------
+Sanity report: Togo/interview_date
+  15 checks: 14 pass, 0 warn, 1 fail
+  [+] not_empty: 6171 rows
+  [+] has_named_index: Index levels: ['t', 'i']
+  [+] index_levels_match_scheme: All declared levels present: ['t', 'i']
+  [+] no_null_index_levels
+  [+] has_time_index: 1 distinct periods
+  [+] has_household_index: 6171 distinct households
+  [+] reasonable_size: 6,171 rows
+  [+] no_all_null_columns: 1 columns, none all-null
+  [+] no_constant_columns
+  [!] declared_columns_present: Missing: ['Int_t']
+  [+] dtype_consistency
+  [+] value_constraints: No constrained columns (skipped)
+  [+] low_duplicate_rate: No duplicate indices
+  [+] no_float_stringified_index: No float-stringified index values
+  [+] index_overlap_with_spine: other_features not cached (skipped)
+__________ test_parquet_matches_baseline[var/interview_date.parquet] ___________
+[gw4] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+tests/test_uganda_invariance.py:156: in test_parquet_matches_baseline
+    assert actual["shape"] == baseline_entry["shape"], (
+E   AssertionError: var/interview_date.parquet: shape mismatch: [24362, 1] != [24264, 1]
+E   assert [24362, 1] == [24264, 1]
+E     
+E     At index 0 diff: 24362 != 24264
+E     Use -v to get more diff
+_______________________ test_age_dtype_is_int64[Armenia] _______________________
+[gw0] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+.venv/lib/python3.11/site-packages/dvc/fs/dvc.py:362: in _open
+    return self.repo.fs.open(fs_path, mode=mode)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/dvc_objects/fs/base.py:323: in open
+    return self.fs.open(path, mode=mode, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/dvc_objects/fs/local.py:131: in open
+    return open(path, mode=mode, encoding=encoding)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/INDSECA.dta'
+
+During handling of the above exception, another exception occurred:
+tests/test_age_dtype_consistency.py:63: in test_age_dtype_is_int64
+    df = c.household_roster()
+         ^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:2214: in method
+    result = self._aggregate_wave_data(waves, name)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:1961: in _aggregate_wave_data
+    df = load_with_dvc_cache(method_name)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:1944: in load_with_dvc_cache
+    return load_dataframe_with_dvc(method_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:1790: in load_dataframe_with_dvc
+    df = load_from_waves(waves)
+         ^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:1619: in load_from_waves
+    wave_result = getattr(wave_obj, method_name)()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:348: in method
+    return self.grab_data(method_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:656: in grab_data
+    df = get_data(data_info, mapping_details)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:585: in get_data
+    df = df_data_grabber(candidate, mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat, missing_ok=multiple_files)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/local_tools.py:586: in df_data_grabber
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/local_tools.py:504: in get_dataframe
+    with dvc.api.open(fn,mode='rb') as f:
+/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/dvc/api/data.py:297: in _open
+    with fs.open(fs_path, mode=mode, encoding=encoding) as fobj:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/dvc_objects/fs/base.py:323: in open
+    return self.fs.open(path, mode=mode, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/fsspec/spec.py:1352: in open
+    f = self._open(
+.venv/lib/python3.11/site-packages/dvc/fs/dvc.py:364: in _open
+    _, dvc_fs, subkey = self._get_subrepo_info(key)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/dvc/fs/dvc.py:352: in _get_subrepo_info
+    dvc_fs = self._datafss.get(repo_key)
+             ^^^^^^^^^^^^^
+/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/functools.py:1001: in __get__
+    val = self.func(instance)
+          ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/dvc/fs/dvc.py:278: in _datafss
+    datafss[key] = DataFileSystem(index=self.repo.index.data["repo"])
+                                        ^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/funcy/objects.py:25: in __get__
+    res = instance.__dict__[self.fget.__name__] = self.fget(instance)
+                                                  ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/dvc/repo/index.py:589: in data
+    _load_storage_from_out(data_index.storage_map, key, out)
+.venv/lib/python3.11/site-packages/dvc/repo/index.py:231: in _load_storage_from_out
+    remote = out.repo.cloud.get_remote(out.remote)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/dvc/data_cloud.py:106: in get_remote
+    index = self.repo.data_index.view(("remote", name))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/dvc_data/index/index.py:810: in view
+    ret._trie = self._trie.view(key)
+                ^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqltrie/serialized.py:71: in view
+    raw_trie = self._trie.view(key)
+               ^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqltrie/sqlite/sqlite.py:312: in view
+    nid = self._get_node(key)["id"]
+          ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqltrie/sqlite/sqlite.py:202: in _get_node
+    rows = list(self._traverse(key))
+                ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqltrie/sqlite/sqlite.py:191: in _traverse
+    self._conn.executescript(STEPS_SQL.format(path=path, root=self._root_id))
+E   Failed: Timeout (>180.0s) from pytest-timeout.
+----------------------------- Captured stdout call -----------------------------
+~~~~~~~~~~~~~~~~~~~~~ Stack of <unknown> (22620985714432) ~~~~~~~~~~~~~~~~~~~~~~
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/execnet/gateway_base.py", line 411, in _perform_spawn
+    reply.run()
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/execnet/gateway_base.py", line 341, in run
+    self._result = func(*args, **kwargs)
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/execnet/gateway_base.py", line 1160, in _thread_receiver
+    msg = Message.from_io(io)
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/execnet/gateway_base.py", line 567, in from_io
+    header = io.read(9)  # type 1, channel 4, payload 4
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/execnet/gateway_base.py", line 534, in read
+    data = self._read(numbytes - len(buf))
+------------------------------ Captured log call -------------------------------
+WARNING  lsms_library.country:country.py:1987 Panel IDs not found in Armenia.
+_____________________ test_age_no_negative_values[Armenia] _____________________
+[gw2] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+.venv/lib/python3.11/site-packages/dvc/fs/dvc.py:362: in _open
+    return self.repo.fs.open(fs_path, mode=mode)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/dvc_objects/fs/base.py:323: in open
+    return self.fs.open(path, mode=mode, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/dvc_objects/fs/local.py:131: in open
+    return open(path, mode=mode, encoding=encoding)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/INDSECA.dta'
+
+During handling of the above exception, another exception occurred:
+tests/test_age_dtype_consistency.py:102: in test_age_no_negative_values
+    df = c.household_roster()
+         ^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:2214: in method
+    result = self._aggregate_wave_data(waves, name)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:1961: in _aggregate_wave_data
+    df = load_with_dvc_cache(method_name)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:1944: in load_with_dvc_cache
+    return load_dataframe_with_dvc(method_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:1790: in load_dataframe_with_dvc
+    df = load_from_waves(waves)
+         ^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:1619: in load_from_waves
+    wave_result = getattr(wave_obj, method_name)()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:348: in method
+    return self.grab_data(method_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:656: in grab_data
+    df = get_data(data_info, mapping_details)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:585: in get_data
+    df = df_data_grabber(candidate, mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat, missing_ok=multiple_files)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/local_tools.py:586: in df_data_grabber
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/local_tools.py:504: in get_dataframe
+    with dvc.api.open(fn,mode='rb') as f:
+/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/dvc/api/data.py:297: in _open
+    with fs.open(fs_path, mode=mode, encoding=encoding) as fobj:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/dvc_objects/fs/base.py:323: in open
+    return self.fs.open(path, mode=mode, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/fsspec/spec.py:1352: in open
+    f = self._open(
+.venv/lib/python3.11/site-packages/dvc/fs/dvc.py:364: in _open
+    _, dvc_fs, subkey = self._get_subrepo_info(key)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/dvc/fs/dvc.py:352: in _get_subrepo_info
+    dvc_fs = self._datafss.get(repo_key)
+             ^^^^^^^^^^^^^
+/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/functools.py:1001: in __get__
+    val = self.func(instance)
+          ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/dvc/fs/dvc.py:278: in _datafss
+    datafss[key] = DataFileSystem(index=self.repo.index.data["repo"])
+                                        ^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/funcy/objects.py:25: in __get__
+    res = instance.__dict__[self.fget.__name__] = self.fget(instance)
+                                                  ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/dvc/repo/__init__.py:291: in index
+    return Index.from_repo(self)
+           ^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/dvc/repo/index.py:325: in from_repo
+    return cls.from_indexes(
+.venv/lib/python3.11/site-packages/dvc/repo/index.py:372: in from_indexes
+    for idx in idxs:
+.venv/lib/python3.11/site-packages/dvc/repo/index.py:326: in <genexpr>
+    repo, (idx for _, idx in collect_files(repo, onerror=onerror))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/dvc/repo/index.py:93: in collect_files
+    index = Index.from_file(repo, file_path)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/dvc/repo/index.py:336: in from_file
+    stages=list(dvcfile.stages.values()),
+                ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/dvc/dvcfile.py:190: in stages
+    data, raw = self._load()
+                ^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/dvc/dvcfile.py:140: in _load
+    return self._load_yaml(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/dvc/dvcfile.py:151: in _load_yaml
+    return strictyaml.load(
+.venv/lib/python3.11/site-packages/dvc/utils/strictyaml.py:292: in load
+    with open_fn(path, encoding=encoding) as fd:  # type: ignore[operator]
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/dvc_objects/fs/base.py:323: in open
+    return self.fs.open(path, mode=mode, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/dvc_objects/fs/local.py:131: in open
+    return open(path, mode=mode, encoding=encoding)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen codecs>:309: in __init__
+    ???
+E   Failed: Timeout (>180.0s) from pytest-timeout.
+----------------------------- Captured stdout call -----------------------------
+~~~~~~~~~~~~~~~~~~~~~ Stack of <unknown> (23023367968512) ~~~~~~~~~~~~~~~~~~~~~~
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/execnet/gateway_base.py", line 411, in _perform_spawn
+    reply.run()
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/execnet/gateway_base.py", line 341, in run
+    self._result = func(*args, **kwargs)
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/execnet/gateway_base.py", line 1160, in _thread_receiver
+    msg = Message.from_io(io)
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/execnet/gateway_base.py", line 567, in from_io
+    header = io.read(9)  # type 1, channel 4, payload 4
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/execnet/gateway_base.py", line 534, in read
+    data = self._read(numbytes - len(buf))
+------------------------------ Captured log call -------------------------------
+WARNING  lsms_library.country:country.py:1987 Panel IDs not found in Armenia.
+WARNING  lsms_library.data_access:data_access.py:1213 No Stata zip found for ARM_1996_HBS_v01_M (https://microdata.worldbank.org/index.php/catalog/2324/related-materials)
+=============================== warnings summary ===============================
+tests/test_sample.py: 10 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1407: UserWarning: Data scheme does not contain panel_ids for Cambodia
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 10 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1407: UserWarning: Data scheme does not contain panel_ids for Albania
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 9 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1407: UserWarning: Data scheme does not contain panel_ids for India
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 9 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1407: UserWarning: Data scheme does not contain panel_ids for Serbia
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 10 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1407: UserWarning: Data scheme does not contain panel_ids for Liberia
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 10 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1407: UserWarning: Data scheme does not contain panel_ids for Azerbaijan
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 8 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1407: UserWarning: Data scheme does not contain panel_ids for Serbia and Montenegro
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 9 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1407: UserWarning: Data scheme does not contain panel_ids for Guatemala
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 10 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1407: UserWarning: Data scheme does not contain panel_ids for Benin
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 8 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1407: UserWarning: Data scheme does not contain panel_ids for South Africa
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 9 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1407: UserWarning: Data scheme does not contain panel_ids for Guinea-Bissau
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 10 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1407: UserWarning: Data scheme does not contain panel_ids for Iraq
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 10 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1407: UserWarning: Data scheme does not contain panel_ids for Kazakhstan
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 8 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1407: UserWarning: Data scheme does not contain panel_ids for Guyana
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 8 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1407: UserWarning: Data scheme does not contain panel_ids for Timor-Leste
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 8 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1407: UserWarning: Data scheme does not contain panel_ids for Tajikistan
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 11 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1407: UserWarning: Data scheme does not contain panel_ids for Kosovo
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 8 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1407: UserWarning: Data scheme does not contain panel_ids for Togo
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_sample.py: 10 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1407: UserWarning: Data scheme does not contain panel_ids for China
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[South Africa]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_int64[South Africa]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1376: UserWarning: Unknown relationship labels (add to kinship.yml): ['-1']
+    df = _expand_kinship(df)
+
+tests/test_sample.py: 10 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1407: UserWarning: Data scheme does not contain panel_ids for Pakistan
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_dvc_caching.py: 13 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:800: UserWarning: Country directory not found for 'TestCountry'
+    warnings.warn(f"Country directory not found for {country_name!r}")
+
+tests/test_dvc_caching.py::TestDVCCaching::test_dvc_cache_applies_location_index
+tests/test_dvc_caching.py::TestDVCCaching::test_dvc_stage_dirty_then_clean
+tests/test_dvc_caching.py::TestDVCCaching::test_v070_top_cache_read_returns_without_dvc
+tests/test_dvc_caching.py::TestDVCCaching::test_v070_lsms_no_cache_skips_top_read
+tests/test_dvc_caching.py::TestDVCCaching::test_v070_dvc_fallback_writes_cache
+tests/test_dvc_caching.py::TestDVCCaching::test_stale_cache_triggers_rebuild
+tests/test_dvc_caching.py::TestDVCCaching::test_valid_cache_uses_cached_file
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1407: UserWarning: Data scheme does not contain panel_ids for TestCountry
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_int64[Nepal]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Nepal]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1407: UserWarning: Data scheme does not contain panel_ids for Nepal
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_int64[Nepal]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Nepal]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1568: UserWarning: Makefile execution failed for Nepal/_ household_roster: Command '['make', '-s', '-j12', '/global/home/users/ligon/.local/share/lsms_library/Nepal/var/household_roster.parquet']' returned non-zero exit status 2.
+    warnings.warn(f"Makefile execution failed for {self.name}/{wave or '_'} {method_name}: {error}")
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_int64[Nepal]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Nepal]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1568: UserWarning: Makefile execution failed for Nepal/_ household_roster: Command '['make', '-s', '-j12', '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/household_roster.parquet']' returned non-zero exit status 2.
+    warnings.warn(f"Makefile execution failed for {self.name}/{wave or '_'} {method_name}: {error}")
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_int64[Nepal]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Nepal]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1568: UserWarning: Makefile execution failed for Nepal/_ household_roster: Command '['make', '-s', '-j12', '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/household_roster.parquet']' returned non-zero exit status 2.
+    warnings.warn(f"Makefile execution failed for {self.name}/{wave or '_'} {method_name}: {error}")
+
+tests/test_sample.py: 10 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1407: UserWarning: Data scheme does not contain panel_ids for CotedIvoire
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[CotedIvoire]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:586: UserWarning: Refusing workspace copy of DVC-tracked file CotedIvoire/2018-19/Data/Menage/s01_me_CIV2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_int64[Armenia]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Armenia]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1407: UserWarning: Data scheme does not contain panel_ids for Armenia
+    warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_dvc_caching.py::TestDVCCaching::test_dvc_cache_applies_location_index
+FAILED tests/test_dvc_caching.py::TestDVCCaching::test_panel_ids_dataframe_cache_written_as_parquet
+FAILED tests/test_dvc_caching.py::TestDVCCaching::test_dvc_stage_dirty_then_clean
+FAILED tests/test_dvc_caching.py::TestDVCCaching::test_v070_top_cache_read_returns_without_dvc
+FAILED tests/test_dvc_caching.py::TestDVCCaching::test_v070_lsms_no_cache_skips_top_read
+FAILED tests/test_dvc_caching.py::TestDVCCaching::test_v070_dvc_fallback_writes_cache
+FAILED tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Togo/interview_date]
+FAILED tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Senegal/interview_date]
+FAILED tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Senegal/interview_date]
+FAILED tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Togo/interview_date]
+FAILED tests/test_uganda_invariance.py::test_parquet_matches_baseline[var/interview_date.parquet]
+FAILED tests/test_age_dtype_consistency.py::test_age_dtype_is_int64[Armenia]
+FAILED tests/test_age_dtype_consistency.py::test_age_no_negative_values[Armenia]
+= 13 failed, 1470 passed, 121 skipped, 10 xfailed, 312 warnings in 224.56s (0:03:44) =

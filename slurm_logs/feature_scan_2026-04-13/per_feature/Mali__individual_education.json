@@ -1,0 +1,55 @@
+{
+  "country": "Mali",
+  "feature": "individual_education",
+  "status": "ok",
+  "rows": 188706,
+  "columns": [
+    "Educational Attainment"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "v",
+    "pid"
+  ],
+  "dtypes": {
+    "Educational Attainment": "string"
+  },
+  "canonical_columns": {
+    "Educational Attainment": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 132521,
+      "n_null": 56185,
+      "non_null_rate": 0.7022617192882049,
+      "n_unique": 41,
+      "sample_unique": [
+        "1.0",
+        "10.0",
+        "11.0",
+        "12.0",
+        "13.0",
+        "14.0",
+        "15.0",
+        "16.0",
+        "17.0",
+        "18.0",
+        "2.0",
+        "21.0",
+        "22.0",
+        "25.0",
+        "26.0",
+        "27.0",
+        "29.0",
+        "3.0",
+        "32.0",
+        "33.0"
+      ]
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Mali/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 0.63
+}

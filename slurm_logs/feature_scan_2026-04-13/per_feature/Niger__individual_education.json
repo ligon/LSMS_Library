@@ -1,0 +1,44 @@
+{
+  "country": "Niger",
+  "feature": "individual_education",
+  "status": "ok",
+  "rows": 74159,
+  "columns": [
+    "Educational Attainment"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "v",
+    "pid"
+  ],
+  "dtypes": {
+    "Educational Attainment": "string"
+  },
+  "canonical_columns": {
+    "Educational Attainment": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 74159,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 9,
+      "sample_unique": [
+        "Aucun",
+        "Maternelle",
+        "Postsecondaire",
+        "Primaire",
+        "Second. gl 1",
+        "Second. gl 2",
+        "Second. tech. 1",
+        "Second. tech. 2",
+        "Superieur"
+      ]
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Niger/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 0.25
+}

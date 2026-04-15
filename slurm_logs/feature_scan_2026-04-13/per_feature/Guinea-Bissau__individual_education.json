@@ -1,0 +1,43 @@
+{
+  "country": "Guinea-Bissau",
+  "feature": "individual_education",
+  "status": "ok",
+  "rows": 42839,
+  "columns": [
+    "Educational Attainment"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "v",
+    "pid"
+  ],
+  "dtypes": {
+    "Educational Attainment": "string"
+  },
+  "canonical_columns": {
+    "Educational Attainment": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 42839,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 6,
+      "sample_unique": [
+        "Ensino Basico",
+        "Ensino Secund\u00e1rio",
+        "Ensino Superior",
+        "Ensino T\u00e9cnico/Profissional",
+        "Nenhum",
+        "Pre-escolar"
+      ]
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Guinea-Bissau/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "UserWarning: Data scheme does not contain panel_ids for Guinea-Bissau",
+    "UserWarning: Data scheme does not contain panel_ids for Guinea-Bissau"
+  ],
+  "elapsed_s": 0.17
+}

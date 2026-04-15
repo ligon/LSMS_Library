@@ -1,0 +1,74 @@
+{
+  "country": "GhanaLSS",
+  "feature": "cluster_features",
+  "status": "ok",
+  "rows": 3791,
+  "columns": [
+    "Region",
+    "Rural",
+    "Ecological_zone"
+  ],
+  "index_names": [
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "Region": "string",
+    "Rural": "string",
+    "Ecological_zone": "str"
+  },
+  "canonical_columns": {
+    "Region": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 3791,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 12,
+      "sample_unique": [
+        "Ashanti",
+        "Brong Ahafo",
+        "Brongahafo",
+        "Central",
+        "Eastern",
+        "Greater Accra",
+        "Nigeria",
+        "Northern",
+        "Upper East",
+        "Upper West",
+        "Volta",
+        "Western"
+      ]
+    },
+    "Rural": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 3445,
+      "n_null": 346,
+      "non_null_rate": 0.908731205486679,
+      "n_unique": 4,
+      "sample_unique": [
+        "Rural",
+        "Semi-urban",
+        "Urban",
+        "Urban "
+      ]
+    },
+    "District": {
+      "present": false
+    },
+    "Latitude": {
+      "present": false
+    },
+    "Longitude": {
+      "present": false
+    }
+  },
+  "extra_columns": [
+    "Ecological_zone"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/GhanaLSS/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 4.52
+}

@@ -1,0 +1,127 @@
+{
+  "country": "Mali",
+  "feature": "cluster_features",
+  "status": "ok",
+  "rows": 3006,
+  "columns": [
+    "Region",
+    "Rural",
+    "Latitude",
+    "Longitude"
+  ],
+  "index_names": [
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "Region": "string",
+    "Rural": "string",
+    "Latitude": "Float64",
+    "Longitude": "Float64"
+  },
+  "canonical_columns": {
+    "Region": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 3006,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 11,
+      "sample_unique": [
+        "Bamako",
+        "Gao",
+        "Kayes",
+        "Kidal",
+        "Koulikoro",
+        "Menaka",
+        "Mopti",
+        "Sikasso",
+        "S\u00e9gou",
+        "Taoudenit",
+        "Tombouctou"
+      ]
+    },
+    "Rural": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 3006,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 4,
+      "sample_unique": [
+        "Autre urbain",
+        "Rural",
+        "Urbain",
+        "Urbain (District de Bamako)"
+      ]
+    },
+    "District": {
+      "present": false
+    },
+    "Latitude": {
+      "present": true,
+      "dtype": "Float64",
+      "n_non_null": 2997,
+      "n_null": 9,
+      "non_null_rate": 0.9970059880239521,
+      "n_unique": 1373,
+      "sample_unique": [
+        "10.2818744893",
+        "10.3158470565",
+        "10.4046498569",
+        "10.4584498",
+        "10.4669307196",
+        "10.4880092554",
+        "10.5134942927",
+        "10.5276526719",
+        "10.5358824255",
+        "10.5500027554",
+        "10.5518968725",
+        "10.55537208",
+        "10.5569801572",
+        "10.55734832",
+        "10.58814493",
+        "10.6047125361",
+        "10.605035341",
+        "10.6153074218",
+        "10.6351822977",
+        "10.6675104697"
+      ]
+    },
+    "Longitude": {
+      "present": true,
+      "dtype": "Float64",
+      "n_non_null": 2997,
+      "n_null": 9,
+      "non_null_rate": 0.9970059880239521,
+      "n_unique": 1373,
+      "sample_unique": [
+        "-0.02117831",
+        "-0.02468157",
+        "-0.02684848",
+        "-0.0268676010672",
+        "-0.03183937",
+        "-0.03710937",
+        "-0.0404216",
+        "-0.04256382",
+        "-0.04259001",
+        "-0.0444270043749",
+        "-0.05316085",
+        "-0.0541630407222",
+        "-0.05535918",
+        "-0.0613604559164",
+        "-0.0678348615434",
+        "-0.0733762786557",
+        "-0.07789048",
+        "-0.095810243393",
+        "-0.101702038372",
+        "-0.121796825942"
+      ]
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Mali/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 4.19
+}

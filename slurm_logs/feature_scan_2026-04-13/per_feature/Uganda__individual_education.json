@@ -1,0 +1,55 @@
+{
+  "country": "Uganda",
+  "feature": "individual_education",
+  "status": "ok",
+  "rows": 14494,
+  "columns": [
+    "Educational Attainment"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "v",
+    "pid"
+  ],
+  "dtypes": {
+    "Educational Attainment": "string"
+  },
+  "canonical_columns": {
+    "Educational Attainment": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 6382,
+      "n_null": 8112,
+      "non_null_rate": 0.4403201324686077,
+      "n_unique": 21,
+      "sample_unique": [
+        "Completed Degree and above",
+        "Completed J.1",
+        "Completed J.2",
+        "Completed J.3",
+        "Completed P.1",
+        "Completed P.2",
+        "Completed P.3",
+        "Completed P.4",
+        "Completed P.5",
+        "Completed P.6",
+        "Completed P.7",
+        "Completed Post secondary Specialized training or diploma",
+        "Completed S.1",
+        "Completed S.2",
+        "Completed S.3",
+        "Completed S.4",
+        "Completed S.5",
+        "Completed S.6",
+        "Completed post primary/junior specialized traing/certificat/diploma",
+        "Don't Know"
+      ]
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 95.89
+}

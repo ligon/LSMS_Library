@@ -1,0 +1,7 @@
+{
+  "country": "Armenia",
+  "status": "error",
+  "error": "no microdata available (CLAUDE.md §Countries Without Microdata); Country API blocked on WB NADA fallback download, killed after 3m54s",
+  "elapsed_s": 234,
+  "warnings": []
+}

@@ -1,0 +1,135 @@
+{
+  "country": "Tanzania",
+  "feature": "shocks",
+  "status": "ok",
+  "rows": 162928,
+  "columns": [
+    "AffectedIncome",
+    "AffectedAssets",
+    "HowCoped0",
+    "HowCoped1",
+    "HowCoped2"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "Shock"
+  ],
+  "dtypes": {
+    "AffectedIncome": "boolean",
+    "AffectedAssets": "boolean",
+    "HowCoped0": "string",
+    "HowCoped1": "string",
+    "HowCoped2": "string"
+  },
+  "canonical_columns": {
+    "AffectedIncome": {
+      "present": true,
+      "dtype": "boolean",
+      "n_non_null": 0,
+      "n_null": 162928,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    },
+    "AffectedAssets": {
+      "present": true,
+      "dtype": "boolean",
+      "n_non_null": 0,
+      "n_null": 162928,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    },
+    "AffectedProduction": {
+      "present": false
+    },
+    "AffectedConsumption": {
+      "present": false
+    },
+    "HowCoped0": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 30448,
+      "n_null": 132480,
+      "non_null_rate": 0.18688009427477167,
+      "n_unique": 21,
+      "sample_unique": [
+        "ADULT HOUSEHOLD MEMBERS WHO WERE PREVIOUSLY NOT WORKING HAD TO FIND WORK",
+        "CHANGED EATING PATTERNS",
+        "DID NOT DO ANYTHING",
+        "EMPLOYED HOUSEHOLD MEMBERS TOOK ON MORE EMPLOYMENT",
+        "ENGAGED IN SPIRITUAL EFFORTS",
+        "HOUSEHOLD MEMBERS MIGRATED",
+        "INTENSIFY FISHING",
+        "OBTAINED CREDIT",
+        "OTHER (SPECIFY)",
+        "RECEIVED UNCONDITIONAL HELP FROM GOVERNEMENT",
+        "RECEIVED UNCONDITIONAL HELP FROM GOVERNMENT",
+        "RECEIVED UNCONDITIONAL HELP FROM NGO/RELIGIOUS INSTITUTION",
+        "RECEIVED UNCONDITIONAL HELP FROM RELATIVES/FRIENDS",
+        "REDUCED EXPENDITURES ON HEALTH AND/OR EDUCATION",
+        "RELIED ON OWN-SAVINGS",
+        "SENT CHILDREN TO LIVE ELSEWHERE",
+        "SOLD AGRICULTURAL ASSETS",
+        "SOLD CROP STOCK",
+        "SOLD DURABLE ASSETS",
+        "SOLD LAND/BUILDING"
+      ]
+    },
+    "HowCoped1": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 1596,
+      "n_null": 161332,
+      "non_null_rate": 0.009795737994697044,
+      "n_unique": 20,
+      "sample_unique": [
+        "ADULT HOUSEHOLD MEMBERS WHO WERE PREVIOUSLY NOT WORKING HAD TO FIND WORK",
+        "CHANGED EATING PATTERNS",
+        "DID NOT DO ANYTHING",
+        "EMPLOYED HOUSEHOLD MEMBERS TOOK ON MORE EMPLOYMENT",
+        "ENGAGED IN SPIRITUAL EFFORTS",
+        "HOUSEHOLD MEMBERS MIGRATED",
+        "INTENSIFY FISHING",
+        "OBTAINED CREDIT",
+        "OTHER (SPECIFY)",
+        "RECEIVED UNCONDITIONAL HELP FROM GOVERNEMENT",
+        "RECEIVED UNCONDITIONAL HELP FROM GOVERNMENT",
+        "RECEIVED UNCONDITIONAL HELP FROM NGO/RELIGIOUS INSTITUTION",
+        "RECEIVED UNCONDITIONAL HELP FROM RELATIVES/FRIENDS",
+        "RELIED ON OWN-SAVINGS",
+        "SENT CHILDREN TO LIVE ELSEWHERE",
+        "SOLD AGRICULTURAL ASSETS",
+        "SOLD CROP STOCK",
+        "SOLD DURABLE ASSETS",
+        "SOLD LAND/BUILDING",
+        "SOLD LIVESTOCK"
+      ]
+    },
+    "HowCoped2": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 72,
+      "n_null": 162856,
+      "non_null_rate": 0.0004419129922419719,
+      "n_unique": 9,
+      "sample_unique": [
+        "CHANGED EATING PATTERNS",
+        "DID NOT DO ANYTHING",
+        "EMPLOYED HOUSEHOLD MEMBERS TOOK ON MORE EMPLOYMENT",
+        "ENGAGED IN SPIRITUAL EFFORTS",
+        "HOUSEHOLD MEMBERS MIGRATED",
+        "OTHER (SPECIFY)",
+        "RECEIVED UNCONDITIONAL HELP FROM RELATIVES/FRIENDS",
+        "RELIED ON OWN-SAVINGS",
+        "SOLD LIVESTOCK"
+      ]
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Tanzania/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 0.53
+}

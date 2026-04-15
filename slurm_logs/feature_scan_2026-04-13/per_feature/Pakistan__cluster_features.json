@@ -1,0 +1,53 @@
+{
+  "country": "Pakistan",
+  "feature": "cluster_features",
+  "status": "ok",
+  "rows": 301,
+  "columns": [
+    "Region",
+    "Language"
+  ],
+  "index_names": [
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "Region": "string",
+    "Language": "string"
+  },
+  "canonical_columns": {
+    "Region": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 301,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 3,
+      "sample_unique": [
+        "1.0",
+        "2.0",
+        "3.0"
+      ]
+    },
+    "Rural": {
+      "present": false
+    },
+    "District": {
+      "present": false
+    },
+    "Latitude": {
+      "present": false
+    },
+    "Longitude": {
+      "present": false
+    }
+  },
+  "extra_columns": [
+    "Language"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Pakistan/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "UserWarning: Data scheme does not contain panel_ids for Pakistan"
+  ],
+  "elapsed_s": 0.06
+}

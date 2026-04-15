@@ -1,0 +1,162 @@
+{
+  "country": "Mali",
+  "feature": "shocks",
+  "status": "ok",
+  "rows": 375481,
+  "columns": [
+    "AffectedIncome",
+    "AffectedAssets",
+    "AffectedProduction",
+    "AffectedConsumption",
+    "HowCoped0",
+    "HowCoped1",
+    "HowCoped2"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "Shock"
+  ],
+  "dtypes": {
+    "AffectedIncome": "boolean",
+    "AffectedAssets": "boolean",
+    "AffectedProduction": "boolean",
+    "AffectedConsumption": "boolean",
+    "HowCoped0": "string",
+    "HowCoped1": "string",
+    "HowCoped2": "string"
+  },
+  "canonical_columns": {
+    "AffectedIncome": {
+      "present": true,
+      "dtype": "boolean",
+      "n_non_null": 0,
+      "n_null": 375481,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    },
+    "AffectedAssets": {
+      "present": true,
+      "dtype": "boolean",
+      "n_non_null": 0,
+      "n_null": 375481,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    },
+    "AffectedProduction": {
+      "present": true,
+      "dtype": "boolean",
+      "n_non_null": 0,
+      "n_null": 375481,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    },
+    "AffectedConsumption": {
+      "present": true,
+      "dtype": "boolean",
+      "n_non_null": 0,
+      "n_null": 375481,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    },
+    "HowCoped0": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 26698,
+      "n_null": 348783,
+      "non_null_rate": 0.0711034646227106,
+      "n_unique": 45,
+      "sample_unique": [
+        " Les enfants ont \u00e9t\u00e9 d\u00e9scolaris\u00e9s",
+        "Achat d'aliments moins chers",
+        "Aide d'organisations religieuses ou ONG",
+        "Aide d'organisations religieuses ou d'ONG",
+        "Aide de gouvernement/Etat",
+        "Aide de parents ou d'amis",
+        "Aide des parents ou d'amis",
+        "Aide du gouvernement/l'Etat",
+        "Aucune strat\u00e9gie",
+        "Autre strat\u00e9gie",
+        "Autre strat\u00e9gie (\u00e0 pr\u00e9ciser)",
+        "Changement des habitudes de consommation",
+        "Changement des habitudes de consommation  (Achat d'aliments moins chers, r\u00e9duction du nombre de repas par jour, R\u00e9ductio",
+        "Changement des habitudes de consommations",
+        "Confiage des enfants \u00e0 d'autres familles",
+        "Confiage des enfants \u00e0 d'autres m\u00e9nages",
+        "Enfants de moins de 15 ans amen\u00e9s \u00e0 travailler",
+        "Engag\u00e9 dans des activit\u00e9s spirituelles",
+        "Engag\u00e9 dans des activit\u00e9s spirituelles (pri\u00e8res, sacrifices, consultation de marabout, ...)",
+        "Les enfants de moins de 15 ans ont \u00e9t\u00e9 amen\u00e9s \u00e0 travailler"
+      ]
+    },
+    "HowCoped1": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 14568,
+      "n_null": 360913,
+      "non_null_rate": 0.03879823479749974,
+      "n_unique": 45,
+      "sample_unique": [
+        " Les enfants ont \u00e9t\u00e9 d\u00e9scolaris\u00e9s",
+        "Achat d'aliments moins chers",
+        "Aide d'organisations religieuses ou ONG",
+        "Aide d'organisations religieuses ou d'ONG",
+        "Aide de gouvernement/Etat",
+        "Aide de parents ou d'amis",
+        "Aide des parents ou d'amis",
+        "Aide du gouvernement/l'Etat",
+        "Aucune strat\u00e9gie",
+        "Autre strat\u00e9gie",
+        "Autre strat\u00e9gie (\u00e0 pr\u00e9ciser)",
+        "Changement des habitudes de consommation",
+        "Changement des habitudes de consommation  (Achat d'aliments moins chers, r\u00e9duction du nombre de repas par jour, R\u00e9ductio",
+        "Changement des habitudes de consommations",
+        "Confiage des enfants \u00e0 d'autres familles",
+        "Confiage des enfants \u00e0 d'autres m\u00e9nages",
+        "Enfants de moins de 15 ans amen\u00e9s \u00e0 travailler",
+        "Engag\u00e9 dans des activit\u00e9s spirituelles",
+        "Engag\u00e9 dans des activit\u00e9s spirituelles (pri\u00e8res, sacrifices, consultation de marabout, ...)",
+        "Les enfants de moins de 15 ans ont \u00e9t\u00e9 amen\u00e9s \u00e0 travailler"
+      ]
+    },
+    "HowCoped2": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 11102,
+      "n_null": 364379,
+      "non_null_rate": 0.029567408204409812,
+      "n_unique": 43,
+      "sample_unique": [
+        " Les enfants ont \u00e9t\u00e9 d\u00e9scolaris\u00e9s",
+        "Achat d'aliments moins chers",
+        "Aide d'organisations religieuses ou ONG",
+        "Aide d'organisations religieuses ou d'ONG",
+        "Aide de gouvernement/Etat",
+        "Aide de parents ou d'amis",
+        "Aide des parents ou d'amis",
+        "Aide du gouvernement/l'Etat",
+        "Aucune strat\u00e9gie",
+        "Autre strat\u00e9gie",
+        "Autre strat\u00e9gie (\u00e0 pr\u00e9ciser)",
+        "Changement des habitudes de consommation",
+        "Changement des habitudes de consommation  (Achat d'aliments moins chers, r\u00e9duction du nombre de repas par jour, R\u00e9ductio",
+        "Changement des habitudes de consommations",
+        "Confiage des enfants \u00e0 d'autres familles",
+        "Confiage des enfants \u00e0 d'autres m\u00e9nages",
+        "Enfants de moins de 15 ans amen\u00e9s \u00e0 travailler",
+        "Engag\u00e9 dans des activit\u00e9s spirituelles",
+        "Engag\u00e9 dans des activit\u00e9s spirituelles (pri\u00e8res, sacrifices, consultation de marabout, ...)",
+        "Les enfants de moins de 15 ans ont \u00e9t\u00e9 amen\u00e9s \u00e0 travailler"
+      ]
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Mali/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 0.99
+}

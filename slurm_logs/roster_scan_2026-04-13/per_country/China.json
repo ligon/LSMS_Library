@@ -1,0 +1,64 @@
+{
+  "country": "China",
+  "status": "ok",
+  "rows": 2998,
+  "columns": [
+    "Sex",
+    "Relationship",
+    "Age",
+    "Generation",
+    "Distance",
+    "Affinity"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "v",
+    "pid"
+  ],
+  "sex": {
+    "n_non_null": 2996,
+    "n_null": 2,
+    "unique": [
+      "F",
+      "M"
+    ],
+    "non_canonical": [],
+    "non_canonical_counts": {}
+  },
+  "age": {
+    "dtype": "Int64",
+    "n_non_null": 2995,
+    "n_null": 3,
+    "n_non_numeric": 0,
+    "min": 1.0,
+    "max": 92.0,
+    "n_negative": 0,
+    "n_gt_120": 0
+  },
+  "relationship": {
+    "n_non_null": 2996,
+    "n_null": 2,
+    "n_unique": 9,
+    "unknown_labels": [],
+    "unknown_label_counts": {}
+  },
+  "kinship_derived": {
+    "Generation_present": true,
+    "Distance_present": true,
+    "Affinity_present": true,
+    "Affinity_unique": [
+      "affinal",
+      "consanguineal",
+      "unrelated"
+    ],
+    "Affinity_null_rate": 0.00066711140760507
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/China/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "UserWarning: Data scheme does not contain panel_ids for China",
+    "UserWarning: Data scheme does not contain panel_ids for China"
+  ],
+  "elapsed_s": 4.07
+}

@@ -1,0 +1,29 @@
+{
+  "country": "Senegal",
+  "feature": "interview_date",
+  "status": "ok",
+  "rows": 14276,
+  "columns": [
+    "int_t"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "int_t": "datetime64[us]"
+  },
+  "canonical_columns": {
+    "Int_t": {
+      "present": false
+    }
+  },
+  "extra_columns": [
+    "int_t"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Senegal/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 0.15
+}

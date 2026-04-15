@@ -1,0 +1,48 @@
+{
+  "country": "Azerbaijan",
+  "feature": "cluster_features",
+  "status": "ok",
+  "rows": 92,
+  "columns": [
+    "Rural"
+  ],
+  "index_names": [
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "Rural": "string"
+  },
+  "canonical_columns": {
+    "Region": {
+      "present": false
+    },
+    "Rural": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 91,
+      "n_null": 1,
+      "non_null_rate": 0.9891304347826086,
+      "n_unique": 2,
+      "sample_unique": [
+        "Rural",
+        "Urban"
+      ]
+    },
+    "District": {
+      "present": false
+    },
+    "Latitude": {
+      "present": false
+    },
+    "Longitude": {
+      "present": false
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Azerbaijan/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "UserWarning: Data scheme does not contain panel_ids for Azerbaijan"
+  ],
+  "elapsed_s": 4.31
+}

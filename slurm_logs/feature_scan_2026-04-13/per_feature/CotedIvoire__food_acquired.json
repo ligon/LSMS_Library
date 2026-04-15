@@ -1,0 +1,36 @@
+{
+  "country": "CotedIvoire",
+  "feature": "food_acquired",
+  "status": "ok",
+  "rows": 292741,
+  "columns": [
+    "Expenditure",
+    "Quantity",
+    "Produced"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "v",
+    "visit",
+    "j",
+    "u"
+  ],
+  "dtypes": {
+    "Expenditure": "Float64",
+    "Quantity": "Float64",
+    "Produced": "Float64"
+  },
+  "canonical_columns": {},
+  "extra_columns": [
+    "Expenditure",
+    "Quantity",
+    "Produced"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/CotedIvoire/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "UserWarning: Data scheme does not contain panel_ids for CotedIvoire",
+    "UserWarning: Data scheme does not contain panel_ids for CotedIvoire"
+  ],
+  "elapsed_s": 1.19
+}

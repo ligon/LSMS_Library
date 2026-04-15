@@ -1,0 +1,128 @@
+{
+  "country": "Senegal",
+  "feature": "cluster_features",
+  "status": "ok",
+  "rows": 1194,
+  "columns": [
+    "Region",
+    "Rural",
+    "Latitude",
+    "Longitude"
+  ],
+  "index_names": [
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "Region": "string",
+    "Rural": "string",
+    "Latitude": "Float64",
+    "Longitude": "Float64"
+  },
+  "canonical_columns": {
+    "Region": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 1194,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 14,
+      "sample_unique": [
+        "Saint-Louis",
+        "dakar",
+        "diourbel",
+        "fatick",
+        "kaffrine",
+        "kaolack",
+        "kedougou",
+        "kolda",
+        "louga",
+        "matam",
+        "sedhiou",
+        "tambacounda",
+        "thies",
+        "ziguinchor"
+      ]
+    },
+    "Rural": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 1194,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 2,
+      "sample_unique": [
+        "Rural",
+        "Urban"
+      ]
+    },
+    "District": {
+      "present": false
+    },
+    "Latitude": {
+      "present": true,
+      "dtype": "Float64",
+      "n_non_null": 1167,
+      "n_null": 27,
+      "non_null_rate": 0.9773869346733668,
+      "n_unique": 591,
+      "sample_unique": [
+        "12.3707649",
+        "12.385048",
+        "12.41166992",
+        "12.4235072",
+        "12.44355515",
+        "12.46149464",
+        "12.463267",
+        "12.46723322",
+        "12.46898435",
+        "12.4927853",
+        "12.4966847",
+        "12.50091944",
+        "12.5423902",
+        "12.5468005",
+        "12.5483125",
+        "12.5518984",
+        "12.55221704",
+        "12.55297183",
+        "12.55312012",
+        "12.55441147"
+      ]
+    },
+    "Longitude": {
+      "present": true,
+      "dtype": "Float64",
+      "n_non_null": 1167,
+      "n_null": 27,
+      "non_null_rate": 0.9773869346733668,
+      "n_unique": 591,
+      "sample_unique": [
+        "-11.37417819",
+        "-11.4001964",
+        "-11.607298",
+        "-11.6115491",
+        "-11.87440812",
+        "-12.00173478",
+        "-12.0026358",
+        "-12.0603724",
+        "-12.12445564",
+        "-12.1721261",
+        "-12.17462466",
+        "-12.1758723",
+        "-12.17619435",
+        "-12.1777516",
+        "-12.1786806",
+        "-12.179145",
+        "-12.18086848",
+        "-12.18271707",
+        "-12.1828481",
+        "-12.1883412"
+      ]
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Senegal/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 0.09
+}

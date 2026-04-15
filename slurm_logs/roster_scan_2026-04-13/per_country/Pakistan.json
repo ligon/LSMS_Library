@@ -1,0 +1,68 @@
+{
+  "country": "Pakistan",
+  "status": "ok",
+  "rows": 36079,
+  "columns": [
+    "Sex",
+    "Age",
+    "Marital",
+    "Relationship",
+    "Generation",
+    "Distance",
+    "Affinity"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "v",
+    "pid"
+  ],
+  "sex": {
+    "n_non_null": 36071,
+    "n_null": 8,
+    "unique": [
+      "F",
+      "M"
+    ],
+    "non_canonical": [],
+    "non_canonical_counts": {}
+  },
+  "age": {
+    "dtype": "Float64",
+    "n_non_null": 36067,
+    "n_null": 12,
+    "n_non_numeric": 0,
+    "min": 0.0,
+    "max": 120.0,
+    "n_negative": 0,
+    "n_gt_120": 0
+  },
+  "relationship": {
+    "n_non_null": 36074,
+    "n_null": 5,
+    "n_unique": 13,
+    "unknown_labels": [],
+    "unknown_label_counts": {}
+  },
+  "kinship_derived": {
+    "Generation_present": true,
+    "Distance_present": true,
+    "Affinity_present": true,
+    "Affinity_unique": [
+      "affinal",
+      "consanguineal",
+      "servant",
+      "unrelated"
+    ],
+    "Affinity_null_rate": 0.0001385847723052191
+  },
+  "extra_columns": [
+    "Marital"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Pakistan/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "UserWarning: Data scheme does not contain panel_ids for Pakistan",
+    "UserWarning: Data scheme does not contain panel_ids for Pakistan"
+  ],
+  "elapsed_s": 0.39
+}

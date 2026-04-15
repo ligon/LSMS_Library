@@ -1,0 +1,77 @@
+{
+  "country": "Cambodia",
+  "feature": "cluster_features",
+  "status": "ok",
+  "rows": 252,
+  "columns": [
+    "Region",
+    "Rural"
+  ],
+  "index_names": [
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "Region": "string",
+    "Rural": "string"
+  },
+  "canonical_columns": {
+    "Region": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 252,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 24,
+      "sample_unique": [
+        "\u1780\u178e\u17d2\u178a\u17b6\u179b / Kandal",
+        "\u1780\u17c4\u17c7\u1780\u17bb\u1784 / Koh Kong",
+        "\u1780\u17c6\u1796\u1784\u17cb\u1785\u17b6\u1798 / Kampong Cham",
+        "\u1780\u17c6\u1796\u1784\u17cb\u1786\u17d2\u1793\u17b6\u17c6\u1784 / Kampong Chhnang",
+        "\u1780\u17c6\u1796\u1784\u17cb\u1792\u17c6 / Kampong Thom",
+        "\u1780\u17c6\u1796\u1784\u17cb\u179f\u17d2\u1796\u17ba / Kampong Speu",
+        "\u1780\u17c6\u1796\u178f / Kampot",
+        "\u1780\u17d2\u179a\u1785\u17c1\u17c7 / Kratie",
+        "\u178f\u17b6\u1780\u17c2\u179c / Takeo",
+        "\u178f\u17d2\u1794\u17bc\u1784\u1783\u17d2\u1798\u17bb\u17c6 / Tboung Khmum",
+        "\u1794\u1793\u17d2\u1791\u17b6\u1799\u1798\u17b6\u1793\u1787\u17d0\u1799 / Banteay Meanchey",
+        "\u1794\u17b6\u178f\u17cb\u178a\u17c6\u1794\u1784 / Battambang",
+        "\u1794\u17c9\u17c3\u179b\u17b7\u1793 / Pailin",
+        "\u1796\u17c4\u1792\u17b7\u17cd\u179f\u17b6\u178f\u17cb / Pursat",
+        "\u1796\u17d2\u179a\u17c3\u179c\u17c2\u1784 / Prey Veng",
+        "\u1796\u17d2\u179a\u17c7\u179c\u17b7\u17a0\u17b6\u179a / Preah Vihear",
+        "\u1796\u17d2\u179a\u17c7\u179f\u17b8\u17a0\u1793\u17bb / Preah Sihanouk",
+        "\u1797\u17d2\u1793\u17c6\u1796\u17c1\u1789 / Phnom Penh",
+        "\u1798\u178e\u17d2\u178c\u179b\u1782\u17b7\u179a\u17b8 / Mondul Kiri",
+        "\u179a\u178f\u1793\u1782\u17b7\u179a\u17b8 / Ratanak Kiri"
+      ]
+    },
+    "Rural": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 252,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 2,
+      "sample_unique": [
+        "Rural",
+        "Urban"
+      ]
+    },
+    "District": {
+      "present": false
+    },
+    "Latitude": {
+      "present": false
+    },
+    "Longitude": {
+      "present": false
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Cambodia/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "UserWarning: Data scheme does not contain panel_ids for Cambodia"
+  ],
+  "elapsed_s": 4.21
+}

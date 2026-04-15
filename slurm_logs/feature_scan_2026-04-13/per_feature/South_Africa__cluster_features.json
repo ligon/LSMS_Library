@@ -1,0 +1,67 @@
+{
+  "country": "South Africa",
+  "feature": "cluster_features",
+  "status": "ok",
+  "rows": 355,
+  "columns": [
+    "Region",
+    "Rural"
+  ],
+  "index_names": [
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "Region": "string",
+    "Rural": "string"
+  },
+  "canonical_columns": {
+    "Region": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 355,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 9,
+      "sample_unique": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ]
+    },
+    "Rural": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 355,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 3,
+      "sample_unique": [
+        "Informal",
+        "Rural",
+        "Urban"
+      ]
+    },
+    "District": {
+      "present": false
+    },
+    "Latitude": {
+      "present": false
+    },
+    "Longitude": {
+      "present": false
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/South Africa/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "UserWarning: Data scheme does not contain panel_ids for South Africa"
+  ],
+  "elapsed_s": 0.1
+}

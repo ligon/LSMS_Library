@@ -1,0 +1,134 @@
+{
+  "country": "Benin",
+  "feature": "shocks",
+  "status": "ok",
+  "rows": 176264,
+  "columns": [
+    "AffectedIncome",
+    "AffectedAssets",
+    "AffectedProduction",
+    "AffectedConsumption",
+    "HowCoped0",
+    "HowCoped1"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "Shock"
+  ],
+  "dtypes": {
+    "AffectedIncome": "boolean",
+    "AffectedAssets": "boolean",
+    "AffectedProduction": "boolean",
+    "AffectedConsumption": "boolean",
+    "HowCoped0": "string",
+    "HowCoped1": "string"
+  },
+  "canonical_columns": {
+    "AffectedIncome": {
+      "present": true,
+      "dtype": "boolean",
+      "n_non_null": 0,
+      "n_null": 176264,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    },
+    "AffectedAssets": {
+      "present": true,
+      "dtype": "boolean",
+      "n_non_null": 0,
+      "n_null": 176264,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    },
+    "AffectedProduction": {
+      "present": true,
+      "dtype": "boolean",
+      "n_non_null": 0,
+      "n_null": 176264,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    },
+    "AffectedConsumption": {
+      "present": true,
+      "dtype": "boolean",
+      "n_non_null": 0,
+      "n_null": 176264,
+      "non_null_rate": 0.0,
+      "n_unique": 0,
+      "sample_unique": []
+    },
+    "HowCoped0": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 12305,
+      "n_null": 163959,
+      "non_null_rate": 0.06981005764081151,
+      "n_unique": 26,
+      "sample_unique": [
+        "Achat d'aliments moins chers",
+        "Aide d'organisations religieuses ou d'ONG",
+        "Aide de parents ou d'amis",
+        "Aide du gouvernement/l'Etat",
+        "Aucune strat\u00e9gie",
+        "Autre strat\u00e9gie",
+        "Changement des habitudes de consommation",
+        "Confiage des enfants \u00e0 d'autres m\u00e9nages",
+        "Enfants de moins de 15 ans amen\u00e9s \u00e0 travailler",
+        "Engag\u00e9 dans des activit\u00e9s spirituelles",
+        "Les enfants ont \u00e9t\u00e9 d\u00e9scolaris\u00e9s",
+        "Louer/mettre ses terres en gages",
+        "Marier les enfants",
+        "Membres actifs ont pris des emplois suppl\u00e9mentaires",
+        "Membres adultes inactifs/ch\u00f4meurs ont pris des emplois",
+        "Migration de membres du m\u00e9nage",
+        "Obtention d'un cr\u00e9dit",
+        "Pratique de la culture de contre saison",
+        "Pratique plus importante des activit\u00e9s de p\u00eache",
+        "R\u00e9duction des d\u00e9penses de sant\u00e9/d'\u00e9ducation"
+      ]
+    },
+    "HowCoped1": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 2504,
+      "n_null": 173760,
+      "non_null_rate": 0.014205963781600326,
+      "n_unique": 25,
+      "sample_unique": [
+        "Achat d'aliments moins chers",
+        "Aide d'organisations religieuses ou d'ONG",
+        "Aide de parents ou d'amis",
+        "Aide du gouvernement/l'Etat",
+        "Aucune strat\u00e9gie",
+        "Autre strat\u00e9gie",
+        "Changement des habitudes de consommation",
+        "Confiage des enfants \u00e0 d'autres m\u00e9nages",
+        "Enfants de moins de 15 ans amen\u00e9s \u00e0 travailler",
+        "Engag\u00e9 dans des activit\u00e9s spirituelles",
+        "Les enfants ont \u00e9t\u00e9 d\u00e9scolaris\u00e9s",
+        "Louer/mettre ses terres en gages",
+        "Marier les enfants",
+        "Membres actifs ont pris des emplois suppl\u00e9mentaires",
+        "Membres adultes inactifs/ch\u00f4meurs ont pris des emplois",
+        "Migration de membres du m\u00e9nage",
+        "Obtention d'un cr\u00e9dit",
+        "Pratique de la culture de contre saison",
+        "Pratique plus importante des activit\u00e9s de p\u00eache",
+        "R\u00e9duction des d\u00e9penses de sant\u00e9/d'\u00e9ducation"
+      ]
+    },
+    "HowCoped2": {
+      "present": false
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Benin/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "UserWarning: Data scheme does not contain panel_ids for Benin"
+  ],
+  "elapsed_s": 0.44
+}

@@ -1,0 +1,25 @@
+{
+  "country": "Uganda",
+  "feature": "assets",
+  "status": "ok",
+  "rows": 116808,
+  "columns": [
+    "Value"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "j"
+  ],
+  "dtypes": {
+    "Value": "float64"
+  },
+  "canonical_columns": {},
+  "extra_columns": [
+    "Value"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 0.12
+}

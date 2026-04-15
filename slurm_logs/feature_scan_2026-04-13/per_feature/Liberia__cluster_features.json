@@ -1,0 +1,65 @@
+{
+  "country": "Liberia",
+  "feature": "cluster_features",
+  "status": "ok",
+  "rows": 32,
+  "columns": [
+    "Region",
+    "Rural",
+    "County"
+  ],
+  "index_names": [
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "Region": "string",
+    "Rural": "string",
+    "County": "string"
+  },
+  "canonical_columns": {
+    "Region": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 32,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 4,
+      "sample_unique": [
+        "North Central",
+        "North Western",
+        "South Central",
+        "South Eastern A"
+      ]
+    },
+    "Rural": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 32,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 2,
+      "sample_unique": [
+        "rural",
+        "urban"
+      ]
+    },
+    "District": {
+      "present": false
+    },
+    "Latitude": {
+      "present": false
+    },
+    "Longitude": {
+      "present": false
+    }
+  },
+  "extra_columns": [
+    "County"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Liberia/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "UserWarning: Data scheme does not contain panel_ids for Liberia"
+  ],
+  "elapsed_s": 4.14
+}

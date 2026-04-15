@@ -1,0 +1,130 @@
+{
+  "country": "Nigeria",
+  "feature": "shocks",
+  "status": "ok",
+  "rows": 636256,
+  "columns": [
+    "HowCoped0",
+    "HowCoped1",
+    "HowCoped2"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "Shock"
+  ],
+  "dtypes": {
+    "HowCoped0": "string",
+    "HowCoped1": "string",
+    "HowCoped2": "string"
+  },
+  "canonical_columns": {
+    "AffectedIncome": {
+      "present": false
+    },
+    "AffectedAssets": {
+      "present": false
+    },
+    "AffectedProduction": {
+      "present": false
+    },
+    "AffectedConsumption": {
+      "present": false
+    },
+    "HowCoped0": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 22452,
+      "n_null": 613804,
+      "non_null_rate": 0.03528768294522959,
+      "n_unique": 70,
+      "sample_unique": [
+        "1. SALE OF LIVESTOCK",
+        "10. MEMBERS OF HOUSEHOLD MIGRATED FOR WORK",
+        "10. MEMBERS OF THE HOUSEHOLD MIGRATED FOR WORK",
+        "11. CREDITED PURCHASES",
+        "12. DELAYED PAYMENT OBLIGATIONS",
+        "13. SOLD HARVEST IN ADVANCE",
+        "14. REDUCED FOOD CONSUMPTION",
+        "15. REDUCED NON-FOOD CONSUMPTION",
+        "16. RELIED ON SAVINGS",
+        "17. RECEIVED ASSISTANCE FROM NGO",
+        "18. TOOK ADVANCED PAYMENT FROM EMPLOYER",
+        "19. RECEIVED ASSISTANCE FROM GOVERNMENT",
+        "2. SALE OF LAND",
+        "20. WAS COVERED BY INSURANCE POLICY",
+        "21. DID NOTHING",
+        "22. OTHER (SPECIFY)",
+        "3. SALE OF OTHER PROPERTY",
+        "31.0",
+        "4. SENT CHILDREN TO LIVE WITH FRIENDS",
+        "41.0"
+      ]
+    },
+    "HowCoped1": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 7832,
+      "n_null": 628424,
+      "non_null_rate": 0.012309510637227782,
+      "n_unique": 66,
+      "sample_unique": [
+        "1. SALE OF LIVESTOCK",
+        "10. MEMBERS OF HOUSEHOLD MIGRATED FOR WORK",
+        "10. MEMBERS OF THE HOUSEHOLD MIGRATED FOR WORK",
+        "11. CREDITED PURCHASES",
+        "12. DELAYED PAYMENT OBLIGATIONS",
+        "13. SOLD HARVEST IN ADVANCE",
+        "14. REDUCED FOOD CONSUMPTION",
+        "15. REDUCED NON-FOOD CONSUMPTION",
+        "16. RELIED ON SAVINGS",
+        "17. RECEIVED ASSISTANCE FROM NGO",
+        "18. TOOK ADVANCED PAYMENT FROM EMPLOYER",
+        "19. RECEIVED ASSISTANCE FROM GOVERNMENT",
+        "2. SALE OF LAND",
+        "21. DID NOTHING",
+        "22. OTHER (SPECIFY)",
+        "3. SALE OF OTHER PROPERTY",
+        "4. SENT CHILDREN TO LIVE WITH FRIENDS",
+        "5. WITHDREW CHILDREN FROM SCHOOL",
+        "6. ENGAGED IN ADDITIONAL INCOME GENERATING ACTIVITIES",
+        "7. RECEIVED ASSISTANCE FROM FRIENDS & FAMILY"
+      ]
+    },
+    "HowCoped2": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 3468,
+      "n_null": 632788,
+      "non_null_rate": 0.005450636221898104,
+      "n_unique": 63,
+      "sample_unique": [
+        "1. SALE OF LIVESTOCK",
+        "10. MEMBERS OF HOUSEHOLD MIGRATED FOR WORK",
+        "10. MEMBERS OF THE HOUSEHOLD MIGRATED FOR WORK",
+        "11. CREDITED PURCHASES",
+        "12. DELAYED PAYMENT OBLIGATIONS",
+        "13. SOLD HARVEST IN ADVANCE",
+        "14. REDUCED FOOD CONSUMPTION",
+        "15. REDUCED NON-FOOD CONSUMPTION",
+        "16. RELIED ON SAVINGS",
+        "17. RECEIVED ASSISTANCE FROM NGO",
+        "18. TOOK ADVANCED PAYMENT FROM EMPLOYER",
+        "19. RECEIVED ASSISTANCE FROM GOVERNMENT",
+        "2. SALE OF LAND",
+        "20. WAS COVERED BY INSURANCE POLICY",
+        "21. DID NOTHING",
+        "22. OTHER (SPECIFY)",
+        "3. SALE OF OTHER PROPERTY",
+        "4. SENT CHILDREN TO LIVE WITH FRIENDS",
+        "5. WITHDREW CHILDREN FROM SCHOOL",
+        "6. ENGAGED IN ADDITIONAL INCOME GENERATING ACTIVITIES"
+      ]
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nigeria/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 0.75
+}

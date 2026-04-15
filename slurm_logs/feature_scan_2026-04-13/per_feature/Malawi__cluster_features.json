@@ -1,0 +1,147 @@
+{
+  "country": "Malawi",
+  "feature": "cluster_features",
+  "status": "ok",
+  "rows": 38103,
+  "columns": [
+    "Region",
+    "District",
+    "Rural",
+    "Latitude",
+    "Longitude"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "Region": "string",
+    "District": "string",
+    "Rural": "string",
+    "Latitude": "Float64",
+    "Longitude": "Float64"
+  },
+  "canonical_columns": {
+    "Region": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 38103,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 3,
+      "sample_unique": [
+        "Central",
+        "North",
+        "Southern"
+      ]
+    },
+    "Rural": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 38103,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 2,
+      "sample_unique": [
+        "0",
+        "1"
+      ]
+    },
+    "District": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 25832,
+      "n_null": 12271,
+      "non_null_rate": 0.6779518673070362,
+      "n_unique": 38,
+      "sample_unique": [
+        "Balaka",
+        "Blantyre",
+        "Blantyre City",
+        "Blantyre/Blantyre City",
+        "Chikwawa",
+        "Chiradzulu",
+        "Chitipa",
+        "Dedza",
+        "Dowa",
+        "Karonga",
+        "Kasungu",
+        "Likoma",
+        "Lilongwe",
+        "Lilongwe City",
+        "Lilongwe/Lilongwe City",
+        "Machinga",
+        "Mangochi",
+        "Mchinji",
+        "Mulanje",
+        "Mwanza"
+      ]
+    },
+    "Latitude": {
+      "present": true,
+      "dtype": "Float64",
+      "n_non_null": 23705,
+      "n_null": 14398,
+      "non_null_rate": 0.6221294911161851,
+      "n_unique": 1470,
+      "sample_unique": [
+        "-10.00220012664795",
+        "-10.037099838256836",
+        "-10.040499687194824",
+        "-10.049750328063965",
+        "-10.075480461120605",
+        "-10.152999877929688",
+        "-10.170000076293945",
+        "-10.198800086975098",
+        "-10.200900077819824",
+        "-10.239740371704102",
+        "-10.25629997253418",
+        "-10.257840156555176",
+        "-10.25879955291748",
+        "-10.264849662780762",
+        "-10.312299728393555",
+        "-10.336799621582031",
+        "-10.337209701538086",
+        "-10.343239784240723",
+        "-10.357500076293945",
+        "-10.409899711608887"
+      ]
+    },
+    "Longitude": {
+      "present": true,
+      "dtype": "Float64",
+      "n_non_null": 23705,
+      "n_null": 14398,
+      "non_null_rate": 0.6221294911161851,
+      "n_unique": 1461,
+      "sample_unique": [
+        "0.0",
+        "32.81740188598633",
+        "32.84770965576172",
+        "32.84804916381836",
+        "32.86104965209961",
+        "32.86333084106445",
+        "32.86479949951172",
+        "32.88005828857422",
+        "32.886680603027344",
+        "32.899898529052734",
+        "32.92499923706055",
+        "32.933040618896484",
+        "32.93400955200195",
+        "32.93550109863281",
+        "32.966758728027344",
+        "32.977500915527344",
+        "32.97930145263672",
+        "32.98347854614258",
+        "32.98500061035156",
+        "32.98630142211914"
+      ]
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 4.74
+}

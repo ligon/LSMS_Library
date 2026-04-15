@@ -1,0 +1,32 @@
+{
+  "country": "Tanzania",
+  "feature": "interview_date",
+  "status": "ok",
+  "rows": 22433,
+  "columns": [
+    "date",
+    "int_t"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "date": "datetime64[us]",
+    "int_t": "datetime64[us]"
+  },
+  "canonical_columns": {
+    "Int_t": {
+      "present": false
+    }
+  },
+  "extra_columns": [
+    "date",
+    "int_t"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Tanzania/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 0.18
+}

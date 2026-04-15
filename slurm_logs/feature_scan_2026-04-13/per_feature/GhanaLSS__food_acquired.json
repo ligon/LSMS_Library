@@ -1,0 +1,65 @@
+{
+  "country": "GhanaLSS",
+  "feature": "food_acquired",
+  "status": "ok",
+  "rows": 1459786,
+  "columns": [
+    "purchased_value",
+    "purchased_value_yearly",
+    "produced_value_daily",
+    "produced_value_yearly",
+    "h",
+    "u",
+    "visit",
+    "Purchased",
+    "Price",
+    "Produced",
+    "produced_price",
+    "produced_quantity",
+    "Expenditure",
+    "Quantity"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "v",
+    "j"
+  ],
+  "dtypes": {
+    "purchased_value": "string",
+    "purchased_value_yearly": "float64",
+    "produced_value_daily": "float64",
+    "produced_value_yearly": "float64",
+    "h": "str",
+    "u": "str",
+    "visit": "float64",
+    "Purchased": "float64",
+    "Price": "Float64",
+    "Produced": "Float64",
+    "produced_price": "float64",
+    "produced_quantity": "float64",
+    "Expenditure": "Float64",
+    "Quantity": "Float64"
+  },
+  "canonical_columns": {},
+  "extra_columns": [
+    "purchased_value",
+    "purchased_value_yearly",
+    "produced_value_daily",
+    "produced_value_yearly",
+    "h",
+    "u",
+    "visit",
+    "Purchased",
+    "Price",
+    "Produced",
+    "produced_price",
+    "produced_quantity",
+    "Expenditure",
+    "Quantity"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/GhanaLSS/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 3.02
+}

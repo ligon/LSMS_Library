@@ -1,0 +1,43 @@
+{
+  "country": "Ethiopia",
+  "feature": "food_acquired",
+  "status": "ok",
+  "rows": 264418,
+  "columns": [
+    "quantity",
+    "value_purchased",
+    "quantity_purchased",
+    "unitvalue",
+    "Kgs",
+    "Kgs Purchased"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "v",
+    "j",
+    "units",
+    "units_purchased"
+  ],
+  "dtypes": {
+    "quantity": "float64",
+    "value_purchased": "float64",
+    "quantity_purchased": "float64",
+    "unitvalue": "float64",
+    "Kgs": "float64",
+    "Kgs Purchased": "float64"
+  },
+  "canonical_columns": {},
+  "extra_columns": [
+    "quantity",
+    "value_purchased",
+    "quantity_purchased",
+    "unitvalue",
+    "Kgs",
+    "Kgs Purchased"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Ethiopia/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 1.13
+}

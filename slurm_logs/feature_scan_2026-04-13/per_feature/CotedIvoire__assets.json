@@ -1,0 +1,35 @@
+{
+  "country": "CotedIvoire",
+  "feature": "assets",
+  "status": "ok",
+  "rows": 584640,
+  "columns": [
+    "Quantity",
+    "Age",
+    "Value",
+    "Purchase Price"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "j"
+  ],
+  "dtypes": {
+    "Quantity": "Float64",
+    "Age": "Float64",
+    "Value": "Float64",
+    "Purchase Price": "Float64"
+  },
+  "canonical_columns": {},
+  "extra_columns": [
+    "Quantity",
+    "Age",
+    "Value",
+    "Purchase Price"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/CotedIvoire/_/data_scheme.yml' mode='r' encoding='UTF-8'>",
+    "UserWarning: Data scheme does not contain panel_ids for CotedIvoire"
+  ],
+  "elapsed_s": 0.4
+}

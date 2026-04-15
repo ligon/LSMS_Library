@@ -1,0 +1,56 @@
+{
+  "country": "Tanzania",
+  "feature": "food_acquired",
+  "status": "ok",
+  "rows": 250302,
+  "columns": [
+    "quant_ttl_consume",
+    "unit_ttl_consume",
+    "quant_purchase",
+    "unit_purchase",
+    "value_purchase",
+    "quant_own",
+    "unit_own",
+    "quant_inkind",
+    "unit_inkind",
+    "unitvalue_purchase",
+    "agg_u"
+  ],
+  "index_names": [
+    "i",
+    "t",
+    "v",
+    "j"
+  ],
+  "dtypes": {
+    "quant_ttl_consume": "float64",
+    "unit_ttl_consume": "string",
+    "quant_purchase": "float64",
+    "unit_purchase": "string",
+    "value_purchase": "float64",
+    "quant_own": "float64",
+    "unit_own": "string",
+    "quant_inkind": "float64",
+    "unit_inkind": "string",
+    "unitvalue_purchase": "float64",
+    "agg_u": "string"
+  },
+  "canonical_columns": {},
+  "extra_columns": [
+    "quant_ttl_consume",
+    "unit_ttl_consume",
+    "quant_purchase",
+    "unit_purchase",
+    "value_purchase",
+    "quant_own",
+    "unit_own",
+    "quant_inkind",
+    "unit_inkind",
+    "unitvalue_purchase",
+    "agg_u"
+  ],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Tanzania/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 0.63
+}

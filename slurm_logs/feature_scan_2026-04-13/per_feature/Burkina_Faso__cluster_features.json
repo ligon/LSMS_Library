@@ -1,0 +1,98 @@
+{
+  "country": "Burkina_Faso",
+  "feature": "cluster_features",
+  "status": "ok",
+  "rows": 550,
+  "columns": [
+    "Region",
+    "District",
+    "Rural"
+  ],
+  "index_names": [
+    "t",
+    "v"
+  ],
+  "dtypes": {
+    "Region": "string",
+    "District": "string",
+    "Rural": "string"
+  },
+  "canonical_columns": {
+    "Region": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 550,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 13,
+      "sample_unique": [
+        "Boucle du Mouhoum",
+        "Cascades",
+        "Centre",
+        "Centre-Est",
+        "Centre-Nord",
+        "Centre-Ouest",
+        "Centre-Sud",
+        "Est",
+        "Hauts-Bassins",
+        "Nord",
+        "Plateau-Central",
+        "Sahel",
+        "Sud-Ouest"
+      ]
+    },
+    "Rural": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 550,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 2,
+      "sample_unique": [
+        "Rural",
+        "Urban"
+      ]
+    },
+    "District": {
+      "present": true,
+      "dtype": "string",
+      "n_non_null": 550,
+      "n_null": 0,
+      "non_null_rate": 1.0,
+      "n_unique": 44,
+      "sample_unique": [
+        "Bale",
+        "Bam",
+        "Banwa",
+        "Bazega",
+        "Bougouriba",
+        "Boulgou",
+        "Boulkiemd\u00e9",
+        "Como\u00e9",
+        "Ganzourgou",
+        "Gnagna",
+        "Gourma",
+        "Houet",
+        "Ioba",
+        "Kadiogo",
+        "Komandjoari",
+        "Kossi",
+        "Koulp\u00e9logo",
+        "Kouritenga",
+        "Kourw\u00e9ogo",
+        "K\u00e9n\u00e9dougou"
+      ]
+    },
+    "Latitude": {
+      "present": false
+    },
+    "Longitude": {
+      "present": false
+    }
+  },
+  "extra_columns": [],
+  "warnings": [
+    "ResourceWarning: unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Burkina_Faso/_/data_scheme.yml' mode='r' encoding='UTF-8'>"
+  ],
+  "elapsed_s": 4.59
+}
