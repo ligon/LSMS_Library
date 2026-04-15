@@ -1,0 +1,935 @@
+{
+  "cluster_features": {
+    "feature": "cluster_features",
+    "status": "REPL_READ_ERROR",
+    "error": "Could not open Parquet input source '<Buffer>': Parquet file size is 0 bytes"
+  },
+  "earnings": {
+    "feature": "earnings",
+    "rep_shape": [
+      22447,
+      2
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m"
+    ],
+    "rep_cols": [
+      "earnings",
+      "level_1"
+    ],
+    "rep_hash": "af34762407e5cba7",
+    "method_name": "earnings",
+    "notes": "in data_scheme",
+    "kwargs_used": "market='Region'",
+    "status": "API_TIMEOUT",
+    "error": "Timed out after 180s",
+    "api_shape": null,
+    "api_index": null,
+    "api_cols": null,
+    "api_hash": null
+  },
+  "enterprise_income": {
+    "feature": "enterprise_income",
+    "rep_shape": [
+      13935,
+      6
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m"
+    ],
+    "rep_cols": [
+      "losses",
+      "materials",
+      "otherexpense",
+      "profits",
+      "revenue",
+      "wagebill"
+    ],
+    "rep_hash": "625a11245b7306c9",
+    "method_name": "enterprise_income",
+    "notes": "in data_scheme",
+    "kwargs_used": "market='Region'",
+    "status": "API_TIMEOUT",
+    "error": "Timed out after 180s",
+    "api_shape": null,
+    "api_index": null,
+    "api_cols": null,
+    "api_hash": null
+  },
+  "fct": {
+    "feature": "fct",
+    "rep_shape": [
+      15,
+      114
+    ],
+    "rep_index": [
+      "Nutrient"
+    ],
+    "rep_cols": [
+      "Apples",
+      "Avocado",
+      "Beans (dry)",
+      "Beans (fresh)",
+      "Beef",
+      "Beer",
+      "Biscuits",
+      "Bogoya",
+      "Bongo",
+      "Bread",
+      "Cabbages",
+      "Cakes",
+      "Carrots",
+      "Cassava (dry)",
+      "Cassava (dry/flour)",
+      "Cassava (flour)",
+      "Cassava (fresh)",
+      "Chapati",
+      "Cheese",
+      "Chicken",
+      "Chicken (broiler)",
+      "Chicken (local)",
+      "Chicken (off-layer)",
+      "Coffee",
+      "Cooking Oil",
+      "Cooking Oil (refined)",
+      "Cooking Oil (unrefined)",
+      "Cornflakes",
+      "Dodo",
+      "Donuts",
+      "Dry/Smoked Fish",
+      "Eggplant",
+      "Eggs",
+      "Fresh Fish",
+      "Garlic",
+      "Ghee",
+      "Ginger (fresh)",
+      "Ginger (powder)",
+      "Goat Meat",
+      "Green Pepper",
+      "Ground Nuts (in shell)",
+      "Ground Nuts (paste)",
+      "Ground Nuts (pounded)",
+      "Ground Nuts (shelled)",
+      "Honey",
+      "Ice Cream",
+      "Infant Formula",
+      "Irish Potatoes",
+      "Jackfruit (fresh)",
+      "Jam/Marmalade",
+      "Kabalagala",
+      "Macaroni/Spaghetti",
+      "Maize (cobs)",
+      "Maize (flour)",
+      "Maize (grains)",
+      "Mangos",
+      "Margarine, Butter, etc",
+      "Matoke (??)",
+      "Matoke (bunch)",
+      "Matoke (cluster)",
+      "Matoke (heap)",
+      "Matoke (other)",
+      "Milk (fresh)",
+      "Milk (powdered)",
+      "Millet",
+      "Millet Flour",
+      "Mukene",
+      "Mushrooms",
+      "Ndiizi",
+      "Nkejje (dried)",
+      "Okra",
+      "Onions",
+      "Oranges",
+      "Other Juice (packed)",
+      "Passion Fruits",
+      "Peas",
+      "Peas (dry)",
+      "Perch (dried)",
+      "Perch (fresh)",
+      "Pineapple",
+      "Plantains",
+      "Pork",
+      "Pumpkins",
+      "Restaurant (beer)",
+      "Restaurant (soda)",
+      "Rice",
+      "Salt",
+      "Samosas",
+      "Sausages",
+      "Sim Sim",
+      "Sim Sim (paste)",
+      "Soda",
+      "Sorghum",
+      "Soybeans (dry)",
+      "Soybeans (fresh)",
+      "Sugar",
+      "Sugarcane",
+      "Sweet Bananas",
+      "Sweet Potatoes (dry)",
+      "Sweet Potatoes (flour)",
+      "Sweet Potatoes (fresh)",
+      "Sweet Potatoes (white, flour)",
+      "Tea",
+      "Tea (leaves)",
+      "Tea (other)",
+      "Tilapia (dried)",
+      "Tilapia (fresh)",
+      "Tomatoes",
+      "Waragi",
+      "Water",
+      "Watermelon",
+      "Wheat (flour)",
+      "Yams (arrowroot)",
+      "Yoghurt"
+    ],
+    "rep_hash": "87137502e7022bfe",
+    "method_name": "fct",
+    "notes": "in data_scheme",
+    "kwargs_used": "{}",
+    "status": "API_ERROR",
+    "error": "No method fct on Country"
+  },
+  "food_acquired": {
+    "feature": "food_acquired",
+    "rep_shape": [
+      352913,
+      18
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m",
+      "j",
+      "u"
+    ],
+    "rep_cols": [
+      "Kgs",
+      "farmgate",
+      "market",
+      "market_away",
+      "market_home",
+      "market_own",
+      "quantity_away",
+      "quantity_home",
+      "quantity_inkind",
+      "quantity_own",
+      "unitvalue_away",
+      "unitvalue_home",
+      "unitvalue_inkind",
+      "unitvalue_own",
+      "value_away",
+      "value_home",
+      "value_inkind",
+      "value_own"
+    ],
+    "rep_hash": "b1064dfb68a66e8f",
+    "method_name": "food_acquired",
+    "notes": "",
+    "kwargs_used": "market='Region'",
+    "api_shape": [
+      314997,
+      18
+    ],
+    "api_index": [
+      "i",
+      "t",
+      "m",
+      "j",
+      "u"
+    ],
+    "api_cols": [
+      "Kgs",
+      "farmgate",
+      "market",
+      "market_away",
+      "market_home",
+      "market_own",
+      "quantity_away",
+      "quantity_home",
+      "quantity_inkind",
+      "quantity_own",
+      "unitvalue_away",
+      "unitvalue_home",
+      "unitvalue_inkind",
+      "unitvalue_own",
+      "value_away",
+      "value_home",
+      "value_inkind",
+      "value_own"
+    ],
+    "api_hash": "efa577434b56c866",
+    "index_match": true,
+    "cols_match": true,
+    "hash_match": false,
+    "shape_match": false,
+    "cols_only_rep": [],
+    "cols_only_api": [],
+    "idx_only_rep": [],
+    "idx_only_api": [],
+    "dtype_diffs": {},
+    "rows_common": 312451,
+    "rows_only_rep": 40462,
+    "rows_only_api": 2546,
+    "sample_mad": {
+      "Kgs": 0.0,
+      "farmgate": 0.0,
+      "market": 0.0
+    },
+    "status": "CONTENT_DRIFT"
+  },
+  "food_expenditures": {
+    "feature": "food_expenditures",
+    "rep_shape": [
+      352722,
+      1
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m",
+      "j"
+    ],
+    "rep_cols": [
+      "x"
+    ],
+    "rep_hash": "c31668d793555567",
+    "method_name": "food_expenditures",
+    "notes": "auto-derived",
+    "kwargs_used": "market='Region'",
+    "api_shape": [
+      314859,
+      1
+    ],
+    "api_index": [
+      "i",
+      "t",
+      "m",
+      "j"
+    ],
+    "api_cols": [
+      "Expenditure"
+    ],
+    "api_hash": "708da00bf3104ac0",
+    "index_match": true,
+    "cols_match": false,
+    "hash_match": false,
+    "shape_match": false,
+    "cols_only_rep": [
+      "x"
+    ],
+    "cols_only_api": [
+      "Expenditure"
+    ],
+    "idx_only_rep": [],
+    "idx_only_api": [],
+    "dtype_diffs": {},
+    "status": "SCHEMA_DRIFT"
+  },
+  "food_prices": {
+    "feature": "food_prices",
+    "rep_shape": [
+      352913,
+      9
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m",
+      "j",
+      "u"
+    ],
+    "rep_cols": [
+      "farmgate",
+      "market",
+      "market_away",
+      "market_home",
+      "market_own",
+      "unitvalue_away",
+      "unitvalue_home",
+      "unitvalue_inkind",
+      "unitvalue_own"
+    ],
+    "rep_hash": "ba696a785ba28544",
+    "method_name": "food_prices",
+    "notes": "auto-derived",
+    "kwargs_used": "market='Region'",
+    "api_shape": [
+      314997,
+      9
+    ],
+    "api_index": [
+      "i",
+      "t",
+      "m",
+      "j",
+      "u"
+    ],
+    "api_cols": [
+      "farmgate",
+      "market",
+      "market_away",
+      "market_home",
+      "market_own",
+      "unitvalue_away",
+      "unitvalue_home",
+      "unitvalue_inkind",
+      "unitvalue_own"
+    ],
+    "api_hash": "c1ea91d6756b6d33",
+    "index_match": true,
+    "cols_match": true,
+    "hash_match": false,
+    "shape_match": false,
+    "cols_only_rep": [],
+    "cols_only_api": [],
+    "idx_only_rep": [],
+    "idx_only_api": [],
+    "dtype_diffs": {
+      "farmgate": {
+        "rep": "float64",
+        "api": "string"
+      },
+      "market": {
+        "rep": "float64",
+        "api": "string"
+      },
+      "market_away": {
+        "rep": "float64",
+        "api": "string"
+      },
+      "market_home": {
+        "rep": "float64",
+        "api": "string"
+      },
+      "market_own": {
+        "rep": "float64",
+        "api": "string"
+      },
+      "unitvalue_away": {
+        "rep": "float64",
+        "api": "string"
+      },
+      "unitvalue_home": {
+        "rep": "float64",
+        "api": "string"
+      },
+      "unitvalue_inkind": {
+        "rep": "float64",
+        "api": "string"
+      },
+      "unitvalue_own": {
+        "rep": "float64",
+        "api": "string"
+      }
+    },
+    "rows_common": 312388,
+    "rows_only_rep": 40462,
+    "rows_only_api": 2546,
+    "sample_mad": {},
+    "status": "CONTENT_DRIFT"
+  },
+  "food_quantities": {
+    "feature": "food_quantities",
+    "rep_shape": [
+      352913,
+      4
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m",
+      "j",
+      "u"
+    ],
+    "rep_cols": [
+      "quantity_away",
+      "quantity_home",
+      "quantity_inkind",
+      "quantity_own"
+    ],
+    "rep_hash": "42d42f8c946ab809",
+    "method_name": "food_quantities",
+    "notes": "auto-derived",
+    "kwargs_used": "market='Region'",
+    "api_shape": [
+      314997,
+      4
+    ],
+    "api_index": [
+      "i",
+      "t",
+      "m",
+      "j",
+      "u"
+    ],
+    "api_cols": [
+      "quantity_away",
+      "quantity_home",
+      "quantity_inkind",
+      "quantity_own"
+    ],
+    "api_hash": "a7a151cf5860493e",
+    "index_match": true,
+    "cols_match": true,
+    "hash_match": false,
+    "shape_match": false,
+    "cols_only_rep": [],
+    "cols_only_api": [],
+    "idx_only_rep": [],
+    "idx_only_api": [],
+    "dtype_diffs": {
+      "quantity_away": {
+        "rep": "float64",
+        "api": "string"
+      },
+      "quantity_home": {
+        "rep": "float64",
+        "api": "string"
+      },
+      "quantity_inkind": {
+        "rep": "float64",
+        "api": "string"
+      },
+      "quantity_own": {
+        "rep": "float64",
+        "api": "string"
+      }
+    },
+    "rows_common": 312388,
+    "rows_only_rep": 40462,
+    "rows_only_api": 2546,
+    "sample_mad": {},
+    "status": "CONTENT_DRIFT"
+  },
+  "household_characteristics": {
+    "feature": "household_characteristics",
+    "rep_shape": [
+      24363,
+      15
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m"
+    ],
+    "rep_cols": [
+      "Females 00-03",
+      "Females 04-08",
+      "Females 09-13",
+      "Females 14-18",
+      "Females 19-30",
+      "Females 31-50",
+      "Females 51-99",
+      "Males 00-03",
+      "Males 04-08",
+      "Males 09-13",
+      "Males 14-18",
+      "Males 19-30",
+      "Males 31-50",
+      "Males 51-99",
+      "log HSize"
+    ],
+    "rep_hash": "e4e608dde8a10a74",
+    "method_name": "household_characteristics",
+    "notes": "roster-derived",
+    "kwargs_used": "market='Region'",
+    "api_shape": [
+      21358,
+      15
+    ],
+    "api_index": [
+      "t",
+      "m",
+      "i"
+    ],
+    "api_cols": [
+      "F 00-03",
+      "F 04-08",
+      "F 09-13",
+      "F 14-18",
+      "F 19-30",
+      "F 31-50",
+      "F 51+",
+      "M 00-03",
+      "M 04-08",
+      "M 09-13",
+      "M 14-18",
+      "M 19-30",
+      "M 31-50",
+      "M 51+",
+      "log HSize"
+    ],
+    "api_hash": "42ede7d8bd6dbd0e",
+    "index_match": false,
+    "cols_match": false,
+    "hash_match": false,
+    "shape_match": false,
+    "cols_only_rep": [
+      "Females 00-03",
+      "Females 04-08",
+      "Females 09-13",
+      "Females 14-18",
+      "Females 19-30",
+      "Females 31-50",
+      "Females 51-99",
+      "Males 00-03",
+      "Males 04-08",
+      "Males 09-13",
+      "Males 14-18",
+      "Males 19-30",
+      "Males 31-50",
+      "Males 51-99"
+    ],
+    "cols_only_api": [
+      "F 00-03",
+      "F 04-08",
+      "F 09-13",
+      "F 14-18",
+      "F 19-30",
+      "F 31-50",
+      "F 51+",
+      "M 00-03",
+      "M 04-08",
+      "M 09-13",
+      "M 14-18",
+      "M 19-30",
+      "M 31-50",
+      "M 51+"
+    ],
+    "idx_only_rep": [],
+    "idx_only_api": [],
+    "dtype_diffs": {},
+    "rows_common": 21166,
+    "rows_only_rep": 3197,
+    "rows_only_api": 192,
+    "sample_mad": {
+      "log HSize": 0.016747985190085895
+    },
+    "status": "SCHEMA_DRIFT"
+  },
+  "household_roster": {
+    "feature": "household_roster",
+    "rep_shape": [
+      35493,
+      3
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "pid"
+    ],
+    "rep_cols": [
+      "Age",
+      "Relation",
+      "Sex"
+    ],
+    "rep_hash": "81b73e0c41f99ca3",
+    "method_name": "household_roster",
+    "notes": "",
+    "kwargs_used": "{}",
+    "api_shape": [
+      147612,
+      6
+    ],
+    "api_index": [
+      "i",
+      "t",
+      "v",
+      "pid"
+    ],
+    "api_cols": [
+      "Affinity",
+      "Age",
+      "Distance",
+      "Generation",
+      "Relationship",
+      "Sex"
+    ],
+    "api_hash": "b4694c9a410d0bcd",
+    "index_match": false,
+    "cols_match": false,
+    "hash_match": false,
+    "shape_match": false,
+    "cols_only_rep": [
+      "Relation"
+    ],
+    "cols_only_api": [
+      "Affinity",
+      "Distance",
+      "Generation",
+      "Relationship"
+    ],
+    "idx_only_rep": [],
+    "idx_only_api": [
+      "v"
+    ],
+    "dtype_diffs": {
+      "Age": {
+        "rep": "float64",
+        "api": "Int64"
+      }
+    },
+    "rows_common": 35493,
+    "rows_only_rep": 0,
+    "rows_only_api": 112119,
+    "sample_mad": {
+      "Age": 0.0
+    },
+    "status": "SCHEMA_DRIFT"
+  },
+  "income": {
+    "feature": "income",
+    "rep_shape": [
+      10193,
+      1
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m"
+    ],
+    "rep_cols": [
+      "income"
+    ],
+    "rep_hash": "e619aa570008021d",
+    "method_name": "income",
+    "notes": "in data_scheme",
+    "kwargs_used": "market='Region'",
+    "status": "API_TIMEOUT",
+    "error": "Timed out after 180s",
+    "api_shape": null,
+    "api_index": null,
+    "api_cols": null,
+    "api_hash": null
+  },
+  "interview_date": {
+    "feature": "interview_date",
+    "rep_shape": [
+      24264,
+      1
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m"
+    ],
+    "rep_cols": [
+      "date"
+    ],
+    "rep_hash": "dabcc37172d360ce",
+    "method_name": "interview_date",
+    "notes": "",
+    "kwargs_used": "market='Region'",
+    "api_shape": [
+      21385,
+      1
+    ],
+    "api_index": [
+      "i",
+      "t",
+      "m"
+    ],
+    "api_cols": [
+      "date"
+    ],
+    "api_hash": "2b41c37590ae19da",
+    "index_match": true,
+    "cols_match": true,
+    "hash_match": false,
+    "shape_match": false,
+    "cols_only_rep": [],
+    "cols_only_api": [],
+    "idx_only_rep": [],
+    "idx_only_api": [],
+    "dtype_diffs": {
+      "date": {
+        "rep": "datetime64[ns]",
+        "api": "datetime64[us]"
+      }
+    },
+    "rows_common": 21130,
+    "rows_only_rep": 3134,
+    "rows_only_api": 255,
+    "sample_mad": {},
+    "status": "CONTENT_DRIFT"
+  },
+  "locality": {
+    "feature": "locality",
+    "rep_shape": [
+      24362,
+      1
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m"
+    ],
+    "rep_cols": [
+      "v"
+    ],
+    "rep_hash": "a994f5b8b26dfe2f",
+    "method_name": "locality",
+    "notes": "deprecated",
+    "kwargs_used": "market='Region'",
+    "api_shape": [
+      24362,
+      1
+    ],
+    "api_index": [
+      "i",
+      "t",
+      "m"
+    ],
+    "api_cols": [
+      "Parish"
+    ],
+    "api_hash": "281510f25b1dcb65",
+    "index_match": true,
+    "cols_match": false,
+    "hash_match": false,
+    "shape_match": true,
+    "cols_only_rep": [
+      "v"
+    ],
+    "cols_only_api": [
+      "Parish"
+    ],
+    "idx_only_rep": [],
+    "idx_only_api": [],
+    "dtype_diffs": {},
+    "status": "SCHEMA_DRIFT"
+  },
+  "nutrition": {
+    "feature": "nutrition",
+    "rep_shape": [
+      24166,
+      15
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m"
+    ],
+    "rep_cols": [
+      "Calcium",
+      "Carbohydrate",
+      "Energy",
+      "Fiber",
+      "Folate",
+      "Iron",
+      "Niacin",
+      "Protein",
+      "Riboflavin",
+      "Thiamin",
+      "Vitamin A",
+      "Vitamin B-12",
+      "Vitamin B-6",
+      "Vitamin C",
+      "Zinc"
+    ],
+    "rep_hash": "581910f89ad78d43",
+    "method_name": "nutrition",
+    "notes": "",
+    "kwargs_used": "market='Region'",
+    "status": "API_ERROR",
+    "error": "Could not materialize Uganda/nutrition: no wave-level build succeeded and no cached parquet was found at /global/home/users/ligon/.local/share/lsms_library/Uganda/var/nutrition.parquet.\n\nCommon causes:\n  - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;\n  - LSMS_DATA_DIR points to an empty or stale cache location;\n  - DVC credentials are missing or misconfigured;\n  - the raw .dta source files have not been dvc-pulled.\n\nSee README.org for supported install and data-access patterns.",
+    "api_shape": null,
+    "api_index": null,
+    "api_cols": null,
+    "api_hash": null
+  },
+  "other_features": {
+    "feature": "other_features",
+    "rep_shape": [
+      24362,
+      1
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m"
+    ],
+    "rep_cols": [
+      "Rural"
+    ],
+    "rep_hash": "345f9346d6ae2abf",
+    "method_name": null,
+    "notes": "deprecated/removed",
+    "kwargs_used": "{}",
+    "status": "NO_API",
+    "api_shape": null,
+    "api_index": null,
+    "api_cols": null,
+    "api_hash": null,
+    "index_match": null,
+    "cols_match": null,
+    "hash_match": null,
+    "shape_match": null
+  },
+  "people_last7days": {
+    "feature": "people_last7days",
+    "rep_shape": [
+      15402,
+      4
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m"
+    ],
+    "rep_cols": [
+      "Boys",
+      "Girls",
+      "Men",
+      "Women"
+    ],
+    "rep_hash": "3ef74fafac299cf0",
+    "method_name": "people_last7days",
+    "notes": "in data_scheme",
+    "kwargs_used": "market='Region'",
+    "status": "API_ERROR",
+    "error": "'Country' object has no attribute 'other_features'",
+    "api_shape": null,
+    "api_index": null,
+    "api_cols": null,
+    "api_hash": null
+  },
+  "shocks": {
+    "feature": "shocks",
+    "rep_shape": [
+      14457,
+      11
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m"
+    ],
+    "rep_cols": [
+      "Duration",
+      "EffectedAssets",
+      "EffectedConsumption",
+      "EffectedIncome",
+      "EffectedProduction",
+      "HowCoped0",
+      "HowCoped1",
+      "HowCoped2",
+      "Onset",
+      "Shock",
+      "Year"
+    ],
+    "rep_hash": "c8e438403607118c",
+    "method_name": "shocks",
+    "notes": "",
+    "kwargs_used": "market='Region'",
+    "status": "API_TIMEOUT",
+    "error": "Timed out after 180s",
+    "api_shape": null,
+    "api_index": null,
+    "api_cols": null,
+    "api_hash": null
+  }
+}

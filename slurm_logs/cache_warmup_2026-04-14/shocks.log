@@ -1,0 +1,3 @@
+[shocks] OK shape=(14456, 10) index=['i', 't', 'm', 'Shock'] cols=['Year', 'Onset', 'Duration', 'AffectedIncome', 'AffectedAssets', 'AffectedProduction', 'AffectedConsumption', 'HowCoped0']
+[shocks] dtypes={'Year': Float64Dtype(), 'Onset': Float64Dtype(), 'Duration': dtype('float64'), 'AffectedIncome': BooleanDtype, 'AffectedAssets': BooleanDtype, 'AffectedProduction': BooleanDtype, 'AffectedConsumption': BooleanDtype, 'HowCoped0': <StringDtype(na_value=<NA>)>, 'HowCoped1': <StringDtype(na_value=<NA>)>, 'HowCoped2': <StringDtype(na_value=<NA>)>}
+[shocks] wall=6373s

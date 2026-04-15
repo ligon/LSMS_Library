@@ -1,0 +1,3 @@
+[earnings] OK shape=(48477, 2) index=['i', 't', 'm'] cols=['level_1', 'earnings']
+[earnings] dtypes={'level_1': <StringDtype(na_value=nan)>, 'earnings': Float64Dtype()}
+[earnings] wall=3245s

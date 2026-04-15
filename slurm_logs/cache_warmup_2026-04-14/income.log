@@ -1,0 +1,3 @@
+[income] OK shape=(13927, 1) index=['i', 't', 'm'] cols=['income']
+[income] dtypes={'income': Float64Dtype()}
+[income] wall=3768s

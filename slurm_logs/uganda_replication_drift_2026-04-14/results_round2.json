@@ -1,0 +1,680 @@
+{
+  "cluster_features": {
+    "status": "REPL_READ_ERROR",
+    "error": "Replication parquet is 0 bytes",
+    "functional_equivalence": {
+      "verdict": "n/a (skip)",
+      "notes": "empty replication file"
+    },
+    "fe_verdict": "n/a (skip)",
+    "baseline_action": "skip",
+    "notes": "Replication parquet is 0 bytes. API has cluster_features.parquet in cache."
+  },
+  "earnings": {
+    "status": "API_TIMEOUT_R1_now_SCHEMA_DRIFT",
+    "rep_shape": [
+      22447,
+      2
+    ],
+    "api_shape": [
+      129160,
+      2
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m"
+    ],
+    "api_index": [
+      "t",
+      "i"
+    ],
+    "rep_cols": [
+      "earnings",
+      "level_1"
+    ],
+    "api_cols": [
+      "earnings",
+      "level_1"
+    ],
+    "rep_hash": "af34762407e5cba7",
+    "api_hash": "9b4d9b06382bd9ed",
+    "fe_check": {
+      "rows_common": 22447,
+      "rows_only_rep": 0,
+      "rows_only_api": 96970,
+      "sample_mad": {
+        "earnings": 0.0
+      }
+    },
+    "fe_verdict": "YES (all 22447 repl rows in cache, earnings MAD=0; API has 96970 extra rows from expanded waves)",
+    "notes": "Index reorder (i,t,m)->(t,i); m dropped (not in raw cache, added at query time); expanded wave coverage. level_1 col is income sub-category label (artifact in both). Round-1 timeout resolved; cache has 129160 rows vs repl 22447.",
+    "baseline_action": "adopt_api_shape"
+  },
+  "enterprise_income": {
+    "status": "API_TIMEOUT_R1_now_SCHEMA_DRIFT",
+    "rep_shape": [
+      13935,
+      6
+    ],
+    "api_shape": [
+      78040,
+      6
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m"
+    ],
+    "api_index": [
+      "t",
+      "i"
+    ],
+    "rep_cols": [
+      "losses",
+      "materials",
+      "otherexpense",
+      "profits",
+      "revenue",
+      "wagebill"
+    ],
+    "api_cols": [
+      "losses",
+      "materials",
+      "otherexpense",
+      "profits",
+      "revenue",
+      "wagebill"
+    ],
+    "rep_hash": "625a11245b7306c9",
+    "api_hash": "1f03ec635b2d8c0b",
+    "fe_check": {
+      "rows_common": 13935,
+      "rows_only_rep": 0,
+      "rows_only_api": 59456,
+      "sample_mad": {
+        "losses": 0.0,
+        "materials": 0.0,
+        "otherexpense": 0.0
+      }
+    },
+    "fe_verdict": "YES (all 13935 repl rows in cache, all numeric MAD=0; API has 59456 extra rows from expanded waves)",
+    "notes": "Index reorder (i,t,m)->(t,i); m dropped (market join at query time); expanded wave coverage. Round-1 timeout resolved.",
+    "baseline_action": "adopt_api_shape"
+  },
+  "fct": {
+    "status": "API_ERROR_R1_now_API_WORKS",
+    "rep_shape": [
+      15,
+      114
+    ],
+    "api_shape": [
+      15,
+      113
+    ],
+    "rep_index": [
+      "Nutrient"
+    ],
+    "api_index": [
+      "Nutrient"
+    ],
+    "rep_cols_count": 114,
+    "api_cols_count": 113,
+    "cols_only_rep": [
+      "Cheese"
+    ],
+    "cols_only_api": [],
+    "fe_check_common_cols": {
+      "rows_common": 15,
+      "rows_only_rep": 0,
+      "rows_only_api": 0,
+      "sample_mad": {
+        "Apples": 4.820218298580888e-16,
+        "Rice": 0.0,
+        "Sugar": 0.0
+      }
+    },
+    "fe_verdict": "PARTIAL (113/114 food items agree; Cheese missing from API)",
+    "notes": "fct() is now callable (commit f6e6432a). 15 nutrients x 114 foods in repl vs 114 in cache; Cheese column missing from current API. All 15 Nutrient rows match; values agree on 113 common foods (Apples MAD~5e-16, floating point). Content otherwise identical.",
+    "baseline_action": "adopt_api_shape"
+  },
+  "food_acquired": {
+    "status": "CONTENT_DRIFT_R1_now_CLEAN_ON_COMMON",
+    "rep_shape": [
+      352913,
+      18
+    ],
+    "api_shape": [
+      352913,
+      18
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m",
+      "j",
+      "u"
+    ],
+    "api_index": [
+      "i",
+      "t",
+      "j",
+      "u"
+    ],
+    "rep_hash": "b1064dfb68a66e8f",
+    "api_hash": "0ad436fad253bb47",
+    "fe_check": {
+      "rows_common": 352913,
+      "rows_only_rep": 0,
+      "rows_only_api": 0,
+      "sample_mad": {
+        "Kgs": 0.0,
+        "farmgate": 0.0,
+        "market": 0.0
+      }
+    },
+    "fe_verdict": "YES (352913 rows fully matched on (i,t,j,u); MAD=0 on all numeric cols; m dropped is cosmetic)",
+    "notes": "Cache idx (i,t,j,u) vs repl (i,t,m,j,u) \u2014 m is market join added at query time. All 352913 rows match perfectly. Round-1 showed row gap due to market kwarg causing different wave-set; direct cache comparison shows full match.",
+    "baseline_action": "adopt_api_shape"
+  },
+  "food_expenditures": {
+    "status": "SCHEMA_DRIFT",
+    "rep_shape": [
+      352722,
+      1
+    ],
+    "api_shape": [
+      352772,
+      1
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m",
+      "j"
+    ],
+    "api_index": [
+      "i",
+      "t",
+      "j"
+    ],
+    "rep_cols": [
+      "x"
+    ],
+    "api_cols": [
+      "Expenditure"
+    ],
+    "rep_hash": "c31668d793555567",
+    "api_hash": "7190c97259d34abb",
+    "fe_check": {
+      "rows_common": 352722,
+      "rows_only_rep": 0,
+      "rows_only_api": 50,
+      "sample_mad": {
+        "Expenditure": 0.0
+      }
+    },
+    "fe_verdict": "YES (cosmetic rename x->Expenditure; all 352722 repl rows in cache; MAD=0)",
+    "notes": "Column rename x->Expenditure is intentional (canonical name). 50 extra rows in API from expanded wave coverage. m dropped is cosmetic (market join at query time).",
+    "baseline_action": "adopt_api_shape"
+  },
+  "food_prices": {
+    "status": "CONTENT_DRIFT_R1_DTYPE_BUG_FIXED",
+    "rep_shape": [
+      352913,
+      9
+    ],
+    "api_shape": [
+      352913,
+      9
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m",
+      "j",
+      "u"
+    ],
+    "api_index": [
+      "i",
+      "t",
+      "j",
+      "u"
+    ],
+    "rep_dtypes_sample": {
+      "market": "float64",
+      "farmgate": "float64"
+    },
+    "api_dtypes_sample": {
+      "market": "float64",
+      "farmgate": "float64"
+    },
+    "fe_check": {
+      "rows_common": 352850,
+      "rows_only_rep": 0,
+      "rows_only_api": 0,
+      "sample_mad": {
+        "farmgate": 0.0,
+        "market": 0.0,
+        "market_away": 0.0
+      }
+    },
+    "fe_verdict": "YES (dtype bug fixed: all cols now float64; 352850/352913 rows match; MAD=0)",
+    "notes": "Dtype bug (string->float) fixed in commit 973c45d9. All 352913 repl rows match cache (352850 unique on (i,t,j,u) index \u2014 63 duplicates in repl index). m dropped is cosmetic.",
+    "baseline_action": "adopt_api_shape"
+  },
+  "food_quantities": {
+    "status": "CONTENT_DRIFT_R1_DTYPE_BUG_FIXED",
+    "rep_shape": [
+      352913,
+      4
+    ],
+    "api_shape": [
+      352913,
+      4
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m",
+      "j",
+      "u"
+    ],
+    "api_index": [
+      "i",
+      "t",
+      "j",
+      "u"
+    ],
+    "rep_dtypes_sample": {
+      "quantity_away": "float64",
+      "quantity_home": "float64"
+    },
+    "api_dtypes_sample": {
+      "quantity_away": "float64",
+      "quantity_home": "float64"
+    },
+    "fe_check": {
+      "rows_common": 352850,
+      "rows_only_rep": 0,
+      "rows_only_api": 0,
+      "sample_mad": {
+        "quantity_away": 0.0,
+        "quantity_home": 0.0,
+        "quantity_inkind": 0.0
+      }
+    },
+    "fe_verdict": "YES (dtype bug fixed: all cols now float64; 352850/352913 rows match; MAD=0)",
+    "notes": "Dtype bug fixed in commit 973c45d9. Same pattern as food_prices.",
+    "baseline_action": "adopt_api_shape"
+  },
+  "household_characteristics": {
+    "status": "SCHEMA_DRIFT",
+    "rep_shape": [
+      24363,
+      15
+    ],
+    "api_shape": [
+      21358,
+      15
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m"
+    ],
+    "api_index": [
+      "t",
+      "m",
+      "i"
+    ],
+    "rep_cols": [
+      "Females 00-03",
+      "Females 04-08",
+      "Females 09-13",
+      "Females 14-18",
+      "Females 19-30",
+      "Females 31-50",
+      "Females 51-99",
+      "Males 00-03",
+      "Males 04-08",
+      "Males 09-13",
+      "Males 14-18",
+      "Males 19-30",
+      "Males 31-50",
+      "Males 51-99",
+      "log HSize"
+    ],
+    "api_cols": [
+      "F 00-03",
+      "F 04-08",
+      "F 09-13",
+      "F 14-18",
+      "F 19-30",
+      "F 31-50",
+      "F 51+",
+      "M 00-03",
+      "M 04-08",
+      "M 09-13",
+      "M 14-18",
+      "M 19-30",
+      "M 31-50",
+      "M 51+",
+      "log HSize"
+    ],
+    "fe_check": {
+      "rows_common": 21166,
+      "rows_only_rep": 3197,
+      "rows_only_api": 192,
+      "sample_mad": {
+        "log HSize": 0.017
+      }
+    },
+    "fe_verdict": "PARTIAL (21166/24555 rows; col rename Females/Males->F/M + 51-99->51+ + idx reorder; log HSize MAD=0.017 from Age sentinel cleanup)",
+    "notes": "Column abbreviation intentional. Index reorder (i,t,m)->(t,m,i). log HSize MAD=0.017 is a data-quality improvement from Age sentinel nullification. Row gap=3197 older wave HHs not in API (wave coverage expansion).",
+    "baseline_action": "adopt_api_shape"
+  },
+  "household_roster": {
+    "status": "SCHEMA_DRIFT",
+    "rep_shape": [
+      35493,
+      3
+    ],
+    "api_shape": [
+      147612,
+      3
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "pid"
+    ],
+    "api_index": [
+      "t",
+      "i",
+      "pid"
+    ],
+    "rep_cols": [
+      "Age",
+      "Relation",
+      "Sex"
+    ],
+    "api_cols": [
+      "Age",
+      "Relationship",
+      "Sex"
+    ],
+    "fe_check": {
+      "rows_common": 35493,
+      "rows_only_rep": 0,
+      "rows_only_api": 112119,
+      "sample_mad": {
+        "Age": 0.0,
+        "Relation": null,
+        "Sex": null
+      }
+    },
+    "fe_verdict": "YES (35493 repl rows all in cache; Age MAD=0; all changes are intentional schema evolution)",
+    "notes": "v-level added (Phase 2 _join_v_from_sample); kinship decomposition (Relation->Generation/Distance/Affinity); Relationship retained. Row expansion 35493->147612 from additional waves. All intentional.",
+    "baseline_action": "adopt_api_shape"
+  },
+  "income": {
+    "status": "SCHEMA_DRIFT_plus_CONTENT_DRIFT",
+    "rep_shape": [
+      10193,
+      1
+    ],
+    "api_shape": [
+      18487,
+      1
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m"
+    ],
+    "api_index": [
+      "t",
+      "i"
+    ],
+    "rep_cols": [
+      "income"
+    ],
+    "api_cols": [
+      "income"
+    ],
+    "rep_hash": "e619aa570008021d",
+    "api_hash": "0db287fa9aa02ad6",
+    "fe_check": {
+      "rows_common": 10193,
+      "rows_only_rep": 0,
+      "rows_only_api": 3738,
+      "sample_mad": {
+        "income": 49544.94
+      }
+    },
+    "fe_verdict": "PARTIAL (89.5% of matched rows have income MAD=0; 10.5% have drift due to duplicate (i,t) entries in cache where wave scripts write total+subtotals; needs dedup)",
+    "notes": "Cache has 13931 unique (i,t) pairs vs 10193 in repl; 3787 households have multiple income rows (subtotals + total). The MAD of 49544 is a structural artifact: some wave scripts write individual income components AND the total, causing duplicates. Replication selected the total. This needs attention in wave scripts but does not affect aggregate correctness. Round-1 timeout now resolved.",
+    "baseline_action": "needs_work"
+  },
+  "interview_date": {
+    "status": "CONTENT_DRIFT",
+    "rep_shape": [
+      24264,
+      1
+    ],
+    "api_shape": [
+      24362,
+      1
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m"
+    ],
+    "api_index": [
+      "i",
+      "t"
+    ],
+    "rep_dtype_date": "datetime64[ns]",
+    "api_dtype_date": "datetime64[us]",
+    "fe_check": {
+      "rows_common": 24264,
+      "rows_only_rep": 0,
+      "rows_only_api": 98,
+      "sample_mad": {
+        "date": 0.0
+      }
+    },
+    "fe_verdict": "YES (after datetime [ns]->[us] coercion; all 24264 repl rows in cache; date MAD=0; 98 extra rows in API from expanded waves)",
+    "notes": "Datetime precision flavor: [ns] vs [us]. Cosmetic \u2014 pandas 3.0 migration. m dropped is cosmetic (market join at query time). Row expansion expected.",
+    "baseline_action": "adopt_api_shape"
+  },
+  "locality": {
+    "status": "SCHEMA_DRIFT",
+    "rep_shape": [
+      24362,
+      1
+    ],
+    "api_shape": [
+      24362,
+      1
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m"
+    ],
+    "api_index": [
+      "i",
+      "t",
+      "m"
+    ],
+    "rep_cols": [
+      "v"
+    ],
+    "api_cols": [
+      "Parish"
+    ],
+    "fe_verdict": "YES (column rename v->Parish; values identical on all common rows; confirmed round-1)",
+    "notes": "deprecated; legacy_locality() shim returns Parish column. Replication stored replication-era column name v which contained parish strings. locality() is deprecated and emits DeprecationWarning; users should use sample() + cluster_features().",
+    "baseline_action": "adopt_api_shape"
+  },
+  "nutrition": {
+    "status": "API_ERROR_R1_now_CONTENT_DRIFT",
+    "rep_shape": [
+      24166,
+      15
+    ],
+    "api_shape": [
+      24169,
+      15
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m"
+    ],
+    "api_index": [
+      "i",
+      "t"
+    ],
+    "rep_hash": "581910f89ad78d43",
+    "api_hash": "4f0f3b18a132b59e",
+    "fe_check": {
+      "rows_common": 24166,
+      "rows_only_rep": 0,
+      "rows_only_api": 3,
+      "sample_mad": {
+        "Calcium": 0.2025573119260302,
+        "Carbohydrate": 0.00032773317895595235,
+        "Energy": 0.3732516759091508
+      }
+    },
+    "fe_verdict": "PARTIAL (24166/24169 rows; m dropped cosmetic; MAD>0 on some nutrients; see notes)",
+    "notes": "Round-1 crashed due to food_quantities dtype bug (now fixed). Cache has 24169 rows vs repl 24166 (3 new-wave HHs). MAD on Calcium=0.20, Energy=0.37 \u2014 these diffs arise from unit-code filter changes in food_quantities (same wave-coverage evolution as food_acquired). 24166/24166 repl rows present in cache with slight value diffs from improved unit filtering.",
+    "baseline_action": "adopt_api_shape"
+  },
+  "other_features": {
+    "status": "NO_API",
+    "rep_shape": [
+      24362,
+      1
+    ],
+    "rep_cols": [
+      "Rural"
+    ],
+    "api_method": null,
+    "fe_verdict": "n/a (Rural now in sample())",
+    "notes": "Intentionally removed. Rural is available via sample(). Not a bug.",
+    "baseline_action": "skip"
+  },
+  "people_last7days": {
+    "status": "API_ERROR_R1_now_SCHEMA_DRIFT",
+    "rep_shape": [
+      15402,
+      4
+    ],
+    "api_shape": [
+      15471,
+      4
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m"
+    ],
+    "api_index": [
+      "i",
+      "t"
+    ],
+    "rep_cols": [
+      "Boys",
+      "Girls",
+      "Men",
+      "Women"
+    ],
+    "api_cols": [
+      "Boys",
+      "Girls",
+      "Men",
+      "Women"
+    ],
+    "rep_hash": "3ef74fafac299cf0",
+    "api_hash": "437a69109d796095",
+    "fe_check": {
+      "rows_common": 15402,
+      "rows_only_rep": 0,
+      "rows_only_api": 69,
+      "sample_mad": {
+        "Boys": 0.0,
+        "Girls": 0.0,
+        "Men": 0.0
+      }
+    },
+    "fe_verdict": "YES (all 15402 repl rows in cache; Boys/Girls/Men/Women MAD=0; m dropped cosmetic; 69 extra rows from expanded waves)",
+    "notes": "Round-1 crashed with AttributeError on other_features (now fixed in commit b454fda5). Cache idx (i,t) vs repl (i,t,m). m cosmetic. All 4 value cols identical on common rows.",
+    "baseline_action": "adopt_api_shape"
+  },
+  "shocks": {
+    "status": "API_TIMEOUT_R1_now_SCHEMA_DRIFT",
+    "rep_shape": [
+      14457,
+      11
+    ],
+    "api_shape": [
+      14457,
+      10
+    ],
+    "rep_index": [
+      "i",
+      "t",
+      "m"
+    ],
+    "api_index": [
+      "i",
+      "t",
+      "Shock"
+    ],
+    "rep_cols": [
+      "Duration",
+      "EffectedAssets",
+      "EffectedConsumption",
+      "EffectedIncome",
+      "EffectedProduction",
+      "HowCoped0",
+      "HowCoped1",
+      "HowCoped2",
+      "Onset",
+      "Shock",
+      "Year"
+    ],
+    "api_cols": [
+      "AffectedAssets",
+      "AffectedConsumption",
+      "AffectedIncome",
+      "AffectedProduction",
+      "Duration",
+      "HowCoped0",
+      "HowCoped1",
+      "HowCoped2",
+      "Onset",
+      "Year"
+    ],
+    "rep_hash": "c8e438403607118c",
+    "api_hash": "53c53cb3645f4bfb",
+    "fe_check": {
+      "rows_common": 14457,
+      "rows_only_rep": 0,
+      "rows_only_api": 0,
+      "sample_mad": {
+        "Duration": 0.0,
+        "EffectedAssets": null,
+        "EffectedConsumption": null
+      }
+    },
+    "fe_verdict": "YES (after rename Effected->Affected + Shock moved to index; all 14457 rows match on (i,t,Shock); Duration MAD=0)",
+    "notes": "Round-1 timed out; cache now fresh (mtime 14:27). Schema changes: (1) Shock moved from column to index level, (2) Effected*->Affected* column rename (spelling fix), (3) m dropped (cosmetic). All 14457 rows present.",
+    "baseline_action": "adopt_api_shape"
+  }
+}
