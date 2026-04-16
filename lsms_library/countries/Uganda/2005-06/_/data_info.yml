@@ -10,6 +10,7 @@ household_roster:
         Sex: h2q4
         Relationship: h2q5
         Age: h2q9
+        MonthsSpent: h2q6
 
 people_last7days:
     file: GSEC14.dta
