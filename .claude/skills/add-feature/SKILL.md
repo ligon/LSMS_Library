@@ -63,6 +63,8 @@ Note:
 - **Column names and types** — e.g., `Sex: str`, `Age: int`, `Relation: str`
 - The feature name itself (e.g., `household_roster`, `earnings`, `assets`)
 
+**For `household_roster` specifically:** in addition to the core columns (`Sex`, `Age`, `Relationship`), look for a residence-duration variable in the same source file. Most LSMS surveys ask either "how many months did [NAME] live here in the past 12 months?" (→ `MonthsSpent`) or "how many months was [NAME] away?" (→ `MonthsAway`). Some use weeks instead of months (→ `WeeksAway`). EHCVM 2018-19 surveys have a binary version (s01q12, "lived continuously 6+ months?" → map Oui/Non to MonthsSpent 12/0). Add whichever is available — `roster_to_characteristics()` in `transformations.py` handles all three names and applies an automatic presence filter for `household_characteristics` derivation. See CLAUDE.md "MonthsSpent / MonthsAway / WeeksAway" for the full mapping.
+
 Also read 1-2 of the reference country's `data_info.yml` files to see how the raw variable mappings work:
 ```
 lsms_library/countries/Uganda/{wave}/_/data_info.yml
