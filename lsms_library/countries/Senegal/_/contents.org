@@ -12,3 +12,23 @@ Brief table of contents and todo list.
 ** DONE other_features.py
 ** DONE household_characteristics.py
 ** DONE food_acquired.py
+
+* Household Presence / MonthsSpent
+
+The EHCVM questionnaire (used in the 2018-19 and 2021-22 waves) does
+NOT ask "How many months did [NAME] live here in the past 12 months?"
+(the continuous MonthsSpent/MonthsAway variable available in Uganda,
+Ethiopia, Tanzania, Malawi, and many other LSMS countries).  Instead,
+EHCVM uses two binary eligibility filters:
+
+- =s01q12= :: "Has [NAME] lived continuously in this household for at
+  least 6 months?"
+- =s01q13= :: "Does [NAME] intend to stay at least 6 months?"
+
+These determine membership eligibility but do not give a continuous
+duration measure.  Downstream analysts who need a presence filter for
+=household_characteristics= should use these binary variables directly
+rather than expecting a =MonthsSpent= column in =household_roster()=.
+
+Senegal has no pre-EHCVM waves in the library, so no continuous
+months-of-presence variable is available for any wave.
