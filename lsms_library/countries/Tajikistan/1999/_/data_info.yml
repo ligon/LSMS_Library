@@ -23,7 +23,8 @@ household_roster:
                 4.0: living apart but not divorced
                 5.0: widow/widower
                 6.0: never married
-        Relationship: 
+        MonthsAway: s1q9
+        Relationship:
             - s1q3
             - mapping:
                 1.0: head

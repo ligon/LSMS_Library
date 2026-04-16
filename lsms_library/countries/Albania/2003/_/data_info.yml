@@ -52,3 +52,5 @@ household_roster:
                 father - mother in law: Father/Mother in law
                 other relative: Other relative
                 not related: Not related
+
+        MonthsAway: B1_Q08

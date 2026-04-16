@@ -34,3 +34,4 @@ household_roster:
         Age: agey
         Birthplace: s1q10
         Relationship: rel
+        MonthsAway: s1q21

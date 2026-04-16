@@ -24,7 +24,8 @@ household_roster:
                 5.0: widow/widower
                 6.0: single
                 7.0: other
-        Relationship: 
+        MonthsAway: m1q8
+        Relationship:
             - m1q4
             - mapping:
                 'Ãëàâà äîìîõîçÿéñòâà': head

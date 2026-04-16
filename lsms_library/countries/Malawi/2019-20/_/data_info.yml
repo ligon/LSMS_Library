@@ -86,6 +86,7 @@ household_roster:
         Sex: hh_b03
         Age: hh_b05a
         Relationship: hh_b04
+        MonthsAway: hh_b07
 
 
 individual_education:

@@ -51,6 +51,7 @@ household_roster:
                 1: Male
                 2: Female
         Age: agey
+        MonthsAway: mosabs
         Marital:
             - mar
             - mapping:

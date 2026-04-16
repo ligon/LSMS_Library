@@ -12,6 +12,7 @@ household_roster:
                 1: M
                 2: F
         Age: age
+        MonthsSpent: monhh
         Relationship:
             - relhead
             - mapping:

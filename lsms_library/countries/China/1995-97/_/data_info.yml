@@ -37,6 +37,7 @@ household_roster:
                 8: Other relative
                 9: Non-relative
         Age: s01a208
+        MonthsAway: s01a212
 
 cluster_features:
     file:

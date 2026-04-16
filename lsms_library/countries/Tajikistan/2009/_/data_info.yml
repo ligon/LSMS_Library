@@ -23,6 +23,7 @@ household_roster:
                 'WIDOW/ER': widow/er
                 'SINGLE': single
                 'OTHER': other
+        MonthsAway: M1Q15
         Relationship:
             - M1Q5
             - mapping:

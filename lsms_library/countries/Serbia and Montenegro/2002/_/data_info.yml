@@ -25,6 +25,7 @@ household_roster:
         Age: starost
         Relationship: a2
         Sex: a1
+        MonthsSpent: mesecpri
 
 sample:
     file: "../Data/2002 incomeconsumption.dta"

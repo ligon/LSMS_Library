@@ -45,6 +45,7 @@ household_roster:
       Sex: v01a02
       Age: v01a04
       Relationship: v01a03
+      MonthsSpent: v01a10
       Educational Attainment: v01a05
 employment:
   file:

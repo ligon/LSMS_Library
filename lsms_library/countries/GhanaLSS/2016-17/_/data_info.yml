@@ -36,5 +36,4 @@ household_roster:
         Age: s1q5y
         Birthplace: s1q11
         Relationship: s1q3
-
-
+        MonthsAway: s1q22

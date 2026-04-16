@@ -25,6 +25,7 @@ household_roster:
         Age: brojgod
         Relationship: a2
         Sex: a1
+        MonthsSpent: mes
 
 sample:
     file: "../Data/2003 incomeconsumption.dta"

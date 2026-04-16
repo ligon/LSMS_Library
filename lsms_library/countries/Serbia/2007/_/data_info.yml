@@ -23,6 +23,7 @@ household_roster:
         Sex: pol
         Relationship: srodstvo
         Age: starost
+        MonthsSpent: prisustvo
 
 sample:
     dfs:

@@ -27,7 +27,5 @@ household_roster:
         Age: AGEY
         Birthplace: REGION
         Relationship: REL
-
-
-
+        MonthsAway: MON
 

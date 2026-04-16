@@ -28,6 +28,7 @@ household_roster:
         Sex: hh_b02
         Age: hh_b04
         Relationship: hh_b05
+        MonthsAway: hh_b10
 
 shocks:
     file: hh_sec_r.dta

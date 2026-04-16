@@ -45,3 +45,5 @@ household_roster:
                 12: Father/Mother in law
                 13: Other relative
                 14: Not related
+
+        MonthsAway: m1a_q09

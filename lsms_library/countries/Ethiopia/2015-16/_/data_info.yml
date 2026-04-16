@@ -61,6 +61,7 @@ household_roster:
         Sex: hh_s1q03
         Age: hh_s1q04a
         Relationship: hh_s1q02
+        MonthsAway: hh_s1q05
 
 shocks:
     file: sect8_hh_w3.dta

@@ -11,6 +11,7 @@ household_roster:
         Relationship: S2_2
         Sex: S2_3
         Age: S2_5
+        MonthsSpent: S2_7
 
 cluster_features:
     file:

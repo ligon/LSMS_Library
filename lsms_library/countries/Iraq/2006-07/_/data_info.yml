@@ -83,3 +83,4 @@ household_roster:
         Relationship: q0105
         Sex: q0102
         Age: q0103
+        MonthsAway: q0113

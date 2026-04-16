@@ -107,8 +107,18 @@ def roster_to_characteristics(df, age_cuts=(0,4,9,14,19,31,51), drop = 'pid', fi
     # This matches the replication's lsms.tools.get_household_roster
     # which did dropna(how='any') on [HHID, sex, age, months_spent],
     # plus the stricter exclusion of non-infant zero-month members.
+    # Resolve months of residence from whichever column is available.
+    # Uganda uses MonthsSpent (months present, 0-12).  East African
+    # surveys (Ethiopia, Tanzania, Malawi) use MonthsAway (months
+    # absent, 0-12); convert to months-present for a uniform filter.
+    ms = None
     if 'monthsspent' in roster_df.columns:
         ms = pd.to_numeric(roster_df['monthsspent'], errors='coerce')
+    elif 'monthsaway' in roster_df.columns:
+        ma = pd.to_numeric(roster_df['monthsaway'], errors='coerce')
+        ms = 12 - ma
+        ms = ms.clip(lower=0)  # guard against >12 outliers
+    if ms is not None:
         age = pd.to_numeric(roster_df['age'], errors='coerce')
         keep = ms.notna() & ((ms > 0) | (age < 1))
         roster_df = roster_df[keep]
