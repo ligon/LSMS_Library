@@ -1,0 +1,165 @@
+#+TITLE: Session Handoff — 2026-04-15
+#+DATE: <2026-04-15 Wed>
+#+AUTHOR: scrum-master session (picking up after abrupt termination)
+
+* Session summary
+
+Session opened with "we seem to have had a session abruptly
+terminated — possible to pick up the pieces?"  Recovery was the
+first ~10 minutes of the session; the substantive work is follow-up
+on the Uganda API-vs-replication test failures triaged in
+=HANDOFF_2026-04-14_evening.org=.
+
+* Recovery
+
+The previous session on 2026-04-14 → 2026-04-15 made three commits
+to =development=, wrote ~9 hours of additional work after the last
+commit, then crashed at 14:58 today with a =reset: moving to master=
+that orphaned the three commits and stashed the uncommitted work.
+
+Actions taken:
+1. Located the 3 orphan commits in the reflog and the corresponding
+   =stash@{0}= (231-line WIP on =tests/test_uganda_api_vs_replication.py=
+   plus ~9 untracked files).
+2. Verified clean fast-forward path: =da7a42cc= (local dev tip) is an
+   ancestor of =a7087d61= (orphan tip), so =merge --ff-only= landed
+   all three cleanly.
+3. Pushed 5 commits to =origin/development= (includes the two
+   earlier-today Uganda fixes =7a679263= + =8bae8bad= that were also
+   local-only).
+4. Applied =stash@{0}= to restore the test refactor + diagnostic
+   scripts; dropped the stash.
+5. Deleted the safety branch =recover/2026-04-15= once =origin/development=
+   confirmed the commits were landed.
+
+Commits now on =origin/development=:
+
+| SHA         | Subject                                                         |
+|-------------+-----------------------------------------------------------------|
+| ~7a679263~  | fix(Uganda/income): collapse duplicate (t,i) rows               |
+| ~8bae8bad~  | test(Uganda): refresh invariance baseline (drift round 2)       |
+| ~4a70aa33~  | test(Uganda): add API-vs-replication functional-equivalence test + drift artifacts |
+| ~91bb77f8~  | docs(slurm_logs): preserve rescue/2026-04-14 diagnostic artifacts |
+| ~a7087d61~  | docs(slurm_logs): handoff + pytest log                          |
+
+Uncommitted at time of this note:
+- =tests/test_uganda_api_vs_replication.py=: 155+/76-.  Refactor to
+  =FeatureSpec= dataclass with =extra_keys=, =max_na_asym=,
+  =max_outliers=.  Already contains the Sex mapping, the
+  HSize max_na_asym=1, the Cheese max_outliers=2, and the
+  Shock extra_keys=('Shock',) fixes.
+- =slurm_logs/pytest_api_vs_replication_2026-04-15/=,
+  =slurm_logs/pytest_api_vs_replication_2026-04-15_rerun/=: pytest
+  logs from the refactored test file — first run got to 93% before
+  session death; rerun targeted =household_characteristics= and
+  failed with 1315/23574 rows out of tolerance (the "atol=0.02
+  isn't enough" surprise).
+- =slurm_logs/uganda_replication_drift_2026-04-14/diagnose.py= /
+  =diagnose.out=: completed earlier diagnostic.
+- =slurm_logs/uganda_replication_drift_2026-04-14/diagnose_hsize.py=:
+  second diagnostic (chasing the 1315-row drift).  Running at time
+  of this note; =.out= is 0 bytes because Python pipe-buffers when
+  stdout is a tee.
+
+* Compute state
+
+- Node: n0049.savio2 (24 cores, 62 GB RAM, 52 GB free)
+- Slurm job: 33421472 (single interactive "no-shell")
+- Account =fc_jevons=: 35,286 / 1,500,000 SUs used (2.35%).  No
+  budget pressure; plenty of headroom for any follow-up work.
+- No other queued / running jobs.
+
+=.venv= migrated via Option A (tar-pipe) at session start because
+the symlink was stale from the prior job's =/local/jobNNN=.  7:26
+wall-time, 922 MB payload.
+
+* Open threads (inherited from 2026-04-14 evening handoff)
+
+1. [ ] Confirm the root cause of the 1315-row =log HSize= drift in
+   =household_characteristics=.  Diagnostic running; hypothesis is
+   that =age_handler()= is recovering members the replication
+   dropped, so HSize on the API side is larger.  If true, fix =
+   bump =max_outliers= in the =household_characteristics= FeatureSpec
+   to cover 1315+ rows AND document in a =CONTENTS.org= or in-test
+   comment.
+
+2. [ ] Finish =shocks= Shock NaN mismatch triage — =diagnose.out=
+   from earlier today was cut short before dumping the 6 rows.  The
+   refactor already promotes Shock to an extra merge key; verify the
+   second pytest run covered it.
+
+3. [ ] Re-run the full parametrized test after whatever fix emerges
+   from (1).  Previous run stopped at 93% when the node died.
+
+4. [ ] Triage stale branches (deferred from 2026-04-14):
+   - =scrum-session-2026-04-13= :: already ancestor of development;
+     safe to delete.
+   - =rescue/2026-04-14= :: its commit =880e3537= has been preserved
+     via =91bb77f8=; safe to delete.
+   - =claude/fix-dvc-caching-docs-aokxr= :: 2 real commits (Niger
+     panel_ids +185, country.py +50, transformations.py +65) from
+     2026-04-11; stale but unique.  Needs user's judgment:
+     cherry-pick Niger panel fix, rebase + PR, or drop.
+
+5. [ ] Profile the 12-way market-join serialization (37 min plateau
+   under =market='Region'= across 12 concurrent pytest workers).
+   Deferred.
+
+* Branches / stashes at session start
+
+- =stash@{0}= (recovered and applied, then dropped) — was 231-line
+  test refactor
+- =stash@{1}= pre-existing WIP on master from 2026-04-13 (untouched)
+- =stash@{2}= pre-existing WIP on master from 2026-04-12 (untouched)
+
+* Pivot — wave-level L2 cache for YAML-path tables
+
+Diagnostic work on the 1315-row =log HSize= drift
+(=household_characteristics=) was pre-empted by a more systemic
+finding: the 43-min plateau under =market='Region'= across 12
+pytest-xdist workers is caused by =_market_lookup= iterating all 8
+Uganda waves calling wave-level =cluster_features()=.  Wave-level
+=cluster_features= is a YAML-path table and, per design, has no L2
+parquet cache — so every call runs the YAML grabber + reads the
+cover-page =.dta= via L1 (DVC SQLite).  12 workers × 8 waves =
+concurrent DVC-SQLite contention.
+
+User's design decision: extend L2 caching to wave-level YAML-path
+tables (pre-transform; same staleness semantics as country L2;
+=to_parquet= gets an =absolute_path= flag to suppress the call-
+stack heuristic).  Staleness detection is a v0.8.0 concern.
+
+** Patch (uncommitted at time of note)
+
+- =lsms_library/local_tools.py=: add =absolute_path=False= kwarg to
+  =to_parquet=; skip =_resolve_data_path= when set (13 LOC).
+- =lsms_library/country.py=, =Wave.grab_data=:
+  1. At top: gate on truthy =data_info= (YAML path).  Compute cache
+     path =data_root(country)/year/_/<request>.parquet=; if exists
+     and no =LSMS_NO_CACHE=, short-circuit to =pd.read_parquet=.
+  2. Before =return df= at the common tail: if data_info, not
+     =LSMS_NO_CACHE=, and not empty, =to_parquet(df, cache_path,
+     absolute_path=True)=.  Write failures warn but don't crash.
+  Total: 39 LOC added in =country.py=.
+
+Diff: =git diff lsms_library/country.py lsms_library/local_tools.py=.
+
+** Verification
+
+Functional probe =b2t50bwds= in flight at time of note:
+=Country('Uganda')['2015-16'].cluster_features()= called three
+times: cold, warm, =LSMS_NO_CACHE=1=.  Expected:
+cold > warm (parquet hit); =LSMS_NO_CACHE=1= forces full rebuild.
+
+** Open follow-ups once patch lands
+
+- Decide whether the 15-way pytest rerun on development confirms
+  the plateau collapse.
+- Resume =household_characteristics= =log HSize= investigation
+  (1315-row drift) — probably =age_handler()= recovering members.
+- Write-atomicity: current patch does =df.to_parquet(cache_path)=
+  directly, which is not atomic.  Two concurrent writers could
+  produce a truncated file.  Rare, but a =tmp-then-rename= guard
+  would be a cheap hardening.
+
+* Notes for next session

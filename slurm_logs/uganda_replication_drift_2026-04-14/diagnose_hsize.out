@@ -1,0 +1,21 @@
+
+==============================================================================
+  household_characteristics: log HSize outlier rows
+==============================================================================
+API shape=(23768, 15)  index=['t', 'm', 'i']
+REPL shape=(24363, 15)  index=['i', 't', 'm']
+Merge on: ['i', 't', 'm']
+Traceback (most recent call last):
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/slurm_logs/uganda_replication_drift_2026-04-14/diagnose_hsize.py", line 132, in <module>
+    main()
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/slurm_logs/uganda_replication_drift_2026-04-14/diagnose_hsize.py", line 64, in main
+    a = api.reset_index()[common + ["HSize", "log HSize"]]
+        ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/pandas/core/frame.py", line 4384, in __getitem__
+    indexer = self.columns._get_indexer_strict(key, "columns")[1]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/pandas/core/indexes/base.py", line 6302, in _get_indexer_strict
+    self._raise_if_missing(keyarr, indexer, axis_name)
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/pandas/core/indexes/base.py", line 6355, in _raise_if_missing
+    raise KeyError(f"{not_found} not in index")
+KeyError: "['HSize'] not in index"

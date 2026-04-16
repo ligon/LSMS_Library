@@ -1,0 +1,43 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.6, pytest-8.4.2, pluggy-1.6.0 -- /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library
+configfile: pyproject.toml
+plugins: anyio-4.13.0, instafail-0.5.0, timeout-2.4.0, xdist-3.8.0, hydra-core-1.3.2
+timeout: 1800.0s
+timeout method: signal
+timeout func_only: False
+created: 6/6 workers
+6 workers [15 items]
+
+scheduling tests via LoadScheduling
+
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[interview_date] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[household_roster] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_expenditures] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[earnings] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[fct] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_quantities] 
+[gw1] [  6%] PASSED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[fct] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_acquired] 
+[gw4] [ 13%] PASSED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[household_roster] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[income] 
+[gw4] [ 20%] PASSED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[income] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[people_last7days] 
+[gw5] [ 26%] PASSED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[interview_date] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[locality] 
+[gw3] [ 33%] PASSED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_quantities] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[household_characteristics] 
+[gw5] [ 40%] PASSED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[locality] 
+[gw2] [ 46%] PASSED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_expenditures] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_prices] 
+[gw1] [ 53%] PASSED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_acquired] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[nutrition] 
+[gw0] [ 60%] PASSED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[earnings] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[enterprise_income] 
+[gw3] [ 66%] FAILED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[household_characteristics] 
+[gw0] [ 73%] PASSED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[enterprise_income] 
+[gw4] [ 80%] PASSED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[people_last7days] 
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[shocks] 
+[gw1] [ 86%] PASSED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[nutrition] 
+[gw2] [ 93%] PASSED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_prices] 

@@ -1,0 +1,33 @@
+
+==============================================================================
+  household_roster: Sex mismatch on all 35,493 rows
+==============================================================================
+API  dtypes on shared cols:
+Sex         string
+Relation    string
+Age          Int64
+
+REPL dtypes on shared cols:
+Sex          string
+Relation     string
+Age         float64
+
+Merged: 35493 rows on ['i', 't', 'pid']
+
+--- 'Sex'
+  api  dtype=string  sample head: ['F', 'F', 'M', 'M', 'M']
+  repl dtype=string  sample head: ['FEMALE', 'FEMALE', 'MALE', 'MALE', 'MALE']
+  api.astype(str).unique():  ['F', 'M']
+  repl.astype(str).unique(): ['FEMALE', 'MALE']
+  35493/35493 rows differ under .astype(str)
+
+==============================================================================
+  household_characteristics: log HSize 1-row NaN mismatch
+==============================================================================
+Total merged: 23575   NaN-mismatched: 1
+                  i        t        m  log HSize_api  log HSize_repl
+14441  H35301-04-01  2015-16  Central            0.0             NaN
+
+==============================================================================
+  shocks: Shock 6-row NaN mismatch
+==============================================================================
