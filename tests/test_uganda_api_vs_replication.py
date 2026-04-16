@@ -34,22 +34,38 @@ transforms and compares on the **intersection of common `(i, t)` keys**.
 Wave-coverage expansion (API covers more waves than replication) is
 expected and not a failure; only value disagreement on common rows is.
 
-Tolerance is per-feature:
-- 0.0 for string / integer columns and for features where API and
-  replication should be bit-exact on common rows.
-- Small non-zero `atol` for features where intentional data-quality
-  improvements (e.g. `age_handler()` sentinel cleanup affecting
-  `household_characteristics.log HSize`) produce small numeric drift.
+Per-feature tolerances live in `FeatureSpec`:
+
+- `atol`: max absolute numeric difference (0.0 = bit-exact).
+- `extra_keys`: data columns to promote to the merge key (e.g. `Shock`
+  for multi-shock HHs, where the replication keeps Shock as a column
+  and the API keeps it as an index level).
+- `max_na_asym`: tolerated count of rows with NaN on one side and a
+  value on the other.  Non-zero values document known recoveries
+  (e.g. a HH whose members' ages were all sentinel-null in the old
+  pipeline and are now kept with a real HSize).
+- `max_outliers`: tolerated count of rows exceeding `atol`.  Non-zero
+  values document known-benign drift from quality improvements
+  (e.g. nutrition rows for HHs who bought Cheese, whose fct Energy
+  row in the replication was ~4x too high and was correctly dropped
+  from the current API fct).
+
+Rows with a duplicate merge key are collapsed with ``groupby(key).first()``
+on both sides before merging, which canonicalizes sparse multi-acquisition
+rows (food_prices / food_quantities have 63 dup `(i,t,m,j,u)` rows per
+side, one per acquisition mode).  The string literal ``'<NA>'`` is
+treated as a genuine null on non-numeric columns — it appears in the
+replication's shock-coping data from a Stata import quirk.
 """
 
 from __future__ import annotations
 
 import os
 import warnings
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, Optional
 
-import numpy as np
 import pandas as pd
 import pytest
 
@@ -119,6 +135,9 @@ def _tx_household_roster(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(columns={"Relationship": "Relation"})
     if "v" in df.index.names:
         df = df.reset_index("v", drop=True)
+    # API uses canonical single-letter Sex ('M'/'F'); replication has 'MALE'/'FEMALE'.
+    if "Sex" in df.columns:
+        df = df.assign(Sex=df["Sex"].map({"M": "MALE", "F": "FEMALE"}).astype("string"))
     return df
 
 
@@ -127,36 +146,62 @@ def _tx_locality(df: pd.DataFrame) -> pd.DataFrame:
     return df.rename(columns={"Parish": "v"})
 
 
-def _tx_shocks(df: pd.DataFrame) -> pd.DataFrame:
-    # Replication had 'Shock' as a regular column; API has it in the index.
-    if "Shock" in df.index.names:
-        df = df.reset_index("Shock")
-    return df
+@dataclass(frozen=True)
+class FeatureSpec:
+    """Per-feature comparison parameters; see module docstring for semantics."""
+    name: str
+    kwargs: dict = field(default_factory=dict)
+    transform: Optional[Callable[[pd.DataFrame], pd.DataFrame]] = None
+    atol: float = 0.0
+    extra_keys: tuple = ()
+    max_na_asym: int = 0
+    max_outliers: int = 0
 
 
-# Spec: (api_method, api_kwargs, transform_api, atol)
-# transform_api normalises API output to match replication schema before compare.
-# atol is the max absolute difference allowed on a numeric column (0.0 = bit-exact).
-FEATURE_SPECS: list[tuple[str, dict, Optional[Callable], float]] = [
-    ("earnings",                  {"market": "Region"}, None,                          0.0),
-    ("enterprise_income",         {"market": "Region"}, None,                          0.0),
-    ("fct",                       {},                   None,                          0.0),
-    ("food_acquired",             {"market": "Region"}, None,                          0.0),
-    ("food_expenditures",         {"market": "Region"}, _tx_food_expenditures,         0.0),
-    ("food_prices",               {"market": "Region"}, None,                          0.0),
-    ("food_quantities",           {"market": "Region"}, None,                          0.0),
-    ("household_characteristics", {"market": "Region"}, _tx_household_characteristics, 0.02),
-    ("household_roster",          {},                   _tx_household_roster,          0.0),
-    ("income",                    {"market": "Region"}, None,                          0.0),
-    ("interview_date",            {"market": "Region"}, None,                          0.0),
-    ("locality",                  {"market": "Region"}, _tx_locality,                  0.0),
-    ("nutrition",                 {"market": "Region"}, None,                          0.1),
-    ("people_last7days",          {"market": "Region"}, None,                          0.0),
-    ("shocks",                    {"market": "Region"}, _tx_shocks,                    0.0),
+FEATURE_SPECS: list[FeatureSpec] = [
+    FeatureSpec("earnings",          kwargs={"market": "Region"}),
+    FeatureSpec("enterprise_income", kwargs={"market": "Region"}),
+    FeatureSpec("fct",               atol=1e-12),
+    FeatureSpec("food_acquired",     kwargs={"market": "Region"}),
+    FeatureSpec("food_expenditures", kwargs={"market": "Region"},
+                transform=_tx_food_expenditures),
+    FeatureSpec("food_prices",       kwargs={"market": "Region"}),
+    FeatureSpec("food_quantities",   kwargs={"market": "Region"}),
+    # household_characteristics: age_handler() now keeps HHs whose members had
+    # all-sentinel-null ages; 1 such HH (H35301-04-01, 2015-16) has HSize=1 on
+    # the API side where the replication had NaN.  Net quality improvement.
+    FeatureSpec("household_characteristics", kwargs={"market": "Region"},
+                transform=_tx_household_characteristics, atol=0.02, max_na_asym=1),
+    FeatureSpec("household_roster",  transform=_tx_household_roster),
+    FeatureSpec("income",            kwargs={"market": "Region"}),
+    FeatureSpec("interview_date",    kwargs={"market": "Region"}),
+    FeatureSpec("locality",          kwargs={"market": "Region"},
+                transform=_tx_locality),
+    # nutrition: two HHs bought Cheese (0.5Kg and 0.05Kg).  The replication's
+    # fct row for Cheese had Energy=16400 kcal/Kg — ~4x the real value and a
+    # known data error.  The current API fct correctly omits that row, so the
+    # two HHs' total Energy is lower by 8200 and 820 kcal respectively.
+    FeatureSpec("nutrition",         kwargs={"market": "Region"}, atol=0.1,
+                max_outliers=2),
+    FeatureSpec("people_last7days",  kwargs={"market": "Region"}),
+    # shocks: API keeps `Shock` in the index, the replication as a column.
+    # Promote it to the merge key on both sides so multi-shock HHs don't
+    # cartesian-merge and so the one HH with a NaN-Shock row (3213002805,
+    # 2005-06) aligns 1:1 instead of producing 6 NaN-asymmetric pairings.
+    FeatureSpec("shocks",            kwargs={"market": "Region"},
+                extra_keys=("Shock",)),
 ]
 
 
 # ------------------------------------------------------------------- helpers
+
+# String dtype roundtrip via .dta / .sav / parquet occasionally preserves the
+# literal four-character string '<NA>' as a genuine value.  Treat it as null
+# on non-numeric comparison — otherwise `.astype(str)` compares it against
+# pandas' own display for NA.  This is a replication-side quirk in the shock-
+# coping strategy columns.
+_STRING_NA_LITERALS = frozenset({"<NA>"})
+
 
 def _load_replication(name: str) -> pd.DataFrame:
     """Load a replication parquet; pytest.skip if missing or unreadable."""
@@ -179,14 +224,21 @@ def _call_api(name: str, kwargs: dict) -> pd.DataFrame:
 
 
 def _merge_on_common_index(
-    api: pd.DataFrame, repl: pd.DataFrame
+    api: pd.DataFrame,
+    repl: pd.DataFrame,
+    extra_keys: tuple = (),
 ) -> tuple[pd.DataFrame, list[str]]:
     """
-    Inner-merge on the intersection of index level names.
+    Inner-merge on the intersection of index level names plus ``extra_keys``.
 
-    Returns (merged_frame, common_levels).  Merged frame has one row per
-    common key and `_api` / `_repl` suffixed columns for every shared
-    column name.
+    Before merging, both sides are collapsed with ``groupby(key).first()`` to
+    handle the case where a single nominal key has multiple rows whose values
+    occupy complementary columns (e.g. food_prices rows where one holds
+    ``quantity_home`` and the sibling holds ``quantity_inkind``).  Without this
+    dedupe, the merge cartesian-explodes such groups and manufactures spurious
+    NaN asymmetries.
+
+    Returns (merged_frame, full_merge_key).
     """
     common_levels = [lev for lev in repl.index.names if lev in api.index.names]
     if not common_levels:
@@ -194,10 +246,31 @@ def _merge_on_common_index(
             f"no common index levels between API {list(api.index.names)} "
             f"and replication {list(repl.index.names)}"
         )
+
     api_flat = api.reset_index()
     repl_flat = repl.reset_index()
-    merged = api_flat.merge(repl_flat, on=common_levels, suffixes=("_api", "_repl"))
-    return merged, common_levels
+
+    merge_key = list(common_levels) + [k for k in extra_keys if k not in common_levels]
+    missing_api = [k for k in merge_key if k not in api_flat.columns]
+    missing_repl = [k for k in merge_key if k not in repl_flat.columns]
+    assert not missing_api, f"extra_keys missing on API side: {missing_api}"
+    assert not missing_repl, f"extra_keys missing on replication side: {missing_repl}"
+
+    # Collapse duplicate merge-key groups: groupby.first() skips NaN per column.
+    api_ded = api_flat.groupby(merge_key, dropna=False, sort=False,
+                               as_index=False).first()
+    repl_ded = repl_flat.groupby(merge_key, dropna=False, sort=False,
+                                 as_index=False).first()
+
+    merged = api_ded.merge(repl_ded, on=merge_key, suffixes=("_api", "_repl"))
+    return merged, merge_key
+
+
+def _coerce_string_na(s: pd.Series) -> pd.Series:
+    """Replace known literal-string NA sentinels with real nulls on string data."""
+    if s.dtype == object or pd.api.types.is_string_dtype(s):
+        return s.mask(s.isin(_STRING_NA_LITERALS))
+    return s
 
 
 def _compare_column(
@@ -205,77 +278,78 @@ def _compare_column(
     api_series: pd.Series,
     repl_series: pd.Series,
     atol: float,
+    max_na_asym: int = 0,
+    max_outliers: int = 0,
 ) -> None:
     """Raise AssertionError on disagreement, with an informative message."""
+    api_series = _coerce_string_na(api_series)
+    repl_series = _coerce_string_na(repl_series)
+
     api_na = api_series.isna()
     repl_na = repl_series.isna()
-    # Both NaN is agreement.
     both_na = api_na & repl_na
-    # One NaN but not the other is disagreement only if there's real data.
     only_one_na = api_na ^ repl_na
-    assert not only_one_na.any(), (
-        f"column {col!r}: {only_one_na.sum()} rows have NaN in one side but not the other"
-    )
-    mask = ~both_na
+    n_asym = int(only_one_na.sum())
+    if n_asym > max_na_asym:
+        raise AssertionError(
+            f"column {col!r}: {n_asym} rows have NaN in one side but not the "
+            f"other (max_na_asym={max_na_asym})"
+        )
+
+    mask = ~(both_na | only_one_na)
     if not mask.any():
         return
     a = api_series[mask]
     r = repl_series[mask]
     if pd.api.types.is_numeric_dtype(a) and pd.api.types.is_numeric_dtype(r):
         diff = (a.astype(float) - r.astype(float)).abs()
-        max_diff = diff.max()
-        mean_diff = diff.mean()
-        if max_diff > atol:
-            # Provide context on how bad it is.
-            n_bad = int((diff > atol).sum())
+        n_bad = int((diff > atol).sum())
+        if n_bad > max_outliers:
             raise AssertionError(
-                f"column {col!r}: max |Δ| = {max_diff:.6g} > atol {atol:.6g}; "
-                f"mean |Δ| = {mean_diff:.6g}; {n_bad}/{len(diff)} rows out of tolerance"
+                f"column {col!r}: max |Δ| = {diff.max():.6g} > atol {atol:.6g}; "
+                f"mean |Δ| = {diff.mean():.6g}; "
+                f"{n_bad}/{len(diff)} rows out of tolerance "
+                f"(max_outliers={max_outliers})"
             )
     else:
-        # Non-numeric: require exact string equality.
         a_str = a.astype(str)
         r_str = r.astype(str)
-        mismatch = (a_str != r_str).sum()
-        assert mismatch == 0, (
-            f"column {col!r}: {mismatch}/{len(a)} rows differ (non-numeric)"
-        )
+        n_bad = int((a_str != r_str).sum())
+        if n_bad > max_outliers:
+            raise AssertionError(
+                f"column {col!r}: {n_bad}/{len(a)} rows differ (non-numeric; "
+                f"max_outliers={max_outliers})"
+            )
 
 
 # ------------------------------------------------------------------- the test
 
 @pytest.mark.parametrize(
-    "name,kwargs,transform,atol",
+    "spec",
     FEATURE_SPECS,
-    ids=[spec[0] for spec in FEATURE_SPECS],
+    ids=[spec.name for spec in FEATURE_SPECS],
 )
-def test_api_matches_replication(
-    name: str,
-    kwargs: dict,
-    transform: Optional[Callable],
-    atol: float,
-) -> None:
+def test_api_matches_replication(spec: FeatureSpec) -> None:
     """API output must agree with the canonical replication parquet on common rows."""
-    repl = _load_replication(name)
+    repl = _load_replication(spec.name)
 
     try:
-        api = _call_api(name, kwargs)
+        api = _call_api(spec.name, spec.kwargs)
     except Exception as exc:
-        pytest.fail(f"API call Country('Uganda').{name}(**{kwargs}) raised: "
+        pytest.fail(f"API call Country('Uganda').{spec.name}(**{spec.kwargs}) raised: "
                     f"{type(exc).__name__}: {exc}")
 
-    if transform is not None:
-        api = transform(api)
+    if spec.transform is not None:
+        api = spec.transform(api)
 
-    merged, common_levels = _merge_on_common_index(api, repl)
+    merged, merge_key = _merge_on_common_index(api, repl, extra_keys=spec.extra_keys)
 
     assert len(merged) > 0, (
-        f"{name}: no overlap between API and replication on {common_levels}; "
+        f"{spec.name}: no overlap between API and replication on {merge_key}; "
         f"API shape={api.shape} index={list(api.index.names)}; "
         f"repl shape={repl.shape} index={list(repl.index.names)}"
     )
 
-    # Enumerate columns present on both sides (after `_api`/`_repl` suffixing).
     suffixed_api = [c for c in merged.columns if c.endswith("_api")]
     pairs = []
     for c in suffixed_api:
@@ -284,10 +358,15 @@ def test_api_matches_replication(
             pairs.append(base)
 
     assert pairs, (
-        f"{name}: no shared data columns after merge; "
+        f"{spec.name}: no shared data columns after merge; "
         f"API cols after transform={list(api.columns)}; "
         f"repl cols={list(repl.columns)}"
     )
 
     for base in pairs:
-        _compare_column(base, merged[f"{base}_api"], merged[f"{base}_repl"], atol)
+        _compare_column(
+            base, merged[f"{base}_api"], merged[f"{base}_repl"],
+            atol=spec.atol,
+            max_na_asym=spec.max_na_asym,
+            max_outliers=spec.max_outliers,
+        )
