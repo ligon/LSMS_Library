@@ -97,6 +97,21 @@ def roster_to_characteristics(df, age_cuts=(0,4,9,14,19,31,51), drop = 'pid', fi
     for col in ('sex', 'age'):
         if col in roster_df.columns:
             roster_df[col] = roster_df[col].replace({s: pd.NA for s in _na_strings})
+    # Filter on monthsspent if available: exclude departed members
+    # (NaN = question not asked, typically "Left permanently") and
+    # members with 0 months of residence in the past 12 months —
+    # EXCEPT infants (age < 1), who haven't lived anywhere for 12
+    # months but are current household members.  age_handler() can
+    # return fractional years (e.g. 0.50 for a 6-month-old) when
+    # DOB is available, so the threshold is < 1 not == 0.
+    # This matches the replication's lsms.tools.get_household_roster
+    # which did dropna(how='any') on [HHID, sex, age, months_spent],
+    # plus the stricter exclusion of non-infant zero-month members.
+    if 'monthsspent' in roster_df.columns:
+        ms = pd.to_numeric(roster_df['monthsspent'], errors='coerce')
+        age = pd.to_numeric(roster_df['age'], errors='coerce')
+        keep = ms.notna() & ((ms > 0) | (age < 1))
+        roster_df = roster_df[keep]
     roster_df = roster_df.dropna(subset=['sex', 'age'])
     roster_df['age_interval'] = age_intervals(roster_df['age'], age_cuts)
     roster_df['sex_age'] = roster_df.apply(
