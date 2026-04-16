@@ -177,18 +177,17 @@ FEATURE_SPECS: list[FeatureSpec] = [
                 transform=_tx_food_expenditures),
     FeatureSpec("food_prices",       kwargs={"market": "Region"}),
     FeatureSpec("food_quantities",   kwargs={"market": "Region"}),
-    # household_characteristics: 1315 HHs have full rosters on the API side
-    # but only 1 member on the replication side (the replication's roster
-    # was built with incomplete coverage for these HHs).  The age-bracket
-    # count columns (F 00-03, ..., M 51+) are compared directly; log HSize
-    # is dropped in the transform because it is a mechanical derivative of
-    # the brackets and its large magnitude (api=2+ vs repl=0) obscures
-    # the per-bracket view.  max_na_asym=1 covers H35301-04-01 (2015-16),
-    # whose members all had sentinel-null ages and whose HSize is NaN on
-    # the replication side.
+    # household_characteristics: with MonthsSpent filter active, the large
+    # 1315-HH roster-coverage drift is resolved.  Residual outliers (~211
+    # per boundary bracket, max |Δ|=2) are from age_handler's DOB-derived
+    # fractional ages shifting members across bucket boundaries (e.g. a
+    # 3.8-year-old bins into 04-08 on the API but 00-03 on the replication).
+    # log HSize is dropped (mechanical derivative of brackets; see
+    # _tx_household_characteristics).  max_na_asym=1 covers H35301-04-01
+    # (2015-16) whose members all had sentinel-null ages.
     FeatureSpec("household_characteristics", kwargs={"market": "Region"},
                 transform=_tx_household_characteristics, max_na_asym=1,
-                max_outliers=1315),
+                max_outliers=220),
     FeatureSpec("household_roster",  transform=_tx_household_roster),
     FeatureSpec("income",            kwargs={"market": "Region"}),
     FeatureSpec("interview_date",    kwargs={"market": "Region"}),
