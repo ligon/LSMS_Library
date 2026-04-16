@@ -55,6 +55,11 @@ household_roster:
                 - s01q03a
                 - s01q03b
                 - s01q03c
+            MonthsSpent:
+                - s01q12
+                - mapping:
+                    Oui: 12
+                    Non: 0
     df_cover:
         file: s00_me_bfa2021.dta
         idxvars:

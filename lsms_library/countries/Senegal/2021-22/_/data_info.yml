@@ -70,6 +70,11 @@ household_roster:
           - s01q03b
           - s01q03c
         Relationship: s01q02
+        MonthsSpent:
+            - s01q12
+            - mapping:
+                Oui: 12
+                Non: 0
   df_temp:
       file: s00_me_sen2021.dta
       idxvars:

@@ -1,0 +1,42 @@
+#+title: Contents
+
+* Overview
+
+Niger has four waves in the LSMS Library: two pre-EHCVM national
+surveys (2011-12, 2014-15) and two EHCVM waves (2018-19, 2021-22).
+
+* Sampling Design
+
+EHCVM convention (2018-19 and 2021-22): =grappe= is the cluster
+identifier (=v=); each grappe is visited in exactly one =vague=, so
+household identifier is =(grappe, menage)= without a vague level.
+See CLAUDE.md "EHCVM countries" for the cross-country pattern.
+
+Pre-EHCVM waves (2011-12, 2014-15) follow their own conventions;
+see the wave-level =data_info.yml= files for index definitions.
+
+* Household Presence / MonthsSpent
+
+The EHCVM questionnaire (used in the 2018-19 and 2021-22 waves) does
+NOT ask "How many months did [NAME] live here in the past 12 months?"
+(the continuous MonthsSpent/MonthsAway variable available in Uganda,
+Ethiopia, Tanzania, Malawi, and many other LSMS countries).  Instead,
+EHCVM uses two binary eligibility filters:
+
+- =s01q12= :: "Has [NAME] lived continuously in this household for at
+  least 6 months?"
+- =s01q13= :: "Does [NAME] intend to stay at least 6 months?"
+
+These determine membership eligibility but do not give a continuous
+duration measure.  Downstream analysts who need a presence filter for
+=household_characteristics= should use these binary variables directly
+rather than expecting a =MonthsSpent= column in =household_roster()=.
+
+The pre-EHCVM waves DO have a continuous months-of-presence variable:
+
+- 2011-12 :: =ms01q19= in the household roster file records the
+  number of months the individual spent in the household over the
+  past 12 months.  See the wave-level =data_info.yml= for details.
+- 2014-15 :: =MS01Q19= in the household roster file records the
+  number of months the individual spent in the household over the
+  past 12 months.  See the wave-level =data_info.yml= for details.

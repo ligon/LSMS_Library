@@ -45,3 +45,30 @@ fix should map the numeric codes to canonical labels via Mali's
 =categorical_mapping.org= (or by adding a per-wave =mapping:= dict
 in each wave's =data_info.yml=); pending that, downstream
 consumers should treat Mali separately.
+
+* Household Presence / MonthsSpent
+
+The EHCVM questionnaire (used in the 2018-19 and 2021-22 waves) does
+NOT ask "How many months did [NAME] live here in the past 12 months?"
+(the continuous MonthsSpent/MonthsAway variable available in Uganda,
+Ethiopia, Tanzania, Malawi, and many other LSMS countries).  Instead,
+EHCVM uses two binary eligibility filters:
+
+- =s01q12= :: "Has [NAME] lived continuously in this household for at
+  least 6 months?"
+- =s01q13= :: "Does [NAME] intend to stay at least 6 months?"
+
+These determine membership eligibility but do not give a continuous
+duration measure.  Downstream analysts who need a presence filter for
+=household_characteristics= should use these binary variables directly
+rather than expecting a =MonthsSpent= column in =household_roster()=.
+
+The pre-EHCVM 2014-15 wave DOES have a continuous months-of-presence
+variable:
+
+- 2014-15 :: =s01q11= in the household roster file records the number
+  of months the individual spent in the household over the past 12
+  months.  See the wave-level =data_info.yml= for details.
+
+The 2017-18 wave may also predate the EHCVM template; check its
+wave-level =data_info.yml= for the applicable variable name.

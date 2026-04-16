@@ -1,0 +1,34 @@
+#+title: Contents
+
+* Overview
+
+Togo EHCVM (Enquete Harmonisee sur les Conditions de Vie des
+Menages), the harmonized West African household-conditions survey
+template.  One wave configured: =2018=.
+
+* Sampling Design
+
+Standard EHCVM convention: =grappe= is the cluster identifier (=v=);
+each grappe is visited in exactly one =vague=, so household
+identifier is =(grappe, menage)= without a vague level.  See
+CLAUDE.md "EHCVM countries" for the cross-country pattern.
+
+* Household Presence / MonthsSpent
+
+The EHCVM questionnaire (used in the 2018 wave) does NOT ask
+"How many months did [NAME] live here in the past 12 months?"
+(the continuous MonthsSpent/MonthsAway variable available in Uganda,
+Ethiopia, Tanzania, Malawi, and many other LSMS countries).  Instead,
+EHCVM uses two binary eligibility filters:
+
+- =s01q12= :: "Has [NAME] lived continuously in this household for at
+  least 6 months?"
+- =s01q13= :: "Does [NAME] intend to stay at least 6 months?"
+
+These determine membership eligibility but do not give a continuous
+duration measure.  Downstream analysts who need a presence filter for
+=household_characteristics= should use these binary variables directly
+rather than expecting a =MonthsSpent= column in =household_roster()=.
+
+Togo has no pre-EHCVM waves in the library, so no continuous
+months-of-presence variable is available for any wave.

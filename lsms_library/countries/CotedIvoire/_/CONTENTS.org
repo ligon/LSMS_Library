@@ -128,3 +128,24 @@ Wave-level =_/food_expenditures.py= scripts exist for 1985-86, 1986-87 using the
 =cotedivoire.food_expenditures()= function from =_/cotedivoire.py=. These read =F12A.DAT=
 files as CSV format via =dvc.api.open=. They are legacy scripts and use the retired
 =lsms.tools= package — do not extend them.
+
+* Household Presence / MonthsSpent
+
+The EHCVM questionnaire (used in the 2018-19 wave) does NOT ask
+"How many months did [NAME] live here in the past 12 months?"
+(the continuous MonthsSpent/MonthsAway variable available in Uganda,
+Ethiopia, Tanzania, Malawi, and many other LSMS countries).  Instead,
+EHCVM uses two binary eligibility filters:
+
+- =s01q12= :: "Has [NAME] lived continuously in this household for at
+  least 6 months?"
+- =s01q13= :: "Does [NAME] intend to stay at least 6 months?"
+
+These determine membership eligibility but do not give a continuous
+duration measure.  Downstream analysts who need a presence filter for
+=household_characteristics= should use these binary variables directly
+rather than expecting a =MonthsSpent= column in =household_roster()=.
+
+The pre-EHCVM 1985-89 waves (CILSS/EPAM) also lack a continuous
+months-of-presence variable; these surveys predate the EHCVM design
+and do not include MonthsSpent or equivalent fields.
