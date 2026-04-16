@@ -1,0 +1,391 @@
+Loading data...
+
+Merged rows: 23575  |Δ log HSize| > 0.02: 1315
+==============================================================================
+  #1  i='1083003308'  t='2011-12'  log HSize: api=3.3673  repl=0.0000  Δ=+3.3673
+  HSize (sum of brackets): api=29  repl=1  Δ=+28
+==============================================================================
+
+  Age-bracket counts:
+  Bracket             API   REPL      Δ
+  ----------------  -----  -----  -----
+  F 00-03               3      0  +3  <---
+  F 04-08               2      0  +2  <---
+  F 09-13               2      0  +2  <---
+  F 14-18               1      0  +1  <---
+  F 19-30               2      0  +2  <---
+  F 31-50               1      0  +1  <---
+  F 51+                 5      0  +5  <---
+  M 00-03               0      0  
+  M 04-08               1      0  +1  <---
+  M 09-13               3      0  +3  <---
+  M 14-18               2      0  +2  <---
+  M 19-30               2      0  +2  <---
+  M 31-50               2      0  +2  <---
+  M 51+                 3      1  +2  <---
+
+  API household_roster (29 members):
+         pid Sex  Age  Generation  Distance      Affinity
+108300330801   M   83           0         0 consanguineal
+108300330802   F   76           0         1 consanguineal
+108300330803   M   53          -1         0 consanguineal
+108300330804   M   47          -1         0 consanguineal
+108300330805   M   40          -1         0 consanguineal
+108300330806   M   99          -2         0 consanguineal
+108300330807   F   99          -2         0 consanguineal
+108300330808   M   22          -2         0 consanguineal
+108300330809   M   21          -2         0 consanguineal
+108300330810   M   18          -2         0 consanguineal
+108300330811   M   16          -2         0 consanguineal
+108300330812   F   15          -2         0 consanguineal
+108300330813   M   12          -2         0 consanguineal
+108300330814   F   12          -2         0 consanguineal
+108300330815   M   12          -2         0 consanguineal
+108300330816   F    8          -2         0 consanguineal
+108300330817   M   10          -2         0 consanguineal
+108300330818   M    8          -2         0 consanguineal
+108300330819   F    7          -2         0 consanguineal
+108300330820   F   99          -2         0 consanguineal
+108300330821   F    3          -2         0 consanguineal
+108300330822   F    2          -2         0 consanguineal
+108300330823   F    1          -2         0 consanguineal
+108300330824   F   99          -2         0 consanguineal
+108300330825   F   42           0         0 consanguineal
+108300330826   F   27          -1         0 consanguineal
+108300330827   F   27           0         0 consanguineal
+108300330828   F   99           0         0     unrelated
+108300330829   F   11          -2         0 consanguineal
+
+  REPL household_roster (0 members):
+    (no rows)
+
+==============================================================================
+  #2  i='1021001607'  t='2010-11'  log HSize: api=2.1972  repl=0.0000  Δ=+2.1972
+  HSize (sum of brackets): api=9  repl=1  Δ=+8
+==============================================================================
+
+  Age-bracket counts:
+  Bracket             API   REPL      Δ
+  ----------------  -----  -----  -----
+  F 00-03               1      0  +1  <---
+  F 04-08               0      0  
+  F 09-13               1      1  
+  F 14-18               0      0  
+  F 19-30               2      0  +2  <---
+  F 31-50               1      0  +1  <---
+  F 51+                 1      0  +1  <---
+  M 00-03               0      0  
+  M 04-08               0      0  
+  M 09-13               0      0  
+  M 14-18               0      0  
+  M 19-30               1      0  +1  <---
+  M 31-50               1      0  +1  <---
+  M 51+                 1      0  +1  <---
+
+  API household_roster (9 members):
+         pid Sex  Age  Generation  Distance      Affinity
+102100160706   F   26          -1         0 consanguineal
+102100160707   M   26          -1         0 consanguineal
+102100160709   F   12          -1         1 consanguineal
+102100160703   M   34          -1         0 consanguineal
+102100160701   M   60           0         0 consanguineal
+102100160705   F   29          -1         0 consanguineal
+102100160708   F    3          -2         0 consanguineal
+102100160702   F   53           0         0       affinal
+102100160704   F   31          -1         0 consanguineal
+
+  REPL household_roster (0 members):
+    (no rows)
+
+==============================================================================
+  #3  i='1021000610'  t='2010-11'  log HSize: api=2.0794  repl=0.0000  Δ=+2.0794
+  HSize (sum of brackets): api=8  repl=1  Δ=+7
+==============================================================================
+
+  Age-bracket counts:
+  Bracket             API   REPL      Δ
+  ----------------  -----  -----  -----
+  F 00-03               0      0  
+  F 04-08               0      0  
+  F 09-13               2      1  +1  <---
+  F 14-18               1      0  +1  <---
+  F 19-30               2      0  +2  <---
+  F 31-50               1      0  +1  <---
+  F 51+                 0      0  
+  M 00-03               0      0  
+  M 04-08               0      0  
+  M 09-13               0      0  
+  M 14-18               1      0  +1  <---
+  M 19-30               0      0  
+  M 31-50               1      0  +1  <---
+  M 51+                 0      0  
+
+  API household_roster (9 members):
+         pid Sex  Age  Generation  Distance      Affinity
+102100061002   F   45           0         0       affinal
+102100061009   F    9           0         0 consanguineal
+102100061004   F   19          -1         0 consanguineal
+102100061008   F <NA>          -2         0 consanguineal
+102100061003   F   21          -1         0 consanguineal
+102100061007   F    9          -2         0 consanguineal
+102100061005   F   15          -1         0 consanguineal
+102100061006   M   15          -1         0 consanguineal
+102100061001   M   49           0         0 consanguineal
+
+  REPL household_roster (0 members):
+    (no rows)
+
+==============================================================================
+  #4  i='1021003205'  t='2010-11'  log HSize: api=2.0794  repl=0.0000  Δ=+2.0794
+  HSize (sum of brackets): api=8  repl=1  Δ=+7
+==============================================================================
+
+  Age-bracket counts:
+  Bracket             API   REPL      Δ
+  ----------------  -----  -----  -----
+  F 00-03               0      0  
+  F 04-08               0      0  
+  F 09-13               2      1  +1  <---
+  F 14-18               0      0  
+  F 19-30               2      0  +2  <---
+  F 31-50               0      0  
+  F 51+                 0      0  
+  M 00-03               1      0  +1  <---
+  M 04-08               1      0  +1  <---
+  M 09-13               0      0  
+  M 14-18               0      0  
+  M 19-30               1      0  +1  <---
+  M 31-50               1      0  +1  <---
+  M 51+                 0      0  
+
+  API household_roster (8 members):
+         pid Sex  Age  Generation  Distance      Affinity
+102100320505   M   23           0         1 consanguineal
+102100320508   F   12           0         0       servant
+102100320507   F   30           0         1 consanguineal
+102100320501   F   26           0         0 consanguineal
+102100320503   M    8          -1         0 consanguineal
+102100320506   M   42           0         0       affinal
+102100320504   M    1          -1         0 consanguineal
+102100320502   F    9          -1         0 consanguineal
+
+  REPL household_roster (0 members):
+    (no rows)
+
+==============================================================================
+  #5  i='1021003201'  t='2010-11'  log HSize: api=1.9459  repl=0.0000  Δ=+1.9459
+  HSize (sum of brackets): api=7  repl=1  Δ=+6
+==============================================================================
+
+  Age-bracket counts:
+  Bracket             API   REPL      Δ
+  ----------------  -----  -----  -----
+  F 00-03               1      1  
+  F 04-08               0      0  
+  F 09-13               2      0  +2  <---
+  F 14-18               0      0  
+  F 19-30               1      0  +1  <---
+  F 31-50               0      0  
+  F 51+                 0      0  
+  M 00-03               1      0  +1  <---
+  M 04-08               0      0  
+  M 09-13               1      0  +1  <---
+  M 14-18               0      0  
+  M 19-30               0      0  
+  M 31-50               1      0  +1  <---
+  M 51+                 0      0  
+
+  API household_roster (7 members):
+         pid Sex  Age  Generation  Distance      Affinity
+102100320103   M   13          -1         0 consanguineal
+102100320105   F    9          -1         0 consanguineal
+102100320107   F    0          -1         0 consanguineal
+102100320106   M    2          -1         0 consanguineal
+102100320102   F   20           0         0       affinal
+102100320104   F   12          -1         0 consanguineal
+102100320101   M   43           0         0 consanguineal
+
+  REPL household_roster (0 members):
+    (no rows)
+
+==============================================================================
+  #6  i='1073002702'  t='2010-11'  log HSize: api=1.9459  repl=0.0000  Δ=+1.9459
+  HSize (sum of brackets): api=7  repl=1  Δ=+6
+==============================================================================
+
+  Age-bracket counts:
+  Bracket             API   REPL      Δ
+  ----------------  -----  -----  -----
+  F 00-03               0      0  
+  F 04-08               2      0  +2  <---
+  F 09-13               0      0  
+  F 14-18               0      0  
+  F 19-30               1      1  
+  F 31-50               0      0  
+  F 51+                 0      0  
+  M 00-03               1      0  +1  <---
+  M 04-08               1      0  +1  <---
+  M 09-13               1      0  +1  <---
+  M 14-18               0      0  
+  M 19-30               1      0  +1  <---
+  M 31-50               0      0  
+  M 51+                 0      0  
+
+  API household_roster (7 members):
+         pid Sex  Age  Generation  Distance      Affinity
+107300270202   F   28          -1         0 consanguineal
+107300270204   F    8          -1         0 consanguineal
+107300270206   M    5          -1         0 consanguineal
+107300270203   M   10          -1         0 consanguineal
+107300270205   F    7          -1         0 consanguineal
+107300270201   M   28           0         0 consanguineal
+107300270207   M    3          -1         0 consanguineal
+
+  REPL household_roster (0 members):
+    (no rows)
+
+==============================================================================
+  #7  i='1021002312'  t='2010-11'  log HSize: api=1.7918  repl=0.0000  Δ=+1.7918
+  HSize (sum of brackets): api=6  repl=1  Δ=+5
+==============================================================================
+
+  Age-bracket counts:
+  Bracket             API   REPL      Δ
+  ----------------  -----  -----  -----
+  F 00-03               0      0  
+  F 04-08               1      0  +1  <---
+  F 09-13               0      0  
+  F 14-18               0      0  
+  F 19-30               1      0  +1  <---
+  F 31-50               0      0  
+  F 51+                 0      0  
+  M 00-03               2      0  +2  <---
+  M 04-08               1      0  +1  <---
+  M 09-13               0      0  
+  M 14-18               0      0  
+  M 19-30               0      0  
+  M 31-50               1      1  
+  M 51+                 0      0  
+
+  API household_roster (6 members):
+         pid Sex  Age  Generation  Distance      Affinity
+102100231202   F    8          -1         0 consanguineal
+102100231203   M    5          -1         0 consanguineal
+102100231201   F   27           0         0 consanguineal
+102100231206   M   36           0         0       affinal
+102100231205   M    0          -1         0 consanguineal
+102100231204   M    3          -1         0 consanguineal
+
+  REPL household_roster (0 members):
+    (no rows)
+
+==============================================================================
+  #8  i='1051000308'  t='2010-11'  log HSize: api=2.4849  repl=0.6931  Δ=+1.7918
+  HSize (sum of brackets): api=12  repl=2  Δ=+10
+==============================================================================
+
+  Age-bracket counts:
+  Bracket             API   REPL      Δ
+  ----------------  -----  -----  -----
+  F 00-03               1      1  
+  F 04-08               0      0  
+  F 09-13               0      0  
+  F 14-18               1      0  +1  <---
+  F 19-30               3      1  +2  <---
+  F 31-50               0      0  
+  F 51+                 0      0  
+  M 00-03               0      0  
+  M 04-08               0      0  
+  M 09-13               2      0  +2  <---
+  M 14-18               1      0  +1  <---
+  M 19-30               3      0  +3  <---
+  M 31-50               0      0  
+  M 51+                 1      0  +1  <---
+
+  API household_roster (12 members):
+         pid Sex  Age  Generation  Distance      Affinity
+105100030801   M   70           0         0 consanguineal
+105100030806   M   19          -1         0 consanguineal
+105100030809   M   12          -2         0 consanguineal
+105100030812   F    0          -2         0 consanguineal
+105100030811   F   23           0         0 consanguineal
+105100030803   M   22          -1         0 consanguineal
+105100030807   M   18          -1         0 consanguineal
+105100030810   M   10          -1         0 consanguineal
+105100030802   F   27          -1         0 consanguineal
+105100030804   F   21          -1         0 consanguineal
+105100030808   F   16          -1         0 consanguineal
+105100030805   M   20          -1         0 consanguineal
+
+  REPL household_roster (0 members):
+    (no rows)
+
+==============================================================================
+  #9  i='4123000305'  t='2011-12'  log HSize: api=1.7918  repl=0.0000  Δ=+1.7918
+  HSize (sum of brackets): api=6  repl=1  Δ=+5
+==============================================================================
+
+  Age-bracket counts:
+  Bracket             API   REPL      Δ
+  ----------------  -----  -----  -----
+  F 00-03               0      0  
+  F 04-08               1      0  +1  <---
+  F 09-13               1      0  +1  <---
+  F 14-18               0      0  
+  F 19-30               0      0  
+  F 31-50               1      1  
+  F 51+                 0      0  
+  M 00-03               1      0  +1  <---
+  M 04-08               1      0  +1  <---
+  M 09-13               0      0  
+  M 14-18               0      0  
+  M 19-30               0      0  
+  M 31-50               1      0  +1  <---
+  M 51+                 0      0  
+
+  API household_roster (6 members):
+         pid Sex  Age  Generation  Distance      Affinity
+412300030501   F   34           0         0 consanguineal
+412300030502   M   41           0         0       affinal
+412300030503   F   12           0         0 consanguineal
+412300030504   M    7          -1         0 consanguineal
+412300030505   F    5          -1         0 consanguineal
+412300030506   M    3          -1         0 consanguineal
+
+  REPL household_roster (0 members):
+    (no rows)
+
+==============================================================================
+  #10  i='1021001202'  t='2010-11'  log HSize: api=1.6094  repl=0.0000  Δ=+1.6094
+  HSize (sum of brackets): api=5  repl=1  Δ=+4
+==============================================================================
+
+  Age-bracket counts:
+  Bracket             API   REPL      Δ
+  ----------------  -----  -----  -----
+  F 00-03               1      1  
+  F 04-08               0      0  
+  F 09-13               0      0  
+  F 14-18               1      0  +1  <---
+  F 19-30               1      0  +1  <---
+  F 31-50               1      0  +1  <---
+  F 51+                 0      0  
+  M 00-03               0      0  
+  M 04-08               1      0  +1  <---
+  M 09-13               0      0  
+  M 14-18               0      0  
+  M 19-30               0      0  
+  M 31-50               0      0  
+  M 51+                 0      0  
+
+  API household_roster (5 members):
+         pid Sex  Age  Generation  Distance      Affinity
+102100120203   F   20           0         1 consanguineal
+102100120205   F    0          -1         1 consanguineal
+102100120202   F   17          -1         0 consanguineal
+102100120201   F   42           0         0 consanguineal
+102100120204   M    4          -1         1 consanguineal
+
+  REPL household_roster (0 members):
+    (no rows)
+

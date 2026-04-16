@@ -162,4 +162,66 @@ cold > warm (parquet hit); =LSMS_NO_CACHE=1= forces full rebuild.
   produce a truncated file.  Rare, but a =tmp-then-rename= guard
   would be a cheap hardening.
 
+* Test results (post all fixes)
+
+15/15 passed in 14.14 seconds (6 workers, warm L2 caches).
+Previous session: 8/15 passed in 43 minutes (12 workers, cold).
+
+Speedup: 183x (wave-level L2 cache + all fixes combined).
+
+Log: =slurm_logs/pytest_api_vs_replication_2026-04-15_postfix/pytest.log=
+
+* MonthsSpent cross-country investigation
+
+Three agents surveyed ~30 countries.  Results:
+
+- 14+ countries have a usable "months in HH" variable (most as
+  months away; 4 as months present).  High-priority: Ethiopia (3/5
+  waves months, 2/5 weeks), Tanzania (3/3), Malawi (5/5).
+  Medium: Albania (6/6), GhanaLSS (7/7), Tajikistan (4/4).
+- EHCVM 2018-19 countries have NO continuous variable -- only
+  binary s01q12/s01q13 (>=6 months y/n).  Pre-EHCVM waves of
+  Niger, Burkina Faso, Mali do have it.
+- Most need =MonthsSpent = 12 - MonthsAway= transform.
+- Ethiopia W4/W5 changed units to weeks.
+- Tanzania 2008-15 is script-path (needs script edit, not YAML).
+
+Full agent reports in session context; a design note for which
+countries to prioritize next should be filed as a GH issue.
+
+* Niger branch =claude/fix-dvc-caching-docs-aokxr= — DELETED
+
+Investigation confirmed the branch was fully superseded.
+Development already has the improved Niger panel_ids with
+transitive-chain collision detection (=48fbafbd= + =517eeb1c=).
+Branch deleted this session.
+
+* age_handler precision fix
+
+=b6e2ce24= restructured =age_handler()= to parse DOB before
+checking the reported age field.  When both agree (within 1 year),
+the DOB-derived fractional age is returned (e.g. 3.75 instead of
+3).  No change for individuals without DOB data.
+
+* Session commits (8 on =development=)
+
+| SHA         | Summary                                                       |
+|-------------+---------------------------------------------------------------|
+| ~354b1916~  | feat(cache): wave-level L2 cache for YAML-path tables         |
+| ~86227d5d~  | test(Uganda): FeatureSpec refactor with per-bucket tolerances  |
+| ~268f24a0~  | docs(slurm_logs): session recovery + diagnostics              |
+| ~7c7df414~  | fix(test): correct HC column rename + drop log HSize          |
+| ~e243c333~  | feat(Uganda): add MonthsSpent to all 8 waves                  |
+| ~ab447b40~  | feat(transformations): filter HC on MonthsSpent               |
+| ~b6e2ce24~  | fix(age_handler): prefer DOB-derived fractional age           |
+| (pending)   | docs: final handoff update                                    |
+
+* Compute accounting
+
+- Node: n0049.savio2 (24 cores), job 33421472
+- fc_jevons at session start: 35,286 / 1,500,000 SUs (2.35%)
+- Parallel warmers: 8 × cluster_features (~6.5 min wall),
+  8 × household_roster (~4 min wall), 3 investigation agents
+- Test run: 14.14s (vs 43 min prior)
+
 * Notes for next session
