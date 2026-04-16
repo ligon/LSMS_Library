@@ -118,6 +118,10 @@ def roster_to_characteristics(df, age_cuts=(0,4,9,14,19,31,51), drop = 'pid', fi
         ma = pd.to_numeric(roster_df['monthsaway'], errors='coerce')
         ms = 12 - ma
         ms = ms.clip(lower=0)  # guard against >12 outliers
+    elif 'weeksaway' in roster_df.columns:
+        wa = pd.to_numeric(roster_df['weeksaway'], errors='coerce')
+        ms = 12 - (wa / (52 / 12))
+        ms = ms.clip(lower=0)
     if ms is not None:
         age = pd.to_numeric(roster_df['age'], errors='coerce')
         keep = ms.notna() & ((ms > 0) | (age < 1))

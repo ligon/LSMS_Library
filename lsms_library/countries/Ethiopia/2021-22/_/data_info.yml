@@ -57,7 +57,7 @@ household_roster:
                 '2. Female': F
         Age: s1q03a
         Relationship: s1q01
-        MonthsAway: s1q06  # WARNING: raw variable is WEEKS away, not months; needs conversion
+        WeeksAway: s1q06
 
 shocks:
     file: sect9_hh_w5.dta

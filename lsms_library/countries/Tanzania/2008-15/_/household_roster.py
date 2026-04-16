@@ -19,6 +19,7 @@ roster = pd.DataFrame({
     'Sex': df.hb_02.values.tolist(),
     'Age': df.hb_04.values.tolist(),
     'Relationship': df.hb_05.values.tolist(),
+    'MonthsAway': df.hb_10.values.tolist(),
 })
 
 # Map round numbers to wave labels

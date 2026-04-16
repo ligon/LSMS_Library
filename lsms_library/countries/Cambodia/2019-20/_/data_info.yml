@@ -31,7 +31,7 @@ household_roster:
                 2: Divorced/Separated
                 3: Widowed
                 4: Never married/Never lived with a partner
-        MonthsAway: s02q14  # WARNING: raw variable is WEEKS away, not months; needs conversion
+        WeeksAway: s02q14
         Relationship:
             - s02q06
             - mapping:
