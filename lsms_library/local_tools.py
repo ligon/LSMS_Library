@@ -1333,11 +1333,7 @@ def age_handler(age = None, interview_date = None, interview_year = None, format
             return True
         return False
 
-    if age is not None and pd.notna(age):
-        if is_valid(int(age)):
-            return int(age)
-
-    # interview handling
+    # --- Parse interview date (needed for DOB-based age) ---
     if interview_date is not None and pd.notna(interview_date):
         if isinstance(interview_date, list):
             if len(interview_date) == 3 and is_valid(interview_date):
@@ -1354,14 +1350,13 @@ def age_handler(age = None, interview_date = None, interview_year = None, format
         else:
             try:
                 final_interview_date = pd.to_datetime(interview_date)
-            except: 
+            except:
                 final_interview_date = None
 
-    # dob handling
+    # --- Parse DOB ---
     if dob is not None and pd.notna(dob):
         final_date_of_birth = pd.to_datetime(dob, format = format_dob)
         year_born = final_date_of_birth.year
-    #conversion to pd.datetime obj of the date of birth if we are given mdy or all values
     elif is_valid([m, d, y]):
         date_conv = str(int(m)) + '/' + str(int(d)) + '/' + str(int(y))
         final_date_of_birth = pd.to_datetime(date_conv, format = "%m/%d/%Y")
@@ -1369,9 +1364,28 @@ def age_handler(age = None, interview_date = None, interview_year = None, format
         date_conv = str(int(m)) + '/15/' + str(int(y))
         final_date_of_birth = pd.to_datetime(date_conv, format = "%m/%d/%Y")
 
-    #final calculations
+    # --- Compute DOB-derived age if both dates are available ---
+    dob_age = None
     if final_interview_date and final_date_of_birth:
-        return round((final_interview_date - final_date_of_birth).days / 365.25, 2)
+        candidate = round((final_interview_date - final_date_of_birth).days / 365.25, 2)
+        if candidate >= 0:
+            dob_age = candidate
+
+    # --- Choose best age estimate ---
+    has_reported_age = age is not None and pd.notna(age) and is_valid(int(age))
+
+    if has_reported_age and dob_age is not None:
+        # Both available: prefer DOB precision when they agree
+        # (int(age) truncates, so a 1-year tolerance covers rounding)
+        int_age = int(age)
+        if abs(int_age - dob_age) <= 1:
+            return dob_age
+        else:
+            return int_age  # disagreement — trust the reported age
+    elif dob_age is not None:
+        return dob_age
+    elif has_reported_age:
+        return int(age)
     elif is_valid([year_born, interview_yr]):
         return int(interview_yr) - int(year_born)
     else:
