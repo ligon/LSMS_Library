@@ -49,6 +49,7 @@ The returned DataFrame prepends a `country` index level.
 - **`assume_cache_fresh=True`** is a narrower in-process short-circuit at the top of `_aggregate_wave_data` that still calls `_finalize_result` (so kinship expansion, spelling normalization, and `_join_v_from_sample` still apply). Use when the cache is known fresh to skip all DVC / existence checks. It ignores `LSMS_NO_CACHE`. (`trust_cache=True` is a deprecated alias; removed in v0.8.0.)
 - **Cache vs. API**: cached parquets store pre-transformation data. Kinship expansion, canonical spelling enforcement, and dtype coercion happen in `_finalize_result()` on every read — not at cache write time. So `pd.read_parquet(cache_path)` shows raw `Relationship` strings; the Country API shows decomposed `(Sex, Generation, Distance, Affinity)`.
 - **DVC stage layer is retired (v0.7.0).** Country-level `dvc.yaml` files are now `stages: {}`. All data loading goes through the cache + `load_from_waves` path. The `reproduce()` code path in `country.py` is dead code pending removal. See `SkunkWorks/dvc_object_management.org`.
+- **Wave-level L2 cache for YAML-path tables (2026-04-15).** `Wave.grab_data()` now caches its result at `data_root()/{Country}/{wave}/_/{table}.parquet` on first call, for YAML-path tables only (script-path tables already wrote wave parquets via their `to_parquet()` calls). This eliminates the per-wave DVC metadata lookup that previously made `_market_lookup` (and any other wave-iterating code) hit DVC SQLite on every call. Measured speedup: 408s → 0.02s per wave on Uganda `cluster_features`. Same staleness semantics as the country-level cache (no auto-invalidation; `LSMS_NO_CACHE=1` forces rebuild). The `to_parquet()` function gains an `absolute_path=True` kwarg to skip call-stack inference when the caller builds an absolute path itself.
 
 ## Two Build Paths: YAML vs. Makefile/Script
 
@@ -113,6 +114,20 @@ Auto-unlock decrypts `s3_reader_creds.gpg` with an obfuscated passphrase at impo
 
 **Automatic categorical mappings.** If a column/index name in a returned DataFrame matches a table name in the country's `categorical_mapping.org` (case-insensitive) and that table has a `Preferred Label` column, the mapping is applied automatically — no `mappings:` declaration needed. For name mismatches (e.g. `harmonize_food` for index `j`), use the explicit `mappings:` syntax in `data_info.yml`. Cross-country label harmonization is a design sketch; see `SkunkWorks/cross_country_label_harmonization.org`.
 
+## MonthsSpent / MonthsAway / WeeksAway (2026-04-15)
+
+`household_roster` can optionally include a residence-duration column:
+
+- **`MonthsSpent`**: months the person lived in the household (0–12). Used by Uganda (direct question) and EHCVM countries (binary: Oui→12, Non→0 from `s01q12`). Also used where the source records months present directly (Serbia, Liberia, India, Kazakhstan, pre-EHCVM Niger/Burkina Faso/Mali).
+- **`MonthsAway`**: months absent (0–12). Used by Ethiopia (W1–W3), Tanzania, Malawi, Albania, GhanaLSS, Tajikistan, and others where the survey asks "how many months was [NAME] away?"
+- **`WeeksAway`**: weeks absent. Used by Ethiopia W4–W5 and Cambodia, where the questionnaire switched from months to weeks.
+
+`roster_to_characteristics()` in `transformations.py` resolves whichever column is present: `MonthsAway` is converted via `12 - value`, `WeeksAway` via `12 - weeks/(52/12)`. The filter excludes members with NaN (question not asked — departed/deceased) and zero months present, **except** infants (age < 1). Countries without any residence column are unaffected — the old count-everyone behavior continues.
+
+**Root cause context**: the replication pipeline (`lsms.tools.get_household_roster`) did `dropna(how='any')` on `[HHID, sex, age, months_spent]`, implicitly excluding departed members. The current API's runtime derivation previously counted everyone in the roster, producing a 1315-HH drift on Uganda `household_characteristics`. Adding MonthsSpent + the filter resolved this to ~220 residual outliers (age-bracket boundary shifts from `age_handler`'s DOB-derived fractional ages).
+
+**EHCVM note**: EHCVM 2018-19 countries lack a continuous months variable. The binary `s01q12` ("lived continuously 6+ months?") is mapped to 0/12. Guinea-Bissau may need Portuguese keys (`Sim`/`Não`) alongside `Oui`/`Non`. See CONTENTS.org files for per-country documentation.
+
 ## Derived Tables
 
 `household_characteristics`, `food_expenditures`, `food_prices`, and `food_quantities` are **auto-derived at runtime** via `_ROSTER_DERIVED` and `_FOOD_DERIVED` in `country.py` (source transforms live in `transformations.py`). **Do NOT register them in `data_scheme.yml`** — doing so bypasses the derivation path and forces legacy `!make` scripts to run.
@@ -147,9 +162,11 @@ result.attrs = dict(df.attrs)  # preserve id_converted flag
 
 ## Gotchas with Teeth
 
+- **`age_handler` returns fractional years when DOB is available.** As of 2026-04-15, when both a reported integer age and a DOB are present and agree within 1 year, `age_handler()` returns the DOB-derived fractional age (e.g. 3.75 instead of 3). This is more precise but means `Age` in `household_roster` is no longer always integer-valued. Code that assumes `int(age)` or bins on integer boundaries (e.g. `household_characteristics` age brackets) will see ~200 boundary-shift cases per country. The `_enforce_canonical_dtypes` Int64 coercion in `_finalize_result` rounds fractional ages to integer for the API output, but intermediate DataFrames (wave-level, pre-finalize) carry the fractional values.
+
 - **`other_features` is obsolete** — it's fully replaced by `cluster_features` + `_add_market_index()` at query time. Do not read `other_features.parquet` in new code. The `m` index should NOT be baked into cached parquets; it's added on demand when the user passes `market='Region'`. If a wave-level script genuinely needs region for data processing (Malawi's region-specific unit factors), read the cover-page `.dta` directly.
 
-- **EHCVM countries**: in Senegal, Mali, Niger, Burkina Faso, Benin, Togo, and Guinea-Bissau, each `grappe` is visited in exactly one `vague` — so `v: grappe` (not `v: [vague, grappe]`) and `i: [grappe, menage]` (not `[vague, grappe, menage]`). CotedIvoire 2018-19 is also EHCVM but predates the list above.
+- **EHCVM countries**: in Senegal, Mali, Niger, Burkina Faso, Benin, Togo, and Guinea-Bissau, each `grappe` is visited in exactly one `vague` — so `v: grappe` (not `v: [vague, grappe]`) and `i: [grappe, menage]` (not `[vague, grappe, menage]`). CotedIvoire 2018-19 is also EHCVM but predates the list above. **EHCVM 2018-19 waves lack a continuous MonthsSpent variable** — they use binary `s01q12`/`s01q13` (>=6 months y/n), mapped to MonthsSpent 12/0. See CONTENTS.org per country.
 
 - **`format_id` is auto-applied to `idxvars` but NOT to `myvars`**. A numeric column reaching `myvars` (e.g. a cluster ID) stays float and gets `.0` suffixes when stringified. Fix with an explicit formatting function in the wave module. `is_this_feature_sane()` checks for this via `_check_float_stringified_index`.
 
