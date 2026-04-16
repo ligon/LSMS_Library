@@ -33,6 +33,7 @@ household_roster:
         Sex: B2
         Age: B4
         Relationship: B5
+        MonthsSpent: B3A
 
 cluster_features:
     dfs:

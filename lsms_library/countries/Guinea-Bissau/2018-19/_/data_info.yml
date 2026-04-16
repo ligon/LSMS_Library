@@ -108,6 +108,9 @@ household_roster:
                 - mapping:
                     Oui: 12
                     Non: 0
+                    Sim: 12
+                    Não: 0
+                    Nao: 0
     df_cover:
         file: s00_me_gnb2018.dta
         idxvars:

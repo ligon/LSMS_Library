@@ -29,6 +29,7 @@ household_roster:
         Sex: ms01q01
         Age: ms01q06a
         Relationship: ms01q02
+        MonthsSpent: ms01q19
 
 cluster_features:
     dfs:

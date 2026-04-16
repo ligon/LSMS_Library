@@ -72,7 +72,8 @@ household_roster:
         Sex: s01q01
         Age: s01q04a
         Relationship: s01q02
-        
+        MonthsSpent: s01q11
+
 food_acquired:
     idxvars:
         v: grappe

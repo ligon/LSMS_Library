@@ -73,6 +73,11 @@ household_roster:
         Sex: s1q01
         Age: s1q04a
         Relationship: s1q02
+        MonthsSpent:
+            - s1q13
+            - mapping:
+                Oui: 12
+                Non: 0
     file: eaci17_s01p1.dta
 
 shocks:
