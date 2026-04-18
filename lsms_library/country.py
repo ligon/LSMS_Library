@@ -913,10 +913,10 @@ class Country:
                 for org_file in sorted(global_cm_path.glob("*.org")):
                     try:
                         global_maps.update(all_dfs_from_orgfile(org_file))
-                    except Exception:
-                        pass
-            except Exception:
-                pass
+                    except (ValueError, OSError, pd.errors.ParserError) as exc:
+                        logger.info("Skipping global categorical mapping %s: %s", org_file.name, exc)
+            except (FileNotFoundError, OSError) as exc:
+                logger.info("Global categorical_mapping directory not accessible: %s", exc)
 
             # Load per-country mappings (override global on name collision)
             country_maps: dict[str, pd.DataFrame] = {}
@@ -1064,7 +1064,8 @@ class Country:
                 c = w.cluster_features()
                 if not c.empty:
                     cf_parts.append(c.reset_index())
-            except Exception:
+            except (FileNotFoundError, KeyError, ValueError) as exc:
+                logger.info("Skipping cluster_features for %s/%s: %s", self.name, wave, exc)
                 continue
 
         if not cf_parts:
@@ -1120,7 +1121,8 @@ class Country:
                 s = self.sample()
                 cache = s[['v']].copy()
                 self._sample_v_cache = cache
-            except Exception:
+            except (FileNotFoundError, KeyError, ValueError, AttributeError) as exc:
+                logger.info("sample() unavailable for v-join on %s: %s", self.name, exc)
                 self._sample_v_cache = False
                 return df
         if cache is False:
