@@ -46,12 +46,8 @@ Data Scheme:
   fct: !make
   nutrition: !make
   interview_date: !make
-  food_quantities: !make
-  food_expenditures:
-    materialize: make
-    index: (i, t, j)
-    Expenditure: float
-  food_prices: !make
+  # food_expenditures, food_prices, food_quantities are derived at
+  # runtime from food_acquired — see _FOOD_DERIVED in country.py.
   panel_ids: !make
   income:
     materialize: make

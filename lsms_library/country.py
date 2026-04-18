@@ -995,9 +995,21 @@ class Country:
     @property
     def data_scheme(self) -> list[str]:
         """List of data objects available for country.
+
+        Includes derived tables (e.g. food_expenditures, household_characteristics)
+        when their source table is present, even if they are not explicitly
+        registered in data_scheme.yml.
         """
         data_info = self.resources
         data_list = list(data_info.get('Data Scheme', {}).keys()) if data_info else []
+        # Surface derived tables when their source is present
+        _derived_sources = {
+            **{k: 'food_acquired' for k in self._FOOD_DERIVED},
+            **{k: 'household_roster' for k in self._ROSTER_DERIVED},
+        }
+        for derived, source in _derived_sources.items():
+            if source in data_list and derived not in data_list:
+                data_list.append(derived)
         return data_list
         # # return list of python files in the _ folder
         # py_ls = [f.stem for f in (self.file_path / "_").iterdir() if f.suffix == '.py']
@@ -2304,8 +2316,11 @@ class Country:
                             derived = transform_fn(fa)
                             scheme_entry = self._materialization_entry(name)
                             derived = self._finalize_result(derived, scheme_entry, name)
-                    except Exception:
-                        derived = None  # Fall through to normal aggregation
+                    except (FileNotFoundError, KeyError, ValueError, RuntimeError) as exc:
+                        logger.info(
+                            "Deriving %s from food_acquired failed (%s); "
+                            "falling back to legacy aggregation", name, exc)
+                        derived = None
                     if derived is not None:
                         # Relabel is outside the except so user-facing KeyErrors
                         # (bad labels=) propagate instead of silently falling
@@ -2333,10 +2348,17 @@ class Country:
                             if market is not None:
                                 result = self._add_market_index(result, column=market)
                             return result
-                    except Exception:
-                        pass  # Fall through to normal aggregation
+                    except (FileNotFoundError, KeyError, ValueError, RuntimeError) as exc:
+                        logger.info(
+                            "Deriving %s from household_roster failed (%s); "
+                            "falling back to legacy aggregation", name, exc)
 
                 result = self._aggregate_wave_data(waves, name)
+                # Apply relabeling to fallback result for food-derived tables
+                if (name in self._FOOD_DERIVED
+                        and isinstance(result, pd.DataFrame) and not result.empty):
+                    reagg = name in {'food_expenditures', 'food_quantities'}
+                    result = self._relabel_j(result, labels, reaggregate=reagg)
                 if market is not None and isinstance(result, pd.DataFrame) and not result.empty:
                     result = self._add_market_index(result, column=market)
                 return result
