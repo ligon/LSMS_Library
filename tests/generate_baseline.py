@@ -51,12 +51,14 @@ def build_manifest(uganda_root: Path, data_root_path: Path | None = None) -> dic
     manifest = {}
 
     # First pass: in-tree parquets (take precedence)
+    import pyarrow.lib as _pa_lib
+    _parquet_errors = (OSError, ValueError, _pa_lib.ArrowInvalid)
     for pq in sorted(uganda_root.rglob("*.parquet")):
         rel = str(pq.relative_to(uganda_root))
         try:
             df = pd.read_parquet(pq, engine="pyarrow")
             manifest[rel] = fingerprint(df)
-        except Exception as e:
+        except _parquet_errors as e:
             print(f"WARNING: Could not read {rel}: {e}", file=sys.stderr)
             manifest[rel] = {"error": str(e)}
 
@@ -68,7 +70,7 @@ def build_manifest(uganda_root: Path, data_root_path: Path | None = None) -> dic
                 try:
                     df = pd.read_parquet(pq, engine="pyarrow")
                     manifest[rel] = fingerprint(df)
-                except Exception as e:
+                except _parquet_errors as e:
                     print(f"WARNING: Could not read {rel}: {e}", file=sys.stderr)
                     manifest[rel] = {"error": str(e)}
 
@@ -94,7 +96,7 @@ def main():
         try:
             from lsms_library.paths import data_root
             data_root_path = data_root("Uganda")
-        except Exception:
+        except (ImportError, KeyError, ValueError):
             pass
 
     manifest = build_manifest(uganda_root, data_root_path)

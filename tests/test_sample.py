@@ -71,7 +71,7 @@ def _get_sample(country_name: str) -> pd.DataFrame | None:
                 _sample_cache[country_name] = result
             else:
                 _sample_cache[country_name] = None
-        except Exception:
+        except (FileNotFoundError, KeyError, ValueError, RuntimeError, AttributeError):
             _sample_cache[country_name] = None
     return _sample_cache[country_name]
 
