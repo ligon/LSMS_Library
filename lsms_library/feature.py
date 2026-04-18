@@ -138,7 +138,7 @@ class Feature:
                 # Prepend country as an index level
                 df = pd.concat({name: df}, names=["country"])
                 frames.append(df)
-            except Exception as e:
+            except (KeyError, ValueError, AttributeError, OSError) as e:
                 warnings.warn(
                     f"Failed to load {self.table_name} for {name}: {e}"
                 )

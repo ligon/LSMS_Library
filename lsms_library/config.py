@@ -18,6 +18,7 @@ Lookup order for each setting: environment variable → config file → None.
 from __future__ import annotations
 
 import os
+import warnings
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -53,12 +54,16 @@ def _load_config() -> dict[str, Any]:
     path = _config_file()
     if not path.exists():
         return {}
+    import yaml
     try:
-        import yaml
         with open(path) as f:
             data = yaml.safe_load(f) or {}
         return data if isinstance(data, dict) else {}
-    except Exception:
+    except (yaml.YAMLError, OSError) as exc:
+        warnings.warn(
+            f"Ignoring malformed config at {path}: {exc}",
+            stacklevel=2,
+        )
         return {}
 
 
