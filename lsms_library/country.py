@@ -1373,6 +1373,52 @@ class Country:
 
         return df
 
+    def _relabel_j(self, df: pd.DataFrame, labels: str | None, *, reaggregate: bool) -> pd.DataFrame:
+        """Rename the ``j`` index level using a column of the country's food label table.
+
+        ``labels='Preferred'`` (or ``None``) is a no-op.  For any other value
+        ``X``, look for a column named ``'X Label'`` (falling back to ``'X'``)
+        in ``food_items`` or ``harmonize_food`` under ``categorical_mapping``,
+        keyed on ``'Preferred Label'`` (the current ``j`` values).
+        """
+        if labels in (None, 'Preferred'):
+            return df
+        if not isinstance(df, pd.DataFrame) or 'j' not in (df.index.names or []):
+            raise KeyError(
+                f"Cannot apply labels={labels!r}: result has no 'j' index level"
+            )
+        cat_maps = self.categorical_mapping or {}
+        table = cat_maps.get('food_items')
+        if table is None:
+            table = cat_maps.get('harmonize_food')
+        if table is None:
+            raise KeyError(
+                f"No food label table ('food_items' or 'harmonize_food') "
+                f"on {self.name!r} for labels={labels!r}"
+            )
+        if 'Preferred Label' not in table.columns:
+            raise KeyError(
+                f"Food label table on {self.name!r} has no 'Preferred Label' column"
+            )
+        target = f"{labels} Label" if f"{labels} Label" in table.columns else labels
+        if target not in table.columns:
+            available = [c for c in table.columns if c != 'Preferred Label']
+            raise KeyError(
+                f"Column {target!r} not in food label table on {self.name!r}; "
+                f"available: {available}"
+            )
+        rdict = (table[['Preferred Label', target]]
+                 .dropna()
+                 .set_index('Preferred Label')[target]
+                 .to_dict())
+        result = df.rename(index=rdict, level='j')
+        if reaggregate:
+            numeric = result.select_dtypes(include='number')
+            if not numeric.empty:
+                result = numeric.groupby(list(result.index.names)).sum(min_count=1)
+        result.attrs = dict(df.attrs)
+        return result
+
     def _finalize_result(self, df: Any, scheme_entry: dict[str, Any], method_name: str) -> pd.DataFrame | dict[str, Any]:
         """
         Apply final harmonization steps (index augmentation, normalization, id walk)
@@ -2238,7 +2284,7 @@ class Country:
             return method
 
         if name in self.data_scheme or name in self._FOOD_DERIVED or name in self._ROSTER_DERIVED:
-            def method(waves=None, market=None):
+            def method(waves=None, market=None, labels='Preferred'):
                 # For derived food tables, try deriving from food_acquired first
                 # before falling back to wave-level scripts / make
                 if (name in self._FOOD_DERIVED
@@ -2251,17 +2297,24 @@ class Country:
                         'food_prices': food_prices_from_acquired,
                         'food_quantities': food_quantities_from_acquired,
                     }[name]
+                    derived = None
                     try:
                         fa = self._aggregate_wave_data(waves, 'food_acquired')
                         if isinstance(fa, pd.DataFrame) and not fa.empty:
-                            result = transform_fn(fa)
+                            derived = transform_fn(fa)
                             scheme_entry = self._materialization_entry(name)
-                            result = self._finalize_result(result, scheme_entry, name)
-                            if market is not None:
-                                result = self._add_market_index(result, column=market)
-                            return result
+                            derived = self._finalize_result(derived, scheme_entry, name)
                     except Exception:
-                        pass  # Fall through to normal aggregation
+                        derived = None  # Fall through to normal aggregation
+                    if derived is not None:
+                        # Relabel is outside the except so user-facing KeyErrors
+                        # (bad labels=) propagate instead of silently falling
+                        # through to the legacy aggregation path.
+                        reagg = name in {'food_expenditures', 'food_quantities'}
+                        derived = self._relabel_j(derived, labels, reaggregate=reagg)
+                        if market is not None:
+                            derived = self._add_market_index(derived, column=market)
+                        return derived
 
                 # Derive household_characteristics from household_roster
                 if (name in self._ROSTER_DERIVED
@@ -2295,6 +2348,15 @@ class Country:
                 "market : str, optional\n"
                 "    Column from cluster_features (e.g. 'Region') to add as\n"
                 "    an ``m`` index level for demand estimation.\n"
+                "labels : str, optional\n"
+                "    Label column to use for the ``j`` index on derived food\n"
+                "    tables (food_expenditures, food_quantities, food_prices).\n"
+                "    Defaults to ``'Preferred'`` (current behaviour).  Other\n"
+                "    values (e.g. ``'Aggregate'``) select a same-named column\n"
+                "    from the country's ``food_items`` / ``harmonize_food``\n"
+                "    table; ``food_expenditures`` and ``food_quantities`` are\n"
+                "    re-aggregated after renaming.  Raises ``KeyError`` if the\n"
+                "    column is absent.\n"
             )
             method.__name__ = name
             method.__qualname__ = f"Country.{name}"
