@@ -2356,9 +2356,9 @@ class Country:
                             "falling back to legacy aggregation", name, exc)
 
                 result = self._aggregate_wave_data(waves, name)
-                # Apply relabeling to fallback result for food-derived tables
-                if (name in self._FOOD_DERIVED
-                        and isinstance(result, pd.DataFrame) and not result.empty):
+                # Apply relabeling to any table with a j index level
+                if (isinstance(result, pd.DataFrame) and not result.empty
+                        and 'j' in (result.index.names or [])):
                     reagg = name in {'food_expenditures', 'food_quantities'}
                     result = self._relabel_j(result, labels, reaggregate=reagg)
                 if market is not None and isinstance(result, pd.DataFrame) and not result.empty:
