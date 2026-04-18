@@ -1427,7 +1427,7 @@ class Country:
         if reaggregate:
             numeric = result.select_dtypes(include='number')
             if not numeric.empty:
-                result = numeric.groupby(list(result.index.names)).sum(min_count=1)
+                result = numeric.groupby(list(result.index.names), dropna=False).sum(min_count=1)
         result.attrs = dict(df.attrs)
         return result
 
