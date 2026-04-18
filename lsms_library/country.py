@@ -2392,11 +2392,15 @@ class Country:
             ]
             if name in self._ROSTER_DERIVED:
                 doc_parts.append(
-                    "age_cuts : tuple[int, ...], optional\n"
-                    "    Upper bounds for age buckets passed to\n"
+                    "age_cuts : tuple of positive numbers, optional\n"
+                    "    Interior breakpoints between age buckets, passed to\n"
                     "    :func:`lsms_library.transformations.roster_to_characteristics`.\n"
-                    "    Defaults to ``(0, 4, 9, 14, 19, 31, 51)`` when omitted,\n"
-                    "    producing buckets ``00-03``, ``04-08``, …, ``51+``.\n"
+                    "    Partitions ages into ``len(age_cuts) + 1`` half-open\n"
+                    "    buckets ``[0, c_0), [c_0, c_1), ..., [c_{n-1}, inf)``.\n"
+                    "    Defaults to ``(4, 9, 14, 19, 31, 51)``, producing the\n"
+                    "    compact labels ``00-03``, ``04-08``, …, ``51+``.\n"
+                    "    Fractional breakpoints (e.g. ``(0.5, 1, 5)``) are\n"
+                    "    allowed and trigger explicit ``[lo, hi)`` labels.\n"
                 )
             method.__doc__ = "".join(doc_parts)
             method.__name__ = name

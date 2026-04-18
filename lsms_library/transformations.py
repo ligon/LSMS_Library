@@ -9,13 +9,55 @@ from pandas import concat, get_dummies, MultiIndex
 from cfe.df_utils import use_indices
 from .local_tools import format_id
 
-def age_intervals(age,age_cuts=(0,4,9,14,19,31,51)):
+def age_intervals(age, age_cuts=(4, 9, 14, 19, 31, 51)):
+    """Bucket ages into half-open intervals for household_characteristics.
+
+    ``age_cuts`` is a strictly increasing tuple of **interior breakpoints**,
+    each strictly positive.  Breakpoints may be fractional (e.g. ``0.5`` to
+    separate neonates from older infants).  The tuple partitions ages into
+    ``len(age_cuts) + 1`` half-open buckets:
+
+        [0, c_0), [c_0, c_1), ..., [c_{n-1}, inf)
+
+    The default ``(4, 9, 14, 19, 31, 51)`` reproduces the demographic
+    buckets `00-03`, `04-08`, ..., `51+` used throughout the library.
+
+    Back-compat: earlier releases took ``(0, 4, 9, ...)`` with a leading
+    zero.  A leading zero is now stripped with a :class:`DeprecationWarning`
+    so legacy callers keep producing identical buckets.
+
+    Parameters
+    ----------
+    age : array-like
+        Numeric ages.  Negative values fall outside the first bucket and
+        become NaN.
+    age_cuts : tuple of positive numbers, strictly increasing
+        Interior breakpoints between buckets.
+
+    Returns
+    -------
+    pandas.Categorical
+        Half-open ``[a, b)`` intervals, one per input age.
     """
-    Take as input a Series (e.g., a row from a dataframe), and use variables =Age= and =Sex=
-    to create a set of coarser categories.
-    """
-    age_cuts = [-np.inf]+list(age_cuts)+[np.inf]
-    return pd.cut(age,age_cuts,duplicates='drop', right = False)
+    cuts = list(age_cuts)
+    if cuts and cuts[0] == 0:
+        import warnings
+        warnings.warn(
+            "age_cuts with a leading 0 is deprecated; pass interior "
+            "breakpoints only (the first bucket always starts at 0). "
+            "Buckets are unchanged; drop the leading 0 to silence this.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        cuts = cuts[1:]
+    if not cuts:
+        raise ValueError("age_cuts must contain at least one positive breakpoint")
+    if any(c <= 0 for c in cuts):
+        raise ValueError(f"age_cuts breakpoints must be > 0; got {age_cuts}")
+    if any(a >= b for a, b in zip(cuts, cuts[1:])):
+        raise ValueError(f"age_cuts must be strictly increasing; got {age_cuts}")
+    bins = [0, *cuts, np.inf]
+    return pd.cut(age, bins, duplicates='drop', right=False)
 
 def dummies(df,cols,suffix=False):
     """From a dataframe df, construct an array of indicator (dummy) variables,
@@ -51,15 +93,47 @@ def dummies(df,cols,suffix=False):
 
     return v
 
-def format_interval(interval):
-    if interval.right == np.inf:
-        return f"{int(interval.left)}+"
-    elif interval.left == -np.inf:
-        return f'00-03'
-    else:
-        return f"{int(interval.left):02d}-{int(interval.right-1):02d}"
+def _is_int_bound(x):
+    """True if ``x`` is an integer-valued finite number."""
+    try:
+        return np.isfinite(x) and float(x).is_integer()
+    except (TypeError, ValueError):
+        return False
 
-def roster_to_characteristics(df, age_cuts=(0,4,9,14,19,31,51), drop = 'pid', final_index = ['t','v','i']):
+
+def _fmt_bound(x):
+    """Render a numeric bound for use inside an explicit ``[a, b)`` label."""
+    if _is_int_bound(x):
+        return str(int(x))
+    return f"{x:g}"
+
+
+def format_interval(interval, compact=True):
+    """Render a ``pd.Interval`` as a human-readable column-name label.
+
+    Two styles, selected by the ``compact`` flag:
+
+    * **Compact (default)** — matches the historical ``household_characteristics``
+      column names.  Finite integer bounds span-1 apart or wider collapse to
+      ``"{lo:02d}-{hi-1:02d}"`` (e.g. ``[0, 4)`` → ``"00-03"``); the
+      unbounded-top bucket renders as ``"{lo:02d}+"`` (e.g. ``[51, inf)`` →
+      ``"51+"``).
+    * **Explicit** — half-open interval notation ``"[lo, hi)"`` with
+      ``"{lo}+"`` for the unbounded top bucket.  Used whenever any bound is
+      fractional (spans shorter than a year).
+
+    :func:`roster_to_characteristics` picks ``compact=True`` when all
+    ``age_cuts`` are integers and ``False`` otherwise, so column names stay
+    consistent within a single call.
+    """
+    lo, hi = interval.left, interval.right
+    if hi == np.inf:
+        return f"{int(lo):02d}+" if _is_int_bound(lo) else f"{_fmt_bound(lo)}+"
+    if compact and _is_int_bound(lo) and _is_int_bound(hi) and (hi - lo) >= 1:
+        return f"{int(lo):02d}-{int(hi) - 1:02d}"
+    return f"[{_fmt_bound(lo)}, {_fmt_bound(hi)})"
+
+def roster_to_characteristics(df, age_cuts=(4, 9, 14, 19, 31, 51), drop='pid', final_index=['t', 'v', 'i']):
     """Collapse a household roster into household-level sex × age counts.
 
     Drives the derived ``household_characteristics`` table: takes a
@@ -74,9 +148,14 @@ def roster_to_characteristics(df, age_cuts=(0,4,9,14,19,31,51), drop = 'pid', fi
     ----------
     df : pandas.DataFrame
         Household roster with ``Sex`` and ``Age`` columns (case-insensitive).
-    age_cuts : tuple[int, ...]
-        Upper bounds for age buckets; ``(0, 4, 9, 14, 19, 31, 51)`` by
-        default, producing the buckets ``00-03``, ``04-08``, …, ``51+``.
+    age_cuts : tuple of positive numbers, strictly increasing
+        Interior breakpoints separating age buckets.  See
+        :func:`age_intervals` for the full semantics; the default
+        ``(4, 9, 14, 19, 31, 51)`` produces the historical buckets
+        ``00-03``, ``04-08``, ``09-13``, ``14-18``, ``19-30``, ``31-50``,
+        ``51+``.  Fractional breakpoints (e.g. ``(0.5, 1, 5)``) are
+        allowed and switch the label format from compact ``00-03``-style
+        to explicit half-open ``[lo, hi)``-style.
     drop : str
         Index level to drop before aggregation (typically ``'pid'``).
     final_index : list[str]
@@ -128,8 +207,12 @@ def roster_to_characteristics(df, age_cuts=(0,4,9,14,19,31,51), drop = 'pid', fi
         roster_df = roster_df[keep]
     roster_df = roster_df.dropna(subset=['sex', 'age'])
     roster_df['age_interval'] = age_intervals(roster_df['age'], age_cuts)
+    # All-integer breakpoints (including the 0 left edge and open inf) → compact
+    # "00-03"-style labels that preserve historical column names; any fractional
+    # breakpoint triggers explicit "[lo, hi)"-style labels uniformly.
+    _compact = all(_is_int_bound(c) for c in age_cuts if c != 0)
     roster_df['sex_age'] = roster_df.apply(
-        lambda x: f"{x['sex']} {format_interval(x['age_interval'])}" if not pd.isna(x['age_interval']) else f"{x['sex']} NA",
+        lambda x: f"{x['sex']} {format_interval(x['age_interval'], compact=_compact)}" if not pd.isna(x['age_interval']) else f"{x['sex']} NA",
         axis=1
     )
     roster_df = dummies(roster_df,['sex_age'])
