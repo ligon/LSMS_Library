@@ -2298,7 +2298,13 @@ class Country:
             return method
 
         if name in self.data_scheme or name in self._FOOD_DERIVED or name in self._ROSTER_DERIVED:
-            def method(waves=None, market=None, labels='Preferred'):
+            def method(waves=None, market=None, labels='Preferred', age_cuts=None):
+                if age_cuts is not None and name not in self._ROSTER_DERIVED:
+                    raise TypeError(
+                        f"{name}() got an unexpected keyword argument 'age_cuts'; "
+                        "only roster-derived tables (e.g. household_characteristics) "
+                        "accept age_cuts."
+                    )
                 # For derived food tables, try deriving from food_acquired first
                 # before falling back to wave-level scripts / make
                 if (name in self._FOOD_DERIVED
@@ -2345,8 +2351,10 @@ class Country:
                             final_index = [n for n in ['t', 'v', 'i', 'm'] if n in idx]
                             if not final_index:
                                 final_index = [n for n in idx if n != 'pid']
-                            result = roster_to_characteristics(
-                                roster, drop='pid', final_index=final_index)
+                            rc_kwargs = {'drop': 'pid', 'final_index': final_index}
+                            if age_cuts is not None:
+                                rc_kwargs['age_cuts'] = tuple(age_cuts)
+                            result = roster_to_characteristics(roster, **rc_kwargs)
                             if market is not None:
                                 result = self._add_market_index(result, column=market)
                             return result
@@ -2364,24 +2372,33 @@ class Country:
                 if market is not None and isinstance(result, pd.DataFrame) and not result.empty:
                     result = self._add_market_index(result, column=market)
                 return result
-            method.__doc__ = (
-                f"Return {name} as a DataFrame, aggregated across *waves*.\n\n"
-                "Parameters\n----------\n"
-                "waves : list of str, optional\n"
-                "    Subset of waves to include.  Defaults to all available.\n"
-                "market : str, optional\n"
-                "    Column from cluster_features (e.g. 'Region') to add as\n"
-                "    an ``m`` index level for demand estimation.\n"
-                "labels : str, optional\n"
-                "    Label column to use for the ``j`` index on derived food\n"
-                "    tables (food_expenditures, food_quantities, food_prices).\n"
-                "    Defaults to ``'Preferred'`` (current behaviour).  Other\n"
-                "    values (e.g. ``'Aggregate'``) select a same-named column\n"
-                "    from the country's ``food_items`` / ``harmonize_food``\n"
-                "    table; ``food_expenditures`` and ``food_quantities`` are\n"
-                "    re-aggregated after renaming.  Raises ``KeyError`` if the\n"
-                "    column is absent.\n"
-            )
+            doc_parts = [
+                f"Return {name} as a DataFrame, aggregated across *waves*.\n\n",
+                "Parameters\n----------\n",
+                "waves : list of str, optional\n",
+                "    Subset of waves to include.  Defaults to all available.\n",
+                "market : str, optional\n",
+                "    Column from cluster_features (e.g. 'Region') to add as\n",
+                "    an ``m`` index level for demand estimation.\n",
+                "labels : str, optional\n",
+                "    Label column to use for the ``j`` index on derived food\n",
+                "    tables (food_expenditures, food_quantities, food_prices).\n",
+                "    Defaults to ``'Preferred'`` (current behaviour).  Other\n",
+                "    values (e.g. ``'Aggregate'``) select a same-named column\n",
+                "    from the country's ``food_items`` / ``harmonize_food``\n",
+                "    table; ``food_expenditures`` and ``food_quantities`` are\n",
+                "    re-aggregated after renaming.  Raises ``KeyError`` if the\n",
+                "    column is absent.\n",
+            ]
+            if name in self._ROSTER_DERIVED:
+                doc_parts.append(
+                    "age_cuts : tuple[int, ...], optional\n"
+                    "    Upper bounds for age buckets passed to\n"
+                    "    :func:`lsms_library.transformations.roster_to_characteristics`.\n"
+                    "    Defaults to ``(0, 4, 9, 14, 19, 31, 51)`` when omitted,\n"
+                    "    producing buckets ``00-03``, ``04-08``, …, ``51+``.\n"
+                )
+            method.__doc__ = "".join(doc_parts)
             method.__name__ = name
             method.__qualname__ = f"Country.{name}"
             method.__module__ = self.__class__.__module__
