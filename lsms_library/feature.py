@@ -138,9 +138,11 @@ class Feature:
                 # Prepend country as an index level
                 df = pd.concat({name: df}, names=["country"])
                 frames.append(df)
-            except (KeyError, ValueError, AttributeError, OSError) as e:
+            except Exception as e:  # broad catch intentional: surface per-country failures as warnings
+                # Cross-country aggregation must not crash on one country's
+                # implementation error; the warning carries the specific type.
                 warnings.warn(
-                    f"Failed to load {self.table_name} for {name}: {e}"
+                    f"Failed to load {self.table_name} for {name}: {type(e).__name__}: {e}"
                 )
 
         if not frames:
