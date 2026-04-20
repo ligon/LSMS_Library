@@ -224,3 +224,101 @@ class TestSample:
             f"{country_name}: {bad.sum()} refreshment households have "
             f"non-positive cross-sectional weight"
         )
+
+
+# ---------------------------------------------------------------------------
+# Uganda 2009-10 hybrid v: comm when present, "@lat,lon" synthetic otherwise.
+# See countries/Uganda/_/CONTENTS.org §"Hybrid v in 2009-10" for rationale.
+# ---------------------------------------------------------------------------
+
+class TestUganda2009HybridV:
+    """2009-10 uses the `coalesce_coord_bin` transformer to fill v for
+    the 565 HH whose `comm` is blank (movers + split-offs + 5 data-entry
+    anomalies).  After the fix:
+      - 2 410 HH have a numeric-string `comm` (317 distinct EAs);
+      - 541 HH have a synthetic `@lat,lon` label (~339 distinct bins);
+      - 24 HH are genuinely NA (no comm AND no coords).
+    """
+
+    @pytest.fixture()
+    def s09(self):
+        df = _get_sample("Uganda")
+        if df is None:
+            pytest.skip("Uganda.sample() could not be built")
+        try:
+            return df.xs("2009-10", level="t")
+        except KeyError:
+            pytest.skip("no 2009-10 wave in Uganda sample()")
+
+    def test_row_count(self, s09):
+        assert len(s09) == 2975, f"expected 2975 HH, got {len(s09)}"
+
+    def test_na_exact(self, s09):
+        assert s09["v"].isna().sum() == 24, (
+            f"expected exactly 24 NA v's (geo-missing tail), got "
+            f"{s09['v'].isna().sum()}"
+        )
+
+    def test_no_empty_strings(self, s09):
+        empty = (s09["v"] == "").sum()
+        assert empty == 0, (
+            f"{empty} rows with empty-string v — NA sentinel should be pd.NA"
+        )
+
+    def test_partitions_by_form(self, s09):
+        v = s09["v"].astype("string")
+        numeric = v.str.fullmatch(r"\d+", na=False)
+        synthetic = v.str.startswith("@").fillna(False)
+        na = v.isna()
+        # No overlap.
+        assert not (numeric & synthetic).any()
+        assert not (numeric & na).any()
+        assert not (synthetic & na).any()
+        # Cover everyone.
+        assert (numeric | synthetic | na).all()
+
+    def test_real_comm_count(self, s09):
+        numeric = s09["v"].astype("string").str.fullmatch(r"\d+", na=False)
+        n = numeric.sum()
+        # 2410 is the expected count; allow small drift from upstream data
+        # cleaning, but flag anything that departs meaningfully.
+        assert 2400 <= n <= 2420, f"expected ~2410 numeric-comm HH, got {n}"
+        # Distinct EAs on the real side — the 2005-06 sampling frame had
+        # 322 EAs; 2009-10 saw 317 of them with at least one surviving HH.
+        unique_real = s09.loc[numeric, "v"].nunique()
+        assert 310 <= unique_real <= 325, (
+            f"expected ~317 distinct real comms, got {unique_real}"
+        )
+
+    def test_synthetic_count(self, s09):
+        synthetic = s09["v"].astype("string").str.startswith("@").fillna(False)
+        n = synthetic.sum()
+        # 541 expected (movers + split-offs + 5 anomalies whose coords are
+        # present in the geovars file).  Allow small drift for upstream
+        # corrections.
+        assert 530 <= n <= 555, f"expected ~541 synthetic-v HH, got {n}"
+
+    def test_synthetic_labels_well_formed(self, s09):
+        synthetic = s09["v"].astype("string")
+        synthetic = synthetic[synthetic.str.startswith("@").fillna(False)]
+        # Format: @[+-]dd.dd,[+-]ddd.dd (lat, lon with 0.01° precision).
+        pattern = r"^@[+-]\d+\.\d{2},[+-]\d+\.\d{2}$"
+        bad = synthetic[~synthetic.str.match(pattern, na=False)]
+        assert bad.empty, (
+            f"{len(bad)} synthetic v's don't match {pattern}: {bad.head().tolist()}"
+        )
+
+    def test_synthetic_disjoint_from_real(self, s09):
+        """Any @-prefixed value must not collide with any numeric comm —
+        this is the property that lets downstream CSECTION joins naturally
+        skip the synthetic entries."""
+        v = s09["v"].astype("string")
+        numeric_vals = set(v[v.str.fullmatch(r"\d+", na=False)].dropna())
+        synth_vals = set(v[v.str.startswith("@").fillna(False)].dropna())
+        assert numeric_vals.isdisjoint(synth_vals)
+
+    def test_temporary_columns_dropped(self, s09):
+        """The `_lat`/`_lon` columns should be consumed by the transformer
+        and removed by `drop:` — they must not leak into the final frame."""
+        leaked = [c for c in s09.columns if c.startswith("_")]
+        assert not leaked, f"temporary columns leaked: {leaked}"
