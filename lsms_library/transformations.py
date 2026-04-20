@@ -222,6 +222,134 @@ def roster_to_characteristics(df, age_cuts=(4, 9, 14, 19, 31, 51), drop='pid', f
     result.columns = result.columns.get_level_values(0)
     return result
 
+def fill_v_with_coord_bin(df, target='v', lat='_lat', lon='_lon',
+                          grid_degrees=0.05, prefix='@'):
+    """Fill blank ``target`` entries with a synthetic ``{prefix}lat,lon`` label.
+
+    For rows where ``target`` is NA or the empty string, build a synthetic
+    cluster identifier from the modified coordinates: bin ``lat``/``lon`` to
+    a ``grid_degrees`` grid and format as ``{prefix}{lat:+.2f},{lon:+.2f}``.
+    Rows whose ``lat`` or ``lon`` is itself missing keep their missing
+    ``target`` — nothing can be synthesised from unknown coordinates.
+
+    Intended as a ``derived:`` transformer for ``sample()`` in panels where
+    some households (movers, split-offs) fall outside the original sampling
+    frame and therefore have no panel-EA code, yet do carry modified GPS
+    coordinates so a within-wave spatial cluster can still be expressed.
+    The ``@`` prefix keeps the synthetic labels distinct from real
+    numeric-string EA codes, so downstream joins to the community
+    questionnaire naturally don't match them.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Post-merge frame containing ``target``, ``lat``, and ``lon``
+        columns.  Target may be the empty string or NA on rows to fill.
+    target : str
+        Name of the column to fill (default ``'v'``).
+    lat, lon : str
+        Names of the latitude/longitude columns (defaults ``'_lat'`` /
+        ``'_lon'`` — the leading underscore is a convention for temporary
+        columns that will be removed by a ``drop:`` clause).
+    grid_degrees : float
+        Grid resolution in decimal degrees.  Default 0.05 ≈ 5.5 km at the
+        equator, which matches the rural coordinate-jitter applied by
+        LSMS-ISA geo files so two physically co-located households
+        reliably share a bin.
+    prefix : str
+        Prefix distinguishing synthetic labels from real EA codes; default
+        ``'@'``.  Joins against real-EA tables (e.g. a community
+        questionnaire keyed by the original EA code) will not match
+        synthetic labels — by construction, not by accident.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Copy of ``df`` with ``target`` populated where coordinates allow.
+    """
+    if target not in df.columns:
+        raise ValueError(f"{target!r} not in DataFrame columns; cannot coalesce")
+    for col in (lat, lon):
+        if col not in df.columns:
+            raise ValueError(
+                f"{col!r} not in DataFrame columns; cannot synthesise "
+                f"{target!r} from coordinates"
+            )
+    out = df.copy()
+    v = out[target]
+    # A "blank" target is NA or the empty string — we treat them the same for
+    # fill purposes, and normalise both to pd.NA in the output when we can't
+    # fill (so downstream consumers see one missing sentinel, not two).
+    blank = v.isna() | (v.astype('string').fillna('') == '')
+    lat_vals = pd.to_numeric(out[lat], errors='coerce')
+    lon_vals = pd.to_numeric(out[lon], errors='coerce')
+    coords_ok = lat_vals.notna() & lon_vals.notna()
+    fill_mask = blank & coords_ok
+    cant_fill = blank & ~coords_ok
+    lat_bin = (lat_vals / grid_degrees).round() * grid_degrees
+    lon_bin = (lon_vals / grid_degrees).round() * grid_degrees
+    synthetic = (
+        prefix
+        + lat_bin.map(lambda x: f'{x:+.2f}' if pd.notna(x) else '')
+        + ','
+        + lon_bin.map(lambda x: f'{x:+.2f}' if pd.notna(x) else '')
+    ).astype('string')
+    # String dtype throughout so the union is homogeneous.
+    result = v.astype('string')
+    result = result.mask(fill_mask, synthetic)
+    result = result.mask(cant_fill, pd.NA)
+    # Also normalise any pre-existing empty strings that weren't filled.
+    result = result.replace({'': pd.NA})
+    out[target] = result
+    return out
+
+
+# Registry of transformers usable from a ``derived:`` block in
+# ``data_info.yml``.  Each entry is ``kind: callable(df, target=<col>, **kwargs)``
+# — the dispatcher supplies ``target`` from the derived-block key; everything
+# else comes from the YAML.  Add new transformers here; document their
+# kwargs in the callable's docstring.
+_DERIVED_TRANSFORMERS = {
+    'coalesce_coord_bin': fill_v_with_coord_bin,
+}
+
+
+def apply_derived(df, derived_spec):
+    """Apply a ``derived:`` block from ``data_info.yml`` to a DataFrame.
+
+    ``derived_spec`` is ``{output_col: {kind: <name>, **kwargs}}``; each
+    entry dispatches to the transformer registered under ``kind`` in
+    :data:`_DERIVED_TRANSFORMERS`.  The target column name is forwarded
+    to the transformer as ``target=<output_col>`` and must not appear
+    in the YAML kwargs.  Unknown ``kind`` raises ``ValueError`` with
+    the list of registered transformers so mistakes surface at read
+    time, not in a mysterious downstream KeyError.
+    """
+    if not derived_spec:
+        return df
+    for output_col, step in derived_spec.items():
+        step = dict(step)                          # don't mutate caller
+        kind = step.pop('kind', None)
+        if kind is None:
+            raise ValueError(
+                f"derived: entry for {output_col!r} missing required 'kind:' key"
+            )
+        if 'target' in step:
+            raise ValueError(
+                f"derived: entry for {output_col!r} must not set 'target:' "
+                f"(target is taken from the block key)"
+            )
+        fn = _DERIVED_TRANSFORMERS.get(kind)
+        if fn is None:
+            registered = sorted(_DERIVED_TRANSFORMERS)
+            raise ValueError(
+                f"derived: unknown kind {kind!r} for column {output_col!r}; "
+                f"registered transformers: {registered}"
+            )
+        df = fn(df, target=output_col, **step)
+    return df
+
+
 def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=['t','m','i'], unit_col = 'u'):
     """Infer local-unit → kg conversion factors from price ratios.
 

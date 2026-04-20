@@ -667,6 +667,22 @@ class Wave:
                         for i in range(2, len(merge_dfs)):
                             df = pd.merge(df, merge_dfs[i], on=merge_on, how='outer')
                     df = df.set_index(idxvars_list)
+                # Apply any `derived:` transformers declared in the YAML.  These
+                # run on the merged-and-indexed frame, before the per-request
+                # Python hook, so they see the full multi-source result and
+                # anything the hook does afterwards builds on the derived
+                # columns.  See transformations.apply_derived for the contract.
+                derived_spec = data_info.get('derived')
+                if derived_spec:
+                    from .transformations import apply_derived
+                    df = apply_derived(df, derived_spec)
+                # `drop:` removes the temporary columns that existed only to
+                # feed the `derived:` transformers.  Listed columns that aren't
+                # present are silently skipped so YAML authors don't have to
+                # keep the list in lock-step with conditional transformers.
+                drop_cols = data_info.get('drop') or []
+                if drop_cols:
+                    df = df.drop(columns=[c for c in drop_cols if c in df.columns])
                 if df_edit_function:
                     df = df_edit_function(df)
 
