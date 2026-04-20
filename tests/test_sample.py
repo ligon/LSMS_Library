@@ -367,3 +367,63 @@ class TestUgandaRegionOnSample:
                 f"{wave}: only {frac:.1%} of HH have Region populated "
                 f"({non_null}/{len(sub)})"
             )
+
+
+# ---------------------------------------------------------------------------
+# _add_market_index: HH-level fallback for synthetic-v rows
+# ---------------------------------------------------------------------------
+
+class TestUganda2009MarketFallback:
+    """When `cluster_features.Region` has no row for a HH's v (e.g.
+    synthetic `@lat,lon` in 2009-10), `_add_market_index` should fall back
+    to `sample()['Region']` at HH level rather than silently drop the HH.
+    Without the fallback, movers + split-offs were being filtered out of
+    `food_expenditures(market='Region')` — defeating the hybrid-v recovery.
+    """
+
+    def test_food_expenditures_retains_hybrid_v_HH(self):
+        """food_expenditures(market='Region') should retain the 2 929 HH
+        in Uganda 2009-10, not the 2 240 that survive cluster-only Region."""
+        import lsms_library as ll
+        uga = ll.Country("Uganda")
+        fe = uga.food_expenditures(market="Region").squeeze()
+        if "t" not in fe.index.names or "m" not in fe.index.names:
+            pytest.fail(
+                f"food_expenditures(market='Region') index {fe.index.names} "
+                "missing required t/m levels"
+            )
+        if "2009-10" not in fe.index.get_level_values("t").unique():
+            pytest.skip("no 2009-10 wave")
+        hh09 = fe.xs("2009-10", level="t").index.get_level_values("i").nunique()
+        # Sample-level HH count in 2009-10 is 2 975 (full roster).  22 HH have
+        # no food-expenditure records and drop out for that reason, not because
+        # of a NaN Region.  The pre-fallback coverage was ~2 240.
+        assert hh09 >= 2900, (
+            f"food_expenditures(market='Region') retained only {hh09} HH in "
+            f"2009-10 — expected ≥2900 after _add_market_index HH-level "
+            f"fallback"
+        )
+
+    def test_household_characteristics_retains_hybrid_v_HH(self):
+        """household_characteristics(market='Region') should cover the
+        full 2 951 HH (those with populated sample.v, hybrid or real)."""
+        import lsms_library as ll
+        uga = ll.Country("Uganda")
+        hc = uga.household_characteristics(market="Region")
+        if "2009-10" not in hc.index.get_level_values("t").unique():
+            pytest.skip("no 2009-10 wave")
+        hh09 = hc.xs("2009-10", level="t").index.get_level_values("i").nunique()
+        assert hh09 >= 2900, (
+            f"household_characteristics(market='Region') retained only "
+            f"{hh09} HH in 2009-10 — expected ≥2900 after fallback"
+        )
+
+    def test_no_nan_m_after_fallback(self):
+        """After the fallback, no row in food_expenditures(market='Region')
+        for Uganda 2009-10 should have a NaN m."""
+        import lsms_library as ll
+        uga = ll.Country("Uganda")
+        fe = uga.food_expenditures(market="Region").squeeze()
+        m_vals = fe.index.get_level_values("m").astype("string")
+        nan_count = m_vals.isna().sum()
+        assert nan_count == 0, f"{nan_count} rows have NaN m after fallback"

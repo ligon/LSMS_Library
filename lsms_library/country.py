@@ -1233,6 +1233,37 @@ class Country:
         lkup['v'] = _normalize_v(lkup['v'])
         flat = flat.merge(lkup, on=['t', 'v'], how='left')
 
+        # Some rows may not match cluster_features — in particular, HH whose
+        # ``v`` is a synthetic label (e.g. ``@lat,lon`` from Uganda 2009-10's
+        # hybrid v) don't have an EA in cluster_features and come back NaN.
+        # Fall back to HH-level ``column`` from sample() if that table
+        # happens to carry it — this recovers movers/split-offs without
+        # changing the cluster-level semantics for HH that did match.
+        missing_m = flat['m'].isna()
+        if missing_m.any() and 'sample' in self.data_scheme:
+            try:
+                s = self.sample()
+            except Exception as exc:
+                logger.info(
+                    "_add_market_index: could not load sample() for HH-level "
+                    "fallback of column %r on %s: %s",
+                    column, self.name, exc,
+                )
+                s = None
+            if isinstance(s, pd.DataFrame) and column in s.columns:
+                hh_lookup = s[column].rename('m_hh')
+                if 'v' in hh_lookup.index.names:
+                    hh_lookup = hh_lookup.droplevel('v')
+                hh_lookup = hh_lookup[~hh_lookup.index.duplicated(keep='first')]
+                hh_lookup.index = hh_lookup.index.set_names(
+                    [n if n in ('i', 't') else n for n in hh_lookup.index.names]
+                )
+                flat = flat.merge(
+                    hh_lookup, how='left', left_on=['i', 't'], right_index=True
+                )
+                flat['m'] = flat['m'].fillna(flat['m_hh'])
+                flat = flat.drop(columns=['m_hh'])
+
         flat = flat.dropna(subset=['m'])
         # Drop village/cluster index (v) since m supersedes it
         if 'v' in idx_names:
