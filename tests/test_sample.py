@@ -322,3 +322,48 @@ class TestUganda2009HybridV:
         and removed by `drop:` — they must not leak into the final frame."""
         leaked = [c for c in s09.columns if c.startswith("_")]
         assert not leaked, f"temporary columns leaked: {leaked}"
+
+
+# ---------------------------------------------------------------------------
+# Uganda: HH-level Region exposed on sample() (not just cluster-level).
+# ---------------------------------------------------------------------------
+
+class TestUgandaRegionOnSample:
+    """`sample()[['Region']]` should be populated per-HH for every Uganda
+    wave, mapping to the canonical 4-region set used by cluster_features.
+    Kampala is folded into Central (2009-10, 2010-11); 2005-06's `'0'`
+    sentinel (same encoding quirk as Rural) is also folded into Central.
+    """
+
+    @pytest.fixture()
+    def uga_sample(self):
+        df = _get_sample("Uganda")
+        if df is None:
+            pytest.skip("Uganda.sample() could not be built")
+        if "Region" not in df.columns:
+            pytest.fail("Uganda.sample() missing 'Region' column")
+        return df
+
+    def test_region_present(self, uga_sample):
+        assert "Region" in uga_sample.columns
+
+    def test_region_canonical_labels(self, uga_sample):
+        """Every non-NA Region value must be one of the four canonical
+        labels — no '0', 'None', 'Kampala', or numeric residue."""
+        canonical = {"Central", "Eastern", "Northern", "Western"}
+        bad = set(uga_sample["Region"].dropna().astype(str).unique()) - canonical
+        assert not bad, (
+            f"Uganda sample().Region contains non-canonical labels: {sorted(bad)}"
+        )
+
+    def test_region_coverage_per_wave(self, uga_sample):
+        """All waves except (possibly) 2019-20 should have ≥99% HH with
+        a populated Region.  2019-20 has a handful of NA in the
+        refreshment tail."""
+        for wave, sub in uga_sample.groupby("t"):
+            non_null = sub["Region"].notna().sum()
+            frac = non_null / len(sub)
+            assert frac >= 0.995, (
+                f"{wave}: only {frac:.1%} of HH have Region populated "
+                f"({non_null}/{len(sub)})"
+            )
