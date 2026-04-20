@@ -1190,27 +1190,23 @@ class Country:
         return result
 
     def _add_market_index(self, df: pd.DataFrame, column: str = 'Region') -> pd.DataFrame:
-        """Join a market identifier ``m`` from cluster_features onto *df*.
+        """Join a market identifier ``m`` onto *df*, preferring the HH-level
+        source.
 
-        Joins on ``(t, v)`` from ``_market_lookup(column)``.  If *df*
-        lacks ``v`` in its index (e.g. a derived table that bypassed
-        ``_finalize_result``), join ``v`` from ``sample()`` first.
+        Looks ``column`` up first from ``sample()`` (HH-level, keyed on
+        ``(i, t)``) and falls back to ``cluster_features()`` (cluster-level,
+        keyed on ``(t, v)``) for rows where sample has no value.  Prior
+        implementations had the opposite priority, which systematically
+        reassigned HH whose own survey-reported region differed from the
+        cluster's modal label — for Uganda that affected ~145 HH per wave
+        relative to the retired ``other_features()`` path.
+
+        ``cluster_features`` is retained as a fallback so countries whose
+        ``sample()`` doesn't expose ``column`` still get a market label
+        (via the historical cluster-level path).
 
         Returns *df* with ``m`` added and ``v`` removed from the index.
         """
-        lookup = self._market_lookup(column)
-
-        # Ensure v is present before doing the (t, v) -> m join
-        if 'v' not in (df.index.names if isinstance(df.index, pd.MultiIndex) else [df.index.name]):
-            if 'sample' in self.data_scheme:
-                df = self._join_v_from_sample(df)
-            else:
-                warnings.warn(
-                    f"_add_market_index: cannot join market {column!r} — "
-                    f"v not in index and no sample() table available for {self.name}"
-                )
-                return df
-
         idx_names = list(df.index.names)
         flat = df.reset_index()
 
@@ -1225,28 +1221,15 @@ class Country:
                     return str(x).strip()
             return series.map(_norm)
 
-        # Join on (t, v) — v is now guaranteed present
-        flat['t'] = flat['t'].astype(str)
-        flat['v'] = _normalize_v(flat['v'])
-        lkup = lookup.copy()
-        lkup['t'] = lkup['t'].astype(str)
-        lkup['v'] = _normalize_v(lkup['v'])
-        flat = flat.merge(lkup, on=['t', 'v'], how='left')
-
-        # Some rows may not match cluster_features — in particular, HH whose
-        # ``v`` is a synthetic label (e.g. ``@lat,lon`` from Uganda 2009-10's
-        # hybrid v) don't have an EA in cluster_features and come back NaN.
-        # Fall back to HH-level ``column`` from sample() if that table
-        # happens to carry it — this recovers movers/split-offs without
-        # changing the cluster-level semantics for HH that did match.
-        missing_m = flat['m'].isna()
-        if missing_m.any() and 'sample' in self.data_scheme:
+        # --- primary: HH-level lookup from sample() on (i, t) ---
+        flat['m'] = pd.NA
+        if 'sample' in self.data_scheme:
             try:
                 s = self.sample()
             except Exception as exc:
                 logger.info(
                     "_add_market_index: could not load sample() for HH-level "
-                    "fallback of column %r on %s: %s",
+                    "lookup of column %r on %s: %s",
                     column, self.name, exc,
                 )
                 s = None
@@ -1255,21 +1238,47 @@ class Country:
                 if 'v' in hh_lookup.index.names:
                     hh_lookup = hh_lookup.droplevel('v')
                 hh_lookup = hh_lookup[~hh_lookup.index.duplicated(keep='first')]
-                hh_lookup.index = hh_lookup.index.set_names(
-                    [n if n in ('i', 't') else n for n in hh_lookup.index.names]
-                )
                 flat = flat.merge(
                     hh_lookup, how='left', left_on=['i', 't'], right_index=True
                 )
+                # HH-level value takes priority; for rows where it's NA we
+                # fall through to the cluster-level lookup below.
                 flat['m'] = flat['m'].fillna(flat['m_hh'])
                 flat = flat.drop(columns=['m_hh'])
 
+        # --- fallback: cluster-level lookup on (t, v) for still-missing m ---
+        missing = flat['m'].isna()
+        if missing.any():
+            # Ensure v is available for the cluster-level merge.
+            if 'v' not in flat.columns:
+                if 'sample' in self.data_scheme:
+                    df_with_v = self._join_v_from_sample(df)
+                    v_lookup = df_with_v.reset_index()[['i', 't', 'v']]
+                    flat = flat.merge(v_lookup, on=['i', 't'], how='left')
+                else:
+                    warnings.warn(
+                        f"_add_market_index: {missing.sum()} row(s) have NaN "
+                        f"{column!r} at HH level and v is unavailable for "
+                        f"cluster-level fallback on {self.name}"
+                    )
+            if 'v' in flat.columns:
+                lookup = self._market_lookup(column).copy()
+                flat['t'] = flat['t'].astype(str)
+                flat['v'] = _normalize_v(flat['v'])
+                lookup['t'] = lookup['t'].astype(str)
+                lookup['v'] = _normalize_v(lookup['v'])
+                lookup = lookup.rename(columns={'m': 'm_cluster'})
+                flat = flat.merge(lookup, on=['t', 'v'], how='left')
+                flat['m'] = flat['m'].fillna(flat['m_cluster'])
+                flat = flat.drop(columns=['m_cluster'])
+
         flat = flat.dropna(subset=['m'])
+
         # Drop village/cluster index (v) since m supersedes it
         if 'v' in idx_names:
             idx_names = [n for n in idx_names if n != 'v']
-            if 'v' in flat.columns:
-                flat = flat.drop(columns=['v'])
+        if 'v' in flat.columns:
+            flat = flat.drop(columns=['v'])
         # Insert m after t to match cfe convention (i, t, m, ...)
         new_idx = []
         for n in idx_names:
