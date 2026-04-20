@@ -50,6 +50,15 @@ sample:
             panel_weight: wgt09  # pre-refreshment — same as cross-sectional
             strata: stratum
             Rural: urban
+            # HH-level Region — populated in GSEC1 for every household
+            # (including the 565 movers/split-offs whose comm is blank),
+            # so Region is always available regardless of whether v ended
+            # up as a real comm or a synthetic @lat,lon label.
+            Region:
+                - region
+                - # Fix some values (matches cluster_features convention)
+                  " Kampala": "Central"
+                  "Central without Kampala": "Central"
     df_geo:
         file: ../Data/UNPS_Geovars_0910.dta
         idxvars:

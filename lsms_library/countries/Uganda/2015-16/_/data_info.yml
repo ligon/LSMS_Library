@@ -30,6 +30,7 @@ sample:
         panel_weight: hwgt_W5  # longitudinal weight (zero for refreshment sample)
         strata: sregion
         Rural: urban
+        Region: region
 
 cluster_features:
     file: gsec1.dta

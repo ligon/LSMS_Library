@@ -40,6 +40,7 @@ sample:
         panel_weight: wgt  # longitudinal weight (zero for non-sample, NaN for refreshment)
         strata: sregion
         Rural: urban
+        Region: region
 
 cluster_features:
     file: ../Data/GSEC1.dta

@@ -49,6 +49,7 @@ sample:
         panel_weight: wgt
         strata: subreg
         Rural: urban
+        Region: region
 
 cluster_features:
     file: HH/gsec1.dta

@@ -41,6 +41,7 @@ sample:
         panel_weight: hwgt_W7  # longitudinal weight (NaN for refreshment sample)
         strata: subreg
         Rural: urban
+        Region: region
 
 cluster_features:
     file: GSEC1.dta

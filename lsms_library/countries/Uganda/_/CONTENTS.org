@@ -116,6 +116,35 @@ original-sample EA), so no fallback is needed.  From 2013-14 onward,
 =v= is a parish identifier — every household has one — and the
 issue disappears by construction.
 
+*** HH-level =Region= on =sample()=
+
+Since =v= can be a synthetic =@lat,lon= label (§above) that has no
+entry in =cluster_features()=, consumers that needed =Region= used to
+pull it from =cluster_features()= and silently lose those households
+— the cluster-level table is keyed on real EA codes and cannot answer
+for synthetic ones.  =sample()= now exposes =Region= directly as a
+household-level column for every Uganda wave (it reads the same
+=region= field that =cluster_features()= does, with the same Kampala
+→ Central fold in 2009-10 and 2010-11 where applicable).
+
+Practical consequence: =Country('Uganda').sample()[['v','Region']]=
+is complete for every household; joining =Region= from =sample()=
+— rather than =cluster_features()= — avoids dropping the 565
+movers/split-offs from any =(i, t, m)=-keyed regression where =m=
+is derived from Region.  Recommended pattern:
+
+#+begin_src python
+uga = ll.Country('Uganda')
+d = uga.household_characteristics()
+# Region = market at HH level, available for all HH including movers
+d = d.join(uga.sample()[['Region']])
+d = d.rename(columns={'Region': 'm'}).set_index('m', append=True)
+#+end_src
+
+Continue to use =cluster_features()[['Region']]= when you want the
+cluster-level view (e.g., summarising EAs); use =sample()[['Region']]=
+when you want every surveyed household covered.
+
 ** Rotating panel and refreshment sample
 
 Beginning in 2013-14, one-third of the original sample is refreshed
