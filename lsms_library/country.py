@@ -667,6 +667,22 @@ class Wave:
                         for i in range(2, len(merge_dfs)):
                             df = pd.merge(df, merge_dfs[i], on=merge_on, how='outer')
                     df = df.set_index(idxvars_list)
+                # Apply any `derived:` transformers declared in the YAML.  These
+                # run on the merged-and-indexed frame, before the per-request
+                # Python hook, so they see the full multi-source result and
+                # anything the hook does afterwards builds on the derived
+                # columns.  See transformations.apply_derived for the contract.
+                derived_spec = data_info.get('derived')
+                if derived_spec:
+                    from .transformations import apply_derived
+                    df = apply_derived(df, derived_spec)
+                # `drop:` removes the temporary columns that existed only to
+                # feed the `derived:` transformers.  Listed columns that aren't
+                # present are silently skipped so YAML authors don't have to
+                # keep the list in lock-step with conditional transformers.
+                drop_cols = data_info.get('drop') or []
+                if drop_cols:
+                    df = df.drop(columns=[c for c in drop_cols if c in df.columns])
                 if df_edit_function:
                     df = df_edit_function(df)
 
@@ -1174,27 +1190,23 @@ class Country:
         return result
 
     def _add_market_index(self, df: pd.DataFrame, column: str = 'Region') -> pd.DataFrame:
-        """Join a market identifier ``m`` from cluster_features onto *df*.
+        """Join a market identifier ``m`` onto *df*, preferring the HH-level
+        source.
 
-        Joins on ``(t, v)`` from ``_market_lookup(column)``.  If *df*
-        lacks ``v`` in its index (e.g. a derived table that bypassed
-        ``_finalize_result``), join ``v`` from ``sample()`` first.
+        Looks ``column`` up first from ``sample()`` (HH-level, keyed on
+        ``(i, t)``) and falls back to ``cluster_features()`` (cluster-level,
+        keyed on ``(t, v)``) for rows where sample has no value.  Prior
+        implementations had the opposite priority, which systematically
+        reassigned HH whose own survey-reported region differed from the
+        cluster's modal label — for Uganda that affected ~145 HH per wave
+        relative to the retired ``other_features()`` path.
+
+        ``cluster_features`` is retained as a fallback so countries whose
+        ``sample()`` doesn't expose ``column`` still get a market label
+        (via the historical cluster-level path).
 
         Returns *df* with ``m`` added and ``v`` removed from the index.
         """
-        lookup = self._market_lookup(column)
-
-        # Ensure v is present before doing the (t, v) -> m join
-        if 'v' not in (df.index.names if isinstance(df.index, pd.MultiIndex) else [df.index.name]):
-            if 'sample' in self.data_scheme:
-                df = self._join_v_from_sample(df)
-            else:
-                warnings.warn(
-                    f"_add_market_index: cannot join market {column!r} — "
-                    f"v not in index and no sample() table available for {self.name}"
-                )
-                return df
-
         idx_names = list(df.index.names)
         flat = df.reset_index()
 
@@ -1209,20 +1221,64 @@ class Country:
                     return str(x).strip()
             return series.map(_norm)
 
-        # Join on (t, v) — v is now guaranteed present
-        flat['t'] = flat['t'].astype(str)
-        flat['v'] = _normalize_v(flat['v'])
-        lkup = lookup.copy()
-        lkup['t'] = lkup['t'].astype(str)
-        lkup['v'] = _normalize_v(lkup['v'])
-        flat = flat.merge(lkup, on=['t', 'v'], how='left')
+        # --- primary: HH-level lookup from sample() on (i, t) ---
+        flat['m'] = pd.NA
+        if 'sample' in self.data_scheme:
+            try:
+                s = self.sample()
+            except Exception as exc:
+                logger.info(
+                    "_add_market_index: could not load sample() for HH-level "
+                    "lookup of column %r on %s: %s",
+                    column, self.name, exc,
+                )
+                s = None
+            if isinstance(s, pd.DataFrame) and column in s.columns:
+                hh_lookup = s[column].rename('m_hh')
+                if 'v' in hh_lookup.index.names:
+                    hh_lookup = hh_lookup.droplevel('v')
+                hh_lookup = hh_lookup[~hh_lookup.index.duplicated(keep='first')]
+                flat = flat.merge(
+                    hh_lookup, how='left', left_on=['i', 't'], right_index=True
+                )
+                # HH-level value takes priority; for rows where it's NA we
+                # fall through to the cluster-level lookup below.
+                flat['m'] = flat['m'].fillna(flat['m_hh'])
+                flat = flat.drop(columns=['m_hh'])
+
+        # --- fallback: cluster-level lookup on (t, v) for still-missing m ---
+        missing = flat['m'].isna()
+        if missing.any():
+            # Ensure v is available for the cluster-level merge.
+            if 'v' not in flat.columns:
+                if 'sample' in self.data_scheme:
+                    df_with_v = self._join_v_from_sample(df)
+                    v_lookup = df_with_v.reset_index()[['i', 't', 'v']]
+                    flat = flat.merge(v_lookup, on=['i', 't'], how='left')
+                else:
+                    warnings.warn(
+                        f"_add_market_index: {missing.sum()} row(s) have NaN "
+                        f"{column!r} at HH level and v is unavailable for "
+                        f"cluster-level fallback on {self.name}"
+                    )
+            if 'v' in flat.columns:
+                lookup = self._market_lookup(column).copy()
+                flat['t'] = flat['t'].astype(str)
+                flat['v'] = _normalize_v(flat['v'])
+                lookup['t'] = lookup['t'].astype(str)
+                lookup['v'] = _normalize_v(lookup['v'])
+                lookup = lookup.rename(columns={'m': 'm_cluster'})
+                flat = flat.merge(lookup, on=['t', 'v'], how='left')
+                flat['m'] = flat['m'].fillna(flat['m_cluster'])
+                flat = flat.drop(columns=['m_cluster'])
 
         flat = flat.dropna(subset=['m'])
+
         # Drop village/cluster index (v) since m supersedes it
         if 'v' in idx_names:
             idx_names = [n for n in idx_names if n != 'v']
-            if 'v' in flat.columns:
-                flat = flat.drop(columns=['v'])
+        if 'v' in flat.columns:
+            flat = flat.drop(columns=['v'])
         # Insert m after t to match cfe convention (i, t, m, ...)
         new_idx = []
         for n in idx_names:
@@ -2298,7 +2354,13 @@ class Country:
             return method
 
         if name in self.data_scheme or name in self._FOOD_DERIVED or name in self._ROSTER_DERIVED:
-            def method(waves=None, market=None, labels='Preferred'):
+            def method(waves=None, market=None, labels='Preferred', age_cuts=None):
+                if age_cuts is not None and name not in self._ROSTER_DERIVED:
+                    raise TypeError(
+                        f"{name}() got an unexpected keyword argument 'age_cuts'; "
+                        "only roster-derived tables (e.g. household_characteristics) "
+                        "accept age_cuts."
+                    )
                 # For derived food tables, try deriving from food_acquired first
                 # before falling back to wave-level scripts / make
                 if (name in self._FOOD_DERIVED
@@ -2345,8 +2407,10 @@ class Country:
                             final_index = [n for n in ['t', 'v', 'i', 'm'] if n in idx]
                             if not final_index:
                                 final_index = [n for n in idx if n != 'pid']
-                            result = roster_to_characteristics(
-                                roster, drop='pid', final_index=final_index)
+                            rc_kwargs = {'drop': 'pid', 'final_index': final_index}
+                            if age_cuts is not None:
+                                rc_kwargs['age_cuts'] = tuple(age_cuts)
+                            result = roster_to_characteristics(roster, **rc_kwargs)
                             if market is not None:
                                 result = self._add_market_index(result, column=market)
                             return result
@@ -2356,32 +2420,45 @@ class Country:
                             "falling back to legacy aggregation", name, exc)
 
                 result = self._aggregate_wave_data(waves, name)
-                # Apply relabeling to fallback result for food-derived tables
-                if (name in self._FOOD_DERIVED
-                        and isinstance(result, pd.DataFrame) and not result.empty):
+                # Apply relabeling to any table with a j index level
+                if (isinstance(result, pd.DataFrame) and not result.empty
+                        and 'j' in (result.index.names or [])):
                     reagg = name in {'food_expenditures', 'food_quantities'}
                     result = self._relabel_j(result, labels, reaggregate=reagg)
                 if market is not None and isinstance(result, pd.DataFrame) and not result.empty:
                     result = self._add_market_index(result, column=market)
                 return result
-            method.__doc__ = (
-                f"Return {name} as a DataFrame, aggregated across *waves*.\n\n"
-                "Parameters\n----------\n"
-                "waves : list of str, optional\n"
-                "    Subset of waves to include.  Defaults to all available.\n"
-                "market : str, optional\n"
-                "    Column from cluster_features (e.g. 'Region') to add as\n"
-                "    an ``m`` index level for demand estimation.\n"
-                "labels : str, optional\n"
-                "    Label column to use for the ``j`` index on derived food\n"
-                "    tables (food_expenditures, food_quantities, food_prices).\n"
-                "    Defaults to ``'Preferred'`` (current behaviour).  Other\n"
-                "    values (e.g. ``'Aggregate'``) select a same-named column\n"
-                "    from the country's ``food_items`` / ``harmonize_food``\n"
-                "    table; ``food_expenditures`` and ``food_quantities`` are\n"
-                "    re-aggregated after renaming.  Raises ``KeyError`` if the\n"
-                "    column is absent.\n"
-            )
+            doc_parts = [
+                f"Return {name} as a DataFrame, aggregated across *waves*.\n\n",
+                "Parameters\n----------\n",
+                "waves : list of str, optional\n",
+                "    Subset of waves to include.  Defaults to all available.\n",
+                "market : str, optional\n",
+                "    Column from cluster_features (e.g. 'Region') to add as\n",
+                "    an ``m`` index level for demand estimation.\n",
+                "labels : str, optional\n",
+                "    Label column to use for the ``j`` index on derived food\n",
+                "    tables (food_expenditures, food_quantities, food_prices).\n",
+                "    Defaults to ``'Preferred'`` (current behaviour).  Other\n",
+                "    values (e.g. ``'Aggregate'``) select a same-named column\n",
+                "    from the country's ``food_items`` / ``harmonize_food``\n",
+                "    table; ``food_expenditures`` and ``food_quantities`` are\n",
+                "    re-aggregated after renaming.  Raises ``KeyError`` if the\n",
+                "    column is absent.\n",
+            ]
+            if name in self._ROSTER_DERIVED:
+                doc_parts.append(
+                    "age_cuts : tuple of positive numbers, optional\n"
+                    "    Interior breakpoints between age buckets, passed to\n"
+                    "    :func:`lsms_library.transformations.roster_to_characteristics`.\n"
+                    "    Partitions ages into ``len(age_cuts) + 1`` half-open\n"
+                    "    buckets ``[0, c_0), [c_0, c_1), ..., [c_{n-1}, inf)``.\n"
+                    "    Defaults to ``(4, 9, 14, 19, 31, 51)``, producing the\n"
+                    "    compact labels ``00-03``, ``04-08``, …, ``51+``.\n"
+                    "    Fractional breakpoints (e.g. ``(0.5, 1, 5)``) are\n"
+                    "    allowed and trigger explicit ``[lo, hi)`` labels.\n"
+                )
+            method.__doc__ = "".join(doc_parts)
             method.__name__ = name
             method.__qualname__ = f"Country.{name}"
             method.__module__ = self.__class__.__module__

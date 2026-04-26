@@ -30,6 +30,7 @@ sample:
         panel_weight: mult  # pre-refreshment — same as cross-sectional
         strata: sregion
         Rural: urban
+        Region: region
 
 cluster_features:
     dfs:

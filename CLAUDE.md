@@ -130,7 +130,11 @@ Auto-unlock decrypts `s3_reader_creds.gpg` with an obfuscated passphrase at impo
 
 ## Derived Tables
 
-`household_characteristics`, `food_expenditures`, `food_prices`, and `food_quantities` are **auto-derived at runtime** via `_ROSTER_DERIVED` and `_FOOD_DERIVED` in `country.py` (source transforms live in `transformations.py`). **Do NOT register them in `data_scheme.yml`** — doing so bypasses the derivation path and forces legacy `!make` scripts to run.
+`household_characteristics`, `food_expenditures`, `food_prices`, and `food_quantities` are **auto-derived at runtime** via `_ROSTER_DERIVED` and `_FOOD_DERIVED` in `country.py` (source transforms live in `transformations.py`). **Do NOT register them in `data_scheme.yml`** — `Country.data_scheme` auto-surfaces them when the source table (`food_acquired` or `household_roster`) is present. A `!derived` YAML tag was considered and rejected (2026-04-18): it would create a migration burden with no gain over the hardcoded dicts + auto-discovery.
+
+**`labels=` kwarg (2026-04-18).** Any table with a `j` index level accepts `labels='Aggregate'` (or any column name from the country's `food_items` / `harmonize_food` table). For derived food tables (`food_expenditures`, `food_quantities`), `reaggregate=True` sums collapsed categories. For all other tables (including `food_acquired`), `reaggregate=False` renames without summing, preserving per-unit and per-source row detail.
+
+**Uganda's derivation path cannot fire** because its `food_acquired` uses `value_home`/`value_away`/`value_own`/`value_inkind` columns, not a single `Expenditure` column. The legacy script `food_prices_quantities_and_expenditures.py` handles the sum and unit conversion via `kgs_per_other_units.json`. The framework falls back to this materialized parquet and applies `_relabel_j` to the result. Blocked on GH #169 (canonical food_acquired columns).
 
 `Country._DEPRECATED` maps removed/deprecated table names to deprecation messages. `__getattr__` checks it before `data_scheme`, returning a method that emits `DeprecationWarning` and calls a compatibility shim. Currently contains `locality` only. See `docs/migration/locality.md`.
 

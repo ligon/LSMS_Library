@@ -100,12 +100,14 @@ The library's S3 bucket is a read cache over the authoritative WB NADA
 downloads, unlocked automatically when a valid API key is present.
 """
 
-from importlib.metadata import PackageNotFoundError, version
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as _get_version
 
 try:
-    __version__ = version("LSMS_Library")
+    __version__ = _get_version("LSMS_Library")
 except PackageNotFoundError:
     __version__ = "0.0.0"
+del _get_version
 
 from pathlib import Path
 import os

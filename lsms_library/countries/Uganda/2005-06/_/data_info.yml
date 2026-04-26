@@ -47,6 +47,15 @@ sample:
               # strings").  GH #163 item 3.
                 '0': Rural
                 urban: Urban
+        # HH-level Region — the same column cluster_features reads, exposed
+        # here so consumers can get Region for every HH regardless of cluster
+        # membership (relevant when v is a synthetic @lat,lon label in 2009-10).
+        # The raw 'region' column uses string codes in 2005-06: '0' is the
+        # Kampala-area sentinel (matches the Rural '0' convention above);
+        # fold it into Central following the cluster_features convention.
+        Region:
+            - region
+            - 0: "Central"
 
 cluster_features:
     file: GSEC1.dta

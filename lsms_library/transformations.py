@@ -9,13 +9,55 @@ from pandas import concat, get_dummies, MultiIndex
 from cfe.df_utils import use_indices
 from .local_tools import format_id
 
-def age_intervals(age,age_cuts=(0,4,9,14,19,31,51)):
+def age_intervals(age, age_cuts=(4, 9, 14, 19, 31, 51)):
+    """Bucket ages into half-open intervals for household_characteristics.
+
+    ``age_cuts`` is a strictly increasing tuple of **interior breakpoints**,
+    each strictly positive.  Breakpoints may be fractional (e.g. ``0.5`` to
+    separate neonates from older infants).  The tuple partitions ages into
+    ``len(age_cuts) + 1`` half-open buckets:
+
+        [0, c_0), [c_0, c_1), ..., [c_{n-1}, inf)
+
+    The default ``(4, 9, 14, 19, 31, 51)`` reproduces the demographic
+    buckets `00-03`, `04-08`, ..., `51+` used throughout the library.
+
+    Back-compat: earlier releases took ``(0, 4, 9, ...)`` with a leading
+    zero.  A leading zero is now stripped with a :class:`DeprecationWarning`
+    so legacy callers keep producing identical buckets.
+
+    Parameters
+    ----------
+    age : array-like
+        Numeric ages.  Negative values fall outside the first bucket and
+        become NaN.
+    age_cuts : tuple of positive numbers, strictly increasing
+        Interior breakpoints between buckets.
+
+    Returns
+    -------
+    pandas.Categorical
+        Half-open ``[a, b)`` intervals, one per input age.
     """
-    Take as input a Series (e.g., a row from a dataframe), and use variables =Age= and =Sex=
-    to create a set of coarser categories.
-    """
-    age_cuts = [-np.inf]+list(age_cuts)+[np.inf]
-    return pd.cut(age,age_cuts,duplicates='drop', right = False)
+    cuts = list(age_cuts)
+    if cuts and cuts[0] == 0:
+        import warnings
+        warnings.warn(
+            "age_cuts with a leading 0 is deprecated; pass interior "
+            "breakpoints only (the first bucket always starts at 0). "
+            "Buckets are unchanged; drop the leading 0 to silence this.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        cuts = cuts[1:]
+    if not cuts:
+        raise ValueError("age_cuts must contain at least one positive breakpoint")
+    if any(c <= 0 for c in cuts):
+        raise ValueError(f"age_cuts breakpoints must be > 0; got {age_cuts}")
+    if any(a >= b for a, b in zip(cuts, cuts[1:])):
+        raise ValueError(f"age_cuts must be strictly increasing; got {age_cuts}")
+    bins = [0, *cuts, np.inf]
+    return pd.cut(age, bins, duplicates='drop', right=False)
 
 def dummies(df,cols,suffix=False):
     """From a dataframe df, construct an array of indicator (dummy) variables,
@@ -51,15 +93,47 @@ def dummies(df,cols,suffix=False):
 
     return v
 
-def format_interval(interval):
-    if interval.right == np.inf:
-        return f"{int(interval.left)}+"
-    elif interval.left == -np.inf:
-        return f'00-03'
-    else:
-        return f"{int(interval.left):02d}-{int(interval.right-1):02d}"
+def _is_int_bound(x):
+    """True if ``x`` is an integer-valued finite number."""
+    try:
+        return np.isfinite(x) and float(x).is_integer()
+    except (TypeError, ValueError):
+        return False
 
-def roster_to_characteristics(df, age_cuts=(0,4,9,14,19,31,51), drop = 'pid', final_index = ['t','v','i']):
+
+def _fmt_bound(x):
+    """Render a numeric bound for use inside an explicit ``[a, b)`` label."""
+    if _is_int_bound(x):
+        return str(int(x))
+    return f"{x:g}"
+
+
+def format_interval(interval, compact=True):
+    """Render a ``pd.Interval`` as a human-readable column-name label.
+
+    Two styles, selected by the ``compact`` flag:
+
+    * **Compact (default)** — matches the historical ``household_characteristics``
+      column names.  Finite integer bounds span-1 apart or wider collapse to
+      ``"{lo:02d}-{hi-1:02d}"`` (e.g. ``[0, 4)`` → ``"00-03"``); the
+      unbounded-top bucket renders as ``"{lo:02d}+"`` (e.g. ``[51, inf)`` →
+      ``"51+"``).
+    * **Explicit** — half-open interval notation ``"[lo, hi)"`` with
+      ``"{lo}+"`` for the unbounded top bucket.  Used whenever any bound is
+      fractional (spans shorter than a year).
+
+    :func:`roster_to_characteristics` picks ``compact=True`` when all
+    ``age_cuts`` are integers and ``False`` otherwise, so column names stay
+    consistent within a single call.
+    """
+    lo, hi = interval.left, interval.right
+    if hi == np.inf:
+        return f"{int(lo):02d}+" if _is_int_bound(lo) else f"{_fmt_bound(lo)}+"
+    if compact and _is_int_bound(lo) and _is_int_bound(hi) and (hi - lo) >= 1:
+        return f"{int(lo):02d}-{int(hi) - 1:02d}"
+    return f"[{_fmt_bound(lo)}, {_fmt_bound(hi)})"
+
+def roster_to_characteristics(df, age_cuts=(4, 9, 14, 19, 31, 51), drop='pid', final_index=['t', 'v', 'i']):
     """Collapse a household roster into household-level sex × age counts.
 
     Drives the derived ``household_characteristics`` table: takes a
@@ -74,9 +148,14 @@ def roster_to_characteristics(df, age_cuts=(0,4,9,14,19,31,51), drop = 'pid', fi
     ----------
     df : pandas.DataFrame
         Household roster with ``Sex`` and ``Age`` columns (case-insensitive).
-    age_cuts : tuple[int, ...]
-        Upper bounds for age buckets; ``(0, 4, 9, 14, 19, 31, 51)`` by
-        default, producing the buckets ``00-03``, ``04-08``, …, ``51+``.
+    age_cuts : tuple of positive numbers, strictly increasing
+        Interior breakpoints separating age buckets.  See
+        :func:`age_intervals` for the full semantics; the default
+        ``(4, 9, 14, 19, 31, 51)`` produces the historical buckets
+        ``00-03``, ``04-08``, ``09-13``, ``14-18``, ``19-30``, ``31-50``,
+        ``51+``.  Fractional breakpoints (e.g. ``(0.5, 1, 5)``) are
+        allowed and switch the label format from compact ``00-03``-style
+        to explicit half-open ``[lo, hi)``-style.
     drop : str
         Index level to drop before aggregation (typically ``'pid'``).
     final_index : list[str]
@@ -128,8 +207,12 @@ def roster_to_characteristics(df, age_cuts=(0,4,9,14,19,31,51), drop = 'pid', fi
         roster_df = roster_df[keep]
     roster_df = roster_df.dropna(subset=['sex', 'age'])
     roster_df['age_interval'] = age_intervals(roster_df['age'], age_cuts)
+    # All-integer breakpoints (including the 0 left edge and open inf) → compact
+    # "00-03"-style labels that preserve historical column names; any fractional
+    # breakpoint triggers explicit "[lo, hi)"-style labels uniformly.
+    _compact = all(_is_int_bound(c) for c in age_cuts if c != 0)
     roster_df['sex_age'] = roster_df.apply(
-        lambda x: f"{x['sex']} {format_interval(x['age_interval'])}" if not pd.isna(x['age_interval']) else f"{x['sex']} NA",
+        lambda x: f"{x['sex']} {format_interval(x['age_interval'], compact=_compact)}" if not pd.isna(x['age_interval']) else f"{x['sex']} NA",
         axis=1
     )
     roster_df = dummies(roster_df,['sex_age'])
@@ -138,6 +221,134 @@ def roster_to_characteristics(df, age_cuts=(0,4,9,14,19,31,51), drop = 'pid', fi
     result['log HSize'] = np.log(result.sum(axis=1))
     result.columns = result.columns.get_level_values(0)
     return result
+
+def fill_v_with_coord_bin(df, target='v', lat='_lat', lon='_lon',
+                          grid_degrees=0.05, prefix='@'):
+    """Fill blank ``target`` entries with a synthetic ``{prefix}lat,lon`` label.
+
+    For rows where ``target`` is NA or the empty string, build a synthetic
+    cluster identifier from the modified coordinates: bin ``lat``/``lon`` to
+    a ``grid_degrees`` grid and format as ``{prefix}{lat:+.2f},{lon:+.2f}``.
+    Rows whose ``lat`` or ``lon`` is itself missing keep their missing
+    ``target`` — nothing can be synthesised from unknown coordinates.
+
+    Intended as a ``derived:`` transformer for ``sample()`` in panels where
+    some households (movers, split-offs) fall outside the original sampling
+    frame and therefore have no panel-EA code, yet do carry modified GPS
+    coordinates so a within-wave spatial cluster can still be expressed.
+    The ``@`` prefix keeps the synthetic labels distinct from real
+    numeric-string EA codes, so downstream joins to the community
+    questionnaire naturally don't match them.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Post-merge frame containing ``target``, ``lat``, and ``lon``
+        columns.  Target may be the empty string or NA on rows to fill.
+    target : str
+        Name of the column to fill (default ``'v'``).
+    lat, lon : str
+        Names of the latitude/longitude columns (defaults ``'_lat'`` /
+        ``'_lon'`` — the leading underscore is a convention for temporary
+        columns that will be removed by a ``drop:`` clause).
+    grid_degrees : float
+        Grid resolution in decimal degrees.  Default 0.05 ≈ 5.5 km at the
+        equator, which matches the rural coordinate-jitter applied by
+        LSMS-ISA geo files so two physically co-located households
+        reliably share a bin.
+    prefix : str
+        Prefix distinguishing synthetic labels from real EA codes; default
+        ``'@'``.  Joins against real-EA tables (e.g. a community
+        questionnaire keyed by the original EA code) will not match
+        synthetic labels — by construction, not by accident.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Copy of ``df`` with ``target`` populated where coordinates allow.
+    """
+    if target not in df.columns:
+        raise ValueError(f"{target!r} not in DataFrame columns; cannot coalesce")
+    for col in (lat, lon):
+        if col not in df.columns:
+            raise ValueError(
+                f"{col!r} not in DataFrame columns; cannot synthesise "
+                f"{target!r} from coordinates"
+            )
+    out = df.copy()
+    v = out[target]
+    # A "blank" target is NA or the empty string — we treat them the same for
+    # fill purposes, and normalise both to pd.NA in the output when we can't
+    # fill (so downstream consumers see one missing sentinel, not two).
+    blank = v.isna() | (v.astype('string').fillna('') == '')
+    lat_vals = pd.to_numeric(out[lat], errors='coerce')
+    lon_vals = pd.to_numeric(out[lon], errors='coerce')
+    coords_ok = lat_vals.notna() & lon_vals.notna()
+    fill_mask = blank & coords_ok
+    cant_fill = blank & ~coords_ok
+    lat_bin = (lat_vals / grid_degrees).round() * grid_degrees
+    lon_bin = (lon_vals / grid_degrees).round() * grid_degrees
+    synthetic = (
+        prefix
+        + lat_bin.map(lambda x: f'{x:+.2f}' if pd.notna(x) else '')
+        + ','
+        + lon_bin.map(lambda x: f'{x:+.2f}' if pd.notna(x) else '')
+    ).astype('string')
+    # String dtype throughout so the union is homogeneous.
+    result = v.astype('string')
+    result = result.mask(fill_mask, synthetic)
+    result = result.mask(cant_fill, pd.NA)
+    # Also normalise any pre-existing empty strings that weren't filled.
+    result = result.replace({'': pd.NA})
+    out[target] = result
+    return out
+
+
+# Registry of transformers usable from a ``derived:`` block in
+# ``data_info.yml``.  Each entry is ``kind: callable(df, target=<col>, **kwargs)``
+# — the dispatcher supplies ``target`` from the derived-block key; everything
+# else comes from the YAML.  Add new transformers here; document their
+# kwargs in the callable's docstring.
+_DERIVED_TRANSFORMERS = {
+    'coalesce_coord_bin': fill_v_with_coord_bin,
+}
+
+
+def apply_derived(df, derived_spec):
+    """Apply a ``derived:`` block from ``data_info.yml`` to a DataFrame.
+
+    ``derived_spec`` is ``{output_col: {kind: <name>, **kwargs}}``; each
+    entry dispatches to the transformer registered under ``kind`` in
+    :data:`_DERIVED_TRANSFORMERS`.  The target column name is forwarded
+    to the transformer as ``target=<output_col>`` and must not appear
+    in the YAML kwargs.  Unknown ``kind`` raises ``ValueError`` with
+    the list of registered transformers so mistakes surface at read
+    time, not in a mysterious downstream KeyError.
+    """
+    if not derived_spec:
+        return df
+    for output_col, step in derived_spec.items():
+        step = dict(step)                          # don't mutate caller
+        kind = step.pop('kind', None)
+        if kind is None:
+            raise ValueError(
+                f"derived: entry for {output_col!r} missing required 'kind:' key"
+            )
+        if 'target' in step:
+            raise ValueError(
+                f"derived: entry for {output_col!r} must not set 'target:' "
+                f"(target is taken from the block key)"
+            )
+        fn = _DERIVED_TRANSFORMERS.get(kind)
+        if fn is None:
+            registered = sorted(_DERIVED_TRANSFORMERS)
+            raise ValueError(
+                f"derived: unknown kind {kind!r} for column {output_col!r}; "
+                f"registered transformers: {registered}"
+            )
+        df = fn(df, target=output_col, **step)
+    return df
+
 
 def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=['t','m','i'], unit_col = 'u'):
     """Infer local-unit → kg conversion factors from price ratios.

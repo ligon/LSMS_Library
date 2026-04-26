@@ -31,15 +31,54 @@ housing:
         Floor: H9q06
 
 sample:
-    file: ../Data/GSEC1.dta
-    idxvars:
-        i: HHID
-    myvars:
-        v: comm
-        weight: wgt09
-        panel_weight: wgt09  # pre-refreshment — same as cross-sectional
-        strata: stratum
-        Rural: urban
+    # 2009-10 is a panel-refresh wave: `comm` in GSEC1 is the 2005-06 EA
+    # (the original sampling frame).  565 HH (movers + split-offs) have
+    # blank `comm` because they fall outside that frame.  Fall back to a
+    # synthetic `@lat,lon` cluster label built from the modified GPS
+    # coordinates in the geovars file.  See Uganda/_/CONTENTS.org for
+    # the full rationale.
+    dfs:
+        - df_main
+        - df_geo
+    df_main:
+        file: ../Data/GSEC1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            v: comm
+            weight: wgt09
+            panel_weight: wgt09  # pre-refreshment — same as cross-sectional
+            strata: stratum
+            Rural: urban
+            # HH-level Region — populated in GSEC1 for every household
+            # (including the 565 movers/split-offs whose comm is blank),
+            # so Region is always available regardless of whether v ended
+            # up as a real comm or a synthetic @lat,lon label.
+            Region:
+                - region
+                - # Fix some values (matches cluster_features convention)
+                  " Kampala": "Central"
+                  "Central without Kampala": "Central"
+    df_geo:
+        file: ../Data/UNPS_Geovars_0910.dta
+        idxvars:
+            i: HHID
+        myvars:
+            _lat: lat_mod
+            _lon: lon_mod
+    merge_on:
+        - i
+    final_index:
+        - t
+        - i
+    derived:
+        v:
+            kind: coalesce_coord_bin
+            lat: _lat
+            lon: _lon
+    drop:
+        - _lat
+        - _lon
 
 cluster_features:
     dfs:

@@ -59,6 +59,92 @@ from numeric EA codes to parish names occurred around 2015-16 as
 the sampling frame evolved from strict EA boundaries to parish-level
 clusters to accommodate split-off households.
 
+*** Hybrid =v= in 2009-10 (movers and split-offs)
+
+The 2009-10 =comm= column is labeled /Current EA Code as in 2005/06
+Data/: it is the /original 2005-06/ sampling-frame EA, not a new
+2009-10 code.  That convention makes sense for panel continuity
+(every /original/ 2005-06 household keeps its EA across waves) but
+leaves two groups of 2009-10 households without a usable =comm=:
+
+| =hh_status= | count | why =comm= is blank                                     |
+|-------------+-------+---------------------------------------------------------|
+| 2 (mover)   |   192 | Left the original EA; no 2005-06 code applies.          |
+| 3 (split-off) | 368 | Did not exist in 2005-06; no 2005-06 code applies.     |
+| 1 (orig. non-mover, anomaly) | 5 | Isolated data-entry gap (HHIDs =3163001601..1608=). |
+| Total       |   565 | 19% of 2 975 interviewed households.                    |
+
+These 565 households are not a data bug — by survey design they are
+/outside the 2005-06 sampling frame/ that =comm= encodes.  They do,
+however, carry modified GPS coordinates from =UNPS_Geovars_0910.dta=
+(=lat_mod=/=lon_mod=, jittered ±2 km urban / ±5 km rural, with a
+=source= flag distinguishing current-location from origin-location
+fixes), so a within-wave spatial identifier can still be built.
+
+To avoid silent data loss in downstream tables (the old behaviour
+dropped these 565 households in =roster_to_characteristics='s
+=groupby=), =sample()='s =v= column in 2009-10 is populated by a
+hybrid rule:
+
+- =v = comm= (7-digit numeric string) when =comm= is non-blank —
+  2 410 households, 317 distinct panel EAs.  Matches CSECTION1's
+  =comm= index exactly, so community-questionnaire joins work as
+  they always did.
+- =v = "@{lat:+.2f},{lon:+.2f}"= (a /synthetic/ label prefixed with
+  =@=, binned to a 0.05° grid ≈ 5.5 km) when =comm= is blank but
+  coordinates are available — 541 households, ~339 distinct bins.
+  These labels do /not/ match any CSECTION1 =comm=, by design: the
+  community questionnaire was not administered at the movers' or
+  split-offs' 2009-10 locations, so a non-match is the correct
+  outcome of a join.
+- =v = <NA>= when neither =comm= nor coordinates are available —
+  24 households, the refreshment / geo-missing tail that is also
+  reported in the =UNPS_Geovars_0910= docs as /Invalid: 24/.
+
+Implementation: in =data_info.yml= the =sample:= block uses the
+=dfs:=/=derived:=/=drop:= pattern to merge GSEC1 and the geovars
+file, then dispatches to the =coalesce_coord_bin= transformer in
+=lsms_library/transformations.py=.  The 0.05° grid resolution and
+=@= prefix are documented defaults on the transformer and can be
+overridden in the YAML if another wave or country needs different
+values.
+
+Why only 2009-10 gets the hybrid treatment: 2010-11 and 2011-12
+also use =comm= from GSEC1, but their raw surveys populated it for
+every household (movers and split-offs got re-coded with their
+original-sample EA), so no fallback is needed.  From 2013-14 onward,
+=v= is a parish identifier — every household has one — and the
+issue disappears by construction.
+
+*** HH-level =Region= on =sample()=
+
+Since =v= can be a synthetic =@lat,lon= label (§above) that has no
+entry in =cluster_features()=, consumers that needed =Region= used to
+pull it from =cluster_features()= and silently lose those households
+— the cluster-level table is keyed on real EA codes and cannot answer
+for synthetic ones.  =sample()= now exposes =Region= directly as a
+household-level column for every Uganda wave (it reads the same
+=region= field that =cluster_features()= does, with the same Kampala
+→ Central fold in 2009-10 and 2010-11 where applicable).
+
+Practical consequence: =Country('Uganda').sample()[['v','Region']]=
+is complete for every household; joining =Region= from =sample()=
+— rather than =cluster_features()= — avoids dropping the 565
+movers/split-offs from any =(i, t, m)=-keyed regression where =m=
+is derived from Region.  Recommended pattern:
+
+#+begin_src python
+uga = ll.Country('Uganda')
+d = uga.household_characteristics()
+# Region = market at HH level, available for all HH including movers
+d = d.join(uga.sample()[['Region']])
+d = d.rename(columns={'Region': 'm'}).set_index('m', append=True)
+#+end_src
+
+Continue to use =cluster_features()[['Region']]= when you want the
+cluster-level view (e.g., summarising EAs); use =sample()[['Region']]=
+when you want every surveyed household covered.
+
 ** Rotating panel and refreshment sample
 
 Beginning in 2013-14, one-third of the original sample is refreshed

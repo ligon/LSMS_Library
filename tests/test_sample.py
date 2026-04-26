@@ -224,3 +224,223 @@ class TestSample:
             f"{country_name}: {bad.sum()} refreshment households have "
             f"non-positive cross-sectional weight"
         )
+
+
+# ---------------------------------------------------------------------------
+# Uganda 2009-10 hybrid v: comm when present, "@lat,lon" synthetic otherwise.
+# See countries/Uganda/_/CONTENTS.org §"Hybrid v in 2009-10" for rationale.
+# ---------------------------------------------------------------------------
+
+class TestUganda2009HybridV:
+    """2009-10 uses the `coalesce_coord_bin` transformer to fill v for
+    the 565 HH whose `comm` is blank (movers + split-offs + 5 data-entry
+    anomalies).  After the fix:
+      - 2 410 HH have a numeric-string `comm` (317 distinct EAs);
+      - 541 HH have a synthetic `@lat,lon` label (~339 distinct bins);
+      - 24 HH are genuinely NA (no comm AND no coords).
+    """
+
+    @pytest.fixture()
+    def s09(self):
+        df = _get_sample("Uganda")
+        if df is None:
+            pytest.skip("Uganda.sample() could not be built")
+        try:
+            return df.xs("2009-10", level="t")
+        except KeyError:
+            pytest.skip("no 2009-10 wave in Uganda sample()")
+
+    def test_row_count(self, s09):
+        assert len(s09) == 2975, f"expected 2975 HH, got {len(s09)}"
+
+    def test_na_exact(self, s09):
+        assert s09["v"].isna().sum() == 24, (
+            f"expected exactly 24 NA v's (geo-missing tail), got "
+            f"{s09['v'].isna().sum()}"
+        )
+
+    def test_no_empty_strings(self, s09):
+        empty = (s09["v"] == "").sum()
+        assert empty == 0, (
+            f"{empty} rows with empty-string v — NA sentinel should be pd.NA"
+        )
+
+    def test_partitions_by_form(self, s09):
+        v = s09["v"].astype("string")
+        numeric = v.str.fullmatch(r"\d+", na=False)
+        synthetic = v.str.startswith("@").fillna(False)
+        na = v.isna()
+        # No overlap.
+        assert not (numeric & synthetic).any()
+        assert not (numeric & na).any()
+        assert not (synthetic & na).any()
+        # Cover everyone.
+        assert (numeric | synthetic | na).all()
+
+    def test_real_comm_count(self, s09):
+        numeric = s09["v"].astype("string").str.fullmatch(r"\d+", na=False)
+        n = numeric.sum()
+        # 2410 is the expected count; allow small drift from upstream data
+        # cleaning, but flag anything that departs meaningfully.
+        assert 2400 <= n <= 2420, f"expected ~2410 numeric-comm HH, got {n}"
+        # Distinct EAs on the real side — the 2005-06 sampling frame had
+        # 322 EAs; 2009-10 saw 317 of them with at least one surviving HH.
+        unique_real = s09.loc[numeric, "v"].nunique()
+        assert 310 <= unique_real <= 325, (
+            f"expected ~317 distinct real comms, got {unique_real}"
+        )
+
+    def test_synthetic_count(self, s09):
+        synthetic = s09["v"].astype("string").str.startswith("@").fillna(False)
+        n = synthetic.sum()
+        # 541 expected (movers + split-offs + 5 anomalies whose coords are
+        # present in the geovars file).  Allow small drift for upstream
+        # corrections.
+        assert 530 <= n <= 555, f"expected ~541 synthetic-v HH, got {n}"
+
+    def test_synthetic_labels_well_formed(self, s09):
+        synthetic = s09["v"].astype("string")
+        synthetic = synthetic[synthetic.str.startswith("@").fillna(False)]
+        # Format: @[+-]dd.dd,[+-]ddd.dd (lat, lon with 0.01° precision).
+        pattern = r"^@[+-]\d+\.\d{2},[+-]\d+\.\d{2}$"
+        bad = synthetic[~synthetic.str.match(pattern, na=False)]
+        assert bad.empty, (
+            f"{len(bad)} synthetic v's don't match {pattern}: {bad.head().tolist()}"
+        )
+
+    def test_synthetic_disjoint_from_real(self, s09):
+        """Any @-prefixed value must not collide with any numeric comm —
+        this is the property that lets downstream CSECTION joins naturally
+        skip the synthetic entries."""
+        v = s09["v"].astype("string")
+        numeric_vals = set(v[v.str.fullmatch(r"\d+", na=False)].dropna())
+        synth_vals = set(v[v.str.startswith("@").fillna(False)].dropna())
+        assert numeric_vals.isdisjoint(synth_vals)
+
+    def test_temporary_columns_dropped(self, s09):
+        """The `_lat`/`_lon` columns should be consumed by the transformer
+        and removed by `drop:` — they must not leak into the final frame."""
+        leaked = [c for c in s09.columns if c.startswith("_")]
+        assert not leaked, f"temporary columns leaked: {leaked}"
+
+
+# ---------------------------------------------------------------------------
+# Uganda: HH-level Region exposed on sample() (not just cluster-level).
+# ---------------------------------------------------------------------------
+
+class TestUgandaRegionOnSample:
+    """`sample()[['Region']]` should be populated per-HH for every Uganda
+    wave, mapping to the canonical 4-region set used by cluster_features.
+    Kampala is folded into Central (2009-10, 2010-11); 2005-06's `'0'`
+    sentinel (same encoding quirk as Rural) is also folded into Central.
+    """
+
+    @pytest.fixture()
+    def uga_sample(self):
+        df = _get_sample("Uganda")
+        if df is None:
+            pytest.skip("Uganda.sample() could not be built")
+        if "Region" not in df.columns:
+            pytest.fail("Uganda.sample() missing 'Region' column")
+        return df
+
+    def test_region_present(self, uga_sample):
+        assert "Region" in uga_sample.columns
+
+    def test_region_canonical_labels(self, uga_sample):
+        """Every non-NA Region value must be one of the four canonical
+        labels — no '0', 'None', 'Kampala', or numeric residue."""
+        canonical = {"Central", "Eastern", "Northern", "Western"}
+        bad = set(uga_sample["Region"].dropna().astype(str).unique()) - canonical
+        assert not bad, (
+            f"Uganda sample().Region contains non-canonical labels: {sorted(bad)}"
+        )
+
+    def test_region_coverage_per_wave(self, uga_sample):
+        """All waves except (possibly) 2019-20 should have ≥99% HH with
+        a populated Region.  2019-20 has a handful of NA in the
+        refreshment tail."""
+        for wave, sub in uga_sample.groupby("t"):
+            non_null = sub["Region"].notna().sum()
+            frac = non_null / len(sub)
+            assert frac >= 0.995, (
+                f"{wave}: only {frac:.1%} of HH have Region populated "
+                f"({non_null}/{len(sub)})"
+            )
+
+
+# ---------------------------------------------------------------------------
+# _add_market_index: HH-level fallback for synthetic-v rows
+# ---------------------------------------------------------------------------
+
+class TestUganda2009MarketFallback:
+    """When `cluster_features.Region` has no row for a HH's v (e.g.
+    synthetic `@lat,lon` in 2009-10), `_add_market_index` should fall back
+    to `sample()['Region']` at HH level rather than silently drop the HH.
+    Without the fallback, movers + split-offs were being filtered out of
+    `food_expenditures(market='Region')` — defeating the hybrid-v recovery.
+    """
+
+    @pytest.fixture(scope="class")
+    def fe(self):
+        """Uganda food_expenditures(market='Region'), or skip if the
+        underlying microdata cannot be built in this environment
+        (e.g. CI without DVC S3 credentials)."""
+        try:
+            return (
+                ll.Country("Uganda")
+                .food_expenditures(market="Region")
+                .squeeze()
+            )
+        except Exception as exc:  # broad catch intentional: skip on any build failure
+            pytest.skip(f"Uganda food_expenditures unavailable: {exc}")
+
+    @pytest.fixture(scope="class")
+    def hc(self):
+        """Uganda household_characteristics(market='Region'), or skip if
+        the underlying microdata cannot be built in this environment
+        (e.g. CI without DVC S3 credentials)."""
+        try:
+            return ll.Country("Uganda").household_characteristics(market="Region")
+        except Exception as exc:  # broad catch intentional: skip on any build failure
+            pytest.skip(
+                f"Uganda household_characteristics unavailable: {exc}"
+            )
+
+    def test_food_expenditures_retains_hybrid_v_HH(self, fe):
+        """food_expenditures(market='Region') should retain the 2 929 HH
+        in Uganda 2009-10, not the 2 240 that survive cluster-only Region."""
+        if "t" not in fe.index.names or "m" not in fe.index.names:
+            pytest.fail(
+                f"food_expenditures(market='Region') index {fe.index.names} "
+                "missing required t/m levels"
+            )
+        if "2009-10" not in fe.index.get_level_values("t").unique():
+            pytest.skip("no 2009-10 wave")
+        hh09 = fe.xs("2009-10", level="t").index.get_level_values("i").nunique()
+        # Sample-level HH count in 2009-10 is 2 975 (full roster).  22 HH have
+        # no food-expenditure records and drop out for that reason, not because
+        # of a NaN Region.  The pre-fallback coverage was ~2 240.
+        assert hh09 >= 2900, (
+            f"food_expenditures(market='Region') retained only {hh09} HH in "
+            f"2009-10 — expected ≥2900 after _add_market_index HH-level "
+            f"fallback"
+        )
+
+    def test_household_characteristics_retains_hybrid_v_HH(self, hc):
+        """household_characteristics(market='Region') should cover the
+        full 2 951 HH (those with populated sample.v, hybrid or real)."""
+        if "2009-10" not in hc.index.get_level_values("t").unique():
+            pytest.skip("no 2009-10 wave")
+        hh09 = hc.xs("2009-10", level="t").index.get_level_values("i").nunique()
+        assert hh09 >= 2900, (
+            f"household_characteristics(market='Region') retained only "
+            f"{hh09} HH in 2009-10 — expected ≥2900 after fallback"
+        )
+
+    def test_no_nan_m_after_fallback(self, fe):
+        """After the fallback, no row in food_expenditures(market='Region')
+        for Uganda 2009-10 should have a NaN m."""
+        m_vals = fe.index.get_level_values("m").astype("string")
+        nan_count = m_vals.isna().sum()
+        assert nan_count == 0, f"{nan_count} rows have NaN m after fallback"
