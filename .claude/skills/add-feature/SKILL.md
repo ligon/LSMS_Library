@@ -19,6 +19,10 @@ For domain-specific guidance on particular features, load the relevant sub-skill
 - `add-feature/pp-ph` — Post-planting / post-harvest countries (Nigeria, Ethiopia, GhanaSPS, Tanzania `2008-15/`). Covers the canonical duplicate-index bug, distinct-`t`-value script pattern, and attrition handling for people who appear in only one round.
 - `add-feature/housing` — Dwelling material characteristics (roof, floor). Covers module-letter instability across surveys, case normalization of Stata labels, and the Cross_Sectional + Panel merge pattern.
 
+## Related skills
+
+- `add-wave` — Use this skill first if the survey wave's raw data hasn't been downloaded and pushed to S3 yet.  Covers `discover_waves()`, `add_wave()`, DVC push, and wave registration.  **The wave must appear in `Country(name).waves`** before any feature work; many countries have a hardcoded `Waves` dict in `{country}.py` (e.g., `lsms_library/countries/Ethiopia/_/ethiopia.py`) that overrides directory scanning.
+
 ## World Bank reference code
 
 The World Bank's LSMS-ISA Harmonised Panel project has Stata code mapping raw files and variables for all 8 countries. Saved at `/var/tmp/lsms-isa-harmonised/reproduction/Reproduction_v2/Code/Cleaning_code/`. GitHub: `lsms-worldbank/LSMS-ISA-harmonised-dataset-on-agricultural-productivity-and-welfare` (release v2.0).
@@ -119,6 +123,44 @@ for c in df.columns:
     print(f'  {c}: {df[c].dropna().value_counts().head(3).to_dict()}')
 ```
 
+**For fast column-only inspection without loading data**, use
+`pyreadstat` with `metadataonly=True` — reads only the file header:
+
+```python
+import pyreadstat
+df, meta = pyreadstat.read_dta('path/to/file.dta', metadataonly=True)
+print(meta.column_names)
+for var, labels in meta.variable_value_labels.items():
+    if len(labels) < 30:
+        print(f'  {var}: {labels}')
+```
+
+Use `metadataonly=True` when triaging many files; use `from_dta` when
+you need to see actual values.  In feature scripts proper, always use
+`get_dataframe()` / `df_data_grabber()` from `local_tools` rather than
+calling `pyreadstat` directly.
+
+#### Filename patterns by survey program
+
+Use this as a starting point — **always verify against the actual files**:
+
+| Program | Countries | Pattern | food | shocks | assets | roster |
+|---------|-----------|---------|------|--------|--------|--------|
+| EHCVM | Mali, Niger, Burkina Faso, Senegal, Togo, Benin, Guinea-Bissau | `s{NN}_me_{country}{year}.dta` | s07b | s08a | s12 | `ehcvm_individu_{cc}{year}.dta` |
+| ECVMA (Niger pre-2018) | Niger 2011-12, 2014-15 | `ecvma{mod}_p{pass}_{lang}.dta` or `ECVMA2_MS{NN}P{pass}.dta` | varies | varies | varies | varies |
+| ESS (Ethiopia) | Ethiopia | `sect{N}_hh_w{wave}.dta` | sect6a | sect9 | sect10a | sect1 |
+| NPS (Tanzania) | Tanzania | `HH_SEC_{letter}.dta` | J1 | S | M1 | B |
+| GHS (Nigeria) | Nigeria | `sect{N}_{round}w{wave}.dta` | varies | varies | sect5 | sect1 |
+| IHS/IHPS (Malawi) | Malawi | `HH_MOD_{letter}.dta` | G1 | U | L | B |
+| UNPS (Uganda) | Uganda | `GSEC{N}.dta` | 15C | varies | 14A | 2 |
+
+#### Reference configs to copy from
+
+For new EHCVM countries, start from **Mali 2018-19** — most complete
+feature set.  For ESS countries, start from **Ethiopia 2018-19**.
+For NPS/GHS/IHS/UNPS countries, start from **Uganda** or **Malawi**
+(most waves covered).
+
 ### Step 4: Map variable names per wave
 
 Variable names differ across waves AND across survey instruments. Build a complete mapping table by inspecting the actual data:
@@ -129,6 +171,16 @@ Variable names differ across waves AND across survey instruments. Build a comple
 **Key patterns:**
 - Household ID changes per wave (e.g., `case_id`, `y2_hhid`, `y3_hhid`, `y4_hhid` in Malawi)
 - Check existing `data_info.yml` entries for other features in the same wave to learn the correct `i` variable
+- **EHCVM composite household ID:** all EHCVM countries (Mali, Niger,
+  Burkina Faso, Senegal, etc.) construct `i` from two columns:
+  ```yaml
+  i:
+      - grappe    # cluster number
+      - menage    # household number within cluster
+  ```
+  This composite `(grappe, menage)` is the standard `i` for every
+  EHCVM feature.  Copy the pattern from existing configs (e.g.,
+  `Mali/2018-19/_/data_info.yml`).
 - Value labels may differ in capitalization across waves (e.g., "Decrease" vs "DECREASE" vs "Did Not Change" vs "Did not change") — mappings must handle all variants
 - Subdirectory structure varies: some waves have flat `Data/`, others have `Data/Cross_Sectional/` and `Data/Panel/`
 
@@ -257,6 +309,23 @@ This runs 13 checks: non-empty, index levels match `data_scheme.yml`, no null in
 
 **The feature is not done until `report.ok` is True.**
 
+**Cross-country validation with `Feature`:**
+
+Use the `Feature` class to verify the new feature works alongside
+existing countries:
+
+```python
+import lsms_library as ll
+
+feat = ll.Feature('{feature_name}')
+feat.countries          # all countries declaring this table
+df = feat(['{Country}', 'Uganda'])   # compare against reference country
+```
+
+The returned DataFrame has a `country` index level prepended.  This
+is the fastest way to spot schema mismatches, missing columns, or
+unexpected dtypes across countries.
+
 Additionally, spot-check the data:
 ```python
 # Coverage
@@ -329,4 +398,5 @@ The corresponding `data_scheme.yml` entry:
 - **Multi-round files:** A single `.dta` containing multiple survey rounds (e.g., Tanzania 2008-15) cannot be handled by `data_info.yml` alone — use a `.py` script.
 - **Missing columns across waves:** Earlier survey instruments may not include all variables. Columns absent from a wave's `data_info.yml` entry will be NaN in the output — this is expected.
 - **DVC-tracked files:** Pull data with `dvc pull {path}.dvc` before building. Run from the DVC root (`lsms_library/countries/`).
+- **DVC lock contention:** If `dvc pull` hangs with `Unable to acquire lock`, clear stale locks: `rm -f lsms_library/countries/.dvc/tmp/*.lock lsms_library/countries/.dvc/tmp/rwlock`, then retry.  For parallel work across agents, use git worktrees so each has its own DVC lock.
 - **Pre-ISA vs ISA waves:** Earlier waves (e.g., Malawi 2004-05 "IHS2") predate the LSMS-ISA standardization and often use completely different module letters and variable naming conventions. Module L might be "non-food expenditures" in 2004-05 but "durable goods" in 2010+. Always verify via the World Bank data dictionary — never assume module letters are stable across survey instruments.

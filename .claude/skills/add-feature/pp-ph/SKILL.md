@@ -107,6 +107,74 @@ Key details:
 - The `data_scheme.yml` must use `materialize: make` for these
   features.
 
+## Variable-name differences between rounds
+
+Source variable names often differ between pp and ph files within
+the same wave.  Always check both files before defining `myvars`:
+
+```python
+import pyreadstat
+_, meta_pp = pyreadstat.read_dta('../Data/sect1_plantingw4.dta', metadataonly=True)
+_, meta_ph = pyreadstat.read_dta('../Data/sect1_harvestw4.dta', metadataonly=True)
+print('PP columns:', meta_pp.column_names)
+print('PH columns:', meta_ph.column_names)
+```
+
+Concrete example (Nigeria 2018-19 `household_roster`): the Age
+variable is `s1q6` in the planting file but `s1q4` in the harvest
+file — same concept, different name.  Define separate `myvars`
+dicts per round whenever names diverge.
+
+## Script template
+
+Skeleton for a pp/ph feature script.  Replace the bracketed
+placeholders with the country / feature / wave specifics:
+
+```python
+#!/usr/bin/env python
+"""Extract {feature_name} for {Country} {wave}.
+
+Source files:
+  - {pp_file}  (post-planting, t={pp_t})
+  - {ph_file}  (post-harvest,  t={ph_t})
+"""
+import sys
+import pandas as pd
+
+sys.path.append('../../../_/')
+from lsms_library.local_tools import df_data_grabber, to_parquet
+
+# --- Post-planting ---
+idxvars_pp = dict(
+    i='hhid',
+    t=('hhid', lambda x: '{pp_t}'),
+    v='ea',
+    # pid='indiv',  # if person-level
+)
+myvars_pp = dict(
+    # Column mappings for planting file
+)
+pp = df_data_grabber('../Data/{pp_file}', idxvars_pp, **myvars_pp)
+
+# --- Post-harvest ---
+idxvars_ph = dict(
+    i='hhid',
+    t=('hhid', lambda x: '{ph_t}'),
+    v='ea',
+    # pid='indiv',
+)
+myvars_ph = dict(
+    # Column mappings for harvest file (may differ from pp)
+)
+ph = df_data_grabber('../Data/{ph_file}', idxvars_ph, **myvars_ph)
+
+# --- Combine ---
+df = pd.concat([pp, ph])
+df = df.replace('', pd.NA).sort_index().dropna(how='all')
+
+to_parquet(df, '{feature_name}.parquet')
+```
+
 ## Reference implementations
 
 - **Nigeria `household_roster`**:
@@ -116,3 +184,61 @@ Key details:
   — pp/ph with food item and unit harmonization across rounds.
 - **Tanzania `2008-15/`**: multi-round single-file pattern with
   `round` column mapping. See `.claude/skills/multi-round-waves.md`.
+
+## Relationship to `multi-round-waves`
+
+Some pp/ph countries also use the `wave_folder_map` mechanism (see
+`.claude/skills/multi-round-waves.md`).  Tanzania `2008-15/` is the
+canonical case: it is *both* a multi-round folder (rounds 1–4 in
+one directory) and uses a single-file pattern with a `round`
+column rather than separate pp/ph files.  These are distinct
+mechanisms that can co-occur:
+
+- **pp/ph** = two source files per wave, each needing a different
+  `t` → solved by script-level `t` assignment.
+- **multi-round-waves** = multiple logical waves sharing one
+  physical directory → solved by `Wave(year=..., wave_folder=...)`
+  and filtering by `t`.
+
+Both require `materialize: make`.  A single script can handle both
+patterns (e.g., Tanzania `2008-15/_/food_acquired.py`).
+
+## Common bugs and how to avoid them
+
+| Bug | Cause | Fix |
+|-----|-------|-----|
+| 50–87% duplicate indices | Both rounds assigned the same `t` value | Assign distinct `t` values (e.g. `2018Q3` / `2019Q1`) |
+| Missing half the data | Loaded only pp or only ph | Load both files and concatenate |
+| Wrong variable names | Used pp variable names for ph file (or vice versa) | Check column names in both files separately |
+| Ghost rows after concat | Individual enumerated in pp but absent in ph | `dropna(how='all')` after concat |
+| Double-counted households | Concatenated without distinct `t` on a household-level feature | Assign distinct `t` values; for hh-level features, also confirm data is truly from both rounds |
+| `data_info.yml` used for pp/ph feature | YAML cannot express two-file + distinct-`t` pattern | Switch to `materialize: make` with a `.py` script |
+
+## Checklist for adding a pp/ph feature
+
+1. Confirm the country has dual-round structure (file naming in `Data/`).
+2. Identify which source files contain the needed variables for each round.
+3. Check variable names in **both** pp and ph files (they may differ).
+4. Write a `.py` script that:
+   - Loads pp file with distinct `t` value
+   - Loads ph file with different `t` value
+   - Concatenates and deduplicates
+   - Uses `df_data_grabber()` for data access
+   - Uses `to_parquet()` for output
+5. Mark the feature as `materialize: make` in `data_scheme.yml`.
+6. Verify with `is_this_feature_sane()` — duplicate rate should be small.
+7. Confirm both rounds appear in `df.index.get_level_values('t').unique()`.
+
+## Relationship to the `add-feature` parent skill
+
+This skill extends the general `add-feature` workflow.  When the
+target country is identified as a pp/ph country:
+
+- **YAML vs Script step**: always **script** for features that use
+  both rounds' data.
+- **Configuration step**: use the script template above; the
+  `data_scheme.yml` entry must include `materialize: make`.
+- **Verify step**: pay special attention to duplicate rates and
+  `t` value coverage in diagnostics.
+
+All other steps in the `add-feature` workflow apply unchanged.
