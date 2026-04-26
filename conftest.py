@@ -1,23 +1,35 @@
 """Project-level pytest configuration.
 
-Two-tier test strategy
-----------------------
-- **Fast tier** (default ``pytest``): uses the L2 parquet cache at
-  ``~/.local/share/lsms_library/``.  Tests the API surface and
-  ``_finalize_result()`` transformations but does NOT exercise the
-  wave-level build pipeline.
-- **Full rebuild tier** (``pytest --rebuild`` or
-  ``LSMS_NO_CACHE=1 pytest``): forces every table to rebuild from
-  ``.dta`` source through ``load_from_waves``.  Catches regressions in
-  ``data_info.yml``, formatting functions, and wave scripts.
+Three-tier test strategy
+------------------------
+- **Fast tier** (default ``pytest``): uses both L1 (country-level) and
+  L2 (wave-level) parquet caches at ``~/.local/share/lsms_library/``.
+  Tests the API surface and ``_finalize_result()`` transformations
+  but does NOT exercise the wave-level build pipeline.
+- **Soft rebuild** (``pytest --rebuild`` or ``LSMS_NO_CACHE=1 pytest``):
+  sets ``LSMS_NO_CACHE=1``.  The framework bypasses L1 reads and L2
+  reads on the YAML path, but **script-path L2 parquets** (written by
+  ``_/{table}.py`` scripts via ``local_tools.to_parquet()``) are read
+  through ``run_make_target`` which does not consult the env var, so
+  stale wave parquets can still shadow source-script fixes.  Use this
+  tier when you want a moderately cold rebuild but trust the L2 wave
+  caches to be fresh.
+- **Hard rebuild** (``pytest --rebuild-caches``): physically deletes
+  every ``data_root()`` cache file for every country we have a checkout
+  for, then sets ``LSMS_NO_CACHE=1``.  This is the only tier that
+  catches the failure mode where a source script fix has shipped but
+  the wave-level L2 parquet predates it (Nigeria/Senegal age sentinel
+  case, 2026-04-25).
 
-Use ``make test`` for the fast tier and ``make test-full`` for the
-rebuild tier.
+Use ``make test`` for the fast tier and ``make test-full`` (now passes
+``--rebuild-caches``) for a fully cold rebuild.
 """
 
-import os
+from __future__ import annotations
 
-import pytest
+import os
+import shutil
+import warnings
 
 
 def pytest_addoption(parser):
@@ -25,7 +37,17 @@ def pytest_addoption(parser):
         "--rebuild",
         action="store_true",
         default=False,
-        help="Force cold-cache rebuilds (sets LSMS_NO_CACHE=1).",
+        help="Soft cold-cache rebuilds (sets LSMS_NO_CACHE=1; does not "
+             "delete script-path L2 wave parquets).",
+    )
+    parser.addoption(
+        "--rebuild-caches",
+        action="store_true",
+        default=False,
+        help="Hard cold-cache rebuilds: physically delete every L1 and "
+             "L2 parquet under data_root() before the session, then set "
+             "LSMS_NO_CACHE=1.  Use this when a source-script fix has "
+             "shipped but cached parquets predate it.",
     )
 
 
@@ -38,5 +60,58 @@ def pytest_configure(config):
         "markers",
         "slow: mark test as slow (requires network or full data loading).",
     )
-    if config.getoption("--rebuild", default=False):
+
+    rebuild_caches = config.getoption("--rebuild-caches", default=False)
+    if rebuild_caches:
+        _purge_data_root_caches()
         os.environ["LSMS_NO_CACHE"] = "1"
+    elif config.getoption("--rebuild", default=False):
+        os.environ["LSMS_NO_CACHE"] = "1"
+
+
+def _purge_data_root_caches() -> None:
+    """Delete every parquet/json under ``data_root()`` for every cached
+    country.
+
+    Uses ``Country.clear_cache`` per country so the L2 wave-level
+    sweep (and the existing CLI logic) stays in one place.  Falls back
+    to a recursive parquet/json glob if the Country construction fails
+    (avoids a bad-config ever blocking a rebuild).
+
+    Skips non-country directories that may live alongside real
+    countries under ``data_root()`` — e.g. ``TestCountry`` fixtures
+    or ``dvc-cache`` artefacts — by checking for the canonical
+    ``data_scheme.yml`` under ``lsms_library/countries/{name}/_/``.
+    """
+    from lsms_library.paths import COUNTRIES_ROOT, data_root
+
+    root = data_root()
+    if not root.exists():
+        return
+
+    purged = 0
+    for country_dir in sorted(p for p in root.iterdir() if p.is_dir()):
+        country_name = country_dir.name
+        # Skip directories that aren't real LSMS countries.
+        if not (COUNTRIES_ROOT / country_name / "_" / "data_scheme.yml").exists():
+            continue
+
+        try:
+            from lsms_library import Country  # lazy: heavy import
+
+            removed = Country(country_name, verbose=False).clear_cache()
+            purged += len(removed)
+        except Exception as exc:  # noqa: BLE001
+            warnings.warn(
+                f"--rebuild-caches: Country({country_name!r}).clear_cache "
+                f"failed ({exc!r}); falling back to recursive parquet sweep."
+            )
+            for path in country_dir.rglob("*.parquet"):
+                path.unlink()
+                purged += 1
+            for path in country_dir.rglob("*.json"):
+                path.unlink()
+                purged += 1
+
+    if purged:
+        print(f"\n[--rebuild-caches] purged {purged} cache files under {root}")

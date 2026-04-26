@@ -2202,16 +2202,38 @@ class Country:
     def cached_datasets(self) -> list[str]:
         """
         List dataset names currently cached for this country.
+
+        Discovers caches at all three layers:
+
+        - **L1**: ``data_root(country)/var/*.parquet``.
+        - **Country-level companion**: ``data_root(country)/_/*.{parquet,json}``.
+        - **L2 wave-level**: ``data_root(country)/{wave}/_/*.parquet`` for
+          every wave subdirectory (excluding the special ``_/`` and
+          ``var/`` directories above).  This catches script-path tables
+          (Nigeria's PP/PH ``household_roster``, Tanzania's multi-round
+          tables) whose only cache lives at the wave level.
         """
-        cache_files = []
-        var_dir = data_root(self.name) / "var"
-        underscore_dir = data_root(self.name) / "_"
+        cache_files: list[Path] = []
+        country_root = data_root(self.name)
+        var_dir = country_root / "var"
+        underscore_dir = country_root / "_"
 
         if var_dir.exists():
             cache_files.extend(var_dir.glob("*.parquet"))
         if underscore_dir.exists():
             cache_files.extend(underscore_dir.glob("*.json"))
             cache_files.extend(underscore_dir.glob("*.parquet"))
+
+        # L2 wave-level: any direct subdir of the country root with a
+        # ``_/`` containing parquets, excluding the two special dirs
+        # already handled above.
+        if country_root.exists():
+            for wave_dir in country_root.iterdir():
+                if not wave_dir.is_dir() or wave_dir.name in ("_", "var"):
+                    continue
+                wave_underscore = wave_dir / "_"
+                if wave_underscore.exists():
+                    cache_files.extend(wave_underscore.glob("*.parquet"))
 
         datasets = []
         for path in cache_files:
@@ -2228,19 +2250,54 @@ class Country:
     ) -> list[Path]:
         """
         Remove cached files for this country.
-        If methods is None, all cached datasets are removed.
-        If waves is provided, removes only caches tied to those waves (for DVC outputs under build/).
+
+        Clears three cache layers:
+
+        - **L1 country-level** at ``data_root(country)/var/{method}.parquet``
+          and the JSON-companion ``data_root(country)/_/{method}.parquet|json``.
+        - **L2 wave-level** at ``data_root(country)/{wave}/_/{method}.parquet``
+          for every wave the country knows about (via :attr:`waves`).
+          Both YAML-path tables (cached on first ``Wave.grab_data`` call,
+          since the 2026-04-15 wave-level L2 addition) and script-path
+          tables (written by ``_/{method}.py`` via
+          :func:`local_tools.to_parquet`) live here.
+        - **DVC build artifacts** under ``lsms_library/countries/{country}/...``
+          when ``waves=`` is passed (resolved via the materialize stage map).
+
+        If ``methods`` is None, all cached datasets are removed.
         Returns list of deleted file paths.
         """
         removed: list[Path] = []
         targets = list(dict.fromkeys(methods or self.cached_datasets()))
 
-        for method in targets:
-            json_cache = data_root(self.name) / "_" / f"{method}.json"
-            parquet_cache = data_root(self.name) / "_" / f"{method}.parquet"
-            var_cache = data_root(self.name) / "var" / f"{method}.parquet"
+        # Discover L2 wave-level caches by globbing the country root.
+        # We *cannot* derive directory names from ``self.waves`` because
+        # countries with per-round ``t`` values write under the round
+        # name, not the wave-folder name (e.g. Nigeria's
+        # ``2012-13/_/household_roster.py`` writes to
+        # ``data_root/Nigeria/{2012Q3,2013Q1}/_/household_roster.parquet``).
+        # The country root may not exist if nothing has been cached yet.
+        country_root = data_root(self.name)
+        l2_caches_by_method: dict[str, list[Path]] = {}
+        if country_root.exists():
+            for method in targets:
+                # Match any *direct* subdir of the country root that has
+                # an _/{method}.parquet — excludes ``_/`` (companion) and
+                # ``var/`` (L1) which are already handled below.
+                hits = [
+                    p for p in country_root.glob(f"*/_/{method}.parquet")
+                    if p.parent.parent.name not in ("_", "var")
+                ]
+                if hits:
+                    l2_caches_by_method[method] = hits
 
-            for candidate in (json_cache, parquet_cache, var_cache):
+        for method in targets:
+            json_cache = country_root / "_" / f"{method}.json"
+            parquet_cache = country_root / "_" / f"{method}.parquet"
+            var_cache = country_root / "var" / f"{method}.parquet"
+            l2_caches = l2_caches_by_method.get(method, [])
+
+            for candidate in (json_cache, parquet_cache, var_cache, *l2_caches):
                 if candidate.suffix == ".json" and candidate.stem not in JSON_CACHE_METHODS:
                     continue
                 if candidate.exists():
