@@ -414,7 +414,10 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
             try:
                 df_pr, meta = pyreadstat.read_sav(f, apply_value_formats=convert_categoricals, encoding=encoding)
                 return df_pr
-            except Exception:
+            except (ValueError, pyreadstat.ReadstatError, OSError,
+                    NotImplementedError):
+                # Format-fallback: parser/IO errors mean "try next reader".
+                # Programmer bugs (TypeError, AttributeError) propagate.
                 pass
         elif Path(fn).suffix.lower() == '.sav':
             # SAV file accessed as a stream (e.g. via DVC); pyreadstat needs a path
@@ -422,7 +425,9 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
                 return _pyreadstat_via_tempfile(
                     pyreadstat.read_sav, f, '.sav',
                     apply_value_formats=convert_categoricals, encoding=encoding)
-            except Exception:
+            except (ValueError, pyreadstat.ReadstatError, OSError,
+                    NotImplementedError):
+                # Format-fallback: parser/IO errors mean "try next reader".
                 pass
 
         try:
@@ -445,7 +450,10 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
                 return _pyreadstat_via_tempfile(
                     pyreadstat.read_dta, f, Path(fn).suffix or '.dta',
                     apply_value_formats=convert_categoricals, encoding=encoding)
-        except Exception:
+        except (ValueError, pyreadstat.ReadstatError, OSError,
+                NotImplementedError):
+            # Format-fallback: parser/IO errors mean "try the next reader"
+            # (csv, excel, feather, fwf).  Programmer bugs propagate.
             pass
 
         try:
@@ -507,9 +515,10 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         try:
             with dvc.api.open(fn,mode='rb') as f:
                 df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
-        except Exception:
-            # Last resort: try get_data_file() which can download from
-            # the World Bank Microdata Library (requires MICRODATA_API_KEY).
+        except (OSError, ValueError, KeyError, ImportError):
+            # DVC handle / config / network failure -> fall back to the WB
+            # Microdata download path.  Programmer bugs (TypeError,
+            # AttributeError) propagate so they aren't silently masked.
             local_path = _try_get_data_file(fn)
             if local_path is not None:
                 with open(local_path, mode='rb') as f:
