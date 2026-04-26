@@ -1182,10 +1182,14 @@ class Country:
             new_idx.append('v')
         result = flat.set_index(new_idx)
         # pandas merge() and set_index() both drop DataFrame.attrs.
-        # Preserve them so flags like id_converted survive the v-join —
-        # otherwise _finalize_result runs id_walk a second time on
-        # already-converted data, causing ID-chain collisions in
-        # countries with transitive panel linkage (#140 BF case).
+        # We preserve them across the v-join as a *performance* hint:
+        # the surviving id_converted flag lets _finalize_result skip a
+        # redundant id_walk pass.  Correctness no longer depends on
+        # this — id_walk is idempotent by construction (see
+        # _close_id_map in local_tools.py and tests/test_id_walk.py).
+        # Historical context: commit 4db41a27 added this line as a
+        # correctness fix for the Burkina Faso 2021-22 chain-collision
+        # bug, before id_walk itself was made safe.
         result.attrs = dict(df.attrs)
         return result
 
@@ -1486,6 +1490,11 @@ class Country:
             numeric = result.select_dtypes(include='number')
             if not numeric.empty:
                 result = numeric.groupby(list(result.index.names), dropna=False).sum(min_count=1)
+        # Carry attrs across the rename / groupby: a performance hint
+        # so id_converted survives and _finalize_result can skip a
+        # redundant id_walk.  Idempotence in id_walk makes this
+        # non-load-bearing for correctness; see _join_v_from_sample
+        # above and tests/test_id_walk.py.
         result.attrs = dict(df.attrs)
         return result
 
