@@ -68,10 +68,13 @@ class TestAgeHandlerYearOnly:
         result = age_handler(y=2000, interview_year=2000)
         assert result == 0
 
-    def test_year_only_negative_result(self):
-        """Should return negative if birth year > interview year (data error)."""
+    def test_year_only_swapped_returns_nan(self):
+        """Birth year > interview year is a data error: must return NaN, not
+        a negative age.  Pre-2026-04-25 this returned -10; the year-math
+        fallback now clamps to [0, 120] so swapped/garbage inputs surface
+        as missing rather than poisoning downstream stats."""
         result = age_handler(y=2010, interview_year=2000)
-        assert result == -10
+        assert np.isnan(result)
 
 
 class TestAgeHandlerPassthrough:
@@ -110,36 +113,72 @@ class TestAgeHandlerAllNone:
 
 
 class TestAgeHandlerStataSentinel:
-    """Stata sentinel -1 in year / month → treated as missing."""
+    """LSMS/EHCVM missing-value sentinels (-1, -99, 9999, etc.) must
+    be rejected at the source so countries don't need per-wave
+    ``_clean_age`` lambdas or post-processing wrappers."""
 
     def test_sentinel_minus1_birth_year(self):
-        """If birth year is -1 (invalid via is_valid since int(-1) < 0 but < 2100),
-        should fall through; with a valid age fallback return age."""
-        # is_valid checks int(float(x)) < 2100 (not < 0), so -1 < 2100 is True.
-        # But -1 as birth year produces interview_yr - (-1) = survey_year + 1,
-        # which is clearly wrong.  The sentinel should be pre-stripped before
-        # age_handler; here we test that -1 birth year does NOT return a
-        # plausible positive age when age column is None.
-        # This test documents behaviour rather than asserting correctness —
-        # per-country YAML mapping: {-1: null} neutralises the sentinel before
-        # age_handler is called.
+        """``y=-1`` is a Stata/EHCVM 'missing' sentinel.  ``is_valid``
+        now lower-bounds at 0, so the year-math branch is skipped and
+        the result is NaN instead of the year-arithmetic absurdity
+        ``2023 - (-1) = 2024`` produced before 2026-04-25."""
         result = age_handler(y=-1, interview_year=2023)
-        # -1 < 2100 so is_valid passes; result will be 2023 - (-1) = 2024.
-        # This confirms the sentinel MUST be mapped to null in YAML before calling
-        # age_handler.  Test just verifies no exception is raised.
-        assert isinstance(result, (int, float))
+        assert np.isnan(result)
+
+    def test_sentinel_minus99_birth_year(self):
+        """Same guard catches the other common sentinel ``-99``."""
+        result = age_handler(y=-99, interview_year=2023)
+        assert np.isnan(result)
+
+    def test_sentinel_9999_birth_year(self):
+        """EHCVM uses ``9999`` for missing year of birth (Senegal
+        2018-19 has 7,284 such rows)."""
+        result = age_handler(y=9999, interview_year=2023)
+        assert np.isnan(result)
 
     def test_sentinel_minus1_pre_stripped_to_none(self):
-        """Simulates correct usage: -1 sentinel pre-converted to None."""
+        """Simulates correct upstream usage: -1 pre-converted to None.
+        Same NaN result as the bare-sentinel case — countries that
+        already pre-strip lose nothing."""
         y_raw = -1
         y_val = None if y_raw == -1 else y_raw
         result = age_handler(y=y_val, interview_year=2023)
         assert np.isnan(result)
 
     def test_sentinel_minus1_with_valid_age_fallback(self):
-        """If y=-1 (sentinel) but age column is valid, age wins."""
+        """Reported age wins: ``y=-1`` no longer poisons the result
+        when ``age`` is plausible."""
         result = age_handler(age=42, y=-1, interview_year=2023)
         assert result == 42
+
+    def test_negative_reported_age_returns_nan(self):
+        """A reported age of -1 (Nigeria 2012-13's leak; pre-2026-04-25
+        was returned verbatim) must surface as NaN."""
+        result = age_handler(age=-1, interview_year=2023)
+        assert np.isnan(result)
+
+    def test_implausibly_old_reported_age_returns_nan(self):
+        """Nigeria's documented sentinels at the upper end (130, 150,
+        999) must also return NaN — the 0-120 clamp is symmetric."""
+        for sentinel in (130, 150, 999):
+            result = age_handler(age=sentinel, interview_year=2023)
+            assert np.isnan(result), f"age={sentinel} should be NaN"
+
+    def test_zero_reported_age_passes(self):
+        """``age=0`` is a valid infant age and must not be filtered."""
+        result = age_handler(age=0, interview_year=2023)
+        assert result == 0
+
+    def test_age_120_passes(self):
+        """The upper bound 120 is inclusive — verified human ages
+        approach this; 121+ is implausible."""
+        result = age_handler(age=120, interview_year=2023)
+        assert result == 120
+
+    def test_age_121_returns_nan(self):
+        """Just over the bound."""
+        result = age_handler(age=121, interview_year=2023)
+        assert np.isnan(result)
 
 
 class TestAgeHandlerWrapperClosureFix:

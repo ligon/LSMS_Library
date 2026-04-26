@@ -1398,11 +1398,40 @@ def age_handler(age = None, interview_date = None, interview_year = None, format
     year_born = y
 
     def is_valid(x):
+        """Validate a numeric date component (year, month, day).
+
+        Lower-bounds at 0 so missing-value sentinels common in
+        LSMS/EHCVM raw data — ``-1``, ``-99``, ``-97``, ``-98`` —
+        are rejected.  Upper-bounds at 2100 to also catch the
+        ``9999`` "missing year" sentinel.  Lists must have every
+        element pass.
+        """
         if isinstance(x, list):
             return all(pd.notna(x)) and all([is_valid(i) for i in x])
-        elif pd.notna(x) and int(float(x)) < 2100:
-            return True
+        elif pd.notna(x):
+            try:
+                v = int(float(x))
+            except (TypeError, ValueError):
+                return False
+            return 0 <= v < 2100
         return False
+
+    def _is_plausible_age(x):
+        """Validate a reported-age input as a biologically plausible value.
+
+        Distinct from ``is_valid``: ages live in [0, 120], not the
+        [0, 2100) range used for year/month/day components.  This
+        guard means callers no longer need per-wave ``_clean_age``
+        lambdas to filter ``-1`` / ``999`` / ``130`` / ``150``
+        sentinels out of reported-age columns.
+        """
+        if not pd.notna(x):
+            return False
+        try:
+            v = int(float(x))
+        except (TypeError, ValueError):
+            return False
+        return 0 <= v <= 120
 
     # --- Parse interview date (needed for DOB-based age) ---
     if interview_date is not None and pd.notna(interview_date):
@@ -1439,11 +1468,11 @@ def age_handler(age = None, interview_date = None, interview_year = None, format
     dob_age = None
     if final_interview_date and final_date_of_birth:
         candidate = round((final_interview_date - final_date_of_birth).days / 365.25, 2)
-        if candidate >= 0:
+        if 0 <= candidate <= 120:
             dob_age = candidate
 
     # --- Choose best age estimate ---
-    has_reported_age = age is not None and pd.notna(age) and is_valid(int(age))
+    has_reported_age = age is not None and _is_plausible_age(age)
 
     if has_reported_age and dob_age is not None:
         # Both available: prefer DOB precision when they agree
@@ -1458,7 +1487,14 @@ def age_handler(age = None, interview_date = None, interview_year = None, format
     elif has_reported_age:
         return int(age)
     elif is_valid([year_born, interview_yr]):
-        return int(interview_yr) - int(year_born)
+        # Year-math fallback: interview_year - year_born.  Clamp to
+        # the biological range so swapped-year data errors and
+        # implausible chains return NaN rather than a misleading
+        # negative or super-centenarian age.
+        candidate = int(interview_yr) - int(year_born)
+        if 0 <= candidate <= 120:
+            return candidate
+        return np.nan
     else:
         return np.nan
 
