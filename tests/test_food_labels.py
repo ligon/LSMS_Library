@@ -96,6 +96,37 @@ def test_relabel_j_no_reaggregate_keeps_duplicates():
     assert out.index.duplicated().any()
 
 
+def test_relabel_j_preserves_rows_with_na_index():
+    """Regression: groupby().sum() must not drop groups with NA index keys.
+
+    Household-level tables routinely have NA in the ``v`` level
+    (households not matched by _join_v_from_sample). Without
+    ``dropna=False`` on the re-aggregation groupby, those rows were
+    silently dropped — ~1.7% of Uganda expenditure (fixed in commit
+    12459a22).
+    """
+    idx = pd.MultiIndex.from_tuples(
+        [
+            ("T1", "V1", "H1", "Beans (fresh)"),
+            ("T1", "V1", "H1", "Beans (dry)"),
+            ("T1", pd.NA, "H2", "Matoke (bunch)"),   # v is NA
+            ("T1", pd.NA, "H2", "Matoke (cluster)"), # v is NA
+        ],
+        names=["t", "v", "i", "j"],
+    )
+    df = pd.DataFrame({"Expenditure": [10.0, 5.0, 7.0, 3.0]}, index=idx)
+    fake = _fake_country({"food_items": _food_items_table()})
+    out = fake._relabel_j(df, "Aggregate", reaggregate=True)
+
+    # All four rows' expenditure must survive the re-aggregation
+    assert out["Expenditure"].sum() == pytest.approx(df["Expenditure"].sum())
+    # The NA-v group is preserved, collapsed to 'Matoke'
+    j_with_na_v = {
+        j for (_, v, _, j) in out.index if pd.isna(v)
+    }
+    assert "Matoke" in j_with_na_v
+
+
 def test_relabel_j_missing_column_raises():
     fake = _fake_country({"food_items": _food_items_table()})
     df = _sample_expenditure_df()
