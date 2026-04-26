@@ -181,6 +181,28 @@ class TestAgeHandlerStataSentinel:
         assert np.isnan(result)
 
 
+class TestAgeHandlerBadInterviewDate:
+    """Regression for #186: bare ``except:`` → narrow exception list.
+
+    When ``interview_date`` is given without ``format_interv``, the function
+    falls into a bare ``pd.to_datetime(interview_date)`` call.  The bare
+    ``except:`` originally guarded this against parse failure but also
+    swallowed ``SystemExit`` / ``KeyboardInterrupt``.  The narrowed
+    ``(ValueError, TypeError, pd.errors.ParserError)`` clause must still
+    catch unparseable strings so the function falls back to
+    ``interview_year`` arithmetic without raising.
+    """
+
+    def test_unparseable_interview_date_falls_back_to_year_arithmetic(self):
+        """Garbage interview_date with no format → caught, year path wins."""
+        result = age_handler(
+            interview_date="not-a-date",
+            interview_year=2023,
+            y=1990,
+        )
+        assert result == 33
+
+
 class TestAgeHandlerWrapperClosureFix:
     """Regression test for the interview_year closure bug (GH #173 Step 2).
 

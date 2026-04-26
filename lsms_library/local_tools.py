@@ -1450,7 +1450,7 @@ def age_handler(age = None, interview_date = None, interview_year = None, format
         else:
             try:
                 final_interview_date = pd.to_datetime(interview_date)
-            except:
+            except (ValueError, TypeError, pd.errors.ParserError):
                 final_interview_date = None
 
     # --- Parse DOB ---

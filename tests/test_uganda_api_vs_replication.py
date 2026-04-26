@@ -224,9 +224,10 @@ def _load_replication(name: str) -> pd.DataFrame:
     path = _REPL_DIR / f"{name}.parquet"
     if not path.is_file():
         pytest.skip(f"replication parquet missing: {path}")
+    import pyarrow.lib as _pa_lib
     try:
         return pd.read_parquet(path, engine="pyarrow")
-    except Exception as exc:
+    except (OSError, ValueError, _pa_lib.ArrowInvalid) as exc:
         pytest.skip(f"replication parquet unreadable ({type(exc).__name__}): {exc}")
 
 
@@ -351,7 +352,7 @@ def test_api_matches_replication(spec: FeatureSpec) -> None:
 
     try:
         api = _call_api(spec.name, spec.kwargs)
-    except Exception as exc:
+    except Exception as exc:  # broad catch intentional: any API failure is a test failure
         pytest.fail(f"API call Country('Uganda').{spec.name}(**{spec.kwargs}) raised: "
                     f"{type(exc).__name__}: {exc}")
 
