@@ -40,10 +40,54 @@ class TestDataRoot:
                 from lsms_library.paths import data_root
                 data_root.cache_clear()
                 root = data_root()
-                # Should be a real path (platformdirs or fallback)
+                # Should be a real path (XDG-style default)
                 assert isinstance(root, Path)
                 assert "lsms_library" in str(root)
                 data_root.cache_clear()
+
+    def test_default_is_space_free(self):
+        """Default data_root must never contain whitespace.
+
+        GNU make (used by wave-level builds like Uganda food_expenditures)
+        splits target names on whitespace, so a space in ``data_root``
+        breaks every Makefile-backed feature.  On macOS,
+        ``platformdirs.user_data_path`` would return
+        ``~/Library/Application Support/lsms_library`` — that's why we
+        use an XDG-style default instead.  Regression guard for the
+        2026-04-23 macOS bug report.
+        """
+        env = os.environ.copy()
+        env.pop("LSMS_DATA_DIR", None)
+        with mock.patch.dict(os.environ, env, clear=True):
+            from lsms_library.paths import data_root
+            data_root.cache_clear()
+            root = data_root()
+            assert " " not in str(root), (
+                f"Default data_root must not contain whitespace "
+                f"(GNU make target parsing breaks): {root!s}"
+            )
+            data_root.cache_clear()
+
+    def test_whitespace_override_warns(self, tmp_path):
+        """Explicit overrides with whitespace get a RuntimeWarning."""
+        import warnings as _warnings
+
+        spaced = tmp_path / "My Data" / "lsms_library"
+        spaced.mkdir(parents=True)
+        with mock.patch.dict(os.environ, {"LSMS_DATA_DIR": str(spaced)}):
+            from lsms_library.paths import data_root, _WHITESPACE_WARNED
+            _WHITESPACE_WARNED.clear()
+            data_root.cache_clear()
+            with _warnings.catch_warnings(record=True) as caught:
+                _warnings.simplefilter("always")
+                data_root()
+            data_root.cache_clear()
+            _WHITESPACE_WARNED.clear()
+            messages = [str(w.message) for w in caught
+                        if issubclass(w.category, RuntimeWarning)]
+            assert any("whitespace" in m for m in messages), (
+                f"expected a whitespace RuntimeWarning, got: {messages}"
+            )
 
 
 class TestResolveDataPath:
