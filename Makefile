@@ -37,7 +37,7 @@ test: setup
 	$(POETRY) run pytest $(PYTEST_ARGS)
 
 test-full: setup
-	LSMS_NO_CACHE=1 $(POETRY) run pytest $(PYTEST_ARGS) --rebuild
+	$(POETRY) run pytest $(PYTEST_ARGS) --rebuild-caches
 
 # Iterative-development test targets.  Both use pytest's cache at
 # .pytest_cache/ to remember which tests failed on the previous run.
@@ -135,7 +135,7 @@ help:
 	@echo "Top-level targets:"
 	@echo "  setup    Install dependencies via Poetry"
 	@echo "  test       Run pytest suite (fast tier, uses L2 parquet cache)"
-	@echo "  test-full  Run pytest with cold cache (LSMS_NO_CACHE=1 --rebuild)"
+	@echo "  test-full  Run pytest with cold cache (--rebuild-caches: purges L1+L2)"
 	@echo "  retest     Re-run only last-failed tests, stop on first failure"
 	@echo "  test-ff    Run last-failed first, stop on first failure"
 	@echo "  build      Build distribution"
