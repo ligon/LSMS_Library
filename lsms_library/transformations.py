@@ -484,8 +484,11 @@ def _get_kg_factors(df):
                 for unit, factor in inferred.items():
                     if unit.lower() not in factors and np.isfinite(factor) and factor > 0:
                         factors[unit.lower()] = factor
-            except Exception:
-                pass  # If inference fails, proceed with known metric only
+            except (ValueError, ZeroDivisionError, KeyError):
+                # Inference is best-effort; numeric / lookup failure means
+                # we proceed with the known-metric factors only.  Programmer
+                # bugs (TypeError, AttributeError) propagate.
+                pass
 
     return factors
 

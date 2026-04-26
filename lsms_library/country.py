@@ -51,6 +51,7 @@ from sys import stderr
 import sys
 from dvc.repo import Repo
 from dvc.exceptions import DvcException, PathMissingError
+from pyarrow.lib import ArrowInvalid
 from datetime import datetime
 from typing import Any, Callable, Iterable
 from contextlib import contextmanager, redirect_stdout
@@ -751,7 +752,10 @@ class Wave:
             try:
                 cache_path.parent.mkdir(parents=True, exist_ok=True)
                 df = to_parquet(df, cache_path, absolute_path=True)
-            except Exception as exc:
+            except (OSError, ValueError, ArrowInvalid) as exc:
+                # Disk full / permission denied / parquet serialization
+                # failure -> warn and continue with the in-memory df.
+                # Programmer bugs propagate.
                 warnings.warn(
                     f'wave-level L2 cache write failed for '
                     f'{self.country.name}/{self.year}/{request}: {exc}'
@@ -1230,7 +1234,11 @@ class Country:
         if 'sample' in self.data_scheme:
             try:
                 s = self.sample()
-            except Exception as exc:
+            except (OSError, KeyError, ValueError, AttributeError,
+                    DvcException) as exc:
+                # Sample-table missing / mis-shaped / DVC-fetch failure ->
+                # fall back to wave-level region scan.  Programmer bugs
+                # (TypeError, NameError) surface unchanged.
                 logger.info(
                     "_add_market_index: could not load sample() for HH-level "
                     "lookup of column %r on %s: %s",
@@ -1653,7 +1661,11 @@ class Country:
                 elif current != reference_order:
                     try:
                         df = df.reorder_levels(reference_order)
-                    except Exception as e:
+                    except (ValueError, KeyError, TypeError) as e:
+                        # reorder_levels raises ValueError on level mismatch;
+                        # KeyError/TypeError on bad arg shapes.  Re-raise
+                        # with a richer message so the offending key is
+                        # surfaced.
                         raise ValueError(f"Cannot reorder index levels for '{key}': {e}")
                 aligned_dfs[key] = df
 
@@ -1969,10 +1981,16 @@ class Country:
                         f"v0.7.0 cache read: {method_name} from {cache_path}"
                     )
                     return cached_df
-                except Exception as cache_read_error:
-                    logger.debug(
+                except (OSError, ArrowInvalid) as cache_read_error:
+                    # Stale / corrupted cache parquet -> rebuild from source.
+                    # Surface to the user (not just debug log) so a silent
+                    # cache-miss isn't mistaken for a healthy build.
+                    # Programmer bugs (TypeError, AttributeError) propagate.
+                    warnings.warn(
                         f"v0.7.0 cache read failed for {method_name} "
-                        f"({cache_read_error!r}); rebuilding from source"
+                        f"({cache_read_error!r}); rebuilding from source",
+                        category=UserWarning,
+                        stacklevel=2,
                     )
 
             dvc_root = self.file_path.parent
@@ -2163,6 +2181,9 @@ class Country:
                     if df is None:
                         raise _rebuild_failure_error(self.name, method_name)
             except Exception as error:
+                # broad catch intentional: tee-into-log then re-raise so
+                # _log_issue() captures every materialization failure for
+                # the issues tracker before the exception propagates.
                 _log_issue(self.name, method_name, waves, error)
                 raise
         return self._finalize_result(df, scheme_entry, method_name)
