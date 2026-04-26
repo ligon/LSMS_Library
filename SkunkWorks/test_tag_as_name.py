@@ -101,7 +101,8 @@ with tempfile.NamedTemporaryFile(mode='w', suffix='.yml', delete=False) as f:
     temp_path = f.name
 
 try:
-    result = yaml.safe_load(open(temp_path))
+    with open(temp_path) as fh:
+        result = yaml.safe_load(fh)
     print("✓ Successfully loaded YAML\n")
 
     print("cluster_features.myvars:")
@@ -133,7 +134,8 @@ with tempfile.NamedTemporaryFile(mode='w', suffix='.yml', delete=False) as f:
     temp_path = f.name
 
 try:
-    result = yaml.safe_load(open(temp_path))
+    with open(temp_path) as fh:
+        result = yaml.safe_load(fh)
     print("✓ Loaded, but structure may be unexpected:")
     print(f"myvars content: {result['cluster_features']['myvars']}")
     print("\nNote: YAML doesn't support '!Tag value' as a mapping entry.")

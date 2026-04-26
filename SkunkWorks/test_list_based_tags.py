@@ -94,7 +94,8 @@ with tempfile.NamedTemporaryFile(mode='w', suffix='.yml', delete=False) as f:
     temp_path = f.name
 
 try:
-    result = yaml.safe_load(open(temp_path))
+    with open(temp_path) as fh:
+        result = yaml.safe_load(fh)
 
     print("\n" + "="*70)
     print("Loaded Structure:")
