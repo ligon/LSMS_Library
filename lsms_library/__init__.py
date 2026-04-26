@@ -130,12 +130,15 @@ try:
     if hasattr(dvc_ui, "rich_console"):
         try:
             dvc_ui.rich_console.file = stderr
-        except Exception:
+        except (AttributeError, ImportError):
+            # Defensive against DVC rich-console API drift; programmer bugs
+            # (TypeError, NameError) propagate.
             pass
     if hasattr(dvc_ui, "error_console"):
         try:
             dvc_ui.error_console.file = stderr
-        except Exception:
+        except (AttributeError, ImportError):
+            # Defensive against DVC rich-console API drift.
             pass
     original_init = LoggerHandler.__init__
 
@@ -153,8 +156,9 @@ try:
         for handler in logger_obj.handlers:
             if isinstance(handler, LoggerHandler) and getattr(handler, "stream", None) is not stderr:
                 handler.stream = stderr
-except Exception:
-    # DVC optional; if missing, proceed without UI tweaks
+except (ImportError, AttributeError):
+    # DVC optional or its UI module changed shape; proceed without
+    # UI tweaks.  Programmer bugs surface unchanged.
     pass
 
 from .config import s3_creds_path as _s3_creds_path
@@ -175,10 +179,15 @@ if not SKIP_AUTH and not creds_file.exists():
             # Local GPG decryption failed or no .gpg file — fall back to
             # interactive passphrase prompt.
             raise RuntimeError("auto-unlock did not produce S3 credentials")
-    except Exception:
+    except (ImportError, RuntimeError, OSError):
+        # Auto-unlock skipped (missing dep), failed (no .gpg / bad
+        # passphrase / gpg binary missing).  Fall through to interactive
+        # authenticate(); programmer bugs propagate.
         try:
             authenticate()
-        except Exception as exc:
+        except (RuntimeError, OSError) as exc:
+            # Auth flow failure (network, subprocess, missing creds).
+            # Warn but don't crash import.
             warnings.warn(
                 f"Automatic DVC authentication failed: {exc}. "
                 "Set LSMS_SKIP_AUTH=1 to suppress, or set "

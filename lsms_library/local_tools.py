@@ -214,13 +214,19 @@ def _ensure_dvc_pulled(fn) -> None:
         except ValueError:
             return  # outside the countries dir, can't fetch
 
-    except Exception:
-        return  # bad sidecar shape, missing key, OS error: bail to streaming
+    except (OSError, yaml.YAMLError, KeyError, IndexError, TypeError):
+        # Bad sidecar shape (None / wrong type), missing 'outs'/'md5' key,
+        # corrupt YAML, or filesystem error -> bail to streaming.  Programmer
+        # bugs (NameError, AttributeError) propagate.
+        return
 
     try:
         with _dvc_working_directory(_COUNTRIES_DIR):
             DVCFS.repo.fetch(targets=[str(rel_path)], jobs=1)
-    except Exception:
+    except (OSError, ValueError, KeyError, RuntimeError):
+        # Fetch is best-effort warming.  DVC raises RuntimeError on remote
+        # config / auth issues; OSError on network/disk; ValueError/KeyError
+        # on bad sidecar metadata.  Stream-fallback handles all of them.
         pass
 
 
@@ -248,7 +254,9 @@ def _is_polluted_workspace_copy(fn) -> bool:
         p = Path(fn).resolve()
         sidecar = p.parent / f"{p.name}.dvc"
         return sidecar.exists()
-    except Exception:
+    except (OSError, ValueError):
+        # Path-resolution failure (loop, permission denied) -> not pollution.
+        # TypeError / AttributeError signal a programmer bug and propagate.
         return False
 
 
@@ -329,7 +337,9 @@ def _try_get_data_file(fn: str | Path) -> Path | None:
     """
     try:
         from .data_access import get_data_file
-    except Exception:
+    except ImportError:
+        # data_access import-time failure (missing optional dep) -> caller
+        # falls back to other paths.
         return None
 
     p = Path(fn)
