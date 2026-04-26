@@ -2,12 +2,23 @@
 Centralized data-path resolution for LSMS Library.
 
 All materialized data (parquets, JSON caches) is written under a
-platform-appropriate user-data directory, keeping the installed package
-tree read-only.
+user-data directory, keeping the installed package tree read-only.
 
 Resolution order for the data root:
   1. ``LSMS_DATA_DIR`` environment variable (explicit override)
-  2. ``platformdirs.user_data_path("lsms_library")`` (per-user default)
+  2. ``data_dir`` in ``~/.config/lsms_library/config.yml``
+  3. ``~/.local/share/lsms_library`` (XDG-style default, all platforms)
+
+The default is deliberately XDG-style on every platform rather than the
+OS-native location that ``platformdirs.user_data_path()`` would pick.
+On macOS, that function returns ``~/Library/Application Support/lsms_library``
+— a path containing a literal space that GNU make cannot parse, because
+make splits target names on whitespace.  Several wave-level builds shell
+out to ``make`` (see ``country.py::run_make_target``), so a space in
+``data_root()`` would break every Makefile-backed feature (Uganda
+``food_expenditures``, Nigeria / GhanaLSS ``food_acquired``, etc.).
+Using ``~/.local/share/lsms_library`` everywhere keeps the path
+space-free and matches the location documented in ``CLAUDE.md``.
 
 The ``var_path`` helper maps a bare table filename to the correct
 country ``var/`` subdirectory by inspecting the caller's location in
@@ -18,11 +29,40 @@ from __future__ import annotations
 
 import inspect
 import os
+import warnings
 from functools import lru_cache
 from pathlib import Path
 
 
 COUNTRIES_ROOT = Path(__file__).resolve().parent / "countries"
+
+
+_WHITESPACE_WARNED: set[str] = set()
+
+
+def _warn_on_whitespace(base: Path, source: str) -> None:
+    """Warn once per path when ``data_root`` resolves to a path with whitespace.
+
+    GNU make splits target names on whitespace, so every Makefile-backed
+    wave build (Uganda ``food_expenditures``, etc.) fails when the data
+    root contains a space.  We can't stop the user from pointing
+    ``LSMS_DATA_DIR`` at ``/Users/alice/My Data/``, but we can surface
+    the problem loudly instead of letting make emit an opaque flood of
+    "overriding recipe for target" warnings.
+    """
+    key = str(base)
+    if " " in key and key not in _WHITESPACE_WARNED:
+        _WHITESPACE_WARNED.add(key)
+        warnings.warn(
+            f"LSMS Library data root {base!s} contains whitespace "
+            f"(source: {source}).  GNU make cannot handle targets with "
+            "spaces, so Makefile-backed wave builds (e.g. Uganda "
+            "food_expenditures) will fail.  Point `LSMS_DATA_DIR` or "
+            "`data_dir` in ~/.config/lsms_library/config.yml at a "
+            "space-free directory such as ~/.local/share/lsms_library.",
+            RuntimeWarning,
+            stacklevel=3,
+        )
 
 
 @lru_cache(maxsize=None)
@@ -42,13 +82,13 @@ def data_root(country: str | None = None) -> Path:
     _override = _config.data_dir()
     if _override:
         base = Path(_override)
+        _warn_on_whitespace(base, "LSMS_DATA_DIR or config.yml data_dir")
     else:
-        try:
-            import platformdirs
-            base = platformdirs.user_data_path("lsms_library")
-        except ImportError:
-            # Fallback when platformdirs is not installed
-            base = Path.home() / ".local" / "share" / "lsms_library"
+        # XDG-style default on every platform.  See module docstring for
+        # why we don't use ``platformdirs.user_data_path`` here (macOS
+        # returns ``~/Library/Application Support/lsms_library`` — a
+        # path with a space that breaks GNU make).
+        base = Path.home() / ".local" / "share" / "lsms_library"
     return base / country if country else base
 
 
