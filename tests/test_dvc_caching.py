@@ -1457,7 +1457,7 @@ class TestLayer1Caching:
             with dvcfs_mock, ensure_mock:
                 try:
                     local_tools.get_dataframe(str(target))
-                except Exception:
+                except (OSError, ValueError, KeyError, AttributeError, TypeError):
                     # We don't care if read_file fails on the BytesIO --
                     # what matters is whether the warning fired before
                     # we got there.

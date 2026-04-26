@@ -26,6 +26,7 @@ Configuration:
 from __future__ import annotations
 
 import argparse
+import logging
 import os
 import re
 import subprocess
@@ -35,6 +36,8 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 import yaml
+
+logger = logging.getLogger(__name__)
 
 
 # Patterns that identify geovariables / GPS files in Data directories.
@@ -82,7 +85,8 @@ def check_configured(country_dir: Path, wave: str) -> bool:
     try:
         with open(data_info) as f:
             cfg = yaml.safe_load(f)
-    except Exception:
+    except (yaml.YAMLError, OSError) as exc:
+        logger.warning("Could not read %s: %s", data_info, exc)
         return False
     cf = cfg.get("cluster_features", {})
     if not isinstance(cf, dict):
@@ -97,11 +101,12 @@ def read_source_url(country_dir: Path, wave: str) -> str | None:
         return None
     try:
         text = source.read_text()
-        # Match plain URL or org-mode link [[url]]
-        m = re.search(r'https?://[^\s\]\)]+', text)
-        return m.group(0).rstrip("/") if m else None
-    except Exception:
+    except OSError as exc:
+        logger.warning("Could not read %s: %s", source, exc)
         return None
+    # Match plain URL or org-mode link [[url]]
+    m = re.search(r'https?://[^\s\]\)]+', text)
+    return m.group(0).rstrip("/") if m else None
 
 
 def guess_lat_lon_vars(geo_path: str) -> tuple[str, str]:
@@ -123,30 +128,33 @@ def guess_idxvar(country_dir: Path, wave: str) -> dict:
     try:
         with open(data_info) as f:
             cfg = yaml.safe_load(f)
-        cf = cfg.get("cluster_features", {})
-        if cf.get("dfs"):
-            main = cf.get("df_main", {})
-            return main.get("idxvars", {"v": "grappe"})
-        return cf.get("idxvars", {"v": "grappe"})
-    except Exception:
+    except (yaml.YAMLError, OSError) as exc:
+        logger.warning("Could not read %s: %s", data_info, exc)
         return {"v": "grappe"}
+    cf = cfg.get("cluster_features", {}) or {}
+    if cf.get("dfs"):
+        main = cf.get("df_main", {})
+        return main.get("idxvars", {"v": "grappe"})
+    return cf.get("idxvars", {"v": "grappe"})
 
 
 def data_path_for_yaml(dvc_path: Path, wave_dir: Path) -> str:
     """Get the data file path as it should appear in data_info.yml."""
     data_file = dvc_path.with_suffix("")  # strip .dvc
     try:
-        for data_dir in wave_dir.iterdir():
-            if data_dir.name.startswith("Data") and data_dir.is_dir():
-                try:
-                    rel = data_file.relative_to(data_dir)
-                    if data_dir.name != "Data":
-                        return f"../{data_dir.name}/{rel}"
-                    return str(rel)
-                except ValueError:
-                    continue
-    except Exception:
-        pass
+        data_dirs = list(wave_dir.iterdir())
+    except OSError as exc:
+        logger.warning("Could not list %s: %s", wave_dir, exc)
+        return data_file.name
+    for data_dir in data_dirs:
+        if data_dir.name.startswith("Data") and data_dir.is_dir():
+            try:
+                rel = data_file.relative_to(data_dir)
+            except ValueError:
+                continue
+            if data_dir.name != "Data":
+                return f"../{data_dir.name}/{rel}"
+            return str(rel)
     return data_file.name
 
 
@@ -237,10 +245,11 @@ def cmd_audit(args: argparse.Namespace) -> None:
                 continue
             try:
                 with open(di) as f:
-                    cfg = yaml.safe_load(f)
-                if "cluster_features" not in cfg:
-                    continue
-            except Exception:
+                    cfg = yaml.safe_load(f) or {}
+            except (yaml.YAMLError, OSError) as exc:
+                logger.warning("Could not read %s: %s", di, exc)
+                continue
+            if "cluster_features" not in cfg:
                 continue
 
             source_url = read_source_url(country_dir, wave)
@@ -405,10 +414,11 @@ def _find_missing_geo_waves() -> list[tuple[str, str, Path]]:
                 continue
             try:
                 with open(di) as f:
-                    cfg = yaml.safe_load(f)
-                if "cluster_features" not in cfg:
-                    continue
-            except Exception:
+                    cfg = yaml.safe_load(f) or {}
+            except (yaml.YAMLError, OSError) as exc:
+                logger.warning("Could not read %s: %s", di, exc)
+                continue
+            if "cluster_features" not in cfg:
                 continue
             missing.append((country_dir.name, wave, country_dir))
     return missing

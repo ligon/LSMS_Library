@@ -70,7 +70,7 @@ def test_age_dtype_is_int64(country):
     c = ll.Country(country)
     try:
         df = c.household_roster()
-    except Exception as exc:
+    except Exception as exc:  # broad catch intentional: skip on data-unavailable
         pytest.skip(f"{country}: household_roster() raised {type(exc).__name__}: {exc}")
 
     if "Age" not in df.columns:
@@ -112,7 +112,7 @@ def test_age_no_negative_values(country):
     c = ll.Country(country)
     try:
         df = c.household_roster()
-    except Exception as exc:
+    except Exception as exc:  # broad catch intentional: skip on data-unavailable
         pytest.skip(f"{country}: household_roster() raised {type(exc).__name__}: {exc}")
 
     if "Age" not in df.columns:

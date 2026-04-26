@@ -80,3 +80,4 @@ lsms_library/countries/*/var/*
 
 # Other ignored patterns
 .coder-session/
+.gitnexus
