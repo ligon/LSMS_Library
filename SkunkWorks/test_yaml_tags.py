@@ -103,7 +103,8 @@ with tempfile.NamedTemporaryFile(mode='w', suffix='.yml', delete=False) as f:
     temp_path = f.name
 
 try:
-    result = yaml.safe_load(open(temp_path))
+    with open(temp_path) as f:
+        result = yaml.safe_load(f)
     print("✓ Successfully loaded YAML with tags\n")
     print("cluster_features.myvars:")
     for k, v in result['cluster_features']['myvars'].items():
