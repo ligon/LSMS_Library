@@ -61,8 +61,17 @@ household_roster:
         Sex: hh_s1q03
         # Age list = [age_in_years, age_in_months].  ../_/2015-16.py
         # falls back to floor(months/12) when years is missing.
-        # The DOB triplet (hh_s1q04g_*) exists but is only filled
-        # when years is also filled, so adds no rescue (GH #178).
+        #
+        # The DOB triplet (hh_s1q04g_*) exists but cannot be used:
+        # the year is in the Ethiopian calendar (4-digit Eth year)
+        # while the month is in English Gregorian ('November',
+        # 'February', occasionally misspelled 'Sebtember').  The two
+        # don't compose into a real date without a survey-team
+        # convention that is undocumented; trying either interpretation
+        # produces ages that disagree with the reported ages by ~7
+        # years, so the precision improvement is not safe to apply.
+        # We keep the years-or-months fallback only.  See GH #178 for
+        # context and the calendar audit in PR notes.
         Age:
             - hh_s1q04a
             - hh_s1q04b

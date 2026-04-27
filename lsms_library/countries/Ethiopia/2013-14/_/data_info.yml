@@ -56,13 +56,21 @@ household_roster:
         pid: individual_id2
     myvars:
         Sex: hh_s1q03
-        # Age list = [age_in_years, age_in_months].  ../_/2013-14.py
-        # falls back to floor(months/12) when years is missing.
-        # The DOB triplet (hh_s1q04g_*) exists but is only filled
-        # when years is also filled, so adds no rescue (GH #178).
+        # Age list = [age_yrs, age_mos, dob_day, dob_month_amharic,
+        #             dob_year_eth_2dig, corrected_age].
+        # ../_/2013-14.py converts the Ethiopian-calendar DOB to
+        # Gregorian (via lsms_library.calendars) before feeding
+        # age_handler, falls back to age_yrs / corrected_age, and
+        # to floor(age_mos / 12) when none of those are populated.
+        # Rescue: ~26 of 748 missing-age rows; precision: ~720
+        # rows get DOB-derived fractional age.  GH #178.
         Age:
             - hh_s1q04_a
             - hh_s1q04_b
+            - hh_s1q04g_1
+            - hh_s1q04g_2
+            - hh_s1q04g_3
+            - hh_s1q04h
         Relationship: hh_s1q02
         MonthsAway: hh_s1q05
 
