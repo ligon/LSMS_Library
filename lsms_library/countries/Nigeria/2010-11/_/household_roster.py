@@ -1,17 +1,30 @@
+"""Build Nigeria 2010-11 household_roster from pp + ph rounds (GH #179).
+
+Adopts ``age_handler`` via the country-level helper so rows with a
+valid date-of-birth get DOB-derived (fractional) Age precision, with
+fallback to the reported integer age when DOB is missing.
+
+Source files:
+  - Post Planting: sect1_plantingw1.dta  (t=2010Q3)  — DOB triplet ~100% coverage
+  - Post Harvest:  sect1_harvestw1.dta   (t=2011Q1)  — DOB sparse (~4%, follow-up question)
+"""
+import importlib.util
+import sys
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
-import sys
+
 sys.path.append('../../../_/')
 from lsms_library.local_tools import df_data_grabber, to_parquet
 
-def extract_number(x):
-    """
-    Deal with formatting field of the form "n. x" where x is the desired number.
-    """
-    try:
-        return float(x.split('. ')[-1])
-    except AttributeError:
-        return pd.NA
+# Load the country-level age helper via spec import (the ``_/`` dir
+# is not a Python package).
+_HELPERS = Path(__file__).resolve().parent.parent.parent / '_' / '_age_helpers.py'
+_spec = importlib.util.spec_from_file_location('_nigeria_age_helpers', _HELPERS)
+_age = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_age)
+
 
 def extract_string(x):
     try:
@@ -19,41 +32,65 @@ def extract_string(x):
     except AttributeError:
         return ''
 
-_clean_age = lambda a: a if pd.notna(a) and 0 <= a <= 120 else pd.NA
 
-# Post planting:
+# ---- Post planting (t=2010Q3): full DOB triplet (s1q5_*) -------------------
 
-idxvars = dict(i='hhid',
-               t=('hhid', lambda x: "2010Q3"),
-               v='ea',
-               pid='indiv',
-               )
+idxvars = dict(
+    i='hhid',
+    t=('hhid', lambda x: '2010Q3'),
+    v='ea',
+    pid='indiv',
+)
 
-myvars = dict(Sex = ('s1q2', lambda s: extract_string(s).title()),
-              Age = ('s1q4', _clean_age),
-              Relationship = ('s1q3', lambda s: extract_string(s).title()))
+myvars = dict(
+    Sex=('s1q2', lambda s: extract_string(s).title()),
+    Age='s1q4',                # cleaned by the helper
+    _dob_day='s1q5_day',
+    _dob_month='s1q5_month',
+    _dob_year='s1q5_year',
+    Relationship=('s1q3', lambda s: extract_string(s).title()),
+)
 
+pp = df_data_grabber(
+    '../Data/Post Planting Wave 1/Household/sect1_plantingw1.dta',
+    idxvars, **myvars,
+)
 
+# ---- Post harvest (t=2011Q1): DOB triplet at s1q6_* (sparse) ---------------
 
-pp = df_data_grabber('../Data/Post Planting Wave 1/Household/sect1_plantingw1.dta',idxvars,**myvars)
+idxvars = dict(
+    i='hhid',
+    t=('hhid', lambda x: '2011Q1'),
+    v='ea',
+    pid='indiv',
+)
 
-# Post harvest
-#
-idxvars = dict(i='hhid',
-               t=('hhid', lambda x: "2011Q1"),
-               v='ea',
-               pid='indiv',
-               )
+myvars = dict(
+    Sex=('s1q2', lambda s: extract_string(s).title()),
+    Age='s1q4',
+    _dob_day='s1q6_day',
+    _dob_month='s1q6_month',
+    _dob_year='s1q6_year',
+    Relationship=('s1q3', lambda s: extract_string(s).title()),
+)
 
-myvars = dict(Sex = ('s1q2', lambda s: extract_string(s).title()),
-              Age = ('s1q4', _clean_age),
-              Relationship = ('s1q3', lambda s: extract_string(s).title()),)
+ph = df_data_grabber(
+    '../Data/Post Harvest Wave 1/Household/sect1_harvestw1.dta',
+    idxvars, **myvars,
+)
 
-ph = df_data_grabber('../Data/Post Harvest Wave 1/Household/sect1_harvestw1.dta',idxvars,**myvars)
-df = pd.concat([pp,ph])
+df = pd.concat([pp, ph])
 
-# Drop rows for individuals who are not in household any longer
-# (e.g., who were in hh at planting, but left or died before harvest)
-df = df.replace('',pd.NA).sort_index().dropna(how='all')
+# Drop rows for individuals who left the household between rounds.
+df = df.replace('', pd.NA).sort_index().dropna(how='all')
 
-to_parquet(df,'household_roster.parquet')
+# Reduce DOB triplet via age_handler.  ``interview_year`` is only used
+# in the year-math fallback (when both Age and DOB-day/month are
+# missing); 2010 is a fine anchor for both rounds in that residual case.
+df = _age.apply_age_handler(
+    df, age_col='Age',
+    day_col='_dob_day', month_col='_dob_month', year_col='_dob_year',
+    interview_year=2010,
+)
+
+to_parquet(df, 'household_roster.parquet')

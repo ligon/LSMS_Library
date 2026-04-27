@@ -1,6 +1,12 @@
 Country: Nigeria
 Wave: 2023-24
 
+# household_roster is built by the script-path: ../_/household_roster.py
+# emits a parquet at $LSMS_DATA_DIR/Nigeria/2023-24/_/household_roster.parquet
+# (declared in ../../_/data_scheme.yml with `materialize: make`).
+# The script handles the pp/ph concat and t-value assignment
+# (2023Q3 / 2024Q1) per the pp-ph skill.
+
 sample:
     file: Post Planting Wave 5/Household/secta_plantingw5.dta
     idxvars:

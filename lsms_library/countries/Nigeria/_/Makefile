@@ -90,6 +90,9 @@ $(VAR_DIR)/household_roster.parquet: household_roster.py $(household_roster_parq
 ../2018-19/_/household_roster.parquet: ../2018-19/_/household_roster.py
 	(cd ../2018-19/_; python household_roster.py)
 
+../2023-24/_/household_roster.parquet: ../2023-24/_/household_roster.py
+	(cd ../2023-24/_; python household_roster.py)
+
 food_quantities = $(shell find $(rounds) -name food_expenditures.py)
 food_quantities_parquet := $(food_quantities:.py=.parquet)
 
