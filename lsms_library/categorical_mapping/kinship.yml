@@ -108,6 +108,7 @@ Parent Of Head Or Spouse:    [1, 0, consanguineal]
 Sister/Brother Of Head Or Spouse: [0, 1, consanguineal]
 Brother/Sister:              [0, 1, consanguineal]
 Son/Daughter-In-Law:         [-1, 0, affinal]
+Son-In-Law/Daughter-In-Law:  [-1, 0, affinal]   # Nigeria 2023-24 GHS-Panel s1q3
 Father/Mother-In-Law:        [1, 0, affinal]
 Brother/Sister-In-Law:       [0, 1, affinal]
 Head Of Household:           [0, 0, consanguineal]
