@@ -9,7 +9,13 @@ household_roster:
     myvars:
         Sex: h2q3
         Relationship: h2q4
-        Age: h2q8
+        # Age list = [age, day, month, year] -> ../_/2015-16.py reduces
+        # to a scalar via tools.age_handler() (GH #177).
+        Age:
+            - h2q8
+            - h2q9a
+            - h2q9b
+            - h2q9c
         MonthsSpent: h2q5
 
 housing:
