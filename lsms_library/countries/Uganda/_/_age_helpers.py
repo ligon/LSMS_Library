@@ -25,8 +25,6 @@ GH #177.
 """
 from __future__ import annotations
 
-from datetime import date as _date
-
 import pandas as pd
 import lsms_library.local_tools as tools
 
@@ -111,21 +109,15 @@ def age_components(value):
     ``[h2q8, h2q9a, h2q9b, h2q9c]`` = ``[age, day, month, year]``.
     Returns a list of cleaned numeric components or ``None``s.
 
-    Drops ``d`` when the (d, m, y) combination doesn't form a valid
-    calendar date (e.g. day=31 in a 30-day month, or 29 Feb in a
-    non-leap year).  This protects ``age_handler``'s
-    ``pd.to_datetime(..., format='%m/%d/%Y')`` from raising
-    ``ValueError`` and lets it fall through to the month-middle path.
+    Note: invalid ``(d, m, y)`` calendar combinations (Feb 30, etc.)
+    used to be dropped here as a workaround for a latent crash in
+    ``age_handler``.  GH #205 lifted that guard into ``age_handler``
+    itself, so the local version was removed.
     """
     age = clean_age(value.iloc[0])
     d = clean_day(value.iloc[1])
     m = clean_month(value.iloc[2])
     y = clean_year(value.iloc[3])
-    if d is not None and m is not None and y is not None:
-        try:
-            _date(y, m, d)
-        except ValueError:
-            d = None
     return [age, d, m, y]
 
 

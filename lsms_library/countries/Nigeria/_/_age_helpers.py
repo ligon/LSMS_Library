@@ -27,8 +27,6 @@ GH #179.
 """
 from __future__ import annotations
 
-from datetime import date as _date
-
 import pandas as pd
 import lsms_library.local_tools as tools
 
@@ -129,12 +127,9 @@ def apply_age_handler(df, *, age_col='Age', day_col=None, month_col=None,
         d = _clean_day(row[day_col]) if day_col else None
         m = _clean_month(row[month_col]) if month_col else None
         y = _clean_year(row[year_col]) if year_col else None
-        # Drop d if (d, m, y) doesn't form a valid calendar date.
-        if d is not None and m is not None and y is not None:
-            try:
-                _date(y, m, d)
-            except ValueError:
-                d = None
+        # Note: a local guard used to drop ``d`` for impossible (d, m, y)
+        # combos (Feb 30 etc.).  GH #205 lifted that fallback into
+        # ``age_handler`` itself, so the local guard was removed.
         return tools.age_handler(
             age=a, d=d, m=m, y=y, interview_year=interview_year,
         )

@@ -1454,7 +1454,16 @@ def age_handler(age = None, interview_date = None, interview_year = None, format
         return 0 <= v <= 120
 
     # --- Parse interview date (needed for DOB-based age) ---
-    if interview_date is not None and pd.notna(interview_date):
+    # Note on the ``isinstance(... list)`` short-circuit: ``pd.notna`` on
+    # a list returns an ndarray of bools whose truth value is ambiguous,
+    # so we must check ``isinstance(... list)`` *before* ``pd.notna``.
+    # Without the short-circuit, callers passing ``interview_date=[y,
+    # m, d]`` get ``ValueError: The truth value of an array with more
+    # than one element is ambiguous`` instead of the documented
+    # list-form behaviour.
+    if interview_date is not None and (
+        isinstance(interview_date, list) or pd.notna(interview_date)
+    ):
         if isinstance(interview_date, list):
             if len(interview_date) == 3 and is_valid(interview_date):
                 interview_date = str(int(interview_date[1])) + '/' + str(int(interview_date[2])) + '/' + str(int(interview_date[0]))

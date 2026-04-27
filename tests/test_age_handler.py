@@ -56,6 +56,30 @@ class TestAgeHandlerDOBPlusInterviewDate:
         # born ~2000-06-15, interviewed 2025-06-15 → ~25 years
         assert abs(result - 25.0) < 0.05
 
+    def test_interview_date_as_list_ymd(self):
+        """``interview_date=[year, month, day]`` is a documented input
+        form (the function builds ``"%m/%d/%Y"`` from the list and
+        parses it).  Pre-fix ``pd.notna(list)`` returned an ndarray
+        and the ``and``-chain raised ``ValueError: ambiguous truth
+        value``; the isinstance-list short-circuit in the guard now
+        bypasses ``pd.notna`` for list inputs.
+        """
+        result = age_handler(
+            m=3, d=20, y=1985,
+            interview_date=[2023, 3, 20],
+            interview_year=2023,
+        )
+        assert abs(result - 38.0) < 0.05
+
+    def test_interview_date_as_list_ym(self):
+        """Two-element list (year, month) → uses the 15th of month."""
+        result = age_handler(
+            m=6, y=2000,
+            interview_date=[2025, 6],
+            interview_year=2025,
+        )
+        assert abs(result - 25.0) < 0.05
+
 
 class TestAgeHandlerYearOnly:
     """Year-only birth year + interview_year → integer difference."""
