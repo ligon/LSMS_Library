@@ -65,6 +65,7 @@ import pandas as pd
 import dvc.api
 from collections import defaultdict
 from contextlib import contextmanager
+from datetime import date
 import warnings
 import yaml
 import json
@@ -1473,15 +1474,40 @@ def age_handler(age = None, interview_date = None, interview_year = None, format
                 final_interview_date = None
 
     # --- Parse DOB ---
+    def _safe_dob(m_, d_, y_):
+        """Build a Timestamp from (y, m, d) with graceful downgrade.
+
+        ``is_valid`` only checks each component individually; it does not
+        verify that the combination forms a real calendar date.  Without
+        this guard, rows with impossible combos (Feb 30, Apr 31, Feb 29
+        in a non-leap year, m=0 or m=13 sentinels) crash
+        ``pd.to_datetime`` with ``ValueError: day is out of range``.
+
+        Tries the full ``(y, m, d)`` first; if that's not a real date but
+        ``(y, m, 15)`` is, returns the month-middle (same precision as
+        the year+month-only path).  Returns ``None`` only when the month
+        itself is unsalvageable.
+        """
+        try:
+            return pd.Timestamp(date(int(y_), int(m_), int(d_)))
+        except (ValueError, TypeError):
+            try:
+                return pd.Timestamp(date(int(y_), int(m_), 15))
+            except (ValueError, TypeError):
+                return None
+
     if dob is not None and pd.notna(dob):
         final_date_of_birth = pd.to_datetime(dob, format = format_dob)
         year_born = final_date_of_birth.year
     elif is_valid([m, d, y]):
-        date_conv = str(int(m)) + '/' + str(int(d)) + '/' + str(int(y))
-        final_date_of_birth = pd.to_datetime(date_conv, format = "%m/%d/%Y")
+        final_date_of_birth = _safe_dob(m, d, y)
     elif is_valid([m, y]):
-        date_conv = str(int(m)) + '/15/' + str(int(y))
-        final_date_of_birth = pd.to_datetime(date_conv, format = "%m/%d/%Y")
+        try:
+            final_date_of_birth = pd.Timestamp(date(int(y), int(m), 15))
+        except (ValueError, TypeError):
+            # Unsalvageable month (e.g. m=0 or m=13 sentinel); fall
+            # through to the year-math path via ``year_born``.
+            final_date_of_birth = None
 
     # --- Compute DOB-derived age if both dates are available ---
     dob_age = None

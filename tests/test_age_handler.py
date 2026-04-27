@@ -181,6 +181,79 @@ class TestAgeHandlerStataSentinel:
         assert np.isnan(result)
 
 
+class TestAgeHandlerInvalidDOBCombo:
+    """Regression for the ``ValueError: day is out of range for month``
+    crash when ``(m, d, y)`` components individually pass ``is_valid``
+    but don't form a real calendar date.
+
+    Pre-fix, a row with ``(m=2, d=30, y=1985)`` would crash
+    ``pd.to_datetime`` with format='%m/%d/%Y' and propagate the
+    exception, killing the wave's ``household_roster()`` call.
+
+    The fix downgrades to month-middle (``day=15``) when ``(y, m, d)``
+    isn't a valid calendar date, preserving year+month precision.
+    """
+
+    def test_feb_30_falls_back_to_midmonth(self):
+        """Feb 30 isn't a real date; should downgrade to Feb 15."""
+        result = age_handler(
+            m=2, d=30, y=1990,
+            interview_date="2020-02-15",
+            format_interv="%Y-%m-%d",
+            interview_year=2020,
+        )
+        # Feb 15 1990 -> Feb 15 2020 = exactly 30 years.  Pre-fix this
+        # raised ValueError instead of returning a number.
+        assert abs(result - 30.0) < 0.05
+
+    def test_apr_31_falls_back_to_midmonth(self):
+        """April only has 30 days; day=31 should downgrade to mid-April."""
+        result = age_handler(
+            m=4, d=31, y=2000,
+            interview_date="2025-04-15",
+            format_interv="%Y-%m-%d",
+            interview_year=2025,
+        )
+        assert abs(result - 25.0) < 0.05
+
+    def test_feb_29_non_leap_year_falls_back_to_midmonth(self):
+        """1991 is not a leap year; Feb 29 1991 isn't a real date."""
+        result = age_handler(
+            m=2, d=29, y=1991,
+            interview_date="2021-02-15",
+            format_interv="%Y-%m-%d",
+            interview_year=2021,
+        )
+        assert abs(result - 30.0) < 0.05
+
+    def test_feb_29_leap_year_works_unchanged(self):
+        """Sanity: Feb 29 in a real leap year still uses the exact day."""
+        result = age_handler(
+            m=2, d=29, y=1992,
+            interview_date="2020-02-29",
+            format_interv="%Y-%m-%d",
+            interview_year=2020,
+        )
+        # exactly 28 years
+        assert abs(result - 28.0) < 0.05
+
+    def test_invalid_dmy_no_interview_date_returns_year_math(self):
+        """When DOB is invalid AND no interview_date, the function should
+        still return ``interview_year - y`` (year-math fallback) rather
+        than crashing."""
+        result = age_handler(m=2, d=30, y=1990, interview_year=2025)
+        # No interview_date → no DOB-derived age, but year-math gives 35.
+        assert result == 35
+
+    def test_zero_month_falls_through(self):
+        """``m=0`` passes ``is_valid`` (lower bound is 0) but no calendar
+        date has month 0.  Should fall through to year-math, not crash."""
+        result = age_handler(m=0, d=15, y=1990, interview_year=2023)
+        # Year-math fallback only fires when ``has_reported_age`` is False
+        # AND DOB-age is None; m=0 produces no DOB so year-math activates.
+        assert result == 33
+
+
 class TestAgeHandlerBadInterviewDate:
     """Regression for #186: bare ``except:`` → narrow exception list.
 
