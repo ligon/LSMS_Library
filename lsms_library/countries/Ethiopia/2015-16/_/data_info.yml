@@ -59,7 +59,13 @@ household_roster:
         pid: individual_id2
     myvars:
         Sex: hh_s1q03
-        Age: hh_s1q04a
+        # Age list = [age_in_years, age_in_months].  ../_/2015-16.py
+        # falls back to floor(months/12) when years is missing.
+        # The DOB triplet (hh_s1q04g_*) exists but is only filled
+        # when years is also filled, so adds no rescue (GH #178).
+        Age:
+            - hh_s1q04a
+            - hh_s1q04b
         Relationship: hh_s1q02
         MonthsAway: hh_s1q05
 
