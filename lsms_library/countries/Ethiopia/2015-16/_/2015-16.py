@@ -1,7 +1,10 @@
-"""Wave-level formatting helpers for Ethiopia 2015-16.
+"""Wave-level formatting helpers for Ethiopia 2015-16 (GH #178).
 
 Falls back to ``age_in_months // 12`` when ``hh_s1q04a`` (years) is
-missing.  All cleanup logic lives in ``../../_/_age_helpers.py``.
+missing.  See ``data_info.yml`` for why the ``hh_s1q04g_*`` DOB
+triplet is *not* used: the year is Ethiopian-calendar (e.g. 1999)
+while the month is English Gregorian ('November', 'February') --
+mixed-calendar entry the survey codebook does not disambiguate.
 
 GH #178.
 """
