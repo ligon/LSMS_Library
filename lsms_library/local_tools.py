@@ -214,13 +214,19 @@ def _ensure_dvc_pulled(fn) -> None:
         except ValueError:
             return  # outside the countries dir, can't fetch
 
-    except Exception:
-        return  # bad sidecar shape, missing key, OS error: bail to streaming
+    except (OSError, yaml.YAMLError, KeyError, IndexError, TypeError):
+        # Bad sidecar shape (None / wrong type), missing 'outs'/'md5' key,
+        # corrupt YAML, or filesystem error -> bail to streaming.  Programmer
+        # bugs (NameError, AttributeError) propagate.
+        return
 
     try:
         with _dvc_working_directory(_COUNTRIES_DIR):
             DVCFS.repo.fetch(targets=[str(rel_path)], jobs=1)
-    except Exception:
+    except (OSError, ValueError, KeyError, RuntimeError):
+        # Fetch is best-effort warming.  DVC raises RuntimeError on remote
+        # config / auth issues; OSError on network/disk; ValueError/KeyError
+        # on bad sidecar metadata.  Stream-fallback handles all of them.
         pass
 
 
@@ -248,7 +254,9 @@ def _is_polluted_workspace_copy(fn) -> bool:
         p = Path(fn).resolve()
         sidecar = p.parent / f"{p.name}.dvc"
         return sidecar.exists()
-    except Exception:
+    except (OSError, ValueError):
+        # Path-resolution failure (loop, permission denied) -> not pollution.
+        # TypeError / AttributeError signal a programmer bug and propagate.
         return False
 
 
@@ -329,7 +337,9 @@ def _try_get_data_file(fn: str | Path) -> Path | None:
     """
     try:
         from .data_access import get_data_file
-    except Exception:
+    except ImportError:
+        # data_access import-time failure (missing optional dep) -> caller
+        # falls back to other paths.
         return None
 
     p = Path(fn)
@@ -414,7 +424,10 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
             try:
                 df_pr, meta = pyreadstat.read_sav(f, apply_value_formats=convert_categoricals, encoding=encoding)
                 return df_pr
-            except Exception:
+            except (ValueError, pyreadstat.ReadstatError, OSError,
+                    NotImplementedError):
+                # Format-fallback: parser/IO errors mean "try next reader".
+                # Programmer bugs (TypeError, AttributeError) propagate.
                 pass
         elif Path(fn).suffix.lower() == '.sav':
             # SAV file accessed as a stream (e.g. via DVC); pyreadstat needs a path
@@ -422,7 +435,9 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
                 return _pyreadstat_via_tempfile(
                     pyreadstat.read_sav, f, '.sav',
                     apply_value_formats=convert_categoricals, encoding=encoding)
-            except Exception:
+            except (ValueError, pyreadstat.ReadstatError, OSError,
+                    NotImplementedError):
+                # Format-fallback: parser/IO errors mean "try next reader".
                 pass
 
         try:
@@ -445,7 +460,10 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
                 return _pyreadstat_via_tempfile(
                     pyreadstat.read_dta, f, Path(fn).suffix or '.dta',
                     apply_value_formats=convert_categoricals, encoding=encoding)
-        except Exception:
+        except (ValueError, pyreadstat.ReadstatError, OSError,
+                NotImplementedError):
+            # Format-fallback: parser/IO errors mean "try the next reader"
+            # (csv, excel, feather, fwf).  Programmer bugs propagate.
             pass
 
         try:
@@ -507,9 +525,10 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         try:
             with dvc.api.open(fn,mode='rb') as f:
                 df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
-        except Exception:
-            # Last resort: try get_data_file() which can download from
-            # the World Bank Microdata Library (requires MICRODATA_API_KEY).
+        except (OSError, ValueError, KeyError, ImportError):
+            # DVC handle / config / network failure -> fall back to the WB
+            # Microdata download path.  Programmer bugs (TypeError,
+            # AttributeError) propagate so they aren't silently masked.
             local_path = _try_get_data_file(fn)
             if local_path is not None:
                 with open(local_path, mode='rb') as f:

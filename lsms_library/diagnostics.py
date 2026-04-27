@@ -26,6 +26,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 import yaml as _yaml
+from pyarrow.lib import ArrowInvalid
 
 from .paths import data_root, COUNTRIES_ROOT
 from .yaml_utils import load_yaml
@@ -47,7 +48,9 @@ def _load_api_derived() -> dict[str, set[str]]:
         info_path = files("lsms_library") / "data_info.yml"
         with open(info_path, "r", encoding="utf-8") as f:
             info = _yaml.safe_load(f)
-    except Exception:
+    except (OSError, _yaml.YAMLError):
+        # Missing or malformed data_info.yml -> empty derived-columns map.
+        # Programmer bugs (TypeError, AttributeError) propagate.
         return {}
     result: dict[str, set[str]] = {}
     for table, cols in info.get("Columns", {}).items():
@@ -439,7 +442,8 @@ def _check_index_overlap_with_spine(df: pd.DataFrame, country: str) -> Check:
                      "other_features not cached (skipped)")
     try:
         spine = pd.read_parquet(spine_path, engine="pyarrow")
-    except Exception:
+    except (OSError, ArrowInvalid):
+        # Stale / corrupt spine parquet -> skip overlap check.
         return Check("index_overlap_with_spine", "pass", "Could not read spine (skipped)")
     if "i" not in spine.index.names:
         return Check("index_overlap_with_spine", "pass", "Spine has no 'i' index (skipped)")
@@ -721,7 +725,7 @@ def validate_feature(
         c = Country(country)
         method = getattr(c, feature)
         df = method()
-    except Exception as e:
+    except Exception as e:  # broad catch intentional: surfaced via Check report
         report.checks.append(Check("load_data", "fail", str(e)))
         return report
     report.checks.append(Check("load_data", "pass",
@@ -777,7 +781,7 @@ def validate_feature(
                 report.checks.append(
                     Check("cross_country", "pass",
                           f"{reference_country} doesn't have {feature} (skipped)"))
-        except Exception as e:
+        except Exception as e:  # broad catch intentional: surfaced via Check report
             report.checks.append(
                 Check("cross_country", "warn",
                       f"Could not load reference {reference_country}: {e}"))
@@ -867,7 +871,7 @@ def _check_has_panel_ids(country) -> Check:
         if not pi:
             return Check("has_panel_ids", "fail", "panel_ids is empty or None")
         return Check("has_panel_ids", "pass", f"{len(pi)} panel ID mappings")
-    except Exception as e:
+    except Exception as e:  # broad catch intentional: surfaced via Check report
         return Check("has_panel_ids", "fail", f"Could not load panel_ids: {e}")
 
 
@@ -880,7 +884,7 @@ def _check_has_updated_ids(country) -> Check:
         waves_with_mappings = {w for w, m in ui.items() if m}
         return Check("has_updated_ids", "pass",
                      f"{len(waves_with_mappings)} waves with ID mappings")
-    except Exception as e:
+    except Exception as e:  # broad catch intentional: surfaced via Check report
         return Check("has_updated_ids", "fail", f"Could not load updated_ids: {e}")
 
 
@@ -919,7 +923,7 @@ def _check_updated_ids_cover_waves(country) -> Check:
         return Check("updated_ids_cover_waves", "pass",
                      f"All {len(covered)} follow-up waves have mappings "
                      f"(baselines: {sorted(baselines)})")
-    except Exception as e:
+    except Exception as e:  # broad catch intentional: surfaced via Check report
         return Check("updated_ids_cover_waves", "fail", str(e))
 
 
@@ -978,7 +982,7 @@ def _check_ids_are_self_consistent(country) -> Check:
         if issues:
             return Check("ids_self_consistent", "warn", "; ".join(issues[:5]))
         return Check("ids_self_consistent", "pass")
-    except Exception as e:
+    except Exception as e:  # broad catch intentional: surfaced via Check report
         return Check("ids_self_consistent", "fail", str(e))
 
 
@@ -1014,7 +1018,9 @@ def _compute_panel_spine(country) -> tuple[pd.DataFrame | None, str]:
                     .set_index(["i", "t"])
                 )
                 return spine, "cached household_roster.parquet"
-        except Exception:
+        except (OSError, ArrowInvalid, KeyError):
+            # Cache miss / corrupt parquet / missing 'i'|'t' columns ->
+            # fall through to the API path.
             pass
 
     # Next try the API (applies the full finalize pipeline including
@@ -1030,7 +1036,11 @@ def _compute_panel_spine(country) -> tuple[pd.DataFrame | None, str]:
                 .set_index(["i", "t"])
             )
             return spine, "household_roster (API)"
-    except Exception:
+    except (OSError, ArrowInvalid, KeyError, ValueError, AttributeError,
+            RuntimeError):
+        # API build failure (missing wave / bad config / DVC fetch) ->
+        # fall through to the cluster_features fallback.  Programmer bugs
+        # (NameError, TypeError on bad caller args) propagate.
         pass
 
     # Last-resort: legacy cluster_features parquet.
@@ -1045,7 +1055,8 @@ def _compute_panel_spine(country) -> tuple[pd.DataFrame | None, str]:
                     .set_index(["i", "t"])
                 )
                 return spine, f"cached cluster_features.parquet"
-        except Exception:
+        except (OSError, ArrowInvalid, KeyError):
+            # Stale / corrupt cluster_features parquet -> caller gets None.
             pass
 
     return None, "no household_roster / cluster_features available"
@@ -1164,7 +1175,7 @@ def _check_panel_attrition_monotonic(country) -> Check:
         return Check("attrition_monotonic", "pass",
                      f"Attrition chains OK ({provenance}): "
                      + "; ".join(summaries[:6]))
-    except Exception as e:
+    except Exception as e:  # broad catch intentional: surfaced via Check report
         return Check("attrition_monotonic", "fail", str(e))
 
 
@@ -1223,7 +1234,7 @@ def _check_ids_applied_consistently(country) -> Check:
             return Check("ids_applied_consistently", "warn", "; ".join(issues[:5]))
         return Check("ids_applied_consistently", "pass",
                      f"Spine IDs look canonical ({provenance})")
-    except Exception as e:
+    except Exception as e:  # broad catch intentional: surfaced via Check report
         return Check("ids_applied_consistently", "fail", str(e))
 
 
@@ -1330,7 +1341,7 @@ def _check_panel_ids_targets_exist(country) -> Check:
             )
         return Check("panel_ids_targets_exist", "pass",
                      f"All {total} chain endpoints present in {provenance}")
-    except Exception as e:
+    except Exception as e:  # broad catch intentional: surfaced via Check report
         return Check("panel_ids_targets_exist", "fail", str(e))
 
 
@@ -1395,7 +1406,7 @@ def _check_id_walk_idempotent(country) -> Check:
         return Check("id_walk_idempotent", "pass",
                      f"id_walk is idempotent on {provenance} "
                      f"({before_rows} rows)")
-    except Exception as e:
+    except Exception as e:  # broad catch intentional: surfaced via Check report
         return Check("id_walk_idempotent", "fail", str(e))
 
 

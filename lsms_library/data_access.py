@@ -44,11 +44,13 @@ from __future__ import annotations
 
 import base64
 import configparser
+import json
 import logging
 import os
 import re
 import subprocess
 import tempfile
+import urllib.error
 import zipfile
 from pathlib import Path
 from urllib.parse import urlparse
@@ -221,7 +223,10 @@ def _validate_wb_api_key(api_key: str) -> bool:
         with urllib.request.urlopen(req, timeout=15) as resp:
             data = json.loads(resp.read())
         _wb_key_validated = data.get("result", {}).get("found", 0) > 0
-    except Exception:
+    except (urllib.error.URLError, OSError, TimeoutError,
+            json.JSONDecodeError):
+        # network / HTTP / decode failure — treat as un-validated; programmer
+        # bugs (TypeError, AttributeError) propagate.
         _wb_key_validated = False
 
     return _wb_key_validated
@@ -245,7 +250,9 @@ def _gpg_decrypt(gpg_file: Path, passphrase: str) -> str | None:
             return str(decrypted)
     except ImportError:
         pass
-    except Exception as exc:
+    except (OSError, RuntimeError, ValueError) as exc:
+        # python-gnupg wraps the gpg binary; runtime/IO/value errors are the
+        # plausible failure modes.  Programmer bugs surface unchanged.
         logger.debug("python-gnupg decryption failed: %s", exc)
 
     # Subprocess fallback (works when only the gpg binary is installed)
@@ -260,7 +267,9 @@ def _gpg_decrypt(gpg_file: Path, passphrase: str) -> str | None:
             )
             if result.returncode == 0:
                 return result.stdout.decode()
-        except Exception as exc:
+        except (OSError, subprocess.SubprocessError) as exc:
+            # subprocess failure (binary missing, timeout, etc.); other
+            # exceptions are programmer bugs and should propagate.
             logger.debug("gpg subprocess error: %s", exc)
 
     return None
@@ -389,7 +398,8 @@ def _read_source_url(country: str, wave: str) -> str | None:
         text = source.read_text()
         m = re.search(r'https?://[^\s\]\)]+', text)
         return m.group(0).rstrip("/") if m else None
-    except Exception:
+    except (OSError, UnicodeDecodeError):
+        # File missing or undecodable — treat as no-source-link.
         return None
 
 
@@ -409,7 +419,8 @@ def _get_catalog_idno(catalog_url: str) -> str | None:
             html = resp.read().decode("utf-8", errors="replace")
         m = re.search(r'data-idno="([^"]+)"', html)
         return m.group(1) if m else None
-    except Exception:
+    except (urllib.error.URLError, OSError, TimeoutError):
+        # network / HTTP / timeout — caller treats None as "scrape failed".
         return None
 
 
@@ -430,7 +441,9 @@ def _find_stata_zip_url(api_base: str, idno: str,
     try:
         with urllib.request.urlopen(req, timeout=30) as resp:
             data = json.loads(resp.read())
-    except Exception as e:
+    except (urllib.error.URLError, OSError, TimeoutError,
+            json.JSONDecodeError) as e:
+        # network / HTTP / timeout / JSON decode — caller handles None.
         logger.debug("NADA resources API error for %s: %s", idno, e)
         return None
 
@@ -508,7 +521,9 @@ def _download_and_extract(download_url: str, zip_filename: str,
 
         logger.warning("File %s not found in %s", target_file, zip_filename)
         return False
-    except Exception as e:
+    except (urllib.error.URLError, OSError, TimeoutError,
+            zipfile.BadZipFile) as e:
+        # network / HTTP / disk / corrupt-zip; programmer bugs propagate.
         logger.error("Download/extract failed: %s", e)
         return False
     finally:
@@ -556,7 +571,9 @@ def _extract_all_from_zip(download_url: str, zip_filename: str,
                         extracted.append(dest)
                         logger.info("  Extracted %s", basename)
         return extracted
-    except Exception as e:
+    except (urllib.error.URLError, OSError, TimeoutError,
+            zipfile.BadZipFile) as e:
+        # network / HTTP / disk / corrupt-zip; programmer bugs propagate.
         logger.error("Full zip download/extract failed: %s", e)
         return extracted
     finally:
@@ -654,7 +671,9 @@ def push_to_cache(path: str | Path,
 
         logger.info("Pushed to cache: %s", path)
         return True
-    except Exception as exc:
+    except (OSError, subprocess.SubprocessError) as exc:
+        # subprocess invocation / timeout / dvc binary missing; programmer
+        # bugs (TypeError, etc.) propagate.
         logger.error("push_to_cache error: %s", exc)
         return False
 
@@ -741,7 +760,9 @@ def push_to_cache_batch(paths: list[str | Path],
         logger.info("dvc push: %d files done.", len(abs_paths))
 
         return abs_paths
-    except Exception as exc:
+    except (OSError, subprocess.SubprocessError) as exc:
+        # subprocess invocation / timeout / dvc binary missing; programmer
+        # bugs (TypeError, etc.) propagate.
         logger.error("push_to_cache_batch error: %s", exc)
         return []
 
@@ -827,7 +848,9 @@ def _wb_catalog_search(country_code: str,
     try:
         with urllib.request.urlopen(req, timeout=30) as resp:
             data = json.loads(resp.read())
-    except Exception as exc:
+    except (urllib.error.URLError, OSError, TimeoutError,
+            json.JSONDecodeError) as exc:
+        # network / HTTP / decode failure; programmer bugs propagate.
         logger.error("WB catalog search failed: %s", exc)
         return []
 
@@ -1171,7 +1194,9 @@ def get_data_file(path: str | Path,
                 fs.get_file(dvc_path, str(abs_path))
                 logger.info("Fetched from DVC: %s", path)
                 return abs_path
-        except Exception as e:
+        except (OSError, ValueError, KeyError, ImportError) as e:
+            # DVC handle / network / config-key issues fall back to WB
+            # download.  Programmer bugs (TypeError, AttributeError) propagate.
             logger.debug("DVC fetch failed: %s", e)
 
     # 3. Try World Bank download

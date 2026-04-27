@@ -108,8 +108,8 @@ with tempfile.NamedTemporaryFile(mode='w', suffix='.yml', delete=False) as f:
     temp_path = f.name
 
 try:
-    with open(temp_path) as f:
-        result = yaml.safe_load(f)
+    with open(temp_path) as fh:
+        result = yaml.safe_load(fh)
 
     print("="*70)
     print("✓ Successfully loaded YAML with tag-as-name syntax")
