@@ -766,6 +766,32 @@ class Wave:
     # This cluster_features method is explicitly defined because additional processing is required after calling grab_data.
     def cluster_features(self) -> pd.DataFrame:
         df = self.grab_data('cluster_features')
+        # Some countries declare ``i: <HHID>`` in cluster_features
+        # ``idxvars`` so the YAML can merge a household-level df_geo
+        # for GPS.  The result then has HH grain (one row per
+        # household) instead of the canonical ``(t, v)`` cluster
+        # grain documented in ``data_scheme.yml``.  Collapse with
+        # ``.first()`` for non-GPS columns (Region/Rural/District are
+        # invariant within a cluster by construction of the LSMS-ISA
+        # sampling design) and ``.mean()`` for Latitude/Longitude
+        # (HH-level GPS approximated as the cluster centroid).
+        # GH #161.
+        if 'i' in df.index.names:
+            keep_levels = [lvl for lvl in df.index.names if lvl != 'i']
+            if df.columns.size:
+                agg = {
+                    c: ('mean' if c in ('Latitude', 'Longitude') else 'first')
+                    for c in df.columns
+                }
+                df = df.groupby(level=keep_levels).agg(agg)
+            else:
+                df = df.groupby(level=keep_levels).first()
+        # ``i`` may also leak in as a *column* when df_geo's idxvars
+        # include it (the merge step turns the duplicate into a column).
+        # Drop it: cluster_features is keyed on ``(t, v)``, the
+        # household identifier has no place in the result.  GH #161.
+        if 'i' in df.columns:
+            df = df.drop(columns='i')
         # if cluster_feature data is from old other_features.parquet file, region is called 'm' so we need to rename it
         if 'm' in df.index.names:
             df = df.reset_index(level = 'm').rename(columns = {'m':'Region'})

@@ -15,6 +15,46 @@ if __name__=='__main__':
 else:
     from lsms_library.local_tools import format_id
 
+def District(x):
+    """Canonical District form across all Uganda waves.
+
+    Pre-2018 waves source ``District`` from numeric Stata columns
+    (``h1aq1``, ``h1aq1a``) which df_data_grabber stringifies to
+    ``'101.0'``-style float-strings (CLAUDE.md: ``format_id`` is
+    auto-applied to ``idxvars`` but NOT to ``myvars``).  Post-2018
+    waves source from string columns (``district_name`` / ``district``)
+    which need no normalisation but ``format_id`` is a no-op on them.
+
+    Defining a country-level ``District`` formatter routes every
+    Uganda ``District`` myvar through the canonical normalizer so
+    cross-wave District values share an int-string encoding.
+    GH #161.
+    """
+    return format_id(x)
+
+
+def v(x):
+    """Canonical cluster-id form for Uganda's ``v`` myvar across all tables.
+
+    Uganda declares ``v`` as a ``myvar`` in ``sample`` (and elsewhere)
+    rather than an ``idxvar``, so the auto-applied ``format_id`` does
+    not fire and numeric cluster codes like ``10120402`` get
+    float-stringified to ``'10120402.0'`` -- which silently fails to
+    join against ``cluster_features.v`` and ``household_characteristics.v``
+    where ``v`` is in ``idxvars`` and *does* go through ``format_id``.
+
+    Defining a country-level ``v`` formatter routes every Uganda
+    ``v`` myvar through ``format_id``, restoring the cross-table
+    invariant.  ``format_id`` is a no-op on already-canonical strings
+    (e.g., the ``parish_name`` strings in 2018-19, 2019-20) and maps
+    empty strings to ``None`` (cleaning up the 565-row ``v == ''``
+    leak in 2009-10's sample).
+
+    GH #196.
+    """
+    return format_id(x)
+
+
 # Data to link household ids across waves
 Waves = {'2005-06':(),
          '2009-10':(), # ID of parent household  in ('GSEC1.dta',"HHID",'HHID_parent'), but not clear how to use
