@@ -1,16 +1,13 @@
 #!/usr/bin/env python
-from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import to_parquet, get_dataframe
 
 import sys
 sys.path.append('../../_/')
 import pandas as pd
-import dvc.api
-from ligonlibrary.dataframes import from_dta
 import numpy as np
 
 # Shock dataset (multi-round file covering rounds 1-4)
-with dvc.api.open('../Data/upd4_hh_r.dta', mode='rb') as dta:
-    df = from_dta(dta)
+df = get_dataframe('../Data/upd4_hh_r.dta')
 
 # Filter for households that experienced the shock
 df = df[df['hr_01'] == 'YES']

@@ -6,12 +6,9 @@ sys.path.append('../../../_/')
 import pandas as pd
 import numpy as np
 import json
-import dvc.api
-from ligonlibrary.dataframes import from_dta
-from lsms_library.local_tools import df_from_orgfile, to_parquet
+from lsms_library.local_tools import df_from_orgfile, to_parquet, get_dataframe
 
-with dvc.api.open('../Data/s07b_me_sen2018.dta', mode='rb') as dta:
-    df = from_dta(dta, convert_categoricals=True,encoding='ISO-8859-1')
+df = get_dataframe('../Data/s07b_me_sen2018.dta', convert_categoricals=True,encoding='ISO-8859-1')
 
 df['j'] = df['vague'].astype(str) + df['grappe'].astype(str) + df['menage'].astype(str)
 waves = {1: 2018, 2: 2019}

@@ -5,9 +5,9 @@ mapping is the same across both post-harvest and post-planting waves.
 But second, the mapping of non-metric units is allowed to vary by
 zone.
 """
-import dvc.api
 import pandas as pd
 import json
+from lsms_library.local_tools import get_dataframe
 
 unitcodes = {1:'Kg',
              2:'g',
@@ -58,8 +58,7 @@ with open('../../_/food_items.json') as f:
 
 # See https://microdata.worldbank.org/index.php/catalog/2734/data-dictionary/F112?file_name=food_conv_w3
 
-with dvc.api.open('../Data/food_conv_w3.csv') as csv:
-    conv0 = pd.read_csv(csv)
+conv0 = get_dataframe('../Data/food_conv_w3.csv')
 
 # Replace unit codes and food codes with labels
 conv = conv0.replace({'unit_cd':unitcodes,

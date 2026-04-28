@@ -4,10 +4,6 @@ import pandas as pd
 import pyreadstat
 import numpy as np
 import json
-import dvc.api
-from ligonlibrary.dataframes import from_dta
-
-
 def _household_roster_from_df(df, sex, age, HHID, sex_converter=None, age_converter=None,
                                months_spent='months_spent', Age_ints=None):
     """Inline replacement for lsms.tools.get_household_roster(fn_type=None)."""

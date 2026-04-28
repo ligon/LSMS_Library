@@ -5,17 +5,12 @@ sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
 import json
-import dvc.api
-from ligonlibrary.dataframes import from_dta
-import pyreadstat
 sys.path.append('../../../_/')
-from lsms_library.local_tools import to_parquet, df_from_orgfile, format_id
+from lsms_library.local_tools import to_parquet, df_from_orgfile, format_id, get_dataframe
 
 t = '2008'
 
-fs = dvc.api.DVCFileSystem('../../')
-fs.get_file('/Panama/2008/Data/05alimentos.dta', '/tmp/05alimentos.dta')
-df, meta = pyreadstat.read_dta('/tmp/05alimentos.dta', apply_value_formats = True, formats_as_category = True)
+df = get_dataframe('../Data/05alimentos.dta', convert_categoricals=True)
 
 df = df.loc[:, ['hogar','producto', 's11a6a', 's11a6b', 's11a6c', 's11a10a', 's11a10b']]
 df = df.rename({'hogar': 'j', 'producto':'i', 's11a6a':'quantity bought', 's11a6b':'unitcode (bought)',

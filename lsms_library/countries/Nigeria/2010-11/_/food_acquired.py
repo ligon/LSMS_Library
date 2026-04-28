@@ -11,10 +11,9 @@ Source files:
 import sys
 import numpy as np
 import pandas as pd
-import dvc.api
 
 sys.path.append('../../../_/')
-from lsms_library.local_tools import to_parquet, get_categorical_mapping
+from lsms_library.local_tools import to_parquet, get_categorical_mapping, get_dataframe
 
 food_labels = get_categorical_mapping(tablename='harmonize_food',
                                        idxvars='Code',
@@ -35,8 +34,7 @@ zone_labels = {1: 'North central',
 
 def extract_food(fn, varmap, t, food_labels):
     """Read a food consumption file and produce a standardized DataFrame."""
-    with dvc.api.open(fn, mode='rb') as csv:
-        df = pd.read_csv(csv)
+    df = get_dataframe(fn)
 
     df = df.rename(columns=varmap)
 

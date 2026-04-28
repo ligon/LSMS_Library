@@ -7,12 +7,9 @@ sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
 import json
-import dvc.api
-from ligonlibrary.dataframes import from_dta
 from malawi import conversion_table_matching
 
-with dvc.api.open('../Data/HH_MOD_G1_13.dta', mode='rb') as dta:
-    df = from_dta(dta, convert_categoricals=True)
+df = get_dataframe('../Data/HH_MOD_G1_13.dta', convert_categoricals=True)
 
 conversions = pd.read_csv('../../2010-11/_/ihs3_conversions.csv')
 

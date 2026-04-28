@@ -1,7 +1,7 @@
 import pandas as pd
 from pandas.io import stata
 from cfe.df_utils import df_to_orgtbl
-import dvc.api
+from lsms_library.local_tools import DVCFS
 
 #'2010':{'fn':'../2010-11/Data/GSEC15c.dta','itmcd':'H15CQ2'},
 #'2011':{'fn':'../2011-12/Data/GSEC15C.dta','itmcd':'H15CQ2'},
@@ -16,7 +16,8 @@ Rounds = {'2005':{'fn':'../2005-06/Data/GSEC14B.dta','itmcd':'H14BQ2'},
     
 D = {}
 for k,v in Rounds.items():
-    with dvc.api.open(v['fn'],mode='rb') as dta:
+    # value_labels() needs a stream, not a DataFrame.
+    with DVCFS.open(v['fn']) as dta:
         sr = stata.StataReader(dta)
     D[k] = sr.value_labels()[v['itmcd']]
 

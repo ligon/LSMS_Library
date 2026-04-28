@@ -1,10 +1,8 @@
 #!/usr/bin/env python
-from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import to_parquet, get_dataframe
 import sys
 sys.path.append('../../_')
 from uganda import nonfood_expenditures
-import dvc.api
-from ligonlibrary.dataframes import from_dta
 
 myvars = dict(fn='../Data/gsec15c.dta',
               item='itmcd',
@@ -17,8 +15,7 @@ myvars = dict(fn='../Data/gsec15c.dta',
 x = nonfood_expenditures(**myvars)
 
 # "Wrong" hhid variable; get correct one from gsec1
-with dvc.api.open('../Data/gsec1.dta',mode='rb') as f:
-    ids = from_dta(f)[['HHID','hh']]
+ids = get_dataframe('../Data/gsec1.dta')[['HHID','hh']]
 
 ids = ids.set_index('hh').squeeze().to_dict()
 

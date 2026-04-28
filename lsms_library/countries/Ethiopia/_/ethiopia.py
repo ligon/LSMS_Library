@@ -1,12 +1,10 @@
-from ligonlibrary.dataframes import from_dta
 import numpy as np
 import pandas as pd
-import dvc.api
 from collections import defaultdict
 from cfe.df_utils import use_indices
 import warnings
 import json
-from lsms_library.local_tools import get_dataframe
+from lsms_library.local_tools import get_dataframe, DVCFS
 
 # Wave list used by harmonized_food_labels() and other helpers.
 # NB: panel_ids no longer uses this dict -- see panel_ids.py for the
@@ -157,8 +155,8 @@ def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market'
 
     df = get_dataframe(fn, convert_categoricals=True)
 
-    # Unit labels from Stata value labels
-    with dvc.api.open(fn,mode='rb') as dta:
+    # Unit labels from Stata value labels (need a stream, not a DataFrame)
+    with DVCFS.open(fn) as dta:
         sr = pd.io.stata.StataReader(dta)
         try:
             unitlabels = sr.value_labels()[units]
@@ -187,8 +185,7 @@ def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market'
 
 def food_acquired(fn,myvars):
 
-    with dvc.api.open(fn,mode='rb') as dta:
-        df = from_dta(dta,convert_categoricals=True)
+    df = get_dataframe(fn,convert_categoricals=True)
 
     df = df.loc[:,list(myvars.values())].rename(columns={v:k for k,v in myvars.items()})
 
@@ -338,12 +335,7 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
 
         return x
 
-    try:
-        with open(fn,mode='rb') as dta:
-            id = from_dta(dta)
-    except IOError:
-        with dvc.api.open(fn,mode='rb') as dta:
-            id = from_dta(dta)
+    id = get_dataframe(fn)
 
     id = id[[id0,id1]]
 

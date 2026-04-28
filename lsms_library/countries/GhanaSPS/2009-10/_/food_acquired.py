@@ -1,9 +1,8 @@
 #!/usr/bin/env python
-from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import to_parquet, get_dataframe
 import sys
 sys.path.append('../../_')
 import numpy as np
-import dvc.api
 import pandas as pd
 sys.path.append('../../../_/')
 from lsms_library.local_tools import df_from_orgfile
@@ -12,8 +11,7 @@ t = '2009-10'
 
 myvars = dict(fn='../Data/S11A.dta',item='itname',HHID='hhno')
 
-with dvc.api.open(myvars['fn'],mode='rb') as dta:
-    df = pd.read_stata(dta, convert_categoricals=True)
+df = get_dataframe(myvars['fn'], convert_categoricals=True)
 
 # Values recorded as cedis & pesewas; add 'em up
 df['purchased_value'] = df['s11a_cii'] + df['s11a_ciii']/100

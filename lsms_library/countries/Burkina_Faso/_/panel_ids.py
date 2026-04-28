@@ -23,15 +23,12 @@ import json
 import sys
 
 import pandas as pd
-import dvc.api
-from ligonlibrary.dataframes import from_dta
 
 sys.path.append('../../_')
-from lsms_library.local_tools import panel_ids
+from lsms_library.local_tools import panel_ids, get_dataframe
 
 # Read the 2021-22 cover sheet (already filtered to panel households)
-with dvc.api.open('../2021-22/Data/s00_me_bfa2021.dta', mode='rb') as dta:
-    df = from_dta(dta, convert_categoricals=True)
+df = get_dataframe('../2021-22/Data/s00_me_bfa2021.dta', convert_categoricals=True)
 
 # Build current wave ID (2021-22 style)
 df['i'] = df['hhid'].astype(int).astype(str)

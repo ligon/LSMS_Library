@@ -1,9 +1,8 @@
 #!/usr/bin/env python
-from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import to_parquet, get_dataframe
 import sys
 sys.path.append('../../_')
 import numpy as np
-import dvc.api
 import pandas as pd
 from ghanalss import split_by_visit
 sys.path.append('../../../_/')
@@ -22,11 +21,10 @@ for column in ['Code_9b', 'Code_8h']:
 units = df_from_orgfile('./categorical_mapping.org',name='s8hq9',encoding='ISO-8859-1')
 unitsd = units.set_index('Code').to_dict('dict')
 
-#food expenditure 
-with dvc.api.open('../Data/SEC9B.DTA',mode='rb') as dta:
-    df = pd.read_stata(dta, convert_categoricals=True)
-    #harmonize food labels
-    df['fdexpcd'] = df['fdexpcd'].replace(labelsd['Code_9b']['Preferred Label'])
+#food expenditure
+df = get_dataframe('../Data/SEC9B.DTA', convert_categoricals=True)
+#harmonize food labels
+df['fdexpcd'] = df['fdexpcd'].replace(labelsd['Code_9b']['Preferred Label'])
 
 df['hhid'] = df.apply(lambda x:f"{int(x['clust']):d}/{int(x['nh']):02d}",axis=1)
 
@@ -47,11 +45,10 @@ x['u'] = 'Value'
 x = x.reset_index().set_index(['j','i','u','visit'])
 
 #home produced amounts
-with dvc.api.open('../Data/SEC8H.DTA',mode='rb') as dta:
-    prod = pd.read_stata(dta, convert_categoricals=True)
-    #harmonize food labels and map unit labels:
-    prod['homagrcd'] = prod['homagrcd'].replace(labelsd['Code_8h']['Preferred Label'])
-    prod['s8hq9'] = prod['s8hq9'].replace(unitsd['Label'])
+prod = get_dataframe('../Data/SEC8H.DTA', convert_categoricals=True)
+#harmonize food labels and map unit labels:
+prod['homagrcd'] = prod['homagrcd'].replace(labelsd['Code_8h']['Preferred Label'])
+prod['s8hq9'] = prod['s8hq9'].replace(unitsd['Label'])
 
 # Some bizarre garbage in dta masquerading as extremely large numbers.
 #prod['s8hq14'] = prod.s8hq14.where(prod.s8hq14!=prod.s8hq14.max())

@@ -1,27 +1,22 @@
 #!/usr/bin/env python
-from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import to_parquet, get_dataframe
 
 from calendar import month
 import sys
 sys.path.append('../../_/')
 import pandas as pd
-import dvc.api
 from datetime import datetime
-from ligonlibrary.dataframes import from_dta
 
 
 #shock dataset
-with dvc.api.open('../Data/GSEC16.dta',mode='rb') as dta:
-    df = from_dta(dta)
+df = get_dataframe('../Data/GSEC16.dta')
+df = df[df['s16q02y'].notna()] #filter for valid entry
 
-    df = df[df['s16q02y'].notna()] #filter for valid entry
-
-df= df.replace(20018, 2018).loc[df['s16q02y'] != 1] #fix erroneous year entries 
+df= df.replace(20018, 2018).loc[df['s16q02y'] != 1] #fix erroneous year entries
 
 
 
-with dvc.api.open('../Data/GSEC1.dta',mode='rb') as dta:
-    date = from_dta(dta)
+date = get_dataframe('../Data/GSEC1.dta')
 #filter for hhs who have taken the shock questionnaire 
 date = date[date.set_index('hhid').index.isin(df.set_index('hhid').index)]
 

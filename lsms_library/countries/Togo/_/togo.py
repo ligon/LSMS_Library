@@ -1,8 +1,7 @@
 import pandas as pd
-import dvc.api
 import numpy as np
 import lsms_library.local_tools as tools
-from lsms_library.local_tools import get_dataframe
+from lsms_library.local_tools import get_dataframe, DVCFS
 
 
 def i(value):
@@ -103,8 +102,8 @@ def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market'
 
     df = get_dataframe(fn, convert_categoricals=True)
 
-    # Unit labels from Stata value labels
-    with dvc.api.open(fn,mode='rb') as dta:
+    # Unit labels from Stata value labels (need a stream, not a DataFrame)
+    with DVCFS.open(fn) as dta:
         sr = pd.io.stata.StataReader(dta)
         try:
             unitlabels = sr.value_labels()[units]

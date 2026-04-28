@@ -13,34 +13,27 @@ Tanzania needs bespoke handling:
 import json
 import sys
 import pandas as pd
-import dvc.api
 
 sys.path.append('../../_')
-from lsms_library.local_tools import format_id, RecursiveDict
-from ligonlibrary.dataframes import from_dta
+from lsms_library.local_tools import format_id, RecursiveDict, get_dataframe
 from tanzania import map_08_15, _map_with_head_tracking
 
 # --- Phase 1: Build raw linkage per wave ---
 
 # 2008-15: UPHI-based with composite IDs for household splits (#114)
-with dvc.api.open('../2008-15/Data/upd4_hh_a.dta', mode='rb') as dta:
-    cover_08 = from_dta(dta)
+cover_08 = get_dataframe('../2008-15/Data/upd4_hh_a.dta')
 linkage_08 = map_08_15(cover_08[['r_hhid', 'round', 'UPHI']], ['r_hhid', 'round', 'UPHI'])
 
 # 2019-20: head-tracking for splits
-with dvc.api.open('../2019-20/Data/HH_SEC_A.dta', mode='rb') as dta:
-    cover_19 = from_dta(dta)
-with dvc.api.open('../2019-20/Data/HH_SEC_B.dta', mode='rb') as dta:
-    roster_19 = from_dta(dta)
+cover_19 = get_dataframe('../2019-20/Data/HH_SEC_A.dta')
+roster_19 = get_dataframe('../2019-20/Data/HH_SEC_B.dta')
 linkage_19 = _map_with_head_tracking(
     cover_19, roster_19, 'sdd_hhid', 'y4_hhid')
 linkage_19['t'] = '2019-20'
 
 # 2020-21: head-tracking for splits
-with dvc.api.open('../2020-21/Data/hh_sec_a.dta', mode='rb') as dta:
-    cover_20 = from_dta(dta)
-with dvc.api.open('../2020-21/Data/hh_sec_b.dta', mode='rb') as dta:
-    roster_20 = from_dta(dta)
+cover_20 = get_dataframe('../2020-21/Data/hh_sec_a.dta')
+roster_20 = get_dataframe('../2020-21/Data/hh_sec_b.dta')
 linkage_20 = _map_with_head_tracking(
     cover_20, roster_20, 'y5_hhid', 'y4_hhid')
 linkage_20['t'] = '2020-21'

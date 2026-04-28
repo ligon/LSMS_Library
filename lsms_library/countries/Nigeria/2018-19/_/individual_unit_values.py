@@ -3,11 +3,11 @@ import sys
 import numpy as np
 import pandas as pd
 import json
-import dvc.api
 from cfe.df_utils import broadcast_binary_op
 
 sys.path.append('../../2015-16/_')
 from units import unitcodes
+from lsms_library.local_tools import get_dataframe
 
 def rectify(food,units=unitcodes):
 
@@ -49,8 +49,7 @@ lbls = json.load(open('../../_/food_items.json'))
 # Harvest
 t = '2019Q1'
 
-with dvc.api.open('../Data/sect10b_harvestw4.csv',mode='rb') as csv:
-    harvest = pd.read_csv(csv)
+harvest = get_dataframe('../Data/sect10b_harvestw4.csv')
 
 vars={'hhid': 'j',
       'item_cd' : 'i',
@@ -84,8 +83,7 @@ U.append(unit_values)
 
 t = '2018Q3'
 
-with dvc.api.open('Nigeria/2018-19/Data/sect7b_plantingw4.csv',mode='rb') as csv:
-    planting = pd.read_csv(csv)
+planting = get_dataframe('Nigeria/2018-19/Data/sect7b_plantingw4.csv')
 
 vars={'hhid': 'j',
       'item_cd' : 'i',

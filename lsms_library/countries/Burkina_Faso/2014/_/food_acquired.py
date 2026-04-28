@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import to_parquet, get_dataframe
 
 import sys
 sys.path.append('../../_/')
@@ -7,9 +7,6 @@ from burkina_faso import age_sex_composition
 import pandas as pd
 import numpy as np
 import json
-import dvc.api
-from ligonlibrary.dataframes import from_dta
-import pyreadstat
 
 x = []
 
@@ -22,9 +19,7 @@ for i in np.arange(1,2): #change to 5 to get the files for all 4 rounds
     round = variables[i-1]
 
     filestring = 'emc2014_p'+str(i)+'_conso7jours_16032015.dta'
-    fs = dvc.api.DVCFileSystem('../../')
-    fs.get_file('/Burkina_Faso/2014/Data/'+filestring, '/tmp/'+filestring)
-    df, meta_r = pyreadstat.read_dta('/tmp/'+filestring, apply_value_formats = True, formats_as_category = True)
+    df = get_dataframe('../Data/'+filestring)
 
     df["j"] = df["zd"].astype(str) + df["menage"].astype(int).astype(str).str.rjust(3, '0')
     df = df.set_index('j')

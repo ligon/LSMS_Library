@@ -3,7 +3,6 @@ from lsms_library.local_tools import to_parquet
 import sys
 sys.path.append('../../_')
 import numpy as np
-import dvc.api
 import pandas as pd
 sys.path.append('../../../_/')
 from lsms_library.local_tools import df_from_orgfile, get_dataframe

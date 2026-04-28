@@ -1,8 +1,6 @@
-from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import to_parquet, get_dataframe
 #!/usr/bin/env python3
 import pandas as pd
-import dvc.api
-from ligonlibrary.dataframes import from_dta
 import numpy as np
 from pint import UnitRegistry, UndefinedUnitError, DimensionalityError
 
@@ -24,7 +22,7 @@ b = dict(int_key    = 'interview__key',  # interview__{key,id} both unique ident
          unit_d     = 'cm_f064',
          )
 
-with dvc.api.open(fn,mode='rb') as dta: df = from_dta(dta)
+df = get_dataframe(fn)
 
 df = df[b.values()]
 df = df.rename(columns={v:k for k,v in b.items()}).set_index(['int_key','i'])
@@ -45,7 +43,7 @@ c = dict(int_key    = 'interview__key',  # interview__{key,id} both unique ident
          ea         = 'id_05',
          )
 
-with dvc.api.open(fn,mode='rb') as dta: place = from_dta(dta,convert_categoricals=False)
+place = get_dataframe(fn,convert_categoricals=False)
 
 place = place.replace('**CONFIDENTIAL**',pd.NA)
 place = place.loc[:,place.count()>0] # Drop columns with no data
@@ -72,7 +70,7 @@ myvars = dict(HHID='y5_hhid',
               region = 'hh_a01_1',
               )
 
-with dvc.api.open(fn,mode='rb') as dta: hhloc = from_dta(dta)
+hhloc = get_dataframe(fn)
 
 
 hhloc = hhloc.replace('**CONFIDENTIAL**',pd.NA)

@@ -1,13 +1,11 @@
-from ligonlibrary.dataframes import from_dta
 import pandas as pd
 import numpy as np
-import dvc.api
 import warnings
 import json
 import sys
 sys.path.append('../../_')
 sys.path.append('../../../_')
-from lsms_library.local_tools import format_id, id_walk, RecursiveDict, get_dataframe, update_id
+from lsms_library.local_tools import format_id, id_walk, RecursiveDict, get_dataframe, update_id, DVCFS
 from collections import defaultdict
 
 country = 'Tanzania'
@@ -284,8 +282,8 @@ def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market'
 
     df = get_dataframe(fn, convert_categoricals=True)
 
-    # Unit labels from Stata value labels
-    with dvc.api.open(fn,mode='rb') as dta:
+    # Unit labels from Stata value labels (need a stream, not a DataFrame)
+    with DVCFS.open(fn) as dta:
         sr = pd.io.stata.StataReader(dta)
         try:
             unitlabels = sr.value_labels()[units]
@@ -364,8 +362,7 @@ def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Label',value='Prefer
 
     
 def food_acquired(fn,myvars):
-    with dvc.api.open(fn,mode='rb') as dta:
-        df = from_dta(dta)
+    df = get_dataframe(fn)
     df = df.loc[:,list(myvars.values())].rename(columns={v:k for k,v in myvars.items()})
 
     if 'year' in myvars:
@@ -443,13 +440,11 @@ def id_match(df, wave, waves_dict):
     df = df.reset_index()
     if len(waves_dict[wave]) == 3:
         if 'y4_hhid' and 'UPHI' not in df.columns:
-            with dvc.api.open('../%s/Data/%s' % (wave,waves_dict[wave][0]),mode='rb') as dta:
-                h = from_dta(dta)
+            h = get_dataframe('../%s/Data/%s' % (wave,waves_dict[wave][0]))
             h = h[[waves_dict[wave][1], waves_dict[wave][2]]]
             m = df.merge(h, how = 'left', left_on ='j', right_on =waves_dict[wave][2])
 
-            with dvc.api.open('../2008-15/Data/upd4_hh_a.dta',mode='rb') as dta:
-                uphi = from_dta(dta)[['UPHI','r_hhid','round']]
+            uphi = get_dataframe('../2008-15/Data/upd4_hh_a.dta')[['UPHI','r_hhid','round']]
             uphi['UPHI'] = uphi['UPHI'].astype(int).astype(str)
             y4 = uphi.loc[uphi['round']==4, 'r_hhid'].to_frame().rename(columns ={'r_hhid':'y4_hhid'})
             uphi = uphi.join(y4)    
@@ -466,9 +461,8 @@ def id_match(df, wave, waves_dict):
     if len(waves_dict[wave]) == 4:
         if 'UPHI'  in df.columns: 
             m = df.rename(columns={'UPHI': 'j'})
-        else: 
-            with dvc.api.open('../%s/Data/%s' % (wave,waves_dict[wave][0]),mode='rb') as dta:
-                h = from_dta(dta)
+        else:
+            h = get_dataframe('../%s/Data/%s' % (wave,waves_dict[wave][0]))
             h = h[[waves_dict[wave][1], waves_dict[wave][2], waves_dict[wave][3]]]
             h[waves_dict[wave][1]] = h[waves_dict[wave][1]].astype(int).astype(str)
             dict = {1:'2008-09', 2:'2010-11', 3:'2012-13', 4:'2014-15'}
