@@ -15,6 +15,24 @@ if __name__=='__main__':
 else:
     from lsms_library.local_tools import format_id
 
+def District(x):
+    """Canonical District form across all Uganda waves.
+
+    Pre-2018 waves source ``District`` from numeric Stata columns
+    (``h1aq1``, ``h1aq1a``) which df_data_grabber stringifies to
+    ``'101.0'``-style float-strings (CLAUDE.md: ``format_id`` is
+    auto-applied to ``idxvars`` but NOT to ``myvars``).  Post-2018
+    waves source from string columns (``district_name`` / ``district``)
+    which need no normalisation but ``format_id`` is a no-op on them.
+
+    Defining a country-level ``District`` formatter routes every
+    Uganda ``District`` myvar through the canonical normalizer so
+    cross-wave District values share an int-string encoding.
+    GH #161.
+    """
+    return format_id(x)
+
+
 def v(x):
     """Canonical cluster-id form for Uganda's ``v`` myvar across all tables.
 
