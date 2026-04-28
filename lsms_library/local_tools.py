@@ -637,8 +637,15 @@ def df_data_grabber(fn: str | Path, idxvars: dict[str, Any] | str, convert_categ
             else: # A list?
                 for k in kwargs:
                     out[k] = df[k]
-    else:
-        out = df
+    # When ``kwargs`` (myvars) is empty, ``out`` already holds just
+    # the renamed idxvars frame (built above from the ``idxvars`` dict)
+    # which is what ``set_index(list(idxvars.keys()))`` needs.  An
+    # earlier ``else: out = df`` branch overwrote ``out`` with the raw
+    # DataFrame, which still had source column names (``identif`` /
+    # ``id4`` etc.) so ``set_index(['i','v'])`` raised
+    # ``KeyError: "None of ['i','v'] are in the columns"``.  Two
+    # countries hit this: Azerbaijan 1995 and Timor-Leste 2001 sample
+    # df_cover (both declare a deliberately-empty ``myvars: {}``).
 
     out = out.set_index(list(idxvars.keys()))
 
