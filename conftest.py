@@ -67,6 +67,41 @@ def pytest_configure(config):
         os.environ["LSMS_NO_CACHE"] = "1"
     elif config.getoption("--rebuild", default=False):
         os.environ["LSMS_NO_CACHE"] = "1"
+    else:
+        # Always clear Uganda's parquet cache at session start.  v0.7.1
+        # added country-level ``v`` and ``District`` formatters to
+        # Uganda/_/uganda.py and a framework-level grain fix in
+        # ``Country.cluster_features()``; both run only at extraction
+        # time, so cached parquets predating those changes mask the
+        # fix and produce spurious test failures (float-stringified v,
+        # missing Region column, household-grain cluster_features).
+        # The cost of a fresh build is small (~5-10s for Uganda's
+        # tables) and runs in the master process before xdist workers
+        # spawn, so there's no race.  Tracked as part of GH #196 /
+        # #197 / #161.  A no-op on a clean tree.
+        _purge_country_caches("Uganda")
+
+
+def _purge_country_caches(country_name: str) -> None:
+    """Targeted single-country variant of :func:`_purge_data_root_caches`.
+
+    Used as a session-start hook to flush parquets that predate a
+    recently-shipped extraction-layer change.  Idempotent on a clean
+    tree.  Failures are warnings, not errors --- a missing data tree
+    or import failure shouldn't stop the test session.
+    """
+    try:
+        from lsms_library.paths import COUNTRIES_ROOT
+        if not (COUNTRIES_ROOT / country_name / "_" / "data_scheme.yml").exists():
+            return
+        from lsms_library import Country
+        Country(country_name, verbose=False).clear_cache()
+    except Exception as exc:  # noqa: BLE001
+        warnings.warn(
+            f"_purge_country_caches({country_name!r}) failed ({exc!r}); "
+            f"tests may see stale parquets.  Run "
+            f"`lsms-library cache clear --country {country_name}` manually."
+        )
 
 
 def _purge_data_root_caches() -> None:
