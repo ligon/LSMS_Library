@@ -27,10 +27,18 @@ PYTEST_ARGS ?= -n $(PYTEST_WORKERS) --dist=loadfile
 .PHONY: setup test test-full retest test-ff build release clean help \
         profile profile-cold profile-cprofile
 
-setup: .venv/pyvenv.cfg
+# Use a stamp file in .make/ rather than .venv/pyvenv.cfg --- Poetry's
+# default ``virtualenvs.in-project = false`` puts the venv under
+# ``~/.cache/pypoetry/`` so .venv/ never exists in the project root,
+# which made the previous ``touch .venv/pyvenv.cfg`` fail (the parent
+# directory doesn't exist).  ``--with test`` explicitly installs the
+# pytest-xdist / pytest-instafail / pytest-timeout group so a fresh
+# clone never trips on ``unrecognized arguments: -n --dist=loadfile``.
+setup: .make/setup.stamp
 
-.venv/pyvenv.cfg: pyproject.toml
-	$(POETRY) install
+.make/setup.stamp: pyproject.toml poetry.lock
+	@mkdir -p $(@D)
+	$(POETRY) install --no-interaction --with test
 	@touch $@
 
 test: setup
