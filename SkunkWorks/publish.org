@@ -1,0 +1,383 @@
+#+TITLE: Replication-Package Publishing --- Design (v0.7.2)
+#+filetags: skunkworks publishing anonymization replication lsms_library plan
+#+DATE: <2026-04-28 Tue>
+#+AUTHOR: Ethan Ligon + Claude (planning session)
+
+* Purpose
+
+Add an =lsms-library publish= CLI (and supporting =Country.publish()=
+method) that materializes a self-contained directory of parquet
+files suitable for shipping with an AER-style replication package.
+Output has:
+
+- ID columns (=i=, =j=, =v=, person-level IDs in roster) hashed
+  with a per-paper salt, so the data cannot be merged back to other
+  WB datasets;
+- a =manifest.yml= enumerating the transformations the library
+  applied (the substance of the "this is a derived analytical
+  product, not redistribution of WB =.dta= files" argument);
+- a =provenance.csv= from =Country.provenance()= with source URL
+  and license per wave;
+- a =README.md= explaining how to read the parquets without
+  installing =lsms_library=.
+
+* Why
+
+Anticipated AER data-editor request for the Uganda paper:
+
+  "Hash household IDs so the published data can't be merged with
+  other World Bank datasets."
+
+We could hand-write a script per paper.  But:
+
+1. The substantive argument to the editor isn't "we hashed IDs" ---
+   it's "the library applies a substantial transformation pipeline,
+   and the parquet you see is a derived analytical product."  That
+   argument is much stronger when the transformation list is
+   enumerated mechanically in a manifest, not asserted in a
+   methods-section paragraph.
+
+2. Multiple papers will use this library.  Without a primitive,
+   each author rolls their own =hashlib.sha256(str(x).encode())=
+   loop and the substance of the transformation list lives only in
+   the methods section.  With a primitive, the manifest is a
+   library artifact tied to the library version.
+
+3. ID hashing alone is fragile --- it's easy to forget a column,
+   inconsistently salt across tables (breaks within-package
+   joins), or accidentally publish raw =Lat=/=Lon=.  The library
+   knows the schema; let it own the bookkeeping.
+
+* Non-goals
+
+- *Hide the salt from the reviewer.*  The salt is shared in the
+  replication package's README.  Two adversary models:
+  - The reviewer (who has the salt) can reproduce the regressions;
+    that's a feature.
+  - A generic adversary (who doesn't have this paper's salt) can't
+    rainbow-table back to WB IDs across N papers; that's the
+    privacy claim.
+  Not making the salt itself secret beyond the package; AER convention
+  is salt-revealed-but-paper-specific.
+
+- *Automatic GPS coarsening.*  WB already jitters
+  =cluster_features.Lat=/=Lon= upstream (2 km urban, 5 km rural).
+  Default policy is to pass through.  A =--gps drop= option exists
+  for paranoid use; coarsening (a third option) is deferred unless
+  a reviewer asks.
+
+- *Preserving raw-ID round-tripping inside the package.*  Once
+  published, IDs are hashed.  Reviewer can join across tables (same
+  hash → same equi-join), but cannot recover the original WB IDs
+  without the salt.  This is exactly the property the editor wants.
+
+- *A general-purpose anonymization framework.*  Scope is
+  ID-hashing + manifest.  Differential privacy, k-anonymity,
+  redaction of free-text columns are out of scope.
+
+* User-facing surface
+
+** CLI
+
+#+begin_src bash
+lsms-library publish \
+    --country Uganda \
+    --out-dir /path/to/replication_package/data \
+    --salt aer-paper-2026 \
+    --market Region \
+    [--tables food_expenditures household_characteristics ...] \
+    [--gps keep|drop] \
+    [--include-cluster-features no|yes]
+#+end_src
+
+Defaults:
+- =--tables= : every member of =Country('Uganda').data_scheme= that
+  has a runnable accessor.  Excludes =sample= and =cluster_features=
+  unless explicitly named (they leak =v= which the AER paper's
+  =market='Region'= aggregation wants gone).
+- =--market= : =None= (passed verbatim to each table call; if user
+  doesn't want region aggregation they omit the flag).
+- =--gps keep= : default; trust WB jitter.
+
+** Programmatic
+
+#+begin_src python
+from pathlib import Path
+import lsms_library as ll
+
+ll.Country('Uganda').publish(
+    out_dir=Path('/path/to/data'),
+    salt='aer-paper-2026',
+    market='Region',
+    tables=None,                # default: all in data_scheme
+    gps='keep',
+)
+#+end_src
+
+The CLI is a thin wrapper around =Country.publish()=.
+
+* Output layout
+
+#+begin_src
+data/
+├── manifest.yml
+├── provenance.csv
+├── README.md
+├── food_expenditures.parquet
+├── household_characteristics.parquet
+├── household_roster.parquet
+├── food_acquired.parquet
+├── housing.parquet
+├── ...
+#+end_src
+
+** =manifest.yml=
+
+#+begin_src yaml
+country: Uganda
+library_version: 0.7.2
+generated: 2026-04-28T12:00:00Z
+salt_sha256: a1b2c3d4e5f6   # first 12 hex of SHA-256(salt); proves salt without leaking
+hashed_columns: [i, j, v, person_id]
+hash_algorithm: sha256
+hash_truncate_hex: 12
+gps_policy: keep   # WB-jittered upstream; documented per cluster_features citation
+market: Region
+tables:
+  food_expenditures: {rows: 24290, columns: 12}
+  household_characteristics: {rows: 24270, columns: 23}
+  ...
+transformations:
+  - schema_harmonization
+  - kinship_decomposition_kroeber
+  - categorical_canonicalization
+  - food_label_harmonization
+  - unit_conversion_kg_ml
+  - cluster_grain_aggregation
+  - months_spent_normalization
+  - transitive_id_resolution_panel
+  - sample_v_join
+  - canonical_dtype_coercion
+provenance: see provenance.csv
+#+end_src
+
+The =transformations= list is the central legal claim.  Each entry
+maps to a documented operation in =country.py= /
+=transformations.py= / =local_tools.py=.  We need a stable
+vocabulary: ideally each transformation has a =LSMS-T-NNN=
+identifier with a fixed url to the docs.
+
+** =provenance.csv=
+
+Direct dump of =Country('Uganda').provenance()= --- one row per
+wave with =source=, =license=, =documentation_path= columns.  The
+=documentation_path= column is rewritten to be relative to the
+publishing user's repo path so it doesn't leak local filesystem
+structure (or can be dropped entirely if we decide it's noise).
+
+** =README.md=
+
+Auto-generated.  Contents:
+
+- Citation block (paper + library)
+- "How to read these files" --- =pd.read_parquet('food_expenditures.parquet')=, no =lsms_library= import needed
+- The salt (=aer-paper-2026=, plain text in the README; reviewer
+  needs it to reproduce ID hashes if they want to cross-check
+  against an analytical assertion in the paper)
+- Pointer to =manifest.yml= and =provenance.csv=
+- License + redistribution restrictions
+
+* Hashing details
+
+** Algorithm
+
+#+begin_src python
+import hashlib
+
+def hash_id(value, salt: str, length: int = 12) -> str:
+    h = hashlib.sha256(f"{salt}\x00{value}".encode("utf-8")).hexdigest()
+    return h[:length]
+#+end_src
+
+Notes:
+- =\x00= separator prevents collision between =salt='ab', value='cd'=
+  and =salt='abc', value='d'=.
+- Truncation to 12 hex (= 48 bits) keeps the columns readable but
+  collision-resistant for any survey-sized population.
+- Output is a Python =str=, written into parquet as Arrow string.
+  Existing test fixtures and downstream code that does =df['i'] ==
+  df2['i']= still works.
+
+** Auto-detection of ID columns
+
+Hash exactly the columns that:
+1. Are named in the canonical schema (=lsms_library/data_info.yml=)
+   under "required ID columns" (= ={i, j, v}=); plus
+2. Any column whose name starts with =person_id_= (roster
+   member-level IDs); plus
+3. =--hash-extra-columns= for paper-specific cases.
+
+If a column would be hashed but doesn't appear in the table (e.g.
+=v= when =market='Region'= collapses it away), no-op silently.
+
+** What ISN'T hashed
+
+- Categorical labels (=Sex=, =Generation=, =Affinity=, food labels)
+  --- already harmonized away from raw WB codes.
+- Numeric measurements (expenditures, ages, GPS).
+- Cluster lat/lon --- WB-jittered upstream.
+- =strata= column in =sample()= --- this is a survey-design
+  variable, not an identifier we have a privacy claim on.
+- =t= (wave label, e.g. ='2019-20'=) --- public information.
+
+* Library-internal questions
+
+** Where does =Country.publish()= live?
+
+Either:
+- a method on =Country= (currently 1632 lines of =country.py=,
+  adding ~150 LOC)
+- a separate =lsms_library/publish.py= module exposing
+  =publish_country(country: Country, ...)=
+
+Lean toward the latter --- =country.py= is already the largest file
+in the package, and publishing is a side concern from the runtime
+core.  Make =Country.publish= a thin shim that calls
+=publish_country=.
+
+** CLI registration
+
+The =lsms-library= CLI is registered in =pyproject.toml= under
+=[tool.poetry.scripts]=.  Add a =publish= subcommand that argparses
+the flags above and calls =publish_country=.
+
+** Reproducibility
+
+Within one publish run: deterministic.  Across publishes (same
+salt, same library version, same data): bit-for-bit identical
+parquets, modulo any non-determinism in =Country.<table>()= itself
+(currently none I'm aware of, but worth checking).
+
+If a reviewer wants to verify "the parquet you shipped is the
+parquet your code produces," they:
+1. Get the salt from the README.
+2. Pin to the same library version (=manifest.yml= records it).
+3. Run =lsms-library publish= and =diff= the result.
+4. Ideally bit-identical; at minimum =pd.read_parquet=-equal.
+
+** Versioning
+
+=manifest.yml= records =library_version=.  Bumping the library
+should be treated like bumping any analysis dependency: re-run
+=publish=, re-run downstream regressions, re-publish.  We don't
+promise stability across major versions.
+
+** Deferred: package-name canonicalization
+
+Eventually we may want every published file to start with a magic
+prefix (=lsms-library-publish-v1-=) so file identity is
+unambiguous when zipped into a paper's replication package.  Defer
+unless a reviewer asks.
+
+* Implementation sketch
+
+** Phase 1 --- core
+
+- Add =lsms_library/publish.py=:
+  - =hash_id(value, salt, length=12)= primitive.
+  - =hash_dataframe(df, columns, salt)= --- vectorized over a
+    Series; returns new DataFrame.
+  - =publish_country(country, out_dir, salt, market=None,
+    tables=None, gps='keep')= orchestrator.
+  - =_build_manifest(country, salt, tables, ...)= writes
+    =manifest.yml=.
+  - =_build_readme(country, salt, ...)= writes =README.md= from a
+    template.
+- Add =Country.publish(self, out_dir, salt, **kwargs)= shim.
+- Add =publish= subcommand to =lsms-library= CLI.
+
+** Phase 2 --- tests
+
+- =tests/test_publish.py=:
+  - hash_id determinism across calls
+  - hash_id different salts → different output
+  - hash_id different values → different output (collision probe)
+  - publish_country writes expected files
+  - manifest.yml round-trip
+  - within-package equi-join still works on hashed IDs
+  - skipping unconfigured columns silently (no =v= when market='Region')
+
+** Phase 3 --- documentation
+
+- =docs/publish.md= with rationale + worked example
+- Update =CLAUDE.md= and =CONTRIBUTING.org= with the
+  ID-hashing-policy guidance
+- Update =README.md= with "Publishing for AER replication" section
+
+* Outstanding decisions
+
+1. *Manifest format.*  YAML or JSON?  YAML reads better; JSON is
+   more universally tooled.  Lean YAML (=manifest.yaml= already
+   familiar from =data_info.yml=).
+2. *Per-paper salt collision.*  Two papers using the same salt
+   would have identical hashes for the same household.  Probably
+   fine (papers are siloed) but worth flagging in docs.  An
+   accidental copy-paste of =aer-paper-2026= across two unrelated
+   papers' READMEs would be silently dangerous.
+3. *Should =Country.publish()= run all =data_scheme= tables, or
+   only the ones the paper used?*  For the AER editor the answer
+   is "publish what the paper consumed."  But the library doesn't
+   know that.  Tentative resolution: paper author explicitly
+   passes =--tables= to be honest about what data the paper
+   touches.  Default = all of =data_scheme=.
+4. *Should the =sample()= weights ship?*  Yes --- they're public
+   survey-design info, no privacy concern, and the reviewer needs
+   them to reproduce regressions.  But include them only if the
+   user explicitly asks (=--tables sample=).
+5. *DVC remote for the published artifact itself.*  Not us.  The
+   author commits the published directory to whatever artifact
+   store the journal mandates (Inter-University Consortium for
+   Political and Social Research / OPENICPSR, Zenodo, etc.).
+
+* Worked example
+
+For Uganda, the AER paper-author flow becomes:
+
+#+begin_src bash
+# 1. Develop, run, debug paper analysis using full library.
+python paper_analysis.py    # uses ll.Country('Uganda').food_expenditures(market='Region') etc.
+
+# 2. Publish the data the paper used.
+lsms-library publish \
+    --country Uganda \
+    --out-dir replication_package/data \
+    --salt aer-paper-2026 \
+    --market Region
+
+# 3. Modify paper_analysis.py to use the published parquet directly:
+#    df = pd.read_parquet('replication_package/data/food_expenditures.parquet')
+#    No lsms_library import in the replication package.
+
+# 4. Zip and upload to journal.
+cd replication_package && zip -r submission.zip *
+#+end_src
+
+The reviewer:
+1. Downloads =submission.zip=.
+2. Reads =data/README.md=, sees the salt, sees the transformation
+   list in =manifest.yml=, sees source URLs in =provenance.csv=.
+3. Runs =paper_analysis.py= --- it just reads parquet, no library
+   needed.
+4. (Optional) installs =lsms_library==0.7.2=, runs =lsms-library
+   publish --salt aer-paper-2026=, diffs against shipped parquets.
+   Identical → "transformation pipeline produces what was
+   published" verified.
+
+* References
+
+- =SkunkWorks/configurable_data_cache.org= --- companion v0.7.2
+  design doc; same salt/separation principle.
+- =CLAUDE.md= "Canonical Schema" section --- list of
+  transformations applied at the API layer.
+- AER data and code availability policy: https://aeapubs.aeaweb.org/journals/policies/data-code
+- ICPSR replication archive guidelines: https://www.openicpsr.org/openicpsr/workflow/replication
