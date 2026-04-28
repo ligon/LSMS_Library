@@ -53,16 +53,75 @@ PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring poetry build
 Slurm submission scripts for release builds should export this env
 var unconditionally.
 
-## Compute nodes have no outbound internet (Savio)
+## Outbound internet on Savio compute nodes (was: blocked, now: works)
 
-`poetry build` reaches out to `pypi.org` during the build (for
-build-isolation dependency fetching, even for a simple library). On
-Savio compute nodes this fails with DNS resolution errors and the
-build aborts.
+Originally observed 2026-04-10: `poetry build` failed with DNS
+errors on Savio2 compute nodes; release builds had to be run from
+the login node.
 
-**Release builds must run on the login node or on a host with
-outbound internet.** Regular `pytest` runs don't need internet and
-can still run on compute nodes via Slurm.
+**Updated 2026-04-28**: outbound HTTPS reaches `pypi.org`,
+`github.com`, and `files.pythonhosted.org` from at least
+`n0291.savio2` (HTTP 200 in 30–200 ms each).  Either the original
+outage was transient or the cluster's network policy has been
+relaxed.  **Release builds can run from a compute node again** —
+verify with a quick `curl -s -o /dev/null -w "%{http_code}\n"
+https://pypi.org/` before relying on it.
+
+The login-node fallback remains a safe default for release builds
+that take long enough to be expensive to retry.
+
+## Working around a broken system poetry
+
+Independent of the above, the system poetry on Savio
+(`/global/home/users/ligon/.local/bin/poetry`) has been observed
+to fail with:
+
+```
+ModuleNotFoundError: No module named 'packaging.licenses'
+```
+
+on `poetry --version`, `poetry env info`, and `poetry install`.
+Root cause: Poetry 2.x expects `packaging>=24.2` (which exposes
+`packaging.licenses`); the user-site `packaging` is older, and
+poetry's vendored deps don't shadow it cleanly.
+
+**For tests** — bypass poetry entirely.  Run pytest directly via
+the project venv:
+
+```sh
+.venv/bin/python -m pytest -n $(nproc) --dist=loadfile
+```
+
+If a `make` target routes through `$POETRY` and the wrapping
+`make setup` fails on `poetry install`, just touch the stamp to
+skip it (the venv is already populated):
+
+```sh
+touch .make/setup.stamp
+```
+
+then call pytest directly as above.
+
+**For builds** — install poetry into the project venv so the
+broken user-site poetry is bypassed:
+
+```sh
+.venv/bin/pip install --upgrade poetry \
+    "poetry-dynamic-versioning[plugin]>=1.0.0,<2.0.0"
+.venv/bin/poetry self show plugins   # verify plugin is listed
+PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring \
+    .venv/bin/poetry build
+```
+
+A more invasive alternative is to upgrade the user-site
+`packaging`:
+
+```sh
+python3 -m pip install --user --upgrade packaging
+```
+
+That fixes the system poetry in place but may have flow-on effects
+on other user-site packages.  Prefer the venv-local install above.
 
 ## Typical release sequence
 
