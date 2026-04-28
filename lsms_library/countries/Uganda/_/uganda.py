@@ -9,9 +9,9 @@ if __name__=='__main__':
     import sys
     sys.path.append('../../_')
     sys.path.append('../../../_')
-    from local_tools import format_id
+    from local_tools import format_id, get_dataframe
 else:
-    from lsms_library.local_tools import format_id
+    from lsms_library.local_tools import format_id, get_dataframe
 
 def District(x):
     """Canonical District form across all Uganda waves.
