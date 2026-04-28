@@ -388,6 +388,35 @@ def test_api_matches_replication(spec: FeatureSpec) -> None:
             f"replication should regenerate against the current API."
         )
 
+    # locality: deprecated API (DeprecationWarning, see docs/migration/
+    # locality.md); current implementation is a compatibility shim
+    # (`legacy_locality` in transformations.py) that joins sample() and
+    # cluster_features().  The replication parquet was generated from
+    # the original wave-level locality.py scripts (since deleted) and
+    # has bit-rotted in three orthogonal ways:
+    #   1. Uganda 2009-10: replication has empty-string Parish for
+    #      541 HHs; the current sample() carries `@<lat>,<lon>`
+    #      coordinate strings as the `v` (cluster) code for the same
+    #      HHs -> 541 string mismatches plus 25 NaN-asymmetry rows
+    #      (HHs whose API-side sample.v is genuinely NaN, where the
+    #      replication had coerced the missing value to '').
+    #   2. Float stringification: replication has e.g. '10120402.0'
+    #      where the API now has the canonical '10120402' (~3118
+    #      additional string diffs, all 2010-11/2011-12 numeric
+    #      cluster codes).
+    #   3. The single both-NaN HH (3b486c0be9... 2019-20) is a
+    #      split-off with no sample-row cluster (GH #197 family).
+    # All three disagreements are replication staleness, not library
+    # regressions.  Keeping as xfail (not skip) so we still notice if
+    # the divergence resolves after a replication regenerate.
+    if spec.name == "locality":
+        pytest.xfail(
+            "locality: deprecated API; replication parquet predates the "
+            "sample() + cluster_features() shim and the @-coord cluster "
+            "codes in 2009-10 / float-suffix cleanup.  Library output is "
+            "correct; replication should regenerate."
+        )
+
     repl = _load_replication(spec.name)
 
     try:
