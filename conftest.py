@@ -92,15 +92,33 @@ def _purge_country_caches(country_name: str) -> None:
     """
     try:
         from lsms_library.paths import COUNTRIES_ROOT
-        if not (COUNTRIES_ROOT / country_name / "_" / "data_scheme.yml").exists():
+        country_dir = COUNTRIES_ROOT / country_name
+        if not (country_dir / "_" / "data_scheme.yml").exists():
             return
         from lsms_library import Country
         Country(country_name, verbose=False).clear_cache()
+        # Also delete any **in-tree** ``{country}/var/*.parquet`` build
+        # artefacts.  These are gitignored legacy outputs from before
+        # the data_root migration; ``test_uganda_invariance.py`` (and a
+        # handful of others) read in-tree first and only fall through to
+        # ``data_root()`` when in-tree is missing, so a stale in-tree
+        # parquet masks the data_root rebuild that
+        # ``Country.clear_cache()`` just primed.  Surfaced as the
+        # housing.parquet ``[27741, 2] != [24290, 2]`` shape mismatch.
+        # Files are gitignored (``lsms_library/countries/*/var/*``) --
+        # safe to delete.
+        intree_var = country_dir / "var"
+        if intree_var.is_dir():
+            for parquet in intree_var.glob("*.parquet"):
+                parquet.unlink()
     except Exception as exc:  # noqa: BLE001
         warnings.warn(
             f"_purge_country_caches({country_name!r}) failed ({exc!r}); "
             f"tests may see stale parquets.  Run "
-            f"`lsms-library cache clear --country {country_name}` manually."
+            f"`lsms-library cache clear --country {country_name}` "
+            f"and "
+            f"`rm -f lsms_library/countries/{country_name}/var/*.parquet` "
+            f"manually."
         )
 
 
