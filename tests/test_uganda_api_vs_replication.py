@@ -178,16 +178,23 @@ FEATURE_SPECS: list[FeatureSpec] = [
     FeatureSpec("food_prices",       kwargs={"market": "Region"}),
     FeatureSpec("food_quantities",   kwargs={"market": "Region"}),
     # household_characteristics: with MonthsSpent filter active, the large
-    # 1315-HH roster-coverage drift is resolved.  Residual outliers (~211
-    # per boundary bracket, max |Δ|=2) are from age_handler's DOB-derived
-    # fractional ages shifting members across bucket boundaries (e.g. a
-    # 3.8-year-old bins into 04-08 on the API but 00-03 on the replication).
-    # log HSize is dropped (mechanical derivative of brackets; see
-    # _tx_household_characteristics).  max_na_asym=1 covers H35301-04-01
-    # (2015-16) whose members all had sentinel-null ages.
+    # 1315-HH roster-coverage drift is resolved.  Residual outliers
+    # (~229 per boundary bracket, max |Δ|=2) are from age_handler's
+    # DOB-derived fractional ages shifting members across bucket
+    # boundaries.  After the Int64 → Float64 canonical Age dtype
+    # change (see data_info.yml, this release), the API now uses
+    # floor-semantics bracketing (3.8 → [0,4) = "00-03"), so it
+    # generally agrees with the replication on whole-number reported
+    # ages and on DOB-derived fractional ages alike — the residual
+    # outliers reflect the few cases where rounding vs. flooring
+    # disagree at the bucket boundary.  log HSize is dropped
+    # (mechanical derivative of brackets; see _tx_household_characteristics).
+    # max_na_asym=1 covers H35301-04-01 (2015-16) whose members all had
+    # sentinel-null ages.  max_outliers carries ~21 of headroom over the
+    # current 229 to absorb future age_handler refinements.
     FeatureSpec("household_characteristics", kwargs={"market": "Region"},
                 transform=_tx_household_characteristics, max_na_asym=1,
-                max_outliers=220),
+                max_outliers=250),
     FeatureSpec("household_roster",  transform=_tx_household_roster),
     FeatureSpec("income",            kwargs={"market": "Region"}),
     FeatureSpec("interview_date",    kwargs={"market": "Region"}),

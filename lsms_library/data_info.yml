@@ -47,7 +47,12 @@ Columns:
         F: [Female, female, Féminin, feminin, Femme, femme, f, FEMALE,
             Feminin, Feminino, femenino]
     Age:
-      type: int
+      # Float64 (pandas nullable) so DOB-derived fractional ages
+      # survive (e.g. age_handler returns 3.8 from a (DOB, interview)
+      # pair).  Int64 round-then-cast was reverted in v0.7.2 because
+      # it pushed boundary-fractional ages into the wrong demographic
+      # bracket via pd.cut(..., right=False) in age_intervals().
+      type: float
       required: true
     Relationship:
       type: str

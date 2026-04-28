@@ -1,9 +1,14 @@
-"""Cross-country regression test: household_roster Age dtype must be Int64.
+"""Cross-country regression test: household_roster Age dtype must be Float64.
 
 Parametrises over every country that declares household_roster in its
 data_scheme.yml and asserts:
-  1. df.Age.dtype is nullable integer (Int64).
+  1. df.Age.dtype is pandas nullable float (Float64).
   2. All non-NA Age values are >= 0.
+
+Float64 is the canonical dtype as of v0.7.2 (data_info.yml ``Age:
+type: float``) so DOB-derived fractional ages from age_handler
+(e.g. 3.8 years) survive without being rounded into the wrong
+demographic bracket.
 
 Marked @pytest.mark.slow because it may trigger cache builds on a cold
 machine.  In CI the parquet cache is expected to be warm.
@@ -60,8 +65,8 @@ _NO_MICRODATA = {"Armenia", "Nepal"}
 
 @pytest.mark.slow
 @pytest.mark.parametrize("country", _ROSTER_COUNTRIES)
-def test_age_dtype_is_int64(country):
-    """household_roster().Age must be nullable Int64 (or compatible integer dtype)."""
+def test_age_dtype_is_float64(country):
+    """household_roster().Age must be nullable Float64 (pandas nullable float)."""
     import lsms_library as ll
 
     if country in _NO_MICRODATA:
@@ -88,14 +93,15 @@ def test_age_dtype_is_int64(country):
 
     dtype = age.dtype
 
-    # Accept Int64 (pandas nullable integer) or any integer dtype that also
-    # supports pd.NA (i.e. not plain int64 which cannot hold NA).
-    is_nullable_int = (
-        isinstance(dtype, pd.Int64Dtype)
-        or str(dtype) == "Int64"
+    # Float64 (pandas nullable float) is the canonical dtype as of v0.7.2
+    # so DOB-derived fractional ages survive into household_characteristics
+    # bracketing without being rounded across bucket boundaries.
+    is_nullable_float = (
+        isinstance(dtype, pd.Float64Dtype)
+        or str(dtype) == "Float64"
     )
-    assert is_nullable_int, (
-        f"{country}: Age.dtype is {dtype!r}, expected Int64 (nullable integer). "
+    assert is_nullable_float, (
+        f"{country}: Age.dtype is {dtype!r}, expected Float64 (nullable float). "
         f"Sample values: {age.dropna().head(5).tolist()}"
     )
 
