@@ -3,10 +3,9 @@ import sys
 sys.path.append('../../_')
 from ghanalss import yearly_expenditure
 import numpy as np
-import dvc.api
 import pandas as pd
 sys.path.append('../../../_/')
-from lsms_library.local_tools import df_from_orgfile, to_parquet
+from lsms_library.local_tools import df_from_orgfile, to_parquet, get_dataframe
 
 t = '1987-88'
 #categorical mapping
@@ -16,11 +15,10 @@ for column in ['Code_12A', 'Code_12B']:
     labels[column] = labels[column].astype('Int64').astype('string')
     labelsd[column] = labels[['Preferred Label', column]].set_index(column).to_dict('dict')
 
-# food expenditure 
-with dvc.api.open('../Data/Y12A.DAT',mode='rb') as csv:
-    df = pd.read_csv(csv)
-    #map codes to categorical labels 
-    df['FOODCD'] = df['FOODCD'].astype('string').replace(labelsd['Code_12A']['Preferred Label'])
+# food expenditure
+df = get_dataframe('../Data/Y12A.DAT')
+#map codes to categorical labels
+df['FOODCD'] = df['FOODCD'].astype('string').replace(labelsd['Code_12A']['Preferred Label'])
 
 df['purchased_value_yearly'] = df.apply(yearly_expenditure, axis=1)
 
@@ -34,10 +32,9 @@ xf = x.dropna(subset = x.columns.tolist()[2:], how ='all')
 
 
 #home produced amounts
-with dvc.api.open('../Data/Y12B.DAT',mode='rb') as csv:
-    prod = pd.read_csv(csv)
-    #harmonize food labels and map unit labels:
-    prod['FOODCD'] = prod['FOODCD'].astype('string').replace(labelsd['Code_12B']['Preferred Label'])
+prod = get_dataframe('../Data/Y12B.DAT')
+#harmonize food labels and map unit labels:
+prod['FOODCD'] = prod['FOODCD'].astype('string').replace(labelsd['Code_12B']['Preferred Label'])
 
 prod['UTFOODC'] = prod['UTFOODC'].astype(str)
 prod['produced_value_yearly'] = prod.apply(yearly_expenditure, 

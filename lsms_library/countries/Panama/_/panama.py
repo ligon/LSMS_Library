@@ -1,9 +1,7 @@
 import pandas as pd
 import numpy as np
 import json
-import dvc.api
-from ligonlibrary.dataframes import from_dta
-import pyreadstat
+from lsms_library.local_tools import get_dataframe
 
 
 def _household_roster_from_df(df, sex, age, HHID, sex_converter=None, age_converter=None,
@@ -53,9 +51,8 @@ def age_sex_composition(df, sex, sex_converter, age, age_converter, hhid):
     return testdf
 
 def regional_data(t, filename, hhid, provinces):
-    fs = dvc.api.DVCFileSystem('../../')
-    fs.get_file('/Panama/'+t+'/Data/'+filename, '/tmp/'+filename)
-    regional_info, meta_r  = pyreadstat.read_dta('/tmp/E03BASE.DTA', apply_value_formats = True, formats_as_category = True)
+    # NB: this function appears to be unreferenced; keeping for parity.
+    regional_info = get_dataframe('../Data/' + filename)
     regions = regional_info.groupby(hhid).agg({provinces: 'first'})
     regions.index = regions.index.map(str)
     return regions

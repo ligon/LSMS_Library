@@ -1,16 +1,13 @@
 #!/usr/bin/env python
-from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import to_parquet, get_dataframe
 import sys
 sys.path.append('../../_')
 import numpy as np
 import pandas as pd
 import json
-import dvc.api
-from ligonlibrary.dataframes import from_dta
 from cfe.df_utils import broadcast_binary_op
 
-with dvc.api.open('../Data/Togo_survey2018_fooditems_forEthan.dta',mode='rb') as dta:
-    food = from_dta(dta)
+food = get_dataframe('../Data/Togo_survey2018_fooditems_forEthan.dta')
 
 vars={'hhid': 'j',
       's07bq01' : 'i',

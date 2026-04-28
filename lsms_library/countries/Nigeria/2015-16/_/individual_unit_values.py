@@ -3,9 +3,9 @@ import sys
 import numpy as np
 import pandas as pd
 import json
-import dvc.api
 from cfe.df_utils import broadcast_binary_op
 from units import conv, unitcodes
+from lsms_library.local_tools import get_dataframe
 
 
 def rectify(food,units=unitcodes,conv=conv):
@@ -51,8 +51,7 @@ lbls = json.load(open('../../_/food_items.json'))
 
 #########################
 # Harvest
-with dvc.api.open('../Data/sect10b_harvestw3.csv',mode='rb') as csv:
-    harvest = pd.read_csv(csv)
+harvest = get_dataframe('../Data/sect10b_harvestw3.csv')
 
 vars={'hhid': 'j',
       'item_cd' : 'i',
@@ -87,8 +86,7 @@ U.append(unit_values)
 
 ##################
 # Planting (2015Q3)
-with dvc.api.open('../Data/sect7b_plantingw3.csv',mode='rb') as csv:
-    planting = pd.read_csv(csv)
+planting = get_dataframe('../Data/sect7b_plantingw3.csv')
 
 vars={'hhid': 'j',
       'item_cd' : 'i',

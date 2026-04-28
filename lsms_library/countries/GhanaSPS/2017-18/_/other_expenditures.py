@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import to_parquet, get_dataframe
 import sys
-import dvc.api
 import pandas as pd
 import numpy as np
 
@@ -9,8 +8,7 @@ t = '2017-18'
 
 myvars = dict(fn='../Data/11c_otheritems.dta',item=None,HHID='FPrimary')
 
-with dvc.api.open(myvars['fn'],mode='rb') as dta:
-    x = pd.read_stata(dta).set_index(myvars['HHID'])
+x = get_dataframe(myvars['fn']).set_index(myvars['HHID'])
 
 x.index.name = 'j'
 x.columns.name = 'i'

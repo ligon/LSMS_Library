@@ -1,17 +1,15 @@
 #!/usr/bin/env python
-from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import to_parquet, get_dataframe
 import sys
 sys.path.append('../../_')
 import numpy as np
-import dvc.api
 import pandas as pd
 
 t = '2017-18'
 
 myvars = dict(fn='../Data/11a_foodconsumption_prod_purch.dta')
 
-with dvc.api.open(myvars['fn'],mode='rb') as dta:
-    df = pd.read_stata(dta, convert_categoricals=True)
+df = get_dataframe(myvars['fn'], convert_categoricals=True)
 
 # Values recorded as cedis
 

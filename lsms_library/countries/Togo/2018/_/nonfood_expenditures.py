@@ -5,7 +5,6 @@ import sys
 sys.path.append('../../_')
 sys.path.append('../../../_')
 from togo import food_expenditures
-import dvc.api
 import numpy as np
 import pandas as pd
 import json
@@ -13,8 +12,7 @@ from cfe.df_utils import broadcast_binary_op
 
 Dfs = []
 for period in ['7days','30days','3months','6months','12months']:
-    with dvc.api.open('../Data/Togo_survey2018_nonfooditems%s.csv' % period,mode='rb') as csv:
-        Dfs.append(pd.read_csv(csv))
+    Dfs.append(get_dataframe('../Data/Togo_survey2018_nonfooditems%s.csv' % period))
 
 vars={'hhid': 'j',
       'nonfood_item' : 'i',

@@ -3,16 +3,13 @@
 from calendar import month
 import sys
 sys.path.append('../../../_/')
-from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import to_parquet, get_dataframe
 import pandas as pd
-import dvc.api
 from datetime import datetime
-from ligonlibrary.dataframes import from_dta
 
 
 #shock dataset
-with dvc.api.open('../Data/sect8_hh_w3.dta',mode='rb') as dta:
-    df = from_dta(dta)
+df = get_dataframe('../Data/sect8_hh_w3.dta')
 df = df[df['hh_s8q01'] == 'Yes'] #filter for valid entry 
 
 shocks = pd.DataFrame({"j": df.household_id2.values.tolist(),

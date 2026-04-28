@@ -5,17 +5,13 @@ sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
 import json
-import dvc.api
-from ligonlibrary.dataframes import from_dta
-import pyreadstat
 sys.path.append('../../../_/')
-from lsms_library.local_tools import to_parquet, df_from_orgfile, format_id
+from lsms_library.local_tools import to_parquet, df_from_orgfile, format_id, get_dataframe
 
 t = '1997'
 
-fs = dvc.api.DVCFileSystem('../../')
-fs.get_file('/Panama/1997/Data/GAST-A.DTA', '/tmp/GAST-A.DTA')
-df, meta = pyreadstat.read_dta('/tmp/GAST-A.DTA')
+# Original used pyreadstat with default kwargs (no value-format application).
+df = get_dataframe('../Data/GAST-A.DTA', convert_categoricals=False)
 with open('../../_/units.json','r') as f:
    unit_conversions = json.load(f)
 

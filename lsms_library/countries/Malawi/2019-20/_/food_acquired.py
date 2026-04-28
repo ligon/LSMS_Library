@@ -7,17 +7,13 @@ sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
 import json
-import dvc.api
-from ligonlibrary.dataframes import from_dta
 from malawi import handling_unusual_units, conversion_table_matching
 
 wave = '2019-20'
 
-with dvc.api.open('../Data/Cross_Sectional/HH_MOD_G1.dta', mode='rb') as dta:
-    df = from_dta(dta, convert_categoricals=True)
+df = get_dataframe('../Data/Cross_Sectional/HH_MOD_G1.dta', convert_categoricals=True)
 
-with dvc.api.open('../Data/Cross_Sectional/ihs_foodconversion_factor_2020.dta', mode='rb') as dta:
-    conversions = from_dta(dta, convert_categoricals=True)
+conversions = get_dataframe('../Data/Cross_Sectional/ihs_foodconversion_factor_2020.dta', convert_categoricals=True)
 
 panel_df = get_dataframe('../Data/Panel/hh_mod_g1_19.dta',convert_categoricals=True)
 

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import to_parquet, get_dataframe
 import sys
-import dvc.api
 import pandas as pd
 import numpy as np
 
@@ -9,8 +8,7 @@ t = '2009-10'
 
 myvars = dict(fn='../Data/S11C.dta',item='itemname',HHID='hhno')
 
-with dvc.api.open(myvars['fn'],mode='rb') as dta:
-    df = pd.read_stata(dta)
+df = get_dataframe(myvars['fn'])
 
 # Values recorded as cedis & pesewas; add 'em up
 df['value'] = df['s11c_1'] + df['s11c_2']/100

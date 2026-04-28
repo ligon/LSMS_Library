@@ -1,9 +1,7 @@
-from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import to_parquet, get_dataframe
 #!/usr/bin/env python3
 import numpy as np
 import pandas as pd
-import dvc.api
-from ligonlibrary.dataframes import from_dta
 
 fn = '../Data/GSEC12.dta'
 hhid = 'HHID'
@@ -12,8 +10,7 @@ d = dict(revenue = 'h12q13',
          materials = 'h12q16',
          otherexpense = 'h12q17')
 
-with dvc.api.open(fn,mode='rb') as dta:
-    df = from_dta(dta)
+df = get_dataframe(fn)
 
 enterprise_income = df.groupby(hhid)[list(d.values())].sum() # Sum over enterprises
 enterprise_income.index.name = 'j'

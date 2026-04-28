@@ -3,17 +3,12 @@ sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
 import json
-import dvc.api
-from ligonlibrary.dataframes import from_dta
-import pyreadstat
 sys.path.append('../../../_/')
-from lsms_library.local_tools import to_parquet, df_from_orgfile, format_id
+from lsms_library.local_tools import to_parquet, df_from_orgfile, format_id, get_dataframe
 
 t = '2003'
 
-fs = dvc.api.DVCFileSystem('../../')
-fs.get_file('/Panama/2003/Data/E03GA10B.DTA', '/tmp/E03GA10B.DTA')
-df, meta = pyreadstat.read_dta('/tmp/E03GA10B.DTA', apply_value_formats=True)
+df = get_dataframe('../Data/E03GA10B.DTA', convert_categoricals=True)
 
 columns_dict = {"form": "j", "gai00": "i", "gai06a": "quantity (bought, in original units)", "gai06b1": "conversionb",  "gai06b2": "unitcode (bought)",
                 "gai06c": "total spent", "gai10a": "quantity (obtained, in original units)", "gai10b1": "conversiono", "gai10b2": "unitcode (obtained)"}

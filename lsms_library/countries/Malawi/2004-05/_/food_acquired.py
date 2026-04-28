@@ -7,13 +7,10 @@ sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
 import json
-import dvc.api
-from ligonlibrary.dataframes import from_dta
 
 wave = "2004-05"
 
-with dvc.api.open('../Data/sec_i.dta', mode='rb') as dta:
-    df = from_dta(dta, convert_categoricals=True)
+df = get_dataframe('../Data/sec_i.dta', convert_categoricals=True)
 
 columns_dict = {'case_id': 'j', 'i0a' : 'i', 'i03a': 'quantity_consumed', 'i03b' : 'u_consumed',
                 'i05': 'expenditure', 'i04a': 'quantity_bought', 'i04b' : 'u_bought',

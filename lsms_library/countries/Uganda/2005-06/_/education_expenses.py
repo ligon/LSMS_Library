@@ -1,16 +1,13 @@
 #!/usr/bin/env python
-from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import to_parquet, get_dataframe
 
 import sys
 import pandas as pd
 import numpy as np
-import dvc.api
-from ligonlibrary.dataframes import from_dta
 sys.path.append('../../_')
 
 
-with dvc.api.open('../Data/GSEC4.dta',mode='rb') as dta:
-    df = from_dta(dta)
+df = get_dataframe('../Data/GSEC4.dta')
 
 labels = {'HHID': 'j',
           'PID': 'pid',

@@ -1,7 +1,5 @@
-from ligonlibrary.dataframes import from_dta
 import numpy as np
 import pandas as pd
-import dvc.api
 from collections import defaultdict
 from cfe.df_utils import use_indices
 import warnings
@@ -87,8 +85,7 @@ def harmonized_food_labels(fn='../../_/food_items.org',key='Code',value='Preferr
 
 def food_acquired(fn,myvars):
 
-    with dvc.api.open(fn,mode='rb') as dta:
-        df = from_dta(dta,convert_categoricals=False)
+    df = get_dataframe(fn,convert_categoricals=False)
 
     df = df.loc[:,[v for v in myvars.values()]].rename(columns={v:k for k,v in myvars.items()})
 

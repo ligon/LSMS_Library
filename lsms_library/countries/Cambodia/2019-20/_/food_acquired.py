@@ -5,15 +5,11 @@ sys.path.append('../../../_/')
 import pandas as pd
 import numpy as np
 import json
-import dvc.api
-from ligonlibrary.dataframes import from_dta
-from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import to_parquet, get_dataframe
 
-with dvc.api.open('../Data/hh_sec_5.dta', mode='rb') as dta:
-    foods = from_dta(dta, convert_categoricals=True)
+foods = get_dataframe('../Data/hh_sec_5.dta', convert_categoricals=True)
 
-with dvc.api.open('../Data/hh_sec_5.dta', mode='rb') as dta:
-    df = from_dta(dta, convert_categoricals=False)
+df = get_dataframe('../Data/hh_sec_5.dta', convert_categoricals=False)
 
 df = df.rename({'HHID': 'j', 'food_consumption_roster_1__id' : 'i', 's05q03' : 'units','s05q04' : 'quantity', 's05q05' : 'total spent', 's05q06': 'value obtained'}, axis=1)
 df['i'] = foods['food_consumption_roster_1__id']

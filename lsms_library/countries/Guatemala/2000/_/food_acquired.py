@@ -1,17 +1,13 @@
 #!/usr/bin/env python
-from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import to_parquet, get_dataframe
 
 import sys
 import pandas as pd
-import pyreadstat
 import numpy as np
-import dvc.api
 sys.path.append('../../../_/')
 from lsms_library.local_tools import df_from_orgfile
 
-fs = dvc.api.DVCFileSystem('../../')
-fs.get_file('/Guatemala/2000/Data/ECV13G12.DTA', '/tmp/ECV13G12.DTA')
-df, meta = pyreadstat.read_dta('/tmp/ECV13G12.DTA', apply_value_formats = True, formats_as_category = True)
+df = get_dataframe('../Data/ECV13G12.DTA', convert_categoricals=True)
 
 #deal with labels
 food_items = df_from_orgfile('../../_/food_items.org')

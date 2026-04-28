@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import to_parquet, get_dataframe
 
 import sys
 sys.path.append('../../_/')
@@ -7,11 +7,8 @@ import pandas as pd
 import pyreadstat
 import numpy as np
 import json
-import dvc.api
-from ligonlibrary.dataframes import from_dta
 
-with dvc.api.open('../Data/m5_1_diary.dta', mode='rb') as dta:
-    df = from_dta(dta, convert_categoricals=False)
+df = get_dataframe('../Data/m5_1_diary.dta', convert_categoricals=False)
 
 cols = ['opstina', 'popkrug', 'dom']
 df['j'] = df[cols].apply(lambda row: ''.join(row.values.astype(str)), axis=1)

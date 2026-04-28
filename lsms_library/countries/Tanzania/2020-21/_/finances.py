@@ -1,14 +1,11 @@
 import sys
 import pandas as pd
 import numpy as np
-import dvc.api
-from ligonlibrary.dataframes import from_dta
 import sys
-from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import to_parquet, get_dataframe
 sys.path.append('../../_')
 
-with dvc.api.open('../Data/hh_sec_q1.dta',mode='rb') as dta:
-    df = from_dta(dta)
+df = get_dataframe('../Data/hh_sec_q1.dta')
 
 labels = {'y5_hhid': 'HHID',
           'hh_q01_1': 'Use M-PESA?',

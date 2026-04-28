@@ -3,16 +3,13 @@
 import sys
 sys.path.append('../../_/')
 sys.path.append('../../../_')
-from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import to_parquet, get_dataframe
 import pandas as pd
 import numpy as np
-import dvc.api
-from ligonlibrary.dataframes import from_dta
 
 #data recorded for two periods: seven days before the survey and thirty days before the survey.
 
-with dvc.api.open('../Data/s07b_me_bfa2021.dta', mode='rb') as dta:
-    df = from_dta(dta, convert_categoricals=True, encoding='iso-8859-1')
+df = get_dataframe('../Data/s07b_me_bfa2021.dta', convert_categoricals=True, encoding='iso-8859-1')
 
 df["j"] = df["hhid"].astype(int).astype(str)
 

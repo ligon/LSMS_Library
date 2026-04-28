@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
-from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import to_parquet, get_dataframe
 import numpy as np
 import pandas as pd
-import dvc.api
-from ligonlibrary.dataframes import from_dta
 
 fn = '../Data/GSEC14A.dta'
 
-with dvc.api.open(fn, mode='rb') as dta:
-    df = from_dta(dta)
+df = get_dataframe(fn)
 
 # Filter to items owned (has_it == 'yes' or similar)
 # Note: h14q3/h14q03 contains 'yes'/'Yes'/'No' values; filter to keep owned items

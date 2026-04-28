@@ -1,9 +1,9 @@
 """
 Construct mapping from consumption unit codes into labels, with conversion into metric units.
 """
-import dvc.api
 import pandas as pd
 import json
+from lsms_library.local_tools import get_dataframe
 
 # Preferred labels for foods
 with open('../../_/food_items.json') as f:
@@ -27,15 +27,13 @@ unitcodes = {1:'Kg',
              15:'kobiowu',
              16:'piece'}
 
-with dvc.api.open('../Data/food_conv_w2ph.csv') as csv:
-    conv_ph = pd.read_csv(csv)
+conv_ph = get_dataframe('../Data/food_conv_w2ph.csv')
 
 # Replace unit codes and food codes with labels
 conv_ph = conv_ph.replace({'nsu_cd':unitcodes,
                      'item_cd':{int(k):v for k,v in foodlabels['2012Q3'].items()}})
 
-with dvc.api.open('../Data/food_conv_w2pp.csv') as csv:
-    conv_pp = pd.read_csv(csv)
+conv_pp = get_dataframe('../Data/food_conv_w2pp.csv')
 
 # Replace unit codes and food codes with labels
 conv_pp = conv_pp.replace({'s7bq2b':unitcodes,

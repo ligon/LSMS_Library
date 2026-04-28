@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import to_parquet, get_dataframe
 import sys
-import dvc.api
 import pandas as pd
 import json
 import numpy as np
@@ -46,8 +45,7 @@ def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,it
         food_items = {int(float(k)):v for k,v in json.load(f)['Label'].items()}
 
     # expenditures
-    with dvc.api.open(fn,mode='rb') as f:
-        df = pd.read_stata(f,convert_categoricals=False,preserve_dtypes=False)
+    df = get_dataframe(fn,convert_categoricals=False,preserve_dtypes=False)
 
     df['HHID'] = df.grappe*1000+df.menage
 

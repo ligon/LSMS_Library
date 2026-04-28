@@ -4,15 +4,12 @@ import sys
 sys.path.append('../../_/')
 from burkina_faso import age_sex_composition
 sys.path.append('../../../_')
-from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import to_parquet, get_dataframe
 import pandas as pd
 import numpy as np
 import json
-import dvc.api
-from ligonlibrary.dataframes import from_dta
 
-with dvc.api.open('../Data/s07b_me_bfa2018.dta', mode='rb') as dta:
-    df = from_dta(dta, convert_categoricals=True, encoding='iso-8859-1')
+df = get_dataframe('../Data/s07b_me_bfa2018.dta', convert_categoricals=True, encoding='iso-8859-1')
 
 df["j"] = df["grappe"].astype(int).astype(str) + df["menage"].astype(int).astype(str).str.rjust(3, '0') #concatenate menage and grappe
 

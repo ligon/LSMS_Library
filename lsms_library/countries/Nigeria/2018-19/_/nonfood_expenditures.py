@@ -1,10 +1,9 @@
 #!/usr/bin/env python
-from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import to_parquet, get_dataframe
 import sys
 import numpy as np
 import pandas as pd
 import json
-import dvc.api
 
 C = []
 
@@ -39,16 +38,14 @@ vars={'hhid': 'j',
 
 for t in files.keys():
     for fn in files[t]:
-        with dvc.api.open(fn,mode='rb') as csv:
-            df = pd.read_csv(csv)
+        df = get_dataframe(fn)
+        df = df.rename(columns=vars)
 
-            df = df.rename(columns=vars)
+        df['t'] = t
+        df = df.replace({'i':{int(k):v for k,v in lbls[t].items()}})
 
-            df['t'] = t
-            df = df.replace({'i':{int(k):v for k,v in lbls[t].items()}})
-
-            df = df[list(set(vars.values()))]
-            C.append(df)
+        df = df[list(set(vars.values()))]
+        C.append(df)
 
 ###################
 

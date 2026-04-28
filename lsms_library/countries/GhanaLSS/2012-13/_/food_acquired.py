@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import sys
 import numpy as np
-import dvc.api
 import pandas as pd
 sys.path.append('../../../_/')
 from lsms_library.local_tools import df_from_orgfile, get_categorical_mapping, df_data_grabber, format_id, _to_numeric, to_parquet, get_dataframe
