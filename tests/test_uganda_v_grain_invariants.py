@@ -54,6 +54,23 @@ def uga_cf(uga):
         pytest.skip(f"cluster_features() failed: {exc!r}")
 
 
+@pytest.fixture(scope='module')
+def uga_hc_warnings(uga):
+    """Capture warnings emitted by ``household_characteristics()`` once.
+
+    Skips the dependent tests cleanly on environments without DVC/S3
+    credentials (where ``household_characteristics()`` triggers a
+    wave-level rebuild that needs the raw .dta files).
+    """
+    try:
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter('always')
+            _ = uga.household_characteristics()
+        return list(caught)
+    except Exception as exc:  # pragma: no cover
+        pytest.skip(f"household_characteristics() failed: {exc!r}")
+
+
 # ---------------------------------------------------------------------------
 # GH #196: cross-table v encoding
 # ---------------------------------------------------------------------------
@@ -98,21 +115,19 @@ class TestSilentHHDropWarns:
     """``household_characteristics()`` must warn when groupby drops NaN-v
     roster rows, naming the per-wave row count."""
 
-    def test_warning_emitted_with_per_wave_breakdown(self, uga):
+    def test_warning_emitted_with_per_wave_breakdown(self, uga_hc_warnings):
         # Some Uganda waves have NaN-v roster rows (panel-refresh movers,
         # 2018-19 parish-name gaps).  The warning must fire and name the
-        # affected waves.
-        with warnings.catch_warnings(record=True) as caught:
-            warnings.simplefilter('always')
-            _ = uga.household_characteristics()
+        # affected waves.  ``uga_hc_warnings`` is the captured list from
+        # the module-scoped fixture (skips on no-DVC environments).
         relevant = [
-            w for w in caught
+            w for w in uga_hc_warnings
             if 'household_characteristics' in str(w.message)
             and 'dropped' in str(w.message)
         ]
         assert relevant, (
             "Expected a UserWarning naming the dropped roster rows; "
-            f"got: {[str(w.message)[:80] for w in caught]}"
+            f"got: {[str(w.message)[:80] for w in uga_hc_warnings]}"
         )
         msg = str(relevant[0].message)
         assert 'per-wave' in msg, f"Warning missing per-wave breakdown: {msg}"
