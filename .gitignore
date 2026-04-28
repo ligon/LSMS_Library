@@ -18,6 +18,9 @@ env/
 .venv
 .venv.lustre/
 
+# Make stamp dir
+.make/
+
 # Others
 .DS_Store
 .idea/
