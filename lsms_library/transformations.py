@@ -630,10 +630,23 @@ def legacy_locality(country):
     """
     sample = country.sample().reset_index()
     cluster = country.cluster_features().reset_index()
-    # Take only the columns needed for the legacy shape
-    cluster_subset = cluster[['t', 'v', 'Region']]
+    # Bring cluster-level Region under a non-colliding name so the merge
+    # doesn't pandas-suffix it.  Since b87028d4 (HH-level Region in
+    # sample()), both tables carry a 'Region' column; matching
+    # _add_market_index (e8f79e93) we treat sample.Region as primary
+    # and cluster.Region as the fallback for HHs whose sample row is
+    # NaN (3227a39f).
+    cluster_subset = cluster[['t', 'v', 'Region']].rename(
+        columns={'Region': '_cluster_Region'}
+    )
     loc = sample.merge(cluster_subset, on=['t', 'v'], how='left')
-    # Rename Region -> m to match legacy output shape; rename v -> Parish to
-    # avoid semantic collision with the cluster 'v' used elsewhere in the API.
-    loc = loc.rename(columns={'Region': 'm', 'v': 'Parish'})
+    if 'Region' in loc.columns:
+        loc['m'] = loc['Region'].fillna(loc['_cluster_Region'])
+    else:
+        loc['m'] = loc['_cluster_Region']
+    loc = loc.drop(columns=[c for c in ('Region', '_cluster_Region')
+                            if c in loc.columns])
+    # Rename v -> Parish to avoid semantic collision with the cluster 'v'
+    # used elsewhere in the API.
+    loc = loc.rename(columns={'v': 'Parish'})
     return loc.set_index(['i', 't', 'm'])[['Parish']].sort_index()
