@@ -275,12 +275,77 @@ def _gpg_decrypt(gpg_file: Path, passphrase: str) -> str | None:
     return None
 
 
+def _sync_legacy_dvc_creds(dvc_dir: Path | None = None) -> bool:
+    """Mirror user-config ``s3_creds`` into the in-tree ``.dvc/s3_creds``.
+
+    Legacy wave scripts in ``lsms_library/countries/{country}/{wave}/_/*.py``
+    call ``dvc.api.open(fn, mode='rb')`` directly.  These calls do not
+    pass a ``credentialpath`` override, so DVC resolves the relative
+    ``credentialpath = s3_creds`` from ``.dvc/config`` against the DVC
+    directory itself --- i.e. ``lsms_library/countries/.dvc/s3_creds``.
+
+    The v0.7.0 user-config migration moved credential storage to
+    :func:`config.s3_creds_path` (``~/.config/lsms_library/s3_creds``)
+    so the package can install into read-only site-packages, and
+    :class:`DVCFileSystem` constructions in ``local_tools`` override
+    ``credentialpath`` to point there.  But ``dvc.api.open()`` does
+    not benefit from that override --- on a fresh clone, the in-tree
+    ``s3_creds`` is missing (gitignored) and legacy scripts hit
+    ``NoCredentialsError``.
+
+    This helper bridges the gap by copying the user-config credentials
+    into the in-tree ``.dvc/s3_creds`` location whenever the in-tree
+    file is missing or stale.  Idempotent and safe to call repeatedly.
+
+    Returns ``True`` if the in-tree mirror is in sync (either already
+    matched or was just written), ``False`` otherwise (no source creds,
+    write failed, or read-only DVC dir).
+    """
+    if dvc_dir is None:
+        dvc_dir = _COUNTRIES_DIR / ".dvc"
+
+    user_creds = config.s3_creds_path()
+    if not (user_creds.exists() and user_creds.stat().st_size > 0):
+        return False
+
+    if not dvc_dir.exists():
+        return False
+
+    legacy_creds = dvc_dir / "s3_creds"
+    try:
+        user_text = user_creds.read_text()
+    except OSError as exc:
+        logger.debug("Could not read user-config s3_creds: %s", exc)
+        return False
+
+    # Skip the write if the legacy file already matches.
+    if legacy_creds.exists():
+        try:
+            if legacy_creds.read_text() == user_text:
+                return True
+        except OSError:
+            pass  # fall through to overwrite
+
+    try:
+        legacy_creds.write_text(user_text)
+    except OSError as exc:
+        logger.debug("Could not mirror s3_creds to %s: %s", legacy_creds, exc)
+        return False
+
+    logger.debug("Mirrored s3_creds to legacy in-tree path %s", legacy_creds)
+    return True
+
+
 def _auto_unlock_s3(dvc_dir: Path | None = None) -> bool:
     """Decrypt ``s3_reader_creds.gpg`` using the obfuscated passphrase.
 
     Called automatically when a valid WB API key is present.  The API
     key validation is the real access gate; the obfuscated passphrase
     just keeps the value from being trivially discoverable via grep.
+
+    Always attempts to mirror the resulting creds into the legacy
+    in-tree ``.dvc/s3_creds`` path (see :func:`_sync_legacy_dvc_creds`)
+    so that legacy ``dvc.api.open()`` call sites still work.
 
     Returns ``True`` if ``s3_creds`` was written (or already exists).
     """
@@ -290,6 +355,9 @@ def _auto_unlock_s3(dvc_dir: Path | None = None) -> bool:
     creds_file = config.s3_creds_path()
     creds_file.parent.mkdir(parents=True, exist_ok=True)
     if creds_file.exists() and creds_file.stat().st_size > 0:
+        # User-config creds already in place; still ensure the legacy
+        # in-tree mirror is populated for `dvc.api.open()` callers.
+        _sync_legacy_dvc_creds(dvc_dir)
         return True
 
     gpg_file = dvc_dir / "s3_reader_creds.gpg"
@@ -308,6 +376,9 @@ def _auto_unlock_s3(dvc_dir: Path | None = None) -> bool:
     except OSError as exc:
         logger.warning("Could not write s3_creds: %s", exc)
         return False
+
+    # Mirror into the legacy in-tree path so `dvc.api.open()` works.
+    _sync_legacy_dvc_creds(dvc_dir)
 
     logger.info("Auto-unlocked S3 read credentials via WB API key.")
     return True

@@ -193,3 +193,19 @@ if not SKIP_AUTH and not creds_file.exists():
                 "Set LSMS_SKIP_AUTH=1 to suppress, or set "
                 "MICRODATA_API_KEY for non-interactive access."
             )
+elif not SKIP_AUTH and creds_file.exists():
+    # User-config creds are already in place, so the auto-unlock branch
+    # above is short-circuited.  We still need to populate the legacy
+    # in-tree ``lsms_library/countries/.dvc/s3_creds`` path so that
+    # legacy wave scripts using ``dvc.api.open()`` (which don't pass a
+    # ``credentialpath`` override) can find credentials.  Without this,
+    # a fresh clone with valid user-config creds still hits
+    # ``NoCredentialsError`` on Uganda's earnings, enterprise_income,
+    # food_acquired etc. via the legacy DVC API path.
+    try:
+        from .data_access import _sync_legacy_dvc_creds as _sync
+        _sync()
+    except (ImportError, OSError):
+        # Sync failure is non-fatal --- legacy `dvc.api.open()` callers
+        # will surface a clear NoCredentialsError if it matters.
+        pass
