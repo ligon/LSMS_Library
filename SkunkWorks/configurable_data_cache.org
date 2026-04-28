@@ -1,0 +1,332 @@
+#+TITLE: Configurable Data Cache --- Design (v0.7.2)
+#+filetags: skunkworks dvc lsms_library plan
+#+DATE: <2026-04-28 Tue>
+#+AUTHOR: Ethan Ligon + Claude (planning session)
+
+* Purpose
+
+Lift the hardcoded =dvcbucket0= S3 bucket out of the read/write path
+so that any user can point the library at their own DVC remote ---
+another S3 bucket, a Google Drive, or simply a writable local
+directory like =/var/tmp/wb_data/=.  When the configured cache is
+empty (or stale relative to the in-tree =.dvc= sidecars), the WB
+Microdata fallback populates that cache rather than the default
+=dvcbucket0=.
+
+The design was scoped during a session that landed v0.7.1 (Uganda
+=v=-encoding, =cluster_features= grain, silent HH drop, plus the
+empty-=myvars= =df_data_grabber= fix).  Implementation is deferred
+to v0.7.2.
+
+* Why
+
+Two real-world drivers:
+
+1. *AER replication.*  A reviewer who wants to reproduce the paper
+   needs a self-contained data store on their own disk.  Today they'd
+   have to either get write access to =dvcbucket0= (admin only) or
+   use the package's read path with =MICRODATA_API_KEY= and somehow
+   accept that the library tries to push to a bucket they can't
+   write to.
+
+2. *Custom self-host.*  A user / institution / lab with their own
+   S3 bucket or shared filesystem wants the library's data layer to
+   target that, not the project's central bucket.  Today this
+   requires editing the package's in-tree =.dvc/config= which is
+   broken under pip-install layouts.
+
+* Non-goals
+
+- *Frozen cache for redistribution.*  We do not have permission to
+  redistribute the original WB =.dta= files.  The cache always needs
+  a WB API key for cold-start population.  After population the key
+  becomes optional, but bundling a populated cache with a paper
+  isn't a thing we can do.
+- *Raw-files-mode (Country/Wave/Data/foo.dta) cache.*  Considered
+  and dropped --- DVC's content-addressed layout works fine on a
+  local path, and a "raw files" backend would be a parallel code
+  path with no advantage.
+- *Refactoring the default URL out of in-tree =.dvc/config=.*
+  Conceptually cleaner but not functionally needed; defer to a
+  hypothetical v0.8.0 cleanup.
+
+* What we have today
+
+Three layers; the bottom one is hardcoded.
+
+#+begin_src
++----------------------------------------------------------------+
+|  Country.<table>() / Wave.grab_data()                          |
++----------------------------------------------------------------+
+                              │
+                              ▼
++----------------------------------------------------------------+
+|  get_dataframe() in local_tools.py                             |
+|    1. Local file on disk         OK already abstracted         |
+|    2. DVCFS.open(...)            HARDCODED to dvcbucket0       |
+|    3. _try_get_data_file -> WB   OK already abstracted         |
++----------------------------------------------------------------+
+                              │
+                              ▼
++----------------------------------------------------------------+
+|  get_data_file() in data_access.py                             |
+|  On WB success: writes back to dvcbucket0 via                  |
+|  push_to_cache* (uses the package .dvc/config)                 |
++----------------------------------------------------------------+
+#+end_src
+
+The hardcoding lives in three places:
+
+- =local_tools.py=:113-123 --- =DVCFS= module-level singleton built
+  against =_COUNTRIES_DIR= and the package =.dvc/config=.  We override
+  =credentialpath= for =ligonresearch_s3= but the bucket URL itself
+  comes from the in-tree config.
+- =data_access.py=::=_auto_unlock_s3= --- decrypts a GPG file with a
+  hardcoded passphrase, only opens =dvcbucket0=.
+- =data_access.py=::=push_to_cache_batch= --- =cwd=_COUNTRIES_DIR= and
+  =dvc push= against =core.remote= (=ligonresearch_s3=).
+
+* Design
+
+** Configuration
+
+User config in =~/.config/lsms_library/config.yml=:
+
+#+begin_src yaml
+microdata_api_key: KEY                # existing
+data_dir: /path/to/parquet            # existing (output cache; orthogonal)
+
+data_cache:                            # new
+  url: /var/tmp/wb_data                # any DVC-supported URL
+  credentials_path: ~/.aws/lsms        # optional, only for s3://, gs://, etc.
+#+end_src
+
+Env-var overrides: =LSMS_DATA_CACHE_URL=, =LSMS_DATA_CACHE_CREDENTIALS_PATH=.
+Lookup order: env -> file -> unset.  When unset, behaviour is
+identical to today (=dvcbucket0=, byte-for-byte).
+
+URL scheme determines DVC's storage adapter automatically: =s3://=,
+=gs://=, =gdrive://=, plain path or =file:///...= --- DVC handles all
+of these without our intervention.  Local-path caches store files in
+DVC's content-addressed layout (=files/md5/{prefix}/{rest}=), the
+same layout S3 uses just on disk.
+
+** Read flow
+
+Unchanged in spirit:
+
+#+begin_src
+Country.<table>()
+  -> get_dataframe() local_tools.py
+    -> DVCFS.open(rel_path)        # DVCFS now points at user remote
+      -> hit?  return.
+    -> miss?  _try_get_data_file -> get_data_file()
+      -> populate_and_push(country, wave, remote=<configured>)
+         (download wave's zip from WB, extract all .dta,
+          dvc-add + dvc-push to user remote)
+      -> return rel_path from now-populated cache.
+#+end_src
+
+After =populate_and_push= completes, the wave's full set of =.dta=
+files is in the user's cache; future reads of /any/ file from that
+wave are local hits.  This is the existing function from the
+=add-wave= skill --- we just rewire =get_data_file='s WB-miss
+fallback to invoke it instead of doing a per-file extract.
+
+Net effect: a cold-cache populate is roughly 50x faster.  Today's
+per-file fallback re-downloads the same wave zip ~50 times (once per
+file extracted).
+
+** Auth scenarios
+
+| Setup                            | WB key | Cache creds       | Behaviour                                                                                                       |
+|----------------------------------+--------+-------------------+-----------------------------------------------------------------------------------------------------------------|
+| Default (no =data_cache= config) | yes    | auto-unlocked GPG | read from =dvcbucket0=; on miss, WB -> push to =dvcbucket0= (write access to =dvcbucket0= is admin-only; non-admins effectively read-only) |
+| Custom S3 bucket                 | yes    | r+w on bucket     | read from user's bucket; on miss, WB -> push to user's bucket                                                   |
+| Local path =/var/tmp/wb_data=    | yes    | none needed       | read from =/var/tmp/wb_data=; on miss, WB -> write to =/var/tmp/wb_data=                                        |
+| Local path, populated already    | no     | n/a               | read from =/var/tmp/wb_data=; *no WB needed*                                                                    |
+
+The last row is the key win.  Once a user has populated their cache
+they can run reproducibly without contacting the WB.  Sharing the
+populated cache with someone else is still constrained by the
+original WB redistribution rules, but each user can build their own.
+
+* The kinks
+
+In rough order of pain.
+
+** =DVCFS= built at import time
+:PROPERTIES:
+:CUSTOM_ID: kink-dvcfs-import
+:END:
+
+=local_tools.py=:113-123 builds a module-level =DVCFS= singleton
+before any user config has been consulted.
+
+*Fix*: at import time, /if/ =data_cache.url= is set, write a
+=dvc_config_local= file to the user-config directory and pass it as
+=DVCFileSystem='s runtime config override.  Continue to keep =DVCFS=
+as a module-level singleton; just compute the override before
+constructing it.
+
+The user-config-dir location (rather than the package's
+=.dvc/config.local=) mirrors how we already handle =s3_creds_path()=
+to keep the package tree read-only-friendly under pip-install
+layouts.
+
+** =_auto_unlock_s3= hardcoded for =dvcbucket0=
+:PROPERTIES:
+:CUSTOM_ID: kink-autounlock
+:END:
+
+It GPG-decrypts =s3_reader_creds.gpg= with a hardcoded passphrase
+and writes to =s3_creds_path()=.  Only opens =dvcbucket0=.
+
+*Fix*: skip auto-unlock when =data_cache.url= is set.  User-supplied
+credentials path is authoritative.  Default URL -> run auto-unlock
+exactly as today.
+
+** =push_to_cache_batch= writes to =core.remote=
+:PROPERTIES:
+:CUSTOM_ID: kink-push
+:END:
+
+Hardcoded =cwd=_COUNTRIES_DIR=, then =dvc push= against the
+=core.remote= from in-tree config.
+
+*Fix*: when =data_cache.url= is set, the =dvc_config_local= we
+wrote at import (kink #1) overrides =core.remote= to point at the
+user's remote.  =dvc push= without =-r= picks it up.  No code change
+in =push_to_cache_batch= itself --- the redirection happens in DVC's
+config layer.
+
+We just need to make sure the subprocess inherits the right
+working directory (already does --- =cwd=_COUNTRIES_DIR=) and
+that =.dvc/config.local= is on the read path for that working
+directory.  DVC's standard config layering handles this.
+
+** WB API key requirement at import
+:PROPERTIES:
+:CUSTOM_ID: kink-wb-key
+:END:
+
+=__init__.py=:165-186 runs =_auto_unlock_s3()= and =authenticate()=
+at import.  Once a populated user-cache exists the WB key isn't
+needed for reads.
+
+*Fix*: skip the eager unlock + authenticate when =data_cache.url= is
+set.  The lazy WB-fallback path inside =populate_and_push= already
+calls =permissions()= which surfaces a missing-key error /only when
+actually downloading/.  That's the right place for the error.
+
+** Package-tree DVC pollution
+:PROPERTIES:
+:CUSTOM_ID: kink-pollution
+:END:
+
+=populate_and_push= today extracts to
+=_COUNTRIES_DIR/<Country>/<Wave>/Data/<file>.dta= in-tree.  Per
+=CLAUDE.md=, the library specifically refuses to read in-tree
+DVC-tracked files (=_is_polluted_workspace_copy=).  Today's flow
+is:
+
+1. =populate_and_push= extracts -> in-tree
+2. =dvc add= -> creates =.dvc= sidecar in-tree, adds to local DVC cache
+3. =dvc push= -> pushes to remote
+4. (User typically deletes the in-tree extract, leaving just the sidecar)
+
+For our use case step 4 wants to be automatic.
+
+*Fix*: add =cleanup_after_push=True= default to
+=populate_and_push= --- after =dvc push= succeeds, =unlink= the
+extracted =.dta= files in-tree.  The =.dvc= sidecar (a tiny YAML)
+stays.
+
+** =dvc push -r <remote>= requires the remote in =.dvc/config=
+
+Subsumed by [[#kink-dvcfs-import][kink #1]] --- writing the user's remote into
+=dvc_config_local= makes it available to both =DVCFS= reads and
+=dvc push= writes.
+
+** CI / tests
+
+=data-tests= today requires DVC creds; =unit-tests= doesn't.  The
+new code paths can be unit-tested against a temporary local-path
+cache without any creds or WB API.  CI gains coverage on this
+code.
+
+* Code changes (v0.7.2 PR scope)
+
+| File                             | Change                                                                                                                                                                                                                          |
+|----------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| =config.py=                      | Add =data_cache_url()= and =data_cache_credentials_path()= getters with the env -> file -> None pattern.  Add =dvc_config_local_path()= mirroring =s3_creds_path()=.                                                            |
+| =__init__.py=                    | Skip =_auto_unlock_s3()= and =authenticate()= when =data_cache.url= is set.                                                                                                                                                     |
+| =local_tools.py=                 | If =data_cache.url= is set, write =dvc_config_local_path()= with the user's remote and =credentialpath=, then build =DVCFS= with that as a runtime config override.  Keep =DVCFS= as a module-level singleton; just config-aware. |
+| =data_access.py=                 | Rewire =get_data_file='s WB-miss fallback to call =populate_and_push(country, wave, remote=<configured>)=.  Add =cleanup_after_push=True= default that unlinks in-tree =.dta= extracts after a successful =dvc push=.            |
+| =tests/test_data_cache_url.py=   | New: opt-in mode with a =tmp_path= cache, populate one wave, verify second-call cache hit.  Doesn't need DVC S3 creds or a real WB key --- mock the WB download with a tiny fixture zip.                                          |
+
+* Edge cases (docstring-worthy)
+
+- *Concurrent populate from two processes.*  DVC has its own locking
+  but it isn't bulletproof.  "Single-process recommended" caveat in
+  the =populate_and_push= docstring.
+
+- *Cache invalidation when WB ships a new version.*  Self-healing:
+  in-tree =.dvc= sidecar md5 changes (via the next =dvc add= the
+  maintainer runs) -> user's cache misses on the new md5 -> the WB
+  fallback re-downloads.  No user action required.
+
+- *Cross-platform paths.*  DVC handles both POSIX and Windows;
+  =file:///C:/Users/.../wb_data= is the portable spelling.  Document
+  that =LSMS_DATA_CACHE_URL= accepts any DVC-supported URL.
+
+- *Shared multi-user caches.*  Content-addressed layout is naturally
+  dedup-friendly; =chmod g+w= on the cache root is enough to share.
+  Worth a =CONTRIBUTING.org= note.
+
+- *WB key not needed for cache-hit-only workflows.*  Once the cache
+  is populated, =import lsms_library= works without =MICRODATA_API_KEY=
+  set.  Document this as a feature, not a bug.
+
+* Why this is enough for the AER replication story
+
+A reviewer:
+
+#+begin_src sh
+export LSMS_DATA_CACHE_URL=/scratch/lsms_replication_cache
+export MICRODATA_API_KEY=xxx              # required only on first cold-cache run
+pip install lsms_library==0.7.2
+python paper_replication.py               # populates cache lazily, wave-by-wave
+#+end_src
+
+After the first run, =MICRODATA_API_KEY= becomes optional.  The cache
+is theirs, on their disk, governed by their own auth.  Doesn't
+redistribute the WB data --- they fetched it themselves, with their
+own key.
+
+* Implementation sequencing
+
+When v0.7.1 has landed and we pick this up:
+
+1. =config.py= getters --- pure additions, no behaviour change.
+2. =dvc_config_local= writer in =local_tools.py= (gated behind
+   =data_cache_url()= being non-=None=).
+3. Make =DVCFS= construction config-aware (read the gated override).
+4. Update =__init__.py= to skip auto-unlock + authenticate when
+   gated.
+5. Rewire =get_data_file= fallback to =populate_and_push= +
+   =cleanup_after_push=.
+6. Tests with a =tmp_path= cache and a small fixture zip.
+7. Document in =CLAUDE.md= "Three-tier credential model" section.
+
+Each step is independently bisectable; the code change at each step
+is small.
+
+* Phase 2 (later)
+
+- =lsms-library cache populate <Country> [<Wave>]= CLI for bulk
+  pre-warming.
+- =lsms-library cache verify <Country>= --- compare what's in the
+  cache against what the in-tree =.dvc= sidecars expect.
+
+Both are nice-to-haves; neither blocks v0.7.2.
