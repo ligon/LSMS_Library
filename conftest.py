@@ -5,7 +5,17 @@ Three-tier test strategy
 - **Fast tier** (default ``pytest``): uses both L1 (country-level) and
   L2 (wave-level) parquet caches at ``~/.local/share/lsms_library/``.
   Tests the API surface and ``_finalize_result()`` transformations
-  but does NOT exercise the wave-level build pipeline.
+  but does NOT exercise the wave-level build pipeline.  As a session-
+  start safety hook, Uganda's L1+L2+in-tree caches are purged each run
+  (Uganda is where extraction-layer iteration happens; staleness here
+  has bitten GH #196 / #197 / #161).  Cost: ~5-15 min per session for
+  Uganda's table rebuilds.
+- **Skip-purge sub-mode** (``pytest --no-purge``): same as the fast
+  tier but without the Uganda auto-purge.  Use during iterative
+  diagnosis loops where the failures under investigation are known
+  not to be Uganda-extraction-related (e.g. framework bugs, import
+  errors, test-expectation tweaks).  Re-run without ``--no-purge``
+  for the final pre-merge / pre-release verification.
 - **Soft rebuild** (``pytest --rebuild`` or ``LSMS_NO_CACHE=1 pytest``):
   sets ``LSMS_NO_CACHE=1``.  The framework bypasses L1 reads and L2
   reads on the YAML path, but **script-path L2 parquets** (written by
@@ -49,6 +59,16 @@ def pytest_addoption(parser):
              "LSMS_NO_CACHE=1.  Use this when a source-script fix has "
              "shipped but cached parquets predate it.",
     )
+    parser.addoption(
+        "--no-purge",
+        action="store_true",
+        default=False,
+        help="Skip the default-mode Uganda cache auto-purge.  Use during "
+             "iterative diagnosis loops where the failures aren't Uganda-"
+             "extraction-related, to avoid the 5-15 min Uganda-rebuild "
+             "cost per run.  No effect when combined with --rebuild or "
+             "--rebuild-caches (those have their own cache semantics).",
+    )
 
 
 def pytest_configure(config):
@@ -67,6 +87,12 @@ def pytest_configure(config):
         os.environ["LSMS_NO_CACHE"] = "1"
     elif config.getoption("--rebuild", default=False):
         os.environ["LSMS_NO_CACHE"] = "1"
+    elif config.getoption("--no-purge", default=False):
+        # Iterative-diagnosis escape hatch.  Skip the Uganda auto-purge
+        # when the operator knows the failure under investigation is not
+        # Uganda-extraction-related.  Restore (re-run without the flag)
+        # before merging to master / cutting a release.
+        pass
     else:
         # Always clear Uganda's parquet cache at session start.  v0.7.1
         # added country-level ``v`` and ``District`` formatters to
@@ -78,7 +104,8 @@ def pytest_configure(config):
         # The cost of a fresh build is small (~5-10s for Uganda's
         # tables) and runs in the master process before xdist workers
         # spawn, so there's no race.  Tracked as part of GH #196 /
-        # #197 / #161.  A no-op on a clean tree.
+        # #197 / #161.  A no-op on a clean tree.  Pass --no-purge to
+        # skip this step for iterative diagnosis only.
         _purge_country_caches("Uganda")
 
 
