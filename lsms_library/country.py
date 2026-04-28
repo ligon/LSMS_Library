@@ -513,8 +513,19 @@ class Wave:
             return dic
 
     @property
+    def documentation_path(self) -> Path:
+        """Path to ``<wave>/Documentation/``."""
+        return self.file_path / "Documentation"
+
+    @property
     def license(self) -> str:
-        license_path = self.file_path / "Documentation" / "LICENSE.org"
+        """Verbatim contents of ``<wave>/Documentation/LICENSE.org``.
+
+        Whatever's in the file --- a URL, full terms text, or both ---
+        is what the user gets.  No format-dependent fork.  Empty
+        string if the file is missing (with a warning).
+        """
+        license_path = self.documentation_path / "LICENSE.org"
         if license_path.exists():
             with open(license_path, 'r') as file:
                 return file.read()
@@ -523,7 +534,13 @@ class Wave:
 
     @property
     def data_source(self) -> str:
-        source_path = self.file_path / "Documentation" / "SOURCE.org"
+        """Verbatim contents of ``<wave>/Documentation/SOURCE.org``.
+
+        Typically a one-line catalog URL, but the API doesn't promise
+        that --- whatever's in the file is what gets returned.  Empty
+        string if the file is missing (with a warning).
+        """
+        source_path = self.documentation_path / "SOURCE.org"
         if source_path.exists():
             with open(source_path, 'r') as file:
                 return file.read()
@@ -1037,6 +1054,51 @@ class Country:
             if f.is_dir() and ((self.file_path / f.name / 'Documentation' / 'SOURCE.org').exists() or (self.file_path / f.name / 'Documentation' / 'SOURCE').exists())
         ]
         return sorted(waves)
+
+    def provenance(self) -> pd.DataFrame:
+        """Tabular survey of source + license per wave.
+
+        Reads ``<wave>/Documentation/SOURCE.org`` and
+        ``<wave>/Documentation/LICENSE.org`` for every wave in
+        :attr:`waves`.  Useful for AER-style data-editor reviews where
+        the reviewer wants programmatic provenance verification
+        rather than poking at the filesystem.
+
+        Returns
+        -------
+        pandas.DataFrame
+            Indexed by wave label ``t``.  Columns:
+
+            - ``source`` — verbatim contents of ``SOURCE.org``,
+              or ``pd.NA`` if the file is missing.  Typically a
+              World Bank Microdata catalog URL.
+            - ``license`` — verbatim contents of ``LICENSE.org``,
+              or ``pd.NA``.  May be a URL, full terms text, or both,
+              depending on what's recorded for that wave.
+            - ``documentation_path`` — filesystem path to the wave's
+              ``Documentation/`` directory.
+
+        Reads silently --- no warnings for waves missing one or both
+        files.  Use :attr:`Wave.license` / :attr:`Wave.data_source`
+        directly if you want the warning side effect on miss.
+        """
+        rows = []
+        for t in self.waves:
+            wave = self[t]
+            doc = wave.documentation_path
+            src_path = doc / "SOURCE.org"
+            lic_path = doc / "LICENSE.org"
+            rows.append({
+                't': t,
+                'source': src_path.read_text() if src_path.exists() else pd.NA,
+                'license': lic_path.read_text() if lic_path.exists() else pd.NA,
+                'documentation_path': str(doc),
+            })
+        if not rows:
+            return pd.DataFrame(
+                columns=['source', 'license', 'documentation_path']
+            ).rename_axis('t')
+        return pd.DataFrame(rows).set_index('t')
 
     @property
     def data_scheme(self) -> list[str]:
