@@ -217,6 +217,39 @@ def roster_to_characteristics(df, age_cuts=(4, 9, 14, 19, 31, 51), drop='pid', f
     )
     roster_df = dummies(roster_df,['sex_age'])
     roster_df.index = roster_df.index.droplevel(drop)
+    # Pandas' ``groupby(...)`` default is ``dropna=True``, which silently
+    # excludes rows whose index has NaN in any of ``final_index``.  We
+    # keep that drop (the canonical (t, v, i) key assumes v is
+    # meaningful) but warn loudly with the per-wave count so the loss
+    # isn't invisible to the caller.  GH #197.
+    idx_df = roster_df.index.to_frame(index=False)
+    nan_mask = idx_df[final_index].isna().any(axis=1)
+    n_nan_rows = int(nan_mask.sum())
+    if n_nan_rows > 0:
+        import warnings as _warnings
+        nan_idx = idx_df.loc[nan_mask]
+        # Per-wave row count keyed off ``t`` (the typical user-visible
+        # axis); HH count is a row-count proxy since (t, i) uniquely
+        # identifies a household.
+        if 't' in nan_idx.columns:
+            per_wave = (
+                nan_idx.assign(_one=1)
+                .groupby('t', dropna=True)['_one']
+                .sum()
+                .sort_index()
+                .to_dict()
+            )
+        else:
+            per_wave = {'<no-t>': n_nan_rows}
+        _warnings.warn(
+            f"household_characteristics: dropped {n_nan_rows} roster rows "
+            f"with NaN in one of {final_index} (typically v) "
+            f"-- per-wave: {per_wave}.  These are usually movers / "
+            f"split-offs whose sample() row lacks a cluster code; see "
+            f"GH #197.",
+            UserWarning,
+            stacklevel=3,
+        )
     result = roster_df.groupby(level=final_index).sum()
     result['log HSize'] = np.log(result.sum(axis=1))
     result.columns = result.columns.get_level_values(0)
