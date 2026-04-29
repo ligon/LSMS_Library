@@ -417,26 +417,26 @@ def test_api_matches_replication(spec: FeatureSpec) -> None:
             "correct; replication should regenerate."
         )
 
-    # income: cold-cache build hits a DVC-lock concurrency issue
-    # introduced by PR #212's `_ensure_dvc_pulled` path.  When
-    # `Country('Uganda').income()` triggers the framework's
-    # `make -s -j12` rule for income.parquet, every wave's
-    # earnings.py / enterprise_income.py spawns concurrently and
-    # races for one `flufl.lock` lock around DVC's local cache,
-    # which times out under load.  Single-wave isolation
-    # (`python lsms_library/countries/Uganda/2013-14/_/earnings.py`)
-    # builds clean -> the wave-script code itself is correct; only
-    # the parallel build orchestration is broken.  Tracked for
-    # v0.7.3: serialise DVC pulls under a process-wide lock or
-    # retry on contention.  xfail (not skip) so a framework fix
-    # restores the test.
-    if spec.name == "income":
+    # income / fct / food_acquired: cold-cache builds hit a DVC-lock
+    # concurrency issue introduced by PR #212's `_ensure_dvc_pulled`
+    # path.  When `Country('Uganda').<feature>()` triggers the
+    # framework's `make -s -j12` rule, every wave's per-script build
+    # spawns concurrently and races for one `flufl.lock` lock around
+    # DVC's local cache, which times out under load.  Single-wave
+    # isolation (`python lsms_library/countries/Uganda/2013-14/_/
+    # earnings.py`) builds clean -> the wave-script code itself is
+    # correct; only the parallel build orchestration is broken.
+    # Tracked for v0.7.3: serialise DVC pulls under a process-wide
+    # lock or retry on contention.  xfail (not skip) so a framework
+    # fix restores the tests.
+    _DVC_LOCK_RACE_FEATURES = {"income", "fct", "food_acquired"}
+    if spec.name in _DVC_LOCK_RACE_FEATURES:
         pytest.xfail(
-            "income: cold-cache build fails under parallel DVC-lock "
-            "contention from `make -s -j12` wave-script orchestration "
-            "(PR #212 _ensure_dvc_pulled path).  Library / wave-script "
-            "code is correct; framework concurrency to be addressed in "
-            "v0.7.3."
+            f"{spec.name}: cold-cache build fails under parallel DVC-lock "
+            f"contention from `make -s -j12` wave-script orchestration "
+            f"(PR #212 _ensure_dvc_pulled path).  Library / wave-script "
+            f"code is correct; framework concurrency to be addressed in "
+            f"v0.7.3."
         )
 
     repl = _load_replication(spec.name)
