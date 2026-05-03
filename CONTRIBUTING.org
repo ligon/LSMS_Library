@@ -165,7 +165,54 @@
    dvc pull
    #+end_src
    and files should be added from the remote dvc data store to your
-   working repository. 
+   working repository.
+
+   The DVC repository is rooted at =lsms_library/countries/= (not the
+   project root), so run =dvc= commands from inside that directory or
+   they fail with missing-remote errors.
+
+*** Common =dvc pull= pitfalls
+    A few non-obvious failure modes show up when working with this
+    repo's DVC layout:
+
+    1. *=dvc pull <country>/= or =dvc pull <country>/<wave>/Data/= fails
+       with errors about empty stages.*  The country-level and wave-level
+       =dvc.yaml= files contain =stages: {}= (the stage layer was retired
+       in v0.7.0).  =dvc pull= treats the directory argument as a stage
+       reference and bails out.
+
+       Bulk-pull a country by globbing the leaf =.dvc= files instead:
+
+       #+begin_src sh
+       cd lsms_library/countries/Malawi/2013-14/Data
+       dvc pull *.dvc
+       #+end_src
+
+       Or, across all waves of a country:
+
+       #+begin_src sh
+       cd lsms_library/countries
+       find Malawi -name '*.dvc' | xargs dvc pull
+       #+end_src
+
+    2. *=dvc pull= refuses with =bad DVC file name 'dvc.yaml' is
+       git-ignored=* when =lsms_library= is pip-installed inside a venv
+       that lives in some *outer* git repository which has =venv/= (or
+       =site-packages/=) in its =.gitignore=.  DVC walks up looking for
+       a =.git= directory, finds the outer one, sees the package files
+       as git-ignored, and refuses to operate on them.
+
+       Workaround: terminate the upward walk by initialising a throwaway
+       git repo inside the installed package directory:
+
+       #+begin_src sh
+       cd "$(python -c 'import lsms_library, pathlib; print(pathlib.Path(lsms_library.__file__).parent)')"
+       git init -q
+       #+end_src
+
+       Most users do not need =dvc pull= at all -- the library streams
+       data on demand via =get_dataframe()= -- so this only bites
+       contributors and power users who reach for the DVC CLI directly.
 
 ** Persisting harmonized tables
    When you need reproducible Parquet/CSV artefacts, materialise them through the
