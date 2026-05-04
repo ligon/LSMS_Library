@@ -1216,8 +1216,11 @@ def conversion_table_matching_global(df: pd.DataFrame, conversions: pd.DataFrame
     D = defaultdict(dict)
     all_matches = pd.DataFrame(columns=["Conversion Table Label"] +
                                ["Match " + str(n) for n in range(1, num_matches + 1)])
-    items_unique = df['i'].str.capitalize().unique()
-    for l in conversions[conversion_label_name].unique():
+    # difflib.get_close_matches calls len() on every candidate, so any NaN
+    # or non-string entry crashes with "TypeError: object of type 'float' has
+    # no len()". Coerce both sides to string and drop NA before matching.
+    items_unique = df['i'].dropna().astype(str).str.capitalize().unique()
+    for l in conversions[conversion_label_name].dropna().astype(str).unique():
         k = difflib.get_close_matches(l.capitalize(), items_unique, n = num_matches, cutoff=cutoff)
         if len(k):
             D[l] = k[0]

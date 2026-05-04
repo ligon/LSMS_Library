@@ -39,7 +39,7 @@ $(VAR_DIR)/household_characteristics.parquet: household_characteristics.py $(hou
 	python household_characteristics.py
 
 
-%.parquet: %.py food_items.org senegal.py
+%.parquet: %.py senegal.py
 	(cd $(@D) && python ./$(<F))
 
 clean:

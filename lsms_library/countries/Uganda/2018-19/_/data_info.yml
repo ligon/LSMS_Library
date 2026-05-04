@@ -9,7 +9,7 @@ household_roster:
     myvars:
         Sex: h2q3
         Relationship: h2q4
-        # Age list = [age, day, month, year] -> ../_/2018-19.py reduces
+        # Age list = [age, day, month, year] -> ./mapping.py reduces
         # to a scalar via tools.age_handler() (GH #177).  h2q9b is an
         # English month name in this wave; the Age formatter normalises.
         Age:

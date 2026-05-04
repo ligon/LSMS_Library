@@ -39,7 +39,7 @@ indicators), but inspection across all 8,012 households finds
 
 - =data_scheme.yml= declares only =HowCoped0= and =HowCoped1=
   (not =HowCoped2=).
-- =2018-19/_/2018-19.py= ranks the marked strategies by code and
+- =2018-19/_/mapping.py= ranks the marked strategies by code and
   emits the first 2 into =HowCoped0= / =HowCoped1=.
 
 This is honest — the survey's underlying form allows 26 entries
