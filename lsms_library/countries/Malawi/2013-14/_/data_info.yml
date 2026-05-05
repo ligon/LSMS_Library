@@ -11,6 +11,13 @@ sample:
         panel_weight: panelweight
         strata: district
         Rural: reside
+        Region:
+            - region
+            - mapping:
+                North: North
+                Central: Central
+                South: Southern
+        District: district
 
 cluster_features:
     dfs:
@@ -35,14 +42,17 @@ cluster_features:
                     rural: 0
                     urban: 1
     df_geo:
+        # 2013-14 IHPS publishes lat/lon per HOUSEHOLD (jittered per HH),
+        # not per cluster — the file is keyed on y2_hhid, not ea_id.
+        # Merge df_geo onto df_main on i rather than v.
         file: HouseholdGeovariables_IHPS_13.dta
         idxvars:
-            v: ea_id
+            i: y2_hhid
         myvars:
             Latitude: LAT_DD_MOD
             Longitude: LON_DD_MOD
     merge_on:
-        - v
+        - i
     final_index:
         - t
         - v

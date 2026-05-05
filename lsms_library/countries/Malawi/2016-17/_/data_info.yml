@@ -16,6 +16,14 @@ sample:
         panel_weight: panelweight_2016
         strata: district
         Rural: reside
+        Region:
+            - region
+            - mapping:
+                North: North
+                Central: Central
+                Southern: Southern
+                South: Southern
+        District: district
 
 cluster_features:
     dfs:
@@ -48,14 +56,17 @@ cluster_features:
                     RURAL: 1
                     URBAN: 0
     df_geo:
+        # 2016-17 IHS4 publishes lat/lon per HOUSEHOLD (cross-sectional file
+        # is keyed on case_id, not ea_id).  Panel HHs (~2.5k) lack a geo
+        # file in this wave and end up with NaN lat/lon -- acceptable.
         file: Cross_Sectional/householdgeovariablesihs4.dta
         idxvars:
-            v: ea_id
+            i: case_id
         myvars:
             Latitude: lat_modified
             Longitude: lon_modified
     merge_on:
-        - v
+        - i
     final_index:
         - t
         - v
