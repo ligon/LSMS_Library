@@ -7,13 +7,12 @@ COUNTRY := $(shell basename "$$(cd .. && pwd)")
 LSMS_DATA_ROOT ?= $(if $(LSMS_DATA_DIR),$(LSMS_DATA_DIR),$(if $(XDG_DATA_HOME),$(XDG_DATA_HOME),$(HOME)/.local/share)/lsms_library)
 VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 
-var = $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_quantities.parquet $(VAR_DIR)/food_prices.parquet \
-	  $(VAR_DIR)/household_characteristics.parquet
+# food_expenditures / food_prices / food_quantities are derived at API time
+# from food_acquired via lsms_library.transformations._FOOD_DERIVED — no
+# country-level parquet is built or consulted.  See GH #218.
+var = $(VAR_DIR)/household_characteristics.parquet
 
 all: $(parquet) $(var)
-
-$(VAR_DIR)/food_quantities.parquet $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_prices.parquet &: $(VAR_DIR)/food_acquired.parquet food_acquired.py
-	python food_prices_quantities_and_expenditures.py
 
 food_acquired = $(shell find $(rounds) -name food_acquired.py)
 # Wave-level parquets live in data_root, not in-tree
