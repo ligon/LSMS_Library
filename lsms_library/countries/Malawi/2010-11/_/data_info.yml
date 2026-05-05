@@ -61,6 +61,12 @@ cluster_features:
                     Neno: Southern
                     Zomba City: Southern
                     Blantyre City: Southern
+            # 2010-11 has no separate `district` column; hh_a01 is the
+            # district *name* (and is also consumed above as the source
+            # for Region via the district->region mapping).  Surface it
+            # raw here so cluster_features() can satisfy market='District'
+            # lookups for this wave.
+            District: hh_a01
     df_geo:
         file: Full_Sample/Geovariables/HH_level/householdgeovariables.dta
         idxvars:
