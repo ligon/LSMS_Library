@@ -274,8 +274,15 @@ For items that have such unit conversions already done, they were scaled by the 
   4. Extend conversion to cover all quantity columns (production,
      in-kind receipt), not just consumption and expenditure.
 
-** DONE other_features.py
-** DONE household_characteristics.py
+** RETIRED other_features.py
+=other_features= is obsolete (per top-level =CLAUDE.md=); replaced by
+=cluster_features= + =_add_market_index()= at query time.
+** RETIRED household_characteristics.py (2026-05-05)
+=Country('Malawi').household_characteristics()= now derives from
+=household_roster= via =transformations.roster_to_characteristics=
+(=country.py:2574-2596=, =_ROSTER_DERIVED=); no Malawi-level script
+exists or is needed.  The dead Makefile rule has been removed.  See
+GH #218.
 ** DONE food_acquired.py
 
 Test...
@@ -371,6 +378,10 @@ case: "Rural"/"Urban", "rural"/"urban", "RURAL"/"URBAN". Harmonized to
 "Rural"/"Urban" via the =Rural= table in =categorical_mapping.org=.
 
 * Files in Malawi/<SOMEYEAR>/_/
-** DONE household_characteristics.py
+** RETIRED household_characteristics.py
+Now derived at API time via =transformations.roster_to_characteristics=
+from =household_roster=.  No wave-level script ever existed for Malawi.
+See GH #218.
 ** DONE food_acquired.py
-** DONE other_features.py
+** RETIRED other_features.py
+=other_features= is obsolete (per top-level =CLAUDE.md=).
