@@ -14,14 +14,17 @@ df = get_dataframe('../Data/Full_Sample/Household/hh_mod_g1.dta', convert_catego
 conversions = pd.read_csv('ihs3_conversions.csv')
 
 # Read region directly from household module for conversion table merge
-# 2010-11 has no 'region' column; derive from district code hh_a01 (1xx=North, 2xx=Central, 3xx=Southern)
+# 2010-11 has no 'region' column.  hh_a01 is the district *name* (string,
+# e.g. "Chitipa"), not a numeric district code; derive Region from the
+# first character of case_id instead (1=North, 2=Central, 3=Southern).
 hh = get_dataframe('../Data/Full_Sample/Household/hh_mod_a_filt.dta')
-_region_map = {1: 'North', 2: 'Central', 3: 'Southern'}
-regions = hh[['case_id', 'hh_a01']].drop_duplicates().set_index('case_id')['hh_a01']
-regions = (pd.to_numeric(regions, errors='coerce') // 100).map(_region_map).dropna()
+_region_map = {'1': 'North', '2': 'Central', '3': 'Southern'}
+regions = (hh[['case_id']].drop_duplicates()
+           .assign(region=lambda d: d['case_id'].astype(str).str[0].map(_region_map))
+           .dropna(subset=['region'])
+           .set_index('case_id')['region'])
 regions.index.name = 'j'
 regions.name = 'm'
-regions = regions.astype(str)
 
 columns_dict = {'case_id': 'j', 'hh_g02' : 'i', 'hh_g03a': 'quantity_consumed', 'hh_g03b' : 'unitcode_consumed', 'hh_g03b_os': 'unitsdetail_consumed',
                 'hh_g05': 'expenditure', 'hh_g04a': 'quantity_bought', 'hh_g04b': 'unitcode_bought', 'hh_g04b_os': 'unitsdetail_bought',
