@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 import json
 from malawi import (handling_unusual_units, conversion_table_matching,
-                    apply_harmonize_food, normalize_food_label)
+                    food_acquired_to_canonical, normalize_food_label)
 
 wave = '2019-20'
 
@@ -69,21 +69,9 @@ df = df.merge(conversions, how='left',
               right_on=['item_name', 'region', 'unit_code']).rename({'factor' : 'cfactor_gifted'}, axis = 1)
 
 df = df.set_index(['j', 'i'])
-df = handling_unusual_units(df)
-
-df['price per unit'] = df['expenditure']/df['quantity_bought']
+df = handling_unusual_units(df, suffixes=['consumed','bought','produced','gifted'])
 
 df['t'] = wave
-df = df.reset_index().drop(columns=['m']).set_index(['j','t','i']).dropna(how='all')
-
-final = df.loc[:, ['quantity_consumed', 'u_consumed', 'quantity_bought',
-                   'u_bought', 'price per unit', 'expenditure',
-                   'quantity_produced',
-                   'cfactor_consumed', 'cfactor_bought']]
-final['u_bought'] = final.u_bought.astype(str)
-
-final = apply_harmonize_food(final, wave, level='i')
-
-final = final.dropna(how='all')
-final = final.reorder_levels(['j','t','i']).sort_index()
-to_parquet(final, "food_acquired.parquet")
+df = df.reset_index()
+out = food_acquired_to_canonical(df.set_index(['j', 't', 'i']), wave=wave)
+to_parquet(out, 'food_acquired.parquet')
