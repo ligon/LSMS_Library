@@ -122,3 +122,92 @@ def shocks(df):
     df['HowCoped2'] = how_coped[2]
     df = df.drop(columns=cope_cols)
     return df
+
+
+def food_acquired(df):
+    '''
+    Reshape Guinea-Bissau 2018-19 food_acquired to the canonical (s) form.
+
+    Inputs (post-data_grabber):
+      - Index: (i, t, v, visit, j, u)
+      - Columns: Quantity (TOTAL acquired in unit u, s07bq03a),
+                 Expenditure (monetary value of purchases, s07bq08),
+                 Produced (subset of Quantity from own production,
+                 s07bq04)
+
+    Output:
+      - Index: (t, v, i, j, u, s)
+      - Columns: Quantity, Expenditure
+      - Price is api-derived (computed downstream for s=purchased).
+
+    Reshape rules:
+      - Each input row -> up to 2 long-form rows:
+        * s='purchased': Quantity = (Total - Produced) clipped at 0,
+          Expenditure as observed
+        * s='produced':  Quantity = Produced, Expenditure = NaN
+      - Rows with no measurements after the split are dropped.
+      - visit (vague) is dropped: in EHCVM 2018-19 it's a sample split,
+        not a repeated measure; each household appears in exactly one
+        vague.  This was confirmed empirically during the Benin pilot
+        (commit 27e3d963; 0 of 8012 Benin households had multiple
+        visits).  EHCVM countries share this design (see CLAUDE.md
+        "EHCVM countries" gotcha — each grappe is visited in exactly
+        one vague).  Households are uniquely keyed by (t, v, i, j, u,
+        s) without it.
+
+    Column semantics: Quantity (s07bq03a) is the reported total
+    acquisition over the recall period; Produced (s07bq04) is the own-
+    production subset.  Same wide-form structure as Benin, Mali, Niger,
+    Senegal, Togo and CotedIvoire 2018-19 EHCVM waves.
+
+    See: slurm_logs/DESIGN_food_acquired_canonical_2026-05-05.org, GH #169.
+    '''
+    import pandas as pd
+    import numpy as np
+
+    work = df.reset_index()
+
+    # `visit` (vague) in EHCVM 2018-19 is a sample split, not a repeated
+    # measure: each grappe (and so each household) is surveyed in exactly
+    # one vague.  Confirmed via the Benin pilot probe (commit 27e3d963):
+    # 0 of 8012 Benin households had multiple visit values, 0 of 670
+    # clusters did.  EHCVM 2018-19 design is shared across the EHCVM-7,
+    # so the same conclusion applies to Guinea-Bissau.  Drop visit;
+    # households are uniquely keyed by (t, v, i, j, u, s) without it.
+    # See slurm_logs/DESIGN_food_acquired_canonical_2026-05-05.org.
+    work = work.drop(columns=['visit'])
+
+    # Purchased = Total - Produced, clipped at zero (a few survey rows
+    # have Produced slightly > Quantity due to rounding; treat those as
+    # purchased=0 rather than negative).
+    purchased_qty = (work['Quantity'].fillna(0)
+                     - work['Produced'].fillna(0)).clip(lower=0)
+
+    purchased = pd.DataFrame({
+        't': work['t'].values,
+        'v': work['v'].values,
+        'i': work['i'].values,
+        'j': work['j'].values,
+        'u': work['u'].values,
+        's': 'purchased',
+        'Quantity': purchased_qty.values,
+        'Expenditure': work['Expenditure'].values,
+    })
+    purchased = purchased[(purchased['Quantity'] > 0)
+                          | (purchased['Expenditure'] > 0)]
+
+    produced = pd.DataFrame({
+        't': work['t'].values,
+        'v': work['v'].values,
+        'i': work['i'].values,
+        'j': work['j'].values,
+        'u': work['u'].values,
+        's': 'produced',
+        'Quantity': work['Produced'].values,
+        'Expenditure': np.nan,
+    })
+    produced = produced[produced['Quantity'].fillna(0) > 0]
+
+    out = pd.concat([purchased, produced], ignore_index=True)
+    out = out.set_index(['t', 'v', 'i', 'j', 'u', 's'])
+    return out
