@@ -9,7 +9,9 @@ sample:
         v: ea
         weight: hhwght
         panel_weight: hhwght
-        strata: strata
+        strata:
+            - strata
+            - mappings: ['district', 'Alternate Spelling', 'Preferred Label']
         Rural: reside
         # Region / District declared at HH grain so that
         # _add_market_index() resolves market='Region' / 'District'

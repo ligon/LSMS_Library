@@ -69,3 +69,85 @@ def handling_unusual_units(df, suffixes=None):
 def conversion_table_matching(df, conversions, conversion_label_name, num_matches=3, cutoff=0.6):
     return conversion_table_matching_global(df, conversions, conversion_label_name,
                                             num_matches=num_matches, cutoff=cutoff)
+
+
+# ---- Food-label normalization & harmonize_food application ----------------
+#
+# Three flavors of mangled en-dash show up in the raw food-item .dta values
+# across waves, depending on the source encoding and pyreadstat decode path:
+#   - '\x96'  : cp1252 byte for en-dash, preserved when the file is read as
+#               latin1 (seen in 2010-11, 2013-14).
+#   - '�': Unicode replacement char from a failed UTF-8 decode (2016-17).
+#   - 'ï¿½'   : UTF-8 mojibake of '�' (the bytes 0xef 0xbf 0xbd
+#               re-decoded as latin1 and re-encoded as UTF-8) (2016-17).
+# All three should become a proper en-dash before the harmonize_food rename,
+# otherwise rows like 'Citrus – naartje, orange, etc.' fail to match.
+
+_ENDASH_MOJIBAKE = [('\x96', '–'), ('ï¿½', '–'), ('�', '–')]
+
+
+def normalize_food_label(s):
+    """Replace mangled en-dashes in a food-label Series.
+
+    Apply *after* ``.str.capitalize()`` in wave scripts so that the data
+    side matches the dict keys produced by :func:`apply_harmonize_food`.
+    """
+    out = s
+    for bad, good in _ENDASH_MOJIBAKE:
+        out = out.str.replace(bad, good, regex=False)
+    return out
+
+
+def _normalize_label_key(k):
+    """Normalize a single dict key to mirror the wave-script data path.
+
+    Applies ``str.capitalize()`` (single-word title-case as in every wave
+    script's ``df['i'] = ... .str.capitalize()`` line) followed by the same
+    en-dash repair as :func:`normalize_food_label`.  2004-05's wave script
+    skips ``capitalize()`` but its column entries in categorical_mapping.org
+    are already in capitalize-form, so this is a no-op there.
+    """
+    if not isinstance(k, str):
+        return k
+    out = k.capitalize()
+    for bad, good in _ENDASH_MOJIBAKE:
+        out = out.replace(bad, good)
+    return out
+
+
+def apply_harmonize_food(df, wave, level='i'):
+    """Rename *level* of *df*'s index via Malawi's harmonize_food table.
+
+    Builds the dict from the *wave* column of
+    ``../../_/categorical_mapping.org``, then normalizes each dict key with
+    :func:`_normalize_label_key` so that case drift and encoding mojibake
+    between the .dta source and the org table never silently break the
+    mapping.
+
+    .. note:: This intentionally calls :func:`df_from_orgfile` directly
+        instead of :func:`get_categorical_mapping`, because the latter
+        runs every ``idxvars`` value through
+        :func:`local_tools.format_id`, which does ``.split('.')[0]`` to
+        strip Stata's ``"123.0"`` → ``"123"``.  For food labels ending in
+        ``"etc."`` (and anything else with an internal period) that
+        truncates the key and silently breaks the mapping.
+    """
+    from lsms_library.local_tools import df_from_orgfile
+    import os
+    for d in ('./', '../../_/', '../../../_/'):
+        p = os.path.join(d, 'categorical_mapping.org')
+        if os.path.exists(p):
+            tab = df_from_orgfile(p, name='harmonize_food')
+            break
+    else:
+        raise FileNotFoundError(
+            "categorical_mapping.org not found in any of "
+            "'./', '../../_/', '../../../_/'"
+        )
+    if wave not in tab.columns:
+        raise KeyError(f"Wave column {wave!r} not in harmonize_food table; "
+                       f"available: {[c for c in tab.columns if c not in ('Preferred Label','GD Category')]}")
+    pairs = tab[[wave, 'Preferred Label']].dropna()
+    raw = dict(zip(pairs[wave], pairs['Preferred Label']))
+    labelsd = {_normalize_label_key(k): v for k, v in raw.items()}
+    return df.rename(index=labelsd, level=level)
