@@ -24,10 +24,15 @@ Data Scheme:
     HowCoped2: str
 
   food_acquired:
-    index: (t, i, j, u)
+    # Canonical post-2026-05-05 (GH #169): s axis carries acquisition
+    # source (purchased / produced).  Wave-level food_acquired.py
+    # reshapes wide-form (Quantity-total, Produced-subset, Expenditure)
+    # into long-form on s via food_acquired_to_canonical.  `m` (zone)
+    # dropped — lives in cluster_features.  See
+    # slurm_logs/DESIGN_food_acquired_canonical_2026-05-05.org.
+    index: (t, i, j, u, s)
     Quantity: float
     Expenditure: float
-    Produced: float
     materialize: make
   food_expenditures:
     index: (t, i, j)

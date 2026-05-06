@@ -11,6 +11,7 @@ import pandas as pd
 
 sys.path.append('../../../_/')
 from lsms_library.local_tools import to_parquet, get_categorical_mapping, get_dataframe
+from lsms_library.transformations import food_acquired_to_canonical
 
 food_labels = get_categorical_mapping(tablename='harmonize_food',
                                        idxvars='Code',
@@ -85,6 +86,20 @@ df = pd.concat([harvest, planting], ignore_index=True)
 df['i'] = df['i'].astype(int).astype(str)
 
 df = df.set_index(['t', 'i', 'j', 'u'])
+df = df.sort_index()
+
+# Canonical reshape (GH #169): drop `m` (lives in cluster_features) and
+# melt (Quantity, Produced, Expenditure) onto the `s` (acquisition source)
+# axis.  `v` is a required input to food_acquired_to_canonical but does
+# NOT belong in the wave-level parquet (it's joined at API time from
+# sample()), so we add a placeholder and strip it from the output index.
+if 'm' in df.columns:
+    df = df.drop(columns=['m'])
+df = df.reset_index()
+df['v'] = pd.NA
+df = food_acquired_to_canonical(df.set_index(['t', 'v', 'i', 'j', 'u']),
+                                drop_columns=())
+df = df.reset_index('v', drop=True)
 df = df.sort_index()
 
 to_parquet(df, 'food_acquired.parquet')
