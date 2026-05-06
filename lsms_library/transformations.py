@@ -560,8 +560,15 @@ def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=
     v = v.reset_index(unit_col)
     if unit_col != 'u':
         v = v.rename(columns={unit_col: 'u'})
-    v['u'] = v['u'].astype(str)
-    v['Kgs'] = v.apply(lambda row: row[quantity] * unit_conversion.get(row['u'].lower(), np.nan), axis=1)
+    # Vectorize: ``astype(str)`` followed by ``.str.lower()`` handles any
+    # underlying dtype (object with NaN, pyarrow string with pd.NA,
+    # Categorical from a .dta read), whereas the previous row-by-row
+    # ``.apply`` could surface a Python float for an NA cell despite the
+    # earlier ``astype(str)`` (pandas 2.x AttributeError: 'float' object
+    # has no attribute 'lower').  Unknown units map to NaN, matching the
+    # original ``unit_conversion.get(..., np.nan)`` semantics.
+    factors = v['u'].astype(str).str.lower().map(unit_conversion).astype(float)
+    v['Kgs'] = v[quantity] * factors
     v = v.set_index('u', append=True)
     pkg = v[price].divide(v['Kgs'], axis=0)
     pkg = pkg.groupby(index).median().median(axis=1)
