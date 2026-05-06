@@ -255,7 +255,14 @@ def food_acquired_to_canonical(df, wave):
             out['Expenditure'] = pd.to_numeric(work[value_col],
                                                errors='coerce').values
         else:
-            out['Expenditure'] = pd.NA
+            # Use np.nan (float64) rather than pd.NA so the all-missing
+            # Expenditure column for produced/inkind pieces concatenates
+            # with the same dtype as the populated 'purchased' piece.
+            # Mismatched dtypes here trigger pandas 3.0's FutureWarning
+            # about all-NA columns at pd.concat dtype inference.  Float
+            # NaN is appropriate per CLAUDE.md "Pandas 3.0 Targets" --
+            # numeric float columns prefer np.nan over pd.NA.
+            out['Expenditure'] = np.nan
         return out
 
     pieces = []
