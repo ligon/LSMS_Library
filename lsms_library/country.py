@@ -1707,6 +1707,17 @@ class Country:
             if method_name:
                 _enforce_canonical_dtypes(df, method_name)
 
+            # Defensive: drop any row where every non-index column is NaN.
+            # Wave-level scripts can leak hollow rows (e.g. survey questionnaire
+            # entries where every food/quantity/expenditure field is missing
+            # but a unit code happened to be filled in); plain dropna(how='all')
+            # only fires when literally every column is NaN, which is rarely
+            # the case once unit/cfactor columns enter the picture.  Wave
+            # scripts that need the stricter "drop unless any DATA column is
+            # non-null" form should use ``subset=`` themselves; this step is
+            # the universal safety-net.
+            df = df.dropna(how='all')
+
         return df
 
     def _aggregate_wave_data(self, waves: list[str] | None = None, method_name: str | None = None) -> pd.DataFrame | dict[str, Any]:
