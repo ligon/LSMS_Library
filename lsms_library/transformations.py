@@ -674,15 +674,24 @@ def _apply_kg_conversion(df, factors):
 def food_expenditures_from_acquired(df):
     """Derive food expenditures from food_acquired.
 
-    Returns a DataFrame of total expenditure per household × item × period,
+    Returns a DataFrame of total expenditure per household × item × period
+    × acquisition source (when ``s`` is present in the input index),
     summed over units.
+
+    Phase 4 of GH #169 / DESIGN_food_acquired_canonical_2026-05-05.org
+    extends the group-by to preserve the ``s`` (acquisition-source) index
+    level.  Users who want the legacy collapsed view call
+    ``food_expenditures.groupby(level=['t','v','i','j']).sum()``
+    explicitly.
     """
     df = _normalize_columns(df)
     if 'Expenditure' not in df.columns:
         raise ValueError("food_acquired must have an 'Expenditure' column")
 
     idx_names = list(df.index.names)
-    group_by = [n for n in ['t', 'v', 'i', 'j'] if n in idx_names]
+    # Preserve `s` in the output (Phase 4).  `u` is dropped — Expenditure
+    # is currency-denominated, so summing across units is meaningful.
+    group_by = [n for n in ['t', 'v', 'i', 'j', 's'] if n in idx_names]
 
     x = df[['Expenditure']].replace(0, np.nan).dropna()
     x = x.groupby(group_by).sum()
@@ -693,7 +702,14 @@ def food_quantities_from_acquired(df):
     """Derive food quantities (in kg) from food_acquired.
 
     Uses known metric conversions and price-ratio inference to convert
-    local units to kg, then sums per household × item × period.
+    local units to kg, then sums per household × item × period × unit ×
+    acquisition source (when ``s`` and ``u`` are present in the input
+    index).
+
+    Phase 4 of GH #169: the group-by preserves both ``u`` (the original
+    per-row unit) and ``s`` (acquisition source).  The summed values are
+    in kg (``Quantity_kg``) but the output column is named ``Quantity``;
+    the ``u`` index level records what the original per-row unit was.
     """
     df = _normalize_columns(df)
     if 'Quantity' not in df.columns:
@@ -703,7 +719,8 @@ def food_quantities_from_acquired(df):
     v = _apply_kg_conversion(df, factors)
 
     idx_names = list(v.index.names)
-    group_by = [n for n in ['t', 'v', 'i', 'j'] if n in idx_names]
+    # Preserve both `u` and `s` in the output (Phase 4).
+    group_by = [n for n in ['t', 'v', 'i', 'j', 'u', 's'] if n in idx_names]
 
     q = v[['Quantity_kg']].rename(columns={'Quantity_kg': 'Quantity'})
     q = q.replace(0, np.nan).dropna()
@@ -715,11 +732,20 @@ def food_prices_from_acquired(df):
     """Derive food prices (per kg) from food_acquired.
 
     Unit values are computed as Expenditure / Quantity_kg and returned
-    at the natural grain of the input (typically ``(t, v, i, j, u)`` or
-    a subset).  It is the analyst's responsibility to compute medians /
-    means across whatever dimension they care about — returning the raw
-    per-observation prices preserves information and lets the downstream
-    analysis choose its own aggregation.
+    at the natural grain of the input (``(t, v, i, j, u, s)`` after the
+    Phase 3 canonical reshape, or a legacy subset).  It is the analyst's
+    responsibility to compute medians / means across whatever dimension
+    they care about — returning the raw per-observation prices preserves
+    information and lets the downstream analysis choose its own
+    aggregation.
+
+    For canonical s-axis input, only purchased rows have a meaningful
+    Expenditure (helper sets produced/inkind to NaN).  Their Price is
+    NaN-after-divide and dropped by ``replace([0, inf, -inf], nan).dropna()``.
+    Users who want farmgate prices on produced rows must supply a
+    survey-reported Price column upstream (Uganda Phase 3 path); this
+    function does not synthesize one.  See GH #169 design doc for the
+    s-keyed price semantics.
     """
     df = _normalize_columns(df)
     if 'Expenditure' not in df.columns or 'Quantity' not in df.columns:
