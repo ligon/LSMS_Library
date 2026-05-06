@@ -278,7 +278,18 @@ def food_acquired_to_canonical(df, wave):
     out = pd.concat(pieces, ignore_index=True)
     # Drop rows without a positive Quantity.
     out = out[out['Quantity'].notna() & (out['Quantity'] > 0)]
-    out = out.set_index(['t', 'i', 'j', 'u', 's']).sort_index()
+    # Sum across genuine source-data duplicates: a household occasionally
+    # records multiple ``Other (Specify)`` entries for the same
+    # (item, unit, source) triple, lumping distinct foods under one
+    # canonical key.  Empirically observed in 2013-14 (HH 1508-006: two
+    # OTHER (SPECIFY) rows of qty 20 and 180) and 2019-20 (6 dupes across
+    # 3 households).  Sum is the right aggregation -- the household's
+    # total acquisition under that (item, unit, source) is the sum of the
+    # entries.  ``min_count=1`` keeps all-NaN Expenditure (produced/
+    # inkind) as NaN rather than coercing to 0.
+    out = out.groupby(['t', 'i', 'j', 'u', 's'],
+                      dropna=False).sum(min_count=1)
+    out = out.sort_index()
 
     # Normalize food labels on the canonical 'j' level.
     out = apply_harmonize_food(out, wave, level='j')
