@@ -26,10 +26,24 @@ Data Scheme:
     index: (t, i, pid)
     Educational Attainment: str
   food_acquired:
-    index: (t, visit, i, j, u)
+    # Canonical post-2026-05-05 (GH #169): s axis carries acquisition
+    # source (purchased / produced / inkind / other).  EHCVM 2018-19
+    # and 2021-22 wave mapping.py files import
+    # food_acquired_to_canonical as food_acquired to reshape the
+    # wide-form (Quantity-total, Produced-subset, Expenditure) into
+    # long-form on s.  `visit` (vague) is dropped: in EHCVM it's a
+    # sample split, not a repeated measure.
+    #
+    # The 2014-15 EACI wave is Phase-2-incomplete: its data_info.yml
+    # incorrectly maps `Quantity: s13q02`, but s13q02 is a Oui/Non
+    # column.  Pending a Phase 3 audit to identify the correct
+    # quantity / produced / expenditure variables for that instrument,
+    # 2014-15 continues to emit a legacy non-canonical shape; runtime
+    # output of Country('Mali').food_acquired() therefore mixes shapes
+    # across waves.
+    index: (t, v, i, j, u, s)
     Quantity: float
     Expenditure: float
-    Produced: float
   interview_date:
     index: (t, visit, i)
     Int_t: str
