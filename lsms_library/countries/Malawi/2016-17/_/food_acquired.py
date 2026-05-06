@@ -6,7 +6,8 @@ sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
 import json
-from malawi import handling_unusual_units, conversion_table_matching, apply_harmonize_food, normalize_food_label
+from malawi import (handling_unusual_units, conversion_table_matching,
+                    food_acquired_to_canonical, normalize_food_label)
 
 wave = '2016-17'
 
@@ -42,29 +43,36 @@ df[cols] = df[cols].apply(pd.to_numeric, errors='coerce')
 
 match_df, D = conversion_table_matching(df, conversions, conversion_label_name = 'item_name')
 conversions['item_name'] = conversions['item_name'].map(D)
+# conversion_table_matching is non-injective for 2016-17 (e.g. two
+# distinct ihs3 entries both fuzzy-match to 'Groundnut flour'); after
+# map(D) the conversions table acquires duplicate (region, item_name,
+# unit_code) triples that would multiply rows in each per-source merge
+# below.  Collapse to one factor per triple before the merge.
+conversions = (conversions.dropna(subset=['item_name'])
+               .groupby(['region', 'item_name', 'unit_code'], as_index=False)['factor']
+               .mean())
 
 df = df.set_index(['j', 'i'])
 df = df.join(regions).replace(r'^\s*$', pd.NA, regex=True)
 
 # Deal with some problematic units which are floats
-df['units_consumed'] = df.units_consumed.astype(str).str.upper()
-df['units_bought'] = df.units_bought.astype(str).str.upper()
+for src in ('consumed', 'bought', 'produced', 'gifted'):
+    df[f'units_{src}'] = df[f'units_{src}'].astype(str).str.upper()
+    df[f'unitcode_{src}'] = df[f'unitcode_{src}'].astype(str).str.upper()
 
 # handling conversion table
 conversions = conversions.set_index(['region', 'item_name', 'unit_code'])
-df = df.reset_index().merge(conversions, how='left', left_on=['i', 'm', 'unitcode_consumed'], right_on=['item_name', 'region', 'unit_code']).rename({'factor' : 'cfactor_consumed'}, axis=1)
-df = df.merge(conversions, how='left', left_on=['i', 'm', 'unitcode_bought'], right_on=['item_name', 'region', 'unit_code']).rename({'factor' : 'cfactor_bought'}, axis = 1)
+df = df.reset_index()
+for src in ('consumed', 'bought', 'produced', 'gifted'):
+    df = df.merge(
+        conversions, how='left',
+        left_on=['i', 'm', f'unitcode_{src}'],
+        right_on=['item_name', 'region', 'unit_code'],
+    ).rename({'factor': f'cfactor_{src}'}, axis=1)
 df = df.set_index(['j', 'i'])
-df = handling_unusual_units(df)
+df = handling_unusual_units(df, suffixes=['consumed', 'bought', 'produced', 'gifted'])
 
-df['price per unit'] = df['expenditure']/df['quantity_bought']
 df['t'] = wave
-df = df.reset_index().drop(columns=['m']).set_index(['j','t','i']).dropna(how='all')
-
-final = df.loc[:, ['quantity_consumed', 'u_consumed', 'quantity_bought', 'u_bought', 'price per unit', 'expenditure', 'cfactor_consumed', 'cfactor_bought']]
-
-final = apply_harmonize_food(final, wave, level='i')
-
-final = final.dropna(how='all')
-final = final.reorder_levels(['j','t','i']).sort_index()
-to_parquet(final, "food_acquired.parquet")
+df = df.reset_index()
+out = food_acquired_to_canonical(df.set_index(['j', 't', 'i']), wave=wave)
+to_parquet(out, 'food_acquired.parquet')
