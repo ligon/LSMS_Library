@@ -901,6 +901,11 @@ class Country:
         self.name = country_name
         self._panel_ids_cache = None
         self._updated_ids_cache = None
+        # Tristate guard: distinguishes "never tried" from "tried and got
+        # nothing".  Without this, _compute_panel_ids would re-fire (and
+        # re-emit warnings) on every property access for countries that
+        # don't declare panel_ids in data_scheme.yml.
+        self._panel_ids_attempted = False
         self.wave_folder_map = {}
         if trust_cache:
             warnings.warn(
@@ -1719,7 +1724,7 @@ class Country:
                 return self._finalize_result(df_cached, scheme_entry, method_name)
 
         if (
-            self._updated_ids_cache is None
+            not self._panel_ids_attempted
             and method_name not in ("panel_ids", "updated_ids")
         ):
             try:
@@ -2279,7 +2284,26 @@ class Country:
     def _compute_panel_ids(self) -> None:
         """
         Compute and cache both panel_ids and updated_ids.
+
+        Records the attempt via ``self._panel_ids_attempted`` regardless of
+        outcome so the property accessors don't re-run the miss path on
+        every access.  Countries that don't declare ``panel_ids`` in their
+        data_scheme are silently absent (no warning); countries that
+        declare it but fail to materialize trigger the loud warning, which
+        is the case worth surfacing.
         """
+        # Mark the attempt up front so any return path counts.
+        self._panel_ids_attempted = True
+
+        # Declared-absent: no panel_ids in data_scheme means the country
+        # is intentionally cross-section / non-panel.  Don't even try to
+        # aggregate — that would emit a "Data scheme does not contain
+        # panel_ids" warning from _aggregate_wave_data.
+        if 'panel_ids' not in self.data_scheme:
+            self._panel_ids_cache = None
+            self._updated_ids_cache = None
+            return
+
         panel_ids_dic = self._aggregate_wave_data(None, 'panel_ids')
         if isinstance(panel_ids_dic, dict):
             updated_ids_dic = self._aggregate_wave_data(None, 'updated_ids')
@@ -2290,21 +2314,30 @@ class Country:
             self._panel_ids_cache = panel_ids_dic
             self._updated_ids_cache = updated_ids_dic
         else:
-            logger.warning(f"Panel IDs not found in {self.name}.")
+            # Declared but materialization failed — this IS noteworthy.
+            logger.warning(
+                f"Panel IDs declared in data_scheme but not materialized "
+                f"for {self.name}."
+            )
             self._panel_ids_cache = None
             self._updated_ids_cache = None
 
     @property
     def panel_ids(self) -> dict[str, Any] | None:
-        """Raw panel-ID tables keyed by wave.  Computed lazily on first access."""
-        if self._panel_ids_cache is None or self._updated_ids_cache is None:
+        """Raw panel-ID tables keyed by wave.  Computed lazily on first access.
+
+        Gated on ``_panel_ids_attempted`` rather than the cache value so a
+        legitimate negative result (country without panel design) is
+        cached as ``None`` without re-running ``_compute_panel_ids``.
+        """
+        if not self._panel_ids_attempted:
             self._compute_panel_ids()
         return self._panel_ids_cache
 
     @property
     def updated_ids(self) -> dict[str, dict[str, str]] | None:
         """Mapping ``{old_id: new_id}`` per wave for ID harmonization.  Computed lazily."""
-        if self._panel_ids_cache is None or self._updated_ids_cache is None:
+        if not self._panel_ids_attempted:
             self._compute_panel_ids()
         return self._updated_ids_cache
 
