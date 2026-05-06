@@ -98,16 +98,10 @@ df = df.sort_index()
 
 # Canonical reshape (GH #169): drop `m` (lives in cluster_features) and
 # melt (Quantity, Produced, Expenditure) onto the `s` (acquisition source)
-# axis.  `v` is a required input to food_acquired_to_canonical but does
-# NOT belong in the wave-level parquet (it's joined at API time from
-# sample()), so we add a placeholder and strip it from the output index.
+# axis.  `v` is added at API time by _join_v_from_sample.
 if 'm' in df.columns:
     df = df.drop(columns=['m'])
-df = df.reset_index()
-df['v'] = pd.NA
-df = food_acquired_to_canonical(df.set_index(['t', 'v', 'i', 'j', 'u']),
-                                drop_columns=())
-df = df.reset_index('v', drop=True)
+df = food_acquired_to_canonical(df, drop_columns=())
 df = df.sort_index()
 
 to_parquet(df, 'food_acquired.parquet')
