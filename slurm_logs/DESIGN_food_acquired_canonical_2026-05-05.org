@@ -1,0 +1,184 @@
+#+title: Design: food_acquired canonical schema with acquisition-source axis
+#+date: <2026-05-05 Tue>
+
+Resolves the design call left open in GH #169 (2026-04-13) and unblocks
+the Uganda piece of GH #218.
+
+* Motivation
+
+=Feature('food_acquired')()= currently returns 5.13M rows × 54 columns
+across 14 countries, none of which agree on either index structure or
+column names.  The audits (=SkunkWorks/audits/food_acquired.md=,
+=slurm_logs/feature_scan_2026-04-13/food_acquired_rescan.md=) document
+the mess; #169 enumerates four direction options.
+
+The disagreement isn't accidental --- different surveys decompose food
+acquisition along different axes:
+
+- EHCVM 7-country: =(Expenditure, Quantity, Produced)= flat
+- Uganda: by source =(home, away, own, inkind)= as column suffixes
+- Tanzania: by source =(purchase, own, inkind)= as column suffixes
+- Malawi, Burkina_Faso: partial decomposition
+- GhanaLSS, Ethiopia: ad-hoc
+
+Every country at least implicitly distinguishes /how/ food was acquired
+(purchased vs produced vs received) from /what attributes/ the
+acquisition has (quantity, expenditure, price).  The canonical schema
+should make that explicit.
+
+* Decision (2026-05-05, Ligon)
+
+Take the long-form variant of #169 Option B: add the acquisition source
+as an /index level/, not a column-name suffix.
+
+** Canonical index
+
+=(t, v, i, j, u, s)= where =s= is the new acquisition-source index
+level.
+
+(Replaces the current declared =(t, m, v, i, j, u)=.  =m= leaves the
+index permanently --- it's added on demand via =_add_market_index=, per
+the post-2026-04-15 design.)
+
+** =s= vocabulary (minimal)
+
+Four values:
+
+- =purchased= --- bought at market
+- =produced= --- own production / farm / garden
+- =inkind= --- received as wage payment, gift, barter (gift folded in)
+- =other= --- fallback for countries that emit a coarse "obtained"
+  bucket without further decomposition (Burkina_Faso)
+
+Spellings live under =Columns: food_acquired: s: spellings:= in
+=data_info.yml=.
+
+** Canonical columns
+
+Three:
+
+- =Quantity= (float, required) --- amount acquired in unit =u=
+- =Expenditure= (float, optional) --- monetary value of the
+  acquisition; populated for =s=purchased= and for in-kind receipts
+  where the survey records imputed value
+- =Price= (float, api-derived /or/ stored, per source) --- value per
+  unit at the relevant point of acquisition.  Semantics depend on =s=:
+
+  | =s=         | Price means                              | source                                          |
+  |-------------+------------------------------------------+-------------------------------------------------|
+  | =purchased= | market price                             | =Expenditure / Quantity= (back-calculated)      |
+  | =produced=  | farmgate price                           | survey-reported where available, else NaN       |
+  | =inkind=    | imputed value of in-kind receipt, if any | survey-reported where available, else NaN       |
+  | =other=     | NaN by default                           | only filled if the country provides a valuation |
+
+  Several countries already record farmgate prices natively --- Uganda
+  has both =market= and =farmgate= columns; preserving that distinction
+  is exactly what the per-=s= price semantics buy.  =_finalize_result=
+  computes Price for =s=purchased= rows where Expenditure and Quantity
+  are present and Price isn't already supplied; for =s=produced= rows,
+  the country script is expected to supply farmgate Price directly.
+
+** Uganda home/away
+
+The =home/away= split (consumption location, not acquisition source) is
+dropped at the canonical layer.  Both fold into =s = purchased=.  Users
+who care about consumption location can still read Uganda's wave-level
+parquet directly; the canonical API view loses it.
+
+* Cascade to derived tables
+
+Per design call: derived tables /preserve/ the =s= index by default.
+
+| table             | default behaviour                                                 |
+|-------------------+-------------------------------------------------------------------|
+| food_quantities   | groups by =(t, v, i, j, u, s)=, sums Quantity                     |
+| food_expenditures | groups by =(t, v, i, j, s)=, sums Expenditure                     |
+| food_prices       | Price per =(t, v, j, u, s)= --- market price for =s=purchased=,   |
+|                   | farmgate price for =s=produced= (where the survey reports it),    |
+|                   | imputed for =s=inkind= where available                            |
+
+Users who want the legacy collapsed view (Quantity total, Expenditure
+total) call =.groupby(level=[...]).sum()= explicitly.
+
+For =food_prices= and =food_expenditures=, the =u= dimension is dropped
+in the default aggregation when summing across units doesn't make sense
+(prices), or is preserved when needed for unit-conversion downstream.
+TBD per-table once we touch the implementation.
+
+* Per-country reshape
+
+14 countries to reshape (Nepal has no microdata).  All are mechanical
+melts of existing wave-level outputs into long form on =s=.
+
+| Country        | Current shape                                    | Reshape       |
+|----------------+--------------------------------------------------+---------------|
+| Benin          | =(Expenditure, Quantity, Produced)=              | trivial melt  |
+| CotedIvoire    | =(Expenditure, Quantity, Produced)=              | trivial melt  |
+| Guinea-Bissau  | =(Expenditure, Quantity, Produced)=              | trivial melt  |
+| Mali           | =(Expenditure, Quantity, Produced)=              | trivial melt  |
+| Niger          | =(Expenditure, Quantity, Produced)=              | trivial melt  |
+| Senegal        | =(Expenditure, Quantity, Produced)=              | trivial melt  |
+| Togo           | =(Expenditure, Quantity, Produced)=              | trivial melt  |
+| Tanzania       | =quant_/value_/unit_{purchase,own,inkind}=       | suffix melt   |
+| Uganda         | =value_/quantity_/unitvalue_{home,away,own,inkind}= + =market=, =farmgate= | suffix melt + home/away→purchased; preserve =market= price for =s=purchased= and =farmgate= price for =s=produced= |
+| Malawi         | =quantity_{consumed,bought,produced}, expenditure= | drop consumed; melt the rest |
+| Burkina_Faso   | =quantity, total expenses= (purchased) + =quantity obtained, units obtained= (other) | two-row melt: =purchased= + =other= |
+| Ethiopia       | =quantity, value_purchased, quantity_purchased, ...= | derive purchased + produced (=total - purchased=) |
+| Nigeria        | =m, Quantity, Expenditure, Produced=             | drop =m= column (lives in cluster_features); trivial melt |
+| GhanaLSS       | 14 cols including yearly/daily flow variants     | hardest --- needs per-wave attention |
+
+EHCVM 7 are the easy parallel-dispatch batch.  The bespoke 7 (Tanzania
+through GhanaLSS) need individual attention.  GhanaLSS is the long
+pole.
+
+* Implementation phases
+
+** Phase 1 --- canonical declaration (one commit)
+- Update =lsms_library/data_info.yml=:
+  + add =s: acquisition source= to =Single Index:=
+  + change =food_acquired:= index entry to =(t, v, i, j, u, s)=
+  + add =Columns: food_acquired:= block declaring Quantity (required),
+    Expenditure (optional), Price (api-derived), and =s= with
+    spellings.
+- Update =_finalize_result= to compute =Price= when Expenditure and
+  Quantity are present and =Price= column is absent.
+- Add a =_check_food_acquired_canonical= entry to the schema-consistency
+  test.
+
+** Phase 2 --- EHCVM 7 reshape (parallel dispatch, one agent per country)
+The trivial-melt cluster.  Each agent updates the country's wave
+script(s) to emit long-form on =s=.
+
+** Phase 3 --- bespoke 7 reshape (sequential, with review)
+Tanzania, Uganda, Malawi, Burkina_Faso, Ethiopia, Nigeria, GhanaLSS.
+Each needs the human (or a careful agent with a per-country prompt) to
+decide source assignment for ambiguous columns.
+
+** Phase 4 --- derived-table semantics
+=food_expenditures=, =food_prices=, =food_quantities= updated to
+preserve =s=.  Uganda's broken derivation path becomes fireable
+(unblocks Uganda piece of GH #218).
+
+** Phase 5 --- vocabulary harmonization (separable; deferred)
+The 1,039 distinct =j= values and 385 distinct =u= values across
+countries.  Mirrors GH #168 (harmonize_assets); per-country
+=harmonize_food= tables in =categorical_mapping.org=.  Not in scope
+for the =s= migration.
+
+* Open questions
+
+1. =food_expenditures= aggregation default: keep =u= in the index, drop
+   it, or take a kwarg?  Decided per-table at implementation time.
+2. Whether to deprecate =food_quantities= as a separate table once
+   =food_acquired= is canonical (it's a thin wrapper).  Decided after
+   Phase 4.
+
+* References
+
+- GH #169 --- the design issue (now resolved by this doc)
+- GH #218 --- modernize harmony.py / retire legacy food_*.py family
+  (Uganda piece blocked on this work)
+- GH #168 --- harmonize_assets precedent for vocabulary work
+- =SkunkWorks/audits/food_acquired.md= --- 2026-04-12 audit
+- =slurm_logs/feature_scan_2026-04-13/food_acquired_rescan.md= --- rescan
+- CLAUDE.md "Derived Tables" section --- =_FOOD_DERIVED= dispatch
