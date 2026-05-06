@@ -299,37 +299,36 @@ def food_acquired_to_canonical(df, wave):
 def apply_harmonize_food(df, wave, level='i'):
     """Rename *level* of *df*'s index via Malawi's harmonize_food table.
 
-    Builds the dict from the *wave* column of
-    ``../../_/categorical_mapping.org``, then normalizes each dict key with
-    :func:`_normalize_label_key` so that case drift and encoding mojibake
-    between the .dta source and the org table never silently break the
-    mapping.
+    Builds a ``{wave-column-label -> Preferred Label}`` dict from
+    ``../../_/categorical_mapping.org#harmonize_food``, normalizes each
+    dict key with :func:`_normalize_label_key` so that case drift and
+    encoding mojibake between the .dta source and the org table never
+    silently break the mapping, then applies the rename at *level*.
 
-    .. note:: This intentionally calls :func:`df_from_orgfile` directly
-        instead of :func:`get_categorical_mapping`, because the latter
-        runs every ``idxvars`` value through
-        :func:`local_tools.format_id`, which does ``.split('.')[0]`` to
-        strip Stata's ``"123.0"`` → ``"123"``.  For food labels ending in
-        ``"etc."`` (and anything else with an internal period) that
-        truncates the key and silently breaks the mapping.
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame whose index includes a food-label level.
+    wave : str
+        Wave label (e.g. ``'2010-11'``) -- selects which column of
+        ``harmonize_food`` carries the source-side labels.
+    level : str, default 'i'
+        Index level name carrying the food labels.  Phase 3 reshape
+        passes ``'j'`` (food on the canonical j-axis).
+
+    Returns
+    -------
+    pd.DataFrame
+        ``df`` with food labels remapped to Preferred Labels where the
+        wave column covers them; labels not in the map pass through
+        unchanged.
     """
-    from lsms_library.local_tools import df_from_orgfile
-    import os
-    for d in ('./', '../../_/', '../../../_/'):
-        p = os.path.join(d, 'categorical_mapping.org')
-        if os.path.exists(p):
-            tab = df_from_orgfile(p, name='harmonize_food')
-            break
-    else:
-        raise FileNotFoundError(
-            "categorical_mapping.org not found in any of "
-            "'./', '../../_/', '../../../_/'"
-        )
-    if wave not in tab.columns:
-        raise KeyError(f"Wave column {wave!r} not in harmonize_food table; "
-                       f"available: {[c for c in tab.columns if c not in ('Preferred Label','GD Category')]}")
-    pairs = tab[[wave, 'Preferred Label']].dropna()
-    raw = dict(zip(pairs[wave], pairs['Preferred Label']))
-    labelsd = {_normalize_label_key(k): v for k, v in raw.items()}
+    from lsms_library.local_tools import get_categorical_mapping
+    raw = get_categorical_mapping(tablename='harmonize_food',
+                                  idxvars={'_k': wave},
+                                  **{'_v': 'Preferred Label'})
+    labelsd = {_normalize_label_key(k): v
+               for k, v in raw.items()
+               if pd.notna(k) and pd.notna(v)}
     return df.rename(index=labelsd, level=level)
 
