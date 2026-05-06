@@ -22,15 +22,31 @@ The downstream features (`food_expenditures`, `food_prices`, `food_quantities`) 
 
 ```yaml
 food_acquired:
-    index: (t, v, visit, i, j, u)
+    index: (t, v, i, j, u, s)
     Quantity: float
-    Price: float
-    Produced: float
+    Expenditure: float
 ```
 
-Index: wave (`t`) × cluster (`v`) × visit (`visit`) × household (`i`) × food item (`j`) × unit (`u`).
+Index: wave (`t`) × cluster (`v`) × household (`i`) × food item (`j`) × unit (`u`) × **acquisition source (`s`)**.
 
-Not all countries use all index levels — `visit` may be absent, `v` may be absent. The key levels are `(t, i, j, u)`.
+The `s` axis carries acquisition source as canonical values: `purchased`, `produced`, `inkind`, `other` (see `lsms_library.transformations.S_VALUES`).  The full design rationale lives in `slurm_logs/DESIGN_food_acquired_canonical_2026-05-05.org` and GH #169.
+
+Each input row from a survey questionnaire typically becomes **multiple long-form rows** — one per (item, unit, source) tuple where the household has data.  E.g., a household that purchased 5 kg of rice and produced 2 kg of rice emits two rows: one with `s='purchased'`, `Quantity=5`; another with `s='produced'`, `Quantity=2`.
+
+`Price` is **api-derived** (computed in `Country._finalize_result`) — it is *not* stored in the wave-level parquet.  Semantics by source:
+
+| `s`         | Price means                        | Where it comes from                              |
+|-------------|------------------------------------|--------------------------------------------------|
+| `purchased` | market price                       | `Expenditure / Quantity` (back-calculated)       |
+| `produced`  | farmgate price                     | survey-reported where available, else NaN        |
+| `inkind`    | imputed value of in-kind receipt   | survey-reported where available, else NaN        |
+| `other`     | NaN by default                     | only filled if the country provides a valuation  |
+
+If a country's source data records farmgate prices natively (e.g., Uganda's `farmgate` column), pass them through under `Price` for the `s='produced'` rows.
+
+### Visit / round handling
+
+Some surveys record multiple visits per wave (EHCVM `vague`, pp/ph countries' planting / harvest rounds).  **Fold these into `t` rather than carrying a separate `visit` index level**, e.g., `2018-19_p1` / `2018-19_p2` for EHCVM passages, `2018Q3` / `2019Q1` for Nigeria pp/ph.  See `add-feature/pp-ph` for the script-path pattern.
 
 ## The unit conversion pipeline
 

@@ -112,13 +112,13 @@ melts of existing wave-level outputs into long form on =s=.
 
 | Country        | Current shape                                    | Reshape       |
 |----------------+--------------------------------------------------+---------------|
-| Benin          | =(Expenditure, Quantity, Produced)=              | trivial melt  |
-| CotedIvoire    | =(Expenditure, Quantity, Produced)=              | trivial melt  |
-| Guinea-Bissau  | =(Expenditure, Quantity, Produced)=              | trivial melt  |
-| Mali           | =(Expenditure, Quantity, Produced)=              | trivial melt  |
-| Niger          | =(Expenditure, Quantity, Produced)=              | trivial melt  |
-| Senegal        | =(Expenditure, Quantity, Produced)=              | trivial melt  |
-| Togo           | =(Expenditure, Quantity, Produced)=              | trivial melt  |
+| Benin          | =(Expenditure, Quantity, Produced)=              | trivial melt; drop visit |
+| CotedIvoire    | =(Expenditure, Quantity, Produced)=              | trivial melt; drop visit |
+| Guinea-Bissau  | =(Expenditure, Quantity, Produced)=              | trivial melt; drop visit |
+| Mali           | =(Expenditure, Quantity, Produced)=              | trivial melt; drop visit |
+| Niger          | =(Expenditure, Quantity, Produced)=              | trivial melt; drop visit |
+| Senegal        | =(Expenditure, Quantity, Produced)=              | trivial melt; drop visit |
+| Togo           | =(Expenditure, Quantity, Produced)=              | trivial melt; drop visit |
 | Tanzania       | =quant_/value_/unit_{purchase,own,inkind}=       | suffix melt   |
 | Uganda         | =value_/quantity_/unitvalue_{home,away,own,inkind}= + =market=, =farmgate= | suffix melt + home/away→purchased; preserve =market= price for =s=purchased= and =farmgate= price for =s=produced= |
 | Malawi         | =quantity_{consumed,bought,produced}, expenditure= | drop consumed; melt the rest |
@@ -172,6 +172,31 @@ for the =s= migration.
 2. Whether to deprecate =food_quantities= as a separate table once
    =food_acquired= is canonical (it's a thin wrapper).  Decided after
    Phase 4.
+
+* Resolved: EHCVM =vague= (2026-05-05)
+
+The initial plan was to fold the EHCVM =vague= (visit) index level into
+=t= using a =_p1= / =_p2= suffix, mirroring Nigeria's pp/ph =2018Q3= /
+=2019Q1= pattern.  Two findings during Benin's Phase-2 pilot retired
+that plan:
+
+1. =Wave.grab_data= (=country.py:759=) hard-filters to
+   =df[df.index.get_level_values('t') == self.year]= --- visit-folded
+   =t= values =2018-19_p1= / =_p2= are silently rejected, returning an
+   empty DataFrame.  Nigeria's pattern only works because it registers
+   multiple logical waves via =wave_folder_map=, which is too heavy for
+   a single-passage decomposition.
+2. EHCVM 2018-19 =vague= is a /sample split/, not a repeated measure.
+   Empirical probe on Benin (8,012 households, 670 grappes): every
+   household appears in exactly one =vague=, every grappe is visited
+   in exactly one =vague=.  CONTENTS.org and CLAUDE.md both flag this
+   as the EHCVM design.  There is no temporal-duplication risk if =vague=
+   simply leaves the index.
+
+Decision: drop =vague= from the food_acquired index entirely.  Wave-level
+mapping.py post-processors discard the column.  If a downstream analysis
+needs the survey-passage label, it should live as a column on
+=cluster_features= or =sample=, not as a food_acquired index level.
 
 * References
 
