@@ -37,6 +37,103 @@ def validate_acquisition_source(df: pd.DataFrame) -> None:
         )
 
 
+def food_acquired_to_canonical(df: pd.DataFrame, drop_columns=('visit',)) -> pd.DataFrame:
+    """Reshape wide-form ``food_acquired`` into canonical long-form on ``s``.
+
+    Designed for use as a wave-level ``mapping.py`` post-processor.  The
+    typical pattern in a country's wave file is::
+
+        from lsms_library.transformations import food_acquired_to_canonical as food_acquired
+
+    Inputs (post-data_grabber):
+      - DataFrame with a multi-level index that includes ``(t, v, i, j, u)``
+        and may include extras (``visit`` for EHCVM passages).
+      - Columns: ``Quantity`` (TOTAL acquired in unit ``u``), ``Expenditure``
+        (monetary value of purchases; may be NaN), ``Produced`` (subset of
+        Quantity from own production; may be NaN/0).
+
+    Output:
+      - Index: ``(t, v, i, j, u, s)`` where ``s`` ∈ ``{'purchased', 'produced'}``.
+      - Columns: ``Quantity``, ``Expenditure``.  ``Price`` is api-derived.
+
+    Reshape rules:
+      - Each input row becomes up to two long-form rows:
+
+        * ``s='purchased'``: ``Quantity = (Total - Produced)`` clipped at 0;
+          ``Expenditure`` as observed.
+        * ``s='produced'``: ``Quantity = Produced``; ``Expenditure = NaN``
+          (note: the wave-level groupby in ``Wave.food_acquired`` may
+          coerce all-NaN sums to 0.0 — semantically equivalent for produced
+          rows).
+
+      - Rows with no measurements after the split are dropped.
+      - Index columns named in ``drop_columns`` are removed before the
+        long-form set_index, allowing per-country quirks (EHCVM ``visit``
+        is dropped by default — it's a sample split, not a repeated
+        measure; see ``slurm_logs/DESIGN_food_acquired_canonical_2026-05-05.org``).
+
+    Empirical sanity: Benin 2018-19 (commit 27e3d963) confirmed Produced ≤
+    Quantity in 100% of rows where both populated (2,597 rows), supporting
+    the (Total - Produced) = purchased decomposition.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Wide-form food_acquired DataFrame from the wave-level data_grabber.
+    drop_columns : iterable of str, optional
+        Index/column names to drop before the canonical reshape.  Default
+        ``('visit',)`` covers the EHCVM ``vague`` case.  Pass an empty
+        tuple to keep all index levels (e.g., for pre-EHCVM single-passage
+        waves where ``visit`` is absent — the function silently skips
+        missing columns).
+
+    Returns
+    -------
+    pd.DataFrame
+        Canonical long-form food_acquired with index ``(t, v, i, j, u, s)``.
+    """
+    work = df.reset_index()
+
+    for col in drop_columns:
+        if col in work.columns:
+            work = work.drop(columns=[col])
+
+    # Purchased = Total - Produced, clipped at zero (a few survey rows
+    # have Produced slightly > Quantity due to rounding; treat those as
+    # purchased=0 rather than negative).
+    purchased_qty = (work['Quantity'].fillna(0)
+                     - work['Produced'].fillna(0)).clip(lower=0)
+
+    purchased = pd.DataFrame({
+        't': work['t'].values,
+        'v': work['v'].values,
+        'i': work['i'].values,
+        'j': work['j'].values,
+        'u': work['u'].values,
+        's': 'purchased',
+        'Quantity': purchased_qty.values,
+        'Expenditure': work['Expenditure'].values,
+    })
+    purchased = purchased[(purchased['Quantity'] > 0)
+                          | (purchased['Expenditure'] > 0)]
+
+    produced = pd.DataFrame({
+        't': work['t'].values,
+        'v': work['v'].values,
+        'i': work['i'].values,
+        'j': work['j'].values,
+        'u': work['u'].values,
+        's': 'produced',
+        'Quantity': work['Produced'].values,
+        'Expenditure': np.nan,
+    })
+    produced = produced[produced['Quantity'].fillna(0) > 0]
+
+    out = pd.concat([purchased, produced], ignore_index=True)
+    out = out.set_index(['t', 'v', 'i', 'j', 'u', 's'])
+    return out
+
+
 def age_intervals(age, age_cuts=(4, 9, 14, 19, 31, 51)):
     """Bucket ages into half-open intervals for household_characteristics.
 
