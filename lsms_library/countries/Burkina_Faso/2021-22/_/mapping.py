@@ -2,6 +2,7 @@
 import pandas as pd
 import numpy as np
 import lsms_library.local_tools as tools
+from lsms_library.transformations import food_acquired_to_canonical as food_acquired
 
 COPING_LABELS = {
     1: "Utilisation de son épargne",

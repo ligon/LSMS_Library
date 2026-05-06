@@ -40,10 +40,26 @@ Data Scheme:
     materialize: make
 
   food_acquired:
-    index: (t, visit, i, j, u)
+    # Canonical post-2026-05-05 (GH #169): s axis carries acquisition
+    # source (purchased / produced / inkind / other).  EHCVM 2018-19
+    # and 2021-22 wave mapping.py files import
+    # food_acquired_to_canonical as food_acquired to reshape the
+    # wide-form (Quantity-total, Produced-subset, Expenditure) into
+    # long-form on s.  `visit` (vague) is dropped: in EHCVM it's a
+    # sample split, not a repeated measure.
+    #
+    # The 2014 wave (which the country module emits as t='2013_Q4' via
+    # the country-level food_acquired.py script) is Phase-2-incomplete:
+    # it follows the legacy script-path build that bypasses mapping.py
+    # post-processors, so the helper isn't invoked.  Pending a Phase 3
+    # rewrite of Burkina_Faso/2014/_/food_acquired.py (or the country-
+    # level food_acquired.py) to emit canonical shape, t='2013_Q4'
+    # continues to emit a legacy non-canonical shape.  Country
+    # ('Burkina_Faso').food_acquired() runtime output mixes shapes
+    # across waves until that lands.
+    index: (t, v, i, j, u, s)
     Quantity: float
     Expenditure: float
-    Produced: float
   assets:
     index: (t, i, j)
     Quantity: float
