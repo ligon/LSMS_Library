@@ -9,7 +9,9 @@ sample:
         v: ea_id
         weight: hh_wgt
         panel_weight: panelweight
-        strata: district
+        strata:
+            - district
+            - mappings: ['district', 'Alternate Spelling', 'Preferred Label']
         Rural: reside
         Region:
             - region

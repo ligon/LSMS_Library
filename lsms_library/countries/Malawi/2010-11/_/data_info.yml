@@ -9,7 +9,9 @@ sample:
         v: ea_id
         weight: hh_wgt
         panel_weight: hh_wgt
-        strata: hh_a01
+        strata:
+            - hh_a01
+            - mappings: ['district', 'Alternate Spelling', 'Preferred Label']
         Rural: reside
         # 2010-11 has no separate `region` or `district` column;
         # hh_a01 is the district *name*.  Declare Region (mapped) and

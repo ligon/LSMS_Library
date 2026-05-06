@@ -7,7 +7,9 @@ sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
 import json
-from malawi import conversion_table_matching
+from malawi import conversion_table_matching, apply_harmonize_food, normalize_food_label
+
+wave = "2013-14"
 
 df = get_dataframe('../Data/HH_MOD_G1_13.dta', convert_categoricals=True)
 
@@ -28,7 +30,7 @@ columns_dict = {'y2_hhid': 'j', 'hh_g02' : 'i', 'hh_g03a': 'quantity_consumed', 
 
 df = df.rename(columns_dict, axis=1)
 df = df.loc[:, list(columns_dict.values())]
-df['i'] = df['i'].astype(str).str.capitalize()
+df['i'] = normalize_food_label(df['i'].astype(str).str.capitalize())
 
 unitsdetail_convertions = get_categorical_mapping(tablename='unit',
                                                   idxvars={'j':'Code'},
@@ -86,10 +88,10 @@ df = df.reset_index().drop(columns=['m']).set_index(['j','t','i']).dropna(how='a
 
 final = df.loc[:, ['quantity_consumed', 'u_consumed', 'quantity_bought', 'u_bought', 'price per unit', 'expenditure', 'cfactor_consumed', 'cfactor_bought']]
 
-# Fix food labels via the cross-wave union helper (GH #216).  See
-# malawi.harmonize_food_labels() for rationale and the full derivation.
-from malawi import harmonize_food_labels
-final = harmonize_food_labels(final, level='i')
+
+# Fix food labels
+final = apply_harmonize_food(final, wave, level='i')
+
 final = final.dropna(how='all')
 final = final.reorder_levels(['j','t','i']).sort_index()
 

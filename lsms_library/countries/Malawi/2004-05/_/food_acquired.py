@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from lsms_library.local_tools import to_parquet, get_categorical_mapping
+from lsms_library.local_tools import to_parquet
 from lsms_library.local_tools import get_dataframe
 
 import sys
@@ -7,6 +7,7 @@ sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
 import json
+from malawi import apply_harmonize_food, normalize_food_label
 
 wave = "2004-05"
 
@@ -21,6 +22,9 @@ columns_dict = {'case_id': 'j', 'i0a' : 'i', 'i03a': 'quantity_consumed', 'i03b'
 df = df.astype(str).replace('nan', pd.NA)
 df = df.rename(columns_dict, axis=1)
 df = df.loc[:, list(columns_dict.values())]
+# Normalize case + en-dash mojibake on the food-label column to match
+# the form that apply_harmonize_food expects (same shape as other waves).
+df['i'] = normalize_food_label(df['i'].astype(str).str.capitalize())
 
 cols = df.loc[:, ['quantity_consumed', 'expenditure', 'quantity_bought',
                   'quantity_produced', 'quantity_gifted']].columns
@@ -54,10 +58,9 @@ df = df.reset_index().set_index(['j','t','i']).dropna(how='all')
 
 final = df.loc[:, ['quantity_consumed', 'u_consumed', 'quantity_bought', 'u_bought', 'price per unit', 'expenditure', 'cfactor_consumed', 'cfactor_bought']]
 
-# Fix food labels via the cross-wave union helper (GH #216).  See
-# malawi.harmonize_food_labels() for rationale and the full derivation.
-from malawi import harmonize_food_labels
-final = harmonize_food_labels(final, level='i')
+
+final = apply_harmonize_food(final, wave, level='i')
+
 final = final.dropna(how='all')
 final = final.reorder_levels(['j','t','i']).sort_index()
 to_parquet(final, "food_acquired.parquet")
