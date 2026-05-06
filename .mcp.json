@@ -4,6 +4,11 @@
       "command": "npx",
       "args": ["-y", "@github/github-mcp-server"],
       "env": {}
+    },
+    "gitnexus": {
+      "command": "npx",
+      "args": ["-y", "gitnexus", "mcp"],
+      "env": {}
     }
   }
 }
