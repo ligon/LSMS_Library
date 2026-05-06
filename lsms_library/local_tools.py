@@ -957,12 +957,25 @@ def format_id(id: Any, zeropadding: int = 0) -> str | None:
       returns ``None``.
     - Numeric input is cast to int then formatted as a decimal string.
       Float inputs lose their ``.0`` suffix; ``123.0`` → ``"123"``.
-    - String input has any trailing ``.xxx`` decimal suffix stripped
-      (e.g. Stata sometimes stringifies floats), surrounding
-      whitespace removed, and leading zeros preserved.
+    - String input has surrounding whitespace removed.  A trailing
+      ``.xxx`` decimal suffix is stripped *only* when the whole
+      pre-decimal-point string is numeric (``"123.0"`` → ``"123"``,
+      ``"-45.00"`` → ``"-45"``); arbitrary strings with internal or
+      trailing periods (``"Mr."``, ``"Citrus, etc."``,
+      ``"Coca-Cola, Inc."``) are passed through unchanged.  Leading
+      zeros are preserved.
     - The result is left-padded with zeros to ``zeropadding`` width,
       so ``format_id(1, zeropadding=3)`` returns ``"001"``. Pass
       ``0`` (the default) to skip padding.
+
+    Note
+    ----
+    The numeric-only decimal-strip is narrower than the historic
+    ``s.split('.')[0]`` behaviour, which silently truncated any string
+    containing a period.  See GH #222 for the regression that motivated
+    the narrower form (Malawi ``harmonize_food`` labels ending in
+    ``"etc."`` were having the trailing period dropped, breaking the
+    rename against data that retained it).
 
     Parameters
     ----------
@@ -989,6 +1002,14 @@ def format_id(id: Any, zeropadding: int = 0) -> str | None:
     '456'
     >>> format_id("  007 ")
     '007'
+    >>> format_id("-45.00")
+    '-45'
+    >>> format_id("Citrus, naartje, orange, etc.")
+    'Citrus, naartje, orange, etc.'
+    >>> format_id("Mr.")
+    'Mr.'
+    >>> format_id("123.abc")
+    '123.abc'
     >>> format_id(float("nan"))
     >>> format_id("")
     """
@@ -997,7 +1018,16 @@ def format_id(id: Any, zeropadding: int = 0) -> str | None:
     try:  # If numeric, return as string int
         return ('%d' % id).zfill(zeropadding)
     except TypeError:  # Not numeric
-        return id.split('.')[0].strip().zfill(zeropadding)
+        s = id.strip()
+        # Strip a trailing ``.xxx`` decimal suffix only when the string
+        # represents a stringified-numeric (``"123.0"``, ``"-45.00"``).
+        # Arbitrary labels with internal or trailing periods are left
+        # alone; see GH #222.
+        if '.' in s:
+            head, _, tail = s.partition('.')
+            if head.lstrip('-').isdigit() and tail.isdigit():
+                s = head
+        return s.zfill(zeropadding)
     except ValueError:
         return None
 
