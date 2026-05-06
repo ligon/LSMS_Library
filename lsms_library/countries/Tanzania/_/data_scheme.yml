@@ -37,7 +37,16 @@ Data Scheme:
     index: (t, i)
     Int_t: datetime
 
-  food_acquired: !make
+  food_acquired:
+    # Canonical post-2026-05-05 (GH #169): s axis carries acquisition
+    # source (purchased / produced / inkind).  Wave-level food_acquired.py
+    # melts the {purchase, own, inkind} suffix decomposition into long
+    # form via tanzania.food_acquired_to_canonical.  See
+    # slurm_logs/DESIGN_food_acquired_canonical_2026-05-05.org.
+    index: (t, i, j, u, s)
+    Quantity: float
+    Expenditure: float
+    materialize: make
   food_expenditures: !make
   food_quantities: !make
   food_prices: !make

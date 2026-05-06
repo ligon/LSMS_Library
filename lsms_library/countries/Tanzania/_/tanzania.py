@@ -371,19 +371,24 @@ def food_acquired(fn,myvars):
         df = df.replace({"year": dict})
         df = df.set_index(['HHID','item','year']).dropna(how='all')
         df.index.names = ['j','i','t']
-        try:
-            # Attempt to assert that the index is unique
-            assert df.index.is_unique, "Non-unique index!  Fix me!"
-        except AssertionError as e:
-            # Drop completely duplicated rows 
-            # Same HH recorded down multiple times due to tracking of complete HH lineage in the UPHI system
+        if not df.index.is_unique:
+            # Same HH recorded multiple times due to tracking of complete HH
+            # lineage in the UPHI system.  If dedup-by-index and dedup-by-row
+            # produce the same row count, the duplicates are harmless
+            # exact-duplicate rows; drop them by index.  Otherwise fail loud.
+            #
+            # NB: an earlier version ran ``pd.testing.assert_frame_equal`` as
+            # a paranoia check between the two dedupes, but under pandas 2.x
+            # a StringDtype(na_value=nan) index level vs. plain ``object``
+            # dtype on the same string values trips ``assert_index_equal`` on
+            # dtype.  The trailing ``is_unique`` check already provides the
+            # safety net.
             if df[~df.index.duplicated()].shape[0] == df.reset_index().drop_duplicates().shape[0]:
-                pd.testing.assert_frame_equal(df.reset_index().drop_duplicates().set_index(['j','i','t']), df[~df.index.duplicated()])
                 df = df[~df.index.duplicated()]
                 if not df.index.is_unique:
                     raise ValueError("Non-unique index! Even after attempted fix.")
             else:
-                raise e
+                raise AssertionError("Non-unique index with non-trivial duplicates!  Fix me!")
     else:
         df = df.set_index(['HHID','item']).dropna(how='all')
         df.index.names = ['j','i']
@@ -473,6 +478,84 @@ def id_match(df, wave, waves_dict):
             m = m.drop(columns=[waves_dict[wave][2], waves_dict[wave][3]])
     return m
 
+def food_acquired_to_canonical(df):
+    '''
+    Reshape Tanzania wide-form food_acquired output to the canonical
+    (t, i, j, u, s) long form.  Phase 3 of GH #169 / DESIGN_food_acquired_
+    canonical_2026-05-05.org.
+
+    Input
+    -----
+    DataFrame produced by ``food_acquired()`` then ``new_harmonize_units()``,
+    indexed by ``(j, t, i)`` where (per the legacy Tanzania convention)
+    ``j`` is the HHID and ``i`` is the food item code.  Required columns:
+    ``quant_purchase, unit_purchase, value_purchase, quant_own, unit_own,
+    quant_inkind, unit_inkind`` plus the redundant ``quant_ttl_consume,
+    unit_ttl_consume`` (dropped here — they are the sum of the per-source
+    quants).
+
+    Output
+    ------
+    DataFrame indexed by ``(t, i, j, u, s)`` with columns
+    ``[Quantity, Expenditure]``, where the canonical convention is
+    ``i`` = household, ``j`` = item, ``u`` = unit, ``s`` ∈
+    ``{'purchased', 'produced', 'inkind'}``.  The wave-level legacy
+    ``j ↔ i`` swap is handled here so downstream code sees canonical names.
+
+    Reshape rules
+    -------------
+    Each input row becomes up to 3 long-form rows:
+
+    * ``s = 'purchased'`` -- ``Quantity = quant_purchase``,
+      ``u = unit_purchase``, ``Expenditure = value_purchase``
+    * ``s = 'produced'``  -- ``Quantity = quant_own``,
+      ``u = unit_own``, ``Expenditure = NaN``
+    * ``s = 'inkind'``    -- ``Quantity = quant_inkind``,
+      ``u = unit_inkind``, ``Expenditure = NaN``
+
+    Rows whose ``Quantity`` is NaN, zero, or negative are dropped, except
+    that a purchased row with ``Quantity > 0`` is kept even if
+    ``Expenditure`` is missing/zero (and vice versa for the rare case of
+    a recorded purchase value with no quantity, which we still drop --
+    we require Quantity).  The redundant ``quant_ttl_consume`` /
+    ``unit_ttl_consume`` columns are discarded.
+    '''
+    work = df.reset_index()
+    # Legacy Tanzania: j=HHID, i=item.  Canonical: i=HHID, j=item.
+    work = work.rename(columns={'j': 'i_canon', 'i': 'j_canon'})
+    work = work.rename(columns={'i_canon': 'i', 'j_canon': 'j'})
+
+    def _make(source_label, quant_col, unit_col, value_col=None):
+        out = pd.DataFrame({
+            't': work['t'].values,
+            'i': work['i'].values,
+            'j': work['j'].values,
+            'u': work[unit_col].values,
+            's': source_label,
+            'Quantity': pd.to_numeric(work[quant_col], errors='coerce').values,
+        })
+        if value_col is not None:
+            out['Expenditure'] = pd.to_numeric(work[value_col], errors='coerce').values
+        else:
+            out['Expenditure'] = pd.NA
+        return out
+
+    purchased = _make('purchased', 'quant_purchase', 'unit_purchase',
+                      value_col='value_purchase')
+    produced  = _make('produced',  'quant_own',      'unit_own')
+    inkind    = _make('inkind',    'quant_inkind',   'unit_inkind')
+
+    out = pd.concat([purchased, produced, inkind], ignore_index=True)
+    # Require a positive Quantity; drop NaN/zero/negative.  The redundant
+    # quant_ttl_consume / unit_ttl_consume axes are simply not represented
+    # in the long form (they were the sum of the three per-source quants).
+    out = out[out['Quantity'].notna()]
+    out = out[out['Quantity'] > 0]
+
+    out = out.set_index(['t', 'i', 'j', 'u', 's']).sort_index()
+    return out
+
+
 def new_harmonize_units(df, unit_conversion):
     pair = {'quant': ['quant_ttl_consume', 'quant_purchase', 'quant_own', 'quant_inkind'] ,
         'unit': ['unit_ttl_consume', 'unit_purchase', 'unit_own', 'unit_inkind']}
@@ -488,7 +571,12 @@ def new_harmonize_units(df, unit_conversion):
         if df[pair['quant'][i]].dtype != 'O':
             df[pair['unit'][i]] = 'kg'
         else: 
-            df[pair['unit'][i]] = np.where(df[pair['quant'][i]].str.contains(pattern).to_frame() == True, 'piece', 'kg')
+            # NB: dropped a vestigial ``.to_frame()`` here — under pandas 2.x
+            # it produced a 2-D mask that ``np.where`` returned as a 2-D
+            # ndarray, which then failed to assign back into a 1-D column
+            # (``ArrowInvalid: only handle 1-dimensional arrays``).  Series
+            # comparison stays 1-D, so the rest of the expression is fine.
+            df[pair['unit'][i]] = np.where(df[pair['quant'][i]].str.contains(pattern) == True, 'piece', 'kg')
             df[pair['quant'][i]] = df[pair['quant'][i]].apply(lambda x: x if str(x).count('p') == 0 else str(x).count('p'))
 
     df['agg_u'] = df[pair['unit']].apply(lambda x: max(x) if min(x) == max(x) else min(x) + '+' + max(x), axis = 1)

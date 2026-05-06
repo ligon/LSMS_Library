@@ -2,7 +2,7 @@
 from lsms_library.local_tools import to_parquet
 import sys
 sys.path.append('../../_/')
-from tanzania import food_acquired, new_harmonize_units
+from tanzania import food_acquired, new_harmonize_units, food_acquired_to_canonical
 import numpy as np
 
 fn='../Data/HH_SEC_J1.dta'
@@ -16,10 +16,10 @@ myvars = dict(item='itemcode',
               quant_purchase = 'hh_j03_2',
               unit_purchase = 'hh_j03_1',
               value_purchase = 'hh_j04',
-              #place_purchase = 'hj_05', 
+              #place_purchase = 'hj_05',
               quant_own = 'hh_j05_2',
-              unit_own = 'hh_j05_1', 
-              quant_inkind = 'hh_j06_2', 
+              unit_own = 'hh_j05_1',
+              quant_inkind = 'hh_j06_2',
               unit_inkind = 'hh_j06_1'
               )
 
@@ -36,8 +36,11 @@ unit_conversion = {'Kg': 1,
                    'Piece': 'p'}
 df = new_harmonize_units(df, unit_conversion)
 
-assert df.index.is_unique, "Non-unique index!  Fix me!"
+# Canonical (t, i, j, u, s) long form (Phase 3 of GH #169).  See
+# tanzania.food_acquired_to_canonical for the suffix-melt rules.
+df = food_acquired_to_canonical(df)
 
-assert len(df[['quant_purchase','quant_own','quant_inkind']].dropna(how='all'))>0
+assert df.index.is_unique, "Non-unique (t,i,j,u,s) index!  Fix me!"
+assert len(df) > 0, "food_acquired produced no rows after canonical reshape"
 
 to_parquet(df, 'food_acquired.parquet')
