@@ -7,7 +7,7 @@ sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
 import json
-from malawi import conversion_table_matching, apply_harmonize_food, normalize_food_label
+from malawi import conversion_table_matching, food_acquired_to_canonical, normalize_food_label
 
 wave = "2013-14"
 
@@ -52,47 +52,49 @@ conversions['item_name'] = conversions['item_name'].map(D)
 df = df.set_index(['j', 'i'])
 df = df.join(regions).replace(r'^\s*$', pd.NA, regex=True)
 
-df['unitcode_consumed'] = df['unitcode_consumed'].str.upper()
+# Uppercase unit codes for the (region, item, unit) merge below.
+for src in ('consumed', 'bought', 'produced', 'gifted'):
+    col = f'unitcode_{src}'
+    df[col] = df[col].str.upper()
+
 conversions = conversions.set_index(['region', 'item_name', 'unit_code'])
 
-df['unitcode_consumed'], df['unitcode_bought'] = df['unitcode_consumed'].str.upper(), df['unitcode_bought'].str.upper()
-df = df.reset_index().merge(conversions, how='left', left_on=['i', 'm', 'unitcode_consumed'], right_on=['item_name', 'region', 'unit_code']).rename({'factor' : 'cfactor_consumed'}, axis=1)
-df = df.merge(conversions, how='left', left_on=['i', 'm', 'unitcode_bought'], right_on=['item_name', 'region', 'unit_code']).rename({'factor' : 'cfactor_bought'}, axis = 1)
+# Region-keyed unit conversion.  Merge once per source.
+df = df.reset_index()
+for src in ('consumed', 'bought', 'produced', 'gifted'):
+    df = df.merge(
+        conversions, how='left',
+        left_on=['i', 'm', f'unitcode_{src}'],
+        right_on=['item_name', 'region', 'unit_code'],
+    ).rename({'factor': f'cfactor_{src}'}, axis=1)
 df = df.set_index(['j', 'i'])
 
-# custom convert some units in formats such as "300 grams" into kg, typically handled by handling_unusual_units in malawi.py for data with conversion tables
+# Inline "300 grams"-style fallback per source.
 grams = r'(\d+)\s*g(?:\s+|r)'
-kgs =r'(\d+)\s*k(?:g|ilo)'
+kgs = r'(\d+)\s*k(?:g|ilo)'
 
+for src in ('consumed', 'bought', 'produced', 'gifted'):
+    detail_col = f'unitsdetail_{src}'
+    cfactor_col = f'cfactor_{src}'
+    quant_col = f'quantity_{src}'
+    u_col = f'u_{src}'
+    code_col = f'unitcode_{src}'
 
-conv_kgrams_consumed = pd.concat([df['unitsdetail_consumed'].str.lower().str.extract(grams).astype(float)*0.01,
-                                   df['unitsdetail_consumed'].str.lower().str.extract(kgs).astype(float),], axis= 0).dropna()
-conv_kgrams_bought = pd.concat([df['unitsdetail_bought'].str.lower().str.extract(grams).astype(float)*0.01,
-                                df['unitsdetail_bought'].str.lower().str.extract(kgs).astype(float)], axis=0).dropna()
+    detail_lower = df[detail_col].astype(str).str.lower()
+    fallback = pd.concat([
+        detail_lower.str.extract(grams).astype(float) * 0.01,
+        detail_lower.str.extract(kgs).astype(float),
+    ], axis=0).dropna()
+    df[cfactor_col] = df.apply(lambda x, c=cfactor_col, f=fallback: x[c] or f, axis=1)
+    df[quant_col] = df[quant_col].mul(df[cfactor_col].fillna(1))
+    df[u_col] = np.where(~df[cfactor_col].isna(), 'kg', df[detail_col])
+    df[u_col] = df[u_col].replace('nan', pd.NA).fillna(df[code_col])
 
-df['cfactor_consumed'] = df.apply(lambda x: x['cfactor_consumed'] or conv_kgrams_consumed, axis = 1)
-df['cfactor_bought'] = df.apply(lambda x: x['cfactor_bought'] or conv_kgrams_bought, axis = 1)
-
-df["quantity_consumed"] = df['quantity_consumed'].mul(df['cfactor_consumed'].fillna(1))
-df["quantity_bought"] = df['quantity_bought'].mul(df['cfactor_bought'].fillna(1))
-
-df['u_consumed'] = np.where(~df['cfactor_consumed'].isna(), 'kg', df['unitsdetail_consumed'])
-df['u_consumed'] = df['u_consumed'].replace('nan', pd.NA)
-df['u_bought'] = np.where(~df['cfactor_bought'].isna(), 'kg', df['unitsdetail_bought'])
-df['u_bought'] = df['u_bought'].replace('nan', pd.NA)
-# prices
-df['price per unit'] = df['expenditure']/df['quantity_bought']
-
-df['t'] = '2013-14'
-df = df.reset_index().drop(columns=['m']).set_index(['j','t','i']).dropna(how='all')
-
-final = df.loc[:, ['quantity_consumed', 'u_consumed', 'quantity_bought', 'u_bought', 'price per unit', 'expenditure', 'cfactor_consumed', 'cfactor_bought']]
-
-
-# Fix food labels
-final = apply_harmonize_food(final, wave, level='i')
-
-final = final.dropna(how='all')
-final = final.reorder_levels(['j','t','i']).sort_index()
-
-to_parquet(final, "food_acquired.parquet")
+df['t'] = wave
+df = df.reset_index()
+out = food_acquired_to_canonical(df.set_index(['j', 't', 'i']), wave=wave)
+# 2013-14 source lacks the _os (other-specify) free-text column that 2010-11
+# uses to disambiguate two rows with i='OTHER (SPECIFY)' for the same HH.
+# Collapse the resulting duplicate canonical-index rows by summing.
+out = out.groupby(level=out.index.names).sum(min_count=1)
+to_parquet(out, 'food_acquired.parquet')
