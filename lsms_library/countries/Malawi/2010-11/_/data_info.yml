@@ -157,24 +157,10 @@ housing:
     idxvars:
         i: case_id
     myvars:
-        Roof:
-            - hh_f08
-            - mapping:
-                Grass: Grass
-                Iron sheets: Iron Sheets
-                Clay tiles: Clay Tiles
-                Plastic sheeting: Plastic Sheeting
-                Concrete: Concrete
-                Other (specify): Other
-        Floor:
-            - hh_f09
-            - mapping:
-                Smoothed mud: Smoothed Mud
-                Smooth cement: Smooth Cement
-                Sand: Sand
-                Tile: Tile
-                Wood: Wood
-                Other (Specify): Other
+        # Roof / Floor values harmonized via the auto-discovery `Roof`
+        # and `Floor` tables in ../../_/categorical_mapping.org.
+        Roof: hh_f08
+        Floor: hh_f09
 
 # panel_ids:
 #     file: Full_Sample/Household/hh_mod_a_filt.dta

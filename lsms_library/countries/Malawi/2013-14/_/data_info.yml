@@ -13,12 +13,10 @@ sample:
             - district
             - mappings: ['district', 'Alternate Spelling', 'Preferred Label']
         Rural: reside
-        Region:
-            - region
-            - mapping:
-                North: North
-                Central: Central
-                South: Southern
+        # Region values harmonized via the auto-discovery `region` table
+        # in ../../_/categorical_mapping.org (case-insensitive name match
+        # on column `Region`).
+        Region: region
         District: district
 
 cluster_features:
@@ -31,12 +29,7 @@ cluster_features:
             i: y2_hhid
             v: ea_id
         myvars:
-            Region:
-                - region
-                - mapping:
-                    North: North
-                    Central: Central
-                    South: Southern
+            Region: region
             District: district
             Rural:
                 - reside
@@ -85,24 +78,10 @@ housing:
     idxvars:
         i: y2_hhid
     myvars:
-        Roof:
-            - hh_f08
-            - mapping:
-                GRASS: Grass
-                IRON SHEETS: Iron Sheets
-                CLAY TILES: Clay Tiles
-                PLASTIC SHEETING: Plastic Sheeting
-                CONCRETE: Concrete
-                OTHER (SPECIFY): Other
-        Floor:
-            - hh_f09
-            - mapping:
-                SMOOTHED MUD: Smoothed Mud
-                SMOOTH CEMENT: Smooth Cement
-                SAND: Sand
-                TILE: Tile
-                WOOD: Wood
-                OTHER(SPECIFY): Other
+        # Roof / Floor values harmonized via the auto-discovery `Roof`
+        # and `Floor` tables in ../../_/categorical_mapping.org.
+        Roof: hh_f08
+        Floor: hh_f09
 
 panel_ids:
     file: HH_MOD_A_FILT_13.dta

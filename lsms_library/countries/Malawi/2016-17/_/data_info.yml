@@ -18,13 +18,9 @@ sample:
             - district
             - mappings: ['district', 'Alternate Spelling', 'Preferred Label']
         Rural: reside
-        Region:
-            - region
-            - mapping:
-                North: North
-                Central: Central
-                Southern: Southern
-                South: Southern
+        # Region values harmonized via the auto-discovery `region` table
+        # in ../../_/categorical_mapping.org.
+        Region: region
         District: district
 
 cluster_features:
@@ -42,13 +38,7 @@ cluster_features:
                 - mapping: cs_i
             v: ea_id
         myvars:
-            Region:
-                - region
-                - mapping:
-                    North: North
-                    Central: Central
-                    Southern: Southern
-                    South: Southern
+            Region: region
             District: district
             Rural:
                 - reside
@@ -125,30 +115,10 @@ housing:
             - case_id
             - mapping: cs_i
     myvars:
-        Roof:
-            - hh_f08
-            - mapping:
-                grass: Grass
-                GRASS: Grass
-                IRON SHEETS: Iron Sheets
-                Iron sheets: Iron Sheets
-                CLAY TILES: Clay Tiles
-                PLASTIC SHEETING: Plastic Sheeting
-                concrete: Concrete
-                CONCRETE: Concrete
-                OTHER (SPECIFY): Other
-        Floor:
-            - hh_f09
-            - mapping:
-                SMOOTHED MUD: Smoothed Mud
-                SMOOTH CEMENT: Smooth Cement
-                sand: Sand
-                SAND: Sand
-                tile: Tile
-                TILE: Tile
-                wood: Wood
-                WOOD: Wood
-                OTHER(SPECIFY): Other
+        # Roof / Floor values harmonized via the auto-discovery `Roof`
+        # and `Floor` tables in ../../_/categorical_mapping.org.
+        Roof: hh_f08
+        Floor: hh_f09
 
 panel_ids:
     file: Panel/hh_mod_a_filt_16.dta

@@ -35,7 +35,6 @@
 | Locally Brewed Liquor                       | Alcohol     | Locally brewed liquor      | Locally brewed liquor (kachasu)                  | Locally brewed liquor (kachasu)                  | Locally brewed liquor (kachasu )                    | Locally brewed liquor (kachasu)                  |
 | Wine Or Commercial Liquor                   | Alcohol     | Wine or commercial liquor  | Wine or commercial liquor                        | Wine or commercial liquor                        | Wine or commercial liquor                           | Wine or commercial liquor                        |
 | Traditional Beer (Masase)                   | Alcohol     | Traditional beer (masase)  | Traditional beer (masese)                        | Traditional beer (masese)                        | Traditional beer (masese)                           | Traditional beer (masese)                        |
-| Local Sweet Beer (Thobwa)                   | Alcohol     | Local sweet beer (thobwa)  | ---                                              | ---                                              | ---                                                 | Thobwa                                           |
 | Bottled/ Canned Beer                        | Alcohol     | Bottled/ canned beer       | Bottled / canned beer (carlsberg, etc.)          | Bottled / canned beer (carlsberg, etc.)          | Bottled / canned beer (carlsberg, etc)              | Bottled / canned beer (carlsberg, etc.)          |
 | Bottled Water                               | Beverage    | ---                        | Bottled water                                    | Bottled water                                    | Bottled water                                       | Bottled water                                    |
 | Chibuku (Commercial Traditional-Style Beer) | Alcohol     | Chibuku/ Napolo            | ---                                              | ---                                              | ---                                                 | ---                                              |
@@ -93,7 +92,6 @@
 | Small Animal - Rabbit, Mice, Etc.           | Meat        | Small animal- rabbit, mice | Small animal – rabbit, mice, etc.                | Small animal – rabbit, mice, etc.                | Small animal – rabbit, mice, etc                    | Small animal – rabbit, mice, etc.                |
 | Groundnut Flour                             | Legumes     | Groundnut flour            | Groundnut flour                                  | Groundnut flour                                  | Groundnut flour                                     | Groundnut flour                                  |
 | Groundnut (Shelled)                         | Legumes     | ---                        | ---                                              | Groundnut (Shelled)                              | Groundnut (Shelled)                                 | ---                                              |
-| Groundnut (Unshelled)                       | Legumes     | ---                        | ---                                              | Groundnut (unshelled)                            | ---                                                 | ---                                              |
 | Other Poultry - Guinea Fowl, Doves, Etc.    | Other       | Other poultry-guinea fowl, | Other poultry - guinea fowl, doves, etc.         | Other poultry - guinea fowl, doves, etc.         | Other poultry - guinea fowl, doves, etc             | Other poultry - guinea fowl, doves, etc.         |
 | Chicken                                     | Meat        | Chicken                    | Chicken                                          | Chicken                                          | Chicken - Whole                                     | Chicken                                          |
 | Pork                                        | Meat        | Pork                       | Pork                                             | Pork                                             | Pork                                                | Pork                                             |
@@ -122,10 +120,9 @@
 | Eggs                                        | Dairy       | Eggs                       | Eggs                                             | Eggs                                             | Eggs                                                | Eggs                                             |
 | Other (Specify)                             | Other       | ---                        | Other (specify)                                  | Other (specify)                                  | Other (specify)                                     | Other (specify)                                  |
 | Fish Soup/Sauce                             | Fish        | ---                        | Fish Soup/Sauce                                  | Fish Soup/Sauce                                  | Fish Soup/Sauce                                     | Fish soup/sauce                                  |
-| Thobwa                                      | Alcohol     | ---                        | Thobwa                                           | Thobwa                                           | Thobwa                                              | Thobwa                                           |
+| Thobwa                                      | Alcohol     | Local sweet beer (thobwa)  | Thobwa                                           | Thobwa                                           | Thobwa                                              | Thobwa                                           |
 | Maheu                                       | Alcohol     | ---                        | Maheu                                            | Maheu                                            | Maheu                                               | Maheu                                            |
 | Chibuku (Commercial Traditional-Style Beer) | Alcohol     | ---                        | Chibuku (commercial traditional-style beer)      | Chibuku (commercial traditional-style beer)      | Chibuku(commercial traditional-style beer)          | Chibuku (commercial traditional-style beer)      |
-| Cocoa, Millo                                | Beverage    | ---                        | Cocoa, millo                                     | Cocoa, millo                                     | ---                                                 | Cocoa, millo                                     |
 | Honey                                       | Sugar       | ---                        | Honey                                            | Honey                                            | Honey                                               | Honey                                            |
 | Mutton                                      | Meat        | ---                        | Mutton                                           | Mutton                                           | Mutton                                              | Mutton                                           |
 | Mushroom                                    | Vegetables  | ---                        | Mushroom                                         | Mushroom                                         | Mushroom                                            | Mushroom                                         |
@@ -143,9 +140,9 @@
 | Popcorn                                     | Maize       | ---                        | ---                                              | Popcorn                                          | Popcorn                                             | ---                                              |
 | Groundnut Fresh (Unshelled)                 | Legumes     | ---                        | ---                                              | Groundnut Fresh (UnShelled)                      | Groundnut Fresh (UnShelled)                         | ---                                              |
 | Smoked Fish (Small Variety)                 | Fish        | ---                        | ---                                              | Smoked fish (Small Variety)                      | Smoked fish (Small Variety)                         | ---                                              |
-| Cocoa, Milo                                 | Beverage    | ---                        | ---                                              | ---                                              | Cocoa, milo                                         | Cocoa, millo                                     |
+| Cocoa, Milo                                 | Beverage    | ---                        | Cocoa, millo                                     | Cocoa, millo                                     | Cocoa, milo                                         | Cocoa, millo                                     |
 | Kalongonda (Mucuna)                         | Vegetables  | ---                        | ---                                              | ---                                              | KALONGONDA (Mucuna)                                 | ---                                              |
-| Groundnut Dried (Unshelled)                 | Legumes     | ---                        | ---                                              | ---                                              | Groundnut Dried (UnShelled)                         | ---                                              |
+| Groundnut Dried (Unshelled)                 | Legumes     | ---                        | ---                                              | Groundnut (unshelled)                            | Groundnut Dried (UnShelled)                         | ---                                              |
 | Smoked Fish                                 | Fish        | ---                        | Smoked fish                                      | ---                                              | ---                                                 | ---                                              |
 | Sweet Potato - Boiled (Vendor)              | Vendor      | ---                        | ---                                              | Boiled sweet potatoes                            | Boiled sweet potatoes                               | ---                                              |
 | Sweet Potato - Roasted (Vendor)             | Vendor      | ---                        | ---                                              | Rosted sweet potatoes                            | Roasted sweet potatoes                              | ---                                              |
@@ -288,3 +285,49 @@
 | RURAL              | Rural           |
 | urban              | Urban           |
 | URBAN              | Urban           |
+
+#+name: region
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| North              | North           |
+| Central            | Central         |
+| Centre             | Central         |
+| Southern           | Southern        |
+| South              | Southern        |
+
+#+name: Roof
+| Alternate Spelling | Preferred Label  |
+|--------------------+------------------|
+| Grass              | Grass            |
+| grass              | Grass            |
+| GRASS              | Grass            |
+| Iron sheets        | Iron Sheets      |
+| IRON SHEETS        | Iron Sheets      |
+| Clay tiles         | Clay Tiles       |
+| CLAY TILES         | Clay Tiles       |
+| Plastic sheeting   | Plastic Sheeting |
+| PLASTIC SHEETING   | Plastic Sheeting |
+| Concrete           | Concrete         |
+| concrete           | Concrete         |
+| CONCRETE           | Concrete         |
+| Other (specify)    | Other            |
+| OTHER (SPECIFY)    | Other            |
+
+#+name: Floor
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| Smoothed mud       | Smoothed Mud    |
+| SMOOTHED MUD       | Smoothed Mud    |
+| Smooth cement      | Smooth Cement   |
+| SMOOTH CEMENT      | Smooth Cement   |
+| Sand               | Sand            |
+| sand               | Sand            |
+| SAND               | Sand            |
+| Tile               | Tile            |
+| tile               | Tile            |
+| TILE               | Tile            |
+| Wood               | Wood            |
+| wood               | Wood            |
+| WOOD               | Wood            |
+| Other (Specify)    | Other           |
+| OTHER(SPECIFY)     | Other           |
