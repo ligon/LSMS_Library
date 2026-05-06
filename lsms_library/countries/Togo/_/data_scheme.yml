@@ -26,10 +26,16 @@ Data Scheme:
     index: (t, i, pid)
     Educational Attainment: str
   food_acquired:
-    index: (t, visit, i, j, u)
+    # Canonical post-2026-05-05 (GH #169): s axis carries acquisition
+    # source (purchased / produced / inkind / other).  The wave-level
+    # mapping.py food_acquired() function reshapes the wide-form
+    # (Quantity-total, Produced-subset, Expenditure) into long-form on s.
+    # `visit` (vague) is dropped: in EHCVM 2018 it's a sample split
+    # (each grappe surveyed in exactly one vague), not a repeated measure,
+    # so households are uniquely keyed by (t, v, i, j, u, s) without it.
+    index: (t, v, i, j, u, s)
     Quantity: float
     Expenditure: float
-    Produced: float
   assets:
     index: (t, i, j)
     Quantity: float

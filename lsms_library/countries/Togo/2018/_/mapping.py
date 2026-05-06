@@ -98,3 +98,75 @@ def household_roster(df):
     df["Age"] = df.apply(_age_from_row, axis=1)
     df = df.drop('interview_date', axis='columns')
     return df
+
+
+def food_acquired(df):
+    '''
+    Reshape Togo 2018 food_acquired to the canonical (s) form.
+
+    Inputs (post-data_grabber):
+      - Index: (i, t, v, visit, j, u)
+      - Columns: Quantity (TOTAL acquired in unit u, s07bq03a),
+                 Expenditure (monetary value of purchases, s07bq08),
+                 Produced (subset of Quantity from own production, s07bq04)
+
+    Output:
+      - Index: (t, v, i, j, u, s)
+      - Columns: Quantity, Expenditure
+      - Price is api-derived (computed downstream for s=purchased).
+
+    Reshape rules:
+      - Each input row -> up to 2 long-form rows:
+        * s='purchased': Quantity = (Total - Produced) clipped at 0,
+          Expenditure as observed
+        * s='produced':  Quantity = Produced, Expenditure = NaN
+      - Rows with no measurements after the split are dropped.
+      - visit (vague) is dropped: in EHCVM 2018 it's a sample split,
+        not a repeated measure (each household appears in exactly one
+        vague).  Confirmed empirically during the Benin pilot
+        (commit 27e3d963: 0 of 8012 Benin households had multiple
+        visits, 0 of 670 clusters did).  EHCVM-7 share this design
+        per CLAUDE.md.
+
+    See: slurm_logs/DESIGN_food_acquired_canonical_2026-05-05.org, GH #169.
+    '''
+    import pandas as pd
+    import numpy as np
+
+    work = df.reset_index()
+    work = work.drop(columns=['visit'])
+
+    # Purchased = Total - Produced, clipped at zero (a few survey rows
+    # have Produced slightly > Quantity due to rounding; treat those as
+    # purchased=0 rather than negative).
+    purchased_qty = (work['Quantity'].fillna(0)
+                     - work['Produced'].fillna(0)).clip(lower=0)
+
+    purchased = pd.DataFrame({
+        't': work['t'].values,
+        'v': work['v'].values,
+        'i': work['i'].values,
+        'j': work['j'].values,
+        'u': work['u'].values,
+        's': 'purchased',
+        'Quantity': purchased_qty.values,
+        'Expenditure': work['Expenditure'].values,
+    })
+    purchased = purchased[(purchased['Quantity'] > 0)
+                          | (purchased['Expenditure'] > 0)]
+
+    produced = pd.DataFrame({
+        't': work['t'].values,
+        'v': work['v'].values,
+        'i': work['i'].values,
+        'j': work['j'].values,
+        'u': work['u'].values,
+        's': 'produced',
+        'Quantity': work['Produced'].values,
+        'Expenditure': np.nan,
+    })
+    produced = produced[produced['Quantity'].fillna(0) > 0]
+
+    out = pd.concat([purchased, produced], ignore_index=True)
+    out = out.set_index(['t', 'v', 'i', 'j', 'u', 's'])
+    return out
