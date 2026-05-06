@@ -9,6 +9,34 @@ from pandas import concat, get_dummies, MultiIndex
 from cfe.df_utils import use_indices
 from .local_tools import format_id
 
+
+# Canonical values for the food_acquired ``s`` (acquisition source) index
+# level.  See ``slurm_logs/DESIGN_food_acquired_canonical_2026-05-05.org``
+# and GH #169.  ``data_info.yml`` does not currently support enumerated
+# value constraints on index levels, so the enumeration lives here and is
+# enforced in code by :func:`validate_acquisition_source`.
+S_VALUES = ('purchased', 'produced', 'inkind', 'other')
+
+
+def validate_acquisition_source(df: pd.DataFrame) -> None:
+    """Raise ``ValueError`` if ``s`` index level contains non-canonical values.
+
+    No-op when ``s`` is not in the index.  Called from
+    :meth:`Country._finalize_result` for tables that carry an ``s`` level
+    (currently just ``food_acquired`` and its derivatives).
+    """
+    if 's' not in (df.index.names or []):
+        return
+    observed = set(df.index.get_level_values('s').dropna().unique())
+    invalid = observed - set(S_VALUES)
+    if invalid:
+        raise ValueError(
+            f"Non-canonical values in 's' index level: {sorted(invalid)}. "
+            f"Allowed values are {S_VALUES}.  See "
+            f"slurm_logs/DESIGN_food_acquired_canonical_2026-05-05.org."
+        )
+
+
 def age_intervals(age, age_cuts=(4, 9, 14, 19, 31, 51)):
     """Bucket ages into half-open intervals for household_characteristics.
 

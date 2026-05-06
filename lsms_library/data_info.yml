@@ -8,6 +8,7 @@ Single Index:
   int_t: interview date
   u: unit
   m: region
+  s: acquisition source       # values: purchased, produced, inkind, other (food_acquired)
 
 Index Info:
   note: global index info
@@ -16,7 +17,7 @@ Index Info:
     household_roster: (t, v, i, pid)
     household_characteristics: (t, v, i, m)
     plot_features: (t, v, i, plot_id)
-    food_acquired: (t, m, v, i, j, u)
+    food_acquired: (t, v, i, j, u, s)
     interview_date: (t, v, i)
     shocks: (t, i, Shock)
     panel_ids: (t, i)
@@ -123,6 +124,29 @@ Columns:
   panel_ids:
     previous_i:
       type: str
+  food_acquired:
+    # Acquisition source 's' is an INDEX level (see Index Info above),
+    # not a column.  Canonical values: purchased, produced, inkind,
+    # other.  Enforced in code (lsms_library.transformations.S_VALUES);
+    # data_info.yml has no schema for index-level value enumerations.
+    Quantity:
+      type: float
+      required: true
+      note: amount acquired in unit u, per acquisition source s
+    Expenditure:
+      type: float
+      note: monetary value of the acquisition; primarily for
+        s=purchased, also for s=inkind where the survey records an
+        imputed value
+    Price:
+      type: float
+      api_derived: true
+      note: |
+        Value per unit at the relevant point of acquisition.  Market
+        price for s=purchased (Expenditure / Quantity, back-calculated
+        in _finalize_result if not stored).  Farmgate price for
+        s=produced (survey-reported where available).  Imputed value
+        for s=inkind where available.  NaN otherwise.
 
 # Spellings that must never appear in column names.  Key is the rejected
 # spelling; value is the canonical replacement.

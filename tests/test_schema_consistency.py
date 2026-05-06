@@ -96,6 +96,22 @@ _TABLE_SCHEMES: dict[str, list[tuple[str, Path, dict]]] = {
     for table in _TABLES_WITH_REQUIREMENTS
 }
 
+# (country, table) pairs whose required-column check is expected to fail
+# while a documented migration is in progress.  When the country's
+# data_scheme.yml is updated to declare the canonical columns, remove the
+# entry here.  When the set is empty, drop the xfail logic entirely.
+_REQUIRED_COLUMN_XFAILS: dict[tuple[str, str], str] = {
+    # food_acquired canonical schema migration (GH #169 / DESIGN_food_acquired_canonical_2026-05-05).
+    # These four countries declare `food_acquired: !make` without column
+    # listings; their wave-level scripts emit non-canonical column names.
+    # xfail removed per country as each is reshaped onto the (s, j, u)
+    # canonical form.
+    ("Ethiopia", "food_acquired"): "food_acquired migration: GH #169",
+    ("Malawi", "food_acquired"): "food_acquired migration: GH #169",
+    ("Tanzania", "food_acquired"): "food_acquired migration: GH #169",
+    ("Uganda", "food_acquired"): "food_acquired migration: GH #169",
+}
+
 
 # ---------------------------------------------------------------------------
 # Tests
@@ -109,9 +125,14 @@ class TestRequiredColumns:
         for table, schemes in _TABLE_SCHEMES.items():
             required = _required_columns(table)
             for country, path, spec in schemes:
+                marks = ()
+                xfail_reason = _REQUIRED_COLUMN_XFAILS.get((country, table))
+                if xfail_reason:
+                    marks = (pytest.mark.xfail(reason=xfail_reason, strict=False),)
                 yield pytest.param(
                     country, path, spec, table, required,
                     id=f"{country}:{table}",
+                    marks=marks,
                 )
 
     @pytest.mark.parametrize(
