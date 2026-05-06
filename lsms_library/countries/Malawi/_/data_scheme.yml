@@ -40,7 +40,18 @@ Data Scheme:
     index: (t, i)
     Roof: str
     Floor: str
-  food_acquired: !make
+  food_acquired:
+    # Canonical post-2026-05-05 (GH #169): s axis carries acquisition
+    # source (purchased / produced / inkind).  Wave-level food_acquired.py
+    # threads the per-source quantities and units through the conversion
+    # tables and then calls malawi.food_acquired_to_canonical, which
+    # handles the long-form melt and fixes Malawi's legacy (j=HHID,
+    # i=item) -> canonical (i=HHID, j=item) inversion.  See
+    # slurm_logs/DESIGN_food_acquired_canonical_2026-05-05.org.
+    index: (t, i, j, u, s)
+    Quantity: float
+    Expenditure: float
+    materialize: make
   interview_date:
     index: (t, visit, i)
     Int_t: str

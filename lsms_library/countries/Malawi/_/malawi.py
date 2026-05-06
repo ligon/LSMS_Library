@@ -188,6 +188,103 @@ def _normalize_label_key(k):
     return out
 
 
+def food_acquired_to_canonical(df, wave):
+    """Reshape Malawi wide-form ``food_acquired`` to canonical long form.
+
+    Phase 3 of GH #169 / DESIGN_food_acquired_canonical_2026-05-05.org.
+
+    Inputs
+    ------
+    df : DataFrame
+        Wave-level wide-form output produced by the per-wave food_acquired.py
+        scripts after all per-source unit-conversion machinery has run.
+        Index ``(j, t, i)`` per Malawi's legacy convention where ``j`` is
+        the household ID and ``i`` is the food item (opposite of the
+        canonical LSMS convention).  Recognized columns:
+
+        * ``quantity_bought``, ``u_bought``, ``expenditure``
+          (purchased rows; Expenditure populated)
+        * ``quantity_produced``, ``u_produced``  (produced rows;
+          Expenditure NaN)
+        * ``quantity_gifted``, ``u_gifted``      (in-kind rows;
+          Expenditure NaN)
+
+        Any of ``quantity_consumed``, ``u_consumed``, ``cfactor_*``,
+        ``price per unit`` (and other vestigial columns) are silently
+        ignored — only the per-source columns above are read.
+    wave : str
+        Wave label (e.g. ``'2010-11'``) — passed through to
+        :func:`apply_harmonize_food` for the food-label rename.
+
+    Output
+    ------
+    DataFrame indexed by canonical ``(t, i, j, u, s)`` where
+    ``i`` is the household ID and ``j`` is the food item (the legacy
+    Malawi ``j↔i`` swap is handled inside this function).
+    Columns: ``Quantity``, ``Expenditure``.
+    ``s`` ∈ ``{'purchased', 'produced', 'inkind'}``.
+
+    Notes
+    -----
+    - Rows whose Quantity is NaN, zero, or negative are dropped.
+    - Food labels are normalized via :func:`apply_harmonize_food` at
+      ``level='j'`` before returning.
+    - ``v`` is intentionally absent — the framework joins it from
+      ``sample()`` at API time; see CLAUDE.md "## ``sample()`` and
+      Cluster Identity".
+    """
+    work = df.reset_index()
+    # Swap legacy Malawi (j=HHID, i=item) to canonical (i=HHID, j=item).
+    work = work.rename(columns={'j': '_i_canon', 'i': '_j_canon'})
+    work = work.rename(columns={'_i_canon': 'i', '_j_canon': 'j'})
+
+    def _make(source_label, quant_col, unit_col, value_col=None):
+        if quant_col not in work.columns:
+            return None
+        out = pd.DataFrame({
+            't': work['t'].values,
+            'i': work['i'].values,
+            'j': work['j'].values,
+            'u': (work[unit_col].values if unit_col in work.columns
+                  else pd.NA),
+            's': source_label,
+            'Quantity': pd.to_numeric(work[quant_col],
+                                      errors='coerce').values,
+        })
+        if value_col is not None and value_col in work.columns:
+            out['Expenditure'] = pd.to_numeric(work[value_col],
+                                               errors='coerce').values
+        else:
+            out['Expenditure'] = pd.NA
+        return out
+
+    pieces = []
+    for src, qcol, ucol, vcol in [
+        ('purchased', 'quantity_bought',   'u_bought',   'expenditure'),
+        ('produced',  'quantity_produced', 'u_produced', None),
+        ('inkind',    'quantity_gifted',   'u_gifted',   None),
+    ]:
+        piece = _make(src, qcol, ucol, value_col=vcol)
+        if piece is not None:
+            pieces.append(piece)
+
+    if not pieces:
+        raise ValueError(
+            "food_acquired_to_canonical: no source columns "
+            "(quantity_bought / quantity_produced / quantity_gifted) "
+            "found in input"
+        )
+
+    out = pd.concat(pieces, ignore_index=True)
+    # Drop rows without a positive Quantity.
+    out = out[out['Quantity'].notna() & (out['Quantity'] > 0)]
+    out = out.set_index(['t', 'i', 'j', 'u', 's']).sort_index()
+
+    # Normalize food labels on the canonical 'j' level.
+    out = apply_harmonize_food(out, wave, level='j')
+    return out
+
+
 def apply_harmonize_food(df, wave, level='i'):
     """Rename *level* of *df*'s index via Malawi's harmonize_food table.
 
