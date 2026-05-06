@@ -1,6 +1,6 @@
 ---
 name: release
-description: Use this skill when cutting a release (poetry build + wheel upload) of the LSMS Library. Covers poetry-dynamic-versioning plugin install, the Linux keyring hang, and the need for outbound internet during builds.
+description: Use this skill when cutting a release (poetry build + wheel upload) of the LSMS Library. Covers poetry-dynamic-versioning plugin install, the Linux keyring hang on headless hosts, broken-system-poetry workarounds, and Savio compute-node outbound-network status.
 ---
 
 # Release Tooling Gotchas
@@ -53,22 +53,22 @@ PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring poetry build
 Slurm submission scripts for release builds should export this env
 var unconditionally.
 
-## Outbound internet on Savio compute nodes (was: blocked, now: works)
+## Outbound internet on Savio compute nodes (works)
 
-Originally observed 2026-04-10: `poetry build` failed with DNS
-errors on Savio2 compute nodes; release builds had to be run from
-the login node.
+Outbound HTTPS to `pypi.org`, `files.pythonhosted.org`, and
+`github.com` works from Savio2 compute nodes — confirmed
+2026-04-28 on `n0291.savio2` and 2026-05-06 on `n0293.savio2`
+(HTTP 200 in 30–210 ms each).  **Release builds, `poetry install`,
+`pip install`, `dvc push`, and `poetry publish` all run fine from
+a compute node.**
 
-**Updated 2026-04-28**: outbound HTTPS reaches `pypi.org`,
-`github.com`, and `files.pythonhosted.org` from at least
-`n0291.savio2` (HTTP 200 in 30–200 ms each).  Either the original
-outage was transient or the cluster's network policy has been
-relaxed.  **Release builds can run from a compute node again** —
-verify with a quick `curl -s -o /dev/null -w "%{http_code}\n"
-https://pypi.org/` before relying on it.
-
-The login-node fallback remains a safe default for release builds
-that take long enough to be expensive to retry.
+Historical note: a 2026-04-10 session reported DNS failures on a
+Savio2 compute node; that outage hasn't recurred in any subsequent
+session.  Treat it as a one-off — don't preemptively fall back to
+the login node.  If a fresh session does see DNS or connection
+failures, a quick `curl -sS -o /dev/null -w "%{http_code}\n"
+https://pypi.org/` confirms whether outbound is the actual culprit
+before chasing it further.
 
 ## Working around a broken system poetry
 
