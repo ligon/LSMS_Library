@@ -1,0 +1,331 @@
+#+TITLE: Handoff -- Phase 3 + Phase 4 of food_acquired Canonical Migration (GH #169)
+#+DATE: 2026-05-06
+#+AUTHOR: scrum-master session (Sue / Claude Opus 4.7, with Sonnet 4.5 worker agents)
+
+* Session summary
+
+Picked up where the killed 2026-05-05 evening session left off.  That
+session had landed Phase 1 (canonical schema declaration) and Phases
+2A/2B (EHCVM-7 + Burkina Faso wave-script reshape) before its hosting
+process died ~22:35.  Master was still 22 commits behind
+=origin/development= when this session began.
+
+Today's session covers:
+
+- Phase 3 fan-out (the "bespoke 7" tier from the design doc), 6 of 7
+  countries done: *Nigeria, Tanzania, Malawi, Ethiopia, Uganda*.
+  GhanaLSS deferred (see /Open work/).  Burkina Faso was already
+  folded into Phase 2B by the prior session.
+- Phase 4 in full: derived-table semantics
+  (=food_expenditures, food_prices, food_quantities=) preserve the
+  =s= acquisition-source axis.
+- Two ancillary fixes surfaced en route: =format_id= period-truncation
+  bug (#222) and =conversion_to_kgs= pandas-2.x type bug.
+- Two Tanzania pandas-2.x compat fixes folded in opportunistically
+  while verifying the Phase 3 Tanzania reshape.
+- Skill updates in =../sucoder-skills/scrum-master-hpc/SKILL.md= for
+  two harness gotchas observed today (scatter-gather worktree-base
+  drift, and the recommended self-reset-at-top recovery).
+
+Net: =development= advanced from =400475ae= to =c8d8f525= with 17
+commits.  Pushed to =origin=.  Master not advanced (no FF this
+session); the gap is now ~38 commits, all on a coherent Phase 3 +
+Phase 4 line.  Ready for FF when convenient.
+
+Pytest not run end-to-end this session -- the reshape work touches
+many country fixtures, and the pre-existing replication-package
+xfails would muddy the signal.  /Open work/ flags the post-merge
+test-suite check as a pre-FF gate.
+
+* Cost
+
+| When                | =fc_jevons= SUs used | Note                                         |
+|---------------------+----------------------+----------------------------------------------|
+| Session start 05:13 | 36,299.41            | from =check_usage.sh -a fc_jevons=           |
+| Session end ~18:40  | 36,299.41            | identical (script reconciliation lag, again) |
+
+The =check_usage.sh -a fc_jevons= reconciliation behaviour matches
+the 2026-04-28 session's experience -- the SU figure is stale
+relative to the day's actual draw.  Real cost: ~14 hours wall on a
+24-core compute node held by =no-shell= job =34020685= on
+=n0293.savio2=, but most of that wall was idle (background-agent
+dispatches sleeping while I worked at human pace, plus the sub-agent
+verification windows).  Estimated true CPU-hours << 100, well within
+allocation slack (~1.46 M SUs remaining).
+
+* Commits (in landing order on =development=)
+
+| Hash        | Subject                                                                       |
+|-------------+-------------------------------------------------------------------------------|
+| =400475ae= | docs(release): drop stale outbound-internet hedge on Savio                     |
+| =7307ab9c= | feat(Tanzania/food_acquired): canonical s-axis reshape (Phase 3)               |
+| =8def205d= | feat(Nigeria/food_acquired): canonical s-axis reshape (Phase 3)                |
+| =3c4f3539= | refactor(transformations): food_acquired_to_canonical accepts v-less input     |
+| =44a55db6= | refactor(Nigeria/food_acquired): drop v-NaN placeholder dance                  |
+| =c479cb10= | feat(Malawi/food_acquired): Phase 3 pilot - helper + 2010-11 reshape           |
+| =0ee5137f= | fix(transformations): vectorize conversion_to_kgs unit lookup (pandas 2.x)     |
+| =3b964436= | feat(Malawi/2013-14/food_acquired): canonical s-axis reshape (Phase 3)         |
+| =513f2a5c= | feat(Malawi/2016-17/food_acquired): canonical s-axis reshape (Phase 3)         |
+| =9383d26d= | feat(Malawi/2019-20/food_acquired): canonical s-axis reshape (Phase 3)         |
+| =65c939e7= | feat(Malawi/2004-05/food_acquired): canonical s-axis reshape (Phase 3)         |
+| =28429f14= | fix(Malawi): dedup canonical food_acquired rows in the helper                  |
+| =2ab51106= | fix(format_id): only strip ``.xxx`` decimal when both sides are digits (#222)  |
+| =25b01736= | refactor(Malawi): drop apply_harmonize_food bypass of get_categorical_mapping  |
+| =9c4ba58a= | feat(Ethiopia/food_acquired): canonical s-axis reshape (Phase 3)               |
+| =b9df8fb4= | feat(transformations): preserve =s= in derived food tables (Phase 4, #169)     |
+| =c8d8f525= | feat(Uganda/food_acquired): canonical s-axis reshape (Phase 3)                 |
+
+* Per-country Phase-3 outcome (verified end-to-end)
+
+| Country      | Pattern                                | Final shape (sample wave)                              | s vocabulary               |
+|--------------+----------------------------------------+--------------------------------------------------------+----------------------------|
+| Nigeria      | Drop =m=; framework helper             | (319954, 2) for 2018-19, idx (t,i,j,u,s)              | {purchased, produced}       |
+| Tanzania     | Per-country helper, suffix melt        | (229377, 2) for 2008-15, all 4 rounds                 | {purchased, produced, inkind} |
+| Malawi       | Per-country helper, i/j swap, dedup    | (198306, 2) for 2010-11 pilot, all 5 waves done       | {purchased, produced, inkind} |
+| Ethiopia     | Derive Produced = Total - Purchased; framework helper | (31084, 2) for 2011-12, all 5 waves done | {purchased, produced}       |
+| Uganda       | Per-country helper, home/away->purchased; preserve market/farmgate Price | (39495, 3) for 2005-06, all 8 waves done | {purchased, produced, inkind} |
+| Burkina Faso | (folded into Phase 2B on 2026-05-05)   | -- already canonical --                               | {purchased, produced}       |
+
+GhanaLSS not done.  See /Open work/.
+
+* Skill updates
+
+** =./.claude/skills/release/SKILL.md= (committed in =400475ae=)
+   Demoted the 2026-04-10 outbound-internet outage from a hedged
+   "(was: blocked, now: works)" advisory to a flat "works" with two
+   confirmation data points (n0291.savio2 on 2026-04-28, n0293.savio2
+   on 2026-05-06).  Front-matter description rewritten.  Empirically
+   PyPI / GitHub / files.pythonhosted.org all reach via HTTPS in
+   30-210 ms.
+
+** =../sucoder-skills/scrum-master-hpc/SKILL.md= (UNCOMMITTED on remote -- separate repo, defers to user push cadence)
+
+   Local commits:
+   - =0b4f2a9= scrum-master-hpc: per-worktree base verification when
+     scatter-gathering.  When several agents are launched in a single
+     message, individual worktrees may branch from /different/ parent
+     commits.  =git worktree list= once after dispatch and confirm
+     every entry is at the expected SHA.  Empirical anchor:
+     2026-05-06 a five-agent dispatch put all five worktrees on the
+     stale =master= tip; an earlier two-agent dispatch had landed
+     half-and-half.
+
+   - =9743c96= scrum-master-hpc: self-reset preamble preferred over
+     abort-on-mismatch.  When the harness mis-defaults to =master=,
+     prepending an unconditional reset to every worker prompt is more
+     productive than verify-and-bail:
+
+     #+begin_src bash
+     git -C "$(pwd)" fetch origin <branch> 2>&1 | tail -2
+     git -C "$(pwd)" reset --hard origin/<branch>
+     git -C "$(pwd)" log -1 --oneline
+     #+end_src
+
+     Idempotent on already-correct bases; sidesteps the heuristic
+     entirely.  Followed today's later dispatches and worked.
+
+   The two skill commits sit on local =main= of
+   =/global/scratch/fsa/fc_jevons/ligon/mirrors/sucoder-skills= and
+   are NOT pushed -- per the workspace convention that skill repos
+   defer to the user's push cadence.
+
+* Open work
+
+** [P3] GhanaLSS Phase 3                                                :A:
+   The remaining bespoke-7 country.  Seven waves
+   (=1987-88= ... =2016-17=); each wave script is its own ~60-90
+   line beast with multi-visit (range(1,7)) =df_data_grabber=
+   iterations and separate paths for purchased vs home-produced data
+   joined later.  Not a drop-in helper job.
+
+   /Recommended approach (deferred to a focused session)/: pick one
+   wave (probably =2016-17= as the most recent and most-instrumented)
+   as a pilot; develop a =ghanalss.food_acquired_to_canonical= helper
+   from it; fan out to the other six waves in parallel once the
+   pattern stabilizes.  Estimated 2-4 hours wall.
+
+** [P3.5] Survey-reported Price for produced rows                       :B:
+   Uganda's Phase 3 commit chose Path B from the design doc -- the
+   wave parquets now carry a =Price= column whose values are the
+   survey-reported =market= price for s=purchased and =farmgate=
+   price for s=produced.  But =food_prices_from_acquired= in
+   =transformations.py= still re-derives Price as
+   =Expenditure / Quantity_kg= on every row and silently ignores any
+   stored Price column.
+
+   /Recommended fix/: change =food_prices_from_acquired= to prefer a
+   stored =Price= over the back-calculation when present.  One-liner;
+   maybe ~5 lines with a clean docstring.  Closes the design-doc
+   intent on per-=s= price semantics:
+
+   #+begin_quote
+   |  s         | Price means          | source                                          |
+   |  purchased | market price         | Expenditure / Quantity (back-calculated)        |
+   |  produced  | farmgate price       | survey-reported where available, else NaN       |
+   |  inkind    | imputed value        | survey-reported where available, else NaN       |
+   #+end_quote
+
+   Currently for Uganda, the back-calculation gives correct Price for
+   purchased rows and NaN-and-dropped for produced/inkind (zero
+   Expenditure on those rows).  Survey-reported farmgate / imputed
+   values are simply not surfaced through the framework -- but they
+   are in Uganda's wave parquet on disk for any analyst who reads it
+   directly.  Phase 3 outcome is *correct under current contract*;
+   Phase 3.5 unlocks the design's intent.
+
+** [P3] Retire Uganda's legacy =food_prices_quantities_and_expenditures.py= :C:
+   Uganda was the last hold-out from GH #218's "retire the legacy
+   food_*.py family" cleanup, blocked on Phase 3 (the legacy script
+   needed wide-form columns =value_home, value_away, ...= that the
+   canonical reshape no longer emits at country-level).  With Uganda
+   Phase 3 landed, the script is obsolete -- the framework's
+   =_FOOD_DERIVED= dispatch correctly fires on the canonical
+   =Expenditure= column.
+
+   Mirrors the Malawi-side retirement in commit =7a525b0c= (#219).
+   Mechanical follow-up.
+
+** [P5] Vocabulary harmonization (#223 just filed)                       :C:
+   Filed today: GH #223 "Wire categorical_mapping 'unit' table to
+   canonical 'u' index level (Phase 5 -- Malawi evidence)".
+
+   Concretely-Malawi: 220 distinct =u= values in 2010-11 post-Phase-3
+   (free-text plate names, raw codes, partial 'kg' canonicalization).
+   Cross-country: 14 countries × 385 distinct =u= values across all
+   of food_acquired = a real Phase 5 sweep.  Per the design doc
+   Phase 5 is explicitly deferred from the s-axis migration; #223
+   captures the entry point.
+
+** [Tanzania] xfail re-evaluation                                       :B:
+   Two pre-existing pandas-2.x compat bugs in =Tanzania/_/tanzania.py=
+   were folded into commit =7307ab9c= (the dedup =assert_frame_equal=
+   paranoia check, and the =to_frame()= 2-D mask in
+   =new_harmonize_units=).  Both surfaced because the Phase 3 reshape
+   needed the wave script to actually run; both are independent bugs
+   that were quietly blocking Tanzania's wave-level builds.
+
+   /Followups/: the four Tanzania-related xfails from 2026-04-28
+   (=earnings, enterprise_income, income, locality=) may now XPASS
+   given the framework derivations work cleanly on canonical
+   Expenditure.  Worth a =pytest -k tanzania= and removing whichever
+   xfails XPASS.
+
+** [release] v0.7.2 wheel                                                :B:
+   Still uncut from the 2026-04-28 backlog.  After Phase 3 GhanaLSS
+   lands and master fast-forwards, this is the natural moment for
+   v0.7.2 (or v0.8.0 -- the =s= axis is a meaningful API change
+   that arguably warrants a minor bump).
+
+** [DVC] flufl.lock contention                                           :B:
+   v0.7.3-tagged item from 2026-04-28 still pending.
+   =_ensure_dvc_pulled= hits a lock-time-out under =make -j12=
+   orchestration.  Independent of Phase 3 / 4.
+
+** [#218] DVC lock contention follow-on                                  :C:
+   See /v0.7.3 DVC lock contention/ in =HANDOFF_2026-04-28.org=.
+
+* Cache invalidation note for next session
+
+After Phase 3 commits, anyone pulling =development= and running
+=Country(X).food_acquired()= against an existing parquet cache will
+see *legacy-shape* output -- the cache does not auto-invalidate when
+wave scripts change (per CLAUDE.md "## Cache Behavior").  Before
+running tests on a freshly-pulled tip:
+
+#+begin_src sh
+for c in Nigeria Tanzania Malawi Ethiopia Uganda; do
+    lsms-library cache clear --country "$c"
+done
+#+end_src
+
+or set =LSMS_NO_CACHE=1= in the session.  This caught me twice today
+during Phase 4 verification -- /the cached parquets were stale Phase
+3 output/ even after the Phase 3 commits had been on
+=origin/development= for hours.
+
+There is a related secondary issue: dispatched worker agents'
+verification builds wrote parquets to their /worktree directory/
+rather than the shared cache (because =_resolve_data_path()= can't
+infer country/wave when the script lives under
+=.claude/worktrees/agent-XXX/lsms_library/...=).  Net effect: the
+shared cache remained legacy until the coordinator force-rebuilt
+each country.  Worth a future fix in =_resolve_data_path= to handle
+worktree paths correctly, but it's a low-priority developer-tooling
+ergonomic, not a correctness issue.
+
+* Harness gotchas observed today (worth handoff awareness)
+
+** Worktree base drift on multi-agent dispatch
+   Worker agents with =isolation: "worktree"= can land on the wrong
+   parent commit -- empirically the harness defaults to =master= when
+   the user is on =development=.  Lessons baked into
+   =sucoder-skills/scrum-master-hpc/SKILL.md=:
+
+   1. Always =git worktree list= after a multi-agent dispatch and
+      verify each entry's SHA individually (commit =0b4f2a9=).
+   2. Prepend an unconditional =git fetch origin <branch> && git
+      reset --hard origin/<branch>= block to every worker prompt to
+      self-correct (commit =9743c96=).  Avoids the
+      bounce-and-redispatch round trip when the harness mis-defaults.
+
+** Edit/Write tool path-resolution glitch
+   Sub-agents reported (intermittently) that the harness's =Edit= /
+   =Write= tools would route file modifications to the *main checkout*
+   instead of the agent's worktree, despite =cwd= being the worktree.
+   Detection: =git -C <worktree> status= shows the file clean even
+   though the agent just edited it; =git -C <main> status= shows the
+   diff.  Recovery: bash heredoc + =cp= to write the file directly,
+   then =md5sum= to confirm both paths.
+
+   Two of the seven worker agents I ran today hit this; one
+   (Malawi 2013-14) caught and recovered cleanly, one (Malawi 2016-17)
+   recovered after several Edit attempts failed.  Five others edited
+   in-worktree without issue.  No clear pattern on triggers.  Worth
+   reporting to harness vendor if it persists.
+
+** Sub-agent narrative termination
+   Two agents (Malawi 2004-05, Ethiopia) terminated mid-narrative
+   ("Probes still running.  Let me wait for the Monitor's notification.")
+   without committing despite making complete and correct edits.
+   Worktree had complete diff; coordinator committed on their behalf.
+   Likely a harness-side timeout or thinking-budget exhaustion.
+
+* Path forward -- minimal next-session restart sequence
+
+#+begin_src sh
+# 1. Confirm where we are
+git status
+git log --oneline -5            # should show c8d8f525 at tip
+
+# 2. Clear stale post-Phase-3 caches
+for c in Nigeria Tanzania Malawi Ethiopia Uganda; do
+    lsms-library cache clear --country "$c"
+done
+
+# 3. Smoke-test the Phase 3 + 4 chain
+.venv/bin/python -c "
+import lsms_library as ll
+mwi = ll.Country('Malawi')
+fa = mwi.food_acquired()
+print('food_acquired:', fa.shape, fa.index.names)
+fp = mwi.food_prices()
+print('food_prices:  ', fp.shape, fp.index.names)
+"
+
+# 4. Pick up wherever:
+#    - GhanaLSS Phase 3
+#    - Phase 3.5 (survey-reported Price preference)
+#    - master FF + v0.7.2 / v0.8.0 release
+#    - Tanzania xfail re-eval
+#    - or something else
+#+end_src
+
+* References
+
+- Design doc: =slurm_logs/DESIGN_food_acquired_canonical_2026-05-05.org=
+- Prior handoff: =slurm_logs/HANDOFF_2026-04-28.org= (v0.7.2 prep)
+- GH issues touched today: #169 (s-axis), #216 (Malawi label drift,
+  closed by mojibake fix in earlier session), #222 (format_id, closed
+  by =2ab51106=), #223 (filed for Phase 5)
+- Skills: =./.claude/skills/release/SKILL.md=,
+  =../sucoder-skills/scrum-master-hpc/SKILL.md=
