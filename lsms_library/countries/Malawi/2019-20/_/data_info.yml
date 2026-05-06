@@ -16,6 +16,14 @@ sample:
         panel_weight: panelweight_2019
         strata: district
         Rural: reside
+        Region:
+            - region
+            - mapping:
+                North: North
+                Central: Central
+                Southern: Southern
+                South: Southern
+        District: district
 
 cluster_features:
     dfs:

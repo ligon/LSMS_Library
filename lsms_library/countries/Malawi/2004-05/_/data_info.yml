@@ -11,6 +11,18 @@ sample:
         panel_weight: hhwght
         strata: strata
         Rural: reside
+        # Region / District declared at HH grain so that
+        # _add_market_index() resolves market='Region' / 'District'
+        # via sample() (HH-level) rather than via cluster_features
+        # (cluster aggregate).  Both declarations coexist; see PR
+        # description for the design rationale (path A).
+        Region:
+            - region
+            - mapping:
+                North: North
+                Centre: Central
+                South: Southern
+        District: dist
 
 cluster_features:
     file: sec_a.dta

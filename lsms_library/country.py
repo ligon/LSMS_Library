@@ -1178,7 +1178,21 @@ class Country:
                 if not c.empty:
                     cf_parts.append(c.reset_index())
             except (FileNotFoundError, KeyError, ValueError) as exc:
-                logger.info("Skipping cluster_features for %s/%s: %s", self.name, wave, exc)
+                # Surface as a warning rather than an info-level log so that
+                # YAML / data-shape config bugs don't silently drop entire
+                # waves from market-keyed lookups.  Pre-2026-05-05 this was a
+                # logger.info that never reached users without explicit log
+                # configuration; the silent drop hid the Malawi 2013-14 /
+                # 2016-17 df_geo schema bug for years.
+                warnings.warn(
+                    f"_market_lookup: skipping cluster_features for "
+                    f"{self.name}/{wave} ({type(exc).__name__}: {exc}). "
+                    f"Rows from this wave will be absent from any "
+                    f"{column!r} lookup; check that this wave's "
+                    f"cluster_features YAML matches its source files.",
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
                 continue
 
         if not cf_parts:

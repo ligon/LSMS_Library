@@ -8,6 +8,8 @@ Data Scheme:
     panel_weight: float
     strata: str
     Rural: str
+    Region: str
+    District: str
   cluster_features:
     index: (t, v, i)
     Region: str

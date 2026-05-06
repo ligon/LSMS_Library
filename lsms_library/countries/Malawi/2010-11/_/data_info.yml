@@ -11,6 +11,46 @@ sample:
         panel_weight: hh_wgt
         strata: hh_a01
         Rural: reside
+        # 2010-11 has no separate `region` or `district` column;
+        # hh_a01 is the district *name*.  Declare Region (mapped) and
+        # District (raw) at HH grain so _add_market_index() resolves
+        # market='Region' / 'District' from sample() directly.  Same
+        # source/mapping as cluster_features.df_main below.
+        Region:
+            - hh_a01
+            - mapping:
+                Chitipa: North
+                Karonga: North
+                Nkhatabay: North
+                Rumphi: North
+                Mzimba: North
+                Mzuzu City: North
+                Kasungu: Central
+                Nkhota kota: Central
+                Ntchisi: Central
+                Dowa: Central
+                Salima: Central
+                Lilongwe: Central
+                Mchinji: Central
+                Dedza: Central
+                Ntcheu: Central
+                Lilongwe City: Central
+                Mangochi: Southern
+                Machinga: Southern
+                Zomba: Southern
+                Chiradzulu: Southern
+                Blanytyre: Southern
+                Mwanza: Southern
+                Thyolo: Southern
+                Mulanje: Southern
+                Phalombe: Southern
+                Chikwawa: Southern
+                Nsanje: Southern
+                Balaka: Southern
+                Neno: Southern
+                Zomba City: Southern
+                Blantyre City: Southern
+        District: hh_a01
 
 cluster_features:
     dfs:
@@ -61,6 +101,12 @@ cluster_features:
                     Neno: Southern
                     Zomba City: Southern
                     Blantyre City: Southern
+            # 2010-11 has no separate `district` column; hh_a01 is the
+            # district *name* (and is also consumed above as the source
+            # for Region via the district->region mapping).  Surface it
+            # raw here so cluster_features() can satisfy market='District'
+            # lookups for this wave.
+            District: hh_a01
     df_geo:
         file: Full_Sample/Geovariables/HH_level/householdgeovariables.dta
         idxvars:
