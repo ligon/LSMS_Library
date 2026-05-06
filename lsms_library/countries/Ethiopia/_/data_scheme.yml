@@ -54,7 +54,17 @@ Data Scheme:
     index: (t, i)
     Int_t: datetime
 
-  food_acquired: !make
+  food_acquired:
+    # Canonical post-2026-05-05 (GH #169): s ∈ {purchased, produced}.
+    # Wave scripts call ethiopia.food_acquired which derives Produced
+    # from (quantity - quantity_purchased) and applies the framework
+    # canonical-melt helper.  See
+    # slurm_logs/DESIGN_food_acquired_canonical_2026-05-05.org.
+    index: (t, i, j, u, s)
+    Quantity: float
+    Expenditure: float
+    materialize: make
+
   food_expenditures: !make
   food_prices: !make
   food_quantities: !make

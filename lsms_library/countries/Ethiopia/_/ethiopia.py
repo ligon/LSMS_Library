@@ -184,66 +184,86 @@ def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market'
     return prices
 
 def food_acquired(fn,myvars):
+    """Reshape Ethiopia's food_acquired into the canonical (t, i, j, u, s) form.
+
+    Phase 3 of GH #169 / DESIGN_food_acquired_canonical_2026-05-05.org.
+    Per the design row for Ethiopia:
+        "derive purchased + produced (= total - purchased)"
+
+    Ethiopia's source records, per (household, item):
+      - quantity / units              : TOTAL acquired in `units`
+      - value_purchased               : monetary value of the purchased subset
+      - quantity_purchased / units_purchased : amount and unit of the
+        purchased subset
+
+    The wave script supplies `myvars` mapping these to the source columns;
+    `t` is appended from the wave folder name (parent of cwd).
+
+    Unit handling (decision documented 2026-05-06):
+      In wave 1 (2011-12) only 64/19,231 (0.3%) of rows where both quantity
+      and quantity_purchased are positive have `units != units_purchased`.
+      The asymmetry is rare enough that we treat the row as "single-unit":
+      we use `units` as the canonical `u` axis and silently drop
+      `units_purchased`.  Produced is then derived in the same unit:
+          Produced = (quantity - quantity_purchased).clip(lower=0)
+      For the rare unit-mismatch rows the subtraction is approximate, but
+      preserving the framework helper's one-unit-per-row contract is more
+      important than the ~0.3% accuracy loss.  No kg conversion is done at
+      this layer — that lives downstream in the framework's
+      food_quantities_from_acquired path.
+    """
+    from lsms_library.transformations import food_acquired_to_canonical
 
     df = get_dataframe(fn,convert_categoricals=True)
 
     df = df.loc[:,list(myvars.values())].rename(columns={v:k for k,v in myvars.items()})
 
-    #correct unit labels 
+    # Correct unit labels (title-case + a few historical typos).  Preserved
+    # from the legacy implementation -- keeps `u` values consistent with the
+    # countries/Ethiopia/_/conversion_to_kgs.json keys that downstream code
+    # still references for kg conversion.
     df['units_purchased'] = df['units_purchased'].str.title()
     df['units'] = df['units'].str.title()
     rep = {r'\s+':' ',
            'Meduim': 'Medium',
            'Kubaya ':'Kubaya/Cup ',
            'Milliliter' : 'Mili Liter'}
-    df=df.replace(rep, regex = True)
+    df = df.replace(rep, regex=True)
 
-    df = df.set_index(['HHID','item','units','units_purchased']).dropna(how='all')
+    # Coerce HHID to canonical integer-string form when it lands as float
+    # (some Ethiopia waves' household_id columns import as float64).
+    if df['HHID'].dtype == float:
+        df['HHID'] = df['HHID'].astype(str).str.split('.').str[0].replace('nan', pd.NA)
 
-    df.index.names = ['j','i','units','units_purchased']
+    # Compute Produced = total - purchased, clipped at 0.  In ~0.3% of
+    # populated rows units != units_purchased; we accept the approximate
+    # subtraction and use `units` as the canonical unit u.
+    quantity = pd.to_numeric(df['quantity'], errors='coerce')
+    quantity_purchased = pd.to_numeric(df['quantity_purchased'], errors='coerce')
+    df['Quantity'] = quantity
+    df['Produced'] = (quantity.fillna(0) - quantity_purchased.fillna(0)).clip(lower=0)
+    df['Expenditure'] = pd.to_numeric(df['value_purchased'], errors='coerce')
 
+    # Derive `t` from the wave folder name.  Wave scripts cd into
+    # countries/Ethiopia/<wave>/_/ before importing this helper, so the
+    # parent directory of cwd is the wave label.  Mirrors the established
+    # script-path pattern in Tanzania / Malawi.
+    import os
+    wave = os.path.basename(os.path.dirname(os.getcwd()))
+    df['t'] = wave
 
-    # Fix type of hhids if need be
-    if df.index.get_level_values('j').dtype ==float:
-        fix = dict(zip(df.index.levels[0],df.index.levels[0].astype(int).astype(str)))
-        df = df.rename(index=fix,level=0)
+    # Build the wide-form frame the framework helper expects:
+    # index (t, i, j, u), columns (Quantity, Expenditure, Produced).
+    df = (df.rename(columns={'HHID': 'i', 'item': 'j', 'units': 'u'})
+            .set_index(['t', 'i', 'j', 'u'])
+            [['Quantity', 'Expenditure', 'Produced']]
+            .dropna(how='all'))
 
-    #df = df.rename(index=harmonized_food_labels(key=df.index.get_level_values('i')),level='i')
-
-    # Compute unit values; BUT note these are in units_purchased, not necessarily units.
-    df['unitvalue'] = df['value_purchased']/df['quantity_purchased']
-
-    df['unitvalue'] = df['unitvalue'].where(np.isfinite(df.unitvalue))
-
-    # Get list of units used in current survey
-    units = list(set(df.index.get_level_values('units').tolist()))
-    units_purchased = list(set(df.index.get_level_values('units_purchased').tolist()))
-    units = list(set(units+units_purchased))
-
-    #unknown_units = set(units).difference(unitlabels.values())
-    #if len(unknown_units):
-    #   warnings.warn("Dropping some unknown unit codes!")
-    #   print(unknown_units)
-    #   df = df.loc[df.index.isin(unitlabels.values(),level='units')]
-
-    with open('../../_/conversion_to_kgs.json','r') as f:
-        conversion_to_kgs = pd.Series(json.load(f))
-
-    conversion_to_kgs.name='Kgs'
-    conversion_to_kgs.index.name='units'
-    conversion_to_kgs = pd.to_numeric(conversion_to_kgs,errors='coerce')
-
-    df = df.join(conversion_to_kgs,on='units')
-
-    # Add conversion for purchased units
-    conversion_to_kgs.name='Kgs Purchased'
-    conversion_to_kgs.index.name='units'
-
-    df = df.join(conversion_to_kgs,on='units_purchased')
-
-    #df = df.astype(float)
-
-    return df
+    # Ditch the now-unused `units_purchased` (already dropped via the
+    # column projection above).  Helper produces (t, i, j, u, s) with
+    # s in {'purchased', 'produced'}.
+    out = food_acquired_to_canonical(df, drop_columns=())
+    return out
 
 def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,item='item',HHID='HHID'):
     food_items = harmonized_food_labels(fn='../../_/food_items.org')
