@@ -136,6 +136,131 @@ def food_acquired(fn,myvars):
     return df
 
 
+def food_acquired_to_canonical(df):
+    """Reshape Uganda wide-form ``food_acquired`` to canonical long form.
+
+    Phase 3 of GH #169 / DESIGN_food_acquired_canonical_2026-05-05.org.
+
+    Inputs
+    ------
+    df : DataFrame
+        Output of :func:`food_acquired` (one row per ``(i, j, u)`` triple)
+        plus a ``t`` index level supplied by the caller (so the canonical
+        index ``(t, i, j, u, s)`` is producible without inferring the wave
+        label here).  Recognized columns:
+
+        * ``value_home``, ``value_away``, ``quantity_home``, ``quantity_away``
+          (consumption-location splits of *purchased* food; folded together
+          here because the home/away distinction is consumption-location,
+          not acquisition-source -- see design doc)
+        * ``value_own``, ``quantity_own``  (own production)
+        * ``value_inkind``, ``quantity_inkind``  (in-kind receipts)
+        * ``market`` (market price per unit ``u``; preserved for ``s='purchased'``)
+        * ``farmgate`` (farmgate price per unit ``u``; preserved for ``s='produced'``)
+
+        Other columns (``unitvalue_*``, ``Kgs``, ``market_home``/``_away``/
+        ``_own``) are ignored -- ``unitvalue_*`` are derived (= value/quantity)
+        and ``Kgs`` is per-unit metadata not in the canonical schema.
+
+    Output
+    ------
+    DataFrame indexed by canonical ``(t, i, j, u, s)`` with columns
+    ``Quantity``, ``Expenditure``, ``Price``.  ``s`` ∈
+    ``{'purchased', 'produced', 'inkind'}``.
+
+    Reshape rules
+    -------------
+    Each input row becomes up to 3 long-form rows:
+
+    * ``s = 'purchased'`` -- ``Quantity = quantity_home + quantity_away``,
+      ``Expenditure = value_home + value_away``, ``Price = market``
+    * ``s = 'produced'``  -- ``Quantity = quantity_own``,
+      ``Expenditure = value_own``, ``Price = farmgate``
+    * ``s = 'inkind'``    -- ``Quantity = quantity_inkind``,
+      ``Expenditure = value_inkind``, ``Price = NaN`` (Uganda surveys
+      do not record an imputed valuation distinct from value_inkind)
+
+    Rows where Quantity is NaN, zero, or negative are dropped.  An
+    ``Expenditure``-only row (positive value but no quantity) is also
+    dropped to keep the canonical schema's "Quantity required" invariant
+    consistent with the other Phase-3 countries (Tanzania, Malawi).
+
+    Notes
+    -----
+    - The ``home``/``away`` consumption-location distinction is dropped
+      at the canonical layer per DESIGN_food_acquired_canonical_2026-05-05.
+      Users who care about it can read the wave-level pre-canonical
+      DataFrame directly.
+    - ``v`` is intentionally absent -- the framework joins it from
+      ``sample()`` at API time.  See CLAUDE.md "## ``sample()`` and
+      Cluster Identity".
+    - ``Price`` is carried for purchased / produced rows from the
+      survey-reported ``market`` / ``farmgate`` columns.  The framework's
+      ``food_prices_from_acquired`` currently re-derives Price from
+      ``Expenditure / Quantity_kg`` and ignores a stored Price; the
+      stored Price preserves the survey-reported information for
+      consumers reading the wave parquet directly, and is forward-
+      compatible with a future framework change to prefer stored Price
+      where available (per DESIGN doc).
+    """
+    work = df.reset_index()
+
+    # Build the three per-source pieces.
+    def _make(source_label, qty, expenditure, price):
+        out = pd.DataFrame({
+            't': work['t'].values,
+            'i': work['i'].values,
+            'j': work['j'].values,
+            'u': work['u'].values,
+            's': source_label,
+            'Quantity': pd.to_numeric(qty, errors='coerce').values,
+            'Expenditure': pd.to_numeric(expenditure, errors='coerce').values,
+            'Price': pd.to_numeric(price, errors='coerce').values,
+        })
+        return out
+
+    # Purchased: fold home + away.  Sum with min_count=1 so a row with
+    # both NaN stays NaN (and is dropped below); a row with one value
+    # populated keeps that value.
+    purchased_qty = work[['quantity_home', 'quantity_away']].sum(
+        axis=1, min_count=1)
+    purchased_val = work[['value_home', 'value_away']].sum(
+        axis=1, min_count=1)
+    purchased_price = (work['market']
+                       if 'market' in work.columns else pd.Series(np.nan,
+                                                                   index=work.index))
+
+    purchased = _make('purchased', purchased_qty, purchased_val,
+                      purchased_price)
+    produced  = _make('produced',  work['quantity_own'], work['value_own'],
+                      work['farmgate'] if 'farmgate' in work.columns
+                      else pd.Series(np.nan, index=work.index))
+    inkind    = _make('inkind',    work['quantity_inkind'],
+                      work['value_inkind'],
+                      pd.Series(np.nan, index=work.index))
+
+    out = pd.concat([purchased, produced, inkind], ignore_index=True)
+    # Require a positive Quantity; drop NaN/zero/negative.  The home/away
+    # consumption split is no longer represented in the long form.
+    out = out[out['Quantity'].notna() & (out['Quantity'] > 0)]
+
+    # Aggregate genuine source-data duplicates: a household occasionally
+    # records multiple rows for the same (item, unit) -- e.g., two
+    # ``Other (Specify)`` entries that lump distinct foods under one
+    # canonical key.  Sum is the right aggregation for Quantity and
+    # Expenditure; for Price (a per-unit price) we take the mean across
+    # duplicate rows.  ``min_count=1`` keeps an all-NaN Price as NaN
+    # instead of coercing to 0.  Empirically observed in 2013-14 wave;
+    # mirrors the Malawi handling (commit 28429f14).
+    out = out.groupby(['t', 'i', 'j', 'u', 's'], dropna=False).agg(
+        Quantity=('Quantity', 'sum'),
+        Expenditure=('Expenditure', lambda s: s.sum(min_count=1)),
+        Price=('Price', 'mean'),
+    )
+    out = out.sort_index()
+    return out
+
+
 def nonfood_expenditures(fn='', purchased=None, away=None, produced=None,
                          given=None, item='item', HHID='HHID'):
     """Uganda non-food expenditures from a single .dta file.

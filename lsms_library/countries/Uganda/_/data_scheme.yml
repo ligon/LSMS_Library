@@ -42,7 +42,20 @@ Data Scheme:
     materialize: make
     index: (t, i)
     earnings: float
-  food_acquired: !make
+  food_acquired:
+    # Canonical post-2026-05-05 (GH #169): s in {purchased, produced, inkind}.
+    # Wave scripts call uganda.food_acquired (wide form, source-suffixed
+    # columns) then uganda.food_acquired_to_canonical (suffix melt with
+    # home/away -> purchased; preserves market Price for s=purchased and
+    # farmgate Price for s=produced).  Unblocks the Uganda piece of GH #218
+    # (food_expenditures derivation chain previously failed because Uganda's
+    # food_acquired lacked a single Expenditure column).  See
+    # slurm_logs/DESIGN_food_acquired_canonical_2026-05-05.org.
+    index: (t, i, j, u, s)
+    Quantity: float
+    Expenditure: float
+    Price: float
+    materialize: make
   fct: !make
   nutrition: !make
   interview_date: !make

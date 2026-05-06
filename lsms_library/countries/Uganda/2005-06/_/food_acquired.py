@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 import sys
 sys.path.append('../../_/')
-from uganda import food_acquired
+from uganda import food_acquired, food_acquired_to_canonical
 from lsms_library.local_tools import to_parquet
 
 fn='../Data/GSEC14A.dta'
+round = '2005-06'
 
 myvars = dict(item='h14aq2',               # Code label uniquely identifying food
               HHID='HHID',                 # Unique household id
@@ -20,6 +21,15 @@ myvars = dict(item='h14aq2',               # Code label uniquely identifying foo
               quantity_inkind='h14aq10',   # Quantity of consumed food received in kind
               units='h14aq3')              # Units in which quantities are measured
 
-df = food_acquired(fn,myvars)
+d = food_acquired(fn,myvars)
+d['t'] = round
+df = d.reset_index().set_index(['t','i','j','u'])
+
+# Canonical (t, i, j, u, s) long form (Phase 3 of GH #169).  See
+# uganda.food_acquired_to_canonical for the suffix-melt rules.
+df = food_acquired_to_canonical(df)
+
+assert df.index.is_unique, "Non-unique (t,i,j,u,s) index!  Fix me!"
+assert len(df) > 0, "food_acquired produced no rows after canonical reshape"
 
 to_parquet(df, 'food_acquired.parquet')
