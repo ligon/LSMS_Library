@@ -83,12 +83,13 @@ df = df.reset_index().drop(columns=['m']).set_index(['j','t','i']).dropna(how='a
 
 final = df.loc[:, ['quantity_consumed', 'u_consumed', 'quantity_bought', 'u_bought', 'price per unit', 'expenditure', 'cfactor_consumed', 'cfactor_bought']]
 
-# Fix food labels
-labelsd = get_categorical_mapping(tablename='harmonize_food',
-                                  idxvars={'j':'2010-11'},
-                                  **{'Label':'Preferred Label'})
-
-final = final.rename(index=labelsd,level='i')
+# Fix food labels via the cross-wave union helper (GH #216).  The wave-
+# specific lookup `idxvars={'j': '2010-11'}` loses items whose 2010-11
+# column entry has different capitalization than what `.capitalize()`
+# produces above; harmonize_food_labels() in malawi.py uses the union of
+# all wave columns so a label documented in *any* wave resolves correctly.
+from malawi import harmonize_food_labels
+final = harmonize_food_labels(final, level='i')
 final = final.dropna(how='all')
 final = final.reorder_levels(['j','t','i']).sort_index()
 to_parquet(final, "food_acquired.parquet")

@@ -63,11 +63,10 @@ df = df.reset_index().drop(columns=['m']).set_index(['j','t','i']).dropna(how='a
 
 final = df.loc[:, ['quantity_consumed', 'u_consumed', 'quantity_bought', 'u_bought', 'price per unit', 'expenditure', 'cfactor_consumed', 'cfactor_bought']]
 
-labelsd = get_categorical_mapping(tablename='harmonize_food',
-                                  idxvars={'j':wave},
-                                  **{'Label':'Preferred Label'})
-
-final = final.rename(index=labelsd,level='i')
+# Fix food labels via the cross-wave union helper (GH #216).  See
+# malawi.harmonize_food_labels() for rationale and the full derivation.
+from malawi import harmonize_food_labels
+final = harmonize_food_labels(final, level='i')
 final = final.dropna(how='all')
 final = final.reorder_levels(['j','t','i']).sort_index()
 to_parquet(final, "food_acquired.parquet")
