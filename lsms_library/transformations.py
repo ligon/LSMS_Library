@@ -46,14 +46,18 @@ def food_acquired_to_canonical(df: pd.DataFrame, drop_columns=('visit',)) -> pd.
         from lsms_library.transformations import food_acquired_to_canonical as food_acquired
 
     Inputs (post-data_grabber):
-      - DataFrame with a multi-level index that includes ``(t, v, i, j, u)``
-        and may include extras (``visit`` for EHCVM passages).
+      - DataFrame with a multi-level index that includes ``(t, i, j, u)``
+        and optionally ``v`` (cluster) and ``visit`` (EHCVM passages).
       - Columns: ``Quantity`` (TOTAL acquired in unit ``u``), ``Expenditure``
         (monetary value of purchases; may be NaN), ``Produced`` (subset of
         Quantity from own production; may be NaN/0).
 
     Output:
-      - Index: ``(t, v, i, j, u, s)`` where ``s`` ∈ ``{'purchased', 'produced'}``.
+      - Index: ``(t, v, i, j, u, s)`` if ``v`` was present in the input,
+        else ``(t, i, j, u, s)``; ``s`` ∈ ``{'purchased', 'produced'}``.
+        Per the post-2026-04-10 v-from-sample design, script-path waves
+        omit ``v`` and let ``_join_v_from_sample`` add it at API time;
+        YAML-path waves that already carry ``v`` keep it through.
       - Columns: ``Quantity``, ``Expenditure``.  ``Price`` is api-derived.
 
     Reshape rules:
@@ -104,33 +108,29 @@ def food_acquired_to_canonical(df: pd.DataFrame, drop_columns=('visit',)) -> pd.
     purchased_qty = (work['Quantity'].fillna(0)
                      - work['Produced'].fillna(0)).clip(lower=0)
 
-    purchased = pd.DataFrame({
-        't': work['t'].values,
-        'v': work['v'].values,
-        'i': work['i'].values,
-        'j': work['j'].values,
-        'u': work['u'].values,
-        's': 'purchased',
-        'Quantity': purchased_qty.values,
-        'Expenditure': work['Expenditure'].values,
-    })
+    has_v = 'v' in work.columns
+    base_levels = ['t', 'v', 'i', 'j', 'u'] if has_v else ['t', 'i', 'j', 'u']
+
+    def _row_dict(source, qty, expenditure):
+        d = {lvl: work[lvl].values for lvl in base_levels}
+        d['s'] = source
+        d['Quantity'] = qty
+        d['Expenditure'] = expenditure
+        return d
+
+    purchased = pd.DataFrame(_row_dict('purchased',
+                                       purchased_qty.values,
+                                       work['Expenditure'].values))
     purchased = purchased[(purchased['Quantity'] > 0)
                           | (purchased['Expenditure'] > 0)]
 
-    produced = pd.DataFrame({
-        't': work['t'].values,
-        'v': work['v'].values,
-        'i': work['i'].values,
-        'j': work['j'].values,
-        'u': work['u'].values,
-        's': 'produced',
-        'Quantity': work['Produced'].values,
-        'Expenditure': np.nan,
-    })
+    produced = pd.DataFrame(_row_dict('produced',
+                                      work['Produced'].values,
+                                      np.nan))
     produced = produced[produced['Quantity'].fillna(0) > 0]
 
     out = pd.concat([purchased, produced], ignore_index=True)
-    out = out.set_index(['t', 'v', 'i', 'j', 'u', 's'])
+    out = out.set_index(base_levels + ['s'])
     return out
 
 
