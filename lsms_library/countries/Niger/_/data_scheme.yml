@@ -39,10 +39,18 @@ Data Scheme:
   panel_ids: !make
 
   food_acquired:
-    index: (t, visit, i, j, u)
+    # Canonical post-2026-05-05 (GH #169): s axis carries acquisition
+    # source (purchased / produced / inkind / other).  Niger declares
+    # food_acquired in EHCVM 2018-19 and 2021-22 only; older waves
+    # (2011-12, 2014-15) have no food_acquired block in their
+    # data_info.yml so they are silent at runtime.  Each EHCVM wave's
+    # mapping.py imports food_acquired_to_canonical as food_acquired
+    # to reshape the wide-form (Quantity-total, Produced-subset,
+    # Expenditure) into long-form on s.  `visit` (vague) is dropped:
+    # in EHCVM it's a sample split, not a repeated measure.
+    index: (t, v, i, j, u, s)
     Quantity: float
     Expenditure: float
-    Produced: float
 
   shocks:
     index: (t, i, Shock)
