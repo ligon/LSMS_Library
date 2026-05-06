@@ -35,10 +35,17 @@ Data Scheme:
     HowCoped1: str
     HowCoped2: str
   food_acquired:
-    index: (t, visit, i, j, u)
+    # Canonical post-2026-05-05 (GH #169): s axis carries acquisition
+    # source (purchased / produced / inkind / other).  The wave-level
+    # mapping.py imports food_acquired_to_canonical as food_acquired
+    # to reshape the wide-form (Quantity-total, Produced-subset,
+    # Expenditure) into long-form on s.  `visit` (vague) is dropped:
+    # in EHCVM 2018-19 / 2021-22 it's a sample split, not a repeated
+    # measure (each grappe surveyed in exactly one vague), so
+    # households are uniquely keyed by (t, v, i, j, u, s) without it.
+    index: (t, v, i, j, u, s)
     Quantity: float
     Expenditure: float
-    Produced: float
   assets:
     index: (t, i, j)
     Quantity: float
