@@ -428,3 +428,22 @@
 | WANGING'OMBE                             | Wanging'ombe                             |
 | WETE                                     | Wete                                     |
 | wete                                     | Wete                                     |
+
+#+NAME: Roof
+| Alternate Spelling          | Preferred Label |
+|-----------------------------+-----------------|
+| Metal Sheets                | Iron Sheets     |
+| Grass/Leaves/Bamboo         | Thatch          |
+| Mud And Grass               | Mud             |
+| Concrete/Cement             | Concrete        |
+| Tiles                       | Clay Tiles      |
+| Asbestos Sheets             | Asbestos        |
+
+#+NAME: Floor
+| Alternate Spelling             | Preferred Label |
+|--------------------------------+-----------------|
+| Earth                          | Earth           |
+| Concrete/Cement/Tiles/Timber   | Other           |
+| Sand/Cement                    | Cement          |
+| Concrete Slab                  | Concrete        |
+| Timber                         | Wood            |
