@@ -46,8 +46,10 @@ final_fct = pd.concat([fct, fct_usda]).sort_index().T
 fct_cols = fct.columns.intersection(fct_usda.columns)
 final_fct = final_fct.loc[fct_cols]
 
-#sum all quantities
-q = q.xs('Kg',level='u').sum(axis=1)
+#sum all quantities — case-insensitive 'kg' to handle both
+# legacy parquets (u='Kg') and Phase-4 derived ones (u='kg').
+mask = q.index.get_level_values('u').astype(str).str.lower() == 'kg'
+q = q[mask].droplevel('u').sum(axis=1)
 
 # Deal with any dupes
 q = q.groupby(['i','t','j']).sum()

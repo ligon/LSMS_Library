@@ -33,16 +33,35 @@ The `s` axis carries acquisition source as canonical values: `purchased`, `produ
 
 Each input row from a survey questionnaire typically becomes **multiple long-form rows** — one per (item, unit, source) tuple where the household has data.  E.g., a household that purchased 5 kg of rice and produced 2 kg of rice emits two rows: one with `s='purchased'`, `Quantity=5`; another with `s='produced'`, `Quantity=2`.
 
-`Price` is **api-derived** (computed in `Country._finalize_result`) — it is *not* stored in the wave-level parquet.  Semantics by source:
+`Price` is an **optional column** on the wave-level parquet — it is populated only when the survey records a unit price directly.  Semantics by source:
 
 | `s`         | Price means                        | Where it comes from                              |
 |-------------|------------------------------------|--------------------------------------------------|
-| `purchased` | market price                       | `Expenditure / Quantity` (back-calculated)       |
+| `purchased` | market price                       | survey-reported where available, else NaN        |
 | `produced`  | farmgate price                     | survey-reported where available, else NaN        |
 | `inkind`    | imputed value of in-kind receipt   | survey-reported where available, else NaN        |
 | `other`     | NaN by default                     | only filled if the country provides a valuation  |
 
-If a country's source data records farmgate prices natively (e.g., Uganda's `farmgate` column), pass them through under `Price` for the `s='produced'` rows.
+If a country's source data records prices natively (e.g., Uganda's `market` column for purchased and `farmgate` column for produced), pass them through under `Price` for the corresponding `s` value.  Consumers access these via `food_prices(units='unitprice')` (per native `u`) or `food_prices(units='kgprice')` (converted to per-kg).
+
+Wave scripts that omit `Price` are fine — `food_prices(units='kgvalue')` (the default) and `food_prices(units='unitvalue')` derive Price from `Expenditure / Quantity_kg` and `Expenditure / Quantity` respectively, so the framework still produces useful per-kg or per-unit prices.  See *Downstream API* below.
+
+### LCU-only goods: `u='Value'`
+
+Some goods have no natural physical unit — the survey records only expenditure in local currency.  Examples: "Meals in restaurants", GhanaLSS 1987-88 / 1988-89 (money-only food data).  Encode these as a synthetic `u='Value'` with `Quantity = Expenditure` and `Expenditure` populated.
+
+These rows flow correctly through:
+
+- `food_expenditures` (sum across `u`, irrespective of physical-unit conversion).
+- `food_prices(units='unitvalue')` — gives 1 (Kwacha per Kwacha; mathematically tautological, sentinel-clear).
+- `food_quantities(units='kgs')` — carried through with `u='Value'` and the LCU quantity preserved (per the carry rule); consumers wanting purely-kg do `df.xs('kg', level='u')`.
+
+They naturally drop out of:
+
+- `food_prices(units='kgvalue' | 'kgprice')` — no kg factor for `u='Value'`, so NaN.
+- `food_prices(units='unitprice')` — no reported `Price` column for value-only goods.
+
+No special-casing required; the canonical schema accommodates `u='Value'` directly.
 
 ### Visit / round handling
 
@@ -194,6 +213,32 @@ These documents may explain *why* certain choices were made (e.g., why a particu
 
 6. **Verify** with `is_this_feature_sane`
 
+## Downstream API: `food_prices(units=...)` and `food_quantities(units=...)`
+
+Phase 4 (PR #224) added a `units=` kwarg to the derived food tables.  When implementing a country's `food_acquired`, anticipate which modes will be useful:
+
+**`food_prices(units=...)` — four modes:**
+
+| Mode          | Formula                                   | Output unit         | When useful                                                  |
+|---------------|-------------------------------------------|---------------------|--------------------------------------------------------------|
+| `'kgvalue'` *(default)* | `Expenditure / Quantity_kg`     | currency / kg       | Cross-country comparisons; demand systems; backward compat.   |
+| `'unitvalue'` | `Expenditure / Quantity` (native)         | currency / native u | Native-unit prices; preserves info `kgvalue` discards.       |
+| `'kgprice'`   | reported `Price` × kg_factor              | currency / kg       | When wave script populates `Price`; gives per-kg prices for produced/inkind rows where Expenditure is NaN. |
+| `'unitprice'` | reported `Price` (native u)               | currency / native u | Surfaces farmgate / market / imputed prices the survey recorded directly. |
+
+**`food_quantities(units=...)` — two modes:**
+
+| Mode      | Formula                              | Output                                                |
+|-----------|--------------------------------------|-------------------------------------------------------|
+| `'kgs'` *(default)* | kg where convertible; native `Quantity` carried with native `u` tag where it isn't | mixed-physical-unit; `u` tag distinguishes |
+| `'units'` | sum of native `Quantity` per `(t, v, i, j, u, s)` | preserves native units |
+
+The default for both is the pre-Phase-4 behavior (kg-denominated).  No silent fallback between modes — `unitprice` returns NaN where `Price` is missing, doesn't fall back to `unitvalue`.
+
+Full design rationale: `slurm_logs/DESIGN_food_prices_units_kwarg_2026-05-06.org`.
+
+**Naming caveat**: `kgvalue` is what the demand-systems literature usually calls "unit value" (Deaton 1988, 1997 — `Expenditure / Quantity` standardized to kg).  Our `unitvalue` mode deliberately departs from that convention to mean per-native-`u`.  Document this distinction in any analysis-facing docstring.
+
 ## Common pitfalls
 
 - **Unit codes change across waves** — the same physical unit (e.g., "Pail Small") may have code 4 in one wave and code 4A in another
@@ -201,3 +246,4 @@ These documents may explain *why* certain choices were made (e.g., why a particu
 - **Regional variation in local units** — a "heap" of tomatoes may be 0.5 kg in one region and 2 kg in another. Survey-provided conversion factors are region-specific for this reason.
 - **Missing conversion factors** — some unit × item combinations may lack conversion factors. The price-ratio method can fill these gaps.
 - **Multiple acquisition sources** — surveys typically ask about purchased, own-produced, received as gift. Each may have different units.
+- **Case-sensitive `u='kg'` lookups in downstream code** — the framework's `_apply_kg_conversion` lowercases unit lookups against `KNOWN_METRIC`, and Phase 4's `food_quantities(units='kgs')` tags converted rows with lowercase `'kg'`.  If a country's source data uses capital `'Kg'`, downstream code that does `df.xs('Kg', level='u')` will silently break against framework-derived input (Uganda nutrition.py / unitvalues.py hit this — fixed in PR #224 with case-insensitive `mask = u.str.lower() == 'kg'`).

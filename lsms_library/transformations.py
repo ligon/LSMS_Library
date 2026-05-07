@@ -674,64 +674,245 @@ def _apply_kg_conversion(df, factors):
 def food_expenditures_from_acquired(df):
     """Derive food expenditures from food_acquired.
 
-    Returns a DataFrame of total expenditure per household × item × period,
+    Returns a DataFrame of total expenditure per household × item × period
+    × acquisition source (when ``s`` is present in the input index),
     summed over units.
+
+    Phase 4 of GH #169 / DESIGN_food_acquired_canonical_2026-05-05.org
+    extends the group-by to preserve the ``s`` (acquisition-source) index
+    level.  Users who want the legacy collapsed view call
+    ``food_expenditures.groupby(level=['t','v','i','j']).sum()``
+    explicitly.
     """
     df = _normalize_columns(df)
     if 'Expenditure' not in df.columns:
         raise ValueError("food_acquired must have an 'Expenditure' column")
 
     idx_names = list(df.index.names)
-    group_by = [n for n in ['t', 'v', 'i', 'j'] if n in idx_names]
+    # Preserve `s` in the output (Phase 4).  `u` is dropped — Expenditure
+    # is currency-denominated, so summing across units is meaningful.
+    group_by = [n for n in ['t', 'v', 'i', 'j', 's'] if n in idx_names]
 
     x = df[['Expenditure']].replace(0, np.nan).dropna()
     x = x.groupby(group_by).sum()
     return x
 
 
-def food_quantities_from_acquired(df):
-    """Derive food quantities (in kg) from food_acquired.
+def food_quantities_from_acquired(df, units='kgs'):
+    """Derive food quantities from food_acquired.
 
-    Uses known metric conversions and price-ratio inference to convert
-    local units to kg, then sums per household × item × period.
+    Parameters
+    ----------
+    df : pd.DataFrame
+        food_acquired DataFrame with a ``Quantity`` column and a ``u``
+        index level naming the unit each row's quantity is in.
+    units : {'kgs', 'units'}, default 'kgs'
+        Aggregation basis:
+
+        - ``'kgs'`` (default): convert ``Quantity`` to kilograms where
+          the unit's kg factor is known (via :func:`_get_kg_factors`);
+          tag those rows with ``u='kg'``.  Rows whose unit lacks a
+          factor (e.g. ``u='Value'`` for LCU-only goods such as
+          "meals in restaurants", or ``u='tin'`` when no per-tin kg
+          conversion is known) are *carried through* with their native
+          ``Quantity`` and original ``u`` label, NOT dropped.  The output
+          is therefore mixed-physical-unit; the ``u`` index distinguishes
+          kg from native rows.  Consumers wanting purely-kg rows do
+          ``df.xs('kg', level='u')``.
+        - ``'units'``: sum native ``Quantity`` per ``(t, v, i, j, u, s)``,
+          no kg conversion attempted.
+
+    Returns
+    -------
+    pd.DataFrame
+        Single-column ``Quantity`` DataFrame with ``u`` and ``s``
+        retained in the index (Phase 4 of GH #169 preserves the
+        acquisition-source axis).
+
+    Notes
+    -----
+    The carry rule for unconvertible units in ``'kgs'`` mode is the
+    Phase-4 design call recorded in
+    ``slurm_logs/DESIGN_food_prices_units_kwarg_2026-05-06.org``.  It
+    differs from the original implementation, which silently dropped
+    unconvertible rows from ``food_quantities``.
+
+    The output's group-by preserves both ``u`` (the per-row unit; ``'kg'``
+    for converted rows, native otherwise) and ``s`` (acquisition source),
+    per the GH #169 canonical schema.  Pre-canonical waves where ``s`` is
+    absent silently skip the ``s`` level.
     """
+    valid_units = {'kgs', 'units'}
+    if units not in valid_units:
+        raise ValueError(
+            f"food_quantities units= must be one of {sorted(valid_units)}, "
+            f"got {units!r}"
+        )
+
     df = _normalize_columns(df)
     if 'Quantity' not in df.columns:
         raise ValueError("food_acquired must have a 'Quantity' column")
 
+    idx_names = list(df.index.names)
+    if 'u' not in idx_names:
+        # No u index level → can't tag units; fall back to a single-bucket
+        # aggregation per (t, v, i, j, s).
+        group_by = [n for n in ['t', 'v', 'i', 'j', 's'] if n in idx_names]
+        q = df[['Quantity']].replace(0, np.nan).dropna()
+        if group_by:
+            q = q.groupby(group_by).sum()
+        return q
+
+    if units == 'units':
+        group_by = [n for n in ['t', 'v', 'i', 'j', 'u', 's'] if n in idx_names]
+        q = df[['Quantity']].replace(0, np.nan).dropna()
+        q = q.groupby(group_by).sum()
+        return q
+
+    # units == 'kgs': carry rule
     factors = _get_kg_factors(df)
     v = _apply_kg_conversion(df, factors)
 
-    idx_names = list(v.index.names)
-    group_by = [n for n in ['t', 'v', 'i', 'j'] if n in idx_names]
+    # Per-row: where Quantity_kg is non-NaN, use it and tag u='kg';
+    # otherwise carry native Quantity with native u.  Subsumes the
+    # Phase-4 (b9df8fb4) s-preserving group-by below.
+    converted = v['Quantity_kg'].notna().to_numpy()
+    qty_kg = v['Quantity_kg'].to_numpy()
+    qty_native = v['Quantity'].to_numpy()
+    qty = np.where(converted, qty_kg, qty_native)
 
-    q = v[['Quantity_kg']].rename(columns={'Quantity_kg': 'Quantity'})
-    q = q.replace(0, np.nan).dropna()
-    q = q.groupby(group_by).sum()
-    return q
+    u_native = v.index.get_level_values('u').astype(str).to_numpy()
+    u_new = np.where(converted, 'kg', u_native)
+
+    # Rebuild index with the new u column.
+    new_levels = []
+    for name in v.index.names:
+        if name == 'u':
+            new_levels.append(u_new)
+        else:
+            new_levels.append(v.index.get_level_values(name).to_numpy())
+    new_idx = pd.MultiIndex.from_arrays(new_levels, names=v.index.names)
+
+    out = pd.DataFrame({'Quantity': qty}, index=new_idx)
+    out = out.replace(0, np.nan).dropna()
+    group_by = [n for n in ['t', 'v', 'i', 'j', 'u', 's'] if n in out.index.names]
+    out = out.groupby(group_by).sum()
+    return out
 
 
-def food_prices_from_acquired(df):
-    """Derive food prices (per kg) from food_acquired.
+def food_prices_from_acquired(df, units='kgvalue'):
+    """Derive food prices from food_acquired.
 
-    Unit values are computed as Expenditure / Quantity_kg and returned
-    at the natural grain of the input (typically ``(t, v, i, j, u)`` or
-    a subset).  It is the analyst's responsibility to compute medians /
-    means across whatever dimension they care about — returning the raw
-    per-observation prices preserves information and lets the downstream
-    analysis choose its own aggregation.
+    Returned at the natural grain of the input (``(t, v, i, j, u, s)``
+    after the Phase 3 canonical reshape, or a legacy subset) — analysts
+    compute medians / means across whatever dimension they care about,
+    so per-observation Price preserves information.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        food_acquired DataFrame.  Must have ``Quantity``; needs
+        ``Expenditure`` for the ``*value`` modes and ``Price`` for
+        the ``*price`` modes.
+    units : {'kgvalue', 'kgprice', 'unitvalue', 'unitprice'}, default 'kgvalue'
+        Which Price to compute, varying across two axes (denominator and
+        source):
+
+        - ``'kgvalue'`` (default): ``Expenditure / Quantity_kg``
+          (currency / kg, derived).  Backward-compatible with the
+          pre-Phase-4 implementation.
+        - ``'unitvalue'``: ``Expenditure / Quantity`` (currency / native u,
+          derived).  For ``u='Value'`` rows (LCU-only goods) the formula
+          gives 1 — *Kwacha per Kwacha* — mathematically correct but
+          analytically useless; consumers should filter on ``u`` before
+          aggregating.
+        - ``'kgprice'``: reported ``Price`` × kg_factor (currency / kg).
+          NaN where ``Price`` is missing or ``u`` is unconvertible to kg.
+        - ``'unitprice'``: reported ``Price`` (currency / native u).
+          NaN where the survey did not record a unit price.  This
+          mode reflects the canonical ``food_acquired.Price`` column —
+          market price for ``s='purchased'``, farmgate for
+          ``s='produced'``, imputed for ``s='inkind'``.
+
+        See ``slurm_logs/DESIGN_food_prices_units_kwarg_2026-05-06.org``.
+
+    Returns
+    -------
+    pd.DataFrame
+        Single-column ``Price`` DataFrame at the natural grain of the
+        input (typically ``(t, v, i, j, u, s)`` after the s-axis
+        migration).  Zero / infinite / NaN prices are dropped.
+
+    Notes
+    -----
+    The ``'kgvalue'`` default deliberately departs from the term-of-art
+    "unit value" common in the literature (e.g. Deaton 1988, 1997),
+    which usually means ``Expenditure / Quantity`` standardized to kg.
+    The ``'kgvalue'`` / ``'unitvalue'`` naming makes the denominator
+    explicit at the cost of mild inconsistency with prior usage; consult
+    the docstring before substituting one for "unit value" in literature
+    review or reproduction work.
+
+    No silent fallback between modes.  ``'unitprice'`` returns NaN where
+    Price is missing rather than falling back to ``'unitvalue'``; a
+    caller wanting "best available" combines results explicitly with
+    their own provenance tracking.
+
+    For canonical s-axis input, only ``s='purchased'`` rows have a
+    meaningful ``Expenditure`` (the Phase-3 helpers set produced/inkind
+    Expenditure to NaN).  Under ``'kgvalue'`` / ``'unitvalue'`` those
+    rows become NaN-after-divide and drop out.  Under ``'kgprice'`` /
+    ``'unitprice'`` produced/inkind rows survive iff the wave script
+    populated the survey-reported ``Price`` column upstream (Uganda
+    Phase 3 path).  This function does not synthesize a Price.
     """
+    valid_units = {'kgvalue', 'kgprice', 'unitvalue', 'unitprice'}
+    if units not in valid_units:
+        raise ValueError(
+            f"food_prices units= must be one of {sorted(valid_units)}, "
+            f"got {units!r}"
+        )
+
     df = _normalize_columns(df)
-    if 'Expenditure' not in df.columns or 'Quantity' not in df.columns:
-        raise ValueError("food_acquired must have 'Expenditure' and 'Quantity' columns")
 
-    factors = _get_kg_factors(df)
-    v = _apply_kg_conversion(df, factors)
+    # Validate inputs per mode.
+    if units in {'kgvalue', 'unitvalue'}:
+        missing = [c for c in ('Expenditure', 'Quantity') if c not in df.columns]
+        if missing:
+            raise ValueError(
+                f"food_prices(units={units!r}) requires {missing} on food_acquired"
+            )
+    if units in {'kgprice', 'unitprice'}:
+        if 'Price' not in df.columns:
+            # No reported Price column at all → empty frame with right schema.
+            empty = df.iloc[0:0].copy()
+            empty['Price'] = np.array([], dtype='float64')
+            return empty[['Price']]
 
-    v['price_per_kg'] = v['Expenditure'] / v['Quantity_kg']
-    v = v[['price_per_kg']].replace([0, np.inf, -np.inf], np.nan).dropna()
+    if units == 'kgvalue':
+        factors = _get_kg_factors(df)
+        v = _apply_kg_conversion(df, factors)
+        with np.errstate(divide='ignore', invalid='ignore'):
+            v = v.assign(Price=v['Expenditure'] / v['Quantity_kg'])
+    elif units == 'unitvalue':
+        with np.errstate(divide='ignore', invalid='ignore'):
+            v = df.assign(Price=df['Expenditure'] / df['Quantity'])
+    elif units == 'unitprice':
+        v = df.copy()
+        # Price column already populated.
+    elif units == 'kgprice':
+        factors = _get_kg_factors(df)
+        if 'u' in df.index.names:
+            u_lower = df.index.get_level_values('u').astype(str).str.lower()
+            kg_per_unit = pd.Series(u_lower.map(factors).values, index=df.index)
+            with np.errstate(divide='ignore', invalid='ignore'):
+                v = df.assign(Price=df['Price'] / kg_per_unit)
+        else:
+            # No u index → can't convert; emit NaN
+            v = df.assign(Price=np.nan)
 
-    return v.rename(columns={'price_per_kg': 'Price'})
+    v = v[['Price']].replace([0, np.inf, -np.inf], np.nan).dropna()
+    return v
 
 
 def legacy_locality(country):

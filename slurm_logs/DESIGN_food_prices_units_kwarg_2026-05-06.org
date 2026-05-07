@@ -1,0 +1,162 @@
+#+title: Design: ``food_prices`` / ``food_quantities`` ``units=`` kwarg (Phase 4)
+#+date: <2026-05-06 Wed>
+
+Resolves Open Question #1 from
+=slurm_logs/DESIGN_food_acquired_canonical_2026-05-05.org= and
+fills in the "Phase 4 --- derived-table semantics" placeholder
+there.  This is also the Phase-3.5 fix the prior session
+(=4dfb7ff0=) flagged for =food_prices_from_acquired=.
+
+* Motivation
+
+Different surveys report food prices via different observable
+quantities.  A consumer may want any of:
+
+- the survey's *reported* unit price (where present), in native units;
+- that unit price converted to per-kg via the unit-conversion table;
+- the *derived* unit value =Expenditure / Quantity= in native units;
+- the derived per-kg value =Expenditure / Quantity_kg=.
+
+Today's =food_prices_from_acquired= forces option 4 only.  That
+silently drops information for waves that record =Price= directly
+(Uganda farmgate, e.g.) and provides no way to ask for the
+unit-native variants.
+
+* Two design calls (resolved)
+
+** Call 1 --- LCU-only goods (e.g. GhanaLSS 1987-88, "Meals in restaurants")
+
+Some goods have no natural physical unit; the survey records only
+expenditure in local currency.
+
+| Option                                      | Decision    |
+|---------------------------------------------+-------------|
+| (a) Synthetic unit =u='Value'=              | *chosen*    |
+| (b) =s='other'= (Burkina Faso convention)   | --          |
+| (c) Drop the affected waves from canonical  | --          |
+
+Rationale: there's nothing wrong with /value/ as a unit.  The
+canonical row carries =u='Value'=, =Quantity=Expenditure=,
+=Expenditure=Expenditure=.  These rows naturally fall out of any
+per-kg aggregation (no kg factor) without special-casing.
+
+** Call 2 --- =food_prices= unit semantics
+
+| Option                                            | Decision     |
+|---------------------------------------------------+--------------|
+| (α) Per-=u= everywhere; behavioral break          | --           |
+| (β) Mixed-basis with =Basis= column               | --           |
+| (γ) Single-basis default + =units== kwarg         | *chosen*     |
+
+Rationale: heterogeneous units within a single =Price= column make
+analysis hostile.  Default to one basis; let advanced consumers opt
+in to alternatives via a kwarg.  Avoids the silent breakage of (α)
+and the universal complexity tax of (β).
+
+* The =units== kwarg
+
+** =food_prices(units=...)= --- four modes
+
+| value         | formula                       | output unit         | source                                      |
+|---------------+-------------------------------+---------------------+---------------------------------------------|
+| =unitprice=   | reported =Price=              | currency / native u | =food_acquired.Price=                        |
+| =kgprice=     | reported =Price= × kg_factor  | currency / kg       | =food_acquired.Price= via =_apply_kg_conversion= |
+| =unitvalue=   | =Expenditure / Quantity=      | currency / native u | derived from =food_acquired=                 |
+| =kgvalue=     | =Expenditure / Quantity_kg=   | currency / kg       | derived from =food_acquired= (current default) |
+
+*Default: =kgvalue=* (preserves today's behavior).
+
+NaN-handling rules:
+
+- =unitprice= / =kgprice=: NaN where the source =food_acquired= row
+  has no reported =Price=.  No silent fallback to =Expenditure/Quantity=
+  --- a caller who wants "best available" combines =unitprice= and
+  =unitvalue= explicitly with their own provenance tracking.
+- =kgprice= / =kgvalue=: NaN where the unit lacks a kg conversion
+  factor (most importantly, =u='Value'= rows).
+- =unitvalue=: for =u='Value'= rows, formula gives =Expenditure /
+  Expenditure = 1=, i.e. /one Kwacha per Kwacha/.  Mathematically
+  correct, analytically useless; consumers should filter on =u=
+  before aggregating.  Documented in docstring; not NaN'd
+  automatically.
+
+** =food_quantities(units=...)= --- two modes
+
+| value     | formula                                                                  | output column |
+|-----------+--------------------------------------------------------------------------+---------------|
+| =kgs=     | sum of =Quantity_kg= where convertible; native =Quantity= where not, with =u= retained as the unit tag | mixed         |
+| =units=   | sum of native =Quantity=; =u= retained                                  | native        |
+
+*Default: =kgs=* (preserves today's behavior).
+
+Carry rule (=kgs= mode): /any/ =u= lacking a kg conversion factor ---
+not just =u='Value'= --- carries through with native quantity rather
+than being dropped.  The =u= index level distinguishes kg-converted
+rows (tagged =u='kg'=) from non-converted rows (tagged with the
+native unit).  Symmetric: same treatment for =u='tin'=, =u='Value'=,
+or any other unconvertible label.
+
+Consumers wanting pure kg do =df.drop('Value', level='u')= or filter
+on =u != 'kg'=.  Consumers wanting the legacy purely-kg behavior of
+the pre-Phase-4 implementation can do
+=df.xs('kg', level='u')=.
+
+** Index shape
+
+For both functions, =u= is retained in the index across all =units==
+modes.  This is a deliberate departure from today's
+=food_quantities_from_acquired= (which collapses =u=) for symmetry
+and to support the LCU-only-goods carry rule above.
+
+* Why no third hybrid mode
+
+The prior round considered a "prefer reported =Price=, fall back to
+=Expenditure/Quantity=" hybrid for prices.  Rejected: it produces a
+=Price= column whose basis varies row-by-row with no in-band marker.
+Same objection as Call-2 (β).  If a real consumer demands
+provenance-aware mixed-basis output later, add it then with an
+explicit =Basis= column.
+
+For =food_quantities=, no analogous hybrid exists at all --- there's
+no "reported quantity" alternative to derived quantity (=Quantity= is
+already the reported quantity).
+
+* Implementation
+
+** Files affected
+
+- =lsms_library/transformations.py= --- add =units== kwarg to
+  =food_prices_from_acquired= and =food_quantities_from_acquired=.
+- =lsms_library/country.py= --- plumb =units== through =_FOOD_DERIVED=
+  dispatch (around lines 2465--2601).
+- =tests/test_food_acquired_canonical.py= (new) --- one round-trip
+  test per mode against a synthetic country fixture.
+- =CLAUDE.md= "Derived Tables" section --- document the kwarg.
+
+** Sequencing
+
+Lands in three commits on =food-acquired-units-kwarg= topic
+branch off =development=:
+
+1. =feat(transformations): add units= kwarg to food_prices /
+   food_quantities= --- pure helper change with unit tests.
+2. =feat(country): forward units= kwarg in _FOOD_DERIVED dispatch=
+   --- API plumbing + integration test.
+3. =docs(CLAUDE): document food_prices / food_quantities units= kwarg=
+   --- entry in Derived Tables section.
+
+GhanaLSS Phase 3 reshape (the prior session's attack point) sits
+*on top of* this work: once the kwarg lands, the GhanaLSS-specific
+=food_acquired_to_canonical= helper for the LCU-only waves (1987-88,
+1988-89, 1991-92 purchased side) emits =u='Value'= per Call 1 and
+flows correctly through all four price modes.
+
+* References
+
+- =slurm_logs/DESIGN_food_acquired_canonical_2026-05-05.org= ---
+  parent design doc; this resolves its Open Q #1 and Phase 4
+- Prior session transcript:
+  =~/.claude/projects/-global-scratch-fsa-fc-jevons-ligon-mirrors-LSMS-Library/4dfb7ff0-7ae9-40e9-8acc-5ffec0377b73.jsonl=
+  (Calls 1 + 2 originate at line 240)
+- GH #169 --- food_acquired schema design (resolved by parent)
+- GH #218 --- Uganda harmony.py modernization (blocked on Phase 4)
