@@ -446,3 +446,21 @@
 | unitÃ©                               | Unité                  |
 | verre                                | Verre                  |
 | verre Ã   thÃ©                       | Verre à thé             |
+
+#+NAME: Roof
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| Iron Sheets        | Iron Sheets     |
+| Concrete Slab      | Concrete        |
+| Thatch             | Thatch          |
+| Clay Tiles         | Clay Tiles      |
+| Adobe              | Mud             |
+| Woven Mats         | Mats            |
+
+#+NAME: Floor
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| Cement             | Cement          |
+| Tiles              | Tiles           |
+| Earth              | Earth           |
+| Dung               | Earth with Dung |
