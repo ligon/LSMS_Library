@@ -1,0 +1,20 @@
+#+title: Categorical Mappings — Togo
+
+#+name: Roof
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| Iron Sheets        | Iron Sheets     |
+| Thatch             | Thatch          |
+| Clay Tiles         | Clay Tiles      |
+| Concrete Slab      | Concrete        |
+| Mud                | Mud             |
+| Woven Mats         | Mats            |
+
+#+name: Floor
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| Cement             | Cement          |
+| Earth              | Earth           |
+| Tile               | Tiles           |
+| Dung               | Earth with Dung |
+| Other              | Other           |

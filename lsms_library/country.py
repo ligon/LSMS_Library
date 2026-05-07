@@ -2591,7 +2591,8 @@ class Country:
             return method
 
         if name in self.data_scheme or name in self._FOOD_DERIVED or name in self._ROSTER_DERIVED:
-            def method(waves=None, market=None, labels='Preferred', age_cuts=None, units=None):
+            def method(waves=None, market=None, labels='Preferred', age_cuts=None,
+                       units=None, volume_as_mass=True):
                 if age_cuts is not None and name not in self._ROSTER_DERIVED:
                     raise TypeError(
                         f"{name}() got an unexpected keyword argument 'age_cuts'; "
@@ -2602,6 +2603,12 @@ class Country:
                     raise TypeError(
                         f"{name}() got an unexpected keyword argument 'units'; "
                         "only 'food_prices' and 'food_quantities' accept units."
+                    )
+                if (volume_as_mass is not True
+                        and name not in {'food_prices', 'food_quantities'}):
+                    raise TypeError(
+                        f"{name}() got an unexpected keyword argument 'volume_as_mass'; "
+                        "only 'food_prices' and 'food_quantities' accept it."
                     )
                 # For derived food tables, try deriving from food_acquired first
                 # before falling back to wave-level scripts / make
@@ -2618,6 +2625,8 @@ class Country:
                     transform_kwargs = {}
                     if units is not None and name in {'food_prices', 'food_quantities'}:
                         transform_kwargs['units'] = units
+                    if name in {'food_prices', 'food_quantities'}:
+                        transform_kwargs['volume_as_mass'] = volume_as_mass
                     derived = None
                     try:
                         fa = self._aggregate_wave_data(waves, 'food_acquired')
@@ -2721,6 +2730,17 @@ class Country:
                         "    :func:`lsms_library.transformations.food_quantities_from_acquired`\n"
                         "    and ``slurm_logs/DESIGN_food_prices_units_kwarg_2026-05-06.org``.\n"
                     )
+                doc_parts.append(
+                    "volume_as_mass : bool, optional\n"
+                    "    When ``True`` (default), treat ``1 litre = 1 kg`` for\n"
+                    "    fluid units (litre, ml, cl) -- a specific-gravity-1\n"
+                    "    approximation, roughly right for water-based foods\n"
+                    "    and moderately wrong for cooking oil and alcohol.\n"
+                    "    Pass ``False`` to drop fluid units from the hand-coded\n"
+                    "    factor map and from the explicit-metric label parser;\n"
+                    "    their kg conversion (if any) then comes purely from\n"
+                    "    data-driven price-ratio inference.  See GH #231.\n"
+                )
             if name in self._ROSTER_DERIVED:
                 doc_parts.append(
                     "age_cuts : tuple of positive numbers, optional\n"

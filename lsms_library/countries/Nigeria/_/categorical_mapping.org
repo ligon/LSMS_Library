@@ -375,3 +375,29 @@
 | 36. Zamfara                              | Zamfara                                  |
 | Zamfara                                  | Zamfara                                  |
 | zamfara                                  | Zamfara                                  |
+
+#+NAME: Roof
+| Alternate Spelling           | Preferred Label  |
+|------------------------------+------------------|
+| Iron Sheets                  | Iron Sheets      |
+| Zinc Sheet                   | Iron Sheets      |
+| Long/Short Span Sheets       | Iron Sheets      |
+| Grass                        | Thatch           |
+| Thatch                       | Thatch           |
+| Asbestos Sheet               | Asbestos         |
+| Concrete                     | Concrete         |
+| Clay Tiles                   | Clay Tiles       |
+| Step Tiles                   | Clay Tiles       |
+| Plastic Sheeting             | Plastic Sheeting |
+| Mud                          | Mud              |
+
+#+NAME: Floor
+| Alternate Spelling   | Preferred Label |
+|----------------------+-----------------|
+| Smooth Cement        | Cement          |
+| Smoothed Mud         | Earth           |
+| Sand/Dirt/Straw      | Earth           |
+| Tile                 | Tiles           |
+| Wood                 | Wood            |
+| Terrazzo             | Tiles           |
+| Marble               | Tiles           |

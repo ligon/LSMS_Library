@@ -32,9 +32,9 @@ df = df.rename(columns_dict, axis=1)
 df = df.loc[:, list(columns_dict.values())]
 df['i'] = normalize_food_label(df['i'].astype(str).str.capitalize())
 
-unitsdetail_convertions = get_categorical_mapping(tablename='unit',
+unitsdetail_convertions = get_categorical_mapping(tablename='u',
                                                   idxvars={'j':'Code'},
-                                                **{'Label':'Unit'})
+                                                **{'Label':'Preferred Label'})
 
 df['unitsdetail_consumed'] = df['unitcode_consumed'].astype(str).str.lower().map(unitsdetail_convertions).fillna(pd.NA)
 df['unitsdetail_bought'] = df['unitcode_bought'].astype(str).str.lower().map(unitsdetail_convertions).fillna(pd.NA)

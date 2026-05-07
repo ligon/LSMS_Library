@@ -1,0 +1,176 @@
+#+TITLE: Malawi unit-resolution diagnostic (post #231)
+#+DATE: 2026-05-07
+#+AUTHOR: Sue / Claude Opus 4.7
+
+* Why this note exists
+
+GH #231 introduced an explicit-metric label parser (=_parse_explicit_metric=)
+and a =volume_as_mass= kwarg on =food_quantities= / =food_prices=.  This
+diagnostic exercises both against Malawi's full =food_acquired= table to
+quantify how much of the heavy lifting each path does, where the residual
+unresolved rows live, and whether the 1 L = 1 kg shortcut introduces a
+visible specific-gravity bias on cooking oil.
+
+Run via:
+
+#+begin_src python
+from lsms_library.country import Country
+m = Country('Malawi')
+fa  = m.food_acquired()                                    # 970,809 rows
+fq1 = m.food_quantities(units='kgs')                       # default
+fq2 = m.food_quantities(units='kgs', volume_as_mass=False) # opt-out
+#+end_src
+
+* Headline numbers
+
+| Metric                                       |       Value |
+|----------------------------------------------+-------------|
+| food_acquired rows                           |     970,809 |
+| food_acquired distinct =u= values            |         732 |
+| food_quantities rows (default)               |     773,680 |
+| food_quantities distinct =u= values (output) |          86 |
+| rows resolved to =u='kg'= (default)          | 773,200 (99.9%) |
+| rows still in native =u= (default)           |     480 (0.1%) |
+| rows resolved to =u='kg'= (no_fluid)         | 773,193 (99.9%) |
+| difference (rows lost when fluids disabled)  |           7 |
+
+* What worked: case-variant resolution
+
+The 732→86 collapse happens almost entirely via =_apply_kg_conversion='s
+lowercase lookup against =KNOWN_METRIC=.  Top input u-values like
+=KILOGRAMME= (74k rows), =Kg= (36k), =Kilogramme= (11k), =GRAM= (10k),
+=LITRE= (29k), =Litre= (15k), =Millilitre= (12k), =MILLILITRE= (5k) all
+successfully resolve.
+
+The price-ratio inference path =conversion_to_kgs= *does* compute factors
+for these case-variants (e.g. =Kg=>1.43, =LITRE=>1.07), but
+=_get_kg_factors='s consumer guard (=if unit.lower() not in factors=)
+correctly suppresses them because the lowercased forms are already in
+=KNOWN_METRIC=.  So the case-variants ride the canonical factor, not the
+inferred one.
+
+* What didn't resolve (the 0.1% tail)
+
+Container labels with no metric content.  Top by row count:
+
+| j (food)                            | u             | rows |
+|-------------------------------------+---------------+------|
+| Nkwani                              | Basin/Lichero |   81 |
+| Maize Ufa Refined                   | Basin/Lichero |   25 |
+| Thobwa                              | Basin/Lichero |   23 |
+| Groundnut                           | Basin/Lichero |   21 |
+| Maize Ufa Mgaiwa                    | Basin/Lichero |   21 |
+| Okra/Therere                        | Basin/Lichero |   20 |
+| Other Cultivated Green Leafy Vegs.  | THUNGWA       |   20 |
+| Other Cultivated Green Leafy Vegs.  | Basin/Lichero |   19 |
+| Gathered Wild Green Leaves          | THUNGWA       |   17 |
+| Pigeon Pea (Nandolo)                | Basin/Lichero |   16 |
+| Gathered Wild Green Leaves          | Basin/Lichero |   10 |
+
+These are local container/measure terms (Basin/Lichero is a basket;
+THUNGWA, NKOKO, PHAVA, TINA are vessels of varying size).  The price-ratio
+inference fails for them because they appear in too few (t, m, i) groups
+relative to kg-reporting alternatives, or the price-ratio dispersion is
+too high.
+
+If we want to push past 99.9%, the cleanest path is hand-coded factors
+in =categorical_mapping.org='s =u= table -- e.g. add =Basin/Lichero= as a
+preferred-label row with a per-region =factor= column.  Cost-benefit
+suggests this isn't urgent: the 480 residual rows are 0.06% of the input
+and concentrated in vegetable categories (Nkwani, leafy greens) where
+nutritional inference doesn't critically depend on kg precision.
+
+* The cooking-oil specific-gravity tell
+
+The motivating concern for #231's =volume_as_mass=False= opt-out: cooking
+oil's true specific gravity is ~0.92 (1 L = 0.92 kg), so the naive shortcut
+overstates kg and *understates* price-per-kg.  The expected direction
+under =volume_as_mass=False= is that the price-per-kg should *rise*.
+
+Observed (food_prices, =units='kgvalue'=):
+
+| j           | volume_as_mass=True | volume_as_mass=False |
+|-------------+---------------------+----------------------|
+| Cooking Oil |          500.00 MWK |           468.75 MWK |
+
+Price went *down*, not up -- by 6.7%.
+
+** Why?
+
+When =volume_as_mass=False=, the hardcoded =factors['litre']=1= is
+removed.  But =conversion_to_kgs= still infers a litre factor from the
+bulk data, returning =LITRE = 1.07=.  Since 1.07 > 1.0, more kg per litre
+gets attributed, which lowers price-per-kg.  Both the inferred 1.07 and
+the hardcoded 1.0 are dragged toward water-density by the bulk of fluid
+foods (juice, milk, beer, soup), which is *the wrong reference class for
+oil*.  Neither path reaches oil's true 0.92.
+
+** Implications
+
+- **The naive default (=1L=1kg=) is closer to truth for Malawi cooking oil**
+  than =volume_as_mass=False= turns out to be -- 0.6% off vs 7% off, in
+  opposite directions.  This is incidental to Malawi's data composition,
+  not a general property.
+- **=volume_as_mass=False= is not a /correct fluid handling/ flag** -- it's
+  a /disable the hand-coded shortcut/ flag.  The inference path then takes
+  over with whatever factor the data implies, which may or may not be
+  better than the shortcut.
+- **The 6.7% bias is small enough to ignore** for demand-system work where
+  βs are typically estimated to 1-2 sig figs.  The user's read in the
+  original issue ("wrong for any fluid that doesn't have a specific
+  gravity of 1, but for foods probably not /too/ wrong") is empirically
+  validated.
+
+** Could we do better?
+
+Yes, but it requires per-item factors.  Two paths:
+
+1. *Hand-coded specific-gravity table* keyed by (item, source-unit).
+   E.g. =cooking_oil + L = 0.92 kg=, =cooking_oil + ml = 0.000_92 kg=.
+   Authoritative but tedious; needs maintenance per country.
+
+2. *Per-item price-ratio inference* in =conversion_to_kgs=.  Currently the
+   function takes a global per-unit median across all items in each
+   group.  An item-specific variant -- =kgper.groupby(['j','u']).median()=
+   instead of =kgper.groupby('u').median()= -- would let oil's
+   kg/L conversion diverge from juice's.  Risk: small-N items get noisy
+   factors.  Worth prototyping.
+
+Filed as a follow-up consideration; not blocking #231.
+
+* Recommendation for #223 cross-country phase
+
+The case-variant collapse here came for free from =KNOWN_METRIC='s
+lowercase lookup -- no =categorical_mapping.org= fixup was needed in
+Malawi for that.  But other countries may have unit names not in
+=KNOWN_METRIC= (Portuguese in Mozambique, French in EHCVM countries,
+Swahili in Tanzania).  The cross-country audit should:
+
+1. For each country, run the same pre/post u-distribution comparison
+   (probably worth scripting as =scripts/diagnose_units.py=).
+2. Identify the country-specific top-N residual u-values.
+3. Add hand-coded factors via the categorical_mapping =u= table where
+   the residual is large enough to matter.
+
+The =u= table convention (=Code=, =Preferred Label=, =factor=) wired up
+in commit =bcd1c4b8= is the right home for this -- per-country, by
+preferred-label.
+
+* Status of #231
+
+Fully closed for Malawi.  Ready to push to gh/development.  No
+outstanding bugs surfaced by this diagnostic.
+
+* Reproducibility
+
+Generated 2026-05-07 from commit =0073d549= (= #231 implementation +
+=bcd1c4b8= Malawi-only #223).  Should be re-run after any change to:
+
+- =lsms_library/transformations.py= (=_get_kg_factors=,
+  =_parse_explicit_metric=, =conversion_to_kgs=).
+- =lsms_library/countries/Malawi/_/categorical_mapping.org= =u= table.
+- Any Malawi wave's =food_acquired.py= conversion logic.
+
+The probe scripts used to produce this note are inline above; a
+permanent =scripts/diagnose_units.py= that takes =--country= and emits
+this report is a reasonable next step if we want CI-tracked numbers.

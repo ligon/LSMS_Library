@@ -399,3 +399,24 @@
 | unité                     | Unité           |
 | verre                     | Verre           |
 | yoruba                    | Yorouba         |
+
+#+name: Roof
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| Iron Sheets        | Iron Sheets     |
+| Thatch             | Thatch          |
+| Earth              | Mud             |
+| Mud                | Mud             |
+| Concrete Slab      | Concrete        |
+| Clay Tiles         | Clay Tiles      |
+| Mats               | Mats            |
+
+#+name: Floor
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| Cement             | Cement          |
+| Earth              | Earth           |
+| Tiles              | Tiles           |
+| Sand               | Sand            |
+| Dung               | Earth with Dung |
+| Carpet             | Other           |

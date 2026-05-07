@@ -206,8 +206,8 @@
 | Thatch, Straw      | Thatch          |
 | Thatch, straw      | Thatch          |
 | thatch,straw       | Thatch          |
-| Tiles              | Tiles           |
-| tiles              | Tiles           |
+| Tiles              | Clay Tiles      |
+| tiles              | Clay Tiles      |
 | Cement             | Cement          |
 | cement             | Cement          |
 | Cement screed      | Cement          |
@@ -216,8 +216,6 @@
 | Concrete/cement    | Concrete        |
 | Asbestos           | Asbestos        |
 | asbestos           | Asbestos        |
-| Earth              | Earth           |
-| earth              | Earth           |
 | Mud                | Mud             |
 | mud                | Mud             |
 | Wood, Planks       | Wood            |
@@ -232,8 +230,8 @@
 | Earth              | Earth           |
 | earth              | Earth           |
 | Rammed earth       | Earth           |
-| Earth and cow dung | Earth           |
-| earth and cow dung | Earth           |
+| Earth and cow dung | Earth with Dung |
+| earth and cow dung | Earth with Dung |
 | Cement             | Cement          |
 | cement             | Cement          |
 | Cement screed      | Cement          |
