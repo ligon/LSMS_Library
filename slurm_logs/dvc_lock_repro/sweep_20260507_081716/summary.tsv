@@ -1,0 +1,3 @@
+config	trial	n	elapsed	successes	failures	fail_rate	exc
+baseline	1	12	102.35	1	11	0.917	{"LockError": 11}
+baseline	2	12	101.48	1	11	0.917	{"LockError": 11}

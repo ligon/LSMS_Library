@@ -1919,6 +1919,24 @@ class Country:
                         return candidate
                 return None
 
+            # Pre-warm the DVC cache for this feature's source files
+            # before invoking make / the wave script.  See
+            # ``_warm_dvc_cache_for_feature`` for design notes; the
+            # short version is that one batched ``Repo.fetch`` here
+            # amortises DVC's ~93s graph-walk cost (Lustre metadata-
+            # bound) over arbitrarily many targets, so the make -j12
+            # subprocess that follows sees a warm cache and never
+            # contends on ``.dvc/tmp/lock``.  Best-effort: any failure
+            # falls through to the per-process retry loop in
+            # ``_ensure_dvc_pulled`` (defense in depth).
+            try:
+                from .local_tools import _warm_dvc_cache_for_feature
+                _warm_dvc_cache_for_feature(self, method_name, wave=wave)
+            except Exception:
+                # Pre-warm must never break a build.  The retry loop
+                # downstream is the safety net.
+                pass
+
             output_path: Path | None = None
             if makefile_path is not None:
                 output_path = try_make(makefile_path.parent)
