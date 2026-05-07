@@ -1,0 +1,84 @@
+# Aggregate Label -> short form for graph axes / table headers.
+# Consumed by `python -m lsms_library.util.orgtbl` to (re)generate the
+# `Aggregate (short)` column in categorical_mapping.org.  Re-run with:
+#
+#     python -m lsms_library.util.orgtbl \
+#         lsms_library/countries/Malawi/_/categorical_mapping.org \
+#         --table harmonize_food \
+#         --column 'Aggregate (short)' \
+#         --mapping lsms_library/countries/Malawi/_/aggregate_short.yml \
+#         --source-column 'Aggregate Label' \
+#         --insert-after 'Aggregate Label'
+#
+# Design: max length 11 chars, mean ~7.  Local Malawian terms preferred
+# where they help legibility (Mgaiwa, Madeya, Nkwani, Tanaposi, Therere,
+# Nandolo, Maheu, Thobwa, Bica, Chambo).  Drop generic qualifiers when
+# uniqueness preserved (Cooking Oil -> Oil; Sugar Cane -> Cane;
+# Smoked Fish -> Smoked).  Suffix `+` for "this term and similar"
+# (Mango+, Beans+).
+
+Avocado:                                    Avocado
+Banana:                                     Banana
+Beer & Liquor:                              Beer
+Bread:                                      Bread
+Buns & Wheat Flour:                         Buns
+Cassava Flour:                              Cass.Flour
+Cassava Tubers:                             Cassava
+Chips:                                      Chips
+Citrus:                                     Citrus
+Coffee & Cocoa:                             Coffee
+Common Fruits:                              Local Fruit
+Cooking Oil:                                Oil
+Cucumber:                                   Cucumber
+Dairy:                                      Dairy
+Eggs:                                       Eggs
+Fresh Fish:                                 Fresh Fish
+Fresh Fish (Premium):                       Chambo
+Fruit Juice:                                Juice
+Groundnut Flour:                            G/n Flour
+Groundnut, Vendor/Boiled:                   Vend. G/n
+Groundnut, Whole:                           Groundnut
+Irish Potato:                               Potato
+Leafy Greens, Low-β:                        Nkwani
+Leafy Greens, Mid-β:                        Cabbage
+Maheu & Squash:                             Maheu
+Maize Madeya & Grain:                       Madeya
+Maize Refined:                              Refined
+Maize Ufa Mgaiwa (Normal Flour):            Mgaiwa
+Maize, Whole:                               Green Maize
+Mandazi, Doughnut (Vendor):                 Mandazi
+Margarine:                                  Margarine
+Okra/Therere:                               Therere
+Onion:                                      Onion
+Other:                                      Other
+Other Cereals:                              Millet
+Other Tropical Fruits:                      Mango+
+Pasta:                                      Pasta
+Poultry:                                    Chicken
+Powdered Milk:                              Powder Mlk
+Premium Cereal:                             Brkfst Crl
+Pulses, Low-β:                              Nandolo
+Pulses, Mid-β:                              Beans+
+Pumpkin:                                    Pumpkin
+Red Meat:                                   Red Meat
+Restaurant:                                 Eat Out
+Rice:                                       Rice
+Salt:                                       Salt
+Samosa:                                     Samosa
+Smoked Fish:                                Smoked
+Soft Drinks & Freezes:                      Soda
+Spices & Condiments:                        Spices
+Sugar:                                      Sugar
+Sugar Cane:                                 Cane
+Sun Dried Fish:                             Sun Dried
+Sweet Potato (Orange):                      Orange SP
+Sweet Potato (White):                       White SP
+Sweets & Biscuits:                          Sweets
+Tanaposi Rape:                              Tanaposi
+Tea:                                        Tea
+Thobwa:                                     Thobwa
+Tomato:                                     Tomato
+Vendor Carbs:                               Roast Maize
+Vendor Cooked:                              Street Food
+Vendor Meat & Fish:                         Street Meat
+Yeast, Baking Powder, Bicarbonate of Soda:  Bica
