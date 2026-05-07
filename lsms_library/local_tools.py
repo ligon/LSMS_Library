@@ -219,10 +219,19 @@ def _ensure_dvc_pulled(fn) -> None:
         )
         if any(p.exists() for p in cache_layouts):
             return  # cache hit -- DVCFS.open() will serve from local
-        try:
-            rel_path = abs_path.relative_to(_COUNTRIES_DIR)
-        except ValueError:
-            return  # outside the countries dir, can't fetch
+        # NB: an earlier ``rel_path = abs_path.relative_to(_COUNTRIES_DIR)``
+        # guard lived here -- it was needed when the cache-miss path called
+        # ``Repo.fetch(targets=[str(rel_path)])`` and would have produced a
+        # NoOutputOrStageError otherwise.  The bypass below uses md5 +
+        # cache_layouts directly and has no such requirement; the guard
+        # was actively harmful when ``abs_path`` resolves under a worktree
+        # whose path doesn't share a prefix with the imported
+        # ``_COUNTRIES_DIR`` (e.g. a wave script in a worktree but
+        # importing lsms_library from a separate main checkout via the
+        # venv's ``.pth`` file -- ``relative_to`` raises ``ValueError``
+        # and the function silently bails without fetching).  We don't
+        # need the path to be inside ``_COUNTRIES_DIR`` to fetch the blob;
+        # we only need its md5, which we already have.
 
     except (OSError, yaml.YAMLError, KeyError, IndexError, TypeError):
         # Bad sidecar shape (None / wrong type), missing 'outs'/'md5' key,
