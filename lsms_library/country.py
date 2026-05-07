@@ -2576,12 +2576,17 @@ class Country:
             return method
 
         if name in self.data_scheme or name in self._FOOD_DERIVED or name in self._ROSTER_DERIVED:
-            def method(waves=None, market=None, labels='Preferred', age_cuts=None):
+            def method(waves=None, market=None, labels='Preferred', age_cuts=None, units=None):
                 if age_cuts is not None and name not in self._ROSTER_DERIVED:
                     raise TypeError(
                         f"{name}() got an unexpected keyword argument 'age_cuts'; "
                         "only roster-derived tables (e.g. household_characteristics) "
                         "accept age_cuts."
+                    )
+                if units is not None and name not in {'food_prices', 'food_quantities'}:
+                    raise TypeError(
+                        f"{name}() got an unexpected keyword argument 'units'; "
+                        "only 'food_prices' and 'food_quantities' accept units."
                     )
                 # For derived food tables, try deriving from food_acquired first
                 # before falling back to wave-level scripts / make
@@ -2595,14 +2600,23 @@ class Country:
                         'food_prices': food_prices_from_acquired,
                         'food_quantities': food_quantities_from_acquired,
                     }[name]
+                    transform_kwargs = {}
+                    if units is not None and name in {'food_prices', 'food_quantities'}:
+                        transform_kwargs['units'] = units
                     derived = None
                     try:
                         fa = self._aggregate_wave_data(waves, 'food_acquired')
                         if isinstance(fa, pd.DataFrame) and not fa.empty:
-                            derived = transform_fn(fa)
+                            derived = transform_fn(fa, **transform_kwargs)
                             scheme_entry = self._materialization_entry(name)
                             derived = self._finalize_result(derived, scheme_entry, name)
                     except (FileNotFoundError, KeyError, ValueError, RuntimeError) as exc:
+                        if units is not None:
+                            # Caller explicitly asked for canonical units= behaviour;
+                            # the legacy fall-through path can't honour that, so
+                            # surface the failure rather than silently returning
+                            # un-units-aware data.
+                            raise
                         logger.info(
                             "Deriving %s from food_acquired failed (%s); "
                             "falling back to legacy aggregation", name, exc)
@@ -2668,6 +2682,30 @@ class Country:
                 "    re-aggregated after renaming.  Raises ``KeyError`` if the\n",
                 "    column is absent.\n",
             ]
+            if name in {'food_prices', 'food_quantities'}:
+                if name == 'food_prices':
+                    doc_parts.append(
+                        "units : {'kgvalue', 'kgprice', 'unitvalue', 'unitprice'}, optional\n"
+                        "    Price basis.  Default ``'kgvalue'`` (Expenditure /\n"
+                        "    Quantity_kg, currency per kg).  Other modes:\n"
+                        "    ``'unitvalue'`` (Expenditure / Quantity, per native\n"
+                        "    u; gives 1 = Kwacha-per-Kwacha for u='Value' rows),\n"
+                        "    ``'kgprice'`` (reported Price × kg_factor),\n"
+                        "    ``'unitprice'`` (reported Price as-is).  See\n"
+                        "    :func:`lsms_library.transformations.food_prices_from_acquired`\n"
+                        "    and ``slurm_logs/DESIGN_food_prices_units_kwarg_2026-05-06.org``.\n"
+                    )
+                else:  # food_quantities
+                    doc_parts.append(
+                        "units : {'kgs', 'units'}, optional\n"
+                        "    Quantity basis.  Default ``'kgs'`` (kilograms\n"
+                        "    where the unit is convertible; native quantity\n"
+                        "    carried with native u-tag where it isn't).\n"
+                        "    ``'units'`` returns native Quantity per (t,v,i,j,u,s).\n"
+                        "    See\n"
+                        "    :func:`lsms_library.transformations.food_quantities_from_acquired`\n"
+                        "    and ``slurm_logs/DESIGN_food_prices_units_kwarg_2026-05-06.org``.\n"
+                    )
             if name in self._ROSTER_DERIVED:
                 doc_parts.append(
                     "age_cuts : tuple of positive numbers, optional\n"

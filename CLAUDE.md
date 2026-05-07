@@ -138,6 +138,13 @@ Auto-unlock decrypts `s3_reader_creds.gpg` with an obfuscated passphrase at impo
 
 **`labels=` kwarg (2026-04-18).** Any table with a `j` index level accepts `labels='Aggregate'` (or any column name from the country's `food_items` / `harmonize_food` table). For derived food tables (`food_expenditures`, `food_quantities`), `reaggregate=True` sums collapsed categories. For all other tables (including `food_acquired`), `reaggregate=False` renames without summing, preserving per-unit and per-source row detail.
 
+**`units=` kwarg (2026-05-06, Phase 4).** `food_prices()` and `food_quantities()` accept a `units=` kwarg that controls the price/quantity basis of the returned DataFrame. Other tables reject it.
+
+- `food_prices(units=...)`: `'kgvalue'` (default — `Expenditure / Quantity_kg`, currency per kg, backward-compatible with the pre-Phase-4 implementation), `'unitvalue'` (`Expenditure / Quantity` per native `u`; gives 1 = "Kwacha per Kwacha" for `u='Value'` rows), `'kgprice'` (reported `food_acquired.Price` × kg_factor), `'unitprice'` (reported `Price` per native `u`). The `*price` modes return NaN where the survey did not record a unit price; **no silent fallback** to the `*value` modes.
+- `food_quantities(units=...)`: `'kgs'` (default — kilograms where `u` is convertible, native quantity carried with the native `u` tag where it isn't; the `u` index distinguishes `'kg'` from native rows), `'units'` (sum of native `Quantity` per `(t, v, i, j, u, s)`).
+- The `'kgvalue'` default deliberately departs from the term-of-art "unit value" common in the literature (Deaton 1988, 1997), which usually means `Expenditure / Quantity` standardized to kg. The denominator-explicit naming avoids ambiguity.
+- See `slurm_logs/DESIGN_food_prices_units_kwarg_2026-05-06.org` for full rationale.
+
 **Uganda's derivation path cannot fire** because its `food_acquired` uses `value_home`/`value_away`/`value_own`/`value_inkind` columns, not a single `Expenditure` column. The legacy script `food_prices_quantities_and_expenditures.py` handles the sum and unit conversion via `kgs_per_other_units.json`. The framework falls back to this materialized parquet and applies `_relabel_j` to the result. Blocked on GH #169 (canonical food_acquired columns).
 
 `Country._DEPRECATED` maps removed/deprecated table names to deprecation messages. `__getattr__` checks it before `data_scheme`, returning a method that emits `DeprecationWarning` and calls a compatibility shim. Currently contains `locality` only. See `docs/migration/locality.md`.
