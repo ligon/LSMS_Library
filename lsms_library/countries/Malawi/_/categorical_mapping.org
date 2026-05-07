@@ -225,8 +225,8 @@
 | OTHER (SPECIFY)                                                                                             | Other                                                    |
 | Other                                                                                                       | Other                                                    |
 
-#+name: unit
-| Unit                      | Code |
+#+name: u
+| Preferred Label           | Code |
 |---------------------------+------|
 | Kilogramme                | 01    |
 | 50 kg Bag                 | 02    |
