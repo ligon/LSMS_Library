@@ -738,7 +738,20 @@ class Wave:
                 env["LSMS_DATA_DIR"] = str(data_root())
                 bin_dir = os.path.dirname(sys.executable)
                 env["PATH"] = bin_dir + os.pathsep + env.get("PATH", "")
-                subprocess.run(["make", "-s", '../' + str(relative_parquet_path)], cwd=cwd_path, check=True, env=env)
+                # Mirror ``run_make_target`` (country.py ~line 1856): include
+                # ``_make_jobs_flag()`` so this wave-level legacy fallback can
+                # exploit the cores it was given.  Without this, every
+                # script-path table without a YAML data_info entry built
+                # serially regardless of cpu_count() -- the source of the
+                # cold-build slowness observed when calling derived features
+                # (e.g. Uganda's food_expenditures, which routes here per
+                # wave for food_acquired).
+                make_cmd = ["make", "-s"]
+                jobs_flag = _make_jobs_flag()
+                if jobs_flag:
+                    make_cmd.append(jobs_flag)
+                make_cmd.append('../' + str(relative_parquet_path))
+                subprocess.run(make_cmd, cwd=cwd_path, check=True, env=env)
                 logger.info(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...")
 
                 for candidate in [external_parquet, intree_parquet]:
