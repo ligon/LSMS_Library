@@ -1,0 +1,1895 @@
+[
+  {
+    "country": "Togo",
+    "tables": {
+      "food_prices": {
+        "kgvalue": {
+          "shape": [
+            75967,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Tas": 23915,
+            "Sachet": 15496,
+            "Unit\u00e9": 12127,
+            "Bol": 6414,
+            "101": 4560
+          },
+          "elapsed_s": 0.86
+        },
+        "unitvalue": {
+          "shape": [
+            75969,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Tas": 23915,
+            "Sachet": 15496,
+            "Unit\u00e9": 12127,
+            "Bol": 6414,
+            "101": 4560
+          },
+          "elapsed_s": 0.35
+        },
+        "kgprice": {
+          "shape": [
+            0,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "elapsed_s": 0.25
+        },
+        "unitprice": {
+          "shape": [
+            0,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "elapsed_s": 0.28
+        }
+      },
+      "food_quantities": {
+        "kgs": {
+          "shape": [
+            112439,
+            1
+          ],
+          "cols": [
+            "Quantity"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "kg": 112429,
+            "116": 6,
+            "Sac (10 Kg)": 2,
+            "114": 1,
+            "Sac (25 Kg)": 1
+          },
+          "elapsed_s": 0.95
+        },
+        "units": {
+          "shape": [
+            112439,
+            1
+          ],
+          "cols": [
+            "Quantity"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Tas": 33149,
+            "Sachet": 19868,
+            "Unit\u00e9": 16449,
+            "Bol": 14714,
+            "101": 6622
+          },
+          "elapsed_s": 0.34
+        }
+      }
+    }
+  },
+  {
+    "country": "Guinea-Bissau",
+    "tables": {
+      "food_prices": {
+        "kgvalue": {
+          "shape": [
+            89773,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Monte": 21579,
+            "Unidade": 20329,
+            "Saquinho": 11760,
+            "Kg": 8953,
+            "Caneca": 3637
+          },
+          "elapsed_s": 0.94
+        },
+        "unitvalue": {
+          "shape": [
+            89773,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Monte": 21579,
+            "Unidade": 20329,
+            "Saquinho": 11760,
+            "Kg": 8953,
+            "Caneca": 3637
+          },
+          "elapsed_s": 0.34
+        },
+        "kgprice": {
+          "shape": [
+            0,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "elapsed_s": 0.34
+        },
+        "unitprice": {
+          "shape": [
+            0,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "elapsed_s": 0.29
+        }
+      },
+      "food_quantities": {
+        "kgs": {
+          "shape": [
+            126197,
+            1
+          ],
+          "cols": [
+            "Quantity"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "kg": 126197
+          },
+          "elapsed_s": 1.04
+        },
+        "units": {
+          "shape": [
+            126197,
+            1
+          ],
+          "cols": [
+            "Quantity"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Monte": 33302,
+            "Unidade": 27409,
+            "Saquinho": 13913,
+            "Kg": 12900,
+            "Caneca": 8045
+          },
+          "elapsed_s": 0.48
+        }
+      }
+    }
+  },
+  {
+    "country": "Nepal",
+    "tables": {
+      "food_prices": {
+        "kgvalue": {
+          "error": "RuntimeError('Could not materialize Nepal/food_acquired: no wave-level build succeeded and no cached parquet was found at /global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_acquired.parquet.\\n\\nCommon causes:\\n  - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;\\n  - LSMS_DATA_DIR points to an empty or stale cache location;\\n  - DVC credentials are missing or misconfigured;\\n  - the raw .dta source files have not been dvc-pulled.\\n\\nSee README.org for supported install and data-access patterns.')",
+          "traceback_tail": [
+            "  - the raw .dta source files have not been dvc-pulled.",
+            "",
+            "See README.org for supported install and data-access patterns."
+          ],
+          "elapsed_s": 1.96
+        },
+        "unitvalue": {
+          "error": "RuntimeError('Could not materialize Nepal/food_acquired: no wave-level build succeeded and no cached parquet was found at /global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_acquired.parquet.\\n\\nCommon causes:\\n  - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;\\n  - LSMS_DATA_DIR points to an empty or stale cache location;\\n  - DVC credentials are missing or misconfigured;\\n  - the raw .dta source files have not been dvc-pulled.\\n\\nSee README.org for supported install and data-access patterns.')",
+          "traceback_tail": [
+            "  - the raw .dta source files have not been dvc-pulled.",
+            "",
+            "See README.org for supported install and data-access patterns."
+          ],
+          "elapsed_s": 0.52
+        },
+        "kgprice": {
+          "error": "RuntimeError('Could not materialize Nepal/food_acquired: no wave-level build succeeded and no cached parquet was found at /global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_acquired.parquet.\\n\\nCommon causes:\\n  - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;\\n  - LSMS_DATA_DIR points to an empty or stale cache location;\\n  - DVC credentials are missing or misconfigured;\\n  - the raw .dta source files have not been dvc-pulled.\\n\\nSee README.org for supported install and data-access patterns.')",
+          "traceback_tail": [
+            "  - the raw .dta source files have not been dvc-pulled.",
+            "",
+            "See README.org for supported install and data-access patterns."
+          ],
+          "elapsed_s": 0.36
+        },
+        "unitprice": {
+          "error": "RuntimeError('Could not materialize Nepal/food_acquired: no wave-level build succeeded and no cached parquet was found at /global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_acquired.parquet.\\n\\nCommon causes:\\n  - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;\\n  - LSMS_DATA_DIR points to an empty or stale cache location;\\n  - DVC credentials are missing or misconfigured;\\n  - the raw .dta source files have not been dvc-pulled.\\n\\nSee README.org for supported install and data-access patterns.')",
+          "traceback_tail": [
+            "  - the raw .dta source files have not been dvc-pulled.",
+            "",
+            "See README.org for supported install and data-access patterns."
+          ],
+          "elapsed_s": 0.43
+        }
+      },
+      "food_quantities": {
+        "kgs": {
+          "error": "RuntimeError('Could not materialize Nepal/food_acquired: no wave-level build succeeded and no cached parquet was found at /global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_acquired.parquet.\\n\\nCommon causes:\\n  - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;\\n  - LSMS_DATA_DIR points to an empty or stale cache location;\\n  - DVC credentials are missing or misconfigured;\\n  - the raw .dta source files have not been dvc-pulled.\\n\\nSee README.org for supported install and data-access patterns.')",
+          "traceback_tail": [
+            "  - the raw .dta source files have not been dvc-pulled.",
+            "",
+            "See README.org for supported install and data-access patterns."
+          ],
+          "elapsed_s": 0.56
+        },
+        "units": {
+          "error": "RuntimeError('Could not materialize Nepal/food_acquired: no wave-level build succeeded and no cached parquet was found at /global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_acquired.parquet.\\n\\nCommon causes:\\n  - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;\\n  - LSMS_DATA_DIR points to an empty or stale cache location;\\n  - DVC credentials are missing or misconfigured;\\n  - the raw .dta source files have not been dvc-pulled.\\n\\nSee README.org for supported install and data-access patterns.')",
+          "traceback_tail": [
+            "  - the raw .dta source files have not been dvc-pulled.",
+            "",
+            "See README.org for supported install and data-access patterns."
+          ],
+          "elapsed_s": 0.53
+        }
+      }
+    }
+  },
+  {
+    "country": "Benin",
+    "tables": {
+      "food_prices": {
+        "kgvalue": {
+          "shape": [
+            150183,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Tas": 32851,
+            "Sachet": 31958,
+            "Unit\u00e9": 29090,
+            "Tohoungolo": 14645,
+            "Litre": 9381
+          },
+          "elapsed_s": 1.24
+        },
+        "unitvalue": {
+          "shape": [
+            150187,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Tas": 32851,
+            "Sachet": 31958,
+            "Unit\u00e9": 29090,
+            "Tohoungolo": 14645,
+            "Litre": 9381
+          },
+          "elapsed_s": 0.45
+        },
+        "kgprice": {
+          "shape": [
+            0,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "elapsed_s": 0.65
+        },
+        "unitprice": {
+          "shape": [
+            0,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "elapsed_s": 0.4
+        }
+      },
+      "food_quantities": {
+        "kgs": {
+          "shape": [
+            188306,
+            1
+          ],
+          "cols": [
+            "Quantity"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "kg": 188209,
+            "Pinc\u00e9e": 87,
+            "nimkotirou(BARIBA)": 3,
+            "sikpanou": 3,
+            "Sac (10 Kg)": 2
+          },
+          "elapsed_s": 1.41
+        },
+        "units": {
+          "shape": [
+            188306,
+            1
+          ],
+          "cols": [
+            "Quantity"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Tas": 43120,
+            "Sachet": 35526,
+            "Unit\u00e9": 34168,
+            "Tohoungolo": 20104,
+            "Litre": 11660
+          },
+          "elapsed_s": 0.55
+        }
+      }
+    }
+  },
+  {
+    "country": "Niger",
+    "tables": {
+      "food_prices": {
+        "kgvalue": {
+          "shape": [
+            85741,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Sachet": 32135,
+            "Unit\u00c3\u00a9": 13668,
+            "Tas": 9467,
+            "Tiya": 9233,
+            "Kg": 6336
+          },
+          "elapsed_s": 1.42
+        },
+        "unitvalue": {
+          "shape": [
+            198372,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "139": 48282,
+            "Sachet": 32135,
+            "147": 16000,
+            "Unit\u00c3\u00a9": 13668,
+            "143": 12119
+          },
+          "elapsed_s": 0.56
+        },
+        "kgprice": {
+          "shape": [
+            0,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "elapsed_s": 0.54
+        },
+        "unitprice": {
+          "shape": [
+            0,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "elapsed_s": 0.49
+        }
+      },
+      "food_quantities": {
+        "kgs": {
+          "shape": [
+            238265,
+            1
+          ],
+          "cols": [
+            "Quantity"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "kg": 107449,
+            "139": 52223,
+            "512": 17868,
+            "147": 17307,
+            "143": 13991
+          },
+          "elapsed_s": 1.89
+        },
+        "units": {
+          "shape": [
+            238265,
+            1
+          ],
+          "cols": [
+            "Quantity"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "139": 52223,
+            "Sachet": 36036,
+            "Tiya": 18493,
+            "512": 17868,
+            "147": 17307
+          },
+          "elapsed_s": 0.66
+        }
+      }
+    }
+  },
+  {
+    "country": "Ethiopia",
+    "tables": {
+      "food_prices": {
+        "kgvalue": {
+          "error": "ValueError(\"food_prices(units='kgvalue') requires ['Expenditure', 'Quantity'] on food_acquired\")",
+          "traceback_tail": [
+            "  File \"/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/transformations.py\", line 882, in food_prices_from_acquired",
+            "    raise ValueError(",
+            "ValueError: food_prices(units='kgvalue') requires ['Expenditure', 'Quantity'] on food_acquired"
+          ],
+          "elapsed_s": 1.47
+        },
+        "unitvalue": {
+          "error": "ValueError(\"food_prices(units='unitvalue') requires ['Expenditure', 'Quantity'] on food_acquired\")",
+          "traceback_tail": [
+            "  File \"/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/transformations.py\", line 882, in food_prices_from_acquired",
+            "    raise ValueError(",
+            "ValueError: food_prices(units='unitvalue') requires ['Expenditure', 'Quantity'] on food_acquired"
+          ],
+          "elapsed_s": 1.13
+        },
+        "kgprice": {
+          "shape": [
+            0,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u"
+          ],
+          "unique": true,
+          "elapsed_s": 1.14
+        },
+        "unitprice": {
+          "shape": [
+            0,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u"
+          ],
+          "unique": true,
+          "elapsed_s": 1.14
+        }
+      },
+      "food_quantities": {
+        "kgs": {
+          "error": "ValueError(\"food_acquired must have a 'Quantity' column\")",
+          "traceback_tail": [
+            "  File \"/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/transformations.py\", line 754, in food_quantities_from_acquired",
+            "    raise ValueError(\"food_acquired must have a 'Quantity' column\")",
+            "ValueError: food_acquired must have a 'Quantity' column"
+          ],
+          "elapsed_s": 1.08
+        },
+        "units": {
+          "error": "ValueError(\"food_acquired must have a 'Quantity' column\")",
+          "traceback_tail": [
+            "  File \"/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/transformations.py\", line 754, in food_quantities_from_acquired",
+            "    raise ValueError(\"food_acquired must have a 'Quantity' column\")",
+            "ValueError: food_acquired must have a 'Quantity' column"
+          ],
+          "elapsed_s": 1.05
+        }
+      }
+    }
+  },
+  {
+    "country": "CotedIvoire",
+    "tables": {
+      "food_prices": {
+        "kgvalue": {
+          "shape": [
+            213872,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Sachet": 55576,
+            "Tas": 48510,
+            "Unit\u00c3\u00a9": 46321,
+            "Kg": 15451,
+            "Morceau": 7104
+          },
+          "elapsed_s": 1.77
+        },
+        "unitvalue": {
+          "shape": [
+            213872,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Sachet": 55576,
+            "Tas": 48510,
+            "Unit\u00c3\u00a9": 46321,
+            "Kg": 15451,
+            "Morceau": 7104
+          },
+          "elapsed_s": 0.81
+        },
+        "kgprice": {
+          "shape": [
+            0,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "elapsed_s": 0.69
+        },
+        "unitprice": {
+          "shape": [
+            0,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "elapsed_s": 0.73
+        }
+      },
+      "food_quantities": {
+        "kgs": {
+          "shape": [
+            294493,
+            1
+          ],
+          "cols": [
+            "Quantity"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "kg": 294493
+          },
+          "elapsed_s": 2.37
+        },
+        "units": {
+          "shape": [
+            294493,
+            1
+          ],
+          "cols": [
+            "Quantity"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Unit\u00c3\u00a9": 67876,
+            "Tas": 66617,
+            "Sachet": 62638,
+            "Kg": 20139,
+            "Boite": 9452
+          },
+          "elapsed_s": 0.95
+        }
+      }
+    }
+  },
+  {
+    "country": "Burkina_Faso",
+    "tables": {
+      "food_prices": {
+        "kgvalue": {
+          "shape": [
+            147384,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Sachet": 39623,
+            "Tas": 31607,
+            "Unit\u00e9": 26008,
+            "Kg": 14238,
+            "Bo\u00eete": 6277
+          },
+          "elapsed_s": 1.9
+        },
+        "unitvalue": {
+          "shape": [
+            147387,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Sachet": 39623,
+            "Tas": 31607,
+            "Unit\u00e9": 26008,
+            "Kg": 14238,
+            "Bo\u00eete": 6277
+          },
+          "elapsed_s": 0.78
+        },
+        "kgprice": {
+          "shape": [
+            0,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "elapsed_s": 0.82
+        },
+        "unitprice": {
+          "shape": [
+            0,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "elapsed_s": 0.72
+        }
+      },
+      "food_quantities": {
+        "kgs": {
+          "shape": [
+            206469,
+            1
+          ],
+          "cols": [
+            "Quantity"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "kg": 206463,
+            "116": 4,
+            "Sac (5 Kg)": 2
+          },
+          "elapsed_s": 2.43
+        },
+        "units": {
+          "shape": [
+            206554,
+            1
+          ],
+          "cols": [
+            "Quantity"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Sachet": 47679,
+            "Tas": 44725,
+            "Unit\u00e9": 30563,
+            "Kg": 18310,
+            "Bo\u00eete": 14638
+          },
+          "elapsed_s": 0.84
+        }
+      }
+    }
+  },
+  {
+    "country": "Mali",
+    "tables": {
+      "food_prices": {
+        "kgvalue": {
+          "shape": [
+            306398,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Tas": 60471,
+            "Kg": 45924,
+            "Sachet": 33118,
+            "Unit\u00e9": 26180,
+            "kg": 24429
+          },
+          "elapsed_s": 2.37
+        },
+        "unitvalue": {
+          "shape": [
+            306398,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Tas": 60471,
+            "Kg": 45924,
+            "Sachet": 33118,
+            "Unit\u00e9": 26180,
+            "kg": 24429
+          },
+          "elapsed_s": 0.97
+        },
+        "kgprice": {
+          "shape": [
+            0,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "elapsed_s": 0.96
+        },
+        "unitprice": {
+          "shape": [
+            0,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "elapsed_s": 0.87
+        }
+      },
+      "food_quantities": {
+        "kgs": {
+          "shape": [
+            305591,
+            1
+          ],
+          "cols": [
+            "Quantity"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "kg": 305583,
+            "Seau (25 Kg)": 4,
+            "Sac (25 Kg)": 4
+          },
+          "elapsed_s": 2.83
+        },
+        "units": {
+          "shape": [
+            306997,
+            1
+          ],
+          "cols": [
+            "Quantity"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Tas": 57071,
+            "kg": 35288,
+            "Kg": 35112,
+            "Sachet": 32668,
+            "sachet industriel": 25448
+          },
+          "elapsed_s": 1.05
+        }
+      }
+    }
+  },
+  {
+    "country": "Senegal",
+    "tables": {
+      "food_prices": {
+        "kgvalue": {
+          "shape": [
+            387272,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Sachet": 99192,
+            "Kg": 73419,
+            "Unit\u00e9": 62833,
+            "Tas": 41814,
+            "Morceau": 25213
+          },
+          "elapsed_s": 2.57
+        },
+        "unitvalue": {
+          "shape": [
+            387272,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Sachet": 99192,
+            "Kg": 73419,
+            "Unit\u00e9": 62833,
+            "Tas": 41814,
+            "Morceau": 25213
+          },
+          "elapsed_s": 1.1
+        },
+        "kgprice": {
+          "shape": [
+            0,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "elapsed_s": 0.94
+        },
+        "unitprice": {
+          "shape": [
+            0,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "elapsed_s": 1.01
+        }
+      },
+      "food_quantities": {
+        "kgs": {
+          "shape": [
+            434389,
+            1
+          ],
+          "cols": [
+            "Quantity"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "kg": 434389
+          },
+          "elapsed_s": 3.38
+        },
+        "units": {
+          "shape": [
+            434612,
+            1
+          ],
+          "cols": [
+            "Quantity"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Sachet": 106708,
+            "Kg": 84218,
+            "Unit\u00e9": 69989,
+            "Tas": 46595,
+            "Morceau": 26303
+          },
+          "elapsed_s": 1.17
+        }
+      }
+    }
+  },
+  {
+    "country": "GhanaLSS",
+    "tables": {
+      "food_prices": {
+        "kgvalue": {
+          "shape": [
+            0,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u"
+          ],
+          "unique": true,
+          "elapsed_s": 5.58
+        },
+        "unitvalue": {
+          "shape": [
+            341401,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u"
+          ],
+          "unique": true,
+          "u_top5": {},
+          "elapsed_s": 3.25
+        },
+        "kgprice": {
+          "shape": [
+            1,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Liter": 1
+          },
+          "elapsed_s": 4.48
+        },
+        "unitprice": {
+          "shape": [
+            45106,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Value": 22,
+            "All": 6,
+            "Margarine tin": 5,
+            "Fruits": 4,
+            "Pounds": 4
+          },
+          "elapsed_s": 3.28
+        }
+      },
+      "food_quantities": {
+        "kgs": {
+          "error": "ValueError('No objects to concatenate')",
+          "traceback_tail": [
+            "  File \"/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/pandas/core/reshape/concat.py\", line 808, in _clean_keys_and_objs",
+            "    raise ValueError(\"No objects to concatenate\")",
+            "ValueError: No objects to concatenate"
+          ],
+          "elapsed_s": 6.5
+        },
+        "units": {
+          "shape": [
+            0,
+            1
+          ],
+          "cols": [
+            "Quantity"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u"
+          ],
+          "unique": true,
+          "elapsed_s": 3.15
+        }
+      }
+    }
+  },
+  {
+    "country": "Malawi",
+    "tables": {
+      "food_prices": {
+        "kgvalue": {
+          "shape": [
+            681289,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "kg": 292131,
+            "KILOGRAMME": 53458,
+            "Piece": 39576,
+            "HEAP": 29010,
+            "LITRE": 22077
+          },
+          "elapsed_s": 7.36
+        },
+        "unitvalue": {
+          "shape": [
+            681326,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "kg": 292131,
+            "KILOGRAMME": 53458,
+            "Piece": 39576,
+            "HEAP": 29010,
+            "LITRE": 22077
+          },
+          "elapsed_s": 4.15
+        },
+        "kgprice": {
+          "shape": [
+            0,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "elapsed_s": 3.84
+        },
+        "unitprice": {
+          "shape": [
+            0,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "elapsed_s": 3.8
+        }
+      },
+      "food_quantities": {
+        "kgs": {
+          "shape": [
+            773593,
+            1
+          ],
+          "cols": [
+            "Quantity"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "kg": 773089,
+            "Basin/Lichero": 320,
+            "THUNGWA": 40,
+            "0": 13,
+            "PLATES": 7
+          },
+          "elapsed_s": 8.85
+        },
+        "units": {
+          "shape": [
+            773720,
+            1
+          ],
+          "cols": [
+            "Quantity"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "kg": 337743,
+            "Piece": 63488,
+            "KILOGRAMME": 46471,
+            "Kg": 35805,
+            "1": 23022
+          },
+          "elapsed_s": 4.72
+        }
+      }
+    }
+  },
+  {
+    "country": "Tanzania",
+    "tables": {
+      "food_prices": {
+        "kgvalue": {
+          "error": "CalledProcessError(2, ['make', '-s', '../2008-15/_/sample.parquet'])",
+          "traceback_tail": [
+            "  File \"/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/subprocess.py\", line 571, in run",
+            "    raise CalledProcessError(retcode, process.args,",
+            "subprocess.CalledProcessError: Command '['make', '-s', '../2008-15/_/sample.parquet']' returned non-zero exit status 2."
+          ],
+          "elapsed_s": 103.37
+        },
+        "unitvalue": {
+          "error": "CalledProcessError(2, ['make', '-s', '../2008-15/_/sample.parquet'])",
+          "traceback_tail": [
+            "  File \"/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/subprocess.py\", line 571, in run",
+            "    raise CalledProcessError(retcode, process.args,",
+            "subprocess.CalledProcessError: Command '['make', '-s', '../2008-15/_/sample.parquet']' returned non-zero exit status 2."
+          ],
+          "elapsed_s": 87.56
+        },
+        "kgprice": {
+          "error": "CalledProcessError(2, ['make', '-s', '../2008-15/_/sample.parquet'])",
+          "traceback_tail": [
+            "  File \"/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/subprocess.py\", line 571, in run",
+            "    raise CalledProcessError(retcode, process.args,",
+            "subprocess.CalledProcessError: Command '['make', '-s', '../2008-15/_/sample.parquet']' returned non-zero exit status 2."
+          ],
+          "elapsed_s": 95.0
+        },
+        "unitprice": {
+          "error": "CalledProcessError(2, ['make', '-s', '../2008-15/_/sample.parquet'])",
+          "traceback_tail": [
+            "  File \"/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/subprocess.py\", line 571, in run",
+            "    raise CalledProcessError(retcode, process.args,",
+            "subprocess.CalledProcessError: Command '['make', '-s', '../2008-15/_/sample.parquet']' returned non-zero exit status 2."
+          ],
+          "elapsed_s": 93.33
+        }
+      },
+      "food_quantities": {
+        "kgs": {
+          "error": "CalledProcessError(2, ['make', '-s', '../2008-15/_/sample.parquet'])",
+          "traceback_tail": [
+            "  File \"/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/subprocess.py\", line 571, in run",
+            "    raise CalledProcessError(retcode, process.args,",
+            "subprocess.CalledProcessError: Command '['make', '-s', '../2008-15/_/sample.parquet']' returned non-zero exit status 2."
+          ],
+          "elapsed_s": 91.2
+        },
+        "units": {
+          "error": "CalledProcessError(2, ['make', '-s', '../2008-15/_/sample.parquet'])",
+          "traceback_tail": [
+            "  File \"/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/subprocess.py\", line 571, in run",
+            "    raise CalledProcessError(retcode, process.args,",
+            "subprocess.CalledProcessError: Command '['make', '-s', '../2008-15/_/sample.parquet']' returned non-zero exit status 2."
+          ],
+          "elapsed_s": 92.82
+        }
+      }
+    }
+  },
+  {
+    "country": "Uganda",
+    "tables": {
+      "food_prices": {
+        "kgvalue": {
+          "shape": [
+            349081,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Kg": 69590,
+            "Cup/Mug(0.5lt)": 22247,
+            "Heap (Small)": 21685,
+            "Heap (Medium)": 19282,
+            "Heap (unspecified)": 16018
+          },
+          "elapsed_s": 665.19
+        },
+        "unitvalue": {
+          "shape": [
+            349081,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Kg": 69590,
+            "Cup/Mug(0.5lt)": 22247,
+            "Heap (Small)": 21685,
+            "Heap (Medium)": 19282,
+            "Heap (unspecified)": 16018
+          },
+          "elapsed_s": 1.36
+        },
+        "kgprice": {
+          "shape": [
+            325814,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Kg": 66337,
+            "Cup/Mug(0.5lt)": 20619,
+            "Heap (Small)": 19849,
+            "Heap (Medium)": 17876,
+            "Packet (500 g)": 15001
+          },
+          "elapsed_s": 2.25
+        },
+        "unitprice": {
+          "shape": [
+            325814,
+            1
+          ],
+          "cols": [
+            "Price"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Kg": 66337,
+            "Cup/Mug(0.5lt)": 20619,
+            "Heap (Small)": 19849,
+            "Heap (Medium)": 17876,
+            "Packet (500 g)": 15001
+          },
+          "elapsed_s": 1.34
+        }
+      },
+      "food_quantities": {
+        "kgs": {
+          "shape": [
+            348742,
+            1
+          ],
+          "cols": [
+            "Quantity"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "kg": 348742
+          },
+          "elapsed_s": 3.3
+        },
+        "units": {
+          "shape": [
+            348800,
+            1
+          ],
+          "cols": [
+            "Quantity"
+          ],
+          "idx": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "unique": true,
+          "u_top5": {
+            "Kg": 69530,
+            "Cup/Mug(0.5lt)": 22228,
+            "Heap (Small)": 21681,
+            "Heap (Medium)": 19282,
+            "Heap (unspecified)": 15952
+          },
+          "elapsed_s": 1.54
+        }
+      }
+    }
+  },
+  {
+    "country": "Nigeria",
+    "tables": {
+      "food_prices": {
+        "kgvalue": {
+          "error": "CalledProcessError(2, ['make', '-s', '../2010-11/_/food_acquired.parquet'])",
+          "traceback_tail": [
+            "  File \"/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/subprocess.py\", line 571, in run",
+            "    raise CalledProcessError(retcode, process.args,",
+            "subprocess.CalledProcessError: Command '['make', '-s', '../2010-11/_/food_acquired.parquet']' returned non-zero exit status 2."
+          ],
+          "elapsed_s": 532.83
+        },
+        "unitvalue": {
+          "error": "CalledProcessError(2, ['make', '-s', '../2010-11/_/food_acquired.parquet'])",
+          "traceback_tail": [
+            "  File \"/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/subprocess.py\", line 571, in run",
+            "    raise CalledProcessError(retcode, process.args,",
+            "subprocess.CalledProcessError: Command '['make', '-s', '../2010-11/_/food_acquired.parquet']' returned non-zero exit status 2."
+          ],
+          "elapsed_s": 94.63
+        },
+        "kgprice": {
+          "error": "CalledProcessError(2, ['make', '-s', '../2010-11/_/food_acquired.parquet'])",
+          "traceback_tail": [
+            "  File \"/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/subprocess.py\", line 571, in run",
+            "    raise CalledProcessError(retcode, process.args,",
+            "subprocess.CalledProcessError: Command '['make', '-s', '../2010-11/_/food_acquired.parquet']' returned non-zero exit status 2."
+          ],
+          "elapsed_s": 103.61
+        },
+        "unitprice": {
+          "error": "CalledProcessError(2, ['make', '-s', '../2010-11/_/food_acquired.parquet'])",
+          "traceback_tail": [
+            "  File \"/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/subprocess.py\", line 571, in run",
+            "    raise CalledProcessError(retcode, process.args,",
+            "subprocess.CalledProcessError: Command '['make', '-s', '../2010-11/_/food_acquired.parquet']' returned non-zero exit status 2."
+          ],
+          "elapsed_s": 89.56
+        }
+      },
+      "food_quantities": {
+        "kgs": {
+          "error": "CalledProcessError(2, ['make', '-s', '../2010-11/_/food_acquired.parquet'])",
+          "traceback_tail": [
+            "  File \"/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/subprocess.py\", line 571, in run",
+            "    raise CalledProcessError(retcode, process.args,",
+            "subprocess.CalledProcessError: Command '['make', '-s', '../2010-11/_/food_acquired.parquet']' returned non-zero exit status 2."
+          ],
+          "elapsed_s": 88.15
+        },
+        "units": {
+          "error": "CalledProcessError(2, ['make', '-s', '../2010-11/_/food_acquired.parquet'])",
+          "traceback_tail": [
+            "  File \"/global/software/rocky-8.x86_64/python-3.11.6/._python-3.11.6/zxbhdko4pyfbffp3rebfywqstwyqctut/python/3.11.6-gcc/lib/python3.11/subprocess.py\", line 571, in run",
+            "    raise CalledProcessError(retcode, process.args,",
+            "subprocess.CalledProcessError: Command '['make', '-s', '../2010-11/_/food_acquired.parquet']' returned non-zero exit status 2."
+          ],
+          "elapsed_s": 90.02
+        }
+      }
+    }
+  }
+]
