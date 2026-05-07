@@ -215,7 +215,9 @@ Strata labels typically vary across waves (case, spelling, whitespace). Add a `#
 | kampala            | Kampala         |
 ```
 
-The library auto-applies this mapping when the column name (`strata`) matches a table name in `categorical_mapping.org`. The framework strips leading/trailing whitespace from string columns before matching, so space-padded labels from Stata files are handled automatically.
+The library auto-applies this mapping when the column name (`strata`) matches a table name in `categorical_mapping.org` (case-insensitive). The framework strips leading/trailing whitespace from string columns before matching, so space-padded labels from Stata files are handled automatically.
+
+**Naming the table after the column.** Auto-discovery is keyed on column name, so a single table normalises *one* column. If the same vocabulary covers multiple columns (e.g. a country whose `strata` and `District` columns share the same district names), name the table after the column most callers will use and reach the other column via an explicit `mappings:` clause in `data_info.yml`. Malawi names its table `#+name: district` (because `cluster_features.District` and `sample.District` both auto-pick it up) and then the `sample.strata` field uses `mappings: ['district', 'Alternate Spelling', 'Preferred Label']` to share the same vocabulary.
 
 **Note:** Different waves may use genuinely different stratification schemes (e.g., Uganda 2009-10 has 6 strata while 2013-14 has 10 sub-regions). Do not force-harmonize across different schemes --- just fix cosmetic issues (case, whitespace, typos) within each scheme.
 

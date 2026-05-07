@@ -64,6 +64,10 @@ food_labels = get_categorical_mapping(tablename='harmonize_food',
 
 The `get_categorical_mapping()` function searches for the named org table in `categorical_mapping.org`, reads it via `df_from_orgfile()`, and returns a dict.
 
+**Caveat (fixed in `2ab51106`, GH #222).** `df_data_grabber` -- which `get_categorical_mapping` calls under the hood -- runs every `idxvars` value through `format_id`, which historically did `s.split('.')[0]` on string input to strip Stata's `"123.0"` -> `"123"`.  For food labels ending in `"etc."` or any internal period, that quietly truncated the dict key.  The fix narrows the strip to "both sides of the dot are digits", so calls like `get_categorical_mapping(idxvars={'j': 'Original Label'})` are now safe.  If you're working on a country that hasn't been rebuilt since the fix, force a rebuild after pulling.
+
+**Alternative for case / encoding handling.** If your wave script applies `df['i'].str.capitalize()` (or hits encoding mojibake -- `\x96`, `�`, `ï¿½` for en-dashes), the dict-key lookup will silently miss anything where the org-column entry differs in case from the post-`.capitalize()` data.  Malawi works around this with `apply_harmonize_food()` and `normalize_food_label()` helpers in `Malawi/_/malawi.py` that read `categorical_mapping.org` directly and case-fold dict keys to match the data path.  Worth copying that pattern when adding a new country whose source `.dta` carries case drift or mojibake.
+
 Reference: `lsms_library/countries/Uganda/_/food_items.org`, `lsms_library/countries/Malawi/_/categorical_mapping.org`
 
 ### Step 2: Harmonize unit labels
