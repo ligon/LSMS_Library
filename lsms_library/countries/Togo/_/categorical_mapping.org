@@ -1,5 +1,22 @@
 #+title: Categorical Mappings — Togo
 
+#+name: u
+| Original Label | Preferred Label |
+|----------------+-----------------|
+| Kg             | Kg              |
+| Tas            | Tas             |
+| Sachet         | Sachet          |
+| Unité          | Unité           |
+| Bol            | Bol             |
+| Paquet         | Paquet          |
+| Calebasse      | Calebasse       |
+| Morceau        | Morceau         |
+| Sac (5 Kg)     | Sac (5 Kg)      |
+| Sac (10 Kg)    | Sac (10 Kg)     |
+| Sac (25 Kg)    | Sac (25 Kg)     |
+| Agoua          | Agoua           |
+| Kpogban        | Kpogban         |
+
 #+name: Roof
 | Alternate Spelling | Preferred Label |
 |--------------------+-----------------|
