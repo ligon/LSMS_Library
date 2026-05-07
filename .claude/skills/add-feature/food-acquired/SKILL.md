@@ -239,6 +239,138 @@ Full design rationale: `slurm_logs/DESIGN_food_prices_units_kwarg_2026-05-06.org
 
 **Naming caveat**: `kgvalue` is what the demand-systems literature usually calls "unit value" (Deaton 1988, 1997 — `Expenditure / Quantity` standardized to kg).  Our `unitvalue` mode deliberately departs from that convention to mean per-native-`u`.  Document this distinction in any analysis-facing docstring.
 
+## Designing the `Aggregate Label` and `Aggregate (short)` columns
+
+After `harmonize_food` is in place and `food_expenditures()` returns
+clean per-PL data, downstream demand estimation (CFE) usually wants a
+*coarser* grouping than the full Preferred-Label list — both for
+estimation power (sparse PLs that fail `cfe.regression.prepare_data`'s
+`min_obs=30` floor want a home) and for downstream interpretability.
+This is the role of the `Aggregate Label` column on `harmonize_food`.
+
+### When to add an `Aggregate Label` column
+
+When any of:
+
+- The country has > ~30 Preferred Labels and the analyst plans to run
+  CFE — a smaller bucketing avoids the dense-many-items regression
+  becoming noisy.
+- A meaningful number of PLs are observed too rarely (per-wave-market)
+  to clear `prepare_data`'s thresholds; bundling sparse items with
+  type-similar bigger items rescues them.
+- The analyst wants a `j` index of ~20–40 buckets for plots / tables.
+
+Trigger the API by calling
+`Country.food_expenditures(labels='Aggregate', reaggregate=True)` (or
+the same on `food_quantities`). The framework reads the `Aggregate
+Label` column from `harmonize_food` and renames the `j` level
+accordingly, summing expenditures within each bucket.
+
+### Bucket-design rules (Malawi worked example: 65 buckets)
+
+The principled criterion is the **CFE β-spread test** at low
+confidence (~ 50% CI):
+
+> For every multi-PL bucket, the within-bucket β span must satisfy
+> `max(β) - min(β) < 1.348 × σ_min`, where σ_min is the smallest
+> standard error among the bucket's well-estimated constituents.
+> Buckets failing this introduce a w-correlated residual: the
+> aggregate β becomes a weighted average that drifts from each
+> constituent's individual β by more than 50% CI, and the resulting
+> aggregate-labelled regression no longer estimates the same latent
+> MUE as the Preferred-labelled one.
+
+In practice the curator iterates:
+
+1. Run CFE on Preferred Labels → get `(β, σ)` for each PL.
+2. Cluster PLs by β within type-coherent groups (don't lump
+   `Eggs Boiled (Vendor)` β=0.51 with `Maize Ufa Refined (Fine Flour)`
+   β=0.51 just because the βs match — they're different food types).
+3. Assign sparse (no-β) PLs to whichever bucket they conceptually
+   match (use category, common-sense substitutability).
+4. Re-test the bucket scheme against the β-spread rule; split any
+   failing bucket along its dominant β cleavage line.
+
+A typical end state: ~30–60 buckets, with 5–10 well-estimated
+singletons (sugar, salt, rice, …), ~20–30 small clusters (tropical
+fruits, leafy greens, fish-by-preservation, …), and a residual
+"Other" bucket.
+
+### Carve-outs for downstream experiments
+
+Sometimes a downstream analysis (an experimental sub-survey, a
+specific paper) requires that certain Preferred Labels remain their
+own Aggregate buckets — verbatim string match. In Malawi the
+MalawiMUEs experiment reserves 17 such PLs. The convention: set
+`Aggregate Label = Preferred Label` for those rows, and design the
+remaining buckets around them. Other PLs in the same conceptual
+category that *aren't* on the carve-out list can still fold into the
+carve-out's bucket (e.g. `Honey` and `Jam, Jelly, Honey` join the
+`Sugar` carve-out bucket because Sugar is the carve-out anchor).
+
+### `Aggregate (short)` column for graphs / tables
+
+A second optional column gives short forms (≤ 11 characters) of each
+Aggregate Label, suitable for axis ticks, panel titles, table
+headers. Keep the two columns separate — the long form is the
+analytical handle, the short form is the display label.
+
+Design heuristics:
+
+- Drop generic qualifiers when uniqueness preserved (`Cooking Oil`
+  → `Oil`, `Sugar Cane` → `Cane`).
+- Use local terms where they help legibility (Malawi: Mgaiwa,
+  Madeya, Nkwani, Tanaposi, Therere, Nandolo, Maheu, Thobwa, Bica,
+  Chambo).
+- Pluralisation suffix `+` for "this term and similar" when the
+  bucket is a list (`Mango+`, `Beans+`).
+- Brand-as-genre when the brand is the bucket
+  (`Coffee`, `Soda`, `Mandazi`).
+
+### Tooling
+
+`lsms_library/util/orgtbl.py` adds or updates a derived column in any
+named Org table.  Used like:
+
+```bash
+python -m lsms_library.util.orgtbl \
+    lsms_library/countries/{Country}/_/categorical_mapping.org \
+    --table harmonize_food \
+    --column 'Aggregate (short)' \
+    --mapping lsms_library/countries/{Country}/_/aggregate_short.yml \
+    --source-column 'Aggregate Label' \
+    --insert-after 'Aggregate Label'
+```
+
+The mapping YAML is a flat dict from source-column value to
+target-column value. Idempotent on re-run; the same invocation can
+update an existing column. Same tool handles inserting the
+`Aggregate Label` column itself — supply a YAML keyed on
+`Preferred Label`.
+
+For Malawi see `lsms_library/countries/Malawi/_/aggregate_short.yml`
+as a reference checked-in mapping.
+
+### Empirical sanity (after re-running CFE on the Aggregate scheme)
+
+Once buckets are designed and you have estimates `w_p` (Preferred)
+and `w_a` (Aggregate), the empirical comparisons that matter:
+
+1. Predictive validity against held-out non-food expenditure (your
+   `lambda_predicts_nonfood.py` pattern). Whichever w predicts
+   non-food better is closer to true MUE.
+2. Stability under perturbation (drop one wave, sub-sample HHs).
+3. Correlation `corr(w_p, w_a)` and the regression
+   `w_p ~ α + δ·w_a` — useful as **diagnostics**: agreement
+   reassures, disagreement signals a bucket-design problem the
+   β-spread test missed (e.g., separability violation, demographic
+   heterogeneity within bucket). Disagreement does not by itself
+   adjudicate which is correct — for that, fall back on (1).
+
+GH #226 tracks the principled auto-aggregation script that would
+codify the β-spread test plus a type-coherence judgement plus
+greedy clustering.
+
 ## Common pitfalls
 
 - **Unit codes change across waves** — the same physical unit (e.g., "Pail Small") may have code 4 in one wave and code 4A in another
