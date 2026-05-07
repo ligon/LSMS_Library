@@ -1,5 +1,90 @@
 #+title: Categorical Mappings — Benin
 
+* Food Units
+
+#+name: u
+| Original Label           | Preferred Label  |
+|--------------------------+------------------|
+| Kg                       | Kg               |
+| Litre                    | Litre            |
+| Unité                    | Unité            |
+| Sachet                   | Sachet           |
+| Paquet                   | Paquet           |
+| Boîte                    | Boîte            |
+| Boîte de tomate          | Boîte de tomate  |
+| Bocal de mayonnaise      | Bocal de mayonnaise |
+| Grand bocal              | Grand bocal      |
+| Bol                      | Bol              |
+| Bassine                  | Bassine          |
+| Tas                      | Tas              |
+| Boule                    | Boule            |
+| Bouquet                  | Bouquet          |
+| bouteille                | Bouteille        |
+| Morceau                  | Morceau          |
+| Panier                   | Panier           |
+| Calebasse                | Calebasse        |
+| Régime                   | Régime           |
+| Pot                      | Pot              |
+| Fagot                    | Fagot            |
+| Carton                   | Carton           |
+| Grappe                   | Grappe           |
+| Plastique                | Plastique        |
+| Alvéole/Plateau          | Alvéole/Plateau  |
+| Chaîne en bois           | Chaîne en bois   |
+| Gobelet                  | Gobelet          |
+| passoire                 | Passoire         |
+| Pincée                   | Pincée           |
+| Gousse                   | Gousse           |
+| Louche                   | Louche           |
+| Canette                  | Canette          |
+| Filet                    | Filet            |
+| cuisse                   | Cuisse           |
+| Quarantaine              | Quarantaine      |
+| Bidon                    | Bidon            |
+| Bidon de 1l              | Bidon de 1 L     |
+| Bidon de 5l              | Bidon de 5 L     |
+| Bidon de 1 litre et démi | Bidon de 1,5 L   |
+| bidon de demi litre      | Bidon de 0,5 L   |
+| Sac (5 Kg)               | Sac (5 Kg)       |
+| sac de 2,5kg             | Sac (2,5 Kg)     |
+| Sac (10 Kg)              | Sac (10 Kg)      |
+| Sac (25 Kg)              | Sac (25 Kg)      |
+| Sac (50 Kg)              | Sac (50 Kg)      |
+| Sac (100 Kg)             | Sac (100 Kg)     |
+| Avec os au Kg            | Avec os au Kg    |
+| Avec os au tas           | Avec os au tas   |
+| Sans os au Kg            | Sans os au Kg    |
+| Sans os au tas           | Sans os au tas   |
+| Tohoungolo               | Tohoungolo       |
+| Otoka/Fihanfingban       | Otoka/Fihanfingban |
+| sogo                     | Sogo             |
+| Agoua                    | Agoua            |
+| Pome                     | Pome             |
+| Yoroukou/Yorougou        | Yoroukou/Yorougou |
+| Abotoca                  | Abotoca          |
+| Rôba                     | Rôba             |
+| sagagou ( en bariba)     | Sagagou          |
+| Paï                      | Paï              |
+| Ike                      | Ike              |
+| Nobayirou                | Nobayirou        |
+| Atonnongban              | Atonnongban      |
+| gannouvi                 | Gannouvi         |
+| corbar en bariba         | Corbar           |
+| Si                       | Si               |
+| Blèvi                    | Blèvi            |
+| Tinnabou (bariba )       | Tinnabou         |
+| ibogban                  | Ibogban          |
+| Djogledo                 | Djogledo         |
+| Ayewa                    | Ayewa            |
+| Gbinbou bonnou           | Gbinbou bonnou   |
+| nimkotirou(BARIBA)       | Nimkotirou       |
+| Kpanouvi                 | Kpanouvi         |
+| sikpanou                 | Sikpanou         |
+| siroba                   | Siroba           |
+| sivlo                    | Sivlo            |
+| Djlèka                   | Djlèka           |
+| Signi                    | Signi            |
+
 #+name: Roof
 | Alternate Spelling | Preferred Label |
 |--------------------+-----------------|
