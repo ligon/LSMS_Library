@@ -149,3 +149,43 @@ rather than expecting a =MonthsSpent= column in =household_roster()=.
 The pre-EHCVM 1985-89 waves (CILSS/EPAM) also lack a continuous
 months-of-presence variable; these surveys predate the EHCVM design
 and do not include MonthsSpent or equivalent fields.
+
+* Unit handling for =food_acquired=
+
+The =u= (unit) index level on =food_acquired= carries clean canonical
+French unit names (=Kg=, =Litre=, =Sachet=, =Unité=, =Cuillière=,
+=Régime=, =Boîte de tomate=, ...) -- 52 distinct values total.  No
+=u= table is wired into =_/categorical_mapping.org=; the framework's
+auto-discovery on =u= would be a no-op (the labels are already
+canonical).
+
+The clean labels come from a per-wave mojibake fix in
+=2018-19/_/mapping.py=:
+
+- The .dta file's value-labels block stores French strings as raw
+  UTF-8 bytes, but its metadata declares Latin-1 encoding.  pyreadstat
+  respects the metadata and produces double-decoded strings (=Unité=
+  becomes =UnitÃ©=, =Cuillière= becomes =CuilliÃ¨re=, etc.).
+- The wave's =mapping.py= defines a =food_acquired= post-processor
+  (replacing the default =food_acquired_to_canonical= alias) that calls
+  the canonical reshape and then sweeps mojibake out of every string
+  column / index level via =_decode_mojibake_in_df()=.  See the
+  module's docstring for the encoding analysis.
+- No lost-prefix substitutions are needed for CotedIvoire 2018-19:
+  every distinct =u= and =j= value cleans up via the byte-level
+  decode alone.  =_LOST_PREFIX_REPLACEMENTS= is therefore an empty
+  dict (kept for parity with the GuineaBissau / Niger
+  implementations).
+
+After this fix landed:
+- =food_acquired()= index level =u=: 52/52 clean (was 47/52).
+- =food_acquired()= index level =j=: 136/136 clean (was 90/136).
+
+Cache caveat: anyone with cached parquets predating this commit must
+run =lsms-library cache clear --country CotedIvoire= to pick up the
+fix; the staleness check does not see =mapping.py= edits.
+
+For the cross-country canonical-=u= roadmap, see GH #223.  CotedIvoire
+was originally classified Tier 3 (needing a new =u= table built) in
+that issue's inventory, but turned out to be Tier 2 once the mojibake
+fix landed -- the underlying labels are already canonical.
