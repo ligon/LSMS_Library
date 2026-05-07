@@ -2,7 +2,99 @@
 import pandas as pd
 import numpy as np
 import lsms_library.local_tools as tools
-from lsms_library.transformations import food_acquired_to_canonical as food_acquired
+from lsms_library.transformations import food_acquired_to_canonical as _food_acquired_canonical
+
+
+# Lossy-substitution prefixes the source data carries upstream of
+# pyreadstat: the export pipeline sometimes replaced the second byte
+# of certain UTF-8 codepoints with literal ``__`` (0x5f 0x5f).  No
+# byte-level decoding can recover those (the original byte is gone),
+# so we substitute the canonical French form directly when the
+# prefix appears at the start of a string.
+#
+# CotedIvoire 2018-19 ``food_acquired`` does NOT exhibit any
+# lost-prefix entries in either ``u`` or ``j`` (verified 2026-05-07
+# against the cleaned output), so this dict is currently empty.  It
+# is kept so the post-processor mirrors the structure used by other
+# EHCVM countries (Guinea-Bissau, Niger) and to make extending it
+# trivial if a future cache rebuild surfaces new lost-prefix labels.
+_LOST_PREFIX_REPLACEMENTS = {}
+
+
+def _decode_mojibake(s):
+    """Reverse the UTF-8-as-Latin-1-as-UTF-8 double-encoding that pyreadstat
+    produces for CotedIvoire's 2018-19 .dta value labels.
+
+    The .dta file's value-labels block stores French strings as raw
+    UTF-8 bytes (e.g. ``UnitÃ©`` should be ``Unité``: the ``é`` is
+    UTF-8 ``b'\\xc3\\xa9'``), but the file metadata declares Latin-1
+    encoding.  pyreadstat respects the metadata, decoding the UTF-8
+    bytes as Latin-1 and re-encoding as Python ``str`` -- producing
+    ``UnitÃ©`` instead of ``Unité``.  None of pyreadstat's
+    ``encoding=`` options correct this (verified for the analogous
+    Guinea-Bissau case 2026-05-07).  The fix is post-decode: encode
+    the mojibake string back to Latin-1 bytes (recovers the original
+    UTF-8 byte sequence), then decode as UTF-8.
+
+    Strings without non-ASCII characters round-trip cleanly through
+    ``encode('latin-1').decode('utf-8')`` (every byte 0x00-0x7F is
+    valid in both encodings and identical), so this is safe to apply
+    to all string values; only the mojibake-bearing ones change.
+
+    Returns the input unchanged on any error or when ``s`` isn't a
+    string -- best-effort, never raises.
+    """
+    if not isinstance(s, str):
+        return s
+    for bad, good in _LOST_PREFIX_REPLACEMENTS.items():
+        if s.startswith(bad):
+            return good + s[len(bad):]
+    try:
+        return s.encode('latin-1').decode('utf-8')
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        return s
+
+
+def _decode_mojibake_in_df(df):
+    """Apply ``_decode_mojibake`` to every string column and string
+    index level.  Used by per-feature ``df_edit`` hooks to fix
+    value-label mojibake that affects French strings in multiple
+    columns at once (food items, units, etc.) -- 5 of 52 ``u`` values
+    and 46 of 136 ``j`` values carry it before this fix.
+    """
+    new_levels = []
+    new_names = list(df.index.names)
+    changed = False
+    for i, name in enumerate(df.index.names):
+        level = df.index.get_level_values(i)
+        if level.dtype == object or pd.api.types.is_string_dtype(level):
+            mapped = level.map(_decode_mojibake)
+            if not mapped.equals(level):
+                changed = True
+            new_levels.append(mapped)
+        else:
+            new_levels.append(level)
+    if changed:
+        df = df.copy()
+        df.index = pd.MultiIndex.from_arrays(new_levels, names=new_names) \
+            if len(new_levels) > 1 else new_levels[0]
+    for col in df.columns:
+        if df[col].dtype == object or pd.api.types.is_string_dtype(df[col]):
+            df[col] = df[col].map(_decode_mojibake)
+    return df
+
+
+def food_acquired(df):
+    """``food_acquired`` post-processor: canonical reshape + mojibake fix.
+
+    Wraps ``transformations.food_acquired_to_canonical`` (the Phase 3
+    s-axis reshape) and then sweeps mojibake out of every string
+    column / index level.  See ``_decode_mojibake`` for the encoding
+    rationale.
+    """
+    df = _food_acquired_canonical(df)
+    df = _decode_mojibake_in_df(df)
+    return df
 
 
 def pid(value):
