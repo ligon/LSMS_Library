@@ -3,6 +3,8 @@
 """
 A collection of mappings to transform dataframes.
 """
+import re
+
 import pandas as pd
 import numpy as np
 from pandas import concat, get_dummies, MultiIndex
@@ -631,11 +633,117 @@ KNOWN_METRIC = {
     'pound': 0.453592, 'lbs': 0.453592,
 }
 
+# Subset of ``KNOWN_METRIC`` whose factors only hold under the implicit
+# ``1 litre = 1 kg`` assumption (specific-gravity-1 approximation).
+# Stripped from the factor map when ``volume_as_mass=False`` is requested
+# at the public API.
+_FLUID_UNITS = ('l', 'litre', 'liter', 'ml', 'cl')
 
-def _get_kg_factors(df):
-    """Build a combined kg-per-unit mapping from known metric units
-    and price-ratio inference on the data."""
+# Explicit-metric pattern triples: (regex, scale, is_volume).
+# ``regex`` matches the numeric prefix; ``scale`` converts to kg (or kg-
+# equivalent under ``volume_as_mass=True``); ``is_volume=True`` means the
+# pattern is gated by the ``volume_as_mass`` kwarg.
+#
+# Order matters: kg before g (so "50 kg" doesn't first match "5" "0kg"),
+# and the more specific patterns (``ml``, ``litre``) before less
+# specific (``l``).  Decimal numbers (``0.5 kg``) are accepted.  Word
+# boundaries on the unit token prevent ``20gallon`` from matching the
+# ``g`` pattern.
+_EXPLICIT_METRIC_PATTERNS = (
+    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:kg|kilogram|kilogramme)\b',
+                re.IGNORECASE), 1, False),
+    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:gram|gramme|grams|grammes|gr|g)\b',
+                re.IGNORECASE), 1/1000, False),
+    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:lbs?|pounds?)\b',
+                re.IGNORECASE), 0.453592, False),
+    (re.compile(r'(\d+(?:\.\d+)?)\s*ml\b',
+                re.IGNORECASE), 1/1000, True),
+    (re.compile(r'(\d+(?:\.\d+)?)\s*cl\b',
+                re.IGNORECASE), 1/100, True),
+    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:litres?|liters?|l)\b',
+                re.IGNORECASE), 1, True),
+)
+
+
+def _parse_explicit_metric(s, *, volume_as_mass=True):
+    """Extract a kg factor from a unit label that names its own metric content.
+
+    Returns the kg-per-unit factor, or ``None`` if no metric content is
+    found in *s*.  When *volume_as_mass* is False, volume-based patterns
+    (litre, ml, cl) decline to match -- letting the caller (typically
+    :func:`_get_kg_factors`) fall back to the price-ratio inference path
+    for those units rather than asserting ``1 L = 1 kg`` by fiat.
+
+    Examples
+    --------
+    >>> _parse_explicit_metric('50 kg Bag')
+    50.0
+    >>> _parse_explicit_metric('500 g packet')
+    0.5
+    >>> _parse_explicit_metric('1L Carton')
+    1.0
+    >>> _parse_explicit_metric('500 ml Bottle')
+    0.5
+    >>> _parse_explicit_metric('500 ml Bottle', volume_as_mass=False) is None
+    True
+    >>> _parse_explicit_metric('Heap (Small)') is None
+    True
+    >>> _parse_explicit_metric('2 lbs sack')
+    0.907184
+    """
+    if not isinstance(s, str):
+        return None
+    for pattern, scale, is_volume in _EXPLICIT_METRIC_PATTERNS:
+        if is_volume and not volume_as_mass:
+            continue
+        m = pattern.search(s)
+        if m:
+            try:
+                return float(m.group(1)) * scale
+            except (ValueError, IndexError):
+                return None
+    return None
+
+
+def _get_kg_factors(df, *, volume_as_mass=True):
+    """Build a combined kg-per-unit mapping from known metric units,
+    explicit-metric label parsing, and price-ratio inference on the data.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        food_acquired-shaped DataFrame; expected to have ``u`` in the
+        index (or columns).
+    volume_as_mass : bool, default True
+        When True (default), treat ``1 litre = 1 kg`` for fluid units
+        (litre, ml, cl) -- a specific-gravity-1 approximation that's
+        roughly right for water-based foods (milk, juice, soup) and
+        moderately wrong for cooking oil and alcohol.  When False, fluid
+        units are removed from the hand-coded factor map and from the
+        explicit-metric label parser; their kg conversion (if any) then
+        comes from data-driven price-ratio inference, which empirically
+        recovers the actual specific gravity per (item, region, time)
+        when enough kg-reporting households share the cell.
+    """
     factors = dict(KNOWN_METRIC)
+    if not volume_as_mass:
+        for u in _FLUID_UNITS:
+            factors.pop(u, None)
+
+    # Explicit-metric parser: derive factors from labels that name their
+    # own metric content (e.g. '50 kg Bag', '500 g Packet', '1L Carton').
+    # Lower-case the keys so they match the lower-cased lookup in
+    # ``_apply_kg_conversion``.  Don't override factors already in
+    # ``KNOWN_METRIC`` -- those are exact-match tokens that shouldn't
+    # be re-derived via the parser.
+    if 'u' in df.index.names:
+        for u in df.index.get_level_values('u').dropna().unique():
+            key = str(u).lower()
+            if key in factors:
+                continue
+            kg = _parse_explicit_metric(str(u), volume_as_mass=volume_as_mass)
+            if kg is not None and np.isfinite(kg) and kg > 0:
+                factors[key] = kg
 
     # Infer additional factors from price ratios where possible
     if 'Expenditure' in df.columns and 'Quantity' in df.columns:
@@ -698,7 +806,7 @@ def food_expenditures_from_acquired(df):
     return x
 
 
-def food_quantities_from_acquired(df, units='kgs'):
+def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True):
     """Derive food quantities from food_acquired.
 
     Parameters
@@ -770,7 +878,7 @@ def food_quantities_from_acquired(df, units='kgs'):
         return q
 
     # units == 'kgs': carry rule
-    factors = _get_kg_factors(df)
+    factors = _get_kg_factors(df, volume_as_mass=volume_as_mass)
     v = _apply_kg_conversion(df, factors)
 
     # Per-row: where Quantity_kg is non-NaN, use it and tag u='kg';
@@ -800,7 +908,7 @@ def food_quantities_from_acquired(df, units='kgs'):
     return out
 
 
-def food_prices_from_acquired(df, units='kgvalue'):
+def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True):
     """Derive food prices from food_acquired.
 
     Returned at the natural grain of the input (``(t, v, i, j, u, s)``
@@ -890,7 +998,7 @@ def food_prices_from_acquired(df, units='kgvalue'):
             return empty[['Price']]
 
     if units == 'kgvalue':
-        factors = _get_kg_factors(df)
+        factors = _get_kg_factors(df, volume_as_mass=volume_as_mass)
         v = _apply_kg_conversion(df, factors)
         with np.errstate(divide='ignore', invalid='ignore'):
             v = v.assign(Price=v['Expenditure'] / v['Quantity_kg'])
@@ -901,7 +1009,7 @@ def food_prices_from_acquired(df, units='kgvalue'):
         v = df.copy()
         # Price column already populated.
     elif units == 'kgprice':
-        factors = _get_kg_factors(df)
+        factors = _get_kg_factors(df, volume_as_mass=volume_as_mass)
         if 'u' in df.index.names:
             u_lower = df.index.get_level_values('u').astype(str).str.lower()
             kg_per_unit = pd.Series(u_lower.map(factors).values, index=df.index)
