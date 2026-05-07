@@ -154,11 +154,28 @@ The code joins these factors onto the food data by item × unit × region.
 
 Reference: `lsms_library/countries/Malawi/2010-11/_/food_acquired.py`
 
+#### Approach C: Framework-level conversion (default since GH #231)
+
+As of GH #231, the framework's `food_quantities_from_acquired` and `food_prices_from_acquired` (in `lsms_library/transformations.py`) do *most* of the kg conversion work without per-country setup, given a canonical `food_acquired` table with a `u` index level.  The pipeline `_get_kg_factors()` runs three layers in order:
+
+1. **Hand-coded `KNOWN_METRIC` lookup** — covers `kg`, `kilogram`, `kilogramme`, `g`, `gram`, `gramm`, `l`, `litre`, `liter`, `ml`, `cl`, `pound`, `lbs`, all case-insensitive.  Most country surveys are case-mojibake of these (`KILOGRAMME`, `Kg`, `LITRE`) and resolve here for free.
+2. **Explicit-metric label parser `_parse_explicit_metric()`** — extracts a kg factor from labels that name their own metric content: `"50 kg Bag"`, `"500 g packet"`, `"1L Carton"`, `"500 ml Bottle"`, `"2 lbs sack"`.  Mass patterns always match; volume patterns (l/ml/cl) are gated on the `volume_as_mass` kwarg.
+3. **Price-ratio inference (Approach A above)** — fills in remaining unit factors from the data.
+
+Empirically (see `SkunkWorks/malawi_unit_resolution_diagnostic_2026-05-07.org`): on Malawi, this resolves 99.9% of rows to `u='kg'` with no country-specific code at all — 732 distinct input u-values collapse to 86.  The 0.1% residual is dominated by unmeasured container labels (`Basin/Lichero`, `THUNGWA`, `NKOKO`).
+
+**`volume_as_mass` kwarg.**  By default the framework treats `1 litre = 1 kg` (specific-gravity-1 approximation).  This is roughly right for water-based foods (juice, milk, soup) and moderately wrong for cooking oil (~0.92) and alcohol.  Pass `volume_as_mass=False` to drop fluid units from the hand-coded factor map and from the parser; the inference path then back-fills whatever the data implies.  Note: this is a *disable-the-shortcut* flag, not a *correct-fluid-handling* flag — `volume_as_mass=False` may not improve oil estimates if the inference's median factor across all foods is also water-dragged.
+
+**When you still need country-specific Approaches A or B.**  Approach C handles the easy cases (case-variants, explicit-metric labels, items where kg-and-local-unit observations co-exist).  You'll still want the legacy paths when:
+  - the survey ships authoritative conversion tables item × unit × region (Malawi IHS, Ethiopia ESS) — Approach B remains better than inference for these;
+  - unit labels encode hand-coded factors that the regex parser doesn't catch (e.g. `"Pail (Small)"`, `"No.10 Plate (Heaped)"`, `"Sack of 120 kgs"` with non-standard punctuation) — populate `conversion_to_kgs.json` per Approach A;
+  - per-item specific-gravity matters (cooking oil precision) — neither Approach C nor the existing inference handles per-item factors today; per-item refinement is a noted future option.
+
 ### Which approach to use
 
-- If the survey provides conversion factors (`.dta` or `.csv` files with item × unit → kg mappings): **use Approach B**
-- If not: **use Approach A** (price-ratio inference)
-- Many countries benefit from a **combination**: hand-coded conversions for units with metric amounts in their names, survey-provided factors where available, and price-ratio inference for the rest
+- **Default**: Approach C does the work; minimum viable wave script is just the canonical `food_acquired` reshape.  Verify with the diagnostic recipe in `SkunkWorks/malawi_unit_resolution_diagnostic_2026-05-07.org` that >99% of rows resolve to `u='kg'`.
+- If the survey provides conversion factors (`.dta` or `.csv` files with item × unit → kg mappings): **layer Approach B** on top of C — Approach B applies first at the wave script level, leaving Approach C with cleaner residuals.
+- If neither C nor B closes the gap and the long tail is large (>1% of rows or contains nutritionally important items): **add hand-coded factors** via Approach A or via the categorical_mapping `u` table.
 
 ## Country-specific notes
 
