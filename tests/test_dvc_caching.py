@@ -1192,11 +1192,13 @@ class TestLayer1Caching:
             mock_dvcfs.repo.fetch.assert_not_called()
 
     def test_ensure_dvc_pulled_calls_pull_on_miss(self, tmp_path, monkeypatch):
-        """Sidecar present + blob NOT in cache -> ``Repo.fetch`` is called.
+        """Sidecar present + blob NOT in cache -> direct ``fs.get_file`` is called.
 
-        Verifies the target passed to ``Repo.fetch`` is the
-        countries-relative path, not the absolute path or the
-        script-relative path.
+        Verifies the bypass calls ``DVCFS.repo.cloud.get_remote().fs.get_file``
+        with a source path under the active remote's root and the canonical
+        DVC 2.x cache layout as the destination.  See ``_ensure_dvc_pulled``
+        in ``local_tools.py`` for the rationale -- we no longer call
+        ``Repo.fetch`` because of its ~93s graph-walk cost on Lustre.
         """
         from lsms_library import local_tools
 
@@ -1219,13 +1221,34 @@ class TestLayer1Caching:
         monkeypatch.setattr(local_tools, "_COUNTRIES_DIR", countries_dir)
 
         with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
+            mock_remote = mock_dvcfs.repo.cloud.get_remote.return_value
+            mock_remote.path = "bucket0/repo"
+
+            # The mock get_file must actually create the destination
+            # file -- otherwise the bypass's atomic-rename step (tmp ->
+            # dst) fails and the bypass falls through to the second
+            # cache layout, calling get_file twice.  Real S3
+            # ``get_file`` writes the file before returning.
+            def fake_get_file(src, dst, *args, **kwargs):
+                Path(dst).parent.mkdir(parents=True, exist_ok=True)
+                Path(dst).write_bytes(b"")
+            mock_remote.fs.get_file.side_effect = fake_get_file
+
             local_tools._ensure_dvc_pulled(str(target))
-            mock_dvcfs.repo.fetch.assert_called_once()
-            call = mock_dvcfs.repo.fetch.call_args
-            assert call.kwargs.get("targets") == ["TestC/wave/Data/foo.dta"]
+
+            mock_remote.fs.get_file.assert_called_once()
+            call = mock_remote.fs.get_file.call_args
+            src, dst = call.args[:2]
+            # Source: DVC 2.x layout under the remote's path
+            assert src == f"bucket0/repo/{md5[:2]}/{md5[2:]}"
+            # Destination: canonical DVC 2.x slot under our cache dir,
+            # via an atomic-rename temp suffix on the way in.
+            assert str(dst).startswith(str(cache_dir / md5[:2] / md5[2:]))
+            # And the final cache file landed at the canonical path.
+            assert (cache_dir / md5[:2] / md5[2:]).exists()
 
     def test_ensure_dvc_pulled_swallows_pull_errors(self, tmp_path, monkeypatch):
-        """If ``Repo.fetch`` raises, ``_ensure_dvc_pulled`` returns silently.
+        """If the remote ``fs.get_file`` raises, ``_ensure_dvc_pulled`` returns silently.
 
         Layer-1 warming is best-effort; the streaming fallback in
         ``get_dataframe`` should still run.
@@ -1247,62 +1270,17 @@ class TestLayer1Caching:
         monkeypatch.setattr(local_tools, "_COUNTRIES_DIR", countries_dir)
 
         with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
-            mock_dvcfs.repo.fetch.side_effect = RuntimeError("simulated S3 failure")
+            mock_remote = mock_dvcfs.repo.cloud.get_remote.return_value
+            mock_remote.path = "bucket0/repo"
+            mock_remote.fs.get_file.side_effect = RuntimeError("simulated S3 failure")
             # Should NOT raise
             local_tools._ensure_dvc_pulled(str(target))
-            mock_dvcfs.repo.fetch.assert_called_once()
-
-    def test_ensure_dvc_pulled_changes_cwd_to_countries(self, tmp_path, monkeypatch):
-        """``Repo.fetch`` is invoked from inside ``_COUNTRIES_DIR``.
-
-        Cwd-independence regression test for the footgun discovered in
-        Probe 2 of the 2026-04-11 session: ``Repo.pull(targets=[X])``
-        resolves ``X`` against ``os.getcwd()``, not against the repo
-        root, so without an explicit chdir the call fails with
-        ``NoOutputOrStageError`` from any cwd that isn't already
-        ``lsms_library/countries/``.
-        """
-        from lsms_library import local_tools
-
-        countries_dir = (tmp_path / "countries").resolve()
-        target_dir = countries_dir / "TestC" / "Data"
-        target_dir.mkdir(parents=True)
-        target = target_dir / "foo.dta"
-        sidecar = target.parent / "foo.dta.dvc"
-        sidecar.write_text(
-            "outs:\n- md5: 0123456789abcdef0123456789abcdef\n"
-            "  size: 0\n  path: foo.dta\n"
-        )
-        cache_dir = tmp_path / "cache"
-        cache_dir.mkdir()
-        monkeypatch.setattr(local_tools, "_DVC_CACHE_DIR", cache_dir)
-        monkeypatch.setattr(local_tools, "_COUNTRIES_DIR", countries_dir)
-
-        # Start from a cwd that is NOT countries_dir.
-        elsewhere = tmp_path / "elsewhere"
-        elsewhere.mkdir()
-        original_cwd = Path.cwd()
-        os.chdir(elsewhere)
-
-        observed = []
-
-        def record_cwd(*args, **kwargs):
-            observed.append(Path.cwd())
-
-        try:
-            with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
-                mock_dvcfs.repo.fetch.side_effect = record_cwd
-                local_tools._ensure_dvc_pulled(str(target))
-        finally:
-            os.chdir(original_cwd)
-
-        assert len(observed) == 1
-        assert observed[0] == countries_dir
-        # And the original cwd is restored after the helper returns
-        assert Path.cwd() == original_cwd
+            # The bypass attempted at least one get_file call before
+            # bailing to the streaming fallback.
+            assert mock_remote.fs.get_file.call_count >= 1
 
     def test_ensure_dvc_pulled_bails_on_path_outside_countries(self, tmp_path, monkeypatch):
-        """A sidecar at a path outside _COUNTRIES_DIR -> no pull (no error)."""
+        """A sidecar at a path outside _COUNTRIES_DIR -> no fetch (no error)."""
         from lsms_library import local_tools
 
         countries_dir = (tmp_path / "countries").resolve()
@@ -1321,11 +1299,13 @@ class TestLayer1Caching:
         monkeypatch.setattr(local_tools, "_COUNTRIES_DIR", countries_dir)
 
         with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
+            mock_remote = mock_dvcfs.repo.cloud.get_remote.return_value
+            mock_remote.path = "bucket0/repo"
             local_tools._ensure_dvc_pulled(str(target))
-            mock_dvcfs.repo.fetch.assert_not_called()
+            mock_remote.fs.get_file.assert_not_called()
 
     def test_ensure_dvc_pulled_handles_malformed_sidecar(self, tmp_path, monkeypatch):
-        """A sidecar with unexpected shape -> bail silently, no pull."""
+        """A sidecar with unexpected shape -> bail silently, no fetch."""
         from lsms_library import local_tools
 
         target = tmp_path / "foo.dta"
@@ -1339,8 +1319,10 @@ class TestLayer1Caching:
         monkeypatch.setattr(local_tools, "_DVC_CACHE_DIR", cache_dir)
 
         with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
+            mock_remote = mock_dvcfs.repo.cloud.get_remote.return_value
+            mock_remote.path = "bucket0/repo"
             local_tools._ensure_dvc_pulled(str(target))
-            mock_dvcfs.repo.fetch.assert_not_called()
+            mock_remote.fs.get_file.assert_not_called()
 
     def test_ensure_dvc_pulled_handles_countries_relative_path(self, tmp_path, monkeypatch):
         """Interactive callers can pass countries-relative paths.
@@ -1375,11 +1357,24 @@ class TestLayer1Caching:
 
         try:
             with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
+                mock_remote = mock_dvcfs.repo.cloud.get_remote.return_value
+                mock_remote.path = "bucket0/repo"
+
+                def fake_get_file(src, dst, *args, **kwargs):
+                    Path(dst).parent.mkdir(parents=True, exist_ok=True)
+                    Path(dst).write_bytes(b"")
+                mock_remote.fs.get_file.side_effect = fake_get_file
+
                 # Pass the countries-relative path, not an absolute path
                 local_tools._ensure_dvc_pulled("TestC/wave/Data/foo.dta")
-                mock_dvcfs.repo.fetch.assert_called_once()
-                call = mock_dvcfs.repo.fetch.call_args
-                assert call.kwargs.get("targets") == ["TestC/wave/Data/foo.dta"]
+                # The bypass found the sidecar via the _COUNTRIES_DIR / fn
+                # interpretation and called fs.get_file with the canonical
+                # remote layout.  cwd is irrelevant -- the bypass uses
+                # absolute remote paths, so it works from any cwd.
+                mock_remote.fs.get_file.assert_called_once()
+                call = mock_remote.fs.get_file.call_args
+                src, dst = call.args[:2]
+                assert src == f"bucket0/repo/{md5[:2]}/{md5[2:]}"
         finally:
             os.chdir(original_cwd)
 

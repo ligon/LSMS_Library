@@ -1,0 +1,25 @@
+mode	trial	target	size_bytes	elapsed_s	ok	exc
+lock-only	0	acquire#0	0	0.007	1	
+lock-only	0	acquire#1	0	0.005	1	
+lock-only	0	acquire#2	0	0.006	1	
+lock-only	0	acquire#3	0	0.005	1	
+lock-only	0	acquire#4	0	0.007	1	
+lock-only	0	acquire#5	0	0.006	1	
+lock-only	0	acquire#6	0	0.006	1	
+lock-only	0	acquire#7	0	0.006	1	
+lock-only	0	acquire#8	0	0.006	1	
+lock-only	0	acquire#9	0	0.006	1	
+lock-only	0	acquire#10	0	0.006	1	
+lock-only	0	acquire#11	0	0.006	1	
+cold-warm-process	0	Uganda/2013-14/Data/gsec12.dta	-1	89.534	1	
+cold-warm-process	0	Uganda/2013-14/Data/GSEC8_1.dta	-1	93.783	1	
+cold-warm-process	0	Uganda/2013-14/Data/GSEC11A.dta	-1	93.422	1	
+cold-warm-process	0	Uganda/2013-14/Data/GSEC10_1.dta	-1	93.229	1	
+cold-warm-process	0	Uganda/2015-16/Data/gsec12_1.dta	-1	93.505	1	
+cold-warm-process	0	Uganda/2015-16/Data/gsec10_1.dta	-1	94.329	1	
+cold-warm-process	0	Uganda/2015-16/Data/gsec11_1.dta	-1	95.500	1	
+cold-warm-process	0	Uganda/2015-16/Data/AGSEC8A.dta	-1	94.167	1	
+cold-warm-process	0	Uganda/2019-20/Data/HH/gsec12_1.dta	122339	95.265	1	
+cold-warm-process	0	Uganda/2019-20/Data/HH/gsec8.dta	2719891	94.819	1	
+cold-warm-process	0	Uganda/2019-20/Data/HH/gsec10_1.dta	319202	94.105	1	
+cold-warm-process	0	Uganda/2009-10/Data/GSEC12.dta	-1	94.163	1	

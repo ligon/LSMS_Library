@@ -417,26 +417,50 @@ def test_api_matches_replication(spec: FeatureSpec) -> None:
             "correct; replication should regenerate."
         )
 
-    # income / fct / food_acquired: cold-cache builds hit a DVC-lock
-    # concurrency issue introduced by PR #212's `_ensure_dvc_pulled`
-    # path.  When `Country('Uganda').<feature>()` triggers the
-    # framework's `make -s -j12` rule, every wave's per-script build
-    # spawns concurrently and races for one `flufl.lock` lock around
-    # DVC's local cache, which times out under load.  Single-wave
-    # isolation (`python lsms_library/countries/Uganda/2013-14/_/
-    # earnings.py`) builds clean -> the wave-script code itself is
-    # correct; only the parallel build orchestration is broken.
-    # Tracked for v0.7.3: serialise DVC pulls under a process-wide
-    # lock or retry on contention.  xfail (not skip) so a framework
-    # fix restores the tests.
-    _DVC_LOCK_RACE_FEATURES = {"income", "fct", "food_acquired"}
-    if spec.name in _DVC_LOCK_RACE_FEATURES:
+    # NOTE: ``income`` and ``fct`` were previously ``xfail``-marked
+    # here due to a DVC-lock concurrency issue under ``make -s -j12``.
+    # Resolved by replacing ``Repo.fetch`` (which acquired
+    # ``repo.lock`` and rebuilt ``Repo.index`` per call, ~93s + lock
+    # contention) with a direct fsspec ``get_file()`` call in
+    # ``_ensure_dvc_pulled`` (~1s, no lock).  See
+    # ``slurm_logs/HANDOFF_2026-05-07.org`` for the empirical
+    # investigation and ``lsms_library/local_tools.py`` for the bypass.
+    #
+    # ``food_acquired`` was *also* previously ``xfail``-marked under
+    # the same DVC-lock-race umbrella, but actually had a second,
+    # independent failure mode that the lock-race xfail was masking:
+    # the ``market`` column (computed at API time by
+    # ``_add_market_index`` joining ``Region`` from
+    # ``cluster_features``) shows ~92k rows of NaN-asymmetry vs the
+    # replication baseline.  Verified with ``LSMS_FORCE_DVCFS_OPEN=1``
+    # (forcing the legacy DVCFS.open code path) on 2026-05-07: same
+    # 92119-row asymmetry.  So this is a data-correctness issue
+    # downstream of DVC, not a fetch issue.
+    #
+    # Likely root cause: the replication baseline predates two recent
+    # schema changes to ``food_acquired`` -- (a) the addition of an
+    # ``s`` (source) index level (commits ``2048122f`` and
+    # ``b9df8fb4``, GH #169 Phases 1 + 4), and (b) revised unit
+    # handling (commits ``a5f8544f`` GH #224, ``2ccd9301`` GH #231
+    # ``volume_as_mass`` kwarg).  Both change row count or row
+    # structure relative to the baseline, producing rows in the API
+    # output that have no corresponding row in replication; on merge,
+    # such rows show NaN on the replication side for every column
+    # including ``market`` (since ``market`` is computed-then-merged).
+    # Resolving will likely require regenerating the replication
+    # baseline against current canonical schema -- tracked in the
+    # ``Replication parquet regeneration`` open item.
+    #
+    # Keeping ``xfail`` (not skip) so we still notice when the
+    # underlying ``market`` divergence is resolved.
+    if spec.name == "food_acquired":
         pytest.xfail(
-            f"{spec.name}: cold-cache build fails under parallel DVC-lock "
-            f"contention from `make -s -j12` wave-script orchestration "
-            f"(PR #212 _ensure_dvc_pulled path).  Library / wave-script "
-            f"code is correct; framework concurrency to be addressed in "
-            f"v0.7.3."
+            "food_acquired: pre-existing 'market' NaN-asymmetry vs "
+            "replication baseline (~92k rows).  Surfaces now that the "
+            "DVC-lock contention is fixed and the build completes.  "
+            "Likely caused by recent food_acquired schema changes "
+            "(s-axis, units) post-dating the baseline; needs replication "
+            "regeneration."
         )
 
     repl = _load_replication(spec.name)

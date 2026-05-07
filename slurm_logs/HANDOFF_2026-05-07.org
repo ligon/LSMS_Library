@@ -1,0 +1,224 @@
+#+TITLE: Session handoff: DVC lock contention -> fetch bypass
+#+DATE: 2026-05-07
+#+AUTHOR: Sue (Claude Sonnet 4.5)
+
+* TL;DR
+
+The DVC lock contention symptom (PR #212, three xfailed tests) is
+resolved by *bypassing =Repo.fetch= entirely* in the hot path.  The
+real bottleneck was never the lock itself but DVC's per-call index
+walk (=Index.from_repo= over hundreds of =.dvc= sidecars on Lustre,
+~93 s per fetch).  The lock contention was a downstream symptom: 12
+sub-makes spawning concurrently each took the repo lock for ~93 s of
+graph-walking, blowing the 3 s default timeout.
+
+The fix in =lsms_library/local_tools.py= replaces =Repo.fetch= with a
+direct =fsspec.get_file()= call (~1 s per blob), and =DVCFS.open()=
+with a direct local =open(cache_path)= once the cache is populated.
+The bypass is *remote-agnostic* via fsspec, so the long-standing
+feature request to support non-S3 DVC remotes is unaffected.
+
+After the patch:
+- 12-way contention reproducer: 91.7 % =LockError= -> 12/12 success
+  in 5 s (down from 100 s for one winner + 11 failures)
+- Single cold blob fetch: 93 s -> 1.2 s (~80x)
+- =Country('Uganda').household_roster()= cold: 90 s -> 18 s (~5x)
+- =Country('Uganda').income()= cold: =LockError= -> success in 333 s
+- =test_api_matches_replication[income, fct]= xfail -> PASS
+
+* Empirical investigation
+
+** Reproducer
+=slurm_logs/dvc_lock_repro/repro_micro.py= -- spawns =N= child
+processes, each calling =_ensure_dvc_pulled()= on a different
+DVC-tracked Uganda source file.  =--clear-cache= deletes the
+corresponding blobs first to force the cold path.
+
+Master baseline (12-way, cold cache): 91.7 % =LockError=, ~100 s for
+the lone winner.  Reproducible across two sweeps.
+
+** Sweep
+=slurm_logs/dvc_lock_repro/run_sweep.sh= toggles =.dvc/config=
+between candidate configs and runs the reproducer.  Tested
+=baseline=, =shared_cachetype= (the rumor combo: =cache.shared =
+group= + =cache.type = reflink,hardlink,symlink,copy=).  Result:
+identical fail rate -- the rumor combo is *cosmetic* (DVC source
+confirms =cache.shared= only sets file/dir mode bits;
+=cache.type= only affects =Repo.checkout= materialisation, which
+we don't use).  See =slurm_logs/dvc_lock_repro/sweep_*/summary.tsv=.
+
+** Bench
+=slurm_logs/dvc_lock_repro/bench_fetch.py= and =bench_batched.py=
+characterise the fetch path:
+
+| measurement                          | mean   | observation                       |
+|--------------------------------------+--------+-----------------------------------|
+| =repo.lock= acquire+release (warm)   | 6 ms   | floor; lock primitive is free     |
+| Per-target =fetch=, separate calls   | 93.5 s | dominated by DVC index walk       |
+| Batched =fetch(targets=[12])= jobs=1 | 97.9 s | one walk, all 12 transfers        |
+| Same, jobs=4                         | 95.8 s | =jobs= parameter has no effect    |
+| Same, jobs=8                         | 95.5 s | same                              |
+
+File size irrelevant: a 122 KB file took 95.3 s, a 2.7 MB file took
+94.8 s.  S3 transfer is rounding error.
+
+** Profile
+=slurm_logs/dvc_lock_repro/profile_one_fetch.py= ran =pyinstrument=
+on a single cold =_ensure_dvc_pulled()= call.  Top-of-stack:
+
+#+begin_example
+262.20 _ensure_dvc_pulled  lsms_library/local_tools.py
+└─ 262.05 wrapper          dvc/repo/__init__.py:56  (the @locked decorator)
+   └─ ...
+      └─ 78.83 StorageMapping.__getitem__  dvc_data/index/index.py:436
+         └─ 58.38 [self]                   dvc_data/index/index.py
+#+end_example
+
+The =@locked= decorator routes through =lock_repo()=, which calls
+=Repo._reset()= on entry and exit -- this drops the cached
+=Repo.index= (=@cached_property=).  Next access rebuilds via
+=Index.from_repo(self)= which walks the entire countries =.dvc=
+tree on Lustre.  Cost: ~93 s, invariant of which blob is being
+fetched.
+
+** Direct-S3 experiment
+With md5 + S3 client + cache path all in hand,
+=fs.get_file(src, dst)= = *0.11 s* for the same 165 KB blob -- vs
+~95 s through =Repo.fetch=.  ~850x speedup at the per-blob layer.
+
+* Fix architecture
+
+Two changes in =lsms_library/local_tools.py=, both removing DVC's
+heavy machinery from the hot path:
+
+** Write path: =_ensure_dvc_pulled=
+Cache miss -> parse =.dvc= sidecar for md5 -> resolve
+=DVCFS.repo.cloud.get_remote(name=...)= -> =fs.get_file()= directly
+to the canonical cache path.  Atomic temp-file + rename.  No
+=Repo.fetch=, no =repo.lock=, no =_reset= thrash.
+
+** Read path: =get_dataframe= -> =_dvc_cache_path= helper
+After =_ensure_dvc_pulled= returns, instead of =DVCFS.open(fn,
+'rb')=, we call a new =_dvc_cache_path(fn)= helper that resolves the
+sidecar -> md5 -> cache path *without going through DVC's
+filesystem*.  Open that path with regular =open()=.  =DVCFS.open=
+remains as a fallback for the rare case where the sidecar is missing
+or the cache failed to populate.
+
+** Discriminator: =file_system_path= shortcut
+Previously called =DVCFS.open(fn)= as a fail-fast existence check
+(slow!).  Now checks for sidecar existence directly via two stat()
+calls; falls back to =DVCFS.open= only when no sidecar is found at
+the standard interpretations of =fn=.
+
+* Remote-agnostic
+
+The bypass works for any DVC-supported remote, not just S3.
+=remote.fs= is whatever fsspec backend matches the active remote's
+URL scheme (=s3fs.S3FileSystem=, =gcsfs.GCSFileSystem=,
+=adlfs.AzureBlobFileSystem=, the GDrive wrapper, =HTTPFileSystem=,
+=SFTPFileSystem=, =LocalFileSystem=, ...).  All implement
+=get_file(src, dst)=.  The active remote name is read at call time
+from =.dvc/config='s =[core] remote = ...= setting -- no S3-specific
+assumptions in the code.
+
+The previous =DVCFS= constructor block at =local_tools.py:114-124=
+still hardcodes the remote *name* =ligonresearch_s3= for credential
+override; this is a pre-existing limitation, unchanged by the
+bypass, and is the spot to revisit when adding multi-remote support.
+
+* Helpers retained but no longer auto-invoked
+
+** =_gc_stale_dvc_lock= and =_proc_held_inodes=
+We hit a =flufl.lock= orphan during the investigation: when a worker
+holding =core.hardlink_lock=true= is killed, it leaves a hardlink
+pair (=lock= + claim file) with mtime set 365 days in the future
+(flufl's =_lifetime= default).  Subsequent acquirers see a "valid"
+lock and time out.
+
+Since the bypass doesn't take =repo.lock= at all, this can't bite us
+from the library hot path -- but CLI =dvc pull= invocations or
+manual operations could still leave such orphans.  =_gc_stale_dvc_lock=
+detects them (mtime > now + 1 day, no process holds an fd) and
+unlinks.  Available as a utility but not auto-called.
+
+** =_warm_dvc_cache_for_feature=
+Earlier in the investigation this was the proposed "primary fix":
+batched =Repo.fetch(targets=[all])= to amortise the index walk.
+With the bypass, =_ensure_dvc_pulled= is itself ~1 s per call, so
+pre-warming is largely vestigial.  The helper is retained (now
+using the same direct-S3 path internally) for cases where one
+process wants to populate the cache for many feature inputs at
+once.  The =country.run_make_target= integration is wired up but
+mostly a no-op now (skips when blobs are cached, which they are
+post-bypass).
+
+* Test impact
+
+=tests/test_uganda_api_vs_replication.py='s =_DVC_LOCK_RACE_FEATURES=
+xfail block is removed.
+
+- =income= and =fct= now PASS.
+- =food_acquired= still fails -- but for an *independent*
+  pre-existing reason: =market= column shows ~92k rows of
+  NaN-asymmetry vs the replication baseline.  Confirmed
+  pre-existing by re-running with =LSMS_FORCE_DVCFS_OPEN=1=
+  (force legacy path): same 92119-row asymmetry.  Likely root
+  cause: replication baseline predates the =s=-axis addition
+  (commits =2048122f=, =b9df8fb4=, GH #169) and the unit-handling
+  changes (=a5f8544f= GH #224, =2ccd9301= GH #231 =volume_as_mass=).
+  Tracked under "Replication parquet regeneration" open item.
+
+A new =food_acquired=-only =xfail= replaces the old
+=_DVC_LOCK_RACE_FEATURES= block, with the corrected explanation.
+
+* What I'd flag for review
+
+1. *MD5 verification.* The bypass doesn't post-verify the downloaded
+   blob's md5 against the sidecar (=Repo.fetch= does).  If S3 ever
+   returns corrupt bytes, we silently use bad data.  Mitigation:
+   ~5-line addition to compute =hashlib.md5= post-download.
+   Decision deferred to maintainer; ~50 ms / file overhead.
+
+2. *DVC API surface coupling.*  We rely on
+   =DVCFS.repo.cloud.get_remote().fs= being a usable fsspec
+   filesystem.  A future DVC version refactor could break this.
+   Mitigation: a lightweight unit test asserting the API surface
+   exists.
+
+3. *Post-bypass startup overhead.*  The 333 s for
+   =Country('Uganda').income()= cold is dominated by
+   per-process Python + lsms_library imports x 18 wave-script
+   subprocesses under =make -j12=.  Each ~5 s import x 18 spawns,
+   serialised through 12 cores.  Not a regression -- it was
+   invisible before because the build never completed -- but a
+   real startup-overhead opportunity if anyone wants ~10x further.
+
+4. *food_acquired data divergence (open).*  Independent of this
+   fix.  Needs replication baseline regeneration against the
+   current canonical schema.
+
+* Cost
+
+Session start: =fc_jevons= 36731 SU / 1.5M (~2.5 % used).
+This session ran on the no-shell job 34033513 throughout; no
+=sbatch= dispatches.  S3 egress for the bench / repro / profile
+runs estimated <1 GB.
+
+* Files changed
+
+| file                                       | additions | deletions |
+|--------------------------------------------+-----------+-----------|
+| =lsms_library/local_tools.py=              |       406 |        44 |
+| =lsms_library/country.py=                  |        17 |         0 |
+| =tests/test_uganda_api_vs_replication.py=  |        38 |        24 |
+
+Most additions are docstrings / comments documenting the bypass
+rationale and the recovered index-walk diagnosis.  Actual logic
+delta is ~150 lines in =local_tools.py=.
+
+Bench / repro suite committed under
+=slurm_logs/dvc_lock_repro/= for reproducibility:
+=repro_micro.py=, =run_sweep.sh=, =bench_fetch.py=,
+=bench_batched.py=, =profile_one_fetch.py=, =analyze.py=, plus the
+session's measurement TSVs and the pyinstrument HTML profile.

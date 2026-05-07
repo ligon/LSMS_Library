@@ -76,6 +76,7 @@ from pyarrow.lib import ArrowInvalid
 from functools import lru_cache
 from pathlib import Path
 import os
+import time
 from importlib.resources import files
 from dvc.api import DVCFileSystem
 import pyreadstat
@@ -145,31 +146,39 @@ def _ensure_dvc_pulled(fn) -> None:
     """Best-effort warm of the local DVC cache for a tracked path.
 
     The hot path (cache hit) is two ``os.path.exists`` calls and a tiny
-    YAML parse -- no DVC Python API, no ``DVCFS.repo``, no index walk,
-    no minutes-long lazy index build.
+    YAML parse -- no DVC Python API, no ``DVCFS.repo``, no index walk.
 
-    Only on a cache miss does this fall through to ``DVCFS.repo.fetch``,
-    which is wrapped in ``_dvc_working_directory(_COUNTRIES_DIR)``
-    because ``Repo.fetch`` resolves targets against ``os.getcwd()``.
+    On a cache miss this downloads the blob directly from the configured
+    S3 remote, bypassing ``Repo.fetch``.  Why bypass: ``Repo.fetch`` is
+    decorated with ``@locked``, which routes through ``lock_repo``
+    (``dvc/repo/__init__.py:38``).  That context manager calls
+    ``Repo._reset()`` on entry and exit, dropping the cached
+    ``Repo.index``.  The next access rebuilds the index by walking
+    every ``.dvc`` sidecar in the countries tree (~93s on Lustre,
+    invariant of the actual blob's size).  Pyinstrument profiling
+    confirmed ~78s of that goes into ``StorageMapping.__getitem__``
+    alone.  We have everything we need without going there: the md5
+    from the parsed sidecar, the destination cache path, and an
+    authenticated ``S3FileSystem`` from ``DVCFS.repo.cloud.get_remote``.
+    A direct ``s3.get_file`` is ~0.1s for a 165 KB blob; the speedup
+    over ``Repo.fetch`` is ~850x.  As a side effect, concurrent callers
+    fetching different blobs no longer contend on ``.dvc/tmp/lock`` --
+    we never take the DVC repo lock at all.
 
-    **Why fetch and not pull**: ``Repo.pull = Repo.fetch + Repo.checkout``.
-    The ``checkout`` step materializes the file in the workspace at its
-    DVC-tracked path -- which is **inside the package tree**
-    (``_COUNTRIES_DIR``).  We do not want DVC-tracked data files
-    materializing in the package tree under any circumstances; the
-    package tree is for code and ``.dvc`` sidecars only, and data lives
-    under ``data_root()``.  ``Repo.fetch`` populates the local DVC cache
-    (which is under ``data_root()`` thanks to the ``cache.dir`` override
-    on ``DVCFS``) without touching the workspace at all.  After the
-    fetch, ``DVCFS.open`` serves reads from the cache via
-    ``DataFileSystem._get_fs_path``'s ``typ == "cache"`` branch.
+    See ``slurm_logs/HANDOFF_2026-05-07.org`` for the empirical
+    investigation (lock contention reproducer, batched-fetch bench,
+    pyinstrument profile, and the direct-S3 timing experiment).
+
+    Earlier history: ``slurm_logs/DESIGN_dvc_layer1_caching.md``
+    landed the ``Repo.fetch``-based design that this function used to
+    have; that design moved the DVC index work from ``DVCFS.open``'s
+    streaming fallback to a single ``Repo.fetch`` call per cache miss,
+    which was a big improvement, but still paid the index walk cost
+    on every miss.  The current bypass eliminates it.
 
     Every error is swallowed.  This function is best-effort warming
     glue; the caller's ``DVCFS.open`` streaming fallback handles any
     failure to populate the cache.
-
-    See ``slurm_logs/DESIGN_dvc_layer1_caching.md`` for the empirical
-    investigation that landed this design.
     """
     try:
         # Try several interpretations of fn to find the .dvc sidecar.
@@ -221,14 +230,366 @@ def _ensure_dvc_pulled(fn) -> None:
         # bugs (NameError, AttributeError) propagate.
         return
 
+    # Cache-miss path: download the blob directly from the S3 remote,
+    # bypassing ``Repo.fetch`` entirely.
+    #
+    # Why bypass: ``Repo.fetch`` is decorated with ``@locked``, which
+    # routes through ``lock_repo`` (``dvc/repo/__init__.py:38``).  That
+    # context manager calls ``Repo._reset()`` both on entry and on exit,
+    # which drops the cached ``Repo.index`` (``@cached_property``).  The
+    # next access rebuilds the index via ``Index.from_repo(self)`` --
+    # walking every ``.dvc`` sidecar in the countries tree on Lustre.
+    # Pyinstrument confirms this is the dominant cost: ~78s in
+    # ``StorageMapping.__getitem__`` per ``Repo.fetch`` call, ~93s total
+    # wall-clock per call regardless of file size (122 KB and 2.7 MB
+    # both took ~95s end-to-end -- the actual S3 GET is rounding error).
+    #
+    # We don't need any of that.  We have:
+    #   1. The blob's md5 (from the .dvc sidecar, parsed above).
+    #   2. The cache target path (``cache_layouts[0]``).
+    #   3. The S3 remote ``fs`` and ``path`` from ``DVCFS.repo.cloud``.
+    # That's enough for a direct ``fsspec.get_file`` call: ~0.1s for a
+    # 165 KB blob, dominated by the S3 GET roundtrip.  No index walk,
+    # no repo.lock acquisition, no ``_reset`` thrash.  Concurrent
+    # callers fetching different blobs no longer contend at all.
+    #
+    # See ``slurm_logs/HANDOFF_2026-05-07.org`` for the empirical
+    # investigation that established the ~850x speedup over
+    # ``Repo.fetch``.
+    # The bypass is *remote-agnostic*: ``remote.fs`` is whatever fsspec
+    # implementation matches the active remote's URL scheme
+    # (``s3fs.S3FileSystem``, ``gcsfs.GCSFileSystem``,
+    # ``adlfs.AzureBlobFileSystem``, the GDrive wrapper,
+    # ``HTTPFileSystem``, ``SFTPFileSystem``, ``LocalFileSystem``, ...).
+    # All of them implement ``get_file(src, dst)`` with the same
+    # contract.  The active remote name is resolved at call time from
+    # ``.dvc/config``'s ``[core] remote =`` setting -- no S3-specific
+    # assumptions.  Adding a new DVC remote requires only that its
+    # fsspec implementation honour ``get_file()``, which is the standard
+    # fsspec contract.
     try:
-        with _dvc_working_directory(_COUNTRIES_DIR):
-            DVCFS.repo.fetch(targets=[str(rel_path)], jobs=1)
-    except (OSError, ValueError, KeyError, RuntimeError):
-        # Fetch is best-effort warming.  DVC raises RuntimeError on remote
-        # config / auth issues; OSError on network/disk; ValueError/KeyError
-        # on bad sidecar metadata.  Stream-fallback handles all of them.
+        remote = DVCFS.repo.cloud.get_remote(name=DVCFS.repo.config["core"].get("remote"))
+        fs = remote.fs
+        # Try DVC 2.x layout first (where most LSMS blobs live), then
+        # DVC 3.x layout as fallback.  ``get_file`` fails fast with a
+        # FileNotFoundError if the source isn't there, which is cheaper
+        # than a separate HEAD-style ``exists()`` probe (each HEAD on
+        # this Lustre+S3 setup is ~1s).
+        src_candidates = [
+            f"{remote.path}/{md5[:2]}/{md5[2:]}",                 # DVC 2.x
+            f"{remote.path}/files/md5/{md5[:2]}/{md5[2:]}",       # DVC 3.x
+        ]
+        # Atomic write via tempfile + rename.  PID-suffixed temp name
+        # avoids collisions if two processes happen to fetch the same
+        # blob concurrently (rare in practice; each contender wants a
+        # different blob).
+        dst = cache_layouts[0]
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        tmp = dst.with_suffix(dst.suffix + f".tmp.{os.getpid()}")
+        for src in src_candidates:
+            try:
+                fs.get_file(src, str(tmp))
+                tmp.rename(dst)
+                return
+            except FileNotFoundError:
+                continue  # try the other layout
+            except OSError:
+                # Network / permission / disk error.  Clean up the tmp
+                # file if any partial write happened.
+                try:
+                    tmp.unlink()
+                except OSError:
+                    pass
+                continue
+        # Both layouts missed -- the blob is genuinely not on the
+        # remote.  Fall through to streaming fallback at the call site.
+        try:
+            tmp.unlink()
+        except OSError:
+            pass
+    except (OSError, ValueError, KeyError, RuntimeError, AttributeError):
+        # Best-effort fetch.  Any remote / config / sidecar failure
+        # falls through to ``DVCFS.open`` streaming fallback at the
+        # call site.
         pass
+
+
+def _dvc_cache_path(fn) -> "Path | None":
+    """Resolve a DVC-tracked path to its on-disk cache file, if cached.
+
+    Mirrors ``_ensure_dvc_pulled``'s sidecar-parsing logic but without
+    side effects: parses the ``.dvc`` sidecar for ``fn``, computes the
+    expected cache layouts (DVC 2.x flat + DVC 3.x ``files/md5/``), and
+    returns the first one that exists.  Returns ``None`` if no sidecar
+    is found or no cache layout is populated.
+
+    Used by ``get_dataframe`` to bypass ``DVCFS.open()`` once the cache
+    has been populated -- ``DVCFS.open()`` walks the DVC sidecar tree
+    on every call (~10-20s on Lustre per file), but a direct
+    ``open(cache_path, 'rb')`` is microseconds.
+    """
+    try:
+        fn_path = Path(fn)
+        candidates = []
+        if fn_path.is_absolute():
+            candidates.append(fn_path)
+        else:
+            candidates.append((Path.cwd() / fn_path).resolve())
+            candidates.append((_COUNTRIES_DIR / fn_path).resolve())
+
+        abs_path = None
+        for c in candidates:
+            if (c.parent / f"{c.name}.dvc").exists():
+                abs_path = c
+                break
+        if abs_path is None:
+            return None
+
+        sidecar = abs_path.parent / f"{abs_path.name}.dvc"
+        with sidecar.open() as fh:
+            md5 = yaml.safe_load(fh)["outs"][0]["md5"]
+        for layout in (
+            _DVC_CACHE_DIR / md5[:2] / md5[2:],                 # DVC 2.x
+            _DVC_CACHE_DIR / "files" / "md5" / md5[:2] / md5[2:], # DVC 3.x
+        ):
+            if layout.exists():
+                return layout
+        return None
+    except (OSError, yaml.YAMLError, KeyError, IndexError, TypeError):
+        return None
+
+
+def _gc_stale_dvc_lock() -> None:
+    """Best-effort cleanup of orphaned ``.dvc/tmp/*lock*`` files.
+
+    DVC's HardlinkLock (``core.hardlink_lock = true``) leaves a hardlink
+    pair behind when its holder dies -- the canonical ``lock`` file plus
+    one or more md5-named ``.lock`` claim files, all sharing one inode
+    with ``Links: 2``.  flufl.lock encodes a 365-day "lifetime" in the
+    file's mtime, so the orphan is treated as held until 2027-something
+    and every subsequent acquire fails.
+
+    On Lustre, the default zc.lockfile (used when ``hardlink_lock`` is
+    off) also fails to acquire when a stale flufl-format lockfile is
+    present -- the open() succeeds but fcntl.lockf returns EAGAIN even
+    though no process holds an fd into the file.  Recovery without this
+    helper requires a manual ``find .dvc/tmp/ -name '*lock*' -delete``.
+
+    This GC removes any file under ``.dvc/tmp/`` matching ``*lock*``
+    that:
+      1. Has mtime more than 1 day in the future (sentinel for the
+         365-day flufl lifetime), AND
+      2. Has no process holding an open fd into it (probed via
+         ``/proc/*/fd/*``; on platforms without procfs, skipped --
+         on Linux this is reliable).
+
+    Both conditions must hold to avoid GC'ing a lock currently in use
+    by a peer process.
+    """
+    try:
+        lock_dir = _COUNTRIES_DIR / ".dvc" / "tmp"
+        if not lock_dir.exists():
+            return
+        candidates = list(lock_dir.glob("*lock*"))
+        if not candidates:
+            return
+        future_mtime_threshold = time.time() + 86400  # 1 day from now
+        # Probe /proc/*/fd/ once for the union of inodes we'd consider
+        # GC'ing.  An inode in the held-fds set is excluded from GC.
+        held_inodes = _proc_held_inodes(candidates)
+        for p in candidates:
+            try:
+                st = p.stat()
+            except OSError:
+                continue
+            if st.st_mtime <= future_mtime_threshold:
+                continue  # not a flufl-orphan signature
+            if st.st_ino in held_inodes:
+                continue  # someone has it open right now
+            try:
+                p.unlink()
+            except OSError:
+                pass
+    except OSError:
+        # Best-effort.  Never let GC failures propagate.
+        pass
+
+
+def _proc_held_inodes(paths) -> set:
+    """Return the set of inodes that any process has an open fd into.
+
+    Conservative on failure: returns the FULL set of `paths`' inodes if
+    we can't read /proc/, so we err on the side of NOT GC'ing.
+    """
+    try:
+        target_inodes = {p.stat().st_ino for p in paths if p.exists()}
+    except OSError:
+        return set()
+    if not target_inodes:
+        return set()
+    proc = Path("/proc")
+    if not proc.exists():
+        # No procfs (e.g. macOS).  Conservative: claim all inodes are held.
+        return target_inodes
+    held = set()
+    for pid_dir in proc.iterdir():
+        if not pid_dir.name.isdigit():
+            continue
+        fd_dir = pid_dir / "fd"
+        try:
+            for fd in fd_dir.iterdir():
+                try:
+                    target = os.readlink(fd)
+                    st = os.stat(target)
+                    if st.st_ino in target_inodes:
+                        held.add(st.st_ino)
+                except (OSError, FileNotFoundError):
+                    continue
+        except (OSError, PermissionError):
+            continue  # skip processes we can't read
+    return held
+
+
+def _warm_dvc_cache_for_feature(country, feature: str, wave: str | None = None) -> None:
+    """Pre-warm the DVC blob cache for source files declared in
+    ``data_info.yml`` for the requested feature.
+
+    Pre-fetches each missing blob via direct S3 download (the same
+    bypass used by ``_ensure_dvc_pulled`` -- see that function's
+    cache-miss path for the rationale).  Each download costs ~0.1s
+    after the S3 client is warmed; for typical features this means
+    a handful of source files per wave fetched in a fraction of a
+    second total, vs the ~95s ``Repo.fetch`` would take.
+
+    Scope:
+      - Walks each wave's ``data_info.yml`` for the feature's ``file:``
+        entries (top-level and nested under ``dfs:``).
+      - Skips files that are not DVC-tracked (no sister ``.dvc`` sidecar).
+      - Skips files whose blob is already in the cache.
+      - If ``wave`` is given, only that wave is warmed.
+
+    Limitations:
+      - Script-path (``materialize: make`` / ``!make``) features have
+        their source-file declarations in Python strings inside the
+        wave script, NOT in ``data_info.yml``.  Those features are not
+        covered by this helper; ``_ensure_dvc_pulled`` handles them
+        per-call (still cheaply, since the bypass eliminates the
+        contention regardless).  Once script-path features grow YAML
+        input declarations, this helper can be extended to read them.
+
+    Best-effort:
+      - All exceptions are swallowed.  A pre-warm failure must not
+        block the actual ``make`` invocation; the per-process call
+        path in ``_ensure_dvc_pulled`` is the safety net.
+    """
+    try:
+        if wave is not None:
+            wave_names = [wave]
+        else:
+            wave_names = list(country.waves)
+
+        # Collect (md5, dst_cache_path) pairs for every uncached, DVC-
+        # tracked source file the feature declares across the requested
+        # waves.
+        targets: list[tuple[str, Path]] = []
+        seen_md5: set[str] = set()
+        for w in wave_names:
+            try:
+                wave_obj = country[w]
+            except (KeyError, AttributeError):
+                continue
+            di_path = wave_obj.file_path / "_" / "data_info.yml"
+            if not di_path.exists():
+                continue
+            try:
+                data_info = yaml.safe_load(di_path.read_text())
+            except (OSError, yaml.YAMLError):
+                continue
+            if not isinstance(data_info, dict):
+                continue
+            block = data_info.get(feature)
+            if not block:
+                continue
+            for fn in _collect_file_paths_from_block(block):
+                # Resolve relative to the wave's _/ directory (matches
+                # the convention wave scripts use).
+                abs_path = (wave_obj.file_path / "_" / fn).resolve()
+                sidecar = abs_path.with_name(abs_path.name + ".dvc")
+                if not sidecar.exists():
+                    continue  # untracked source — no DVC fetch needed
+                try:
+                    md5 = yaml.safe_load(sidecar.read_text())["outs"][0]["md5"]
+                except (KeyError, IndexError, TypeError, OSError, yaml.YAMLError):
+                    continue
+                if md5 in seen_md5:
+                    continue
+                seen_md5.add(md5)
+                # DVC 2.x layout is the canonical destination for our
+                # cache (see ``_ensure_dvc_pulled``'s comment block).
+                dst = _DVC_CACHE_DIR / md5[:2] / md5[2:]
+                if dst.exists() or (_DVC_CACHE_DIR / "files/md5" / md5[:2] / md5[2:]).exists():
+                    continue  # already cached
+                targets.append((md5, dst))
+
+        if not targets:
+            return
+
+        # Resolve the active DVC remote once; reuse across all blobs.
+        # Remote-agnostic -- ``remote.fs`` is whatever fsspec backend
+        # the active remote uses (S3, GCS, Azure, HTTP, SSH, ...).
+        try:
+            remote = DVCFS.repo.cloud.get_remote(name=DVCFS.repo.config["core"].get("remote"))
+            fs = remote.fs
+            remote_path = remote.path
+        except (OSError, KeyError, AttributeError, RuntimeError):
+            return  # remote unreachable; fall back to per-call path
+
+        for md5, dst in targets:
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            tmp = dst.with_suffix(dst.suffix + f".tmp.{os.getpid()}")
+            for src in (
+                f"{remote_path}/{md5[:2]}/{md5[2:]}",                  # DVC 2.x
+                f"{remote_path}/files/md5/{md5[:2]}/{md5[2:]}",        # DVC 3.x
+            ):
+                try:
+                    fs.get_file(src, str(tmp))
+                    tmp.rename(dst)
+                    break
+                except FileNotFoundError:
+                    continue
+                except OSError:
+                    try:
+                        tmp.unlink()
+                    except OSError:
+                        pass
+                    continue
+            else:
+                # Both layouts missed for this blob; clean tmp if any.
+                try:
+                    tmp.unlink()
+                except OSError:
+                    pass
+    except Exception:
+        # Last-ditch swallow: never let pre-warm break a build.
+        pass
+
+
+def _collect_file_paths_from_block(block):
+    """Walk a data_info.yml feature block and yield every ``file:`` value
+    encountered, including those nested in ``dfs:`` sub-blocks."""
+    if isinstance(block, dict):
+        f = block.get("file")
+        if isinstance(f, str):
+            yield f
+        elif isinstance(f, list):
+            for x in f:
+                if isinstance(x, str):
+                    yield x
+        for v in block.values():
+            yield from _collect_file_paths_from_block(v)
+    elif isinstance(block, list):
+        for item in block:
+            yield from _collect_file_paths_from_block(item)
 
 
 def _is_polluted_workspace_copy(fn) -> bool:
@@ -394,7 +755,26 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         return True
     
     def file_system_path(fn):
-    # is the file a relative path or it's the full path from our fs (DVCFileSystem)?
+        # Is the file DVC-tracked?  We answer this by checking for the
+        # sidecar directly, NOT by trying ``DVCFS.open(fn)``.  The
+        # latter walks the DVC sidecar tree (~10-20s on Lustre per
+        # call) just to determine existence.  We only need to know
+        # whether a ``.dvc`` sidecar exists at one of the standard
+        # interpretations of ``fn``; that's a couple of stat() calls.
+        fn_path = Path(fn)
+        candidates = (
+            [fn_path] if fn_path.is_absolute()
+            else [Path.cwd() / fn_path, _COUNTRIES_DIR / fn_path]
+        )
+        for c in candidates:
+            try:
+                if (c.parent / f"{c.name}.dvc").exists():
+                    return True
+            except OSError:
+                continue
+        # Sidecar not found via the cheap path.  Fall back to DVCFS.open
+        # for the rare case where the file is genuinely DVC-tracked but
+        # not at one of the standard interpretations.
         try:
             with DVCFS.open(fn) as f:
                 pass
@@ -501,26 +881,35 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         except (TypeError,ValueError): # Needs filename?
             df = read_file(fn,convert_categoricals=convert_categoricals,encoding=encoding)
     elif file_system_path(fn):
-        # Layer-1 (raw .dta blob) caching: best-effort warm the local
-        # DVC object cache before streaming.  ``_ensure_dvc_pulled``
-        # is a no-op when the blob is already cached (cache hit ->
-        # ``DVCFS.open`` below serves it from local disk via
-        # ``_get_fs_path``'s ``typ == "cache"`` branch) and a no-op
-        # on any failure (streaming via ``DVCFS.open`` is the
-        # fallback).  This restores the Layer-1 caching that
-        # ``slurm_logs/DESIGN_dvc_layer1_caching.md`` originally
-        # diagnosed as dormant -- the working approach uses
-        # ``Repo.fetch`` (NOT ``Repo.pull``, which would also check
-        # the file out into the package tree) plus a runtime
-        # ``cache.dir`` config override at ``DVCFS`` construction
-        # (see _DVC_CACHE_DIR above), not the ``cache_remote_stream``
-        # kwarg the prior session tried.
+        # Layer-1 (raw .dta blob) caching.  After ``_ensure_dvc_pulled``
+        # populates the cache, we open the cache file *directly* rather
+        # than via ``DVCFS.open()``.  Why: ``DVCFS.open()`` resolves the
+        # virtual path through DVC's filesystem, which walks the
+        # ``.dvc`` sidecar tree on Lustre (~10-20s per call when cold).
+        # We already have everything needed to find the cache file: the
+        # md5 from the sidecar (parsed by ``_dvc_cache_path``) and the
+        # canonical cache layout at ``_DVC_CACHE_DIR``.  See
+        # ``slurm_logs/HANDOFF_2026-05-07.org`` for the profiling data
+        # (167s of a 198s ``Country.household_roster()`` call was in
+        # ``_DVCFileSystem.open``; bypassing it brings that to ~ms).
         _ensure_dvc_pulled(fn)
-        try:
-            with DVCFS.open(fn,mode='rb') as f:
-                df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
-        except TypeError: # Needs filename?
-            df = read_file(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+        cache_path = _dvc_cache_path(fn)
+        if cache_path is not None:
+            try:
+                with open(cache_path, mode='rb') as f:
+                    df = read_file(f, convert_categoricals=convert_categoricals, encoding=encoding)
+            except (TypeError, ValueError):  # Reader needs a filename, not a stream
+                df = read_file(str(cache_path),
+                               convert_categoricals=convert_categoricals,
+                               encoding=encoding)
+        else:
+            # No usable cache file (sidecar missing/corrupt or fetch failed).
+            # Fall back to ``DVCFS.open`` for streaming.  Slow but correct.
+            try:
+                with DVCFS.open(fn, mode='rb') as f:
+                    df = read_file(f, convert_categoricals=convert_categoricals, encoding=encoding)
+            except TypeError:  # Needs filename?
+                df = read_file(fn, convert_categoricals=convert_categoricals, encoding=encoding)
 
     else:
         try:
