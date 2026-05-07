@@ -152,7 +152,7 @@
   (e.g., code 10 = "medium derica" in wave 2 but "bin/basket" in
   waves 3-4).  The per-wave columns record the wave-specific meaning.
 
-#+NAME: unit
+#+NAME: u
 | Code | Preferred Label              | 2010-11                      | 2012-13                      | 2015-16                      | 2018-19                      |
 |------+------------------------------+------------------------------+------------------------------+------------------------------+------------------------------|
 |    1 | Kg                           | Kg                           | Kg                           | Kg                           | Kg                           |

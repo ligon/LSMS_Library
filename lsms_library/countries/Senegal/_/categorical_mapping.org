@@ -323,7 +323,7 @@
 
 * Food Units
 
-#+NAME: unit
+#+NAME: u
 | Original Label                       | Preferred Label        |
 |--------------------------------------+------------------------|
 | 1.0                                  | 1.0                    |

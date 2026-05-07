@@ -17,7 +17,7 @@ food_labels = get_categorical_mapping(tablename='harmonize_food',
                                        idxvars='Code',
                                        **{'Preferred Label': 'Preferred Label'})
 
-_unit_raw = get_categorical_mapping(tablename='unit',
+_unit_raw = get_categorical_mapping(tablename='u',
                                      idxvars='Code',
                                      **{'2012-13': '2012-13'})
 unitcodes = {k: v for k, v in _unit_raw.items() if isinstance(v, str)}

@@ -1279,8 +1279,21 @@ class TestLayer1Caching:
             # bailing to the streaming fallback.
             assert mock_remote.fs.get_file.call_count >= 1
 
-    def test_ensure_dvc_pulled_bails_on_path_outside_countries(self, tmp_path, monkeypatch):
-        """A sidecar at a path outside _COUNTRIES_DIR -> no fetch (no error)."""
+    def test_ensure_dvc_pulled_fetches_sidecar_outside_countries(self, tmp_path, monkeypatch):
+        """A sidecar outside _COUNTRIES_DIR -> bypass still attempts fetch.
+
+        The pre-bypass implementation refused to fetch when ``abs_path``
+        couldn't be made relative to ``_COUNTRIES_DIR`` -- a technical
+        constraint of the old ``Repo.fetch(targets=[str(rel_path)])``
+        call (which resolved the target against the repo root).  The
+        bypass uses the md5 directly for the cache write, so no such
+        constraint applies; refusing was actively harmful when wave
+        scripts ran from a worktree but imported ``lsms_library`` from
+        a separate main checkout (``abs_path`` resolved under the
+        worktree, ``_COUNTRIES_DIR`` pointed at main, ``relative_to``
+        raised ``ValueError``, function silently bailed, cache stayed
+        empty).  See commit 5e2ea913.
+        """
         from lsms_library import local_tools
 
         countries_dir = (tmp_path / "countries").resolve()
@@ -1289,9 +1302,9 @@ class TestLayer1Caching:
         outside.mkdir(parents=True)
         target = outside / "foo.dta"
         sidecar = outside / "foo.dta.dvc"
+        md5 = "0123456789abcdef0123456789abcdef"
         sidecar.write_text(
-            "outs:\n- md5: 0123456789abcdef0123456789abcdef\n"
-            "  size: 0\n  path: foo.dta\n"
+            f"outs:\n- md5: {md5}\n  size: 0\n  path: foo.dta\n"
         )
         cache_dir = tmp_path / "cache"
         cache_dir.mkdir()
@@ -1301,8 +1314,24 @@ class TestLayer1Caching:
         with patch("lsms_library.local_tools.DVCFS") as mock_dvcfs:
             mock_remote = mock_dvcfs.repo.cloud.get_remote.return_value
             mock_remote.path = "bucket0/repo"
+
+            def fake_get_file(src, dst, *args, **kwargs):
+                Path(dst).parent.mkdir(parents=True, exist_ok=True)
+                Path(dst).write_bytes(b"")
+            mock_remote.fs.get_file.side_effect = fake_get_file
+
+            # Should not raise.
             local_tools._ensure_dvc_pulled(str(target))
-            mock_remote.fs.get_file.assert_not_called()
+
+            # Bypass attempted a fetch from the canonical DVC 2.x layout
+            # and exited after that single call (the rename succeeded
+            # because fake_get_file actually created the file).
+            mock_remote.fs.get_file.assert_called_once()
+            call = mock_remote.fs.get_file.call_args
+            src, dst = call.args[:2]
+            assert src == f"bucket0/repo/{md5[:2]}/{md5[2:]}"
+            # And the final cache file landed at the canonical path.
+            assert (cache_dir / md5[:2] / md5[2:]).exists()
 
     def test_ensure_dvc_pulled_handles_malformed_sidecar(self, tmp_path, monkeypatch):
         """A sidecar with unexpected shape -> bail silently, no fetch."""

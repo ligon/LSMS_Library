@@ -22,7 +22,7 @@ print(write_df_to_org(df, 'unit'))
 #+end_src
 
 #+RESULTS:
-#+NAME: unit
+#+NAME: u
 |    | Original Label               | Preferred Label |
 |----+------------------------------+-----------------|
 |  0 | Alvéole                      | Alvéole         |

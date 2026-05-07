@@ -303,7 +303,7 @@
 
 * Food Units
 
-#+NAME: unit
+#+NAME: u
 | Original Label            | Preferred Label |
 |---------------------------+-----------------|
 | 101.0                     | 101.0           |
