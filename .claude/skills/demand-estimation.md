@@ -44,6 +44,23 @@ Two derivation fallbacks avoid the need for wave-level scripts:
 For these to work, `food_acquired` and `household_roster` must be in
 the country's `data_scheme.yml`.
 
+### `units=` kwarg on prices and quantities (Phase 4)
+
+`food_prices()` and `food_quantities()` accept a `units=` kwarg that
+controls the price / quantity basis.  Defaults preserve the
+pre-Phase-4 behavior (`'kgvalue'` / `'kgs'`).
+
+For demand estimation, `food_prices(units='kgvalue')` (the default —
+`Expenditure / Quantity_kg`) is what the literature calls "unit
+value" (Deaton 1988, 1997).  `food_prices(units='unitvalue')` gives
+per-native-`u` unit values, useful when working in survey units.
+`food_prices(units='unitprice')` returns survey-reported prices
+directly (NaN where not recorded) — surfaces farmgate prices for
+`s='produced'` rows on countries whose wave scripts populate `Price`
+(Uganda Phase 3 onwards).  See
+`slurm_logs/DESIGN_food_prices_units_kwarg_2026-05-06.org` and the
+`add-feature/food-acquired` skill for the full menu.
+
 ## Column aliases
 
 Tanzania's wave scripts produce `value_purchase` / `quant_ttl_consume`
