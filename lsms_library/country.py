@@ -1643,8 +1643,33 @@ class Country:
             # column (a legacy script may have written v alongside other
             # columns; joining again would create v_x/v_y name conflicts).
             current_names = list(df.index.names) if isinstance(df.index, pd.MultiIndex) else [df.index.name]
-            v_already_present = ('v' in current_names
-                                 or (isinstance(df, pd.DataFrame) and 'v' in df.columns))
+            v_in_idx = 'v' in current_names
+            v_in_cols = isinstance(df, pd.DataFrame) and 'v' in df.columns
+            v_already_present = v_in_idx or v_in_cols
+
+            # Repair pattern (GH #172): some countries' rosters carry ``v`` in
+            # the YAML-declared index but with all-NaN values (Guyana,
+            # Azerbaijan, Serbia and Montenegro).  ``_join_v_from_sample``'s
+            # short-circuit treated this as "v already populated" and
+            # silently dropped every row downstream in
+            # ``roster_to_characteristics``.  Detect the all-NaN case and
+            # strip the placeholder so the join below re-fills v from
+            # ``sample()`` cleanly.
+            if v_already_present:
+                if v_in_idx:
+                    v_vals = df.index.get_level_values('v')
+                    v_all_nan = bool(v_vals.isna().all())
+                else:
+                    v_all_nan = bool(df['v'].isna().all())
+                if v_all_nan:
+                    if v_in_idx:
+                        df = df.droplevel('v')
+                    else:
+                        df = df.drop(columns=['v'])
+                    v_already_present = False
+                    current_names = (list(df.index.names) if isinstance(df.index, pd.MultiIndex)
+                                     else [df.index.name])
+
             # Tables whose canonical index in data_info.yml does NOT include
             # v; joining v from sample() would produce a non-canonical shape.
             # See SkunkWorks/audits/framework_diagnosis.md for the schema survey.
