@@ -447,7 +447,34 @@ CLOSED: [2023-03-07 Tue 11:25]
 CLOSED: [2023-03-07 Tue 11:32]
 ** DONE food_acquired.py
 CLOSED: [2023-03-07 Tue 21:10]
-Test...
+*** Unit handling
+
+The =u= (unit) index level on =food_acquired= is canonical at
+parquet-write time via two passes inside =tanzania.py=:
+
+1. =food_acquired()= maps raw upper-case codes to title-case labels
+   (=KILOGRAMS -> Kg=, =GRAMS -> Gram=, =LITRE -> Litre=,
+   =MILLILITRE -> Millilitre=, =PIECES -> Piece=) via an inline
+   =unitlabels= dict.  See
+   =lsms_library/countries/Tanzania/_/tanzania.py= around lines
+   400-405.
+2. =new_harmonize_units()= then *collapses every unit to either
+   =kg= or =piece=*, scaling the corresponding quantity by the
+   per-unit kg factor.  See =tanzania.py= around lines 559-586.
+
+So the =u= axis on the final parquet is a 2-token vocabulary
+({=kg=, =piece=}) -- already canonical by construction.  No =u=
+table is wired into =_/categorical_mapping.org=; the framework's
+auto-discovery on =u= would be a no-op.
+
+Note that the =_/conversion_to_kgs.json= file is *dead code* in
+the current Tanzania pipeline (the =new_harmonize_units= path
+absorbs the kg conversion); the load is commented out at
+=tanzania.py= ~lines 417-422.
+
+For the cross-country canonical-=u= roadmap, see GH #223.
+
+*** Test...
 #+begin_src python :results output
 import pandas as pd
 

@@ -79,3 +79,21 @@ There is no rotating panel or refreshment sample in the NLSS series.
 ** food_acquired
 ** interview_date
 ** assets
+
+* Unit handling for =food_acquired=
+
+Not yet applicable: =food_acquired= is not implemented for Nepal
+(no source =.dta= files have been DVC-tracked or downloaded; see
+"Data Acquisition Status" above).  No wave script and no
+country-level script exist for =food_acquired=, so there is
+nothing to canonicalise the =u= index level *of yet*, and no =u=
+table in =_/categorical_mapping.org= is needed.
+
+When the source data is acquired and the wave scripts are
+written, the team should choose one of the established patterns
+(in-script normalisation as in Ethiopia / Tanzania / Uganda /
+GhanaLSS, or a =u= entry in =_/categorical_mapping.org= as in
+Malawi / Mali / Nigeria / Senegal / Burkina_Faso) and document
+the choice in this section.
+
+For the cross-country canonical-=u= roadmap, see GH #223.

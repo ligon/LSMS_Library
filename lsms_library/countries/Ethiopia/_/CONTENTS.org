@@ -178,7 +178,31 @@ CLOSED: [2023-03-07 Tue 11:25]
 CLOSED: [2023-03-07 Tue 11:32]
 ** DONE food_acquired.py
 CLOSED: [2023-03-07 Tue 21:10]
-Test...
+*** Unit handling
+
+The =u= (unit) index level on =food_acquired= is canonical at
+parquet-write time via in-script title-casing plus a small typo
+patch in =ethiopia.py:food_acquired=.  Source labels are read with
+=convert_categoricals=True= (so they arrive as strings like
+=KILOGRAM=, =Meduim Cup=, =Kubaya 100Ml=), then normalised to
+=Kilogram=, =Medium Cup=, =Kubaya/Cup 100Ml=, etc., before the
+parquet is written.  See =lsms_library/countries/Ethiopia/_/ethiopia.py=
+around lines 220-231 for the exact regex / =str.title()= calls.
+
+No =u= table is wired into =_/categorical_mapping.org=; the
+framework's auto-discovery on =u= would be a no-op (the labels are
+already canonical).
+
+The =_/conversion_to_kgs.json= file is a kg-per-unit factor
+lookup consumed by =food_quantities= derivation -- it is a
+separate concern from =u= label canonicalisation.  Its keys are
+the same canonical unit labels (=Kilogram=, =Litre=, etc.), so
+preserving the in-script normalisation above is what keeps that
+join working.
+
+For the cross-country canonical-=u= roadmap, see GH #223.
+
+*** Test...
 #+begin_src python :results output
 import pandas as pd
 

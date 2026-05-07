@@ -140,6 +140,32 @@ Second, starting in the 1991--92 wave, rather than eliciting expenditures over a
 
 NB: Differences in elicitation across waves may complicate comparisons across those waves.  In particular, the two rounds in the 1980s ask for expenditures "since my last visit", but only for one visit, while subsequent rounds elicit this information across several visits.
 
+*** Unit handling
+
+The =u= (unit) index level on =food_acquired= is canonical at
+parquet-write time via the country-level
+=_/food_acquired.py= script.  At line 22 it reads
+=_/unit_labels.org= (an org table named =unit_label= with columns
+=Preferred Label= and =u=), and at line 52 it applies the inverse
+map to the =u= column with =df.replace(...)= before setting the
+final =(j, t, i, u)= index and writing the parquet.
+
+This is stylistically different from the
+=_/categorical_mapping.org= pattern used by Malawi / Mali /
+Nigeria / Senegal / Burkina_Faso (a separate =unit_labels.org=
+file rather than a =u= table inside =categorical_mapping.org=)
+but functionally equivalent: =u= is canonical at parquet-write
+time, and no =u= table needs to be wired into
+=_/categorical_mapping.org=.  The framework's auto-discovery on
+=u= would be a no-op.
+
+There is no =_/conversion_to_kgs.json= for GhanaLSS; the
+food_quantities pipeline for this country is currently a
+work-in-progress (see =food_prices_quantities_and_expenditures.py=
+TODO below).
+
+For the cross-country canonical-=u= roadmap, see GH #223.
+
 *** Test...
 #+begin_src python :results output
 import pandas as pd
