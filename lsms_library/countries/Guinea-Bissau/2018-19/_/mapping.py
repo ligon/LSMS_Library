@@ -2,7 +2,109 @@
 import pandas as pd
 import numpy as np
 import lsms_library.local_tools as tools
-from lsms_library.transformations import food_acquired_to_canonical as food_acquired
+from lsms_library.transformations import food_acquired_to_canonical as _food_acquired_canonical
+
+
+# Lossy-substitution prefixes the source data carries for two specific
+# Portuguese words.  Upstream of pyreadstat, the export pipeline
+# replaced the second byte of certain UTF-8 codepoints with literal
+# ``__`` (0x5f 0x5f) -- so ``Óleo`` (UTF-8: 0xc3 0x93 + 'leo') becomes
+# ``Ã__leo`` and ``Água`` (UTF-8: 0xc3 0x81 + 'gua') becomes
+# ``Ã__gua``.  No byte-level decoding can recover these (the original
+# byte is gone), so we substitute the canonical Portuguese form
+# directly when we see the prefix.  Two known cases drive this:
+# food items ``Óleo de mancarra``, ``Óleo de soja``, ``Óleo de palma``,
+# and ``Água filtrada`` (4 of 135 distinct ``j`` values in
+# food_acquired 2018-19).
+_LOST_PREFIX_REPLACEMENTS = {
+    'Ã__leo': 'Óleo',
+    'Ã__gua': 'Água',
+}
+
+
+def _decode_mojibake(s):
+    """Reverse the UTF-8-as-Latin-1-as-UTF-8 double-encoding that pyreadstat
+    produces for Guinea-Bissau's 2018-19 .dta value labels.
+
+    The .dta file's value-labels block stores Portuguese strings as raw
+    UTF-8 bytes (e.g. ``Pedaço`` = ``b'\\xc3\\xa7'`` for the ``ç``), but
+    the file metadata declares Latin-1 encoding.  pyreadstat respects
+    the metadata, decoding the UTF-8 bytes as Latin-1 and re-encoding
+    them as Python ``str`` -- producing ``PedaÃ§o`` instead of ``Pedaço``.
+    None of pyreadstat's ``encoding=`` options correct this (verified
+    2026-05-07: ``utf-8`` raises, ``cp1252`` / ``iso-8859-1`` give the
+    same mojibake).  The fix is post-decode: encode the mojibake string
+    back to Latin-1 bytes (recovers the original UTF-8 byte sequence),
+    then decode as UTF-8.
+
+    Two j-values in food_acquired 2018-19 carry an additional lossy
+    substitution upstream of pyreadstat where the second byte of
+    certain UTF-8 codepoints was replaced with literal ``__`` (i.e.
+    ``Óleo`` -> ``Ã__leo``, ``Água`` -> ``Ã__gua``).  Those can't be
+    recovered byte-wise, so we handle them via
+    ``_LOST_PREFIX_REPLACEMENTS`` above.
+
+    Strings without non-ASCII characters round-trip cleanly through
+    ``encode('latin-1').decode('utf-8')`` (every byte 0x00-0x7F is
+    valid in both encodings and identical).  So this is safe to apply
+    to all string values; only the mojibake-bearing ones change.
+
+    Returns the input unchanged on any error or when ``s`` isn't a
+    string -- best-effort, never raises.
+    """
+    if not isinstance(s, str):
+        return s
+    for bad, good in _LOST_PREFIX_REPLACEMENTS.items():
+        if s.startswith(bad):
+            return good + s[len(bad):]
+    try:
+        return s.encode('latin-1').decode('utf-8')
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        return s
+
+
+def _decode_mojibake_in_df(df):
+    """Apply ``_decode_mojibake`` to every string column and string
+    index level in-place.  Used by per-feature ``df_edit`` hooks below
+    to fix value-label mojibake that affects Portuguese strings in
+    multiple columns at once (food items, units, etc.) -- 40 of 135
+    food items and 4 of 29 units carry it before this fix.
+    """
+    # Index levels
+    new_levels = []
+    new_names = list(df.index.names)
+    changed = False
+    for i, name in enumerate(df.index.names):
+        level = df.index.get_level_values(i)
+        if level.dtype == object or pd.api.types.is_string_dtype(level):
+            mapped = level.map(_decode_mojibake)
+            if not mapped.equals(level):
+                changed = True
+            new_levels.append(mapped)
+        else:
+            new_levels.append(level)
+    if changed:
+        df = df.copy()
+        df.index = pd.MultiIndex.from_arrays(new_levels, names=new_names) \
+            if len(new_levels) > 1 else new_levels[0]
+    # String columns
+    for col in df.columns:
+        if df[col].dtype == object or pd.api.types.is_string_dtype(df[col]):
+            df[col] = df[col].map(_decode_mojibake)
+    return df
+
+
+def food_acquired(df):
+    """``food_acquired`` post-processor: canonical reshape + mojibake fix.
+
+    Wraps ``transformations.food_acquired_to_canonical`` (the Phase 3
+    s-axis reshape) and then sweeps mojibake out of every string
+    column / index level.  See ``_decode_mojibake`` for the encoding
+    rationale.
+    """
+    df = _food_acquired_canonical(df)
+    df = _decode_mojibake_in_df(df)
+    return df
 
 def Sex(value):
     '''

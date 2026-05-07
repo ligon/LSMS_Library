@@ -32,3 +32,36 @@ rather than expecting a =MonthsSpent= column in =household_roster()=.
 
 Guinea-Bissau has no pre-EHCVM waves in the library, so no continuous
 months-of-presence variable is available for any wave.
+
+* Unit handling for =food_acquired=
+
+The =u= (unit) index level on =food_acquired= carries clean canonical
+Portuguese unit names (=Kg=, =Litro=, =Sachet=, =Pacote=, =Unidade=,
+=Pedaço=, =Dúzia=, ...) -- 29 distinct values total.  No =u= table is
+wired into =_/categorical_mapping.org=; the framework's auto-discovery
+on =u= would be a no-op (the labels are already canonical).
+
+The clean labels come from a per-wave mojibake fix in
+=2018-19/_/mapping.py=:
+
+- The .dta file's value-labels block stores Portuguese strings as raw
+  UTF-8 bytes, but its metadata declares Latin-1 encoding.  pyreadstat
+  respects the metadata and produces double-decoded strings (=Pedaço=
+  becomes =PedaÃ§o=, =Dúzia= becomes =DÃºzia=, etc.).
+- The wave's =mapping.py= defines a =food_acquired= post-processor
+  (replacing the default =food_acquired_to_canonical= alias) that calls
+  the canonical reshape and then sweeps mojibake out of every string
+  column / index level via =_decode_mojibake_in_df()=.  See the
+  module's docstring for the encoding analysis.
+- Two food labels carry an additional lossy substitution upstream of
+  pyreadstat (=Óleo= -> =Ã__leo=, =Água= -> =Ã__gua=, with literal
+  underscores replacing the second byte of certain UTF-8 codepoints).
+  These can't be recovered byte-wise, so =mapping.py= ships an explicit
+  =_LOST_PREFIX_REPLACEMENTS= dict for the four affected food items
+  (=Óleo de mancarra=, =Óleo de soja=, =Óleo de palma=,
+  =Água filtrada=).
+
+For the cross-country canonical-=u= roadmap, see GH #223.  Guinea-Bissau
+was originally classified Tier 3 (needing a new =u= table built) in
+that issue's inventory, but turned out to be Tier 2 once the mojibake
+fix landed -- the underlying labels are already canonical.
