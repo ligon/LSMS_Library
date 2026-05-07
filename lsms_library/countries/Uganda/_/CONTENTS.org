@@ -207,6 +207,30 @@ For cross-sectional analysis within a single wave, use =weight=.
 For longitudinal/panel analysis across waves, use =panel_weight=
 (and restrict to households where it is non-null and positive).
 
+* Unit handling for =food_acquired=
+
+The =u= (unit) index level on =food_acquired= is canonical at
+parquet-write time via =harmonized_unit_labels()= in
+=lsms_library/countries/Uganda/_/uganda.py= (~line 66), which reads
+=_/unitlabels.csv= -- a two-column =Code, Preferred Label= mapping
+where the canonical labels (=Kg=, =Gram=, =Litre=, =Akendo
+(Small)=, =Sack (120 kgs)=, ...) are already in human-readable
+form.  =food_acquired()= (~line 106) renames the =u= index level
+through this map, so by the time the wave parquet is written the
+=u= index carries clean labels.
+
+No =u= table is wired into =_/categorical_mapping.org=; the
+framework's auto-discovery on =u= would be a no-op (the labels are
+already canonical).
+
+The =_/conversion_to_kgs.json= file is a kg-per-unit factor
+lookup consumed by =food_quantities= derivation -- a separate
+concern from =u= label canonicalisation.  Its keys are the same
+=Preferred Label= strings used above; it is built dynamically by
+=_/kg_per_other_units.py=.
+
+For the cross-country canonical-=u= roadmap, see GH #223.
+
 * Known Issues
 ** TODO Missing panel weight for 2019-20
 :LOGBOOK:
