@@ -63,14 +63,41 @@ Waves = {'2005-06':(),
          '2018-19':('GSEC1.dta','hhid','t0_hhid'),
          '2019-20':('HH/gsec1.dta','hhid','hhidold')}
 
-def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Code',value='Preferred Label'):
-    unitlabels = pd.read_csv(fn)
-    unitlabels.columns = [s.strip() for s in unitlabels.columns]
-    unitlabels = unitlabels[[key,value]].dropna()
-    unitlabels = unitlabels.set_index(key)
+def harmonized_unit_labels(key='Code', value='Preferred Label'):
+    """Return the {Code: Preferred Label} mapping from the ``u`` table
+    in ``lsms_library/countries/Uganda/_/categorical_mapping.org``.
 
-    unitlabels = unitlabels.squeeze().str.strip().to_dict()
+    Replaces the older CSV-based pipeline (``unitlabels.py`` emitting
+    ``unitlabels.csv``); the org table is now the single source of truth
+    for unit-label canonicalisation.  See GH #223 for the cross-country
+    roadmap and Tier 1 convention (Malawi, Mali, Nigeria, Senegal,
+    Burkina Faso).
 
+    The org table reuses the ``---`` sentinel for empty cells (per
+    ``df_from_orgfile``).  To preserve compatibility with the previous
+    CSV-based behaviour -- which carried explicit ``'---'`` strings as
+    the canonical label for unit codes that exist but lack a meaningful
+    label -- we restore those NaN-valued labels to the literal
+    ``'---'`` string.  Codes are coerced to ``int`` so the mapping
+    matches the float-typed ``u`` index values produced by the wave
+    scripts (``hash(1) == hash(1.0)``; a string key would not match).
+    """
+    from lsms_library.local_tools import get_categorical_mapping
+
+    raw = get_categorical_mapping(tablename='u',
+                                  idxvars=key,
+                                  **{value: value})
+
+    unitlabels = {}
+    for k, v in raw.items():
+        try:
+            int_k = int(k)
+        except (TypeError, ValueError):
+            int_k = k
+        if pd.isna(v):
+            unitlabels[int_k] = '---'
+        else:
+            unitlabels[int_k] = str(v).strip()
     return unitlabels
 
 def harmonized_food_labels(fn='../../_/food_items.org',key='Code',value='Preferred Label'):

@@ -14,10 +14,7 @@ var = $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_quantities.parquet $(
 	  $(VAR_DIR)/assets.parquet $(VAR_DIR)/earnings.parquet $(VAR_DIR)/housing.parquet $(VAR_DIR)/income.parquet \
 	  $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet
 
-all: unitlabels.csv $(parquet) $(var)
-
-unitlabels.csv: unitlabels.py
-	python unitlabels.py
+all: $(parquet) $(var)
 
 panel_ids.json updated_ids.json: panel_ids.py
 	python panel_ids.py
@@ -67,7 +64,7 @@ $(VAR_DIR)/food_quantities.parquet $(VAR_DIR)/food_expenditures.parquet $(VAR_DI
 food_acquired = $(shell find $(rounds) -name food_acquired.py)
 food_acquired_parquet := $(food_acquired:.py=.parquet)
 
-$(VAR_DIR)/food_acquired.parquet: unitlabels.csv food_acquired.py $(food_acquired_parquet)
+$(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
 	python food_acquired.py
 
 household_characteristics = $(shell find $(rounds) -name household_characteristics.py)

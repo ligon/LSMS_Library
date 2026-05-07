@@ -211,17 +211,24 @@ For longitudinal/panel analysis across waves, use =panel_weight=
 
 The =u= (unit) index level on =food_acquired= is canonical at
 parquet-write time via =harmonized_unit_labels()= in
-=lsms_library/countries/Uganda/_/uganda.py= (~line 66), which reads
-=_/unitlabels.csv= -- a two-column =Code, Preferred Label= mapping
-where the canonical labels (=Kg=, =Gram=, =Litre=, =Akendo
-(Small)=, =Sack (120 kgs)=, ...) are already in human-readable
-form.  =food_acquired()= (~line 106) renames the =u= index level
-through this map, so by the time the wave parquet is written the
-=u= index carries clean labels.
+=lsms_library/countries/Uganda/_/uganda.py=.  It reads the =#+name: u=
+table in =_/categorical_mapping.org= via =get_categorical_mapping=
+(Tier 1 convention shared with Malawi, Mali, Nigeria, Senegal, Burkina
+Faso) and returns a =Code -> Preferred Label= dict where the canonical
+labels (=Kg=, =Gram=, =Litre=, =Akendo (Small)=, =Sack (120 kgs)=,
+...) are already in human-readable form.  =food_acquired()= renames
+the =u= index level through this map, so by the time the wave parquet
+is written the =u= index carries clean labels.
 
-No =u= table is wired into =_/categorical_mapping.org=; the
-framework's auto-discovery on =u= would be a no-op (the labels are
-already canonical).
+The =u= table also retains the per-wave variant columns (=2005-06=,
+=2009-10=, ..., =2019-20=) that document the raw label appearing in
+each wave's questionnaire.  These extra columns are unused at runtime
+but preserve the cross-wave provenance previously captured in the
+retired =_/unitlabels.py= file.
+
+The legacy =_/unitlabels.csv= /=_/unitlabels.py= pipeline (which
+emitted a 2-column projection of the same data) was retired in
+favour of the org-table single source of truth.
 
 The =_/conversion_to_kgs.json= file is a kg-per-unit factor
 lookup consumed by =food_quantities= derivation -- a separate
