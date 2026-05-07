@@ -1677,14 +1677,18 @@ class Country:
             # a column or index name (issue #49)
             df = self._apply_categorical_mappings(df)
 
-            # Apply harmonize_assets mapping to the j index level for
-            # the assets feature (GH #168).  Runs after _apply_categorical_mappings
-            # because the table name (harmonize_assets) does not match the index
-            # level name (j) so the auto-dispatch above cannot fire.
-            if (method_name == 'assets'
+            # Apply ``harmonize_<method_name>`` mapping to the ``j`` index
+            # level when such a categorical_mapping table exists (GH #180,
+            # #168).  Runs after :meth:`_apply_categorical_mappings` because
+            # the table name (``harmonize_assets``, ``harmonize_food``, …)
+            # does not match the index level name (``j``) so the auto-dispatch
+            # above cannot fire.  Generalises the original assets-only hook
+            # so future ``harmonize_education``, ``harmonize_housing``, etc.
+            # tables auto-apply by convention.
+            if (method_name
                     and isinstance(df.index, pd.MultiIndex)
                     and 'j' in df.index.names):
-                ha_table = self.categorical_mapping.get('harmonize_assets')
+                ha_table = self.categorical_mapping.get(f'harmonize_{method_name}')
                 if ha_table is not None and 'Preferred Label' in ha_table.columns:
                     src_cols = [c for c in ha_table.columns if c != 'Preferred Label']
                     if src_cols:
