@@ -157,9 +157,7 @@ food_acquired:
         j:
             - product
             - mappings: ['harmonize_food', 'Original Label', 'Preferred Label']
-        u:
-            - uachat
-            - mappings: ['unit', 'Original Label', 'Preferred Label']
+        u: uachat
     myvars:
         Quantity: qachat
         Expenditure: achat
