@@ -323,3 +323,22 @@ print(write_df_to_org(df, 'unit'))
 | 250 | Zaban                                                                                                | Zaban                                        |
 | 251 | ufs                                                                                              | Œufs                                         |
 | 252 | Œufs                                                                                                 | Œufs                                         |
+
+#+name: Roof
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| Iron Sheets        | Iron Sheets     |
+| Thatch             | Thatch          |
+| Straw              | Thatch          |
+| Clay Tiles         | Clay Tiles      |
+| Concrete Slab      | Concrete        |
+| Adobe              | Mud             |
+| Mats               | Mats            |
+
+#+name: Floor
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| Earth              | Earth           |
+| Cement             | Cement          |
+| Tiles              | Tiles           |
+| Dung               | Earth with Dung |

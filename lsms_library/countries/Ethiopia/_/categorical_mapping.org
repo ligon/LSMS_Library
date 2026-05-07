@@ -47,3 +47,28 @@ waves in casing and spelling. This table harmonizes them.
 | TIGRAY Urban                | Tigray Urban             |
 | Addis Ababa Urban           | Addis Ababa Urban        |
 | ADDIS ABABA Urban           | Addis Ababa Urban        |
+
+#+name: Roof
+| Alternate Spelling     | Preferred Label  |
+|------------------------+------------------|
+| Corrugated Iron Sheet  | Iron Sheets      |
+| Thatch                 | Thatch           |
+| Wood And Mud           | Mud              |
+| Plastic Canvas         | Plastic Sheeting |
+| Concrete/Cement        | Concrete         |
+| Reed/Bamboo            | Mats             |
+| Asbestos               | Asbestos         |
+| Bricks                 | Other            |
+
+#+name: Floor
+| Alternate Spelling       | Preferred Label |
+|--------------------------+-----------------|
+| Mud/Dung                 | Earth with Dung |
+| Cement Screed            | Cement          |
+| Ceramic/Marble Tiles     | Tiles           |
+| Cement Tiles             | Cement          |
+| Plastic Tiles            | Tiles           |
+| Brick Tiles              | Bricks          |
+| Wood Planks              | Wood            |
+| Parquet Of Polished Wood | Wood            |
+| Reed/Bamboo              | Other           |

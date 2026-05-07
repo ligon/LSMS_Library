@@ -1,0 +1,152 @@
+#+title: Canonical Housing Labels (Roof / Floor)
+#+author: LSMS Library
+#+description: Canonical Preferred-Label vocabulary for ``housing.Roof`` and
+#+    ``housing.Floor`` across all LSMS-ISA countries.  The canonical
+#+    values are the second column of the per-country ``Roof`` /
+#+    ``Floor`` tables in each ``categorical_mapping.org``; survey-
+#+    specific local variants are the first column.  See GitHub #170.
+#+date: 2026-05-07
+
+* Why this exists
+
+Pre-2026-05-07, ``Feature('housing')`` returned heterogeneous
+``Roof`` / ``Floor`` vocabularies across countries (audit:
+=SkunkWorks/audits/housing.md=, 2026-04-12; <30% overlap between
+Uganda and Malawi alone).  Cross-country questions like "what
+fraction of households have metal roofs" required manual
+reconciliation of every country's value space.
+
+This document fixes a single shared vocabulary that every country's
+per-country ``Roof`` / ``Floor`` table in ``categorical_mapping.org``
+must target as ``Preferred Label``.  The framework's existing
+``_apply_categorical_mappings`` (``country.py:1516``) auto-discovers
+each country's tables and applies them at API time — no framework
+change is needed; the work is purely data curation.
+
+* Design choices
+
+** Thatch vs Grass
+   Malawi uses ``"Grass"`` for the same dried-plant-material roof
+   that Uganda calls ``"Thatch"``.  Canonical: *Thatch*.  All variants
+   (``Grass``, ``Straw``, ``Thatch, Straw``, ``thatch,straw``,
+   ``Mwambabwala``, etc.) collapse to ``Thatch``.
+
+** Mud vs Adobe
+   Adobe is sun-dried mud brick; ``Mud`` covers wattle-and-daub and
+   packed mud walls / earth roofs.  Surveys rarely distinguish
+   construction technique consistently.  Canonical: *Mud* (Adobe → Mud).
+
+** Concrete vs Cement (Roof / Floor)
+   Treated as *distinct* per Uganda's existing harmonization.  Concrete
+   typically means aggregate + cement (slab); Cement typically means a
+   poured cement screed without aggregate.  Surveys often record both
+   alongside; preserve the distinction.
+
+** Earth, Earth-with-Dung, Sand, Smoothed Mud (Floor)
+   - ``Earth`` covers raw earth, packed earth, rammed earth.
+   - ``Earth with Dung`` is preserved as a *separate* category — the
+     dung treatment changes hygiene / cleanability properties and some
+     analyses care.  (Uganda's existing harmonization merges this into
+     ``Earth``; we deliberately depart to keep the distinction
+     accessible.)
+   - ``Sand`` (Malawi-specific) is structurally distinct from packed
+     earth and is preserved as its own category.
+   - ``Smoothed Mud`` (Malawi-specific) maps to ``Earth`` — same
+     material, finishing detail not preserved at the canonical level.
+
+** Iron Sheets, Tin
+   Both refer to the same metal-sheet roofing.  Canonical: *Iron Sheets*.
+
+** Tiles vs Tile
+   Singular vs plural.  Canonical: *Tiles* (matches Uganda; the most
+   common form).
+
+** "Manquant" / "Other (specify)" / blanks
+   - ``Manquant`` (French "missing", Mali) → NaN, not a Preferred
+     Label.  Strip in country-level extraction or via wave-level
+     ``mapping:``.
+   - ``Other (specify)`` / ``Other (Specify)`` / ``OTHER(SPECIFY)`` →
+     Preferred Label ``Other``.
+
+* Canonical Roof Preferred Labels
+
+| Preferred Label  | Notes                                                                |
+|------------------+----------------------------------------------------------------------|
+| Iron Sheets      | Includes ``Tin``.  Most common across LSMS-ISA.                      |
+| Thatch           | Dried plant material.  Includes ``Grass``, ``Straw``, ``Thatch, Straw``. |
+| Clay Tiles       | Fired clay tile roofs.  Distinct from generic ``Tiles`` floor label.  |
+| Concrete         | Includes ``Concrete Slab``.                                          |
+| Cement           | Cement-only (no aggregate).  Rare for Roof; common for Floor.        |
+| Plastic Sheeting | Rare; Malawi has ~50 obs / wave.                                     |
+| Asbestos         | Uganda; possibly elsewhere.                                          |
+| Mud              | Includes ``Adobe`` (sun-dried mud brick).                            |
+| Mats             | Woven mats.  Togo: 1 obs.                                            |
+| Wood             | ``Wood, Planks`` / ``wood,planks``.                                  |
+| Other            | ``Other (specify)``, ``OTHER(SPECIFY)``, etc.                        |
+
+* Canonical Floor Preferred Labels
+
+| Preferred Label   | Notes                                                                |
+|-------------------+----------------------------------------------------------------------|
+| Earth             | Raw / packed / rammed earth.  Includes ``Smoothed Mud``.             |
+| Earth with Dung   | Dung-treated earth floor.  Distinct from ``Earth`` (hygiene-relevant). |
+| Sand              | Loose sand floor.  Malawi-specific.                                  |
+| Cement            | Includes ``Smooth Cement``, ``Cement screed``.                       |
+| Concrete          | Aggregate + cement.  Distinct from ``Cement``.                       |
+| Tiles             | Includes ``Tile``, ``Mosaic or tiles``.                              |
+| Stone             | Stone floor.                                                         |
+| Bricks            | Brick floor.                                                         |
+| Wood              | Wood plank / parquet.                                                |
+| Other             | ``Other (specify)``, etc.                                            |
+
+* Per-country wiring
+
+Each country with a ``housing`` table in ``data_scheme.yml`` must
+declare two tables in its ``categorical_mapping.org``:
+
+#+begin_example
+#+name: Roof
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| <local variant 1>  | <canonical>     |
+| ...                | ...             |
+
+#+name: Floor
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| ...                | ...             |
+#+end_example
+
+The framework's ``_apply_categorical_mappings`` auto-applies these
+tables to the matching column (``Roof`` ↔ ``Roof``, ``Floor`` ↔
+``Floor``) at API time.  No code change.
+
+* Status by country (2026-05-07)
+
+| Country       | Status                                  | Notes                                       |
+|---------------+-----------------------------------------+---------------------------------------------|
+| Uganda        | Has ``Roof`` / ``Floor`` tables         | Predates this canonical doc; mostly aligned but uses ``Earth`` for Roof (no obs) and merges ``Earth and Dung`` into ``Earth``.  Realign per this doc. |
+| Malawi        | Has ``Roof`` / ``Floor`` tables         | Uses ``Grass`` (→ Thatch) and ``Smoothed Mud``/``Smooth Cement`` (→ Earth/Cement).  Realign per this doc. |
+| Tanzania      | Wave-level housing.py; no canon         | TBD                                         |
+| Nigeria       | Has ``materialize: make``               | TBD                                         |
+| Ethiopia      | Wave-level                              | TBD                                         |
+| Niger         | Wave-level                              | TBD                                         |
+| Mali          | EHCVM, partly canonicalized             | Wave-level emits clean values; map ``Manquant`` → NaN; ``Adobe`` → Mud.   |
+| Senegal       | EHCVM                                   | TBD                                         |
+| Benin         | EHCVM                                   | TBD                                         |
+| CotedIvoire   | EHCVM                                   | TBD                                         |
+| Guinea-Bissau | EHCVM                                   | TBD; Portuguese variants likely             |
+| Burkina Faso  | EHCVM                                   | TBD                                         |
+| Togo          | EHCVM                                   | TBD                                         |
+
+* Cross-references
+
+- GH #170 — this issue
+- GH #168 — sibling: ``harmonize_assets`` global table (Phase 1 done)
+- GH #180 — generalised ``harmonize_<method_name>`` j-index hook
+  (PR #227, merged 2026-05-07).  Note: ``housing`` uses Roof / Floor as
+  *columns* (not a ``j`` index), so #180's hook does not apply; the
+  column-level auto-dispatch in ``_apply_categorical_mappings`` is
+  what wires the per-country tables here.
+- ``SkunkWorks/audits/housing.md`` — original audit
+- ``CLAUDE.md`` — "Housing schema is categorical, not binary." note

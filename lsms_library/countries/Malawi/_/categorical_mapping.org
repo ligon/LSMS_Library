@@ -297,9 +297,9 @@
 #+name: Roof
 | Alternate Spelling | Preferred Label  |
 |--------------------+------------------|
-| Grass              | Grass            |
-| grass              | Grass            |
-| GRASS              | Grass            |
+| Grass              | Thatch           |
+| grass              | Thatch           |
+| GRASS              | Thatch           |
 | Iron sheets        | Iron Sheets      |
 | IRON SHEETS        | Iron Sheets      |
 | Clay tiles         | Clay Tiles       |
@@ -315,16 +315,16 @@
 #+name: Floor
 | Alternate Spelling | Preferred Label |
 |--------------------+-----------------|
-| Smoothed mud       | Smoothed Mud    |
-| SMOOTHED MUD       | Smoothed Mud    |
-| Smooth cement      | Smooth Cement   |
-| SMOOTH CEMENT      | Smooth Cement   |
+| Smoothed mud       | Earth           |
+| SMOOTHED MUD       | Earth           |
+| Smooth cement      | Cement          |
+| SMOOTH CEMENT      | Cement          |
 | Sand               | Sand            |
 | sand               | Sand            |
 | SAND               | Sand            |
-| Tile               | Tile            |
-| tile               | Tile            |
-| TILE               | Tile            |
+| Tile               | Tiles           |
+| tile               | Tiles           |
+| TILE               | Tiles           |
 | Wood               | Wood            |
 | wood               | Wood            |
 | WOOD               | Wood            |

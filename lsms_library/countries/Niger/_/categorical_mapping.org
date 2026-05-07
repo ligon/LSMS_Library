@@ -114,3 +114,26 @@
 | VILLE DE NIAMEY                | Ville de Niamey                |
 | VILLE DE TAHOUA                | Ville de Tahoua                |
 | VILLE DE ZINDER                | Ville de Zinder                |
+
+#+NAME: Roof
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| Earth              | Mud             |
+| Thatch             | Thatch          |
+| Straw              | Thatch          |
+| Iron Sheets        | Iron Sheets    |
+| Wood               | Wood            |
+| Hide               | Other           |
+| Clay Tiles         | Clay Tiles      |
+| Concrete Slab      | Concrete        |
+| Adobe              | Mud             |
+| Mats               | Mats            |
+
+#+NAME: Floor
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| Earth              | Earth           |
+| Cement             | Cement          |
+| Tiles              | Tiles           |
+| Parquet            | Wood            |
+| Dung               | Earth with Dung |
