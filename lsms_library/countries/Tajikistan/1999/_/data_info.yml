@@ -5,7 +5,7 @@ household_roster:
         - ../Data/SSEC1.DTA
     idxvars:
         v: pop_pt
-        i: hhid
+        i: [pop_pt, hhid]
         pid: iid
     myvars:
         Sex:
