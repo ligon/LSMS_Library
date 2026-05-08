@@ -1,22 +1,33 @@
-from lsms_library.local_tools import to_parquet
-from lsms_library.local_tools import get_dataframe
+"""Concatenate wave-level food_acquired data for Uganda.
 
-"""Calculate food prices for different items across rounds; allow
-different prices for different units.  
+Wave-level scripts (each ``Uganda/<wave>/_/food_acquired.py``) call
+``uganda.food_acquired_to_canonical()`` and produce canonical-form
+parquets with index ``[t, i, j, u, s]`` (``s in {'purchased', 'inkind',
+'produced'}``) and columns ``[Quantity, Expenditure, Price]`` (Phase 3
+of GH #169).  This script just concatenates them across waves and
+applies cross-wave id_walk.
+
+The pre-Phase-3 implementation expected wide-form wave parquets and
+did ``df['t'] = t`` followed by ``groupby(['i','t','j','u']).sum()``;
+that broke once the wave-level reshape moved ``t`` into the index
+(pandas 2.x raises ``ValueError: 't' is both an index level and a
+column label``).  Replaced 2026-05-08 to mirror the Ethiopia fix from
+PR #242.
 """
+import json
 
 import pandas as pd
-import numpy as np
+
+from lsms_library.local_tools import get_dataframe, to_parquet
 from uganda import Waves, id_walk
-import json
+
+
 p = []
-for t in ['2005-06','2009-10','2010-11','2011-12','2013-14','2015-16','2018-19','2019-20']:
-    df = get_dataframe('../'+t+'/_/food_acquired.parquet').squeeze()
-    df['t'] = t
-    df.index = df.index.rename({'units':'u'})
-    # There may be occasional repeated reports of purchases of same food
-    df = df.groupby(['i','t','j','u']).sum()
-    df = df.reset_index().set_index(['i','t','j','u'])
+for t in Waves.keys():
+    df = get_dataframe('../' + t + '/_/food_acquired.parquet').squeeze()
+    # Wave parquet already has canonical index [t, i, j, u, s] and
+    # columns [Quantity, Expenditure, Price] from
+    # food_acquired_to_canonical().
     p.append(df)
 
 p = pd.concat(p)
