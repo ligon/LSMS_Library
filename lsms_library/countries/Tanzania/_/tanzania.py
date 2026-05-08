@@ -513,12 +513,12 @@ def food_acquired_to_canonical(df):
     * ``s = 'inkind'``    -- ``Quantity = quant_inkind``,
       ``u = unit_inkind``, ``Expenditure = NaN``
 
-    Rows whose ``Quantity`` is NaN, zero, or negative are dropped, except
-    that a purchased row with ``Quantity > 0`` is kept even if
-    ``Expenditure`` is missing/zero (and vice versa for the rare case of
-    a recorded purchase value with no quantity, which we still drop --
-    we require Quantity).  The redundant ``quant_ttl_consume`` /
-    ``unit_ttl_consume`` columns are discarded.
+    Rows are kept where EITHER ``Quantity > 0`` OR ``Expenditure > 0``
+    (matches the shared
+    :func:`lsms_library.transformations.food_acquired_to_canonical` rule).
+    A purchased row with a recorded value but no quantity is legitimate
+    data and is carried through with NaN ``Quantity``.  The redundant
+    ``quant_ttl_consume`` / ``unit_ttl_consume`` columns are discarded.
     '''
     work = df.reset_index()
     # Legacy Tanzania: j=HHID, i=item.  Canonical: i=HHID, j=item.
@@ -546,11 +546,14 @@ def food_acquired_to_canonical(df):
     inkind    = _make('inkind',    'quant_inkind',   'unit_inkind')
 
     out = pd.concat([purchased, produced, inkind], ignore_index=True)
-    # Require a positive Quantity; drop NaN/zero/negative.  The redundant
-    # quant_ttl_consume / unit_ttl_consume axes are simply not represented
-    # in the long form (they were the sum of the three per-source quants).
-    out = out[out['Quantity'].notna()]
-    out = out[out['Quantity'] > 0]
+    # Keep rows with EITHER positive Quantity OR positive Expenditure.
+    # An expenditure-only row (HH reported food expenditure but no
+    # quantity) is legitimate data and is carried through with NaN
+    # Quantity.  Matches the shared
+    # ``transformations.food_acquired_to_canonical`` rule.
+    qty_ok = out['Quantity'].notna() & (out['Quantity'] > 0)
+    exp_ok = out['Expenditure'].notna() & (out['Expenditure'] > 0)
+    out = out[qty_ok | exp_ok]
 
     out = out.set_index(['t', 'i', 'j', 'u', 's']).sort_index()
     return out
