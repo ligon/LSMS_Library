@@ -226,7 +226,12 @@ def food_acquired_to_canonical(df, wave):
 
     Notes
     -----
-    - Rows whose Quantity is NaN, zero, or negative are dropped.
+    - Rows are kept where EITHER ``Quantity > 0`` OR ``Expenditure > 0``
+      (matches the shared
+      :func:`lsms_library.transformations.food_acquired_to_canonical`
+      rule).  An expenditure-only row (HH reported food expenditure but
+      no quantity) is legitimate data and is carried through with NaN
+      ``Quantity``.
     - Food labels are normalized via :func:`apply_harmonize_food` at
       ``level='j'`` before returning.
     - ``v`` is intentionally absent — the framework joins it from
@@ -283,8 +288,13 @@ def food_acquired_to_canonical(df, wave):
         )
 
     out = pd.concat(pieces, ignore_index=True)
-    # Drop rows without a positive Quantity.
-    out = out[out['Quantity'].notna() & (out['Quantity'] > 0)]
+    # Keep rows with EITHER positive Quantity OR positive Expenditure.
+    # Matches the shared ``transformations.food_acquired_to_canonical``
+    # rule.  An expenditure-only row is legitimate data and is carried
+    # through with NaN Quantity.
+    qty_ok = out['Quantity'].notna() & (out['Quantity'] > 0)
+    exp_ok = out['Expenditure'].notna() & (out['Expenditure'] > 0)
+    out = out[qty_ok | exp_ok]
     # Sum across genuine source-data duplicates: a household occasionally
     # records multiple ``Other (Specify)`` entries for the same
     # (item, unit, source) triple, lumping distinct foods under one

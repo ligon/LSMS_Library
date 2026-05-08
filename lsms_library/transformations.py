@@ -799,7 +799,14 @@ def food_expenditures_from_acquired(df):
     idx_names = list(df.index.names)
     # Preserve `s` in the output (Phase 4).  `u` is dropped — Expenditure
     # is currency-denominated, so summing across units is meaningful.
-    group_by = [n for n in ['t', 'v', 'i', 'j', 's'] if n in idx_names]
+    # `v` is also omitted: with pandas's default ``dropna=True``, a
+    # groupby that includes ``v`` silently drops HH whose cluster ID is
+    # unrecoverable in ``sample()``, even though their food-expenditure
+    # data is valid.  ``_finalize_result`` re-joins ``v`` from sample at
+    # API time and ``_add_market_index`` resolves Region HH-level when
+    # asked, so dropping ``v`` here loses no information.  Closes #246
+    # part (C-2) NaN-``v`` regression.
+    group_by = [n for n in ['t', 'i', 'j', 's'] if n in idx_names]
 
     x = df[['Expenditure']].replace(0, np.nan).dropna()
     x = x.groupby(group_by).sum()
@@ -864,15 +871,18 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True):
     idx_names = list(df.index.names)
     if 'u' not in idx_names:
         # No u index level → can't tag units; fall back to a single-bucket
-        # aggregation per (t, v, i, j, s).
-        group_by = [n for n in ['t', 'v', 'i', 'j', 's'] if n in idx_names]
+        # aggregation per (t, i, j, s).  `v` is omitted from the group_by
+        # to avoid silently dropping HH whose cluster ID is unrecoverable;
+        # ``_finalize_result`` re-joins ``v`` from sample at API time.
+        group_by = [n for n in ['t', 'i', 'j', 's'] if n in idx_names]
         q = df[['Quantity']].replace(0, np.nan).dropna()
         if group_by:
             q = q.groupby(group_by).sum()
         return q
 
     if units == 'units':
-        group_by = [n for n in ['t', 'v', 'i', 'j', 'u', 's'] if n in idx_names]
+        # `v` omitted; see `food_expenditures_from_acquired` for rationale.
+        group_by = [n for n in ['t', 'i', 'j', 'u', 's'] if n in idx_names]
         q = df[['Quantity']].replace(0, np.nan).dropna()
         q = q.groupby(group_by).sum()
         return q
@@ -903,7 +913,8 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True):
 
     out = pd.DataFrame({'Quantity': qty}, index=new_idx)
     out = out.replace(0, np.nan).dropna()
-    group_by = [n for n in ['t', 'v', 'i', 'j', 'u', 's'] if n in out.index.names]
+    # `v` omitted; see `food_expenditures_from_acquired` for rationale.
+    group_by = [n for n in ['t', 'i', 'j', 'u', 's'] if n in out.index.names]
     out = out.groupby(group_by).sum()
     return out
 

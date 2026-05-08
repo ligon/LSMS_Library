@@ -207,10 +207,12 @@ def food_acquired_to_canonical(df):
       ``Expenditure = value_inkind``, ``Price = NaN`` (Uganda surveys
       do not record an imputed valuation distinct from value_inkind)
 
-    Rows where Quantity is NaN, zero, or negative are dropped.  An
-    ``Expenditure``-only row (positive value but no quantity) is also
-    dropped to keep the canonical schema's "Quantity required" invariant
-    consistent with the other Phase-3 countries (Tanzania, Malawi).
+    Rows are kept where EITHER ``Quantity > 0`` OR ``Expenditure > 0``.
+    Expenditure-only rows (HH reported a food expenditure with no
+    quantity — common in Uganda's GSEC15b for food consumed away from
+    home) are legitimate data and are carried through with NaN
+    ``Quantity``.  Matches the shared
+    :func:`lsms_library.transformations.food_acquired_to_canonical` rule.
 
     Notes
     -----
@@ -267,9 +269,17 @@ def food_acquired_to_canonical(df):
                       pd.Series(np.nan, index=work.index))
 
     out = pd.concat([purchased, produced, inkind], ignore_index=True)
-    # Require a positive Quantity; drop NaN/zero/negative.  The home/away
-    # consumption split is no longer represented in the long form.
-    out = out[out['Quantity'].notna() & (out['Quantity'] > 0)]
+    # Keep rows with EITHER positive Quantity OR positive Expenditure.
+    # An expenditure-only row (HH reported food expenditure but no
+    # quantity -- common for "food away from home" in Uganda's GSEC15b)
+    # is legitimate data and is carried through with NaN Quantity.
+    # Matches the shared ``transformations.food_acquired_to_canonical``
+    # rule.  See GH #246 part (C-2) — pre-fix behavior dropped 39 HH per
+    # wave for Uganda 2009-10 (and similarly across waves) whose only
+    # records were expenditure-without-quantity.
+    qty_ok = out['Quantity'].notna() & (out['Quantity'] > 0)
+    exp_ok = out['Expenditure'].notna() & (out['Expenditure'] > 0)
+    out = out[qty_ok | exp_ok]
 
     # Aggregate genuine source-data duplicates: a household occasionally
     # records multiple rows for the same (item, unit) -- e.g., two
