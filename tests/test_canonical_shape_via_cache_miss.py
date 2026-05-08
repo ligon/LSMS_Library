@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import os
 import warnings
+from pathlib import Path
 
 import pandas as pd
 import pytest
@@ -36,6 +37,56 @@ from lsms_library.diagnostics import (
 
 
 warnings.simplefilter("ignore")  # silence noisy DVC / pandas chatter
+
+
+def _aws_creds_available() -> bool:
+    """True iff DVC could perform an S3 pull right now.
+
+    The cache-miss tests delete cached parquets and force the framework
+    to rebuild from source, which goes through DVC -> S3.  Without
+    credentials the rebuild fails with ``NoCredentialsError`` regardless
+    of whether the test logic is correct.
+
+    Three credential locations are checked, matching where lsms_library
+    / DVC / boto3 actually look:
+
+    1. ``AWS_ACCESS_KEY_ID`` / ``AWS_SECRET_ACCESS_KEY`` env vars
+       (set by the ``data-tests`` CI job from repo secrets).
+    2. ``lsms_library/countries/.dvc/s3_creds`` (written by either the
+       ``data-tests`` CI job or the import-time auto-unlock path).
+    3. The auto-unlock path itself: if ``import lsms_library`` succeeds
+       without ``LSMS_SKIP_AUTH=1`` set, the ``.gpg``-decrypt-on-import
+       hook has already populated location (2).
+
+    The CI ``unit-tests`` job intentionally sets ``LSMS_SKIP_AUTH=1`` to
+    keep PR validation fast and data-free; this function returns False
+    in that environment, and the tests below silent-skip.
+    """
+    if os.environ.get("AWS_ACCESS_KEY_ID") and os.environ.get(
+        "AWS_SECRET_ACCESS_KEY"
+    ):
+        return True
+    creds_file = (
+        Path(__file__).parent.parent
+        / "lsms_library" / "countries" / ".dvc" / "s3_creds"
+    )
+    if creds_file.exists():
+        try:
+            return "aws_access_key_id" in creds_file.read_text()
+        except OSError:
+            return False
+    return False
+
+
+# Module-level skip: every test in this file needs DVC -> S3 access.
+pytestmark = pytest.mark.skipif(
+    not _aws_creds_available(),
+    reason=(
+        "cache-miss tests need S3 credentials; provided by the "
+        "'data-tests' CI job (post-merge to master) and on Savio. "
+        "The 'unit-tests' CI job sets LSMS_SKIP_AUTH=1 and skips."
+    ),
+)
 
 
 # --------------------------------------------------------------------------
