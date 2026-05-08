@@ -5,7 +5,7 @@ household_roster:
         - ../Data/A01A.dta
     idxvars:
         v: ppid
-        i: hid
+        i: [ppid, hid]
         pid: pid
     myvars:
         Sex:
