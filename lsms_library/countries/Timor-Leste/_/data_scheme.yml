@@ -19,3 +19,7 @@ Data Scheme:
       optional: true
     strata: str
     Rural: str
+
+  interview_date:
+    index: (t, i)
+    Int_t: datetime

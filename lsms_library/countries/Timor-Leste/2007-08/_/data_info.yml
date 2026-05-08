@@ -12,6 +12,17 @@ household_roster:
         Relationship: q01a02
         Age: q01a05y
 
+interview_date:
+    file: ../Data/basicvars.dta
+    idxvars:
+        i: hh_id
+    myvars:
+        Int_t:
+            - intday
+            - intmonth
+            - intyear
+    converted_categoricals: False
+
 sample:
     file: ../Data/basicvars.dta
     idxvars:
