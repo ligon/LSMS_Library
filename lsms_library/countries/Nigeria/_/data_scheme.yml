@@ -34,15 +34,15 @@ Data Scheme:
     Quantity: float
     Expenditure: float
     materialize: make
-  food_expenditures:
-    index: (t, i, j)
-    Expenditure: float
-  food_prices:
-    index: (t, j)
-    Price: float
-  food_quantities:
-    index: (t, i, j)
-    Quantity: float
+  # food_expenditures, food_prices, food_quantities are auto-derived
+  # at runtime from food_acquired via _FOOD_DERIVED — do NOT register
+  # them here.  Explicit declarations with a non-canonical index spec
+  # like ``index: (t, i, j)`` cause _finalize_result to strip the ``s``
+  # acquisition-source level from the derived result, breaking
+  # cross-country index compatibility in Feature('food_expenditures')()
+  # (it concatenates 4-level Nigeria with 5-level Phase-3 countries
+  # and falls back to a flat single-level index, destroying country
+  # provenance).  Per CLAUDE.md "Derived Tables".
   household_roster:
     index: (t, i, pid)
     Sex: str
