@@ -19,7 +19,7 @@ household_roster:
         - "../Data/2002 1 demography.dta"
     idxvars:
         v: mesto
-        i: rbd
+        i: [mesto, rbd]
         pid: clan
     myvars:
         Age: starost

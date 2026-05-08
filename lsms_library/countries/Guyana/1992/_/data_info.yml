@@ -47,7 +47,7 @@ household_roster:
         - ../Data/ROSTERN.dta
     idxvars:
         v: ED
-        i: HH
+        i: [ED, HH]
         pid: PID
     myvars:
         Sex:
