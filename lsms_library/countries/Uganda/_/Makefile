@@ -8,8 +8,12 @@ COUNTRY := $(shell basename "$$(cd .. && pwd)")
 LSMS_DATA_ROOT ?= $(if $(LSMS_DATA_DIR),$(LSMS_DATA_DIR),$(if $(XDG_DATA_HOME),$(XDG_DATA_HOME),$(HOME)/.local/share)/lsms_library)
 VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 
-var = $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_quantities.parquet $(VAR_DIR)/food_prices.parquet \
-	  $(VAR_DIR)/household_characteristics.parquet \
+# food_expenditures, food_quantities, food_prices are produced at runtime
+# from canonical food_acquired.parquet via the framework's auto-derivation
+# path (_FOOD_DERIVED in lsms_library/country.py); they no longer need to
+# be materialized as country-level parquets.  See PR uganda-drop-legacy-fpqe
+# (post-#245).
+var = $(VAR_DIR)/household_characteristics.parquet \
       $(VAR_DIR)/shocks.parquet $(VAR_DIR)/nonfood_expenditures.parquet $(VAR_DIR)/enterprise_income.parquet \
 	  $(VAR_DIR)/assets.parquet $(VAR_DIR)/earnings.parquet $(VAR_DIR)/housing.parquet $(VAR_DIR)/income.parquet \
 	  $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet
@@ -58,9 +62,6 @@ nonfood_expenditures_parquet := $(nonfood_expenditures:.py=.parquet)
 $(VAR_DIR)/nonfood_expenditures.parquet: nonfood_expenditures.py $(nonfood_expenditures_parquet)
 	python nonfood_expenditures.py
 
-$(VAR_DIR)/food_quantities.parquet $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_prices.parquet &: $(VAR_DIR)/food_acquired.parquet food_prices_quantities_and_expenditures.py
-	python food_prices_quantities_and_expenditures.py
-
 food_acquired = $(shell find $(rounds) -name food_acquired.py)
 food_acquired_parquet := $(food_acquired:.py=.parquet)
 
@@ -82,7 +83,7 @@ $(VAR_DIR)/housing.parquet: housing.py $(housing_parquet)
 $(VAR_DIR)/income.parquet: income.py $(VAR_DIR)/enterprise_income.parquet $(VAR_DIR)/earnings.parquet
 	python income.py
 
-$(VAR_DIR)/nutrition.parquet $(VAR_DIR)/fct.parquet: nutrition.py $(VAR_DIR)/food_quantities.parquet nutrition.org
+$(VAR_DIR)/nutrition.parquet $(VAR_DIR)/fct.parquet: nutrition.py $(VAR_DIR)/food_acquired.parquet nutrition.org
 	python nutrition.py
 
 %.parquet: %.py food_items.org uganda.py
