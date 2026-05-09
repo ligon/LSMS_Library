@@ -29,7 +29,7 @@ agg_labels = harmonized_food_labels(fn='./nonfood_items.org',
                                     value='Aggregate Label')
 #x = x.rename(columns=agg_labels)
 
-x = x.groupby('i',axis=1).sum()
+x = x.T.groupby('i').sum().T
 
 x = x.fillna(0)
 updated_ids = json.load(open('updated_ids.json'))

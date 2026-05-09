@@ -59,7 +59,7 @@ x = x.unstack('i')
 labels = json.load(open('food_items.json'))
 
 x = x.rename(columns=labels)
-x = x.groupby('i',axis=1).sum()
+x = x.T.groupby('i').sum().T
 
 x = x.replace(0,np.nan)
 

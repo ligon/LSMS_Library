@@ -21,7 +21,7 @@ with open('aggregate_items.json') as f:
 p = p.rename(columns=lbl['Aggregated Label'])
 
 p.columns.name = 'i'
-p = p.groupby('i',axis=1).sum()
+p = p.T.groupby('i').sum().T
 
 p = p.replace(0,np.nan)
 
