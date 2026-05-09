@@ -1,0 +1,70 @@
+=== sbatch prolog ===
+node:        n0216.savio2
+jobid:       34085538
+cpus:        2
+git head:    fa67d6d7 docs(slurm_logs): recover 2026-05-07 integration artifacts from stash
+branch:      development
+started:     Sat May  9 06:21:43 PDT 2026
+
+=== migrate venv to /local/job34085538/venv ===
+  python:    /local/job34085538/venv/bin/python
+  python ver: 3.11.6
+
+=== probe ===
+=== Uganda 2009-10 hybrid-v attrition probe ===
+python:        /local/job34085538/venv/bin/python
+lsms_library:  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/__init__.py
+LSMS_NO_CACHE: None
+
+=== HH counts at each pipeline stage ===
+  sample()                                           HHs= 2975  rows=   2975  (0.2s)
+  household_roster()                                 HHs= 2975  rows=  18734  (13.0s)
+  household_characteristics()                        HHs= 2951  rows=   2951  (2.9s)
+  household_characteristics(market='Region')         HHs= 2951  rows=   2951  (3.2s)
+  food_expenditures()                                HHs= 2929  rows=  38107  (1.7s)
+  food_expenditures(market='Region')                 HHs= 2929  rows=  38107  (2.4s)
+
+=== sample \ household_roster: 0 HHs (in sample only) ===
+=== household_roster \ sample: 0 HHs (in household_roster only) ===
+=== household_roster \ household_characteristics: 24 HHs (in household_roster only) ===
+=== household_characteristics \ household_roster: 0 HHs (in household_characteristics only) ===
+  examples (a only): ['1021000608', '102100260304', '102100310406', '1021003413', '107300200503', '...']
+=== household_characteristics \ household_characteristics(m): 0 HHs (in household_characteristics only) ===
+=== household_characteristics(m) \ household_characteristics: 0 HHs (in household_characteristics(m) only) ===
+=== household_characteristics(m) \ food_expenditures(m): 43 HHs (in household_characteristics(m) only) ===
+=== food_expenditures(m) \ household_characteristics(m): 21 HHs (in food_expenditures(m) only) ===
+  examples (a only): ['1021000412', '1021001904', '102100260606', '1021002608', '1021002804', '...']
+=== food_expenditures \ food_expenditures(m): 0 HHs (in food_expenditures only) ===
+=== food_expenditures(m) \ food_expenditures: 0 HHs (in food_expenditures(m) only) ===
+=== sample \ food_expenditures(m): 46 HHs (in sample only) ===
+=== food_expenditures(m) \ sample: 0 HHs (in food_expenditures(m) only) ===
+  examples (a only): ['1021000412', '1021001904', '102100260304', '102100260606', '1021002608', '...']
+
+=== Synthetic-v classification of HHs lost from sample to fe(m) ===
+  total lost (sample - fe(m)): 46
+  with synthetic v (@-prefixed): 4
+  with real cluster v:           39
+  not found in sample/other:     3
+  synthetic examples: [('105300300505', '@-0.35,+31.75')]
+  real-v examples:    [('1021002804', '1020028'), ('4133000203', '4130002'), ('1133002101', '1130021')]
+
+=== Attrition table (2009-10, Uganda) ===
+  sample()                                  : 2975
+  household_roster()  (HHs)                 : 2975
+  household_characteristics()               : 2951
+  household_characteristics(market='Region'): 2951
+  food_expenditures()                       : 2929
+  food_expenditures(market='Region')        : 2929  [test target >=2900]
+
+=== Per-stage attrition (HHs lost crossing) ===
+  sample -> roster:                          0
+  roster -> characteristics:                 24
+  characteristics -> characteristics(m):     0
+  characteristics(m) -> fe(m):               22
+  fe -> fe(m):                               0
+  sample -> fe(m):                           46
+
+=== elapsed: 23.7s ===
+
+=== probe exit: 0 ===
+finished:    Sat May  9 06:23:47 PDT 2026

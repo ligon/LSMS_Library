@@ -1,0 +1,32 @@
+=== sbatch prolog ===
+node:        n0216.savio2
+jobid:       34085543
+git head:    fa67d6d7 docs(slurm_logs): recover 2026-05-07 integration artifacts from stash
+started:     Sat May  9 06:27:28 PDT 2026
+
+=== migrate venv to /local/job34085543/venv ===
+
+=== run failing test (warm cache) ===
+============================= test session starts ==============================
+collecting ... collected 3 items
+
+tests/test_sample.py::TestUganda2009MarketFallback::test_food_expenditures_retains_hybrid_v_HH PASSED [ 33%]
+tests/test_sample.py::TestUganda2009MarketFallback::test_household_characteristics_retains_hybrid_v_HH PASSED [ 66%]
+tests/test_sample.py::TestUganda2009MarketFallback::test_no_nan_m_after_fallback PASSED [100%]
+
+========================= 3 passed in 86.88s (0:01:26) =========================
+
+=== exit (warm cache): 0 ===
+
+=== run failing test (LSMS_NO_CACHE=1) ===
+============================= test session starts ==============================
+collecting ... collected 3 items
+
+tests/test_sample.py::TestUganda2009MarketFallback::test_food_expenditures_retains_hybrid_v_HH PASSED [ 33%]
+tests/test_sample.py::TestUganda2009MarketFallback::test_household_characteristics_retains_hybrid_v_HH PASSED [ 66%]
+tests/test_sample.py::TestUganda2009MarketFallback::test_no_nan_m_after_fallback PASSED [100%]
+
+========================= 3 passed in 87.62s (0:01:27) =========================
+
+=== exit (cold cache): 0 ===
+finished:    Sat May  9 06:30:56 PDT 2026
