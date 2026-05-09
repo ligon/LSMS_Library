@@ -1,0 +1,28 @@
+=== sbatch prolog ===
+node:        n0213.savio2
+jobid:       34085552
+git head:    29f3e32e docs(slurm_logs): close out #246 in 2026-05-09 handoff
+started:     Sat May  9 06:43:27 PDT 2026
+
+=== migrate venv to /local/job34085552/venv ===
+
+=== probe ===
+=== Uganda 2009-10 cold-cache hc/fe count probe ===
+python:        /local/job34085552/venv/bin/python
+lsms_library:  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/__init__.py
+LSMS_NO_CACHE: '1'
+purged 11 cache files for Uganda
+
+  household_characteristics(market='Region')         HHs= 2951  shape=(24272, 15)  (20.1s)
+{996.0, 997.0, 998.0, 999.0}
+{800.0, 801.0, 802.0, 996.0, 997.0, 998.0, 999.0}
+  food_expenditures(market='Region')                 HHs= 2929  shape=(355442, 1)  (78.2s)
+
+=== verdict ===
+  hc count (cold): 2951  -- target for >=2951 tightening: PASS
+  fe count (cold): 2929  -- target for >=2929 (already tightened in PR #257): PASS
+
+=== elapsed: 98.3s ===
+
+=== probe exit: 0 ===
+finished:    Sat May  9 06:47:03 PDT 2026
