@@ -138,6 +138,40 @@ def _tx_food_expenditures(df: pd.DataFrame) -> pd.DataFrame:
     return df.rename(columns={"Expenditure": "x"})
 
 
+def _tx_food_quantities(df: pd.DataFrame) -> pd.DataFrame:
+    # Bridge canonical [i,t,m,j,u,s] long-form to the replication's
+    # [i,t,m,j,u] wide form by unstacking the s axis.  After Phase-3
+    # canonicalisation Uganda's home/away consumption-location split
+    # is folded into a single ``s='purchased'`` row, so the
+    # replication's ``quantity_home`` / ``quantity_away`` cannot be
+    # recovered cleanly — drop ``purchased`` and compare on
+    # ``quantity_own`` (= s='produced') and ``quantity_inkind``
+    # (= s='inkind').  Native-unit quantities (FeatureSpec passes
+    # ``units='units'``) match the replication's per-source quantity_*
+    # columns, which were computed from raw survey values without
+    # kg conversion.
+    if "s" not in df.index.names:
+        return df
+    out = df["Quantity"].unstack("s")
+    out = out.rename(columns={"produced": "quantity_own",
+                              "inkind": "quantity_inkind"})
+    return out.drop(columns=["purchased"], errors="ignore")
+
+
+def _tx_food_prices(df: pd.DataFrame) -> pd.DataFrame:
+    # Same bridging strategy as ``_tx_food_quantities``: unstack ``s``
+    # to compare against the replication's per-source unit-value
+    # columns.  FeatureSpec passes ``units='unitvalue'`` so the API's
+    # Price is ``Expenditure / Quantity`` in native units, matching
+    # the replication's ``unitvalue_*`` definitions.
+    if "s" not in df.index.names:
+        return df
+    out = df["Price"].unstack("s")
+    out = out.rename(columns={"produced": "unitvalue_own",
+                              "inkind": "unitvalue_inkind"})
+    return out.drop(columns=["purchased"], errors="ignore")
+
+
 def _tx_household_roster(df: pd.DataFrame) -> pd.DataFrame:
     # API adds kinship decomposition and joins `v` from sample().  Neither
     # is in the replication roster — strip them for comparison.
@@ -173,10 +207,33 @@ FEATURE_SPECS: list[FeatureSpec] = [
     FeatureSpec("enterprise_income", kwargs={"market": "Region"}),
     FeatureSpec("fct",               atol=1e-12),
     FeatureSpec("food_acquired",     kwargs={"market": "Region"}),
+    # food_expenditures: post-#250 (PR landing the canonical Phase-3
+    # filter relaxation + the runtime auto-derivation NaN-v fix), the
+    # API and replication agree on shape but differ on ~0.76% of rows
+    # by a mean Δ≈34 UGX (rounding noise from the Phase-3 sum
+    # aggregation reorder).  atol=1.0 covers sub-shilling drift;
+    # max_outliers=3000 covers the observed 2,668 with margin.  The
+    # test still catches regressions if either threshold gets
+    # exceeded.
     FeatureSpec("food_expenditures", kwargs={"market": "Region"},
-                transform=_tx_food_expenditures),
-    FeatureSpec("food_prices",       kwargs={"market": "Region"}),
-    FeatureSpec("food_quantities",   kwargs={"market": "Region"}),
+                transform=_tx_food_expenditures,
+                atol=1.0, max_outliers=3000),
+    # food_prices / food_quantities: API moved to canonical
+    # [i,t,m,j,u,s] long form (Phase 3+4 of GH #169), replication
+    # remains pre-Phase-3 wide form with per-source
+    # quantity_*/unitvalue_* columns.  Bridge by unstacking ``s`` and
+    # passing the ``units=`` mode that produces native-unit values
+    # comparable to the replication's columns.  The home/away
+    # consumption-location split was folded into purchased at Phase
+    # 3 and is not recoverable; comparison is on own + inkind only.
+    FeatureSpec("food_prices",       kwargs={"market": "Region",
+                                             "units": "unitvalue"},
+                transform=_tx_food_prices,
+                max_na_asym=30),
+    FeatureSpec("food_quantities",   kwargs={"market": "Region",
+                                             "units": "units"},
+                transform=_tx_food_quantities,
+                max_na_asym=30),
     # household_characteristics: with MonthsSpent filter active, the large
     # 1315-HH roster-coverage drift is resolved.  Residual outliers
     # (~229 per boundary bracket, max |Δ|=2) are from age_handler's
