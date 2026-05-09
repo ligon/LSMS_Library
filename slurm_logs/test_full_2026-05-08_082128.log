@@ -1,0 +1,10 @@
+kicked off at: Fri May  8 08:21:28 PDT 2026
+branch: development, commit: f5ff48f96b9cd55fc09e393d6c99a854c5caa066
+---
+poetry run pytest -n 24 --dist=loadfile --rebuild-caches
+/global/home/users/ligon/.local/lib/python3.11/site-packages/requests/__init__.py:86: RequestsDependencyWarning: Unable to find acceptable character detection dependency (chardet or charset_normalizer).
+  warnings.warn(
+
+No module named 'packaging.licenses'
+make: *** [Makefile:48: test-full] Error 1
+===EXIT=2===

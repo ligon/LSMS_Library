@@ -1,0 +1,186 @@
+
+[--rebuild-caches] purged 110 cache files under /global/home/users/ligon/.local/share/lsms_library
+============================= test session starts ==============================
+platform linux -- Python 3.11.6, pytest-8.4.2, pluggy-1.6.0 -- /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library
+configfile: pyproject.toml
+plugins: xdist-3.8.0, timeout-2.4.0, anyio-4.13.0, instafail-0.5.0, hydra-core-1.3.2
+collecting ... collected 18 items
+
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[earnings] XFAIL [  5%]
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[enterprise_income] XFAIL [ 11%]
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[fct] FAILED [ 16%]
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_acquired] XFAIL [ 22%]
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_expenditures] FAILED [ 27%]
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_prices] FAILED [ 33%]
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_quantities] FAILED [ 38%]
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[household_characteristics] PASSED [ 44%]
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[household_roster] PASSED [ 50%]
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[income] PASSED [ 55%]
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[interview_date] PASSED [ 61%]
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[locality] XFAIL [ 66%]
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[nutrition] FAILED [ 72%]
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[people_last7days] PASSED [ 77%]
+tests/test_uganda_api_vs_replication.py::test_api_matches_replication[shocks] PASSED [ 83%]
+tests/test_sample.py::TestUganda2009MarketFallback::test_food_expenditures_retains_hybrid_v_HH FAILED [ 88%]
+tests/test_sample.py::TestUganda2009MarketFallback::test_household_characteristics_retains_hybrid_v_HH PASSED [ 94%]
+tests/test_sample.py::TestUganda2009MarketFallback::test_no_nan_m_after_fallback PASSED [100%]
+
+=================================== FAILURES ===================================
+______________________ test_api_matches_replication[fct] _______________________
+tests/test_uganda_api_vs_replication.py:469: in test_api_matches_replication
+    api = _call_api(spec.name, spec.kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_uganda_api_vs_replication.py:247: in _call_api
+    return method(**kwargs)
+           ^^^^^^^^^^^^^^^^
+lsms_library/country.py:2713: in method
+    result = self._aggregate_wave_data(waves, name)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:2329: in _aggregate_wave_data
+    df = load_with_dvc_cache(method_name)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:2312: in load_with_dvc_cache
+    return load_dataframe_with_dvc(method_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:2158: in load_dataframe_with_dvc
+    df = load_from_waves(waves)
+         ^^^^^^^^^^^^^^^^^^^^^^
+lsms_library/country.py:2043: in load_from_waves
+    raise _rebuild_failure_error(self.name, method_name)
+E   RuntimeError: Could not materialize Uganda/fct: no wave-level build succeeded and no cached parquet was found at /global/home/users/ligon/.local/share/lsms_library/Uganda/var/fct.parquet.
+E   
+E   Common causes:
+E     - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;
+E     - LSMS_DATA_DIR points to an empty or stale cache location;
+E     - DVC credentials are missing or misconfigured;
+E     - the raw .dta source files have not been dvc-pulled.
+E   
+E   See README.org for supported install and data-access patterns.
+
+During handling of the above exception, another exception occurred:
+tests/test_uganda_api_vs_replication.py:471: in test_api_matches_replication
+    pytest.fail(f"API call Country('Uganda').{spec.name}(**{spec.kwargs}) raised: "
+E   Failed: API call Country('Uganda').fct(**{}) raised: RuntimeError: Could not materialize Uganda/fct: no wave-level build succeeded and no cached parquet was found at /global/home/users/ligon/.local/share/lsms_library/Uganda/var/fct.parquet.
+E   
+E   Common causes:
+E     - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;
+E     - LSMS_DATA_DIR points to an empty or stale cache location;
+E     - DVC credentials are missing or misconfigured;
+E     - the raw .dta source files have not been dvc-pulled.
+E   
+E   See README.org for supported install and data-access patterns.
+----------------------------- Captured stdout call -----------------------------
+{800.0, 801.0, 802.0, 996.0, 997.0, 998.0, 999.0}
+{996.0, 997.0, 998.0, 999.0}
+----------------------------- Captured stderr call -----------------------------
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/2019-20/_/../../_/uganda.py:150: UserWarning: Dropping some unknown unit codes!
+  warnings.warn("Dropping some unknown unit codes!")
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/2018-19/_/../../_/uganda.py:150: UserWarning: Dropping some unknown unit codes!
+  warnings.warn("Dropping some unknown unit codes!")
+Traceback (most recent call last):
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/_/food_prices_quantities_and_expenditures.py", line 17, in <module>
+    fa = fa.reorder_levels(want)
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/pandas/core/frame.py", line 9111, in reorder_levels
+    result.index = result.index.reorder_levels(order)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/pandas/core/indexes/multi.py", line 3017, in reorder_levels
+    result = self._reorder_ilevels(order)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/pandas/core/indexes/multi.py", line 3022, in _reorder_ilevels
+    raise AssertionError(
+AssertionError: Length of order must be same as number of levels (5), got 4
+make: *** [Makefile:62: /global/home/users/ligon/.local/share/lsms_library/Uganda/var/food_quantities.parquet] Error 1
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/var/fct.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/_/fct.parquet'.  Stop.
+------------------------------ Captured log call -------------------------------
+WARNING  lsms_library.country:country.py:1961 Data file /global/home/users/ligon/.local/share/lsms_library/Uganda/var/fct.parquet still missing after running fallbacks.
+_______________ test_api_matches_replication[food_expenditures] ________________
+tests/test_uganda_api_vs_replication.py:499: in test_api_matches_replication
+    _compare_column(
+tests/test_uganda_api_vs_replication.py:332: in _compare_column
+    raise AssertionError(
+E   AssertionError: column 'x': max |Δ| = 142500 > atol 0; mean |Δ| = 24.1166; 2392/346276 rows out of tolerance (max_outliers=0)
+__________________ test_api_matches_replication[food_prices] ___________________
+tests/test_uganda_api_vs_replication.py:492: in test_api_matches_replication
+    assert pairs, (
+E   AssertionError: food_prices: no shared data columns after merge; API cols after transform=['Price']; repl cols=['market', 'farmgate', 'unitvalue_home', 'unitvalue_away', 'unitvalue_own', 'unitvalue_inkind', 'market_home', 'market_away', 'market_own']
+E   assert []
+________________ test_api_matches_replication[food_quantities] _________________
+tests/test_uganda_api_vs_replication.py:479: in test_api_matches_replication
+    assert len(merged) > 0, (
+E   AssertionError: food_quantities: no overlap between API and replication on ['i', 't', 'm', 'j', 'u']; API shape=(348729, 1) index=['i', 't', 'm', 'j', 'u', 's']; repl shape=(352913, 4) index=['i', 't', 'm', 'j', 'u']
+E   assert 0 > 0
+E    +  where 0 = len(Empty DataFrame\nColumns: [i, t, m, j, u, s, Quantity, quantity_home, quantity_away, quantity_own, quantity_inkind]\nIndex: [])
+___________________ test_api_matches_replication[nutrition] ____________________
+tests/test_uganda_api_vs_replication.py:499: in test_api_matches_replication
+    _compare_column(
+tests/test_uganda_api_vs_replication.py:332: in _compare_column
+    raise AssertionError(
+E   AssertionError: column 'Energy': max |Δ| = 4.64885e+06 > atol 0.1; mean |Δ| = 19778.3; 23230/23776 rows out of tolerance (max_outliers=2)
+----------------------------- Captured stdout call -----------------------------
+{800.0, 801.0, 802.0, 996.0, 997.0, 998.0, 999.0}
+{996.0, 997.0, 998.0, 999.0}
+----------------------------- Captured stderr call -----------------------------
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/2019-20/_/../../_/uganda.py:150: UserWarning: Dropping some unknown unit codes!
+  warnings.warn("Dropping some unknown unit codes!")
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/2018-19/_/../../_/uganda.py:150: UserWarning: Dropping some unknown unit codes!
+  warnings.warn("Dropping some unknown unit codes!")
+Traceback (most recent call last):
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/_/food_prices_quantities_and_expenditures.py", line 17, in <module>
+    fa = fa.reorder_levels(want)
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/pandas/core/frame.py", line 9111, in reorder_levels
+    result.index = result.index.reorder_levels(order)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/pandas/core/indexes/multi.py", line 3017, in reorder_levels
+    result = self._reorder_ilevels(order)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/pandas/core/indexes/multi.py", line 3022, in _reorder_ilevels
+    raise AssertionError(
+AssertionError: Length of order must be same as number of levels (5), got 4
+make: *** [Makefile:62: /global/home/users/ligon/.local/share/lsms_library/Uganda/var/food_quantities.parquet] Error 1
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/var/nutrition.parquet'.  Stop.
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq1
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+___ TestUganda2009MarketFallback.test_food_expenditures_retains_hybrid_v_HH ____
+tests/test_sample.py:424: in test_food_expenditures_retains_hybrid_v_HH
+    assert hh09 >= 2900, (
+E   AssertionError: food_expenditures(market='Region') retained only 2869 HH in 2009-10 — expected ≥2900 after _add_market_index HH-level fallback
+E   assert 2869 >= 2900
+=============================== warnings summary ===============================
+tests/test_sample.py::TestUganda2009MarketFallback::test_food_expenditures_retains_hybrid_v_HH
+tests/test_sample.py::TestUganda2009MarketFallback::test_food_expenditures_retains_hybrid_v_HH
+tests/test_sample.py::TestUganda2009MarketFallback::test_food_expenditures_retains_hybrid_v_HH
+tests/test_sample.py::TestUganda2009MarketFallback::test_household_characteristics_retains_hybrid_v_HH
+tests/test_sample.py::TestUganda2009MarketFallback::test_household_characteristics_retains_hybrid_v_HH
+tests/test_sample.py::TestUganda2009MarketFallback::test_household_characteristics_retains_hybrid_v_HH
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq1
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py::TestUganda2009MarketFallback::test_food_expenditures_retains_hybrid_v_HH
+tests/test_sample.py::TestUganda2009MarketFallback::test_food_expenditures_retains_hybrid_v_HH
+tests/test_sample.py::TestUganda2009MarketFallback::test_food_expenditures_retains_hybrid_v_HH
+tests/test_sample.py::TestUganda2009MarketFallback::test_household_characteristics_retains_hybrid_v_HH
+tests/test_sample.py::TestUganda2009MarketFallback::test_household_characteristics_retains_hybrid_v_HH
+tests/test_sample.py::TestUganda2009MarketFallback::test_household_characteristics_retains_hybrid_v_HH
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq3
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py::TestUganda2009MarketFallback::test_household_characteristics_retains_hybrid_v_HH
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/tests/test_sample.py:404: UserWarning: household_characteristics: dropped 448 roster rows with NaN in one of ['t', 'v', 'i'] (typically v) -- per-wave: {'2009-10': 110, '2013-14': 7, '2018-19': 328, '2019-20': 3}.  These are usually movers / split-offs whose sample() row lacks a cluster code; see GH #197.
+    return ll.Country("Uganda").household_characteristics(market="Region")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[fct]
+FAILED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_expenditures]
+FAILED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_prices]
+FAILED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[food_quantities]
+FAILED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[nutrition]
+FAILED tests/test_sample.py::TestUganda2009MarketFallback::test_food_expenditures_retains_hybrid_v_HH
+======= 6 failed, 8 passed, 4 xfailed, 13 warnings in 236.90s (0:03:56) ========
