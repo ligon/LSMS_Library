@@ -8,16 +8,19 @@ COUNTRY := $(shell basename "$$(cd .. && pwd)")
 LSMS_DATA_ROOT ?= $(if $(LSMS_DATA_DIR),$(LSMS_DATA_DIR),$(if $(XDG_DATA_HOME),$(XDG_DATA_HOME),$(HOME)/.local/share)/lsms_library)
 VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 
-# Auto-derived at runtime, NOT materialized as country-level parquets:
+# NOT materialized as country-level parquets (would re-introduce the
+# obsolete-rule failures that broke master CI on 2026-05-09):
 #   - household_characteristics, food_expenditures, food_prices,
-#     food_quantities -- see _ROSTER_DERIVED / _FOOD_DERIVED in
-#     lsms_library/country.py and CLAUDE.md "Derived Tables".
-# Listing them here would re-introduce the obsolete-rule failure that
-# broke master CI on 2026-05-09 (no rule to make target
-# 'household_characteristics.py').  The food_*.py legacy script was
-# already dropped in PR #248/#249 (post-#245).
+#     food_quantities -- auto-derived at runtime via _ROSTER_DERIVED /
+#     _FOOD_DERIVED in lsms_library/country.py.  See CLAUDE.md
+#     "Derived Tables".  food_*.py legacy script was dropped in
+#     PR #248/#249 (post-#245).  household_characteristics has no
+#     Python source anywhere -- it has always been auto-derived.
+#   - housing -- extracted at API time from each wave's data_info.yml
+#     (per CLAUDE.md "Housing schema is categorical, not binary"; no
+#     housing.py source exists in any Uganda wave).
 var = $(VAR_DIR)/shocks.parquet $(VAR_DIR)/nonfood_expenditures.parquet $(VAR_DIR)/enterprise_income.parquet \
-	  $(VAR_DIR)/assets.parquet $(VAR_DIR)/earnings.parquet $(VAR_DIR)/housing.parquet $(VAR_DIR)/income.parquet \
+	  $(VAR_DIR)/assets.parquet $(VAR_DIR)/earnings.parquet $(VAR_DIR)/income.parquet \
 	  $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet
 
 all: $(parquet) $(var)
@@ -69,12 +72,6 @@ food_acquired_parquet := $(food_acquired:.py=.parquet)
 
 $(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
 	python food_acquired.py
-
-housing = $(shell find $(rounds) -name housing.py)
-housing_parquet := $(housing:.py=.parquet)
-
-$(VAR_DIR)/housing.parquet: housing.py $(housing_parquet)
-	python housing.py
 
 $(VAR_DIR)/income.parquet: income.py $(VAR_DIR)/enterprise_income.parquet $(VAR_DIR)/earnings.parquet
 	python income.py
