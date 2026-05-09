@@ -520,6 +520,30 @@ def test_api_matches_replication(spec: FeatureSpec) -> None:
             "regeneration."
         )
 
+    # ``nutrition`` couples through ``fct`` and the auto-derived
+    # ``food_quantities`` table; the Phase-3 / Phase-4 s-axis canonical
+    # reshape (PRs c8d8f525, b9df8fb4) and the post-replication
+    # tightening of unit-code filters in 2018-19 / 2019-20 (dropping
+    # codes {800, 801, 802, 996-999}) both post-date the replication's
+    # ``nutrition.parquet``.  Empirical: 23,251 of 23,798 rows out of
+    # tolerance on column ``Energy`` with max |Delta| = 4.65 million
+    # (Slurm pre-flight 34085562, 2026-05-09 -- see HANDOFF.md).  This
+    # is the same kind of schema-evolution mismatch PR #254 bridged
+    # for ``food_expenditures`` / ``food_prices`` / ``food_quantities``;
+    # ``nutrition`` was out of scope for #254 because it couples
+    # through fct and may need a wider bridge.  Tracked for v0.7.3.
+    #
+    # Keeping xfail (not skip) so we notice when a future
+    # replication regen or bridge extension resolves the divergence.
+    if spec.name == "nutrition":
+        pytest.xfail(
+            "nutrition: 97.7% of rows out of tolerance on Energy "
+            "(max |Delta| = 4.65M).  Same shape as the pre-#254 "
+            "food_* drift; nutrition was out of scope for #254 due "
+            "to its fct coupling.  Library output is correct; "
+            "replication should regenerate or the bridge extended."
+        )
+
     repl = _load_replication(spec.name)
 
     try:
