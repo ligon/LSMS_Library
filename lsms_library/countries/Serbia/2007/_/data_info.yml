@@ -17,7 +17,7 @@ household_roster:
         - "../Data/individual.dta"
     idxvars:
         v: popkrug
-        i: dom
+        i: [opstina, popkrug, dom]
         pid: lice
     myvars:
         Sex: pol
@@ -32,7 +32,7 @@ sample:
     df_hh:
         file: "../Data/domacinstva.dta"
         idxvars:
-            i: [popkrug, naselje, dom]
+            i: [opstina, popkrug, dom]
         myvars:
             v: popkrug
             weight: hhweight
