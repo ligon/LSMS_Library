@@ -19,6 +19,6 @@ x = x.replace(np.inf,np.nan)
 # x = x.rename(columns=lbl['Aggregated Label'])
 
 x.columns.name = 'i'
-x = x.groupby('i',axis=1).sum()
+x = x.T.groupby('i').sum().T
 
 to_parquet(x, '../var/nonfood_expenditures.parquet')

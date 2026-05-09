@@ -19,6 +19,6 @@ with open('aggregate_items.json') as f:
 c = c.rename(columns=lbl['Aggregated Label'])
 
 c.columns.name = 'i'
-c = c.groupby('i',axis=1).sum()
+c = c.T.groupby('i').sum().T
 
 to_parquet(c, '../var/food_quantities.parquet')
