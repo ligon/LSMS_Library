@@ -1,0 +1,63 @@
+=== sbatch prolog ===
+node:        n0001.savio2
+jobid:       34085515
+cpus:        2
+started:     Sat May  9 05:38:55 PDT 2026
+
+=== migrate venv to /local/job34085515/venv ===
+  python:    /local/job34085515/venv/bin/python
+  python ver: 3.11.6
+
+=== probe ===
+=== Serbia/2007 cardinality probe ===
+python: /local/job34085515/venv/bin/python
+cwd:    /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Serbia/2007/_
+
+--- individual.dta (roster): ../Data/individual.dta ---
+  rows: 17375
+  ('popkrug', 'dom'): unique=3868
+  ('opstina', 'popkrug', 'dom'): unique=5557
+  ('opstina', 'popkrug', 'naselje', 'dom'): MISSING ['naselje']
+  ('opstina', 'popkrug'): unique=510
+
+--- domacinstva.dta (sample): ../Data/domacinstva.dta ---
+  rows: 5557
+  ('popkrug', 'dom'): unique=3868
+  ('opstina', 'popkrug', 'dom'): unique=5557
+  ('opstina', 'popkrug', 'naselje', 'dom'): unique=5557
+  ('opstina', 'popkrug'): unique=510
+  ('opstina', 'popkrug', 'naselje'): unique=510
+
+--- enumeration_district.dta (cluster): ../Data/enumeration_district.dta ---
+  rows: 510
+  ('popkrug',): unique=328
+  ('opstina', 'popkrug'): unique=510
+  ('opstina', 'popkrug', 'naselje'): unique=510
+
+=== Q1: does (opstina, popkrug) determine naselje in ED? ===
+  (opstina, popkrug) tuples with 1 naselje:   510
+  (opstina, popkrug) tuples with >1 naselje:  0
+  YES -- (opstina, popkrug) -> naselje is functional.
+
+=== Q2: is (opstina, popkrug, dom) unique per sample HH? ===
+  sample rows:                  5557
+  unique (opstina, popkrug, dom): 5557
+  YES -- (opstina, popkrug, dom) uniquely identifies sample HHs.
+
+=== Q3: roster grouped by (opstina, popkrug, dom) -- HH count ===
+  roster rows (people):            17375
+  unique (opstina, popkrug, dom):  5557
+  avg HH size if 5557 HHs: 3.13
+  HH size distribution: min=1 median=3.0 max=12
+
+=== Q4: roster keys vs sample keys overlap ===
+  roster keys: 5557
+  sample keys: 5557
+  overlap:     5557
+  roster-only: 0
+  sample-only: 0
+
+=== elapsed: 1.3s ===
+
+=== probe exit: 0 ===
+finished:    Sat May  9 05:41:18 PDT 2026

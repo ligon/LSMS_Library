@@ -1,0 +1,57 @@
+=== sbatch prolog ===
+node:        n0001.savio2
+jobid:       34085520
+cpus:        2
+git head:    50817753 docs(caching): unify L1 / L2-country / L2-wave naming across docs and code
+branch:      serbia-2007-compound-i
+started:     Sat May  9 05:45:56 PDT 2026
+
+=== migrate venv to /local/job34085520/venv ===
+  python:    /local/job34085520/venv/bin/python
+  python ver: 3.11.6
+
+=== verify ===
+=== Serbia/2007 fix verification ===
+python: /local/job34085520/venv/bin/python
+lsms_library: /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/__init__.py
+LSMS_NO_CACHE: '1'
+cache files cleared: 0
+
+=== Country('Serbia').sample() ===
+  sample(): shape=(5557, 5) index=['i', 't'] (4.6s)
+    head:
+                        v      weight  panel_weight  Rural    strata
+i              t                                                    
+70017-156-1001 2007  0156  365.749634    731.499268  Rural  sumadija
+70017-156-1002 2007  0156  365.749634    365.749634  Rural  sumadija
+70017-156-1003 2007  0156  365.749634    731.499268  Rural  sumadija
+    v populated: 5557 / 5557
+
+=== Country('Serbia').household_roster() ===
+  household_roster(): shape=(17375, 7) index=['i', 't', 'v', 'pid'] (7.1s)
+    head:
+                          Sex                                Relationship   Age  MonthsSpent  Generation  Distance       Affinity
+i             t    v  pid                                                                                                        
+70017-17-1001 2007 17 1     M                           head of household  50.0           12           0         0  consanguineal
+                      2     F                             spouse, partner  47.0           12           0         0        affinal
+                      3     F  child of head of household/spouse, partner  20.0           12          -1         0  consanguineal
+
+=== Country('Serbia').household_characteristics() ===
+  household_characteristics(): shape=(5557, 15) index=['t', 'v', 'i'] (3.6s)
+    v populated: 5557 / 5557
+    columns: ['F 00-03', 'F 04-08', 'F 09-13', 'F 14-18', 'F 19-30', 'F 31-50', 'F 51+', 'M 00-03']...
+    per-wave HH counts:
+      2007: 5557
+    PASS: shape (5557) is within [5000, 6000] -- close to sample's 5557 HHs
+
+=== Cross-check: roster i ↔ sample i overlap ===
+  roster unique i:  5557
+  sample unique i:  5557
+  overlap:          5557
+  roster-only:      0  (sample of 3: [])
+  sample-only:      0  (sample of 3: [])
+
+=== elapsed: 15.3s ===
+
+=== verify exit: 0 ===
+finished:    Sat May  9 05:46:44 PDT 2026
