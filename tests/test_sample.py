@@ -434,13 +434,26 @@ class TestUganda2009MarketFallback:
 
     def test_household_characteristics_retains_hybrid_v_HH(self, hc):
         """household_characteristics(market='Region') should cover the
-        full 2 951 HH (those with populated sample.v, hybrid or real)."""
+        full 2 951 HH (those with populated sample.v, hybrid or real).
+
+        Pinned to equality on 2026-05-09: warm- and cold-cache probes
+        both produce 2951 exactly (Slurm jobs 34085538 and 34085552).
+        The 24-HH gap from sample's 2975 is the MonthsSpent filter in
+        roster_to_characteristics dropping departed-only HHs (added
+        2026-04-15 to resolve a 1315-HH drift vs RiskSharing_Replication;
+        see CLAUDE.md "MonthsSpent / MonthsAway / WeeksAway"). Any
+        legitimate change to that filter -- or any new attrition path
+        -- will trip this test, which is the intent: surface drift in
+        either direction.
+        """
         if "2009-10" not in hc.index.get_level_values("t").unique():
             pytest.skip("no 2009-10 wave")
         hh09 = hc.xs("2009-10", level="t").index.get_level_values("i").nunique()
-        assert hh09 >= 2900, (
-            f"household_characteristics(market='Region') retained only "
-            f"{hh09} HH in 2009-10 — expected ≥2900 after fallback"
+        assert hh09 == 2951, (
+            f"household_characteristics(market='Region') retained {hh09} HH "
+            f"in 2009-10 — expected exactly 2951 (sample 2975 − 24 "
+            f"departed-only via MonthsSpent filter). Drift in either "
+            f"direction is meaningful: investigate before re-pinning."
         )
 
     def test_no_nan_m_after_fallback(self, fe):
