@@ -1,0 +1,85 @@
+=== sbatch prolog ===
+node:        n0213.savio2
+jobid:       34085557
+started:     Sat May  9 06:56:57 PDT 2026
+git head:    fbe5b478 test(uganda/sample): pin 2009-10 hc retention to == 2951 (#258)
+git describe: v0.7.2
+
+=== migrate venv to /local/job34085557/venv ===
+  python: Python 3.11.6
+  poetry: Poetry (version 2.3.4)
+
+=== verify poetry-dynamic-versioning plugin ===
+  - poetry-dynamic-versioning (1.10.0) Plugin for Poetry to enable dynamic versioning based on VCS tags
+
+=== verify version resolution (should be 0.7.2, not 0.0.0) ===
+LSMS_Library 0.7.2
+
+=== preserve existing dist/ artifacts ===
+Before build:
+total 7400
+drwxr-xr-x  2 ligon ucb    4096 Apr 12 23:51 .
+drwxr-xr-x 19 ligon ucb    4096 May  9 06:55 ..
+-rw-r--r--  1 ligon ucb 5295374 Apr 12 23:51 lsms_library-0.7.0-py3-none-any.whl
+-rw-r--r--  1 ligon ucb 2272290 Apr 12 23:50 lsms_library-0.7.0.tar.gz
+
+=== poetry build (PYTHON_KEYRING_BACKEND=null) ===
+Building LSMS_Library (0.7.2)
+Building sdist
+Building wheel
+
+=== build exit: 0 ===
+
+=== verify wheel filename ===
+total 9804
+drwxr-xr-x  2 ligon ucb    4096 May  9 07:01 .
+drwxr-xr-x 19 ligon ucb    4096 May  9 06:55 ..
+-rw-r--r--  1 ligon ucb 5295374 Apr 12 23:51 lsms_library-0.7.0-py3-none-any.whl
+-rw-r--r--  1 ligon ucb 2272290 Apr 12 23:50 lsms_library-0.7.0.tar.gz
+-rw-r--r--  1 ligon ucb 5424481 May  9 07:01 lsms_library-0.7.2-py3-none-any.whl
+-rw-r--r--  1 ligon ucb 2394873 May  9 07:00 lsms_library-0.7.2.tar.gz
+
+=== sha256 ===
+0be6c8896b94c88e10111635cb41243441b468111255ddf014b43c84f6bf041b  dist/lsms_library-0.7.2-py3-none-any.whl
+71393db4c451c8702cff08f290815a37279498768b6c8b51c38404a4ecd3fa6a  dist/lsms_library-0.7.2.tar.gz
+
+=== wheel metadata sanity ===
+--- METADATA (head) ---
+Metadata-Version: 2.4
+Name: LSMS_Library
+Version: 0.7.2
+Summary: Abstraction layer for Living Standards Measurement Survey data
+License: CC-BY-4.0
+License-File: LICENSE.txt
+Author: Ethan Ligon
+Author-email: ligon@berkeley.edu
+Requires-Python: >=3.11, <4.0
+Classifier: License :: Other/Proprietary License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Requires-Dist: CFEDemands (>=0.8.2)
+Requires-Dist: PyYAML (>=6.0,<7.0)
+Requires-Dist: dvc[s3] (>=3.67.0,<4.0.0)
+Requires-Dist: fooddatacentral (>=1.0.10,<2.0.0)
+Requires-Dist: ligonlibrary (>=0.2.0)
+Requires-Dist: openai (>=1.99.5,<2.0.0)
+Requires-Dist: pandas (>=2.2)
+Requires-Dist: pint (>=0.25.2,<0.26.0)
+Requires-Dist: platformdirs (>=4.0.0,<5.0.0)
+Requires-Dist: pyarrow (>=21.0.0)
+Requires-Dist: pyreadstat (>=1.3.0,<2.0.0)
+Requires-Dist: python-Levenshtein (>=0.27.3,<0.28.0)
+Requires-Dist: python-gnupg (>=0.5,<1.0)
+Requires-Dist: scikit-learn (>=1.7.0,<2.0.0)
+Requires-Dist: typer (>=0.12.0,<1.0.0)
+Project-URL: Repository, https://github.com/ligon/LSMS_Library
+Description-Content-Type: text/plain
+
+=== artifacts ready ===
+  wheel: dist/lsms_library-0.7.2-py3-none-any.whl
+  sdist: dist/lsms_library-0.7.2.tar.gz
+
+finished:    Sat May  9 07:01:22 PDT 2026
