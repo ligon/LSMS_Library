@@ -1,0 +1,365 @@
+==================================================
+=== sbatch prolog Sat May  9 07:22:12 PDT 2026
+==================================================
+node:        n0090.savio2
+jobid:       34085562
+cpus:        24
+git head:    c3b26fdd fix(scripts): replace removed-in-pandas-2.1 groupby(axis=1) with T.groupby().T
+branch:      fix-pandas2-groupby-axis1
+free mem:    51Gi
+
+=== migrate venv to /local/job34085562/venv ===
+  python:    /local/job34085562/venv/bin/python
+
+==================================================
+=== STEP 1: Build Uganda tables (mirrors GH Actions 'Build Uganda tables')
+==================================================
+cwd: /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/_
+PATH: /local/job34085562/venv/bin:$PATH (so make rules pick up the right python)
+make -j24 starting at Sat May  9 07:23:45 PDT 2026
+/var/spool/slurmd/job34085562/slurm_script: line 56: /local/job34085562/venv/bin/make: No such file or directory
+
+=== make exit: 127 ===
+
+==================================================
+=== STEP 2: Full pytest --rebuild-caches
+==================================================
+pytest -n 24 --dist=loadfile --rebuild-caches starting at Sat May  9 07:23:45 PDT 2026
+
+[--rebuild-caches] purged 63 cache files under /global/home/users/ligon/.local/share/lsms_library
+============================= test session starts ==============================
+platform linux -- Python 3.11.6, pytest-8.4.2, pluggy-1.6.0
+rootdir: /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library
+configfile: pyproject.toml
+plugins: hydra-core-1.3.2, xdist-3.8.0, timeout-2.4.0, anyio-4.13.0, instafail-0.5.0
+created: 24/24 workers
+24 workers [1145 items]
+
+.....sss...............sss.............................................. [  6%]
+........................................................................ [ 12%]
+................................................................s....... [ 18%]
+ss.....................................sssssss.......................... [ 25%]
+.....s.s..........sss.......................sssssssssssssssssssss.s..... [ 31%]
+.sss..................ssssssss..ssssss..s.ss.sss.s.s.sss.s.ss.ss..sssss. [ 37%]
+s...............s.ss.ss...............s............s................s.s. [ 44%]
+........................................................................ [ 50%]
+..................................................xx.................... [ 56%]
+.....................x.....s...........................s................ [ 62%]
+...................s...............................s.................... [ 69%]
+...........s.................x........x....s..x......................... [ 75%]
+....s...............................s...............................s... [ 81%]
+............................s.............ss.ssx..ssss.sss..s..s.s.s...s [ 88%]
+.sssssssssssssssss.sss.sss.ss.ss.......................................s [ 94%]
+..xF..x...........s...X..........s..................s............        [100%]
+=================================== FAILURES ===================================
+___________________ test_api_matches_replication[nutrition] ____________________
+[gw17] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+tests/test_uganda_api_vs_replication.py:556: in test_api_matches_replication
+    _compare_column(
+tests/test_uganda_api_vs_replication.py:389: in _compare_column
+    raise AssertionError(
+E   AssertionError: column 'Energy': max |Δ| = 4.64885e+06 > atol 0.1; mean |Δ| = 19965.2; 23251/23798 rows out of tolerance (max_outliers=2)
+----------------------------- Captured stdout call -----------------------------
+{800.0, 801.0, 802.0, 996.0, 997.0, 998.0, 999.0}
+{996.0, 997.0, 998.0, 999.0}
+----------------------------- Captured stderr call -----------------------------
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/2019-20/_/../../_/uganda.py:150: UserWarning: Dropping some unknown unit codes!
+  warnings.warn("Dropping some unknown unit codes!")
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/2018-19/_/../../_/uganda.py:150: UserWarning: Dropping some unknown unit codes!
+  warnings.warn("Dropping some unknown unit codes!")
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq1
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+=============================== warnings summary ===============================
+tests/test_dvc_caching.py: 13 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:912: UserWarning: Country directory not found for 'TestCountry'
+    warnings.warn(f"Country directory not found for {country_name!r}")
+
+tests/test_uganda_v_grain_invariants.py: 2 warnings
+tests/test_locality_deprecation.py: 2 warnings
+tests/test_canonical_shape_via_cache_miss.py: 5 warnings
+tests/test_sample.py: 7 warnings
+tests/test_age_dtype_consistency.py: 2 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq1
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_uganda_v_grain_invariants.py: 2 warnings
+tests/test_locality_deprecation.py: 2 warnings
+tests/test_canonical_shape_via_cache_miss.py: 5 warnings
+tests/test_sample.py: 7 warnings
+tests/test_age_dtype_consistency.py: 2 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq3
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR230_Guyana_household_characteristics]
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR230_Azerbaijan_household_characteristics]
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR230_Serbia_and_Montenegro_household_characteristics]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/diagnostics.py:771: UserWarning: household_characteristics: dropped 448 roster rows with NaN in one of ['t', 'v', 'i'] (typically v) -- per-wave: {'2009-10': 110, '2013-14': 7, '2018-19': 328, '2019-20': 3}.  These are usually movers / split-offs whose sample() row lacks a cluster code; see GH #197.
+    ref_df = ref_method()
+
+tests/test_sample.py: 6 warnings
+tests/test_age_dtype_consistency.py: 6 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:731: UserWarning: Makefile not found in /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Albania/_. Unable to generate required data.
+    warnings.warn(f"Makefile not found in {makefile_path.parent}. Unable to generate required data.")
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Benin]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Benin]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file Benin/2018-19/Data/s01_me_ben2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[Malawi]
+tests/test_sample.py::TestSample::test_index_is_i_t[Malawi]
+tests/test_sample.py::TestSample::test_index_is_i_t[Malawi]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Malawi]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Malawi]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Malawi]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Malawi]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Malawi]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Malawi]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: hh_a22
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[Malawi]
+tests/test_sample.py::TestSample::test_index_is_i_t[Malawi]
+tests/test_sample.py::TestSample::test_index_is_i_t[Malawi]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Malawi]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Malawi]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Malawi]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Malawi]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Malawi]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Malawi]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: hh_a23
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[Malawi]
+tests/test_sample.py::TestSample::test_index_is_i_t[Malawi]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Malawi]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Malawi]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Malawi]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Malawi]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: hh_a37
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[Malawi]
+tests/test_sample.py::TestSample::test_index_is_i_t[Malawi]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Malawi]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Malawi]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Malawi]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Malawi]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: hh_a40
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[Mali]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Mali]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Mali]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Mali]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Mali]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+  One or more strings in the dta file could not be decoded using utf-8, and
+  so the fallback encoding of latin-1 is being used.  This can happen when a file
+  has been incorrectly encoded by Stata or some other software. You should verify
+  the string values returned are correct.
+    values = reader.value_labels()
+
+tests/test_sample.py::TestSample::test_index_is_i_t[Nigeria]
+tests/test_sample.py::TestSample::test_index_is_i_t[Nigeria]
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR242_Nigeria_food_expenditures]
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR242_Nigeria_food_expenditures]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Nigeria]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Nigeria]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Nigeria]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Nigeria]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: saq13y
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[Nigeria]
+tests/test_sample.py::TestSample::test_index_is_i_t[Nigeria]
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR242_Nigeria_food_expenditures]
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR242_Nigeria_food_expenditures]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Nigeria]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Nigeria]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Nigeria]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Nigeria]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: saq16y
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[Nigeria]
+tests/test_sample.py::TestSample::test_index_is_i_t[Nigeria]
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR242_Nigeria_food_expenditures]
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR242_Nigeria_food_expenditures]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Nigeria]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Nigeria]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Nigeria]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Nigeria]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: tracked_obs
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[Timor-Leste]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Timor-Leste]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Timor-Leste]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s00_inte
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[Timor-Leste]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Timor-Leste]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Timor-Leste]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s00_supe
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[Timor-Leste]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Timor-Leste]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Timor-Leste]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s00_entr
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Burkina_Faso]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Burkina_Faso]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file Burkina_Faso/2018-19/Data/s01_me_bfa2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Burkina_Faso]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Burkina_Faso]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file Burkina_Faso/2021-22/Data/s01_me_bfa2021.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_sample.py::TestUganda2009MarketFallback::test_household_characteristics_retains_hybrid_v_HH
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/tests/test_sample.py:405: UserWarning: household_characteristics: dropped 448 roster rows with NaN in one of ['t', 'v', 'i'] (typically v) -- per-wave: {'2009-10': 110, '2013-14': 7, '2018-19': 328, '2019-20': 3}.  These are usually movers / split-offs whose sample() row lacks a cluster code; see GH #197.
+    return ll.Country("Uganda").household_characteristics(market="Region")
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[CotedIvoire]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[CotedIvoire]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file CotedIvoire/2018-19/Data/Menage/s01_me_CIV2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Ethiopia]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Ethiopia]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s1q06
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[GhanaLSS]
+tests/test_canonical_shape_via_cache_miss.py::test_ghanalss_panel_consistency
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[GhanaLSS]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1982: UserWarning: '1'
+    warnings.warn(str(error))
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[GhanaLSS]
+tests/test_canonical_shape_via_cache_miss.py::test_ghanalss_panel_consistency
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[GhanaLSS]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1911: UserWarning: Makefile execution failed for GhanaLSS/1991-92 household_roster: Command '['make', '-s', '-j12', '/global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1991-92/_/household_roster.parquet']' returned non-zero exit status 2.
+    warnings.warn(f"Makefile execution failed for {self.name}/{wave or '_'} {method_name}: {error}")
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[GhanaLSS]
+tests/test_canonical_shape_via_cache_miss.py::test_ghanalss_panel_consistency
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1911: UserWarning: Makefile execution failed for GhanaLSS/1991-92 household_roster: Command '['make', '-s', '-j12', '/global/home/users/ligon/.local/share/lsms_library/GhanaLSS/var/household_roster.parquet']' returned non-zero exit status 2.
+    warnings.warn(f"Makefile execution failed for {self.name}/{wave or '_'} {method_name}: {error}")
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[GhanaLSS]
+tests/test_canonical_shape_via_cache_miss.py::test_ghanalss_panel_consistency
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1911: UserWarning: Makefile execution failed for GhanaLSS/1991-92 household_roster: Command '['make', '-s', '-j12', '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/GhanaLSS/1991-92/_/household_roster.parquet']' returned non-zero exit status 2.
+    warnings.warn(f"Makefile execution failed for {self.name}/{wave or '_'} {method_name}: {error}")
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[GhanaLSS]
+tests/test_canonical_shape_via_cache_miss.py::test_ghanalss_panel_consistency
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1911: UserWarning: Makefile execution failed for GhanaLSS/1991-92 household_roster: Command '['make', '-s', '-j12', '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/GhanaLSS/var/household_roster.parquet']' returned non-zero exit status 2.
+    warnings.warn(f"Makefile execution failed for {self.name}/{wave or '_'} {method_name}: {error}")
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[GhanaLSS]
+tests/test_canonical_shape_via_cache_miss.py::test_ghanalss_panel_consistency
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1911: UserWarning: Makefile execution failed for GhanaLSS/1991-92 household_roster: Command '['make', '-s', '-j12', '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/GhanaLSS/_/household_roster.parquet']' returned non-zero exit status 2.
+    warnings.warn(f"Makefile execution failed for {self.name}/{wave or '_'} {method_name}: {error}")
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[GhanaLSS]
+tests/test_canonical_shape_via_cache_miss.py::test_ghanalss_panel_consistency
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1927: UserWarning: Python fallback failed for /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/GhanaLSS/_/household_roster.py: Command '['/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python', '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/GhanaLSS/_/household_roster.py']' returned non-zero exit status 1.
+    warnings.warn(f"Python fallback failed for {script}: {error}")
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Guinea-Bissau]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Guinea-Bissau]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file Guinea-Bissau/2018-19/Data/s01_me_gnb2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Mali]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Mali]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file Mali/2018-19/Data/s01_me_mli2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Mali]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Mali]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file Mali/2021-22/Data/s01_me_mli2021.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Niger]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Niger]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file Niger/2018-19/Data/s01_me_ner2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Niger]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Niger]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file Niger/2021-22/Data/s01_me_ner2021.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Senegal]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Senegal]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file Senegal/2018-19/Data/s01_me_sen2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[South Africa]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[South Africa]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1686: UserWarning: Unknown relationship labels (add to kinship.yml): ['-1']
+    df = _expand_kinship(df)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Tajikistan]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Tajikistan]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s1q2
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Tajikistan]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Tajikistan]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s1q3
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Tajikistan]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Tajikistan]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s1q4
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Tajikistan]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Tajikistan]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s1q7
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Tajikistan]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Tajikistan]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s1q10
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Tajikistan]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Tajikistan]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s1q11
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Tajikistan]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Tajikistan]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: isabel
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Togo]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Togo]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file Togo/2018/Data1/s01_me_tgo2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[nutrition]
+= 1 failed, 986 passed, 148 skipped, 9 xfailed, 1 xpassed, 189 warnings in 2312.61s (0:38:32) =
+
+=== pytest exit: 1 ===
+
+==================================================
+=== verdict Sat May  9 08:02:30 PDT 2026
+==================================================
+make    exit: 127  (FAIL)
+pytest  exit: 1  (FAIL)
+
+STILL FAILING -- inspect the per-step output above for the next latent bug.
