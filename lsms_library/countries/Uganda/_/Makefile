@@ -8,13 +8,15 @@ COUNTRY := $(shell basename "$$(cd .. && pwd)")
 LSMS_DATA_ROOT ?= $(if $(LSMS_DATA_DIR),$(LSMS_DATA_DIR),$(if $(XDG_DATA_HOME),$(XDG_DATA_HOME),$(HOME)/.local/share)/lsms_library)
 VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 
-# food_expenditures, food_quantities, food_prices are produced at runtime
-# from canonical food_acquired.parquet via the framework's auto-derivation
-# path (_FOOD_DERIVED in lsms_library/country.py); they no longer need to
-# be materialized as country-level parquets.  See PR uganda-drop-legacy-fpqe
-# (post-#245).
-var = $(VAR_DIR)/household_characteristics.parquet \
-      $(VAR_DIR)/shocks.parquet $(VAR_DIR)/nonfood_expenditures.parquet $(VAR_DIR)/enterprise_income.parquet \
+# Auto-derived at runtime, NOT materialized as country-level parquets:
+#   - household_characteristics, food_expenditures, food_prices,
+#     food_quantities -- see _ROSTER_DERIVED / _FOOD_DERIVED in
+#     lsms_library/country.py and CLAUDE.md "Derived Tables".
+# Listing them here would re-introduce the obsolete-rule failure that
+# broke master CI on 2026-05-09 (no rule to make target
+# 'household_characteristics.py').  The food_*.py legacy script was
+# already dropped in PR #248/#249 (post-#245).
+var = $(VAR_DIR)/shocks.parquet $(VAR_DIR)/nonfood_expenditures.parquet $(VAR_DIR)/enterprise_income.parquet \
 	  $(VAR_DIR)/assets.parquet $(VAR_DIR)/earnings.parquet $(VAR_DIR)/housing.parquet $(VAR_DIR)/income.parquet \
 	  $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet
 
@@ -67,12 +69,6 @@ food_acquired_parquet := $(food_acquired:.py=.parquet)
 
 $(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
 	python food_acquired.py
-
-household_characteristics = $(shell find $(rounds) -name household_characteristics.py)
-household_characteristics_parquet := $(household_characteristics:.py=.parquet)
-
-$(VAR_DIR)/household_characteristics.parquet: household_characteristics.py $(household_characteristics_parquet)
-	python household_characteristics.py
 
 housing = $(shell find $(rounds) -name housing.py)
 housing_parquet := $(housing:.py=.parquet)
