@@ -564,18 +564,17 @@ class Wave:
             return pd.DataFrame()
         data_info = self.resources.get(request, None)
 
-        # --- Wave-level L2 cache check (YAML-path only) ---
-        # Script-path tables (data_info is None) already get wave parquets
+        # --- L2-wave cache check (YAML-path only) ---
+        # Script-path tables (data_info is None) already get L2-wave parquets
         # from their _/<table>.py scripts via local_tools.to_parquet().  The
         # YAML path returns in-memory DataFrames without writing, so every
         # per-wave iterator (e.g. Country._market_lookup) pays the full
         # df_data_grabber cost on every call.  Cache the extracted+formatted
         # wave frame the first time it's produced.  Stored pre-transform:
         # categorical mapping, kinship expansion, and _finalize_result all
-        # run downstream on every read.  Staleness semantics match the
-        # country-level L2 (see CLAUDE.md "Cache Behavior"): no automatic
-        # invalidation; force a rebuild with LSMS_NO_CACHE=1 or by deleting
-        # the parquet.
+        # run downstream on every read.  Staleness semantics match L2-country
+        # (see CLAUDE.md "Cache Behavior"): no automatic invalidation; force
+        # a rebuild with LSMS_NO_CACHE=1 or by deleting the parquet.
         cache_path = None
         if data_info:
             cache_path = (data_root(self.country.name) / self.year / '_'
@@ -771,7 +770,7 @@ class Wave:
         df = check_adding_t(df)
         df = df[df.index.get_level_values('t') == self.year]
 
-        # --- Wave-level L2 cache write (YAML-path only) ---
+        # --- L2-wave cache write (YAML-path only) ---
         # See the matching read at the top of this method for rationale.
         # Write failures warn but don't propagate — the caller gets a
         # correct DataFrame either way.
@@ -787,7 +786,7 @@ class Wave:
                 # failure -> warn and continue with the in-memory df.
                 # Programmer bugs propagate.
                 warnings.warn(
-                    f'wave-level L2 cache write failed for '
+                    f'L2-wave cache write failed for '
                     f'{self.country.name}/{self.year}/{request}: {exc}'
                 )
 
@@ -2405,11 +2404,13 @@ class Country:
         """
         List dataset names currently cached for this country.
 
-        Discovers caches at all three layers:
+        Discovers caches at three locations under ``data_root()``
+        (DVC blob cache L1 lives under ``dvc-cache/`` and is not enumerated
+        by this method):
 
-        - **L1**: ``data_root(country)/var/*.parquet``.
+        - **L2-country**: ``data_root(country)/var/*.parquet``.
         - **Country-level companion**: ``data_root(country)/_/*.{parquet,json}``.
-        - **L2 wave-level**: ``data_root(country)/{wave}/_/*.parquet`` for
+        - **L2-wave**: ``data_root(country)/{wave}/_/*.parquet`` for
           every wave subdirectory (excluding the special ``_/`` and
           ``var/`` directories above).  This catches script-path tables
           (Nigeria's PP/PH ``household_roster``, Tanzania's multi-round
@@ -2426,7 +2427,7 @@ class Country:
             cache_files.extend(underscore_dir.glob("*.json"))
             cache_files.extend(underscore_dir.glob("*.parquet"))
 
-        # L2 wave-level: any direct subdir of the country root with a
+        # L2-wave: any direct subdir of the country root with a
         # ``_/`` containing parquets, excluding the two special dirs
         # already handled above.
         if country_root.exists():
@@ -2453,14 +2454,16 @@ class Country:
         """
         Remove cached files for this country.
 
-        Clears three cache layers:
+        Clears two parquet tiers (the L1 DVC blob cache is left alone;
+        evict it manually with ``rm -rf {data_root}/dvc-cache`` if you
+        really mean to re-fetch from S3) plus DVC build artifacts:
 
-        - **L1 country-level** at ``data_root(country)/var/{method}.parquet``
+        - **L2-country** at ``data_root(country)/var/{method}.parquet``
           and the JSON-companion ``data_root(country)/_/{method}.parquet|json``.
-        - **L2 wave-level** at ``data_root(country)/{wave}/_/{method}.parquet``
+        - **L2-wave** at ``data_root(country)/{wave}/_/{method}.parquet``
           for every wave the country knows about (via :attr:`waves`).
           Both YAML-path tables (cached on first ``Wave.grab_data`` call,
-          since the 2026-04-15 wave-level L2 addition) and script-path
+          since the 2026-04-15 L2-wave addition) and script-path
           tables (written by ``_/{method}.py`` via
           :func:`local_tools.to_parquet`) live here.
         - **DVC build artifacts** under ``lsms_library/countries/{country}/...``
@@ -2472,7 +2475,7 @@ class Country:
         removed: list[Path] = []
         targets = list(dict.fromkeys(methods or self.cached_datasets()))
 
-        # Discover L2 wave-level caches by globbing the country root.
+        # Discover L2-wave caches by globbing the country root.
         # We *cannot* derive directory names from ``self.waves`` because
         # countries with per-round ``t`` values write under the round
         # name, not the wave-folder name (e.g. Nigeria's
@@ -2485,7 +2488,7 @@ class Country:
             for method in targets:
                 # Match any *direct* subdir of the country root that has
                 # an _/{method}.parquet — excludes ``_/`` (companion) and
-                # ``var/`` (L1) which are already handled below.
+                # ``var/`` (L2-country) which are already handled below.
                 hits = [
                     p for p in country_root.glob(f"*/_/{method}.parquet")
                     if p.parent.parent.name not in ("_", "var")

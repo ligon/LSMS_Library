@@ -52,7 +52,7 @@ df = roster()      # Load all countries into one DataFrame
 - **Cross-Country Analysis** -- `Feature` class concatenates harmonized data
   across countries
 - **DVC Integration** -- stream data from remote storage
-- **Two-Layer Cache** -- DVC blob cache (Layer 1, populated lazily on first read of any tracked file) and harmonized parquet cache (Layer 2, the v0.7.0 fast path that serves warm reads in ~0.5 s). Both live under `data_root()` and are controlled together by `LSMS_DATA_DIR`. See the [Caching guide](guide/caching.md).
+- **Three-Tier Cache** -- DVC blob cache (L1, populated lazily on first read of any tracked file), per-wave harmonized parquet (L2-wave, written by `Wave.grab_data` on first call), and per-country aggregated parquet (L2-country, the v0.7.0 fast path that serves warm reads in ~0.5 s). All three tiers live under `data_root()` and are controlled together by `LSMS_DATA_DIR`. See the [Caching guide](guide/caching.md).
 - **Extensible** -- add new surveys via YAML configuration files
 
 ## Next Steps

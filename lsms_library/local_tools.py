@@ -89,10 +89,11 @@ from .config import s3_creds_path as _s3_creds_path
 #
 # The runtime ``config={"cache": {"dir": ...}}`` override pins the
 # DVC object cache to a user-writable location under ``data_root()``,
-# so the same ``LSMS_DATA_DIR`` controls both the parquet cache (Layer 2)
-# and the DVC blob cache (Layer 1).  Without this override, the cache
-# falls back to ``{_COUNTRIES_DIR}/.dvc/cache`` which is unwritable in
-# pip-installed layouts.
+# so the same ``LSMS_DATA_DIR`` controls both the parquet cache
+# (L2-country and L2-wave tiers) and the DVC blob cache (L1).
+# Without this override, the cache falls back to
+# ``{_COUNTRIES_DIR}/.dvc/cache`` which is unwritable in pip-installed
+# layouts.
 #
 # The override also makes the DVCFileSystem cache-read fast path
 # (``DataFileSystem._get_fs_path`` iterating ``["cache", "remote", "data"]``)

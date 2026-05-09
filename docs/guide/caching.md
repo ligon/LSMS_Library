@@ -22,35 +22,38 @@ hh = uga.household_characteristics()
 hh = uga.household_characteristics()
 ```
 
-## Two Cache Layers
+## Three Cache Tiers
 
-The library maintains two independent caches, both rooted under
+The library maintains three independent caches, all rooted under
 `data_root()`:
 
-| Layer | Path | Content | Populated by | Read by |
+| Tier | Path | Content | Populated by | Read by |
 |---|---|---|---|---|
-| **Layer 2 (parquet)** | `~/.local/share/lsms_library/{Country}/var/{table}.parquet` | Per-table harmonized output, ready for analysis | `Country.{table}()` after building from waves | The v0.7.0 top-of-function cache read in `load_dataframe_with_dvc` (`country.py:1611-1652`) |
-| **Layer 1 (DVC blobs)** | `~/.local/share/lsms_library/dvc-cache/{md5[:2]}/{md5[2:]}` | Content-addressed copies of the raw `.dta` files (and other DVC-tracked sources) | `_ensure_dvc_pulled()` in `local_tools.py` calls `Repo.fetch` on first read of any DVC-tracked file | `DVCFS.open()` via `DataFileSystem._get_fs_path`'s `typ == "cache"` branch |
+| **L2-country (parquet)** | `~/.local/share/lsms_library/{Country}/var/{table}.parquet` | Per-country, per-table harmonized output (waves concatenated, ready for analysis) | `Country.{table}()` after building from waves | The v0.7.0 top-of-function cache read in `load_dataframe_with_dvc` (`country.py:1611-1652`) |
+| **L2-wave (parquet)** | `~/.local/share/lsms_library/{Country}/{wave}/_/{table}.parquet` | Per-wave harmonized output (one wave's portion of the table) | `Wave.grab_data()` on first call (YAML path, since 2026-04-15) or `_/{table}.py` scripts via `to_parquet()` (script path, always) | `Wave.grab_data()` on subsequent calls; `run_make_target` for script-path tables |
+| **L1 (DVC blobs)** | `~/.local/share/lsms_library/dvc-cache/{md5[:2]}/{md5[2:]}` | Content-addressed copies of the raw `.dta` files (and other DVC-tracked sources) | `_ensure_dvc_pulled()` in `local_tools.py` calls `Repo.fetch` on first read of any DVC-tracked file | `DVCFS.open()` via `DataFileSystem._get_fs_path`'s `typ == "cache"` branch |
 
-Both layers live under the same root, so a single `LSMS_DATA_DIR`
+All three tiers live under the same root, so a single `LSMS_DATA_DIR`
 environment variable moves them together. On a shared cluster, set
 `LSMS_DATA_DIR=/shared/...` and every user gets the same warm caches.
 
 ### How they interact
 
-The fast path on warm reads is Layer 2 alone: the v0.7.0 top-of-function
-read in `load_dataframe_with_dvc` returns the harmonized parquet without
-ever touching DVC. All-warm calls finish in ~0.5 s regardless of how
-many raw files the country has.
+The fast path on warm reads is L2-country alone: the v0.7.0 top-of-function
+read in `load_dataframe_with_dvc` returns the per-country aggregated
+parquet without ever touching the lower tiers. All-warm calls finish
+in ~0.5 s regardless of how many raw files the country has.
 
-When Layer 2 is cold (e.g. after editing a `data_info.yml` and clearing
-the parquet cache), the library re-runs wave aggregation. Each wave
-script calls `get_dataframe()` for its raw `.dta` files; on a cache hit
-the file is served from Layer 1's local copy via `DVCFS.open()`, on a
-miss `_ensure_dvc_pulled` runs `Repo.fetch` to populate the cache and
-then `DVCFS.open` reads from it. After the first cold rebuild, Layer 1
-stays warm across sessions, so the next L2 rebuild doesn't need any
-S3 traffic.
+When L2-country is cold (e.g. after editing a `data_info.yml` and clearing
+the parquet cache), the library re-runs wave aggregation. For each wave
+in turn, `Wave.grab_data()` checks L2-wave first and reads it directly
+on a hit. On an L2-wave miss the wave script calls `get_dataframe()` for
+its raw `.dta` files; on an L1 hit the file is served from the local
+blob cache via `DVCFS.open()`, on an L1 miss `_ensure_dvc_pulled` runs
+`Repo.fetch` to populate the cache and then `DVCFS.open` reads from it.
+After the first cold rebuild, L1 and L2-wave both stay warm across
+sessions, so the next L2-country rebuild doesn't need any S3 traffic
+or repeated DVC SQLite lookups.
 
 Empirical numbers on a Linux workstation, Niger `household_roster`
 (~10 raw `.dta` files):
@@ -58,13 +61,15 @@ Empirical numbers on a Linux workstation, Niger `household_roster`
 | Scenario | Time | What's running |
 |---|---|---|
 | Truly cold (no caches) | ~600 s | First-ever fetch, every blob from S3, full DVC index build |
-| Cold-cold (L1 + L2 both empty) | 460-510 s | Per-file `Repo.fetch` (~11 s each) + harmonization + parquet write |
-| **L2-cold L1-warm** | **~70 s** | Sidecar pre-check finds blobs in cache, no S3 traffic, harmonization + parquet write only |
-| All-warm (L2 hit) | ~0.5 s | v0.7.0 top read returns the parquet directly |
+| Cold-cold (L1 + L2-country both empty) | 460-510 s | Per-file `Repo.fetch` (~11 s each) + harmonization + parquet write |
+| **L2-country cold, L1 warm** | **~70 s** | Sidecar pre-check finds blobs in cache, no S3 traffic, harmonization + parquet write only |
+| All-warm (L2-country hit) | ~0.5 s | v0.7.0 top read returns the parquet directly |
 
-The interesting row is L2-cold L1-warm: ~7× faster than cold-cold,
-because the per-file `Repo.fetch` overhead and the S3 round-trips are
-both gone.
+The interesting row is "L2-country cold, L1 warm": ~7× faster than
+cold-cold, because the per-file `Repo.fetch` overhead and the S3
+round-trips are both gone. Adding the L2-wave tier (2026-04-15) further
+removes the per-wave DVC SQLite metadata lookup on cold L2-country
+rebuilds (Uganda `cluster_features`: 408 s → 0.02 s per wave).
 
 ## Cross-Session Behavior
 
@@ -78,12 +83,14 @@ DVC-stage countries.
 `data_info.yml`, a `_/{table}.py` script, or some other source, the
 library cannot tell that the source changed. Two ways to invalidate:
 
-- Set `LSMS_NO_CACHE=1` for the session — this skips the v0.7.0 top read
-  and forces a Layer 2 rebuild from source.
+- Set `LSMS_NO_CACHE=1` for the session — this skips both the v0.7.0
+  top read (L2-country) and the L2-wave reads on the YAML path, forcing
+  a rebuild from source.
 - Run `lsms-library cache clear --country {Country}` (optionally with
-  `--method {table}`) to evict the affected parquet before the next call.
+  `--method {table}`) to evict the affected L2-country and L2-wave
+  parquets before the next call.
 
-Either way, the rebuild reads from Layer 1 (the DVC blob cache) where
+Either way, the rebuild reads from L1 (the DVC blob cache) where
 possible, so you only pay the S3 cost once per blob per machine.
 
 Content-hash invalidation that automatically detects edits to
@@ -91,11 +98,12 @@ Content-hash invalidation that automatically detects edits to
 
 ## Cache Location
 
-Both layers are under the user data directory:
+All three tiers are under the user data directory:
 
 - **Linux**: `~/.local/share/lsms_library/`
-  - Layer 2: `{Country}/var/{dataset}.parquet`
-  - Layer 1: `dvc-cache/{md5[:2]}/{md5[2:]}` (DVC 2.x layout) or
+  - L2-country: `{Country}/var/{dataset}.parquet`
+  - L2-wave: `{Country}/{wave}/_/{dataset}.parquet`
+  - L1: `dvc-cache/{md5[:2]}/{md5[2:]}` (DVC 2.x layout) or
     `dvc-cache/files/md5/{md5[:2]}/{md5[2:]}` (DVC 3.x layout)
 - **macOS**: `~/Library/Application Support/lsms_library/...`
 - **Windows**: `%LOCALAPPDATA%/lsms_library/...`
@@ -113,7 +121,7 @@ sidecar pre-check in `_ensure_dvc_pulled` looks at both locations.
 
 This is a hard architectural rule: the package source tree
 (`lsms_library/countries/`) holds code, configs, and `.dvc` sidecars
-only. Tracked data files live in the Layer 1 cache under `data_root()`,
+only. Tracked data files live in the L1 cache under `data_root()`,
 not in the workspace.
 
 `_ensure_dvc_pulled` calls `Repo.fetch` (not `Repo.pull`) to populate
@@ -178,10 +186,11 @@ lsms-library cache clear --all --dry-run
 When contributing changes to a wave's `data_info.yml` or `_/{table}.py`,
 clear the affected country's cache before rebuilding so the next call
 actually reads your new source data rather than an older cached parquet.
-The Layer 1 blob cache stays populated either way, so the rebuild won't
-re-fetch from S3.
+`lsms-library cache clear` evicts both L2-country and L2-wave; the L1
+blob cache stays populated either way, so the rebuild won't re-fetch
+from S3.
 
-To clear the Layer 1 blob cache too (rarely needed):
+To clear the L1 blob cache too (rarely needed):
 
 ```bash
 rm -rf ~/.local/share/lsms_library/dvc-cache/
@@ -204,7 +213,7 @@ under the package tree as a transient step:
 
 In both cases the new file lives temporarily in the workspace. **Once
 the `.dvc` sidecar exists, remove the workspace copy** — the file is
-now in the Layer 1 cache and `local_file()` will refuse to read the
+now in the L1 cache and `local_file()` will refuse to read the
 workspace copy on subsequent calls (with the cleanup warning). Removing
 it keeps the package tree clean and consistent with the architectural
 rule above.
@@ -223,9 +232,9 @@ country and environment:
 
 | Backend | When Used | Description |
 |---------|-----------|-------------|
-| Python aggregator | Default for all countries | Reads wave-level `data_info.yml` and builds in memory; Layer 2 parquet is written and read across sessions via the v0.7.0 top read |
+| Python aggregator | Default for all countries | Reads wave-level `data_info.yml` and builds in memory; the L2-country parquet is written and read across sessions via the v0.7.0 top read, and each wave's intermediate is cached as L2-wave |
 | DVC stage layer | The 7 countries with a populated `dvc.yaml` (Uganda, Senegal, Malawi, Togo, Kazakhstan, Serbia, GhanaLSS) | DVC hashes stage deps and reads cache when clean. Note: on hosts where `python3` resolves to Python < 3.9 (e.g. Savio login nodes with Python 3.6.8), `stage.reproduce()` fails with `ModuleNotFoundError` and the library silently falls back to the Python aggregator path |
-| Make / script | When `data_scheme.yml` marks a table `materialize: make` | Per-country/wave Makefiles and standalone Python scripts; the only choice for tables that cannot be expressed purely in YAML (post-planting/post-harvest dual rounds, multi-wave source files, etc.) |
+| Make / script | When `data_scheme.yml` marks a table `materialize: make` | Per-country/wave Makefiles and standalone Python scripts; the only choice for tables that cannot be expressed purely in YAML (post-planting/post-harvest dual rounds, multi-wave source files, etc.). These also write L2-wave parquets via `to_parquet()` |
 
 ```bash
 # Force the Python aggregator path (bypasses the DVC stage layer for
@@ -236,8 +245,8 @@ export LSMS_BUILD_BACKEND=make
 
 Note that `LSMS_BUILD_BACKEND=make` dispatches `_aggregate_wave_data`
 directly to `load_from_waves` (`country.py:1830`), bypassing both the
-DVC stage layer and the Layer 2 Parquet cache. Use only when actively
-debugging.
+DVC stage layer and both L2 parquet tiers. L1 is still used to serve
+raw blobs. Use only when actively debugging.
 
 ## Build Parallelism
 

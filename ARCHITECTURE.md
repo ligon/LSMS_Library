@@ -16,7 +16,7 @@ Underneath the API surface, three orthogonal concerns are layered:
 2. **Build path** is either YAML-driven (`Wave.grab_data` extracts directly) or script-driven (`_/{table}.py` writes a wave-level parquet) — chosen per-table.
 3. **Access layer** (`local_tools.get_dataframe`, `to_parquet`, `data_root`, DVC, WB NADA fallback) abstracts where bytes actually come from on disk, in cache, or over the network.
 
-A two-tier parquet cache (country-level L1 + wave-level L2, both under `~/.local/share/lsms_library/`) short-circuits DVC and re-extraction on the hot path; a single in-memory finalize step (`_finalize_result`) applies kinship decomposition, canonical spellings, dtype coercion, and `v` joining at API time, so the cache never needs to be re-baked when those rules evolve.
+A three-tier cache (L1 = DVC blob cache for raw `.dta`; L2-wave = per-wave harmonized parquet; L2-country = per-country aggregated parquet, all under `~/.local/share/lsms_library/`) short-circuits DVC and re-extraction on the hot path; a single in-memory finalize step (`_finalize_result`) applies kinship decomposition, canonical spellings, dtype coercion, and `v` joining at API time, so the cache never needs to be re-baked when those rules evolve.
 
 ## 2. Functional Areas
 
@@ -63,7 +63,7 @@ This is the canonical YAML-driven flow: a feature method delegates to `Wave.grab
 ```
 cluster_features → grab_data → get_data → df_data_grabber → get_dataframe → _resolve_data_path → data_root → _warn_on_whitespace
 ```
-Cluster-level data (`v`, region, urban/rural) is the source of truth that `_join_v_from_sample` and `_add_market_index` later read from. The wave-level L2 cache (introduced 2026-04-15) caches each wave's `cluster_features` parquet to skip the per-call DVC SQLite hit.
+Cluster-level data (`v`, region, urban/rural) is the source of truth that `_join_v_from_sample` and `_add_market_index` later read from. The L2-wave cache (introduced 2026-04-15) caches each wave's `cluster_features` parquet to skip the per-call DVC SQLite hit.
 
 ### 3.3 `_finalize_result` cross-table augmentation (7 steps)
 ```
@@ -128,8 +128,9 @@ flowchart TD
     end
 
     subgraph Store["Storage tiers"]
-        L1[("L1 cache<br/>~/.local/share/lsms_library/&lt;Country&gt;/var/")]:::storage
-        L2[("L2 cache<br/>data_root/&lt;Country&gt;/&lt;wave&gt;/_/")]:::storage
+        L2C[("L2-country<br/>~/.local/share/lsms_library/&lt;Country&gt;/var/")]:::storage
+        L2W[("L2-wave<br/>data_root/&lt;Country&gt;/&lt;wave&gt;/_/")]:::storage
+        L1[("L1 (DVC blobs)<br/>~/.local/share/lsms_library/dvc-cache/")]:::storage
         Repo[("Repo .dta / .csv<br/>countries/&lt;Country&gt;/&lt;wave&gt;/Data/")]:::storage
         DVC[("DVC remote<br/>S3 read cache")]:::storage
         WB[("WB Microdata Library<br/>(NADA API)")]:::storage
@@ -144,11 +145,12 @@ flowchart TD
     Script --> ToParquet
     Script --> GetDF
 
-    Country -. cache-first .-> L1
-    Wave -. cache-first .-> L2
-    L1 -. miss .-> YAML
-    L1 -. miss .-> Script
-    L2 -. miss .-> GetDF
+    Country -. cache-first .-> L2C
+    Wave -. cache-first .-> L2W
+    L2C -. miss .-> YAML
+    L2C -. miss .-> Script
+    L2W -. miss .-> GetDF
+    GetDF -. cache-first .-> L1
 
     GetDF --> Resolve --> DataRoot
     GetDF --> ReadFile --> PyRead
@@ -170,7 +172,7 @@ flowchart TD
 
 ## 5. Cross-Cutting Concerns
 
-- **Caching.** Two parquet tiers (L1 country-level, L2 wave-level) both honor `LSMS_NO_CACHE=1`; neither does staleness checks. `LSMS_BUILD_BACKEND=make` bypasses both. `assume_cache_fresh=True` is an in-process short-circuit that still runs `_finalize_result`.
+- **Caching.** Three tiers: L1 (DVC blob cache for raw `.dta`), L2-wave (per-wave harmonized parquet), L2-country (per-country aggregated parquet). The two L2 tiers honor `LSMS_NO_CACHE=1`; none of the three does staleness checks. `LSMS_BUILD_BACKEND=make` bypasses both L2 tiers (L1 still serves blobs). `assume_cache_fresh=True` is an in-process short-circuit that still runs `_finalize_result`. See `docs/guide/caching.md`.
 - **DVC.** Rooted at `lsms_library/countries/`, *not* the top of the repo. The stage layer was retired in v0.7.0; all reads go through cache + `load_from_waves`.
 - **Credentials.** Three-tier model: nothing → import warns; WB API key → S3 read cache auto-unlocks via cosmetic obfuscation; WB key + S3 write creds → push access. The WB key is the authoritative gate.
 - **Schema source of truth.** `lsms_library/data_info.yml` defines required columns, accepted values, and rejected spellings; `tests/test_schema_consistency.py` reads from it (never hardcoded).

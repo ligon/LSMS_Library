@@ -10,10 +10,11 @@ import pytest
 import pandas as pd
 
 # NOTE: pre-v0.7.0 this set LSMS_BUILD_BACKEND=make "to avoid DVC locks".
-# That advice is now harmful: it bypasses the L2 parquet cache and forces
-# a full .dta rebuild on every sample() call, turning the 310-test suite
-# into hours of work.  Since v0.7.0 the default "dvc" backend short-
-# circuits on warm cache (country.py:1758) without touching DVC locks.
+# That advice is now harmful: it bypasses the L2-country parquet cache
+# and forces a full .dta rebuild on every sample() call, turning the
+# 310-test suite into hours of work.  Since v0.7.0 the default "dvc"
+# backend short-circuits on warm cache (country.py:1758) without
+# touching DVC locks.
 
 import lsms_library as ll
 from lsms_library.paths import COUNTRIES_ROOT
