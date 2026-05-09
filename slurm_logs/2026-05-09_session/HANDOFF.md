@@ -88,6 +88,29 @@ Across all wave-level `data_info.yml` files, **zero waves** remain
 with `roster.i = single string AND sample.i = list`. PRs #244 + #253 +
 #255 exhaust the structural-cross-source-granularity pattern.
 
+## v0.7.2 release
+
+After all the above merged into `development`, fast-forwarded
+`master` from `65d35f33` → `fbe5b478` (100 commits) and tagged
+**v0.7.2** with annotated release notes (Phase-3/4 s-axis migration,
+five waves recovered from silent NaN-v skip, MonthsSpent filter,
+three-tier cache hierarchy standardized, etc.).  All public API
+changes additive or internal -- no breaks vs v0.7.1.
+
+Wheel built on Slurm (job 34085557, `co_carleton`, 4 min wall):
+
+```
+dist/lsms_library-0.7.2-py3-none-any.whl   5.4 MB
+dist/lsms_library-0.7.2.tar.gz             2.4 MB
+sha256 (whl):    0be6c8896b94c88e10111635cb41243441b468111255ddf014b43c84f6bf041b
+sha256 (sdist):  71393db4c451c8702cff08f290815a37279498768b6c8b51c38404a4ecd3fa6a
+```
+
+Per the user's preference (matches Apr 28 prep plan), publication
+to PyPI is being handled off-cluster.  Wheel + sdist live in
+`/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/dist/`
+on Savio; gitignored, so they don't enter the repo.
+
 ## #246 (C-2) closeout — Uganda 2009-10 hybrid-v retention
 
 The May 8 failure (2869 vs ≥2900) was a stale-cache effect: the
