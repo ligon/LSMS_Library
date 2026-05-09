@@ -88,6 +88,31 @@ Across all wave-level `data_info.yml` files, **zero waves** remain
 with `roster.i = single string AND sample.i = list`. PRs #244 + #253 +
 #255 exhaust the structural-cross-source-granularity pattern.
 
+## #246 (C-2) closeout — Uganda 2009-10 hybrid-v retention
+
+The May 8 failure (2869 vs ≥2900) was a stale-cache effect: the
+`pytest --rebuild-caches` run at commit `f5ff48f9` rebuilt Uganda
+parquets while `_/food_acquired.py` was still in the broken pre-#245
+state. PR #245's source-fix landed later that day; once cached
+parquets reflect post-#245 source, the test passes at exactly the
+docstring's target (2929 HHs).
+
+- **Probe** (Slurm 34085538, `co_carleton`, 23.7 s): per-stage HH
+  attrition for 2009-10. Sample 2975 → roster 2975 → characteristics
+  2951 (lost 24 to MonthsSpent filter) → fe 2929 (lost 22 to no-food
+  HHs) → fe(market) 2929 (lost 0; HH-level `_add_market_index`
+  fallback works). Synthetic-`v` classification: only 4 of 46 lost
+  HHs have `@lat,lon` synthetic `v`; the fallback recovers them all.
+- **Test re-run** (Slurm 34085543, ~3 min): 3 passed in both
+  warm-cache and cold-cache (`LSMS_NO_CACHE=1`) modes. Source-level
+  pass.
+- **PR #257**: tightens `assert hh09 >= 2900` → `>= 2929`. CI green
+  (both `unit-tests` SUCCESS in ~6 min). **Squash-merged** at
+  13:36:26 UTC as `80c9533a`. Branch
+  `origin/uganda-hybrid-v-tighten-2929` deleted with the merge.
+- **#246 closed** at 13:36:41 UTC. All parts (1, 2, 3, D-1, D-2)
+  resolved across this and the prior PR sequence.
+
 ## Open items
 
 - **#246 (D-2)**: Serbia/2007 design call after probe completes.
