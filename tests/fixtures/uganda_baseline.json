@@ -43,106 +43,39 @@
   },
   "2005-06/_/food_acquired.parquet": {
     "columns": [
-      "Kgs",
-      "farmgate",
-      "market",
-      "quantity_away",
-      "quantity_home",
-      "quantity_inkind",
-      "quantity_own",
-      "unitvalue_away",
-      "unitvalue_home",
-      "unitvalue_inkind",
-      "unitvalue_own",
-      "value_away",
-      "value_home",
-      "value_inkind",
-      "value_own"
+      "Expenditure",
+      "Price",
+      "Quantity"
     ],
-    "content_hash": "0f6a29c7123564be6f8ee3fd418d713009d7ca8d93654a123098cf03bfbeafcd",
+    "content_hash": "837a649e6c868e67ef24604bd666f5b1a8817632c9b4b38792017fb61b8f9dfa",
     "dtypes": {
-      "Kgs": "float64",
-      "farmgate": "float64",
-      "market": "float64",
-      "quantity_away": "float64",
-      "quantity_home": "float64",
-      "quantity_inkind": "float64",
-      "quantity_own": "float64",
-      "unitvalue_away": "float64",
-      "unitvalue_home": "float64",
-      "unitvalue_inkind": "float64",
-      "unitvalue_own": "float64",
-      "value_away": "float64",
-      "value_home": "float64",
-      "value_inkind": "float64",
-      "value_own": "float64"
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
     },
     "index_names": [
+      "t",
       "i",
       "j",
-      "u"
+      "u",
+      "s"
     ],
     "shape": [
-      40394,
-      15
+      40749,
+      3
     ]
   },
-  "2005-06/_/household_characteristics.parquet": {
+  "2005-06/_/interview_date.parquet": {
     "columns": [
-      "Females 00-03",
-      "Females 04-08",
-      "Females 09-13",
-      "Females 14-18",
-      "Females 19-30",
-      "Females 31-50",
-      "Females 51-99",
-      "Males 00-03",
-      "Males 04-08",
-      "Males 09-13",
-      "Males 14-18",
-      "Males 19-30",
-      "Males 31-50",
-      "Males 51-99",
-      "log HSize"
+      "date"
     ],
-    "content_hash": "c8de70a0e86cb48c7c0414e085b169e74a1c0510ff800ca15f0b4279611c141a",
+    "content_hash": "74c6bdba442651cf4aef26d338f6b69123d83c5228d871f7577c78af9831623d",
     "dtypes": {
-      "Females 00-03": "int64",
-      "Females 04-08": "int64",
-      "Females 09-13": "int64",
-      "Females 14-18": "int64",
-      "Females 19-30": "int64",
-      "Females 31-50": "int64",
-      "Females 51-99": "int64",
-      "Males 00-03": "int64",
-      "Males 04-08": "int64",
-      "Males 09-13": "int64",
-      "Males 14-18": "int64",
-      "Males 19-30": "int64",
-      "Males 31-50": "int64",
-      "Males 51-99": "int64",
-      "log HSize": "float64"
+      "date": "datetime64[us]"
     },
     "index_names": [
-      "i"
-    ],
-    "shape": [
-      3122,
-      15
-    ]
-  },
-  "2005-06/_/other_features.parquet": {
-    "columns": [
-      "Rural"
-    ],
-    "content_hash": "191bc5afe43f6e9adee3e6a79dc054e88ff998d58dbe30ed82d296a25ffd8e5e",
-    "dtypes": {
-      "Rural": "int64"
-    },
-    "index_names": [
-      "i",
-      "t",
-      "m"
+      "j",
+      "t"
     ],
     "shape": [
       3123,
@@ -169,9 +102,9 @@
       "AffectedIncome": "float64",
       "AffectedProduction": "float64",
       "Duration": "float64",
-      "HowCoped0": "string",
-      "HowCoped1": "string",
-      "HowCoped2": "string",
+      "HowCoped0": "str",
+      "HowCoped1": "str",
+      "HowCoped2": "str",
       "Onset": "float64",
       "Year": "float64"
     },
@@ -229,106 +162,39 @@
   },
   "2009-10/_/food_acquired.parquet": {
     "columns": [
-      "Kgs",
-      "farmgate",
-      "market",
-      "quantity_away",
-      "quantity_home",
-      "quantity_inkind",
-      "quantity_own",
-      "unitvalue_away",
-      "unitvalue_home",
-      "unitvalue_inkind",
-      "unitvalue_own",
-      "value_away",
-      "value_home",
-      "value_inkind",
-      "value_own"
+      "Expenditure",
+      "Price",
+      "Quantity"
     ],
-    "content_hash": "26c887cd928d35eb347ed3cb3b3a6beaf9005c5beccca1539db7bbefb7694140",
+    "content_hash": "16acd49786fbfb7bf6b4c395bb9d027fd92272e5682e2ddc358c9b1d571d5465",
     "dtypes": {
-      "Kgs": "float64",
-      "farmgate": "float64",
-      "market": "float64",
-      "quantity_away": "float64",
-      "quantity_home": "float64",
-      "quantity_inkind": "float64",
-      "quantity_own": "float64",
-      "unitvalue_away": "float64",
-      "unitvalue_home": "float64",
-      "unitvalue_inkind": "float64",
-      "unitvalue_own": "float64",
-      "value_away": "float64",
-      "value_home": "float64",
-      "value_inkind": "float64",
-      "value_own": "float64"
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
     },
     "index_names": [
+      "t",
       "i",
       "j",
-      "u"
+      "u",
+      "s"
     ],
     "shape": [
-      37879,
-      15
+      38107,
+      3
     ]
   },
-  "2009-10/_/household_characteristics.parquet": {
+  "2009-10/_/interview_date.parquet": {
     "columns": [
-      "Females 00-03",
-      "Females 04-08",
-      "Females 09-13",
-      "Females 14-18",
-      "Females 19-30",
-      "Females 31-50",
-      "Females 51-99",
-      "Males 00-03",
-      "Males 04-08",
-      "Males 09-13",
-      "Males 14-18",
-      "Males 19-30",
-      "Males 31-50",
-      "Males 51-99",
-      "log HSize"
+      "date"
     ],
-    "content_hash": "46cd86f86d4e249c130a469336c11641bfe906383173845751e2cb63d975d227",
+    "content_hash": "129f3f1d69eb639afac4e94fe36490e8705af5a824a48c42a32c69f6a1ef8061",
     "dtypes": {
-      "Females 00-03": "int64",
-      "Females 04-08": "int64",
-      "Females 09-13": "int64",
-      "Females 14-18": "int64",
-      "Females 19-30": "int64",
-      "Females 31-50": "int64",
-      "Females 51-99": "int64",
-      "Males 00-03": "int64",
-      "Males 04-08": "int64",
-      "Males 09-13": "int64",
-      "Males 14-18": "int64",
-      "Males 19-30": "int64",
-      "Males 31-50": "int64",
-      "Males 51-99": "int64",
-      "log HSize": "float64"
+      "date": "datetime64[us]"
     },
     "index_names": [
-      "i"
-    ],
-    "shape": [
-      2974,
-      15
-    ]
-  },
-  "2009-10/_/other_features.parquet": {
-    "columns": [
-      "Rural"
-    ],
-    "content_hash": "c5c22f492ef62f4f8ccb0432d61c431f48488ab5d44633fe52207d26da28610c",
-    "dtypes": {
-      "Rural": "int64"
-    },
-    "index_names": [
-      "i",
-      "t",
-      "m"
+      "j",
+      "t"
     ],
     "shape": [
       2975,
@@ -415,106 +281,39 @@
   },
   "2010-11/_/food_acquired.parquet": {
     "columns": [
-      "Kgs",
-      "farmgate",
-      "market",
-      "quantity_away",
-      "quantity_home",
-      "quantity_inkind",
-      "quantity_own",
-      "unitvalue_away",
-      "unitvalue_home",
-      "unitvalue_inkind",
-      "unitvalue_own",
-      "value_away",
-      "value_home",
-      "value_inkind",
-      "value_own"
+      "Expenditure",
+      "Price",
+      "Quantity"
     ],
-    "content_hash": "3a2acc45fe08dd4923267a14c7e56fb0a3c9f0e8551e523fe599d4afec341a33",
+    "content_hash": "386bf361098261db6eb40499ad7caf8a63e93801e40460f61272c337c2524e6d",
     "dtypes": {
-      "Kgs": "float64",
-      "farmgate": "float64",
-      "market": "float64",
-      "quantity_away": "float64",
-      "quantity_home": "float64",
-      "quantity_inkind": "float64",
-      "quantity_own": "float64",
-      "unitvalue_away": "float64",
-      "unitvalue_home": "float64",
-      "unitvalue_inkind": "float64",
-      "unitvalue_own": "float64",
-      "value_away": "float64",
-      "value_home": "float64",
-      "value_inkind": "float64",
-      "value_own": "float64"
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
     },
     "index_names": [
+      "t",
       "i",
       "j",
-      "u"
+      "u",
+      "s"
     ],
     "shape": [
-      35232,
-      15
+      35489,
+      3
     ]
   },
-  "2010-11/_/household_characteristics.parquet": {
+  "2010-11/_/interview_date.parquet": {
     "columns": [
-      "Females 00-03",
-      "Females 04-08",
-      "Females 09-13",
-      "Females 14-18",
-      "Females 19-30",
-      "Females 31-50",
-      "Females 51-99",
-      "Males 00-03",
-      "Males 04-08",
-      "Males 09-13",
-      "Males 14-18",
-      "Males 19-30",
-      "Males 31-50",
-      "Males 51-99",
-      "log HSize"
+      "date"
     ],
-    "content_hash": "1d9d51354dfdd6aa8824c3bc42613b1d83e456b7ffe803303b9ed654dfe1d271",
+    "content_hash": "9de8b45ca42ecbda0d5ca7979407ae03c7942d966bd4c6a54bcc38a569af03ca",
     "dtypes": {
-      "Females 00-03": "int64",
-      "Females 04-08": "int64",
-      "Females 09-13": "int64",
-      "Females 14-18": "int64",
-      "Females 19-30": "int64",
-      "Females 31-50": "int64",
-      "Females 51-99": "int64",
-      "Males 00-03": "int64",
-      "Males 04-08": "int64",
-      "Males 09-13": "int64",
-      "Males 14-18": "int64",
-      "Males 19-30": "int64",
-      "Males 31-50": "int64",
-      "Males 51-99": "int64",
-      "log HSize": "float64"
+      "date": "datetime64[us]"
     },
     "index_names": [
-      "i"
-    ],
-    "shape": [
-      2685,
-      15
-    ]
-  },
-  "2010-11/_/other_features.parquet": {
-    "columns": [
-      "Rural"
-    ],
-    "content_hash": "d1cb1e1be699f95dba3319a1771f0328a682bd58e517e8d2885ea1f00132e8b6",
-    "dtypes": {
-      "Rural": "int64"
-    },
-    "index_names": [
-      "i",
-      "t",
-      "m"
+      "j",
+      "t"
     ],
     "shape": [
       2716,
@@ -601,106 +400,39 @@
   },
   "2011-12/_/food_acquired.parquet": {
     "columns": [
-      "Kgs",
-      "farmgate",
-      "market",
-      "quantity_away",
-      "quantity_home",
-      "quantity_inkind",
-      "quantity_own",
-      "unitvalue_away",
-      "unitvalue_home",
-      "unitvalue_inkind",
-      "unitvalue_own",
-      "value_away",
-      "value_home",
-      "value_inkind",
-      "value_own"
+      "Expenditure",
+      "Price",
+      "Quantity"
     ],
-    "content_hash": "4d255f9216267677d0e7d92529527964385d035d0e3e8ba0bf893f0729bbf737",
+    "content_hash": "df46fc328b79aa8011ee05c3243856a3d4a79ea522611880f33b1216f4331b3d",
     "dtypes": {
-      "Kgs": "float64",
-      "farmgate": "float64",
-      "market": "float64",
-      "quantity_away": "float64",
-      "quantity_home": "float64",
-      "quantity_inkind": "float64",
-      "quantity_own": "float64",
-      "unitvalue_away": "float64",
-      "unitvalue_home": "float64",
-      "unitvalue_inkind": "float64",
-      "unitvalue_own": "float64",
-      "value_away": "float64",
-      "value_home": "float64",
-      "value_inkind": "float64",
-      "value_own": "float64"
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
     },
     "index_names": [
+      "t",
       "i",
       "j",
-      "u"
+      "u",
+      "s"
     ],
     "shape": [
-      38741,
-      15
+      38983,
+      3
     ]
   },
-  "2011-12/_/household_characteristics.parquet": {
+  "2011-12/_/interview_date.parquet": {
     "columns": [
-      "Females 00-03",
-      "Females 04-08",
-      "Females 09-13",
-      "Females 14-18",
-      "Females 19-30",
-      "Females 31-50",
-      "Females 51-99",
-      "Males 00-03",
-      "Males 04-08",
-      "Males 09-13",
-      "Males 14-18",
-      "Males 19-30",
-      "Males 31-50",
-      "Males 51-99",
-      "log HSize"
+      "date"
     ],
-    "content_hash": "183adb5bda2486fbf0dba5628af16c366c9cd0711367add1278df5ee9c24f723",
+    "content_hash": "0d8b25cc6e9fe530c02cf69a42a8df409a1c3a352a07a3ebbc6379b2c065b722",
     "dtypes": {
-      "Females 00-03": "int64",
-      "Females 04-08": "int64",
-      "Females 09-13": "int64",
-      "Females 14-18": "int64",
-      "Females 19-30": "int64",
-      "Females 31-50": "int64",
-      "Females 51-99": "int64",
-      "Males 00-03": "int64",
-      "Males 04-08": "int64",
-      "Males 09-13": "int64",
-      "Males 14-18": "int64",
-      "Males 19-30": "int64",
-      "Males 31-50": "int64",
-      "Males 51-99": "int64",
-      "log HSize": "float64"
+      "date": "datetime64[us]"
     },
     "index_names": [
-      "i"
-    ],
-    "shape": [
-      2843,
-      15
-    ]
-  },
-  "2011-12/_/other_features.parquet": {
-    "columns": [
-      "Rural"
-    ],
-    "content_hash": "f1ec526048f633ff00121ed53dc53f065a862a7ede10e8d324b04963ecce13b5",
-    "dtypes": {
-      "Rural": "int64"
-    },
-    "index_names": [
-      "i",
-      "t",
-      "m"
+      "j",
+      "t"
     ],
     "shape": [
       2850,
@@ -787,106 +519,39 @@
   },
   "2013-14/_/food_acquired.parquet": {
     "columns": [
-      "Kgs",
-      "farmgate",
-      "market",
-      "quantity_away",
-      "quantity_home",
-      "quantity_inkind",
-      "quantity_own",
-      "unitvalue_away",
-      "unitvalue_home",
-      "unitvalue_inkind",
-      "unitvalue_own",
-      "value_away",
-      "value_home",
-      "value_inkind",
-      "value_own"
+      "Expenditure",
+      "Price",
+      "Quantity"
     ],
-    "content_hash": "f4647ea8dd5f3c981d8175440a3ccecfae8c22c8c07912fd5b9039018c229337",
+    "content_hash": "8804bd91911ac217cbcc1743cd10919cba00dd459978d418b0cbd057bc6c4d16",
     "dtypes": {
-      "Kgs": "float64",
-      "farmgate": "float64",
-      "market": "float64",
-      "quantity_away": "float64",
-      "quantity_home": "float64",
-      "quantity_inkind": "float64",
-      "quantity_own": "float64",
-      "unitvalue_away": "float64",
-      "unitvalue_home": "float64",
-      "unitvalue_inkind": "float64",
-      "unitvalue_own": "float64",
-      "value_away": "float64",
-      "value_home": "float64",
-      "value_inkind": "float64",
-      "value_own": "float64"
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
     },
     "index_names": [
+      "t",
       "i",
       "j",
-      "u"
+      "u",
+      "s"
     ],
     "shape": [
-      50396,
-      15
+      50703,
+      3
     ]
   },
-  "2013-14/_/household_characteristics.parquet": {
+  "2013-14/_/interview_date.parquet": {
     "columns": [
-      "Females 00-03",
-      "Females 04-08",
-      "Females 09-13",
-      "Females 14-18",
-      "Females 19-30",
-      "Females 31-50",
-      "Females 51-99",
-      "Males 00-03",
-      "Males 04-08",
-      "Males 09-13",
-      "Males 14-18",
-      "Males 19-30",
-      "Males 31-50",
-      "Males 51-99",
-      "log HSize"
+      "date"
     ],
-    "content_hash": "8603d3523d74c68a41a04b345ee5d008c90f6624719fffcd0dba3b61ee4cdb0f",
+    "content_hash": "d211e3d4ce558199f69d2202c8da8e38880141a361ae84a74a79cb900488fc53",
     "dtypes": {
-      "Females 00-03": "int64",
-      "Females 04-08": "int64",
-      "Females 09-13": "int64",
-      "Females 14-18": "int64",
-      "Females 19-30": "int64",
-      "Females 31-50": "int64",
-      "Females 51-99": "int64",
-      "Males 00-03": "int64",
-      "Males 04-08": "int64",
-      "Males 09-13": "int64",
-      "Males 14-18": "int64",
-      "Males 19-30": "int64",
-      "Males 31-50": "int64",
-      "Males 51-99": "int64",
-      "log HSize": "float64"
+      "date": "datetime64[us]"
     },
     "index_names": [
-      "i"
-    ],
-    "shape": [
-      3117,
-      15
-    ]
-  },
-  "2013-14/_/other_features.parquet": {
-    "columns": [
-      "Rural"
-    ],
-    "content_hash": "bae800d5d942c7257b06aeb5959e374b03f95bb55facc65442a04f000ae6ccd5",
-    "dtypes": {
-      "Rural": "int64"
-    },
-    "index_names": [
-      "i",
-      "t",
-      "m"
+      "j",
+      "t"
     ],
     "shape": [
       3119,
@@ -973,106 +638,39 @@
   },
   "2015-16/_/food_acquired.parquet": {
     "columns": [
-      "Kgs",
-      "farmgate",
-      "market",
-      "quantity_away",
-      "quantity_home",
-      "quantity_inkind",
-      "quantity_own",
-      "unitvalue_away",
-      "unitvalue_home",
-      "unitvalue_inkind",
-      "unitvalue_own",
-      "value_away",
-      "value_home",
-      "value_inkind",
-      "value_own"
+      "Expenditure",
+      "Price",
+      "Quantity"
     ],
-    "content_hash": "c6e4c14f9515ebcf9378c40e1441f25d4abe57da7aa5111d3ec35b90df437bdf",
+    "content_hash": "84f188882ce086017cd19d087f12f554f99a532cbf7fc9a7a565c99da4021209",
     "dtypes": {
-      "Kgs": "float64",
-      "farmgate": "float64",
-      "market": "float64",
-      "quantity_away": "float64",
-      "quantity_home": "float64",
-      "quantity_inkind": "float64",
-      "quantity_own": "float64",
-      "unitvalue_away": "float64",
-      "unitvalue_home": "float64",
-      "unitvalue_inkind": "float64",
-      "unitvalue_own": "float64",
-      "value_away": "float64",
-      "value_home": "float64",
-      "value_inkind": "float64",
-      "value_own": "float64"
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
     },
     "index_names": [
+      "t",
       "i",
       "j",
-      "u"
+      "u",
+      "s"
     ],
     "shape": [
-      49751,
-      15
+      50108,
+      3
     ]
   },
-  "2015-16/_/household_characteristics.parquet": {
+  "2015-16/_/interview_date.parquet": {
     "columns": [
-      "Females 00-03",
-      "Females 04-08",
-      "Females 09-13",
-      "Females 14-18",
-      "Females 19-30",
-      "Females 31-50",
-      "Females 51-99",
-      "Males 00-03",
-      "Males 04-08",
-      "Males 09-13",
-      "Males 14-18",
-      "Males 19-30",
-      "Males 31-50",
-      "Males 51-99",
-      "log HSize"
+      "date"
     ],
-    "content_hash": "17541f3620495f7a1e017f189333e761e1705e7d5075b13e0ce63de1d959d915",
+    "content_hash": "5b548b5731f30008220185de11bf6203ee9f64df5cd93dc9875126a993c694e4",
     "dtypes": {
-      "Females 00-03": "int64",
-      "Females 04-08": "int64",
-      "Females 09-13": "int64",
-      "Females 14-18": "int64",
-      "Females 19-30": "int64",
-      "Females 31-50": "int64",
-      "Females 51-99": "int64",
-      "Males 00-03": "int64",
-      "Males 04-08": "int64",
-      "Males 09-13": "int64",
-      "Males 14-18": "int64",
-      "Males 19-30": "int64",
-      "Males 31-50": "int64",
-      "Males 51-99": "int64",
-      "log HSize": "float64"
+      "date": "datetime64[us]"
     },
     "index_names": [
-      "i"
-    ],
-    "shape": [
-      3305,
-      15
-    ]
-  },
-  "2015-16/_/other_features.parquet": {
-    "columns": [
-      "Rural"
-    ],
-    "content_hash": "5d70a9bd504ec61028231254c99090cc1b3d4cd4d27e71e2ba364a60326db853",
-    "dtypes": {
-      "Rural": "int64"
-    },
-    "index_names": [
-      "i",
-      "t",
-      "m"
+      "j",
+      "t"
     ],
     "shape": [
       3305,
@@ -1159,112 +757,39 @@
   },
   "2018-19/_/food_acquired.parquet": {
     "columns": [
-      "Kgs",
-      "farmgate",
-      "market",
-      "market_away",
-      "market_home",
-      "market_own",
-      "quantity_away",
-      "quantity_home",
-      "quantity_inkind",
-      "quantity_own",
-      "unitvalue_away",
-      "unitvalue_home",
-      "unitvalue_inkind",
-      "unitvalue_own",
-      "value_away",
-      "value_home",
-      "value_inkind",
-      "value_own"
+      "Expenditure",
+      "Price",
+      "Quantity"
     ],
-    "content_hash": "a28f0638f8dceeb75dc983e9c0edc9f1c79c92d901aee012e59bce92df2ff500",
+    "content_hash": "2a25418040c9e1977acfe6959c169cdc51835c9e06b3a87367c3c473006b1ef5",
     "dtypes": {
-      "Kgs": "float64",
-      "farmgate": "float64",
-      "market": "float64",
-      "market_away": "float64",
-      "market_home": "float64",
-      "market_own": "float64",
-      "quantity_away": "float64",
-      "quantity_home": "float64",
-      "quantity_inkind": "float64",
-      "quantity_own": "float64",
-      "unitvalue_away": "float64",
-      "unitvalue_home": "float64",
-      "unitvalue_inkind": "float64",
-      "unitvalue_own": "float64",
-      "value_away": "float64",
-      "value_home": "float64",
-      "value_inkind": "float64",
-      "value_own": "float64"
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
     },
     "index_names": [
+      "t",
       "i",
       "j",
-      "u"
+      "u",
+      "s"
     ],
     "shape": [
-      52783,
-      18
+      53288,
+      3
     ]
   },
-  "2018-19/_/household_characteristics.parquet": {
+  "2018-19/_/interview_date.parquet": {
     "columns": [
-      "Females 00-03",
-      "Females 04-08",
-      "Females 09-13",
-      "Females 14-18",
-      "Females 19-30",
-      "Females 31-50",
-      "Females 51-99",
-      "Males 00-03",
-      "Males 04-08",
-      "Males 09-13",
-      "Males 14-18",
-      "Males 19-30",
-      "Males 31-50",
-      "Males 51-99",
-      "log HSize"
+      "date"
     ],
-    "content_hash": "16aa71ba5ccaacb0a5c450e00372623b570639f1527abec0f8751637b315d448",
+    "content_hash": "3253f8884dc0560b05679ee0cd022026e83205b0d1fed74e748eb239d204c81b",
     "dtypes": {
-      "Females 00-03": "int64",
-      "Females 04-08": "int64",
-      "Females 09-13": "int64",
-      "Females 14-18": "int64",
-      "Females 19-30": "int64",
-      "Females 31-50": "int64",
-      "Females 51-99": "int64",
-      "Males 00-03": "int64",
-      "Males 04-08": "int64",
-      "Males 09-13": "int64",
-      "Males 14-18": "int64",
-      "Males 19-30": "int64",
-      "Males 31-50": "int64",
-      "Males 51-99": "int64",
-      "log HSize": "float64"
+      "date": "datetime64[us]"
     },
     "index_names": [
-      "i"
-    ],
-    "shape": [
-      3241,
-      15
-    ]
-  },
-  "2018-19/_/other_features.parquet": {
-    "columns": [
-      "Rural"
-    ],
-    "content_hash": "3785f62919646c919e9e50caf8e5cfa62e6d221b8450d385e1673f94fa03aa7b",
-    "dtypes": {
-      "Rural": "int64"
-    },
-    "index_names": [
-      "i",
-      "t",
-      "m"
+      "j",
+      "t"
     ],
     "shape": [
       3176,
@@ -1351,112 +876,39 @@
   },
   "2019-20/_/food_acquired.parquet": {
     "columns": [
-      "Kgs",
-      "farmgate",
-      "market",
-      "market_away",
-      "market_home",
-      "market_own",
-      "quantity_away",
-      "quantity_home",
-      "quantity_inkind",
-      "quantity_own",
-      "unitvalue_away",
-      "unitvalue_home",
-      "unitvalue_inkind",
-      "unitvalue_own",
-      "value_away",
-      "value_home",
-      "value_inkind",
-      "value_own"
+      "Expenditure",
+      "Price",
+      "Quantity"
     ],
-    "content_hash": "cbb7ae584eea9419d86abe89c63ea40b12ee6a79188bdbea123d46c682a287c0",
+    "content_hash": "fed48ae5c9c056528f987d392d07c1189311729d285de717c1eeeccee5419af7",
     "dtypes": {
-      "Kgs": "float64",
-      "farmgate": "float64",
-      "market": "float64",
-      "market_away": "float64",
-      "market_home": "float64",
-      "market_own": "float64",
-      "quantity_away": "float64",
-      "quantity_home": "float64",
-      "quantity_inkind": "float64",
-      "quantity_own": "float64",
-      "unitvalue_away": "float64",
-      "unitvalue_home": "float64",
-      "unitvalue_inkind": "float64",
-      "unitvalue_own": "float64",
-      "value_away": "float64",
-      "value_home": "float64",
-      "value_inkind": "float64",
-      "value_own": "float64"
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
     },
     "index_names": [
+      "t",
       "i",
       "j",
-      "u"
+      "u",
+      "s"
     ],
     "shape": [
-      47740,
-      18
+      48144,
+      3
     ]
   },
-  "2019-20/_/household_characteristics.parquet": {
+  "2019-20/_/interview_date.parquet": {
     "columns": [
-      "Females 00-03",
-      "Females 04-08",
-      "Females 09-13",
-      "Females 14-18",
-      "Females 19-30",
-      "Females 31-50",
-      "Females 51-99",
-      "Males 00-03",
-      "Males 04-08",
-      "Males 09-13",
-      "Males 14-18",
-      "Males 19-30",
-      "Males 31-50",
-      "Males 51-99",
-      "log HSize"
+      "date"
     ],
-    "content_hash": "0144d435b1988b54d64df8f66da33f557d48d112ada2df52a5599ea4a50c9bd5",
+    "content_hash": "e4378281a5f351bef2fe154ee67e00f8c57fdf848aedcee16ade6d261a317907",
     "dtypes": {
-      "Females 00-03": "int64",
-      "Females 04-08": "int64",
-      "Females 09-13": "int64",
-      "Females 14-18": "int64",
-      "Females 19-30": "int64",
-      "Females 31-50": "int64",
-      "Females 51-99": "int64",
-      "Males 00-03": "int64",
-      "Males 04-08": "int64",
-      "Males 09-13": "int64",
-      "Males 14-18": "int64",
-      "Males 19-30": "int64",
-      "Males 31-50": "int64",
-      "Males 51-99": "int64",
-      "log HSize": "float64"
+      "date": "datetime64[us]"
     },
     "index_names": [
-      "i"
-    ],
-    "shape": [
-      3076,
-      15
-    ]
-  },
-  "2019-20/_/other_features.parquet": {
-    "columns": [
-      "Rural"
-    ],
-    "content_hash": "571e549cac272b79718874c6befbb5f8611f845c70dc46e3ac16050db115ba5e",
-    "dtypes": {
-      "Rural": "int64"
-    },
-    "index_names": [
-      "i",
-      "t",
-      "m"
+      "j",
+      "t"
     ],
     "shape": [
       3098,
@@ -1499,22 +951,29 @@
       10
     ]
   },
-  "var/assets.parquet": {
+  "var/cluster_features.parquet": {
     "columns": [
-      "Value"
+      "District",
+      "Latitude",
+      "Longitude",
+      "Region",
+      "Rural"
     ],
-    "content_hash": "2c0055cfe17c1908f10e24a55c6a7b498ce9773a450647accbe8431cd1021d7f",
+    "content_hash": "1d6fcaba9606ce0d00ee340a0cb141475e2a05d67db9e654692bbfdfb852a982",
     "dtypes": {
-      "Value": "float64"
+      "District": "str",
+      "Latitude": "float32",
+      "Longitude": "float32",
+      "Region": "string",
+      "Rural": "string"
     },
     "index_names": [
       "t",
-      "i",
-      "j"
+      "v"
     ],
     "shape": [
-      116808,
-      1
+      4409,
+      5
     ]
   },
   "var/earnings.parquet": {
@@ -1805,190 +1264,39 @@
   },
   "var/food_acquired.parquet": {
     "columns": [
-      "Kgs",
-      "farmgate",
-      "market",
-      "market_away",
-      "market_home",
-      "market_own",
-      "quantity_away",
-      "quantity_home",
-      "quantity_inkind",
-      "quantity_own",
-      "unitvalue_away",
-      "unitvalue_home",
-      "unitvalue_inkind",
-      "unitvalue_own",
-      "value_away",
-      "value_home",
-      "value_inkind",
-      "value_own"
+      "Expenditure",
+      "Price",
+      "Quantity"
     ],
-    "content_hash": "0ad436fad253bb47c26b2a798884684d4138ecf8815502c971756befb1e9f121",
+    "content_hash": "bc8eaa2122db2df483ff989eae0841dc9bef095cc9d559bd95e6ddf365abfdc7",
     "dtypes": {
-      "Kgs": "float64",
-      "farmgate": "float64",
-      "market": "float64",
-      "market_away": "float64",
-      "market_home": "float64",
-      "market_own": "float64",
-      "quantity_away": "float64",
-      "quantity_home": "float64",
-      "quantity_inkind": "float64",
-      "quantity_own": "float64",
-      "unitvalue_away": "float64",
-      "unitvalue_home": "float64",
-      "unitvalue_inkind": "float64",
-      "unitvalue_own": "float64",
-      "value_away": "float64",
-      "value_home": "float64",
-      "value_inkind": "float64",
-      "value_own": "float64"
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
     },
     "index_names": [
-      "i",
       "t",
+      "i",
       "j",
-      "u"
+      "u",
+      "s"
     ],
     "shape": [
-      352913,
-      18
-    ]
-  },
-  "var/food_expenditures.parquet": {
-    "columns": [
-      "Expenditure"
-    ],
-    "content_hash": "7190c97259d34abb4f627d957cbde62a24908dcbabfae8cc62bc6fb0e6975953",
-    "dtypes": {
-      "Expenditure": "float64"
-    },
-    "index_names": [
-      "i",
-      "t",
-      "j"
-    ],
-    "shape": [
-      352772,
-      1
-    ]
-  },
-  "var/food_prices.parquet": {
-    "columns": [
-      "farmgate",
-      "market",
-      "market_away",
-      "market_home",
-      "market_own",
-      "unitvalue_away",
-      "unitvalue_home",
-      "unitvalue_inkind",
-      "unitvalue_own"
-    ],
-    "content_hash": "1a5e34d39c8f0b763f66c0599bc1ccc538aa6407f2c59318a38359a57d82d612",
-    "dtypes": {
-      "farmgate": "float64",
-      "market": "float64",
-      "market_away": "float64",
-      "market_home": "float64",
-      "market_own": "float64",
-      "unitvalue_away": "float64",
-      "unitvalue_home": "float64",
-      "unitvalue_inkind": "float64",
-      "unitvalue_own": "float64"
-    },
-    "index_names": [
-      "i",
-      "t",
-      "j",
-      "u"
-    ],
-    "shape": [
-      352913,
-      9
-    ]
-  },
-  "var/food_quantities.parquet": {
-    "columns": [
-      "quantity_away",
-      "quantity_home",
-      "quantity_inkind",
-      "quantity_own"
-    ],
-    "content_hash": "0ebbd5c2eeed8ba02bc688a694339cec282f12b70362476ac0b0181f56a5af01",
-    "dtypes": {
-      "quantity_away": "float64",
-      "quantity_home": "float64",
-      "quantity_inkind": "float64",
-      "quantity_own": "float64"
-    },
-    "index_names": [
-      "i",
-      "t",
-      "j",
-      "u"
-    ],
-    "shape": [
-      352913,
-      4
-    ]
-  },
-  "var/household_characteristics.parquet": {
-    "columns": [
-      "Females 00-03",
-      "Females 04-08",
-      "Females 09-13",
-      "Females 14-18",
-      "Females 19-30",
-      "Females 31-50",
-      "Females 51-99",
-      "Males 00-03",
-      "Males 04-08",
-      "Males 09-13",
-      "Males 14-18",
-      "Males 19-30",
-      "Males 31-50",
-      "Males 51-99",
-      "log HSize"
-    ],
-    "content_hash": "e4e608dde8a10a7489442afe9894e106c3fc6429b5c9f371034d7c60254f1e25",
-    "dtypes": {
-      "Females 00-03": "float64",
-      "Females 04-08": "float64",
-      "Females 09-13": "float64",
-      "Females 14-18": "float64",
-      "Females 19-30": "float64",
-      "Females 31-50": "float64",
-      "Females 51-99": "float64",
-      "Males 00-03": "float64",
-      "Males 04-08": "float64",
-      "Males 09-13": "float64",
-      "Males 14-18": "float64",
-      "Males 19-30": "float64",
-      "Males 31-50": "float64",
-      "Males 51-99": "float64",
-      "log HSize": "float64"
-    },
-    "index_names": [
-      "i",
-      "t",
-      "m"
-    ],
-    "shape": [
-      24363,
-      15
+      355571,
+      3
     ]
   },
   "var/household_roster.parquet": {
     "columns": [
       "Age",
+      "MonthsSpent",
       "Relationship",
       "Sex"
     ],
-    "content_hash": "1d2cb9b61cda4641ea0879384c910ca00caccce48f3390c8fafa1772fa653ca4",
+    "content_hash": "a9e52fccadbea0d565b889e3f95c1b69c6a86e86ee10a23a9b8af2eea2ad9495",
     "dtypes": {
       "Age": "float64",
+      "MonthsSpent": "float64",
       "Relationship": "string",
       "Sex": "string"
     },
@@ -1999,7 +1307,7 @@
     ],
     "shape": [
       147612,
-      3
+      4
     ]
   },
   "var/housing.parquet": {
@@ -2009,8 +1317,8 @@
     ],
     "content_hash": "aa027a50167a6f2c6570c2f73d4dcd78a2a2c95f6b0f6fecc366455dce14f815",
     "dtypes": {
-      "Floor": "object",
-      "Roof": "object"
+      "Floor": "string",
+      "Roof": "string"
     },
     "index_names": [
       "t",
@@ -2055,144 +1363,6 @@
       1
     ]
   },
-  "var/nonfood_expenditures.parquet": {
-    "columns": [
-      "Air Time (Fixed Phones)",
-      "Air Time (Mobile Phones)",
-      "Air Time/Services Fee (Owned Fixed/Mobile Phones)",
-      "Air Time/Services Fee (Phones not Owned)",
-      "Barber/Beauty Shops",
-      "Bathing Soap",
-      "Batteries (Dry cells)",
-      "Candles",
-      "Charcoal",
-      "Consultation Fees",
-      "Cosmetics (Body Lotion, Deodorant, etc)",
-      "Detergent",
-      "Diapers",
-      "Diesel",
-      "Dry Cleaning/Laundry",
-      "Electricity",
-      "Firewood",
-      "Fuels (Generators/Lawn Mower)",
-      "Handbags, Travel Bags, etc",
-      "Hospital/Clinic Charges",
-      "Hotels, Lodging, etc",
-      "Houseboys/girls, Shamba Boys, etc",
-      "Imputed Rent of Free House",
-      "Imputed Rent of Owned House",
-      "Internet Fees",
-      "Lubricants (Engine oil, Grease, Coolant, etc)",
-      "Maintenance/Repair (House)",
-      "Maintenance/Repair (Vehicles, Motorcycles, Bicycles)",
-      "Matches",
-      "Medicines",
-      "Mobile Money Charges",
-      "Newspapers/Magazines",
-      "Other Health/Medical Care",
-      "Other Non-Durable/Personal Goods",
-      "Other Rent/Fuel/Power",
-      "Other Transportation/Communication",
-      "Paraffin (Kerosene)",
-      "Petrol",
-      "Petrol, Diesel, etc",
-      "Postal Services",
-      "Public Transport (Bodaboda/Bicycle)",
-      "Public Transport (Bus)",
-      "Public Transport (Others)",
-      "Public Transport (Taxi/Minibus)",
-      "Refuse Collection",
-      "Rent of Rented House",
-      "Sanitary Towels",
-      "Security Fees (Guard, LC Defense, Community Security)",
-      "Sports, Theaters, etc",
-      "Stamps, Envelopes, etc",
-      "Toilet Paper",
-      "Tooth Brush",
-      "Tooth Paste",
-      "Total Health Expenditure",
-      "Toys, Games, etc",
-      "Traditional Doctors Fees/Medicines",
-      "Tyres, Tubes, Spares, Brake Pads, etc",
-      "Washing Soap",
-      "Water (NWSC)",
-      "Water (Other Sources)",
-      "Water (Utility)"
-    ],
-    "content_hash": "afad9f8ddb18abe64b0d7e0e3836d6e0f58bfd7a60477027d893324f074bc732",
-    "dtypes": {
-      "Air Time (Fixed Phones)": "float64",
-      "Air Time (Mobile Phones)": "float64",
-      "Air Time/Services Fee (Owned Fixed/Mobile Phones)": "float64",
-      "Air Time/Services Fee (Phones not Owned)": "float64",
-      "Barber/Beauty Shops": "float64",
-      "Bathing Soap": "float64",
-      "Batteries (Dry cells)": "float64",
-      "Candles": "float64",
-      "Charcoal": "float64",
-      "Consultation Fees": "float64",
-      "Cosmetics (Body Lotion, Deodorant, etc)": "float64",
-      "Detergent": "float64",
-      "Diapers": "float64",
-      "Diesel": "float64",
-      "Dry Cleaning/Laundry": "float64",
-      "Electricity": "float64",
-      "Firewood": "float64",
-      "Fuels (Generators/Lawn Mower)": "float64",
-      "Handbags, Travel Bags, etc": "float64",
-      "Hospital/Clinic Charges": "float64",
-      "Hotels, Lodging, etc": "float64",
-      "Houseboys/girls, Shamba Boys, etc": "float64",
-      "Imputed Rent of Free House": "float64",
-      "Imputed Rent of Owned House": "float64",
-      "Internet Fees": "float64",
-      "Lubricants (Engine oil, Grease, Coolant, etc)": "float64",
-      "Maintenance/Repair (House)": "float64",
-      "Maintenance/Repair (Vehicles, Motorcycles, Bicycles)": "float64",
-      "Matches": "float64",
-      "Medicines": "float64",
-      "Mobile Money Charges": "float64",
-      "Newspapers/Magazines": "float64",
-      "Other Health/Medical Care": "float64",
-      "Other Non-Durable/Personal Goods": "float64",
-      "Other Rent/Fuel/Power": "float64",
-      "Other Transportation/Communication": "float64",
-      "Paraffin (Kerosene)": "float64",
-      "Petrol": "float64",
-      "Petrol, Diesel, etc": "float64",
-      "Postal Services": "float64",
-      "Public Transport (Bodaboda/Bicycle)": "float64",
-      "Public Transport (Bus)": "float64",
-      "Public Transport (Others)": "float64",
-      "Public Transport (Taxi/Minibus)": "float64",
-      "Refuse Collection": "float64",
-      "Rent of Rented House": "float64",
-      "Sanitary Towels": "float64",
-      "Security Fees (Guard, LC Defense, Community Security)": "float64",
-      "Sports, Theaters, etc": "float64",
-      "Stamps, Envelopes, etc": "float64",
-      "Toilet Paper": "float64",
-      "Tooth Brush": "float64",
-      "Tooth Paste": "float64",
-      "Total Health Expenditure": "float64",
-      "Toys, Games, etc": "float64",
-      "Traditional Doctors Fees/Medicines": "float64",
-      "Tyres, Tubes, Spares, Brake Pads, etc": "float64",
-      "Washing Soap": "float64",
-      "Water (NWSC)": "float64",
-      "Water (Other Sources)": "float64",
-      "Water (Utility)": "float64"
-    },
-    "index_names": [
-      "i",
-      "t",
-      "m"
-    ],
-    "shape": [
-      23991,
-      61
-    ]
-  },
   "var/nutrition.parquet": {
     "columns": [
       "Calcium",
@@ -2211,7 +1381,7 @@
       "Vitamin C",
       "Zinc"
     ],
-    "content_hash": "4f0f3b18a132b59e7c0e2e77f15bea924339e3325afb2522dd15f6ab6598c958",
+    "content_hash": "7575d77349c031fcd72ec80613eb62eea5ce9426dc72af47e7663b87fd4d10e8",
     "dtypes": {
       "Calcium": "float64",
       "Carbohydrate": "float64",
@@ -2234,26 +1404,8 @@
       "t"
     ],
     "shape": [
-      24169,
+      23801,
       15
-    ]
-  },
-  "var/other_features.parquet": {
-    "columns": [
-      "Rural"
-    ],
-    "content_hash": "345f9346d6ae2abf821b41830287f5e4dcd9b4f7b48370fbdefba9a5c25a5b90",
-    "dtypes": {
-      "Rural": "int64"
-    },
-    "index_names": [
-      "i",
-      "t",
-      "m"
-    ],
-    "shape": [
-      24362,
-      1
     ]
   },
   "var/people_last7days.parquet": {
@@ -2277,6 +1429,33 @@
     "shape": [
       15471,
       4
+    ]
+  },
+  "var/sample.parquet": {
+    "columns": [
+      "Region",
+      "Rural",
+      "panel_weight",
+      "strata",
+      "v",
+      "weight"
+    ],
+    "content_hash": "93759186a35f9ae1984933238adc5857ba7a4b953b6a1450786efccde84117e4",
+    "dtypes": {
+      "Region": "string",
+      "Rural": "string",
+      "panel_weight": "float64",
+      "strata": "string",
+      "v": "string",
+      "weight": "float64"
+    },
+    "index_names": [
+      "i",
+      "t"
+    ],
+    "shape": [
+      24362,
+      6
     ]
   },
   "var/shocks.parquet": {
