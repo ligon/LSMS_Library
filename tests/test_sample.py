@@ -421,11 +421,15 @@ class TestUganda2009MarketFallback:
         hh09 = fe.xs("2009-10", level="t").index.get_level_values("i").nunique()
         # Sample-level HH count in 2009-10 is 2 975 (full roster).  22 HH have
         # no food-expenditure records and drop out for that reason, not because
-        # of a NaN Region.  The pre-fallback coverage was ~2 240.
-        assert hh09 >= 2900, (
+        # of a NaN Region.  Another 24 are dropped by the MonthsSpent filter
+        # in roster_to_characteristics (departed-only HHs).  The remaining
+        # 2 929 is what the HH-level _add_market_index fallback delivers,
+        # confirmed by Slurm-rebuild on 2026-05-09 with both warm and cold
+        # caches.  The pre-fallback coverage was ~2 240.
+        assert hh09 >= 2929, (
             f"food_expenditures(market='Region') retained only {hh09} HH in "
-            f"2009-10 — expected ≥2900 after _add_market_index HH-level "
-            f"fallback"
+            f"2009-10 — expected ≥2929 after _add_market_index HH-level "
+            f"fallback (sample 2975 − 22 no-food − 24 departed-only)"
         )
 
     def test_household_characteristics_retains_hybrid_v_HH(self, hc):
