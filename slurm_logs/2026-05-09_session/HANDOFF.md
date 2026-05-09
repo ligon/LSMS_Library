@@ -93,10 +93,13 @@ with `roster.i = single string AND sample.i = list`. PRs #244 + #253 +
 - **#246 (D-2)**: Serbia/2007 design call after probe completes.
 - **#246 (B/C-2)**: residual Uganda atol=0 / 2009-10 hybrid-v retention
   (2869 vs ≥2900). Not addressed yet.
-- **#172**: 5/7 country-specific gaps closed (Guyana/Azerbaijan/S+M
-  via #244, Senegal/Togo via prior wave-build work). Remaining: framework
-  `UserWarning` recommendation, plus Armenia/Nepal declaration cleanup.
-  Decision: comment + re-scope (deferred).
+- **#172**: closed today. All 5 named "declared-but-never-built" and
+  Guyana resolved; Armenia/Nepal remain "no microdata in repo" per
+  CLAUDE.md (separate from framework). Status comment captured the
+  closure: <https://github.com/ligon/LSMS_Library/issues/172#issuecomment-4412572184>.
+- **#256**: new focused issue for the framework `UserWarning` ask
+  that #172 originally raised. Cites Tajikistan/1999 pre-#253 as the
+  worked example of why this matters.
 - Local **master** is one commit ahead of `origin/master`
   (`7c6d095c`, the orphaned docs commit; same content as `50817753` on
   development, retained as safety net via the `recovery/docs-rename-2026-05-09`
