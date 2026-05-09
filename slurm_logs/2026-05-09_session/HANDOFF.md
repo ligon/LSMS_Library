@@ -78,7 +78,9 @@ cherry-picked the docs commit. Pushed as `50817753`.
       (was `(0, 15)` pre-fix).
     - Cross-check: roster i ↔ sample i = 5557 / 5557 / 0 / 0 bijection.
     - Output: `verify_serbia_fix_34085520.out`.
-- **PR #255** opened against `development`.
+- **PR #255** opened against `development`. CI green (both `unit-tests`
+  SUCCESS in ~5 min). **Squash-merged** at 12:51:45 UTC as `f2459d30`.
+  Branch `origin/serbia-2007-compound-i` deleted with the merge.
 
 ## Universe scan post-#255
 
