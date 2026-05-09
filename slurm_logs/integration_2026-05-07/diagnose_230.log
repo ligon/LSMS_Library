@@ -1,0 +1,48 @@
+lsms_library: /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/__init__.py
+data_root: /global/home/users/ligon/.local/share/lsms_library
+
+
+======================================================================
+Guyana
+======================================================================
+  cache: /global/home/users/ligon/.local/share/lsms_library/Guyana/var/household_roster.parquet
+    shape=(150, 4), index=['t', 'i', 'pid'], cols=['Sex', 'Age', 'Marital', 'Relationship']
+    cache: v ABSENT
+  sample(): v in COLUMN, 0/1502 NaN, 130 unique non-NaN
+    sample shape=(1502, 3), index=['i', 't']
+  household_roster(): v in INDEX, 150/150 NaN, 0 unique non-NaN
+    roster shape=(150, 7), index=['i', 't', 'v', 'pid']
+    roster cols=['Sex', 'Age', 'Marital', 'Relationship', 'Generation', 'Distance', 'Affinity']
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/slurm_logs/integration_2026-05-07/diagnose_230.py:78: UserWarning: household_characteristics: dropped 150 roster rows with NaN in one of ['t', 'v', 'i'] (typically v) -- per-wave: {'1992': 150}.  These are usually movers / split-offs whose sample() row lacks a cluster code; see GH #197.
+  hc = c.household_characteristics()
+  household_characteristics(): shape=(0, 15), index=['t', 'v', 'i']
+
+======================================================================
+Azerbaijan
+======================================================================
+  cache: /global/home/users/ligon/.local/share/lsms_library/Azerbaijan/var/household_roster.parquet
+    shape=(319, 3), index=['t', 'i', 'pid'], cols=['Sex', 'Age', 'Relationship']
+    cache: v ABSENT
+  sample(): v in COLUMN, 0/2016 NaN, 168 unique non-NaN
+    sample shape=(2016, 2), index=['i', 't']
+  household_roster(): v in INDEX, 319/319 NaN, 0 unique non-NaN
+    roster shape=(319, 6), index=['i', 't', 'v', 'pid']
+    roster cols=['Sex', 'Age', 'Relationship', 'Generation', 'Distance', 'Affinity']
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/slurm_logs/integration_2026-05-07/diagnose_230.py:78: UserWarning: household_characteristics: dropped 319 roster rows with NaN in one of ['t', 'v', 'i'] (typically v) -- per-wave: {'1995': 319}.  These are usually movers / split-offs whose sample() row lacks a cluster code; see GH #197.
+  hc = c.household_characteristics()
+  household_characteristics(): shape=(0, 15), index=['t', 'v', 'i']
+
+======================================================================
+Serbia and Montenegro
+======================================================================
+  cache: /global/home/users/ligon/.local/share/lsms_library/Serbia and Montenegro/var/household_roster.parquet
+    shape=(201, 4), index=['t', 'i', 'pid'], cols=['Age', 'Relationship', 'Sex', 'MonthsSpent']
+    cache: v ABSENT
+  sample(): v in COLUMN, 0/8934 NaN, 618 unique non-NaN
+    sample shape=(8934, 5), index=['i', 't']
+  household_roster(): v in INDEX, 201/201 NaN, 0 unique non-NaN
+    roster shape=(201, 7), index=['i', 't', 'v', 'pid']
+    roster cols=['Age', 'Relationship', 'Sex', 'MonthsSpent', 'Generation', 'Distance', 'Affinity']
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/slurm_logs/integration_2026-05-07/diagnose_230.py:78: UserWarning: household_characteristics: dropped 201 roster rows with NaN in one of ['t', 'v', 'i'] (typically v) -- per-wave: {'2002': 102, '2003': 99}.  These are usually movers / split-offs whose sample() row lacks a cluster code; see GH #197.
+  hc = c.household_characteristics()
+  household_characteristics(): shape=(0, 15), index=['t', 'v', 'i']

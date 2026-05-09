@@ -1,0 +1,60 @@
+=== integration smokes started 2026-05-07 20:33:37 ===
+lsms_library: /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/__init__.py
+version: 0.6.1.post138.dev0+02074edb
+python: /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+
+
+======================================================================
+BEGIN: PR #228 Timor-Leste interview_date
+  expectation: non-empty (t,i)-indexed datetime DataFrame
+======================================================================
+
+  head(2):
+                    Int_t
+i      t    v            
+0011A1 2001 11 2001-09-26
+0011A2 2001 11 2001-09-24
+
+[PASS] PR #228 Timor-Leste interview_date (0.1s) :: shape=(1800, 1), dtypes_sample={'Int_t': dtype('<M8[us]')}
+
+======================================================================
+BEGIN: PR #230 Guyana household_characteristics
+  expectation: non-empty (was returning (0, 15) before fix)
+======================================================================
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/slurm_logs/integration_2026-05-07/run_smokes.py:64: UserWarning: household_characteristics: dropped 150 roster rows with NaN in one of ['t', 'v', 'i'] (typically v) -- per-wave: {'1992': 150}.  These are usually movers / split-offs whose sample() row lacks a cluster code; see GH #197.
+  df = getattr(c, table)()
+
+[FAIL] PR #230 Guyana household_characteristics (0.2s) :: sanity check failed; shape=(0, 15)
+
+======================================================================
+BEGIN: PR #230 Azerbaijan household_characteristics
+  expectation: non-empty
+======================================================================
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/slurm_logs/integration_2026-05-07/run_smokes.py:64: UserWarning: household_characteristics: dropped 319 roster rows with NaN in one of ['t', 'v', 'i'] (typically v) -- per-wave: {'1995': 319}.  These are usually movers / split-offs whose sample() row lacks a cluster code; see GH #197.
+  df = getattr(c, table)()
+
+[FAIL] PR #230 Azerbaijan household_characteristics (0.1s) :: sanity check failed; shape=(0, 15)
+
+======================================================================
+BEGIN: PR #230 Serbia and Montenegro household_characteristics
+  expectation: non-empty
+======================================================================
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/slurm_logs/integration_2026-05-07/run_smokes.py:64: UserWarning: household_characteristics: dropped 201 roster rows with NaN in one of ['t', 'v', 'i'] (typically v) -- per-wave: {'2002': 102, '2003': 99}.  These are usually movers / split-offs whose sample() row lacks a cluster code; see GH #197.
+  df = getattr(c, table)()
+
+[FAIL] PR #230 Serbia and Montenegro household_characteristics (0.1s) :: sanity check failed; shape=(0, 15)
+
+
+======================================================================
+FINAL SUMMARY
+======================================================================
+  [PASS] PR #228 Timor-Leste interview_date (0.1s)
+          shape=(1800, 1), dtypes_sample={'Int_t': dtype('<M8[us]')}
+  [FAIL] PR #230 Guyana household_characteristics (0.2s)
+          sanity check failed; shape=(0, 15)
+  [FAIL] PR #230 Azerbaijan household_characteristics (0.1s)
+          sanity check failed; shape=(0, 15)
+  [FAIL] PR #230 Serbia and Montenegro household_characteristics (0.1s)
+          sanity check failed; shape=(0, 15)
+
+FINAL: FAILED 3/4 tests

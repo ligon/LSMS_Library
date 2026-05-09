@@ -1,0 +1,85 @@
+=== Feature('food_expenditures')() sanity check 21:13:11 ===
+lsms_library: /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/__init__.py
+
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+Traceback (most recent call last):
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Ethiopia/_/food_acquired.py", line 37, in <module>
+    df0 = df.groupby(['j','t','i','units','units_purchased']).sum()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/pandas/util/_decorators.py", line 336, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/pandas/core/frame.py", line 10821, in groupby
+    return DataFrameGroupBy(
+           ^^^^^^^^^^^^^^^^^
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/pandas/core/groupby/groupby.py", line 1095, in __init__
+    grouper, exclusions, obj = get_grouper(
+                               ^^^^^^^^^^^^
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/pandas/core/groupby/grouper.py", line 891, in get_grouper
+    obj._check_label_or_level_ambiguity(gpr, axis=0)
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/pandas/core/generic.py", line 1729, in _check_label_or_level_ambiguity
+    raise ValueError(msg)
+ValueError: 't' is both an index level and a column label, which is ambiguous.
+make: *** [Makefile:30: /global/home/users/ligon/.local/share/lsms_library/Ethiopia/var/food_acquired.parquet] Error 1
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Ethiopia/var/food_expenditures.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Ethiopia/_/food_expenditures.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Ethiopia/var/food_expenditures.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_acquired.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/food_acquired.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/food_acquired.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_acquired.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_expenditures.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/food_expenditures.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/food_expenditures.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_expenditures.parquet still missing after running fallbacks.
+feat() built in 59.8s
+warnings raised: 11
+  - UserWarning: Makefile execution failed for Ethiopia/_ food_expenditures: Command '['make', '-s', '-j12', '/global/home/users/ligon/.l
+  - UserWarning: Makefile execution failed for Ethiopia/_ food_expenditures: Command '['make', '-s', '-j12', '/global/scratch/fsa/fc_jevo
+  - UserWarning: Makefile execution failed for Ethiopia/_ food_expenditures: Command '['make', '-s', '-j12', '/global/scratch/fsa/fc_jevo
+  - UserWarning: Failed to load food_expenditures for Ethiopia: RuntimeError: Could not materialize Ethiopia/food_expenditures: no wave-l
+  - UserWarning: Makefile execution failed for Nepal/_ food_acquired: Command '['make', '-s', '-j12', '/global/home/users/ligon/.local/sh
+  - UserWarning: Makefile execution failed for Nepal/_ food_acquired: Command '['make', '-s', '-j12', '/global/scratch/fsa/fc_jevons/ligo
+  - UserWarning: Makefile execution failed for Nepal/_ food_acquired: Command '['make', '-s', '-j12', '/global/scratch/fsa/fc_jevons/ligo
+  - UserWarning: Makefile execution failed for Nepal/_ food_expenditures: Command '['make', '-s', '-j12', '/global/home/users/ligon/.loca
+  - UserWarning: Makefile execution failed for Nepal/_ food_expenditures: Command '['make', '-s', '-j12', '/global/scratch/fsa/fc_jevons/
+  - UserWarning: Makefile execution failed for Nepal/_ food_expenditures: Command '['make', '-s', '-j12', '/global/scratch/fsa/fc_jevons/
+  - UserWarning: Failed to load food_expenditures for Nepal: RuntimeError: Could not materialize Nepal/food_expenditures: no wave-level b
+
+=== shape / index / columns ===
+  shape: (3882776, 1)
+  index names: [None]
+  index nlevels: 1
+  columns: ['Expenditure']
+  dtypes:
+Expenditure    Float64
+dtype: object
+
+=== per-country coverage ===
+  ! 'country' not in index names — Feature() may have not prepended it
+
+=== numeric column distributions per country ===
+  examining column: Expenditure
+Traceback (most recent call last):
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/slurm_logs/integration_2026-05-07/feature_food_exp_sanity.py", line 123, in <module>
+    main()
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/slurm_logs/integration_2026-05-07/feature_food_exp_sanity.py", line 82, in main
+    per_country_stats = df.groupby(level="country")[col].agg(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/pandas/util/_decorators.py", line 336, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/pandas/core/frame.py", line 10821, in groupby
+    return DataFrameGroupBy(
+           ^^^^^^^^^^^^^^^^^
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/pandas/core/groupby/groupby.py", line 1095, in __init__
+    grouper, exclusions, obj = get_grouper(
+                               ^^^^^^^^^^^^
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/pandas/core/groupby/grouper.py", line 789, in get_grouper
+    raise ValueError(f"level name {level} is not the name of the index")
+ValueError: level name country is not the name of the index

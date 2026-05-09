@@ -1,0 +1,78 @@
+=== integration smokes started 2026-05-07 21:10:05 ===
+lsms_library: /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/__init__.py
+version: 0.6.1.post138.dev0+02074edb
+python: /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+
+
+======================================================================
+BEGIN: PR #228 Timor-Leste interview_date
+  expectation: non-empty (t,i)-indexed datetime DataFrame
+======================================================================
+
+  head(2):
+                    Int_t
+i      t    v            
+0011A1 2001 11 2001-09-26
+0011A2 2001 11 2001-09-24
+
+[PASS] PR #228 Timor-Leste interview_date (0.2s) :: shape=(1800, 1), dtypes_sample={'Int_t': dtype('<M8[us]')}
+
+======================================================================
+BEGIN: PR #230 Guyana household_characteristics
+  expectation: non-empty (was returning (0, 15) before fix)
+======================================================================
+
+  head(2):
+sex_age      F 00-03  F 04-08  F 09-13  F 14-18  F 19-30  ...  M 14-18  M 19-30  M 31-50  M 51+  log HSize
+t    v i                                                  ...                                             
+1992 1 1-1         0        0        0        0        0  ...        0        0        1      0   0.693147
+       1-10        0        0        0        0        1  ...        2        0        1      0   1.609438
+
+[2 rows x 15 columns]
+
+[PASS] PR #230 Guyana household_characteristics (3.8s) :: shape=(1495, 15), dtypes_sample={'F 00-03': dtype('int64'), 'F 04-08': dtype('int64'), 'F 09-13': dtype('int64')}
+
+======================================================================
+BEGIN: PR #230 Azerbaijan household_characteristics
+  expectation: non-empty
+======================================================================
+
+  head(2):
+sex_age      F 00-03  F 04-08  F 09-13  F 14-18  F 19-30  ...  M 14-18  M 19-30  M 31-50  M 51+  log HSize
+t    v i                                                  ...                                             
+1995 1 1-1         0        0        0        0        0  ...        0        0        1      0   1.791759
+       1-10        0        0        0        1        1  ...        1        0        1      0   1.791759
+
+[2 rows x 15 columns]
+
+[PASS] PR #230 Azerbaijan household_characteristics (1.3s) :: shape=(2016, 15), dtypes_sample={'F 00-03': dtype('int64'), 'F 04-08': dtype('int64'), 'F 09-13': dtype('int64')}
+
+======================================================================
+BEGIN: PR #230 Serbia and Montenegro household_characteristics
+  expectation: non-empty
+======================================================================
+
+  head(2):
+sex_age      F 00-03  F 04-08  F 09-13  F 14-18  F 19-30  ...  M 14-18  M 19-30  M 31-50  M 51+  log HSize
+t    v i                                                  ...                                             
+2002 1 1-1         0        1        1        0        0  ...        0        0        1      0   2.079442
+       1-10        0        0        0        0        0  ...        0        0        0      0   0.000000
+
+[2 rows x 15 columns]
+
+[PASS] PR #230 Serbia and Montenegro household_characteristics (1.8s) :: shape=(8934, 15), dtypes_sample={'F 00-03': dtype('int64'), 'F 04-08': dtype('int64'), 'F 09-13': dtype('int64')}
+
+
+======================================================================
+FINAL SUMMARY
+======================================================================
+  [PASS] PR #228 Timor-Leste interview_date (0.2s)
+          shape=(1800, 1), dtypes_sample={'Int_t': dtype('<M8[us]')}
+  [PASS] PR #230 Guyana household_characteristics (3.8s)
+          shape=(1495, 15), dtypes_sample={'F 00-03': dtype('int64'), 'F 04-08': dtype('int64'), 'F 09-13': dtype('int64')}
+  [PASS] PR #230 Azerbaijan household_characteristics (1.3s)
+          shape=(2016, 15), dtypes_sample={'F 00-03': dtype('int64'), 'F 04-08': dtype('int64'), 'F 09-13': dtype('int64')}
+  [PASS] PR #230 Serbia and Montenegro household_characteristics (1.8s)
+          shape=(8934, 15), dtypes_sample={'F 00-03': dtype('int64'), 'F 04-08': dtype('int64'), 'F 09-13': dtype('int64')}
+
+FINAL: PASSED 4/4 tests

@@ -1,0 +1,220 @@
+=== diagnostics on combined PR branch 05:20:27 ===
+lsms_library: /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/__init__.py
+
+
+======================================================================
+PR #230: validate_feature('Guyana', 'household_characteristics')
+======================================================================
+  ran in 25.6s, report.ok=True
+Sanity report: Guyana/household_characteristics
+  20 checks: 20 pass, 0 warn, 0 fail
+  [+] load_data: Loaded 1,495 rows
+  [+] not_empty: 1495 rows
+  [+] has_named_index: Index levels: ['t', 'v', 'i']
+  [+] index_levels_match_scheme: No index declared in scheme (skipped)
+  [+] no_null_index_levels
+  [+] has_time_index: 1 distinct periods
+  [+] has_household_index: 1495 distinct households
+  [+] reasonable_size: 1,495 rows
+  [+] no_all_null_columns: 15 columns, none all-null
+  [+] no_constant_columns
+  [+] declared_columns_present: No columns declared (skipped)
+  [+] dtype_consistency: No dtype declarations (skipped)
+  [+] value_constraints: No value constraints declared (skipped)
+  [+] low_duplicate_rate: No duplicate indices
+  [+] no_regression: All 1 waves have data
+  [+] unmapped_labels: No raw survey codes detected
+  [+] string_consistency: No inconsistent string casing detected
+  [+] columns_match_reference: Columns match Uganda
+  [+] index_structure_matches: Index structure matches Uganda
+  [+] value_ranges_plausible: Numeric column ranges look plausible vs reference
+
+======================================================================
+PR #230: validate_feature('Azerbaijan', 'household_characteristics')
+======================================================================
+  ran in 5.4s, report.ok=True
+Sanity report: Azerbaijan/household_characteristics
+  20 checks: 20 pass, 0 warn, 0 fail
+  [+] load_data: Loaded 2,016 rows
+  [+] not_empty: 2016 rows
+  [+] has_named_index: Index levels: ['t', 'v', 'i']
+  [+] index_levels_match_scheme: No index declared in scheme (skipped)
+  [+] no_null_index_levels
+  [+] has_time_index: 1 distinct periods
+  [+] has_household_index: 2016 distinct households
+  [+] reasonable_size: 2,016 rows
+  [+] no_all_null_columns: 15 columns, none all-null
+  [+] no_constant_columns
+  [+] declared_columns_present: No columns declared (skipped)
+  [+] dtype_consistency: No dtype declarations (skipped)
+  [+] value_constraints: No value constraints declared (skipped)
+  [+] low_duplicate_rate: No duplicate indices
+  [+] no_regression: All 1 waves have data
+  [+] unmapped_labels: No raw survey codes detected
+  [+] string_consistency: No inconsistent string casing detected
+  [+] columns_match_reference: Columns match Uganda
+  [+] index_structure_matches: Index structure matches Uganda
+  [+] value_ranges_plausible: Numeric column ranges look plausible vs reference
+
+======================================================================
+PR #230: validate_feature('Serbia and Montenegro', 'household_characteristics')
+======================================================================
+  ran in 5.9s, report.ok=True
+Sanity report: Serbia and Montenegro/household_characteristics
+  20 checks: 20 pass, 0 warn, 0 fail
+  [+] load_data: Loaded 8,934 rows
+  [+] not_empty: 8934 rows
+  [+] has_named_index: Index levels: ['t', 'v', 'i']
+  [+] index_levels_match_scheme: No index declared in scheme (skipped)
+  [+] no_null_index_levels
+  [+] has_time_index: 2 distinct periods
+  [+] has_household_index: 6392 distinct households
+  [+] reasonable_size: 8,934 rows
+  [+] no_all_null_columns: 15 columns, none all-null
+  [+] no_constant_columns
+  [+] declared_columns_present: No columns declared (skipped)
+  [+] dtype_consistency: No dtype declarations (skipped)
+  [+] value_constraints: No value constraints declared (skipped)
+  [+] low_duplicate_rate: No duplicate indices
+  [+] no_regression: All 2 waves have data
+  [+] unmapped_labels: No raw survey codes detected
+  [+] string_consistency: No inconsistent string casing detected
+  [+] columns_match_reference: Columns match Uganda
+  [+] index_structure_matches: Index structure matches Uganda
+  [+] value_ranges_plausible: Numeric column ranges look plausible vs reference
+
+======================================================================
+PR #242: validate_feature('Ethiopia', 'food_expenditures')
+======================================================================
+  ran in 3.9s, report.ok=True
+Sanity report: Ethiopia/food_expenditures
+  20 checks: 20 pass, 0 warn, 0 fail
+  [+] load_data: Loaded 264,056 rows
+  [+] not_empty: 264056 rows
+  [+] has_named_index: Index levels: ['i', 't', 'v', 'j', 's']
+  [+] index_levels_match_scheme: No index declared in scheme (skipped)
+  [+] no_null_index_levels
+  [+] has_time_index: 5 distinct periods
+  [+] has_household_index: 12305 distinct households
+  [+] reasonable_size: 264,056 rows
+  [+] no_all_null_columns: 1 columns, none all-null
+  [+] no_constant_columns
+  [+] declared_columns_present: No columns declared (skipped)
+  [+] dtype_consistency: No dtype declarations (skipped)
+  [+] value_constraints: No value constraints declared (skipped)
+  [+] low_duplicate_rate: No duplicate indices
+  [+] no_regression: All 5 waves have data
+  [+] unmapped_labels: No raw survey codes detected
+  [+] string_consistency: No inconsistent string casing detected
+  [+] columns_match_reference: Columns match Uganda
+  [+] index_structure_matches: Index structure matches Uganda
+  [+] value_ranges_plausible: Numeric column ranges look plausible vs reference
+
+======================================================================
+PR #242: validate_feature('Nigeria', 'food_expenditures')
+======================================================================
+  ran in 5.8s, report.ok=True
+Sanity report: Nigeria/food_expenditures
+  20 checks: 20 pass, 0 warn, 0 fail
+  [+] load_data: Loaded 482,032 rows
+  [+] not_empty: 482032 rows
+  [+] has_named_index: Index levels: ['i', 't', 'v', 'j', 's']
+  [+] index_levels_match_scheme: No index declared in scheme (skipped)
+  [+] no_null_index_levels
+  [+] has_time_index: 8 distinct periods
+  [+] has_household_index: 8584 distinct households
+  [+] reasonable_size: 482,032 rows
+  [+] no_all_null_columns: 1 columns, none all-null
+  [+] no_constant_columns
+  [+] declared_columns_present: No columns declared (skipped)
+  [+] dtype_consistency: No dtype declarations (skipped)
+  [+] value_constraints: No value constraints declared (skipped)
+  [+] low_duplicate_rate: No duplicate indices
+  [+] no_regression: All 8 waves have data
+  [+] unmapped_labels: No raw survey codes detected
+  [+] string_consistency: No inconsistent string casing detected
+  [+] columns_match_reference: Columns match Uganda
+  [+] index_structure_matches: Index structure matches Uganda
+  [+] value_ranges_plausible: Numeric column ranges look plausible vs reference
+
+======================================================================
+PR #243: validate_feature('GhanaLSS', 'food_acquired')
+======================================================================
+  ran in 10.7s, report.ok=False
+Sanity report: GhanaLSS/food_acquired
+  20 checks: 15 pass, 4 warn, 1 fail
+  [+] load_data: Loaded 902,425 rows
+  [+] not_empty: 902425 rows
+  [+] has_named_index: Index levels: ['i', 't', 'v', 'j', 'u']
+  [!] index_levels_match_scheme: Missing declared levels ['s']; actual: ['i', 't', 'v', 'j', 'u']
+  [~] no_null_index_levels: Index level 'v' has 50.0% nulls
+  [+] has_time_index: 4 distinct periods
+  [+] has_household_index: 28662 distinct households
+  [+] reasonable_size: 902,425 rows
+  [+] no_all_null_columns: 10 columns, none all-null
+  [+] no_constant_columns
+  [+] declared_columns_present: All 2 declared columns present
+  [+] dtype_consistency
+  [+] value_constraints: No constrained columns (skipped)
+  [+] low_duplicate_rate: No duplicate indices
+  [+] no_regression: All 4 waves have data
+  [+] unmapped_labels: No raw survey codes detected
+  [+] string_consistency: No inconsistent string casing detected
+  [~] columns_match_reference: Extra vs Uganda: ['Produced', 'Purchased', 'h', 'produced_price', 'produced_quantity', 'purchased_value', 'visit']
+  [~] index_structure_matches: Index ['i', 't', 'v', 'j', 'u'] vs Uganda ['i', 't', 'v', 'j', 'u', 's']
+  [~] value_ranges_plausible: Price: mean 10.2 vs ref 1615.3 (ratio 0.0); Expenditure: mean 5.7 vs ref 3338.5 (ratio 0.0)
+
+======================================================================
+PR #243: validate_feature('GhanaLSS', 'food_expenditures')
+======================================================================
+  ran in 4.5s, report.ok=True
+Sanity report: GhanaLSS/food_expenditures
+  20 checks: 18 pass, 2 warn, 0 fail
+  [+] load_data: Loaded 341,403 rows
+  [+] not_empty: 341403 rows
+  [+] has_named_index: Index levels: ['i', 't', 'v', 'j']
+  [+] index_levels_match_scheme: No index declared in scheme (skipped)
+  [+] no_null_index_levels
+  [+] has_time_index: 1 distinct periods
+  [+] has_household_index: 13902 distinct households
+  [+] reasonable_size: 341,403 rows
+  [+] no_all_null_columns: 1 columns, none all-null
+  [+] no_constant_columns
+  [+] declared_columns_present: No columns declared (skipped)
+  [+] dtype_consistency: No dtype declarations (skipped)
+  [+] value_constraints: No value constraints declared (skipped)
+  [+] low_duplicate_rate: No duplicate indices
+  [+] no_regression: All 1 waves have data
+  [+] unmapped_labels: No raw survey codes detected
+  [+] string_consistency: No inconsistent string casing detected
+  [+] columns_match_reference: Columns match Uganda
+  [~] index_structure_matches: Index ['i', 't', 'v', 'j'] vs Uganda ['i', 't', 'v', 'j', 's']
+  [~] value_ranges_plausible: Expenditure: mean 6.8 vs ref 3338.4 (ratio 0.0)
+
+======================================================================
+PR #243: check_panel_consistency(Country('GhanaLSS'))
+======================================================================
+  ran in 0.7s, report.ok=False
+Sanity report: GhanaLSS/[panel]
+  8 checks: 3 pass, 3 warn, 2 fail
+  [+] has_panel_ids: 714 panel ID mappings
+  [+] has_updated_ids: 1 waves with ID mappings
+  [~] updated_ids_cover_waves: No ID mappings for follow-up waves: ['1991-92', '1998-99', '2005-06', '2012-13', '2016-17'] (baselines inferred: ['1987-88'])
+  [+] ids_self_consistent
+  [!] panel_ids_targets_exist: 714/714 cur (100%), 0/714 prev (0%), 0/714 inconsistent (0%) vs cached household_roster.parquet; sample: ['cur (1988-89,100101)', 'cur (1988-89,100108)', 'cur (1988-89,100301)']
+  [~] attrition_monotonic: (1987-88,1988-89): zero overlap in cached household_roster.parquet
+  [~] ids_applied_consistently: 1988-89: 714 IDs look pre-update (id_walk may not have been applied)
+  [!] id_walk_idempotent: id_walk not idempotent: rows 56346->56346 (delta +0), 714 disappeared, 712 appeared (cached household_roster.parquet)
+
+
+######################################################################
+FINAL TALLY
+######################################################################
+  PR #230: Guyana                 household_characteristics    OK  (20P/0W/0F of 20)
+  PR #230: Azerbaijan             household_characteristics    OK  (20P/0W/0F of 20)
+  PR #230: Serbia and Montenegro  household_characteristics    OK  (20P/0W/0F of 20)
+  PR #242: Ethiopia               food_expenditures            OK  (20P/0W/0F of 20)
+  PR #242: Nigeria                food_expenditures            OK  (20P/0W/0F of 20)
+  PR #243: GhanaLSS               food_acquired                FAIL  (20P/0W/0F of 20)
+  PR #243: GhanaLSS               food_expenditures            OK  (20P/0W/0F of 20)
+  PR #243: GhanaLSS               panel_consistency           FAIL  (8P/0W/0F of 8)
