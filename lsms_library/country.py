@@ -1279,6 +1279,39 @@ class Country:
 
         flat = flat.merge(v_lookup, on=['i', 't'], how='left')
 
+        # Silent-skip guard (GH #256).  A wave whose roster `i` does not
+        # intersect sample's `i` for the same `t` produces rows with NaN v
+        # after the left-merge.  Downstream groupby() in
+        # ``roster_to_characteristics`` and the food-derivation pipeline
+        # drops NaN-keyed rows by default, silently swallowing the entire
+        # wave.  Tajikistan/1999 pre-PR #253 was the worked example:
+        # ``Country('Tajikistan').household_characteristics()`` returned
+        # ``(10306, 15)`` -- 3 waves, with 1999 silently missing -- when
+        # the roster declared ``i: hhid`` but sample declared
+        # ``i: [pop_pt, hhid]``.  Warn here so the next such drift
+        # surfaces immediately rather than via manual universe scan.
+        if 't' in flat.columns and 'v' in flat.columns:
+            nan_v_per_wave = flat.groupby('t')['v'].apply(
+                lambda s: s.isna().mean() if len(s) else 0.0
+            )
+            fully_nan = sorted(
+                str(t) for t, frac in nan_v_per_wave.items() if frac == 1.0
+            )
+            if fully_nan:
+                warnings.warn(
+                    f"{self.name}: waves {fully_nan} have 100% NaN v after "
+                    f"_join_v_from_sample; these will be silently dropped "
+                    f"from derived tables (household_characteristics, "
+                    f"food_expenditures, food_prices, food_quantities) by "
+                    f"the downstream groupby.  Check i-key compatibility "
+                    f"between the roster source and the sample table -- "
+                    f"compare wave-level data_info.yml's `idxvars.i` on "
+                    f"each side.  See GH #256 for context and PRs #244 / "
+                    f"#253 / #255 for the established fix pattern.",
+                    UserWarning,
+                    stacklevel=2,
+                )
+
         # Normalize v to canonical pd.StringDtype.  sample() may return v as
         # int64, float64 (left-merge with NaN converts int→float), or plain
         # object; mixed dtypes across waves cause pyarrow serialisation failures
