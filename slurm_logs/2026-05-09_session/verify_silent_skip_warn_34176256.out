@@ -1,0 +1,36 @@
+=== sbatch prolog ===
+node:    n0010.savio2
+jobid:   34176256
+git:     34c87ee3 test(invariance): regenerate Uganda baseline against post-Phase-4 build (closes GH #135) (#264)
+branch:  framework-warn-silent-v-skip
+started: Sun May 10 08:40:43 PDT 2026
+
+
+=== STEP 1: new unit tests (should all pass) ===
+============================= test session starts ==============================
+collecting ... collected 5 items
+
+tests/test_join_v_silent_skip_warn.py::test_warns_on_fully_nan_wave PASSED [ 20%]
+tests/test_join_v_silent_skip_warn.py::test_no_warn_when_all_waves_match PASSED [ 40%]
+tests/test_join_v_silent_skip_warn.py::test_no_warn_on_partial_nan PASSED [ 60%]
+tests/test_join_v_silent_skip_warn.py::test_warns_only_for_fully_nan_waves_when_mixed PASSED [ 80%]
+tests/test_join_v_silent_skip_warn.py::test_no_warn_when_sample_unavailable PASSED [100%]
+
+============================== 5 passed in 0.37s ===============================
+=== exit: 0 ===
+
+=== STEP 2: Uganda hybrid-v tests (must NOT trigger spurious warning) ===
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/tests/test_sample.py:405: UserWarning: household_characteristics: dropped 448 roster rows with NaN in one of ['t', 'v', 'i'] (typically v) -- per-wave: {'2009-10': 110, '2013-14': 7, '2018-19': 328, '2019-20': 3}.  These are usually movers / split-offs whose sample() row lacks a cluster code; see GH #197.
+    return ll.Country("Uganda").household_characteristics(market="Region")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================== 3 passed, 5 warnings in 141.81s (0:02:21) ===================
+=== exit: 0 ===
+
+=== STEP 3: scan STEP 2 output for spurious silent-skip warnings ===
+PASS: no spurious silent-skip warning on Uganda hybrid-v test
+
+=== verdict Sun May 10 08:45:34 PDT 2026 ===
+  unit tests:           0  (PASS)
+  Uganda hybrid-v:      0  (PASS)
+  no spurious warning:  0  (PASS)
