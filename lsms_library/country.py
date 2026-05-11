@@ -1417,7 +1417,19 @@ class Country:
             if 'v' not in flat.columns:
                 if 'sample' in self.data_scheme:
                     df_with_v = self._join_v_from_sample(df)
-                    v_lookup = df_with_v.reset_index()[['i', 't', 'v']]
+                    # ``drop_duplicates`` on (i, t) is load-bearing for tables
+                    # whose canonical index has more levels than (i, t) --
+                    # e.g. ``shocks`` (one row per (i, t, Shock)) or any
+                    # future table with similar shape.  Without it, a tall
+                    # input frame produces *k* identical (i, t, v) rows for
+                    # a HH-period with *k* extra-level rows, and the merge
+                    # below becomes a Cartesian product yielding *k^2* output
+                    # rows per HH-period.  See GH #266 for the worked example
+                    # (Uganda shocks: 14,457 rows -> 27,268 with 12,812 dup).
+                    # The parallel logic in ``_location_lookup`` already
+                    # carries the same dedup; this restores the symmetry.
+                    v_lookup = (df_with_v.reset_index()[['i', 't', 'v']]
+                                .drop_duplicates(subset=['i', 't']))
                     flat = flat.merge(v_lookup, on=['i', 't'], how='left')
                 else:
                     warnings.warn(
