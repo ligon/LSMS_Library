@@ -1,0 +1,74 @@
+=== sbatch prolog Sun May 10 18:58:40 PDT 2026 ===
+node:    n0007.savio2
+jobid:   34192990
+git:     c5e25a5e feat(country): warn when _join_v_from_sample silently drops a wave (closes #256) (#265)
+branch:  fix-add-market-index-dedup
+
+
+=== STEP 1: GH #266 regression test (must pass with fix applied) ===
+============================= test session starts ==============================
+collecting ... collected 3 items
+
+tests/test_add_market_index_dedup.py::TestAddMarketIndexDedup::test_no_duplicate_index_rows PASSED [ 33%]
+tests/test_add_market_index_dedup.py::TestAddMarketIndexDedup::test_row_count_not_inflated PASSED [ 66%]
+tests/test_add_market_index_dedup.py::TestAddMarketIndexDedup::test_shock_distribution_preserved PASSED [100%]
+
+=============================== warnings summary ===============================
+tests/test_add_market_index_dedup.py::TestAddMarketIndexDedup::test_no_duplicate_index_rows
+tests/test_add_market_index_dedup.py::TestAddMarketIndexDedup::test_no_duplicate_index_rows
+tests/test_add_market_index_dedup.py::TestAddMarketIndexDedup::test_no_duplicate_index_rows
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq1
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_add_market_index_dedup.py::TestAddMarketIndexDedup::test_no_duplicate_index_rows
+tests/test_add_market_index_dedup.py::TestAddMarketIndexDedup::test_no_duplicate_index_rows
+tests/test_add_market_index_dedup.py::TestAddMarketIndexDedup::test_no_duplicate_index_rows
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq3
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=================== 3 passed, 6 warnings in 96.81s (0:01:36) ===================
+=== exit: 0 ===
+
+=== STEP 2: smoke check existing market='Region' tests didn't regress ===
+============================= test session starts ==============================
+collected 3 items
+
+tests/test_sample.py ...                                                 [100%]
+
+=============================== warnings summary ===============================
+tests/test_sample.py::TestUganda2009MarketFallback::test_food_expenditures_retains_hybrid_v_HH
+tests/test_sample.py::TestUganda2009MarketFallback::test_food_expenditures_retains_hybrid_v_HH
+tests/test_sample.py::TestUganda2009MarketFallback::test_food_expenditures_retains_hybrid_v_HH
+tests/test_sample.py::TestUganda2009MarketFallback::test_household_characteristics_retains_hybrid_v_HH
+tests/test_sample.py::TestUganda2009MarketFallback::test_household_characteristics_retains_hybrid_v_HH
+tests/test_sample.py::TestUganda2009MarketFallback::test_household_characteristics_retains_hybrid_v_HH
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq1
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py::TestUganda2009MarketFallback::test_food_expenditures_retains_hybrid_v_HH
+tests/test_sample.py::TestUganda2009MarketFallback::test_food_expenditures_retains_hybrid_v_HH
+tests/test_sample.py::TestUganda2009MarketFallback::test_food_expenditures_retains_hybrid_v_HH
+tests/test_sample.py::TestUganda2009MarketFallback::test_household_characteristics_retains_hybrid_v_HH
+tests/test_sample.py::TestUganda2009MarketFallback::test_household_characteristics_retains_hybrid_v_HH
+tests/test_sample.py::TestUganda2009MarketFallback::test_household_characteristics_retains_hybrid_v_HH
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq3
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py::TestUganda2009MarketFallback::test_household_characteristics_retains_hybrid_v_HH
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/tests/test_sample.py:405: UserWarning: household_characteristics: dropped 448 roster rows with NaN in one of ['t', 'v', 'i'] (typically v) -- per-wave: {'2009-10': 110, '2013-14': 7, '2018-19': 328, '2019-20': 3}.  These are usually movers / split-offs whose sample() row lacks a cluster code; see GH #197.
+    return ll.Country("Uganda").household_characteristics(market="Region")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================== 3 passed, 13 warnings in 119.49s (0:01:59) ==================
+=== exit: 0 ===
+
+=== STEP 3: explicit before/after shape on Uganda shocks ===
+  shocks()                   shape: (14457, 10)  dup: 0
+  shocks(market=Region)      shape: (14456, 10)  dup: 0
+  expected:                  m_rows <= bare_rows (14456 <= 14457) -> True
+  pre-fix:                   m_rows = 27268 (1.88x inflation)
+  post-fix:                  m_rows = 14456
+
+=== verdict ===
+ALL GREEN -- #266 fix verified.
