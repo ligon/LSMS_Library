@@ -260,7 +260,9 @@ def format_interval(interval, compact=True):
         return f"{int(lo):02d}-{int(hi) - 1:02d}"
     return f"[{_fmt_bound(lo)}, {_fmt_bound(hi)})"
 
-def roster_to_characteristics(df, age_cuts=(4, 9, 14, 19, 31, 51), drop='pid', final_index=['t', 'v', 'i']):
+def roster_to_characteristics(df, age_cuts=(4, 9, 14, 19, 31, 51), drop='pid',
+                              final_index=['t', 'v', 'i'],
+                              mover_sentinel='Mover'):
     """Collapse a household roster into household-level sex × age counts.
 
     Drives the derived ``household_characteristics`` table: takes a
@@ -289,6 +291,21 @@ def roster_to_characteristics(df, age_cuts=(4, 9, 14, 19, 31, 51), drop='pid', f
         Final groupby level; defaults to the household key ``('t', 'v',
         'i')`` but ``Country._finalize_result`` can pass a different
         tuple when the roster's actual index differs.
+    mover_sentinel : str or None, default ``'Mover'``
+        Value to substitute for NaN entries in any ``final_index``
+        level (in practice always ``v``) before the household
+        groupby.  When non-None, mover / split-off households with a
+        NaN cluster code survive as a distinct bucket identifiable
+        by ``index.get_level_values('v') == mover_sentinel``.  Pass
+        ``None`` to recover the legacy GH #197 behavior where the
+        groupby silently drops these households.
+
+        Default flipped from drop-via-NaN to keep-with-sentinel in
+        GH #268.  ``sample()`` typically carries a valid ``Region``
+        for movers even when ``v`` is missing, so dropping them at
+        this stage loses households we /can/ still assign to a
+        market.  Callers who want the strict legacy drop pass
+        ``mover_sentinel=None``.
 
     Returns
     -------
@@ -344,11 +361,15 @@ def roster_to_characteristics(df, age_cuts=(4, 9, 14, 19, 31, 51), drop='pid', f
     )
     roster_df = dummies(roster_df,['sex_age'])
     roster_df.index = roster_df.index.droplevel(drop)
-    # Pandas' ``groupby(...)`` default is ``dropna=True``, which silently
-    # excludes rows whose index has NaN in any of ``final_index``.  We
-    # keep that drop (the canonical (t, v, i) key assumes v is
-    # meaningful) but warn loudly with the per-wave count so the loss
-    # isn't invisible to the caller.  GH #197.
+    # Pandas' ``groupby(...)`` default is ``dropna=True``, so rows whose
+    # index has NaN in any of ``final_index`` are silently excluded.
+    # The NaN is almost always in ``v``: ``v`` is joined onto the
+    # roster post-hoc via ``_join_v_from_sample`` and ``sample``'s
+    # ``v`` column is NaN for movers / split-offs that lack a cluster
+    # code.  GH #197 flagged the silent drop; GH #268 makes the
+    # keep-with-sentinel path the default (movers survive as a
+    # distinguishable ``v == mover_sentinel`` bucket) and turns the
+    # legacy drop into an opt-in via ``mover_sentinel=None``.
     idx_df = roster_df.index.to_frame(index=False)
     nan_mask = idx_df[final_index].isna().any(axis=1)
     n_nan_rows = int(nan_mask.sum())
@@ -368,15 +389,38 @@ def roster_to_characteristics(df, age_cuts=(4, 9, 14, 19, 31, 51), drop='pid', f
             )
         else:
             per_wave = {'<no-t>': n_nan_rows}
-        _warnings.warn(
-            f"household_characteristics: dropped {n_nan_rows} roster rows "
-            f"with NaN in one of {final_index} (typically v) "
-            f"-- per-wave: {per_wave}.  These are usually movers / "
-            f"split-offs whose sample() row lacks a cluster code; see "
-            f"GH #197.",
-            UserWarning,
-            stacklevel=3,
-        )
+        if mover_sentinel is None:
+            _warnings.warn(
+                f"household_characteristics: dropped {n_nan_rows} roster "
+                f"rows with NaN in one of {final_index} (typically v) "
+                f"-- per-wave: {per_wave}.  These are usually movers / "
+                f"split-offs whose sample() row lacks a cluster code; "
+                f"the groupby below silently excludes them.  To keep "
+                f"them as an identifiable bucket, pass a non-None "
+                f"``mover_sentinel`` (default ``'Mover'``).  See "
+                f"GH #197, GH #268.",
+                UserWarning,
+                stacklevel=3,
+            )
+        else:
+            # GH #268: fill NaN in every final_index level with the
+            # sentinel so movers survive the household groupby as a
+            # distinguishable bucket rather than getting dropped.
+            for level in final_index:
+                if idx_df[level].isna().any():
+                    idx_df[level] = idx_df[level].fillna(mover_sentinel)
+            roster_df.index = pd.MultiIndex.from_frame(idx_df)
+            _warnings.warn(
+                f"household_characteristics: replaced {n_nan_rows} roster "
+                f"rows with NaN in one of {final_index} (typically v) by "
+                f"sentinel {mover_sentinel!r} -- per-wave: {per_wave}.  "
+                f"These are usually movers / split-offs whose sample() row "
+                f"lacks a cluster code.  Filter on "
+                f"index.get_level_values('v') == {mover_sentinel!r} to "
+                f"recover the legacy drop (GH #197, GH #268).",
+                UserWarning,
+                stacklevel=3,
+            )
     result = roster_df.groupby(level=final_index).sum()
     result['log HSize'] = np.log(result.sum(axis=1))
     result.columns = result.columns.get_level_values(0)
