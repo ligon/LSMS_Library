@@ -28,22 +28,34 @@ def _norm_village(v):
 
 
 def i(value):
-    """Composite household id: (peasant association, within-village HH no.).
+    """Household id formatter, dual-path.
 
-    `value` is a row Series [village, hh_no].  ERHS `hhid`/`q5`/`q2`
-    is unique only within a village, so identity is the pair.
+    Composite path (1994+ waves): ``value`` is a row Series
+    ``[village, hh_no]`` -- ERHS ``hhid``/``q5``/``q2`` is unique only
+    within a village, so identity is the pair, joined as
+    ``<village>_<hh_no>``.
 
-    A row missing either component cannot be assigned to a household
-    (observed: a single food3.dta row with NaN HH number that still
+    Scalar path (1989): ``value`` is a single already-unique household
+    key (the packed 5-digit ``hhid`` = region+PA+HH; one column, fed
+    per-cell by ``df[col].apply``).  Just format it.
+
+    A row missing a required component cannot be assigned to a
+    household (observed: a food3.dta row with NaN HH number that still
     carries food data).  Return ``pd.NA`` rather than crashing; such
-    rows are unidentifiable and are dropped downstream (the
-    food_acquired melt filters them; roster NA-index rows fail the
-    sanity no-null-index check, surfacing genuinely bad data).
+    rows are dropped downstream (the food melt filters them; roster
+    NA-index rows fail the sanity no-null-index check, surfacing
+    genuinely bad data).
     """
-    v0, v1 = value.iloc[0], value.iloc[1]
-    if pd.isna(v0) or pd.isna(v1):
+    # Composite: a 2+-element row Series from df[[village, hh]].apply.
+    if hasattr(value, 'iloc') and getattr(value, 'size', 1) >= 2:
+        v0, v1 = value.iloc[0], value.iloc[1]
+        if pd.isna(v0) or pd.isna(v1):
+            return pd.NA
+        return tools.format_id(_norm_village(v0)) + '_' + tools.format_id(v1)
+    # Scalar: single packed household key (1989 hhid).
+    if pd.isna(value):
         return pd.NA
-    return tools.format_id(_norm_village(v0)) + '_' + tools.format_id(v1)
+    return tools.format_id(value)
 
 
 def food_acquired(df):
@@ -61,7 +73,26 @@ def food_acquired(df):
     Output: index (i, j, u, s), columns [Quantity, Expenditure];
     s in {purchased, produced, inkind}.  The framework prepends `t`
     (check_adding_t) and joins `v` from sample() at API time.
+
+    Pass-through path (1989): food89.dta is already long -- one row
+    per (hh, item) with a single `source` code, mapped to `s` in the
+    wave's data_info.yml, so the frame arrives canonical (no q_/u_/e_
+    triplet columns).  Detect that (no 'q_purch'), keep only canonical
+    s values (drops the NaN/5/6/7 source rows that have no clean
+    purchased/produced/inkind meaning), drop unidentifiable rows, and
+    return as-is.
     """
+    CANON_S = ('purchased', 'produced', 'inkind')
+    flat = df.reset_index()
+    if 'q_purch' not in flat.columns:
+        idx = [c for c in ('i', 'j', 'u', 's') if c in flat.columns]
+        flat = flat[flat['s'].isin(CANON_S)]
+        for k in ('i', 'j', 'u'):
+            if k in flat.columns:
+                flat = flat[flat[k].notna() & (flat[k].astype('string')
+                                               .str.strip() != '')]
+        return flat.set_index(idx)
+
     w = df.reset_index()
     specs = [('purchased', 'q_purch', 'u_purch', 'e_purch'),
              ('produced',  'q_prod',  'u_prod',  None),

@@ -1,0 +1,56 @@
+# ERHS wave 1989 (pre-expansion round, 6-7 villages).
+#
+# 1989 is a DISTINCT instrument from the 1994+ panel and deviates from
+# the standard recipe in three ways (all handled here / in shared
+# _/ethiopiarhs.py + _/categorical_mapping.org, GH #271):
+#
+#  1. Household id is a single PACKED 5-digit `hhid` (region+PA+HH,
+#     e.g. 10101) that is already unique per household (338 HH).  So
+#     i = hhid as a SINGLE column -- the shared `i` formatter's scalar
+#     path handles it (no (village, hh_no) composite here).
+#  2. Relationship uses a 9-code taxonomy (relnhhed), NOT the 16-code
+#     erhs_relation -> mapped via the dedicated erhs_relation_1989
+#     table.  Sex matches erhs_sex (1=M,2=F).
+#  3. food89.dta is already LONG (one row per hh x food item with a
+#     single `source` code), not the 1994 wide purch/prod/inkind
+#     triplets.  We map `source` -> canonical `s` directly in idxvars;
+#     the shared food_acquired df_edit hook detects the absence of the
+#     q_purch triplet columns and passes the frame through (filtering
+#     to canonical s, which drops the NaN/5/6/7 source rows that have
+#     no clean purchased/produced/inkind meaning).
+#
+# Code-based extraction (converted_categoricals: False), consistent
+# with the other ERHS waves; foodcode/unitcode carried as stable
+# codes (label harmonization a documented follow-up).
+
+household_roster:
+    file: demog89_1.dta
+    converted_categoricals: False
+    idxvars:
+        i: hhid          # packed 5-digit region+PA+HH, unique per HH
+        pid: pid
+    myvars:
+        Sex:
+            - sex
+            - mappings: ['erhs_sex', 'Code', 'Preferred Label']
+        Age: age
+        Relationship:
+            - relnhhed
+            - mappings: ['erhs_relation_1989', 'Code', 'Preferred Label']
+
+food_acquired:
+    file: food89.dta
+    converted_categoricals: False
+    idxvars:
+        i: hhid
+        j: foodcode
+        u: unitcode
+        s:
+            - source
+            - mapping:
+                1: purchased
+                2: produced
+                3: inkind
+    myvars:
+        Quantity: quantity
+        Expenditure: value

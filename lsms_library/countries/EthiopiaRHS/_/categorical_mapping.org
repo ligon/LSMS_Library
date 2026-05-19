@@ -44,6 +44,36 @@ as genuine-missing (no spurious kinship warning), same as NaN.
 |   15 | Tenant/Boarder         |
 |   16 | Other unrelated person |
 
+* erhs_relation_1989
+
+The 1989 pre-expansion instrument (demog89_1.dta =relnhhed=) uses a
+DISTINCT 9-code relationship taxonomy, NOT the 16-code =erhs_relation=
+of the 1994+ rounds.  Mapped to Preferred Labels that already resolve
+in kinship.yml.  Judgment calls: code 5 "Illegitimate child" -> child
+(consanguineal, like Own child); code 8 "Helper" -> Servants; code 9
+"Other" -> Other unrelated person (conservative; could be distant kin
+or non-kin -- treated as unrelated rather than guessing a kin tie).
+
+#+NAME: erhs_relation_1989
+| Code | Preferred Label        |
+|------+------------------------|
+|    1 | Head                   |
+|    2 | Wife/Husband/Partner   |
+|    3 | Son/Daughter           |
+|    4 | Adopted Child          |
+|    5 | Son/Daughter           |
+|    6 | Sister/Brother         |
+|    7 | Father/Mother          |
+|    8 | Servants               |
+|    9 | Other unrelated person |
+|   11 |                        |
+|   36 |                        |
+
+(Codes 11 and 36 are two single-row data-entry errors in
+demog89_1.relnhhed -- the labelled scheme is 1..9 only.  Mapped to
+empty -> NA Relationship, same treatment as the 1997 reltn4 -9
+sentinel; avoids a spurious kinship warning.)
+
 * erhs_sex
 
 #+NAME: erhs_sex

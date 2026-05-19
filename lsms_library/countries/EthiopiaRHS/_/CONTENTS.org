@@ -91,11 +91,29 @@ appear to have village-level split files (=debdemo4=, =dindemo4=,
   template, commit 36818510
 - [X] Waves 1994b / 1995 / 1997 wired (scatter-gather; roster + food
   =is_this_feature_sane= OK, per-wave i-overlap 95.6--99.7%)
-- [ ] Waves 1989 / 1999 / 2004 / 2009
+- [X] Wave 1989 wired (pre-expansion instrument; roster + food
+  =is_this_feature_sane= OK).  Deviations handled: single packed
+  =hhid= (scalar =i= path), 9-code =relnhhed= (=erhs_relation_1989=
+  table), already-long =food89= single =source= column (food melt
+  pass-through).  *Caveats:* =demog89_1= is a PARTIAL person roster
+  (338 HH) vs =food89= (483 HH; 279 shared) -- no fuller 1989 person
+  roster exists (=demog89_2= is a 203-row HH summary), so 1989
+  =food_expenditures= is meaningful only for the ~279 shared HH; two
+  single-row =relnhhed= data errors (codes 11, 36) mapped to NA.
+- [ ] Waves 1999 / 2004 / 2009: *NOT WIREABLE for roster/food.* The
+  IFPRI Dataverse archive has NO person roster and NO item-level food
+  for R5/R6/R7 -- only pre-aggregated household consumption scalars
+  (=consumptionaggregates_123456.tab= cols =*5=/=*6=;
+  =consumptionAggrgates_r7.tab= for 2009).  =household_roster= /
+  =food_acquired= cannot be built without violating the library's
+  item-level principle.  Decision (2026-05-18): keep declared as
+  waves (SOURCE.org auto-discovery) but unwired; the pre-aggregated
+  consumption is out of scope for GH #271 (would be a separate
+  non-canonical table).
 - [X] Auto-derived =household_characteristics= / =food_expenditures= /
-  =food_quantities= build across all 4 1990s waves (38,484 roster rows;
-  zero kinship warnings).  Validation against survey documentation
-  still TODO.
+  =food_quantities= build across the 5 wired waves (1989 + four
+  1990s); zero kinship warnings.  Validation against survey
+  documentation still TODO.
 - [ ] Follow-ups: food-item (=q36_1=/=q36_1b=) + unit code->label
   harmonization (currently carried as stable codes); =dvc add= +
   =dvc push= to S3 (deferred -- no writer creds this session); cross-
