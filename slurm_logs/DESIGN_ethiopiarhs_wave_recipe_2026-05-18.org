@@ -75,6 +75,12 @@ expected to be stable across rounds -- reuse =erhs_relation= /
 
 * Verification (required before reporting done)
 
+IMPORTANT: =is_this_feature_sane= must run on the FULL multi-wave
+frame (it checks the index includes =t=).  Do NOT =.xs(W, level='t')=
+before sanity -- that strips =t= and produces a spurious
+=index_levels_match_scheme: Missing ['t']= ok=False.  Slice only for
+the per-wave overlap number.
+
 #+begin_src python
 import warnings, lsms_library as ll
 from lsms_library.diagnostics import is_this_feature_sane
@@ -83,14 +89,25 @@ with warnings.catch_warnings():
     warnings.simplefilter('ignore')
     r = c.household_roster(); fa = c.food_acquired()
 W = '<wave>'
+assert W in set(r.index.get_level_values('t')), f'{W} missing from roster'
+assert W in set(fa.index.get_level_values('t')), f'{W} missing from food'
+# sanity on the FULL frame (needs the t level):
+print('roster ok =', is_this_feature_sane(r,  country='EthiopiaRHS',
+      feature='household_roster').ok)
+print('food   ok =', is_this_feature_sane(fa, country='EthiopiaRHS',
+      feature='food_acquired').ok)
+# per-wave overlap (slicing is fine here):
 rw = r.xs(W, level='t'); fw = fa.xs(W, level='t')
 ri = set(rw.index.get_level_values('i')); fi = set(fw.index.get_level_values('i'))
 print(W, 'roster', rw.shape, 'food', fw.shape,
       'overlap %.1f%%' % (100*len(ri & fi)/len(ri | fi)))
-print(is_this_feature_sane(rw,  country='EthiopiaRHS', feature='household_roster').ok)
-print(is_this_feature_sane(fw,  country='EthiopiaRHS', feature='food_acquired').ok)
 #+end_src
 
 Run with =LSMS_NO_CACHE=1=.  Pass bar: both =is_this_feature_sane=
-OK=True for the wave's slice, i-overlap > 95%, Affinity decomposed
-(no kinship warnings).
+OK=True on the FULL frame, the per-wave i-overlap > 95%, Affinity
+decomposed (no kinship warnings).
+
+Note: the food household-number column name *varies by round*
+(1994a/food1 = =q5=; 1994b/food2 & 1995/food3 = =q2=; food3's own
+=q5= means "same HH as round 2?").  Discover it from metadata per
+wave -- do not assume =q5=.

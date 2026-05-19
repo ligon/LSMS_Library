@@ -87,8 +87,16 @@ appear to have village-level split files (=debdemo4=, =dindemo4=,
 
 - [X] Country scaffold (dirs, =data_scheme.yml=, this file, per-wave
   =SOURCE.org= for auto-discovery)
-- [ ] Wave 1994a acquired + wired (roster, food_acquired)
-- [ ] Waves 1994b / 1995 / 1997
+- [X] Wave 1994a acquired + wired (roster, food_acquired) -- code-based
+  template, commit 36818510
+- [X] Waves 1994b / 1995 / 1997 wired (scatter-gather; roster + food
+  =is_this_feature_sane= OK, per-wave i-overlap 95.6--99.7%)
 - [ ] Waves 1989 / 1999 / 2004 / 2009
-- [ ] Auto-derived =household_characteristics= / =food_expenditures=
-  validated against survey documentation
+- [X] Auto-derived =household_characteristics= / =food_expenditures= /
+  =food_quantities= build across all 4 1990s waves (38,484 roster rows;
+  zero kinship warnings).  Validation against survey documentation
+  still TODO.
+- [ ] Follow-ups: food-item (=q36_1=/=q36_1b=) + unit code->label
+  harmonization (currently carried as stable codes); =dvc add= +
+  =dvc push= to S3 (deferred -- no writer creds this session); cross-
+  wave panel id linkage via =q2= (1989/90 HH no.).

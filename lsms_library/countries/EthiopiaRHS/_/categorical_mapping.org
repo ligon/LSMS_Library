@@ -18,9 +18,15 @@ equivalents share this code scheme).  Preferred Label strings match
 the kinship.yml keys added for GH #271 so =_expand_kinship= decomposes
 them into (Generation, Distance, Affinity).
 
+Code -9 ("Head Died and Replaced", round-4 reltn4 interview-status
+sentinel) and any other non-1..16 value are not real relationships;
+they map to an empty Preferred Label so =_expand_kinship= treats them
+as genuine-missing (no spurious kinship warning), same as NaN.
+
 #+NAME: erhs_relation
 | Code | Preferred Label        |
 |------+------------------------|
+|   -9 |                        |
 |    1 | Head                   |
 |    2 | Wife/Husband/Partner   |
 |    3 | Son/Daughter           |

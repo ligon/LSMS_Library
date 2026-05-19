@@ -1,0 +1,64 @@
+# ERHS wave 1994b (Round 2).
+#
+# CODE-BASED extraction (converted_categoricals: False).  ERHS label
+# spellings drift across files/rounds (village code 6 = "Shumsha" in
+# demo123 vs "Yetmen" in food2; the food2 q1c label table is itself
+# shifted vs demo123) but numeric codes are stable and identical
+# across modules -- raw (q1c,hh_no) overlap demo123<->food2 for the
+# round-2 slice is 1467/1477 (99.3%).  So household identity and all
+# categoricals key off the stable codes; labels come from
+# _/categorical_mapping.org.
+#
+# Roster source demo123.dta is the pooled R1-R3 *person-panel* file
+# (one row per (household, individual), round-suffixed columns).
+# 1994b uses the round-2 columns: presence is flagged by the round-2
+# person variables.  `sex2`/`agey2` are the round-2 sex/age; `q11_1b`
+# (relation to head) is roster-wide and stable across rounds -- the
+# only round-2-specific relation columns (q11_102/q11_62) cover just
+# the ~286 new comers / ~185 new births, not the continuing roster,
+# so the round-1 relation column is carried forward (codes identical
+# to round 2/3: verified against erhs_relation 1-16).  Selecting Sex
+# from `sex2` restricts the roster to round-2 members (the framework
+# drops NaN-Sex rows).
+
+household_roster:
+    file: demo123.dta
+    converted_categoricals: False
+    idxvars:
+        i:
+            - q1c        # peasant association (stable code)
+            - hhid       # HH no. within village
+        pid: ind         # roster-card id
+    myvars:
+        Sex:
+            - sex2       # sex of individuals in sample in round 2
+            - mappings: ['erhs_sex', 'Code', 'Preferred Label']
+        Age: agey2       # age in years in round 2
+        Relationship:
+            - q11_1b     # relation to HH head (round-wide, stable codes)
+            - mappings: ['erhs_relation', 'Code', 'Preferred Label']
+
+# food2.dta: one row per (household, food item); three acquisition
+# sources side by side, each with its own quantity + unit (purchases
+# also carry expenditure).  Household keys q1c+q2 use the SAME stable
+# codes as demo123's q1c+hhid (q2 here = "HH No. for this survey",
+# the round-2 analogue of food1's q5).  The `food_acquired` df_edit
+# hook in _/ethiopiarhs.py melts the source triplets into canonical
+# (t, i, j, u, s).  j (q36_1b) and units are carried as stable codes;
+# food-label / unit harmonization is a documented follow-up.
+food_acquired:
+    file: food2.dta
+    converted_categoricals: False
+    idxvars:
+        i:
+            - q1c
+            - q2
+        j: q36_1b
+    myvars:
+        q_purch: q36_2a
+        u_purch: q36_2b
+        e_purch: q36_2c
+        q_prod: q36_3a
+        u_prod: q36_3b
+        q_inkind: q36_4a
+        u_inkind: q36_4b

@@ -30,11 +30,20 @@ def _norm_village(v):
 def i(value):
     """Composite household id: (peasant association, within-village HH no.).
 
-    `value` is a row Series [village, hh_no].  ERHS `hhid`/`q5` is
-    unique only within a village, so identity is the pair.
+    `value` is a row Series [village, hh_no].  ERHS `hhid`/`q5`/`q2`
+    is unique only within a village, so identity is the pair.
+
+    A row missing either component cannot be assigned to a household
+    (observed: a single food3.dta row with NaN HH number that still
+    carries food data).  Return ``pd.NA`` rather than crashing; such
+    rows are unidentifiable and are dropped downstream (the
+    food_acquired melt filters them; roster NA-index rows fail the
+    sanity no-null-index check, surfacing genuinely bad data).
     """
-    return (tools.format_id(_norm_village(value.iloc[0]))
-            + '_' + tools.format_id(value.iloc[1]))
+    v0, v1 = value.iloc[0], value.iloc[1]
+    if pd.isna(v0) or pd.isna(v1):
+        return pd.NA
+    return tools.format_id(_norm_village(v0)) + '_' + tools.format_id(v1)
 
 
 def food_acquired(df):
@@ -73,7 +82,10 @@ def food_acquired(df):
                   | (sub['Expenditure'].fillna(0) > 0)]
         frames.append(sub)
     out = pd.concat(frames, ignore_index=True)
-    # A unit is required to place the quantity on the (.. u ..) axis.
+    # Drop rows with no household id (i is pd.NA when the HH-number
+    # key was missing in the source -- see `i` above) and rows with
+    # no unit (a unit is required to place the quantity on the u axis).
+    out = out[out['i'].notna()]
     out = out[out['u'].notna() & (out['u'] != '')]
     out = out.set_index(['i', 'j', 'u', 's'])
     return out

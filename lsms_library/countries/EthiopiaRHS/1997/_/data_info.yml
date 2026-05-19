@@ -1,0 +1,73 @@
+# ERHS wave 1997 (Round 4).
+#
+# CODE-BASED extraction (converted_categoricals: False).  ERHS label
+# spellings drift across files/rounds but numeric codes are stable and
+# identical across modules, so household identity and all categoricals
+# key off the stable codes; labels come from _/categorical_mapping.org.
+#
+# 1997 uses a DIFFERENT instrument than rounds 1-3.  The pooled R1-R3
+# roster file (demo123) does not exist for this round.  Instead there
+# are two round-4 demographic files:
+#   - demo4.dta: a split-block roster (q11a_* continuing members,
+#     q11b_* new members) with NO clean per-person Age column.
+#   - age_sex_r4.dta: a clean ONE-ROW-PER-INDIVIDUAL file carrying
+#     pid + sex + age4 + reltn4 (relation to head, Round-4 roster).
+# age_sex_r4 has everything household_roster needs in a single file
+# with no merge, so it is the roster source (no demo4 join needed).
+# Its q1c (peasant association) codes 1-20 match the demo123/food
+# scheme; sex (1=Male,2=Female) matches erhs_sex; reltn4 codes 1-16
+# match erhs_relation EXACTLY (verified code-by-code).
+#
+# reltn4 also carries an interview-STATUS sentinel -9 ("Head Died and
+# Replaced", 76 rows) plus 61 NaN.  -9 is NOT in erhs_relation and is
+# NOT a divergent kinship taxonomy -- the head slot was vacated
+# between rounds.  The erhs_relation org-table mapping passes -9
+# through unchanged, so _expand_kinship currently emits one warning
+# for label '-9.0'.  This is the only deviation from the recipe
+# pass-bar; resolving it requires a change to the coordinator-owned
+# shared EthiopiaRHS/_/categorical_mapping.org (add a -9 -> NA row to
+# erhs_relation) or kinship.yml, both OUT OF SCOPE for this wave.
+# Escalated in slurm_logs/build_2026-05-18/QUESTIONS_FROM_AGENT.txt;
+# do NOT remap -9 inside this file.
+
+household_roster:
+    file: age_sex_r4.dta
+    converted_categoricals: False
+    idxvars:
+        i:
+            - q1c        # peasant association (stable code)
+            - q1d        # HH no. for this survey, within village
+        pid: pid         # individual id
+    myvars:
+        Sex:
+            - sex
+            - mappings: ['erhs_sex', 'Code', 'Preferred Label']
+        Age: age4
+        Relationship:
+            - reltn4
+            - mappings: ['erhs_relation', 'Code', 'Preferred Label']
+
+# food4.dta: one row per (household, food item); three acquisition
+# sources side by side (purchase / own production / gift-loan), each
+# with its own quantity + unit (purchases also carry expenditure).
+# Household keys q1c+q1d use the SAME stable codes as age_sex_r4's
+# q1c+q1d.  The `food_acquired` df_edit hook in _/ethiopiarhs.py melts
+# the source triplets into canonical (t, i, j, u, s).  j (q36_1) and
+# units are carried as stable codes; food-label / unit harmonization
+# is a documented follow-up.
+food_acquired:
+    file: food4.dta
+    converted_categoricals: False
+    idxvars:
+        i:
+            - q1c
+            - q1d
+        j: q36_1
+    myvars:
+        q_purch: q36_2a
+        u_purch: q36_2b
+        e_purch: q36_2c
+        q_prod: q36_3a
+        u_prod: q36_3b
+        q_inkind: q36_4a
+        u_inkind: q36_4b
