@@ -1,0 +1,47 @@
+#+title: EthiopiaRHS categorical mappings
+
+Cross-wave harmonization tables.  ERHS label *spellings* drift across
+files/rounds (e.g. village code 6 is "Shumsha" in demo123 but
+"SHUMSHEHA" in food1) while the numeric *codes* are stable.  So every
+ERHS wave extracts with =converted_categoricals: False= and maps the
+stable codes here.  Referenced from each wave's =data_info.yml= via
+the =mappings:= list form, e.g.
+
+: Relationship:
+:     - q11_1b
+:     - mappings: ['erhs_relation', 'Code', 'Preferred Label']
+
+* erhs_relation
+
+Relationship-to-head codes (questionnaire q11_1b / round-2/3
+equivalents share this code scheme).  Preferred Label strings match
+the kinship.yml keys added for GH #271 so =_expand_kinship= decomposes
+them into (Generation, Distance, Affinity).
+
+#+NAME: erhs_relation
+| Code | Preferred Label        |
+|------+------------------------|
+|    1 | Head                   |
+|    2 | Wife/Husband/Partner   |
+|    3 | Son/Daughter           |
+|    4 | Grandchild             |
+|    5 | Father/Mother          |
+|    6 | Sister/Brother         |
+|    7 | Niece/Nephew           |
+|    8 | Uncle/Aunt             |
+|    9 | Son/Daughter-in-law    |
+|   10 | Father/Mother-in-law   |
+|   11 | Brother/Sister-in-law  |
+|   12 | Grandparent            |
+|   13 | Other relative of head |
+|   14 | Servants               |
+|   15 | Tenant/Boarder         |
+|   16 | Other unrelated person |
+
+* erhs_sex
+
+#+NAME: erhs_sex
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | M               |
+|    2 | F               |
