@@ -28,3 +28,22 @@ Data Scheme:
     index: (t, i, j, u, s)
     Quantity: float
     Expenditure: float
+
+  # Sampling design.  ERHS is a PURPOSIVE 15-village longitudinal
+  # panel, not a weighted national sample -- there are no design
+  # weights, so weight/panel_weight are NaN (sourcing any constructed
+  # weights is a documented follow-up).  v = peasant association
+  # (village).  Sources are per-person; the `sample`/`cluster_features`
+  # df_edit hooks in _/ethiopiarhs.py dedup to the required grain.
+  sample:
+    index: (i, t)
+    v: str
+    weight: float
+    panel_weight: float
+    strata: str
+    Rural: str
+
+  cluster_features:
+    index: (t, v)
+    Region: str
+    Rural: str

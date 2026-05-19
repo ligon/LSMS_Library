@@ -74,6 +74,38 @@ demog89_1.relnhhed -- the labelled scheme is 1..9 only.  Mapped to
 empty -> NA Relationship, same treatment as the 1997 reltn4 -9
 sentinel; avoids a spurious kinship warning.)
 
+* erhs_village_region
+
+Peasant-association (=q1c= village code) -> Ethiopian region code
+(=q1a=).  ERHS villages sit in exactly one region; this 1:1 map was
+derived from food1 (the only early file carrying both =q1c= and
+=q1a=); 17/18 villages are unambiguous, the 1 stray uses the modal
+region.  Used to build =cluster_features.Region= for the 1994+ waves
+(the per-person rosters lack =q1a=).  Region values are the source
+=q1a= codes as strings.
+
+#+NAME: erhs_village_region
+| Code | Region |
+|------+--------|
+|    1 | 1      |
+|    2 | 1      |
+|    3 | 3      |
+|    5 | 3      |
+|    6 | 3      |
+|    7 | 4      |
+|    8 | 4      |
+|    9 | 4      |
+|   10 | 4      |
+|   12 | 7      |
+|   13 | 7      |
+|   14 | 8      |
+|   15 | 9      |
+|   16 | 9      |
+|   17 | 3      |
+|   18 | 3      |
+|   19 | 3      |
+|   20 | 3      |
+
 * erhs_sex
 
 #+NAME: erhs_sex

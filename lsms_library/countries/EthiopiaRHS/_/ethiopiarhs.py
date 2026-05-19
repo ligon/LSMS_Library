@@ -120,3 +120,44 @@ def food_acquired(df):
     out = out[out['u'].notna() & (out['u'] != '')]
     out = out.set_index(['i', 'j', 'u', 's'])
     return out
+
+
+def sample(df):
+    """Dedup the per-person extract to one row per household.
+
+    ERHS has no household-level cover file, so `sample` is extracted
+    from the per-person roster (i + v=village).  Collapse to HH grain
+    (first row per i), and fill the design-weight columns: ERHS is a
+    PURPOSIVE 15-village panel with no sampling weights, so weight /
+    panel_weight are NaN (documented follow-up to source any
+    constructed weights).  strata = village (the panel's PSU); Rural =
+    'Rural' (it is the *Rural* Household Survey -- all rural).
+    """
+    flat = df.reset_index()
+    flat = flat[flat['i'].notna()].drop_duplicates(subset='i', keep='first')
+    # v is a myvar here (no auto format_id) but is an idxvar in
+    # cluster_features (auto format_id'd) -- format it the same way so
+    # the market join (_add_market_index) matches ('1' == '1', not
+    # '1.0' != '1').
+    flat['v'] = flat['v'].map(tools.format_id)
+    flat['weight'] = np.nan
+    flat['panel_weight'] = np.nan
+    flat['strata'] = flat['v'].astype('string')
+    flat['Rural'] = 'Rural'
+    return flat.set_index(['i'])[['v', 'weight', 'panel_weight',
+                                  'strata', 'Rural']]
+
+
+def cluster_features(df):
+    """Dedup the per-person extract to one row per village (v).
+
+    Region comes from the erhs_village_region map applied in the wave
+    data_info (per-person rosters lack q1a).  Collapse to one row per
+    v and stamp Rural='Rural'.
+    """
+    flat = df.reset_index()
+    flat = flat[flat['v'].notna() & (flat['v'].astype('string').str.strip()
+                                     != '')]
+    flat = flat.drop_duplicates(subset='v', keep='first')
+    flat['Rural'] = 'Rural'
+    return flat.set_index(['v'])[['Region', 'Rural']]

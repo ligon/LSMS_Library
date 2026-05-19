@@ -63,3 +63,26 @@ food_acquired:
         u_prod: q36_3b
         q_inkind: q36_4a
         u_inkind: q36_4b
+
+# Sampling design (GH #271 follow-up: market='Region').  ERHS has no
+# HH-level cover file -> extracted from the per-person roster; the
+# sample/cluster_features df_edit hooks in _/ethiopiarhs.py dedup to
+# the (i)/(v) grain.  No design weights (purposive panel) -> NaN.
+sample:
+    file: demo123.dta
+    converted_categoricals: False
+    idxvars:
+        i:
+            - q1c
+            - hhid
+    myvars:
+        v: q1c
+cluster_features:
+    file: demo123.dta
+    converted_categoricals: False
+    idxvars:
+        v: q1c
+    myvars:
+        Region:
+            - q1c
+            - mappings: ['erhs_village_region', 'Code', 'Region']

@@ -114,6 +114,19 @@ appear to have village-level split files (=debdemo4=, =dindemo4=,
   =food_quantities= build across the 5 wired waves (1989 + four
   1990s); zero kinship warnings.  Validation against survey
   documentation still TODO.
+- [X] =sample= + =cluster_features= wired for the 4 1990s waves
+  (v = peasant association =q1c=; =cluster_features.Region= via the
+  =erhs_village_region= 1:1 map).  Enables =market='Region'=
+  (=food_expenditures(market='Region')= returns the =m=-indexed
+  view).  *Caveat:* ERHS is a PURPOSIVE 15-village panel with no
+  design weights -> =weight=/=panel_weight= are all-NaN by design
+  (=is_this_feature_sane= reports the expected
+  no-all-null/constant fails on these + the constant =Rural=, since
+  every HH is rural -- 13/15 checks pass; these are true survey
+  properties, not wiring defects).  =strata= = village; =Rural= =
+  'Rural'.  1989 =sample= deferred (partial wave; region is packed
+  in =hhid= -- separate map needed).  Sourcing any constructed ERHS
+  weights remains a documented follow-up.
 - [ ] Follow-ups: food-item (=q36_1=/=q36_1b=) + unit code->label
   harmonization (currently carried as stable codes); =dvc add= +
   =dvc push= to S3 (deferred -- no writer creds this session); cross-
