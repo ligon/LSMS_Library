@@ -87,3 +87,6 @@ cluster_features:
         Region:
             - q1c
             - mappings: ['erhs_village_region', 'Code', 'Region']
+        Woreda:
+            - q1c
+            - mappings: ['erhs_village_woreda', 'Code', 'Woreda']

@@ -76,37 +76,82 @@ sentinel; avoids a spurious kinship warning.)
 
 * erhs_village_region
 
-Peasant-association (=q1c= village code) -> Ethiopian region code
-(=q1a=).  ERHS villages sit in exactly one region; this 1:1 map was
-derived from food1 (the only early file carrying both =q1c= and
-=q1a=); 17/18 villages are unambiguous, the 1 stray uses the modal
-region.  Used to build =cluster_features.Region= for the 1994+ waves
-(the per-person rosters lack =q1a=).  Region values are the source
-=q1a= codes as strings.
+Peasant-association (=q1c= village code) -> NAMED Ethiopian regional
+state.  The in-data =q1a= carries only "Region N" (no names); the
+village->region assignment is the canonical ERHS one from the
+ERHS data description (Dercon & Hoddinott), archived in-repo at
+=EthiopiaRHS/<wave>/Documentation/Overview and Acknowledgements and
+Data Description.pdf= -- which states the 1989 PAs were in
+Amhara/Oromiya/SNNPR with Tigray added in the 1994 expansion, and
+documents each village's location (corroborated by the in-data
+=q1b= Woreda names).  1:1 by
+village.  Used for =cluster_features.Region= on the 1994+ waves
+(rosters lack =q1a=).  1989 has no in-data Woreda/region key
+(=demog89_1= carries only =site=) -> 1989 gets no named region (the
+1989 site->village key would come from Dercon-Hoddinott; cross-era
+reconciliation is a documented follow-up).
 
 #+NAME: erhs_village_region
 | Code | Region |
 |------+--------|
-|    1 | 1      |
-|    2 | 1      |
-|    3 | 3      |
-|    5 | 3      |
-|    6 | 3      |
-|    7 | 4      |
-|    8 | 4      |
-|    9 | 4      |
-|   10 | 4      |
-|   12 | 7      |
-|   13 | 7      |
-|   14 | 8      |
-|   15 | 9      |
-|   16 | 9      |
-|   17 | 3      |
-|   18 | 3      |
-|   19 | 3      |
-|   20 | 3      |
+|    1 | Tigray |
+|    2 | Tigray |
+|    3 | Amhara |
+|    5 | Amhara |
+|    6 | Amhara |
+|    7 | Oromia |
+|    8 | Oromia |
+|    9 | Oromia |
+|   10 | Oromia |
+|   12 | SNNP   |
+|   13 | SNNP   |
+|   14 | SNNP   |
+|   15 | SNNP   |
+|   16 | SNNP   |
+|   17 | Amhara |
+|   18 | Amhara |
+|   19 | Amhara |
+|   20 | Amhara |
 
-* erhs_site_region_1989
+* erhs_village_woreda
+
+Peasant-association (=q1c= village code) -> Woreda NAME.  Sourced
+directly from the in-data =q1b= Woreda value labels (demo123 has the
+complete set; village->woreda is a clean 1:1).  Real in-data
+geography -- no external assumption.  1994+ only (1989 =demog89_1=
+has no =q1b=).  Debre Birhan sub-sites 17-20 all roll up to Basso
+na Worana, as expected.
+
+#+NAME: erhs_village_woreda
+| Code | Woreda          |
+|------+-----------------|
+|    1 | Atsbi           |
+|    2 | Sebhaassahsie   |
+|    3 | Ankober         |
+|    5 | Enemayi         |
+|    6 | Bugena          |
+|    7 | Adaa            |
+|    8 | Kersa           |
+|    9 | Dodota          |
+|   10 | Shashemene      |
+|   12 | Cheha           |
+|   13 | Kedida Gamela   |
+|   14 | Bule            |
+|   15 | Boloso          |
+|   16 | Daramalo        |
+|   17 | Basso na Worana |
+|   18 | Basso na Worana |
+|   19 | Basso na Worana |
+|   20 | Basso na Worana |
+
+* erhs_site_region_1989 (currently UNUSED)
+
+NOTE: no longer referenced -- the 1989 cluster_features block was
+removed (numeric hhid-prefix region codes aren't the named federal
+regions, and the 1989 site->village key needed to assign named
+regions is not in-data; cross-era reconciliation is a documented
+follow-up).  Retained for provenance / future use.
+
 
 1989 pre-expansion =site= (cluster) -> region.  1989 has no =q1c=;
 the cluster is =site= and region is the leading region digit of the

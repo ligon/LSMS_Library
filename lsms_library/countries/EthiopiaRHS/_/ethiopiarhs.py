@@ -154,13 +154,16 @@ def sample(df):
 def cluster_features(df):
     """Dedup the per-person extract to one row per village (v).
 
-    Region comes from the erhs_village_region map applied in the wave
-    data_info (per-person rosters lack q1a).  Collapse to one row per
-    v and stamp Rural='Rural'.
+    Region (named, via erhs_village_region) and Woreda (real in-data
+    name, via erhs_village_woreda) are applied in the wave data_info.
+    1989 supplies neither (demog89_1 has no q1b/q1a) -- keep whichever
+    of Region/Woreda the wave provided so the country-level concat
+    fills the rest with NaN.  Collapse to one row per v; Rural='Rural'.
     """
     flat = df.reset_index()
     flat = flat[flat['v'].notna() & (flat['v'].astype('string').str.strip()
                                      != '')]
     flat = flat.drop_duplicates(subset='v', keep='first')
     flat['Rural'] = 'Rural'
-    return flat.set_index(['v'])[['Region', 'Rural']]
+    keep = [c for c in ('Region', 'Woreda') if c in flat.columns] + ['Rural']
+    return flat.set_index(['v'])[keep]

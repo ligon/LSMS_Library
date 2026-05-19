@@ -114,27 +114,43 @@ appear to have village-level split files (=debdemo4=, =dindemo4=,
   =food_quantities= build across the 5 wired waves (1989 + four
   1990s); zero kinship warnings.  Validation against survey
   documentation still TODO.
-- [X] =sample= + =cluster_features= wired for the 4 1990s waves
-  (v = peasant association =q1c=; =cluster_features.Region= via the
-  =erhs_village_region= 1:1 map).  Enables =market='Region'=
-  (=food_expenditures(market='Region')= returns the =m=-indexed
-  view).  *Weights:* ERHS is a PURPOSIVE 15-village panel with no
+- [X] =sample= (all 5 waves) + =cluster_features= (4 1994+ waves)
+  wired.  =cluster_features= carries NAMED =Region= (Tigray /
+  Amhara / Oromia / SNNP, via =erhs_village_region=, grounded in the
+  Dercon-Hoddinott data description now archived at
+  =<wave>/Documentation/Overview...pdf= and corroborated by in-data
+  =q1b=) and NAMED =Woreda= (=erhs_village_woreda=, straight from
+  in-data =q1b= labels; 15 woredas, D.B. sub-sites -> Basso na
+  Worana).  Both =market='Region'= and =market='Woreda'= return the
+  =m=-indexed view with real names.  1989 has =sample= (cluster
+  v==site=) but NO =cluster_features= (=demog89_1= lacks q1b/q1a; no
+  authoritative named geography in-data -> 1989 drops from market
+  views; cross-era reconciliation a documented follow-up;
+  =erhs_site_region_1989= retained but unused).  *Weights:* ERHS is a PURPOSIVE 15-village panel with no
   survey *design* weights, so =weight=/=panel_weight= are set to a
   UNIFORM 1.0 (self-weighting -- each HH counts once; unweighted
   means; does not break weighted-aggregation code the way NaN would).
   Explicitly NOT expansion factors.  =is_this_feature_sane= emits
   only a constant-column *warning* (weight/panel_weight = 1, =Rural= =
   'Rural' since every ERHS HH is rural -- a true survey property); no
-  fails -> =sample= OK.  =strata= = village.  1989 =sample= is now
-  wired too (cluster = =site=; region via =erhs_site_region_1989=,
-  1989's own pre-expansion region codes -- not assumed aligned with
-  the 1994+ =q1a= scheme).  After 1989, =food_expenditures= v-NA
+  fails -> =sample= OK.  =strata= = village.  1989 =sample= is
+  wired (cluster = =site=; no 1989 =cluster_features=, see above).
+  After adding 1989 =sample=, =food_expenditures= v-NA
   fell 2,144 -> 553; the residual is the inherent roster<food
   HH-coverage gap (1989 423 / 1995 111 / 1994b 19 -- food-only
   households absent from the per-person roster the sample derives
   from; documented, not fixable without a different roster source).
   Sourcing any constructed ERHS weights remains a documented
   follow-up.
+- [X] Named geography: =cluster_features.Region= (Tigray / Amhara /
+  Oromia / SNNP) and =cluster_features.Woreda= (15 real Woreda
+  names) for the 1994+ waves; =market='Region'= and
+  =market='Woreda'= both return named =m= views.  ERHS
+  documentation (Overview/data-description, per-village PDFs,
+  per-wave questionnaires, SPS codebooks) archived in-repo under
+  each =<wave>/Documentation/= -- DVC-tracked, content-deduped on
+  S3 (survey-wide docs share one blob across waves' per-wave
+  =.dvc=).
 - [X] Food-item harmonization: =harmonize_food= table
   (Uganda-style: =Preferred Label= + =Aggregate= + one CODE column
   per wave; no stable ERHS food code scheme, so each wave's
@@ -148,9 +164,8 @@ appear to have village-level split files (=debdemo4=, =dindemo4=,
   0/6) -> NA via =erhs_sex=.
 - [ ] Follow-ups: *unit* code->label harmonization (units still
   carried as stable codes); refine =harmonize_food= residual
-  (unlabelled source codes) + variant split/merge; *region labels*
-  -- the source carries only "Region N" (no real names; =q1b=
-  Woreda / =q1c= village DO have real names if readable geography is
-  wanted) -- pending decision; cross-wave panel-id linkage via =q2=
-  (1989/90 HH no.); cross-era 1989-vs-1994+ region reconciliation;
-  sourcing constructed ERHS weights.
+  (unlabelled source codes) + variant split/merge; 1989 named
+  geography (needs the Dercon-Hoddinott 1989 site->village key) +
+  cross-era 1989-vs-1994+ region reconciliation; cross-wave
+  panel-id linkage via =q2= (1989/90 HH no.); sourcing constructed
+  ERHS weights; validation of derived tables vs survey docs.

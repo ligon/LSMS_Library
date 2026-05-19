@@ -46,4 +46,5 @@ Data Scheme:
   cluster_features:
     index: (t, v)
     Region: str
+    Woreda: str
     Rural: str

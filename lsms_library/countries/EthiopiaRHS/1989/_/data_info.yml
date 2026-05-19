@@ -71,12 +71,9 @@ sample:
         i: hhid
     myvars:
         v: site
-cluster_features:
-    file: demog89_1.dta
-    converted_categoricals: False
-    idxvars:
-        v: site
-    myvars:
-        Region:
-            - site
-            - mappings: ['erhs_site_region_1989', 'Code', 'Region']
+# No 1989 cluster_features: demog89_1 has no q1b/q1a -> no in-data
+# Woreda and no authoritative named region (the 1989 site->village
+# key would come from Dercon-Hoddinott; cross-era named-geography
+# reconciliation is a documented follow-up).  1989 keeps `sample`
+# (cluster v = site) for the v-join; market='Region'/'Woreda' rows
+# for 1989 are NaN and drop, as documented in CONTENTS.
