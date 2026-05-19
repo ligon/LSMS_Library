@@ -433,26 +433,32 @@ class TestUganda2009MarketFallback:
         )
 
     def test_household_characteristics_retains_hybrid_v_HH(self, hc):
-        """household_characteristics(market='Region') should cover the
-        full 2 951 HH (those with populated sample.v, hybrid or real).
+        """household_characteristics(market='Region') should cover every
+        HH in sample (2975 for Uganda 2009-10).
 
-        Pinned to equality on 2026-05-09: warm- and cold-cache probes
-        both produce 2951 exactly (Slurm jobs 34085538 and 34085552).
-        The 24-HH gap from sample's 2975 is the MonthsSpent filter in
-        roster_to_characteristics dropping departed-only HHs (added
-        2026-04-15 to resolve a 1315-HH drift vs RiskSharing_Replication;
-        see CLAUDE.md "MonthsSpent / MonthsAway / WeeksAway"). Any
-        legitimate change to that filter -- or any new attrition path
-        -- will trip this test, which is the intent: surface drift in
-        either direction.
+        Pin history:
+
+        - 2026-05-09: pinned to 2951 (sample 2975 − 24 mover HHs whose
+          NaN ``v`` was being silently dropped by the household
+          groupby, originally attributed in the comment to the
+          MonthsSpent filter).
+        - 2026-05-11 (GH #268): re-pinned to 2975.  The 24 mover HHs
+          previously dropped by the groupby now survive as
+          ``v == 'Mover'`` under the new ``mover_sentinel`` default in
+          ``roster_to_characteristics``.  Sample carried a valid
+          Region for those HHs all along, so they're correctly
+          assignable to a market.
+
+        Any further drift in either direction is meaningful: investigate
+        before re-pinning.
         """
         if "2009-10" not in hc.index.get_level_values("t").unique():
             pytest.skip("no 2009-10 wave")
         hh09 = hc.xs("2009-10", level="t").index.get_level_values("i").nunique()
-        assert hh09 == 2951, (
+        assert hh09 == 2975, (
             f"household_characteristics(market='Region') retained {hh09} HH "
-            f"in 2009-10 — expected exactly 2951 (sample 2975 − 24 "
-            f"departed-only via MonthsSpent filter). Drift in either "
+            f"in 2009-10 — expected exactly 2975 (full sample including "
+            f"mover HHs with v='Mover'; GH #268).  Drift in either "
             f"direction is meaningful: investigate before re-pinning."
         )
 
