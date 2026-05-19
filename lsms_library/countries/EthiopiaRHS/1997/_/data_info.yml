@@ -62,7 +62,9 @@ food_acquired:
         i:
             - q1c
             - q1d
-        j: q36_1
+        j:
+            - q36_1
+            - mappings: ['harmonize_food', '1997', 'Preferred Label']
     myvars:
         q_purch: q36_2a
         u_purch: q36_2b

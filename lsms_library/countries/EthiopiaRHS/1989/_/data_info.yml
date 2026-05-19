@@ -43,7 +43,9 @@ food_acquired:
     converted_categoricals: False
     idxvars:
         i: hhid
-        j: foodcode
+        j:
+            - foodcode
+            - mappings: ['harmonize_food', '1989', 'Preferred Label']
         u: unitcode
         s:
             - source

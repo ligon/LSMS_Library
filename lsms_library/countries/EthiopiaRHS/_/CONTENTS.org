@@ -135,7 +135,22 @@ appear to have village-level split files (=debdemo4=, =dindemo4=,
   from; documented, not fixable without a different roster source).
   Sourcing any constructed ERHS weights remains a documented
   follow-up.
-- [ ] Follow-ups: food-item (=q36_1=/=q36_1b=) + unit code->label
-  harmonization (currently carried as stable codes); =dvc add= +
-  =dvc push= to S3 (deferred -- no writer creds this session); cross-
-  wave panel id linkage via =q2= (1989/90 HH no.).
+- [X] Food-item harmonization: =harmonize_food= table
+  (Uganda-style: =Preferred Label= + =Aggregate= + one CODE column
+  per wave; no stable ERHS food code scheme, so each wave's
+  data_info maps its own code column via
+  =mappings: ['harmonize_food','<wave>','Preferred Label']=).
+  ~94.5% of food rows now resolve to names; =labels='Aggregate'=
+  works.  Residual ~5.5% stay numeric -- codes with NO value label
+  in the source survey itself (cannot be named without external
+  food-code documentation; first-pass reconciliation, refinements a
+  follow-up like Uganda's evolving table).  Sex strays (1989 codes
+  0/6) -> NA via =erhs_sex=.
+- [ ] Follow-ups: *unit* code->label harmonization (units still
+  carried as stable codes); refine =harmonize_food= residual
+  (unlabelled source codes) + variant split/merge; *region labels*
+  -- the source carries only "Region N" (no real names; =q1b=
+  Woreda / =q1c= village DO have real names if readable geography is
+  wanted) -- pending decision; cross-wave panel-id linkage via =q2=
+  (1989/90 HH no.); cross-era 1989-vs-1994+ region reconciliation;
+  sourcing constructed ERHS weights.
