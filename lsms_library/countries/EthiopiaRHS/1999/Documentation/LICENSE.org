@@ -1,0 +1,5 @@
+LICENSE
+
+IFPRI Dataverse Terms of Use. Publicly downloadable without account
+or token; not DUA-gated. Acknowledge the source (IFPRI / Addis Ababa
+University / CSAE) and cite doi:10.7910/DVN/T8G8IV. Non-commercial use.

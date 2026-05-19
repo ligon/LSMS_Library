@@ -1,0 +1,9 @@
+SOURCE
+
+Ethiopian Rural Household Survey (ERHS) -- 2004 wave, Round 6 (2004).
+
+IFPRI Dataverse, doi:10.7910/DVN/T8G8IV (hdl:1902.1/15646)
+https://doi.org/10.7910/DVN/T8G8IV
+
+All ERHS rounds share one Dataverse deposit; see ../../_/CONTENTS.org
+for the round->file map.

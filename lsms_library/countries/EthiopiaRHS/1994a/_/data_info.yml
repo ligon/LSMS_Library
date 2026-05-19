@@ -1,0 +1,88 @@
+# ERHS wave 1994a (Round 1).
+#
+# CODE-BASED extraction (converted_categoricals: False).  ERHS label
+# spellings drift across files/rounds (village code 6 = "Shumsha" in
+# demo123 vs "SHUMSHEHA" in food1) but numeric codes are stable and
+# identical across modules -- raw (q1c,hh_no) overlap demo123<->food1
+# is 1473/1473.  So household identity and all categoricals key off
+# the stable codes; labels come from _/categorical_mapping.org.
+#
+# Roster source demo123.dta is the pooled R1-R3 file (round-suffixed
+# columns); 1994a uses the round-1 columns.  1994b/1995 point at the
+# same file with their round-2/round-3 column names.  `q2` (1989/90
+# HH no.) is the cross-wave/1989 linkage key (carried later).
+
+household_roster:
+    file: demo123.dta
+    converted_categoricals: False
+    idxvars:
+        i:
+            - q1c        # peasant association (stable code)
+            - hhid       # HH no. within village
+        pid: ind         # roster-card id
+    myvars:
+        Sex:
+            - q11_5
+            - mappings: ['erhs_sex', 'Code', 'Preferred Label']
+        Age: q11_6a
+        Relationship:
+            - q11_1b
+            - mappings: ['erhs_relation', 'Code', 'Preferred Label']
+
+# food1.dta: one row per (household, food item); three acquisition
+# sources side by side, each with its own quantity + unit (purchases
+# also carry expenditure).  Household keys q1c+q5 use the SAME stable
+# codes as demo123's q1c+hhid.  The `food_acquired` df_edit hook in
+# _/ethiopiarhs.py melts the source triplets into canonical
+# (t, i, j, u, s).  j (q36_1b) and units are carried as stable codes;
+# food-label / unit harmonization is a documented follow-up.
+food_acquired:
+    file: food1.dta
+    converted_categoricals: False
+    idxvars:
+        i:
+            - q1c
+            - q5
+        j:
+            - q36_1b
+            - mappings: ['harmonize_food', '1994a', 'Preferred Label']
+    myvars:
+        q_purch: q36_2a
+        u_purch:
+            - q36_2b
+            - mappings: ['harmonize_unit', 'Code', 'Preferred Label']
+        e_purch: q36_2c
+        q_prod: q36_3a
+        u_prod:
+            - q36_3b
+            - mappings: ['harmonize_unit', 'Code', 'Preferred Label']
+        q_inkind: q36_4a
+        u_inkind:
+            - q36_4b
+            - mappings: ['harmonize_unit', 'Code', 'Preferred Label']
+
+# Sampling design (GH #271 follow-up: market='Region').  ERHS has no
+# HH-level cover file -> extracted from the per-person roster; the
+# sample/cluster_features df_edit hooks in _/ethiopiarhs.py dedup to
+# the (i)/(v) grain.  No design weights (purposive panel) -> NaN.
+sample:
+    file: demo123.dta
+    converted_categoricals: False
+    idxvars:
+        i:
+            - q1c
+            - hhid
+    myvars:
+        v: q1c
+cluster_features:
+    file: demo123.dta
+    converted_categoricals: False
+    idxvars:
+        v: q1c
+    myvars:
+        Region:
+            - q1c
+            - mappings: ['erhs_village_region', 'Code', 'Region']
+        Woreda:
+            - q1c
+            - mappings: ['erhs_village_woreda', 'Code', 'Woreda']

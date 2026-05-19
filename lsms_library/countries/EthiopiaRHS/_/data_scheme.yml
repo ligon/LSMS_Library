@@ -1,0 +1,50 @@
+Country: EthiopiaRHS
+
+# Ethiopian Rural Household Survey (ERHS), 1989-2009.
+# Distinct survey from the World Bank ESS/LSMS-ISA `Ethiopia` module.
+# Source: IFPRI Dataverse, doi:10.7910/DVN/T8G8IV (hdl:1902.1/15646).
+# Waves are auto-discovered from {wave}/Documentation/SOURCE.org -- no
+# ethiopiarhs.py / Waves dict (per maintainer steer 2026-05-18).
+#
+# First pass is CFE-minimal (GH #271): household_roster + food_acquired,
+# which auto-derive household_characteristics and
+# food_expenditures/food_quantities at runtime. Per-wave variable
+# mappings live in {wave}/_/data_info.yml and are filled in wave by wave.
+
+Data Scheme:
+  household_roster:
+    index: (t, i, pid)
+    Sex: str
+    Age: int
+    Relationship: str
+    Generation: int
+    Distance: int
+    Affinity: str
+
+  # Mali-style clean YAML: extract wide per-source columns; the
+  # `food_acquired` df_edit hook in _/ethiopiarhs.py melts them to
+  # canonical long form on s. Price is API-derived (food_prices).
+  food_acquired:
+    index: (t, i, j, u, s)
+    Quantity: float
+    Expenditure: float
+
+  # Sampling design.  ERHS is a PURPOSIVE 15-village longitudinal
+  # panel, not a weighted national sample -- there are no design
+  # weights, so weight/panel_weight are NaN (sourcing any constructed
+  # weights is a documented follow-up).  v = peasant association
+  # (village).  Sources are per-person; the `sample`/`cluster_features`
+  # df_edit hooks in _/ethiopiarhs.py dedup to the required grain.
+  sample:
+    index: (i, t)
+    v: str
+    weight: float
+    panel_weight: float
+    strata: str
+    Rural: str
+
+  cluster_features:
+    index: (t, v)
+    Region: str
+    Woreda: str
+    Rural: str

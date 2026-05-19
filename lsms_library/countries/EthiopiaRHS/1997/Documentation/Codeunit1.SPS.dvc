@@ -1,0 +1,5 @@
+outs:
+- md5: 7b88a0a3a34f9a35d75fe7901ca23ac4
+  size: 119
+  hash: md5
+  path: Codeunit1.SPS
