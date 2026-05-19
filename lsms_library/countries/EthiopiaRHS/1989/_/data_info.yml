@@ -77,3 +77,17 @@ sample:
 # reconciliation is a documented follow-up).  1989 keeps `sample`
 # (cluster v = site) for the v-join; market='Region'/'Woreda' rows
 # for 1989 are NaN and drop, as documented in CONTENTS.
+
+# Income (1989 ONLY).  ethyrev.dta ships a constructed annual
+# household income total for the 1989 instrument; hhid is the same
+# packed scalar as the 1989 roster i.  income = totinc (GROSS annual
+# birr, matching Uganda's gross-sum convention; netinc available as
+# an alternative).  1994+ rounds have no constructed income aggregate
+# -> no income block there (documented in CONTENTS).
+income:
+    file: ethyrev.dta
+    converted_categoricals: False
+    idxvars:
+        i: hhid
+    myvars:
+        income: totinc

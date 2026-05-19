@@ -48,3 +48,16 @@ Data Scheme:
     Region: str
     Woreda: str
     Rural: str
+
+  # 1989 ONLY.  ERHS ships a constructed annual household income
+  # total (ethyrev.dta totinc/netinc, packed-hhid = 1989 roster i)
+  # for the 1989 instrument only.  The 1994+ panel rounds ship NO
+  # constructed income aggregate (unlike consumption) -- only raw
+  # per-transaction crop-sale/livestock/wage modules; reconstructing
+  # a household total there is a large separate effort, documented
+  # in CONTENTS, intentionally NOT attempted here.
+  income:
+    index: (t, i)
+    income: float
+
+  panel_ids: !make
