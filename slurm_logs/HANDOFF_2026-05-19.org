@@ -1,0 +1,110 @@
+#+TITLE: Session handoff — EthiopiaRHS (ERHS) ingestion + follow-ons
+#+DATE: 2026-05-19
+#+FILETAGS: handoff erhs lsms_library
+
+* Summary
+
+Long session: built the *Ethiopian Rural Household Survey* as a new
+survey (=EthiopiaRHS=, GH #271), then a series of follow-ons
+(panel_ids, the #274 fix) and scoped several future efforts as
+issues.  This note captures durable state + the one open decision so
+a fresh context can resume cleanly.  Almost nothing lives only in
+chat — design rationale is in commit messages, =EthiopiaRHS/_/CONTENTS.org=,
+and the issue bodies.
+
+* Branch / PR / issue state
+
+- *master*: #271/#272 merged (squash =f60a9239=) — full EthiopiaRHS:
+  5 wired waves (1989, 1994a/b, 1995, 1997) roster/food/sample/
+  cluster_features + derived household_characteristics/food_prices/
+  food_quantities; named Region+Woreda; food + unit harmonization
+  with good-specific kg conversion; full data + 37 docs DVC-tracked
+  on S3.
+- *development*: contains master (=343eabbe Merge branch 'master'=).
+  *Branch policy (maintainer steer 2026-05-19): all new work targets
+  =development=, NOT =master=.*
+- *PR #273* (OPEN -> development) =feature/erhs-income-panelids2=:
+  EthiopiaRHS =panel_ids= (4,708-edge crosswalk; script-path
+  =_/panel_ids.py=).  1989 income was added then *dropped per
+  @ligon review* (commit =ee00d24f=); income deferred entirely.
+- *PR #276* (OPEN -> development) =fix/274-data-scheme-missing-underscore=:
+  one-line guard in =Wave.data_scheme= (country.py:~373) — a wave
+  with no =_/= dir declares no tables instead of raising
+  FileNotFoundError.  Closes #274 (fresh-checkout crash on the
+  unwired 1999/2004/2009 stub waves).  Verified.
+- Issues filed: *#275* ERHS community/market prices; *#277* ERHS
+  additional features (assets/shocks/housing/livestock; 1999-2009
+  consumption aggregate; 1994+ panel income — income deferred here);
+  *#278* ERHS =plot_features= (plot-level ag, R1–R4) under the
+  project-wide umbrella *#167*.
+- =chore/handoff-2026-05-19= (this note), off =development=.
+
+* THE open decision (resume here)
+
+Should ERHS implement the canonical =plot_features= (#278)?  Data
+exists for R1–R4 only (real plot rosters; =plot_id= = =q21_1= R1 /
+=q21_3=+=q21_4= R3+; R4 ships pre-computed hectares =plotha=).
+Recommendation: yes, high value (central to the ERHS price-risk
+literature) and the #272 unit/kg pattern already half-solves #167's
+"area-unit -> hectares hard part".  *Blocker = a maintainer/architecture
+call*: #167 reserves =plot_features (t,v,i,plot_id)= but no country
+implements it, and adding the canonical =Columns:= block flips
+=tests/test_feature.py::test_column_table_has_countries= red until
+≥1 country declares it.  #167 names *Uganda* as the Phase-1 pilot;
+if ERHS implements first it becomes the de-facto pilot and pins the
+canonical column set.  *Decide: is ERHS the plot_features pilot (or
+co-pilot), and who signs off on the canonical Columns block?*
+
+Proposed next step (not yet done): draft
+=slurm_logs/DESIGN_erhs_plot_features_2026-05-NN.org= — per-round
+column mapping, ERHS =hectares_per_unit= approach (R4 hectares as
+the validation oracle; =prodconv.tab= candidate factors), =plot_id=
+construction, and the #167 atomicity/pilot resolution — for review
+*before* implementation (scrum-master "design in a shared artifact").
+
+NB: =plot_features= is plot *characteristics* (area/crop/tenure/
+soil).  Crop output/yield/profit is a *distinct* concern (HH×crop in
+ERHS, not per-plot) — see #277, not #278.
+
+* Environment / gotchas (for the next session)
+
+- Savio compute node; venv =.venv/bin/python= works.  Verify ERHS
+  builds with =LSMS_NO_CACHE=1=.
+- *S3 writer creds now valid*: =.dvc/config.local= (gitignored) has
+  =credentialpath = s3_write_creds= for =ligonresearch_s3=; key
+  tested good.  =dvc push -r ligonresearch_s3= works.  (The earlier
+  =localstage= local remote was retired.)
+- *gh CLI has a Projects-classic GraphQL bug*: =gh pr view --comments=,
+  =gh pr edit= fail with a projectCards error.  Workaround used
+  throughout: REST via =gh api= (e.g.
+  =gh api -X PATCH repos/ligon/LSMS_Library/pulls/N -f body=...=,
+  =gh api repos/.../issues/N/comments=).
+- #274 stub-wave gotcha: empty =1999/2004/2009/_= & =Data/= dirs are
+  untracked (git drops empty dirs) so they vanish on fresh checkout;
+  PR #276 fixes the crash.  PR #273's branch predates #276 — if
+  testing #273 in isolation, either land #276 first or
+  =mkdir EthiopiaRHS/{1999,2004,2009}/_= locally.
+- Ephemeral steering dirs =slurm_logs/build_2026-05-1{8,9}/= are
+  untracked by design (subagent channels); ignore / safe to rm.
+- ERHS conventions (see =EthiopiaRHS/_/CONTENTS.org= + commit msgs):
+  code-based extraction (=converted_categoricals: False=); shared
+  =_/ethiopiarhs.py= formatters (composite/scalar =i=, food melt,
+  sample/cluster_features dedup hooks); harmonize tables in
+  =_/categorical_mapping.org= (food/unit/relation/sex/village).
+
+* Recon artifacts produced this session (in chat / issue bodies)
+
+- ERHS source-structure recon (panel-id linkage, income, ag
+  production) — findings folded into #273/#277/#278 and CONTENTS.
+- Key fact: ERHS Dataverse archive is *incomplete for R5–R7* raw
+  modules (only derived HH×crop aggregates for 1999/2004/2009; no
+  plot sections, no item food, no roster).
+
+* Reproducibility
+
+#+begin_src bash
+# verify wired ERHS (any branch with #276 or local stub dirs):
+LSMS_NO_CACHE=1 .venv/bin/python -c "import lsms_library as ll; \
+c=ll.Country('EthiopiaRHS'); print(c.household_roster().shape, \
+c.food_expenditures().shape, len(c.panel_ids))"
+#+end_src
