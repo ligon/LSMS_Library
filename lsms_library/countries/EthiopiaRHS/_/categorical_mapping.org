@@ -106,6 +106,27 @@ region.  Used to build =cluster_features.Region= for the 1994+ waves
 |   19 | 3      |
 |   20 | 3      |
 
+* erhs_site_region_1989
+
+1989 pre-expansion =site= (cluster) -> region.  1989 has no =q1c=;
+the cluster is =site= and region is the leading region digit of the
+packed 5-digit =hhid= (R VV HH), derived from the perfectly 1:1
+=site= x =hhid//1000= crosstab in demog89_1.  These are the 1989
+survey's OWN region codes -- NOT assumed aligned with the 1994+
+=q1a= regions (cross-era region harmonization is a documented
+follow-up).  demog89_1 carries sites {1,2,4,5,7}; food89-only sites
+{3,6} have no roster/cluster row (the usual 1989 roster<food
+coverage gap).
+
+#+NAME: erhs_site_region_1989
+| Code | Region |
+|------+--------|
+|    1 | 1      |
+|    2 | 2      |
+|    4 | 6      |
+|    5 | 7      |
+|    7 | 4      |
+
 * erhs_sex
 
 #+NAME: erhs_sex

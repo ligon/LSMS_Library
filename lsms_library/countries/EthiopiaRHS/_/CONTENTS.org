@@ -125,8 +125,14 @@ appear to have village-level split files (=debdemo4=, =dindemo4=,
   Explicitly NOT expansion factors.  =is_this_feature_sane= emits
   only a constant-column *warning* (weight/panel_weight = 1, =Rural= =
   'Rural' since every ERHS HH is rural -- a true survey property); no
-  fails -> =sample= OK.  =strata= = village.  1989 =sample= deferred
-  (partial wave; region is packed in =hhid= -- separate map needed).
+  fails -> =sample= OK.  =strata= = village.  1989 =sample= is now
+  wired too (cluster = =site=; region via =erhs_site_region_1989=,
+  1989's own pre-expansion region codes -- not assumed aligned with
+  the 1994+ =q1a= scheme).  After 1989, =food_expenditures= v-NA
+  fell 2,144 -> 553; the residual is the inherent roster<food
+  HH-coverage gap (1989 423 / 1995 111 / 1994b 19 -- food-only
+  households absent from the per-person roster the sample derives
+  from; documented, not fixable without a different roster source).
   Sourcing any constructed ERHS weights remains a documented
   follow-up.
 - [ ] Follow-ups: food-item (=q36_1=/=q36_1b=) + unit code->label

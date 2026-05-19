@@ -54,3 +54,27 @@ food_acquired:
     myvars:
         Quantity: quantity
         Expenditure: value
+
+# Sampling design (1989).  No q1c; cluster = `site`, household id =
+# the packed scalar `hhid` (same as the 1989 roster i).  Region via
+# erhs_site_region_1989 (1989's own pre-expansion region codes).  The
+# shared sample()/cluster_features() df_edit hooks dedup to (i)/(v).
+# Coverage: demog89_1 is the partial 1989 roster (338 HH); food89 HH
+# absent from it (food-only sites/HH) keep v=NA -- the documented
+# 1989 roster<food gap, same as the 1994b/1995 residual.
+sample:
+    file: demog89_1.dta
+    converted_categoricals: False
+    idxvars:
+        i: hhid
+    myvars:
+        v: site
+cluster_features:
+    file: demog89_1.dta
+    converted_categoricals: False
+    idxvars:
+        v: site
+    myvars:
+        Region:
+            - site
+            - mappings: ['erhs_site_region_1989', 'Code', 'Region']
