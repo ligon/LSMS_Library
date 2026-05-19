@@ -1,0 +1,5 @@
+outs:
+- md5: cfe6e2b3fc17b039f8b3b1c59d6a3331
+  size: 693289
+  hash: md5
+  path: age_sex_r4.dta
