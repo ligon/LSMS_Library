@@ -177,15 +177,7 @@ appear to have village-level split files (=debdemo4=, =dindemo4=,
   dependency.  1989 unitcode is in-data-unlabelled -> all 1989 units
   good-specific from raw code (1989 metric units not distinguished;
   Codeunit1.SPS in Documentation could seed this -- follow-up).
-- [X] =income= (stacked PR / GH #271).  1989 ONLY: =ethyrev.dta=
-  ships a constructed annual household income total
-  (=income= = =totinc=, GROSS annual birr, crop year 1980 E.C.;
-  packed-hhid = 1989 roster i).  490 HH, sane OK.  The 1994+ panel
-  rounds ship NO constructed income aggregate (unlike consumption) --
-  only raw per-transaction crop-sale/livestock/wage modules;
-  reconstructing a household total there is a large separate effort,
-  intentionally NOT attempted (no income block for 1994a/b/1995/1997).
-- [X] =panel_ids= (stacked PR / GH #271).  Script-path
+- [X] =panel_ids= (GH #271, PR #273).  Script-path
   =_/panel_ids.py= -> =panel_ids.json= (4,708 edges);
   =updated_ids.json= empty (no household-split var in ERHS).
   Baseline 1994a; chain 1989 -> 1994a -> 1994b -> 1995 -> 1997.
@@ -201,9 +193,11 @@ appear to have village-level split files (=debdemo4=, =dindemo4=,
   residual = HH dropped by the roster's NA-Sex round filter -- those
   edges simply link nothing).  id_walk fires with no roster
   regression.
-- [ ] Follow-ups: reconstruct 1994+ panel income from raw R1-R7
-  transaction modules (crop-sale/livestock/wage/transfers, large
-  effort); refine =harmonize_food= residual (unlabelled source
+- [ ] Follow-ups: *income* -- deferred entirely (per #273 review):
+  the larger project of handling ERHS income from different sources
+  (1989 =ethyrev= =totinc= AND reconstructing the 1994+ panel total
+  from raw R1-R7 crop-sale/livestock/wage/transfer modules) is a
+  separate future effort -- see #277; refine =harmonize_food= residual (unlabelled source
   codes) + variant split/merge; 1989 named geography + 1989
   metric-unit distinction (Codeunit1.SPS); cross-era 1989-vs-1994+
   region reconciliation; sourcing constructed ERHS weights; optional
