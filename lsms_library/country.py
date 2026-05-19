@@ -370,7 +370,17 @@ class Wave:
 
     @property
     def data_scheme(self) -> list[str]:
-        wave_data = [f.stem for f in (self.file_path / "_").iterdir() if f.suffix == '.py' and f.stem not in [f'{self.wave_folder}']]
+        # A wave with no ``_/`` directory simply declares no tables
+        # (e.g. a partially-wired survey where a wave is auto-discovered
+        # from ``Documentation/SOURCE.org`` but not yet wired -- and the
+        # empty ``_/`` dir is absent on a fresh checkout since git does
+        # not track empty directories).  Treat as empty rather than
+        # raising FileNotFoundError, which otherwise poisons every
+        # Country-level ``load_from_waves`` call (GH #274).
+        _wave_dir = self.file_path / "_"
+        if not _wave_dir.is_dir():
+            return []
+        wave_data = [f.stem for f in _wave_dir.iterdir() if f.suffix == '.py' and f.stem not in [f'{self.wave_folder}']]
         # Customed
         replace_dic = { 'other_features': ['cluster_features']}
         # replace the key with the value in the dictionary
