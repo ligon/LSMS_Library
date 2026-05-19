@@ -1,0 +1,186 @@
+#+title: Contents
+
+The Ethiopian Rural Household Survey (ERHS) is a longitudinal survey of
+rural households in Ethiopia, distinct from the World Bank ESS /
+LSMS-ISA waves carried in the separate =Ethiopia= module.  It is the
+data behind a well-known price-risk / welfare literature (Dercon,
+Krishnan, and collaborators).  This declaration tracks the
+library-side enhancement requested in GH #271.
+
+* Survey Program
+
+Run jointly by the Department of Economics, Addis Ababa University
+(AAU); the Centre for the Study of African Economies (CSAE), Oxford;
+and the International Food Policy Research Institute (IFPRI).  Initial
+fieldwork in 1989 covered 6--7 villages in Central/Southern Ethiopia;
+in 1994 the sample was expanded to ~1,494 households across 15
+villages (=peasant associations=) and revisited repeatedly.
+
+Eight rounds are declared:
+
+| Wave  | Round | Fieldwork           | Notes                                  |
+|-------+-------+---------------------+----------------------------------------|
+| 1989  | --    | 1989                | 6--7 villages; pre-expansion instrument |
+| 1994a | R1    | early 1994          | expansion to 15 villages               |
+| 1994b | R2    | late 1994           |                                        |
+| 1995  | R3    | 1995                |                                        |
+| 1997  | R4    | 1997                |                                        |
+| 1999  | R5    | 1999                |                                        |
+| 2004  | R6    | 2004                |                                        |
+| 2009  | R7    | 2009                |                                        |
+
+* Data Source
+
+Single IFPRI Dataverse deposit covering all rounds:
+
+- DOI: [[https://doi.org/10.7910/DVN/T8G8IV][doi:10.7910/DVN/T8G8IV]] (handle =hdl:1902.1/15646=)
+- Title: "Ethiopian Rural Household Surveys (ERHS), 1989-2009"
+- 309 files, *none restricted* (=fileAccessRequest: false=).
+
+** Access / Terms of Use
+
+Contrary to GH #271's initial assumption, ERHS is *not* DUA-gated.
+Files are publicly downloadable without an account or API token via
+the Dataverse data-access API:
+
+: curl -L "https://dataverse.harvard.edu/api/access/datafile/<id>?format=original"
+
+=format=original= returns the original Stata =.dta= for ingested
+tabular files (verified).  The IFPRI Dataverse Terms of Use require
+acknowledging the source and are non-commercial in spirit; cite IFPRI
+/ AAU / CSAE and the DOI above.  Researchers are encouraged to
+coordinate with AAU Economics (contact historically Stefan Dercon).
+
+* Round -> File Map (work in progress, filled wave by wave)
+
+The Dataverse archive mixes several naming conventions across rounds.
+Confirmed core files:
+
+| Wave  | Roster / demographics       | Food consumption        |
+|-------+-----------------------------+-------------------------|
+| 1989  | demog89_1, demog89_2        | cons89, food89          |
+| 1994a | demo123 (pooled R1--R3)     | food1                   |
+| 1994b | demo123 (pooled R1--R3)     | food2                   |
+| 1995  | demo123 (pooled R1--R3)     | food3                   |
+| 1997  | demo4, age_sex_r4           | food4                   |
+| 1999  | TBD (village-split: deb/din/har/sid/wol demo4 ...) | TBD |
+| 2004  | TBD                         | TBD (consumptionaggregates_123456?) |
+| 2009  | TBD                         | consumptionAggrgates_r7 |
+
+=demo123= and =food1/2/3= cover rounds 1--3; =demo123= is pooled
+(round column -> wave split likely needs a =_/=-script per the
+multi-round pattern; to be confirmed on inspection).  Later rounds
+appear to have village-level split files (=debdemo4=, =dindemo4=,
+=hardemo4=, =siddemo4=, =woldemo4=, ...) -- structure TBD.
+
+* Open Questions (from GH #271)
+
+- Raw module layout: roster vs. consumption one-file-per-round vs.
+  pooled; member and commodity identifiers; a stable household key
+  across rounds.
+- Whether a household-ID crosswalk exists to link ERHS to
+  third-party derived panels (same-sample comparisons).
+- Restricted staple basket vs. the fuller ERHS food basket (the
+  latter is the more natural CFE input).
+
+* Status
+
+- [X] Country scaffold (dirs, =data_scheme.yml=, this file, per-wave
+  =SOURCE.org= for auto-discovery)
+- [X] Wave 1994a acquired + wired (roster, food_acquired) -- code-based
+  template, commit 36818510
+- [X] Waves 1994b / 1995 / 1997 wired (scatter-gather; roster + food
+  =is_this_feature_sane= OK, per-wave i-overlap 95.6--99.7%)
+- [X] Wave 1989 wired (pre-expansion instrument; roster + food
+  =is_this_feature_sane= OK).  Deviations handled: single packed
+  =hhid= (scalar =i= path), 9-code =relnhhed= (=erhs_relation_1989=
+  table), already-long =food89= single =source= column (food melt
+  pass-through).  *Caveats:* =demog89_1= is a PARTIAL person roster
+  (338 HH) vs =food89= (483 HH; 279 shared) -- no fuller 1989 person
+  roster exists (=demog89_2= is a 203-row HH summary), so 1989
+  =food_expenditures= is meaningful only for the ~279 shared HH; two
+  single-row =relnhhed= data errors (codes 11, 36) mapped to NA.
+- [ ] Waves 1999 / 2004 / 2009: *NOT WIREABLE for roster/food.* The
+  IFPRI Dataverse archive has NO person roster and NO item-level food
+  for R5/R6/R7 -- only pre-aggregated household consumption scalars
+  (=consumptionaggregates_123456.tab= cols =*5=/=*6=;
+  =consumptionAggrgates_r7.tab= for 2009).  =household_roster= /
+  =food_acquired= cannot be built without violating the library's
+  item-level principle.  Decision (2026-05-18): keep declared as
+  waves (SOURCE.org auto-discovery) but unwired; the pre-aggregated
+  consumption is out of scope for GH #271 (would be a separate
+  non-canonical table).
+- [X] Auto-derived =household_characteristics= / =food_expenditures= /
+  =food_quantities= build across the 5 wired waves (1989 + four
+  1990s); zero kinship warnings.  Validation against survey
+  documentation still TODO.
+- [X] =sample= (all 5 waves) + =cluster_features= (4 1994+ waves)
+  wired.  =cluster_features= carries NAMED =Region= (Tigray /
+  Amhara / Oromia / SNNP, via =erhs_village_region=, grounded in the
+  Dercon-Hoddinott data description now archived at
+  =<wave>/Documentation/Overview...pdf= and corroborated by in-data
+  =q1b=) and NAMED =Woreda= (=erhs_village_woreda=, straight from
+  in-data =q1b= labels; 15 woredas, D.B. sub-sites -> Basso na
+  Worana).  Both =market='Region'= and =market='Woreda'= return the
+  =m=-indexed view with real names.  1989 has =sample= (cluster
+  v==site=) but NO =cluster_features= (=demog89_1= lacks q1b/q1a; no
+  authoritative named geography in-data -> 1989 drops from market
+  views; cross-era reconciliation a documented follow-up;
+  =erhs_site_region_1989= retained but unused).  *Weights:* ERHS is a PURPOSIVE 15-village panel with no
+  survey *design* weights, so =weight=/=panel_weight= are set to a
+  UNIFORM 1.0 (self-weighting -- each HH counts once; unweighted
+  means; does not break weighted-aggregation code the way NaN would).
+  Explicitly NOT expansion factors.  =is_this_feature_sane= emits
+  only a constant-column *warning* (weight/panel_weight = 1, =Rural= =
+  'Rural' since every ERHS HH is rural -- a true survey property); no
+  fails -> =sample= OK.  =strata= = village.  1989 =sample= is
+  wired (cluster = =site=; no 1989 =cluster_features=, see above).
+  After adding 1989 =sample=, =food_expenditures= v-NA
+  fell 2,144 -> 553; the residual is the inherent roster<food
+  HH-coverage gap (1989 423 / 1995 111 / 1994b 19 -- food-only
+  households absent from the per-person roster the sample derives
+  from; documented, not fixable without a different roster source).
+  Sourcing any constructed ERHS weights remains a documented
+  follow-up.
+- [X] Named geography: =cluster_features.Region= (Tigray / Amhara /
+  Oromia / SNNP) and =cluster_features.Woreda= (15 real Woreda
+  names) for the 1994+ waves; =market='Region'= and
+  =market='Woreda'= both return named =m= views.  ERHS
+  documentation (Overview/data-description, per-village PDFs,
+  per-wave questionnaires, SPS codebooks) archived in-repo under
+  each =<wave>/Documentation/= -- DVC-tracked, content-deduped on
+  S3 (survey-wide docs share one blob across waves' per-wave
+  =.dvc=).
+- [X] Food-item harmonization: =harmonize_food= table
+  (Uganda-style: =Preferred Label= + =Aggregate= + one CODE column
+  per wave; no stable ERHS food code scheme, so each wave's
+  data_info maps its own code column via
+  =mappings: ['harmonize_food','<wave>','Preferred Label']=).
+  ~94.5% of food rows now resolve to names; =labels='Aggregate'=
+  works.  Residual ~5.5% stay numeric -- codes with NO value label
+  in the source survey itself (cannot be named without external
+  food-code documentation; first-pass reconciliation, refinements a
+  follow-up like Uganda's evolving table).  Sex strays (1989 codes
+  0/6) -> NA via =erhs_sex=.
+- [X] Unit harmonization + kg conversion: =harmonize_unit= (single
+  Code table -- ERHS unit codes are stable across 1994+).  Metric &
+  good-invariant codes -> framework-recognized tokens (1->=kg=,
+  2->="100 kg"= so the explicit-metric parser yields 100,
+  19->=litre=, 92->=g=; 30->=Birr= currency, shared, no kg factor).
+  ALL other (local volumetric/container) units are made
+  GOOD-SPECIFIC by the =food_acquired= df_edit ("Chinet [Butter]"),
+  so the framework's existing price-ratio inference recovers a
+  per-good kg factor with NO framework change (a kg is good-
+  invariant; a Chinet is not).  Result: =food_quantities(units='kgs')=
+  ~92% converted to kg; =food_prices(units='kgvalue')= 100% non-null.
+  ERHS's own =conv_*.tab= are an optional future cross-check, not a
+  dependency.  1989 unitcode is in-data-unlabelled -> all 1989 units
+  good-specific from raw code (1989 metric units not distinguished;
+  Codeunit1.SPS in Documentation could seed this -- follow-up).
+- [ ] Follow-ups: refine =harmonize_food= residual (unlabelled
+  source codes) + variant split/merge; 1989 named geography +
+  1989 metric-unit distinction (Codeunit1.SPS); cross-era
+  1989-vs-1994+ region reconciliation; cross-wave panel-id linkage
+  via =q2= (1989/90 HH no.); sourcing constructed ERHS weights;
+  optional validation of inferred kg factors vs ERHS =conv_*.tab=;
+  validation of derived tables vs survey docs.

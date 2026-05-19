@@ -1,0 +1,5 @@
+outs:
+- md5: bac782d048f350a1995d0b0981b9fc3f
+  size: 786
+  hash: md5
+  path: Mergepricenumber.SPS

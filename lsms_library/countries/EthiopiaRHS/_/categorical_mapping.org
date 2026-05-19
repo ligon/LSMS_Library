@@ -1,0 +1,425 @@
+#+title: EthiopiaRHS categorical mappings
+
+Cross-wave harmonization tables.  ERHS label *spellings* drift across
+files/rounds (e.g. village code 6 is "Shumsha" in demo123 but
+"SHUMSHEHA" in food1) while the numeric *codes* are stable.  So every
+ERHS wave extracts with =converted_categoricals: False= and maps the
+stable codes here.  Referenced from each wave's =data_info.yml= via
+the =mappings:= list form, e.g.
+
+: Relationship:
+:     - q11_1b
+:     - mappings: ['erhs_relation', 'Code', 'Preferred Label']
+
+* erhs_relation
+
+Relationship-to-head codes (questionnaire q11_1b / round-2/3
+equivalents share this code scheme).  Preferred Label strings match
+the kinship.yml keys added for GH #271 so =_expand_kinship= decomposes
+them into (Generation, Distance, Affinity).
+
+Code -9 ("Head Died and Replaced", round-4 reltn4 interview-status
+sentinel) and any other non-1..16 value are not real relationships;
+they map to an empty Preferred Label so =_expand_kinship= treats them
+as genuine-missing (no spurious kinship warning), same as NaN.
+
+#+NAME: erhs_relation
+| Code | Preferred Label        |
+|------+------------------------|
+|   -9 |                        |
+|    1 | Head                   |
+|    2 | Wife/Husband/Partner   |
+|    3 | Son/Daughter           |
+|    4 | Grandchild             |
+|    5 | Father/Mother          |
+|    6 | Sister/Brother         |
+|    7 | Niece/Nephew           |
+|    8 | Uncle/Aunt             |
+|    9 | Son/Daughter-in-law    |
+|   10 | Father/Mother-in-law   |
+|   11 | Brother/Sister-in-law  |
+|   12 | Grandparent            |
+|   13 | Other relative of head |
+|   14 | Servants               |
+|   15 | Tenant/Boarder         |
+|   16 | Other unrelated person |
+
+* erhs_relation_1989
+
+The 1989 pre-expansion instrument (demog89_1.dta =relnhhed=) uses a
+DISTINCT 9-code relationship taxonomy, NOT the 16-code =erhs_relation=
+of the 1994+ rounds.  Mapped to Preferred Labels that already resolve
+in kinship.yml.  Judgment calls: code 5 "Illegitimate child" -> child
+(consanguineal, like Own child); code 8 "Helper" -> Servants; code 9
+"Other" -> Other unrelated person (conservative; could be distant kin
+or non-kin -- treated as unrelated rather than guessing a kin tie).
+
+#+NAME: erhs_relation_1989
+| Code | Preferred Label        |
+|------+------------------------|
+|    1 | Head                   |
+|    2 | Wife/Husband/Partner   |
+|    3 | Son/Daughter           |
+|    4 | Adopted Child          |
+|    5 | Son/Daughter           |
+|    6 | Sister/Brother         |
+|    7 | Father/Mother          |
+|    8 | Servants               |
+|    9 | Other unrelated person |
+|   11 |                        |
+|   36 |                        |
+
+(Codes 11 and 36 are two single-row data-entry errors in
+demog89_1.relnhhed -- the labelled scheme is 1..9 only.  Mapped to
+empty -> NA Relationship, same treatment as the 1997 reltn4 -9
+sentinel; avoids a spurious kinship warning.)
+
+* erhs_village_region
+
+Peasant-association (=q1c= village code) -> NAMED Ethiopian regional
+state.  The in-data =q1a= carries only "Region N" (no names); the
+village->region assignment is the canonical ERHS one from the
+ERHS data description (Dercon & Hoddinott), archived in-repo at
+=EthiopiaRHS/<wave>/Documentation/Overview and Acknowledgements and
+Data Description.pdf= -- which states the 1989 PAs were in
+Amhara/Oromiya/SNNPR with Tigray added in the 1994 expansion, and
+documents each village's location (corroborated by the in-data
+=q1b= Woreda names).  1:1 by
+village.  Used for =cluster_features.Region= on the 1994+ waves
+(rosters lack =q1a=).  1989 has no in-data Woreda/region key
+(=demog89_1= carries only =site=) -> 1989 gets no named region (the
+1989 site->village key would come from Dercon-Hoddinott; cross-era
+reconciliation is a documented follow-up).
+
+#+NAME: erhs_village_region
+| Code | Region |
+|------+--------|
+|    1 | Tigray |
+|    2 | Tigray |
+|    3 | Amhara |
+|    5 | Amhara |
+|    6 | Amhara |
+|    7 | Oromia |
+|    8 | Oromia |
+|    9 | Oromia |
+|   10 | Oromia |
+|   12 | SNNP   |
+|   13 | SNNP   |
+|   14 | SNNP   |
+|   15 | SNNP   |
+|   16 | SNNP   |
+|   17 | Amhara |
+|   18 | Amhara |
+|   19 | Amhara |
+|   20 | Amhara |
+
+* erhs_village_woreda
+
+Peasant-association (=q1c= village code) -> Woreda NAME.  Sourced
+directly from the in-data =q1b= Woreda value labels (demo123 has the
+complete set; village->woreda is a clean 1:1).  Real in-data
+geography -- no external assumption.  1994+ only (1989 =demog89_1=
+has no =q1b=).  Debre Birhan sub-sites 17-20 all roll up to Basso
+na Worana, as expected.
+
+#+NAME: erhs_village_woreda
+| Code | Woreda          |
+|------+-----------------|
+|    1 | Atsbi           |
+|    2 | Sebhaassahsie   |
+|    3 | Ankober         |
+|    5 | Enemayi         |
+|    6 | Bugena          |
+|    7 | Adaa            |
+|    8 | Kersa           |
+|    9 | Dodota          |
+|   10 | Shashemene      |
+|   12 | Cheha           |
+|   13 | Kedida Gamela   |
+|   14 | Bule            |
+|   15 | Boloso          |
+|   16 | Daramalo        |
+|   17 | Basso na Worana |
+|   18 | Basso na Worana |
+|   19 | Basso na Worana |
+|   20 | Basso na Worana |
+
+* erhs_site_region_1989 (currently UNUSED)
+
+NOTE: no longer referenced -- the 1989 cluster_features block was
+removed (numeric hhid-prefix region codes aren't the named federal
+regions, and the 1989 site->village key needed to assign named
+regions is not in-data; cross-era reconciliation is a documented
+follow-up).  Retained for provenance / future use.
+
+
+1989 pre-expansion =site= (cluster) -> region.  1989 has no =q1c=;
+the cluster is =site= and region is the leading region digit of the
+packed 5-digit =hhid= (R VV HH), derived from the perfectly 1:1
+=site= x =hhid//1000= crosstab in demog89_1.  These are the 1989
+survey's OWN region codes -- NOT assumed aligned with the 1994+
+=q1a= regions (cross-era region harmonization is a documented
+follow-up).  demog89_1 carries sites {1,2,4,5,7}; food89-only sites
+{3,6} have no roster/cluster row (the usual 1989 roster<food
+coverage gap).
+
+#+NAME: erhs_site_region_1989
+| Code | Region |
+|------+--------|
+|    1 | 1      |
+|    2 | 2      |
+|    4 | 6      |
+|    5 | 7      |
+|    7 | 4      |
+
+* erhs_sex
+
+Codes 0 and 6 are 1989 demog89_1.sex data-entry errors (the
+labelled scheme is 1=Male/2=Female only) -> empty -> NA Sex, same
+treatment as the relnhhed 11/36 and reltn4 -9 sentinels.
+
+#+NAME: erhs_sex
+| Code | Preferred Label |
+|------+-----------------|
+|    0 |                 |
+|    1 | M               |
+|    2 | F               |
+|    6 |                 |
+
+* harmonize_food
+
+Cross-wave food-item harmonization (Uganda-style: Preferred Label
++ Aggregate + one CODE column per wave).  ERHS has no stable food
+code scheme -- 1994b/1995/1997 share one numbering (1997 labels
+truncated), 1989 and 1994a each have their own -- so each wave's
+data_info maps its own code column via this table:
+  j: [<codecol>, mappings: ['harmonize_food', '<wave>', 'Preferred Label']]
+First-pass reconciliation (normalized-label + shared-code
+alignment); refinements (variant splits/merges) are a documented
+follow-up, mirroring how Uganda's table evolved.  Use
+labels='Aggregate' for the coarse grouping.
+
+#+NAME: harmonize_food
+| Preferred Label | Aggregate | 1989 | 1994a | 1994b | 1995 | 1997 |
+|-----------------+-----------+------+-------+-------+------+------|
+| Adenguare | Vegetables | --- | 127 | --- | --- | 44 |
+| Araqi/Katikala | Beverages | 85 | 164 | 73 | 73 | 73 |
+| Avocado | Fruit | --- | --- | --- | --- | 30 |
+| Banana | Fruit | --- | 199 | --- | --- | 19 |
+| Barley | Cereals | 3 | 101 | 3 | 3 | 3 |
+| Beef | Meat | --- | 142 | 61 | 61 | 61 |
+| Beer (Birra) | Beverages | --- | 162 | 72 | 72 | 72 |
+| Beetroot | Vegetables | 56 | 207 | 55 | 55 | 55 |
+| Berbere | Condiments | --- | --- | 85 | 83 | 85 |
+| Biscuits | Other | 81 | --- | --- | --- | --- |
+| Bread | Cereals | --- | 191 | 86 | 86 | 86 |
+| Bula | Roots & Tubers | --- | --- | --- | --- | 100 |
+| Butter | Oils & Fats | 46 | 218 | 64 | 64 | 64 |
+| Cabbage | Vegetables | 58 | 208 | 59 | 59 | 59 |
+| Cactus fruit (Beles) | Fruit | --- | 189 | 91 | --- | --- |
+| Carrot | Vegetables | 57 | 209 | 56 | 56 | 56 |
+| Cassava | Roots & Tubers | 94 | --- | --- | --- | --- |
+| Chat | Stimulants | 25 | 163 | 17 | 17 | 17 |
+| Cheese | Dairy | 47 | --- | --- | --- | --- |
+| Chick Peas | Pulses | 32 | 124 | 40 | 40 | 40 |
+| Chicken | Meat | --- | 144 | 67 | 67 | 67 |
+| Coffee | Beverages | 82 | 181 | 16 | 16 | 16 |
+| Coffee leaf/Tea | Beverages | --- | --- | 90 | --- | 90 |
+| Cooking Oil | Oils & Fats | 38 | 185 | 82 | 82 | 82 |
+| Cow Peas | Pulses | --- | 123 | 41 | 41 | 41 |
+| Dagusa (finger millet) | Cereals | --- | 110 | --- | --- | 24 |
+| Dengollo | Cereals | --- | 106 | --- | --- | --- |
+| Eggs | Animal Products | --- | 145 | 68 | 68 | 68 |
+| Enset | Roots & Tubers | 91 | 194 | 18 | 18 | 18 |
+| Eucalyptus | Other | --- | --- | --- | --- | 22 |
+| Fasolia (haricot) | Pulses | 33 | --- | 35 | 35 | 35 |
+| Fenugreek (Abish) | Condiments | 34 | 204 | 54 | 54 | 54 |
+| Field Peas | Pulses | 80 | --- | 53 | 53 | 53 |
+| Flour | Cereals | --- | --- | 92 | --- | 92 |
+| Fruit | Fruit | 89 | 217 | 36 | 36 | 91 |
+| Garlic | Vegetables | 62 | 206 | 33 | 33 | 33 |
+| Gesho (hops) | Beverages | --- | --- | --- | --- | 21 |
+| Ginger | Condiments | 86 | 212 | 57 | 57 | 57 |
+| Goat Meat | Meat | 98 | --- | --- | --- | --- |
+| Godere (taro) | Roots & Tubers | --- | --- | --- | --- | 43 |
+| Grass | Other | --- | --- | --- | --- | 20 |
+| Green Vegetables | Vegetables | --- | 195 | 15 | 15 | 15 |
+| Groundnut | Oilseeds | --- | --- | --- | --- | 11 |
+| Guava | Fruit | --- | --- | --- | --- | 47 |
+| Hamicho | Roots & Tubers | --- | --- | --- | --- | 38 |
+| Haricot Beans | Pulses | --- | 129 | --- | --- | 52 |
+| Honey | Sugar | --- | 183 | 76 | 76 | 76 |
+| Horse Beans | Pulses | 30 | 122 | 9 | 9 | 9 |
+| Injera | Cereals | --- | 105 | --- | --- | 93 |
+| Injera+Wot | Prepared | --- | --- | 93 | --- | --- |
+| Intochi | Other | --- | --- | --- | --- | 101 |
+| Juice | Beverages | --- | --- | --- | --- | 94 |
+| Kale (Gomen) | Vegetables | 88 | 216 | 49 | 49 | --- |
+| Karia (chilli) | Condiments | 36 | --- | --- | --- | 84 |
+| Karibo/Keredo | Beverages | --- | 166 | 88 | --- | 88 |
+| Kiba-Nueg | Oilseeds | --- | --- | --- | --- | 98 |
+| Kocho | Roots & Tubers | --- | 196 | --- | --- | 39 |
+| Kundo Berbere | Condiments | --- | --- | --- | --- | 13 |
+| Lentils | Pulses | 16 | 121 | 14 | 14 | 14 |
+| Lettuce | Vegetables | 87 | 214 | 58 | 58 | 58 |
+| Linseed | Oilseeds | 10 | 201 | 10 | 10 | 10 |
+| Macaroni/Spaghetti | Cereals | 96 | 192 | 87 | 87 | 87 |
+| Maize | Cereals | 5 | 103 | 5 | 5 | 5 |
+| Mango | Fruit | --- | --- | --- | --- | 37 |
+| Meat | Meat | 48 | --- | --- | --- | 62 |
+| Merara | Other | --- | --- | --- | --- | 97 |
+| Milk | Dairy | 45 | 141 | 65 | 65 | 65 |
+| Milk (sour) | Dairy | 92 | --- | --- | --- | --- |
+| Millet | Cereals | 7 | --- | --- | --- | --- |
+| Mutton/Goat | Meat | --- | 143 | 62 | 62 | --- |
+| Noug/Suf | Oilseeds | --- | 126 | --- | --- | 48 |
+| Oats | Cereals | --- | --- | --- | --- | 8 |
+| Onion | Vegetables | 53 | 205 | 31 | 31 | 31 |
+| Orange | Fruit | --- | --- | --- | --- | 42 |
+| Pineapple | Fruit | --- | --- | --- | --- | 29 |
+| Potato | Roots & Tubers | 52 | 193 | 26 | 26 | 26 |
+| Pumpkin | Vegetables | --- | 197 | --- | --- | 60 |
+| Rice | Cereals | --- | 128 | --- | --- | 50 |
+| Salt | Condiments | 50 | 184 | 81 | 81 | 81 |
+| Salt (Amole) | Condiments | --- | 187 | --- | --- | --- |
+| Sesame | Oilseeds | --- | --- | --- | --- | 12 |
+| Shiferaw (moringa) | Vegetables | --- | 240 | --- | --- | 23 |
+| Shiro | Pulses | --- | 125 | --- | --- | 63 |
+| Sinnar | Cereals | --- | --- | --- | --- | 51 |
+| Soft Drinks | Beverages | --- | 165 | 74 | 74 | 74 |
+| Sorghum | Cereals | 6 | 104 | 6 | 6 | 6 |
+| Spices | Condiments | 37 | 186 | 83 | --- | 83 |
+| Spinach | Vegetables | 63 | --- | 32 | 32 | 32 |
+| Sugar | Sugar | 40 | 182 | 75 | 75 | 75 |
+| Sugarcane | Sugar | 90 | 252 | --- | --- | 27 |
+| Sunflower | Oilseeds | --- | --- | --- | --- | 25 |
+| Sweet Potato | Roots & Tubers | 20 | 253 | --- | --- | 45 |
+| Tea | Beverages | 35 | 188 | --- | --- | --- |
+| Teff | Cereals | --- | 100 | 1 | 1 | --- |
+| Teff (black) | Cereals | 2 | --- | 2 | 2 | 2 |
+| Teff (white) | Cereals | 1 | --- | --- | --- | 1 |
+| Tej | Beverages | 83 | --- | --- | --- | 71 |
+| Tella | Beverages | 84 | 161 | 71 | 71 | 70 |
+| Tobacco | Other | --- | --- | --- | --- | 28 |
+| Tomato | Vegetables | 51 | 198 | --- | --- | 46 |
+| Turmeric | Condiments | --- | --- | 89 | --- | 89 |
+| Wheat | Cereals | 4 | 102 | 4 | 4 | 4 |
+| Wine | Beverages | --- | --- | --- | --- | 96 |
+| Yam | Roots & Tubers | --- | --- | 34 | 34 | 34 |
+| Zengada | Cereals | --- | --- | --- | --- | 7 |
+
+* harmonize_unit
+
+Unit code -> canonical label.  The ERHS unit code scheme is
+STABLE across the 1994+ waves (only spelling drifts), so a single
+Code column suffices (cf. harmonize_food which needed per-wave
+columns).  Metric & good-invariant codes map to framework-
+recognized tokens (1->kg, 2->"100 kg" so the explicit-metric
+parser yields 100, 19->litre, 92->g) and 30->Birr (currency:
+shared, intentionally no kg factor).  ALL OTHER units are local
+volumetric/containers whose kg-equivalent is good-specific; the
+food_acquired df_edit appends the food label (e.g. "Chinet/Butter")
+so the framework price-ratio inference recovers a per-good factor
+(metric units stay shared -- a kg is good-invariant).  1989
+unitcode is a different, in-data-unlabelled scheme -> 1989 units
+stay raw+good-specific (no metric distinction) pending Codeunit1.SPS.
+
+#+NAME: harmonize_unit
+| Code | Preferred Label |
+|------+-----------------|
+| 1 | kg |
+| 2 | 100 kg |
+| 3 | Chinet |
+| 4 | Dawla |
+| 5 | Kunna |
+| 6 | Medeb |
+| 7 | Kurbet |
+| 8 | Silicha |
+| 9 | Akmada |
+| 10 | Esir |
+| 11 | Bobo |
+| 12 | Packets |
+| 13 | Bags |
+| 14 | Bundels |
+| 15 | Pieces |
+| 16 | Bars |
+| 17 | Boxes |
+| 18 | Leaves |
+| 19 | litre |
+| 20 | Kil |
+| 21 | Gan |
+| 22 | Ensira |
+| 23 | Gurzigne |
+| 24 | Tassa |
+| 25 | Kubaya |
+| 26 | Birchiko |
+| 27 | Sini |
+| 28 | Gembo |
+| 29 | Bottles |
+| 30 | Birr |
+| 32 | Melekia |
+| 33 | Bikole |
+| 34 | Guchiye |
+| 35 | Butille |
+| 36 | Madaberia |
+| 38 | Goma |
+| 39 | Sahen |
+| 40 | Big mada |
+| 41 | Small ma |
+| 42 | Sahin |
+| 43 | Dirib |
+| 44 | Mankorko |
+| 45 | Festal |
+| 46 | Zurba |
+| 47 | Akara |
+| 48 | Mika |
+| 49 | Kerchat |
+| 50 | Bunch |
+| 51 | Melekia |
+| 52 | Guchiye |
+| 53 | Bekolo |
+| 54 | Enkib |
+| 55 | Shekim |
+| 56 | Number |
+| 57 | Gotera |
+| 58 | Lemba |
+| 59 | Shirimir |
+| 60 | Egir |
+| 61 | Wesla |
+| 62 | Mesferia |
+| 63 | Kufaro |
+| 64 | kolela |
+| 65 | Sefied |
+| 66 | Dist |
+| 67 | Bere'lei |
+| 68 | Kettle/Jebena/Pot |
+| 69 | Bilkat |
+| 70 | Butile/Shigute |
+| 72 | Sifir |
+| 73 | Baldi |
+| 74 | Jerry can |
+| 75 | Kelemeshash |
+| 76 | Small tomato can |
+| 77 | Safa |
+| 78 | Bilkat |
+| 79 | Woket |
+| 80 | Gebete/Buchu |
+| 81 | Jemb |
+| 82 | Efigne |
+| 84 | Wochit |
+| 85 | Temene |
+| 86 | Gembo |
+| 87 | Lotterey |
+| 88 | Chika |
+| 89 | Tekuye |
+| 90 | Small kunna |
+| 91 | Sale |
+| 92 | g |
+| 93 | Kuch'belu |
+| 94 | Spoon |
+| 96 | Gungun |
+| 97 | Kidan |
+| 98 | Kidan |
+| 100 | Minilik |
+| 102 | Mezo |
+| 103 | Finala |

@@ -1,0 +1,113 @@
+#+title: EthiopiaRHS per-wave wiring recipe (GH #271)
+#+date: 2026-05-18
+
+Reference for wiring each remaining ERHS wave's =household_roster= and
+=food_acquired=.  The 1994a template (commit 36818510,
+=lsms_library/countries/EthiopiaRHS/1994a/_/data_info.yml=) is the
+canonical example; this doc states the invariants so per-wave workers
+don't re-derive them.
+
+* Hard invariants (do NOT change)
+
+- *Code-based extraction*: every wave's =data_info.yml= sets
+  =converted_categoricals: False= on both tables.  ERHS label spellings
+  drift across files/rounds; numeric codes are stable and shared across
+  modules.  Map codes -> labels via =EthiopiaRHS/_/categorical_mapping.org=
+  (=erhs_relation=, =erhs_sex=), referenced with the
+  =- mappings: ['erhs_relation','Code','Preferred Label']= list form.
+- *Composite household id* = (village_code, hh_no) via the =i= formatter
+  already in =_/ethiopiarhs.py= (shared, do not redefine).  Roster and
+  food MUST key i on the same stable codes so they join (target: roster
+  ∩ food i-overlap > 95%).
+- *food_acquired* uses the shared =food_acquired= df_edit melt in
+  =_/ethiopiarhs.py=.  Wave =data_info.yml= just extracts the wide
+  per-source columns into the fixed myvars names it expects:
+  =q_purch,u_purch,e_purch,q_prod,u_prod,q_inkind,u_inkind=, with
+  idxvars =i=[village,hh_no]=, =j=<food item code col>=.  Do not write a
+  script, a country concatenator, or add materialize:make / a Waves dict.
+- Only =household_roster= + =food_acquired= this pass.  The derived
+  =household_characteristics= / =food_expenditures= come for free.
+
+* Dataverse file IDs (tokenless curl, format=original -> Stata .dta)
+
+: curl -s -L "https://dataverse.harvard.edu/api/access/datafile/<ID>?format=original" -o <name>.dta
+
+| Wave  | Roster file(s)            | Food file        |
+|-------+---------------------------+------------------|
+| 1994b | demo123.dta (ID 2301919)  | food2 (2301917)  |
+| 1995  | demo123.dta (ID 2301919)  | food3 (2301922)  |
+| 1997  | demo4 (2301963), age_sex_r4 (2301948) | food4 (2301958) |
+
+demo123.dta is the *pooled R1-R3* roster file (round-suffixed
+columns).  1994b = round 2, 1995 = round 3.  Each wave gets its own
+copy under =EthiopiaRHS/<wave>/Data/= (re-curl; ~5 MB).  Add a
+=Data/.gitignore= containing =/*.dta=.  Do NOT =dvc add= (publish
+handoff is deferred; raw .dta stays gitignored in-tree).
+
+* Round-1 column reference (from demo123, known good for 1994a)
+
+| Target          | 1994a column |
+|-----------------+--------------|
+| i               | q1c, hhid    |
+| pid             | ind          |
+| Sex             | q11_5        |
+| Age             | q11_6a       |
+| Relationship    | q11_1b       |
+| food j          | q36_1b       |
+| purch q/u/exp   | q36_2a/2b/2c |
+| produced q/u    | q36_3a/3b    |
+| inkind q/u      | q36_4a/4b    |
+
+* Per-round discovery (the part that varies)
+
+demo123 carries round-2/round-3 panel columns (e.g. =sex2/sex3=,
+=agey2/agey3=, and q11_* with =2=/=3= suffixes).  food2/food3 mirror
+food1's q36_* questionnaire structure.  demo4/food4 (1997) are a
+*different* instrument -- inspect column names + value labels with
+=pyreadstat.read_dta(path, metadataonly=True)= (meta.column_names,
+meta.column_names_to_labels, meta.variable_value_labels) and map by
+*meaning*, following the round-1 reference above.
+
+The village/hh_no code scheme and the relation/sex code scheme are
+expected to be stable across rounds -- reuse =erhs_relation= /
+=erhs_sex= as-is.  If a round's relation codes differ from the
+=erhs_relation= table, STOP and report (do not silently remap).
+
+* Verification (required before reporting done)
+
+IMPORTANT: =is_this_feature_sane= must run on the FULL multi-wave
+frame (it checks the index includes =t=).  Do NOT =.xs(W, level='t')=
+before sanity -- that strips =t= and produces a spurious
+=index_levels_match_scheme: Missing ['t']= ok=False.  Slice only for
+the per-wave overlap number.
+
+#+begin_src python
+import warnings, lsms_library as ll
+from lsms_library.diagnostics import is_this_feature_sane
+c = ll.Country('EthiopiaRHS')
+with warnings.catch_warnings():
+    warnings.simplefilter('ignore')
+    r = c.household_roster(); fa = c.food_acquired()
+W = '<wave>'
+assert W in set(r.index.get_level_values('t')), f'{W} missing from roster'
+assert W in set(fa.index.get_level_values('t')), f'{W} missing from food'
+# sanity on the FULL frame (needs the t level):
+print('roster ok =', is_this_feature_sane(r,  country='EthiopiaRHS',
+      feature='household_roster').ok)
+print('food   ok =', is_this_feature_sane(fa, country='EthiopiaRHS',
+      feature='food_acquired').ok)
+# per-wave overlap (slicing is fine here):
+rw = r.xs(W, level='t'); fw = fa.xs(W, level='t')
+ri = set(rw.index.get_level_values('i')); fi = set(fw.index.get_level_values('i'))
+print(W, 'roster', rw.shape, 'food', fw.shape,
+      'overlap %.1f%%' % (100*len(ri & fi)/len(ri | fi)))
+#+end_src
+
+Run with =LSMS_NO_CACHE=1=.  Pass bar: both =is_this_feature_sane=
+OK=True on the FULL frame, the per-wave i-overlap > 95%, Affinity
+decomposed (no kinship warnings).
+
+Note: the food household-number column name *varies by round*
+(1994a/food1 = =q5=; 1994b/food2 & 1995/food3 = =q2=; food3's own
+=q5= means "same HH as round 2?").  Discover it from metadata per
+wave -- do not assume =q5=.

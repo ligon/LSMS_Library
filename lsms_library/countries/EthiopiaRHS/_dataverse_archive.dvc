@@ -1,0 +1,6 @@
+outs:
+- md5: 109ab1bf475b0ae025e3ebbb5fdf83e3.dir
+  size: 221571967
+  nfiles: 251
+  hash: md5
+  path: _dataverse_archive
