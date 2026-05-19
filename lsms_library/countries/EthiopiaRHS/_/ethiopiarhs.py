@@ -127,11 +127,14 @@ def sample(df):
 
     ERHS has no household-level cover file, so `sample` is extracted
     from the per-person roster (i + v=village).  Collapse to HH grain
-    (first row per i), and fill the design-weight columns: ERHS is a
-    PURPOSIVE 15-village panel with no sampling weights, so weight /
-    panel_weight are NaN (documented follow-up to source any
-    constructed weights).  strata = village (the panel's PSU); Rural =
-    'Rural' (it is the *Rural* Household Survey -- all rural).
+    (first row per i).  ERHS is a PURPOSIVE 15-village panel with no
+    survey *design* weights; rather than NaN we use UNIFORM weights of
+    1.0 (self-weighting -- each household counts once, giving
+    unweighted means and not breaking downstream weighted-aggregation
+    code).  These are explicitly NOT expansion factors; sourcing any
+    constructed ERHS weights remains a documented follow-up.  strata =
+    village (the panel's PSU); Rural = 'Rural' (it is the *Rural*
+    Household Survey -- all rural).
     """
     flat = df.reset_index()
     flat = flat[flat['i'].notna()].drop_duplicates(subset='i', keep='first')
@@ -140,8 +143,8 @@ def sample(df):
     # the market join (_add_market_index) matches ('1' == '1', not
     # '1.0' != '1').
     flat['v'] = flat['v'].map(tools.format_id)
-    flat['weight'] = np.nan
-    flat['panel_weight'] = np.nan
+    flat['weight'] = 1.0
+    flat['panel_weight'] = 1.0
     flat['strata'] = flat['v'].astype('string')
     flat['Rural'] = 'Rural'
     return flat.set_index(['i'])[['v', 'weight', 'panel_weight',
