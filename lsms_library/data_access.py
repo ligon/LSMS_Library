@@ -145,7 +145,9 @@ def _check_remote_access(remote_name: str, remote_cfg: dict[str, str],
       paired with ``LSMS_S3_WRITE_KEY_ID`` for the access key id), or
     - ``AWS_ACCESS_KEY_ID`` / ``AWS_SECRET_ACCESS_KEY`` env vars
       (standard boto3 credentials), or
-    - A ``s3_write_creds`` file alongside ``s3_creds`` in the DVC dir.
+    - A ``s3_write_creds`` file at :func:`config.s3_write_creds_path`
+      (``~/.config/lsms_library/s3_write_creds``), or the legacy
+      in-tree ``<dvc_dir>/s3_write_creds`` fallback.
 
     Note: ``~/.aws/credentials`` is *not* checked for write access
     because there is no way to distinguish reader vs writer keys from
@@ -176,6 +178,12 @@ def _check_remote_access(remote_name: str, remote_cfg: dict[str, str],
             return "write"
         if (os.environ.get("AWS_ACCESS_KEY_ID")
                 and os.environ.get("AWS_SECRET_ACCESS_KEY")):
+            return "write"
+        # Prefer the user-writable location (mirrors s3_creds);
+        # fall back to the legacy in-tree .dvc/s3_write_creds for
+        # editable installs that predate the user-config layout.
+        user_write = config.s3_write_creds_path()
+        if user_write.exists() and user_write.stat().st_size > 0:
             return "write"
         write_creds = dvc_dir / "s3_write_creds"
         if write_creds.exists() and write_creds.stat().st_size > 0:
