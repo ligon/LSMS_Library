@@ -162,10 +162,25 @@ appear to have village-level split files (=debdemo4=, =dindemo4=,
   food-code documentation; first-pass reconciliation, refinements a
   follow-up like Uganda's evolving table).  Sex strays (1989 codes
   0/6) -> NA via =erhs_sex=.
-- [ ] Follow-ups: *unit* code->label harmonization (units still
-  carried as stable codes); refine =harmonize_food= residual
-  (unlabelled source codes) + variant split/merge; 1989 named
-  geography (needs the Dercon-Hoddinott 1989 site->village key) +
-  cross-era 1989-vs-1994+ region reconciliation; cross-wave
-  panel-id linkage via =q2= (1989/90 HH no.); sourcing constructed
-  ERHS weights; validation of derived tables vs survey docs.
+- [X] Unit harmonization + kg conversion: =harmonize_unit= (single
+  Code table -- ERHS unit codes are stable across 1994+).  Metric &
+  good-invariant codes -> framework-recognized tokens (1->=kg=,
+  2->="100 kg"= so the explicit-metric parser yields 100,
+  19->=litre=, 92->=g=; 30->=Birr= currency, shared, no kg factor).
+  ALL other (local volumetric/container) units are made
+  GOOD-SPECIFIC by the =food_acquired= df_edit ("Chinet [Butter]"),
+  so the framework's existing price-ratio inference recovers a
+  per-good kg factor with NO framework change (a kg is good-
+  invariant; a Chinet is not).  Result: =food_quantities(units='kgs')=
+  ~92% converted to kg; =food_prices(units='kgvalue')= 100% non-null.
+  ERHS's own =conv_*.tab= are an optional future cross-check, not a
+  dependency.  1989 unitcode is in-data-unlabelled -> all 1989 units
+  good-specific from raw code (1989 metric units not distinguished;
+  Codeunit1.SPS in Documentation could seed this -- follow-up).
+- [ ] Follow-ups: refine =harmonize_food= residual (unlabelled
+  source codes) + variant split/merge; 1989 named geography +
+  1989 metric-unit distinction (Codeunit1.SPS); cross-era
+  1989-vs-1994+ region reconciliation; cross-wave panel-id linkage
+  via =q2= (1989/90 HH no.); sourcing constructed ERHS weights;
+  optional validation of inferred kg factors vs ERHS =conv_*.tab=;
+  validation of derived tables vs survey docs.

@@ -48,12 +48,18 @@ food_acquired:
             - mappings: ['harmonize_food', '1994a', 'Preferred Label']
     myvars:
         q_purch: q36_2a
-        u_purch: q36_2b
+        u_purch:
+            - q36_2b
+            - mappings: ['harmonize_unit', 'Code', 'Preferred Label']
         e_purch: q36_2c
         q_prod: q36_3a
-        u_prod: q36_3b
+        u_prod:
+            - q36_3b
+            - mappings: ['harmonize_unit', 'Code', 'Preferred Label']
         q_inkind: q36_4a
-        u_inkind: q36_4b
+        u_inkind:
+            - q36_4b
+            - mappings: ['harmonize_unit', 'Code', 'Preferred Label']
 
 # Sampling design (GH #271 follow-up: market='Region').  ERHS has no
 # HH-level cover file -> extracted from the per-person roster; the

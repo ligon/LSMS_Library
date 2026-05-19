@@ -307,3 +307,119 @@ labels='Aggregate' for the coarse grouping.
 | Wine | Beverages | --- | --- | --- | --- | 96 |
 | Yam | Roots & Tubers | --- | --- | 34 | 34 | 34 |
 | Zengada | Cereals | --- | --- | --- | --- | 7 |
+
+* harmonize_unit
+
+Unit code -> canonical label.  The ERHS unit code scheme is
+STABLE across the 1994+ waves (only spelling drifts), so a single
+Code column suffices (cf. harmonize_food which needed per-wave
+columns).  Metric & good-invariant codes map to framework-
+recognized tokens (1->kg, 2->"100 kg" so the explicit-metric
+parser yields 100, 19->litre, 92->g) and 30->Birr (currency:
+shared, intentionally no kg factor).  ALL OTHER units are local
+volumetric/containers whose kg-equivalent is good-specific; the
+food_acquired df_edit appends the food label (e.g. "Chinet/Butter")
+so the framework price-ratio inference recovers a per-good factor
+(metric units stay shared -- a kg is good-invariant).  1989
+unitcode is a different, in-data-unlabelled scheme -> 1989 units
+stay raw+good-specific (no metric distinction) pending Codeunit1.SPS.
+
+#+NAME: harmonize_unit
+| Code | Preferred Label |
+|------+-----------------|
+| 1 | kg |
+| 2 | 100 kg |
+| 3 | Chinet |
+| 4 | Dawla |
+| 5 | Kunna |
+| 6 | Medeb |
+| 7 | Kurbet |
+| 8 | Silicha |
+| 9 | Akmada |
+| 10 | Esir |
+| 11 | Bobo |
+| 12 | Packets |
+| 13 | Bags |
+| 14 | Bundels |
+| 15 | Pieces |
+| 16 | Bars |
+| 17 | Boxes |
+| 18 | Leaves |
+| 19 | litre |
+| 20 | Kil |
+| 21 | Gan |
+| 22 | Ensira |
+| 23 | Gurzigne |
+| 24 | Tassa |
+| 25 | Kubaya |
+| 26 | Birchiko |
+| 27 | Sini |
+| 28 | Gembo |
+| 29 | Bottles |
+| 30 | Birr |
+| 32 | Melekia |
+| 33 | Bikole |
+| 34 | Guchiye |
+| 35 | Butille |
+| 36 | Madaberia |
+| 38 | Goma |
+| 39 | Sahen |
+| 40 | Big mada |
+| 41 | Small ma |
+| 42 | Sahin |
+| 43 | Dirib |
+| 44 | Mankorko |
+| 45 | Festal |
+| 46 | Zurba |
+| 47 | Akara |
+| 48 | Mika |
+| 49 | Kerchat |
+| 50 | Bunch |
+| 51 | Melekia |
+| 52 | Guchiye |
+| 53 | Bekolo |
+| 54 | Enkib |
+| 55 | Shekim |
+| 56 | Number |
+| 57 | Gotera |
+| 58 | Lemba |
+| 59 | Shirimir |
+| 60 | Egir |
+| 61 | Wesla |
+| 62 | Mesferia |
+| 63 | Kufaro |
+| 64 | kolela |
+| 65 | Sefied |
+| 66 | Dist |
+| 67 | Bere'lei |
+| 68 | Kettle/Jebena/Pot |
+| 69 | Bilkat |
+| 70 | Butile/Shigute |
+| 72 | Sifir |
+| 73 | Baldi |
+| 74 | Jerry can |
+| 75 | Kelemeshash |
+| 76 | Small tomato can |
+| 77 | Safa |
+| 78 | Bilkat |
+| 79 | Woket |
+| 80 | Gebete/Buchu |
+| 81 | Jemb |
+| 82 | Efigne |
+| 84 | Wochit |
+| 85 | Temene |
+| 86 | Gembo |
+| 87 | Lotterey |
+| 88 | Chika |
+| 89 | Tekuye |
+| 90 | Small kunna |
+| 91 | Sale |
+| 92 | g |
+| 93 | Kuch'belu |
+| 94 | Spoon |
+| 96 | Gungun |
+| 97 | Kidan |
+| 98 | Kidan |
+| 100 | Minilik |
+| 102 | Mezo |
+| 103 | Finala |

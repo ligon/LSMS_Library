@@ -16,6 +16,30 @@ import pandas as pd
 import lsms_library.local_tools as tools
 
 
+# Units whose kg-equivalent is good-INvariant (a kg is a kg whatever
+# the food).  Mapped via harmonize_unit to framework-recognized tokens
+# ('kg', '100 kg' for quintal -> explicit-metric parser yields 100,
+# 'litre', 'g'); 'birr' is currency (shared, no kg factor by design).
+# Every OTHER unit is a local volumetric/container measure whose kg
+# value depends on the good, so food_acquired() appends the food label
+# ("Chinet [Butter]") -- making each (unit, good) its own token so the
+# framework price-ratio inference recovers a per-good kg factor with
+# no framework change.
+_SHARED_UNITS = {'kg', '100 kg', 'litre', 'g', 'birr'}
+
+
+def _good_specific_units(u, j):
+    """Append the food label to non-shared (local) units, vectorized.
+
+    `u`, `j` are string Series.  Shared/metric units (``_SHARED_UNITS``)
+    pass through unchanged; everything else becomes ``"<unit> [<food>]"``.
+    """
+    u = u.astype('string').str.strip()
+    j = j.astype('string').str.strip()
+    local = ~u.str.lower().isin(_SHARED_UNITS)
+    return u.where(~local, u + ' [' + j + ']')
+
+
 def _norm_village(v):
     """Canonicalize a peasant-association name across source files.
 
@@ -91,6 +115,12 @@ def food_acquired(df):
             if k in flat.columns:
                 flat = flat[flat[k].notna() & (flat[k].astype('string')
                                                .str.strip() != '')]
+        # 1989 unitcode is an in-data-unlabelled scheme (harmonize_unit
+        # not applied) -> none match _SHARED_UNITS, so every 1989 unit
+        # becomes good-specific.  1989 metric units are therefore not
+        # distinguished (documented; would need Codeunit1.SPS).
+        if 'u' in flat.columns and 'j' in flat.columns:
+            flat['u'] = _good_specific_units(flat['u'], flat['j'])
         return flat.set_index(idx)
 
     w = df.reset_index()
@@ -118,6 +148,10 @@ def food_acquired(df):
     # no unit (a unit is required to place the quantity on the u axis).
     out = out[out['i'].notna()]
     out = out[out['u'].notna() & (out['u'] != '')]
+    # Non-metric (local) units -> good-specific so the framework's
+    # price-ratio inference recovers a per-good kg factor; metric units
+    # stay shared (good-invariant).
+    out['u'] = _good_specific_units(out['u'], out['j'])
     out = out.set_index(['i', 'j', 'u', 's'])
     return out
 
