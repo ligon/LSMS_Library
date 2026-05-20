@@ -555,3 +555,68 @@
 | 156090 | ---                               |                                    |                                  |                                   |                                   |                                   |                                   |                                   |                                   |
 | 181087 | ---                               |                                    |                                  |                                   |                                   |                                   |                                   |                                   |                                   |
 | 142090 | ---                               |                                    |                                  |                                   |                                   |                                   |                                   |                                   |                                   |
+
+# plot_features harmonization tables (GH #167 Phase 1; see uganda.py
+# plot_features_for_wave and data_info.yml Columns:plot_features).
+#
+# harmonize_tenure_system — AGSEC2A.a2aq7 / AGSEC2B.a2bq7 / s2aq7 codes
+#   to canonical TenureSystem spellings.  Stable across all 8 UNPS
+#   waves (2005-06 has 5='other'; 2009-10+ uses 6).
+# harmonize_soil — AGSEC2A.a2aq16 / AGSEC2B.a2bq14/a2bq17 / s2aq16 codes
+#   to canonical SoilType spellings.  2005-06 does not ask soil type.
+# harmonize_water — AGSEC2A.a2aq18/a2aq20 / AGSEC2B.a2bq16/a2bq19 codes.
+#   The Irrigated bool is derived as (water_label == 'Irrigated').
+#   Some Stata files mislabel this column as "soil type" — verify by
+#   inspecting the value distribution per wave.
+# harmonize_acquire — AGSEC2A.a2aq8 / AGSEC2B.a2bq8 "How did you acquire"
+#   codes, keyed by (File, Code) since the AGSEC2A and AGSEC2B code
+#   schemes diverge.  AGSEC2A entries map to 'owned' regardless of how
+#   the household came to own; AGSEC2B entries map to rented_in /
+#   other_tenure depending on whether the access is by-agreement or not.
+
+#+name: harmonize_tenure_system
+| Code | Preferred Label      |
+|------+----------------------|
+|    1 | freehold             |
+|    2 | leasehold            |
+|    3 | mailo                |
+|    4 | customary            |
+|    5 | other_tenure_system  |
+|    6 | other_tenure_system  |
+
+#+name: harmonize_soil
+| Code | Preferred Label   |
+|------+-------------------|
+|    1 | sand_loam         |
+|    2 | sandy_clay_loam   |
+|    3 | black_clay        |
+|    4 | other             |
+|    6 | other             |
+
+#+name: harmonize_water
+| Code | Preferred Label  |
+|------+------------------|
+|    1 | Irrigated        |
+|    2 | Rain-fed         |
+|    3 | Swamp/Wetland    |
+
+#+name: harmonize_acquire
+| File | Code | Preferred Label |
+|------+------+-----------------|
+| 2A   |    1 | owned           |
+| 2A   |    2 | owned           |
+| 2A   |    3 | owned           |
+| 2A   |    4 | owned           |
+| 2A   |    5 | owned           |
+| 2A   |    6 | owned           |
+| 2A   |    7 | owned           |
+| 2A   |    8 | owned           |
+| 2A   |    9 | owned           |
+| 2A   |   96 | owned           |
+| 2B   |    1 | rented_in       |
+| 2B   |    2 | other_tenure    |
+| 2B   |    3 | rented_in       |
+| 2B   |    6 | other_tenure    |
+| 2B   |    8 | rented_in       |
+| 2B   |    9 | other_tenure    |
+| 2B   |   96 | other_tenure    |
