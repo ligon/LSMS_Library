@@ -1,0 +1,198 @@
+#+TITLE: Appendix to HANDOFF 2026-05-19 — subagent blockers & resolutions
+#+DATE: 2026-05-18 / 2026-05-19
+#+FILETAGS: handoff erhs lsms_library subagents
+#+SETUPFILE: ./HANDOFF_2026-05-19.org
+
+* Why this file exists
+
+The 2026-05-18 build of EthiopiaRHS (GH #271, merged via #272) was a
+parallel scatter-gather across waves.  The coordinator <-> worker
+channel ran through =slurm_logs/build_2026-05-18/{MESSAGES,QUESTIONS}_*=,
+which the parent skill documents as "ephemeral, safe to rm".  Most of
+that traffic *was* ephemeral, but four reports captured genuine
+forensic content -- /how/ specific 1989 / 1995 / 1997 blockers were
+resolved -- that does not appear in any commit message or in the
+parent =HANDOFF_2026-05-19.org=.  Preserving it here so future
+contributors working on ERHS can see the question / answer pair in
+one place, not just the silent fix in shared code.
+
+The =slurm_logs/build_2026-05-19/= channels were created but never
+used (empty files) and are not preserved.
+
+* Subagent reports (=build_2026-05-18/QUESTIONS_FROM_AGENT.txt=)
+
+** 1995 worker -- shared formatter NaN crash
+
+#+begin_quote
+food3.dta has exactly 1 row (row idx 6121, q1c=9) where q2 (within-village
+HH number) is NaN while it still carries food data (item 16, purch qty 2).
+The shared =_/ethiopiarhs.py:i= composite-id formatter does
+  =tools.format_id(...) + '_' + tools.format_id(value.iloc[1])=
+and format_id(NaN)->None, so c.food_acquired() raises
+  TypeError: can only concatenate str (not "NoneType") to str
+during the 1995 build.  1994a/food1 and 1994b/food2 had ZERO NaN keys so
+never exercised this.  Editing =_/ethiopiarhs.py= is OUT OF SCOPE; YAML-path
+extraction (no script / no df_edit allowed for food per recipe) cannot
+drop the malformed row from within 1995/.  Proceeding to check for an
+in-scope framework mechanism (e.g. idxvars NaN handling); if none exists
+this wave needs either (a) a one-line NaN-guard in the shared =i=
+formatter or (b) recipe permission for a 1995-local df_edit.
+#+end_quote
+
+*Resolution* (coordinator-side, 2026-05-18): option (a).  The shared
+=_/ethiopiarhs.py:i= formatter NaN-guards to return =pd.NA=; the food
+melt drops NA-=i= rows.  Workers told to NOT work around it themselves
+and NOT to edit =_/ethiopiarhs.py= (see /coordinator broadcast 1/
+below).
+
+** 1994b worker -- cross-wave instability
+
+#+begin_quote
+Full-country recipe verification (c.household_roster() over all wired
+waves) is intermittently/persistently crashing with TypeError in the
+SHARED =_/ethiopiarhs.py= =i= formatter (line 36: value.iloc[1] is None
+-> "can only concatenate str (not NoneType)").  =demo123.dta= (1994b
+source) has ZERO NaN q1c/hhid and the 1994b per-wave grab + per-wave
+sanity PASS.  The None hh_no originates from a concurrently-being-wired
+sibling wave (1995 or 1997), not 1994b.  1994b wiring is verified via
+the per-wave path; flagging the cross-wave instability for the scrum
+master.
+#+end_quote
+
+*Resolution*: not a 1994b defect; the cross-wave failure was the
+identical 1995 NaN row, surfaced via the shared formatter on the
+all-waves verification path.  Closed by the same shared-formatter
+NaN-guard.
+
+** 1997 worker -- =-9= "Head Died and Replaced" sentinel
+
+#+begin_quote
+reltn4 in 1997/age_sex_r4.dta carries a code -9 = "Head Died and
+Replaced" (76 rows) plus 61 NaN, alongside the normal relation codes
+1-16 which match =erhs_relation= EXACTLY.  -9 is an interview-STATUS
+sentinel (the head slot was vacated between rounds), NOT a divergent
+kinship taxonomy.  The =erhs_relation= org-table mapping passes -9
+through unchanged, so =_expand_kinship= emits the only blocking
+warning: "Unknown relationship labels (add to kinship.yml): ['-9.0']".
+
+Need a coordinator decision among:
+  (a) add a -9 -> (NA/sentinel) row to =erhs_relation= in
+      =EthiopiaRHS/_/categorical_mapping.org= (-9 maps to a blank
+      Preferred Label -> =_expand_kinship= treats it as the usual
+      missing-relationship sentinel, no warning);
+  (b) treat -9 like a relation in =kinship.yml= with an explicit
+      (Gen,Dist,Aff) tuple;
+  (c) accept the single -9.0 warning for 1997 as a documented,
+      non-kinship-taxonomy sentinel and relax the bar for this wave.
+#+end_quote
+
+*Resolution*: option (a).  =erhs_relation= now has a =-9 -> ""= row in
+=lsms_library/countries/EthiopiaRHS/_/categorical_mapping.org=; the
+empty Preferred Label routes through =_expand_kinship= as a
+genuine-missing sentinel, identical to NaN.  No =kinship.yml= change
+was needed.
+
+** 1989 roster worker -- pre-expansion instrument divergence
+
+#+begin_quote
+STOP+REPORT: 1989 is the pre-expansion instrument and its code schemes
+DIVERGE from the 1994+ shared tables.  Roster source chosen:
+=demog89_1.dta= (ID 2301923) -- 2302 rows, ONE row per individual, has
+site/hhid/pid/sex/age/relnhhed.  =demog89_2.dta= (ID 2301927) is a
+203-row HH-level summary, NOT a roster -> rejected.
+
+BLOCKER 1 -- relation codes differ (cannot reuse =erhs_relation=):
+  1989 relnhhed value labels:
+    1 Household Head | 2 Wife | 3 Own child | 4 Adopted child
+    5 Illegitimate child | 6 Brother/sister | 7 Mother/father
+    8 Helper | 9 Other  (+ stray codes 11 x1, 36 x1, NaN x3)
+  Only codes 1,2 align loosely; 4,5,7,8,9 MEAN DIFFERENT THINGS.
+
+BLOCKER 2 -- composite =i= cannot be expressed in pure YAML:
+  1989 demog89_1 has NO separate village column + NO separate hh_no
+  column.  Identity is packed into one 5-digit hhid = R(1)VV(2)HH(2)
+  [region * region+PA + within-PA HH no], e.g. 10101 = region 1, PA 01,
+  HH 01.  Pure-YAML =idxvars= cannot derive two columns from one.
+
+Awaiting coordinator decision: (a) add =erhs_relation_1989= + 1989
+village/hh split helper to the shared files yourselves, or (b)
+authorize a 1989-local wave script/df_edit for the hhid split and a
+1989 relation mapping.
+#+end_quote
+
+*Resolution* (coordinator-side, post-1990s batch): option (a) for
+both blockers.
+
+- New =erhs_relation_1989= table in
+  =lsms_library/countries/EthiopiaRHS/_/categorical_mapping.org=
+  mapping 1989's 9-code =relnhhed= taxonomy to Preferred Labels that
+  already resolve in =lsms_library/categorical_mapping/kinship.yml=.
+  Judgment calls recorded in the table's preamble: code 5
+  "Illegitimate child" -> child (consanguineal); code 8 "Helper" ->
+  Servants; code 9 "Other" -> Other unrelated person.  Stray data
+  errors (codes 11 x1, 36 x1) map to NA.
+- Shared =_/ethiopiarhs.py= grew a *scalar* =i= path alongside the
+  composite (village, hh_no) path: the packed 5-digit =hhid= is
+  carried through as a single scalar identifier.  No 1989 wave script
+  / df_edit needed.
+- Caveat documented in =EthiopiaRHS/_/CONTENTS.org=: =demog89_1= is a
+  partial person roster (338 HH) vs =food89= (483 HH; 279 shared) --
+  1989 =food_expenditures= is meaningful only for the ~279 shared HH;
+  no fuller 1989 person roster exists in the archive (=demog89_2= is a
+  203-row HH-level summary).
+
+* Coordinator broadcasts (=build_2026-05-18/MESSAGES_TO_AGENT.txt=)
+
+** Broadcast 1: to 1994b & 1997 workers, mid-1995-crash
+
+#+begin_quote
+1. The NaN household-key crash in the shared =_/ethiopiarhs.py:i=
+   formatter (found by the 1995 worker) is FIXED centrally by the
+   coordinator (NaN-guard returns pd.NA; the food melt drops NA-=i=
+   rows).  Do NOT attempt to work around it yourself and do NOT edit
+   =_/ethiopiarhs.py=.  Just build & verify normally.
+2. VERIFICATION CORRECTION: do NOT =.xs(W, level='t')= before
+   =is_this_feature_sane= -- that strips the =t= level and yields a
+   spurious ok=False on index_levels_match_scheme "Missing ['t']".
+   Run =is_this_feature_sane= on the FULL frame; slice only for the
+   per-wave =i=-overlap number.  The recipe doc's verification block
+   has been updated -- re-read it.
+3. The food household-number column name VARIES by round (1994a/food1=q5;
+   1994b/food2 & 1995/food3=q2).  Discover it from metadata for your
+   wave; do not assume q5.
+#+end_quote
+
+** Broadcast 2: post-1990s batch dispatch
+
+#+begin_quote
+1990s waves (1994a/b, 1995, 1997) are DONE & committed.  New batch:
+1989 roster wiring + an investigation of 1999/2004/2009 structure.
+Same invariants/recipe as before.  Code scheme (=erhs_relation=,
+=erhs_sex=, village codes) is from 1994+; 1989 is the pre-expansion
+instrument and codes MAY differ -- verify, do not edit shared tables;
+STOP+report if they diverge.
+#+end_quote
+
+The "do not edit shared tables; STOP+report if they diverge" was
+literally executed by the 1989 worker, hence the question above and
+the subsequent coordinator-side =erhs_relation_1989= + scalar-=i=
+additions.
+
+* Lessons for the next ERHS batch
+
+- The "STOP+report on shared-file changes" stop-list works.  Workers
+  refused to silently invent =erhs_relation_1989= or hack the shared
+  formatter; the coordinator made the policy choice (option (a) both
+  times) and the worker re-verified against the new shared state.
+- The single-row =food3.dta= NaN-key bug was lurking behind a
+  YAML-path extraction that had been green on every other wave;
+  cross-wave verification surfaces this class of bug, per-wave
+  verification never will.  Keep the all-waves =is_this_feature_sane=
+  step in the recipe.
+- The 1999 / 2004 / 2009 STOP+report (from the same post-1990s
+  dispatch, not preserved here) led to the wired/unwired split
+  documented in =EthiopiaRHS/_/CONTENTS.org= (no person roster + no
+  item-level food in the Dataverse archive for R5-R7; only
+  pre-aggregated consumption scalars; declared as waves but unwired).
+  PR #276 closes the fresh-checkout =FileNotFoundError= that this
+  stub-wave layout caused.
