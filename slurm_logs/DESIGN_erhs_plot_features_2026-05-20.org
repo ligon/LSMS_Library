@@ -13,7 +13,12 @@ branch: =design/erhs-plot-features-278=.
   =Columns:= block lands with Uganda, not ERHS.
 - *D2*: =plot_features= captures *lasting* features of the plot only.
   *Drop =Crop=, =Crop2=* from the canonical Columns block (crops vary
-  year-to-year and are outcomes, not plot characteristics).
+  year-to-year and are outcomes, not plot characteristics).  =Tenure=
+  retains sharecropping (the /form/ of tenure is lasting even when
+  contract terms renegotiate); =Irrigated= retained (read as
+  "irrigation infrastructure / customary water access", a lasting
+  plot attribute).  Per-season contract / cultivation detail is the
+  natural home of a future =plot_cultivation= table (D5 below).
 - *D3*: moot (no =Crop= column to multi-up).
 - *D4*: still open (deferred; pick after Phase-1 schema stabilizes).
 
@@ -70,14 +75,17 @@ sections 2(ii)/(viii), =Table of Contents.pdf=, per-wave
 | Wave  | Round | Source file(s)                  | plot_id raw cols  | Area cols                                                       | Tenure / soil / irrigation             |
 |-------+-------+---------------------------------+-------------------+-----------------------------------------------------------------+----------------------------------------|
 | 1994a | R1    | =land1all.tab= / =r1p2s1.tab=   | =q21_1=           | =q21_1a= (qty) + =q21_1b= (unit); =q21_1aha= already in hectares | TBD on questionnaire pass              |
-| 1994b | R2    | =r2p3s1a*=                      | parcel+plot       | yes (units TBD)                                                 | =r2p2s8*= sharecropping sections       |
+| 1994b | R2    | =r2p3s1a*=                      | parcel+plot       | yes (units TBD)                                                 | =r2p2s8*= (sharecropping form); TBD: other tenure / soil / irrigation |
 | 1995  | R3    | =r3p2s1a3.tab=                  | =q21_3= + =q21_4= | =q21_5a= (qty) + =q21_5b= (unit)                                | TBD on questionnaire pass              |
 | 1997  | R4    | =r4p2s1af.tab= / =r4p2s1bf.tab= | plot              | *=plotha= / =area1ha...= (hectares pre-computed)*               | TBD on questionnaire pass              |
 
 (R1 crop columns =q21_8a/c/e/g= + per-crop area =q21_8b/d/f=, R3
-=q21_10*=, and any R2/R4 crop sections are *not* extracted into
-=plot_features= per D2; they remain available in source for a
-potential future =plot_cultivation= table.)
+=q21_10*=, R2/R4 crop sections, and the *per-season contract detail*
+inside R2 =r2p2s8*= (crop-share %, partner, current-season inputs)
+are *not* extracted into =plot_features= per D2; they remain
+available in source for a potential future =plot_cultivation= table.
+R2 =r2p2s8*= still populates =Tenure='sharecropped_*'= because the
+tenure category itself is lasting.)
 
 R4 is the best round (pre-computed hectares; serves as the
 conversion oracle for R1-R3).  R1 also ships a =q21_1aha= hectare
@@ -129,14 +137,17 @@ plot_features:
   Tenure:
     type: str
     note: |
-      Lasting ownership/use disposition for the plot.  Annual-varying
-      sharecropping arrangements (e.g. who farmed the plot this
-      season) belong in a separate plot_cultivation table, not here.
+      Form under which the plot is held.  Per-season contract detail
+      (this year's crop-share percentage, this year's cash rent
+      amount) belongs in a future plot_cultivation table; the tenure
+      category itself is the lasting attribute.
     spellings:
       owned: []
       leased: []
       rented_in: []
       rented_out: []
+      sharecropped_in: []
+      sharecropped_out: []
       inherited: []
       communal: []
       other_tenure: []
@@ -144,8 +155,12 @@ plot_features:
     type: str
   Irrigated:
     type: bool
-    note: irrigation infrastructure present, not whether irrigated
-      this season
+    note: |
+      True if the plot has irrigation -- treat as a lasting plot
+      attribute (infrastructure / customary water access).  Surveys
+      that ask "irrigated this season?" report effectively the same
+      value for plots with permanent infrastructure; per-season
+      variation, where it matters, lives in plot_cultivation.
   Latitude:
     type: float
   Longitude:
@@ -153,19 +168,26 @@ plot_features:
 #+end_src
 
 Notes on the D2 reflow:
-- =Crop= and =Crop2= are *not* in this block (D2).
-- =sharecropped= is removed from =Tenure= spellings: it's a
-  per-season arrangement, not a lasting attribute.  Sharecropping
-  data lives in source (ERHS R2 =r2p2s8*=) and can be surfaced via a
-  future =plot_cultivation= table.
-- =Irrigated= is reframed as "infrastructure present" -- a property
-  of the plot, not of this season's planting.
+- =Crop= and =Crop2= are *not* in this block (D2): planted crops vary
+  season-to-season and are outcomes, not plot attributes.
+- =Tenure= retains sharecropping (split into =sharecropped_in= /
+  =sharecropped_out= for consistency with the rented split).
+  Sharecropping is a /form/ of tenure, lasting at the
+  plot-arrangement level even when the specific contract terms get
+  renegotiated.  What's excluded from =Tenure= is the per-season
+  /contract detail/ (this year's crop-share percentage, who
+  cultivated, etc.) -- that's plot_cultivation territory.
+- =Irrigated= stays in.  Where a questionnaire asks "irrigated this
+  season?" the answer is dominated by whether infrastructure exists;
+  treat as a lasting attribute and let plot_cultivation capture any
+  real season-to-season variation if it ever matters.
 
-ERHS would populate =Area=, =AreaUnit=, and =Tenure= where the
-questionnaire records lasting ownership (R2 has the richest
-information; R1/R3/R4 to confirm on a recon pass).  =SoilType= and
-=Irrigated= conditional on per-round questionnaire support.  No GPS
-in ERHS.
+ERHS would populate =Area=, =AreaUnit=, =Tenure= (including
+sharecropped categories where R2's =r2p2s8*= sections support them),
+and =Irrigated= / =SoilType= where the per-round questionnaire
+records them.  Per-round coverage TBD on the questionnaire pass; per
+country convention, declared columns NaN out where data are absent.
+No GPS in ERHS.
 
 ** Test-suite consequence
 
@@ -188,8 +210,13 @@ Add to =lsms_library/countries/EthiopiaRHS/_/data_scheme.yml=:
     Area: float
     AreaUnit: str
     Tenure: str
-    # SoilType / Irrigated added per-round if questionnaire supports
+    SoilType: str
+    Irrigated: bool
 #+end_src
+
+All five columns are declared up front; per-round coverage is
+discovered on the questionnaire pass and absent data NaN out, same
+as e.g. =cluster_features.Latitude= for countries without GPS.
 
 (Following the ERHS convention from #271/#272: =v= is *not* in the
 index because =_join_v_from_sample()= adds it at API time.  Wave
@@ -280,23 +307,29 @@ already in CONTENTS.org.
 
 ** Tenure
 
-Under D2 ("lasting features"), =Tenure= covers the *ownership /
-long-run-use* disposition only -- =owned=, =leased=, =inherited=,
-=communal=, etc.  *Per-season sharecropping arrangements are
-excluded* (they vary year-to-year; they're outcomes, not plot
-attributes).
+=Tenure= records the /form/ under which the plot is held -- =owned=,
+=leased=, =rented_in=, =rented_out=, =sharecropped_in=,
+=sharecropped_out=, =inherited=, =communal=.  Sharecropping is a
+recognized form of tenure in agricultural economics (Ethiopian
+/yikul/ arrangements are typically multi-year and not infrequently
+generational); the *category* is a lasting plot attribute, even when
+the specific contract terms (this season's crop, this season's
+split) get renegotiated.
 
-ERHS R2's sharecropping sections (=r2p2s8*=) therefore do *not*
-populate =Tenure= -- they're the prototypical per-season piece D2
-moves out of =plot_features=.  If/when a =plot_cultivation= table
-gets filed, R2 sharecropping is one of its first sources.
+What ERHS R2's sharecropping sections =r2p2s8*= add over and above
+the tenure category is the per-season /contract detail/: crop-share
+percentage, partner identity, inputs each side provides.  That
+contract detail is what D2 moves out of =plot_features= and into a
+prospective =plot_cultivation= table.  The tenure-category fact ("the
+plot is held under sharecropping, =sharecropped_out= from the
+landlord HH's view, =sharecropped_in= from the tenant's") *does*
+populate =Tenure= here.
 
-R1 / R3 / R4 likely record a lasting tenure question (ownership of
-the parcel) separately from the sharecropping detail; questionnaire
-pass needs to confirm and map the code values to the canonical
-spellings via a =harmonize_tenure= org-table or per-wave inline
-=mapping:=.  Where lasting tenure is absent or ambiguous, =Tenure=
-is NaN.
+R1 / R3 / R4 ownership-of-plot questions to confirm on the
+questionnaire pass; map code values to the canonical spellings via a
+=harmonize_tenure= org-table or per-wave inline =mapping:=.  Where
+the tenure question is absent or ambiguous in a given round,
+=Tenure= NaNs out for that round.
 
 ** plot_id stability across rounds
 
@@ -315,9 +348,14 @@ needs to /not/ try to link them.
   no longer carries the canonical =Columns:= block.
 - *D2*: =plot_features= = lasting plot characteristics.  Drop =Crop=
   and =Crop2= from the canonical block (and from ERHS extraction).
-  Sharecropping moves out of =Tenure= (per-season, not lasting).
-  =Irrigated= reframed as "infrastructure present", not
-  "irrigated this season".
+  =Tenure= keeps sharecropping (split into =sharecropped_in= /
+  =sharecropped_out=) -- the /form/ of tenure is lasting even when
+  contract terms renegotiate.  =Irrigated= retained as a lasting
+  attribute (read as infrastructure / customary water access; per-
+  season variation, if it matters, lives in =plot_cultivation=).
+  What D2 actually moves out of =plot_features= is per-season
+  /contract detail/ -- crop share %, partner identity, this-season
+  inputs -- not the tenure category itself.
 - *D3*: moot.
 
 ** Still open
@@ -328,10 +366,14 @@ needs to /not/ try to link them.
   Recommend wait -- pinning a baseline against a still-evolving
   schema is wasted work.  Re-raise after Uganda Phase 1 merges.
 - *D5* (new, surfaced by D2's reflow): does anyone want a separate
-  =plot_cultivation= table for per-season crop / sharecropping /
-  input data?  Out of scope for this design but worth filing under
-  #167's umbrella if there's appetite.  ERHS would be a natural
-  contributor (R1 =q21_8*=, R3 =q21_10*=, R2 =r2p2s8*=).
+  =plot_cultivation= table for per-season /contract & cultivation
+  detail/ -- planted crop(s), crop-share %, partner identity,
+  this-season inputs?  Out of scope for this design but worth filing
+  under #167's umbrella if there's appetite.  ERHS would be a natural
+  contributor (R1 =q21_8*=, R3 =q21_10*=, R2 =r2p2s8*= contract
+  detail).  =Tenure= and =Irrigated= remain in =plot_features=; what
+  =plot_cultivation= would carry is the per-season layer on top of
+  the lasting plot attributes.
 
 * Risk register
 
@@ -343,9 +385,12 @@ needs to /not/ try to link them.
   could surprise on detailed recon.  Mitigation: deliberately
   picked the script path for R2; the recipe absorbs cross-file
   joins.  R1/R3/R4 are de-risked by single-source-file structure.
-- *R3*: Tenure semantics may not cleanly split into "lasting
-  ownership" vs "per-season sharecropping" in every round's
-  questionnaire.  Mitigation: questionnaire pass *before* coding;
+- *R3*: Tenure semantics may not cleanly map every round's tenure
+  question to the canonical spellings (owned / leased / rented_in /
+  rented_out / sharecropped_in / sharecropped_out / inherited /
+  communal / other_tenure), and the lasting tenure-category fact
+  may be entangled with per-season contract detail in a single
+  source column.  Mitigation: questionnaire pass *before* coding;
   if a round's tenure question is ambiguous, emit NaN rather than
   guess.  Cleaner to under-populate than to mis-attribute.
 - *R4*: The Dataverse file IDs for plot files aren't yet listed in
@@ -375,10 +420,14 @@ quarter.
 2. Pull R4 =r4p2s1af.tab=/=r4p2s1bf.tab= + =prodconv.tab=; inspect
    the unit codes and the =plotha= column to seed the empirical
    =hectares_per_unit= map.  Independent of Uganda Phase 1.
-3. Per-wave questionnaire pass: confirm /lasting/ tenure questions
-   exist (distinct from per-season sharecropping detail); enumerate
-   soiltype / irrigation-infrastructure questions if any.  Decide
-   per-round which canonical columns ERHS can actually populate.
+3. Per-wave questionnaire pass: enumerate the tenure question(s) per
+   round (mapping source codes to the canonical spellings -- owned /
+   leased / rented_in / rented_out / sharecropped_in /
+   sharecropped_out / inherited / communal / other_tenure); identify
+   soiltype and irrigation questions if any.  Per-season contract
+   detail (crop-share %, partner identity, this-season inputs)
+   stays in source for a potential =plot_cultivation= follow-up.
+   Decide per-round which canonical columns ERHS can populate.
 4. Watch #167 Phase 1 land.  Confirm Uganda's actual landed Columns
    block + spellings; reconcile this design against it.
 5. *Then* open the ERHS Phase 2 PR with the data_scheme.yml
