@@ -1,0 +1,411 @@
+#+TITLE: Design — EthiopiaRHS plot_features (GH #278, under #167)
+#+DATE: 2026-05-20
+#+FILETAGS: design erhs plot_features lsms_library
+
+* Status
+
+Draft for maintainer review.  *Not for implementation* until the
+"Decisions for maintainer" section below is resolved.  Target branch:
+=development=.  Authoring branch: =design/erhs-plot-features-278=.
+
+* Problem and scope
+
+** What
+
+Implement the canonical =plot_features= table for *EthiopiaRHS*
+(R1-R4 = 1994a/1994b/1995/1997 only).  Reserved canonical index
+=(t, v, i, plot_id)= lives in =lsms_library/data_info.yml=
+(Index Info); the =Columns:= block has *never been declared*, and
+no country has ever populated =plot_features=.  This design covers
+both the ERHS-side implementation /and/ the framework-level
+Columns-block question that necessarily moves with it (#167).
+
+** Not what (out of scope)
+
+- =plot_features= is plot /characteristics/ (area, crop, tenure,
+  soil).  Crop *output / yield / profit* is a distinct concern: in
+  ERHS it lives at HH x crop, not per-plot (R1 harvest sections,
+  R2 =r2p2s1a=, derived =area_output_*= aggregates, 1997 output
+  value).  Out of this design entirely; relates to the deferred
+  ERHS income work in #277.
+- 1989: no plot roster in the IFPRI Dataverse archive (only
+  HH x crop =ethprodv.tab=).  No plot_features.
+- 1999 / 2004 / 2009 (R5-R7): no raw plot sections in the
+  Dataverse archive (only pre-aggregated HH x crop
+  =area_output_99/04/2009=).  No plot_features; same wired/unwired
+  split as roster/food (CONTENTS.org and #276).
+- GPS coordinates: ERHS doesn't record them.  =Latitude= /
+  =Longitude= columns in the canonical schema stay optional.
+- Implementing =plot_features= for any other country: that is #167's
+  job, with Uganda as Phase-1 pilot.  This design proposes ERHS as
+  *Phase-1 co-pilot or Phase-2 first follower* (see "Decisions" below).
+
+* Source data summary (R1-R4)
+
+Combined from #278's recon (=Overview ... Data Description.pdf=
+sections 2(ii)/(viii), =Table of Contents.pdf=, per-wave
+=ERHS_hhquestionnaire_*.pdf=).
+
+| Wave  | Round | Source file(s)                 | plot_id raw cols      | Area cols                                | Crops cols                             |
+|-------+-------+--------------------------------+-----------------------+------------------------------------------+----------------------------------------|
+| 1994a | R1    | =land1all.tab= / =r1p2s1.tab=  | =q21_1=               | =q21_1a= (qty) + =q21_1b= (unit); =q21_1aha= already in hectares | =q21_8a/c/e/g= (codes) + =q21_8b/d/f= per-crop area |
+| 1994b | R2    | =r2p3s1a*=                     | parcel+plot           | yes (units TBD)                          | yes                                    |
+| 1995  | R3    | =r3p2s1a3.tab=                 | =q21_3= + =q21_4=     | =q21_5a= (qty) + =q21_5b= (unit)         | =q21_10*=                              |
+| 1997  | R4    | =r4p2s1af.tab= / =r4p2s1bf.tab= | plot                  | *=plotha= / =area1ha...= (hectares pre-computed)* | yes                                  |
+
+R4 is the best round (pre-computed hectares; serves as the
+conversion oracle for R1-R3).  R1 also ships a =q21_1aha= hectare
+column for the primary plot area, which gives an independent within-R1
+calibration point.
+
+HH key throughout: =q1a . q1b . q1c= + HH-no (=q5= R1 / =q2= R2-3 /
+=q1d= R4) -- identical to the shared =_/ethiopiarhs.py= composite-=i=
+convention used by =household_roster= / =food_acquired= / =sample=.
+Region (cluster v) is auto-joined by =_join_v_from_sample()= at API
+time -- design doesn't need to plumb it.
+
+** Files to acquire from Dataverse
+
+None of the plot-table files are currently in the repo's DVC store.
+Acquisition steps (mirrors the existing per-wave =Data/= pattern; see
+=CONTRIBUTING.org=):
+
+#+begin_src bash
+# in EthiopiaRHS/<wave>/Data/, per wave:
+curl -L "https://dataverse.harvard.edu/api/access/datafile/<id>?format=original" -o <file>.tab
+dvc add <file>.tab
+dvc push -r ligonresearch_s3
+git add <file>.tab.dvc .gitignore
+#+end_src
+
+Concrete IDs come from the IFPRI Dataverse listing
+(=doi:10.7910/DVN/T8G8IV=); the file-id <-> name map for the
+already-wired demo/food files is in =EthiopiaRHS/_/CONTENTS.org=
+section "Round -> File Map".  Adding plot files extends that table.
+
+* Proposed canonical =Columns:= block (framework-level, #167)
+
+The Columns set must land *atomically* with the first declaring
+country (test consequence below).  Drawing from #167's draft schema
++ #278's evidence, the minimal sustainable set is:
+
+#+begin_src yaml
+plot_features:
+  Area:
+    type: float
+    required: true
+    note: plot area in hectares (canonical unit)
+  AreaUnit:
+    type: str
+    note: original survey unit before conversion to hectares
+  Crop:
+    type: str
+    note: primary crop (harmonized vocabulary per country)
+  Crop2:
+    type: str
+  Tenure:
+    type: str
+    spellings:
+      owned: []
+      leased: []
+      rented_in: []
+      rented_out: []
+      sharecropped: []
+      inherited: []
+      communal: []
+      other_tenure: []
+  SoilType:
+    type: str
+  Irrigated:
+    type: bool
+  Latitude:
+    type: float
+  Longitude:
+    type: float
+#+end_src
+
+ERHS would populate =Area=, =AreaUnit=, =Crop=, =Crop2= (R1 has up to
+four crop codes per plot via =q21_8a/c/e/g=; truncating to two loses
+information -- see "Open question: multi-crop" below), and =Tenure=
+where the questionnaire supports it (R2 =r2p2s8*= sharecropping
+sections per #278).  =SoilType= / =Irrigated= conditional on
+questionnaire support per round (to verify on a recon pass after
+maintainer signs off on schema).  No GPS in ERHS.
+
+** Test-suite consequence
+
+=tests/test_feature.py::test_column_table_has_countries= iterates
+canonical =Columns:= and asserts =>=1 country declares each.  The
+moment the block above lands in =data_info.yml=, the gate flips red
+until =>=1 country puts =plot_features= in its =data_scheme.yml=.
+*Therefore the Columns block + the first country's declaration must
+land in a single PR* (or a tightly-sequenced PR pair merged the same
+session).  Same lesson the audit (=SkunkWorks/audits/plot_features.md=)
+calls out.
+
+* ERHS-side implementation plan
+
+** =data_scheme.yml= declaration
+
+Add to =lsms_library/countries/EthiopiaRHS/_/data_scheme.yml=:
+
+#+begin_src yaml
+  plot_features:
+    index: (t, i, plot_id)        # v auto-joined by framework
+    Area: float
+    AreaUnit: str
+    Crop: str
+    Crop2: str
+    Tenure: str
+#+end_src
+
+(Following the ERHS convention from #271/#272: =v= is *not* in the
+index because =_join_v_from_sample()= adds it at API time.  Wave
+extractors emit =(t, i, plot_id)= only.)
+
+** YAML vs. script path (per CLAUDE.md "Two Build Paths")
+
+R1 / R3 / R4 are single-source-file per wave (=land1all.tab=,
+=r3p2s1a3.tab=, =r4p2s1af.tab=/=r4p2s1bf.tab=) and could be wired
+in pure YAML if the per-row =plot_id= can be expressed as a single
+=idxvars= entry.
+
+- R1: =plot_id= = =q21_1= scalar.  *YAML path OK.*
+- R3: =plot_id= = composite =q21_3 . q21_4=.  Same shape as the
+  composite-=i= problem already solved by =_/ethiopiarhs.py:i= --
+  add a sibling formatter =plot_id_composite= taking
+  =[q21_3, q21_4]= and emitting a single string.  *YAML path OK
+  with shared formatter.*
+- R4: =r4p2s1af.tab= + =r4p2s1bf.tab= concatenated.  Two source files
+  per wave -> *script path required* (mirrors the existing
+  =_/ethiopiarhs.py= recipe for cross-file food merges, per
+  =DESIGN_ethiopiarhs_wave_recipe_2026-05-18.org=).
+- R2: =r2p3s1a*= family (multiple sub-files for parcels and crop
+  rows).  Likely *script path* -- to confirm during R2 recon.
+
+So: R1 and R3 are YAML; R2 and R4 are =materialize: make= scripts.
+That matches the half-and-half pattern already in EthiopiaRHS.
+
+** Shared helpers in =_/ethiopiarhs.py=
+
+New additions (additive only; existing =i= / food helpers untouched):
+
+1. =plot_id_scalar(value)= -- pass-through formatter for R1's =q21_1=.
+   Trivial; could also just use the built-in =format_id=.
+2. =plot_id_composite(value)= -- two-element formatter for R3:
+   =format_id(value.iloc[0]) + '_' + format_id(value.iloc[1])=.
+   Identical shape to the existing composite-=i= helper, NaN-guarded
+   the same way (returns =pd.NA= if either component is missing).
+3. =to_hectares(qty, unit_code, hpu_map)= -- a multiplier lookup
+   against the static =hectares_per_unit= map (below).  Returns
+   =(area_ha, area_unit_label)=, with =area_ha = NaN= when the unit
+   code is unrecognized (no silent fallback; explicit miss makes
+   coverage easy to audit, same policy as the kg conversion in #272).
+
+** Hectares conversion -- the area-unit harmonization
+
+ERHS uses local volumetric / area units (timad, kert, ...).
+Recipe, mirroring the *spirit* of the =harmonize_unit= pattern in
+=_/categorical_mapping.org= but *not* the good-specific trick (an
+area is not good-attributed the way a Chinet of butter is):
+
+1. Build a static =hectares_per_unit= map -- one factor per ERHS
+   area-unit code, single table since ERHS unit codes were verified
+   stable across 1994+ in the food work.  Implementation: either
+   (a) a new =hectares_per_unit= org-table sibling to =harmonize_unit=
+   in =EthiopiaRHS/_/categorical_mapping.org=, or (b) a JSON
+   companion =EthiopiaRHS/_/hectares_per_unit.json= (mirrors the
+   pattern named in #167 "the equivalent =kgs_per_unit.json=").
+   Recommend (a) -- keeps the harmonization tables co-located and
+   diff-able as one file; consistent with =harmonize_unit=.
+2. Seed factor values from candidate sources (each needs validation):
+   - =prodconv.tab= in the Dataverse archive (per #278; needs
+     download + inspection).
+   - Codeunit*.SPS files in =<wave>/Documentation/= (already
+     DVC-tracked; the food-unit work referenced them but for ERHS
+     1989 only).
+   - Published literature on Ethiopian land-area conventions
+     (timad = ~0.25 ha is a common citation; kert / kada vary by
+     region -- recon needed).
+3. *R4 =plotha= as oracle.* For every R4 plot, R4 records the raw
+   unit + qty *and* a pre-computed hectare value.  Compute the
+   empirical ratio =plotha / qty= for each unit code in R4, compare
+   to the seeded =hectares_per_unit= map, and resolve discrepancies
+   in favor of the empirical R4 ratio.  Same triangulation pattern
+   used by the #272 food kg-factor work.  R1's =q21_1aha= column
+   gives an additional within-R1 calibration point for the primary
+   plot.
+4. =AreaUnit= column carries the *original* unit's harmonized label
+   (from a sibling =harmonize_area_unit= table -- preserves
+   provenance for users who want to re-aggregate or sanity-check the
+   conversion).
+
+Two-stage rollout option (worth considering): land =plot_features=
+with =Area = NaN= where the unit is un-mapped, then iterate on the
+=hectares_per_unit= map in a follow-on PR.  Mirrors the food
+harmonization residual (~5.5% un-resolved codes) acceptance posture
+already in CONTENTS.org.
+
+** Crop harmonization
+
+R1 records up to four crops per plot (=q21_8a/c/e/g= as codes).  The
+canonical Columns block has =Crop= and =Crop2= only -- so either:
+
+- (i) emit =Crop= = primary, =Crop2= = secondary; drop tertiary and
+  quaternary (data loss; cross-country-uniform).
+- (ii) extend the canonical schema to =Crop=, =Crop2=, =Crop3=,
+  =Crop4= (more columns; thinner per-country).
+- (iii) emit a long-form one-row-per-(plot, crop) version --
+  changes the index to =(t, v, i, plot_id, crop_seq)=; biggest
+  schema change.
+
+Option (i) is the minimum-disruption choice; (iii) is the most
+"like-=food_acquired=" choice.  This is a #167 design question, not
+ERHS-local -- pinned for the maintainer in "Decisions" below.
+
+ERHS-local: harmonize crop codes via a new =harmonize_crop= org-table
+in =EthiopiaRHS/_/categorical_mapping.org=, same pattern as
+=harmonize_food= (one CODE column per wave; Preferred Label drives
+the canonical name).  Don't try to pre-harmonize cross-country crop
+names -- that's a #167 follow-up if ever needed.
+
+** Tenure
+
+R2 has sharecropping sections (=r2p2s8*= per #278).  R1/R3/R4
+questionnaire support for tenure to confirm during the round-by-round
+extraction pass.  Where present, map to the =Tenure= spellings above
+(owned / leased / inherited / sharecropped / etc.) via a
+=harmonize_tenure= org-table or per-wave inline =mapping:=.
+Where absent, =Tenure= is NaN.
+
+** plot_id stability across rounds
+
+ERHS plots are *not* a panel across rounds at the plot level (a HH
+re-rosters their plots each round; plot IDs are wave-local).  Same
+posture as Tanzania's plot module: =plot_id= is unique within
+=(t, i)= but does not link across =t=.  This is the canonical schema
+already (=(t, v, i, plot_id)= -- =t= is part of the key); design just
+needs to /not/ try to link them.
+
+* Decisions for maintainer
+
+These need a maintainer call before code lands.  Each is independent;
+options are stacked from minimum-disruption to most-disruption.
+
+** D1.  Pilot disposition (the #167 atomicity question)
+
+Three plausible paths:
+
+| Path | Who pilots | Atomic PR shape                                              | Net cost |
+|------+------------+--------------------------------------------------------------+----------|
+| A    | ERHS solo  | =data_info.yml= Columns + ERHS data_scheme + ERHS waves      | one PR; ERHS pins the canonical Columns set ahead of #167's Phase 1 plan |
+| B    | Uganda solo (per #167 Phase 1), then ERHS Phase 2 | Uganda lands #167 Phase 1 first; ERHS follows in a second PR without atomicity question | two PRs; ERHS waits for Uganda; canonical set debated once |
+| C    | Uganda + ERHS atomic co-pilot | one PR landing Columns + Uganda + ERHS together | one large PR; biggest review surface |
+
+Recommendation: *B*, unless Uganda Phase 1 is stalled for unrelated
+reasons.  B is the path #167 itself proposes; ERHS-first only pins
+the canonical schema in a way Uganda then has to live with.  The
+counter-argument is that ERHS-first lets ERHS price-risk work
+unblock without waiting on Uganda -- a legitimate prioritization
+call the maintainer should make.
+
+(If A is chosen, the rest of this design is the implementation plan.
+If B, ERHS hangs back and this design becomes the "Phase 2 follower"
+spec.)
+
+** D2.  Canonical Columns set sign-off
+
+Sign off on the Columns block proposed above.  Per-row open
+questions:
+
+- Is =Area= required or optional?  (#167 audit defaults to required;
+  this design follows that.)  ERHS R1-R4 all have area data; setting
+  required is safe for ERHS.  Risk: other countries with patchy
+  area coverage would have to NaN it out, which =required: true=
+  permits.  Recommend: required.
+- =Tenure= spellings -- the list above is best-effort; if there's a
+  preferred canonical list (e.g. from existing Uganda tenure
+  encoding), use that.
+- Include =SoilType= and =Irrigated= now or defer?  Recommend
+  *include now* (cheap to declare empty; cheap for ERHS to
+  populate where the questionnaire supports them; expensive to
+  retrofit after Columns lands).
+
+** D3.  Multi-crop posture
+
+Pick (i) Crop+Crop2, (ii) Crop+Crop2+Crop3+Crop4, (iii) long-form
+=(t, v, i, plot_id, crop_seq)= with one row per (plot, crop).
+Recommendation: *(i)*, on the principle that #167 already proposed
+two and ERHS would not be the only country emitting tertiary crops.
+If the maintainer prefers (iii) the canonical index changes; that's
+a strictly larger #167 design surface and should not be smuggled
+into the ERHS implementation.
+
+** D4.  Test-fixture / baseline policy
+
+Once ERHS plot_features lands, do we ship a fixture / baseline
+(mirrors =tests/test_invariance.py=)?  The food and roster work has
+deferred plot_features baselines.  Recommendation: yes, but in a
+follow-on PR after the canonical Columns set has stabilized -- a
+baseline pinned against a draft schema is wasted work.
+
+* Risk register
+
+- *R1*: =hectares_per_unit= seed values may not validate against R4
+  =plotha=.  Mitigation: two-stage rollout (land with =Area=NaN= where
+  un-mapped; iterate); accept up to a documented residual share, as
+  with food.
+- *R2*: R2 source structure (=r2p3s1a= family) is multi-file and
+  could surprise on detailed recon.  Mitigation: deliberately
+  picked the script path for R2; the recipe absorbs cross-file
+  joins.  R1/R3/R4 are de-risked by single-source-file structure.
+- *R3*: Crop schema decision (D3) cascades into the column-count
+  contract.  Mitigation: pin D3 *before* coding R1; do not let
+  parallel workers each pick a different multi-crop convention.
+  (This is the "anchor design in a shared artifact" rule from
+  scrum-master-hpc -- exactly why this doc exists.)
+- *R4*: The Dataverse file IDs for plot files aren't yet listed in
+  =CONTENTS.org= "Round -> File Map".  Mitigation: one-pass recon
+  to enumerate them and extend the map *before* opening the
+  implementation PR.
+- *R5*: Test-suite redness window during the atomic PR.  Mitigation:
+  open the PR with both Columns + first-country declaration in the
+  same first commit; do not split into "schema-only" + "data" commits.
+
+* Out-of-band: things to do before any implementation PR
+
+(Assuming maintainer chooses to proceed via A or scheduled B.)
+
+1. Recon pass: enumerate Dataverse file IDs for R1-R4 plot files;
+   extend =EthiopiaRHS/_/CONTENTS.org= "Round -> File Map".
+2. Pull R4 =r4p2s1af.tab=/=r4p2s1bf.tab= + =prodconv.tab=; inspect
+   the unit codes and the =plotha= column to seed the empirical
+   =hectares_per_unit= map.
+3. Per-wave questionnaire pass: confirm tenure / soiltype /
+   irrigation coverage round-by-round; finalize the per-round
+   column mapping.
+4. *Then* open the PR with Columns + ERHS declaration + wave
+   extractors + harmonization tables, with a worked example
+   (e.g. =Country('EthiopiaRHS').plot_features().head()=) in the
+   PR body.
+
+* References
+
+- #167 (canonical =plot_features= umbrella; Uganda Phase 1; the
+  Columns-atomicity test gate)
+- #271 / #272 (EthiopiaRHS country baseline; established ERHS
+  conventions -- code-based extraction, shared formatters,
+  =harmonize_*= org-tables, R4 as oracle pattern)
+- #277 (ERHS additional features; this design supersedes its
+  implicit agriculture line)
+- #275 (ERHS community / market prices; not gated by this)
+- =SkunkWorks/audits/plot_features.md= (2026-04-12 audit;
+  documents the schema-code mismatch this design closes)
+- =slurm_logs/DESIGN_ethiopiarhs_wave_recipe_2026-05-18.org= (wave
+  recipe pattern; the script path here follows it)
+- =slurm_logs/HANDOFF_2026-05-19.org= + appendix (current ERHS
+  state; the appendix records resolutions to 1989 / 1997 / 1995
+  blockers that the same shared-formatter pattern will encounter
+  here)
+- =lsms_library/countries/EthiopiaRHS/_/CONTENTS.org= (ground
+  truth for current ERHS coverage, conventions, deferred work)
