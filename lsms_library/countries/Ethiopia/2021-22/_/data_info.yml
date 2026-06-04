@@ -59,6 +59,16 @@ household_roster:
         Relationship: s1q01
         WeeksAway: s1q06
 
+individual_education:
+    file: sect2_hh_w5.dta
+    idxvars:
+        i: household_id
+        pid: individual_id
+    myvars:
+        # Highest grade completed (free-text survey labels; W5 labels are
+        # uppercased and code-prefixed, e.g. "10. 10TH GRADE COMPLETE").
+        Educational Attainment: s2q06
+
 shocks:
     file: sect9_hh_w5.dta
     idxvars:
