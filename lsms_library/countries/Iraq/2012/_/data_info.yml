@@ -29,13 +29,9 @@ household_roster:
         Relationship: q0105
         Age: q0104
 
-assets:
-    file:
-        - "../Data/2012ihses18_durables.dta"
-    idxvars:
-        i: questid
-        j: durable_code
-    myvars:
-        Quantity: q1801
-        Value: q1805
-        Purchase Price: q1803
+# assets is built via the script path (_/assets.py) so that physical
+# instances of a durable (multiple `durable_serial` rows per
+# (questid, durable_code)) are SUMMED into the canonical (t, i, j) index
+# rather than silently collapsed with .first().  Mark `assets: !make` in
+# the country data_scheme.yml.  The YAML path cannot groupby-sum, hence the
+# script.

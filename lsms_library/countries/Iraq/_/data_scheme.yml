@@ -23,3 +23,9 @@ Data Scheme:
     Quantity: float
     Value: float
     Purchase Price: float
+    # 2012 is built via the script path (2012/_/assets.py) so durable
+    # physical instances (multiple `durable_serial` rows per
+    # (i, j)) are SUMMED into the canonical (t, i, j) index rather than
+    # silently collapsed with .first().  2006-07 has zero such duplicates
+    # and stays on the YAML path; `load_from_waves` dispatches per wave.
+    materialize: make
