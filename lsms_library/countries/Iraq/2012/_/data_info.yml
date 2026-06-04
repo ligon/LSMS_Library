@@ -28,3 +28,14 @@ household_roster:
         Sex: q0102
         Relationship: q0105
         Age: q0104
+
+assets:
+    file:
+        - "../Data/2012ihses18_durables.dta"
+    idxvars:
+        i: questid
+        j: durable_code
+    myvars:
+        Quantity: q1801
+        Value: q1805
+        Purchase Price: q1803
