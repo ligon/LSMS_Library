@@ -71,3 +71,12 @@ sample:
             - mapping:
                 Rural: Rural
                 Urban: Urban
+
+assets:
+    file: "../Data/DURGOODS.dta"
+    idxvars:
+        i: hhid
+        j: s10e_01
+    myvars:
+        Age: s10e_02
+        Value: s10e_4a
