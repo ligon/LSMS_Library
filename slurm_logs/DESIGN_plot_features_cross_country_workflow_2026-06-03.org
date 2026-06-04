@@ -290,8 +290,14 @@ refuter disposes.  Corrections that MUST fold into implementation:
   (else +265..+1567 phantom rows/wave; plot_id collides) → plot_id =
   holder_id+parcel_id+field_id.  (2) GPS is 100% "**CONFIDENTIAL**" →
   DEFER Lat/Lon (recon's "first GPS country" was false).  (3) W2/W3
-  sample key is ~household_id~ NOT ~household_id2~ (98% orphan otherwise).
+  sample key is ~household_id2~ (recon was right; the REFUTER's "use
+  household_id" was a FALSE POSITIVE — it compared raw ids without
+  id_walk.  Ground truth: ethiopia.py panel chain + 2013-14 sample.py /
+  food_acquired all use household_id2; implementer verified household_id2
+  → 0.7% orphan and overrode the bad instruction.  Confirmed in PR #283).
   (4) W1 tenure codes 10/11/12 uncovered; W1 area-unit 7='Other'.
+  (5) TenureSystem all-NaN (ESS has no analogue) → declare
+  ~optional: true~ in data_scheme.yml (a real, widely-used schema flag).
 - *EHCVM*: (1) TOGO IS FEASIBLE — module is in ~Togo/2018/Data1/~
   (s16a_me_tgo2018.dta, 9557 rows); back in scope → 7 EHCVM countries,
   ~91,500 rows.  (2) emit ~i:[grappe,menage]~ composite, verify orphans
