@@ -22,3 +22,8 @@ Data Scheme:
     Generation: int
     Distance: int
     Affinity: str
+
+  interview_date:
+    index: (t, i)
+    Int_t: datetime
+    materialize: make
