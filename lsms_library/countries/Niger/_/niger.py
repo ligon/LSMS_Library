@@ -204,3 +204,136 @@ def age_handler(df, interview_date = None, format_interv = None, age = None, dob
     df['age'] = df.apply(fill_func, axis = 1)
 
     return df
+
+
+# ---------------------------------------------------------------------------
+# plot_features (GH #167; EHCVM cluster)
+# ---------------------------------------------------------------------------
+#
+# Niger is an EHCVM sibling of the Mali reference implementation
+# (PR #284).  The agriculture-parcel module s16a_me_ner{year}.dta uses
+# the same uniform EHCVM column scheme.  The shared harmonization lives
+# in ``plot_features_for_wave``; each wave's ``_/plot_features.py`` is a
+# thin loader that hands the raw DataFrame plus a column map to it.
+#
+# NIGER-SPECIFIC delta: 2021-22 s16aq10 adds code 7 = Co-propriétaire,
+# which Niger's harmonize_tenure maps to ``owned`` (2018-19 has codes
+# 1-6 only, identical to Mali).
+#
+# i() above already produces the EHCVM composite id ('E_' + grappe + '0'
+# + zero-padded menage) when handed a lowercase-named (grappe, menage)
+# Series, matching sample().i natively.
+
+
+def _harmonized_codes(tablename, key='Code', value='Preferred Label'):
+    """Load a ``{int code -> Preferred Label}`` dict from
+    ``categorical_mapping.org`` for one of the plot_features harmonize_*
+    tables.  Codes whose Preferred Label is blank / '---' map to NA so
+    the corresponding column stays NaN.  Mirrors the Mali reference."""
+    raw = tools.get_categorical_mapping(tablename=tablename, idxvars=key,
+                                        **{value: value})
+    out = {}
+    for k, v in raw.items():
+        try:
+            int_k = int(k)
+        except (TypeError, ValueError):
+            int_k = k
+        if pd.isna(v) or str(v).strip() in ('---', ''):
+            out[int_k] = pd.NA
+        else:
+            out[int_k] = str(v).strip()
+    return out
+
+
+def _map_codes(series, code_map):
+    """Map a numeric (raw Stata integer-code) Series through ``code_map``,
+    returning a string Series with NA where the code is unmapped.  Source
+    files must be loaded with ``convert_categoricals=False`` so the codes
+    arrive as integers."""
+    out = series.astype('Int64').map(code_map)
+    return out.astype('string').where(out.notna(), pd.NA)
+
+
+def plot_features_for_wave(t, source, colmap):
+    """Build canonical ``plot_features`` for one Niger EHCVM wave.
+
+    See ``Mali/_/mali.py:plot_features_for_wave`` for the full contract
+    (this is a direct sibling).  Returns a DataFrame indexed by
+    ``(t, i, plot_id)`` with columns ``Area`` (hectares float),
+    ``AreaUnit`` (always 'hectares'), ``Tenure``, ``TenureSystem``,
+    ``SoilType`` (str), and ``Irrigated`` (nullable bool).
+
+    Niger note: ``i`` is built with Niger's ``i()`` formatter from a
+    lowercase-named (grappe, menage) Series so the EHCVM 'E_' prefix
+    fires and the id matches ``sample().i``.  ``plot_id =
+    "{field_no}_{parcel_no}"`` is unique within ``(grappe, menage)``.
+    """
+    tenure_map = _harmonized_codes('harmonize_tenure')
+    tenure_system_map = _harmonized_codes('harmonize_tenure_system')
+    soil_map = _harmonized_codes('harmonize_soil')
+    water_map = _harmonized_codes('harmonize_water')
+
+    c = colmap
+
+    # Drop s16a placeholder rows for non-farming households: one row per
+    # household with NO field/parcel number and every plot attribute
+    # blank.  Keeping them would emit a content-free "nan_nan" plot_id
+    # per household and collide once two such households id_walk to the
+    # same baseline id (Mali had ~3286 such rows in 2021-22; Niger has
+    # none in either wave, but the guard is kept for parity / safety).
+    src = source[source[c['field_no']].notna() & source[c['parcel_no']].notna()].copy()
+
+    # Household id: EHCVM composite (grappe, menage) via niger.i().  Build
+    # a Series with the original lowercase column names as its index so
+    # i()'s is_ehcvm detection fires and prefixes 'E_'.
+    g_col, m_col = c['grappe'], c['menage']
+    hh = src.apply(lambda r: i(pd.Series([r[g_col], r[m_col]],
+                                         index=[g_col, m_col])),
+                   axis=1)
+
+    field = src[c['field_no']].apply(tools.format_id)
+    parcel = src[c['parcel_no']].apply(tools.format_id)
+    plot_id = field.astype(str) + '_' + parcel.astype(str)
+
+    # Area in hectares.  GPS where measured, else farmer estimate
+    # converted from its declared unit (1=Hectare ->x1, 2=m^2 ->/10000).
+    area_gps = pd.to_numeric(src[c['area_gps']], errors='coerce').astype('Float64')
+    gps_flag = src[c['gps_measured']].astype('Int64')
+
+    est_raw = pd.to_numeric(src[c['area_est']], errors='coerce').astype('Float64')
+    est_unit = src[c['area_est_unit']].astype('Int64')
+    est_ha = est_raw.where(est_unit != 2, est_raw / 10000)
+
+    area_ha = est_ha.copy()
+    use_gps = (gps_flag == 1) & area_gps.notna()
+    area_ha = area_gps.where(use_gps, area_ha)
+
+    area_unit = pd.Series(['hectares'] * len(src), index=src.index, dtype='string')
+    area_unit = area_unit.where(area_ha.notna(), pd.NA)
+
+    tenure = _map_codes(src[c['tenure']], tenure_map) \
+        if c.get('tenure') in src.columns else pd.Series(pd.NA, index=src.index, dtype='string')
+    tenure_system = _map_codes(src[c['tenure_system']], tenure_system_map) \
+        if c.get('tenure_system') in src.columns else pd.Series(pd.NA, index=src.index, dtype='string')
+    soil_type = _map_codes(src[c['soil_type']], soil_map) \
+        if c.get('soil_type') in src.columns else pd.Series(pd.NA, index=src.index, dtype='string')
+
+    irrigated = pd.Series(pd.NA, index=src.index, dtype='boolean')
+    if c.get('water_source') in src.columns:
+        water_label = _map_codes(src[c['water_source']], water_map)
+        irrigated = (water_label == 'Irrigated').astype('boolean')
+        irrigated = irrigated.where(water_label.notna(), pd.NA)
+
+    df = pd.DataFrame({
+        't':            t,
+        'i':            hh.values,
+        'plot_id':      plot_id.values,
+        'Area':         area_ha.values,
+        'AreaUnit':     area_unit.values,
+        'Tenure':       tenure.values,
+        'TenureSystem': tenure_system.values,
+        'SoilType':     soil_type.values,
+        'Irrigated':    irrigated.values,
+    })
+    df = df.set_index(['t', 'i', 'plot_id'])
+    return df
