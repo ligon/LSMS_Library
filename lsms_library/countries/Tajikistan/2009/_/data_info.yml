@@ -72,3 +72,13 @@ sample:
     final_index:
         - i
         - t
+
+individual_education:
+    # M3BQ4 highest diploma (Module 3b Education); clean diploma labels in the
+    # .dta — pass through verbatim (free-text attainment).
+    file: ../Data/m3b.dta
+    idxvars:
+        i: HHID
+        pid: MEMID
+    myvars:
+        Educational Attainment: M3BQ4
