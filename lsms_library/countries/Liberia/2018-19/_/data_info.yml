@@ -37,3 +37,19 @@ sample:
             - mapping:
                 rural: Rural
                 urban: Urban
+
+assets:
+    # Section 15 (durable goods) is LONG: one row per asset type per HH.
+    # j is the clean string `item_name` (NOT `item_id`, a lowercase dupe).
+    # Quantity=S15_2 ("how many owned"); Value=S15_5 (resale price of the
+    # most-recent purchase).  No Age and no separate purchase-price
+    # question in this instrument, so those canonical columns are omitted
+    # (-> NaN).  S15_6/S15_7 (forest-use / sufficiency) are dropped.
+    file:
+        - "../Data/Household/sect15_public.dta"
+    idxvars:
+        i: hhid
+        j: item_name
+    myvars:
+        Quantity: S15_2
+        Value: S15_5
