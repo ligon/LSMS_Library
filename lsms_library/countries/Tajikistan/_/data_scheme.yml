@@ -1,6 +1,11 @@
 Country: Tajikistan
 
 Data Scheme:
+  interview_date:
+    index: (t, i)
+    Int_t: datetime
+    materialize: make
+
   cluster_features:
     index: (t, v)
     Region: str
