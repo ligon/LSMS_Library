@@ -150,6 +150,10 @@ Columns:
         leasehold: []
         mailo: []
         customary: []
+        granted_right_of_occupancy: []
+        state: []
+        community: []
+        cooperative: []
         other_tenure_system: []
     SoilType:
       type: str
