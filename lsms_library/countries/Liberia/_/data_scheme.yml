@@ -16,6 +16,14 @@ Data Scheme:
     Distance: int
     Affinity: str
 
+  assets:
+    # 2018-19 (Section 15) records only count-owned and resale value.
+    # No Age and no purchase-recency / purchase-price questions in this
+    # instrument, so only Quantity and Value are declared.
+    index: (t, i, j)
+    Quantity: float
+    Value: float
+
   sample:
     index: (i, t)
     v: str
