@@ -1,6 +1,16 @@
 Country: Albania
 Wave: 2005
 
+individual_education:
+    file: ../Data/educationB_cl.dta
+    idxvars:
+        i:
+            - m0_q00
+            - m0_q01
+        pid: m2b_q00
+    myvars:
+        Educational Attainment: m2b_q04
+
 cluster_features:
     file: ../Data/identification_cl.dta
     idxvars:
