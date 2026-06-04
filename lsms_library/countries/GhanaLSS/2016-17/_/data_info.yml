@@ -37,3 +37,16 @@ household_roster:
         Birthplace: s1q11
         Relationship: s1q3
         MonthsAway: s1q22
+
+individual_education:
+    file: g7sec2.dta
+    idxvars:
+        v: clust
+        i:
+            - clust
+            - nh
+        pid: pid
+    myvars:
+        # s2aq2 = "highest grade completed"; value labels are embedded in the
+        # .dta and decoded automatically by get_dataframe().
+        Educational Attainment: s2aq2
