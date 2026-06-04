@@ -47,6 +47,16 @@ household_roster:
       Relationship: v01a03
       MonthsSpent: v01a10
       Educational Attainment: v01a05
+individual_education:
+  file:
+      - ../Data/SECT01A.DTA
+  idxvars:
+      i: hhcode
+      pid: idcode
+      v: village
+  myvars:
+      Educational Attainment: v01a05
+
 employment:
   file:
       - ../Data/SECT02AD.DTA
