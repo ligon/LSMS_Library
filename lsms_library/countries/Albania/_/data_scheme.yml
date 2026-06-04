@@ -33,3 +33,9 @@ Data Scheme:
     Distance: int
     Affinity: str
     Marital: str
+
+  assets:
+    index: (t, i, j)
+    Age: float
+    Value: float
+    materialize: make
