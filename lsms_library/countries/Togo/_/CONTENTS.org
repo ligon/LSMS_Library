@@ -32,3 +32,29 @@ rather than expecting a =MonthsSpent= column in =household_roster()=.
 
 Togo has no pre-EHCVM waves in the library, so no continuous
 months-of-presence variable is available for any wave.
+
+* plot_features (GH #167)
+
+Lasting parcel-level characteristics from the EHCVM agriculture module
+=s16a= (Togo is an EHCVM sibling of the Mali reference, PR #284).
+
+*** SOURCE LOCATION (read this first): the agriculture module lives in
+=2018/Data1/s16a_me_tgo2018.dta= (9557 parcel rows) — *NOT* in
+=2018/Data/=, which holds only =_forEthan= extracts.  Future
+maintainers will instinctively look in =Data/= and find nothing. ***
+
+Index =(t, i, plot_id)= where =i= is the EHCVM composite =(grappe,
+menage)= household id and =plot_id = "{s16aq02}_{s16aq03}"= (field _
+parcel sequence numbers), unique within each household.  =t = "2018"=
+(single EHCVM wave).
+
+Columns: =Area= (hectares; GPS measure =s16aq47= where =s16aq45==1=,
+else farmer estimate =s16aq09a= converted from its unit =s16aq09b=),
+=AreaUnit= (always "hectares"), =Tenure= (=s16aq10=), =TenureSystem=
+(=s16aq13=), =SoilType= (=s16aq18=), =Irrigated= (from water source
+=s16aq17=).  Latitude / Longitude deferred (no decimal-degree parcel
+GPS in EHCVM s16a).  The harmonize_* code maps live in
+=categorical_mapping.org=.
+
+Verification (2026-06-03): 9557 rows, unique =(t, i, plot_id)= index,
+=is_this_feature_sane= passes, 0% orphan households vs =sample()=.

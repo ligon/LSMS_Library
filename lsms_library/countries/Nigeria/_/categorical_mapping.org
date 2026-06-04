@@ -401,3 +401,96 @@
 | Wood                 | Wood            |
 | Terrazzo             | Tiles           |
 | Marble               | Tiles           |
+
+* plot_features harmonization tables (GH #167)
+
+  Lasting plot characteristics from the post-planting Agriculture
+  module sect11b / sect11b1.  See =Nigeria/_/nigeria.py=
+  (=plot_features_for_wave=) and the per-wave
+  =Nigeria/{wave}/_/plot_features.py= scripts.
+
+** harmonize_acquire (WAVE-KEYED)
+
+  The "How was [PLOT] acquired?" code scheme EVOLVES across waves
+  (s11bq4 in W1; s11b1q4 in W2--W5): W1/W2 have 4 codes, W3 has 6,
+  W4 has 7, W5 fully re-orders to 9 codes (e.g. W5 code 2 = "rented
+  in", W4 code 2 = "rented for cash/inkind").  So the lookup MUST be
+  keyed on (Wave, Code) -- a flat Code map would mislabel rows.  This
+  mirrors the Uganda wave-keyed-acquire lesson (GH #167 pilot).
+
+  Canonical Tenure spellings (from lsms_library/data_info.yml):
+  purchase -> owned; rented -> rented_in; inheritance -> inherited;
+  sharecropped in -> sharecropped_in; used-free / distributed-by-
+  community / granted-by-customary-or-community -> communal;
+  temporary-land-exchange / allocated-by-government / gifted ->
+  other_tenure.  Codes absent for a wave map to NaN (no silent
+  default).
+
+#+NAME: harmonize_acquire
+| Wave    | Code | Preferred Label |
+|---------+------+-----------------|
+| 2010-11 |    1 | owned           |
+| 2010-11 |    2 | rented_in       |
+| 2010-11 |    3 | communal        |
+| 2010-11 |    4 | communal        |
+| 2012-13 |    1 | owned           |
+| 2012-13 |    2 | rented_in       |
+| 2012-13 |    3 | communal        |
+| 2012-13 |    4 | communal        |
+| 2015-16 |    1 | owned           |
+| 2015-16 |    2 | rented_in       |
+| 2015-16 |    3 | communal        |
+| 2015-16 |    4 | communal        |
+| 2015-16 |    5 | inherited       |
+| 2015-16 |    6 | sharecropped_in |
+| 2018-19 |    1 | owned           |
+| 2018-19 |    2 | rented_in       |
+| 2018-19 |    3 | communal        |
+| 2018-19 |    4 | communal        |
+| 2018-19 |    5 | inherited       |
+| 2018-19 |    6 | sharecropped_in |
+| 2018-19 |    7 | other_tenure    |
+| 2023-24 |    1 | owned           |
+| 2023-24 |    2 | rented_in       |
+| 2023-24 |    3 | communal        |
+| 2023-24 |    4 | communal        |
+| 2023-24 |    5 | inherited       |
+| 2023-24 |    6 | sharecropped_in |
+| 2023-24 |    7 | other_tenure    |
+| 2023-24 |    8 | other_tenure    |
+| 2023-24 |    9 | other_tenure    |
+
+** harmonize_tenure_system (W5 only: s11b1q4b)
+
+  Only the 2023-24 (W5) questionnaire asks the legal/customary tenure
+  regime separately (s11b1q4b).  Earlier waves leave TenureSystem NaN.
+  Canonical TenureSystem spellings: state / community / cooperative
+  were extended for this cross-country rollout (GH #167).
+
+#+NAME: harmonize_tenure_system
+| Code | Preferred Label     |
+|------+---------------------|
+|    1 | customary           |
+|    2 | freehold            |
+|    3 | leasehold           |
+|    4 | state               |
+|    5 | community           |
+|    6 | cooperative         |
+|   96 | other_tenure_system |
+
+** harmonize_soil (stable W2--W5: s11b1q44 / W5 s11b1q61)
+
+  W1 (2010-11) does not ask soil type -> SoilType NaN that wave.
+  SoilType has no canonical spellings constraint in data_info.yml, so
+  these descriptive labels are carried as-is.
+
+#+NAME: harmonize_soil
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | sandy           |
+|    2 | clay            |
+|    3 | sandy_clay      |
+|    4 | forest_loam     |
+|    5 | loamy           |
+|    6 | other           |
+|   96 | other           |

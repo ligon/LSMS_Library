@@ -72,3 +72,25 @@ sample:
     final_index:
         - i
         - t
+
+individual_education:
+    # m3bq5 "highest diploma obtained" (Module 3b Education).  Value labels are
+    # stripped in this wave's .dta; codes 0-7 match the 2007 file's clean
+    # m3bq5 ladder ("what is the highest diploma you have obtained?") exactly.
+    file: ../Data/module3.dta
+    idxvars:
+        v: tlss_psu
+        i: hhid
+        pid: hhlid
+    myvars:
+        Educational Attainment:
+            - m3bq5
+            - mapping:
+                0.0: none
+                1.0: primary (grades 1-4)
+                2.0: basic (grades 1-8(9))
+                3.0: secondary general (grades 9-10(11))
+                4.0: secondary special
+                5.0: secondary technical
+                6.0: higher education
+                7.0: graduate school/aspirantura

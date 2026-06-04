@@ -34,6 +34,22 @@ household_roster:
                 14: Servant
                 15: Other non-relative
 
+individual_education:
+    file: ../Data/KZ96EDU_PUF.dta
+    idxvars:
+        i: rn
+        pid: personnr
+    myvars:
+        Educational Attainment:
+            - bw003_
+            - mapping:
+                'occ. cou': Occupational courses
+                'PTU with': PTU with secondary education
+                'PTU, FSO': PTU/FSO without secondary education
+                'tech. co': Technical college
+                'univ. an': University and institute
+                'post-gra': Post-graduate
+
 cluster_features:
     file: ../Data/KZ96SMP_PUF.dta
     idxvars:

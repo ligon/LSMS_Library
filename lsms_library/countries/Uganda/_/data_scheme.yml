@@ -74,4 +74,26 @@ Data Scheme:
     index: (t, i)
     Roof: str
     Floor: str
+  plot_features:
+    # Lasting parcel-level characteristics for the Uganda UNPS waves
+    # (GH #167 Phase 1 pilot).  Uganda terminology: a "parcel" is the
+    # lasting land unit; what UNPS calls a "plot" is the within-parcel
+    # cropping subdivision (varies by season).  Our canonical plot_id
+    # is Uganda's parcelID suffixed with '_A' (AGSEC2A: owned) or '_B'
+    # (AGSEC2B: use-rights/rented) so the two source files can be
+    # concatenated without ID collision.  See
+    # slurm_logs/DESIGN_erhs_plot_features_2026-05-20.org.
+    # Latitude / Longitude are reserved in the canonical Columns block
+    # but NOT declared here — Uganda's parcel-level GPS in AGSEC2A is
+    # in a non-standard DMS encoding (Latitude_Minutes range 0-99 etc.)
+    # and is mostly NaN.  Adding GPS is a documented follow-up; for v1
+    # Uganda emits the six lasting-attribute columns only.
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    Tenure: str
+    TenureSystem: str
+    SoilType: str
+    Irrigated: bool
+    materialize: make
   nonfood_expenditures: !make

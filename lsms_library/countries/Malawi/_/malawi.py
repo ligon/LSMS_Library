@@ -349,3 +349,196 @@ def apply_harmonize_food(df, wave, level='i'):
                if pd.notna(k) and pd.notna(v)}
     return df.rename(index=labelsd, level=level)
 
+
+
+# ---------------------------------------------------------------------------
+# plot_features (GH #167)
+# ---------------------------------------------------------------------------
+# Lasting plot-level characteristics for the four buildable IHS/IHPS waves
+# (2010-11, 2013-14, 2016-17, 2019-20).  Module C carries plot area (farmer
+# estimate ag_c04a + unit ag_c04b, or GPS-measured ag_c04c in acres);
+# Module D carries soil type (ag_d21), irrigation/water source (ag_d28a),
+# and -- in 2010-11 & 2013-14 ONLY -- the tenure/acquire question ag_d03.
+# 2016-17 & 2019-20 ag_mod_d have NO ag_d03 (ag_d02 there is "ID of
+# Respondent", not tenure), so Tenure is NaN for those two waves.
+#
+# The C<->D merge is on (hhid, plotkey).  2004-05 (IHS2) is DEFERRED -- it
+# has no standard plot roster.  See ../_/CONTENTS.org and the validated
+# recon recipe slurm_logs/2026-06-03_session/RECON_Malawi.md.
+
+ACRES_TO_HECTARES = 0.404686
+
+
+def _malawi_code_map(tablename, here=None):
+    """Load a {int code: Preferred Label} dict from the Malawi
+    categorical_mapping.org table ``tablename`` (Code-keyed).
+
+    Resolves the org file relative to this module first so wave-script
+    CWDs (``Malawi/<wave>/_``) still find it.  Codes whose Preferred
+    Label is missing / '---' map to pd.NA."""
+    import os
+    from lsms_library.local_tools import df_from_orgfile
+
+    if here is None:
+        here = os.path.dirname(os.path.abspath(__file__))
+    candidates = [
+        os.path.join(here, 'categorical_mapping.org'),
+        os.path.abspath(os.path.join('..', '..', '_', 'categorical_mapping.org')),
+        'categorical_mapping.org',
+    ]
+    orgfn = next((c for c in candidates if os.path.exists(c)), candidates[0])
+
+    df = df_from_orgfile(orgfn, name=tablename, set_columns=True, to_numeric=True)
+    out = {}
+    for _, row in df.iterrows():
+        c = row['Code']
+        try:
+            c = int(c)
+        except (TypeError, ValueError):
+            continue
+        lab = row.get('Preferred Label')
+        if pd.isna(lab) or str(lab).strip() in ('---', ''):
+            out[c] = pd.NA
+        else:
+            out[c] = str(lab).strip()
+    return out
+
+
+def _map_codes(series, code_map):
+    """Map a numeric (raw Stata code) Series through ``code_map``
+    ({int: str}).  Returns a nullable-string Series, NaN where the code
+    is absent from the map.  Source must be loaded with
+    convert_categoricals=False so the codes are numeric."""
+    out = pd.to_numeric(series, errors='coerce').astype('Int64').map(code_map)
+    return out.astype('string').where(out.notna(), pd.NA)
+
+
+def plot_features_for_wave(t, df_c, df_d, colmap):
+    """Build canonical ``plot_features`` for one Malawi IHS/IHPS wave.
+
+    Parameters
+    ----------
+    t : str
+        Wave id (e.g. ``"2010-11"``), used as the ``t`` index value.
+    df_c : pd.DataFrame
+        Module C (area) rows, loaded with convert_categoricals=False,
+        with an ``hhid`` column already set to the canonical wave
+        household id string (cs-17 prefix applied for the 2016-17
+        cross-sectional half by the caller) and a ``plotkey`` column
+        uniquely identifying the plot within the household.
+    df_d : pd.DataFrame | None
+        Module D (soil / irrigation / tenure) rows, same ``hhid`` /
+        ``plotkey`` convention.  ``None`` is permitted (Tenure / SoilType
+        / Irrigated then all NaN), but every buildable wave has one.
+    colmap : dict
+        Column-name map.  Keys:
+            area_est   — farmer-estimated area column in df_c (ag_c04a)
+            area_unit  — area unit code column in df_c (ag_c04b)
+            area_gps   — GPS-measured area in acres in df_c (ag_c04c)
+            soil_type  — soil-type code column in df_d (ag_d21)
+            water_source — water-source code column in df_d (ag_d28a)
+            acquire    — tenure/acquire code column in df_d (ag_d03);
+                         omit (or absent) -> Tenure NaN (2016-17/2019-20)
+
+    Returns
+    -------
+    pd.DataFrame indexed by ``(t, i, plot_id)`` with columns
+        ``Area`` (hectares, float), ``AreaUnit`` (str, always 'acres'),
+        ``Tenure`` (str), ``TenureSystem`` (str), ``SoilType`` (str),
+        and ``Irrigated`` (nullable bool).  Latitude / Longitude are
+        deferred (Malawi plot GPS is offset / redacted; GH #167).
+    """
+    c = colmap
+
+    # C<->D merge on (hhid, plotkey).  Left-join keeps every area row;
+    # D attributes are NaN where the plot is absent from Module D.
+    df = df_c.copy()
+    if df_d is not None and not df_d.empty:
+        d_cols = ['hhid', 'plotkey'] + [
+            df_d_col for df_d_col in (c.get('soil_type'),
+                                      c.get('water_source'),
+                                      c.get('acquire'))
+            if df_d_col and df_d_col in df_d.columns]
+        df = df.merge(df_d[d_cols].drop_duplicates(['hhid', 'plotkey']),
+                      on=['hhid', 'plotkey'], how='left')
+
+    n = len(df)
+    idx_i = df['hhid'].astype('string')
+    plot_id = df['plotkey'].astype('string')
+
+    # Area: prefer GPS-measured (ag_c04c, acres), else farmer estimate
+    # (ag_c04a) converted via its unit code (ag_c04b: 1=Acre, 2=Hectare,
+    # 3=Square Meters, 4=Other).
+    area_ha = pd.Series(pd.NA, index=df.index, dtype='Float64')
+
+    gps_col = c.get('area_gps')
+    if gps_col and gps_col in df.columns:
+        gps_acres = pd.to_numeric(df[gps_col], errors='coerce').astype('Float64')
+        # Plausibility clamp: > 2500 acres (~1000 ha) is a data-entry
+        # error for Malawi smallholder plots; drop to NaN (GH #167).
+        gps_acres = gps_acres.where((gps_acres <= 2500) | gps_acres.isna(), pd.NA)
+        area_ha = gps_acres * ACRES_TO_HECTARES
+
+    est_col = c.get('area_est')
+    unit_col = c.get('area_unit')
+    if est_col and est_col in df.columns:
+        est = pd.to_numeric(df[est_col], errors='coerce').astype('Float64')
+        unit = (pd.to_numeric(df[unit_col], errors='coerce').astype('Int64')
+                if unit_col and unit_col in df.columns
+                else pd.Series(pd.NA, index=df.index, dtype='Int64'))
+        # acre -> ha, hectare -> ha, sq metre -> ha; OTHER (4) / 0 -> NaN
+        est_ha = pd.Series(pd.NA, index=df.index, dtype='Float64')
+        est_ha = est_ha.where(unit != 1, est * ACRES_TO_HECTARES)
+        est_ha = est_ha.where(unit != 2, est)
+        est_ha = est_ha.where(unit != 3, est / 10000.0)
+        # Clamp implausible estimates too (>1000 ha)
+        est_ha = est_ha.where((est_ha <= 1000) | est_ha.isna(), pd.NA)
+        area_ha = area_ha.where(area_ha.notna(), est_ha)
+
+    area_unit = pd.Series(['acres'] * n, index=df.index, dtype='string')
+    area_unit = area_unit.where(area_ha.notna(), pd.NA)
+
+    # SoilType
+    soil_type = pd.Series(pd.NA, index=df.index, dtype='string')
+    soil_col = c.get('soil_type')
+    if soil_col and soil_col in df.columns:
+        soil_type = _map_codes(df[soil_col], _malawi_code_map('harmonize_soil'))
+
+    # Irrigated: derived from water-source code (ag_d28a).  Code 7 =
+    # 'Rainfed/No irrigation' is the only non-irrigated value; any other
+    # recorded code means the plot is irrigated.  NaN where unrecorded.
+    irrigated = pd.Series(pd.NA, index=df.index, dtype='boolean')
+    water_col = c.get('water_source')
+    if water_col and water_col in df.columns:
+        wcode = pd.to_numeric(df[water_col], errors='coerce').astype('Int64')
+        irrigated = (wcode != 7).astype('boolean')
+        irrigated = irrigated.where(wcode.notna(), pd.NA)
+
+    # Tenure / TenureSystem from the acquire code (ag_d03), present in
+    # 2010-11 & 2013-14 only.  Absent -> all NaN (2016-17 / 2019-20).
+    tenure = pd.Series(pd.NA, index=df.index, dtype='string')
+    tenure_system = pd.Series(pd.NA, index=df.index, dtype='string')
+    acq_col = c.get('acquire')
+    if acq_col and acq_col in df.columns:
+        acode = pd.to_numeric(df[acq_col], errors='coerce').astype('Int64')
+        tenure = _map_codes(acode, _malawi_code_map('harmonize_tenure'))
+        # Leasehold acquire code (6) -> TenureSystem 'leasehold'.
+        tenure_system = pd.Series(pd.NA, index=df.index, dtype='string')
+        tenure_system = tenure_system.where(acode != 6, 'leasehold')
+
+    out = pd.DataFrame({
+        't':            t,
+        'i':            idx_i.values,
+        'plot_id':      plot_id.values,
+        'Area':         area_ha.values,
+        'AreaUnit':     area_unit.values,
+        'Tenure':       tenure.values,
+        'TenureSystem': tenure_system.values,
+        'SoilType':     soil_type.values,
+        'Irrigated':    irrigated.values,
+    })
+    # Collapse any duplicate (hhid, plotkey) area rows defensively
+    # (Module C should be one row per plot; first-wins keeps it unique).
+    out = out.groupby(['t', 'i', 'plot_id'], as_index=False).first()
+    out = out.set_index(['t', 'i', 'plot_id'])
+    return out

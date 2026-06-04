@@ -72,3 +72,80 @@ variable:
 
 The 2017-18 wave may also predate the EHCVM template; check its
 wave-level =data_info.yml= for the applicable variable name.
+
+* plot_features (GH #167)
+
+Mali is the EHCVM reference implementation for =plot_features=; the
+six other EHCVM countries (Niger, Senegal, Burkina_Faso, Benin, Togo,
+Guinea-Bissau) copy this pattern.
+
+Source: the agriculture-parcel module =s16a_me_mli{2018,2021}.dta=, one
+parcel per row.  Only the two EHCVM waves are wired:
+
+| Wave    | s16a file              | rows | real plot rows |
+|---------+------------------------+------+----------------|
+| 2018-19 | s16a_me_mli2018.dta    | 7323 |           7323 |
+| 2021-22 | s16a_me_mli2021.dta    | 9924 |           6638 |
+
+The pre-EHCVM EACI waves (2014-15, 2017-18) use a different agriculture
+instrument and are deferred to a separate recipe.
+
+Build path: =materialize: make=.  Per-wave =_/plot_features.py= loads the
+single s16a file and calls =mali.plot_features_for_wave(t, src, colmap)=
+(shared helper, mirrors Uganda).  The country-level =_/plot_features.py=
+concatenates the wave parquets.
+
+Column map (identical both waves; codes verified from the .dta value
+labels):
+
+| Canonical    | s16a var       | notes                                     |
+|--------------+----------------+-------------------------------------------|
+| i            | grappe, menage | EHCVM composite via mali.i()              |
+| plot_id      | s16aq02_s16aq03| field_no _ parcel_no                      |
+| Area (ha)    | s16aq47/s16aq09a| GPS where measured else estimate; m^2/1e4 |
+| Tenure       | s16aq10        | -> harmonize_tenure                        |
+| TenureSystem | s16aq13        | -> harmonize_tenure_system (partial)       |
+| SoilType     | s16aq18        | -> harmonize_soil                          |
+| Irrigated    | s16aq17        | codes 1-3 True; 4-5 False; 6 NaN           |
+
+Verification (country parquet, pre-id_walk): is_this_feature_sane OK
+(14 pass / 1 warn — AreaUnit constant 'hectares'); 13,961 rows
+(7323 + 6638); =(t, i, plot_id)= globally unique; Area median 1.18 ha
+(max 1000 ha, a survey-reported large parcel — left unclamped per
+recon); 0.00% orphan rate vs =sample().i= (every plot household matches
+a sampled household).
+
+** Oddities / decisions
+
+- *2021-22 placeholder rows.*  3286 of the 9924 rows have NO field /
+  parcel number (s16aq02 / s16aq03 NaN) and every plot attribute blank
+  — one placeholder per non-farming household.  These are dropped in
+  =plot_features_for_wave= (they would otherwise emit a content-free
+  "nan_nan" plot_id and collide once two such households id_walk to the
+  same baseline id).  2018-19 has none.
+
+- *Tenure code 2 (Prêt gratuit / free land loan)* -> =use_right=.  The
+  recon left this as a communal-vs-other judgment call; =use_right= is
+  the better canonical fit ("held under agreement with a use-rights
+  owner, often non-cash"), which a free loan of land precisely is.
+  Code 5 (Gage / pledge-pawn) and 6 (Autre) -> =other_tenure=.  Mali
+  has NO co-propriétaire code 7 (that is Niger-2021 only).
+
+- *TenureSystem is partial.*  EHCVM has no land-tenure-regime question;
+  s16aq13 records the land *document* held.  Only the three documents
+  implying a clear regime are mapped (Titre foncier -> freehold, Bail ->
+  leasehold, Permis d'exploiter -> granted_right_of_occupancy); Procès-
+  verbal, Convention de vente, Autre, and Aucun are left NaN rather than
+  force-fit.  Result: 96% of rows have TenureSystem = NaN.
+
+- *No parcel GPS.*  s16aq47 is an AREA in hectares, not a coordinate;
+  EHCVM has no decimal-degree parcel GPS, so Latitude / Longitude are
+  deferred (as in Uganda).
+
+- *id_walk deliberately NOT applied at the country level* (unlike
+  Uganda).  Mali's 2021-22 panel has "moved" households whose id maps to
+  the same 2018-19 baseline id as another household; applying id_walk at
+  cache-write time collides those onto identical =(t, i, plot_id)=
+  tuples (9 dups).  The parquet stores the pre-walk (unique) index and
+  lets the framework's idempotent id_walk in =_finalize_result= do the
+  panel remap, consistent with every other Mali table.

@@ -6,6 +6,10 @@ Data Scheme:
     Region: str
     Rural: str
 
+  individual_education:
+    index: (t, i, pid)
+    Educational Attainment: str
+
   household_roster:
     index: (t, i, pid)
     Sex: str

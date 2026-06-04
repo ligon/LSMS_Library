@@ -24,6 +24,10 @@ Data Scheme:
     Quantity: float
     Value: float
 
+  individual_education:
+    index: (t, i, pid)
+    Educational Attainment: str
+
   sample:
     index: (i, t)
     v: str

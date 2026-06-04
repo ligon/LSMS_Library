@@ -67,3 +67,19 @@ Data Scheme:
     HowCoped0: str
     HowCoped1: str
     HowCoped2: str
+  plot_features:
+    # Lasting parcel-level characteristics from the EHCVM agriculture
+    # module s16a (GH #167; Mali is the EHCVM reference implementation).
+    # EHCVM waves only: 2018-19 and 2021-22.  The pre-EHCVM EACI waves
+    # (2014-15, 2017-18) use a different instrument and are deferred.
+    # plot_id = "{field_no}_{parcel_no}".  Latitude / Longitude are NOT
+    # emitted — EHCVM s16a has no decimal-degree parcel GPS (s16aq47 is
+    # an area, not a coordinate); deferred as in Uganda.
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    Tenure: str
+    TenureSystem: str
+    SoilType: str
+    Irrigated: bool
+    materialize: make

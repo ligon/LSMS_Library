@@ -72,3 +72,13 @@ sample:
     final_index:
         - i
         - t
+
+individual_education:
+    # m3bq5 "what is the highest diploma you have obtained?" — clean 8-level
+    # diploma labels in the .dta; pass through verbatim (free-text attainment).
+    file: ../Data/r1m3b.dta
+    idxvars:
+        i: hhid
+        pid: memid
+    myvars:
+        Educational Attainment: m3bq5

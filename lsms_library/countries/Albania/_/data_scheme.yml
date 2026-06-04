@@ -40,3 +40,7 @@ Data Scheme:
     Value: float
     Age: float
     materialize: make
+
+  individual_education:
+    index: (t, i, pid)
+    Educational Attainment: str

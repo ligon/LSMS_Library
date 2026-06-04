@@ -21,7 +21,8 @@ VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 #     housing.py source exists in any Uganda wave).
 var = $(VAR_DIR)/shocks.parquet $(VAR_DIR)/nonfood_expenditures.parquet $(VAR_DIR)/enterprise_income.parquet \
 	  $(VAR_DIR)/assets.parquet $(VAR_DIR)/earnings.parquet $(VAR_DIR)/income.parquet \
-	  $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet
+	  $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet \
+	  $(VAR_DIR)/plot_features.parquet
 
 all: $(parquet) $(var)
 
@@ -72,6 +73,12 @@ food_acquired_parquet := $(food_acquired:.py=.parquet)
 
 $(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
 	python food_acquired.py
+
+plot_features = $(shell find $(rounds) -name plot_features.py)
+plot_features_parquet := $(plot_features:.py=.parquet)
+
+$(VAR_DIR)/plot_features.parquet: plot_features.py $(plot_features_parquet)
+	python plot_features.py
 
 $(VAR_DIR)/income.parquet: income.py $(VAR_DIR)/enterprise_income.parquet $(VAR_DIR)/earnings.parquet
 	python income.py
