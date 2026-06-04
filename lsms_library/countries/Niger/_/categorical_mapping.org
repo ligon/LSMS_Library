@@ -137,3 +137,57 @@
 | Tiles              | Tiles           |
 | Parquet            | Wood            |
 | Dung               | Earth with Dung |
+
+# plot_features harmonize_* tables (GH #167; EHCVM cluster).  Niger is
+# an EHCVM sibling of the Mali reference (PR #284); these key on the
+# INTEGER s16a codes (sources loaded with convert_categoricals=False).
+#
+# harmonize_tenure — s16aq10 "mode de faire-valoir" -> canonical Tenure.
+#   2 Prêt gratuit (free loan of land under agreement, non-cash) ->
+#   use_right.  5 Gage (pledge / pawned) and 6 Autre -> other_tenure.
+#   NIGER-SPECIFIC: the 2021-22 instrument adds 7 Co-propriétaire (co-
+#   ownership) -> owned (2018-19 has codes 1-6 only, identical to Mali).
+# harmonize_soil — s16aq18 -> SoilType (free-form str; English labels).
+# harmonize_water — s16aq17; the Irrigated bool is (label=='Irrigated').
+# harmonize_tenure_system — s16aq13 land-document regime -> canonical
+#   TenureSystem spellings.  Only the three documents implying a clear
+#   regime are mapped (1 Titre foncier->freehold, 2 Permis d'exploiter->
+#   granted_right_of_occupancy, 4 Bail->leasehold).  Procès-verbal,
+#   Convention de vente, Autre, and Aucun have no defensible regime
+#   mapping and are left out (NaN) rather than force-fit.
+
+#+name: harmonize_tenure
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | owned           |
+|    2 | use_right       |
+|    3 | rented_in       |
+|    4 | sharecropped_in |
+|    5 | other_tenure    |
+|    6 | other_tenure    |
+|    7 | owned           |
+
+#+name: harmonize_soil
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | sandy           |
+|    2 | loam            |
+|    3 | clay            |
+|    4 | hardpan         |
+|    5 | other           |
+
+#+name: harmonize_water
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Irrigated       |
+|    2 | Irrigated       |
+|    3 | Irrigated       |
+|    4 | Rain-fed        |
+|    5 | Wetland         |
+
+#+name: harmonize_tenure_system
+| Code | Preferred Label            |
+|------+----------------------------|
+|    1 | freehold                   |
+|    2 | granted_right_of_occupancy |
+|    4 | leasehold                  |

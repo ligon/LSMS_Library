@@ -77,3 +77,22 @@ Data Scheme:
   interview_date:
     index: (t, i)
     Int_t: datetime
+
+  plot_features:
+    # Lasting parcel-level characteristics from the EHCVM agriculture
+    # module s16a (GH #167; Niger is an EHCVM sibling of the Mali
+    # reference, PR #284).  EHCVM waves only: 2018-19 and 2021-22.  The
+    # pre-EHCVM ECVMA waves (2011-12, 2014-15) use a different
+    # instrument and are deferred.  plot_id = "{field_no}_{parcel_no}".
+    # NIGER-SPECIFIC: 2021-22 s16aq10 adds code 7 (Co-propriétaire) ->
+    # owned.  Latitude / Longitude are NOT emitted — EHCVM s16a has no
+    # decimal-degree parcel GPS (s16aq47 is an area, not a coordinate);
+    # deferred as in Uganda.
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    Tenure: str
+    TenureSystem: str
+    SoilType: str
+    Irrigated: bool
+    materialize: make
