@@ -1,0 +1,528 @@
+
+=== Wave 2005-06 ===
+
+## FILE lsms_library/countries/Uganda/2005-06/Data/AGSEC2A.dta
+  shape: (3695, 16)
+  cols (16): ['HHID', 'a2aq2', 'a2aq3', 'a2aq4', 'a2aq5', 'a2aq6', 'a2aq7', 'a2aq8', 'a2aq9', 'a2aq10', 'a2aq11', 'a2aq12', 'a2aq13a', 'a2aq13b', 'a2aq14', 'a2aq15']
+  hhid candidates:
+    HHID  dtype=str  nunique=1900  null=0
+
+## FILE lsms_library/countries/Uganda/2005-06/Data/AGSEC2B.dta
+  shape: (1768, 17)
+  cols (17): ['HHID', 'a2bq2', 'a2bq3', 'a2bq4', 'a2bq5', 'a2bq6', 'a2bq7', 'a2bq8', 'a2bq9', 'a2bq10', 'a2bq11', 'a2bq12', 'a2bq13', 'a2bq14', 'a2bq15a', 'a2bq15b', 'a2bq16']
+  hhid candidates:
+    HHID  dtype=str  nunique=1127  null=0
+
+=== Wave 2009-10 ===
+
+## FILE lsms_library/countries/Uganda/2009-10/Data/AGSEC2A.dta
+  shape: (4305, 33)
+  cols (33): ['HHID', 'a2aq2', 'a2aq4', 'a2aq5', 'a2aq6', 'a2aq7', 'a2aq8', 'a2aq9', 'a2aq10', 'a2aq11', 'a2aq12', 'a2aq13a', 'a2aq13b', 'a2aq14', 'a2aq15', 'a2aq16', 'a2aq17a', 'a2aq17b', 'a2aq18', 'a2aq19', 'a2aq20', 'a2aq21', 'a2aq22', 'a2aq23', 'a2aq24', 'a2aq25', 'a2aq26a', 'a2aq26b', 'a2aq27a', 'a2aq27b', 'a2aq28a', 'a2aq28b', 'a2aq29']
+  hhid candidates:
+    HHID  dtype=str  nunique=2133  null=0
+
+## FILE lsms_library/countries/Uganda/2009-10/Data/AGSEC2B.dta
+  shape: (1520, 29)
+  cols (29): ['HHID', 'a2bq2', 'a2bq4', 'a2bq5', 'a2bq6', 'a2bq7', 'a2bq8', 'a2bq9', 'a2bq10', 'a2bq11', 'a2bq12', 'a2bq13', 'a2bq14', 'a2bq15a', 'a2bq15b', 'a2bq16', 'a2bq17', 'a2bq18', 'a2bq19', 'a2bq20', 'a2bq21', 'a2bq22', 'a2bq23', 'a2bq24a', 'a2bq24b', 'a2bq25a', 'a2bq25b', 'a2bq26a', 'a2bq26b']
+  hhid candidates:
+    HHID  dtype=str  nunique=976  null=0
+
+=== Wave 2010-11 ===
+
+## FILE lsms_library/countries/Uganda/2010-11/Data/AGSEC2A.dta
+  shape: (3457, 35)
+  cols (35): ['HHID', 'prcid', 'a2aq4', 'a2aq5', 'a2aq6', 'a2aq7', 'a2aq8', 'a2aq9', 'a2aq10', 'a2aq11', 'a2aq12', 'a2aq13a', 'a2aq13b', 'a2aq14', 'a2aq15a', 'a2aq15b', 'a2aq16', 'a2aq17a', 'a2aq17b', 'a2aq18', 'a2aq19', 'a2aq20', 'a2aq21', 'a2aq22', 'a2aq23', 'a2aq24a', 'a2aq24b', 'a2aq25', 'a2aq26a', 'a2aq26b', 'a2aq27a', 'a2aq27b', 'a2aq28a', 'a2aq28b', 'a2aq29']
+  hhid candidates:
+    HHID  dtype=str  nunique=1957  null=0
+  parcel id candidates:
+    prcid  dtype=object  nunique=10  null=0
+      '01': 1934
+      '02': 940
+      '03': 362
+      '04': 126
+      '05': 46
+      '06': 25
+      '07': 11
+      '08': 7
+      '09': 5
+      '10': 1
+
+## FILE lsms_library/countries/Uganda/2010-11/Data/AGSEC2B.dta
+  shape: (1063, 32)
+  cols (32): ['HHID', 'prcid', 'a2bq4', 'a2bq5', 'a2bq6', 'a2bq7', 'a2bq8', 'a2bq9', 'a2bq10', 'a2bq11', 'a2bq12', 'a2bq13', 'a2bq14', 'a2bq15a', 'a2bq15b', 'a2bq15a1', 'a2bq15b1', 'a2bq16', 'a2bq17', 'a2bq18', 'a2bq19', 'a2bq20', 'a2bq21', 'a2bq22', 'a2bq23a', 'a2bq23b', 'a2bq24a', 'a2bq24b', 'a2bq25a', 'a2bq25b', 'a2bq26a', 'a2bq26b']
+  hhid candidates:
+    HHID  dtype=str  nunique=788  null=0
+  parcel id candidates:
+    prcid  dtype=int8  nunique=4  null=0
+      21: 783
+      22: 220
+      23: 54
+      24: 6
+
+=== Wave 2011-12 ===
+
+## FILE lsms_library/countries/Uganda/2011-12/Data/AGSEC2A.dta
+  shape: (3763, 45)
+  cols (45): ['HHID', 'parcelID', 'parcelName', 'a2aq4', 'a2aq5', 'a2aq5_1', 'a2aq6', 'a2aq7', 'a2aq8', 'a2aq9', 'a2aq10', 'a2aq11a', 'a2aq11a_plots', 'a2aq11b', 'a2aq11b_plots', 'a2aq12', 'a2aq13a', 'a2aq13b', 'a2aq14', 'a2aq15a', 'a2aq15b', 'a2aq16', 'a2aq17', 'a2aq18', 'a2aq19', 'a2aq20', 'a2aq21', 'a2aq22a', 'a2aq22b', 'a2aq23', 'a2aq24a', 'a2aq24b', 'a2aq25', 'Visit_GPS_Parcel', 'GPS_Not_Captured', 'GPS_Manual', 'Latitude_N_S', 'Latitude_Degrees', 'Latitude_Minutes', 'Latitude_Seconds', 'Longitude_Degrees', 'Longitude_Minutes', 'Longitude_Seconds', 'Number_Satellites', 'Weather_Condition']
+  hhid candidates:
+    HHID  dtype=float64  nunique=2022  null=0
+      describe: min=np.float64(1021000710.0) median=np.float64(3103000604.0) max=np.float64(3010830020020503.0)
+  parcel id candidates:
+    parcelID  dtype=int8  nunique=9  null=0
+      1: 1946
+      2: 1063
+      3: 456
+      4: 190
+      5: 61
+      6: 24
+      7: 11
+      8: 8
+      9: 4
+    parcelName  dtype=str  nunique=1736  null=0
+    Visit_GPS_Parcel  dtype=object  nunique=2  null=32
+      'No': 1966
+      'Yes': 1765
+      nan: 32
+  plot id candidates:
+    a2aq11a_plots  dtype=float64  nunique=10  null=463
+      1.0: 1714
+      2.0: 834
+      nan: 463
+      3.0: 411
+      4.0: 189
+      5.0: 96
+      6.0: 32
+      7.0: 16
+      8.0: 6
+      0.0: 1
+      10.0: 1
+    a2aq11b_plots  dtype=float64  nunique=11  null=747
+      1.0: 1655
+      nan: 747
+      2.0: 736
+      3.0: 330
+      4.0: 174
+      5.0: 70
+      6.0: 29
+      7.0: 14
+      8.0: 5
+      10.0: 1
+      9.0: 1
+      320.0: 1
+  area candidates:
+    Visit_GPS_Parcel  dtype=object  nunique=2  null=32
+      'No': 1966
+      'Yes': 1765
+      nan: 32
+    GPS_Not_Captured  dtype=object  nunique=4  null=1798
+      nan: 1798
+      'Outside of LC1': 960
+      'Inside LC1 but owner refused': 499
+      'Other (specify)': 360
+      'Inside LC1 but not accessible': 146
+    GPS_Manual  dtype=object  nunique=2  null=1999
+      nan: 1999
+      'Yes': 1742
+      'No': 22
+  gps candidates:
+    Visit_GPS_Parcel  dtype=object  nunique=2  null=32
+      'No': 1966
+      'Yes': 1765
+      nan: 32
+    GPS_Not_Captured  dtype=object  nunique=4  null=1798
+      nan: 1798
+      'Outside of LC1': 960
+      'Inside LC1 but owner refused': 499
+      'Other (specify)': 360
+      'Inside LC1 but not accessible': 146
+    GPS_Manual  dtype=object  nunique=2  null=1999
+      nan: 1999
+      'Yes': 1742
+      'No': 22
+    Latitude_N_S  dtype=object  nunique=2  null=2022
+      nan: 2022
+      'N': 1283
+      'S': 458
+    Latitude_Degrees  dtype=float64  nunique=4  null=2022
+      nan: 2022
+      0.0: 792
+      1.0: 403
+      2.0: 396
+      3.0: 150
+    Latitude_Minutes  dtype=float64  nunique=100  null=2022
+      describe: min=np.float64(0.0) median=np.float64(43.0) max=np.float64(99.0)
+    Latitude_Seconds  dtype=float64  nunique=806  null=2022
+      describe: min=np.float64(0.0) median=np.float64(468.0) max=np.float64(999.0)
+    Longitude_Degrees  dtype=float64  nunique=7  null=2022
+      nan: 2022
+      30.0: 423
+      33.0: 420
+      32.0: 323
+      31.0: 280
+      34.0: 155
+      29.0: 139
+      9.0: 1
+    Longitude_Minutes  dtype=float64  nunique=100  null=2022
+      describe: min=np.float64(0.0) median=np.float64(43.0) max=np.float64(99.0)
+    Longitude_Seconds  dtype=float64  nunique=822  null=2022
+      describe: min=np.float64(0.0) median=np.float64(446.0) max=np.float64(998.0)
+
+## FILE lsms_library/countries/Uganda/2011-12/Data/AGSEC2B.dta
+  shape: (1077, 42)
+  cols (42): ['HHID', 'parcelID', 'parcelName', 'a2bq1', 'a2bq5_1', 'a2bq4', 'a2bq5', 'a2bq6', 'a2bq7', 'a2bq8', 'a2bq9', 'a2bq10', 'a2bq11', 'a2bq12a', 'a2bq12a_plots', 'a2bq12b', 'a2bq12b_plots', 'a2bq12a_1', 'a2bq12b_1', 'a2bq13', 'a2bq14', 'a2bq15', 'a2bq16', 'a2bq17', 'a2bq18', 'a2bq19', 'a2bq20a', 'a2bq20b', 'a2bq21a', 'a2bq21b', 'Visit_GPS_Parcel', 'GPS_Not_Captured', 'GPS_Manual', 'Latitude_N_S', 'Latitude_Degrees', 'Latitude_Minutes', 'Latitude_Seconds', 'Longitude_Degrees', 'Longitude_Minutes', 'Longitude_Seconds', 'Number_Satellites', 'Weather_Condition']
+  hhid candidates:
+    HHID  dtype=float64  nunique=783  null=0
+      describe: min=np.float64(1021001109.0) median=np.float64(3041000401.0) max=np.float64(3030230010040204.0)
+  parcel id candidates:
+    parcelID  dtype=int8  nunique=10  null=0
+      2: 416
+      1: 307
+      3: 231
+      4: 79
+      5: 27
+      6: 7
+      7: 6
+      8: 2
+      9: 1
+      10: 1
+    parcelName  dtype=str  nunique=875  null=0
+    Visit_GPS_Parcel  dtype=object  nunique=2  null=7
+      'No': 917
+      'Yes': 153
+      nan: 7
+  plot id candidates:
+    a2bq12a_plots  dtype=float64  nunique=6  null=148
+      1.0: 626
+      2.0: 213
+      nan: 148
+      3.0: 55
+      4.0: 24
+      5.0: 8
+      7.0: 3
+    a2bq12b_plots  dtype=float64  nunique=7  null=227
+      1.0: 575
+      nan: 227
+      2.0: 184
+      3.0: 66
+      4.0: 16
+      5.0: 7
+      7.0: 1
+      6.0: 1
+  area candidates:
+    Visit_GPS_Parcel  dtype=object  nunique=2  null=7
+      'No': 917
+      'Yes': 153
+      nan: 7
+    GPS_Not_Captured  dtype=object  nunique=4  null=161
+      'Outside of LC1': 566
+      'Inside LC1 but owner refused': 168
+      nan: 161
+      'Other (specify)': 149
+      'Inside LC1 but not accessible': 33
+    GPS_Manual  dtype=object  nunique=2  null=924
+      nan: 924
+      'Yes': 149
+      'No': 4
+  gps candidates:
+    Visit_GPS_Parcel  dtype=object  nunique=2  null=7
+      'No': 917
+      'Yes': 153
+      nan: 7
+    GPS_Not_Captured  dtype=object  nunique=4  null=161
+      'Outside of LC1': 566
+      'Inside LC1 but owner refused': 168
+      nan: 161
+      'Other (specify)': 149
+      'Inside LC1 but not accessible': 33
+    GPS_Manual  dtype=object  nunique=2  null=924
+      nan: 924
+      'Yes': 149
+      'No': 4
+    Latitude_N_S  dtype=object  nunique=2  null=928
+      nan: 928
+      'N': 129
+      'S': 20
+    Latitude_Degrees  dtype=float64  nunique=4  null=928
+      nan: 928
+      0.0: 76
+      2.0: 36
+      1.0: 29
+      3.0: 8
+    Latitude_Minutes  dtype=float64  nunique=68  null=928
+      describe: min=np.float64(1.0) median=np.float64(44.0) max=np.float64(99.0)
+    Latitude_Seconds  dtype=float64  nunique=141  null=928
+      describe: min=np.float64(5.0) median=np.float64(495.0) max=np.float64(998.0)
+    Longitude_Degrees  dtype=float64  nunique=6  null=928
+      nan: 928
+      33.0: 50
+      32.0: 43
+      30.0: 23
+      31.0: 20
+      34.0: 10
+      29.0: 3
+    Longitude_Minutes  dtype=float64  nunique=70  null=928
+      describe: min=np.float64(2.0) median=np.float64(32.0) max=np.float64(98.0)
+    Longitude_Seconds  dtype=float64  nunique=136  null=928
+      describe: min=np.float64(10.0) median=np.float64(445.0) max=np.float64(999.0)
+
+=== Wave 2013-14 ===
+
+## FILE lsms_library/countries/Uganda/2013-14/Data/AGSEC2A.dta
+  shape: (4142, 39)
+  cols (39): ['HHID', 'parcelID', 'a2aq1owned', 'a2aq4', 'a2aq5', 'a2aq5_1', 'a2aq5_2', 'a2aq5_2_1', 'a2aq6', 'a2aq7', 'a2aq8', 'a2aq9', 'a2aq10', 'a2aq11a', 'a2aq11b', 'a2aq12', 'a2aq13a', 'a2aq13b', 'a2aq14', 'a2aq15a', 'a2aq15b', 'a2aq16', 'a2aq17', 'a2aq18', 'a2aq19', 'a2aq20', 'a2aq21', 'a2aq22a', 'a2aq22b', 'a2aq23', 'a2aq24a', 'a2aq24b', 'a2aq25', 'a2aq26a', 'a2aq26b', 'a2aq27a', 'a2aq27b', 'hh', 'wgt_X']
+  hhid candidates:
+    HHID  dtype=int32  nunique=2150  null=0
+      describe: min=np.float64(1100401.0) median=np.float64(242095401.5) max=np.float64(430100401.0)
+  parcel id candidates:
+    parcelID  dtype=int8  nunique=10  null=0
+      1: 2074
+      2: 1140
+      3: 577
+      4: 237
+      5: 84
+      6: 20
+      7: 4
+      8: 3
+      9: 2
+      10: 1
+  tenure candidates:
+    a2aq1owned  dtype=object  nunique=1  null=0
+      'Owned': 4142
+
+## FILE lsms_library/countries/Uganda/2013-14/Data/AGSEC2B.dta
+  shape: (1294, 33)
+  cols (33): ['HHID', 'parcelID', 'a2bq1owned', 'Parcel_Resp', 'a2bq4', 'a2bq5', 'a2bq5_2_1', 'a2bq5_2', 'a2bq6', 'a2bq7', 'a2bq8', 'a2bq9', 'a2bq10', 'a2bq11', 'a2bq12a', 'a2bq12b', 'a2bq12a1', 'a2bq12b1', 'a2bq13', 'a2bq14', 'a2bq15', 'a2bq16', 'a2bq17', 'a2bq18', 'a2bq19', 'a2bq20a', 'a2bq20b', 'a2bq21a', 'a2bq21b', 'A2BQ12B_plots', 'A2BQ12A_plots', 'hh', 'wgt_X']
+  hhid candidates:
+    HHID  dtype=int32  nunique=892  null=0
+      describe: min=np.float64(1020401.0) median=np.float64(260575403.5) max=np.float64(430100401.0)
+  parcel id candidates:
+    parcelID  dtype=int8  nunique=9  null=0
+      2: 480
+      1: 366
+      3: 264
+      4: 114
+      5: 41
+      6: 19
+      7: 7
+      8: 2
+      10: 1
+    Parcel_Resp  dtype=float64  nunique=902  null=1
+      describe: min=np.float64(102001.0) median=np.float64(26009023.0) max=np.float64(43010001.0)
+  plot id candidates:
+    A2BQ12B_plots  dtype=float64  nunique=9  null=211
+      1.0: 794
+      nan: 211
+      2.0: 189
+      3.0: 60
+      4.0: 28
+      5.0: 8
+      6.0: 1
+      7.0: 1
+      11.0: 1
+      9.0: 1
+    A2BQ12A_plots  dtype=float64  nunique=8  null=231
+      1.0: 773
+      nan: 231
+      2.0: 189
+      3.0: 57
+      4.0: 26
+      5.0: 14
+      6.0: 2
+      100.0: 1
+      7.0: 1
+  tenure candidates:
+    a2bq1owned  dtype=object  nunique=1  null=0
+      'Access / Use Rights': 1294
+
+=== Wave 2015-16 ===
+
+## FILE lsms_library/countries/Uganda/2015-16/Data/AGSEC2A.dta
+  shape: (4200, 38)
+  cols (38): ['HHID', 'hh_agric', 'parcelID', 'parcelName', 'a2aq1owned', 'a2aq4', 'a2aq5', 'a2aq6', 'a2aq7', 'a2aq8', 'a2aq9', 'a2aq10', 'a2aq11a', 'a2aq11b', 'a2aq12', 'a2aq13a', 'a2aq13b', 'a2aq14', 'a2aq15a', 'a2aq15b', 'a2aq16', 'a2aq17', 'a2aq18', 'a2aq19', 'a2aq20', 'a2aq21', 'a2aq22a', 'a2aq22b', 'a2aq23', 'a2aq26a', 'a2aq26b', 'a2aq24a', 'a2aq24b', 'a2aq27a', 'a2aq27b', 'a2aq25', 'Parcel_Resp', 'hh']
+  hhid candidates:
+    HHID  dtype=str  nunique=2298  null=0
+  parcel id candidates:
+    parcelID  dtype=int8  nunique=10  null=0
+      1: 2181
+      2: 1176
+      3: 535
+      4: 205
+      5: 67
+      6: 23
+      7: 8
+      9: 2
+      10: 2
+      8: 1
+    parcelName  dtype=str  nunique=1924  null=0
+    Parcel_Resp  dtype=int32  nunique=2342  null=0
+      describe: min=np.float64(810001.0) median=np.float64(24203013.0) max=np.float64(43010001.0)
+  tenure candidates:
+    a2aq1owned  dtype=object  nunique=1  null=0
+      'Owned': 4200
+
+## FILE lsms_library/countries/Uganda/2015-16/Data/AGSEC2B.dta
+  shape: (1381, 35)
+  cols (35): ['HHID', 'hh_agric', 'parcelID', 'parcelName', 'a2bq1owned', 'Parcel_Resp', 'a2bq4', 'a2bq5', 'a2bq6', 'a2bq7', 'a2bq8', 'a2bq9', 'a2bq10', 'a2bq11', 'a2bq12a', 'a2bq12b', 'a2bq12a1', 'a2bq12b1', 'a2bq13', 'a2bq14', 'a2bq15', 'a2bq16', 'a2bq17', 'a2bq18', 'a2bq19', 'a2bq20a', 'a2bq20b', 'A2BQ12A_plots', 'A2BQ12B_plots', 'a2bq21a', 'a2bq21b', 'Visit_GPS_Parcel', 'GPS_Not_Captured', 'GPS_Manual', 'hh']
+  hhid candidates:
+    HHID  dtype=str  nunique=1005  null=0
+  parcel id candidates:
+    parcelID  dtype=int8  nunique=7  null=0
+      2: 500
+      1: 447
+      3: 276
+      4: 109
+      5: 36
+      6: 12
+      7: 1
+    parcelName  dtype=str  nunique=1047  null=0
+    Parcel_Resp  dtype=float64  nunique=1008  null=3
+      describe: min=np.float64(102001.0) median=np.float64(24205501.5) max=np.float64(43010001.0)
+    Visit_GPS_Parcel  dtype=object  nunique=2  null=4
+      'No': 1256
+      'Yes': 121
+      nan: 4
+  plot id candidates:
+    A2BQ12A_plots  dtype=float64  nunique=8  null=221
+      1.0: 833
+      2.0: 225
+      nan: 221
+      3.0: 61
+      4.0: 26
+      5.0: 10
+      6.0: 3
+      7.0: 1
+      11.0: 1
+    A2BQ12B_plots  dtype=float64  nunique=6  null=250
+      1.0: 821
+      nan: 250
+      2.0: 216
+      3.0: 61
+      4.0: 18
+      5.0: 10
+      6.0: 5
+  area candidates:
+    Visit_GPS_Parcel  dtype=object  nunique=2  null=4
+      'No': 1256
+      'Yes': 121
+      nan: 4
+    GPS_Not_Captured  dtype=object  nunique=4  null=123
+      'Outside of LC1': 680
+      'Inside LC1 but owner refused': 263
+      'Other (specify)': 186
+      'Inside LC1 but not accessible': 129
+      nan: 123
+    GPS_Manual  dtype=object  nunique=2  null=1260
+      nan: 1260
+      'Yes': 111
+      'No': 10
+  tenure candidates:
+    a2bq1owned  dtype=object  nunique=1  null=0
+      'Access / Use Rights': 1381
+  gps candidates:
+    Visit_GPS_Parcel  dtype=object  nunique=2  null=4
+      'No': 1256
+      'Yes': 121
+      nan: 4
+    GPS_Not_Captured  dtype=object  nunique=4  null=123
+      'Outside of LC1': 680
+      'Inside LC1 but owner refused': 263
+      'Other (specify)': 186
+      'Inside LC1 but not accessible': 129
+      nan: 123
+    GPS_Manual  dtype=object  nunique=2  null=1260
+      nan: 1260
+      'Yes': 111
+      'No': 10
+
+=== Wave 2018-19 ===
+
+## FILE lsms_library/countries/Uganda/2018-19/Data/AGSEC2A.dta
+  shape: (4368, 47)
+  cols (47): ['interview__key', 'hhid', 'parcelID', 't0_hhid', 'a2aq1owned', 's2aq3_1a', 's2aq4', 's2aq5', 's2aq6', 's2aq7', 's2aq8', 's2aq9', 's2aq10', 's2aq11a', 's2aq11b', 's2aq14', 's2aq15a', 's2aq15b', 'a2aq28', 'a2aq29a', 'a2aq29b', 's2aq16', 's2aq17', 'a2aq18', 's2aq19', 's2aq20', 's2aq21', 's2aq22a', 's2aq22b', 's2aq23', 'a2aq31', 's2aq26__0', 's2aq26__1', 'a2aq32', 'a2aq33a', 'a2aq33b', 's2aq24__0', 's2aq24__1', 's2aq27__0', 's2aq27__1', 'a2aq34', 'a2aq25', 'a2aq35', 'a2aq36', 'a2aq37', 'a2aq38', 'a2aq39']
+  hhid candidates:
+    hhid  dtype=str  nunique=2374  null=0
+    t0_hhid  dtype=str  nunique=2357  null=0
+  parcel id candidates:
+    parcelID  dtype=int8  nunique=11  null=0
+      1: 2173
+      2: 1169
+      3: 537
+      4: 231
+      0: 107
+      5: 100
+      6: 30
+      7: 13
+      8: 5
+      9: 2
+      10: 1
+  tenure candidates:
+    a2aq1owned  dtype=object  nunique=1  null=0
+      'Owned': 4368
+
+## FILE lsms_library/countries/Uganda/2018-19/Data/AGSEC2B.dta
+  shape: (1443, 26)
+  cols (26): ['hhid', 'parcelID', 't0_hhid', 'a2bq1owned', 's2aq03_1', 's2aq04', 's2aq05', 's2aq06', 's2aq07', 's2aq08', 'a2bq09', 'a2bq10', 'a2bq11', 'a2bq12a', 'a2bq12b', 'a2bq12a_1', 'a2bq12b_1', 's2aq16', 's2aq17', 'a2aq18', 's2aq19', 's2aq20', 's2aq21', 's2aq22a', 's2aq22b', 'interview__key']
+  hhid candidates:
+    hhid  dtype=str  nunique=1025  null=0
+    t0_hhid  dtype=str  nunique=1021  null=0
+  parcel id candidates:
+    parcelID  dtype=int8  nunique=9  null=0
+      2: 510
+      1: 333
+      3: 327
+      4: 164
+      5: 55
+      6: 27
+      0: 14
+      7: 8
+      8: 5
+  tenure candidates:
+    a2bq1owned  dtype=object  nunique=1  null=0
+      'Accessed through use rights': 1443
+
+=== Wave 2019-20 ===
+
+## FILE lsms_library/countries/Uganda/2019-20/Data/Agric/agsec2a.dta
+  shape: (4087, 46)
+  cols (46): ['hhid', 'parcelID', 'a2aq1owned', 's2aq5_1', 's2aq03_1a', 's2aq4', 's2aq5', 's2aq6', 's2aq7', 's2aq8', 's2aq9', 's2aq10', 's2aq11a', 's2aq11b', 'a2bq12a_1', 'a2bq12b_1', 's2aq14', 's2aq15a', 's2aq15b', 'a2aq28', 'a2aq29a', 'a2aq29b', 'a2aq18', 's2aq20', 's2aq21', 's2aq22a', 's2aq22b', 's2aq23', 'a2aq31', 's2aq26__0', 's2aq26__1', 'a2aq32', 'a2aq33a', 'a2aq33b', 'a2aq33c', 's2aq24__0', 's2aq24__1', 's2aq27__0', 's2aq27__1', 'a2aq34', 'a2aq25', 'a2aq35', 'a2aq36', 'a2aq37', 'a2aq38', 'a2aq39']
+  hhid candidates:
+    hhid  dtype=str  nunique=2222  null=0
+  parcel id candidates:
+    parcelID  dtype=int8  nunique=11  null=0
+      1: 1837
+      2: 1221
+      3: 613
+      4: 269
+      5: 92
+      6: 33
+      7: 11
+      8: 7
+      9: 2
+      10: 1
+      11: 1
+  tenure candidates:
+    a2aq1owned  dtype=object  nunique=1  null=0
+      'Owned': 4087
+
+## FILE lsms_library/countries/Uganda/2019-20/Data/Agric/agsec2b.dta
+  shape: (1278, 24)
+  cols (24): ['hhid', 'parcelID', 't0_hhid', 's2aq05_1', 's2aq03_3', 'a2bq1owned', 's2aq03_1', 's2aq04', 's2aq05', 's2aq06', 's2aq07', 's2aq08', 'a2bq09', 'a2bq10', 'a2bq11', 'a2bq12a', 'a2bq12b', 'a2bq12a_1', 'a2bq12b_1', 'a2aq18', 's2aq20', 's2aq21', 's2aq22a', 's2aq22b']
+  hhid candidates:
+    hhid  dtype=str  nunique=911  null=0
+    t0_hhid  dtype=str  nunique=911  null=0
+  parcel id candidates:
+    parcelID  dtype=int8  nunique=11  null=0
+      1: 463
+      2: 373
+      3: 233
+      4: 113
+      5: 55
+      6: 25
+      7: 7
+      8: 4
+      9: 3
+      10: 1
+      11: 1
+  tenure candidates:
+    a2bq1owned  dtype=object  nunique=1  null=0
+      'Accessed through use rights': 1278
