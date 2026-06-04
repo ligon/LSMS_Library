@@ -6,6 +6,11 @@ Data Scheme:
     Region: str
     Rural: str
 
+  interview_date:
+    index: (t, i)
+    Int_t: datetime
+    materialize: make
+
   household_roster:
     index: (t, i, pid)
     Sex: str
