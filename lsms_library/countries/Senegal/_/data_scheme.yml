@@ -73,3 +73,21 @@ Data Scheme:
     Rural: str
 
   panel_ids: !make
+
+  plot_features:
+    # Lasting parcel-level characteristics from the EHCVM agriculture
+    # module s16a (GH #167; copies the Mali EHCVM reference, PR #284).
+    # EHCVM waves only: 2018-19 and 2021-22.  plot_id =
+    # "{field_no}_{parcel_no}".  Latitude / Longitude are NOT emitted —
+    # EHCVM s16a has no decimal-degree parcel GPS (s16aq47 is an area,
+    # not a coordinate); deferred as in Uganda.  Senegal-specific delta:
+    # 2021-22 relabels s16aq10 code 3 "Fermage/colonage" but the integer
+    # code is unchanged (still rented_in); the harmonizer keys on codes.
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    Tenure: str
+    TenureSystem: str
+    SoilType: str
+    Irrigated: bool
+    materialize: make
