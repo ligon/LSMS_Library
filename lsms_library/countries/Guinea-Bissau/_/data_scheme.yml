@@ -66,3 +66,21 @@ Data Scheme:
   interview_date:
     index: (t, i)
     Int_t: datetime
+
+  plot_features:
+    # Lasting parcel-level characteristics from the EHCVM agriculture
+    # module s16a (GH #167; Guinea-Bissau is an EHCVM sibling of the
+    # Mali reference, PR #284).  Single EHCVM wave: 2018-19 (no 2021-22).
+    # s16a value labels are Portuguese but the integer codes match the
+    # French EHCVM countries, so the harmonize_* tables key on the codes.
+    # plot_id = "{field_no}_{parcel_no}".  Latitude / Longitude are NOT
+    # emitted — EHCVM s16a has no decimal-degree parcel GPS (s16aq47 is
+    # an area, not a coordinate); deferred as in Uganda.
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    Tenure: str
+    TenureSystem: str
+    SoilType: str
+    Irrigated: bool
+    materialize: make

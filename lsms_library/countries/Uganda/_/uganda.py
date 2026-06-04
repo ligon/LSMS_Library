@@ -444,4 +444,247 @@ def id_walk(df, updated_ids, hh_index='i'):
 
     # df= df.rename(index=updated_ids,level=['t', household_level])
     df.attrs['id_converted'] = True
-    return df  
+    return df
+
+
+# ---------------------------------------------------------------------
+# plot_features (GH #167 Phase 1 pilot)
+# ---------------------------------------------------------------------
+
+ACRES_PER_HECTARE = 2.471053814671653  # 1 ha = 2.471... acres
+HECTARES_PER_ACRE = 1.0 / ACRES_PER_HECTARE  # 0.404686 ha / acre
+
+
+def _harmonized_codes(tablename, key='Code', value='Preferred Label'):
+    """Load a Code -> Preferred Label dict from categorical_mapping.org.
+
+    Mirrors the shape of ``harmonized_unit_labels`` but returns integer
+    keys directly (no '---' sentinel restoration; for our use NaN
+    Preferred Labels mean "leave the column NaN").
+    """
+    from lsms_library.local_tools import get_categorical_mapping
+
+    raw = get_categorical_mapping(tablename=tablename, idxvars=key,
+                                  **{value: value})
+    out = {}
+    for k, v in raw.items():
+        try:
+            int_k = int(k)
+        except (TypeError, ValueError):
+            int_k = k
+        if pd.isna(v) or str(v).strip() in ('---', ''):
+            out[int_k] = pd.NA
+        else:
+            out[int_k] = str(v).strip()
+    return out
+
+
+def _harmonize_acquire_table():
+    """Load harmonize_acquire from categorical_mapping.org and return
+    a {(Wave, File, Code): Preferred Label} dict for three-key lookup.
+
+    The acquire codes mean different things across waves (GH #167), so
+    the table is wave-keyed.  Codes absent from the table map to NaN
+    (no silent default)."""
+    from lsms_library.local_tools import df_from_orgfile
+
+    # Resolve org file relative to this module (search ../../_ first so
+    # wave-script CWDs still find it).
+    import os
+    here = os.path.dirname(os.path.abspath(__file__))
+    candidates = [
+        os.path.join(here, 'categorical_mapping.org'),
+        os.path.abspath(os.path.join('..', '..', '_', 'categorical_mapping.org')),
+        'categorical_mapping.org',
+    ]
+    orgfn = next((c for c in candidates if os.path.exists(c)), candidates[0])
+
+    df = df_from_orgfile(orgfn, name='harmonize_acquire',
+                         set_columns=True, to_numeric=True)
+    out = {}
+    for _, row in df.iterrows():
+        wv = str(row['Wave']).strip()
+        f = str(row['File']).strip()
+        c = row['Code']
+        try:
+            c = int(c)
+        except (TypeError, ValueError):
+            pass
+        lab = row.get('Preferred Label')
+        if pd.isna(lab):
+            continue
+        out[(wv, f, c)] = str(lab).strip()
+    return out
+
+
+def _map_codes(series, code_map):
+    """Map a categorical or numeric Series through ``code_map`` (a
+    {int: str} dict).  Returns a string Series with NaN where the
+    code is not in the map."""
+    if series is None:
+        return None
+    # Stata categoricals come through as strings if convert_categoricals
+    # is True.  We need the underlying integer code for the map lookup.
+    if pd.api.types.is_categorical_dtype(series) or series.dtype == object:
+        # Reverse map: build {label: code} from the categorical, then
+        # invert.  Easier path: re-read the value labels from the raw
+        # data.  But for our purposes, the harmonized tables were
+        # written against the integer codes; if the wave loaded
+        # categoricals, the label string IS the value.  So we map
+        # by code only when the dtype is numeric; otherwise treat the
+        # string value as already canonical (lowercased + spelling
+        # normalized via the harmonize table's *value* column).
+        # ---
+        # Simpler approach: build a reverse lookup of label_lower -> code,
+        # then look up.  For tenure/soil/water tables, the value_labels
+        # are the source-survey labels, not our preferred labels — so
+        # the simple path doesn't work.  We require an int-keyed series.
+        # If we received strings, attempt to recover the int code by
+        # forcing convert_categoricals=False in the caller, OR by
+        # parsing the label.  For now, raise — callers must pass
+        # numeric codes.
+        raise TypeError(
+            f"_map_codes expects a numeric Series (raw Stata codes); "
+            f"got dtype={series.dtype}.  Re-load the source with "
+            f"convert_categoricals=False, or pass the integer-coded "
+            f"underlying values.")
+    # Numeric: convert to nullable Int64 (NaN-safe) and map
+    out = series.astype('Int64').map(code_map)
+    return out.astype('string').where(out.notna(), pd.NA)
+
+
+def plot_features_for_wave(t, source_2a, source_2b, colmap):
+    """Build canonical ``plot_features`` for one Uganda UNPS wave.
+
+    Parameters
+    ----------
+    t : str
+        Wave id (e.g. ``"2013-14"``), used as the ``t`` index value.
+    source_2a, source_2b : pd.DataFrame | None
+        Raw AGSEC2A (owned parcels) and AGSEC2B (use-rights parcels)
+        DataFrames, loaded via ``get_dataframe(..., convert_categoricals=False)``
+        so the categorical columns carry integer codes.  ``None`` is
+        permitted when a wave lacks one of the source files.
+    colmap : dict
+        Per-wave column-name map.  Required keys (for any source the
+        caller passes):
+            hhid           — household id column
+            parcel_id      — within-HH parcel sequence column
+        Optional keys (NaN where omitted or absent in source):
+            area_gps       — GPS-measured parcel area (acres)
+            area_est       — farmer-estimated parcel area (acres)
+            tenure_system  — Tenure System question (a2aq7 / s2aq7 / ...)
+            acquire        — How-acquired question (a2aq8 / s2aq8 / ...)
+            soil_type      — Soil-type question
+            water_source   — Main-water-source question
+        Each value is the column name in the corresponding source df.
+
+    Returns
+    -------
+    pd.DataFrame indexed by ``(t, i, plot_id)`` with columns
+        ``Area`` (hectares, float), ``AreaUnit`` (str, always 'acres'),
+        ``Tenure`` (str), ``TenureSystem`` (str), ``SoilType`` (str),
+        and ``Irrigated`` (bool nullable).  GPS columns (Latitude /
+        Longitude) are reserved in the canonical Columns block but not
+        emitted here — Uganda's DMS encoding in AGSEC2A is
+        non-standard and mostly NaN; revisit in a follow-up.
+    """
+    tenure_system_map = _harmonized_codes('harmonize_tenure_system')
+    soil_map = _harmonized_codes('harmonize_soil')
+    water_map = _harmonized_codes('harmonize_water')
+    acquire_map = _harmonize_acquire_table()
+
+    pieces = []
+    for letter, src in (('A', source_2a), ('B', source_2b)):
+        if src is None or src.empty:
+            continue
+
+        # Build the per-row canonical frame
+        c = colmap  # alias
+        hh = src[c['hhid']].apply(format_id)
+        parcel = src[c['parcel_id']].apply(format_id)
+        plot_id = parcel.astype(str) + f'_{letter}'
+
+        # Area: prefer GPS-measured, fall back to farmer estimate.
+        area_acres = pd.Series(pd.NA, index=src.index, dtype='Float64')
+        if c.get('area_gps') in src.columns:
+            area_acres = pd.to_numeric(src[c['area_gps']], errors='coerce').astype('Float64')
+        if c.get('area_est') in src.columns:
+            est = pd.to_numeric(src[c['area_est']], errors='coerce').astype('Float64')
+            area_acres = area_acres.where(area_acres.notna(), est)
+        # Plausibility clamp: > 2500 acres (~1000 ha) is a data-entry
+        # error for Ugandan smallholder parcels (observed 8093 ha in
+        # 2005-06); drop to NaN so AreaUnit follows, rather than poison
+        # area-weighted aggregates downstream (GH #167).
+        area_acres = area_acres.where((area_acres <= 2500) | area_acres.isna(), pd.NA)
+        area_ha = area_acres * HECTARES_PER_ACRE
+
+        area_unit = pd.Series(['acres'] * len(src), index=src.index, dtype='string')
+        # Where area is NaN, leave AreaUnit NaN too (no measurement = no unit).
+        area_unit = area_unit.where(area_acres.notna(), pd.NA)
+
+        # TenureSystem (Freehold/Leasehold/Mailo/Customary/...)
+        tenure_system = pd.Series(pd.NA, index=src.index, dtype='string')
+        ts_col = c.get('tenure_system')
+        if ts_col and ts_col in src.columns:
+            tenure_system = _map_codes(src[ts_col], tenure_system_map)
+
+        # Tenure: wave-keyed acquire-mode code -> canonical tenure.  The
+        # same raw code means different things across waves (e.g. 2B
+        # code 1 = 'purchased' in 2005-06 but 'agreement' in 2009-15),
+        # so the lookup is keyed on (wave, File, Code).  Unmapped codes
+        # ('Do not know', etc.) and absent acquire columns stay NaN --
+        # NO silent file-letter default (GH #167; the old default
+        # mislabelled ~85% of 2005-06 2B rows and made 2A content-free).
+        acq_col = c.get('acquire')
+        tenure = pd.Series(pd.NA, index=src.index, dtype='string')
+        if acq_col and acq_col in src.columns:
+            acq = src[acq_col].astype('Int64')
+            tenure = acq.map(lambda code: acquire_map.get((t, f'2{letter}', int(code)))
+                             if pd.notna(code) else pd.NA).astype('string')
+
+        # SoilType
+        soil_type = pd.Series(pd.NA, index=src.index, dtype='string')
+        soil_col = c.get('soil_type')
+        if soil_col and soil_col in src.columns:
+            soil_type = _map_codes(src[soil_col], soil_map)
+
+        # Irrigated boolean derived from water_source
+        irrigated = pd.Series(pd.NA, index=src.index, dtype='boolean')
+        water_col = c.get('water_source')
+        if water_col and water_col in src.columns:
+            water_label = _map_codes(src[water_col], water_map)
+            irrigated = (water_label == 'Irrigated').astype('boolean')
+            # Where water_label is NaN, leave irrigated as NaN too
+            irrigated = irrigated.where(water_label.notna(), pd.NA)
+
+        # GPS deferred for v1.  Uganda's DMS encoding in AGSEC2A is
+        # non-standard (Minutes ranges 0-99, Seconds 0-999) and the
+        # columns are mostly NaN; revisit when a maintainer with
+        # Uganda-specific knowledge can confirm the encoding.
+        # Canonical Latitude / Longitude in data_info.yml stay
+        # reserved for future countries (e.g. Ethiopia ESS) that
+        # have decimal-degree plot GPS.
+
+        piece = pd.DataFrame({
+            't':            t,
+            'i':            hh.values,
+            'plot_id':      plot_id.values,
+            'Area':         area_ha.values,
+            'AreaUnit':     area_unit.values,
+            'Tenure':       tenure.values,
+            'TenureSystem': tenure_system.values,
+            'SoilType':     soil_type.values,
+            'Irrigated':    irrigated.values,
+        })
+        pieces.append(piece)
+
+    if not pieces:
+        return pd.DataFrame(
+            columns=['Area','AreaUnit','Tenure','TenureSystem',
+                     'SoilType','Irrigated'])
+
+    df = pd.concat(pieces, ignore_index=True)
+    df = df.set_index(['t', 'i', 'plot_id'])
+    return df
+

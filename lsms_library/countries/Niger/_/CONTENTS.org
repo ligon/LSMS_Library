@@ -99,3 +99,29 @@ the mojibake fix landed -- the underlying labels are canonical
 French names (with a handful of preserved local-language entries for
 which a follow-up =u= table could be added if the harmonization plan
 requires it).
+
+* plot_features (GH #167)
+
+Lasting parcel-level characteristics from the EHCVM agriculture module
+=s16a_me_ner{year}.dta=, harmonized to the canonical =plot_features=
+schema indexed by =(t, i, plot_id)=.  Niger is an EHCVM sibling of the
+Mali reference implementation (PR #284); the shared harmonization lives
+in =niger.py:plot_features_for_wave=, with thin per-wave loaders in
+=2018-19/_/plot_features.py= and =2021-22/_/plot_features.py= and a
+country-level concatenator =_/plot_features.py=.
+
+EHCVM waves only (2018-19, 2021-22).  =plot_id = "{field_no}_{parcel_no}"=
+(=s16aq02_s16aq03=), unique within each =(grappe, menage)=.  =Area= is
+the GPS measurement (=s16aq47=, hectares) where measured, otherwise the
+farmer estimate (=s16aq09a=) converted via its unit (=s16aq09b=: 1 ha,
+2 m^2 -> /10000); =AreaUnit= is always 'hectares'.  =Tenure= (=s16aq10=),
+=TenureSystem= (=s16aq13=), =SoilType= (=s16aq18=), and =Irrigated=
+(=s16aq17=) are mapped via the =harmonize_*= tables in
+=categorical_mapping.org=, keyed on the integer Stata codes.
+
+NIGER-SPECIFIC: the 2021-22 instrument adds =s16aq10= code 7 =
+Co-propriétaire (co-ownership), mapped to =owned=; 2018-19 has codes
+1-6 only (identical to Mali).  Latitude / Longitude are deferred —
+EHCVM s16a records no decimal-degree parcel GPS.  Pre-EHCVM ECVMA waves
+(2011-12, 2014-15) use a different agriculture instrument and are out of
+scope for this recipe.

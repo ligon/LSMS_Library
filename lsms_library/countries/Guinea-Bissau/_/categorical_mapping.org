@@ -29,3 +29,66 @@
 | Cement             | Cement          |
 | Tiles              | Tiles           |
 | Dung               | Earth with Dung |
+
+# plot_features harmonize_* tables (GH #167; EHCVM cluster).
+#
+# Guinea-Bissau's s16a value LABELS are Portuguese (Proprietário,
+# Arenoso, Sim/Não, ...) but the underlying INTEGER CODES are IDENTICAL
+# to the French-language EHCVM countries (Mali, Niger, Senegal, ...).
+# These tables therefore key on the integer Code and reuse Mali's
+# code->canonical mapping verbatim — there is NO Portuguese-language
+# branch.  The wave script loads s16a with convert_categoricals=False so
+# the codes arrive as integers; guinea_bissau._map_codes maps them here.
+#
+# harmonize_tenure — s16aq10 "mode d'occupation" -> canonical Tenure.
+#   PT labels: 1 Proprietário->owned, 2 Empréstimo a título gratuito
+#   (free loan)->use_right, 3 Arrendamento->rented_in, 4 Parceria
+#   (sharecrop)->sharecropped_in, 5 Penhora (pledge/pawn) & 6 Outro
+#   ->other_tenure.
+# harmonize_soil — s16aq18 -> SoilType (English labels).  PT: 1 Arenoso
+#   ->sandy, 2 Limoso->loam, 3 Argiloso->clay, 4 Talude->hardpan,
+#   5 Outro->other.
+# harmonize_water — s16aq17; the Irrigated bool is (label=='Irrigated').
+#   PT: 1-3 Irrigação (poço/canal/regato)->Irrigated, 4 Pluvial->Rain-fed,
+#   5 Pântano/wetlands->Wetland, 6 Outro unmapped (NaN -> Irrigated=NA).
+# harmonize_tenure_system — s16aq13 land-document regime -> canonical
+#   TenureSystem spellings.  Only the three documents that imply a clear
+#   regime are mapped (1 Título fundiário->freehold, 2 Licença de
+#   exploração->granted_right_of_occupancy, 4 Locação->leasehold).
+#   3 Registo, 5 Convençao de venda, 6 Outro, 7 Nenhum have no defensible
+#   regime mapping and are left out (NaN) rather than force-fit.
+
+#+name: harmonize_tenure
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | owned           |
+|    2 | use_right       |
+|    3 | rented_in       |
+|    4 | sharecropped_in |
+|    5 | other_tenure    |
+|    6 | other_tenure    |
+
+#+name: harmonize_soil
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | sandy           |
+|    2 | loam            |
+|    3 | clay            |
+|    4 | hardpan         |
+|    5 | other           |
+
+#+name: harmonize_water
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Irrigated       |
+|    2 | Irrigated       |
+|    3 | Irrigated       |
+|    4 | Rain-fed        |
+|    5 | Wetland         |
+
+#+name: harmonize_tenure_system
+| Code | Preferred Label            |
+|------+----------------------------|
+|    1 | freehold                   |
+|    2 | granted_right_of_occupancy |
+|    4 | leasehold                  |

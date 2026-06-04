@@ -11,6 +11,10 @@ Data Scheme:
     Int_t: datetime
     materialize: make
 
+  individual_education:
+    index: (t, i, pid)
+    Educational Attainment: str
+
   household_roster:
     index: (t, i, pid)
     Sex: str

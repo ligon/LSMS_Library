@@ -1,0 +1,457 @@
+#+TITLE: Design — EthiopiaRHS plot_features (GH #278, under #167)
+#+DATE: 2026-05-20
+#+FILETAGS: design erhs plot_features lsms_library
+
+* Status
+
+Draft for maintainer review.  Target branch: =development=.  Authoring
+branch: =design/erhs-plot-features-278=.
+
+*Maintainer decisions (2026-05-20):*
+- *D1*: =B= -- Uganda Phase-1 first (per #167), ERHS as Phase-2
+  follower.  This document is the ERHS Phase-2 spec; the canonical
+  =Columns:= block lands with Uganda, not ERHS.
+- *D2*: =plot_features= captures *lasting* features of the plot only.
+  *Drop =Crop=, =Crop2=* from the canonical Columns block (crops vary
+  year-to-year and are outcomes, not plot characteristics).  =Tenure=
+  retains sharecropping (the /form/ of tenure is lasting even when
+  contract terms renegotiate); =Irrigated= retained (read as
+  "irrigation infrastructure / customary water access", a lasting
+  plot attribute).  Per-season contract / cultivation detail is the
+  natural home of a future =plot_cultivation= table (D5 below).
+- *D3*: moot (no =Crop= column to multi-up).
+- *D4*: still open (deferred; pick after Phase-1 schema stabilizes).
+
+The body below reflects these decisions.  Original draft (with the
+four open questions) is preserved in this branch's first commit
+=09e6b017= for the audit trail.
+
+* Problem and scope
+
+** What
+
+Implement the canonical =plot_features= table for *EthiopiaRHS*
+(R1-R4 = 1994a/1994b/1995/1997 only) as the Phase-2 follower to
+#167's Uganda Phase-1 pilot.  Reserved canonical index
+=(t, v, i, plot_id)= lives in =lsms_library/data_info.yml=
+(Index Info); the =Columns:= block has *never been declared* and
+lands with Uganda Phase 1.  By the time ERHS Phase 2 opens its PR,
+the canonical schema and the test-suite gate (=test_column_table_has_countries=)
+will already be green, so this is a "second declaring country"
+implementation with no atomicity gymnastics.
+
+** Not what (out of scope)
+
+- =plot_features= is *lasting* plot characteristics only (area,
+  tenure, soil, irrigation infrastructure).  *Crop composition is
+  excluded* (D2 decision 2026-05-20): planted crops vary
+  season-to-season and are outcomes, not plot attributes.
+- Crop *output / yield / profit* and per-season *crop composition*
+  are distinct concerns: in ERHS they live at HH x crop, not per-plot
+  (R1 harvest sections, R2 =r2p2s1a=, derived =area_output_*=
+  aggregates, 1997 output value).  Out of this design entirely;
+  relate to the deferred ERHS income work in #277.  If someone
+  later wants a per-plot, per-season =plot_cultivation= table (one
+  row per =(t, v, i, plot_id, crop_seq)=, recording what was
+  planted), that's a separate canonical-schema proposal -- file a
+  new issue under #167's umbrella, do not retrofit =plot_features=.
+- 1989: no plot roster in the IFPRI Dataverse archive (only
+  HH x crop =ethprodv.tab=).  No plot_features.
+- 1999 / 2004 / 2009 (R5-R7): no raw plot sections in the
+  Dataverse archive (only pre-aggregated HH x crop
+  =area_output_99/04/2009=).  No plot_features; same wired/unwired
+  split as roster/food (CONTENTS.org and #276).
+- GPS coordinates: ERHS doesn't record them.  =Latitude= /
+  =Longitude= columns in the canonical schema stay optional.
+- Implementing =plot_features= for any other country: that is #167's
+  job, with Uganda as Phase-1 pilot (per D1).
+
+* Source data summary (R1-R4)
+
+Combined from #278's recon (=Overview ... Data Description.pdf=
+sections 2(ii)/(viii), =Table of Contents.pdf=, per-wave
+=ERHS_hhquestionnaire_*.pdf=).
+
+| Wave  | Round | Source file(s)                  | plot_id raw cols  | Area cols                                                       | Tenure / soil / irrigation             |
+|-------+-------+---------------------------------+-------------------+-----------------------------------------------------------------+----------------------------------------|
+| 1994a | R1    | =land1all.tab= / =r1p2s1.tab=   | =q21_1=           | =q21_1a= (qty) + =q21_1b= (unit); =q21_1aha= already in hectares | TBD on questionnaire pass              |
+| 1994b | R2    | =r2p3s1a*=                      | parcel+plot       | yes (units TBD)                                                 | =r2p2s8*= (sharecropping form); TBD: other tenure / soil / irrigation |
+| 1995  | R3    | =r3p2s1a3.tab=                  | =q21_3= + =q21_4= | =q21_5a= (qty) + =q21_5b= (unit)                                | TBD on questionnaire pass              |
+| 1997  | R4    | =r4p2s1af.tab= / =r4p2s1bf.tab= | plot              | *=plotha= / =area1ha...= (hectares pre-computed)*               | TBD on questionnaire pass              |
+
+(R1 crop columns =q21_8a/c/e/g= + per-crop area =q21_8b/d/f=, R3
+=q21_10*=, R2/R4 crop sections, and the *per-season contract detail*
+inside R2 =r2p2s8*= (crop-share %, partner, current-season inputs)
+are *not* extracted into =plot_features= per D2; they remain
+available in source for a potential future =plot_cultivation= table.
+R2 =r2p2s8*= still populates =Tenure='sharecropped_*'= because the
+tenure category itself is lasting.)
+
+R4 is the best round (pre-computed hectares; serves as the
+conversion oracle for R1-R3).  R1 also ships a =q21_1aha= hectare
+column for the primary plot area, which gives an independent within-R1
+calibration point.
+
+HH key throughout: =q1a . q1b . q1c= + HH-no (=q5= R1 / =q2= R2-3 /
+=q1d= R4) -- identical to the shared =_/ethiopiarhs.py= composite-=i=
+convention used by =household_roster= / =food_acquired= / =sample=.
+Region (cluster v) is auto-joined by =_join_v_from_sample()= at API
+time -- design doesn't need to plumb it.
+
+** Files to acquire from Dataverse
+
+None of the plot-table files are currently in the repo's DVC store.
+Acquisition steps (mirrors the existing per-wave =Data/= pattern; see
+=CONTRIBUTING.org=):
+
+#+begin_src bash
+# in EthiopiaRHS/<wave>/Data/, per wave:
+curl -L "https://dataverse.harvard.edu/api/access/datafile/<id>?format=original" -o <file>.tab
+dvc add <file>.tab
+dvc push -r ligonresearch_s3
+git add <file>.tab.dvc .gitignore
+#+end_src
+
+Concrete IDs come from the IFPRI Dataverse listing
+(=doi:10.7910/DVN/T8G8IV=); the file-id <-> name map for the
+already-wired demo/food files is in =EthiopiaRHS/_/CONTENTS.org=
+section "Round -> File Map".  Adding plot files extends that table.
+
+* Canonical =Columns:= block (lands with Uganda Phase 1, #167)
+
+Under D1=B this block is *Uganda's PR to land*, not ERHS's.  Listed
+here for two reasons: (1) ERHS Phase 2 needs to know what columns
+it's populating, and (2) D2 ("lasting features only") is a
+framework-level commitment the maintainer made on 2026-05-20, so
+the canonical set proposed below reflects it.
+
+#+begin_src yaml
+plot_features:
+  Area:
+    type: float
+    required: true
+    note: plot area in hectares (canonical unit)
+  AreaUnit:
+    type: str
+    note: original survey unit before conversion to hectares
+  Tenure:
+    type: str
+    note: |
+      Form under which the plot is held.  Per-season contract detail
+      (this year's crop-share percentage, this year's cash rent
+      amount) belongs in a future plot_cultivation table; the tenure
+      category itself is the lasting attribute.
+    spellings:
+      owned: []
+      leased: []
+      rented_in: []
+      rented_out: []
+      sharecropped_in: []
+      sharecropped_out: []
+      inherited: []
+      communal: []
+      other_tenure: []
+  SoilType:
+    type: str
+  Irrigated:
+    type: bool
+    note: |
+      True if the plot has irrigation -- treat as a lasting plot
+      attribute (infrastructure / customary water access).  Surveys
+      that ask "irrigated this season?" report effectively the same
+      value for plots with permanent infrastructure; per-season
+      variation, where it matters, lives in plot_cultivation.
+  Latitude:
+    type: float
+  Longitude:
+    type: float
+#+end_src
+
+Notes on the D2 reflow:
+- =Crop= and =Crop2= are *not* in this block (D2): planted crops vary
+  season-to-season and are outcomes, not plot attributes.
+- =Tenure= retains sharecropping (split into =sharecropped_in= /
+  =sharecropped_out= for consistency with the rented split).
+  Sharecropping is a /form/ of tenure, lasting at the
+  plot-arrangement level even when the specific contract terms get
+  renegotiated.  What's excluded from =Tenure= is the per-season
+  /contract detail/ (this year's crop-share percentage, who
+  cultivated, etc.) -- that's plot_cultivation territory.
+- =Irrigated= stays in.  Where a questionnaire asks "irrigated this
+  season?" the answer is dominated by whether infrastructure exists;
+  treat as a lasting attribute and let plot_cultivation capture any
+  real season-to-season variation if it ever matters.
+
+ERHS would populate =Area=, =AreaUnit=, =Tenure= (including
+sharecropped categories where R2's =r2p2s8*= sections support them),
+and =Irrigated= / =SoilType= where the per-round questionnaire
+records them.  Per-round coverage TBD on the questionnaire pass; per
+country convention, declared columns NaN out where data are absent.
+No GPS in ERHS.
+
+** Test-suite consequence
+
+By the time ERHS Phase 2 opens its PR, Uganda Phase 1 will already
+have landed the Columns block + the first country declaration, so
+=test_column_table_has_countries= is green and ERHS is the *second*
+declaring country -- no atomic-PR gymnastics.  If Uganda's
+declaration set or column choices change between this design and
+Uganda's PR, ERHS Phase 2 picks up whatever Uganda actually shipped.
+
+* ERHS-side implementation plan
+
+** =data_scheme.yml= declaration
+
+Add to =lsms_library/countries/EthiopiaRHS/_/data_scheme.yml=:
+
+#+begin_src yaml
+  plot_features:
+    index: (t, i, plot_id)        # v auto-joined by framework
+    Area: float
+    AreaUnit: str
+    Tenure: str
+    SoilType: str
+    Irrigated: bool
+#+end_src
+
+All five columns are declared up front; per-round coverage is
+discovered on the questionnaire pass and absent data NaN out, same
+as e.g. =cluster_features.Latitude= for countries without GPS.
+
+(Following the ERHS convention from #271/#272: =v= is *not* in the
+index because =_join_v_from_sample()= adds it at API time.  Wave
+extractors emit =(t, i, plot_id)= only.)
+
+** YAML vs. script path (per CLAUDE.md "Two Build Paths")
+
+R1 / R3 / R4 are single-source-file per wave (=land1all.tab=,
+=r3p2s1a3.tab=, =r4p2s1af.tab=/=r4p2s1bf.tab=) and could be wired
+in pure YAML if the per-row =plot_id= can be expressed as a single
+=idxvars= entry.
+
+- R1: =plot_id= = =q21_1= scalar.  *YAML path OK.*
+- R3: =plot_id= = composite =q21_3 . q21_4=.  Same shape as the
+  composite-=i= problem already solved by =_/ethiopiarhs.py:i= --
+  add a sibling formatter =plot_id_composite= taking
+  =[q21_3, q21_4]= and emitting a single string.  *YAML path OK
+  with shared formatter.*
+- R4: =r4p2s1af.tab= + =r4p2s1bf.tab= concatenated.  Two source files
+  per wave -> *script path required* (mirrors the existing
+  =_/ethiopiarhs.py= recipe for cross-file food merges, per
+  =DESIGN_ethiopiarhs_wave_recipe_2026-05-18.org=).
+- R2: =r2p3s1a*= family (multiple sub-files for parcels and crop
+  rows).  Likely *script path* -- to confirm during R2 recon.
+
+So: R1 and R3 are YAML; R2 and R4 are =materialize: make= scripts.
+That matches the half-and-half pattern already in EthiopiaRHS.
+
+** Shared helpers in =_/ethiopiarhs.py=
+
+New additions (additive only; existing =i= / food helpers untouched):
+
+1. =plot_id_scalar(value)= -- pass-through formatter for R1's =q21_1=.
+   Trivial; could also just use the built-in =format_id=.
+2. =plot_id_composite(value)= -- two-element formatter for R3:
+   =format_id(value.iloc[0]) + '_' + format_id(value.iloc[1])=.
+   Identical shape to the existing composite-=i= helper, NaN-guarded
+   the same way (returns =pd.NA= if either component is missing).
+3. =to_hectares(qty, unit_code, hpu_map)= -- a multiplier lookup
+   against the static =hectares_per_unit= map (below).  Returns
+   =(area_ha, area_unit_label)=, with =area_ha = NaN= when the unit
+   code is unrecognized (no silent fallback; explicit miss makes
+   coverage easy to audit, same policy as the kg conversion in #272).
+
+** Hectares conversion -- the area-unit harmonization
+
+ERHS uses local volumetric / area units (timad, kert, ...).
+Recipe, mirroring the *spirit* of the =harmonize_unit= pattern in
+=_/categorical_mapping.org= but *not* the good-specific trick (an
+area is not good-attributed the way a Chinet of butter is):
+
+1. Build a static =hectares_per_unit= map -- one factor per ERHS
+   area-unit code, single table since ERHS unit codes were verified
+   stable across 1994+ in the food work.  Implementation: either
+   (a) a new =hectares_per_unit= org-table sibling to =harmonize_unit=
+   in =EthiopiaRHS/_/categorical_mapping.org=, or (b) a JSON
+   companion =EthiopiaRHS/_/hectares_per_unit.json= (mirrors the
+   pattern named in #167 "the equivalent =kgs_per_unit.json=").
+   Recommend (a) -- keeps the harmonization tables co-located and
+   diff-able as one file; consistent with =harmonize_unit=.
+2. Seed factor values from candidate sources (each needs validation):
+   - =prodconv.tab= in the Dataverse archive (per #278; needs
+     download + inspection).
+   - Codeunit*.SPS files in =<wave>/Documentation/= (already
+     DVC-tracked; the food-unit work referenced them but for ERHS
+     1989 only).
+   - Published literature on Ethiopian land-area conventions
+     (timad = ~0.25 ha is a common citation; kert / kada vary by
+     region -- recon needed).
+3. *R4 =plotha= as oracle.* For every R4 plot, R4 records the raw
+   unit + qty *and* a pre-computed hectare value.  Compute the
+   empirical ratio =plotha / qty= for each unit code in R4, compare
+   to the seeded =hectares_per_unit= map, and resolve discrepancies
+   in favor of the empirical R4 ratio.  Same triangulation pattern
+   used by the #272 food kg-factor work.  R1's =q21_1aha= column
+   gives an additional within-R1 calibration point for the primary
+   plot.
+4. =AreaUnit= column carries the *original* unit's harmonized label
+   (from a sibling =harmonize_area_unit= table -- preserves
+   provenance for users who want to re-aggregate or sanity-check the
+   conversion).
+
+Two-stage rollout option (worth considering): land =plot_features=
+with =Area = NaN= where the unit is un-mapped, then iterate on the
+=hectares_per_unit= map in a follow-on PR.  Mirrors the food
+harmonization residual (~5.5% un-resolved codes) acceptance posture
+already in CONTENTS.org.
+
+** Tenure
+
+=Tenure= records the /form/ under which the plot is held -- =owned=,
+=leased=, =rented_in=, =rented_out=, =sharecropped_in=,
+=sharecropped_out=, =inherited=, =communal=.  Sharecropping is a
+recognized form of tenure in agricultural economics (Ethiopian
+/yikul/ arrangements are typically multi-year and not infrequently
+generational); the *category* is a lasting plot attribute, even when
+the specific contract terms (this season's crop, this season's
+split) get renegotiated.
+
+What ERHS R2's sharecropping sections =r2p2s8*= add over and above
+the tenure category is the per-season /contract detail/: crop-share
+percentage, partner identity, inputs each side provides.  That
+contract detail is what D2 moves out of =plot_features= and into a
+prospective =plot_cultivation= table.  The tenure-category fact ("the
+plot is held under sharecropping, =sharecropped_out= from the
+landlord HH's view, =sharecropped_in= from the tenant's") *does*
+populate =Tenure= here.
+
+R1 / R3 / R4 ownership-of-plot questions to confirm on the
+questionnaire pass; map code values to the canonical spellings via a
+=harmonize_tenure= org-table or per-wave inline =mapping:=.  Where
+the tenure question is absent or ambiguous in a given round,
+=Tenure= NaNs out for that round.
+
+** plot_id stability across rounds
+
+ERHS plots are *not* a panel across rounds at the plot level (a HH
+re-rosters their plots each round; plot IDs are wave-local).  Same
+posture as Tanzania's plot module: =plot_id= is unique within
+=(t, i)= but does not link across =t=.  This is the canonical schema
+already (=(t, v, i, plot_id)= -- =t= is part of the key); design just
+needs to /not/ try to link them.
+
+* Decisions
+
+** Resolved 2026-05-20
+
+- *D1*: =B= -- Uganda Phase-1 first, ERHS Phase 2 follower.  ERHS PR
+  no longer carries the canonical =Columns:= block.
+- *D2*: =plot_features= = lasting plot characteristics.  Drop =Crop=
+  and =Crop2= from the canonical block (and from ERHS extraction).
+  =Tenure= keeps sharecropping (split into =sharecropped_in= /
+  =sharecropped_out=) -- the /form/ of tenure is lasting even when
+  contract terms renegotiate.  =Irrigated= retained as a lasting
+  attribute (read as infrastructure / customary water access; per-
+  season variation, if it matters, lives in =plot_cultivation=).
+  What D2 actually moves out of =plot_features= is per-season
+  /contract detail/ -- crop share %, partner identity, this-season
+  inputs -- not the tenure category itself.
+- *D3*: moot.
+
+** Still open
+
+- *D4*: ship a =plot_features= baseline / test fixture (a la
+  =tests/test_invariance.py=) once ERHS lands, or wait until the
+  canonical Columns set stabilizes across Phase 1 / Phase 2?
+  Recommend wait -- pinning a baseline against a still-evolving
+  schema is wasted work.  Re-raise after Uganda Phase 1 merges.
+- *D5* (new, surfaced by D2's reflow): does anyone want a separate
+  =plot_cultivation= table for per-season /contract & cultivation
+  detail/ -- planted crop(s), crop-share %, partner identity,
+  this-season inputs?  Out of scope for this design but worth filing
+  under #167's umbrella if there's appetite.  ERHS would be a natural
+  contributor (R1 =q21_8*=, R3 =q21_10*=, R2 =r2p2s8*= contract
+  detail).  =Tenure= and =Irrigated= remain in =plot_features=; what
+  =plot_cultivation= would carry is the per-season layer on top of
+  the lasting plot attributes.
+
+* Risk register
+
+- *R1*: =hectares_per_unit= seed values may not validate against R4
+  =plotha=.  Mitigation: two-stage rollout (land with =Area=NaN= where
+  un-mapped; iterate); accept up to a documented residual share, as
+  with food.
+- *R2*: R2 source structure (=r2p3s1a= family) is multi-file and
+  could surprise on detailed recon.  Mitigation: deliberately
+  picked the script path for R2; the recipe absorbs cross-file
+  joins.  R1/R3/R4 are de-risked by single-source-file structure.
+- *R3*: Tenure semantics may not cleanly map every round's tenure
+  question to the canonical spellings (owned / leased / rented_in /
+  rented_out / sharecropped_in / sharecropped_out / inherited /
+  communal / other_tenure), and the lasting tenure-category fact
+  may be entangled with per-season contract detail in a single
+  source column.  Mitigation: questionnaire pass *before* coding;
+  if a round's tenure question is ambiguous, emit NaN rather than
+  guess.  Cleaner to under-populate than to mis-attribute.
+- *R4*: The Dataverse file IDs for plot files aren't yet listed in
+  =CONTENTS.org= "Round -> File Map".  Mitigation: one-pass recon
+  to enumerate them and extend the map *before* opening the
+  implementation PR.
+- *R5*: Uganda Phase 1's actual landed Columns set may diverge from
+  the block proposed above (e.g. different =Tenure= spellings,
+  different =SoilType= treatment).  Mitigation: ERHS Phase 2
+  re-anchors against whatever Uganda actually shipped at PR-open
+  time; this design is the *intent*, not the spec.
+- *R6*: Uganda Phase 1 stalls (no movement on #167).  Mitigation:
+  ERHS Phase 2 stays parked.  The recon punch-list below can
+  still proceed in parallel (it produces useful artifacts
+  regardless of when Phase 2 opens).
+
+* Out-of-band: things to do before ERHS Phase 2 opens its PR
+
+These can run in parallel with #167 Phase 1 (Uganda) -- they
+produce useful artifacts whether Phase 2 starts next week or next
+quarter.
+
+1. Recon pass: enumerate Dataverse file IDs for R1-R4 plot files
+   (=land1all.tab=, =r1p2s1.tab=, =r2p3s1a*=, =r3p2s1a3.tab=,
+   =r4p2s1af.tab=, =r4p2s1bf.tab=, =prodconv.tab=); extend
+   =EthiopiaRHS/_/CONTENTS.org= "Round -> File Map".
+2. Pull R4 =r4p2s1af.tab=/=r4p2s1bf.tab= + =prodconv.tab=; inspect
+   the unit codes and the =plotha= column to seed the empirical
+   =hectares_per_unit= map.  Independent of Uganda Phase 1.
+3. Per-wave questionnaire pass: enumerate the tenure question(s) per
+   round (mapping source codes to the canonical spellings -- owned /
+   leased / rented_in / rented_out / sharecropped_in /
+   sharecropped_out / inherited / communal / other_tenure); identify
+   soiltype and irrigation questions if any.  Per-season contract
+   detail (crop-share %, partner identity, this-season inputs)
+   stays in source for a potential =plot_cultivation= follow-up.
+   Decide per-round which canonical columns ERHS can populate.
+4. Watch #167 Phase 1 land.  Confirm Uganda's actual landed Columns
+   block + spellings; reconcile this design against it.
+5. *Then* open the ERHS Phase 2 PR with the data_scheme.yml
+   declaration + wave extractors + harmonization tables, including
+   a worked example
+   (=Country('EthiopiaRHS').plot_features().head()=) in the PR body.
+
+* References
+
+- #167 (canonical =plot_features= umbrella; Uganda Phase 1; the
+  Columns-atomicity test gate)
+- #271 / #272 (EthiopiaRHS country baseline; established ERHS
+  conventions -- code-based extraction, shared formatters,
+  =harmonize_*= org-tables, R4 as oracle pattern)
+- #277 (ERHS additional features; this design supersedes its
+  implicit agriculture line)
+- #275 (ERHS community / market prices; not gated by this)
+- =SkunkWorks/audits/plot_features.md= (2026-04-12 audit;
+  documents the schema-code mismatch this design closes)
+- =slurm_logs/DESIGN_ethiopiarhs_wave_recipe_2026-05-18.org= (wave
+  recipe pattern; the script path here follows it)
+- =slurm_logs/HANDOFF_2026-05-19.org= + appendix (current ERHS
+  state; the appendix records resolutions to 1989 / 1997 / 1995
+  blockers that the same shared-formatter pattern will encounter
+  here)
+- =lsms_library/countries/EthiopiaRHS/_/CONTENTS.org= (ground
+  truth for current ERHS coverage, conventions, deferred work)

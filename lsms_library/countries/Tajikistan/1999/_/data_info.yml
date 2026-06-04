@@ -72,3 +72,26 @@ sample:
             - mapping:
                 1.0: Urban
                 2.0: Rural
+
+individual_education:
+    # s3q2 "highest diploma or certificate obtained" (Section 3 Education).
+    # Value labels are stripped in the .dta; codes decoded from the household
+    # questionnaire (HH012007-00.pdf) qualification ladder.
+    file: ../Data/SSEC3.DTA
+    idxvars:
+        v: pop_pt
+        i: [pop_pt, hhid]
+        pid: iid
+    myvars:
+        Educational Attainment:
+            - s3q2
+            - mapping:
+                1.0: 8th (9th) class
+                2.0: secondary school
+                3.0: prof-tech school
+                4.0: spec tech school
+                5.0: higher ed institute
+                6.0: candidate of science
+                7.0: doctor of science
+                8.0: other
+                9.0: none

@@ -1,0 +1,126 @@
+#+TITLE: Scrum-master session handoff — plot_features rollout + coverage matrix
+#+DATE: 2026-06-03
+#+AUTHOR: Sue (Claude Opus 4.8)
+
+* TL;DR for Ethan (you were asleep)
+DONE: plot_features (GH #167) is implemented across ALL 11 implementable
+countries + the Uganda pilot fix.  12 open PRs, NONE merged — all yours to
+review.  Per-country verification passed on every one (is_this_feature_sane
+ok, (t,i,plot_id) unique, 0% sample-orphan, values within canonical spellings,
+scope clean).  See * FINAL STATUS at the bottom.
+
+One incident occurred and was fully recovered (Burkina's git leaked a
+checkout to the main checkout; one docs commit was re-applied via
+cherry-pick; no data or PR was affected — details under * INCIDENT).
+
+* Compute / branch state
+- Node n0148.savio3; venv recovered to /local/job34804121/venv (was stale).
+- =development= is 4 ahead of =master=, unchanged this session.
+- =feature/plot-features-uganda-167= (PR #280 -> development): Uganda pilot
+  + the Tenure fix.  *Do not merge until 2019-20 is rebuilt on a data node.*
+- =feature/plot-features-167= (integration branch, off the fixed Uganda tip):
+  carries the Tenure fix + design docs + validated recipes + the central
+  TenureSystem spelling extension.  Per-country PRs target THIS branch.
+
+* Committed this session
+1. 8c43ec99 fix(Uganda): wave-key Tenure derivation (PR #280 branch).
+   - harmonize_acquire now keyed (Wave, File, Code); no silent default;
+     2A detail preserved; use_right/squatted spellings; area clamp >2500ac.
+   - Verified on 7/8 waves: 2005-06 2B was 85% wrong 'rented_in' -> now
+     use_right/squatted/inherited/owned; 2A was 100% 'owned' -> varied.
+   - *2019-20 NOT rebuilt here* (source not DVC-pullable on this node;
+     dvc-s3 missing).  Code path identical; rebuild in CI / a data node,
+     then re-run the auditor checks before merging PR #280.
+2. 6d0ba42a docs: design doc + validated recon recipes (integration branch).
+3. 4711d92f schema: extended TenureSystem spellings (granted_right_of_occupancy,
+   state, community, cooperative) — centralized so per-country PRs don't
+   conflict on data_info.yml.
+
+* In flight (background agents, dispatched ~end of session)
+Track A — plot_features implementation (worktree-isolated, each opens a PR
+to feature/plot-features-167, NONE merges):
+- Mali (EHCVM reference — validates the pattern for 6 more EHCVM countries)
+- Nigeria (pp/ph single-PP-quarter t; wave-keyed Tenure)
+- Ethiopia (cross-file parcel⋈field join; MUST include holder_id in key)
+- Tanzania (2019-20 + 2020-21 only; 2008-15 deferred — no ag source)
+Track B — coverage matrix:
+- 1 read-only agent producing the implementable-gap matrix for
+  individual_education, shocks, assets, interview_date.
+
+* What I do when these land (autonomous, continuing)
+- Review each PR's diff + verification output (is_this_feature_sane, row
+  counts, (t,i,plot_id) uniqueness, sample-orphan %, Tenure dist).  I do
+  NOT merge — that's your call.
+- If Mali's EHCVM pattern is clean: fan out the remaining 6 EHCVM countries
+  (Niger, Senegal, Burkina_Faso, Benin, Togo, Guinea-Bissau) as near-mechanical
+  copies of Mali (each its own worktree PR).
+- Malawi: needs special handling (refuter found Tenure absent in 2016-17/
+  2019-20 -> ship those waves Tenure=NaN; latin-1 file via usecols; cs-17-
+  id mapping).  Dispatch after the bespoke 4 validate.
+- Fold the coverage matrix into a (Country×Feature) wall-chart; recommend the
+  next feature to roll out with this same machine.
+
+* Validated recipes (durable)
+slurm_logs/2026-06-03_session/RECON_{EHCVM,Ethiopia,Malawi,Nigeria,Tanzania}.md
+— each carries its adversarial-refuter corrections (marked).  EVERY recon
+recipe had load-bearing errors caught by refutation; trust the REFUTER notes
+over the recon body.
+
+* Scope (plot_features, GH #167): 11 implementable countries
+EHCVM ×7 (Mali, Niger, Senegal, Burkina_Faso, Benin, Togo, Guinea-Bissau)
++ Ethiopia, Malawi, Nigeria, Tanzania.  Deferred: GhanaSPS (no data_scheme.yml),
+pre-EHCVM waves, Tanzania 2008-15, Malawi 2004-05.
+
+* FINAL STATUS — plot_features (GH #167)
+All 12 PRs OPEN, none merged, base feature/plot-features-167 (Uganda #280 -> development):
+| PR   | Country       | rows    | verification |
+|------+---------------+---------+--------------|
+| #280 | Uganda (fix)  | 42,593  | Tenure fix verified ALL 8 waves; full plot_features() sane ok |
+| #281 | Nigeria       | 38,111  | sane ok, 0% orphan, scope clean |
+| #282 | Tanzania      | 8,865   | sane ok, clean 1:1 merge, 0% orphan |
+| #283 | Ethiopia      | 132,694 | sane ok, holder_id 0-inflation, ids adjudicated |
+| #284 | Mali          | 13,961  | sane ok, EHCVM reference |
+| #285 | Senegal       | 13,879  | sane ok, 0% orphan |
+| #286 | Guinea-Bissau | 9,873   | sane ok, PT-labels-via-codes |
+| #287 | Benin         | 7,588   | sane ok, 0% orphan |
+| #288 | Niger         | 12,414  | sane ok, code-7 handled |
+| #289 | Togo          | 9,557   | sane ok, module in Data1/ |
+| #290 | Burkina_Faso  | 19,791  | sane ok, 0% orphan |
+| #291 | Malawi        | 68,342  | sane ok, cs-17 XS orphan 0%, Tenure NaN 2016-17/2019-20 |
+Total new plot_features rows ~ 335k across the 11 countries (+Uganda).
+Every PR scope-verified: changed files all under that country's dir; main
+checkout clean after each.  KNOWN_ISSUES.md lists the EHCVM area-clamp gap
+(systematic, one-line fix provided) + the Uganda 2019-20 rebuild.
+
+** Phase D (cross-country Feature() check) — DEFERRED, recommended next
+Feature('plot_features')() needs all countries in ONE checkout, which (given
+the .pth editable-install pinning) means merging the PRs first.  I did NOT do
+unattended merges (your review + the no-merge rule + the incident below).
+After you review/merge the country PRs into feature/plot-features-167, run:
+  Feature('plot_features')()  ; pytest tests/test_schema_consistency.py tests/test_feature.py
+to confirm cross-country schema parity.  Per-country is_this_feature_sane
+already passed for all 11, so this should be a formality.
+
+* INCIDENT (resolved) — Burkina git-leak
+The Burkina worktree agent's `git checkout -b plot-features-burkina-167` leaked
+to the MAIN checkout (a known worktree pitfall), switching main off
+feature/plot-features-167.  Consequences + recovery:
+- Burkina's actual work committed cleanly to origin/plot-features-burkina-167
+  (7c07995d) and PR #290 is correct (one commit, Burkina files only).
+- One of MY docs commits (KNOWN_ISSUES, d0459b4e) landed on the leaked local
+  branch instead of feature/plot-features-167; my push of feature/... missed
+  it.  When I deleted the stale local branch I briefly lost it, then recovered
+  via `git cherry-pick d0459b4e` (now 15c21a13 on feature/plot-features-167,
+  pushed).  No data, no PR, no other commit affected.
+- Main checkout restored to feature/plot-features-167 (clean).
+Lesson for next time: worktree agents can leak git ops to the main checkout;
+don't make coordinator commits from the main checkout while worktree agents
+are mid-run, and re-check `git branch --show-current` before each commit.
+
+* Things for YOU to decide / check on waking
+- Review PRs #280 (Uganda fix) + the per-country PRs to feature/plot-features-167.
+- Confirm the Tenure semantic calls (use_right / squatted; cleared->squatted;
+  given-by-authority->communal) — documented in Uganda/_/categorical_mapping.org.
+- (RESOLVED 2026-06-04) Uganda 2019-20 was a false-alarm wrong-path probe;
+  rebuilt + full plot_features() verified on all 8 waves (42,593 rows, sane ok).
+- Whether to also pursue the next feature (coverage matrix will recommend one).

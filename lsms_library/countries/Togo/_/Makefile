@@ -34,6 +34,14 @@ $(VAR_DIR)/household_characteristics.parquet: household_characteristics.py $(hou
 	python household_characteristics.py
 
 
+# Wave-level plot_features (GH #167).  The framework's grab_data calls
+# `make ../<wave>/_/plot_features.parquet` from this `_/` dir; this
+# pattern rule runs the wave script that materializes it.  (Same gap as
+# the EHCVM siblings Mali/Niger; the generic %.parquet rule below never
+# fires for it because its food_items.org/malawi.py prereqs are absent.)
+../%/_/plot_features.parquet: ../%/_/plot_features.py
+	(cd $(@D) && python plot_features.py)
+
 %.parquet: %.py food_items.org malawi.py
 	(cd $(@D) && python ./$(<F))
 

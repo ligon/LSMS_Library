@@ -177,10 +177,29 @@ appear to have village-level split files (=debdemo4=, =dindemo4=,
   dependency.  1989 unitcode is in-data-unlabelled -> all 1989 units
   good-specific from raw code (1989 metric units not distinguished;
   Codeunit1.SPS in Documentation could seed this -- follow-up).
-- [ ] Follow-ups: refine =harmonize_food= residual (unlabelled
-  source codes) + variant split/merge; 1989 named geography +
-  1989 metric-unit distinction (Codeunit1.SPS); cross-era
-  1989-vs-1994+ region reconciliation; cross-wave panel-id linkage
-  via =q2= (1989/90 HH no.); sourcing constructed ERHS weights;
-  optional validation of inferred kg factors vs ERHS =conv_*.tab=;
-  validation of derived tables vs survey docs.
+- [X] =panel_ids= (GH #271, PR #273).  Script-path
+  =_/panel_ids.py= -> =panel_ids.json= (4,708 edges);
+  =updated_ids.json= empty (no household-split var in ERHS).
+  Baseline 1994a; chain 1989 -> 1994a -> 1994b -> 1995 -> 1997.
+  R1-3 share demo123 so (q1c,hhid) identity links them; 1997<->1995
+  identity on (q1c,q1d)==(q1c,hhid) (1466/1475, 99.4%); 1994a->1989
+  via =q2= (=str(int(abs(q2)))=, drop non-5-digit junk) -- LOSSY by
+  the data's nature: only ~31% of R1-3 HH carry =q2= and ~62% of
+  those resolve into the *partial* 1989 demog89_1 roster (282 edges;
+  the documented pre-expansion-subset gap, not attrition error).
+  IDs built via the shared =ethiopiarhs.i= with
+  =convert_categoricals=False= so keys match the code-based roster
+  index exactly (cur-i 4705/4708, prev-i 4702/4708; the ~0.1%
+  residual = HH dropped by the roster's NA-Sex round filter -- those
+  edges simply link nothing).  id_walk fires with no roster
+  regression.
+- [ ] Follow-ups: *income* -- deferred entirely (per #273 review):
+  the larger project of handling ERHS income from different sources
+  (1989 =ethyrev= =totinc= AND reconstructing the 1994+ panel total
+  from raw R1-R7 crop-sale/livestock/wage/transfer modules) is a
+  separate future effort -- see #277; refine =harmonize_food= residual (unlabelled source
+  codes) + variant split/merge; 1989 named geography + 1989
+  metric-unit distinction (Codeunit1.SPS); cross-era 1989-vs-1994+
+  region reconciliation; sourcing constructed ERHS weights; optional
+  validation of inferred kg factors vs ERHS =conv_*.tab=; validation
+  of derived tables vs survey docs.
