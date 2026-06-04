@@ -4,7 +4,8 @@ from collections import defaultdict
 from cfe.df_utils import use_indices
 import warnings
 import json
-from lsms_library.local_tools import get_dataframe, DVCFS
+from lsms_library.local_tools import get_dataframe, DVCFS, format_id, df_from_orgfile
+import os
 
 # Wave list used by harmonized_food_labels() and other helpers.
 # NB: panel_ids no longer uses this dict -- see panel_ids.py for the
@@ -417,3 +418,202 @@ def panel_attrition(df,return_ids=False,waves=None):
         return foo,IDs
     else:
         return foo
+
+
+# ---------------------------------------------------------------------
+# plot_features (GH #167) — ESS post-planting parcel/field join
+# ---------------------------------------------------------------------
+#
+# ESS records farm land at two granularities in the post-planting (pp)
+# round:
+#   - sect2_pp  : one row per PARCEL (holder_id, household_id, parcel_id)
+#                 with the lasting parcel attributes Tenure / SoilType.
+#   - sect3_pp  : one row per FIELD  (holder_id, household_id, parcel_id,
+#                 field_id) with field-level Area / Irrigated.
+# plot_features emits ONE ROW PER FIELD, broadcasting the parcel-level
+# attributes onto each of the parcel's fields via a LEFT JOIN on the
+# composite key (holder_id, household_id, parcel_id).
+#
+# CRITICAL: the join key MUST include holder_id.  A single household can
+# host several "holders" (decision-makers) who each number their parcels
+# from 1; joining on (household_id, parcel_id) alone collides those and
+# inflates the result by +265..+1567 rows/wave.  Verified empirically:
+# with holder_id in the key the merged row count equals the sect3 row
+# count exactly in every wave (0 inflation).
+#
+# plot_id = format_id(holder_id)_format_id(parcel_id)_format_id(field_id)
+# — globally unique within (t, i).
+#
+# GPS: the public ESS GPS coordinates are 100% redacted to the literal
+# string "**CONFIDENTIAL**" in every wave, so Latitude / Longitude are
+# DEFERRED (not emitted).  The GPS-*measured field area* (sq metres) is
+# NOT redacted and is the primary Area source.
+#
+# Area: GPS sq-metres / 10000 -> hectares where present (AreaUnit =
+# 'hectares').  Where only a farmer estimate in a non-metric local unit
+# (Timad/Kert/Boy/...) exists, we cannot convert (local-unit->ha factors
+# are not in the repo), so Area = NaN and AreaUnit = the native unit name.
+
+PLOT_AREA_UNIT_HA = 'hectares'
+
+
+def _eth_orgfile_path():
+    """Resolve Ethiopia/_/categorical_mapping.org from any wave-script CWD."""
+    here = os.path.dirname(os.path.abspath(__file__))
+    candidates = [
+        os.path.join(here, 'categorical_mapping.org'),
+        os.path.abspath(os.path.join('..', '..', '_', 'categorical_mapping.org')),
+        'categorical_mapping.org',
+    ]
+    return next((c for c in candidates if os.path.exists(c)), candidates[0])
+
+
+def _harmonize_wave_keyed(name):
+    """Load a (Wave, Code) -> Preferred Label dict from categorical_mapping.org."""
+    df = df_from_orgfile(_eth_orgfile_path(), name=name,
+                         set_columns=True, to_numeric=True)
+    out = {}
+    for _, row in df.iterrows():
+        wv = str(row['Wave']).strip()
+        c = row['Code']
+        try:
+            c = int(c)
+        except (TypeError, ValueError):
+            pass
+        lab = row.get('Preferred Label')
+        if pd.isna(lab):
+            continue
+        out[(wv, c)] = str(lab).strip()
+    return out
+
+
+def _harmonize_code_label(name):
+    """Load a Code -> Preferred Label dict (not wave-keyed)."""
+    df = df_from_orgfile(_eth_orgfile_path(), name=name,
+                         set_columns=True, to_numeric=True)
+    out = {}
+    for _, row in df.iterrows():
+        c = row['Code']
+        try:
+            c = int(c)
+        except (TypeError, ValueError):
+            pass
+        lab = row.get('Preferred Label')
+        if pd.isna(lab):
+            continue
+        out[c] = str(lab).strip()
+    return out
+
+
+def _map_int_codes(series, code_map):
+    """Map a numeric (raw Stata code) Series through ``code_map``.
+
+    Returns a 'string' Series with pd.NA where the code is absent."""
+    if series is None:
+        return None
+    out = pd.to_numeric(series, errors='coerce').astype('Int64').map(code_map)
+    return out.astype('string').where(out.notna(), pd.NA)
+
+
+def plot_features_for_wave(t, sect2, sect3, colmap):
+    """Build canonical ``plot_features`` for one Ethiopia ESS wave.
+
+    Parameters
+    ----------
+    t : str
+        Wave id (e.g. ``"2013-14"``), used as the ``t`` index value AND
+        as the wave key for the wave-keyed harmonize tables.
+    sect2 : pd.DataFrame
+        Raw ``sect2_pp_w{N}.dta`` (parcel roster), loaded with
+        ``convert_categoricals=False`` so categorical columns carry the
+        integer codes the harmonize tables key on.
+    sect3 : pd.DataFrame
+        Raw ``sect3_pp_w{N}.dta`` (field roster), same loading.
+    colmap : dict
+        Per-wave column-name map.  Required keys:
+            hhid       — household id column EMITTED as ``i`` (must match
+                         sample().i: household_id2 for W2/W3, else
+                         household_id).  Carried from sect3.
+            join_hhid  — household id column used in the parcel JOIN key
+                         (always 'household_id', present in both files).
+            holder_id, parcel_id, field_id — join-key + plot_id columns.
+            area_gps   — sect3 GPS field-area column (square metres).
+            area_unit  — sect3 farmer-estimate area-unit code column.
+            acquire    — sect2 "how acquired" code column (-> Tenure).
+        Optional keys (NaN where omitted / not asked):
+            soil_type  — sect2 soil-type code column (absent in W1).
+
+    Returns
+    -------
+    pd.DataFrame indexed by ``(t, i, plot_id)`` with columns
+        ``Area`` (hectares, float), ``AreaUnit`` (str), ``Tenure`` (str),
+        ``TenureSystem`` (str, always NaN — ESS has no analogue),
+        ``SoilType`` (str), ``Irrigated`` (nullable bool).  GPS
+        Latitude / Longitude are NOT emitted (source 100% redacted).
+    """
+    c = colmap
+    acquire_map = _harmonize_wave_keyed('harmonize_acquire')
+    area_unit_map = _harmonize_wave_keyed('harmonize_area_unit')
+    soil_map = _harmonize_code_label('harmonize_soil')
+
+    # --- Parcel-level attributes (sect2), keyed for the join ---
+    key = [c['holder_id'], c['join_hhid'], c['parcel_id']]
+    parcel = sect2.copy()
+    # Tenure: wave-keyed acquire code -> canonical tenure.
+    parcel['_Tenure'] = parcel[c['acquire']].pipe(
+        lambda s: pd.to_numeric(s, errors='coerce').astype('Int64').map(
+            lambda code: acquire_map.get((t, int(code))) if pd.notna(code) else pd.NA
+        )).astype('string')
+    if c.get('soil_type') and c['soil_type'] in parcel.columns:
+        parcel['_SoilType'] = _map_int_codes(parcel[c['soil_type']], soil_map)
+    else:
+        parcel['_SoilType'] = pd.Series(pd.NA, index=parcel.index, dtype='string')
+
+    parcel_attrs = (parcel[key + ['_Tenure', '_SoilType']]
+                    .drop_duplicates(subset=key))
+
+    # --- Field-level rows (sect3) ---
+    field = sect3.copy()
+
+    # Area: GPS square-metres -> hectares where present.
+    area_sqm = pd.to_numeric(field[c['area_gps']], errors='coerce')
+    area_ha = (area_sqm / 10000.0).astype('Float64')
+    area_ha = area_ha.where(area_sqm > 0, pd.NA)
+
+    # AreaUnit: 'hectares' where GPS area is present; otherwise the
+    # native farmer-estimate unit name (Area stays NaN there).
+    native_unit = _map_int_codes(field[c['area_unit']], area_unit_map) \
+        if c.get('area_unit') and c['area_unit'] in field.columns \
+        else pd.Series(pd.NA, index=field.index, dtype='string')
+    area_unit = pd.Series(pd.NA, index=field.index, dtype='string')
+    area_unit = area_unit.where(area_ha.isna(), PLOT_AREA_UNIT_HA)
+    area_unit = area_unit.where(area_ha.notna(), native_unit)
+
+    # Irrigated: 1=Yes, 2=No.
+    irr = pd.to_numeric(field[c['irrigated']], errors='coerce').astype('Int64')
+    irrigated = pd.Series(pd.NA, index=field.index, dtype='boolean')
+    irrigated = irrigated.mask(irr == 1, True)
+    irrigated = irrigated.mask(irr == 2, False)
+
+    # Join parcel attributes onto field rows (LEFT, on the holder-aware key).
+    field = field.merge(parcel_attrs, on=key, how='left')
+
+    hh = field[c['hhid']].apply(format_id)
+    plot_id = (field[c['holder_id']].apply(format_id).astype(str) + '_'
+               + field[c['parcel_id']].apply(format_id).astype(str) + '_'
+               + field[c['field_id']].apply(format_id).astype(str))
+
+    out = pd.DataFrame({
+        't':            t,
+        'i':            hh.values,
+        'plot_id':      plot_id.values,
+        'Area':         area_ha.values,
+        'AreaUnit':     area_unit.values,
+        'Tenure':       field['_Tenure'].astype('string').values,
+        'TenureSystem': pd.Series(pd.NA, index=field.index, dtype='string').values,
+        'SoilType':     field['_SoilType'].astype('string').values,
+        'Irrigated':    irrigated.values,
+    })
+    out = out.dropna(subset=['i', 'plot_id'])
+    out = out.set_index(['t', 'i', 'plot_id'])
+    return out
