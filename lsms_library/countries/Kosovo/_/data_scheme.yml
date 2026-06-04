@@ -27,3 +27,8 @@ Data Scheme:
       type: str
       optional: true
     Rural: str
+
+  assets:
+    index: (t, i, j)
+    Age: float
+    Value: float
