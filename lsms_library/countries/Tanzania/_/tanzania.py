@@ -692,3 +692,137 @@ def panel_ids(Waves):
         wave_matches, check_id_split = update_id(wave_matches,  check_id_split)
         updated_wave[wave_year] = wave_matches
     return recursive_D, updated_wave
+
+
+# ---------------------------------------------------------------------
+# plot_features (GH #167)
+# ---------------------------------------------------------------------
+
+ACRES_PER_HECTARE = 2.471053814671653  # 1 ha = 2.471... acres
+HECTARES_PER_ACRE = 1.0 / ACRES_PER_HECTARE  # 0.404686 ha / acre
+
+
+def _plot_harmonized_codes(tablename, key='Code', value='Preferred Label'):
+    """Load a {int code -> Preferred Label} dict from
+    Tanzania/_/categorical_mapping.org.  Codes whose Preferred Label is
+    blank / '---' map to pd.NA (so the column is left NaN)."""
+    from lsms_library.local_tools import get_categorical_mapping
+
+    raw = get_categorical_mapping(tablename=tablename, idxvars=key,
+                                  **{value: value})
+    out = {}
+    for k, v in raw.items():
+        try:
+            int_k = int(k)
+        except (TypeError, ValueError):
+            int_k = k
+        if pd.isna(v) or str(v).strip() in ('---', ''):
+            out[int_k] = pd.NA
+        else:
+            out[int_k] = str(v).strip()
+    return out
+
+
+def _map_plot_codes(series, code_map):
+    """Map a numeric (raw Stata) Series through ``code_map`` ({int: str}).
+    Returns a nullable string Series, NaN where the code is unmapped."""
+    if series is None:
+        return None
+    out = pd.to_numeric(series, errors='coerce').astype('Int64').map(code_map)
+    return out.astype('string').where(out.notna(), pd.NA)
+
+
+def plot_features_for_wave(t, sec02, sec3a, colmap):
+    """Build canonical ``plot_features`` for one Tanzania NPS wave.
+
+    The two source modules are merged on (hhid, plot):
+      AG_SEC_02 — plot area: farmer estimate (acres) + GPS-measured (acres).
+      AG_SEC_3A — plot detail: use status, soil type, irrigation, how
+                  acquired, and certificate of occupancy.
+
+    Parameters
+    ----------
+    t : str
+        Wave id ('2019-20' or '2020-21'); used as the ``t`` index value.
+    sec02, sec3a : pd.DataFrame
+        Raw AG_SEC_02 / AG_SEC_3A frames, loaded via
+        ``get_dataframe(..., convert_categoricals=False)`` so categorical
+        columns carry integer codes.
+    colmap : dict with keys
+        hhid       — household id column (sdd_hhid / y5_hhid)
+        plot       — within-HH plot column (plotnum / plot_id)
+        area_est   — farmer-estimated area, acres (ag2a_04)
+        area_gps   — GPS-measured area, acres   (ag2a_09)
+        use        — plot use status            (ag3a_03)
+        soil_type  — soil type                  (ag3a_10)
+        irrigated  — irrigated y/n              (ag3a_18)
+        acquire    — how acquired               (ag3a_25)
+        legal_cert — certificate of occupancy   (ag3a_28a)
+
+    Returns
+    -------
+    pd.DataFrame indexed by ``(t, i, plot_id)`` with columns
+        Area (hectares, float), AreaUnit (str, 'acres'), Tenure (str),
+        TenureSystem (str), SoilType (str), Irrigated (bool nullable).
+    GPS coordinates (ag2a_07__Latitude/Longitude) are CONFIDENTIAL /
+    redacted in the source and are deliberately NOT emitted.
+    """
+    c = colmap
+    tenure_map = _plot_harmonized_codes('harmonize_tenure')
+    tenure_system_map = _plot_harmonized_codes('harmonize_tenure_system')
+    soil_map = _plot_harmonized_codes('harmonize_soil')
+
+    # --- AG_SEC_02: area ------------------------------------------------
+    a = sec02[[c['hhid'], c['plot']]].copy()
+    a['_hh'] = sec02[c['hhid']].apply(format_id)
+    a['_plot'] = sec02[c['plot']].apply(format_id)
+    area_gps = pd.to_numeric(sec02[c['area_gps']], errors='coerce').astype('Float64')
+    area_est = pd.to_numeric(sec02[c['area_est']], errors='coerce').astype('Float64')
+    # Plausibility clamp: parcels > 2500 acres (~1000 ha) are data-entry
+    # errors for smallholder plots (the 2020-21 GPS column has a 28710-acre
+    # outlier); drop to NaN so AreaUnit follows rather than poisoning
+    # area-weighted aggregates downstream (GH #167).
+    area_gps = area_gps.where((area_gps <= 2500) & (area_gps > 0) | area_gps.isna(), pd.NA)
+    area_est = area_est.where((area_est <= 2500) & (area_est > 0) | area_est.isna(), pd.NA)
+    # Prefer GPS-measured, fall back to farmer estimate.
+    area_acres = area_gps.where(area_gps.notna(), area_est)
+    a['Area'] = (area_acres * HECTARES_PER_ACRE).values
+    area_unit = pd.Series(['acres'] * len(sec02), index=sec02.index, dtype='string')
+    a['AreaUnit'] = area_unit.where(area_acres.notna(), pd.NA).values
+    area = a[['_hh', '_plot', 'Area', 'AreaUnit']]
+
+    # --- AG_SEC_3A: detail ---------------------------------------------
+    d = pd.DataFrame(index=sec3a.index)
+    d['_hh'] = sec3a[c['hhid']].apply(format_id)
+    d['_plot'] = sec3a[c['plot']].apply(format_id)
+
+    # Tenure from how-acquired, with a use-status override.
+    acq = pd.to_numeric(sec3a[c['acquire']], errors='coerce').astype('Int64')
+    tenure = acq.map(tenure_map).astype('string')
+    use = pd.to_numeric(sec3a[c['use']], errors='coerce').astype('Int64')
+    # ag3a_03 code 2 = RENTED OUT, 3 = GIVEN OUT -> Tenure rented_out.
+    tenure = tenure.where(~use.isin([2, 3]), 'rented_out')
+    d['Tenure'] = tenure.values
+
+    d['TenureSystem'] = _map_plot_codes(sec3a[c['legal_cert']], tenure_system_map).values
+    d['SoilType'] = _map_plot_codes(sec3a[c['soil_type']], soil_map).values
+
+    # Irrigated: ag3a_18 1=YES->True, 2=NO->False, else NaN.
+    irr = pd.to_numeric(sec3a[c['irrigated']], errors='coerce').astype('Int64')
+    irrigated = irr.map({1: True, 2: False}).astype('boolean')
+    d['Irrigated'] = irrigated.values
+
+    # --- merge (1:1 on hhid, plot) -------------------------------------
+    df = area.merge(d, on=['_hh', '_plot'], how='outer', indicator=True)
+    n_unmatched = int((df['_merge'] != 'both').sum())
+    if n_unmatched:
+        warnings.warn(
+            f"plot_features {t}: {n_unmatched} of {len(df)} (hhid, plot) "
+            f"rows did not match across AG_SEC_02 and AG_SEC_3A.")
+    df = df.drop(columns='_merge')
+
+    df['t'] = t
+    df = df.rename(columns={'_hh': 'i', '_plot': 'plot_id'})
+    df = df.set_index(['t', 'i', 'plot_id'])
+    df = df[['Area', 'AreaUnit', 'Tenure', 'TenureSystem', 'SoilType', 'Irrigated']]
+    return df
