@@ -28,4 +28,8 @@ Data Scheme:
     # (i, j)) are SUMMED into the canonical (t, i, j) index rather than
     # silently collapsed with .first().  2006-07 has zero such duplicates
     # and stays on the YAML path; `load_from_waves` dispatches per wave.
+
+  interview_date:
+    index: (t, i)
+    Int_t: datetime
     materialize: make

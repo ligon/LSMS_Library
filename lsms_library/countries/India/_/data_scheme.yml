@@ -34,3 +34,8 @@ Data Scheme:
     index: (t, i, pid)
     Cash_per_day: float
     Rural: str
+
+  interview_date:
+    index: (t, i)
+    Int_t: datetime
+    materialize: make
