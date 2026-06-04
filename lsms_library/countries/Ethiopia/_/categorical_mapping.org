@@ -72,3 +72,160 @@ waves in casing and spelling. This table harmonizes them.
 | Wood Planks              | Wood            |
 | Parquet Of Polished Wood | Wood            |
 | Reed/Bamboo              | Other           |
+
+* plot_features (GH #167)
+
+Harmonization tables for the ESS plot_features feature.  Field-level
+rows (sect3_pp) carry Area / Irrigated; parcel-level attributes
+(Tenure, SoilType) come from sect2_pp and are broadcast onto the
+fields via the (holder_id, household_id, parcel_id) join.  See
+=Ethiopia/_/ethiopia.py:plot_features_for_wave= and the
+=* plot_features (GH #167)= section of =CONTENTS.org=.
+
+** harmonize_acquire (WAVE-KEYED)
+
+The sect2 "how was the parcel acquired" question (=pp_s2q03= W1-W3,
+=s2q05= W4-W5) -> canonical Tenure.  The code set EVOLVES across
+waves: W1-W2 have a narrower 1-6 scheme (W1 additionally re-uses
+10/11/12 as alias codes for 'Moved in Without Permission' / 'Other'),
+while W3-W5 add 6='Shared Crop in' and 7='Purchased'.  Hence the
+lookup is keyed on (Wave, Code).  Decisions (canonical spellings from
+=lsms_library/data_info.yml=):
+  - Granted by Local Leaders -> communal (allocated by local authority)
+  - Inherited                -> inherited
+  - Rent                     -> rented_in
+  - Borrowed for Free        -> use_right (recognized informal,
+                                non-cash arrangement)
+  - Moved in Without Permission -> squatted (occupied without a
+                                recognized transfer; canonical def)
+  - Shared Crop in           -> sharecropped_in
+  - Purchased                -> owned
+  - Other (Specify)          -> other_tenure
+Codes absent for a wave map to NaN (no silent default).
+
+NOTE: this departs from the recon recipe, which coarsely mapped
+"Borrowed for Free"/"Moved in Without Permission" to other_tenure.
+The =use_right= / =squatted= canonical spellings are exact matches
+for those survey categories (see data_info.yml Columns:plot_features
+Tenure notes), so we preserve the finer signal.
+
+#+name: harmonize_acquire
+| Wave    | Code | Preferred Label |
+|---------+------+-----------------|
+| 2011-12 |    1 | communal        |
+| 2011-12 |    2 | inherited       |
+| 2011-12 |    3 | rented_in       |
+| 2011-12 |    4 | use_right       |
+| 2011-12 |    5 | squatted        |
+| 2011-12 |    6 | other_tenure    |
+| 2011-12 |   10 | squatted        |
+| 2011-12 |   11 | other_tenure    |
+| 2011-12 |   12 | other_tenure    |
+| 2013-14 |    1 | communal        |
+| 2013-14 |    2 | inherited       |
+| 2013-14 |    3 | rented_in       |
+| 2013-14 |    4 | use_right       |
+| 2013-14 |    5 | squatted        |
+| 2013-14 |    6 | other_tenure    |
+| 2015-16 |    1 | communal        |
+| 2015-16 |    2 | inherited       |
+| 2015-16 |    3 | rented_in       |
+| 2015-16 |    4 | use_right       |
+| 2015-16 |    5 | squatted        |
+| 2015-16 |    6 | sharecropped_in |
+| 2015-16 |    7 | owned           |
+| 2015-16 |    8 | other_tenure    |
+| 2018-19 |    1 | communal        |
+| 2018-19 |    2 | inherited       |
+| 2018-19 |    3 | rented_in       |
+| 2018-19 |    4 | use_right       |
+| 2018-19 |    5 | squatted        |
+| 2018-19 |    6 | sharecropped_in |
+| 2018-19 |    7 | owned           |
+| 2018-19 |    8 | other_tenure    |
+| 2021-22 |    1 | communal        |
+| 2021-22 |    2 | inherited       |
+| 2021-22 |    3 | rented_in       |
+| 2021-22 |    4 | use_right       |
+| 2021-22 |    5 | squatted        |
+| 2021-22 |    6 | sharecropped_in |
+| 2021-22 |    7 | owned           |
+| 2021-22 |    8 | other_tenure    |
+
+** harmonize_soil
+
+The sect2 soil-type question (=pp_s2q14= W2-W3, =s2q16= W4-W5) ->
+canonical SoilType.  FAO/WRB reference soil groups; stable W2-W5.
+W1 (2011-12) does NOT ask soil type, so SoilType is NaN there.
+Code 7 ('OTHER PARCEL USE (BARN, RESIDENTIAL, ETC.)') is a
+non-cultivation sentinel, mapped to 'other'.
+
+#+name: harmonize_soil
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | leptosol        |
+|    2 | cambisol        |
+|    3 | vertisol        |
+|    4 | luvisol         |
+|    5 | mixed           |
+|    6 | other           |
+|    7 | other           |
+
+** harmonize_area_unit (WAVE-KEYED)
+
+The sect3 field-area unit (=pp_s3q02_c= W1-W3, =s3q02b= W4-W5).
+Only used to label rows where Area is NaN (i.e. the survey recorded
+a farmer estimate in a non-metric local unit but no GPS measurement,
+so we cannot convert to hectares -- local-unit->ha factors are not
+in the repo).  Where GPS sq-m IS present, AreaUnit is forced to
+'hectares' in code regardless of this table.  Code 7 means 'Other'
+in W1 but 'Tilm' in W2-W5, hence wave-keyed.
+
+#+name: harmonize_area_unit
+| Wave    | Code | Preferred Label |
+|---------+------+-----------------|
+| 2011-12 |    1 | Hectare         |
+| 2011-12 |    2 | Square Meters   |
+| 2011-12 |    3 | Timad           |
+| 2011-12 |    4 | Boy             |
+| 2011-12 |    5 | Senga           |
+| 2011-12 |    6 | Kert            |
+| 2011-12 |    7 | Other           |
+| 2013-14 |    1 | Hectare         |
+| 2013-14 |    2 | Square Meters   |
+| 2013-14 |    3 | Timad           |
+| 2013-14 |    4 | Boy             |
+| 2013-14 |    5 | Senga           |
+| 2013-14 |    6 | Kert            |
+| 2013-14 |    7 | Tilm            |
+| 2013-14 |    8 | Other           |
+| 2015-16 |    1 | Hectare         |
+| 2015-16 |    2 | Square Meters   |
+| 2015-16 |    3 | Timad           |
+| 2015-16 |    4 | Boy             |
+| 2015-16 |    5 | Senga           |
+| 2015-16 |    6 | Kert            |
+| 2015-16 |    7 | Tilm            |
+| 2015-16 |    8 | Other           |
+| 2018-19 |    1 | Hectare         |
+| 2018-19 |    2 | Square Meters   |
+| 2018-19 |    3 | Timad           |
+| 2018-19 |    4 | Boy             |
+| 2018-19 |    5 | Senga           |
+| 2018-19 |    6 | Kert            |
+| 2018-19 |    7 | Tilm            |
+| 2018-19 |    8 | Medeb           |
+| 2018-19 |    9 | Rope            |
+| 2018-19 |   10 | Ermija          |
+| 2018-19 |   11 | Other           |
+| 2021-22 |    1 | Hectare         |
+| 2021-22 |    2 | Square Meters   |
+| 2021-22 |    3 | Timad           |
+| 2021-22 |    4 | Boy             |
+| 2021-22 |    5 | Senga           |
+| 2021-22 |    6 | Kert            |
+| 2021-22 |    7 | Tilm            |
+| 2021-22 |    8 | Medeb           |
+| 2021-22 |    9 | Rope            |
+| 2021-22 |   10 | Ermija          |
+| 2021-22 |   11 | Other           |

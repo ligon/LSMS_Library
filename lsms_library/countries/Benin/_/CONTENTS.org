@@ -73,3 +73,28 @@ rather than expecting a =MonthsSpent= column in =household_roster()=.
 
 Benin has no pre-EHCVM waves in the library, so no continuous
 months-of-presence variable is available for any wave.
+
+* plot_features (GH #167)
+
+Lasting parcel-level characteristics from the EHCVM agriculture
+module =s16a_me_ben2018.dta= (single 2018-19 wave; Benin has no
+2021-22 EHCVM-II wave in this repo).  Benin is an EHCVM sibling of
+the Mali reference implementation (PR #284): the shared
+harmonization lives in =Benin/_/benin.py:plot_features_for_wave=,
+mirroring =Mali/_/mali.py=.
+
+- Index =(t, i, plot_id)= where =plot_id = "{field_no}_{parcel_no}"=
+  (=s16aq02 _ s16aq03=), unique within each =(grappe, menage)=.
+- =Area= in hectares: GPS measurement (=s16aq47=, already hectares)
+  where =s16aq45 == 1=, else farmer estimate (=s16aq09a=) converted
+  via =s16aq09b= (1=Hectare ->x1, 2=m^2 ->/10000).  =AreaUnit= is
+  always ='hectares'=.
+- =Tenure= <- =s16aq10= (harmonize_tenure); =SoilType= <- =s16aq18=
+  (harmonize_soil); =Irrigated= <- =s16aq17= (harmonize_water, True
+  where label=='Irrigated'); =TenureSystem= <- =s16aq13=
+  (harmonize_tenure_system, only the three document codes that imply
+  a clear regime; others NaN).
+- Placeholder rows for non-farming households (no field/parcel
+  number) are dropped.  =v= is joined from =sample()= at API time
+  (not baked in).  Latitude / Longitude deferred — EHCVM s16a has no
+  decimal-degree parcel GPS.

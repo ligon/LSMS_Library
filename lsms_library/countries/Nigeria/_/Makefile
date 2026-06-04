@@ -135,6 +135,19 @@ housing_parquet := $(housing:.py=.parquet)
 $(VAR_DIR)/housing.parquet: housing.py $(housing_parquet)
 	python housing.py
 
+# plot_features (GH #167).  The framework's grab_data calls
+# `make ../<wave>/_/plot_features.parquet` from this `_/` dir; the
+# pattern rule runs the wave script.  The VAR_DIR rule mirrors the
+# household_roster country-level convention above.
+plot_features = $(shell find $(rounds) -name plot_features.py)
+plot_features_parquet := $(plot_features:.py=.parquet)
+
+../%/_/plot_features.parquet: ../%/_/plot_features.py
+	(cd $(@D) && python plot_features.py)
+
+$(VAR_DIR)/plot_features.parquet: plot_features.py $(plot_features_parquet)
+	python plot_features.py
+
 ../2010-11/_/housing.parquet: ../2010-11/_/housing.py
 	(cd ../2010-11/_; python housing.py)
 

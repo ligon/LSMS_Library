@@ -71,5 +71,24 @@ Data Scheme:
     Value: float
     Purchased Recently: str
     Purchase Price: float
+  plot_features:
+    # Lasting plot-level characteristics for the four buildable IHS/IHPS
+    # waves (2010-11, 2013-14, 2016-17, 2019-20); GH #167.  2004-05 (IHS2)
+    # is deferred -- it has no standard plot roster.  Module C (area) is
+    # merged with Module D (soil / irrigation / tenure) on (hhid, plotkey)
+    # in each wave's plot_features.py.  Tenure is derived from the labeled
+    # acquire question ag_d03 in 2010-11 & 2013-14 ONLY; ag_d03 is absent
+    # from IHS4/IHS5 ag_mod_d (where ag_d02 is "ID of Respondent", not
+    # tenure), so Tenure / TenureSystem are NaN for 2016-17 & 2019-20.
+    # Latitude / Longitude are deferred: Malawi plot GPS is offset /
+    # redacted in the public release.
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    Tenure: str
+    TenureSystem: str
+    SoilType: str
+    Irrigated: bool
+    materialize: make
   food_expenditures:
   food_prices:
