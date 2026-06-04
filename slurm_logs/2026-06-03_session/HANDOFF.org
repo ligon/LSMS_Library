@@ -3,8 +3,15 @@
 #+AUTHOR: Sue (Claude Opus 4.8)
 
 * TL;DR for Ethan (you were asleep)
-Uganda pilot is FIXED and the cross-country rollout is in flight. Nothing
-merged to development/master — everything is branches + PRs for your review.
+DONE: plot_features (GH #167) is implemented across ALL 11 implementable
+countries + the Uganda pilot fix.  12 open PRs, NONE merged — all yours to
+review.  Per-country verification passed on every one (is_this_feature_sane
+ok, (t,i,plot_id) unique, 0% sample-orphan, values within canonical spellings,
+scope clean).  See * FINAL STATUS at the bottom.
+
+One incident occurred and was fully recovered (Burkina's git leaked a
+checkout to the main checkout; one docs commit was re-applied via
+cherry-pick; no data or PR was affected — details under * INCIDENT).
 
 * Compute / branch state
 - Node n0148.savio3; venv recovered to /local/job34804121/venv (was stale).
@@ -63,6 +70,52 @@ over the recon body.
 EHCVM ×7 (Mali, Niger, Senegal, Burkina_Faso, Benin, Togo, Guinea-Bissau)
 + Ethiopia, Malawi, Nigeria, Tanzania.  Deferred: GhanaSPS (no data_scheme.yml),
 pre-EHCVM waves, Tanzania 2008-15, Malawi 2004-05.
+
+* FINAL STATUS — plot_features (GH #167)
+All 12 PRs OPEN, none merged, base feature/plot-features-167 (Uganda #280 -> development):
+| PR   | Country       | rows    | verification |
+|------+---------------+---------+--------------|
+| #280 | Uganda (fix)  | 42,841* | Tenure fix, 7/8 waves (2019-20 needs data-node rebuild) |
+| #281 | Nigeria       | 38,111  | sane ok, 0% orphan, scope clean |
+| #282 | Tanzania      | 8,865   | sane ok, clean 1:1 merge, 0% orphan |
+| #283 | Ethiopia      | 132,694 | sane ok, holder_id 0-inflation, ids adjudicated |
+| #284 | Mali          | 13,961  | sane ok, EHCVM reference |
+| #285 | Senegal       | 13,879  | sane ok, 0% orphan |
+| #286 | Guinea-Bissau | 9,873   | sane ok, PT-labels-via-codes |
+| #287 | Benin         | 7,588   | sane ok, 0% orphan |
+| #288 | Niger         | 12,414  | sane ok, code-7 handled |
+| #289 | Togo          | 9,557   | sane ok, module in Data1/ |
+| #290 | Burkina_Faso  | 19,791  | sane ok, 0% orphan |
+| #291 | Malawi        | 68,342  | sane ok, cs-17 XS orphan 0%, Tenure NaN 2016-17/2019-20 |
+Total new plot_features rows ~ 335k across the 11 countries (+Uganda).
+Every PR scope-verified: changed files all under that country's dir; main
+checkout clean after each.  KNOWN_ISSUES.md lists the EHCVM area-clamp gap
+(systematic, one-line fix provided) + the Uganda 2019-20 rebuild.
+
+** Phase D (cross-country Feature() check) — DEFERRED, recommended next
+Feature('plot_features')() needs all countries in ONE checkout, which (given
+the .pth editable-install pinning) means merging the PRs first.  I did NOT do
+unattended merges (your review + the no-merge rule + the incident below).
+After you review/merge the country PRs into feature/plot-features-167, run:
+  Feature('plot_features')()  ; pytest tests/test_schema_consistency.py tests/test_feature.py
+to confirm cross-country schema parity.  Per-country is_this_feature_sane
+already passed for all 11, so this should be a formality.
+
+* INCIDENT (resolved) — Burkina git-leak
+The Burkina worktree agent's `git checkout -b plot-features-burkina-167` leaked
+to the MAIN checkout (a known worktree pitfall), switching main off
+feature/plot-features-167.  Consequences + recovery:
+- Burkina's actual work committed cleanly to origin/plot-features-burkina-167
+  (7c07995d) and PR #290 is correct (one commit, Burkina files only).
+- One of MY docs commits (KNOWN_ISSUES, d0459b4e) landed on the leaked local
+  branch instead of feature/plot-features-167; my push of feature/... missed
+  it.  When I deleted the stale local branch I briefly lost it, then recovered
+  via `git cherry-pick d0459b4e` (now 15c21a13 on feature/plot-features-167,
+  pushed).  No data, no PR, no other commit affected.
+- Main checkout restored to feature/plot-features-167 (clean).
+Lesson for next time: worktree agents can leak git ops to the main checkout;
+don't make coordinator commits from the main checkout while worktree agents
+are mid-run, and re-check `git branch --show-current` before each commit.
 
 * Things for YOU to decide / check on waking
 - Review PRs #280 (Uganda fix) + the per-country PRs to feature/plot-features-167.
