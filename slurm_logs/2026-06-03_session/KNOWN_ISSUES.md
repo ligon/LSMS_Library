@@ -24,11 +24,15 @@ Pre-existing `Guinea-Bissau/_/guinea-bissau.py` (hyphen, not importable as a
 module) coexists with the new `guinea_bissau.py` (underscore, importable). Not a
 bug, but consider consolidating to avoid confusion.
 
-## ISSUE 3 (Uganda pilot, PR #280): 2019-20 wave not rebuilt on this node
-Source not DVC-pullable here (dvc-s3 missing; 2019-20 Agric/ blob absent).
-The Tenure fix was verified on 7/8 waves; 2019-20 uses the identical code path
-+ verified wave-keyed table. REBUILD 2019-20 on a data node / CI and re-run the
-auditor checks before merging PR #280.
+## ISSUE 3 (Uganda pilot, PR #280): RESOLVED 2026-06-04 — was a false alarm
+Earlier I claimed 2019-20 "wasn't rebuildable on this node". That was MY
+wrong-path probe: 2019-20 stores its files at the nested path
+`Data/Agric/agsec2a.dta` (lowercase), not the flat `../Data/AGSEC2A.dta` the
+other waves use; the wave script itself uses the correct path. Verified:
+ran the 2019-20 wave script through the fixed helper (5,365 rows, wave-keyed
+Tenure correct) AND the full `Country('Uganda').plot_features()` end-to-end:
+42,593 rows, all 8 waves, index unique, is_this_feature_sane = ok. The Tenure
+fix is verified on ALL 8 waves; no data-node rebuild needed.
 
 ## ISSUE 4 (framework, from interview_date audit — informational): for the NEXT
 feature (interview_date), budget two framework cleanups: current interview_date

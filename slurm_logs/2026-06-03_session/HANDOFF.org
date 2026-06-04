@@ -75,7 +75,7 @@ pre-EHCVM waves, Tanzania 2008-15, Malawi 2004-05.
 All 12 PRs OPEN, none merged, base feature/plot-features-167 (Uganda #280 -> development):
 | PR   | Country       | rows    | verification |
 |------+---------------+---------+--------------|
-| #280 | Uganda (fix)  | 42,841* | Tenure fix, 7/8 waves (2019-20 needs data-node rebuild) |
+| #280 | Uganda (fix)  | 42,593  | Tenure fix verified ALL 8 waves; full plot_features() sane ok |
 | #281 | Nigeria       | 38,111  | sane ok, 0% orphan, scope clean |
 | #282 | Tanzania      | 8,865   | sane ok, clean 1:1 merge, 0% orphan |
 | #283 | Ethiopia      | 132,694 | sane ok, holder_id 0-inflation, ids adjudicated |
@@ -121,5 +121,6 @@ are mid-run, and re-check `git branch --show-current` before each commit.
 - Review PRs #280 (Uganda fix) + the per-country PRs to feature/plot-features-167.
 - Confirm the Tenure semantic calls (use_right / squatted; cleared->squatted;
   given-by-authority->communal) — documented in Uganda/_/categorical_mapping.org.
-- 2019-20 Uganda rebuild on a data node (the one wave I couldn't verify).
+- (RESOLVED 2026-06-04) Uganda 2019-20 was a false-alarm wrong-path probe;
+  rebuilt + full plot_features() verified on all 8 waves (42,593 rows, sane ok).
 - Whether to also pursue the next feature (coverage matrix will recommend one).
