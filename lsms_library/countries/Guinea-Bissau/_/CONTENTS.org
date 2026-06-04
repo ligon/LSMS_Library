@@ -65,3 +65,30 @@ For the cross-country canonical-=u= roadmap, see GH #223.  Guinea-Bissau
 was originally classified Tier 3 (needing a new =u= table built) in
 that issue's inventory, but turned out to be Tier 2 once the mojibake
 fix landed -- the underlying labels are already canonical.
+
+* plot_features (GH #167)
+
+Lasting parcel-level characteristics from the EHCVM agriculture module
+=s16a_me_gnb2018.dta=, indexed by =(t, i, plot_id)= with =plot_id =
+"{field_no}_{parcel_no}"= (=s16aq02= _ =s16aq03=).  Columns: =Area=
+(hectares; GPS =s16aq47= where measured, else farmer estimate =s16aq09a=
+converted via =s16aq09b=), =AreaUnit=, =Tenure= (=s16aq10=),
+=TenureSystem= (=s16aq13=), =SoilType= (=s16aq18=), =Irrigated=
+(=s16aq17=).  Single EHCVM wave =2018-19=; there is no 2021-22 wave.
+
+Guinea-Bissau is an EHCVM sibling of the Mali reference implementation
+(PR #284): the per-wave =_/plot_features.py= is a thin loader handing
+the raw s16a DataFrame plus a column map to the shared
+=guinea_bissau.plot_features_for_wave=.
+
+*** Portuguese labels, same integer codes. ***  The s16a value LABELS
+are in Portuguese (=Proprietário=, =Arenoso=, =Sim/Não=, ...) but the
+underlying INTEGER CODES are IDENTICAL to the French-language EHCVM
+countries.  The source is loaded with =convert_categoricals=False= and
+the =harmonize_*= tables in =_/categorical_mapping.org= key on the
+integer Code, so Mali's code->canonical mapping is reused verbatim with
+NO Portuguese-language branch (e.g. SoilType code 1 =Arenoso= maps to
+=sandy=, the same as the French =sableux=).
+
+Latitude / Longitude are deferred: EHCVM s16a has no decimal-degree
+parcel GPS (=s16aq47= is an area, not a coordinate), as in Uganda.
