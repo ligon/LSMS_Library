@@ -330,3 +330,55 @@
 | WOOD               | Wood            |
 | Other (Specify)    | Other           |
 | OTHER(SPECIFY)     | Other           |
+
+# plot_features harmonization tables (GH #167).  These are keyed on the
+# raw integer Stata codes (NOT labels), so wave scripts read the source
+# with convert_categoricals=False and map the underlying codes.  This is
+# robust to the cross-wave label drift (Title Case vs UPPER CASE, the
+# 2019-20 '&amp;' HTML entity in soil labels, Chichewa parentheticals).
+#
+# harmonize_tenure — ag_d03 "How did you acquire this plot?" codes.
+#   LABELED and present in 2010-11 & 2013-14 ONLY.  ABSENT from 2016-17
+#   and 2019-20 ag_mod_d (where ag_d02 is "ID of Respondent", NOT
+#   tenure), so Tenure is NaN for those two waves.  TenureSystem is set
+#   to 'leasehold' only for the leasehold acquire code (6); otherwise NaN.
+# harmonize_soil — ag_d21 soil-type codes (all four buildable waves).
+# harmonize_irrigation — ag_d28a water-source codes.  The Irrigated bool
+#   is derived as (code != 7 and code notna): code 7 = 'Rainfed/No
+#   irrigation' is the only non-irrigated value across all waves.
+
+#+name: harmonize_tenure
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | communal        |
+|    2 | inherited       |
+|    3 | inherited       |
+|    4 | owned           |
+|    5 | owned           |
+|    6 | leased          |
+|    7 | rented_in       |
+|    8 | sharecropped_in |
+|    9 | other_tenure    |
+|   10 | other_tenure    |
+|   11 | other_tenure    |
+
+#+name: harmonize_soil
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | sandy           |
+|    2 | sandy_clay      |
+|    3 | clay            |
+|    4 | other           |
+
+#+name: harmonize_irrigation
+| Code | Preferred Label       |
+|------+-----------------------|
+|    1 | Divert stream         |
+|    2 | Bucket                |
+|    3 | Hand pump             |
+|    4 | Treadle pump          |
+|    5 | Motor pump            |
+|    6 | Gravity               |
+|    7 | Rainfed/No irrigation |
+|    8 | Other                 |
+|    9 | Other                 |
