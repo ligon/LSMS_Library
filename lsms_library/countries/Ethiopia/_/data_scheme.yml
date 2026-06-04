@@ -36,6 +36,10 @@ Data Scheme:
     Distance: int
     Affinity: str
 
+  individual_education:
+    index: (t, i, pid)
+    Educational Attainment: str
+
   panel_ids:
     index: (t, i)
     previous_i: str

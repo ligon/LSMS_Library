@@ -1,6 +1,16 @@
 Country: Albania
 Wave: 2008
 
+individual_education:
+    file: ../Data/Modul_2B_education.sav
+    idxvars:
+        i:
+            - psu
+            - hh
+        pid: id
+    myvars:
+        Educational Attainment: m2b_q04
+
 household_roster:
     file:
         - ../Data/Modul_1A_household_roster.sav
