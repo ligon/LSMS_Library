@@ -16,6 +16,10 @@ Data Scheme:
     Distance: int
     Affinity: str
 
+  individual_education:
+    index: (t, i, pid)
+    Educational Attainment: str
+
   sample:
     index: (i, t)
     v: str
