@@ -1,0 +1,72 @@
+#+TITLE: Scrum-master session handoff — plot_features rollout + coverage matrix
+#+DATE: 2026-06-03
+#+AUTHOR: Sue (Claude Opus 4.8)
+
+* TL;DR for Ethan (you were asleep)
+Uganda pilot is FIXED and the cross-country rollout is in flight. Nothing
+merged to development/master — everything is branches + PRs for your review.
+
+* Compute / branch state
+- Node n0148.savio3; venv recovered to /local/job34804121/venv (was stale).
+- =development= is 4 ahead of =master=, unchanged this session.
+- =feature/plot-features-uganda-167= (PR #280 -> development): Uganda pilot
+  + the Tenure fix.  *Do not merge until 2019-20 is rebuilt on a data node.*
+- =feature/plot-features-167= (integration branch, off the fixed Uganda tip):
+  carries the Tenure fix + design docs + validated recipes + the central
+  TenureSystem spelling extension.  Per-country PRs target THIS branch.
+
+* Committed this session
+1. 8c43ec99 fix(Uganda): wave-key Tenure derivation (PR #280 branch).
+   - harmonize_acquire now keyed (Wave, File, Code); no silent default;
+     2A detail preserved; use_right/squatted spellings; area clamp >2500ac.
+   - Verified on 7/8 waves: 2005-06 2B was 85% wrong 'rented_in' -> now
+     use_right/squatted/inherited/owned; 2A was 100% 'owned' -> varied.
+   - *2019-20 NOT rebuilt here* (source not DVC-pullable on this node;
+     dvc-s3 missing).  Code path identical; rebuild in CI / a data node,
+     then re-run the auditor checks before merging PR #280.
+2. 6d0ba42a docs: design doc + validated recon recipes (integration branch).
+3. 4711d92f schema: extended TenureSystem spellings (granted_right_of_occupancy,
+   state, community, cooperative) — centralized so per-country PRs don't
+   conflict on data_info.yml.
+
+* In flight (background agents, dispatched ~end of session)
+Track A — plot_features implementation (worktree-isolated, each opens a PR
+to feature/plot-features-167, NONE merges):
+- Mali (EHCVM reference — validates the pattern for 6 more EHCVM countries)
+- Nigeria (pp/ph single-PP-quarter t; wave-keyed Tenure)
+- Ethiopia (cross-file parcel⋈field join; MUST include holder_id in key)
+- Tanzania (2019-20 + 2020-21 only; 2008-15 deferred — no ag source)
+Track B — coverage matrix:
+- 1 read-only agent producing the implementable-gap matrix for
+  individual_education, shocks, assets, interview_date.
+
+* What I do when these land (autonomous, continuing)
+- Review each PR's diff + verification output (is_this_feature_sane, row
+  counts, (t,i,plot_id) uniqueness, sample-orphan %, Tenure dist).  I do
+  NOT merge — that's your call.
+- If Mali's EHCVM pattern is clean: fan out the remaining 6 EHCVM countries
+  (Niger, Senegal, Burkina_Faso, Benin, Togo, Guinea-Bissau) as near-mechanical
+  copies of Mali (each its own worktree PR).
+- Malawi: needs special handling (refuter found Tenure absent in 2016-17/
+  2019-20 -> ship those waves Tenure=NaN; latin-1 file via usecols; cs-17-
+  id mapping).  Dispatch after the bespoke 4 validate.
+- Fold the coverage matrix into a (Country×Feature) wall-chart; recommend the
+  next feature to roll out with this same machine.
+
+* Validated recipes (durable)
+slurm_logs/2026-06-03_session/RECON_{EHCVM,Ethiopia,Malawi,Nigeria,Tanzania}.md
+— each carries its adversarial-refuter corrections (marked).  EVERY recon
+recipe had load-bearing errors caught by refutation; trust the REFUTER notes
+over the recon body.
+
+* Scope (plot_features, GH #167): 11 implementable countries
+EHCVM ×7 (Mali, Niger, Senegal, Burkina_Faso, Benin, Togo, Guinea-Bissau)
++ Ethiopia, Malawi, Nigeria, Tanzania.  Deferred: GhanaSPS (no data_scheme.yml),
+pre-EHCVM waves, Tanzania 2008-15, Malawi 2004-05.
+
+* Things for YOU to decide / check on waking
+- Review PRs #280 (Uganda fix) + the per-country PRs to feature/plot-features-167.
+- Confirm the Tenure semantic calls (use_right / squatted; cleared->squatted;
+  given-by-authority->communal) — documented in Uganda/_/categorical_mapping.org.
+- 2019-20 Uganda rebuild on a data node (the one wave I couldn't verify).
+- Whether to also pursue the next feature (coverage matrix will recommend one).
