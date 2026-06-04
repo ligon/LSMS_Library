@@ -120,6 +120,11 @@ Columns:
         Captures the lasting ownership disposition; per-season contract
         detail (this year's crop-share percentage, this year's cash
         rent amount, partner identity) belongs in plot_cultivation.
+        `use_right` = held under agreement with a use-rights owner (a
+        recognized informal arrangement, often non-cash).  `squatted` =
+        informal occupation without a recognized transfer (used without
+        the owner's agreement, or cleared / walked-in).  Countries may
+        extend this list rather than force-fit a local category.
       spellings:
         owned: []
         leased: []
@@ -129,6 +134,8 @@ Columns:
         sharecropped_out: []
         inherited: []
         communal: []
+        use_right: []
+        squatted: []
         other_tenure: []
     TenureSystem:
       type: str

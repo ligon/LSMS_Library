@@ -481,7 +481,11 @@ def _harmonized_codes(tablename, key='Code', value='Preferred Label'):
 
 def _harmonize_acquire_table():
     """Load harmonize_acquire from categorical_mapping.org and return
-    a {(File, Code): Preferred Label} dict for two-key lookup."""
+    a {(Wave, File, Code): Preferred Label} dict for three-key lookup.
+
+    The acquire codes mean different things across waves (GH #167), so
+    the table is wave-keyed.  Codes absent from the table map to NaN
+    (no silent default)."""
     from lsms_library.local_tools import df_from_orgfile
 
     # Resolve org file relative to this module (search ../../_ first so
@@ -499,6 +503,7 @@ def _harmonize_acquire_table():
                          set_columns=True, to_numeric=True)
     out = {}
     for _, row in df.iterrows():
+        wv = str(row['Wave']).strip()
         f = str(row['File']).strip()
         c = row['Code']
         try:
@@ -508,7 +513,7 @@ def _harmonize_acquire_table():
         lab = row.get('Preferred Label')
         if pd.isna(lab):
             continue
-        out[(f, c)] = str(lab).strip()
+        out[(wv, f, c)] = str(lab).strip()
     return out
 
 
@@ -607,6 +612,11 @@ def plot_features_for_wave(t, source_2a, source_2b, colmap):
         if c.get('area_est') in src.columns:
             est = pd.to_numeric(src[c['area_est']], errors='coerce').astype('Float64')
             area_acres = area_acres.where(area_acres.notna(), est)
+        # Plausibility clamp: > 2500 acres (~1000 ha) is a data-entry
+        # error for Ugandan smallholder parcels (observed 8093 ha in
+        # 2005-06); drop to NaN so AreaUnit follows, rather than poison
+        # area-weighted aggregates downstream (GH #167).
+        area_acres = area_acres.where((area_acres <= 2500) | area_acres.isna(), pd.NA)
         area_ha = area_acres * HECTARES_PER_ACRE
 
         area_unit = pd.Series(['acres'] * len(src), index=src.index, dtype='string')
@@ -619,17 +629,19 @@ def plot_features_for_wave(t, source_2a, source_2b, colmap):
         if ts_col and ts_col in src.columns:
             tenure_system = _map_codes(src[ts_col], tenure_system_map)
 
-        # Tenure: combination of file letter (A/B) + acquire-mode code
+        # Tenure: wave-keyed acquire-mode code -> canonical tenure.  The
+        # same raw code means different things across waves (e.g. 2B
+        # code 1 = 'purchased' in 2005-06 but 'agreement' in 2009-15),
+        # so the lookup is keyed on (wave, File, Code).  Unmapped codes
+        # ('Do not know', etc.) and absent acquire columns stay NaN --
+        # NO silent file-letter default (GH #167; the old default
+        # mislabelled ~85% of 2005-06 2B rows and made 2A content-free).
         acq_col = c.get('acquire')
         tenure = pd.Series(pd.NA, index=src.index, dtype='string')
         if acq_col and acq_col in src.columns:
             acq = src[acq_col].astype('Int64')
-            tenure = acq.map(lambda code: acquire_map.get((f'2{letter}', int(code)))
+            tenure = acq.map(lambda code: acquire_map.get((t, f'2{letter}', int(code)))
                              if pd.notna(code) else pd.NA).astype('string')
-        # Fallback: rows without an acquire code (or unmapped) — assign
-        # the file-default (2A → 'owned'; 2B → 'rented_in').
-        default = 'owned' if letter == 'A' else 'rented_in'
-        tenure = tenure.where(tenure.notna(), default)
 
         # SoilType
         soil_type = pd.Series(pd.NA, index=src.index, dtype='string')

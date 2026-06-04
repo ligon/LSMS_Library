@@ -600,23 +600,90 @@
 |    2 | Rain-fed         |
 |    3 | Swamp/Wetland    |
 
+# WAVE-KEYED (GH #167).  The AGSEC2A/2B "how acquired" codes mean
+# DIFFERENT things across waves: 2B code 1 = 'purchased' in 2005-06 but
+# 'agreement with use-rights owner' in 2009-15; 2018-19 2B shifts to
+# 8/9/96; 2019-20 adopts the full 1-9 scheme on both files.  The old
+# (File,Code) table baked in the 2009-15 meaning and mislabelled ~85%
+# of 2005-06 2B rows.  This table is keyed on (Wave, File, Code).
+# Codes not listed for a wave (e.g. 'Do not know'=5, the malformed
+# 2009-10 2B code 3) and absent acquire columns (2018-19 2A is 0%
+# populated) map to NaN -- there is NO silent file-letter default.
+# Decisions: agreement-with-use-rights-owner -> use_right; without
+# agreement / cleared / just-walked-in -> squatted; leased-in -> leased;
+# given by local authority / government -> communal.  See
+# slurm_logs/DESIGN_plot_features_cross_country_workflow_2026-06-03.org.
 #+name: harmonize_acquire
-| File | Code | Preferred Label |
-|------+------+-----------------|
-| 2A   |    1 | owned           |
-| 2A   |    2 | owned           |
-| 2A   |    3 | owned           |
-| 2A   |    4 | owned           |
-| 2A   |    5 | owned           |
-| 2A   |    6 | owned           |
-| 2A   |    7 | owned           |
-| 2A   |    8 | owned           |
-| 2A   |    9 | owned           |
-| 2A   |   96 | owned           |
-| 2B   |    1 | rented_in       |
-| 2B   |    2 | other_tenure    |
-| 2B   |    3 | rented_in       |
-| 2B   |    6 | other_tenure    |
-| 2B   |    8 | rented_in       |
-| 2B   |    9 | other_tenure    |
-| 2B   |   96 | other_tenure    |
+| Wave    | File | Code | Preferred Label |
+|---------+------+------+-----------------|
+| 2005-06 | 2A   |    1 | owned           |
+| 2005-06 | 2A   |    2 | inherited       |
+| 2005-06 | 2A   |    3 | inherited       |
+| 2005-06 | 2A   |    4 | squatted        |
+| 2005-06 | 2A   |    5 | other_tenure    |
+| 2005-06 | 2B   |    1 | owned           |
+| 2005-06 | 2B   |    2 | inherited       |
+| 2005-06 | 2B   |    3 | inherited       |
+| 2005-06 | 2B   |    4 | use_right       |
+| 2005-06 | 2B   |    5 | squatted        |
+| 2005-06 | 2B   |    6 | other_tenure    |
+| 2009-10 | 2A   |    1 | owned           |
+| 2009-10 | 2A   |    2 | inherited       |
+| 2009-10 | 2A   |    3 | leased          |
+| 2009-10 | 2A   |    4 | squatted        |
+| 2009-10 | 2A   |    6 | other_tenure    |
+| 2009-10 | 2B   |    1 | use_right       |
+| 2009-10 | 2B   |    2 | squatted        |
+| 2009-10 | 2B   |    6 | other_tenure    |
+| 2010-11 | 2A   |    1 | owned           |
+| 2010-11 | 2A   |    2 | inherited       |
+| 2010-11 | 2A   |    3 | leased          |
+| 2010-11 | 2A   |    4 | squatted        |
+| 2010-11 | 2A   |    6 | other_tenure    |
+| 2010-11 | 2B   |    1 | use_right       |
+| 2010-11 | 2B   |    2 | squatted        |
+| 2010-11 | 2B   |    6 | other_tenure    |
+| 2011-12 | 2A   |    1 | owned           |
+| 2011-12 | 2A   |    2 | inherited       |
+| 2011-12 | 2A   |    3 | leased          |
+| 2011-12 | 2A   |    4 | squatted        |
+| 2011-12 | 2A   |    6 | other_tenure    |
+| 2011-12 | 2B   |    1 | use_right       |
+| 2011-12 | 2B   |    2 | squatted        |
+| 2011-12 | 2B   |    6 | other_tenure    |
+| 2013-14 | 2A   |    1 | owned           |
+| 2013-14 | 2A   |    2 | inherited       |
+| 2013-14 | 2A   |    3 | leased          |
+| 2013-14 | 2A   |    4 | squatted        |
+| 2013-14 | 2A   |    6 | other_tenure    |
+| 2013-14 | 2B   |    1 | use_right       |
+| 2013-14 | 2B   |    2 | squatted        |
+| 2013-14 | 2B   |    6 | other_tenure    |
+| 2015-16 | 2A   |    1 | owned           |
+| 2015-16 | 2A   |    2 | inherited       |
+| 2015-16 | 2A   |    3 | leased          |
+| 2015-16 | 2A   |    4 | squatted        |
+| 2015-16 | 2A   |    6 | other_tenure    |
+| 2015-16 | 2B   |    1 | use_right       |
+| 2015-16 | 2B   |    2 | squatted        |
+| 2015-16 | 2B   |    6 | other_tenure    |
+| 2018-19 | 2B   |    8 | use_right       |
+| 2018-19 | 2B   |    9 | squatted        |
+| 2018-19 | 2B   |   96 | other_tenure    |
+| 2019-20 | 2A   |    1 | owned           |
+| 2019-20 | 2A   |    2 | inherited       |
+| 2019-20 | 2A   |    3 | leased          |
+| 2019-20 | 2A   |    4 | squatted        |
+| 2019-20 | 2A   |    6 | communal        |
+| 2019-20 | 2A   |    7 | communal        |
+| 2019-20 | 2A   |    8 | use_right       |
+| 2019-20 | 2A   |    9 | squatted        |
+| 2019-20 | 2A   |   96 | other_tenure    |
+| 2019-20 | 2B   |    1 | owned           |
+| 2019-20 | 2B   |    2 | inherited       |
+| 2019-20 | 2B   |    3 | leased          |
+| 2019-20 | 2B   |    4 | squatted        |
+| 2019-20 | 2B   |    6 | communal        |
+| 2019-20 | 2B   |    8 | use_right       |
+| 2019-20 | 2B   |    9 | squatted        |
+| 2019-20 | 2B   |   96 | other_tenure    |
