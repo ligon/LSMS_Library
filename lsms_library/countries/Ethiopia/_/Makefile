@@ -53,6 +53,19 @@ sample_parquet := $(sample:.py=.parquet)
 ../%/_/sample.parquet:
 	(cd $(@D) && python sample.py)
 
+# plot_features (GH #167).  The framework's grab_data calls
+# `make ../<wave>/_/plot_features.parquet` from this `_/` dir; the
+# pattern rule runs the wave script.  The VAR_DIR rule mirrors the
+# household_characteristics country-level convention above.
+plot_features = $(shell find $(rounds) -name plot_features.py)
+plot_features_parquet := $(plot_features:.py=.parquet)
+
+../%/_/plot_features.parquet: ../%/_/plot_features.py
+	(cd $(@D) && python plot_features.py)
+
+$(VAR_DIR)/plot_features.parquet: plot_features.py $(plot_features_parquet)
+	python plot_features.py
+
 $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet: nutrition.py food_items.org $(VAR_DIR)/food_quantities.parquet
 	python nutrition.py
 

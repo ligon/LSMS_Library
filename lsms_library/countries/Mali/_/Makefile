@@ -12,6 +12,12 @@ all: panel_ids.json
 panel_ids.json updated_ids.json: panel_ids.py mali.py
 	python panel_ids.py
 
+# Wave-level plot_features (GH #167).  The framework's grab_data calls
+# `make ../<wave>/_/plot_features.parquet` from this `_/` dir; this
+# pattern rule runs the wave script that materializes it.
+../%/_/plot_features.parquet: ../%/_/plot_features.py
+	(cd $(@D) && python plot_features.py)
+
 clean:
 	rm -f panel_ids.json updated_ids.json
 

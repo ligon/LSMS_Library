@@ -31,7 +31,8 @@ sys.path.append('../../_/')
 import pyreadstat
 
 from lsms_library.local_tools import (get_dataframe, to_parquet, format_id,
-                                       DVCFS, _ensure_dvc_pulled)
+                                       DVCFS, _ensure_dvc_pulled,
+                                       _dvc_working_directory, _COUNTRIES_DIR)
 from malawi import plot_features_for_wave
 
 
@@ -44,8 +45,13 @@ def _read_usecols(countries_rel, usecols):
     the DVC cache like get_dataframe, but restricts the column set so
     pyreadstat never touches the offending free-text column."""
     _ensure_dvc_pulled(countries_rel)
-    with DVCFS.open(countries_rel) as f:
-        data = f.read()
+    # DVCFS.open resolves ``countries_rel`` against os.getcwd(); under
+    # ``make`` the cwd is the wave ``_/`` dir, which would double the
+    # path (Malawi/2016-17/_/Malawi/2016-17/Data/...).  Pin the cwd to
+    # the countries dir so the relative path resolves regardless of cwd.
+    with _dvc_working_directory(_COUNTRIES_DIR):
+        with DVCFS.open(countries_rel) as f:
+            data = f.read()
     with tempfile.NamedTemporaryFile(suffix='.dta', delete=False) as tmp:
         tmp.write(data)
         tmp_path = tmp.name
