@@ -64,3 +64,24 @@ months-of-presence variable:
 - 2014 :: =B3A= in the household roster file records the number of
   months the individual spent in the household over the past 12
   months.  See the wave-level =data_info.yml= for details.
+
+* plot_features (GH #167)
+
+Parcel-level lasting characteristics from the EHCVM agriculture module
+=s16a_me_bfa{2018,2021}.dta= (copied from the Mali EHCVM reference, PR
+#284).  EHCVM waves only (2018-19, 2021-22); the pre-EHCVM 2014 EMC wave
+uses a different instrument and is out of scope.
+
+- Index =(t, i, plot_id)= with =plot_id = "{field_no}_{parcel_no}"=
+  (=s16aq02= _ =s16aq03=); =i= is the EHCVM composite =(grappe, menage)=
+  built with Burkina's =i()= formatter so it matches =sample().i=.
+- Columns: =Area= (hectares; GPS =s16aq47= where measured, else farmer
+  estimate =s16aq09a= converted via =s16aq09b= 1=ha/2=m²), =AreaUnit=
+  ('hectares'), =Tenure= (=s16aq10=), =TenureSystem= (=s16aq13=),
+  =SoilType= (=s16aq18=), =Irrigated= (=s16aq17= in {1,2,3}).
+- Harmonize tables =harmonize_tenure=, =harmonize_soil=,
+  =harmonize_water=, =harmonize_tenure_system= live in
+  =categorical_mapping.org=, keyed on the integer s16a codes.
+- Placeholder rows (no field/parcel number) for non-farming households
+  are dropped.  Latitude / Longitude deferred (no decimal-degree parcel
+  GPS in EHCVM s16a).
