@@ -84,3 +84,13 @@ household_roster:
         Sex: q0102
         Age: q0103
         MonthsAway: q0113
+
+assets:
+    file:
+        - "../Data/2007ihses16_durable_goods.dta"
+    idxvars:
+        i: xhhkey
+        j: q1601_n
+    myvars:
+        Quantity: q1602
+        Value: q1604

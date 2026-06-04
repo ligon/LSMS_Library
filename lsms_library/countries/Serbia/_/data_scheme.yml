@@ -22,3 +22,9 @@ Data Scheme:
     panel_weight: float
     strata: str
     Rural: str
+
+  assets:
+    index: (t, i, j)
+    Quantity: float
+    Age: float
+    Value: float
