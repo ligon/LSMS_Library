@@ -585,3 +585,66 @@ CLOSED: [2023-03-03 Fri 11:26]
 CLOSED: [2023-03-07 Tue 11:32]
 ** DONE shocks.py
 CLOSED: [2023-03-23 Thu 15:59]
+
+* plot_features (GH #167)
+
+Lasting plot characteristics, index =(t, i, plot_id)=, columns Area
+(hectares, float), AreaUnit, Tenure, TenureSystem, SoilType, Irrigated.
+Built via =materialize: make= as a cross-file merge of two NPS
+agriculture modules per wave:
+
+- =AG_SEC_02= :: plot area --- farmer estimate =ag2a_04= (acres) and
+  GPS-measured =ag2a_09= (acres).  GPS is preferred where present,
+  farmer estimate is the fallback.  Acres are converted to hectares
+  (=x 0.404686=); =AreaUnit= records the original survey unit.  A
+  plausibility clamp drops areas > 2500 acres (~1000 ha; the 2020-21
+  GPS column has a 28710-acre data-entry outlier) and non-positive
+  areas to NaN.
+- =AG_SEC_3A= :: plot detail --- use status =ag3a_03=, soil type
+  =ag3a_10=, irrigation =ag3a_18=, how-acquired =ag3a_25=, certificate
+  of occupancy =ag3a_28a=.
+
+The merge is on (hhid, plot) and is a clean 1:1 in both waves (2305/2305
+and 6560/6560 rows; zero unmatched).
+
+** Buildable waves (2 of 6)
+
+- 2019-20 (NPS-SDD, Extended Panel) :: key =(sdd_hhid, plotnum)=; 2305 plots.
+- 2020-21 (NPS Y5, Refresh Panel)   :: key =(y5_hhid, plot_id)=; 6560 plots.
+  Note: BOTH 2020-21 modules key on =plot_id= (there is no =plotnum=
+  column in 2020-21, unlike 2019-20).
+
+These two waves track disjoint sub-panels by design (see the panel
+design note above), so they share no household IDs.
+
+** Deferred
+
+- 2008-15 (rounds 2008-09 / 2010-11 / 2012-13 / 2014-15) :: NO
+  agriculture source file on disk (only =upd4_hh_*= consumption files
+  are DVC-tracked).  Deferred until the UPD ag file is DVC-added.
+
+** Harmonization
+
+Code -> canonical-label tables live in =Tanzania/_/categorical_mapping.org=
+(=harmonize_tenure=, =harmonize_tenure_system=, =harmonize_soil=).  The
+AG_SEC_3A categorical code scheme is IDENTICAL across the two buildable
+waves (verified against the Stata value labels), so the tables are keyed
+on the integer code, not the label string (2020-21 lowercases several
+labels).  =Tenure= comes from =ag3a_25= with an override to =rented_out=
+where =ag3a_03= use-status is 2 (RENTED OUT) or 3 (GIVEN OUT).
+=TenureSystem= comes from =ag3a_28a= (1 -> granted_right_of_occupancy,
+2 -> customary, 3 NO CERTIFICATE -> NaN); =granted_right_of_occupancy=
+was added to the canonical TenureSystem spellings for this rollout.
+
+** GPS redaction
+
+=AG_SEC_02= carries =ag2a_07__Latitude= / =ag2a_07__Longitude=, but
+these are CONFIDENTIAL / redacted in the WB microdata.  Latitude /
+Longitude are therefore NOT emitted.
+
+** Files
+
+- =Tanzania/_/tanzania.py= :: =plot_features_for_wave()= shared helper
+  (+ =_plot_harmonized_codes=, =_map_plot_codes=).
+- =Tanzania/2019-20/_/plot_features.py=, =Tanzania/2020-21/_/plot_features.py= :: per-wave scripts.
+- =Tanzania/_/plot_features.py= :: country concatenator (concat + id_walk).
