@@ -17,3 +17,9 @@ Data Scheme:
     Generation: int
     Distance: int
     Affinity: str
+
+  assets:
+    index: (t, i, j)
+    Quantity: float
+    Value: float
+    Purchase Price: float
