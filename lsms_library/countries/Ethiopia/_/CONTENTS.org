@@ -399,6 +399,98 @@ The household identifier variable changes across waves:
 | 2018-19 | =household_id=   | New ID scheme                    |
 | 2021-22 | =household_id=   | Continues wave 4 ID scheme       |
 
+* plot_features (GH #167)
+
+ESS land characteristics, one row per FIELD, index =(t, i, plot_id)=.
+Built with =materialize: make= because it requires a cross-file join
+that =data_info.yml= cannot express.
+
+** Source granularity and the holder_id join
+
+ESS records farmland at two levels in the post-planting (pp) round:
+  - =sect2_pp_w{N}.dta= : one row per PARCEL, carrying the lasting
+    parcel attributes Tenure (acquisition mode) and SoilType.
+  - =sect3_pp_w{N}.dta= : one row per FIELD, carrying field-level
+    Area and Irrigated.
+We emit one row per field and broadcast the parcel attributes onto
+each of the parcel's fields via a LEFT JOIN.
+
+*** The join key MUST include holder_id
+
+A single household can host several "holders" (decision-makers), each
+of whom numbers their parcels from 1.  Joining on
+=(household_id, parcel_id)= alone collides those and INFLATES the
+result by +265..+1567 rows/wave with =plot_id= collisions.  The
+correct key is =(holder_id, household_id, parcel_id)=.  Verified
+empirically: with =holder_id= in the key the merged field count equals
+the raw sect3 row count EXACTLY in every wave (0 inflation), and
+=plot_id = holder_id_parcel_id_field_id= is globally unique within
+=(t, i)=.  Per-wave field rows: W1 32025, W2 33147, W3 33305,
+W4 19339, W5 14878 (= 132694 total).
+
+** Household id emitted as =i= (W2/W3 use household_id2)
+
+The emitted =i= must match =sample().i=.  The =sample= and
+=household_roster= features index on:
+  - W1 (2011-12): =household_id=
+  - W2 (2013-14): =household_id2=
+  - W3 (2015-16): =household_id2=
+  - W4 (2018-19): =household_id=
+  - W5 (2021-22): =household_id=
+For W2/W3, only =household_id2= overlaps the sample spine (99.3% vs
+0.0% for =household_id=).  plot_features therefore EMITS
+=household_id2= as =i= for W2/W3 (NOT =household_id=), even though the
+sect3<->sect2 JOIN itself uses =household_id= (present in both files
+and consistent within a wave).  Overall orphan rate vs =sample()=
+after id_walk: 1.4% (W1 0.0%, W2 0.7%, W3 0.7%, W4 4.2%, W5 2.0%) --
+a handful of farm households slightly off the cover-page spine.
+
+** GPS redaction
+
+The public ESS plot GPS coordinates are 100% replaced with the literal
+string =**CONFIDENTIAL**= in every wave (=pp_s3q06_a/_b= in W2/W3,
+=s3q09__Latitude/__Longitude= in W4/W5; W1 has no coordinate columns).
+We therefore DEFER Latitude/Longitude -- they are NOT emitted.  Note
+the GPS-*measured field area* (square metres; =pp_s3q05_a= W1-W3,
+=s3q08= W4-W5) is NOT redacted and is the primary Area source.
+
+** Area and the local-unit gap
+
+Area is GPS square-metres / 10000 -> hectares where present
+(=AreaUnit= = 'hectares').  Where only a farmer estimate in a
+non-metric local unit (Timad, Kert, Boy, Senga, Tilm, Medeb, Rope,
+Ermija) exists, we cannot convert -- the local-unit->hectare factors
+are NOT in the repo -- so =Area= is NaN and =AreaUnit= carries the
+native unit name.  GPS area covers ~80-97% of fields per wave.
+
+** W1 missing soil; wave-keyed Tenure
+
+W1 (2011-12) does NOT ask soil type, so =SoilType= is all-NaN there.
+Soil is FAO/WRB-coded and stable W2-W5 (=harmonize_soil=).
+
+The acquisition->Tenure code set EVOLVES across waves, so
+=harmonize_acquire= is WAVE-KEYED: W1-W2 use a narrow 1-6 scheme
+(W1 also re-uses alias codes 10/11/12); W3-W5 add 6='Shared Crop in'
+(sharecropped_in) and 7='Purchased' (owned).  W1 area-unit code 7
+means 'Other' (W2+ it means 'Tilm'), so =harmonize_area_unit= is also
+wave-keyed.
+
+** TenureSystem always NaN
+
+ESS land is state-owned under usufruct with no land-tenure-regime
+analogue to Uganda's mailo/freehold, so =TenureSystem= is left NaN.
+It is declared =optional: true= in =data_scheme.yml= so the all-null
+sanity check exempts it while the canonical column stays declared for
+cross-country alignment.
+
+** Files
+
+  - =Ethiopia/_/ethiopia.py:plot_features_for_wave= -- shared helper.
+  - =Ethiopia/<wave>/_/plot_features.py= -- per-wave drivers.
+  - =Ethiopia/_/plot_features.py= -- country concatenator (+ id_walk).
+  - =Ethiopia/_/categorical_mapping.org= -- =harmonize_acquire=,
+    =harmonize_soil=, =harmonize_area_unit=.
+
 * Files in Ethiopia/<SOMEYEAR>/_/
 ** DONE household_characteristics.py
 CLOSED: [2023-03-03 Fri 11:26]
