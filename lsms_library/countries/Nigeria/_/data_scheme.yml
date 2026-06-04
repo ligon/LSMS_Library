@@ -71,4 +71,23 @@ Data Scheme:
     Floor: str
     materialize: make
 
+  plot_features:
+    # Lasting plot characteristics from the post-planting Agriculture
+    # module (GH #167).  Nigeria is post-planting/post-harvest; lasting
+    # attributes are recorded only in the PP round, so each wave maps to
+    # a single t = PP quarter (2010Q3, 2012Q3, 2015Q3, 2018Q3, 2023Q3).
+    # Area (sect11a1) is joined onto plot detail (sect11b/sect11b1) on
+    # (hhid, plotid) -- two files per wave -> materialize: make.
+    # Latitude / Longitude deferred (no decimal-degree parcel coords;
+    # only GPS area in m^2).  W1 lacks soil / irrigation / tenure-system;
+    # TenureSystem populated for W5 only.
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    Tenure: str
+    TenureSystem: str
+    SoilType: str
+    Irrigated: bool
+    materialize: make
+
   nonfood_expenditures: !make

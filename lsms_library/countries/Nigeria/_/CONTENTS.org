@@ -64,3 +64,89 @@ weights but not longitudinal panel weights.
 
 - Wave 5: =ghs_panel_wave_5_basic_information_document_v1.pdf=
   (in =2023-24/Documentation/=)
+
+* plot_features (GH #167)
+
+Lasting plot characteristics from the post-planting Agriculture
+module.  Nigeria GHS-Panel is post-planting / post-harvest; the
+lasting attributes (how acquired, soil type, irrigation, tenure
+system) are recorded only in the POST-PLANTING round, so each wave
+maps to a single =t= = its PP quarter:
+
+| Wave    | t      | rows  |
+|---------+--------+-------|
+| 2010-11 | 2010Q3 |  6086 |
+| 2012-13 | 2012Q3 |  5893 |
+| 2015-16 | 2015Q3 |  5824 |
+| 2018-19 | 2018Q3 | 11076 |
+| 2023-24 | 2023Q3 |  9232 |
+|         | total  | 38111 |
+
+Index =(t, i, plot_id)=; =i= = =hhid=, =plot_id= = =plotid= (unique
+within hhid).  =v= is NOT baked in -- the framework joins it from
+=sample()= at API time.  0% duplicate index, 0% orphan vs
+=sample().i= (6936 distinct households, all present in the spine).
+=is_this_feature_sane= passes all 15 checks.
+
+** Source files
+
+Per wave, area (=sect11a1=) is joined onto plot detail
+(=sect11b= in W1, =sect11b1= in W2--W5) on =(hhid, plotid)=:
+
+| Field        | W1 (2010-11) | W2 (2012-13) | W3 (2015-16) | W4 (2018-19) | W5 (2023-24)  |
+|--------------+--------------+--------------+--------------+--------------+---------------|
+| area number  | s11aq4a      | s11aq4a      | s11aq4a      | s11aq4aa     | s11aq3_number |
+| area unit    | s11aq4b      | s11aq4b      | s11aq4b      | s11aq4b      | s11aq3_unit   |
+| GPS (sqm)    | s11aq4d      | s11aq4c      | s11aq4c      | s11aq4c      | s11mq3        |
+| acquire      | s11bq4       | s11b1q4      | s11b1q4      | s11b1q4      | s11b1q4       |
+| soil type    | --           | s11b1q44     | s11b1q44     | s11b1q44     | s11b1q61      |
+| irrigated    | --           | s11b1q39     | s11b1q39     | s11b1q39     | s11b1q56      |
+| tenure sys.  | --           | --           | --           | --           | s11b1q4b      |
+
+Traps avoided (per recon recipe):
+- W4 =s11aq4a= is a GPS yes/no FLAG, not the area; the area number is
+  =s11aq4aa=.
+- W5 fully renumbers =sect11b1=: =s11b1q39= = "right to bequeath" and
+  =s11b1q44= = "main use", NOT irrigation / soil.  Use =s11b1q56= /
+  =s11b1q61=.
+
+** Area conversion
+
+=Area= is in hectares.  Preference: GPS measurement (m^2 / 10000).
+Where GPS is missing, fall back to the farmer estimate ONLY for
+convertible units: acres (x0.404686), hectares (x1), square metres
+(/10000).  The NON-STANDARD local units (heaps, ridges, stands, plots,
+and W5's square-foot 8/9 and football-field 10) have no in-repo
+conversion factor -- for those rows =Area= is taken from GPS, and where
+GPS is missing =Area= is NaN while =AreaUnit= carries the native label.
+A >1000 ha plausibility clamp drops data-entry errors to NaN.
+Net: ~86.6% of rows have a non-null Area; non-standard units dominate
+W1--W3 (per the refuter, convertible-unit share is W1 29% / W2 28% /
+W3 25% / W4 56% / W5 49%).
+
+** Harmonization (=categorical_mapping.org=)
+
+- =harmonize_acquire= -> Tenure.  WAVE-KEYED =(Wave, Code)=: the
+  acquire scheme evolves (W1/W2 4 codes, W3 6, W4 7, W5 9 with a full
+  re-order), so a flat code map would mislabel rows (the Uganda pilot
+  bug).  purchase->owned, rented->rented_in, inheritance->inherited,
+  sharecropped-in->sharecropped_in, used-free / community / customary
+  ->communal, temporary-exchange / government / gift->other_tenure.
+- =harmonize_tenure_system= -> TenureSystem.  W5 only (=s11b1q4b=);
+  state / community / cooperative extend the canonical spellings.
+- =harmonize_soil= -> SoilType.  Stable W2--W5; W1 has no soil
+  question (SoilType NaN that wave).
+- Irrigated: 1=Yes, 2=No; the 11 ".A" sentinel and any other value
+  -> NaN.
+
+** Caveats / blockers
+
+- W1 (2010-11) carries NO soil type, irrigation, or separate
+  tenure-system question (=sect11b= stops at q28) -> those columns are
+  NaN for the entire wave.
+- TenureSystem is populated for W5 only.
+- Latitude / Longitude DEFERRED: Nigeria records only GPS plot AREA in
+  m^2, no decimal-degree parcel coordinates.
+- No id_walk applied at the country level: GHS-Panel hhids are stable
+  across waves (panel_ids maps previous_i = hhid), so there is no
+  per-wave remapping dict (mirrors Nigeria food_acquired).
