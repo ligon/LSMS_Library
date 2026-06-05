@@ -1,0 +1,620 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  3%]
+........................................................................ [  7%]
+........................................................................ [ 10%]
+........................................................................ [ 14%]
+........................................................................ [ 18%]
+.....................s..s.ss..s.s.s.s.s..ss..ss........ss.ssss.s.sssss.s [ 21%]
+s.s.sssssss.s.ssssss...ssss.sss.s.sss..s.sss..ss.ss.s.ssss.............. [ 25%]
+...............s.ss.s..................................................s [ 29%]
+s.s....................................................x...x............ [ 32%]
+......................................................................s. [ 36%]
+.....................F.......................................s.......... [ 39%]
+..........s...........s.....................s............s.............. [ 43%]
+........s............s...........x.........x....s..x........s........... [ 47%]
+...........s............s....................s...........s.............. [ 50%]
+......s...........s.........................s.............s..ss..ssx...s [ 54%]
+sss..sss..s..s.s.s...sssss.sss.ssssssssssss.sss.sss.ss.sssssssssssssss.. [ 58%]
+........................................................................ [ 61%]
+.......................................................s................ [ 65%]
+........................................................................ [ 68%]
+............................................................s........... [ 72%]
+.........s.............................................................. [ 76%]
+........................................................................ [ 79%]
+........................................................................ [ 83%]
+........s............................................................... [ 87%]
+........................................................................ [ 90%]
+...............................x..F..................................... [ 94%]
+........................................................................ [ 97%]
+..................................xx...xX                                [100%]
+=================================== FAILURES ===================================
+__________ TestTableStructure.test_readable[Guyana/household_roster] ___________
+[gw1] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+
+self = <LSMS_Library.tests.test_table_structure.TestTableStructure object at 0x1488e5a98c10>
+country = 'Guyana', table = 'household_roster'
+path = PosixPath('/global/home/users/ligon/.local/share/lsms_library/Guyana/var/household_roster.parquet')
+
+    def test_readable(self, country, table, path):
+        """Parquet file can be read into a DataFrame."""
+>       df = pd.read_parquet(path, engine="pyarrow")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_table_structure.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.11/site-packages/pandas/io/parquet.py:671: in read_parquet
+    return impl.read(
+.venv/lib/python3.11/site-packages/pandas/io/parquet.py:253: in read
+    path_or_handle, handles, filesystem = _get_path_or_handle(
+.venv/lib/python3.11/site-packages/pandas/io/parquet.py:141: in _get_path_or_handle
+    handles = get_handle(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path_or_buf = '/global/home/users/ligon/.local/share/lsms_library/Guyana/var/household_roster.parquet'
+mode = 'rb'
+
+    def get_handle(
+        path_or_buf: FilePath | BaseBuffer,
+        mode: str,
+        *,
+        encoding: str | None = None,
+        compression: CompressionOptions | None = None,
+        memory_map: bool = False,
+        is_text: bool = True,
+        errors: str | None = None,
+        storage_options: StorageOptions | None = None,
+    ) -> IOHandles[str] | IOHandles[bytes]:
+        """
+        Get file handle for given path/buffer and mode.
+    
+        Parameters
+        ----------
+        path_or_buf : str or file handle
+            File path or object.
+        mode : str
+            Mode to open path_or_buf with.
+        encoding : str or None
+            Encoding to use.
+        compression : str or dict, default 'infer'
+            For on-the-fly compression of the output data. If 'infer' and 'path_or_buf'
+            is path-like, then detect compression from the following extensions: '.gz',
+            '.bz2', '.zip', '.xz', '.zst', '.tar', '.tar.gz', '.tar.xz' or '.tar.bz2'
+            (otherwise no compression).
+            Set to ``None`` for no compression.
+            Can also be a dict with key ``'method'`` set
+            to one of {``'zip'``, ``'gzip'``, ``'bz2'``, ``'zstd'``, ``'xz'``, ``'tar'``}
+            and other key-value pairs are forwarded to
+            ``zipfile.ZipFile``, ``gzip.GzipFile``,
+            ``bz2.BZ2File``, ``zstandard.ZstdCompressor``, ``lzma.LZMAFile`` or
+            ``tarfile.TarFile``, respectively.
+            As an example, the following could be passed for faster compression and to
+            create a reproducible gzip archive:
+            ``compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1}``.
+    
+               May be a dict with key 'method' as compression mode
+               and other keys as compression options if compression
+               mode is 'zip'.
+    
+               Passing compression options as keys in dict is
+               supported for compression modes 'gzip', 'bz2', 'zstd' and 'zip'.
+    
+        memory_map : bool, default False
+            See parsers._parser_params for more information. Only used by read_csv.
+        is_text : bool, default True
+            Whether the type of the content passed to the file/buffer is string or
+            bytes. This is not the same as `"b" not in mode`. If a string content is
+            passed to a binary file/buffer, a wrapper is inserted.
+        errors : str, default 'strict'
+            Specifies how encoding and decoding errors are to be handled.
+            See the errors argument for :func:`open` for a full list
+            of options.
+        storage_options: StorageOptions = None
+            Passed to _get_filepath_or_buffer
+    
+        Returns the dataclass IOHandles
+        """
+        # Windows does not default to utf-8. Set to utf-8 for a consistent behavior
+        encoding = encoding or "utf-8"
+    
+        errors = errors or "strict"
+    
+        # read_csv does not know whether the buffer is opened in binary/text mode
+        if _is_binary_mode(path_or_buf, mode) and "b" not in mode:
+            mode += "b"
+    
+        # validate encoding and errors
+        codecs.lookup(encoding)
+        if isinstance(errors, str):
+            codecs.lookup_error(errors)
+    
+        # open URLs
+        ioargs = _get_filepath_or_buffer(
+            path_or_buf,
+            encoding=encoding,
+            compression=compression,
+            mode=mode,
+            storage_options=storage_options,
+        )
+    
+        handle = ioargs.filepath_or_buffer
+        handles: list[BaseBuffer]
+    
+        # memory mapping needs to be the first step
+        # only used for read_csv
+        handle, memory_map, handles = _maybe_memory_map(handle, memory_map)
+    
+        is_path = isinstance(handle, str)
+        compression_args = dict(ioargs.compression)
+        compression = compression_args.pop("method")
+    
+        # Only for write methods
+        if "r" not in mode and is_path:
+            check_parent_directory(str(handle))
+    
+        if compression:
+            if compression != "zstd":
+                # compression libraries do not like an explicit text-mode
+                ioargs.mode = ioargs.mode.replace("t", "")
+            elif compression == "zstd" and "b" not in ioargs.mode:
+                # python-zstandard defaults to text mode, but we always expect
+                # compression libraries to use binary mode.
+                ioargs.mode += "b"
+    
+            # GZ Compression
+            if compression == "gzip":
+                if isinstance(handle, str):
+                    # error: Incompatible types in assignment (expression has type
+                    # "GzipFile", variable has type "Union[str, BaseBuffer]")
+                    handle = gzip.GzipFile(  # type: ignore[assignment]
+                        filename=handle,
+                        mode=ioargs.mode,
+                        **compression_args,
+                    )
+                else:
+                    handle = gzip.GzipFile(
+                        # No overload variant of "GzipFile" matches argument types
+                        # "Union[str, BaseBuffer]", "str", "Dict[str, Any]"
+                        fileobj=handle,  # type: ignore[call-overload]
+                        mode=ioargs.mode,
+                        **compression_args,
+                    )
+    
+            # BZ Compression
+            elif compression == "bz2":
+                import bz2
+    
+                # Overload of "BZ2File" to handle pickle protocol 5
+                # "Union[str, BaseBuffer]", "str", "Dict[str, Any]"
+                handle = bz2.BZ2File(  # type: ignore[call-overload]
+                    handle,
+                    mode=ioargs.mode,
+                    **compression_args,
+                )
+    
+            # ZIP Compression
+            elif compression == "zip":
+                # error: Argument 1 to "_BytesZipFile" has incompatible type
+                # "Union[str, BaseBuffer]"; expected "Union[Union[str, PathLike[str]],
+                # ReadBuffer[bytes], WriteBuffer[bytes]]"
+                handle = _BytesZipFile(
+                    handle,  # type: ignore[arg-type]
+                    ioargs.mode,
+                    **compression_args,
+                )
+                if handle.buffer.mode == "r":
+                    handles.append(handle)
+                    zip_names = handle.buffer.namelist()
+                    if len(zip_names) == 1:
+                        handle = handle.buffer.open(zip_names.pop())
+                    elif not zip_names:
+                        raise ValueError(f"Zero files found in ZIP file {path_or_buf}")
+                    else:
+                        raise ValueError(
+                            "Multiple files found in ZIP file. "
+                            f"Only one file per ZIP: {zip_names}"
+                        )
+    
+            # TAR Encoding
+            elif compression == "tar":
+                compression_args.setdefault("mode", ioargs.mode)
+                if isinstance(handle, str):
+                    handle = _BytesTarFile(name=handle, **compression_args)
+                else:
+                    # error: Argument "fileobj" to "_BytesTarFile" has incompatible
+                    # type "BaseBuffer"; expected "Union[ReadBuffer[bytes],
+                    # WriteBuffer[bytes], None]"
+                    handle = _BytesTarFile(
+                        fileobj=handle,  # type: ignore[arg-type]
+                        **compression_args,
+                    )
+                assert isinstance(handle, _BytesTarFile)
+                if "r" in handle.buffer.mode:
+                    handles.append(handle)
+                    files = handle.buffer.getnames()
+                    if len(files) == 1:
+                        file = handle.buffer.extractfile(files[0])
+                        assert file is not None
+                        handle = file
+                    elif not files:
+                        raise ValueError(f"Zero files found in TAR archive {path_or_buf}")
+                    else:
+                        raise ValueError(
+                            "Multiple files found in TAR archive. "
+                            f"Only one file per TAR archive: {files}"
+                        )
+    
+            # XZ Compression
+            elif compression == "xz":
+                # error: Argument 1 to "LZMAFile" has incompatible type "Union[str,
+                # BaseBuffer]"; expected "Optional[Union[Union[str, bytes, PathLike[str],
+                # PathLike[bytes]], IO[bytes]], None]"
+                import lzma
+    
+                handle = lzma.LZMAFile(
+                    handle,  # type: ignore[arg-type]
+                    ioargs.mode,
+                    **compression_args,
+                )
+    
+            # Zstd Compression
+            elif compression == "zstd":
+                zstd = import_optional_dependency("zstandard")
+                if "r" in ioargs.mode:
+                    open_args = {"dctx": zstd.ZstdDecompressor(**compression_args)}
+                else:
+                    open_args = {"cctx": zstd.ZstdCompressor(**compression_args)}
+                handle = zstd.open(
+                    handle,
+                    mode=ioargs.mode,
+                    **open_args,
+                )
+    
+            # Unrecognized Compression
+            else:
+                msg = f"Unrecognized compression type: {compression}"
+                raise ValueError(msg)
+    
+            assert not isinstance(handle, str)
+            handles.append(handle)
+    
+        elif isinstance(handle, str):
+            # Check whether the filename is to be opened in binary mode.
+            # Binary mode does not support 'encoding' and 'newline'.
+            if ioargs.encoding and "b" not in ioargs.mode:
+                # Encoding
+                handle = open(
+                    handle,
+                    ioargs.mode,
+                    encoding=ioargs.encoding,
+                    errors=errors,
+                    newline="",
+                )
+            else:
+                # Binary mode
+>               handle = open(handle, ioargs.mode)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E               FileNotFoundError: [Errno 2] No such file or directory: '/global/home/users/ligon/.local/share/lsms_library/Guyana/var/household_roster.parquet'
+
+.venv/lib/python3.11/site-packages/pandas/io/common.py:935: FileNotFoundError
+________ TestFeatureSanity.test_feature_is_sane[Ethiopia/food_acquired] ________
+[gw1] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+
+self = <LSMS_Library.tests.test_table_structure.TestFeatureSanity object at 0x1488e585f490>
+country = 'Ethiopia', table = 'food_acquired'
+path = PosixPath('/global/home/users/ligon/.local/share/lsms_library/Ethiopia/var/food_acquired.parquet')
+
+    def test_feature_is_sane(self, country, table, path):
+        """Each cached feature must pass is_this_feature_sane (no failures)."""
+        from lsms_library.diagnostics import is_this_feature_sane
+>       df = pd.read_parquet(path, engine="pyarrow")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_table_structure.py:257: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.11/site-packages/pandas/io/parquet.py:671: in read_parquet
+    return impl.read(
+.venv/lib/python3.11/site-packages/pandas/io/parquet.py:253: in read
+    path_or_handle, handles, filesystem = _get_path_or_handle(
+.venv/lib/python3.11/site-packages/pandas/io/parquet.py:141: in _get_path_or_handle
+    handles = get_handle(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path_or_buf = '/global/home/users/ligon/.local/share/lsms_library/Ethiopia/var/food_acquired.parquet'
+mode = 'rb'
+
+    def get_handle(
+        path_or_buf: FilePath | BaseBuffer,
+        mode: str,
+        *,
+        encoding: str | None = None,
+        compression: CompressionOptions | None = None,
+        memory_map: bool = False,
+        is_text: bool = True,
+        errors: str | None = None,
+        storage_options: StorageOptions | None = None,
+    ) -> IOHandles[str] | IOHandles[bytes]:
+        """
+        Get file handle for given path/buffer and mode.
+    
+        Parameters
+        ----------
+        path_or_buf : str or file handle
+            File path or object.
+        mode : str
+            Mode to open path_or_buf with.
+        encoding : str or None
+            Encoding to use.
+        compression : str or dict, default 'infer'
+            For on-the-fly compression of the output data. If 'infer' and 'path_or_buf'
+            is path-like, then detect compression from the following extensions: '.gz',
+            '.bz2', '.zip', '.xz', '.zst', '.tar', '.tar.gz', '.tar.xz' or '.tar.bz2'
+            (otherwise no compression).
+            Set to ``None`` for no compression.
+            Can also be a dict with key ``'method'`` set
+            to one of {``'zip'``, ``'gzip'``, ``'bz2'``, ``'zstd'``, ``'xz'``, ``'tar'``}
+            and other key-value pairs are forwarded to
+            ``zipfile.ZipFile``, ``gzip.GzipFile``,
+            ``bz2.BZ2File``, ``zstandard.ZstdCompressor``, ``lzma.LZMAFile`` or
+            ``tarfile.TarFile``, respectively.
+            As an example, the following could be passed for faster compression and to
+            create a reproducible gzip archive:
+            ``compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1}``.
+    
+               May be a dict with key 'method' as compression mode
+               and other keys as compression options if compression
+               mode is 'zip'.
+    
+               Passing compression options as keys in dict is
+               supported for compression modes 'gzip', 'bz2', 'zstd' and 'zip'.
+    
+        memory_map : bool, default False
+            See parsers._parser_params for more information. Only used by read_csv.
+        is_text : bool, default True
+            Whether the type of the content passed to the file/buffer is string or
+            bytes. This is not the same as `"b" not in mode`. If a string content is
+            passed to a binary file/buffer, a wrapper is inserted.
+        errors : str, default 'strict'
+            Specifies how encoding and decoding errors are to be handled.
+            See the errors argument for :func:`open` for a full list
+            of options.
+        storage_options: StorageOptions = None
+            Passed to _get_filepath_or_buffer
+    
+        Returns the dataclass IOHandles
+        """
+        # Windows does not default to utf-8. Set to utf-8 for a consistent behavior
+        encoding = encoding or "utf-8"
+    
+        errors = errors or "strict"
+    
+        # read_csv does not know whether the buffer is opened in binary/text mode
+        if _is_binary_mode(path_or_buf, mode) and "b" not in mode:
+            mode += "b"
+    
+        # validate encoding and errors
+        codecs.lookup(encoding)
+        if isinstance(errors, str):
+            codecs.lookup_error(errors)
+    
+        # open URLs
+        ioargs = _get_filepath_or_buffer(
+            path_or_buf,
+            encoding=encoding,
+            compression=compression,
+            mode=mode,
+            storage_options=storage_options,
+        )
+    
+        handle = ioargs.filepath_or_buffer
+        handles: list[BaseBuffer]
+    
+        # memory mapping needs to be the first step
+        # only used for read_csv
+        handle, memory_map, handles = _maybe_memory_map(handle, memory_map)
+    
+        is_path = isinstance(handle, str)
+        compression_args = dict(ioargs.compression)
+        compression = compression_args.pop("method")
+    
+        # Only for write methods
+        if "r" not in mode and is_path:
+            check_parent_directory(str(handle))
+    
+        if compression:
+            if compression != "zstd":
+                # compression libraries do not like an explicit text-mode
+                ioargs.mode = ioargs.mode.replace("t", "")
+            elif compression == "zstd" and "b" not in ioargs.mode:
+                # python-zstandard defaults to text mode, but we always expect
+                # compression libraries to use binary mode.
+                ioargs.mode += "b"
+    
+            # GZ Compression
+            if compression == "gzip":
+                if isinstance(handle, str):
+                    # error: Incompatible types in assignment (expression has type
+                    # "GzipFile", variable has type "Union[str, BaseBuffer]")
+                    handle = gzip.GzipFile(  # type: ignore[assignment]
+                        filename=handle,
+                        mode=ioargs.mode,
+                        **compression_args,
+                    )
+                else:
+                    handle = gzip.GzipFile(
+                        # No overload variant of "GzipFile" matches argument types
+                        # "Union[str, BaseBuffer]", "str", "Dict[str, Any]"
+                        fileobj=handle,  # type: ignore[call-overload]
+                        mode=ioargs.mode,
+                        **compression_args,
+                    )
+    
+            # BZ Compression
+            elif compression == "bz2":
+                import bz2
+    
+                # Overload of "BZ2File" to handle pickle protocol 5
+                # "Union[str, BaseBuffer]", "str", "Dict[str, Any]"
+                handle = bz2.BZ2File(  # type: ignore[call-overload]
+                    handle,
+                    mode=ioargs.mode,
+                    **compression_args,
+                )
+    
+            # ZIP Compression
+            elif compression == "zip":
+                # error: Argument 1 to "_BytesZipFile" has incompatible type
+                # "Union[str, BaseBuffer]"; expected "Union[Union[str, PathLike[str]],
+                # ReadBuffer[bytes], WriteBuffer[bytes]]"
+                handle = _BytesZipFile(
+                    handle,  # type: ignore[arg-type]
+                    ioargs.mode,
+                    **compression_args,
+                )
+                if handle.buffer.mode == "r":
+                    handles.append(handle)
+                    zip_names = handle.buffer.namelist()
+                    if len(zip_names) == 1:
+                        handle = handle.buffer.open(zip_names.pop())
+                    elif not zip_names:
+                        raise ValueError(f"Zero files found in ZIP file {path_or_buf}")
+                    else:
+                        raise ValueError(
+                            "Multiple files found in ZIP file. "
+                            f"Only one file per ZIP: {zip_names}"
+                        )
+    
+            # TAR Encoding
+            elif compression == "tar":
+                compression_args.setdefault("mode", ioargs.mode)
+                if isinstance(handle, str):
+                    handle = _BytesTarFile(name=handle, **compression_args)
+                else:
+                    # error: Argument "fileobj" to "_BytesTarFile" has incompatible
+                    # type "BaseBuffer"; expected "Union[ReadBuffer[bytes],
+                    # WriteBuffer[bytes], None]"
+                    handle = _BytesTarFile(
+                        fileobj=handle,  # type: ignore[arg-type]
+                        **compression_args,
+                    )
+                assert isinstance(handle, _BytesTarFile)
+                if "r" in handle.buffer.mode:
+                    handles.append(handle)
+                    files = handle.buffer.getnames()
+                    if len(files) == 1:
+                        file = handle.buffer.extractfile(files[0])
+                        assert file is not None
+                        handle = file
+                    elif not files:
+                        raise ValueError(f"Zero files found in TAR archive {path_or_buf}")
+                    else:
+                        raise ValueError(
+                            "Multiple files found in TAR archive. "
+                            f"Only one file per TAR archive: {files}"
+                        )
+    
+            # XZ Compression
+            elif compression == "xz":
+                # error: Argument 1 to "LZMAFile" has incompatible type "Union[str,
+                # BaseBuffer]"; expected "Optional[Union[Union[str, bytes, PathLike[str],
+                # PathLike[bytes]], IO[bytes]], None]"
+                import lzma
+    
+                handle = lzma.LZMAFile(
+                    handle,  # type: ignore[arg-type]
+                    ioargs.mode,
+                    **compression_args,
+                )
+    
+            # Zstd Compression
+            elif compression == "zstd":
+                zstd = import_optional_dependency("zstandard")
+                if "r" in ioargs.mode:
+                    open_args = {"dctx": zstd.ZstdDecompressor(**compression_args)}
+                else:
+                    open_args = {"cctx": zstd.ZstdCompressor(**compression_args)}
+                handle = zstd.open(
+                    handle,
+                    mode=ioargs.mode,
+                    **open_args,
+                )
+    
+            # Unrecognized Compression
+            else:
+                msg = f"Unrecognized compression type: {compression}"
+                raise ValueError(msg)
+    
+            assert not isinstance(handle, str)
+            handles.append(handle)
+    
+        elif isinstance(handle, str):
+            # Check whether the filename is to be opened in binary mode.
+            # Binary mode does not support 'encoding' and 'newline'.
+            if ioargs.encoding and "b" not in ioargs.mode:
+                # Encoding
+                handle = open(
+                    handle,
+                    ioargs.mode,
+                    encoding=ioargs.encoding,
+                    errors=errors,
+                    newline="",
+                )
+            else:
+                # Binary mode
+>               handle = open(handle, ioargs.mode)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E               FileNotFoundError: [Errno 2] No such file or directory: '/global/home/users/ligon/.local/share/lsms_library/Ethiopia/var/food_acquired.parquet'
+
+.venv/lib/python3.11/site-packages/pandas/io/common.py:935: FileNotFoundError
+=============================== warnings summary ===============================
+tests/test_dvc_caching.py: 13 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:922: UserWarning: Country directory not found for 'TestCountry'
+    warnings.warn(f"Country directory not found for {country_name!r}")
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Albania]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Albania]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1712: UserWarning: Albania: waves ['2002', '2005', '2008'] have 100% NaN v after _join_v_from_sample; these will be silently dropped from derived tables (household_characteristics, food_expenditures, food_prices, food_quantities) by the downstream groupby.  Check i-key compatibility between the roster source and the sample table -- compare wave-level data_info.yml's `idxvars.i` on each side.  See GH #256 for context and PRs #244 / #253 / #255 for the established fix pattern.
+    df = self._join_v_from_sample(df)
+
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_no_float_stringified_v_in_sample
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_sample_v_matches_cluster_features_v[2005-06]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq1
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_no_float_stringified_v_in_sample
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_sample_v_matches_cluster_features_v[2005-06]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq3
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[India]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[India]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1712: UserWarning: India: waves ['1997-98'] have 100% NaN v after _join_v_from_sample; these will be silently dropped from derived tables (household_characteristics, food_expenditures, food_prices, food_quantities) by the downstream groupby.  Check i-key compatibility between the roster source and the sample table -- compare wave-level data_info.yml's `idxvars.i` on each side.  See GH #256 for context and PRs #244 / #253 / #255 for the established fix pattern.
+    df = self._join_v_from_sample(df)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Iraq]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Iraq]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1712: UserWarning: Iraq: waves ['2012'] have 100% NaN v after _join_v_from_sample; these will be silently dropped from derived tables (household_characteristics, food_expenditures, food_prices, food_quantities) by the downstream groupby.  Check i-key compatibility between the roster source and the sample table -- compare wave-level data_info.yml's `idxvars.i` on each side.  See GH #256 for context and PRs #244 / #253 / #255 for the established fix pattern.
+    df = self._join_v_from_sample(df)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[South Africa]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[South Africa]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1741: UserWarning: Unknown relationship labels (add to kinship.yml): ['-1']
+    df = _expand_kinship(df)
+
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR230_Guyana_household_characteristics]
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR230_Azerbaijan_household_characteristics]
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR230_Serbia_and_Montenegro_household_characteristics]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/diagnostics.py:771: UserWarning: household_characteristics: replaced 448 roster rows with NaN in one of ['t', 'v', 'i'] (typically v) by sentinel 'Mover' -- per-wave: {'2009-10': 110, '2013-14': 7, '2018-19': 328, '2019-20': 3}.  These are usually movers / split-offs whose sample() row lacks a cluster code.  Filter on index.get_level_values('v') == 'Mover' to recover the legacy drop (GH #197, GH #268).
+    ref_df = ref_method()
+
+tests/test_sample.py::TestUganda2009MarketFallback::test_household_characteristics_retains_hybrid_v_HH
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/tests/test_sample.py:405: UserWarning: household_characteristics: replaced 448 roster rows with NaN in one of ['t', 'v', 'i'] (typically v) by sentinel 'Mover' -- per-wave: {'2009-10': 110, '2013-14': 7, '2018-19': 328, '2019-20': 3}.  These are usually movers / split-offs whose sample() row lacks a cluster code.  Filter on index.get_level_values('v') == 'Mover' to recover the legacy drop (GH #197, GH #268).
+    return ll.Country("Uganda").household_characteristics(market="Region")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_table_structure.py::TestTableStructure::test_readable[Guyana/household_roster]
+FAILED tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Ethiopia/food_acquired]
+2 failed, 1819 passed, 153 skipped, 10 xfailed, 1 xpassed, 29 warnings in 356.16s (0:05:56)
+EXIT=1
