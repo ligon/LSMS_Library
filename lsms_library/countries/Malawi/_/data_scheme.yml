@@ -11,7 +11,7 @@ Data Scheme:
     Region: str
     District: str
   cluster_features:
-    index: (t, v, i)
+    index: (t, v)
     Region: str
     District: str
     Rural: str
