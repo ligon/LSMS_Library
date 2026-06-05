@@ -117,16 +117,19 @@ class TestSilentHHDropWarns:
 
     def test_warning_emitted_with_per_wave_breakdown(self, uga_hc_warnings):
         # Some Uganda waves have NaN-v roster rows (panel-refresh movers,
-        # 2018-19 parish-name gaps).  The warning must fire and name the
-        # affected waves.  ``uga_hc_warnings`` is the captured list from
-        # the module-scoped fixture (skips on no-DVC environments).
+        # 2018-19 parish-name gaps).  Since GH #268 these rows are no
+        # longer silently dropped -- they are retained under a 'Mover'
+        # sentinel and the warning reports the per-wave count.  The
+        # warning must still fire and name the affected waves.
+        # ``uga_hc_warnings`` is the captured list from the module-scoped
+        # fixture (skips on no-DVC environments).
         relevant = [
             w for w in uga_hc_warnings
             if 'household_characteristics' in str(w.message)
-            and 'dropped' in str(w.message)
+            and 'sentinel' in str(w.message)
         ]
         assert relevant, (
-            "Expected a UserWarning naming the dropped roster rows; "
+            "Expected a UserWarning naming the sentinel-'Mover' roster rows; "
             f"got: {[str(w.message)[:80] for w in uga_hc_warnings]}"
         )
         msg = str(relevant[0].message)

@@ -1,9 +1,5 @@
 # Formatting functions for EthiopiaRHS (ERHS).
 #
-# Formatting helpers ONLY -- intentionally NO `waves`/`Waves` dict, so
-# Country.waves falls through to SOURCE.org auto-discovery
-# (country.py:1054-1073). See _/CONTENTS.org and GH #271.
-#
 # ERHS `hhid` (HH no. for this survey) is unique only WITHIN a peasant
 # association, so household identity is the composite (village, hhid)
 # -- the EHCVM (grappe, menage) pattern. Pure YAML cannot express a
@@ -14,6 +10,17 @@ import numpy as np
 import pandas as pd
 
 import lsms_library.local_tools as tools
+
+
+# Explicit `waves` list (consumed by Country.waves, country.py:1054-1073):
+# only the FIVE wired rounds are declared.  Rounds 1999/2004/2009
+# (R5/R6/R7) are deliberately excluded -- the IFPRI Dataverse archive has
+# no person roster and no item-level food for them (only pre-aggregated
+# consumption scalars), so they are NOT WIREABLE for the canonical tables
+# and must not appear in sample() / derived-table wave coverage.  Their
+# ``Documentation/`` dirs are retained on disk for provenance.
+# See _/CONTENTS.org (decision 2026-06-05) and GH #271 / #277.
+waves = ['1989', '1994a', '1994b', '1995', '1997']
 
 
 # Units whose kg-equivalent is good-INvariant (a kg is a kg whatever

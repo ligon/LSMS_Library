@@ -106,10 +106,14 @@ appear to have village-level split files (=debdemo4=, =dindemo4=,
   (=consumptionaggregates_123456.tab= cols =*5=/=*6=;
   =consumptionAggrgates_r7.tab= for 2009).  =household_roster= /
   =food_acquired= cannot be built without violating the library's
-  item-level principle.  Decision (2026-05-18): keep declared as
-  waves (SOURCE.org auto-discovery) but unwired; the pre-aggregated
-  consumption is out of scope for GH #271 (would be a separate
-  non-canonical table).
+  item-level principle.  Decision (2026-06-05, supersedes 2026-05-18):
+  *drop 1999/2004/2009 from* =Country.waves= via an explicit
+  =waves= list in =_/ethiopiarhs.py= (rather than leaving them
+  auto-discovered-but-unwired).  Auto-discovery made them appear in
+  =waves= while =sample()= could not cover them, failing
+  =test_covers_all_waves[EthiopiaRHS]=.  The =Documentation/= dirs are
+  retained on disk for provenance; the pre-aggregated consumption is
+  out of scope for GH #271 (would be a separate non-canonical table).
 - [X] Auto-derived =household_characteristics= / =food_expenditures= /
   =food_quantities= build across the 5 wired waves (1989 + four
   1990s); zero kinship warnings.  Validation against survey
