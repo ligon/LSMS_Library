@@ -9,6 +9,7 @@ trigger builds.
 
 import os
 import re
+import time
 from pathlib import Path
 
 import pandas as pd
@@ -145,6 +146,36 @@ def cached_parquets():
 # Parametrized tests over cached tables
 # ---------------------------------------------------------------------------
 
+def _read_or_skip(path) -> pd.DataFrame:
+    """Read a cached parquet, tolerating concurrent cache mutation (GH #330).
+
+    ``CACHED`` is enumerated at *collection* time, but the file is read at
+    *execution* time.  Under the parallel suite (``-n N --dist=loadfile``) a
+    concurrent cache-mutating test (e.g. ``test_canonical_shape_via_cache_miss``
+    unlinks shared ``var/*.parquet`` to force a rebuild) can delete or rewrite
+    the file in between, producing a transient ``FileNotFoundError`` or a torn
+    read (``ArrowInvalid``).  A parquet that vanishes mid-run was never a stable
+    target, so skipping — rather than failing — is faithful to this module's
+    "only test what is already cached" contract.
+
+    Works under any ``--dist`` mode, unlike ``@pytest.mark.xdist_group`` which
+    is a no-op under the configured ``--dist=loadfile``.
+    """
+    from pyarrow.lib import ArrowInvalid
+
+    for attempt in range(2):
+        try:
+            return pd.read_parquet(path, engine="pyarrow")
+        except (FileNotFoundError, ArrowInvalid):
+            if attempt == 0:
+                time.sleep(0.25)  # torn mid-rewrite → let the writer finish
+                continue
+            pytest.skip(
+                f"{Path(path).name} vanished/rewritten mid-run "
+                f"(concurrent cache mutation, GH #330)"
+            )
+
+
 def _cached_ids():
     return [f"{c}/{t}" for c, t, _ in CACHED]
 
@@ -158,7 +189,7 @@ class TestTableStructure:
 
     def test_readable(self, country, table, path):
         """Parquet file can be read into a DataFrame."""
-        df = pd.read_parquet(path, engine="pyarrow")
+        df = _read_or_skip(path)
         assert isinstance(df, pd.DataFrame)
         assert len(df) > 0, f"{country}/{table} is empty"
 
@@ -169,7 +200,7 @@ class TestTableStructure:
         if not expected_idx:
             pytest.skip(f"{country}/{table} has no declared index")
 
-        df = pd.read_parquet(path, engine="pyarrow")
+        df = _read_or_skip(path)
         actual_idx = list(df.index.names)
 
         # Check that declared levels are present (order may vary,
@@ -201,7 +232,7 @@ class TestTableStructure:
         # Columns declared optional in data_scheme.yml (genuinely unavailable data).
         optional_cols = spec.get("optional", set())
 
-        df = pd.read_parquet(path, engine="pyarrow")
+        df = _read_or_skip(path)
         all_names = set(df.columns.tolist() + list(df.index.names))
 
         for col_name in expected_cols:
@@ -218,7 +249,7 @@ class TestTableStructure:
         """No non-optional column should be entirely null."""
         spec = ALL_SCHEMES[country][table]
         optional_cols = spec.get("optional", set())
-        df = pd.read_parquet(path, engine="pyarrow")
+        df = _read_or_skip(path)
         for col in df.columns:
             if col in optional_cols:
                 continue  # genuinely absent data is allowed to be all-null
@@ -230,7 +261,7 @@ class TestTableStructure:
         """Index should be unique (no exact duplicate rows by index)."""
         # Known: some tables (e.g., shocks) have legitimate duplicate indices
         # from multiple shock types per household.  We flag >50% as likely errors.
-        df = pd.read_parquet(path, engine="pyarrow")
+        df = _read_or_skip(path)
         if df.index.has_duplicates:
             dup_count = df.index.duplicated().sum()
             total = len(df)
@@ -254,7 +285,7 @@ class TestFeatureSanity:
     def test_feature_is_sane(self, country, table, path):
         """Each cached feature must pass is_this_feature_sane (no failures)."""
         from lsms_library.diagnostics import is_this_feature_sane
-        df = pd.read_parquet(path, engine="pyarrow")
+        df = _read_or_skip(path)
         report = is_this_feature_sane(df, country, table)
         if not report.ok:
             report.summarize()
