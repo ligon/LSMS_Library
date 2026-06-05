@@ -25,7 +25,7 @@ For domain-specific guidance on particular features, load the relevant sub-skill
 
 ## World Bank reference code
 
-The World Bank's LSMS-ISA Harmonised Panel project has Stata code mapping raw files and variables for all 8 countries. Saved at `/var/tmp/lsms-isa-harmonised/reproduction/Reproduction_v2/Code/Cleaning_code/`. GitHub: `lsms-worldbank/LSMS-ISA-harmonised-dataset-on-agricultural-productivity-and-welfare` (release v2.0).
+The World Bank's LSMS-ISA Harmonised Panel project has Stata code mapping raw files and variables for all 8 countries. The authoritative source is GitHub: `lsms-worldbank/LSMS-ISA-harmonised-dataset-on-agricultural-productivity-and-welfare` (release v2.0). A local checkout *may* exist at `/var/tmp/lsms-isa-harmonised/reproduction/Reproduction_v2/Code/Cleaning_code/`, but `/var/tmp` is ephemeral / node-local on HPC — do not rely on it across sessions or nodes; clone from GitHub if it is absent.
 
 Their goal (one huge merged .dta) differs from ours (uniform API, preserve detail), but their per-wave do files reveal file names, variable names, and ID linkage logic that are useful reference. Treat with skepticism — verify against actual data.
 
@@ -113,7 +113,12 @@ Identify which `.dta` file in each wave contains the needed variables.
 3. **Questionnaire PDFs** in `{wave}/Documentation/`
 4. **Naming convention inference** — within a wave, variables follow patterns (e.g., `hh_b02`, `hh_b03`, `hh_b04`)
 
-**Always pull the data and inspect it directly:**
+**Always pull the data and inspect it directly.** The `from_dta` /
+`pyreadstat.read_dta` idioms below are for **interactive inspection only** —
+both appear in CLAUDE.md's anti-patterns table and must NOT be copied into
+feature scripts. In scripts proper, always read via `get_dataframe()` /
+`df_data_grabber()` from `local_tools` (handles the local → DVC → WB-NADA
+fallback chain), and never hardcode an absolute path.
 ```python
 from ligonlibrary.dataframes import from_dta
 df = from_dta('/path/to/file.dta')
@@ -292,7 +297,27 @@ This tells the library: "look up the org table named `harmonize_food`, use the `
 
 ### Step 7: Verify
 
-**Run the built-in sanity checker:**
+**FIRST — defeat the cache, or you may verify stale data.** The library does
+NOT auto-invalidate caches when you edit a `data_info.yml`, a `_/{table}.py`
+script, or an upstream `.dta` (see CLAUDE.md "Cache Behavior"). A warm L2
+parquet from before your change will silently shadow your new wiring, so
+`c.{feature_name}()` can return old data — making a broken build look fine, or
+a correct fix look broken. Always verify a fresh build:
+
+```bash
+# either force a no-cache read for the session …
+LSMS_NO_CACHE=1 python -c "import lsms_library as ll; ll.Country('{Country}').{feature_name}()"
+# … or hard-clear this country's caches, then rebuild
+lsms-library cache clear --country {Country}
+```
+
+For script-path tables (`materialize: make`) a stale **L2-wave** parquet can
+shadow a source-script fix even under `LSMS_NO_CACHE=1`; prefer
+`lsms-library cache clear --country {Country}` (or `pytest --rebuild-caches`)
+in that case. This is not hypothetical — stale caches have masked real build
+bugs and broken tests (see the cache-staleness notes in CLAUDE.md).
+
+**Then run the built-in sanity checker** (against the fresh build):
 ```python
 from lsms_library.diagnostics import is_this_feature_sane
 import lsms_library as ll
