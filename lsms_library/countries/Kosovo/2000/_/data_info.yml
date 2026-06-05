@@ -59,6 +59,22 @@ household_roster:
                   5: Widow/er
                   6: Never ma
 
+individual_education:
+    file: "../Data/EDUC.dta"
+    idxvars:
+        i: hhid
+        pid: s04_q00
+    myvars:
+        Educational Attainment:
+            - s04_q4b
+            - mapping:
+                Pre-Scho: Pre-School
+                Primary: Primary
+                'Second. ': Secondary
+                Gymnasiu: Gymnasium
+                Vocation: Vocational
+                Universi: University
+
 sample:
     file: "../Data/ID.dta"
     idxvars:
@@ -71,3 +87,12 @@ sample:
             - mapping:
                 Rural: Rural
                 Urban: Urban
+
+assets:
+    file: "../Data/DURGOODS.dta"
+    idxvars:
+        i: hhid
+        j: s10e_01
+    myvars:
+        Age: s10e_02
+        Value: s10e_4a

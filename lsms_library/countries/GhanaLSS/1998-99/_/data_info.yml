@@ -35,3 +35,36 @@ household_roster:
         Birthplace: s1q10
         Relationship: rel
         MonthsAway: s1q21
+
+individual_education:
+    file: SEC2A.DTA
+    idxvars:
+        v: clust
+        i:
+            - clust
+            - nh
+        pid: pid
+    myvars:
+        # s2aq2 = "highest level completed" (bare numeric codes in the .dta;
+        # decoded from the GLSS4 household questionnaire, Section 2A).
+        Educational Attainment:
+            - s2aq2
+            - mapping:
+                1: None
+                2: Kindergarten
+                3: Primary
+                4: Middle
+                5: JSS
+                6: SSS
+                7: Voc / Comm
+                8: Sec. (O Level)
+                9: Sixth Form
+                10: Teacher Training
+                11: Technical
+                12: P/Sec. Teacher Training
+                13: Nursing
+                14: P/Sec. Nursing
+                15: Polytechnic
+                16: University
+                17: Koranic stage
+                96: Other

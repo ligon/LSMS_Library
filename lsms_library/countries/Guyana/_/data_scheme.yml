@@ -1,10 +1,21 @@
 Country: Guyana
 
 Data Scheme:
+  assets:
+    index: (t, i, j)
+    Quantity: float
+    Value: float
+    materialize: make
+
   cluster_features:
     index: (t, v)
     Region: str
     Rural: str
+
+  interview_date:
+    index: (t, i)
+    Int_t: datetime
+    materialize: make
 
   household_roster:
     index: (t, i, pid)

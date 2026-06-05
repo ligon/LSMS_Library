@@ -48,3 +48,5 @@ Data Scheme:
     Region: str
     Woreda: str
     Rural: str
+
+  panel_ids: !make

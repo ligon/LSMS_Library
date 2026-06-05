@@ -26,7 +26,16 @@ Data Scheme:
     Distance: int
     Affinity: str
     Educational Attainment: str
+  individual_education:
+    index: (t, i, pid)
+    Educational Attainment: str
+
   employment:
     index: (t, i, pid)
     Cash_per_day: float
     Rural: str
+
+  interview_date:
+    index: (t, i)
+    Int_t: datetime
+    materialize: make

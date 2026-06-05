@@ -447,3 +447,51 @@
 | Sand/Cement                    | Cement          |
 | Concrete Slab                  | Concrete        |
 | Timber                         | Wood            |
+
+* plot_features (GH #167)
+
+# Code -> canonical-label tables consumed by
+# tanzania.plot_features_for_wave (see Tanzania/_/tanzania.py).  Both
+# NPS waves with an agriculture roster (2019-20 NPS-SDD Extended
+# Panel, 2020-21 NPS Y5 Refresh Panel) share an IDENTICAL integer
+# code scheme for the AG_SEC_3A categorical variables (verified by
+# reading the Stata value labels directly), so a single non-wave-keyed
+# (Code) table per concept is sufficient.  We key on the integer code,
+# never on the label string -- 2020-21 lowercases several labels
+# ('loam' vs 'LOAM', 'inheritance' vs 'INHERITANCE').
+
+# harmonize_tenure -- ag3a_25 "How did you acquire this plot?" codes to
+# canonical Tenure spellings.  An override is applied in code from
+# ag3a_03 use-status (2 RENTED OUT / 3 GIVEN OUT -> rented_out).
+#+name: harmonize_tenure
+| Code | Preferred Label  |
+|------+------------------|
+|    1 | inherited        |
+|    2 | inherited        |
+|    3 | other_tenure     |
+|    4 | communal         |
+|    5 | owned            |
+|    6 | other_tenure     |
+|    7 | rented_in        |
+|    8 | sharecropped_in  |
+|    9 | sharecropped_out |
+|   10 | communal         |
+|   11 | other_tenure     |
+
+# harmonize_tenure_system -- ag3a_28a certificate-of-occupancy codes to
+# canonical TenureSystem spellings.  Code 3 (NO CERTIFICATE) is absent
+# from the table and therefore maps to NaN.
+#+name: harmonize_tenure_system
+| Code | Preferred Label            |
+|------+----------------------------|
+|    1 | granted_right_of_occupancy |
+|    2 | customary                  |
+
+# harmonize_soil -- ag3a_10 soil-type codes to canonical SoilType.
+#+name: harmonize_soil
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | sandy           |
+|    2 | loam            |
+|    3 | clay            |
+|    4 | other           |

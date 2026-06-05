@@ -35,3 +35,61 @@
 | Tile               | Tiles           |
 | Dung               | Earth with Dung |
 | Other              | Other           |
+
+# plot_features harmonize_* tables (GH #167; EHCVM cluster).  Togo is an
+# EHCVM sibling of the Mali reference (PR #284).  Codes key on the raw
+# integer Stata codes of the s16a agriculture-parcel module (loaded with
+# convert_categoricals=False); verified against the .dta value-label
+# metadata.  Togo's s16a code schemes match Mali's, with two Togo
+# additions: s16aq13 has a code 7 (Aucun) and s16aq17 has a code 6
+# (Autre); both are left unmapped (NaN) rather than force-fit.
+#
+# harmonize_tenure — s16aq10 "mode d'occupation" -> canonical Tenure.
+#   1 Propriétaire->owned; 2 Prêt gratuit (free loan under agreement,
+#   non-cash)->use_right; 3 Fermage->rented_in; 4 Métayage->sharecropped_in;
+#   5 Gage (pledge/pawned) and 6 Autre->other_tenure.
+# harmonize_soil — s16aq18 -> SoilType.  1 Sableux->sandy, 2 Limoneux->
+#   loam, 3 Argileux->clay, 4 Glacis->hardpan, 5 Autre->other.
+# harmonize_water — s16aq17; Irrigated bool is (label=='Irrigated').
+#   1-3 (Irrigation puits/canal/ruisseau)->Irrigated; 4 Pluviale->Rain-fed;
+#   5 Marais/wetlands->Wetland; 6 Autre unmapped.
+# harmonize_tenure_system — s16aq13 land-document regime -> canonical
+#   TenureSystem.  1 Titre foncier->freehold, 2 Permis d'exploiter->
+#   granted_right_of_occupancy, 4 Bail->leasehold.  Procès-verbal (3),
+#   Convention de vente (5), Autre (6), Aucun (7) have no defensible
+#   regime mapping and are left out (NaN).
+
+#+name: harmonize_tenure
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | owned           |
+|    2 | use_right       |
+|    3 | rented_in       |
+|    4 | sharecropped_in |
+|    5 | other_tenure    |
+|    6 | other_tenure    |
+
+#+name: harmonize_soil
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | sandy           |
+|    2 | loam            |
+|    3 | clay            |
+|    4 | hardpan         |
+|    5 | other           |
+
+#+name: harmonize_water
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Irrigated       |
+|    2 | Irrigated       |
+|    3 | Irrigated       |
+|    4 | Rain-fed        |
+|    5 | Wetland         |
+
+#+name: harmonize_tenure_system
+| Code | Preferred Label            |
+|------+----------------------------|
+|    1 | freehold                   |
+|    2 | granted_right_of_occupancy |
+|    4 | leasehold                  |

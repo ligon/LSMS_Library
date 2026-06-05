@@ -39,6 +39,15 @@ $(VAR_DIR)/shocks.parquet: shocks.py $(shocks_parquet)
 ../%/_/shocks.parquet:
 	(cd $(@D) && python shocks.py)
 
+plot_features = $(shell find $(rounds) -name plot_features.py)
+plot_features_parquet := $(plot_features:.py=.parquet)
+
+$(VAR_DIR)/plot_features.parquet: plot_features.py $(plot_features_parquet)
+	python plot_features.py
+
+../%/_/plot_features.parquet:
+	(cd $(@D) && python plot_features.py)
+
 %.parquet: %.py CONTENTS.org tanzania.py
 	(cd $(@D) && python ./$(<F))
 

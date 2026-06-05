@@ -74,3 +74,41 @@ household_roster:
                 17: "Lodger or relative of lodgers"
                 18: "Other family"
                 19: "Other non-family"
+
+individual_education:
+    file:
+        - ../Data/M8_HROST.dta
+    idxvars:
+        v: clustnum
+        i: hhid
+        pid: pcode
+    myvars:
+        Educational Attainment:
+            - educ_c
+            - mapping:
+                # SALDRU PSLSD 1993 educ_c: highest education completed.
+                # No value labels in source (.dta int codes); decoded from
+                # the pre-1994 South African schooling ladder.
+                -4: ~          # sentinel for missing — null out
+                -3: ~          # sentinel for missing — null out
+                -1: ~          # sentinel for missing — null out
+                0: "None"
+                1: "Sub A (Grade 1)"
+                2: "Sub B (Grade 2)"
+                3: "Standard 1 (Grade 3)"
+                4: "Standard 2 (Grade 4)"
+                5: "Standard 3 (Grade 5)"
+                6: "Standard 4 (Grade 6)"
+                7: "Standard 5 (Grade 7)"
+                8: "Standard 6 (Grade 8)"
+                9: "Standard 7 (Grade 9)"
+                10: "Standard 8 (Grade 10)"
+                11: "Standard 9 (Grade 11)"
+                12: "Standard 10 (Matric, Grade 12)"
+                13: "Diploma/certificate with less than Standard 10"
+                14: "Diploma/certificate with Standard 10"
+                15: "Degree"
+                16: "Postgraduate degree or diploma"
+                17: "Other"
+                18: "Don't know"
+                19: "Adult education / literacy"

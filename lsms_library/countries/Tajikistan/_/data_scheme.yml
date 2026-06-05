@@ -1,6 +1,11 @@
 Country: Tajikistan
 
 Data Scheme:
+  interview_date:
+    index: (t, i)
+    Int_t: datetime
+    materialize: make
+
   cluster_features:
     index: (t, v)
     Region: str
@@ -14,6 +19,10 @@ Data Scheme:
     Generation: int
     Distance: int
     Affinity: str
+
+  individual_education:
+    index: (t, i, pid)
+    Educational Attainment: str
 
   sample:
     index: (i, t)

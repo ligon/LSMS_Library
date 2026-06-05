@@ -36,6 +36,10 @@ Data Scheme:
     Distance: int
     Affinity: str
 
+  individual_education:
+    index: (t, i, pid)
+    Educational Attainment: str
+
   panel_ids:
     index: (t, i)
     previous_i: str
@@ -63,6 +67,28 @@ Data Scheme:
     index: (t, i, j, u, s)
     Quantity: float
     Expenditure: float
+    materialize: make
+
+  plot_features:
+    # ESS post-planting parcel/field land characteristics (GH #167).
+    # One row per FIELD (sect3_pp), with parcel-level Tenure / SoilType
+    # broadcast from sect2_pp via the holder-aware join key
+    # (holder_id, household_id, parcel_id).  Cross-file join => script.
+    # Latitude/Longitude deferred: source GPS 100% '**CONFIDENTIAL**'.
+    # TenureSystem always NaN: ESS has no land-tenure-regime analogue.
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    Tenure: str
+    # ESS records no land-tenure-regime analogue (all land is state-owned
+    # under usufruct), so TenureSystem is legitimately all-NaN here.
+    # Mark optional so the all-null sanity check exempts it while the
+    # canonical column is still declared for cross-country alignment.
+    TenureSystem:
+      type: str
+      optional: true
+    SoilType: str
+    Irrigated: bool
     materialize: make
 
   food_expenditures: !make

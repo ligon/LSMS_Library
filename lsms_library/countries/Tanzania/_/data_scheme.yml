@@ -63,3 +63,17 @@ Data Scheme:
     index: (t, i)
     Roof: str
     Floor: str
+
+  plot_features:
+    # Lasting plot characteristics (GH #167).  Cross-file merge of
+    # AG_SEC_02 (area) and AG_SEC_3A (soil/irrigation/tenure) per wave;
+    # only 2019-20 and 2020-21 are buildable (2008-15 lacks an ag
+    # source on disk).  GPS coordinates are redacted in the source.
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    Tenure: str
+    TenureSystem: str
+    SoilType: str
+    Irrigated: bool
+    materialize: make

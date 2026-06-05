@@ -100,6 +100,73 @@ Columns:
       type: float
     Longitude:
       type: float
+  plot_features:
+    # Lasting plot/parcel characteristics (GH #167).  Per-season detail
+    # (which crop, who farmed it this season, season-specific inputs,
+    # crop-share %) belongs in a future plot_cultivation table.  See
+    # slurm_logs/DESIGN_erhs_plot_features_2026-05-20.org for the design
+    # rationale; Uganda is the Phase-1 pilot.
+    Area:
+      type: float
+      required: true
+      note: plot area in hectares (canonical unit)
+    AreaUnit:
+      type: str
+      note: original survey unit before conversion to hectares
+    Tenure:
+      type: str
+      note: |
+        Form under which the plot is held by the surveyed household.
+        Captures the lasting ownership disposition; per-season contract
+        detail (this year's crop-share percentage, this year's cash
+        rent amount, partner identity) belongs in plot_cultivation.
+        `use_right` = held under agreement with a use-rights owner (a
+        recognized informal arrangement, often non-cash).  `squatted` =
+        informal occupation without a recognized transfer (used without
+        the owner's agreement, or cleared / walked-in).  Countries may
+        extend this list rather than force-fit a local category.
+      spellings:
+        owned: []
+        leased: []
+        rented_in: []
+        rented_out: []
+        sharecropped_in: []
+        sharecropped_out: []
+        inherited: []
+        communal: []
+        use_right: []
+        squatted: []
+        other_tenure: []
+    TenureSystem:
+      type: str
+      note: |
+        Lasting legal / customary land-tenure regime, orthogonal to
+        Tenure (which captures the household's ownership disposition).
+        Country-specific vocabulary is permitted; Uganda contributes
+        the mailo system, other countries are expected to extend the
+        spellings list rather than force-fit to a foreign regime.
+      spellings:
+        freehold: []
+        leasehold: []
+        mailo: []
+        customary: []
+        granted_right_of_occupancy: []
+        state: []
+        community: []
+        cooperative: []
+        other_tenure_system: []
+    SoilType:
+      type: str
+    Irrigated:
+      type: bool
+      note: |
+        True if the plot has irrigation infrastructure / customary
+        water access.  Treat as a lasting attribute (per-season
+        variation in irrigated use lives in plot_cultivation).
+    Latitude:
+      type: float
+    Longitude:
+      type: float
   shocks:
     AffectedIncome:
       type: bool

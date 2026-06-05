@@ -12,6 +12,18 @@ cluster_features:
                 urban: Urban
                 rural: Rural
 
+assets:
+    file: "../Data/m2_durables.dta"
+    idxvars:
+        i: [opstina, popkrug, dom]
+        j: s26
+    myvars:
+        Quantity: s27
+        Age: s28
+        Value:
+            - s30
+            - mappings: to_float
+
 household_roster:
     file:
         - "../Data/individual.dta"
