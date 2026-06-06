@@ -52,6 +52,20 @@ Data Scheme:
     Distance: int
     Affinity: str
     materialize: make
+
+  individual_education:
+    # Highest educational attainment per household member.  GHS
+    # section 2 (education) is collected only in the post-harvest
+    # round, so each wave maps to a single t = PH quarter (2011Q1,
+    # 2013Q1, 2016Q1, 2019Q1, 2024Q1) -> materialize: make.
+    # Educational Attainment = highest qualification (s2aq9 in W1-W4;
+    # numeric code s2q3 in W5), kept as raw per-wave labels/codes.
+    # W1/W2 coverage is low (~640/310 rows): those waves recorded the
+    # qualification only for members who had left school.
+    index: (t, i, pid)
+    Educational Attainment: str
+    materialize: make
+
   panel_ids:
     index: (t, i)
     previous_i: str
