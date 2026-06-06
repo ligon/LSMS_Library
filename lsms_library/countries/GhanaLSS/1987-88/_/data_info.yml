@@ -16,6 +16,16 @@ sample:
     myvars:
         v: CLUST
 
+interview_date:
+    file: Y00A.DAT
+    idxvars:
+        i: HID
+    myvars:
+        Int_t:
+            - DAY1
+            - MO1
+            - YR1
+
 household_roster:
     file: Y01A.DAT
     idxvars:

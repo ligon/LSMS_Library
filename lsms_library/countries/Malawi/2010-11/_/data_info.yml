@@ -54,6 +54,15 @@ sample:
                 Blantyre City: Southern
         District: hh_a01
 
+interview_date:
+    file: Full_Sample/Household/hh_mod_a_filt.dta
+    idxvars:
+        i: case_id
+    myvars:
+        # hh_a23_1 = "Interview Date [MDY] (Visit 1)", a Stata %td date that
+        # get_dataframe returns as datetime64.  Visit 2 (hh_a23_2) is dropped.
+        int_t: hh_a23_1
+
 cluster_features:
     dfs:
         - df_main

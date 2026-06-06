@@ -38,6 +38,18 @@ household_roster:
         Relationship: s1q3
         MonthsAway: s1q22
 
+interview_date:
+    file: g7sec0.dta
+    idxvars:
+        i:
+            - clust
+            - nh
+    myvars:
+        Int_t:
+            - ddate
+            - mdate
+            - ydate
+
 individual_education:
     file: g7sec2.dta
     idxvars:

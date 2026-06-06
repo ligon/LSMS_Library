@@ -21,6 +21,77 @@ def _load_global_columns() -> dict[str, dict[str, Any]]:
     return data.get("Columns", {})
 
 
+def _canonical_index_levels(table_name: str) -> list[str]:
+    """Return the canonical index level names for *table_name*.
+
+    Reads the global ``Index Info: index_info`` section of data_info.yml,
+    whose values are tuple strings like ``(t, v, i)``.  Returns ``[]`` when
+    the table is not listed (no canonical reshaping is then attempted).
+    """
+    info_path = files("lsms_library") / "data_info.yml"
+    with open(info_path, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    spec = data.get("Index Info", {}).get("index_info", {}).get(table_name)
+    if not isinstance(spec, str):
+        return []
+    cleaned = spec.strip()
+    if cleaned.startswith("(") and cleaned.endswith(")"):
+        cleaned = cleaned[1:-1]
+    return [tok.strip() for tok in cleaned.split(",") if tok.strip()]
+
+
+def _harmonize_country_frame(
+    df: pd.DataFrame, canonical_levels: list[str], country: str, table_name: str
+) -> pd.DataFrame:
+    """Coerce a single country's frame toward the canonical shape before concat.
+
+    Defensive net for cross-country assembly (GH #325): a stray extra index
+    level or an all-NaN leaked column on ONE country otherwise makes
+    ``pd.concat`` fall back to an unnamed object index of stringified tuples
+    for the WHOLE feature.  This drops all-NaN columns and removes index
+    levels that are not part of the canonical index (only when every
+    canonical level is present, so legitimately-reduced frames are left
+    alone).  It never fabricates missing levels.
+    """
+    if not isinstance(df, pd.DataFrame) or df.empty:
+        return df
+
+    # Drop columns that are entirely missing (e.g. a `date`/`v` column left
+    # populated only on other countries).  Concat re-introduces them as NaN
+    # where another country supplies values, so no information is lost.
+    all_nan = [c for c in df.columns if df[c].isna().all()]
+    if all_nan:
+        warnings.warn(
+            f"{table_name}: dropping all-NaN column(s) {all_nan} from {country} "
+            "before cross-country concat"
+        )
+        df = df.drop(columns=all_nan)
+
+    # Remove undeclared extra index levels so every country shares the same
+    # MultiIndex names.  Only act when all canonical levels are present and
+    # there is at least one extra (keeps single-country reductions intact).
+    if canonical_levels and isinstance(df.index, pd.MultiIndex):
+        names = list(df.index.names)
+        extra = [n for n in names if n not in canonical_levels]
+        have_all_canonical = all(lvl in names for lvl in canonical_levels)
+        if extra and have_all_canonical and len(names) > len(extra):
+            ordered = [lvl for lvl in canonical_levels if lvl in names] + \
+                      [n for n in names if n not in canonical_levels]
+            try:
+                df = df.reorder_levels(ordered)
+            except (ValueError, TypeError):
+                pass
+            warnings.warn(
+                f"{table_name}: dropping extra index level(s) {extra} from "
+                f"{country} before cross-country concat"
+            )
+            df = df.droplevel(extra)
+            if not df.index.is_unique:
+                df = df.groupby(level=list(df.index.names), observed=True).first()
+
+    return df
+
+
 # Derived tables and the source table they require in data_scheme.yml
 _DERIVED_SOURCE = {
     'household_characteristics': 'household_roster',
@@ -124,6 +195,7 @@ class Feature:
         effective_trust_cache = trust_cache if trust_cache is not None else self.trust_cache
         targets = countries if countries is not None else self.countries
         frames: list[pd.DataFrame] = []
+        canonical_levels = _canonical_index_levels(self.table_name)
 
         for name in targets:
             try:
@@ -135,6 +207,12 @@ class Feature:
                         f"No data for {self.table_name} in {name}"
                     )
                     continue
+                # Coerce toward the canonical shape so one country's stray
+                # column / extra index level can't collapse the whole
+                # concatenated index to object tuples (GH #325).
+                df = _harmonize_country_frame(
+                    df, canonical_levels, name, self.table_name
+                )
                 # Prepend country as an index level
                 df = pd.concat({name: df}, names=["country"])
                 frames.append(df)
@@ -148,4 +226,20 @@ class Feature:
         if not frames:
             return pd.DataFrame()
 
-        return pd.concat(frames)
+        result = pd.concat(frames)
+
+        # Surface (rather than silently return) the pathological case where
+        # heterogeneous per-country indices made pandas fall back to an
+        # unnamed object index of stringified tuples (GH #325).
+        if len(frames) > 1 and list(result.index.names) == [None]:
+            shapes = {
+                f.index.get_level_values(0)[0] if len(f) else "?":
+                    list(f.index.names)
+                for f in frames
+            }
+            warnings.warn(
+                f"{self.table_name}: cross-country index collapsed to an "
+                f"unnamed object index; per-country index names differ: {shapes}"
+            )
+
+        return result

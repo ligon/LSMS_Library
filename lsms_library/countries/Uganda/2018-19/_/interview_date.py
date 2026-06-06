@@ -12,7 +12,7 @@ myvars = dict(year='year',
                 day='day')
 
 df = df_data_grabber('../Data/GSEC1.dta',idxvars,**myvars)
-df['date'] = pd.to_datetime(df[['year', 'month', 'day']])
+df['Int_t'] = pd.to_datetime(df[['year', 'month', 'day']])
 df=df.drop(columns=['year','month','day'])
 
 to_parquet(df,'interview_date.parquet')

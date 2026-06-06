@@ -23,6 +23,22 @@ sample:
         Region: region
         District: district
 
+interview_date:
+    file:
+        - Cross_Sectional/hh_mod_a_filt.dta
+        - Panel/hh_mod_a_filt_19.dta:
+            i: y4_hhid
+            int_t: interviewdate_v1
+    idxvars:
+        i:
+            - case_id
+            - function: cs_i
+    myvars:
+        # Cross_Sectional names the date column 'interviewDate'; the Panel
+        # file uses 'interviewdate_v1' (Visit 1), overridden per-file above.
+        # Both are 'YYYY-MM-DD' strings -> datetime via the Int_t coercion.
+        int_t: interviewDate
+
 cluster_features:
     dfs:
         - df_main

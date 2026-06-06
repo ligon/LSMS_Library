@@ -53,8 +53,8 @@ Data Scheme:
     Expenditure: float
     materialize: make
   interview_date:
-    index: (t, visit, i)
-    Int_t: str
+    index: (t, i)
+    Int_t: datetime
   shocks:
     index: (t, i, Shock)
     AffectedIncome: bool

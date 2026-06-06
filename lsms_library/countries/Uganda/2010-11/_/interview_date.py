@@ -17,6 +17,6 @@ myvars = dict(day = 'day',
 df = df_data_grabber('../Data/GSEC1.dta',idxvars,**myvars)
 # error = coerce returns NaT when encountering NaN vals in the 3 coloumns or when day/month is out of range
 # 3 instances in April have day as 31
-df['date'] = pd.to_datetime(df[['year', 'month', 'day']], errors='coerce')
+df['Int_t'] = pd.to_datetime(df[['year', 'month', 'day']], errors='coerce')
 df = df.drop(columns = list( myvars.keys()))
 to_parquet(df,'interview_date.parquet')

@@ -23,6 +23,19 @@ sample:
         Region: region
         District: dist
 
+interview_date:
+    file: sec_a.dta
+    idxvars:
+        i: case_id
+    myvars:
+        # a14a/b/c = Day / Month / Year of interview (numeric).
+        # Combined into a datetime by malawi_date_ymd (year, month, day order).
+        int_t:
+            - a14c
+            - a14b
+            - a14a
+            - mapping: malawi_date_ymd
+
 cluster_features:
     file: sec_a.dta
     idxvars:

@@ -16,7 +16,6 @@ df = df_data_grabber('../Data/COVERN.dta', idxvars, **myvars).reset_index()
 
 # Composite household id "ED-HH" and cluster id v=ED (format_id each part).
 df['i'] = df['ED'].map(format_id) + '-' + df['HH'].map(format_id)
-df['v'] = df['ED'].map(format_id)
 df['t'] = '1992'
 
 # Expand 2-digit year of enumeration to 4-digit (e.g. 93 -> 1993).
@@ -26,6 +25,9 @@ df['Int_t'] = pd.to_datetime(dict(year=year,
                                   month=df['month'].astype(int),
                                   day=df['day'].astype(int)))
 
-df = df.set_index(['t', 'i'])[['v', 'Int_t']]
+# Do NOT emit `v` as a column: the framework joins it from sample() into
+# the index at API time (_join_v_from_sample).  Emitting it as a column
+# suppresses that join and leaves the index at (t, i) (GH #325).
+df = df.set_index(['t', 'i'])[['Int_t']]
 
 to_parquet(df, 'interview_date.parquet')
