@@ -57,3 +57,45 @@ household_roster:
                 14: Not related
 
         MonthsAway: m1a_q09
+
+housing:
+    # Module 13A dwelling. i=[psu,hh] uses the composite i() (mapping.py) to
+    # match the household identity built by sample.py, so _join_v_from_sample
+    # resolves v. Walls/Toilet/Tenure are value-labelled categoricals; the 2008
+    # labels are lower-cased, so inline mappings normalise them to the canonical
+    # Title-case forms shared with 2005/2012. Rooms is the integer room count.
+    # Tenure is m13a_q26 here (the 13A question numbering differs from 2005).
+    # No Roof/Floor/Water/Electricity in Module 13A.
+    file: ../Data/Modul_13A_dwelling.sav
+    idxvars:
+        i:
+            - psu
+            - hh
+    myvars:
+        Walls:
+            - m13a_q02
+            - mapping:
+                bricks, stones: Bricks, stones
+                pre-fabricated: Pre-fabricated
+                mud: Mud
+                wood: Wood
+                eternit, tin: Eternit, tin
+                other: Other
+        Toilet:
+            - m13a_q10
+            - mapping:
+                wc inside the house: WC inside the house
+                two or more wc inside: Two or more WC inside
+                wc outside, with piping: WC outside, with piping
+                wc outside, without piping: WC outside, without piping
+                other: Other
+        Tenure:
+            - m13a_q26
+            - mapping:
+                owner: Owner
+                owner with a mortgage on dwelling: Owner with a mortgage on dwelling
+                rent from a private individual: Rent from a private individual
+                rent from the state: Rent from the state
+                live for free: Live for free
+                other: Other
+        Rooms: m13a_q08

@@ -67,6 +67,24 @@ household_roster:
 
         MonthsAway: m1a_q09
 
+housing:
+    # Module 13A dwelling. i=[m0_q00,m0_q01] uses the composite i() (mapping.py)
+    # to match the household identity built by sample.py, so _join_v_from_sample
+    # resolves v. Walls/Toilet/Tenure are value-labelled categoricals (NAME
+    # strings via convert_categoricals); Rooms is the integer room count.
+    # No Roof/Floor/Water/Electricity in Module 13A (water/electricity live in
+    # dwellingB_cl.dta).
+    file: ../Data/dwellingA_cl.dta
+    idxvars:
+        i:
+            - m0_q00
+            - m0_q01
+    myvars:
+        Walls: m13a_q02
+        Toilet: m13a_q10
+        Tenure: m13a_q14
+        Rooms: m13a_q08
+
 interview_date:
     # Cover page identification_cl.dta; m0_date is int YYYYMMDD parsed by
     # mapping.py:Int_t. i=[m0_q00,m0_q01] uses the composite i() to match the
