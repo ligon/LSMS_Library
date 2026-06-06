@@ -69,4 +69,18 @@ def Rural(value):
 
     return rural_dict.get(value, pd.NA)
 
+def Int_t(value):
+    '''
+    Build interview date from (dd, mm, yy).  yy is a 2-digit year
+    (e.g. 91, 92) -> 1991, 1992.
+    '''
+    d, m, y = value.iloc[0], value.iloc[1], value.iloc[2]
+    if pd.isna(d) or pd.isna(m) or pd.isna(y):
+        return pd.NaT
+    y = int(y)
+    if y < 100:
+        y += 1900
+    s = f"{y}-{int(m)}-{int(d)}"
+    return pd.to_datetime(s, format='%Y-%m-%d', errors='coerce')
+
 Visits = range(1,7)

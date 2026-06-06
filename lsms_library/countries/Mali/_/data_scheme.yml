@@ -44,9 +44,14 @@ Data Scheme:
     index: (t, v, i, j, u, s)
     Quantity: float
     Expenditure: float
+  # EHCVM visits each household across multiple vagues/passages, each with
+  # its own date.  The canonical interview_date is one date per household
+  # (t, v, i); _normalize_dataframe_index drops the undeclared `visit` level
+  # and collapses the duplicate rows via groupby.first(), keeping the first
+  # visit's date.  (GH #325)
   interview_date:
-    index: (t, visit, i)
-    Int_t: str
+    index: (t, v, i)
+    Int_t: datetime
   panel_ids: !make
   assets:
     index: (t, i, j)

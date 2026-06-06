@@ -73,6 +73,32 @@ def Sex(value):
         return np.nan
 
 
+def malawi_date_ymd(row):
+    """Combine a [year, month, day] row into a Timestamp.
+
+    Used by the ``interview_date`` table for the waves that store the
+    interview date as three separate columns (2004-05 IHS2: numeric
+    a14a/b/c; 2013-14 IHS3: hh_a23a_* with the month as an English name
+    like 'MAY').  Declare the columns in year, month, day order in the
+    wave's data_info.yml ``int_t`` myvar with a trailing
+    ``mapping: malawi_date_ymd``.
+
+    The month component may be numeric (5) or a name ('MAY'); both are
+    handled by building a 'DAY MONTH YEAR' string and letting
+    ``pd.to_datetime`` parse it.  Returns ``pd.NaT`` when any part is
+    missing or the date is unparseable.
+    """
+    y, m, d = row.iloc[0], row.iloc[1], row.iloc[2]
+    if pd.isna(y) or pd.isna(m) or pd.isna(d):
+        return pd.NaT
+    # Month may be numeric (float/int) or an English name.
+    if isinstance(m, str):
+        month = m.strip()
+    else:
+        month = str(int(m))
+    return pd.to_datetime(f"{int(d)} {month} {int(y)}", errors='coerce')
+
+
 def harmonize_food_labels(df, level='i'):
     """Apply the cross-wave union of Malawi's harmonize_food map to ``df``.
 

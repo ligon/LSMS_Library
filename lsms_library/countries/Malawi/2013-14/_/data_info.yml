@@ -19,6 +19,21 @@ sample:
         Region: region
         District: district
 
+interview_date:
+    file: HH_MOD_A_FILT_13.dta
+    idxvars:
+        i: y2_hhid
+    myvars:
+        # Visit 1, Attempt 1 interview date split across three columns:
+        #   hh_a23a_1 = Day (numeric), hh_a23a_2 = Month (English name e.g.
+        #   'MAY'), hh_a23a_3 = Year.  Combined into a datetime by
+        #   malawi_date_ymd (year, month, day order).
+        int_t:
+            - hh_a23a_3
+            - hh_a23a_2
+            - hh_a23a_1
+            - mapping: malawi_date_ymd
+
 cluster_features:
     dfs:
         - df_main

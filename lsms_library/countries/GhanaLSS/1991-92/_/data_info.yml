@@ -21,6 +21,18 @@ sample:
         strata: region
         Rural: loc2
 
+interview_date:
+    file: S0A.DTA
+    idxvars:
+        i:
+            - clust
+            - nh
+    myvars:
+        Int_t:
+            - dd
+            - mm
+            - yy
+
 household_roster:
     file: S1.DTA
     idxvars:

@@ -20,6 +20,16 @@ sample:
         panel_weight: weight
         strata: region
 
+interview_date:
+    file: parta/sec0.dta
+    idxvars:
+        i: hhid
+    myvars:
+        Int_t:
+            - ddate
+            - mdate
+            - ydate
+
 household_roster:
     file: parta/sec1.dta
     idxvars:
