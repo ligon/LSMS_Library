@@ -65,3 +65,27 @@ sample:
     final_index:
         - i
         - t
+
+interview_date:
+    # Household file domacinstva.dta; Int_t from dana/mesa/goda (day/month/year)
+    # via mapping.py:Int_t. i=[opstina,popkrug,dom] matches roster. 100% coverage.
+    file:
+        - "../Data/domacinstva.dta"
+    idxvars:
+        i: [opstina, popkrug, dom]
+    myvars:
+        Int_t:
+            - dana
+            - mesa
+            - goda
+
+individual_education:
+    # Education embedded in the roster file individual.dta; obrazovanje is the
+    # attainment code (00-11). pid=lice matches the roster (0% spine orphans).
+    file:
+        - "../Data/individual.dta"
+    idxvars:
+        i: [opstina, popkrug, dom]
+        pid: lice
+    myvars:
+        Educational Attainment: obrazovanje

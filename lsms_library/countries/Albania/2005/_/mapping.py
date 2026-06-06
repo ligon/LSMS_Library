@@ -1,5 +1,14 @@
 # Formatting functions for Albania 2005.
+import pandas as pd
 import lsms_library.local_tools as tools
+
+
+def Int_t(value):
+    '''Parse m0_date (int YYYYMMDD) into a datetime.'''
+    v = value.iloc[0]
+    if pd.isna(v):
+        return pd.NaT
+    return pd.to_datetime(str(int(v)), format='%Y%m%d', errors='coerce')
 
 
 def i(value):

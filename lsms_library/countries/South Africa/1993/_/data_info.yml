@@ -124,3 +124,16 @@ assets:
         j: dura_c
     myvars:
         Quantity: dura_n
+
+interview_date:
+    # Cover page S4_HDEF.dta; Int_t built from year1/month1/day1 (year1 is a
+    # 2-digit offset from 1900) via mapping.py:Int_t. 100% coverage.
+    file:
+        - ../Data/S4_HDEF.dta
+    idxvars:
+        i: hhid
+    myvars:
+        Int_t:
+            - year1
+            - month1
+            - day1

@@ -77,3 +77,16 @@ individual_education:
         pid: pid
     myvars:
         Educational Attainment: diploma
+
+interview_date:
+    # Cover module A00.dta; Int_t from dayint/moint/yrint (yrint 2-digit ->
+    # +1900) via mapping.py:Int_t. i=[ppid,hid] matches roster. ~99.9% coverage.
+    file:
+        - ../Data/A00.dta
+    idxvars:
+        i: [ppid, hid]
+    myvars:
+        Int_t:
+            - dayint
+            - moint
+            - yrint

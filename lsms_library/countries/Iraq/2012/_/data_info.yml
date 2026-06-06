@@ -29,6 +29,17 @@ household_roster:
         Relationship: q0105
         Age: q0104
 
+individual_education:
+    # Education module; q0503 = highest attainment (12 English-labeled levels).
+    # i=hh, pid=idcode match the roster (0% spine orphans).
+    file:
+        - "../Data/2012ihses05_education.dta"
+    idxvars:
+        i: hh
+        pid: idcode
+    myvars:
+        Educational Attainment: q0503
+
 # assets is built via the script path (_/assets.py) so that physical
 # instances of a durable (multiple `durable_serial` rows per
 # (questid, durable_code)) are SUMMED into the canonical (t, i, j) index

@@ -66,3 +66,15 @@ household_roster:
                 14: Not related
 
         MonthsAway: m1a_q09
+
+interview_date:
+    # Cover page identification_cl.dta; m0_date is int YYYYMMDD parsed by
+    # mapping.py:Int_t. i=[m0_q00,m0_q01] uses the composite i() to match the
+    # household identity built by sample.py (so _join_v_from_sample resolves v).
+    file:
+        - ../Data/identification_cl.dta
+    idxvars:
+        i: [m0_q00, m0_q01]
+    myvars:
+        Int_t:
+            - m0_date
