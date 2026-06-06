@@ -85,6 +85,8 @@ Lookup order for each setting: environment variable → config file → None.
 
 **Always read files with `get_dataframe()` from `local_tools`.** It handles `.dta` / `.csv` / `.parquet` via a fallback chain: local file on disk → DVC filesystem (`DVCFileSystem`) → WB NADA download via `data_access.get_data_file()`. A script written as `get_dataframe('../Data/file.dta')` works whether the file is local, DVC-cached, or has never been downloaded.
 
+> **Never run `dvc pull` / `dvc fetch` from the CLI to materialize source data — especially in parallel (multiple agents, `make -j`, scatter-gather sweeps).** The DVC CLI takes the global `.dvc/tmp/lock` and rebuilds the repo index by walking ~7k `.dvc` sidecars (~93 s/call on Lustre); concurrent callers collide and fail with *"Unable to acquire lock"* (measured 91.7% failure at 12 concurrent — see `slurm_logs/dvc_lock_repro/`). `get_dataframe()` / `_ensure_dvc_pulled()` instead download the blob **directly from S3 (lock-free, ~0.1 s)** via the v0.7.3 bypass — so any number of readers can run concurrently. The *write* path (`push_to_cache` / `push_to_cache_batch`) still takes the lock; it retries on contention with backoff (`_run_dvc_with_lock_retry`). A coordinating fetch/write queue was considered and judged **unnecessary**: reads are already lock-free, and writes don't contend in practice — a single contributor's writes batch into one `dvc add`/`push`, and the rare concurrent-writer overlap is absorbed by the retry above. See `SkunkWorks/dvc_writer_distribution.org`.
+
 **Always write parquets with `to_parquet(df, 'name.parquet')`** from `local_tools`. It redirects to `data_root()` via `_resolve_data_path()`, which inspects the call stack to infer country/wave and handles three patterns: bare `foo.parquet` from wave scripts, `../var/foo.parquet` from country scripts, and `../wave/_/foo.parquet` cross-wave refs. Stale parquets from before this migration may still exist in-tree; they are harmless artifacts.
 
 **Anti-patterns — do not use:**
@@ -95,6 +97,7 @@ Lookup order for each setting: environment variable → config file → None.
 | `pd.read_stata('/absolute/path/...')`                    | Breaks on other machines, no DVC/WB fallback     |
 | `pyreadstat.read_dta(path)` directly                     | Same — bypasses all access layers                |
 | `from_dta('lsms_library/countries/...')` with abs path   | Non-portable; use relative `../Data/` paths      |
+| `dvc pull` / `dvc fetch` CLI to materialize data         | Takes the global `.dvc/tmp/lock`; serializes and fails under concurrency. Use `get_dataframe()` (lock-free direct-S3 bypass). |
 
 **Adding new waves**: `lsms_library.data_access.discover_waves()` / `add_wave()`; `push_to_cache_batch()` for batched `dvc add` + `dvc push`. See `CONTRIBUTING.org`.
 
