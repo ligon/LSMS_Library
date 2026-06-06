@@ -1,0 +1,20 @@
+#+TITLE: Pakistan — country notes & known data issues
+
+* Known data issues
+
+** individual_education — only primary grade available (2026-06-06)
+PIHS 1991 records educational attainment only as ~primgr~ (primary grade
+completed, codes 0–5) in the F03 section (F03C.DTA).  A scan of the F03*
+education files found no highest-level / secondary / tertiary attainment
+column — ~primgr~ caps at "5 = grade 5 or higher", so a university graduate
+and a primary-school leaver are indistinguishable.
+
+Wiring ~individual_education~ on ~primgr~ alone would **misrepresent
+attainment** cross-country (every Pakistani would appear to have at most
+primary education), so it is intentionally NOT wired.  The household roster
+(F01A.DTA, i=hid, pid=pid) and the (hid, pid) join are fine; only a usable
+highest-attainment variable is missing.
+
+Revisit if a fuller attainment variable is located (e.g. a secondary/tertiary
+column elsewhere in the instrument, or a later PIHS/PSLM wave).  Tracked in
+GitHub issue #344.
