@@ -33,6 +33,11 @@ Data Scheme:
     Age: float
     Value: float
 
+  housing:
+    index: (t, i)
+    Water: str
+    Toilet: str
+
   interview_date:
     index: (t, i)
     Int_t: datetime

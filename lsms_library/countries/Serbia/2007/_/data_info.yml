@@ -79,6 +79,20 @@ interview_date:
             - mesa
             - goda
 
+housing:
+    # Dwelling water/sanitation module (bo*) in household.dta. Administered to a
+    # sub-sample (~2744 of 5557 HH; rest NaN). i=[opstina,popkrug,dom] matches
+    # roster. No Roof/Floor/Walls/Tenure/Rooms/Electricity in this survey: the bo*
+    # block is exclusively a water-and-sanitation module, so housing declares only
+    # the Water and Toilet subset. Values are decoded NAME strings (value labels).
+    file:
+        - "../Data/household.dta"
+    idxvars:
+        i: [opstina, popkrug, dom]
+    myvars:
+        Water: bo2_1
+        Toilet: bo28
+
 individual_education:
     # Education embedded in the roster file individual.dta; obrazovanje is the
     # attainment code (00-11). pid=lice matches the roster (0% spine orphans).
