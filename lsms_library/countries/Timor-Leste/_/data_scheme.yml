@@ -20,6 +20,11 @@ Data Scheme:
     strata: str
     Rural: str
 
+  cluster_features:
+    index: (t, v)
+    Region: str
+    Rural: str
+
   interview_date:
     index: (t, i)
     Int_t: datetime

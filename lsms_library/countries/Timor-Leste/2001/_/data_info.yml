@@ -47,3 +47,18 @@ sample:
     final_index:
         - i
         - t
+
+cluster_features:
+    # WEIGHT.DTA is already one row per cluster (id4); Region=region,
+    # Rural from urbrural (1=Urban, 2=Rural). 300 clusters.
+    file:
+        - ../Data/WEIGHT.DTA
+    idxvars:
+        v: id4
+    myvars:
+        Region: region
+        Rural:
+            - urbrural
+            - mapping:
+                1: Urban
+                2: Rural

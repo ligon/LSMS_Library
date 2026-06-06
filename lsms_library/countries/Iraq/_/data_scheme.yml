@@ -9,6 +9,11 @@ Data Scheme:
     strata: str
     Rural: str
 
+  cluster_features:
+    index: (t, v)
+    Region: str
+    Rural: str
+
   household_roster:
     index: (t, i, pid)
     Sex: str

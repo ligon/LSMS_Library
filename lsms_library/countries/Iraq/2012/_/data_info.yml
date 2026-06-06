@@ -46,3 +46,18 @@ individual_education:
 # rather than silently collapsed with .first().  Mark `assets: !make` in
 # the country data_scheme.yml.  The YAML path cannot groupby-sum, hence the
 # script.
+
+cluster_features:
+    # Cover page; one row per cluster v=cluster. Region=governorate;
+    # Rural from q00_16. Constant within cluster (verified, 2828 clusters).
+    file:
+        - "../Data/2012ihses00_cover_page.dta"
+    idxvars:
+        v: cluster
+    myvars:
+        Region: governorate
+        Rural:
+            - q00_16
+            - mapping:
+                URBAN: Urban
+                RURAL: Rural
