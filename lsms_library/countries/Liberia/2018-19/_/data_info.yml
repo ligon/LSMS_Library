@@ -62,3 +62,14 @@ assets:
     myvars:
         Quantity: S15_2
         Value: S15_5
+
+interview_date:
+    # Cover/identification module sect1_public.dta; interview_date1 is the
+    # primary-visit date (datetime64; interview_date2/3 are follow-up visits,
+    # ignored). Single pre-formed date column -> no combine helper needed.
+    file:
+        - "../Data/Household/sect1_public.dta"
+    idxvars:
+        i: hhid
+    myvars:
+        Int_t: interview_date1
