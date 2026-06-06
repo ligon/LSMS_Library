@@ -12,6 +12,19 @@ household_roster:
         Relationship: s01a03
         Age: s01a06a
 
+housing:
+    # S02A.DTA dwelling module; value labels already human-readable strings.
+    # s02a01 walls, s02a02 roof, s02a03 floor (s02a04 type / s02a05 condition
+    # are not part of the canonical housing subset). No room-count question.
+    file:
+        - ../Data/S02A.DTA
+    idxvars:
+        i: identif
+    myvars:
+        Walls: s02a01
+        Roof: s02a02
+        Floor: s02a03
+
 interview_date:
     file: ../Data/S00.DTA
     idxvars:
