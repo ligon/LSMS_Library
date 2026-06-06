@@ -67,3 +67,13 @@ sample:
     final_index:
         - i
         - t
+
+individual_education:
+    # Education module A03.dta; attainment code `diploma` (Soviet-era levels 1-13).
+    file:
+        - ../Data/A03.dta
+    idxvars:
+        i: [ppid, hid]
+        pid: pid
+    myvars:
+        Educational Attainment: diploma
