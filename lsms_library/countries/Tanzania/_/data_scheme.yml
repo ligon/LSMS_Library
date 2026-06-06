@@ -33,6 +33,11 @@ Data Scheme:
     Distance: int
     Affinity: str
 
+  individual_education:
+    index: (t, i, pid)
+    Educational Attainment: str
+    materialize: make
+
   interview_date:
     index: (t, i)
     Int_t: datetime
