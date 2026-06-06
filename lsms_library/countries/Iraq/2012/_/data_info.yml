@@ -47,6 +47,25 @@ individual_education:
 # the country data_scheme.yml.  The YAML path cannot groupby-sum, hence the
 # script.
 
+housing:
+    # Dwelling module 2012ihses04. One row per household (questid, unique).
+    # i=questid (matches sample/assets), NOT hh: the housing/roster `hh`
+    # field is a within-dwelling sequence number (9 distinct values), so it
+    # cannot key households.  All columns are English value-labeled -> NAME
+    # strings.  q0406 "Principal material of ceiling" -> Roof.
+    file:
+        - "../Data/2012ihses04_housing.dta"
+    idxvars:
+        i: questid
+    myvars:
+        Roof: q0406
+        Floor: q0407
+        Walls: q0405
+        Water: q0414
+        Toilet: q0419
+        Electricity: q0421_1
+        Tenure: q0427
+
 cluster_features:
     # Cover page; one row per cluster v=cluster. Region=governorate;
     # Rural from q00_16. Constant within cluster (verified, 2828 clusters).
