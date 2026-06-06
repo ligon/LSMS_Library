@@ -96,3 +96,30 @@ assets:
     myvars:
         Age: s10e_02
         Value: s10e_4a
+
+housing:
+    # DWELLING.dta has no Roof/Floor/Walls/Water/Toilet items in this
+    # survey; only dwelling type, electricity, rooms, and tenure exist.
+    # s3a_q0a is the full-text dwelling type (s3a_q00 is the 8-char
+    # truncated Stata label); s3a_q06 only exists truncated, so its
+    # labels are spelled out via mapping.
+    file: "../Data/DWELLING.dta"
+    idxvars:
+        i: hhid
+    myvars:
+        Type: s3a_q0a
+        Electricity: s3a_q01
+        Rooms: s3a_q04
+        Tenure:
+            - s3a_q06
+            - mapping:
+                Built pe: Built personally
+                Purchase: Purchased
+                Inherite: Inherited
+                Borrowed: Borrowed
+                Occupied: Occupied
+                From emp: From employer
+                Assigned: Assigned
+                Donated: Donated
+                Swapped: Swapped
+                Others: Others
