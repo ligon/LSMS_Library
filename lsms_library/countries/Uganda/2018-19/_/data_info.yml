@@ -51,12 +51,30 @@ sample:
         Region: region
 
 cluster_features:
-    file: GSEC1.dta
-    idxvars:
-        i: hhid
-        #v: parish_code  # BROKEN: Different codes than in previous years, and only 19 values!
-        v: parish_name
-    myvars:
-        Region: region
-        Rural: urban
-        District: distirct_name
+    dfs:
+        - df_main
+        - df_geo
+    df_main:
+        file: GSEC1.dta
+        idxvars:
+            i: hhid
+            #v: parish_code  # BROKEN: Different codes than in previous years, and only 19 values!
+            v: parish_name
+        myvars:
+            Region: region
+            Rural: urban
+            District: distirct_name
+    # GPS from the public geovar (modified/offset coordinates), joined on
+    # household id then collapsed to cluster grain by final_index (GH #161).
+    df_geo:
+        file: ../Data/unps_geovars_2018_19.dta
+        idxvars:
+            i: hhid
+        myvars:
+            Latitude: pub_lat_mod
+            Longitude: pub_lon_mod
+    merge_on:
+        - i
+    final_index:
+        - t
+        - v

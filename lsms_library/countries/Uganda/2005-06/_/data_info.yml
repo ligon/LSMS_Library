@@ -58,23 +58,45 @@ sample:
             - 0: "Central"
 
 cluster_features:
-    file: GSEC1.dta
-    idxvars:
-        i: HHID
-        v: comm
-    myvars:
+    dfs:
+        - df_main
+        - df_geo
+    df_main:
+        file: GSEC1.dta
+        idxvars:
+            i: HHID
+            v: comm
+        myvars:
 
-        Region:
-            # Some "Central" households have region coded as 0?  These seem to be households in one of the 34
-            # Enumeration Areas (comm) of Kampala.
-            # See https://microdata.worldbank.org/index.php/catalog/1001/data-dictionary/F41?file_name=2005_GSEC1
-            - region
-            - # Fix some values as above
-               0: "Central"
-        Rural: urban
-        District: h1aq1
-        Rural:
-            - urban
-            - # Value mapping dictionary
-                urban: Urban
-                0: Rural
+            Region:
+                # Some "Central" households have region coded as 0?  These seem to be households in one of the 34
+                # Enumeration Areas (comm) of Kampala.
+                # See https://microdata.worldbank.org/index.php/catalog/1001/data-dictionary/F41?file_name=2005_GSEC1
+                - region
+                - # Fix some values as above
+                   0: "Central"
+            Rural: urban
+            District: h1aq1
+            Rural:
+                - urban
+                - # Value mapping dictionary
+                    urban: Urban
+                    0: Rural
+    # 2005-06 UNPS predates GPS collection; the only coordinates available
+    # for these (panel) households are in the 2009-10 geovar, which shares
+    # the panel HHID space (~83% of 2005-06 households match).  Cluster
+    # location is geographically stable, so 2009 GPS is a sound cluster
+    # centroid for the 2005-06 baseline.  Joined on HHID, collapsed to
+    # cluster grain by final_index (GH #161).
+    df_geo:
+        file: ../Data/2009_UNPS_Geovars_0910.dta
+        idxvars:
+            i: HHID
+        myvars:
+            Latitude: lat_mod
+            Longitude: lon_mod
+    merge_on:
+        - i
+    final_index:
+        - t
+        - v
