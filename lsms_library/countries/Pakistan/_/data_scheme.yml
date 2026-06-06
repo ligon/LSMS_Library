@@ -14,6 +14,16 @@ Data Scheme:
     Int_t: datetime
     materialize: make
 
+  housing:
+    index: (t, i)
+    Walls: str
+    Floor: str
+    Roof: str
+    Rooms: float
+    Tenure: str
+    Water: str
+    Toilet: str
+
   household_roster:
     index: (t, i, pid)
     Sex: str
