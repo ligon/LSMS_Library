@@ -90,3 +90,83 @@ interview_date:
             - dayint
             - moint
             - yrint
+
+housing:
+    # Dwelling module: A02A.dta (rooms, area, dwelling-type code `dom`) and
+    # A02B.dta (water/electricity/cooking/heating/lighting + tenure `ownhh`).
+    # Both keyed on (ppid, hid) -> composite i via mapping.py:i; merged on i.
+    # Codes carry no value labels in the .dta; names taken from the household
+    # questionnaire (queshhe.pdf, Section 2 DWELLING).
+    dfs:
+        - df_a
+        - df_b
+    df_a:
+        file: ../Data/A02A.dta
+        idxvars:
+            i: [ppid, hid]
+        myvars:
+            Rooms: rooms
+            Area: area
+            DwellingType:
+                - dom
+                - mapping:
+                    1.0: One Family House
+                    2.0: Separate Apartment
+                    3.0: Communal Apartment
+                    4.0: Several Buildings Connected
+                    5.0: Several Separate Buildings
+                    6.0: Room In A Hostel
+                    7.0: Place In A Hostel
+                    8.0: Other
+    df_b:
+        file: ../Data/A02B.dta
+        idxvars:
+            i: [ppid, hid]
+        myvars:
+            Water:
+                - water
+                - mapping:
+                    1.0: Centralized Water Pipe
+                    2.0: Own System Of Water Supply
+                    3.0: Well
+                    4.0: River/Lake/Spring/Pond
+                    5.0: Rainwater
+                    6.0: Other
+            Electricity:
+                - light
+                - mapping:
+                    1.0: Electricity
+                    2.0: Kerosene/Oil/Gas Lamps
+                    3.0: Candles Or Battery Flashlights
+                    4.0: No Lighting
+            Cooking:
+                - cook
+                - mapping:
+                    1: Gas
+                    2: Electricity
+                    3: Wood
+                    4: Coal
+                    5: Kerosene
+                    6: Other
+                    7: Do Not Cook At Home
+            Heating:
+                - heat
+                - mapping:
+                    1.0: Centralized Heating
+                    2.0: Water Radiators From Gas Or Coal Boiler
+                    3.0: Electric Heaters
+                    4.0: Coal Stove
+                    5.0: Wood Stove
+                    6.0: Stove Burning Straw/Weeds/Manure
+                    7.0: Other
+            Tenure:
+                - ownhh
+                - mapping:
+                    1.0: owned
+                    2.0: not_owned_privatizable
+                    3.0: not_owned_non_privatizable
+    merge_on:
+        - i
+    final_index:
+        - i
+        - t
