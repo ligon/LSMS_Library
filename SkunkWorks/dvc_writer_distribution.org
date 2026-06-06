@@ -197,3 +197,31 @@ current set of readers this is probably fine, but a tighter
 custom policy mirroring ~s3_bucket_writer~ would be cleaner if
 the account ever holds anything in other buckets that some
 readers shouldn't see.
+
+* Concurrent-write coordination (lock contention) — considered, declined 2026-06-06
+
+Separate from *who* may write: do *concurrent* writers need
+coordination? DVC serializes every repo op on ~.dvc/tmp/lock~, and
+~Repo.fetch~/add rebuild the index by walking ~7k sidecars (~93 s on
+Lustre), so colliding writers fail with "Unable to acquire lock"
+(reproduced at 91.7% failure / 12 procs — see
+~slurm_logs/dvc_lock_repro/~). A coordinating fetch/write *queue*
+(daemon or fair FIFO lock) was floated as the fix.
+
+Decision: *not worth building.*
+
+- Reads never touch the lock — ~_ensure_dvc_pulled~ downloads blobs
+  straight from S3 (the v0.7.3 direct-S3 bypass), so any number of
+  concurrent readers coexist. The contention people hit comes from
+  shelling out to ~dvc pull~ CLI, not from the library.
+- Writes are rare and human-paced, and a single contributor's writes
+  already batch into one ~dvc add~/~push~ (one lock acquisition) via
+  ~push_to_cache_batch~. Cross-contributor concurrent writes are
+  uncommon.
+- The rare remaining overlap is absorbed by ~_run_dvc_with_lock_retry~
+  (exponential backoff + jitter, lock-markers only; added 2026-06-06).
+- A daemon/queue would also need a cross-node (Slurm) story — real
+  infrastructure for a problem that barely occurs.
+
+Revisit only if a routine *parallel multi-contributor
+materialize-and-push* workload emerges; until then the retry suffices.
