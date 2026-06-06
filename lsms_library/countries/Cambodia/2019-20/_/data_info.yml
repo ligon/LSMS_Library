@@ -59,3 +59,16 @@ cluster_features:
     myvars:
         Region: s01q02
         Rural: s01q06b
+
+individual_education:
+    # Education module hh_sec_3.dta. pid is `children_out_of_H__id` (a
+    # household-relative person sequence that matches the roster PID space,
+    # despite the misleading name); attainment is s03q04. NB the module also
+    # covers out-of-household children in school (s03q00='Yes'), which are
+    # not roster members and surface as spine orphans.
+    file: ../Data/hh_sec_3.dta
+    idxvars:
+        i: HHID
+        pid: children_out_of_H__id
+    myvars:
+        Educational Attainment: s03q04
