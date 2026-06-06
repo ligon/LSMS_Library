@@ -1,3 +1,36 @@
+#+name: u
+| Original Label | Preferred Label |
+|----------------+-----------------|
+| Kg             | Kg              |
+| Monte          | Monte           |
+| Unidade        | Unidade         |
+| Saquinho       | Saquinho        |
+| Caneca         | Caneca          |
+| Litro          | Litro           |
+| Garrafa        | Garrafa         |
+| Pacote         | Pacote          |
+| Pedaço         | Pedaço          |
+| Lata           | Lata            |
+| Colher         | Colher          |
+| Múndo          | Múndo           |
+| Pacotinho      | Pacotinho       |
+| Carteira       | Carteira        |
+| Dente          | Dente           |
+| Maradura       | Maradura        |
+| Frasco         | Frasco          |
+| Cacho          | Cacho           |
+| Calma          | Calma           |
+| Corda          | Corda           |
+| Balde          | Balde           |
+| Saco           | Saco            |
+| Tigela         | Tigela          |
+| Pé             | Pé              |
+| Fatia          | Fatia           |
+| Bacia          | Bacia           |
+| Dúzia          | Dúzia           |
+| Tabuleiro      | Tabuleiro       |
+| Copo           | Copo            |
+
 #+NAME: strata
 | Alternate Spelling | Preferred Label |
 |--------------------+-----------------|
