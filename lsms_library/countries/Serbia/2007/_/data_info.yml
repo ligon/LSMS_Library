@@ -78,3 +78,14 @@ interview_date:
             - dana
             - mesa
             - goda
+
+individual_education:
+    # Education embedded in the roster file individual.dta; obrazovanje is the
+    # attainment code (00-11). pid=lice matches the roster (0% spine orphans).
+    file:
+        - "../Data/individual.dta"
+    idxvars:
+        i: [opstina, popkrug, dom]
+        pid: lice
+    myvars:
+        Educational Attainment: obrazovanje

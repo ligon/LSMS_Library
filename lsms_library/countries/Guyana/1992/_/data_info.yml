@@ -80,3 +80,14 @@ household_roster:
                8: Bro/Sis/B-in-law/S-in-law/Other relative
                9: Servant/Employee/Other non-relative
 
+individual_education:
+    # Dedicated education module EDUCN.dta; HS = highest school (codes 1-17).
+    # i=[ED,HH], pid=PID match the roster (~0.3% spine orphans).
+    file:
+        - ../Data/EDUCN.dta
+    idxvars:
+        i: [ED, HH]
+        pid: PID
+    myvars:
+        Educational Attainment: HS
+
