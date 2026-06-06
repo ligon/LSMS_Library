@@ -23,6 +23,12 @@ Data Scheme:
     Distance: int
     Affinity: str
 
+  assets:
+    # 1993 module M2_NFS4 records only count-owned (dura_n); no value or
+    # age in this instrument, so only Quantity is declared.
+    index: (t, i, j)
+    Quantity: float
+
   individual_education:
     index: (t, i, pid)
     Educational Attainment: str
