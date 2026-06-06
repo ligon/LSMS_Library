@@ -65,3 +65,16 @@ sample:
     final_index:
         - i
         - t
+
+interview_date:
+    # Household file domacinstva.dta; Int_t from dana/mesa/goda (day/month/year)
+    # via mapping.py:Int_t. i=[opstina,popkrug,dom] matches roster. 100% coverage.
+    file:
+        - "../Data/domacinstva.dta"
+    idxvars:
+        i: [opstina, popkrug, dom]
+    myvars:
+        Int_t:
+            - dana
+            - mesa
+            - goda

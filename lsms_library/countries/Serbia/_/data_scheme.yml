@@ -28,3 +28,7 @@ Data Scheme:
     Quantity: float
     Age: float
     Value: float
+
+  interview_date:
+    index: (t, i)
+    Int_t: datetime
