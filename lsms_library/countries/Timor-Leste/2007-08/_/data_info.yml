@@ -36,3 +36,18 @@ sample:
             - mapping:
                 0: Rural
                 1: Urban
+
+cluster_features:
+    # basicvars.dta; one row per cluster v=cluster. Region=region; Rural from
+    # urban (0=Rural, 1=Urban). 300 clusters, constant within cluster.
+    file:
+        - ../Data/basicvars.dta
+    idxvars:
+        v: cluster
+    myvars:
+        Region: region
+        Rural:
+            - urban
+            - mapping:
+                0: Rural
+                1: Urban
