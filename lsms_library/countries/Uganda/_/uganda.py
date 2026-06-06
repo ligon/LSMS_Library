@@ -268,33 +268,15 @@ def food_acquired_to_canonical(df):
                       work['value_inkind'],
                       pd.Series(np.nan, index=work.index))
 
-    out = pd.concat([purchased, produced, inkind], ignore_index=True)
-    # Keep rows with EITHER positive Quantity OR positive Expenditure.
-    # An expenditure-only row (HH reported food expenditure but no
-    # quantity -- common for "food away from home" in Uganda's GSEC15b)
-    # is legitimate data and is carried through with NaN Quantity.
-    # Matches the shared ``transformations.food_acquired_to_canonical``
-    # rule.  See GH #246 part (C-2) — pre-fix behavior dropped 39 HH per
-    # wave for Uganda 2009-10 (and similarly across waves) whose only
-    # records were expenditure-without-quantity.
-    qty_ok = out['Quantity'].notna() & (out['Quantity'] > 0)
-    exp_ok = out['Expenditure'].notna() & (out['Expenditure'] > 0)
-    out = out[qty_ok | exp_ok]
+    from lsms_library.transformations import _finalize_canonical_food_acquired
 
-    # Aggregate genuine source-data duplicates: a household occasionally
-    # records multiple rows for the same (item, unit) -- e.g., two
-    # ``Other (Specify)`` entries that lump distinct foods under one
-    # canonical key.  Sum is the right aggregation for Quantity and
-    # Expenditure; for Price (a per-unit price) we take the mean across
-    # duplicate rows.  ``min_count=1`` keeps an all-NaN Price as NaN
-    # instead of coercing to 0.  Empirically observed in 2013-14 wave;
-    # mirrors the Malawi handling (commit 28429f14).
-    out = out.groupby(['t', 'i', 'j', 'u', 's'], dropna=False).agg(
-        Quantity=('Quantity', 'sum'),
-        Expenditure=('Expenditure', lambda s: s.sum(min_count=1)),
-        Price=('Price', 'mean'),
-    )
-    out = out.sort_index()
+    out = pd.concat([purchased, produced, inkind], ignore_index=True)
+    # Filter (qty>0 | exp>0; expenditure-only rows kept with NaN Quantity --
+    # GH #246 C-2) and aggregate genuine source-data duplicates (e.g. two
+    # ``Other (Specify)`` rows under one canonical key) via the shared tail
+    # (GH #251): Quantity/Expenditure summed with min_count=1, per-unit
+    # Price averaged.
+    out = _finalize_canonical_food_acquired(out)
     return out
 
 

@@ -545,17 +545,13 @@ def food_acquired_to_canonical(df):
     produced  = _make('produced',  'quant_own',      'unit_own')
     inkind    = _make('inkind',    'quant_inkind',   'unit_inkind')
 
-    out = pd.concat([purchased, produced, inkind], ignore_index=True)
-    # Keep rows with EITHER positive Quantity OR positive Expenditure.
-    # An expenditure-only row (HH reported food expenditure but no
-    # quantity) is legitimate data and is carried through with NaN
-    # Quantity.  Matches the shared
-    # ``transformations.food_acquired_to_canonical`` rule.
-    qty_ok = out['Quantity'].notna() & (out['Quantity'] > 0)
-    exp_ok = out['Expenditure'].notna() & (out['Expenditure'] > 0)
-    out = out[qty_ok | exp_ok]
+    from lsms_library.transformations import _finalize_canonical_food_acquired
 
-    out = out.set_index(['t', 'i', 'j', 'u', 's']).sort_index()
+    out = pd.concat([purchased, produced, inkind], ignore_index=True)
+    # Filter (qty>0 | exp>0; expenditure-only rows kept with NaN Quantity)
+    # via the shared tail (GH #251).  dedupe=False: Tanzania's per-source
+    # _make already yields unique canonical keys, so no groupby is needed.
+    out = _finalize_canonical_food_acquired(out, dedupe=False)
     return out
 
 
