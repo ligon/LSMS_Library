@@ -1,5 +1,94 @@
 #+title: Categorical Mappings
 
+* Food Units
+
+# Niger's food_acquired `u` index leaks Stata value-label codes: the same
+# unit appears both code-prefixed ('139. Sachet') and clean ('Sachet').
+# Map both forms to the clean canonical label (native French / local
+# names; cross-country harmonization deferred per GH #223).
+
+#+name: u
+| Original Label       | Preferred Label   |
+|----------------------+-------------------|
+| 100. Kg              | Kg                |
+| Kg                   | Kg                |
+| 101. Litre           | Litre             |
+| Litre                | Litre             |
+| 147. Unité           | Unité             |
+| Unité                | Unité             |
+| 139. Sachet          | Sachet            |
+| Sachet               | Sachet            |
+| 129. Paquet          | Paquet            |
+| Paquet               | Paquet            |
+| 143. Tas             | Tas               |
+| Tas                  | Tas               |
+| 126. Morceau         | Morceau           |
+| Morceau              | Morceau           |
+| 113. Bouteille       | Bouteille         |
+| Bouteille            | Bouteille         |
+| 107. Boîte           | Boîte             |
+| Boîte                | Boîte             |
+| 108. Boîte de tomate | Boîte de tomate   |
+| Boîte de tomate      | Boîte de tomate   |
+| 506. Boîte de nescafé | Boîte de nescafé |
+| Boîte de nescafé     | Boîte de nescafé  |
+| 112. Bouquet         | Bouquet           |
+| Bouquet              | Bouquet           |
+| 115. Calebasse       | Calebasse         |
+| Calebasse            | Calebasse         |
+| 125. Louche          | Louche            |
+| Louche               | Louche            |
+| 120. Cueillère       | Cueillère         |
+| Cueillère            | Cueillère         |
+| 124. Gousse          | Gousse            |
+| Gousse               | Gousse            |
+| 117. Cannette        | Cannette          |
+| Cannette             | Cannette          |
+| 111. Boule           | Boule             |
+| Boule                | Boule             |
+| 106. Bidon           | Bidon             |
+| Bidon                | Bidon             |
+| 102. Alvéole         | Alvéole           |
+| Alvéole              | Alvéole           |
+| 131. Pot             | Pot               |
+| Pot                  | Pot               |
+| 127. Moudou          | Moudou            |
+| Moudou               | Moudou            |
+| 146. Tongolo         | Tongolo           |
+| Tongolo              | Tongolo           |
+| 130. Plaquette       | Plaquette         |
+| Plaquette            | Plaquette         |
+| 142. Seau            | Seau              |
+| Seau                 | Seau              |
+| 128. Panier          | Panier            |
+| Panier               | Panier            |
+| 508. Feuille         | Feuille           |
+| Feuille              | Feuille           |
+| 510. Pot-tarzan      | Pot-tarzan        |
+| Pot-tarzan           | Pot-tarzan        |
+| 512. Tiya            | Tiya              |
+| Tiya                 | Tiya              |
+| 103. Avec os au Kg   | Avec os au Kg     |
+| Avec os au Kg        | Avec os au Kg     |
+| 104. Avec os au tas  | Avec os au tas    |
+| Avec os au tas       | Avec os au tas    |
+| 140. Sans os au Kg   | Sans os au Kg     |
+| Sans os au Kg        | Sans os au Kg     |
+| 141. Sans os au tas  | Sans os au tas    |
+| Sans os au tas       | Sans os au tas    |
+| 509. Koriya /Gassou  | Koriya /Gassou    |
+| Tasse                | Tasse             |
+| Botte                | Botte             |
+| Carton               | Carton            |
+| Gobelet              | Gobelet           |
+| Canari               | Canari            |
+| Waygouizé            | Waygouizé         |
+| Cristal (Kantou)     | Cristal (Kantou)  |
+| Sac Filet            | Sac Filet         |
+| Sac (25 Kg)          | Sac (25 Kg)       |
+| Sac (50 Kg)          | Sac (50 Kg)       |
+| Sac (100 Kg)         | Sac (100 Kg)      |
+
 #+NAME: Region
 | Original Label                 | Preferred Label                |
 |--------------------------------+--------------------------------|
