@@ -91,3 +91,90 @@ individual_education:
     myvars:
         Educational Attainment: HS
 
+housing:
+    # Dwelling module HHCHAR.dta, block (16) HOUSING (questionnaire GUY02.pdf
+    # p.31).  HHCHAR keys the household on (ed_dvsn, smpl_hh); these equal the
+    # roster's (ED, HH) numerically, so i=[ed_dvsn, smpl_hh] hyphen-joins to the
+    # same "ED-HH" form the roster/sample use (~1.1% orphans vs sample, same
+    # (ED,HH) ambiguity the roster itself carries).  All dwelling columns are
+    # bare integer codes with NO embedded value labels, so each carries an
+    # explicit code->name mapping (0 = not recorded -> "Not Stated").
+    #   Roof        <- bldg4  (16.1,4 material used for roof)
+    #   Walls       <- bldg3  (16.1,3 material used for walls)
+    #   Tenure      <- hous1  (16.2,1 ownership)
+    #   Toilet      <- hous4  (16.2,4 toilet facility)
+    #   Water       <- hous6  (16.2,6 water supply)
+    #   Electricity <- hous8  (16.2,8 lighting type)
+    #   Rooms       <- hhld4  (16.1,34 # rooms occupied; numeric)
+    # No Floor variable exists in the module (bldg2 is year of construction).
+    file:
+        - ../Data/HHCHAR.dta
+    idxvars:
+        i: [ed_dvsn, smpl_hh]
+    myvars:
+        Roof:
+            - bldg4
+            - mapping:
+                0: Not Stated
+                1: Sheet Metal
+                2: Shingle (Asphalt)
+                3: Shingle (Wood)
+                4: Shingle (Other)
+                5: Tile
+                6: Concrete
+                7: Makeshift
+                9: Other
+        Walls:
+            - bldg3
+            - mapping:
+                0: Not Stated
+                1: Wood
+                2: Concrete
+                3: Wood & Concrete
+                4: Stone
+                5: Brick
+                6: Adobe
+                7: Makeshift
+                9: Other
+        Tenure:
+            - hous1
+            - mapping:
+                0: Not Stated
+                1: Owned
+                2: Squatted
+                3: Rented (Private)
+                4: Rented (Government)
+                5: Leased
+                6: Rent-Free
+                9: Other
+        Toilet:
+            - hous4
+            - mapping:
+                0: Not Stated
+                1: WC Linked to Sewer
+                2: WC Cesspit or Septic Tank
+                3: Pit Latrine
+                4: None
+                9: Other
+        Water:
+            - hous6
+            - mapping:
+                0: Not Stated
+                1: Private Piped into Dwelling
+                2: Private Catchment, Not Piped
+                3: Public Piped into Dwelling
+                4: Public Piped into Yard
+                5: Public Standpipe
+                6: Public Well or Tank
+                9: Other
+        Electricity:
+            - hous8
+            - mapping:
+                0: Not Stated
+                1: Gas
+                2: Kerosene
+                3: Electricity
+                4: Other
+                9: Other
+        Rooms: hhld4
+

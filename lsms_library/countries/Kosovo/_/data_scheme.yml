@@ -41,3 +41,12 @@ Data Scheme:
     index: (t, i, j)
     Age: float
     Value: float
+
+  housing:
+    # Kosovo 2000 DWELLING.dta has no Roof/Floor/Walls/Water/Toilet
+    # module; only the dwelling-characteristic subset below exists.
+    index: (t, i)
+    Type: str
+    Electricity: str
+    Rooms: float
+    Tenure: str

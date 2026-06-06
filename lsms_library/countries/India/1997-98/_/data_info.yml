@@ -57,6 +57,18 @@ individual_education:
   myvars:
       Educational Attainment: v01a05
 
+housing:
+  file:
+      - ../Data/SECT03AB.DTA
+  idxvars:
+      i: hhcode
+  myvars:
+      Tenure: v03a01
+      Roof: v03a05
+      Floor: v03a06
+      Water: v03b01
+      Toilet: v03b09
+
 employment:
   file:
       - ../Data/SECT02AD.DTA

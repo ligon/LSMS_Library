@@ -45,6 +45,13 @@ Data Scheme:
     index: (t, i, pid)
     Educational Attainment: str
 
+  housing:
+    index: (t, i)
+    Walls: str
+    Toilet: str
+    Tenure: str
+    Rooms: float
+
   interview_date:
     index: (t, i)
     Int_t: datetime

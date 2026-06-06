@@ -12,6 +12,21 @@ household_roster:
         Relationship: q01a02
         Age: q01a05y
 
+housing:
+    # hhold.dta dwelling module; value labels already human-readable strings.
+    # q02a01 walls, q02a02 roof, q02a03 floor, q02a06 number of rooms
+    # (q02a04 type / q02a05 condition / q02a07 business rooms are outside the
+    # canonical housing subset).
+    file:
+        - ../Data/hhold.dta
+    idxvars:
+        i: hh_id
+    myvars:
+        Walls: q02a01
+        Roof: q02a02
+        Floor: q02a03
+        Rooms: q02a06
+
 interview_date:
     file: ../Data/basicvars.dta
     idxvars:

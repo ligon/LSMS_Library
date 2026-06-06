@@ -57,3 +57,21 @@ household_roster:
                 14: Not related
 
         MonthsAway: m1a_q09
+
+housing:
+    # Module 13A dwelling. i=[psu,hh] uses the composite i() (mapping.py), which
+    # reconstructs hhid=psu*100+hh to match the household identity built by
+    # sample.py, so _join_v_from_sample resolves v. Walls/Toilet/Tenure are
+    # value-labelled Title-case categoricals (NAME strings); Rooms is the integer
+    # room count. No Roof/Floor/Water/Electricity in Module 13A (utilities live
+    # in Modul_13B_Utilities.sav).
+    file: ../Data/Modul_13A_Description_of_Dwelling.sav
+    idxvars:
+        i:
+            - psu
+            - hh
+    myvars:
+        Walls: m13a_q02
+        Toilet: m13a_q10
+        Tenure: m13a_q14
+        Rooms: m13a_q08

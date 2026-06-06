@@ -38,6 +38,21 @@ Data Scheme:
     # silently collapsed with .first().  2006-07 has zero such duplicates
     # and stays on the YAML path; `load_from_waves` dispatches per wave.
 
+  housing:
+    # Dwelling module: 2007ihses03 (q03xx) / 2012ihses04 (q04xx).
+    # All source columns carry English value labels, so values are
+    # material/category NAMES, not codes.  i = the wave household key:
+    # xhhkey (2006-07) / questid (2012) -- the latter matches sample/assets
+    # (the roster's i:hh is a known pre-existing mis-key, GH #256).
+    index: (t, i)
+    Roof: str
+    Floor: str
+    Walls: str
+    Water: str
+    Toilet: str
+    Electricity: str
+    Tenure: str
+
   interview_date:
     index: (t, i)
     Int_t: datetime

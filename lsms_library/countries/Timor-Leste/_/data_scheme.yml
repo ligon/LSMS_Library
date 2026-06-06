@@ -25,6 +25,15 @@ Data Scheme:
     Region: str
     Rural: str
 
+  housing:
+    index: (t, i)
+    Walls: str
+    Roof: str
+    Floor: str
+    Rooms:
+      type: float
+      optional: true
+
   interview_date:
     index: (t, i)
     Int_t: datetime

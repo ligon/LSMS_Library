@@ -29,6 +29,20 @@ Data Scheme:
     index: (t, i, j)
     Quantity: float
 
+  housing:
+    # 1993 dwelling characteristics merged from S4_HSV1 (structure/tenure)
+    # and S3_HSV2 (water/toilet) on hhid. All material/service values are
+    # human-readable names decoded from the SALDRU PSLSD 1993 codebook;
+    # Rooms is the integer total room count.
+    index: (t, i)
+    Roof: str
+    Walls: str
+    Floor: str
+    Rooms: int
+    Tenure: str
+    Water: str
+    Toilet: str
+
   individual_education:
     index: (t, i, pid)
     Educational Attainment: str
