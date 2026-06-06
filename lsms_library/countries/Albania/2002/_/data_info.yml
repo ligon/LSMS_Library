@@ -55,3 +55,17 @@ household_roster:
                 13: Not related
 
         MonthsAway: m1_q11
+
+interview_date:
+    # Cover page metadata_cl.dta; m0_date is int YYYYMMDD parsed by
+    # mapping.py:Int_t. i=[psu,hh] -> composite via mapping.py:i() to match
+    # sample()'s household identity ('psu-hh'); `hh` alone is only the
+    # within-cluster number (14 unique). See CONTENTS.org re: the roster's
+    # i=hh issue.
+    file:
+        - ../Data/metadata_cl.dta
+    idxvars:
+        i: [psu, hh]
+    myvars:
+        Int_t:
+            - m0_date

@@ -1,0 +1,12 @@
+#+TITLE: Kazakhstan — country notes & known data issues
+
+* Known data issues
+
+** interview_date — not available at household level (2026-06-06)
+The Kazakhstan 1996 survey carries no household-level interview-date field.
+A scan of the household/cover files (KAZ96CON, KZ96SMP_PUF, KZ96REL, ...)
+found no household date columns.  Temporal data exists only at the
+individual level (~dob~ in KZ96REL) and at the community level (KOMMU has
+survey dates ~a4day/a4mon/a4year~, but these are not household-linked).
+~interview_date~ is therefore not implementable from the available
+microdata.  Tracked in GitHub issue #341.

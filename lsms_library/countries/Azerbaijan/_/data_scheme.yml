@@ -24,6 +24,10 @@ Data Scheme:
     index: (t, i, pid)
     Educational Attainment: str
 
+  interview_date:
+    index: (t, i)
+    Int_t: datetime
+
   sample:
     index: (i, t)
     v: str
