@@ -128,6 +128,18 @@ features:
 - =hh_sec_8.dta= :: Non-food expenditures
 - =hh_sec_9.dta= :: Housing
 - =hh_sec_10.dta= through =hh_sec_12.dta= :: Assets, savings, credit
-- =hh_sec_13a.dta=, =hh_sec_13b.dta= :: Shocks
+- =hh_sec_13a.dta=, =hh_sec_13b.dta= :: Shocks  *(MISLABEL — see Known data issues; these are migration modules)*
 - =hh_sec_14.dta= through =hh_sec_20b.dta= :: Various additional modules
 - =individual_cover.dta= :: Individual-level cover page
+
+* Known data issues
+
+** shocks — not available (2026-06-06)
+Cambodia 2019-20 LSMS+ has **no shocks-and-coping roster**. A full scan of
+every household section (5–20b) via variable labels found none. Note the
+section list above is mislabeled: =hh_sec_13a/13b= are **migration** modules
+(internal + international labor migration: destination, ISCO occupation,
+earnings), NOT shocks; =hh_sec_11/12= are education/health, not assets/credit.
+The only shock-adjacent content is per-member illness/injury in the health
+module (not a household shock-type × coping roster). `shocks` is therefore not
+implementable. Tracked in GitHub issue #352.

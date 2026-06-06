@@ -1,0 +1,13 @@
+#+TITLE: Timor-Leste — country notes & known data issues
+
+* Known data issues
+
+** shocks — not available (2026-06-06)
+Neither wave has a shocks-and-coping roster. The triage's candidate (2001
+`S08A*`) is the **labor/employment** section (person-level "worked?/activity
+type"), not shocks; a keyword scan of all 2001 files found no shock-type
+labels. 2007-08 has no shocks section. `shocks` is not implementable.
+Tracked in GitHub issue #352.
+
+(Note: housing, interview_date, individual_education, and cluster_features
+are implemented for Timor-Leste; plot_features is implementable 2007-08.)

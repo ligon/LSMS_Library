@@ -61,3 +61,11 @@ TOTEXP, etc.) found no date/day/month/year/interview columns; S00's
 multiple rows per household are section-response flags, not visit dates.
 ~interview_date~ is therefore not implementable from the available
 microdata.  Tracked in GitHub issue #341.
+
+** shocks — not available (2026-06-06)
+No household shocks-and-coping roster. The `S07*` family is the **non-farm
+enterprise** module (enterprise assets/debts/income), not shocks. A scan of
+all 24 household-level S-modules found only a plot-level crop-disaster field
+(`S05B` `s05b12`/`s05b13`, no coping), which is part of the farming roster —
+not a canonical `(t, i, Shock)` shocks-and-coping module. Not implementable.
+Tracked in GitHub issue #352.

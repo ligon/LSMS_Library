@@ -1,0 +1,11 @@
+#+TITLE: Guyana — country notes & known data issues
+
+* Known data issues
+
+** shocks — not available (2026-06-06)
+Guyana 1992 (early-design GLSS) has no shocks-and-coping roster. A scan of
+every 1992 data file found no shock-type × impact × coping module. The
+triage's candidate `DRBLS.dta` is the **durable-goods inventory** (item/year-
+acquired/value triplets), already covered by `assets` — not shocks. The
+closest signals (HEALTHN illness; HHCHAR other-income recall) are not shocks.
+`shocks` is therefore not implementable. Tracked in GitHub issue #352.
