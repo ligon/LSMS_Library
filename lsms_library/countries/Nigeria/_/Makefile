@@ -148,6 +148,12 @@ plot_features_parquet := $(plot_features:.py=.parquet)
 $(VAR_DIR)/plot_features.parquet: plot_features.py $(plot_features_parquet)
 	python plot_features.py
 
+# individual_education (GHS section 2, post-harvest only).  The
+# framework's grab_data calls `make ../<wave>/_/individual_education.parquet`
+# from this `_/` dir; the pattern rule runs the wave script.
+../%/_/individual_education.parquet: ../%/_/individual_education.py
+	(cd $(@D) && python individual_education.py)
+
 ../2010-11/_/housing.parquet: ../2010-11/_/housing.py
 	(cd ../2010-11/_; python housing.py)
 
