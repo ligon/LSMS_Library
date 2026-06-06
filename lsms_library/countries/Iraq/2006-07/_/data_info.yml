@@ -105,3 +105,16 @@ individual_education:
         pid: xpers
     myvars:
         Educational Attainment: q0406
+
+cluster_features:
+    # Cover page; one row per cluster v=xcluster. Region=xgov (governorate);
+    # Rural derived from the xstrat label via mapping.py:Rural. Constant
+    # within cluster (verified, 2961 clusters).
+    file:
+        - "../Data/2007ihses00_cover_page.dta"
+    idxvars:
+        v: xcluster
+    myvars:
+        Region: xgov
+        Rural:
+            - xstrat
