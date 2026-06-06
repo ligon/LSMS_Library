@@ -25,3 +25,15 @@ Data Scheme:
     Distance: int
     Affinity: str
     Marital: str
+
+  individual_education:
+    index: (t, i, pid)
+    Educational Attainment: str
+
+  assets:
+    # ENCOVI 2000 section E14 (durables): one row per (household, item) over a
+    # fixed 38-item list; non-owned items carry NaN Quantity/Value/Age.
+    index: (t, i, j)
+    Quantity: float
+    Value: float
+    Age: float
