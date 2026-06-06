@@ -50,3 +50,14 @@ household_roster:
                 13: Not related
 
         MonthsAway: m1_q08
+
+interview_date:
+    # Cover page w3_hh_basic.dta; m0_date is int YYYYMMDD parsed by
+    # mapping.py:Int_t. i=chid matches the roster.
+    file:
+        - ../Data/w3_hh_basic.dta
+    idxvars:
+        i: chid
+    myvars:
+        Int_t:
+            - m0_date
