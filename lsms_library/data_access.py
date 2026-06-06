@@ -47,9 +47,11 @@ import configparser
 import json
 import logging
 import os
+import random
 import re
 import subprocess
 import tempfile
+import time
 import urllib.error
 import zipfile
 from pathlib import Path
@@ -91,6 +93,57 @@ def _dvc_cmd() -> str:
     if venv_dvc.exists():
         return str(venv_dvc)
     return "dvc"
+
+
+# DVC serializes every repo operation on ``.dvc/tmp/lock``.  Concurrent
+# WRITERS therefore collide: multiple RAs running ``populate_and_push`` at
+# once, or a ``make -j`` materialize, fail with "Unable to acquire lock"
+# instead of queueing.  (The READ path does not hit this at all -- it warms
+# the cache via the direct-S3 bypass in ``local_tools._ensure_dvc_pulled``,
+# which never calls ``Repo.fetch`` and never takes the lock.  Concurrent
+# reads should always go through ``get_dataframe()`` / that bypass, NEVER a
+# raw ``dvc pull`` CLI, which would re-introduce the contention.)  This is
+# the cheap, in-process mitigation short of a full fetch/write queue (see
+# SkunkWorks/dvc_writer_distribution.org): retry the write CLI on lock
+# contention with exponential backoff + jitter so colliding writers serialize
+# gracefully rather than failing.
+_DVC_LOCK_MARKERS = (
+    "unable to acquire lock",
+    "lock is busy",
+    "failed to acquire lock",
+    "lockerror",
+)
+
+
+def _run_dvc_with_lock_retry(cmd, *, cwd, timeout, retries: int = 5,
+                             base_delay: float = 4.0) -> subprocess.CompletedProcess:
+    """Run a ``dvc`` CLI command, retrying only on DVC lock contention.
+
+    Returns the final :class:`subprocess.CompletedProcess`.  A non-zero exit
+    whose stderr does not look like lock contention is returned immediately
+    (no retry) so genuine errors surface fast.  ``subprocess.TimeoutExpired``
+    propagates to the caller's existing handler.
+
+    The retry targets the global ``.dvc/tmp/lock`` collision between
+    concurrent writers; backoff is exponential with uniform jitter to avoid a
+    thundering herd of writers waking together.
+    """
+    sub = cmd[1] if len(cmd) > 1 else "dvc"
+    result = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True,
+                            timeout=timeout)
+    for attempt in range(1, retries + 1):
+        if result.returncode == 0:
+            return result
+        stderr_lc = (result.stderr or "").lower()
+        if not any(m in stderr_lc for m in _DVC_LOCK_MARKERS):
+            return result  # genuine failure, not lock contention
+        delay = base_delay * (2 ** (attempt - 1)) + random.uniform(0, base_delay)
+        logger.warning("dvc %s: lock contention (attempt %d/%d); retrying in %.1fs",
+                       sub, attempt, retries, delay)
+        time.sleep(delay)
+        result = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True,
+                                timeout=timeout)
+    return result
 
 
 # Base64-obfuscated passphrase for s3_reader_creds.gpg.
@@ -726,10 +779,9 @@ def push_to_cache(path: str | Path,
 
     try:
         if dvc_add:
-            result = subprocess.run(
+            result = _run_dvc_with_lock_retry(
                 [_dvc_cmd(), "add", str(abs_path)],
-                cwd=str(_COUNTRIES_DIR),
-                capture_output=True, text=True, timeout=600,
+                cwd=str(_COUNTRIES_DIR), timeout=600,
             )
             if result.returncode != 0:
                 logger.error("dvc add failed: %s", result.stderr.strip())
@@ -739,10 +791,9 @@ def push_to_cache(path: str | Path,
         push_cmd = [_dvc_cmd(), "push", str(abs_path) + ".dvc"]
         if remote:
             push_cmd.extend(["-r", remote])
-        result = subprocess.run(
+        result = _run_dvc_with_lock_retry(
             push_cmd,
-            cwd=str(_COUNTRIES_DIR),
-            capture_output=True, text=True, timeout=600,
+            cwd=str(_COUNTRIES_DIR), timeout=600,
         )
         if result.returncode != 0:
             logger.error("dvc push failed: %s", result.stderr.strip())
@@ -808,10 +859,9 @@ def push_to_cache_batch(paths: list[str | Path],
         if dvc_add:
             add_cmd = [_dvc_cmd(), "add"] + [str(p) for p in abs_paths]
             logger.info("dvc add: %d files ...", len(abs_paths))
-            result = subprocess.run(
+            result = _run_dvc_with_lock_retry(
                 add_cmd,
                 cwd=str(_COUNTRIES_DIR),
-                capture_output=True, text=True,
                 timeout=600 + 30 * len(abs_paths),
             )
             if result.returncode != 0:
@@ -826,10 +876,9 @@ def push_to_cache_batch(paths: list[str | Path],
         if remote:
             push_cmd.extend(["-r", remote])
         logger.info("dvc push: %d files ...", len(abs_paths))
-        result = subprocess.run(
+        result = _run_dvc_with_lock_retry(
             push_cmd,
             cwd=str(_COUNTRIES_DIR),
-            capture_output=True, text=True,
             timeout=600 + 60 * len(abs_paths),
         )
         if result.returncode != 0:
