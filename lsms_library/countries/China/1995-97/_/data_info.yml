@@ -49,3 +49,14 @@ cluster_features:
     myvars:
         Region:
             - hid
+
+individual_education:
+    # Education detail S01B.DTA; attainment code s01b10 (grade/level 1-12).
+    # pid maps from s01bid (person order); join to roster pid verified at build.
+    file:
+        - ../Data/S01B.DTA
+    idxvars:
+        i: hid
+        pid: s01bid
+    myvars:
+        Educational Attainment: s01b10
