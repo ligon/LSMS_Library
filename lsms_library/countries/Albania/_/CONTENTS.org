@@ -1,0 +1,41 @@
+#+TITLE: Albania — country notes & known data issues
+
+* Known issues
+
+** household_roster 2002 & 2005 collapse to the within-cluster id (BROKEN)
+   :PROPERTIES:
+   :Discovered: 2026-06-06
+   :Affects: household_roster (2002, 2005) and everything derived from it
+             (household_characteristics, demands), plus the v / weight join
+   :END:
+
+The 2002 and 2005 ~household_roster~ blocks key the household index ~i~ on the
+*within-cluster* household number, not the canonical household identity:
+
+- 2002 ~data_info.yml~: ~i: hh~  (hh is 1..N within a PSU; only 14 distinct values)
+- 2005 ~data_info.yml~: ~i: m0_q01~  (likewise the within-cluster number)
+
+But ~sample()~ builds the canonical household id as the *composite*
+~format_id(psu) + '-' + format_id(hh)~ (2002) / ~format_id(m0_q00) + '-' +
+format_id(m0_q01)~ (2005) — e.g. ~'1-2'~, 3599 households in 2002.
+
+Consequences (observed 2026-06-06 via ~Country('Albania').household_roster()~,
+~LSMS_NO_CACHE=1~):
+
+| wave | persons | unique hh | v joined? | expected hh |
+|------+---------+-----------+-----------+-------------|
+| 2002 |     146 |        14 | no        | ~3599       |
+| 2004 |    8025 |      1898 | yes       | ok          |
+| 2005 |     140 |        12 | no        | ~3840       |
+
+So 2002/2005 rosters are collapsed to ~12–14 "households" and get NO ~v~ from
+~_join_v_from_sample()~ (their ~i~ doesn't match the sample spine).  2004 is fine.
+
+*Fix*: change the 2002/2005 ~household_roster~ ~idxvars~ to the composite
+(add an ~i()~ to each wave's ~mapping.py~ that returns ~format_id(psu)-format_id(hh)~
+/ ~format_id(m0_q00)-format_id(m0_q01)~, and set ~i: [psu, hh]~ / ~i: [m0_q00, m0_q01]~),
+mirroring what ~sample.py~ / the 2005 ~mapping.py:i()~ already do.  This is the
+same fix already applied to ~interview_date~ in those waves (see their
+~data_info.yml~), which keys on the composite and matches sample at 0% orphans.
+
+Tracked in GitHub issue #340.
