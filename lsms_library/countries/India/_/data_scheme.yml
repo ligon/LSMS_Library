@@ -35,6 +35,14 @@ Data Scheme:
     Cash_per_day: float
     Rural: str
 
+  housing:
+    index: (t, i)
+    Tenure: str
+    Roof: str
+    Floor: str
+    Water: str
+    Toilet: str
+
   interview_date:
     index: (t, i)
     Int_t: datetime
