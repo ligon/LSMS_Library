@@ -60,6 +60,26 @@ cluster_features:
         Region: s01q02
         Rural: s01q06b
 
+housing:
+    # Dwelling module hh_sec_4.dta. NB the questionnaire labels (read from the
+    # .dta variable labels) differ from the bare column-number intuition:
+    #   s04q04 = WALL material, s04q05 = ROOF material, s04q06 = FLOOR material.
+    #   s04q02 is FLOOR AREA (m^2), NOT a room count; s04q03 is the room count.
+    # All categorical columns already carry human-readable value labels, so no
+    # mapping is needed; Rooms (s04q03) is numeric.
+    file: ../Data/hh_sec_4.dta
+    idxvars:
+        i: HHID
+    myvars:
+        Roof: s04q05
+        Floor: s04q06
+        Walls: s04q04
+        Water: s04q08
+        Toilet: s04q19a
+        Electricity: s04q07
+        Rooms: s04q03
+        Tenure: s04q28
+
 individual_education:
     # Education module hh_sec_3.dta. pid is `children_out_of_H__id` (a
     # household-relative person sequence that matches the roster PID space,
