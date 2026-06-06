@@ -5,6 +5,15 @@ Data Scheme:
     Region: str
     Rural: str
 
+  housing:
+    index: (t, i)
+    Walls: str
+    Toilet: str
+    Tenure: str
+    Electricity: str
+    Rooms: float
+    materialize: make
+
   household_roster:
     index: (t, i, pid)
     Sex: str
