@@ -113,6 +113,18 @@ individual_education:
                 18: "Don't know"
                 19: "Adult education / literacy"
 
+assets:
+    # Durable-goods module M2_NFS4.dta: Quantity (dura_n, count owned) per item
+    # (dura_c, 11 codes). No value/age in this instrument -> Quantity-only.
+    # ~10 rows carry dura_n<=0 (data artifacts; left as-is).
+    file:
+        - ../Data/M2_NFS4.dta
+    idxvars:
+        i: hhid
+        j: dura_c
+    myvars:
+        Quantity: dura_n
+
 interview_date:
     # Cover page S4_HDEF.dta; Int_t built from year1/month1/day1 (year1 is a
     # 2-digit offset from 1900) via mapping.py:Int_t. 100% coverage.
