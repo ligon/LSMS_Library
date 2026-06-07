@@ -29,6 +29,10 @@ Data Scheme:
     index: (t, i, pid)
     Educational Attainment: str
 
+  subjective_well_being:
+    index: (t, i)
+    Own Step: int
+
   shocks:
     index: (t, i, Shock)
     AffectedIncome: bool
