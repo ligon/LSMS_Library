@@ -74,6 +74,19 @@ Data Scheme:
     Roof: str
     Floor: str
 
+  subjective_well_being:
+    # EHCVM Section 20 'Pauvreté relative' (s20 / s20a).  Self-placement
+    # on a 4-point relative-welfare ladder (Très pauvre / Pauvre / Moyen
+    # / Riche) mapped to Own Step 1-4 so higher = better off, consistent
+    # with the Malawi/Cantril ladder.  EHCVM waves only (2018-19,
+    # 2021-22).  The pre-EHCVM ECVMA waves (2011-12, 2014-15) have no
+    # self-placement welfare ladder: ECVMA2 §15 'Aspirations'
+    # (ECVMA2_MS15P1, MS15Q16 = "Pensez-vous que vous aurez le même
+    # succès dans votre vie") is a binary expectation/aspiration item,
+    # not a current ladder, so it is deliberately NOT wired here.
+    index: (t, i)
+    Own Step: int
+
   interview_date:
     index: (t, i)
     Int_t: datetime
