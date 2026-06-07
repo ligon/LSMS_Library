@@ -274,3 +274,28 @@ interview_date:
             - menage
     myvars:
         Int_t: s00q23a
+
+food_security:
+    # FAO 8-item Food Insecurity Experience Scale (FIES), EHCVM Section 8A
+    # 'Segurança alimentar'.  Recall period: last 12 months.  Items
+    # s08aq01..s08aq08 map IN ORDER to the canonical FAO items
+    # Worried..WholeDay.  Guinea-Bissau labels are Portuguese:
+    # Sim -> True, Não -> False; Recusa / Não sabe (refused / don't know)
+    # -> NaN.  French Oui/Non handled defensively.  The bool mapping and
+    # the FIES_score (count of True across the 8 items) are computed in
+    # the food_security() hook in mapping.py.  s08aq07a / s08aq08a are
+    # frequency follow-ups and are not part of the binary scale (ignored).
+    file: s08a_me_gnb2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        Worried: s08aq01
+        HealthyDiet: s08aq02
+        FewFoods: s08aq03
+        SkippedMeal: s08aq04
+        AteLess: s08aq05
+        RanOut: s08aq06
+        Hungry: s08aq07
+        WholeDay: s08aq08
