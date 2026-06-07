@@ -35,6 +35,24 @@ Data Scheme:
     Region: str
     Rural: str
 
+  housing:
+    # TLSS dwelling module.  1999 (SSEC2) and 2007 (r1m7a/b/c) field a full
+    # structure+utilities block; 2009 (m6b) retained utilities only (the
+    # physical-structure block was dropped), so it contributes Water alone.
+    # 2003 (module6) is skipped: value labels are stripped in the repo .dta
+    # (codes only, no questionnaire in scope to decode them).
+    # 1999 omits Water (s2bq40 is distance-to-source in metres, not a source
+    # category) and Electricity (s2bq26 is hours/availability, not boolean).
+    index: (t, i)
+    Tenure: str
+    Walls: str
+    Roof: str
+    Floor: str
+    Rooms: int
+    Toilet: str
+    Water: str
+    Electricity: str
+
   household_roster:
     index: (t, i, pid)
     Sex: str
