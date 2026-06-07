@@ -27,6 +27,8 @@ Standard EHCVM format, nearly identical to Mali.  Variable names: =s07bq01= (foo
 *** Categorical mapping
 ISSUE: No harmonised =categorical_mapping.org= file yet.  Food labels and units come through as raw categoricals from the =.dta= files.  Many 2014 units remain as French text without standardisation.  The 2018-19/2021-22 unit codes are numeric without categorical labels in some entries.
 
+UPDATE (GH #223 Layer 2): the 2018-19/2021-22 =s07bq03b= numeric unit codes are now decoded via the shared EHCVM codebook (=lsms_library/categorical_mapping/ehcvm_units.org=, unioned from the sibling countries' =.dta= value labels) applied through =mappings: ['ehcvm_units','Code','Preferred Label']= in =data_info.yml=.  The dead identity rows (=101.0->101.0=, ...) were removed from =categorical_mapping.org=.  Code leaks 22 -> 2; residual codes =254, 255= have no label in any EHCVM source.
+
 ** DONE sample
 Sampling design table: cluster, weights, strata, and Rural classification.
 

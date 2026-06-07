@@ -182,7 +182,9 @@ food_acquired:
         j:
             - s07bq01
             - mappings: ['harmonize_food', 'Original Label', 'Preferred Label']
-        u: s07bq03b
+        u:
+            - s07bq03b
+            - mappings: ['ehcvm_units', 'Code', 'Preferred Label']
     myvars:
         Quantity: s07bq03a
         Expenditure: s07bq08
