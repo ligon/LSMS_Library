@@ -60,6 +60,16 @@ logger = logging.getLogger(__name__)
 
 JSON_CACHE_METHODS = {'panel_ids', 'updated_ids'}
 
+# Reserved values on the ``u`` index level that are framework sentinels, not
+# survey unit labels: ``'kg'`` is the kg-conversion tag emitted by
+# food_quantities/food_prices; ``'Value'`` marks LCU-only goods.  A country's
+# ``#+name: u`` categorical table must not remap these on *derived* food
+# tables (GH #361) — see ``_apply_categorical_mappings(protect_u_sentinels=)``.
+_RESERVED_U_SENTINELS = frozenset({'kg', 'Value'})
+
+# Derived food tables whose ``u`` level can carry the reserved sentinels.
+_U_SENTINEL_PROTECTED_METHODS = frozenset({'food_quantities', 'food_prices'})
+
 
 class DeprecatedFeatureError(AttributeError):
     """Raised when a removed or deprecated table method is called on Country.
@@ -1580,7 +1590,8 @@ class Country:
         return merged.set_index(df.index.names)
     
 
-    def _apply_categorical_mappings(self, df: pd.DataFrame) -> pd.DataFrame:
+    def _apply_categorical_mappings(self, df: pd.DataFrame,
+                                    protect_u_sentinels: bool = False) -> pd.DataFrame:
         """Auto-apply categorical mappings where table names match columns or indices.
 
         For each column or index level in *df*, check whether
@@ -1588,6 +1599,18 @@ class Country:
         (case-insensitive).  If the table has a ``Preferred Label``
         column, build a replacement dictionary from the first other
         column → ``Preferred Label`` and apply it.
+
+        ``protect_u_sentinels`` (GH #361): when True, the country
+        ``#+name: u`` table is not allowed to remap the framework's reserved
+        ``u`` conversion sentinels (:data:`_RESERVED_U_SENTINELS` — ``'kg'``,
+        ``'Value'``).  Set for *derived* food tables (food_quantities /
+        food_prices), whose ``u`` level carries the lowercase ``'kg'`` tag
+        produced by the kg conversion.  A country whose table happens to map
+        e.g. ``kg → Kg`` (Burkina, to unify raw food_acquired spellings)
+        would otherwise corrupt that sentinel, so cross-country
+        ``xs('kg', level='u')`` silently misses it.  food_acquired itself
+        passes ``protect_u_sentinels=False`` so its raw unit-label
+        canonicalization is unaffected.
         """
         cat_maps = self.categorical_mapping
         if not cat_maps:
@@ -1596,20 +1619,27 @@ class Country:
         # Build case-insensitive lookup
         lower_lookup = {name.lower(): name for name in cat_maps}
 
-        def _build_replace_dict(table: pd.DataFrame) -> dict | None:
+        def _build_replace_dict(table: pd.DataFrame, *,
+                                drop_keys: set | None = None) -> dict | None:
             if "Preferred Label" not in table.columns:
                 return None
             source_cols = [c for c in table.columns if c != "Preferred Label"]
             if not source_cols:
                 return None
-            return table.set_index(source_cols[0])["Preferred Label"].to_dict()
+            rdict = table.set_index(source_cols[0])["Preferred Label"].to_dict()
+            if drop_keys:
+                # Never remap a reserved sentinel (e.g. the 'kg' conversion
+                # tag) away from itself.
+                rdict = {k: v for k, v in rdict.items() if k not in drop_keys}
+            return rdict
 
         # Apply to columns
         for col in df.columns:
             key = lower_lookup.get(col.lower())
             if key is None:
                 continue
-            rdict = _build_replace_dict(cat_maps[key])
+            drop = _RESERVED_U_SENTINELS if (protect_u_sentinels and col == 'u') else None
+            rdict = _build_replace_dict(cat_maps[key], drop_keys=drop)
             if rdict:
                 if hasattr(df[col], 'str'):
                     df[col] = df[col].str.strip()
@@ -1623,7 +1653,9 @@ class Country:
                 key = lower_lookup.get(level_name.lower())
                 if key is None:
                     continue
-                rdict = _build_replace_dict(cat_maps[key])
+                drop = (_RESERVED_U_SENTINELS
+                        if (protect_u_sentinels and level_name == 'u') else None)
+                rdict = _build_replace_dict(cat_maps[key], drop_keys=drop)
                 if rdict:
                     df = df.rename(index=rdict, level=level_name)
 
@@ -1741,8 +1773,13 @@ class Country:
                 df = _expand_kinship(df)
 
             # Auto-apply categorical mappings where table name matches
-            # a column or index name (issue #49)
-            df = self._apply_categorical_mappings(df)
+            # a column or index name (issue #49).  For derived food tables,
+            # protect the reserved 'kg'/'Value' u-sentinels from a country's
+            # #+name: u remap (GH #361).
+            df = self._apply_categorical_mappings(
+                df,
+                protect_u_sentinels=method_name in _U_SENTINEL_PROTECTED_METHODS,
+            )
 
             # Apply ``harmonize_<method_name>`` mapping to the ``j`` index
             # level when such a categorical_mapping table exists (GH #180,
