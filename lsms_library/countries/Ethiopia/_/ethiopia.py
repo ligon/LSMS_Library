@@ -617,3 +617,72 @@ def plot_features_for_wave(t, sect2, sect3, colmap):
     out = out.dropna(subset=['i', 'plot_id'])
     out = out.set_index(['t', 'i', 'plot_id'])
     return out
+
+
+# food_coping (CSI / rCSI coping-strategies battery; GH #332, Family B).
+#
+# ESS Section 7 ("Food Security"), household-level file sect7_hh_w{1,2,3}.
+# Question hh_s7q02_{a..h} = "In the past 7 days, how many days have you or
+# someone in your HH had to: [strategy]?" (integer 0-7, "IF NO DAYS, RECORD
+# ZERO").  This is the 8-item Coping Strategies Index, which embeds the 5
+# reduced-CSI (rCSI) strategies (LessPreferred, BorrowFood, LimitPortion,
+# RestrictAdults, ReduceMeals) plus three survey-specific items.  Item
+# wording was confirmed verbatim from the ESS3 HH Questionnaire (Section 7,
+# Q2, columns A-H); the W1/W2 .dta labels are byte-identical (Stata
+# truncates them at 80 chars but the prefixes match exactly).
+#
+# Wave wiring: i is the wave-native household id matching household_roster /
+# sample (household_id for W1; household_id2 for W2/W3).  The cross-wave
+# id_walk to panel-canonical ids is applied once at the country level.
+FOOD_COPING_STRATEGIES = {
+    'hh_s7q02_a': 'LessPreferred',   # Rely on less preferred foods? (rCSI)
+    'hh_s7q02_b': 'LimitVariety',    # Limit the variety of foods eaten?
+    'hh_s7q02_c': 'LimitPortion',    # Limit portion size at mealtimes? (rCSI)
+    'hh_s7q02_d': 'ReduceMeals',     # Reduce number of meals eaten in a day? (rCSI)
+    'hh_s7q02_e': 'RestrictAdults',  # Restrict consumption by adults for small children to eat? (rCSI)
+    'hh_s7q02_f': 'BorrowFood',      # Borrow food, or rely on help from a friend/relative? (rCSI)
+    'hh_s7q02_g': 'NoFood',          # Have no food of any kind in your household?
+    'hh_s7q02_h': 'WholeDay',        # Go a whole day and night without eating anything?
+}
+
+
+def food_coping_for_wave(t, df, hhid):
+    """Reshape the ESS Section 7 CSI day-count battery to long form.
+
+    Parameters
+    ----------
+    t : str
+        Wave label (e.g. '2011-12').
+    df : pd.DataFrame
+        Raw sect7_hh_w*.dta frame.
+    hhid : str
+        Source household-id column matching the wave's roster/sample i
+        ('household_id' for W1, 'household_id2' for W2/W3).
+
+    Returns
+    -------
+    pd.DataFrame
+        Index (t, i, Strategy); column ``Days`` (Int64, 0-7).  One row per
+        (household, coping strategy).  Rows with a missing Days value are
+        dropped (the strategy was not answered for that household).
+    """
+    cols = list(FOOD_COPING_STRATEGIES)
+    out = df[[hhid] + cols].copy()
+    out['i'] = out[hhid].apply(format_id)
+    out = out.drop(columns=[hhid])
+
+    long = out.melt(id_vars='i', value_vars=cols,
+                    var_name='_var', value_name='Days')
+    long['Strategy'] = long['_var'].map(FOOD_COPING_STRATEGIES)
+    long = long.drop(columns='_var')
+    long['t'] = t
+
+    long['Days'] = pd.to_numeric(long['Days'], errors='coerce')
+    # Valid domain is 0-7 days within the 7-day recall window.  ESS W3 has
+    # one data-entry outlier (LimitPortion = 8); drop out-of-domain values.
+    long.loc[(long['Days'] < 0) | (long['Days'] > 7), 'Days'] = pd.NA
+    long['Days'] = long['Days'].astype('Int64')
+    long = long.dropna(subset=['i', 'Days'])
+
+    long = long.set_index(['t', 'i', 'Strategy']).sort_index()
+    return long

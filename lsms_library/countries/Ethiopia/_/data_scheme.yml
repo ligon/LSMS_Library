@@ -98,7 +98,8 @@ Data Scheme:
     # wave data_info.yml).  W4 (2018-19) §8 is an rCSI/coping-strategy
     # battery (s8q02a..h = number-of-days frequency counts), NOT FIES, so
     # it is deliberately NOT wired here; it belongs to a future rCSI
-    # feature.  W1-3 likewise used the rCSI/coping battery.
+    # feature.  W1-3 carry the rCSI/coping battery in §7 (sect7_hh,
+    # hh_s7q02_*), wired separately as `food_coping` below.
     # Recall period: 12 months for 7 items; WholeDay (s8q06) is 30-day.
     index: (t, i)
     Worried: bool
@@ -110,6 +111,26 @@ Data Scheme:
     Hungry: bool
     WholeDay: bool
     FIES_score: int
+
+  food_coping:
+    # CSI / rCSI coping-strategies battery (GH #332, Family B).  ESS
+    # Section 7 ("Food Security"), household file sect7_hh_w{1,2,3}.dta,
+    # question hh_s7q02_{a..h} = "In the past 7 days, how many days have
+    # you or someone in your HH had to: [strategy]?" (integer 0-7).  This
+    # is the 8-item Coping Strategies Index; it embeds the 5 reduced-CSI
+    # (rCSI) strategies (LessPreferred, BorrowFood, LimitPortion,
+    # RestrictAdults, ReduceMeals) plus 3 survey-specific items
+    # (LimitVariety, NoFood, WholeDay).  Item wording confirmed verbatim
+    # from the ESS3 HH Questionnaire (Section 7, Q2, columns A-H).
+    #
+    # Wired ONLY for the rCSI day-count waves: W1 (2011-12), W2 (2013-14),
+    # W3 (2015-16).  W4 (2018-19) §8 s8q02a..h is a separate coping battery
+    # (future feature); W5 (2021-22) §8 is FAO FIES (wired as
+    # food_security).  Reshape (wide -> long over Strategy) requires a
+    # script => materialize: make.  Recall period: last 7 days.
+    index: (t, i, Strategy)
+    Days: int
+    materialize: make
 
   food_expenditures: !make
   food_prices: !make
