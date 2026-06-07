@@ -18,13 +18,22 @@ reduced Coping Strategies Index battery, mapped in questionnaire order:
     SA2E  borrow food / rely on help from relatives        -> BorrowFood
 
 The Stata variable labels are all truncated at Stata's 80-char cap to the
-identical shared prefix above, so the discriminating clause is NOT recoverable
-from the .dta and no questionnaire ships with the data.  The SA2A..SA2E ->
-Strategy attribution is therefore INFERRED from peer surveys whose labels are
-verifiable and which use this exact a-e ordering: Mali EACI 2014-15 (a
-near-twin francophone-Sahelian WB survey, §17 s17q02a-e, label-verified) and
-Malawi IHS Module H (verified vs the IHS3 questionnaire).  Only the per-strategy
-NAME attribution rests on this inference; the ``Days`` counts are exact.
+identical shared prefix above, so the .dta itself cannot disambiguate the five
+items.  The a-e -> Strategy attribution is VERIFIED against the WB EMC 2014
+Passage-3 questionnaire (microdata.worldbank.org catalog 2538,
+Questionnaire_EMC_2014_Passage_3.pdf, section SA), whose SA2 columns read
+verbatim:
+
+    A. "Consommer des aliments moins chers que d'habitude?"       -> LessPreferred
+    B. "Réduire les quantités consommées chaque fois?"            -> LimitPortion
+    C. "Réduire le nombre de repas par jour?"                     -> ReduceMeals
+    D. "Réduire les quantités consommées par les adultes au
+        profit des enfants?"                                      -> RestrictAdults
+    E. "Emprunter de la nourriture, ou compter sur l'aide de
+        parents ou d'amis?"                                       -> BorrowFood
+
+(This order also matches the labels independently verified in the Mali EACI
+2014-15 and Malawi IHS peer surveys.)
 
 SA1 (the 7-day gate) is NOT a coping day-count, so it is out of scope here;
 SA3 (meals/day) and SA5/SA6 (12-month provisioning) belong to other features.
@@ -38,9 +47,10 @@ import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, format_id
 
-# SA2{letter} -> rCSI Strategy, in questionnaire order (a-e) inferred from the
-# Mali EACI 2014-15 / Malawi IHS peer surveys (see module docstring); the
-# Burkina .dta labels are 80-char-truncated and cannot disambiguate directly.
+# SA2{letter} -> rCSI Strategy, in questionnaire order (a-e) verified against
+# the WB EMC 2014 Passage-3 questionnaire (catalog 2538, section SA; see module
+# docstring for the verbatim French).  The .dta labels are 80-char-truncated and
+# cannot disambiguate, but the questionnaire is authoritative.
 STRATEGIES = {
     'A': 'LessPreferred',
     'B': 'LimitPortion',

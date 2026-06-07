@@ -140,11 +140,12 @@ Data Scheme:
     # [...] avez-vous dû [...]" -- a day-count 0-7.  WIDE->LONG: one
     # (t, i, Strategy) row per strategy.  SA2A..SA2E map IN ORDER to
     # LessPreferred / LimitPortion / ReduceMeals / RestrictAdults / BorrowFood.
-    # The Stata labels are all truncated to an identical 80-char prefix and no
-    # questionnaire ships with the data, so this a-e attribution is INFERRED
-    # from the verifiable peer surveys that use the same ordering (Mali EACI
-    # 2014-15 s17q02a-e, label-verified; Malawi IHS Module H).  Days counts are
-    # exact regardless; only the per-strategy name rests on the inference.
+    # The Stata labels are all truncated to an identical 80-char prefix, but the
+    # a-e attribution is VERIFIED against the WB EMC 2014 Passage-3 questionnaire
+    # (catalog 2538, section SA): A "aliments moins chers", B "réduire les
+    # quantités consommées", C "réduire le nombre de repas", D "réduire les
+    # quantités des adultes au profit des enfants", E "emprunter de la
+    # nourriture".  (Matches the Mali EACI / Malawi IHS peer surveys.)
     # HOUSEHOLD-level; i = the 2014 roster i (format_id(zd)+format_id(menage,3)).
     index: (t, i, Strategy)
     Days: int
