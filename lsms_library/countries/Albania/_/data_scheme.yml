@@ -64,3 +64,26 @@ Data Scheme:
     index: (t, i, Shock)
     Years: str
     materialize: make
+
+  # Lasting per-plot characteristics from each wave's agriculture roster
+  # (GH #167).  Four buildable waves: 2002 (agr_a1_cl.dta), 2005
+  # (agric/part1_roster_a.dta), 2008 (Modul_17_id_of_agric_household.sav),
+  # 2012 (Modul_17_..._Hh_Q3-9.sav).  i matches each wave's sample identity
+  # (psu-hh for 2002/2005/2008; psu*100+hh for 2012); plot_id is the source
+  # plot code (2012 has none -> synthesised 1..n per HH).  Area is converted
+  # from the source square meters to canonical hectares; AreaUnit records the
+  # source unit.  Tenure (acquisition/origin), TenureSystem (legal title doc),
+  # SoilType (kind of land), and Irrigated are populated where the wave's
+  # questionnaire carries them: 2008 has only Area/AreaUnit/SoilType; only
+  # 2002 & 2005 carry an irrigation question.  Panel waves 2003 & 2004 have
+  # only a wide household-level farm module with undecodable column labels and
+  # no per-plot area -> ABSENT (see CONTENTS.org).
+  plot_features:
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    Tenure: str
+    TenureSystem: str
+    SoilType: str
+    Irrigated: bool
+    materialize: make
