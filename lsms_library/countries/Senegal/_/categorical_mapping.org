@@ -326,7 +326,7 @@
 #+NAME: u
 | Original Label                       | Preferred Label        |
 |--------------------------------------+------------------------|
-| 1.0                                  | 1.0                    |
+| 1.0                                  | NA                     |
 | 100. kg                              | Kg                     |
 | 1000. Bouteille de 20 litres         | Bouteille de 20 L      |
 | 1001. 12,5 cl (démi walatt)          | Demi walatt            |
