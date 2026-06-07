@@ -204,6 +204,35 @@
 |  121 | medium packet/sachet         | ---                          | ---                          | medium packet/sachet         | medium packet/sachet         |
 |  122 | large packet/sachet          | ---                          | ---                          | large packet/sachet          | large packet/sachet          |
 |  900 | other specify                | ---                          | ---                          | other specify                | other specify                |
+| 22 | Basket Medium | Basket Medium | --- | --- | --- |
+| 23 | Basket Big | Basket Big | --- | --- | --- |
+| 32 | Basin Medium | Basin Medium | --- | --- | --- |
+| 33 | Basin Big/Large | Basin Big/Large | --- | --- | --- |
+| 34 | Basin Extra Large | Basin Extra Large | --- | --- | --- |
+| 53 | Yam Tuber Big/Large | Yam Tuber Big/Large | --- | --- | --- |
+| 63 | Bundle Big | Bundle Big | --- | --- | --- |
+| 93 | Jerry Can Big | Jerry Can Big | --- | --- | --- |
+| 94 | Jerry Can Large | Jerry Can Large | --- | --- | --- |
+| 125 | Packet | --- | --- | --- | Packet |
+| 130 | Sack/Bag | --- | --- | --- | Sack/Bag |
+| 140 | Basket | --- | --- | --- | Basket |
+| 150 | Basin | --- | --- | --- | Basin |
+| 170 | Wheelbarrow | --- | --- | --- | Wheelbarrow |
+| 200 | Loaf | --- | --- | --- | Loaf |
+| 211 | Tuber | --- | --- | --- | Tuber |
+| 240 | Bottle/Can | --- | --- | --- | Bottle/Can |
+| 250 | Sachet | --- | --- | --- | Sachet |
+| 251 | Bag of 20 Sachets | --- | --- | --- | Bag of 20 Sachets |
+| 270 | Cube | --- | --- | --- | Cube |
+| 280 | Metric Cup | --- | --- | --- | Metric Cup |
+| 290 | Wrap | --- | --- | --- | Wrap |
+| 300 | Spoon | --- | --- | --- | Spoon |
+| 301 | Tea Spoon | --- | --- | --- | Tea Spoon |
+| 302 | Table Spoon | --- | --- | --- | Table Spoon |
+| 310 | Crate | --- | --- | --- | Crate |
+| 320 | Slice | --- | --- | --- | Slice |
+| 330 | Whole Animal | --- | --- | --- | Whole Animal |
+| 340 | Shot | --- | --- | --- | Shot |
 
 * Geopolitical Zones
 
