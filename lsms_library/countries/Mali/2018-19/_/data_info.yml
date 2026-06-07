@@ -2,6 +2,28 @@ Country: Mali
 Wave: 2018-19
 
 
+subjective_well_being:
+    # EHCVM Section 20 'Pauvreté relative'.  s20q05 = self-placement on a
+    # 4-point relative-welfare ladder (Très pauvre / Pauvre / Moyen / Riche).
+    # Mapped to Own Step so higher = better off, consistent with the
+    # Malawi/Cantril ladder.  Ne sait pas / Refus / NaN -> NaN.
+    # NB: the 2018-19 .dta truncates the "Très pauvre" label to "Tr".
+    file: s20_me_mli2018.dta
+    idxvars:
+        v: grappe
+        i:
+            - grappe
+            - menage
+    myvars:
+        Own Step:
+            - s20q05
+            - mapping:
+                Tr: 1
+                Pauvre: 2
+                Moyen: 3
+                Riche: 4
+
+
 sample:
     dfs:
         - df_cover
