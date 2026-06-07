@@ -25,6 +25,17 @@ Data Scheme:
     index: (t, i, pid)
     Educational Attainment: str
 
+  subjective_well_being:
+    # EHCVM Section 20 'Pauvreté relative' self-placement ladder.
+    # Single item: respondent classes the household on a 4-point
+    # welfare scale (Très pauvre / Pauvre / Moyen / Riche) mapped to
+    # Own Step 1-4 (higher = better off, consistent with Malawi/Cantril).
+    # Ne sait pas / Refus / NaN -> NaN.  Source item: s20q05 (2018-19),
+    # s20aq05 (2021-22, after §20 was split into a/b/c subsections).
+    # Only 'Own Step' is asked (no Neighbors/Friends placement).
+    index: (t, i)
+    Own Step: int
+
   shocks:
     index: (t, i, Shock)
     AffectedIncome: bool
