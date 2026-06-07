@@ -15,6 +15,7 @@ Index Info:
     household_roster: (t, v, i, pid)
     individual_education: (t, i, pid)
     food_acquired: (t, v, i, j)
+    food_security: (t, i)
 
 Data Scheme:
   cluster_features:
@@ -51,5 +52,17 @@ Data Scheme:
   interview_date:
     index: (t, i)
     Int_t: datetime
+
+  food_security:
+    index: (t, i)
+    Worried: bool
+    HealthyDiet: bool
+    FewFoods: bool
+    SkippedMeal: bool
+    AteLess: bool
+    RanOut: bool
+    Hungry: bool
+    WholeDay: bool
+    FIES_score: int
 
   panel_ids: !make

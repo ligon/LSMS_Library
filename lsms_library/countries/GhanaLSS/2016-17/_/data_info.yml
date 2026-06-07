@@ -62,3 +62,33 @@ individual_education:
         # s2aq2 = "highest grade completed"; value labels are embedded in the
         # .dta and decoded automatically by get_dataframe().
         Educational Attainment: s2aq2
+
+food_security:
+    # GLSS7 Section 9C 'Household Food Insecurity' = the FAO FIES 8-item
+    # battery, 12-month recall.  s9cq1..s9cq8 are in canonical FAO order
+    # (s9cq6 = "household ran out of food" confirms the alignment).
+    # Each item: Yes->True, No->False, "Don't Know"/Refused/NaN->NA
+    # (binarized by the same-named formatting fn in mapping.py).
+    file: g7sec9c.dta
+    idxvars:
+        i:
+            - clust
+            - nh
+    myvars:
+        Worried: s9cq1
+        HealthyDiet: s9cq2
+        FewFoods: s9cq3
+        SkippedMeal: s9cq4
+        AteLess: s9cq5
+        RanOut: s9cq6
+        Hungry: s9cq7
+        WholeDay: s9cq8
+        FIES_score:
+            - s9cq1
+            - s9cq2
+            - s9cq3
+            - s9cq4
+            - s9cq5
+            - s9cq6
+            - s9cq7
+            - s9cq8
