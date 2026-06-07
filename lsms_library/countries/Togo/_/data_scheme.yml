@@ -62,6 +62,23 @@ Data Scheme:
       type: str
       optional: true
 
+  food_security:
+    # FAO Food Insecurity Experience Scale (FIES), EHCVM §8A
+    # 'Sécurité alimentaire'.  Recall period: last 12 months.  The 8
+    # experience items s08aq01..s08aq08 map IN ORDER to the canonical
+    # FIES bools; FIES_score (0-8) is the count of True items, computed
+    # by the food_security() function in 2018/_/mapping.py.
+    index: (t, i)
+    Worried: bool
+    HealthyDiet: bool
+    FewFoods: bool
+    SkippedMeal: bool
+    AteLess: bool
+    RanOut: bool
+    Hungry: bool
+    WholeDay: bool
+    FIES_score: int
+
   housing:
     index: (t, i)
     Roof: str

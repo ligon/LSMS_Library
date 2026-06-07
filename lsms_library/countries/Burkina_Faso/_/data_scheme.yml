@@ -111,6 +111,27 @@ Data Scheme:
     Irrigated: bool
     materialize: make
 
+  food_security:
+    # FAO 8-item Food Insecurity Experience Scale (FIES) from EHCVM
+    # Section 8A 'Sécurité alimentaire'.  s08aq01..s08aq08 map IN ORDER
+    # to the 8 canonical FAO items (Worried..WholeDay); Oui->True,
+    # Non->False, 'Ne sait pas'/'Refus'/NaN->NaN.  Recall period: last
+    # 12 months.  FIES_score = count of True across the 8 items (NaN
+    # only if all 8 are NaN), computed in each wave's food_security()
+    # post-processor in mapping.py.  Both EHCVM waves (2018-19, 2021-22)
+    # use s08a_me_bfa<YYYY>.dta with identical structure; the §20->§20a
+    # sub-module split did NOT extend to §8.
+    index: (t, i)
+    Worried: bool
+    HealthyDiet: bool
+    FewFoods: bool
+    SkippedMeal: bool
+    AteLess: bool
+    RanOut: bool
+    Hungry: bool
+    WholeDay: bool
+    FIES_score: int
+
   interview_date:
     index: (t, i)
     Int_t: datetime

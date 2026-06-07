@@ -256,6 +256,45 @@ interview_date:
     myvars:
         Int_t: s00q23a
 
+food_security:
+    # FAO FIES 8-item scale, EHCVM §8A 'Sécurité alimentaire'.
+    # Recall period: last 12 months.  §8 was NOT split in 2021-22: the
+    # 8 items remain s08aq01..s08aq08 in s08a_me_sen2021.dta, mapping IN
+    # ORDER to the FAO items Worried..WholeDay.  Oui->True, Non->False,
+    # Ne sait pas / Refus / NaN -> NaN.  s08aq07a/s08aq08a are frequency
+    # follow-ups and are ignored.  FIES_score (0-8 count of True) is
+    # added row-wise by the food_security() function in mapping.py.
+    file: s08a_me_sen2021.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        Worried:
+            - s08aq01
+            - mapping: &fies_map {Oui: true, Non: false, Ne sait pas: null, Refus: null}
+        HealthyDiet:
+            - s08aq02
+            - mapping: *fies_map
+        FewFoods:
+            - s08aq03
+            - mapping: *fies_map
+        SkippedMeal:
+            - s08aq04
+            - mapping: *fies_map
+        AteLess:
+            - s08aq05
+            - mapping: *fies_map
+        RanOut:
+            - s08aq06
+            - mapping: *fies_map
+        Hungry:
+            - s08aq07
+            - mapping: *fies_map
+        WholeDay:
+            - s08aq08
+            - mapping: *fies_map
+
 # panel_ids is constructed at the country level by
 # Senegal/_/panel_ids.py (declared as !make in data_scheme.yml).
 # Do not reintroduce a wave-level block here.

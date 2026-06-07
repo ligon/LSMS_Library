@@ -36,6 +36,24 @@ Data Scheme:
     index: (t, i)
     Own Step: int
 
+  food_security:
+    # FAO FIES 8-item experience scale, EHCVM Section 8A 'Sécurité
+    # alimentaire' (recall: last 12 months).  Source items s08aq01..
+    # s08aq08 map IN ORDER to the FAO items Worried..WholeDay.
+    # Oui->True, Non->False, Ne sait pas / Refus / NaN -> NaN.
+    # FIES_score = count of True across the 8 items (0-8), NaN only if
+    # all eight are NaN.  Both EHCVM waves (2018-19, 2021-22).
+    index: (t, i)
+    Worried: bool
+    HealthyDiet: bool
+    FewFoods: bool
+    SkippedMeal: bool
+    AteLess: bool
+    RanOut: bool
+    Hungry: bool
+    WholeDay: bool
+    FIES_score: int
+
   shocks:
     index: (t, i, Shock)
     AffectedIncome: bool

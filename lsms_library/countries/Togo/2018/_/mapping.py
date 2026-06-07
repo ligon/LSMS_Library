@@ -81,6 +81,27 @@ def shocks(df):
     return df
 
 
+FIES_ITEMS = ['Worried', 'HealthyDiet', 'FewFoods', 'SkippedMeal',
+              'AteLess', 'RanOut', 'Hungry', 'WholeDay']
+
+
+def food_security(df):
+    '''Compute the harmonized FIES_score from the 8 FAO FIES items.
+
+    The 8 experience items (Worried..WholeDay) arrive as booleans
+    (Oui->True, Non->False, Ne sait pas / Refus -> NaN) from the YAML
+    `mapping:` blocks.  FIES_score is the row-wise count of True items
+    (0-8); it is NaN only when ALL 8 items are NaN (the FIES module was
+    not administered to that household).
+    '''
+    items = df[FIES_ITEMS]
+    score = items.sum(axis=1, skipna=True)
+    all_na = items.isna().all(axis=1)
+    score = score.where(~all_na, other=pd.NA)
+    df['FIES_score'] = score.astype('Int64')
+    return df
+
+
 def household_roster(df):
     '''
     Recover Age from date-of-birth components when s01q04a is null.

@@ -74,6 +74,26 @@ Data Scheme:
     Roof: str
     Floor: str
 
+  food_security:
+    # FAO Food Insecurity Experience Scale (FIES), 8-item household
+    # battery (GH #332).  Recall period: last 12 months.  Sources:
+    #   2014-15 (ECVMA2): §14 file ECVMA2_MS14P1, MS14Q01..Q08
+    #   2018-19 (EHCVM):  §8A file s08a_me_ner2018, s08aq01..08
+    #   2021-22 (EHCVM):  §8A file s08a_me_ner2021, s08aq01..08
+    # 2011-12 has no FIES module and is silent.  The 8 items are in FAO
+    # order; Oui->True, Non->False, Ne sait pas/NSP/Refus/NaN->NaN.
+    # FIES_score = count of True across the 8 items (NaN iff all 8 NaN).
+    index: (t, i)
+    Worried: bool
+    HealthyDiet: bool
+    FewFoods: bool
+    SkippedMeal: bool
+    AteLess: bool
+    RanOut: bool
+    Hungry: bool
+    WholeDay: bool
+    FIES_score: int
+
   subjective_well_being:
     # EHCVM Section 20 'Pauvreté relative' (s20 / s20a).  Self-placement
     # on a 4-point relative-welfare ladder (Très pauvre / Pauvre / Moyen

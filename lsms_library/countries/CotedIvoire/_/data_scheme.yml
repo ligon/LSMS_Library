@@ -33,6 +33,20 @@ Data Scheme:
     index: (t, i)
     Own Step: int
 
+  food_security:
+    # FAO 8-item Food Insecurity Experience Scale (FIES).  EHCVM §8A
+    # 'Sécurité alimentaire', recall period = last 12 months.
+    index: (t, i)
+    Worried: bool
+    HealthyDiet: bool
+    FewFoods: bool
+    SkippedMeal: bool
+    AteLess: bool
+    RanOut: bool
+    Hungry: bool
+    WholeDay: bool
+    FIES_score: int
+
   shocks:
     index: (t, i, Shock)
     AffectedIncome: bool

@@ -91,6 +91,26 @@ Data Scheme:
     Irrigated: bool
     materialize: make
 
+  food_security:
+    # FAO FIES 8-item experience scale (GH #332).  Confirmed ONLY in
+    # W5 (2021-22): ESS §8 file sect8_hh_w5.dta carries the FAO battery
+    # (s8q01..s8q08, mapped BY LABEL — not sequential FAO order; see the
+    # wave data_info.yml).  W4 (2018-19) §8 is an rCSI/coping-strategy
+    # battery (s8q02a..h = number-of-days frequency counts), NOT FIES, so
+    # it is deliberately NOT wired here; it belongs to a future rCSI
+    # feature.  W1-3 likewise used the rCSI/coping battery.
+    # Recall period: 12 months for 7 items; WholeDay (s8q06) is 30-day.
+    index: (t, i)
+    Worried: bool
+    HealthyDiet: bool
+    FewFoods: bool
+    SkippedMeal: bool
+    AteLess: bool
+    RanOut: bool
+    Hungry: bool
+    WholeDay: bool
+    FIES_score: int
+
   food_expenditures: !make
   food_prices: !make
   food_quantities: !make

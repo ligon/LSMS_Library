@@ -75,6 +75,23 @@ Data Scheme:
     index: (t, i)
     Int_t: datetime
 
+  food_security:
+    # FAO 8-item Food Insecurity Experience Scale (FIES), EHCVM Section
+    # 8A.  Recall period: last 12 months.  Items s08aq01..s08aq08 ->
+    # the 8 canonical FAO experience items (bool); FIES_score = count of
+    # True (0-8, NaN only when all 8 items are NaN).  Portuguese labels
+    # Sim/Não -> True/False; Recusa/Não sabe -> NaN.
+    index: (t, i)
+    Worried: bool
+    HealthyDiet: bool
+    FewFoods: bool
+    SkippedMeal: bool
+    AteLess: bool
+    RanOut: bool
+    Hungry: bool
+    WholeDay: bool
+    FIES_score: int
+
   plot_features:
     # Lasting parcel-level characteristics from the EHCVM agriculture
     # module s16a (GH #167; Guinea-Bissau is an EHCVM sibling of the
