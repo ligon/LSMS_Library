@@ -225,6 +225,15 @@ def food_acquired(fn,myvars):
     # still references for kg conversion.
     df['units_purchased'] = df['units_purchased'].str.title()
     df['units'] = df['units'].str.title()
+    # Strip the survey's "NNN. " code prefix that ESS embeds in the unit
+    # value labels (e.g. "1. Kilogram", "171. Sini Small") so `u` carries a
+    # clean label, not a code-prefixed string (GH #223 Layer 2).  Applied
+    # only to the unit columns -- item names / IDs may legitimately start
+    # with a digit.  "1. Kilogram" -> "Kilogram" then resolves via KNOWN_METRIC
+    # / the global u.org (-> "Kg"); container labels stay native.
+    for _col in ('units', 'units_purchased'):
+        df[_col] = (df[_col].str.replace(r'^\s*\d+\.\s*', '', regex=True)
+                            .str.strip())
     rep = {r'\s+':' ',
            'Meduim': 'Medium',
            'Kubaya ':'Kubaya/Cup ',
