@@ -28,3 +28,20 @@ def Region(value):
         return 7
     else:
         return 8
+
+
+def PlotArea(x):
+    """Clean S05B plot area (question 2, reported in mu).
+
+    A handful of rows carry the Stata sentinel ~1.75e+100 (extreme
+    encoding for a missing/refused value); coerce anything outside a
+    plausible plot range to NA.
+    """
+    import pandas as pd
+    s = pd.to_numeric(x, errors='coerce')
+    return s.where((s > 0) & (s < 1000))
+
+
+def AreaUnit(x):
+    """S05B plot areas are reported in mu (the Chinese land unit)."""
+    return 'mu'

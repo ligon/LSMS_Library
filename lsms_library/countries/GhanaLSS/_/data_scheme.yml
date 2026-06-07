@@ -34,6 +34,22 @@ Data Scheme:
   individual_education:
     index: (t, i, pid)
     Educational Attainment: str
+  plot_features:
+    # Section 8B (Agricultural land / farms) is a clean per-plot roster:
+    # one row per (household, farm).  The Section 10 module is non-farm
+    # ENTERPRISES (entno / "Enterprise name"), NOT agricultural plots --
+    # confirmed by reading the variable labels in every wave.  Wired for
+    # 1991-92, 1998-99, 2012-13, 2016-17 (the waves whose Section 8B is a
+    # genuine per-plot roster with a farm identifier + per-plot area).
+    # 1987-88/1988-89 store only household-level land totals (Y09A: ACRFRM
+    # etc.), so they are NOT plot_features.  2005-06 lacks Section 8
+    # agriculture (data jumps sec9 -> sec11).  AreaUnit/Tenure decoded from
+    # the GLSS7 value labels; 1=Acres,2=Poles,3=Ropes,4=Hectare in the
+    # older 4-code waves (no Plot/Other categories).
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    Tenure: str
   food_acquired:
     index: (t, i, j)
     Expenditure: float

@@ -60,6 +60,101 @@ logger = logging.getLogger(__name__)
 
 JSON_CACHE_METHODS = {'panel_ids', 'updated_ids'}
 
+# Reserved values on the ``u`` index level that are framework sentinels, not
+# survey unit labels: ``'kg'`` is the kg-conversion tag emitted by
+# food_quantities/food_prices; ``'Value'`` marks LCU-only goods.  A country's
+# ``#+name: u`` categorical table must not remap these on *derived* food
+# tables (GH #361) — see ``_apply_categorical_mappings(protect_u_sentinels=)``.
+_RESERVED_U_SENTINELS = frozenset({'kg', 'Value'})
+
+# Derived food tables whose ``u`` level can carry the reserved sentinels.
+_U_SENTINEL_PROTECTED_METHODS = frozenset({'food_quantities', 'food_prices'})
+
+
+def _augment_numeric_code_keys(rdict: dict) -> dict:
+    """Add int/float-string variants of integer-valued keys to a replace dict.
+
+    A categorical_mapping keyed on numeric codes (e.g. ``Code`` = 1, 2, 3)
+    won't match index data that arrives as float-strings (``'1.0'``) — the
+    "format_id applied to idxvars but not myvars" gotcha that leaks raw unit
+    codes into ``food_acquired``'s ``u`` level (GH #223 Layer 2).  For every
+    key whose value is an integer (whether ``1``, ``'1'``, or ``'1.0'``),
+    register the ``'1'`` and ``'1.0'`` string variants pointing at the same
+    Preferred Label.  Purely additive — the original keys win on collision,
+    and non-numeric labels (``'Tas'``) are left untouched.
+    """
+    extra: dict = {}
+    for k, v in rdict.items():
+        ks = str(k).strip()
+        try:
+            f = float(ks)
+        except (TypeError, ValueError):
+            continue
+        if f != int(f):
+            continue  # genuine non-integer; not a unit code
+        i = int(f)
+        for variant in (str(i), f"{i}.0"):
+            extra.setdefault(variant, v)
+    if not extra:
+        return rdict
+    # Original keys take precedence over synthesized variants.
+    return {**extra, **rdict}
+
+
+# Categorical tables whose global (lsms_library/categorical_mapping/) and
+# per-country versions are merged ROW-additively rather than full-override
+# (GH #223 Layer 2 / DESIGN_u_consolidation).  For these, a country inherits
+# the global rows (e.g. universal metric units in a global u.org) and only
+# needs to declare its country-specific rows; a country row wins on a
+# source-label key collision.  Every other table keeps the historical
+# full-table override.  Keep this allow-list small and explicit.
+_ADDITIVE_CATEGORICAL_TABLES = frozenset({'u'})
+
+
+def _categorical_key_column(table: "pd.DataFrame") -> str | None:
+    """The source-label column of a categorical table (first non-Preferred)."""
+    cols = [c for c in table.columns if c != "Preferred Label"]
+    return cols[0] if cols else None
+
+
+def _row_union_categorical(global_t: "pd.DataFrame",
+                           country_t: "pd.DataFrame") -> "pd.DataFrame":
+    """Row-union a global and a country categorical table; country row wins.
+
+    Identity is the source-label key column (first non-``Preferred Label``
+    column).  Country rows override global rows with the same key; new
+    country keys are added; global keys absent from the country table are
+    kept.  Columns are outer-unioned (e.g. per-wave columns), with country
+    values winning on overlap.  Falls back to the country table wholesale
+    when the two key columns don't agree (can't align).
+    """
+    gk = _categorical_key_column(global_t)
+    ck = _categorical_key_column(country_t)
+    if gk is None or ck is None or gk != ck:
+        return country_t
+    # country first + keep='first' => country rows win on key collision;
+    # concat outer-joins columns (NaN-filled), so wave columns survive.
+    combined = pd.concat([country_t, global_t], ignore_index=True, sort=False)
+    combined = combined.drop_duplicates(subset=[ck], keep="first")
+    return combined.reset_index(drop=True)
+
+
+def _merge_categorical_tables(global_maps: dict, country_maps: dict) -> dict:
+    """Merge global and per-country categorical tables.
+
+    Default is full-table override (country replaces global by name).  For
+    names in :data:`_ADDITIVE_CATEGORICAL_TABLES`, the two are row-unioned
+    (see :func:`_row_union_categorical`) when both exist, so the country
+    inherits global rows and overrides only the keys it redeclares.
+    """
+    merged = dict(global_maps)
+    for name, ctab in country_maps.items():
+        if name in _ADDITIVE_CATEGORICAL_TABLES and name in merged:
+            merged[name] = _row_union_categorical(merged[name], ctab)
+        else:
+            merged[name] = ctab
+    return merged
+
 
 class DeprecatedFeatureError(AttributeError):
     """Raised when a removed or deprecated table method is called on Country.
@@ -992,7 +1087,10 @@ class Country:
         Get the categorical mapping for the country.
         Searches current directory, then parent directory.
         Also merges global .org files from lsms_library/categorical_mapping/ (GH #168).
-        Global tables are loaded first; per-country tables override on name collision.
+        Global tables are loaded first; per-country tables override on name
+        collision -- except names in ``_ADDITIVE_CATEGORICAL_TABLES`` (e.g.
+        ``u``), which are row-unioned so a country inherits global rows and
+        overrides only the keys it redeclares (DESIGN_u_consolidation).
         '''
         if '_categorical_mapping_cache' not in self.__dict__:
             # Load global mappings from lsms_library/categorical_mapping/*.org
@@ -1016,7 +1114,8 @@ class Country:
                     country_maps = all_dfs_from_orgfile(org_fn)
                     break
 
-            self.__dict__['_categorical_mapping_cache'] = {**global_maps, **country_maps}
+            self.__dict__['_categorical_mapping_cache'] = _merge_categorical_tables(
+                global_maps, country_maps)
         return self.__dict__['_categorical_mapping_cache']
 
     @property
@@ -1580,7 +1679,8 @@ class Country:
         return merged.set_index(df.index.names)
     
 
-    def _apply_categorical_mappings(self, df: pd.DataFrame) -> pd.DataFrame:
+    def _apply_categorical_mappings(self, df: pd.DataFrame,
+                                    protect_u_sentinels: bool = False) -> pd.DataFrame:
         """Auto-apply categorical mappings where table names match columns or indices.
 
         For each column or index level in *df*, check whether
@@ -1588,6 +1688,18 @@ class Country:
         (case-insensitive).  If the table has a ``Preferred Label``
         column, build a replacement dictionary from the first other
         column → ``Preferred Label`` and apply it.
+
+        ``protect_u_sentinels`` (GH #361): when True, the country
+        ``#+name: u`` table is not allowed to remap the framework's reserved
+        ``u`` conversion sentinels (:data:`_RESERVED_U_SENTINELS` — ``'kg'``,
+        ``'Value'``).  Set for *derived* food tables (food_quantities /
+        food_prices), whose ``u`` level carries the lowercase ``'kg'`` tag
+        produced by the kg conversion.  A country whose table happens to map
+        e.g. ``kg → Kg`` (Burkina, to unify raw food_acquired spellings)
+        would otherwise corrupt that sentinel, so cross-country
+        ``xs('kg', level='u')`` silently misses it.  food_acquired itself
+        passes ``protect_u_sentinels=False`` so its raw unit-label
+        canonicalization is unaffected.
         """
         cat_maps = self.categorical_mapping
         if not cat_maps:
@@ -1596,20 +1708,35 @@ class Country:
         # Build case-insensitive lookup
         lower_lookup = {name.lower(): name for name in cat_maps}
 
-        def _build_replace_dict(table: pd.DataFrame) -> dict | None:
+        def _build_replace_dict(table: pd.DataFrame, *,
+                                drop_keys: set | None = None) -> dict | None:
             if "Preferred Label" not in table.columns:
                 return None
             source_cols = [c for c in table.columns if c != "Preferred Label"]
             if not source_cols:
                 return None
-            return table.set_index(source_cols[0])["Preferred Label"].to_dict()
+            rdict = table.set_index(source_cols[0])["Preferred Label"].to_dict()
+            # Numeric-code tables (e.g. a `Code` column 1, 2, 3) don't match
+            # data that arrives as float-strings ('1.0') -- the documented
+            # "format_id is applied to idxvars but not myvars" gotcha, which
+            # leaks raw unit codes into food_acquired's `u` level (GH #223
+            # Layer 2).  Additively register int/float-string variants of
+            # every integer-valued key so '1', '1.0' both resolve.  Purely
+            # additive: existing keys win, non-numeric labels are untouched.
+            rdict = _augment_numeric_code_keys(rdict)
+            if drop_keys:
+                # Never remap a reserved sentinel (e.g. the 'kg' conversion
+                # tag) away from itself.
+                rdict = {k: v for k, v in rdict.items() if k not in drop_keys}
+            return rdict
 
         # Apply to columns
         for col in df.columns:
             key = lower_lookup.get(col.lower())
             if key is None:
                 continue
-            rdict = _build_replace_dict(cat_maps[key])
+            drop = _RESERVED_U_SENTINELS if (protect_u_sentinels and col == 'u') else None
+            rdict = _build_replace_dict(cat_maps[key], drop_keys=drop)
             if rdict:
                 if hasattr(df[col], 'str'):
                     df[col] = df[col].str.strip()
@@ -1623,7 +1750,9 @@ class Country:
                 key = lower_lookup.get(level_name.lower())
                 if key is None:
                     continue
-                rdict = _build_replace_dict(cat_maps[key])
+                drop = (_RESERVED_U_SENTINELS
+                        if (protect_u_sentinels and level_name == 'u') else None)
+                rdict = _build_replace_dict(cat_maps[key], drop_keys=drop)
                 if rdict:
                     df = df.rename(index=rdict, level=level_name)
 
@@ -1741,8 +1870,13 @@ class Country:
                 df = _expand_kinship(df)
 
             # Auto-apply categorical mappings where table name matches
-            # a column or index name (issue #49)
-            df = self._apply_categorical_mappings(df)
+            # a column or index name (issue #49).  For derived food tables,
+            # protect the reserved 'kg'/'Value' u-sentinels from a country's
+            # #+name: u remap (GH #361).
+            df = self._apply_categorical_mappings(
+                df,
+                protect_u_sentinels=method_name in _U_SENTINEL_PROTECTED_METHODS,
+            )
 
             # Apply ``harmonize_<method_name>`` mapping to the ``j`` index
             # level when such a categorical_mapping table exists (GH #180,

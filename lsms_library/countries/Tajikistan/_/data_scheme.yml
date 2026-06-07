@@ -48,6 +48,21 @@ Data Scheme:
     index: (t, i, pid)
     Educational Attainment: str
 
+  plot_features:
+    # Per-plot land roster from TLSS 2007 module 12a (only round with a
+    # usable plot roster).  Three subsections merged on a tenure-tagged
+    # plot_id: r1m12a1 (owned), r1m12a2 (rented_in), r1m12a3 (rented_out).
+    # Area is in sotka (1/100 ha); TenureSystem (legal title) is present for
+    # owned plots only.  See _/plot_features.py.
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    Tenure: str
+    TenureSystem: str
+    SoilType: str
+    Irrigated: bool
+    materialize: make
+
   sample:
     index: (i, t)
     v: str
