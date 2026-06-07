@@ -33,7 +33,7 @@ def Birthplace(value):
     '''
     if value > 1e99:
         return pd.NA
-    return (lambda x: region_dict[f"{x:3.0f}".strip()])(value)
+    return region_dict.get(f"{value:3.0f}".strip(), pd.NA)
 
 def Relationship(value):
     '''
@@ -47,7 +47,7 @@ def Region(value):
     Formatting region variable
     '''
 
-    return (lambda x: region_dict[f"{x:3.0f}".strip()])(value)
+    return region_dict.get(f"{value:3.0f}".strip(), pd.NA)
     
 
 def v(value):
