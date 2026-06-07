@@ -11,6 +11,25 @@ Data Scheme:
     Satisfaction: str
     materialize: make
 
+  food_security_hfias:
+    index: (t, i)
+    HFIAS1: int
+    HFIAS2: int
+    HFIAS3: int
+    HFIAS4: int
+    HFIAS5: int
+    HFIAS6: int
+    HFIAS7: int
+    HFIAS8: int
+    HFIAS9: int
+    HFIAS_score: int
+    HFIAS_category:
+      - Food secure
+      - Mildly food insecure
+      - Moderately food insecure
+      - Severely food insecure
+    materialize: make
+
   cluster_features:
     index: (t, v)
     Region: str
