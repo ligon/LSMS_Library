@@ -29,6 +29,14 @@ Data Scheme:
     index: (t, i, pid)
     Educational Attainment: str
 
+  subjective_well_being:
+    # EHCVM Section 20 'Pauvreté relative' ladder item s20q05: household
+    # self-placement on a 4-point welfare ladder (higher = better off).
+    # Portuguese labels in the Guinea-Bissau .dta: Muito pobre / Pobre /
+    # Medio / Rico (+ Não sabe -> NaN).  LADDER construct only (Own Step).
+    index: (t, i)
+    Own Step: int
+
   shocks:
     index: (t, i, Shock)
     AffectedIncome: bool
