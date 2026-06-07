@@ -1,0 +1,9 @@
+#+title: Contents
+
+* shocks — not available (2026-06-07, verified)
+
+=shocks= (a household adverse-events-and-coping roster, index =(t, i, Shock)=)
+is an ISA/EHCVM-specific module.  PSLSD 1993 carries no such roster.  Verified
+this round by full variable-label inspection of the source =.dta= files:
+all 72 files keyword-scanned; the crime-victimization items (§9 Perceived Quality of Life) and a single "drought relief" subsidy line are not a shocks-and-coping roster.  Not implementable from current data; revisit only if a coping roster
+is later identified.  Tracked in GitHub issue #352.

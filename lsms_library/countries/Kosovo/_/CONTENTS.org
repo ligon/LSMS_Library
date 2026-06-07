@@ -1,0 +1,9 @@
+#+title: Contents
+
+* shocks — not available (2026-06-07, verified)
+
+=shocks= (a household adverse-events-and-coping roster, index =(t, i, Shock)=)
+is an ISA/EHCVM-specific module.  Kosovo LSMS 2000 carries no such roster.  Verified
+this round by full variable-label inspection of the source =.dta= files:
+displacement content is community-level only; the household modules (=MISC= social-protection, =NETWORKS= assistance-received, =HEALTH=, =DWELLING=) hold no adverse-events roster with affected-y/n + coping.  Not implementable from current data; revisit only if a coping roster
+is later identified.  Tracked in GitHub issue #352.

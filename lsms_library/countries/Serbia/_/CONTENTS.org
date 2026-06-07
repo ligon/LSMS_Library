@@ -160,3 +160,12 @@ All wave-level scripts use =dvc.api.open()= and
 =get_dataframe()=.  The =food_acquired.py= script also imports
 =pyreadstat= directly.  These should be migrated to the standard
 =get_dataframe()= pattern per CLAUDE.md.
+
+
+* shocks — not available (2026-06-07, verified)
+
+=shocks= (a household adverse-events-and-coping roster, index =(t, i, Shock)=)
+is an ISA/EHCVM-specific module.  Serbia LSMS 2007 carries no such roster.  Verified
+this round by full variable-label inspection of the source =.dta= files:
+full inspection of all 445 household + 346 individual variables; the lone damage field (=mp20=) sits in the Kosovo-IDP module, not a shocks roster.  Not implementable from current data; revisit only if a coping roster
+is later identified.  Tracked in GitHub issue #352.

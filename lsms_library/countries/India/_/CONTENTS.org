@@ -1,0 +1,9 @@
+#+title: Contents
+
+* shocks — not available (2026-06-07, verified)
+
+=shocks= (a household adverse-events-and-coping roster, index =(t, i, Shock)=)
+is an ISA/EHCVM-specific module.  the UP & Bihar Survey of Living Conditions 1997-98 carries no such roster.  Verified
+this round by full variable-label inspection of the source =.dta= files:
+§8 "Vulnerability" decomposes into food-adequacy (=SECT08A=, already wired as =months_food_inadequate=), IRDP credit (=SECT08B=), and government transfers/pensions (=SECT08C=) — none a drought/flood/illness/death/theft event roster; a keyword sweep of all SECT files was otherwise clean.  Not implementable from current data; revisit only if a coping roster
+is later identified.  Tracked in GitHub issue #352.

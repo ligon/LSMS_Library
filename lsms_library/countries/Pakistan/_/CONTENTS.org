@@ -18,3 +18,12 @@ highest-attainment variable is missing.
 Revisit if a fuller attainment variable is located (e.g. a secondary/tertiary
 column elsewhere in the instrument, or a later PIHS/PSLM wave).  Tracked in
 GitHub issue #344.
+
+
+* shocks — not available (2026-06-07, verified)
+
+=shocks= (a household adverse-events-and-coping roster, index =(t, i, Shock)=)
+is an ISA/EHCVM-specific module.  Pakistan Integrated Household Survey (PIHS) 1991 carries no such roster.  Verified
+this round by full variable-label inspection of the source =.dta= files:
+all 17 sections (=F01=–=F17=) are accounted for with no shocks chapter — the loan-purpose (§15) and migration-reason (§8) codes are not an events roster.  Not implementable from current data; revisit only if a coping roster
+is later identified.  Tracked in GitHub issue #352.
