@@ -75,8 +75,9 @@ _KNOWN_CLEAN = ["Mali", "Niger", "CotedIvoire", "Guinea-Bissau"]
 #   Togo      25 -> 4 (EHCVM codebook decode; residual 114/659/660/662)
 #   Burkina   22 -> 2 (EHCVM codebook decode; residual 254/255)
 #   Nigeria   32 -> 3 (codes decoded from WB .dta labels; residual 131/151/152)
+#   Senegal    1 -> 0 (code '1' data-entry anomaly, 2 rows -> u='NA')
 # Residual codes have no label in any source .dta. Still dirty:
-# Senegal (code '1', unresolved), Malawi, GhanaLSS, EthiopiaRHS.
+# Malawi, GhanaLSS, EthiopiaRHS.
 
 
 def test_clean_countries_have_no_u_code_leaks():
