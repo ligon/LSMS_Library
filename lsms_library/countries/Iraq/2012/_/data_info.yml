@@ -66,6 +66,63 @@ housing:
         Electricity: q0421_1
         Tenure: q0427
 
+shocks:
+    # Shocks-and-coping roster, module 2012ihses20. LONG form: 23 shock
+    # categories (shock_id, English-labeled) x ~25k households as a full
+    # cross-product. q2001 ("Has hh experienced..?") flags the few that
+    # actually occurred; the `shocks` df_edit hook in _/mapping.py keeps
+    # only q2001=='yes' rows (8812) and drops the temporary Experienced
+    # column, yielding a true experienced-shock roster.
+    #   i=questid (matches sample/housing/assets; the roster/file `hh`
+    #     field is the within-dwelling sequence number, GH #256).
+    #   Shock = shock_id label (-> Shock index level).
+    #   Impact (q2002_1/2/3/5 "Did increase/decrease income/assets/food
+    #     production/food purchases?"): DECREASE|INCREASE -> True (the shock
+    #     moved the dimension), DID NOT CHANGE -> False. q2002_4 (food
+    #     stock) is dropped -- the canonical schema has no Affected* slot
+    #     for it.
+    #   Coping (q2003_1/2/3 "Response to shock"): -> HowCoped0/1/2 (text).
+    file:
+        - "../Data/2012ihses20_shocks.dta"
+    idxvars:
+        i: questid
+        Shock: shock_id
+    myvars:
+        Experienced:
+            # NB: 'yes'/'no' MUST be quoted -- bare yes/no parse to YAML
+            # booleans, which never match the string values in q2001.
+            - q2001
+            - mapping:
+                'yes': True
+                'no': False
+        AffectedIncome:
+            - q2002_1
+            - mapping:
+                DECREASE: True
+                INCREASE: True
+                DID NOT CHANGE: False
+        AffectedAssets:
+            - q2002_2
+            - mapping:
+                DECREASE: True
+                INCREASE: True
+                DID NOT CHANGE: False
+        AffectedProduction:
+            - q2002_3
+            - mapping:
+                DECREASE: True
+                INCREASE: True
+                DID NOT CHANGE: False
+        AffectedConsumption:
+            - q2002_5
+            - mapping:
+                DECREASE: True
+                INCREASE: True
+                DID NOT CHANGE: False
+        HowCoped0: q2003_1
+        HowCoped1: q2003_2
+        HowCoped2: q2003_3
+
 cluster_features:
     # Cover page; one row per cluster v=cluster. Region=governorate;
     # Rural from q00_16. Constant within cluster (verified, 2828 clusters).

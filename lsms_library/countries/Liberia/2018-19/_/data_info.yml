@@ -63,6 +63,31 @@ assets:
         Quantity: S15_2
         Value: S15_5
 
+shocks:
+    # Section 17 (National Household Forest Survey shocks module) is LONG:
+    # one row per (hhid, shock_name).  shock_name carries the 14 shock-type
+    # labels (drought, floods, large rise in price of food, death of a
+    # member, ...).  S17_1 = "severely negatively affected in the past 12
+    # months" (yes/no) -> Experienced.  S17_5_A/B/C = first/second/third
+    # forest product collected to recover -> HowCoped0/1/2 (populated only
+    # where S17_4=yes, ~38% of experienced shocks).  Rows whose shock_name is
+    # the Stata '.' sentinel (84 HH with the module left blank) format_id to
+    # None and are dropped by the null-index guard.
+    file:
+        - "../Data/Household/sect17_public.dta"
+    idxvars:
+        i: hhid
+        Shock: shock_name
+    myvars:
+        Experienced:
+            - S17_1
+            - mapping:
+                "yes": True
+                "no": False
+        HowCoped0: S17_5_A
+        HowCoped1: S17_5_B
+        HowCoped2: S17_5_C
+
 interview_date:
     # Cover/identification module sect1_public.dta; interview_date1 is the
     # primary-visit date (datetime64; interview_date2/3 are follow-up visits,

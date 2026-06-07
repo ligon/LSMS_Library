@@ -55,3 +55,12 @@ Data Scheme:
   interview_date:
     index: (t, i)
     Int_t: datetime
+
+  # Occurrence-only shocks module (2012 wave only; earlier waves have no
+  # shocks module).  No impact (Affected*) or coping (HowCoped*) detail in
+  # the source; ``Years`` is the comma-joined list of years 2008-2012 in
+  # which each experienced shock was reported.
+  shocks:
+    index: (t, i, Shock)
+    Years: str
+    materialize: make
