@@ -432,6 +432,42 @@ def _check_float_stringified_index(df: pd.DataFrame) -> Check:
                  "No float-stringified index values")
 
 
+def food_acquired_u_code_leaks(country: str, *,
+                               df: pd.DataFrame | None = None) -> list[str]:
+    """Return ``food_acquired`` ``u`` values that look like leaked unit codes.
+
+    Audit guard for the unit-label harmonization (GH #223 Layer 2).  A clean
+    ``u`` index level holds native unit *labels* (``'Kg'``, ``'Tas'``).  Values
+    that begin with a digit — raw numeric codes (``'116'``, ``'6.0'``),
+    code-prefixed labels (``'1. Kilogram'``), or item-names (``'0 [Butter]'``)
+    — indicate an incomplete / identity ``#+name:u`` table, a missing decode,
+    or an extraction bug, and should be driven to zero as Layer 2 progresses.
+
+    Parameters
+    ----------
+    country : str
+        Country name (passed to :class:`~lsms_library.Country`).  Ignored when
+        *df* is supplied.
+    df : pd.DataFrame, optional
+        A pre-built ``food_acquired`` frame to inspect instead of building one.
+
+    Returns
+    -------
+    list[str]
+        Sorted distinct offending ``u`` values; empty when the level is clean.
+    """
+    import re
+
+    if df is None:
+        from . import Country
+        df = Country(country, preload_panel_ids=False).food_acquired()
+    if not isinstance(df, pd.DataFrame) or "u" not in (df.index.names or []):
+        return []
+    u = df.index.get_level_values("u").astype(str)
+    code = re.compile(r"^\s*\d")  # leading digit => code / code-prefix / item-name
+    return sorted({v for v in u.unique() if code.match(v)})
+
+
 def _check_index_overlap_with_spine(df: pd.DataFrame, country: str) -> Check:
     """Check that household IDs overlap with other_features (the 'spine')."""
     if "i" not in df.index.names:
