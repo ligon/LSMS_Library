@@ -42,3 +42,63 @@ household_roster:
         Birthplace: s1q11
         Relationship: s1q3
         MonthsAway: s1q22
+
+housing:
+    # GLSS5 Section 7 dwelling characteristics (parta/sec7.dta).  Wall/Floor/
+    # Roof = Part F (s7fq1/2/3); Water = Part D q1a; Toilet = Part D q16;
+    # Rooms = Part A q2; Tenure = Part B q1 (occupancy status); Electricity =
+    # Part D q11 (main source of lighting).  Value labels in this wave are
+    # lowercase -> Title-cased / canonicalized below.  i = hhid, matching the
+    # household_roster i for this wave.
+    file: parta/sec7.dta
+    idxvars:
+        i: hhid
+    myvars:
+        Walls:
+            - s7fq1
+            - mapping:
+                mud/ mud brick: Mud/Earth
+                wood/bamboo: Wood/Bamboo
+                metal sheet/slate/asbestos: Metal/Asbestos
+                stone: Stone
+                burned bricks: Burnt Bricks
+                cement/sandcrete blocks: Cement/Concrete
+                landcrete: Landcrete
+                thatch: Thatch
+                cardboard: Cardboard
+                other: Other
+        Floor:
+            - s7fq2
+            - mapping:
+                earth/mud/mud bricks: Earth/Mud
+                wood: Wood
+                stone: Stone
+                cement/concrete: Cement/Concrete
+                burnt bricks: Burnt Bricks
+                vinyl tiles: Vinyl Tiles
+                ceramic/marble/tiles: Ceramic/Marble Tiles
+                terrazo: Terrazzo
+                other: Other
+        Roof:
+            - s7fq3
+            - mapping:
+                palme leaves/raffia/thatch: Thatch
+                wood: Wood
+                corrugated iron sheets: Metal Sheet
+                cement/concrete: Cement/Concrete
+                asbestos/slate: Slate/Asbestos
+                roofing tiles: Roofing Tiles
+                mud bricks/earth: Mud/Earth
+                bamboo: Bamboo
+                other: Other
+        Water: s7dq1a
+        Toilet: s7dq16
+        Rooms: s7aq2
+        Tenure:
+            - s7bq1
+            - mapping:
+                owning: Own
+                renting: Rent
+                rent-free: Rent-free
+                perching: Perching
+        Electricity: s7dq11

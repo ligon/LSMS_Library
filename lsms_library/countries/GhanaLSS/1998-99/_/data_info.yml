@@ -107,3 +107,87 @@ plot_features:
                 2: Poles
                 3: Ropes
                 4: Hectare
+
+housing:
+    # GLSS4 Section 7 dwelling characteristics (SEC7.DTA).  The .dta has variable
+    # labels but NO value labels, so codes are decoded from the GLSS4 household
+    # questionnaire text (Section 7): walls = Part E q1 (s7eq1), floor = Part E
+    # q2 (s7eq2), roof = Part D q3 (s7eq3); water source = Part D q1 (s7dq1 --
+    # the "Drinking water cost" label is a misnomer; the column holds the 1-12
+    # source code, confirmed by its 1-12 range); lighting = Part D q8 (s7dq8);
+    # toilet = Part D q13 (s7dq13); occupancy = Part B (s7bq1); rooms = Part A
+    # q2 (s7aq2).  Part E walls/floor code lists follow the GLSS3 instrument
+    # (identical structure, verified from the GLSS3 questionnaire).  i =
+    # [clust, nh] to match household_roster.
+    file: SEC7.DTA
+    idxvars:
+        i:
+            - clust
+            - nh
+    myvars:
+        Walls:
+            - s7eq1
+            - mapping:
+                1: Mud/Earth
+                2: Wood
+                3: Metal Sheet
+                4: Stone/Burnt Bricks
+                5: Cement/Concrete
+                6: Other
+        Floor:
+            - s7eq2
+            - mapping:
+                1: Earth/Mud
+                2: Wood
+                3: Stone/Brick
+                4: Fibre-glass
+                5: Cement/Concrete
+                6: Other
+        Roof:
+            - s7eq3
+            - mapping:
+                1: Thatch
+                2: Wood
+                3: Metal Sheet
+                4: Cement/Concrete
+                5: Slate/Asbestos
+                6: Other
+        Water:
+            - s7dq1
+            - mapping:
+                1: Indoor plumbing
+                2: Inside standpipe
+                3: Water vendor
+                4: Water truck/tanker service
+                5: Neighbouring household
+                6: Private outside standpipe/tap
+                7: Public standpipe
+                8: Well with pump
+                9: Well without pump
+                10: River/lake/spring/pond
+                11: Rainwater
+                12: Other
+        Toilet:
+            - s7dq13
+            - mapping:
+                1: Flush toilet
+                2: Pit latrine
+                3: Pan/Bucket
+                4: KVIP
+                5: No toilet
+        Rooms: s7aq2
+        Tenure:
+            - s7bq1
+            - mapping:
+                1: Own
+                2: Rent
+                3: Rent-free
+                4: Perching
+        Electricity:
+            - s7dq8
+            - mapping:
+                1: Electricity (mains)
+                2: Generator
+                3: Kerosene/Gas lamp
+                4: Candles/Torches
+                5: Other

@@ -83,4 +83,13 @@ def Int_t(value):
     s = f"{y}-{int(m)}-{int(d)}"
     return pd.to_datetime(s, format='%Y-%m-%d', errors='coerce')
 
+def Rooms(value):
+    '''
+    Number of rooms.  This wave uses a large float sentinel (~1.75e100) for
+    missing/not-applicable; null it and coerce the rest to integer.
+    '''
+    if pd.isna(value) or value > 1e99:
+        return pd.NA
+    return int(value)
+
 Visits = range(1,7)

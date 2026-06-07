@@ -81,4 +81,29 @@ Data Scheme:
     WholeDay: bool
     FIES_score: int
 
+  housing:
+    # GLSS Section 7 "Housing" (dwelling characteristics).  Wired for the five
+    # waves whose Section-7 file carries value labels we could verify against
+    # the actual questionnaire/codebook: 1991-92 (S7.DTA), 1998-99 (SEC7.DTA),
+    # 2005-06 (sec7.dta), 2012-13 (SEC7.dta), 2016-17 (g7sec7.dta).  Codes
+    # differ across waves (GLSS3 6-code walls vs GLSS5/6/7 9-10 code walls;
+    # question numbering shifts), so each wave maps its own raw variables ->
+    # human-readable category strings inline.  Roof/Floor/Walls present in
+    # every wired wave; Water/Toilet/Rooms/Tenure/Electricity where available
+    # (1998-99 has no Electricity column, only a 'main source of lighting').
+    # 1987-88/1988-89 DO field a housing module (Y08.DAT: WALLS/FLOOR/ROOF),
+    # but their GLSS1/GLSS2 questionnaires are scanned-image PDFs with no text
+    # layer and the DDI/Basic-info docs carry no value codebook, so the numeric
+    # codes (WALLS 1-8, FLOOR 1-7, ROOF 1-9) cannot be decoded to labels -- those
+    # two waves are intentionally NOT wired (see CONTENTS notes / report).
+    index: (t, i)
+    Roof: str
+    Floor: str
+    Walls: str
+    Water: str
+    Toilet: str
+    Rooms: int
+    Tenure: str
+    Electricity: str
+
   panel_ids: !make
