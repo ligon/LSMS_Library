@@ -101,6 +101,61 @@ def _augment_numeric_code_keys(rdict: dict) -> dict:
     return {**extra, **rdict}
 
 
+# Categorical tables whose global (lsms_library/categorical_mapping/) and
+# per-country versions are merged ROW-additively rather than full-override
+# (GH #223 Layer 2 / DESIGN_u_consolidation).  For these, a country inherits
+# the global rows (e.g. universal metric units in a global u.org) and only
+# needs to declare its country-specific rows; a country row wins on a
+# source-label key collision.  Every other table keeps the historical
+# full-table override.  Keep this allow-list small and explicit.
+_ADDITIVE_CATEGORICAL_TABLES = frozenset({'u'})
+
+
+def _categorical_key_column(table: "pd.DataFrame") -> str | None:
+    """The source-label column of a categorical table (first non-Preferred)."""
+    cols = [c for c in table.columns if c != "Preferred Label"]
+    return cols[0] if cols else None
+
+
+def _row_union_categorical(global_t: "pd.DataFrame",
+                           country_t: "pd.DataFrame") -> "pd.DataFrame":
+    """Row-union a global and a country categorical table; country row wins.
+
+    Identity is the source-label key column (first non-``Preferred Label``
+    column).  Country rows override global rows with the same key; new
+    country keys are added; global keys absent from the country table are
+    kept.  Columns are outer-unioned (e.g. per-wave columns), with country
+    values winning on overlap.  Falls back to the country table wholesale
+    when the two key columns don't agree (can't align).
+    """
+    gk = _categorical_key_column(global_t)
+    ck = _categorical_key_column(country_t)
+    if gk is None or ck is None or gk != ck:
+        return country_t
+    # country first + keep='first' => country rows win on key collision;
+    # concat outer-joins columns (NaN-filled), so wave columns survive.
+    combined = pd.concat([country_t, global_t], ignore_index=True, sort=False)
+    combined = combined.drop_duplicates(subset=[ck], keep="first")
+    return combined.reset_index(drop=True)
+
+
+def _merge_categorical_tables(global_maps: dict, country_maps: dict) -> dict:
+    """Merge global and per-country categorical tables.
+
+    Default is full-table override (country replaces global by name).  For
+    names in :data:`_ADDITIVE_CATEGORICAL_TABLES`, the two are row-unioned
+    (see :func:`_row_union_categorical`) when both exist, so the country
+    inherits global rows and overrides only the keys it redeclares.
+    """
+    merged = dict(global_maps)
+    for name, ctab in country_maps.items():
+        if name in _ADDITIVE_CATEGORICAL_TABLES and name in merged:
+            merged[name] = _row_union_categorical(merged[name], ctab)
+        else:
+            merged[name] = ctab
+    return merged
+
+
 class DeprecatedFeatureError(AttributeError):
     """Raised when a removed or deprecated table method is called on Country.
 
@@ -1032,7 +1087,10 @@ class Country:
         Get the categorical mapping for the country.
         Searches current directory, then parent directory.
         Also merges global .org files from lsms_library/categorical_mapping/ (GH #168).
-        Global tables are loaded first; per-country tables override on name collision.
+        Global tables are loaded first; per-country tables override on name
+        collision -- except names in ``_ADDITIVE_CATEGORICAL_TABLES`` (e.g.
+        ``u``), which are row-unioned so a country inherits global rows and
+        overrides only the keys it redeclares (DESIGN_u_consolidation).
         '''
         if '_categorical_mapping_cache' not in self.__dict__:
             # Load global mappings from lsms_library/categorical_mapping/*.org
@@ -1056,7 +1114,8 @@ class Country:
                     country_maps = all_dfs_from_orgfile(org_fn)
                     break
 
-            self.__dict__['_categorical_mapping_cache'] = {**global_maps, **country_maps}
+            self.__dict__['_categorical_mapping_cache'] = _merge_categorical_tables(
+                global_maps, country_maps)
         return self.__dict__['_categorical_mapping_cache']
 
     @property
