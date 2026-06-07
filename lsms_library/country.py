@@ -71,6 +71,36 @@ _RESERVED_U_SENTINELS = frozenset({'kg', 'Value'})
 _U_SENTINEL_PROTECTED_METHODS = frozenset({'food_quantities', 'food_prices'})
 
 
+def _augment_numeric_code_keys(rdict: dict) -> dict:
+    """Add int/float-string variants of integer-valued keys to a replace dict.
+
+    A categorical_mapping keyed on numeric codes (e.g. ``Code`` = 1, 2, 3)
+    won't match index data that arrives as float-strings (``'1.0'``) — the
+    "format_id applied to idxvars but not myvars" gotcha that leaks raw unit
+    codes into ``food_acquired``'s ``u`` level (GH #223 Layer 2).  For every
+    key whose value is an integer (whether ``1``, ``'1'``, or ``'1.0'``),
+    register the ``'1'`` and ``'1.0'`` string variants pointing at the same
+    Preferred Label.  Purely additive — the original keys win on collision,
+    and non-numeric labels (``'Tas'``) are left untouched.
+    """
+    extra: dict = {}
+    for k, v in rdict.items():
+        ks = str(k).strip()
+        try:
+            f = float(ks)
+        except (TypeError, ValueError):
+            continue
+        if f != int(f):
+            continue  # genuine non-integer; not a unit code
+        i = int(f)
+        for variant in (str(i), f"{i}.0"):
+            extra.setdefault(variant, v)
+    if not extra:
+        return rdict
+    # Original keys take precedence over synthesized variants.
+    return {**extra, **rdict}
+
+
 class DeprecatedFeatureError(AttributeError):
     """Raised when a removed or deprecated table method is called on Country.
 
@@ -1627,6 +1657,14 @@ class Country:
             if not source_cols:
                 return None
             rdict = table.set_index(source_cols[0])["Preferred Label"].to_dict()
+            # Numeric-code tables (e.g. a `Code` column 1, 2, 3) don't match
+            # data that arrives as float-strings ('1.0') -- the documented
+            # "format_id is applied to idxvars but not myvars" gotcha, which
+            # leaks raw unit codes into food_acquired's `u` level (GH #223
+            # Layer 2).  Additively register int/float-string variants of
+            # every integer-valued key so '1', '1.0' both resolve.  Purely
+            # additive: existing keys win, non-numeric labels are untouched.
+            rdict = _augment_numeric_code_keys(rdict)
             if drop_keys:
                 # Never remap a reserved sentinel (e.g. the 'kg' conversion
                 # tag) away from itself.
