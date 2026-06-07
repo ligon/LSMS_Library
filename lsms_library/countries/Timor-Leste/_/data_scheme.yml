@@ -42,3 +42,9 @@ Data Scheme:
     index: (t, i, Domain)
     Satisfaction: str
     materialize: make
+
+  months_food_inadequate:
+    index: (t, i)
+    MonthsInadequate: int
+    AnyInadequate: bool
+    materialize: make
