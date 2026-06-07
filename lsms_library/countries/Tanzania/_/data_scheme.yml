@@ -54,6 +54,23 @@ Data Scheme:
     Satisfaction: str
     materialize: make
 
+  food_coping:
+    # Coping-strategies / rCSI battery (Section H "Food Security", item
+    # hh_h02a..hh_h02h / hh_02_1..hh_02_8).  For each strategy the survey
+    # asks "in the past 7 days, how many days had to [...]" -- a day-count
+    # 0-7.  Present in 2010-11, 2012-13, 2014-15 (multi-round upd4_hh_h.dta;
+    # round 1 / 2008-09 did NOT field the module), 2019-20 (HH_SEC_H.dta),
+    # and 2020-21 (hh_sec_h.dta).  HOUSEHOLD-level; i = each wave's roster i
+    # (r_hhid / sdd_hhid / y5_hhid).  WIDE->LONG: one (t, i, Strategy) row
+    # per strategy.  Strategy names: the five canonical rCSI strategies
+    # (LessPreferred, LimitPortion, ReduceMeals, RestrictAdults, BorrowFood)
+    # plus survey-specific LimitVariety / NoFood / WholeDayWithout.  Days =
+    # native count 0-7.  The hh_h08 12-month-insufficiency item is out of
+    # scope (a months-style measure, not a coping-day count).
+    index: (t, i, Strategy)
+    Days: int
+    materialize: make
+
   interview_date:
     index: (t, i)
     Int_t: datetime
