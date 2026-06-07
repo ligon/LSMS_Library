@@ -207,3 +207,14 @@ appear to have village-level split files (=debdemo4=, =dindemo4=,
   region reconciliation; sourcing constructed ERHS weights; optional
   validation of inferred kg factors vs ERHS =conv_*.tab=; validation
   of derived tables vs survey docs.
+
+* Food security (non-FIES families, GH #332) --- not wired
+
+ERHS carries only bespoke, non-standardized food-stress items (IFPRI
+meals-per-day counts and shock-roster coping responses), not a standard
+HFIAS occurrence/frequency scale, an rCSI coping-day battery, or a
+months-of-inadequate-provisioning question.  None maps cleanly onto
+=food_security_hfias=, =food_coping=, or =months_food_inadequate=, so
+those families are left unwired for EthiopiaRHS.  (The separate
+=Ethiopia= LSMS-ISA module wires =food_coping= for W1--3 and FIES
+=food_security= for W5.)

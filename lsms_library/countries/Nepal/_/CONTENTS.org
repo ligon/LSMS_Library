@@ -97,3 +97,14 @@ Malawi / Mali / Nigeria / Senegal / Burkina_Faso) and document
 the choice in this section.
 
 For the cross-country canonical-=u= roadmap, see GH #223.
+
+* Food security (non-FIES families, GH #332)
+
+NLSS III (2010-11) Section 19 ("Food security and steps taken to
+alleviate food shortage") fields a full coping-strategies battery
+(=v19_1801=..=v19_1814=, a 14-item index) plus a days-of-scarcity
+item (=v19_17=) --- enough in principle to support both =food_coping=
+and =months_food_inadequate=.  NLSS I/II carry only a food-adequacy
+self-assessment.  None is wired: as noted under "Data Acquisition
+Status" above, no Nepal =.dta= is in the repository (NSO-hosted, not
+WB).  Implement once the NLSS III source files are acquired.
