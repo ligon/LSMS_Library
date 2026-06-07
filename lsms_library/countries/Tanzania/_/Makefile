@@ -39,6 +39,15 @@ $(VAR_DIR)/shocks.parquet: shocks.py $(shocks_parquet)
 ../%/_/shocks.parquet:
 	(cd $(@D) && python shocks.py)
 
+life_satisfaction = $(shell find $(rounds) -name life_satisfaction.py)
+life_satisfaction_parquet := $(life_satisfaction:.py=.parquet)
+
+$(VAR_DIR)/life_satisfaction.parquet: life_satisfaction.py $(life_satisfaction_parquet)
+	python life_satisfaction.py
+
+../%/_/life_satisfaction.parquet:
+	(cd $(@D) && python life_satisfaction.py)
+
 plot_features = $(shell find $(rounds) -name plot_features.py)
 plot_features_parquet := $(plot_features:.py=.parquet)
 

@@ -38,6 +38,22 @@ Data Scheme:
     Educational Attainment: str
     materialize: make
 
+  life_satisfaction:
+    # Domain-satisfaction battery (Section G "Subjective Welfare", item
+    # hh_g03_* / hg_03_*).  Present in ALL Tanzania waves: 2008-09, 2010-11,
+    # 2012-13, 2014-15 (multi-round upd4_hh_g.dta), 2019-20 (HH_SEC_G.dta),
+    # and 2020-21 (hh_sec_g.dta).  The module is INDIVIDUAL-level (asked of
+    # every member 15+); each wave script REDUCES to the household HEAD (roster
+    # hh_b05/hb_05 == 'HEAD') and reshapes the 9 items WIDE->LONG.  Domains:
+    # Health, Finances, Housing, Job, HealthCareAccess, Education, Safety, plus
+    # TransportSafety + Overall (2019-/2020-) or Overall + Spouse (2008-15;
+    # item order differs).  Satisfaction = native 7-point ordinal label,
+    # Title-cased ("Very satisfied".."Very dissatisfied"); "NOT APPLICABLE"
+    # nulled.  NOT the Cantril ladder (that is subjective_well_being).
+    index: (t, i, Domain)
+    Satisfaction: str
+    materialize: make
+
   interview_date:
     index: (t, i)
     Int_t: datetime
