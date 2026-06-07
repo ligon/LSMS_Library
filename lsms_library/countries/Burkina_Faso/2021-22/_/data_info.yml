@@ -224,6 +224,48 @@ interview_date:
     myvars:
         Int_t: s00q23a
 
+food_security:
+    # FAO 8-item FIES, EHCVM §8A.  s08aq01..08 -> Worried..WholeDay in
+    # FAO order (same instrument as 2018-19; §8 was NOT split into
+    # sub-modules unlike §20).  Oui->True, Non->False,
+    # 'Ne sait pas'/'Refus'->NaN.  Recall: last 12 months.  s08aq07a/08a
+    # are frequency follow-ups -- ignored.  FIES_score computed in
+    # mapping.py's food_security() post-processor.
+    file: s08a_me_bfa2021.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        Worried:
+            - s08aq01
+            - mapping: &fies_yn
+                Oui: true
+                Non: false
+                Ne sait pas: null
+                Refus: null
+        HealthyDiet:
+            - s08aq02
+            - mapping: *fies_yn
+        FewFoods:
+            - s08aq03
+            - mapping: *fies_yn
+        SkippedMeal:
+            - s08aq04
+            - mapping: *fies_yn
+        AteLess:
+            - s08aq05
+            - mapping: *fies_yn
+        RanOut:
+            - s08aq06
+            - mapping: *fies_yn
+        Hungry:
+            - s08aq07
+            - mapping: *fies_yn
+        WholeDay:
+            - s08aq08
+            - mapping: *fies_yn
+
 subjective_well_being:
     # EHCVM §20 'Pauvreté relative'.  In the 2021-22 instrument §20 was
     # split into sub-modules A/B/C; sub-module A (s20a_me) is relative

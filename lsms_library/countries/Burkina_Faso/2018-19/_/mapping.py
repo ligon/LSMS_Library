@@ -77,6 +77,33 @@ def household_roster(df):
     return df
 
 
+FIES_ITEMS = ['Worried', 'HealthyDiet', 'FewFoods', 'SkippedMeal',
+              'AteLess', 'RanOut', 'Hungry', 'WholeDay']
+
+
+def food_security(df):
+    '''
+    FAO 8-item FIES post-processor (EHCVM §8A).
+
+    The YAML maps s08aq01..08 (Oui/Non) to True/False, with
+    'Ne sait pas'/'Refus' -> None.  Here we coerce each item to a
+    nullable boolean and compute FIES_score = count of True across the
+    8 items.  FIES_score is NaN only when ALL 8 items are NaN; otherwise
+    a NaN item contributes 0 to the count (standard for the raw FIES
+    affirmative-count screener).
+    '''
+    for c in FIES_ITEMS:
+        df[c] = df[c].astype('boolean')
+
+    items = df[FIES_ITEMS]
+    score = items.sum(axis=1, skipna=True)              # True counts as 1
+    all_na = items.isna().all(axis=1)
+    score = score.astype('Int64')
+    score[all_na] = pd.NA
+    df['FIES_score'] = score
+    return df
+
+
 COPING_LABELS = {
     1: "Utilisation de son épargne",
     2: "Aide de parents ou d'amis",
