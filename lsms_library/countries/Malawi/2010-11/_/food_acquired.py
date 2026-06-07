@@ -21,7 +21,7 @@ sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
 from malawi import (conversion_table_matching, food_acquired_to_canonical,
-                    normalize_food_label)
+                    normalize_food_label, _clean_freetext_unit)
 
 wave = "2010-11"
 
@@ -112,6 +112,9 @@ for src in ('consumed', 'bought', 'produced', 'gifted'):
                                x[c] or f, axis=1)
     # Apply conversion factor (NaN cfactor -> identity).
     df[quant_col] = df[quant_col].mul(df[cfactor_col].fillna(1))
+    # Tidy the other-specify free text for use as a `u` label (after the
+    # grams/kg parse above): "1 Basket" -> "Basket" (GH #223 Layer 2).
+    df[detail_col] = df[detail_col].map(_clean_freetext_unit)
     # Canonical unit string: 'kg' if a cfactor was applied, else the
     # raw unit-detail text, falling back to the unitcode if absent.
     df[u_col] = np.where(~df[cfactor_col].isna(), 'kg', df[detail_col])
