@@ -37,3 +37,8 @@ Data Scheme:
   interview_date:
     index: (t, i)
     Int_t: datetime
+
+  life_satisfaction:
+    index: (t, i, Domain)
+    Satisfaction: str
+    materialize: make
