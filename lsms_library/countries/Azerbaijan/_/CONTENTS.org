@@ -48,3 +48,12 @@ The original questionnaires (=queshhe.pdf=, =quespope.pdf= under
 =1995/Documentation/=) are DVC-tracked but not yet read into this
 note; if a future maintainer pulls them and confirms the sampling
 plan, please update.
+
+
+* shocks — not available (2026-06-07, verified)
+
+=shocks= (a household adverse-events-and-coping roster, index =(t, i, Shock)=)
+is an ISA/EHCVM-specific module.  Azerbaijan Survey of Living Conditions (SLC) 1995 carries no such roster.  Verified
+this round by full variable-label inspection of the source =.dta= files:
+the nine household sections (roster, dwelling, education, health, employment, migration/displacement, consumption, durables, agriculture) hold no adverse-events roster; the only shock-adjacent content is the war-displacement aid block =A06B=.  Not implementable from current data; revisit only if a coping roster
+is later identified.  Tracked in GitHub issue #352.

@@ -243,3 +243,12 @@ No GLSS wave (1987-88…2016-17) carries a subjective-well-being / life-evaluati
 subjective-poverty ladder. GLSS7 §13 is "Governance, Peace, Security" (political
 participation + threat perception), not SWB. Confirmed by a variable-label scan of
 all section files. Resolves the #331 "unknown" → absent. Tracked in #331.
+
+
+* housing — implementable, not yet wired (2026-06-07)
+
+Contrary to an earlier triage (GH #350), GLSS DOES field a dwelling module:
+=g7sec7=/=g7sec7i=/=g7sec7j= (GLSS7 Section 7 "Housing"), =S7.DTA=/=SEC7.DTA=
+(earlier waves), plus =04_GHA_EXPHOUS= (housing expenditure).  The data is
+present in-repo but no =housing= feature is wired.  A future =housing=
+extractor is feasible — this is a feature gap, not an absence.

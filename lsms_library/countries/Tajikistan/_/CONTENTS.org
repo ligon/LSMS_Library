@@ -1,0 +1,19 @@
+#+title: Contents
+
+* shocks — not available (2026-06-07, verified)
+
+=shocks= (a household adverse-events-and-coping roster, index =(t, i, Shock)=)
+is an ISA/EHCVM-specific module.  the TLSS (1999/2003/2007/2009) carries no such roster.  Verified
+this round by full variable-label inspection of the source =.dta= files:
+the coping batteries that exist (2009 =m8b= 26-item CSI, =m8a=, =m4c=; 1999 =SSEC8=C; 2007 =r1m9=) are tied to food-insecurity / health costs, not a general adverse-events roster with an event trigger.  Not implementable from current data; revisit only if a coping roster
+is later identified.  Tracked in GitHub issue #352.
+
+
+* housing — implementable, not yet wired (2026-06-07)
+
+Contrary to an earlier triage (GH #350), the TLSS fields a full dwelling
+module: 1999 =SSEC2= (=s2aq*= walls/roof/floor/rooms/tenure/water/toilet),
+2007 =r1m7a/b/c= (=m7aq*= structure + utilities), 2009 =m6a/b= (utilities
+only — physical-structure block dropped), 2003 =module6= (structure;
+labels stripped in the repo =.dta=).  Data present in-repo; =housing= is
+simply not yet wired (full for 1999/2007, partial 2009).  Not an absence.

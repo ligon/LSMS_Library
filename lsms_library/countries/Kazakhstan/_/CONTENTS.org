@@ -25,3 +25,12 @@ household (relhead == 1); 1992 of 1996 heads appear in OCC and 1983 give a
 non-missing step.  Households whose head did not answer are dropped.
 Built via ~1996/_/subjective_well_being.py~ (materialize: make).  Observed
 range 1-8 (no household head reported step 9).
+
+
+* shocks — not available (2026-06-07, verified)
+
+=shocks= (a household adverse-events-and-coping roster, index =(t, i, Shock)=)
+is an ISA/EHCVM-specific module.  Kazakhstan LSMS 1996 carries no such roster.  Verified
+this round by full variable-label inspection of the source =.dta= files:
+the only adverse-event content is community-level (=KOMMU= droughts/calamities, keyed by =oblast= not household) or livestock-loss stock-accounting (=AGR2= =w25=); no household-level shock roster with coping.  Not implementable from current data; revisit only if a coping roster
+is later identified.  Tracked in GitHub issue #352.
