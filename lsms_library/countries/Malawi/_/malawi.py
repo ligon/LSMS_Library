@@ -11,6 +11,7 @@ food_prices_quantities_and_expenditures.py — see GH #218.
 
 import pandas as pd
 import numpy as np
+import re
 import sys
 sys.path.append('../../../_/')
 from lsms_library.local_tools import conversion_table_matching_global, format_id
@@ -29,6 +30,51 @@ def _extract_kg_conversion(series):
     conv = pd.concat([lower.str.extract(grams).astype(float) * 0.01,
                       lower.str.extract(kgs).astype(float)], axis=0).dropna()
     return conv
+
+
+def _clean_freetext_unit(value):
+    """Tidy a respondent other-specify unit string (GH #223 Layer 2).
+
+    These are free text like ``'1 BASKET'``, ``'1 NSIMA PLATE (PHAZI)'``,
+    ``'1/4'``.  Strip a *leading quantity* (``'1 BASKET'`` -> ``'Basket'``)
+    so the residual is a unit name with a chance of matching; title-case for
+    consistency; a bare quantity with no unit (``'1/4'``, ``'0.5'``) -> NA.
+    Only ever applied to the genuine other-specify column, never to standard
+    or sized labels (``'50 Kg Bag'``), so no legitimate size is dropped.
+    """
+    if pd.isna(value):
+        return value
+    s = str(value).strip()
+    if s.lower() in ('nan', ''):
+        return pd.NA
+    # Pure quantity + metric magnitude ('10Kgs', '149G', '5 kg') -> that unit.
+    _MAG = {'kg': 'Kg', 'kgs': 'Kg', 'kilogram': 'Kg', 'kilograms': 'Kg',
+            'g': 'Gram', 'gram': 'Gram', 'grams': 'Gram',
+            'ml': 'Millilitre', 'mls': 'Millilitre',
+            'millilitre': 'Millilitre', 'millilitres': 'Millilitre',
+            'l': 'Litre', 'ls': 'Litre', 'litre': 'Litre', 'litres': 'Litre'}
+    m = re.fullmatch(r'\d+(?:[.,/]\d+)?\s*([a-z]+)', s, flags=re.I)
+    if m and m.group(1).lower() in _MAG:
+        return _MAG[m.group(1).lower()]
+    # Otherwise strip a leading "N " (with an optional metric magnitude before
+    # the space, so '10G Packet'/'10Kg Pail' -> 'Packet'/'Pail').
+    s = re.sub(r'^\s*\d+(?:[.,/]\d+)?\s*(?:kgs?|g|mls?|l|litres?)?\s+', '',
+               s, flags=re.I).strip()
+    if (not s) or re.fullmatch(r'[\d.,/]+', s):           # bare quantity, no unit
+        return pd.NA
+    return s.title()
+
+
+def _titlecase_label(value):
+    """Title-case a unit label so case-variants collapse (``'PIECE'`` ->
+    ``'Piece'``); leaves the lowercase ``'kg'`` sentinel and sized labels
+    (no leading number is stripped here) intact."""
+    if pd.isna(value):
+        return value
+    s = str(value).strip()
+    if s.lower() in ('nan', ''):
+        return pd.NA
+    return s.title()
 
 
 def handling_unusual_units(df, suffixes=None):
@@ -56,12 +102,19 @@ def handling_unusual_units(df, suffixes=None):
         if detail_col not in df.columns:
             continue
 
-        conv_kg = _extract_kg_conversion(df[detail_col])
+        conv_kg = _extract_kg_conversion(df[detail_col])  # parse "300 grams" first
+
+        # Tidy the other-specify free text for use as a `u` label (after the
+        # kg parse above): "1 Basket" -> "Basket", "1/4" -> NA (#223 Layer 2).
+        df[detail_col] = df[detail_col].map(_clean_freetext_unit)
 
         df[cfactor_col] = df.apply(lambda x, c=cfactor_col: x[c] or conv_kg, axis=1)
         df[quantity_col] = df[quantity_col].mul(df[cfactor_col].fillna(1))
         df[u_col] = np.where(~df[cfactor_col].isna(), 'kg', df[detail_col])
-        df[u_col] = df[u_col].replace('nan', pd.NA).fillna(df[units_col])
+        # Fallback to the standard label, title-cased so 'PIECE'/'Piece'
+        # collapse; the 'kg' sentinel above is untouched.
+        df[u_col] = df[u_col].replace('nan', pd.NA).fillna(
+            df[units_col].map(_titlecase_label))
 
     return df
 
