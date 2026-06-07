@@ -108,5 +108,30 @@ Data Scheme:
     SoilType: str
     Irrigated: bool
     materialize: make
+  food_coping:
+    # rCSI coping-strategy day counts (GH #332).  Module H question H02
+    # (hh_h02a..hh_h02e) of the IHS3/IHS4/IHS5 + IHPS-2013 household
+    # questionnaire: how many of the past 7 days the HH used each of the 5
+    # standard reduced-Coping-Strategies-Index strategies.  One row per
+    # (HH, Strategy); Days is 0-7.  Strategy order is stable across all
+    # waves (verified vs the IHS3 questionnaire Module H, Page 35):
+    # a=LessPreferred, b=LimitPortion, c=ReduceMeals, d=RestrictAdults,
+    # e=BorrowFood.  Recall: last 7 days.  ABSENT in 2004-05 (IHS2): its
+    # Module H is a 3-day food-consumption recall, not a coping battery.
+    index: (t, i, Strategy)
+    Days: int
+    materialize: make
+  months_food_inadequate:
+    # Months of inadequate food provisioning (GH #332).  Module H questions
+    # H04 (hh_h04, Yes/No: faced a food-shortage situation in the last 12
+    # months) and H05 (wide month calendar, 'X' = a month the HH lacked
+    # food).  MonthsInadequate = count of marked months (0-12) for H04==Yes
+    # households, 0 otherwise; AnyInadequate = (H04==Yes).  The H05 count is
+    # gated on H04==Yes because IHS4/IHS5 pre-fill all 25 calendar cells for
+    # H04==No households.  Recall: last 12 months.  ABSENT in 2004-05.
+    index: (t, i)
+    MonthsInadequate: int
+    AnyInadequate: bool
+    materialize: make
   food_expenditures:
   food_prices:
