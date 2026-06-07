@@ -95,3 +95,56 @@ individual_education:
                 7.0: doctor of science
                 8.0: other
                 9.0: none
+
+housing:
+    # SSEC2 Part 2A (structure) + Part 2B (tenure/toilet).  Value labels are
+    # stripped in the .dta; codes decoded from the household questionnaire
+    # (HH012007-00.pdf, Section 2).  Water (s2bq40) is distance-to-source in
+    # metres, not a source category, so it is omitted; Electricity (s2bq26) is
+    # hours/availability (values up to 500), not a clean indicator, omitted.
+    file:
+        - ../Data/SSEC2.DTA
+    idxvars:
+        v: pop_pt
+        i: [pop_pt, hhid]
+    myvars:
+        Tenure:
+            - s2bq1
+            - mapping:
+                1.0: owned
+                2.0: not owned
+        Walls:
+            - s2aq6
+            - mapping:
+                1.0: brick/stones
+                2.0: concrete plates
+                3.0: mud
+                4.0: wood, logs
+                5.0: other
+        Roof:
+            - s2aq7
+            - mapping:
+                1.0: slate
+                2.0: metal sheets
+                3.0: thatch
+                4.0: tiles
+                5.0: plastic on metal
+                6.0: mud
+                7.0: other
+        Floor:
+            - s2aq8
+            - mapping:
+                1.0: parquet
+                2.0: painted wood
+                3.0: linoleum
+                4.0: concrete
+                5.0: clay/earthen floor
+                6.0: other
+        Rooms: s2aq2
+        Toilet:
+            - s2bq22
+            - mapping:
+                1.0: flush toilet
+                2.0: latrine
+                3.0: other
+                4.0: no toilet

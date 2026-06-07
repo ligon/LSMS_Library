@@ -92,5 +92,63 @@ plot_features:
                 distributed by village/family: communal
                 inherited: inherited
 
-
-
+housing:
+    # GLSS6 Section 7 dwelling characteristics (PARTA/SEC7.dta).  Wall/Floor/
+    # Roof = Part F (s7fq1/2/3); Water = Part D q1a1; Toilet = Part D q16a;
+    # Rooms = Part A q2; Tenure = Part B q1 (holding agreement); Electricity =
+    # Part D q11 (main source of lighting -- GLSS6 has no separate power-source
+    # question).  All variables carry Title-case value labels in the .dta.
+    file:
+        - PARTA/SEC7.dta
+    idxvars:
+        i: HID
+    myvars:
+        Walls:
+            - s7fq1
+            - mapping:
+                Mud/Mud bricks/Earth: Mud/Earth
+                Wood: Wood
+                Metal sheet/slate/asbestos: Metal/Asbestos
+                Stone: Stone
+                Burnt bricks: Burnt Bricks
+                Cement blocks/concrete: Cement/Concrete
+                Landcrete: Landcrete
+                Bamboo: Bamboo
+                Palm leaves/Thatch(grass/Raffia): Thatch
+                Other: Other
+        Floor:
+            - s7fq2
+            - mapping:
+                Earth/Mud: Earth/Mud
+                Cement/Concrete: Cement/Concrete
+                Stone: Stone
+                Burnt brick: Burnt Bricks
+                Wood: Wood
+                Vinyl tiles: Vinyl Tiles
+                Ceramic/Porcelain/Granite/Marble tiles: Ceramic/Marble Tiles
+                Terrazzo/Terrazzo tiles: Terrazzo
+                Other: Other
+        Roof:
+            - s7fq3
+            - mapping:
+                Mud/Mud bricks/Earth: Mud/Earth
+                Wood: Wood
+                Metal sheet: Metal Sheet
+                Slate/Asbestos: Slate/Asbestos
+                Cement/Concrete: Cement/Concrete
+                Bamboo: Bamboo
+                Palm leaves/Thatch(grass/Raffia): Thatch
+                Roofing tile: Roofing Tiles
+                Other: Other
+        Water: s7dq1a1
+        Toilet: s7dq16a
+        Rooms: s7aq2
+        Tenure:
+            - s7bq1
+            - mapping:
+                Owning: Own
+                Renting: Rent
+                Rent-free: Rent-free
+                Perching: Perching
+                Squatting: Squatting
+        Electricity: s7dq11

@@ -116,3 +116,66 @@ plot_features:
                 Use free of charge: use_right
                 Distributed by village/family: communal
                 Inherited: inherited
+
+housing:
+    # GLSS7 Section 7 dwelling characteristics.  Wall/Floor/Roof live in Part F
+    # (s7fq1/2/3); Water = Part D q1a1; Toilet = Part D q26a; Electricity =
+    # Part D q11a (most-used power source); Rooms = Part A q2; Tenure = Part B
+    # q1 (present holding agreement).  All these variables carry value labels in
+    # the .dta, so get_dataframe(convert_categoricals=True) decodes them; the
+    # mappings below only normalize the decoded GLSS7 labels to canonical forms.
+    file: g7sec7.dta
+    idxvars:
+        i:
+            - clust
+            - nh
+    myvars:
+        Walls:
+            - s7fq1
+            - mapping:
+                Mud/Mud bricks/Earth: Mud/Earth
+                Wood: Wood
+                Metal sheet/slate/asbestos: Metal/Asbestos
+                Stone: Stone
+                Burnt bricks: Burnt Bricks
+                Cement blocks/concrete: Cement/Concrete
+                Landcrete: Landcrete
+                Bamboo: Bamboo
+                Palm leaves/Thatch (grass/Raffia): Thatch
+                Other: Other
+        Floor:
+            - s7fq2
+            - mapping:
+                Earth/Mud: Earth/Mud
+                Cement/Concrete: Cement/Concrete
+                Stone: Stone
+                Burnt brick: Burnt Bricks
+                Wood: Wood
+                Vinyl tiles: Vinyl Tiles
+                Ceramic/Porcelain/Granite/Marble tiles: Ceramic/Marble Tiles
+                Terrazzo/Terrazzo tiles: Terrazzo
+                Other: Other
+        Roof:
+            - s7fq3
+            - mapping:
+                Mud/Mud bricks/Earth: Mud/Earth
+                Wood: Wood
+                Metal sheet: Metal Sheet
+                Slate/Asbestos: Slate/Asbestos
+                Cement/Concrete: Cement/Concrete
+                Bamboo: Bamboo
+                Thatch/Palm leaf or Raffia: Thatch
+                Roofing tile: Roofing Tiles
+                Other: Other
+        Water: s7dq1a1
+        Toilet: s7dq26a
+        Rooms: s7aq2
+        Tenure:
+            - s7bq1
+            - mapping:
+                Owning: Own
+                Renting: Rent
+                Rent-free: Rent-free
+                Perching: Perching
+                Squatting: Squatting
+        Electricity: s7dq11a
