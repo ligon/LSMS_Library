@@ -47,3 +47,9 @@ Data Scheme:
     index: (t, i)
     Int_t: datetime
     materialize: make
+
+  months_food_inadequate:
+    index: (t, i)
+    MonthsInadequate: int
+    AnyInadequate: bool
+    materialize: make
