@@ -2,10 +2,11 @@
 
 * Food Units
 
+# 'Kg' is inherited from the global categorical_mapping/u.org (row-additive
+# merge), so it is not redeclared in the table below (GH #223 Layer 2 PoC).
 #+name: u
 | Original Label  | Preferred Label |
 |-----------------+-----------------|
-| Kg              | Kg              |
 | Litre           | Litre           |
 | Unité           | Unité           |
 | Sachet          | Sachet          |
