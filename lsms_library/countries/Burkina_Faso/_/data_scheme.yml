@@ -138,10 +138,13 @@ Data Scheme:
     # The EHCVM waves (2018-19, 2021-22) field FIES instead -> food_security.
     # Items SA2A..SA2E ask "au cours des 7 derniers jours, combien de jours
     # [...] avez-vous dû [...]" -- a day-count 0-7.  WIDE->LONG: one
-    # (t, i, Strategy) row per strategy.  SA2A..SA2E map IN ORDER to the five
-    # canonical rCSI strategies LessPreferred / BorrowFood / LimitPortion /
-    # RestrictAdults / ReduceMeals (the Stata labels are 80-char-truncated to
-    # a shared prefix; SA2A..SA2E follow the WFP-standard rCSI ordering).
+    # (t, i, Strategy) row per strategy.  SA2A..SA2E map IN ORDER to
+    # LessPreferred / LimitPortion / ReduceMeals / RestrictAdults / BorrowFood.
+    # The Stata labels are all truncated to an identical 80-char prefix and no
+    # questionnaire ships with the data, so this a-e attribution is INFERRED
+    # from the verifiable peer surveys that use the same ordering (Mali EACI
+    # 2014-15 s17q02a-e, label-verified; Malawi IHS Module H).  Days counts are
+    # exact regardless; only the per-strategy name rests on the inference.
     # HOUSEHOLD-level; i = the 2014 roster i (format_id(zd)+format_id(menage,3)).
     index: (t, i, Strategy)
     Days: int
