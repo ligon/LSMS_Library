@@ -75,3 +75,19 @@ housing:
         Toilet: m13a_q10
         Tenure: m13a_q14
         Rooms: m13a_q08
+
+subjective_well_being:
+    # Module 7 "Subjective Poverty" (Modul_7_Subjective_Poverty.sav).  Two
+    # ladder items: M7_Q09 "Step you are today" = CURRENT step, M7_Q9A
+    # "Step in 2008" = the retrospective companion.  Own Step = the current
+    # item (1-10; 1 = poorest, 10 = richest); the retrospective item is
+    # dropped.  The source carries psu + hh but not the global hhid used as
+    # household_roster's i, so i=[psu,hh] -> mapping.py:i() reconstructs
+    # hhid = psu*100 + hh to match the roster/sample (the housing idiom);
+    # _join_v_from_sample then resolves v.
+    file:
+        - ../Data/Modul_7_Subjective_Poverty.sav
+    idxvars:
+        i: [psu, hh]
+    myvars:
+        Own Step: M7_Q09

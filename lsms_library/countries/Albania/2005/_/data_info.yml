@@ -96,3 +96,18 @@ interview_date:
     myvars:
         Int_t:
             - m0_date
+
+subjective_well_being:
+    # Module 7 "Subjective Poverty" (subjective_poverty_cl.dta).  Two
+    # economic-status ladder items are asked: m07_q09_1 = CURRENT step,
+    # m07_q09_2 = the retrospective companion.  Own Step = the current item
+    # (1-10; 1 = poorest, 10 = richest); the retrospective item is dropped.
+    # i=[m0_q00,m0_q01] -> composite via mapping.py:i() to match sample()'s
+    # household identity (the housing/interview_date idiom); the roster's bare
+    # i=m0_q01 is the known within-cluster-number defect we do NOT copy.
+    file:
+        - ../Data/subjective_poverty_cl.dta
+    idxvars:
+        i: [m0_q00, m0_q01]
+    myvars:
+        Own Step: m07_q09_1
