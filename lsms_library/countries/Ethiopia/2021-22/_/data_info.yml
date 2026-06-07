@@ -169,3 +169,63 @@ interview_date:
         i: household_id
     myvars:
         int_t: InterviewDate
+
+food_security:
+    # FAO FIES 8-item experience scale.  ESS §8 file sect8_hh_w5.dta
+    # carries the full FAO battery, but the question order is NOT the
+    # sequential FAO order — the items are mapped BY LABEL:
+    #   s8q01 worried -> Worried        (12-month recall)
+    #   s8q02 unable healthy/nutritious -> HealthyDiet
+    #   s8q03 only a few kinds of foods -> FewFoods
+    #   s8q04 had to skip a meal        -> SkippedMeal
+    #   s8q05 ate less than should      -> AteLess
+    #   s8q07 ran out of food           -> RanOut
+    #   s8q08 hungry but did not eat    -> Hungry
+    #   s8q06 whole day without eating  -> WholeDay  (30-day recall)
+    # Items recorded as '1. YES'/'2. NO' -> True/False; NaN stays NaN.
+    # FIES_score (count of True over the 8 items) is computed row-wise by
+    # the food_security() df_edit function in mapping.py.
+    file: sect8_hh_w5.dta
+    idxvars:
+        i: household_id
+    myvars:
+        Worried:
+            - s8q01
+            - mapping:
+                '1. YES': true
+                '2. NO': false
+        HealthyDiet:
+            - s8q02
+            - mapping:
+                '1. YES': true
+                '2. NO': false
+        FewFoods:
+            - s8q03
+            - mapping:
+                '1. YES': true
+                '2. NO': false
+        SkippedMeal:
+            - s8q04
+            - mapping:
+                '1. YES': true
+                '2. NO': false
+        AteLess:
+            - s8q05
+            - mapping:
+                '1. YES': true
+                '2. NO': false
+        RanOut:
+            - s8q07
+            - mapping:
+                '1. YES': true
+                '2. NO': false
+        Hungry:
+            - s8q08
+            - mapping:
+                '1. YES': true
+                '2. NO': false
+        WholeDay:
+            - s8q06
+            - mapping:
+                '1. YES': true
+                '2. NO': false
