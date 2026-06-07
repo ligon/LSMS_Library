@@ -25,7 +25,7 @@ panel_ids.json updated_ids.json: panel_ids.py mali.py
 ../%/_/food_coping.parquet: ../%/_/food_coping.py
 	(cd $(@D) && python food_coping.py)
 
-$(VAR_DIR)/food_coping.parquet ../var/food_coping.parquet: food_coping.py ../2014-15/_/food_coping.parquet
+$(VAR_DIR)/food_coping.parquet: food_coping.py ../2014-15/_/food_coping.parquet
 	python food_coping.py
 
 clean:
