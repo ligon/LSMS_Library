@@ -148,6 +148,20 @@ plot_features_parquet := $(plot_features:.py=.parquet)
 $(VAR_DIR)/plot_features.parquet: plot_features.py $(plot_features_parquet)
 	python plot_features.py
 
+# food_coping (#332, Family B).  Post-planting GHS section-9 coping
+# day-count battery (W1-W3).  The framework's grab_data calls
+# `make ../<wave>/_/food_coping.parquet` from this `_/` dir for each
+# wired wave; the pattern rule runs the wave script.  The VAR_DIR rule
+# concatenates them (mirrors plot_features above).
+food_coping = $(shell find $(rounds) -name food_coping.py)
+food_coping_parquet := $(food_coping:.py=.parquet)
+
+../%/_/food_coping.parquet: ../%/_/food_coping.py
+	(cd $(@D) && python food_coping.py)
+
+$(VAR_DIR)/food_coping.parquet: food_coping.py $(food_coping_parquet)
+	python food_coping.py
+
 # individual_education (GHS section 2, post-harvest only).  The
 # framework's grab_data calls `make ../<wave>/_/individual_education.parquet`
 # from this `_/` dir; the pattern rule runs the wave script.
