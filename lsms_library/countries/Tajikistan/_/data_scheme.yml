@@ -6,6 +6,11 @@ Data Scheme:
     Int_t: datetime
     materialize: make
 
+  life_satisfaction:
+    index: (t, i, Domain)
+    Satisfaction: str
+    materialize: make
+
   cluster_features:
     index: (t, v)
     Region: str
