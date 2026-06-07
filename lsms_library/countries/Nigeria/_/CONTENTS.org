@@ -2,6 +2,28 @@
 * Food Conversion Table
 A food conversion table can be found at https://docs.google.com/spreadsheets/d/1whE_EW5x-jxrsKvYWfefdBppzp_TZhPP61bdEN-FEJ4/
 
+* food_acquired unit codes (GH #223 Layer 2)
+
+The =s10bq2b= / =s7bq2b= unit variable is a numeric code.  The repo's
+source files are *CSV*, which carry **no value labels**, so codes outside
+the questionnaire's printed "FOOD ITEM UNIT CODES" card (1--122, 900) leaked
+as bare numbers into =food_acquired= =u= (32 codes after the #366
+float-code normalization).
+
+Resolution: the WB also ships *Stata =.dta=* versions of the same files,
+and **those carry the value labels** the CSV drops --- descriptive in W1
+(=22 = Basket: Medium (30 kg)=) and code-prefixed in W3/W4 (=200. LOAF=,
+=211. TUBER=).  The 29 decodable codes were added to =categorical_mapping.org=
+=#+name:u= (W1 size-specific codes 22--94; W4 codes 125--340), cleaned to
+canonical labels.  Code leaks 32 -> 3.
+
+Residual codes =131, 151, 152= (W3) have **no label even in the =.dta=** and
+are left as codes.
+
+Future enhancement (not yet wired): the W3/W4 data carry a per-row Kg/L
+conversion factor =s10bq2_cvn= (99.6% coverage) --- an exact Approach-B kg
+factor for =food_quantities=, independent of the unit label.
+
 * Sampling Design
 
 ** Overview
