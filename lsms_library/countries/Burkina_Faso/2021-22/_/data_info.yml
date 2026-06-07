@@ -223,3 +223,24 @@ interview_date:
             - menage
     myvars:
         Int_t: s00q23a
+
+subjective_well_being:
+    # EHCVM §20 'Pauvreté relative'.  In the 2021-22 instrument §20 was
+    # split into sub-modules A/B/C; sub-module A (s20a_me) is relative
+    # poverty, and s20aq05 is the ladder item equivalent to 2018-19's
+    # s20q05.  4-point relative-wealth scale, higher = better off
+    # (Très pauvre=1 ... Riche=4); Ne sait pas -> NaN.
+    file: s20a_me_bfa2021.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        Own Step:
+            - s20aq05
+            - mapping:
+                Très pauvre: 1
+                Pauvre: 2
+                Moyen: 3
+                Riche: 4
+                Ne sait pas: null
