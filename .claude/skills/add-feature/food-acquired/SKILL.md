@@ -179,16 +179,44 @@ Empirically (see `SkunkWorks/malawi_unit_resolution_diagnostic_2026-05-07.org`):
 
 ## Country-specific notes
 
-| Country | Approach | Conversion source | Status |
-|---------|----------|-------------------|--------|
-| Uganda | A (price-ratio) | `conversion_to_kgs.json` + `kg_per_other_units.py` | Complete |
-| Malawi | B (survey tables) | `ihs3_conversions.csv`, IHS food conversion factors | Partial (legacy .py scripts) |
-| Tanzania | A (price-ratio) | `conversion_to_kgs.json` | Complete (legacy) |
-| Ethiopia | B (survey tables) | `Food_CF_WaveN.dta` | Partial (legacy) |
-| Mali | Mixed | Has `categorical_mapping.org` for food items | Partial |
-| Nigeria | ? | Check for conversion factor files | Not started |
-| Niger | ? | Check for ECVMA/EHCVM conversion files | Not started |
-| Burkina Faso | ? | Check for EHCVM conversion files | Not started |
+**16 countries currently declare `food_acquired`:** Benin, Burkina_Faso,
+CotedIvoire, Ethiopia, EthiopiaRHS, GhanaLSS, Guinea-Bissau, Malawi, Mali,
+Nepal, Niger, Nigeria, Senegal, Tanzania, Togo, Uganda.
+
+Status below is from a fresh cross-country build (NO_CACHE, 2026-06-07);
+"kg-resolved" = share of `food_quantities(units='kgs')` rows reaching
+`u='kg'` (non-convertible container units — heaps, sachets — legitimately
+never reach kg, so 100% is not the target for every country).
+
+| Country | Schema | kg-resolved | Notes |
+|---------|--------|-------------|-------|
+| Uganda | canonical (s-axis) | high | Approach A, `conversion_to_kgs.json` + price-ratio; reference impl |
+| Tanzania | canonical | ~100% | Approach C default does the work |
+| Malawi | canonical | ~99.9% | Approach C + `#+name: u`; residual = container units (GH #116 closed) |
+| Ethiopia | canonical | ~44% | Approach B (`Food_CF_WaveN.dta`) only partly wired — see GH #115 |
+| Benin / Togo / CotedIvoire / Niger / Guinea-Bissau | canonical (via `transformations.food_acquired_to_canonical`) | varies | EHCVM; `#+name: u` tables wired (GH #223). Units are mostly non-metric containers (`Tas`, `Sachet`) so kg-resolution is intrinsically low |
+| Mali / Senegal | canonical | varies | EHCVM; `#+name: u` tables wired (GH #223) |
+| Nigeria | canonical | — | built (PP/PH wave scripts) |
+| Nepal | canonical | — | built |
+| **Burkina_Faso** | **legacy (`Produced` column, no s-axis)** | **0%** | NOT migrated to canonical; kg derivation broken — see GH #107 |
+| GhanaLSS | canonical but **`u` is raw codes** | — | unit_label map not applied to codes; build is partial — see GH #348 |
+| EthiopiaRHS | canonical but **`u` holds item names** | — | extraction bug — see GH #347 |
+
+**Reading this table:** "canonical" means the `[t, (v,) i, j, u, s] ×
+[Quantity, Expenditure]` long form (GH #169) — verify with
+`Country(c).food_acquired().columns == ['Quantity','Expenditure']` and an
+`s` index level.  A `Produced` column or a missing `s` level means the
+country is still on the pre-#169 wide shape and needs migration before the
+`_FOOD_DERIVED` kg path works.
+
+**Gap countries** (have a `data_scheme` but no `food_acquired`): Albania,
+Armenia, Azerbaijan, Cambodia, China, Guatemala, Guyana, India, Iraq,
+Kazakhstan, Kosovo, Liberia, Pakistan, Serbia, Tajikistan, Timor-Leste.
+Several (Serbia, Cambodia) carry a *legacy* `food_acquired.py` +
+`food_prices_quantities_and_expenditures.py` that predates the canonical
+schema — filling those is a *modernize-and-wire* job (port to
+`food_acquired_to_canonical`, declare in `data_scheme.yml`), not a
+from-scratch build.
 
 ## Check existing documentation first
 
