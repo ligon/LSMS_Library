@@ -88,6 +88,37 @@ shocks:
         HowCoped1: S17_5_B
         HowCoped2: S17_5_C
 
+plot_features:
+    # Section 10 (Land Parcels) of the National Household Forest Survey is
+    # clean LONG: one row per (hhid, parcel_id), no duplicates.  parcel_id
+    # is the per-household parcel identifier (float in source -> format_id
+    # makes it a clean string '1','2',...).  Area=S10_4 ("total area of
+    # parcel - respondent's estimate", native unit) with AreaUnit=S10_4B
+    # (acres / lot(s) / hectares / other -- units are NOT homogeneous, so
+    # Area is left in its native unit and the unit is carried alongside,
+    # following the Uganda/Tanzania pattern).  Tenure=S10_5 (ownership
+    # status) mapped to the canonical Tenure vocabulary.  S10_6A/S10_6B are
+    # use-payment amount / period (NOT GPS, despite the triage note) and
+    # are ~98% NaN, so they are omitted.  No SoilType / Irrigated /
+    # TenureSystem question exists in this instrument (-> those canonical
+    # columns are not declared).
+    file:
+        - "../Data/Household/sect10_public.dta"
+    idxvars:
+        i: hhid
+        plot_id: parcel_id
+    myvars:
+        Area: S10_4
+        AreaUnit: S10_4B
+        Tenure:
+            - S10_5
+            - mapping:
+                "owned by hh": owned
+                "rented in": rented_in
+                "free use (with permission)": use_right
+                "occupy (without permission)": squatted
+                "other specify": other_tenure
+
 interview_date:
     # Cover/identification module sect1_public.dta; interview_date1 is the
     # primary-visit date (datetime64; interview_date2/3 are follow-up visits,

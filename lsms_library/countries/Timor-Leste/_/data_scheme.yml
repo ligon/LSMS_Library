@@ -42,3 +42,22 @@ Data Scheme:
     index: (t, i, Domain)
     Satisfaction: str
     materialize: make
+  plot_features:
+    # Lasting plot-level characteristics from the 2007-08 TLSLS-2 land
+    # module (plot.dta, q09a*).  One row per (household, plot); plot.dta
+    # is a clean LONG roster keyed on (hh_id, pcode) with no duplicates,
+    # so this is the YAML path.  Source variable labels confirmed:
+    #   pcode  = "Plot number"            -> plot_id
+    #   q09a04 = "Plot area (m2)"         -> Area (AreaUnit = square meters)
+    #   q09a06 = "Tenure status of the plot" -> Tenure
+    #   q09a09 = "Irrigation of the plot" -> Irrigated (bool; non-"Not
+    #            irrigated" source method -> True)
+    # SoilType is NOT declared: q09a05 ("Kind of land") is a land-use
+    # class (Plantation/Tree crop/Grassland/...) and q09a08 is slope,
+    # neither a soil classification.  TenureSystem absent in the source.
+    # The 2001 wave (TLSLS-1) has no plot/land module -> 2007-08 only.
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    Tenure: str
+    Irrigated: bool

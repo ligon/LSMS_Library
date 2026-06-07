@@ -80,3 +80,30 @@ individual_education:
                 16: University
                 17: Koranic stage
                 96: Other
+
+plot_features:
+    # Section 8B (Agricultural land) -- clean per-plot roster, one row per
+    # (household, farm).  farmcd = "Farm land number ID" -> plot_id.
+    # i = [clust, nh] (no pre-composed hid column in this wave), matching
+    # household_roster's i.  s8bq4a/s8bq4b = farm size + unit code.  The
+    # .dta carries no value labels, so AreaUnit is decoded with the GLSS
+    # area-unit codes (1=Acres,2=Poles,3=Ropes,4=Hectare; verified against
+    # the GLSS7 g7sec8b value labels and the code-frequency distribution).
+    # s8bq8 ("how land was obtained") is 4 bare codes whose GLSS4 mapping is
+    # not recoverable from the available materials, so Tenure is omitted
+    # here rather than fabricated.  Section 10 is non-farm ENTERPRISES.
+    file: SEC8B.DTA
+    idxvars:
+        i:
+            - clust
+            - nh
+        plot_id: farmcd
+    myvars:
+        Area: s8bq4a
+        AreaUnit:
+            - s8bq4b
+            - mapping:
+                1: Acres
+                2: Poles
+                3: Ropes
+                4: Hectare

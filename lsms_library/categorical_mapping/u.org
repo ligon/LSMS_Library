@@ -1,0 +1,42 @@
+#+title: Global unit (=u=) canonical mappings
+
+Cross-country defaults for the =u= (unit) index level, merged into every
+country's =categorical_mapping= and row-unioned with the country's own
+=#+name:u= table (country rows win on a source-label collision; see
+=_merge_categorical_tables= / =_ADDITIVE_CATEGORICAL_TABLES= in =country.py=
+and =slurm_logs/DESIGN_u_consolidation_2026-06-07.org=).
+
+Scope (deliberately conservative): the *kilogram* spelling/case variants
+only.  =Kg= is the one metric unit with a cross-country-consistent canonical
+Preferred Label (Benin, Togo, CotedIvoire, Mali, Nigeria, Niger, Senegal,
+Uganda all already emit =Kg=), so unifying its variants imposes no contested
+choice.  Gram / litre / millilitre have *disagreeing* canonical forms across
+countries (=g= vs =Gram=, =l= vs =Litre=, =ml= vs =Millilitre=); harmonizing
+those is the deferred cross-language vocabulary decision (Layer 3) and is
+NOT done here.
+
+Note: this table is keyed on =Original Label=, so it composes additively
+only with country =#+name:u= tables that are also =Original Label=-keyed (or
+countries with no =u= table).  Code-keyed tables (e.g. Nigeria, Mali, Uganda)
+hit the key-column fallback and are unaffected -- standardizing their keying
+is a follow-up.
+
+The reserved lowercase =kg= *conversion sentinel* emitted by
+food_quantities / food_prices is protected from any =u= remap on derived
+tables by =protect_u_sentinels= (GH #361), so this table cannot disturb
+=Feature('food_quantities').xs('kg', level='u')=.
+
+#+name: u
+| Original Label | Preferred Label |
+|----------------+-----------------|
+| Kg             | Kg              |
+| kg             | Kg              |
+| KG             | Kg              |
+| kgs            | Kg              |
+| KGS            | Kg              |
+| Kilogram       | Kg              |
+| kilogram       | Kg              |
+| KILOGRAM       | Kg              |
+| Kilogramme     | Kg              |
+| kilogramme     | Kg              |
+| KILOGRAMME     | Kg              |

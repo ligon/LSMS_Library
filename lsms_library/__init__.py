@@ -118,6 +118,7 @@ from sys import stderr
 from . import country
 from .country import Country, Wave
 from .feature import Feature
+from .catalog import countries, features
 from . import local_tools as tools
 from . import transformations
 from .dvc_permissions import authenticate
