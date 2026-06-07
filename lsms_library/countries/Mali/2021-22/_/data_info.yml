@@ -21,6 +21,63 @@ subjective_well_being:
                 Moyen: 3
                 Riche: 4
 
+food_security:
+    # EHCVM Section 8A 'Sécurité alimentaire' — the FAO 8-item Food
+    # Insecurity Experience Scale (FIES), recall period = last 12 months
+    # ("12 derniers mois").  §8 is NOT split in 2021-22: items remain in
+    # s08a_me_mli2021.dta as s08aq01..s08aq08, mapping IN ORDER to the 8
+    # canonical FIES items (verified against the .dta variable labels).
+    # Values Oui->True, Non->False; "Ne sait pas"/"Refus"/NaN->NaN (full
+    # strings, not truncated).  s08aq07a/s08aq08a frequency follow-ups are
+    # ignored.  FIES_score is computed by mapping.food_security().
+    file: s08a_me_mli2021.dta
+    idxvars:
+        v: grappe
+        i:
+            - grappe
+            - menage
+    myvars:
+        Worried:
+            - s08aq01
+            - mapping:
+                Oui: True
+                Non: False
+        HealthyDiet:
+            - s08aq02
+            - mapping:
+                Oui: True
+                Non: False
+        FewFoods:
+            - s08aq03
+            - mapping:
+                Oui: True
+                Non: False
+        SkippedMeal:
+            - s08aq04
+            - mapping:
+                Oui: True
+                Non: False
+        AteLess:
+            - s08aq05
+            - mapping:
+                Oui: True
+                Non: False
+        RanOut:
+            - s08aq06
+            - mapping:
+                Oui: True
+                Non: False
+        Hungry:
+            - s08aq07
+            - mapping:
+                Oui: True
+                Non: False
+        WholeDay:
+            - s08aq08
+            - mapping:
+                Oui: True
+                Non: False
+
 sample:
     dfs:
         - df_cover

@@ -151,3 +151,25 @@ def panel_ids(df):
     df['previous_i'] = df[['previous_v', 'previous_hid']].apply(previous_i, axis=1)
     df = df.reset_index().loc[:, ['i', 'previous_i']].drop_duplicates().set_index('i')
     return df
+
+_FIES_ITEMS = ['Worried', 'HealthyDiet', 'FewFoods', 'SkippedMeal',
+               'AteLess', 'RanOut', 'Hungry', 'WholeDay']
+
+
+def food_security(df):
+    '''Compute FIES_score from the 8 FAO FIES experience items.
+
+    EHCVM §8A items s08aq01..s08aq08 have already been mapped to the 8
+    canonical bool columns by the YAML ``mapping:`` blocks (Oui->True,
+    Non->False, everything else->NaN).  FIES_score is the row-wise count
+    of True across those 8 items.  Per the canonical contract it is NaN
+    only when ALL 8 items are NaN; otherwise NaN items count as 0 (not
+    affirmative).
+    '''
+    items = df[_FIES_ITEMS].apply(lambda c: c.map({True: 1, False: 0}))
+    score = items.sum(axis=1, skipna=True)
+    all_na = items.isna().all(axis=1)
+    score = score.where(~all_na, np.nan)
+    df = df.copy()
+    df['FIES_score'] = score.astype('Int64')
+    return df
