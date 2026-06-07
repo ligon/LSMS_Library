@@ -18,6 +18,16 @@ panel_ids.json updated_ids.json: panel_ids.py mali.py
 ../%/_/plot_features.parquet: ../%/_/plot_features.py
 	(cd $(@D) && python plot_features.py)
 
+# food_coping (non-FIES rCSI day-counts, #332).  Only the EACI 2014-15
+# wave carries the Section-17 coping battery.  The wave pattern rule
+# materializes the wave parquet; the country-level concatenator
+# (food_coping.py) aggregates into var/food_coping.parquet.
+../%/_/food_coping.parquet: ../%/_/food_coping.py
+	(cd $(@D) && python food_coping.py)
+
+$(VAR_DIR)/food_coping.parquet ../var/food_coping.parquet: food_coping.py ../2014-15/_/food_coping.parquet
+	python food_coping.py
+
 clean:
 	rm -f panel_ids.json updated_ids.json
 

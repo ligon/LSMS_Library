@@ -94,6 +94,19 @@ Data Scheme:
     HowCoped0: str
     HowCoped1: str
     HowCoped2: str
+  food_coping:
+    # Non-FIES food-security: reduced Coping Strategies Index (rCSI)
+    # day-counts (#332).  EACI 2014-15 household questionnaire Section 17
+    # ("Sécurité alimentaire"), recall = last 7 days.  s17q02a..s17q02e
+    # are "nombre de jours" (0-7) the HH used each of the five canonical
+    # CSI strategies; survey code 9 ("Manquant") is dropped.  Long-form:
+    # one row per (t, i, Strategy).  EACI 2014-15 ONLY — the EHCVM waves
+    # (2018-19, 2021-22) use the FAO FIES instrument (food_security) and
+    # have no day-count coping block.  Built by a wave script + a
+    # country-level concatenator (reshape -> materialize: make).
+    index: (t, i, Strategy)
+    Days: int
+    materialize: make
   plot_features:
     # Lasting parcel-level characteristics from the EHCVM agriculture
     # module s16a (GH #167; Mali is the EHCVM reference implementation).
