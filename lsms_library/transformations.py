@@ -136,6 +136,75 @@ def food_acquired_to_canonical(df: pd.DataFrame, drop_columns=('visit',)) -> pd.
     return out
 
 
+def _finalize_canonical_food_acquired(out: pd.DataFrame,
+                                      *,
+                                      index_levels=('t', 'i', 'j', 'u', 's'),
+                                      dedupe: bool = True) -> pd.DataFrame:
+    """Shared filter (+ optional dedupe) tail for the country-level
+    ``food_acquired_to_canonical`` builders (Uganda / Tanzania / Malawi).
+
+    Extracted per GH #251 so the canonical filter rule lives in one place
+    rather than being copied into each country file (the 2026-05-08
+    expenditure-only-row fix had to touch all of them).
+
+    Filter
+        Keep rows where ``Quantity > 0`` OR ``Expenditure > 0``.  An
+        expenditure-only row (food reported by value but not quantity) is
+        legitimate and is carried through with NaN ``Quantity``.
+
+    Dedupe (``dedupe=True``)
+        Genuine source-data duplicates on a canonical key — e.g. two
+        ``Other (Specify)`` rows that lump distinct foods under one
+        ``(t, i, j, u, s)`` — are aggregated: ``Quantity`` and
+        ``Expenditure`` summed with ``min_count=1`` (an all-NaN group stays
+        NaN rather than coercing to 0), and a per-unit ``Price`` (when the
+        column is present) averaged across the duplicate rows.  When
+        ``dedupe=False`` the rows are kept as-is (the caller's pre-melt
+        already yields unique keys) and only the filter + reindex apply.
+
+    Note
+        ``food_acquired_to_canonical`` (this module) intentionally does NOT
+        route through this helper: it filters per source *before* the
+        purchased/produced concat and its index carries an optional ``v``
+        level, so its tail has a different shape.  See #251.
+
+    Parameters
+    ----------
+    out : pd.DataFrame
+        Flat long-form frame with the canonical levels (``t, i, j, u, s``)
+        as *columns* plus ``Quantity``, ``Expenditure``, and optionally
+        ``Price``.
+    index_levels : iterable of str
+        Levels to group / index on.  Default ``('t', 'i', 'j', 'u', 's')``.
+    dedupe : bool
+        Aggregate duplicate canonical keys (True) or just filter + reindex
+        (False).
+
+    Returns
+    -------
+    pd.DataFrame
+        Indexed on ``index_levels`` and sorted.
+    """
+    qty_ok = out['Quantity'].notna() & (out['Quantity'] > 0)
+    exp_ok = out['Expenditure'].notna() & (out['Expenditure'] > 0)
+    out = out[qty_ok | exp_ok]
+
+    levels = list(index_levels)
+    if dedupe:
+        aggs = {
+            'Quantity': ('Quantity', lambda s: s.sum(min_count=1)),
+            'Expenditure': ('Expenditure', lambda s: s.sum(min_count=1)),
+        }
+        if 'Price' in out.columns:
+            # Price is per-unit, so it averages (not sums) across dup rows.
+            aggs['Price'] = ('Price', 'mean')
+        out = out.groupby(levels, dropna=False).agg(**aggs)
+    else:
+        out = out.set_index(levels)
+
+    return out.sort_index()
+
+
 def age_intervals(age, age_cuts=(4, 9, 14, 19, 31, 51)):
     """Bucket ages into half-open intervals for household_characteristics.
 

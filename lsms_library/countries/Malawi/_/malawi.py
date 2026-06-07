@@ -313,26 +313,16 @@ def food_acquired_to_canonical(df, wave):
             "found in input"
         )
 
+    from lsms_library.transformations import _finalize_canonical_food_acquired
+
     out = pd.concat(pieces, ignore_index=True)
-    # Keep rows with EITHER positive Quantity OR positive Expenditure.
-    # Matches the shared ``transformations.food_acquired_to_canonical``
-    # rule.  An expenditure-only row is legitimate data and is carried
-    # through with NaN Quantity.
-    qty_ok = out['Quantity'].notna() & (out['Quantity'] > 0)
-    exp_ok = out['Expenditure'].notna() & (out['Expenditure'] > 0)
-    out = out[qty_ok | exp_ok]
-    # Sum across genuine source-data duplicates: a household occasionally
-    # records multiple ``Other (Specify)`` entries for the same
-    # (item, unit, source) triple, lumping distinct foods under one
-    # canonical key.  Empirically observed in 2013-14 (HH 1508-006: two
-    # OTHER (SPECIFY) rows of qty 20 and 180) and 2019-20 (6 dupes across
-    # 3 households).  Sum is the right aggregation -- the household's
-    # total acquisition under that (item, unit, source) is the sum of the
-    # entries.  ``min_count=1`` keeps all-NaN Expenditure (produced/
-    # inkind) as NaN rather than coercing to 0.
-    out = out.groupby(['t', 'i', 'j', 'u', 's'],
-                      dropna=False).sum(min_count=1)
-    out = out.sort_index()
+    # Filter (qty>0 | exp>0; expenditure-only rows kept with NaN Quantity)
+    # and sum genuine source-data duplicates -- e.g. two ``Other (Specify)``
+    # rows under one (item, unit, source) key (observed 2013-14 HH 1508-006,
+    # 2019-20) -- via the shared tail (GH #251).  Malawi has no Price column,
+    # so Quantity/Expenditure summed with min_count=1 reproduces the prior
+    # blanket ``.sum(min_count=1)`` exactly.
+    out = _finalize_canonical_food_acquired(out)
 
     # Normalize food labels on the canonical 'j' level.
     out = apply_harmonize_food(out, wave, level='j')
