@@ -52,6 +52,30 @@ sample:
                 0: Rural
                 1: Urban
 
+plot_features:
+    # Land module: plot.dta, one clean LONG row per (hh_id, pcode), no
+    # duplicates.  Variable labels confirmed via pyreadstat metadata:
+    #   q09a04 "Plot area (m2)"; q09a06 "Tenure status of the plot";
+    #   q09a09 "Irrigation of the plot".
+    # AreaUnit is the constant 'square meters' (mapping.py AreaUnit()).
+    # Irrigated: 'Not irrigated' -> False, any irrigation method -> True.
+    # SoilType / TenureSystem absent in the source (q09a05 is land-use,
+    # q09a08 is slope -- neither a soil class).
+    file:
+        - ../Data/plot.dta
+    idxvars:
+        i: hh_id
+        plot_id: pcode
+    myvars:
+        Area: q09a04
+        AreaUnit:
+            - q09a04
+            - mapping: AreaUnit
+        Tenure: q09a06
+        Irrigated:
+            - q09a09
+            - mapping: Irrigated
+
 cluster_features:
     # basicvars.dta; one row per cluster v=cluster. Region=region; Rural from
     # urban (0=Rural, 1=Urban). 300 clusters, constant within cluster.
