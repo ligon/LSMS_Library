@@ -28,6 +28,14 @@ Data Scheme:
     index: (t, i, pid)
     Educational Attainment: str
 
+  subjective_well_being:
+    # EHCVM Section 20 'Pauvreté relative' item s20q05 -> Own Step, a
+    # 4-point relative-welfare ladder (1=Très pauvre ... 4=Riche;
+    # 'Ne sait pas'/NaN -> NaN).  LADDER construct only.  Benin's §20
+    # asks only the own-placement item, so no Neighbors/Friends Step.
+    index: (t, i)
+    Own Step: int
+
   food_acquired:
     # Canonical post-2026-05-05 (GH #169): s axis carries acquisition
     # source (purchased / produced / inkind / other).  The wave-level

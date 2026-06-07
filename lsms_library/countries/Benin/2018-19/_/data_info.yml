@@ -110,6 +110,25 @@ household_roster:
         - i
         - pid
 
+subjective_well_being:
+    # Section 20 'Pauvreté relative', item s20q05: self-placement on a
+    # 4-point relative-welfare ladder.  Mapped to canonical Own Step
+    # (higher = better off, consistent with Malawi/Cantril).
+    # 'Ne sait pas' / 'Refus' / NaN -> NaN (LADDER construct only).
+    file: s20_me_ben2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        Own Step:
+            - s20q05
+            - mapping:
+                Très pauvre: 1
+                Pauvre: 2
+                Moyen: 3
+                Riche: 4
+
 food_acquired:
     file: s07b_me_ben2018.dta
     idxvars:
