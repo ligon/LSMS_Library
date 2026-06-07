@@ -70,6 +70,17 @@ Data Scheme:
     materialize: make
     index: (t, i)
   assets: !make
+  months_food_inadequate:
+    # Family C (non-FIES food security): months in the last 12 the HH
+    # could not meet its food needs.  Source GSEC17 'Welfare and Food
+    # Security' food-deprivation item (h17q9 / h17q09) + which-months
+    # follow-up.  Present in 2009-10, 2010-11, 2011-12, 2013-14,
+    # 2015-16.  MonthsInadequate is <NA> for 2010-11 (no which-months
+    # follow-up that wave; only the binary item was asked).
+    index: (t, i)
+    MonthsInadequate: int
+    AnyInadequate: bool
+    materialize: make
   housing:
     index: (t, i)
     Roof: str

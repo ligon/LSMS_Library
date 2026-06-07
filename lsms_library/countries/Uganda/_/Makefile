@@ -22,7 +22,8 @@ VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 var = $(VAR_DIR)/shocks.parquet $(VAR_DIR)/nonfood_expenditures.parquet $(VAR_DIR)/enterprise_income.parquet \
 	  $(VAR_DIR)/assets.parquet $(VAR_DIR)/earnings.parquet $(VAR_DIR)/income.parquet \
 	  $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet \
-	  $(VAR_DIR)/plot_features.parquet
+	  $(VAR_DIR)/plot_features.parquet \
+	  $(VAR_DIR)/months_food_inadequate.parquet
 
 all: $(parquet) $(var)
 
@@ -79,6 +80,12 @@ plot_features_parquet := $(plot_features:.py=.parquet)
 
 $(VAR_DIR)/plot_features.parquet: plot_features.py $(plot_features_parquet)
 	python plot_features.py
+
+months_food_inadequate = $(shell find $(rounds) -name months_food_inadequate.py)
+months_food_inadequate_parquet := $(months_food_inadequate:.py=.parquet)
+
+$(VAR_DIR)/months_food_inadequate.parquet: months_food_inadequate.py $(months_food_inadequate_parquet)
+	python months_food_inadequate.py
 
 $(VAR_DIR)/income.parquet: income.py $(VAR_DIR)/enterprise_income.parquet $(VAR_DIR)/earnings.parquet
 	python income.py

@@ -10,7 +10,8 @@ VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 
 var = $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_quantities.parquet $(VAR_DIR)/food_prices.parquet \
 	  $(VAR_DIR)/household_characteristics.parquet \
-      $(VAR_DIR)/shocks.parquet $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet
+      $(VAR_DIR)/shocks.parquet $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet \
+      $(VAR_DIR)/food_coping.parquet
 
 all: panel_ids.json updated_ids.json $(parquet) $(var)
 
@@ -65,6 +66,19 @@ plot_features_parquet := $(plot_features:.py=.parquet)
 
 $(VAR_DIR)/plot_features.parquet: plot_features.py $(plot_features_parquet)
 	python plot_features.py
+
+# food_coping (GH #332, Family B; ESS §7 CSI/rCSI day-count battery).
+# Mirrors the plot_features convention: the framework's grab_data calls
+# `make ../<wave>/_/food_coping.parquet`, whose pattern rule runs the wave
+# script; the VAR_DIR rule concatenates them via the country script.
+food_coping = $(shell find $(rounds) -name food_coping.py)
+food_coping_parquet := $(food_coping:.py=.parquet)
+
+../%/_/food_coping.parquet: ../%/_/food_coping.py
+	(cd $(@D) && python food_coping.py)
+
+$(VAR_DIR)/food_coping.parquet: food_coping.py $(food_coping_parquet)
+	python food_coping.py
 
 $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet: nutrition.py food_items.org $(VAR_DIR)/food_quantities.parquet
 	python nutrition.py

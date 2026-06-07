@@ -48,6 +48,15 @@ $(VAR_DIR)/life_satisfaction.parquet: life_satisfaction.py $(life_satisfaction_p
 ../%/_/life_satisfaction.parquet:
 	(cd $(@D) && python life_satisfaction.py)
 
+food_coping = $(shell find $(rounds) -name food_coping.py)
+food_coping_parquet := $(food_coping:.py=.parquet)
+
+$(VAR_DIR)/food_coping.parquet: food_coping.py $(food_coping_parquet)
+	python food_coping.py
+
+../%/_/food_coping.parquet:
+	(cd $(@D) && python food_coping.py)
+
 plot_features = $(shell find $(rounds) -name plot_features.py)
 plot_features_parquet := $(plot_features:.py=.parquet)
 

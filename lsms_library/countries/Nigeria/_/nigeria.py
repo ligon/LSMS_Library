@@ -50,6 +50,76 @@ PP_QUARTER = {
     '2023-24': '2023Q3',
 }
 
+# ---------------------------------------------------------------------
+# food_coping (#332, Family B: coping-strategies / rCSI)
+# ---------------------------------------------------------------------
+#
+# GHS section 9 ("Food Security") is a coping day-count battery, NOT an
+# HFIAS occurrence/frequency scale.  Items s9q1a..s9q1i ask "HOW MANY
+# DAYS [in the last 7] HAD TO..." for each coping strategy, coded 0-7.
+# Collected in the post-planting round only (sect9_plantingwN.dta), so
+# each wave maps to a single t = PP_QUARTER[wave].  The post-harvest
+# round has no equivalent battery.  sect9b (W4+) is FIES and is wired
+# separately (do not include here).
+#
+# Canonical rCSI strategy names (LessPreferred, LimitVariety,
+# LimitPortion, ReduceMeals, RestrictAdults, BorrowFood) plus the
+# survey-specific severe-coping items (NoFood, SleepHungry,
+# WholeDayNoFood).  Order follows the questionnaire (s9q1a..s9q1i).
+FOOD_COPING_ITEMS = {
+    's9q1a': 'LessPreferred',     # rely on less preferred foods
+    's9q1b': 'LimitVariety',      # limit variety of foods eaten
+    's9q1c': 'LimitPortion',      # limit portion size at meal times
+    's9q1d': 'ReduceMeals',       # reduce number of meals eaten
+    's9q1e': 'RestrictAdults',    # restrict adult consump for children
+    's9q1f': 'BorrowFood',        # borrow food / rely on help
+    's9q1g': 'NoFood',            # no food of any kind in household
+    's9q1h': 'SleepHungry',       # go to sleep hungry
+    's9q1i': 'WholeDayNoFood',    # go a whole day & night without eating
+}
+
+
+def food_coping_for_wave(t, df, id_col='hhid', items=None):
+    """Reshape a sect9 coping battery into long-form food_coping.
+
+    Parameters
+    ----------
+    t : str
+        The single post-planting quarter for this wave (e.g. '2010Q3').
+    df : DataFrame
+        Raw sect9_plantingwN data (one row per household), read with
+        ``convert_categoricals=False`` so the day counts stay numeric.
+    id_col : str
+        Household id column (Nigeria GHS uses 'hhid').
+    items : dict
+        Mapping of source column -> Strategy name; defaults to
+        ``FOOD_COPING_ITEMS``.
+
+    Returns
+    -------
+    DataFrame indexed by (t, i, Strategy) with an integer ``Days``
+    column (0-7).  Rows where the day count is missing are dropped; a
+    household with all-missing items contributes no rows.
+    """
+    items = items or FOOD_COPING_ITEMS
+    present = {src: name for src, name in items.items() if src in df.columns}
+    if not present:
+        raise ValueError(f"food_coping: none of {list(items)} in source for t={t}")
+
+    sub = df[[id_col] + list(present)].copy()
+    sub['i'] = sub[id_col].apply(format_id)
+    sub = sub.drop(columns=[id_col]).rename(columns=present)
+
+    long = sub.melt(id_vars='i', var_name='Strategy', value_name='Days')
+    long['Days'] = pd.to_numeric(long['Days'], errors='coerce')
+    long = long.dropna(subset=['Days'])
+    long['Days'] = long['Days'].round().astype('Int64')
+    long['t'] = t
+
+    long = long.set_index(['t', 'i', 'Strategy']).sort_index()
+    return long[['Days']]
+
+
 HECTARES_PER_ACRE = 0.404686          # 1 acre  = 0.404686 ha
 SQM_PER_HECTARE = 10000.0             # 1 ha    = 10,000 m^2
 

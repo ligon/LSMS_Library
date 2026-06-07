@@ -1,0 +1,11 @@
+#+title: Contents
+
+* Food security (non-FIES families, GH #332) --- not wired
+
+The IHSES 2012 questionnaire has no standard food-insecurity-experience
+battery: no FIES, no HFIAS occurrence/frequency scale, no HHS or FCS, no
+rCSI coping-day index, and no months-of-inadequate-provisioning item.
+The only food-stress signal is a single bespoke food-difficulty item
+(=q2005=) embedded in the shocks module, which is already captured by
+the wired =shocks= feature.  =food_security_hfias=, =food_coping=, and
+=months_food_inadequate= are therefore not implementable for Iraq.

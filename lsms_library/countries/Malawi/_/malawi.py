@@ -13,7 +13,7 @@ import pandas as pd
 import numpy as np
 import sys
 sys.path.append('../../../_/')
-from lsms_library.local_tools import conversion_table_matching_global
+from lsms_library.local_tools import conversion_table_matching_global, format_id
 
 
 def _extract_kg_conversion(series):
@@ -557,4 +557,156 @@ def plot_features_for_wave(t, df_c, df_d, colmap):
     # (Module C should be one row per plot; first-wins keeps it unique).
     out = out.groupby(['t', 'i', 'plot_id'], as_index=False).first()
     out = out.set_index(['t', 'i', 'plot_id'])
+    return out
+
+
+# --- non-FIES food security (GH #332) -----------------------------------
+# Module H "Food Security" of the IHS3/IHS4/IHS5 household questionnaire and
+# the IHPS 2013 carries two non-FIES batteries shared verbatim across all
+# four buildable waves (the IHS2 2004-05 instrument is unrelated -- a 3-day
+# food-consumption recall, no coping/months items -- so 2004-05 is ABSENT):
+#
+#   * H02 a-e: rCSI coping-strategy day counts (0-7 days in the past 7 days).
+#     The 5 sub-items are in the SAME order in every wave (verified against
+#     the IHS3 Household Questionnaire Module H, Page 35; the 2010-11 .dta
+#     Stata labels are truncated to the question stem but the questionnaire
+#     order is identical to the explicitly-labelled IHS4/IHS5/IHPS items):
+#         hh_h02a = Rely on less preferred / less expensive foods
+#         hh_h02b = Limit portion size at meal-times
+#         hh_h02c = Reduce number of meals eaten in a day
+#         hh_h02d = Restrict consumption by adults so small children can eat
+#         hh_h02e = Borrow food / rely on help from a friend or relative
+#   * H04 + H05: months of inadequate food provisioning in the last 12
+#     months.  H04 is a Yes(1)/No(2) gate; H05 is a wide month-calendar
+#     (one cell per month, 'X' marks a month the HH lacked enough food).
+
+# Canonical rCSI Strategy names, indexed by the hh_h02 suffix order that is
+# stable across every Malawi wave (a, b, c, d, e).
+_MALAWI_COPING_STRATEGIES = {
+    'a': 'LessPreferred',
+    'b': 'LimitPortion',
+    'c': 'ReduceMeals',
+    'd': 'RestrictAdults',
+    'e': 'BorrowFood',
+}
+
+
+def food_coping_for_wave(t, df, idcol, i_prefix=''):
+    """Build canonical ``food_coping`` for one Malawi Module-H wave.
+
+    Parameters
+    ----------
+    t : str
+        Wave id (e.g. ``"2010-11"``), used as the ``t`` index value.
+    df : pd.DataFrame
+        Household Module H rows, loaded with ``convert_categoricals=False``
+        so the day counts stay integer-coded.  Must carry ``idcol`` plus
+        ``hh_h02a`` .. ``hh_h02e``.
+    idcol : str
+        Household-id column (``case_id`` for the cross-sectional waves,
+        ``y2_hhid`` for the 2013-14 IHPS panel).
+    i_prefix : str, optional
+        Prefix to prepend to ``format_id(idcol)`` so ``i`` matches the
+        wave's ``household_roster`` index.  ``'cs-17-'`` for 2016-17 (its
+        cross-sectional half is prefixed in the roster); empty otherwise.
+
+    Returns
+    -------
+    pd.DataFrame indexed by ``(t, i, Strategy)`` with a single integer
+        column ``Days`` (0-7, days in the past 7 the HH used the strategy).
+        Recall period: last 7 days.
+    """
+    df = df.copy()
+    df['i'] = i_prefix + df[idcol].apply(format_id)
+
+    pieces = []
+    for suffix, strategy in _MALAWI_COPING_STRATEGIES.items():
+        col = f'hh_h02{suffix}'
+        if col not in df.columns:
+            continue
+        days = pd.to_numeric(df[col], errors='coerce')
+        # Day counts live on 0-7; anything outside (e.g. the lone 20 in the
+        # 2019-20 cross-section) is a data-entry error -> NaN.
+        days = days.where((days >= 0) & (days <= 7))
+        piece = pd.DataFrame({'i': df['i'].values,
+                              'Strategy': strategy,
+                              'Days': days.values})
+        pieces.append(piece)
+
+    out = pd.concat(pieces, ignore_index=True)
+    out['t'] = t
+    out = out.dropna(subset=['Days'])
+    out['Days'] = out['Days'].round().astype('Int64')
+    # One row per (HH, strategy); first-wins guards against duplicate HH rows.
+    out = out.groupby(['t', 'i', 'Strategy'], as_index=False).first()
+    out = out.set_index(['t', 'i', 'Strategy'])
+    return out
+
+
+def _months_inadequate_columns(df):
+    """Return the ordered list of wide month-calendar columns (hh_h05*).
+
+    Handles both Module-H layouts: 2010-11 names its 25 month cells
+    ``hh_h05a_01`` .. ``hh_h05b_15``; the later waves use single-letter
+    suffixes ``hh_h05a`` .. ``hh_h05y``.
+    """
+    cols = [c for c in df.columns if c.lower().startswith('hh_h05')]
+    # Exclude any "other specify" / cause companions defensively.
+    cols = [c for c in cols if not c.lower().endswith('_os')]
+    return sorted(cols)
+
+
+def months_food_inadequate_for_wave(t, df, idcol, i_prefix=''):
+    """Build canonical ``months_food_inadequate`` for one Malawi wave.
+
+    Parameters
+    ----------
+    t, df, idcol, i_prefix
+        As in :func:`food_coping_for_wave`.  ``df`` must carry the H04 gate
+        (``hh_h04``: 1=Yes faced shortage, 2=No) and the wide H05 month
+        calendar (cells marked ``'X'`` for months the HH lacked food).
+
+    Returns
+    -------
+    pd.DataFrame indexed by ``(t, i)`` with columns ``MonthsInadequate``
+        (Int64 0-12) and ``AnyInadequate`` (nullable bool).  Recall: last
+        12 months.
+
+    Notes
+    -----
+    The H05 calendar is **gated on H04==Yes**.  In IHS4 (2016-17) and IHS5
+    (2019-20) every household that answered H04==No has ALL 25 calendar
+    cells pre-filled with 'X' (a skip-pattern/template artifact -- verified:
+    the count of 25-X households equals the count of H04==No households).
+    Counting X marks unconditionally would therefore report 25 months for
+    food-secure households.  Gating on H04==Yes yields a clean 0-12 count
+    in every wave (the earlier IHS3/IHPS calendars are already blank for
+    H04==No households, so the gate is a no-op there).
+    """
+    df = df.copy()
+    df['i'] = i_prefix + df[idcol].apply(format_id)
+
+    gate = pd.to_numeric(df['hh_h04'], errors='coerce')
+    any_inadequate = pd.Series(pd.NA, index=df.index, dtype='boolean')
+    any_inadequate = any_inadequate.where(gate != 1, True)
+    any_inadequate = any_inadequate.where(gate != 2, False)
+
+    month_cols = _months_inadequate_columns(df)
+    marked = (df[month_cols].astype('string')
+              .apply(lambda s: s.str.strip().str.upper() == 'X')
+              .sum(axis=1))
+    # Only H04==Yes households contribute a genuine month count; everyone
+    # else (No, or unanswered) is zero months.
+    months = marked.where(gate == 1, 0)
+    # Plausibility clamp to the 12-month recall window.
+    months = months.clip(upper=12).astype('Int64')
+
+    out = pd.DataFrame({
+        't': t,
+        'i': df['i'].values,
+        'MonthsInadequate': months.values,
+        'AnyInadequate': any_inadequate.values,
+    })
+    out = out.groupby(['t', 'i'], as_index=False).first()
+    out = out.set_index(['t', 'i'])
     return out

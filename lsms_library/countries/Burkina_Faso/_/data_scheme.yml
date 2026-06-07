@@ -132,6 +132,40 @@ Data Scheme:
     WholeDay: bool
     FIES_score: int
 
+  food_coping:
+    # Reduced Coping Strategies Index (rCSI).  2014 EMC wave ONLY (Part 3
+    # "Sécurité alimentaire", emc2014_p3_securitealimentaire_27022015.dta).
+    # The EHCVM waves (2018-19, 2021-22) field FIES instead -> food_security.
+    # Items SA2A..SA2E ask "au cours des 7 derniers jours, combien de jours
+    # [...] avez-vous dû [...]" -- a day-count 0-7.  WIDE->LONG: one
+    # (t, i, Strategy) row per strategy.  SA2A..SA2E map IN ORDER to
+    # LessPreferred / LimitPortion / ReduceMeals / RestrictAdults / BorrowFood.
+    # The Stata labels are all truncated to an identical 80-char prefix, but the
+    # a-e attribution is VERIFIED against the WB EMC 2014 Passage-3 questionnaire
+    # (catalog 2538, section SA): A "aliments moins chers", B "réduire les
+    # quantités consommées", C "réduire le nombre de repas", D "réduire les
+    # quantités des adultes au profit des enfants", E "emprunter de la
+    # nourriture".  (Matches the Mali EACI / Malawi IHS peer surveys.)
+    # HOUSEHOLD-level; i = the 2014 roster i (format_id(zd)+format_id(menage,3)).
+    index: (t, i, Strategy)
+    Days: int
+    materialize: make
+
+  months_food_inadequate:
+    # Months of inadequate food provisioning in the last 12.  2014 EMC wave
+    # ONLY (Part 3 "Sécurité alimentaire",
+    # emc2014_p3_securitealimentaire_27022015.dta).  SA4 ("au cours des 12
+    # derniers mois, avez-vous fait face à une situation où vous n'aviez pas
+    # assez de nourriture", Oui/Non) gates the SA5A..SA5L which-months battery
+    # (12 Oui/Non flags, Juillet 2013..Juillet 2014).  MonthsInadequate =
+    # count of SA5 'Oui' where SA4=Oui; 0 where SA4=Non; NaN where SA4 NaN.
+    # AnyInadequate = MonthsInadequate > 0.  HOUSEHOLD-level; i = the 2014
+    # roster i.  The EHCVM waves field FIES (food_security), not this battery.
+    index: (t, i)
+    MonthsInadequate: int
+    AnyInadequate: bool
+    materialize: make
+
   interview_date:
     index: (t, i)
     Int_t: datetime
