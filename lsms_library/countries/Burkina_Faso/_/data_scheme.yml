@@ -34,6 +34,18 @@ Data Scheme:
     index: (t, i, pid)
     Educational Attainment: str
 
+  subjective_well_being:
+    # Cantril-style self-placement ladder from EHCVM Section 20
+    # ('Pauvreté relative').  The ladder item is s20q05 (2018-19) /
+    # s20aq05 (2021-22; §20 was split into sub-modules A/B/C in the
+    # 2021 instrument, A = relative poverty).  4-point categorical scale
+    # mapped higher = better off, consistent with Malawi/Cantril:
+    # Très pauvre=1, Pauvre=2, Moyen=3, Riche=4; Ne sait pas / Refus /
+    # NaN -> NaN.  EHCVM asks only the own-placement item, so unlike
+    # Malawi there are no Neighbors/Friends Step columns.
+    index: (t,i)
+    Own Step: int
+
   panel_ids:
     index: (t, i)
     previous_i: str

@@ -69,3 +69,18 @@ interview_date:
     myvars:
         Int_t:
             - m0_date
+
+subjective_well_being:
+    # Module 9 "Subjective Poverty" (subjpov_cl.dta).  m09_q09 "Economic status"
+    # is the welfare-ladder self-placement (1-10; 1 = poorest, 10 = richest).
+    # i=[psu,hh] -> composite via mapping.py:i() to match sample()'s household
+    # identity ('psu-hh') so _join_v_from_sample resolves v.  This is the
+    # housing/interview_date idiom; the roster's bare i=hh is a known wave-2002
+    # defect (the within-cluster number, only 14 unique) that we do NOT copy.
+    # Only the single current-status item is present here.
+    file:
+        - ../Data/subjpov_cl.dta
+    idxvars:
+        i: [psu, hh]
+    myvars:
+        Own Step: m09_q09

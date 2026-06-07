@@ -198,6 +198,28 @@ individual_education:
     myvars:
         Educational Attainment: 'educ_hi'
 
+subjective_well_being:
+    # EHCVM §20 'Pauvreté relative' ladder.  In 2021-22 §20 was split
+    # into a/b/c subsections; the self-placement item moved to s20aq05
+    # (file s20a_me_sen2021.dta) with identical 4-point labels.
+    # -> Own Step (higher = better off).  Ne sait pas / Refus / NaN -> NaN.
+    file: s20a_me_sen2021.dta
+    idxvars:
+        v: grappe
+        i:
+            - grappe
+            - menage
+    myvars:
+        Own Step:
+            - s20aq05
+            - mapping:
+                Très pauvre: 1
+                Pauvre: 2
+                Moyen: 3
+                Riche: 4
+                Ne sait pas: null
+                Refus: null
+
 housing:
     file: s11_me_sen2021.dta
     idxvars:

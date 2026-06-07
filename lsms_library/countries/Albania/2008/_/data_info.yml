@@ -99,3 +99,18 @@ housing:
                 live for free: Live for free
                 other: Other
         Rooms: m13a_q08
+
+subjective_well_being:
+    # Module 7 "Subjective Poverty" (Modul_7_subjective_poverty.sav).  Two
+    # "economic status" ladder items: m07_q09 = CURRENT step, m07_q090 = the
+    # retrospective companion.  Own Step = the current item (1-10; 1 = poorest,
+    # 10 = richest); the retrospective item is dropped.  i=[psu,hh] -> composite
+    # via mapping.py:i() to match sample()'s household identity (the
+    # housing/interview_date idiom); the roster's bare i=hh is the known
+    # within-cluster-number defect we do NOT copy.
+    file:
+        - ../Data/Modul_7_subjective_poverty.sav
+    idxvars:
+        i: [psu, hh]
+    myvars:
+        Own Step: m07_q09

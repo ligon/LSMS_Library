@@ -498,3 +498,10 @@ CLOSED: [2023-03-03 Fri 11:26]
 CLOSED: [2023-03-03 Fri 11:26]
 ** DONE other_features.py
 CLOSED: [2023-03-07 Tue 11:32]
+
+* subjective_well_being — not available (2026-06-06)
+No Ethiopia ESS wave (2011-12, 2013-14, 2015-16, 2018-19, 2021-22) carries a
+subjective-well-being / Cantril-ladder / life-satisfaction module. A variable-name
+scan of all 63-75 household section files per wave returned zero matches
+(ladder/well-being/satisfaction/step/life). Resolves the #331 "unknown" → absent.
+(Food-security IS present — see #332.) Tracked in #331.

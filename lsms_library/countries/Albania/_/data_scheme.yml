@@ -52,6 +52,19 @@ Data Scheme:
     Tenure: str
     Rooms: float
 
+  # Module 7 "Subjective Poverty" (household questionnaire; Module 9 in the
+  # 2002 questionnaire numbering).  Self-placement welfare ladder: "imagine a
+  # ladder/scale of economic status; on which step does your household stand
+  # today?".  The native scale is 1-10 (1 = poorest, 10 = richest) in EVERY
+  # wired wave -- NOT the 6 steps suggested in the #331 verifier note (the data
+  # plainly span 1..10).  Own Step keeps the native 1-10 integer; higher =
+  # better off (consistent with the Malawi/Cantril anchor).  Only the CURRENT
+  # placement is carried; the retrospective "step N years ago" companion item
+  # present in 2005/2008/2012 is dropped.  No Neighbors/Friends step is asked.
+  subjective_well_being:
+    index: (t, i)
+    Own Step: int
+
   interview_date:
     index: (t, i)
     Int_t: datetime

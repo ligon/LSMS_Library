@@ -25,6 +25,13 @@ Data Scheme:
   individual_education:
     index: (t, i, pid)
     Educational Attainment: str
+  subjective_well_being:
+    # EHCVM Section 20 'Pauvreté relative' (s20/s20a).  Self-placement on
+    # a 4-point relative-welfare ladder (Très pauvre / Pauvre / Moyen /
+    # Riche) mapped to Own Step 1-4 so higher = better off, consistent
+    # with the Malawi/Cantril ladder.  EHCVM waves only (2018-19, 2021-22).
+    index: (t, i)
+    Own Step: int
   food_acquired:
     # Canonical post-2026-05-05 (GH #169): s axis carries acquisition
     # source (purchased / produced / inkind / other).  EHCVM 2018-19

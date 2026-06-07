@@ -10,3 +10,18 @@ individual level (~dob~ in KZ96REL) and at the community level (KOMMU has
 survey dates ~a4day/a4mon/a4year~, but these are not household-linked).
 ~interview_date~ is therefore not implementable from the available
 microdata.  Tracked in GitHub issue #341.
+
+* subjective_well_being (Cantril ladder) — 1996 (2026-06-06, #331)
+Source: KZ96OCC_PUF.dta (catalog F20, individual occupation file), variable
+~d_095_~ = "personal staircase identification" — a Cantril self-anchoring
+ladder with Stata value labels {1: 'lowest', 2..8 literal, 9: 'highest'},
+i.e. a 1-9 step scale, higher = better off (consistent with the Malawi
+anchor).  Only ~Own Step~ is asked (no Neighbors/Friends item).
+
+The OCC file is INDIVIDUAL level (rn = household, personnr = person).  The
+canonical table is household level (t, i), i = rn.  We reduce by taking the
+HOUSEHOLD HEAD's step: the roster (KZ96REL) has exactly one head per
+household (relhead == 1); 1992 of 1996 heads appear in OCC and 1983 give a
+non-missing step.  Households whose head did not answer are dropped.
+Built via ~1996/_/subjective_well_being.py~ (materialize: make).  Observed
+range 1-8 (no household head reported step 9).

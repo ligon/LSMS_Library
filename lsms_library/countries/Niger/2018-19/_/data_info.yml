@@ -50,6 +50,26 @@ food_acquired:
         Expenditure: s07bq08
         Produced: s07bq04
 
+subjective_well_being:
+    # EHCVM Section 20 'Pauvreté relative'.  s20q05 = self-placement on a
+    # 4-point relative-welfare ladder (Très pauvre / Pauvre / Moyen /
+    # Riche).  Mapped to Own Step so higher = better off, consistent with
+    # the Malawi/Cantril ladder.  Ne sait pas / NaN -> NaN.
+    file: s20_me_ner2018.dta
+    idxvars:
+        v: grappe
+        i:
+            - grappe
+            - menage
+    myvars:
+        Own Step:
+            - s20q05
+            - mapping:
+                Très pauvre: 1
+                Pauvre: 2
+                Moyen: 3
+                Riche: 4
+
 household_roster:
   dfs:
     - df_main

@@ -242,3 +242,22 @@ interview_date:
             - menage
     myvars:
         Int_t: s00q23a
+
+subjective_well_being:
+    # EHCVM §20 'Pauvreté relative'.  s20q05 = self-placement on a
+    # 4-point relative-wealth ladder.  Mapped higher = better off
+    # (Très pauvre=1 ... Riche=4); Ne sait pas -> NaN.
+    file: s20_me_bfa2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        Own Step:
+            - s20q05
+            - mapping:
+                Très pauvre: 1
+                Pauvre: 2
+                Moyen: 3
+                Riche: 4
+                Ne sait pas: null
