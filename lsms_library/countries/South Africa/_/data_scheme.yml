@@ -50,3 +50,14 @@ Data Scheme:
   interview_date:
     index: (t, i)
     Int_t: datetime
+
+  life_satisfaction:
+    # 1993 S5_PQL.dta (Section 9 'Perceived Quality of Life'), one row per
+    # household.  Only the overall satisfaction item `satisfie` is a genuine
+    # satisfaction rating (-> Domain='Overall'); safety/crime/priorities/
+    # comparison items in the same module are deliberately excluded.  Built
+    # by the wave script 1993/_/life_satisfaction.py (constant Domain level +
+    # WIDE->LONG reshape need a script, not YAML).
+    index: (t, i, Domain)
+    Satisfaction: str
+    materialize: make
