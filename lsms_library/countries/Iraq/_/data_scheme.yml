@@ -74,3 +74,23 @@ Data Scheme:
     index: (t, i)
     Int_t: datetime
     materialize: make
+
+  life_satisfaction:
+    # Domain-satisfaction battery. 2012 ONLY (module 2012ihses23, SECTION
+    # 23). The module is INDIVIDUAL-level (asked of every member aged 15+,
+    # ~7 rows/HH), so the wave script (2012/_/life_satisfaction.py) REDUCES
+    # to the household HEAD (roster q0105=='Head'; 100% of heads present in
+    # the module) and reshapes the 11 items q2302_1..q2302_11 WIDE->LONG.
+    #   i=questid (matches sample/housing/assets; the roster's `hh` is the
+    #     within-dwelling sequence number, GH #256). The head's idcode is
+    #     joined from the roster on questid.
+    #   Domain = canonical life aspect from the questionnaire order: Food,
+    #     Housing, Finances(income), Health, Job(work), Safety(local
+    #     security), Education, FreedomOfChoice, Control, Community(trust/
+    #     acceptance), Overall. FreedomOfChoice/Control are autonomy items
+    #     with no canonical slot, kept under descriptive names.
+    #   Satisfaction = native ordinal label, Title-cased (Very satisfied ..
+    #     Not at all satisfied); "DO NOT KNOW/NO ANSWER" -> dropped.
+    # 2006-07 (IHSES-I) has no life-satisfaction module -> not wired.
+    index: (t, i, Domain)
+    Satisfaction: str
