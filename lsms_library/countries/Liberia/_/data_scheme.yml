@@ -49,6 +49,18 @@ Data Scheme:
     HowCoped1: str
     HowCoped2: str
 
+  months_food_inadequate:
+    # 2018-19 §16 'Food security' (sect16a_public.dta). MonthsInadequate=S16_2
+    # ("how many months in the past 12 did you not have enough food to feed the
+    # household", 1-12; the 'no'/S16_1 households are filled to 0). AnyInadequate
+    # =S16_1 ("faced a situation with not enough food in the last 12 months",
+    # yes/no). No which-months battery in this instrument (S16_3/S16_4 are
+    # forest-product coping follow-ups), so the count item is the source.
+    index: (t, i)
+    MonthsInadequate: int
+    AnyInadequate: bool
+    materialize: make
+
   sample:
     index: (i, t)
     v: str
