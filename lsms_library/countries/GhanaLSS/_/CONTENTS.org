@@ -237,3 +237,9 @@ Ghana's LSMS-ISA participation is through the GhanaSPS (Social Panel Survey), no
 ** TODO household_characteristics.py
 ** TODO food_acquired.py
 ** TODO other_features.py
+
+* subjective_well_being — not available (2026-06-06)
+No GLSS wave (1987-88…2016-17) carries a subjective-well-being / life-evaluation /
+subjective-poverty ladder. GLSS7 §13 is "Governance, Peace, Security" (political
+participation + threat perception), not SWB. Confirmed by a variable-label scan of
+all section files. Resolves the #331 "unknown" → absent. Tracked in #331.
