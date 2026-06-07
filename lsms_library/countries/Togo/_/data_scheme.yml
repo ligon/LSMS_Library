@@ -25,6 +25,14 @@ Data Scheme:
   individual_education:
     index: (t, i, pid)
     Educational Attainment: str
+  subjective_well_being:
+    # EHCVM §20 'Pauvreté relative' ladder item s20q05: self-placement
+    # on a 4-point welfare ladder (Très pauvre=1, Pauvre=2, Moyen=3,
+    # Riche=4; higher = better off, as in Malawi/Cantril).  Ne sait pas /
+    # Refus / NaN -> NaN.  Only the Own-placement item exists in EHCVM;
+    # no Neighbors/Friends steps (unlike Malawi).
+    index: (t, i)
+    Own Step: int
   food_acquired:
     # Canonical post-2026-05-05 (GH #169): s axis carries acquisition
     # source (purchased / produced / inkind / other).  The wave-level

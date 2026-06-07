@@ -124,6 +124,23 @@ individual_education:
     myvars:
         Educational Attainment: 'educ_hi'
 
+subjective_well_being:
+    file: ../Data1/s20_me_tgo2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        Own Step:
+            - s20q05
+            - mapping:
+                Très pauvre: 1
+                Pauvre: 2
+                Moyen: 3
+                Riche: 4
+                Ne sait pas: null
+                Refus: null
+
 assets:
     file: ../Data1/s12_me_tgo2018.dta
     idxvars:
