@@ -36,6 +36,25 @@ Data Scheme:
     index: (t, i)
     Own Step: int
 
+  food_security:
+    # FAO 8-item Food Insecurity Experience Scale (FIES).  EHCVM §8A
+    # 'Sécurité alimentaire', recall period = last 12 months.  Single
+    # EHCVM wave (2018-19) reads s08a_me_ben2018.dta; items
+    # s08aq01..s08aq08 map IN ORDER to the 8 canonical FIES items
+    # (Worried..WholeDay).  Values Oui->True, Non->False;
+    # "Ne sait pas"/"Refus"/NaN->NaN.  FCS (#332) is deliberately NOT
+    # wired here; only the FIES binary battery is exposed.
+    index: (t, i)
+    Worried: bool
+    HealthyDiet: bool
+    FewFoods: bool
+    SkippedMeal: bool
+    AteLess: bool
+    RanOut: bool
+    Hungry: bool
+    WholeDay: bool
+    FIES_score: int
+
   food_acquired:
     # Canonical post-2026-05-05 (GH #169): s axis carries acquisition
     # source (purchased / produced / inkind / other).  The wave-level
