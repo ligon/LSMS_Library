@@ -15,7 +15,7 @@ unitsd = defaultdict(lambda:pd.NA,get_categorical_mapping(tablename='units'))
 # food expenditure
 idxvars = dict(i=(['clust','nh'],lambda x: format_id(x.clust)+'/'+format_id(x.nh,zeropadding=2)),
                w=('nh',lambda x: w),
-               j=('freqcd',lambda x: labelsd[format_id(x)]))
+               j=('freqcd',lambda x: labelsd.get(format_id(x), '')))
 
 myvars = dict()
 # Iterate over visits
@@ -48,7 +48,7 @@ labelsd = get_categorical_mapping(tablename='harmonize_food',idxvars={'Code':('C
 # food quantities
 idxvars = dict(i=(['clust','nh'],lambda x: format_id(x.clust)+'/'+format_id(x.nh,zeropadding=2)),
                w=('nh',lambda x: w),
-               j=('foodcd',lambda x: labelsd[format_id(x)]))
+               j=('foodcd',lambda x: labelsd.get(format_id(x), '')))
 
 myvars = {}
 # Iterate over visits
