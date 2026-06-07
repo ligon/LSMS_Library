@@ -1,0 +1,316 @@
+#+title: EHCVM unit (=s07bq03b=) codebook --- curated
+#+date: <2026-06-07 Sun>
+
+Curated unit code->label map for the EHCVM (WAEMU) =s07bq03b= unit
+variable (GH #223 Layer 2).  Union of the =s07bq03b= Stata value labels
+across all 8 EHCVM countries (the coding is standardized; Togo/Senegal
+lost their =.dta= labels but the codes survive in the siblings), curated
+to one clean canonical per code.  Regenerate with
+=slurm_logs/build_ehcvm_unit_codebook.py=.
+
+NOT yet wired: the wiring step decodes =s07bq03b= for the label-less
+countries (Togo, Senegal) and documents the Benin<->Togo link in
+=Togo/_/CONTENTS.org=.
+
+* Method
+- Source :: union of =s07bq03b= value labels across Benin, CotedIvoire, Niger, Mali, Guinea-Bissau, Burkina_Faso, Senegal, Togo.
+- Per code: reverse mojibake (=UnitÃ©= -> =Unité=), strip =NNN.= prefix,
+  collapse whitespace; group case/accent-insensitively; dominant group
+  wins by frequency, representative prefers Title-cased + accented.
+- 175 resolved; 3 unresolved; 13 flagged for review.
+
+* Curated codebook
+#+name: ehcvm_units
+| Code | Preferred Label |
+|------+-----------------|
+| 100 | Kg |
+| 101 | Litre |
+| 102 | Alvéole |
+| 103 | Avec os au Kg |
+| 104 | Avec os en tas |
+| 105 | Bassine |
+| 106 | Bidon |
+| 107 | Boîte |
+| 108 | Boîte de tomate |
+| 109 | Bol |
+| 110 | Botte |
+| 111 | Boule |
+| 112 | Bouquet |
+| 113 | Bouteille |
+| 115 | Calebasse |
+| 116 | Canari |
+| 117 | Cannette |
+| 118 | Carton |
+| 119 | Casier |
+| 120 | Cuillere |
+| 121 | Fagot |
+| 122 | filet (1 kg) |
+| 123 | Gobelet |
+| 124 | Gousse |
+| 125 | Louche |
+| 126 | Morceau |
+| 127 | Moudou |
+| 128 | Panier |
+| 129 | Paquet |
+| 130 | Plaquette |
+| 131 | Pot |
+| 132 | Régime |
+| 133 | Saco |
+| 134 | Sac (10 Kg) |
+| 135 | Sac (100 Kg) |
+| 136 | Sac (25 Kg) |
+| 137 | Sac (5 Kg) |
+| 138 | Sac (50 Kg) |
+| 139 | Sachet |
+| 140 | Sans os au Kg |
+| 141 | Sans os au tas |
+| 142 | Seau |
+| 143 | Tas |
+| 144 | Tasse |
+| 145 | Tine |
+| 146 | Tohoungolo |
+| 147 | Unité |
+| 148 | Verre |
+| 149 | Yorouba |
+| 150 | Gigot |
+| 151 | Carcasse |
+| 201 | Otoka/Fihanfingban |
+| 203 | Yoroukou/Yorougou |
+| 204 | Pome |
+| 205 | Agoua |
+| 206 | Paï |
+| 208 | sogo |
+| 209 | Djogledo |
+| 211 | Ike |
+| 212 | Abotoca |
+| 214 | Ayewa |
+| 216 | Quarantaine |
+| 220 | Tinnabou (bariba ) |
+| 222 | sivlo |
+| 223 | siroba |
+| 224 | sagagou ( en bariba) |
+| 226 | Plastique |
+| 227 | Nobayirou |
+| 228 | Blèvi |
+| 229 | passoire |
+| 230 | Rôba |
+| 232 | Chaîne en bois |
+| 233 | Bidon de 1 litre et démi |
+| 234 | Bidon de 1l |
+| 235 | Bidon de 5l |
+| 236 | Bocal de mayonnaise |
+| 238 | corbar en bariba |
+| 239 | cuisse |
+| 240 | Grappe |
+| 241 | sac de 2,5kg |
+| 242 | Signi |
+| 243 | nimkotirou(BARIBA) |
+| 245 | Grand bocal |
+| 246 | Gbinbou bonnou |
+| 251 | Quart-Yorouba |
+| 252 | Demi-Yorouba |
+| 257 | Boîte de lait |
+| 258 | Plat |
+| 262 | Carreau |
+| 273 | Yéll |
+| 274 | Cube |
+| 302 | Cope |
+| 303 | Cuvette |
+| 305 | bidon de demi litre |
+| 306 | Bâtonnet |
+| 307 | Papier |
+| 308 | Djlèka |
+| 310 | gannouvi |
+| 311 | ibogban |
+| 312 | Sac (11kg) |
+| 313 | Kpanouvi |
+| 315 | Sac (4 kg) |
+| 316 | Feuille |
+| 318 | Poignet |
+| 319 | Sac (0,9 kg) |
+| 320 | Brochette |
+| 321 | Grain |
+| 324 | Si |
+| 325 | sikpanou |
+| 327 | Pincée |
+| 406 | Calma |
+| 407 | Caneca |
+| 409 | Fatia |
+| 411 | Frasco |
+| 412 | Maradura |
+| 413 | Monte |
+| 415 | Pacotinho |
+| 416 | Pé |
+| 417 | Tabuleiro |
+| 418 | Dúzia |
+| 419 | Múndo |
+| 420 | Corda |
+| 421 | Tigela |
+| 424 | Carteira |
+| 456 | Barre |
+| 460 | Moude (Moudé)) |
+| 462 | Paani |
+| 464 | Seau (10 Kg) |
+| 465 | Seau (25 Kg) |
+| 466 | Seau (5 Kg ) |
+| 467 | Tranche |
+| 468 | Gigot |
+| 469 | Piece |
+| 470 | Boite de lait concentré |
+| 506 | Boîte de nescafé |
+| 507 | Cristal (Kantou) |
+| 508 | Feuille |
+| 509 | Koriya /Gassou |
+| 510 | Pot-tarzan |
+| 511 | Sac Filet |
+| 512 | Tiya |
+| 513 | Waygouizé |
+| 561 | barquette |
+| 562 | Cornet |
+| 563 | Cuillère à café |
+| 564 | Cuillère à soupe |
+| 565 | Quart de litre |
+| 566 | Démi litre |
+| 567 | Lakhass |
+| 568 | miche |
+| 569 | Démi-miche |
+| 570 | Tiers de miche |
+| 571 | Quart de miche |
+| 572 | tablette |
+| 573 | demi tablette |
+| 577 | Tablette (30) |
+| 578 | tranche |
+| 579 | Verre à thé |
+| 663 | Agoua |
+| 664 | Kpogban |
+| 986 | filet (5 kg) |
+| 987 | Filet (2,5Kg) |
+| 989 | Sac de 10 Kg |
+| 991 | Bouteille de 5L |
+| 992 | Bouteille de 10 litre |
+| 993 | Bouteille de 1,5 litre |
+| 994 | Bouteille de 1l |
+| 995 | Bouteille de 5 litres |
+| 996 | Bouteille de 1 litre |
+| 997 | Bouteille de 50 cl |
+| 999 | Paquet (1 Kg) |
+| 1000 | Bouteille de 19L |
+| 1001 | 12,5 cl (démi walatt) |
+| 1002 | Bouteille de 25cl |
+| 1003 | Bouteille de 33cl |
+
+* Unresolved codes
+No label in any source wave; left undecoded: 1, 254, 255.
+
+* Flagged for review
+| Code | Flag | Chosen | Candidates (form:votes) |
+|------+------+--------+-------------------------|
+| 116 | LOW-VOTES | Canari | Canari:2 |
+| 122 | AMBIGUOUS | filet (1 kg) | filet (1 kg):56; Filet au Kg:41; Filet:14 |
+| 465 | LOW-VOTES | Seau (25 Kg) | Seau (25 Kg):4 |
+| 509 | LOW-VOTES | Koriya /Gassou | Koriya /Gassou:2 |
+| 513 | LOW-VOTES | Waygouizé | Waygouizé:4 |
+| 573 | AMBIGUOUS | demi tablette | demi tablette:163; Démi-tablette:160 |
+| 987 | LOW-VOTES | Filet (2,5Kg) | Filet (2,5Kg):1 |
+| 989 | LOW-VOTES | Sac de 10 Kg | Sac de 10 Kg:2; sac (10 kg):1 |
+| 993 | AMBIGUOUS | Bouteille de 1,5 litre | Bouteille de 1,5 litre:392; Bouteille de 1,5 L:384 |
+| 997 | AMBIGUOUS | Bouteille de 50 cl | Bouteille de 50 cl:180; Bouteille de 50 cl (demi litre):175 |
+
+* Full resolution log
+Every code whose variants conflicted (raw variant:votes -> canonical).
+
+- =[1]= UNRESOLVED --- =1.0=:2
+- =[100]= -> *Kg* --- =Kg=:110651; =100. kg=:44211; =       kg=:35019; =kg=:32594; =100. Kg=:7889
+- =[101]= -> *Litre* --- =Litre=:30309; =101. litre=:6777; =101.0=:6054; =       litre=:5361; =Litro=:5318; =litre=:4990; =101. Litre=:3185
+- =[102]= -> *Alvéole* --- =Alvéole=:140; =Alvéole/Plateau=:133; =       Alvéole=:123; =102. Alvéole=:50; =AlvÃ©ole=:43
+- =[103]= -> *Avec os au Kg* --- =Avec os au Kg=:6448; =       Avec os au Kg=:2609; =103.0=:343; =103. Avec os au Kg=:226
+- =[104]= -> *Avec os en tas* --- =       Avec os en tas=:3022; =Avec os en tas=:2620; =Avec os au tas=:2224; =104. Avec os au tas=:1207; =104.0=:753
+- =[105]= -> *Bassine* --- =Bassine=:619; =Bacia=:57; =bassine=:17; =105. bassine=:13
+- =[106]= -> *Bidon* --- =Bidon=:1618; =106.0=:629; =       Bidon=:464; =106. Bidon=:33
+- =[107]= -> *Boîte* --- =Boite=:12921; =Boîte=:10963; =       boite=:3259; =BoÃ®te=:3254; =boite=:2863; =Lata=:2561; =107. boîte=:1807; =107. Boîte=:1605
+- =[108]= -> *Boîte de tomate* --- =Boite de tomate/Pot=:7962; =Boîte de tomate=:5775; =108. Boite de tomate=:4844; =BoÃ®te de tomate=:3651; =       Boite de tomate=:3292; =Boite de tomate=:2311; =108. Boîte de tomate=:738
+- =[109]= -> *Bol* --- =Bol=:25577; =109. bol=:378; =bol=:261
+- =[111]= -> *Boule* --- =Boule=:11743; =111.0=:5091; =       Motte (boule)=:3989; =Motte (boule)=:3289; =boule (dankk)=:557; =111. boule=:414; =111. Boule=:63
+- =[112]= -> *Bouquet* --- =Bouquet=:12118; =112.0=:3481; =112. Bouquet=:1215; =Cacho=:688
+- =[113]= -> *Bouteille* --- =Bouteille=:6743; =bouteille=:4351; =Garrafa=:3805; =       bouteille=:2507; =113. Bouteille=:1754; =113.0=:1071; =Bouteilles=:813; =113. bouteille=:544
+- =[115]= -> *Calebasse* --- =Calebasse=:2662; =115. Calebasse=:1116; =       calebasse=:264; =calebasse=:188; =115. calebasse=:93
+- =[116]= -> *Canari* [LOW-VOTES] --- =116.0=:3; =Canari=:2
+- =[117]= -> *Cannette* --- =Canette=:122; =117. Cannette=:83; =       cannette=:80; =cannette=:78; =Cannette=:32
+- =[118]= -> *Carton* --- =Carton=:274; =       carton (brique)=:56; =carton (brique)=:46; =118. Carton=:3; =carton=:2
+- =[120]= -> *Cuillere* --- =Colher=:1844; =       Cuillere=:1696; =CuilliÃ¨re=:1482; =Cuillere=:1376; =120.0=:401; =120. Cueillère=:300; =Cueillère=:248; =CueillÃ¨re=:170
+- =[122]= -> *filet (1 kg)* [AMBIGUOUS] --- =122. filet (1 kg)=:41; =Filet au Kg=:39; =filet (1 kg)=:15; =Filet=:14; =       Filet au Kg=:2
+- =[123]= -> *Gobelet* --- =Gobelet=:5024; =       Gobelet=:420; =cup/gobelet=:345; =123. Cup Gobelet=:159
+- =[124]= -> *Gousse* --- =Gousse=:4008; =       Gousse=:2145; =Dente=:1280; =124.0=:505; =124. canette=:144; =Canette=:128; =124. Gousse=:95
+- =[125]= -> *Louche* --- =Louche=:1865; =125. Louche=:971; =125. Louche traditionnelle=:545; =Louche traditionnelle=:327; =       louche traditionnelle (cokk)=:281; =louche traditionnelle (cokk)=:152; =125.0=:61
+- =[126]= -> *Morceau* --- =Morceau=:26732; =126. Morceau=:16838; =PedaÃ§o=:2681; =       Morceau=:691; =126.0=:596
+- =[127]= -> *Moudou* --- =127. Moudou=:136; =Brique carton=:46; =127. Brique carton=:33; =Moudou=:20
+- =[128]= -> *Panier* --- =Panier=:2416; =       Panier=:354; =128.0=:39; =128. Panier=:8; =panier=:4
+- =[129]= -> *Paquet* --- =Paquet=:15259; =       Paquet=:6950; =paquet=:6693; =129. paquet (250 g)=:5922; =129. Paquet=:3811; =Pacote=:3571
+- =[130]= -> *Plaquette* --- =Plaquette=:578; =130.0=:41; =130. Plaquette=:19
+- =[131]= -> *Pot* --- =Pot=:2480; =pot=:2420; =131. pot=:1179; =       pot=:788; =131.0=:283; =131. Pot=:42
+- =[132]= -> *Régime* --- =RÃ©gime=:2055; =Régime=:425; =rÃ©gime=:50; =132. Régime=:8; =132.0=:5
+- =[133]= -> *Saco* --- =Saco=:188; =sac=:60; =Sac=:34; =133.0=:8; =133. Sac=:7
+- =[136]= -> *Sac (25 Kg)* --- =Sac (25 Kg)=:124; =136. Sac de 25 Kg=:12; =       Sac (25 Kg)=:4
+- =[138]= -> *Sac (50 Kg)* --- =Sac (50 Kg)=:109; =138. Sac (50 Kg)=:14; =sac (50 kg)=:10
+- =[139]= -> *Sachet* --- =Sachet=:254989; =139. Sachet=:105452; =sachet industriel=:32706; =       sachet industriel=:25419; =Saquinho=:13890
+- =[140]= -> *Sans os au Kg* --- =Sans os au Kg=:607; =       Sans os au Kg=:93; =140.0=:27; =140. Sans os au Kg=:11
+- =[141]= -> *Sans os au tas* --- =Sans os au tas=:192; =       Sans os au tas=:145; =141.0=:77; =141. Sans os au tas=:35
+- =[142]= -> *Seau* --- =Seau=:1942; =142. Seau=:753; =Balde=:233
+- =[143]= -> *Tas* --- =Tas=:222148; =143. Tas=:38182; =       Tas=:29173; =tas=:22290
+- =[146]= -> *Tohoungolo* --- =Tohoungolo=:20006; =146. Tongolo=:297; =Tongolo=:205
+- =[147]= -> *Unité* --- =UnitÃ©=:82902; =Unité=:62175; =147. Unité=:53202; =unitÃ©=:33926; =Unidade=:27288; =       unité=:22621; =unité=:20720; =Unite=:18828
+- =[148]= -> *Verre* --- =       verre=:2812; =verre=:2262; =Verre=:682; =148. Verre=:48; =148.0=:13; =Copo=:11
+- =[254]= UNRESOLVED --- =254.0=:6
+- =[255]= UNRESOLVED --- =255.0=:123
+- =[273]= -> *Yéll* --- =273. Yéll=:17; =YÃ©ll=:5
+- =[274]= -> *Cube* --- =Cube=:6057; =274. Cube=:5807
+- =[303]= -> *Cuvette* --- =Cuvette=:1580; =Atonnongban=:27
+- =[306]= -> *Bâtonnet* --- =BÃ¢tonnet=:271
+- =[416]= -> *Pé* --- =PÃ©=:181
+- =[418]= -> *Dúzia* --- =DÃºzia=:27
+- =[419]= -> *Múndo* --- =MÃºndo=:1682
+- =[456]= -> *Barre* --- =       Barre=:31; =Barre=:23
+- =[460]= -> *Moude (Moudé))* --- =       Moude (Moudé))=:278; =Moude (Moudé))=:195
+- =[462]= -> *Paani* --- =       Paani=:3533; =Paani=:2683
+- =[464]= -> *Seau (10 Kg)* --- =       Seau (10 Kg)=:27; =Seau (10 Kg)=:25
+- =[465]= -> *Seau (25 Kg)* [LOW-VOTES] --- =       Seau (25 Kg)=:4
+- =[466]= -> *Seau (5 Kg )* --- =       Seau (5 Kg )=:105; =Seau (5 Kg )=:83
+- =[467]= -> *Tranche* --- =Tranche=:1102; =       Tranche=:919
+- =[468]= -> *Gigot* --- =       Gigot=:216; =Gigot=:53
+- =[469]= -> *Piece* --- =       Piece=:80; =Piece=:61
+- =[470]= -> *Boite de lait concentré* --- =       Boite de lait concentré=:1136; =Boite de lait concentré=:776
+- =[506]= -> *Boîte de nescafé* --- =BoÃ®te de nescafÃ©=:40; =506. Boîte de nescafé=:38
+- =[508]= -> *Feuille* --- =508. Feuille=:28; =Feuille=:19
+- =[509]= -> *Koriya /Gassou* [LOW-VOTES] --- =509. Koriya /Gassou=:2
+- =[510]= -> *Pot-tarzan* --- =Pot-tarzan=:1730; =510. Pot-tarzan=:971
+- =[512]= -> *Tiya* --- =Tiya=:18357; =512. Tiya=:17722
+- =[513]= -> *Waygouizé* [LOW-VOTES] --- =WaygouizÃ©=:4
+- =[561]= -> *barquette* --- =barquette=:123; =561. barquette=:84
+- =[562]= -> *Cornet* --- =562. Cornet=:423; =cornet=:291
+- =[563]= -> *Cuillère à café* --- =563. Cuillère à café=:1266; =CuillÃ¨re Ã  cafÃ©=:736
+- =[564]= -> *Cuillère à soupe* --- =564. Cuillère à soupe=:4003; =cuillÃ¨re Ã &nbsp; soupe=:2271
+- =[565]= -> *Quart de litre* --- =quart de litre=:2223; =565. Quart de litre=:1591
+- =[566]= -> *Démi litre* --- =566. Démi litre=:430; =demi litre=:388
+- =[567]= -> *Lakhass* --- =567. Lakhass=:38; =lakhass=:25
+- =[568]= -> *miche* --- =miche=:5614; =568. miche=:5434
+- =[569]= -> *Démi-miche* --- =demi-miche=:350; =569. Démi-miche=:314
+- =[570]= -> *Tiers de miche* --- =tiers de miche=:73; =570. Tiers de miche=:28
+- =[571]= -> *Quart de miche* --- =quart de miche=:11; =571. Quart de miche=:11
+- =[572]= -> *tablette* --- =tablette=:239; =572. tablette=:238
+- =[573]= -> *demi tablette* [AMBIGUOUS] --- =demi tablette=:163; =573. Démi-tablette=:160
+- =[577]= -> *Tablette (30)* --- =tablette (30)=:80; =577. Tablette (30)=:74
+- =[578]= -> *tranche* --- =578. tranche=:845; =tranche=:675
+- =[579]= -> *Verre à thé* --- =verre Ã   thÃ©=:2196; =579. Verre à thé=:1924
+- =[987]= -> *Filet (2,5Kg)* [LOW-VOTES] --- =987. Filet (2,5Kg)=:1
+- =[989]= -> *Sac de 10 Kg* [LOW-VOTES] --- =989. Sac de 10 Kg=:2; =sac (10 kg)=:1
+- =[991]= -> *Bouteille de 5L* --- =Bouteille de 5L=:95; =991. Bouteille de 5 litre=:42
+- =[992]= -> *Bouteille de 10 litre* --- =992. Bouteille de 10 litre=:236; =Bouteille de 10L=:81
+- =[993]= -> *Bouteille de 1,5 litre* [AMBIGUOUS] --- =993. Bouteille de 1,5 litre=:392; =Bouteille de 1,5 L=:384
+- =[995]= -> *Bouteille de 5 litres* --- =995. Bouteille de 5 litres=:21; =bouteille de 5 litres=:20
+- =[996]= -> *Bouteille de 1 litre* --- =996. Bouteille de 1 litre=:335; =bouteille de 1 litre=:165
+- =[997]= -> *Bouteille de 50 cl* [AMBIGUOUS] --- =Bouteille de 50 cl=:180; =997. Bouteille de 50 cl (demi litre)=:175
+- =[999]= -> *Paquet (1 Kg)* --- =999. Paquet (1 Kg)=:187; =paquet (1 kg)=:117
+- =[1000]= -> *Bouteille de 19L* --- =Bouteille de 19L=:45; =1000. Bouteille de 20 litres=:23
+- =[1001]= -> *12,5 cl (démi walatt)* --- =1001. 12,5 cl (démi walatt)=:371; =12,5cl(demi walatt)=:246
+- =[1002]= -> *Bouteille de 25cl* --- =Bouteille de 25cl=:781; =1002. Bouteille de 25 cl=:452
+- =[1003]= -> *Bouteille de 33cl* --- =Bouteille de 33cl=:110; =1003. Bouteille de 33 cl=:37
