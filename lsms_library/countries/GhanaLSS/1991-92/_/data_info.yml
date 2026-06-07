@@ -37,7 +37,7 @@ household_roster:
     file: S1.DTA
     idxvars:
         v: clust
-        i: 
+        i:
             - clust
             - nh
         pid: pid
@@ -47,3 +47,28 @@ household_roster:
         Birthplace: s1q10
         Relationship: rel
         MonthsAway: s1q22
+
+plot_features:
+    # Section 8B (Agricultural land) -- clean per-plot roster, one row per
+    # (household, farm).  farmcd = farm number -> plot_id.  i = [clust, nh],
+    # matching household_roster's i.  This wave has no variable/value labels:
+    # s8bq4 = farm size, s8bq4c = unit code (decoded with the GLSS area-unit
+    # codes 1=Acres,2=Poles,3=Ropes,4=Hectare; verified against the GLSS7
+    # value labels and the code-frequency distribution).  s8bq8 in this wave
+    # is a value field (not a tenure code), and the GLSS3 tenure code is not
+    # recoverable, so Tenure is omitted.  Section 10 is non-farm ENTERPRISES.
+    file: S8B.DTA
+    idxvars:
+        i:
+            - clust
+            - nh
+        plot_id: farmcd
+    myvars:
+        Area: s8bq4
+        AreaUnit:
+            - s8bq4c
+            - mapping:
+                1: Acres
+                2: Poles
+                3: Ropes
+                4: Hectare

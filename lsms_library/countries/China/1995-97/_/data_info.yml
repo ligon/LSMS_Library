@@ -50,6 +50,39 @@ cluster_features:
         Region:
             - hid
 
+plot_features:
+    # S05B.DTA is the genuine per-plot farming roster: one row per
+    # (household, plot), keyed by s05bpn ("PLOT NUMBER", 1..10).  3186
+    # rows / 734 households.  Variable labels confirm plot-level detail:
+    #   s05b02 = "AREA OF THE PLOT"  (reported in mu; see PlotArea/AreaUnit)
+    #   s05b09 = "IS IT IRRIGATED?"  (1 yes / 2 no -> Irrigated bool)
+    # The file carries CODES only (no Stata value labels) for the
+    # categorical land-attribute questions (s05b10 quality, s05b11 type,
+    # s05b15/s05b16 land status), and the codebook PDF is not pullable in
+    # this environment, so those codes are NOT decoded here -- only the
+    # well-grounded Area / AreaUnit / Irrigated columns are surfaced.
+    # PlotArea() nulls the ~11 Stata 1.75e+100 missing-sentinel rows and
+    # any non-positive / implausible (>=1000 mu) values.  (Two households
+    # -- hid 30132, 30137 -- carry a few duplicate plot rows in the raw
+    # source; left as-is, they are a tiny share and the index is still
+    # essentially one row per (i, plot_id).)
+    file: ../Data/S05B.DTA
+    idxvars:
+        i: hid
+        plot_id: s05bpn
+    myvars:
+        Area:
+            - s05b02
+            - mapping: PlotArea
+        AreaUnit:
+            - s05b02
+            - mapping: AreaUnit
+        Irrigated:
+            - s05b09
+            - mapping:
+                1: true
+                2: false
+
 individual_education:
     # Education detail S01B.DTA; attainment code s01b10 (grade/level 1-12).
     # pid maps from s01bid (person order); join to roster pid verified at build.

@@ -58,5 +58,39 @@ individual_education:
     myvars:
         Educational Attainment: s2aq2
 
+plot_features:
+    # Section 8B (Agricultural land) -- clean per-plot roster, one row per
+    # (household, farm).  s8bq3 = "farm number" -> plot_id.  hid is already
+    # the clust/nh composite, matching household_roster's i (=HID here).
+    # Value labels are lowercase in this wave.  Section 10 is non-farm
+    # ENTERPRISES (entno), not plots.
+    file:
+        - PARTB/sec8b.dta
+    idxvars:
+        i: hid
+        plot_id: s8bq3
+    myvars:
+        Area: s8bq4a
+        AreaUnit:
+            # value labels are lowercase in this wave -> Title-case to match
+            # the other waves' AreaUnit vocabulary.
+            - s8bq4b
+            - mapping:
+                acres: Acres
+                poles: Poles
+                ropes: Ropes
+                plot: Plot
+                hectare: Hectare
+                other: Other
+        Tenure:
+            - s8bq8
+            - mapping:
+                bought: owned
+                rented for cash or in kind: rented_in
+                sharecropped by household: sharecropped_in
+                use free of charge: use_right
+                distributed by village/family: communal
+                inherited: inherited
+
 
 

@@ -92,3 +92,27 @@ food_security:
             - s9cq6
             - s9cq7
             - s9cq8
+
+plot_features:
+    # Section 8B (Agricultural land) is a clean per-plot roster: one row per
+    # (household, farm).  s8bq3 = "Farm number" -> plot_id.  hid is already
+    # the canonical clust/nh composite, matching household_roster's i.
+    # s8bq4a/s8bq4b = farm size + unit; s8bq8 = how the land was obtained
+    # (mapped to the canonical Tenure vocabulary).  NB Section 10 in GLSS7
+    # is non-farm ENTERPRISES, not plots.
+    file: g7sec8b.dta
+    idxvars:
+        i: hid
+        plot_id: s8bq3
+    myvars:
+        Area: s8bq4a
+        AreaUnit: s8bq4b
+        Tenure:
+            - s8bq8
+            - mapping:
+                Bought: owned
+                Rented for cash or in kind: rented_in
+                Sharecropped by household: sharecropped_in
+                Use free of charge: use_right
+                Distributed by village/family: communal
+                Inherited: inherited
