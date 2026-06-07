@@ -1,0 +1,192 @@
+#+title: EHCVM (WAEMU) unit codebook (=s07bq03b=)
+
+Code->label map for the standardized EHCVM unit variable =s07bq03b=.
+Loaded into every country's =categorical_mapping= (global, GH #168) but
+inert unless a country's =data_info.yml= references it via
+=mappings: ['ehcvm_units','Code','Preferred Label']= on its =u= index.
+Used to decode the bare unit codes that leak in EHCVM countries whose
+=.dta= lost the =s07bq03b= value labels (Togo, Senegal); the labels
+survive in the sibling countries' =.dta= (same standardized coding).
+
+Provenance + the full curation/resolution log:
+=slurm_logs/ehcvm_unit_codebook_2026-06-07.org=
+(regenerate with =slurm_logs/build_ehcvm_unit_codebook.py=).
+
+#+name: ehcvm_units
+| Code | Preferred Label |
+|------+-----------------|
+| 100 | Kg |
+| 101 | Litre |
+| 102 | Alvéole |
+| 103 | Avec os au Kg |
+| 104 | Avec os en tas |
+| 105 | Bassine |
+| 106 | Bidon |
+| 107 | Boîte |
+| 108 | Boîte de tomate |
+| 109 | Bol |
+| 110 | Botte |
+| 111 | Boule |
+| 112 | Bouquet |
+| 113 | Bouteille |
+| 115 | Calebasse |
+| 116 | Canari |
+| 117 | Cannette |
+| 118 | Carton |
+| 119 | Casier |
+| 120 | Cuillere |
+| 121 | Fagot |
+| 122 | filet (1 kg) |
+| 123 | Gobelet |
+| 124 | Gousse |
+| 125 | Louche |
+| 126 | Morceau |
+| 127 | Moudou |
+| 128 | Panier |
+| 129 | Paquet |
+| 130 | Plaquette |
+| 131 | Pot |
+| 132 | Régime |
+| 133 | Saco |
+| 134 | Sac (10 Kg) |
+| 135 | Sac (100 Kg) |
+| 136 | Sac (25 Kg) |
+| 137 | Sac (5 Kg) |
+| 138 | Sac (50 Kg) |
+| 139 | Sachet |
+| 140 | Sans os au Kg |
+| 141 | Sans os au tas |
+| 142 | Seau |
+| 143 | Tas |
+| 144 | Tasse |
+| 145 | Tine |
+| 146 | Tohoungolo |
+| 147 | Unité |
+| 148 | Verre |
+| 149 | Yorouba |
+| 150 | Gigot |
+| 151 | Carcasse |
+| 201 | Otoka/Fihanfingban |
+| 203 | Yoroukou/Yorougou |
+| 204 | Pome |
+| 205 | Agoua |
+| 206 | Paï |
+| 208 | sogo |
+| 209 | Djogledo |
+| 211 | Ike |
+| 212 | Abotoca |
+| 214 | Ayewa |
+| 216 | Quarantaine |
+| 220 | Tinnabou (bariba ) |
+| 222 | sivlo |
+| 223 | siroba |
+| 224 | sagagou ( en bariba) |
+| 226 | Plastique |
+| 227 | Nobayirou |
+| 228 | Blèvi |
+| 229 | passoire |
+| 230 | Rôba |
+| 232 | Chaîne en bois |
+| 233 | Bidon de 1 litre et démi |
+| 234 | Bidon de 1l |
+| 235 | Bidon de 5l |
+| 236 | Bocal de mayonnaise |
+| 238 | corbar en bariba |
+| 239 | cuisse |
+| 240 | Grappe |
+| 241 | sac de 2,5kg |
+| 242 | Signi |
+| 243 | nimkotirou(BARIBA) |
+| 245 | Grand bocal |
+| 246 | Gbinbou bonnou |
+| 251 | Quart-Yorouba |
+| 252 | Demi-Yorouba |
+| 257 | Boîte de lait |
+| 258 | Plat |
+| 262 | Carreau |
+| 273 | Yéll |
+| 274 | Cube |
+| 302 | Cope |
+| 303 | Cuvette |
+| 305 | bidon de demi litre |
+| 306 | Bâtonnet |
+| 307 | Papier |
+| 308 | Djlèka |
+| 310 | gannouvi |
+| 311 | ibogban |
+| 312 | Sac (11kg) |
+| 313 | Kpanouvi |
+| 315 | Sac (4 kg) |
+| 316 | Feuille |
+| 318 | Poignet |
+| 319 | Sac (0,9 kg) |
+| 320 | Brochette |
+| 321 | Grain |
+| 324 | Si |
+| 325 | sikpanou |
+| 327 | Pincée |
+| 406 | Calma |
+| 407 | Caneca |
+| 409 | Fatia |
+| 411 | Frasco |
+| 412 | Maradura |
+| 413 | Monte |
+| 415 | Pacotinho |
+| 416 | Pé |
+| 417 | Tabuleiro |
+| 418 | Dúzia |
+| 419 | Múndo |
+| 420 | Corda |
+| 421 | Tigela |
+| 424 | Carteira |
+| 456 | Barre |
+| 460 | Moude (Moudé)) |
+| 462 | Paani |
+| 464 | Seau (10 Kg) |
+| 465 | Seau (25 Kg) |
+| 466 | Seau (5 Kg ) |
+| 467 | Tranche |
+| 468 | Gigot |
+| 469 | Piece |
+| 470 | Boite de lait concentré |
+| 506 | Boîte de nescafé |
+| 507 | Cristal (Kantou) |
+| 508 | Feuille |
+| 509 | Koriya /Gassou |
+| 510 | Pot-tarzan |
+| 511 | Sac Filet |
+| 512 | Tiya |
+| 513 | Waygouizé |
+| 561 | barquette |
+| 562 | Cornet |
+| 563 | Cuillère à café |
+| 564 | Cuillère à soupe |
+| 565 | Quart de litre |
+| 566 | Démi litre |
+| 567 | Lakhass |
+| 568 | miche |
+| 569 | Démi-miche |
+| 570 | Tiers de miche |
+| 571 | Quart de miche |
+| 572 | tablette |
+| 573 | demi tablette |
+| 577 | Tablette (30) |
+| 578 | tranche |
+| 579 | Verre à thé |
+| 663 | Agoua |
+| 664 | Kpogban |
+| 986 | filet (5 kg) |
+| 987 | Filet (2,5Kg) |
+| 989 | Sac de 10 Kg |
+| 991 | Bouteille de 5L |
+| 992 | Bouteille de 10 litre |
+| 993 | Bouteille de 1,5 litre |
+| 994 | Bouteille de 1l |
+| 995 | Bouteille de 5 litres |
+| 996 | Bouteille de 1 litre |
+| 997 | Bouteille de 50 cl |
+| 999 | Paquet (1 Kg) |
+| 1000 | Bouteille de 19L |
+| 1001 | 12,5 cl (démi walatt) |
+| 1002 | Bouteille de 25cl |
+| 1003 | Bouteille de 33cl |

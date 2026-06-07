@@ -13,6 +13,25 @@ each grappe is visited in exactly one =vague=, so household
 identifier is =(grappe, menage)= without a vague level.  See
 CLAUDE.md "EHCVM countries" for the cross-country pattern.
 
+* food_acquired units (Benin<->Togo codebook link)
+
+Togo's =s07bq03b= unit variable stores bare numeric codes (100-662): its
+=.dta= lost the Stata value labels, so =convert_categoricals=True= still
+returns codes.  The labels survive in the *sibling EHCVM countries* whose
+=.dta= kept them --- chiefly *Benin*, which uses the identical standardized
+coding (=100=Kg=, =101=Litre=, =107=Boite=, =124=Gousse=, ...).
+
+The decode therefore borrows the sibling labels: the shared codebook
+=lsms_library/categorical_mapping/ehcvm_units.org= (=#+name:ehcvm_units=,
+built by unioning =s07bq03b= value labels across all 8 EHCVM countries ---
+see =slurm_logs/ehcvm_unit_codebook_2026-06-07.org=) is applied to =u= via
+=mappings: ['ehcvm_units','Code','Preferred Label']= in
+=2018/_/data_info.yml=.  Result: code leaks 25 -> 4.
+
+Residual undecoded codes (=114, 659, 660, 662=) have no label in *any*
+EHCVM source =.dta= and are left as codes pending the questionnaire unit
+nomenclature.
+
 * Household Presence / MonthsSpent
 
 The EHCVM questionnaire (used in the 2018 wave) does NOT ask
