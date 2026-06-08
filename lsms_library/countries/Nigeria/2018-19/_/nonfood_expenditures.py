@@ -68,4 +68,4 @@ x = x.set_index(['j','t','m','i'])
 
 x = x['value'].unstack('i')
 
-to_parquet(x, 'nonfood_expenditures.parquet',compression='gzip')
+to_parquet(x, 'nonfood_expenditures.parquet')
