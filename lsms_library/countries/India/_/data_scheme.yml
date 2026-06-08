@@ -53,3 +53,11 @@ Data Scheme:
     MonthsInadequate: int
     AnyInadequate: bool
     materialize: make
+
+  assets:
+    # Consumer durables owned (SECT07D §7D). Item-level (t, i, j); j is the
+    # recovered durable-item label.  §7D records counts only, so Quantity is
+    # the sole measure (no reported value).
+    index: (t, i, j)
+    Quantity: float
+    materialize: make
