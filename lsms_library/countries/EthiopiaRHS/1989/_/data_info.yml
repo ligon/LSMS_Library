@@ -77,3 +77,30 @@ sample:
 # reconciliation is a documented follow-up).  1989 keeps `sample`
 # (cluster v = site) for the v-join; market='Region'/'Woreda' rows
 # for 1989 are NaN and drop, as documented in CONTENTS.
+
+# assets (#277): HH-level asset-VALUE aggregates from the 1989/R1 asset
+# module (fieldwork 1989-1990), one .tab per peasant association.  This
+# instrument records household TOTALS (farm/non-farm asset value +
+# count), NOT the canonical item-level (t,i,j) Quantity/Value -- so
+# EthiopiaRHS `assets` is a documented HH-level (t,i) variant (see
+# data_scheme.yml + Liberia's documented-variant precedent).  i = the
+# same packed 5-digit hhid as the roster (276/488 overlap with the 338-HH
+# 1989 roster; asset-only HH keep v=NA, mirroring the roster<food gap).
+# The 7 village files share an identical schema, so listing them together
+# row-concatenates them (missing_ok column union).
+assets:
+    file:
+        - assetars.tab
+        - assetdeb.tab
+        - assetdin.tab
+        - assetgam.tab
+        - assethar.tab
+        - assetsid.tab
+        - assetwol.tab
+    idxvars:
+        i: hhid
+    myvars:
+        FarmValue: frmval         # value of farm assets (land, oxen, ...)
+        NonFarmValue: nfrmval     # value of non-farm assets
+        TotalValue: assettot      # total asset value
+        NumberOfAssets: noassets  # count of distinct assets held

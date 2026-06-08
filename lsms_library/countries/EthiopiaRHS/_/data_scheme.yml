@@ -21,6 +21,18 @@ Data Scheme:
     Distance: int
     Affinity: str
 
+  # assets (#277): HH-level asset-VALUE aggregates from the 1989/R1
+  # asset module (one .tab per peasant association).  The ERHS
+  # instrument records household TOTALS (farm/non-farm value + count),
+  # NOT the canonical item-level (t,i,j) Quantity/Value -- so this is a
+  # documented HH-level (t,i) variant (cf. Liberia's reduced `assets`).
+  assets:
+    index: (t, i)
+    FarmValue: float
+    NonFarmValue: float
+    TotalValue: float
+    NumberOfAssets: float
+
   # Mali-style clean YAML: extract wide per-source columns; the
   # `food_acquired` df_edit hook in _/ethiopiarhs.py melts them to
   # canonical long form on s. Price is API-derived (food_prices).
