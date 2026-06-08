@@ -27,3 +27,64 @@ household_roster:
         Sex: sex                 # already 'Male'/'Female' -> M/F via canonical spellings
         Age: age4                # round-5 age in years
         Relationship: reltn3     # already a label; decomposed by kinship.yml
+
+# livestock + income (#277): HH-level VALUE aggregates from the R5
+# livestock ({village}lvs5.tab) and income ({village}inc5.tab) modules,
+# one .tab per ORIGINAL-7-village peasant association.  These are
+# pre-aggregated household TOTALS (herd value, TLU, income subtotals),
+# NOT the canonical item-level (t,i,j) Quantity/Value -- so EthiopiaRHS
+# `livestock`/`income` are documented HH-level (t,i) variants (see
+# data_scheme.yml + the 1989 `assets` precedent + Liberia's reduced
+# `assets`).
+#
+# i-KEY (CRITICAL).  The R5 lvs5/inc5 files key on the *packed 5-digit*
+# `hhid` (region+PA+HH, e.g. 10101) -- the SAME pre-expansion scalar
+# scheme as the 1989 roster/assets, NOT the 1999 roster's named
+# composite [q1c, hh] (= 'Haresaw_1.2.').  Measured overlap of the
+# packed `hhid` against the 1999-roster composite i is ZERO (different
+# keyspaces); against the 338-HH 1989 packed-hhid roster it is
+# 322/541 (livestock) and 150/252 (income).  So i = the single packed
+# `hhid` (shared `i` formatter's scalar path), reconciling with the
+# 1989 roster (and, transitively, the 1994+ panel via the `q2`/panel_ids
+# linkage) -- exactly as the 1989 `assets` block does.  lvs5/inc5 HH
+# absent from the 1999 person roster keep v=NA, mirroring the documented
+# 1989 roster<asset gap.  The 7 village files share an identical schema,
+# so listing them together row-concatenates (missing_ok column union).
+#
+# Calendar note: the `*80` suffix is the Ethiopian-calendar reference
+# year of the R5 current-stock columns (lvsval80 = total livestock value
+# in Birr; lsu80 = Livestock Standard Units = TLU).  All chosen myvars
+# are present and populated in every listed file (statically verified).
+livestock:
+    file:
+        - arslvs5.tab
+        - deblvs5.tab
+        - dinklvs5.tab      # din's livestock file is dinklvs5.tab
+        - gamlvs5.tab
+        - harlvs5.tab
+        - sidlvs5.tab
+        - wollvs5.tab
+    idxvars:
+        i: hhid             # packed 5-digit region+PA+HH, unique per HH
+    myvars:
+        LivestockValue: lvsval80  # total value of livestock herd (Birr), current year
+        TLU: lsu80                # Livestock Standard Units (tropical livestock units)
+
+# income: only 4 of the 7 villages have an R5 inc5 file in the IFPRI
+# Dataverse deposit (ars/deb/din/sid); gam/har/wol have no inc5 (gam has
+# only gaminc6 = R6/2004, OUT OF SCOPE).  `din`'s income file is
+# `dininc5.tab` (note: NOT `dinkinc5`).
+income:
+    file:
+        - arsinc5.tab
+        - debinc5.tab
+        - dininc5.tab       # din's income file is dininc5.tab
+        - sidinc5.tab
+    idxvars:
+        i: hhid             # packed 5-digit region+PA+HH, unique per HH
+    myvars:
+        TotalIncome: totinc       # total household income (Birr)
+        CropIncome: cropinc       # income from crop production/sales
+        LivestockIncome: lvsincom # income from livestock products/sales
+        OffFarmIncome: nonfarmy   # non-farm income
+        WageIncome: wageinc       # wage/labour income

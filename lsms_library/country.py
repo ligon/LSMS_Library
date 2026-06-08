@@ -1832,7 +1832,7 @@ class Country:
             # v; joining v from sample() would produce a non-canonical shape.
             # See SkunkWorks/audits/framework_diagnosis.md for the schema survey.
             _no_v_join = {'sample', 'cluster_features', 'panel_ids', 'updated_ids',
-                          'shocks', 'assets'}
+                          'shocks', 'assets', 'livestock', 'income'}
             if (not v_already_present
                     and 'i' in current_names
                     and 't' in current_names

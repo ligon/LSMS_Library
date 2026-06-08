@@ -33,6 +33,31 @@ Data Scheme:
     TotalValue: float
     NumberOfAssets: float
 
+  # livestock (#277): HH-level livestock-VALUE aggregates from the R5
+  # (1999) livestock module (one {village}lvs5.tab per original-7-village
+  # peasant association).  Pre-aggregated household TOTALS (herd value +
+  # TLU), NOT canonical item-level (t,i,j) -- so this is a documented
+  # HH-level (t,i) variant, like `assets`.  i = the packed 5-digit hhid
+  # (same scalar scheme as the 1989 roster; ZERO overlap with the 1999
+  # roster's named [q1c,hh] composite, 322/541 vs the 1989 packed roster).
+  livestock:
+    index: (t, i)
+    LivestockValue: float   # total value of livestock herd (Birr)
+    TLU: float              # Livestock Standard Units (tropical livestock units)
+
+  # income (#277): HH-level income-VALUE aggregates from the R5 (1999)
+  # income module ({village}inc5.tab; only 4 of 7 villages have an inc5
+  # file -- ars/deb/din/sid).  Pre-aggregated household income TOTALS +
+  # major source subtotals, NOT item-level -- a documented HH-level (t,i)
+  # variant.  i = the same packed 5-digit hhid as `livestock`.
+  income:
+    index: (t, i)
+    TotalIncome: float      # total household income (Birr)
+    CropIncome: float       # income from crop production/sales
+    LivestockIncome: float  # income from livestock products/sales
+    OffFarmIncome: float    # non-farm income
+    WageIncome: float       # wage/labour income
+
   # Mali-style clean YAML: extract wide per-source columns; the
   # `food_acquired` df_edit hook in _/ethiopiarhs.py melts them to
   # canonical long form on s. Price is API-derived (food_prices).
