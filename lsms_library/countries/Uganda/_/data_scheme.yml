@@ -41,7 +41,7 @@ Data Scheme:
   earnings:
     materialize: make
     index: (t, i)
-    earnings: float
+    Earnings: float
   food_acquired:
     # Canonical post-2026-05-05 (GH #169): s in {purchased, produced, inkind}.
     # Wave scripts call uganda.food_acquired (wide form, source-suffixed
