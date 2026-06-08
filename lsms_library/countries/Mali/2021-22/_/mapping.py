@@ -73,7 +73,16 @@ def Age(value):
     Convert 4-element Age list [s01q04a, s01q03a, s01q03b, s01q03c].
     s01q03b is a French month string (or 'Ne sait pas'); convert to integer.
     Numeric sentinel masking (9999) and age_handler call happen in household_roster(df).
+
+    The function name ``Age`` collides with the ``assets`` myvar
+    ``Age: s12q07`` (item age in years), which the framework binds to
+    this formatter by name (column_mapping in country.py).  That path
+    passes a *scalar*, not the roster's DOB Series; pass scalars
+    through unchanged so assets extraction does not crash on
+    ``list(<float>)`` (closes #321).
     '''
+    if not isinstance(value, pd.Series):
+        return value
     result = list(value)
     m_raw = value.iloc[2]
     if pd.isna(m_raw):

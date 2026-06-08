@@ -134,7 +134,16 @@ def Age(value):
     CotedIvoire s01q03b (month) is already an integer (1-12); no
     month_map conversion needed.  The list is returned unchanged so
     household_roster() can unpack [age_raw, day, month, year].
+
+    The function name ``Age`` collides with the ``assets`` myvar
+    ``Age: s12q07`` (item age in years), which the framework binds to
+    this formatter by name (column_mapping in country.py).  That path
+    passes a *scalar*, not the roster's DOB Series; pass scalars
+    through unchanged so assets extraction does not crash on
+    ``list(<float>)`` (closes #321).
     '''
+    if not isinstance(value, pd.Series):
+        return value
     return list(value)
 
 

@@ -242,7 +242,16 @@ def Age(value):
     Pre-process Age list: convert French month name (s01q03b) to integer.
     Sentinel 9999 for any component is left as-is; age_handler's is_valid()
     rejects values >= 2100 (covers 9999).
+
+    The function name ``Age`` collides with the ``assets`` myvar
+    ``Age: s12q07`` (item age in years), which the framework binds to
+    this formatter by name (column_mapping in country.py).  That path
+    passes a *scalar*, not the roster's DOB Series; pass scalars
+    through unchanged so assets extraction does not crash on
+    ``list(<float>)`` (closes #321).
     '''
+    if not isinstance(value, pd.Series):
+        return value
     month_map = {
         'Janvier': 1, 'Fevrier': 2, 'Février': 2, 'Mars': 3, 'Avril': 4,
         'Mai': 5, 'Juin': 6, 'Juillet': 7, 'Aout': 8, 'Août': 8,

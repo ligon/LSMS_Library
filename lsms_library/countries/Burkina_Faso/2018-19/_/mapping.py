@@ -43,7 +43,16 @@ def Age(value):
     Formatting age from date components.
     s01q03b (month) uses French month names in this file.
     Mask 9999 sentinels on day and month before passing to age_handler.
+
+    The function name ``Age`` collides with the ``assets`` myvar
+    ``Age: s12q07`` (item age in years), which the framework binds to
+    this formatter by name (column_mapping in country.py).  That path
+    passes a *scalar*, not the roster's DOB Series; pass scalars
+    through unchanged so assets extraction does not crash on
+    ``list(<float>)`` (closes #321).
     '''
+    if not isinstance(value, pd.Series):
+        return value
     month_map = {'Janvier': 1, 'Février': 2, 'Mars': 3, 'Avril': 4, 'Mai': 5,
                  'Juin': 6, 'Juillet': 7, 'Août': 8, 'Septembre': 9,
                  'Octobre': 10, 'Novembre': 11, 'Décembre': 12}

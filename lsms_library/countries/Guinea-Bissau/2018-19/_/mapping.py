@@ -134,7 +134,16 @@ def Age(value):
     s01q03b Stata labels are Portuguese month names (Janeiro…Dezembro).
     get_dataframe() returns the label strings as categoricals.
     The sentinel 9999 is left as-is; household_roster() handles it.
+
+    The function name ``Age`` collides with the ``assets`` myvar
+    ``Age: s12q07`` (item age in years), which the framework binds to
+    this formatter by name (column_mapping in country.py).  That path
+    passes a *scalar*, not the roster's DOB Series; pass scalars
+    through unchanged so assets extraction does not crash on
+    ``list(<float>)`` (closes #321).
     '''
+    if not isinstance(value, pd.Series):
+        return value
     result = list(value)
     raw_month = value.iloc[2]
     if isinstance(raw_month, str):
