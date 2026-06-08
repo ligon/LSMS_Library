@@ -86,3 +86,44 @@ cluster_features:
         Woreda:
             - q1c
             - mappings: ['erhs_village_woreda', 'Code', 'Woreda']
+
+# community_prices (BESPOKE, GH #275).  ERHS community/market price
+# module -- village/market-level food prices, NOT the API-derived
+# `food_prices` (which comes from food_acquired).  There is no
+# canonical cross-country market-price feature, so this is an
+# ERHS-specific table, modelled on the bespoke assets/livestock/income
+# blocks (HH-level value variants).
+#
+# SOURCE.  price1234_rev.tab -- ONE file covering Rounds 1--4, i.e.
+# waves 1994a/1994b/1995/1997.  It is WIDE on round: one row per
+# (q1b market x item1234 food item) with four per-kg price columns
+# p_r1..p_r4 (Birr/kg) for R1..R4.  q1b is the WOREDA / market town
+# (15 of them; the same named geography as cluster_features.Woreda --
+# NOT the peasant-association `v`/q1c).  item1234 is a food *label*
+# (white teff, barley, ...), not the numeric food code harmonize_food
+# keys on, so j carries the raw label (label harmonization a
+# follow-up).  Confirmed per-kg by the IFPRI Mergepricekg.SPS codebook
+# (value = amount * p_r1, matched BY item1234 q1b).
+#
+# WIRING.  The SAME price1234_rev.tab is listed in ALL FOUR 1994+
+# waves' community_prices block.  The shared df_edit hook
+# `community_prices` in _/ethiopiarhs.py melts p_r1..p_r4 to long and
+# stamps each round's own `t` (p_r1->1994a, ..., p_r4->1997);
+# check_adding_t then leaves that `t` and the per-wave year filter
+# selects this wave's slice (1994a -> the p_r1 rows).  market=q1b,
+# j=item1234, u='kg', Price in Birr/kg.  R1--R3 carry only the ~19
+# core staples; R4 (1997) is broader (~72 items).
+#
+# OUT OF SCOPE / deferred: the non-round-keyed `pricenum` (price per
+# *number*) and the R6/R7 (2004/2009) price files
+# (rd6_kgpr_Mkt.tab / price2009*.tab) -- 2004/2009 are not wired waves.
+community_prices:
+    file: price1234_rev.tab
+    idxvars:
+        market: q1b      # Woreda / market town (== cluster_features.Woreda)
+        j: item1234      # food-item label (raw; harmonization a follow-up)
+    myvars:
+        p_r1: p_r1       # R1 (1994a) market price, Birr/kg
+        p_r2: p_r2       # R2 (1994b) market price, Birr/kg
+        p_r3: p_r3       # R3 (1995)  market price, Birr/kg
+        p_r4: p_r4       # R4 (1997)  market price, Birr/kg

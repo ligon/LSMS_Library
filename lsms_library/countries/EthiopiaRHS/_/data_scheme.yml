@@ -86,4 +86,31 @@ Data Scheme:
     Woreda: str
     Rural: str
 
+  # community_prices (#275): BESPOKE ERHS community/market price table.
+  # Village/market-level food prices -- NOT the API-derived `food_prices`
+  # (which comes from food_acquired).  There is NO canonical
+  # cross-country market-price feature, so this is an ERHS-specific
+  # variant, modelled on the bespoke assets/livestock/income blocks.
+  #
+  # SOURCE: price1234_rev.tab -- one WIDE-on-round file of per-kg market
+  # prices (Birr/kg) for Rounds 1-4 (cols p_r1..p_r4), keyed on the
+  # WOREDA / market town (q1b) x food-item LABEL (item1234).  Wired to
+  # waves 1994a/1994b/1995/1997: each wave's data_info lists the same
+  # file and the shared `community_prices` df_edit hook melts + stamps
+  # the round's t, so each wave returns its own round's prices.
+  #
+  # INDEX: (t, market, j, u).  market = Woreda/market-town label (the
+  # same named geography as cluster_features.Woreda, NOT the
+  # peasant-association v).  j = raw ERHS item label (label->Preferred
+  # harmonization is a follow-up -- the price file carries item names,
+  # not the numeric food codes harmonize_food keys on).  u = 'kg'
+  # (prices are per-kg, per the IFPRI Mergepricekg.SPS codebook).
+  #
+  # DEFERRED: the non-round-keyed `pricenum` (price per NUMBER) and the
+  # R6/R7 (2004/2009) price files (rd6_kgpr_Mkt.tab, price2009*.tab) --
+  # 2004/2009 are NOT wired waves.
+  community_prices:
+    index: (t, market, j, u)
+    Price: float   # market price, Birr per unit (u='kg')
+
   panel_ids: !make

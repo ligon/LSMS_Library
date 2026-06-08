@@ -159,6 +159,72 @@ def food_acquired(df):
     return out
 
 
+def community_prices(df):
+    """Melt the wide R1--R4 market-price file into long market prices.
+
+    BESPOKE table (GH #275), modelled on the ERHS `assets`/`livestock`/
+    `income` HH-level variants -- there is NO canonical cross-country
+    village/market-price feature.  This is the ERHS community/market
+    price module, NOT the API-derived `food_prices` (which comes from
+    `food_acquired`); the two are independent.
+
+    SOURCE: `price1234_rev.tab` -- one row per (market x item), keyed
+    on `q1b` (the WOREDA / market town, 15 of them; the same named
+    geography as `cluster_features.Woreda`) and `item1234` (a food
+    *label*, 127 items).  The four columns `p_r1..p_r4` are the
+    per-kg market price (Birr/kg) for Rounds 1--4 == waves
+    1994a/1994b/1995/1997 respectively (confirmed by the IFPRI
+    `Mergepricekg.SPS` codebook: `value = amount * p_r1`, matched BY
+    item1234 q1b).  The single, non-round-keyed `pricenum` column
+    (price per *number*, unit1234=56) is a documented follow-up --
+    it cannot be assigned to one round, so the kg prices are wired
+    first.
+
+    The SAME source file is listed in all four 1994+ waves'
+    `community_prices` block.  This hook melts `p_r1..p_r4` to long,
+    stamping each round's own `t`; `check_adding_t` (country.py) sees
+    `t` already present in the melted frame and leaves it, and the
+    per-wave year filter (country.py:
+    ``df = df[... 't' == self.year]``) then selects just that wave's
+    slice.  So 1994a returns the p_r1 rows, 1994b the p_r2 rows, etc.
+    -- one file, four waves, no per-wave duplication.
+
+    Input (df_edit hook): index (t, market, j) -- the framework has
+    already stamped `t = self.year`, which we DROP and replace with
+    the round-specific year below; columns p_r1..p_r4.
+
+    Output: index (t, market, j, u); column [Price]; u = 'kg'.
+    `market` = Woreda/market-town label; `j` = the raw ERHS item
+    label (label->Preferred-Label harmonization is a follow-up, as
+    the price file carries item *names*, not the numeric food codes
+    `harmonize_food` keys on).  R5--R7 (1999/2004/2009) prices are
+    out of scope (rd6_kgpr_Mkt.tab / price2009*.tab) -- 2004/2009 are
+    not wired waves; deferred.
+    """
+    # Round column -> wave label.  R1..R4 == 1994a/1994b/1995/1997.
+    ROUND_TO_WAVE = {'p_r1': '1994a', 'p_r2': '1994b',
+                     'p_r3': '1995', 'p_r4': '1997'}
+    flat = df.reset_index()
+    # Drop the framework-stamped per-file `t`; the round melt below
+    # assigns the correct per-round `t`.
+    if 't' in flat.columns:
+        flat = flat.drop(columns='t')
+    price_cols = [c for c in ROUND_TO_WAVE if c in flat.columns]
+    long = flat.melt(id_vars=['market', 'j'], value_vars=price_cols,
+                     var_name='_round', value_name='Price')
+    long['t'] = long['_round'].map(ROUND_TO_WAVE)
+    long['Price'] = pd.to_numeric(long['Price'], errors='coerce')
+    long['u'] = 'kg'   # p_r* are Birr-per-kg (Mergepricekg.SPS)
+    # Keep only rows that actually carry a price for that round.
+    long = long[long['Price'].notna()]
+    # A market/item must be identifiable.
+    for k in ('market', 'j'):
+        long = long[long[k].notna()
+                    & (long[k].astype('string').str.strip() != '')]
+        long[k] = long[k].astype('string').str.strip()
+    return long.set_index(['t', 'market', 'j', 'u'])[['Price']]
+
+
 def sample(df):
     """Dedup the per-person extract to one row per household.
 

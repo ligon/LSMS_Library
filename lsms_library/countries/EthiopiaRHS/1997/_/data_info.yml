@@ -105,3 +105,22 @@ cluster_features:
         Woreda:
             - q1c
             - mappings: ['erhs_village_woreda', 'Code', 'Woreda']
+
+# community_prices (BESPOKE, GH #275) -- Round 4 (1997) market prices.
+# Same WIDE-on-round source file price1234_rev.tab as 1994a/1994b/1995;
+# the shared `community_prices` df_edit hook (_/ethiopiarhs.py) melts
+# p_r1..p_r4 and stamps each round's `t`, and the per-wave year filter
+# keeps THIS wave's slice -- 1997 gets the p_r4 (R4) rows, the broadest
+# round (~72 items vs ~19 staples in R1--R3).  market=q1b (Woreda/market
+# town), j=item1234 (raw food label), u='kg', Price in Birr/kg.  See the
+# 1994a data_info for the full design note.
+community_prices:
+    file: price1234_rev.tab
+    idxvars:
+        market: q1b      # Woreda / market town (== cluster_features.Woreda)
+        j: item1234      # food-item label (raw; harmonization a follow-up)
+    myvars:
+        p_r1: p_r1       # R1 (1994a) market price, Birr/kg
+        p_r2: p_r2       # R2 (1994b) market price, Birr/kg
+        p_r3: p_r3       # R3 (1995)  market price, Birr/kg
+        p_r4: p_r4       # R4 (1997)  market price, Birr/kg
