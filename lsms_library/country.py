@@ -3295,7 +3295,12 @@ def _enforce_declared_dtypes(df: pd.DataFrame, scheme_entry: dict[str, Any]) -> 
                     # Round before casting so float values (e.g. 59.41 from
                     # age_handler) survive the safe-cast check.
                     df[col] = pd.to_numeric(df[col], errors='coerce').round().astype(target)
-                elif target in (pd.Float64Dtype(), pd.BooleanDtype()):
+                elif target == pd.BooleanDtype():
+                    # NOT pd.to_numeric: cached parquets store bools as the
+                    # strings 'True'/'False', and pd.to_numeric('True') -> NaN
+                    # would silently wipe every value (GH #386).
+                    df[col] = _coerce_to_boolean(df[col])
+                elif target == pd.Float64Dtype():
                     df[col] = pd.to_numeric(df[col], errors='coerce').astype(target)
                 else:
                     df[col] = df[col].astype(target)
@@ -3353,7 +3358,12 @@ def _enforce_canonical_dtypes(df: pd.DataFrame, method_name: str) -> None:
                 # age_handler's date-arithmetic path) survive the safe-cast
                 # check in pandas' IntegerArray.__from_sequence__.
                 df[col] = pd.to_numeric(df[col], errors='coerce').round().astype(target)
-            elif target in (pd.Float64Dtype(), pd.BooleanDtype()):
+            elif target == pd.BooleanDtype():
+                # NOT pd.to_numeric: cached parquets store bools as the strings
+                # 'True'/'False', and pd.to_numeric('True') -> NaN would
+                # silently wipe every value (GH #386).
+                df[col] = _coerce_to_boolean(df[col])
+            elif target == pd.Float64Dtype():
                 df[col] = pd.to_numeric(df[col], errors='coerce').astype(target)
             else:
                 df[col] = df[col].astype(target)
