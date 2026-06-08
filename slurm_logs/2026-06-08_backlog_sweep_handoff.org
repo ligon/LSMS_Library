@@ -1,0 +1,75 @@
+#+TITLE: Backlog Sweep + EthiopiaRHS Wiring — Session Handoff
+#+DATE: 2026-06-08
+#+AUTHOR: Sue (Claude Opus 4.8, 1M context)
+
+* Summary
+Large multi-wave session: a cold-build audit of all features x countries,
+a data-availability sleuth that reframed the "blocked" tier, the EthiopiaRHS
+feature build-out, and a worktree-delegated sweep of the implementable
+backlog.  Open issues went ~34 -> 22.  ~20 PRs merged; all coordinator
+build-verified before merge.
+
+* Workflow that worked: worktree delegation + coordinator build-verify
+- Agents run in isolated git worktrees, *static-verify only* (read code,
+  grep, parse YAML, read .dta labels via pyreadstat/get_dataframe), commit
+  on =fix/NNN=, push.  They do NOT build.
+- Why: the venv =.pth= hardcodes the MAIN checkout path, so any
+  =import lsms_library= in a worktree runs main's code + reads main's
+  =countries/=.  Worktree agents literally cannot build-verify their edits.
+- The coordinator build-verifies each pushed branch IN THE MAIN CHECKOUT via
+  =git checkout -B vNNN origin/fix/NNN= (a *differently-named* local branch
+  from the origin ref — the agent's worktree still holds =fix/NNN=, so a
+  same-name checkout fails), then PR -> merge -> *close the issue* (merging to
+  development does NOT auto-close).
+- The gate earns its keep: static-only agents shipped build bugs the
+  coordinator caught — e.g. =convert_categoricals= defaults (India/KZ assets,
+  1999 roster), an undeclared =food_acquired= (Cambodia/Serbia), a
+  DataFrame-truthiness crash (Mali #380).
+- Branches touching the same files (e.g. two EthiopiaRHS config branches)
+  conflict at merge: merge one, then =git merge origin/development= into the
+  other and resolve (both blocks coexist).
+
+* Shipped (merged)
+- Index/bool framework fixes: #386 (bool coercion), #323/#326 (dup-index warn +
+  Feature index names), #329 (missing wave =_/= now logged).
+- EthiopiaRHS #277: 1999 (R5) household_roster; bespoke =assets= (1989),
+  =livestock= + =income= (1999); #278 plot_features (1994a).
+- Delegated bug sweep: #6 (India employment / Mali ie pid), #377 (GhanaLSS
+  region), #11/#342 (India+Kazakhstan item-level assets), #321/#322/#324/#327/
+  #340/#347/#380/#387/#388/#389/#390 (earlier waves), #109 (GhanaLSS 2005-06 ie),
+  #117 (Panama conversion_to_kgs), #113 (Tanzania community-price region join),
+  #108/#111 (Cambodia/Serbia food_items.org + Makefile fixes).
+- Documented-and-closed (verified limitations): #146, #344, #174, #175, #252,
+  #325, #378.
+
+* DEFERRED / remaining — with precise next-steps
+- *#275 EthiopiaRHS community/market prices* — config + data correct (285
+  rows/wave) but the framework relabels the =j= index level to =i= somewhere
+  between =df_data_grabber= (which correctly yields =(market, j)=) and the
+  materialized output, so the country-level dedup collapses (t,market,j,u) ->
+  60 rows.  NEXT: trace why a bespoke non-household table's 2nd idxvar becomes
+  =i= in the grab path.  Work preserved on branch =feat/ethiopiarhs-prices=
+  (conflict-resolved, files DVC'd + pushed).
+- *#426 (new) get_categorical_mapping returns {} on empty myvars* —
+  =df_data_grabber= drops the value column when =myvars= is empty, so any
+  code->label-only mapping reads all-NA (silently NA'd GhanaLSS 1991-92 until
+  worked around in-country, PR #421).  Framework fix removes the per-country
+  workaround.
+- *#140 GhanaSPS* — final data located (Harvard Dataverse 10.7910/DVN/E5QP0F,
+  WB-2534, + ISSER 2018-19).  NEXT: bulk download + push_to_cache_batch +
+  re-wire against final var names (an add-wave effort; can't be done in a
+  static worktree).
+- *#108/#111 Cambodia/Serbia* — food_items.org built; =food_acquired.py= is
+  inert scaffolding (not declared; not yet (t,i,j,u,s) canonical — Cambodia has
+  an i/j swap).  FCT download URLs are in each food_items.org "Food Conversion
+  Table" section.
+- *#161 Uganda cluster_features* — residual grain + stringified-float =i=
+  collapse in uganda.py (GPS wiring already done).
+- *#12 framework/design cluster* — #218/#330/#180/#279/#226/#168/#170(in
+  progress elsewhere)/#171 remain as their own tracked issues (multi-session).
+
+* Artifacts
+- Audit harness: =slurm_logs/2026-06-07_foodsec_nonfies/audit_one_country.py=
+  (cold-clears one country's cache, builds every declared feature, runs
+  is_this_feature_sane, emits a JSON health record; country-partitioned so
+  concurrent runs don't race the shared cache).  Driver: xargs -P14.
