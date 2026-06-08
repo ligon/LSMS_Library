@@ -8,8 +8,13 @@ COUNTRY := $(shell basename "$$(cd .. && pwd)")
 LSMS_DATA_ROOT ?= $(if $(LSMS_DATA_DIR),$(LSMS_DATA_DIR),$(if $(XDG_DATA_HOME),$(XDG_DATA_HOME),$(HOME)/.local/share)/lsms_library)
 VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 
-var = $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_quantities.parquet $(VAR_DIR)/food_prices.parquet \
-	  $(VAR_DIR)/household_characteristics.parquet \
+# food_expenditures, food_quantities, food_prices are auto-derived at
+# runtime from food_acquired (_FOOD_DERIVED in country.py; see CLAUDE.md
+# "Derived Tables") — NOT materialized as country-level parquets.  The
+# pre-Phase-3 food_prices_quantities_and_expenditures.py was dropped
+# (GH #387); it crashed KeyError 'm' on the canonical food_acquired
+# schema and shadowed the runtime derivation with a stale parquet.
+var = $(VAR_DIR)/household_characteristics.parquet \
       $(VAR_DIR)/shocks.parquet $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet \
       $(VAR_DIR)/food_coping.parquet
 
@@ -17,9 +22,6 @@ all: panel_ids.json updated_ids.json $(parquet) $(var)
 
 panel_ids.json updated_ids.json: panel_ids.py
 	python panel_ids.py
-
-$(VAR_DIR)/food_quantities.parquet $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_prices.parquet &: $(VAR_DIR)/food_acquired.parquet food_prices_quantities_and_expenditures.py
-	python food_prices_quantities_and_expenditures.py
 
 food_acquired = $(shell find $(rounds) -name food_acquired.py)
 food_acquired_parquet := $(food_acquired:.py=.parquet)
@@ -80,7 +82,7 @@ food_coping_parquet := $(food_coping:.py=.parquet)
 $(VAR_DIR)/food_coping.parquet: food_coping.py $(food_coping_parquet)
 	python food_coping.py
 
-$(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet: nutrition.py food_items.org $(VAR_DIR)/food_quantities.parquet
+$(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet: nutrition.py food_items.org $(VAR_DIR)/food_acquired.parquet
 	python nutrition.py
 
 

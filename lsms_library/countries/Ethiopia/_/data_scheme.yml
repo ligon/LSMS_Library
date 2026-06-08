@@ -132,7 +132,7 @@ Data Scheme:
     Days: int
     materialize: make
 
-  food_expenditures: !make
-  food_prices: !make
-  food_quantities: !make
+  # food_expenditures, food_prices, food_quantities are derived at
+  # runtime from food_acquired — see _FOOD_DERIVED in country.py.  Do
+  # NOT register them here (per CLAUDE.md "Derived Tables").
   nutrition: !make
