@@ -32,7 +32,9 @@ def _unit_canonicalizer():
         tables = all_dfs_from_orgfile(org, to_numeric=False)
     except (OSError, ValueError):
         return {}
-    tbl = tables.get('u') or tables.get('unit')
+    tbl = tables.get('u')
+    if tbl is None:
+        tbl = tables.get('unit')
     if tbl is None or 'Preferred Label' not in tbl.columns:
         return {}
     src = [c for c in tbl.columns if c != 'Preferred Label']
