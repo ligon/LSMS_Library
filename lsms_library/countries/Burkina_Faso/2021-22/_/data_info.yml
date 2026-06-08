@@ -77,6 +77,22 @@ household_roster:
         - i
         - pid
 
+individual_education:
+    # EHCVM 2021-22: highest education attained = educ_hi.  This wave's
+    # household_roster keys pid off a SCALAR `pid` column, and the individu
+    # file carries the same scalar `pid`, so individual_education uses
+    # `pid: pid` (scalar) to align (verified 22,362/22,362 individu keys
+    # overlap the roster after format_id).  i = country i([grappe, menage]).
+    file: ehcvm_individu_bfa2021.dta
+    idxvars:
+        v: grappe
+        i:
+            - grappe
+            - menage
+        pid: pid
+    myvars:
+        Educational Attainment: educ_hi
+
 cluster_features:
     file: s00_me_bfa2021.dta
     idxvars:

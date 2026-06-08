@@ -80,6 +80,25 @@ household_roster:
         - i
         - pid
 
+individual_education:
+    # EHCVM 2018-19: highest education attained = educ_hi (same convention as
+    # Mali / CotedIvoire EHCVM reference).  pid = [grappe, menage, numind]
+    # built with this wave's pid() override, matching household_roster's
+    # [grappe, menage, s01q00a] composite (numind == s01q00a in the individu
+    # file; verified 45,612/45,612 key overlap after format_id).
+    file: ehcvm_individu_bfa2018.dta
+    idxvars:
+        v: grappe
+        i:
+            - grappe
+            - menage
+        pid:
+            - grappe
+            - menage
+            - numind
+    myvars:
+        Educational Attainment: educ_hi
+
 cluster_features:
     dfs:
         - df_main
