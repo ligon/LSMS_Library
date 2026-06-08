@@ -71,13 +71,17 @@ def test_leak_detector_no_u_level():
 # Clean per the 2026-06-07 audit; must stay clean.
 _KNOWN_CLEAN = ["Mali", "Niger", "CotedIvoire", "Guinea-Bissau"]
 # Tracked dirty (driven down by Layer 2 / #347 / #348). Progress:
-#   Ethiopia  45 -> 0 (prefix strip, #370)
-#   Togo      25 -> 4 (EHCVM codebook decode; residual 114/659/660/662)
-#   Burkina   22 -> 2 (EHCVM codebook decode; residual 254/255)
-#   Nigeria   32 -> 3 (codes decoded from WB .dta labels; residual 131/151/152)
-#   Senegal    1 -> 0 (code '1' data-entry anomaly, 2 rows -> u='NA')
-# Residual codes have no label in any source .dta. Still dirty:
-# Malawi, GhanaLSS, EthiopiaRHS.
+#   Ethiopia  45 -> 0  (prefix strip, #370)
+#   Togo      25 -> 4  (EHCVM codebook; residual 114/659/660/662 ACCEPTED*)
+#   Burkina   22 -> 2  (EHCVM codebook; residual 254/255 ACCEPTED*)
+#   Nigeria   32 -> 3  (WB .dta labels; residual 131/151/152 ACCEPTED*)
+#   Senegal    1 -> 0  (code '1' data-entry anomaly, 2 rows -> u='NA')
+#   Malawi   217 -> 19 (#382/#391/#399/#383; 19 residual ACCEPTED*)
+# *ACCEPTED = item-specific / data-entry codes with no label in ANY source
+#  (questionnaire scheme differs from the data coding); documented per-country
+#  and left as codes -- they still yield valid food_expenditures + unitvalue,
+#  only the kg aggregate excludes them.  Still genuinely dirty: GhanaLSS
+#  (#348/#384 -- raw codes, Tier-4 unit_label lift not yet done).
 
 
 def test_clean_countries_have_no_u_code_leaks():
