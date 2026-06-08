@@ -43,7 +43,11 @@ c = dict(int_key    = 'interview__key',  # interview__{key,id} both unique ident
          ea         = 'id_05',
          )
 
-place = get_dataframe(fn,convert_categoricals=False)
+# convert_categoricals=True so the location codes (id_01..id_05) decode
+# to region/district/... *names*, matching the household HH_SEC_A region
+# names (hh_a01_1).  With numeric codes the community and household files
+# use incompatible coding schemes (see the linkage note below).
+place = get_dataframe(fn,convert_categoricals=True)
 
 place = place.replace('**CONFIDENTIAL**',pd.NA)
 place = place.loc[:,place.count()>0] # Drop columns with no data
@@ -56,36 +60,31 @@ place = place.dropna(how='all')
 ### Merge ###
 out = pd.merge(df.reset_index('i'),place,on='int_key',how='outer')
 
-# Get regions for households
+#######################################################################
+# Link community prices to household clusters.
+#
+# Issue #113 hoped to join community prices to households via the EA
+# (=id_05=) <-> household =clusterid= relationship in HH_SEC_A.dta.
+# That linkage does NOT hold in the data:
+#   - The community =interview__key= has zero overlap with the household
+#     =interview__key= (community is its own questionnaire instrument).
+#   - The community location codes (region/district/ward/village/EA in
+#     id_01..id_05) and the household =clusterid= / =y5_cluster=
+#     (year-region-district-village-EA) use incompatible coding schemes:
+#     at the EA level only ~2/488 community location tuples match any
+#     household cluster, and the community EA column is mostly missing.
+# The finest geographic key that DOES reconcile is the region name
+# (all 30 community regions match a household region once id_01 is
+# decoded to a name).  So community prices are linked to households at
+# the *region* level (market index =m=), serving as a region-level
+# fallback price -- not a cluster-level one.  See CONTENTS.org "#113".
+#######################################################################
 
-fn = '../Data/hh_sec_a.dta'
-
-myvars = dict(HHID='y5_hhid',
-              urban='y5_rural',
-              domain='domain',
-              ea = 'hh_a04_1',
-              village = 'hh_a03_3a',
-              ward = 'hh_a03_1',
-              district = 'hh_a02_1',
-              region = 'hh_a01_1',
-              )
-
-hhloc = get_dataframe(fn)
-
-
-hhloc = hhloc.replace('**CONFIDENTIAL**',pd.NA)
-hhloc = hhloc.loc[:,hhloc.count()>0] # Drop columns with no data
-
-hhloc = hhloc[myvars.values()]
-hhloc = hhloc.rename(columns={v:k for k,v in myvars.items()}).set_index(['HHID'])
-
-mdict = hhloc[['domain','region']].dropna()
-
-mdict = mdict.drop_duplicates()
-
-mdict = {x[2]:x[1] for x in mdict.to_records()}
-
-out['m'] = out.region.map(mdict)
+# Region name is reported directly on the community record (id_01,
+# decoded above); upper-case it so it matches the HH_SEC_A region names
+# (hh_a01_1), which are upper-cased.
+out['m'] = out['region'].astype(str).str.upper().str.strip()
+out['m'] = out['m'].replace({'NAN': pd.NA, '<NA>': pd.NA})
 
 out = out.reset_index().set_index(['int_key','i','m'])
 

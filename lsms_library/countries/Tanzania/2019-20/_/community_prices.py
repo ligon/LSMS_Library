@@ -57,32 +57,29 @@ place = place.dropna(how='all')
 ### Merge ###
 out = pd.merge(df.reset_index('i'),place,on='int_key',how='outer')
 
-# Get regions for households
+#######################################################################
+# Link community prices to household clusters.
+#
+# Issue #113 hoped to join community prices to households via the EA
+# (=cm_f05=) <-> household =clusterid= relationship in HH_SEC_A.dta.
+# That linkage does NOT hold in the data:
+#   - The community =interview__key= has zero overlap with the household
+#     =interview__key= (community is its own questionnaire instrument).
+#   - The community location codes (region/district/ward/village/EA in
+#     cm_f01..cm_f05) and the household =clusterid= / =sdd_cluster=
+#     (region-rural-district-EA) use incompatible coding schemes: at the
+#     EA level only ~2/31 community location tuples match any household
+#     cluster, and the community EA column is mostly missing.
+# The finest geographic key that DOES reconcile is the region name
+# (~20/21 community regions match a household region).  So community
+# prices are linked to households at the *region* level (market index
+# =m=), serving as a region-level fallback price -- not a cluster-level
+# one.  See CONTENTS.org "#113" and HH_SEC_A for the verification.
+#######################################################################
 
-fn = '../Data/HH_SEC_A.dta'
-
-myvars = dict(HHID='sdd_hhid',
-              urban='sdd_rural',
-              domain='domain',
-              ea = 'hh_a04_1',
-              village = 'hh_a03_3a',
-              ward = 'hh_a03_1',
-              district = 'hh_a02_1',
-              region = 'hh_a01_1',
-              )
-
-hhloc = get_dataframe(fn)
-
-hhloc = hhloc[myvars.values()]
-hhloc = hhloc.rename(columns={v:k for k,v in myvars.items()}).set_index(['HHID'])
-
-mdict = hhloc[['domain','region']].dropna()
-
-mdict = mdict.drop_duplicates()
-
-mdict = {x[2]:x[1] for x in mdict.to_records()}
-
-out['m'] = out.region.map(mdict)
+# Region name is reported directly on the community record (cm_f01);
+# use it as the market index m.
+out['m'] = out['region']
 
 out = out.reset_index().set_index(['int_key','i','m'])
 
