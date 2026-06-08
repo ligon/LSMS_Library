@@ -12,12 +12,18 @@ individual_education:
         Educational Attainment: m2b_q04
 
 household_roster:
+    # i=[psu,hh] -> composite via mapping.py:i() ('psu-hh') to match sample()'s
+    # household identity (format_id(psu)+'-'+format_id(hh)), so
+    # _join_v_from_sample resolves v.  Bare i=hh keyed on the within-PSU
+    # household number, which did not match sample()'s composite i and broke the
+    # v-join (the within-PSU number is unique only inside a PSU).  v is NOT
+    # declared here -- the framework joins it from sample() (the 2005 idiom; only
+    # cluster_features owns v).  See GH #324, #340, CONTENTS.org.
     file:
         - ../Data/Modul_1A_household_roster.sav
 
     idxvars:
-        v: psu
-        i: hh
+        i: [psu, hh]
         pid: id
 
     myvars:
