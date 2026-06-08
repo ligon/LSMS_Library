@@ -12,15 +12,17 @@ import pandas as pd
 import lsms_library.local_tools as tools
 
 
-# Explicit `waves` list (consumed by Country.waves, country.py:1054-1073):
-# only the FIVE wired rounds are declared.  Rounds 1999/2004/2009
-# (R5/R6/R7) are deliberately excluded -- the IFPRI Dataverse archive has
-# no person roster and no item-level food for them (only pre-aggregated
-# consumption scalars), so they are NOT WIREABLE for the canonical tables
-# and must not appear in sample() / derived-table wave coverage.  Their
-# ``Documentation/`` dirs are retained on disk for provenance.
-# See _/CONTENTS.org (decision 2026-06-05) and GH #271 / #277.
-waves = ['1989', '1994a', '1994b', '1995', '1997']
+# Explicit `waves` list (consumed by Country.waves, country.py:1054-1073).
+# 1989/1994a/1994b/1995/1997 are the original wired rounds.  1999 (R5) was
+# previously excluded as "no person roster", but the IFPRI Dataverse archive
+# DOES contain an R5 person roster ("11 3.3.99 roster.tab" -> 1999/Data/
+# roster.tab, 10,788 person-rows, already label-decoded), so it is now wired
+# for household_roster (GH #277; data-availability sleuth 2026-06-07).
+# 2004/2009 (R6/R7) remain excluded -- they carry only HH-size summaries, no
+# person roster.  Item-level food is absent for R5/R6/R7 (only pre-aggregated
+# consumption scalars), so food_acquired stays 1994-1997 only.
+# See _/CONTENTS.org and GH #271 / #277.
+waves = ['1989', '1994a', '1994b', '1995', '1997', '1999']
 
 
 # Unit handling (GH #347).  ``u`` carries the harmonized unit label
