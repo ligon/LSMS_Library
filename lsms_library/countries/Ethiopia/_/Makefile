@@ -14,7 +14,8 @@ VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 # pre-Phase-3 food_prices_quantities_and_expenditures.py was dropped
 # (GH #387); it crashed KeyError 'm' on the canonical food_acquired
 # schema and shadowed the runtime derivation with a stale parquet.
-var = $(VAR_DIR)/household_characteristics.parquet \
+# household_characteristics is auto-derived too (_ROSTER_DERIVED, GH #260).
+var = \
       $(VAR_DIR)/shocks.parquet $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet \
       $(VAR_DIR)/food_coping.parquet
 
@@ -31,15 +32,6 @@ food_acquired_parquet := $(food_acquired:.py=.parquet)
 
 $(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
 	python food_acquired.py
-
-household_characteristics = $(shell find $(rounds) -name household_characteristics.py)
-household_characteristics_parquet := $(household_characteristics:.py=.parquet)
-
-../%/_/household_characteristics.parquet:
-	(cd $(@D) && python household_characteristics.py)
-
-$(VAR_DIR)/household_characteristics.parquet: household_characteristics.py $(household_characteristics_parquet)
-	python household_characteristics.py
 
 shocks = $(shell find $(rounds) -name shocks.py)
 shocks_parquet := $(shocks:.py=.parquet)
@@ -59,7 +51,7 @@ sample_parquet := $(sample:.py=.parquet)
 # plot_features (GH #167).  The framework's grab_data calls
 # `make ../<wave>/_/plot_features.parquet` from this `_/` dir; the
 # pattern rule runs the wave script.  The VAR_DIR rule mirrors the
-# household_characteristics country-level convention above.
+# food_acquired country-level convention above.
 plot_features = $(shell find $(rounds) -name plot_features.py)
 plot_features_parquet := $(plot_features:.py=.parquet)
 

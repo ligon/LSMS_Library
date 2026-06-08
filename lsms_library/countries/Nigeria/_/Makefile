@@ -9,7 +9,7 @@ LSMS_DATA_ROOT ?= $(if $(LSMS_DATA_DIR),$(LSMS_DATA_DIR),$(if $(XDG_DATA_HOME),$
 VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 
 var = $(VAR_DIR)/food_acquired.parquet $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_quantities.parquet \
-	  $(VAR_DIR)/household_roster.parquet $(VAR_DIR)/household_characteristics.parquet \
+	  $(VAR_DIR)/household_roster.parquet \
 	  $(VAR_DIR)/interview_date.parquet
 
 all: $(var)
@@ -31,9 +31,6 @@ $(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
 
 ../2018-19/_/food_acquired.parquet: ../2018-19/_/food_acquired.py
 	(cd ../2018-19/_; python food_acquired.py)
-
-$(VAR_DIR)/household_characteristics.parquet: $(VAR_DIR)/household_roster.parquet household_roster.py household_characteristics.py
-	python household_characteristics.py 
 
 food_expenditures = $(shell find $(rounds) -name food_expenditures.py)
 food_expenditures_parquet := $(food_expenditures:.py=.parquet)
