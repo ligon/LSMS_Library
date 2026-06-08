@@ -43,6 +43,20 @@ household_roster:
         Relationship: s1q3
         MonthsAway: s1q22
 
+individual_education:
+    # GLSS5 Section 2A (Education).  s2aq2 = "highest grade completed"; the
+    # .dta carries embedded value labels (none, preschool, p1..p6, jss1..jss3,
+    # m1..m4, sss1..sss3, voc, teacher training, nursing, polytechnic,
+    # university, ...), decoded automatically by get_dataframe().  i = hhid and
+    # pid = pid to match this wave's household_roster index.
+    file: parta/sec2a.dta
+    idxvars:
+        v: clust
+        i: hhid
+        pid: pid
+    myvars:
+        Educational Attainment: s2aq2
+
 housing:
     # GLSS5 Section 7 dwelling characteristics (parta/sec7.dta).  Wall/Floor/
     # Roof = Part F (s7fq1/2/3); Water = Part D q1a; Toilet = Part D q16;

@@ -1,5 +1,32 @@
 The following tables are mapping of numerical codes to categorical labels for 1991--92
 
+* S1 / POV_GH region codes
+
+GLSS3 (1991-92) region code -> name, transcribed from the GLSS3 household
+questionnaire Part A, Section 1, q10 ("In what region/country was [NAME]
+born", value list Western..1 ... Foreign Country..11).  Source PDF:
+Documentation/pdf/G3QPartA.pdf.  This wave-specific table is REQUIRED because
+GLSS3 orders the two northern regions 9=Upper West, 10=Upper East -- the
+reverse of the later-wave GSS coding (e.g. the GLSS5 .dta value labels and the
+country-level GhanaLSS/_/categorical_mapping.org both use 9=Upper East,
+10=Upper West).  s1q10 (Birthplace, codes 1-11) and POV_GH.region / sample
+strata (codes 1-10) both use this list.
+
+#+name: region
+| Code | Label           |
+|------+-----------------|
+|    1 | Western         |
+|    2 | Central         |
+|    3 | Greater Accra   |
+|    4 | Eastern         |
+|    5 | Volta           |
+|    6 | Ashanti         |
+|    7 | Brong Ahafo     |
+|    8 | Northern        |
+|    9 | Upper West      |
+|   10 | Upper East      |
+|   11 | Foreign Country |
+
 * POV_GH
 
 #+name: rural

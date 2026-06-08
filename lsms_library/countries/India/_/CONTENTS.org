@@ -1,5 +1,18 @@
 #+title: Contents
 
+* assets — consumer durables (2026-06-08, #342)
+Source: =SECT07D.DTA= §7 Part D "Consumer durables owned".  The module is
+already stored long (one row per household-item) with =itemcode= and =v07d02=
+"Number of items owned".  The item label (=j=) is recovered from the
+value-label set on =itemcode=; the old Stata-105 format truncates those labels
+to 8 characters AND gives codes 512/515 the same truncated label =Pressure=, so
+we map by code to full, disambiguated names (512 = Pressure cooker, 515 =
+Pressure lamp/stove).  §7D records counts only — there is no value/price column
+— so only =Quantity= is emitted (cf. Liberia's count-only instrument).
+Canonical index =(t, i, j)=, i = hhcode.  15 distinct items appear in the data
+(washing machine, code 507, has zero owners).  Built via
+=1997-98/_/assets.py= (materialize: make).
+
 * shocks — not available (2026-06-07, verified)
 
 =shocks= (a household adverse-events-and-coping roster, index =(t, i, Shock)=)

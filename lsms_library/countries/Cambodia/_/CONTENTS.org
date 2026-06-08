@@ -20,10 +20,10 @@ and no =data_info.yml= at the country level, so Cambodia is not yet
 accessible via the =Country()= API.
 
 * Known issues
-- Makefile :: The generic =%.parquet= rule references =food_items.org=
-  and =malawi.py= (copy-paste error from Malawi).  Neither file exists
-  in this country.  The rule will fail for any target that falls through
-  to it.
+- Makefile :: FIXED (2026-06-08).  The generic =%.parquet= rule
+  previously referenced =malawi.py= (copy-paste error from Malawi); it
+  now references =cambodia.py=.  =food_items.org= now exists (see below),
+  so that prerequisite resolves too.
 - =cambodia.py= :: Uses deprecated =from ligonlibrary.dataframes import from_dta=
   and =dvc.api.open()= anti-patterns instead of =get_dataframe()=.
 - No =data_scheme.yml= :: Cambodia cannot be loaded via
@@ -64,12 +64,16 @@ parquets from =var/food_acquired.parquet=.
 Note: writes CSV files to =~/Downloads/=, which is a side effect that
 should be removed.
 
-** TODO food_items.org
-No food item label mapping exists.  A =food_items.org= table is needed
-to harmonize the food codes from =hh_sec_5.dta= (variable
-=food_consumption_roster_1__id=) into preferred labels.  Since there is
-only one wave, the table would be simple (one column plus preferred
-label).
+** DONE food_items.org (2026-06-08; FCT column scaffolded)
+Harmonizes the 64 food codes from =hh_sec_5.dta= (variable
+=food_consumption_roster_1__id=) into preferred labels.  Columns:
+=Preferred Label | 2019-20 | Code | FCT ID=.  =2019-20/_/food_acquired.py=
+keys on the numeric =Code= (1--64) to map =i= to Preferred Labels
+(verified 64/64 coverage).  The =FCT ID= column is a *scaffold* (blank):
+no freely-downloadable, machine-readable Cambodia FCT was obtained.
+Candidate FCT = SMILING-project Cambodia table (ASEANFOODS-based); see
+the org file's "Food Conversion Table" section for the source URL and
+remaining steps.
 
 ** TODO nutrition.py
 Not yet implemented.  Requires:

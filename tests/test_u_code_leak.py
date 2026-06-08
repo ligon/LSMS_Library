@@ -77,11 +77,13 @@ _KNOWN_CLEAN = ["Mali", "Niger", "CotedIvoire", "Guinea-Bissau"]
 #   Nigeria   32 -> 3  (WB .dta labels; residual 131/151/152 ACCEPTED*)
 #   Senegal    1 -> 0  (code '1' data-entry anomaly, 2 rows -> u='NA')
 #   Malawi   217 -> 19 (#382/#391/#399/#383; 19 residual ACCEPTED*)
+#   GhanaLSS  13 -> 0  (#348; 1991-92 units dict was empty -- fixed value-col
+#                       + float->str code lookup; all codes now decode)
 # *ACCEPTED = item-specific / data-entry codes with no label in ANY source
 #  (questionnaire scheme differs from the data coding); documented per-country
 #  and left as codes -- they still yield valid food_expenditures + unitvalue,
-#  only the kg aggregate excludes them.  Still genuinely dirty: GhanaLSS
-#  (#348/#384 -- raw codes, Tier-4 unit_label lift not yet done).
+#  only the kg aggregate excludes them.  No food_acquired country now leaks
+#  non-accepted unit codes (Layer-2 u-harmonization complete).
 
 
 def test_clean_countries_have_no_u_code_leaks():

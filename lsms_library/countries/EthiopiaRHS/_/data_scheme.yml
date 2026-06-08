@@ -66,6 +66,31 @@ Data Scheme:
     Quantity: float
     Expenditure: float
 
+  # plot_features (#278, under #167): LASTING plot/parcel characteristics
+  # of the household's farmland.  One row per plot -- MULTIPLE PLOTS PER
+  # HOUSEHOLD (mean ~3.9, max 29).  WIRED for 1994a (R1) only, from the
+  # conversion-applied R1 land section land1all.tab (clean YAML, code-
+  # based, i=[q1c,q5], plot_id=q21_1; see 1994a/_/data_info.yml).  Area
+  # is in HECTARES (pre-computed in-file); AreaUnit carries the native
+  # local unit label; Tenure is mapped to the canonical plot_features
+  # spellings.  v (peasant association) is auto-joined by
+  # _join_v_from_sample() at API time, so it is NOT in the index --
+  # canonical (t, v, i, plot_id) less the framework-joined v.
+  #
+  # DEFERRED (no plot_features yet): 1989 (no plot roster in the IFPRI
+  # Dataverse archive -- HH x crop only), 1994b/1995/1997 (R2-R4 raw
+  # plot sections present but unwired -- R2/R4 are multi-file/script-path,
+  # R3 needs a composite plot_id formatter), and 1999/2004/2009 (R5-R7,
+  # only pre-aggregated HH x crop area_output_* -- no raw plot rows).
+  # See slurm_logs/DESIGN_erhs_plot_features_2026-05-20.org.
+  plot_features:
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    Tenure: str
+    SoilType: str
+    Irrigated: bool
+
   # Sampling design.  ERHS is a PURPOSIVE 15-village longitudinal
   # panel, not a weighted national sample -- there are no design
   # weights, so weight/panel_weight are NaN (sourcing any constructed

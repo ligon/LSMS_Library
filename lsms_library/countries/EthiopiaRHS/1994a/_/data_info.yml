@@ -127,3 +127,112 @@ community_prices:
         p_r2: p_r2       # R2 (1994b) market price, Birr/kg
         p_r3: p_r3       # R3 (1995)  market price, Birr/kg
         p_r4: p_r4       # R4 (1997)  market price, Birr/kg
+# plot_features (#278, under #167).  LASTING plot/parcel characteristics
+# of the household's farmland, from the R1 (early 1994) land section
+# (questionnaire Q21).  ONE ROW PER PLOT -- multiple plots per household
+# (mean ~3.9, max 29 over 1,477 HH; 5,811 source rows).
+#
+# SOURCE FILE.  land1all.tab is the conversion-applied version of the
+# raw R1 land section r1p2s1.tab (Landconversion.SPS sets
+# area1 = q21_1b and merges the land-unit -> hectare factors): it ships
+# the pre-computed per-plot HECTARE column q21_1aha, so Area needs no
+# in-library unit conversion (cf. the R4 plotha "oracle" in the design
+# doc, slurm_logs/DESIGN_erhs_plot_features_2026-05-20.org).  land1all
+# is also markedly cleaner than r1p2s1 (19 vs 215 duplicate (i, plot_id)
+# pairs), so it is the chosen R1 source.
+#
+# CODE-BASED extraction (converted_categoricals: False), consistent with
+# the 1994a roster/food: q1c and q5 are read as the STABLE NUMERIC CODES
+# the shared `i` formatter title-cases and joins as <village>_<hh_no>.
+#
+# i-KEY (statically verified).  i = [q1c, q5] -- peasant-association code
+# + HH-no-within-village -- the SAME composite the 1994a `food_acquired`
+# block uses (food1.dta q1c+q5).  Measured overlap of the plot file's
+# packed [q1c, q5] against the 1994a roster's [q1c, hhid] composite is
+# 1477/1477 (perfect): the roster's `hhid` == the land/food file's `q5`
+# (both = HH number within village).  v (peasant association) is
+# auto-joined from sample() at API time (NOT in the index).
+#
+# plot_id = q21_1, the plot's sequence number within the household
+# (1..29).  507 of the 5,811 rows (8.7%) are per-HH land TOTAL rows that
+# carry q21_1a/q21_1aha but NO q21_1 / area1 / q21_3 -- they get a null
+# plot_id and surface as the documented residual (is_this_feature_sane
+# warns, not fails, below the 10% null-index threshold), mirroring the
+# ERHS food harmonization residual posture.  A handful of duplicate
+# (i, plot_id) pairs (~19) are genuine source data-entry artifacts.
+#
+# COLUMNS (= source var):
+#  - Area     = q21_1aha  (plot area in HECTARES, the canonical unit;
+#               already converted in-file -- 5,808 non-null, 0-7.5 ha).
+#  - AreaUnit = area1 (== raw q21_1b) -- the NATIVE local area unit, mapped
+#               to its harmonized label (Timad/Gemed/Kert/Hectare/...);
+#               preserves provenance behind the hectare conversion.
+#  - Tenure   = q21_3, the form under which the plot is HELD, mapped to the
+#               canonical plot_features Tenure spellings.  ERHS code 5
+#               conflates "sharecropped, rented" -> sharecropped_in (the
+#               dominant arrangement); code 6 (fixed rent) -> rented_in;
+#               redistribution / land-reform / pre-reform purchase -> owned;
+#               pre-reform inheritance + gift from parents -> inherited;
+#               cleared forest -> squatted; trustship -> communal; the rest
+#               -> other_tenure.  (Per-season contract detail -- crop-share
+#               %, partner identity -- is plot_cultivation territory, out
+#               of scope per the design doc's D2.)
+#  - SoilType = q21_5, the local soil-FERTILITY class (Lem = fertile,
+#               Lem-teuf = medium, Teuf = poor); carried as its label.
+#  - Irrigated= q21_7 (Yes/No -> True/False), the plot's irrigation
+#               status; treated as a lasting plot attribute.
+plot_features:
+    file: land1all.tab
+    converted_categoricals: False
+    idxvars:
+        i:
+            - q1c
+            - q5
+        plot_id: q21_1
+    myvars:
+        Area: q21_1aha
+        AreaUnit:
+            - area1
+            - mapping:
+                2: Hectare
+                3: Gemed
+                4: Timad
+                5: Kert
+                6: Massa
+                8: Kufaro
+                9: Other
+                10: Kend (arms-length)
+                11: Square meters
+                12: Farrow (Boy)
+                13: Tinto
+                14: Ermija
+                15: Dearo
+                16: Gezem
+                17: Debe Zhir
+                20: Wodero
+                21: Gura Zhir
+        Tenure:
+            - q21_3
+            - mapping:
+                1: inherited        # Own land, pre-reform inheritance
+                2: owned            # Own land, pre-reform purchase
+                3: owned            # Own land, obtained at land reform
+                4: owned            # Own land, obtained during redistribution
+                5: sharecropped_in  # "Sharecropped, rented land" (conflated)
+                6: rented_in        # Rented land with fixed rent
+                7: other_tenure     # Other
+                10: other_tenure    # after demise of prod coop / state farm
+                11: squatted        # by clearing forest
+                12: inherited       # gift from parents
+                13: communal        # trustship land
+        SoilType:
+            - q21_5
+            - mapping:
+                1: Lem        # fertile
+                2: Lem-teuf   # medium
+                3: Teuf       # poor
+        Irrigated:
+            - q21_7
+            - mapping:
+                1: True       # Yes
+                2: False      # No
