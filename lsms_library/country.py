@@ -3431,10 +3431,23 @@ def _normalize_dataframe_index(
     # Aggregate duplicates if any remain
     if not df.index.is_unique:
         present_levels = [lvl for lvl in declared if lvl in df.index.names]
+        n_dropped = int(df.index.duplicated().sum())
         # Convert unordered categoricals to strings so groupby.first() works
         for col in df.columns:
             if hasattr(df[col], 'cat') and not df[col].cat.ordered:
                 df[col] = df[col].astype(str).replace({'nan': pd.NA, 'None': pd.NA, '<NA>': pd.NA})
         df = df.groupby(level=present_levels, observed=True).first()
+        if n_dropped:
+            # GH #323: collapsing a non-unique canonical index with .first()
+            # silently DISCARDS the dropped rows.  Surface it loudly rather
+            # than lose data quietly; a feature whose source legitimately has
+            # multiple rows per index tuple needs an explicit duplicate-
+            # aggregation policy (e.g. sum quantities) instead of .first().
+            warnings.warn(
+                f"Canonical index over {present_levels} had {n_dropped} "
+                f"duplicate tuple(s); collapsed via groupby().first(), dropping "
+                f"those rows (possible silent data loss — GH #323).",
+                RuntimeWarning,
+            )
 
     return df
