@@ -47,17 +47,19 @@ Data Scheme:
 
   shocks:
     # 2018-19 Section 17 (National Household Forest Survey). LONG form: one
-    # row per (household, shock-type). `Shock` is the shock_name label (14
-    # types: drought, floods, food-price rise, death, illness, crop pests,
-    # ...). `Experienced` is S17_1 ("severely negatively affected in the past
-    # 12 months", yes/no). This forest-survey instrument has NO income/asset/
+    # row per (household, EXPERIENCED shock-type). `Shock` is the shock_name
+    # label (14 types: drought, floods, food-price rise, death, illness, crop
+    # pests, ...). The NHFS enumerates all 14 types per HH with S17_1
+    # ("severely negatively affected in the past 12 months", yes/no); the
+    # mapping.py `shocks` post-processor keeps only S17_1==yes and drops the
+    # redundant Experienced flag (a row's existence conveys it, matching the
+    # other countries). This forest-survey instrument has NO income/asset/
     # production/consumption impact breakdown, so the canonical Affected*
     # columns are omitted. Coping is forest-specific: HowCoped0/1/2 are the
     # first/second/third forest products the household collected to recover
     # (S17_5_A/B/C); only populated for the ~38% of experienced shocks where
     # forest products were used (S17_4=yes).
     index: (t, i, Shock)
-    Experienced: bool
     HowCoped0: str
     HowCoped1: str
     HowCoped2: str
