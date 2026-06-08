@@ -474,6 +474,24 @@ class Wave:
         # Country-level ``load_from_waves`` call (GH #274).
         _wave_dir = self.file_path / "_"
         if not _wave_dir.is_dir():
+            # GH #329: a missing _/ is tolerated (an auto-discovered wave not
+            # yet wired legitimately has an empty, git-untracked _/), but it is
+            # indistinguishable from a BROKEN checkout (failed dvc pull, sparse
+            # / shallow clone, interrupted git checkout) where a wave that
+            # should contribute data silently contributes nothing -- a
+            # quiet-wrong-answer (fewer waves than expected, no error) that is
+            # worse than a loud one for a completeness-sensitive data library.
+            # Surface it via logger.warning so the absence is at least visible
+            # when debugging an incomplete table, without spamming a
+            # UserWarning for every legitimately-unwired stub on every call.
+            # (Marking intentional stubs to silence even this is a deferred
+            # refinement; see GH #329.)
+            logger.warning(
+                "no _/ directory for wave %s -- this wave declares no tables. "
+                "If this wave is expected to be wired, check for a partial "
+                "checkout or a failed dvc pull (GH #329).",
+                self.file_path,
+            )
             return []
         wave_data = [f.stem for f in _wave_dir.iterdir() if f.suffix == '.py' and f.stem not in [f'{self.wave_folder}']]
         # Customed
