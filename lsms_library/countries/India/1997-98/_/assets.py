@@ -46,7 +46,11 @@ ITEM_LABELS = {
     516: 'Watches/clocks',
 }
 
-df = get_dataframe('../Data/SECT07D.DTA')
+# convert_categoricals=False: keep itemcode as the numeric code (the .dta
+# value labels are 8-char-truncated and collide on 512/515; we map codes
+# ourselves via ITEM_LABELS).  With the default decode, itemcode comes back
+# as the label string ('Watches'...) and astype('Int64') raises.
+df = get_dataframe('../Data/SECT07D.DTA', convert_categoricals=False)
 
 out = pd.DataFrame(index=df.index)
 out['i'] = df['hhcode'].astype(int).astype(str)

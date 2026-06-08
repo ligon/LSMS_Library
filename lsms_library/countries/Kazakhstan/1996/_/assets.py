@@ -53,7 +53,10 @@ ITEM_LABELS = {
     '16': 'Carpets',
 }
 
-df = get_dataframe('../Data/KZ96HSG_PUF.dta')
+# convert_categoricals=False: keep the b37 block numeric (b37_NN_1 = 1/0 have-flag,
+# counts/prices numeric).  With the default decode, b37_NN_1 comes back as
+# 'Yes'/'No' -> to_numeric NaN -> `owned` never true -> empty records.
+df = get_dataframe('../Data/KZ96HSG_PUF.dta', convert_categoricals=False)
 
 # Durables are constant within household; collapse person-level rows to one per hh.
 keep_cols = ['rn'] + [f'b37_{n}_{a}' for n in ITEM_LABELS for a in ('1', '2', '4')]
