@@ -1,0 +1,29 @@
+# EthiopiaRHS 1999 (Round 5).  Source: IFPRI ERHS 1989-2009 Dataverse
+# deposit (doi:10.7910/DVN/T8G8IV), file "11 3.3.99 roster.tab" -> Data/roster.tab.
+#
+# Unlike the raw-code rosters of 1994a/b/1995/1997 (which set
+# converted_categoricals: False and decode q11_5/q11_1b via erhs_sex/
+# erhs_relation), this R5 file carries embedded VALUE LABELS, so we leave
+# converted_categoricals unset (-> convert_categoricals=True, country.py:700):
+# get_dataframe then decodes `sex` to Male/Female and `reltn3` to the
+# relationship label (Head, Son/Daughter, Wife/Husband/Partner, ...) on read,
+# and the canonical Sex spellings + kinship.yml handle those labels directly --
+# no per-country code mapping needed.  (Setting converted_categoricals: False
+# here would surface raw codes 1.0/2.0 and break kinship decomposition.)
+#
+# Household keys q1c (peasant association) + hh (HH no. within village) are the
+# SAME stable codes used by the other waves' roster i:[q1c, hhid].
+#
+# R5 (1999) has a person roster; R6 (2004) / R7 (2009) do NOT (only HH-size
+# summaries), and item-level food is absent for R5-R7 -- see CONTENTS.org.
+household_roster:
+    file: roster.tab
+    idxvars:
+        i:
+            - q1c        # peasant association (stable code)
+            - hh         # HH no. within village
+        pid: pid         # roster-card id
+    myvars:
+        Sex: sex                 # already 'Male'/'Female' -> M/F via canonical spellings
+        Age: age4                # round-5 age in years
+        Relationship: reltn3     # already a label; decomposed by kinship.yml

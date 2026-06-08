@@ -78,6 +78,11 @@ Visitor:             [0, 0, guest]
 Non-Relative:        [0, 0, unrelated]
 Other Non-Relative:  [0, 0, unrelated]
 Other Relative:      [0, 0, consanguineal]
+# EthiopiaRHS 1999 (R5) source-label spellings (sic) -> same tuples as the
+# canonical forms above; kept verbatim so the value-label decode matches.
+Other reative:       [0, 0, consanguineal]   # "Other relative" (source typo)
+Other unrelated:     [0, 0, unrelated]
+Tenant/Broader:      [0, 0, guest]           # "Tenant/Boarder" (source typo)
 Other Family:        [0, 0, consanguineal]
 Adopted Child:       [-1, 0, consanguineal]
 
