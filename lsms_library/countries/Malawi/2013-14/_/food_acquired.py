@@ -86,9 +86,9 @@ for src in ('consumed', 'bought', 'produced', 'gifted'):
         detail_lower.str.extract(kgs).astype(float),
     ], axis=0).dropna()
     df[cfactor_col] = df.apply(lambda x, c=cfactor_col, f=fallback: x[c] or f, axis=1)
-    df[quant_col] = df[quant_col].mul(df[cfactor_col].fillna(1))
-    df[u_col] = np.where(~df[cfactor_col].isna(), 'kg', df[detail_col])
-    df[u_col] = df[u_col].replace('nan', pd.NA).fillna(df[code_col])
+    # Keep native quantity + native unit; food_acquired_to_canonical computes
+    # the summable Quantity_kg = quantity x cfactor (GH #378 / Malawi migration).
+    df[u_col] = df[detail_col].replace('nan', pd.NA).fillna(df[code_col])
 
 df['t'] = wave
 df = df.reset_index()

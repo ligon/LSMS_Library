@@ -60,3 +60,54 @@ def test_food_quantities_uses_exact_kg():
     # both sources convert to kg (u='kg'); total = 1.5 + 0.5 = 2.0
     total = fq.xs('kg', level='u')['Quantity'].sum()
     assert abs(total - 2.0) < 1e-9
+
+
+def test_conversion_to_kgs_uses_quantity_kg_as_baseline_excludes_from_inference():
+    """Rows with an exact Quantity_kg serve as the price-per-kg baseline but
+    are NOT themselves inferred (GH #378 / Malawi migration).  Without that, a
+    unit whose only kg references come from exact rows couldn't be inferred."""
+    from lsms_library.transformations import conversion_to_kgs
+    # item 'X', region 'r', time 't': 2 exact 'heap' rows (kg known via
+    # Quantity_kg) + 1 'bowl' row to infer. Same per-kg price => bowl ~ its kg.
+    idx = pd.MultiIndex.from_tuples([
+        ('t', 'r', 'X', 'heap'), ('t', 'r', 'X', 'heap'), ('t', 'r', 'X', 'bowl')],
+        names=['t', 'm', 'i', 'u'])
+    df = pd.DataFrame({
+        'Expenditure': [100.0, 100.0, 200.0],
+        'Quantity':    [1.0, 1.0, 1.0],
+        'Quantity_kg': [2.0, 2.0, np.nan],   # heap = 2 kg exact; bowl unknown
+    }, index=idx)
+    out = conversion_to_kgs(df, index=['t', 'm', 'i'])
+    # heap is exact -> not inferred (excluded from po); bowl inferred ~ 4 kg
+    assert 'heap' not in out
+    assert 'bowl' in out and out['bowl'] > 0
+
+
+def test_conversion_to_kgs_unchanged_without_quantity_kg():
+    """Guard: no Quantity_kg column -> identical to the legacy behavior."""
+    from lsms_library.transformations import conversion_to_kgs
+    idx = pd.MultiIndex.from_tuples([
+        ('t', 'r', 'X', 'kg'), ('t', 'r', 'X', 'bowl')],
+        names=['t', 'm', 'i', 'u'])
+    df = pd.DataFrame({'Expenditure': [100.0, 200.0], 'Quantity': [1.0, 1.0]},
+                      index=idx)
+    out = conversion_to_kgs(df, index=['t', 'm', 'i'])
+    assert 'bowl' in out and out['bowl'] > 0
+
+
+def test_malawi_food_quantities_kg_total_preserved():
+    """Malawi migration acceptance pin (GH #378): the kg total is preserved to
+    ~0.001% after moving Malawi off build-time conversion onto Quantity_kg.
+    Baseline 8.796e6 kg captured 2026-06-07 (pre-migration).  Skips when the
+    Malawi food data isn't available."""
+    import warnings as _w
+    import lsms_library as ll
+    try:
+        with _w.catch_warnings():
+            _w.simplefilter('ignore')
+            fq = ll.Country('Malawi', preload_panel_ids=False).food_quantities(units='kgs')
+    except Exception:
+        import pytest
+        pytest.skip('Malawi food data unavailable')
+    total = float(fq.xs('kg', level='u')['Quantity'].sum())
+    assert abs(total - 8.7968e6) / 8.7968e6 < 0.005, f"kg total drifted: {total}"
