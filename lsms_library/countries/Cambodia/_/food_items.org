@@ -1,0 +1,117 @@
+#+title: Cambodia food items
+#+author: LSMS Library
+
+Harmonization table mapping the raw food-item labels of the Cambodia
+LSMS+ 2019-20 food-consumption module (=hh_sec_5.dta=, variable
+=food_consumption_roster_1__id=, codes 1--64) to preferred English
+labels.
+
+* Columns
+- =Preferred Label= :: canonical cross-survey label.
+- =2019-20= :: the raw categorical label as decoded from
+  =hh_sec_5.dta='s =food_consumption_roster_1__id=.  These strings are
+  the join key used by =2019-20/_/food_acquired.py= (which sets =i= from
+  the categorical of that variable).  Encoding artifacts in the raw
+  Stata value labels are reproduced verbatim so the string match
+  succeeds (e.g. =sugarâ​ cane/ palm sugar=, =cafÃ©=).
+- =Code= :: the integer item code (1--64) from the source roster.
+- =FCT ID= :: *SCAFFOLD -- not yet populated.*  Intended to key into a
+  Cambodia Food Composition Table (see "Food Conversion Table" below).
+  Left blank pending a machine-readable FCT.
+
+The Code column lets =harmonized_food_labels()= (key=Code) build a
+numeric-code -> Preferred Label map; the =2019-20= column lets
+=df_from_orgfile()= consumers build a raw-label -> Preferred Label map.
+
+#+name: food_label
+| Preferred Label                 | 2019-20                                          | Code | FCT ID |
+|---------------------------------+--------------------------------------------------+------+--------|
+| Rice (quality 1)                | rice, quality 1                                  |    1 |        |
+| Rice (quality 2)                | rice, quality 2                                  |    2 |        |
+| Rice Noodles                    | rice noodles/ fried noodle                       |    3 |        |
+| Chinese/Khmer Noodles           | chinese noodle/ Khmer noodles                    |    4 |        |
+| Other Cereals/Flour/Bakery      | other cereals or flour and other bakery products |    5 |        |
+| Bread                           | bread                                            |    6 |        |
+| Mudfish                         | Mudfish                                          |    7 |        |
+| Catfish                         | Catfish                                          |    8 |        |
+| Other Inland Fish               | Other inland fish                                |    9 |        |
+| Shrimp/Lobster                  | shrimp/lobster                                   |   10 |        |
+| Crab                            | Crabs                                            |   11 |        |
+| Other Seafood                   | Other seafood                                    |   12 |        |
+| Fish/Seafood (preserved)        | preserved or processed fish/seafood              |   13 |        |
+| Pork                            | Pork                                             |   14 |        |
+| Beef                            | Beef                                             |   15 |        |
+| Duck                            | Duck                                             |   16 |        |
+| Chicken                         | Chicken                                          |   17 |        |
+| Other Meat Products             | Other meat products                              |   18 |        |
+| Eggs                            | eggs and egg-based products                      |   19 |        |
+| Milk/Yoghurt                    | milk or yoghurt                                  |   20 |        |
+| Oils/Fats                       | oils or fats                                     |   21 |        |
+| Banana                          | Banana                                           |   22 |        |
+| Mango                           | mangoes                                          |   23 |        |
+| Longan                          | longan (mien)                                    |   24 |        |
+| Papaya                          | papaya                                           |   25 |        |
+| Tamarind                        | tamarind                                         |   26 |        |
+| Coconut                         | coconut                                          |   27 |        |
+| Nuts/Edible Seeds               | nuts and edible seeds                            |   28 |        |
+| Maize                           | maize and corn crop                              |   29 |        |
+| Other Fresh Fruits              | other fresh fruits                               |   30 |        |
+| Dried/Preserved Fruits          | dried and preserved fruits                       |   31 |        |
+| Watercress (trakun)             | trakun (watercress marsh cabbage)                |   32 |        |
+| Spring Onion/Garlic/Leeks       | spring onion/ garlic/ leeks leaves               |   33 |        |
+| Cabbage/Leaves                  | cabbage/ leaves                                  |   34 |        |
+| Gourd/Cucumber/Pumpkin/Eggplant | gourd, cucumber, pumpkin,  eggplant              |   35 |        |
+| Other Fresh Vegetables          | other fresh vegetables                           |   36 |        |
+| Prepared/Preserved Vegetables   | prepared and preserved vegetables                |   37 |        |
+| Tubers                          | tubers (potato, sweet potato, carrot, radish..)  |   38 |        |
+| Mushrooms                       | mushrooms/ dried mushrooms                       |   39 |        |
+| Pea/Bean/Soybean/Bean Sprout    | pea, bean/ soybean/ bean sprout                  |   40 |        |
+| Sugarcane/Palm Sugar            | sugarâ​ cane/ palm sugar                         |   41 |        |
+| Sweets                          | sweets                                           |   42 |        |
+| Salt                            | salt                                             |   43 |        |
+| Pepper                          | pepper                                           |   44 |        |
+| Monosodium Glutamate            | monosodium glutamte                              |   45 |        |
+| Fish/Soy/Chilli Sauces          | fish sources/ soy sources/ chilly sources        |   46 |        |
+| Other Ingredients               | Other ingrediences                               |   47 |        |
+| Nutritive Tablets               | nutritive tablets                                |   48 |        |
+| Coffee/Tea/Chocolate            | coffee, tea, and chocolate                       |   49 |        |
+| Bottled/Mineral Water           | bottled/mineral water                            |   50 |        |
+| Soft Drinks/Juices              | soft drinks, orange juices, friut juices         |   51 |        |
+| Ice Cream                       | ice cream                                        |   52 |        |
+| Beer (at home)                  | beer at home                                     |   53 |        |
+| Wine (at home)                  | wine at home                                     |   54 |        |
+| Other Alcohol (at home)         | other alcohol not in bar or restaurant           |   55 |        |
+| Cigarettes/Tobacco              | cigarettes and other tobacco                     |   56 |        |
+| Food (at school)                | food at school                                   |   57 |        |
+| Drinks (at school)              | drinks at school                                 |   58 |        |
+| Food (at work)                  | food at work                                     |   59 |        |
+| Drinks (at work)                | drinks at work                                   |   60 |        |
+| Food/Snacks (restaurant)        | food/snacks at restaurant pub or cafÃ©           |   61 |        |
+| Drinks (restaurant)             | drinks at restaurant pub or cafÃ©                |   62 |        |
+| Prepared Meals (takeaway)       | Prepared meals bought outside and eaten at home  |   63 |        |
+| Other Food Expenses             | other food expenses                              |   64 |        |
+
+* Food Conversion Table (FCT) -- TODO
+
+The =FCT ID= column above is a scaffold.  No freely-downloadable,
+machine-readable Cambodia FCT was obtained for this commit.
+
+Candidate source: the *SMILING project* Cambodia FCT (ASEANFOODS-based,
+~140--175 selected foods with energy, protein, fat, carbohydrate, iron,
+zinc, vitamin A, folate, calcium, vitamin D, B-vitamins, vitamin C).
+See Berger et al. (2019), "Food Composition Tables in Southeast Asia:
+The Contribution of the SMILING Project", /Matern Child Health J/ 23
+(Suppl 1):S46--S54, https://doi.org/10.1007/s10995-018-2528-8 (open
+access: https://pmc.ncbi.nlm.nih.gov/articles/PMC6373311/).  The
+underlying Cambodia FCT is an unpublished Excel held by the SMILING/IRD
+consortium (http://www.nutrition-smiling.eu/) and is not posted for
+direct download; obtain it by request, or fall back to ASEANFOODS /
+FAO/INFOODS regional tables.
+
+Remaining steps to wire nutrition:
+1. Obtain the Cambodia FCT (above) as CSV.
+2. Map each of the 64 items here to an FCT food code; fill the =FCT ID=
+   column.
+3. Add a country-level =fct.py= / =nutrition.py= (cf. Panama,
+   Guatemala) that joins =food_acquired= quantities to per-100g nutrient
+   values via =FCT ID=.
