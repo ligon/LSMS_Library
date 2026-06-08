@@ -122,6 +122,25 @@ def _metric_kg_factor(value):
     return None
 
 
+def _norm_unit_code(value):
+    """Canonicalize a raw unit *code* to zero-padded-2 + lowercase suffix.
+
+    Malawi's waves emit the same code in different forms -- 2013-14
+    zero-pads ('01', '04A'), 2016-17/2019-20 don't ('1', '4A', '10A').
+    Normalizing to the questionnaire/table form ('01', '04a', '10a') lets a
+    single #+name:u table decode every wave (GH #383).  Only pure
+    ``<digits><optional-single-letter>`` codes are touched; labels, the 'kg'
+    sentinel, and multi-letter strings pass through unchanged.
+    """
+    if pd.isna(value):
+        return value
+    s = str(value).strip()
+    m = re.fullmatch(r'(\d+)([A-Za-z]?)', s)
+    if not m:
+        return value
+    return m.group(1).zfill(2) + m.group(2).lower()
+
+
 def _titlecase_label(value):
     """Title-case a unit label so case-variants collapse (``'PIECE'`` ->
     ``'Piece'``); leaves the lowercase ``'kg'`` sentinel and sized labels
@@ -394,6 +413,11 @@ def food_acquired_to_canonical(df, wave):
                 q = pd.to_numeric(work[qcol], errors='coerce')
                 work.loc[mask, qcol] = q[mask] * factor[mask].astype(float)
                 work.loc[mask, ucol] = 'kg'
+            # Normalize any remaining raw unit *code* to the canonical
+            # zero-padded-2 + lowercase-suffix form ('1'->'01', '4A'->'04a',
+            # '10A'->'10a') so all waves match the #+name:u table (GH #383),
+            # which then decodes them to Preferred Labels at finalize.
+            work[ucol] = work[ucol].map(_norm_unit_code)
 
     def _make(source_label, quant_col, unit_col, value_col=None):
         if quant_col not in work.columns:
