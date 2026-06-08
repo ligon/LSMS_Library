@@ -228,6 +228,18 @@ class Feature:
 
         result = pd.concat(frames)
 
+        # GH #326: pd.concat can leave the (structurally-consistent) index
+        # levels UNNAMED, forcing callers to index positionally instead of
+        # `groupby('country')`.  When the level count matches the canonical
+        # shape (country + declared levels), restore the names — the per-country
+        # frames were already coerced to canonical order by
+        # _harmonize_country_frame above.  The nlevels-mismatch (genuinely
+        # heterogeneous) case is left to the warning below.
+        expected_names = ["country"] + canonical_levels
+        if (result.index.nlevels == len(expected_names)
+                and list(result.index.names) != expected_names):
+            result.index = result.index.set_names(expected_names)
+
         # Surface (rather than silently return) the pathological case where
         # heterogeneous per-country indices made pandas fall back to an
         # unnamed object index of stringified tuples (GH #325).
