@@ -33,7 +33,7 @@ interview_date_parquet := $(interview_date:.py=.parquet)
 $(VAR_DIR)/interview_date.parquet: interview_date.py $(interview_date_parquet)
 	python interview_date.py
 
-%.parquet: %.py malawi.py
+%.parquet: %.py cambodia.py
 	(cd $(@D) && python ./$(<F))
 
 clean:
