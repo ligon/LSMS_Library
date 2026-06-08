@@ -185,11 +185,13 @@ def handling_unusual_units(df, suffixes=None):
         df[detail_col] = df[detail_col].map(_clean_freetext_unit)
 
         df[cfactor_col] = df.apply(lambda x, c=cfactor_col: x[c] or conv_kg, axis=1)
-        df[quantity_col] = df[quantity_col].mul(df[cfactor_col].fillna(1))
-        df[u_col] = np.where(~df[cfactor_col].isna(), 'kg', df[detail_col])
-        # Fallback to the standard label, title-cased so 'PIECE'/'Piece'
-        # collapse; the 'kg' sentinel above is untouched.
-        df[u_col] = df[u_col].replace('nan', pd.NA).fillna(
+        # Migration to GH #378's Quantity_kg: keep the NATIVE quantity and the
+        # native unit label; do NOT multiply in place or stamp the 'kg'
+        # sentinel here.  The summable Quantity_kg = quantity x cfactor is
+        # computed per source in food_acquired_to_canonical, so food_acquired
+        # regains native units (and unitvalue) while food_quantities(kgs)
+        # stays identical.
+        df[u_col] = df[detail_col].replace('nan', pd.NA).fillna(
             df[units_col].map(_titlecase_label))
 
     return df
@@ -403,12 +405,17 @@ def food_acquired_to_canonical(df, wave):
     # 10 kg -- relabelling it 'Kg' without scaling would be off by 10x, so we
     # scale instead.  Non-metric / container strings ('Basket', '10G Packet')
     # are left untouched.  Applies across every wave at this single choke point.
-    for ucol, qcol in [('u_bought', 'quantity_bought'),
-                       ('u_produced', 'quantity_produced'),
-                       ('u_gifted', 'quantity_gifted')]:
+    for ucol, qcol, ccol in [('u_bought', 'quantity_bought', 'cfactor_bought'),
+                             ('u_produced', 'quantity_produced', 'cfactor_produced'),
+                             ('u_gifted', 'quantity_gifted', 'cfactor_gifted')]:
         if ucol in work.columns and qcol in work.columns:
             factor = work[ucol].map(_metric_kg_factor)
-            mask = factor.notna()
+            # Skip rows that already have a per-row cfactor: those become an
+            # exact Quantity_kg in _make, and the inline grams/kgs regex
+            # already captured any metric magnitude into cfactor -- converting
+            # again here would double-count (GH #378 / Malawi migration).
+            has_cf = work[ccol].notna() if ccol in work.columns else False
+            mask = factor.notna() & ~has_cf
             if mask.any():
                 q = pd.to_numeric(work[qcol], errors='coerce')
                 work.loc[mask, qcol] = q[mask] * factor[mask].astype(float)
@@ -419,9 +426,11 @@ def food_acquired_to_canonical(df, wave):
             # which then decodes them to Preferred Labels at finalize.
             work[ucol] = work[ucol].map(_norm_unit_code)
 
-    def _make(source_label, quant_col, unit_col, value_col=None):
+    def _make(source_label, quant_col, unit_col, value_col=None,
+              cfactor_col=None):
         if quant_col not in work.columns:
             return None
+        qty = pd.to_numeric(work[quant_col], errors='coerce')
         out = pd.DataFrame({
             't': work['t'].values,
             'i': work['i'].values,
@@ -429,9 +438,14 @@ def food_acquired_to_canonical(df, wave):
             'u': (work[unit_col].values if unit_col in work.columns
                   else pd.NA),
             's': source_label,
-            'Quantity': pd.to_numeric(work[quant_col],
-                                      errors='coerce').values,
+            'Quantity': qty.values,
         })
+        # Summable exact kg = native quantity x per-source cfactor (GH #378 /
+        # Malawi migration).  NaN where no cfactor -> food_quantities falls
+        # back to the unit->factor map.
+        if cfactor_col is not None and cfactor_col in work.columns:
+            out['Quantity_kg'] = (
+                qty * pd.to_numeric(work[cfactor_col], errors='coerce')).values
         if value_col is not None and value_col in work.columns:
             out['Expenditure'] = pd.to_numeric(work[value_col],
                                                errors='coerce').values
@@ -447,12 +461,12 @@ def food_acquired_to_canonical(df, wave):
         return out
 
     pieces = []
-    for src, qcol, ucol, vcol in [
-        ('purchased', 'quantity_bought',   'u_bought',   'expenditure'),
-        ('produced',  'quantity_produced', 'u_produced', None),
-        ('inkind',    'quantity_gifted',   'u_gifted',   None),
+    for src, qcol, ucol, vcol, ccol in [
+        ('purchased', 'quantity_bought',   'u_bought',   'expenditure', 'cfactor_bought'),
+        ('produced',  'quantity_produced', 'u_produced', None,          'cfactor_produced'),
+        ('inkind',    'quantity_gifted',   'u_gifted',   None,          'cfactor_gifted'),
     ]:
-        piece = _make(src, qcol, ucol, value_col=vcol)
+        piece = _make(src, qcol, ucol, value_col=vcol, cfactor_col=ccol)
         if piece is not None:
             pieces.append(piece)
 

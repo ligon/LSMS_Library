@@ -700,10 +700,19 @@ def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=
     # original ``unit_conversion.get(..., np.nan)`` semantics.
     factors = v['u'].astype(str).str.lower().map(unit_conversion).astype(float)
     v['Kgs'] = v[quantity] * factors
+    # Rows with an exact per-row Quantity_kg (e.g. Malawi cfactor units, GH
+    # #378) serve as kg *references* for the price-per-kg baseline -- exactly
+    # as they did when they were build-time-converted to u='kg' -- but they
+    # are excluded from the per-unit inference below (their kg is known, not
+    # inferred).  This keeps the data-driven factors for genuinely-unknown
+    # units identical before/after the Quantity_kg migration.
+    if 'Quantity_kg' in v.columns:
+        v['Kgs'] = v['Kgs'].where(v['Kgs'].notna(), v['Quantity_kg'])
     v = v.set_index('u', append=True)
     pkg = v[price].divide(v['Kgs'], axis=0)
     pkg = pkg.groupby(index).median().median(axis=1)
-    po = v[price].groupby(index + ['u']).median().median(axis=1)
+    v_infer = (v[v['Quantity_kg'].isna()] if 'Quantity_kg' in v.columns else v)
+    po = v_infer[price].groupby(index + ['u']).median().median(axis=1)
     kgper = (po / pkg).dropna()
     kgper = kgper.groupby('u').median()
     #convert to dict
