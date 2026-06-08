@@ -323,7 +323,7 @@ z=[]
 for t in rounds:
     x = pd.concat([pd.read_parquet('../%s/_/food_expenditures.parquet' % t).rename(columns=labels),
                    pd.read_parquet('../%s/_/other_expenditures.parquet' % t).rename(columns=labels)],axis=1)
-    x = x.groupby('i',axis=1).sum()
+    x = x.T.groupby('i').sum().T
     x = x.replace(0,np.nan)
     x = x[x.columns.intersection(items)] # Drop anything not an item with expenditures
 

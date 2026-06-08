@@ -6,6 +6,7 @@ Create a nutrition DataFrame for households based on food consumption quantities
 
 import sys
 sys.path.append('../../_/')
+import lsms_library as ll
 from lsms_library.local_tools import df_from_orgfile
 from fct_tools import nutrient_df, harmonize_nutrient, fct_filter
 import pandas as pd
@@ -34,15 +35,30 @@ final_fct = pd.concat([fct, fct_add]).sort_index().T
 
 
 ##--Part 3: multiply consumption quantities to get the aggregate nutrition consumption
-#sum all quantities 
-q = get_dataframe('../var/food_quantities.parquet')
-q['q_sum'] = q.sum(axis=1)
-#q = q[['q_sum']].droplevel('units').reset_index()
-q = q[['q_sum']].reset_index()
+# food_quantities is now derived at runtime from food_acquired
+# (_FOOD_DERIVED in country.py); mirror Uganda's nutrition.py and pull
+# it via the Country API instead of the retired
+# ../var/food_quantities.parquet (built by the removed pre-Phase-3
+# food_prices_quantities_and_expenditures.py).  The derived table has a
+# single Quantity column and canonical index (t, [v], i, j, u, s) where
+# i is the household, j the food item; u='kg' tags kg-converted rows.
+eth = ll.Country('Ethiopia')
+q = eth.food_quantities()
 
-final_q = q.pivot_table(index = ['j','t'], columns = 'i', values = 'q_sum')
+#sum all quantities — keep only kg-converted rows (case-insensitive 'kg'
+# to tolerate legacy u='Kg' and Phase-4 u='kg'), drop the unit level and
+# collapse the acquisition-source axis.
+mask = q.index.get_level_values('u').astype(str).str.lower() == 'kg'
+q = q[mask].droplevel('u').sum(axis=1)
 
-#cross-filter two dfs to align matrices; replace NaN values with 0 
+# Deal with any dupes (sum over s and any remaining levels).
+q = q.groupby(['i','t','j']).sum()
+
+# final_q: rows (i household, t), columns j (food item); final_fct.columns
+# are food Preferred Labels, matching the renamed j level.
+final_q = q.unstack('j')
+
+#cross-filter two dfs to align matrices; replace NaN values with 0
 list1 = final_q.columns.values.tolist()
 list2 = final_fct.columns.values.tolist()
 final_q = final_q.filter(items=list2).replace(np.nan,0)
