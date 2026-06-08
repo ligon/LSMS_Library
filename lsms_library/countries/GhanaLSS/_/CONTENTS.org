@@ -252,3 +252,33 @@ Contrary to an earlier triage (GH #350), GLSS DOES field a dwelling module:
 (earlier waves), plus =04_GHA_EXPHOUS= (housing expenditure).  The data is
 present in-repo but no =housing= feature is wired.  A future =housing=
 extractor is feasible — this is a feature gap, not an absence.
+
+* individual_education — wave coverage (2026-06-08, GH #109)
+
+=individual_education= (Educational Attainment from each round's Section 2A)
+is now wired for *5* of the 7 waves: 1998-99, *2005-06* (newly added),
+2012-13, 2016-17 — and was already absent-by-design only for the two GLSS1/2
+rounds.  Source files and label handling:
+
+| Wave    | File              | Var   | Labels                                    |
+|---------+-------------------+-------+-------------------------------------------|
+| 1998-99 | =SEC2A.DTA=       | s2aq2 | hand-decoded (no embedded value labels)   |
+| 2005-06 | =parta/sec2a.dta= | s2aq2 | embedded value labels (grade-level scheme)|
+| 2012-13 | =PARTA/SEC2a.dta= | s2aq2 | embedded value labels                     |
+| 2016-17 | =g7sec2.dta=      | s2aq2 | embedded value labels                     |
+
+Still NOT wired (genuine blockers, not feature gaps to close cheaply):
+
+- *1987-88 / 1988-89* (GLSS1/GLSS2): the education module lives in
+  =Y02A.DAT=/=Y02B.DAT= fixed-format =.DAT= files (parsed via =.DCT=
+  dictionaries), which are not in the local DVC blob cache and carry no
+  embedded value labels.  Wiring would require materializing those blobs and
+  hand-building a GLSS1/2 grade→label map from the questionnaire — but the
+  GLSS1/2 questionnaires are scanned-image PDFs with no text layer (same
+  blocker noted for =housing= above), so the codes cannot be reliably decoded.
+- *1991-92* (GLSS3): the cached =S2.DTA= blob is a cover/control file
+  (interviewer codes + interview dates), NOT the Section-2 education roster.
+  The GLSS3 person-level education module is among the ~140 un-cached blobs,
+  GLSS3 =.dta= files carry NO embedded value labels, and the correct file is
+  not identifiable from the cached set, so it is left unwired rather than
+  guessed.
