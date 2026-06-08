@@ -167,20 +167,26 @@ appear to have village-level split files (=debdemo4=, =dindemo4=,
   follow-up like Uganda's evolving table).  Sex strays (1989 codes
   0/6) -> NA via =erhs_sex=.
 - [X] Unit harmonization + kg conversion: =harmonize_unit= (single
-  Code table -- ERHS unit codes are stable across 1994+).  Metric &
-  good-invariant codes -> framework-recognized tokens (1->=kg=,
+  Code table -- ERHS unit codes are stable across 1994+).  Metric
+  codes -> framework-recognized tokens (1->=kg=,
   2->="100 kg"= so the explicit-metric parser yields 100,
-  19->=litre=, 92->=g=; 30->=Birr= currency, shared, no kg factor).
-  ALL other (local volumetric/container) units are made
-  GOOD-SPECIFIC by the =food_acquired= df_edit ("Chinet [Butter]"),
-  so the framework's existing price-ratio inference recovers a
-  per-good kg factor with NO framework change (a kg is good-
-  invariant; a Chinet is not).  Result: =food_quantities(units='kgs')=
-  ~92% converted to kg; =food_prices(units='kgvalue')= 100% non-null.
-  ERHS's own =conv_*.tab= are an optional future cross-check, not a
-  dependency.  1989 unitcode is in-data-unlabelled -> all 1989 units
-  good-specific from raw code (1989 metric units not distinguished;
-  Codeunit1.SPS in Documentation could seed this -- follow-up).
+  19->=litre=, 92->=g=; 30->=Birr= currency, no kg factor).  ALL
+  other (local volumetric/container) codes -> their unit NAME
+  (=Chinet=, =Kunna=, ...).  The =u= index carries the unit label
+  ALONE; the framework's price-ratio inference
+  (=transformations.conversion_to_kgs=) groups by item within each
+  unit and recovers a per-good kg factor with NO framework change.
+  Code 0 is the source's missing-unit sentinel -> empty label
+  (dropped, à la Uganda's =0 | ---=).  1989 unitcode is
+  in-data-unlabelled -> 1989 =u= carries the raw unit *code* (a unit
+  token, no metric distinction; Codeunit1.SPS in Documentation could
+  seed this -- follow-up).
+  *GH #347 (fixed):* an earlier version appended the food label to
+  non-metric units ("Chinet [Butter]") to coax a per-good kg factor;
+  that polluted the =u= axis with ITEM NAMES (e.g. =0 [Butter]=,
+  =5 [Teff]=).  Removed -- =u= is now a clean unit token, like every
+  other country (Uganda/Malawi/EHCVM); the framework's per-item
+  price-ratio inference recovers the factors on its own.
 - [X] =panel_ids= (GH #271, PR #273).  Script-path
   =_/panel_ids.py= -> =panel_ids.json= (4,708 edges);
   =updated_ids.json= empty (no household-split var in ERHS).
