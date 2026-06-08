@@ -18,6 +18,7 @@ Usage::
 
 from __future__ import annotations
 
+import collections.abc
 import warnings
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -847,7 +848,13 @@ def _normalize_panel_ids(country) -> list[tuple[tuple[str, str], tuple[str, str]
     the country uses.
     """
     pi = country.panel_ids
-    if not pi or not isinstance(pi, dict):
+    # ``panel_ids`` is typically a ``RecursiveDict`` (a ``UserDict`` subclass),
+    # which is NOT an instance of ``dict`` but IS a ``collections.abc.Mapping``.
+    # Guarding on ``Mapping`` (rather than ``dict``) admits both plain dicts and
+    # UserDict subclasses, consistent with the truthiness check in
+    # ``_check_has_panel_ids``. A genuinely empty/None ``panel_ids`` still
+    # short-circuits to ``[]`` via the ``not pi`` test.
+    if not pi or not isinstance(pi, collections.abc.Mapping):
         return []
     data = getattr(pi, "data", pi)
 
