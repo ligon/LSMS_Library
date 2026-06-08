@@ -229,25 +229,61 @@
 | Code | Preferred Label | hh_g03b_label |
 |------+-----------------+---------------|
 | 01 | Kilogramme |  |
+| 01a | Kilogramme |  |
+| 01b | Kilogramme |  |
+| 01c | Kilogramme |  |
+| 01d | Kilogramme |  |
+| 01e | Kilogramme |  |
+| 01f | Kilogramme |  |
 | 02 | 50 kg Bag |  |
+| 02a | 50 kg Bag |  |
+| 02b | 50 kg Bag |  |
+| 02c | 50 kg Bag |  |
+| 02d | 50 kg Bag |  |
+| 02e | 50 kg Bag |  |
+| 02f | 50 kg Bag |  |
 | 04 | Pail | PAIL |
 | 04a | Pail (Small) |  |
 | 04b | Pail (Medium) |  |
 | 04c | Pail (Large) |  |
+| 04d | Pail |  |
+| 04e | Pail |  |
+| 04f | Pail |  |
+| 05 | Pail (Large) | PAIL (LARGE) |
+| 05a | Pail (Large) |  |
+| 05b | Pail (Large) |  |
+| 05c | Pail (Large) |  |
+| 05d | Pail (Large) |  |
+| 05e | Pail (Large) |  |
+| 05f | Pail (Large) |  |
 | 06 | No 10 Plate | No 10 PLATE |
 | 06a | No.10 Plate (Flat) |  |
 | 06b | No.10 Plate (Heaped) |  |
+| 06c | No 10 Plate |  |
+| 06d | No 10 Plate |  |
+| 06e | No 10 Plate |  |
+| 06f | No 10 Plate |  |
 | 07 | No.12 Plate |  |
 | 07a | No 12 Plate | No 12 PLATE |
 | 07b | No 12 Plate | No 12 PLATE |
+| 07c | No.12 Plate |  |
+| 07d | No.12 Plate |  |
+| 07e | No.12 Plate |  |
+| 07f | No.12 Plate |  |
 | 08 | Bunch | bunch |
 | 08a | Bunch (Small) |  |
 | 08b | Bunch (Medium) |  |
 | 08c | Bunch (Large) |  |
+| 08d | Bunch |  |
+| 08e | Bunch |  |
+| 08f | Bunch |  |
 | 09 | Piece | PIECE |
 | 09a | Piece (Small) |  |
 | 09b | Piece (Medium) |  |
 | 09c | Piece (Large) |  |
+| 09d | Piece |  |
+| 09e | Piece |  |
+| 09f | Piece |  |
 | 10 | Heap | HEAP |
 | 10a | Heap (Small) | HEAP |
 | 10b | Heap (Medium) | HEAP |
@@ -258,14 +294,47 @@
 | 11 | Bale |  |
 | 14 | Ox-Cart (Unshelled) |  |
 | 15 | Litre | LITRE |
+| 15a | Litre |  |
+| 15b | Litre |  |
+| 15c | Litre |  |
+| 15d | Litre |  |
+| 15e | Litre |  |
+| 15f | Litre |  |
 | 18 | Gram | gram |
+| 18a | Gram |  |
+| 18b | Gram |  |
+| 18c | Gram |  |
+| 18d | Gram |  |
+| 18e | Gram |  |
+| 18f | Gram |  |
 | 19 | Millilitre | MILLILITRE |
+| 19a | Millilitre |  |
+| 19b | Millilitre |  |
+| 19c | Millilitre |  |
+| 19d | Millilitre |  |
+| 19e | Millilitre |  |
+| 19f | Millilitre |  |
 | 20 | Teaspoon | TEASPOON |
+| 20a | Teaspoon |  |
+| 20b | Teaspoon |  |
+| 20c | Teaspoon |  |
+| 20d | Teaspoon |  |
+| 20e | Teaspoon |  |
+| 20f | Teaspoon |  |
 | 22 | Satchet/Tube | SATCHET/TUBE |
 | 22a | Satchet/Tube (Small) | SATCHET/TUBE |
 | 22b | Satchet/Tube (Medium) | SATCHET/TUBE |
 | 22c | Satchet/Tube (Large) | SATCHET/TUBE |
+| 22d | Satchet/Tube |  |
+| 22e | Satchet/Tube |  |
+| 22f | Satchet/Tube |  |
 | 23 | Other (Specify) | OTHER (SPECIFY) |
+| 23a | Other (Specify) |  |
+| 23b | Other (Specify) |  |
+| 23c | Other (Specify) |  |
+| 23d | Other (Specify) |  |
+| 23e | Other (Specify) |  |
+| 23f | Other (Specify) |  |
 | 25 | Tina | TINA |
 | 25a | Tina | TINA |
 | 25b | Tina | TINA |
