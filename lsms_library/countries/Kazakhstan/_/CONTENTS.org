@@ -1,5 +1,20 @@
 #+TITLE: Kazakhstan — country notes & known data issues
 
+* assets — durable goods (2026-06-08, #342)
+Source: =KZ96HSG_PUF.dta= block =b37=, a WIDE durable-goods roster (16 items x
+4 attributes, one column per (item, attribute)):
+=b37_NN_1= "do you have?" (1/2), =b37_NN_2= "how many pieces?", =b37_NN_3= year
+acquired, =b37_NN_4= per-piece price.  The item label (=j=) is buried in the
+=b37_NN_1= variable label ("<item>: do you have?") — the columns themselves
+carry no usable label — so the wide block is unusable as-is; we recover the 16
+names from the variable labels and melt wide -> long.  Like =housing.py= the
+file is person-level but =b37= is constant within =rn= (household), so we
+=drop_duplicates= on =rn= first.  =Quantity= = pieces (missing-among-owned
+treated as 1, the modal value); =Value= = pieces x per-piece price.  Only items
+the household reports owning (=b37_NN_1 == 1=) are emitted.  Canonical index
+=(t, i, j)=, i = rn.  ~11k rows, 16 items, 1979 households.  Built via
+=1996/_/assets.py= (materialize: make).
+
 * Known data issues
 
 ** interview_date — not available at household level (2026-06-06)
