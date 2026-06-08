@@ -38,13 +38,21 @@ x = x.reset_index().set_index(['h','w','j','u','visit'])
 ####################
 
 labelsd = get_categorical_mapping(tablename='harmonize_food',idxvars={'Code':('Code_8h',format_id)},**{'Label':'Preferred Label'})
-unitsd = get_categorical_mapping(tablename='units')
+# GH #348: pass the value column ('Label') so the Code->Label dict is built.
+# A bare get_categorical_mapping(tablename='units') yields an EMPTY dict (no
+# value column requested -> df_data_grabber returns a column-less frame), so
+# the wave-level unit decode was silently dead and raw s8hq13 codes
+# (1/7/8/9/12/14/16/17/18/19/22/23/25) leaked into food_acquired's u.
+unitsd = get_categorical_mapping(tablename='units', Label='Label')
 
-# food quantities
+# food quantities.  s8hq13 reads as float (1.0); the units table is keyed on
+# string codes ('1'), so normalize via format_id before lookup (same pattern
+# as j above) -- otherwise every code misses the dict.  Unknown / missing
+# sentinel codes (Stata's large-number NA) map to <NA>.
 idxvars = dict(h=(['clust','nh'],lambda x: format_id(x.clust)+format_id(x.nh)),
                w=('nh',lambda x: w),
                j=('homagrcd',lambda x: labelsd[format_id(x)]),
-               u=('s8hq13',unitsd))
+               u=('s8hq13',lambda x: unitsd.get(format_id(x), pd.NA)))
 
 # Keep visits separate
 myvars = {'Price':('s8hq14',_to_numeric)}
