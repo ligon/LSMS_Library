@@ -28,9 +28,16 @@ see =slurm_logs/ehcvm_unit_codebook_2026-06-07.org=) is applied to =u= via
 =mappings: ['ehcvm_units','Code','Preferred Label']= in
 =2018/_/data_info.yml=.  Result: code leaks 25 -> 4.
 
-Residual undecoded codes (=114, 659, 660, 662=) have no label in *any*
-EHCVM source =.dta= and are left as codes pending the questionnaire unit
-nomenclature.
+Residual codes (=114, 659, 660, 662=) are *item-specific local units* --
+659 banana/plantain, 660 meat, 662 yam/cassava/plantain portions, 114
+tomato -- with the size in =s07bq03c= (Petit/Moyen/Grand).  They have no
+label in *any* EHCVM source =.dta=, and the household-questionnaire =Unites=
+sheet is the generic 1--57 scheme, NOT the data's 100--700 coding (whose
+neighbours -- 663=Agoua, 664=Kpogban -- are specific local names).  No
+available source decodes them, so they are *accepted as undecodable* and
+left as codes (consistent with Malawi's residuals, #383).  They still
+contribute valid food_expenditures and per-native-unit =unitvalue= prices;
+only the kg aggregate excludes them.
 
 * Household Presence / MonthsSpent
 
