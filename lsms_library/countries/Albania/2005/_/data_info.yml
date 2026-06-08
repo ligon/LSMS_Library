@@ -21,12 +21,18 @@ cluster_features:
         Rural: m0_ur
 
 household_roster:
+    # i=[m0_q00,m0_q01] -> composite via mapping.py:i() ('m0_q00-m0_q01') to
+    # match sample()'s household identity, so _join_v_from_sample resolves v.
+    # Bare i=m0_q01 keyed on the within-cluster household number (only ~12
+    # distinct), which collapsed the roster and broke the v-join (sample's i is
+    # the composite m0_q00-m0_q01; the within-cluster number is unique only
+    # inside a PSU).  v is NOT declared here -- the framework joins it from
+    # sample() (the 2004 / interview_date idiom).  See GH #340, CONTENTS.org.
     file:
         - ../Data/household_rosterA_cl.dta
 
     idxvars:
-        v: m0_q00
-        i: m0_q01
+        i: [m0_q00, m0_q01]
         pid: m1a_q00
 
     myvars:
