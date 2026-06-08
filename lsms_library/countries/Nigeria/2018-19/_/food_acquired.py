@@ -51,7 +51,7 @@ def extract_food(fn, varmap, t, food_labels):
 
     # Keep relevant columns
     keep = ['t', 'i', 'j', 'u', 'm',
-            'Quantity', 'Expenditure', 'Produced']
+            'Quantity', 'Expenditure', 'Produced', 'kg_factor']
     # Only keep columns that exist (some may be absent in some waves)
     keep = [c for c in keep if c in df.columns]
     df = df[keep]
@@ -72,6 +72,7 @@ harvest_vars = {
     's10bq2b': 'u',                # unit of consumption
     's10bq10': 'Expenditure',      # total value purchased
     's10bq5a': 'Produced',         # home produced quantity
+    's10bq2_cvn': 'kg_factor',     # exact Kg/L conversion factor (GH #378)
     'zone': 'm',
 }
 harvest = extract_food('../Data/sect10b_harvestw4.csv',
@@ -85,6 +86,7 @@ planting_vars = {
     's7bq2b': 'u',
     's7bq10': 'Expenditure',
     's7bq5a': 'Produced',
+    's7bq2_cvn': 'kg_factor',      # exact Kg/L conversion factor (GH #378)
     'zone': 'm',
 }
 planting = extract_food('../Data/sect7b_plantingw4.csv',

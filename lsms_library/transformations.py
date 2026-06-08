@@ -113,11 +113,22 @@ def food_acquired_to_canonical(df: pd.DataFrame, drop_columns=('visit',)) -> pd.
     has_v = 'v' in work.columns
     base_levels = ['t', 'v', 'i', 'j', 'u'] if has_v else ['t', 'i', 'j', 'u']
 
+    # Optional exact per-row kg factor (e.g. Nigeria's s10bq2_cvn, GH #378):
+    # one factor per input row, applied to whichever source quantity this is,
+    # producing a *summable* per-source Quantity_kg.  Valid here because the
+    # melt is pre-collapse (one row, one factor); the lossy step would be
+    # summing a factor, which we never do.  The factor itself is not carried
+    # past the melt -- only the resulting Quantity_kg.
+    kg_factor = (pd.to_numeric(work['kg_factor'], errors='coerce').values
+                 if 'kg_factor' in work.columns else None)
+
     def _row_dict(source, qty, expenditure):
         d = {lvl: work[lvl].values for lvl in base_levels}
         d['s'] = source
         d['Quantity'] = qty
         d['Expenditure'] = expenditure
+        if kg_factor is not None:
+            d['Quantity_kg'] = qty * kg_factor
         return d
 
     purchased = pd.DataFrame(_row_dict('purchased',
@@ -198,6 +209,11 @@ def _finalize_canonical_food_acquired(out: pd.DataFrame,
         if 'Price' in out.columns:
             # Price is per-unit, so it averages (not sums) across dup rows.
             aggs['Price'] = ('Price', 'mean')
+        if 'Quantity_kg' in out.columns:
+            # Exact per-row kg (GH #378) is a *quantity*, so it sums like
+            # Quantity -- this is what lets different-size rows of one
+            # (item, unit) collapse without losing the exact kg total.
+            aggs['Quantity_kg'] = ('Quantity_kg', lambda s: s.sum(min_count=1))
         out = out.groupby(levels, dropna=False).agg(**aggs)
     else:
         out = out.set_index(levels)
@@ -881,14 +897,27 @@ def _get_kg_factors(df, *, volume_as_mass=True):
 
 def _apply_kg_conversion(df, factors):
     """Convert Quantity to kg using the factors dict.
-    Returns a copy with a 'Quantity_kg' column added."""
+    Returns a copy with a 'Quantity_kg' column added.
+
+    An *exact, survey-provided* per-row ``Quantity_kg`` (e.g. Nigeria's
+    ``s10bq2_cvn``, GH #378 / DESIGN_per_row_kg_quantity) takes precedence
+    where it is present and non-null; the unit→factor map only fills the
+    rows that lack it.  Carried as a summable quantity (not a factor) because
+    the canonical index has no size level -- see the design doc."""
     v = df.copy()
     if 'u' in v.index.names:
         units = v.index.get_level_values('u').astype(str).str.lower()
     else:
         return v
 
-    v['Quantity_kg'] = v['Quantity'] * units.map(factors)
+    factor_kg = v['Quantity'] * units.map(factors)
+    if 'Quantity_kg' in v.columns:
+        # Precomputed exact kg wins; fall back to the factor estimate only
+        # where the survey didn't supply one.
+        v['Quantity_kg'] = v['Quantity_kg'].where(v['Quantity_kg'].notna(),
+                                                   factor_kg)
+    else:
+        v['Quantity_kg'] = factor_kg
     return v
 
 
