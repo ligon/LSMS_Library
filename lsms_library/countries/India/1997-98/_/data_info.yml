@@ -75,10 +75,15 @@ housing:
       Toilet: v03b09
 
 employment:
+  # i=hhcode matches sample().i (HHLIST.DTA uses i:hhcode), so
+  # _join_v_from_sample resolves v.  The old i:hh was the within-village
+  # household number, which did not match sample()'s i:hhcode and broke the
+  # v-join (sibling of the household_roster defect fixed in GH #324).  v is
+  # NOT declared here -- the framework joins it from sample().
   file:
       - ../Data/SECT02AD.DTA
   idxvars:
-      i: hh
+      i: hhcode
       pid: idcode
   myvars:
       Cash_per_day: v02b02

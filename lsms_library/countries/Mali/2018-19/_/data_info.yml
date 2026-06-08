@@ -204,13 +204,17 @@ individual_education:
     file: ehcvm_individu_mli2018.dta
     idxvars:
         v: grappe
-        i: 
+        i:
             - grappe
             - menage
-        pid:
-            - grappe
-            - menage 
-            - numind
+        # 2018-19 uses a SCALAR within-household member number for pid, to
+        # match this wave's household_roster (which keys pid off the scalar
+        # s01q00a; numind == s01q00a here -- verified 46,014/46,014 key
+        # overlap).  The 3-column composite list [grappe, menage, numind]
+        # made Mali's pid() formatter build a "grappe0menage0numind"
+        # composite that the roster's scalar pid never matched (0% overlap;
+        # sibling of the Mali 2021-22 defect fixed in GH #322).
+        pid: numind
     myvars:
         Educational Attainment: 'educ_hi'
 
