@@ -22,7 +22,7 @@ The returned DataFrame prepends a `country` index level.
 
 ## Task-Specific Skills (read these on demand)
 
-- `.claude/skills/add-feature/SKILL.md` — adding a new table to a country. Has sub-skills for `sample`, `food-acquired`, `shocks`, `assets`, `panel-ids`, and `pp-ph` (post-planting/post-harvest countries — Nigeria, Ethiopia, GhanaSPS).
+- `.claude/skills/add-feature/SKILL.md` — adding a new table to a country. Has sub-skills for `sample`, `food-acquired` (and its nested `food-acquired/units` — decoding/cleaning the unit `u` label: leak audit, decode toolkit, and the silent-failure gotchas), `shocks`, `assets`, `panel-ids`, and `pp-ph` (post-planting/post-harvest countries — Nigeria, Ethiopia, GhanaSPS).
 - `.claude/skills/multi-round-waves.md` — Tanzania `2008-15/` multi-round folder pattern and `wave_folder_map`.
 - `.claude/skills/tanzania-panel-design.md` — NPS sub-panel split (extended vs. refresh).
 - `.claude/skills/demand-estimation.md` — running CFE demands via the Country API.
