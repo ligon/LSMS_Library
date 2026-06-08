@@ -308,6 +308,15 @@ def plot_features_for_wave(t, source, colmap):
     use_gps = (gps_flag == 1) & area_gps.notna()
     area_ha = area_gps.where(use_gps, area_ha)
 
+    # Plausibility clamp (GH #327): raw EHCVM s16a parcel areas carry
+    # data-entry outliers many orders of magnitude too large against sane
+    # medians of ~1 ha.  NaN out anything outside the plausible agronomic
+    # range — above 1000 ha (a single smallholder parcel above this is an
+    # error) or non-positive (zero / negative ha is impossible).  Rows are
+    # kept; only the Area value is dropped.  The AreaUnit line below already
+    # clears the unit wherever Area becomes NA.
+    area_ha = area_ha.where(((area_ha > 0) & (area_ha <= 1000)) | area_ha.isna(), pd.NA)
+
     area_unit = pd.Series(['hectares'] * len(src), index=src.index, dtype='string')
     area_unit = area_unit.where(area_ha.notna(), pd.NA)
 
