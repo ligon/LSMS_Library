@@ -1,0 +1,114 @@
+#+title: Design: per-row exact kg quantity (=Quantity_kg=) for food_acquired
+#+date: <2026-06-07 Sun>
+
+Resolves GH #378 (Nigeria =s10bq2_cvn=) and unifies it with Malawi's
+build-time kg conversion onto one summable mechanism.
+
+* Motivation
+
+=food_quantities(units='kgs')= converts each =food_acquired= row's native
+=Quantity= to kilograms.  Today that conversion is a *per-unit* factor map
+built by =_get_kg_factors= (=KNOWN_METRIC= + explicit-metric label parse +
+price-ratio inference) and applied in =_apply_kg_conversion= as
+=Quantity_kg = Quantity * units.map(factors)=.
+
+Two surveys carry an *exact, survey-provided* per-row conversion that beats
+the inference:
+
+- *Nigeria* GHS W3/W4: =s10bq2_cvn= / =s7bq2_cvn= -- "Kg/L conversion factor
+  for consumption quantity", per (household, item, unit, size), ~99.6%
+  coverage (GH #378).
+- *Malawi* IHS/IHPS: a per-(item, region, unit_code) factor from
+  =ihs_foodconversion_factor= (and inline "300 grams"-style parsing),
+  already used -- but *build-time*: =handling_unusual_units= multiplies
+  =Quantity *= cfactor= and tags =u='kg'= before the canonical reshape,
+  which discards the native unit label for every converted row.
+
+* The size-collapse problem (why a per-row *factor* column won't do)
+
+The exact factor varies by *size* within a single =(item, unit)=.  Measured
+in Nigeria W4: unit code 200 (item 25) has =cvn= = 0.38 / 0.575 / 0.78 for
+three sizes (=s10bq2c=).  But the canonical =food_acquired= index is
+=(t, v, i, j, u, s)= --- *size is not a level*.  So
+=_finalize_canonical_food_acquired= *sums* different-size rows of the same
+=(item, unit)= into one row.
+
+Consequently a per-row =kg_factor= carried as a column cannot survive that
+sum: averaging factors across sizes is lossy.  The exact kg total requires
+multiplying =Quantity * cvn= *per row, before the collapse*, and then
+summing a precomputed *=Quantity_kg=*.  =Quantity_kg= is additive; a factor
+is not.
+
+This is exactly why Malawi converts build-time (it multiplies before the
+collapse) --- but it pays for it by replacing the native =u= with the =kg=
+sentinel.
+
+* Design
+
+Carry a summable, optional *=Quantity_kg=* column through the canonical
+pipeline; keep the native =Quantity= and =u= intact.
+
+** D1.  Wave/country build computes per-row Quantity_kg
+For each acquisition-source quantity (purchased / produced / inkind) that
+shares the converted unit, the wave script computes
+=Quantity_kg = Quantity * <per-row factor>= *before* any grouping.  The
+factor source is country-specific (Nigeria: the =*_cvn= column; Malawi: the
+=cfactor_{source}= merge).  Native =Quantity= and =u= are left untouched.
+
+** D2.  Canonical melt carries Quantity_kg (additive)
+=transformations.food_acquired_to_canonical= (and Malawi's bespoke
+=malawi.food_acquired_to_canonical=) thread =Quantity_kg= through the
+per-source row builder when the column is present.  Purchased
+=Quantity_kg = (Total_kg - Produced_kg)= mirrors the native
+=(Total - Produced)= split.
+
+** D3.  Finalize sums Quantity_kg
+=_finalize_canonical_food_acquired= sums =Quantity_kg= with the same
+=min_count=1= rule as =Quantity= / =Expenditure=.  Different-size rows of
+one =(item, unit)= now collapse to (summed native =Quantity=, summed exact
+=Quantity_kg=) --- the native count and the exact kg both survive.
+
+** D4.  food_quantities prefers Quantity_kg
+=_apply_kg_conversion= / =food_quantities_from_acquired=: where a row has a
+non-null =Quantity_kg=, use it for the =kgs= basis (and tag =u='kg'= in the
+output as today); otherwise fall back to the existing
+=Quantity * units.map(factors)= path.  =units= mode and =unitvalue=/=kgvalue=
+prices continue to read native =Quantity= / =u= unchanged.
+
+** D5.  Schema
+=Quantity_kg= is an *optional* food_acquired column (like =Price=).  Schema
+validation must permit but not require it; only Nigeria and Malawi emit it.
+
+* Backward compatibility / blast radius
+- All changes are guarded by =Quantity_kg= presence.  Countries that don't
+  emit it (38 of 40) flow through the unchanged factor path -- *byte
+  identical*.
+- Malawi's food_quantities(kgs) result must stay *identical* after migration
+  (native =Quantity= x per-row factor == the old pre-converted kg); this is
+  the migration's acceptance gate.  What changes for Malawi is that
+  =food_acquired= regains native =Quantity= + native =u= (and =unitvalue=
+  becomes per-native-unit), with =Quantity_kg= carrying the exact kg.
+
+* Acceptance criteria
+- Nigeria =food_quantities(units='kgs')= uses =cvn= exactly (spot-checked
+  vs the raw =Quantity * s10bq2_cvn=); kg-resolution >= the prior 99.8%.
+- Malawi =food_quantities(units='kgs')= byte-identical pre/post migration;
+  Malawi =food_acquired= =u= no longer collapsed to =kg= for converted rows
+  (native labels restored); =food_quantities(units='units')= shows native.
+- A non-Nigeria, non-Malawi country's =food_quantities= unchanged.
+- =test_schema_consistency= / =test_food_labels= green; new unit tests for
+  the =Quantity_kg= melt-carry + =_apply_kg_conversion= preference.
+
+* Sequencing
+1. (this doc).
+2. *GH #378*: framework =Quantity_kg= carry (D2--D5, additive) + Nigeria
+   wave scripts emit =Quantity_kg= from =*_cvn=.  Other countries unaffected.
+3. *Malawi migration*: =handling_unusual_units= emits =Quantity_kg= and
+   keeps native =Quantity= / =u= instead of converting in place; verify the
+   food_quantities-identical gate.
+
+* References
+- GH #378 (Nigeria =s10bq2_cvn=), #375 (Nigeria unit-label decode),
+  #383 (Malawi code-table), #169 / =DESIGN_food_acquired_canonical_2026-05-05.org=
+  (canonical schema), =DESIGN_food_prices_units_kwarg_2026-05-06.org=
+  (=units=/=kgvalue=/=unitvalue= modes).
