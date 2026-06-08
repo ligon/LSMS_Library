@@ -70,7 +70,16 @@ def Age(value):
     'Ne sait pas' ('don't know') is the sentinel for unknown month; it maps to
     None so age_handler falls back to year-only age computation.
     Returns a list [s01q04a, s01q03a(day), s01q03b(month int), s01q03c(year)].
+
+    The function name ``Age`` collides with the ``assets`` myvar
+    ``Age: s12q07`` (item age in years), which the framework binds to
+    this formatter by name (column_mapping in country.py).  That path
+    passes a *scalar*, not the roster's DOB Series; pass scalars
+    through unchanged so assets extraction does not crash on
+    ``list(<float>)`` (closes #321).
     '''
+    if not isinstance(value, pd.Series):
+        return value
     month_map = {'Janvier': 1, 'Février': 2, 'Mars': 3, 'Avril': 4, 'Mai': 5,
                  'Juin': 6, 'Juillet': 7, 'Août': 8, 'Septembre': 9,
                  'Octobre': 10, 'Novembre': 11, 'Décembre': 12}

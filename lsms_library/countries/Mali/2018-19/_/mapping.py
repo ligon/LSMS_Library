@@ -49,7 +49,16 @@ def Age(value):
     Pass Age list [s01q04a, s01q03a, s01q03b, s01q03c] through unchanged.
     s01q03b is integer month (1-12); 9999 sentinels handled by age_handler.
     Override country-level mali.py Age() which expects a scalar.
+
+    The function name ``Age`` also collides with the ``assets`` myvar
+    ``Age: s12q07`` (item age in years), which the framework binds to
+    this formatter by name (column_mapping in country.py).  That path
+    passes a *scalar*, not the roster's DOB Series; pass scalars
+    through unchanged so assets extraction does not crash on
+    ``list(<float>)`` (closes #321).
     '''
+    if not isinstance(value, pd.Series):
+        return value
     return list(value)
 
 

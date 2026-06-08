@@ -69,7 +69,16 @@ def Age(value):
     '''
     Pass through Age list; numeric coercion of "." sentinels is done in
     household_roster() before age_handler is called.
+
+    The function name ``Age`` collides with the ``assets`` myvar
+    ``Age: s12q07`` (item age in years), which the framework binds to
+    this formatter by name (column_mapping in country.py).  That path
+    passes a *scalar*, not the roster's DOB Series; pass scalars
+    through unchanged so assets extraction does not crash on
+    ``list(<float>)`` (closes #321).
     '''
+    if not isinstance(value, pd.Series):
+        return value
     return list(value)
 
 
