@@ -36,33 +36,90 @@ def _clean_freetext_unit(value):
     """Tidy a respondent other-specify unit string (GH #223 Layer 2).
 
     These are free text like ``'1 BASKET'``, ``'1 NSIMA PLATE (PHAZI)'``,
-    ``'1/4'``.  Strip a *leading quantity* (``'1 BASKET'`` -> ``'Basket'``)
-    so the residual is a unit name with a chance of matching; title-case for
-    consistency; a bare quantity with no unit (``'1/4'``, ``'0.5'``) -> NA.
-    Only ever applied to the genuine other-specify column, never to standard
-    or sized labels (``'50 Kg Bag'``), so no legitimate size is dropped.
+    ``'1/4'``.  Drop ONLY a leading count of *one* (``'1 BASKET'`` ->
+    ``'Basket'``) and title-case; a bare quantity with no unit (``'1/4'``,
+    ``'0.5'``, ``'0'``) -> NA.
+
+    Deliberately conservative on the leading number: a count of one is a
+    safe no-op multiplier, but a *larger* leading number may be a magnitude
+    that defines the unit's kg-equivalence (``'10Kgs'``, ``'10G Packet'``,
+    ``'10 Litre Bucket'``).  Stripping or relabelling those would corrupt the
+    kg quantity by an order of magnitude, so they are left untouched (their
+    kg conversion, where known, is handled separately by the conversion
+    factor; the residual ``u`` label simply stays as-is).  Only ever applied
+    to the genuine other-specify column, never to standard/sized labels.
     """
     if pd.isna(value):
         return value
     s = str(value).strip()
     if s.lower() in ('nan', ''):
         return pd.NA
-    # Pure quantity + metric magnitude ('10Kgs', '149G', '5 kg') -> that unit.
-    _MAG = {'kg': 'Kg', 'kgs': 'Kg', 'kilogram': 'Kg', 'kilograms': 'Kg',
-            'g': 'Gram', 'gram': 'Gram', 'grams': 'Gram',
-            'ml': 'Millilitre', 'mls': 'Millilitre',
-            'millilitre': 'Millilitre', 'millilitres': 'Millilitre',
-            'l': 'Litre', 'ls': 'Litre', 'litre': 'Litre', 'litres': 'Litre'}
-    m = re.fullmatch(r'\d+(?:[.,/]\d+)?\s*([a-z]+)', s, flags=re.I)
-    if m and m.group(1).lower() in _MAG:
-        return _MAG[m.group(1).lower()]
-    # Otherwise strip a leading "N " (with an optional metric magnitude before
-    # the space, so '10G Packet'/'10Kg Pail' -> 'Packet'/'Pail').
-    s = re.sub(r'^\s*\d+(?:[.,/]\d+)?\s*(?:kgs?|g|mls?|l|litres?)?\s+', '',
-               s, flags=re.I).strip()
-    if (not s) or re.fullmatch(r'[\d.,/]+', s):           # bare quantity, no unit
+    if re.fullmatch(r'[\d.,/]+', s):          # bare quantity, no unit -> NA
+        return pd.NA
+    # Drop a leading count of one only ('1 Basket' -> 'Basket').  Never a
+    # larger leading number -- it may be a magnitude (see docstring).
+    s = re.sub(r'^\s*1\s+', '', s).strip()
+    if (not s) or re.fullmatch(r'[\d.,/]+', s):
         return pd.NA
     return s.title()
+
+
+_METRIC_KG = {  # unit token -> kg per 1 of that unit (volume at water density 1)
+    'kg': 1.0, 'kgs': 1.0, 'kilo': 1.0, 'kilos': 1.0,
+    'kilogram': 1.0, 'kilograms': 1.0, 'kilogramme': 1.0, 'kilogrammes': 1.0,
+    'g': 0.001, 'gram': 0.001, 'grams': 0.001, 'gramme': 0.001, 'grammes': 0.001,
+    'ml': 0.001, 'mls': 0.001, 'millilitre': 0.001, 'millilitres': 0.001,
+    'millitre': 0.001, 'milimitre': 0.001, 'milimiter': 0.001, 'millimeter': 0.001,
+    'l': 1.0, 'ls': 1.0, 'litre': 1.0, 'litres': 1.0, 'liter': 1.0, 'liters': 1.0,
+}
+
+# Known container nouns that may trail a metric magnitude.  A glued/spaced
+# "<num><metric-unit><container>" converts ONLY when the trailing word is one
+# of these -- so '90Kgbag'/'10G Packet' convert but '10Giraffes' does not.
+_CONTAINERS = {
+    'packet', 'packets', 'bag', 'bags', 'tin', 'tins', 'bottle', 'bottles',
+    'sachet', 'sachets', 'satchet', 'satchets', 'pail', 'pails',
+    'plate', 'plates', 'cup', 'cups', 'tube', 'tubes', 'can', 'cans',
+    'crate', 'crates', 'pack', 'packs', 'bucket', 'buckets', 'carton', 'cartons',
+    'pale', 'pales', 'container', 'containers', 'paint', 'jar', 'jars',
+}
+
+
+def _metric_kg_factor(value):
+    """kg-equivalent of a unit string that *leads* with a metric magnitude.
+
+    Table-driven (``_METRIC_KG`` units x ``_CONTAINERS``): a leading
+    ``<number><metric-unit>`` -- optionally followed by a known container,
+    spaced or glued -- converts to its kg weight by scaling the quantity
+    (GH #223 Layer 2), so '50 kg bag' and '90Kgbag' both -> 50 / 90 kg, and
+    '10G Packet'/'10Gpacket' -> 0.01.  litres/ml use water density 1.
+
+    The trailing word, if any, MUST be a known container, so a number glued
+    to a non-container word ('10Giraffes', '5Lions', '1Mlambe') returns None
+    and is left as-is rather than being scaled by a spurious metric prefix.
+    """
+    if pd.isna(value):
+        return None
+    m = re.match(r'\s*(\d+(?:[.,]\d+)?)\s*([a-z].*)$', str(value).strip().lower())
+    if not m:
+        return None
+    num = float(m.group(1).replace(',', '.'))
+    rest = m.group(2).strip()
+    for unit in sorted(_METRIC_KG, key=len, reverse=True):
+        if rest == unit:
+            return num * _METRIC_KG[unit]
+        if rest.startswith(unit):
+            tail = rest[len(unit):].strip(' .,-')
+            if tail == '':
+                return num * _METRIC_KG[unit]
+            # Convert when the magnitude is followed by a known container
+            # (first word, so 'bottle super' / 'bucket(chigoba)' count) or by
+            # an 'of <item>' descriptor ('25Gram Of Uchi').  A non-container,
+            # non-'of' word ('10Giraffes' -> 'iraffes') is rejected.
+            first = re.split(r'[\s(),.]+', tail, maxsplit=1)[0]
+            if first in _CONTAINERS or first == 'of':
+                return num * _METRIC_KG[unit]
+    return None
 
 
 def _titlecase_label(value):
@@ -321,6 +378,22 @@ def food_acquired_to_canonical(df, wave):
     # Swap legacy Malawi (j=HHID, i=item) to canonical (i=HHID, j=item).
     work = work.rename(columns={'j': '_i_canon', 'i': '_j_canon'})
     work = work.rename(columns={'_i_canon': 'i', '_j_canon': 'j'})
+
+    # Convert any *pure metric* unit string ('10Kgs', '149G', '250 Ml') to the
+    # 'kg' sentinel by scaling its quantity (GH #223 Layer 2).  '10Kgs' is
+    # 10 kg -- relabelling it 'Kg' without scaling would be off by 10x, so we
+    # scale instead.  Non-metric / container strings ('Basket', '10G Packet')
+    # are left untouched.  Applies across every wave at this single choke point.
+    for ucol, qcol in [('u_bought', 'quantity_bought'),
+                       ('u_produced', 'quantity_produced'),
+                       ('u_gifted', 'quantity_gifted')]:
+        if ucol in work.columns and qcol in work.columns:
+            factor = work[ucol].map(_metric_kg_factor)
+            mask = factor.notna()
+            if mask.any():
+                q = pd.to_numeric(work[qcol], errors='coerce')
+                work.loc[mask, qcol] = q[mask] * factor[mask].astype(float)
+                work.loc[mask, ucol] = 'kg'
 
     def _make(source_label, quant_col, unit_col, value_col=None):
         if quant_col not in work.columns:
