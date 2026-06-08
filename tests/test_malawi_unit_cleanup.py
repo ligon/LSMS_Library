@@ -91,6 +91,24 @@ def test_metric_kg_factor_scales_not_relabels():
     assert mf(pd.NA) is None
 
 
+def test_norm_unit_code_canonicalizes_pad_and_case():
+    nc = _load_mod()._norm_unit_code
+    # zero-pad numeric to 2 + lowercase suffix -> table's canonical form
+    assert nc("1") == "01"
+    assert nc("4A") == "04a"
+    assert nc("10A") == "10a"
+    assert nc("04A") == "04a"
+    assert nc("01") == "01"
+    assert nc("10") == "10"
+    assert nc("101") == "101"     # 3-digit stays
+    # non-codes pass through untouched
+    assert nc("kg") == "kg"
+    assert nc("Heap") == "Heap"
+    assert nc("10Kgs") == "10Kgs"  # multi-letter -> not a code
+    import pandas as _pd
+    assert nc(_pd.NA) is _pd.NA
+
+
 def test_metric_factor_rejects_glued_nonmetric_words():
     # The greedy letter-run guard: a number glued to a NON-metric word must
     # not match a metric prefix ('10Giraffes' is not 10 g!).  '5Lions' must
