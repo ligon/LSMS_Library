@@ -23,28 +23,19 @@ import lsms_library.local_tools as tools
 waves = ['1989', '1994a', '1994b', '1995', '1997']
 
 
-# Units whose kg-equivalent is good-INvariant (a kg is a kg whatever
-# the food).  Mapped via harmonize_unit to framework-recognized tokens
-# ('kg', '100 kg' for quintal -> explicit-metric parser yields 100,
-# 'litre', 'g'); 'birr' is currency (shared, no kg factor by design).
-# Every OTHER unit is a local volumetric/container measure whose kg
-# value depends on the good, so food_acquired() appends the food label
-# ("Chinet [Butter]") -- making each (unit, good) its own token so the
-# framework price-ratio inference recovers a per-good kg factor with
-# no framework change.
-_SHARED_UNITS = {'kg', '100 kg', 'litre', 'g', 'birr'}
-
-
-def _good_specific_units(u, j):
-    """Append the food label to non-shared (local) units, vectorized.
-
-    `u`, `j` are string Series.  Shared/metric units (``_SHARED_UNITS``)
-    pass through unchanged; everything else becomes ``"<unit> [<food>]"``.
-    """
-    u = u.astype('string').str.strip()
-    j = j.astype('string').str.strip()
-    local = ~u.str.lower().isin(_SHARED_UNITS)
-    return u.where(~local, u + ' [' + j + ']')
+# Unit handling (GH #347).  ``u`` carries the harmonized unit label
+# ALONE -- the ``harmonize_unit`` Preferred Label for the 1994+ waves
+# (1->kg, 2->"100 kg", 3->Chinet, 19->litre, 30->Birr, ...) and the
+# raw in-data unit *code* for 1989 (an unlabelled scheme; still a unit
+# token, not a food label).  An EARLIER design appended the food label
+# to non-metric units ("Chinet [Butter]") to coax the framework's
+# price-ratio kg inference into a per-good factor; that polluted the
+# unit axis with ITEM NAMES (e.g. '0 [Butter]', '5 [Teff]') and is the
+# bug reported in #347.  Removed: ``u`` is now a clean unit token, as
+# in every other country (Uganda/Malawi/EHCVM).  The framework's
+# price-ratio inference (transformations.conversion_to_kgs) already
+# groups by item ``i`` within each unit, so a single unit label per
+# good still recovers sensible factors with no per-good tagging.
 
 
 def _norm_village(v):
@@ -123,11 +114,12 @@ def food_acquired(df):
                 flat = flat[flat[k].notna() & (flat[k].astype('string')
                                                .str.strip() != '')]
         # 1989 unitcode is an in-data-unlabelled scheme (harmonize_unit
-        # not applied) -> none match _SHARED_UNITS, so every 1989 unit
-        # becomes good-specific.  1989 metric units are therefore not
-        # distinguished (documented; would need Codeunit1.SPS).
-        if 'u' in flat.columns and 'j' in flat.columns:
-            flat['u'] = _good_specific_units(flat['u'], flat['j'])
+        # not applied), so ``u`` carries the raw unit *code* here -- a
+        # unit token on the unit axis, NOT a food label (#347).  1989
+        # metric units are therefore not distinguished (documented;
+        # would need Codeunit1.SPS).
+        if 'u' in flat.columns:
+            flat['u'] = flat['u'].astype('string').str.strip()
         return flat.set_index(idx)
 
     w = df.reset_index()
@@ -153,12 +145,14 @@ def food_acquired(df):
     # Drop rows with no household id (i is pd.NA when the HH-number
     # key was missing in the source -- see `i` above) and rows with
     # no unit (a unit is required to place the quantity on the u axis).
+    # ``u`` is the harmonize_unit Preferred Label (e.g. 'kg', 'Chinet',
+    # 'Birr'); the source missing-unit sentinel 0 maps to '' via
+    # harmonize_unit (#347) and is dropped here.  Each row's ``u`` is a
+    # clean unit token -- no food label appended (the framework's
+    # price-ratio inference recovers per-good factors on its own).
+    out['u'] = out['u'].astype('string').str.strip()
     out = out[out['i'].notna()]
     out = out[out['u'].notna() & (out['u'] != '')]
-    # Non-metric (local) units -> good-specific so the framework's
-    # price-ratio inference recovers a per-good kg factor; metric units
-    # stay shared (good-invariant).
-    out['u'] = _good_specific_units(out['u'], out['j'])
     out = out.set_index(['i', 'j', 'u', 's'])
     return out
 

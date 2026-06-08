@@ -313,20 +313,25 @@ labels='Aggregate' for the coarse grouping.
 Unit code -> canonical label.  The ERHS unit code scheme is
 STABLE across the 1994+ waves (only spelling drifts), so a single
 Code column suffices (cf. harmonize_food which needed per-wave
-columns).  Metric & good-invariant codes map to framework-
-recognized tokens (1->kg, 2->"100 kg" so the explicit-metric
-parser yields 100, 19->litre, 92->g) and 30->Birr (currency:
-shared, intentionally no kg factor).  ALL OTHER units are local
-volumetric/containers whose kg-equivalent is good-specific; the
-food_acquired df_edit appends the food label (e.g. "Chinet/Butter")
-so the framework price-ratio inference recovers a per-good factor
-(metric units stay shared -- a kg is good-invariant).  1989
-unitcode is a different, in-data-unlabelled scheme -> 1989 units
-stay raw+good-specific (no metric distinction) pending Codeunit1.SPS.
+columns).  Metric codes map to framework-recognized tokens
+(1->kg, 2->"100 kg" so the explicit-metric parser yields 100,
+19->litre, 92->g) and 30->Birr (currency: intentionally no kg
+factor).  ALL OTHER codes map to their local volumetric/container
+unit NAME (Chinet, Kunna, ...).  The ``u`` index carries this unit
+label ALONE -- NOT a food label (GH #347).  The framework's
+price-ratio kg inference (transformations.conversion_to_kgs) groups
+by item within each unit, so it recovers a per-good kg factor for
+these local units with no food-label tagging.  Code 0 is the
+source's missing-unit sentinel -> empty label (dropped downstream,
+à la Uganda's ``0 | ---``).  1989 unitcode is a different,
+in-data-unlabelled scheme not mapped through this table -> 1989
+``u`` carries the raw unit code (still a unit token, no metric
+distinction) pending Codeunit1.SPS.
 
 #+NAME: harmonize_unit
 | Code | Preferred Label |
 |------+-----------------|
+| 0 |  |
 | 1 | kg |
 | 2 | 100 kg |
 | 3 | Chinet |
