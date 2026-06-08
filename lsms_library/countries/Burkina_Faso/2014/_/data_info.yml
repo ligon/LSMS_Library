@@ -35,6 +35,21 @@ household_roster:
         Relationship: B5
         MonthsSpent: B3A
 
+individual_education:
+    # 2014 EMC: highest formal-education level attained is B14 ("Quel est le
+    # degré de l'enseignement formel le plus élevé que [NOM] a suivi"), the
+    # EMC analog of the EHCVM waves' educ_hi.  Read from the same person-level
+    # file as the roster, so (i, pid) align with household_roster by
+    # construction: i = country i([zd, menage]), pid = numind (scalar).
+    file: emc2014_p1_individu_27022015.dta
+    idxvars:
+        i:
+            - zd
+            - menage
+        pid: numind
+    myvars:
+        Educational Attainment: B14
+
 cluster_features:
     dfs:
         - df_main

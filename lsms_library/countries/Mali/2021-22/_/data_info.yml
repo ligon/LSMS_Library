@@ -193,13 +193,18 @@ individual_education:
     file: ehcvm_individu_mli2021.dta
     idxvars:
         v: grappe
-        i: 
+        i:
             - grappe
             - menage
-        pid:
-            - grappe
-            - menage 
-            - numind
+        # 2021-22 uses a SCALAR within-household member number for pid, to
+        # match this wave's household_roster (which keys pid off the scalar
+        # membres__id; numind == membres__id here -- verified 43,472/43,472
+        # key overlap).  The wave-level pid() override in mapping.py also
+        # expects a scalar (format_id(value)); passing the 3-column composite
+        # list [grappe, menage, numind] made df_data_grabber apply pid()
+        # row-wise to a Series and raise "The truth value of a Series is
+        # ambiguous" (GH #322).
+        pid: numind
     myvars:
         Educational Attainment: 'educ_hi'
 
