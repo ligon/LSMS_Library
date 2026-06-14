@@ -50,6 +50,257 @@ PP_QUARTER = {
     '2023-24': '2023Q3',
 }
 
+# Post-harvest quarter assigned as the single `t` for each wave's
+# crop_production.  Crop-level harvest is recorded only in the
+# post-harvest round (the secta3* files), so each wave contributes
+# exactly one t value -- the PH quarter -- distinct from the PP quarter
+# used by plot_features (same survey wave, different round).  plot_id
+# values still align across the two rounds (both format_id(plotid)).
+PH_QUARTER = {
+    '2010-11': '2011Q1',
+    '2012-13': '2013Q1',
+    '2015-16': '2016Q1',
+    '2018-19': '2019Q1',
+    '2023-24': '2024Q1',
+}
+
+
+# ---------------------------------------------------------------------
+# crop_production (GAP 1) -- item-level reported crop harvest
+# ---------------------------------------------------------------------
+#
+# Natural grain (t, i, plot, crop): one row per crop grown on a plot in
+# the post-harvest crop module (secta3*).  Stores REPORTED item-level
+# fields only -- Quantity (native harvest qty) + u (native unit),
+# Quantity_sold + Value_sold (reported), planting_month + harvest_month
+# (item dates), intercropped + perennial flags.  No kg conversion, no
+# yield, no main_crop, no shares -- those are transformations.
+#
+# crop labels (j): cropcode -> Preferred Label via harmonize_food
+# (extended with the crop codes; reused food labels where a crop is a
+# consumed food so crop_production.j joins food_acquired.j).
+# units (u): native production-unit label normalized to a base
+# Preferred Label registered in the `u` table.
+
+
+def _crop_labels():
+    """{int cropcode: Preferred Label} from harmonize_food (shared with
+    food_acquired)."""
+    from lsms_library.local_tools import get_categorical_mapping
+    raw = get_categorical_mapping(tablename='harmonize_food', idxvars='Code',
+                                  **{'Preferred Label': 'Preferred Label'})
+    out = {}
+    for k, v in raw.items():
+        try:
+            ik = int(k)
+        except (TypeError, ValueError):
+            continue
+        if pd.isna(v) or str(v).strip() in ('', '---'):
+            continue
+        out[ik] = str(v).strip()
+    return out
+
+
+def _strip_code_prefix(s):
+    """'1080. MAIZE' -> 'MAIZE'; '130. SACK/BAG' -> 'SACK/BAG'."""
+    import re
+    s = str(s).strip()
+    m = re.match(r'^\s*\d+\.\s*(.*)$', s)
+    return (m.group(1) if m else s).strip()
+
+
+def _canon_unit(s):
+    """Normalize a native harvest production-unit label to a size-agnostic
+    base Preferred Label registered in the `u` table.  Returns pd.NA for
+    blanks / pure-numeric junk."""
+    import re
+    if s is None or (isinstance(s, float) and pd.isna(s)):
+        return pd.NA
+    t = _strip_code_prefix(s)
+    if t == '' or re.fullmatch(r'[\d.]+', t):
+        return pd.NA
+    tl = t.lower()
+    if 'kilogram' in tl or tl == 'kg' or tl == 'kilograms':
+        return 'Kg'
+    if 'gram' in tl or tl == 'grams':
+        return 'g'
+    if 'centilitre' in tl or tl == 'cl':
+        return 'cl'
+    if 'litre' in tl or tl == 'litres' or tl == 'l':
+        return 'l'
+    if 'bag' in tl or 'sack' in tl:
+        return 'Sack/Bag'
+    if 'basket' in tl or 'bin/basket' in tl:
+        return 'Basket'
+    if 'basin' in tl:
+        return 'Basin'
+    if 'bowl' in tl:
+        return 'Bowl'
+    if 'bunch' in tl:
+        return 'Bunch'
+    if 'bundle' in tl:
+        return 'Bundle'
+    if 'tuber' in tl:
+        return 'Tuber'
+    if 'heap' in tl:
+        return 'Heap'
+    if 'stalk' in tl:
+        return 'Stalk'
+    if 'wheel' in tl:
+        return 'Wheelbarrow'
+    if 'pick' in tl:
+        return 'Pick-up'
+    if 'jerry' in tl or 'keg' in tl:
+        return 'Jerry Can'
+    if 'derica' in tl or tl == 'tin':
+        return 'Derica'
+    if 'tiya' in tl:
+        return 'Tiya'
+    if 'kobiowu' in tl:
+        return 'Kobiowu'
+    if 'congo' in tl:
+        return 'Congo'
+    if 'mudu' in tl:
+        return 'Mudu'
+    if 'packet' in tl or 'sachet' in tl:
+        return 'Packet/Sachet'
+    if 'piece' in tl:
+        return 'Piece'
+    if 'paint rubber' in tl:
+        return 'Paint rubber'
+    if 'milk cup' in tl:
+        return 'Milk cup'
+    if 'cigarette' in tl:
+        return 'Cigarette cup'
+    if 'olodo' in tl:
+        return 'Olodo'
+    if 'other' in tl or 'specify' in tl:
+        return 'other specify'
+    return pd.NA
+
+
+def _month_str(month_series, year_series):
+    """Build a 'YYYY-MM' month string from numeric month + year columns;
+    pd.NA where month is missing/invalid."""
+    m = pd.to_numeric(month_series, errors='coerce')
+    y = pd.to_numeric(year_series, errors='coerce') if year_series is not None else None
+    out = pd.Series(pd.NA, index=m.index, dtype='string')
+    valid = m.between(1, 12)
+    if y is not None:
+        valid = valid & y.notna()
+        out.loc[valid] = (y[valid].astype('Int64').astype(str) + '-'
+                          + m[valid].astype('Int64').astype(str).str.zfill(2))
+    else:
+        out.loc[valid] = m[valid].astype('Int64').astype(str).str.zfill(2)
+    return out
+
+
+def crop_production_for_wave(t, frames, crop_labels):
+    """Assemble item-level crop_production for one Nigeria GHS-Panel wave.
+
+    Parameters
+    ----------
+    t : str
+        PH-quarter wave id (e.g. '2011Q1'), used as the `t` index.
+    frames : list of dict
+        Each dict describes one source frame (annual harvest, perennial,
+        and/or an hh-crop sold frame) with keys:
+            df        : raw DataFrame (convert_categoricals as noted below)
+            dec       : decoded-label DataFrame (for crop/unit label decode)
+            hhid, plot, crop                 column names (plot may be None)
+            qty, unit                        harvest qty / unit columns
+            qty_sold, unit_sold, value_sold  reported sale columns (optional)
+            plant_m, plant_y                 planting/harvest-start month/yr
+            harv_m, harv_y                   harvest-end month/yr (optional)
+            intercropped                     bool Series aligned to df (opt)
+            perennial                        bool flag for the whole frame
+            sold_on                          'plot' | 'hh' join grain for sale
+    crop_labels : dict
+        {int cropcode: Preferred Label}.
+
+    Returns
+    -------
+    DataFrame indexed by (t, i, plot, crop) with reported columns.
+    Sale columns are populated only for frames where they sit at the
+    plot-crop grain; hh-crop sale frames are merged on (i, crop) where
+    that is the survey's grain (W3-W5 record sales at hh-crop level, so
+    the same sale value applies to every plot row of that hh-crop --
+    a reported attribute, not a per-plot allocation).
+    """
+    pieces = []
+    for fr in frames:
+        df = fr['df']
+        dec = fr['dec']
+        n = len(df)
+        i = df[fr['hhid']].apply(format_id)
+        crop_code = pd.to_numeric(df[fr['crop']], errors='coerce').astype('Int64')
+        crop = crop_code.map(crop_labels).astype('string')
+        if fr.get('plot') is not None:
+            plot = df[fr['plot']].apply(format_id)
+        else:
+            plot = pd.Series(pd.NA, index=df.index, dtype='string')
+
+        piece = pd.DataFrame({
+            'i': i.values,
+            'plot': plot.values,
+            'crop': crop.values,
+        }, index=df.index)
+
+        piece['Quantity'] = (pd.to_numeric(df[fr['qty']], errors='coerce')
+                             if fr.get('qty') in df.columns else pd.NA)
+        if fr.get('unit') in dec.columns:
+            piece['u'] = dec[fr['unit']].map(_canon_unit).astype('string').values
+        else:
+            piece['u'] = pd.Series(pd.NA, index=df.index, dtype='string').values
+
+        # Reported sale at plot-crop grain (W1/W2); hh-crop sales merged
+        # separately below.
+        if fr.get('sold_on') == 'plot':
+            piece['Quantity_sold'] = (pd.to_numeric(df[fr['qty_sold']], errors='coerce')
+                                      if fr.get('qty_sold') in df.columns else pd.NA)
+            piece['Value_sold'] = (pd.to_numeric(df[fr['value_sold']], errors='coerce')
+                                   if fr.get('value_sold') in df.columns else pd.NA)
+
+        piece['planting_month'] = (
+            _month_str(df[fr['plant_m']], df.get(fr.get('plant_y'))).values
+            if fr.get('plant_m') in df.columns
+            else pd.Series(pd.NA, index=df.index, dtype='string').values)
+        piece['harvest_month'] = (
+            _month_str(df[fr['harv_m']], df.get(fr.get('harv_y'))).values
+            if fr.get('harv_m') in df.columns
+            else pd.Series(pd.NA, index=df.index, dtype='string').values)
+
+        if fr.get('intercropped') is not None:
+            piece['intercropped'] = fr['intercropped'].reindex(df.index).values
+        piece['perennial'] = bool(fr.get('perennial', False))
+
+        pieces.append(piece)
+
+    out = pd.concat(pieces, ignore_index=True)
+    out['t'] = t
+
+    # Ensure all canonical columns exist.
+    for col in ['Quantity', 'u', 'Quantity_sold', 'Value_sold',
+                'planting_month', 'harvest_month', 'intercropped', 'perennial']:
+        if col not in out.columns:
+            out[col] = pd.NA
+
+    # Drop rows with no crop label resolved (free-text junk codes) and no
+    # household.  Keep rows with a crop even if Quantity is NaN (the
+    # survey recorded the crop on the plot but no harvest qty).
+    out = out[out['i'].notna() & out['crop'].notna()]
+
+    # Dedup on the index grain (a handful of duplicate (i,plot,crop) rows
+    # exist in W1); keep the first non-null record.
+    out = out.sort_values(['i', 'plot', 'crop'])
+    out = out.drop_duplicates(subset=['t', 'i', 'plot', 'crop'], keep='first')
+
+    out = out.set_index(['t', 'i', 'plot', 'crop']).sort_index()
+    out = out[['Quantity', 'u', 'Quantity_sold', 'Value_sold',
+               'planting_month', 'harvest_month', 'intercropped', 'perennial']]
+    return out
+
+
 # ---------------------------------------------------------------------
 # food_coping (#332, Family B: coping-strategies / rCSI)
 # ---------------------------------------------------------------------
