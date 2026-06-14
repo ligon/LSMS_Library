@@ -19,7 +19,8 @@ var = \
       $(VAR_DIR)/shocks.parquet $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet \
       $(VAR_DIR)/food_coping.parquet $(VAR_DIR)/crop_production.parquet \
       $(VAR_DIR)/plot_inputs.parquet $(VAR_DIR)/livestock.parquet \
-      $(VAR_DIR)/anthropometry.parquet
+      $(VAR_DIR)/anthropometry.parquet $(VAR_DIR)/plot_labor.parquet \
+      $(VAR_DIR)/people_last7days.parquet
 
 all: panel_ids.json updated_ids.json $(parquet) $(var)
 
@@ -128,6 +129,34 @@ anthropometry_parquet := $(anthropometry:.py=.parquet)
 
 $(VAR_DIR)/anthropometry.parquet: anthropometry.py $(anthropometry_parquet)
 	python anthropometry.py
+
+# plot_labor (GAP 3.2; ESS §3-PP + §10-PH plot labor person-days at
+# (t, i, plot_id, source) with source in {family, hired, other}).  Mirrors
+# the crop_production convention: the framework's grab_data calls
+# `make ../<wave>/_/plot_labor.parquet`, whose pattern rule runs the wave
+# script; the VAR_DIR rule concatenates them via the country script.
+plot_labor = $(shell find $(rounds) -name plot_labor.py)
+plot_labor_parquet := $(plot_labor:.py=.parquet)
+
+../%/_/plot_labor.parquet: ../%/_/plot_labor.py
+	(cd $(@D) && python plot_labor.py)
+
+$(VAR_DIR)/plot_labor.parquet: plot_labor.py $(plot_labor_parquet)
+	python plot_labor.py
+
+# people_last7days (GAP 3.1; ESS §4 individual 7-day activity at (t, i, pid),
+# mirroring Uganda's per-individual schema).  Mirrors the crop_production
+# convention: the framework's grab_data calls
+# `make ../<wave>/_/people_last7days.parquet`, whose pattern rule runs the
+# wave script; the VAR_DIR rule concatenates them via the country script.
+people_last7days = $(shell find $(rounds) -name people_last7days.py)
+people_last7days_parquet := $(people_last7days:.py=.parquet)
+
+../%/_/people_last7days.parquet: ../%/_/people_last7days.py
+	(cd $(@D) && python people_last7days.py)
+
+$(VAR_DIR)/people_last7days.parquet: people_last7days.py $(people_last7days_parquet)
+	python people_last7days.py
 
 $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet: nutrition.py categorical_mapping.org $(VAR_DIR)/food_acquired.parquet
 	python nutrition.py

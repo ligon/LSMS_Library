@@ -1732,3 +1732,475 @@ def anthropometry_for_wave(t, health, roster, colmap):
     # Collapse any accidental duplicate measurement rows for an individual.
     out = out[~out.index.duplicated(keep='first')]
     return out.sort_index()
+
+
+# =====================================================================
+# GAP 3 -- LABOR / TIME-USE.  TWO distinct natural grains (do NOT collapse
+# them into one wide table):
+#   (1) plot_labor       (t, i, plot_id, source)  -- plot labor person-DAYS
+#                        by source {family, hired, other}, with the reported
+#                        cash wage paid to hired labor (NaN family/other).
+#   (2) people_last7days (t, i, pid)              -- individual 7-day activity
+#                        dummies / hours / wage-work industry / working_age.
+#
+# Both reproduce the *reported* item-level data the WB ESS code reads
+# (plot days ETH_ESS1.do:554-799; individual ETH_ESS1.do:1242-1264).  We do
+# NOT bake in the WB rollups -- total_labor_days / total_family_labor_days /
+# total_hired_labor_days (egen rowtotal across sources) and hired_labor_value
+# (valuation_median_wages median-wage imputation) are SUM / median-wage
+# TRANSFORMS over these item rows, never stored columns.
+# =====================================================================
+
+# Canonical labor-source labels for the `source` index level of plot_labor.
+# A small inline mapping (3 fixed values, identical across all ESS waves);
+# no wave-keyed org table is needed because each source block is emitted
+# in-script (analogous to crop_production emitting crop labels directly).
+LABOR_SOURCES = ('family', 'hired', 'other')
+
+
+def labor_family_triples(prefix, n_members, sep='_'):
+    """Generate the (did, weeks, days) column triples for an ESS family-labor
+    block.  The §3-PP / §10-PH family roster lays each member's sub-columns
+    out at a stride of 4 letters: a=did-work, b=#weeks, c=days/week, d=hours
+    (then e,f,g,h for the next member, ...).  After 'z' the ESS questionnaire
+    continues 'ka','la','ma','na','oa','pa' (the W1/W2 PH family block uses
+    up to that extension for its 8 member slots).  We only need (did, weeks,
+    days) -- person-days = weeks * days, gated on did != 0.
+
+    Parameters
+    ----------
+    prefix : str
+        Column stem, e.g. ``'pp_s3q27'`` (W1-W3) or ``'s3q29'`` (W4-W5).
+    n_members : int
+        Number of member slots the wave records (6 PP / 8 PH for W1-W2;
+        4 for W3-W5).
+    sep : str
+        Separator between stem and letter -- ``'_'`` for the hh_/pp_/ph_
+        waves (W1-W3), ``''`` for the bare-stem waves (W4-W5).
+    """
+    import string
+    seq = list(string.ascii_lowercase) + ['ka', 'la', 'ma', 'na', 'oa',
+                                           'pa', 'qa', 'ra', 'sa', 'ta']
+    out = []
+    for m in range(n_members):
+        i = m * 4
+        out.append((f'{prefix}{sep}{seq[i]}',
+                    f'{prefix}{sep}{seq[i + 1]}',
+                    f'{prefix}{sep}{seq[i + 2]}'))
+    return out
+
+
+def _eth_industry_label_map():
+    """Load the harmonize_industry code -> Preferred Label dict.
+
+    The wage-work industry of section 4 (hh_s4q11_b W1-W3 / s4q34d W4-W5)
+    is recoded by the WB code into six dummies (ind_ag / ind_fish /
+    ind_mining / ind_manuf / ind_const / ind_serv).  We keep the single
+    REPORTED industry label per individual instead (richer than six
+    dummies; the dummies are trivially derived downstream).  The
+    code->coarse-industry collapse (1=Agriculture, 2=Fishing, 3=Mining,
+    4|5=Manufacturing, 6=Construction, 7-18=Services) is the SAME across
+    every ESS wave, so the table is plain (not wave-keyed)."""
+    return _harmonize_code_label('harmonize_industry')
+
+
+def plot_labor_for_wave(t, pp_roster, ph_labor, colmap):
+    """Build canonical ``plot_labor`` for one Ethiopia ESS wave (GAP 3.2).
+
+    Plot labor person-DAYS at ``(t, i, plot_id, source)`` -- one row per
+    (plot, labor source) with ``source`` in {family, hired, other},
+    carrying ONLY reported fields:
+
+      PersonDays  reported person-days of that source applied to the plot.
+                  The WB code builds per-source days as a SUM over the
+                  man / woman / child member rows on the plot (egen rowtotal
+                  of days_per_member; ETH_ESS1.do:561-655 for PP, 667-799 for
+                  PH).  Summing the man/woman/child rows of ONE source to the
+                  (plot, source) grain is the natural item-level datum here
+                  (analogous to livestock summing within-species sub-codes) --
+                  it is NOT the banned ``total_labor_days`` (an egen rowtotal
+                  ACROSS sources / across PP+PH; ETH_ESS1.do:785-797).
+      Wage        reported cash wage PAID to hired labor (mean of the reported
+                  man / woman / child daily wages, pp_s3q28_c/f/i for PP and
+                  ph_s10q01_c/f/i for PH).  This is the SURVEYED cash wage, NOT
+                  the WB ``valuation_median_wages`` median-wage imputation
+                  (ETH_ESS1.do:588-593) -- NaN for family / other rows.
+
+    The ESS asks plot labor in TWO modules, both summed onto the same plot:
+      * post-PLANTING (§3 plot roster, sect3_pp): hired pp_s3q28_* /
+        s3q30* ; family pp_s3q27_* / s3q29* (weeks x days/week per member);
+        other pp_s3q29_* / s3q31*.
+      * post-HARVEST (§10 labor file, sect10_ph): hired ph_s10q01_* /
+        s10q01* ; family ph_s10q02_* / s10q02* ; other ph_s10q03_* /
+        s10q03*.  The PH file is plot x crop -- we sum its days over crops
+        to the plot, since our grain is (plot, source), not (plot, crop).
+    PP and PH person-days of the SAME source are summed onto one
+    (plot, source) row (the survey's own two-season split of the same
+    source's labor).  This stays WITHIN a single source, so it is not the
+    forbidden cross-source rollup.
+
+    Parameters
+    ----------
+    t : str
+        Wave id (e.g. ``"2011-12"``) -- the ``t`` index value.
+    pp_roster : pd.DataFrame or None
+        Raw §3 post-planting plot roster (sect3_pp_w{N}.dta),
+        convert_categoricals=False.
+    ph_labor : pd.DataFrame or None
+        Raw §10 post-harvest labor file (sect10_ph_w{N}.dta), same loading.
+    colmap : dict
+        Per-wave column map.  Keys (a block is skipped if its frame is None
+        or its keys are absent):
+            hhid, holder_id, parcel_id, field_id  -- id / plot_id columns
+            pp_filter        optional (col, keep_values) to drop non-cultivated
+                             PP plots (the WB ``drop if !inlist(pp_s3q03,1,2)``)
+          PP hired:  pp_h_n_m, pp_h_d_m, pp_h_w_m   (#men, days/man, wage/man)
+                     pp_h_n_w, pp_h_d_w, pp_h_w_w   (women)
+                     pp_h_n_c, pp_h_d_c, pp_h_w_c   (children)
+          PP family: pp_f_members = list of (did_col, weeks_col, days_col)
+                     triples (one per member slot; person-days = weeks*days).
+          PP other:  pp_o_n_m, pp_o_d_m / _w / _c   (#, days/member; no wage)
+          PH hired:  ph_h_*  (same shape as PP hired)
+          PH family: ph_f_members  (list of (did_col, weeks_col, days_col))
+          PH other:  ph_o_*  (same shape as PP other)
+
+    Returns
+    -------
+    pd.DataFrame indexed by ``(t, i, plot_id, source)`` with columns
+        ``PersonDays`` (Float64), ``Wage`` (Float64, NaN for family/other).
+    """
+    c = colmap
+
+    def _num(df, key):
+        col = c.get(key)
+        if col is None or df is None or col not in df.columns:
+            return None
+        return pd.to_numeric(df[col], errors='coerce').astype('Float64')
+
+    def _member_days(df, n_key, d_key):
+        """person-days for one (#workers, days-per-worker) member group.
+
+        Mirrors the WB ``replace days=0 if number==0; gen days =
+        days_av * number``: zero workers contribute zero days; otherwise
+        days-per-worker x number of workers."""
+        n = _num(df, n_key)
+        d = _num(df, d_key)
+        if n is None or d is None:
+            return None
+        d = d.where(n != 0, 0)
+        return d * n
+
+    def _hired_block(df, prefix):
+        """(PersonDays, Wage) for a hired block (man/woman/child days +
+        reported daily wages)."""
+        if df is None:
+            return None, None
+        parts = [
+            _member_days(df, f'{prefix}_n_m', f'{prefix}_d_m'),
+            _member_days(df, f'{prefix}_n_w', f'{prefix}_d_w'),
+            _member_days(df, f'{prefix}_n_c', f'{prefix}_d_c'),
+        ]
+        parts = [p for p in parts if p is not None]
+        if not parts:
+            return None, None
+        days = parts[0]
+        for p in parts[1:]:
+            days = days.add(p, fill_value=0)
+        # reported cash daily wages (NOT a median imputation); zero out the
+        # wage where that member group did not work, as the WB does before
+        # taking medians, then average the reported member wages.
+        wparts = []
+        for n_key, w_key in ((f'{prefix}_n_m', f'{prefix}_w_m'),
+                             (f'{prefix}_n_w', f'{prefix}_w_w'),
+                             (f'{prefix}_n_c', f'{prefix}_w_c')):
+            w = _num(df, w_key)
+            n = _num(df, n_key)
+            if w is None:
+                continue
+            if n is not None:
+                w = w.where(n != 0)          # only members actually hired
+            wparts.append(w)
+        if wparts:
+            wage = pd.concat(wparts, axis=1).mean(axis=1)
+        else:
+            wage = pd.Series(pd.NA, index=df.index, dtype='Float64')
+        return days, wage.astype('Float64')
+
+    def _other_block(df, prefix):
+        """PersonDays for an other/exchange block (no wage)."""
+        if df is None:
+            return None
+        parts = [
+            _member_days(df, f'{prefix}_n_m', f'{prefix}_d_m'),
+            _member_days(df, f'{prefix}_n_w', f'{prefix}_d_w'),
+            _member_days(df, f'{prefix}_n_c', f'{prefix}_d_c'),
+        ]
+        parts = [p for p in parts if p is not None]
+        if not parts:
+            return None
+        days = parts[0]
+        for p in parts[1:]:
+            days = days.add(p, fill_value=0)
+        return days
+
+    def _family_block(df, members):
+        """PersonDays for a family block = Sum over member slots of
+        weeks x days-per-week (WB: family_labor_days = number_weeks *
+        days_per_week, summed across the member loop)."""
+        if df is None or not members:
+            return None
+        total = None
+        for did_col, weeks_col, days_col in members:
+            weeks = pd.to_numeric(df[weeks_col], errors='coerce').astype('Float64') \
+                if weeks_col in df.columns else None
+            days = pd.to_numeric(df[days_col], errors='coerce').astype('Float64') \
+                if days_col in df.columns else None
+            if weeks is None or days is None:
+                continue
+            if did_col and did_col in df.columns:
+                did = pd.to_numeric(df[did_col], errors='coerce')
+                weeks = weeks.where(did != 0, 0)
+                days = days.where(did != 0, 0)
+            md = weeks * days
+            total = md if total is None else total.add(md, fill_value=0)
+        return total
+
+    def _apply_pp_filter(df):
+        if df is None:
+            return None
+        f = c.get('pp_filter')
+        if not f:
+            return df
+        col, keep = f
+        if col not in df.columns:
+            return df
+        v = pd.to_numeric(df[col], errors='coerce')
+        return df[v.isin(keep)].copy()
+
+    pp = _apply_pp_filter(pp_roster)
+    ph = ph_labor
+
+    pieces = []   # list of (frame_with_plot_id+i, source, days_series, wage_series_or_None)
+
+    # ----- post-PLANTING (§3 plot roster) -----
+    if pp is not None:
+        pp_pid = _plot_id_from(pp, c)
+        pp_i = pp[c['hhid']].apply(format_id)
+        h_days, h_wage = _hired_block(pp, 'pp_h')
+        f_days = _family_block(pp, c.get('pp_f_members'))
+        o_days = _other_block(pp, 'pp_o')
+        for src, days, wage in (('hired', h_days, h_wage),
+                                ('family', f_days, None),
+                                ('other', o_days, None)):
+            if days is None:
+                continue
+            d = pd.DataFrame({'i': pp_i.values, 'plot_id': pp_pid.values,
+                              'source': src, 'PersonDays': days.values})
+            d['Wage'] = wage.values if wage is not None else pd.NA
+            pieces.append(d)
+
+    # ----- post-HARVEST (§10 labor file; plot x crop -> sum over crops) -----
+    if ph is not None:
+        ph_pid = _plot_id_from(ph, c)
+        ph_i = ph[c['hhid']].apply(format_id)
+        h_days, h_wage = _hired_block(ph, 'ph_h')
+        f_days = _family_block(ph, c.get('ph_f_members'))
+        o_days = _other_block(ph, 'ph_o')
+        for src, days, wage in (('hired', h_days, h_wage),
+                                ('family', f_days, None),
+                                ('other', o_days, None)):
+            if days is None:
+                continue
+            d = pd.DataFrame({'i': ph_i.values, 'plot_id': ph_pid.values,
+                              'source': src, 'PersonDays': days.values})
+            d['Wage'] = wage.values if wage is not None else pd.NA
+            pieces.append(d)
+
+    if not pieces:
+        return pd.DataFrame(
+            columns=['PersonDays', 'Wage'],
+            index=pd.MultiIndex.from_arrays([[], [], [], []],
+                                            names=['t', 'i', 'plot_id', 'source']))
+
+    out = pd.concat(pieces, ignore_index=True)
+    out['PersonDays'] = pd.to_numeric(out['PersonDays'], errors='coerce').astype('Float64')
+    out['Wage'] = pd.to_numeric(out['Wage'], errors='coerce').astype('Float64')
+
+    # Drop rows with no reported days for that source (the source was not
+    # used on that plot -- nothing reported, not a zero).
+    out = out.dropna(subset=['plot_id'])
+    out = out[out['PersonDays'].notna()].copy()
+    out = out[out['i'].notna()].copy()
+
+    # Aggregate PP + PH person-days of the SAME source onto one plot-source
+    # row (the survey's two-season split of one source's labor; within-source,
+    # NOT a cross-source rollup).  Wage = mean of reported wages across the
+    # contributing hired rows (NaN where no cash wage reported).
+    out['t'] = t
+    out['i'] = out['i'].astype('string')
+    out['plot_id'] = out['plot_id'].astype('string')
+    out['source'] = out['source'].astype('string')
+    g = out.groupby(['t', 'i', 'plot_id', 'source'], dropna=False)
+    res = g.agg(PersonDays=('PersonDays', 'sum'),
+                Wage=('Wage', 'mean'))
+    res['PersonDays'] = res['PersonDays'].astype('Float64')
+    res['Wage'] = res['Wage'].astype('Float64')
+    res = res[['PersonDays', 'Wage']]
+    return res.sort_index()
+
+
+def people_last7days_for_wave(t, lab, colmap):
+    """Build canonical ``people_last7days`` for one Ethiopia ESS wave (GAP 3.1).
+
+    Individual 7-day activity at ``(t, i, pid)`` -- one row per roster
+    member of section 4 (lab_roster, sect4_hh_w{N}.dta), carrying ONLY the
+    REPORTED per-individual data the WB labor block reads
+    (ETH_ESS1.do:1242-1264).  Mirrors Uganda's existing per-individual
+    schema (the country we already have for this feature) so the six
+    new countries match:
+
+      farm_work / SOB_work / wage_work  reported did-this-activity dummies
+                  (worked on the household farm / own non-farm business /
+                  for a wage in the last 7 days; nullable bool).
+      farm_hrs / SB_hrs / wage_hrs      reported hours on each activity.
+      industry    the wage-work industry Preferred Label (harmonize_industry:
+                  Agriculture / Fishing / Mining / Manufacturing /
+                  Construction / Services), from the SAME code the WB recodes
+                  into ind_ag..ind_serv dummies -- we keep the single label.
+      working_age reported working-age flag (nullable bool).
+
+    NO household rollups (the WB ``nb_members_working_age`` egen-total is a
+    SUM transform over these rows; the ind_* six dummies are trivially
+    derived from ``industry``).
+
+    Per-wave source variables (confirmed via get_dataframe):
+      W1-W3 (hh_s4* prefix; sect4_hh_w{1,2,3}):
+        farm  hh_s4q04 (hours; recode else=1 -> work dummy)
+        SOB   hh_s4q05 ; wage hh_s4q07
+        employed-gate hh_s4q09 (==2 or missing zeroes the industry dummies)
+        industry hh_s4q11_b ; working_age = (hh_s4q01 == "X")
+        W2/W3 emit household_id2 / individual_id2.
+      W4-W5 (s4* prefix; sect4_hh_w{4,5}):
+        farm dummy s4q05 ; SOB dummy s4q08 ; wage dummy s4q12
+        farm hrs s4q06 ; SB hrs s4q09 ; wage hrs s4q13
+        working_age = (s4q00 == 1) ; industry s4q34d.
+
+    Parameters
+    ----------
+    t : str
+        Wave id -- the ``t`` index value.
+    lab : pd.DataFrame
+        Raw §4 labor roster (sect4_hh_w{N}.dta), convert_categoricals=False.
+    colmap : dict
+        Per-wave column map.  Keys:
+            hhid, pid                 id columns EMITTED as i / pid (must match
+                                      household_roster: household_id2 /
+                                      individual_id2 for W2/W3, else
+                                      household_id / individual_id).
+          activity dummies (present where the wave records a separate dummy):
+            farm_work, sob_work, wage_work
+          activity hours:
+            farm_hrs, sb_hrs, wage_hrs
+          where the wave records ONLY hours (W1-W3), pass the hours column as
+          BOTH the *_hrs and the *_work key with ``dummy_from_hours=True`` so
+          the dummy is recoded from the hours (hours>0 -> worked).
+            dummy_from_hours          bool -- recode dummies from hours columns
+            industry                  wage-work industry code column
+            employed_gate             optional code; ==no_code or missing
+                                      zeroes the industry (WB hh_s4q09==2/.)
+            employed_no               value of employed_gate meaning "not
+                                      employed" (default 2)
+            working_age               working-age flag column
+            working_age_marker        value meaning working-age:
+                                      "X" (W1-W3 string) or 1 (W4-W5 numeric)
+
+    Returns
+    -------
+    pd.DataFrame indexed by ``(t, i, pid)`` with columns
+        farm_work, SOB_work, wage_work (boolean),
+        farm_hrs, SB_hrs, wage_hrs (Float64),
+        industry (string), working_age (boolean).
+    """
+    c = colmap
+    df = lab.copy()
+    industry_map = _eth_industry_label_map()
+
+    def _hours(key):
+        col = c.get(key)
+        if col is None or col not in df.columns:
+            return pd.Series(pd.NA, index=df.index, dtype='Float64')
+        return pd.to_numeric(df[col], errors='coerce').astype('Float64')
+
+    def _dummy(work_key, hours_series):
+        """nullable-bool did-activity dummy.  If the wave has its own dummy
+        column (1=yes/2=no), use it; otherwise recode from hours
+        (hours>0 -> True, ==0 -> False, missing -> NA; WB recode 0=0 else=1)."""
+        col = c.get(work_key)
+        if c.get('dummy_from_hours') or col is None or col not in df.columns:
+            h = hours_series
+            out = pd.Series(pd.NA, index=df.index, dtype='boolean')
+            return out.mask(h > 0, True).mask(h == 0, False)
+        return _yesno_bool(df[col], yes=1, no=2)
+
+    farm_hrs = _hours('farm_hrs')
+    sb_hrs = _hours('sb_hrs')
+    wage_hrs = _hours('wage_hrs')
+
+    farm_work = _dummy('farm_work', farm_hrs)
+    sob_work = _dummy('sob_work', sb_hrs)
+    wage_work = _dummy('wage_work', wage_hrs)
+
+    # working_age flag
+    wa_col = c.get('working_age')
+    marker = c.get('working_age_marker', 'X')
+    if wa_col and wa_col in df.columns:
+        col = df[wa_col]
+        if isinstance(marker, str):
+            working_age = (col.astype('string').str.strip() == marker)
+        else:
+            working_age = (pd.to_numeric(col, errors='coerce') == marker)
+        working_age = working_age.astype('boolean')
+    else:
+        working_age = pd.Series(pd.NA, index=df.index, dtype='boolean')
+
+    # wage-work industry label (reported, single label -- not the six dummies)
+    ind_col = c.get('industry')
+    if ind_col and ind_col in df.columns:
+        industry = _map_int_codes(df[ind_col], industry_map)
+        # WB zeroes the industry dummies for the not-employed; we blank the
+        # reported industry label there so a stray code does not survive.
+        gate = c.get('employed_gate')
+        if gate and gate in df.columns:
+            no = c.get('employed_no', 2)
+            g = pd.to_numeric(df[gate], errors='coerce')
+            industry = industry.where(~(g.isna() | (g == no)), pd.NA)
+    else:
+        industry = pd.Series(pd.NA, index=df.index, dtype='string')
+
+    out = pd.DataFrame({
+        'i':          df[c['hhid']].apply(format_id).values,
+        'pid':        df[c['pid']].apply(format_id).values,
+        'farm_work':  farm_work.values,
+        'SOB_work':   sob_work.values,
+        'wage_work':  wage_work.values,
+        'farm_hrs':   farm_hrs.values,
+        'SB_hrs':     sb_hrs.values,
+        'wage_hrs':   wage_hrs.values,
+        'industry':   industry.astype('string').values,
+        'working_age': working_age.values,
+    })
+    out['t'] = t
+    out['i'] = out['i'].astype('string')
+    out['pid'] = out['pid'].astype('string')
+    out = out.dropna(subset=['i', 'pid'])
+    out = out.set_index(['t', 'i', 'pid'])
+    out = out[['farm_work', 'SOB_work', 'wage_work',
+               'farm_hrs', 'SB_hrs', 'wage_hrs', 'industry', 'working_age']]
+    for col in ['farm_work', 'SOB_work', 'wage_work', 'working_age']:
+        out[col] = out[col].astype('boolean')
+    for col in ['farm_hrs', 'SB_hrs', 'wage_hrs']:
+        out[col] = out[col].astype('Float64')
+    out['industry'] = out['industry'].astype('string')
+    # Collapse accidental duplicate roster rows for an individual.
+    out = out[~out.index.duplicated(keep='first')]
+    return out.sort_index()

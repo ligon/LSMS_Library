@@ -291,6 +291,101 @@ Data Scheme:
     Sex: str
     materialize: make
 
+  plot_labor:
+    # GAP 3.2 -- item-level plot labor at (t, i, plot_id, source).  One row
+    # per (plot, labor SOURCE) with source in {family, hired, other},
+    # carrying ONLY reported fields:
+    #   PersonDays  reported person-days of that source applied to the plot.
+    #               The ESS asks plot labor in two modules -- post-PLANTING
+    #               (§3 plot roster sect3_pp: hired pp_s3q28*/s3q30*, family
+    #               pp_s3q27*/s3q29* as weeks x days/week per member, other
+    #               pp_s3q29*/s3q31*) and post-HARVEST (§10 labor sect10_ph:
+    #               hired ph_s10q01*/s10q01*, family ph_s10q02*/s10q02*, other
+    #               ph_s10q03*/s10q03*).  The WB code (ETH_ESS1.do:554-799)
+    #               sums man+woman+child member rows of ONE source to a per-
+    #               source person-day total; THAT per-source total is the
+    #               natural item datum here (like livestock summing within-
+    #               species sub-codes), NOT the banned total_labor_days (which
+    #               is an egen rowtotal ACROSS sources / across PP+PH).  PP and
+    #               PH person-days of the SAME source are summed onto one
+    #               (plot, source) row (the survey's two-season split of that
+    #               source's labor -- WITHIN a single source, not cross-source).
+    #               The §10 file is plot x crop; person-days are summed over
+    #               crops to the plot (our grain is plot, not plot-crop).
+    #   Wage        reported cash daily wage PAID to hired labor (mean of the
+    #               reported man/woman/child wages pp_s3q28_c/f/i (PP) and
+    #               ph_s10q01_c/f/i (PH)).  This is the SURVEYED cash wage, NOT
+    #               the WB valuation_median_wages median-wage IMPUTATION; NaN
+    #               for family / other rows (the survey records no wage there).
+    #
+    # source axis: inline {family, hired, other} labels (3 fixed values,
+    # identical across every ESS wave -- emitted in-script, no org table).
+    # plot_id and i match plot_features / crop_production / plot_inputs
+    # exactly (holder_parcel_field plot_id; i = household_id2 for W2/W3, else
+    # household_id), so plot_labor joins them on (t, i, plot_id).
+    #
+    # NO total_labor_days / total_family_labor_days / total_hired_labor_days
+    # (cross-source / cross-module SUM transforms) and NO hired_labor_value
+    # (median-wage valuation) baked in -- all are transformations over these
+    # item rows (GAP 3 / GAP 7).  Grain is (t, i, plot_id, source); v is NOT
+    # baked in -- the framework auto-joins it from sample() at query time
+    # (plot_labor is household-linked and NOT in the _no_v_join set).  Per-
+    # wave var renumbering (W1-W3 hh_/pp_/ph_ prefix; W4-W5 bare s* stems) +
+    # multi-module within-source sum => script (materialize: make).
+    index: (t, i, plot_id, source)
+    PersonDays: float
+    # Wage is reported only on hired rows where the survey records a cash
+    # daily wage; family / other rows and unreported hired rows are NaN.
+    # Mark optional so the all-null sanity check exempts it on a hypothetical
+    # wage-free wave while the canonical column stays declared.
+    Wage:
+      type: float
+      optional: true
+    materialize: make
+
+  people_last7days:
+    # GAP 3.1 -- item-level individual 7-day activity at (t, i, pid).  One
+    # row per §4 labor-roster member (sect4_hh_w{N}), mirroring Uganda's
+    # existing per-individual schema (the one country we already have for
+    # this feature).  Carries ONLY the REPORTED per-individual data the WB
+    # labor block reads (ETH_ESS1.do:1242-1264):
+    #   farm_work / SOB_work / wage_work  did-this-activity dummies (worked
+    #                 on the HH farm / own non-farm business / for a wage in
+    #                 the last 7 days; nullable bool).  W1-W3 record only
+    #                 HOURS (hh_s4q04/05/07) and the WB recodes a dummy from
+    #                 them (hours>0 -> worked); W4-W5 carry explicit 1/2
+    #                 dummies (s4q05/08/12) separate from the hours.
+    #   farm_hrs / SB_hrs / wage_hrs      reported hours on each activity
+    #                 (hh_s4q04/05/07 W1-W3; s4q06/09/13 W4-W5).
+    #   industry      the single REPORTED wage-work industry Preferred Label
+    #                 (harmonize_industry: Agriculture / Fishing / Mining /
+    #                 Manufacturing / Construction / Services), from the same
+    #                 code (hh_s4q11_b W1-W3 / s4q34d W4-W5) the WB recodes
+    #                 into the six ind_* dummies -- we keep the label (the six
+    #                 dummies are trivially derived from it downstream).
+    #                 Blanked where the member is not employed (the WB gate
+    #                 hh_s4q09==2/.).
+    #   working_age   reported working-age flag (hh_s4q01=="X" W1-W3;
+    #                 s4q00==1 W4-W5; nullable bool).
+    #
+    # i / pid match household_roster exactly (household_id2 / individual_id2
+    # for W2/W3, else household_id / individual_id).  NO household rollups:
+    # the WB nb_members_working_age (egen-total) and the six ind_* dummies
+    # are transformations over these per-individual rows, never stored.  v is
+    # auto-joined from sample() at query time (people_last7days is household-
+    # linked, NOT in _no_v_join).  Per-wave var renumbering + code->industry
+    # harmonization + dummy-from-hours recode => script (materialize: make).
+    index: (t, i, pid)
+    farm_work: bool
+    SOB_work: bool
+    wage_work: bool
+    farm_hrs: float
+    SB_hrs: float
+    wage_hrs: float
+    industry: str
+    working_age: bool
+    materialize: make
+
   # food_expenditures, food_prices, food_quantities are derived at
   # runtime from food_acquired — see _FOOD_DERIVED in country.py.  Do
   # NOT register them here (per CLAUDE.md "Derived Tables").
