@@ -155,14 +155,21 @@ Waves = {'2008-15': ('upd4_hh_a.dta', ['r_hhid', 'round', 'UPHI'], map_08_15),
 waves = ['2008-09', '2010-11', '2012-13', '2014-15', '2019-20', '2020-21']
 wave_folder_map = {'2008-09':'2008-15', '2010-11':'2008-15', '2012-13':'2008-15', '2014-15':'2008-15', '2019-20':'2019-20', '2020-21':'2020-21'}
 
-def harmonized_food_labels(fn='../../_/food_items.org'):
-    # Harmonized food labels
-    food_items = pd.read_csv(fn,delimiter='|',skipinitialspace=True,converters={1:int,2:lambda s: s.strip()})
-    food_items.columns = [s.strip() for s in food_items.columns]
-    food_items = food_items[['Code','Preferred Label']].dropna()
-    food_items = food_items.set_index('Code')
-
-    return food_items.to_dict()['Preferred Label']
+def harmonized_food_labels(fn='../../_/categorical_mapping.org', name='harmonize_food'):
+    # Harmonized food labels.  Reads the canonical harmonize_food table
+    # (migrated from the retired food_items.org -- Unit #0 shared label
+    # foundation).  Returns a {raw per-wave survey label -> Preferred Label}
+    # dict by stacking every per-wave code column, so a raw food_acquired
+    # (j) label resolves to its canonical Preferred Label regardless of wave.
+    from lsms_library.local_tools import df_from_orgfile
+    hf = df_from_orgfile(fn, name=name)
+    wave_cols = [c for c in hf.columns if c not in ('Code', 'Preferred Label', 'FTC Label')]
+    out = {}
+    for col in wave_cols:
+        for raw, pref in zip(hf[col], hf['Preferred Label']):
+            if isinstance(raw, str) and raw.strip():
+                out[raw.strip()] = pref
+    return out
     
 
 def _sum_expenditures_from_file(fn, purchased, away, produced, given, itmcd, HHID,
@@ -278,7 +285,7 @@ def _household_roster_from_file(fn, sex='sex', age='age', HHID='HHID',
 
 def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market',farmgate='farmgate'):
 
-    food_items = harmonized_food_labels(fn='../../_/food_items.org')
+    food_items = harmonized_food_labels()
 
     df = get_dataframe(fn, convert_categoricals=True)
 
@@ -311,7 +318,7 @@ def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market'
     return prices
 
 def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,item='item',HHID='HHID'):
-    food_items = harmonized_food_labels(fn='../../_/food_items.org')
+    food_items = harmonized_food_labels()
 
     expenditures = _sum_expenditures_from_file(fn, purchased, away, produced, given,
                                                 itmcd=item, HHID=HHID, itemlabels=food_items)
@@ -323,7 +330,7 @@ def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,it
 
 def food_quantities(fn='',item='item',HHID='HHID',
                     purchased=None,away=None,produced=None,given=None,units=None):
-    food_items = harmonized_food_labels(fn='../../_/food_items.org')
+    food_items = harmonized_food_labels()
 
     quantities = _sum_expenditures_from_file(fn, purchased, away, produced, given,
                                               itmcd=item, HHID=HHID, units=units,
