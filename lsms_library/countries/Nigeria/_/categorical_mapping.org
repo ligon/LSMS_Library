@@ -781,3 +781,48 @@
 |  121 | Fish            | Fish     | fish            | FISH            | 121. FISH          | ---                | ---                |
 |  122 | Camel           | Camels   | camel           | CAMEL           | 122. CAMEL         | 122. CAMEL         | 122. CAMEL         |
 |  123 | Other Livestock | Other    | other (specify) | OTHER (SPECIFY) | 123. OTHER (SPECIFY) | 123. OTHER (SPECIFY) | 123. OTHER (SPECIFY) |
+
+* Labor (plot_labor + people_last7days, GAP 3)
+
+** harmonize_labor_source -- the plot_labor `source` axis
+
+  The plot_labor feature's ``source`` index level carries one of these
+  three Preferred Labels.  The country-level ``_/plot_labor.py`` script
+  emits the canonical label directly (mirroring how livestock emits the
+  harmonize_species label), so this table is the canonical REGISTRY for the
+  plot-labor source taxonomy.  Every GHS-Panel post-harvest plot labor
+  roster (secta2) splits reported plot labor into exactly these three
+  acquisition channels:
+  - ``family``  household-member labor (the worker-slot block, sa2q1[a-d]*).
+  - ``hired``   paid hired labor (man / woman / child blocks; carries Wage).
+  - ``other``   free / exchange labor (sa2q12a/b/c; no cash wage).
+
+#+NAME: harmonize_labor_source
+| Code | Preferred Label | Concept                                         |
+|------+-----------------+-------------------------------------------------|
+|    1 | family          | household-member labor (worker-slot roster)     |
+|    2 | hired           | paid hired labor (carries reported Wage)        |
+|    3 | other           | free / exchange labor (no cash wage)            |
+
+** harmonize_industry -- the people_last7days `Industry` axis
+
+  The people_last7days feature's ``Industry`` column carries one of these
+  Preferred Labels (the harmonized industry of a member's wage/main work;
+  ``<NA>`` for non-wage-workers / non-working-age).  The country-level
+  ``_/people_last7days.py`` script resolves each wave's native industry
+  code to the Preferred Label directly (W1-W4 the section-3 ``s3q14``
+  1--14 code grouping; W5 the ISIC-style ``s4aq41_code`` ranges), so this
+  table is the canonical REGISTRY for the wage-work industry taxonomy.
+  The grouping mirrors NGA_GHS{1..5}.do's ``ind_ag``..``ind_serv``
+  branches (no Fishing branch in the W1-W4 code list -> Fishing only
+  appears in W5).
+
+#+NAME: harmonize_industry
+| Code | Preferred Label | s3q14 (W1-W4) | s4aq41_code (W5) |
+|------+-----------------+---------------+------------------|
+|    1 | Agriculture     | 1             | 101--299         |
+|    2 | Fishing         | ---           | 301--399         |
+|    3 | Mining          | 2             | 501--999         |
+|    4 | Manufacturing   | 3--5          | 1010--4000       |
+|    5 | Construction    | 6             | 4100--4500       |
+|    6 | Services        | 7--14         | 4501--10000      |
