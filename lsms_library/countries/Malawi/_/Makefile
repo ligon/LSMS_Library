@@ -12,7 +12,7 @@ VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 # _ROSTER_DERIVED — no country-level parquet is built or consulted.
 # See GH #218.
 
-all: $(parquet) $(VAR_DIR)/food_acquired.parquet $(VAR_DIR)/food_coping.parquet $(VAR_DIR)/months_food_inadequate.parquet
+all: $(parquet) $(VAR_DIR)/food_acquired.parquet $(VAR_DIR)/food_coping.parquet $(VAR_DIR)/months_food_inadequate.parquet $(VAR_DIR)/crop_production.parquet
 
 food_acquired = $(shell find $(rounds) -name food_acquired.py)
 # Wave-level parquets live in data_root, not in-tree
@@ -46,6 +46,19 @@ $(VAR_DIR)/food_coping.parquet: food_coping.py $(food_coping_parquet)
 
 $(VAR_DIR)/months_food_inadequate.parquet: months_food_inadequate.py $(months_food_inadequate_parquet)
 	python months_food_inadequate.py
+
+# --- crop_production / harvest (GAP 1) ------------------------------------
+# Item-level (t, i, plot, crop) harvest for the four IHS3+/IHPS waves.
+# Each wave script writes its parquet into data_root; the country script
+# concatenates.  2004-05 is ABSENT (household-level aggregated ag file).
+crop_waves := 2010-11 2013-14 2016-17 2019-20
+crop_production_parquet := $(foreach r,$(crop_waves),$(LSMS_DATA_ROOT)/$(COUNTRY)/$(r)/_/crop_production.parquet)
+
+$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/crop_production.parquet: malawi.py
+	(cd ../$(*)/_/ && python crop_production.py)
+
+$(VAR_DIR)/crop_production.parquet: crop_production.py $(crop_production_parquet)
+	python crop_production.py
 
 %.parquet: %.py malawi.py
 	(cd $(@D) && python ./$(<F))
