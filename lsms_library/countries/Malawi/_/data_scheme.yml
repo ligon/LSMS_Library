@@ -190,5 +190,35 @@ Data Scheme:
     Quantity_purchased: float
     Improved: bool
     materialize: make
+  livestock:
+    # Item-level (t, i, animal) livestock-roster feature for the four
+    # IHS3+/IHPS waves (2010-11, 2013-14, 2016-17, 2019-20); GAP 4.  One
+    # reported row per (household, species owned), from Module R
+    # (ag_mod_r1) -- the SAME roster the World Bank cleaning code reads then
+    # collapses to a single HH "engaged-in-livestock" binary (MWI_IHPS{1-4}
+    # .do: recode ag_r00 -> collapse (max) livestock by hhid).  We keep the
+    # PRE-collapse rows, which are strictly richer: their binary =
+    # livestock().groupby(['t','i']).size() > 0.  Reported item columns:
+    #   HeadCount    (ag_r02, head owned now),
+    #   HeadAcquired (ag_r10, head bought to raise in last 12 months),
+    #   HeadSold     (ag_r16, head sold alive in last 12 months),
+    #   Value        (ag_r04, REPORTED per-head current value -- "if you
+    #                 sold one today, how much would you receive?";  a herd
+    #                 value = Value x HeadCount and a TLU rollup are
+    #                 transformations, NOT stored columns).
+    # `animal` is the harmonize_species Preferred Label (the wave scripts
+    # reconcile 2010-11's fine 301-318 code scheme with the later coarse
+    # scheme -- Ox=3304, Donkey/Horse=3305, Chicken=3310,
+    # Turkey/Guinea Fowl=3314 -- and drop code 318 "Other (Specify)").
+    # Grain is (t, i, animal) with NO v level: 'livestock' is in the
+    # framework _no_v_join set (a household holding, not a cluster roster).
+    # 2004-05 (IHS2) deferred: household-level aggregated ag file, no
+    # Module R roster.  See _/malawi.py:assemble_livestock.
+    index: (t, i, animal)
+    HeadCount: float
+    HeadAcquired: float
+    HeadSold: float
+    Value: float
+    materialize: make
   food_expenditures:
   food_prices:

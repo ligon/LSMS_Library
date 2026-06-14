@@ -662,3 +662,53 @@
 |   11 | Other Pesticide       |
 |   20 | Organic Fertilizer    |
 |   30 | Seed                  |
+
+# harmonize_species: livestock-species identity for the livestock feature
+# (GAP 4).  Code-keyed map for the Module R livestock-roster animal code
+# (ag_r0a, "LIVESTOCK CODE"; convert_categoricals=False).  Two code
+# namespaces are reconciled here:
+#   * IHS3 2010-11 uses the fine 301-318 scheme (separate Donkey 305 /
+#     Mule-horse 306, Chicken-layer 310 / -broiler 312, Turkey 314 /
+#     Guinea fowl 316, Beehive 317; Bull/ox shares code 304).
+#   * IHS3-IHPS 2013-14 + IHS4/IHS5 (2016-17, 2019-20) use a coarser
+#     scheme: code 304 is just Bull, with Ox split out to 3304,
+#     Donkey/mule/horse merged to 3305, Chicken-layer/broiler merged to
+#     3310, Turkey/guinea-fowl merged to 3314, and Dove/pigeon at 319.
+# Each numeric code maps to exactly ONE canonical Preferred Label (no
+# within-wave collapse, so the (t, i, animal) index stays unique), but a
+# canonical label may be reached from several codes across the two
+# schemes (e.g. 314 Turkey & 316 Guinea fowl from 2010-11 are kept
+# distinct, while the later merged 3314 -> "Turkey/Guinea Fowl").  Code
+# 318 "Other (Specify)" maps to NaN (no canonical species) and so is
+# dropped from the animal index, like crop_production's "Other" crop.
+# The cattle subtypes (Calf, Steer/Heifer, Cow, Bull, Ox) are kept as
+# separate reported species rather than rolled into one "Cattle" label,
+# preserving the survey's item-level distinction; a tropical-livestock-
+# unit (TLU) rollup over species is a transformations concern, not a
+# stored column.
+#+name: harmonize_species
+| Code | Preferred Label   |
+|------+-------------------|
+|  301 | Calf              |
+|  302 | Steer/Heifer      |
+|  303 | Cow               |
+|  304 | Bull              |
+|  305 | Donkey            |
+|  306 | Mule/Horse        |
+|  307 | Goat              |
+|  308 | Sheep             |
+|  309 | Pig               |
+|  310 | Chicken-Layer     |
+|  311 | Local Hen         |
+|  312 | Chicken-Broiler   |
+|  313 | Local Cock        |
+|  314 | Turkey            |
+|  315 | Duck              |
+|  316 | Guinea Fowl       |
+|  317 | Beehive           |
+|  318 | ---               |
+|  319 | Dove/Pigeon       |
+| 3304 | Ox                |
+| 3305 | Donkey/Horse      |
+| 3310 | Chicken           |
+| 3314 | Turkey/Guinea Fowl|
