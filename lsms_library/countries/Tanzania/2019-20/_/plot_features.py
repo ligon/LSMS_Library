@@ -24,8 +24,10 @@ colmap = dict(
     use        = 'ag3a_03',
     soil_type  = 'ag3a_10',
     irrigated  = 'ag3a_18',
+    erosion    = 'ag3a_15',
     acquire    = 'ag3a_25',
     legal_cert = 'ag3a_28a',
+    cert_other = 'ag3a_28d',
 )
 
 df = plot_features_for_wave('2019-20', sec02, sec3a, colmap)

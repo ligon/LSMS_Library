@@ -759,16 +759,33 @@ def plot_features_for_wave(t, sec02, sec3a, colmap):
         use        — plot use status            (ag3a_03)
         soil_type  — soil type                  (ag3a_10)
         irrigated  — irrigated y/n              (ag3a_18)
+        erosion    — erosion-protection y/n     (ag3a_15)  [optional]
         acquire    — how acquired               (ag3a_25)
         legal_cert — certificate of occupancy   (ag3a_28a)
+        cert_other — other ownership document   (ag3a_28d) [optional]
 
     Returns
     -------
     pd.DataFrame indexed by ``(t, i, plot_id)`` with columns
-        Area (hectares, float), AreaUnit (str, 'acres'), Tenure (str),
-        TenureSystem (str), SoilType (str), Irrigated (bool nullable).
+        Area (hectares, float), AreaUnit (str, 'acres'),
+        SelfReportedArea (hectares, float — farmer estimate before the
+        GPS-preference merge), Tenure (str), TenureSystem (str),
+        SoilType (str), Irrigated (bool nullable), Owned (bool nullable),
+        Certificate (bool nullable), ErosionProtection (bool nullable),
+        Fallow (bool nullable).
+
+    The five reported item attributes beyond the original area/tenure/soil
+    set (SelfReportedArea, Owned, Certificate, ErosionProtection, Fallow)
+    mirror the WB LSMS-ISA Plot_dataset item fields (TZA_NPS*.do plot
+    block); each is a value the questionnaire records PER PLOT.  Per-HH
+    rollups (farm_size, nb_plots, nb_fallow_plots, soil_fertility_index)
+    are transformations over these item columns, NOT stored here.
+
     GPS coordinates (ag2a_07__Latitude/Longitude) are CONFIDENTIAL /
-    redacted in the source and are deliberately NOT emitted.
+    redacted in the source and are deliberately NOT emitted.  plot_slope /
+    plot_elevation are ABSENT from the NPS instrument (the WB cleaning code
+    notes "plot slope (absent)" / "plot elevation (absent)"; they come from
+    external geospatial layers, not the survey) and are likewise omitted.
     """
     c = colmap
     tenure_map = _plot_harmonized_codes('harmonize_tenure')
@@ -792,7 +809,11 @@ def plot_features_for_wave(t, sec02, sec3a, colmap):
     a['Area'] = (area_acres * HECTARES_PER_ACRE).values
     area_unit = pd.Series(['acres'] * len(sec02), index=sec02.index, dtype='string')
     a['AreaUnit'] = area_unit.where(area_acres.notna(), pd.NA).values
-    area = a[['_hh', '_plot', 'Area', 'AreaUnit']]
+    # SelfReportedArea: the farmer estimate alone (ha), kept distinct from
+    # the GPS-preferred Area (WB Plot_dataset carries area_self_reported as
+    # its own item field).  Same plausibility clamp already applied above.
+    a['SelfReportedArea'] = (area_est * HECTARES_PER_ACRE).values
+    area = a[['_hh', '_plot', 'Area', 'AreaUnit', 'SelfReportedArea']]
 
     # --- AG_SEC_3A: detail ---------------------------------------------
     d = pd.DataFrame(index=sec3a.index)
@@ -815,6 +836,39 @@ def plot_features_for_wave(t, sec02, sec3a, colmap):
     irrigated = irr.map({1: True, 2: False}).astype('boolean')
     d['Irrigated'] = irrigated.values
 
+    # --- reported item attributes (WB Plot_dataset parity, GAP 6) -------
+    # Owned: WB plot_owned recode of how-acquired ag3a_25 -- codes
+    # {1,2,5,9} (purchased / granted-titled / inherited / allocated as
+    # owner) -> True, any other acquisition mode -> False.  NaN where
+    # acquisition is unrecorded.  (TZA_NPS*.do plot block.)
+    owned = acq.map(lambda v: pd.NA if pd.isna(v)
+                    else (True if v in (1, 2, 5, 9) else False)).astype('boolean')
+    d['Owned'] = owned.values
+
+    # Certificate: WB plot_certificate.  Base from ag3a_28a (1,2 -> Yes;
+    # 3 -> No), promoted to True when any other ownership document
+    # ag3a_28d is in 1..5, and forced False when the plot is not Owned.
+    cert_a = pd.to_numeric(sec3a[c['legal_cert']], errors='coerce').astype('Int64')
+    cert = cert_a.map({1: True, 2: True, 3: False}).astype('boolean')
+    if c.get('cert_other') is not None and c['cert_other'] in sec3a.columns:
+        cert_d = pd.to_numeric(sec3a[c['cert_other']], errors='coerce').astype('Int64')
+        cert = cert.where(~cert_d.isin([1, 2, 3, 4, 5]), True)
+    cert = cert.where(~(owned == False), False)
+    d['Certificate'] = cert.values
+
+    # ErosionProtection: ag3a_15 1=YES->True, 2=NO->False, else NaN.
+    if c.get('erosion') is not None and c['erosion'] in sec3a.columns:
+        ero = pd.to_numeric(sec3a[c['erosion']], errors='coerce').astype('Int64')
+        d['ErosionProtection'] = ero.map({1: True, 2: False}).astype('boolean').values
+    else:
+        d['ErosionProtection'] = pd.array([pd.NA] * len(sec3a), dtype='boolean')
+
+    # Fallow: WB fallow_plot from use status ag3a_03 == 4 (left fallow);
+    # any other recorded use -> False; NaN where use is unrecorded.
+    fallow = use.map(lambda v: pd.NA if pd.isna(v)
+                     else (True if v == 4 else False)).astype('boolean')
+    d['Fallow'] = fallow.values
+
     # --- merge (1:1 on hhid, plot) -------------------------------------
     df = area.merge(d, on=['_hh', '_plot'], how='outer', indicator=True)
     n_unmatched = int((df['_merge'] != 'both').sum())
@@ -827,7 +881,9 @@ def plot_features_for_wave(t, sec02, sec3a, colmap):
     df['t'] = t
     df = df.rename(columns={'_hh': 'i', '_plot': 'plot_id'})
     df = df.set_index(['t', 'i', 'plot_id'])
-    df = df[['Area', 'AreaUnit', 'Tenure', 'TenureSystem', 'SoilType', 'Irrigated']]
+    df = df[['Area', 'AreaUnit', 'SelfReportedArea', 'Tenure', 'TenureSystem',
+             'SoilType', 'Irrigated', 'Owned', 'Certificate',
+             'ErosionProtection', 'Fallow']]
     return df
 
 
