@@ -61,6 +61,33 @@ $(VAR_DIR)/livestock.parquet: livestock.py niger.py categorical_mapping.org \
 ../%/_/livestock.parquet: ../%/_/livestock.py niger.py categorical_mapping.org
 	(cd $(@D) && python livestock.py)
 
+# plot_labor (GAP 3, item-level).  Same shape as the siblings above: the
+# country-level var/ parquet is built by the concatenator, which reads each
+# wave's parquet; the country script is run unconditionally to (re)build the
+# wave parquets it reads, then concatenates.  (No categorical table dep --
+# the labor `source` vocabulary is an inline code mapping.)
+PLOT_LABOR_WAVES := 2011-12 2014-15 2018-19 2021-22
+
+$(VAR_DIR)/plot_labor.parquet: plot_labor.py niger.py \
+		$(foreach w,$(PLOT_LABOR_WAVES),../$(w)/_/plot_labor.py)
+	$(foreach w,$(PLOT_LABOR_WAVES),(cd ../$(w)/_ && python plot_labor.py);)
+	python plot_labor.py
+
+../%/_/plot_labor.parquet: ../%/_/plot_labor.py niger.py
+	(cd $(@D) && python plot_labor.py)
+
+# people_last7days (GAP 3, item-level).  Same shape; Industry / hours are
+# derived in code (no categorical table dep).
+PEOPLE7_WAVES := 2011-12 2014-15 2018-19 2021-22
+
+$(VAR_DIR)/people_last7days.parquet: people_last7days.py niger.py \
+		$(foreach w,$(PEOPLE7_WAVES),../$(w)/_/people_last7days.py)
+	$(foreach w,$(PEOPLE7_WAVES),(cd ../$(w)/_ && python people_last7days.py);)
+	python people_last7days.py
+
+../%/_/people_last7days.parquet: ../%/_/people_last7days.py niger.py
+	(cd $(@D) && python people_last7days.py)
+
 clean:
 	rm -f panel_ids.json updated_ids.json
 

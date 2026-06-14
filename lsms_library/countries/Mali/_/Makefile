@@ -58,6 +58,27 @@ $(VAR_DIR)/plot_inputs.parquet: plot_inputs.py ../2014-15/_/plot_inputs.parquet 
 $(VAR_DIR)/livestock.parquet: livestock.py ../2014-15/_/livestock.parquet ../2017-18/_/livestock.parquet
 	python livestock.py
 
+# plot_labor (item-level plot labor by source, GAP 3a / parity loop).  The
+# plot-labor module lives in the EACI waves only (2014-15, 2017-18).  The
+# wave pattern rule materializes each wave parquet; the country-level
+# concatenator (plot_labor.py) aggregates into var/plot_labor.parquet.
+../%/_/plot_labor.parquet: ../%/_/plot_labor.py
+	(cd $(@D) && python plot_labor.py)
+
+$(VAR_DIR)/plot_labor.parquet: plot_labor.py ../2014-15/_/plot_labor.parquet ../2017-18/_/plot_labor.parquet
+	python plot_labor.py
+
+# people_last7days (per-individual 7-day activity, GAP 3b / parity loop).
+# The individual labor/time-use module lives in the EACI waves only
+# (2014-15, 2017-18).  The wave pattern rule materializes each wave parquet;
+# the country-level concatenator (people_last7days.py) aggregates into
+# var/people_last7days.parquet.
+../%/_/people_last7days.parquet: ../%/_/people_last7days.py
+	(cd $(@D) && python people_last7days.py)
+
+$(VAR_DIR)/people_last7days.parquet: people_last7days.py ../2014-15/_/people_last7days.parquet ../2017-18/_/people_last7days.parquet
+	python people_last7days.py
+
 clean:
 	rm -f panel_ids.json updated_ids.json
 

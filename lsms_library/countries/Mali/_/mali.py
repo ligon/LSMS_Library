@@ -529,3 +529,183 @@ def livestock_finalize(df):
     })
     out = out[['HeadCount', 'HeadAcquired', 'HeadSold', 'Value']]
     return out.sort_index()
+
+
+# ---------------------------------------------------------------------------
+# plot_labor (GAP 3a; parity loop) — item-level (t, i, plot, source)
+# ---------------------------------------------------------------------------
+#
+# One row per (plot, labor source).  source in {family, hired, other}, on
+# the shared `harmonize_labor_source` Preferred Labels.  Source: the EACI
+# plot-labor rosters that the WB MLI_EACI*.do code reads then collapses to
+# the per-plot totals (total_family_labor_days / total_hired_labor_days /
+# total_other_labor_days / total_labor_days) and the median-wage valuation
+# (hired_labor_value).  We keep the PRE-collapse REPORTED person-days per
+# source — strictly richer than the WB collapsed totals, which are
+# transformations.py rollups over these item rows.
+#
+# Two questionnaire passages contribute, both at the plot grain:
+#   - post-planting (PP): MLI_EACI1.do:667-748 (lab_roster, s2b vars);
+#     MLI_EACI2.do:603-674 (s11e vars).
+#   - post-harvest  (PH): MLI_EACI1.do:750-868 (lab_roster2, s2f vars);
+#     MLI_EACI2.do:676-769 (s7e vars).
+# The wave script computes person-days for each (source, passage,
+# gender-split) and hands a long (t, i, plot, source) frame to
+# `plot_labor_finalize`, which sums the passages and gender splits to the
+# REPORTED person-days per (plot, source) and carries the reported hired
+# cash wage.  PersonDays = persons * days-each (s..05a * s..05b style), the
+# same product the WB code forms before it sums.
+#
+# REPORTED item-level columns ONLY:
+#   PersonDays — reported person-days of that source applied to the plot,
+#                summed over passages (PP+PH) and the man/woman/child
+#                demographic splits within a source.
+#   Wage       — reported cash paid to HIRED labor (FCFA) where the survey
+#                records it; NaN for family / other (no cash wage asked).
+# NO total_labor_days / total_family_labor_days / total_hired_labor_days /
+# hired_labor_value — all four are transformations.py rollups over these
+# rows (total_* = groupby-sum by source; hired_labor_value = median-wage
+# valuation over the hired rows).
+
+# EACI "Manquant" / refusal sentinels on the reported day/persons/wage
+# columns (cf. MLI_EACI1.do:720-722 `replace = . if ==99|999|99999999`).
+_LABOR_SENTINELS = [99, 999, 9999, 99999, 999999, 9999999, 99999999]
+
+
+def _labor_source_labels(series):
+    """Map a Series of harmonize_labor_source Codes (family/hired/other)
+    -> Preferred Label."""
+    m = tools.get_categorical_mapping(tablename='harmonize_labor_source',
+                                      idxvars='Code',
+                                      **{'Preferred Label': 'Preferred Label'})
+    out = series.astype('string').str.strip().map(m)
+    return out.astype('string').where(out.notna(), pd.NA)
+
+
+def plot_labor_finalize(df):
+    """Common post-processing for a plot_labor wave DataFrame.
+
+    Expects raw columns already assembled, one row per
+    (t, i, plot, source, <passage/gender split>):
+        t, i, plot, source (harmonize_labor_source Code: family/hired/other),
+        PersonDays (reported person-days for that split), Wage (reported cash
+        wage for hired rows; NA otherwise).
+    Maps the source code -> Preferred Label, coerces the reported columns to
+    numeric (clearing the EACI Manquant sentinels), drops content-free rows
+    (a source/split with no reported person-days and no wage), sets the
+    (t, i, plot, source) index, and collapses to ONE row per (plot, source)
+    by SUMMING the reported person-days over passages and gender splits
+    (min_count=1 so an all-NA group stays NA, not a spurious 0) and summing
+    the reported hired wage over the splits.
+    """
+    df = df.copy()
+    df['source'] = _labor_source_labels(df['source'])
+    df = df.dropna(subset=['source'])  # drop unmapped source codes
+
+    for c in ('PersonDays', 'Wage'):
+        if c not in df.columns:
+            df[c] = pd.NA
+        df[c] = pd.to_numeric(df[c], errors='coerce')
+        df.loc[df[c].isin(_LABOR_SENTINELS), c] = pd.NA
+
+    # Drop content-free rows: a (plot, source, split) for which the survey
+    # reported neither person-days nor a wage.  A reported positive
+    # PersonDays or a reported positive Wage counts as content; an
+    # all-zero/all-NA split does not (the roster has fixed slots per source
+    # and gender, with zeros where that source did not work the plot —
+    # keeping them would emit empty rows on every plot).
+    has_content = (df['PersonDays'].fillna(0).gt(0)
+                   | df['Wage'].fillna(0).gt(0))
+    df = df[has_content]
+
+    df['plot'] = df['plot'].astype('string')
+
+    keys = ['t', 'i', 'plot', 'source']
+    g = df.groupby(keys, dropna=False, as_index=True)
+    out = pd.DataFrame({
+        'PersonDays': g['PersonDays'].sum(min_count=1),
+        'Wage':       g['Wage'].sum(min_count=1),
+    })
+    out = out[['PersonDays', 'Wage']]
+    return out.sort_index()
+
+
+# ---------------------------------------------------------------------------
+# people_last7days (GAP 3b; parity loop) — item-level (t, i, pid)
+# ---------------------------------------------------------------------------
+#
+# One row per individual, mirroring Uganda's per-individual 7-day activity
+# feature so the six labor-gap countries match the one we already have.
+# Source: the EACI individual labor/time-use module the WB MLI_EACI*.do
+# code reads (MLI_EACI1.do:1435-1520, indiv_roster EACIIND_p1 s04 vars;
+# MLI_EACI2.do:1340-1427, indiv_labor eaci17_s04p1 s4 vars).
+#
+# REPORTED per-individual columns ONLY (no rollups):
+#   farm_work / SOB_work / wage_work — nullable-bool 7-day activity dummies
+#       (worked on the household farm / own non-farm business / for a wage).
+#   farm_hrs / SB_hrs / wage_hrs     — average weekly hours in each activity
+#       ((months * days * hours) / 52, the WB av_hours construction).
+#   Industry — primary-job industry on the `harmonize_industry` Preferred
+#       Labels (Agriculture / Fishing / Mining / Manufacturing /
+#       Construction / Services), decoded from the WB ind_* dummy split over
+#       the primary-job industry code.  Zeroed (-> NA) for self-employment /
+#       no-work as the WB code does; NOT gated on wage_work (so a non-wage
+#       primary job in a recognized industry still carries a label — a
+#       wage-only cut is a transformation over (Industry, wage_work)).
+#   working_age — nullable bool (the WB working_age = age >= 6 floor).
+# These are per-individual REPORTED values; the household roll-ups
+# (nb_members_working_age etc.) are transformations.py, never stored.
+
+# The six WB ind_* dummies map to one canonical Industry label.  Code is the
+# WB dummy stem; Preferred Label resolves via the harmonize_industry table.
+_INDUSTRY_CODES = ['ind_ag', 'ind_fish', 'ind_mining',
+                   'ind_manuf', 'ind_const', 'ind_serv']
+
+
+def _industry_labels(series):
+    """Map a Series of harmonize_industry Codes (ind_ag .. ind_serv)
+    -> Preferred Label."""
+    m = tools.get_categorical_mapping(tablename='harmonize_industry',
+                                      idxvars='Code',
+                                      **{'Preferred Label': 'Preferred Label'})
+    out = series.astype('string').str.strip().map(m)
+    return out.astype('string').where(out.notna(), pd.NA)
+
+
+def people_last7days_finalize(df):
+    """Common post-processing for a people_last7days wave DataFrame.
+
+    Expects raw columns already assembled, one row per (t, i, pid):
+        t, i, pid, farm_work, SOB_work, wage_work (nullable bool dummies),
+        farm_hrs, SB_hrs, wage_hrs (float weekly hours),
+        Industry (harmonize_industry Code or NA), working_age (nullable bool).
+    Maps the Industry code -> Preferred Label, coerces dtypes, sets the
+    (t, i, pid) index, and (defensively) collapses any exact-duplicate
+    (t, i, pid) by taking the any/first of the reported values.
+    """
+    df = df.copy()
+    df['Industry'] = _industry_labels(df['Industry'])
+
+    for c in ('farm_work', 'SOB_work', 'wage_work', 'working_age'):
+        df[c] = df[c].astype('boolean')
+    for c in ('farm_hrs', 'SB_hrs', 'wage_hrs'):
+        df[c] = pd.to_numeric(df[c], errors='coerce')
+
+    df['pid'] = df['pid'].astype('string')
+    keys = ['t', 'i', 'pid']
+    df = df.dropna(subset=['pid'])
+
+    g = df.groupby(keys, dropna=False, as_index=True)
+    out = pd.DataFrame({
+        'farm_work':   g['farm_work'].max(),
+        'SOB_work':    g['SOB_work'].max(),
+        'wage_work':   g['wage_work'].max(),
+        'farm_hrs':    g['farm_hrs'].sum(min_count=1),
+        'SB_hrs':      g['SB_hrs'].sum(min_count=1),
+        'wage_hrs':    g['wage_hrs'].sum(min_count=1),
+        'Industry':    g['Industry'].first(),
+        'working_age': g['working_age'].max(),
+    })
+    out = out[['farm_work', 'SOB_work', 'wage_work',
+               'farm_hrs', 'SB_hrs', 'wage_hrs', 'Industry', 'working_age']]
+    return out.sort_index()

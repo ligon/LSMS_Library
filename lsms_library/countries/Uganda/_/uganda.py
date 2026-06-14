@@ -1880,3 +1880,250 @@ ANTHRO_FILES = {
     '2018-19': '../Data/GSEC6_5.dta',
     '2019-20': '../Data/HH/gsec6_5.dta',
 }
+
+
+# ---------------------------------------------------------------------------
+# plot_labor  (GAP 3 — item-level plot-labor person-days)
+# ---------------------------------------------------------------------------
+#
+# One row per REPORTED labor source on a plot-season, grain
+# (t, i, plot, source, season).  Source: the AGSEC3A (season 1) / AGSEC3B
+# (season 2) plot-input modules -- the SAME files plot_inputs reads -- whose
+# labor block the WB code (UGA_UNPS1.do:467-509, and the corresponding block
+# in UNPS2..8) reads only to build the per-parcel SUM columns
+# total_labor_days / total_family_labor_days / total_hired_labor_days and the
+# median-wage hired_labor_value.  We keep the PRE-collapse REPORTED rows:
+#   PersonDays  -- reported person-days of that source on the plot-season
+#   Wage        -- reported cash paid to HIRED labor (NaN for family/other)
+# The WB sums and median-wage valuation are TRANSFORMATIONS, never stored here
+# (total_labor_days = groupby(['t','i']).PersonDays.sum(); hired_labor_value =
+# median-wage x hired PersonDays).
+#
+# ``source`` is a tiny controlled vocabulary emitted directly by this builder
+# (no per-wave code lookup needed) -- the three canonical labels below.  It is
+# NOT a categorical_mapping table because the builder assigns the label, it is
+# not decoded from a raw survey code.
+LABOR_SOURCES = ('family', 'hired', 'other')
+
+# ``season`` is carried in the grain (mirroring crop_production) because the
+# SAME (hhid-parcel-plot) plot id appears in BOTH AGSEC3A and AGSEC3B for ~64%
+# of plots, and the labor question is asked per plot-SEASON.  Collapsing the
+# two seasons into one (plot, source) row would require summing across seasons
+# -- a transformation.  Keeping ``season`` in {A, B} preserves the reported
+# per-plot-season rows.  ``plot`` itself is the bare hhid-parcel-plot (no
+# season suffix) so a plot_labor row joins crop_production / plot_inputs /
+# plot_features on (t, i, plot) [+ season for crop_production].
+
+# Per-wave column maps for plot_labor_for_wave.  Three questionnaire vintages:
+#
+#   2009-10 / 2010-11 (UNPS1/2):
+#     family  q39  (single cell, person-days)   gate used q38 (q38==0 -> 0)
+#     hired   q42a/q42b/q42c (man/woman/child)  gate hired-flag q41 (q41==2 -> 0)
+#     wage    q43
+#   2011-12 (UNPS3):
+#     family  q32  (single cell)                no separate gate
+#     hired   q35a/q35b/q35c                     gate q34 (q34==2 -> 0)
+#     wage    q36
+#     other   q47/q48/q49 (exchange man/woman/child days)  [only this wave]
+#   2013-14 / 2015-16 (UNPS4/5):
+#     family  q33a_1 .. q33e_1 (up to 5 family-worker day cells)  no gate
+#     hired   q35a/q35b/q35c                     gate q34 (q34==2 -> 0)
+#     wage    q36
+#   2018-19 (UNPS7):
+#     family  ABSENT  (the WB code sets total_family_labor_days = .)
+#     hired   s3aq35a/b/c                        gate s3aq34 (==2 -> 0)
+#     wage    s3aq36
+#     season B: the AGSEC3B labor block is not present (only s3bq35b), so no
+#               season-B labor rows are emitted for this wave.
+#   2019-20 (UNPS8):
+#     family  in a SEPARATE AGSEC3A_1 family-roster file that is NOT in-repo,
+#             so no family rows are emitted (documented partial).
+#     hired   s3aq35a/b/c                        gate s3aq34 (==2 -> 0)
+#     wage    s3aq36
+#
+# Prefix is the only season-B difference (a3aq->a3bq, s3aq->s3bq) except the
+# 2011-12 "other" cells, which are upper-case A3AQ47.. / A3BQ47.. in the raw
+# .dta.  Each season sub-map names: hhid/parcel/plot id columns, the family
+# day cell(s) (``family`` -> list), the hired day cells (``hired`` -> list) +
+# its used-flag (``hired_flag``), the ``wage`` cell, and the optional ``other``
+# day cells (``other`` -> list).  A missing key means that source is not
+# recorded for that wave/season.
+LABOR_COLMAPS = {
+    '2009-10': {
+        'A': {'hhid': 'HHID', 'parcel': 'a3aq1', 'plot': 'a3aq3',
+              'family': ['a3aq39'], 'family_flag': 'a3aq38',
+              'hired': ['a3aq42a', 'a3aq42b', 'a3aq42c'], 'hired_flag': 'a3aq41',
+              'wage': 'a3aq43'},
+        'B': {'hhid': 'HHID', 'parcel': 'a3bq1', 'plot': 'a3bq3',
+              'family': ['a3bq39'], 'family_flag': 'a3bq38',
+              'hired': ['a3bq42a', 'a3bq42b', 'a3bq42c'], 'hired_flag': 'a3bq41',
+              'wage': 'a3bq43'},
+    },
+    '2010-11': {
+        'A': {'hhid': 'HHID', 'parcel': 'prcid', 'plot': 'pltid',
+              'family': ['a3aq39'], 'family_flag': 'a3aq38',
+              'hired': ['a3aq42a', 'a3aq42b', 'a3aq42c'], 'hired_flag': 'a3aq41',
+              'wage': 'a3aq43'},
+        'B': {'hhid': 'HHID', 'parcel': 'prcid', 'plot': 'pltid',
+              'family': ['a3bq39'], 'family_flag': 'a3bq38',
+              'hired': ['a3bq42a', 'a3bq42b', 'a3bq42c'], 'hired_flag': 'a3bq41',
+              'wage': 'a3bq43'},
+    },
+    '2011-12': {
+        'A': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+              'family': ['a3aq32'],
+              'hired': ['a3aq35a', 'a3aq35b', 'a3aq35c'], 'hired_flag': 'a3aq34',
+              'wage': 'a3aq36',
+              'other': ['A3AQ47', 'A3AQ48', 'A3AQ49']},
+        'B': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+              'family': ['a3bq32'],
+              'hired': ['a3bq35a', 'a3bq35b', 'a3bq35c'], 'hired_flag': 'a3bq34',
+              'wage': 'a3bq36',
+              'other': ['A3BQ47', 'A3BQ48', 'A3BQ49']},
+    },
+    '2013-14': {
+        'A': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+              'family': ['a3aq33a_1', 'a3aq33b_1', 'a3aq33c_1', 'a3aq33d_1', 'a3aq33e_1'],
+              'hired': ['a3aq35a', 'a3aq35b', 'a3aq35c'], 'hired_flag': 'a3aq34',
+              'wage': 'a3aq36'},
+        'B': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+              'family': ['a3bq33a_1', 'a3bq33b_1', 'a3bq33c_1', 'a3bq33d_1', 'a3bq33e_1'],
+              'hired': ['a3bq35a', 'a3bq35b', 'a3bq35c'], 'hired_flag': 'a3bq34',
+              'wage': 'a3bq36'},
+    },
+    '2015-16': {
+        'A': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+              'family': ['a3aq33a_1', 'a3aq33b_1', 'a3aq33c_1', 'a3aq33d_1', 'a3aq33e_1'],
+              'hired': ['a3aq35a', 'a3aq35b', 'a3aq35c'], 'hired_flag': 'a3aq34',
+              'wage': 'a3aq36'},
+        'B': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+              'family': ['a3bq33a_1', 'a3bq33b_1', 'a3bq33c_1', 'a3bq33d_1', 'a3bq33e_1'],
+              'hired': ['a3bq35a', 'a3bq35b', 'a3bq35c'], 'hired_flag': 'a3bq34',
+              'wage': 'a3bq36'},
+    },
+    '2018-19': {
+        # No family-labor cells; season-B labor block absent (only s3bq35b).
+        'A': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
+              'hired': ['s3aq35a', 's3aq35b', 's3aq35c'], 'hired_flag': 's3aq34',
+              'wage': 's3aq36'},
+    },
+    '2019-20': {
+        # Family labor lives in a separate AGSEC3A_1 roster not in-repo.
+        'A': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
+              'hired': ['s3aq35a', 's3aq35b', 's3aq35c'], 'hired_flag': 's3aq34',
+              'wage': 's3aq36'},
+        'B': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
+              'hired': ['s3bq35a', 's3bq35b', 's3bq35c'], 'hired_flag': 's3bq34',
+              'wage': 's3bq36'},
+    },
+}
+
+
+def _labor_persondays(df, cols, flag_col=None, flag_zero_code=None):
+    """Sum the REPORTED person-day cells in ``cols`` row-wise (NaN where ALL
+    cells are missing, mirroring Stata ``egen rowtotal(), missing``).  When a
+    ``flag_col`` is given, set the result to 0 where the flag equals
+    ``flag_zero_code`` (the survey "did you use this source? No" branch), again
+    mirroring the WB ``replace ... = 0 if flag==code`` logic.
+
+    The sum is over the survey's own disaggregated cells of a SINGLE labor
+    question (man/woman/child day cells, or per-family-worker day cells); it is
+    the reported person-day quantity that question measures, NOT a cross-row /
+    cross-plot aggregate (those stay in transformations)."""
+    present = [c for c in cols if c in df.columns]
+    if not present:
+        return pd.Series([np.nan] * len(df), index=df.index)
+    block = df[present].apply(lambda s: pd.to_numeric(s, errors='coerce'))
+    # rowtotal(..., missing): NaN only when every cell is NaN, else sum.
+    out = block.sum(axis=1, min_count=1)
+    if flag_col is not None and flag_col in df.columns and flag_zero_code is not None:
+        flag = _to_int_code(df[flag_col])
+        out = out.where(flag != flag_zero_code, 0.0)
+    return out
+
+
+def plot_labor_for_wave(t, df3a, df3b, colmap):
+    """Build canonical ``plot_labor`` for one Uganda UNPS wave.
+
+    Parameters
+    ----------
+    t : str
+        Wave id (e.g. ``"2011-12"``).
+    df3a, df3b : pd.DataFrame | None
+        Raw AGSEC3A (season 1) / AGSEC3B (season 2) plot-input modules,
+        loaded with ``convert_categoricals=False`` so code columns carry
+        integer codes.  ``None`` permitted (season absent).
+    colmap : dict
+        Per-wave column map; see ``LABOR_COLMAPS``.
+
+    Returns
+    -------
+    pd.DataFrame indexed by ``(t, i, plot, source, season)`` with REPORTED
+    columns ``PersonDays`` (Float64) and ``Wage`` (Float64, hired rows only;
+    NaN for family/other).  One row per (plot, source, season) with a non-NaN
+    reported PersonDays value.
+    """
+    pieces = []
+    for season, df3 in (('A', df3a), ('B', df3b)):
+        if df3 is None or len(df3) == 0:
+            continue
+        cm = (colmap or {}).get(season)
+        if not cm:
+            continue
+        hh = df3[cm['hhid']].apply(format_id)
+        parcel = df3[cm['parcel']].apply(format_id)
+        plot = (df3[cm['plot']].apply(format_id)
+                if cm.get('plot') and cm['plot'] in df3.columns
+                else pd.Series([''] * len(df3), index=df3.index))
+        plot_id = hh.astype(str) + '-' + parcel.astype(str) + '-' + plot.astype(str)
+
+        # Reported person-days per source (one Series each, aligned to df3).
+        source_days = {}
+        if cm.get('family'):
+            source_days['family'] = _labor_persondays(
+                df3, cm['family'], cm.get('family_flag'),
+                flag_zero_code=0 if cm.get('family_flag') else None)
+        if cm.get('hired'):
+            source_days['hired'] = _labor_persondays(
+                df3, cm['hired'], cm.get('hired_flag'), flag_zero_code=2)
+        if cm.get('other'):
+            source_days['other'] = _labor_persondays(df3, cm['other'])
+
+        # Reported hired wage (cash paid to hired labor).
+        wage = (pd.to_numeric(df3[cm['wage']], errors='coerce')
+                if cm.get('wage') and cm['wage'] in df3.columns
+                else pd.Series([np.nan] * len(df3), index=df3.index))
+
+        for source, days in source_days.items():
+            piece = pd.DataFrame({
+                't': t,
+                'i': hh.values,
+                'plot': plot_id.values,
+                'source': source,
+                'season': season,
+                'PersonDays': days.values,
+                'Wage': (wage.values if source == 'hired'
+                         else np.full(len(df3), np.nan)),
+            })
+            # Keep only rows with a reported person-day value (drop the
+            # question-not-asked NaNs); a plot with 0 reported days for a
+            # source that WAS asked is a genuine reported zero and stays.
+            piece = piece[piece['PersonDays'].notna()]
+            if len(piece):
+                pieces.append(piece)
+
+    if not pieces:
+        return pd.DataFrame(
+            columns=['PersonDays', 'Wage'],
+            index=pd.MultiIndex.from_arrays(
+                [[]] * 5, names=['t', 'i', 'plot', 'source', 'season']))
+
+    out = pd.concat(pieces, ignore_index=True)
+    out['PersonDays'] = out['PersonDays'].astype('Float64')
+    out['Wage'] = out['Wage'].astype('Float64')
+    # Collapse exact-duplicate (plot, source, season) keys that can arise when
+    # a wave repeats a plot row; keep the max reported days / wage so the index
+    # is unique without summing distinct reported observations.
+    out = (out.groupby(['t', 'i', 'plot', 'source', 'season'], dropna=False)
+              .agg({'PersonDays': 'max', 'Wage': 'max'}))
+    return out

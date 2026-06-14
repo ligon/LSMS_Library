@@ -715,3 +715,40 @@ count, but ride the same roster row; carried for completeness.)
 | 2021-22 |   14 | Mules           |
 | 2021-22 |   15 | Donkeys         |
 | 2021-22 |   16 | Beehives        |
+
+* harmonize_industry (wage-work industry -- GAP 3, people_last7days)
+
+The section-4 wage-work industry code (=hh_s4q11_b= W1-W3, =s4q34d= W4-W5)
+-> a coarse ISIC-style industry the WB code recodes into six dummies
+(=ind_ag= / =ind_fish= / =ind_mining= / =ind_manuf= / =ind_const= /
+=ind_serv=; ETH_ESS1.do:1242-1248).  We keep the single REPORTED industry
+*label* per individual instead (richer than six dummies, which are
+trivially derived downstream).  The code->coarse-industry collapse is the
+SAME across every ESS wave (1=Agriculture; 2=Fishing; 3=Mining; 4|5=
+Manufacturing; 6=Construction; 7-18=Services), so the table is plain (not
+wave-keyed).  Codes 19+ (a handful of "other / not stated" sector codes that
+appear in some waves) fall outside the WB 1-18 industry range and map to
+=pd.NA= (no Preferred Label row), matching the WB code that only classifies
+1-18.
+
+#+name: harmonize_industry
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Agriculture     |
+|    2 | Fishing         |
+|    3 | Mining          |
+|    4 | Manufacturing   |
+|    5 | Manufacturing   |
+|    6 | Construction    |
+|    7 | Services        |
+|    8 | Services        |
+|    9 | Services        |
+|   10 | Services        |
+|   11 | Services        |
+|   12 | Services        |
+|   13 | Services        |
+|   14 | Services        |
+|   15 | Services        |
+|   16 | Services        |
+|   17 | Services        |
+|   18 | Services        |

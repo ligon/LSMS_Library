@@ -566,3 +566,39 @@
 |  730 | Other Poultry      | Autres volailles      | Autres volailles      |
 |  810 | Pigs               | Porcs                 | Porcs                 |
 |  910 | Rabbits            | Lapins                | Lapins                |
+
+# harmonize_labor_source — the labor-source (`source` index level) taxonomy
+# for plot_labor (GAP 3a, parity loop).  The three sources are FIXED
+# questionnaire blocks in the EACI plot-labor rosters (post-planting
+# lab_roster: family s2bq04/s11eq04, hired s2bq06/s11eq06, other/exchange
+# s2bq08/s11eq08; post-harvest lab_roster2: the analogous s2f/s7e blocks),
+# NOT a decoded label column.  The wave scripts emit a synthetic `Code` per
+# source (identical across waves, hence one shared column), and this table
+# maps it to the canonical Preferred Label.  'other' is the EACI "free /
+# exchange / mutual-aid" labor the WB code calls "other (free) labor".
+#+name: harmonize_labor_source
+| Code   | Preferred Label | 2014-15 | 2017-18 |
+|--------+-----------------+---------+---------|
+| family | Family          | x       | x       |
+| hired  | Hired           | x       | x       |
+| other  | Other           | x       | x       |
+
+# harmonize_industry — the wage-work industry (`Industry` column) taxonomy
+# for people_last7days (GAP 3b, parity loop).  The WB MLI_EACI*.do code
+# splits the individual's primary-job industry code (s04q22 in 2014-15
+# EACIIND_p1; s4q13 in 2017-18 eaci17_s04p1) into six mutually-exclusive
+# dummies ind_ag / ind_fish / ind_mining / ind_manuf / ind_const / ind_serv
+# (MLI_EACI1.do:1450-1456; MLI_EACI2.do:1355-1361, different raw cut-points
+# per wave but the SAME six target classes).  The wave script reduces those
+# six dummies back to one `Code` (the dummy stem) per individual; this table
+# maps it to the canonical Preferred Label.  Industry is non-NA only for
+# wage workers (the dummies are zeroed for self-employment / no-work).
+#+name: harmonize_industry
+| Code       | Preferred Label | 2014-15 | 2017-18 |
+|------------+-----------------+---------+---------|
+| ind_ag     | Agriculture     | x       | x       |
+| ind_fish   | Fishing         | x       | x       |
+| ind_mining | Mining          | x       | x       |
+| ind_manuf  | Manufacturing   | x       | x       |
+| ind_const  | Construction    | x       | x       |
+| ind_serv   | Services        | x       | x       |

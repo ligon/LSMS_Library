@@ -12,7 +12,7 @@ VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 # _ROSTER_DERIVED — no country-level parquet is built or consulted.
 # See GH #218.
 
-all: $(parquet) $(VAR_DIR)/food_acquired.parquet $(VAR_DIR)/food_coping.parquet $(VAR_DIR)/months_food_inadequate.parquet $(VAR_DIR)/crop_production.parquet $(VAR_DIR)/plot_inputs.parquet $(VAR_DIR)/livestock.parquet $(VAR_DIR)/anthropometry.parquet
+all: $(parquet) $(VAR_DIR)/food_acquired.parquet $(VAR_DIR)/food_coping.parquet $(VAR_DIR)/months_food_inadequate.parquet $(VAR_DIR)/crop_production.parquet $(VAR_DIR)/plot_inputs.parquet $(VAR_DIR)/livestock.parquet $(VAR_DIR)/anthropometry.parquet $(VAR_DIR)/plot_labor.parquet $(VAR_DIR)/people_last7days.parquet
 
 food_acquired = $(shell find $(rounds) -name food_acquired.py)
 # Wave-level parquets live in data_root, not in-tree
@@ -102,6 +102,37 @@ $(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/anthropometry.parquet: malawi.py
 
 $(VAR_DIR)/anthropometry.parquet: anthropometry.py $(anthropometry_parquet)
 	python anthropometry.py
+
+# --- plot_labor (GAP 3, plot grain) ---------------------------------------
+# Item-level (t, i, plot, source) plot labor (PersonDays, Wage) for the four
+# IHS3+/IHPS waves.  source in {family, hired, other}.  Each wave script
+# writes its parquet into data_root; the country script concatenates.
+# 2004-05 (IHS2) is ABSENT (household-level aggregated ag file, no
+# plot-level labor roster).  total_*_labor_days / hired_labor_value are
+# transformations, NOT stored.
+plot_labor_waves := 2010-11 2013-14 2016-17 2019-20
+plot_labor_parquet := $(foreach r,$(plot_labor_waves),$(LSMS_DATA_ROOT)/$(COUNTRY)/$(r)/_/plot_labor.parquet)
+
+$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/plot_labor.parquet: malawi.py
+	(cd ../$(*)/_/ && python plot_labor.py)
+
+$(VAR_DIR)/plot_labor.parquet: plot_labor.py $(plot_labor_parquet)
+	python plot_labor.py
+
+# --- people_last7days (GAP 3, individual grain) ---------------------------
+# Item-level (t, i, pid) 7-day individual time-use for the four IHS3+/IHPS
+# waves carrying the hh_mod_e labor module.  Each wave script writes its
+# parquet into data_root; the country script concatenates.  2004-05 (IHS2)
+# is ABSENT (predates the 7-day activity battery).  The six WB ind_* dummies
+# collapse to one wage_industry label; per-industry dummies are transforms.
+people_last7days_waves := 2010-11 2013-14 2016-17 2019-20
+people_last7days_parquet := $(foreach r,$(people_last7days_waves),$(LSMS_DATA_ROOT)/$(COUNTRY)/$(r)/_/people_last7days.parquet)
+
+$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/people_last7days.parquet: malawi.py
+	(cd ../$(*)/_/ && python people_last7days.py)
+
+$(VAR_DIR)/people_last7days.parquet: people_last7days.py $(people_last7days_parquet)
+	python people_last7days.py
 
 %.parquet: %.py malawi.py
 	(cd $(@D) && python ./$(<F))

@@ -1258,3 +1258,413 @@ def anthropometry_for_wave(t, anthro, roster, weight_cols, height_cols,
     out = out.set_index(['t', 'i', 'pid']).sort_index()
     return out[['Weight', 'Height', 'Sex', 'Age']]
 
+
+# ---------------------------------------------------------------------
+# plot_labor (GAP 3, grain 2) -- item-level reported plot labor by source
+# ---------------------------------------------------------------------
+#
+# Natural grain (t, i, plot, source): one row per labor SOURCE used on a
+# plot, source in {family, hired, other}.  Source: the post-harvest plot
+# labor roster (secta2_harvest{wN}; W4/W5 split it into secta2a family +
+# secta2b hired/other).  This is the construct NGA_GHS{1..5}.do reads then
+# collapses to the household totals total_labor_days / total_family_labor_
+# days / total_hired_labor_days / hired_labor_value.  We keep the
+# PRE-collapse per-(plot, source) rows:
+#   PersonDays  reported person-days of that source on the plot.
+#               family = Sigma over worker slots of (#workers * days each)
+#                        (or days alone where #workers is missing -- mirrors
+#                        the WB `replace hh_labordays = days if persons==.`).
+#               hired  = Sigma over man/woman/child of (#hired * days each).
+#               other  = Sigma over man/woman/child of reported free/exchange
+#                        person-days.
+#   Wage        cash paid to hired labor on the plot = Sigma over
+#               man/woman/child of (reported daily wage * hired days).
+#               NaN for family / other (no cash wage reported).
+# NO total_labor_days / total_family_labor_days / total_hired_labor_days /
+# hired_labor_value -- those are HH / cross-source SUM / median-wage
+# transformations over these rows, NEVER stored here.
+#
+# `source` (index) carries a harmonize_labor_source Preferred Label
+# (family / hired / other).  `v` auto-joins from sample() at API time
+# (plot_labor is NOT in the framework `_no_v_join` set).  plot (= plotid,
+# format_id) aligns with crop_production / plot_inputs on (t, i, plot)
+# (post-harvest round; t = PH_QUARTER[wave], matching crop_production).
+#
+# PP-round plot labor (sect11c1_planting{wN}, W2-W5) is NOT included: it is
+# a SECOND round of the same source on the same plot, and folding it onto
+# the same (plot, source) row would require a PP+PH SUM (the forbidden
+# total) while a separate round level is outside the GAP-3 grain.  Documented
+# partial -- the PH roster is present and consistent for all five waves.
+
+LABOR_FAMILY = 'family'
+LABOR_HIRED = 'hired'
+LABOR_OTHER = 'other'
+
+
+def _num(df, col):
+    """pd.to_numeric on df[col] if present, else an all-NaN float Series."""
+    if col in df.columns:
+        return pd.to_numeric(df[col], errors='coerce')
+    return pd.Series(np.nan, index=df.index, dtype='float64')
+
+
+def _family_days_wide(df, slots=('a', 'b', 'c', 'd'),
+                      id_t='sa2q1{let}1', n_t='sa2q1{let}2', d_t='sa2q1{let}3'):
+    """Family person-days from the wide W1-W3 secta2 roster: Sigma over worker
+    slots a-d of (#workers * days), using days alone where #workers is
+    missing (mirrors NGA_GHS1.do:642-643).  NaN where no slot is filled."""
+    total = pd.Series(0.0, index=df.index)
+    any_slot = pd.Series(False, index=df.index)
+    for let in slots:
+        present = _num(df, id_t.format(let=let)).notna()
+        n = _num(df, n_t.format(let=let))
+        d = _num(df, d_t.format(let=let))
+        slot = (n * d).where(n.notna(), d)
+        total = total.add(slot.where(present, 0.0).fillna(0.0), fill_value=0.0)
+        any_slot = any_slot | present
+    return total.where(any_slot, np.nan)
+
+
+def _mwc_days(df, n_cols, d_cols):
+    """Sigma over (man, woman, child) of #persons * days.  n_cols / d_cols are
+    3-tuples of (count, days) column names.  NaN where no group is reported."""
+    total = pd.Series(0.0, index=df.index)
+    any_grp = pd.Series(False, index=df.index)
+    for nc, dc in zip(n_cols, d_cols):
+        n = _num(df, nc)
+        d = _num(df, dc)
+        total = total.add((n * d).fillna(0.0), fill_value=0.0)
+        any_grp = any_grp | n.notna()
+    return total.where(any_grp, np.nan)
+
+
+def _mwc_days_direct(df, d_cols):
+    """Sigma over (man, woman, child) of reported person-days (each a single
+    column, the W1-W3 `other` block sa2q12a/b/c).  NaN where none reported."""
+    total = pd.Series(0.0, index=df.index)
+    any_grp = pd.Series(False, index=df.index)
+    for dc in d_cols:
+        d = _num(df, dc)
+        total = total.add(d.fillna(0.0), fill_value=0.0)
+        any_grp = any_grp | d.notna()
+    return total.where(any_grp, np.nan)
+
+
+def _hired_cash(df, n_cols, d_cols, w_cols):
+    """Cash paid to hired labor = Sigma over (man, woman, child) of
+    (daily wage * hired person-days).  hired person-days for a group =
+    #hired * days.  NaN where no group reports both a wage and days."""
+    total = pd.Series(0.0, index=df.index)
+    any_pay = pd.Series(False, index=df.index)
+    for nc, dc, wc in zip(n_cols, d_cols, w_cols):
+        n = _num(df, nc)
+        d = _num(df, dc)
+        w = _num(df, wc)
+        days = n * d
+        pay = days * w
+        total = total.add(pay.fillna(0.0), fill_value=0.0)
+        any_pay = any_pay | (days.notna() & w.notna())
+    return total.where(any_pay, np.nan)
+
+
+def _plot_labor_assemble(t, hhid, plot, family, hired, other, wage):
+    """Build the (t, i, plot, source) frame from per-plot day/cash Series.
+
+    family / hired / other : person-days Series aligned to the plot rows.
+    wage : hired-labor cash Series (NaN for family/other rows).
+    Returns DataFrame indexed by (t, i, plot, source) with PersonDays, Wage.
+    """
+    i = hhid.apply(format_id)
+    p = plot.apply(format_id)
+    rows = []
+    for source, days in ((LABOR_FAMILY, family),
+                         (LABOR_HIRED, hired),
+                         (LABOR_OTHER, other)):
+        piece = pd.DataFrame({
+            'i': i.values,
+            'plot': p.values,
+            'source': source,
+            'PersonDays': pd.to_numeric(days, errors='coerce').values,
+        })
+        if source == LABOR_HIRED:
+            piece['Wage'] = pd.to_numeric(wage, errors='coerce').values
+        else:
+            piece['Wage'] = np.nan
+        rows.append(piece)
+    out = pd.concat(rows, ignore_index=True)
+    out['t'] = t
+    # Drop rows with no household / plot key or no reported person-days
+    # (a source not used on the plot -> no item row).
+    out = out[out['i'].notna() & out['plot'].notna() & out['PersonDays'].notna()]
+    out = out.sort_values(['i', 'plot', 'source'])
+    out = out.drop_duplicates(subset=['t', 'i', 'plot', 'source'], keep='first')
+    out = out.set_index(['t', 'i', 'plot', 'source']).sort_index()
+    return out[['PersonDays', 'Wage']]
+
+
+def plot_labor_wide(t, df):
+    """Assemble plot_labor for a W1-W3 wide secta2 PH labor roster
+    (sa2q* variable scheme; one row per (hhid, plotid))."""
+    family = _family_days_wide(df)
+    hired = _mwc_days(df, ('sa2q2', 'sa2q5', 'sa2q8'),
+                      ('sa2q3', 'sa2q6', 'sa2q9'))
+    other = _mwc_days_direct(df, ('sa2q12a', 'sa2q12b', 'sa2q12c'))
+    wage = _hired_cash(df, ('sa2q2', 'sa2q5', 'sa2q8'),
+                       ('sa2q3', 'sa2q6', 'sa2q9'),
+                       ('sa2q4', 'sa2q7', 'sa2q10'))
+    return _plot_labor_assemble(t, df['hhid'], df['plotid'],
+                                family, hired, other, wage)
+
+
+def plot_labor_split(t, fam_df, hired_df, fam_days_col='sa2aq1b',
+                     n_cols=('sa2bq2', 'sa2bq5', 'sa2bq8'),
+                     d_cols=('sa2bq3', 'sa2bq6', 'sa2bq9'),
+                     w_cols=('sa2bq4', 'sa2bq7', 'sa2bq10'),
+                     other_n=('sa2bq14a', 'sa2bq14b', 'sa2bq14c'),
+                     other_d=('sa2bq15a', 'sa2bq15b', 'sa2bq15c')):
+    """Assemble plot_labor for the W4 split PH roster: a long family roster
+    (secta2a, one row per family worker, days in `fam_days_col`) summed to
+    plot level, joined to the plot-level hired/other roster (secta2b).
+    Mirrors NGA_GHS4.do:788-838 (sa2aq*/sa2bq* scheme)."""
+    fam = fam_df.copy()
+    fam['_i'] = fam['hhid'].apply(format_id)
+    fam['_plot'] = fam['plotid'].apply(format_id)
+    fam['_days'] = pd.to_numeric(fam.get(fam_days_col), errors='coerce')
+    fam_plot = (fam.groupby(['_i', '_plot'])['_days']
+                .sum(min_count=1).rename('family').reset_index())
+
+    h = hired_df.copy()
+    h['_i'] = h['hhid'].apply(format_id)
+    h['_plot'] = h['plotid'].apply(format_id)
+    h['hired'] = _mwc_days(h, n_cols, d_cols).values
+    h['other'] = _mwc_days(h, other_n, other_d).values
+    h['wage'] = _hired_cash(h, n_cols, d_cols, w_cols).values
+    h_plot = h[['_i', '_plot', 'hired', 'other', 'wage']].drop_duplicates(
+        ['_i', '_plot'])
+
+    merged = fam_plot.merge(h_plot, on=['_i', '_plot'], how='outer')
+    hhid = merged['_i']
+    plot = merged['_plot']
+    # _i / _plot are already format_id-applied; pass through identity so
+    # _plot_labor_assemble's format_id is a no-op on the canonical strings.
+    family = merged['family']
+    hired = merged.get('hired')
+    other = merged.get('other')
+    wage = merged.get('wage')
+    rows = []
+    for source, days in ((LABOR_FAMILY, family),
+                         (LABOR_HIRED, hired),
+                         (LABOR_OTHER, other)):
+        piece = pd.DataFrame({
+            'i': hhid.values,
+            'plot': plot.values,
+            'source': source,
+            'PersonDays': pd.to_numeric(days, errors='coerce').values
+            if days is not None else np.nan,
+        })
+        piece['Wage'] = (pd.to_numeric(wage, errors='coerce').values
+                         if source == LABOR_HIRED and wage is not None else np.nan)
+        rows.append(piece)
+    out = pd.concat(rows, ignore_index=True)
+    out['t'] = t
+    out = out[out['i'].notna() & out['plot'].notna() & out['PersonDays'].notna()]
+    out = out.sort_values(['i', 'plot', 'source'])
+    out = out.drop_duplicates(subset=['t', 'i', 'plot', 'source'], keep='first')
+    out = out.set_index(['t', 'i', 'plot', 'source']).sort_index()
+    return out[['PersonDays', 'Wage']]
+
+
+# ---------------------------------------------------------------------
+# people_last7days (GAP 3, grain 1) -- individual 7-day activity
+# ---------------------------------------------------------------------
+#
+# Natural grain (t, i, pid): one row per household member, with the
+# reported last-7-days labor-activity items the WB code (NGA_GHS{1..5}.do
+# labor section) builds:
+#   farm_work / SOB_work / wage_work  0/1 did the member do farm work /
+#                                     own-business work / wage work in the
+#                                     last 7 days
+#   farm_hrs / SB_hrs / wage_hrs      hours spent on each (last 7 days)
+#   Industry                          harmonized industry of the member's
+#                                     wage/main work (harmonize_industry
+#                                     Preferred Label; <NA> for non-workers)
+#   working_age                       0/1 member is of working age (the WB
+#                                     `s3q1==1` / `s4aq1==1` filter)
+# Reported per-individual ONLY -- no household rollups.  `v` auto-joins
+# from sample() at API time (people_last7days is NOT in `_no_v_join`).
+# `pid` matches household_roster's pid (raw indiv as string).
+#
+# Per-wave source (the labor module):
+#   W1 2010-11  sect3_plantingw1   s3q* ; hours via job-type logic (s3q18/30)
+#   W2 2012-13  sect3a_plantingw2  s3aq*; hours via s3aq18/31
+#   W3 2015-16  sect3_plantingw3   s3q* ; hours direct s3q5b/6b/4b
+#   W4 2018-19  sect3_plantingw4   s3q* ; hours direct s3q5b/6b/4b
+#   W5 2023-24  sect4a_harvestw5   s4aq*; own scheme (post-harvest module)
+
+# WB industry grouping over the section-3 industry code (s3q14, 1-14):
+#   1 -> Agriculture; 2 -> Mining; 3-5 -> Manufacturing; 6 -> Construction;
+#   7-14 -> Services.  (No Fishing branch in this code list.)  Registered in
+#   harmonize_industry.  W5 uses ISIC-style s4aq41_code ranges instead.
+def _industry_from_s3q14(code):
+    c = pd.to_numeric(code, errors='coerce')
+    out = pd.Series(pd.NA, index=c.index, dtype='string')
+    out = out.mask(c == 1, 'Agriculture')
+    out = out.mask(c == 2, 'Mining')
+    out = out.mask(c.between(3, 5), 'Manufacturing')
+    out = out.mask(c == 6, 'Construction')
+    out = out.mask(c.between(7, 14), 'Services')
+    return out
+
+
+def _industry_from_isic(code):
+    """W5 ISIC-style code (s4aq41_code) -> harmonized industry label,
+    mirroring NGA_GHS5.do:1315-1320 ranges."""
+    c = pd.to_numeric(code, errors='coerce')
+    out = pd.Series(pd.NA, index=c.index, dtype='string')
+    out = out.mask((c > 100) & (c < 300), 'Agriculture')
+    out = out.mask((c > 300) & (c < 400), 'Fishing')
+    out = out.mask((c > 500) & (c < 1000), 'Mining')
+    out = out.mask((c >= 1010) & (c <= 4000), 'Manufacturing')
+    out = out.mask((c >= 4100) & (c <= 4500), 'Construction')
+    out = out.mask((c >= 4501) & (c <= 10000), 'Services')
+    return out
+
+
+def _dummy01(series, yes=1, no=2):
+    """Recode a yes/no item to 1.0/0.0 (yes->1, no->0); NaN otherwise."""
+    c = pd.to_numeric(series, errors='coerce')
+    out = pd.Series(np.nan, index=c.index, dtype='float64')
+    out = out.where(~(c == yes), 1.0)
+    out = out.where(~(c == no), 0.0)
+    return out
+
+
+def people_last7days_from_s3q(t, df, hhid='hhid', indiv='indiv',
+                              farm='s3q5', sob='s3q6', wage='s3q4',
+                              working='s3q1', industry='s3q14',
+                              hrs_mode='direct',
+                              farm_hrs='s3q5b', sb_hrs='s3q6b', wage_hrs='s3q4b',
+                              hour_job1='s3q18', hour_job2='s3q30'):
+    """Build people_last7days for a section-3 (s3q*/s3aq*) labor module.
+
+    hrs_mode='direct'  hours read straight from per-activity columns
+                       (W3/W4 s3q5b/6b/4b).
+    hrs_mode='joblogic' hours derived from job-1/job-2 totals (W1/W2):
+                       a coarse fallback -- assign the reported job hours to
+                       farm if the member did farm work, else to wage work,
+                       so per-activity hours are at least non-degenerate.
+    """
+    farm_work = _dummy01(df[farm]) if farm in df.columns else pd.Series(np.nan, index=df.index)
+    sob_work = _dummy01(df[sob]) if sob in df.columns else pd.Series(np.nan, index=df.index)
+    wage_work = _dummy01(df[wage]) if wage in df.columns else pd.Series(np.nan, index=df.index)
+    working_age = (pd.to_numeric(df[working], errors='coerce') == 1).astype('float64') \
+        if working in df.columns else pd.Series(np.nan, index=df.index)
+
+    if hrs_mode == 'direct':
+        fh = _num(df, farm_hrs)
+        sh = _num(df, sb_hrs)
+        wh = _num(df, wage_hrs)
+        # WB zeros the activity hours where the activity dummy is 'no'.
+        fh = fh.where(~(farm_work == 0), 0.0)
+        sh = sh.where(~(sob_work == 0), 0.0)
+        wh = wh.where(~(wage_work == 0), 0.0)
+    else:  # joblogic (W1/W2): coarse split of reported job hours
+        h1 = _num(df, hour_job1)
+        h2 = _num(df, hour_job2)
+        tot = h1.add(h2, fill_value=0).where(h1.notna() | h2.notna(), np.nan)
+        fh = tot.where(farm_work == 1, 0.0)
+        wh = tot.where((wage_work == 1) & ~(farm_work == 1), 0.0)
+        sh = tot.where((sob_work == 1) & ~(farm_work == 1) & ~(wage_work == 1), 0.0)
+
+    ind = (_industry_from_s3q14(df[industry])
+           if industry in df.columns
+           else pd.Series(pd.NA, index=df.index, dtype='string'))
+    # WB zeros activity items for non-working-age members; mirror by
+    # blanking work dummies / hours / industry where working_age==0.
+    notwa = (working_age == 0)
+    for s in (farm_work, sob_work, wage_work):
+        s.loc[notwa] = 0.0
+    for s in (fh, sh, wh):
+        s.loc[notwa] = 0.0
+    ind = ind.mask(notwa, pd.NA)
+    # Industry only meaningful for wage workers.
+    ind = ind.where(wage_work == 1, pd.NA)
+
+    out = pd.DataFrame({
+        'i': df[hhid].apply(format_id).values,
+        'pid': _to_pid(df[indiv]).values,
+        'farm_work': farm_work.values,
+        'SOB_work': sob_work.values,
+        'wage_work': wage_work.values,
+        'farm_hrs': fh.values,
+        'SB_hrs': sh.values,
+        'wage_hrs': wh.values,
+        'Industry': ind.values,
+        'working_age': working_age.values,
+    })
+    out['t'] = t
+    out = out[out['i'].notna() & out['pid'].notna()]
+    out = out.drop_duplicates(subset=['t', 'i', 'pid'], keep='first')
+    out = out.set_index(['t', 'i', 'pid']).sort_index()
+    return out[['farm_work', 'SOB_work', 'wage_work',
+                'farm_hrs', 'SB_hrs', 'wage_hrs', 'Industry', 'working_age']]
+
+
+def people_last7days_from_s4aq(t, df, hhid='hhid', indiv='indiv'):
+    """Build people_last7days for the W5 post-harvest labor module
+    (sect4a_harvestw5, s4aq* scheme), mirroring NGA_GHS5.do:1299-1337."""
+    # farm_work = farmed for hh (s4aq10) OR worked on hh farm (s4aq11)
+    fw1 = _dummy01(df['s4aq10']) if 's4aq10' in df.columns else pd.Series(np.nan, index=df.index)
+    fw2 = _dummy01(df['s4aq11']) if 's4aq11' in df.columns else pd.Series(np.nan, index=df.index)
+    farm_work = pd.Series(np.nan, index=df.index, dtype='float64')
+    farm_work = farm_work.where(~((fw1 == 1) | (fw2 == 1)), 1.0)
+    farm_work = farm_work.where(~(fw1 == 0), 0.0)
+    sob_work = _dummy01(df['s4aq6']) if 's4aq6' in df.columns else pd.Series(np.nan, index=df.index)
+    # wage_work: a non-zero occupation code (s4aq40_code), zeroed where no
+    # wage work (s4aq32==2).
+    occ = pd.to_numeric(df.get('s4aq40_code'), errors='coerce')
+    wage_work = pd.Series(np.nan, index=df.index, dtype='float64')
+    wage_work = wage_work.where(~(occ == 0), 0.0)
+    wage_work = wage_work.where(~(occ > 0), 1.0)
+    if 's4aq32' in df.columns:
+        wage_work = wage_work.where(~(pd.to_numeric(df['s4aq32'], errors='coerce') == 2), 0.0)
+    working_age = (pd.to_numeric(df['s4aq1'], errors='coerce') == 1).astype('float64') \
+        if 's4aq1' in df.columns else pd.Series(np.nan, index=df.index)
+
+    farm_hrs = _num(df, 's4aq12')
+    sb_hrs = _num(df, 's4aq7')
+    wage_hrs = _num(df, 's4aq5')
+    if 's4aq11' in df.columns:
+        farm_hrs = farm_hrs.where(~(pd.to_numeric(df['s4aq11'], errors='coerce') == 2), 0.0)
+    if 's4aq6' in df.columns:
+        sb_hrs = sb_hrs.where(~(pd.to_numeric(df['s4aq6'], errors='coerce') == 2), 0.0)
+    if 's4aq4' in df.columns:
+        wage_hrs = wage_hrs.where(~(pd.to_numeric(df['s4aq4'], errors='coerce') == 2), 0.0)
+
+    ind = (_industry_from_isic(df['s4aq41_code'])
+           if 's4aq41_code' in df.columns
+           else pd.Series(pd.NA, index=df.index, dtype='string'))
+    notwa = (working_age == 0)
+    for s in (farm_work, sob_work, wage_work, farm_hrs, sb_hrs, wage_hrs):
+        s.loc[notwa] = 0.0
+    ind = ind.mask(notwa, pd.NA).where(wage_work == 1, pd.NA)
+
+    out = pd.DataFrame({
+        'i': df[hhid].apply(format_id).values,
+        'pid': _to_pid(df[indiv]).values,
+        'farm_work': farm_work.values,
+        'SOB_work': sob_work.values,
+        'wage_work': wage_work.values,
+        'farm_hrs': farm_hrs.values,
+        'SB_hrs': sb_hrs.values,
+        'wage_hrs': wage_hrs.values,
+        'Industry': ind.values,
+        'working_age': working_age.values,
+    })
+    out['t'] = t
+    out = out[out['i'].notna() & out['pid'].notna()]
+    out = out.drop_duplicates(subset=['t', 'i', 'pid'], keep='first')
+    out = out.set_index(['t', 'i', 'pid']).sort_index()
+    return out[['farm_work', 'SOB_work', 'wage_work',
+                'farm_hrs', 'SB_hrs', 'wage_hrs', 'Industry', 'working_age']]
+

@@ -255,4 +255,65 @@ Data Scheme:
       optional: true
     Age_months: float
     materialize: make
+  plot_labor:
+    # Item-level plot-labor module (GAP 3 parity build).  One row per
+    # REPORTED labor source on a plot-season.  Source: AGSEC3A (season 1) +
+    # AGSEC3B (season 2) plot-input modules -- the SAME files plot_inputs
+    # reads, whose labor block the WB code (UGA_UNPS1.do:467-509, and the
+    # corresponding block in UNPS2..8) reads only to build the per-parcel
+    # SUM columns total_labor_days / total_family_labor_days /
+    # total_hired_labor_days and the median-wage hired_labor_value.  We keep
+    # the PRE-collapse REPORTED person-days -- strictly richer than the WB
+    # construct, and those sums / the wage valuation are TRANSFORMATIONS,
+    # never stored here.
+    #
+    # Grain (t, i, plot, source, season):
+    #   plot   — hhid-parcel-plot, mirroring the WB harmonised plot_id and
+    #            the crop_production / plot_inputs / plot_features plot key
+    #            (join on (t, i, plot)); its parcel component is the parcel
+    #            plot_features keys on.
+    #   source — the labor identity, a tiny controlled vocabulary emitted
+    #            directly by the builder (uganda.LABOR_SOURCES): 'family'
+    #            (household labor), 'hired' (paid labor), 'other' (exchange /
+    #            communal labor — only recorded in 2011-12).  NOT a
+    #            categorical_mapping table: the label is assigned by the
+    #            builder, not decoded from a raw survey code.
+    #   season — 'A' (first season) / 'B' (second season).  Carried in the
+    #            grain (as in crop_production) because the same plot id
+    #            appears in BOTH AGSEC3A and AGSEC3B for ~64% of plots and the
+    #            labor question is per plot-season; collapsing the two seasons
+    #            into one (plot, source) row would require summing across
+    #            seasons (a transformation).
+    #
+    # Columns are REPORTED values only (missing-in-wave -> NaN):
+    #   PersonDays — reported person-days of that source on the plot-season.
+    #                For 'hired' / 'other' this is the row-sum of the survey's
+    #                own man/woman/child day cells of ONE labor question (the
+    #                reported quantity that question measures); for 'family' in
+    #                2013-14/2015-16 it is the row-sum of the per-family-worker
+    #                day cells of one question.  It is NOT a cross-plot /
+    #                cross-source aggregate (total_*_labor_days are those, and
+    #                stay in transformations).
+    #   Wage       — reported cash paid to HIRED labor (the survey's q43/q36
+    #                wage cell).  NaN on family / other rows.
+    #
+    # Coverage (family / hired availability per wave):
+    #   2009-10, 2010-11  family (q39) + hired (q42a-c) + wage (q43)
+    #   2011-12           family (q32) + hired (q35a-c) + wage (q36) + OTHER
+    #                     (exchange q47-q49) — the only wave with 'other'
+    #   2013-14, 2015-16  family (q33a_1..e_1) + hired (q35a-c) + wage (q36)
+    #   2018-19           hired (s3aq35a-c) + wage (s3aq36) ONLY — the WB code
+    #                     sets family to missing; AGSEC3B labor block absent so
+    #                     no season-B rows
+    #   2019-20           hired (s3aq35a-c) + wage (s3aq36) for BOTH seasons;
+    #                     NO family rows (family roster is in a separate
+    #                     AGSEC3A_1 file not in-repo) — documented partial
+    #
+    # No v level baked in: v auto-joins from sample() at API time (plot_labor
+    # is NOT in the framework _no_v_join set).  2005-06 is excluded (no
+    # plot-input/labor module; the UNPS panel starts at 2009-10).
+    index: (t, i, plot, source, season)
+    PersonDays: float
+    Wage: float
+    materialize: make
   nonfood_expenditures: !make

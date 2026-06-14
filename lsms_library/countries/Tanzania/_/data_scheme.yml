@@ -214,6 +214,87 @@ Data Scheme:
     Improved: bool
     materialize: make
 
+  plot_labor:
+    # Item-level plot labor (parity-loop GAP 3, first of TWO labor grains) at
+    # the natural grain (t, i, plot_id, source) -- one row per (plot, source).
+    # Source from AG_SEC_3A; aligns plot_id with crop_production / plot_inputs
+    # so plot_labor joins them on (t, i, plot_id).
+    #   source : the labor source -- 'family' (household members' own days) or
+    #            'hired' (paid labor).  The GAP-3 schema also allows
+    #            'other'/'exchange' cross-country, but the NPS-SDD / Y5 AG_SEC_3A
+    #            instrument records NO free / exchange labor block, so no 'other'
+    #            rows arise for Tanzania (we do not fabricate them).  No raw-code
+    #            mapping is needed: the wave script emits the canonical 'family'
+    #            / 'hired' label directly.
+    #   PersonDays : REPORTED person-days of that source on the plot --
+    #                hired = Sum over the three farm tasks (Land Prep / Weeding /
+    #                Harvest) of the per-gender day cells ag3a_74_{1,2,3}{a,b,c};
+    #                family = Sum over members and tasks of the reported day
+    #                cells (2020-21: ag3a_72c_*/72g_*/72k_*).
+    #   Wage       : REPORTED cash wage PAID to hired labor (TSH), Sum over tasks
+    #                of ag3a_74_{1,2,3}d.  NaN for family rows (no cash wage).
+    # STORES REPORTED PERSON-DAYS / WAGE ONLY -- the WB aggregates
+    # total_labor_days / total_family_labor_days / total_hired_labor_days (sums
+    # over source) and hired_labor_value (median-wage valuation over the hired
+    # rows) are TRANSFORMATIONS, NEVER stored here.
+    # A per-cell plausibility clamp (>730 person-days per gender/task -> NaN)
+    # drops the ~0.7% of hired cells where a TSH value was typed into a day field
+    # (2020-21 ag3a_74_1c reaches 450000) -- same discipline livestock /
+    # plot_features use (GH #167).
+    # WAVE SCOPE: only 2019-20 (NPS-SDD Extended Panel) and 2020-21 (NPS Y5
+    # Refresh Panel) are buildable; the 2008-15 multi-round folder has no
+    # agriculture source on disk (same deferral as plot_features /
+    # crop_production / plot_inputs, GH #167).  FAMILY rows are emitted for
+    # 2020-21 only: the 2019-20 family-labor block records worker ROSTER IDs but
+    # NO days (ag3a_72b/f/j_*), so 2019-20 carries HIRED rows only -- we do not
+    # fabricate family person-days from the ID columns (which the WB NPS5.do
+    # erroneously rowtotals).  v (cluster) joins from sample() at API time --
+    # plot_labor is NOT in the framework _no_v_join set.
+    index: (t, i, plot_id, source)
+    PersonDays: float
+    Wage: float
+    materialize: make
+
+  people_last7days:
+    # Per-INDIVIDUAL 7-day activity (parity-loop GAP 3, second of TWO labor
+    # grains) at the natural grain (t, i, pid) -- one row per household member.
+    # NEW feature for Tanzania, mirroring Uganda's people_last7days construct
+    # (the one country that already has it).  Source HH_SEC_E1, following the WB
+    # NPS5.do labor block but using the LABEL-CORRECT dummy<->hours pairing (the
+    # .do swaps farm_hrs/wage_hrs relative to its own dummies; we pair each hours
+    # item with the activity it actually times, per the questionnaire labels).
+    #   farm_work / SOB_work / wage_work : REPORTED 7-day activity dummies --
+    #            did the member work in HH agriculture (hh_e07) / run an own
+    #            non-farm business (hh_e05) / work as a wage employee (hh_e03) in
+    #            the last 7 days.
+    #   farm_hrs / SB_hrs / wage_hrs : REPORTED hours in that activity in the
+    #            last 7 days (hh_e08 / hh_e06 / hh_e04); 0 where the matching
+    #            dummy is False.
+    #   industry : coarse ISIC class of the WAGE job (hh_e31b_2) -- Agriculture /
+    #            Fishing / Mining / Manufacturing / Construction / Services;
+    #            non-null only for wage workers (gated by hh_e28).
+    #   working_age : member is 5 years or above (hh_e01_1==1).  Below working
+    #            age, every activity dummy / hours is zeroed (the WB convention)
+    #            but the row is kept with working_age=False.
+    # REPORTED PER-INDIVIDUAL VALUES ONLY -- no household rollups / counts /
+    # labor-force-participation rates (those are transformations).
+    # WAVE SCOPE: 2019-20 and 2020-21 only.  2008-15 is deferred: its harmonised
+    # panel labor module (upd4_hh_e) is a "last 12 months" employment screen with
+    # NO 7-day HOURS items, so it cannot populate farm_hrs / SB_hrs / wage_hrs
+    # (the WB code reads the per-round raw SEC_B_C_D_E1_F_G1_U.dta 7-day `seq*`
+    # block, which is not the file present in our 2008-15 panel folder).
+    # i/pid match household_roster; v joins from sample() at API time.
+    index: (t, i, pid)
+    farm_work: bool
+    SOB_work: bool
+    wage_work: bool
+    farm_hrs: float
+    SB_hrs: float
+    wage_hrs: float
+    industry: str
+    working_age: bool
+    materialize: make
+
   livestock:
     # Item-level livestock herd (parity-loop GAP 4) at the natural grain
     # (t, i, animal) -- one row per species/animal-type the household OWNS,

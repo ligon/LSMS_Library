@@ -662,3 +662,351 @@ def _finish_livestock(df, t):
     df = df[keep]
     df = df.set_index(['t', 'i', 'animal'])
     return df
+
+
+# ---------------------------------------------------------------------------
+# plot_labor (GAP 3 — item-level plot labor at (t, i, plot, source))
+# ---------------------------------------------------------------------------
+#
+# One row per REPORTED labor SOURCE on a plot.  source in {family, hired,
+# other} (the "other" = free / exchange labor exists only in the ECVMA
+# waves; the EHCVM s16a parcel module records family vs non-family only, so
+# it emits {family, hired}).  COLUMNS, reported values only:
+#   PersonDays — reported person-days of that source on the plot.
+#   Wage       — cash PAID to hired labor (where the survey records it);
+#                NaN for family / other (no cash changes hands).
+#
+# This is the REPORTED person-day item, NOT the WB collapsed plot total.
+# The WB .do (NER_ECVMA1.do:676-858, NER_ECVMA2.do:768-...) reads exactly
+# these reported day cells, rowtotals them into PPtotal_/PHtotal_*_labor_days
+# and finally total_labor_days / total_family_labor_days /
+# total_hired_labor_days / hired_labor_value (a median-wage valuation).  ALL
+# of those sums / valuations are TRANSFORMATIONS over these rows, never
+# columns here (item-level / reported-values discipline):
+#   total_labor_days        = Σ PersonDays over all sources on a plot
+#   total_family_labor_days = Σ PersonDays where source=='family'
+#   total_hired_labor_days  = Σ PersonDays where source=='hired'
+#   hired_labor_value       = median-wage valuation over the hired rows
+#
+# WITHIN-SOURCE SUM is NOT a forbidden rollup (mirrors livestock summing
+# age/sex strata).  The surveys report a labor source as several reported
+# day cells — one per family member, or per hired-worker gender category,
+# and across the post-planting (PP) and post-harvest (PH) seasons / phases.
+# Those cells are strata of the SAME (plot, source) labor item, so the
+# per-(plot, source) person-day total IS the natural item grain.  The
+# forbidden rollups are the CROSS-source ones (total_labor_days) and the
+# wage VALUATION — both recovered by a transformations fn over these rows.
+#
+# GRAIN = (t, i, plot, source).  `plot` = "{field_no}_{parcel_no}" aligns
+# with crop_production's plot key and plot_features' plot_id (verified
+# 100% on the EHCVM waves, ~78-92% on the ECVMA waves — labor is reported
+# on plots that carry no harvest record, which is expected).  v is NOT baked
+# in (household-linked; the framework joins it from sample()).
+#
+# Plot-labor instrument by wave:
+#   2011-12  ecvmaas1_p1 (PP) + ecvmaas1_p2 (PH).  Family days
+#            as02aq20b..25b (PP) / as02aq28b..33b,36b..41b (PH); hired
+#            as02aq27{a/b-d/e} (PP) / as02aq35,43 (PH) with e=wage; other
+#            as02aq26 (PP) / as02aq34,42 (PH).  Day sentinel 99/999, wage
+#            sentinel 999999.  plot = concat(hid, as01q03, as01q05).
+#   2014-15  ECVMA2_AS2AP1 (PP) + ECVMA2_AS2AP2 (PH).  Same scheme,
+#            UPPERCASE; PP plot = (AS01Q01, AS01Q03), PH plot =
+#            (AS02AQ01, AS02AQ03); i from (GRAPPE, MENAGE).
+#   2018-19  s16a_me_ner2018 — family days s16aq33b_*/35b_*/37b_* (per
+#            member, prep/maint/harvest); non-family (hired)
+#            s16aq39/41/43 {a=#workers, b=days, c=wage} per gender category.
+#            EHCVM has no "other" labor.  plot = (s16aq02, s16aq03).
+#   2021-22  s16a_me_ner2021 — identical s16a labor-grid scheme.
+#
+# A wave with no plot-labor module is silently skipped by the country-level
+# concatenator (no parquet emitted); see _/plot_labor.py.
+
+
+# Canonical labor-source Preferred Labels (the `source` index level).  Tiny
+# fixed vocabulary assigned in code (not read from a raw label column), so it
+# is an inline mapping rather than a categorical_mapping table.
+LABOR_SOURCE_FAMILY = 'family'
+LABOR_SOURCE_HIRED = 'hired'
+LABOR_SOURCE_OTHER = 'other'
+
+
+def _coerce_days(series, sentinels=(99, 999)):
+    """Numeric person-day cell -> Float64, with the survey's day sentinels
+    (99 family / 999 hired-or-other 'no answer') mapped to NA."""
+    s = pd.to_numeric(series, errors='coerce').astype('Float64')
+    for sv in sentinels:
+        s = s.where(s != sv, pd.NA)
+    return s
+
+
+def _coerce_wage(series, sentinel=999999):
+    """Numeric wage cell -> Float64, with the 999999 'no answer' sentinel
+    mapped to NA.  Used for the cash paid to hired labor."""
+    s = pd.to_numeric(series, errors='coerce').astype('Float64')
+    return s.where(s != sentinel, pd.NA)
+
+
+def plot_labor_ehcvm(src, t):
+    """Build plot_labor for one EHCVM wave (2018-19 / 2021-22) from its
+    s16a parcel module.  EHCVM records family vs non-family (hired) plot
+    labor only (no free / exchange 'other' source).  Shared by the two
+    EHCVM wave scripts since the s16a labor-grid scheme is identical
+    (member-day grids s16aq{33,35,37}b_*, hired grids s16aq{39,41,43}{a,b,c}_*;
+    a = #workers, b = days, c = wage).  See the wave scripts' docstrings and
+    the module note for the grain / column contract.
+
+    Returns the long (i, plot, source, PersonDays, Wage) frame ready for
+    _finish_plot_labor (which sums onto the (t, i, plot, source) grain)."""
+    cols = list(src.columns)
+
+    def _num(col):
+        return pd.to_numeric(src[col], errors='coerce').astype('Float64')
+
+    hh = src.apply(lambda r: i(pd.Series([r['grappe'], r['menage']],
+                                         index=['grappe', 'menage'])),
+                   axis=1)
+    field = src['s16aq02'].apply(tools.format_id)
+    parcel = src['s16aq03'].apply(tools.format_id)
+    plot = field.astype('string') + '_' + parcel.astype('string')
+
+    # family: sum member-day cells across the three phase grids
+    fam_cols = [c for c in cols
+                if c.startswith('s16aq33b_')
+                or c.startswith('s16aq35b_')
+                or c.startswith('s16aq37b_')]
+    fam_days = sum(_num(c).fillna(0) for c in fam_cols)
+    fam_any = pd.concat([_num(c).notna() for c in fam_cols], axis=1).any(axis=1)
+    fam_days = fam_days.where(fam_any.values, pd.NA)
+    fam = pd.DataFrame({
+        'i': hh.values, 'plot': plot.values,
+        'source': LABOR_SOURCE_FAMILY,
+        'PersonDays': fam_days.values, 'Wage': pd.NA,
+    })
+
+    # hired: Σ(#workers × days) person-days, Σ wage, over phase × category
+    hired_days = pd.Series(0.0, index=src.index, dtype='Float64')
+    hired_wage = pd.Series(0.0, index=src.index, dtype='Float64')
+    any_days = pd.Series(False, index=src.index)
+    any_wage = pd.Series(False, index=src.index)
+    for base in ['s16aq39', 's16aq41', 's16aq43']:
+        for ac in [c for c in cols if c.startswith(base + 'a_')]:
+            suf = ac[len(base + 'a'):]   # e.g. '_1' (keeps the underscore)
+            bc, cc = base + 'b' + suf, base + 'c' + suf
+            workers = _num(ac)
+            days = _num(bc) if bc in cols else pd.Series(pd.NA, index=src.index, dtype='Float64')
+            wage = _num(cc) if cc in cols else pd.Series(pd.NA, index=src.index, dtype='Float64')
+            pd_cell = workers * days
+            hired_days = hired_days.add(pd_cell.fillna(0))
+            any_days = any_days | pd_cell.notna().values
+            hired_wage = hired_wage.add(wage.fillna(0))
+            any_wage = any_wage | wage.notna().values
+    hired_days = hired_days.where(any_days.values, pd.NA)
+    hired_wage = hired_wage.where(any_wage.values, pd.NA)
+    hired = pd.DataFrame({
+        'i': hh.values, 'plot': plot.values,
+        'source': LABOR_SOURCE_HIRED,
+        'PersonDays': hired_days.values, 'Wage': hired_wage.values,
+    })
+
+    return pd.concat([fam, hired], ignore_index=True)
+
+
+def _finish_plot_labor(df, t):
+    """Common tail for the wave-level plot_labor scripts.
+
+    `df` arrives with columns [i, plot, source, PersonDays, Wage] — one row
+    per (plot, source) labor cell already reduced to a person-day count and
+    (for hired) a wage.  This SUMS PersonDays / Wage within
+    (t, i, plot, source) so the strata (family members, hired-worker gender
+    categories, PP/PH seasons) collapse onto the natural (plot, source) item
+    grain (see module note — a within-source sum, NOT a cross-source rollup).
+    min_count=1 keeps an all-NA group NA rather than 0.  Rows with no plot,
+    no source, or no person-days at all are dropped (roster placeholders, not
+    reported labor)."""
+    df = df.copy()
+    df['t'] = t
+    df['source'] = df['source'].astype('string')
+    df['plot'] = df['plot'].astype('string')
+    df['PersonDays'] = pd.to_numeric(df.get('PersonDays'), errors='coerce').astype('Float64')
+    if 'Wage' not in df.columns:
+        df['Wage'] = pd.NA
+    df['Wage'] = pd.to_numeric(df['Wage'], errors='coerce').astype('Float64')
+    df = df[df['i'].notna() & df['plot'].notna() & df['source'].notna()]
+    df = (df.groupby(['t', 'i', 'plot', 'source'], dropna=False)[['PersonDays', 'Wage']]
+            .sum(min_count=1)
+            .reset_index())
+    # Drop (plot, source) rows that carry no reported labor at all (both
+    # PersonDays and Wage NA) — a survey skip, not a reported labor item.
+    df = df[df['PersonDays'].notna() | df['Wage'].notna()]
+    df = df.set_index(['t', 'i', 'plot', 'source'])
+    return df
+
+
+# ---------------------------------------------------------------------------
+# people_last7days (GAP 3 — individual 7-day activity at (t, i, pid))
+# ---------------------------------------------------------------------------
+#
+# One row per individual, carrying the REPORTED 7-day (last-week) labor
+# participation the survey records.  Mirrors the target schema in the GAP
+# ranking (the per-individual activity feature; Uganda's existing
+# `people_last7days` is a legacy HH-level Men/Women/Boys/Girls count and is a
+# DIFFERENT, older construct — this is the (t, i, pid) individual feature the
+# 6 new countries are meant to gain).  COLUMNS, reported per-individual:
+#   farm_work  — worked on own farm/garden/livestock in the last 7 days (bool)
+#   SOB_work   — worked in own business / commerce in the last 7 days (bool)
+#   wage_work  — worked for a wage / employer in the last 7 days (bool)
+#   farm_hrs   — usual weekly hours on farm work (float; ECVMA only)
+#   SB_hrs     — usual weekly hours in own business (float; ECVMA only)
+#   wage_hrs   — usual weekly hours in wage work (float; ECVMA only)
+#   Industry   — broad industry of the (main) job: Agriculture / Fishing /
+#                Mining / Manufacturing / Construction / Services (str;
+#                ECVMA only — derived from the WB code's section-code ranges)
+#   working_age— member is of working age (Age >= 6, the survey threshold)
+#
+# NO rollups (the WB nb_members_working_age HH total is a transformation, not
+# a column here).  Industry is stored as ONE harmonized label rather than the
+# WB's six ind_* dummies (a wide encoding of one categorical); the ranges
+# come straight from the WB .do (NER_ECVMA1.do:1386-1391) and do not vary
+# across waves, so the mapping lives in code (no per-wave label variation to
+# harmonize via a categorical table).
+#
+# 7-day instrument by wave:
+#   2011-12  ecvmaind_p1p2 — ms04q03/05/02 (farm/SOB/wage work, 1=Oui),
+#            ms04q24 industry section code, ms04q29-31/55-57 month/day/hour
+#            per job (av weekly hours = month*day*hour/52), ms04q23/51 the
+#            job's occupation code -> farm/SB/wage job classifier, ms01q06a
+#            age (working_age = age>=6).  ID = hid-ms01q00.
+#   2014-15  ECVMA2_MS04P1 merged to ECVMA2_MS01P1 — MS04Q01/02/03
+#            (farm/SOB/wage), MS04Q23 industry, MS04Q25-28/51-53 + week
+#            (av weekly hours = month*week*day*hour/52), MS01Q06A age.
+#            ID = hhid-MS01Q00 with i from (GRAPPE, MENAGE).
+#   2018-19  s04_me_ner2018 — 7-day dummies s04q06 (own farm/garden/
+#            livestock/fishing -> farm_work), s04q07 (paid own account ->
+#            SOB_work), s04q08 (paid employee/State/employer -> wage_work).
+#            The EHCVM 7-day module records hours only for UNPAID domestic
+#            tasks (q01-05), not for productive work in an ECVMA-comparable
+#            per-activity form, and the industry is recorded as 12-month
+#            occupation codes, not the WB 7-day section ranges — so
+#            farm_hrs/SB_hrs/wage_hrs and Industry are NA in EHCVM (declared
+#            for cross-wave schema parity).  working_age from s01 Age>=6.
+#            pid = s01q00a (matches household_roster).
+#   2021-22  s04a_me_ner2021 — same s04 7-day dummy scheme (s04q06/07/08).
+#
+# The two ECVMA waves carry the full schema; the EHCVM waves carry the
+# dummies + working_age and leave hours / Industry NA.  Every wave has a
+# 7-day labor module, so all four are wired.
+
+
+# WB industry section-code ranges (NER_ECVMA1.do:1386-1391 / ECVMA2:1409-14).
+# The code is a section of the national activity classification; the WB
+# buckets it into six broad industries.  Stored as one `Industry` label.
+def _industry_label(code_series):
+    """Map a numeric activity-section code to a broad Industry Preferred
+    Label using the WB .do ranges.  Returns NA where the code is missing /
+    out of every range (e.g. the not-working / no-job sentinel)."""
+    c = pd.to_numeric(code_series, errors='coerce')
+    out = pd.Series(pd.NA, index=c.index, dtype='string')
+    out = out.mask((c >= 11) & (c <= 40), 'Agriculture')
+    out = out.mask((c == 51) | (c == 52), 'Fishing')
+    out = out.mask((c >= 60) & (c <= 72), 'Mining')
+    out = out.mask((c >= 81) & (c <= 292), 'Manufacturing')
+    out = out.mask((c >= 301) & (c <= 302), 'Construction')
+    out = out.mask((c >= 310) & (c <= 430), 'Services')
+    return out
+
+
+def _yn_bool(series, yes=1, no=2):
+    """Map a 1=Oui / 2=Non survey item to nullable boolean (other codes,
+    e.g. 9 'no answer', -> NA)."""
+    s = pd.to_numeric(series, errors='coerce')
+    out = pd.Series(pd.NA, index=s.index, dtype='boolean')
+    out = out.mask(s == yes, True)
+    out = out.mask(s == no, False)
+    return out
+
+
+def people_last7days_ehcvm(s04, s01, t, pid_col='s01q00a', age_col='s01q04a',
+                           dob_year_col='s01q03c', survey_year=None):
+    """Build people_last7days for one EHCVM wave (2018-19 / 2021-22).
+
+    EHCVM's 7-day labor module (s04) records only the three participation
+    DUMMIES in an ECVMA-comparable form:
+      s04q06 -> farm_work (worked >=1h on own farm/garden/livestock/fishing)
+      s04q07 -> SOB_work  (worked >=1h for own account / own business)
+      s04q08 -> wage_work (worked >=1h for an employer / the State / others)
+    The module records HOURS only for UNPAID domestic tasks (q01-05), and the
+    industry only as 12-month occupation codes (not the WB 7-day section
+    ranges), so farm_hrs / SB_hrs / wage_hrs and Industry are left NA (the
+    _finish tail fills them).  working_age = roster Age >= 6; Age (`age_col`)
+    is merged from the s01 roster on (grappe, menage, `pid_col`) — the same
+    person key household_roster uses.  pid = `pid_col`.
+
+    The person key differs by wave: 2018-19 uses ``s01q00a``; 2021-22 uses
+    ``membres__id`` (matching each wave's household_roster pid).  Returns the
+    (i, pid, farm_work, SOB_work, wage_work, working_age) frame ready for
+    _finish_people_last7days.
+
+    AGE: the EHCVM s01 roster fills age-in-years (`age_col`, s01q04a) for only
+    ~27% of people and birth-year (`dob_year_col`, s01q03c) for the rest --
+    exactly the two inputs household_roster's age_handler resolves.  We mirror
+    that: prefer reported years, else survey_year - birth_year (9999 sentinel
+    -> NA).  working_age = Age >= 6 (the survey threshold)."""
+    key = ['grappe', 'menage', pid_col]
+    roster_cols = [age_col, dob_year_col]
+    merged = s04[key + ['s04q06', 's04q07', 's04q08']].merge(
+        s01[key + roster_cols], on=key, how='left')
+
+    hh = merged.apply(lambda r: i(pd.Series([r['grappe'], r['menage']],
+                                            index=['grappe', 'menage'])),
+                      axis=1)
+    pid = merged[pid_col].apply(tools.format_id)
+
+    age = pd.to_numeric(merged[age_col], errors='coerce')
+    if survey_year is not None:
+        birth = pd.to_numeric(merged[dob_year_col], errors='coerce')
+        birth = birth.where((birth >= 1900) & (birth <= survey_year), pd.NA)
+        age_from_dob = survey_year - birth
+        age = age.where(age.notna(), age_from_dob)
+    working_age = (age >= 6)
+    # Keep working_age NA where age is entirely unknown (rather than False).
+    working_age = working_age.where(age.notna(), pd.NA)
+
+    df = pd.DataFrame({
+        'i': hh.values,
+        'pid': pid.values,
+        'farm_work': _yn_bool(merged['s04q06']).values,
+        'SOB_work': _yn_bool(merged['s04q07']).values,
+        'wage_work': _yn_bool(merged['s04q08']).values,
+        'working_age': working_age.values,
+    })
+    return df
+
+
+def _finish_people_last7days(df, t):
+    """Common tail for the wave-level people_last7days scripts: coerce dtypes,
+    guarantee the full schema column set (NA where a wave lacks a field),
+    drop rows with no individual key, and build the (t, i, pid) index."""
+    df = df.copy()
+    df['t'] = t
+    df['pid'] = df['pid'].astype('string')
+    for col in ['farm_work', 'SOB_work', 'wage_work', 'working_age']:
+        if col not in df.columns:
+            df[col] = pd.NA
+        df[col] = df[col].astype('boolean')
+    for col in ['farm_hrs', 'SB_hrs', 'wage_hrs']:
+        if col not in df.columns:
+            df[col] = pd.NA
+        df[col] = pd.to_numeric(df[col], errors='coerce').astype('Float64')
+    if 'Industry' not in df.columns:
+        df['Industry'] = pd.NA
+    df['Industry'] = df['Industry'].astype('string')
+    df = df[df['i'].notna() & df['pid'].notna()]
+    # One row per (t, i, pid): keep the first reported line per individual
+    # (the source rosters are already one-row-per-person; this guards the
+    # 2014-15 m:1 labor->roster merge against any stray duplicate).
+    keep = ['t', 'i', 'pid', 'farm_work', 'SOB_work', 'wage_work',
+            'farm_hrs', 'SB_hrs', 'wage_hrs', 'Industry', 'working_age']
+    df = df[keep]
+    df = (df.groupby(['t', 'i', 'pid'], dropna=False, as_index=False).first())
+    df = df.set_index(['t', 'i', 'pid'])
+    return df
