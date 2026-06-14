@@ -327,5 +327,45 @@ Data Scheme:
     wage_industry: str
     working_age: bool
     materialize: make
+  community_prices:
+    # Item-level (t, v, j, u) community reference-price feature (GAP C;
+    # OURS-ONLY -- the WB panel surveys no community prices).  One REPORTED
+    # row per (cluster EA, priced item, native unit) from the Community/
+    # Market questionnaire Module CK "Reference prices of selected items"
+    # (codes 1-51).  Collected in three of the five waves: 2010-11 (IHS3),
+    # 2013-14 (IHPS) and 2019-20 (IHS5).  2016-17 (IHS4) ran a community
+    # questionnaire but DROPPED the Module CK price section (no com_ck file),
+    # and 2004-05 (IHS2) has no community price questionnaire -- both absent
+    # (reported, not imputed).
+    #   v  -- community EA cluster id, on the SAME keyspace as sample().v
+    #         (an EA visited in one community interview per wave), so a
+    #         surveyed price joins the households of that cluster.  v is
+    #         NATIVE in the index: there is no household i here, so the
+    #         framework's _join_v_from_sample does not apply.
+    #   j  -- priced item on the shared harmonize_price_item -> harmonize_food
+    #         / harmonize_crop Preferred Label axis, so a community price for
+    #         a consumed food (Maize Grain (Not As Ufa), Rice, Beef, Tomato,
+    #         Banana, ...) JOINS food_acquired.j and crop_production.crop;
+    #         the non-food priced goods (soap, batteries, tools, fertilizer,
+    #         transport service, ganyu day-wage) carry their own labels on
+    #         the same axis.
+    #   u  -- native reported unit on the shared harmonize_price_unit -> `u`
+    #         Preferred Label axis, so community_prices.u joins
+    #         food_acquired.u / crop_production.u.
+    # Reported columns only:
+    #   Price         -- the surveyed price (MK) for NumberOfUnits of the
+    #                    item in unit u.
+    #   NumberOfUnits -- the number of units that Price refers to (the
+    #                    native price-per-quantity basis the survey gives).
+    #   Available     -- in-market availability flag (com_ck00c/cka, 1=Yes).
+    # A per-unit price (Price / NumberOfUnits), kg-standardisation, and any
+    # cross-cluster median/mean or community->household price imputation are
+    # TRANSFORMATIONS, NEVER stored columns.  See
+    # _/malawi.py:_price_block / assemble_community_prices.
+    index: (t, v, j, u)
+    Price: float
+    NumberOfUnits: float
+    Available: bool
+    materialize: make
   food_expenditures:
   food_prices:
