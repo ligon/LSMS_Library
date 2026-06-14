@@ -155,3 +155,37 @@ Data Scheme:
     intercropped: bool
     perennial: bool
     materialize: make
+  plot_inputs:
+    # Item-level agricultural inputs, GAP 2 (parity loop).  One row per
+    # (t, i, plot, input, crop): the REPORTED inputs the survey records, NOT
+    # aggregates.  The input module lives in the EACI waves only (2014-15
+    # EACI14 s1e/s2c, 2017-18 EACI17 s11c/s7d).  The EHCVM waves (2018-19,
+    # 2021-22) have no agriculture-input block — deferred (same split as
+    # crop_production).
+    #
+    # plot  = "{field}_{parcel}" — the SAME plot id as crop_production /
+    #         plot_features.  crop is set on SEED rows only (the seed's crop,
+    #         harmonize_food Preferred Label); NaN for fertilizer/pesticide
+    #         rows (applied at the plot grain, not per-crop).
+    # input = harmonize_input Preferred Label (Seed / Urea / DAP / NPK /
+    #         Other inorganic / Manure / Compost / Other organic / Pesticide /
+    #         Fungicide / Herbicide / Other phytosanitary).  These are FIXED
+    #         questionnaire slots, not a decoded label column.
+    # u     = harmonize unit label (`u` categorical table).
+    #
+    # Purchased / Quantity_purchased come from the household input-purchase
+    # roster (s2d / s7b, HH grain) for fertilizers, and from the seed module's
+    # paid-for question (s11cq12) in 2017-18; organic-fertilizer Purchased is
+    # also derivable from the plot-level acquisition mode ('Achat').  Improved
+    # is set on seed rows (s1eq04 / s11cq10).
+    #
+    # NO seed_kg / nitrogen_kg / any-use flags / fertilizer totals — those are
+    # transformations.py rollups over these item rows.  Built by per-wave
+    # scripts + a country-level concatenator.
+    index: (t, i, plot, input, crop)
+    Quantity: float
+    u: str
+    Purchased: bool
+    Quantity_purchased: float
+    Improved: bool
+    materialize: make

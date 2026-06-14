@@ -90,6 +90,13 @@
 | Casier                       | Casier          | x       | ---     | ---     |
 | Chargement camion            | Chargement camion | x       | ---     | ---     |
 | Tonne                        | Tonne           | x       | ---     | ---     |
+|------------------------------+-----------------+---------+---------+---------|
+| # plot_inputs units (EACI 2014-15 s1c/s1e/s2c & 2017-18 s11c/s7d) — fertilizer/seed/pesticide units not already present above |                 |         |         |         |
+| Charrette asine              | Cart (donkey)   | x       | ---     | ---     |
+| Charette asine               | Cart (donkey)   | x       | ---     | ---     |
+| Charrette bovine             | Cart (ox)       | x       | ---     | ---     |
+| Charette bovine              | Cart (ox)       | x       | ---     | ---     |
+| Litres                       | Litre           | x       | ---     | ---     |
 
 #+name: harmonize_food
 | Code                                                                                                 | Preferred Label                              | 2014-15 | 2018-19 | 2021-22 |
@@ -493,3 +500,29 @@
 |    1 | freehold                   |
 |    2 | granted_right_of_occupancy |
 |    4 | leasehold                  |
+
+# harmonize_input — the input-identity (`input` index level) taxonomy for
+# plot_inputs (GAP 2, parity loop).  Unlike the other harmonize_* tables,
+# the inputs are NOT a decoded label column in the source: each input type
+# is a FIXED questionnaire slot in the EACI ag instrument (seed module
+# s1e/s11c; plot-fertilizer/pesticide module s2c/s7d, with separate
+# Urea/DAP/NPK/other and manure/compost/other-organic and pesticide/
+# fungicide/herbicide/other-phytosanitary columns).  The wave scripts emit
+# a synthetic `Code` per slot (identical across waves, hence one shared
+# column), and this table maps it to the canonical Preferred Label.  The
+# Code IS the cross-wave join key; both EACI waves emit every slot.
+#+name: harmonize_input
+| Code                | Preferred Label     | 2014-15 | 2017-18 |
+|---------------------+---------------------+---------+---------|
+| seed                | Seed                | x       | x       |
+| urea                | Urea                | x       | x       |
+| dap                 | DAP                 | x       | x       |
+| npk                 | NPK                 | x       | x       |
+| other_inorganic     | Other inorganic     | x       | x       |
+| manure              | Manure              | x       | x       |
+| compost             | Compost             | x       | x       |
+| other_organic       | Other organic       | x       | x       |
+| pesticide           | Pesticide           | x       | x       |
+| fungicide           | Fungicide           | x       | x       |
+| herbicide           | Herbicide           | x       | x       |
+| other_phytosanitary | Other phytosanitary | x       | x       |
