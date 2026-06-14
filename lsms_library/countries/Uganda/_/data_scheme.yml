@@ -208,4 +208,51 @@ Data Scheme:
     HeadSold: float
     Value: float
     materialize: make
+  anthropometry:
+    # Item-level anthropometry module (GAP 5 parity build).  One row per
+    # MEASURED individual.  Source: the GSEC6 anthropometry module of the
+    # UNPS questionnaire, the raw weight/height the WB code
+    # (UGA_UNPS{1..8}.do anthro section) feeds into ``zscore06`` — we keep
+    # ONLY the reported measures, never the z-scores / wasting flags.
+    #
+    # NEW feature, distinct from ``nutrition`` (which is nutrient INTAKE,
+    # consumption x food-composition tables).  anthropometry is body
+    # measurement.
+    #
+    # Grain (t, i, pid) [individual]:
+    #   pid — the individual key, matching household_roster's pid so the
+    #         child's Sex (and integer Age) join from the roster.  v auto-
+    #         joins from sample() at API time (anthropometry is NOT in the
+    #         framework _no_v_join set).
+    #
+    # Columns are REPORTED values ONLY (missing-in-wave -> NaN):
+    #   Weight     — kg
+    #   Height     — cm (lying-down length preferred, else standing height)
+    #   MUAC       — mid-upper-arm circumference, cm.  NaN throughout: no
+    #                UNPS wave records arm circumference (declared for
+    #                cross-country schema parity only).
+    #   Age_months — child age in months as recorded by the survey.  <NA>
+    #                in 2018-19 / 2019-20 (those waves dropped the in-module
+    #                age-in-months question; the WB code derives child age
+    #                from the roster there).
+    #
+    # NO haz06 / waz06 / whz06 / bmiz06 / wasting / stunting — all of those
+    # are WHO-2006 reference-population TRANSFORMS, computed at query time
+    # over (Weight, Height, child Age/Sex), never stored.
+    #
+    # Wired for 2009-10 .. 2019-20 (every wave with a GSEC6 anthro module).
+    # 2005-06 has no anthropometry module (the UNPS panel starts at 2009-10).
+    index: (t, i, pid)
+    Weight: float
+    Height: float
+    # No UNPS wave records mid-upper-arm circumference, so MUAC is
+    # legitimately all-NaN for Uganda.  Mark optional so the all-null
+    # sanity check exempts it while the canonical column stays declared
+    # for cross-country alignment (other countries — e.g. Ethiopia ESS —
+    # do record MUAC).
+    MUAC:
+      type: float
+      optional: true
+    Age_months: float
+    materialize: make
   nonfood_expenditures: !make
