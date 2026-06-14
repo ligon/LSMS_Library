@@ -48,6 +48,16 @@ $(VAR_DIR)/crop_production.parquet: crop_production.py ../2014-15/_/crop_product
 $(VAR_DIR)/plot_inputs.parquet: plot_inputs.py ../2014-15/_/plot_inputs.parquet ../2017-18/_/plot_inputs.parquet
 	python plot_inputs.py
 
+# livestock (item-level animal roster, GAP 4 / parity loop).  The livestock
+# module lives in the EACI waves only (2014-15, 2017-18).  The wave pattern
+# rule materializes each wave parquet; the country-level concatenator
+# (livestock.py) aggregates into var/livestock.parquet.
+../%/_/livestock.parquet: ../%/_/livestock.py
+	(cd $(@D) && python livestock.py)
+
+$(VAR_DIR)/livestock.parquet: livestock.py ../2014-15/_/livestock.parquet ../2017-18/_/livestock.parquet
+	python livestock.py
+
 clean:
 	rm -f panel_ids.json updated_ids.json
 

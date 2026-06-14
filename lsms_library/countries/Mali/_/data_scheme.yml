@@ -189,3 +189,37 @@ Data Scheme:
     Quantity_purchased: float
     Improved: bool
     materialize: make
+  livestock:
+    # Item-level animal roster, GAP 4 (parity loop).  One row per
+    # (t, i, animal): the REPORTED counts the survey records, NOT the WB
+    # single engaged-in-livestock binary (which is groupby(['t','i']).any()
+    # over these rows).  The livestock module lives in the EACI waves only
+    # (2014-15 EACIS4A_p2 / s4a; 2017-18 eaci17_s8ap2 + eaci17_s8b1p2 /
+    # s8a+s8b1).  The EHCVM waves (2018-19, 2021-22) carry no livestock
+    # roster — deferred (the same split as crop_production / plot_inputs).
+    #
+    # animal = harmonize_species Preferred Label, keyed on the survey's own
+    # integer species code (s4aq02 / s8aq02; identical across both EACI
+    # waves).  Mali's roster has a FINER grain than a coarse Cattle/Sheep/
+    # Goats/Poultry rollup (separate bulls/cows/heifers/calves, rams/ewes,
+    # bucks/does, three poultry types) — kept on the `animal` axis so we are
+    # richer than the WB binary AND than a species rollup.  NO v: the
+    # framework's _no_v_join set already excludes 'livestock', so the
+    # canonical grain is (t, i, animal) with no cluster level.
+    #
+    # HeadCount    = number currently in the herd (s4aq04 / s8aq06).
+    # HeadAcquired = number bought in the recall period (s4aq15 / s8b1q10).
+    # HeadSold     = number owned by the HH sold (s4aq22 / s8b1q13).
+    # Value        = gross SALES value (FCFA) where reported (s4aq24 /
+    #                s8b1q14); NaN otherwise — the EACI roster carries NO
+    #                current herd-value question.
+    #
+    # NO TLU / herd-value total / engaged-in-livestock binary — those are
+    # transformations.py rollups over these item rows.  Built by per-wave
+    # scripts + a country-level concatenator.
+    index: (t, i, animal)
+    HeadCount: float
+    HeadAcquired: float
+    HeadSold: float
+    Value: float
+    materialize: make

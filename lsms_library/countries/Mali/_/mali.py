@@ -435,3 +435,97 @@ def plot_inputs_finalize(df):
     })
     out = out[['Quantity', 'u', 'Purchased', 'Quantity_purchased', 'Improved']]
     return out.sort_index()
+
+
+# ---------------------------------------------------------------------------
+# livestock (GAP 4; parity loop) — item-level (t, i, animal)
+# ---------------------------------------------------------------------------
+#
+# One row per (household, species owned).  Source: the EACI livestock roster
+# that the WB MLI_EACI*.do code reads, recodes to a single engaged-in-
+# livestock binary (s4aq03==Oui / s8aq04==Oui, collapse-max per hhid), then
+# THROWS AWAY.  We keep the pre-collapse roster — strictly richer than their
+# one y/n flag.
+#
+# Grain: one row per (t, i, animal), where
+#   - i      = Mali composite household id (grappe, menage/exploitation),
+#   - animal = harmonize_species Preferred Label (the survey's own integer
+#              species code s4aq02/s8aq02 -> canonical species).
+#
+# REPORTED item-level columns only (NO TLU, NO herd-value total, NO
+# engaged-in-livestock binary — those are transformations.py rollups over
+# these rows; their binary is groupby(['t','i']).any() over these rows):
+#   HeadCount        — number currently in the herd (owned + raised),
+#   HeadAcquired     — number bought in the recall period,
+#   HeadSold         — number owned by the HH sold in the recall period,
+#   Value            — gross value of those sales (FCFA) where the source
+#                      records it; NaN otherwise (the EACI roster carries NO
+#                      current herd-value question, only a sales value).
+#
+# `animal` is set by the wave script from the numeric species code, mapped
+# here to the harmonize_species Preferred Label.  No `v`: the framework's
+# _no_v_join set already excludes 'livestock', so the canonical grain is
+# (t, i, animal) with no cluster level.
+
+# EACI "Manquant" / refusal sentinels on the reported count/value columns.
+_LIVESTOCK_SENTINELS = [99, 999, 9999, 99999, 999999, 9999999]
+
+
+def _species_labels(series):
+    """Map a Series of numeric survey species codes (110, 120, ... 910)
+    -> harmonize_species Preferred Label.  The org-table Code column is read
+    back as STRING keys ('110', ...), so coerce the raw code to int->str
+    before the map; unmapped codes (none expected) become NA."""
+    m = tools.get_categorical_mapping(tablename='harmonize_species',
+                                      idxvars='Code',
+                                      **{'Preferred Label': 'Preferred Label'})
+    code = pd.to_numeric(series, errors='coerce').astype('Int64')
+    key = code.astype('string').str.replace(r'\.0$', '', regex=True)
+    out = key.map(m)
+    return out.astype('string').where(out.notna(), pd.NA)
+
+
+def livestock_finalize(df):
+    """Common post-processing for a livestock wave DataFrame.
+
+    Expects raw columns already assembled:
+        t, i, animal (numeric species code), HeadCount, HeadAcquired,
+        HeadSold, Value.
+    Maps the species code -> harmonize_species Preferred Label, coerces the
+    reported count/value columns to numeric (clearing the EACI Manquant
+    sentinels), drops content-free rows (a species the household does not
+    keep — no head count and no transaction), sets the (t, i, animal) index,
+    and collapses any exact-duplicate index rows by summing the reported
+    amounts (min_count=1 so an all-NA group stays NA, not a spurious 0).
+    """
+    df = df.copy()
+    df['animal'] = _species_labels(df['animal'])
+    df = df.dropna(subset=['animal'])  # drop unmapped species codes
+
+    for c in ('HeadCount', 'HeadAcquired', 'HeadSold', 'Value'):
+        if c not in df.columns:
+            df[c] = pd.NA
+        df[c] = pd.to_numeric(df[c], errors='coerce')
+        df.loc[df[c].isin(_LIVESTOCK_SENTINELS), c] = pd.NA
+
+    # Drop content-free rows: a species the household reported nothing
+    # positive for.  A reported head count, an acquisition, a sale, or a
+    # sale value all count as content; an all-zero/all-NA row does not (the
+    # roster has a fixed slot per species, with zeros for animals the HH
+    # does not keep — keeping them would emit 18 rows per household).
+    has_content = (df['HeadCount'].fillna(0).gt(0)
+                   | df['HeadAcquired'].fillna(0).gt(0)
+                   | df['HeadSold'].fillna(0).gt(0)
+                   | df['Value'].fillna(0).gt(0))
+    df = df[has_content]
+
+    keys = ['t', 'i', 'animal']
+    g = df.groupby(keys, dropna=False, as_index=True)
+    out = pd.DataFrame({
+        'HeadCount':    g['HeadCount'].sum(min_count=1),
+        'HeadAcquired': g['HeadAcquired'].sum(min_count=1),
+        'HeadSold':     g['HeadSold'].sum(min_count=1),
+        'Value':        g['Value'].sum(min_count=1),
+    })
+    out = out[['HeadCount', 'HeadAcquired', 'HeadSold', 'Value']]
+    return out.sort_index()

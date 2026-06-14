@@ -526,3 +526,43 @@
 | fungicide           | Fungicide           | x       | x       |
 | herbicide           | Herbicide           | x       | x       |
 | other_phytosanitary | Other phytosanitary | x       | x       |
+
+# harmonize_species — the animal-identity (`animal` index level) taxonomy
+# for livestock (GAP 4, parity loop).  Source: the EACI livestock roster
+# the WB MLI_EACI*.do code collapses to a single engaged-in-livestock
+# binary (s4aq03 / s8aq04) then discards.  The `Code` is the survey's own
+# integer species code (s4aq02 in 2014-15 EACIS4A_p2; s8aq02 in 2017-18
+# eaci17_s8ap2 / eaci17_s8b1p2) — IDENTICAL across both EACI waves, hence
+# one shared Code column.  The wave scripts key on this integer code; this
+# table maps it to a canonical species Preferred Label.
+#
+# Mali's roster carries a FINER grain than the coarse Cattle/Sheep/Goats/
+# Poultry rollup (it separately reports bulls/cows/heifers/calves within
+# cattle, rams/ewes within sheep, bucks/does within goats, and three
+# poultry types).  We keep that finer grain on the `animal` axis — strictly
+# RICHER than the WB single binary AND richer than a coarse species
+# rollup; the coarse Cattle/Smallruminants/Poultry grouping and any TLU
+# weighting are transformations.py rollups over these item rows, never a
+# stored column.  Per-wave decoded-label columns document the (near-
+# identical) source strings; the join key is the numeric Code.
+#+name: harmonize_species
+| Code | Preferred Label    | 2014-15               | 2017-18               |
+|------+--------------------+-----------------------+-----------------------|
+|  110 | Oxen               | Buf                   | Boeufs                |
+|  120 | Bulls              | Taureau               | Taureau               |
+|  130 | Cows               | Vache                 | Vache                 |
+|  140 | Young Cattle       | Taurillon / Bouvillon | Taurillon / Bouvillon |
+|  150 | Heifers            | Génisse               | Génisse               |
+|  160 | Calves             | Veau / Velle          | Veau / Velle          |
+|  210 | Rams               | Mouton / Bélier       | Mouton / Bélier       |
+|  220 | Ewes               | Brebis                | Brebis                |
+|  310 | Bucks              | Bouc                  | Bouc                  |
+|  320 | Goats              | Chèvre                | Chèvre                |
+|  410 | Camels             | Chameaux/Chamelles    | Chameaux/Chamelles    |
+|  510 | Horses             | Cheveau/Jument        | Cheveau/Jument        |
+|  610 | Donkeys            | Anes/Anesse           | Anes/Anesse           |
+|  710 | Chickens           | Poules / poulets      | Coq/Poules            |
+|  720 | Guinea Fowl        | Pintades              | Pintades              |
+|  730 | Other Poultry      | Autres volailles      | Autres volailles      |
+|  810 | Pigs               | Porcs                 | Porcs                 |
+|  910 | Rabbits            | Lapins                | Lapins                |
