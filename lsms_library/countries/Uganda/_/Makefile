@@ -25,6 +25,7 @@ var = $(VAR_DIR)/shocks.parquet $(VAR_DIR)/nonfood_expenditures.parquet $(VAR_DI
 	  $(VAR_DIR)/plot_features.parquet \
 	  $(VAR_DIR)/crop_production.parquet \
 	  $(VAR_DIR)/plot_inputs.parquet \
+	  $(VAR_DIR)/plot_labor.parquet \
 	  $(VAR_DIR)/livestock.parquet \
 	  $(VAR_DIR)/anthropometry.parquet \
 	  $(VAR_DIR)/months_food_inadequate.parquet
@@ -96,6 +97,12 @@ plot_inputs_parquet := $(plot_inputs:.py=.parquet)
 
 $(VAR_DIR)/plot_inputs.parquet: plot_inputs.py $(plot_inputs_parquet)
 	python plot_inputs.py
+
+plot_labor = $(shell find $(rounds) -name plot_labor.py)
+plot_labor_parquet := $(plot_labor:.py=.parquet)
+
+$(VAR_DIR)/plot_labor.parquet: plot_labor.py $(plot_labor_parquet)
+	python plot_labor.py
 
 livestock = $(shell find $(rounds) -name livestock.py)
 livestock_parquet := $(livestock:.py=.parquet)
