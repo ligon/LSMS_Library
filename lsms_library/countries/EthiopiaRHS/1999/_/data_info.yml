@@ -1,32 +1,77 @@
 # EthiopiaRHS 1999 (Round 5).  Source: IFPRI ERHS 1989-2009 Dataverse
 # deposit (doi:10.7910/DVN/T8G8IV), file "11 3.3.99 roster.tab" -> Data/roster.tab.
 #
-# Unlike the raw-code rosters of 1994a/b/1995/1997 (which set
-# converted_categoricals: False and decode q11_5/q11_1b via erhs_sex/
-# erhs_relation), this R5 file carries embedded VALUE LABELS, so we leave
-# converted_categoricals unset (-> convert_categoricals=True, country.py:700):
-# get_dataframe then decodes `sex` to Male/Female and `reltn3` to the
-# relationship label (Head, Son/Daughter, Wife/Husband/Partner, ...) on read,
-# and the canonical Sex spellings + kinship.yml handle those labels directly --
-# no per-country code mapping needed.  (Setting converted_categoricals: False
-# here would surface raw codes 1.0/2.0 and break kinship decomposition.)
+# CODE-BASED extraction (converted_categoricals: False), CONSISTENT WITH the
+# 1994a/b/1995/1997 rosters.  This R5 file carries embedded value labels, but
+# the underlying NUMERIC codes are identical to the other waves' stable scheme:
+# q1c = 1..20 (peasant association, the SAME codes that key
+# erhs_village_region/erhs_village_woreda), sex = 1/2 (-> M/F via erhs_sex), and
+# reltn3 = 1..16 (-> Preferred Label via erhs_relation, the SAME 16-code
+# taxonomy verified label-for-label against this file's own value labels).
+#
+# WHY code-path (not the earlier label-path): the 1999 sample/cluster_features
+# blocks below key on q1c, and v is joined onto the roster from sample() at API
+# time by _join_v_from_sample().  Under the label-path q1c is the village NAME
+# ('Haresaw', ...) -- which (a) cannot key the numeric erhs_village_* Code
+# tables (Region/Woreda would be all-NaN) and (b) mismatches the numeric q1c
+# the other waves use, so the roster<->sample i would not join (roster v all
+# NaN).  Code-path q1c (numeric) fixes both: the 1999 roster i = [q1c, hh] and
+# the 1999 sample i = [q1c, hh] share one encoding, the v join lands, and
+# Region/Woreda resolve.  (Verified: 1999 roster v non-NaN and 1999
+# cluster_features Region/Woreda non-NaN after this change.)
 #
 # Household keys q1c (peasant association) + hh (HH no. within village) are the
 # SAME stable codes used by the other waves' roster i:[q1c, hhid].
 #
-# R5 (1999) has a person roster; R6 (2004) / R7 (2009) do NOT (only HH-size
-# summaries), and item-level food is absent for R5-R7 -- see CONTENTS.org.
+# R5 (1999) has a person roster; R6 (2004) / R7 (2009) do NOT (only
+# pre-aggregated HH-level scalars), and item-level food is absent for R5-R7 --
+# so 2004/2009 are wired as bespoke (t,i) aggregate waves; see CONTENTS.org.
 household_roster:
     file: roster.tab
+    converted_categoricals: False
     idxvars:
         i:
-            - q1c        # peasant association (stable code)
+            - q1c        # peasant association (stable code 1..20)
             - hh         # HH no. within village
         pid: pid         # roster-card id
     myvars:
-        Sex: sex                 # already 'Male'/'Female' -> M/F via canonical spellings
+        Sex:
+            - sex                # 1/2 -> M/F
+            - mappings: ['erhs_sex', 'Code', 'Preferred Label']
         Age: age4                # round-5 age in years
-        Relationship: reltn3     # already a label; decomposed by kinship.yml
+        Relationship:
+            - reltn3             # 1..16 -> Preferred Label; decomposed by kinship.yml
+            - mappings: ['erhs_relation', 'Code', 'Preferred Label']
+
+# Sampling design + cluster geography for 1999, mirroring the 1994a blocks
+# (code-based; v = q1c).  ERHS has no HH-level cover file, so sample is
+# extracted from the per-person roster and the sample/cluster_features df_edit
+# hooks in _/ethiopiarhs.py dedup to the (i)/(v) grain.  This is the BLOCKING
+# fix for test_covers_all_waves[EthiopiaRHS]: without a 1999 sample block,
+# sample() emits no t='1999' row even though '1999' is in Country.waves.
+# q1c (numeric 1..20) keys erhs_village_region/erhs_village_woreda exactly as
+# the 1994+ waves do, keeping geography consistent across all waves.
+sample:
+    file: roster.tab
+    converted_categoricals: False
+    idxvars:
+        i:
+            - q1c
+            - hh
+    myvars:
+        v: q1c
+cluster_features:
+    file: roster.tab
+    converted_categoricals: False
+    idxvars:
+        v: q1c
+    myvars:
+        Region:
+            - q1c
+            - mappings: ['erhs_village_region', 'Code', 'Region']
+        Woreda:
+            - q1c
+            - mappings: ['erhs_village_woreda', 'Code', 'Woreda']
 
 # livestock + income (#277): HH-level VALUE aggregates from the R5
 # livestock ({village}lvs5.tab) and income ({village}inc5.tab) modules,
