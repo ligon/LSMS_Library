@@ -1,0 +1,116 @@
+# EthiopiaRHS 2009 (Round 7).  Source: IFPRI ERHS 1989-2009 Dataverse
+# deposit (doi:10.7910/DVN/T8G8IV).
+#
+# Like R6, R7 has NO person roster and NO item-level food in the IFPRI
+# archive -- only pre-aggregated HH-level scalars.  So 2009 is wired as a
+# set of bespoke HH-level (t,i) aggregate tables (assets/livestock/income
+# pattern), NOT household_roster/food_acquired.
+#
+# i-KEY (statically verified).  i = composite (pa, hhid) for the
+# consumption/hhsize/livestock files, and (paid, hhid) for the area_output
+# file -- `pa`/`paid` are the SAME numeric peasant-association code 1..20
+# as q1c; `hhid` is the HH-number-within-PA (NOT unique within the wave:
+# 265 distinct vs 1357 rows), so the composite is mandatory.  Same keyspace
+# as the 1994+ panel -> joins the main panel + gets a real v from the 2009
+# sample below.  All extraction is CODE-BASED (converted_categoricals:
+# False): pa/paid/hhid and the value columns are stable numeric scalars.
+#
+# The 2009 files are SINGLE-ROUND (not pooled), so the all-NaN-row drop in
+# the consumption/hhsize/area_output hooks is effectively a no-op here.
+
+# consumption: HH-level R7 consumption scalars.  Poor uses poorpc7 (the
+# per-capita poverty indicator; 2009 has no plain `poor7`).  aeu absent.
+consumption:
+    file: consumptionAggrgates_r7.tab
+    converted_categoricals: False
+    idxvars:
+        i:
+            - pa
+            - hhid
+    myvars:
+        HouseholdSize: hhsize
+        TotalConsumption: cons7
+        FoodConsumption: food7
+        RealConsumptionPC: rconspc7
+        FoodPriceIndex: fpi7
+        Poor: poorpc7
+
+# hhsize: 2009-only HH-size + male-head summary.
+hhsize:
+    file: hhsize_round7.tab
+    converted_categoricals: False
+    idxvars:
+        i:
+            - pa
+            - hhid
+    myvars:
+        HouseholdSize: hhsize
+        MaleHead: malehead
+
+# livestock: R7 herd value + TLU.  Reuses the (t,i) `livestock` feature
+# (already _no_v_join-exempt).
+livestock:
+    file: livestock_agg_round7.tab
+    converted_categoricals: False
+    idxvars:
+        i:
+            - pa
+            - hhid
+    myvars:
+        LivestockValue: lvs_val7
+        TLU: tlu7
+
+# area_output: HH x cereal AREA (ha) + PRODUCTION (kg), 2009 = 6 cereals
+# (white/black teff, barley, wheat, maize, sorghum).  Coffee/chat/enset are
+# NOT in the 2009 cereals file, so they are simply omitted here; the
+# country-level cross-wave concat unions columns, leaving 2009's
+# Coffee/Chat/Enset_ha/_kg NaN (the data_scheme declares the 2004+2009
+# union).  This file keys on `paid` (not `pa`).
+area_output:
+    file: erhs7_meher_area_output_cereals_2009.tab
+    converted_categoricals: False
+    idxvars:
+        i:
+            - paid
+            - hhid
+    myvars:
+        WhiteTeff_ha: wtefha09
+        WhiteTeff_kg: wtefprd09
+        BlackTeff_ha: btefha09
+        BlackTeff_kg: btefprd09
+        Barley_ha: barlha09
+        Barley_kg: barlprd09
+        Wheat_ha: whtha09
+        Wheat_kg: whtprd09
+        Maize_ha: maizha09
+        Maize_kg: maizprd09
+        Sorghum_ha: sorgha09
+        Sorghum_kg: sorgprd09
+
+# Sampling design + cluster geography.  Extracted from the consumption
+# aggregate file; v = pa (numeric PA code 1..20).  Region/Woreda mapped
+# via the cross-wave erhs_village_* Code tables (the in-data 2009
+# region/woreda columns are non-NaN too, but the Code tables keep the
+# canonical 15-Woreda spelling consistent with the other 7 waves so
+# market='Woreda' joins across waves).  REQUIRED for test_covers_all_waves.
+sample:
+    file: consumptionAggrgates_r7.tab
+    converted_categoricals: False
+    idxvars:
+        i:
+            - pa
+            - hhid
+    myvars:
+        v: pa
+cluster_features:
+    file: consumptionAggrgates_r7.tab
+    converted_categoricals: False
+    idxvars:
+        v: pa
+    myvars:
+        Region:
+            - pa
+            - mappings: ['erhs_village_region', 'Code', 'Region']
+        Woreda:
+            - pa
+            - mappings: ['erhs_village_woreda', 'Code', 'Woreda']

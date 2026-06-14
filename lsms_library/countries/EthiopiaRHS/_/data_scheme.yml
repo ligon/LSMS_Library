@@ -3,13 +3,25 @@ Country: EthiopiaRHS
 # Ethiopian Rural Household Survey (ERHS), 1989-2009.
 # Distinct survey from the World Bank ESS/LSMS-ISA `Ethiopia` module.
 # Source: IFPRI Dataverse, doi:10.7910/DVN/T8G8IV (hdl:1902.1/15646).
-# Waves are auto-discovered from {wave}/Documentation/SOURCE.org -- no
-# ethiopiarhs.py / Waves dict (per maintainer steer 2026-05-18).
 #
-# First pass is CFE-minimal (GH #271): household_roster + food_acquired,
-# which auto-derive household_characteristics and
-# food_expenditures/food_quantities at runtime. Per-wave variable
-# mappings live in {wave}/_/data_info.yml and are filled in wave by wave.
+# Waves are declared by the EXPLICIT `waves` list in _/ethiopiarhs.py
+# (consumed by Country.waves) -- it is authoritative, NOT auto-discovery.
+# All 8 rounds are wired: 1989, 1994a, 1994b, 1995, 1997, 1999 (R1-R5) plus
+# 2004 (R6) and 2009 (R7).  Per-wave variable mappings live in
+# {wave}/_/data_info.yml.
+#
+# Feature set (this file enumerates the canonical tables):
+#  - household_roster + food_acquired (1989-1997, person/item-level) ->
+#    auto-derive household_characteristics, food_expenditures/food_quantities.
+#  - sample + cluster_features (all 8 waves where geography exists).
+#  - plot_features (1994a R1).
+#  - bespoke HH-level (t,i) VALUE/aggregate tables where the IFPRI archive
+#    ships only pre-aggregated household scalars (no roster/item-level food):
+#    assets (1989 R1), livestock (1999 R5 + 2004 R6 + 2009 R7),
+#    income (1999 R5), consumption (2004 R6 + 2009 R7), hhsize (2009 R7),
+#    area_output (2004 R6 + 2009 R7).  These follow the documented
+#    _no_v_join (t,i) pattern (see country.py _no_v_join + CLAUDE.md).
+#  - panel_ids (!make).
 
 Data Scheme:
   household_roster:
@@ -33,13 +45,16 @@ Data Scheme:
     TotalValue: float
     NumberOfAssets: float
 
-  # livestock (#277): HH-level livestock-VALUE aggregates from the R5
-  # (1999) livestock module (one {village}lvs5.tab per original-7-village
-  # peasant association).  Pre-aggregated household TOTALS (herd value +
-  # TLU), NOT canonical item-level (t,i,j) -- so this is a documented
-  # HH-level (t,i) variant, like `assets`.  i = the packed 5-digit hhid
-  # (same scalar scheme as the 1989 roster; ZERO overlap with the 1999
-  # roster's named [q1c,hh] composite, 322/541 vs the 1989 packed roster).
+  # livestock (#277): HH-level livestock-VALUE aggregates.  Pre-aggregated
+  # household TOTALS (herd value + TLU), NOT canonical item-level (t,i,j) --
+  # a documented HH-level (t,i) variant, like `assets`.  Three wired waves:
+  #  - 1999 (R5): one {village}lvs5.tab per original-7-village peasant
+  #    association; i = the packed 5-digit hhid (same scalar scheme as the
+  #    1989 roster; ZERO overlap with the 1999 roster's [q1c,hh] composite).
+  #  - 2004 (R6): livestockaggregates_123456.tab, the livval6/lsu6 slice;
+  #    i = composite (paid, hhid) via the shared ethiopiarhs.i formatter.
+  #  - 2009 (R7): livestock_agg_round7.tab (lvs_val7/tlu7); i = (pa, hhid).
+  # All wired via the existing _no_v_join exemption for `livestock`.
   livestock:
     index: (t, i)
     LivestockValue: float   # total value of livestock herd (Birr)
@@ -57,6 +72,62 @@ Data Scheme:
     LivestockIncome: float  # income from livestock products/sales
     OffFarmIncome: float    # non-farm income
     WageIncome: float       # wage/labour income
+
+  # consumption (#277): HH-level pre-aggregated consumption scalars for
+  # 2004 (R6) and 2009 (R7).  The IFPRI archive has NO person roster and
+  # NO item-level food for R6/R7 -- only these CONSTRUCTED aggregates --
+  # so this is a documented HH-level (t,i) variant (cf. assets/livestock/
+  # income), NOT food_acquired.  Source: the R6 *6-suffixed slice of
+  # consumptionaggregates_123456.tab (R6-population = cons6 non-null,
+  # 1368 HH) and consumptionAggrgates_r7.tab (2009, 1357 HH).  i =
+  # composite (paid|pa, hhid) via the shared ethiopiarhs.i formatter
+  # (hhid is NOT unique within a wave -> composite mandatory).  aeu* is
+  # all-NaN in the 2004 source, so no AEU column.  Added to _no_v_join.
+  consumption:
+    index: (t, i)
+    HouseholdSize: float    # hhsize6 / hhsize
+    TotalConsumption: float # cons6 / cons7 (total real consumption, Birr)
+    FoodConsumption: float  # food6 / food7
+    RealConsumptionPC: float # rconspc6 / rconspc7 (real consumption per capita)
+    FoodPriceIndex: float   # fpi6 / fpi7
+    Poor: float             # poor6 / poorpc7 (poverty indicator)
+
+  # hhsize (#277): 2009 (R7) HH-size summary from hhsize_round7.tab.
+  # Documented HH-level (t,i) variant.  i = (pa, hhid).  Added to _no_v_join.
+  hhsize:
+    index: (t, i)
+    HouseholdSize: float    # hhsize
+    MaleHead: float         # malehead (1 = male-headed)
+
+  # area_output (#277): HH x crop pre-aggregated AREA (ha) + PRODUCTION (kg)
+  # totals for 2004 (R6) and 2009 (R7).  NOT plot_features (no per-plot rows;
+  # this is the HH-level constructed crop summary).  Documented HH-level
+  # (t,i) variant.  Columns are the UNION of 2004 (9 crops: white/black teff,
+  # barley, wheat, maize, sorghum, coffee, chat, enset) and 2009 (6 cereals:
+  # white/black teff, barley, wheat, maize, sorghum); 2009 leaves
+  # coffee/chat/enset NaN (missing_ok column union).  Per-crop column
+  # naming: {Crop}_ha (hectares), {Crop}_kg (production).  i = composite
+  # (paid, hhid) via the shared ethiopiarhs.i formatter.  Added to _no_v_join.
+  area_output:
+    index: (t, i)
+    WhiteTeff_ha: float
+    WhiteTeff_kg: float
+    BlackTeff_ha: float
+    BlackTeff_kg: float
+    Barley_ha: float
+    Barley_kg: float
+    Wheat_ha: float
+    Wheat_kg: float
+    Maize_ha: float
+    Maize_kg: float
+    Sorghum_ha: float
+    Sorghum_kg: float
+    Coffee_ha: float        # 2004 only
+    Coffee_kg: float        # 2004 only
+    Chat_ha: float          # 2004 only
+    Chat_kg: float          # 2004 only
+    Enset_ha: float         # 2004 only
+    Enset_kg: float         # 2004 only
 
   # Mali-style clean YAML: extract wide per-source columns; the
   # `food_acquired` df_edit hook in _/ethiopiarhs.py melts them to
@@ -92,11 +163,17 @@ Data Scheme:
     Irrigated: bool
 
   # Sampling design.  ERHS is a PURPOSIVE 15-village longitudinal
-  # panel, not a weighted national sample -- there are no design
-  # weights, so weight/panel_weight are NaN (sourcing any constructed
-  # weights is a documented follow-up).  v = peasant association
-  # (village).  Sources are per-person; the `sample`/`cluster_features`
-  # df_edit hooks in _/ethiopiarhs.py dedup to the required grain.
+  # panel, not a weighted national sample -- there are no survey *design*
+  # weights, so weight/panel_weight are set to a UNIFORM 1.0
+  # (self-weighting: each HH counts once -> unweighted means; does NOT
+  # break weighted-aggregation code the way NaN would).  These are
+  # explicitly NOT expansion factors; sourcing any constructed ERHS
+  # weights remains a documented follow-up.  is_this_feature_sane emits
+  # only a constant-column *warning* (weight/panel_weight = 1, Rural =
+  # 'Rural' since every ERHS HH is rural -- a true survey property).
+  # v = peasant association (village).  Sources are per-person (1989-1999)
+  # or the HH-level aggregate file (2004/2009); the `sample`/
+  # `cluster_features` df_edit hooks in _/ethiopiarhs.py dedup to grain.
   sample:
     index: (i, t)
     v: str
