@@ -769,3 +769,55 @@
 |      | Organic Fertilizer |      |         |
 |      | Herbicide       |         |         |
 |      | Pesticide       |         |         |
+
+# Livestock species (parity-loop GAP 4 -- the `animal` index level of the
+# `livestock` feature).  The LF_SEC_02 livestock roster records ownership at
+# the (household, lvstckid) grain -- one row per animal TYPE the household was
+# asked about.  This table maps each wave's raw `lvstckid` code to a canonical
+# species/type Preferred Label, which becomes the `animal` index value.
+#
+# It is RICHER than the WB cleaning code, which recodes the own-y/n flag
+# (lf02_01 / s10aq2 / ag10a_02) and collapse(max)es every animal type down to a
+# single household "engaged-in-livestock" binary -- discarding the species,
+# head counts, purchases, sales and values.  Here every owned-species row is
+# kept (their binary = our `groupby(['t','i']).size() > 0`).
+#
+# The cattle sub-types (Bulls / Cows / Steers / Heifers / Male & Female
+# Calves) are kept DISTINCT, matching the questionnaire's own item grain; a
+# coarser "Cattle" rollup is a transformation over these rows, not a stored
+# label.  Codes are stable across waves for 1..14 EXCEPT code 13 (2019-20
+# "HARE" vs 2020-21 "rabbits" -- same family, one label "Rabbits"); the
+# pet/other tail diverges: 2019-20 has 15=DOGS, 16=OTHER; 2020-21 has 15=dogs,
+# 16=cats, 17=other.  Only 2019-20 / 2020-21 are buildable (the 2008-15
+# multi-round folder has no livestock source on disk -- same deferral as
+# plot_features / crop_production / plot_inputs, GH #167); the SEC_10A
+# (2008-09) / AG_SEC10A (2010-11) rosters are documented in the comment but
+# have no code column here because their .dta is not present.
+#
+# DOGS / CATS / OTHER are pets, NOT livestock: their Preferred Label is blank
+# (-> pd.NA), so `_map_plot_codes` drops them and they never become `animal`
+# rows -- mirroring the WB `drop if inlist(animal, 15, 16)` exclusion and
+# keeping our distinct livestock-owning-HH count comparable to their binary.
+# The wave-script resolves each wave's RAW lvstckid through that wave's own
+# code column (NOT the canonical Code), so the 13/15/16/17 divergence is
+# handled without fabricating a cross-wave code identity.
+#+name: harmonize_species
+| Code | Preferred Label | 2019-20 | 2020-21 |
+|------+-----------------+---------+---------|
+| 1    | Bulls           | 1       | 1       |
+| 2    | Cows            | 2       | 2       |
+| 3    | Steers          | 3       | 3       |
+| 4    | Heifers         | 4       | 4       |
+| 5    | Male Calves     | 5       | 5       |
+| 6    | Female Calves   | 6       | 6       |
+| 7    | Goats           | 7       | 7       |
+| 8    | Sheep           | 8       | 8       |
+| 9    | Pigs            | 9       | 9       |
+| 10   | Chickens        | 10      | 10      |
+| 11   | Ducks           | 11      | 11      |
+| 12   | Other Poultry   | 12      | 12      |
+| 13   | Rabbits         | 13      | 13      |
+| 14   | Donkeys         | 14      | 14      |
+| 15   |                 | 15      | 15      |
+| 16   |                 | 16      | 16      |
+| 17   |                 |         | 17      |

@@ -1213,3 +1213,139 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
         })
     df = df[PLOT_INPUTS_COLUMNS]
     return df
+
+
+# Livestock feature (parity-loop GAP 4).  Item-level herd at the natural grain
+# (t, i, animal) -- one row per species/animal-type the household OWNS --
+# carrying ONLY reported survey fields.  No TLU, no herd-value total, no
+# engaged-in-livestock binary: those are transformations over these rows (the
+# WB binary = our ``groupby(['t','i']).size() > 0``).
+#
+# 'livestock' is in the framework ``_no_v_join`` set, so the grain is (t, i,
+# animal) with NO ``v`` cluster level joined.
+LIVESTOCK_COLUMNS = ['HeadCount', 'HeadAcquired', 'HeadSold']
+# NB: a herd VALUE column is part of the GAP-4 schema "where the source reports
+# it", but the Tanzania NPS livestock module (LF_SEC_02) records no current-
+# herd valuation -- only purchase value (lf02_08), sale value (lf02_26) and
+# loss values, each a transaction value, not a stock value.  So Value is
+# omitted here rather than carried all-null (which fails the
+# no_all_null_columns sanity check) -- the same discipline crop_production uses
+# for the absent planting_month.  A purchase/sale value is recoverable as a
+# transformation over HeadAcquired / HeadSold should a valuation be wanted.
+
+
+# Plausibility ceiling for a 12-month head-count FLOW (bought / sold).  The
+# largest legitimate flow observed is ~2500 head (a poultry operation); two
+# rows carry an obvious data-entry error where the TSH value was typed into the
+# count field (2019-20: HH 0525-001-001 "bought 324000" == its 324000-TSH
+# purchase value; 2020-21: HH 3722-001-01 "sold 100000" of its 10 owned
+# chickens for 10 TSH).  Clamp flows above 50000 to NaN -- well above any
+# plausible smallholder flow, so only the corrupt entries are dropped.  This is
+# the same plausibility-clamp discipline plot_features uses for >2500-acre
+# parcels (GH #167).
+_LIVESTOCK_FLOW_CEILING = 50000
+
+
+def _livestock_count(series, ceiling=None):
+    """Coerce a reported head-count column to nullable Float64 (>=0; negatives
+    -> NaN).  When ``ceiling`` is given, values above it (data-entry errors
+    where a TSH value landed in the count field) are also set to NaN."""
+    v = pd.to_numeric(series, errors='coerce').astype('Float64')
+    v = v.where(v >= 0, pd.NA)
+    if ceiling is not None:
+        v = v.where(v <= ceiling, pd.NA)
+    return v
+
+
+def livestock_for_wave(t, lf, colmap):
+    """Build canonical ``livestock`` for one Tanzania NPS wave.
+
+    The livestock roster (LF_SEC_02 in 2019-20 / 2020-21) is at the
+    (household, lvstckid) grain -- one row per animal TYPE the household was
+    asked about.  We keep ONLY the rows the household actually OWNS
+    (``lf02_01`` == 1), so the emitted grain is one row per (household, owned
+    species).  Each raw ``lvstckid`` is resolved to a canonical species
+    Preferred Label via this wave's column of the ``harmonize_species``
+    categorical table; pets (Dogs / Cats / Other -> blank label -> NaN) are
+    dropped, mirroring the WB ``drop if inlist(animal, 15, 16)``.
+
+    Reported item-level fields carried (NO aggregation):
+      HeadCount    -- currently owned = lf02_04_1 (indigenous) + lf02_04_2
+                      (improved/exotic).  Reported current stock.
+      HeadAcquired -- bought alive in the past 12 months (lf02_07).  The
+                      directly-reported acquisition flow that parallels
+                      HeadSold; births (lf02_05) and gifts received (lf02_10)
+                      are separate reported flows, NOT summed in here.
+      HeadSold     -- sold alive in the past 12 months (lf02_25).
+
+    Parameters
+    ----------
+    t : str          wave id ('2019-20' or '2020-21'); the ``t`` value.
+    lf : pd.DataFrame
+        raw LF_SEC_02 frame (convert_categoricals=False, so lvstckid carries
+        the integer code).
+    colmap : dict with keys
+        hhid    -- household id column (sdd_hhid / y5_hhid)
+        animal  -- animal-type code column (lvstckid)
+        own     -- own-y/n flag           (lf02_01; 1=yes, 2=no)
+        owned   -- [indigenous, improved] current-stock columns
+                   (['lf02_04_1', 'lf02_04_2'])
+        bought  -- head bought alive      (lf02_07)
+        sold    -- head sold alive        (lf02_25)
+        species_col -- this wave's column name in harmonize_species
+                       ('2019-20' / '2020-21')
+
+    Returns
+    -------
+    pd.DataFrame indexed by (t, i, animal) with columns LIVESTOCK_COLUMNS.
+    Emits raw hhid as ``i``; the country-level concatenator applies id_walk.
+    """
+    c = colmap
+    species_map = _plot_harmonized_codes('harmonize_species',
+                                         value='Preferred Label')
+    # _plot_harmonized_codes keys on the canonical 'Code' column, but the raw
+    # lvstckid uses this wave's own code column; for Tanzania the two coincide
+    # for every species we keep (1..14) and the divergent pet/other tail maps
+    # to NA either way -- but resolve through the wave column to be exact.
+    from lsms_library.local_tools import get_categorical_mapping
+    raw = get_categorical_mapping(tablename='harmonize_species',
+                                  idxvars=c['species_col'],
+                                  **{'Preferred Label': 'Preferred Label'})
+    species_map = {}
+    for k, v in raw.items():
+        try:
+            k = int(k)
+        except (TypeError, ValueError):
+            pass
+        species_map[k] = (pd.NA if (pd.isna(v) or str(v).strip() in ('', '---'))
+                          else str(v).strip())
+
+    out = pd.DataFrame(index=lf.index)
+    out['i'] = lf[c['hhid']].apply(format_id)
+    out['animal'] = _map_plot_codes(lf[c['animal']], species_map)
+
+    owned = lf[c['owned']].apply(pd.to_numeric, errors='coerce')
+    head = owned.sum(axis=1, min_count=1).astype('Float64')
+    out['HeadCount'] = head.where((head >= 0) & (head <= _LIVESTOCK_FLOW_CEILING),
+                                  pd.NA)
+    out['HeadAcquired'] = _livestock_count(lf[c['bought']],
+                                           ceiling=_LIVESTOCK_FLOW_CEILING)
+    out['HeadSold'] = _livestock_count(lf[c['sold']],
+                                       ceiling=_LIVESTOCK_FLOW_CEILING)
+
+    own = pd.to_numeric(lf[c['own']], errors='coerce')
+
+    # Keep only OWNED rows (own-flag == yes) with a resolvable species label.
+    out = out[(own == 1) & out['animal'].notna()].copy()
+
+    out['t'] = t
+    out = out.set_index(['t', 'i', 'animal'])
+    # Guard against a duplicated (t,i,animal): sum reported head counts.
+    if not out.index.is_unique:
+        out = out.groupby(level=['t', 'i', 'animal']).agg({
+            'HeadCount': lambda s: s.sum(min_count=1),
+            'HeadAcquired': lambda s: s.sum(min_count=1),
+            'HeadSold': lambda s: s.sum(min_count=1),
+        })
+    out = out[LIVESTOCK_COLUMNS]
+    return out

@@ -601,3 +601,117 @@ rows carry an applied-y/n flag only (no quantity in the survey).
 |    6 | Compost         |
 |    7 | Other Organic   |
 |    8 | Pesticide       |
+
+* harmonize_species (the animal axis -- GAP 4, livestock; WAVE-KEYED)
+
+The §8 livestock-roster animal code (=ls_s8aq00= W1-W2, =ls_code= W4-W5,
+=ls_code= W3) -> canonical species.  WAVE-KEYED because the raw code
+scheme is NOT stable across waves:
+
+- W1-W2 (=ls_s8aq00=, 14 codes) report CATTLE / POULTRY at the *aggregate*
+  species grain (a single CATTLE code; four separate poultry codes for
+  laying/non-laying hens, cocks, cockerels, pullets, chicks).
+- W3 (=ls_code=, 23 codes) and W4-W5 (=ls_code=, 16 codes) split the
+  bovine herd by age/sex (Bulls / Oxen / Cows / Steers / Heifers /
+  Calves) and the small ruminants / camels likewise.
+
+To keep a single cross-wave =animal= axis we fold every bovine sub-type
+(Bulls/Oxen/Cows/Steers/Heifers/Calves) onto *Cattle* and every
+chicken/hen/cock/chick sub-type onto *Poultry* -- W1-W2 cannot
+distinguish Oxen from the rest of the herd, so a finer scheme would not
+be cross-wave comparable.  The wave-level script SUMS the reported head
+counts over the raw codes that share a canonical species within a
+household (e.g. W3 Bulls+Oxen+Cows+... -> one Cattle row per HH), which
+is the within-household roll-up to the (t, i, animal) grain, NOT a
+WB-style collapse-to-binary.
+
+Canonical species: Cattle, Sheep, Goats, Camels, Poultry, Horses,
+Mules, Donkeys, Beehives.  (Beehives are a hive count, not a head
+count, but ride the same roster row; carried for completeness.)
+
+#+name: harmonize_species
+| Wave    | Code | Preferred Label |
+|---------+------+-----------------|
+| 2011-12 |    1 | Cattle          |
+| 2011-12 |    2 | Sheep           |
+| 2011-12 |    3 | Goats           |
+| 2011-12 |    4 | Horses          |
+| 2011-12 |    5 | Donkeys         |
+| 2011-12 |    6 | Mules           |
+| 2011-12 |    7 | Camels          |
+| 2011-12 |    8 | Poultry         |
+| 2011-12 |    9 | Poultry         |
+| 2011-12 |   10 | Poultry         |
+| 2011-12 |   11 | Poultry         |
+| 2011-12 |   12 | Poultry         |
+| 2011-12 |   13 | Poultry         |
+| 2011-12 |   14 | Beehives        |
+| 2013-14 |    1 | Cattle          |
+| 2013-14 |    2 | Sheep           |
+| 2013-14 |    3 | Goats           |
+| 2013-14 |    4 | Horses          |
+| 2013-14 |    5 | Donkeys         |
+| 2013-14 |    6 | Mules           |
+| 2013-14 |    7 | Camels          |
+| 2013-14 |    8 | Poultry         |
+| 2013-14 |    9 | Poultry         |
+| 2013-14 |   10 | Poultry         |
+| 2013-14 |   11 | Poultry         |
+| 2013-14 |   12 | Poultry         |
+| 2013-14 |   13 | Poultry         |
+| 2013-14 |   14 | Beehives        |
+| 2015-16 |    1 | Cattle          |
+| 2015-16 |    2 | Cattle          |
+| 2015-16 |    3 | Cattle          |
+| 2015-16 |    4 | Cattle          |
+| 2015-16 |    5 | Cattle          |
+| 2015-16 |    6 | Cattle          |
+| 2015-16 |    7 | Goats           |
+| 2015-16 |    8 | Goats           |
+| 2015-16 |    9 | Goats           |
+| 2015-16 |   10 | Sheep           |
+| 2015-16 |   11 | Sheep           |
+| 2015-16 |   12 | Sheep           |
+| 2015-16 |   13 | Camels          |
+| 2015-16 |   14 | Camels          |
+| 2015-16 |   15 | Camels          |
+| 2015-16 |   16 | Poultry         |
+| 2015-16 |   17 | Poultry         |
+| 2015-16 |   18 | Poultry         |
+| 2015-16 |   19 | Poultry         |
+| 2015-16 |   20 | Horses          |
+| 2015-16 |   21 | Mules           |
+| 2015-16 |   22 | Donkeys         |
+| 2015-16 |   23 | Beehives        |
+| 2018-19 |    1 | Cattle          |
+| 2018-19 |    2 | Cattle          |
+| 2018-19 |    3 | Cattle          |
+| 2018-19 |    4 | Cattle          |
+| 2018-19 |    5 | Cattle          |
+| 2018-19 |    6 | Cattle          |
+| 2018-19 |    7 | Goats           |
+| 2018-19 |    8 | Sheep           |
+| 2018-19 |    9 | Camels          |
+| 2018-19 |   10 | Poultry         |
+| 2018-19 |   11 | Poultry         |
+| 2018-19 |   12 | Poultry         |
+| 2018-19 |   13 | Horses          |
+| 2018-19 |   14 | Mules           |
+| 2018-19 |   15 | Donkeys         |
+| 2018-19 |   16 | Beehives        |
+| 2021-22 |    1 | Cattle          |
+| 2021-22 |    2 | Cattle          |
+| 2021-22 |    3 | Cattle          |
+| 2021-22 |    4 | Cattle          |
+| 2021-22 |    5 | Cattle          |
+| 2021-22 |    6 | Cattle          |
+| 2021-22 |    7 | Goats           |
+| 2021-22 |    8 | Sheep           |
+| 2021-22 |    9 | Camels          |
+| 2021-22 |   10 | Poultry         |
+| 2021-22 |   11 | Poultry         |
+| 2021-22 |   12 | Poultry         |
+| 2021-22 |   13 | Horses          |
+| 2021-22 |   14 | Mules           |
+| 2021-22 |   15 | Donkeys         |
+| 2021-22 |   16 | Beehives        |

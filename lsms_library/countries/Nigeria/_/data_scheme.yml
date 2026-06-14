@@ -189,4 +189,42 @@ Data Scheme:
     Days: int
     materialize: make
 
+  livestock:
+    # Item-level reported livestock holdings (GAP 4) at natural grain
+    # (t, i, animal).  Source: the GHS-Panel livestock roster
+    # sect11i_planting{wN} -- the PRE-collapse roster the WB code reads
+    # then throws away down to a single household engaged-in-livestock
+    # y/n binary (NGA_GHS1.do:992-998 recodes s11iq1 then `collapse
+    # (max) livestock, by(hhid)`).  We keep the roster richer: per-animal
+    # head counts, acquisitions, sales, and reported per-head value.
+    #
+    # Collected in the post-planting round only, so each wave maps to a
+    # single t = PP_QUARTER[wave] (2010Q3 / 2012Q3 / 2015Q3 / 2018Q3 /
+    # 2023Q3), matching plot_features / plot_inputs; hhid aligns via
+    # format_id.  Country-level script (_/livestock.py) resolves each
+    # wave's native animal code (101-123, one stable scheme) to a
+    # harmonize_species Preferred Label and reshapes per wave ->
+    # materialize: make.
+    #
+    # NO `v` level: livestock is in the framework `_no_v_join` set, so the
+    # grain is exactly (t, i, animal) -- no cluster join at API time.
+    #
+    # Stores REPORTED item-level fields ONLY:
+    #   HeadCount      head owned/kept now (s11iq2 W1-W3/W5; s11iq2a W4)
+    #   HeadAcquired   head bought to raise (s11iq10 W1-W4; s11iq17 W5)
+    #   HeadSold       head sold alive      (s11iq16 W1-W4; s11iq23 W5)
+    #   Value          reported reservation value of ONE head -- "if you
+    #                  sold one today, how much would you receive"
+    #                  (s11iq3 W1-W4; s11iq7 W5).  Per-head reported price,
+    #                  NOT a herd-value total and NOT the WB engaged
+    #                  binary.
+    # NO TLU, NO herd-value total, NO engaged-in-livestock binary -- those
+    # are transformations over these rows (their binary = groupby.any()).
+    index: (t, i, animal)
+    HeadCount: float
+    HeadAcquired: float
+    HeadSold: float
+    Value: float
+    materialize: make
+
   nonfood_expenditures: !make

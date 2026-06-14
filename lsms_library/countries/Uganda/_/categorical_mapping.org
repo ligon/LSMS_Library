@@ -878,3 +878,71 @@
 |------+-----------------|
 |    1 | Kg              |
 |    2 | Litre           |
+
+# harmonize_species: livestock animal-type Code -> canonical species Preferred
+# Label for the livestock feature (GAP 4).  One row per REPORTED species/herd
+# a household owns, ``animal`` axis.  Source: the UNPS livestock roster the WB
+# code (UGA_UNPS1.do:710-720) reads only to collapse to a single engaged-y/n
+# binary; we keep the PRE-collapse roster.  Three roster sections per wave:
+#   AGSEC6A  large ruminants / draft  (cattle, donkeys, horses)   codes 1-12
+#   AGSEC6B  small ruminants          (goats, sheep, pigs)        codes 13-22
+#   AGSEC6C  poultry & other          (chicken, other birds,      codes 23-28
+#            rabbits, bees)                                      (2011-12+);
+#            the 2010-11 AGSEC6C roster uses a SEPARATE 31-42 code block for
+#            the same animals (Rabbits 31, chicken 32-38, turkeys/ducks/geese
+#            39-41, beehives 42) -- both blocks are folded into this one table.
+# The codes carry exotic/cross vs indigenous AND age/sex detail (Calves, Bulls,
+# Oxen, Heifer, Cows; Male/Female goats/sheep; Layers, Broilers, Pullets, ...);
+# that cross-row variation collapses to the SPECIES here -- the exotic/indigenous
+# and age/sex splits are sub-species detail recoverable from the raw codes if
+# needed, but unimportant for the harmonized species axis.  Per-head value and
+# herd value are NOT in this table (Value is a reported column; herd value =
+# Value x HeadCount is a transformation).
+#
+# 2009-10 and the AGSEC6A/6B sections of 2010-11 carry NO integer value labels
+# (the type comes through as a label STRING, e.g. 'Bulls and Oxen', 'Backyard
+# chicke'); uganda._species_string_map() maps those wave-specific strings to the
+# same canonical species, so a single Preferred Label set spans all waves.
+#+name: harmonize_species
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Cattle          |
+|    2 | Cattle          |
+|    3 | Cattle          |
+|    4 | Cattle          |
+|    5 | Cattle          |
+|    6 | Cattle          |
+|    7 | Cattle          |
+|    8 | Cattle          |
+|    9 | Cattle          |
+|   10 | Cattle          |
+|   11 | Donkeys         |
+|   12 | Horses          |
+|   13 | Goats           |
+|   14 | Goats           |
+|   15 | Sheep           |
+|   16 | Sheep           |
+|   17 | Pigs            |
+|   18 | Goats           |
+|   19 | Goats           |
+|   20 | Sheep           |
+|   21 | Sheep           |
+|   22 | Pigs            |
+|   23 | Chicken         |
+|   24 | Chicken         |
+|   25 | Chicken         |
+|   26 | Other Poultry   |
+|   27 | Rabbits         |
+|   28 | Bees            |
+|   31 | Rabbits         |
+|   32 | Chicken         |
+|   33 | Chicken         |
+|   34 | Chicken         |
+|   35 | Chicken         |
+|   36 | Chicken         |
+|   37 | Chicken         |
+|   38 | Chicken         |
+|   39 | Other Poultry   |
+|   40 | Other Poultry   |
+|   41 | Other Poultry   |
+|   42 | Bees            |

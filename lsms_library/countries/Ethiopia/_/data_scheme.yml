@@ -168,6 +168,47 @@ Data Scheme:
       optional: true
     materialize: make
 
+  livestock:
+    # GAP 4 -- item-level livestock at (t, i, animal).  One row per
+    # (household, canonical species) from ESS §8 (sect8a_ls W1/W2;
+    # sect8_1_ls + sect8_2_ls W3-W5), carrying only REPORTED roster fields:
+    #   HeadCount     current head owned/kept by the HH.
+    #   HeadAcquired  head PURCHASED alive in the last 12 months.
+    #   HeadSold      head SOLD alive in the last 12 months.
+    #   Value         total income from livestock SALES in the last 12 months
+    #                 (Birr).  The §8 roster records NO current herd-value
+    #                 question in any ESS wave, so Value carries the reported
+    #                 sale income (the only monetary §8 field); it is NOT a
+    #                 herd valuation.
+    # This is the PRE-COLLAPSE §8 roster the WB code reads then throws away
+    # down to a single engaged-in-livestock y/n binary (their recode of the
+    # post-planting cover pp_saq13 + collapse-max).  We keep the head counts
+    # / transactions instead -- strictly richer than their binary, over the
+    # same (broader, since §8 covers livestock-only HHs the PP module omits)
+    # set of households.
+    #
+    # animal axis: the canonical species Preferred Label (Cattle / Sheep /
+    # Goats / Camels / Poultry / Horses / Mules / Donkeys / Beehives) from
+    # the WAVE-KEYED harmonize_species table -- W1/W2 report Cattle/Poultry
+    # at the aggregate grain, W3-W5 split the herd by age/sex; the script
+    # folds the sub-codes (Bulls/Oxen/Cows/... -> Cattle) onto the canonical
+    # species and SUMS the reported head counts within each household (the
+    # within-household roll-up to the grain, NOT a WB collapse-to-binary).
+    #
+    # NO TLU / herd-value total / engaged-y/n binary baked in (those are
+    # transformations -- the binary = groupby(['t','i']).any() over these
+    # rows; tlu = Sum(head x species-TLU-factor)).  Grain is (t, i, animal)
+    # with NO v level: livestock is per-household, and the framework
+    # _no_v_join set already covers 'livestock'.  Multi-file join (count <->
+    # transactions on (holder, code)) + per-wave code->species harmonization
+    # + within-household sum => script (materialize: make).
+    index: (t, i, animal)
+    HeadCount: float
+    HeadAcquired: float
+    HeadSold: float
+    Value: float
+    materialize: make
+
   food_security:
     # FAO FIES 8-item experience scale (GH #332).  Confirmed ONLY in
     # W5 (2021-22): ESS §8 file sect8_hh_w5.dta carries the FAO battery

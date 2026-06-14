@@ -48,6 +48,66 @@ Wave-specific notes (validated against the recon refuter pass,
   prefix so XS plots are not ~100% orphaned.  All other halves emit the
   raw wave hhid and rely on framework id_walk / =panel_ids= chaining.
 
+* livestock (GAP 4)
+
+Item-level livestock-roster feature.  Schema: =(t, i, animal)= index;
+columns =HeadCount= (head owned now, =ag_r02=), =HeadAcquired= (head
+bought to raise in the last 12 months, =ag_r10=), =HeadSold= (head sold
+alive in the last 12 months, =ag_r16=), =Value= (REPORTED per-head
+current value, =ag_r04= -- "if you sold one today, how much would you
+receive?").  One reported row per (household, species owned).
+
+Source: Module R livestock roster (=ag_mod_r1_{10,13,16,19}.dta=) -- the
+SAME file the World Bank cleaning code reads then *collapses to a single
+HH "engaged-in-livestock" binary* (=MWI_IHPS{1-4}.do=: =recode ag_r00 ...
+gen(livestock)= then =collapse (max) livestock, by(<hhid>)=).  We keep
+the *pre-collapse* roster, which is strictly richer.  Their binary is
+recovered as =livestock().groupby(['t','i']).size() > 0=; a TLU rollup
+=Sigma(head x species-TLU-factor)= is a =transformations= concern, NOT a
+stored column.
+
+Built for the four IHS3+ waves; *2004-05 (IHS2) deferred* -- its ag file
+is household-level aggregated, with no Module R roster.  Each wave's
+=Malawi/<wave>/_/livestock.py= reshapes the roster via the shared
+=malawi._livestock_block= + =malawi.assemble_livestock= helpers; the
+country-level =Malawi/_/livestock.py= concatenates them.  Grain is
+=(t, i, animal)= with *NO v level* -- 'livestock' is in the framework
+=_no_v_join= set (a household holding, not a cluster-keyed roster).
+Registered =materialize: make= in =data_scheme.yml=.
+
+| Wave    | Module R file                                        | hhid                   |
+|---------+------------------------------------------------------+------------------------|
+| 2010-11 | Full_Sample/Agriculture/ag_mod_r1.dta                | case_id                |
+| 2013-14 | AG_MOD_R1_13.dta                                     | y2_hhid                |
+| 2016-17 | Cross_Sectional/ag_mod_r1.dta + Panel/ag_mod_r1_16.dta | case_id (cs-17) / y3_hhid |
+| 2019-20 | Cross_Sectional/ag_mod_r1.dta + Panel/ag_mod_r1_19.dta | case_id / y4_hhid      |
+
+=animal= is the =harmonize_species= Preferred Label (Code-keyed table in
+=categorical_mapping.org=).  Two code namespaces are reconciled: 2010-11
+uses the fine 301-318 scheme (separate Donkey 305 / Mule-horse 306,
+Chicken-layer 310 / -broiler 312, Turkey 314 / Guinea fowl 316, Beehive
+317; Bull/ox shares code 304), while 2013-14 + IHS4/IHS5 use a coarser
+scheme (Bull 304, Ox 3304, Donkey/Horse 3305, Chicken 3310,
+Turkey/Guinea Fowl 3314, Dove/Pigeon 319).  Each code -> one canonical
+species (no within-wave collapse, so =(t, i, animal)= stays unique); code
+318 "Other (Specify)" -> NaN -> dropped from the index, like
+=crop_production='s "Other" crop.
+
+Keep-filter: a roster row is retained when the household genuinely holds
+the species -- per-species ownership flag =ag_r01= == Yes, OR any
+positive reported =HeadCount= / =HeadSold= / =HeadAcquired=.  Rows for
+species the HH was merely asked about and does not own are dropped, so
+the feature is the household's actual herd, not the full species
+checklist.
+
+Coverage cross-check (distinct livestock-owning HH per wave): the feature
+matches the raw Module-R =ag_r00= == Yes universe within ~0.5% every wave
+(2010-11: 5674 vs 5710; 2013-14: 1886 vs 1888; 2016-17: 6178 vs 6210;
+2019-20: 6534 vs 6575).  The WB =Plot_dataset= livestock binary is much
+smaller (1484 / 1835 / 1119 / 1249) because it is joined onto the
+*plot-cultivating subsample* only -- so the item feature both is richer
+AND spans the correct, broader livestock-keeping universe.
+
 * Housing feature (added 2026-04-12)
 
 Schema: =(t, i)= index, =Roof: str=, =Floor: str=.  Categorical material

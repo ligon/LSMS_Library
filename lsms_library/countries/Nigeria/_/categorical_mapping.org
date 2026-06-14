@@ -721,3 +721,63 @@
 |    6 | Pesticide                  | pesticide         | pesticide         | pesticide           | pesticide          | pesticide          |
 |    7 | Herbicide                  | herbicide         | herbicide         | herbicide           | herbicide          | herbicide          |
 |    8 | Animal Traction            | animal traction   | animal traction   | animal traction     | animal traction    | animal traction    |
+
+* Livestock (livestock, GAP 4)
+
+** harmonize_species -- animal identity (the livestock `animal` axis)
+
+  The livestock feature's ``animal`` index level carries the ``Preferred
+  Label`` from this table.  The country-level ``_/livestock.py`` script
+  resolves each wave's native animal code (101--123, a single STABLE
+  scheme across all five GHS-Panel waves) to the Preferred Label directly
+  (mirroring how crop_production resolves crops via harmonize_food and
+  plot_inputs resolves inputs via harmonize_input), so this table is the
+  canonical REGISTRY for the cross-wave animal taxonomy.
+
+  Two label granularities, both retained as columns:
+  - ``Preferred Label`` keeps the ITEM as the survey records it -- the
+    cattle life-stages (Calf-Female / Calf-Male / Heifer / Steer / Cow /
+    Bull / Ox) and the chicken types (Chicken-Layer / Chicken-Local /
+    Chicken-Broiler / Chicken-Cockerel) stay DISTINCT, because each is a
+    separately-reported herd row for a household.  Collapsing them would
+    fold several reported (i, animal) rows into one index tuple and
+    destroy item-level detail (the whole point of going richer than the
+    WB single engaged-y/n binary).  This is the ``animal`` index value.
+  - ``Species`` is the canonical biological-species rollup (Cattle /
+    Donkeys / Horses / Goats / Sheep / Pigs / Poultry / Rabbits / Fish /
+    Camels / Other), where the cross-life-stage / cross-breed variation
+    is unimportant.  It is NOT an index level -- a downstream tlu /
+    herd-aggregation transformation groups the item rows by Species.
+
+  Code 123 (Other-Specify) maps to Preferred Label "Other Livestock"
+  (Species "Other").  ``v`` is NOT joined (livestock is in the framework
+  ``_no_v_join`` set -- the grain is (t, i, animal)).  The per-wave
+  columns record the native decoded animal label; ``---`` means the wave
+  does not enumerate that animal (W4/W5 dropped Rabbit 119 and Fish 121).
+
+#+NAME: harmonize_species
+| Code | Preferred Label | Species  | 2010-11         | 2012-13         | 2015-16            | 2018-19            | 2023-24            |
+|------+-----------------+----------+-----------------+-----------------+--------------------+--------------------+--------------------|
+|  101 | Calf-Female     | Cattle   | calf female     | CALF FEMALE     | 101. CALF FEMALE   | 101. CALF FEMALE   | 101. CALF FEMALE   |
+|  102 | Calf-Male       | Cattle   | calf male       | CALF MALE       | 102. CALF MALE     | 102. CALF MALE     | 102. CALF MALE     |
+|  103 | Heifer          | Cattle   | heifer          | HEIFER          | 103. HEIFER        | 103. HEIFER        | 103. HEIFER        |
+|  104 | Steer           | Cattle   | steer           | STEER           | 104. STEER         | 104. STEER         | 104. STEER         |
+|  105 | Cow             | Cattle   | cow             | COW             | 105. COW           | 105. COW           | 105. COW           |
+|  106 | Bull            | Cattle   | bull            | BULL            | 106. BULL          | 106. BULL          | 106. BULL          |
+|  107 | Ox              | Cattle   | ox              | OX              | 107. OX            | 107. OX            | 107. OX            |
+|  108 | Donkey          | Donkeys  | donkey          | DONKEY          | 108. DONKEY        | 108. DONKEY        | 108. DONKEY        |
+|  109 | Horse           | Horses   | horse           | HORSE           | 109. HORSE         | 109. HORSE         | 109. HORSE         |
+|  110 | Goat            | Goats    | goat            | GOAT            | 110. GOAT          | 110. GOAT          | 110. GOAT          |
+|  111 | Sheep           | Sheep    | sheep           | SHEEP           | 111. SHEEP         | 111. SHEEP         | 111. SHEEP         |
+|  112 | Pig             | Pigs     | pig             | PIG             | 112. PIG           | 112. PIG           | 112. PIG           |
+|  113 | Chicken-Layer   | Poultry  | chicken-layer   | CHICKEN-LAYER   | 113. CHICKEN-LAYER | 113. CHICKEN-LAYER | 113. CHICKEN-LAYER |
+|  114 | Chicken-Local   | Poultry  | chicken-local   | CHICKEN-LOCAL   | 114. CHICKEN-LOCAL | 114. CHICKEN-LOCAL | 114. CHICKEN-LOCAL |
+|  115 | Chicken-Broiler | Poultry  | chicken-broiler | CHICKEN-BROILER | 115. CHICKEN-BROILER | 115. CHICKEN-BROILER | 115. CHICKEN-BROILER |
+|  116 | Chicken-Cockerel| Poultry  | chicken-cockery | CHICKEN-COCKERY | 116. CHICKEN-COCKERY | 116. CHICKEN-COCKERY | 116. CHICKEN-COCKEREL |
+|  117 | Turkey          | Poultry  | turkey          | TURKEY          | 117. TURKEY        | 117. TURKEY        | 117. TURKEY        |
+|  118 | Duck            | Poultry  | duck            | DUCK            | 118. DUCK          | 118. DUCK          | 118. DUCK          |
+|  119 | Rabbit          | Rabbits  | rabbit          | RABBIT          | 119. RABBIT        | ---                | ---                |
+|  120 | Guinea Fowl     | Poultry  | guinea fowl     | GUINEA FOWL     | 120. GUINEA FOWL   | 120. GUINEA FOWL   | 120. GUINEA FOWL   |
+|  121 | Fish            | Fish     | fish            | FISH            | 121. FISH          | ---                | ---                |
+|  122 | Camel           | Camels   | camel           | CAMEL           | 122. CAMEL         | 122. CAMEL         | 122. CAMEL         |
+|  123 | Other Livestock | Other    | other (specify) | OTHER (SPECIFY) | 123. OTHER (SPECIFY) | 123. OTHER (SPECIFY) | 123. OTHER (SPECIFY) |

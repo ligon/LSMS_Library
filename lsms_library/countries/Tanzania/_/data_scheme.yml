@@ -183,3 +183,44 @@ Data Scheme:
     Quantity_purchased: float
     Improved: bool
     materialize: make
+
+  livestock:
+    # Item-level livestock herd (parity-loop GAP 4) at the natural grain
+    # (t, i, animal) -- one row per species/animal-type the household OWNS,
+    # from the livestock roster LF_SEC_02 (one source row per (household,
+    # lvstckid)).  RICHER than the WB cleaning code, which recodes the own-y/n
+    # flag (lf02_01 / s10aq2 / ag10a_02) and collapse(max)es every animal type
+    # down to a single household "engaged-in-livestock" BINARY -- discarding
+    # species, head counts, purchases and sales.  Their binary is recoverable
+    # as a transformation: livestock.groupby(['t','i']).size() > 0.
+    #   animal : canonical species/type Preferred Label from harmonize_species
+    #            (Bulls / Cows / Steers / Heifers / Male & Female Calves / Goats
+    #            / Sheep / Pigs / Chickens / Ducks / Other Poultry / Rabbits /
+    #            Donkeys).  Cattle sub-types are kept DISTINCT (the
+    #            questionnaire's own item grain); a coarser "Cattle" rollup and
+    #            a TLU index are transformations, NOT stored labels.  Pets
+    #            (Dogs / Cats / Other) are dropped, mirroring the WB
+    #            drop-if-inlist(animal, 15, 16) exclusion.
+    #   HeadCount    : currently owned = lf02_04_1 (indigenous) + lf02_04_2
+    #                  (improved/exotic).  Reported current stock.
+    #   HeadAcquired : bought alive in the past 12 months (lf02_07) -- the
+    #                  directly-reported acquisition flow that parallels
+    #                  HeadSold; births (lf02_05) / gifts (lf02_10) are separate
+    #                  reported flows, NOT summed in.
+    #   HeadSold     : sold alive in the past 12 months (lf02_25).
+    # A herd VALUE column is omitted: the NPS livestock module records no
+    # current-herd valuation (only transaction values lf02_08 purchase /
+    # lf02_26 sale), so carrying Value all-null would fail the
+    # no_all_null_columns sanity check -- the same discipline crop_production
+    # uses for the absent planting_month.
+    # Only 2019-20 (NPS-SDD Extended Panel) and 2020-21 (NPS Y5 Refresh Panel)
+    # are buildable; the 2008-15 multi-round folder has no livestock source on
+    # disk (same deferral as plot_features / crop_production / plot_inputs,
+    # GH #167).
+    # NO v level: 'livestock' is in the framework _no_v_join set, so the grain
+    # stays (t, i, animal) -- the framework does not join a cluster v.
+    index: (t, i, animal)
+    HeadCount: float
+    HeadAcquired: float
+    HeadSold: float
+    materialize: make

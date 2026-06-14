@@ -924,3 +924,98 @@
 | Plants/boutures de tubercules | Autre crop          |
 | Autres semences               | Autre crop          |
 | 20                            | Autre crop          |
+
+* Livestock Species (livestock — the animal axis)
+
+# harmonize_species (GAP 4 livestock, parity loop 2026-06-14).  Maps each
+# wave's raw livestock-roster animal CODE onto a shared species taxonomy
+# `Preferred Label`.  The reported item-level `livestock` feature (grain
+# (t, i, animal)) puts this Preferred Label on its `animal` index level.
+#
+# WHY TWO CODE-KEYED TABLES (not one string-keyed like harmonize_food):
+# Niger's two survey programs use DISJOINT, but internally clean, integer
+# code schemes, while the convert_categoricals=True species NAME strings
+# carry wave-specific mojibake ('B\x9cuf' in 2011-12 vs 'B?oeuf' in
+# 2014-15) that make a string key brittle.  The integer code is the stable
+# key WITHIN each program, so the wave scripts load convert_categoricals=
+# False and map the code via _map_codes (the same mechanism as
+# harmonize_tenure / harmonize_soil).  Two tables because the ECVMA 3-digit
+# codes and the EHCVM 1-11 codes overlap in value (e.g. 11 = Canards in
+# ECVMA 2014-15 vs Autres volailles in EHCVM) — a single Code table could
+# not disambiguate them.
+#
+# A. harmonize_species_ecvma — ECVMA waves (2011-12 ecvmaas4a_p2 as4aq04,
+#    2014-15 ECVMA2_AS4AP2 AS4AQ04).  The 3-digit code's first one-or-two
+#    digits give the species class; the trailing digit is sex/age subtype
+#    (bœuf/taureau/vache/veau all -> Cattle), which is harmonized away —
+#    cross-subtype variation is unimportant for the species axis.  Class 2
+#    splits on the 2nd digit: 21x/22x (mouton/brebis) -> Sheep, 23x/24x
+#    (bouc/chèvre) -> Goats.  Code 11 (Canards, 2014-15 only) -> Ducks.
+#
+# B. harmonize_species_ehcvm — EHCVM waves (2018-19 s17 species code
+#    s17q02, 2021-22 s17 species code s17q01 — the column moved but the
+#    1-11 value scheme is identical).  Codes are the elevage__id value
+#    labels: 1 Bovins, 2 Ovins, 3 Caprins, 4 Camelins, 5 Equins, 6 Asins,
+#    7 Porcins, 8 Lapins, 9 Poules, 10 Pintades, 11 Autres volailles.
+#    (Code 7 Porcins is absent from the Niger data — predominantly Muslim —
+#    but kept for completeness.)
+#
+# The Preferred Label vocabulary is shared across both tables so the
+# `animal` axis is consistent across all four waves:
+#   Cattle, Sheep, Goats, Camels, Horses, Donkeys, Pigs, Rabbits,
+#   Chicken, Guinea Fowl, Ducks, Other Poultry.
+# Referenced from the wave-level _/livestock.py via
+#   tools.get_categorical_mapping('harmonize_species_{ecvma,ehcvm}',
+#                                 'Code', 'Preferred Label').
+
+#+NAME: harmonize_species_ecvma
+| Code | Preferred Label |
+|------+-----------------|
+|   11 | Ducks           |
+|  111 | Cattle          |
+|  112 | Cattle          |
+|  121 | Cattle          |
+|  122 | Cattle          |
+|  131 | Cattle          |
+|  132 | Cattle          |
+|  141 | Cattle          |
+|  142 | Cattle          |
+|  151 | Cattle          |
+|  152 | Cattle          |
+|  161 | Cattle          |
+|  162 | Cattle          |
+|  211 | Sheep           |
+|  212 | Sheep           |
+|  221 | Sheep           |
+|  222 | Sheep           |
+|  231 | Goats           |
+|  232 | Goats           |
+|  241 | Goats           |
+|  242 | Goats           |
+|  311 | Camels          |
+|  321 | Camels          |
+|  331 | Camels          |
+|  411 | Donkeys         |
+|  511 | Horses          |
+|  611 | Pigs            |
+|  621 | Pigs            |
+|  711 | Chicken         |
+|  721 | Chicken         |
+|  722 | Chicken         |
+|  811 | Guinea Fowl     |
+|  911 | Other Poultry   |
+
+#+NAME: harmonize_species_ehcvm
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Cattle          |
+|    2 | Sheep           |
+|    3 | Goats           |
+|    4 | Camels          |
+|    5 | Horses          |
+|    6 | Donkeys         |
+|    7 | Pigs            |
+|    8 | Rabbits         |
+|    9 | Chicken         |
+|   10 | Guinea Fowl     |
+|   11 | Other Poultry   |

@@ -1472,3 +1472,144 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
     # NaN u as well).  dropna=False above keeps those NaN-keyed rows.
     grp = grp.set_index(['t', 'i', 'plot', 'input', 'crop', 'u'])
     return grp
+
+
+# --- livestock (GAP 4) --------------------------------------------------
+# Item-level (t, i, animal) livestock-roster feature -- one reported row per
+# (household, species owned).  Source: Module R livestock roster
+# (ag_mod_r1_{10,13,16,19}.dta), the SAME file the World Bank cleaning code
+# reads then collapses to a single HH "engaged in livestock" binary
+# (MWI_IHPS{1-4}.do: `recode ag_r00 ... gen(livestock)` then
+# `collapse (max) livestock, by(<hhid>)`).  We keep the PRE-collapse roster
+# at its natural grain, which is strictly richer than their binary (their
+# binary = our `livestock().groupby(['t','i']).size() > 0`).
+#
+# One row per (household, species).  Reported item columns (only those the
+# survey records; missing-in-wave -> NaN):
+#   * HeadCount     -- ag_r02: head owned now (present at farm or away).
+#   * HeadAcquired  -- ag_r10: head bought to raise in the last 12 months
+#                      (the survey also records born/ag_r08 and gifts/ag_r09
+#                      separately; HeadAcquired carries the PURCHASED count,
+#                      the closest single reported "acquired" figure -- a
+#                      born+gifts+bought total would be a transformation).
+#   * HeadSold      -- ag_r16: head sold alive in the last 12 months.
+#   * Value         -- ag_r04: REPORTED per-head current value ("if you sold
+#                      one [LIVESTOCK] today, how much would you receive?").
+#                      This is the per-head value the survey records; a herd
+#                      value (Value x HeadCount) and a TLU rollup are
+#                      transformations, NOT stored columns.  Malawi reports
+#                      no herd-total value column, so we carry the honest
+#                      per-head figure rather than fabricating a total.
+#
+# The per-animal ownership gate is ag_r01 (Yes/No, "did you own
+# [LIVESTOCK]?"); ag_r00 is the HH-level any-livestock gate the WB binary
+# comes from.  We keep a roster row when the household reports owning that
+# species (ag_r01 == 1, i.e. "Yes") OR records any positive HeadCount /
+# HeadSold / HeadAcquired -- i.e. the species is genuinely part of the
+# household's livestock holding.  Rows for species the HH was simply asked
+# about and does not own (ag_r01 == No, all counts 0/NaN) are dropped, so
+# the roster is the household's actual herd, not the full species checklist.
+# `animal` is the harmonize_species Preferred Label (code 318 "Other
+# (Specify)" -> NaN -> dropped from the index, like crop_production's
+# "Other" crop).
+
+# Module R columns are stable across all four waves EXCEPT the gifts-received
+# count, which is ag_r09 in 2010-11 and ag_r09_1 from 2013-14 on.  The
+# columns we read (ag_r00/r0a/r01/r02/r04/r10/r16) carry the same name in
+# every wave; ag_r09* is not among them (gifts is not one of our four
+# reported columns), so no per-wave column remap is needed.
+
+def _livestock_block(df, *, hhid, animalcode, owned_flag='ag_r01',
+                     headcount='ag_r02', acquired='ag_r10', sold='ag_r16',
+                     value='ag_r04', t=None):
+    """Reshape one wave's Module R livestock roster to canonical long rows.
+
+    All keyword args are RAW column names in ``df`` (or None when a wave
+    lacks that field).  ``df`` must already carry an ``hhid`` string column.
+    Returns a long DataFrame at grain (t, i, animal) with the reported item
+    columns (HeadCount, HeadAcquired, HeadSold, Value) and an internal
+    ``_animal_code`` used for the keep-filter / dedup.  NO aggregation.
+    """
+    species_map = _malawi_code_map('harmonize_species')
+    code = pd.to_numeric(df[animalcode], errors='coerce').astype('Int64')
+    animal = code.map(species_map)
+    animal = animal.astype('string').where(animal.notna(), pd.NA)
+
+    def _num(col):
+        if col is None or col not in df.columns:
+            return pd.Series(pd.NA, index=df.index, dtype='Float64')
+        return pd.to_numeric(df[col], errors='coerce').astype('Float64')
+
+    head = _num(headcount)
+    acq = _num(acquired)
+    sold_n = _num(sold)
+    val = _num(value)
+
+    # Per-species ownership gate (ag_r01 == 1 "Yes").  NaN where the wave
+    # lacks the column (then the count-based keep below carries the row).
+    if owned_flag is not None and owned_flag in df.columns:
+        owns = pd.to_numeric(df[owned_flag], errors='coerce') == 1
+    else:
+        owns = pd.Series(False, index=df.index)
+
+    out = pd.DataFrame({
+        't':            t,
+        'i':            df['hhid'].astype('string').values,
+        'animal':       animal.values,
+        '_animal_code': code.values,
+        'HeadCount':    head.values,
+        'HeadAcquired': acq.values,
+        'HeadSold':     sold_n.values,
+        'Value':        val.values,
+        '_owns':        owns.values,
+    })
+    # Keep a roster row when the household genuinely holds the species:
+    # owned-flag Yes, or any positive reported head movement / holding.
+    holds = (out['_owns']
+             | (out['HeadCount'].fillna(0) > 0)
+             | (out['HeadSold'].fillna(0) > 0)
+             | (out['HeadAcquired'].fillna(0) > 0))
+    out = out[holds]
+    # Must have a species identity for the index axis.
+    out = out[out['_animal_code'].notna()]
+    out = out.drop(columns=['_owns'])
+    return out
+
+
+def assemble_livestock(t, pieces):
+    """Combine reshaped per-half livestock blocks (_livestock_block) into the
+    canonical livestock DataFrame for wave ``t``.
+
+    Parameters
+    ----------
+    t : str -- wave id, used as the ``t`` index value.
+    pieces : list[pd.DataFrame] -- outputs of _livestock_block.
+
+    Returns
+    -------
+    pd.DataFrame indexed (t, i, animal) with columns HeadCount,
+    HeadAcquired, HeadSold, Value.  Item-level reported values only.
+    """
+    cat = pd.concat(pieces, ignore_index=True)
+
+    # Drop rows whose code did not resolve to a canonical species (code 318
+    # "Other (Specify)" and any unmapped) -- they have no place on the
+    # `animal` index axis, exactly like crop_production's "Other" crop.
+    cat = cat[cat['animal'].notna()]
+
+    # Collapse any duplicate (i, animal) rows.  A canonical species is
+    # reached from a SINGLE code within any wave (the harmonize_species map
+    # is 1:1 per wave), so a duplicate here means the household reported the
+    # same species on two roster lines: sum the head movements (HeadCount /
+    # HeadAcquired / HeadSold are additive counts of the same herd) and take
+    # the first reported per-head Value (a per-head price is not additive).
+    cat['t'] = t
+    grp = cat.groupby(['t', 'i', 'animal'], as_index=False, dropna=False).agg({
+        'HeadCount':    'sum',
+        'HeadAcquired': 'sum',
+        'HeadSold':     'sum',
+        'Value':        'first',
+    })
+    out = grp.set_index(['t', 'i', 'animal'])
+    assert out.index.is_unique, f"Non-unique (t,i,animal) in livestock {t}"
+    return out

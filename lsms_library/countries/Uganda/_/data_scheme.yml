@@ -172,4 +172,40 @@ Data Scheme:
     Quantity_purchased: float
     Improved: bool
     materialize: make
+  livestock:
+    # Item-level livestock roster (GAP 4 parity build).  One row per
+    # REPORTED species/herd a household owns.  Source: the UNPS livestock
+    # roster (AGSEC6A large ruminants / AGSEC6B small ruminants / AGSEC6C
+    # poultry & other) that the WB code (UGA_UNPS1.do:710-720) reads only
+    # to collapse to a single engaged-livestock y/n binary.  We keep the
+    # PRE-collapse roster -- strictly richer than the WB construct.
+    #
+    # Grain (t, i, animal):
+    #   animal — canonical SPECIES on the 'harmonize_species' Preferred
+    #            Labels: Cattle, Goats, Sheep, Pigs, Donkeys, Horses,
+    #            Chicken, Other Poultry, Rabbits, Bees.  The roster's
+    #            exotic/indigenous and age/sex splits collapse to species
+    #            here (sub-species detail recoverable from raw codes).
+    #
+    # Columns are REPORTED values only (missing-in-wave -> NaN):
+    #   HeadCount     — head owned now
+    #   HeadAcquired  — head bought to raise (last reference period)
+    #   HeadSold      — head sold alive
+    #   Value         — reported per-head animal value ('value if you sold
+    #                   one today' in 2009-10/2010-11; 'average value of
+    #                   each one sold' for 2011-12+, which dropped the
+    #                   sell-today question)
+    # The WB engaged-livestock binary = groupby(['t','i']).any() over these
+    # rows; herd value = Value * HeadCount; TLU = sum(head * TLU-factor).
+    # All three are TRANSFORMATIONS -- never stored here.
+    #
+    # No v level: livestock is in the framework _no_v_join set
+    # (country.py), so the (t, i, animal) grain is final.  2005-06 is
+    # excluded (no canonical AGSEC6 roster; the WB panel starts at 2009-10).
+    index: (t, i, animal)
+    HeadCount: float
+    HeadAcquired: float
+    HeadSold: float
+    Value: float
+    materialize: make
   nonfood_expenditures: !make

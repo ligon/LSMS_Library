@@ -204,3 +204,44 @@ Data Scheme:
     Purchased: bool
     Quantity_purchased: float
     materialize: make
+
+  livestock:
+    # Item-level livestock roster (GAP 4, parity loop 2026-06-14).  One row
+    # per REPORTED (household, species) the household owns/raises — the
+    # pre-collapse roster the WB .do code (NER_ECVMA1.do:1103-1108,
+    # NER_ECVMA2.do:1170-1177) reads then THROWS AWAY down to a single
+    # engaged-in-livestock y/n binary (recode as4aq05 ...; collapse (max)).
+    # Their HH binary is recoverable as groupby(['t','i']).any() over these
+    # rows; TLU is a Σ(head × species-factor) transformation — neither is a
+    # column here (item-level / reported-values discipline).
+    #
+    # GRAIN (t, i, animal) — NO v level: 'livestock' is in the framework's
+    # _no_v_join set (country.py ~L1852), so the household-level rows carry no
+    # cluster level and the framework does NOT join one from sample().
+    # `animal` is the harmonized species Preferred Label (harmonize_species_
+    # ecvma for the 3-digit ECVMA codes, harmonize_species_ehcvm for the 1-11
+    # EHCVM codes; both resolve to one shared vocabulary: Cattle / Sheep /
+    # Goats / Camels / Horses / Donkeys / Pigs / Rabbits / Chicken / Guinea
+    # Fowl / Ducks / Other Poultry).
+    #
+    # All four waves have a livestock roster (script-path):
+    #   2011-12 ecvmaas4a_p2   as4aq04 species, as4aq11 head, as4aq43 bought,
+    #                          as4aq51 sold; as4aq05 owned(1/2) gate.
+    #   2014-15 ECVMA2_AS4AP2  same, UPPERCASE; i from (GRAPPE, MENAGE).
+    #   2018-19 s17_me_ner2018 s17q02 species, s17q06 head, s17q08 bought,
+    #                          s17q10 sold; roster pre-filtered to owned.
+    #   2021-22 s17_me_ner2021 same as 2018-19 EXCEPT species code is s17q01.
+    #
+    # COLUMNS (reported, item-level): HeadCount (owned now), HeadAcquired
+    # (number bought in the last 12 months — the single reported acquisition
+    # flow; births / gifts are separate flows, not folded in), HeadSold
+    # (number sold on the hoof in the last 12 months).  A `Value` (herd value)
+    # column is intentionally OMITTED: NO Niger wave asks a current herd value
+    # (the surveys record only purchase / sale FLOW values), so an all-NaN
+    # Value column would only trip the sanity checker (GAP rule "only include
+    # columns the source actually records").
+    index: (t, i, animal)
+    HeadCount: float
+    HeadAcquired: float
+    HeadSold: float
+    materialize: make

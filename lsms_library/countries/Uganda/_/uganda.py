@@ -1454,3 +1454,269 @@ INPUT_COLMAPS = {
                  'qty': 's4aq11a', 'unit': 's4aq11b', 'seed_type': 's4aq13'},
     },
 }
+
+
+# ---------------------------------------------------------------------------
+# livestock  (GAP 4 — item-level livestock roster)
+# ---------------------------------------------------------------------------
+#
+# One row per REPORTED species/herd a household owns, grain (t, i, animal).
+# Source: the UNPS livestock roster (AGSEC6A large ruminants / AGSEC6B small
+# ruminants / AGSEC6C poultry & other) that UGA_UNPS1.do:710-720 reads only to
+# collapse to a single engaged-livestock y/n binary.  We keep the PRE-collapse
+# roster and harmonise the animal type to the canonical SPECIES axis via the
+# harmonize_species table (Code | Preferred Label).
+#
+# Reported item-level columns (missing-in-wave -> NaN):
+#   HeadCount      head owned now              (q5 / q5a / q3a / s..q03a)
+#   HeadAcquired   head bought to raise        (q12 / q13a / s..q13a)
+#   HeadSold       head sold alive             (q14 / q14a / s..q14a)
+#   Value          reported per-head value     (q6 'value if sold one today',
+#                  2009-10/2010-11; q14b 's..q14b' 'avg value of each sold' for
+#                  2011-12+ which dropped the sell-today question)
+# Herd value (= Value x HeadCount), TLU, and the WB engaged-livestock binary
+# (= groupby.any over these rows) are TRANSFORMATIONS, never stored here.
+#
+# Per-wave the animal type lives in different columns and two encodings:
+#   * integer codes 1-42 (2010-11 6B/6C via q3, all of 2011-12+) -> harmonize_species
+#   * label STRINGS (2009-10 all sections; 2010-11 6A q2) -> _species_string_map()
+# The COLMAP 'type' entry names the column; 'type_kind' is 'code' or 'string'.
+
+_SPECIES_TABLE = 'harmonize_species'
+
+
+def _species_code_map():
+    """Code (int 1-42) -> canonical species Preferred Label."""
+    return _harmonized_codes(_SPECIES_TABLE)
+
+
+# 2009-10 (all sections) and 2010-11 AGSEC6A carry the animal type as a label
+# string with NO integer value labels.  Map those wave-specific strings to the
+# same canonical species the integer codes resolve to.  Keys are lower-cased
+# and whitespace-stripped; truncated UNPS strings ('backyard chicke', 'parent
+# stock fo', 'geese and other', 'behives') are included verbatim.
+_SPECIES_STRING_MAP = {
+    # cattle / draft
+    'calves': 'Cattle', 'bulls': 'Cattle', 'oxen': 'Cattle',
+    'bulls and oxen': 'Cattle', 'heifer': 'Cattle', 'cows': 'Cattle',
+    'heifer and cows': 'Cattle',
+    'donkeys': 'Donkeys',
+    'mules / horses': 'Horses', 'mules/horses': 'Horses', 'horses': 'Horses',
+    # small ruminants
+    'male goats': 'Goats', 'female goats': 'Goats',
+    'male sheep': 'Sheep', 'female sheep': 'Sheep',
+    'pigs': 'Pigs',
+    # poultry & other (2009-10 strings, some truncated)
+    'backyard chicke': 'Chicken', 'backyard chicken': 'Chicken',
+    'parent stock fo': 'Chicken', 'parent stock for broilers': 'Chicken',
+    'parent stock for layers': 'Chicken',
+    'layers': 'Chicken', 'pullet chicken': 'Chicken', 'growers': 'Chicken',
+    'broilers': 'Chicken',
+    'turkeys': 'Other Poultry', 'ducks': 'Other Poultry',
+    'geese and other': 'Other Poultry', 'geese and other birds': 'Other Poultry',
+    'rabbits': 'Rabbits',
+    'behives': 'Bees', 'beehives': 'Bees',
+}
+
+
+def _species_string_map():
+    return dict(_SPECIES_STRING_MAP)
+
+
+def livestock_for_wave(t, df6a, df6b, df6c, colmap):
+    """Build canonical ``livestock`` for one Uganda UNPS wave.
+
+    Parameters
+    ----------
+    t : str
+        Wave id (e.g. ``"2013-14"``).
+    df6a, df6b, df6c : pd.DataFrame | None
+        Raw AGSEC6A (large ruminants) / AGSEC6B (small ruminants) /
+        AGSEC6C (poultry & other) livestock-roster modules.  ``None``
+        permitted (section absent in a wave).  Code-typed sections must
+        be loaded with ``convert_categoricals=False`` (integer codes);
+        string-typed sections (2009-10, 2010-11 6A) with
+        ``convert_categoricals=True`` (label strings) -- the wave script
+        loads each section with the kind its colmap declares.
+    colmap : dict
+        Per-section column maps keyed by ``'A'`` / ``'B'`` / ``'C'``.  Each
+        value is a dict with keys:
+            hhid       — household id column
+            type       — animal-type column (int code or label string)
+            type_kind  — 'code' (map via harmonize_species) | 'string'
+                         (map via _species_string_map)
+            headcount  — head owned now column (or None)
+            acquired   — head bought column (or None)
+            sold       — head sold column (or None)
+            value      — reported per-head value column (or None)
+
+    Returns
+    -------
+    pd.DataFrame indexed ``(t, i, animal)`` with Float64 columns
+        ``HeadCount``, ``HeadAcquired``, ``HeadSold``, ``Value``.
+        One row per (household, species) -- duplicate species rows within
+        a household (e.g. exotic + indigenous cattle, both mapping to
+        'Cattle') are summed for the head columns and value-weighted-mean
+        for ``Value`` so the (t, i, animal) index is unique.  NO TLU, NO
+        herd-value total, NO engaged binary (all transformations).
+    """
+    code_map = _species_code_map()
+    str_map = _species_string_map()
+
+    pieces = []
+    for section, df6 in (('A', df6a), ('B', df6b), ('C', df6c)):
+        if df6 is None or len(df6) == 0:
+            continue
+        cm = colmap.get(section)
+        if cm is None:
+            continue
+
+        hh = df6[cm['hhid']].apply(format_id)
+
+        # --- resolve canonical species ---
+        tcol = cm['type']
+        if tcol not in df6.columns:
+            continue
+        if cm.get('type_kind') == 'string':
+            keys = df6[tcol].astype('string').str.strip().str.lower()
+            animal = keys.map(lambda s: str_map.get(s, pd.NA) if pd.notna(s) else pd.NA)
+        else:
+            # Per-section integer-code overrides (for waves whose code scheme
+            # diverges from the shared harmonize_species table -- e.g. the
+            # 2010-11 AGSEC6B roster, whose codes 17/19/20/21 mean different
+            # species than the 2011-12+ scheme baked into the table).
+            ov = cm.get('code_overrides') or {}
+            wmap = {**code_map, **ov}
+            code = _to_int_code(df6[tcol])
+            animal = code.map(lambda c: wmap.get(int(c), pd.NA) if pd.notna(c) else pd.NA)
+
+        def _num(key):
+            col = cm.get(key)
+            if col and col in df6.columns:
+                return pd.to_numeric(df6[col], errors='coerce')
+            return pd.Series([pd.NA] * len(df6), index=df6.index, dtype='Float64')
+
+        piece = pd.DataFrame({
+            't':            t,
+            'i':            hh.values,
+            'animal':       animal.values,
+            'HeadCount':    _num('headcount').values,
+            'HeadAcquired': _num('acquired').values,
+            'HeadSold':     _num('sold').values,
+            'Value':        _num('value').values,
+        })
+        pieces.append(piece)
+
+    cols = ['HeadCount', 'HeadAcquired', 'HeadSold', 'Value']
+    if not pieces:
+        return pd.DataFrame(columns=cols)
+
+    df = pd.concat(pieces, ignore_index=True)
+
+    # Drop rows that carry no species label and rows with nothing reported
+    # at all (empty roster placeholders).  A household line that lists a
+    # species but reports zero/NaN everywhere is dropped (it did not own
+    # that animal -- the roster pre-lists every species).
+    df = df[df['animal'].notna()]
+    for c in cols:
+        df[c] = pd.to_numeric(df[c], errors='coerce')
+    measure = ['HeadCount', 'HeadAcquired', 'HeadSold']
+    # Keep a row when ANY head measure is a positive number (owned now,
+    # bought, or sold).  Value alone (per-head price with no head count)
+    # is not evidence of ownership.
+    has_head = (df[measure].fillna(0) > 0).any(axis=1)
+    df = df[has_head]
+
+    # Collapse to (t, i, animal): the roster splits a species across
+    # exotic/indigenous and age/sex lines; those are the SAME species for
+    # this axis, so sum the head columns and take a head-weighted mean of
+    # the reported per-head Value (NaN where no line reported a value).
+    df['_w'] = df['HeadCount'].fillna(0)
+    df['_vw'] = df['Value'] * df['_w']
+    grouped = df.groupby(['t', 'i', 'animal'], dropna=False)
+    out = grouped[measure].sum(min_count=1)
+    vw_sum = grouped['_vw'].sum(min_count=1)
+    w_sum = grouped['_w'].sum(min_count=1)
+    value = vw_sum / w_sum.where(w_sum > 0, pd.NA)
+    # Fall back to a simple mean of reported values where head weights are
+    # all zero/NaN but a value was nonetheless reported.
+    plain = grouped['Value'].mean()
+    out['Value'] = value.where(value.notna(), plain)
+
+    for c in cols:
+        out[c] = pd.to_numeric(out[c], errors='coerce').astype('Float64')
+    return out
+
+
+# Per-wave column maps for livestock_for_wave.  ``type`` is the animal-type
+# column; ``type_kind`` 'code' (harmonize_species) or 'string'
+# (_species_string_map).  Value is the reported per-head animal value: the
+# 'sell one today' question (q6) where the wave asks it (2009-10, 2010-11),
+# else the 'average value of each sold' (q14b) for 2011-12+.
+LIVESTOCK_COLMAPS = {
+    '2009-10': {
+        'A': {'hhid': 'HHID', 'type': 'a6aq2', 'type_kind': 'string',
+              'headcount': 'a6aq5', 'acquired': 'a6aq12', 'sold': 'a6aq14', 'value': 'a6aq6'},
+        'B': {'hhid': 'HHID', 'type': 'a6bq2', 'type_kind': 'string',
+              'headcount': 'a6bq5', 'acquired': 'a6bq12', 'sold': 'a6bq14', 'value': 'a6bq6'},
+        'C': {'hhid': 'HHID', 'type': 'a6cq2', 'type_kind': 'string',
+              'headcount': 'a6cq5', 'acquired': 'a6cq12', 'sold': 'a6cq14', 'value': 'a6cq6'},
+    },
+    '2010-11': {
+        # 6A carries the type as a string (a6aq2); 6B/6C carry the integer
+        # 'Livestock code' (a6bq3 / a6cq3, codes 13-21 / 31-42).
+        'A': {'hhid': 'HHID', 'type': 'a6aq3', 'type_kind': 'code',
+              'headcount': 'a6aq5a', 'acquired': 'a6aq12', 'sold': 'a6aq14', 'value': 'a6aq6'},
+        # 2010-11 AGSEC6B code scheme diverges from 2011-12+: codes 17/19/20/21
+        # mean (17=Indigenous male goats, 19=Indigenous male sheep, 20=Indig.
+        # female sheep, 21=Indig. male goats [dup]) -- overridden here so they
+        # resolve to the right species despite the shared table's 2011-12+
+        # meanings (17=Pigs, 19=Goats, 20/21=Sheep).  Codes 13-16/18 already
+        # agree with the table.  No Pigs code in 2010-11 6B.
+        'B': {'hhid': 'HHID', 'type': 'a6bq3', 'type_kind': 'code',
+              'headcount': 'a6bq5a', 'acquired': 'a6bq12', 'sold': 'a6bq14', 'value': 'a6bq6',
+              'code_overrides': {17: 'Goats', 19: 'Sheep', 20: 'Sheep', 21: 'Goats'}},
+        'C': {'hhid': 'HHID', 'type': 'a6cq3', 'type_kind': 'code',
+              'headcount': 'a6cq5a', 'acquired': 'a6cq12', 'sold': 'a6cq14', 'value': 'a6cq6'},
+    },
+    '2011-12': {
+        'A': {'hhid': 'HHID', 'type': 'lvstid', 'type_kind': 'code',
+              'headcount': 'a6aq3a', 'acquired': 'a6aq13a', 'sold': 'a6aq14a', 'value': 'a6aq14b'},
+        'B': {'hhid': 'HHID', 'type': 'lvstid', 'type_kind': 'code',
+              'headcount': 'a6bq3a', 'acquired': 'a6bq13a', 'sold': 'a6bq14a', 'value': 'a6bq14b'},
+        'C': {'hhid': 'HHID', 'type': 'lvstid', 'type_kind': 'code',
+              'headcount': 'a6cq3a', 'acquired': 'a6cq13a', 'sold': 'a6cq14a', 'value': 'a6cq14b'},
+    },
+    '2013-14': {
+        'A': {'hhid': 'HHID', 'type': 'LiveStockID', 'type_kind': 'code',
+              'headcount': 'a6aq3a', 'acquired': 'a6aq13a', 'sold': 'a6aq14a', 'value': 'a6aq14b'},
+        'B': {'hhid': 'HHID', 'type': 'ALiveStock_Small_ID', 'type_kind': 'code',
+              'headcount': 'a6bq3a', 'acquired': 'a6bq13a', 'sold': 'a6bq14a', 'value': 'a6bq14b'},
+        'C': {'hhid': 'HHID', 'type': 'APCode', 'type_kind': 'code',
+              'headcount': 'a6cq3a', 'acquired': 'a6cq13a', 'sold': 'a6cq14a', 'value': 'a6cq14b'},
+    },
+    '2015-16': {
+        'A': {'hhid': 'HHID', 'type': 'LiveStockID', 'type_kind': 'code',
+              'headcount': 'a6aq3a', 'acquired': 'a6aq13a', 'sold': 'a6aq14a', 'value': 'a6aq14b'},
+        'B': {'hhid': 'HHID', 'type': 'ALiveStock_Small_ID', 'type_kind': 'code',
+              'headcount': 'a6bq3a', 'acquired': 'a6bq13a', 'sold': 'a6bq14a', 'value': 'a6bq14b'},
+        'C': {'hhid': 'HHID', 'type': 'APCode', 'type_kind': 'code',
+              'headcount': 'a6cq3a', 'acquired': 'a6cq13a', 'sold': 'a6cq14a', 'value': 'a6cq14b'},
+    },
+    '2018-19': {
+        'A': {'hhid': 'hhid', 'type': 'LiveStockID', 'type_kind': 'code',
+              'headcount': 's6aq03a', 'acquired': 's6aq13a', 'sold': 's6aq14a', 'value': 's6aq14b'},
+        'B': {'hhid': 'hhid', 'type': 'ALiveStock_Small_ID', 'type_kind': 'code',
+              'headcount': 's6bq03a', 'acquired': 's6bq13a', 'sold': 's6bq14a', 'value': 's6bq14b'},
+        'C': {'hhid': 'hhid', 'type': 'APCode', 'type_kind': 'code',
+              'headcount': 's6cq03a', 'acquired': 's6cq13a', 'sold': 's6cq14a', 'value': 's6cq14b'},
+    },
+    '2019-20': {
+        'A': {'hhid': 'hhid', 'type': 'LiveStockID', 'type_kind': 'code',
+              'headcount': 's6aq03a', 'acquired': 's6aq13a', 'sold': 's6aq14a', 'value': 's6aq14b'},
+        'B': {'hhid': 'hhid', 'type': 'ALiveStock_Small_ID', 'type_kind': 'code',
+              'headcount': 's6bq03a', 'acquired': 's6bq13a', 'sold': 's6bq14a', 'value': 's6bq14b'},
+        'C': {'hhid': 'hhid', 'type': 'APCode', 'type_kind': 'code',
+              'headcount': 's6cq03a', 'acquired': 's6cq13a', 'sold': 's6cq14a', 'value': 's6cq14b'},
+    },
+}

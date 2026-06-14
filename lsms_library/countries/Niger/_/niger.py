@@ -552,3 +552,113 @@ def _finish_plot_inputs(df, t):
     df = df[[c for c in keep if c in df.columns]]
     df = df.set_index(['t', 'i', 'input', 'crop', 'u'])
     return df
+
+
+# ---------------------------------------------------------------------------
+# livestock (GAP 4 — item-level livestock at (t, i, animal))
+# ---------------------------------------------------------------------------
+#
+# One row per REPORTED (household, species) the household owns/raised.  This
+# is the raw livestock roster the WB .do code (NER_ECVMA1.do:1103-1108,
+# NER_ECVMA2.do:1170-1177) reads and then THROWS AWAY down to a single
+# engaged-in-livestock y/n binary (recode as4aq05 ... ; collapse (max)).  We
+# keep the pre-collapse roster: head count owned now, head acquired/sold, and
+# herd value where the source reports it.  The WB HH binary is recoverable as
+# groupby(['t','i']).any() over these rows; TLU is a Σ(head × factor)
+# transform — neither is a column here (item-level / reported-values rule).
+#
+# GRAIN = (t, i, animal): ONE row per (household, canonical species owned).
+# NO `v`: 'livestock' is in the framework's _no_v_join set, so the
+# household-level rows carry no cluster level and the framework does NOT join
+# one from sample().  `animal` is the harmonized species Preferred Label.
+#
+# SUB-TYPE COLLAPSE (why the wave tail sums within (t, i, animal)).  The
+# ECVMA roster lists each animal SUB-TYPE on its own line — bœuf, taureau,
+# vache, taurillon, génisse and veau are six separate rows that all
+# harmonize to the single species "Cattle" (likewise mouton/brebis ->
+# Sheep, bouc/chèvre -> Goats, the three camel sub-types -> Camels, ...).
+# Those sub-type lines are NOT independent species items: they are age/sex
+# strata of one species the household owns.  So the per-species head count
+# IS the natural item grain (a household owning 2 bœuf + 1 vache owns 3
+# Cattle), and _finish_livestock SUMS HeadCount / HeadAcquired / HeadSold
+# within (t, i, animal).  This is the species-level item, NOT a forbidden
+# aggregation: TLU (cross-species Σ head×factor), a herd-value total, and
+# the WB engaged-in-livestock binary are the transformations the GAP rule
+# forbids as columns — all three are CROSS-species rollups, recovered by a
+# transformations fn over these rows (the binary = groupby(['t','i']).any()).
+# Summing age/sex strata of ONE species is not a cross-species rollup.  The
+# EHCVM waves already report one row per species (codes 1-11), so the sum is
+# a no-op there; it only merges the ECVMA sub-type lines.  After the sum the
+# (t, i, animal) index is unique, so no rows are lost to the framework's
+# canonical-index de-dup collapse (groupby().first()).
+#
+# Livestock instrument by wave (all four waves have one):
+#   2011-12  ecvmaas4a_p2  : as4aq04 species code, as4aq05 owned(1/2) gate,
+#                            as4aq11 head owned by HH, as4aq38 head 12mo ago,
+#                            as4aq43 head bought, as4aq51 head sold on hoof,
+#                            as4aq55 net sale value.  NO current herd value.
+#   2014-15  ECVMA2_AS4AP2 : same layout, UPPERCASE columns (AS4AQ*); i from
+#                            (GRAPPE, MENAGE, EXTENSION).
+#   2018-19  s17_me_ner2018: s17q02 species code, s17q03 owned(1/2) gate (all
+#                            rows ==1 — roster pre-filtered to owned species),
+#                            s17q06 head owned by HH, s17q08 head bought,
+#                            s17q10 head sold on hoof.  NO current herd value.
+#   2021-22  s17_me_ner2021: same as 2018-19 EXCEPT the species code lives in
+#                            s17q01 (s17q02 absent); 1-11 value scheme is
+#                            identical.
+#
+# Columns by wave: HeadCount (owned now) and HeadSold are in every wave;
+# HeadAcquired = number bought in the last 12 months (the single reported
+# "acquired" flow, matching EHCVM s17q08 "Combien avez-vous achetés"; births
+# and gifts are separate flows, not folded in).  Value = herd value where the
+# source records it — NO Niger wave asks a current herd value, so Value is
+# all-NaN and therefore OMITTED from the schema entirely (an all-NaN column
+# would only trip the sanity checker; per the GAP rule "only include columns
+# the source actually records").  The reported sale value (as4aq55) is a
+# FLOW value, not a herd stock value, so it is deliberately not emitted as
+# Value.
+
+
+def _species_maps():
+    """Load the two species code->Preferred Label dicts (ECVMA 3-digit
+    codes, EHCVM 1-11 codes) from categorical_mapping.org.  Keyed on the
+    integer Code, like harmonize_tenure / harmonize_soil — so the wave
+    scripts load convert_categoricals=False and map the raw integer code."""
+    ecvma = _harmonized_codes('harmonize_species_ecvma')
+    ehcvm = _harmonized_codes('harmonize_species_ehcvm')
+    return ecvma, ehcvm
+
+
+def _finish_livestock(df, t):
+    """Common tail for the wave-level livestock scripts: coerce numeric
+    columns, drop unresolved-species placeholder rows, SUM the head counts
+    within (t, i, animal) so each (household, canonical species) is one row,
+    and build the (t, i, animal) index.  Mirrors _finish_crop_production /
+    _finish_plot_inputs in shape, but unlike those it aggregates: the ECVMA
+    roster's animal SUB-TYPE lines (bœuf/vache/... all -> Cattle) are
+    age/sex strata of one species, so the per-species head count is the
+    natural item grain (see module note).  HeadCount / HeadAcquired /
+    HeadSold are Float64 (head counts, nullable); the sum uses min_count=1
+    so an all-NaN group stays NaN rather than becoming 0.  Value is NOT a
+    column: no Niger wave records a current herd value (see module note)."""
+    cols = ['HeadCount', 'HeadAcquired', 'HeadSold']
+    for col in cols:
+        if col not in df.columns:
+            df[col] = pd.NA
+        df[col] = pd.to_numeric(df[col], errors='coerce').astype('Float64')
+    df['t'] = t
+    df['animal'] = df['animal'].astype('string')
+    # Drop rows with no resolved species (animal NA) — a roster placeholder
+    # line, not a reported owned-animal record.  i must also be non-null for
+    # a valid household key.
+    df = df[df['animal'].notna() & df['i'].notna()]
+    # Sum sub-type strata onto the canonical species (no-op for the EHCVM
+    # waves, which already report one row per species).  min_count=1 keeps an
+    # all-NaN group NaN.
+    df = (df.groupby(['t', 'i', 'animal'], dropna=False)[cols]
+            .sum(min_count=1)
+            .reset_index())
+    keep = ['t', 'i', 'animal'] + cols
+    df = df[keep]
+    df = df.set_index(['t', 'i', 'animal'])
+    return df

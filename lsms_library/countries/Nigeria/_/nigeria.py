@@ -679,6 +679,144 @@ def assemble_plot_inputs(t, parts):
 
 
 # ---------------------------------------------------------------------
+# livestock (GAP 4) -- item-level reported livestock holdings
+# ---------------------------------------------------------------------
+#
+# Natural grain (t, i, animal): one row per species/herd a household
+# reports owning, from the GHS-Panel livestock roster sect11i.  This is
+# the PRE-collapse roster the WB code reads then throws away down to a
+# single household engaged-in-livestock y/n binary (NGA_GHS1.do:992-998
+# recodes s11iq1 then `collapse (max) livestock, by(hhid)`).  We keep the
+# roster richer: per-animal head counts, acquisitions, sales, and the
+# reported per-head reservation value.
+#
+# `animal` (index) is the harmonize_species Preferred Label, resolved
+# in-script from the wave's native animal code (101--123, one stable
+# scheme across all five waves), mirroring how crop_production resolves
+# crops via harmonize_food.  No `v` level: livestock is in the framework
+# `_no_v_join` set, so the grain is exactly (t, i, animal).
+#
+# Stores REPORTED item-level fields ONLY:
+#   HeadCount      head owned/kept now (s11iq2 W1-W3; s11iq2a "kept" W4;
+#                  s11iq2 "kept" W5 -- W4/W5 split kept vs owned-subset,
+#                  we carry the primary kept/owned-now count)
+#   HeadAcquired   head bought to raise this period (s11iq10 W1-W4;
+#                  s11iq17 W5)
+#   HeadSold       head sold alive this period (s11iq16 W1-W4; s11iq23 W5)
+#   Value          reported reservation value of ONE head -- "if you sold
+#                  one today, how much would you receive" (s11iq3 W1-W4;
+#                  s11iq7 W5).  This is a per-head reported price, NOT a
+#                  herd-value total and NOT the WB engaged binary; a herd
+#                  value (HeadCount x Value) and TLU are transformations.
+# NO TLU, NO herd-value total, NO engaged-in-livestock binary -- those
+# are transformations over these rows (their binary = groupby.any()).
+#
+# Each wave maps to a single t = PP_QUARTER[wave]: sect11i is collected
+# in the post-planting round only (matching plot_features / plot_inputs;
+# hhid aligns via format_id).
+
+
+def _species_labels():
+    """{int animal_code: Preferred Label} from harmonize_species."""
+    from lsms_library.local_tools import get_categorical_mapping
+    raw = get_categorical_mapping(tablename='harmonize_species',
+                                  idxvars='Code',
+                                  **{'Preferred Label': 'Preferred Label'})
+    out = {}
+    for k, v in raw.items():
+        try:
+            ik = int(k)
+        except (TypeError, ValueError):
+            continue
+        if pd.isna(v) or str(v).strip() in ('', '---'):
+            continue
+        out[ik] = str(v).strip()
+    return out
+
+
+def livestock_for_wave(t, df, animal_code, owned, head_now, head_acquired,
+                       head_sold, value, species_labels, own_yes=1):
+    """Assemble item-level livestock for one Nigeria GHS-Panel wave.
+
+    Parameters
+    ----------
+    t : str
+        PP-quarter wave id (e.g. '2010Q3'), used as the `t` index.
+    df : DataFrame
+        Raw livestock roster (convert_categoricals=False), one row per
+        (household, animal).
+    animal_code : str
+        Column holding the native animal code (101-123).
+    owned : str or None
+        Ownership y/n column (s11iq1).  Rows kept only where this == own_yes
+        (1).  None keeps every row (W1/W5 files are already filtered to
+        owned rows).
+    head_now, head_acquired, head_sold, value : str or None
+        Reported column names for HeadCount / HeadAcquired / HeadSold /
+        Value.  None -> that column is all-NA for the wave.
+    species_labels : dict
+        {int animal_code: Preferred Label} from harmonize_species.
+
+    Returns
+    -------
+    DataFrame indexed by (t, i, animal) with reported numeric columns.
+    Keeps a row when the animal label resolves AND the household reports
+    something for it (any of HeadCount / HeadAcquired / HeadSold / Value
+    non-missing-and-nonzero) so the roster grid's never-owned all-zero
+    rows (W2-W4 enumerate every animal for every HH) do not bloat the
+    feature.  A row with own==yes but all-zero quantities is still kept
+    (the household engaged with that species).
+    """
+    n = len(df)
+    i = df['hhid'].apply(format_id)
+    code = pd.to_numeric(df[animal_code], errors='coerce').astype('Int64')
+    animal = code.map(species_labels).astype('string')
+
+    def num(col):
+        if col is not None and col in df.columns:
+            return pd.to_numeric(df[col], errors='coerce')
+        return pd.Series(pd.NA, index=df.index, dtype='Float64')
+
+    piece = pd.DataFrame({
+        'i': i.values,
+        'animal': animal.values,
+        'HeadCount': num(head_now).astype('Float64').values,
+        'HeadAcquired': num(head_acquired).astype('Float64').values,
+        'HeadSold': num(head_sold).astype('Float64').values,
+        'Value': num(value).astype('Float64').values,
+    }, index=df.index)
+
+    if owned is not None and owned in df.columns:
+        own = pd.to_numeric(df[owned], errors='coerce')
+        piece['_own'] = (own == own_yes).values
+    else:
+        # File already filtered to owned rows.
+        piece['_own'] = True
+
+    piece['t'] = t
+
+    # Keep rows the HH actually engaged with: either flagged owned, or any
+    # reported quantity is non-null and nonzero.  Drop the roster-grid
+    # not-owned all-zero filler rows (W2-W4) and unresolved animal labels.
+    qcols = ['HeadCount', 'HeadAcquired', 'HeadSold', 'Value']
+    has_qty = pd.Series(False, index=piece.index)
+    for c in qcols:
+        v = piece[c]
+        has_qty = has_qty | (v.notna() & (v != 0))
+    keep = piece['animal'].notna() & piece['i'].notna() & (piece['_own'] | has_qty)
+    out = piece[keep].copy()
+
+    # Dedup on the index grain (defensive: a species code can appear twice
+    # for one HH in a malformed roster); keep the first/largest record.
+    out = out.sort_values(['i', 'animal', 'HeadCount'],
+                          ascending=[True, True, False])
+    out = out.drop_duplicates(subset=['t', 'i', 'animal'], keep='first')
+
+    out = out.set_index(['t', 'i', 'animal']).sort_index()
+    return out[['HeadCount', 'HeadAcquired', 'HeadSold', 'Value']]
+
+
+# ---------------------------------------------------------------------
 # food_coping (#332, Family B: coping-strategies / rCSI)
 # ---------------------------------------------------------------------
 #

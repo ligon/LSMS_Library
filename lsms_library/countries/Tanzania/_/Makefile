@@ -84,6 +84,15 @@ $(VAR_DIR)/plot_inputs.parquet: plot_inputs.py $(plot_inputs_parquet)
 ../%/_/plot_inputs.parquet:
 	(cd $(@D) && python plot_inputs.py)
 
+livestock = $(shell find $(rounds) -name livestock.py)
+livestock_parquet := $(livestock:.py=.parquet)
+
+$(VAR_DIR)/livestock.parquet: livestock.py $(livestock_parquet)
+	python livestock.py
+
+../%/_/livestock.parquet:
+	(cd $(@D) && python livestock.py)
+
 %.parquet: %.py CONTENTS.org tanzania.py
 	(cd $(@D) && python ./$(<F))
 

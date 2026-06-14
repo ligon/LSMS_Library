@@ -1462,3 +1462,128 @@ def plot_inputs_for_wave(t, plot_roster, planting, seeds, colmap, labels=None):
     # reports the same fertilizer type twice) by taking the first.
     out = out[~out.index.duplicated(keep='first')]
     return out.sort_index()
+
+
+def _eth_species_label_map(t):
+    """Load the wave-keyed harmonize_species -> {code: Preferred Label} for t."""
+    wave_keyed = _harmonize_wave_keyed('harmonize_species')
+    return {code: lab for (wv, code), lab in wave_keyed.items() if wv == t}
+
+
+def livestock_for_wave(t, count, txn, colmap):
+    """Build canonical ``livestock`` for one Ethiopia ESS §8 wave (GAP 4).
+
+    Item-level livestock at ``(t, i, animal)`` -- one row per
+    (household, canonical species).  Carries only the REPORTED fields the
+    §8 roster records; anything a wave does not ask is NaN.  This is the
+    *pre-collapse* roster the WB code throws away down to a single
+    engaged-y/n binary (their =recode pp_saq13 ... collapse(max)=); we keep
+    the head counts / transactions instead.
+
+    Parameters
+    ----------
+    t : str
+        Wave id (e.g. ``"2011-12"``), the ``t`` index value AND the wave
+        key for the wave-keyed harmonize_species table.
+    count : pd.DataFrame
+        Raw §8 livestock-roster file carrying the current head count
+        (W1/W2 ``sect8a_ls`` -- which also carries the transactions; W3-W5
+        ``sect8_1_ls``), loaded with ``convert_categoricals=False`` so the
+        animal code column carries the integer codes harmonize_species
+        keys on.
+    txn : pd.DataFrame or None
+        Raw §8 transaction file (W3-W5 ``sect8_2_ls``).  None for W1/W2,
+        where the transaction columns live in the ``count`` frame itself.
+    colmap : dict
+        Per-wave column map.  Required keys:
+            hhid        — household id column EMITTED as ``i`` (household_id2
+                          for W2/W3, else household_id -- matches sample().i).
+            holder_id   — holder id (join key for the count<->txn merge).
+            animal_code — animal/species code column in ``count``.
+            head_count  — current-head-count column in ``count``.
+        Optional keys (NaN where the wave does not ask):
+            t_animal_code   — animal code column in ``txn`` (W3-W5; defaults
+                              to animal_code).
+            t_holder_id     — holder id in ``txn`` (defaults to holder_id).
+            head_acquired   — head purchased in last 12 months.
+            head_sold       — head sold alive in last 12 months.
+            sale_value      — total income from livestock sales (Birr).
+
+    Returns
+    -------
+    pd.DataFrame indexed by ``(t, i, animal)`` with columns
+        HeadCount (float), HeadAcquired (float), HeadSold (float),
+        Value (float).  Summed over the raw animal sub-codes that share a
+        canonical species within a household (e.g. Bulls+Oxen+Cows ->
+        Cattle), which is the within-household roll-up to the (t, i, animal)
+        grain -- NOT a WB-style collapse-to-binary.  Rows where the
+        household reports neither any head nor any transaction for a
+        species are dropped.
+    """
+    c = colmap
+    species_map = _eth_species_label_map(t)
+    assert species_map, f'livestock {t}: harmonize_species has no rows for this wave'
+
+    def _num(df, key):
+        col = c.get(key)
+        if col is None or col not in df.columns:
+            return None
+        return pd.to_numeric(df[col], errors='coerce').astype('Float64')
+
+    # ---- current head count (from `count`) --------------------------
+    cnt = count.copy()
+    code = pd.to_numeric(cnt[c['animal_code']], errors='coerce').astype('Int64')
+    base = pd.DataFrame({
+        'i':        cnt[c['hhid']].apply(format_id).values,
+        '_holder':  cnt[c['holder_id']].apply(format_id).values,
+        '_code':    code.values,
+        'animal':   code.map(species_map).astype('string').values,
+        'HeadCount': (_num(cnt, 'head_count') if c.get('head_count') else
+                      pd.Series(pd.NA, index=cnt.index, dtype='Float64')).values,
+    })
+
+    # ---- transactions (same frame for W1/W2; `txn` for W3-W5) -------
+    src = txn if txn is not None else count
+    tx = src.copy()
+    t_code = pd.to_numeric(tx[c.get('t_animal_code', c['animal_code'])],
+                           errors='coerce').astype('Int64')
+    txdf = pd.DataFrame({
+        '_holder': tx[c.get('t_holder_id', c['holder_id'])].apply(format_id).values,
+        '_code':   t_code.values,
+        'HeadAcquired': (_num(tx, 'head_acquired') if c.get('head_acquired') else
+                         pd.Series(pd.NA, index=tx.index, dtype='Float64')).values,
+        'HeadSold': (_num(tx, 'head_sold') if c.get('head_sold') else
+                     pd.Series(pd.NA, index=tx.index, dtype='Float64')).values,
+        'Value':   (_num(tx, 'sale_value') if c.get('sale_value') else
+                    pd.Series(pd.NA, index=tx.index, dtype='Float64')).values,
+    })
+
+    if txn is None:
+        # W1/W2: count and txn are the same rows -> concatenate columns.
+        merged = pd.concat([base, txdf.drop(columns=['_holder', '_code'])], axis=1)
+    else:
+        # W3-W5: join txn onto the count rows by (holder, raw code).
+        merged = base.merge(txdf, on=['_holder', '_code'], how='left')
+
+    merged = merged[merged['animal'].notna()].copy()
+
+    # Within-household roll-up to the (t, i, animal) grain: sum the head
+    # counts / transactions over the raw codes that share a canonical
+    # species (and over multiple holders in one household).
+    agg = merged.groupby(['i', 'animal'], dropna=True)[
+        ['HeadCount', 'HeadAcquired', 'HeadSold', 'Value']].sum(min_count=1)
+
+    # Drop species the household neither owns nor transacts (all-NaN or
+    # all-zero across every reported column).
+    nonzero = agg.fillna(0).abs().sum(axis=1) > 0
+    agg = agg[nonzero]
+
+    agg = agg.reset_index()
+    agg['t'] = t
+    agg['i'] = agg['i'].astype('string')
+    agg['animal'] = agg['animal'].astype('string')
+    for col in ['HeadCount', 'HeadAcquired', 'HeadSold', 'Value']:
+        agg[col] = agg[col].astype('Float64')
+    agg = agg.set_index(['t', 'i', 'animal'])
+    agg = agg[['HeadCount', 'HeadAcquired', 'HeadSold', 'Value']]
+    return agg.sort_index()
