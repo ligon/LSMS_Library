@@ -25,6 +25,23 @@
 # Preferred Label keeps native French / local names.
 # SCOPE = food_acquired's existing units only (Unit #0 foundation); crop /
 # community-price units extend this table later.
+#
+# CROP-HARVEST EXTENSION (GAP 1 crop_production, 2026-06-14).  The
+# agriculture harvest/sold modules report quantities in their own local
+# unit lists, distinct from the food-consumption units above and varying
+# in spelling/case across waves: 2011-12 lowercase ('kilogramme', 'sac de
+# 50 kg', 'panier'), 2014-15 Title-case ('Kilogramme', 'Sac de 50 Kg'),
+# EHCVM 2018-19 ('Gros sac', 'Sac Moyen', 'Plat Yoruba', 'Tine', 'Tia',
+# 'Botte', 'Unité'), EHCVM 2021-22 ('Sac de 50kg', 'tiya', 'tongolo',
+# 'panier').  Each raw spelling is added as an Original Label keying onto
+# one clean Preferred Label; 'Kilogramme'/'kilogramme' collapse onto the
+# existing food 'Kg' so crop and food quantities share that unit, and the
+# sack/local units ('Sac de 50 kg', 'Sac de 100 kg', 'Gros sac', 'Sac
+# Moyen', 'Plat Yoruba', 'Tine', 'Tia', 'Cope', 'Planche', 'Gramme') get
+# their own Preferred Labels (kg-conversion factors are NOT stored here —
+# the u table is the label axis only, per the GAP_RANKING steer).  Used by
+# the script-path crop_production via tools.get_categorical_mapping('u',
+# 'Original Label', 'Preferred Label').
 
 
 #+name: u
@@ -109,6 +126,37 @@
 | 147. Unité            | Unité            | 147  | Unité            | 147. Unité            |
 | Unité                 | Unité            | 147  | Unité            | 147. Unité            |
 | Waygouizé             | Waygouizé        | 513  | Waygouizé        |                       |
+| Kilogramme            | Kg               |      |                  |                       |
+| kilogramme            | Kg               |      |                  |                       |
+| Gramme                | Gramme           |      |                  |                       |
+| gramme                | Gramme           |      |                  |                       |
+| Cope                  | Cope             |      |                  |                       |
+| cope                  | Cope             |      |                  |                       |
+| tiya                  | Tiya             |      |                  |                       |
+| tongolo               | Tongolo          |      |                  |                       |
+| panier                | Panier           |      |                  |                       |
+| unité                 | Unité            |      |                  |                       |
+| Planche               | Planche          |      |                  |                       |
+| planche               | Planche          |      |                  |                       |
+| Plat Yoruba           | Plat Yoruba      |      |                  |                       |
+| Sac Moyen             | Sac Moyen        |      |                  |                       |
+| Gros sac              | Gros sac         |      |                  |                       |
+| Tia                   | Tia              |      |                  |                       |
+| Tine                  | Tine             |      |                  |                       |
+| Sac de 50 Kg          | Sac de 50 kg     |      |                  |                       |
+| Sac de 50 kg          | Sac de 50 kg     |      |                  |                       |
+| sac de 50 kg          | Sac de 50 kg     |      |                  |                       |
+| Sac de 50kg           | Sac de 50 kg     |      |                  |                       |
+| Sac de 100 Kg         | Sac de 100 kg    |      |                  |                       |
+| sac de 100 kg         | Sac de 100 kg    |      |                  |                       |
+| Sac de 100kg          | Sac de 100 kg    |      |                  |                       |
+| Autre                 | Autre            |      |                  |                       |
+| autre                 | Autre            |      |                  |                       |
+| Autre (préciser)      | Autre            |      |                  |                       |
+| Autres                | Autre            |      |                  |                       |
+| botte                 | Botte            |      |                  |                       |
+| Manquant              | Manquant         |      |                  |                       |
+| manquant              | Manquant         |      |                  |                       |
 
 #+NAME: Region
 | Original Label                 | Preferred Label                |
@@ -326,6 +374,27 @@
 #   mappings: ['harmonize_food', 'Original Label', 'Preferred Label'].
 # SCOPE = food_acquired's existing items only (Unit #0 foundation); crop /
 # community-price items extend this table later.
+#
+# CROP EXTENSION (GAP 1 crop_production, 2026-06-14).  The agriculture
+# harvest modules (ecvmaas2e / ECVMA2_AS2E1 / s16c) carry a crop code
+# whose value labels are short crop names ('Mil', 'Sorgho', 'Maïs', ...);
+# 2011-12 emits them lowercase, the other three waves Title-case, so BOTH
+# case variants are added as Original Label keys.  Per the maintainer
+# steer, every crop that is also a consumed food REUSES the existing food
+# Preferred Label so crop_production.j joins food_acquired.j (e.g. crop
+# 'Maïs' -> 'Maïs en grain'; 'Niébé' -> 'Niébé/Haricots secs'; 'Tomate'
+# -> 'Tomate fraîche'; 'Oignon' -> 'Oignon frais'; 'Laitue' ->
+# 'Salade (laitue)'; staples 'Mil'/'Sorgho'/'Blé'/'Fonio'/'Sésame'/
+# 'Manioc'/etc. match an existing label exactly).  NEW Preferred Labels
+# are added ONLY for crops with no consumed-food counterpart: the raw
+# crop 'Riz Paddy' (unhusked, distinct from the milled-rice foods),
+# 'Souchet' (tigernut), 'Voandzou' (bambara groundnut), the unprocessed
+# 'Arachide'/'Oseille' crops, 'Menthe', 'Persil', 'Amarante',
+# 'Calebassier'/'Calebasse' (gourd), 'Betterave', the cash crop 'Coton',
+# and the catch-all 'Autre crop'.  crop_production is a script-path
+# feature; it looks this table up via
+# tools.get_categorical_mapping('harmonize_food', 'Original Label',
+# 'Preferred Label') in the wave-level _/crop_production.py.
 
 #+NAME: harmonize_food
 | Original Label                                                                            | Preferred Label                                                                      |
@@ -630,3 +699,87 @@
 | 148. Vinaigre de citron                                                                   | Vinaigre de citron                                                                   |
 | 60. Œufs                                                                                  | Œufs                                                                                 |
 | Å__ufs                                                                                    | Œufs                                                                                 |
+| Mil                                                                                       | Mil                                                                                  |
+| mil                                                                                       | Mil                                                                                  |
+| Sorgho                                                                                    | Sorgho                                                                               |
+| sorgho                                                                                    | Sorgho                                                                               |
+| Riz Paddy                                                                                 | Riz Paddy                                                                            |
+| riz paddy                                                                                 | Riz Paddy                                                                            |
+| Maïs                                                                                      | Maïs en grain                                                                        |
+| maïs                                                                                      | Maïs en grain                                                                        |
+| Souchet                                                                                   | Souchet                                                                              |
+| souchet                                                                                   | Souchet                                                                              |
+| Blé                                                                                       | Blé                                                                                  |
+| blé                                                                                       | Blé                                                                                  |
+| Fonio                                                                                     | Fonio                                                                                |
+| fonio                                                                                     | Fonio                                                                                |
+| Niébé                                                                                     | Niébé/Haricots secs                                                                  |
+| niébé                                                                                     | Niébé/Haricots secs                                                                  |
+| Voandzou                                                                                  | Voandzou                                                                             |
+| voandzou                                                                                  | Voandzou                                                                             |
+| Arachide                                                                                  | Arachide                                                                             |
+| arachide                                                                                  | Arachide                                                                             |
+| Gombo                                                                                     | Gombo frais                                                                          |
+| gombo                                                                                     | Gombo frais                                                                          |
+| Oseille                                                                                   | Oseille                                                                              |
+| oseille                                                                                   | Oseille                                                                              |
+| Sésame                                                                                    | Sésame                                                                               |
+| sésame                                                                                    | Sésame                                                                               |
+| Manioc                                                                                    | Manioc                                                                               |
+| manioc                                                                                    | Manioc                                                                               |
+| Patate douce                                                                              | Patate douce                                                                         |
+| patate douce                                                                              | Patate douce                                                                         |
+| Pomme de terre                                                                            | Pomme de terre                                                                       |
+| pomme de terre                                                                            | Pomme de terre                                                                       |
+| Poivron                                                                                   | Poivron frais                                                                        |
+| poivron                                                                                   | Poivron frais                                                                        |
+| Menthe                                                                                    | Menthe                                                                               |
+| menthe                                                                                    | Menthe                                                                               |
+| Persil                                                                                    | Persil                                                                               |
+| persil                                                                                    | Persil                                                                               |
+| Piment                                                                                    | Piment frais                                                                         |
+| piment                                                                                    | Piment frais                                                                         |
+| Melon                                                                                     | Melon                                                                                |
+| melon                                                                                     | Melon                                                                                |
+| Pastèque                                                                                  | Pastèque                                                                             |
+| pastèque                                                                                  | Pastèque                                                                             |
+| Laitue                                                                                    | Salade (laitue)                                                                      |
+| laitue                                                                                    | Salade (laitue)                                                                      |
+| Chou                                                                                      | Chou                                                                                 |
+| chou                                                                                      | Chou                                                                                 |
+| Tomate                                                                                    | Tomate fraîche                                                                       |
+| tomate                                                                                    | Tomate fraîche                                                                       |
+| Oignon                                                                                    | Oignon frais                                                                         |
+| oignon                                                                                    | Oignon frais                                                                         |
+| Courge                                                                                    | Courge/Courgette                                                                     |
+| courge                                                                                    | Courge/Courgette                                                                     |
+| Haricot vert                                                                              | Haricot vert                                                                         |
+| haricot vert                                                                              | Haricot vert                                                                         |
+| Calebassier                                                                               | Calebassier                                                                          |
+| calebassier                                                                               | Calebassier                                                                          |
+| Betterave                                                                                 | Betterave                                                                            |
+| betterave                                                                                 | Betterave                                                                            |
+| Aubergine                                                                                 | Aubergine,                                                                           |
+| aubergine                                                                                 | Aubergine,                                                                           |
+| Concombre                                                                                 | Concombre                                                                            |
+| concombre                                                                                 | Concombre                                                                            |
+| Ail                                                                                       | Ail                                                                                  |
+| ail                                                                                       | Ail                                                                                  |
+| Amarante                                                                                  | Amarante                                                                             |
+| amarante                                                                                  | Amarante                                                                             |
+| Coton                                                                                     | Coton                                                                                |
+| coton                                                                                     | Coton                                                                                |
+| Calebasse                                                                                 | Calebassier                                                                          |
+| Menthe Fraiche                                                                            | Menthe                                                                               |
+| Manguier                                                                                  | Mangue                                                                               |
+| manguier                                                                                  | Mangue                                                                               |
+| Agrume                                                                                    | Agrume                                                                               |
+| agrume                                                                                    | Agrume                                                                               |
+| Navet                                                                                     | Navet                                                                               |
+| navet                                                                                     | Navet                                                                               |
+| Poireaux                                                                                  | Poireaux                                                                            |
+| Poireau                                                                                   | Poireaux                                                                            |
+| poireau                                                                                   | Poireaux                                                                            |
+| Autre                                                                                     | Autre crop                                                                           |
+| autre                                                                                     | Autre crop                                                                           |
+| Autre (à préciser)                                                                        | Autre crop                                                                           |

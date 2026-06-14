@@ -17,6 +17,22 @@ panel_ids.json updated_ids.json: panel_ids.py niger.py
 ../%/_/plot_features.parquet: ../%/_/plot_features.py
 	(cd $(@D) && python plot_features.py)
 
+# crop_production (GAP 1, item-level).  Country-level var/ parquet built by
+# the concatenator, which depends on each wave's parquet; the pattern rule
+# below runs each wave script.  Wave parquets land under data_root() (via
+# to_parquet); the in-tree paths here are only the make prerequisites'
+# script files, so we run the country script unconditionally to (re)build
+# the wave parquets it reads, then concatenate.
+CROP_WAVES := 2011-12 2014-15 2018-19 2021-22
+
+$(VAR_DIR)/crop_production.parquet: crop_production.py niger.py categorical_mapping.org \
+		$(foreach w,$(CROP_WAVES),../$(w)/_/crop_production.py)
+	$(foreach w,$(CROP_WAVES),(cd ../$(w)/_ && python crop_production.py);)
+	python crop_production.py
+
+../%/_/crop_production.parquet: ../%/_/crop_production.py niger.py categorical_mapping.org
+	(cd $(@D) && python crop_production.py)
+
 clean:
 	rm -f panel_ids.json updated_ids.json
 
