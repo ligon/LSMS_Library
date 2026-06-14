@@ -1668,3 +1668,238 @@ def people_last7days_from_s4aq(t, df, hhid='hhid', indiv='indiv'):
     return out[['farm_work', 'SOB_work', 'wage_work',
                 'farm_hrs', 'SB_hrs', 'wage_hrs', 'Industry', 'working_age']]
 
+
+# ---------------------------------------------------------------------
+# community_prices (GAP C) -- item-level reported community food prices
+# ---------------------------------------------------------------------
+#
+# Natural grain (t, v, j, u): one row per (cluster/EA x food-item x unit)
+# from the post-harvest COMMUNITY questionnaire's food-price module
+# (Section C8 "Food Prices", file sectc8_harvest{wN}; W3 splits it across
+# sectc8a / sectc8b; W5 lives under Post Harvest Wave 5/Community/).  This
+# is a CLUSTER-level table: there is no household i.  `v` is the native
+# community-questionnaire EA id (`ea`), which maps to the SAME keyspace as
+# sample().v (sample joins v = format_id(ea) too), so community_prices.v
+# joins households via their cluster.  Item-level REPORTED prices only --
+# NOT an index, NOT a median/mean across clusters, NOT an HH-median
+# imputation (those are transformations over these rows).
+#
+# Stores the REPORTED field only:
+#   Price   the surveyed prevailing price of one unit `u` of item `j` in
+#           cluster `v` at the present time (Naira).  W1/W2 sc8q2/c8q2;
+#           W3-W5 c8q3 / c8aq3.
+#
+# Labels (the community-price arm of label unification):
+#   j  -> the SHARED harmonize_food Preferred Label, so community_prices.j
+#         joins food_acquired.j and crop_production.crop.  W3-W5 carry the
+#         consumption-module item_cd scheme already registered in
+#         harmonize_food (resolved via Code, exactly like food_acquired).
+#         W1/W2 use the community questionnaire's OWN (disjoint) item-code
+#         scheme -- mapped here by NAME to the canonical Preferred Label via
+#         _W1W2_PRICE_ITEM, reusing existing food labels where the priced
+#         good is a consumption-module food and adding only genuinely new
+#         price-questionnaire prepared-food/drink items (Moi moi, Akara,
+#         soups, Kunu, juices, ...).  Tobacco/cigarettes (non-food) dropped.
+#   u  -> the SHARED `u` table base Preferred Label via _canon_unit.  W3-W5
+#         record the unit per row (sc8q2/c8q2/c8aq2); W1/W2 do NOT carry a
+#         unit column -- the questionnaire fixes one unit per item, so the
+#         per-item unit is supplied from _W1W2_PRICE_UNIT (Section C8's
+#         column heads: KG / PIECE / BUNCH / LITRE / TIN / BOTTLE / ...).
+#
+# t = PH_QUARTER[wave] (the price module sits in the post-harvest round,
+# matching crop_production / anthropometry).
+
+
+# W1/W2 community-price questionnaire (Section C8) item codes -> canonical
+# harmonize_food Preferred Label.  The 4-digit data codes encode a size
+# variant as `base*10 + size` (e.g. 1511 = item 151 size 1), so the build
+# resolves a data code by trying the code itself, then `code // 10`.
+_W1W2_PRICE_ITEM = {
+    1: 'Guinea corn/sorghum', 2: 'Millet', 3: 'Maize', 4: 'Maize',
+    5: 'Rice--local', 6: 'Rice--local', 7: 'Rice--imported', 8: 'Bread',
+    9: 'Buns/Pofpof/Donuts', 10: 'Biscuits', 11: 'Maize flour',
+    20: 'Millet flour', 21: 'Wheat flour', 22: 'Yam flour',
+    23: 'Cassava flour', 24: 'Plantain flour', 30: 'Cassava--roots',
+    31: 'Yam--roots', 32: 'Gari--white', 33: 'Gari--yellow', 34: 'Cocoyam',
+    35: 'Plantains', 36: 'Sweet potatoes', 37: 'Potatoes',
+    38: 'Fufu/Cassava dough (akpu)', 50: 'Brown beans', 51: 'Soya beans',
+    52: 'Moi moi', 53: 'Akara (bean cake)', 54: 'Kulikuli (groundnut cake)',
+    55: 'Locust bean', 60: 'Bambara nut', 61: 'Groundnuts (shelled)',
+    62: 'Kola nut', 63: 'Palm kernel', 64: 'Cashew nut', 65: 'Coconut',
+    70: 'Palm oil', 71: 'Coconut oil', 72: 'Sheabutter',
+    73: 'Butter/Margarine', 74: 'Cheese (wara)', 75: 'Animal fat',
+    76: 'Groundnut oil', 78: 'Butter/Margarine', 80: 'Bananas',
+    81: 'Watermelon', 82: 'Orange/tangerine', 83: 'Mangoes', 84: 'Pawpaw',
+    85: 'Avocado pear', 86: 'Pineapples', 87: 'Pineapple juice',
+    88: 'Orange juice', 90: 'Fruit canned', 91: 'Fruit juice canned/Pack',
+    101: 'Tomatoes', 102: 'Onions', 103: 'Garden eggs/egg plant',
+    104: 'Okra--fresh', 105: 'Okra--dried', 106: 'Fresh Pepper',
+    107: 'Cabbage', 108: 'Cucumber',
+    109: 'Leaves (Cocoyam, Spinach, etc.)', 111: 'Tomato puree (canned)',
+    120: 'Chicken', 121: 'Duck', 122: 'Other domestic poultry',
+    123: 'Wild game meat', 125: 'Agricultural eggs', 126: 'Local eggs',
+    130: 'Beef', 131: 'Mutton', 132: 'Pork', 133: 'Goat',
+    134: 'Wild game meat', 136: 'Canned beef/corned beef',
+    140: 'Fish--fresh', 141: 'Fish--frozen', 142: 'Fish--smoked',
+    143: 'Fish--dried', 144: 'Fish--fresh', 145: 'Snails',
+    146: 'Seafood (lobster, crab, prawns, etc)', 147: 'Canned fish/seafood',
+    150: 'Fresh milk', 151: 'Milk powder', 152: 'Baby milk powder',
+    153: 'Milk tinned (unsweetened)', 154: 'Fresh milk',
+    155: 'Other milk products', 160: 'Coffee',
+    161: 'Chocolate drinks (including Milo)', 162: 'Tea',
+    170: 'Cooked rice and stew', 171: 'Fufu and soup', 172: 'Tuo and soup',
+    173: 'Amala and soup', 174: 'Gari and soup',
+    175: 'Pounded yam and soup', 180: 'Sugar', 181: 'Jams', 182: 'Honey',
+    183: 'Other sweets and confectionary', 184: 'Ice cream',
+    190: 'Condiments (salt, spices, pepper, etc)', 200: 'Bottled water',
+    201: 'Sachet water', 202: 'Malt drinks',
+    203: 'Soft drinks (Coca Cola, spirit, etc)', 204: 'Kunu',
+    611: 'Other vegetables (fresh or canned)',
+    612: 'Other vegetables (fresh or canned)',
+    900: 'Beer (local and imported)', 901: 'Beer (local and imported)',
+    903: 'Palm wine', 904: 'Pito', 905: 'Other alcoholic beverages',
+    906: 'Gin',
+}
+
+# W1/W2 Section C8 per-item fixed unit (the column head on the printed
+# questionnaire -- W1/W2 record no unit column, so the unit is the item's
+# canonical sale unit).  Normalized to the shared `u` table base label.
+_W1W2_PRICE_UNIT = {
+    1: 'Kg', 2: 'Kg', 3: 'Kg', 4: 'Kg', 5: 'Kg', 6: 'Kg', 7: 'Kg',
+    8: 'Piece', 9: 'Piece', 10: 'Piece', 11: 'Kg', 20: 'Kg', 21: 'Kg',
+    22: 'Kg', 23: 'Kg', 24: 'Kg', 30: 'Piece', 31: 'Piece', 32: 'Kg',
+    33: 'Kg', 34: 'Piece', 35: 'Piece', 36: 'Piece', 37: 'Piece', 38: 'Kg',
+    50: 'Kg', 51: 'Kg', 52: 'Piece', 53: 'Piece', 54: 'Kg', 55: 'Kg',
+    60: 'Kg', 61: 'Kg', 62: 'Kg', 63: 'Kg', 64: 'Kg', 65: 'Piece',
+    70: 'l', 71: 'l', 72: 'Kg', 73: 'Kg', 74: 'Kg', 75: 'Kg', 76: 'l',
+    78: 'Kg', 80: 'Bunch', 81: 'Piece', 82: 'Piece', 83: 'Piece',
+    84: 'Piece', 85: 'Piece', 86: 'Piece', 87: 'Piece', 88: 'Piece',
+    90: 'Piece', 91: 'Piece', 101: 'Kg', 102: 'Kg', 103: 'Kg', 104: 'Kg',
+    105: 'Kg', 106: 'Kg', 107: 'Piece', 108: 'Piece', 109: 'Bunch',
+    111: 'Piece', 120: 'Kg', 121: 'Kg', 122: 'Kg', 123: 'Kg',
+    125: 'Crate', 126: 'Piece', 130: 'Kg', 131: 'Kg', 132: 'Kg',
+    133: 'Kg', 134: 'Kg', 136: 'Bottle/Can', 140: 'Kg', 141: 'Kg',
+    142: 'Kg', 143: 'Kg', 144: 'Kg', 145: 'Kg', 146: 'Kg',
+    147: 'Bottle/Can', 150: 'l', 151: 'tin', 152: 'tin', 153: 'tin',
+    154: 'Bottle/Can', 155: 'Bottle/Can', 160: 'Sachet', 161: 'tin',
+    162: 'Piece', 170: 'Piece', 171: 'Piece', 172: 'Piece', 173: 'Piece',
+    174: 'Piece', 175: 'Piece', 180: 'Wrap', 181: 'Bottle/Can',
+    182: 'Bottle/Can', 183: 'Bowl', 184: 'l', 190: 'Wrap',
+    200: 'Bottle/Can', 201: 'cl', 202: 'cl', 203: 'cl', 204: 'cl',
+    611: 'Kg', 612: 'Kg', 900: 'Bottle/Can', 901: 'Bottle/Can',
+    903: 'Bottle/Can', 904: 'Bottle/Can', 905: 'Bottle/Can',
+    906: 'Bottle/Can',
+}
+
+
+def _resolve_w1w2_price_item(code):
+    """W1/W2 community item code -> (Preferred Label, base unit).  Tries the
+    code itself, then ``code // 10`` (4-digit codes are ``base*10+size``).
+    Returns (None, None) for unmapped / non-food codes."""
+    code = int(code)
+    for c in (code, code // 10):
+        if c in _W1W2_PRICE_ITEM:
+            return _W1W2_PRICE_ITEM[c], _W1W2_PRICE_UNIT.get(c)
+    return None, None
+
+
+def community_prices_for_wave(t, frames, mode, crop_labels=None):
+    """Assemble item-level community_prices for one Nigeria GHS-Panel wave.
+
+    Parameters
+    ----------
+    t : str
+        PH-quarter wave id (e.g. '2011Q1'), used as the `t` index.
+    frames : list of dict
+        Each dict describes one source price frame:
+            df     raw DataFrame (convert_categoricals=False)
+            dec    decoded-label DataFrame (for unit / item decode)
+            ea     EA id column name (-> v = format_id(ea))
+            item   item_cd column name
+            price  reported-price column name
+            unit   unit column name (W3-W5; None for W1/W2)
+    mode : {'codes', 'names'}
+        'codes' -> item_cd is the consumption-module scheme already in
+                   harmonize_food (W3-W5): resolve via crop_labels (Code).
+        'names' -> item_cd is the community questionnaire's own scheme
+                   (W1/W2): resolve via _resolve_w1w2_price_item.
+    crop_labels : dict, required for mode='codes'
+        {int code: Preferred Label} from harmonize_food.
+
+    Returns
+    -------
+    DataFrame indexed by (t, v, j, u) with the reported `Price` column.
+    One row per (cluster, item, unit); the reported price is the MEDIAN of
+    the cluster's reported prices when a cluster lists an item more than once
+    at the same unit (e.g. sectc8a + sectc8b both list it) -- a within-row
+    dedup of the SAME surveyed quantity, never a cross-cluster aggregate.
+    """
+    pieces = []
+    for fr in frames:
+        df = fr['df']
+        dec = fr['dec']
+        v = df[fr['ea']].apply(format_id)
+        code = pd.to_numeric(df[fr['item']], errors='coerce')
+        price = pd.to_numeric(df[fr['price']], errors='coerce')
+
+        if mode == 'codes':
+            j = code.astype('Int64').map(crop_labels).astype('string')
+            if fr.get('unit') and fr['unit'] in dec.columns:
+                u = dec[fr['unit']].map(_canon_unit).astype('string')
+            else:
+                u = pd.Series(pd.NA, index=df.index, dtype='string')
+        else:  # names (W1/W2)
+            labs, units = [], []
+            for c in code:
+                if pd.isna(c):
+                    labs.append(pd.NA)
+                    units.append(pd.NA)
+                    continue
+                lab, un = _resolve_w1w2_price_item(c)
+                labs.append(lab if lab is not None else pd.NA)
+                units.append(un if un is not None else pd.NA)
+            j = pd.Series(labs, index=df.index, dtype='string')
+            u = pd.Series(units, index=df.index, dtype='string')
+
+        piece = pd.DataFrame({
+            'v': v.values,
+            'j': j.values,
+            'u': u.values,
+            'Price': price.values,
+        }, index=df.index)
+        pieces.append(piece)
+
+    out = pd.concat(pieces, ignore_index=True)
+    out['t'] = t
+
+    # Keep only rows with a resolved cluster, item, unit and a positive
+    # reported price (price 0 / NaN = item not available / not priced).
+    out = out[out['v'].notna() & out['j'].notna() & out['u'].notna()
+              & out['Price'].notna() & (out['Price'] > 0)]
+
+    # Collapse same-(cluster,item,unit) duplicates to one row.  A cluster can
+    # list the same item/unit more than once (W3 sectc8a+sectc8b overlap;
+    # multiple size variants mapping to one base unit) -- keep the FIRST reported
+    # price (a genuine REPORTED surveyed value, consistent with every sibling
+    # community_prices feature), NOT a computed median.  Within-(t,v,j,u) only,
+    # never a cross-cluster aggregate.
+    out = (out.groupby(['t', 'v', 'j', 'u'], as_index=False)['Price']
+              .first())
+
+    # community_prices is a CLUSTER table -- there is no household i, the
+    # natural grain is (t, v, j, u).  But the framework's
+    # local_tools.map_index() (run on EVERY read path) unconditionally swaps
+    # j -> i whenever a `j` index level is present and an `i` level is NOT.
+    # That swap would rename our item level `j` to `i`, drop `j`, and collapse
+    # the table to (t, v, u).  To keep `j` intact WITHOUT touching the
+    # framework, carry a redundant `i` level (set equal to the cluster v)
+    # positioned BEFORE `j`: map_index then sees i present and j after i, so it
+    # does NOT swap, and the framework's _normalize_dataframe_index drops the
+    # undeclared `i` level (data_scheme declares (t, v, j, u)), leaving the
+    # canonical (t, v, j, u) grain.  v already in the index means
+    # _join_v_from_sample is skipped; the spurious i==v never reaches the API.
+    # (Same framework-compatibility shim Tanzania/Malawi/Ethiopia/Mali
+    # community_prices use.)
+    out['i'] = out['v']
+    out = out.set_index(['t', 'v', 'i', 'j', 'u']).sort_index()
+    return out[['Price']]

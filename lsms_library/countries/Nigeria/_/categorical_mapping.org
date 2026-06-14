@@ -8,6 +8,19 @@
   sub-varieties (e.g. "Maize (shelled)" and "Maize (unshelled)" both
   aggregate to "Maize").
 
+  Community-price item codes (GAP C / community_prices feature) reuse this
+  same table.  The post-harvest community price module (Section C8,
+  sectc8_harvest*) in W3-W5 carries the consumption-module item_cd scheme,
+  so its items resolve directly via Code here -- no extension needed.  W1/W2
+  community-price use the community questionnaire's OWN (disjoint) item-code
+  scheme, mapped by NAME to these Preferred Labels in nigeria.py
+  (_W1W2_PRICE_ITEM), reusing existing food labels where the priced good is
+  a consumption-module food.  Codes 4001-4016 below register the only
+  genuinely NEW price-questionnaire items (prepared foods / drinks the
+  consumption module does not list: Moi moi, Akara, Kulikuli, the soups,
+  Kunu, juices, flours, Ice cream); they appear only in the W1/W2 community
+  price round (PH quarters 2011Q1/2013Q1).
+
   Crop-production item codes (GAP 1 / crop_production feature) are appended
   to the same table.  The post-harvest crop module (secta3*) uses its own
   cropcode scheme (1010-9999), DISJOINT from the food-consumption codes
@@ -266,6 +279,22 @@
 | 3250 | Eru | Eru | --- | Eru | --- | Eru | --- | Eru | --- | Eru |
 | 3260 | Iyere | Iyere | --- | Iyere | --- | Iyere | --- | Iyere | --- | Iyere |
 | 9999 | Other crop | Other crop | --- | Other (Specify) | --- | Other (Specify) | --- | Other (Specify) | --- | Other (Specify) |
+| 4001 | Millet flour | Millet flour | --- | Millet flour | --- | Millet flour | --- | --- | --- | --- |
+| 4002 | Plantain flour | Plantain flour | --- | Plantain flour | --- | Plantain flour | --- | --- | --- | --- |
+| 4003 | Fufu/Cassava dough (akpu) | Fufu/Cassava dough (akpu) | --- | Fufu/Cassava dough (akpu) | --- | Fufu/Cassava dough (akpu) | --- | --- | --- | --- |
+| 4004 | Moi moi | Moi moi | --- | Moi moi | --- | Moi moi | --- | --- | --- | --- |
+| 4005 | Akara (bean cake) | Akara (bean cake) | --- | Akara (bean cake) | --- | Akara (bean cake) | --- | --- | --- | --- |
+| 4006 | Kulikuli (groundnut cake) | Kulikuli (groundnut cake) | --- | Kulikuli (groundnut cake) | --- | Kulikuli (groundnut cake) | --- | --- | --- | --- |
+| 4007 | Orange juice | Orange juice | --- | Orange juice | --- | Orange juice | --- | --- | --- | --- |
+| 4008 | Pineapple juice | Pineapple juice | --- | Pineapple juice | --- | Pineapple juice | --- | --- | --- | --- |
+| 4009 | Cooked rice and stew | Cooked rice and stew | --- | Cooked rice and stew | --- | Cooked rice and stew | --- | --- | --- | --- |
+| 4010 | Fufu and soup | Fufu and soup | --- | Fufu and soup | --- | Fufu and soup | --- | --- | --- | --- |
+| 4011 | Tuo and soup | Tuo and soup | --- | Tuo and soup | --- | Tuo and soup | --- | --- | --- | --- |
+| 4012 | Amala and soup | Amala and soup | --- | Amala and soup | --- | Amala and soup | --- | --- | --- | --- |
+| 4013 | Gari and soup | Gari and soup | --- | Gari and soup | --- | Gari and soup | --- | --- | --- | --- |
+| 4014 | Pounded yam and soup | Pounded yam and soup | --- | Pounded yam and soup | --- | Pounded yam and soup | --- | --- | --- | --- |
+| 4015 | Ice cream | Ice cream | --- | Ice cream | --- | Ice cream | --- | --- | --- | --- |
+| 4016 | Kunu | Kunu | --- | Kunu | --- | Kunu | --- | --- | --- | --- |
 
 * Units
 

@@ -171,6 +171,22 @@ $(VAR_DIR)/food_coping.parquet: food_coping.py $(food_coping_parquet)
 $(VAR_DIR)/anthropometry.parquet: anthropometry.py
 	python anthropometry.py
 
+# community_prices (GAP C).  Wave-level scripts read each year folder's
+# post-harvest community price module (Section C8, sectc8_harvest*) and
+# write a wave parquet at the PH quarter; the country-level concatenator
+# joins them to var/community_prices.parquet.  The wave-level split routes
+# the build through the framework's wave path, preserving the (t, v, j, u)
+# grain (the country-only fallback applies map_index(), which swaps a
+# j-without-i index level to i and collapses the table).
+community_prices = $(shell find $(rounds) -name community_prices.py)
+community_prices_parquet := $(community_prices:.py=.parquet)
+
+../%/_/community_prices.parquet: ../%/_/community_prices.py
+	(cd $(@D) && python community_prices.py)
+
+$(VAR_DIR)/community_prices.parquet: community_prices.py $(community_prices_parquet)
+	python community_prices.py
+
 ../2010-11/_/housing.parquet: ../2010-11/_/housing.py
 	(cd ../2010-11/_; python housing.py)
 

@@ -172,3 +172,85 @@ W3 25% / W4 56% / W5 49%).
 - No id_walk applied at the country level: GHS-Panel hhids are stable
   across waves (panel_ids maps previous_i = hhid), so there is no
   per-wave remapping dict (mirrors Nigeria food_acquired).
+
+* community_prices (GAP C -- OURS-ONLY, maintainer priority)
+
+Item-level REPORTED community food prices at natural grain (t, v, j, u):
+one row per (cluster/EA x food-item x unit) from the post-harvest COMMUNITY
+questionnaire's food-price module (Section C8 "Food Prices").  CLUSTER-level
+-- there is NO household i.  Stores the surveyed Price ONLY (Naira); NOT an
+index, NOT a cross-cluster median/mean, NOT an HH-median imputation (those
+are transformations).  The WB panel surveys no community prices (their
+crop_price_EA is an HH-median imputation), so this is strictly richer.
+
+124,539 priced rows across 5 waves x 584 clusters x 139 food items x 30 units.
+
+** Source files (post-harvest community round)
+
+| Wave | t      | File(s)                                                   | item code scheme        |
+|------+--------+----------------------------------------------------------+-------------------------|
+| W1   | 2011Q1 | sectc8_harvestw1.csv                                      | community-own (by name) |
+| W2   | 2013Q1 | sectc8_harvestw2.csv                                      | community-own (by name) |
+| W3   | 2016Q1 | sectc8a_harvestw3.dta + sectc8b_harvestw3.dta            | consumption (by Code)   |
+| W4   | 2019Q1 | sectc8_harvestw4.dta                                      | consumption (by Code)   |
+| W5   | 2024Q1 | Post Harvest Wave 5/Community/sectc8_harvestw5.dta        | consumption (by Code)   |
+
+Price / unit columns: W1 sc8q2 price (no unit col); W2 c8q2 price (no unit
+col); W3 c8q3 price / c8q2 unit; W4 c8q3 price / c8q2 unit; W5 c8aq3 price /
+c8aq2_b unit.
+
+** v -> sample() keyspace
+
+v = format_id(ea), the community questionnaire's EA id.  ALL 584 community
+EAs intersect sample().v (which also joins v = format_id(ea)), so
+community_prices.v joins households via their cluster -- confirmed
+584/584.
+
+** Item labels (j) -- the community-price arm of label unification
+
+- W3-W5 item_cd is the CONSUMPTION-module scheme already registered in
+  harmonize_food, so items resolve directly via Code (exactly like
+  food_acquired / crop_production).  No extension needed.
+- W1/W2 use the community questionnaire's OWN (disjoint) item-code scheme.
+  The 4-digit data codes encode a size variant as base*10+size (1511 = item
+  151 size 1).  Mapped by NAME to canonical harmonize_food Preferred Labels
+  in nigeria.py (_W1W2_PRICE_ITEM, from the W1 Community_Questionnaire C8
+  item list), reusing existing food labels.  The 16 genuinely-new
+  prepared-food / drink price items (Moi moi, Akara, Kulikuli, the 6 soups,
+  Kunu, the 2 juices, Millet/Plantain flour, Fufu dough, Ice cream) are
+  registered in harmonize_food as codes 4001-4016.  Tobacco / cigarettes
+  (non-food, community codes 951/952) are dropped.
+- 118 of the 139 community-price items match a food_acquired Preferred
+  Label, 45 match a crop_production crop label -> j joins consumption and
+  harvest on the canonical label.
+
+** Units (u)
+
+Native unit label normalized to the shared `u` table base Preferred Label
+via _canon_unit.  W3-W5 record the unit per row; W1/W2 carry NO unit column
+(the questionnaire fixes one unit per item) so the unit is the per-item
+fixed C8 unit (_W1W2_PRICE_UNIT).  All 30 units used already exist in `u`
+(no extension needed).
+
+** Framework-compatibility shim (the i==v level)
+
+community_prices is cluster-level, but local_tools.map_index() (run on every
+read) unconditionally swaps a j index level to i whenever i is absent --
+which would rename our item level `j` to `i` and collapse the table to
+(t, v, u).  community_prices_for_wave carries a redundant i level (= v)
+positioned BEFORE j, so map_index sees i present and does not swap;
+_normalize_dataframe_index then drops the undeclared i, leaving the
+canonical (t, v, j, u).  Same shim Tanzania/Malawi/Ethiopia/Mali use.  This
+is also why the build is split into per-wave scripts + a country
+concatenator (mirroring food_acquired): the wave path preserves the grain;
+the country-only fallback path's map_index would corrupt it.
+
+** Coverage of priced rows
+
+W3-W5 resolve via Code (the consumption scheme); near-complete.  W1 98.5% of
+positive-price rows resolve to a label (the only drops are the non-food
+community codes 951 Cigarette / 952 Tobacco -- deliberately excluded as
+non-food).  W2 94.7% resolve: in addition to the same tobacco drop, a small
+W2-only block of undocumented "other miscellaneous foods" sub-codes
+(191x/192x/193x, ~4% of W2 rows) has no authoritative label in the retained
+documentation and is left unresolved rather than guessed (no faked labels).
