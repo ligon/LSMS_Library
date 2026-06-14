@@ -53,6 +53,45 @@ def v(x):
     return format_id(x)
 
 
+def _format_agsec_hhid(s, t):
+    """Canonical household id for Uganda's AGSEC (agricultural) modules.
+
+    Uganda's **2013-14** AGSEC modules (AGSEC2*--AGSEC6*) encode ``HHID``
+    as a stripped *integer* (e.g. ``1100401``), whereas the GSEC
+    household modules, :meth:`Country.sample`, and the panel-id map
+    (``updated_ids['2013-14']``) all use the dashed string form
+    (``H00110-04-01``).  The integer is exactly that string with the
+    ``'H'``, the leading zeros, and the dashes removed -- so the two are
+    a deterministic, invertible pair (verified: all 2394 distinct AGSEC
+    ids round-trip to valid GSEC ids).
+
+    Left unfixed, every AGSEC-derived feature's ``i`` for 2013-14 matches
+    neither ``sample()``'s ids nor the panel-id map: ``_join_v_from_sample``
+    yields 100% NaN ``v`` and the whole wave is silently dropped from the
+    derived tables, while ``id_walk`` cannot canonicalize the ids (its
+    source keys are the ``H...`` strings).  See GH #256 and the v-join
+    warning in country.py for the failure mode.
+
+    Only 2013-14 is affected: 2015-16 AGSEC already carries the H-form,
+    and 2018-19 / 2019-20 use their own (numeric / hash) canonical ids
+    that must **not** be reformatted -- hence the decode is gated on the
+    wave.  For every other wave this is exactly ``s.apply(format_id)``.
+    """
+    out = s.apply(format_id)
+    if t != '2013-14':
+        return out
+
+    def _decode(x):
+        if pd.isna(x):
+            return x
+        xs = str(x)
+        if xs.isdigit():
+            return f'H{xs[:-4].zfill(5)}-{xs[-4:-2]}-{xs[-2:]}'
+        return xs
+
+    return out.apply(_decode)
+
+
 # Data to link household ids across waves
 Waves = {'2005-06':(),
          '2009-10':(), # ID of parent household  in ('GSEC1.dta',"HHID",'HHID_parent'), but not clear how to use
@@ -649,7 +688,7 @@ def plot_features_for_wave(t, source_2a, source_2b, colmap):
 
         # Build the per-row canonical frame
         c = colmap  # alias
-        hh = src[c['hhid']].apply(format_id)
+        hh = _format_agsec_hhid(src[c['hhid']], t)
         parcel = src[c['parcel_id']].apply(format_id)
         plot_id = parcel.astype(str) + f'_{letter}'
 
@@ -930,7 +969,7 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
     planting_lookup = {}   # (hh, parcel, plot, crop) -> Int month
     ic = colmap.get('intercrop')
     if df4a is not None and ic is not None:
-        hh4 = df4a[ic['hhid']].apply(format_id)
+        hh4 = _format_agsec_hhid(df4a[ic['hhid']], t)
         pa4 = df4a[ic['parcel']].apply(format_id)
         pl4 = df4a[ic['plot']].apply(format_id)
         key3 = list(zip(hh4, pa4, pl4))
@@ -962,7 +1001,7 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
         if cm is None:
             continue
 
-        hh = df5[cm['hhid']].apply(format_id)
+        hh = _format_agsec_hhid(df5[cm['hhid']], t)
         parcel = df5[cm['parcel']].apply(format_id)
         plot = df5[cm['plot']].apply(format_id) if cm.get('plot') and cm['plot'] in df5.columns else pd.Series(['']*len(df5), index=df5.index)
         plot_id = hh.astype(str) + '-' + parcel.astype(str) + '-' + plot.astype(str)
@@ -1270,7 +1309,7 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
         cm = (colmap.get(season) or {}).get('inputs')
         if not cm:
             continue
-        hh = df3[cm['hhid']].apply(format_id)
+        hh = _format_agsec_hhid(df3[cm['hhid']], t)
         parcel = df3[cm['parcel']].apply(format_id)
         plot = (df3[cm['plot']].apply(format_id)
                 if cm.get('plot') and cm['plot'] in df3.columns
@@ -1340,7 +1379,7 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
     # ---- seed block from AGSEC4A (plot-crop grain) ----
     sc = colmap.get('seed')
     if df4a is not None and len(df4a) and sc:
-        hh = df4a[sc['hhid']].apply(format_id)
+        hh = _format_agsec_hhid(df4a[sc['hhid']], t)
         parcel = df4a[sc['parcel']].apply(format_id)
         plot = (df4a[sc['plot']].apply(format_id)
                 if sc.get('plot') and sc['plot'] in df4a.columns
@@ -1694,7 +1733,7 @@ def livestock_for_wave(t, df6a, df6b, df6c, colmap):
         if cm is None:
             continue
 
-        hh = df6[cm['hhid']].apply(format_id)
+        hh = _format_agsec_hhid(df6[cm['hhid']], t)
 
         # --- resolve canonical species ---
         tcol = cm['type']
@@ -2193,7 +2232,7 @@ def plot_labor_for_wave(t, df3a, df3b, colmap):
         cm = (colmap or {}).get(season)
         if not cm:
             continue
-        hh = df3[cm['hhid']].apply(format_id)
+        hh = _format_agsec_hhid(df3[cm['hhid']], t)
         parcel = df3[cm['parcel']].apply(format_id)
         plot = (df3[cm['plot']].apply(format_id)
                 if cm.get('plot') and cm['plot'] in df3.columns
