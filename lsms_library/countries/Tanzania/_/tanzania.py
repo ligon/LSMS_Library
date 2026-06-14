@@ -1349,3 +1349,250 @@ def livestock_for_wave(t, lf, colmap):
         })
     out = out[LIVESTOCK_COLUMNS]
     return out
+
+
+# ---------------------------------------------------------------------------
+# Labor features (parity-loop GAP 3).  TWO distinct natural grains:
+#
+#   plot_labor        (t, i, plot_id, source)  -- plot-level person-days of
+#                     labor by source {family, hired}, from AG_SEC_3A, joins
+#                     crop_production / plot_inputs on (t, i, plot_id).
+#   people_last7days  (t, i, pid)              -- per-INDIVIDUAL 7-day activity
+#                     dummies / hours / wage-work industry, from HH_SEC_E1.
+#
+# Both store REPORTED person-level/plot-level fields ONLY.  The WB aggregate
+# constructs (total_labor_days / total_family_labor_days /
+# total_hired_labor_days = sums over plot_labor by source; hired_labor_value =
+# median-wage valuation over the hired rows) are TRANSFORMATIONS over these
+# rows, NEVER stored here.
+# ---------------------------------------------------------------------------
+
+# plot_labor at the natural grain (t, i, plot_id, source) -- one row per
+# (plot, source) -- carrying REPORTED person-days and (hired only) reported
+# cash wage.  source in {family, hired}; the GAP-3 schema also allows
+# {other/exchange} cross-country, but the NPS-SDD / Y5 AG_SEC_3A instrument
+# records no free / exchange labor block, so no 'other' rows arise for Tanzania
+# (we do not fabricate them).
+PLOT_LABOR_COLUMNS = ['PersonDays', 'Wage']
+
+# Plausibility ceiling for a per-(plot, gender, task) person-day cell.  A
+# single farm task in one season cannot legitimately absorb hundreds of
+# person-days from one gender group; values this large are data-entry errors
+# where a TSH wage amount was typed into a day field (2020-21 ag3a_74_1c reaches
+# 450000, ~0.7% of hired-labor plots carry such a corrupt cell).  Clamp cells
+# above 730 (two person-years) to NaN -- well above any plausible single-task
+# smallholder figure, so only the corrupt entries drop.  Same plausibility-clamp
+# discipline livestock / plot_features already use (GH #167).
+_PLOT_LABOR_DAY_CEILING = 730
+
+
+def _clamp_days(series):
+    """Coerce a reported person-day column to nullable Float64 (>=0; negatives
+    and values above the plausibility ceiling -> NaN)."""
+    v = pd.to_numeric(series, errors='coerce').astype('Float64')
+    return v.where((v >= 0) & (v <= _PLOT_LABOR_DAY_CEILING), pd.NA)
+
+
+def plot_labor_for_wave(t, sec3a, colmap):
+    """Build canonical ``plot_labor`` for one Tanzania NPS wave from AG_SEC_3A.
+
+    Item-level plot labor at grain (t, i, plot_id, source), source in
+    {family, hired}:
+
+      HIRED -- gated by ag3a_73 (did you hire labor? 1=yes/2=no).  PersonDays =
+        Sum over the three farm tasks (Land Prep / Weeding / Harvest, blocks
+        1/2/3) of the per-gender day cells ag3a_74_{1,2,3}{a,b,c} (woman / man /
+        child).  Wage = Sum over tasks of the cash paid ag3a_74_{1,2,3}d [TSH].
+        When ag3a_73==2 (no hired labor) PersonDays and Wage are 0.
+
+      FAMILY -- the household members' own reported days on the plot.  In
+        2020-21 (Y5) the questionnaire records per-member DAYS for each of the
+        three tasks (ag3a_72c_* prep / ag3a_72g_* weeding / ag3a_72k_*
+        harvest); PersonDays = the rowtotal over all member slots and tasks.
+        In 2019-20 (NPS-SDD) the family block records only the WORKER ROSTER IDs
+        per task (ag3a_72b/f/j_*) and NO day columns, so family person-days are
+        NOT reported that wave -- we emit NO family rows for 2019-20 rather than
+        fabricate a count (the WB NPS5.do rowtotals the ID columns as "days",
+        which we deliberately do NOT reproduce).  Wage is NaN for family rows.
+
+    Parameters
+    ----------
+    t : str            wave id ('2019-20' or '2020-21').
+    sec3a : pd.DataFrame   raw AG_SEC_3A (convert_categoricals=False).
+    colmap : dict with keys hhid, plot (the id columns: sdd_hhid/plotnum for
+        2019-20, y5_hhid/plot_id for 2020-21).
+
+    Returns
+    -------
+    pd.DataFrame indexed by (t, i, plot_id, source) with columns
+    PLOT_LABOR_COLUMNS (PersonDays, Wage).
+    """
+    c = colmap
+    hh = sec3a[c['hhid']].apply(format_id)
+    plot = sec3a[c['plot']].apply(format_id)
+
+    rows = []
+
+    # --- HIRED labor (ag3a_73 / ag3a_74_*) ------------------------------
+    hire_yn = pd.to_numeric(sec3a['ag3a_73'], errors='coerce')
+    day_cols = [f'ag3a_74_{task}{g}'
+                for task in (1, 2, 3) for g in ('a', 'b', 'c')]
+    wage_cols = [f'ag3a_74_{task}d' for task in (1, 2, 3)]
+    hired_days = pd.concat([_clamp_days(sec3a[col]) for col in day_cols],
+                           axis=1).sum(axis=1, min_count=1)
+    hired_wage = pd.concat(
+        [pd.to_numeric(sec3a[col], errors='coerce').astype('Float64')
+         for col in wage_cols],
+        axis=1).sum(axis=1, min_count=1)
+    # ag3a_73==2 -> the household hired no labor: 0 days, 0 wage.
+    hired_days = hired_days.where(hire_yn != 2, 0)
+    hired_wage = hired_wage.where(hire_yn != 2, 0)
+    hired = pd.DataFrame({
+        'i': hh.values, 'plot_id': plot.values, 'source': 'hired',
+        'PersonDays': hired_days.values, 'Wage': hired_wage.values,
+    })
+    # Keep a hired row only where the hire question was answered.
+    hired = hired[hire_yn.notna().values]
+    rows.append(hired)
+
+    # --- FAMILY labor -- DAYS only where the wave records them -----------
+    # 2020-21: ag3a_72c_* (prep) + ag3a_72g_* (weeding) + ag3a_72k_* (harvest).
+    fam_day_prefixes = ['ag3a_72c_', 'ag3a_72g_', 'ag3a_72k_']
+    fam_day_cols = [col for col in sec3a.columns
+                    if any(col.startswith(p) and col[len(p):].isdigit()
+                           for p in fam_day_prefixes)]
+    if fam_day_cols:
+        fam_days = pd.concat([_clamp_days(sec3a[col]) for col in fam_day_cols],
+                             axis=1).sum(axis=1, min_count=1)
+        family = pd.DataFrame({
+            'i': hh.values, 'plot_id': plot.values, 'source': 'family',
+            'PersonDays': fam_days.values,
+            'Wage': pd.array([pd.NA] * len(sec3a), dtype='Float64'),
+        })
+        # Keep a family row only where a day total is reported (>=0).
+        family = family[fam_days.notna().values]
+        rows.append(family)
+    # else (2019-20): family block is worker-IDs only, no days -> no family
+    # rows for this wave.
+
+    df = pd.concat([r for r in rows if r is not None and len(r)],
+                   ignore_index=True)
+    df['t'] = t
+    df = df.set_index(['t', 'i', 'plot_id', 'source'])
+    # Collapse the rare duplicate (t,i,plot_id,source): sum reported days,
+    # sum reported wage (min_count=1 keeps an all-NA group NA).
+    if not df.index.is_unique:
+        def _sum1(s):
+            return s.sum(min_count=1)
+        df = df.groupby(level=['t', 'i', 'plot_id', 'source']).agg({
+            'PersonDays': _sum1, 'Wage': _sum1,
+        })
+    df = df[PLOT_LABOR_COLUMNS]
+    return df
+
+
+# people_last7days at the natural grain (t, i, pid) -- one row per INDIVIDUAL,
+# carrying the REPORTED 7-day activity dummies / hours / wage-work industry,
+# mirroring Uganda's (the one country that already has this feature) construct.
+# Source HH_SEC_E1, following the NPS5.do labor block (lines 1026-1058) but
+# using the LABEL-CORRECT dummy<->hours pairing (the .do swaps farm_hrs/wage_hrs
+# relative to its own dummies; we pair each hours item with the activity it
+# actually times, per the questionnaire labels).
+PEOPLE_LAST7DAYS_COLUMNS = [
+    'farm_work', 'SOB_work', 'wage_work',
+    'farm_hrs', 'SB_hrs', 'wage_hrs',
+    'industry', 'working_age',
+]
+
+
+def _industry_from_isic(sec, isic_col, in_wage_emp):
+    """Classify the ISIC-division sector code (hh_e31b_2) into the canonical
+    coarse industry label, following the NPS .do ranges.  Only meaningful for
+    individuals in wage employment (``in_wage_emp`` True); others -> NA."""
+    s = pd.to_numeric(sec[isic_col], errors='coerce')
+    ind = pd.Series(pd.NA, index=sec.index, dtype='object')
+    ind = ind.mask((s == 1) | (s == 2), 'Agriculture')
+    ind = ind.mask(s == 3, 'Fishing')
+    ind = ind.mask((s >= 5) & (s <= 9), 'Mining')
+    ind = ind.mask((s >= 10) & (s <= 37), 'Manufacturing')
+    ind = ind.mask((s >= 41) & (s <= 43), 'Construction')
+    ind = ind.mask((s >= 45) & (s <= 4000), 'Services')
+    ind = ind.where(in_wage_emp.fillna(False), pd.NA)
+    return ind.astype('string')
+
+
+def people_last7days_for_wave(t, sec, colmap):
+    """Build canonical ``people_last7days`` for one Tanzania NPS wave.
+
+    Per-individual 7-day activity at grain (t, i, pid) from HH_SEC_E1:
+      farm_work  = hh_e07 (worked in HH agriculture, last 7 days)  1->1 / 2->0
+      SOB_work   = hh_e05 (ran an own non-farm business, last 7 days)
+      wage_work  = hh_e03 (worked as a wage employee, last 7 days)
+      farm_hrs   = hh_e08 (hours in HH ag),  0 if farm_work==0
+      SB_hrs     = hh_e06 (hours in own business), 0 if SOB_work==0
+      wage_hrs   = hh_e04 (hours in wage work), 0 if wage_work==0
+      industry   = coarse ISIC class of the wage job (hh_e31b_2), wage workers
+                   only (gated by hh_e28, "is the answer to wage-work Q yes?")
+      working_age= hh_e01_1==1 (member is 5 years or above)
+    All dummies / hours are set to 0 for members below working age, mirroring
+    the WB .do (every activity is zeroed when working_age==0).
+
+    Parameters
+    ----------
+    t : str            wave id ('2019-20' or '2020-21').
+    sec : pd.DataFrame    raw HH_SEC_E1 (convert_categoricals=False).
+    colmap : dict with keys hhid, pid (sdd_hhid/sdd_indid for 2019-20,
+        y5_hhid/indidy5 for 2020-21).
+
+    Returns
+    -------
+    pd.DataFrame indexed by (t, i, pid) with columns PEOPLE_LAST7DAYS_COLUMNS.
+    """
+    c = colmap
+    working_age = (pd.to_numeric(sec['hh_e01_1'], errors='coerce') == 1)
+
+    def _dummy(col):
+        v = pd.to_numeric(sec[col], errors='coerce').astype('Int64')
+        return v.map({1: True, 2: False}).astype('boolean')
+
+    def _hrs(col, work_dummy):
+        v = pd.to_numeric(sec[col], errors='coerce').astype('Float64')
+        # hours are meaningful only for those who did the activity; set 0 where
+        # the activity dummy is False (matching the .do gating).
+        return v.where(work_dummy.fillna(False), 0)
+
+    farm_work = _dummy('hh_e07')
+    sob_work = _dummy('hh_e05')
+    wage_work = _dummy('hh_e03')
+    in_wage_emp = (pd.to_numeric(sec['hh_e28'], errors='coerce') == 1)
+
+    out = pd.DataFrame({
+        'i': sec[c['hhid']].apply(format_id).values,
+        'pid': sec[c['pid']].apply(format_id).values,
+        'farm_work': farm_work.values,
+        'SOB_work': sob_work.values,
+        'wage_work': wage_work.values,
+        'farm_hrs': _hrs('hh_e08', farm_work).values,
+        'SB_hrs': _hrs('hh_e06', sob_work).values,
+        'wage_hrs': _hrs('hh_e04', wage_work).values,
+        'industry': _industry_from_isic(sec, 'hh_e31b_2', in_wage_emp).values,
+        'working_age': working_age.values,
+    })
+
+    # Below working age: zero every activity dummy / hours (the .do convention),
+    # but keep the row -- working_age itself stays the truthful flag.
+    not_wa = ~out['working_age']
+    for col in ('farm_work', 'SOB_work', 'wage_work'):
+        out.loc[not_wa, col] = False
+    for col in ('farm_hrs', 'SB_hrs', 'wage_hrs'):
+        out.loc[not_wa, col] = 0
+    out.loc[not_wa, 'industry'] = pd.NA
+
+    out['working_age'] = out['working_age'].astype('boolean')
+    out['t'] = t
+    out = out.set_index(['t', 'i', 'pid'])
+    # Drop rows whose every activity field is null (no labor screen answered).
+    if not out.index.is_unique:
+        out = out.groupby(level=['t', 'i', 'pid']).first()
+    out = out[PEOPLE_LAST7DAYS_COLUMNS]
+    return out

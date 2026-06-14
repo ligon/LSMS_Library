@@ -102,6 +102,24 @@ $(VAR_DIR)/anthropometry.parquet: anthropometry.py $(anthropometry_parquet)
 ../%/_/anthropometry.parquet:
 	(cd $(@D) && python anthropometry.py)
 
+plot_labor = $(shell find $(rounds) -name plot_labor.py)
+plot_labor_parquet := $(plot_labor:.py=.parquet)
+
+$(VAR_DIR)/plot_labor.parquet: plot_labor.py $(plot_labor_parquet)
+	python plot_labor.py
+
+../%/_/plot_labor.parquet:
+	(cd $(@D) && python plot_labor.py)
+
+people_last7days = $(shell find $(rounds) -name people_last7days.py)
+people_last7days_parquet := $(people_last7days:.py=.parquet)
+
+$(VAR_DIR)/people_last7days.parquet: people_last7days.py $(people_last7days_parquet)
+	python people_last7days.py
+
+../%/_/people_last7days.parquet:
+	(cd $(@D) && python people_last7days.py)
+
 %.parquet: %.py CONTENTS.org tanzania.py
 	(cd $(@D) && python ./$(<F))
 
