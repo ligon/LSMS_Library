@@ -687,3 +687,141 @@
 | 2019-20 | 2B   |    8 | use_right       |
 | 2019-20 | 2B   |    9 | squatted        |
 | 2019-20 | 2B   |   96 | other_tenure    |
+
+# harmonize_crop: crop-item code -> Preferred Label for the post-harvest
+# crop module (AGSEC5A/5B cropID).  The UNPS crop-code scheme is SEPARATE
+# from the food-consumption harmonize_food Code scheme (crop 130 = Maize
+# but food 130 = Passion Fruits), so crop labels live in their own table.
+# Where a crop is also a consumed food the Preferred Label REUSES the
+# harmonize_food *Aggregate Label* string (Maize, Beans, Rice, Sorghum,
+# Cassava, Sweet Potatoes, Ground Nuts, Sim Sim, Coffee, Tea, Onions,
+# Tomatoes, Cabbages, Sugarcane, Mangos, Oranges, Pineapple, Avocado,
+# Pawpaw, Passion Fruits, Soybean, Yam, Jackfruit, Millet) so
+# crop_production.j joins food_acquired(labels='Aggregate').j.  Non-food
+# crops (Cotton, Tobacco, Cocoa, Vanilla, Sunflower, Finger Millet, Field
+# / Cow / Pigeon / Chick Peas, Banana Beer, Cocoyam, Green Gram) get new
+# labels.  Land-status / non-crop codes (Fallow, Bush, Pastures, Forest,
+# Other) keep their literal label.
+#+name: harmonize_crop
+| Code | Preferred Label  |
+|------+------------------|
+|  111 | Wheat            |
+|  112 | Barley           |
+|  120 | Rice             |
+|  130 | Maize            |
+|  141 | Finger Millet    |
+|  150 | Sorghum          |
+|  210 | Beans            |
+|  211 | Beans            |
+|  221 | Field Peas       |
+|  222 | Cow Peas         |
+|  223 | Pigeon Peas      |
+|  224 | Chick Peas       |
+|  310 | Ground Nuts      |
+|  320 | Soybean          |
+|  330 | Sunflower        |
+|  340 | Sim Sim          |
+|  410 | Cabbages         |
+|  420 | Tomatoes         |
+|  430 | Carrots          |
+|  440 | Onions           |
+|  450 | Pumpkins         |
+|  460 | Dodo             |
+|  470 | Eggplant         |
+|  480 | Other Vegetable  |
+|  490 | Other Vegetable  |
+|  510 | Sugarcane        |
+|  520 | Cotton           |
+|  530 | Tobacco          |
+|  610 | Irish Potatoes   |
+|  620 | Sweet Potatoes   |
+|  630 | Cassava          |
+|  640 | Yam              |
+|  650 | Cocoyam          |
+|  700 | Oranges          |
+|  710 | Pawpaw           |
+|  720 | Pineapple        |
+|  741 | Banana Food      |
+|  742 | Banana Beer      |
+|  744 | Sweet Bananas    |
+|  750 | Mangos           |
+|  760 | Jackfruit        |
+|  770 | Avocado          |
+|  780 | Passion Fruits   |
+|  810 | Coffee           |
+|  811 | Coffee           |
+|  812 | Coffee           |
+|  820 | Cocoa            |
+|  830 | Tea              |
+|  840 | Ginger           |
+|  860 | Other Spice      |
+|  870 | Vanilla          |
+|  890 | Other Crop       |
+|  891 | Other Crop       |
+|  910 | Natural Pasture  |
+|  920 | Improved Pasture |
+|  930 | Fallow           |
+|  940 | Bush             |
+|  950 | Natural Forest   |
+|  960 | Plantation Trees |
+|  990 | Other Forest     |
+|  991 | Green Gram       |
+
+# harvest_units: harvest measurement-unit code -> Preferred Label for the
+# post-harvest crop module (AGSEC5A/5B a5aq6c / s5aq06b_1 and sold a5aq7c
+# / s5aq07c_1).  This is the UNPS *harvest* unit scheme (1=Kg, sacks,
+# tins, baskets, bunches, ...), distinct from the food-consumption u
+# scheme.  Preferred Labels reuse the canonical u-table unit strings where
+# they coincide (Kg, Sack/Tin/Basket/Bunch sizes, Number of Units
+# (General)).  kg-conversion factors are NOT stored here (they live in
+# transformations; the survey also carries a per-row conversion factor
+# a5aq6d / s5aq06d_1).
+#+name: harvest_units
+| Code | Preferred Label                   |
+|------+-----------------------------------|
+|    1 | Kg                                |
+|    2 | Gram                              |
+|    9 | Sack (120 kgs)                    |
+|   10 | Sack (100 kgs)                    |
+|   11 | Sack (80 kgs)                     |
+|   12 | Sack (50 kgs)                     |
+|   13 | Sack (unspecified)                |
+|   14 | Jerrican (20 lts)                 |
+|   15 | Jerrican (10 lts)                 |
+|   16 | Jerrican (5 lts)                  |
+|   17 | Jerrican (3 lts)                  |
+|   18 | Jerrican (2 lts)                  |
+|   20 | Tin (Debe) (20 lts)               |
+|   21 | Tin (5 lts)                       |
+|   22 | Plastic Basin (15 lts)            |
+|   29 | Kimbo/Cowboy/Blueband Tin (2kg)   |
+|   30 | Kimbo/Cowboy/Blueband Tin (1kg)   |
+|   31 | Kimbo/Cowboy/Blueband Tin (0.5kg) |
+|   32 | Cup/Mug(0.5lt)                    |
+|   37 | Basket (20 kg)                    |
+|   38 | Basket (10 kg)                    |
+|   39 | Basket (5 kg)                     |
+|   40 | Basket (2 kg)                     |
+|   63 | Crate                             |
+|   64 | Heap (unspecified)                |
+|   66 | Bundle (Unspecified)              |
+|   67 | Bunch (Big)                       |
+|   68 | Bunch (Medium)                    |
+|   69 | Bunch (Small)                     |
+|   70 | Cluster (Unspecified)             |
+|   83 | Tobacco leaf (Number)             |
+|   85 | Number of Units (General)         |
+|   87 | Piece (Big)                       |
+|   88 | Piece (Medium)                    |
+|   89 | Piece (Small)                     |
+|   90 | Heap (Big)                        |
+|   91 | Heap (Medium)                     |
+|   92 | Heap (Small)                      |
+|   93 | Cluster (Big)                     |
+|   94 | Cluster (Medium)                  |
+|   95 | Cluster (Small)                   |
+|   99 | Others specify                    |
+|  107 | Nice cup (100g) - Large           |
+|  108 | Nice cup (60g) - Medium           |
+|  119 | Nomi Tin (1kg)                    |
+|  120 | Nomi Tin (500g)                   |

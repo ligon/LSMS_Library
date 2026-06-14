@@ -123,3 +123,35 @@ Data Scheme:
     SoilType: str
     Irrigated: bool
     materialize: make
+  crop_production:
+    # Item-level harvest, GAP 1 (parity loop).  One row per (t, i, plot,
+    # crop): the REPORTED quantities the survey records, NOT aggregates.
+    # The crop/harvest module lives in the EACI waves only (2014-15 EACI14
+    # s3a/s3b/s1c; 2017-18 EACI17 s7f/s7g/s11f/s11c).  The EHCVM waves
+    # (2018-19, 2021-22) have no harvest block — deferred (the same split
+    # as plot_features, but the opposite two waves).
+    #
+    # plot = "{field}_{parcel}" for seasonal crops; <NA> for perennial
+    # trees (the perennial roster is not on the seasonal field grid).
+    # crop = harmonize_food Preferred Label (food crops REUSE the consumed-
+    # food label so crop_production.j joins food_acquired.j; non-food crops
+    # — Coton, Soja, Voandzou, Dah/Fibre, tree species — get new labels).
+    # u   = harmonize unit label (`u` categorical table).
+    #
+    # NO harvest_kg / yield / main_crop / value-share columns — those are
+    # transformations.py rollups over these item rows.  2017-18 sold qty/
+    # value is recorded at (household, crop) grain (module s7g), so it is
+    # attached at the plot level only for single-plot crops; multi-plot
+    # crops carry NaN sold (see the wave script).  intercropped is recorded
+    # in 2014-15 (s1cq05 Pure/Association) only; NaN in 2017-18.
+    # Built by per-wave scripts + a country-level concatenator.
+    index: (t, i, plot, crop)
+    Quantity: float
+    u: str
+    Quantity_sold: float
+    Value_sold: float
+    planting_month: int
+    harvest_month: int
+    intercropped: bool
+    perennial: bool
+    materialize: make

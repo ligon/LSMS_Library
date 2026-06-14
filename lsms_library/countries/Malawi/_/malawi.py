@@ -731,6 +731,218 @@ def plot_features_for_wave(t, df_c, df_d, colmap):
     return out
 
 
+# --- crop_production / harvest (GAP 1) ----------------------------------
+# Item-level (t, i, plot, crop) harvest feature.  Two source modules feed
+# the plot-crop grain:
+#   * Module G  — seasonal (rainy-season) crop harvest, one row per
+#     (plot, crop).  Crop codes 1-48 (harmonize_crop).
+#   * Module P  — perennial / tree-crop harvest, one row per (plot, crop).
+#     Crop codes offset +1000 (1001-1018) to disambiguate the namespace,
+#     exactly as the World Bank cleaning code does (MWI_IHPS1.do:59).
+# Two further modules carry the SALE, but only at the household-crop grain
+# (NO plot id in the questionnaire):
+#   * Module I  — seasonal harvest sale, one row per (hh, crop).
+#   * Module Q  — perennial harvest sale, one row per (hh, crop).
+# We therefore attach the REPORTED Quantity_sold / Value_sold to a
+# plot-crop row ONLY when that (i, crop) is grown on exactly one plot, so
+# the reported value unambiguously belongs to that single plot-crop.
+# Where a crop spans several plots, the sale is not plot-resolvable and
+# those columns stay NaN -- we never fabricate a per-plot split of a
+# household-level reported figure.  Everything aggregate (harvest_kg,
+# yield, share_kg_sold, main_crop, value-shares) is a transformations.py
+# concern, NOT a stored column.
+
+# Module G/I/P/Q "non-standard unit" codes -> months map is for dates;
+# the 1-12 month codes are the standard Stata month value labels.
+_MONTH_CODES = {i: i for i in range(1, 13)}  # months stored as 1-12 ints
+
+
+def _crop_codes(series, perennial=False):
+    """Map a numeric crop-code Series through harmonize_crop, applying
+    the +1000 perennial offset first when ``perennial`` is True.  Source
+    must be loaded convert_categoricals=False (numeric codes)."""
+    codes = pd.to_numeric(series, errors='coerce').astype('Int64')
+    if perennial:
+        codes = codes + 1000
+    cmap = _malawi_code_map('harmonize_crop')
+    out = codes.map(cmap)
+    return out.astype('string').where(out.notna(), pd.NA), codes
+
+
+def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
+                   plant_m=None, plant_y=None, harv_m=None, intercrop=None,
+                   perennial=False, t=None):
+    """Reshape one harvest module (G or P) to canonical long rows.
+
+    All keyword args are RAW column names in ``df`` (or None when the
+    wave/module lacks that field).  ``df`` must already carry an ``hhid``
+    string column.  Returns a long DataFrame with the canonical columns
+    (i, plot, crop, crop_code, Quantity, u, planting_month, harvest_month,
+    intercropped, perennial) -- NO aggregation.
+    """
+    unit_map = _malawi_code_map('harmonize_crop_unit')
+
+    crop_label, crop_code_int = _crop_codes(df[cropcode], perennial=perennial)
+    plot = df[plotkey].apply(format_id).astype('string')
+
+    u = (pd.to_numeric(df[unit], errors='coerce').astype('Int64').map(unit_map)
+         if unit is not None and unit in df.columns
+         else pd.Series(pd.NA, index=df.index, dtype='string'))
+    u = u.astype('string').where(u.notna(), pd.NA)
+
+    quantity = (pd.to_numeric(df[qty], errors='coerce').astype('Float64')
+                if qty is not None and qty in df.columns
+                else pd.Series(pd.NA, index=df.index, dtype='Float64'))
+
+    def _month(col):
+        if col is None or col not in df.columns:
+            return pd.Series(pd.NA, index=df.index, dtype='Int64')
+        m = pd.to_numeric(df[col], errors='coerce').astype('Int64')
+        # Calendar months are 1-12; 0 / out-of-range codes are "not
+        # recorded" sentinels -> NaN.
+        return m.where((m >= 1) & (m <= 12), pd.NA)
+
+    planting_month = _month(plant_m)
+    harvest_month = _month(harv_m)
+
+    # intercropped flag: Module G ag_g01 crop-stand code (1 = pure/sole;
+    # >=2 = some form of intercrop/mixed stand).  Perennial rows: NaN.
+    if intercrop is not None and intercrop in df.columns:
+        stand = pd.to_numeric(df[intercrop], errors='coerce').astype('Int64')
+        intercropped = (stand >= 2).astype('boolean')
+        intercropped = intercropped.where(stand.notna(), pd.NA)
+    else:
+        intercropped = pd.Series(pd.NA, index=df.index, dtype='boolean')
+
+    out = pd.DataFrame({
+        't':              t,
+        'i':              df['hhid'].astype('string').values,
+        'plot':           plot.values,
+        'crop':           crop_label.values,
+        '_crop_code':     crop_code_int.values,
+        'Quantity':       quantity.values,
+        'u':              u.values,
+        'planting_month': planting_month.values,
+        'harvest_month':  harvest_month.values,
+        'intercropped':   intercropped.values,
+        'perennial':      pd.array([perennial] * len(df), dtype='boolean'),
+    })
+    # Drop rows with no crop identity (crop code missing) — not a planted
+    # item.  Keep rows with a crop even if Quantity is NaN (reported "no
+    # harvest yet"/refused are legitimately item rows).
+    out = out[out['crop'].notna() | out['_crop_code'].notna()]
+    return out
+
+
+def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
+                perennial=False):
+    """Reshape one sale module (I or Q) to (i, _crop_code) reported sale.
+
+    Returns a DataFrame with columns [i, _crop_code, Quantity_sold,
+    Value_sold] at the household-crop grain (no plot).  Summed within
+    (i, _crop_code) because a household may report several sale rows for
+    the same crop -- this is the REPORTED total the household sold of that
+    crop, not a derived aggregate over plots.
+    """
+    crop_label, crop_code_int = _crop_codes(df[cropcode], perennial=perennial)
+
+    qs = (pd.to_numeric(df[qty_sold], errors='coerce').astype('Float64')
+          if qty_sold is not None and qty_sold in df.columns
+          else pd.Series(pd.NA, index=df.index, dtype='Float64'))
+    vs = (pd.to_numeric(df[value_sold], errors='coerce').astype('Float64')
+          if value_sold is not None and value_sold in df.columns
+          else pd.Series(pd.NA, index=df.index, dtype='Float64'))
+
+    out = pd.DataFrame({
+        'i':            df['hhid'].astype('string').values,
+        '_crop_code':   crop_code_int.values,
+        'Quantity_sold': qs.values,
+        'Value_sold':   vs.values,
+    })
+    out = out[out['_crop_code'].notna()]
+    grp = out.groupby(['i', '_crop_code'], as_index=False).agg(
+        {'Quantity_sold': 'sum', 'Value_sold': 'sum'})
+    return grp
+
+
+def assemble_crop_production(t, harvest_pieces, sale_pieces):
+    """Combine reshaped harvest (_harvest_block) and sale (_sale_block)
+    pieces into the canonical crop_production DataFrame for wave ``t``.
+
+    Parameters
+    ----------
+    t : str — wave id, used as the ``t`` index value.
+    harvest_pieces : list[pd.DataFrame] — outputs of _harvest_block.
+    sale_pieces : list[pd.DataFrame] — outputs of _sale_block (may be []).
+
+    Returns
+    -------
+    pd.DataFrame indexed (t, i, plot, crop) with columns Quantity, u,
+    Quantity_sold, Value_sold, planting_month, harvest_month,
+    intercropped, perennial.  Item-level reported values only.
+    """
+    harv = pd.concat(harvest_pieces, ignore_index=True)
+
+    # Collapse exact duplicate (i, plot, crop, u) harvest rows by summing
+    # reported quantity (a plot-crop may be split across several recorded
+    # lines in the same unit); keep the first non-null date/flag.  This is
+    # a reported-line consolidation, NOT a cross-unit aggregation: rows in
+    # different units `u` stay distinct.
+    harv['u'] = harv['u'].astype('string')
+    harv = harv.groupby(['i', 'plot', 'crop', 'u', '_crop_code'],
+                        as_index=False, dropna=False).agg({
+        'Quantity':       'sum',
+        'planting_month': 'first',
+        'harvest_month':  'first',
+        'intercropped':   'first',
+        'perennial':      'first',
+    })
+
+    if sale_pieces:
+        sale = pd.concat(sale_pieces, ignore_index=True)
+        sale = sale.groupby(['i', '_crop_code'], as_index=False).agg(
+            {'Quantity_sold': 'sum', 'Value_sold': 'sum'})
+        # Attach sale ONLY where the (i, crop) is grown on exactly one
+        # plot, so the household-crop reported figure unambiguously
+        # belongs to that single plot-crop.  Multi-plot crops keep NaN.
+        nplots = (harv.groupby(['i', '_crop_code'])['plot']
+                  .nunique().rename('_nplots').reset_index())
+        harv = harv.merge(nplots, on=['i', '_crop_code'], how='left')
+        harv = harv.merge(sale, on=['i', '_crop_code'], how='left')
+        single = harv['_nplots'] == 1
+        harv['Quantity_sold'] = harv['Quantity_sold'].where(single, pd.NA)
+        harv['Value_sold'] = harv['Value_sold'].where(single, pd.NA)
+        harv = harv.drop(columns=['_nplots'])
+    else:
+        harv['Quantity_sold'] = pd.array([pd.NA] * len(harv), dtype='Float64')
+        harv['Value_sold'] = pd.array([pd.NA] * len(harv), dtype='Float64')
+
+    harv = harv.drop(columns=['_crop_code'])
+    harv['t'] = t
+
+    # crop must be non-null for the index; rows where the code did not map
+    # to a Preferred Label (only code 48/1018 "Other (Specify)" and any
+    # unmapped) are dropped from the index axis but logged by row count.
+    harv = harv[harv['crop'].notna()]
+
+    out = harv.set_index(['t', 'i', 'plot', 'crop'])
+    # Defensive: collapse any residual duplicate index tuples (same
+    # plot-crop reported in two units would survive above; sum Quantity).
+    if not out.index.is_unique:
+        num = out.groupby(level=['t', 'i', 'plot', 'crop']).agg({
+            'Quantity':       'sum',
+            'u':              'first',
+            'Quantity_sold':  'first',
+            'Value_sold':     'first',
+            'planting_month': 'first',
+            'harvest_month':  'first',
+            'intercropped':   'first',
+            'perennial':      'first',
+        })
+        out = num
+    return out
+
+
 # --- non-FIES food security (GH #332) -----------------------------------
 # Module H "Food Security" of the IHS3/IHS4/IHS5 household questionnaire and
 # the IHPS 2013 carries two non-FIES batteries shared verbatim across all

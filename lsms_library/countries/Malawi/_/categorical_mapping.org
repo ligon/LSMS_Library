@@ -379,6 +379,10 @@
 | 72 | Tin 250G | TIN 250G |
 | 73 | Tin 500G | TIN 500G |
 | 74 | Tin 1Kg | TIN 1KG |
+| C02 | 50 kg Bag |  |
+| C03 | 90 kg Bag |  |
+| C11 | Basket (Dengu) |  |
+| C12 | Ox-Cart |  |
 | 00 | Other (Specify) |  |
 | 03 | Other (Specify) |  |
 | 12 | Other (Specify) |  |
@@ -516,3 +520,119 @@
 |    7 | Rainfed/No irrigation |
 |    8 | Other                 |
 |    9 | Other                 |
+
+# crop_production (GAP 1).  Code-keyed crop map for the IHS/IHPS
+# agricultural harvest modules.  Codes 1-48 are the SEASONAL (rainy-
+# season, Module G) crop codes; the perennial (Module P / tree-crop)
+# codes are offset by +1000 (codes 1001-1018) to keep the two namespaces
+# disjoint, exactly as the World Bank cleaning code does
+# (MWI_IHPS1.do:59 "replace crop_code = crop_code + 1000").  The same
+# numeric codes are stable across all four buildable waves (2010-11,
+# 2013-14, 2016-17, 2019-20); only the decoded label spelling drifts, so
+# we key on the integer code (convert_categoricals=False) rather than the
+# label string.  Preferred Labels REUSE the consumed-food labels from the
+# harmonize_food table above wherever the crop is also a food (Rice,
+# Sorghum, Pigeon Pea (Nandolo), Ground Bean, Groundnut, Tomato, Onion,
+# Cabbage, Sugar Cane, Banana, Mango, Papaya, Pineapple, Avocado, Guava,
+# Nkwani, Tanaposi Rape, Okra/Therere, Irish Potato, ...) so that
+# crop_production.j JOINS food_acquired.j on the shared Preferred Label.
+# New Preferred Labels are added ONLY for crops with no food analogue
+# (Maize as a grain crop, Wheat, Cassava, Sweet Potato, Beans, Soyabean,
+# Cotton, Sunflower, Paprika, Pea, Tobacco varieties, Tea, Coffee,
+# Macadamia, the citrus/stone-tree perennials).
+#+name: harmonize_crop
+| Code | Preferred Label      |
+|------+----------------------|
+|    1 | Maize                |
+|    2 | Maize                |
+|    3 | Maize                |
+|    4 | Maize                |
+|    5 | Tobacco              |
+|    6 | Tobacco              |
+|    7 | Tobacco              |
+|    8 | Tobacco              |
+|    9 | Tobacco              |
+|   10 | Tobacco              |
+|   11 | Groundnut            |
+|   12 | Groundnut            |
+|   13 | Groundnut            |
+|   14 | Groundnut            |
+|   15 | Groundnut            |
+|   16 | Groundnut            |
+|   17 | Rice                 |
+|   18 | Rice                 |
+|   19 | Rice                 |
+|   20 | Rice                 |
+|   21 | Rice                 |
+|   22 | Rice                 |
+|   23 | Rice                 |
+|   24 | Rice                 |
+|   25 | Rice                 |
+|   26 | Rice                 |
+|   27 | Ground Bean          |
+|   28 | Sweet Potato         |
+|   29 | Irish Potato         |
+|   30 | Wheat                |
+|   31 | Finger Millet        |
+|   32 | Sorghum              |
+|   33 | Pearl Millet         |
+|   34 | Beans                |
+|   35 | Soyabean             |
+|   36 | Pigeon Pea (Nandolo) |
+|   37 | Cotton               |
+|   38 | Sunflower            |
+|   39 | Sugar Cane           |
+|   40 | Cabbage              |
+|   41 | Tanaposi Rape        |
+|   42 | Nkwani               |
+|   43 | Okra/Therere         |
+|   44 | Tomato               |
+|   45 | Onion                |
+|   46 | Pea                  |
+|   47 | Paprika              |
+|   48 | Other                |
+| 1001 | Cassava              |
+| 1002 | Tea                  |
+| 1003 | Coffee               |
+| 1004 | Mango                |
+| 1005 | Citrus               |
+| 1006 | Papaya               |
+| 1007 | Banana               |
+| 1008 | Avocado              |
+| 1009 | Guava                |
+| 1010 | Citrus               |
+| 1011 | Citrus               |
+| 1012 | Peach                |
+| 1013 | Custard Apple        |
+| 1014 | Masuku               |
+| 1015 | Masau                |
+| 1016 | Pineapple            |
+| 1017 | Macadamia            |
+| 1018 | Other                |
+
+# crop_production harvest/sale UNIT codes (Module G/I/P/Q non-standard
+# unit list, codes 1-13).  This is a DIFFERENT code space from the
+# food-consumption `u` table above (whose codes are zero-padded strings),
+# so it gets its own Code-keyed table -- but the Preferred Labels REUSE
+# the same `u` Preferred Label strings ('Kilogramme', '50 kg Bag',
+# 'Pail', 'Bunch', 'Piece', 'Bale', ...) so crop_production.u joins
+# food_acquired.u on the shared physical-unit label.  '90 kg Bag',
+# 'Basket (Dengu)' and 'Ox-Cart' are crop-harvest-only physical units
+# also added to the `u` table.  kg-conversion factors are NOT stored
+# here (that is a transformations concern); this is the label axis only.
+#+name: harmonize_crop_unit
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Kilogramme      |
+|    2 | 50 kg Bag       |
+|    3 | 90 kg Bag       |
+|    4 | Pail (Small)    |
+|    5 | Pail (Large)    |
+|    6 | No 10 Plate     |
+|    7 | No 12 Plate     |
+|    8 | Bunch           |
+|    9 | Piece           |
+|   10 | Bale            |
+|   11 | Basket (Dengu)  |
+|   12 | Ox-Cart         |
+|   13 | Other (Specify) |

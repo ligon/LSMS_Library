@@ -133,5 +133,31 @@ Data Scheme:
     MonthsInadequate: int
     AnyInadequate: bool
     materialize: make
+  crop_production:
+    # Item-level (t, i, plot, crop) harvest feature for the four IHS3+
+    # IHPS waves (2010-11, 2013-14, 2016-17, 2019-20); GAP 1.  Reported
+    # values only -- harvest Quantity + native unit, household-crop sale
+    # (Quantity_sold / Value_sold, attached to single-plot crops only),
+    # item planting / harvest-end months, and intercropped / perennial
+    # flags.  Sources: seasonal Module G + perennial Module P (plot-crop
+    # harvest), seasonal Module I + perennial Module Q (household-crop
+    # sale).  crop on the shared harmonize_crop -> harmonize_food
+    # Preferred Label axis so a crop that is also a consumed food (Rice,
+    # Sorghum, Groundnut, Tomato, ...) JOINS food_acquired.j; u on the
+    # shared `u` Preferred Label axis.  Plot grain aligns with
+    # plot_features.  Aggregates (harvest_kg / yield / share_kg_sold /
+    # main_crop / value-shares) are transformations, NOT stored columns.
+    # 2004-05 (IHS2) deferred: household-level aggregated ag file, no
+    # plot-crop roster.  See _/malawi.py:assemble_crop_production.
+    index: (t, i, plot, crop)
+    Quantity: float
+    u: str
+    Quantity_sold: float
+    Value_sold: float
+    planting_month: int
+    harvest_month: int
+    intercropped: bool
+    perennial: bool
+    materialize: make
   food_expenditures:
   food_prices:

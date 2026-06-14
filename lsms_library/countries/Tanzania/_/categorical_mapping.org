@@ -611,3 +611,126 @@
 | mililitre      | Millilitre      |            |            | mililitre |
 | PIECES         | Piece           | PIECES     | PIECES     |           |
 | kilogram       | Kg              |            |            | kilogram  |
+
+# harmonize_crop is the (j) axis for crop_production (parity-loop GAP 1).
+# Keyed on the NPS crop CODE ("cropid" / "zaocode") from the agriculture
+# questionnaire crop-code flap (extracted from
+# 2019-20/Documentation/nps_sdd_agriculture_qx_final_english_.pdf).  The
+# Preferred Label REUSES the harmonize_food Preferred Labels wherever a crop
+# is a consumed food, so crop_production.j shares the (j) axis with
+# food_acquired and community_prices -- e.g. Maize -> "Maize (grain)",
+# Paddy -> "Rice (paddy)", Beans/Cowpeas/Pigeon Pea -> "Pulses",
+# Sugar Cane -> "Sugarcane", Coffee/Cocoa -> "Coffee & Cocoa".  NEW Preferred
+# Labels are added ONLY for non-food crops (Cotton, Tobacco, Sisal, Rubber,
+# Sunflower, Pyrethrum, Jute, Kapok, Wattle, Palm Oil, Seaweed, Spices (crop),
+# Bamboo, Timber, Firewood/Fodder, Medicinal Plant, Fence Tree, Other Crop).
+# The 2019-20 / 2020-21 columns carry the same raw integer code; the
+# crop_production.py scripts resolve code -> Preferred Label in-script via
+# _plot_harmonized_codes('harmonize_crop') (Code -> Preferred Label), so the
+# emitted (j) is already canonical (mostly non-numeric).
+#+name: harmonize_crop
+| Code | Preferred Label          | Crop            | 2019-20 | 2020-21 |
+|------+--------------------------+-----------------+---------+---------|
+| 11   | Maize (grain)            | Maize           | 11      | 11      |
+| 12   | Rice (paddy)             | Paddy           | 12      | 12      |
+| 13   | Millet & Sorghum (grain) | Sorghum         | 13      | 13      |
+| 14   | Millet & Sorghum (grain) | Bulrush Millet  | 14      | 14      |
+| 15   | Millet & Sorghum (grain) | Finger Millet   | 15      | 15      |
+| 16   | Other Cereals            | Wheat           | 16      | 16      |
+| 17   | Other Cereals            | Barley          | 17      | 17      |
+| 18   | Spices (crop)            | Black Pepper    | 18      | 18      |
+| 19   | Seaweed                  | Seaweed         | 19      | 19      |
+| 21   | Cassava Fresh            | Cassava         | 21      | 21      |
+| 22   | Sweet Potatoes           | Sweet Potatoes  | 22      | 22      |
+| 23   | Irish Potatoes           | Irish Potatoes  | 23      | 23      |
+| 24   | Yams/Cocoyams            | Yams            | 24      | 24      |
+| 25   | Yams/Cocoyams            | Cocoyams        | 25      | 25      |
+| 26   | Vegetables (fresh)       | Onions          | 26      | 26      |
+| 27   | Spices (crop)            | Ginger          | 27      | 27      |
+| 31   | Pulses                   | Beans           | 31      | 31      |
+| 32   | Pulses                   | Cowpeas         | 32      | 32      |
+| 33   | Pulses                   | Green Gram      | 33      | 33      |
+| 34   | Pulses                   | Pigeon Pea      | 34      | 34      |
+| 35   | Pulses                   | Chick Peas      | 35      | 35      |
+| 36   | Pulses                   | Bambara Nuts    | 36      | 36      |
+| 37   | Pulses                   | Field Peas      | 37      | 37      |
+| 38   | Other Fruits             | Malay Apple     | 38      | 38      |
+| 39   | Other Fruits             | Star Fruit      | 39      | 39      |
+| 41   | Sunflower                | Sunflower       | 41      | 41      |
+| 42   | Seeds                    | Sesame          | 42      | 42      |
+| 43   | Groundnuts               | Groundnut       | 43      | 43      |
+| 44   | Palm Oil                 | Palm Oil        | 44      | 44      |
+| 45   | Coconuts                 | Coconut         | 45      | 45      |
+| 46   | Nuts                     | Cashew Nut      | 46      | 46      |
+| 47   | Pulses                   | Soyabeans       | 47      | 47      |
+| 48   | Seeds                    | Caster Seed     | 48      | 48      |
+| 50   | Cotton                   | Cotton          | 50      | 50      |
+| 51   | Tobacco                  | Tobacco         | 51      | 51      |
+| 52   | Pyrethrum                | Pyrethrum       | 52      | 52      |
+| 53   | Sisal                    | Sisal           | 53      | 53      |
+| 54   | Coffee & Cocoa           | Coffee          | 54      | 54      |
+| 55   | Tea (dry)                | Tea             | 55      | 55      |
+| 56   | Coffee & Cocoa           | Cocoa           | 56      | 56      |
+| 57   | Rubber                   | Rubber          | 57      | 57      |
+| 58   | Wattle                   | Wattle          | 58      | 58      |
+| 59   | Kapok                    | Kapok           | 59      | 59      |
+| 60   | Sugarcane                | Sugar Cane      | 60      | 60      |
+| 61   | Spices (crop)            | Cardamom        | 61      | 61      |
+| 62   | Jute                     | Jute            | 62      | 62      |
+| 63   | Other Fruits             | Tamarind        | 63      | 63      |
+| 64   | Spices (crop)            | Cinnamon        | 64      | 64      |
+| 65   | Spices (crop)            | Nutmeg          | 65      | 65      |
+| 66   | Spices (crop)            | Clove           | 66      | 66      |
+| 67   | Other Fruits             | Bread Fruit     | 67      | 67      |
+| 68   | Citrus Fruits            | Pomelo          | 68      | 68      |
+| 69   | Other Fruits             | Jack Fruit      | 69      | 69      |
+| 70   | Other Fruits             | Passion Fruit   | 70      | 70      |
+| 71   | Ripe Bananas             | Banana          | 71      | 71      |
+| 72   | Other Fruits             | Avocado         | 72      | 72      |
+| 73   | Other Fruits             | Mango           | 73      | 73      |
+| 74   | Other Fruits             | Papaw           | 74      | 74      |
+| 75   | Other Fruits             | Pineapple       | 75      | 75      |
+| 76   | Citrus Fruits            | Orange          | 76      | 76      |
+| 77   | Citrus Fruits            | Grapefruit      | 77      | 77      |
+| 78   | Other Fruits             | Grapes          | 78      | 78      |
+| 79   | Citrus Fruits            | Mandarin        | 79      | 79      |
+| 80   | Other Fruits             | Guava           | 80      | 80      |
+| 81   | Other Fruits             | Plums           | 81      | 81      |
+| 82   | Other Fruits             | Apples          | 82      | 82      |
+| 83   | Other Fruits             | Pears           | 83      | 83      |
+| 84   | Other Fruits             | Peaches         | 84      | 84      |
+| 86   | Leafy Greens             | Cabbage         | 86      | 86      |
+| 87   | Vegetables (fresh)       | Tomatoes        | 87      | 87      |
+| 88   | Leafy Greens             | Spinach         | 88      | 88      |
+| 89   | Vegetables (fresh)       | Carrot          | 89      | 89      |
+| 90   | Vegetables (fresh)       | Chilies         | 90      | 90      |
+| 91   | Leafy Greens             | Amaranths       | 91      | 91      |
+| 92   | Vegetables (fresh)       | Pumpkins        | 92      | 92      |
+| 93   | Vegetables (fresh)       | Cucumber        | 93      | 93      |
+| 94   | Vegetables (fresh)       | Egg Plant       | 94      | 94      |
+| 95   | Other Fruits             | Water Mellon    | 95      | 95      |
+| 96   | Leafy Greens             | Cauliflower     | 96      | 96      |
+| 97   | Other Fruits             | Durian          | 97      | 97      |
+| 98   | Other Fruits             | Bilimbi         | 98      | 98      |
+| 99   | Other Fruits             | Rambutan        | 99      | 99      |
+| 100  | Vegetables (fresh)       | Okra            | 100     | 100     |
+| 101  | Pulses                   | Fiwi            | 101     | 101     |
+| 200  | Other Fruits             | Custard Apple   | 200     | 200     |
+| 201  | Other Fruits             | God Fruit       | 201     | 201     |
+| 202  | Other Fruits             | Mitobo          | 202     | 202     |
+| 203  | Other Fruits             | Plum            | 203     | 203     |
+| 204  | Other Fruits             | Peaches         | 204     | 204     |
+| 205  | Other Fruits             | Pomegranate     | 205     | 205     |
+| 210  | Other Fruits             | Date            | 210     | 210     |
+| 211  | Other Fruits             | Tungamaa        | 211     | 211     |
+| 212  | Other Fruits             | Other Fruit     | 212     | 212     |
+| 300  | Vegetables (fresh)       | Green Tomato    | 300     | 300     |
+| 301  | Other Fruits             | Monkeybread     | 301     | 301     |
+| 302  | Bamboo                   | Bamboo          | 302     | 302     |
+| 303  | Firewood/Fodder          | Firewood/Fodder | 303     | 303     |
+| 304  | Timber                   | Timber          | 304     | 304     |
+| 305  | Medicinal Plant          | Medicinal Plant | 305     | 305     |
+| 306  | Fence Tree               | Fence Tree      | 306     | 306     |
+| 851  | Citrus Fruits            | Lime            | 851     | 851     |
+| 852  | Citrus Fruits            | Lemon           | 852     | 852     |
+| 998  | Other Crop               | Other           | 998     | 998     |

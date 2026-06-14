@@ -348,8 +348,15 @@ gaps (crop/harvest units, community-price units) extend these rows.
 #+name: u
 | Original Label                     | Preferred Label                    |
 |------------------------------------+------------------------------------|
+| Akumada/Dawla/Lekota Large         | Akumada/Dawla/Lekota Large         |
 | Akumada/Dawla/Lekota Small         | Akumada/Dawla/Lekota Small         |
 | Araba                              | Araba                              |
+| Centilitres                        | Centilitres                        |
+| Chinet                             | Chinet                             |
+| Chinet Large                       | Chinet Large                       |
+| Dawla                              | Dawla                              |
+| Ensira                             | Ensira                             |
+| Esir                               | Esir                               |
 | Birchiko Large                     | Birchiko Large                     |
 | Birchiko Medium                    | Birchiko Medium                    |
 | Birchiko Small                     | Birchiko Small                     |
@@ -372,7 +379,10 @@ gaps (crop/harvest units, community-price units) extend these rows.
 | Gram                               | Gram                               |
 | Jenbe                              | Jenbe                              |
 | Jog                                | Jog                                |
+| Joniya/Kasha Large                 | Joniya/Kasha Large                 |
+| Joniya/Kasha Medium                | Joniya/Kasha Medium                |
 | Joniya/Kasha Small                 | Joniya/Kasha Small                 |
+| Kerchat/Kemba                      | Kerchat/Kemba                      |
 | Kerchat/Kemba Large                | Kerchat/Kemba Large                |
 | Kerchat/Kemba Medium               | Kerchat/Kemba Medium               |
 | Kerchat/Kemba Small                | Kerchat/Kemba Small                |
@@ -381,6 +391,8 @@ gaps (crop/harvest units, community-price units) extend these rows.
 | Kubaya/Cup Large                   | Kubaya/Cup Large                   |
 | Kubaya/Cup Medium                  | Kubaya/Cup Medium                  |
 | Kubaya/Cup Small                   | Kubaya/Cup Small                   |
+| Kunna                              | Kunna                              |
+| Kunna/Mishe/Kefer/Enkib            | Kunna/Mishe/Kefer/Enkib            |
 | Kunna/Mishe/Kefer/Enkib Large      | Kunna/Mishe/Kefer/Enkib Large      |
 | Kunna/Mishe/Kefer/Enkib Medium     | Kunna/Mishe/Kefer/Enkib Medium     |
 | Kunna/Mishe/Kefer/Enkib Small      | Kunna/Mishe/Kefer/Enkib Small      |
@@ -389,6 +401,7 @@ gaps (crop/harvest units, community-price units) extend these rows.
 | Madaberia/Nuse/Shera/Cheret Large  | Madaberia/Nuse/Shera/Cheret Large  |
 | Madaberia/Nuse/Shera/Cheret Medium | Madaberia/Nuse/Shera/Cheret Medium |
 | Madaberia/Nuse/Shera/Cheret Small  | Madaberia/Nuse/Shera/Cheret Small  |
+| Medeb                              | Medeb                              |
 | Medeb Large                        | Medeb Large                        |
 | Medeb Medium                       | Medeb Medium                       |
 | Medeb Small                        | Medeb Small                        |
@@ -396,6 +409,8 @@ gaps (crop/harvest units, community-price units) extend these rows.
 | Melekiya                           | Melekiya                           |
 | Mili Liter                         | Mili Liter                         |
 | Number                             | Number                             |
+| Packets                            | Packets                            |
+| Pieces                             | Pieces                             |
 | Other (Specify)                    | Other (Specify)                    |
 | Other(Specify)                     | Other(Specify)                     |
 | Pack                               | Pack                               |
@@ -420,6 +435,133 @@ gaps (crop/harvest units, community-price units) extend these rows.
 | Tuba                               | Tuba                               |
 | Whole Animal (Poultary)            | Whole Animal (Poultary)            |
 | Whole Animal (Sheep)               | Whole Animal (Sheep)               |
+| Zelela                             | Zelela                             |
+| Zelela Large                       | Zelela Large                       |
+| Zelela Medium                      | Zelela Medium                      |
+| Zelela Small                       | Zelela Small                       |
 | Zorba/Akara Large                  | Zorba/Akara Large                  |
 | Zorba/Akara Medium                 | Zorba/Akara Medium                 |
 | Zorba/Akara Small                  | Zorba/Akara Small                  |
+
+* harmonize_crop (the crop j axis -- GAP 1, crop_production)
+
+Code-keyed crop dictionary for the ESS post-harvest/post-planting crop
+modules (sect9_ph / sect4_pp / sect11_ph).  Maps the stable ESS
+``crop_code`` integer (1-123, consistent across W1-W5; W4/W5 carry it as
+``s9q00b`` / ``s11q01`` / ``s4q01b``) to a Preferred Label.
+
+The Preferred Labels deliberately REUSE the food labels already in the
+``harmonize_food`` table wherever a grown crop is also a consumed food
+(Maize, Sorghum, Teff, Wheat, Barley, Rice, Millet, Oats, the pulses,
+the oilseeds, the vegetables/fruits, Coffee, Onion, Potato, ...), so
+``crop_production.j`` JOINS ``food_acquired.j`` on the shared label.
+NEW Preferred Labels are added only for genuinely non-food / non-
+consumption crops with no food analogue: Cotton, Cotton Seed, Tobacco,
+Enset, Gesho, Chat, Sugar Cane, Cactus, and the residual land-use /
+"Other" categories (Grazing Land, Fallow Land, Forest Land, Other Land
+Use).  Where a crop has no exact food label but is close to one we use
+the food label (e.g. Red Pepper -> Berbere, Green Pepper -> Kariya,
+Kale/Cabbage -> Leafy Greens) so the join still lands.
+
+#+name: harmonize_crop
+| Code | Preferred Label     |
+|------+---------------------|
+|    1 | Barley              |
+|    2 | Maize               |
+|    3 | Millet              |
+|    4 | Oats                |
+|    5 | Rice                |
+|    6 | Sorghum             |
+|    7 | Teff                |
+|    8 | Wheat               |
+|    9 | Mung bean           |
+|   10 | Cassava             |
+|   11 | Chick Pea           |
+|   12 | Haricot Beans       |
+|   13 | Horsebeans          |
+|   14 | Lentils             |
+|   15 | Field Pea           |
+|   16 | Vetch               |
+|   17 | Gibto               |
+|   18 | Soya Beans          |
+|   19 | Red Kidney Beans    |
+|   20 | Fennel              |
+|   22 | Cotton Seed         |
+|   23 | Linseed             |
+|   24 | Ground nuts         |
+|   25 | Niger Seed          |
+|   26 | Rape Seed           |
+|   27 | Sesame              |
+|   28 | Sun Flower          |
+|   29 | Mego                |
+|   31 | Black Cumin         |
+|   32 | Black Pepper        |
+|   33 | Cardamon            |
+|   34 | Chilies             |
+|   35 | Cinnamon            |
+|   36 | Fenugreek           |
+|   37 | Ginger              |
+|   38 | Berbere             |
+|   39 | Turmeric            |
+|   40 | White Cumin         |
+|   41 | Apple               |
+|   42 | Banana              |
+|   43 | Grape               |
+|   44 | Lemon               |
+|   45 | Mandarin            |
+|   46 | Mango               |
+|   47 | Orange              |
+|   48 | Papaya              |
+|   49 | Pineapple           |
+|   50 | Citron              |
+|   51 | Beetroot            |
+|   52 | Leafy Greens        |
+|   53 | Carrot              |
+|   54 | Cauliflower         |
+|   55 | Garlic              |
+|   56 | Leafy Greens        |
+|   57 | Lettuce             |
+|   58 | Onion               |
+|   59 | Kariya              |
+|   60 | Potato              |
+|   61 | Pumpkin             |
+|   62 | Sweet potato        |
+|   63 | Tomato              |
+|   64 | Godere              |
+|   65 | Guava               |
+|   66 | Peach               |
+|   69 | Leafy Greens        |
+|   71 | Chat/Kat            |
+|   72 | Coffee              |
+|   73 | Cotton              |
+|   74 | Enset               |
+|   75 | Hops (gesho)        |
+|   76 | Sugar Cane          |
+|   78 | Tobacco             |
+|   79 | Coriander           |
+|   80 | Sacred Basil        |
+|   81 | Rue                 |
+|   82 | Gishita             |
+|   83 | Watermelon          |
+|   84 | Avocado             |
+|   85 | Grazing Land        |
+|   86 | Fallow Land         |
+|   89 | Forest Land         |
+|   90 | Other Land Use      |
+|   95 | Boye/Yam            |
+|   98 | Other tuber or stem |
+|   99 | Other Land Use      |
+|  108 | Amboshika           |
+|  110 | Giramta             |
+|  111 | Comtatie            |
+|  112 | Kazmir              |
+|  113 | Strawberry          |
+|  114 | Moringa/Shiferaw/Halloka |
+|  115 | Other fruit         |
+|  116 | Timiz Kimem         |
+|  117 | Other condiments    |
+|  118 | Other pulse or nut  |
+|  119 | Other seed          |
+|  120 | Other cereal        |
+|  121 | Other Cash Crop     |
+|  123 | Other vegetable     |

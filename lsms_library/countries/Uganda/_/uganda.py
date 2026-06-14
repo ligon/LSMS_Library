@@ -708,3 +708,323 @@ def plot_features_for_wave(t, source_2a, source_2b, colmap):
     df = df.set_index(['t', 'i', 'plot_id'])
     return df
 
+
+
+# ----------------------------------------------------------------------
+# crop_production  (GAP 1 — item-level post-harvest crop module)
+# ----------------------------------------------------------------------
+#
+# Grain: (t, i, plot, j, u, season).  One row per *reported* harvest
+# record for a crop on a plot.  Stores REPORTED values only — Quantity
+# (native harvest unit u), Quantity_sold, Value_sold, harvest_month and
+# the intercropped / perennial flags.  No harvest_kg / yield / main_crop /
+# value-share — those are transformations over these item rows.
+#
+# Source: AGSEC5A (season 1) + AGSEC5B (season 2), the UNPS post-harvest
+# crop module.  Column names AND the unit/condition column semantics drift
+# across waves (see slurm notes in the wave scripts), so each wave passes
+# an explicit colmap.  Some newer waves (2018-19, 2019-20) record two
+# harvest "conditions" per (plot, crop) in parallel _1 / _2 column sets;
+# we emit one row per non-empty condition rather than summing them.
+#
+# plot id mirrors the WB harmonised plot_id = hhid-parcel-plot; its parcel
+# component (hhid-parcel) is the same parcel that plot_features keys on
+# (plot_features uses the coarser parcel grain with an _A/_B source tag).
+
+_CROP_TABLE = 'harmonize_crop'
+_HARVEST_UNIT_TABLE = 'harvest_units'
+
+
+def _crop_label_map():
+    return _harmonized_codes(_CROP_TABLE)
+
+
+def _harvest_unit_map():
+    return _harmonized_codes(_HARVEST_UNIT_TABLE)
+
+
+def _to_int_code(series):
+    """Coerce a (possibly categorical/float/str) code column to Int64."""
+    if series is None:
+        return None
+    if pd.api.types.is_categorical_dtype(series):
+        # When convert_categoricals=False the categories ARE the codes;
+        # otherwise fall back to numeric coercion of the string form.
+        try:
+            return series.astype('Int64')
+        except (TypeError, ValueError):
+            return pd.to_numeric(series.astype(str), errors='coerce').astype('Int64')
+    return pd.to_numeric(series, errors='coerce').astype('Int64')
+
+
+def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
+    """Build canonical ``crop_production`` for one Uganda UNPS wave.
+
+    Parameters
+    ----------
+    t : str
+        Wave id (e.g. ``"2013-14"``).
+    df5a, df5b : pd.DataFrame | None
+        Raw AGSEC5A (season 1) / AGSEC5B (season 2) post-harvest crop
+        modules, loaded with ``convert_categoricals=False`` so code
+        columns carry integer codes.  ``None`` permitted.
+    df4a : pd.DataFrame | None
+        Raw AGSEC4A plot-crop roster (for the intercropped flag and,
+        where available, the perennial flag).  ``None`` permitted; when
+        absent the flags are NaN.
+    colmap : dict
+        Per-(season) column maps keyed by ``'A'`` / ``'B'``.  Each value
+        is a dict with keys:
+            hhid, parcel, plot, crop       — id columns
+            conditions : list of dicts, one per parallel harvest-record
+                         set, each with keys:
+                qty           — reported harvest quantity column
+                unit          — reported harvest unit code column (or None)
+                qty_sold      — reported quantity sold column (or None)
+                value_sold    — reported sale value column (or None)
+                month         — harvest-end month code column (or None)
+        plus an optional top-level key ``cf`` listing per-condition CF
+        columns (unused for storage; documented for transformations).
+    intercrop_map : (passed via colmap['intercrop']) optional dict
+            file_hhid, file_parcel, file_plot, flag, [perennial]
+        describing how to read the intercropped flag from ``df4a``.
+
+    Returns
+    -------
+    pd.DataFrame indexed by ``(t, i, plot, j, u, season)`` with columns
+        ``Quantity`` (Float64), ``Quantity_sold`` (Float64),
+        ``Value_sold`` (Float64), ``harvest_month`` (Int64 1-12) and
+        ``intercropped`` (boolean).  The ``perennial`` / ``planting_month``
+        lookups are wired but not emitted — no current Uganda wave
+        populates them cleanly (they would be all-null).
+    """
+    crop_map = _crop_label_map()
+    unit_map = _harvest_unit_map()
+
+    # --- intercropped / perennial / planting from AGSEC4A (plot-crop) ---
+    inter_lookup = {}      # (hh, parcel, plot) -> bool   (plot-level flag)
+    perennial_lookup = {}  # (hh, parcel, plot, crop) -> bool
+    planting_lookup = {}   # (hh, parcel, plot, crop) -> Int month
+    ic = colmap.get('intercrop')
+    if df4a is not None and ic is not None:
+        hh4 = df4a[ic['hhid']].apply(format_id)
+        pa4 = df4a[ic['parcel']].apply(format_id)
+        pl4 = df4a[ic['plot']].apply(format_id)
+        key3 = list(zip(hh4, pa4, pl4))
+        if ic.get('flag') and ic['flag'] in df4a.columns:
+            flagcode = _to_int_code(df4a[ic['flag']])
+            # 1 = mono/No, 2 = Yes  (recode mirrors WB: 2 -> True)
+            for k, c in zip(key3, flagcode):
+                if pd.notna(c):
+                    inter_lookup[k] = bool(int(c) == 2)
+        if ic.get('crop') and ic['crop'] in df4a.columns:
+            crop4 = _to_int_code(df4a[ic['crop']])
+            key4 = list(zip(hh4, pa4, pl4, crop4))
+            if ic.get('perennial') and ic['perennial'] in df4a.columns:
+                per = _to_int_code(df4a[ic['perennial']])
+                for k, c in zip(key4, per):
+                    if pd.notna(c):
+                        perennial_lookup[k] = bool(int(c) == 2)
+            if ic.get('planting_month') and ic['planting_month'] in df4a.columns:
+                pm = _to_int_code(df4a[ic['planting_month']])
+                for k, m in zip(key4, pm):
+                    if pd.notna(m) and 1 <= int(m) <= 12:
+                        planting_lookup[k] = int(m)
+
+    pieces = []
+    for season, df5 in (('A', df5a), ('B', df5b)):
+        if df5 is None or len(df5) == 0:
+            continue
+        cm = colmap.get(season)
+        if cm is None:
+            continue
+
+        hh = df5[cm['hhid']].apply(format_id)
+        parcel = df5[cm['parcel']].apply(format_id)
+        plot = df5[cm['plot']].apply(format_id) if cm.get('plot') and cm['plot'] in df5.columns else pd.Series(['']*len(df5), index=df5.index)
+        plot_id = hh.astype(str) + '-' + parcel.astype(str) + '-' + plot.astype(str)
+        crop_code = _to_int_code(df5[cm['crop']])
+        j = crop_code.map(lambda c: crop_map.get(int(c), pd.NA) if pd.notna(c) else pd.NA)
+
+        for cond in cm['conditions']:
+            qcol = cond.get('qty')
+            if not qcol or qcol not in df5.columns:
+                continue
+            qty = pd.to_numeric(df5[qcol], errors='coerce')
+
+            # reported native unit
+            if cond.get('unit') and cond['unit'] in df5.columns:
+                ucode = _to_int_code(df5[cond['unit']])
+                u = ucode.map(lambda c: unit_map.get(int(c), pd.NA) if pd.notna(c) else pd.NA)
+            else:
+                u = pd.Series([pd.NA]*len(df5), index=df5.index, dtype='object')
+
+            qsold = pd.to_numeric(df5[cond['qty_sold']], errors='coerce') if cond.get('qty_sold') in df5.columns else pd.Series([pd.NA]*len(df5), index=df5.index)
+            vsold = pd.to_numeric(df5[cond['value_sold']], errors='coerce') if cond.get('value_sold') in df5.columns else pd.Series([pd.NA]*len(df5), index=df5.index)
+
+            if cond.get('month') and cond['month'] in df5.columns:
+                hm = _to_int_code(df5[cond['month']])
+                hm = hm.where((hm >= 1) & (hm <= 12), pd.NA)
+            else:
+                hm = pd.Series([pd.NA]*len(df5), index=df5.index, dtype='Int64')
+
+            piece = pd.DataFrame({
+                't':             t,
+                'i':             hh.values,
+                'plot':          plot_id.values,
+                'j':             j.values,
+                'u':             u.values,
+                'season':        season,
+                'Quantity':      qty.values,
+                'Quantity_sold': qsold.values,
+                'Value_sold':    vsold.values,
+                'harvest_month': hm.values,
+            })
+            # intercropped flag (plot-level) joined from AGSEC4A.  The
+            # perennial_lookup / planting_lookup hooks exist for future
+            # waves but no current Uganda wave populates them cleanly, so
+            # those columns are not emitted (they would be all-null).
+            k3 = list(zip(hh.values, parcel.values, plot.values))
+            piece['intercropped'] = [inter_lookup.get(k, pd.NA) for k in k3]
+            pieces.append(piece)
+
+    cols = ['Quantity', 'Quantity_sold', 'Value_sold', 'harvest_month',
+            'intercropped']
+    if not pieces:
+        return pd.DataFrame(columns=cols)
+
+    df = pd.concat(pieces, ignore_index=True)
+
+    # Drop rows with no crop label and no quantity at all (empty source
+    # rows / land-status placeholders with nothing reported).
+    df = df[df['j'].notna()]
+    # Keep rows even when Quantity is NaN but a sale was reported; drop
+    # only when ALL reported measures are missing.
+    measure_cols = ['Quantity', 'Quantity_sold', 'Value_sold']
+    df = df[df[measure_cols].notna().any(axis=1)]
+
+    df['Quantity'] = pd.to_numeric(df['Quantity'], errors='coerce').astype('Float64')
+    df['Quantity_sold'] = pd.to_numeric(df['Quantity_sold'], errors='coerce').astype('Float64')
+    df['Value_sold'] = pd.to_numeric(df['Value_sold'], errors='coerce').astype('Float64')
+    df['harvest_month'] = pd.to_numeric(df['harvest_month'], errors='coerce').astype('Int64')
+    df['intercropped'] = df['intercropped'].astype('boolean')
+
+    # u may be NaN (e.g. 2018-19 harvest side has no unit label); fill
+    # with a sentinel so it can be an index level without null-index
+    # failures, but ONLY where Quantity is present (a reported quantity
+    # with no unit).  Where there's no quantity at all, leave the unit
+    # sentinel too.
+    df['u'] = df['u'].astype('object').where(df['u'].notna(), 'Unknown')
+
+    df = df.set_index(['t', 'i', 'plot', 'j', 'u', 'season'])
+    # Collapse exact-duplicate index tuples (same plot/crop/unit/season
+    # reported twice) by summing the reported quantities — this is NOT an
+    # aggregation across distinct items, just de-duplication of repeated
+    # identical source rows so the index is unique.
+    if not df.index.is_unique:
+        num = df[['Quantity', 'Quantity_sold', 'Value_sold']].groupby(level=df.index.names).sum(min_count=1)
+        firstcols = df[['harvest_month', 'intercropped']].groupby(level=df.index.names).first()
+        df = num.join(firstcols)
+    return df
+
+
+# Per-wave column maps for crop_production_for_wave.  The harvest UNIT is
+# the column whose value labels decode to Kg/Sack/Bunch (the harvest_units
+# scheme) — empirically a5aq6c for 2009-16 (NOT a5aq6b, which is the
+# Fresh/Dry condition; the WB .do's A5aq6b/A5aq6c unit/condition rename is
+# inverted for these actual UNPS files).  2018-19's harvest side carries
+# no unit label (-> u='Unknown'); 2019-20 keeps WB names s5aq06b_1.
+CROP_COLMAPS = {
+    '2009-10': {
+        'A': {'hhid': 'HHID', 'parcel': 'a5aq1', 'plot': 'a5aq3', 'crop': 'a5aq5',
+              'conditions': [{'qty': 'a5aq6a', 'unit': 'a5aq6c',
+                              'qty_sold': 'a5aq7a', 'value_sold': 'a5aq8',
+                              'month': None}]},
+        'B': {'hhid': 'HHID', 'parcel': 'a5bq1', 'plot': 'a5bq3', 'crop': 'a5bq5',
+              'conditions': [{'qty': 'a5bq6a', 'unit': 'a5bq6c',
+                              'qty_sold': 'a5bq7a', 'value_sold': 'a5bq8',
+                              'month': None}]},
+        # 2009-10 AGSEC4A uses a non-standard column layout (a4aq1/a4aq2/
+        # a4aq4, no parcel/plot/cropID in the form the join needs), so the
+        # intercrop flag is not cleanly joinable -> intercropped is NaN
+        # this wave.
+        'intercrop': None,
+    },
+    '2010-11': {
+        'A': {'hhid': 'HHID', 'parcel': 'prcid', 'plot': 'pltid', 'crop': 'cropID',
+              'conditions': [{'qty': 'a5aq6a', 'unit': 'a5aq6c',
+                              'qty_sold': 'a5aq7a', 'value_sold': 'a5aq8',
+                              'month': None}]},
+        'B': {'hhid': 'HHID', 'parcel': 'prcid', 'plot': 'pltid', 'crop': 'cropID',
+              'conditions': [{'qty': 'a5bq6a', 'unit': 'a5bq6c',
+                              'qty_sold': 'a5bq7a', 'value_sold': 'a5bq8',
+                              'month': None}]},
+        'intercrop': {'hhid': 'HHID', 'parcel': 'prcid', 'plot': 'pltid',
+                      'flag': 'a4aq3', 'crop': 'cropID'},
+    },
+    '2011-12': {
+        'A': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
+              'conditions': [{'qty': 'a5aq6a', 'unit': 'a5aq6c',
+                              'qty_sold': 'a5aq7a', 'value_sold': 'a5aq8',
+                              'month': 'a5aq6f'}]},
+        'B': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
+              'conditions': [{'qty': 'a5bq6a', 'unit': 'a5bq6c',
+                              'qty_sold': 'a5bq7a', 'value_sold': 'a5bq8',
+                              'month': 'a5bq6f'}]},
+        'intercrop': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+                      'flag': 'a4aq3', 'crop': 'cropID'},
+    },
+    '2013-14': {
+        'A': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
+              'conditions': [{'qty': 'a5aq6a', 'unit': 'a5aq6c',
+                              'qty_sold': 'a5aq7a', 'value_sold': 'a5aq8',
+                              'month': 'a5aq6f'}]},
+        'B': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
+              'conditions': [{'qty': 'a5bq6a', 'unit': 'a5bq6c',
+                              'qty_sold': 'a5bq7a', 'value_sold': 'a5bq8',
+                              'month': 'a5bq6f'}]},
+        'intercrop': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+                      'flag': 'a4aq16', 'crop': 'cropID'},
+    },
+    '2015-16': {
+        'A': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
+              'conditions': [{'qty': 'a5aq6a', 'unit': 'a5aq6c',
+                              'qty_sold': 'a5aq7a', 'value_sold': 'a5aq8',
+                              'month': 'a5aq6f'}]},
+        'B': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
+              'conditions': [{'qty': 'a5bq6a', 'unit': 'a5bq6c',
+                              'qty_sold': 'a5bq7a', 'value_sold': 'a5bq8',
+                              'month': 'a5bq6f'}]},
+        'intercrop': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+                      'flag': 'a4aq16', 'crop': 'cropID'},
+    },
+    '2018-19': {
+        'A': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
+              'conditions': [{'qty': 's5aq06a_1', 'unit': None,
+                              'qty_sold': 's5aq07a_1', 'value_sold': 's5aq08_1',
+                              'month': 's5aq06f_1'}]},
+        'B': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
+              'conditions': [{'qty': 's5bq06a_1', 'unit': None,
+                              'qty_sold': 's5bq07a_1', 'value_sold': 's5bq08_1',
+                              'month': 's5bq06f_1'}]},
+        'intercrop': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
+                      'flag': 's4aq16', 'crop': 'cropID'},
+    },
+    '2019-20': {
+        'A': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
+              'conditions': [
+                  {'qty': 's5aq06a_1', 'unit': 's5aq06b_1',
+                   'qty_sold': 's5aq07a_1', 'value_sold': 's5aq08_1',
+                   'month': 's5aq06f_1'},
+                  {'qty': 's5aq06a_2', 'unit': 's5aq06b_2',
+                   'qty_sold': 's5aq07a_2', 'value_sold': 's5aq08_2',
+                   'month': 's5aq06f_2'},
+              ]},
+        'B': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
+              'conditions': [{'qty': 's5bq06a_1', 'unit': 's5bq06b_1',
+                              'qty_sold': 's5bq07a_1', 'value_sold': 's5bq08_1',
+                              'month': 's5bq06f_1'}]},
+        'intercrop': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
+                      'flag': 's4aq16', 'crop': 'cropID'},
+    },
+}

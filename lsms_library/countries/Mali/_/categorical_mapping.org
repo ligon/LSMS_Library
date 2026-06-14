@@ -77,10 +77,23 @@
 | Sachet                       | Sachet          | x       | ---     | ---     |
 | Unité                        | Unité           | x       | ---     | ---     |
 | Verre                        | Verre           | x       | ---     | ---     |
+|------------------------------+-----------------+---------+---------+---------|
+| # crop_production harvest units (EACI 2014-15 & 2017-18 s3a/s7f/s3b) |                 |         |         |         |
+| Sac                          | Sac             | x       | ---     | ---     |
+| Charretée                    | Charretée       | x       | ---     | ---     |
+| Moude                        | Moude           | x       | ---     | ---     |
+| Kilogramme                   | Kg              | x       | ---     | ---     |
+| Gerbe                        | Gerbe           | x       | ---     | ---     |
+| Grenier                      | Grenier         | x       | ---     | ---     |
+| Bassine                      | Bassine         | x       | ---     | ---     |
+| Calebasse                    | Calebasse       | x       | ---     | ---     |
+| Casier                       | Casier          | x       | ---     | ---     |
+| Chargement camion            | Chargement camion | x       | ---     | ---     |
+| Tonne                        | Tonne           | x       | ---     | ---     |
 
 #+name: harmonize_food
 | Code                                                                                                 | Preferred Label                              | 2014-15 | 2018-19 | 2021-22 |
-|------------------------------------------------------------------------------------------------------+----------------------------------------------+---------+---------+---------|
+|------------------------------------------------------------------------------------------------------+----------------------------------------------+---------+---------+---------+---------|
 | ?ufs                                                                                                 | Oeufs                                        | x       | ---     | ---     |
 | Abats et tripes (foie, rognon, etc.)                                                                 | Abats et tripes                              | x       | x       | x       |
 | Ail                                                                                                  | Ail                                          | ---     | x       | x       |
@@ -334,6 +347,75 @@
 | Zaban                                                                                                | Zaban                                        | x       | ---     | ---     |
 | ufs                                                                                                 | Œufs                                         | ---     | x       | ---     |
 | Œufs                                                                                                 | Œufs                                         | ---     | ---     | x       |
+|------------------------------------------------------------------------------------------------------+----------------------------------------------+---------+---------+---------|
+| # crop_production (GAP 1) crops — EACI 2014-15 & 2017-18 harvest/perennial; food crops REUSE the consumed-food |                                              |         |         |         |
+| Mil                                                                                                  | Mil                                          | x       | ---     | ---     |
+| Sorgho                                                                                               | Sorgho                                       | x       | ---     | ---     |
+| Maïs                                                                                                 | Maïs                                         | x       | ---     | ---     |
+| Riz                                                                                                  | Riz                                          | x       | ---     | ---     |
+| Fonio                                                                                                | Fonio                                        | x       | ---     | ---     |
+| Blé                                                                                                  | Blé                                          | x       | ---     | ---     |
+| Orge                                                                                                 | Orge                                         | x       | ---     | ---     |
+| Arachide                                                                                             | Arachide                                     | x       | ---     | ---     |
+| Niébé                                                                                                | Haricots secs                                | x       | ---     | ---     |
+| Niébé Fourrager                                                                                      | Niébé fourrager                              | x       | ---     | ---     |
+| Voandzou                                                                                             | Voandzou                                     | x       | ---     | ---     |
+| Soja                                                                                                 | Soja                                         | x       | ---     | ---     |
+| Petits Pois                                                                                          | Petit pois                                   | x       | ---     | ---     |
+| Pois sucré                                                                                           | Pois sucrés                                  | x       | ---     | ---     |
+| Sésame                                                                                               | Sésame                                       | x       | ---     | ---     |
+| Coton                                                                                                | Coton                                        | x       | ---     | ---     |
+| Dah/Fibre                                                                                            | Dah/Fibre                                    | x       | ---     | ---     |
+| Igname                                                                                               | Igname                                       | x       | ---     | ---     |
+| Manioc                                                                                               | Manioc                                       | x       | ---     | ---     |
+| Patate Douce                                                                                         | Patate douce                                 | x       | ---     | ---     |
+| Taro                                                                                                 | Taro, macabo                                 | x       | ---     | ---     |
+| Pomme de terre                                                                                       | Pomme de terre                               | x       | ---     | ---     |
+| Tomate                                                                                               | Tomate fraîche                               | x       | ---     | ---     |
+| Oignon                                                                                               | Oignon                                       | x       | ---     | ---     |
+| Aïl                                                                                                  | Ail                                          | x       | ---     | ---     |
+| Gombo                                                                                                | Gombo                                        | x       | ---     | ---     |
+| Piment                                                                                               | Piment                                       | x       | ---     | ---     |
+| Poivron                                                                                              | Poivron frais                                | x       | ---     | ---     |
+| Aubergine                                                                                            | Aubergine                                    | x       | ---     | ---     |
+| Jaxatu                                                                                               | Jaxatu                                       | x       | ---     | ---     |
+| Concombre                                                                                            | Concombre                                    | x       | ---     | ---     |
+| Choux                                                                                                | Chou                                         | x       | ---     | ---     |
+| Carotte                                                                                              | Carotte                                      | x       | ---     | ---     |
+| Betterave                                                                                            | Betterave                                    | x       | ---     | ---     |
+| Laitue                                                                                               | Salade                                       | x       | ---     | ---     |
+| Gingembre                                                                                            | Gingembre                                    | x       | ---     | ---     |
+| Calebasse                                                                                            | Calebasse                                    | x       | ---     | ---     |
+| Courge                                                                                               | Courge, Courgette                            | x       | ---     | ---     |
+| Haricot vert                                                                                         | Haricot vert                                 | x       | ---     | ---     |
+| Melon                                                                                                | Melon                                        | x       | ---     | ---     |
+| Pastèque                                                                                             | Pastèque                                     | x       | ---     | ---     |
+| Oseille verte                                                                                        | Oseille verte                                | x       | ---     | ---     |
+| Oseille rouge de Guinée                                                                              | Oseille rouge de Guinée                      | x       | ---     | ---     |
+| Anacarde                                                                                             | Noix de cajou                                | x       | ---     | ---     |
+| Anacardier                                                                                           | Noix de cajou                                | x       | ---     | ---     |
+| Manguier                                                                                             | Mangue                                       | x       | ---     | ---     |
+| Oranger                                                                                              | Orange                                       | x       | ---     | ---     |
+| Citronnier                                                                                           | Citron                                       | x       | ---     | ---     |
+| Lime Mexicaine                                                                                       | Lime mexicaine                               | x       | ---     | ---     |
+| Lime mexicaine                                                                                       | Lime mexicaine                               | x       | ---     | ---     |
+| Mandarinier                                                                                          | Mandarine                                    | x       | ---     | ---     |
+| Tangerine                                                                                            | Mandarine                                    | x       | ---     | ---     |
+| Tangérine                                                                                            | Mandarine                                    | x       | ---     | ---     |
+| Pamplemoussier                                                                                       | Pamplemousse                                 | x       | ---     | ---     |
+| Plamplemoussier                                                                                      | Pamplemousse                                 | x       | ---     | ---     |
+| Goyavier                                                                                             | Goyave                                       | x       | ---     | ---     |
+| Papayer                                                                                              | Papaye                                       | x       | ---     | ---     |
+| Bananier                                                                                             | Banane douce                                 | x       | ---     | ---     |
+| Bananier (banane douce)                                                                              | Banane douce                                 | x       | ---     | ---     |
+| Bananier (plantain)                                                                                  | Plantain                                     | x       | ---     | ---     |
+| Bananier (banane plantin)                                                                            | Plantain                                     | x       | ---     | ---     |
+| Jujubier Greffé                                                                                      | Jujube                                       | x       | ---     | ---     |
+| Jujubier greffé                                                                                      | Jujube                                       | x       | ---     | ---     |
+| Palmier dattier                                                                                      | Dattes                                       | x       | ---     | ---     |
+| Palmier à huile                                                                                      | Palmier à huile                              | x       | ---     | ---     |
+| Pomme canelle                                                                                        | Pomme cannelle                               | x       | ---     | ---     |
+| Autres                                                                                               | Autres cultures                              | x       | ---     | ---     |
 
 #+name: Roof
 | Alternate Spelling | Preferred Label |

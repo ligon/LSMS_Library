@@ -23,6 +23,7 @@ var = $(VAR_DIR)/shocks.parquet $(VAR_DIR)/nonfood_expenditures.parquet $(VAR_DI
 	  $(VAR_DIR)/assets.parquet $(VAR_DIR)/earnings.parquet $(VAR_DIR)/income.parquet \
 	  $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet \
 	  $(VAR_DIR)/plot_features.parquet \
+	  $(VAR_DIR)/crop_production.parquet \
 	  $(VAR_DIR)/months_food_inadequate.parquet
 
 all: $(parquet) $(var)
@@ -80,6 +81,12 @@ plot_features_parquet := $(plot_features:.py=.parquet)
 
 $(VAR_DIR)/plot_features.parquet: plot_features.py $(plot_features_parquet)
 	python plot_features.py
+
+crop_production = $(shell find $(rounds) -name crop_production.py)
+crop_production_parquet := $(crop_production:.py=.parquet)
+
+$(VAR_DIR)/crop_production.parquet: crop_production.py $(crop_production_parquet)
+	python crop_production.py
 
 months_food_inadequate = $(shell find $(rounds) -name months_food_inadequate.py)
 months_food_inadequate_parquet := $(months_food_inadequate:.py=.parquet)

@@ -346,3 +346,88 @@ def plot_features_for_wave(t, source, colmap):
     })
     df = df.set_index(['t', 'i', 'plot_id'])
     return df
+
+
+# ---------------------------------------------------------------------------
+# crop_production (GAP 1 — item-level crop harvest at (t, i, plot, crop, u))
+# ---------------------------------------------------------------------------
+#
+# One row per REPORTED harvest record: a crop grown on a plot, with the
+# reported harvest quantity in its native unit, plus reported sale
+# quantity / sale value and the intercropped / perennial flags WHERE the
+# instrument records them.  No aggregation — every reported line is kept;
+# harvest_kg, yield, value-shares and main_crop are transformations, not
+# columns here.
+#
+# Index = (t, i, plot, crop, u).  ``u`` is carried in the index (as in
+# food_acquired) because a single (plot, crop) can be reported in more
+# than one unit / harvest line, and collapsing those would be a sum.
+# ``plot`` = "{field_no}_{parcel_no}" aligns with plot_features' plot_id.
+#
+# Crop instrument by wave:
+#   2011-12  ecvmaas2e_p2  : plot-crop harvest + sold (qty/value) in one file.
+#   2014-15  ECVMA2_AS2E1  : plot-crop harvest + harvest months; sold lives
+#                            in ECVMA2_AS2E2 at CROP level (no plot) — joined
+#                            to the plot-crop rows by (i, crop) where a
+#                            household grows the crop on a single plot,
+#                            else left NaN (cannot attribute to one plot).
+#   2018-19  s16c          : plot-crop harvest + sold (qty/value) + intercrop.
+#   2021-22  s16c (+s16d)  : plot-crop harvest + intercrop in s16c; sold
+#                            (qty/value) in s16d at CROP level — joined the
+#                            same single-plot way as 2014-15.
+# perennial is NOT a separate flag in any Niger harvest module (the
+# perennial-crop roster is a distinct instrument not wired here), so the
+# ``perennial`` column is emitted all-NaN for parity with the schema.
+
+
+def _crop_labels(source_codes, source_labels, crop_map):
+    """Map a crop column (string labels from convert_categoricals=True)
+    through ``harmonize_food`` (keyed on Original Label).  Unmapped labels
+    pass through unchanged (kept visible, flagged by the sanity checker)."""
+    lab = source_labels.astype('string')
+    return lab.map(lambda x: crop_map.get(x, x) if pd.notna(x) else pd.NA).astype('string')
+
+
+def _unit_labels(unit_series, unit_map):
+    """Map a harvest-unit column (string labels) through the ``u`` table.
+    Unmapped labels pass through unchanged."""
+    u = unit_series.astype('string')
+    return u.map(lambda x: unit_map.get(x, x) if pd.notna(x) else pd.NA).astype('string')
+
+
+def _crop_maps():
+    crop_map = tools.get_categorical_mapping(
+        tablename='harmonize_food', idxvars='Original Label',
+        **{'Preferred Label': 'Preferred Label'})
+    unit_map = tools.get_categorical_mapping(
+        tablename='u', idxvars='Original Label',
+        **{'Preferred Label': 'Preferred Label'})
+    return crop_map, unit_map
+
+
+def _finish_crop_production(df, t):
+    """Common tail: tag t, build the (t, i, plot, crop, u) index, coerce
+    numeric columns, and guarantee the full schema column set."""
+    for col in ['Quantity', 'Quantity_sold', 'Value_sold']:
+        df[col] = pd.to_numeric(df.get(col), errors='coerce').astype('Float64')
+    # harvest_month: only 2014-15 records it; NaN elsewhere (still carried
+    # because >=1 wave has it).  planting_month / perennial are omitted from
+    # the schema entirely — no Niger wave records them.
+    if 'harvest_month' not in df.columns:
+        df['harvest_month'] = pd.NA
+    df['harvest_month'] = pd.to_numeric(df['harvest_month'], errors='coerce').astype('Float64')
+    if 'intercropped' not in df.columns:
+        df['intercropped'] = pd.NA
+    df['intercropped'] = df['intercropped'].astype('boolean')
+    df['t'] = t
+    df['crop'] = df['crop'].astype('string')
+    df['u'] = df['u'].astype('string')
+    # Drop placeholder rows with no crop recorded (a parcel listed but no
+    # crop grown / reported on the line).  These carry no harvest data
+    # (crop, Quantity, unit all NA) and are not item-level harvest records.
+    df = df[df['crop'].notna()]
+    keep = ['t', 'i', 'plot', 'crop', 'u', 'Quantity',
+            'Quantity_sold', 'Value_sold', 'harvest_month', 'intercropped']
+    df = df[[c for c in keep if c in df.columns]]
+    df = df.set_index(['t', 'i', 'plot', 'crop', 'u'])
+    return df

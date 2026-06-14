@@ -107,4 +107,34 @@ Data Scheme:
     SoilType: str
     Irrigated: bool
     materialize: make
+  crop_production:
+    # Item-level post-harvest crop module (GAP 1 parity build).  One row
+    # per REPORTED harvest record for a crop on a plot.  Source: AGSEC5A
+    # (season 1) + AGSEC5B (season 2) of the UNPS post-harvest
+    # questionnaire, joined to AGSEC4A for the intercropped flag.
+    #
+    # Grain (t, i, plot, j, u, season):
+    #   plot   — hhid-parcel-plot, mirroring the WB harmonised plot_id;
+    #            its parcel component is the parcel plot_features keys on.
+    #   j      — crop, on the shared 'harmonize_crop' Preferred Labels,
+    #            which REUSE the harmonize_food Aggregate Label strings
+    #            for food crops (Maize, Beans, Rice, ...) so a crop j
+    #            joins food_acquired(labels='Aggregate').j.
+    #   u      — reported native harvest unit ('harvest_units' table);
+    #            'Unknown' where a wave records no harvest unit label
+    #            (e.g. 2018-19 harvest side).
+    #   season — 'A' (first season) / 'B' (second season).
+    #
+    # Columns are REPORTED values only — no harvest_kg / yield /
+    # main_crop / value-share (those are transformations).  Missing in a
+    # wave -> NaN.  2005-06 is excluded: its AGSEC5A is a crop-area
+    # allocation matrix with no crop-level harvest quantities, and the
+    # WB LSMS-ISA panel itself starts at wave 1 (2009-10).
+    index: (t, i, plot, j, u, season)
+    Quantity: float
+    Quantity_sold: float
+    Value_sold: float
+    harvest_month: int
+    intercropped: bool
+    materialize: make
   nonfood_expenditures: !make

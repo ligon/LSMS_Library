@@ -129,3 +129,38 @@ Data Scheme:
     SoilType: str
     Irrigated: bool
     materialize: make
+
+  crop_production:
+    # Item-level crop harvest (GAP 1, parity loop 2026-06-14).  One row
+    # per REPORTED (field, parcel, crop) harvest line — REPORTED values
+    # only; harvest_kg / yield / main_crop / value-shares are
+    # transformations, never columns here.  All four waves have an
+    # agriculture harvest module (script-path):
+    #   2011-12 ecvmaas2e_p2          (plot-crop harvest + sold + value)
+    #   2014-15 ECVMA2_AS2E1 (+AS2E2)  (harvest + months; sold crop-level)
+    #   2018-19 s16c                   (harvest + sold + value + intercrop)
+    #   2021-22 s16c (+s16d)           (harvest + intercrop; sold crop-level)
+    # crop joins food via harmonize_food Preferred Labels (so a crop that
+    # is also a consumed food shares food_acquired's Preferred Label); u
+    # via the u table.  ``u`` is in the index (as in food_acquired) because one
+    # (plot, crop) can be reported in several units — collapsing would
+    # sum.  plot = "{field_no}_{parcel_no}" aligns with plot_features'
+    # plot_id (verified 100% join on the EHCVM waves).  Quantity_sold /
+    # Value_sold are at plot-crop grain only where the survey records them
+    # there (2011-12, 2018-19); in 2014-15 / 2021-22 the sale block is
+    # crop-level and is attributed only to single-plot crops, else NaN.
+    # Columns intentionally OMITTED (no Niger wave records them, so an
+    # all-NaN column would just trip the sanity checker — GAP rule "only
+    # include columns the source actually records"): planting_month (no
+    # planting-date question in any harvest module) and a perennial flag
+    # (the perennial-crop roster is a separate, un-wired instrument).
+    # harvest_month is recorded only in 2014-15 (AS02EQ06A); intercropped
+    # only in the EHCVM waves (s16cq07).  Both are present in >=1 wave so
+    # they are carried (NaN in the waves that lack them).
+    index: (t, i, plot, crop, u)
+    Quantity: float
+    Quantity_sold: float
+    Value_sold: float
+    harvest_month: float
+    intercropped: bool
+    materialize: make

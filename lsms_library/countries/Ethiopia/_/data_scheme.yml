@@ -91,6 +91,29 @@ Data Scheme:
     Irrigated: bool
     materialize: make
 
+  crop_production:
+    # GAP 1 — item-level crop harvest at (t, i, plot_id, j, u).  One row
+    # per (plot, crop) from ESS §9 post-harvest (sect9_ph), carrying only
+    # REPORTED fields: harvest Quantity in its native unit u, Quantity_sold
+    # / Value_sold from §11 (attached at the unambiguous holder-crop join,
+    # see ethiopia.crop_production_for_wave SALES GRAIN CAVEAT),
+    # planting_month (§4) / harvest_month (§9), and the intercropped /
+    # perennial flags.  NO unit->kg conversion, NO yield / main-crop /
+    # value-share rollups (those are transformations).  plot_id and i match
+    # plot_features exactly, so the two features join on (t, i, plot_id).
+    # crop labels reuse the food Preferred Labels (harmonize_crop table) so
+    # crop_production.j joins food_acquired.j.  Multi-file joins (§9+§4+§11,
+    # + §3 for W1 intercrop) + code->label harmonization => script.
+    index: (t, i, plot_id, j, u)
+    Quantity: float
+    Quantity_sold: float
+    Value_sold: float
+    planting_month: int
+    harvest_month: int
+    intercropped: bool
+    perennial: bool
+    materialize: make
+
   food_security:
     # FAO FIES 8-item experience scale (GH #332).  Confirmed ONLY in
     # W5 (2021-22): ESS §8 file sect8_hh_w5.dta carries the FAO battery

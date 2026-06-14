@@ -104,6 +104,35 @@ Data Scheme:
     Irrigated: bool
     materialize: make
 
+  crop_production:
+    # Item-level reported crop harvest (GAP 1) at natural grain
+    # (t, i, plot, crop).  Source: post-harvest crop module secta3*.
+    # Crop-level harvest is recorded only in the post-harvest round, so
+    # each wave maps to a single t = PH quarter (2011Q1 / 2013Q1 /
+    # 2016Q1 / 2019Q1 / 2024Q1), distinct from plot_features' PP quarter
+    # (same wave, different round; plot_id aligns via format_id).
+    # Country-level script (_/crop_production.py) joins/reshapes per wave
+    # (W3-W5 split the module across secta3i / secta3ii / secta3iii) ->
+    # materialize: make.  Stores REPORTED fields only -- no kg
+    # conversion, yield, main_crop, or value shares (transformations).
+    # crop (j) on the shared harmonize_food Preferred Label so it joins
+    # food_acquired.j; u normalized to the shared `u` table base labels.
+    # Quantity_sold / Value_sold populated only where the survey records
+    # sales at the plot-crop grain (W1/W2); W3-W5 record sales at
+    # hh-crop grain (no plot linkage) -> NaN.  intercropped derived from
+    # the PP planting roster (sect11f s11fq2) where present (W1-W3);
+    # perennial = True for tree/permanent-crop rows (W4/W5 secta3iii).
+    index: (t, i, plot, crop)
+    Quantity: float
+    u: str
+    Quantity_sold: float
+    Value_sold: float
+    planting_month: str
+    harvest_month: str
+    intercropped: bool
+    perennial: bool
+    materialize: make
+
   food_coping:
     # Family B (coping-strategies / rCSI), #332.  GHS section 9 ("Food
     # Security") is a coping day-count battery (items s9q1a..s9q1i: "how

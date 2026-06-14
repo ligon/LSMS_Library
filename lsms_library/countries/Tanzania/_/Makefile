@@ -66,6 +66,15 @@ $(VAR_DIR)/plot_features.parquet: plot_features.py $(plot_features_parquet)
 ../%/_/plot_features.parquet:
 	(cd $(@D) && python plot_features.py)
 
+crop_production = $(shell find $(rounds) -name crop_production.py)
+crop_production_parquet := $(crop_production:.py=.parquet)
+
+$(VAR_DIR)/crop_production.parquet: crop_production.py $(crop_production_parquet)
+	python crop_production.py
+
+../%/_/crop_production.parquet:
+	(cd $(@D) && python crop_production.py)
+
 %.parquet: %.py CONTENTS.org tanzania.py
 	(cd $(@D) && python ./$(<F))
 
