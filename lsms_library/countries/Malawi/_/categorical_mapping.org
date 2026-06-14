@@ -383,6 +383,8 @@
 | C03 | 90 kg Bag |  |
 | C11 | Basket (Dengu) |  |
 | C12 | Ox-Cart |  |
+| K16 | Cup |  |
+| K17 | Tin |  |
 | 00 | Other (Specify) |  |
 | 03 | Other (Specify) |  |
 | 12 | Other (Specify) |  |
@@ -755,3 +757,115 @@
 |    5 | Construction    |
 |    6 | Services        |
 |    7 | Other           |
+
+# community_prices ITEM codes (Community/Market questionnaire Module CK
+# "Reference prices of selected items", codes 1-51; GAP C).  This is a
+# DIFFERENT code space from the food-consumption food_acquired item lists
+# and the harmonize_crop crop codes, so -- like harmonize_crop /
+# harmonize_crop_unit -- it gets its own Code-keyed table.  The Preferred
+# Labels REUSE the SAME harmonize_food / harmonize_crop Preferred Label
+# strings for the items that are also consumed foods or grown crops (so a
+# surveyed community price for Maize Grain (Not As Ufa) / Rice / Beef /
+# Tomato / ... JOINS food_acquired.j and crop_production.crop on the
+# shared label axis).  The non-food priced goods (soap, batteries, tools,
+# fertilizer, transport, the ganyu day-wage, ...) get their own clear
+# Preferred Labels -- they have no consumed-food / crop counterpart, but
+# stay on the same j axis so a future price index can reach them.
+# Codes 3/4 are MILLING SERVICES (cost to grind a 50 kg bag), code 42 a
+# TRANSPORT service, code 51 the GANYU DAY-WAGE: priced "items" the survey
+# carries here but which are services, labelled as such.  The 2013-14
+# (IHPS) wave codes these items as the STRING "CK<n>" (CK1, CK3, CK22,
+# ...); the wave script strips the "CK" prefix to the same 1-51 integer
+# code before mapping.  2016-17 (IHS4) collected NO Module CK price
+# section -- community_prices is absent for that wave (reported, not
+# imputed).  kg/MK conversion is NOT stored here (a transformations
+# concern); this is the label axis only.
+#+name: harmonize_price_item
+| Code | Preferred Label                   |
+|------+-----------------------------------|
+|    1 | Maize Grain (Not As Ufa)          |
+|    2 | Maize Ufa Mgaiwa (Normal Flour)   |
+|    3 | Cost To Grind 50 Kg Maize         |
+|    4 | Cost To Grind 50 Kg Rice          |
+|    5 | Rice                              |
+|    6 | Bread                             |
+|    7 | Mandazi, Doughnut (Vendor)        |
+|    8 | Beans                             |
+|    9 | Cabbage                           |
+|   10 | Tomato                            |
+|   11 | Banana                            |
+|   12 | Fresh Milk                        |
+|   13 | Eggs                              |
+|   14 | Chicken                           |
+|   15 | Sun Dried Fish                    |
+|   16 | Beef                              |
+|   17 | Tea                               |
+|   18 | Salt                              |
+|   19 | Sugar                             |
+|   20 | Cooking Oil                       |
+|   21 | Chips (Vendor)                    |
+|   22 | Bar Soap                          |
+|   23 | Toothbrush                        |
+|   24 | Toothpaste                        |
+|   25 | Clothes Soap                      |
+|   26 | Vaseline/Glycerin                 |
+|   27 | Aspirin Or Panadol                |
+|   28 | Fansidar                          |
+|   29 | Chitenje Cloth                    |
+|   30 | Trousers (Second-Hand)            |
+|   31 | Soft Drink (Bottle)               |
+|   32 | Bottled/ Canned Beer              |
+|   33 | Cigarettes                        |
+|   34 | Battery (Dry Cell)                |
+|   35 | Watch (Digital)                   |
+|   36 | Firewood                          |
+|   37 | Charcoal                          |
+|   38 | Paraffin                          |
+|   39 | Chemical Fertilizer               |
+|   40 | Pesticides/Insecticides           |
+|   41 | Herbicides/Fungicides             |
+|   42 | Motorized Transport Of Crop       |
+|   43 | Hybrid Maize Seed                 |
+|   44 | Hand Hoe                          |
+|   45 | Panga                             |
+|   46 | Sickle                            |
+|   47 | Axe                               |
+|   48 | Bicycle                           |
+|   49 | Foam Mattress                     |
+|   50 | Mosquito Net                      |
+|   51 | Ganyu Wage (1 Day, Adult Male)    |
+
+# community_prices UNIT codes (Module CK unit list, codes 1-21; GAP C).
+# Same physical-unit label axis as the `u` food-consumption table and
+# harmonize_crop_unit: the Preferred Labels REUSE the shared `u` Preferred
+# Label strings ('Kilogramme', '50 kg Bag', 'Pail (Small)', 'Bunch',
+# 'Piece', 'Litre', ...) so community_prices.u joins food_acquired.u and
+# crop_production.u on the shared physical-unit label.  '90 kg Bag',
+# 'Basket (Dengu)' and 'Ox-Cart' already exist on the crop side; '5L Cup'
+# / 'Tin' / 'Satchet/Tube' likewise reuse the `u` labels.  Codes outside
+# 1-21 (rare 2013-14 data-entry artifacts: 0, 22, 23, 25, 48, 69, 200,
+# 500) fall through to NaN -- not faked into a unit.
+#+name: harmonize_price_unit
+| Code | Preferred Label         |
+|------+-------------------------|
+|    1 | Kilogramme              |
+|    2 | 50 kg Bag               |
+|    3 | 90 kg Bag               |
+|    4 | Pail (Small)            |
+|    5 | Pail (Large)            |
+|    6 | No 10 Plate             |
+|    7 | No 12 Plate             |
+|    8 | Bunch                   |
+|    9 | Piece                   |
+|   10 | Heap                    |
+|   11 | Bale                    |
+|   12 | Basket (Dengu)          |
+|   13 | Basket (Dengu)          |
+|   14 | Ox-Cart                 |
+|   15 | Litre                   |
+|   16 | Cup                     |
+|   17 | Tin                     |
+|   18 | Gram                    |
+|   19 | Millilitre              |
+|   20 | Satchet/Tube            |
+|   21 | Other (Specify)         |

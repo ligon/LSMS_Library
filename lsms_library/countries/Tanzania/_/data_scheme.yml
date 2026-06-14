@@ -335,3 +335,43 @@ Data Scheme:
     HeadAcquired: float
     HeadSold: float
     materialize: make
+
+  community_prices:
+    # Item-level community / market food prices (parity-loop GAP C -- OURS-ONLY,
+    # the maintainer-priority gap; the WB panel surveys no community prices).
+    # Natural grain (t, v, j, u) -- one row per (community cluster v, harmonized
+    # food item j, native unit u) -- from the COMMUNITY price questionnaire
+    # (CM_SEC_F_ID / cm_sec_f_id), carrying ONLY the REPORTED village-market
+    # unit price.  This is the community-price arm of label unification: j is
+    # the canonical Preferred Label from harmonize_community_price, which REUSES
+    # the harmonize_food / harmonize_crop Preferred Labels for every priced
+    # food, so a community_prices "Maize (grain)" row lines up with the
+    # food_acquired (consumption) and crop_production (harvest) "Maize (grain)"
+    # rows.  u is the native unit (Kg / Gram / Litre / Millilitre / Piece) on
+    # the shared `u` table.
+    #   Price : REPORTED unit price = cm_f063 / cm_f062 (currency per ONE native
+    #           unit u) -- the reported village price divided through by its own
+    #           reported quantity basis.  NO median/mean across clusters, NO
+    #           community->household imputation: those are TRANSFORMATIONS over
+    #           these rows (the documented #113 region-level fallback), never
+    #           stored here.  The district-capital price triple (cm_f064/65/66)
+    #           is a different geographic level (the district town) and is NOT
+    #           folded into the cluster grain.
+    # v is the community questionnaire's OWN native cluster id (interview__key).
+    # DATA LIMITATION (issue #113 / CONTENTS.org): the NPS community and
+    # household instruments use INCOMPATIBLE cluster coding -- the community
+    # interview__key has zero overlap with the household interview__key, and the
+    # community location codes reconcile to the household survey-design cluster
+    # only at the REGION level, not the EA/cluster level (~4% EA-tuple match).
+    # So community_prices.v does NOT intersect sample().v; the
+    # community->household join is a region-level fallback TRANSFORMATION,
+    # deliberately not baked in.  Because the grain has no household i, the
+    # framework's _join_v_from_sample never fires (it requires an i level), so v
+    # is left native -- no _no_v_join entry is needed.
+    # WAVE SCOPE: 2019-20 (NPS-SDD Extended Panel; 99 communities, ~3.2k priced
+    # rows) and 2020-21 (NPS Y5 Refresh Panel; 488 communities, ~14.8k priced
+    # rows).  2008-15 has no community questionnaire source on disk (the
+    # multi-round panel release retained only the household upd4_hh_* modules).
+    index: (t, v, j, u)
+    Price: float
+    materialize: make

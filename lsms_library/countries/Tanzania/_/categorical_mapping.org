@@ -615,6 +615,13 @@
 | small cup      | Small Cup       |            |            |           |
 | large cup      | Large Cup       |            |            |           |
 | millilitre     | Millilitre      |            |            |           |
+| kilograms      | Kg              |            |            |           |
+| grams          | Gram            |            |            |           |
+| LITRES         | Litre           |            |            |           |
+| litres         | Litre           |            |            |           |
+| MILLILITRES    | Millilitre      |            |            |           |
+| millilitres    | Millilitre      |            |            |           |
+| pieces         | Piece           |            |            |           |
 
 # harmonize_crop is the (j) axis for crop_production (parity-loop GAP 1).
 # Keyed on the NPS crop CODE ("cropid" / "zaocode") from the agriculture
@@ -821,3 +828,94 @@
 | 15   |                 | 15      | 15      |
 | 16   |                 | 16      | 16      |
 | 17   |                 |         | 17      |
+
+# harmonize_community_price is the (j) axis for the `community_prices` feature
+# (parity-loop GAP C -- the community-price arm of label unification, Unit #0).
+# Keyed on the COMMUNITY price questionnaire's own item code (`item_id`,
+# CM_SEC_F_ID `cm_f060`), which is a SEPARATE 1..52 code space from the
+# food-consumption module codes (harmonize_food `Code`) and from the
+# agriculture crop codes (harmonize_crop).  The 52 codes are identical and
+# stable across both buildable waves (2019-20 NPS-SDD, 2020-21 NPS Y5); the
+# 2019-20 instrument labels several items in Swahili (MAHARAGE=beans,
+# KUNDE=cowpeas, KARANGA=groundnuts, MAZI=coconut, KAROTI=carrots) which is why
+# the wave columns differ in spelling but resolve to the same Preferred Label.
+#
+# The Preferred Label REUSES the harmonize_food Preferred Labels wherever a
+# priced item is a consumed food, so community_prices.j shares the (j) axis
+# with food_acquired (consumption) and crop_production (harvest) -- e.g.
+# RICE (PADDY) -> "Rice (paddy)", MAIZE (GRAIN) -> "Maize (grain)",
+# MILLET (GRAIN)/SORGHUM (GRAIN) -> "Millet & Sorghum (grain)",
+# MAHARAGE/KUNDE -> "Pulses", KARANGA -> "Groundnuts", TOMATOES/ONIONS/KAROTI
+# -> "Vegetables (fresh)", SPINACH/CABBAGE -> "Leafy Greens",
+# MANGOES/PAPAYA -> "Other Fruits", COOKING BANANAS -> "Plantains",
+# DAGAA/FRESH FISH -> "Fish (fresh)".  This is the label join the maintainer
+# asked for: a community price row for code 4 ("Maize (grain)") lines up with
+# the food_acquired and crop_production "Maize (grain)" rows.
+#
+# The community price questionnaire also surveys SEVEN non-food household
+# goods/fuels/services the food-consumption module does not carry (codes
+# 46-52): Kerosene, Charcoal, Maize Grinding (a milling SERVICE, not a good),
+# Firewood, Matches, Cigarettes, Batteries.  These get NEW Preferred Labels
+# (they are legitimate REPORTED community prices, so they are kept, not
+# dropped) -- they will not join food_acquired (no consumed-food counterpart),
+# which is correct: they are non-food priced goods.
+#
+# The wave script resolves the RAW item_id code -> Preferred Label in-script
+# via _community_price_codes()/_plot_harmonized_codes('harmonize_community_price'),
+# so the emitted (j) is already canonical; the per-wave columns below carry the
+# decoded survey string only for documentation / traceability.
+#+name: harmonize_community_price
+| Code | Preferred Label          | 2019-20             | 2020-21              |
+|------+--------------------------+---------------------+----------------------|
+| 1    | Rice (paddy)             | RICE (PADDY)        | RICE (PADDY)         |
+| 2    | Rice (husked)            | RICE (HUSKED)       | RICE (HUSKED)        |
+| 3    | Maize (green, cob)       | MAIZE (GREEN, COB)  | MAIZE (GREEN, COB)   |
+| 4    | Maize (grain)            | MAIZE (GRAIN)       | MAIZE (GRAIN)        |
+| 5    | Maize (flour)            | MAIZE (FLOUR)       | MAIZE (FLOUR)        |
+| 6    | Millet & Sorghum (grain) | MILLET (GRAIN)      | MILLET (GRAIN)       |
+| 7    | Millet & Sorghum (grain) | SORGHUM (GRAIN)     | SORGHUM (GRAIN)      |
+| 8    | Millet & Sorghum (flour) | MILLET (FLOUR)      | MILLET (FLOUR)       |
+| 9    | Millet & Sorghum (flour) | SORGHUM (FLOUR)     | SORGHUM (FLOUR)      |
+| 10   | Bread                    | BREAD               | bread                |
+| 11   | Buns, Cakes And Biscuits | BUNS                | buns                 |
+| 12   | Cassava Fresh            | CASSAVA FRESH       | CASSAVA FRESH        |
+| 13   | Cassava Dry/Flour        | CASSAVA (DRY)       | CASSAVA (DRY)        |
+| 14   | Cassava Dry/Flour        | CASSAVA FLOUR       | CASSAVA FLOUR        |
+| 15   | Sweet Potatoes           | SWEET POTATOES      | SWEET POTATOES       |
+| 16   | Yams/Cocoyams            | COCOYAMS            | cocoyams             |
+| 17   | Yams/Cocoyams            | YAMS                | yams                 |
+| 18   | Irish Potatoes           | IRISH POTATOES      | IRISH POTATOES       |
+| 19   | Plantains                | COOKING BANANAS     | COOKING BANANAS      |
+| 20   | Sugar                    | SUGAR               | sugar                |
+| 21   | Pulses                   | MAHARAGE            | beans                |
+| 22   | Pulses                   | KUNDE               | peas                 |
+| 23   | Groundnuts               | KARANGA             | groundnuts           |
+| 24   | Coconuts                 | MAZI                | coconuts             |
+| 25   | Vegetables (fresh)       | KAROTI              | carrots              |
+| 26   | Vegetables (fresh)       | TOMATOES            | tomatoes             |
+| 27   | Vegetables (fresh)       | ONIONS              | onions               |
+| 28   | Leafy Greens             | SPINACH             | spinach              |
+| 29   | Leafy Greens             | CABBAGE             | cabbage              |
+| 30   | Ripe Bananas             | RIPE BANANAS        | RIPE BANANAS         |
+| 31   | Citrus Fruits            | CITRUS FRUITS       | CITRUS FRUITS        |
+| 32   | Other Fruits             | PAPAYA              | papaya               |
+| 33   | Other Fruits             | MANGOES             | mangoes              |
+| 34   | Goat Meat                | GOAT MEAT           | GOAT MEAT            |
+| 35   | Beef                     | BEEF                | beef                 |
+| 36   | Chicken                  | CHICKEN (LIVE)      | CHICKEN (LIVE)       |
+| 37   | Eggs                     | EGGS                | eggs                 |
+| 38   | Fish (fresh)             | FRESH FISH          | FRESH FISH           |
+| 39   | Fish (fresh)             | DAGAA               | dagaa                |
+| 40   | Milk (fresh)             | FRESH MILK          | FRESH MILK           |
+| 41   | Milk (dry or canned)     | CANNED MILK/POWDER  | CANNED MILK/POWDER   |
+| 42   | Cooking Oil              | COOKING OIL         | COOKING OIL          |
+| 43   | Salt                     | SALT                | salt                 |
+| 44   | Tea (dry)                | TEA (DRY)           | TEA (DRY)            |
+| 45   | Local Brews              | LOCAL BREWS         | LOCAL BREWS          |
+| 46   | Kerosene                 | KEROSINE            | kerosine             |
+| 47   | Charcoal                 | CHARCOAL            | charcoal             |
+| 48   | Maize Grinding           | MAIZE GRINDING COSTS | MAIZE GRINDING COSTS |
+| 49   | Firewood                 | FIREWOOD            | firewood             |
+| 50   | Matches                  | MATCHES             | matches              |
+| 51   | Cigarettes               | CIGARETTES          | cigarettes           |
+| 52   | Batteries                | BATTERIES           | batteries            |

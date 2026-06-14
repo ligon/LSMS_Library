@@ -343,4 +343,44 @@ Data Scheme:
     working_age: float
     materialize: make
 
+  community_prices:
+    # Item-level reported community food prices (GAP C) at natural grain
+    # (t, v, j, u).  CLUSTER-level: one row per (cluster/EA x food-item x
+    # unit) from the post-harvest COMMUNITY questionnaire's food-price
+    # module (Section C8 "Food Prices", file sectc8_harvest{wN}; W3 splits
+    # it across sectc8a / sectc8b; W5 under Post Harvest Wave 5/Community/).
+    # There is NO household i, so _join_v_from_sample does NOT apply -- `v`
+    # is declared in the index here and carried NATIVELY: it is the
+    # community questionnaire's EA id (v = format_id(ea)), the SAME keyspace
+    # as sample().v, so community_prices.v joins households via their
+    # cluster.  Country-level script (_/community_prices.py) maps each wave
+    # -> materialize: make.
+    #
+    # Stores the REPORTED surveyed field ONLY:
+    #   Price   prevailing price of one unit `u` of item `j` in cluster `v`
+    #           at the present time (Naira).  W1/W2 sc8q2 / c8q2; W3-W5
+    #           c8q3 / c8aq3.
+    # NOT an index, NOT a cross-cluster median/mean, NOT an HH-median
+    # imputation -- those are transformations over these rows.  (The WB
+    # panel surveys NO community prices: their crop_price_EA is an HH-median
+    # imputation; ours is the SURVEYED community price -- strictly better.)
+    #
+    # Labels (the community-price arm of label unification):
+    #   j -> the SHARED harmonize_food Preferred Label, so community_prices.j
+    #        joins food_acquired.j and crop_production.crop.  W3-W5 item_cd is
+    #        the consumption-module scheme already in harmonize_food (resolved
+    #        via Code).  W1/W2 use the community questionnaire's OWN code
+    #        scheme, mapped by NAME in nigeria.py (_W1W2_PRICE_ITEM), reusing
+    #        existing food labels; the 16 genuinely-new prepared-food/drink
+    #        price items are registered in harmonize_food (codes 4001-4016).
+    #   u -> the SHARED `u` table base Preferred Label via _canon_unit (all
+    #        30 units used already exist in `u` -- no extension needed).  W3-W5
+    #        record the unit per row; W1/W2 carry no unit column, so the unit
+    #        is the questionnaire's per-item fixed unit (_W1W2_PRICE_UNIT).
+    # t = PH_QUARTER[wave] (the price module sits in the post-harvest round,
+    # matching crop_production / anthropometry).
+    index: (t, v, j, u)
+    Price: float
+    materialize: make
+
   nonfood_expenditures: !make

@@ -177,6 +177,12 @@
 | Sac(50kg)             | Sac de 50 kg     |      |                  |                       |
 | Sac (100kg)           | Sac de 100 kg    |      |                  |                       |
 | Sac(100kg)            | Sac de 100 kg    |      |                  |                       |
+| Sac de 100 kg         | Sac de 100 kg    |      |                  |                       |
+| gros sac              | Gros sac         |      |                  |                       |
+| sac moyen             | Sac Moyen        |      |                  |                       |
+| tia                   | Tia              |      |                  |                       |
+| produit absent        | Manquant         |      |                  |                       |
+| Produit absent        | Manquant         |      |                  |                       |
 
 #+NAME: Region
 | Original Label                 | Preferred Label                |
@@ -811,6 +817,98 @@
 | petits pois                                                                               | Petits pois                                                                          |
 | Céléri                                                                                    | Céleri                                                                               |
 | Celeri                                                                                    | Céleri                                                                               |
+| Mil                                                                                       | Mil                                                                                  |
+| mil                                                                                       | Mil                                                                                  |
+| Sorgho                                                                                    | Sorgho                                                                               |
+| sorgho                                                                                    | Sorgho                                                                               |
+| Maïs                                                                                      | Maïs en grain                                                                        |
+| maïs                                                                                      | Maïs en grain                                                                        |
+| Riz                                                                                       | Autre Riz local                                                                      |
+| riz                                                                                       | Autre Riz local                                                                      |
+| Pain                                                                                      | Pain traditionnel                                                                    |
+| pain                                                                                      | Pain traditionnel                                                                    |
+| Farine de blé                                                                             | Farine de blé local ou importé                                                       |
+| farine de blé                                                                             | Farine de blé local ou importé                                                       |
+| Farine de maïs                                                                            | Farine de maïs                                                                       |
+| farine de maïs                                                                            | Farine de maïs                                                                       |
+| Farine de manioc                                                                          | Farines de manioc                                                                    |
+| farine de manioc                                                                          | Farines de manioc                                                                    |
+| Pâtes alimentaires                                                                        | Pâtes alimentaires                                                                   |
+| pâtes alimentaires                                                                        | Pâtes alimentaires                                                                   |
+| Haricots secs                                                                             | Niébé/Haricots secs                                                                  |
+| haricots secs                                                                             | Niébé/Haricots secs                                                                  |
+| Oignon frais                                                                              | Oignon frais                                                                         |
+| oignon frais                                                                              | Oignon frais                                                                         |
+| Poivron                                                                                   | Poivron frais                                                                        |
+| poivron                                                                                   | Poivron frais                                                                        |
+| Piment                                                                                    | Piment frais                                                                         |
+| piment                                                                                    | Piment frais                                                                         |
+| Tomate fraiche                                                                            | Tomate fraîche                                                                       |
+| tomate fraiche                                                                            | Tomate fraîche                                                                       |
+| Tomate séchée                                                                             | Tomate séchée                                                                        |
+| tomate séchée                                                                             | Tomate séchée                                                                        |
+| Concentré de tomate                                                                       | Concentré de tomate                                                                  |
+| concentré de tomate                                                                       | Concentré de tomate                                                                  |
+| Gombo frais                                                                               | Gombo frais                                                                          |
+| gombo frais                                                                               | Gombo frais                                                                          |
+| Gombo sec                                                                                 | Gombo sec                                                                            |
+| gombo sec                                                                                 | Gombo sec                                                                            |
+| Feuilles de baobab                                                                        | Feuilles de baobab                                                                   |
+| feuilles de baobab                                                                        | Feuilles de baobab                                                                   |
+| Malahya (Fakkou)                                                                          | Malohiya (Fakkou)                                                                    |
+| malahya (fakkou)                                                                          | Malohiya (Fakkou)                                                                    |
+| Soumbala                                                                                  | Soumbala (moutarde africaine)                                                        |
+| soumbala                                                                                  | Soumbala (moutarde africaine)                                                        |
+| Huile d'arachide                                                                          | Huile d'arachide                                                                     |
+| huile d'arachide                                                                          | Huile d'arachide                                                                     |
+| Huile de palme                                                                            | Huile de palme rouge                                                                 |
+| huile de palme                                                                            | Huile de palme rouge                                                                 |
+| Pâte d'arachide                                                                           | Pâte d'arachide                                                                      |
+| pâte d'arachide                                                                           | Pâte d'arachide                                                                      |
+| Sel                                                                                       | Sel                                                                                  |
+| sel                                                                                       | Sel                                                                                  |
+| Sucre                                                                                     | Sucre (poudre ou morceaux)                                                           |
+| sucre                                                                                     | Sucre (poudre ou morceaux)                                                           |
+| Thé                                                                                       | Thé                                                                                  |
+| thé                                                                                       | Thé                                                                                  |
+| Cube (Maggi)                                                                              | Cube alimentaire (Maggi, Jumbo, )                                                    |
+| cube (maggi)                                                                              | Cube alimentaire (Maggi, Jumbo, )                                                    |
+| Viande de bœuf                                                                            | Viande de bœuf                                                                       |
+| viande de boeuf                                                                           | Viande de bœuf                                                                       |
+| Viande de buf                                                                            | Viande de bœuf                                                                       |
+| viande de buf                                                                            | Viande de bœuf                                                                       |
+| Viande mouton                                                                             | Viande de mouton                                                                     |
+| viande mouton                                                                             | Viande de mouton                                                                     |
+| Viande de chèvre                                                                          | Viande de chèvre                                                                     |
+| viande de chèvre                                                                          | Viande de chèvre                                                                     |
+| Viande de poulet                                                                          | Viande de poulet                                                                     |
+| viande de poulet                                                                          | Viande de poulet                                                                     |
+| Lait frais                                                                                | Lait frais                                                                           |
+| lait frais                                                                                | Lait frais                                                                           |
+| Lait caillé                                                                               | Lait caillé, yaourt                                                                  |
+| lait caillé                                                                               | Lait caillé, yaourt                                                                  |
+| Lait en poudre                                                                            | Lait en poudre                                                                       |
+| lait en poudre                                                                            | Lait en poudre                                                                       |
+| Yodo (Foye youto)                                                                         | Yodo (Foye youto)                                                                    |
+| yodo (foye youto)                                                                         | Yodo (Foye youto)                                                                    |
+| Tourteaux d'arachide                                                                      | Tourteaux d'arachide                                                                 |
+| tourteaux d'arachide                                                                      | Tourteaux d'arachide                                                                 |
+| Alumettes                                                                                 | Allumettes                                                                           |
+| alumettes                                                                                 | Allumettes                                                                           |
+| Savon de ménage                                                                           | Savon de ménage                                                                      |
+| savon de ménage                                                                           | Savon de ménage                                                                      |
+| Produits pharmaceutiques                                                                  | Produits pharmaceutiques                                                             |
+| produits pharmaceutiques                                                                  | Produits pharmaceutiques                                                             |
+| Bois de chauffe                                                                           | Bois de chauffe                                                                      |
+| bois de chauffe                                                                           | Bois de chauffe                                                                      |
+| Pétrole lampant                                                                           | Pétrole lampant                                                                      |
+| pétrole lampant                                                                           | Pétrole lampant                                                                      |
+| Essence ordinaire                                                                         | Essence ordinaire                                                                    |
+| essence ordinaire                                                                         | Essence ordinaire                                                                    |
+| Electricité                                                                               | Électricité                                                                          |
+| electricité                                                                               | Électricité                                                                          |
+| Transport urbain                                                                          | Transport urbain                                                                     |
+| transport urbain                                                                          | Transport urbain                                                                     |
 
 * Agricultural Inputs (plot_inputs — the input axis)
 

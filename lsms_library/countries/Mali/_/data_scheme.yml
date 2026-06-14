@@ -298,3 +298,45 @@ Data Scheme:
     Industry: str
     working_age: bool
     materialize: make
+  community_prices:
+    # Item-level cluster food prices, GAP C (parity loop).  One row per
+    # (t, v, j, u): the REPORTED price the EACI community price questionnaire
+    # records for a food item in a cluster, NOT a median / mean / index
+    # (those are transformations.py rollups over these rows) and NOT a
+    # community->household price imputation.  CLUSTER-level — there is no
+    # household i, so v is NATIVE (the community questionnaire's grappe, the
+    # SAME keyspace as sample().v, so the price joins households) and is
+    # declared in the index; the framework's _join_v_from_sample only
+    # augments tables that carry i, so it does not fire here.
+    #
+    # The community price module lives in the 2014-15 EACI wave ONLY
+    # (EACIS04_p1 post-planting + EACIS04_p2 post-harvest, rec_type 8,
+    # grappe-level).  The 2017-18 EACI wave dropped the community
+    # questionnaire; the EHCVM waves (2018-19, 2021-22) collect prices only
+    # at the region x milieu IHPC grain (ehcvm_prix), which has no grappe
+    # key and so cannot join the sample().v cluster keyspace — deferred.
+    #
+    # j = harmonize_food Preferred Label, decoded from item label s04q01
+    #     (food items REUSE the consumed-food label so community_prices.j
+    #     joins food_acquired.j / crop_production.j).
+    # u = u-table Preferred Label, decoded from unit label s04q09.
+    # Price    = s04q11, the surveyed price (FCFA) for a Quantity-sized lot.
+    # Quantity = s04q10, the native quantity that Price refers to (e.g. a
+    #            "Sac moyen" lot is 50, a per-kilogramme price is 1); the 999
+    #            loose-retail sentinel is coerced to NA.
+    # Within a cluster the instrument records a separate price per sale-form
+    # variety and per passage; several collapse to the same (j, u).  One
+    # reported price is SELECTED per (t, v, j, u) (post-harvest passage first,
+    # then questionnaire order) — never averaged.  Built by a per-wave script
+    # + a country-level concatenator.
+    #
+    # The wave/var parquets carry a redundant i==v level positioned before j
+    # (see mali.community_prices_finalize): the framework's map_index swaps
+    # j -> i on every read when j is present without i, so an i level keeps j
+    # intact; _normalize_dataframe_index then drops the undeclared i, surfacing
+    # this canonical (t, v, j, u).  Same shim Tanzania/Malawi community_prices
+    # use.
+    index: (t, v, j, u)
+    Price: float
+    Quantity: float
+    materialize: make

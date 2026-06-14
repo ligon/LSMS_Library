@@ -2160,3 +2160,141 @@ def assemble_people_last7days(t, pieces):
     out = cat.set_index(['t', 'i', 'pid'])
     assert out.index.is_unique, f"Non-unique (t,i,pid) in people_last7days {t}"
     return out
+
+
+# ---- community_prices (GAP C): Community/Market Module CK reference prices --
+# One REPORTED row per (cluster EA, priced item, native unit) from the
+# Community questionnaire's Module CK "Reference prices of selected items"
+# (codes 1-51).  v is the community EA id (== sample().v keyspace, so a
+# surveyed price joins the households of that cluster), j is the item on the
+# shared harmonize_price_item -> harmonize_food / harmonize_crop Preferred
+# Label axis, u the native unit on the shared harmonize_price_unit -> `u`
+# Preferred Label axis.  Reported columns only: the surveyed Price (MK),
+# the NumberOfUnits that price refers to (the native price-per-quantity
+# basis the survey gives), and Available (the in-market y/n flag).  We do
+# NOT compute a per-unit price (Price / NumberOfUnits) or any cross-cluster
+# median/mean -- those are transformations.  There is no household i, so
+# v is NATIVE in the index (the framework's _join_v_from_sample does not
+# apply).  2016-17 (IHS4) collected no Module CK -> absent for that wave.
+
+def _price_item_code_map():
+    """{int item code 1-51: Preferred Label} for community_prices `j`."""
+    return _malawi_code_map('harmonize_price_item')
+
+
+def _price_unit_code_map():
+    """{int unit code 1-21: Preferred Label} for community_prices `u`."""
+    return _malawi_code_map('harmonize_price_unit')
+
+
+def _strip_ck(series):
+    """2013-14 (IHPS) codes Module CK items as the string 'CK<n>' (CK1,
+    CK22, ...).  Strip the 'CK' prefix to the bare integer 1-51 code so it
+    maps through harmonize_price_item like the numeric IHS3/IHS5 codes."""
+    s = series.astype('string').str.upper().str.replace('CK', '', regex=False)
+    return pd.to_numeric(s, errors='coerce').astype('Int64')
+
+
+def _price_block(df, *, ea_col, item_col, price_col, nunits_col, unit_col,
+                 avail_col, t, strip_ck=False):
+    """Reshape one Module CK price file to canonical (t, v, j, u) rows.
+
+    All keyword args are RAW column names in ``df`` (loaded
+    convert_categoricals=False so codes are numeric / 'CK<n>' strings).
+    Returns a long DataFrame with columns [t, v, j, u, _item_code, Price,
+    NumberOfUnits, Available] -- NO aggregation, one row per source row.
+    """
+    item_map = _price_item_code_map()
+    unit_map = _price_unit_code_map()
+
+    code = (_strip_ck(df[item_col]) if strip_ck
+            else pd.to_numeric(df[item_col], errors='coerce').astype('Int64'))
+    j = code.map(item_map)
+    j = j.astype('string').where(j.notna(), pd.NA)
+
+    v = df[ea_col].apply(format_id).astype('string')
+
+    if unit_col is not None and unit_col in df.columns:
+        ucode = pd.to_numeric(df[unit_col], errors='coerce').astype('Int64')
+        u = ucode.map(unit_map)
+        u = u.astype('string').where(u.notna(), pd.NA)
+    else:
+        u = pd.Series(pd.NA, index=df.index, dtype='string')
+
+    price = (pd.to_numeric(df[price_col], errors='coerce').astype('Float64')
+             if price_col in df.columns
+             else pd.Series(pd.NA, index=df.index, dtype='Float64'))
+
+    nunits = (pd.to_numeric(df[nunits_col], errors='coerce').astype('Float64')
+              if nunits_col is not None and nunits_col in df.columns
+              else pd.Series(pd.NA, index=df.index, dtype='Float64'))
+
+    if avail_col is not None and avail_col in df.columns:
+        av = pd.to_numeric(df[avail_col], errors='coerce').astype('Int64')
+        # 1 = Yes (available for sale), 2 = No.
+        available = (av == 1).astype('boolean').where(av.notna(), pd.NA)
+    else:
+        available = pd.Series(pd.NA, index=df.index, dtype='boolean')
+
+    out = pd.DataFrame({
+        't':             t,
+        'v':             v.values,
+        'j':             j.values,
+        'u':             u.values,
+        '_item_code':    code.values,
+        'Price':         price.values,
+        'NumberOfUnits': nunits.values,
+        'Available':     available.values,
+    })
+    # Drop rows with no item identity (item code missing) -- not a priced
+    # item.  Keep rows where the item exists but Price is NaN (a reported
+    # "not available"/refused price is still a legitimate item row).
+    out = out[out['j'].notna() | out['_item_code'].notna()]
+    return out
+
+
+def assemble_community_prices(t, pieces):
+    """Combine reshaped Module CK price blocks (_price_block outputs) into
+    the canonical community_prices DataFrame for wave ``t``.
+
+    Returns a DataFrame indexed (t, v, j, u) with reported columns Price,
+    NumberOfUnits, Available.  Drops rows whose item failed to resolve to a
+    Preferred Label (j NaN) -- those cannot sit on the shared j axis.  Where
+    a unit failed to resolve (u NaN, rare 2013-14 data-entry artifacts) the
+    row is kept with u = <NA> in the index (the price is still reported).
+    """
+    cat = pd.concat(pieces, ignore_index=True)
+    cat = cat[cat['j'].notna()].drop(columns=['_item_code'])
+
+    # Collapse any exact (v, j, u) duplicates (none expected -- (ea, item)
+    # is unique per wave -- but guard the index).  first() keeps the single
+    # reported record.
+    cat = cat.groupby(['t', 'v', 'j', 'u'], as_index=False, dropna=False).agg({
+        'Price':         'first',
+        'NumberOfUnits': 'first',
+        'Available':     'first',
+    })
+
+    # community_prices is a CLUSTER table -- there is no household i, the
+    # natural grain is (t, v, j, u).  But the framework's
+    # local_tools.map_index() (run on EVERY read path) unconditionally
+    # swaps j -> i whenever a `j` index level is present and an `i` level
+    # is NOT (a Malawi-legacy food_acquired inversion).  That swap would
+    # rename our item level `j` to `i`, drop `j`, and then collapse the
+    # table to (t, v, u).  To keep `j` intact WITHOUT touching the
+    # framework, we carry a redundant `i` level (set equal to the cluster
+    # v) positioned BEFORE `j`: map_index then sees i present and j after
+    # i, so it does NOT swap, and the framework's _normalize_dataframe_index
+    # drops the undeclared `i` level (data_scheme declares (t, v, j, u)),
+    # leaving the canonical (t, v, j, u) grain.  v already present in the
+    # index means _join_v_from_sample is skipped; the spurious i==v never
+    # reaches the API.
+    cat['i'] = cat['v']
+    out = cat.set_index(['t', 'v', 'i', 'j', 'u'])
+    out = out[['Price', 'NumberOfUnits', 'Available']]
+
+    chk = out.reset_index()
+    assert not chk.duplicated(['t', 'v', 'j', 'u']).any(), \
+        f"Non-unique (t,v,j,u) in community_prices {t}"
+    assert len(out) > 0, f"community_prices {t} produced no rows"
+    return out

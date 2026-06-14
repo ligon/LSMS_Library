@@ -120,6 +120,15 @@ $(VAR_DIR)/people_last7days.parquet: people_last7days.py $(people_last7days_parq
 ../%/_/people_last7days.parquet:
 	(cd $(@D) && python people_last7days.py)
 
+community_prices = $(shell find $(rounds) -name community_prices.py)
+community_prices_parquet := $(community_prices:.py=.parquet)
+
+$(VAR_DIR)/community_prices.parquet: community_prices.py $(community_prices_parquet)
+	python community_prices.py
+
+../%/_/community_prices.parquet:
+	(cd $(@D) && python community_prices.py)
+
 %.parquet: %.py CONTENTS.org tanzania.py
 	(cd $(@D) && python ./$(<F))
 

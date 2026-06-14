@@ -343,3 +343,72 @@ Data Scheme:
     Industry: str
     working_age: bool
     materialize: make
+
+  community_prices:
+    # Item-level community/market food prices (GAP C, parity loop 2026-06-14).
+    # One row per REPORTED (cluster/EA × food item × unit × observation)
+    # surveyed price from the ECVMA *community* price questionnaire (section
+    # CS07).  This is the OURS-ONLY parity arm: the WB panel surveys no
+    # community prices (their crop_price_EA is an HH-median imputation,
+    # programs.do:31-89), so this records a surveyed price where they only
+    # impute.  REPORTED values only -- any median / mean across clusters, or a
+    # community->household price join, is a TRANSFORMATION over these rows,
+    # never a column here.
+    #
+    # GRAIN (t, v, j, u) -- a CLUSTER-level feature, NOT household-level.  One
+    # REPORTED price per cell: the CS07 instrument records up to three within-
+    # questionnaire price observations (2011-12 across two field passages too)
+    # per (cluster, item, unit); ONE is selected -- post-harvest (passage 2)
+    # before post-planting (passage 1), then questionnaire order -- mirroring
+    # the Mali EACI community_prices reference.  This is a genuinely REPORTED
+    # price, NOT an across-observation mean (averaging is a transformation), and
+    # matches every sibling community_prices (Mali/Malawi/Tanzania/Ethiopia/
+    # Nigeria), which all use (t, v, j, u) with one reported price per cell.
+    #   v   -- the community questionnaire's grappe (EA), formatted into the
+    #          SAME v keyspace as sample() (`v: grappe`/`GRAPPE` there), so
+    #          community_prices.v == sample().v for the same cluster and the
+    #          surveyed price joins households.  There is NO household i, so
+    #          _join_v_from_sample does NOT apply -- v IS declared in the index
+    #          (native, not framework-joined).
+    #   j   -- the SHARED harmonize_food Preferred Labels, so a priced food
+    #          joins food_acquired consumption and the GAP-1 crop_production
+    #          harvest (e.g. community 'mil' -> 'Mil', 'tomate fraiche' ->
+    #          'Tomate fraîche', exactly the food_acquired labels).  Non-food
+    #          price items (allumettes, savon, électricité, transport, fuel,
+    #          firewood) get their own harmonize_food Preferred Labels -- the
+    #          community-price arm of label unification.
+    #   u   -- the SHARED u table (the CS07 unit list: Kg/Gramme/Tia/Tongolo/
+    #          Sac de 50|100 kg/Gros sac/Sac Moyen/Unité/Tas/Sachet/...).
+    #
+    # NOTE on the framework `i` rename: the framework's map_index() renames a
+    # `j` index level to `i` when no `i` is present (a legacy old-parquet
+    # convention in local_tools.map_index).  Like EVERY sibling community_prices
+    # feature, this surfaces the food item under the name `i` at the API layer
+    # and makes is_this_feature_sane flag a missing `j` level -- a pre-existing
+    # framework behavior shared across all community_prices countries, not a
+    # wiring defect.  The cached parquet carries the correct `j` index level.
+    #
+    # WAVE COVERAGE: only the two ECVMA waves carry an EA-level community price
+    # module (script-path):
+    #   2011-12 ecvmacoms07_p1 + ecvmacoms07_p2  (three price/qty/UNIT triples,
+    #                                             both field passages)
+    #   2014-15 comprixcs07                       (one unit col, three price/qty
+    #                                             pairs)
+    # The EHCVM waves (2018-19, 2021-22) replaced the community price module
+    # with a separate region/market-level price survey (ehcvm_prix: region ×
+    # milieu × point_de_vente, NO grappe -- not the EA grain; and ehcvm_nsu, a
+    # region/strata p50/mu MEDIAN -- a forbidden imputation), and 2018-19 ships
+    # no community price file at all.  Those two waves are silently absent (the
+    # concatenator skips a wave with no parquet), NOT faked.
+    #
+    # COLUMNS (reported, item-level):
+    #   Price    -- the surveyed price recorded for `Quantity` units of the item
+    #               in unit `u` in that cluster (CFA francs).  Zero / sentinel
+    #               (9999 / 99999) prices and 'product absent' rows are dropped.
+    #   Quantity -- the measured quantity Price was recorded for, in unit `u`
+    #               (e.g. Price=11000 for Quantity=50, u='Sac de 50 kg').  The
+    #               per-kg unit value Price/Quantity (×kg-factor) is a transform.
+    index: (t, v, j, u)
+    Price: float
+    Quantity: float
+    materialize: make

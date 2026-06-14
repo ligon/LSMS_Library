@@ -386,6 +386,49 @@ Data Scheme:
     working_age: bool
     materialize: make
 
+  community_prices:
+    # GAP C (maintainer priority) -- item-level SURVEYED FOOD prices at the
+    # CLUSTER grain (t, v, j, u).  One row per (EA/cluster v, food item j,
+    # unit u) from the ESS §10 community price questionnaire (the price
+    # module is sect10b1_com W1 / sect10b2_com W2 / sect10a2_com W3 /
+    # sect10b_com W4-W5).  Carries only REPORTED fields:
+    #   Price     the surveyed price (Birr) the enumerator recorded for the
+    #             item at the cluster market.
+    #   Quantity  the native quantity basis that price refers to (the
+    #             survey's Weight/Amount field, e.g. 3000 Birr for 100 Kg of
+    #             Teff).  Both are carried so the per-unit price (Price /
+    #             Quantity) is a downstream TRANSFORMATION, never baked in --
+    #             exactly as food_acquired carries Quantity + Expenditure and
+    #             food_prices derives the unit value.  NO median/mean across
+    #             clusters, NO community->household imputation (those are
+    #             transformations; this is the raw surveyed cluster price,
+    #             strictly better than the WB EA-median crop_price imputation).
+    #
+    # v axis: the EA/cluster id, in the SAME keyspace as sample().v for the
+    # same wave (ea_id for W1/W4/W5, ea_id2 for W2/W3 -- emitted by the wave
+    # scripts to match cluster_features / sample()), so community_prices.v ==
+    # sample().v for the same cluster and the prices join households via
+    # sample().  v is NATIVE (NOT framework-joined): there is no household i,
+    # so _join_v_from_sample (which gates on i) does not apply -- v is
+    # declared in the index here.
+    #
+    # j axis: harmonize_food Preferred Labels (via the
+    # harmonize_community_price item crosswalk + raw-label fallback), so
+    # community_prices.j JOINS food_acquired.j (consumption) and
+    # crop_production.j (harvest).  Only FOOD items are kept; the community
+    # module's non-food goods (Charcoal, Firewood, soap, Matches, ploughs,
+    # fertilizer, ...) have no harmonize_food label and are dropped (this is
+    # the community-FOOD-price arm of label unification).
+    # u axis: the shared u table Preferred Labels.
+    #
+    # Per-wave source files + per-wave column renaming + code-prefix
+    # stripping + item/unit code->label harmonization + W1 Birr/cents +
+    # whole/decimal arithmetic => script (materialize: make).
+    index: (t, v, j, u)
+    Price: float
+    Quantity: float
+    materialize: make
+
   # food_expenditures, food_prices, food_quantities are derived at
   # runtime from food_acquired — see _FOOD_DERIVED in country.py.  Do
   # NOT register them here (per CLAUDE.md "Derived Tables").

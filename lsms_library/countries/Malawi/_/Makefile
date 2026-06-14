@@ -12,7 +12,7 @@ VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 # _ROSTER_DERIVED — no country-level parquet is built or consulted.
 # See GH #218.
 
-all: $(parquet) $(VAR_DIR)/food_acquired.parquet $(VAR_DIR)/food_coping.parquet $(VAR_DIR)/months_food_inadequate.parquet $(VAR_DIR)/crop_production.parquet $(VAR_DIR)/plot_inputs.parquet $(VAR_DIR)/livestock.parquet $(VAR_DIR)/anthropometry.parquet $(VAR_DIR)/plot_labor.parquet $(VAR_DIR)/people_last7days.parquet
+all: $(parquet) $(VAR_DIR)/food_acquired.parquet $(VAR_DIR)/food_coping.parquet $(VAR_DIR)/months_food_inadequate.parquet $(VAR_DIR)/crop_production.parquet $(VAR_DIR)/plot_inputs.parquet $(VAR_DIR)/livestock.parquet $(VAR_DIR)/anthropometry.parquet $(VAR_DIR)/plot_labor.parquet $(VAR_DIR)/people_last7days.parquet $(VAR_DIR)/community_prices.parquet
 
 food_acquired = $(shell find $(rounds) -name food_acquired.py)
 # Wave-level parquets live in data_root, not in-tree
@@ -133,6 +133,24 @@ $(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/people_last7days.parquet: malawi.py
 
 $(VAR_DIR)/people_last7days.parquet: people_last7days.py $(people_last7days_parquet)
 	python people_last7days.py
+
+# --- community_prices (GAP C) ---------------------------------------------
+# Item-level (t, v, j, u) Community/Market Module CK reference prices,
+# collected in three of the five waves: 2010-11 (IHS3), 2013-14 (IHPS),
+# 2019-20 (IHS5).  2016-17 (IHS4) ran a community questionnaire but DROPPED
+# the Module CK price section; 2004-05 (IHS2) has no community price
+# questionnaire -- both ABSENT.  Each wave script writes its parquet into
+# data_root; the country script concatenates.  v is the community EA id on
+# the sample().v keyspace (NATIVE -- no household i).  Per-unit prices and
+# cross-cluster medians are transformations, NOT stored.
+community_prices_waves := 2010-11 2013-14 2019-20
+community_prices_parquet := $(foreach r,$(community_prices_waves),$(LSMS_DATA_ROOT)/$(COUNTRY)/$(r)/_/community_prices.parquet)
+
+$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/community_prices.parquet: malawi.py
+	(cd ../$(*)/_/ && python community_prices.py)
+
+$(VAR_DIR)/community_prices.parquet: community_prices.py $(community_prices_parquet)
+	python community_prices.py
 
 %.parquet: %.py malawi.py
 	(cd $(@D) && python ./$(<F))
