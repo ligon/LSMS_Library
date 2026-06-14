@@ -1,1 +1,12 @@
 /_dataverse_archive
+
+# Country-root OCR scratch dumps of the per-round questionnaires
+# ({1989,1999,2004,2009}.txt).  Low-value OCR noise that duplicates the
+# authoritative, DVC-tracked questionnaire PDFs already under each
+# {wave}/Documentation/; not committed as git blobs (1989.txt is an empty
+# page-marker stub).  Relocate into {wave}/Documentation/ + DVC-add if a
+# maintainer ever wants them retained.
+/1989.txt
+/1999.txt
+/2004.txt
+/2009.txt
