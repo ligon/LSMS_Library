@@ -25,6 +25,17 @@ import pandas as pd
 import lsms_library.local_tools as tools
 
 
+# Authoritative wave list.  Mirrors the ``Waves:`` block in this folder's
+# ``data_scheme.yml`` and, crucially, EXCLUDES 1996 (Employment & Welfare
+# Survey -- not LSMS; the ``1996/`` dir carries only Documentation).  This
+# attribute is required because ``Country.waves`` (country.py) consults a
+# ``_/{country}.py`` module's ``waves`` BEFORE the data_scheme ``Waves:`` list;
+# when the module exists but defines no ``waves``, the property falls through to
+# a directory glob that silently re-includes ``1996/`` (it has
+# Documentation/SOURCE.org), reviving the documented exclusion.  See GH #445.
+waves = ['2002', '2003', '2004', '2005', '2008', '2012']
+
+
 # --- canonical-value maps ----------------------------------------------------
 #
 # Tenure: how the household came to hold the plot.  Albania's land was almost

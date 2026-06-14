@@ -544,6 +544,24 @@ def test_api_matches_replication(spec: FeatureSpec) -> None:
             "replication should regenerate or the bridge extended."
         )
 
+    # ``interview_date`` was harmonized cross-country in commit ``4192eb06``
+    # (closes #325): every declarer now emits a single canonical ``Int_t``
+    # datetime column instead of the old per-country ``date``.  The Uganda
+    # replication baseline (``interview_date.parquet``) predates that change
+    # and still carries ``date``, so the API↔replication merge finds no shared
+    # data column (API cols ``['Int_t']`` vs repl cols ``['date']``).  The
+    # library output is correct; the replication baseline should regenerate.
+    # Same class as the food_acquired / nutrition drift above.  Keeping xfail
+    # (not skip) so we notice when the replication baseline is regenerated.
+    # Surfaced by the 2026-06-14 full cold gate (GH #445).
+    if spec.name == "interview_date":
+        pytest.xfail(
+            "interview_date: API moved to canonical 'Int_t' (#325, commit "
+            "4192eb06); replication baseline still carries 'date', so no "
+            "shared data column after merge.  Library output is correct; "
+            "replication should regenerate."
+        )
+
     repl = _load_replication(spec.name)
 
     try:
