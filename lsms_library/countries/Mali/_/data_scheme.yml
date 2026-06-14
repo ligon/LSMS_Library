@@ -223,3 +223,78 @@ Data Scheme:
     HeadSold: float
     Value: float
     materialize: make
+  plot_labor:
+    # Item-level plot labor by source, GAP 3a (parity loop).  One row per
+    # (t, i, plot, source): the REPORTED person-days the survey records per
+    # labor source, NOT the WB per-plot collapsed totals
+    # (total_family_labor_days / total_hired_labor_days /
+    # total_other_labor_days / total_labor_days) or the median-wage
+    # valuation (hired_labor_value) — all of those are transformations.py
+    # rollups over these item rows.  The plot-labor module lives in the EACI
+    # waves only (2014-15 EACIMAINOUVRE_p1 [PP, s2b] + EACIS2F_p2 [PH, s2f];
+    # 2017-18 eaci17_s11ep1 [PP, s11e] + eaci17_s7ep2 [PH, s7e]).  The EHCVM
+    # waves (2018-19, 2021-22) carry no plot-labor roster — deferred (the
+    # same wave split as crop_production / plot_inputs / livestock).
+    #
+    # plot   = "{field}_{parcel}" — the SAME plot id as crop_production /
+    #          plot_inputs / plot_features (join on (t, i, plot)).
+    # source = harmonize_labor_source Preferred Label (Family / Hired /
+    #          Other), a FIXED questionnaire block, not a decoded column.
+    #
+    # PersonDays = reported person-days of that source on the plot, summed
+    #              over the two passages (post-planting + post-harvest) and
+    #              the man/woman/child demographic splits within a source
+    #              (PersonDays = persons * days-each, the product the WB
+    #              code forms before summing).  Units: person-days.
+    # Wage       = reported cash paid to HIRED labor (FCFA) where recorded;
+    #              NaN for family / other (no cash wage asked).
+    # Built by per-wave scripts + a country-level concatenator.  v auto-joins
+    # from sample() at API time (plot_labor is NOT in _no_v_join).
+    index: (t, i, plot, source)
+    PersonDays: float
+    Wage: float
+    materialize: make
+  people_last7days:
+    # Per-individual 7-day activity / time-use, GAP 3b (parity loop).  One
+    # row per (t, i, pid), mirroring Uganda's per-individual labor feature
+    # so the six labor-gap countries match the one we already have.  The
+    # REPORTED per-individual values the survey records, NOT any household
+    # roll-up (nb_members_working_age etc., which are transformations).  The
+    # individual labor/time-use module lives in the EACI waves only (2014-15
+    # EACIIND_p1 s04 block; 2017-18 eaci17_s04p1 s4 block, merged with
+    # eaci17_s01p1 for age).  The EHCVM waves (2018-19, 2021-22) carry no
+    # individual labor module — deferred (the same wave split as plot_labor).
+    #
+    # pid — the individual key, matching household_roster's pid (2014-15:
+    #       grappe-menage-s01q00; 2017-18: grappe-exploitation-codeid).  v
+    #       auto-joins from sample() at API time (NOT in _no_v_join).
+    #
+    # farm_work / SOB_work / wage_work — 7-day activity dummies (worked on
+    #       the household farm / own non-farm business / for a wage); NA
+    #       where the question was not answered (Manquant/NSP).
+    # farm_hrs / SB_hrs / wage_hrs — average WEEKLY hours in each activity,
+    #       the WB (months * days * hours) / 52 construction attributed to
+    #       the job of that type.  Units: hours/week.
+    # Industry — primary-job industry on harmonize_industry Preferred
+    #       Labels (Agriculture / Fishing / Mining / Manufacturing /
+    #       Construction / Services), decoded from the WB ind_* split over
+    #       the primary-job industry code (s04q22 / s4q13), exactly as the
+    #       WB code derives it: zeroed (-> NA) for self-employment / own-
+    #       account work and (2017-18) no-work, NA where the industry code
+    #       is missing or outside the six classes.  It is NOT gated on the
+    #       wage_work dummy, so a non-wage primary job in a recognized
+    #       industry still carries a label (faithful to the WB ind_*
+    #       construction; restrict to df.wage_work if a wage-only cut is
+    #       wanted — a transformation, not a stored column).
+    # working_age — nullable bool (the WB working_age = age >= 6 floor).
+    # Built by per-wave scripts + a country-level concatenator.
+    index: (t, i, pid)
+    farm_work: bool
+    SOB_work: bool
+    wage_work: bool
+    farm_hrs: float
+    SB_hrs: float
+    wage_hrs: float
+    Industry: str
+    working_age: bool
+    materialize: make
