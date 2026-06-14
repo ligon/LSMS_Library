@@ -83,9 +83,17 @@ PH_QUARTER = {
 # Preferred Label registered in the `u` table.
 
 
-def _crop_labels():
-    """{int cropcode: Preferred Label} from harmonize_food (shared with
-    food_acquired)."""
+def harmonized_food_labels():
+    """{int itemcode: Preferred Label} from the Code-keyed harmonize_food
+    table.  This is the SAME resolver crop_production uses (see
+    ``_crop_labels``), exposed for food_acquired so its ``j`` resolves to
+    the shared Preferred Label and joins crop_production.crop (GH #443).
+
+    The food itemcodes in the GHS consumption modules are read as integers
+    (``item_cd`` is int64 in the source CSVs), while harmonize_food's Code
+    column is string-keyed; this returns an INT-keyed dict so a numeric
+    ``j`` matches.  Codes with a blank / '---' Preferred Label are dropped
+    (they legitimately stay raw)."""
     from lsms_library.local_tools import get_categorical_mapping
     raw = get_categorical_mapping(tablename='harmonize_food', idxvars='Code',
                                   **{'Preferred Label': 'Preferred Label'})
@@ -99,6 +107,12 @@ def _crop_labels():
             continue
         out[ik] = str(v).strip()
     return out
+
+
+def _crop_labels():
+    """{int cropcode: Preferred Label} from harmonize_food (shared with
+    food_acquired)."""
+    return harmonized_food_labels()
 
 
 def _strip_code_prefix(s):

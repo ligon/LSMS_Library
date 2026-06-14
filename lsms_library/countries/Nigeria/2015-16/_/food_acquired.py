@@ -13,9 +13,22 @@ sys.path.append('../../../_/')
 from lsms_library.local_tools import to_parquet, get_categorical_mapping, get_dataframe
 from lsms_library.transformations import food_acquired_to_canonical
 
-food_labels = get_categorical_mapping(tablename='harmonize_food',
-                                       idxvars='Code',
-                                       **{'Preferred Label': 'Preferred Label'})
+_food_labels_raw = get_categorical_mapping(tablename='harmonize_food',
+                                           idxvars='Code',
+                                           **{'Preferred Label': 'Preferred Label'})
+# Re-key harmonize_food on INT codes so the numeric item_cd (int64 in the
+# source CSV) resolves to its Preferred Label.  The Code column is
+# string-keyed, so a raw int j would otherwise never match and stay numeric
+# (GH #443).  Codes with a blank / '---' label legitimately stay raw.
+food_labels = {}
+for _k, _v in _food_labels_raw.items():
+    try:
+        _ik = int(_k)
+    except (TypeError, ValueError):
+        continue
+    if pd.isna(_v) or str(_v).strip() in ('', '---'):
+        continue
+    food_labels[_ik] = str(_v).strip()
 
 _unit_raw = get_categorical_mapping(tablename='u',
                                      idxvars='Code',
