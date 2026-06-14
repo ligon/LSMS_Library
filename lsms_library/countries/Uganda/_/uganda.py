@@ -597,6 +597,17 @@ def plot_features_for_wave(t, source_2a, source_2b, colmap):
             acquire        — How-acquired question (a2aq8 / s2aq8 / ...)
             soil_type      — Soil-type question
             water_source   — Main-water-source question
+            certificate    — Formal certificate-of-title question
+                             (a2aq25 / a2aq23 / s2aq23; AGSEC2A only —
+                             use-rights parcels in AGSEC2B are never
+                             titled, so the question isn't asked there).
+            erosion        — Erosion-control / water-harvesting-facility
+                             question (a2aq24 / a2aq22a / s2aq22a in
+                             AGSEC2A; a2bq23 / a2bq20a / s2aq22a in
+                             AGSEC2B).  May be a numeric method code
+                             (8/'None' -> no facility, other -> facility)
+                             or, in 2009-10, a free-text method string
+                             (empty -> NA, any non-empty code -> facility).
         Each value is the column name in the corresponding source df.
 
     Returns
@@ -604,10 +615,27 @@ def plot_features_for_wave(t, source_2a, source_2b, colmap):
     pd.DataFrame indexed by ``(t, i, plot_id)`` with columns
         ``Area`` (hectares, float), ``AreaUnit`` (str, always 'acres'),
         ``Tenure`` (str), ``TenureSystem`` (str), ``SoilType`` (str),
-        and ``Irrigated`` (bool nullable).  GPS columns (Latitude /
-        Longitude) are reserved in the canonical Columns block but not
-        emitted here — Uganda's DMS encoding in AGSEC2A is
-        non-standard and mostly NaN; revisit in a follow-up.
+        ``Irrigated`` (bool nullable), and the GAP-6 parity item columns
+        ``SelfReportedArea`` (hectares, float — the *reported* farmer
+        estimate, distinct from ``Area`` which prefers the GPS measure),
+        ``PlotOwned`` (bool nullable), ``PlotCertificate`` (bool
+        nullable), and ``ErosionProtection`` (bool nullable).  GPS
+        columns (Latitude / Longitude) are reserved in the canonical
+        Columns block but not emitted here — Uganda's DMS encoding in
+        AGSEC2A is non-standard and mostly NaN; revisit in a follow-up.
+
+    Notes on the GAP-6 reported item columns (audit add, 2026-06-14)
+    ----------------------------------------------------------------
+    These are REPORTED per-parcel attributes the UNPS questionnaire
+    records, mirroring the WB LSMS-ISA harmonised Plot_dataset item
+    fields ``self_reported_area`` / ``plot_owned`` / ``plot_certificate``
+    / ``erosion_protection`` (UGA_UNPS1.do:396-650).  We store the
+    reported booleans only; the WB aggregates ``farm_size`` (Σ area),
+    ``nb_plots`` / ``nb_fallow_plots`` (counts) and ``soil_fertility_index``
+    (PCA over geospatial soil-quality rasters) are transformations and are
+    NOT stored.  ``plot_slope`` and the soil-quality tags are dropped
+    entirely: they come from the GPS ``geovars`` raster file keyed on the
+    household (not the parcel) and are not survey-reported plot attributes.
     """
     tenure_system_map = _harmonized_codes('harmonize_tenure_system')
     soil_map = _harmonized_codes('harmonize_soil')
@@ -642,6 +670,17 @@ def plot_features_for_wave(t, source_2a, source_2b, colmap):
         area_unit = pd.Series(['acres'] * len(src), index=src.index, dtype='string')
         # Where area is NaN, leave AreaUnit NaN too (no measurement = no unit).
         area_unit = area_unit.where(area_acres.notna(), pd.NA)
+
+        # SelfReportedArea (GAP-6 parity): the farmer-estimated parcel
+        # size, kept as its own REPORTED column in hectares.  Distinct
+        # from Area, which prefers the GPS measure and only falls back to
+        # this estimate.  WB: area_self_reported = A2aq5 * 0.404686.
+        self_reported_ha = pd.Series(pd.NA, index=src.index, dtype='Float64')
+        if c.get('area_est') in src.columns:
+            sr_acres = pd.to_numeric(src[c['area_est']], errors='coerce').astype('Float64')
+            # Same plausibility clamp as Area (drop > 2500 acres).
+            sr_acres = sr_acres.where((sr_acres <= 2500) | sr_acres.isna(), pd.NA)
+            self_reported_ha = sr_acres * HECTARES_PER_ACRE
 
         # TenureSystem (Freehold/Leasehold/Mailo/Customary/...)
         tenure_system = pd.Series(pd.NA, index=src.index, dtype='string')
@@ -678,6 +717,85 @@ def plot_features_for_wave(t, source_2a, source_2b, colmap):
             # Where water_label is NaN, leave irrigated as NaN too
             irrigated = irrigated.where(water_label.notna(), pd.NA)
 
+        # PlotCertificate (GAP-6 parity): reported formal/customary
+        # certificate-of-title flag.  Source codes 1-3 = a certificate
+        # type (title / customary / occupancy) -> True; 4 = 'No document'
+        # -> False; anything else / missing -> NA.  Only AGSEC2A (owned
+        # parcels) asks this — use-rights AGSEC2B parcels are never
+        # titled, so the column is absent there and stays NA.
+        # WB: recode A2aq25 (1/3 = 1 "Yes") (4 = 0 "No").
+        plot_certificate = pd.Series(pd.NA, index=src.index, dtype='boolean')
+        cert_col = c.get('certificate')
+        if cert_col and cert_col in src.columns:
+            cert = pd.to_numeric(src[cert_col], errors='coerce').astype('Int64')
+            plot_certificate = pd.Series(pd.NA, index=src.index, dtype='boolean')
+            plot_certificate = plot_certificate.mask(cert.isin([1, 2, 3]), True)
+            plot_certificate = plot_certificate.mask(cert == 4, False)
+
+        # PlotOwned (GAP-6 parity): reported ownership flag derived from
+        # the how-acquired question.  AGSEC2A acquire codes 1 (Purchased)
+        # / 2 (Inherited/gift) -> owned (True); 3 (Leased-in) / 4 (Just
+        # walked in) -> not owned (False); 5 (Do not know) / 6 (Other) ->
+        # NA.  In the 2018-19+ merged code list, 6/7 (given by local
+        # authorities / government) are treated as owned and 8/9
+        # (agreement / without agreement) as use-rights (not owned).
+        # AGSEC2B parcels are use-rights by construction -> False.
+        # A parcel with a certificate is owned regardless of acquire
+        # mode (WB: replace plot_owned = 1 if plot_certificate==1).
+        plot_owned = pd.Series(pd.NA, index=src.index, dtype='boolean')
+        acq_owned_codes = [1, 2, 6, 7]
+        acq_notowned_codes = [3, 4, 8, 9]
+        if letter == 'B':
+            # Use-rights parcels: never owned (acquire codes are
+            # agreement / without-agreement / other).
+            plot_owned = pd.Series(False, index=src.index, dtype='boolean')
+            # But leave NA where the source row carries no acquire info
+            # at all (defensive — keeps parity with the 2A path).
+            if acq_col and acq_col in src.columns:
+                acq_b = src[acq_col].astype('Int64')
+                plot_owned = plot_owned.where(acq_b.notna(), pd.NA)
+        elif acq_col and acq_col in src.columns:
+            acq_a = src[acq_col].astype('Int64')
+            plot_owned = pd.Series(pd.NA, index=src.index, dtype='boolean')
+            plot_owned = plot_owned.mask(acq_a.isin(acq_owned_codes), True)
+            plot_owned = plot_owned.mask(acq_a.isin(acq_notowned_codes), False)
+        # Certificate implies ownership.
+        plot_owned = plot_owned.mask(plot_certificate == True, True)
+
+        # ErosionProtection (GAP-6 parity): reported presence of an
+        # erosion-control / water-harvesting facility on the parcel.
+        # The source column is either a numeric method code (later
+        # waves: 8 / 'none' -> no facility -> False, any other listed
+        # method -> True) or, in 2009-10, a free-text multi-method
+        # string (empty -> NA, any non-empty code -> a facility is
+        # present -> True).  WB: encode then recode 'None' levels -> 0,
+        # else -> 1 (UGA_UNPS1.do:644-648).
+        erosion_protection = pd.Series(pd.NA, index=src.index, dtype='boolean')
+        erosion_col = c.get('erosion')
+        if erosion_col and erosion_col in src.columns:
+            es = src[erosion_col]
+            if pd.api.types.is_numeric_dtype(es):
+                en = pd.to_numeric(es, errors='coerce').astype('Int64')
+                erosion_protection = pd.Series(pd.NA, index=src.index, dtype='boolean')
+                # 8 == 'None' in the method codelist.
+                erosion_protection = erosion_protection.mask(en == 8, False)
+                erosion_protection = erosion_protection.mask(
+                    en.notna() & (en != 8), True)
+            else:
+                # Free-text multi-method string (2009-10 / 2010-11).  The
+                # column holds concatenated method-letter codes; a genuine
+                # method present -> a facility exists (True).  Placeholder
+                # non-answers ('', '0', '-', '.', 'none') carry no
+                # facility information and stay NA.  We deliberately do
+                # NOT reproduce the WB encode-then-recode-by-level logic
+                # (UGA_UNPS2.do:641-648), which is brittle to the
+                # alphabetical encode order.
+                es_str = es.astype('string').str.strip()
+                placeholder = {'', '0', '-', '.', 'none'}
+                is_placeholder = es_str.isna() | es_str.str.lower().isin(placeholder)
+                erosion_protection = pd.Series(pd.NA, index=src.index, dtype='boolean')
+                erosion_protection = erosion_protection.mask(~is_placeholder, True)
+
         # GPS deferred for v1.  Uganda's DMS encoding in AGSEC2A is
         # non-standard (Minutes ranges 0-99, Seconds 0-999) and the
         # columns are mostly NaN; revisit when a maintainer with
@@ -687,22 +805,27 @@ def plot_features_for_wave(t, source_2a, source_2b, colmap):
         # have decimal-degree plot GPS.
 
         piece = pd.DataFrame({
-            't':            t,
-            'i':            hh.values,
-            'plot_id':      plot_id.values,
-            'Area':         area_ha.values,
-            'AreaUnit':     area_unit.values,
-            'Tenure':       tenure.values,
-            'TenureSystem': tenure_system.values,
-            'SoilType':     soil_type.values,
-            'Irrigated':    irrigated.values,
+            't':                t,
+            'i':                hh.values,
+            'plot_id':          plot_id.values,
+            'Area':             area_ha.values,
+            'AreaUnit':         area_unit.values,
+            'Tenure':           tenure.values,
+            'TenureSystem':     tenure_system.values,
+            'SoilType':         soil_type.values,
+            'Irrigated':        irrigated.values,
+            'SelfReportedArea': self_reported_ha.values,
+            'PlotOwned':        plot_owned.values,
+            'PlotCertificate':  plot_certificate.values,
+            'ErosionProtection': erosion_protection.values,
         })
         pieces.append(piece)
 
     if not pieces:
         return pd.DataFrame(
             columns=['Area','AreaUnit','Tenure','TenureSystem',
-                     'SoilType','Irrigated'])
+                     'SoilType','Irrigated','SelfReportedArea',
+                     'PlotOwned','PlotCertificate','ErosionProtection'])
 
     df = pd.concat(pieces, ignore_index=True)
     df = df.set_index(['t', 'i', 'plot_id'])

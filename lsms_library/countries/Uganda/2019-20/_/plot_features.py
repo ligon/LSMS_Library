@@ -25,6 +25,8 @@ colmap_2a = dict(
     # soil_type column appears absent from the 2019-20 AGSEC2A keyword
     # grep — to verify on a follow-up.  Omitting for v1.
     water_source  = 'a2aq18',
+    certificate   = 's2aq23',   # formal certificate of title (1-3=Yes, 4=No)
+    erosion       = 's2aq22a',  # erosion-control facility (method code; 8=None)
 )
 colmap_2b = dict(
     hhid          = 'hhid',
@@ -34,6 +36,8 @@ colmap_2b = dict(
     tenure_system = 's2aq07',
     acquire       = 's2aq08',
     water_source  = 'a2aq18',
+    # No certificate question for use-rights (AGSEC2B) parcels.
+    erosion       = 's2aq22a',  # erosion-control facility (method code; 8=None)
 )
 
 df_a = plot_features_for_wave('2019-20', df_2a, None, colmap_2a)

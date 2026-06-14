@@ -99,6 +99,19 @@ Data Scheme:
     # in a non-standard DMS encoding (Latitude_Minutes range 0-99 etc.)
     # and is mostly NaN.  Adding GPS is a documented follow-up; for v1
     # Uganda emits the six lasting-attribute columns only.
+    #
+    # GAP-6 parity audit (2026-06-14): added the REPORTED per-parcel
+    # item attributes the WB LSMS-ISA harmonised Plot_dataset carries
+    # (self_reported_area / plot_owned / plot_certificate /
+    # erosion_protection; UGA_UNPS1.do:396-650).  SelfReportedArea is
+    # the farmer estimate kept distinct from Area (which prefers GPS).
+    # PlotOwned / PlotCertificate / ErosionProtection are reported
+    # booleans.  The WB aggregates farm_size / nb_plots / nb_fallow_plots
+    # (sums/counts) and soil_fertility_index (PCA over geospatial
+    # soil-quality rasters) are transformations, NOT stored here; the WB
+    # plot_slope / soil-quality tags come from the GPS geovars raster
+    # keyed on the household, not the parcel questionnaire, so they are
+    # not survey-reported plot attributes and are excluded.
     index: (t, i, plot_id)
     Area: float
     AreaUnit: str
@@ -106,6 +119,10 @@ Data Scheme:
     TenureSystem: str
     SoilType: str
     Irrigated: bool
+    SelfReportedArea: float
+    PlotOwned: bool
+    PlotCertificate: bool
+    ErosionProtection: bool
     materialize: make
   crop_production:
     # Item-level post-harvest crop module (GAP 1 parity build).  One row
