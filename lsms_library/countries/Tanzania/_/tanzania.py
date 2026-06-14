@@ -1681,16 +1681,20 @@ def people_last7days_for_wave(t, sec, colmap):
 # and quantity both 0) and are dropped as non-observations.
 #
 # v == the community questionnaire's own cluster id (interview__key).  IMPORTANT
-# DATA LIMITATION (issue #113, CONTENTS.org): the NPS community instrument and
-# the household instrument use INCOMPATIBLE cluster-coding schemes -- the
-# community interview__key has ZERO overlap with the household interview__key,
-# and the community location codes (id_01..id_05, national admin numbering)
-# reconcile to the household survey-design clusterid / y5_cluster only at the
-# region level (the finest key that matches), NOT at the EA/cluster level (~4%
-# EA-tuple match).  So community_prices.v is the community cluster's NATIVE id
-# and does NOT intersect sample().v; a community->household price join is a
-# region-level fallback TRANSFORMATION (the documented #113 use), deliberately
-# NOT baked into this item-level feature.  Because the grain carries no
+# DATA LIMITATION (issue #113; full diagnosis + match rates in CONTENTS.org,
+# "Why the community-price <-> household link cannot be made cleanly"): the NPS
+# community instrument and the household instrument use INCOMPATIBLE cluster
+# coding -- v == interview__key is a per-INTERVIEW token (NOT a cluster id) with
+# ZERO overlap with sample().v (clusterid / y5_cluster).  The only shared
+# geography is the national admin tuple (community id_01..id_05 vs household
+# t0_region/district/ward); but it is many-to-many with the survey cluster even
+# within the household file (tracking design), so the best-case match is 38/99
+# communities -> a unique cluster in 2019-20, and for 2020-21 the district
+# numbering is irreconcilable (region+district+ward match == 0/488).  So
+# community_prices.v is the community cluster's NATIVE id and does NOT intersect
+# sample().v; a community->household price join is at best a REGION-level
+# fallback TRANSFORMATION (the documented #113 use), deliberately NOT baked into
+# this item-level feature.  Because the grain carries no
 # household i, the framework's _join_v_from_sample never fires (it requires an
 # i level), so v is left exactly as emitted -- no _no_v_join entry is needed.
 
