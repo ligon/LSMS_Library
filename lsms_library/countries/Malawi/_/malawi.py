@@ -417,7 +417,14 @@ def food_acquired_to_canonical(df, wave):
             has_cf = work[ccol].notna() if ccol in work.columns else False
             mask = factor.notna() & ~has_cf
             if mask.any():
-                q = pd.to_numeric(work[qcol], errors='coerce')
+                # Coerce the quantity column to float64 *in place* before the
+                # masked write.  Stata reads quantities as float32; pandas 3.0
+                # refuses to setitem a float64 product (e.g. q*1.3) back into a
+                # float32 block when it isn't losslessly representable
+                # (LossySetitemError).  Widening the column first keeps the
+                # values identical and the assignment lossless.
+                q = pd.to_numeric(work[qcol], errors='coerce').astype('float64')
+                work[qcol] = q
                 work.loc[mask, qcol] = q[mask] * factor[mask].astype(float)
                 work.loc[mask, ucol] = 'kg'
             # Normalize any remaining raw unit *code* to the canonical
