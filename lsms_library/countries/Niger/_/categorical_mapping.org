@@ -157,6 +157,26 @@
 | botte                 | Botte            |      |                  |                       |
 | Manquant              | Manquant         |      |                  |                       |
 | manquant              | Manquant         |      |                  |                       |
+| sac de 5 kg           | Sac de 5 kg      |      |                  |                       |
+| sac de 10 kg          | Sac de 10 kg     |      |                  |                       |
+| sac de 25 kg          | Sac (25 Kg)      |      |                  |                       |
+| tas                   | Tas              |      |                  |                       |
+| litres                | Litre            |      |                  |                       |
+| Litres                | Litre            |      |                  |                       |
+| sachet                | Sachet           |      |                  |                       |
+| Sac                   | Sac              |      |                  |                       |
+| Tonne                 | Tonne            |      |                  |                       |
+| Charrette             | Charrette        |      |                  |                       |
+| charette asine        | Charrette asine  |      |                  |                       |
+| Charette asine        | Charrette asine  |      |                  |                       |
+| Charrette asine       | Charrette asine  |      |                  |                       |
+| charette bovine       | Charrette bovine |      |                  |                       |
+| Charette bovine       | Charrette bovine |      |                  |                       |
+| Charrette bovine      | Charrette bovine |      |                  |                       |
+| Sac (50kg)            | Sac de 50 kg     |      |                  |                       |
+| Sac(50kg)             | Sac de 50 kg     |      |                  |                       |
+| Sac (100kg)           | Sac de 100 kg    |      |                  |                       |
+| Sac(100kg)            | Sac de 100 kg    |      |                  |                       |
 
 #+NAME: Region
 | Original Label                 | Preferred Label                |
@@ -783,3 +803,124 @@
 | Autre                                                                                     | Autre crop                                                                           |
 | autre                                                                                     | Autre crop                                                                           |
 | Autre (à préciser)                                                                        | Autre crop                                                                           |
+| jaxatu                                                                                    | Jaxatu                                                                               |
+| Jaxatu                                                                                    | Jaxatu                                                                               |
+| epinard                                                                                   | Épinard                                                                              |
+| Epinard                                                                                   | Épinard                                                                              |
+| Épinard                                                                                   | Épinard                                                                              |
+| petits pois                                                                               | Petits pois                                                                          |
+| Céléri                                                                                    | Céleri                                                                               |
+| Celeri                                                                                    | Céleri                                                                               |
+
+* Agricultural Inputs (plot_inputs — the input axis)
+
+# harmonize_input (GAP 2 plot_inputs, parity loop 2026-06-14).  Maps each
+# wave's agricultural-input *type* label onto a shared input taxonomy
+# `Preferred Label`.  The reported item-level input feature `plot_inputs`
+# (grain (t, i, input, crop, u)) puts this Preferred Label on its `input`
+# index level.
+#
+# WHY STRING-KEYED (Original Label), like harmonize_food / u: the integer
+# input-type code is NOT a stable cross-wave key.  In the ECVMA waves
+# (2011-12 ecvmaas2c_p1 / 2014-15 ECVMA2_AS02CP1, column as02cq02) DAP=4,
+# NPK=5, fungicide=8, herbicide=9.  In the EHCVM waves (2018-19 / 2021-22
+# s16b, column s16bq01) phosphate=4, NPK=5, DAP=6, herbicide=8,
+# fungicide=9 — the codes for DAP / herbicide / fungicide all shifted.
+# So the wave scripts load with convert_categoricals=True and key on the
+# raw French label string, exactly as crop_production keys on the crop
+# label.  Both ECVMA case variants (2011-12 lowercase, 2014-15 Title-case)
+# are listed.
+#
+# TAXONOMY (the Preferred Labels, a sensible shared input vocabulary):
+#   Organic manure / Organic compost   (organic fertilizers)
+#   Urea / DAP / NPK / Phosphate / Mixed fertilizer  (inorganic fertilizers)
+#   Pesticide / Herbicide / Fungicide / Other phytosanitary  (phytosanitary)
+#   Seed                                 (all seed slots collapse to Seed;
+#                                         the seed's crop is carried in the
+#                                         separate `crop` column, NOT here)
+# The ECVMA input roster carries the seed's crop in its own crop column
+# (as02cq04), so all seven ECVMA seed slots ('Semences') map to Seed.
+# The EHCVM s16b roster instead embeds the crop IN the seed-type label
+# ('Semences de petit mil', ...), so every EHCVM seed label ALSO maps to
+# Seed here and its crop is resolved by the companion harmonize_seed_crop
+# table below.  ECVMA code 6 'Mélange' (an unspecified inorganic blend)
+# -> Mixed fertilizer; EHCVM has no such code (it splits DAP/phosphate).
+#
+# Referenced from the wave-level _/plot_inputs.py via
+#   tools.get_categorical_mapping('harmonize_input','Original Label','Preferred Label').
+
+#+NAME: harmonize_input
+| Original Label                            | Preferred Label     |
+|-------------------------------------------+---------------------|
+| engrais organiques-fumure                 | Organic manure      |
+| Engrais organiques-Fumure                 | Organic manure      |
+| Engrais organiques - déchets d'animaux    | Organic manure      |
+| engrais organiques-compost                | Organic compost     |
+| Engrais organiques-Compost                | Organic compost     |
+| Engrais organiques - Ordures ménagères    | Organic compost     |
+| engrais inorganiques - urée               | Urea                |
+| Engrais inorganiques - Urée               | Urea                |
+| engrais inorganiques - dap                | DAP                 |
+| Engrais inorganiques - DAP                | DAP                 |
+| DAP et autres engrais inorganiques        | DAP                 |
+| engrais inorganiques - npk 15/15          | NPK                 |
+| Engrais inorganiques - NPK 15/15          | NPK                 |
+| Engrais inorganiques - NPK/Formule unique | NPK                 |
+| Engrais inorganiques - Phosphates         | Phosphate           |
+| engrais inorganiques - mélange            | Mixed fertilizer    |
+| Engrais inorganiques - Mélange            | Mixed fertilizer    |
+| produits phytosanitaires - pesticides     | Pesticide           |
+| Produits phytosanitaires - Pesticides     | Pesticide           |
+| produits phytosanitaires - herbicides     | Herbicide           |
+| Produits phytosanitaires - Herbicides     | Herbicide           |
+| produits phytosanitaires - fongicides     | Fungicide           |
+| Produits phytosanitaires - Fongicides     | Fungicide           |
+| Produits phytosanitaires-Fongicides       | Fungicide           |
+| Produits phytosanitaires -Fongicides      | Fungicide           |
+| autres produits phytosanitaires           | Other phytosanitary |
+| Autres produits phytosanitaires           | Other phytosanitary |
+| semences                                  | Seed                |
+| Semences                                  | Seed                |
+| Semences de petit mil                     | Seed                |
+| Semences de sorgho                        | Seed                |
+| Semences de maïs                          | Seed                |
+| Semences de riz                           | Seed                |
+| Semences d'autres céréales                | Seed                |
+| Semences de coton                         | Seed                |
+| Semences de sésame                        | Seed                |
+| Semences de césame                        | Seed                |
+| Semences de haricots/niébé                | Seed                |
+| Plants/boutures de tubercules             | Seed                |
+| Autres semences                           | Seed                |
+| 20                                        | Seed                |
+
+# harmonize_seed_crop (GAP 2 plot_inputs, 2026-06-14).  EHCVM-only helper.
+# The EHCVM s16b input roster (2018-19 / 2021-22) has NO crop column — the
+# crop is encoded in the seed-type label ('Semences de petit mil').  This
+# table resolves each EHCVM seed-type label to the crop's harmonize_food
+# `Preferred Label`, so seed rows carry the SAME `crop` value a consumed
+# food / grown crop would (the shared j axis).  The catch-all seed slots
+# ('Semences d'autres céréales', 'Autres semences', 'Plants/boutures de
+# tubercules') resolve to 'Autre crop' (no single crop named).  The bare
+# label '20' is the 2018-19 trailing seed slot whose value-label text was
+# not stored (it is 'Autres semences' = code 20 in the sibling 2021-22
+# wave), so it also maps to 'Autre crop'.  Non-seed input labels are absent
+# here (the wave script only consults this table for rows whose input
+# resolved to 'Seed').  The ECVMA waves do NOT use this table — they read
+# the crop from the roster's own crop column.
+
+#+NAME: harmonize_seed_crop
+| Original Label                | Preferred Label     |
+|-------------------------------+---------------------|
+| Semences de petit mil         | Mil                 |
+| Semences de sorgho            | Sorgho              |
+| Semences de maïs              | Maïs en grain       |
+| Semences de riz               | Riz Paddy           |
+| Semences de coton             | Coton               |
+| Semences de sésame            | Sésame              |
+| Semences de césame            | Sésame              |
+| Semences de haricots/niébé    | Niébé/Haricots secs |
+| Semences d'autres céréales    | Autre crop          |
+| Plants/boutures de tubercules | Autre crop          |
+| Autres semences               | Autre crop          |
+| 20                            | Autre crop          |

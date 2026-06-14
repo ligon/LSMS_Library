@@ -431,3 +431,124 @@ def _finish_crop_production(df, t):
     df = df[[c for c in keep if c in df.columns]]
     df = df.set_index(['t', 'i', 'plot', 'crop', 'u'])
     return df
+
+
+# ---------------------------------------------------------------------------
+# plot_inputs (GAP 2 — item-level agricultural inputs)
+# ---------------------------------------------------------------------------
+#
+# One row per REPORTED agricultural input applied by a household in a wave:
+# its harmonized input identity (Seed / Urea / DAP / NPK / Phosphate / Mixed
+# fertilizer / Organic manure / Organic compost / Pesticide / Herbicide /
+# Fungicide / Other phytosanitary), reported quantity used + native unit, the
+# purchased flag + reported purchased quantity, and — for seed rows — the
+# seed's crop (on the shared harmonize_food labels).  No aggregation: every
+# reported input line is kept.  seed_kg, nitrogen_kg, inorganic_fertilizer
+# any-use flags and fertilizer totals are TRANSFORMATIONS over these rows,
+# never columns here (GAP-2 / item-level discipline).
+#
+# GRAIN = (t, i, input, crop, u).  NOTE: Niger's input modules are at the
+# HOUSEHOLD x input grain (ECVMA additionally x crop), NOT plot x input —
+# no Niger wave records inputs at the parcel level (the WB .do code that
+# emits plot-level seed_kg / nitrogen_kg fabricates a plot allocation via
+# indicator = plot_area / total_land_area, which the reported-only rule
+# forbids).  So `plot` is NOT in the index; the feature name `plot_inputs`
+# follows the GAP-2 ranking name, but the data is the reported HH-level
+# input roster.  `crop` is in the index because the ECVMA input roster is
+# per-(crop) for every input type, and several seed slots / crops can share
+# the same (input, u); it is NaN for non-seed EHCVM rows (those modules
+# carry no crop), accepted as a partly-null index level.
+#
+# Input instrument by wave (all four waves have one; all are item-level
+# household input rosters, loaded convert_categoricals=True so the input /
+# crop / unit labels arrive as the strings the harmonize_* tables key on):
+#   2011-12  ecvmaas2c_p1  : (hid, crop, input-type) — as02cq02 input,
+#                            as02cq04 crop, as02cq05a/b qty+unit,
+#                            as02cq03 purchased(1/2), as02cq08a purchased qty.
+#   2014-15  ECVMA2_AS02CP1: same layout, UPPERCASE columns (AS02CQ*),
+#                            i from (GRAPPE, MENAGE).
+#   2018-19  s16b_me_ner2018: (grappe, menage, input-type) — s16bq01 input
+#                            (crop embedded in seed label -> harmonize_seed_crop),
+#                            s16bq03a/b qty+unit, s16bq05 purchased(Oui/Non),
+#                            s16bq07a purchased qty.  NO crop column.
+#   2021-22  s16b_me_ner2021: same as 2018-19.
+
+
+def _input_maps():
+    """Load the harmonize_input (input-type) and u (unit) string->label
+    maps, plus the harmonize_seed_crop map (EHCVM seed-label -> crop).
+    Keyed on Original Label, like crop_production's _crop_maps."""
+    input_map = tools.get_categorical_mapping(
+        tablename='harmonize_input', idxvars='Original Label',
+        **{'Preferred Label': 'Preferred Label'})
+    unit_map = tools.get_categorical_mapping(
+        tablename='u', idxvars='Original Label',
+        **{'Preferred Label': 'Preferred Label'})
+    seed_crop_map = tools.get_categorical_mapping(
+        tablename='harmonize_seed_crop', idxvars='Original Label',
+        **{'Preferred Label': 'Preferred Label'})
+    return input_map, unit_map, seed_crop_map
+
+
+def _input_labels(source_labels, input_map):
+    """Map an input-type column (string labels from convert_categoricals=True)
+    through harmonize_input.  Unmapped labels pass through unchanged (kept
+    visible, flagged by the sanity checker)."""
+    lab = source_labels.astype('string')
+    return lab.map(lambda x: input_map.get(x, x) if pd.notna(x) else pd.NA).astype('string')
+
+
+def _seed_crop_labels(source_labels, seed_crop_map):
+    """For EHCVM waves: resolve the crop embedded in a seed-type label
+    ('Semences de petit mil' -> 'Mil') via harmonize_seed_crop.  Returns NA
+    for any label not in the seed-crop table (i.e. non-seed input rows)."""
+    lab = source_labels.astype('string')
+    return lab.map(lambda x: seed_crop_map.get(x, pd.NA) if pd.notna(x) else pd.NA).astype('string')
+
+
+# Sentinel for the `crop` index level on input rows that are NOT
+# crop-specific (every fertilizer / pesticide row, and any seed row whose
+# crop could not be resolved).  WHY A SENTINEL, NOT NaN: the framework's
+# canonical-index de-duplication (_finalize_result, country.py ~L3457) does
+# groupby(level=...).first(), and pandas groupby drops rows whose grouping
+# KEY is NaN — so a partly-null `crop` index level silently discards every
+# non-seed input row.  A non-null token keeps all reported rows and makes
+# "no crop dimension" explicit; '(not crop-specific)' is deliberately not a
+# food/crop label so it never collides with the harmonize_food `crop`
+# values that the seed rows carry.
+CROP_NA = '(not crop-specific)'
+
+
+def _finish_plot_inputs(df, t):
+    """Common tail for the wave-level plot_inputs scripts: coerce numeric
+    columns, guarantee the full schema column set, build the
+    (t, i, input, crop, u) index.  Mirrors _finish_crop_production.
+
+    Drops rows with no input identity (input NA) — a roster placeholder
+    line, not a reported input.  The `crop` index level is filled with the
+    CROP_NA sentinel wherever no crop applies (non-seed inputs, unresolved
+    seed crops) so the index is fully non-null and no row is lost to the
+    framework's NaN-key duplicate collapse.  The native unit `u` is filled
+    likewise (a reported input may lack a unit), keeping `u` non-null."""
+    for col in ['Quantity', 'Quantity_purchased']:
+        if col not in df.columns:
+            df[col] = pd.NA
+        df[col] = pd.to_numeric(df[col], errors='coerce').astype('Float64')
+    if 'Purchased' not in df.columns:
+        df['Purchased'] = pd.NA
+    df['Purchased'] = df['Purchased'].astype('boolean')
+    df['t'] = t
+    df['input'] = df['input'].astype('string')
+    if 'crop' not in df.columns:
+        df['crop'] = pd.NA
+    df['crop'] = df['crop'].astype('string').fillna(CROP_NA)
+    # A reported input may lack a recorded unit (e.g. a count of bags); fill
+    # with the existing 'Manquant' (=missing) `u` Preferred Label so the `u`
+    # index level is non-null and survives the canonical de-dup collapse.
+    df['u'] = df['u'].astype('string').fillna('Manquant')
+    df = df[df['input'].notna()]
+    keep = ['t', 'i', 'input', 'crop', 'u',
+            'Quantity', 'Purchased', 'Quantity_purchased']
+    df = df[[c for c in keep if c in df.columns]]
+    df = df.set_index(['t', 'i', 'input', 'crop', 'u'])
+    return df
