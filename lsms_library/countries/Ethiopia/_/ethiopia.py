@@ -2204,3 +2204,180 @@ def people_last7days_for_wave(t, lab, colmap):
     # Collapse accidental duplicate roster rows for an individual.
     out = out[~out.index.duplicated(keep='first')]
     return out.sort_index()
+
+
+def _strip_code_prefix(series):
+    """Strip a leading ``"N. "`` numeric code prefix from a label Series.
+
+    W4/W5 surface item/unit value labels as ``"1. Teff"`` / ``"1. Kilogram"``
+    (the code embedded in the label text); W1-W3 surface bare labels.
+    Returns a 'string' Series with the ``"\\d+\\. "`` prefix removed and
+    surrounding whitespace stripped, so both forms key the same crosswalk.
+    """
+    import re
+    s = series.astype('string')
+    return s.str.replace(r'^\s*\d+\.\s*', '', regex=True).str.strip()
+
+
+def community_prices_for_wave(t, df, colmap):
+    """Build canonical ``community_prices`` for one Ethiopia ESS wave (GAP C).
+
+    Item-level surveyed FOOD prices at ``(t, v, j, u)`` -- one row per
+    (EA/cluster, food item, unit) from the ESS *community* price
+    questionnaire (Section 10).  The price file differs by wave:
+
+      W1 (2011-12)  sect10b1_com_w1  (the primary 'Marketplace' retail
+                    outlet; the survey also fields a secondary outlet
+                    sect10b2_com_w1 (Shops/Stalls) -- NOT wired, to keep one
+                    market per cluster and the strict (t,v,j,u) grain, matching
+                    W2-W5 which each field a single price file per EA).
+                    Item/Unit are LABELS; price = Birr (f1) + cents (f2)/100,
+                    quantity basis = whole (e1) + decimal (e2)/1000.
+      W2 (2013-14)  sect10b2_com_w2  (single price file; sect10b1 is the
+                    retail-outlet metadata).  Item/Unit labels; bare Weight
+                    (q04) and Price (q05).
+      W3 (2015-16)  sect10a2_com_w3  (single price file; sect10a1 is metadata).
+                    Item/Unit labels; bare Weight / Price.
+      W4 (2018-19)  sect10b_com_w4   Item/Unit value-LABELS carry a code
+      W5 (2021-22)  sect10b_com_w5   prefix ("1. Teff"); availability gate
+                    cs10bq00 ("is this item available in the market"); bare
+                    Weight / Price.
+
+    The reported datum is the surveyed ``Price`` (total Birr) for a
+    ``Quantity`` amount of unit ``u`` (e.g. 3000 Birr for 100 Kg of Teff),
+    so BOTH are carried -- the per-unit price is ``Price / Quantity``, a
+    transformation, NEVER baked in here (mirrors how ``food_acquired``
+    carries Quantity + Expenditure and lets ``food_prices`` derive the
+    unit value).  NO median/mean across clusters, NO community->household
+    imputation: this is the raw surveyed cluster price.
+
+    Label unification: ``j`` resolves to ``harmonize_food`` Preferred Labels
+    (so it joins ``food_acquired.j`` / ``crop_production.j``) via the
+    ``harmonize_community_price`` crosswalk, falling back to the
+    code-prefix-stripped raw string for the many exact-match food items.
+    Rows whose item does NOT resolve to a ``harmonize_food`` label (the
+    non-food community goods: Charcoal, Firewood, soap, Matches, ploughs,
+    fertilizer, ...) are DROPPED -- this is the community-FOOD-price feature.
+    ``u`` resolves to the shared ``u`` table Preferred Labels.
+
+    Parameters
+    ----------
+    t : str
+        Wave id (e.g. ``"2018-19"``) -- the ``t`` index value.
+    df : pd.DataFrame
+        Raw community price file for the wave, loaded with
+        ``convert_categoricals=True`` (so item/unit columns carry the Stata
+        value-label strings the crosswalk keys on).
+    colmap : dict
+        Per-wave column map.  Keys:
+            v        EA/cluster id column EMITTED as ``v`` (must match
+                     sample().v: ea_id for W1/W4/W5, ea_id2 for W2/W3).
+            item     surveyed item label column.
+            unit     surveyed unit label column.
+          price / quantity -- exactly ONE of these two forms:
+            price, quantity                 single Birr / weight columns
+                                            (W2-W5).
+            price_whole, price_cents,
+            qty_whole, qty_decimal          split Birr+cents / whole+decimal
+                                            columns (W1: price = whole +
+                                            cents/100, qty = whole +
+                                            decimal/1000).
+          optional:
+            avail, avail_yes                availability-gate column + its
+                                            "available" code; rows not
+                                            flagged available are dropped
+                                            (W4/W5 cs10bq00).
+
+    Returns
+    -------
+    pd.DataFrame indexed by ``(t, v, j, u)`` with columns:
+        ``Price``     reported surveyed price (Birr) for ``Quantity`` of ``u``.
+        ``Quantity``  the native quantity basis the price refers to (the
+                      survey's Weight/Amount field), carried so the per-unit
+                      price is derivable downstream without baking it in.
+    """
+    c = colmap
+    food_labels = set(harmonized_food_labels(fn=_eth_orgfile_path()).values())
+
+    # Item / unit crosswalks (Original Label -> Preferred Label), keyed on
+    # the code-prefix-stripped surveyed string.
+    item_xwalk = df_from_orgfile(_eth_orgfile_path(),
+                                 name='harmonize_community_price',
+                                 set_columns=True, to_numeric=False)
+    item_map = {str(k).strip(): str(v).strip()
+                for k, v in zip(item_xwalk['Original Label'],
+                                item_xwalk['Preferred Label'])
+                if pd.notna(v)}
+    u_xwalk = df_from_orgfile(_eth_orgfile_path(), name='u',
+                              set_columns=True, to_numeric=False)
+    unit_map = {str(k).strip(): str(v).strip()
+                for k, v in zip(u_xwalk['Original Label'],
+                                u_xwalk['Preferred Label'])
+                if pd.notna(v)}
+
+    out = pd.DataFrame(index=df.index)
+    out['v'] = df[c['v']].astype('string').str.strip()
+
+    j_raw = _strip_code_prefix(df[c['item']])
+    out['j'] = j_raw.map(lambda x: item_map.get(x, x) if pd.notna(x) else pd.NA)
+
+    u_raw = _strip_code_prefix(df[c['unit']])
+    out['u'] = u_raw.map(lambda x: unit_map.get(x, x) if pd.notna(x) else pd.NA)
+
+    if 'price' in c:
+        out['Price'] = pd.to_numeric(df[c['price']], errors='coerce')
+    else:
+        whole = pd.to_numeric(df[c['price_whole']], errors='coerce')
+        cents = pd.to_numeric(df[c['price_cents']], errors='coerce').fillna(0)
+        out['Price'] = whole + cents / 100.0
+    if 'quantity' in c:
+        out['Quantity'] = pd.to_numeric(df[c['quantity']], errors='coerce')
+    else:
+        qw = pd.to_numeric(df[c['qty_whole']], errors='coerce')
+        qd = pd.to_numeric(df[c['qty_decimal']], errors='coerce').fillna(0)
+        out['Quantity'] = qw + qd / 1000.0
+
+    # Availability gate (W4/W5): drop items the enumerator marked unavailable.
+    if 'avail' in c and c['avail'] in df.columns:
+        avail = _strip_code_prefix(df[c['avail']])
+        out = out[avail == str(c['avail_yes'])]
+
+    out['t'] = t
+
+    # Keep only FOOD items that resolve to a harmonize_food Preferred Label,
+    # carrying a positive reported price, with a non-empty v / u.
+    out = out[out['j'].isin(food_labels)]
+    out = out[out['Price'].notna() & (out['Price'] > 0)]
+    out = out[out['Quantity'].notna() & (out['Quantity'] > 0)]
+    out = out[out['v'].notna() & (out['v'].str.len() > 0)]
+    out = out[out['u'].notna() & (out['u'].str.len() > 0) & (out['u'] != 'nan')]
+
+    out['Price'] = out['Price'].astype('Float64')
+    out['Quantity'] = out['Quantity'].astype('Float64')
+    out['v'] = out['v'].astype('string')
+    out['j'] = out['j'].astype('string')
+    out['u'] = out['u'].astype('string')
+
+    # community_prices is a CLUSTER table -- there is no household i, the
+    # natural grain is (t, v, j, u).  But the framework's
+    # local_tools.map_index() (run on EVERY read path) unconditionally swaps
+    # j -> i whenever a `j` index level is present and an `i` level is NOT (a
+    # legacy food_acquired inversion).  That swap would rename our item level
+    # `j` to `i`, drop `j`, and collapse the table to (t, v, u).  To keep `j`
+    # intact WITHOUT touching the framework, carry a redundant `i` level (set
+    # equal to the cluster v) positioned BEFORE `j`: map_index then sees i
+    # present and j after i, so it does NOT swap, and the framework's
+    # _normalize_dataframe_index drops the undeclared `i` (data_scheme
+    # declares (t, v, j, u)), leaving the canonical (t, v, j, u) grain.  v
+    # already in the index means _join_v_from_sample is skipped; the spurious
+    # i==v never reaches the API.  This is the same pattern Malawi /
+    # Mali / Tanzania community_prices use (see Malawi.assemble_community_prices).
+    out['i'] = out['v']
+
+    out = out.set_index(['t', 'v', 'i', 'j', 'u'])[['Price', 'Quantity']]
+    # One reported price per (t, v, j, u): keep the first where the survey
+    # records two readings that map to the same key (W3 has a handful; this
+    # is a stable de-dup, NOT an average across clusters).
+    chk = out.reset_index()
+    out = out[~chk.duplicated(['t', 'v', 'j', 'u']).values]
+    return out.sort_index()

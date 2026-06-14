@@ -442,6 +442,103 @@ gaps (crop/harvest units, community-price units) extend these rows.
 | Zorba/Akara Large                  | Zorba/Akara Large                  |
 | Zorba/Akara Medium                 | Zorba/Akara Medium                 |
 | Zorba/Akara Small                  | Zorba/Akara Small                  |
+| Set                                | Set                                |
+| Spoon                              | Spoon                              |
+| Trip                               | Trip                               |
+| Ticket                             | Ticket                             |
+| Frequency                          | Frequency                          |
+| Service                            | Service                            |
+| Meter                              | Meter                              |
+| Meter square                       | Meter square                       |
+| Kilograms (kg)                     | Kg                                 |
+| KILOGRAM                           | Kg                                 |
+| Litre                              | Liter                              |
+| Littere                            | Liter                              |
+| Mili littere                       | Mili Liter                         |
+| Milliliter                         | Mili Liter                         |
+| Centimeter (cm)                    | Cm                                 |
+| Cubic centimeter (cm3)             | Cubic Centimeter                   |
+| Cubic Centimete                    | Cubic Centimeter                   |
+| cubic centimete                    | Cubic Centimeter                   |
+| PACKETS                            | Packets                            |
+| Pices                              | Pieces                             |
+| pices                              | Pieces                             |
+| Set(Mulu)                          | Set                                |
+| Sibisib(set)                       | Set                                |
+| spoon(mankia)                      | Spoon                              |
+| Tiket                              | Ticket                             |
+| Travel(mililis)                    | Trip                               |
+| Digigimosh                         | Other (Specify)                    |
+| pair/tind                          | Pair                               |
+| Siny                               | Sini Small                         |
+| box                                | Box                                |
+| gram                               | Gram                               |
+| centimeter                         | Cm                                 |
+| meter                              | Meter                              |
+| Piece/number Small                 | Piece/Number Small                 |
+| Piece/number Medium                | Piece/Number Medium                |
+| Piece/number Large                 | Piece/Number Large                 |
+
+* harmonize_community_price (the community-price j axis -- GAP C, community_prices)
+
+Item crosswalk for the ESS community/market price questionnaire (Section
+10; the price module is ``sect10b1_com`` W1, ``sect10b2_com`` W2,
+``sect10a2_com`` W3, ``sect10b_com`` W4/W5).  Maps the per-wave surveyed
+item string (the Stata value label the categorical read surfaces, after
+stripping any ``"N. "`` numeric code prefix -- note the community item
+CODES are a DIFFERENT numbering from the food_acquired item codes, so the
+join is on the LABEL, not the code) to a Preferred Label.
+
+The Preferred Labels deliberately REUSE the labels already in the
+``harmonize_food`` table so ``community_prices.j`` JOINS ``food_acquired.j``
+(consumption) and ``crop_production.j`` (harvest) on the shared label.
+Only FOOD items are mapped: the community module also prices many non-food
+goods (Charcoal, Firewood, Kerosene, soap, Matches, Batteries, Cigarettes,
+ploughs, the Mofer/Sickle/Axe farm tools, Mosquito net, Bicycle, local-bus
+transport, Chemical fertilizer, Pesticides, Herbicides), which have NO
+``harmonize_food`` label and are intentionally dropped by the wave script
+(this is the community-FOOD-price arm of label unification).  The crosswalk
+only needs rows where the surveyed string DIFFERS from its Preferred Label
+(casing / spelling / Stata truncation / code-prefix variants); exact-match
+food strings (Teff, Maize, Sorghum, Barley, Millet, Coffee, Onion, Banana,
+Potato, Kocho, Milk, Eggs, Sugar, Salt, Bula, Cheese, Beer, Tea, Tomato,
+Orange, Cassava, Godere, Sweet potato, Mango, Lentils, Linseed, Horsebeans,
+...) pass through unchanged when the wave script falls back to the raw
+stripped label.
+
+#+name: harmonize_community_price
+| Original Label                                     | Preferred Label     |
+|----------------------------------------------------+---------------------|
+| Chat / Kat                                         | Chat/Kat            |
+| Boya/Yam                                           | Boye/Yam            |
+| Chick pea                                          | Chick Pea           |
+| Field pea                                          | Field Pea           |
+| Haricot beans                                       | Haricot Beans      |
+| Niger seed                                         | Niger Seed          |
+| Oils (processed)                                   | Oils                |
+| Peanut                                             | Ground nuts         |
+| Peanut/ nut                                        | Ground nuts         |
+| Green chili pepper (kariya)                        | Kariya              |
+| Green chili pepper (                               | Kariya              |
+| Red pepper (berbere)                               | Berbere             |
+| Red pepper (Processed pepper (Berbere))            | Berbere             |
+| Greens (kale, cabbag                               | Leafy Greens        |
+| kale, cabbage, Pumpikn Leaf, Lettuce, spinach      | Leafy Greens        |
+| Soft drink                                         | Soda                |
+| Soft drinks/Soda                                   | Soda                |
+| Other cereals(Specif                               | Other cereal        |
+| Other Cereals                                      | Other cereal        |
+| Other fruit (SPECIFY                               | Other fruit         |
+| Other fruit (SPECIFY)                              | Other fruit         |
+| ther fruit (SPECIFY                                | Other fruit         |
+| Other pulse or nut(S                               | Other pulse or nut  |
+| Other pulse or nut (SPECIFY)                       | Other pulse or nut  |
+| Other seed (SPECIFY)                               | Other seed          |
+| Other Oil seeds (specify)                          | Other seed          |
+| Other tuber or stem (SPECIFY)                      | Other tuber or stem |
+| Other vegetable (SPE                               | Other vegetable     |
+| Other vegetable (SPECIFY)                          | Other vegetable     |
+| odere                                              | Godere              |
 
 * harmonize_crop (the crop j axis -- GAP 1, crop_production)
 

@@ -20,7 +20,7 @@ var = \
       $(VAR_DIR)/food_coping.parquet $(VAR_DIR)/crop_production.parquet \
       $(VAR_DIR)/plot_inputs.parquet $(VAR_DIR)/livestock.parquet \
       $(VAR_DIR)/anthropometry.parquet $(VAR_DIR)/plot_labor.parquet \
-      $(VAR_DIR)/people_last7days.parquet
+      $(VAR_DIR)/people_last7days.parquet $(VAR_DIR)/community_prices.parquet
 
 all: panel_ids.json updated_ids.json $(parquet) $(var)
 
@@ -157,6 +157,20 @@ people_last7days_parquet := $(people_last7days:.py=.parquet)
 
 $(VAR_DIR)/people_last7days.parquet: people_last7days.py $(people_last7days_parquet)
 	python people_last7days.py
+
+# community_prices (GAP C; ESS §10 community price questionnaire, item-level
+# surveyed FOOD prices at the cluster grain (t, v, j, u)).  Mirrors the
+# crop_production convention: the framework's grab_data calls
+# `make ../<wave>/_/community_prices.parquet`, whose pattern rule runs the
+# wave script; the VAR_DIR rule concatenates them via the country script.
+community_prices = $(shell find $(rounds) -name community_prices.py)
+community_prices_parquet := $(community_prices:.py=.parquet)
+
+../%/_/community_prices.parquet: ../%/_/community_prices.py
+	(cd $(@D) && python community_prices.py)
+
+$(VAR_DIR)/community_prices.parquet: community_prices.py $(community_prices_parquet)
+	python community_prices.py
 
 $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet: nutrition.py categorical_mapping.org $(VAR_DIR)/food_acquired.parquet
 	python nutrition.py
