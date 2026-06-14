@@ -17,7 +17,7 @@ VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 # household_characteristics is auto-derived too (_ROSTER_DERIVED, GH #260).
 var = \
       $(VAR_DIR)/shocks.parquet $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet \
-      $(VAR_DIR)/food_coping.parquet
+      $(VAR_DIR)/food_coping.parquet $(VAR_DIR)/crop_production.parquet
 
 all: panel_ids.json updated_ids.json $(parquet) $(var)
 
@@ -60,6 +60,19 @@ plot_features_parquet := $(plot_features:.py=.parquet)
 
 $(VAR_DIR)/plot_features.parquet: plot_features.py $(plot_features_parquet)
 	python plot_features.py
+
+# crop_production (GAP 1; ESS §9 post-harvest item-level crop harvest).
+# Mirrors the plot_features convention: the framework's grab_data calls
+# `make ../<wave>/_/crop_production.parquet`, whose pattern rule runs the
+# wave script; the VAR_DIR rule concatenates them via the country script.
+crop_production = $(shell find $(rounds) -name crop_production.py)
+crop_production_parquet := $(crop_production:.py=.parquet)
+
+../%/_/crop_production.parquet: ../%/_/crop_production.py
+	(cd $(@D) && python crop_production.py)
+
+$(VAR_DIR)/crop_production.parquet: crop_production.py $(crop_production_parquet)
+	python crop_production.py
 
 # food_coping (GH #332, Family B; ESS §7 CSI/rCSI day-count battery).
 # Mirrors the plot_features convention: the framework's grab_data calls

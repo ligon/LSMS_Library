@@ -766,3 +766,311 @@ def food_coping_for_wave(t, df, hhid):
 
     long = long.set_index(['t', 'i', 'Strategy']).sort_index()
     return long
+
+
+# crop_production (GAP 1 — item-level harvest at (t, i, plot, crop))
+# ---------------------------------------------------------------------
+#
+# ESS post-harvest §9 (sect9_ph) records ONE ROW PER (plot, crop): the
+# crop the farmer grew on a field, the REPORTED harvest quantity, and the
+# native reporting unit.  This is the clean item-level source.  We emit
+# exactly those reported fields — NO unit->kg conversion, NO yield, NO
+# main-crop / value-share rollups (those are transformations, per the
+# parity-loop hard rule).
+#
+# Grain / IDs: plot_id == format_id(holder_id)_format_id(parcel_id)_
+# format_id(field_id) and i == format_id(household_id[2]), IDENTICAL to
+# plot_features (so crop_production joins plot_features on (t, i, plot)).
+#
+# Columns (all REPORTED, item-level):
+#   Quantity        reported harvest quantity (native unit)
+#   u               native harvest unit (Preferred Label via the `u` table)
+#   Quantity_sold   reported quantity sold (sect11/§11 sale module)
+#   Value_sold      reported sale value (Birr)
+#   planting_month  Gregorian planting month 1-12 (sect4_pp / §4)
+#   harvest_month   Gregorian harvest-END month 1-12 (§9)
+#   intercropped    field was a mixed stand (bool)
+#   perennial       crop is a perennial/tree crop (bool, crop-code property)
+#
+# crop labels: code-keyed `harmonize_crop` table whose Preferred Labels
+# REUSE the food labels (Maize, Sorghum, Teff, Wheat, Barley, Rice, ...)
+# so crop_production.j joins food_acquired.j; non-food crops (Cotton,
+# Enset, Gesho, Chat, Coffee, ...) get their own Preferred Labels.
+#
+# SALES GRAIN CAVEAT: the §11 sale module is keyed (household, holder,
+# crop) — NOT (plot, crop).  A holder who grows one crop on several plots
+# reports a single sale figure that cannot be split across plots without
+# fabricating an allocation.  We therefore attach Quantity_sold /
+# Value_sold ONLY where the (holder, crop) maps to exactly ONE plot-crop
+# harvest row (unambiguous).  Where the crop is grown on multiple plots
+# the sale columns stay NaN — we never duplicate or arbitrarily split a
+# reported value.  (Cross-wave aggregate harvest_sold lives in
+# transformations, not here.)
+
+# WB perennial/tree crop-code list (ETH_ESS1.do:415 PERENNIAL/FRUIT set).
+PERENNIAL_CROP_CODES = frozenset({
+    19, 20, 22, 34, 35, 37, 38, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
+    55, 65, 66, 71, 72, 74, 75, 76, 81, 82, 84, 85, 86, 98, 99, 108, 111,
+    112, 113, 114, 115, 116, 117, 122,
+})
+
+
+def _eth_crop_label_map():
+    """Load the code-keyed harmonize_crop table -> {crop_code: Preferred Label}."""
+    return _harmonize_code_label('harmonize_crop')
+
+
+def _clean_unit_label(series):
+    """Normalize a §9/§11 harvest unit label to a canonical `u` value.
+
+    Strips the survey 'NNN. ' code prefix, title-cases, and canonicalizes
+    the harvest module's parenthesized size suffix ``(Small)/(Medium)/
+    (Large)`` to the `` Small/ Medium/ Large`` form the `u` table (and the
+    food_acquired units) already use -- so harvest units resolve through
+    the SAME `u` table the food units use rather than fragmenting the unit
+    axis with a parallel parenthesized scheme.  Also folds a handful of
+    known synonyms / Stata truncations onto their `u`-table label."""
+    s = series.astype('string')
+    s = s.str.replace(r'^\s*\d+\.\s*', '', regex=True).str.strip()
+    # Drop the U+FFFD replacement-char mojibake ESS W5 embeds in a few
+    # labels (e.g. "Zorba/Akara � Large").
+    s = s.str.replace('�', '', regex=False)
+    s = s.str.title()
+    s = s.str.replace(r'\s+', ' ', regex=True)
+    # Normalize the recurring "Meduim" misspelling BEFORE size matching.
+    s = s.str.replace('Meduim', 'Medium', regex=False)
+    # Parenthesized size suffix "(Small)" -> " Small" (tolerating the
+    # Stata-truncated "(Smal"/"(Medi"/"(Larg" and bare "(Mediu" forms).
+    s = s.str.replace(r'\s*\(\s*Smal[l]?\s*\)?\s*$', ' Small', regex=True)
+    s = s.str.replace(r'\s*\(\s*Med(?:i|iu|ium)?\s*\)?\s*$', ' Medium', regex=True)
+    s = s.str.replace(r'\s*\(\s*Larg[e]?\s*\)?\s*$', ' Large', regex=True)
+    s = s.str.replace(r'\s+', ' ', regex=True).str.strip()
+    s = s.str.replace('Joniya Kysha', 'Joniya/Kasha', regex=False)
+    syn = {
+        'Kilogram': 'Kg', 'Kuintal': 'Quintal', 'Quntal': 'Quintal',
+        'Kurbet': 'Quintal',  # ESS W2 alias of Kuintal/Quintal
+        'Meduim': 'Medium',
+        'Kubaya Small': 'Kubaya/Cup Small',
+        'Kubaya Medium': 'Kubaya/Cup Medium',
+        'Kubaya Large': 'Kubaya/Cup Large',
+        'Akumada(Dawela) Lekota Small': 'Akumada/Dawla/Lekota Small',
+        'Akumada(Dawela) Lekota Large': 'Akumada/Dawla/Lekota Large',
+        'Madaberiya/Nuse/Shera/Chiret Small': 'Madaberia/Nuse/Shera/Cheret Small',
+        'Madaberiya/Nuse/Shera/Chiret Medium': 'Madaberia/Nuse/Shera/Cheret Medium',
+        'Madaberiya/Nuse/Shera/Chiret Large': 'Madaberia/Nuse/Shera/Cheret Large',
+        'Others(Specify)': 'Other (Specify)',
+        'Other(Specify)': 'Other (Specify)',
+    }
+    s = s.replace(syn)
+    return s.replace({'': pd.NA, '0': pd.NA})
+
+
+# Ethiopian-calendar month code -> Gregorian month number (1-12).  ESS
+# records the local-calendar month; this deterministic relabel (the same
+# recode the WB do-files apply) is a label normalization, not an
+# aggregate.  Codes 1/13 -> September (9), 2 -> October, ... 12 -> August.
+_ETH_MONTH_TO_GREG = {1: 9, 13: 9, 2: 10, 3: 11, 4: 12, 5: 1, 6: 2,
+                      7: 3, 8: 4, 9: 5, 10: 6, 11: 7, 12: 8}
+
+
+def _greg_month(series):
+    """Recode the ESS local-calendar month code -> Gregorian month (1-12)."""
+    n = pd.to_numeric(series, errors='coerce').astype('Int64')
+    return n.map(_ETH_MONTH_TO_GREG).astype('Int64')
+
+
+def crop_production_for_wave(t, harvest, planting, sale, colmap,
+                             intercrop=None, unit_labels=None,
+                             sale_unit_labels=None):
+    """Build canonical ``crop_production`` for one Ethiopia ESS wave.
+
+    Parameters
+    ----------
+    t : str
+        Wave id (e.g. ``"2011-12"``), the ``t`` index value.
+    harvest : pd.DataFrame
+        Raw §9 post-harvest crop file (sect9_ph_w{N}.dta), loaded with
+        ``convert_categoricals=False`` (codes; unit/crop label decode is
+        done in-script against the harmonize tables).
+    planting : pd.DataFrame or None
+        Raw §4 post-planting crop file (sect4_pp_w{N}.dta) for the
+        planting-month join, or None if unavailable.
+    sale : pd.DataFrame or None
+        Raw §11 post-harvest sale file (sect11_ph_w{N}.dta) for the
+        sold-quantity / sold-value join, or None.
+    colmap : dict
+        Per-wave column map.  Required keys:
+            hhid, holder_id, parcel_id, field_id  — id / plot_id columns
+            crop_code                              — §9 crop code column
+            quantity                               — §9 reported harvest qty
+        Optional keys (NaN where omitted):
+            unit            — §9 native harvest-unit code col (None => Kg,
+                              W1 reports kilos directly)
+            harvest_month   — §9 harvest-END month code col
+            intercrop       — §9 pure/mixed-stand col (1=pure, 2=mixed)
+            pl_crop_code, pl_month  — §4 crop-code + planting-month cols
+            s_crop_code, s_sold_flag, s_qty, s_value, s_unit  — §11 cols
+                              (s_unit None => Kg, W1 sales report kilos)
+    intercrop : pd.DataFrame or None
+        Optional plot-roster (sect3_pp) carrying a plot-level mixed-stand
+        flag, used for W1 (which has no §9 stand variable).  When given,
+        colmap must carry 'ic_holder_id'/'ic_parcel_id'/'ic_field_id'/
+        'ic_flag' (flag: 1=No, 2=Yes per the WB recode).
+
+    Returns
+    -------
+    pd.DataFrame indexed by ``(t, i, plot_id, j, u)`` with columns
+        Quantity (float), Quantity_sold (float), Value_sold (float),
+        planting_month (Int64), harvest_month (Int64),
+        intercropped (boolean), perennial (boolean).
+    """
+    c = colmap
+    crop_map = _eth_crop_label_map()
+
+    h = harvest.copy()
+    # plot_id identical to plot_features.
+    plot_id = (h[c['holder_id']].apply(format_id).astype(str) + '_'
+               + h[c['parcel_id']].apply(format_id).astype(str) + '_'
+               + h[c['field_id']].apply(format_id).astype(str))
+    code = pd.to_numeric(h[c['crop_code']], errors='coerce').astype('Int64')
+
+    out = pd.DataFrame({
+        't':       t,
+        'i':       h[c['hhid']].apply(format_id).values,
+        'plot_id': plot_id.values,
+        '_holder': h[c['holder_id']].apply(format_id).values,
+        '_code':   code.values,
+        'j':       code.map(crop_map).astype('string').values,
+        'Quantity': pd.to_numeric(h[c['quantity']], errors='coerce').astype('Float64').values,
+    })
+
+    # Native harvest unit (Preferred Label).  W1 reports kilos directly.
+    if unit_labels is not None:
+        # ``unit_labels`` is the §9 unit column DECODED to its survey label
+        # (caller loads that one column with convert_categoricals=True),
+        # aligned row-for-row with ``harvest``.  Normalize through the same
+        # pipeline food_acquired uses so it resolves via the shared `u`
+        # table.
+        out['u'] = _clean_unit_label(
+            pd.Series(unit_labels.values, index=h.index)).values
+    else:
+        # W1 reports kilograms directly (no unit code).
+        out['u'] = 'Kg'
+
+    out['harvest_month'] = (_greg_month(h[c['harvest_month']]).values
+                            if c.get('harvest_month') and c['harvest_month'] in h.columns
+                            else pd.NA)
+
+    # intercropped: §9 mixed-stand (1=pure -> False, 2=mixed -> True), or
+    # plot-roster fallback for W1.
+    if c.get('intercrop') and c['intercrop'] in h.columns:
+        ic = pd.to_numeric(h[c['intercrop']], errors='coerce').astype('Int64')
+        icbool = pd.Series(pd.NA, index=h.index, dtype='boolean')
+        icbool = icbool.mask(ic == 1, False).mask(ic == 2, True)
+        out['intercropped'] = icbool.values
+    elif intercrop is not None and c.get('ic_flag'):
+        ic_pid = (intercrop[c['ic_holder_id']].apply(format_id).astype(str) + '_'
+                  + intercrop[c['ic_parcel_id']].apply(format_id).astype(str) + '_'
+                  + intercrop[c['ic_field_id']].apply(format_id).astype(str))
+        flag = pd.to_numeric(intercrop[c['ic_flag']], errors='coerce').astype('Int64')
+        icb = pd.Series(pd.NA, index=intercrop.index, dtype='boolean')
+        icb = icb.mask(flag == 1, False).mask(flag == 2, True)
+        ic_df = pd.DataFrame({'plot_id': ic_pid.values, 'intercropped': icb.values}) \
+            .dropna(subset=['plot_id']).drop_duplicates('plot_id')
+        out = out.merge(ic_df, on='plot_id', how='left')
+    else:
+        out['intercropped'] = pd.Series(pd.NA, index=out.index, dtype='boolean')
+
+    # perennial: crop-code property.
+    out['perennial'] = out['_code'].map(
+        lambda x: (int(x) in PERENNIAL_CROP_CODES) if pd.notna(x) else pd.NA
+    ).astype('boolean')
+
+    # planting_month from §4, joined on (plot_id, crop_code).
+    if planting is not None and c.get('pl_month'):
+        p_pid = (planting[c['holder_id']].apply(format_id).astype(str) + '_'
+                 + planting[c['parcel_id']].apply(format_id).astype(str) + '_'
+                 + planting[c['field_id']].apply(format_id).astype(str))
+        p_code = pd.to_numeric(planting[c['pl_crop_code']], errors='coerce').astype('Int64')
+        pm = pd.DataFrame({
+            'plot_id': p_pid.values,
+            '_code':   p_code.values,
+            'planting_month': _greg_month(planting[c['pl_month']]).values,
+        }).dropna(subset=['plot_id', '_code']).drop_duplicates(['plot_id', '_code'])
+        out = out.merge(pm, on=['plot_id', '_code'], how='left')
+    else:
+        out['planting_month'] = pd.Series(pd.NA, index=out.index, dtype='Int64')
+
+    # Sales: §11 is (household, holder, crop) grain.  Attach reported
+    # sold-qty / sold-value ONLY where (holder, crop) maps to exactly one
+    # plot-crop harvest row (see SALES GRAIN CAVEAT above).
+    #
+    # Value_sold (Birr) is unit-free and always attachable.  Quantity_sold
+    # carries the SALE unit, which need not equal the harvest `u`; since we
+    # never convert units, Quantity_sold is attached only on rows whose
+    # harvest `u` equals the (single) sale unit reported for that
+    # (holder, crop).  Where they differ it stays NaN (no cross-unit fib).
+    out['Quantity_sold'] = pd.Series(pd.NA, index=out.index, dtype='Float64')
+    out['Value_sold'] = pd.Series(pd.NA, index=out.index, dtype='Float64')
+    if sale is not None and c.get('s_qty'):
+        s = sale.copy()
+        s_code = pd.to_numeric(s[c['s_crop_code']], errors='coerce').astype('Int64')
+        s_holder = s[c['holder_id']].apply(format_id)
+        sold_flag = (pd.to_numeric(s[c['s_sold_flag']], errors='coerce').astype('Int64')
+                     if c.get('s_sold_flag') and c['s_sold_flag'] in s.columns else None)
+        qty = pd.to_numeric(s[c['s_qty']], errors='coerce')
+        val = (pd.to_numeric(s[c['s_value']], errors='coerce')
+               if c.get('s_value') and c['s_value'] in s.columns else pd.NA)
+        # sale unit label: pre-decoded labels (s_unit_labels) where the
+        # sale unit is a coded column, else 'Kg' (W1/W2 sale qty is kilos).
+        if sale_unit_labels is not None:
+            s_unit = _clean_unit_label(
+                pd.Series(sale_unit_labels.values, index=s.index)).fillna('Kg')
+        else:
+            s_unit = pd.Series('Kg', index=s.index)
+        sdf = pd.DataFrame({
+            '_holder': s_holder.values,
+            '_code':   s_code.values,
+            '_sunit':  s_unit.values,
+            'Quantity_sold': qty.values,
+            'Value_sold': val if np.isscalar(val) else val.values,
+        })
+        if sold_flag is not None:
+            # sold flag 2 == No -> zero the reported sale.
+            no = (sold_flag == 2).values
+            sdf.loc[no, ['Quantity_sold', 'Value_sold']] = 0.0
+        sdf = sdf.dropna(subset=['_holder', '_code'])
+        # Aggregate to (holder, crop): sum Value_sold (unit-free); for
+        # Quantity_sold sum WITHIN each sale unit and keep the per-unit
+        # breakdown so we can match it against the harvest `u`.
+        vagg = sdf.groupby(['_holder', '_code'], as_index=False)['Value_sold'].sum()
+        qagg = sdf.groupby(['_holder', '_code', '_sunit'], as_index=False)['Quantity_sold'].sum()
+        # Count plot-crop harvest rows per (holder, crop); attach only when 1.
+        nplots = (out.dropna(subset=['_code'])
+                     .groupby(['_holder', '_code'])['plot_id'].nunique()
+                     .rename('_nplots').reset_index())
+        keep = nplots[nplots['_nplots'] == 1][['_holder', '_code']]
+        vagg = vagg.merge(keep, on=['_holder', '_code'], how='inner')
+        qagg = qagg.merge(keep, on=['_holder', '_code'], how='inner')
+        out = out.drop(columns=['Quantity_sold', 'Value_sold'])
+        out = out.merge(vagg, on=['_holder', '_code'], how='left')
+        # Quantity_sold joins additionally on the unit (harvest u == sale unit).
+        out = out.merge(
+            qagg.rename(columns={'_sunit': 'u'}),
+            on=['_holder', '_code', 'u'], how='left')
+
+    out = out.drop(columns=['_holder', '_code'])
+    out = out.dropna(subset=['i', 'plot_id', 'j'])
+    # `u` is an index level (cannot be null).  A row may legitimately
+    # report a quantity with an unrecorded unit -> tag it 'Other (Specify)'
+    # (a value already in the `u` table); rows with neither a quantity nor
+    # a recorded unit are empty placeholders -> drop.
+    empty_u = out['u'].isna()
+    out = out[~(empty_u & out['Quantity'].isna()
+                & out['Quantity_sold'].isna())]
+    out['u'] = out['u'].fillna('Other (Specify)')
+    out = out.set_index(['t', 'i', 'plot_id', 'j', 'u'])
+    # Stable column order.
+    out = out[['Quantity', 'Quantity_sold', 'Value_sold',
+               'planting_month', 'harvest_month', 'intercropped', 'perennial']]
+    return out
