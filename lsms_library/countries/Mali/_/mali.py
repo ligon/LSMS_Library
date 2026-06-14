@@ -336,3 +336,102 @@ def crop_production_finalize(df):
     out = out[['Quantity', 'u', 'Quantity_sold', 'Value_sold',
                'planting_month', 'harvest_month', 'intercropped', 'perennial']]
     return out.sort_index()
+
+
+# ---------------------------------------------------------------------------
+# plot_inputs (GAP 2; parity loop) — item-level (t, i, plot, input)
+# ---------------------------------------------------------------------------
+#
+# One row per input APPLIED to a plot.  The crop/input modules live in the
+# EACI waves only (2014-15 EACI14, 2017-18 EACI17); the EHCVM waves
+# (2018-19, 2021-22) carry no agriculture-input block (the same wave split as
+# crop_production), so plot_inputs is wired for the two EACI waves only.
+#
+# Grain: one row per (t, i, plot, input), where
+#   - i     = Mali composite household id (grappe, menage/exploitation),
+#   - plot  = "{field}_{parcel}" — the SAME plot id as crop_production /
+#             plot_features (s2cq01_s2cq02 etc.); seed rows additionally key
+#             on a crop column where the source records it,
+#   - input = harmonize_input Preferred Label (Seed / Urea / DAP / NPK /
+#             Other inorganic / Manure / Compost / Other organic / Pesticide /
+#             Fungicide / Herbicide / Other phytosanitary).
+#
+# REPORTED item-level columns only (NO seed_kg / nitrogen_kg / any-use flags /
+# fertilizer totals — those are transformations.py rollups over these rows):
+#   Quantity, u, Purchased, Quantity_purchased, Improved, crop.
+#
+# The input types are FIXED questionnaire slots (not a decoded label column),
+# so the wave scripts assign the harmonize_input Code directly; this module's
+# _input_labels maps that Code -> Preferred Label.  Units arrive as decoded
+# Stata labels (the `u` categorical table); the seed's crop is the
+# harmonize_food Preferred Label so it joins crop_production / food_acquired.
+
+
+def _input_labels(series):
+    """Map a Series of harmonize_input Codes -> Preferred Label."""
+    m = tools.get_categorical_mapping(tablename='harmonize_input', idxvars='Code',
+                                      **{'Preferred Label': 'Preferred Label'})
+    out = series.astype('string').str.strip().map(m)
+    return out.astype('string')
+
+
+def plot_inputs_finalize(df):
+    """Common post-processing for a plot_inputs wave DataFrame.
+
+    Expects raw columns already assembled:
+        t, i, plot, input (harmonize_input Code), crop (decoded crop name or
+        NA), u (decoded unit label or NA), Quantity, Purchased (nullable
+        bool), Quantity_purchased, Improved (nullable bool).
+    Maps input/unit/crop labels, coerces dtypes, drops content-free rows
+    (an input slot the household did not use -> no quantity, no purchase,
+    no improved flag), sets the (t, i, plot, input, crop) index, and
+    collapses exact-duplicate index rows by summing the reported quantities
+    and taking the first/any of the flags.
+    """
+    df = df.copy()
+    df['input'] = _input_labels(df['input'])
+    df['u'] = _unit_labels(df['u'])
+    df['crop'] = _crop_labels(df['crop'])
+    df = df.dropna(subset=['input'])  # drop unmapped input slots
+
+    for c in ('Quantity', 'Quantity_purchased'):
+        df[c] = pd.to_numeric(df[c], errors='coerce')
+    # 9999 / 999 / 99 are the EACI "Manquant" sentinels on the reported
+    # quantity columns (cf. the WB seed_kg block `replace seed_kg=. if
+    # s1eq05a>=9999`); coerce to NA so they do not contaminate a downstream
+    # kg-conversion sum.
+    for c in ('Quantity', 'Quantity_purchased'):
+        df.loc[df[c].isin([99, 999, 9999, 99999]), c] = pd.NA
+    df['Purchased'] = df['Purchased'].astype('boolean')
+    df['Improved'] = df['Improved'].astype('boolean')
+
+    # Drop content-free rows: an input slot for which the household reported
+    # nothing positive.  A reported Quantity, a reported purchased quantity,
+    # a positive Purchased flag, or a non-NA Improved flag all count as
+    # content.  Purchased == False does NOT count (it is the ABSENCE of a
+    # purchase — keeping it would emit a content-free row on every plot for a
+    # fertilizer type the household neither applied here nor bought).
+    has_content = (df['Quantity'].notna() | df['Quantity_purchased'].notna()
+                   | df['Purchased'].fillna(False).astype('boolean')
+                   | df['Improved'].notna())
+    df = df[has_content]
+
+    # plot / crop may be NA; carry as NA-able strings so the index level is
+    # not silently dropped.
+    df['plot'] = df['plot'].astype('string')
+    df['crop'] = df['crop'].astype('string')
+
+    keys = ['t', 'i', 'plot', 'input', 'crop']
+    # Collapse any exact (t,i,plot,input,crop) duplicates: sum reported
+    # amounts (min_count=1 keeps an all-NA group NA, not a spurious 0),
+    # first/any for flags.  dropna=False so plot/crop NA rows survive.
+    g = df.groupby(keys, dropna=False, as_index=True)
+    out = pd.DataFrame({
+        'Quantity':           g['Quantity'].sum(min_count=1),
+        'Quantity_purchased': g['Quantity_purchased'].sum(min_count=1),
+        'u':                  g['u'].first(),
+        'Purchased':          g['Purchased'].max(),
+        'Improved':           g['Improved'].max(),
+    })
+    out = out[['Quantity', 'u', 'Purchased', 'Quantity_purchased', 'Improved']]
+    return out.sort_index()

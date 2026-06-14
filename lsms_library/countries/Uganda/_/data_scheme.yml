@@ -137,4 +137,39 @@ Data Scheme:
     harvest_month: int
     intercropped: bool
     materialize: make
+  plot_inputs:
+    # Item-level agricultural-input module (GAP 2 parity build).  One row
+    # per REPORTED input applied to a plot.  Source: AGSEC3A (season 1) +
+    # AGSEC3B (season 2) plot-input modules for the fertilizer / pesticide
+    # blocks, and AGSEC4A (plot-crop roster) for the seed block.
+    #
+    # Grain (t, i, plot, input, j):
+    #   plot   — hhid-parcel-plot, mirroring the WB harmonised plot_id and
+    #            the crop_production plot key (join on (t, i, plot)); its
+    #            parcel component is the parcel plot_features keys on.
+    #   input  — the input identity on the shared 'harmonize_input'
+    #            Preferred Labels: Seed; Organic Fertilizer; Inorganic
+    #            Fertilizer refined by nutrient class (Nitrate / Phosphate /
+    #            Potash / Mixed Fertilizer); Pesticide refined by type
+    #            (Insecticide / Fungicide / Growth Regulator / ...).  These
+    #            are the finest identities the UNPS questionnaire records
+    #            (it asks nutrient class, not urea/DAP/NPK product names).
+    #   j      — the seed's crop, on harmonize_crop labels, for seed rows;
+    #            the sentinel 'n/a' for fertilizer/pesticide rows (no crop
+    #            linkage).  In the index so per-crop seed rows on a
+    #            multi-crop plot stay distinct (plot-crop seed grain) — ~38%
+    #            of seeded plots carry >1 crop.
+    #
+    # Columns are REPORTED values only — NO seed_kg / nitrogen_kg / any-use
+    # flags / fertilizer totals (those are transformations).  Missing in a
+    # wave -> NaN.  Improved is non-null only on seed rows (1=Improved seed
+    # type, 0=Traditional).  Quantity is NaN on 2009-10/2010-11 seed rows
+    # (those waves record no seed quantity, only purchased y/n + seed type).
+    index: (t, i, plot, input, j)
+    Quantity: float
+    u: str
+    Purchased: bool
+    Quantity_purchased: float
+    Improved: bool
+    materialize: make
   nonfood_expenditures: !make

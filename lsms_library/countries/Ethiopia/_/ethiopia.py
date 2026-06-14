@@ -1074,3 +1074,391 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
     out = out[['Quantity', 'Quantity_sold', 'Value_sold',
                'planting_month', 'harvest_month', 'intercropped', 'perennial']]
     return out
+
+
+# plot_inputs (GAP 2 — item-level ag inputs at (t, i, plot, input, j))
+# ---------------------------------------------------------------------
+#
+# ESS records the inputs applied to a plot in the post-planting (pp) round
+# across three sections, at THREE DIFFERENT GRAINS:
+#
+#   §3 plot roster (sect3_pp)  : ONE ROW PER FIELD.  Inorganic-fertilizer
+#       use + reported kg per type (Urea / DAP / NPS), and organic-fertilizer
+#       use dummies (Manure / Compost / Other Organic).  Fertilizer is a
+#       PLOT-LEVEL input (no crop) -> these rows carry j = WHOLE_PLOT_SENTINEL.
+#   §4 planting (sect4_pp)     : ONE ROW PER (FIELD, CROP).  Seed quantity
+#       (kg) + the improved-seed flag (W2-W5; for W1 the seed quantity lives
+#       in §5).  Pesticide use (a plot-crop dummy).  These are CROP-specific
+#       -> j = the crop Preferred Label.
+#   §5 seed (sect5_pp)         : seed PURCHASE detail (purchased y/n, purchased
+#       qty kg, and, for W1, the seed quantity itself).  W1's §5 is at
+#       (field, crop) grain; W2-W5's §5 is at (HOLDER, crop) grain (no
+#       field_id), so its purchased columns attach to the §4 plot-crop seed
+#       rows ONLY where the (holder, crop) maps to exactly ONE plot
+#       (the same SALES GRAIN CAVEAT crop_production uses for §11 sales).
+#
+# We emit ONE ROW PER (plot, input[, crop]) carrying only REPORTED,
+# item-level fields:
+#   input               input identity (Preferred Label via harmonize_input)
+#   Quantity            reported applied quantity (native unit u; kg here)
+#   u                   native unit ('Kg' for every ESS input quantity)
+#   Purchased           was the input purchased (nullable bool; seed rows)
+#   Quantity_purchased  reported purchased quantity (kg; seed rows)
+#   Improved            improved-seed flag (nullable bool; seed rows only)
+#
+# NO unit->kg re-conversion (the source already reports kg), NO nitrogen_kg
+# / seed_kg sums, NO any-use roll-up flags, NO fertilizer totals -- those are
+# transformations over these item rows (GAP 2 / GAP 7), not stored columns.
+#
+# Grain / IDs: plot_id == format_id(holder_id)_format_id(parcel_id)_
+# format_id(field_id) and i == format_id(household_id[2]), IDENTICAL to
+# plot_features / crop_production (so plot_inputs joins them on (t, i, plot)).
+# crop labels reuse harmonize_crop (== the food Preferred Labels) so seed/
+# pesticide rows' j joins crop_production.j and food_acquired.j.
+#
+# WHOLE_PLOT_SENTINEL: a plot-level (non-crop) input cannot carry a real
+# crop label, but `j` is an index level (no nulls allowed; crop_production
+# fills its `u` level the same way).  We tag those rows with a reserved,
+# clearly-non-crop label so the index stays clean and the crop axis is never
+# silently corrupted; downstream code selects crop-specific inputs with
+# `j != 'Whole Plot'`.
+WHOLE_PLOT_SENTINEL = 'Whole Plot'
+
+# Reported nitrogen-fertilizer types whose kg is recorded per plot in §3.
+# (N-content factors live in transformations, NEVER here.)
+PLOT_INPUT_FERTILIZERS = ('Urea', 'DAP', 'NPS')
+PLOT_INPUT_ORGANICS = ('Manure', 'Compost', 'Other Organic')
+
+
+def _eth_input_label_map():
+    """Load the code-keyed harmonize_input table -> {code: Preferred Label}.
+
+    The table documents the shared ESS input taxonomy (Seed / Urea / DAP /
+    NPS / Manure / Compost / Other Organic / Pesticide).  Labels are emitted
+    directly in-script (as crop_production does for crops), so the table is
+    the authoritative label source and a cross-country reference -- not a
+    runtime auto-mapping (the index level is named ``input``, the table
+    ``harmonize_input``, so the name-match auto-mapper does not fire)."""
+    return _harmonize_code_label('harmonize_input')
+
+
+def _yesno_bool(series, yes=1, no=2):
+    """Recode an ESS 1=Yes / 2=No code Series to nullable boolean."""
+    n = pd.to_numeric(series, errors='coerce').astype('Int64')
+    out = pd.Series(pd.NA, index=n.index, dtype='boolean')
+    return out.mask(n == yes, True).mask(n == no, False)
+
+
+def _plot_id_from(df, c, holder='holder_id', parcel='parcel_id', field='field_id'):
+    """holder_parcel_field plot_id, identical to plot_features/crop_production."""
+    return (df[c[holder]].apply(format_id).astype(str) + '_'
+            + df[c[parcel]].apply(format_id).astype(str) + '_'
+            + df[c[field]].apply(format_id).astype(str))
+
+
+def plot_inputs_for_wave(t, plot_roster, planting, seeds, colmap, labels=None):
+    """Build canonical ``plot_inputs`` for one Ethiopia ESS wave.
+
+    Parameters
+    ----------
+    t : str
+        Wave id (e.g. ``"2011-12"``), the ``t`` index value.
+    plot_roster : pd.DataFrame or None
+        Raw §3 plot roster (sect3_pp_w{N}.dta), loaded with
+        ``convert_categoricals=False``.  Source of the per-plot
+        fertilizer (Urea/DAP/NPS kg) and organic-fertilizer dummies.
+    planting : pd.DataFrame or None
+        Raw §4 planting crop file (sect4_pp_w{N}.dta), source of the
+        plot-crop seed quantity (W2-W5), the improved-seed flag, and the
+        pesticide-use dummy.
+    seeds : pd.DataFrame or None
+        Raw §5 seed file (sect5_pp_w{N}.dta), source of seed PURCHASE
+        detail (and, for W1, the seed quantity itself).
+    colmap : dict
+        Per-wave column map.  Recognised keys (all optional; a section is
+        skipped when its keys are absent / the frame is None):
+            hhid, holder_id, parcel_id, field_id   — id / plot_id columns
+
+          § seed (the file carrying the plot-crop seed quantity):
+            seed_src ∈ {'seeds', 'planting'}        — which frame holds qty
+            seed_crop_code                          — crop code in seed_src
+            seed_qty / seed_qty_a / seed_qty_b      — qty col, or kg+gram cols
+            improved_code / improved_yes            — improved flag + yes-codes
+
+          § seed purchase (always from §5):
+            p_holder_id, p_crop_code                — §5 grain keys
+            p_field_id, p_parcel_id                 — present only for W1 §5
+            p_purch_flag                            — purchased y/n (2=No)
+            p_purch_a / p_purch_b / p_purch_qty     — purchased kg (+gram)
+
+          § fertilizer (§3 plot roster):
+            urea_used, urea_kg, dap_used, dap_kg,
+            nps_used, nps_kg                         — per-type use + kg
+            urea_purch_kg, dap_purch_kg, nps_purch_kg — purchased kg (W2+)
+
+          § organic (§3 plot roster):
+            manure_used, compost_used, other_organic_used
+
+          § pesticide (§4 planting):
+            pest_crop_code, pest_used, pest_gate     — used + gate (2 zeros it)
+    labels : dict or None
+        Optional {input_code: Preferred Label} override; defaults to the
+        harmonize_input table.
+
+    Returns
+    -------
+    pd.DataFrame indexed by ``(t, i, plot_id, input, j)`` with columns
+        Quantity (float), u (str), Purchased (boolean),
+        Quantity_purchased (float), Improved (boolean).
+    """
+    c = colmap
+    crop_map = _eth_crop_label_map()
+    pieces = []
+
+    # ---- SEED (plot-crop) -------------------------------------------
+    seed_src = c.get('seed_src')
+    src = {'seeds': seeds, 'planting': planting}.get(seed_src)
+    if src is not None and c.get('seed_crop_code'):
+        s = src.copy()
+        # Optional seed-block gate (W4/W5 drop s4q15==1 immature/cut rows).
+        if c.get('seed_drop_col') and c['seed_drop_col'] in s.columns:
+            gate = pd.to_numeric(s[c['seed_drop_col']], errors='coerce')
+            s = s[gate != c.get('seed_drop_val', 1)].copy()
+        pid = _plot_id_from(s, c)
+        code = pd.to_numeric(s[c['seed_crop_code']], errors='coerce').astype('Int64')
+        # seed quantity (kg): either a single col or kg + gram pair.
+        if c.get('seed_qty') and c['seed_qty'] in s.columns:
+            qty = pd.to_numeric(s[c['seed_qty']], errors='coerce').astype('Float64')
+        elif c.get('seed_qty_a') and c['seed_qty_a'] in s.columns:
+            a = pd.to_numeric(s[c['seed_qty_a']], errors='coerce')
+            g = (pd.to_numeric(s[c['seed_qty_b']], errors='coerce') * 0.001
+                 if c.get('seed_qty_b') and c['seed_qty_b'] in s.columns
+                 else pd.Series(0.0, index=s.index))
+            qty = a.add(g, fill_value=0).astype('Float64').where(
+                a.notna() | (g != 0), pd.NA)
+        else:
+            qty = pd.Series(pd.NA, index=s.index, dtype='Float64')
+        qty = qty.mask(qty < 0, pd.NA)
+        # improved flag.
+        if c.get('improved_code') and c['improved_code'] in s.columns:
+            ic = pd.to_numeric(s[c['improved_code']], errors='coerce').astype('Int64')
+            yes = set(c.get('improved_yes', (2,)))
+            improved = pd.Series(pd.NA, index=s.index, dtype='boolean')
+            improved = improved.mask(ic.isin(list(yes)), True)
+            improved = improved.mask(ic.notna() & ~ic.isin(list(yes)), False)
+        else:
+            improved = pd.Series(pd.NA, index=s.index, dtype='boolean')
+
+        seed_df = pd.DataFrame({
+            'i':        s[c['hhid']].apply(format_id).values,
+            'plot_id':  pid.values,
+            '_holder':  s[c['holder_id']].apply(format_id).values,
+            '_code':    code.values,
+            'j':        code.map(crop_map).astype('string').values,
+            'input':    'Seed',
+            'Quantity': qty.values,
+            'u':        'Kg',
+            'Improved': improved.values,
+            'Applied':  pd.Series(pd.NA, index=s.index, dtype='boolean').values,
+        })
+
+        # Improved flag may instead live in the §4 planting file (W1: §5 has
+        # no improved column).  Join it on (plot_id, crop) where requested.
+        if (c.get('improved_join') and planting is not None
+                and c.get('improved_code') and c['improved_code'] in planting.columns):
+            ipl_pid = _plot_id_from(planting, c)
+            ipl_code = pd.to_numeric(planting[c['pl_crop_code']], errors='coerce').astype('Int64') \
+                if c.get('pl_crop_code') and c['pl_crop_code'] in planting.columns \
+                else pd.to_numeric(planting.get(c['seed_crop_code']), errors='coerce').astype('Int64')
+            iic = pd.to_numeric(planting[c['improved_code']], errors='coerce').astype('Int64')
+            yes = set(c.get('improved_yes', (2,)))
+            ibool = pd.Series(pd.NA, index=planting.index, dtype='boolean')
+            ibool = ibool.mask(iic.isin(list(yes)), True)
+            ibool = ibool.mask(iic.notna() & ~iic.isin(list(yes)), False)
+            idf = pd.DataFrame({'plot_id': ipl_pid.values, '_code': ipl_code.values,
+                                '_imp': ibool.values}) \
+                .dropna(subset=['plot_id', '_code']).drop_duplicates(['plot_id', '_code'])
+            seed_df = seed_df.merge(idf, on=['plot_id', '_code'], how='left')
+            seed_df['Improved'] = seed_df.pop('_imp').astype('boolean')
+
+        # Seed PURCHASE detail from §5 (purchased y/n, purchased kg).
+        seed_df['Purchased'] = pd.Series(pd.NA, index=seed_df.index, dtype='boolean')
+        seed_df['Quantity_purchased'] = pd.Series(pd.NA, index=seed_df.index, dtype='Float64')
+        if seeds is not None and c.get('p_purch_flag'):
+            ps = seeds.copy()
+            p_holder = ps[c['p_holder_id']].apply(format_id)
+            p_code = pd.to_numeric(ps[c['p_crop_code']], errors='coerce').astype('Int64')
+            purch = _yesno_bool(ps[c['p_purch_flag']])
+            if c.get('p_purch_qty') and c['p_purch_qty'] in ps.columns:
+                pqty = pd.to_numeric(ps[c['p_purch_qty']], errors='coerce').astype('Float64')
+            elif c.get('p_purch_a') and c['p_purch_a'] in ps.columns:
+                pa = pd.to_numeric(ps[c['p_purch_a']], errors='coerce')
+                pg = (pd.to_numeric(ps[c['p_purch_b']], errors='coerce') * 0.001
+                      if c.get('p_purch_b') and c['p_purch_b'] in ps.columns
+                      else pd.Series(0.0, index=ps.index))
+                pqty = pa.add(pg, fill_value=0).astype('Float64').where(
+                    pa.notna() | (pg != 0), pd.NA)
+            else:
+                pqty = pd.Series(pd.NA, index=ps.index, dtype='Float64')
+            # purchased flag No -> 0 purchased quantity (mirrors the .do).
+            pqty = pqty.mask(purch == False, 0.0)
+
+            if c.get('p_field_id') and c['p_field_id'] in ps.columns:
+                # W1: §5 carries field_id -> direct plot-crop join.
+                p_pid = _plot_id_from(ps, c, parcel=c.get('p_parcel_id', 'parcel_id'),
+                                      field=c['p_field_id'])
+                pdf = pd.DataFrame({
+                    'plot_id': p_pid.values, '_code': p_code.values,
+                    'Purchased': purch.values, 'Quantity_purchased': pqty.values,
+                }).dropna(subset=['plot_id', '_code']).drop_duplicates(['plot_id', '_code'])
+                seed_df = seed_df.drop(columns=['Purchased', 'Quantity_purchased'])
+                seed_df = seed_df.merge(pdf, on=['plot_id', '_code'], how='left')
+            else:
+                # W2-W5: §5 is (holder, crop) grain -> attach only where the
+                # (holder, crop) maps to exactly ONE plot (the SALES GRAIN
+                # CAVEAT; never split a holder figure across plots).
+                pagg = pd.DataFrame({
+                    '_holder': p_holder.values, '_code': p_code.values,
+                    '_purch_any': (purch == True).values,
+                    'Quantity_purchased': pqty.values,
+                })
+                pagg = pagg.dropna(subset=['_holder', '_code'])
+                pa2 = pagg.groupby(['_holder', '_code'], as_index=False).agg(
+                    _purch_any=('_purch_any', 'max'),
+                    Quantity_purchased=('Quantity_purchased', 'sum'),
+                )
+                nplots = (seed_df.dropna(subset=['_code'])
+                          .groupby(['_holder', '_code'])['plot_id'].nunique()
+                          .rename('_n').reset_index())
+                keep = nplots[nplots['_n'] == 1][['_holder', '_code']]
+                pa2 = pa2.merge(keep, on=['_holder', '_code'], how='inner')
+                seed_df = seed_df.drop(columns=['Purchased', 'Quantity_purchased'])
+                seed_df = seed_df.merge(pa2, on=['_holder', '_code'], how='left')
+                seed_df['Purchased'] = seed_df.pop('_purch_any').astype('boolean')
+
+        seed_df = seed_df.drop(columns=['_holder', '_code'])
+        # Keep a seed row only if it carries a crop and SOME reported value.
+        seed_df = seed_df.dropna(subset=['j'])
+        has_val = (seed_df['Quantity'].notna() | seed_df['Improved'].notna()
+                   | seed_df['Purchased'].notna() | seed_df['Quantity_purchased'].notna())
+        seed_df = seed_df[has_val]
+        pieces.append(seed_df)
+
+    # ---- FERTILIZER + ORGANIC (plot-level, §3) ----------------------
+    if plot_roster is not None:
+        pr = plot_roster.copy()
+        pid = _plot_id_from(pr, c)
+        hh = pr[c['hhid']].apply(format_id)
+        fert_specs = [
+            ('Urea',          c.get('urea_used'), c.get('urea_kg'), c.get('urea_purch_kg')),
+            ('DAP',           c.get('dap_used'),  c.get('dap_kg'),  c.get('dap_purch_kg')),
+            ('NPS',           c.get('nps_used'),  c.get('nps_kg'),  c.get('nps_purch_kg')),
+        ]
+        for name, used_col, kg_col, purch_col in fert_specs:
+            if not (kg_col and kg_col in pr.columns):
+                continue
+            used = _yesno_bool(pr[used_col]) if (used_col and used_col in pr.columns) else None
+            kg = pd.to_numeric(pr[kg_col], errors='coerce').astype('Float64')
+            pqty = (pd.to_numeric(pr[purch_col], errors='coerce').astype('Float64')
+                    if purch_col and purch_col in pr.columns
+                    else pd.Series(pd.NA, index=pr.index, dtype='Float64'))
+            fert = pd.DataFrame({
+                'i': hh.values, 'plot_id': pid.values,
+                'j': WHOLE_PLOT_SENTINEL, 'input': name,
+                'Quantity': kg.values, 'u': 'Kg',
+                'Purchased': pd.Series(pd.NA, index=pr.index, dtype='boolean').values,
+                'Quantity_purchased': pqty.values,
+                'Improved': pd.Series(pd.NA, index=pr.index, dtype='boolean').values,
+                'Applied': (used.values if used is not None
+                            else pd.Series(pd.NA, index=pr.index, dtype='boolean').values),
+                '_used': (used.values if used is not None
+                          else pd.Series(pd.NA, index=pr.index, dtype='boolean').values),
+            })
+            # ONE ROW PER FERTILIZER ACTUALLY APPLIED to a plot.  Keep a row
+            # only where the type was used (used == True) OR a kg / purchased
+            # quantity is reported; a plot that answered "did not use" is NOT
+            # an applied-input row (no zero-quantity placeholder rows -- the
+            # any-use roll-up is a transformation, not stored here).
+            keep = ((fert['_used'] == True) | fert['Quantity'].notna()
+                    | fert['Quantity_purchased'].notna())
+            fert = fert[keep].drop(columns='_used')
+            # Drop a reported 0 kg that is really "not applied".
+            fert['Quantity'] = fert['Quantity'].mask(fert['Quantity'] == 0, pd.NA)
+            pieces.append(fert)
+
+        org_specs = [('Manure', c.get('manure_used')),
+                     ('Compost', c.get('compost_used')),
+                     ('Other Organic', c.get('other_organic_used'))]
+        for name, used_col in org_specs:
+            if not (used_col and used_col in pr.columns):
+                continue
+            used = _yesno_bool(pr[used_col])
+            org = pd.DataFrame({
+                'i': hh.values, 'plot_id': pid.values,
+                'j': WHOLE_PLOT_SENTINEL, 'input': name,
+                'Quantity': pd.Series(pd.NA, index=pr.index, dtype='Float64').values,
+                'u': pd.Series(pd.NA, index=pr.index, dtype='string').values,
+                'Purchased': pd.Series(pd.NA, index=pr.index, dtype='boolean').values,
+                'Quantity_purchased': pd.Series(pd.NA, index=pr.index, dtype='Float64').values,
+                'Improved': pd.Series(pd.NA, index=pr.index, dtype='boolean').values,
+                'Applied': used.values,
+            })
+            # Organic fertilizer carries no reported quantity in ESS -- the
+            # reported datum is the applied dummy, stored in ``Applied``.  Keep
+            # only the plots where it was applied (Applied == True); the
+            # Quantity / Purchased / Quantity_purchased / Improved fields stay
+            # NaN (they are seed-only / fertilizer-purchase fields).
+            org = org[org['Applied'] == True]
+            org['u'] = pd.NA
+            pieces.append(org)
+
+    # ---- PESTICIDE (plot-crop, §4) ----------------------------------
+    if planting is not None and c.get('pest_used') and c['pest_used'] in planting.columns:
+        pl = planting.copy()
+        pid = _plot_id_from(pl, c)
+        code = pd.to_numeric(pl[c['pest_crop_code']], errors='coerce').astype('Int64')
+        used = _yesno_bool(pl[c['pest_used']])
+        if c.get('pest_gate') and c['pest_gate'] in pl.columns:
+            gate = pd.to_numeric(pl[c['pest_gate']], errors='coerce').astype('Int64')
+            used = used.mask(gate == 2, False)
+        pest = pd.DataFrame({
+            'i': pl[c['hhid']].apply(format_id).values,
+            'plot_id': pid.values,
+            'j': code.map(crop_map).astype('string').values,
+            'input': 'Pesticide',
+            'Quantity': pd.Series(pd.NA, index=pl.index, dtype='Float64').values,
+            'u': pd.Series(pd.NA, index=pl.index, dtype='string').values,
+            'Purchased': pd.Series(pd.NA, index=pl.index, dtype='boolean').values,
+            'Quantity_purchased': pd.Series(pd.NA, index=pl.index, dtype='Float64').values,
+            'Improved': pd.Series(pd.NA, index=pl.index, dtype='boolean').values,
+            'Applied': used.values,
+        })
+        pest['u'] = pd.NA
+        pest = pest.dropna(subset=['j'])
+        # Pesticide carries no reported quantity in ESS -- the reported datum
+        # is the applied dummy, stored in ``Applied``.  Keep only the applied
+        # plot-crops; collapse duplicate (plot, crop) rows to plot-crop.
+        pest = pest[pest['Applied'] == True]
+        pest = (pest.groupby(['i', 'plot_id', 'j', 'input'], as_index=False)
+                .agg({'Quantity': 'first', 'u': 'first', 'Purchased': 'first',
+                      'Quantity_purchased': 'first', 'Improved': 'first',
+                      'Applied': 'max'}))
+        pieces.append(pest)
+
+    assert pieces, f"plot_inputs {t}: no input sections produced rows"
+    out = pd.concat(pieces, ignore_index=True)
+    out['t'] = t
+    out = out.dropna(subset=['i', 'plot_id', 'input', 'j'])
+    out['Quantity'] = out['Quantity'].astype('Float64')
+    out['Quantity_purchased'] = out['Quantity_purchased'].astype('Float64')
+    out['Purchased'] = out['Purchased'].astype('boolean')
+    out['Improved'] = out['Improved'].astype('boolean')
+    out['Applied'] = out['Applied'].astype('boolean')
+    out['u'] = out['u'].astype('string')
+    out = out.set_index(['t', 'i', 'plot_id', 'input', 'j'])
+    out = out[['Quantity', 'u', 'Purchased', 'Quantity_purchased',
+               'Improved', 'Applied']]
+    # Collapse any exact-duplicate index rows (defensive; e.g. a plot that
+    # reports the same fertilizer type twice) by taking the first.
+    out = out[~out.index.duplicated(keep='first')]
+    return out.sort_index()

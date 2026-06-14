@@ -38,6 +38,16 @@ $(VAR_DIR)/food_coping.parquet: food_coping.py ../2014-15/_/food_coping.parquet
 $(VAR_DIR)/crop_production.parquet: crop_production.py ../2014-15/_/crop_production.parquet ../2017-18/_/crop_production.parquet
 	python crop_production.py
 
+# plot_inputs (item-level ag inputs, GAP 2 / parity loop).  The input
+# module lives in the EACI waves only (2014-15, 2017-18).  The wave pattern
+# rule materializes each wave parquet; the country-level concatenator
+# (plot_inputs.py) aggregates into var/plot_inputs.parquet.
+../%/_/plot_inputs.parquet: ../%/_/plot_inputs.py
+	(cd $(@D) && python plot_inputs.py)
+
+$(VAR_DIR)/plot_inputs.parquet: plot_inputs.py ../2014-15/_/plot_inputs.parquet ../2017-18/_/plot_inputs.parquet
+	python plot_inputs.py
+
 clean:
 	rm -f panel_ids.json updated_ids.json
 

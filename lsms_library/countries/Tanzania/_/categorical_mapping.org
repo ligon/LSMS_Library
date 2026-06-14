@@ -611,6 +611,10 @@
 | mililitre      | Millilitre      |            |            | mililitre |
 | PIECES         | Piece           | PIECES     | PIECES     |           |
 | kilogram       | Kg              |            |            | kilogram  |
+| 20 liter bucket | 20l Bucket     |            |            |           |
+| small cup      | Small Cup       |            |            |           |
+| large cup      | Large Cup       |            |            |           |
+| millilitre     | Millilitre      |            |            |           |
 
 # harmonize_crop is the (j) axis for crop_production (parity-loop GAP 1).
 # Keyed on the NPS crop CODE ("cropid" / "zaocode") from the agriculture
@@ -734,3 +738,34 @@
 | 851  | Citrus Fruits            | Lime            | 851     | 851     |
 | 852  | Citrus Fruits            | Lemon           | 852     | 852     |
 | 998  | Other Crop               | Other           | 998     | 998     |
+
+# harmonize_input is the (input) axis for plot_inputs (parity-loop GAP 2).
+# Two kinds of rows:
+#   * INORGANIC-FERTILIZER TYPE codes (1-8) -- the ag3a_48 / ag3a_55 value
+#     labels ("What type of INORGANIC FERTILIZER you used?") map to a canonical
+#     fertilizer-product Preferred Label (urea / DAP / NPK / ...).  The 2019-20
+#     and 2020-21 columns carry the same raw integer code; plot_inputs.py
+#     resolves code -> Preferred Label in-script via
+#     _plot_harmonized_codes('harmonize_input').
+#   * The five NON-coded input categories the questionnaire records as their
+#     OWN modules (seed, organic fertilizer, herbicide, pesticide) -- plot_inputs.py
+#     emits these canonical Preferred Labels DIRECTLY as the (input) value, so
+#     they need no code; they are listed here (Code blank) only to document the
+#     full shared input taxonomy.  Fertilizer-product / category names are the
+#     parity input taxonomy reused across waves (and intended to be reused
+#     across countries for GAP 2).
+#+name: harmonize_input
+| Code | Preferred Label | 2019-20 | 2020-21 |
+|------+-----------------+---------+---------|
+| 1    | DAP             | 1       | 1       |
+| 2    | Urea            | 2       | 2       |
+| 3    | TSP             | 3       | 3       |
+| 4    | CAN             | 4       | 4       |
+| 5    | SA              | 5       | 5       |
+| 6    | NPK             | 6       | 6       |
+| 7    | MRP             | 7       | 7       |
+| 8    | Other Fertilizer | 8      | 8       |
+|      | Seed            |         |         |
+|      | Organic Fertilizer |      |         |
+|      | Herbicide       |         |         |
+|      | Pesticide       |         |         |

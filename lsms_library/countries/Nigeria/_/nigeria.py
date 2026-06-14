@@ -302,6 +302,383 @@ def crop_production_for_wave(t, frames, crop_labels):
 
 
 # ---------------------------------------------------------------------
+# plot_inputs (GAP 2) -- item-level reported agricultural inputs
+# ---------------------------------------------------------------------
+#
+# Natural grain (t, i, plot, input[, crop]): one row per input applied to
+# a plot in the post-planting / post-harvest input modules.  `input` is a
+# harmonized input-type label (Seed / NPK / Urea / Organic Fertilizer /
+# Other Inorganic Fertilizer / Pesticide / Herbicide / Animal Traction /
+# Tractor-Machinery) carried on the harmonize_input categorical table.
+# A `crop` index level (harmonize_food labels) disambiguates the multiple
+# seed rows a plot can carry (one per crop); non-seed inputs are not
+# crop-specific and carry crop = 'n/a' (a non-null sentinel so the index
+# stays unique and free of null index levels).
+#
+# Stores REPORTED item-level fields ONLY:
+#   input               harmonized input-type label (index)
+#   crop                seed's crop (index; 'n/a' for non-seed inputs)
+#   Quantity, u         reported quantity + native unit
+#   Purchased           bool: any of this input acquired by purchase
+#   Quantity_purchased  reported purchased quantity (where recorded)
+#   Improved            bool (seed rows): improved / certified seed variety
+# NO kg conversion, NO seed_kg / nitrogen_kg / any-use flags, NO fertilizer
+# totals -- those are transformations.
+#
+# The Nigeria GHS input modules organise each input by ACQUISITION CHANNEL
+# (left-over / free / commercial-1 / commercial-2), each channel its own
+# quantity+unit triplet.  We keep ONE row per (plot[,crop], input) and sum
+# the reported native-unit quantities across channels ONLY when they share
+# a unit; otherwise we keep the channel with the largest reported quantity
+# and carry its unit (mixed-unit channels can't be summed without a kg
+# conversion, which is a transformation).  Purchased quantity is the sum of
+# the commercial channels.  This keeps the row item-level and reported.
+
+# Harmonized input-type labels (the `input` index axis).  Codes are an
+# arbitrary stable enumeration registered in harmonize_input.
+INPUT_SEED = 'Seed'
+INPUT_NPK = 'NPK'
+INPUT_UREA = 'Urea'
+INPUT_FERT_OTHER = 'Other Inorganic Fertilizer'
+INPUT_ORGANIC = 'Organic Fertilizer'
+INPUT_PESTICIDE = 'Pesticide'
+INPUT_HERBICIDE = 'Herbicide'
+INPUT_ANIMAL = 'Animal Traction'
+INPUT_TRACTOR = 'Tractor/Machinery'
+
+NO_CROP = 'n/a'      # crop-level sentinel for non-seed (crop-agnostic) rows
+
+
+def _seed_unit_label(unit_series, unit_dec):
+    """Canonical unit label for a seed-quantity unit column.  `unit_dec`
+    is the decoded-label Series (convert_categoricals=True); fall back to
+    pd.NA where the unit is blank/junk."""
+    if unit_dec is not None:
+        return unit_dec.map(_canon_unit).astype('string')
+    return pd.Series(pd.NA, index=unit_series.index, dtype='string')
+
+
+def _pick_channel(channels):
+    """Collapse a list of (qty Series, unit Series) acquisition channels
+    into ONE (Quantity, u) pair per row, reported-only:
+
+    - If every non-null channel for a row shares the same unit label, sum
+      the quantities (legitimate -- same native unit).
+    - Otherwise keep the channel with the largest reported quantity and
+      its unit (cannot sum across units without a kg conversion factor,
+      which is a transformation).
+
+    `channels` is a list of dicts {qty: Series(float), u: Series(string)},
+    all aligned to a common index.  Returns (qty Series, u Series)."""
+    if not channels:
+        return None, None
+    idx = channels[0]['qty'].index
+    qty_out = pd.Series(pd.NA, index=idx, dtype='Float64')
+    u_out = pd.Series(pd.NA, index=idx, dtype='string')
+
+    qmat = pd.concat([c['qty'] for c in channels], axis=1)
+    umat = pd.concat([c['u'] for c in channels], axis=1)
+    qmat.columns = range(len(channels))
+    umat.columns = range(len(channels))
+
+    for ix in idx:
+        qrow = qmat.loc[ix]
+        urow = umat.loc[ix]
+        mask = qrow.notna() & (qrow > 0)
+        if not mask.any():
+            # No positive quantity; keep first reported unit (if any) so a
+            # recorded-but-zero / recorded-without-qty input still surfaces.
+            present = urow[urow.notna()]
+            if len(present):
+                u_out.loc[ix] = present.iloc[0]
+            # leave a single reported qty (possibly NaN) so the row exists
+            present_q = qrow[qrow.notna()]
+            if len(present_q):
+                qty_out.loc[ix] = present_q.iloc[0]
+            continue
+        units = urow[mask].dropna().unique()
+        if len(units) == 1:
+            qty_out.loc[ix] = qrow[mask].sum()
+            u_out.loc[ix] = units[0]
+        else:
+            # mixed units -> keep the single largest reported channel
+            j = qrow[mask].astype(float).idxmax()
+            qty_out.loc[ix] = qrow[j]
+            u_out.loc[ix] = urow[j]
+    return qty_out, u_out
+
+
+def seed_rows_for_wave(df, dec, hhid, plot, crop, channels, crop_labels,
+                       purchased_idx=None, improved=None):
+    """Build item-level seed rows (input='Seed') for one wave.
+
+    Parameters
+    ----------
+    df, dec : raw / decoded seed-module DataFrames (same row order).
+    hhid, plot, crop : column names for household, plot, cropcode.
+    channels : list of dicts describing each acquisition channel:
+        {qty: 'col', unit: 'col', purchased: bool}
+        `unit` is decoded via `dec` -> _canon_unit.
+    crop_labels : {int cropcode: Preferred Label}.
+    purchased_idx : list[int] | None
+        Indices into `channels` that are purchase (commercial) channels;
+        their summed quantity is Quantity_purchased and Purchased=True when
+        positive.  None -> infer from channel['purchased'].
+    improved : Series aligned to df (nullable boolean) | None.
+
+    Returns a DataFrame with columns
+        [i, plot, input, crop, Quantity, u, Purchased, Quantity_purchased,
+         Improved].
+    """
+    i = df[hhid].apply(format_id)
+    plot_id = df[plot].apply(format_id)
+    crop_code = pd.to_numeric(df[crop], errors='coerce').astype('Int64')
+    crop_lab = crop_code.map(crop_labels).astype('string')
+
+    chan_pairs = []
+    purch_qtys = []
+    for k, ch in enumerate(channels):
+        q = (pd.to_numeric(df[ch['qty']], errors='coerce').astype('Float64')
+             if ch['qty'] in df.columns
+             else pd.Series(pd.NA, index=df.index, dtype='Float64'))
+        u = (_seed_unit_label(df[ch['unit']],
+                              dec[ch['unit']] if ch['unit'] in dec.columns else None)
+             if ch.get('unit') else pd.Series(pd.NA, index=df.index, dtype='string'))
+        q.index = df.index
+        u.index = df.index
+        chan_pairs.append({'qty': q, 'u': u})
+        is_purch = ch.get('purchased', False) if purchased_idx is None else (k in purchased_idx)
+        if is_purch:
+            purch_qtys.append(q)
+
+    qty, u = _pick_channel(chan_pairs)
+
+    if purch_qtys:
+        pq = pd.concat(purch_qtys, axis=1).sum(axis=1, min_count=1)
+        pq = pd.Series(pq.values, index=df.index, dtype='Float64')
+    else:
+        pq = pd.Series(pd.NA, index=df.index, dtype='Float64')
+    purchased = pd.Series(pd.NA, index=df.index, dtype='boolean')
+    purchased = purchased.where(~(pq > 0), True)
+    purchased = purchased.where(~(pq == 0), False)
+
+    out = pd.DataFrame({
+        'i': i.values,
+        'plot': plot_id.values,
+        'input': INPUT_SEED,
+        'crop': crop_lab.values,
+        'Quantity': pd.Series(qty.values, dtype='Float64'),
+        'u': pd.Series(u.values, dtype='string'),
+        'Purchased': pd.Series(purchased.values, dtype='boolean'),
+        'Quantity_purchased': pd.Series(pq.values, dtype='Float64'),
+    })
+    if improved is not None:
+        out['Improved'] = pd.Series(improved.reindex(df.index).values,
+                                    dtype='boolean')
+    else:
+        out['Improved'] = pd.Series(pd.NA, index=out.index, dtype='boolean')
+    # Keep only rows with a household, a plot, and a resolved crop.
+    out = out[out['i'].notna() & out['plot'].notna() & out['crop'].notna()]
+    return out
+
+
+def fert_rows_long_typed(df, dec, hhid, plot, channels, type_map):
+    """Build fertilizer rows for waves where each acquisition channel
+    records a fertilizer TYPE code + a single quantity/unit (W1/W2/W3).
+
+    For each channel (left-over/free/commercial), the row's type comes
+    from the channel's 'type' column mapped through `type_map`
+    ({code:label}); rows are grouped to ONE row per (plot, type),
+    summing same-unit quantities across the channels that resolved to
+    that type.
+
+    df  : raw frame (convert_categoricals=False; numeric type/qty codes).
+    dec : decoded frame (convert_categoricals=True; unit LABELS).
+    channels : list of dicts {qty, unit, type, purchased}.
+    Returns DataFrame [i, plot, input, crop, Quantity, u, Purchased,
+    Quantity_purchased, Improved].
+    """
+    i = df[hhid].apply(format_id)
+    plot_id = df[plot].apply(format_id)
+    base = pd.DataFrame({'i': i.values, 'plot': plot_id.values},
+                        index=df.index)
+
+    # Build a per-channel long frame, then split by resolved type label.
+    chan_frames = []
+    for ch in channels:
+        if ch['qty'] not in df.columns or ch['type'] not in df.columns:
+            continue
+        typ = (pd.to_numeric(df[ch['type']], errors='coerce').astype('Int64')
+               .map(type_map).astype('string'))
+        q = pd.to_numeric(df[ch['qty']], errors='coerce').astype('Float64')
+        u = (dec[ch['unit']].map(_canon_unit).astype('string')
+             if ch.get('unit') and ch['unit'] in dec.columns
+             else pd.Series('Kg', index=df.index, dtype='string'))
+        chan_frames.append(pd.DataFrame({
+            'i': base['i'].values, 'plot': base['plot'].values,
+            'type': typ.values, 'qty': q.values, 'u': u.values,
+            'purchased': bool(ch.get('purchased', False)),
+        }, index=df.index))
+    if not chan_frames:
+        return pd.DataFrame(columns=['i', 'plot', 'input', 'crop', 'Quantity',
+                                     'u', 'Purchased', 'Quantity_purchased',
+                                     'Improved'])
+    long = pd.concat(chan_frames, ignore_index=True)
+    long = long[long['type'].notna() & long['i'].notna() & long['plot'].notna()]
+
+    # One row per (i, plot, type): sum same-unit quantities, purchased = any
+    # positive purchased-channel quantity.
+    recs = []
+    for (i_, p_, typ), g in long.groupby(['i', 'plot', 'type']):
+        gg = g[g['qty'].notna() & (g['qty'] > 0)]
+        if len(gg):
+            units = gg['u'].dropna().unique()
+            if len(units) == 1:
+                qty = gg['qty'].sum(); uu = units[0]
+            else:
+                row = gg.loc[gg['qty'].astype(float).idxmax()]
+                qty = row['qty']; uu = row['u']
+        else:
+            qty = pd.NA
+            uu = g['u'].dropna().iloc[0] if g['u'].notna().any() else pd.NA
+        pq = g.loc[g['purchased'] & g['qty'].notna(), 'qty']
+        pqsum = pq.sum() if len(pq) else pd.NA
+        purchased = (pd.NA if (pqsum is pd.NA or pd.isna(pqsum))
+                     else (True if pqsum > 0 else False))
+        recs.append({'i': i_, 'plot': p_, 'input': typ, 'crop': NO_CROP,
+                     'Quantity': qty, 'u': uu, 'Purchased': purchased,
+                     'Quantity_purchased': pqsum, 'Improved': pd.NA})
+    out = pd.DataFrame.from_records(recs)
+    if len(out):
+        out['Quantity'] = out['Quantity'].astype('Float64')
+        out['Quantity_purchased'] = out['Quantity_purchased'].astype('Float64')
+        out['u'] = out['u'].astype('string')
+        out['Purchased'] = out['Purchased'].astype('boolean')
+        out['Improved'] = out['Improved'].astype('boolean')
+    return out
+
+
+def fert_rows_wide_typed(df, dec, hhid, plot, specs):
+    """Build fertilizer rows for waves where each TYPE has its own
+    quantity/unit columns (W4/W5: NPK / Urea / other / organic).
+
+    df  : raw frame (numeric quantity codes).
+    dec : decoded frame (unit LABELS).
+    specs : list of dicts {input, qty, unit}.  One output row per (plot,
+    input) where the type's quantity is recorded.
+    """
+    i = df[hhid].apply(format_id)
+    plot_id = df[plot].apply(format_id)
+    pieces = []
+    for sp in specs:
+        if sp['qty'] not in df.columns:
+            continue
+        q = pd.to_numeric(df[sp['qty']], errors='coerce').astype('Float64')
+        u = (dec[sp['unit']].map(_canon_unit).astype('string')
+             if sp.get('unit') and sp['unit'] in dec.columns
+             else pd.Series('Kg', index=df.index, dtype='string'))
+        piece = pd.DataFrame({
+            'i': i.values, 'plot': plot_id.values, 'input': sp['input'],
+            'crop': NO_CROP, 'Quantity': q.values, 'u': u.values,
+            'Purchased': pd.Series(pd.NA, index=df.index, dtype='boolean').values,
+            'Quantity_purchased': pd.Series(pd.NA, index=df.index, dtype='Float64').values,
+            'Improved': pd.Series(pd.NA, index=df.index, dtype='boolean').values,
+        }, index=df.index)
+        # keep rows where the type's quantity was recorded (>0 or non-null)
+        piece = piece[piece['Quantity'].notna()]
+        pieces.append(piece)
+    if not pieces:
+        return pd.DataFrame(columns=['i', 'plot', 'input', 'crop', 'Quantity',
+                                     'u', 'Purchased', 'Quantity_purchased',
+                                     'Improved'])
+    out = pd.concat(pieces, ignore_index=True)
+    out = out[out['i'].notna() & out['plot'].notna()]
+    return out
+
+
+def chem_rows(df, dec, hhid, plot, specs):
+    """Build pesticide / herbicide / animal-traction rows carrying the
+    REPORTED quantity (chemical quantity+unit, or animal-traction days).
+
+    df  : raw frame (numeric used/qty codes).
+    dec : decoded frame (unit LABELS).
+    specs : list of dicts; each must record a reported quantity so the row
+    is an item, NOT a bare any-use flag:
+        {input, qty, unit}            -> chemical quantity + decoded unit
+        {input, qty_cols, u_label}    -> sum of numeric day/count columns
+                                         carried with a fixed unit label
+    A row is emitted only where a positive reported quantity exists
+    (so rows are genuine reported items, never collapse-max use flags).
+    """
+    i = df[hhid].apply(format_id)
+    plot_id = df[plot].apply(format_id)
+    pieces = []
+    for sp in specs:
+        if sp.get('qty_cols'):
+            cols = [c for c in sp['qty_cols'] if c in df.columns]
+            if cols:
+                q = (pd.concat([pd.to_numeric(df[c], errors='coerce')
+                                for c in cols], axis=1)
+                     .sum(axis=1, min_count=1).astype('Float64'))
+            else:
+                q = pd.Series(pd.NA, index=df.index, dtype='Float64')
+            u = pd.Series(sp.get('u_label'), index=df.index, dtype='string')
+        else:
+            q = (pd.to_numeric(df[sp['qty']], errors='coerce').astype('Float64')
+                 if sp.get('qty') in df.columns
+                 else pd.Series(pd.NA, index=df.index, dtype='Float64'))
+            if sp.get('unit') and sp['unit'] in dec.columns:
+                u = dec[sp['unit']].map(_canon_unit).astype('string')
+            else:
+                u = pd.Series(pd.NA, index=df.index, dtype='string')
+        q.index = df.index
+        u.index = df.index
+        # Emit ONLY where a positive reported quantity exists.
+        emit = (q.fillna(0) > 0)
+        piece = pd.DataFrame({
+            'i': i.values, 'plot': plot_id.values, 'input': sp['input'],
+            'crop': NO_CROP, 'Quantity': q.values, 'u': u.values,
+            'Purchased': pd.Series(pd.NA, index=df.index, dtype='boolean').values,
+            'Quantity_purchased': pd.Series(pd.NA, index=df.index, dtype='Float64').values,
+            'Improved': pd.Series(pd.NA, index=df.index, dtype='boolean').values,
+        }, index=df.index)
+        piece = piece[emit.values]
+        pieces.append(piece)
+    if not pieces:
+        return pd.DataFrame(columns=['i', 'plot', 'input', 'crop', 'Quantity',
+                                     'u', 'Purchased', 'Quantity_purchased',
+                                     'Improved'])
+    out = pd.concat(pieces, ignore_index=True)
+    out = out[out['i'].notna() & out['plot'].notna()]
+    return out
+
+
+def assemble_plot_inputs(t, parts):
+    """Concatenate the per-module row frames for one wave, attach `t`,
+    drop empties, set the (t, i, plot, input, crop) index and dedup."""
+    parts = [p for p in parts if p is not None and len(p)]
+    cols = ['i', 'plot', 'input', 'crop', 'Quantity', 'u', 'Purchased',
+            'Quantity_purchased', 'Improved']
+    if not parts:
+        return pd.DataFrame(columns=cols).set_index(
+            ['i', 'plot', 'input', 'crop'])
+    out = pd.concat(parts, ignore_index=True)
+    for c in cols:
+        if c not in out.columns:
+            out[c] = pd.NA
+    out['t'] = t
+    out['crop'] = out['crop'].fillna(NO_CROP).astype('string')
+    out['input'] = out['input'].astype('string')
+    # Dedup on the index grain (defensive: a handful of duplicate
+    # (i, plot, input, crop) rows can survive the per-module collapse).
+    out = out.sort_values(['i', 'plot', 'input', 'crop'])
+    out = out.drop_duplicates(subset=['t', 'i', 'plot', 'input', 'crop'],
+                              keep='first')
+    out = out.set_index(['t', 'i', 'plot', 'input', 'crop']).sort_index()
+    return out[['Quantity', 'u', 'Purchased', 'Quantity_purchased', 'Improved']]
+
+
+# ---------------------------------------------------------------------
 # food_coping (#332, Family B: coping-strategies / rCSI)
 # ---------------------------------------------------------------------
 #

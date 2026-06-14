@@ -394,6 +394,7 @@
 | 1016 | Piece | --- | --- | --- | --- |
 | 1017 | Stalk | --- | --- | --- | --- |
 | 1018 | Tiya | --- | --- | --- | --- |
+| 1019 | days | --- | --- | --- | --- |
 
 * Geopolitical Zones
 
@@ -684,3 +685,39 @@
 |    5 | loamy           |
 |    6 | other           |
 |   96 | other           |
+
+* Agricultural inputs (plot_inputs, GAP 2)
+
+** harmonize_input -- input-type identity (the plot_inputs `input` axis)
+
+  The plot_inputs feature's ``input`` index level carries one of these
+  Preferred Labels.  The country-level ``_/plot_inputs.py`` script
+  resolves each module's native input identity to the Preferred Label
+  directly (mirroring how crop_production resolves crops via
+  harmonize_food), so this table is the canonical REGISTRY for the
+  cross-wave input taxonomy.  The per-wave columns record the native
+  source label / questionnaire concept each Preferred Label is built
+  from; ``---`` means the wave does not record that input separately.
+
+  Fertilizer types: W1/W2/W3 record a single fertilizer-type code per
+  acquisition channel (1=NPK, 2=UREA, 3=COMPOSITE MANURE -> Organic
+  Fertilizer, 4=OTHER); W4/W5 give NPK / Urea / other-inorganic /
+  organic each its own quantity column.  Pesticide / herbicide carry the
+  reported quantity used (+unit).  Animal Traction carries reported own +
+  rented animal-days (u = days).  Seeds are the per-plot-crop seed-use
+  rows (crop carried on the harmonize_food ``crop`` index level).  The
+  plain "did you use a tractor/machine?" question records no per-input
+  quantity at this grain, so it is NOT stored as a flag-only row (it is a
+  ``used_machinery`` transformation, not a data-layer item).
+
+#+NAME: harmonize_input
+| Code | Preferred Label            | 2010Q3            | 2012Q3            | 2015Q3              | 2018Q3             | 2023Q3             |
+|------+----------------------------+-------------------+-------------------+---------------------+--------------------+--------------------|
+|    1 | Seed                       | seed (sect11e)    | seed (sect11e)    | seed (sect11e)      | seed (sect11f)     | seed (sect11f)     |
+|    2 | NPK                        | npk               | NPK               | 1. NPK              | NPK                | NPK                |
+|    3 | Urea                       | urea              | UREA              | 2. UREA             | UREA               | UREA               |
+|    4 | Organic Fertilizer         | composite manure  | Composite Manure  | 3. COMPOSITE MANURE | organic fertilizer | organic fertilizer |
+|    5 | Other Inorganic Fertilizer | other (specify)   | Other (specify)   | 4. OTHER (SPECIFY)  | other inorganic    | other inorganic    |
+|    6 | Pesticide                  | pesticide         | pesticide         | pesticide           | pesticide          | pesticide          |
+|    7 | Herbicide                  | herbicide         | herbicide         | herbicide           | herbicide          | herbicide          |
+|    8 | Animal Traction            | animal traction   | animal traction   | animal traction     | animal traction    | animal traction    |

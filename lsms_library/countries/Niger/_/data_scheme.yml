@@ -164,3 +164,43 @@ Data Scheme:
     harvest_month: float
     intercropped: bool
     materialize: make
+
+  plot_inputs:
+    # Item-level agricultural inputs (GAP 2, parity loop 2026-06-14).  One
+    # row per REPORTED input applied by a household in a wave: input
+    # identity (Seed / Urea / DAP / NPK / Phosphate / Mixed fertilizer /
+    # Organic manure / Organic compost / Pesticide / Herbicide / Fungicide
+    # / Other phytosanitary), reported quantity used + native unit,
+    # purchased flag + reported purchased quantity, and (seed rows) the
+    # seed's crop on the shared harmonize_food labels.  REPORTED values
+    # only: seed_kg / nitrogen_kg / inorganic_fertilizer any-use flags /
+    # fertilizer totals are TRANSFORMATIONS over these rows, never columns.
+    #
+    # GRAIN NOTE: Niger records inputs at the HOUSEHOLD x input grain
+    # (ECVMA additionally x crop), NOT plot x input — no wave reports
+    # inputs at the parcel level.  The WB .do code that emits plot-level
+    # seed_kg / nitrogen_kg fabricates a plot split (plot_area /
+    # total_land_area); the reported-only rule forbids that, so `plot` is
+    # NOT in the index.  The feature keeps the GAP-2 name `plot_inputs`.
+    #
+    # All four waves have a household input roster (script-path):
+    #   2011-12 ecvmaas2c_p1   (hid, crop, input)  qty/unit + purchased
+    #   2014-15 ECVMA2_AS02CP1 (hh, crop, input)   same, UPPERCASE cols
+    #   2018-19 s16b_me_ner2018 (hh, input)        crop in seed label
+    #   2021-22 s16b_me_ner2021 (hh, input)        crop in seed label
+    # input -> harmonize_input; u -> the u table; crop -> harmonize_food
+    # (ECVMA crop column directly; EHCVM via harmonize_seed_crop on the
+    # seed label).  `crop` is in the index because one (input, u) spans
+    # several seed crops in ECVMA.  Non-crop-specific rows (every fertilizer
+    # / pesticide; unresolved seed crops) carry the sentinel
+    # '(not crop-specific)' rather than NaN — a NaN index level would be
+    # silently dropped by the framework's canonical NaN-key de-dup collapse
+    # (_finalize_result groupby().first()), losing every non-seed row.  `u`
+    # is in the index because one (input, crop) can be reported in several
+    # units; a missing unit is filled with the 'Manquant' u label for the
+    # same non-null reason.
+    index: (t, i, input, crop, u)
+    Quantity: float
+    Purchased: bool
+    Quantity_purchased: float
+    materialize: make

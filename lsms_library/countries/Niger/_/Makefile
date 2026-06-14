@@ -33,6 +33,20 @@ $(VAR_DIR)/crop_production.parquet: crop_production.py niger.py categorical_mapp
 ../%/_/crop_production.parquet: ../%/_/crop_production.py niger.py categorical_mapping.org
 	(cd $(@D) && python crop_production.py)
 
+# plot_inputs (GAP 2, item-level).  Same shape as crop_production: the
+# country-level var/ parquet is built by the concatenator, which reads each
+# wave's parquet; the country script is run unconditionally to (re)build the
+# wave parquets it reads, then concatenates.
+INPUT_WAVES := 2011-12 2014-15 2018-19 2021-22
+
+$(VAR_DIR)/plot_inputs.parquet: plot_inputs.py niger.py categorical_mapping.org \
+		$(foreach w,$(INPUT_WAVES),../$(w)/_/plot_inputs.py)
+	$(foreach w,$(INPUT_WAVES),(cd ../$(w)/_ && python plot_inputs.py);)
+	python plot_inputs.py
+
+../%/_/plot_inputs.parquet: ../%/_/plot_inputs.py niger.py categorical_mapping.org
+	(cd $(@D) && python plot_inputs.py)
+
 clean:
 	rm -f panel_ids.json updated_ids.json
 

@@ -825,3 +825,56 @@
 |  108 | Nice cup (60g) - Medium           |
 |  119 | Nomi Tin (1kg)                    |
 |  120 | Nomi Tin (500g)                   |
+
+# harmonize_input: agricultural-input identity Code -> Preferred Label for
+# the plot_inputs feature (GAP 2).  One row per REPORTED input applied to a
+# plot, ``input`` axis.  The UNPS plot-input module (AGSEC3A/3B) records four
+# input BLOCKS per plot; the seed block lives in AGSEC4A.  Codes carry the
+# finest identity the source records, in distinct ranges per block so a
+# single table disambiguates:
+#   10        Seed                  (AGSEC4A seed block; Improved flag is a
+#             column, not a separate identity)
+#   20        Organic Fertilizer    (folds the UNPS single organic item;
+#             manure/compost not separately coded by UNPS)
+#   30        Inorganic Fertilizer  (type unreported)
+#   31..34    Inorganic by type     (a3aq14/15 1=Nitrate 2=Phosphate
+#             3=Potash 4=Mixed) -> Nitrate/Phosphate/Potash/Mixed Fertilizer
+#   40        Pesticide             (type unreported)
+#   41..46,49 Pesticide by type     (a3aq22/23 1=Insecticide 2=Miticide/
+#             Acaricide 3=Fungicide 4=Growth Regulator 5=Rodenticide
+#             6=Nematicide/Molluscicide 96->9=Other Pesticide)
+# UNPS records these identities directly (no urea/DAP/NPK product names): the
+# Nitrate/Phosphate/Potash/Mixed nutrient classes are what the questionnaire
+# asks.  This is a country-level shared input taxonomy across waves; the per-
+# wave source columns are documented in uganda.INPUT_COLMAPS, so no per-wave
+# code columns are needed (the wave scripts resolve labels before writing).
+#+name: harmonize_input
+| Code | Preferred Label              |
+|------+------------------------------|
+|   10 | Seed                         |
+|   20 | Organic Fertilizer           |
+|   30 | Inorganic Fertilizer         |
+|   31 | Nitrate Fertilizer           |
+|   32 | Phosphate Fertilizer         |
+|   33 | Potash Fertilizer            |
+|   34 | Mixed Fertilizer             |
+|   40 | Pesticide                    |
+|   41 | Insecticide                  |
+|   42 | Miticide/Acaricide           |
+|   43 | Fungicide                    |
+|   44 | Growth Regulator             |
+|   45 | Rodenticide                  |
+|   46 | Nematicide/Molluscicide      |
+|   49 | Other Pesticide              |
+
+# harmonize_pesticide_unit: pesticide quantity-unit Code -> Preferred Label
+# for the plot_inputs pesticide block (AGSEC3A a3aq24a / a3aq28a, AGSEC3B
+# a3bq24a / a3bq28a).  This is a tiny 2-code scheme (1=Kg, 2=Litres) distinct
+# from the UNPS harvest/seed unit scheme (which seed rows reuse via
+# harvest_units).  Organic/inorganic fertilizer quantities are implicitly Kg
+# (no unit column) -> u='Kg'.
+#+name: harmonize_pesticide_unit
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Kg              |
+|    2 | Litre           |

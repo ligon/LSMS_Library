@@ -1093,3 +1093,382 @@ def months_food_inadequate_for_wave(t, df, idcol, i_prefix=''):
     out = out.groupby(['t', 'i'], as_index=False).first()
     out = out.set_index(['t', 'i'])
     return out
+
+
+# --- plot_inputs (GAP 2) ------------------------------------------------
+# Item-level (t, i, plot, input) feature -- one row per agricultural input
+# applied to a plot.  Sources (the four IHS3+/IHPS waves):
+#   * Module D (ag_mod_d) -- the plot-level input module.  Per plot it
+#     records, in up to two slots, an INORGANIC FERTILIZER type + applied
+#     quantity (ag_d39a/ag_d39d/ag_d39e slot 1; ag_d39f|ag_d39g type +
+#     ag_d39i|ag_d39j applied-qty slot 2 -- the slot-2 column letters
+#     shifted between the IHS3/IHPS2 layout and the IHS4/IHS5 layout),
+#     an ORGANIC FERTILIZER used? flag (ag_d36), and up to two
+#     PESTICIDE/HERBICIDE types + qty + unit (ag_d41a/b/c slot 1;
+#     ag_d41d/e/f slot 2), gated by the any-agrochemical flag ag_d40.
+#   * Module G (ag_mod_g) -- the seasonal plot-crop roster.  Per (plot,
+#     crop) it records the SEED quantity planted + unit (ag_g04a/ag_g04b)
+#     and, in IHS4/IHS5 only, an improved-seed flag (ag_g0f: 2=improved).
+#
+# The grain is (t, i, plot, input).  Fertilizer / pesticide rows have NO
+# crop attached (the questionnaire records them at the plot, not the
+# plot-crop, level); seed rows DO carry the crop (shared harmonize_food
+# label axis) because Module G is a plot-crop roster.  `input` is mapped
+# to the shared harmonize_input Preferred Label.  Reported item columns
+# only: Quantity + native unit `u`, Purchased (bool) + Quantity_purchased
+# for fertilizer/seed acquired through purchase (Module F ferts / Module H
+# seeds, household-crop grain -- attached only when single-plot, like the
+# crop_production sale), and Improved (bool) for seed rows.  Everything
+# aggregate (seed_kg, nitrogen_kg, inorganic/organic/pesticide any-flags)
+# is a transformations.py concern, NOT a stored column.
+
+# Module D inorganic-fertilizer TYPE codes (ag_d39a / slot-2 type) ->
+# harmonize_input codes 1-6 (identity: the source codes ARE the
+# harmonize_input codes for fertilizer).
+_MWI_FERT_TYPE_CODES = [1, 2, 3, 4, 5, 6]
+
+# Module D agrochemical TYPE codes (ag_d41a / ag_d41d) -> harmonize_input
+# codes 7-11 (identity: the source codes ARE the harmonize_input codes for
+# pesticides; the source already numbers them 7..11 disjoint from fert 1-6).
+_MWI_PEST_TYPE_CODES = [7, 8, 9, 10, 11]
+
+# Synthetic harmonize_input codes for the two non-coded inputs.
+_MWI_INPUT_ORGANIC = 20   # ag_d36 == Yes (organic fertilizer used on plot)
+_MWI_INPUT_SEED = 30      # Module G seed planted (per plot-crop)
+
+# Module D APPLIED-amount unit codes -> readable label.  The applied-amount
+# unit value-label set (ag_d39e / ag_d39j) is the SAME bag-size coding as
+# the acquired-amount unit (ag_d39c): 1=gram, 2=kilogram, 3..7 = bag sizes,
+# 13=Other.  Codes 11/12 appear on the applied unit but are not in the
+# acquired value-label set (free-text "tin"/"ox-cart"-style residuals);
+# they map to NaN so we never fabricate a quantity basis.  We carry the
+# REPORTED applied quantity with this declared unit -- the kg conversion
+# (which the WB code performs, treating the applied amount as already-kg)
+# is a transformation, NOT stored here.
+_MWI_FERT_UNIT_LABELS = {
+    1: 'Gram',
+    2: 'Kilogram',
+    3: '2 kg Bag',
+    4: '3 kg Bag',
+    5: '5 kg Bag',
+    6: '10 kg Bag',
+    7: '50 kg Bag',
+    13: 'Other (Specify)',
+}
+
+# Module G SEED unit codes (ag_g04b) -> readable label.  Distinct bag-size
+# coding from the fertilizer unit (note 5 = 3.7 kg bag here, vs 5 kg bag in
+# the fertilizer set), so it gets its own map.
+_MWI_SEED_UNIT_LABELS = {
+    1: 'Gram',
+    2: 'Kilogram',
+    3: '2 kg Bag',
+    4: '3 kg Bag',
+    5: '3.7 kg Bag',
+    6: '5 kg Bag',
+    7: '10 kg Bag',
+    8: '50 kg Bag',
+    9: 'Other (Specify)',
+}
+
+# Module H / Module F PURCHASE unit codes (ag_h{n}6b / ag_f{n}6b) -> label.
+# Same coding as the seed unit set for Module H; carried with the reported
+# purchased quantity.
+_MWI_PURCH_UNIT_LABELS = dict(_MWI_SEED_UNIT_LABELS)
+
+
+def _int_codes(series):
+    """Coerce a raw column to a nullable-Int64 code Series, rounding any
+    stray fractional values (a unit/type code is conceptually an integer;
+    a fractional entry is a data-entry residual).  Plain ``.astype('Int64')``
+    raises on non-equivalent floats (e.g. the 0.5 that turns up in some
+    IHS5 pesticide unit columns), so round first."""
+    s = pd.to_numeric(series, errors='coerce')
+    return s.round().astype('Int64')
+
+
+def _input_labels(code_series):
+    """Map a numeric harmonize_input code Series -> Preferred Label
+    (nullable string), via the harmonize_input categorical table.  NaN
+    where the code is absent / has no Preferred Label."""
+    cmap = _malawi_code_map('harmonize_input')
+    codes = _int_codes(code_series)
+    out = codes.map(cmap)
+    return out.astype('string').where(out.notna(), pd.NA)
+
+
+def _fertilizer_block(df, *, hhid, plotkey, type1, qty1, unit1,
+                      type2, qty2, unit2, t):
+    """Reshape Module D's two inorganic-fertilizer slots to canonical
+    long rows -- one per (plot, fertilizer-type) applied.
+
+    All keyword args are RAW column names in ``df`` (or None when a slot
+    is absent for that wave).  ``df`` must already carry an ``hhid`` string
+    column and a ``plotkey`` string column.  Returns a long DataFrame with
+    (i, plot, _input_code, Quantity, u) and the perennial/seed columns set
+    to NA.  NO aggregation, NO kg conversion.
+    """
+    pieces = []
+    for tcol, qcol, ucol in ((type1, qty1, unit1), (type2, qty2, unit2)):
+        if tcol is None or tcol not in df.columns:
+            continue
+        code = _int_codes(df[tcol])
+        keep = code.isin(_MWI_FERT_TYPE_CODES)
+        q = (pd.to_numeric(df[qcol], errors='coerce').astype('Float64')
+             if qcol and qcol in df.columns
+             else pd.Series(pd.NA, index=df.index, dtype='Float64'))
+        if ucol and ucol in df.columns:
+            ucode = _int_codes(df[ucol])
+            u = ucode.map(_MWI_FERT_UNIT_LABELS).astype('string')
+            u = u.where(u.notna(), pd.NA)
+        else:
+            u = pd.Series(pd.NA, index=df.index, dtype='string')
+        piece = pd.DataFrame({
+            'i':           df['hhid'].astype('string').values,
+            'plot':        df['plotkey'].astype('string').values,
+            '_input_code': code.values,
+            'crop':        pd.array([pd.NA] * len(df), dtype='string'),
+            'Quantity':    q.values,
+            'u':           u.values,
+            'Improved':    pd.array([pd.NA] * len(df), dtype='boolean'),
+        })
+        pieces.append(piece[keep.values])
+    if not pieces:
+        return pd.DataFrame(columns=['i', 'plot', '_input_code', 'crop',
+                                     'Quantity', 'u', 'Improved'])
+    return pd.concat(pieces, ignore_index=True)
+
+
+def _organic_block(df, *, hhid, plotkey, flag, t):
+    """One row per plot where organic fertilizer was reported applied
+    (ag_d36 == 1/Yes).  Presence is the reported item; Quantity / u are NA
+    (Module D records no organic-fertilizer quantity)."""
+    if flag is None or flag not in df.columns:
+        return pd.DataFrame(columns=['i', 'plot', '_input_code', 'crop',
+                                     'Quantity', 'u', 'Improved'])
+    used = _int_codes(df[flag]) == 1
+    out = pd.DataFrame({
+        'i':           df['hhid'].astype('string').values,
+        'plot':        df['plotkey'].astype('string').values,
+        '_input_code': _MWI_INPUT_ORGANIC,
+        'crop':        pd.array([pd.NA] * len(df), dtype='string'),
+        'Quantity':    pd.array([pd.NA] * len(df), dtype='Float64'),
+        'u':           pd.array([pd.NA] * len(df), dtype='string'),
+        'Improved':    pd.array([pd.NA] * len(df), dtype='boolean'),
+    })
+    return out[used.values]
+
+
+def _pesticide_block(df, *, hhid, plotkey, gate, slots, t):
+    """Reshape Module D's agrochemical slots to canonical long rows -- one
+    per (plot, pesticide-type).  ``slots`` is a list of (type, qty, unit)
+    raw-column-name triples (qty/unit may be None).  ``gate`` is ag_d40
+    (any agrochemical used? 1/2); rows are dropped where gate != Yes."""
+    if gate is not None and gate in df.columns:
+        gated = _int_codes(df[gate]) == 1
+    else:
+        gated = pd.Series(True, index=df.index)
+    pieces = []
+    for tcol, qcol, ucol in slots:
+        if tcol is None or tcol not in df.columns:
+            continue
+        code = _int_codes(df[tcol])
+        keep = code.isin(_MWI_PEST_TYPE_CODES) & gated
+        q = (pd.to_numeric(df[qcol], errors='coerce').astype('Float64')
+             if qcol and qcol in df.columns
+             else pd.Series(pd.NA, index=df.index, dtype='Float64'))
+        if ucol and ucol in df.columns:
+            ucode = _int_codes(df[ucol])
+            # Pesticide unit value-label set: 1=gram, 2=kilogram, 8=liter,
+            # 9=milliliter (ag_d41c).  Reuse the fert label map for the
+            # mass codes; add the volume codes.
+            umap = dict(_MWI_FERT_UNIT_LABELS)
+            umap.update({8: 'Liter', 9: 'Milliliter'})
+            u = ucode.map(umap).astype('string')
+            u = u.where(u.notna(), pd.NA)
+        else:
+            u = pd.Series(pd.NA, index=df.index, dtype='string')
+        piece = pd.DataFrame({
+            'i':           df['hhid'].astype('string').values,
+            'plot':        df['plotkey'].astype('string').values,
+            '_input_code': code.values,
+            'crop':        pd.array([pd.NA] * len(df), dtype='string'),
+            'Quantity':    q.values,
+            'u':           u.values,
+            'Improved':    pd.array([pd.NA] * len(df), dtype='boolean'),
+        })
+        pieces.append(piece[keep.values])
+    if not pieces:
+        return pd.DataFrame(columns=['i', 'plot', '_input_code', 'crop',
+                                     'Quantity', 'u', 'Improved'])
+    return pd.concat(pieces, ignore_index=True)
+
+
+def _seed_block(df, *, hhid, plotkey, cropcode, qty, unit, improved=None,
+                t=None):
+    """Reshape Module G's seed-planted columns to canonical long rows --
+    one per (plot, crop) seed.  ``cropcode`` is the harmonize_crop code
+    column (mapped to the shared crop/food label).  Returns (i, plot,
+    _input_code=SEED, crop, Quantity, u, Improved)."""
+    crop_label, _crop_code = _crop_codes(df[cropcode], perennial=False)
+    q = (pd.to_numeric(df[qty], errors='coerce').astype('Float64')
+         if qty and qty in df.columns
+         else pd.Series(pd.NA, index=df.index, dtype='Float64'))
+    if unit and unit in df.columns:
+        ucode = _int_codes(df[unit])
+        u = ucode.map(_MWI_SEED_UNIT_LABELS).astype('string')
+        u = u.where(u.notna(), pd.NA)
+    else:
+        u = pd.Series(pd.NA, index=df.index, dtype='string')
+    if improved is not None and improved in df.columns:
+        icode = _int_codes(df[improved])
+        # ag_g0f: 2 = improved/hybrid, 1 = local/unimproved (WB recode).
+        imp = (icode == 2).astype('boolean')
+        imp = imp.where(icode.notna(), pd.NA)
+    else:
+        imp = pd.Series(pd.NA, index=df.index, dtype='boolean')
+    out = pd.DataFrame({
+        'i':           df['hhid'].astype('string').values,
+        'plot':        df['plotkey'].astype('string').values,
+        '_input_code': _MWI_INPUT_SEED,
+        'crop':        crop_label.values,
+        'Quantity':    q.values,
+        'u':           u.values,
+        'Improved':    imp.values,
+    })
+    # Keep a seed row only where a crop identity is present (the seed item
+    # is meaningless without the crop it seeds).
+    out = out[crop_label.notna().values]
+    return out
+
+
+def _seed_purchase_block(df, *, hhid, cropcode, qty_cols, unit_cols,
+                         value_cols):
+    """Reshape Module H purchased-seed columns to (i, crop) reported
+    purchase totals.  ``qty_cols``/``unit_cols``/``value_cols`` are lists
+    of the per-source raw column names (two purchase sources: ag_h16*,
+    ag_h26*).  A purchased amount is counted only where the corresponding
+    value column is non-zero (WB rule).  Returns (i, _crop_code,
+    Quantity_purchased) -- household-crop grain, no plot."""
+    crop_label, crop_code_int = _crop_codes(df[cropcode], perennial=False)
+    cols = []
+    for qcol, vcol in zip(qty_cols, value_cols):
+        if qcol not in df.columns:
+            continue
+        q = pd.to_numeric(df[qcol], errors='coerce').astype('Float64')
+        if vcol and vcol in df.columns:
+            v = pd.to_numeric(df[vcol], errors='coerce').astype('Float64')
+            q = q.where(v.notna() & (v != 0), pd.NA)
+        cols.append(q)
+    if cols:
+        # Sum the per-source purchased amounts; the row total stays NA when
+        # NO source recorded a (value-backed) purchase -- so a household
+        # that did not buy seed of that crop gets NA, never a spurious 0.
+        total = pd.concat(cols, axis=1).sum(axis=1, min_count=1).astype('Float64')
+    else:
+        total = pd.Series(pd.NA, index=df.index, dtype='Float64')
+    out = pd.DataFrame({
+        'i':            df['hhid'].astype('string').values,
+        '_crop_code':   crop_code_int.values,
+        'Quantity_purchased': total.values,
+    })
+    out = out[out['_crop_code'].notna()]
+    grp = out.groupby(['i', '_crop_code'], as_index=False).agg(
+        {'Quantity_purchased': lambda s: s.sum(min_count=1)})
+    # Drop the (i, crop) rows where no purchase was recorded.
+    grp = grp[grp['Quantity_purchased'].notna()]
+    return grp
+
+
+def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
+    """Combine reshaped input pieces into the canonical plot_inputs
+    DataFrame for wave ``t``.
+
+    Parameters
+    ----------
+    t : str -- wave id, used as the ``t`` index value.
+    input_pieces : list[pd.DataFrame] -- outputs of the per-module blocks
+        (_fertilizer_block, _organic_block, _pesticide_block, _seed_block),
+        each carrying (i, plot, _input_code, crop, Quantity, u, Improved).
+    seed_purchase_pieces : list[pd.DataFrame] | None -- outputs of
+        _seed_purchase_block (i, _crop_code, Quantity_purchased) at the
+        household-crop grain; attached to the single-plot seed row of that
+        (i, crop), like crop_production's sale (no plot fabrication).
+
+    Returns
+    -------
+    pd.DataFrame indexed (t, i, plot, input) with columns Quantity, u,
+    Purchased, Quantity_purchased, Improved, crop.  Item-level reported
+    values only.
+    """
+    df = pd.concat([p for p in input_pieces if p is not None and len(p)],
+                   ignore_index=True)
+
+    df['input'] = _input_labels(df['_input_code'])
+    # An input row needs a resolved input label to land on the index.
+    df = df[df['input'].notna()]
+
+    # Seed-purchase merge (household-crop grain -> single-plot seed rows).
+    df['Quantity_purchased'] = pd.array([pd.NA] * len(df), dtype='Float64')
+    if seed_purchase_pieces:
+        sp = pd.concat([p for p in seed_purchase_pieces if p is not None
+                        and len(p)], ignore_index=True)
+        if len(sp):
+            sp = sp.groupby(['i', '_crop_code'], as_index=False).agg(
+                {'Quantity_purchased': 'sum'})
+            # Re-derive the crop label so we can join on (i, crop) without
+            # carrying _crop_code on the seed rows.
+            sp_label, _ = _crop_codes(sp['_crop_code'], perennial=False)
+            sp = sp.assign(crop=sp_label.values)
+            sp = sp[sp['crop'].notna()]
+            seed = df['input'] == 'Seed'
+            # Count plots per (i, crop) among seed rows; attach only when a
+            # crop's seed is on exactly one plot (unambiguous).
+            seed_rows = df[seed]
+            nplots = (seed_rows.groupby(['i', 'crop'])['plot']
+                      .nunique().rename('_nplots').reset_index())
+            attach = sp.merge(nplots, on=['i', 'crop'], how='inner')
+            attach = attach[attach['_nplots'] == 1][
+                ['i', 'crop', 'Quantity_purchased']]
+            attach = attach.rename(
+                columns={'Quantity_purchased': '_qp'})
+            df = df.merge(attach, on=['i', 'crop'], how='left')
+            take = seed & df['_qp'].notna()
+            df['Quantity_purchased'] = df['Quantity_purchased'].where(
+                ~take, df['_qp'])
+            df = df.drop(columns=['_qp'])
+
+    # Purchased flag: True where a purchased quantity is attached (seed),
+    # else NA (Module D fertilizer/pesticide applied-on-plot rows do not
+    # record a purchase split at the plot grain).
+    df['Purchased'] = pd.array([pd.NA] * len(df), dtype='boolean')
+    df.loc[df['Quantity_purchased'].notna(), 'Purchased'] = True
+
+    df = df.drop(columns=['_input_code'])
+    df['t'] = t
+
+    # Consolidate exact-duplicate reported lines: same (i, plot, input,
+    # crop, u) summed on Quantity (a plot may record the same fertilizer
+    # in two slots with the same unit); first-wins on the flag columns.
+    # Rows in different units `u` stay distinct.  NaN crop / u participate
+    # in the grouping (dropna=False) so fertilizer/pesticide rows (crop
+    # NaN) are not silently dropped.
+    df['crop'] = df['crop'].astype('string')
+    df['u'] = df['u'].astype('string')
+    grp = df.groupby(['t', 'i', 'plot', 'input', 'crop', 'u'],
+                     as_index=False, dropna=False).agg({
+        'Quantity':           'sum',
+        'Quantity_purchased': 'first',
+        'Purchased':          'first',
+        'Improved':           'first',
+    })
+
+    # The natural per-input-line grain is (t, i, plot, input, crop, u): a
+    # plot may carry several seed crops (same input='Seed', distinct crop)
+    # and a fertilizer may be reported in two slots in different units
+    # (same input, crop NaN, distinct u).  crop / u therefore belong in the
+    # index to keep it unique; both are NaN for the inputs that don't carry
+    # them (fertilizer/pesticide have NaN crop; organic-fertilizer rows have
+    # NaN u as well).  dropna=False above keeps those NaN-keyed rows.
+    grp = grp.set_index(['t', 'i', 'plot', 'input', 'crop', 'u'])
+    return grp

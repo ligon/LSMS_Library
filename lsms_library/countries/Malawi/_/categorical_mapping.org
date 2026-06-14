@@ -636,3 +636,29 @@
 |   11 | Basket (Dengu)  |
 |   12 | Ox-Cart         |
 |   13 | Other (Specify) |
+
+# harmonize_input: agricultural-input identity for the plot_inputs feature
+# (GAP 2).  Codes 1-6 are the Module D inorganic-fertilizer type codes
+# (ag_d39a / slot-2 type); codes 7-11 are the Module D agrochemical type
+# codes (ag_d41a / ag_d41d) -- the source already numbers fertilizers 1-6
+# and pesticides 7-11 in one disjoint namespace within Module D.  Codes
+# 20 / 30 are synthetic for the two inputs the survey records without a
+# type code: organic fertilizer (ag_d36 Yes/No) and seed planted (Module
+# G ag_g04a).  Stable across the four IHS3+/IHPS waves (2010-11, 2013-14,
+# 2016-17, 2019-20), so no per-wave column is needed.
+#+name: harmonize_input
+| Code | Preferred Label       |
+|------+-----------------------|
+|    1 | NPK Fertilizer        |
+|    2 | DAP Fertilizer        |
+|    3 | CAN Fertilizer        |
+|    4 | Urea Fertilizer       |
+|    5 | D Compound Fertilizer |
+|    6 | Other Fertilizer      |
+|    7 | Insecticide           |
+|    8 | Herbicide             |
+|    9 | Fungicide             |
+|   10 | Fumigant              |
+|   11 | Other Pesticide       |
+|   20 | Organic Fertilizer    |
+|   30 | Seed                  |

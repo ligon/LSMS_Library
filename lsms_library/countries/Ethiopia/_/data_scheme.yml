@@ -114,6 +114,60 @@ Data Scheme:
     perennial: bool
     materialize: make
 
+  plot_inputs:
+    # GAP 2 -- item-level ag inputs at (t, i, plot_id, input, j).  One row
+    # per input APPLIED to a plot (or plot-crop), from the ESS post-planting
+    # input modules: §3 (sect3_pp) fertilizer/organic, §4 (sect4_pp) seed +
+    # pesticide, §5 (sect5_pp) seed purchase.  Carries only REPORTED,
+    # item-level fields:
+    #   input               input identity (Seed / Urea / DAP / NPS / Manure /
+    #                       Compost / Other Organic / Pesticide; Preferred
+    #                       Labels emitted in-script from harmonize_input).
+    #   Quantity + u        reported applied quantity in its native unit
+    #                       ('Kg' for every ESS input quantity).
+    #   Purchased           was the seed PURCHASED (nullable bool; seed rows,
+    #                       from the §5 purchased-flag, attached where the
+    #                       (holder, crop) maps to a single plot).
+    #   Quantity_purchased  reported purchased kg (seed rows; fertilizer
+    #                       purchased kg where the §3 module records it, W2+).
+    #   Improved            improved-seed flag (nullable bool; seed rows only).
+    #   Applied             reported applied/used dummy (nullable bool).  ESS
+    #                       records organic fertilizer (Manure/Compost/Other
+    #                       Organic) and Pesticide as a yes/no USE flag with NO
+    #                       quantity, so for those input types the reported
+    #                       datum is this flag (one row per applied input);
+    #                       also set for inorganic-fertilizer rows that report
+    #                       use without a kg.  NaN for seed rows (their use is
+    #                       implied by Quantity / Improved / Purchased).
+    #
+    # j (crop axis): the crop Preferred Label (harmonize_crop == food labels,
+    # so seed/pesticide rows join crop_production.j / food_acquired.j) for the
+    # crop-specific inputs (Seed, Pesticide); the 'Whole Plot' sentinel for
+    # plot-level fertilizer/organic inputs (which carry no crop -- j cannot be
+    # null as an index level, mirroring how crop_production fills its u level).
+    # plot_id and i match plot_features / crop_production exactly.
+    #
+    # NO nitrogen_kg / seed_kg sums, NO any-use roll-up flags, NO fertilizer
+    # totals (those are transformations over these item rows -- GAP 2/7).
+    # Multi-file joins (§3+§4+§5) + per-section grain + code->label
+    # harmonization => script (materialize: make).  Seed-purchase detail
+    # attaches from the (holder, crop)-grain §5 ONLY where the (holder, crop)
+    # maps to a single plot (the SALES GRAIN CAVEAT crop_production uses).
+    index: (t, i, plot_id, input, j)
+    Quantity: float
+    u: str
+    Purchased:
+      type: bool
+      optional: true
+    Quantity_purchased: float
+    Improved:
+      type: bool
+      optional: true
+    Applied:
+      type: bool
+      optional: true
+    materialize: make
+
   food_security:
     # FAO FIES 8-item experience scale (GH #332).  Confirmed ONLY in
     # W5 (2021-22): ESS §8 file sect8_hh_w5.dta carries the FAO battery
