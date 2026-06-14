@@ -88,6 +88,21 @@ $(VAR_DIR)/people_last7days.parquet: people_last7days.py niger.py \
 ../%/_/people_last7days.parquet: ../%/_/people_last7days.py niger.py
 	(cd $(@D) && python people_last7days.py)
 
+# community_prices (GAP C, item-level).  Same concatenator shape as the GAP
+# siblings, but only the two ECVMA waves have an EA-level community price
+# module (the EHCVM waves replaced it with a region/market price survey, not
+# this feature), so only those two wave scripts are prerequisites; the
+# concatenator silently skips a wave with no parquet.
+COMMUNITY_PRICE_WAVES := 2011-12 2014-15
+
+$(VAR_DIR)/community_prices.parquet: community_prices.py niger.py categorical_mapping.org \
+		$(foreach w,$(COMMUNITY_PRICE_WAVES),../$(w)/_/community_prices.py)
+	$(foreach w,$(COMMUNITY_PRICE_WAVES),(cd ../$(w)/_ && python community_prices.py);)
+	python community_prices.py
+
+../%/_/community_prices.parquet: ../%/_/community_prices.py niger.py categorical_mapping.org
+	(cd $(@D) && python community_prices.py)
+
 clean:
 	rm -f panel_ids.json updated_ids.json
 

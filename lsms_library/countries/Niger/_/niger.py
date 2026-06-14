@@ -1010,3 +1010,177 @@ def _finish_people_last7days(df, t):
     df = (df.groupby(['t', 'i', 'pid'], dropna=False, as_index=False).first())
     df = df.set_index(['t', 'i', 'pid'])
     return df
+
+
+# ---------------------------------------------------------------------------
+# community_prices (GAP C — item-level community/market food prices)
+# ---------------------------------------------------------------------------
+#
+# One row per REPORTED (cluster/EA × food item × unit) surveyed price from the
+# ECVMA *community* price questionnaire (section CS07).  This is the OURS-ONLY
+# parity arm (GAP_RANKING.org GAP C): the WB panel surveys no community prices
+# — their crop_price_EA is an HH-median imputation, programs.do:31-89 — so this
+# is a surveyed price we record where they only impute.  REPORTED values only:
+# any median / mean across clusters, or a community->household price join, is a
+# TRANSFORMATION over these rows, never a column here.
+#
+# GRAIN = (t, v, j, u).  This is a CLUSTER-level feature: `v` is the community
+# questionnaire's `grappe` (EA), formatted into the SAME v keyspace as
+# sample() (`v: grappe`/`v: GRAPPE` there), so community_prices.v == sample().v
+# for the same cluster and the surveyed price joins households.  There is NO
+# household `i`, so _join_v_from_sample does not apply and `v` IS declared in
+# the index (not framework-joined).  `j` is on the SHARED harmonize_food
+# Preferred Labels (so a priced food joins food_acquired consumption and the
+# GAP-1 crop_production harvest); `u` on the shared `u` table.
+#
+# WAVE COVERAGE: only the two ECVMA waves carry an EA-level community price
+# module.  The EHCVM waves (2018-19, 2021-22) replaced it with a separate
+# region/market-level price survey (ehcvm_prix_ner2021: region × milieu ×
+# point_de_vente, NO grappe — not the EA grain; and ehcvm_nsu, a region/strata
+# p50/mu MEDIAN — a forbidden imputation), and 2018-19 ships no community price
+# file at all.  So those two waves are silently absent (the country-level
+# concatenator skips a wave with no parquet), NOT faked.
+#
+# Community-price instrument by wave (both ECVMA; module CS07):
+#   2011-12  ecvmacoms07_p1 (passage 1) + ecvmacoms07_p2 (passage 2).
+#            grappe; cs07q01 item; THREE (price, qty, unit) triples:
+#            (cs07q03, cs07q04, cs07q05), (cs07q06, cs07q07, cs07q08),
+#            (cs07q09, cs07q10, cs07q11).  Unit is a STRING column per triple.
+#   2014-15  comprixcs07.  grappe; cs07q01 item; ONE unit column cs07q03
+#            shared by THREE (price, qty) pairs: (cs07q04, cs07q05),
+#            (cs07q06, cs07q07), (cs07q08, cs07q09).
+# Both load convert_categoricals=True so the item / unit labels arrive as the
+# strings harmonize_food / u key on.
+#
+# COLUMNS (reported, item-level):
+#   Price    — the surveyed price the enumerator recorded for `Quantity` units
+#              of the item in unit `u` in that cluster (CFA francs).  The
+#              instrument records up to three price observations per
+#              (cluster, item, unit); each is kept as its own row (the within-
+#              cluster observation index is carried as `obs` so the rows do not
+#              collapse).  NOT averaged — an across-observation mean is a
+#              transformation.
+#   Quantity — the measured quantity that Price was recorded for, in unit `u`
+#              (e.g. Price=11000 for Quantity=50, u='Sac de 50 kg').  This is
+#              the native price-per-quantity basis the survey gives; the per-kg
+#              unit value Price/Quantity (×kg-factor) is a transformation.
+# A price of 0 / sentinel (9999 / 99999), and rows whose unit is the
+# 'produit absent' / 'manquant' missing-marker, carry no surveyed price and are
+# dropped.  `obs` (1/2/3) keeps the multiple within-cluster observations as
+# distinct rows without summing.
+
+
+def _community_prices_maps():
+    """Load the harmonize_food (item -> j Preferred Label) and u (unit ->
+    Preferred Label) string maps, keyed on Original Label — exactly the two
+    shared label tables crop_production / food_acquired use, so a priced food
+    joins consumed food and harvested crop on (j, u)."""
+    item_map = tools.get_categorical_mapping(
+        tablename='harmonize_food', idxvars='Original Label',
+        **{'Preferred Label': 'Preferred Label'})
+    unit_map = tools.get_categorical_mapping(
+        tablename='u', idxvars='Original Label',
+        **{'Preferred Label': 'Preferred Label'})
+    return item_map, unit_map
+
+
+def _item_labels(item_series, item_map):
+    """Map a community-price item column (string labels from
+    convert_categoricals=True) through harmonize_food (keyed on Original
+    Label).  Unmapped labels pass through unchanged (kept visible, flagged by
+    the sanity checker)."""
+    lab = item_series.astype('string')
+    return lab.map(lambda x: item_map.get(x, x) if pd.notna(x) else pd.NA).astype('string')
+
+
+# Price sentinels meaning "no answer / not recorded" in the CS07 grids.
+_COMMUNITY_PRICE_SENTINELS = (9999.0, 99999.0)
+# Unit Preferred Labels that mark the product as absent / missing in the
+# cluster — these rows carry no surveyed price and are dropped.
+_COMMUNITY_MISSING_UNITS = {'Manquant'}
+
+
+def _community_price_triples(df, item_map, unit_map, triples, passage=1):
+    """Reshape a wide CS07 community-price frame into long (v, j, u, passage,
+    Price, Quantity) rows.
+
+    `triples` is a list of (price_col, qty_col, unit_col) — the unit_col may be
+    a single shared column repeated across triples (2014-15) or per-triple
+    (2011-12).  The instrument records up to three within-questionnaire price
+    observations; each becomes a candidate row, and one reported price per
+    (t, v, j, u) is selected downstream in _finish_community_prices (NOT
+    averaged).  `v` is the grappe formatted into the sample() keyspace; `j` via
+    harmonize_food; `u` via the u table.  `passage` (the field visit: 1=post-
+    planting, 2=post-harvest) tags the rows for the post-harvest-first
+    selection.  Rows with no usable price (NA / 0 / sentinel) or a
+    missing-marker unit are dropped here so they never reach the index."""
+    v = df['grappe'].apply(tools.format_id).astype('string')
+    j = _item_labels(df['cs07q01'].astype(str).str.strip(), item_map)
+    pieces = []
+    for pcol, qcol, ucol in triples:
+        price = pd.to_numeric(df[pcol], errors='coerce').astype('Float64')
+        qty = pd.to_numeric(df[qcol], errors='coerce').astype('Float64')
+        # Quantity 0 / 9999 / 99999 are "no answer" markers, not a measured
+        # basis — null them (the surveyed Price row is still kept; only the
+        # missing quantity basis is dropped, per the reported-only rule).
+        qty = qty.where((qty > 0)
+                        & (~qty.isin(_COMMUNITY_PRICE_SENTINELS)), pd.NA)
+        u = _unit_labels(df[ucol].astype(str).str.strip(), unit_map)
+        piece = pd.DataFrame({
+            'v': v.values, 'j': j.values, 'u': u.values,
+            'Price': price.values, 'Quantity': qty.values,
+            'passage': passage,
+        })
+        pieces.append(piece)
+    out = pd.concat(pieces, ignore_index=True)
+    # Drop rows with no surveyed price.
+    out = out[out['Price'].notna() & (out['Price'] > 0)]
+    for sv in _COMMUNITY_PRICE_SENTINELS:
+        out = out[out['Price'] != sv]
+    out = out[~out['u'].isin(_COMMUNITY_MISSING_UNITS)]
+    return out
+
+
+def _finish_community_prices(df, t):
+    """Common tail for the wave-level community_prices scripts: tag t, coerce
+    numeric columns, drop rows missing any index key, SELECT one reported price
+    per (t, v, j, u), and build the (t, v, j, u) index.
+
+    The CS07 instrument records up to three within-questionnaire price
+    observations (2011-12 across two field passages too) per (cluster, item,
+    unit).  Mirroring the Mali EACI community_prices reference, ONE reported
+    observation is selected per (t, v, j, u) — post-harvest (passage 2) before
+    post-planting (passage 1), then questionnaire order via a stable sort — so
+    the result is a clean, item-level (t, v, j, u) grain carrying a genuinely
+    REPORTED price (NOT an across-observation mean — averaging is a
+    transformation).  This matches every sibling community_prices feature
+    (Mali / Malawi / Tanzania / Ethiopia / Nigeria), which all use (t, v, j, u)
+    with one reported price per cell."""
+    df = df.copy()
+    for col in ['Price', 'Quantity']:
+        if col not in df.columns:
+            df[col] = pd.NA
+        df[col] = pd.to_numeric(df[col], errors='coerce').astype('Float64')
+    df['t'] = t
+    df['v'] = df['v'].astype('string')
+    df['j'] = df['j'].astype('string')
+    df['u'] = df['u'].astype('string')
+    if 'passage' not in df.columns:
+        df['passage'] = 1
+    # Every index level must be non-null (the framework drops NaN-key rows).
+    df = df[df['v'].notna() & df['j'].notna() & df['u'].notna()]
+    # Select one observation per (t, v, j, u): post-harvest (passage 2) before
+    # post-planting (passage 1), then questionnaire order (stable sort).
+    df = df.reset_index(drop=True)
+    df['_porder'] = df['passage'].map({2: 0, 1: 1}).fillna(2).astype(int)
+    df = df.sort_values(['t', 'v', 'j', 'u', '_porder'], kind='stable')
+    df = df.drop_duplicates(subset=['t', 'v', 'j', 'u'], keep='first')
+    # Redundant i==v level (positioned before j) so the framework's map_index
+    # does not swap j->i for an i-less index; _normalize_dataframe_index then
+    # drops the undeclared i, leaving the canonical (t,v,j,u) grain.  Mirrors
+    # the Mali/Malawi/Tanzania/Ethiopia community_prices shim.
+    df['i'] = df['v']
+    keep = ['t', 'v', 'i', 'j', 'u', 'Price', 'Quantity']
+    df = df[keep]
+    df = df.set_index(['t', 'v', 'i', 'j', 'u']).sort_index()
+    return df
