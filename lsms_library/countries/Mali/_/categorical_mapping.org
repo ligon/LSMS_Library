@@ -97,6 +97,11 @@
 | Charrette bovine             | Cart (ox)       | x       | ---     | ---     |
 | Charette bovine              | Cart (ox)       | x       | ---     | ---     |
 | Litres                       | Litre           | x       | ---     | ---     |
+|------------------------------+-----------------+---------+---------+---------|
+| # community_prices units (EACI 2014-15 s04q09) — the price questionnaire's sack labels carry an explicit nominal weight in the code; fold to the existing bare-sack Preferred Labels so community_prices.u joins food_acquired.u / crop_production.u |                 |         |         |         |
+| Sac moyen (50 kg)            | Sac moyen       | x       | ---     | ---     |
+| Sac large (100 kg)           | Sac large       | x       | ---     | ---     |
+| Sac petit (25 kg)            | Sac petit       | x       | ---     | ---     |
 
 #+name: harmonize_food
 | Code                                                                                                 | Preferred Label                              | 2014-15 | 2018-19 | 2021-22 |
@@ -423,6 +428,13 @@
 | Palmier à huile                                                                                      | Palmier à huile                              | x       | ---     | ---     |
 | Pomme canelle                                                                                        | Pomme cannelle                               | x       | ---     | ---     |
 | Autres                                                                                               | Autres cultures                              | x       | ---     | ---     |
+|------------------------------------------------------------------------------------------------------+----------------------------------------------+---------+---------+---------+---------|
+| # community_prices items (EACI 2014-15 s04q01) — price-questionnaire item labels not already covered by the food_acquired/crop_production codes above; each REUSES the consumed-food Preferred Label so community_prices.j joins food_acquired.j / crop_production.j |                                              |         |         |         |
+| Cube alimentaire (Maggi)                                                                             | Cube alimentaire                             | x       | ---     | ---     |
+| Pâtes almentaires                                                                                    | Pâtes alimentaires                           | x       | ---     | ---     |
+| Thé en paquet ou sachet                                                                              | Thé                                          | x       | ---     | ---     |
+| Tomate fraiche                                                                                       | Tomate fraîche                               | x       | ---     | ---     |
+| Viande mouton                                                                                        | Viande de mouton                             | x       | ---     | ---     |
 
 #+name: Roof
 | Alternate Spelling | Preferred Label |

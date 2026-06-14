@@ -79,6 +79,18 @@ $(VAR_DIR)/plot_labor.parquet: plot_labor.py ../2014-15/_/plot_labor.parquet ../
 $(VAR_DIR)/people_last7days.parquet: people_last7days.py ../2014-15/_/people_last7days.parquet ../2017-18/_/people_last7days.parquet
 	python people_last7days.py
 
+# community_prices (item-level cluster food prices, GAP C / parity loop).  The
+# community price questionnaire lives in the 2014-15 EACI wave only (EACIS04
+# p1/p2); 2017-18 dropped it and the EHCVM waves price only at region x milieu
+# (no grappe key).  The wave pattern rule materializes the wave parquet; the
+# country-level concatenator (community_prices.py) aggregates into
+# var/community_prices.parquet.
+../%/_/community_prices.parquet: ../%/_/community_prices.py
+	(cd $(@D) && python community_prices.py)
+
+$(VAR_DIR)/community_prices.parquet: community_prices.py ../2014-15/_/community_prices.parquet
+	python community_prices.py
+
 clean:
 	rm -f panel_ids.json updated_ids.json
 

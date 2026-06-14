@@ -709,3 +709,111 @@ def people_last7days_finalize(df):
     out = out[['farm_work', 'SOB_work', 'wage_work',
                'farm_hrs', 'SB_hrs', 'wage_hrs', 'Industry', 'working_age']]
     return out.sort_index()
+
+
+# ---------------------------------------------------------------------------
+# community_prices (GAP C; parity loop) — item-level (t, v, j, u)
+# ---------------------------------------------------------------------------
+#
+# One row per (cluster v, food-item j, unit u): the REPORTED surveyed price
+# the EACI community price questionnaire records for that good in that
+# cluster.  CLUSTER-level — there is NO household i, so v is NATIVE (the
+# community questionnaire's grappe, the SAME keyspace as sample().v, so the
+# price joins households) and the framework's _join_v_from_sample does not
+# fire (it only augments tables that carry i).
+#
+# The community price module lives in the 2014-15 EACI wave ONLY
+# (EACIS04_p1 post-planting passage 1 + EACIS04_p2 post-harvest passage 2,
+# rec_type 8, grappe-level, no menage).  The 2017-18 EACI wave dropped the
+# community questionnaire; the EHCVM waves (2018-19, 2021-22) collect prices
+# only at the region x milieu IHPC grain (ehcvm_prix), which carries no
+# grappe key and so cannot join the sample().v cluster keyspace — deferred.
+#
+# Grain: one row per (t, v, j, u), where
+#   - t = wave ('2014-15'),
+#   - v = grappe (cluster) as a string — sample().v keyspace,
+#   - j = harmonize_food Preferred Label, decoded from the broad item label
+#         s04q01 (Riz, Maïs, Oignon frais, ...); REUSES the consumed-food
+#         label so community_prices.j joins food_acquired.j / crop_production.j,
+#   - u = u-table Preferred Label, decoded from the unit label s04q09
+#         (Kilogramme -> Kg, Sac moyen (50 kg) -> Sac moyen, ...).
+#
+# REPORTED columns only:
+#   Price    = s04q11, the surveyed price (FCFA) for a Quantity-sized lot.
+#   Quantity = s04q10, the native quantity that Price refers to (e.g. a
+#              "Sac moyen" lot is 50, a per-kilogramme price is 1).  The 999
+#              sentinel ("non-standard / loose retail lot") is coerced to NA.
+#   passage  = 1 (post-planting) / 2 (post-harvest); NOT emitted — used only
+#              to pick a single observation per (t, v, j, u) below.
+#
+# Within a cluster the instrument records a separate price per sale-form
+# variety (s04q02: imported/local rice, white/yellow maize, box sizes) and
+# per passage.  Several varieties collapse to the same (j, u) — e.g. red vs
+# white onion both -> (Oignon, Kg).  The declared index (t, v, j, u) holds
+# ONE reported price per cell, so a single observation is SELECTED (never
+# averaged — a mean/median across varieties or clusters would be a
+# transformation): prefer the more complete post-harvest passage (2) over
+# post-planting (1), then the first reported sale-form in questionnaire
+# order.  Verified harmless: colliding same-(j,u) prices are near-identical
+# (median max/min ratio ~1.13, median CV ~0.09), so the choice does not
+# distort the reported price.  Any genuine median / community->household
+# price imputation is transformations.py work over these rows.
+
+# s04q09 unit labels that are numeric-coded data artifacts (a handful of
+# rows where the unit was entered as a number / the missing sentinel); they
+# do not map through the u table and are dropped.
+_PRICE_QTY_SENTINELS = {999, 9999}
+
+
+def community_prices_finalize(df):
+    """Post-process a community_prices wave DataFrame.
+
+    Expects raw columns already assembled:
+        t, v, j (decoded item label), u (decoded unit label), Price,
+        Quantity, passage.
+    Maps j/u labels via harmonize_food / u, drops unmapped item/unit rows,
+    coerces the Price/Quantity dtypes and the 999 Quantity sentinel, then
+    SELECTS one reported price per (t, v, j, u) — post-harvest passage first,
+    then questionnaire order — yielding a unique (t, v, j, u) index.
+    """
+    df = df.copy()
+    df['j'] = _crop_labels(df['j'])   # harmonize_food Code -> Preferred Label
+    df['u'] = _unit_labels(df['u'])   # u Code -> Preferred Label
+    df['Price'] = pd.to_numeric(df['Price'], errors='coerce')
+    df['Quantity'] = pd.to_numeric(df['Quantity'], errors='coerce')
+    df.loc[df['Quantity'].isin(_PRICE_QTY_SENTINELS), 'Quantity'] = pd.NA
+
+    df['v'] = df['v'].astype('string')
+    # Keep only resolvable, genuinely-priced item-unit rows.
+    df = df[df['j'].notna() & df['u'].notna() & df['Price'].notna() & (df['Price'] > 0)]
+
+    # Select one observation per (t, v, j, u): post-harvest (passage 2) before
+    # post-planting (passage 1), then questionnaire row order (stable sort).
+    df = df.reset_index(drop=True)
+    df['_porder'] = df['passage'].map({2: 0, 1: 1}).fillna(2).astype(int)
+    df = df.sort_values(['t', 'v', 'j', 'u', '_porder'], kind='stable')
+    df = df.drop_duplicates(subset=['t', 'v', 'j', 'u'], keep='first')
+
+    df['Price'] = pd.to_numeric(df['Price'], errors='coerce')
+    df['Quantity'] = pd.to_numeric(df['Quantity'], errors='coerce')
+
+    # community_prices is a CLUSTER table — there is no household i, the
+    # natural grain is (t, v, j, u).  But the framework's
+    # local_tools.map_index() (run on EVERY read path) unconditionally swaps
+    # j -> i whenever a `j` index level is present and an `i` level is NOT.
+    # That swap would rename the item level `j` to `i`, drop `j`, and collapse
+    # the table to (t, v, u).  To keep `j` intact WITHOUT touching the
+    # framework, carry a redundant `i` level (set equal to the cluster v)
+    # positioned BEFORE `j`: map_index then sees i present and j after i, so it
+    # does NOT swap, and the framework's _normalize_dataframe_index drops the
+    # undeclared `i` level (data_scheme declares (t, v, j, u)), leaving the
+    # canonical (t, v, j, u) grain.  v already in the index means
+    # _join_v_from_sample is skipped, so the spurious i==v never reaches the
+    # API.  (Same framework-compatibility shim Tanzania/Malawi/Ethiopia
+    # community_prices use — see Tanzania community_prices_for_wave.)
+    df['i'] = df['v']
+    out = (df.set_index(['t', 'v', 'i', 'j', 'u'])[['Price', 'Quantity']]
+             .sort_index())
+    assert out.reset_index().duplicated(['t', 'v', 'j', 'u']).sum() == 0, \
+        "community_prices: (t, v, j, u) not unique"
+    return out
