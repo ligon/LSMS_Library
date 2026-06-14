@@ -712,3 +712,46 @@
 | 3305 | Donkey/Horse      |
 | 3310 | Chicken           |
 | 3314 | Turkey/Guinea Fowl|
+
+# harmonize_labor_source: plot-labor source identity for the plot_labor
+# feature (GAP 3, plot grain).  The Module D plot-labor block records three
+# distinct labor sources on a plot, each in its own set of person-day
+# columns: household (family) members, hired (paid) labor, and free /
+# exchange ("other") labor.  These are the `source` axis of plot_labor's
+# (t, i, plot, source) grain.  Stable across all four IHS3+/IHPS waves.
+# Code is a synthetic small-integer identity (the source is read from the
+# COLUMN block in Module D, not a numeric code in the data), so this table
+# is a label-stabilizer / documentation map rather than a code lookup.
+#+name: harmonize_labor_source
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | family          |
+|    2 | hired           |
+|    3 | other           |
+
+# harmonize_industry: wage-job industry identity for the people_last7days
+# feature (GAP 3, individual grain).  The labor module records each
+# individual's main wage-job industry as a 2-digit ISIC-style code
+# (hh_e20b).  The World Bank cleaning code (MWI_IHPS{1-4}.do labor block)
+# bins this code into six one-hot dummies (ind_ag / ind_fish / ind_mining /
+# ind_manuf / ind_const / ind_serv) via numeric ranges:
+#   11,12 -> Agriculture; 13 -> Fishing; 29 -> Mining;
+#   31-42 -> Manufacturing; 50 -> Construction; 61-96 -> Services.
+# We keep ONE harmonized industry label per individual (the natural
+# item-level form) instead of the six wide dummies; a per-industry dummy
+# (e.g. wage_industry == 'Agriculture') is then a trivial transformation.
+# Codes outside the six WB bins map to 'Other'; missing/no-wage-job -> NaN.
+# This table is read by malawi.py:_industry_label, which applies the WB
+# numeric-range bins (a range map, not a 1:1 code lookup), so the Code
+# column below lists only the canonical bin LABELS for reference, keyed by a
+# synthetic ordinal -- the actual hh_e20b->label binning lives in code.
+#+name: harmonize_industry
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Agriculture     |
+|    2 | Fishing         |
+|    3 | Mining          |
+|    4 | Manufacturing   |
+|    5 | Construction    |
+|    6 | Services        |
+|    7 | Other           |

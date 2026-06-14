@@ -1764,3 +1764,399 @@ def assemble_anthropometry(t, pieces):
     out = cat.set_index(['t', 'i', 'pid'])
     assert out.index.is_unique, f"Non-unique (t,i,pid) in anthropometry {t}"
     return out
+
+
+# --- plot_labor (GAP 3, plot grain) ---------------------------------------
+# Item-level (t, i, plot, source) plot-labor feature for the four IHS3+/IHPS
+# waves.  Source: the Module D (ag_mod_d) plot-labor block -- the SAME
+# columns the World Bank cleaning code (MWI_IHPS{1-4}.do labor-days block)
+# reads then collapses to per-plot total_*_labor_days / hired_labor_value.
+# We keep the PRE-collapse REPORTED person-days for each of the survey's
+# three labor sources (family / hired / other), as the `source` axis of the
+# (t, i, plot, source) grain -- one row per (plot, source).  The
+# WB total_labor_days (sum ACROSS sources), the per-source HH-level
+# rollups, and hired_labor_value (median-wage valuation) are ALL
+# transformations, NEVER stored columns here.
+#
+# Reported columns:
+#   PersonDays -- reported person-days of that source on the plot.  For
+#                 family labor the survey records (days x #people) per
+#                 person-slot/week block, so PersonDays sums those
+#                 day*count products (the WB temp_* / total_family_labor_days
+#                 numerator BEFORE the across-source sum).  For hired/other
+#                 the survey records day counts directly across man/woman/
+#                 child categories and two visit columns, so PersonDays sums
+#                 those reported day counts.
+#   Wage       -- reported cash daily wage paid to HIRED labor (the mean of
+#                 the reported man/woman/child daily wages that the survey
+#                 recorded for that plot); NaN for family / other sources
+#                 (no wage is paid).  This is the REPORTED per-day wage, NOT
+#                 the median-wage valuation the WB code derives.
+#
+# The hired/other "person-day" columns differ by questionnaire generation:
+#   IHS3 / IHPS-2013 (2010-11, 2013-14):
+#     hired man  = ag_d47a + ag_d48a   wage man  = ag_d47b, ag_d48b
+#     hired woman= ag_d47c + ag_d48c   wage woman= ag_d47d, ag_d48d
+#     hired child= ag_d47e + ag_d48e   wage child= ag_d47f, ag_d48f
+#   IHS4 / IHS5 (2016-17, 2019-20):
+#     hired man  = ag_d47a1 + ag_d48a1 wage man  = ag_d47b1, ag_d48b1
+#     hired woman= ag_d47a2 + ag_d48a2 wage woman= ag_d47b2, ag_d48b2
+#     hired child= ag_d47a3 + ag_d48a3 wage child= ag_d47b3, ag_d48b3
+# Other (free / exchange) labor is the same in every wave:
+#     other man  = ag_d52a + ag_d54a
+#     other woman= ag_d52b + ag_d54b
+#     other child= ag_d52c + ag_d54c
+# NOTE: the IHS4/IHS5 Cross_Sectional halves drop the Module D "other"
+# labor columns (ag_d52*/ag_d54* absent), so those halves emit no `other`
+# rows -- reported, not faked.
+
+def _labor_source_code_map():
+    """{Preferred Label: synthetic code} for harmonize_labor_source (for
+    documentation / round-trip).  The plot_labor `source` axis carries the
+    Preferred Labels directly, not the codes."""
+    return _malawi_code_map('harmonize_labor_source')
+
+
+def _sum_products(df, pairs):
+    """Row-wise Sum over a list of (days_col, count_col) pairs of
+    days*count, treating absent columns / NaN as 0; the whole result is NaN
+    only when EVERY contributing cell is NaN (matching Stata's
+    `egen rowtotal, missing`)."""
+    total = pd.Series(0.0, index=df.index)
+    any_present = pd.Series(False, index=df.index)
+    for dcol, ccol in pairs:
+        if dcol not in df.columns or ccol not in df.columns:
+            continue
+        d = pd.to_numeric(df[dcol], errors='coerce')
+        c = pd.to_numeric(df[ccol], errors='coerce')
+        prod = d * c
+        total = total + prod.fillna(0.0)
+        any_present = any_present | prod.notna()
+    return total.where(any_present, np.nan)
+
+
+def _sum_cols(df, cols):
+    """Row-wise sum over ``cols`` (absent cols skipped); NaN only when every
+    present cell is NaN (Stata rowtotal-missing semantics)."""
+    total = pd.Series(0.0, index=df.index)
+    any_present = pd.Series(False, index=df.index)
+    for col in cols:
+        if col not in df.columns:
+            continue
+        v = pd.to_numeric(df[col], errors='coerce')
+        total = total + v.fillna(0.0)
+        any_present = any_present | v.notna()
+    return total.where(any_present, np.nan)
+
+
+def _mean_cols(df, cols):
+    """Row-wise mean over the NON-null values among ``cols`` (absent cols
+    skipped); NaN when every present cell is NaN.  Used for the reported
+    hired daily wage across man/woman/child categories."""
+    present = [c for c in cols if c in df.columns]
+    if not present:
+        return pd.Series(np.nan, index=df.index)
+    sub = df[present].apply(lambda s: pd.to_numeric(s, errors='coerce'))
+    return sub.mean(axis=1, skipna=True)
+
+
+def _family_labor_pairs(df):
+    """The (days, count) family-labor column pairs present in ``df``.
+
+    Handles both questionnaire layouts:
+      * IHS3/IHPS-2013: ag_d4{2,3,4}{b/c, f/g, j/k, n/o} -- four person
+        slots (b*c, f*g, j*k, n*o) across the 2nd/3rd/4th week blocks.
+      * IHS4/IHS5: ag_d4{2,3,4}{b}{n} * ag_d4{2,3,4}{c}{n} -- one (b,c)
+        day*count pair per occurrence-suffix n (n = 1..13).
+    Returns a list of (days_col, count_col) tuples, only those present.
+    """
+    pairs = []
+    blocks = ('ag_d42', 'ag_d43', 'ag_d44')
+    # IHS3/IHPS-2013 layout: 4 person-slots, bare suffixes.
+    legacy_slots = [('b', 'c'), ('f', 'g'), ('j', 'k'), ('n', 'o')]
+    legacy = [(blk + d, blk + c) for blk in blocks for d, c in legacy_slots
+              if (blk + d) in df.columns and (blk + c) in df.columns]
+    if legacy:
+        pairs += legacy
+    # IHS4/IHS5 layout: (b{n}, c{n}) day*count per occurrence suffix.
+    for blk in blocks:
+        for n in range(1, 14):
+            dcol, ccol = f'{blk}b{n}', f'{blk}c{n}'
+            if dcol in df.columns and ccol in df.columns:
+                pairs.append((dcol, ccol))
+    return pairs
+
+
+def _plot_labor_block(df, *, hhid, plotkey, t, hired_suffix,
+                      include_other=True):
+    """Build one wave-half's reported (i, plot, source) plot-labor block.
+
+    ``df`` is a raw Module D frame that already carries an ``hhid`` string
+    column and a ``plotkey`` string column.  ``hired_suffix`` selects the
+    hired-labor column naming: '' for the IHS3/IHPS-2013 a/c/e + b/d/f
+    layout, '1/2/3' for the IHS4/IHS5 a1/a2/a3 + b1/b2/b3 layout.
+    ``include_other`` is False for the IHS4/IHS5 Cross_Sectional halves that
+    drop the ag_d52*/ag_d54* "other" columns.
+
+    Returns a long DataFrame at grain (t, i, plot, source) with the reported
+    item columns PersonDays and Wage (Wage non-null only for source=hired).
+    NO across-source sum, NO per-plot HH rollup.
+    """
+    work = pd.DataFrame({
+        'i':    df[hhid].astype('string').values,
+        'plot': df[plotkey].astype('string').values,
+    }, index=df.index)
+
+    rows = []
+
+    # --- family: PersonDays = Sum(days * #people) over the slot/week pairs.
+    fam_days = _sum_products(df, _family_labor_pairs(df))
+    fam = work.copy()
+    fam['source'] = 'family'
+    fam['PersonDays'] = fam_days.values
+    fam['Wage'] = np.nan
+    rows.append(fam)
+
+    # --- hired: PersonDays = Sum reported man/woman/child day counts across
+    # the two visit columns; Wage = mean reported daily wage across the
+    # man/woman/child categories that were recorded.
+    if hired_suffix == '':
+        day_cols = ['ag_d47a', 'ag_d48a', 'ag_d47c', 'ag_d48c',
+                    'ag_d47e', 'ag_d48e']
+        wage_cols = ['ag_d47b', 'ag_d48b', 'ag_d47d', 'ag_d48d',
+                     'ag_d47f', 'ag_d48f']
+    else:
+        day_cols = ['ag_d47a1', 'ag_d48a1', 'ag_d47a2', 'ag_d48a2',
+                    'ag_d47a3', 'ag_d48a3']
+        wage_cols = ['ag_d47b1', 'ag_d48b1', 'ag_d47b2', 'ag_d48b2',
+                     'ag_d47b3', 'ag_d48b3']
+    hired = work.copy()
+    hired['source'] = 'hired'
+    hired['PersonDays'] = _sum_cols(df, day_cols).values
+    hired['Wage'] = _mean_cols(df, wage_cols).values
+    rows.append(hired)
+
+    # --- other (free / exchange): PersonDays = Sum reported man/woman/child
+    # day counts across the two visit columns; no wage.
+    if include_other:
+        other_cols = ['ag_d52a', 'ag_d54a', 'ag_d52b', 'ag_d54b',
+                      'ag_d52c', 'ag_d54c']
+        if any(c in df.columns for c in other_cols):
+            other = work.copy()
+            other['source'] = 'other'
+            other['PersonDays'] = _sum_cols(df, other_cols).values
+            other['Wage'] = np.nan
+            rows.append(other)
+
+    out = pd.concat(rows, ignore_index=True)
+    out['t'] = t
+    # Drop rows with no reported person-days for that source on that plot
+    # (the survey did not record that source -> not a real item row).
+    out = out[out['PersonDays'].notna() & (out['PersonDays'] > 0)
+              | (out['source'] == 'hired') & out['Wage'].notna()]
+    return out
+
+
+def assemble_plot_labor(t, pieces):
+    """Combine per-half plot-labor blocks (_plot_labor_block) into the
+    canonical plot_labor DataFrame for wave ``t``.
+
+    Returns a DataFrame indexed (t, i, plot, source) with columns PersonDays
+    and Wage.  A (plot, source) reached on two source rows (e.g. the same
+    plot reported across CS/Panel overlap, which should not happen but is
+    guarded) sums PersonDays (additive) and takes the first reported Wage.
+    """
+    cat = pd.concat(pieces, ignore_index=True)
+    cat['t'] = t
+    grp = cat.groupby(['t', 'i', 'plot', 'source'], as_index=False,
+                      dropna=False).agg({
+        'PersonDays': 'sum',
+        'Wage':       'first',
+    })
+    out = grp.set_index(['t', 'i', 'plot', 'source'])
+    assert out.index.is_unique, f"Non-unique (t,i,plot,source) in plot_labor {t}"
+    return out
+
+
+# --- people_last7days (GAP 3, individual grain) ---------------------------
+# Item-level (t, i, pid) 7-day individual time-use feature, mirroring
+# Uganda's people_last7days but at the individual grain GAP_RANKING.org
+# specifies (Uganda's existing feature is an HH-level Men/Women/Boys/Girls
+# count; the parity target is the per-individual activity record).  Source:
+# the household labor module (hh_mod_e) -- the SAME module the World Bank
+# cleaning code (MWI_IHPS{1-4}.do labor block) reads to build farm_work /
+# SOB_work / wage_work dummies, farm_hrs / SB_hrs / wage_hrs, the six
+# ind_* industry one-hots, and working_age.  We keep the per-individual
+# REPORTED record (no HH rollup):
+#   farm_work  (bool) -- worked on HH agric/livestock/fishing in last 7 days
+#   SOB_work   (bool) -- helped/ran a non-farm HH business in last 7 days
+#   wage_work  (bool) -- worked for a wage/salary OR ganyu in last 7 days
+#   farm_hrs   (float)-- hours on HH agric (+livestock/fishing where split)
+#   SB_hrs     (float)-- hours on the non-farm HH business
+#   wage_hrs   (float)-- hours of wage work + ganyu (the WB wage_hrs sum)
+#   wage_industry (str)-- main wage-job industry on the harmonize_industry
+#                         Preferred Labels (Agriculture/Fishing/Mining/
+#                         Manufacturing/Construction/Services/Other), binned
+#                         from hh_e20b by the WB numeric ranges; NaN where
+#                         no wage job / not asked.  Replaces the six WB
+#                         ind_* dummies (a per-industry dummy is then a
+#                         trivial transformation).
+#   working_age (bool)-- the WB working_age flag.
+#
+# The variable names differ by questionnaire generation:
+#   IHS3 / IHPS-2013 (2010-11, 2013-14):
+#     farm  = hh_e07 (single agric hours col)        -> farm_work/farm_hrs
+#     SOB   = hh_e08                                  -> SOB_work/SB_hrs
+#     wage  = hh_e11 (wage) + hh_e10 (ganyu)          -> wage_work/wage_hrs
+#     working_age = (hh_e02 != "X")
+#   IHS4 / IHS5 (2016-17, 2019-20):
+#     farm  = hh_e07a (+ hh_e07b livestock, hh_e07c fishing) -> farm_work/hrs
+#     SOB   = hh_e08 (+ hh_e09)                        -> SOB_work/SB_hrs
+#     wage  = hh_e11 (wage) + hh_e10 (ganyu)           -> wage_work/wage_hrs
+#     working_age = (roster age hh_b05a >= 5), joined from the roster.
+# Industry hh_e20b (2-digit ISIC) is present in every wave.
+
+# WB hh_e20b industry-range bins (MWI_IHPS{1-4}.do): code -> label.
+def _industry_label(code_series):
+    """Bin the hh_e20b 2-digit industry code into the harmonize_industry
+    Preferred Label, reproducing the WB numeric ranges:
+      11,12 -> Agriculture; 13 -> Fishing; 29 -> Mining;
+      31-42 -> Manufacturing; 50 -> Construction; 61-96 -> Services;
+      any other recorded code -> Other; missing -> NaN.
+    """
+    code = pd.to_numeric(code_series, errors='coerce')
+
+    def _one(c):
+        if pd.isna(c):
+            return pd.NA
+        c = int(c)
+        if c in (11, 12):
+            return 'Agriculture'
+        if c == 13:
+            return 'Fishing'
+        if c == 29:
+            return 'Mining'
+        if 31 <= c <= 42:
+            return 'Manufacturing'
+        if c == 50:
+            return 'Construction'
+        if 61 <= c <= 96:
+            return 'Services'
+        return 'Other'
+
+    return pd.Series([_one(c) for c in code], index=code_series.index,
+                     dtype='string')
+
+
+def _dummy_from_hours(series):
+    """Reproduce the WB `recode (0=0)(.=.)(else=1)`: >0 -> True, ==0 ->
+    False, NaN -> NA (a nullable boolean)."""
+    v = pd.to_numeric(series, errors='coerce')
+    out = pd.Series(pd.NA, index=v.index, dtype='boolean')
+    out[v == 0] = False
+    out[v > 0] = True
+    return out
+
+
+def _people_last7days_block(labor, *, t, hhid, pid, layout,
+                            i_prefix=None, roster=None,
+                            roster_hhid=None, roster_pid=None):
+    """Build one wave-half's reported (i, pid) 7-day time-use block.
+
+    Parameters
+    ----------
+    labor : pd.DataFrame -- raw hh_mod_e labor module for this half
+        (convert_categoricals=False so hh_e20b is numeric).
+    t : str -- wave id.
+    hhid, pid : str -- HH-id and person-id columns in ``labor`` (must resolve
+        to the SAME (i, pid) household_roster emits, after ``i_prefix``).
+    layout : 'legacy' | 'modern'
+        'legacy' = IHS3/IHPS-2013 (hh_e07 single farm col, hh_e02 working
+        age); 'modern' = IHS4/IHS5 (hh_e07a/b/c, working age from roster
+        age).
+    i_prefix : str | None -- prepended to the formatted HH id (e.g. 'cs-17-'
+        for the IHS4 Cross_Sectional half) to match household_roster.
+    roster, roster_hhid, roster_pid : optional -- the Module B roster half
+        (convert_categoricals=False) used to derive working_age = age>=5 in
+        the 'modern' layout.  Ignored for 'legacy'.
+
+    Returns a DataFrame [i, pid, farm_work, SOB_work, wage_work, farm_hrs,
+    SB_hrs, wage_hrs, wage_industry, working_age] (index reset).
+    """
+    pre = (lambda s: (i_prefix + s)) if i_prefix else (lambda s: s)
+    d = labor.copy()
+    out = pd.DataFrame(index=d.index)
+    out['i'] = d[hhid].apply(format_id).map(pre)
+    out['pid'] = d[pid].apply(format_id)
+
+    if layout == 'legacy':
+        farm_hrs = _sum_cols(d, ['hh_e07'])
+        sb_hrs = _sum_cols(d, ['hh_e08'])
+    else:
+        farm_hrs = _sum_cols(d, ['hh_e07a', 'hh_e07b', 'hh_e07c'])
+        sb_hrs = _sum_cols(d, ['hh_e08', 'hh_e09'])
+    wage_hrs = _sum_cols(d, ['hh_e11', 'hh_e10'])  # wage + ganyu, both waves
+
+    out['farm_work'] = _dummy_from_hours(farm_hrs).values
+    out['SOB_work'] = _dummy_from_hours(sb_hrs).values
+    # wage_work = worked for wage OR ganyu (either hours > 0).
+    wage_dummy = _dummy_from_hours(pd.to_numeric(d.get('hh_e11'),
+                                                 errors='coerce'))
+    ganyu_dummy = _dummy_from_hours(pd.to_numeric(d.get('hh_e10'),
+                                                  errors='coerce'))
+    ww = pd.Series(pd.NA, index=d.index, dtype='boolean')
+    ww[(wage_dummy == False) & (ganyu_dummy == False)] = False
+    ww[(wage_dummy == True) | (ganyu_dummy == True)] = True
+    out['wage_work'] = ww.values
+
+    out['farm_hrs'] = farm_hrs.astype('Float64').values
+    out['SB_hrs'] = sb_hrs.astype('Float64').values
+    out['wage_hrs'] = wage_hrs.astype('Float64').values
+
+    if 'hh_e20b' in d.columns:
+        out['wage_industry'] = _industry_label(d['hh_e20b']).values
+    else:
+        out['wage_industry'] = pd.Series(pd.NA, index=d.index, dtype='string')
+
+    # working_age
+    if layout == 'legacy' and 'hh_e02' in d.columns:
+        wa = d['hh_e02'].astype('string').str.strip().str.upper() != 'X'
+        out['working_age'] = wa.astype('boolean').values
+    elif roster is not None and roster_hhid is not None:
+        r = roster.copy()
+        r['_i'] = r[roster_hhid].apply(format_id).map(pre)
+        r['_pid'] = r[roster_pid].apply(format_id)
+        age = pd.to_numeric(r.get('hh_b05a'), errors='coerce')
+        r['_wa'] = (age >= 5).astype('boolean')
+        key = r[['_i', '_pid', '_wa']].drop_duplicates(['_i', '_pid'])
+        merged = out.merge(key, left_on=['i', 'pid'],
+                           right_on=['_i', '_pid'], how='left')
+        out['working_age'] = merged['_wa'].values
+    else:
+        out['working_age'] = pd.Series(pd.NA, index=d.index, dtype='boolean')
+
+    out['t'] = t
+    return out.reset_index(drop=True)
+
+
+def assemble_people_last7days(t, pieces):
+    """Combine per-half people_last7days blocks into the canonical frame.
+
+    Returns a DataFrame indexed (t, i, pid) with the reported per-individual
+    7-day columns.  A duplicate (i, pid) keeps the first reported record
+    (one labor-module row per individual per half).
+    """
+    cat = pd.concat(pieces, ignore_index=True)
+    cat = cat.groupby(['t', 'i', 'pid'], as_index=False, dropna=False).agg({
+        'farm_work':     'first',
+        'SOB_work':      'first',
+        'wage_work':     'first',
+        'farm_hrs':      'first',
+        'SB_hrs':        'first',
+        'wage_hrs':      'first',
+        'wage_industry': 'first',
+        'working_age':   'first',
+    })
+    out = cat.set_index(['t', 'i', 'pid'])
+    assert out.index.is_unique, f"Non-unique (t,i,pid) in people_last7days {t}"
+    return out

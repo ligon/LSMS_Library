@@ -250,5 +250,82 @@ Data Scheme:
     Age_months: float
     Sex: str
     materialize: make
+  plot_labor:
+    # Item-level (t, i, plot, source) plot-labor feature for the four
+    # IHS3+/IHPS waves (2010-11, 2013-14, 2016-17, 2019-20); GAP 3 (plot
+    # grain).  One REPORTED row per labor source applied to a plot, with
+    # source in {family, hired, other} on the harmonize_labor_source
+    # Preferred Labels.  Source: the Module D (ag_mod_d) plot-labor block --
+    # the SAME columns the World Bank cleaning code (MWI_IHPS{1-4}.do
+    # labor-days block) reads then collapses to per-plot total_*_labor_days /
+    # hired_labor_value.  We keep the PRE-collapse reported person-days per
+    # source:
+    #   PersonDays -- reported person-days of that source on the plot.  For
+    #                 family labor the survey records (days x #people) per
+    #                 person-slot/week block, so PersonDays sums those
+    #                 day*count products; for hired/other it sums the reported
+    #                 man/woman/child day counts across the two visit columns.
+    #   Wage       -- reported cash daily wage paid to HIRED labor (mean of
+    #                 the reported man/woman/child daily wages recorded for
+    #                 that plot); NaN for family / other (no wage paid).  This
+    #                 is the REPORTED per-day wage, NOT the WB median-wage
+    #                 valuation.
+    # The WB total_labor_days (sum ACROSS sources), the per-source HH-level
+    # rollups, and hired_labor_value (median-wage valuation) are ALL
+    # transformations, NEVER stored columns here.  Plot grain aligns with
+    # crop_production / plot_inputs (join on (t, i, plot)).  Variable layout
+    # differs by questionnaire generation: IHS3/IHPS-2013 (2010-11, 2013-14)
+    # use the ag_d47{a,c,e}/d48 hired layout + ag_d4{2,3,4}{b/c,f/g,j/k,n/o}
+    # family slots; IHS4/IHS5 (2016-17, 2019-20) use ag_d47{a1,a2,a3}/d48
+    # hired + ag_d4{2,3,4}{b}{n}*{c}{n} family.  The IHS4/IHS5
+    # Cross_Sectional halves drop the "other" (ag_d52*/ag_d54*) columns, so
+    # those halves carry no `other` rows (reported, not faked).  2004-05
+    # (IHS2) is DEFERRED (household-level aggregated ag file, no plot-labor
+    # roster).  See _/malawi.py:_plot_labor_block / assemble_plot_labor.
+    index: (t, i, plot, source)
+    PersonDays: float
+    Wage: float
+    materialize: make
+  people_last7days:
+    # Item-level (t, i, pid) 7-day individual time-use feature for the four
+    # IHS3+/IHPS waves (2010-11, 2013-14, 2016-17, 2019-20); GAP 3
+    # (individual grain).  Mirrors Uganda's people_last7days at the
+    # per-individual grain GAP_RANKING.org specifies (Uganda's existing
+    # feature is an HH-level Men/Women/Boys/Girls count; the parity target is
+    # the per-individual activity record).  Source: the household labor
+    # module (hh_mod_e) -- the SAME module the World Bank cleaning code
+    # (MWI_IHPS{1-4}.do labor block) reads to build the farm_work/SOB_work/
+    # wage_work dummies, hours, six ind_* industry one-hots, and working_age.
+    # We keep the per-individual REPORTED record:
+    #   farm_work  -- worked on HH agric/livestock/fishing in last 7 days
+    #   SOB_work   -- helped/ran a non-farm HH business in last 7 days
+    #   wage_work  -- worked for a wage/salary OR ganyu in last 7 days
+    #   farm_hrs   -- hours on HH agric (+livestock/fishing where split)
+    #   SB_hrs     -- hours on the non-farm HH business
+    #   wage_hrs   -- hours of wage work + ganyu (the WB wage_hrs sum)
+    #   wage_industry -- main wage-job industry on the harmonize_industry
+    #                 Preferred Labels (Agriculture/Fishing/Mining/
+    #                 Manufacturing/Construction/Services/Other), binned from
+    #                 hh_e20b by the WB numeric ranges; NaN where no wage job.
+    #                 Replaces the six WB ind_* dummies (a per-industry dummy
+    #                 is then a trivial transformation).
+    #   working_age -- the WB working_age flag (hh_e02 != "X" in IHS3/
+    #                 IHPS-2013; roster age hh_b05a >= 5 in IHS4/IHS5).
+    # Variable names differ by questionnaire generation (legacy hh_e07 single
+    # farm col vs modern hh_e07a/b/c + roster-derived working_age); see
+    # _/malawi.py:_people_last7days_block.  Grain is individual (t, i, pid),
+    # aligned with household_roster's (i, pid); v auto-joins from sample() at
+    # API time.  2004-05 (IHS2) is DEFERRED (its labor module predates the
+    # 7-day activity battery).  See _/malawi.py:assemble_people_last7days.
+    index: (t, i, pid)
+    farm_work: bool
+    SOB_work: bool
+    wage_work: bool
+    farm_hrs: float
+    SB_hrs: float
+    wage_hrs: float
+    wage_industry: str
+    working_age: bool
+    materialize: make
   food_expenditures:
   food_prices:
