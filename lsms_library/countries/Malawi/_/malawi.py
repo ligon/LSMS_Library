@@ -625,15 +625,30 @@ def plot_features_for_wave(t, df_c, df_d, colmap):
             soil_type  — soil-type code column in df_d (ag_d21)
             water_source — water-source code column in df_d (ag_d28a)
             acquire    — tenure/acquire code column in df_d (ag_d03);
-                         omit (or absent) -> Tenure NaN (2016-17/2019-20)
+                         omit (or absent) -> Tenure / PlotOwned NaN
+                         (2016-17/2019-20)
+            fallow     — cultivation-status code column in df_d (ag_d14);
+                         omit (or absent) -> Fallow NaN
+            erosion    — 1st erosion-control facility code column in df_d
+                         (ag_d25a); omit (or absent) -> ErosionProtection NaN
 
     Returns
     -------
     pd.DataFrame indexed by ``(t, i, plot_id)`` with columns
-        ``Area`` (hectares, float), ``AreaUnit`` (str, always 'acres'),
-        ``Tenure`` (str), ``TenureSystem`` (str), ``SoilType`` (str),
-        and ``Irrigated`` (nullable bool).  Latitude / Longitude are
-        deferred (Malawi plot GPS is offset / redacted; GH #167).
+        ``Area`` (hectares, float — GPS-preferred), ``AreaUnit`` (str,
+        always 'acres'), ``AreaSelfReported`` (hectares, float — the
+        farmer-estimate area, NOT GPS-overridden, the WB
+        ``area_self_reported``), ``Tenure`` (str), ``TenureSystem`` (str),
+        ``PlotOwned`` (nullable bool — the WB ``plot_owned``, acquire codes
+        1-5 = owned, 6-11 = not owned, from the same ag_d03 that drives
+        Tenure; NaN where acquire is absent), ``SoilType`` (str),
+        ``Irrigated`` (nullable bool), ``Fallow`` (nullable bool — the WB
+        per-plot fallow flag, ag_d14 == 4 "Fallow"; the WB nb_fallow_plots
+        is a count transform over this), and ``ErosionProtection``
+        (nullable bool — the WB ``erosion_protection``, ag_d25a != 1
+        i.e. any facility other than "No erosion control").  Latitude /
+        Longitude are deferred (Malawi plot GPS is offset / redacted;
+        GH #167).
     """
     c = colmap
 
@@ -644,7 +659,9 @@ def plot_features_for_wave(t, df_c, df_d, colmap):
         d_cols = ['hhid', 'plotkey'] + [
             df_d_col for df_d_col in (c.get('soil_type'),
                                       c.get('water_source'),
-                                      c.get('acquire'))
+                                      c.get('acquire'),
+                                      c.get('fallow'),
+                                      c.get('erosion'))
             if df_d_col and df_d_col in df_d.columns]
         df = df.merge(df_d[d_cols].drop_duplicates(['hhid', 'plotkey']),
                       on=['hhid', 'plotkey'], how='left')
@@ -666,6 +683,11 @@ def plot_features_for_wave(t, df_c, df_d, colmap):
         gps_acres = gps_acres.where((gps_acres <= 2500) | gps_acres.isna(), pd.NA)
         area_ha = gps_acres * ACRES_TO_HECTARES
 
+    # AreaSelfReported: the farmer-estimate area in hectares, kept as its
+    # OWN column (the WB ``area_self_reported``), distinct from the
+    # GPS-preferred ``Area`` above.  Reported item attribute, never
+    # GPS-overridden.
+    est_ha = pd.Series(pd.NA, index=df.index, dtype='Float64')
     est_col = c.get('area_est')
     unit_col = c.get('area_unit')
     if est_col and est_col in df.columns:
@@ -674,13 +696,15 @@ def plot_features_for_wave(t, df_c, df_d, colmap):
                 if unit_col and unit_col in df.columns
                 else pd.Series(pd.NA, index=df.index, dtype='Int64'))
         # acre -> ha, hectare -> ha, sq metre -> ha; OTHER (4) / 0 -> NaN
-        est_ha = pd.Series(pd.NA, index=df.index, dtype='Float64')
         est_ha = est_ha.where(unit != 1, est * ACRES_TO_HECTARES)
         est_ha = est_ha.where(unit != 2, est)
         est_ha = est_ha.where(unit != 3, est / 10000.0)
         # Clamp implausible estimates too (>1000 ha)
         est_ha = est_ha.where((est_ha <= 1000) | est_ha.isna(), pd.NA)
+        # GPS-preferred Area falls back to the self-reported estimate.
         area_ha = area_ha.where(area_ha.notna(), est_ha)
+
+    area_self_reported = est_ha
 
     area_unit = pd.Series(['acres'] * n, index=df.index, dtype='string')
     area_unit = area_unit.where(area_ha.notna(), pd.NA)
@@ -701,10 +725,14 @@ def plot_features_for_wave(t, df_c, df_d, colmap):
         irrigated = (wcode != 7).astype('boolean')
         irrigated = irrigated.where(wcode.notna(), pd.NA)
 
-    # Tenure / TenureSystem from the acquire code (ag_d03), present in
-    # 2010-11 & 2013-14 only.  Absent -> all NaN (2016-17 / 2019-20).
+    # Tenure / TenureSystem / PlotOwned from the acquire code (ag_d03),
+    # present in 2010-11 & 2013-14 only.  Absent -> all NaN (2016-17 /
+    # 2019-20: the WB derives plot_owned from the Module B2 parcel-tenure
+    # roster there, a different grain -- left NaN here rather than joined,
+    # matching how Tenure already behaves for those waves).
     tenure = pd.Series(pd.NA, index=df.index, dtype='string')
     tenure_system = pd.Series(pd.NA, index=df.index, dtype='string')
+    plot_owned = pd.Series(pd.NA, index=df.index, dtype='boolean')
     acq_col = c.get('acquire')
     if acq_col and acq_col in df.columns:
         acode = pd.to_numeric(df[acq_col], errors='coerce').astype('Int64')
@@ -712,17 +740,52 @@ def plot_features_for_wave(t, df_c, df_d, colmap):
         # Leasehold acquire code (6) -> TenureSystem 'leasehold'.
         tenure_system = pd.Series(pd.NA, index=df.index, dtype='string')
         tenure_system = tenure_system.where(acode != 6, 'leasehold')
+        # PlotOwned: the WB plot_owned recode of ag_d03 -- codes 1-5
+        # (granted / inherited / bride price / purchased with or without
+        # title) = owned; 6-11 (leasehold / rent / tenant / borrowed /
+        # squatter / other) = not owned.  NaN where the acquire code is
+        # itself missing.
+        plot_owned = ((acode >= 1) & (acode <= 5)).astype('boolean')
+        plot_owned = plot_owned.where(acode.notna(), pd.NA)
+
+    # Fallow: the WB per-plot fallow flag -- cultivation-status code
+    # ag_d14 == 4 ("Fallow").  Any other recorded status (cultivated,
+    # rented/given out, forest, pasture, other) = not fallow; NaN where
+    # the status is unrecorded.  The WB nb_fallow_plots is a count
+    # transform over this item flag (NOT stored here).
+    fallow = pd.Series(pd.NA, index=df.index, dtype='boolean')
+    fallow_col = c.get('fallow')
+    if fallow_col and fallow_col in df.columns:
+        fcode = pd.to_numeric(df[fallow_col], errors='coerce').astype('Int64')
+        fallow = (fcode == 4).astype('boolean')
+        fallow = fallow.where(fcode.notna(), pd.NA)
+
+    # ErosionProtection: the WB erosion_protection recode of the 1st
+    # erosion-control facility code ag_d25a -- code 1 = "No erosion
+    # control" -> False; any other recorded facility (terraces, bunds,
+    # gabions, vetiver, tree belts, drainage, ...) -> True.  NaN where
+    # unrecorded.
+    erosion_protection = pd.Series(pd.NA, index=df.index, dtype='boolean')
+    ero_col = c.get('erosion')
+    if ero_col and ero_col in df.columns:
+        ecode = pd.to_numeric(df[ero_col], errors='coerce').astype('Int64')
+        erosion_protection = (ecode != 1).astype('boolean')
+        erosion_protection = erosion_protection.where(ecode.notna(), pd.NA)
 
     out = pd.DataFrame({
-        't':            t,
-        'i':            idx_i.values,
-        'plot_id':      plot_id.values,
-        'Area':         area_ha.values,
-        'AreaUnit':     area_unit.values,
-        'Tenure':       tenure.values,
-        'TenureSystem': tenure_system.values,
-        'SoilType':     soil_type.values,
-        'Irrigated':    irrigated.values,
+        't':                t,
+        'i':                idx_i.values,
+        'plot_id':          plot_id.values,
+        'Area':             area_ha.values,
+        'AreaUnit':         area_unit.values,
+        'AreaSelfReported': area_self_reported.values,
+        'Tenure':           tenure.values,
+        'TenureSystem':     tenure_system.values,
+        'PlotOwned':        plot_owned.values,
+        'SoilType':         soil_type.values,
+        'Irrigated':        irrigated.values,
+        'Fallow':           fallow.values,
+        'ErosionProtection': erosion_protection.values,
     })
     # Collapse any duplicate (hhid, plotkey) area rows defensively
     # (Module C should be one row per plot; first-wins keeps it unique).

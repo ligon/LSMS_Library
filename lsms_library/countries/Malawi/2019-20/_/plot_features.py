@@ -35,7 +35,11 @@ colmap = dict(
     area_gps     = 'ag_c04c',
     soil_type    = 'ag_d21',
     water_source = 'ag_d28a',
-    # acquire omitted: ag_d03 absent in IHS5 -> Tenure NaN.
+    fallow       = 'ag_d14',
+    erosion      = 'ag_d25a',
+    # acquire omitted: ag_d03 absent in IHS5 -> Tenure / PlotOwned NaN
+    # (the WB derives plot_owned from the Module B2 parcel roster here,
+    # a different grain; left NaN rather than cross-grain joined).
 )
 
 pieces = []
