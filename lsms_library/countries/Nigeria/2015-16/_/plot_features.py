@@ -2,7 +2,9 @@
 
 Post-planting only -> single t = 2015Q3.  Area (sect11a1) joined onto
 plot detail (sect11b1) on (hhid, plotid).  W3 acquire scheme has 6 codes
-(adds family inheritance = 5, sharecropped = 6).
+(adds family inheritance = 5, sharecropped = 6).  Erosion protection
+(s11b1q49) first appears this wave.  PlotSlope from the plot-geovariables
+file (srtmslp_nga, degrees), joined on (hhid, plotid).
 """
 import sys
 
@@ -16,6 +18,8 @@ area = get_dataframe('../Data/sect11a1_plantingw3.dta',
                      convert_categoricals=False)
 detail = get_dataframe('../Data/sect11b1_plantingw3.dta',
                        convert_categoricals=False)
+geovar = get_dataframe('../Data/nga_plotgeovariables_y3.csv',
+                       convert_categoricals=False)
 
 colmap = dict(
     hhid='hhid', plot_id='plotid',
@@ -23,9 +27,13 @@ colmap = dict(
     acquire='s11b1q4',          # tenure
     soil_type='s11b1q44',
     irrigated='s11b1q39',
+    certificate='s11b1q7',      # land-ownership certificate
+    erosion='s11b1q49',         # erosion-protection measure
+    fallow='s11b1q28',          # main-use code 1 = fallow
+    slope='srtmslp_nga',
 )
 
-df = plot_features_for_wave(t, area, detail, colmap)
+df = plot_features_for_wave(t, area, detail, colmap, geovar=geovar)
 
 assert df.index.is_unique, "Non-unique (t, i, plot_id) in plot_features 2015-16"
 assert len(df) > 0, "plot_features 2015-16 produced no rows"

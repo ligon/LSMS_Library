@@ -973,7 +973,7 @@ def _map_codes(series, code_map):
     return out.astype('string').where(out.notna(), pd.NA)
 
 
-def plot_features_for_wave(t, area, detail, colmap):
+def plot_features_for_wave(t, area, detail, colmap, geovar=None):
     """Build canonical ``plot_features`` for one Nigeria GHS-Panel wave.
 
     Nigeria is a post-planting / post-harvest survey; lasting plot
@@ -1001,16 +1001,33 @@ def plot_features_for_wave(t, area, detail, colmap):
             tenure_system                  (in `detail`; W5 only)
             soil_type                      (in `detail`; W2+ only)
             irrigated                      (in `detail`; W2+ only)
+            certificate                    (in `detail`; W2+ -> PlotCertificate)
+            erosion                        (in `detail`; W3+ -> ErosionProtection)
+            fallow                         (in `detail`; -> Fallow, code 1=fallow)
+            fallow_cultivated              (in `detail`; W1 only override:
+                                            value 1 forces Fallow=False)
+            slope                          (in `geovar`; -> PlotSlope, degrees)
         Omitted / absent columns yield NaN for the corresponding output.
+    geovar : pd.DataFrame | None
+        Raw plot-geovariables frame (``nga_plotgeovariables_y*``), loaded
+        with ``get_dataframe(..., convert_categoricals=False)``, joined on
+        (hhid, plotid) to attach ``PlotSlope`` (``srtmslp_nga``).  Absent
+        in W5 (no plot-geovariables file released) -> PlotSlope NaN.
 
     Returns
     -------
     pd.DataFrame indexed by ``(t, i, plot_id)`` with columns
         ``Area`` (hectares float), ``AreaUnit`` (native unit label),
-        ``Tenure``, ``TenureSystem``, ``SoilType`` (str) and
-        ``Irrigated`` (nullable boolean).  Latitude / Longitude are
+        ``Tenure``, ``TenureSystem``, ``SoilType`` (str),
+        ``Irrigated`` (nullable boolean), ``PlotCertificate`` (nullable
+        boolean: holds a land-ownership certificate), ``ErosionProtection``
+        (nullable boolean: erosion-control measure present), ``Fallow``
+        (nullable boolean: plot left fallow this season) and ``PlotSlope``
+        (float, SRTM-derived slope in degrees).  Latitude / Longitude are
         deferred (Nigeria has no decimal-degree parcel coordinates;
-        only GPS area in m^2).
+        only GPS area in m^2).  ``PlotCertificate`` / ``ErosionProtection``
+        / ``Fallow`` are the *reported* per-plot item flags; the HH-level
+        ``nb_fallow_plots`` count is a downstream transform, never stored.
     """
     c = colmap
     wave_label = wave_folder_map.get(t, t)   # PP quarter -> 'YYYY-YY'
@@ -1064,6 +1081,17 @@ def plot_features_for_wave(t, area, detail, colmap):
     soil_type = pd.Series(pd.NA, index=a.index, dtype='string')
     irrigated = pd.Series(pd.NA, index=a.index, dtype='boolean')
 
+    def _yes_no_bool(series):
+        """Map a 1=Yes / 2=No reported flag to nullable boolean.
+
+        Anything else (3 = "don't know", sentinels, missing) -> NA.
+        """
+        num = pd.to_numeric(series, errors='coerce')
+        out = pd.Series(pd.NA, index=series.index, dtype='boolean')
+        out = out.where(~(num == 1), True)
+        out = out.where(~(num == 2), False)
+        return out
+
     if detail is not None and not detail.empty:
         d = detail.copy()
         d_hh = d[c['hhid']].apply(format_id)
@@ -1088,19 +1116,64 @@ def plot_features_for_wave(t, area, detail, colmap):
             irr_bool = irr_bool.where(~(irr == 2), False)
             det['Irrigated'] = irr_bool.values
 
+        # PlotCertificate: holds a land-ownership certificate (s11b1q7 /
+        # s11b1q8).  1 = Yes, 2 = No, 3 ("don't know") -> NA.
+        if c.get('certificate') in d.columns:
+            det['PlotCertificate'] = _yes_no_bool(d[c['certificate']]).values
+
+        # ErosionProtection: erosion-control measure on the plot (s11b1q49 /
+        # s11b1q66).  1 = Yes, 2 = No.
+        if c.get('erosion') in d.columns:
+            det['ErosionProtection'] = _yes_no_bool(d[c['erosion']]).values
+
+        # Fallow: plot left fallow this season.  Reported as a per-plot
+        # item flag with code 1 = fallow (s11bq17 "left fallow" in W1;
+        # s11b1q28 / s11b1q44 main-use code 1 in W2-W5).  Anything else
+        # observed -> not fallow; missing -> NA.  In W1 a separate
+        # "cultivated this plot?" question (s11bq16, value 1 = yes) takes
+        # precedence and forces Fallow = False, matching the WB .do logic
+        # (`replace fallow_plot = 0 if s11bq16 == 1`).
+        if c.get('fallow') in d.columns:
+            fal = pd.to_numeric(d[c['fallow']], errors='coerce')
+            fal_bool = pd.Series(pd.NA, index=d.index, dtype='boolean')
+            fal_bool = fal_bool.where(fal.isna(), False)   # observed -> False
+            fal_bool = fal_bool.where(~(fal == 1), True)    # code 1 -> fallow
+            if c.get('fallow_cultivated') in d.columns:
+                cult = pd.to_numeric(d[c['fallow_cultivated']],
+                                     errors='coerce')
+                fal_bool = fal_bool.where(~(cult == 1), False)
+            det['Fallow'] = fal_bool.values
+
         # Detail is unique on (i, plot_id); drop dup detail rows defensively.
         det = det.drop_duplicates(subset=['i', 'plot_id'])
         pieces = pieces.merge(det, on=['i', 'plot_id'], how='left')
 
+    # --- PlotSlope from plot-geovariables (joined on (hhid, plotid)) ---
+    if (geovar is not None and not geovar.empty
+            and c.get('slope') in geovar.columns):
+        g = geovar.copy()
+        g_hh = g[c['hhid']].apply(format_id)
+        g_plot = g[c['plot_id']].apply(format_id)
+        slope = pd.to_numeric(g[c['slope']], errors='coerce').astype('Float64')
+        gv = pd.DataFrame({'i': g_hh.values, 'plot_id': g_plot.values,
+                           'PlotSlope': slope.values})
+        gv = gv.drop_duplicates(subset=['i', 'plot_id'])
+        pieces = pieces.merge(gv, on=['i', 'plot_id'], how='left')
+
     # Ensure all canonical columns exist.
     for col, dtype in (('Tenure', 'string'), ('TenureSystem', 'string'),
-                       ('SoilType', 'string'), ('Irrigated', 'boolean')):
+                       ('SoilType', 'string'), ('Irrigated', 'boolean'),
+                       ('PlotCertificate', 'boolean'),
+                       ('ErosionProtection', 'boolean'),
+                       ('Fallow', 'boolean'), ('PlotSlope', 'Float64')):
         if col not in pieces.columns:
             pieces[col] = pd.Series(pd.NA, index=pieces.index, dtype=dtype)
 
     pieces['t'] = t
     pieces = pieces[['t', 'i', 'plot_id', 'Area', 'AreaUnit', 'Tenure',
-                     'TenureSystem', 'SoilType', 'Irrigated']]
+                     'TenureSystem', 'SoilType', 'Irrigated',
+                     'PlotCertificate', 'ErosionProtection', 'Fallow',
+                     'PlotSlope']]
     pieces = pieces.set_index(['t', 'i', 'plot_id'])
     return pieces
 

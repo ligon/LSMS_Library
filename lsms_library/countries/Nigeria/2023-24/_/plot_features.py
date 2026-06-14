@@ -9,6 +9,10 @@ field 10).  GPS area is s11mq3.  Tenure acquire is s11b1q4 (9 codes);
 the separate tenure-SYSTEM question s11b1q4b appears ONLY in W5.
 Soil = s11b1q61, irrigation = s11b1q56.  Beware: s11b1q39 here is
 "right to bequeath" and s11b1q44 is "main use" -- NOT soil/irrigation.
+Land certificate is s11b1q8 (was s11b1q7 in W2-W4); erosion protection
+is s11b1q66 (was s11b1q49); Fallow reads the main-use question s11b1q44
+(code 1 = fallow).  No plot-geovariables file was released for W5, so
+PlotSlope is NaN this wave.
 """
 import sys
 
@@ -30,6 +34,10 @@ colmap = dict(
     tenure_system='s11b1q4b',   # W5 only
     soil_type='s11b1q61',       # NOT s11b1q44 (= main use in W5)
     irrigated='s11b1q56',       # NOT s11b1q39 (= right to bequeath in W5)
+    certificate='s11b1q8',      # land-ownership certificate (renumbered)
+    erosion='s11b1q66',         # erosion-protection measure (renumbered)
+    fallow='s11b1q44',          # main-use code 1 = fallow
+    # no plot-geovariables file for W5 -> PlotSlope NaN
 )
 
 df = plot_features_for_wave(t, area, detail, colmap)
