@@ -595,6 +595,29 @@ def _map_int_codes(series, code_map):
     return out.astype('string').where(out.notna(), pd.NA)
 
 
+def _yesno_bool_col(df, col, yes, no):
+    """Recode a reported numeric Yes/No code column to nullable boolean.
+
+    ``yes`` / ``no`` are the integer codes for True / False in this wave's
+    questionnaire (they flip between waves for some ESS items).  Codes that
+    are neither (incl. NaN / "don't know") stay ``pd.NA``.  Returns an
+    all-NA ``boolean`` Series indexed like ``df`` when ``col`` is absent.
+
+    Unlike the broader ``_yesno_bool`` (which collapses unrecognized codes to
+    False), this preserves ``pd.NA`` for unanswered rows -- so the plot
+    attribute distinguishes "reported No" from "not asked".  The
+    ``.fillna(False)`` on each condition is what keeps a <NA> code from being
+    masked to True/False (``Series.mask`` treats a <NA> condition as masking).
+    """
+    if not col or col not in df.columns:
+        return pd.Series(pd.NA, index=df.index, dtype='boolean')
+    code = pd.to_numeric(df[col], errors='coerce').astype('Int64')
+    out = pd.Series(pd.NA, index=df.index, dtype='boolean')
+    out = out.mask((code == yes).fillna(False), True)
+    out = out.mask((code == no).fillna(False), False)
+    return out
+
+
 def plot_features_for_wave(t, sect2, sect3, colmap):
     """Build canonical ``plot_features`` for one Ethiopia ESS wave.
 
@@ -621,14 +644,26 @@ def plot_features_for_wave(t, sect2, sect3, colmap):
             area_unit  — sect3 farmer-estimate area-unit code column.
             acquire    — sect2 "how acquired" code column (-> Tenure).
         Optional keys (NaN where omitted / not asked):
-            soil_type  — sect2 soil-type code column (absent in W1).
+            soil_type   — sect2 soil-type code column (absent in W1).
+            certificate — sect2 "parcel has a certificate?" code column
+                          (1=Yes/2=No: pp_s2q04 W1-W3, s2q03 W4-W5).
+            fallow      — sect3 field land-status code column (status
+                          code 3 == Fallow: pp_s3q03 W1-W3, s3q03 W4-W5).
+            erosion     — sect3 "erosion-control structure?" code column
+                          (pp_s3q32 W1-W3, s3q38 W4-W5).
+            erosion_yes / erosion_no — the wave's Yes / No integer codes
+                          for ``erosion`` (default 1 / 2; W1-W3 flip to
+                          2 / 1).
 
     Returns
     -------
     pd.DataFrame indexed by ``(t, i, plot_id)`` with columns
         ``Area`` (hectares, float), ``AreaUnit`` (str), ``Tenure`` (str),
         ``TenureSystem`` (str, always NaN — ESS has no analogue),
-        ``SoilType`` (str), ``Irrigated`` (nullable bool).  GPS
+        ``SoilType`` (str), ``Irrigated`` (nullable bool), ``Fallow``
+        (nullable bool, field land-status == Fallow), ``ErosionProtection``
+        (nullable bool, reported erosion-control structure), ``Certificate``
+        (nullable bool, parcel has a land-use certificate).  GPS
         Latitude / Longitude are NOT emitted (source 100% redacted).
     """
     c = colmap
@@ -649,7 +684,15 @@ def plot_features_for_wave(t, sect2, sect3, colmap):
     else:
         parcel['_SoilType'] = pd.Series(pd.NA, index=parcel.index, dtype='string')
 
-    parcel_attrs = (parcel[key + ['_Tenure', '_SoilType']]
+    # Certificate: reported parcel-level question "does this parcel have a
+    # certificate?" (pp_s2q04 W1-W3, s2q03 W4-W5), coded 1=Yes / 2=No in
+    # every wave.  REPORTED value only -- we do NOT apply the WB's
+    # acquire-based override (cert:=0 for rented/borrowed/sharecropped),
+    # which is an imputation, not the surveyed answer.
+    parcel['_Certificate'] = _yesno_bool_col(parcel, c.get('certificate'),
+                                             yes=1, no=2)
+
+    parcel_attrs = (parcel[key + ['_Tenure', '_SoilType', '_Certificate']]
                     .drop_duplicates(subset=key))
 
     # --- Field-level rows (sect3) ---
@@ -675,6 +718,28 @@ def plot_features_for_wave(t, sect2, sect3, colmap):
     irrigated = irrigated.mask(irr == 1, True)
     irrigated = irrigated.mask(irr == 2, False)
 
+    # Fallow: reported field-level land-status question (pp_s3q03 W1-W3,
+    # s3q03 W4-W5); status code 3 == "Fallow" in every wave.  True for the
+    # fallow status, False for any other reported status, NA if unanswered.
+    fal = pd.to_numeric(field.get(c.get('fallow')), errors='coerce').astype('Int64') \
+        if c.get('fallow') and c['fallow'] in field.columns \
+        else pd.Series(pd.NA, index=field.index, dtype='Int64')
+    # True iff status == 3 (Fallow), False for any other reported status,
+    # NA where the status was not recorded.  (Note: a comparison against a
+    # masked Int64 yields <NA> for missing codes, and Series.mask treats a
+    # <NA> condition as "mask" -- so guard each mask with .fillna(False).)
+    fallow = pd.Series(pd.NA, index=field.index, dtype='boolean')
+    fallow = fallow.mask(fal.notna(), False)
+    fallow = fallow.mask((fal == 3).fillna(False), True)
+
+    # ErosionProtection: reported field-level question "is there an erosion-
+    # control structure on this field?" (pp_s3q32 W1-W3 coded 2=Yes/1=No;
+    # s3q38 W4-W5 coded 1=Yes/2=No -- the Yes code flips, so the wave script
+    # passes the wave's yes/no codes via the colmap).
+    erosion = _yesno_bool_col(field, c.get('erosion'),
+                              yes=c.get('erosion_yes', 1),
+                              no=c.get('erosion_no', 2))
+
     # Join parcel attributes onto field rows (LEFT, on the holder-aware key).
     field = field.merge(parcel_attrs, on=key, how='left')
 
@@ -684,15 +749,18 @@ def plot_features_for_wave(t, sect2, sect3, colmap):
                + field[c['field_id']].apply(format_id).astype(str))
 
     out = pd.DataFrame({
-        't':            t,
-        'i':            hh.values,
-        'plot_id':      plot_id.values,
-        'Area':         area_ha.values,
-        'AreaUnit':     area_unit.values,
-        'Tenure':       field['_Tenure'].astype('string').values,
-        'TenureSystem': pd.Series(pd.NA, index=field.index, dtype='string').values,
-        'SoilType':     field['_SoilType'].astype('string').values,
-        'Irrigated':    irrigated.values,
+        't':                 t,
+        'i':                 hh.values,
+        'plot_id':           plot_id.values,
+        'Area':              area_ha.values,
+        'AreaUnit':          area_unit.values,
+        'Tenure':            field['_Tenure'].astype('string').values,
+        'TenureSystem':      pd.Series(pd.NA, index=field.index, dtype='string').values,
+        'SoilType':          field['_SoilType'].astype('string').values,
+        'Irrigated':         irrigated.values,
+        'Fallow':            fallow.values,
+        'ErosionProtection': erosion.values,
+        'Certificate':       field['_Certificate'].astype('boolean').values,
     })
     out = out.dropna(subset=['i', 'plot_id'])
     out = out.set_index(['t', 'i', 'plot_id'])

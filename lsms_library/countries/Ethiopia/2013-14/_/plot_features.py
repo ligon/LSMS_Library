@@ -33,6 +33,10 @@ colmap = dict(
     acquire    = 'pp_s2q03',
     soil_type  = 'pp_s2q14',
     irrigated  = 'pp_s3q12',
+    certificate= 'pp_s2q04',     # 1 Yes / 2 No
+    fallow     = 'pp_s3q03',     # field land-status (code 3 == Fallow)
+    erosion    = 'pp_s3q32',     # erosion-control structure?
+    erosion_yes= 2, erosion_no = 1,   # W1-W3 code 2=Yes / 1=No
 )
 
 df = plot_features_for_wave('2013-14', sect2, sect3, colmap)

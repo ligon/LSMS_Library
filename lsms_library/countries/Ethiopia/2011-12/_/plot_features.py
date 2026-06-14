@@ -33,6 +33,10 @@ colmap = dict(
     area_unit  = 'pp_s3q02_c',   # farmer-estimate area unit code
     acquire    = 'pp_s2q03',     # how the parcel was acquired -> Tenure
     irrigated  = 'pp_s3q12',     # 1 Yes / 2 No
+    certificate= 'pp_s2q04',     # parcel has a certificate? 1 Yes / 2 No
+    fallow     = 'pp_s3q03',     # field land-status (code 3 == Fallow)
+    erosion    = 'pp_s3q32',     # erosion-control structure?
+    erosion_yes= 2, erosion_no = 1,   # W1-W3 code 2=Yes / 1=No
     # soil_type: not asked in W1 -> SoilType NaN
 )
 

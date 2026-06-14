@@ -483,6 +483,41 @@ It is declared =optional: true= in =data_scheme.yml= so the all-null
 sanity check exempts it while the canonical column stays declared for
 cross-country alignment.
 
+** Reported item attributes (WB Plot_dataset parity, GAP 6)
+
+Three additional REPORTED Yes/No plot attributes, added at the existing
+=(t, i, plot_id)= grain (row count UNCHANGED at 132694).  All are
+surveyed questions carried verbatim -- nullable =boolean=, with =pd.NA=
+preserved for fields/parcels where the question was not answered (so
+"reported No" is distinguishable from "not asked"):
+  - =Fallow=  : field land-status == "Fallow".  Field-level, =sect3=
+    status code 3 (=pp_s3q03= W1-W3, =s3q03= W4-W5); other reported
+    statuses -> False.
+  - =ErosionProtection= : field has an erosion-control structure.
+    Field-level (=pp_s3q32= W1-W3, =s3q38= W4-W5).  The Yes code FLIPS:
+    W1-W3 code 2 = Yes / 1 = No, W4-W5 code 1 = Yes / 2 = No -- each
+    wave script passes its =erosion_yes= / =erosion_no= via the colmap.
+  - =Certificate= : parcel has a land-use certificate.  Parcel-level
+    (=pp_s2q04= W1-W3, =s2q03= W4-W5; 1 = Yes / 2 = No), broadcast onto
+    the parcel's fields like Tenure / SoilType.  We carry the REPORTED
+    answer only -- NOT the WB's acquire-based override (cert := 0 for
+    rented/borrowed/sharecropped), which is an imputation.
+
+NOT added (deliberately, per the item-level-reported rule):
+  - WB =plot_owned= -- a binary recode of the SAME acquire variable we
+    already carry as =Tenure= (derivable as Tenure in {communal,
+    inherited, owned}); a transform, not an independent question.
+  - WB =plot_slope=, =plot_dist_household=, =elevation=, the
+    soil-quality tags (=nutrient_availability= etc.),
+    =agro_ecological_zone= -- SRTM / HC27 / GAEZ raster joins keyed on
+    EA coordinates, NOT survey-reported plot attributes.
+  - WB =fallow= column is absent for Ethiopia in their panel (they keep
+    only the HH-level count =nb_fallow_plots=, a transform); we recover
+    the item-level reported flag the survey records per field.
+  - WB =farm_size=, =nb_plots=, =nb_fallow_plots=, =soil_fertility_index=
+    -- aggregations / counts / PCA over these item columns; belong in
+    =transformations.py=, not the data layer.
+
 ** Files
 
   - =Ethiopia/_/ethiopia.py:plot_features_for_wave= -- shared helper.
