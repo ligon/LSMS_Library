@@ -1104,3 +1104,157 @@ def plot_features_for_wave(t, area, detail, colmap):
     pieces = pieces.set_index(['t', 'i', 'plot_id'])
     return pieces
 
+
+# ---------------------------------------------------------------------
+# anthropometry (GAP 5) -- item-level reported body measures
+# ---------------------------------------------------------------------
+#
+# Natural grain (t, i, pid): one row per measured individual, carrying the
+# REPORTED body measures the GHS-Panel anthropometry module collects --
+# Weight (kg) and Height (cm) -- plus the individual's Sex and reported Age
+# (years) so the row is self-describing for the downstream WHO-2006 z-score
+# transform.  Source: the post-harvest anthropometry section
+# (sect4a_harvest{wN} W1-W4; sect4b_harvest{w5} W5).  The WB code
+# (NGA_GHS1.do:1296-1308) reads these same weight/height vars, merges sex +
+# age from the roster, calls `zscore06` to produce haz06/waz06/whz06/bmiz06
+# and a `wasting` flag, then keeps only the z-scores.  We keep ONLY the raw
+# reported measures: the z-scores are a TRANSFORM (they require the WHO-2006
+# reference population and child age-in-months), computed at query time,
+# never stored.
+#
+# `Age_months` is NOT stored: the survey records reported age in YEARS; the
+# WB derives age-in-months as (harvest-interview-month - birth-month), a
+# transform.  The z-score helper derives months from Age + interview_date.
+# MUAC (mid-upper-arm circumference) is NOT recorded in any Nigeria GHS wave
+# -> no MUAC column.
+#
+# Anthropometry is collected in the post-harvest round only, so each wave
+# maps to a single t = PH_QUARTER[wave] (2011Q1 / 2013Q1 / 2016Q1 / 2019Q1 /
+# 2024Q1), matching the post-harvest slice of household_roster.  The
+# individual key aligns exactly with household_roster: i = format_id(hhid),
+# pid = str(int(indiv)) (verified 100% (i, pid) overlap on measured rows).
+#
+# Per-wave weight/height column map (verified against the .dta):
+#   W1 2010-11  sect4a_harvestw1  Weight=s4aq52        Height=s4aq53
+#   W2 2012-13  sect4a_harvestw2  Weight=s4aq52        Height=s4aq53
+#   W3 2015-16  sect4a_harvestw3  Weight=s4aq52        Height=s4aq53
+#   W4 2018-19  sect4a_harvestw4  Weight=median(s4aq52_1..3)  Height=median(s4aq53_1..3)
+#   W5 2023-24  sect4b_harvestw5  Weight=median(s4bq8a..c)    Height=median(s4bq12a..c)
+# W4/W5 took three readings per measure; the WB uses their row median
+# (egen rowmedian) -- we mirror that (a measurement-error reduction, not an
+# aggregation that crosses the item grain).
+
+
+def _to_pid(indiv_series):
+    """indiv -> canonical pid string ('1'), matching household_roster's pid
+    (raw indiv as string).  NA where indiv is missing."""
+    num = pd.to_numeric(indiv_series, errors='coerce').astype('Int64')
+    return num.astype('string').where(num.notna(), pd.NA)
+
+
+def _norm_sex(sex_series):
+    """Normalize the GHS roster sex variable (s1q2) to canonical 'M' / 'F'.
+
+    Emit the canonical Sex values directly (M / F), matching what
+    household_roster surfaces at API time.  The Sex canonical-spelling map
+    in data_info.yml is registered under household_roster only, so it is
+    NOT applied to anthropometry by _enforce_canonical_spellings; emitting
+    M / F here keeps anthropometry's Sex consistent with the roster without
+    touching the shared data_info.yml.
+
+    Read with convert_categoricals=False the column is the numeric code
+    1 (male) / 2 (female), stable across all five waves; read with labels
+    it is 'male' / 'MALE' / '1. MALE' etc.  Handle both: numeric 1/2 ->
+    M/F; otherwise strip any 'n. NAME' prefix, titlecase, and map the
+    leading letter.  Returns a 'string'-dtype Series, NA where unresolved."""
+    num = pd.to_numeric(sex_series, errors='coerce')
+    if num.notna().any():
+        return num.map({1: 'M', 2: 'F'}).astype('string')
+    label = (sex_series.astype('string')
+             .str.split('. ').str[-1]
+             .str.strip().str.title())
+    return label.map({'Male': 'M', 'Female': 'F'}).astype('string')
+
+
+def anthropometry_for_wave(t, anthro, roster, weight_cols, height_cols,
+                           hhid='hhid', indiv='indiv', sex_col='s1q2',
+                           age_col='s1q4'):
+    """Assemble item-level anthropometry for one Nigeria GHS-Panel PH wave.
+
+    Parameters
+    ----------
+    t : str
+        PH-quarter wave id (e.g. '2011Q1'), used as the `t` index.
+    anthro : DataFrame
+        Raw post-harvest anthropometry section (convert_categoricals as the
+        caller chose), one row per (household, individual).
+    roster : DataFrame or None
+        Raw post-harvest roster section (sect1_harvest{wN}) supplying Sex +
+        reported Age, merged on (hhid, indiv).  None -> Sex/Age all-NA.
+    weight_cols, height_cols : list of str
+        One or more reported weight / height columns.  A single column is
+        used as-is; multiple columns are reduced by their row median (the
+        W4/W5 three-reading case, mirroring the WB egen rowmedian).
+    hhid, indiv : str
+        ID columns in `anthro` (and `roster`).
+    sex_col, age_col : str
+        Sex / reported-age columns in `roster`.
+
+    Returns
+    -------
+    DataFrame indexed by (t, i, pid) with columns
+    [Weight, Height, Sex, Age].  Keeps a row only where at least one of
+    Weight / Height is reported (the module enumerates every household
+    member; only measured members carry a body measure).  Stores REPORTED
+    fields only -- no z-scores, no wasting/stunting (transforms).
+    """
+    def _median(df, cols):
+        present = [c for c in cols if c in df.columns]
+        if not present:
+            return pd.Series(np.nan, index=df.index)
+        block = df[present].apply(pd.to_numeric, errors='coerce')
+        # Row median across the (up to three) readings; NaN where all NaN.
+        return block.median(axis=1, skipna=True)
+
+    i = anthro[hhid].apply(format_id)
+    pid = _to_pid(anthro[indiv])
+    weight = _median(anthro, weight_cols)
+    height = _median(anthro, height_cols)
+
+    piece = pd.DataFrame({
+        'i': i.values,
+        'pid': pid.values,
+        'Weight': pd.to_numeric(weight, errors='coerce').astype('Float64').values,
+        'Height': pd.to_numeric(height, errors='coerce').astype('Float64').values,
+    }, index=anthro.index)
+
+    # Merge Sex + reported Age from the roster on (i, pid).
+    if roster is not None and sex_col in roster.columns:
+        ri = roster[hhid].apply(format_id)
+        rpid = _to_pid(roster[indiv])
+        ros = pd.DataFrame({'i': ri.values, 'pid': rpid.values})
+        ros['Sex'] = _norm_sex(roster[sex_col]).values
+        if age_col in roster.columns:
+            ros['Age'] = pd.to_numeric(roster[age_col],
+                                       errors='coerce').astype('Float64').values
+        else:
+            ros['Age'] = pd.Series(pd.NA, index=roster.index, dtype='Float64').values
+        ros = ros.dropna(subset=['i', 'pid']).drop_duplicates(subset=['i', 'pid'])
+        piece = piece.merge(ros, on=['i', 'pid'], how='left')
+    else:
+        piece['Sex'] = pd.Series(pd.NA, index=piece.index, dtype='string')
+        piece['Age'] = pd.Series(pd.NA, index=piece.index, dtype='Float64')
+
+    piece['t'] = t
+
+    # Keep measured individuals only: at least one of Weight / Height
+    # reported, and a resolvable individual key.
+    measured = piece['Weight'].notna() | piece['Height'].notna()
+    keep = measured & piece['i'].notna() & piece['pid'].notna()
+    out = piece[keep].copy()
+
+    # Defensive dedup on the index grain (a member should appear once).
+    out = out.drop_duplicates(subset=['t', 'i', 'pid'], keep='first')
+    out = out.set_index(['t', 'i', 'pid']).sort_index()
+    return out[['Weight', 'Height', 'Sex', 'Age']]
+

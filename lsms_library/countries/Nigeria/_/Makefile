@@ -165,6 +165,12 @@ $(VAR_DIR)/food_coping.parquet: food_coping.py $(food_coping_parquet)
 ../%/_/individual_education.parquet: ../%/_/individual_education.py
 	(cd $(@D) && python individual_education.py)
 
+# anthropometry (GAP 5).  Single country-level script reads each wave's
+# post-harvest anthropometry section (sect4a/sect4b_harvest) + roster
+# (sect1_harvest, for Sex/Age) and concatenates to var/anthropometry.parquet.
+$(VAR_DIR)/anthropometry.parquet: anthropometry.py
+	python anthropometry.py
+
 ../2010-11/_/housing.parquet: ../2010-11/_/housing.py
 	(cd ../2010-11/_; python housing.py)
 
