@@ -45,12 +45,12 @@
 | Panier                       | Panier          | ---     | x       | x       |
 | Paquet                       | Paquet          | x       | x       | x       |
 | Piece                        | Piece           | ---     | x       | x       |
-| Sac (25 Kg)                  | 25 Kg           | ---     | x       | ---     |
+| Sac (25 Kg)                  | Sac (25 Kg)     | ---     | x       | ---     |
 | Sans os au Kg                | Kg              | ---     | x       | x       |
 | Sans os au tas               | Tas             | ---     | x       | x       |
-| Seau (10 Kg)                 | 10 Kg           | ---     | x       | x       |
-| Seau (25 Kg)                 | 25 Kg           | ---     | x       | ---     |
-| Seau (5 Kg )                 | 5 Kg            | ---     | x       | x       |
+| Seau (10 Kg)                 | Seau (10 Kg)    | ---     | x       | x       |
+| Seau (25 Kg)                 | Seau (25 Kg)    | ---     | x       | ---     |
+| Seau (5 Kg )                 | Seau (5 Kg)     | ---     | x       | x       |
 | Tas                          | Tas             | x       | x       | x       |
 | Tranche                      | Tranche         | ---     | x       | x       |
 | boite                        | Boite           | ---     | x       | x       |
