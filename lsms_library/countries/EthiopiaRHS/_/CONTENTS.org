@@ -56,22 +56,27 @@ coordinate with AAU Economics (contact historically Stefan Dercon).
 The Dataverse archive mixes several naming conventions across rounds.
 Confirmed core files:
 
-| Wave  | Roster / demographics       | Food consumption        |
-|-------+-----------------------------+-------------------------|
-| 1989  | demog89_1, demog89_2        | cons89, food89          |
-| 1994a | demo123 (pooled R1--R3)     | food1                   |
-| 1994b | demo123 (pooled R1--R3)     | food2                   |
-| 1995  | demo123 (pooled R1--R3)     | food3                   |
-| 1997  | demo4, age_sex_r4           | food4                   |
-| 1999  | TBD (village-split: deb/din/har/sid/wol demo4 ...) | TBD |
-| 2004  | TBD                         | TBD (consumptionaggregates_123456?) |
-| 2009  | TBD                         | consumptionAggrgates_r7 |
+| Wave  | Roster / demographics       | Food / aggregates                                |
+|-------+-----------------------------+--------------------------------------------------|
+| 1989  | demog89_1, demog89_2        | food89; assets: 7x asset{ars,deb,...}.tab        |
+| 1994a | demo123 (pooled R1--R3)     | food1; plot_features: land1all.tab               |
+| 1994b | demo123 (pooled R1--R3)     | food2                                            |
+| 1995  | demo123 (pooled R1--R3)     | food3                                            |
+| 1997  | demo4, age_sex_r4           | food4                                            |
+| 1999  | roster.tab                  | livestock: 7x *lvs5.tab; income: 4x *inc5.tab    |
+| 2004  | (no roster -- aggregates)   | consumption/livestock: *6 slice of consumption/  |
+|       |                             | livestockaggregates_123456; area_output_04rev    |
+| 2009  | (no roster -- aggregates)   | consumptionAggrgates_r7; hhsize_round7;          |
+|       |                             | livestock_agg_round7; erhs7_meher_area_output... |
 
-=demo123= and =food1/2/3= cover rounds 1--3; =demo123= is pooled
-(round column -> wave split likely needs a =_/=-script per the
-multi-round pattern; to be confirmed on inspection).  Later rounds
-appear to have village-level split files (=debdemo4=, =dindemo4=,
-=hardemo4=, =siddemo4=, =woldemo4=, ...) -- structure TBD.
+=demo123= and =food1/2/3= cover rounds 1--3; =demo123= is pooled but the
+round-suffixed columns let each wave's =data_info.yml= slice its round (no
+=_/=-script needed -- pure YAML).  1999 (R5) has a single person =roster.tab=.
+2004 (R6) / 2009 (R7) ship NO person roster and NO item-level food in the
+IFPRI archive -- only pre-aggregated HH-level scalars -- so they are wired as
+bespoke HH-level (t,i) aggregate waves (consumption, livestock, area_output,
+and 2009-only hhsize); the *6-suffixed columns of the pooled R1-R6 aggregate
+files are the R6 slice.
 
 * Open Questions (from GH #271)
 
@@ -86,7 +91,9 @@ appear to have village-level split files (=debdemo4=, =dindemo4=,
 * Status
 
 - [X] Country scaffold (dirs, =data_scheme.yml=, this file, per-wave
-  =SOURCE.org= for auto-discovery)
+  =SOURCE.org= for provenance).  The wave set is the EXPLICIT =waves=
+  list in =_/ethiopiarhs.py= (authoritative; consumed by
+  =Country.waves=), NOT auto-discovery: all 8 rounds 1989-2009.
 - [X] Wave 1994a acquired + wired (roster, food_acquired) -- code-based
   template, commit 36818510
 - [X] Waves 1994b / 1995 / 1997 wired (scatter-gather; roster + food
@@ -100,35 +107,61 @@ appear to have village-level split files (=debdemo4=, =dindemo4=,
   roster exists (=demog89_2= is a 203-row HH summary), so 1989
   =food_expenditures= is meaningful only for the ~279 shared HH; two
   single-row =relnhhed= data errors (codes 11, 36) mapped to NA.
-- [ ] Waves 1999 / 2004 / 2009: *NOT WIREABLE for roster/food.* The
-  IFPRI Dataverse archive has NO person roster and NO item-level food
-  for R5/R6/R7 -- only pre-aggregated household consumption scalars
-  (=consumptionaggregates_123456.tab= cols =*5=/=*6=;
-  =consumptionAggrgates_r7.tab= for 2009).  =household_roster= /
-  =food_acquired= cannot be built without violating the library's
-  item-level principle.  Decision (2026-06-05, supersedes 2026-05-18):
-  *drop 1999/2004/2009 from* =Country.waves= via an explicit
-  =waves= list in =_/ethiopiarhs.py= (rather than leaving them
-  auto-discovered-but-unwired).  Auto-discovery made them appear in
-  =waves= while =sample()= could not cover them, failing
-  =test_covers_all_waves[EthiopiaRHS]=.  The =Documentation/= dirs are
-  retained on disk for provenance; the pre-aggregated consumption is
-  out of scope for GH #271 (would be a separate non-canonical table).
+- [X] Wave 1999 (R5) wired (2026-06-07/2026-06-13).  The IFPRI archive
+  DOES contain an R5 person =roster.tab= (10,788 person-rows), so
+  =household_roster= is wired (CODE-PATH, converted_categoricals: False,
+  consistent with 1994a/b/1995/1997: q1c numeric 1..20, sex 1/2 ->
+  erhs_sex, reltn3 1..16 -> erhs_relation -- the 16-code taxonomy verified
+  label-for-label against the file's own value labels).  =sample= +
+  =cluster_features= are wired off the same roster (v = q1c); the bespoke
+  (t,i) =livestock= (7x *lvs5.tab) and =income= (4x *inc5.tab) come from
+  the R5 modules.  *Earlier label-path was wrong*: under
+  convert_categoricals=True q1c is the village NAME, which neither keyed
+  the numeric erhs_village_* Code tables (Region/Woreda all-NaN) nor
+  matched the other waves' numeric q1c (roster v failed to join, all-NaN);
+  the code-path fixes both.
+- [X] Waves 2004 (R6) / 2009 (R7) promoted as bespoke (t,i) aggregate
+  waves (2026-06-13, supersedes the 2026-06-05 "NOT WIREABLE" decision).
+  R6/R7 have NO person roster and NO item-level food in the IFPRI archive
+  -- only pre-aggregated HH-level scalars -- so they do NOT fake a roster/
+  food_acquired.  Instead they wire the documented HH-level value-table
+  pattern (cf. assets/livestock/income): =consumption= (the *6 slice of
+  consumptionaggregates_123456.tab, R6-population = cons6 non-null = 1368
+  HH; consumptionAggrgates_r7.tab, 1357 HH), =livestock= (livval6/lsu6;
+  lvs_val7/tlu7), =area_output= (HH x crop area+production), and 2009-only
+  =hhsize=.  =sample= + =cluster_features= are derived from the
+  consumption-aggregate file's paid/pa (= peasant-association code 1..20)
+  + the erhs_village_* Code tables -- so =sample()= covers all 8 waves and
+  =test_covers_all_waves[EthiopiaRHS]= is green.  i = composite
+  (paid|pa, hhid) via the shared ethiopiarhs.i formatter (hhid not unique
+  within a wave).  aeu* is all-NaN in the R6 source -> no AEU column.
+  The bespoke (t,i) tables get a framework-joined v (same keyspace as the
+  panel) and so carry the allowed index_levels_match_scheme warn; making
+  consumption/hhsize/area_output fully v-free (t,i) like assets/livestock/
+  income would need a one-line _no_v_join addition in country.py (framework
+  code) -- left as a maintainer follow-up, not required for green.
 - [X] Auto-derived =household_characteristics= / =food_expenditures= /
   =food_quantities= build across the 5 wired waves (1989 + four
   1990s); zero kinship warnings.  Validation against survey
   documentation still TODO.
-- [X] =sample= (all 5 waves) + =cluster_features= (4 1994+ waves)
-  wired.  =cluster_features= carries NAMED =Region= (Tigray /
+- [X] =sample= (all 8 waves) + =cluster_features= (7 waves: 1994a/b,
+  1995, 1997, 1999, 2004, 2009 -- all but 1989) wired.
+  =cluster_features= carries NAMED =Region= (Tigray /
   Amhara / Oromia / SNNP, via =erhs_village_region=, grounded in the
   Dercon-Hoddinott data description now archived at
   =<wave>/Documentation/Overview...pdf= and corroborated by in-data
   =q1b=) and NAMED =Woreda= (=erhs_village_woreda=, straight from
   in-data =q1b= labels; 15 woredas, D.B. sub-sites -> Basso na
   Worana).  Both =market='Region'= and =market='Woreda'= return the
-  =m=-indexed view with real names.  1989 has =sample= (cluster
-  v==site=) but NO =cluster_features= (=demog89_1= lacks q1b/q1a; no
-  authoritative named geography in-data -> 1989 drops from market
+  =m=-indexed view with real names.  For 2004/2009 the geography is keyed
+  on the aggregate file's numeric =paid=/=pa= (= the same 1..20 PA code as
+  =q1c=) through the SAME =erhs_village_*= Code tables, so Region/Woreda
+  spellings stay consistent across all waves (the 2009 file also carries
+  in-data region/woreda columns, but their woreda spellings drift --
+  'Tsibi Wonberat' vs 'Atsbi' -- so the Code tables are used to avoid
+  splitting a village's Woreda label across waves).  1989 has =sample=
+  (cluster v==site=) but NO =cluster_features= (=demog89_1= lacks q1b/q1a;
+  no authoritative named geography in-data -> 1989 drops from market
   views; cross-era reconciliation a documented follow-up;
   =erhs_site_region_1989= retained but unused).  *Weights:* ERHS is a PURPOSIVE 15-village panel with no
   survey *design* weights, so =weight=/=panel_weight= are set to a
@@ -165,7 +198,11 @@ appear to have village-level split files (=debdemo4=, =dindemo4=,
   in the source survey itself (cannot be named without external
   food-code documentation; first-pass reconciliation, refinements a
   follow-up like Uganda's evolving table).  Sex strays (1989 codes
-  0/6) -> NA via =erhs_sex=.
+  0/6) -> NA via =erhs_sex=.  (=_/bellemare_etal13.yml= is an
+  unreferenced provenance stub -- the Bellemare-etal13 (2013) label
+  scheme it documents already lives as the =Bellemare-etal13 Label=
+  column of =harmonize_food=; the YAML is retained for provenance only,
+  load-bearing of nothing.)
 - [X] Unit harmonization + kg conversion: =harmonize_unit= (single
   Code table -- ERHS unit codes are stable across 1994+).  Metric
   codes -> framework-recognized tokens (1->=kg=,
@@ -203,16 +240,25 @@ appear to have village-level split files (=debdemo4=, =dindemo4=,
   residual = HH dropped by the roster's NA-Sex round filter -- those
   edges simply link nothing).  id_walk fires with no roster
   regression.
-- [ ] Follow-ups: *income* -- deferred entirely (per #273 review):
-  the larger project of handling ERHS income from different sources
-  (1989 =ethyrev= =totinc= AND reconstructing the 1994+ panel total
-  from raw R1-R7 crop-sale/livestock/wage/transfer modules) is a
-  separate future effort -- see #277; refine =harmonize_food= residual (unlabelled source
-  codes) + variant split/merge; 1989 named geography + 1989
-  metric-unit distinction (Codeunit1.SPS); cross-era 1989-vs-1994+
-  region reconciliation; sourcing constructed ERHS weights; optional
-  validation of inferred kg factors vs ERHS =conv_*.tab=; validation
-  of derived tables vs survey docs.
+- [X] =income= wired for 1999 (R5): bespoke (t,i) HH-level income
+  totals + major-source subtotals from the 4 village =*inc5.tab= files
+  (ars/deb/din/sid; gam/har/wol have no R5 inc5).  The 2004 income file
+  (=gaminc6.tab=, Gara Godo only, ~102 HH, 1 PA) is intentionally
+  DEFERRED -- a single-village trap with no cross-PA coverage.
+- [ ] Follow-ups: the broader income-reconstruction project (1989
+  =ethyrev= =totinc= AND rebuilding the 1994+ panel total from raw
+  R1-R7 crop-sale/livestock/wage/transfer modules) remains a separate
+  future effort -- see #277.  Optional: add =consumption=/=hhsize=/
+  =area_output= to =country.py= =_no_v_join= so they are fully v-free
+  (t,i) like assets/livestock/income (currently they carry a
+  framework-joined v + the allowed index_levels_match_scheme warn).
+  Refine =harmonize_food= residual (unlabelled source codes) + variant
+  split/merge; 1989 named geography + 1989 metric-unit distinction
+  (Codeunit1.SPS); cross-era 1989-vs-1994+ region reconciliation;
+  sourcing constructed ERHS weights; optional validation of inferred kg
+  factors vs ERHS =conv_*.tab=; validation of derived tables vs docs;
+  R6/R7 area_output PAs 21-23 (extra Debre-Birhan sub-sites not in the
+  erhs_village_* Code tables -> NaN Region/Woreda/v).
 
 * Food security (non-FIES families, GH #332) --- not wired
 
