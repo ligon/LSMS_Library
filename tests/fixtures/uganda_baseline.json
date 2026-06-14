@@ -67,11 +67,11 @@
   },
   "2005-06/_/interview_date.parquet": {
     "columns": [
-      "date"
+      "Int_t"
     ],
     "content_hash": "74c6bdba442651cf4aef26d338f6b69123d83c5228d871f7577c78af9831623d",
     "dtypes": {
-      "date": "datetime64[us]"
+      "Int_t": "datetime64[us]"
     },
     "index_names": [
       "j",
@@ -102,9 +102,9 @@
       "AffectedIncome": "float64",
       "AffectedProduction": "float64",
       "Duration": "float64",
-      "HowCoped0": "object",
-      "HowCoped1": "object",
-      "HowCoped2": "object",
+      "HowCoped0": "str",
+      "HowCoped1": "str",
+      "HowCoped2": "str",
       "Onset": "float64",
       "Year": "float64"
     },
@@ -186,11 +186,11 @@
   },
   "2009-10/_/interview_date.parquet": {
     "columns": [
-      "date"
+      "Int_t"
     ],
     "content_hash": "129f3f1d69eb639afac4e94fe36490e8705af5a824a48c42a32c69f6a1ef8061",
     "dtypes": {
-      "date": "datetime64[us]"
+      "Int_t": "datetime64[us]"
     },
     "index_names": [
       "j",
@@ -305,11 +305,11 @@
   },
   "2010-11/_/interview_date.parquet": {
     "columns": [
-      "date"
+      "Int_t"
     ],
     "content_hash": "9de8b45ca42ecbda0d5ca7979407ae03c7942d966bd4c6a54bcc38a569af03ca",
     "dtypes": {
-      "date": "datetime64[us]"
+      "Int_t": "datetime64[us]"
     },
     "index_names": [
       "j",
@@ -424,11 +424,11 @@
   },
   "2011-12/_/interview_date.parquet": {
     "columns": [
-      "date"
+      "Int_t"
     ],
     "content_hash": "0d8b25cc6e9fe530c02cf69a42a8df409a1c3a352a07a3ebbc6379b2c065b722",
     "dtypes": {
-      "date": "datetime64[us]"
+      "Int_t": "datetime64[us]"
     },
     "index_names": [
       "j",
@@ -543,11 +543,11 @@
   },
   "2013-14/_/interview_date.parquet": {
     "columns": [
-      "date"
+      "Int_t"
     ],
     "content_hash": "d211e3d4ce558199f69d2202c8da8e38880141a361ae84a74a79cb900488fc53",
     "dtypes": {
-      "date": "datetime64[us]"
+      "Int_t": "datetime64[us]"
     },
     "index_names": [
       "j",
@@ -662,11 +662,11 @@
   },
   "2015-16/_/interview_date.parquet": {
     "columns": [
-      "date"
+      "Int_t"
     ],
     "content_hash": "5b548b5731f30008220185de11bf6203ee9f64df5cd93dc9875126a993c694e4",
     "dtypes": {
-      "date": "datetime64[us]"
+      "Int_t": "datetime64[us]"
     },
     "index_names": [
       "j",
@@ -781,11 +781,11 @@
   },
   "2018-19/_/interview_date.parquet": {
     "columns": [
-      "date"
+      "Int_t"
     ],
     "content_hash": "3253f8884dc0560b05679ee0cd022026e83205b0d1fed74e748eb239d204c81b",
     "dtypes": {
-      "date": "datetime64[us]"
+      "Int_t": "datetime64[us]"
     },
     "index_names": [
       "j",
@@ -900,11 +900,11 @@
   },
   "2019-20/_/interview_date.parquet": {
     "columns": [
-      "date"
+      "Int_t"
     ],
     "content_hash": "e4378281a5f351bef2fe154ee67e00f8c57fdf848aedcee16ade6d261a317907",
     "dtypes": {
-      "date": "datetime64[us]"
+      "Int_t": "datetime64[us]"
     },
     "index_names": [
       "j",
@@ -959,11 +959,11 @@
       "Region",
       "Rural"
     ],
-    "content_hash": "1d6fcaba9606ce0d00ee340a0cb141475e2a05d67db9e654692bbfdfb852a982",
+    "content_hash": "fd9f5655ab2ee408840c499061bc1639f7d73fa9b1c09daed4c0e31d8c9f78fa",
     "dtypes": {
       "District": "str",
-      "Latitude": "float32",
-      "Longitude": "float32",
+      "Latitude": "float64",
+      "Longitude": "float64",
       "Region": "string",
       "Rural": "string"
     },
@@ -1348,11 +1348,11 @@
   },
   "var/interview_date.parquet": {
     "columns": [
-      "date"
+      "Int_t"
     ],
     "content_hash": "f60e9b7fd205ecbf352d6f7d1e978867e6790d9719d1b21010cb318f9f9f5166",
     "dtypes": {
-      "date": "datetime64[us]"
+      "Int_t": "datetime64[us]"
     },
     "index_names": [
       "i",
@@ -1381,7 +1381,7 @@
       "Vitamin C",
       "Zinc"
     ],
-    "content_hash": "7575d77349c031fcd72ec80613eb62eea5ce9426dc72af47e7663b87fd4d10e8",
+    "content_hash": "fc85fc2e2046f3c034d77b1b56da52dbafb9f38bd24f6f63331846677b6eee44",
     "dtypes": {
       "Calcium": "float64",
       "Carbohydrate": "float64",
@@ -1471,17 +1471,17 @@
       "Onset",
       "Year"
     ],
-    "content_hash": "b011252b14589f6339de4151baebbaa9365cd2c033eb685c6b0e4888a4cc0623",
+    "content_hash": "53c53cb3645f4bfbf5d56ae33e6140258aaa2f8b3d84cd40e2d039761a96b4f1",
     "dtypes": {
-      "AffectedAssets": "boolean",
-      "AffectedConsumption": "boolean",
-      "AffectedIncome": "boolean",
-      "AffectedProduction": "boolean",
+      "AffectedAssets": "string",
+      "AffectedConsumption": "string",
+      "AffectedIncome": "string",
+      "AffectedProduction": "string",
       "Duration": "float64",
-      "HowCoped0": "object",
-      "HowCoped1": "object",
-      "HowCoped2": "object",
-      "Onset": "Int64",
+      "HowCoped0": "str",
+      "HowCoped1": "str",
+      "HowCoped2": "str",
+      "Onset": "Float64",
       "Year": "Float64"
     },
     "index_names": [
