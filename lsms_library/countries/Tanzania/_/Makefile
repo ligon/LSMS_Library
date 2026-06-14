@@ -93,6 +93,15 @@ $(VAR_DIR)/livestock.parquet: livestock.py $(livestock_parquet)
 ../%/_/livestock.parquet:
 	(cd $(@D) && python livestock.py)
 
+anthropometry = $(shell find $(rounds) -name anthropometry.py)
+anthropometry_parquet := $(anthropometry:.py=.parquet)
+
+$(VAR_DIR)/anthropometry.parquet: anthropometry.py $(anthropometry_parquet)
+	python anthropometry.py
+
+../%/_/anthropometry.parquet:
+	(cd $(@D) && python anthropometry.py)
+
 %.parquet: %.py CONTENTS.org tanzania.py
 	(cd $(@D) && python ./$(<F))
 

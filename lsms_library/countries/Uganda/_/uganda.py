@@ -1720,3 +1720,163 @@ LIVESTOCK_COLMAPS = {
               'headcount': 's6cq03a', 'acquired': 's6cq13a', 'sold': 's6cq14a', 'value': 's6cq14b'},
     },
 }
+
+
+def _anthro_num(series, length):
+    """Coerce an anthropometry measure column to Float64, treating
+    non-positive sentinels (0 / negatives) as missing.
+
+    Uganda's GSEC6 anthropometry records 0.0 in the height columns where
+    a child was measured on the OTHER height instrument (lying vs.
+    standing), and the WB cleaning code (UGA_UNPS{1..8}.do) treats those
+    as ``.`` before feeding ``zscore06``.  Weight/height/MUAC are strictly
+    positive physical quantities, so a 0 or negative reading is an absent
+    or invalid measurement, not a real value.
+    """
+    if series is None:
+        return pd.Series([pd.NA] * length, dtype='Float64')
+    v = pd.to_numeric(series, errors='coerce')
+    v = v.where(v > 0, other=pd.NA)
+    return v.astype('Float64')
+
+
+def anthropometry_for_wave(t, df, colmap):
+    """Build the canonical ``anthropometry`` table for one Uganda UNPS wave.
+
+    Item-level, individual-grain ``(t, i, pid)``.  Carries ONLY the
+    REPORTED body measures the GSEC6 anthropometry module records:
+
+        Weight     — kg            (q27 / q27a / s6q27a)
+        Height     — cm            (lying-down q28a/s6q28a2 preferred,
+                                    falling back to standing q28b/s6q28b2,
+                                    matching the WB ``gen height = ...;
+                                    replace height = ...b if height==.``)
+        MUAC       — mid-upper-arm circumference, cm  (NaN for Uganda —
+                     no UNPS wave records arm circumference; the column is
+                     declared for cross-country schema parity only)
+        Age_months — child age in months as recorded by the survey
+                     (q04 / q4; <NA> in 2018-19 / 2019-20, which dropped
+                     the in-module age-in-months question — the WB code
+                     sets ``age_months=.`` for those waves and derives the
+                     child age from the roster instead)
+
+    NO z-scores (haz06/waz06/whz06/bmiz06), NO wasting/stunting: those are
+    WHO-2006 reference-population TRANSFORMS computed at query time, never
+    stored.  Sex is NOT carried here — the GSEC6 module records only the
+    caregiver's relationship, not the child's sex; the child's ``Sex``
+    (and integer ``Age``) join from ``household_roster`` on the shared
+    ``(t, i, pid)`` key.
+
+    Parameters
+    ----------
+    t : str
+        Wave id (e.g. ``"2009-10"``).
+    df : pd.DataFrame
+        Raw GSEC6 anthropometry module for the wave.
+    colmap : dict
+        Column map with keys ``hhid``, ``pid``, ``weight``,
+        ``height_lying``, ``height_standing``, ``age_months`` (any of the
+        measure keys may be ``None`` when the wave lacks that column).
+
+    Returns
+    -------
+    pd.DataFrame indexed ``(t, i, pid)`` with Float64 columns
+        ``Weight``, ``Height``, ``MUAC``, ``Age_months``.  One row per
+        measured individual: a roster line is kept only when AT LEAST ONE
+        of Weight / Height is reported (the module pre-lists every child,
+        and rows with no measurement at all are empty placeholders).
+    """
+    n = len(df)
+    hh = df[colmap['hhid']].apply(format_id)
+    pid = df[colmap['pid']].apply(format_id)
+
+    weight = _anthro_num(df.get(colmap.get('weight')), n)
+
+    lying = _anthro_num(df.get(colmap.get('height_lying')), n)
+    standing = _anthro_num(df.get(colmap.get('height_standing')), n)
+    # Lying-down length is recorded for the youngest children; standing
+    # height for older ones.  Prefer whichever is present (lying first,
+    # mirroring the WB ``gen height = ...a; replace = ...b if height==.``).
+    height = lying.where(lying.notna(), standing)
+
+    muac = _anthro_num(df.get(colmap.get('muac')), n)
+
+    age_months = _anthro_num(df.get(colmap.get('age_months')), n)
+
+    out = pd.DataFrame({
+        't':          t,
+        'i':          hh.values,
+        'pid':        pid.values,
+        'Weight':     weight.values,
+        'Height':     height.values,
+        'MUAC':       muac.values,
+        'Age_months': age_months.values,
+    })
+
+    # Keep only rows that carry at least one body measure.
+    has_measure = out['Weight'].notna() | out['Height'].notna() | out['MUAC'].notna()
+    out = out[has_measure]
+
+    # Drop rows missing an id (cannot key into the roster).
+    out = out[out['i'].notna() & out['pid'].notna()]
+
+    # A roster may list a child twice (e.g. re-measured); keep the row with
+    # the most non-null measures so the (t, i, pid) index is unique.
+    out['_nn'] = out[['Weight', 'Height', 'MUAC', 'Age_months']].notna().sum(axis=1)
+    out = (out.sort_values('_nn', ascending=False)
+              .drop_duplicates(['t', 'i', 'pid'])
+              .drop(columns='_nn'))
+
+    out = out.set_index(['t', 'i', 'pid'])
+    for c in ['Weight', 'Height', 'MUAC', 'Age_months']:
+        out[c] = pd.to_numeric(out[c], errors='coerce').astype('Float64')
+    return out
+
+
+# Per-wave column maps for anthropometry_for_wave.  Source files / variable
+# names from the GSEC6 anthropometry module, confirmed against the actual
+# .dta via get_dataframe (Stata is case-insensitive but pandas is not, so
+# the casing below is the real on-disk casing, NOT the WB .do casing):
+#   2009-10  GSEC6.dta      weight h6q27   height h6q28a/b   age h6q04
+#   2010-11  GSEC6.dta      weight h6q27   height h6q28a/b   age h6q4
+#   2011-12  GSEC6A.dta     weight h6q27   height h6q28a/b   age h6q4
+#   2013-14  GSEC6_1.dta    weight h6q27a  height h6q28a/b   age h6q4
+#   2015-16  gsec6_1.dta    weight h6q27a  height h6q28a/b   age h6q4
+#   2018-19  GSEC6_5.dta    weight s6q27a  height s6q28a2/b2 (no in-module age)
+#   2019-20  HH/gsec6_5.dta weight s6q27a  height s6q28a2/b2 (no in-module age)
+# No UNPS wave records MUAC (arm circumference); 'muac' is therefore None
+# everywhere and Uganda's MUAC column is NaN throughout.
+ANTHRO_COLMAPS = {
+    '2009-10': {'hhid': 'HHID', 'pid': 'PID', 'weight': 'h6q27',
+                'height_lying': 'h6q28a', 'height_standing': 'h6q28b',
+                'muac': None, 'age_months': 'h6q04'},
+    '2010-11': {'hhid': 'HHID', 'pid': 'PID', 'weight': 'h6q27',
+                'height_lying': 'h6q28a', 'height_standing': 'h6q28b',
+                'muac': None, 'age_months': 'h6q4'},
+    '2011-12': {'hhid': 'HHID', 'pid': 'PID', 'weight': 'h6q27',
+                'height_lying': 'h6q28a', 'height_standing': 'h6q28b',
+                'muac': None, 'age_months': 'h6q4'},
+    '2013-14': {'hhid': 'HHID', 'pid': 'PID', 'weight': 'h6q27a',
+                'height_lying': 'h6q28a', 'height_standing': 'h6q28b',
+                'muac': None, 'age_months': 'h6q4'},
+    '2015-16': {'hhid': 'hhid', 'pid': 'pid', 'weight': 'h6q27a',
+                'height_lying': 'h6q28a', 'height_standing': 'h6q28b',
+                'muac': None, 'age_months': 'h6q4'},
+    '2018-19': {'hhid': 'hhid', 'pid': 'PID', 'weight': 's6q27a',
+                'height_lying': 's6q28a2', 'height_standing': 's6q28b2',
+                'muac': None, 'age_months': None},
+    '2019-20': {'hhid': 'hhid', 'pid': 'pid', 'weight': 's6q27a',
+                'height_lying': 's6q28a2', 'height_standing': 's6q28b2',
+                'muac': None, 'age_months': None},
+}
+
+# Per-wave anthropometry source file (relative to the wave's _/ dir).
+ANTHRO_FILES = {
+    '2009-10': '../Data/GSEC6.dta',
+    '2010-11': '../Data/GSEC6.dta',
+    '2011-12': '../Data/GSEC6A.dta',
+    '2013-14': '../Data/GSEC6_1.dta',
+    '2015-16': '../Data/gsec6_1.dta',
+    '2018-19': '../Data/GSEC6_5.dta',
+    '2019-20': '../Data/HH/gsec6_5.dta',
+}

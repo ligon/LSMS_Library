@@ -1613,3 +1613,154 @@ def assemble_livestock(t, pieces):
     out = grp.set_index(['t', 'i', 'animal'])
     assert out.index.is_unique, f"Non-unique (t,i,animal) in livestock {t}"
     return out
+
+
+# --- anthropometry (GAP 5) ------------------------------------------------
+# Item-level (t, i, pid) body-measurement feature for the four IHS3+/IHPS
+# waves.  Source: Module V (hh_mod_v) of the household questionnaire -- the
+# SAME module the World Bank cleaning code reads then collapses to
+# WHO-2006 z-scores (MWI_IHPS{1-4}.do:1213-1231:
+#   gen weight = hh_v08
+#   gen height = hh_v09
+#   gen cage   = age*12 ; replace cage = hh_b05b if age==.
+#   zscore06 ... -> haz06/waz06/whz06/bmiz06).
+# We keep the RAW reported measures (Weight kg = hh_v08, Height cm = hh_v09)
+# plus the child Age_months and Sex the z-score transform needs to be
+# self-describing.  The z-scores / wasting / stunting are TRANSFORMS (they
+# require the WHO-2006 reference population), computed at query time, NEVER
+# stored here.  Module V records no MUAC (mid-upper-arm circumference) in
+# any IHS/IHPS wave, so Malawi anthropometry carries no MUAC column -- we
+# store only the columns the source actually records.
+#
+# Age_months reproduces the .do `cage`: years-of-age (hh_b05a) x 12, falling
+# back to the infant months-of-age (hh_b05b) where years is missing -- both
+# read from the roster (Module B), joined on the wave's native HH+person
+# id keys.  Sex is the roster's hh_b03 (Female/Male), normalised to F/M.
+
+
+_SEX_TO_FM = {
+    'female': 'F', 'f': 'F', '2': 'F',
+    'male':   'M', 'm': 'M', '1': 'M',
+}
+
+
+def _norm_sex(x):
+    """Roster hh_b03 label -> canonical 'F'/'M' (NaN otherwise)."""
+    if pd.isna(x):
+        return pd.NA
+    return _SEX_TO_FM.get(str(x).strip().lower(), pd.NA)
+
+
+def _age_months(years, months):
+    """Reproduce the .do `cage`: age-in-years*12, else infant months-of-age.
+
+    ``years`` = roster hh_b05a (whole years); ``months`` = roster hh_b05b
+    (months-of-age for under-1s).  Returns months as a float, NaN if both
+    are missing.
+    """
+    if pd.notna(years):
+        return float(years) * 12.0
+    if pd.notna(months):
+        return float(months)
+    return np.nan
+
+
+def _anthropometry_block(health, roster, *, t,
+                         hh_id_health, pid_health,
+                         hh_id_roster, pid_roster,
+                         weight='hh_v08', height='hh_v09',
+                         i_prefix=None):
+    """Build one wave-half's reported (i, pid) anthropometry block.
+
+    Parameters
+    ----------
+    health, roster : pd.DataFrame
+        Raw Module V (anthropometry) and Module B (roster) frames for the
+        SAME sample half (Cross_Sectional or Panel), read via get_dataframe
+        with convert_categoricals=True.
+    t : str -- wave id, used as the ``t`` index value.
+    hh_id_health, pid_health : str
+        HH-id and person-id column names in ``health``.
+    hh_id_roster, pid_roster : str
+        HH-id and person-id column names in ``roster`` -- these MUST resolve
+        to the SAME (i, pid) the framework's household_roster feature emits
+        (so anthropometry's grain aligns with household_roster).  Age/Sex
+        are joined from the roster on (hh_id, pid).
+    weight, height : str -- Module V measurement columns (default hh_v08/09).
+    i_prefix : str | None
+        Prepended to the formatted HH id (e.g. 'cs-17-' for the
+        Cross_Sectional half of IHS4/IHS5), reproducing the roster
+        feature's ``cs_i`` mapping so anthropometry's ``i`` aligns with
+        household_roster.  The Age/Sex roster join happens on the *raw*
+        formatted ids (the roster half is read with the matching prefix
+        applied too, so the join is internally consistent), then the
+        prefix is applied to the emitted ``i``.
+
+    Returns
+    -------
+    pd.DataFrame with columns [i, pid, Weight, Height, Age_months, Sex]
+    (Sex/Age from the roster join).  No MUAC column: Module V records no
+    mid-upper-arm circumference in any IHS/IHPS wave.  Index reset; the
+    caller concatenates halves and sets the index.
+    """
+    pre = (lambda s: (i_prefix + s)) if i_prefix else (lambda s: s)
+
+    h = health.copy()
+    h['i'] = h[hh_id_health].apply(format_id).map(pre)
+    h['pid'] = h[pid_health].apply(format_id)
+    h['Weight'] = pd.to_numeric(h[weight], errors='coerce')
+    h['Height'] = pd.to_numeric(h[height], errors='coerce')
+    # Module V records no mid-upper-arm circumference in any IHS/IHPS wave,
+    # so Malawi anthropometry carries no MUAC column (only the columns the
+    # source actually records).  Countries whose Module V has MUAC declare
+    # and populate it themselves.
+    h = h[['i', 'pid', 'Weight', 'Height']]
+
+    # Keep only rows that actually carry a reported measure -- the rest of
+    # Module V is the "was the person measured?" administrivia (hh_v05/06).
+    h = h[h['Weight'].notna() | h['Height'].notna()]
+
+    r = roster.copy()
+    r['i'] = r[hh_id_roster].apply(format_id).map(pre)
+    r['pid'] = r[pid_roster].apply(format_id)
+    r['Sex'] = r['hh_b03'].apply(_norm_sex)
+    years = r['hh_b05a'] if 'hh_b05a' in r.columns else pd.Series(pd.NA, index=r.index)
+    months = r['hh_b05b'] if 'hh_b05b' in r.columns else pd.Series(pd.NA, index=r.index)
+    r['Age_months'] = [
+        _age_months(y, m) for y, m in zip(years, months)
+    ]
+    r = r[['i', 'pid', 'Sex', 'Age_months']].drop_duplicates(['i', 'pid'])
+
+    out = h.merge(r, on=['i', 'pid'], how='left')
+    out['t'] = t
+    return out
+
+
+def assemble_anthropometry(t, pieces):
+    """Combine per-half anthropometry blocks into the canonical frame.
+
+    Parameters
+    ----------
+    t : str -- wave id.
+    pieces : list[pd.DataFrame] -- outputs of _anthropometry_block.
+
+    Returns
+    -------
+    pd.DataFrame indexed (t, i, pid) with columns Weight, Height,
+    Age_months, Sex.  Reported item-level values only.
+    """
+    cat = pd.concat(pieces, ignore_index=True)
+
+    # A measured individual appears once per sample half; if the same
+    # (i, pid) is reported twice (e.g. CS/Panel overlap), keep the first
+    # non-null measurement -- the measures are a single physical reading,
+    # not additive.
+    cat = cat.groupby(['t', 'i', 'pid'], as_index=False, dropna=False).agg({
+        'Weight':     'first',
+        'Height':     'first',
+        'Age_months': 'first',
+        'Sex':        'first',
+    })
+    out = cat.set_index(['t', 'i', 'pid'])
+    assert out.index.is_unique, f"Non-unique (t,i,pid) in anthropometry {t}"
+    return out

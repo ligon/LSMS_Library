@@ -250,6 +250,47 @@ Data Scheme:
     Days: int
     materialize: make
 
+  anthropometry:
+    # GAP 5 -- NEW item-level feature at (t, i, pid) [individual].  One row
+    # per measured individual from the ESS §3 health module (sect3_hh),
+    # carrying ONLY the REPORTED body measures the WB code feeds into its
+    # zscore06 call (ETH_ESS1.do:1217-1235 and the parallel ESS2-5 blocks):
+    #   Weight      reported weight in kg (hh_s3q22 W1-W3 / s3q37 W4-W5).
+    #   Height      reported height in cm (hh_s3q23 W1-W3 / s3q38 W4-W5);
+    #               the WB data-clean (>200 cm -> NaN) drops unit-error
+    #               outliers (raw §3 carries 971/993 cm typos).
+    #   MUAC        mid-upper-arm circumference -- declared for cross-country
+    #               alignment but legitimately ALL-NaN for Ethiopia: NO ESS
+    #               wave asks a MUAC question.
+    #   Age_months  child age in completed months, and
+    #   Sex         M/F,
+    #               both joined from the §1 roster so the row is
+    #               self-describing for the downstream z-score transform
+    #               (the WB ``cage = age*12``; ``female = sex==2``).
+    #
+    # This is a DISTINCT feature from ``nutrition`` (nutrient intake), NOT a
+    # reuse of it.  The WHO-2006 z-scores (haz06/waz06/whz06/bmiz06) and
+    # wasting/stunting are NOT stored: they require the WHO reference
+    # population and are TRANSFORMS computed at query time over these raw
+    # measures, never data-layer columns.
+    #
+    # Grain is (t, i, pid) -- individual-level.  i/pid match
+    # household_roster exactly (W2/W3 emit household_id2/individual_id2; the
+    # other waves household_id/individual_id), so anthropometry joins the
+    # roster on (t, i, pid).  v is NOT baked in -- the framework auto-joins
+    # it from sample() at query time.  Cross-file join (§3 measures + §1
+    # age/sex) + per-wave var renumbering + within-individual de-dup =>
+    # script (materialize: make).
+    index: (t, i, pid)
+    Weight: float
+    Height: float
+    MUAC:
+      type: float
+      optional: true
+    Age_months: float
+    Sex: str
+    materialize: make
+
   # food_expenditures, food_prices, food_quantities are derived at
   # runtime from food_acquired — see _FOOD_DERIVED in country.py.  Do
   # NOT register them here (per CLAUDE.md "Derived Tables").

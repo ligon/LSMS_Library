@@ -220,5 +220,35 @@ Data Scheme:
     HeadSold: float
     Value: float
     materialize: make
+  anthropometry:
+    # Item-level (t, i, pid) body-measurement feature for the four IHS3+/
+    # IHPS waves (2010-11, 2013-14, 2016-17, 2019-20); GAP 5.  One reported
+    # row per measured individual, from Module V (hh_mod_v) of the household
+    # questionnaire -- the SAME module the World Bank cleaning code reads
+    # then collapses to WHO-2006 z-scores (MWI_IHPS{1-4}.do:1213-1231:
+    # weight=hh_v08; height=hh_v09; cage=age*12 | hh_b05b; zscore06 ->
+    # haz06/waz06/whz06/bmiz06).  We keep the PRE-zscore RAW measures:
+    #   Weight      (hh_v08, kg),
+    #   Height      (hh_v09, cm),
+    #   Age_months  (the .do `cage`: roster years hh_b05a x 12, falling back
+    #                to infant months-of-age hh_b05b -- self-describing for
+    #                the z-score transform),
+    #   Sex         (roster hh_b03, normalised to F/M).
+    # NO MUAC column: Module V records no mid-upper-arm circumference in any
+    # IHS/IHPS wave (we carry only the columns the source actually records;
+    # a country whose Module V has MUAC declares and populates it itself).
+    # The WHO-2006 z-scores (haz06/waz06/whz06/bmiz06) and wasting/stunting
+    # are TRANSFORMS (they require the WHO-2006 reference population),
+    # computed at query time, NEVER stored here.  Grain is individual
+    # (t, i, pid), aligned with household_roster's (i, pid); v auto-joins
+    # from sample() at API time, so the returned grain is (t, i, v, pid).
+    # 2004-05 (IHS2) deferred: no Module V body-measurement roster.  See
+    # _/malawi.py:_anthropometry_block / assemble_anthropometry.
+    index: (t, i, pid)
+    Weight: float
+    Height: float
+    Age_months: float
+    Sex: str
+    materialize: make
   food_expenditures:
   food_prices:

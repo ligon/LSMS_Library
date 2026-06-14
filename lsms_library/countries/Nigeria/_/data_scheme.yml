@@ -227,4 +227,47 @@ Data Scheme:
     Value: float
     materialize: make
 
+  anthropometry:
+    # Item-level reported anthropometry (GAP 5) at natural grain
+    # (t, i, pid) [individual].  A NEW feature, distinct from `nutrition`
+    # (which is nutrient *intake*): this holds the RAW measured body
+    # dimensions the WB code (NGA_GHS1.do:1296-1308) reads, feeds into
+    # `zscore06` to derive haz06/waz06/whz06/bmiz06 + a `wasting` flag,
+    # then discards down to the z-scores.  We store ONLY the reported
+    # measures.  The z-scores and wasting/stunting are TRANSFORMS (they
+    # require the WHO-2006 reference population + child age-in-months,
+    # computed at query time) -- NEVER stored here.
+    #
+    # Source: the post-harvest anthropometry section (sect4a_harvest{wN}
+    # W1-W4; sect4b_harvest{w5} W5).  Collected in the post-harvest round
+    # only, so each wave maps to a single t = PH_QUARTER[wave] (2011Q1 /
+    # 2013Q1 / 2016Q1 / 2019Q1 / 2024Q1), matching the post-harvest slice
+    # of household_roster.  The individual key (i = format_id(hhid),
+    # pid = str(int(indiv))) aligns 100% with household_roster on measured
+    # rows.  Country-level script (_/anthropometry.py) reads each wave's
+    # weight/height (W4/W5 take three readings -> row median, mirroring
+    # the WB egen rowmedian) and merges Sex + reported Age from the same
+    # wave's roster section (sect1_harvest s1q2 / s1q4 [W1-W4] or s1q6
+    # [W5]) so the row is self-describing for the z-score transform ->
+    # materialize: make.
+    #
+    # `v` auto-joins from sample() at API time (anthropometry is NOT in
+    # the framework `_no_v_join` set).  Reported columns ONLY:
+    #   Weight  body weight in kg   (s4aq52 W1-W3; median s4aq52_* W4;
+    #                                median s4bq8* W5)
+    #   Height  standing/recumbent height in cm (s4aq53 W1-W3; median
+    #                                s4aq53_* W4; median s4bq12* W5)
+    #   Sex     M / F  (from roster s1q2; self-describing for z-scores)
+    #   Age     reported age in completed years (from roster s1q4 / s1q6)
+    # MUAC is NOT recorded in any Nigeria GHS wave -> no MUAC column.
+    # Age_months is NOT stored (derived from interview-month minus
+    # birth-month -- a transform; the z-score helper derives it from
+    # Age + interview_date).
+    index: (t, i, pid)
+    Weight: float
+    Height: float
+    Sex: str
+    Age: float
+    materialize: make
+
   nonfood_expenditures: !make

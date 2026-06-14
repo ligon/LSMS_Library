@@ -26,6 +26,7 @@ var = $(VAR_DIR)/shocks.parquet $(VAR_DIR)/nonfood_expenditures.parquet $(VAR_DI
 	  $(VAR_DIR)/crop_production.parquet \
 	  $(VAR_DIR)/plot_inputs.parquet \
 	  $(VAR_DIR)/livestock.parquet \
+	  $(VAR_DIR)/anthropometry.parquet \
 	  $(VAR_DIR)/months_food_inadequate.parquet
 
 all: $(parquet) $(var)
@@ -101,6 +102,12 @@ livestock_parquet := $(livestock:.py=.parquet)
 
 $(VAR_DIR)/livestock.parquet: livestock.py $(livestock_parquet)
 	python livestock.py
+
+anthropometry = $(shell find $(rounds) -name anthropometry.py)
+anthropometry_parquet := $(anthropometry:.py=.parquet)
+
+$(VAR_DIR)/anthropometry.parquet: anthropometry.py $(anthropometry_parquet)
+	python anthropometry.py
 
 months_food_inadequate = $(shell find $(rounds) -name months_food_inadequate.py)
 months_food_inadequate_parquet := $(months_food_inadequate:.py=.parquet)
