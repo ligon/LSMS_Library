@@ -115,3 +115,32 @@ Data Scheme:
     SoilType: str
     Irrigated: bool
     materialize: make
+
+  crop_production:
+    # Item-level crop harvest (parity-loop GAP 1) at the natural grain
+    # (t, i, plot_id, j) -- one row per crop grown on a plot.  Stacks three
+    # harvest modules per wave: AG_SEC_4A (seasonal/annual), AG_SEC_6A
+    # (perennial fruit), AG_SEC_6B (perennial non-fruit/cash trees); reported
+    # sales (5A/7A/7B) attached at the unambiguous single-plot (hhid, crop)
+    # grain.  j is the canonical Preferred Label from harmonize_crop, which
+    # REUSES harmonize_food Preferred Labels where a crop is a consumed food
+    # (Maize (grain), Rice (paddy), Pulses, ...) so crop_production.j joins
+    # food_acquired.j; new labels only for non-food crops (Cotton, Sisal,
+    # Coffee & Cocoa via the food label, Tobacco, ...).  u='kg' (every NPS
+    # harvest variable is recorded in kilograms).  Only 2019-20 and 2020-21
+    # are buildable; 2008-15 has no agriculture source on disk (same as
+    # plot_features).  STORES REPORTED VALUES ONLY -- harvest_kg sums,
+    # yield_kg, main_crop and value-shares are transformations over these
+    # rows, NOT columns here.
+    # planting_month is part of the GAP-1 schema but is NOT recorded by the
+    # NPS instrument (WB cleaning code: "planting month (absent)"), so it is
+    # omitted rather than carried all-null.
+    index: (t, i, plot_id, j)
+    Quantity: float
+    u: str
+    Quantity_sold: float
+    Value_sold: float
+    harvest_month: float
+    intercropped: bool
+    perennial: bool
+    materialize: make

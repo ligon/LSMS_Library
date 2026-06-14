@@ -829,3 +829,173 @@ def plot_features_for_wave(t, sec02, sec3a, colmap):
     df = df.set_index(['t', 'i', 'plot_id'])
     df = df[['Area', 'AreaUnit', 'Tenure', 'TenureSystem', 'SoilType', 'Irrigated']]
     return df
+
+
+# Crop-production feature (parity-loop GAP 1).  Item-level harvest at the
+# natural grain (t, i, plot_id, j) -- one row per crop grown on a plot --
+# carrying ONLY reported survey fields.  No harvest_kg sum, no yield, no
+# main_crop, no value-share: those are transformations over these rows.
+CROP_PRODUCTION_COLUMNS = [
+    'Quantity', 'u', 'Quantity_sold', 'Value_sold',
+    'harvest_month', 'intercropped', 'perennial',
+]
+# NB: planting_month is part of the GAP-1 schema but is NOT recorded by the
+# Tanzania NPS instrument (the WB cleaning code notes "planting month
+# (absent)").  Both buildable waves lack it, so the column is omitted here
+# rather than carried all-null (which fails the no_all_null_columns sanity
+# check); it would be added back for a wave/country that records it.
+
+
+def _crop_labels(tablename='harmonize_crop'):
+    """{int crop code -> canonical Preferred Label} from
+    Tanzania/_/categorical_mapping.org.  Reuses ``_plot_harmonized_codes``
+    (codes with a blank Preferred Label collapse to pd.NA)."""
+    return _plot_harmonized_codes(tablename)
+
+
+def _months_to_int(series):
+    """Coerce a survey month column to nullable Int64 in 1..12; 0/blank -> NaN."""
+    m = pd.to_numeric(series, errors='coerce').astype('Int64')
+    return m.where((m >= 1) & (m <= 12), pd.NA)
+
+
+def crop_production_for_wave(t, seas, fruit, peren, sales, colmaps):
+    """Build canonical ``crop_production`` for one Tanzania NPS wave.
+
+    Three harvest modules are stacked at grain (hhid, plot, crop):
+      seas  -- AG_SEC_4A  seasonal/annual crops (harvest qty ``ag4a_27``,
+               zeroed where ``ag4a_19`` == 2 "did not harvest"; intercrop
+               ``ag4a_04``; harvest-end month ``ag4a_24_2``).
+      fruit -- AG_SEC_6A  perennial FRUIT trees (``ag6a_09``; intercrop
+               ``ag6a_05``; end month ``ag6a_07_4``).  perennial=True.
+      peren -- AG_SEC_6B  perennial NON-fruit/cash trees (``ag6b_09`` ...).
+               perennial=True.
+
+    Reported harvest quantity is recorded in KILOGRAMS by the questionnaire
+    ((KG) on every harvest variable), so ``u`` = 'kg' and the native
+    ``Quantity`` is the reported kg -- NO unit conversion is performed here.
+
+    Sales are recorded at the (hhid, crop) grain (no plot): seasonal in
+    AG_SEC_5A (``ag5a_02`` qty kg, ``ag5a_03`` value), perennial in 7A/7B.
+    We attach ``Quantity_sold`` / ``Value_sold`` to a harvest row ONLY when
+    the (hhid, crop) maps to exactly ONE plot in that wave -- so a reported
+    household-crop sale is carried without being split or duplicated across
+    plots (splitting would fabricate an allocation, which is a
+    transformation, not a reported value).  Where a crop spans >1 plot the
+    sold columns stay NaN.
+
+    planting_month is ABSENT in NPS (the WB cleaning code notes
+    "planting month (absent)") -> NaN.
+
+    Parameters
+    ----------
+    t : str            wave id ('2019-20' or '2020-21'); the ``t`` value.
+    seas, fruit, peren : pd.DataFrame
+        raw AG_SEC_4A / 6A / 6B frames (convert_categoricals=False).
+    sales : dict with optional keys 'seasonal' (5A), 'fruit' (7A),
+        'perennial' (7B), each a raw DataFrame or None.
+    colmaps : dict 'seasonal'/'fruit'/'perennial'/'sales_*' -> column-name
+        dicts (so 2019-20 'plotnum'/'sdd_hhid' vs 2020-21 'plot_id'/'y5_hhid'
+        differences live in the wave script, not here).
+
+    Returns
+    -------
+    pd.DataFrame indexed by (t, i, plot_id, j) with columns
+    CROP_PRODUCTION_COLUMNS.
+    """
+    crop_map = _crop_labels()
+
+    def _block(df, cm, perennial):
+        """One harvest module -> tidy (i, plot_id, code, fields) frame."""
+        if df is None or len(df) == 0:
+            return None
+        out = pd.DataFrame(index=df.index)
+        out['i'] = df[cm['hhid']].apply(format_id)
+        out['plot_id'] = df[cm['plot']].apply(format_id)
+        code = pd.to_numeric(df[cm['crop']], errors='coerce').astype('Int64')
+        out['_code'] = code
+        out['j'] = code.map(crop_map).astype('string')
+        qty = pd.to_numeric(df[cm['qty']], errors='coerce').astype('Float64')
+        # Seasonal: harvest is 0 where respondent did not harvest (ag4a_19==2).
+        if cm.get('harvested') is not None:
+            harvested = pd.to_numeric(df[cm['harvested']], errors='coerce')
+            qty = qty.where(harvested != 2, 0.0)
+        out['Quantity'] = qty
+        out['u'] = pd.Series(['kg'] * len(df), index=df.index, dtype='string')
+        out['u'] = out['u'].where(qty.notna(), pd.NA)
+        out['harvest_month'] = _months_to_int(df[cm['harvest_month']]).values
+        ic = pd.to_numeric(df[cm['intercrop']], errors='coerce').astype('Int64')
+        out['intercropped'] = ic.map({1: True, 2: False}).astype('boolean').values
+        out['perennial'] = perennial
+        return out
+
+    pieces = [
+        _block(seas, colmaps['seasonal'], False),
+        _block(fruit, colmaps['fruit'], True),
+        _block(peren, colmaps['perennial'], True),
+    ]
+    pieces = [p for p in pieces if p is not None]
+    if not pieces:
+        raise ValueError(f"crop_production {t}: no harvest source rows")
+    df = pd.concat(pieces, ignore_index=True)
+
+    # Drop rows with no resolvable crop label AND no quantity (pure noise).
+    df = df[~(df['j'].isna() & df['Quantity'].isna())].copy()
+
+    # --- reported sales, attached at the unambiguous single-plot grain ----
+    def _sales_block(raw, cm):
+        if raw is None or len(raw) == 0:
+            return None
+        s = pd.DataFrame(index=raw.index)
+        s['i'] = raw[cm['hhid']].apply(format_id)
+        s['_code'] = pd.to_numeric(raw[cm['crop']], errors='coerce').astype('Int64')
+        s['Quantity_sold'] = pd.to_numeric(raw[cm['qty']], errors='coerce').astype('Float64')
+        s['Value_sold'] = pd.to_numeric(raw[cm['value']], errors='coerce').astype('Float64')
+        s = s.dropna(subset=['_code'])
+        # Multiple sale rows per (i, crop) (e.g. fruit + non-fruit listed under
+        # the same code) -> sum reported quantities/values.
+        s = (s.groupby(['i', '_code'], dropna=False)[['Quantity_sold', 'Value_sold']]
+               .sum(min_count=1).reset_index())
+        return s
+
+    sales_pieces = [
+        _sales_block(sales.get('seasonal'), colmaps['sales_seasonal']),
+        _sales_block(sales.get('fruit'), colmaps['sales_fruit']),
+        _sales_block(sales.get('perennial'), colmaps['sales_perennial']),
+    ]
+    sales_pieces = [s for s in sales_pieces if s is not None]
+    if sales_pieces:
+        all_sales = pd.concat(sales_pieces, ignore_index=True)
+        all_sales = (all_sales.groupby(['i', '_code'], dropna=False)
+                     [['Quantity_sold', 'Value_sold']].sum(min_count=1)
+                     .reset_index())
+        # Only attach where (i, crop) lives on exactly one plot (no fabricated
+        # split across plots).
+        plot_count = df.groupby(['i', '_code'])['plot_id'].transform('nunique')
+        single = df[['i', '_code']].copy()
+        single['_single'] = (plot_count == 1).values
+        df = df.merge(all_sales, on=['i', '_code'], how='left')
+        df.loc[~single['_single'].values, ['Quantity_sold', 'Value_sold']] = pd.NA
+    else:
+        df['Quantity_sold'] = pd.Series([pd.NA] * len(df), dtype='Float64')
+        df['Value_sold'] = pd.Series([pd.NA] * len(df), dtype='Float64')
+
+    # j unresolved (rare 'Other' / unmapped) -> keep raw code as a string so
+    # the row is not silently dropped, but flag via the sentinel label.
+    df['j'] = df['j'].where(df['j'].notna(),
+                            df['_code'].astype('string').radd('crop_'))
+
+    df['t'] = t
+    df = df.drop(columns=['_code'])
+    df = df.set_index(['t', 'i', 'plot_id', 'j'])
+    # Collapse exact-duplicate (t,i,plot,j) rows (same crop listed twice on a
+    # plot across the seasonal+perennial stack is not expected, but guard):
+    if not df.index.is_unique:
+        df = df.groupby(level=['t', 'i', 'plot_id', 'j']).agg({
+            'Quantity': 'sum', 'u': 'first',
+            'Quantity_sold': 'first', 'Value_sold': 'first',
+            'harvest_month': 'max',
+            'intercropped': 'max', 'perennial': 'max',
+        })
+    df = df[CROP_PRODUCTION_COLUMNS]
+    return df
