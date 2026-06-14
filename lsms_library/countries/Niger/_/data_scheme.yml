@@ -245,3 +245,101 @@ Data Scheme:
     HeadAcquired: float
     HeadSold: float
     materialize: make
+
+  plot_labor:
+    # Item-level plot labor (GAP 3, parity loop 2026-06-14).  One row per
+    # REPORTED labor SOURCE on a plot -- the reported person-days the WB .do
+    # (NER_ECVMA1.do:676-858, NER_ECVMA2.do:768-...) reads then COLLAPSES to
+    # total_labor_days / total_family_labor_days / total_hired_labor_days /
+    # hired_labor_value (a median-wage valuation).  ALL of those sums /
+    # valuations are TRANSFORMATIONS over these rows, never columns here:
+    #   total_labor_days        = Σ PersonDays over all sources on a plot
+    #   total_family_labor_days = Σ PersonDays where source=='family'
+    #   total_hired_labor_days  = Σ PersonDays where source=='hired'
+    #   hired_labor_value       = median-wage valuation over the hired rows
+    #
+    # GRAIN (t, i, plot, source):
+    #   plot   -- "{field_no}_{parcel_no}", aligned with crop_production's
+    #             plot key and plot_features' plot_id (100% on the EHCVM
+    #             waves; ~78-92% on the ECVMA waves -- labor is reported on
+    #             plots with no harvest record too, which is expected).
+    #   source -- 'family' / 'hired' / 'other'.  'other' (free / exchange
+    #             labor) exists only in the ECVMA waves (2011-12, 2014-15);
+    #             the EHCVM s16a parcel module records family vs non-family
+    #             (hired) only, so its rows are {family, hired}.  Small fixed
+    #             vocabulary assigned in code (inline mapping, no categorical
+    #             table).
+    #
+    # COLUMNS (reported, item-level):
+    #   PersonDays -- reported person-days of that source on the plot.  The
+    #                 survey reports a source as several day cells (per family
+    #                 member, or per hired-worker gender category, across the
+    #                 post-planting + post-harvest seasons / phases); these are
+    #                 strata of the SAME (plot, source) item, so PersonDays is
+    #                 their within-source sum (NOT a forbidden cross-source
+    #                 rollup -- mirrors livestock summing age/sex strata).
+    #                 EHCVM hired person-days = Σ(#workers × days) over the
+    #                 non-family grids.  days in days.
+    #   Wage       -- cash PAID to hired labor where the survey records it
+    #                 (CFA francs).  NaN for family / other (no cash paid).
+    #
+    # All four waves have a plot-labor module (script-path):
+    #   2011-12 ecvmaas1_p1 (PP) + ecvmaas1_p2 (PH)
+    #   2014-15 ECVMA2_AS2AP1 (PP) + ECVMA2_AS2AP2 (PH)
+    #   2018-19 s16a_me_ner2018  (family + non-family grids; no 'other')
+    #   2021-22 s16a_me_ner2021  (same s16a labor-grid scheme)
+    # v is NOT baked in (household-linked); the framework joins it from
+    # sample().  units: PersonDays in days; Wage in CFA francs.
+    index: (t, i, plot, source)
+    PersonDays: float
+    Wage: float
+    materialize: make
+
+  people_last7days:
+    # Item-level individual 7-day labor (GAP 3, parity loop 2026-06-14).  One
+    # row per individual, carrying the REPORTED last-7-days labor
+    # participation -- the per-individual activity feature the GAP ranking
+    # targets (Uganda's legacy HH-level Men/Women/Boys/Girls count is a
+    # DIFFERENT, older construct; this is the new (t, i, pid) feature the 6
+    # WB-only labor countries are meant to gain).  No rollups: the WB
+    # nb_members_working_age HH total is a transformation, not a column here.
+    #
+    # GRAIN (t, i, pid): pid matches household_roster's pid each wave
+    # (2011-12 ms01q00; 2014-15 MS01Q00; 2018-19 s01q00a; 2021-22
+    # membres__id).  v auto-joins from sample() (people_last7days is NOT in
+    # the framework _no_v_join set).
+    #
+    # COLUMNS (reported, per-individual):
+    #   farm_work / SOB_work / wage_work -- worked >=1h on own farm /
+    #       own business / for a wage in the last 7 days (nullable bool).
+    #   farm_hrs / SB_hrs / wage_hrs     -- usual weekly hours in each
+    #       activity (av per job = month*[week]*day*hour/52, allocated by the
+    #       job's occupation code, summed across jobs; ECVMA waves only).
+    #   Industry -- broad industry of the job (Agriculture / Fishing / Mining
+    #       / Manufacturing / Construction / Services) from the WB activity-
+    #       section-code ranges (NER_ECVMA1.do:1386-1391).  ONE harmonized
+    #       label rather than the WB's six ind_* dummies (a wide encoding of
+    #       one categorical); the ranges don't vary across waves, so the map
+    #       lives in code.  ECVMA waves only.
+    #   working_age -- member is of working age (Age >= 6, the survey
+    #       threshold ms01q06a>=6).
+    #
+    # WAVE COVERAGE: the two ECVMA waves (2011-12 ecvmaind_p1p2 ms04 module;
+    # 2014-15 ECVMA2_MS04P1 merged to ECVMA2_MS01P1) carry the FULL schema.
+    # The EHCVM waves (2018-19 s04_me_ner2018; 2021-22 s04a_me_ner2021,
+    # merged to s01 for working_age) carry the three participation dummies +
+    # working_age; their 7-day module records hours only for unpaid domestic
+    # tasks and the industry only as 12-month occupation codes (not the WB
+    # 7-day section ranges), so farm_hrs / SB_hrs / wage_hrs / Industry are
+    # NA in EHCVM (declared for cross-wave schema parity).
+    # units: hours in hours.
+    index: (t, i, pid)
+    farm_work: bool
+    SOB_work: bool
+    wage_work: bool
+    farm_hrs: float
+    SB_hrs: float
+    wage_hrs: float
+    Industry: str
+    working_age: bool
+    materialize: make
