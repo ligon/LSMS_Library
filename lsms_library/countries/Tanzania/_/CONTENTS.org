@@ -324,6 +324,42 @@ households=, region fallback where =match != 'cluster'= --- is a separate
 consumer step (plausibly a =_FOOD_DERIVED=-style country transform, since
 it is "fill missing =food_prices= from another table").  Not yet wired.
 
+*** GPS-aided extension attempt for 2019-20 (2026-06-14, transient — coords NOT stored)
+
+Tried to push 2019-20 past 51/99 using location.  Conclusion: **2019-20 is
+structurally capped at ~52--54% clean assignment; geolocation does not help.**
+Method/evidence (coordinates used only in-memory for inference + validation,
+never written to any artifact):
+
+- *Validation (good news).*  The =community_cluster_xwalk= 2019-20 assignments
+  are geographically correct: the community GPS altitude (uncensored in
+  =CM_SEC_A.cm_gps__Altitude=) matches the assigned cluster's *true* elevation
+  within **26 m** (median) against =HH_SEC_WQT= real GPS (41 clusters), and
+  **27 m** against the WB harmonised =lsms_ag.parquet= =elevation= (103
+  clusters; bridged to our =clusterid= via =hh_id_original= == =sdd_hhid=, a
+  clean 569/569 household join).  The harmonised covariates are extracted at
+  the *true* location (only lat/lon are jittered ~4.5 km), so =elevation= is
+  usable.
+- *Extension (no gain).*  Altitude/elevation disambiguation of the ~12
+  ambiguous communities resolves only +1 (WQT) to +2 (WQT ∪ harmonised, 116
+  cluster references) -> 51 -> 53.  Candidate clusters within one ward usually
+  share similar elevation, so altitude can't separate them.
+- *Why it's capped.*  The binding constraint is the 37 communities whose
+  =(region, ward)= holds **no surviving baseline-pinned household** -- nothing
+  to link to.  The Extended-Panel tracking severs the community ↔
+  baseline-=clusterid= correspondence both ways: matching on *current* location
+  (=hh_a01_1=/=hh_a03_1=) instead of baseline is *worse* (unique 39->25,
+  no-match 37->42, ambiguous 23->32), because a current ward mixes households
+  from many baseline clusters.
+
+*Implication.*  For 2019-20 the community-price fallback is **region-level**;
+do not chase a cleaner =clusterid= assignment (it does not exist for a tracking
+panel).  Separately: a WB GPS-redaction MISS was found in =HH_SEC_WQT=
+(=wqt_13__Latitude/Longitude/Altitude= uncensored, 169 HH / 41 clusters) and
+reported to the WB; it is NOT ingested.  The clean =sdd_hhid= bridge to
+=lsms_ag.parquet= (true elevation + weather for 103 of 247 clusters) is a
+separate geovariables-feature opportunity (cf. #449).
+
 ** DONE Link  2019-20 and 2020-21 to panel
 CLOSED: [2026-03-29 Sat]
 According to docs this is possible; e.g., see p. 12 of [[../2019-20/Documentation/tznps_sdd_2019_20_basic_information_document_updated_november_2022.pdf][Basic Information Document]].
