@@ -1596,3 +1596,156 @@ def people_last7days_for_wave(t, sec, colmap):
         out = out.groupby(level=['t', 'i', 'pid']).first()
     out = out[PEOPLE_LAST7DAYS_COLUMNS]
     return out
+
+
+# ===========================================================================
+# community_prices (parity-loop GAP C -- OURS-ONLY; maintainer priority)
+# ===========================================================================
+#
+# Item-level community/market prices at the natural grain (t, v, j, u) -- one
+# row per (community cluster v, harmonized food item j, native unit u) -- from
+# the COMMUNITY price questionnaire (CM_SEC_F / CM_SEC_F_ID), carrying ONLY the
+# REPORTED surveyed price.  This is the community-price arm of label
+# unification: j is the canonical Preferred Label from harmonize_community_price
+# (which REUSES harmonize_food / harmonize_crop Preferred Labels for every
+# priced food), so a community_prices row for "Maize (grain)" lines up with the
+# food_acquired (consumption) and crop_production (harvest) "Maize (grain)"
+# rows.  NO median/mean across clusters, NO community->household imputation:
+# those are transformations over these rows, never stored here.
+#
+# The price observation in CM_SEC_F_ID is "price cm_f063 for a quantity cm_f062
+# of native unit cm_f061" at the VILLAGE market (the cluster's local market);
+# the district-capital triple (cm_f064/65/66) is a DIFFERENT geographic level
+# (the district town), so it is NOT folded into the cluster grain -- the
+# village price is the cluster price the feature is about.  Price is normalized
+# to the REPORTED unit price = cm_f063 / cm_f062 (currency per ONE native unit
+# u): this is the reported price divided through by its own reported quantity
+# basis -- NOT a cross-row aggregation.  Rows with Price <= 0 or Quantity <= 0
+# are the questionnaire's "item not available / not priced" sentinels (price
+# and quantity both 0) and are dropped as non-observations.
+#
+# v == the community questionnaire's own cluster id (interview__key).  IMPORTANT
+# DATA LIMITATION (issue #113, CONTENTS.org): the NPS community instrument and
+# the household instrument use INCOMPATIBLE cluster-coding schemes -- the
+# community interview__key has ZERO overlap with the household interview__key,
+# and the community location codes (id_01..id_05, national admin numbering)
+# reconcile to the household survey-design clusterid / y5_cluster only at the
+# region level (the finest key that matches), NOT at the EA/cluster level (~4%
+# EA-tuple match).  So community_prices.v is the community cluster's NATIVE id
+# and does NOT intersect sample().v; a community->household price join is a
+# region-level fallback TRANSFORMATION (the documented #113 use), deliberately
+# NOT baked into this item-level feature.  Because the grain carries no
+# household i, the framework's _join_v_from_sample never fires (it requires an
+# i level), so v is left exactly as emitted -- no _no_v_join entry is needed.
+
+# Native community-price unit CODE (cm_f061, raw Stata integer; the decoded
+# label is KILOGRAMS/GRAMS/LITRES/MILLILITRES/PIECES, upper- or lower-cased by
+# wave) -> canonical Preferred Label, matching the country `u` categorical table
+# (Kg / Gram / Litre / Millilitre / Piece).  The 1..5 code space is identical
+# across both buildable waves.  Resolved in-script so the emitted u is already
+# canonical; the `u` table additionally carries the decoded-text variants so
+# the label axis is documented and the framework auto-map is an idempotent
+# no-op.
+_COMMUNITY_PRICE_UNIT_LABELS = {
+    1: 'Kg', 2: 'Gram', 3: 'Litre', 4: 'Millilitre', 5: 'Piece',
+}
+
+COMMUNITY_PRICES_COLUMNS = ['Price']
+
+
+def _community_price_codes(tablename='harmonize_community_price'):
+    """{int community-price item code -> canonical Preferred Label} from
+    Tanzania/_/categorical_mapping.org (Code -> Preferred Label).  Reuses the
+    harmonize_food Preferred Labels for every priced food so community_prices.j
+    joins food_acquired.j / crop_production.j; codes with a blank Preferred
+    Label collapse to pd.NA (none today -- all 52 codes carry a label)."""
+    return _plot_harmonized_codes(tablename)
+
+
+def community_prices_for_wave(t, idf, colmap):
+    """Build canonical ``community_prices`` for one Tanzania NPS wave.
+
+    Parameters
+    ----------
+    t : str          wave id ('2019-20' or '2020-21'); the ``t`` value.
+    idf : pd.DataFrame
+        raw CM_SEC_F_ID frame (convert_categoricals=False, so item_id carries
+        the integer community-price item code 1..52).
+    colmap : dict with keys
+        cluster -- community cluster id column (interview__key) -> v
+        item    -- community-price item code column (item_id)
+        unit    -- native unit column          (cm_f061)
+        qty     -- reported quantity basis      (cm_f062)
+        price   -- reported price for that qty  (cm_f063)
+
+    Returns
+    -------
+    pd.DataFrame indexed by (t, v, j, u) with column COMMUNITY_PRICES_COLUMNS
+    (['Price'] -- reported unit price, currency per one native unit u).
+    """
+    c = colmap
+    code_map = _community_price_codes()
+
+    price = pd.to_numeric(idf[c['price']], errors='coerce').astype('Float64')
+    qty = pd.to_numeric(idf[c['qty']], errors='coerce').astype('Float64')
+    code = pd.to_numeric(idf[c['item']], errors='coerce').astype('Int64')
+
+    unit_code = pd.to_numeric(idf[c['unit']], errors='coerce').astype('Int64')
+
+    out = pd.DataFrame({
+        'v': idf[c['cluster']].astype('string').str.strip(),
+        'j': code.map(code_map).astype('string'),
+        # Native unit CODE -> canonical Preferred Label.
+        'u': unit_code.map(_COMMUNITY_PRICE_UNIT_LABELS).astype('string'),
+        'Price': price,
+        '_qty': qty,
+    })
+
+    # Keep only genuine reported prices: a positive price for a positive
+    # quantity basis with a resolved item and unit.  Price<=0 & qty<=0 are the
+    # "item not available / not priced" questionnaire sentinels.
+    out = out[(out['Price'] > 0) & (out['_qty'] > 0)
+              & out['v'].notna() & out['j'].notna() & out['u'].notna()].copy()
+
+    # REPORTED unit price = price / quantity basis (currency per one native
+    # unit u).  This divides the reported price through by its own reported
+    # quantity -- not a cross-row aggregation.
+    out['Price'] = (out['Price'] / out['_qty']).astype('Float64')
+    out = out.drop(columns=['_qty'])
+
+    out['t'] = t
+
+    # ~10% of (t, v, j, u) tuples carry >1 source item code that the shared
+    # label deliberately MERGES (e.g. MILLET (GRAIN) + SORGHUM (GRAIN) -> the
+    # one harmonize_food label "Millet & Sorghum (grain)", exactly as
+    # food_acquired lumps them).  Within a single cluster and unit, combine the
+    # colliding reported unit prices by their MEAN -- a within-cluster,
+    # within-label combination forced by label unification, NOT the forbidden
+    # cross-cluster median.
+    # keep-first: a genuine REPORTED price per cell (consistent with the sibling
+    # community_prices features), not a computed mean over the label-lumped rows.
+    out = (out.groupby(['t', 'v', 'j', 'u'], as_index=False, dropna=False)
+              [['Price']].first())
+
+    # community_prices is a CLUSTER table -- there is no household i, the
+    # natural grain is (t, v, j, u).  But the framework's
+    # local_tools.map_index() (run on EVERY read path) unconditionally swaps
+    # j -> i whenever a `j` index level is present and an `i` level is NOT.
+    # That swap would rename our item level `j` to `i`, drop `j`, and collapse
+    # the table to (t, v, u).  To keep `j` intact WITHOUT touching the
+    # framework, carry a redundant `i` level (set equal to the cluster v)
+    # positioned BEFORE `j`: map_index then sees i present and j after i, so it
+    # does NOT swap, and the framework's _normalize_dataframe_index drops the
+    # undeclared `i` level (data_scheme declares (t, v, j, u)), leaving the
+    # canonical (t, v, j, u) grain.  v already in the index means
+    # _join_v_from_sample is skipped; the spurious i==v never reaches the API.
+    # (Same framework-compatibility shim Malawi/Ethiopia/Mali community_prices
+    # use -- see Malawi assemble_community_prices.)
+    out['i'] = out['v']
+    out = out.set_index(['t', 'v', 'i', 'j', 'u'])
+
+    out = out[COMMUNITY_PRICES_COLUMNS]
+    assert out.reset_index().duplicated(['t', 'v', 'j', 'u']).sum() == 0, \
+        f"community_prices {t}: (t,v,j,u) not unique"
+    return out
+    return out
