@@ -360,6 +360,33 @@ reported to the WB; it is NOT ingested.  The clean =sdd_hhid= bridge to
 =lsms_ag.parquet= (true elevation + weather for 103 of 247 clusters) is a
 separate geovariables-feature opportunity (cf. #449).
 
+*** WB PII handling: over- and under-protective at once (root cause of this issue)
+
+The difficulty linking the community surveys is, at root, a WB redaction-policy
+problem --- and it cuts both ways.  Reported to the WB (2026-06-14):
+
+1. *Over-redaction (the root cause of #113).*  The community questionnaire
+   carries NO survey EA/cluster id --- only admin codes =id_01..05= and censored
+   GPS --- even though the cluster id IS released household-side (=clusterid= /
+   =y5_cluster=).  Withholding it on the community side is inconsistent and is
+   exactly what makes =community_cluster_xwalk= hard (recoverable only via admin
+   tuples + interview dates + an external harmonised dataset, and only partially
+   for 2019-20).  Relatedly, GPS is *fully censored* (=**CONFIDENTIAL**=) rather
+   than *jittered* --- non-standard for LSMS-ISA, whose own public harmonised
+   dataset ships jittered NPS coordinates under CC0 --- so full censorship
+   destroys usability for little marginal confidentiality.
+
+2. *Under-protection (an inadvertent leak).*  =HH_SEC_WQT= leaks unredacted real
+   GPS (=wqt_13__Latitude/Longitude/Altitude=, 169 HH / 41 clusters, 2019-20);
+   community GPS *altitude* also leaks while the paired lat/lon are censored
+   (=CM_SEC_A.cm_gps__Altitude=, =CM_SEC_F.{village,district}_gps__Altitude=,
+   both waves).  NOT ingested.
+
+Net: high-risk real coordinates are exposed while low-risk, high-value
+identifiers (the community EA link; jittered GPS) are censored.  The remedy we
+asked the WB for --- jitter rather than censor GPS, and retain the cluster/EA id
+on the community file --- would dissolve this issue at no added disclosure risk.
+
 ** DONE Link  2019-20 and 2020-21 to panel
 CLOSED: [2026-03-29 Sat]
 According to docs this is possible; e.g., see p. 12 of [[../2019-20/Documentation/tznps_sdd_2019_20_basic_information_document_updated_november_2022.pdf][Basic Information Document]].
