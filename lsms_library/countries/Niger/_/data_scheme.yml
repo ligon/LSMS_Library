@@ -121,12 +121,34 @@ Data Scheme:
     # owned.  Latitude / Longitude are NOT emitted — EHCVM s16a has no
     # decimal-degree parcel GPS (s16aq47 is an area, not a coordinate);
     # deferred as in Uganda.
+    #
+    # WB-parity audit (GAP 6, 2026-06-14): added three REPORTED item
+    # columns at the existing (t, i, plot_id) grain, all from the same
+    # s16a parcel module the feature already reads (label-preserving — the
+    # six original columns and the row count are unchanged):
+    #   AreaSelfReported (s16aq09a/b) — WB area_self_reported: the farmer
+    #     estimate in hectares, kept distinct from GPS-preferred Area.
+    #   PlotCertificate  (s16aq13)    — WB plot_certificate: bool, holds a
+    #     formal land document (codes 1-5) vs none (7); Autre/missing NA.
+    #   SoilFertility    (s16aq20)    — WB soil-quality tag: reported
+    #     good/medium/poor (WB's soil_fertility_index PCA is a transform,
+    #     NOT stored).
+    # WB item attrs NOT in the EHCVM s16a source, hence skipped (no fake
+    # all-NA columns): fallow / erosion_protection (no s16a question;
+    # WB derives them from the ECVMA as01q module, which is the pre-EHCVM
+    # 2011-12/2014-15 instrument — out of scope for this feature) and
+    # plot_slope (WB plot_slope is SRTM geospatial, not survey-reported;
+    # the reported topography s16aq19 is a distinct construct left for a
+    # future Topography column with its own harmonize table).
     index: (t, i, plot_id)
     Area: float
     AreaUnit: str
+    AreaSelfReported: float
     Tenure: str
     TenureSystem: str
+    PlotCertificate: bool
     SoilType: str
+    SoilFertility: str
     Irrigated: bool
     materialize: make
 

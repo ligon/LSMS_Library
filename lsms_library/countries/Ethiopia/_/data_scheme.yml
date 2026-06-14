@@ -89,6 +89,18 @@ Data Scheme:
       optional: true
     SoilType: str
     Irrigated: bool
+    # Reported item-level field/parcel attributes (WB Plot_dataset parity,
+    # GAP 6).  All three are surveyed Yes/No questions carried verbatim
+    # (no aggregation): Fallow = field land-status == "Fallow" (sect3 §3),
+    # ErosionProtection = field has an erosion-control structure (sect3),
+    # Certificate = parcel has a land-use certificate (sect2).  WB
+    # plot_owned is NOT added: it is a binary recode of the same acquire
+    # variable already carried as Tenure (a transform, derivable as
+    # Tenure in {communal, inherited, owned}); plot_slope / plot_dist_*
+    # are SRTM/geospatial raster joins, not survey-reported.
+    Fallow: bool
+    ErosionProtection: bool
+    Certificate: bool
     materialize: make
 
   crop_production:

@@ -97,16 +97,41 @@ Data Scheme:
     # in each wave's plot_features.py.  Tenure is derived from the labeled
     # acquire question ag_d03 in 2010-11 & 2013-14 ONLY; ag_d03 is absent
     # from IHS4/IHS5 ag_mod_d (where ag_d02 is "ID of Respondent", not
-    # tenure), so Tenure / TenureSystem are NaN for 2016-17 & 2019-20.
-    # Latitude / Longitude are deferred: Malawi plot GPS is offset /
-    # redacted in the public release.
+    # tenure), so Tenure / TenureSystem / PlotOwned are NaN for 2016-17 &
+    # 2019-20.  Latitude / Longitude are deferred: Malawi plot GPS is
+    # offset / redacted in the public release.
+    #
+    # GAP-6 audit (parity-plot-audit) added the missing WB Plot_dataset
+    # item-level plot attributes at the existing (t, i, plot_id) grain:
+    #   AreaSelfReported  -- the farmer-estimate plot area in hectares (the
+    #     WB area_self_reported), distinct from the GPS-preferred Area
+    #     above (Area falls back to it when GPS is missing); ag_c04a/b.
+    #   PlotOwned (bool)  -- the WB plot_owned: acquire codes 1-5 (granted/
+    #     inherited/bride price/purchased) = owned, 6-11 = not owned, from
+    #     the same ag_d03 that drives Tenure -> populated 2010-11 & 2013-14
+    #     only (NaN for IHS4/IHS5, where the WB uses a parcel-grain Module
+    #     B2 roster, out of this plot-grain feature's scope).
+    #   Fallow (bool)     -- per-plot fallow flag, ag_d14 == 4 "Fallow"; all
+    #     four waves.  The WB nb_fallow_plots is a COUNT transform over this
+    #     item flag (NOT stored here).
+    #   ErosionProtection (bool) -- the WB erosion_protection: 1st erosion-
+    #     control facility code ag_d25a != 1 (1 = "No erosion control");
+    #     all four waves.
+    # plot_certificate and plot_slope are NOT added: Malawi Module D has no
+    # land-certificate question (the WB plot_certificate comes from a
+    # parcel-grain Module B2 roster in IHS4/IHS5 only), and plot_slope is a
+    # geospatial raster covariate (SRTM slope), not a survey-reported item.
     index: (t, i, plot_id)
     Area: float
     AreaUnit: str
+    AreaSelfReported: float
     Tenure: str
     TenureSystem: str
+    PlotOwned: bool
     SoilType: str
     Irrigated: bool
+    Fallow: bool
+    ErosionProtection: bool
     materialize: make
   food_coping:
     # rCSI coping-strategy day counts (GH #332).  Module H question H02

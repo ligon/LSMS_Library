@@ -115,12 +115,29 @@ Data Scheme:
     # plot_id = "{field_no}_{parcel_no}".  Latitude / Longitude are NOT
     # emitted — EHCVM s16a has no decimal-degree parcel GPS (s16aq47 is
     # an area, not a coordinate); deferred as in Uganda.
+    #
+    # Item-attribute audit vs the WB harmonised Plot_dataset (parity GAP 6):
+    # the WB EACI panel carries irrigated / plot_owned / plot_certificate
+    # (already our Irrigated / Tenure / TenureSystem) plus self_reported_area
+    # and the GAEZ-raster plot_slope / soil_fertility_index (geospatial / PCA
+    # transforms — NOT reported, out of scope).  erosion_protection and the
+    # per-plot fallow flag are EACI-instrument items absent from the EHCVM
+    # s16a module these two waves use, so they are not in the source.  Added
+    # the REPORTED s16a item attributes the audit surfaced: SelfReportedArea
+    # (farmer estimate, kept distinct from the GPS-preferred Area) and the
+    # surveyed slope/fertility tags Topography (s16aq19) / SoilFertility
+    # (s16aq20) — the reported analogues of the WB's GAEZ plot_slope /
+    # soil_fertility_index.  No farm_size / nb_plots / nb_fallow_plots /
+    # soil_fertility_index columns — those are transformations.py rollups.
     index: (t, i, plot_id)
     Area: float
     AreaUnit: str
+    SelfReportedArea: float
     Tenure: str
     TenureSystem: str
     SoilType: str
+    Topography: str
+    SoilFertility: str
     Irrigated: bool
     materialize: make
   crop_production:

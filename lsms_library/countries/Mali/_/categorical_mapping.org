@@ -513,6 +513,32 @@
 |    2 | granted_right_of_occupancy |
 |    4 | leasehold                  |
 
+# harmonize_topography — s16aq19 reported per-plot topography/slope class
+# (the survey-REPORTED analogue of the WB harmonised panel's GAEZ-raster
+# `plot_slope`, which is a geospatial join — not reported — and out of the
+# item-attribute scope here).  Codes are identical across both EHCVM waves
+# (2021-22 merely prefixes "N. ").  Free-form str labels, English.
+#+name: harmonize_topography
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | hill            |
+|    2 | plain           |
+|    3 | gentle slope    |
+|    4 | steep slope     |
+|    5 | valley          |
+|    6 | other           |
+
+# harmonize_soil_fertility — s16aq20 farmer's REPORTED fertility assessment
+# of the plot.  This is the surveyed soil-quality tag, NOT the WB panel's
+# `soil_fertility_index` (a PCA over GAEZ rasters — a forbidden transform).
+# Codes identical across both EHCVM waves.
+#+name: harmonize_soil_fertility
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | good            |
+|    2 | medium          |
+|    3 | poor            |
+
 # harmonize_input — the input-identity (`input` index level) taxonomy for
 # plot_inputs (GAP 2, parity loop).  Unlike the other harmonize_* tables,
 # the inputs are NOT a decoded label column in the source: each input type

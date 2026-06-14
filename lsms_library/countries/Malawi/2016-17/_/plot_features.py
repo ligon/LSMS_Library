@@ -74,7 +74,11 @@ colmap = dict(
     area_gps     = 'ag_c04c',
     soil_type    = 'ag_d21',
     water_source = 'ag_d28a',
-    # acquire omitted: ag_d03 absent in IHS4 -> Tenure NaN.
+    fallow       = 'ag_d14',
+    erosion      = 'ag_d25a',
+    # acquire omitted: ag_d03 absent in IHS4 -> Tenure / PlotOwned NaN
+    # (the WB derives plot_owned from the Module B2 parcel roster here,
+    # a different grain; left NaN rather than cross-grain joined).
 )
 
 pieces = []
@@ -85,7 +89,7 @@ c_xs = get_dataframe('../Data/Cross_Sectional/ag_mod_c.dta',
 d_xs = _read_usecols(
     'Malawi/2016-17/Data/Cross_Sectional/ag_mod_d.dta',
     usecols=['case_id', 'hhid', 'gardenid', 'plotid',
-             'ag_d02', 'ag_d21', 'ag_d28a'])
+             'ag_d02', 'ag_d21', 'ag_d28a', 'ag_d14', 'ag_d25a'])
 
 c_xs['hhid'] = 'cs-17-' + c_xs['case_id'].apply(format_id)
 c_xs['plotkey'] = _plotkey(c_xs)

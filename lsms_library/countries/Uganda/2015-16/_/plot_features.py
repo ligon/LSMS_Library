@@ -25,6 +25,8 @@ colmap_2a = dict(
     acquire       = 'a2aq8',
     soil_type     = 'a2aq16',
     water_source  = 'a2aq18',
+    certificate   = 'a2aq23',   # formal certificate of title (1-3=Yes, 4=No)
+    erosion       = 'a2aq22a',  # erosion-control facility (method code; 8=None)
 )
 colmap_2b = dict(
     hhid          = 'HHID',
@@ -35,6 +37,8 @@ colmap_2b = dict(
     acquire       = 'a2bq8',
     soil_type     = 'a2bq14',
     water_source  = 'a2bq16',
+    # No certificate question for use-rights (AGSEC2B) parcels.
+    erosion       = 'a2bq20a',  # erosion-control facility (method code; 8=None)
 )
 
 df_a = plot_features_for_wave('2015-16', df_2a, None, colmap_2a)

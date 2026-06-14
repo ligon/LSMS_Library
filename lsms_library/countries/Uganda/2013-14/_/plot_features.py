@@ -36,6 +36,8 @@ colmap = dict(
     acquire       = 'a2aq8',
     soil_type     = 'a2aq16',
     water_source  = 'a2aq18',
+    certificate   = 'a2aq23',   # formal certificate of title (1-3=Yes, 4=No)
+    erosion       = 'a2aq22a',  # erosion-control facility (method code; 8=None)
 )
 
 # AGSEC2B uses a2bq* numbering (vs AGSEC2A's a2aq*), so we call the
@@ -49,6 +51,8 @@ colmap_2b = dict(
     acquire       = 'a2bq8',
     soil_type     = 'a2bq14',
     water_source  = 'a2bq16',
+    # No certificate question for use-rights (AGSEC2B) parcels.
+    erosion       = 'a2bq20a',  # erosion-control facility (method code; 8=None)
 )
 
 # Call helper twice (once per source) so each source uses its own

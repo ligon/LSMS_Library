@@ -140,10 +140,23 @@ Data Scheme:
     index: (t, i, plot_id)
     Area: float
     AreaUnit: str
+    # SelfReportedArea: farmer-estimated plot area (ha) from ag2a_04, kept
+    # distinct from the GPS-preferred Area (WB area_self_reported).
+    SelfReportedArea: float
     Tenure: str
     TenureSystem: str
     SoilType: str
     Irrigated: bool
+    # Reported item attributes mirroring the WB Plot_dataset plot block
+    # (TZA_NPS*.do): Owned (plot_owned, ag3a_25), Certificate
+    # (plot_certificate, ag3a_28a/28d), ErosionProtection (ag3a_15),
+    # Fallow (ag3a_03==4).  Per-HH rollups (farm_size, nb_plots,
+    # nb_fallow_plots, soil_fertility_index) are transformations over these
+    # item columns, NOT stored here.
+    Owned: bool
+    Certificate: bool
+    ErosionProtection: bool
+    Fallow: bool
     materialize: make
 
   crop_production:

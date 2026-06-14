@@ -35,6 +35,8 @@ colmap = dict(
     soil_type    = 'ag_d21',
     water_source = 'ag_d28a',
     acquire      = 'ag_d03',
+    fallow       = 'ag_d14',
+    erosion      = 'ag_d25a',
 )
 
 df = plot_features_for_wave(WAVE, df_c, df_d, colmap)

@@ -29,6 +29,8 @@ colmap_2a = dict(
     soil_type     = 'a2aq16',
     # water_source intentionally omitted — a2aq18 Stata label is
     # "main water source" but values are soil-type codes (label bug).
+    certificate   = 'a2aq23',   # formal certificate of title (1-3=Yes, 4=No)
+    erosion       = 'a2aq22a',  # erosion-control facility (method code; 8=None)
 )
 colmap_2b = dict(
     hhid          = 'HHID',
@@ -39,6 +41,8 @@ colmap_2b = dict(
     acquire       = 'a2bq8',
     # 2011-12 AGSEC2B uses different numbering — check questionnaire
     # before declaring soil/water columns here.
+    # No certificate question for use-rights (AGSEC2B) parcels.
+    erosion       = 'a2bq20a',  # erosion-control facility (method code; 8=None)
 )
 
 df_a = plot_features_for_wave('2011-12', df_2a, None, colmap_2a)

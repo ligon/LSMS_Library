@@ -260,8 +260,19 @@ def plot_features_for_wave(t, source, colmap):
     See ``Mali/_/mali.py:plot_features_for_wave`` for the full contract
     (this is a direct sibling).  Returns a DataFrame indexed by
     ``(t, i, plot_id)`` with columns ``Area`` (hectares float),
-    ``AreaUnit`` (always 'hectares'), ``Tenure``, ``TenureSystem``,
-    ``SoilType`` (str), and ``Irrigated`` (nullable bool).
+    ``AreaUnit`` (always 'hectares'), ``AreaSelfReported`` (reported
+    farmer-estimate area in hectares, distinct from the GPS-preferred
+    ``Area``), ``Tenure``, ``TenureSystem``, ``PlotCertificate``
+    (nullable bool: has a formal land document), ``SoilType`` (str),
+    ``SoilFertility`` (reported good/medium/poor str), and ``Irrigated``
+    (nullable bool).
+
+    The three reported item attributes added in the 2026-06-14 WB-parity
+    audit (GAP 6) — ``AreaSelfReported`` (s16aq09a/b), ``PlotCertificate``
+    (s16aq13), ``SoilFertility`` (s16aq20) — are emitted only when the
+    matching ``colmap`` keys (``area_est``/``area_est_unit``,
+    ``certificate``, ``fertility``) are supplied; otherwise they fall back
+    to all-NA so the schema stays stable across waves that lack them.
 
     Niger note: ``i`` is built with Niger's ``i()`` formatter from a
     lowercase-named (grappe, menage) Series so the EHCVM 'E_' prefix
@@ -333,16 +344,59 @@ def plot_features_for_wave(t, source, colmap):
         irrigated = (water_label == 'Irrigated').astype('boolean')
         irrigated = irrigated.where(water_label.notna(), pd.NA)
 
+    # AreaSelfReported (WB parity: area_self_reported / self_reported_area).
+    # The REPORTED farmer-estimate parcel area (s16aq09a), in hectares,
+    # carried distinct from ``Area`` (which prefers GPS where measured).
+    # WB keeps the self-reported estimate as its own variable rather than
+    # folding it into the GPS-preferred area; we mirror that here so the
+    # reported estimate survives even on plots where GPS was used.  Same
+    # unit conversion (1=Ha, 2=m^2 -> /10000) and plausibility clamp
+    # (GH #327) as ``Area``.  ``est_ha`` was already computed above.
+    area_self = est_ha.where(((est_ha > 0) & (est_ha <= 1000)) | est_ha.isna(), pd.NA)
+
+    # PlotCertificate (WB parity: plot_certificate).  Reported bool from
+    # s16aq13 "Avez-vous un document légal qui affirme votre possession de
+    # cette parcelle?" — codes 1-5 are a formal land document (Titre
+    # foncier / Permis d'exploiter / Procès-verbal / Bail / Convention de
+    # vente) -> True; code 7 (Aucun) -> False; code 6 (Autre) and missing
+    # -> NA.  This is a SECOND, complementary projection of s16aq13: the
+    # existing ``TenureSystem`` maps only the three codes (1,2,4) that
+    # imply a clear tenure regime, whereas WB's plot_certificate is the
+    # binary has-any-document fact over the same question.  Not a transform
+    # (no sum/count/PCA) — a direct reported recode of one source column.
+    plot_certificate = pd.Series(pd.NA, index=src.index, dtype='boolean')
+    if c.get('certificate') in src.columns:
+        cert_code = src[c['certificate']].astype('Int64')
+        has_doc = cert_code.isin([1, 2, 3, 4, 5])
+        plot_certificate = has_doc.astype('boolean')
+        # code 7 = Aucun -> False (already via isin); code 6 = Autre and
+        # any missing -> NA (not a defensible yes/no).
+        plot_certificate = plot_certificate.where(cert_code.isin([1, 2, 3, 4, 5, 7]), pd.NA)
+
+    # SoilFertility (WB parity: a reported soil-quality tag; WB's
+    # soil_fertility_index is a banned PCA transform, but s16aq20 records
+    # the farmer's REPORTED fertility rating directly).  s16aq20 codes
+    # 1=Bonne -> good, 2=Moyenne -> medium, 3=Faible -> poor.  Emitted as
+    # a normalized English ordinal string; no parallel categorical table
+    # (the three labels are identical across both EHCVM waves).
+    fertility_map = {1: 'good', 2: 'medium', 3: 'poor'}
+    soil_fertility = pd.Series(pd.NA, index=src.index, dtype='string')
+    if c.get('fertility') in src.columns:
+        soil_fertility = _map_codes(src[c['fertility']], fertility_map)
+
     df = pd.DataFrame({
-        't':            t,
-        'i':            hh.values,
-        'plot_id':      plot_id.values,
-        'Area':         area_ha.values,
-        'AreaUnit':     area_unit.values,
-        'Tenure':       tenure.values,
-        'TenureSystem': tenure_system.values,
-        'SoilType':     soil_type.values,
-        'Irrigated':    irrigated.values,
+        't':                t,
+        'i':                hh.values,
+        'plot_id':          plot_id.values,
+        'Area':             area_ha.values,
+        'AreaUnit':         area_unit.values,
+        'AreaSelfReported': area_self.values,
+        'Tenure':           tenure.values,
+        'TenureSystem':     tenure_system.values,
+        'PlotCertificate':  plot_certificate.values,
+        'SoilType':         soil_type.values,
+        'SoilFertility':    soil_fertility.values,
+        'Irrigated':        irrigated.values,
     })
     df = df.set_index(['t', 'i', 'plot_id'])
     return df

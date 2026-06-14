@@ -30,6 +30,10 @@ colmap = dict(
     acquire    = 's2q05',    # how acquired -> Tenure
     soil_type  = 's2q16',
     irrigated  = 's3q17',    # 1 Yes / 2 No
+    certificate= 's2q03',    # parcel has a certificate? 1 Yes / 2 No
+    fallow     = 's3q03',    # field land-status (code 3 == Fallow)
+    erosion    = 's3q38',    # erosion-control structure? 1 Yes / 2 No
+    erosion_yes= 1, erosion_no = 2,   # W4-W5 code 1=Yes / 2=No
 )
 
 df = plot_features_for_wave('2018-19', sect2, sect3, colmap)
