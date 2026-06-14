@@ -177,6 +177,80 @@ the community's native =interview__key=.  Reproduce the numbers above from
 =Tanzania/2020-21/Data/cm_sec_a.dta= + =hh_sec_a.dta= (=get_dataframe(...,
 convert_categoricals=False)=).
 
+*** Re-opening the link: date disambiguation + district crosswalk (2026-06-14, #113 follow-up)
+
+The diagnosis above is *geography-only*.  Two avenues raised on #113
+(maintainer, 2026-06-14) were not tried and they change the ceiling.
+This subsection is a *desk analysis* (scoping session, no data access);
+the numbered tests at the end are for a data-enabled session.  WB docs
+consulted: NPS-SDD 2019-20 (catalog #3885), NPS Wave 5 2020-21 (catalog
+#5639), LSMS NPS brief.
+
+**Avenue A --- is there a cluster id in another community file?**
+Most likely *no, by design*.  =clusterid= / =strataid= are
+household-side *sampling* variables (documented as living in the
+household Section A), and the NPS community questionnaire is administered
+to *village / kitongoji / mtaa leaders* --- identified by admin geography
+(=id_01..id_05=), not the sampling EA.  So the absent =clusterid= in
+=CM_SEC_F_ID= / =CM_SEC_A= is expected, not an oversight.  Still cheap
+and worth doing once: only =CM_SEC_A= is documented as inspected --- scan
+=CM_SEC_B,C,D,D2,E,G= for any stray id column to close the question (low
+odds; Survey-Solutions sub-files share the cover keys).
+
+**Avenue B --- interview dates (the untried lever).**  The fieldwork
+design supports it: mobile teams spend ~4--5 days per cluster doing the
+household *and* community interviews in one visit, so a community
+interview's date should fall inside the household-interview date window
+of its *own* cluster.  Infra already exists --- =interview_date.py=
+extracts the household start date (=hh_a18=) per cluster for both waves.
+The method that works is *admin-narrow, then date-disambiguate*: use
+=(region, ward)= to get the 2--3 candidate clusters, then pick the one
+whose household date-window matches the community interview date.  This
+targets exactly the residual ambiguity geography alone could not break
+(the 17 ambiguous 2019-20 wards; the 58 ambiguous 2020-21 region+ward
+pairs).
+- *Must confirm with data*: that the community file records an interview
+  date (the =CM_SEC_A= "survey staff / timing" block, or Survey-Solutions
+  paradata timestamps).  Public docs do not expose the variable name.
+
+**The 2020-21 0/488 is a fixable encoding bug, not absence.**  Community
+=id_02= is the 2--3-digit *national* district code; the =y5_cluster=
+"DD" field is a 1--2-digit *within-region* district index.  A
+district-code crosswalk (national code → within-region index, derivable
+from =HH_SEC_A=, which carries both the admin tuple and =y5_cluster=)
+repairs =(region, district, ward)= matching and separates the wards that
+currently collide across districts.
+
+**Realistic ceilings (honest).**
+- *2019-20*: 38/99 unique today → ~55/99 once the 17 ambiguous wards are
+  date-disambiguated.  Irreducible floor: ~44 communities sit in wards
+  with *no surviving tracked household*, so nothing links them below
+  region regardless of method (Extended-Panel attrition/movement).
+- *2020-21*: 0/488 today is the district-encoding bug, not absence.
+  Crosswalk + date plausibly reaches ~475/488; the ~13/488 with no
+  region+ward match fall to region.
+
+So the "region is the floor" framing undersells 2020-21 badly (0 →
+~97% plausibly), and date-linking is a real lever for the ambiguous
+cases in *both* waves --- while 2019-20 keeps an irreducible region-only
+residue.  GPS-based matching is *not* available: Tanzania
+=cluster_features= carries only Region/District/Rural, no coordinates.
+
+**Next steps (data-enabled session).**
+1. Confirm a community interview-date variable in =CM_SEC_A= (both
+   waves); fall back to Survey-Solutions paradata if absent.
+2. Build the 2020-21 district-code crosswalk from =HH_SEC_A= (admin
+   tuple ↔ =y5_cluster=); re-run =(region, district, ward)= matching.
+3. Implement *admin-narrow → date-disambiguate*; report new unique-match
+   counts per wave against the 38/99 and 0/488 baselines.
+4. Scan =CM_SEC_B..G= for any overlooked cluster/EA id (cheap).
+5. If match rates are acceptable, the #113 "community price as
+   quantity-fallback" usage becomes a documented =transformations= step
+   over =community_prices= at the recovered =v=; otherwise keep the
+   region-level fallback.  Either way =community_prices= itself stays
+   item-level with native =interview__key= =v= --- do not bake the lossy
+   join in.
+
 ** DONE Link  2019-20 and 2020-21 to panel
 CLOSED: [2026-03-29 Sat]
 According to docs this is possible; e.g., see p. 12 of [[../2019-20/Documentation/tznps_sdd_2019_20_basic_information_document_updated_november_2022.pdf][Basic Information Document]].
