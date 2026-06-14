@@ -532,6 +532,18 @@ def food_acquired_to_canonical(df):
     work = work.rename(columns={'j': 'i_canon', 'i': 'j_canon'})
     work = work.rename(columns={'i_canon': 'i', 'j_canon': 'j'})
 
+    # Route the canonical item axis (j) through harmonize_food so it carries
+    # the shared Preferred Label rather than the raw UPPERCASE survey label
+    # (GH #443).  This is the SAME {raw label -> Preferred Label} resolver
+    # used by prices_and_units / food_expenditures / food_quantities and by
+    # crop_production, so food_acquired.j now joins crop_production.j.  Items
+    # with no harmonize_food entry keep their raw label (no fabrication); the
+    # row count is unchanged -- only the j *labels* change.
+    _food_labels = harmonized_food_labels()
+    _jcol = work['j'].astype('object')
+    work['j'] = _jcol.map(lambda s: _food_labels.get(s.strip(), s)
+                          if isinstance(s, str) else s)
+
     def _make(source_label, quant_col, unit_col, value_col=None):
         out = pd.DataFrame({
             't': work['t'].values,
