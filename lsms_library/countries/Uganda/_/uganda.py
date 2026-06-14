@@ -1028,3 +1028,429 @@ CROP_COLMAPS = {
                       'flag': 's4aq16', 'crop': 'cropID'},
     },
 }
+
+
+# ---------------------------------------------------------------------------
+# plot_inputs  (GAP 2 — item-level agricultural inputs)
+# ---------------------------------------------------------------------------
+#
+# One row per REPORTED input applied to a plot, grain (t, i, plot, input).
+# Source: AGSEC3A (season-1 plot-input module) + AGSEC3B (season-2) for the
+# fertilizer / pesticide blocks, and AGSEC4A (plot-crop roster) for the seed
+# block.  ``plot`` mirrors the crop_production / WB harmonised plot_id =
+# hhid-parcel-plot, so a plot_inputs row joins crop_production on
+# (t, i, plot) and plot_features on the parcel component.
+#
+# The UNPS plot-input module records four input *blocks* per plot, each a
+# fixed column group:
+#   organic fertilizer   used / qty / purchased? / purchased-qty / purch-value
+#   inorganic fertilizer used / type / qty / purchased? / purch-qty / value
+#   pesticide/herbicide  used / type / unit / qty / purchased? / purch-qty / value
+# and the seed block (AGSEC4A, plot-crop grain):
+#   seed                 qty / unit / seed-type(Trad/Improved) / improved-type
+#                        / purchase-value [/ purchased? in 2009-10/2010-11]
+#
+# ``input`` carries the FINEST identity the source records, via the
+# harmonize_input table (Code | Preferred Label).  Fertilizer/pesticide
+# sub-types live in distinct Code ranges so one table disambiguates:
+#   10           Seed
+#   20           Organic Fertilizer
+#   30 / 31..34  Inorganic Fertilizer  (Nitrate/Phosphate/Potash/Mixed)
+#   40 / 41..49  Pesticide             (Insecticide/Fungicide/...)
+# Reported attribute columns: Quantity + native unit ``u``, Purchased (bool),
+# Quantity_purchased, Improved (bool, seed rows only), crop (j, seed rows
+# where the source records the seed's crop, on harmonize_crop labels).
+# NO seed_kg / nitrogen_kg / any-use flags — those are transformations.
+
+_INPUT_TABLE = 'harmonize_input'
+# pesticide unit scheme is a tiny 1=Kg / 2=Litres code (a3aq24a / a3aq28a),
+# distinct from the UNPS harvest/seed unit scheme reused for seed via
+# harvest_units.  Stored in its own harmonize_pesticide_unit table.
+_PEST_UNIT_TABLE = 'harmonize_pesticide_unit'
+
+# input-block -> harmonize_input base Code.  Inorganic/pesticide refine by
+# adding the source type code (1..4 / 1..6,96 -> 96 folds to 9) so e.g.
+# Nitrate inorganic = 31, Fungicide pesticide = 43.
+_INPUT_BASE = {'seed': 10, 'organic': 20, 'inorganic': 30, 'pesticide': 40}
+
+
+def _input_label_map():
+    return _harmonized_codes(_INPUT_TABLE)
+
+
+def _pest_unit_map():
+    return _harmonized_codes(_PEST_UNIT_TABLE)
+
+
+def _input_code(block, type_code):
+    """Resolve the harmonize_input Code for a block + native type code.
+
+    ``type_code`` may be NaN (block used but type unreported -> base code).
+    Pesticide ``96`` ("Other") folds to base+9 so the table stays compact.
+    """
+    base = _INPUT_BASE[block]
+    if block in ('inorganic', 'pesticide') and pd.notna(type_code):
+        tc = int(type_code)
+        if tc == 96:
+            tc = 9
+        if 1 <= tc <= 9:
+            return base + tc
+    return base
+
+
+def _recode_yes(series):
+    """Map a 1/2 (Yes/No) coded column to a nullable boolean (1->True,
+    2->False; everything else -> NA).  UNPS uses 1=Yes, 2=No."""
+    code = _to_int_code(series)
+    out = pd.Series(pd.NA, index=series.index, dtype='boolean')
+    out[code == 1] = True
+    out[code == 2] = False
+    return out
+
+
+def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
+    """Build canonical ``plot_inputs`` for one Uganda UNPS wave.
+
+    Parameters
+    ----------
+    t : str
+        Wave id (e.g. ``"2011-12"``).
+    df3a, df3b : pd.DataFrame | None
+        Raw AGSEC3A (season 1) / AGSEC3B (season 2) plot-input modules,
+        loaded with ``convert_categoricals=False`` so code columns carry
+        integer codes.  ``None`` permitted (season absent).
+    df4a : pd.DataFrame | None
+        Raw AGSEC4A plot-crop roster, for the seed block.  ``None``
+        permitted; when absent no seed rows are emitted.
+    colmap : dict
+        Per-wave column map; see ``INPUT_COLMAPS``.
+
+    Returns
+    -------
+    pd.DataFrame indexed by ``(t, i, plot, input)`` with columns
+    ``Quantity`` (Float64), ``u`` (object, native unit label), ``Purchased``
+    (boolean), ``Quantity_purchased`` (Float64), ``Improved`` (boolean,
+    seed rows), and ``j`` (object crop label, seed rows where recorded).
+    Reported values only; missing-in-wave columns are NaN.
+    """
+    input_map = _input_label_map()
+    unit_map = _harvest_unit_map()        # seed unit reuses harvest scheme
+    pest_unit_map = _pest_unit_map()
+    crop_map = _crop_label_map()
+
+    pieces = []
+
+    # ---- fertilizer / pesticide blocks from AGSEC3A / AGSEC3B ----
+    for season, df3 in (('A', df3a), ('B', df3b)):
+        if df3 is None or len(df3) == 0:
+            continue
+        cm = (colmap.get(season) or {}).get('inputs')
+        if not cm:
+            continue
+        hh = df3[cm['hhid']].apply(format_id)
+        parcel = df3[cm['parcel']].apply(format_id)
+        plot = (df3[cm['plot']].apply(format_id)
+                if cm.get('plot') and cm['plot'] in df3.columns
+                else pd.Series([''] * len(df3), index=df3.index))
+        plot_id = hh.astype(str) + '-' + parcel.astype(str) + '-' + plot.astype(str)
+
+        for block in ('organic', 'inorganic', 'pesticide'):
+            b = cm.get(block)
+            if not b:
+                continue
+            # A block "applies" to a plot when its used-flag is Yes, OR
+            # (no used-flag column, e.g. inorganic in 2011+) when a type
+            # or quantity is reported.
+            type_code = (_to_int_code(df3[b['type']])
+                         if b.get('type') and b['type'] in df3.columns
+                         else pd.Series([pd.NA] * len(df3), index=df3.index, dtype='Int64'))
+            qty = (pd.to_numeric(df3[b['qty']], errors='coerce')
+                   if b.get('qty') and b['qty'] in df3.columns
+                   else pd.Series([np.nan] * len(df3), index=df3.index))
+
+            if b.get('used') and b['used'] in df3.columns:
+                used = _recode_yes(df3[b['used']])
+                applied = (used == True)
+            else:
+                applied = type_code.notna() | qty.notna()
+
+            if not applied.any():
+                continue
+
+            # native unit: pesticide carries a 1=Kg/2=Litre unit column;
+            # organic/inorganic are implicitly kg (no unit column).
+            if b.get('unit') and b['unit'] in df3.columns:
+                ucode = _to_int_code(df3[b['unit']])
+                u = ucode.map(lambda c: pest_unit_map.get(int(c), pd.NA)
+                              if pd.notna(c) else pd.NA)
+            elif block in ('organic', 'inorganic'):
+                u = pd.Series(['Kg'] * len(df3), index=df3.index, dtype='object')
+            else:
+                u = pd.Series([pd.NA] * len(df3), index=df3.index, dtype='object')
+
+            purchased = (_recode_yes(df3[b['purchased']])
+                         if b.get('purchased') and b['purchased'] in df3.columns
+                         else pd.Series([pd.NA] * len(df3), index=df3.index, dtype='boolean'))
+            qpur = (pd.to_numeric(df3[b['purchased_qty']], errors='coerce')
+                    if b.get('purchased_qty') and b['purchased_qty'] in df3.columns
+                    else pd.Series([np.nan] * len(df3), index=df3.index))
+
+            input_code = type_code.map(lambda c: _input_code(block, c))
+            input_label = input_code.map(lambda c: input_map.get(int(c), pd.NA)
+                                         if pd.notna(c) else pd.NA)
+
+            piece = pd.DataFrame({
+                't': t,
+                'i': hh.values,
+                'plot': plot_id.values,
+                'input': input_label.values,
+                'Quantity': qty.values,
+                'u': u.values,
+                'Purchased': purchased.values,
+                'Quantity_purchased': qpur.values,
+                'Improved': pd.Series([pd.NA] * len(df3), dtype='boolean').values,
+                'j': pd.Series([pd.NA] * len(df3), dtype='object').values,
+            })
+            piece = piece[applied.values]
+            pieces.append(piece)
+
+    # ---- seed block from AGSEC4A (plot-crop grain) ----
+    sc = colmap.get('seed')
+    if df4a is not None and len(df4a) and sc:
+        hh = df4a[sc['hhid']].apply(format_id)
+        parcel = df4a[sc['parcel']].apply(format_id)
+        plot = (df4a[sc['plot']].apply(format_id)
+                if sc.get('plot') and sc['plot'] in df4a.columns
+                else pd.Series([''] * len(df4a), index=df4a.index))
+        plot_id = hh.astype(str) + '-' + parcel.astype(str) + '-' + plot.astype(str)
+
+        crop_code = (_to_int_code(df4a[sc['crop']])
+                     if sc.get('crop') and sc['crop'] in df4a.columns
+                     else pd.Series([pd.NA] * len(df4a), index=df4a.index, dtype='Int64'))
+        j = crop_code.map(lambda c: crop_map.get(int(c), pd.NA)
+                          if pd.notna(c) else pd.NA)
+
+        qty = (pd.to_numeric(df4a[sc['qty']], errors='coerce')
+               if sc.get('qty') and sc['qty'] in df4a.columns
+               else pd.Series([np.nan] * len(df4a), index=df4a.index))
+        if sc.get('unit') and sc['unit'] in df4a.columns:
+            ucode = _to_int_code(df4a[sc['unit']])
+            u = ucode.map(lambda c: unit_map.get(int(c), pd.NA)
+                          if pd.notna(c) else pd.NA)
+        else:
+            u = pd.Series([pd.NA] * len(df4a), index=df4a.index, dtype='object')
+
+        # Improved: seed-type 1=Traditional, 2=Improved.
+        stype = (_to_int_code(df4a[sc['seed_type']])
+                 if sc.get('seed_type') and sc['seed_type'] in df4a.columns
+                 else pd.Series([pd.NA] * len(df4a), index=df4a.index, dtype='Int64'))
+        improved = pd.Series(pd.NA, index=df4a.index, dtype='boolean')
+        improved[stype == 2] = True
+        improved[stype == 1] = False
+
+        purchased = (_recode_yes(df4a[sc['purchased']])
+                     if sc.get('purchased') and sc['purchased'] in df4a.columns
+                     else pd.Series([pd.NA] * len(df4a), index=df4a.index, dtype='boolean'))
+        qpur = (pd.to_numeric(df4a[sc['purchased_qty']], errors='coerce')
+                if sc.get('purchased_qty') and sc['purchased_qty'] in df4a.columns
+                else pd.Series([np.nan] * len(df4a), index=df4a.index))
+
+        seed_label = input_map.get(_INPUT_BASE['seed'], 'Seed')
+        piece = pd.DataFrame({
+            't': t,
+            'i': hh.values,
+            'plot': plot_id.values,
+            'input': seed_label,
+            'Quantity': qty.values,
+            'u': u.values,
+            'Purchased': purchased.values,
+            'Quantity_purchased': qpur.values,
+            'Improved': improved.values,
+            'j': j.values,
+        })
+        # Keep a seed row when any seed measure is reported (qty, improved,
+        # purchased, or a crop label) — a plot-crop with a recorded seed.
+        keep = (piece['Quantity'].notna() | piece['Improved'].notna()
+                | piece['Purchased'].notna() | piece['j'].notna())
+        pieces.append(piece[keep.values])
+
+    cols = ['Quantity', 'u', 'Purchased', 'Quantity_purchased', 'Improved']
+    if not pieces:
+        return pd.DataFrame(columns=cols)
+
+    df = pd.concat(pieces, ignore_index=True)
+    df = df[df['input'].notna()]
+
+    df['Quantity'] = pd.to_numeric(df['Quantity'], errors='coerce').astype('Float64')
+    df['Quantity_purchased'] = pd.to_numeric(df['Quantity_purchased'], errors='coerce').astype('Float64')
+    df['Purchased'] = df['Purchased'].astype('boolean')
+    df['Improved'] = df['Improved'].astype('boolean')
+    # u may be NaN (a reported pesticide with no unit label); sentinel so it
+    # is not an issue for downstream code that strings the column.
+    df['u'] = df['u'].astype('object').where(df['u'].notna(), 'Unknown')
+    # j is the seed's crop (on harmonize_crop labels) for seed rows, and a
+    # 'n/a' sentinel for fertilizer/pesticide rows (no crop linkage).  It is
+    # an INDEX level so per-crop seed rows on a multi-crop plot stay distinct
+    # (the maintainer's "plot-crop seed grain") rather than collapsing —
+    # 37.9% of seeded plots in 2011-12 carry >1 crop.  The sentinel keeps the
+    # level non-null so it is a valid index level.
+    df['j'] = df['j'].astype('object').where(df['j'].notna(), 'n/a')
+
+    df = df.set_index(['t', 'i', 'plot', 'input', 'j'])
+    # Collapse only EXACT-duplicate (t,i,plot,input,j) tuples — the same input
+    # identity reported twice for the same plot-crop (e.g. a fertilizer block
+    # appearing in both AGSEC3A passes, or a seed row repeated).  This is
+    # de-duplication of the index grain, NOT cross-item aggregation: Quantity
+    # / purchased quantity sum, flags/unit take first.
+    if not df.index.is_unique:
+        num = df[['Quantity', 'Quantity_purchased']].groupby(level=df.index.names).sum(min_count=1)
+        flags = df[['Purchased', 'Improved']].groupby(level=df.index.names).max()
+        us = df[['u']].groupby(level=df.index.names).first()
+        df = num.join(flags).join(us)
+        df = df[cols]
+    return df
+
+
+# Per-wave column maps for plot_inputs_for_wave.
+#
+# Two questionnaire vintages:
+#   2009-10 / 2010-11 (older numbering):
+#     organic   used a3aq4  qty a3aq5  purch a3aq6  pqty a3aq7
+#     inorganic used a3aq14 type a3aq15 qty a3aq16 purch a3aq17 pqty a3aq18
+#     pesticide used a3aq26 type a3aq27 unit a3aq28a qty a3aq28b purch a3aq29 pqty a3aq30
+#     seed (AGSEC4A): NO qty/unit; purch a4aq10, seed_type a4aq13  (qty absent)
+#   2011-12 / 2013-14 / 2015-16 / 2018-19 / 2019-20 (newer numbering, s-prefix
+#   for 2018+):
+#     organic   used .4  qty .5  purch .6  pqty .7
+#     inorganic used .13 type .14 qty .15 purch .16 pqty .17
+#     pesticide used .22 type .23 unit .24a qty .24b purch .25 pqty .26
+#     seed (AGSEC4A): qty .11a unit .11b seed_type .13  (purch via value .15;
+#                     no explicit purchased y/n -> Purchased NA)
+INPUT_COLMAPS = {
+    '2009-10': {
+        'A': {'hhid': 'HHID', 'parcel': 'a3aq1', 'plot': 'a3aq3',
+              'inputs': {
+                  'hhid': 'HHID', 'parcel': 'a3aq1', 'plot': 'a3aq3',
+                  'organic':   {'used': 'a3aq4', 'qty': 'a3aq5', 'purchased': 'a3aq6', 'purchased_qty': 'a3aq7'},
+                  'inorganic': {'used': 'a3aq14', 'type': 'a3aq15', 'qty': 'a3aq16', 'purchased': 'a3aq17', 'purchased_qty': 'a3aq18'},
+                  'pesticide': {'used': 'a3aq26', 'type': 'a3aq27', 'unit': 'a3aq28a', 'qty': 'a3aq28b', 'purchased': 'a3aq29', 'purchased_qty': 'a3aq30'},
+              }},
+        'B': {'hhid': 'HHID', 'parcel': 'a3bq1', 'plot': 'a3bq3',
+              'inputs': {
+                  'hhid': 'HHID', 'parcel': 'a3bq1', 'plot': 'a3bq3',
+                  'organic':   {'used': 'a3bq4', 'qty': 'a3bq5', 'purchased': 'a3bq6', 'purchased_qty': 'a3bq7'},
+                  'inorganic': {'used': 'a3bq14', 'type': 'a3bq15', 'qty': 'a3bq16', 'purchased': 'a3bq17', 'purchased_qty': 'a3bq18'},
+                  'pesticide': {'used': 'a3bq26', 'type': 'a3bq27', 'unit': 'a3bq28a', 'qty': 'a3bq28b', 'purchased': 'a3bq29', 'purchased_qty': 'a3bq30'},
+              }},
+        'seed': {'hhid': 'HHID', 'parcel': 'a4aq2', 'plot': 'a4aq4', 'crop': 'a4aq6',
+                 'purchased': 'a4aq10', 'seed_type': 'a4aq13'},
+    },
+    '2010-11': {
+        'A': {'hhid': 'HHID', 'parcel': 'prcid', 'plot': 'pltid',
+              'inputs': {
+                  'hhid': 'HHID', 'parcel': 'prcid', 'plot': 'pltid',
+                  'organic':   {'used': 'a3aq4', 'qty': 'a3aq5', 'purchased': 'a3aq6', 'purchased_qty': 'a3aq7'},
+                  'inorganic': {'used': 'a3aq14', 'type': 'a3aq15', 'qty': 'a3aq16', 'purchased': 'a3aq17', 'purchased_qty': 'a3aq18'},
+                  'pesticide': {'used': 'a3aq26', 'type': 'a3aq27', 'unit': 'a3aq28a', 'qty': 'a3aq28b', 'purchased': 'a3aq29', 'purchased_qty': 'a3aq30'},
+              }},
+        'B': {'hhid': 'HHID', 'parcel': 'prcid', 'plot': 'pltid',
+              'inputs': {
+                  'hhid': 'HHID', 'parcel': 'prcid', 'plot': 'pltid',
+                  'organic':   {'used': 'a3bq4', 'qty': 'a3bq5', 'purchased': 'a3bq6', 'purchased_qty': 'a3bq7'},
+                  'inorganic': {'used': 'a3bq14', 'type': 'a3bq15', 'qty': 'a3bq16', 'purchased': 'a3bq17', 'purchased_qty': 'a3bq18'},
+                  'pesticide': {'used': 'a3bq26', 'type': 'a3bq27', 'unit': 'a3bq28a', 'qty': 'a3bq28b', 'purchased': 'a3bq29', 'purchased_qty': 'a3bq30'},
+              }},
+        'seed': {'hhid': 'HHID', 'parcel': 'prcid', 'plot': 'pltid', 'crop': 'cropID',
+                 'purchased': 'a4aq10', 'seed_type': 'a4aq13'},
+    },
+    '2011-12': {
+        'A': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+              'inputs': {
+                  'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+                  'organic':   {'used': 'a3aq4', 'qty': 'a3aq5', 'purchased': 'a3aq6', 'purchased_qty': 'a3aq7'},
+                  'inorganic': {'used': 'a3aq13', 'type': 'a3aq14', 'qty': 'a3aq15', 'purchased': 'a3aq16', 'purchased_qty': 'a3aq17'},
+                  'pesticide': {'used': 'a3aq22', 'type': 'a3aq23', 'unit': 'a3aq24a', 'qty': 'a3aq24b', 'purchased': 'a3aq25', 'purchased_qty': 'a3aq26'},
+              }},
+        'B': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+              'inputs': {
+                  'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+                  'organic':   {'used': 'a3bq4', 'qty': 'a3bq5', 'purchased': 'a3bq6', 'purchased_qty': 'a3bq7'},
+                  'inorganic': {'used': 'a3bq13', 'type': 'a3bq14', 'qty': 'a3bq15', 'purchased': 'a3bq16', 'purchased_qty': 'a3bq17'},
+                  'pesticide': {'used': 'a3bq22', 'type': 'a3bq23', 'unit': 'a3bq24a', 'qty': 'a3bq24b', 'purchased': 'a3bq25', 'purchased_qty': 'a3bq26'},
+              }},
+        'seed': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
+                 'qty': 'a4aq11a', 'unit': 'a4aq11b', 'seed_type': 'a4aq13'},
+    },
+    '2013-14': {
+        'A': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+              'inputs': {
+                  'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+                  'organic':   {'used': 'a3aq4', 'qty': 'a3aq5', 'purchased': 'a3aq6', 'purchased_qty': 'a3aq7'},
+                  'inorganic': {'used': 'a3aq13', 'type': 'a3aq14', 'qty': 'a3aq15', 'purchased': 'a3aq16', 'purchased_qty': 'a3aq17'},
+                  'pesticide': {'used': 'a3aq22', 'type': 'a3aq23', 'unit': 'a3aq24a', 'qty': 'a3aq24b', 'purchased': 'a3aq25', 'purchased_qty': 'a3aq26'},
+              }},
+        'B': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+              'inputs': {
+                  'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+                  'organic':   {'used': 'a3bq4', 'qty': 'a3bq5', 'purchased': 'a3bq6', 'purchased_qty': 'a3bq7'},
+                  'inorganic': {'used': 'a3bq13', 'type': 'a3bq14', 'qty': 'a3bq15', 'purchased': 'a3bq16', 'purchased_qty': 'a3bq17'},
+                  'pesticide': {'used': 'a3bq22', 'type': 'a3bq23', 'unit': 'a3bq24a', 'qty': 'a3bq24b', 'purchased': 'a3bq25', 'purchased_qty': 'a3bq26'},
+              }},
+        'seed': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
+                 'qty': 'a4aq11a', 'unit': 'a4aq11b', 'seed_type': 'a4aq13'},
+    },
+    '2015-16': {
+        'A': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+              'inputs': {
+                  'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+                  'organic':   {'used': 'a3aq4', 'qty': 'a3aq5', 'purchased': 'a3aq6', 'purchased_qty': 'a3aq7'},
+                  'inorganic': {'used': 'a3aq13', 'type': 'a3aq14', 'qty': 'a3aq15', 'purchased': 'a3aq16', 'purchased_qty': 'a3aq17'},
+                  'pesticide': {'used': 'a3aq22', 'type': 'a3aq23', 'unit': 'a3aq24a', 'qty': 'a3aq24b', 'purchased': 'a3aq25', 'purchased_qty': 'a3aq26'},
+              }},
+        'B': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+              'inputs': {
+                  'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+                  'organic':   {'used': 'a3bq4', 'qty': 'a3bq5', 'purchased': 'a3bq6', 'purchased_qty': 'a3bq7'},
+                  'inorganic': {'used': 'a3bq13', 'type': 'a3bq14', 'qty': 'a3bq15', 'purchased': 'a3bq16', 'purchased_qty': 'a3bq17'},
+                  'pesticide': {'used': 'a3bq22', 'type': 'a3bq23', 'unit': 'a3bq24a', 'qty': 'a3bq24b', 'purchased': 'a3bq25', 'purchased_qty': 'a3bq26'},
+              }},
+        'seed': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
+                 'qty': 'a4aq11a', 'unit': 'a4aq11b', 'seed_type': 'a4aq13'},
+    },
+    '2018-19': {
+        'A': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
+              'inputs': {
+                  'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
+                  'organic':   {'used': 's3aq04', 'qty': 's3aq05', 'purchased': 's3aq06', 'purchased_qty': 's3aq07'},
+                  'inorganic': {'used': 's3aq13', 'type': 's3aq14', 'qty': 's3aq15', 'purchased': 's3aq16', 'purchased_qty': 's3aq17'},
+                  'pesticide': {'used': 's3aq22', 'type': 's3aq23', 'unit': 's3aq24a', 'qty': 's3aq24b', 'purchased': 's3aq25', 'purchased_qty': 's3aq26'},
+              }},
+        'B': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
+              'inputs': {
+                  'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
+                  'organic':   {'used': 's3bq04', 'qty': 's3bq05', 'purchased': 's3bq06', 'purchased_qty': 's3bq07'},
+                  'inorganic': {'used': 's3bq13', 'type': 's3bq14', 'qty': 's3bq15', 'purchased': 's3bq16', 'purchased_qty': 's3bq17'},
+                  'pesticide': {'used': 's3bq22', 'type': 's3bq23', 'unit': 's3bq24a', 'qty': 's3bq24b', 'purchased': 's3bq25', 'purchased_qty': 's3bq26'},
+              }},
+        'seed': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
+                 'qty': 's4aq11a', 'unit': 's4aq11b', 'seed_type': 's4aq13'},
+    },
+    '2019-20': {
+        'A': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
+              'inputs': {
+                  'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
+                  'organic':   {'used': 's3aq04', 'qty': 's3aq05', 'purchased': 's3aq06', 'purchased_qty': 's3aq07'},
+                  'inorganic': {'used': 's3aq13', 'type': 's3aq14', 'qty': 's3aq15', 'purchased': 's3aq16', 'purchased_qty': 's3aq17'},
+                  'pesticide': {'used': 's3aq22', 'type': 's3aq23', 'unit': 's3aq24a', 'qty': 's3aq24b', 'purchased': 's3aq25', 'purchased_qty': 's3aq26'},
+              }},
+        'B': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
+              'inputs': {
+                  'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
+                  'organic':   {'used': 's3bq04', 'qty': 's3bq05', 'purchased': 's3bq06', 'purchased_qty': 's3bq07'},
+                  'inorganic': {'used': 's3bq13', 'type': 's3bq14', 'qty': 's3bq15', 'purchased': 's3bq16', 'purchased_qty': 's3bq17'},
+                  'pesticide': {'used': 's3bq22', 'type': 's3bq23', 'unit': 's3bq24a', 'qty': 's3bq24b', 'purchased': 's3bq25', 'purchased_qty': 's3bq26'},
+              }},
+        'seed': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
+                 'qty': 's4aq11a', 'unit': 's4aq11b', 'seed_type': 's4aq13'},
+    },
+}
