@@ -1587,3 +1587,148 @@ def livestock_for_wave(t, count, txn, colmap):
     agg = agg.set_index(['t', 'i', 'animal'])
     agg = agg[['HeadCount', 'HeadAcquired', 'HeadSold', 'Value']]
     return agg.sort_index()
+
+
+def anthropometry_for_wave(t, health, roster, colmap):
+    """Build item-level ``anthropometry`` for one Ethiopia ESS wave (GAP 5).
+
+    Individual-level body measures at ``(t, i, pid)`` -- one row per
+    measured individual, carrying only the REPORTED anthropometric data the
+    ESS §3 health module records, plus the child Age/Sex needed to make the
+    row self-describing for the downstream WHO-2006 z-score transform.
+
+    This reproduces the *inputs* to the WB ``zscore06`` call
+    (``ETH_ESS1.do:1217-1235`` and the parallel blocks in ESS2-5), NOT its
+    outputs.  We deliberately DO NOT compute or store haz06 / waz06 / whz06 /
+    bmiz06 / wasting / stunting: those require the WHO-2006 reference
+    population and are a *transform* applied at query time, never a data-
+    layer column.
+
+    Source variables (confirmed per wave via get_dataframe):
+      weight  hh_s3q22 (W1-W3) / s3q37 (W4-W5)   -- kg
+      height  hh_s3q23 (W1-W3) / s3q38 (W4-W5)   -- cm; >200 set to NaN
+              (the WB ``replace height=. if height>200`` data-clean; the
+              raw §3 column carries clear unit-error outliers e.g. 971/993).
+    No ESS wave records a MUAC (mid-upper-arm circumference) question, so
+    the canonical ``MUAC`` column is declared for cross-country alignment but
+    is legitimately all-NaN for Ethiopia.
+
+    Age_months / Sex come from the §1 household roster (the same merge the
+    WB code does: ``merge 1:1 household_id individual_id using household_roster``):
+      Age_months = age_years * 12, falling back to the §1 age-in-months
+                   remainder column where age-in-years is missing (mirrors
+                   the WB ``gen cage = age*12; replace cage = <months> if
+                   age==.``).  The downstream zscore06 transform consumes
+                   age in completed months.
+      Sex        = M / F from the §1 sex code (1=Male, 2=Female; the WB
+                   ``female = sex==2``), via the same code map the roster
+                   uses.
+
+    Parameters
+    ----------
+    t : str
+        Wave id (e.g. ``"2011-12"``) -- the ``t`` index value.
+    health : pd.DataFrame
+        Raw §3 health file (sect3_hh), loaded convert_categoricals=False so
+        the weight/height columns are numeric.
+    roster : pd.DataFrame
+        Raw §1 roster file (sect1_hh), convert_categoricals=False, carrying
+        the age (years + months remainder) and sex codes.  Joined on the
+        wave's (hhid, pid) key so Age_months/Sex attach per individual.
+    colmap : dict
+        Per-wave column map.  Required keys:
+            hhid    household-id column EMITTED as ``i`` (and the merge key);
+                    household_id2 for W2/W3 -- so i/pid MATCH household_roster
+                    -- else household_id.
+            pid     individual-id column EMITTED as ``pid`` (individual_id2
+                    for W2/W3, else individual_id).
+            weight  reported weight (kg) column in ``health``.
+            height  reported height (cm) column in ``health``.
+            r_hhid  hhid column in ``roster`` (for the merge; same scheme as
+                    ``hhid``).
+            r_pid   pid column in ``roster``.
+            age_yr  age-in-years column in ``roster``.
+            age_mo  age-in-months-remainder column in ``roster``.
+            sex     sex code column in ``roster`` (1=Male, 2=Female).
+        Optional keys (NaN where the wave does not ask):
+            muac    mid-upper-arm-circumference column (no ESS wave has one).
+
+    Returns
+    -------
+    pd.DataFrame indexed by ``(t, i, pid)`` with columns
+        Weight (Float64, kg), Height (Float64, cm), MUAC (Float64, cm),
+        Age_months (Float64), Sex (string, M/F).
+    Only individuals with at least one reported body measure (Weight,
+    Height, or MUAC) are kept -- the §3 module is administered only to the
+    sampled children, so the roster's un-measured members are dropped.
+    """
+    c = colmap
+
+    def _num(df, key):
+        col = c.get(key)
+        if col is None or col not in df.columns:
+            return None
+        return pd.to_numeric(df[col], errors='coerce').astype('Float64')
+
+    h = health.copy()
+    weight = _num(h, 'weight')
+    height = _num(h, 'height')
+    if height is not None:
+        # WB data-clean: implausible heights (>200 cm) are unit errors.
+        height = height.mask(height > 200)
+    muac = _num(h, 'muac')
+    if muac is None:
+        muac = pd.Series(pd.NA, index=h.index, dtype='Float64')
+    if weight is None:
+        weight = pd.Series(pd.NA, index=h.index, dtype='Float64')
+    if height is None:
+        height = pd.Series(pd.NA, index=h.index, dtype='Float64')
+
+    anthro = pd.DataFrame({
+        'i':      h[c['hhid']].apply(format_id).values,
+        'pid':    h[c['pid']].apply(format_id).values,
+        'Weight': weight.values,
+        'Height': height.values,
+        'MUAC':   muac.values,
+    })
+
+    # Keep only measured individuals (the §3 child-anthro sub-sample).
+    measured = (anthro['Weight'].notna() | anthro['Height'].notna()
+                | anthro['MUAC'].notna())
+    anthro = anthro[measured].copy()
+
+    # ---- attach self-describing Age_months / Sex from the §1 roster ----
+    r = roster.copy()
+    age_yr = pd.to_numeric(r[c['age_yr']], errors='coerce').astype('Float64')
+    age_mo = (pd.to_numeric(r[c['age_mo']], errors='coerce').astype('Float64')
+              if c.get('age_mo') and c['age_mo'] in r.columns else None)
+    # cage = age*12; fall back to the months-remainder column when years
+    # is missing (WB: replace cage = <months> if age==.).
+    age_months = age_yr * 12
+    if age_mo is not None:
+        age_months = age_months.fillna(age_mo)
+
+    sex_code = pd.to_numeric(r[c['sex']], errors='coerce').astype('Int64')
+    sex = sex_code.map({1: 'M', 2: 'F'}).astype('string')
+
+    rinfo = pd.DataFrame({
+        'i':          r[c['r_hhid']].apply(format_id).values,
+        'pid':        r[c['r_pid']].apply(format_id).values,
+        'Age_months': age_months.values,
+        'Sex':        sex.values,
+    }).drop_duplicates(subset=['i', 'pid'])
+
+    out = anthro.merge(rinfo, on=['i', 'pid'], how='left')
+
+    out['t'] = t
+    out['i'] = out['i'].astype('string')
+    out['pid'] = out['pid'].astype('string')
+    for col in ['Weight', 'Height', 'MUAC', 'Age_months']:
+        out[col] = out[col].astype('Float64')
+    out['Sex'] = out['Sex'].astype('string')
+
+    out = out.set_index(['t', 'i', 'pid'])
+    out = out[['Weight', 'Height', 'MUAC', 'Age_months', 'Sex']]
+    # Collapse any accidental duplicate measurement rows for an individual.
+    out = out[~out.index.duplicated(keep='first')]
+    return out.sort_index()

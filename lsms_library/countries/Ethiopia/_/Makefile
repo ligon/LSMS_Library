@@ -18,7 +18,8 @@ VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 var = \
       $(VAR_DIR)/shocks.parquet $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet \
       $(VAR_DIR)/food_coping.parquet $(VAR_DIR)/crop_production.parquet \
-      $(VAR_DIR)/plot_inputs.parquet $(VAR_DIR)/livestock.parquet
+      $(VAR_DIR)/plot_inputs.parquet $(VAR_DIR)/livestock.parquet \
+      $(VAR_DIR)/anthropometry.parquet
 
 all: panel_ids.json updated_ids.json $(parquet) $(var)
 
@@ -113,6 +114,20 @@ food_coping_parquet := $(food_coping:.py=.parquet)
 
 $(VAR_DIR)/food_coping.parquet: food_coping.py $(food_coping_parquet)
 	python food_coping.py
+
+# anthropometry (GAP 5; NEW item-level body measures at (t, i, pid) from
+# the ESS §3 health module + §1 roster age/sex).  Mirrors the livestock
+# convention: the framework's grab_data calls
+# `make ../<wave>/_/anthropometry.parquet`, whose pattern rule runs the wave
+# script; the VAR_DIR rule concatenates them via the country script.
+anthropometry = $(shell find $(rounds) -name anthropometry.py)
+anthropometry_parquet := $(anthropometry:.py=.parquet)
+
+../%/_/anthropometry.parquet: ../%/_/anthropometry.py
+	(cd $(@D) && python anthropometry.py)
+
+$(VAR_DIR)/anthropometry.parquet: anthropometry.py $(anthropometry_parquet)
+	python anthropometry.py
 
 $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet: nutrition.py categorical_mapping.org $(VAR_DIR)/food_acquired.parquet
 	python nutrition.py
