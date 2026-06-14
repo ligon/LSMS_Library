@@ -159,5 +159,36 @@ Data Scheme:
     intercropped: bool
     perennial: bool
     materialize: make
+  plot_inputs:
+    # Item-level (t, i, plot, input, crop, u) agricultural-input feature
+    # for the four IHS3+/IHPS waves (2010-11, 2013-14, 2016-17, 2019-20);
+    # GAP 2.  One reported row per input applied to a plot.  Sources:
+    # Module D (ag_mod_d) -- inorganic fertilizer in two slots (type +
+    # applied quantity + unit), an organic-fertilizer used? flag (ag_d36),
+    # and pesticide/herbicide/fungicide/fumigant types + qty + unit gated
+    # by ag_d40; Module G (ag_mod_g) -- seed planted per plot-crop
+    # (ag_g04a/b) with the improved-seed flag ag_g0f in IHS4/IHS5; Module H
+    # (ag_mod_h) -- purchased seed (household-crop grain) attached to the
+    # single-plot seed row of that (i, crop), like crop_production's sale.
+    # `input` is the shared harmonize_input Preferred Label
+    # (NPK/DAP/CAN/Urea/D-Compound/Other fertilizer, Organic Fertilizer,
+    # Insecticide/Herbicide/Fungicide/Fumigant/Other Pesticide, Seed).
+    # `crop` is the harmonize_crop->harmonize_food label for seed rows
+    # (NaN for fertilizer/pesticide).  `u` is the reported native unit
+    # label (NaN where the survey records no quantity basis, e.g. organic
+    # fertilizer).  crop / u are in the index because a plot may carry
+    # several seed crops or a fertilizer in several units.  Reported item
+    # columns only: Quantity, native u, Purchased (bool, True where a
+    # purchased seed quantity is attached), Quantity_purchased, Improved
+    # (bool, seed rows).  Aggregates (seed_kg, nitrogen_kg,
+    # inorganic/organic/pesticide any-flags) are transformations, NOT
+    # stored columns.  2004-05 (IHS2) deferred: household-level aggregated
+    # ag file, no plot-input roster.  See _/malawi.py:assemble_plot_inputs.
+    index: (t, i, plot, input, crop, u)
+    Quantity: float
+    Purchased: bool
+    Quantity_purchased: float
+    Improved: bool
+    materialize: make
   food_expenditures:
   food_prices:
