@@ -26,8 +26,10 @@ colmap = dict(
     area_est_unit = 's16aq09b',
     tenure        = 's16aq10',
     tenure_system = 's16aq13',
+    certificate   = 's16aq13',  # WB plot_certificate: has-any-legal-document bool
     soil_type     = 's16aq18',
     water_source  = 's16aq17',
+    fertility     = 's16aq20',  # WB soil-quality tag: reported good/medium/poor
 )
 
 df = plot_features_for_wave('2021-22', src, colmap)
