@@ -999,3 +999,217 @@ def crop_production_for_wave(t, seas, fruit, peren, sales, colmaps):
         })
     df = df[CROP_PRODUCTION_COLUMNS]
     return df
+
+
+# Plot-inputs feature (parity-loop GAP 2).  Item-level inputs applied to a
+# plot at the natural grain (t, i, plot_id, input, crop) -- one row per input
+# applied to a plot -- carrying ONLY reported survey fields.  No seed_kg sum,
+# no nitrogen_kg, no any-use flags, no fertilizer totals: those are
+# transformations over these rows.
+#   * input  : the input identity, on the shared harmonize_input labels --
+#              seed / organic fertilizer / a named inorganic-fertilizer product
+#              (Urea / DAP / NPK / CAN / SA / TSP / MRP / Other Fertilizer,
+#              from ag3a_48 / ag3a_55 codes) / herbicide / pesticide.
+#   * crop   : ONLY for seed rows -- the canonical harmonize_food/harmonize_crop
+#              Preferred Label of the crop the seed was sown for (NPS seed is
+#              reported per plot-crop in AG_SEC_4A).  pd.NA for plot-level
+#              inputs (fertilizer / herbicide / pesticide), which are recorded
+#              once per plot with no crop split.
+#   * Quantity + u : reported native quantity and its native unit.  Fertilizer
+#              quantities are in KG; seed/herbicide/pesticide units are the
+#              reported native unit code resolved to a tidy label (kg / litre /
+#              millilitre / 20 liter bucket / small/large cup), harmonized at
+#              API time by the country u table.
+#   * Purchased (bool) + Quantity_purchased : whether any of the input was
+#              purchased and (where the survey records it as a SEPARATE
+#              quantity) how much.  Organic fertilizer and seed record a
+#              purchased quantity (ag3a_44 / ag4a_10c_1); inorganic fert /
+#              herbicide / pesticide record only a purchased VALUE, so Purchased
+#              there is value>0 and Quantity_purchased is NaN (not fabricated).
+#   * Improved (bool) : seed rows only -- ag4a_08 improved/recycled-improved.
+PLOT_INPUTS_COLUMNS = ['Quantity', 'u', 'Purchased', 'Quantity_purchased',
+                       'Improved']
+
+# Native seed-unit code (ag4a_10_2 / ag4a_10c_2) -> tidy label.  kg/litre/etc.
+# are harmonized to the canonical u Preferred Label at API time by the country
+# u table; the bucket/cup rows were added to that table by this feature.
+_SEED_UNIT_LABELS = {
+    1: 'kg', 2: '20 liter bucket', 3: 'small cup', 4: 'large cup',
+    5: pd.NA,  # OTHER (SPECIFY) -- unit unknown
+}
+# Native herbicide/pesticide-unit code (ag3a_62_2 / ag3a_65b_2) -> tidy label.
+_LIQUID_UNIT_LABELS = {1: 'kg', 2: 'litre', 3: 'millilitre', 4: pd.NA}
+
+
+def _yn_true(series):
+    """Coerce a Stata 1=YES/2=NO column to a nullable boolean (1->True,
+    2->False, else NaN)."""
+    v = pd.to_numeric(series, errors='coerce').astype('Int64')
+    return v.map({1: True, 2: False}).astype('boolean')
+
+
+def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
+    """Build canonical ``plot_inputs`` for one Tanzania NPS wave.
+
+    Item-level inputs at grain (t, i, plot_id, input, crop) from two modules:
+      sec3a -- AG_SEC_3A plot detail: organic fertilizer (ag3a_41/42/43/44),
+               inorganic fertilizer type 1 (ag3a_47/48/49/51) and type 2
+               (ag3a_54/55/56/58), herbicide (ag3a_60/62_1/62_2/63), pesticide
+               (ag3a_65a/65b_1/65b_2/65c).  One row per (plot, input).
+      sec4a -- AG_SEC_4A seasonal-crop seed: ag4a_08 improved flag, ag4a_10_1/2
+               total seed qty+unit, ag4a_10c_1/2 purchased seed qty+unit,
+               ag4a_12 amount paid.  One SEED row per (plot, crop).
+
+    STORES REPORTED VALUES ONLY.  seed_kg / nitrogen_kg / inorganic_fertilizer
+    any-use flags are transformations over these rows, NOT columns here.
+
+    Parameters
+    ----------
+    t : str            wave id ('2019-20' or '2020-21'); the ``t`` value.
+    sec3a, sec4a : pd.DataFrame
+        raw AG_SEC_3A / AG_SEC_4A frames (convert_categoricals=False).
+    colmap : dict with keys hhid, plot, crop (the id columns, which differ
+        across waves: sdd_hhid/plotnum/cropid vs y5_hhid/plot_id/cropid).
+
+    Returns
+    -------
+    pd.DataFrame indexed by (t, i, plot_id, input, crop) with columns
+    PLOT_INPUTS_COLUMNS.
+    """
+    c = colmap
+    fert_type_map = _plot_harmonized_codes('harmonize_input')
+    crop_map = _crop_labels()
+
+    def _ids(df):
+        return (df[c['hhid']].apply(format_id), df[c['plot']].apply(format_id))
+
+    rows = []
+
+    # --- AG_SEC_4A: SEED (one row per plot-crop) ------------------------
+    if sec4a is not None and len(sec4a):
+        hh, plot = _ids(sec4a)
+        code = pd.to_numeric(sec4a[c['crop']], errors='coerce').astype('Int64')
+        qty = pd.to_numeric(sec4a['ag4a_10_1'], errors='coerce').astype('Float64')
+        unit = pd.to_numeric(sec4a['ag4a_10_2'], errors='coerce').astype('Int64')
+        pqty = pd.to_numeric(sec4a['ag4a_10c_1'], errors='coerce').astype('Float64')
+        paid = pd.to_numeric(sec4a['ag4a_12'], errors='coerce').astype('Float64')
+        seedtype = pd.to_numeric(sec4a['ag4a_08'], errors='coerce').astype('Int64')
+        seed = pd.DataFrame({
+            'i': hh.values, 'plot_id': plot.values,
+            'input': 'Seed',
+            'crop': code.map(crop_map).astype('string').values,
+            'Quantity': qty.values,
+            'u': unit.map(_SEED_UNIT_LABELS).astype('string').values,
+            # Purchased if a purchased quantity OR an amount paid is recorded.
+            'Purchased': ((pqty.fillna(0) > 0) | (paid.fillna(0) > 0)).values,
+            'Quantity_purchased': pqty.values,
+            'Improved': seedtype.map({1: True, 2: False, 3: True})
+                        .astype('boolean').values,
+        })
+        # A seed row is real only if a quantity OR a crop label is present.
+        seed = seed[seed['Quantity'].notna() | seed['crop'].notna()]
+        # crop unresolved -> keep raw code as crop_<code> (do not drop).
+        seed['crop'] = seed['crop'].where(
+            seed['crop'].notna(),
+            code.map(lambda x: f'crop_{int(x)}' if pd.notna(x) else pd.NA)
+                .astype('string').reindex(seed.index).values)
+        rows.append(seed)
+
+    # --- AG_SEC_3A: plot-level inputs (crop = NA) -----------------------
+    hh3, plot3 = _ids(sec3a)
+
+    def _liquid_unit(col):
+        return (pd.to_numeric(sec3a[col], errors='coerce').astype('Int64')
+                .map(_LIQUID_UNIT_LABELS).astype('string'))
+
+    # organic fertilizer
+    used = _yn_true(sec3a['ag3a_41'])
+    org = pd.DataFrame({
+        'i': hh3.values, 'plot_id': plot3.values, 'input': 'Organic Fertilizer',
+        'crop': pd.array([pd.NA] * len(sec3a), dtype='string'),
+        'Quantity': pd.to_numeric(sec3a['ag3a_42'], errors='coerce').astype('Float64').values,
+        'u': 'kg',
+        'Purchased': _yn_true(sec3a['ag3a_43']).values,
+        'Quantity_purchased': pd.to_numeric(sec3a['ag3a_44'], errors='coerce').astype('Float64').values,
+        'Improved': pd.array([pd.NA] * len(sec3a), dtype='boolean'),
+    })
+    org = org[used.fillna(False).values]
+
+    # inorganic fertilizer, first and second type
+    def _inorg(used_col, type_col, qty_col, val_col):
+        u = _yn_true(sec3a[used_col])
+        typ = pd.to_numeric(sec3a[type_col], errors='coerce').astype('Int64')
+        label = typ.map(fert_type_map).astype('string')
+        val = pd.to_numeric(sec3a[val_col], errors='coerce').astype('Float64')
+        d = pd.DataFrame({
+            'i': hh3.values, 'plot_id': plot3.values,
+            'input': label.where(label.notna(), 'Other Fertilizer').values,
+            'crop': pd.array([pd.NA] * len(sec3a), dtype='string'),
+            'Quantity': pd.to_numeric(sec3a[qty_col], errors='coerce').astype('Float64').values,
+            'u': 'kg',
+            # Inorganic fert records a purchased VALUE (TSH), not a separate
+            # purchased qty -> Purchased = value>0; Quantity_purchased NaN.
+            'Purchased': (val.fillna(0) > 0).astype('boolean').values,
+            'Quantity_purchased': pd.array([pd.NA] * len(sec3a), dtype='Float64'),
+            'Improved': pd.array([pd.NA] * len(sec3a), dtype='boolean'),
+        })
+        return d[u.fillna(False).values]
+
+    inorg1 = _inorg('ag3a_47', 'ag3a_48', 'ag3a_49', 'ag3a_51')
+    inorg2 = _inorg('ag3a_54', 'ag3a_55', 'ag3a_56', 'ag3a_58')
+
+    # herbicide
+    uh = _yn_true(sec3a['ag3a_60'])
+    valh = pd.to_numeric(sec3a['ag3a_63'], errors='coerce').astype('Float64')
+    herb = pd.DataFrame({
+        'i': hh3.values, 'plot_id': plot3.values, 'input': 'Herbicide',
+        'crop': pd.array([pd.NA] * len(sec3a), dtype='string'),
+        'Quantity': pd.to_numeric(sec3a['ag3a_62_1'], errors='coerce').astype('Float64').values,
+        'u': _liquid_unit('ag3a_62_2').values,
+        'Purchased': (valh.fillna(0) > 0).astype('boolean').values,
+        'Quantity_purchased': pd.array([pd.NA] * len(sec3a), dtype='Float64'),
+        'Improved': pd.array([pd.NA] * len(sec3a), dtype='boolean'),
+    })
+    herb = herb[uh.fillna(False).values]
+
+    # pesticide
+    up = _yn_true(sec3a['ag3a_65a'])
+    valp = pd.to_numeric(sec3a['ag3a_65c'], errors='coerce').astype('Float64')
+    pest = pd.DataFrame({
+        'i': hh3.values, 'plot_id': plot3.values, 'input': 'Pesticide',
+        'crop': pd.array([pd.NA] * len(sec3a), dtype='string'),
+        'Quantity': pd.to_numeric(sec3a['ag3a_65b_1'], errors='coerce').astype('Float64').values,
+        'u': _liquid_unit('ag3a_65b_2').values,
+        'Purchased': (valp.fillna(0) > 0).astype('boolean').values,
+        'Quantity_purchased': pd.array([pd.NA] * len(sec3a), dtype='Float64'),
+        'Improved': pd.array([pd.NA] * len(sec3a), dtype='boolean'),
+    })
+    pest = pest[up.fillna(False).values]
+
+    rows += [org, inorg1, inorg2, herb, pest]
+    df = pd.concat([r for r in rows if r is not None and len(r)], ignore_index=True)
+
+    # u is meaningless where there is no quantity.
+    df['u'] = df['u'].where(df['Quantity'].notna(), pd.NA)
+
+    df['t'] = t
+    df = df.set_index(['t', 'i', 'plot_id', 'input', 'crop'])
+    # Collapse the rare exact-duplicate (t,i,plot,input,crop) -- a plot listing
+    # the same inorganic-fertilizer product as both type 1 and type 2, or two
+    # raw crop codes that share a canonical Seed crop label (e.g. Beans +
+    # Cowpeas -> Pulses): sum the reported quantities, OR the purchased flag,
+    # keep the first unit.  ``min_count=1`` so an all-NA group stays NA (a plain
+    # ``sum`` would zero the all-NA Quantity_purchased of fertilizer rows, which
+    # record only a purchased VALUE, not a purchased quantity).  ``dropna=False``
+    # keeps the NA-crop (plot-level input) rows.
+    if not df.index.is_unique:
+        def _sum1(s):
+            return s.sum(min_count=1)
+        df = df.groupby(level=['t', 'i', 'plot_id', 'input', 'crop'],
+                        dropna=False).agg({
+            'Quantity': _sum1, 'u': 'first',
+            'Purchased': 'max', 'Quantity_purchased': _sum1,
+            'Improved': 'max',
+        })
+    df = df[PLOT_INPUTS_COLUMNS]
+    return df

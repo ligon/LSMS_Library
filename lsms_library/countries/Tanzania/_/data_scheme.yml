@@ -144,3 +144,42 @@ Data Scheme:
     intercropped: bool
     perennial: bool
     materialize: make
+
+  plot_inputs:
+    # Item-level plot inputs (parity-loop GAP 2) at the natural grain
+    # (t, i, plot_id, input, crop) -- one row per input applied to a plot.
+    # Stacks the AG_SEC_3A plot-detail input modules (organic fertilizer
+    # ag3a_41..45; inorganic fertilizer type 1 ag3a_47..51 and type 2
+    # ag3a_54..58; herbicide ag3a_60..63; pesticide ag3a_65a..65c) and the
+    # AG_SEC_4A seasonal-crop seed module (ag4a_08 improved; ag4a_10_1/2 qty+unit;
+    # ag4a_10c_1/2 purchased qty+unit; ag4a_12 amount paid).
+    #   input : the input identity on the shared harmonize_input labels -- Seed /
+    #           Organic Fertilizer / a named inorganic-fertilizer product (Urea,
+    #           DAP, NPK, CAN, SA, TSP, MRP, Other Fertilizer from ag3a_48/55) /
+    #           Herbicide / Pesticide.
+    #   crop  : seed rows ONLY -- the canonical harmonize_food/harmonize_crop
+    #           Preferred Label of the crop the seed was sown for (NPS seed is
+    #           reported per plot-crop), so plot_inputs.crop joins crop_production.j
+    #           and food_acquired.j.  pd.NA for plot-level inputs (fertilizer /
+    #           herbicide / pesticide).  ~23% of rows are non-seed -> the crop
+    #           index level is partially null by construction.
+    #   u     : native unit -- 'kg' for fertilizer (the questionnaire records
+    #           fertilizer in KG); native litre/millilitre/bucket/cup for
+    #           seed / herbicide / pesticide, harmonized by the country u table.
+    # Only 2019-20 and 2020-21 are buildable; 2008-15 has no agriculture source
+    # on disk (same as plot_features / crop_production, GH #167).
+    # SEASON SCOPE: long-rainy-season modules (AG_SEC_3A / AG_SEC_4A) only,
+    # matching crop_production's long-rainy + perennial scope; the short-rainy
+    # AG_SEC_3B / AG_SEC_4B inputs are not stacked (few short-season plots use
+    # inputs -- e.g. 2 inorganic-fertilizer plots in 2019-20 3B).  This is why
+    # per-plot input coverage is ~half the WB Plot_dataset, which counts both
+    # seasons as separate plot-season rows.
+    # STORES REPORTED VALUES ONLY -- seed_kg / nitrogen_kg / any-use flags /
+    # fertilizer totals are transformations over these rows, NOT columns here.
+    index: (t, i, plot_id, input, crop)
+    Quantity: float
+    u: str
+    Purchased: bool
+    Quantity_purchased: float
+    Improved: bool
+    materialize: make
