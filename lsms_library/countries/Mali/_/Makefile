@@ -28,6 +28,16 @@ panel_ids.json updated_ids.json: panel_ids.py mali.py
 $(VAR_DIR)/food_coping.parquet: food_coping.py ../2014-15/_/food_coping.parquet
 	python food_coping.py
 
+# crop_production (item-level harvest, GAP 1 / parity loop).  The crop
+# module lives in the EACI waves only (2014-15, 2017-18).  The wave
+# pattern rule materializes each wave parquet; the country-level
+# concatenator (crop_production.py) aggregates into var/crop_production.parquet.
+../%/_/crop_production.parquet: ../%/_/crop_production.py
+	(cd $(@D) && python crop_production.py)
+
+$(VAR_DIR)/crop_production.parquet: crop_production.py ../2014-15/_/crop_production.parquet ../2017-18/_/crop_production.parquet
+	python crop_production.py
+
 clean:
 	rm -f panel_ids.json updated_ids.json
 

@@ -219,3 +219,120 @@ def plot_features_for_wave(t, source, colmap):
     })
     df = df.set_index(['t', 'i', 'plot_id'])
     return df
+
+# ---------------------------------------------------------------------------
+# crop_production (GAP 1; parity loop) — item-level (t, i, plot, crop)
+# ---------------------------------------------------------------------------
+#
+# The crop/harvest module lives in the EACI waves only (2014-15 EACI14,
+# 2017-18 EACI17).  The EHCVM waves (2018-19, 2021-22) carry no crop-harvest
+# block, so crop_production is wired for the two EACI waves only — exactly
+# the two waves the WB MLI_EACI*.do crop sections cover.
+#
+# Grain: one row per (t, i, plot, crop), where
+#   - i     = Mali composite household id (grappe, menage/exploitation),
+#   - plot  = "{field_no}_{parcel_no}" for seasonal crops; NaN for perennial
+#             trees (the perennial roster s3b/s11f is not on the field grid),
+#   - crop  = harmonize_food Preferred Label (food crops REUSE the consumed-
+#             food label so crop_production.j joins food_acquired.j).
+#
+# REPORTED item-level columns only (no harvest_kg / yield / main_crop /
+# value-share — those are transformations.py work over these rows):
+#   Quantity, u, Quantity_sold, Value_sold,
+#   planting_month, harvest_month, intercropped, perennial.
+#
+# Crop names and harvest units arrive as DECODED Stata labels (strings), so
+# the harmonize_food / u tables key on the decoded label (Code column).
+
+# French month name -> month number (2017-18 records month as a label).
+_FR_MONTHS = {
+    'janvier': 1, 'février': 2, 'fevrier': 2, 'mars': 3, 'avril': 4, 'mai': 5,
+    'juin': 6, 'juillet': 7, 'août': 8, 'aout': 8, 'septembre': 9,
+    'octobre': 10, 'novembre': 11, 'décembre': 12, 'decembre': 12,
+}
+
+
+def _crop_labels(series):
+    """Map a Series of decoded crop names -> harmonize_food Preferred Label."""
+    m = tools.get_categorical_mapping(tablename='harmonize_food', idxvars='Code',
+                                      **{'Preferred Label': 'Preferred Label'})
+    out = series.astype('string').str.strip().map(m)
+    return out.astype('string')
+
+
+def _unit_labels(series):
+    """Map a Series of decoded harvest-unit names -> u Preferred Label."""
+    m = tools.get_categorical_mapping(tablename='u', idxvars='Code',
+                                      **{'Preferred Label': 'Preferred Label'})
+    out = series.astype('string').str.strip().map(m)
+    return out.astype('string')
+
+
+def _month_num(series):
+    """Coerce a month column (numeric code or French label) to 1-12 / NA."""
+    def conv(v):
+        if pd.isna(v):
+            return pd.NA
+        s = str(v).strip()
+        if s in ('Manquant', 'Manqant', 'NSP', '99', '99.0', ''):
+            return pd.NA
+        try:
+            n = int(float(s))
+            return n if 1 <= n <= 12 else pd.NA
+        except (TypeError, ValueError):
+            return _FR_MONTHS.get(s.lower(), pd.NA)
+    return series.map(conv).astype('Int64')
+
+
+def crop_production_finalize(df):
+    """Common post-processing for a crop_production wave DataFrame.
+
+    Expects raw columns already assembled:
+        t, i, plot, crop (decoded), u (decoded), Quantity, Quantity_sold,
+        Value_sold, planting_month, harvest_month, intercropped, perennial.
+    Maps crop/unit labels, coerces dtypes, sets the (t, i, plot, crop) index,
+    and collapses exact-duplicate index rows (a crop reported on the same
+    plot more than once in a single questionnaire row-set) by summing the
+    reported quantities / values and taking the first of the flags/dates.
+    """
+    df = df.copy()
+    df['crop'] = _crop_labels(df['crop'])
+    df['u'] = _unit_labels(df['u'])
+    df = df.dropna(subset=['crop'])  # drop "Non exploitée" / unmapped residual
+
+    for c in ('Quantity', 'Quantity_sold', 'Value_sold'):
+        df[c] = pd.to_numeric(df[c], errors='coerce')
+    # 9999 / 99 are the EACI "Manquant" sentinels on the reported quantity
+    # columns (cf. WB `harvest_kg=. if s3aq08a==9999`); coerce to NA so they
+    # do not contaminate a downstream kg-conversion sum.
+    for c in ('Quantity', 'Quantity_sold'):
+        df.loc[df[c].isin([99, 9999]), c] = pd.NA
+    df['planting_month'] = _month_num(df['planting_month'])
+    df['harvest_month'] = _month_num(df['harvest_month'])
+    df['intercropped'] = df['intercropped'].astype('boolean')
+    df['perennial'] = df['perennial'].astype('boolean')
+
+    # plot may be NA (perennial); fill index with <NA> string so the level is
+    # not silently dropped, but keep it as a real pandas NA-able string.
+    df['plot'] = df['plot'].astype('string')
+
+    keys = ['t', 'i', 'plot', 'crop']
+    # Aggregate any exact (t,i,plot,crop) duplicates: sum reported amounts,
+    # first non-null for flags/dates/unit.  Use dropna=False so perennial
+    # rows with plot=<NA> are not discarded by groupby.  min_count=1 on the
+    # sums keeps an all-NA group as NA (not a spurious 0) — important for the
+    # 2017-18 multi-plot crops whose sold qty/value is deliberately NaN.
+    g = df.groupby(keys, dropna=False, as_index=True)
+    out = pd.DataFrame({
+        'Quantity':       g['Quantity'].sum(min_count=1),
+        'Quantity_sold':  g['Quantity_sold'].sum(min_count=1),
+        'Value_sold':     g['Value_sold'].sum(min_count=1),
+        'u':              g['u'].first(),
+        'planting_month': g['planting_month'].first(),
+        'harvest_month':  g['harvest_month'].first(),
+        'intercropped':   g['intercropped'].max(),
+        'perennial':      g['perennial'].max(),
+    })
+    out = out[['Quantity', 'u', 'Quantity_sold', 'Value_sold',
+               'planting_month', 'harvest_month', 'intercropped', 'perennial']]
+    return out.sort_index()
