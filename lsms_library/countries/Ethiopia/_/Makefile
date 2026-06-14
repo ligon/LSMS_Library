@@ -18,7 +18,7 @@ VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 var = \
       $(VAR_DIR)/shocks.parquet $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet \
       $(VAR_DIR)/food_coping.parquet $(VAR_DIR)/crop_production.parquet \
-      $(VAR_DIR)/plot_inputs.parquet
+      $(VAR_DIR)/plot_inputs.parquet $(VAR_DIR)/livestock.parquet
 
 all: panel_ids.json updated_ids.json $(parquet) $(var)
 
@@ -87,6 +87,19 @@ plot_inputs_parquet := $(plot_inputs:.py=.parquet)
 
 $(VAR_DIR)/plot_inputs.parquet: plot_inputs.py $(plot_inputs_parquet)
 	python plot_inputs.py
+
+# livestock (GAP 4; ESS §8 item-level livestock roster at (t, i, animal)).
+# Mirrors the crop_production convention: the framework's grab_data calls
+# `make ../<wave>/_/livestock.parquet`, whose pattern rule runs the wave
+# script; the VAR_DIR rule concatenates them via the country script.
+livestock = $(shell find $(rounds) -name livestock.py)
+livestock_parquet := $(livestock:.py=.parquet)
+
+../%/_/livestock.parquet: ../%/_/livestock.py
+	(cd $(@D) && python livestock.py)
+
+$(VAR_DIR)/livestock.parquet: livestock.py $(livestock_parquet)
+	python livestock.py
 
 # food_coping (GH #332, Family B; ESS §7 CSI/rCSI day-count battery).
 # Mirrors the plot_features convention: the framework's grab_data calls
