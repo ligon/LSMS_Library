@@ -1,0 +1,304 @@
+#+TITLE: LSMS+ Individual / Intra-Household Disaggregation -- Scope (GH #439)
+#+AUTHOR: Claude Code (scoping session) + Ethan Ligon
+#+DATE: 2026-06-14
+
+* Purpose
+
+This is the *scope* for GH #439 -- exploiting the WB LSMS+
+individual-disaggregated (male vs female) intra-household modules that
+the library currently collapses to household level.  It exists so the
+design is reviewable *before* any build agent is dispatched, and so the
+eventual implementation shares one canonical reference.
+
+This document was produced in a *scoping session without data access*
+(no WB Microdata API key, no DVC cache -- the source ~.dta~ files and
+the questionnaire PDF are DVC-locked and unreadable here).  Everything
+below is therefore established from: the wired ~data_info.yml~ /
+~data_scheme.yml~ configs, the ~.dvc~ file inventory, ~CONTENTS.org~,
+the WB-parity precedent on the ~development~ branch, and the public WB
+LSMS+ documentation.  The column-level audit, the build, and
+adversary-verification *must happen in a data-enabled session* (see
+"Execution plan").
+
+* Status / decisions locked in scoping
+
+- *Axis design*: owner-expansion grain ~(t, i, j, pid)~ -- one row per
+  (household, asset-type, individual owner).  (Decided with maintainer.)
+- *Breadth*: *Cambodia-first vertical slice*, proposed for execution in
+  a richer (data-enabled) environment; cross-country extension deferred
+  (see "Cross-country extension").  (Decided with maintainer.)
+- *Deliverable*: this doc + a summary comment on #439.
+
+* Background: what LSMS+ is (and why it is distinct)
+
+The WB *LSMS+* program (2016-2022; Cambodia, Ethiopia, Malawi,
+Tanzania, Nepal, Sudan) conducts *private interviews with each adult
+household member aged 18+*, self-reporting -- minimizing proxy
+respondents -- on:
+
+1. *Ownership of and rights to physical and financial assets*, by asset
+   type: (i) land, (ii) apartments/condos (dwelling), (iii) livestock,
+   (iv) consumer durables and valuables, (v) financial assets, (vi)
+   mobile phones.
+2. *Work and employment* (labor, time use).
+3. *Non-farm enterprises* (entrepreneurship).
+4. *Financial inclusion* (accounts, mobile money, borrowing, savings).
+
+For each asset the modules record, *separately*: reported ownership,
+economic ownership, documented ownership, perceived tenure security,
+and the rights to *sell*, *bequeath*, *use as collateral*, *rent out*,
+and *make improvements / invest* -- with *sole vs joint* ownership.
+
+This is exactly the "harmonize the interface, keep the detail"
+principle: the individual/owner dimension is *item-level detail to
+preserve*, not an aggregate.  Collapsing to one household figure erases
+who (man vs woman) owns, decides, and works.
+
+References: WB LSMS+ program page and the Cambodia findings report
+(see "References").
+
+* Audit (documentation-level)
+
+** Cambodia 2019-20 -- the confirmed, self-contained LSMS+ survey
+
+Catalog: KHM_2019_LSMS-PLUS_v01_M (WB Microdata #4045).  Source
+inventory (~lsms_library/countries/Cambodia/2019-20/Data/~): 32
+~hh_sec_*.dta~ section files + ~individual_cover.dta~.
+
+- ~individual_cover.dta~ :: the per-respondent cover -- identifies the
+  adults (18+) interviewed privately.  This is the *respondent roster*;
+  its person id is the spine of every individual module.
+- The a/b/c-suffixed sections ~hh_sec_16a/b/c~, ~17a/b~, ~18a/b~,
+  ~19a/b~, ~20a/b~ are the *likely* individual asset / rights modules
+  (the six asset types x roster/rights split).  *HYPOTHESIS ONLY* --
+  the exact section->module map is the first task of the data-enabled
+  audit (read the questionnaire PDF + the ~.dta~ value labels).
+
+Currently wired (~Cambodia/_/data_scheme.yml~): only ~sample~,
+~cluster_features~, ~household_roster~ (already at ~(t, i, pid)~).
+*None* of the LSMS+ individual modules are exploited.
+
+Cambodia hygiene to fix while here (from ~CONTENTS.org~, now partly
+stale):
+- ~CONTENTS.org~ claims "no ~data_scheme.yml~" -- false; one exists.
+  Update it.
+- ~cambodia.py~ and the wave scripts use deprecated ~ligonlibrary~ /
+  ~dvc.api.open()~ / ~lsms.tools~ anti-patterns -- migrate to
+  ~get_dataframe~ / ~df_data_grabber~ / ~to_parquet~ per CLAUDE.md.
+- No ~categorical_mapping.org~ -- needed for the asset/industry/etc.
+  label tables.
+- Confirm Cambodia loads via ~ll.Country('Cambodia')~ end to end.
+
+** The other three pilots -- OPEN, needs data-access audit
+
+The WB LSMS+ pilots also include Ethiopia, Malawi, Tanzania, but the
+library carries the *LSMS-ISA panels* (ESS / IHPS / NPS), not surveys
+labeled "Plus".  The individual-disaggregated modules may be *embedded
+in specific ISA waves* or exist as *separate surveys not yet ingested*.
+Best public understanding (to be verified against the actual files):
+
+- Ethiopia :: the individual-level asset/labor modules were associated
+  with *ESS Wave 4 (2018-19)*; we carry that wave (68 source files).
+  Needs a per-file grain audit to confirm a person-level
+  asset-ownership module exists.
+- Malawi :: IHPS (likely 2019-20); audit required.
+- Tanzania :: NPS (2019-20 / 2020-21); audit required.
+- Nepal, Sudan :: also LSMS+ pilots.  Nepal has *no microdata in repo*
+  (see CLAUDE.md "Countries Without Microdata"); Sudan is not in the
+  library.  If their individual modules are wanted, ingest via the
+  ~add-wave~ path.
+
+Action: do NOT wire these blind.  Confirm module presence first; mark
+~blocked~ where a module is absent, exactly as the parity loop did.
+
+** Base-branch finding (IMPORTANT)
+
+The precedent this work builds on -- ~anthropometry~ and
+~people_last7days~ at ~(t, i, pid)~, the ~harmonize_*~ label-foundation
+infra, the ~transformations~ aggregation layer, and the item-level
+discipline -- landed via PRs #430-#437 on the *~development~* branch,
+*not* ~master~.  ~development~ = ~master~ + the parity pass.
+
+*Implementation must branch from ~development~.*  (The scratch
+references in #439 -- ~slurm_logs/2026-06-14_parity_loop/HANDOFF.org~,
+~slurm_logs/2026-06-13_wb_incidence_map/~ -- were working notes that
+were never committed; the code precedent on ~development~ is the
+authoritative reference.)
+
+* Design: the respondent / owner axis convention
+
+LSMS+ exposes *two* individual dimensions:
+
+- *owner* -- the person who holds the asset / the right (the analytical
+  subject: "who owns what").
+- *respondent* -- the person interviewed who reported it.
+
+In the clean self-report design these coincide for an adult's own
+assets, but the asset roster also captures *co-owners* who may not be
+the respondent, and some rows are *proxy-reported*.
+
+** Convention (owner-expansion)
+
+1. *Grain ~(t, i, j, pid)~* -- one row per (household ~i~, harmonized
+   asset-type ~j~, *owner* ~pid~).  Sole ownership => one row; joint =>
+   one row per co-owner.  Sole/joint is thus *first-class and
+   structural*; a reported ~Sole~ bool is also carried where the survey
+   asks it directly, and co-owner count is a trivial transformation.
+2. *Sex is JOINED from ~household_roster~ on ~(t, i, pid)~, never baked
+   in* -- exactly as ~anthropometry~ joins Sex.  This delivers the
+   male-vs-female axis as a queryable attribute *without* duplicating
+   roster data (no-redundancy rule).  "Who (M/F) owns what" =
+   ~individual_assets()~ joined to the roster's ~Sex~.
+3. *Ownership types / rights / tenure = reported boolean columns*, not
+   index levels: ~Reported~, ~Economic~, ~Documented~, ~TenureSecure~,
+   ~RightSell~, ~RightBequeath~, ~RightCollateral~, ~RightRentOut~,
+   ~RightImprove~.
+4. *Owner is the ~pid~, not the respondent.*  Where a row is
+   proxy-reported, carry a ~Proxy: bool~ column (and, if cheaply
+   available, ~reported_by~ as a non-index column).  Keep the
+   analytical subject (owner) in the index.
+5. *~pid~ shares the ~household_roster~ keyspace* (verify per wave, as
+   ~anthropometry~ did with ~individual_id~ vs ~individual_id2~) so the
+   feature joins the roster on ~(t, i, pid)~.
+6. *~v~ auto-joins from ~sample()~* at query time (these features are
+   household-linked; not in ~_no_v_join~).  Do NOT bake ~v~ in.
+7. *No aggregates stored.*  Gender asset gaps, ownership rates,
+   value/area shares, "any account" rollups -> ~transformations~,
+   computed at query time over the item rows.  This is the same
+   discipline as ~anthropometry~ (z-scores never stored) and
+   ~plot_labor~ (totals never stored).
+
+** Why this fits the architecture
+
+- Mirrors the ~(t, i, pid)~ individual grain already shipped
+  (~household_roster~, ~individual_education~, ~anthropometry~,
+  ~people_last7days~).
+- Sex-by-join (not Sex-as-column) matches ~anthropometry~ precedent and
+  the Kroeber-kinship "decompose, don't duplicate" ethos.
+- Item-level + decomposition + aggregation-in-~transformations~ is the
+  exact parity-loop discipline (the two cautions in #438).
+
+* Candidate features (Cambodia first)
+
+Schemas in the ~development~ ~data_scheme.yml~ house style (item-level
+reported columns only; ~materialize: make~ because each needs
+cross-file joins -- the asset roster + the ~individual_cover~ respondent
+spine + the ~household_roster~ for Sex).
+
+| Feature                | Grain                 | Reported columns (sketch)                                                                 |
+|------------------------+-----------------------+-------------------------------------------------------------------------------------------|
+| ~individual_assets~ *  | ~(t, i, j, pid)~      | Reported, Economic, Documented, TenureSecure, Right{Sell,Bequeath,Collateral,RentOut,Improve}, Sole, Proxy, Value?, Quantity? |
+| ~financial_inclusion~  | ~(t, i, pid)~         | HasAccount, MobileMoney, Borrowed, Saved (per-respondent bools)                            |
+| ~decision_making~      | ~(t, i, pid, domain)~ | DecidesSole, DecidesJoint, ControlsIncome (domain in {asset, income, plot, enterprise})    |
+| ~people_last7days~     | ~(t, i, pid)~         | (Cambodia LACKS it; canonical schema already exists) farm/SOB/wage work + hours + industry + domestic/care time-use hours |
+
+(* = flagship.)
+
+Open sub-decision for the build: *land and dwelling are specific
+assets* (a parcel / a structure), not just a type.  Two options:
+- (a) add an ~asset_id~ index level to ~individual_assets~ for the
+  multi-instance asset types; or
+- (b) split a separate ~individual_land~ at parcel grain that joins
+  ~plot_features~ on ~(t, i, plot_id)~, leaving ~individual_assets~ for
+  the type-level assets (livestock/durables/financial/mobile).
+Recommend deciding (a) vs (b) once the real Cambodia land-module grain
+is read.
+
+* Label / axis foundation (Unit #0)
+
+Before any feature, lay the shared foundation (the parity loop's "Unit
+#0 -> GAP-N" sequence):
+
+1. ~harmonize_asset~ crosswalk -- raw Cambodia asset codes -> canonical
+   Preferred Labels (Land, Dwelling, Livestock, Durable,
+   FinancialAsset, MobilePhone, ...), appended to
+   ~Cambodia/_/categorical_mapping.org~.  Reuse ~harmonize_industry~
+   (already on ~development~) for ~people_last7days.industry~.
+2. *Canonical schema* entries in ~lsms_library/data_info.yml~ for the
+   new tables (required columns; accepted values for the new controlled
+   vocab -- ownership types, decision domains).
+   ~tests/test_schema_consistency.py~ reads this file -- never hardcode.
+3. The respondent-axis convention (this doc) referenced from each
+   feature's ~data_scheme.yml~ comment block.
+
+* Execution plan (for a data-enabled session)
+
+Proposed Cambodia-first vertical slice.  *Cannot run here* (no data
+access); dispatch in a richer environment with a WB Microdata API key.
+Branch from *~development~*.
+
+Sequence (each gate must pass before the next):
+
+- Unit #0 :: label foundation + canonical-schema entries (above).
+- GAP 1 :: ~individual_assets~ (flagship) -- proves the owner-expansion
+  convention on real data.
+- GAP 2 :: ~financial_inclusion~.
+- GAP 3 :: ~decision_making~.
+- GAP 4 :: ~people_last7days~ + time-use (Cambodia add).
+
+Per-feature artifact pattern (mirrors the ~plot_features~ /
+~anthropometry~ five-artifact pattern):
+
+1. Wave script ~Cambodia/2019-20/_/<feature>.py~ -- ~get_dataframe(...,
+   convert_categoricals=False)~ on the section file(s) +
+   ~individual_cover~ + roster, a per-wave ~colmap~, call the country
+   helper, assert unique index + >0 rows, ~to_parquet~.
+2. Shared helper ~Cambodia/_/cambodia.py:<feature>_for_wave~ -- the
+   owner-expansion + code->label harmonization + Sex/age join logic.
+3. Country concatenator ~Cambodia/_/<feature>.py~ -- concat waves
+   (only one here), ~id_walk~, write ~var/<feature>.parquet~.
+4. Categorical tables appended to ~categorical_mapping.org~.
+5. ~data_scheme.yml~ block declaring the grain + a convention note.
+
+Verification gates per feature (the parity discipline):
+- *Adversary check*: no aggregates baked in; Sex/v not duplicated;
+  proxy rows flagged; owner-expansion produces the right row
+  multiplicities for known joint-ownership cases.
+- *Cold build* from source (~LSMS_NO_CACHE=1~ / ~--rebuild-caches~).
+- *Test-gate*: ~pytest~ incl. ~test_schema_consistency~ green.
+
+* Cross-country extension (deferred -- separate follow-up)
+
+After Cambodia validates the convention:
+1. *Audit* Ethiopia ESS4 / Malawi IHPS / Tanzania NPS for embedded
+   person-level asset/decision/financial modules (data access).  Wire
+   only what exists; ~blocked~ otherwise.
+2. *Flag* Nepal / Sudan standalone LSMS+ surveys for ~add-wave~
+   ingestion if wanted.
+This pairs naturally with #438 (parity stack to non-ISA countries) and
+benefits from the ~LSMS_COUNTRIES_ROOT~ worktree isolation (GH #436).
+
+* Dependencies / risks / open questions
+
+- *Data access (blocker)* :: column-level audit, build, and
+  verification need a WB Microdata API key + DVC.  Not available in the
+  scoping environment.
+- *Base branch* :: must build on ~development~ (precedent + infra),
+  not ~master~.
+- *Exact Cambodia section->module map* :: hypothesized (16a-20b);
+  confirm from the questionnaire PDF + ~.dta~ labels first.
+- *Land/dwelling grain* :: type-level vs parcel-level ~asset_id~ (vs a
+  separate ~individual_land~) -- decide from real data.
+- *Proxy reporting* :: not all adults are interviewed; some ownership
+  rows are proxy.  Flag, don't drop.
+- *pid keyspace* :: confirm the individual-module person id matches
+  ~household_roster~ pid (per-wave id variants).
+- *Canonical schema + tests* :: new tables and a new controlled
+  vocabulary (ownership types, decision domains) touch
+  ~lsms_library/data_info.yml~ and ~tests/test_schema_consistency.py~.
+- *Cambodia API hygiene* :: deprecated imports + stale ~CONTENTS.org~ +
+  missing ~categorical_mapping.org~; confirm ~Country('Cambodia')~
+  builds.
+
+* References
+
+- GH #439 (this issue); GH #438 (parity stack to non-ISA countries).
+- Precedent on ~development~: ~lsms_library/countries/Ethiopia/_/data_scheme.yml~
+  (~anthropometry~, ~people_last7days~, ~plot_labor~ blocks),
+  ~Ethiopia/2018-19/_/anthropometry.py~, ~lsms_library/transformations.py~.
+- House-style workflow doc: ~slurm_logs/DESIGN_plot_features_cross_country_workflow_2026-06-03.org~.
+- Cambodia: ~lsms_library/countries/Cambodia/2019-20/~, ~Cambodia/_/CONTENTS.org~.
+- WB LSMS+ program: https://www.worldbank.org/en/programs/lsms/initiatives/lsms-plus
+- Cambodia LSMS+ (catalog #4045): https://microdata.worldbank.org/index.php/catalog/4045
+- WB LSMS+ findings (Cambodia, individual-level labor & asset ownership):
+  https://documents.worldbank.org/curated/en/539311620191657449
