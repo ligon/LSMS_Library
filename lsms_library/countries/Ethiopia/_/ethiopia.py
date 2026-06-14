@@ -27,12 +27,41 @@ def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Code',value='Preferr
     return unitlabels.squeeze().str.strip().to_dict()
 
 
-def harmonized_food_labels(fn='../../_/food_items.org',key=list(Waves.keys()),value='Preferred Label'):
-    # Harmonized food labels
-    food_items = pd.read_csv(fn,delimiter='|',skipinitialspace=True,converters={1:lambda s: s.strip(),2:lambda s: s.strip()})
-    food_items.columns = [s.strip() for s in food_items.columns]
+def _read_food_label_table(fn):
+    """Load the harmonized-food label table as a wide DataFrame.
+
+    Unit #0 migration (2026-06-14): the canonical food-item label table now
+    lives as ``#+name: harmonize_food`` inside ``categorical_mapping.org``
+    (was the standalone ``food_items.org``).  Read it via the org-table
+    reader.  A bare pipe-table file (e.g. the legacy ``nonfood_items.org``,
+    which has no ``#+name`` header) still parses -- ``df_from_orgfile`` with
+    ``name=None`` grabs the first table in the file.  Pass the
+    ``categorical_mapping.org`` path to pick up ``harmonize_food`` explicitly.
+    """
+    import os
+    base = os.path.basename(str(fn))
+    if base == 'categorical_mapping.org':
+        from lsms_library.local_tools import all_dfs_from_orgfile
+        return all_dfs_from_orgfile(fn)['harmonize_food']
+    # Legacy / code-keyed tables (nonfood_items.org): bare pipe table.
+    from lsms_library.local_tools import df_from_orgfile
+    return df_from_orgfile(fn, name=None, to_numeric=False)
+
+
+def harmonized_food_labels(fn='../../_/categorical_mapping.org',key=list(Waves.keys()),value='Preferred Label'):
+    # Harmonized food labels.  Reads the canonical ``harmonize_food`` table
+    # (Unit #0); ``df_from_orgfile`` already nulls '---' cells, so the
+    # replace('---', ...) calls below are now defensive no-ops kept for the
+    # rare legacy bare-pipe path.
+    food_items = _read_food_label_table(fn)
+    food_items.columns = [str(s).strip() for s in food_items.columns]
+    food_items = food_items.astype(object).where(food_items.notna(), pd.NA)
     food_items = food_items.loc[:,food_items.count()>0]
-    food_items = food_items.drop(columns = ['FTC Code', 'FDC ID']).apply(lambda x: x.str.strip())
+    drop = [c for c in ['FTC Code', 'FDC ID'] if c in food_items.columns]
+    if drop:
+        food_items = food_items.drop(columns=drop)
+    food_items = food_items.apply(lambda x: x.astype(object).map(
+        lambda s: s.strip() if isinstance(s, str) else s))
 
     if type(key) == list :
         for k in key:
@@ -45,10 +74,39 @@ def harmonized_food_labels(fn='../../_/food_items.org',key=list(Waves.keys()),va
         food_items = food_items[key + [value]].replace('---', pd.NA).dropna(how = 'all')
     else:
         food_items = food_items[[key] + [value]].replace('---', pd.NA).dropna(how = 'all')
-        
+
     food_items = food_items.set_index(key)
 
     return food_items.squeeze().str.strip().to_dict()
+
+
+def harmonize_food_union_map(fn='../../_/categorical_mapping.org', value='Preferred Label'):
+    """Union of every per-wave column of ``harmonize_food`` -> Preferred Label.
+
+    Mirrors Malawi's ``harmonize_food_labels`` cross-wave union (GH #216): a
+    raw food string documented in *any* wave column resolves to its Preferred
+    Label regardless of which wave is being processed.  Applied at the
+    WAVE-script level (in :func:`food_acquired`) so the resolved ``j`` label
+    persists into each wave parquet -- the country-API concat path
+    (``load_from_waves``) then sees clean labels with no further rename.
+    """
+    food_items = _read_food_label_table(fn)
+    food_items.columns = [str(s).strip() for s in food_items.columns]
+    wave_cols = [c for c in food_items.columns
+                 if c not in (value, 'FTC Code', 'FDC ID')]
+    unify = {}
+    for col in wave_cols:
+        for _, row in food_items.iterrows():
+            v = row.get(col)
+            p = row.get(value)
+            if pd.isna(v) or pd.isna(p):
+                continue
+            v_str = str(v).strip()
+            p_str = str(p).strip()
+            if v_str in ('', '---') or p_str in ('', '---'):
+                continue
+            unify.setdefault(v_str, p_str)
+    return unify
 
 def _sum_expenditures_from_file(fn, purchased, away, produced, given, itmcd, HHID,
                                  units=None, itemlabels=None, convert_categoricals=False):
@@ -152,7 +210,7 @@ def _household_roster_from_file(fn, sex='sex', age='age', HHID='HHID',
 
 def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market',farmgate='farmgate'):
 
-    food_items = harmonized_food_labels(fn='../../_/food_items.org')
+    food_items = harmonized_food_labels(fn='../../_/categorical_mapping.org')
 
     df = get_dataframe(fn, convert_categoricals=True)
 
@@ -262,6 +320,19 @@ def food_acquired(fn,myvars):
     wave = os.path.basename(os.path.dirname(os.getcwd()))
     df['t'] = wave
 
+    # Resolve raw food strings to canonical Preferred Labels at the WAVE
+    # level (Unit #0 / Malawi pattern).  The raw `item` is the Stata value
+    # label the categorical read surfaced -- per-wave name strings that vary
+    # in casing, code prefixes ("101. Teff"), typos ("PuUrchased Injera")
+    # and Stata truncation ("Greens (kale, cabbage, e").  The
+    # harmonize_food union map (every per-wave column of categorical_mapping
+    # .org's harmonize_food table -> Preferred Label) covers all of these,
+    # so the resolved label persists into this wave's parquet and the
+    # country-API concat path sees clean `j` labels.  Strings absent from
+    # the map pass through unchanged.
+    food_map = harmonize_food_union_map(fn='../../_/categorical_mapping.org')
+    df['item'] = df['item'].astype(str).str.strip().replace(food_map)
+
     # Build the wide-form frame the framework helper expects:
     # index (t, i, j, u), columns (Quantity, Expenditure, Produced).
     df = (df.rename(columns={'HHID': 'i', 'item': 'j', 'units': 'u'})
@@ -276,7 +347,7 @@ def food_acquired(fn,myvars):
     return out
 
 def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,item='item',HHID='HHID'):
-    food_items = harmonized_food_labels(fn='../../_/food_items.org')
+    food_items = harmonized_food_labels(fn='../../_/categorical_mapping.org')
 
     expenditures = _sum_expenditures_from_file(fn, purchased, away, produced, given,
                                                 itmcd=item, HHID=HHID, itemlabels=food_items)
@@ -303,7 +374,7 @@ def nonfood_expenditures(fn='',purchased=None,away=None,produced=None,given=None
 
 def food_quantities(fn='',item='item',HHID='HHID',
                     purchased=None,away=None,produced=None,given=None,units=None):
-    food_items = harmonized_food_labels(fn='../../_/food_items.org')
+    food_items = harmonized_food_labels(fn='../../_/categorical_mapping.org')
 
     quantities = _sum_expenditures_from_file(fn, purchased, away, produced, given,
                                               itmcd=item, HHID=HHID, units=units,
