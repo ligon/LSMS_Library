@@ -253,9 +253,11 @@ residue.  GPS-based matching is *not* available: Tanzania
 
 *** Data-enabled result: =community_cluster_xwalk= implemented (2026-06-14, #113)
 
-The next-steps above were run with data access.  The date lever is real
-and is now wired as a separate crosswalk feature; the district crosswalk
-is a dead end; the interviewer/team-id idea is unavailable.
+The next-steps above were run with data access.  Headline: for **2020-21
+the survey cluster id is BAKED INTO the community admin codes**, so the
+match there is deterministic; 2019-20 falls back to =(region, ward)= + the
+date lever.  The district crosswalk is a dead end and the interviewer /
+team-id idea is unavailable.
 
 **Avenue A (cluster id elsewhere) --- dead.**  Scanned =CM_SEC_A= and
 =CM_SEC_B..G= in both waves: no =clusterid= / =strataid= / EA column
@@ -273,31 +275,40 @@ does =cm_start= fall in that cluster's =hh_a18= window?): *99%* (2020-21,
 interview and that cluster's household interviews in one visit, so the
 date genuinely separates wards that hold >1 cluster.
 
-**District crosswalk --- abandoned; drop district instead.**  The two
-encodings are structurally different, not a fixable bug: community =id_02=
-is a national district code (11..128+), the survey cluster =DD= is a
-within-region index (1..9), so =(region, district, ward)= = *0/488* in
-2020-21.  But =region= (30/30) and =ward= (105/110) DO share a codespace,
-so the match keys on =(region, ward)= and breaks ward collisions by date.
+**Avenue C (cluster id baked into the admin codes) --- the win for 2020-21.**
+The survey cluster id is *composite*, and for 2020-21 it is reconstructable
+from the community admin codes: with =y5_cluster= = =RR-DD-WWW-EE-CCC=, the
+tuple =(RR, WWW, EE, CCC)= equals the community =(id_01, id_03, id_04,
+id_05)= (region, ward, EA, cluster-seq) on *99--100%* of the geo-unique
+wards.  So 2020-21 resolves *deterministically* from those four codes --- no
+date heuristic --- dropping only the within-region district =DD=, the one
+field whose community (national code 11..128+) and household (within-region
+index 1..9) encodings are incompatible (=(region, district, ward)= =
+*0/488*).  2019-20 cannot use this: its =clusterid= uses an internal
+numbering, so =(region, ward, id_04)= → =clusterid= resolves only 14/99 ---
+it stays on =(region, ward)= + date.
 
 **Measured unique-cluster resolution** (honest; the desk estimates above
 were optimistic):
 
-| wave    | geo-unique | +date | total unique | region fallback |
-|---------+------------+-------+--------------+-----------------|
-| 2019-20 |         39 |   +12 |        51/99 |              48 |
-| 2020-21 |        302 |  +112 |      414/488 |              74 |
+| wave    | unique  | method                               | region fallback |
+|---------+---------+--------------------------------------+-----------------|
+| 2019-20 | 51/99   | (region, ward) geo 39 + date 12      |              48 |
+| 2020-21 | 458/488 | (region, ward, EA, seq) 455 + date 3 |              30 |
 
-Window is wave-specific (from a sweep): 2019-20 widens well (±14d optimal,
-sparse Extended Panel); 2020-21 must stay narrow (±7d --- the dense
-Refresh Panel re-ambiguates when widened, exactly the gap an interviewer
-id would have closed).  Every resolved =cluster= is a real =sample().v=
-(51/51, 414/414), so the household join is valid.
+The 2020-21 baked-in reconstruction (455 deterministic) beats the date-only
+=(region, ward)= approach (414) AND needs no heuristic; the date lever only
+breaks the 8 residual =(RR, WWW, EE, CCC)= collisions across =DD= (+3).  The
+2019-20 window is ±14d (the sparse Extended Panel widens well); 2020-21's is
+±7d (only the residual matters).  Every resolved =cluster= is a real
+=sample().v= (51/51, 458/458), so the household join is valid.
 
 **Implemented as the =community_cluster_xwalk= feature** (NOT a
 =transformations= step --- it is wave-specific, cross-file
 =CM_SEC_A=+=HH_SEC_A= logic, so it belongs on the script path):
-- =tanzania.link_community_to_cluster(t, cm_a, hh_a, window_days)= --- the matcher;
+- =tanzania.link_community_to_cluster(t, cm_a, hh_a, window_days)= --- the
+  matcher (2020-21 reconstructs the cluster from (region, ward, EA, seq);
+  2019-20 keys on (region, ward) + date);
 - wave scripts =2019-20/_/community_cluster_xwalk.py= /
   =2020-21/_/community_cluster_xwalk.py= (=materialize: make=) +
   country-level =_/community_cluster_xwalk.py= concat;

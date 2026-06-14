@@ -61,9 +61,14 @@ def test_resolved_clusters_are_real_sample_v(tz, xwalk):
         assert not bad, f"{t}: {len(bad)} resolved clusters not in sample().v, e.g. {sorted(bad)[:5]}"
 
 
-@pytest.mark.parametrize("t,lo,hi", [("2019-20", 0.40, 0.65), ("2020-21", 0.75, 0.95)])
+@pytest.mark.parametrize("t,lo,hi", [("2019-20", 0.40, 0.65), ("2020-21", 0.88, 0.98)])
 def test_cluster_resolution_rate(xwalk, t, lo, hi):
-    """Cluster-resolution stays near the documented rates (~52% / ~86%)."""
+    """Cluster-resolution stays near the documented rates (~52% / ~94%).
+
+    2020-21 reconstructs the cluster deterministically from the baked-in admin
+    codes (region, ward, EA, seq), so its rate is high and should not regress to
+    the date-only (region, ward) level (~86%).
+    """
     x = xwalk.reset_index()
     x["t"] = x["t"].astype(str)
     sub = x[x["t"] == t]

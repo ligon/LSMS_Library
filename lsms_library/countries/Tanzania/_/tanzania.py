@@ -1824,12 +1824,13 @@ def community_prices_for_wave(t, idf, colmap):
 
 COMMUNITY_CLUSTER_XWALK_COLUMNS = ['cluster', 'region', 'match', 'n_candidates']
 
-# Date half-window (days) for disambiguating wards that hold >1 survey cluster.
-# Wave-specific by design (issue #113): the sparse 2019-20 Extended Panel
-# tolerates a wider window (more recovered, positive control 59%->82%); the
-# dense 2020-21 Refresh Panel RE-ambiguates if widened (a wider window admits
-# more candidate clusters), so it wants a narrow one.  See the window sweep in
-# Tanzania/_/CONTENTS.org (#113).
+# Date half-window (days) for disambiguating match keys that hold >1 survey
+# cluster.  2019-20 leans on this (its key is only (region, ward)): the sparse
+# Extended Panel tolerates a wider window (positive control 59%->82%).  2020-21
+# resolves mostly deterministically from the baked-in (region, ward, EA, seq)
+# codes, so the window only breaks the rare residual collision -- kept narrow
+# since the dense Refresh Panel re-ambiguates if widened.  See the window sweep
+# in Tanzania/_/CONTENTS.org (#113).
 _XWALK_WINDOW_DAYS = {'2019-20': 14, '2020-21': 7}
 
 
@@ -1846,16 +1847,28 @@ def link_community_to_cluster(t, cm_a, hh_a, window_days=None):
     The community price instrument carries no survey-cluster id, its GPS is
     redacted, and the Survey-Solutions interviewer/team id is stripped, so the
     only geography shared with the household frame is the national admin tuple.
-    We match community ``(region, ward)`` to the household survey cluster and
-    disambiguate the wards that hold >1 cluster by interview-date overlap: the
-    community interview ``cm_start`` falls inside the candidate cluster's
-    household ``hh_a18`` window, because one field team runs the community
-    interview and that cluster's household interviews in a single visit
-    (validated 99% (2020-21) / 79% (2019-20) on the wards that are already
-    geo-unique).  The district code is dropped on purpose -- the community
-    ``id_02`` is a *national* district code while the survey cluster's ``DD``
-    field is a *within-region* index, so they are irreconcilable (and
-    ``(region, district, ward)`` matches 0/488 in 2020-21).
+    The match is wave-specific:
+
+    * **2020-21** -- the survey cluster id is BAKED INTO the community admin
+      codes.  With ``y5_cluster = RR-DD-WWW-EE-CCC``, the tuple
+      ``(RR, WWW, EE, CCC)`` equals the community ``(id_01, id_03, id_04,
+      id_05)`` (region, ward, EA, cluster-seq) on 99-100% of the geo-unique
+      wards, so we reconstruct the cluster *deterministically* from those four
+      codes (455/488 unique, all real ``sample().v``), dropping only the
+      within-region district ``DD`` -- the one field whose community (national
+      code) and household (within-region index) encodings are incompatible
+      (``(region, district, ward)`` matches 0/488).
+
+    * **2019-20** -- ``clusterid`` uses an internal numbering that does not line
+      up with the national admin codes below the ward, so the finest reliable
+      key is ``(region, ward)``; wards holding >1 cluster are split by
+      interview-date overlap (the community ``cm_start`` falls inside the
+      candidate cluster's household ``hh_a18`` window, because one field team
+      runs the community interview and that cluster's households in one visit
+      -- validated 99% (2020-21) / 79% (2019-20) on geo-unique wards).
+
+    The date lever is also the residual disambiguator for any wave whose match
+    key still leaves >1 candidate.
 
     Parameters
     ----------
@@ -1881,9 +1894,10 @@ def link_community_to_cluster(t, cm_a, hh_a, window_days=None):
                           fallback key for the #113 quantity/price fallback);
       ``match``        -- ``'cluster'`` (unique) or ``'region'`` (ambiguous or
                           no surviving household in the ward -> region fallback);
-      ``n_candidates`` -- # survey clusters sharing the community's
-                          ``(region, ward)`` (0 = ward absent, 1 = geo-unique,
-                          >1 = date-disambiguated or fell back to region).
+      ``n_candidates`` -- # survey clusters sharing the community's match key
+                          (2020-21: region/ward/EA/seq; 2019-20: region/ward).
+                          0 = no household at that key, 1 = uniquely resolved,
+                          >1 = date-disambiguated or fell back to region.
 
     This is a deliberately lossy, confidence-tagged crosswalk, NOT a clean key
     join (see Tanzania/_/CONTENTS.org #113); it is materialised separately so
@@ -1895,39 +1909,66 @@ def link_community_to_cluster(t, cm_a, hh_a, window_days=None):
     if window_days is None:
         window_days = _XWALK_WINDOW_DAYS.get(t, 10)
 
-    # --- household side: survey cluster + (region, ward) + interview date ---
+    # --- household side: survey cluster id + match key + interview date ---
     if t == '2019-20':
+        # 2019-20's clusterid uses an internal numbering that does NOT line up
+        # with the national admin codes below the ward, so the finest reliable
+        # key is (region, ward); wards holding >1 cluster fall to the date lever.
         h = hh_a[hh_a['clusterid'].notna()].copy()
-        h['reg'] = _int_code(h['t0_region'])
-        h['ward'] = _int_code(h['t0_ward_code'])
-        h['clu'] = h['clusterid'].apply(format_id)          # int -> '11014002'
-    else:  # 2020-21: admin tuple is embedded in y5_cluster = RR-DD-WWW-EE-CCC
+        h['k_region'] = _int_code(h['t0_region'])
+        h['k_ward'] = _int_code(h['t0_ward_code'])
+        h['clu'] = h['clusterid'].apply(format_id)           # int -> '11014002'
+        keycols = ['k_region', 'k_ward']
+        cm_src = {'k_region': 'id_01', 'k_ward': 'id_03'}
+    else:  # 2020-21
+        # The survey cluster id is BAKED INTO the community admin codes: with
+        # y5_cluster = RR-DD-WWW-EE-CCC, the tuple (RR, WWW, EE, CCC) equals the
+        # community (id_01, id_03, id_04, id_05) on 99-100% of the geo-unique
+        # wards (verified, issue #113).  So we reconstruct the cluster directly
+        # from (region, ward, EA, cluster-seq) -- deterministic, no date needed
+        # -- dropping only the within-region district DD, the one field whose
+        # community (national code) and household (within-region index)
+        # encodings are incompatible.  Date only breaks the rare residual
+        # (RR, WWW, EE, CCC) collision across DD.
         y5 = hh_a['y5_cluster'].astype('string').str.strip()
         keep = y5.str.match(r'^\d\d-\d\d-\d\d\d-\d\d-\d\d\d$').fillna(False)
         h = hh_a[keep].copy()
         parts = y5[keep].str.split('-', expand=True)
-        h['reg'] = _int_code(parts[0])
-        h['ward'] = _int_code(parts[2])
-        h['clu'] = y5[keep]                                 # full y5_cluster == sample().v
+        h['k_region'] = _int_code(parts[0])
+        h['k_ward'] = _int_code(parts[2])
+        h['k_ea'] = _int_code(parts[3])
+        h['k_seq'] = _int_code(parts[4])
+        h['clu'] = y5[keep]                                  # full y5_cluster == sample().v
+        keycols = ['k_region', 'k_ward', 'k_ea', 'k_seq']
+        cm_src = {'k_region': 'id_01', 'k_ward': 'id_03',
+                  'k_ea': 'id_04', 'k_seq': 'id_05'}
     h['date'] = pd.to_datetime(h['hh_a18'], errors='coerce')
 
-    cand = (h.dropna(subset=['reg', 'ward', 'clu'])
-             .groupby(['reg', 'ward'])['clu'].agg(lambda s: sorted(set(s))).to_dict())
+    hk = h.dropna(subset=keycols + ['clu']).copy()
+    for k in keycols:
+        hk[k] = hk[k].astype('int64')                        # plain-int keys
+    cand = hk.groupby(keycols)['clu'].agg(lambda s: sorted(set(s))).to_dict()
     win = h.dropna(subset=['date', 'clu']).groupby('clu')['date'].agg(['min', 'max'])
 
     # --- community side ---
     cm = cm_a.copy()
-    cm['reg'] = _int_code(cm['id_01'])
-    cm['ward'] = _int_code(cm['id_03'])
+    for k, src in cm_src.items():
+        cm[k] = _int_code(cm[src])
     cm['date'] = pd.to_datetime(cm['cm_start'], errors='coerce')
     cm['v'] = cm['interview__key'].astype('string').str.strip()
 
     span = pd.Timedelta(days=window_days)
+    cols = keycols + ['v', 'date']
     rows = []
-    for v, r, w, d in zip(cm['v'], cm['reg'], cm['ward'], cm['date']):
+    for vals in zip(*[cm[c] for c in cols]):
+        rec = dict(zip(cols, vals))
+        v = rec['v']
         if pd.isna(v):
             continue
-        clusters = cand.get((r, w), []) if (pd.notna(r) and pd.notna(w)) else []
+        key = tuple(rec[k] for k in keycols)
+        clusters = (cand.get(tuple(int(x) for x in key), [])
+                    if all(pd.notna(x) for x in key) else [])
+        d = rec['date']
         resolved = pd.NA
         if len(clusters) == 1:
             resolved = clusters[0]
@@ -1937,6 +1978,7 @@ def link_community_to_cluster(t, cm_a, hh_a, window_days=None):
                     and win.loc[c, 'min'] - span <= d <= win.loc[c, 'max'] + span]
             if len(hits) == 1:
                 resolved = hits[0]
+        r = rec['k_region']
         rows.append({
             't': t,
             'v': v,
@@ -1953,4 +1995,3 @@ def link_community_to_cluster(t, cm_a, hh_a, window_days=None):
     out['n_candidates'] = out['n_candidates'].astype('Int64')
     out = out.drop_duplicates(['t', 'v']).set_index(['t', 'v'])
     return out[COMMUNITY_CLUSTER_XWALK_COLUMNS]
-    return out
