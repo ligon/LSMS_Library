@@ -98,7 +98,7 @@ food_acquired:
             - menage
         j:
             - s13q01
-            - mappings: ['harmonize_food', 'Original Label', 'Preferred Label']
+            - mappings: ['harmonize_food', 'Code', 'Preferred Label']
     myvars:
         QuantityPurchased: s13q03a
         UnitPurchased: s13q03b

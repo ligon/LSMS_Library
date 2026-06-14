@@ -379,6 +379,19 @@
 | 72 | Tin 250G | TIN 250G |
 | 73 | Tin 500G | TIN 500G |
 | 74 | Tin 1Kg | TIN 1KG |
+| 00 | Other (Specify) |  |
+| 03 | Other (Specify) |  |
+| 12 | Other (Specify) |  |
+| 13 | Other (Specify) |  |
+| 16 | Other (Specify) |  |
+| 17 | Other (Specify) |  |
+| 21 | Other (Specify) |  |
+| 49 | Other (Specify) |  |
+| 69 | Other (Specify) |  |
+| 76 | Other (Specify) |  |
+| 79 | Other (Specify) |  |
+| 99 | Other (Specify) |  |
+| 500 | Other (Specify) |  |
 
 #+name: district
 | Alternate Spelling     | Preferred Label |

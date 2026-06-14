@@ -74,7 +74,7 @@ food_coping_parquet := $(food_coping:.py=.parquet)
 $(VAR_DIR)/food_coping.parquet: food_coping.py $(food_coping_parquet)
 	python food_coping.py
 
-$(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet: nutrition.py food_items.org $(VAR_DIR)/food_acquired.parquet
+$(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet: nutrition.py categorical_mapping.org $(VAR_DIR)/food_acquired.parquet
 	python nutrition.py
 
 

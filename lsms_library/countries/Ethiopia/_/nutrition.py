@@ -15,7 +15,10 @@ import numpy as np
 
 #retrieve org tables 
 fct_origin = df_from_orgfile(orgfn= '../../Tanzania/_/demands.org', name = 'fct_origin')
-food = df_from_orgfile(orgfn= 'food_items.org')
+# Unit #0 (2026-06-14): the food-item label table migrated from the
+# standalone food_items.org into categorical_mapping.org as
+# #+name: harmonize_food (carrying the FTC Code / FDC ID nutrient keys).
+food = df_from_orgfile(orgfn= 'categorical_mapping.org', name='harmonize_food')
 food = food.astype({'FTC Code': 'Int64', 'FDC ID' : 'Int64'})
 n_labels = df_from_orgfile(orgfn= 'nutrient_labels.org')
 

@@ -100,8 +100,46 @@ def harmonized_unit_labels(key='Code', value='Preferred Label'):
             unitlabels[int_k] = str(v).strip()
     return unitlabels
 
-def harmonized_food_labels(fn='../../_/food_items.org',key='Code',value='Preferred Label'):
-    # Harmonized food labels
+def harmonized_food_labels(fn=None,key='Code',value='Preferred Label'):
+    """Return the ``{Code: <value>}`` food-label mapping (default ``value``
+    is ``Preferred Label``).
+
+    Unit #0 migration (2026-06-14): the canonical food-label table is now
+    the ``harmonize_food`` table inside
+    ``lsms_library/countries/Uganda/_/categorical_mapping.org`` (formerly
+    the standalone ``food_items.org``).  When ``fn`` is ``None`` (the
+    default — used by ``food_acquired`` and ``nutrition.org``) the mapping
+    is read from that org table via ``get_categorical_mapping``, mirroring
+    ``harmonized_unit_labels`` so foods and units share one source-of-truth
+    file and become joinable with crop / community-price ``j`` axes.
+
+    A non-``None`` ``fn`` keeps the legacy ``|``-delimited org-CSV reader
+    so the *nonfood* path (``nonfood_items.org``) is unaffected.
+
+    Codes are coerced to ``int`` so the mapping matches the integer item
+    codes carried in the ``j`` index of ``food_acquired`` (the raw
+    ``.dta`` item codes are ``int16``; ``hash(100) == hash(100.0)`` but a
+    string key would not match).
+    """
+    if fn is None:
+        from lsms_library.local_tools import get_categorical_mapping
+
+        raw = get_categorical_mapping(tablename='harmonize_food',
+                                      idxvars=key,
+                                      **{value: value})
+
+        labels = {}
+        for k, v in raw.items():
+            try:
+                int_k = int(k)
+            except (TypeError, ValueError):
+                int_k = k
+            if pd.isna(v):
+                continue
+            labels[int_k] = str(v).strip()
+        return labels
+
+    # Legacy path: explicit standalone org-CSV file (e.g. nonfood_items.org).
     food_items = pd.read_csv(fn,delimiter='|',skipinitialspace=True,converters={1:int,2:lambda s: s.strip()})
     food_items.columns = [s.strip() for s in food_items.columns]
     food_items = food_items[[key,value]].dropna()

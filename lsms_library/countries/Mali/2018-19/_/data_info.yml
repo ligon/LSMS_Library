@@ -191,9 +191,9 @@ food_acquired:
         i: 
             - grappe
             - menage
-        j: 
+        j:
             - s07bq01
-            - mappings: ['harmonize_food', 'Original Label', 'Preferred Label']
+            - mappings: ['harmonize_food', 'Code', 'Preferred Label']
         u: s07bq03b
     myvars:
         Quantity: s07bq03a

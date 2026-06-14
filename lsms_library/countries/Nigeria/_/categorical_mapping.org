@@ -233,6 +233,9 @@
 | 320 | Slice | --- | --- | --- | Slice |
 | 330 | Whole Animal | --- | --- | --- | Whole Animal |
 | 340 | Shot | --- | --- | --- | Shot |
+| 131 | other specify (131) | --- | --- | other specify (131) | --- |
+| 151 | other specify (151) | --- | --- | other specify (151) | --- |
+| 152 | other specify (152) | --- | --- | other specify (152) | --- |
 
 * Geopolitical Zones
 

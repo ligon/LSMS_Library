@@ -229,3 +229,197 @@ in W1 but 'Tilm' in W2-W5, hence wave-keyed.
 | 2021-22 |    9 | Rope            |
 | 2021-22 |   10 | Ermija          |
 | 2021-22 |   11 | Other           |
+
+* harmonize_food (the j axis) -- Unit #0 migration
+
+Canonical food-item label table for the j axis, migrated from the
+standalone food_items.org (Unit #0 of the parity-loop, 2026-06-14).
+Columns: Preferred Label | one per-wave name column (the value labels
+the Stata categorical read surfaces for each wave's food item) | the
+FTC Code / FDC ID nutrient-table keys consumed by nutrition.py /
+fct_tools.py.  ethiopia.food_acquired() applies the UNION of all
+per-wave columns to the j level at the WAVE-script level (Malawi
+pattern), so the resolved Preferred Label persists into each wave
+parquet -- the country-API concat path (load_from_waves) then sees
+clean labels with no further rename.  Per-wave columns retain the raw
+(sometimes truncated / code-prefixed / typo'd) survey strings so the
+union map covers every value food_acquired emits across W1-W5.
+
+#+name: harmonize_food
+| Preferred Label          | 2011-12       | 2013-14       | 2015-16                  | 2018-19                                            | 2021-22                                            | FTC Code | FDC ID  |
+|--------------------------+---------------+---------------+--------------------------+----------------------------------------------------+----------------------------------------------------+----------+---------|
+| Teff                     | Teff          | Teff          | Teff                     | 101. Teff                                          | 101. Teff                                          |          | 169747  |
+| Avocado                  | ---           | ---           | ---                      | 505. Avocado                                       | 505. Avocado                                       |          | 171705  |
+| Milk                     | Milk          | Milk          | Milk                     | 705. Milk                                          | 705. Milk                                          | 901      |         |
+| Fish                     | ---           | ---           | Fish                     | 704. Fish                                          | 704. Fish                                          | 808      |         |
+| Poultry                  | ---           | ---           | Poultry                  | 703. Poultry                                       | 703. Poultry                                       | 804      |         |
+| Beef                     | ---           | ---           | Beef                     | 702. Beef                                          | 702. Beef                                          | 802      |         |
+| Goat & mutton meat       | ---           | ---           | Goat & mutton meat       | 701. Goat & mutton meat                            | 701. Goat & mutton meat                            | 801      |         |
+| Other tuber or stem      | ---           | ---           | Other tuber or stem (SPE | 610. Other tuber or stem (SPECIFY)                 | 610. Other tuber or stem (SPECIFY)                 |          | ---     |
+| Beetroot                 | ---           | ---           | ---                      | 609. Beetroot                                      | 609. Beetroot                                      |          | 169145  |
+| Carrot                   | ---           | ---           | ---                      | 608. Carrot                                        | 608. Carrot                                        | 602      |         |
+| Godere                   | ---           | ---           | Godere                   | 607. Godere                                        | 607. Godere                                        |          | ---     |
+| Cassava                  | ---           | ---           | Cassava                  | 606. Cassava                                       | 606. Cassava                                       | 201      |         |
+| Boye/Yam                 | ---           | ---           | Boye/Yam                 | 605. Boye/Yam                                      | 605. Boye/Yam                                      | 204      |         |
+| Sweet potato             | ---           | ---           | Sweet potato             | 604. Sweet potato                                  | 604. Sweet potato                                  | 203      |         |
+| Bula                     | ---           | Bula          | Bula                     | 603. Bula                                          | 603. Bula                                          |          | ---     |
+| Kocho                    | Kocho         | Kocho         | Kocho                    | 602. Kocho                                         | 602. Kocho                                         |          | ---     |
+| Potato                   | Potato        | Potato        | Potato                   | 601. Potato                                        | 601. Potato                                        | 205      |         |
+| Cheese                   | Cheese        | Cheese        | Cheese                   | 706. Cheese                                        | 706. Cheese                                        | 902      |         |
+| Butter/ghee              | ---           | ---           | Butter/ghee              | 707. Butter/ghee                                   | 707. Butter/ghee                                   | 1002     |         |
+| Oils                     | ---           | ---           | Oils (processed)         | 708. Oils (processed)                              | 708. Oils (processed)                              | 1001     |         |
+| Beer                     | ---           | ---           | Beer                     | 804. Beer                                          | 804. Beer                                          | 1106     |         |
+| Pasta/Macaroni           | ---           | ---           | Pasta/Maccaroni          | 903. Pasta/Maccaroni                               | 903. Pasta/Maccaroni                               | 111      |         |
+| Bread/biscuit            | ---           | ---           | Purchased Bread or Biscu | 902. purchased bread/biscuit                       | 902. purchased bread/biscuit                       | 109      |         |
+| Injera                   | ---           | ---           | PuUrchased Injera        | 901. purchased Injera                              | 901. purchased Injera                              |          | 2343276 |
+| Hops (gesho)             | ---           | ---           | ---                      | 807. Hops (gesho)                                  | 807. Hops (gesho)                                  |          | ---     |
+| Chat/Kat                 | Chat / Kat    | Chat / Kat    | Chat / Kat               | 806. Chat / Kat                                    | 806. Chat / Kat                                    |          | ---     |
+| Tella                    | ---           | ---           | Tella                    | 805. Tella                                         | ---                                                | 1107     |         |
+| Soda                     | ---           | ---           | Soft drinks/Soda         | 803. Soft drinks/Soda                              | 803. Soft drinks/Soda                              | 1104     |         |
+| Eggs                     | Eggs          | Eggs          | Eggs                     | 709. Eggs                                          | 709. Eggs                                          | 807      |         |
+| Tea                      | ---           | ---           | ---                      | 802. Tea                                           | 802. Tea                                           | 1101     |         |
+| Coffee                   | Coffee        | Coffee        | Coffee                   | 801. Coffee                                        | 801. Coffee                                        | 1102     |         |
+| Other condiments         | ---           | ---           | ---                      | 713. Other condiments                              | 713. Other condiments                              |          | ---     |
+| Salt                     | Salt          | Salt          | Salt                     | 712. Salt                                          | 712. Salt                                          | 1003     |         |
+| Honey                    | ---           | ---           | ---                      | 711. Honey, natural                                | 711. Honey, natural                                | 303      |         |
+| Sugar                    | Sugar         | Sugar         | Sugar                    | 710. Sugar                                         | 710. Sugar                                         | 301      |         |
+| Other fruit              | ---           | ---           | Other fruit (SPECIFY)    | 506. Other fruit (SPECIFY) ____                    | 506. Other fruit (SPECIFY)                         |          | ---     |
+| Papaya                   | ---           | ---           | ---                      | 504. Papaya                                        | 504. Papaya                                        |          | 169926  |
+| Wheat                    | ---           | ---           | ---                      | 102. Wheat (Incl. Flour factory product)           | 102. Wheat (Incl. Flour factory product)           | 1081     |         |
+| Mango                    | ---           | ---           | ---                      | 503. Mango                                         | 503. Mango                                         | 703      |         |
+| Fenugreek                | ---           | ---           | ---                      | 208. Fenugreek                                     | 208. Fenugreek                                     |          | 171324  |
+| Vetch                    | ---           | ---           | ---                      | 207. Vetch                                         | 207. Vetch                                         |          | ---     |
+| Ground nuts              | ---           | ---           | Ground nuts              | 206. Ground nuts                                   | 206. Ground nuts                                   | 501      |         |
+| Haricot Beans            | Haricot Beans | Haricot Beans | Haricot Beans            | 205. Haricot Beans                                 | 205. Haricot Beans                                 | 401      |         |
+| Lentils                  | Lentils       | Lentils       | Lentils                  | 204. Lentils                                       | 204. Lentils                                       | 401      |         |
+| Field Pea                | Field Pea     | Field Pea     | Field Pea                | 203. Field Pea                                     | 203. Field Pea                                     | 401      |         |
+| Chick Pea                | Chick Pea     | Chick Pea     | Chick Pea                | 202. Chick Pea                                     | 202. Chick Pea                                     | 401      |         |
+| Horsebeans               | Horsebeans    | Horsebeans    | Horsebeans               | 201. Horsebeans                                    | 201. Horsebeans                                    | 401      |         |
+| Other cereal             | ---           | ---           | Other cereal (SPECIFY)   | 109. Other cereal (SPECIFY)                        | 109. Other cereal (SPECIFY)                        | 112      |         |
+| Oats                     | ---           | ---           | ---                      | 108. Oats                                          | 108. Oats                                          |          | 169705  |
+| Rice                     | ---           | ---           | ---                      | 107. Rice                                          | 107. Rice                                          | 102      |         |
+| Millet                   | Millet        | Millet        | Millet                   | 106. Millet                                        | 106. Millet                                        | 106      |         |
+| Sorghum                  | Sorghum       | Sorghum       | Sorghum                  | 105. Sorghum                                       | 105. Sorghum                                       | 106      |         |
+| Maize                    | Maize         | Maize         | Maize                    | 104. Maize                                         | 104. Maize                                         | 103      |         |
+| Barley                   | ---           | ---           | ---                      | 103. Barley (Incl. Beso: roasted & milled barely)  | 103. Barley (Incl. Beso: roasted & milled barely)  | 1082     |         |
+| Mung bean                | ---           | ---           | ---                      | 209. mung bean                                     | 209. mung bean                                     | 401      |         |
+| Shiro                    | ---           | ---           | ---                      | 210. Processed pulses (Shiro)                      | 210. Processed pulses (Shiro)                      | 401      |         |
+| Other pulse or nut       | ---           | ---           | Other pulse or nut (SPEC | 211. Other pulse or nut (SPECIFY)                  | 211. Other pulse or nut (SPECIFY)                  | 401      |         |
+| Leafy Greens             | ---           | ---           | ---                      | 404. kale, cabbage, Pumpikn Leaf, Lettuce, spinach | 404. kale, cabbage, Pumpikn Leaf, Lettuce, spinach | 602      |         |
+| Orange                   | ---           | ---           | Orange                   | 502. Orange                                        | 502. Orange                                        | 702      |         |
+| Banana                   | Banana        | Banana        | Banana                   | 501. Banana                                        | 501. Banana                                        | 701      |         |
+| Other vegetable          | ---           | ---           | Other vegetable (SPECIFY | 408. Other vegetable (SPECIFY)                     | 408. Other vegetable (SPECIFY)                     | 603      |         |
+| Moringa/Shiferaw/Halloka | ---           | ---           | ---                      | 407. Moringa/Shiferaw/Halloka                      | 407. Moringa/Shiferaw/Halloka                      |          | 168416  |
+| Garlic                   | ---           | ---           | ---                      | 406. Garlic                                        | 406. Garlic                                        |          | 169230  |
+| Tomato                   | ---           | ---           | Tomato                   | 405. Tomato                                        | 405. Tomato                                        | 601      |         |
+| Berbere                  | ---           | ---           | Red pepper (berbere)     | 403. Red pepper (Processed pepper (Berbere))       | 403. Red pepper (Processed pepper (Berbere))       |          | 2258590 |
+| Niger Seed               | Niger Seed    | Niger Seed    | Niger Seed               | 301. Niger Seed                                    | 301. Niger Seed                                    | 504      |         |
+| Kariya                   | ---           | ---           | Green chili pepper (kari | 402. Green chili pepper (kariya)                   | 402. Green chili pepper (kariya)                   | 601      |         |
+| Onion                    | Onion         | Onion         | Onion                    | 401. Onion                                         | 401. Onion                                         | 601      |         |
+| Other seed               | ---           | ---           | Other seed (SPECIFY)     | 305. Other seed (SPECIFY)                          | 305. Other seed (SPECIFY)                          | 504      |         |
+| Sun Flower               | ---           | ---           | ---                      | 304. Sun Flower                                    | 304. Sun Flower                                    | 504      |         |
+| Sesame                   | ---           | ---           | ---                      | 303. SESAME                                        | 303. Seasame                                       | 504      |         |
+| Linseed                  | Linseed       | Linseed       | Linseed                  | 302. Linseed                                       | 302. Linseed                                       | 504      |         |
+| Other prepared food      | ---           | ---           | Other prepared food and  | 904. Other purchased prepared food                 | 904. Other purchased prepared food                 |          | ---     |
+| Meat                     | Meat          | Meat          | ---                      | ---                                                | ---                                                | 804      |         |
+| Wheat                    | Wheat         | Wheat         | Wheat                    | ---                                                | ---                                                | 1082     |         |
+| Barley                   | Barley        | Barley        | Barley                   | ---                                                | ---                                                | 1082     |         |
+| Tea                      | ---           | ---           | Tea                      | ---                                                | ---                                                | 1101     |         |
+| Leafy Greens             | ---           | ---           | Greens (kale, cabbage, e | ---                                                | ---                                                | 602      |         |
+| Leafy Greens             | ---           | ---           | Greens (kale        cabb | ---                                                | ---                                                | 602      |         |
+| Camel meat               | ---           | ---           | ---                      | ---                                                | 714. Camel meat                                    |          | ---     |
+| Bottled water            | ---           | ---           | ---                      | ---                                                | 808. bottelled water 1/2-20 lit (highlaned)        |          | ---     |
+
+* u (the unit axis) -- Unit #0 creation
+
+Canonical unit-label table for the u axis (Unit #0, 2026-06-14).  Keyed
+on Original Label (the cleaned unit string ethiopia.food_acquired()
+emits after title-casing + code-prefix stripping) -> Preferred Label.
+Row-unioned with the global lsms_library/categorical_mapping/u.org
+(country rows win on collision; see _merge_categorical_tables).
+Unit #0 is FOUNDATION ONLY: the mapping is identity for every food_
+acquired unit (Kilogram -> Kg matches the global canonicalization
+already applied), so the u label axis is established WITHOUT changing
+any current food_acquired / food_quantities / food_prices output.  The
+kg-conversion factors live in transformations._get_kg_factors /
+conversion_to_kgs.json -- this table is the label axis only.  Later
+gaps (crop/harvest units, community-price units) extend these rows.
+
+#+name: u
+| Original Label                     | Preferred Label                    |
+|------------------------------------+------------------------------------|
+| Akumada/Dawla/Lekota Small         | Akumada/Dawla/Lekota Small         |
+| Araba                              | Araba                              |
+| Birchiko Large                     | Birchiko Large                     |
+| Birchiko Medium                    | Birchiko Medium                    |
+| Birchiko Small                     | Birchiko Small                     |
+| Box                                | Box                                |
+| Box/Casa                           | Box/Casa                           |
+| Bunch Large                        | Bunch Large                        |
+| Bunch Medium                       | Bunch Medium                       |
+| Bunch Small                        | Bunch Small                        |
+| Chinet Medium                      | Chinet Medium                      |
+| Chinet Small                       | Chinet Small                       |
+| Cm                                 | Cm                                 |
+| Cubic Centimeter                   | Cubic Centimeter                   |
+| Cup                                | Cup                                |
+| Esir Large                         | Esir Large                         |
+| Esir Medium                        | Esir Medium                        |
+| Esir Small                         | Esir Small                         |
+| Festal Large                       | Festal Large                       |
+| Festal Medium                      | Festal Medium                      |
+| Festal Small                       | Festal Small                       |
+| Gram                               | Gram                               |
+| Jenbe                              | Jenbe                              |
+| Jog                                | Jog                                |
+| Joniya/Kasha Small                 | Joniya/Kasha Small                 |
+| Kerchat/Kemba Large                | Kerchat/Kemba Large                |
+| Kerchat/Kemba Medium               | Kerchat/Kemba Medium               |
+| Kerchat/Kemba Small                | Kerchat/Kemba Small                |
+| Kg                                 | Kg                                 |
+| Kilogram                           | Kg                                 |
+| Kubaya/Cup Large                   | Kubaya/Cup Large                   |
+| Kubaya/Cup Medium                  | Kubaya/Cup Medium                  |
+| Kubaya/Cup Small                   | Kubaya/Cup Small                   |
+| Kunna/Mishe/Kefer/Enkib Large      | Kunna/Mishe/Kefer/Enkib Large      |
+| Kunna/Mishe/Kefer/Enkib Medium     | Kunna/Mishe/Kefer/Enkib Medium     |
+| Kunna/Mishe/Kefer/Enkib Small      | Kunna/Mishe/Kefer/Enkib Small      |
+| Liter                              | Liter                              |
+| Litres                             | Litres                             |
+| Madaberia/Nuse/Shera/Cheret Large  | Madaberia/Nuse/Shera/Cheret Large  |
+| Madaberia/Nuse/Shera/Cheret Medium | Madaberia/Nuse/Shera/Cheret Medium |
+| Madaberia/Nuse/Shera/Cheret Small  | Madaberia/Nuse/Shera/Cheret Small  |
+| Medeb Large                        | Medeb Large                        |
+| Medeb Medium                       | Medeb Medium                       |
+| Medeb Small                        | Medeb Small                        |
+| Melekia                            | Melekia                            |
+| Melekiya                           | Melekiya                           |
+| Mili Liter                         | Mili Liter                         |
+| Number                             | Number                             |
+| Other (Specify)                    | Other (Specify)                    |
+| Other(Specify)                     | Other(Specify)                     |
+| Pack                               | Pack                               |
+| Pair                               | Pair                               |
+| Piece/Number Large                 | Piece/Number Large                 |
+| Piece/Number Medium                | Piece/Number Medium                |
+| Piece/Number Small                 | Piece/Number Small                 |
+| Quintal                            | Quintal                            |
+| Roll                               | Roll                               |
+| Sahin Large                        | Sahin Large                        |
+| Sahin Medium                       | Sahin Medium                       |
+| Sahin Small                        | Sahin Small                        |
+| Shekim                             | Shekim                             |
+| Shekim Large                       | Shekim Large                       |
+| Shekim Medium                      | Shekim Medium                      |
+| Shekim Small                       | Shekim Small                       |
+| Sini Large                         | Sini Large                         |
+| Sini Small                         | Sini Small                         |
+| Tasa/Tanika/Shember/Selemon Large  | Tasa/Tanika/Shember/Selemon Large  |
+| Tasa/Tanika/Shember/Selemon Medium | Tasa/Tanika/Shember/Selemon Medium |
+| Tasa/Tanika/Shember/Selemon Small  | Tasa/Tanika/Shember/Selemon Small  |
+| Tuba                               | Tuba                               |
+| Whole Animal (Poultary)            | Whole Animal (Poultary)            |
+| Whole Animal (Sheep)               | Whole Animal (Sheep)               |
+| Zorba/Akara Large                  | Zorba/Akara Large                  |
+| Zorba/Akara Medium                 | Zorba/Akara Medium                 |
+| Zorba/Akara Small                  | Zorba/Akara Small                  |

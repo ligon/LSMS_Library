@@ -93,7 +93,7 @@ $(VAR_DIR)/income.parquet: income.py $(VAR_DIR)/enterprise_income.parquet $(VAR_
 $(VAR_DIR)/nutrition.parquet $(VAR_DIR)/fct.parquet: nutrition.py $(VAR_DIR)/food_acquired.parquet nutrition.org
 	python nutrition.py
 
-%.parquet: %.py food_items.org uganda.py
+%.parquet: %.py categorical_mapping.org uganda.py
 	(cd $(@D) && python ./$(<F))
 
 clean:

@@ -19,12 +19,15 @@ from lsms_library.local_tools import all_dfs_from_orgfile
 
 
 def _unit_canonicalizer():
-    '''Build an Original Label -> Preferred Label dict from the Mali
-    country-level `unit` table (categorical_mapping.org), mirroring the
-    YAML `mappings: ['unit', ...]` step the EHCVM waves apply at idxvars
-    time.  Best-effort: returns an identity (empty) map if the org file
-    or table is unavailable, so the melt never crashes on it.  Unmatched
-    unit labels pass through unchanged, exactly as `.replace()` does.
+    '''Build a Code -> Preferred Label dict from the Mali country-level
+    `u` table (categorical_mapping.org, the canonical
+    Code|Preferred Label|<per-wave> unit table), mirroring the by-name
+    auto-application of that table the EHCVM waves get on their `u`
+    index level.  `Code` is the first non-Preferred-Label column (the
+    raw source label).  Best-effort: returns an identity (empty) map if
+    the org file or table is unavailable, so the melt never crashes on
+    it.  Unmatched unit labels pass through unchanged, exactly as
+    `.replace()` does.
     '''
     org = os.path.join(os.path.dirname(__file__), '..', '..', '_',
                        'categorical_mapping.org')
