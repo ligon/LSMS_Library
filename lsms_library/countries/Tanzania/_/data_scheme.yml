@@ -388,3 +388,33 @@ Data Scheme:
     index: (t, v, j, u)
     Price: float
     materialize: make
+
+  community_cluster_xwalk:
+    # Crosswalk (issue #113): community price cluster -> household survey
+    # cluster, so community_prices can serve as the missing-quantity/price
+    # fallback.  Grain (t, v) -- one row per community price cluster v (the
+    # community questionnaire's native interview__key, matching
+    # community_prices.v).  The community instrument carries no survey-cluster
+    # id (GPS redacted, interviewer/team id stripped), so the only shared
+    # geography with the household frame is the national admin tuple; we match
+    # community (region, ward) -> survey cluster and disambiguate wards holding
+    # >1 cluster by interview-date overlap (community cm_start inside the
+    # cluster's household hh_a18 window -- one field team does both in one
+    # visit).  The district code is dropped on purpose (community = national
+    # code, cluster DD = within-region index -- (region,district,ward) = 0/488
+    # in 2020-21).  This is a deliberately LOSSY, confidence-tagged crosswalk,
+    # materialised SEPARATELY so community_prices.v stays the native
+    # interview__key (the #442 decision) and the residual falls back to region.
+    # Measured cluster-resolution: ~52% (2019-20, +/-14d) / ~86% (2020-21,
+    # +/-7d), region fallback otherwise.  See Tanzania/_/CONTENTS.org (#113).
+    #   cluster      : resolved survey cluster id (== sample().v) where unique,
+    #                  else <NA>.
+    #   region       : region code (always present; region-level fallback key).
+    #   match        : 'cluster' (unique) | 'region' (ambiguous / no ward HH).
+    #   n_candidates : # survey clusters sharing the community's (region, ward).
+    index: (t, v)
+    cluster: str
+    region: str
+    match: str
+    n_candidates: int
+    materialize: make

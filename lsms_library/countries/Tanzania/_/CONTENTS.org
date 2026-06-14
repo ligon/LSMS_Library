@@ -251,6 +251,68 @@ residue.  GPS-based matching is *not* available: Tanzania
    item-level with native =interview__key= =v= --- do not bake the lossy
    join in.
 
+*** Data-enabled result: =community_cluster_xwalk= implemented (2026-06-14, #113)
+
+The next-steps above were run with data access.  The date lever is real
+and is now wired as a separate crosswalk feature; the district crosswalk
+is a dead end; the interviewer/team-id idea is unavailable.
+
+**Avenue A (cluster id elsewhere) --- dead.**  Scanned =CM_SEC_A= and
+=CM_SEC_B..G= in both waves: no =clusterid= / =strataid= / EA column
+anywhere.  Community GPS (=cm_gps__*=) is present but =**CONFIDENTIAL**=
+(redacted), and there is no Survey-Solutions paradata / assignment file in
+either =Data/= dir, so the interviewer / "responsible" id is stripped too
+(=cm_a17..cm_a25= are 1--4 rating items, not team codes).  The only shared
+geography remains the national admin tuple.
+
+**Avenue B (interview dates) --- confirmed and used.**  =CM_SEC_A.cm_start=
+(community) and =HH_SEC_A.hh_a18= (household) both carry real timestamps.
+Positive control (where =(region, ward)= already gives a UNIQUE cluster,
+does =cm_start= fall in that cluster's =hh_a18= window?): *99%* (2020-21,
+298/301) / *79%* (2019-20, 31/39) --- one field team runs the community
+interview and that cluster's household interviews in one visit, so the
+date genuinely separates wards that hold >1 cluster.
+
+**District crosswalk --- abandoned; drop district instead.**  The two
+encodings are structurally different, not a fixable bug: community =id_02=
+is a national district code (11..128+), the survey cluster =DD= is a
+within-region index (1..9), so =(region, district, ward)= = *0/488* in
+2020-21.  But =region= (30/30) and =ward= (105/110) DO share a codespace,
+so the match keys on =(region, ward)= and breaks ward collisions by date.
+
+**Measured unique-cluster resolution** (honest; the desk estimates above
+were optimistic):
+
+| wave    | geo-unique | +date | total unique | region fallback |
+|---------+------------+-------+--------------+-----------------|
+| 2019-20 |         39 |   +12 |        51/99 |              48 |
+| 2020-21 |        302 |  +112 |      414/488 |              74 |
+
+Window is wave-specific (from a sweep): 2019-20 widens well (±14d optimal,
+sparse Extended Panel); 2020-21 must stay narrow (±7d --- the dense
+Refresh Panel re-ambiguates when widened, exactly the gap an interviewer
+id would have closed).  Every resolved =cluster= is a real =sample().v=
+(51/51, 414/414), so the household join is valid.
+
+**Implemented as the =community_cluster_xwalk= feature** (NOT a
+=transformations= step --- it is wave-specific, cross-file
+=CM_SEC_A=+=HH_SEC_A= logic, so it belongs on the script path):
+- =tanzania.link_community_to_cluster(t, cm_a, hh_a, window_days)= --- the matcher;
+- wave scripts =2019-20/_/community_cluster_xwalk.py= /
+  =2020-21/_/community_cluster_xwalk.py= (=materialize: make=) +
+  country-level =_/community_cluster_xwalk.py= concat;
+- grain =(t, v)= (=v= = community =interview__key=, joins =community_prices.v=);
+  columns =cluster= (resolved =sample().v= or NA), =region=, =match=
+  ('cluster' | 'region'), =n_candidates=.  =is_this_feature_sane().ok=.
+- =community_prices.v= stays native (the #442 decision); the lossy,
+  confidence-tagged link lives only in this crosswalk.
+
+**Remaining (the original #113 usage).**  The quantity/price fallback
+itself --- join =community_prices ⨝ community_cluster_xwalk → cluster v →
+households=, region fallback where =match != 'cluster'= --- is a separate
+consumer step (plausibly a =_FOOD_DERIVED=-style country transform, since
+it is "fill missing =food_prices= from another table").  Not yet wired.
+
 ** DONE Link  2019-20 and 2020-21 to panel
 CLOSED: [2026-03-29 Sat]
 According to docs this is possible; e.g., see p. 12 of [[../2019-20/Documentation/tznps_sdd_2019_20_basic_information_document_updated_november_2022.pdf][Basic Information Document]].
