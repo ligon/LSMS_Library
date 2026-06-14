@@ -367,6 +367,38 @@ Consequences for the data:
 Source: NPS 2020/21 Basic Information Document, pp. 7--8.
 
 
+** TODO Pull WB geovariables (weather/distance/soil) for older NPS waves (#449)
+
+- GitHub :: [[https://github.com/ligon/LSMS_Library/issues/449][#449]]
+
+The WB LSMS-ISA *geovariables* module (GPS+raster-derived rainfall/climate,
+distance-to-road/market, soil quality, terrain, EVI, =ea_id= + offset GPS;
+household & plot level, cluster-constant) is available on the WB catalog for
+the *older* NPS waves but is NOT pulled into the repo.  Verified against the
+NADA data-file rosters (2026-06-14):
+
+| wave        | catalog idno                  | geovars file(s)                              |
+|-------------+-------------------------------+----------------------------------------------|
+| 2008-09 W1  | =TZA_2008_NPS-R1_v03_M=        | =HH.Geovariables_Y1=                          |
+| 2010-11 W2  | =TZA_2010_NPS-R2_v03_M=        | =HH.Geovariables_Y2=, =Plot.Geovariables_Y2=  |
+| 2012-13 W3  | =TZA_2012_NPS-R3_v01_M=        | =HouseholdGeovars_Y3=, =PlotGeovars_Y3=       |
+| 2014-15 W4  | =TZA_2014_NPS-R4_v03_M=        | none                                          |
+| 2008-15 UPD | =TZA_2008-2014_NPS-UPD_v01_M=  | none                                          |
+| 2019-20 SDD | =TZA_2019_NPS-SDD_v06_M=       | none                                          |
+| 2020-21 R5  | =TZA_2020_NPS-R5_v02_M=        | none                                          |
+
+*Repo caveat.*  The =2008-15/= folder is built from the *Uniform Panel
+Dataset* (=TZA_2008-2014_NPS-UPD=, the =upd4_hh_*= files), which carries NO
+geovars.  The geovars live in the *per-wave* studies (W1/W2/W3), so they must
+be pulled from those individual catalog entries and joined onto the panel
+household id --- not lifted from the UPD download already in use.
+
+The redesign waves (SDD 2019-20, R5 2020-21) dropped the public geovariables
+module entirely.  Orthogonal to #113: the geovars are household/EA-side and
+GPS-anonymised (and there is no community-level geovars), so they do NOT bridge
+the community↔cluster link.
+
+
 ** WAITING Duplicate rows in food_acquired from r_hhid/UPHI matching in 2008-15 (#114)
 :LOGBOOK:
 - Note taken on [2026-04-01 Tue] \\
