@@ -133,6 +133,50 @@ Data Scheme:
     perennial: bool
     materialize: make
 
+  plot_inputs:
+    # Item-level reported agricultural inputs (GAP 2) at natural grain
+    # (t, i, plot, input, crop).  Source: the post-planting / post-harvest
+    # input modules (seeds sect11e/sect11f, fertilizer sect11d/secta11c2,
+    # pesticide sect11c/secta11c2).  Each wave maps to a single t = PP
+    # quarter (2010Q3 / 2012Q3 / 2015Q3 / 2018Q3 / 2023Q3), matching
+    # plot_features; plot_id aligns with crop_production via format_id.
+    # Country-level script (_/plot_inputs.py) reshapes the per-acquisition-
+    # channel modules into one row per input applied to a plot ->
+    # materialize: make.  Stores REPORTED item-level fields ONLY -- no
+    # seed_kg / nitrogen_kg conversion, no inorganic/organic any-use flags,
+    # no fertilizer totals (those are transformations over these rows).
+    #
+    # `input` (index) carries a harmonized input-type Preferred Label
+    # (Seed / NPK / Urea / Other Inorganic Fertilizer / Organic Fertilizer
+    # / Pesticide / Herbicide / Animal Traction), resolved in-script and
+    # registered in harmonize_input (the canonical registry, mirroring how
+    # crop_production resolves crops via harmonize_food).  `crop` (index)
+    # is the seed's crop on the shared harmonize_food Preferred Label (so
+    # seed rows join food_acquired.j / crop_production.crop); non-seed
+    # crop-agnostic inputs carry crop = 'n/a'.  u is normalized to the
+    # shared `u` table base labels (chemicals: Kg/g/l/cl; animal traction:
+    # days).
+    #
+    # Every row carries a REPORTED quantity (an item), never a bare any-use
+    # flag.  Quantity / u: reported native quantity + unit, summed across
+    # same-unit acquisition channels (mixed-unit channels keep the largest
+    # reported channel -- no kg conversion, which is a transformation).
+    # Animal Traction carries reported own+rented animal-days (u=days).
+    # The plain "used a tractor/machine?" yes/no records no per-input
+    # quantity -> left to a used_machinery transformation, not stored.
+    # Purchased / Quantity_purchased: from the commercial acquisition
+    # channels (W1-W3 only; W4/W5 seed/fert modules do not split purchase
+    # at this grain -> NaN).  Improved: seed rows only -- W3 s11eq3b
+    # (hybrid/improved), W4/W5 s11fq3b/s11fq7 + certified flag; W1/W2 seed
+    # modules have no improved-variety question -> NaN.
+    index: (t, i, plot, input, crop)
+    Quantity: float
+    u: str
+    Purchased: bool
+    Quantity_purchased: float
+    Improved: bool
+    materialize: make
+
   food_coping:
     # Family B (coping-strategies / rCSI), #332.  GHS section 9 ("Food
     # Security") is a coping day-count battery (items s9q1a..s9q1i: "how
