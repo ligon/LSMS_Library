@@ -28,6 +28,8 @@ colmap = dict(
     tenure_system = 's16aq13',
     soil_type     = 's16aq18',
     water_source  = 's16aq17',
+    topography    = 's16aq19',
+    soil_fertility= 's16aq20',
 )
 
 df = plot_features_for_wave('2021-22', src, colmap)

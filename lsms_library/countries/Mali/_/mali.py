@@ -125,12 +125,17 @@ def plot_features_for_wave(t, source, colmap):
             tenure_system — land-document question    -> TenureSystem
             soil_type     — soil-type question        -> SoilType
             water_source  — water-source question     -> Irrigated
+            topography    — topography/slope question -> Topography  (optional)
+            soil_fertility— fertility-rating question -> SoilFertility (optional)
 
     Returns
     -------
     pd.DataFrame indexed by ``(t, i, plot_id)`` with columns
         ``Area`` (hectares float), ``AreaUnit`` (always 'hectares'),
-        ``Tenure``, ``TenureSystem``, ``SoilType`` (str), and
+        ``SelfReportedArea`` (hectares float — the farmer estimate, kept
+        distinct from the GPS-preferred ``Area``), ``Tenure``,
+        ``TenureSystem``, ``SoilType`` (str), ``Topography`` (str reported
+        slope class), ``SoilFertility`` (str reported fertility rating), and
         ``Irrigated`` (nullable bool).
 
     Notes
@@ -149,6 +154,8 @@ def plot_features_for_wave(t, source, colmap):
     tenure_system_map = _harmonized_codes('harmonize_tenure_system')
     soil_map = _harmonized_codes('harmonize_soil')
     water_map = _harmonized_codes('harmonize_water')
+    topo_map = _harmonized_codes('harmonize_topography')
+    fert_map = _harmonized_codes('harmonize_soil_fertility')
 
     c = colmap
 
@@ -193,12 +200,29 @@ def plot_features_for_wave(t, source, colmap):
     area_unit = pd.Series(['hectares'] * len(src), index=src.index, dtype='string')
     area_unit = area_unit.where(area_ha.notna(), pd.NA)
 
+    # Farmer-self-reported parcel area (hectares).  The WB harmonised panel
+    # carries `self_reported_area` distinctly from the GPS measure; we keep it
+    # as its own REPORTED column rather than only as the GPS fallback folded
+    # into Area above.  Same unit conversion (1=Hectare, 2=m^2) and the same
+    # plausibility clamp (GH #327) as Area.
+    self_area = est_ha.where(((est_ha > 0) & (est_ha <= 1000)) | est_ha.isna(), pd.NA)
+
     tenure = _map_codes(src[c['tenure']], tenure_map) \
         if c.get('tenure') in src.columns else pd.Series(pd.NA, index=src.index, dtype='string')
     tenure_system = _map_codes(src[c['tenure_system']], tenure_system_map) \
         if c.get('tenure_system') in src.columns else pd.Series(pd.NA, index=src.index, dtype='string')
     soil_type = _map_codes(src[c['soil_type']], soil_map) \
         if c.get('soil_type') in src.columns else pd.Series(pd.NA, index=src.index, dtype='string')
+
+    # Reported per-plot topography/slope class (s16aq19) and the farmer's
+    # reported soil-fertility assessment (s16aq20).  These are SURVEYED item
+    # attributes — the reported analogues of the WB panel's GAEZ-raster
+    # `plot_slope` / `soil_fertility_index` (which are geospatial/PCA
+    # transforms, out of scope).  Both columns are optional in the colmap.
+    topography = _map_codes(src[c['topography']], topo_map) \
+        if c.get('topography') in src.columns else pd.Series(pd.NA, index=src.index, dtype='string')
+    soil_fertility = _map_codes(src[c['soil_fertility']], fert_map) \
+        if c.get('soil_fertility') in src.columns else pd.Series(pd.NA, index=src.index, dtype='string')
 
     irrigated = pd.Series(pd.NA, index=src.index, dtype='boolean')
     if c.get('water_source') in src.columns:
@@ -207,15 +231,18 @@ def plot_features_for_wave(t, source, colmap):
         irrigated = irrigated.where(water_label.notna(), pd.NA)
 
     df = pd.DataFrame({
-        't':            t,
-        'i':            hh.values,
-        'plot_id':      plot_id.values,
-        'Area':         area_ha.values,
-        'AreaUnit':     area_unit.values,
-        'Tenure':       tenure.values,
-        'TenureSystem': tenure_system.values,
-        'SoilType':     soil_type.values,
-        'Irrigated':    irrigated.values,
+        't':                t,
+        'i':                hh.values,
+        'plot_id':          plot_id.values,
+        'Area':             area_ha.values,
+        'AreaUnit':         area_unit.values,
+        'SelfReportedArea': self_area.values,
+        'Tenure':           tenure.values,
+        'TenureSystem':     tenure_system.values,
+        'SoilType':         soil_type.values,
+        'Topography':       topography.values,
+        'SoilFertility':    soil_fertility.values,
+        'Irrigated':        irrigated.values,
     })
     df = df.set_index(['t', 'i', 'plot_id'])
     return df
