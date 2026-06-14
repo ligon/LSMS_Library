@@ -565,3 +565,39 @@ Kale/Cabbage -> Leafy Greens) so the join still lands.
 |  120 | Other cereal        |
 |  121 | Other Cash Crop     |
 |  123 | Other vegetable     |
+
+* harmonize_input (the input axis -- GAP 2, plot_inputs)
+
+Code-keyed input-type taxonomy for the ESS post-planting input modules
+(sect3_pp fertilizer/organic, sect4_pp seed/pesticide, sect5_pp seed
+purchase).  Maps a small stable internal code to a Preferred Label.
+
+The taxonomy is the shared ag-input set the parity loop standardises on
+across countries (Seed / inorganic-fertilizer types / organic-fertilizer
+types / pesticide), so plot_inputs.input aligns cross-country.  ESS does
+NOT report a numeric input code in the raw data -- the input identity is
+implicit in WHICH question/section is being read -- so ``ethiopia.
+plot_inputs_for_wave`` emits these Preferred Labels DIRECTLY (the same
+in-script labelling crop_production uses for crops); this table is the
+authoritative label source + a cross-country reference, not a runtime
+auto-mapping target (the index level is named ``input``, this table
+``harmonize_input``, so the name-match auto-mapper deliberately does not
+fire on it).
+
+ESS fertilizer coverage by wave: Urea + DAP every wave; NPS added in W3
+(2015-16) and carried in W4/W5; Manure/Compost/Other Organic every wave;
+Pesticide every wave.  Reported quantities (Urea/DAP/NPS kg, seed kg,
+seed purchased kg) are all in kilograms (u = 'Kg'); organic and pesticide
+rows carry an applied-y/n flag only (no quantity in the survey).
+
+#+name: harmonize_input
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Seed            |
+|    2 | Urea            |
+|    3 | DAP             |
+|    4 | NPS             |
+|    5 | Manure          |
+|    6 | Compost         |
+|    7 | Other Organic   |
+|    8 | Pesticide       |

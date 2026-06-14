@@ -491,6 +491,66 @@ cross-country alignment.
   - =Ethiopia/_/categorical_mapping.org= -- =harmonize_acquire=,
     =harmonize_soil=, =harmonize_area_unit=.
 
+* plot_inputs (GAP 2)
+
+Item-level ag inputs at =(t, i, plot_id, input, j)= -- one row per input
+APPLIED to a plot (or plot-crop), from the ESS post-planting input modules.
+Joins =plot_features= / =crop_production= on =(t, i, plot_id)= (identical
+=plot_id= and =i= construction), and =plot_inputs.j= joins
+=crop_production.j= / =food_acquired.j= for the crop-specific (Seed /
+Pesticide) rows via the shared =harmonize_crop= labels.
+
+** Source grains (three sections, three grains)
+
+  - §3 plot roster (=sect3_pp=) -- ONE ROW PER FIELD.  Inorganic-fertilizer
+    use + reported kg per type (Urea / DAP / NPS) and organic-fertilizer use
+    dummies (Manure / Compost / Other Organic).  PLOT-LEVEL (no crop) -> these
+    rows carry =j = 'Whole Plot'= (the reserved non-crop sentinel, since =j=
+    is an index level and cannot be null -- mirrors how =crop_production=
+    fills its =u= level).
+  - §4 planting (=sect4_pp=) -- ONE ROW PER (FIELD, CROP).  Seed quantity (kg;
+    W2-W5; W1's seed qty is in §5), the improved-seed flag, and the
+    pesticide-use dummy.  CROP-specific -> =j = crop Preferred Label=.
+  - §5 seed (=sect5_pp=) -- seed PURCHASE detail (purchased y/n, purchased
+    kg).  W1's §5 is (field, crop) grain (direct plot-crop join); W2-W5's §5
+    is (HOLDER, crop) grain (no field_id), so its purchased columns attach to
+    the §4 plot-crop seed rows ONLY where the (holder, crop) maps to exactly
+    ONE plot (the SALES GRAIN CAVEAT =crop_production= uses for §11 sales).
+
+** Per-wave variable drift
+
+  - W1 (2011-12): seed qty in §5 (=pp_s5q19_a= kg + =pp_s5q19_b= g); UREA/DAP
+    kg read from the =_c= kg-form (=pp_s3q16_c= / =pp_s3q19_c=); NO NPS.
+  - W2 (2013-14): seed qty moves to §4 (=pp_s4q11b=); UREA kg =pp_s3q16_a= +
+    purchased =pp_s3q16c=; DAP =pp_s3q19_a= / =pp_s3q19c=; NO NPS.
+  - W3 (2015-16): seed qty =pp_s4q11b_a= + =pp_s4q11b_b= g; NPS INTRODUCED
+    (used =pp_s3q20a_1=, kg =pp_s3q20a_2=, purchased =pp_s3q20a_4=).
+  - W4 (2018-19) / W5 (2021-22): the =pp_= prefix is dropped and §3
+    restructured -- UREA =s3q21=/=s3q21a=/=s3q21c=, DAP =s3q22*=, NPS
+    =s3q23*=, organic =s3q25/26/27=; seed qty =s4q11a= (crop =s4q01b=,
+    improved =s4q11= with 2/4=Yes), §5 purchase =s5q02=/=s5q04= (crop
+    =s5q0B=); the seed block drops =s4q15==1= (immature / cut-green rows).
+    DAP nearly disappears by W5 (3 rows) as NPS displaces it.
+
+** Columns (all REPORTED, item-level)
+
+=Quantity= + =u= (applied kg; =u='Kg'= for every ESS input quantity),
+=Purchased= (seed purchased y/n), =Quantity_purchased= (seed + fertilizer
+purchased kg where recorded), =Improved= (improved-seed flag, seed rows),
+=Applied= (the reported applied/used dummy -- the sole datum for organic /
+pesticide rows, which carry NO quantity in ESS; also set for fertilizer rows
+that report use without a kg; NaN for seed rows).  NO =nitrogen_kg= /
+=seed_kg= sums, NO any-use roll-up flags, NO fertilizer totals -- those are
+=transformations= over these item rows (GAP 2 / GAP 7).
+
+** Files
+
+  - =Ethiopia/_/ethiopia.py:plot_inputs_for_wave= -- shared helper.
+  - =Ethiopia/<wave>/_/plot_inputs.py= -- per-wave drivers (colmaps).
+  - =Ethiopia/_/plot_inputs.py= -- country concatenator (+ id_walk).
+  - =Ethiopia/_/categorical_mapping.org= -- =harmonize_input= (input
+    taxonomy), =harmonize_crop= (crop =j= for seed/pesticide rows).
+
 * Files in Ethiopia/<SOMEYEAR>/_/
 ** DONE household_characteristics.py
 CLOSED: [2023-03-03 Fri 11:26]
