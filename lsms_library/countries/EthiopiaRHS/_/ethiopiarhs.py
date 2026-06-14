@@ -13,16 +13,21 @@ import lsms_library.local_tools as tools
 
 
 # Explicit `waves` list (consumed by Country.waves, country.py:1054-1073).
-# 1989/1994a/1994b/1995/1997 are the original wired rounds.  1999 (R5) was
-# previously excluded as "no person roster", but the IFPRI Dataverse archive
-# DOES contain an R5 person roster ("11 3.3.99 roster.tab" -> 1999/Data/
-# roster.tab, 10,788 person-rows, already label-decoded), so it is now wired
-# for household_roster (GH #277; data-availability sleuth 2026-06-07).
-# 2004/2009 (R6/R7) remain excluded -- they carry only HH-size summaries, no
-# person roster.  Item-level food is absent for R5/R6/R7 (only pre-aggregated
-# consumption scalars), so food_acquired stays 1994-1997 only.
+# All 8 ERHS rounds are wired:
+#  - 1989/1994a/1994b/1995/1997 (R1-R4): person roster + item-level food.
+#  - 1999 (R5): person roster ("11 3.3.99 roster.tab" -> 1999/Data/roster.tab,
+#    10,788 person-rows) wired for household_roster + sample/cluster_features;
+#    bespoke (t,i) livestock + income from the R5 lvs5/inc5 modules.
+#  - 2004 (R6) / 2009 (R7): the IFPRI archive has NO person roster and NO
+#    item-level food for R6/R7 -- only pre-aggregated HH-level scalars -- so
+#    they are wired as bespoke HH-level (t,i) aggregate waves (consumption,
+#    livestock, area_output, and 2009-only hhsize), with sample +
+#    cluster_features derived from the consumption-aggregate file's
+#    paid/pa (= peasant-association code 1..20) + the erhs_village_* Code
+#    tables.  They do NOT fake a roster/food_acquired the data can't support.
+# Item-level food_acquired stays 1994-1997 only (R1-R4).
 # See _/CONTENTS.org and GH #271 / #277.
-waves = ['1989', '1994a', '1994b', '1995', '1997', '1999']
+waves = ['1989', '1994a', '1994b', '1995', '1997', '1999', '2004', '2009']
 
 
 # Unit handling (GH #347).  ``u`` carries the harmonized unit label
@@ -160,10 +165,11 @@ def food_acquired(df):
 
 
 def sample(df):
-    """Dedup the per-person extract to one row per household.
+    """Dedup the per-person / per-HH extract to one row per household.
 
-    ERHS has no household-level cover file, so `sample` is extracted
-    from the per-person roster (i + v=village).  Collapse to HH grain
+    ERHS has no household-level cover file, so `sample` is extracted from
+    the per-person roster (1989-1999) or the HH-level consumption
+    aggregate file (2004/2009): i + v=village.  Collapse to HH grain
     (first row per i).  ERHS is a PURPOSIVE 15-village panel with no
     survey *design* weights; rather than NaN we use UNIFORM weights of
     1.0 (self-weighting -- each household counts once, giving
@@ -172,8 +178,18 @@ def sample(df):
     constructed ERHS weights remains a documented follow-up.  strata =
     village (the panel's PSU); Rural = 'Rural' (it is the *Rural*
     Household Survey -- all rural).
+
+    R6-POPULATION FILTER (2004).  consumptionaggregates_123456.tab is a
+    pooled R1-R6 file (1598 rows); only the rows with non-NaN cons6 are
+    the R6 population (1368 HH).  A wave may pass an optional `_present`
+    helper myvar (e.g. _present: cons6) -- rows where it is NaN are
+    dropped so the 230 out-of-round HH are not carried into the 2004
+    sample (matches the consumption block's R6 filter).  Waves that do
+    not provide `_present` (1989-1999, 2009) are unaffected.
     """
     flat = df.reset_index()
+    if '_present' in flat.columns:
+        flat = flat[flat['_present'].notna()]
     flat = flat[flat['i'].notna()].drop_duplicates(subset='i', keep='first')
     # v is a myvar here (no auto format_id) but is an idxvar in
     # cluster_features (auto format_id'd) -- format it the same way so
@@ -189,13 +205,21 @@ def sample(df):
 
 
 def cluster_features(df):
-    """Dedup the per-person extract to one row per village (v).
+    """Dedup the per-person/per-HH extract to one row per village (v).
 
     Region (named, via erhs_village_region) and Woreda (real in-data
     name, via erhs_village_woreda) are applied in the wave data_info.
     1989 supplies neither (demog89_1 has no q1b/q1a) -- keep whichever
     of Region/Woreda the wave provided so the country-level concat
     fills the rest with NaN.  Collapse to one row per v; Rural='Rural'.
+
+    For 2004/2009 the source is the HH-level aggregate file (one row per
+    HH); v = paid/pa (the same numeric peasant-association code 1..20 as
+    q1c), so the dedup-to-village + erhs_village_* Code-table mapping
+    yields the SAME canonical Region/Woreda spellings as every other wave
+    (geography is consistent across all 8 waves; 2009's slightly-variant
+    in-data woreda spellings -- 'Tsibi Wonberat' vs 'Atsbi' -- are NOT
+    used, to avoid splitting a village's Woreda label across waves).
     """
     flat = df.reset_index()
     flat = flat[flat['v'].notna() & (flat['v'].astype('string').str.strip()
@@ -204,3 +228,51 @@ def cluster_features(df):
     flat['Rural'] = 'Rural'
     keep = [c for c in ('Region', 'Woreda') if c in flat.columns] + ['Rural']
     return flat.set_index(['v'])[keep]
+
+
+def _drop_all_nan_value_rows(df):
+    """Drop rows whose every value column (non-index) is NaN.
+
+    Shared helper for the 2004/2009 HH-level aggregate tables.  The
+    pooled R1-R6 aggregate files (e.g. consumptionaggregates_123456.tab,
+    1598 rows) carry HH not present in the round being sliced: only the
+    rows with a non-NaN value in the round-suffixed column (cons6, 1368
+    rows for R6) are the round's population.  After myvar extraction the
+    out-of-round rows are all-NaN, so dropping rows that are all-NaN
+    across the value columns recovers exactly the round population (the
+    documented R6-population filter).  For single-round files (the 2009
+    *_r7 files) this drops nothing.
+    """
+    flat = df.reset_index()
+    idx = list(df.index.names)
+    valcols = [c for c in flat.columns if c not in idx]
+    flat = flat.dropna(subset=valcols, how='all')
+    return flat.set_index(idx)
+
+
+def consumption(df):
+    """R6/R7 HH-level consumption aggregates: drop out-of-round rows.
+
+    See _drop_all_nan_value_rows.  For 2004 this filters the 1598-row
+    pooled file down to the 1368 R6-population HH (cons6 non-null); for
+    2009 (consumptionAggrgates_r7.tab, already single-round) it is a
+    no-op.
+    """
+    return _drop_all_nan_value_rows(df)
+
+
+def hhsize(df):
+    """2009 HH-size summary: drop any all-NaN value rows (no-op in practice)."""
+    return _drop_all_nan_value_rows(df)
+
+
+def area_output(df):
+    """R6/R7 HH x crop area(ha)+production(kg): drop all-NaN-crop rows.
+
+    The 2004 source carries 9 crops (white/black teff, barley, wheat,
+    maize, sorghum, coffee, chat, enset); 2009 carries 6 cereals (the
+    teff/barley/wheat/maize/sorghum subset) and leaves coffee/chat/enset
+    absent (filled NaN by the wave data_info's missing_ok myvars).  A row
+    with no crop area or production at all carries no information -> drop.
+    """
+    return _drop_all_nan_value_rows(df)

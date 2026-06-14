@@ -1,0 +1,5 @@
+outs:
+- md5: f3135607bad5ee7dace1a731b0266bde
+  size: 140725
+  hash: md5
+  path: consumptionAggrgates_r7.tab
