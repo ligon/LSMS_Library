@@ -24,6 +24,29 @@ Index Info:
     assets: (t, i, j)
     individual_education: (t, v, i, pid)
 
+# Cluster-id (v) join policy.  _finalize_result() joins v from sample() onto
+# household-level (i, t) tables that lack it.  A table is SKIPPED when its
+# canonical index in `index_info` above omits v, OR when it is listed in
+# `skip_extra` below.  Declarative (GH #436, code/config separation): adding a
+# feature whose canonical index has no v needs no framework-code edit -- declare
+# its index in `index_info`, or (for tables not yet there) add it to skip_extra.
+# If this whole section is absent (e.g. an older data_info.yml is loaded), the
+# framework falls back to its historical hardcoded set rather than re-enabling
+# the join, so behavior never silently changes under version skew.
+Join v from sample:
+  skip_extra:
+    # Framework-special or not-yet-in-index_info tables:
+    #   sample            -- the v source itself (also already carries a v column)
+    #   cluster_features  -- keyed by (t, v) directly; has no i, so never joined
+    #   panel_ids/updated_ids -- dict @property tables, not (i, t) frames
+    #   livestock/income  -- household tables not yet declared in index_info
+    - sample
+    - cluster_features
+    - panel_ids
+    - updated_ids
+    - livestock
+    - income
+
 # Canonical column definitions for cross-country tables.
 # 'required: true' means every country declaring this table must include
 # the column.  'spellings' is an inverse dictionary: each key is the
