@@ -411,6 +411,15 @@ def _rebuild_failure_error(country_name: str, method_name: str) -> RuntimeError:
 # -> reparse) while making repeat reads ~free.
 _DATA_INFO_CACHE: dict[str, dict[str, Any]] = {}
 
+# ``.org`` files in a country/wave ``_/`` dir that are build-time inputs
+# (food_items.org, categorical_mapping.org, unit_labels.org, ...) belong
+# in the cache hash: a script reads them at build time and bakes the
+# result into the parquet, so an edit must invalidate.  We hash *all*
+# ``*.org`` in the relevant ``_/`` dir except the ones below, which are
+# pure documentation never read by a build step -- hashing them would
+# cause a spurious full-country rebuild on a docs edit.
+_ORG_HASH_SKIP = {"CONTENTS.org"}
+
 
 def _parse_data_info_cached(path: Path, content_hash: str | None) -> dict[str, Any]:
     """Parse a ``data_info.yml`` once per distinct content hash."""
@@ -582,6 +591,13 @@ class Wave:
         ]
         for mod in (f"{self.wave_folder}.py", "mapping.py"):
             parts.append(f"mod:{mod}=" + (cached_file_hash(wave_dir / mod) or "none"))
+        # Build-time .org inputs in this wave's _/ (e.g. wave-local
+        # food_items.org / mapping tables).  CONTENTS.org and friends are
+        # skipped (docs, never read by a build step).
+        for org in sorted(wave_dir.glob("*.org")):
+            if org.name in _ORG_HASH_SKIP:
+                continue
+            parts.append(f"org:{org.name}=" + (cached_file_hash(org) or "none"))
 
         data_info = _parse_data_info_cached(wave_dir / "data_info.yml", di_hash)
         block = data_info.get(table) if isinstance(data_info, dict) else None
@@ -2120,7 +2136,21 @@ class Country:
                 "ctbl=" + (cached_file_hash(cdir / f"{method_name}.py") or "none"),
                 "cmod=" + (cached_file_hash(cdir / f"{self.name.lower()}.py") or "none"),
                 "cmap=" + (cached_file_hash(cdir / "mapping.py") or "none"),
+                # The Makefile defines how every script-path (`!make`) table
+                # in this country is built, so an edit to it must invalidate.
+                # Country-level (one per country); affects all the country's
+                # tables (YAML-path included -- a harmless over-invalidation,
+                # since the Makefile is edited rarely).
+                "cmake=" + (cached_file_hash(cdir / "Makefile") or "none"),
             ]
+            # Country-level build-time .org inputs (food_items.org,
+            # categorical_mapping.org, unit_labels.org, ...), CONTENTS.org
+            # excluded.  These are read by the country-level concatenator /
+            # harmonization helpers at build time.
+            for org in sorted(cdir.glob("*.org")):
+                if org.name in _ORG_HASH_SKIP:
+                    continue
+                country_parts.append(f"corg:{org.name}=" + (cached_file_hash(org) or "none"))
             if any(not p.endswith("=none") for p in country_parts):
                 any_hash = True
             if not any_hash:

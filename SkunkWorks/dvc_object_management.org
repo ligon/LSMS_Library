@@ -606,6 +606,7 @@ Per *wave* (=Wave._input_hash(table)= in =country.py=):
 - =LSMS_CACHE_SCHEMA= (a manual integer lever in =local_tools.py=);
 - the wave's =data_info.yml= content;
 - the wave-module formatting code (={wave_folder}.py=, =mapping.py=);
+- the wave's build-time =*.org= inputs in =_/= (=CONTENTS.org= excluded);
 - *YAML-path*: the DVC *sidecar* fingerprint of each declared source
   file (never the multi-MB =.dta= itself), resolved exactly as
   =grab_data= does (=file_path/"Data"/fn= + =normpath=, so both bare
@@ -614,8 +615,15 @@ Per *wave* (=Wave._input_hash(table)= in =country.py=):
   data-file references.
 
 Per *country* (=Country._table_cache_hash=): SHA-256 over the
-sorted-by-wave composition of the per-wave hashes.  A single wave's edit
-busts the country hash; the rebuild re-reads only the changed wave.
+sorted-by-wave composition of the per-wave hashes *plus* the
+country-level inputs the wave hashes can't see: =_/{table}.py= (the
+concatenator), =_/{name.lower()}.py= (the country module), =_/mapping.py=,
+=_/Makefile= (defines every =!make= build), and the country's build-time
+=_/*.org= inputs (=CONTENTS.org= excluded).  A single wave's edit busts
+the country hash; for YAML-path tables the rebuild re-reads only the
+changed wave, while script-path tables rebuild the whole table (their
+hashless wave parquets can't self-invalidate -- see CRITICAL-2 /
+=_evict_hashless_wave_caches=).
 
 *Deliberately excluded* (they re-run on every read, post-cache, so they
 must NOT bust the parquet): =_finalize_result=, kinship expansion,

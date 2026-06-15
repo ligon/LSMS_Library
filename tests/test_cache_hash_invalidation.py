@@ -293,6 +293,32 @@ def test_country_level_scripts_are_in_the_hash(temp_data_dir, monkeypatch):
     base = str(c.file_path / "_")
     assert f"{base}/food_acquired.py" in asked, "country-level table script not hashed"
     assert f"{base}/uganda.py" in asked, "country module not hashed"
+    assert f"{base}/Makefile" in asked, "country Makefile not hashed"
+
+
+def test_org_build_inputs_in_hash_but_contents_org_excluded(temp_data_dir, monkeypatch):
+    """Build-time .org inputs (food_items.org) must be in the hash;
+    CONTENTS.org (documentation) must NOT be."""
+    import lsms_library.country as country_mod
+    c = country_mod.Country("Tanzania")  # country _/ has food_items.org + CONTENTS.org
+    waves = c.waves
+    base = str(c.file_path / "_")
+    real = country_mod.cached_file_hash
+
+    def perturb(target):
+        def f(path):
+            return "PERTURBED" if str(path) == target else real(path)
+        return f
+
+    h0 = c._table_cache_hash("food_acquired", waves)
+
+    monkeypatch.setattr(country_mod, "cached_file_hash", perturb(f"{base}/food_items.org"))
+    assert c._table_cache_hash("food_acquired", waves) != h0, \
+        "food_items.org (build input) must affect the hash"
+
+    monkeypatch.setattr(country_mod, "cached_file_hash", perturb(f"{base}/CONTENTS.org"))
+    assert c._table_cache_hash("food_acquired", waves) == h0, \
+        "CONTENTS.org (docs) must NOT affect the hash"
 
 
 def test_evict_hashless_wave_caches_targets_only_hashless(temp_data_dir):
