@@ -1,35 +1,44 @@
-from lsms_library.local_tools import to_parquet
-from lsms_library.local_tools import get_dataframe
-"""Calculate food prices for different items across rounds; allow
-different prices for different units.  
+"""Concatenate wave-level food_acquired data for GhanaLSS.
+
+Each wave-level script (``GhanaLSS/<wave>/_/food_acquired.py``) now emits
+a canonical long-form parquet with index ``[t, i, j, u, s, visit]`` and
+columns ``[Quantity, Expenditure(, Price)]`` (Phase 1 of GH #109; see
+``slurm_logs/DESIGN_ghanalss_food_acquired_2026-06-15.org``).  ``i`` is the
+household id, ``j`` the harmonized food item, ``u`` the unit, ``s`` the
+source (``{'purchased', 'produced'}``), and ``visit`` the GhanaLSS-local
+repeated-visit recall level.
+
+This script just concatenates the wave parquets and applies GhanaLSS's
+cross-wave ``id_walk`` (the ``change_id`` mechanism in ``ghanalss.py``,
+driven by the ``Waves`` linkage-file dict).  Only the GLSS1<->GLSS2 panel
+(1987-88 <-> 1988-89) is linked, via ``PANELC.DAT``; all later waves are
+cross-sectional and ``change_id`` only normalizes the id dtype for them.
+
+``change_id`` operates on the index level named ``'j'`` (the household id
+under the legacy schema).  Under the canonical schema the household id is
+``'i'`` and ``'j'`` is the food item, so we transiently swap the two level
+names around the ``id_walk`` call: rename ``i`` -> ``j`` (and the food item
+``j`` -> a private name) so ``change_id`` rewrites the household id, then
+rename back.  This preserves the real panel logic without touching
+``ghanalss.py``.
+
+``food_expenditures``/``food_prices``/``food_quantities`` are no longer
+built here -- they are auto-derived at runtime by the framework's
+``_FOOD_DERIVED`` from this canonical ``food_acquired`` (cf. Uganda
+post-#245).
 """
-
 import pandas as pd
-import numpy as np
-from ghanalss import change_id, Waves, harmonized_food_labels
-import sys
-sys.path.append('../../_/')
-from lsms_library.local_tools import df_from_orgfile
 
-#harmonize food labels 
-labels = df_from_orgfile('./food_items.org',name='food_label',encoding='ISO-8859-1')
-labelsd = {}
-for column in Waves:
-    labels[column] = labels[column].astype('string')
-    labelsd[column] = labels[['Preferred Label', column]].set_index(column).to_dict('dict')
+from lsms_library.local_tools import get_dataframe, to_parquet
+from ghanalss import change_id, Waves
 
-#harmonize unit labels 
-ulabels = df_from_orgfile('./unit_labels.org',name='unit_label',encoding='ISO-8859-1')
-ulabelsd = {}
-ulabelsd['u'] = ulabels.set_index('u').to_dict('dict')
 
-def id_walk(df,wave,waves):
-
+def id_walk(df, wave, waves):
     use_waves = list(waves.keys())
     T = use_waves.index(wave)
     for t in use_waves[T::-1]:
         if len(waves[t]):
-            df = change_id(df,'../%s/Data/%s' % (t,waves[t][0]),*waves[t][1:])
+            df = change_id(df, '../%s/Data/%s' % (t, waves[t][0]), *waves[t][1:])
         else:
             df = change_id(df)
     return df
@@ -37,34 +46,15 @@ def id_walk(df,wave,waves):
 
 dfs = []
 for t in Waves.keys():
-    df = get_dataframe('../'+t+'/_/food_acquired.parquet').squeeze()
-    print(t)
-    #df = df.replace({'unit': unitsd[t]})
-    if 'purchased_value' in df.columns and 'purchased_quantity' in df.columns:
-        df['purchased_value'] = pd.to_numeric(df['purchased_value'],errors='coerce').replace(0, np.nan)
-        df['purchased_price'] = df['purchased_value']/df['purchased_quantity']
-    #df = df.reset_index().set_index(['j','t','i','units','units_purchased'])
-    df1 = id_walk(df,t,Waves)
-    df1 = df1.reset_index()
-    df1['t_temp'] = df1['t']
-    df1['t'] = t
-    df1['i'] = df1['i'].astype('string').replace(labelsd[t]['Preferred Label'])
-    df1['u'] = df1['u'].astype('string').replace(ulabelsd['u']['Preferred Label'])
-    df1 = df1.set_index(['j', 't', 'i', 'u'])
-    print(df1)
-    dfs.append(df1)
+    df = get_dataframe('../' + t + '/_/food_acquired.parquet').squeeze()
+    # Apply the cross-wave panel id_walk.  change_id rewrites the index
+    # level named 'j'; under the canonical schema that is the household id
+    # 'i', so swap the level names around the call and swap back.
+    df = df.rename_axis(index={'j': '__jfood', 'i': 'j'})
+    df = id_walk(df, t, Waves)
+    df = df.rename_axis(index={'j': 'i', '__jfood': 'j'})
+    dfs.append(df)
 
 p = pd.concat(dfs)
-
-# Why?!
-p['purchased_value'] = p.purchased_value.astype(float)
-p = p.drop('index',axis=1)
-
-p = p.reset_index()
-p['t'] = p['t_temp']
-p = p.drop(columns='t_temp')
-p = p.set_index(['j', 't', 'i', 'u'])
-
-#p = p.rename(index=fix_food_labels(),level='i')
 
 to_parquet(p, '../var/food_acquired.parquet')
