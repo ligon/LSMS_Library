@@ -11,6 +11,7 @@ import yaml
 from importlib.resources import files
 
 from .yaml_utils import load_yaml
+from .paths import countries_root
 
 
 def _load_global_columns() -> dict[str, dict[str, Any]]:
@@ -110,7 +111,7 @@ def _discover_countries_for_table(table_name: str) -> list[str]:
     # If this is a derived table, look for its source instead
     lookup_name = _DERIVED_SOURCE.get(table_name, table_name)
 
-    countries_dir = files("lsms_library") / "countries"
+    countries_dir = countries_root()
     result = []
     for entry in sorted(Path(countries_dir).iterdir()):
         if not entry.is_dir() or entry.name.startswith("."):

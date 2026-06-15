@@ -22,6 +22,8 @@ import getpass
 import pkgutil
 import gnupg
 
+from .paths import countries_root
+
 def is_git_repo(path='.'):
     """
     Check if the specified path is a Git repository.
@@ -58,7 +60,7 @@ def authenticate(gpg_key_file='s3_reader_creds.gpg', max_attempts: int = 3,
     ValueError: If decryption fails due to an incorrect passphrase or other issues.
     """
     # Construct the path to the encrypted file relative to this function's location
-    gpg_path = Path(__file__).resolve().parent / 'countries' / '.dvc'
+    gpg_path = countries_root() / '.dvc'
     encrypted_file = gpg_path / gpg_key_file
 
     # Load the encrypted data

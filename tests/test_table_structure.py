@@ -16,7 +16,7 @@ import pandas as pd
 import pytest
 import yaml
 
-from lsms_library.paths import data_root, COUNTRIES_ROOT
+from lsms_library.paths import data_root, countries_root
 from lsms_library.yaml_utils import load_yaml
 
 
@@ -75,7 +75,7 @@ def _load_all_schemes() -> dict[str, dict]:
     set so that ``test_declared_columns_present`` can skip them when absent.
     """
     schemes = {}
-    for yml in sorted(COUNTRIES_ROOT.glob("*/_/data_scheme.yml")):
+    for yml in sorted(countries_root().glob("*/_/data_scheme.yml")):
         country = yml.parent.parent.name
         data = load_yaml(yml)
         if not isinstance(data, dict):
@@ -300,10 +300,10 @@ class TestFeatureSanity:
 
 def _countries_with_housing() -> list[str]:
     """Discover countries whose data_scheme.yml declares a housing table."""
-    from lsms_library.paths import COUNTRIES_ROOT
+    from lsms_library.paths import countries_root
     from lsms_library.yaml_utils import load_yaml
     countries = []
-    for yml in sorted(COUNTRIES_ROOT.glob("*/_/data_scheme.yml")):
+    for yml in sorted(countries_root().glob("*/_/data_scheme.yml")):
         data = load_yaml(yml)
         if not isinstance(data, dict):
             continue

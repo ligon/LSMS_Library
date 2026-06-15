@@ -36,7 +36,7 @@ from importlib.resources import files
 import importlib
 from collections import defaultdict
 from .local_tools import df_data_grabber, format_id, get_categorical_mapping, get_dataframe, map_index, get_formatting_functions, panel_ids, id_walk, all_dfs_from_orgfile, to_parquet
-from .paths import data_root
+from .paths import data_root, countries_root
 from .yaml_utils import load_yaml
 import importlib.util
 import logging
@@ -451,7 +451,7 @@ class Wave:
         
     @property
     def file_path(self) -> Path:
-        return files("lsms_library") / "countries" / self.folder
+        return countries_root() / self.folder
 
     @property
     def resources(self) -> dict[str, Any]:
@@ -1027,7 +1027,7 @@ class Country:
 
     def __init__(self, country_name: str, preload_panel_ids: bool = False, verbose: bool = False, assume_cache_fresh: bool = False, trust_cache: bool = False) -> None:
         # Validate country name: reject path traversal attempts
-        countries_dir = Path(__file__).resolve().parent / "countries"
+        countries_dir = countries_root()
         country_dir = (countries_dir / country_name).resolve()
         if not country_dir.is_relative_to(countries_dir):
             raise ValueError(f"Invalid country name {country_name!r}: path traversal not allowed")
@@ -1062,7 +1062,7 @@ class Country:
 
     @property
     def file_path(self) -> Path:
-        return Path(__file__).resolve().parent / "countries" / self.name
+        return countries_root() / self.name
 
     @property
     def resources(self) -> dict[str, Any]:
