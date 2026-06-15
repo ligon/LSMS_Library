@@ -74,6 +74,363 @@ Data Scheme:
     Roof: str
     Floor: str
 
+  food_security:
+    # FAO Food Insecurity Experience Scale (FIES), 8-item household
+    # battery (GH #332).  Recall period: last 12 months.  Sources:
+    #   2014-15 (ECVMA2): §14 file ECVMA2_MS14P1, MS14Q01..Q08
+    #   2018-19 (EHCVM):  §8A file s08a_me_ner2018, s08aq01..08
+    #   2021-22 (EHCVM):  §8A file s08a_me_ner2021, s08aq01..08
+    # 2011-12 has no FIES module and is silent.  The 8 items are in FAO
+    # order; Oui->True, Non->False, Ne sait pas/NSP/Refus/NaN->NaN.
+    # FIES_score = count of True across the 8 items (NaN iff all 8 NaN).
+    index: (t, i)
+    Worried: bool
+    HealthyDiet: bool
+    FewFoods: bool
+    SkippedMeal: bool
+    AteLess: bool
+    RanOut: bool
+    Hungry: bool
+    WholeDay: bool
+    FIES_score: int
+
+  subjective_well_being:
+    # EHCVM Section 20 'Pauvreté relative' (s20 / s20a).  Self-placement
+    # on a 4-point relative-welfare ladder (Très pauvre / Pauvre / Moyen
+    # / Riche) mapped to Own Step 1-4 so higher = better off, consistent
+    # with the Malawi/Cantril ladder.  EHCVM waves only (2018-19,
+    # 2021-22).  The pre-EHCVM ECVMA waves (2011-12, 2014-15) have no
+    # self-placement welfare ladder: ECVMA2 §15 'Aspirations'
+    # (ECVMA2_MS15P1, MS15Q16 = "Pensez-vous que vous aurez le même
+    # succès dans votre vie") is a binary expectation/aspiration item,
+    # not a current ladder, so it is deliberately NOT wired here.
+    index: (t, i)
+    Own Step: int
+
   interview_date:
     index: (t, i)
     Int_t: datetime
+
+  plot_features:
+    # Lasting parcel-level characteristics from the EHCVM agriculture
+    # module s16a (GH #167; Niger is an EHCVM sibling of the Mali
+    # reference, PR #284).  EHCVM waves only: 2018-19 and 2021-22.  The
+    # pre-EHCVM ECVMA waves (2011-12, 2014-15) use a different
+    # instrument and are deferred.  plot_id = "{field_no}_{parcel_no}".
+    # NIGER-SPECIFIC: 2021-22 s16aq10 adds code 7 (Co-propriétaire) ->
+    # owned.  Latitude / Longitude are NOT emitted — EHCVM s16a has no
+    # decimal-degree parcel GPS (s16aq47 is an area, not a coordinate);
+    # deferred as in Uganda.
+    #
+    # WB-parity audit (GAP 6, 2026-06-14): added three REPORTED item
+    # columns at the existing (t, i, plot_id) grain, all from the same
+    # s16a parcel module the feature already reads (label-preserving — the
+    # six original columns and the row count are unchanged):
+    #   AreaSelfReported (s16aq09a/b) — WB area_self_reported: the farmer
+    #     estimate in hectares, kept distinct from GPS-preferred Area.
+    #   PlotCertificate  (s16aq13)    — WB plot_certificate: bool, holds a
+    #     formal land document (codes 1-5) vs none (7); Autre/missing NA.
+    #   SoilFertility    (s16aq20)    — WB soil-quality tag: reported
+    #     good/medium/poor (WB's soil_fertility_index PCA is a transform,
+    #     NOT stored).
+    # WB item attrs NOT in the EHCVM s16a source, hence skipped (no fake
+    # all-NA columns): fallow / erosion_protection (no s16a question;
+    # WB derives them from the ECVMA as01q module, which is the pre-EHCVM
+    # 2011-12/2014-15 instrument — out of scope for this feature) and
+    # plot_slope (WB plot_slope is SRTM geospatial, not survey-reported;
+    # the reported topography s16aq19 is a distinct construct left for a
+    # future Topography column with its own harmonize table).
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    AreaSelfReported: float
+    Tenure: str
+    TenureSystem: str
+    PlotCertificate: bool
+    SoilType: str
+    SoilFertility: str
+    Irrigated: bool
+    materialize: make
+
+  crop_production:
+    # Item-level crop harvest (GAP 1, parity loop 2026-06-14).  One row
+    # per REPORTED (field, parcel, crop) harvest line — REPORTED values
+    # only; harvest_kg / yield / main_crop / value-shares are
+    # transformations, never columns here.  All four waves have an
+    # agriculture harvest module (script-path):
+    #   2011-12 ecvmaas2e_p2          (plot-crop harvest + sold + value)
+    #   2014-15 ECVMA2_AS2E1 (+AS2E2)  (harvest + months; sold crop-level)
+    #   2018-19 s16c                   (harvest + sold + value + intercrop)
+    #   2021-22 s16c (+s16d)           (harvest + intercrop; sold crop-level)
+    # crop joins food via harmonize_food Preferred Labels (so a crop that
+    # is also a consumed food shares food_acquired's Preferred Label); u
+    # via the u table.  ``u`` is in the index (as in food_acquired) because one
+    # (plot, crop) can be reported in several units — collapsing would
+    # sum.  plot = "{field_no}_{parcel_no}" aligns with plot_features'
+    # plot_id (verified 100% join on the EHCVM waves).  Quantity_sold /
+    # Value_sold are at plot-crop grain only where the survey records them
+    # there (2011-12, 2018-19); in 2014-15 / 2021-22 the sale block is
+    # crop-level and is attributed only to single-plot crops, else NaN.
+    # Columns intentionally OMITTED (no Niger wave records them, so an
+    # all-NaN column would just trip the sanity checker — GAP rule "only
+    # include columns the source actually records"): planting_month (no
+    # planting-date question in any harvest module) and a perennial flag
+    # (the perennial-crop roster is a separate, un-wired instrument).
+    # harvest_month is recorded only in 2014-15 (AS02EQ06A); intercropped
+    # only in the EHCVM waves (s16cq07).  Both are present in >=1 wave so
+    # they are carried (NaN in the waves that lack them).
+    index: (t, i, plot, crop, u)
+    Quantity: float
+    Quantity_sold: float
+    Value_sold: float
+    harvest_month: float
+    intercropped: bool
+    materialize: make
+
+  plot_inputs:
+    # Item-level agricultural inputs (GAP 2, parity loop 2026-06-14).  One
+    # row per REPORTED input applied by a household in a wave: input
+    # identity (Seed / Urea / DAP / NPK / Phosphate / Mixed fertilizer /
+    # Organic manure / Organic compost / Pesticide / Herbicide / Fungicide
+    # / Other phytosanitary), reported quantity used + native unit,
+    # purchased flag + reported purchased quantity, and (seed rows) the
+    # seed's crop on the shared harmonize_food labels.  REPORTED values
+    # only: seed_kg / nitrogen_kg / inorganic_fertilizer any-use flags /
+    # fertilizer totals are TRANSFORMATIONS over these rows, never columns.
+    #
+    # GRAIN NOTE: Niger records inputs at the HOUSEHOLD x input grain
+    # (ECVMA additionally x crop), NOT plot x input — no wave reports
+    # inputs at the parcel level.  The WB .do code that emits plot-level
+    # seed_kg / nitrogen_kg fabricates a plot split (plot_area /
+    # total_land_area); the reported-only rule forbids that, so `plot` is
+    # NOT in the index.  The feature keeps the GAP-2 name `plot_inputs`.
+    #
+    # All four waves have a household input roster (script-path):
+    #   2011-12 ecvmaas2c_p1   (hid, crop, input)  qty/unit + purchased
+    #   2014-15 ECVMA2_AS02CP1 (hh, crop, input)   same, UPPERCASE cols
+    #   2018-19 s16b_me_ner2018 (hh, input)        crop in seed label
+    #   2021-22 s16b_me_ner2021 (hh, input)        crop in seed label
+    # input -> harmonize_input; u -> the u table; crop -> harmonize_food
+    # (ECVMA crop column directly; EHCVM via harmonize_seed_crop on the
+    # seed label).  `crop` is in the index because one (input, u) spans
+    # several seed crops in ECVMA.  Non-crop-specific rows (every fertilizer
+    # / pesticide; unresolved seed crops) carry the sentinel
+    # '(not crop-specific)' rather than NaN — a NaN index level would be
+    # silently dropped by the framework's canonical NaN-key de-dup collapse
+    # (_finalize_result groupby().first()), losing every non-seed row.  `u`
+    # is in the index because one (input, crop) can be reported in several
+    # units; a missing unit is filled with the 'Manquant' u label for the
+    # same non-null reason.
+    index: (t, i, input, crop, u)
+    Quantity: float
+    Purchased: bool
+    Quantity_purchased: float
+    materialize: make
+
+  livestock:
+    # Item-level livestock roster (GAP 4, parity loop 2026-06-14).  One row
+    # per REPORTED (household, species) the household owns/raises — the
+    # pre-collapse roster the WB .do code (NER_ECVMA1.do:1103-1108,
+    # NER_ECVMA2.do:1170-1177) reads then THROWS AWAY down to a single
+    # engaged-in-livestock y/n binary (recode as4aq05 ...; collapse (max)).
+    # Their HH binary is recoverable as groupby(['t','i']).any() over these
+    # rows; TLU is a Σ(head × species-factor) transformation — neither is a
+    # column here (item-level / reported-values discipline).
+    #
+    # GRAIN (t, i, animal) — NO v level: 'livestock' is in the framework's
+    # _no_v_join set (country.py ~L1852), so the household-level rows carry no
+    # cluster level and the framework does NOT join one from sample().
+    # `animal` is the harmonized species Preferred Label (harmonize_species_
+    # ecvma for the 3-digit ECVMA codes, harmonize_species_ehcvm for the 1-11
+    # EHCVM codes; both resolve to one shared vocabulary: Cattle / Sheep /
+    # Goats / Camels / Horses / Donkeys / Pigs / Rabbits / Chicken / Guinea
+    # Fowl / Ducks / Other Poultry).
+    #
+    # All four waves have a livestock roster (script-path):
+    #   2011-12 ecvmaas4a_p2   as4aq04 species, as4aq11 head, as4aq43 bought,
+    #                          as4aq51 sold; as4aq05 owned(1/2) gate.
+    #   2014-15 ECVMA2_AS4AP2  same, UPPERCASE; i from (GRAPPE, MENAGE).
+    #   2018-19 s17_me_ner2018 s17q02 species, s17q06 head, s17q08 bought,
+    #                          s17q10 sold; roster pre-filtered to owned.
+    #   2021-22 s17_me_ner2021 same as 2018-19 EXCEPT species code is s17q01.
+    #
+    # COLUMNS (reported, item-level): HeadCount (owned now), HeadAcquired
+    # (number bought in the last 12 months — the single reported acquisition
+    # flow; births / gifts are separate flows, not folded in), HeadSold
+    # (number sold on the hoof in the last 12 months).  A `Value` (herd value)
+    # column is intentionally OMITTED: NO Niger wave asks a current herd value
+    # (the surveys record only purchase / sale FLOW values), so an all-NaN
+    # Value column would only trip the sanity checker (GAP rule "only include
+    # columns the source actually records").
+    index: (t, i, animal)
+    HeadCount: float
+    HeadAcquired: float
+    HeadSold: float
+    materialize: make
+
+  plot_labor:
+    # Item-level plot labor (GAP 3, parity loop 2026-06-14).  One row per
+    # REPORTED labor SOURCE on a plot -- the reported person-days the WB .do
+    # (NER_ECVMA1.do:676-858, NER_ECVMA2.do:768-...) reads then COLLAPSES to
+    # total_labor_days / total_family_labor_days / total_hired_labor_days /
+    # hired_labor_value (a median-wage valuation).  ALL of those sums /
+    # valuations are TRANSFORMATIONS over these rows, never columns here:
+    #   total_labor_days        = Σ PersonDays over all sources on a plot
+    #   total_family_labor_days = Σ PersonDays where source=='family'
+    #   total_hired_labor_days  = Σ PersonDays where source=='hired'
+    #   hired_labor_value       = median-wage valuation over the hired rows
+    #
+    # GRAIN (t, i, plot, source):
+    #   plot   -- "{field_no}_{parcel_no}", aligned with crop_production's
+    #             plot key and plot_features' plot_id (100% on the EHCVM
+    #             waves; ~78-92% on the ECVMA waves -- labor is reported on
+    #             plots with no harvest record too, which is expected).
+    #   source -- 'family' / 'hired' / 'other'.  'other' (free / exchange
+    #             labor) exists only in the ECVMA waves (2011-12, 2014-15);
+    #             the EHCVM s16a parcel module records family vs non-family
+    #             (hired) only, so its rows are {family, hired}.  Small fixed
+    #             vocabulary assigned in code (inline mapping, no categorical
+    #             table).
+    #
+    # COLUMNS (reported, item-level):
+    #   PersonDays -- reported person-days of that source on the plot.  The
+    #                 survey reports a source as several day cells (per family
+    #                 member, or per hired-worker gender category, across the
+    #                 post-planting + post-harvest seasons / phases); these are
+    #                 strata of the SAME (plot, source) item, so PersonDays is
+    #                 their within-source sum (NOT a forbidden cross-source
+    #                 rollup -- mirrors livestock summing age/sex strata).
+    #                 EHCVM hired person-days = Σ(#workers × days) over the
+    #                 non-family grids.  days in days.
+    #   Wage       -- cash PAID to hired labor where the survey records it
+    #                 (CFA francs).  NaN for family / other (no cash paid).
+    #
+    # All four waves have a plot-labor module (script-path):
+    #   2011-12 ecvmaas1_p1 (PP) + ecvmaas1_p2 (PH)
+    #   2014-15 ECVMA2_AS2AP1 (PP) + ECVMA2_AS2AP2 (PH)
+    #   2018-19 s16a_me_ner2018  (family + non-family grids; no 'other')
+    #   2021-22 s16a_me_ner2021  (same s16a labor-grid scheme)
+    # v is NOT baked in (household-linked); the framework joins it from
+    # sample().  units: PersonDays in days; Wage in CFA francs.
+    index: (t, i, plot, source)
+    PersonDays: float
+    Wage: float
+    materialize: make
+
+  people_last7days:
+    # Item-level individual 7-day labor (GAP 3, parity loop 2026-06-14).  One
+    # row per individual, carrying the REPORTED last-7-days labor
+    # participation -- the per-individual activity feature the GAP ranking
+    # targets (Uganda's legacy HH-level Men/Women/Boys/Girls count is a
+    # DIFFERENT, older construct; this is the new (t, i, pid) feature the 6
+    # WB-only labor countries are meant to gain).  No rollups: the WB
+    # nb_members_working_age HH total is a transformation, not a column here.
+    #
+    # GRAIN (t, i, pid): pid matches household_roster's pid each wave
+    # (2011-12 ms01q00; 2014-15 MS01Q00; 2018-19 s01q00a; 2021-22
+    # membres__id).  v auto-joins from sample() (people_last7days is NOT in
+    # the framework _no_v_join set).
+    #
+    # COLUMNS (reported, per-individual):
+    #   farm_work / SOB_work / wage_work -- worked >=1h on own farm /
+    #       own business / for a wage in the last 7 days (nullable bool).
+    #   farm_hrs / SB_hrs / wage_hrs     -- usual weekly hours in each
+    #       activity (av per job = month*[week]*day*hour/52, allocated by the
+    #       job's occupation code, summed across jobs; ECVMA waves only).
+    #   Industry -- broad industry of the job (Agriculture / Fishing / Mining
+    #       / Manufacturing / Construction / Services) from the WB activity-
+    #       section-code ranges (NER_ECVMA1.do:1386-1391).  ONE harmonized
+    #       label rather than the WB's six ind_* dummies (a wide encoding of
+    #       one categorical); the ranges don't vary across waves, so the map
+    #       lives in code.  ECVMA waves only.
+    #   working_age -- member is of working age (Age >= 6, the survey
+    #       threshold ms01q06a>=6).
+    #
+    # WAVE COVERAGE: the two ECVMA waves (2011-12 ecvmaind_p1p2 ms04 module;
+    # 2014-15 ECVMA2_MS04P1 merged to ECVMA2_MS01P1) carry the FULL schema.
+    # The EHCVM waves (2018-19 s04_me_ner2018; 2021-22 s04a_me_ner2021,
+    # merged to s01 for working_age) carry the three participation dummies +
+    # working_age; their 7-day module records hours only for unpaid domestic
+    # tasks and the industry only as 12-month occupation codes (not the WB
+    # 7-day section ranges), so farm_hrs / SB_hrs / wage_hrs / Industry are
+    # NA in EHCVM (declared for cross-wave schema parity).
+    # units: hours in hours.
+    index: (t, i, pid)
+    farm_work: bool
+    SOB_work: bool
+    wage_work: bool
+    farm_hrs: float
+    SB_hrs: float
+    wage_hrs: float
+    Industry: str
+    working_age: bool
+    materialize: make
+
+  community_prices:
+    # Item-level community/market food prices (GAP C, parity loop 2026-06-14).
+    # One row per REPORTED (cluster/EA × food item × unit × observation)
+    # surveyed price from the ECVMA *community* price questionnaire (section
+    # CS07).  This is the OURS-ONLY parity arm: the WB panel surveys no
+    # community prices (their crop_price_EA is an HH-median imputation,
+    # programs.do:31-89), so this records a surveyed price where they only
+    # impute.  REPORTED values only -- any median / mean across clusters, or a
+    # community->household price join, is a TRANSFORMATION over these rows,
+    # never a column here.
+    #
+    # GRAIN (t, v, j, u) -- a CLUSTER-level feature, NOT household-level.  One
+    # REPORTED price per cell: the CS07 instrument records up to three within-
+    # questionnaire price observations (2011-12 across two field passages too)
+    # per (cluster, item, unit); ONE is selected -- post-harvest (passage 2)
+    # before post-planting (passage 1), then questionnaire order -- mirroring
+    # the Mali EACI community_prices reference.  This is a genuinely REPORTED
+    # price, NOT an across-observation mean (averaging is a transformation), and
+    # matches every sibling community_prices (Mali/Malawi/Tanzania/Ethiopia/
+    # Nigeria), which all use (t, v, j, u) with one reported price per cell.
+    #   v   -- the community questionnaire's grappe (EA), formatted into the
+    #          SAME v keyspace as sample() (`v: grappe`/`GRAPPE` there), so
+    #          community_prices.v == sample().v for the same cluster and the
+    #          surveyed price joins households.  There is NO household i, so
+    #          _join_v_from_sample does NOT apply -- v IS declared in the index
+    #          (native, not framework-joined).
+    #   j   -- the SHARED harmonize_food Preferred Labels, so a priced food
+    #          joins food_acquired consumption and the GAP-1 crop_production
+    #          harvest (e.g. community 'mil' -> 'Mil', 'tomate fraiche' ->
+    #          'Tomate fraîche', exactly the food_acquired labels).  Non-food
+    #          price items (allumettes, savon, électricité, transport, fuel,
+    #          firewood) get their own harmonize_food Preferred Labels -- the
+    #          community-price arm of label unification.
+    #   u   -- the SHARED u table (the CS07 unit list: Kg/Gramme/Tia/Tongolo/
+    #          Sac de 50|100 kg/Gros sac/Sac Moyen/Unité/Tas/Sachet/...).
+    #
+    # NOTE on the framework `i` rename: the framework's map_index() renames a
+    # `j` index level to `i` when no `i` is present (a legacy old-parquet
+    # convention in local_tools.map_index).  Like EVERY sibling community_prices
+    # feature, this surfaces the food item under the name `i` at the API layer
+    # and makes is_this_feature_sane flag a missing `j` level -- a pre-existing
+    # framework behavior shared across all community_prices countries, not a
+    # wiring defect.  The cached parquet carries the correct `j` index level.
+    #
+    # WAVE COVERAGE: only the two ECVMA waves carry an EA-level community price
+    # module (script-path):
+    #   2011-12 ecvmacoms07_p1 + ecvmacoms07_p2  (three price/qty/UNIT triples,
+    #                                             both field passages)
+    #   2014-15 comprixcs07                       (one unit col, three price/qty
+    #                                             pairs)
+    # The EHCVM waves (2018-19, 2021-22) replaced the community price module
+    # with a separate region/market-level price survey (ehcvm_prix: region ×
+    # milieu × point_de_vente, NO grappe -- not the EA grain; and ehcvm_nsu, a
+    # region/strata p50/mu MEDIAN -- a forbidden imputation), and 2018-19 ships
+    # no community price file at all.  Those two waves are silently absent (the
+    # concatenator skips a wave with no parquet), NOT faked.
+    #
+    # COLUMNS (reported, item-level):
+    #   Price    -- the surveyed price recorded for `Quantity` units of the item
+    #               in unit `u` in that cluster (CFA francs).  Zero / sentinel
+    #               (9999 / 99999) prices and 'product absent' rows are dropped.
+    #   Quantity -- the measured quantity Price was recorded for, in unit `u`
+    #               (e.g. Price=11000 for Quantity=50, u='Sac de 50 kg').  The
+    #               per-kg unit value Price/Quantity (×kg-factor) is a transform.
+    index: (t, v, j, u)
+    Price: float
+    Quantity: float
+    materialize: make

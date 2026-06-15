@@ -447,3 +447,475 @@
 | Sand/Cement                    | Cement          |
 | Concrete Slab                  | Concrete        |
 | Timber                         | Wood            |
+
+* plot_features (GH #167)
+
+# Code -> canonical-label tables consumed by
+# tanzania.plot_features_for_wave (see Tanzania/_/tanzania.py).  Both
+# NPS waves with an agriculture roster (2019-20 NPS-SDD Extended
+# Panel, 2020-21 NPS Y5 Refresh Panel) share an IDENTICAL integer
+# code scheme for the AG_SEC_3A categorical variables (verified by
+# reading the Stata value labels directly), so a single non-wave-keyed
+# (Code) table per concept is sufficient.  We key on the integer code,
+# never on the label string -- 2020-21 lowercases several labels
+# ('loam' vs 'LOAM', 'inheritance' vs 'INHERITANCE').
+
+# harmonize_tenure -- ag3a_25 "How did you acquire this plot?" codes to
+# canonical Tenure spellings.  An override is applied in code from
+# ag3a_03 use-status (2 RENTED OUT / 3 GIVEN OUT -> rented_out).
+#+name: harmonize_tenure
+| Code | Preferred Label  |
+|------+------------------|
+|    1 | inherited        |
+|    2 | inherited        |
+|    3 | other_tenure     |
+|    4 | communal         |
+|    5 | owned            |
+|    6 | other_tenure     |
+|    7 | rented_in        |
+|    8 | sharecropped_in  |
+|    9 | sharecropped_out |
+|   10 | communal         |
+|   11 | other_tenure     |
+
+# harmonize_tenure_system -- ag3a_28a certificate-of-occupancy codes to
+# canonical TenureSystem spellings.  Code 3 (NO CERTIFICATE) is absent
+# from the table and therefore maps to NaN.
+#+name: harmonize_tenure_system
+| Code | Preferred Label            |
+|------+----------------------------|
+|    1 | granted_right_of_occupancy |
+|    2 | customary                  |
+
+# harmonize_soil -- ag3a_10 soil-type codes to canonical SoilType.
+#+name: harmonize_soil
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | sandy           |
+|    2 | loam            |
+|    3 | clay            |
+|    4 | other           |
+
+* Shared label foundation (Unit #0)
+
+# Canonical shared label tables joined across features (food_acquired <->
+# crop_production <-> community_prices).  See
+# slurm_logs/2026-06-13_wb_incidence_map/PARITY_LOOP_DESIGN.md "Unit #0".
+#
+# harmonize_food is the (j) axis.  Migrated from the standalone
+# food_items.org (now retired): one row per consumed-food item, keyed on a
+# stable integer Code, with the per-wave RAW survey labels that food_acquired
+# emits in its (j) index and the canonical Preferred Label.  The FTC Label
+# column carries the food-composition-table label retained from food_items.org.
+#
+# NB (label-preserving / inert today): the active food_acquired build is the
+# SCRIPT path (per-wave _/food_acquired.py -> parquet), so its (j) values are
+# the RAW per-wave labels, NOT the Preferred Label.  The framework only
+# auto-applies a harmonize_* table to the (j) level when it is named
+# harmonize_<method_name> (here that would be harmonize_food_acquired) or via
+# an explicit data_info.yml `mappings:` ref on a YAML-path table; neither
+# fires for a table named harmonize_food on a script-path feature, and
+# _apply_categorical_mappings only matches a table whose NAME equals the
+# index/column name.  So this table is a CANONICAL FOUNDATION for the later
+# crop/price joins and does not (yet) rewrite food_acquired's (j) values.
+
+#+name: harmonize_food
+| Code | Preferred Label          | 2008-15                                                  | 2019-20                                                  | 2020-21                                                  | FTC Label                                              |
+|------+--------------------------+----------------------------------------------------------+----------------------------------------------------------+----------------------------------------------------------+--------------------------------------------------------|
+| 1    | Rice (paddy)             | RICE (PADDY)                                             | RICE (PADDY)                                             | RICE (PADDY)                                             | Rice (paddy)                                           |
+| 2    | Dairy Products           | MILK PRODUCTS (LIKE CREAM, CHEESE, YOGHURT ETC)          | MILK PRODUCTS (LIKE CREAM, CHEESE, YOGHURT ETC)          | MILK PRODUCTS (LIKE CREAM, CHEESE, YOGHURT ETC)          | Dairy                                                  |
+| 3    | Sugarcane                | SUGARCANE                                                | SUGARCANE                                                | sugarcane                                                | Sugarcane                                              |
+| 4    | Goat Meat                | GOAT MEAT                                                | GOAT MEAT                                                | GOAT MEAT                                                | Goat meat                                              |
+| 5    | Beef                     | BEEF INCLUDING MINCED SAUSAGE                            | BEEF INCLUDING MINCED SAUSAGE                            | BEEF INCLUDING MINCED SAUSAGE                            | Beef                                                   |
+| 6    | Pork                     | PORK INCLUDING SAUSAGES AND BACON                        | PORK INCLUDING SAUSAGES AND BACON                        | PORK INCLUDING SAUSAGES AND BACON                        | Pork                                                   |
+| 7    | Chicken                  | CHICKEN AND OTHER POULTRY                                | CHICKEN AND OTHER POULTRY                                | CHICKEN AND OTHER POULTRY                                | Chicken                                                |
+| 8    | Wild Birds & Insects     | WILD BIRDS AND INSECTS                                   | WILD BIRDS AND INSECTS                                   | WILD BIRDS AND INSECTS                                   | Wild birds and insects                                 |
+| 9    | Other Meat               | OTHER DOMESTIC/WILD MEAT PRODUCTS                        | OTHER DOMESTIC/WILD MEAT PRODUCTS                        | OTHER DOMESTIC/WILD MEAT PRODUCTS                        | Wild birds and insects                                 |
+| 10   | Eggs                     | EGGS                                                     | EGGS                                                     | eggs                                                     | Eggs                                                   |
+| 11   | Fish (fresh)             | FRESH FISH AND SEAFOOD (INCLUDING DAGAA)                 | FRESH FISH AND SEAFOOD (INCLUDING DAGAA)                 | FRESH FISH AND SEAFOOD (INCLUDING DAGAA)                 | Fresh Fish                                             |
+| 12   | Fish (dried)             | DRIED/SALTED/CANNED FISH AND SEAFOOD (INCL. DAGAA)       | DRIED/SALTED/CANNED FISH AND SEAFOOD (INCL. DAGAA)       | DRIED/SALTED/CANNED FISH AND SEAFOOD (INCL. DAGAA)       | Dried/salted/canned fish                               |
+| 13   | Fish (packaged)          | PACKAGE FISH                                             | PACKAGE FISH                                             | PACKAGE FISH                                             | Fish                                                   |
+| 14   | Milk (fresh)             | FRESH MILK                                               | FRESH MILK                                               | FRESH MILK                                               | Fresh milk                                             |
+| 15   | Milk (dry or canned)     | CANNED MILK/MILK POWDER                                  | CANNED MILK/MILK POWDER                                  | CANNED MILK/MILK POWDER                                  | Canned milk/milk powder                                |
+| 16   | Rice (husked)            | RICE (HUSKED)                                            | RICE (HUSKED)                                            | RICE (HUSKED)                                            | Rice (husked)                                          |
+| 17   | Cooking Oil              | COOKING OIL                                              | COOKING OIL                                              | COOKING OIL                                              | Cooking oil                                            |
+| 18   | Butter, Etc.             | BUTTER, MARGARINE, GHEE AND OTHER FAT PRODUCTS           | BUTTER, MARGARINE, GHEE AND OTHER FAT PRODUCTS           | BUTTER, MARGARINE, GHEE AND OTHER FAT PRODUCTS           | Butter                                                 |
+| 19   | Salt                     | SALT                                                     | SALT                                                     | salt                                                     | Salt                                                   |
+| 20   | Other Spices             | OTHER SPICES                                             | OTHER SPICES                                             | OTHER SPICES                                             | Other spices                                           |
+| 21   | Tea (dry)                | TEA DRY                                                  | TEA DRY                                                  | TEA DRY                                                  | Tea (dry)                                              |
+| 22   | Coffee & Cocoa           | COFFEE AND COCOA                                         | COFFEE AND COCOA                                         | COFFEE AND COCOA                                         | Coffee and cocoa                                       |
+| 23   | Materials For Drinks     | OTHER RAW MATERIALS FOR DRINKS                           | OTHER RAW MATERIALS FOR DRINKS                           | OTHER RAW MATERIALS FOR DRINKS                           | Other raw materials for drinks                         |
+| 24   | Soft drinks              | BOTTLED/CANNED SOFT DRINKS (SODA, JUICE, WATER)          | BOTTLED/CANNED SOFT DRINKS (SODA, JUICE, WATER)          | BOTTLED/CANNED SOFT DRINKS (SODA, JUICE, WATER)          | Soft drinks                                            |
+| 25   | Prepared Tea, Coffee     | PREPARED TEA, COFFEE                                     | PREPARED TEA, COFFEE                                     | PREPARED TEA, COFFEE                                     | Prepared tea, coffee                                   |
+| 26   | Bottled Beer             | BOTTLED BEER                                             | BOTTLED BEER                                             | BOTTLED BEER                                             | Bottled beer                                           |
+| 27   | Local Brews              | LOCAL BREWS                                              | LOCAL BREWS                                              | LOCAL BREWS                                              | Local beer                                             |
+| 28   | Wine & Spirits           | WINE AND SPIRITS                                         | WINE AND SPIRITS                                         | WINE AND SPIRITS                                         | Wine and spirits                                       |
+| 29   | Other Fruits             | MANGOES, AVOCADOES AND OTHER FRUITS                      | MANGOES, AVOCADOES AND OTHER FRUITS                      | MANGOES, AVOCADOES AND OTHER FRUITS                      | Mangoes                                                |
+| 30   | Citrus Fruits            | CITRUS FRUITS (ORANGES, LEMON, TANGERINES, ETC.)         | CITRUS FRUITS (ORANGES, LEMON, TANGERINES, ETC.)         | CITRUS FRUITS (ORANGES, LEMON, TANGERINES, ETC.)         | Citrus fruits                                          |
+| 31   | Ripe Bananas             | RIPE BANANAS                                             | RIPE BANANAS                                             | RIPE BANANAS                                             | Ripe bananas                                           |
+| 32   | Vegetables (preserved)   | CANNED, DRIED AND WILD VEGETABLES                        | CANNED, DRIED AND WILD VEGETABLES                        | CANNED, DRIED AND WILD VEGETABLES                        | Canned, dried and wild vegetables                      |
+| 33   | Maize (green, cob)       | MAIZE (GREEN, COB)                                       | MAIZE (GREEN, COB)                                       | MAIZE (GREEN, COB)                                       | Maize (green, cob)                                     |
+| 34   | Maize (grain)            | MAIZE (GRAIN)                                            | MAIZE (GRAIN)                                            | MAIZE (GRAIN)                                            | Maize (grain)                                          |
+| 35   | Maize (flour)            | MAIZE (FLOUR)                                            | MAIZE (FLOUR)                                            | MAIZE (FLOUR)                                            | Maize (flour)                                          |
+| 36   | Millet & Sorghum (grain) | MILLET AND SORGHUM (GRAIN)                               | MILLET AND SORGHUM (GRAIN)                               | MILLET AND SORGHUM (GRAIN)                               | Millet and sorghum (grain)                             |
+| 37   | Millet & Sorghum (flour) | MILLET AND SORGHUM (FLOUR)                               | MILLET AND SORGHUM (FLOUR)                               | MILLET AND SORGHUM (FLOUR)                               | Millet and sorghum (flour)                             |
+| 38   | Bread                    | BREAD                                                    | BREAD                                                    | bread                                                    | Bread                                                  |
+| 39   | Buns, Cakes And Biscuits | BUNS, CAKES AND BISCUITS                                 | BUNS, CAKES AND BISCUITS                                 | BUNS, CAKES AND BISCUITS                                 | Pastries                                               |
+| 40   | Macaroni, Spaghetti      | MACARONI, SPAGHETTI                                      | MACARONI, SPAGHETTI                                      | MACARONI, SPAGHETTI                                      | Pasta                                                  |
+| 41   | Other Cereal Products    | OTHER CEREAL PRODUCTS                                    | OTHER CEREAL PRODUCTS                                    | OTHER CEREAL PRODUCTS                                    | Other cereal products                                  |
+| 42   | Cassava Fresh            | CASSAVA FRESH                                            | CASSAVA FRESH                                            | CASSAVA FRESH                                            | Cassava fresh                                          |
+| 43   | Cassava Dry/Flour        | CASSAVA DRY/FLOUR                                        | CASSAVA DRY/FLOUR                                        | CASSAVA DRY/FLOUR                                        | Cassava dry/flour                                      |
+| 44   | Sweet Potatoes           | SWEET POTATOES                                           | SWEET POTATOES                                           | SWEET POTATOES                                           | Sweet potatoes                                         |
+| 45   | Yams/Cocoyams            | YAMS/COCOYAMS                                            | YAMS/COCOYAMS                                            | YAMS/COCOYAMS                                            | Yams/cocoyams                                          |
+| 46   | Irish Potatoes           | IRISH POTATOES                                           | IRISH POTATOES                                           | IRISH POTATOES                                           | Irish potatoes                                         |
+| 47   | Plantains                | COOKING BANANAS, PLANTAINS                               | COOKING BANANAS, PLANTAINS                               | COOKING BANANAS, PLANTAINS                               | Plantains                                              |
+| 48   | Other Starches           | OTHER STARCHES                                           | OTHER STARCHES                                           | OTHER STARCHES                                           | Other starches                                         |
+| 49   | Sugar                    | SUGAR                                                    | SUGAR                                                    | sugar                                                    | Sugar                                                  |
+| 50   | Sweets                   | SWEETS                                                   | SWEETS                                                   | sweets                                                   | Sweets                                                 |
+| 51   | Honey, Syrups, etc.      | HONEY, SYRUPS, JAMS, MARMALADE, JELLIES, CANNED FRUITS   | HONEY, SYRUPS, JAMS, MARMALADE, JELLIES, CANNED FRUITS   | HONEY, SYRUPS, JAMS, MARMALADE, JELLIES, CANNED FRUITS   | Honey, syrups, jams, marmalade, jellies, canned fruits |
+| 52   | Pulses                   | PEAS, BEANS, LENTILS AND OTHER PULSES                    | PEAS, BEANS, LENTILS AND OTHER PULSES                    | PEAS, BEANS, LENTILS AND OTHER PULSES                    | Peas, beans, lentils and other pulses                  |
+| 53   | Groundnuts               | GROUNDNUTS IN SHELL/SHELLED                              | GROUNDNUTS IN SHELL/SHELLED                              | GROUNDNUTS IN SHELL/SHELLED                              | Groundnuts                                             |
+| 54   | Coconuts                 | COCONUTS (MATURE/IMMATURE)                               | COCONUTS (MATURE/IMMATURE)                               | COCONUTS (MATURE/IMMATURE)                               | Coconuts                                               |
+| 55   | Nuts                     | CASHEW, ALMONDS AND OTHER NUTS                           | CASHEW, ALMONDS AND OTHER NUTS                           | CASHEW, ALMONDS AND OTHER NUTS                           | Nuts                                                   |
+| 56   | Seeds                    | SEEDS AND PRODUCTS FROM NUTS/SEEDS (EXCL. COOKING OIL)   | SEEDS AND PRODUCTS FROM NUTS/SEEDS (EXCL. COOKING OIL)   | SEEDS AND PRODUCTS FROM NUTS/SEEDS (EXCL. COOKING OIL)   | Seeds and nut products                                 |
+| 57   | Vegetables (fresh)       | ONIONS, TOMATOES, CARROTS AND GREEN PEPPER, OTHER VIUNGO | ONIONS, TOMATOES, CARROTS AND GREEN PEPPER, OTHER VIUNGO | ONIONS, TOMATOES, CARROTS AND GREEN PEPPER, OTHER VIUNGO | Onions, tomatoes, carrots, green pepper, other viungo  |
+| 58   | Leafy Greens             | SPINACH, CABBAGE AND OTHER GREEN VEGETABLES              | SPINACH, CABBAGE AND OTHER GREEN VEGETABLES              | SPINACH, CABBAGE AND OTHER GREEN VEGETABLES              | Spinach, cabbage, other green vegetables               |
+| 59   | Wheat Flour              | WHEAT FLOUR                                              | WHEAT FLOUR                                              | WHEAT FLOUR                                              | Wheat (flour)                                          |
+| 60   | Other Cereals            | WHEAT, BARLEY, GRAIN, AND OTHER CEREALS                  | WHEAT, BARLEY GRAIN AND OTHER CEREALS                    | WHEAT, BARLEY GRAIN AND OTHER CEREALS                    | Wheat, barley grain, and other cereals                 |
+
+# u is the unit (u) axis.  Original-Label-keyed so it ROW-UNIONS additively
+# with the global lsms_library/categorical_mapping/u.org (country rows win on
+# a source-label collision; see _ADDITIVE_CATEGORICAL_TABLES /
+# _row_union_categorical in country.py).  Covers the raw food_acquired survey
+# unit codes per wave; food_acquired() title-cases them and
+# new_harmonize_units() then collapses every unit to the {kg, piece}
+# conversion sentinels (kg-conversion factors live in transformations, NOT
+# here -- this is the LABEL axis only).
+#
+# Deliberately does NOT register the bare lowercase 'kg'/'piece' sentinel
+# keys: 'kg' is already mapped to 'Kg' by the global u.org, and 'piece' is the
+# framework collapse sentinel that must pass through unchanged on
+# food_acquired (which is NOT u-sentinel-protected -- only food_quantities /
+# food_prices are).  Registering 'piece' -> 'Piece' here would rewrite the
+# live (u) axis value and regress food_acquired.
+
+#+name: u
+| Original Label | Preferred Label | 2008-15    | 2019-20    | 2020-21   |
+|----------------+-----------------+------------+------------+-----------|
+| KILOGRAMS      | Kg              | KILOGRAMS  | KILOGRAMS  |           |
+| GRAMS          | Gram            | GRAMS      | GRAMS      |           |
+| gram           | Gram            |            |            | gram      |
+| LITRE          | Litre           | LITRE      | LITRE      |           |
+| litre          | Litre           |            |            | litre     |
+| MILLILITRE     | Millilitre      | MILLILITRE | MILLILITRE |           |
+| mililitre      | Millilitre      |            |            | mililitre |
+| PIECES         | Piece           | PIECES     | PIECES     |           |
+| kilogram       | Kg              |            |            | kilogram  |
+| 20 liter bucket | 20l Bucket     |            |            |           |
+| small cup      | Small Cup       |            |            |           |
+| large cup      | Large Cup       |            |            |           |
+| millilitre     | Millilitre      |            |            |           |
+| kilograms      | Kg              |            |            |           |
+| grams          | Gram            |            |            |           |
+| LITRES         | Litre           |            |            |           |
+| litres         | Litre           |            |            |           |
+| MILLILITRES    | Millilitre      |            |            |           |
+| millilitres    | Millilitre      |            |            |           |
+| pieces         | Piece           |            |            |           |
+
+# harmonize_crop is the (j) axis for crop_production (parity-loop GAP 1).
+# Keyed on the NPS crop CODE ("cropid" / "zaocode") from the agriculture
+# questionnaire crop-code flap (extracted from
+# 2019-20/Documentation/nps_sdd_agriculture_qx_final_english_.pdf).  The
+# Preferred Label REUSES the harmonize_food Preferred Labels wherever a crop
+# is a consumed food, so crop_production.j shares the (j) axis with
+# food_acquired and community_prices -- e.g. Maize -> "Maize (grain)",
+# Paddy -> "Rice (paddy)", Beans/Cowpeas/Pigeon Pea -> "Pulses",
+# Sugar Cane -> "Sugarcane", Coffee/Cocoa -> "Coffee & Cocoa".  NEW Preferred
+# Labels are added ONLY for non-food crops (Cotton, Tobacco, Sisal, Rubber,
+# Sunflower, Pyrethrum, Jute, Kapok, Wattle, Palm Oil, Seaweed, Spices (crop),
+# Bamboo, Timber, Firewood/Fodder, Medicinal Plant, Fence Tree, Other Crop).
+# The 2019-20 / 2020-21 columns carry the same raw integer code; the
+# crop_production.py scripts resolve code -> Preferred Label in-script via
+# _plot_harmonized_codes('harmonize_crop') (Code -> Preferred Label), so the
+# emitted (j) is already canonical (mostly non-numeric).
+#+name: harmonize_crop
+| Code | Preferred Label          | Crop            | 2019-20 | 2020-21 |
+|------+--------------------------+-----------------+---------+---------|
+| 11   | Maize (grain)            | Maize           | 11      | 11      |
+| 12   | Rice (paddy)             | Paddy           | 12      | 12      |
+| 13   | Millet & Sorghum (grain) | Sorghum         | 13      | 13      |
+| 14   | Millet & Sorghum (grain) | Bulrush Millet  | 14      | 14      |
+| 15   | Millet & Sorghum (grain) | Finger Millet   | 15      | 15      |
+| 16   | Other Cereals            | Wheat           | 16      | 16      |
+| 17   | Other Cereals            | Barley          | 17      | 17      |
+| 18   | Spices (crop)            | Black Pepper    | 18      | 18      |
+| 19   | Seaweed                  | Seaweed         | 19      | 19      |
+| 21   | Cassava Fresh            | Cassava         | 21      | 21      |
+| 22   | Sweet Potatoes           | Sweet Potatoes  | 22      | 22      |
+| 23   | Irish Potatoes           | Irish Potatoes  | 23      | 23      |
+| 24   | Yams/Cocoyams            | Yams            | 24      | 24      |
+| 25   | Yams/Cocoyams            | Cocoyams        | 25      | 25      |
+| 26   | Vegetables (fresh)       | Onions          | 26      | 26      |
+| 27   | Spices (crop)            | Ginger          | 27      | 27      |
+| 31   | Pulses                   | Beans           | 31      | 31      |
+| 32   | Pulses                   | Cowpeas         | 32      | 32      |
+| 33   | Pulses                   | Green Gram      | 33      | 33      |
+| 34   | Pulses                   | Pigeon Pea      | 34      | 34      |
+| 35   | Pulses                   | Chick Peas      | 35      | 35      |
+| 36   | Pulses                   | Bambara Nuts    | 36      | 36      |
+| 37   | Pulses                   | Field Peas      | 37      | 37      |
+| 38   | Other Fruits             | Malay Apple     | 38      | 38      |
+| 39   | Other Fruits             | Star Fruit      | 39      | 39      |
+| 41   | Sunflower                | Sunflower       | 41      | 41      |
+| 42   | Seeds                    | Sesame          | 42      | 42      |
+| 43   | Groundnuts               | Groundnut       | 43      | 43      |
+| 44   | Palm Oil                 | Palm Oil        | 44      | 44      |
+| 45   | Coconuts                 | Coconut         | 45      | 45      |
+| 46   | Nuts                     | Cashew Nut      | 46      | 46      |
+| 47   | Pulses                   | Soyabeans       | 47      | 47      |
+| 48   | Seeds                    | Caster Seed     | 48      | 48      |
+| 50   | Cotton                   | Cotton          | 50      | 50      |
+| 51   | Tobacco                  | Tobacco         | 51      | 51      |
+| 52   | Pyrethrum                | Pyrethrum       | 52      | 52      |
+| 53   | Sisal                    | Sisal           | 53      | 53      |
+| 54   | Coffee & Cocoa           | Coffee          | 54      | 54      |
+| 55   | Tea (dry)                | Tea             | 55      | 55      |
+| 56   | Coffee & Cocoa           | Cocoa           | 56      | 56      |
+| 57   | Rubber                   | Rubber          | 57      | 57      |
+| 58   | Wattle                   | Wattle          | 58      | 58      |
+| 59   | Kapok                    | Kapok           | 59      | 59      |
+| 60   | Sugarcane                | Sugar Cane      | 60      | 60      |
+| 61   | Spices (crop)            | Cardamom        | 61      | 61      |
+| 62   | Jute                     | Jute            | 62      | 62      |
+| 63   | Other Fruits             | Tamarind        | 63      | 63      |
+| 64   | Spices (crop)            | Cinnamon        | 64      | 64      |
+| 65   | Spices (crop)            | Nutmeg          | 65      | 65      |
+| 66   | Spices (crop)            | Clove           | 66      | 66      |
+| 67   | Other Fruits             | Bread Fruit     | 67      | 67      |
+| 68   | Citrus Fruits            | Pomelo          | 68      | 68      |
+| 69   | Other Fruits             | Jack Fruit      | 69      | 69      |
+| 70   | Other Fruits             | Passion Fruit   | 70      | 70      |
+| 71   | Ripe Bananas             | Banana          | 71      | 71      |
+| 72   | Other Fruits             | Avocado         | 72      | 72      |
+| 73   | Other Fruits             | Mango           | 73      | 73      |
+| 74   | Other Fruits             | Papaw           | 74      | 74      |
+| 75   | Other Fruits             | Pineapple       | 75      | 75      |
+| 76   | Citrus Fruits            | Orange          | 76      | 76      |
+| 77   | Citrus Fruits            | Grapefruit      | 77      | 77      |
+| 78   | Other Fruits             | Grapes          | 78      | 78      |
+| 79   | Citrus Fruits            | Mandarin        | 79      | 79      |
+| 80   | Other Fruits             | Guava           | 80      | 80      |
+| 81   | Other Fruits             | Plums           | 81      | 81      |
+| 82   | Other Fruits             | Apples          | 82      | 82      |
+| 83   | Other Fruits             | Pears           | 83      | 83      |
+| 84   | Other Fruits             | Peaches         | 84      | 84      |
+| 86   | Leafy Greens             | Cabbage         | 86      | 86      |
+| 87   | Vegetables (fresh)       | Tomatoes        | 87      | 87      |
+| 88   | Leafy Greens             | Spinach         | 88      | 88      |
+| 89   | Vegetables (fresh)       | Carrot          | 89      | 89      |
+| 90   | Vegetables (fresh)       | Chilies         | 90      | 90      |
+| 91   | Leafy Greens             | Amaranths       | 91      | 91      |
+| 92   | Vegetables (fresh)       | Pumpkins        | 92      | 92      |
+| 93   | Vegetables (fresh)       | Cucumber        | 93      | 93      |
+| 94   | Vegetables (fresh)       | Egg Plant       | 94      | 94      |
+| 95   | Other Fruits             | Water Mellon    | 95      | 95      |
+| 96   | Leafy Greens             | Cauliflower     | 96      | 96      |
+| 97   | Other Fruits             | Durian          | 97      | 97      |
+| 98   | Other Fruits             | Bilimbi         | 98      | 98      |
+| 99   | Other Fruits             | Rambutan        | 99      | 99      |
+| 100  | Vegetables (fresh)       | Okra            | 100     | 100     |
+| 101  | Pulses                   | Fiwi            | 101     | 101     |
+| 200  | Other Fruits             | Custard Apple   | 200     | 200     |
+| 201  | Other Fruits             | God Fruit       | 201     | 201     |
+| 202  | Other Fruits             | Mitobo          | 202     | 202     |
+| 203  | Other Fruits             | Plum            | 203     | 203     |
+| 204  | Other Fruits             | Peaches         | 204     | 204     |
+| 205  | Other Fruits             | Pomegranate     | 205     | 205     |
+| 210  | Other Fruits             | Date            | 210     | 210     |
+| 211  | Other Fruits             | Tungamaa        | 211     | 211     |
+| 212  | Other Fruits             | Other Fruit     | 212     | 212     |
+| 300  | Vegetables (fresh)       | Green Tomato    | 300     | 300     |
+| 301  | Other Fruits             | Monkeybread     | 301     | 301     |
+| 302  | Bamboo                   | Bamboo          | 302     | 302     |
+| 303  | Firewood/Fodder          | Firewood/Fodder | 303     | 303     |
+| 304  | Timber                   | Timber          | 304     | 304     |
+| 305  | Medicinal Plant          | Medicinal Plant | 305     | 305     |
+| 306  | Fence Tree               | Fence Tree      | 306     | 306     |
+| 851  | Citrus Fruits            | Lime            | 851     | 851     |
+| 852  | Citrus Fruits            | Lemon           | 852     | 852     |
+| 998  | Other Crop               | Other           | 998     | 998     |
+
+# harmonize_input is the (input) axis for plot_inputs (parity-loop GAP 2).
+# Two kinds of rows:
+#   * INORGANIC-FERTILIZER TYPE codes (1-8) -- the ag3a_48 / ag3a_55 value
+#     labels ("What type of INORGANIC FERTILIZER you used?") map to a canonical
+#     fertilizer-product Preferred Label (urea / DAP / NPK / ...).  The 2019-20
+#     and 2020-21 columns carry the same raw integer code; plot_inputs.py
+#     resolves code -> Preferred Label in-script via
+#     _plot_harmonized_codes('harmonize_input').
+#   * The five NON-coded input categories the questionnaire records as their
+#     OWN modules (seed, organic fertilizer, herbicide, pesticide) -- plot_inputs.py
+#     emits these canonical Preferred Labels DIRECTLY as the (input) value, so
+#     they need no code; they are listed here (Code blank) only to document the
+#     full shared input taxonomy.  Fertilizer-product / category names are the
+#     parity input taxonomy reused across waves (and intended to be reused
+#     across countries for GAP 2).
+#+name: harmonize_input
+| Code | Preferred Label | 2019-20 | 2020-21 |
+|------+-----------------+---------+---------|
+| 1    | DAP             | 1       | 1       |
+| 2    | Urea            | 2       | 2       |
+| 3    | TSP             | 3       | 3       |
+| 4    | CAN             | 4       | 4       |
+| 5    | SA              | 5       | 5       |
+| 6    | NPK             | 6       | 6       |
+| 7    | MRP             | 7       | 7       |
+| 8    | Other Fertilizer | 8      | 8       |
+|      | Seed            |         |         |
+|      | Organic Fertilizer |      |         |
+|      | Herbicide       |         |         |
+|      | Pesticide       |         |         |
+
+# Livestock species (parity-loop GAP 4 -- the `animal` index level of the
+# `livestock` feature).  The LF_SEC_02 livestock roster records ownership at
+# the (household, lvstckid) grain -- one row per animal TYPE the household was
+# asked about.  This table maps each wave's raw `lvstckid` code to a canonical
+# species/type Preferred Label, which becomes the `animal` index value.
+#
+# It is RICHER than the WB cleaning code, which recodes the own-y/n flag
+# (lf02_01 / s10aq2 / ag10a_02) and collapse(max)es every animal type down to a
+# single household "engaged-in-livestock" binary -- discarding the species,
+# head counts, purchases, sales and values.  Here every owned-species row is
+# kept (their binary = our `groupby(['t','i']).size() > 0`).
+#
+# The cattle sub-types (Bulls / Cows / Steers / Heifers / Male & Female
+# Calves) are kept DISTINCT, matching the questionnaire's own item grain; a
+# coarser "Cattle" rollup is a transformation over these rows, not a stored
+# label.  Codes are stable across waves for 1..14 EXCEPT code 13 (2019-20
+# "HARE" vs 2020-21 "rabbits" -- same family, one label "Rabbits"); the
+# pet/other tail diverges: 2019-20 has 15=DOGS, 16=OTHER; 2020-21 has 15=dogs,
+# 16=cats, 17=other.  Only 2019-20 / 2020-21 are buildable (the 2008-15
+# multi-round folder has no livestock source on disk -- same deferral as
+# plot_features / crop_production / plot_inputs, GH #167); the SEC_10A
+# (2008-09) / AG_SEC10A (2010-11) rosters are documented in the comment but
+# have no code column here because their .dta is not present.
+#
+# DOGS / CATS / OTHER are pets, NOT livestock: their Preferred Label is blank
+# (-> pd.NA), so `_map_plot_codes` drops them and they never become `animal`
+# rows -- mirroring the WB `drop if inlist(animal, 15, 16)` exclusion and
+# keeping our distinct livestock-owning-HH count comparable to their binary.
+# The wave-script resolves each wave's RAW lvstckid through that wave's own
+# code column (NOT the canonical Code), so the 13/15/16/17 divergence is
+# handled without fabricating a cross-wave code identity.
+#+name: harmonize_species
+| Code | Preferred Label | 2019-20 | 2020-21 |
+|------+-----------------+---------+---------|
+| 1    | Bulls           | 1       | 1       |
+| 2    | Cows            | 2       | 2       |
+| 3    | Steers          | 3       | 3       |
+| 4    | Heifers         | 4       | 4       |
+| 5    | Male Calves     | 5       | 5       |
+| 6    | Female Calves   | 6       | 6       |
+| 7    | Goats           | 7       | 7       |
+| 8    | Sheep           | 8       | 8       |
+| 9    | Pigs            | 9       | 9       |
+| 10   | Chickens        | 10      | 10      |
+| 11   | Ducks           | 11      | 11      |
+| 12   | Other Poultry   | 12      | 12      |
+| 13   | Rabbits         | 13      | 13      |
+| 14   | Donkeys         | 14      | 14      |
+| 15   |                 | 15      | 15      |
+| 16   |                 | 16      | 16      |
+| 17   |                 |         | 17      |
+
+# harmonize_community_price is the (j) axis for the `community_prices` feature
+# (parity-loop GAP C -- the community-price arm of label unification, Unit #0).
+# Keyed on the COMMUNITY price questionnaire's own item code (`item_id`,
+# CM_SEC_F_ID `cm_f060`), which is a SEPARATE 1..52 code space from the
+# food-consumption module codes (harmonize_food `Code`) and from the
+# agriculture crop codes (harmonize_crop).  The 52 codes are identical and
+# stable across both buildable waves (2019-20 NPS-SDD, 2020-21 NPS Y5); the
+# 2019-20 instrument labels several items in Swahili (MAHARAGE=beans,
+# KUNDE=cowpeas, KARANGA=groundnuts, MAZI=coconut, KAROTI=carrots) which is why
+# the wave columns differ in spelling but resolve to the same Preferred Label.
+#
+# The Preferred Label REUSES the harmonize_food Preferred Labels wherever a
+# priced item is a consumed food, so community_prices.j shares the (j) axis
+# with food_acquired (consumption) and crop_production (harvest) -- e.g.
+# RICE (PADDY) -> "Rice (paddy)", MAIZE (GRAIN) -> "Maize (grain)",
+# MILLET (GRAIN)/SORGHUM (GRAIN) -> "Millet & Sorghum (grain)",
+# MAHARAGE/KUNDE -> "Pulses", KARANGA -> "Groundnuts", TOMATOES/ONIONS/KAROTI
+# -> "Vegetables (fresh)", SPINACH/CABBAGE -> "Leafy Greens",
+# MANGOES/PAPAYA -> "Other Fruits", COOKING BANANAS -> "Plantains",
+# DAGAA/FRESH FISH -> "Fish (fresh)".  This is the label join the maintainer
+# asked for: a community price row for code 4 ("Maize (grain)") lines up with
+# the food_acquired and crop_production "Maize (grain)" rows.
+#
+# The community price questionnaire also surveys SEVEN non-food household
+# goods/fuels/services the food-consumption module does not carry (codes
+# 46-52): Kerosene, Charcoal, Maize Grinding (a milling SERVICE, not a good),
+# Firewood, Matches, Cigarettes, Batteries.  These get NEW Preferred Labels
+# (they are legitimate REPORTED community prices, so they are kept, not
+# dropped) -- they will not join food_acquired (no consumed-food counterpart),
+# which is correct: they are non-food priced goods.
+#
+# The wave script resolves the RAW item_id code -> Preferred Label in-script
+# via _community_price_codes()/_plot_harmonized_codes('harmonize_community_price'),
+# so the emitted (j) is already canonical; the per-wave columns below carry the
+# decoded survey string only for documentation / traceability.
+#+name: harmonize_community_price
+| Code | Preferred Label          | 2019-20             | 2020-21              |
+|------+--------------------------+---------------------+----------------------|
+| 1    | Rice (paddy)             | RICE (PADDY)        | RICE (PADDY)         |
+| 2    | Rice (husked)            | RICE (HUSKED)       | RICE (HUSKED)        |
+| 3    | Maize (green, cob)       | MAIZE (GREEN, COB)  | MAIZE (GREEN, COB)   |
+| 4    | Maize (grain)            | MAIZE (GRAIN)       | MAIZE (GRAIN)        |
+| 5    | Maize (flour)            | MAIZE (FLOUR)       | MAIZE (FLOUR)        |
+| 6    | Millet & Sorghum (grain) | MILLET (GRAIN)      | MILLET (GRAIN)       |
+| 7    | Millet & Sorghum (grain) | SORGHUM (GRAIN)     | SORGHUM (GRAIN)      |
+| 8    | Millet & Sorghum (flour) | MILLET (FLOUR)      | MILLET (FLOUR)       |
+| 9    | Millet & Sorghum (flour) | SORGHUM (FLOUR)     | SORGHUM (FLOUR)      |
+| 10   | Bread                    | BREAD               | bread                |
+| 11   | Buns, Cakes And Biscuits | BUNS                | buns                 |
+| 12   | Cassava Fresh            | CASSAVA FRESH       | CASSAVA FRESH        |
+| 13   | Cassava Dry/Flour        | CASSAVA (DRY)       | CASSAVA (DRY)        |
+| 14   | Cassava Dry/Flour        | CASSAVA FLOUR       | CASSAVA FLOUR        |
+| 15   | Sweet Potatoes           | SWEET POTATOES      | SWEET POTATOES       |
+| 16   | Yams/Cocoyams            | COCOYAMS            | cocoyams             |
+| 17   | Yams/Cocoyams            | YAMS                | yams                 |
+| 18   | Irish Potatoes           | IRISH POTATOES      | IRISH POTATOES       |
+| 19   | Plantains                | COOKING BANANAS     | COOKING BANANAS      |
+| 20   | Sugar                    | SUGAR               | sugar                |
+| 21   | Pulses                   | MAHARAGE            | beans                |
+| 22   | Pulses                   | KUNDE               | peas                 |
+| 23   | Groundnuts               | KARANGA             | groundnuts           |
+| 24   | Coconuts                 | MAZI                | coconuts             |
+| 25   | Vegetables (fresh)       | KAROTI              | carrots              |
+| 26   | Vegetables (fresh)       | TOMATOES            | tomatoes             |
+| 27   | Vegetables (fresh)       | ONIONS              | onions               |
+| 28   | Leafy Greens             | SPINACH             | spinach              |
+| 29   | Leafy Greens             | CABBAGE             | cabbage              |
+| 30   | Ripe Bananas             | RIPE BANANAS        | RIPE BANANAS         |
+| 31   | Citrus Fruits            | CITRUS FRUITS       | CITRUS FRUITS        |
+| 32   | Other Fruits             | PAPAYA              | papaya               |
+| 33   | Other Fruits             | MANGOES             | mangoes              |
+| 34   | Goat Meat                | GOAT MEAT           | GOAT MEAT            |
+| 35   | Beef                     | BEEF                | beef                 |
+| 36   | Chicken                  | CHICKEN (LIVE)      | CHICKEN (LIVE)       |
+| 37   | Eggs                     | EGGS                | eggs                 |
+| 38   | Fish (fresh)             | FRESH FISH          | FRESH FISH           |
+| 39   | Fish (fresh)             | DAGAA               | dagaa                |
+| 40   | Milk (fresh)             | FRESH MILK          | FRESH MILK           |
+| 41   | Milk (dry or canned)     | CANNED MILK/POWDER  | CANNED MILK/POWDER   |
+| 42   | Cooking Oil              | COOKING OIL         | COOKING OIL          |
+| 43   | Salt                     | SALT                | salt                 |
+| 44   | Tea (dry)                | TEA (DRY)           | TEA (DRY)            |
+| 45   | Local Brews              | LOCAL BREWS         | LOCAL BREWS          |
+| 46   | Kerosene                 | KEROSINE            | kerosine             |
+| 47   | Charcoal                 | CHARCOAL            | charcoal             |
+| 48   | Maize Grinding           | MAIZE GRINDING COSTS | MAIZE GRINDING COSTS |
+| 49   | Firewood                 | FIREWOOD            | firewood             |
+| 50   | Matches                  | MATCHES             | matches              |
+| 51   | Cigarettes               | CIGARETTES          | cigarettes           |
+| 52   | Batteries                | BATTERIES           | batteries            |

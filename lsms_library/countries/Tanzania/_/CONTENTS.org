@@ -81,10 +81,15 @@ The community questionnaire price data appears decent for 2019-20.
    directory).
 2. Match community prices to households via EA/cluster identifiers.
    - Blocker :: Linking the /places/ where community prices are
-     observed to household locations is not straightforward.  The
-     =clusterid= in =HH_SEC_A.dta= should in principle match the
-     community survey’s EA identifier, but this linkage has not been
-     verified.
+     observed to household locations is /not possible at the EA/cluster
+     level/.  The community survey's =v= (=interview__key=) is a
+     per-interview token with zero overlap with =sample().v=
+     (=clusterid= / =y5_cluster=); the only shared geography is the
+     national admin tuple, which is many-to-many with the survey
+     cluster and (in 2020-21) uses an irreconcilable district
+     numbering.  See *Why the community-price ↔ household link cannot be
+     made cleanly* below for the full diagnosis and match rates.  A
+     region-level fallback is the most that can be done.
 3. Use community prices as a fallback when household-level unit values
    cannot be constructed (i.e., when =quant_purchase= is missing).
 4. Merge with existing =food_prices_quantities_and_expenditures.py=
@@ -97,6 +102,154 @@ The community questionnaire price data appears decent for 2019-20.
 - =Tanzania/2020-21/Data/= --- community questionnaire files (DVC-tracked)
 - =Tanzania/_/food_prices_quantities_and_expenditures.py= --- current price pipeline
 - =Tanzania/_/food_acquired.py= --- country-level aggregation
+
+*** Why the community-price ↔ household link cannot be made cleanly (diagnosis 2026-06-14)
+
+The item-level =community_prices= feature (grain =(t, v, j, u)=, built from
+=CM_SEC_F_ID.dta= / =cm_sec_f_id.dta=) is wired and sane (cold-build 15,831
+rows over 2019-20 + 2020-21, =is_this_feature_sane().ok == True=).  But its
+=v= does **not** intersect =sample().v=, and the proposed step 2 above ---
+matching community prices to households via a shared EA/cluster id --- has been
+investigated and found **infeasible without a lossy, unverifiable crosswalk**.
+The =v= keyspaces are genuinely different identifiers of different things, not
+two encodings of the same EA.  Concrete evidence below; the data limitation is
+recorded so the price-fallback work (#113) is not blocked on a key that does
+not exist.
+
+**The id columns on each side.**
+
+| side                 | =v= source column | format                | example          |
+|----------------------+--------------------+-----------------------+------------------|
+| community_prices     | =interview__key=   | 11-char =XX-XX-XX-XX=  | =00-38-24-76=    |
+| sample() 2019-20     | =clusterid=        | 8--9 digit integer    | =11014002=       |
+| sample() 2020-21     | =y5_cluster=       | 16-char =RR-DD-WWW-EE-CCC= | =02-02-033-04-004= |
+
+=interview__key= is a Survey-Solutions per-*interview* token, **unique per
+questionnaire instance**, NOT a cluster id: the community file's 99 (2019-20) /
+488 (2020-21) keys have **zero** overlap with the household file's own
+=interview__key= column (1,184 / 4,709 keys) --- by construction, because each
+is a distinct interview.  So =interview__key= can never be the join key.
+
+**The only shared geography is the national admin tuple, and it does not
+resolve to a survey cluster.**  The community cover page (=CM_SEC_A=) carries
+admin location codes =id_01..id_05= (region / district / ward / village / ...);
+the household cover page carries the parallel national-admin =t0_region /
+t0_district / t0_ward_code / t0_ea_codee=.  Domains overlap at the coarse
+levels (2019-20: region 27/27, district 53/57, ward 53/58 of community codes
+present on the household side), so in principle one could match on
+=(region, district, ward)=.  But:
+
+1. *The national admin tuple is not 1:1 with the survey cluster, even within
+   the household file.*  The survey-design =clusterid= / =y5_cluster= is a
+   sampling cluster, not an admin unit.  35 of 165 household ward-tuples
+   (2019-20) hold 2--3 distinct =clusterid=; the tracking design also pins
+   moved households to their *baseline* cluster while recording a *new* admin
+   location, so the same =clusterid= appears under several admin tuples.  The
+   admin→cluster map is many-to-many on the household side.
+
+2. *2019-20 best case: 38 of 99 communities (38%) resolve to a unique
+   cluster.*  Matching community =(id_01,id_02,id_03)= to the household
+   ward-tuple: 55/99 match a ward at all (44 communities sit in wards with no
+   surviving tracked household), and of those 55 only 38 map to a single
+   =clusterid= (17 are ambiguous, ward holds >1 cluster).  Adding the village
+   code =id_04= makes it *worse* (15 matches) --- =id_04= is the village number
+   in a different numbering than the survey =t0_ea_codee=.
+
+3. *2020-21: the district numbering is irreconcilable, so no honest match
+   exists.*  Community =id_02= is the 2--3-digit national district code
+   (=128, 71, 97...=); the =y5_cluster= "DD" field is a 1--2-digit
+   within-region district index (domain ≈ =1..9=).  Region+district+ward match
+   = **0/488**.  Dropping district to match on =(region, ward)= "recovers"
+   475/488 --- but ward numbers repeat across districts within a region
+   (58 region+ward pairs already collide onto ≥2 clusters in the household
+   file alone), so those matches conflate wards in different districts and
+   cannot be validated.  That is precisely a lossy many-to-many crosswalk.
+
+**Conclusion.**  There is no shared, lossless EA/cluster key between the
+community-price instrument and =sample()=.  The finest reliably shared key is
+the national *region* (and, for 2019-20 only, partially the ward), not the EA.
+A community→household price join is therefore a deliberate *region-level
+fallback transformation* (the documented #113 use), and must be implemented as
+such by the maintainer --- it is **not** a clean key join and is intentionally
+NOT baked into the item-level =community_prices= feature, whose =v= is left as
+the community's native =interview__key=.  Reproduce the numbers above from
+=Tanzania/2019-20/Data/CM_SEC_A.dta= + =HH_SEC_A.dta= and
+=Tanzania/2020-21/Data/cm_sec_a.dta= + =hh_sec_a.dta= (=get_dataframe(...,
+convert_categoricals=False)=).
+
+*** Re-opening the link: date disambiguation + district crosswalk (2026-06-14, #113 follow-up)
+
+The diagnosis above is *geography-only*.  Two avenues raised on #113
+(maintainer, 2026-06-14) were not tried and they change the ceiling.
+This subsection is a *desk analysis* (scoping session, no data access);
+the numbered tests at the end are for a data-enabled session.  WB docs
+consulted: NPS-SDD 2019-20 (catalog #3885), NPS Wave 5 2020-21 (catalog
+#5639), LSMS NPS brief.
+
+**Avenue A --- is there a cluster id in another community file?**
+Most likely *no, by design*.  =clusterid= / =strataid= are
+household-side *sampling* variables (documented as living in the
+household Section A), and the NPS community questionnaire is administered
+to *village / kitongoji / mtaa leaders* --- identified by admin geography
+(=id_01..id_05=), not the sampling EA.  So the absent =clusterid= in
+=CM_SEC_F_ID= / =CM_SEC_A= is expected, not an oversight.  Still cheap
+and worth doing once: only =CM_SEC_A= is documented as inspected --- scan
+=CM_SEC_B,C,D,D2,E,G= for any stray id column to close the question (low
+odds; Survey-Solutions sub-files share the cover keys).
+
+**Avenue B --- interview dates (the untried lever).**  The fieldwork
+design supports it: mobile teams spend ~4--5 days per cluster doing the
+household *and* community interviews in one visit, so a community
+interview's date should fall inside the household-interview date window
+of its *own* cluster.  Infra already exists --- =interview_date.py=
+extracts the household start date (=hh_a18=) per cluster for both waves.
+The method that works is *admin-narrow, then date-disambiguate*: use
+=(region, ward)= to get the 2--3 candidate clusters, then pick the one
+whose household date-window matches the community interview date.  This
+targets exactly the residual ambiguity geography alone could not break
+(the 17 ambiguous 2019-20 wards; the 58 ambiguous 2020-21 region+ward
+pairs).
+- *Must confirm with data*: that the community file records an interview
+  date (the =CM_SEC_A= "survey staff / timing" block, or Survey-Solutions
+  paradata timestamps).  Public docs do not expose the variable name.
+
+**The 2020-21 0/488 is a fixable encoding bug, not absence.**  Community
+=id_02= is the 2--3-digit *national* district code; the =y5_cluster=
+"DD" field is a 1--2-digit *within-region* district index.  A
+district-code crosswalk (national code → within-region index, derivable
+from =HH_SEC_A=, which carries both the admin tuple and =y5_cluster=)
+repairs =(region, district, ward)= matching and separates the wards that
+currently collide across districts.
+
+**Realistic ceilings (honest).**
+- *2019-20*: 38/99 unique today → ~55/99 once the 17 ambiguous wards are
+  date-disambiguated.  Irreducible floor: ~44 communities sit in wards
+  with *no surviving tracked household*, so nothing links them below
+  region regardless of method (Extended-Panel attrition/movement).
+- *2020-21*: 0/488 today is the district-encoding bug, not absence.
+  Crosswalk + date plausibly reaches ~475/488; the ~13/488 with no
+  region+ward match fall to region.
+
+So the "region is the floor" framing undersells 2020-21 badly (0 →
+~97% plausibly), and date-linking is a real lever for the ambiguous
+cases in *both* waves --- while 2019-20 keeps an irreducible region-only
+residue.  GPS-based matching is *not* available: Tanzania
+=cluster_features= carries only Region/District/Rural, no coordinates.
+
+**Next steps (data-enabled session).**
+1. Confirm a community interview-date variable in =CM_SEC_A= (both
+   waves); fall back to Survey-Solutions paradata if absent.
+2. Build the 2020-21 district-code crosswalk from =HH_SEC_A= (admin
+   tuple ↔ =y5_cluster=); re-run =(region, district, ward)= matching.
+3. Implement *admin-narrow → date-disambiguate*; report new unique-match
+   counts per wave against the 38/99 and 0/488 baselines.
+4. Scan =CM_SEC_B..G= for any overlooked cluster/EA id (cheap).
+5. If match rates are acceptable, the #113 "community price as
+   quantity-fallback" usage becomes a documented =transformations= step
+   over =community_prices= at the recovered =v=; otherwise keep the
+   region-level fallback.  Either way =community_prices= itself stays
+   item-level with native =interview__key= =v= --- do not bake the lossy
+   join in.
 
 ** DONE Link  2019-20 and 2020-21 to panel
 CLOSED: [2026-03-29 Sat]
@@ -585,3 +738,66 @@ CLOSED: [2023-03-03 Fri 11:26]
 CLOSED: [2023-03-07 Tue 11:32]
 ** DONE shocks.py
 CLOSED: [2023-03-23 Thu 15:59]
+
+* plot_features (GH #167)
+
+Lasting plot characteristics, index =(t, i, plot_id)=, columns Area
+(hectares, float), AreaUnit, Tenure, TenureSystem, SoilType, Irrigated.
+Built via =materialize: make= as a cross-file merge of two NPS
+agriculture modules per wave:
+
+- =AG_SEC_02= :: plot area --- farmer estimate =ag2a_04= (acres) and
+  GPS-measured =ag2a_09= (acres).  GPS is preferred where present,
+  farmer estimate is the fallback.  Acres are converted to hectares
+  (=x 0.404686=); =AreaUnit= records the original survey unit.  A
+  plausibility clamp drops areas > 2500 acres (~1000 ha; the 2020-21
+  GPS column has a 28710-acre data-entry outlier) and non-positive
+  areas to NaN.
+- =AG_SEC_3A= :: plot detail --- use status =ag3a_03=, soil type
+  =ag3a_10=, irrigation =ag3a_18=, how-acquired =ag3a_25=, certificate
+  of occupancy =ag3a_28a=.
+
+The merge is on (hhid, plot) and is a clean 1:1 in both waves (2305/2305
+and 6560/6560 rows; zero unmatched).
+
+** Buildable waves (2 of 6)
+
+- 2019-20 (NPS-SDD, Extended Panel) :: key =(sdd_hhid, plotnum)=; 2305 plots.
+- 2020-21 (NPS Y5, Refresh Panel)   :: key =(y5_hhid, plot_id)=; 6560 plots.
+  Note: BOTH 2020-21 modules key on =plot_id= (there is no =plotnum=
+  column in 2020-21, unlike 2019-20).
+
+These two waves track disjoint sub-panels by design (see the panel
+design note above), so they share no household IDs.
+
+** Deferred
+
+- 2008-15 (rounds 2008-09 / 2010-11 / 2012-13 / 2014-15) :: NO
+  agriculture source file on disk (only =upd4_hh_*= consumption files
+  are DVC-tracked).  Deferred until the UPD ag file is DVC-added.
+
+** Harmonization
+
+Code -> canonical-label tables live in =Tanzania/_/categorical_mapping.org=
+(=harmonize_tenure=, =harmonize_tenure_system=, =harmonize_soil=).  The
+AG_SEC_3A categorical code scheme is IDENTICAL across the two buildable
+waves (verified against the Stata value labels), so the tables are keyed
+on the integer code, not the label string (2020-21 lowercases several
+labels).  =Tenure= comes from =ag3a_25= with an override to =rented_out=
+where =ag3a_03= use-status is 2 (RENTED OUT) or 3 (GIVEN OUT).
+=TenureSystem= comes from =ag3a_28a= (1 -> granted_right_of_occupancy,
+2 -> customary, 3 NO CERTIFICATE -> NaN); =granted_right_of_occupancy=
+was added to the canonical TenureSystem spellings for this rollout.
+
+** GPS redaction
+
+=AG_SEC_02= carries =ag2a_07__Latitude= / =ag2a_07__Longitude=, but
+these are CONFIDENTIAL / redacted in the WB microdata.  Latitude /
+Longitude are therefore NOT emitted.
+
+** Files
+
+- =Tanzania/_/tanzania.py= :: =plot_features_for_wave()= shared helper
+  (+ =_plot_harmonized_codes=, =_map_plot_codes=).
+- =Tanzania/2019-20/_/plot_features.py=, =Tanzania/2020-21/_/plot_features.py= :: per-wave scripts.
+- =Tanzania/_/plot_features.py= :: country concatenator (concat + id_walk).

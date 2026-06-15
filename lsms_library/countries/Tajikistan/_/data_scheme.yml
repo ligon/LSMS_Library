@@ -1,10 +1,57 @@
 Country: Tajikistan
 
 Data Scheme:
+  interview_date:
+    index: (t, i)
+    Int_t: datetime
+    materialize: make
+
+  life_satisfaction:
+    index: (t, i, Domain)
+    Satisfaction: str
+    materialize: make
+
+  food_security_hfias:
+    index: (t, i)
+    HFIAS1: int
+    HFIAS2: int
+    HFIAS3: int
+    HFIAS4: int
+    HFIAS5: int
+    HFIAS6: int
+    HFIAS7: int
+    HFIAS8: int
+    HFIAS9: int
+    HFIAS_score: int
+    HFIAS_category:
+      - Food secure
+      - Mildly food insecure
+      - Moderately food insecure
+      - Severely food insecure
+    materialize: make
+
   cluster_features:
     index: (t, v)
     Region: str
     Rural: str
+
+  housing:
+    # TLSS dwelling module.  1999 (SSEC2) and 2007 (r1m7a/b/c) field a full
+    # structure+utilities block; 2009 (m6b) retained utilities only (the
+    # physical-structure block was dropped), so it contributes Water alone.
+    # 2003 (module6) is skipped: value labels are stripped in the repo .dta
+    # (codes only, no questionnaire in scope to decode them).
+    # 1999 omits Water (s2bq40 is distance-to-source in metres, not a source
+    # category) and Electricity (s2bq26 is hours/availability, not boolean).
+    index: (t, i)
+    Tenure: str
+    Walls: str
+    Roof: str
+    Floor: str
+    Rooms: int
+    Toilet: str
+    Water: str
+    Electricity: str
 
   household_roster:
     index: (t, i, pid)
@@ -14,6 +61,25 @@ Data Scheme:
     Generation: int
     Distance: int
     Affinity: str
+
+  individual_education:
+    index: (t, i, pid)
+    Educational Attainment: str
+
+  plot_features:
+    # Per-plot land roster from TLSS 2007 module 12a (only round with a
+    # usable plot roster).  Three subsections merged on a tenure-tagged
+    # plot_id: r1m12a1 (owned), r1m12a2 (rented_in), r1m12a3 (rented_out).
+    # Area is in sotka (1/100 ha); TenureSystem (legal title) is present for
+    # owned plots only.  See _/plot_features.py.
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    Tenure: str
+    TenureSystem: str
+    SoilType: str
+    Irrigated: bool
+    materialize: make
 
   sample:
     index: (i, t)

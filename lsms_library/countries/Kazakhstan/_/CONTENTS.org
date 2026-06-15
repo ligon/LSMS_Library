@@ -1,0 +1,51 @@
+#+TITLE: Kazakhstan — country notes & known data issues
+
+* assets — durable goods (2026-06-08, #342)
+Source: =KZ96HSG_PUF.dta= block =b37=, a WIDE durable-goods roster (16 items x
+4 attributes, one column per (item, attribute)):
+=b37_NN_1= "do you have?" (1/2), =b37_NN_2= "how many pieces?", =b37_NN_3= year
+acquired, =b37_NN_4= per-piece price.  The item label (=j=) is buried in the
+=b37_NN_1= variable label ("<item>: do you have?") — the columns themselves
+carry no usable label — so the wide block is unusable as-is; we recover the 16
+names from the variable labels and melt wide -> long.  Like =housing.py= the
+file is person-level but =b37= is constant within =rn= (household), so we
+=drop_duplicates= on =rn= first.  =Quantity= = pieces (missing-among-owned
+treated as 1, the modal value); =Value= = pieces x per-piece price.  Only items
+the household reports owning (=b37_NN_1 == 1=) are emitted.  Canonical index
+=(t, i, j)=, i = rn.  ~11k rows, 16 items, 1979 households.  Built via
+=1996/_/assets.py= (materialize: make).
+
+* Known data issues
+
+** interview_date — not available at household level (2026-06-06)
+The Kazakhstan 1996 survey carries no household-level interview-date field.
+A scan of the household/cover files (KAZ96CON, KZ96SMP_PUF, KZ96REL, ...)
+found no household date columns.  Temporal data exists only at the
+individual level (~dob~ in KZ96REL) and at the community level (KOMMU has
+survey dates ~a4day/a4mon/a4year~, but these are not household-linked).
+~interview_date~ is therefore not implementable from the available
+microdata.  Tracked in GitHub issue #341.
+
+* subjective_well_being (Cantril ladder) — 1996 (2026-06-06, #331)
+Source: KZ96OCC_PUF.dta (catalog F20, individual occupation file), variable
+~d_095_~ = "personal staircase identification" — a Cantril self-anchoring
+ladder with Stata value labels {1: 'lowest', 2..8 literal, 9: 'highest'},
+i.e. a 1-9 step scale, higher = better off (consistent with the Malawi
+anchor).  Only ~Own Step~ is asked (no Neighbors/Friends item).
+
+The OCC file is INDIVIDUAL level (rn = household, personnr = person).  The
+canonical table is household level (t, i), i = rn.  We reduce by taking the
+HOUSEHOLD HEAD's step: the roster (KZ96REL) has exactly one head per
+household (relhead == 1); 1992 of 1996 heads appear in OCC and 1983 give a
+non-missing step.  Households whose head did not answer are dropped.
+Built via ~1996/_/subjective_well_being.py~ (materialize: make).  Observed
+range 1-8 (no household head reported step 9).
+
+
+* shocks — not available (2026-06-07, verified)
+
+=shocks= (a household adverse-events-and-coping roster, index =(t, i, Shock)=)
+is an ISA/EHCVM-specific module.  Kazakhstan LSMS 1996 carries no such roster.  Verified
+this round by full variable-label inspection of the source =.dta= files:
+the only adverse-event content is community-level (=KOMMU= droughts/calamities, keyed by =oblast= not household) or livestock-loss stock-accounting (=AGR2= =w25=); no household-level shock roster with coping.  Not implementable from current data; revisit only if a coping roster
+is later identified.  Tracked in GitHub issue #352.

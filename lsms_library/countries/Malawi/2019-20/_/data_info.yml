@@ -23,6 +23,22 @@ sample:
         Region: region
         District: district
 
+interview_date:
+    file:
+        - Cross_Sectional/hh_mod_a_filt.dta
+        - Panel/hh_mod_a_filt_19.dta:
+            i: y4_hhid
+            int_t: interviewdate_v1
+    idxvars:
+        i:
+            - case_id
+            - function: cs_i
+    myvars:
+        # Cross_Sectional names the date column 'interviewDate'; the Panel
+        # file uses 'interviewdate_v1' (Visit 1), overridden per-file above.
+        # Both are 'YYYY-MM-DD' strings -> datetime via the Int_t coercion.
+        int_t: interviewDate
+
 cluster_features:
     dfs:
         - df_main
@@ -70,7 +86,50 @@ subjective_well_being:
         Neighbors Step: hh_t06
         Friends Step: hh_t07
 
-    
+food_security:
+    # FAO FIES 8-item battery, IHS5 (hh_t13..hh_t20 in FAO order).
+    # Recall period: last 12 months.  yes->True, no->False,
+    # DON'T KNOW/refused/NaN->NA (see _/mapping.py).
+    file: Cross_Sectional/HH_MOD_T.dta
+    idxvars:
+        i: case_id
+    myvars:
+        Worried:
+            - hh_t13
+            - mapping: fies_yesno
+        HealthyDiet:
+            - hh_t14
+            - mapping: fies_yesno
+        FewFoods:
+            - hh_t15
+            - mapping: fies_yesno
+        SkippedMeal:
+            - hh_t16
+            - mapping: fies_yesno
+        AteLess:
+            - hh_t17
+            - mapping: fies_yesno
+        RanOut:
+            - hh_t18
+            - mapping: fies_yesno
+        Hungry:
+            - hh_t19
+            - mapping: fies_yesno
+        WholeDay:
+            - hh_t20
+            - mapping: fies_yesno
+        FIES_score:
+            - hh_t13
+            - hh_t14
+            - hh_t15
+            - hh_t16
+            - hh_t17
+            - hh_t18
+            - hh_t19
+            - hh_t20
+            - mapping: fies_score
+
+
 household_roster:
     file:
         - Cross_Sectional/HH_MOD_B.dta

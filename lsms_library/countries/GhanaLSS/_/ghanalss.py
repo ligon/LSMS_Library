@@ -11,10 +11,18 @@ from collections import defaultdict
 
 def i(value):
     '''
-    Formatting household id
+    Formatting household id as "clust/nh".
+
+    Returns pd.NA when either component is missing (e.g. blank/trailing
+    rows in some source files such as g7sec9c), so such rows drop out of
+    the index rather than raising.
     '''
     if type(value) == pd.Series:
-        return tools.format_id(value.iloc[0])+'/'+tools.format_id(value.iloc[1],zeropadding=2)
+        clust = tools.format_id(value.iloc[0])
+        nh = tools.format_id(value.iloc[1], zeropadding=2)
+        if clust is None or nh is None:
+            return pd.NA
+        return clust + '/' + nh
     else:
         return tools.format_id(value)
 

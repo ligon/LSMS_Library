@@ -38,8 +38,18 @@ household_roster:
         Relationship: s1q3
         MonthsAway: s1q22
 
+interview_date:
+    file: PARTA/SEC0.dta
+    idxvars:
+        i: HID
+    myvars:
+        Int_t:
+            - ddate
+            - mdate
+            - ydate
+
 individual_education:
-    file: 
+    file:
         - PARTA/SEC2a.dta
     idxvars:
         v: clust
@@ -47,7 +57,98 @@ individual_education:
         pid: PID
     myvars:
         Educational Attainment: s2aq2
-        Current_grade: s2aq7
 
+plot_features:
+    # Section 8B (Agricultural land) -- clean per-plot roster, one row per
+    # (household, farm).  s8bq3 = "farm number" -> plot_id.  hid is already
+    # the clust/nh composite, matching household_roster's i (=HID here).
+    # Value labels are lowercase in this wave.  Section 10 is non-farm
+    # ENTERPRISES (entno), not plots.
+    file:
+        - PARTB/sec8b.dta
+    idxvars:
+        i: hid
+        plot_id: s8bq3
+    myvars:
+        Area: s8bq4a
+        AreaUnit:
+            # value labels are lowercase in this wave -> Title-case to match
+            # the other waves' AreaUnit vocabulary.
+            - s8bq4b
+            - mapping:
+                acres: Acres
+                poles: Poles
+                ropes: Ropes
+                plot: Plot
+                hectare: Hectare
+                other: Other
+        Tenure:
+            - s8bq8
+            - mapping:
+                bought: owned
+                rented for cash or in kind: rented_in
+                sharecropped by household: sharecropped_in
+                use free of charge: use_right
+                distributed by village/family: communal
+                inherited: inherited
 
-
+housing:
+    # GLSS6 Section 7 dwelling characteristics (PARTA/SEC7.dta).  Wall/Floor/
+    # Roof = Part F (s7fq1/2/3); Water = Part D q1a1; Toilet = Part D q16a;
+    # Rooms = Part A q2; Tenure = Part B q1 (holding agreement); Electricity =
+    # Part D q11 (main source of lighting -- GLSS6 has no separate power-source
+    # question).  All variables carry Title-case value labels in the .dta.
+    file:
+        - PARTA/SEC7.dta
+    idxvars:
+        i: HID
+    myvars:
+        Walls:
+            - s7fq1
+            - mapping:
+                Mud/Mud bricks/Earth: Mud/Earth
+                Wood: Wood
+                Metal sheet/slate/asbestos: Metal/Asbestos
+                Stone: Stone
+                Burnt bricks: Burnt Bricks
+                Cement blocks/concrete: Cement/Concrete
+                Landcrete: Landcrete
+                Bamboo: Bamboo
+                Palm leaves/Thatch(grass/Raffia): Thatch
+                Other: Other
+        Floor:
+            - s7fq2
+            - mapping:
+                Earth/Mud: Earth/Mud
+                Cement/Concrete: Cement/Concrete
+                Stone: Stone
+                Burnt brick: Burnt Bricks
+                Wood: Wood
+                Vinyl tiles: Vinyl Tiles
+                Ceramic/Porcelain/Granite/Marble tiles: Ceramic/Marble Tiles
+                Terrazzo/Terrazzo tiles: Terrazzo
+                Other: Other
+        Roof:
+            - s7fq3
+            - mapping:
+                Mud/Mud bricks/Earth: Mud/Earth
+                Wood: Wood
+                Metal sheet: Metal Sheet
+                Slate/Asbestos: Slate/Asbestos
+                Cement/Concrete: Cement/Concrete
+                Bamboo: Bamboo
+                Palm leaves/Thatch(grass/Raffia): Thatch
+                Roofing tile: Roofing Tiles
+                Other: Other
+        Water: s7dq1a1
+        Toilet: s7dq16a
+        Rooms: s7aq2
+        Tenure:
+            - s7bq1
+            - mapping:
+                Owning: Own
+                Renting: Rent
+                Rent-free: Rent-free
+                Perching: Perching
+                Squatting: Squatting
+        Electricity: s7dq11

@@ -41,18 +41,19 @@ independently since it uses the CLI materializer, but the legacy
 Makefile pipeline for food and other features is non-functional.
 
 * Known issues
-- Makefile :: Generic rule references =food_items.org= and =panama.py=
-  (copy-paste error from Panama).  Should reference =serbia.py= and
-  a to-be-created =food_items.org=.
+- Makefile :: FIXED (2026-06-08).  The generic rule's =panama.py=
+  prerequisite (copy-paste error from Panama) now reads =serbia.py=, and
+  =food_items.org= now exists.
 - =serbia.py= :: Nearly empty---imports deprecated =ligonlibrary= and
   =lsms.tools= but defines no functions.  Contrast with =cambodia.py=
   which at least defines =age_sex_composition()=.
 - No =categorical_mapping.org= :: No label harmonization for any
   variables.
-- Anti-pattern usage :: All wave-level scripts use =dvc.api.open()= and
-  =from ligonlibrary.dataframes import from_dta= instead of
-  =get_dataframe()=.  The =food_acquired.py= script additionally
-  imports =pyreadstat= directly.
+- Anti-pattern usage :: =other_features.py= / =household_characteristics.py=
+  still use =dvc.api.open()= and =from ligonlibrary.dataframes import
+  from_dta=.  =food_acquired.py= already uses =get_dataframe()=; its
+  stray =import pyreadstat= was removed (2026-06-08) when wiring
+  =food_items.org=.
 
 * Files in Serbia/_/
 ** DONE data_scheme.yml
@@ -60,31 +61,37 @@ Declares =household_roster= with index =(t, v, i, pid)= and columns
 =Sex=, =Age=, =Generation=, =Distance=, =Affinity=.  Does not declare
 =food_acquired=, =household_characteristics=, or =other_features=.
 
-** TODO food_items.org
-Not yet created.  This is the primary blocker for the food pipeline.
-The 2007 survey uses numeric food codes (=nsifra= in =m5_1_diary.dta=)
-that need mapping to human-readable labels.  With only one wave, the
-table would be simple.
+** DONE food_items.org (2026-06-08; FCT column scaffolded)
+Harmonizes the 100 food items of the 2007 diary (=m5_1_diary.dta=) into
+preferred labels.  Columns: =Preferred Label | proizvod | Serbian Label
+| FCT ID=.  =2007/_/food_acquired.py= keys on the numeric =proizvod=
+code (verified 100/100 coverage) rather than on =nsifra=: =nsifra= is
+the product *text*, stored in a legacy YUSCII transliteration in which
+='|'= encodes "đ" and cannot survive an org-mode pipe-delimited table.
+The =Serbian Label= column is the decoded =nsifra= (documentation only).
+The =FCT ID= column is a *scaffold* (blank) -- see "Food Conversion
+Table" below.
 
-The existing CONTENTS.org had a contradictory status (both DONE and
-TODO) for this item.  It is definitively missing from the directory.
-
-** TODO Food Conversion Table
-Not yet created.  Needed to convert food quantities into nutritional
-content.  The FAO Food Composition Tables for Eastern Europe may be a
-useful starting point.
+** TODO Food Conversion Table (FCT)
+Not yet wired.  No freely-downloadable, machine-readable Serbian FCT was
+obtained.  Candidate = Serbian Food and Nutrition Database (IMR
+Belgrade, EuroFIR-harmonized); access requires EuroFIR registration, no
+bulk download.  Fallback = EuroFIR Balkan regional FCT.  See the
+=food_items.org= "Food Conversion Table" section for source URLs and the
+remaining steps (obtain FCT CSV -> fill =FCT ID= column -> add
+=nutrition.py= cf. Panama/Guatemala).
 
 ** TODO nutrition.py
-Not yet implemented.  Blocked by missing =food_items.org= and Food
-Conversion Table.
+Not yet implemented.  Blocked by the missing FCT (above);
+=food_items.org= is now present.
 
-** TODO Makefile
-Currently broken.  The generic rule references =food_items.org= and
-=panama.py= (copy-paste from Panama).  Needs:
-1. Replace =panama.py= with =serbia.py= in the generic rule.
-2. Create =food_items.org= (or remove the dependency if not needed).
-3. Populate =serbia.py= with any country-specific helper functions, or
-   remove the dependency from the Makefile.
+** DONE Makefile (2026-06-08)
+The generic =%.parquet= rule's =panama.py= prerequisite (copy-paste from
+Panama) was replaced with =serbia.py= (which exists).  =food_items.org=
+now exists too, so that prerequisite resolves.  =serbia.py= remains a
+near-empty placeholder (no helper functions defined); the wave scripts
+do not import it, so the Makefile prerequisite is satisfied by file
+presence alone.
 
 ** DONE other_features.py
 CLOSED: [2023-07-24 Mon]
@@ -160,3 +167,12 @@ All wave-level scripts use =dvc.api.open()= and
 =get_dataframe()=.  The =food_acquired.py= script also imports
 =pyreadstat= directly.  These should be migrated to the standard
 =get_dataframe()= pattern per CLAUDE.md.
+
+
+* shocks — not available (2026-06-07, verified)
+
+=shocks= (a household adverse-events-and-coping roster, index =(t, i, Shock)=)
+is an ISA/EHCVM-specific module.  Serbia LSMS 2007 carries no such roster.  Verified
+this round by full variable-label inspection of the source =.dta= files:
+full inspection of all 445 household + 346 individual variables; the lone damage field (=mp20=) sits in the Kosovo-IDP module, not a shocks roster.  Not implementable from current data; revisit only if a coping roster
+is later identified.  Tracked in GitHub issue #352.

@@ -99,11 +99,16 @@ class TestParseDvcRemotes:
 class TestCheckRemoteAccess:
     @pytest.fixture(autouse=True)
     def _patch_creds_path(self, dvc_dir, monkeypatch):
-        """Redirect s3_creds_path() to the temp dvc_dir so the real
-        ~/.config/lsms_library/s3_creds doesn't leak into tests."""
+        """Redirect s3_creds_path() and s3_write_creds_path() into the
+        temp dvc_dir so the real ~/.config/lsms_library/{s3_creds,
+        s3_write_creds} don't leak into tests.  The write path uses a
+        distinct filename so the user-config vs legacy-.dvc fallback
+        tests stay independent."""
         import lsms_library.config as _cfg
         monkeypatch.setattr(_cfg, "s3_creds_path",
                             lambda: dvc_dir / "s3_creds")
+        monkeypatch.setattr(_cfg, "s3_write_creds_path",
+                            lambda: dvc_dir / "user_s3_write_creds")
 
     def test_s3_read_when_creds_exist(self, dvc_dir):
         from lsms_library.data_access import _check_remote_access
@@ -161,11 +166,24 @@ class TestCheckRemoteAccess:
         cfg = {"url": "s3://dvcbucket0/LSMS", "credentialpath": "s3_creds"}
         assert _check_remote_access("test_s3", cfg, dvc_dir) == "write"
 
-    def test_s3_write_via_write_creds_file(self, dvc_dir):
+    def test_s3_write_via_legacy_dvc_write_creds_file(self, dvc_dir):
+        """Legacy in-tree <dvc_dir>/s3_write_creds still grants write."""
         from lsms_library.data_access import _check_remote_access
 
         (dvc_dir / "s3_creds").write_text("[default]\naws_key=foo\n")
         (dvc_dir / "s3_write_creds").write_text("[default]\nkey=bar\n")
+        cfg = {"url": "s3://dvcbucket0/LSMS", "credentialpath": "s3_creds"}
+        assert _check_remote_access("test_s3", cfg, dvc_dir) == "write"
+
+    def test_s3_write_via_user_config_write_creds(self, dvc_dir):
+        """Preferred user-config s3_write_creds_path() grants write,
+        with no legacy <dvc_dir>/s3_write_creds present."""
+        from lsms_library.data_access import _check_remote_access
+
+        (dvc_dir / "s3_creds").write_text("[default]\naws_key=foo\n")
+        # Fixture patches s3_write_creds_path() -> dvc_dir/user_s3_write_creds
+        (dvc_dir / "user_s3_write_creds").write_text("[default]\nkey=bar\n")
+        assert not (dvc_dir / "s3_write_creds").exists()
         cfg = {"url": "s3://dvcbucket0/LSMS", "credentialpath": "s3_creds"}
         assert _check_remote_access("test_s3", cfg, dvc_dir) == "write"
 
@@ -299,11 +317,16 @@ class TestAutoUnlockS3:
 class TestPermissions:
     @pytest.fixture(autouse=True)
     def _patch_creds_path(self, dvc_dir, monkeypatch):
-        """Redirect s3_creds_path() to the temp dvc_dir so the real
-        ~/.config/lsms_library/s3_creds doesn't leak into tests."""
+        """Redirect s3_creds_path() and s3_write_creds_path() into the
+        temp dvc_dir so the real ~/.config/lsms_library/{s3_creds,
+        s3_write_creds} don't leak into tests.  The write path uses a
+        distinct filename so the user-config vs legacy-.dvc fallback
+        tests stay independent."""
         import lsms_library.config as _cfg
         monkeypatch.setattr(_cfg, "s3_creds_path",
                             lambda: dvc_dir / "s3_creds")
+        monkeypatch.setattr(_cfg, "s3_write_creds_path",
+                            lambda: dvc_dir / "user_s3_write_creds")
 
     def test_s3_read_without_wb_key(self, dvc_dir, monkeypatch):
         """RA scenario: S3 creds exist but no WB API key."""
@@ -396,6 +419,17 @@ class TestPermissions:
 
 
 class TestCanReadWrite:
+    @pytest.fixture(autouse=True)
+    def _patch_creds_path(self, dvc_dir, monkeypatch):
+        """Hermetic creds paths: without this, the real
+        ~/.config/lsms_library/s3_write_creds (populated on dev
+        machines) leaks in and flips can_write() to True."""
+        import lsms_library.config as _cfg
+        monkeypatch.setattr(_cfg, "s3_creds_path",
+                            lambda: dvc_dir / "s3_creds")
+        monkeypatch.setattr(_cfg, "s3_write_creds_path",
+                            lambda: dvc_dir / "user_s3_write_creds")
+
     def test_can_read_true(self, dvc_dir, monkeypatch):
         from lsms_library import data_access
 
@@ -484,6 +518,12 @@ class TestPushToCache:
         mock_result = MagicMock()
         mock_result.returncode = 0
         mock_result.stderr = ""
+        # Isolate from S3 writer-cred injection (covered separately); this
+        # test exercises the dvc add -> push sequence.
+        import contextlib
+        monkeypatch.setattr(data_access, "_s3_writer_credentialpath",
+                            lambda *a, **k: contextlib.nullcontext())
+
         with patch.object(data_access.subprocess, "run",
                           return_value=mock_result) as mock_run:
             assert data_access.push_to_cache("Foo/2020/Data/bar.dta") is True
@@ -509,6 +549,11 @@ class TestPushToCache:
         monkeypatch.setattr("lsms_library.config.microdata_api_key",
                             lambda: None)
 
+        # Isolate from S3 writer-cred injection (covered separately).
+        import contextlib
+        monkeypatch.setattr(data_access, "_s3_writer_credentialpath",
+                            lambda *a, **k: contextlib.nullcontext())
+
         mock_result = MagicMock()
         mock_result.returncode = 0
         with patch.object(data_access.subprocess, "run",
@@ -518,6 +563,70 @@ class TestPushToCache:
             # Only push, no add
             assert mock_run.call_count == 1
             assert "push" in mock_run.call_args_list[0][0][0]
+
+    def test_push_injects_s3_writer_credentialpath(
+            self, dvc_dir, tmp_path, monkeypatch):
+        """push_to_cache temporarily points credentialpath at the writer
+        creds for an S3 remote, then restores .dvc/config.local."""
+        from lsms_library import data_access
+
+        countries = dvc_dir.parent
+        data_dir = countries / "Foo" / "2020" / "Data"
+        data_dir.mkdir(parents=True)
+        (data_dir / "bar.dta").write_bytes(b"fake data")
+        (dvc_dir / "s3_creds").write_text("[default]\nkey=val\n")
+
+        writer = tmp_path / "s3_write_creds"
+        writer.write_text("[default]\naws_access_key_id = AK\n"
+                          "aws_secret_access_key = SK\n")
+        monkeypatch.setenv("LSMS_S3_WRITE_CREDS", str(writer))
+        monkeypatch.setenv("LSMS_S3_WRITE_KEY", "secret")  # _check_write_access
+
+        monkeypatch.setattr(data_access, "_COUNTRIES_DIR", countries)
+        monkeypatch.setattr("lsms_library.config.microdata_api_key",
+                            lambda: None)
+
+        mock_result = MagicMock()
+        mock_result.returncode = 0
+        mock_result.stderr = ""
+        with patch.object(data_access.subprocess, "run",
+                          return_value=mock_result) as mock_run:
+            assert data_access.push_to_cache(
+                "Foo/2020/Data/bar.dta",
+                remote="ligonresearch_s3", dvc_add=False) is True
+
+        cmds = [c[0][0] for c in mock_run.call_args_list]
+        modify = [c for c in cmds if "remote" in c and "modify" in c]
+        assert modify, f"expected a `dvc remote modify` call, got {cmds}"
+        assert "credentialpath" in modify[0]
+        assert str(writer) in modify[0]
+        # config.local was absent before and must be restored to absent.
+        assert not (dvc_dir / "config.local").exists()
+
+
+class TestUnpushedBlobs:
+    def test_parses_cloud_status_json(self, monkeypatch):
+        from lsms_library import data_access
+
+        result = MagicMock()
+        result.stdout = ('{"Uganda/2013-14/Data/x.dta.dvc": [{"new": "x"}], '
+                         '"Uganda/2015-16/Data/y.dta.dvc": [{"new": "y"}]}')
+        result.stderr = ""
+        monkeypatch.setattr(data_access, "_run_dvc_with_lock_retry",
+                            lambda *a, **k: result)
+        out = data_access.unpushed_blobs()
+        assert out == ["Uganda/2013-14/Data/x.dta.dvc",
+                       "Uganda/2015-16/Data/y.dta.dvc"]
+
+    def test_empty_when_in_sync(self, monkeypatch):
+        from lsms_library import data_access
+
+        result = MagicMock()
+        result.stdout = ""  # dvc prints nothing when the remote is in sync
+        result.stderr = ""
+        monkeypatch.setattr(data_access, "_run_dvc_with_lock_retry",
+                            lambda *a, **k: result)
+        assert data_access.unpushed_blobs() == []
 
 
 # ---------------------------------------------------------------------------

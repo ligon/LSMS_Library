@@ -35,11 +35,16 @@ cluster_features:
       District: district
 
 household_roster:
+  # i=hhcode matches sample().i (and interview_date/individual_education/housing,
+  # which read this same SECT01A.DTA with i:hhcode), so _join_v_from_sample
+  # resolves v.  The roster's old i:hh was the within-village household number,
+  # which did not match sample()'s i:hhcode and broke the v-join (GH #324).  v is
+  # NOT declared here -- the framework joins it from sample() (only
+  # cluster_features owns v; see CLAUDE.md).
   file:
       - ../Data/SECT01A.DTA
   idxvars:
-      v: village
-      i: hh
+      i: hhcode
       pid: idcode
   myvars:
       Sex: v01a02
@@ -47,11 +52,38 @@ household_roster:
       Relationship: v01a03
       MonthsSpent: v01a10
       Educational Attainment: v01a05
+individual_education:
+  file:
+      - ../Data/SECT01A.DTA
+  idxvars:
+      i: hhcode
+      pid: idcode
+      v: village
+  myvars:
+      Educational Attainment: v01a05
+
+housing:
+  file:
+      - ../Data/SECT03AB.DTA
+  idxvars:
+      i: hhcode
+  myvars:
+      Tenure: v03a01
+      Roof: v03a05
+      Floor: v03a06
+      Water: v03b01
+      Toilet: v03b09
+
 employment:
+  # i=hhcode matches sample().i (HHLIST.DTA uses i:hhcode), so
+  # _join_v_from_sample resolves v.  The old i:hh was the within-village
+  # household number, which did not match sample()'s i:hhcode and broke the
+  # v-join (sibling of the household_roster defect fixed in GH #324).  v is
+  # NOT declared here -- the framework joins it from sample().
   file:
       - ../Data/SECT02AD.DTA
   idxvars:
-      i: hh
+      i: hhcode
       pid: idcode
   myvars:
       Cash_per_day: v02b02

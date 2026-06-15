@@ -1,5 +1,64 @@
 #+title: Categorical Mappings — CotedIvoire
 
+* Food Units
+
+# 'Kg' is inherited from the global categorical_mapping/u.org (row-additive
+# merge), so it is not redeclared in the table below (GH #223 Layer 2 PoC).
+#+name: u
+| Original Label  | Preferred Label |
+|-----------------+-----------------|
+| Litre           | Litre           |
+| Unité           | Unité           |
+| Sachet          | Sachet          |
+| Paquet          | Paquet          |
+| Boite           | Boîte           |
+| Boîte de tomate | Boîte de tomate |
+| Bol             | Bol             |
+| Tas             | Tas             |
+| Boule           | Boule           |
+| Bouquet         | Bouquet         |
+| Bouteille       | Bouteille       |
+| Morceau         | Morceau         |
+| Panier          | Panier          |
+| Calebasse       | Calebasse       |
+| Régime          | Régime          |
+| Pot             | Pot             |
+| Gobelet         | Gobelet         |
+| Gousse          | Gousse          |
+| Louche          | Louche          |
+| Canette         | Canette         |
+| Cuvette         | Cuvette         |
+| Cuillière       | Cuillère        |
+| Seau            | Seau            |
+| Verre           | Verre           |
+| Papier          | Papier          |
+| Plaquette       | Plaquette       |
+| Feuille         | Feuille         |
+| Cope            | Cope            |
+| Bâtonnet        | Bâtonnet        |
+| Grain           | Grain           |
+| Yorouba         | Yorouba         |
+| Botte           | Botte           |
+| Tasse           | Tasse           |
+| Carton          | Carton          |
+| Tine            | Tine            |
+| Poignet         | Poignée         |
+| Casier          | Casier          |
+| Brochette       | Brochette       |
+| Bidon           | Bidon           |
+| Sac             | Sac             |
+| Sac (0,9 kg)    | Sac (0,9 Kg)    |
+| Sac (4 kg)      | Sac (4 Kg)      |
+| Sac (5 Kg)      | Sac (5 Kg)      |
+| Sac (11kg)      | Sac (11 Kg)     |
+| Sac (25 Kg)     | Sac (25 Kg)     |
+| Sac (50 Kg)     | Sac (50 Kg)     |
+| Avec os au Kg   | Avec os au Kg   |
+| Avec os au tas  | Avec os au tas  |
+| Sans os au Kg   | Sans os au Kg   |
+| Sans os au tas  | Sans os au tas  |
+| Filet au Kg     | Filet au Kg     |
+
 #+name: Roof
 | Alternate Spelling | Preferred Label |
 |--------------------+-----------------|

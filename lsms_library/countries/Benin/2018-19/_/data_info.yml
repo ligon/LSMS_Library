@@ -110,6 +110,84 @@ household_roster:
         - i
         - pid
 
+subjective_well_being:
+    # Section 20 'Pauvreté relative', item s20q05: self-placement on a
+    # 4-point relative-welfare ladder.  Mapped to canonical Own Step
+    # (higher = better off, consistent with Malawi/Cantril).
+    # 'Ne sait pas' / 'Refus' / NaN -> NaN (LADDER construct only).
+    file: s20_me_ben2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        Own Step:
+            - s20q05
+            - mapping:
+                Très pauvre: 1
+                Pauvre: 2
+                Moyen: 3
+                Riche: 4
+
+food_security:
+    # EHCVM Section 8A 'Sécurité alimentaire' — the FAO 8-item Food
+    # Insecurity Experience Scale (FIES), recall period = last 12 months
+    # ("12 derniers mois").  s08aq01..s08aq08 map IN ORDER to the 8
+    # canonical FIES items (q01=worried, q02=healthy/nutritious,
+    # q03=few foods, q04=skip meal, q05=ate less, q06=ran out,
+    # q07=hungry-not-eat, q08=whole day).  Values Oui->True, Non->False;
+    # "Ne sait pas"/"Refus"/NaN->NaN (full strings, verified in the .dta).
+    # The s08aq07a/s08aq08a frequency follow-ups are ignored.  FCS
+    # (#332) is intentionally out of scope.  FIES_score (count of True
+    # across the 8 items) is computed by mapping.food_security().
+    file: s08a_me_ben2018.dta
+    idxvars:
+        v: grappe
+        i:
+            - grappe
+            - menage
+    myvars:
+        Worried:
+            - s08aq01
+            - mapping:
+                Oui: True
+                Non: False
+        HealthyDiet:
+            - s08aq02
+            - mapping:
+                Oui: True
+                Non: False
+        FewFoods:
+            - s08aq03
+            - mapping:
+                Oui: True
+                Non: False
+        SkippedMeal:
+            - s08aq04
+            - mapping:
+                Oui: True
+                Non: False
+        AteLess:
+            - s08aq05
+            - mapping:
+                Oui: True
+                Non: False
+        RanOut:
+            - s08aq06
+            - mapping:
+                Oui: True
+                Non: False
+        Hungry:
+            - s08aq07
+            - mapping:
+                Oui: True
+                Non: False
+        WholeDay:
+            - s08aq08
+            - mapping:
+                Oui: True
+                Non: False
+
 food_acquired:
     file: s07b_me_ben2018.dta
     idxvars:

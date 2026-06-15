@@ -47,11 +47,14 @@ import configparser
 import json
 import logging
 import os
+import random
 import re
 import subprocess
 import tempfile
+import time
 import urllib.error
 import zipfile
+from contextlib import contextmanager
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -91,6 +94,57 @@ def _dvc_cmd() -> str:
     if venv_dvc.exists():
         return str(venv_dvc)
     return "dvc"
+
+
+# DVC serializes every repo operation on ``.dvc/tmp/lock``.  Concurrent
+# WRITERS therefore collide: multiple RAs running ``populate_and_push`` at
+# once, or a ``make -j`` materialize, fail with "Unable to acquire lock"
+# instead of queueing.  (The READ path does not hit this at all -- it warms
+# the cache via the direct-S3 bypass in ``local_tools._ensure_dvc_pulled``,
+# which never calls ``Repo.fetch`` and never takes the lock.  Concurrent
+# reads should always go through ``get_dataframe()`` / that bypass, NEVER a
+# raw ``dvc pull`` CLI, which would re-introduce the contention.)  This is
+# the cheap, in-process mitigation short of a full fetch/write queue (see
+# SkunkWorks/dvc_writer_distribution.org): retry the write CLI on lock
+# contention with exponential backoff + jitter so colliding writers serialize
+# gracefully rather than failing.
+_DVC_LOCK_MARKERS = (
+    "unable to acquire lock",
+    "lock is busy",
+    "failed to acquire lock",
+    "lockerror",
+)
+
+
+def _run_dvc_with_lock_retry(cmd, *, cwd, timeout, retries: int = 5,
+                             base_delay: float = 4.0) -> subprocess.CompletedProcess:
+    """Run a ``dvc`` CLI command, retrying only on DVC lock contention.
+
+    Returns the final :class:`subprocess.CompletedProcess`.  A non-zero exit
+    whose stderr does not look like lock contention is returned immediately
+    (no retry) so genuine errors surface fast.  ``subprocess.TimeoutExpired``
+    propagates to the caller's existing handler.
+
+    The retry targets the global ``.dvc/tmp/lock`` collision between
+    concurrent writers; backoff is exponential with uniform jitter to avoid a
+    thundering herd of writers waking together.
+    """
+    sub = cmd[1] if len(cmd) > 1 else "dvc"
+    result = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True,
+                            timeout=timeout)
+    for attempt in range(1, retries + 1):
+        if result.returncode == 0:
+            return result
+        stderr_lc = (result.stderr or "").lower()
+        if not any(m in stderr_lc for m in _DVC_LOCK_MARKERS):
+            return result  # genuine failure, not lock contention
+        delay = base_delay * (2 ** (attempt - 1)) + random.uniform(0, base_delay)
+        logger.warning("dvc %s: lock contention (attempt %d/%d); retrying in %.1fs",
+                       sub, attempt, retries, delay)
+        time.sleep(delay)
+        result = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True,
+                                timeout=timeout)
+    return result
 
 
 # Base64-obfuscated passphrase for s3_reader_creds.gpg.
@@ -145,7 +199,9 @@ def _check_remote_access(remote_name: str, remote_cfg: dict[str, str],
       paired with ``LSMS_S3_WRITE_KEY_ID`` for the access key id), or
     - ``AWS_ACCESS_KEY_ID`` / ``AWS_SECRET_ACCESS_KEY`` env vars
       (standard boto3 credentials), or
-    - A ``s3_write_creds`` file alongside ``s3_creds`` in the DVC dir.
+    - A ``s3_write_creds`` file at :func:`config.s3_write_creds_path`
+      (``~/.config/lsms_library/s3_write_creds``), or the legacy
+      in-tree ``<dvc_dir>/s3_write_creds`` fallback.
 
     Note: ``~/.aws/credentials`` is *not* checked for write access
     because there is no way to distinguish reader vs writer keys from
@@ -176,6 +232,12 @@ def _check_remote_access(remote_name: str, remote_cfg: dict[str, str],
             return "write"
         if (os.environ.get("AWS_ACCESS_KEY_ID")
                 and os.environ.get("AWS_SECRET_ACCESS_KEY")):
+            return "write"
+        # Prefer the user-writable location (mirrors s3_creds);
+        # fall back to the legacy in-tree .dvc/s3_write_creds for
+        # editable installs that predate the user-config layout.
+        user_write = config.s3_write_creds_path()
+        if user_write.exists() and user_write.stat().st_size > 0:
             return "write"
         write_creds = dvc_dir / "s3_write_creds"
         if write_creds.exists() and write_creds.stat().st_size > 0:
@@ -680,6 +742,115 @@ def _check_write_access(remote: str | None = None) -> bool:
     return True
 
 
+def _default_remote(dvc_dir: Path) -> str | None:
+    """Return the ``core.remote`` configured in ``.dvc/config``, or None."""
+    cfg = configparser.ConfigParser()
+    cfg.read(dvc_dir / "config")
+    if cfg.has_option("core", "remote"):
+        return cfg.get("core", "remote")
+    return None
+
+
+def _resolve_write_credentialpath(dvc_dir: Path) -> tuple[Path | None, bool]:
+    """Resolve a credentials file usable for *writing* to S3.
+
+    Mirrors the write-credential precedence documented on
+    :func:`_check_remote_access`:
+
+    1. ``s3_write_creds`` at :func:`config.s3_write_creds_path`
+       (``~/.config/lsms_library/s3_write_creds``), then the legacy
+       in-tree ``<dvc_dir>/s3_write_creds``;
+    2. env vars — ``LSMS_S3_WRITE_KEY_ID`` / ``LSMS_S3_WRITE_KEY`` (the
+       latter is the secret), or standard ``AWS_ACCESS_KEY_ID`` /
+       ``AWS_SECRET_ACCESS_KEY`` — synthesized into a temp INI file.
+
+    Returns ``(path, is_temp)``.  ``is_temp`` is True when a temporary
+    file was written from env vars and the caller must delete it.
+    Returns ``(None, False)`` when no write credentials are available.
+
+    A boto/INI credentials file is needed (rather than relying on env
+    vars at push time) because the DVC S3 remote pins ``credentialpath``
+    to the *reader* creds, and an explicit credentialpath wins over the
+    boto env-var chain — so a push silently authenticates as the reader
+    unless we point credentialpath at the writer file.
+    """
+    user_write = config.s3_write_creds_path()
+    if user_write.exists() and user_write.stat().st_size > 0:
+        return user_write, False
+    legacy = dvc_dir / "s3_write_creds"
+    if legacy.exists() and legacy.stat().st_size > 0:
+        return legacy, False
+
+    key_id = (os.environ.get("LSMS_S3_WRITE_KEY_ID")
+              or os.environ.get("AWS_ACCESS_KEY_ID"))
+    secret = (os.environ.get("LSMS_S3_WRITE_KEY")
+              or os.environ.get("AWS_SECRET_ACCESS_KEY"))
+    if key_id and secret:
+        tmp = tempfile.NamedTemporaryFile(
+            "w", suffix=".ini", prefix="lsms_s3_write_", delete=False)
+        tmp.write(f"[default]\naws_access_key_id = {key_id}\n"
+                  f"aws_secret_access_key = {secret}\n")
+        tmp.close()
+        return Path(tmp.name), True
+
+    return None, False
+
+
+@contextmanager
+def _s3_writer_credentialpath(remote: str | None, dvc_dir: Path):
+    """Temporarily point an S3 remote's ``credentialpath`` at the writer creds.
+
+    The DVC remote config pins ``credentialpath`` to the read-only
+    ``s3_creds``; ``dvc push`` therefore authenticates as the reader and
+    fails with ``AccessDenied`` even when writer credentials exist.  This
+    context manager resolves the writer creds (see
+    :func:`_resolve_write_credentialpath`) and applies them via a *local*
+    config override (``.dvc/config.local``, git-ignored) for the duration
+    of the block, snapshotting and fully restoring the prior state so the
+    committed ``.dvc/config`` is never touched.
+
+    No-op (yields normally) when the target remote is not an S3 remote or
+    no writer credentials are available — in which case the push proceeds
+    with whatever the existing config provides.
+    """
+    target = remote or _default_remote(dvc_dir)
+    remotes = _parse_dvc_remotes(dvc_dir)
+    cfg = remotes.get(target or "", {})
+    is_s3 = cfg.get("url", "").startswith("s3://")
+
+    write_path: Path | None = None
+    is_temp = False
+    if is_s3 and target:
+        write_path, is_temp = _resolve_write_credentialpath(dvc_dir)
+
+    if not write_path:
+        yield
+        return
+
+    config_local = dvc_dir / "config.local"
+    had_local = config_local.exists()
+    prior = config_local.read_text(encoding="utf-8") if had_local else None
+    try:
+        _run_dvc_with_lock_retry(
+            [_dvc_cmd(), "remote", "modify", "--local",
+             target, "credentialpath", str(write_path)],
+            cwd=str(dvc_dir.parent), timeout=60,
+        )
+        logger.info("Using S3 writer credentials for push to %r", target)
+        yield
+    finally:
+        # Restore .dvc/config.local to its exact prior state.
+        if prior is not None:
+            config_local.write_text(prior, encoding="utf-8")
+        elif config_local.exists():
+            config_local.unlink()
+        if is_temp:
+            try:
+                os.unlink(write_path)
+            except OSError:
+                pass
+
+
 def push_to_cache(path: str | Path,
                   remote: str | None = None,
                   dvc_add: bool = True) -> bool:
@@ -718,10 +889,9 @@ def push_to_cache(path: str | Path,
 
     try:
         if dvc_add:
-            result = subprocess.run(
+            result = _run_dvc_with_lock_retry(
                 [_dvc_cmd(), "add", str(abs_path)],
-                cwd=str(_COUNTRIES_DIR),
-                capture_output=True, text=True, timeout=600,
+                cwd=str(_COUNTRIES_DIR), timeout=600,
             )
             if result.returncode != 0:
                 logger.error("dvc add failed: %s", result.stderr.strip())
@@ -731,11 +901,11 @@ def push_to_cache(path: str | Path,
         push_cmd = [_dvc_cmd(), "push", str(abs_path) + ".dvc"]
         if remote:
             push_cmd.extend(["-r", remote])
-        result = subprocess.run(
-            push_cmd,
-            cwd=str(_COUNTRIES_DIR),
-            capture_output=True, text=True, timeout=600,
-        )
+        with _s3_writer_credentialpath(remote, _COUNTRIES_DIR / ".dvc"):
+            result = _run_dvc_with_lock_retry(
+                push_cmd,
+                cwd=str(_COUNTRIES_DIR), timeout=600,
+            )
         if result.returncode != 0:
             logger.error("dvc push failed: %s", result.stderr.strip())
             return False
@@ -800,10 +970,9 @@ def push_to_cache_batch(paths: list[str | Path],
         if dvc_add:
             add_cmd = [_dvc_cmd(), "add"] + [str(p) for p in abs_paths]
             logger.info("dvc add: %d files ...", len(abs_paths))
-            result = subprocess.run(
+            result = _run_dvc_with_lock_retry(
                 add_cmd,
                 cwd=str(_COUNTRIES_DIR),
-                capture_output=True, text=True,
                 timeout=600 + 30 * len(abs_paths),
             )
             if result.returncode != 0:
@@ -818,12 +987,12 @@ def push_to_cache_batch(paths: list[str | Path],
         if remote:
             push_cmd.extend(["-r", remote])
         logger.info("dvc push: %d files ...", len(abs_paths))
-        result = subprocess.run(
-            push_cmd,
-            cwd=str(_COUNTRIES_DIR),
-            capture_output=True, text=True,
-            timeout=600 + 60 * len(abs_paths),
-        )
+        with _s3_writer_credentialpath(remote, _COUNTRIES_DIR / ".dvc"):
+            result = _run_dvc_with_lock_retry(
+                push_cmd,
+                cwd=str(_COUNTRIES_DIR),
+                timeout=600 + 60 * len(abs_paths),
+            )
         if result.returncode != 0:
             logger.error("dvc push (batch) failed: %s",
                          result.stderr.strip())
@@ -836,6 +1005,53 @@ def push_to_cache_batch(paths: list[str | Path],
         # bugs (TypeError, etc.) propagate.
         logger.error("push_to_cache_batch error: %s", exc)
         return []
+
+
+def unpushed_blobs(remote: str | None = None,
+                   targets: list[str | Path] | None = None) -> list[str]:
+    """Return DVC-tracked paths whose blobs are missing from the remote.
+
+    Wraps ``dvc status --cloud`` (read-only; needs remote *read* access).
+    Catches the "``dvc add``ed locally but never ``dvc push``ed" trap,
+    where a ``.dvc`` pointer is committed but the blob never reached the
+    shared cache — invisible until a build needs the file and fails with
+    "No storage files available".
+
+    Parameters
+    ----------
+    remote : str, optional
+        Remote to compare against (defaults to ``core.remote``).
+    targets : list of str or Path, optional
+        Specific paths (relative to the countries dir, e.g.
+        ``Uganda/2013-14/Data/foo.dta``) to check; defaults to the whole
+        repository.
+
+    Returns
+    -------
+    list[str]
+        Sorted paths that are out of sync with the remote (need a push).
+        Empty when everything tracked is already on the remote.
+    """
+    cmd = [_dvc_cmd(), "status", "--cloud", "--json"]
+    if remote:
+        cmd += ["-r", remote]
+    if targets:
+        cmd += [str(t) for t in targets]
+    result = _run_dvc_with_lock_retry(
+        cmd, cwd=str(_COUNTRIES_DIR), timeout=600,
+    )
+    out = (result.stdout or "").strip()
+    if not out:
+        return []
+    try:
+        data = json.loads(out)
+    except json.JSONDecodeError:
+        logger.warning("Could not parse `dvc status --cloud` output: %s",
+                       (result.stderr or out)[:200])
+        return []
+    if isinstance(data, dict):
+        return sorted(data.keys())
+    return []
 
 
 def populate_and_push(country: str, wave: str,

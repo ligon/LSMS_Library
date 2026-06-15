@@ -1,0 +1,337 @@
+#+TITLE: Cross-Country plot_features Implementation Workflow (GH #167)
+#+AUTHOR: Sue (Claude Opus 4.8) + Ethan Ligon
+#+DATE: 2026-06-03
+
+* Purpose
+
+Uganda landed as the Phase-1 pilot (PR #280, all 8 UNPS waves, 42,841
+plot records).  This doc is the *repeatable workflow* for rolling
+~plot_features~ out to the remaining 12 LSMS-ISA countries named in GH
+#167.  It exists so that (a) the design is reviewable before any
+implementation agent is dispatched, and (b) every per-country
+implementation shares one canonical reference instead of 12 divergent
+prompt copies.
+
+The governing principle (scrum-master skill): *delegate the search and
+the mechanical implementation; keep the schema/vocabulary synthesis.*
+The shape of a per-country implementation is identical; the *content*
+(source files, column names, unit conventions, code vocabularies)
+varies and must be discovered, not guessed.
+
+* The Uganda pattern (what every country reproduces)
+
+Five artifacts per country, all under ~lsms_library/countries/<C>/~:
+
+1. *Per-wave extraction script* ~<C>/<wave>/_/plot_features.py~ — loads
+   the wave's agricultural-module source file(s) with
+   ~get_dataframe(..., convert_categoricals=False)~, defines a per-wave
+   column-name map (~colmap~), calls the country helper, asserts a
+   unique ~(t,i,plot_id)~ index and >0 rows, writes ~plot_features.parquet~.
+2. *Shared per-wave harmonizer* ~<C>/_/<country>.py:plot_features_for_wave~
+   — the harmonization logic: area→hectares, raw codes→canonical
+   vocab via ~categorical_mapping.org~ tables, builds the canonical
+   ~(t,i,plot_id)~ frame with columns Area, AreaUnit, Tenure,
+   TenureSystem, SoilType, Irrigated.
+3. *Country-level concatenator* ~<C>/_/plot_features.py~ — concat the
+   per-wave parquets, ~id_walk~ to the panel canonical id scheme, write
+   ~var/plot_features.parquet~.
+4. *Categorical tables* appended to ~<C>/_/categorical_mapping.org~:
+   ~harmonize_tenure_system~, ~harmonize_soil~, ~harmonize_water~,
+   ~harmonize_acquire~ (names/values are country-specific).
+5. *data_scheme.yml* gains a ~plot_features:~ block declaring index
+   ~(t, i, plot_id)~ and a country note.
+
+Note: ~plot_features~, ~food_expenditures~ etc. are auto-surfaced; the
+table is NOT a "derived" table — it has real wave-level scripts, so it
+*is* declared in ~data_scheme.yml~ (unlike the auto-derived food/roster
+tables).
+
+Reference implementation to read before writing any prompt:
+- ~lsms_library/countries/Uganda/2013-14/_/plot_features.py~ (richest wave)
+- ~lsms_library/countries/Uganda/_/uganda.py:551~ (~plot_features_for_wave~)
+- ~lsms_library/countries/Uganda/_/plot_features.py~ (concatenator)
+- ~lsms_library/data_info.yml:103~ (canonical Columns + spellings)
+
+* Country clustering (drives the dispatch plan)
+
+Confirmed 2026-06-03: 11/12 targets already have ~data_scheme.yml~
+(none declare plot_features yet); GhanaSPS has none.
+
+| Cluster        | Countries                                                   | Shared questionnaire?            | Recipes needed |
+|----------------+-------------------------------------------------------------+----------------------------------+----------------|
+| EHCVM          | Mali, Niger, Senegal, Burkina_Faso, Benin, Togo, Guinea-Bissau | YES — EHCVM 2018-19 common module | 1 → 7 impls    |
+| Bespoke ISA    | Ethiopia, Malawi, Nigeria, Tanzania                         | NO — each its own ag module      | 4 recipes      |
+| Bootstrap      | GhanaSPS                                                    | needs data_scheme.yml first      | separate track |
+
+The EHCVM cluster is the high-leverage win: one reconnaissance pass
+produces a single recipe (same ~s*q*~ variable names, same area-unit
+conventions, same code lists) that 7 implementations share, differing
+only by country directory and panel-id specifics.  Do EHCVM recon
+*once*, review *once*, then fan out 7 near-identical implementations.
+
+Tanzania (multi-round ~2008-15/~ folders) and Nigeria/Ethiopia
+(post-planting/post-harvest, multiple rounds per wave dir) are the
+script-path complications — see CLAUDE.md "Two Build Paths" and the
+~pp-ph~ / ~multi-round-waves~ skills.  Expect these to need
+~materialize: make~ wave scripts, not the simple YAML path.
+
+* Adversarial verification (cross-cutting — gates every phase)
+
+Plausible-but-wrong is the dominant failure mode here: a recon agent
+names the wrong area column, a harmonize_* table omits a code so rows
+silently go NaN, a unit factor is inverted.  None of these throw — they
+produce a table that builds clean and is quietly corrupt.  So every
+phase is paired with an independent skeptic whose mandate is to REFUTE,
+defaulting to "something is wrong; prove it."
+
+- *A.0 Pilot audit (done 2026-06-03)*: adversarial auditor poking the
+  landed Uganda data BEFORE the pattern is cloned 11×.  Attack list:
+  silent unmapped-code drops (the prime suspect behind 56% SoilType
+  NaN), area-conversion direction/sanity, household-id orphans vs
+  sample(), silent row loss, plot_id collisions masked by the _A/_B
+  suffix, tenure-default content-emptiness, wave×column populated
+  matrix.  Findings feed back into the canonical pattern before fan-out.
+- *A.5 Recipe refutation*: as each recon recipe lands, one independent
+  verifier tries to refute its load-bearing claims — "is THIS really the
+  lasting-attributes file?", "does THIS column mean area?", "is the unit
+  factor right and right-way-round?", "do these codes cover the data?".
+  A recipe a skeptic cannot break feeds implementation; one it breaks
+  goes back to recon with the specific gap.  Diversity over redundancy:
+  the verifier re-derives the key facts independently rather than
+  re-reading the recon agent's notes.
+- *C.5 Post-build audit*: after each country's implementation, run the
+  Uganda A.0 attack list against that country's output (unmapped-code
+  drops, area sanity, orphan rate, populated matrix) before its PR is
+  considered landable.  This is the per-country generalization of A.0.
+
+These are read-only and never edit source; they report quantified
+findings (every claim carries a number).  The scrum master arbitrates —
+a skeptic's finding is a hypothesis to confirm, not an auto-revert.
+
+* The workflow: four phases
+
+** Phase A — Reconnaissance (DELEGATE, parallel, read-only)
+
+One agent per *recipe* (so: 1 EHCVM + 4 bespoke = 5 recon agents;
+GhanaSPS deferred).  Each agent investigates the country's ag module
+and returns a structured *extraction recipe* — data, not code.
+
+Recipe schema (the agent's required output):
+- Source file(s) per wave holding *lasting* parcel attributes
+  (ownership, area, soil, water/irrigation, tenure system).
+- ~colmap~ per wave: which raw column → which canonical field
+  (hhid, parcel_id, area_gps, area_est, tenure_system, acquire,
+  soil_type, water_source).
+- Area unit(s) and the hectare conversion factor(s).
+- Raw code → canonical label tables for tenure_system / soil / water /
+  acquire (the values that will seed the harmonize_* org tables).
+- The household-id quirk: which column matches ~sample().i~ vs. an
+  internal section index (Uganda's ~HHID~ trap — see 2013-14 colmap note).
+- plot_id construction rule (Uganda = parcelID + '_A'/'_B' for the two
+  source files; other countries may have a single parcel roster).
+- Wave list + rough row-count estimate per wave.
+- Whether GPS is decimal-degree (emit Latitude/Longitude) or absent/
+  non-standard (defer, like Uganda).
+- Build-path verdict: simple YAML-equivalent vs. needs ~materialize:make~
+  script (multi-round / pp-ph).
+
+Recon agents do NOT write code and do NOT edit any file.  Output is a
+markdown recipe block appended to a per-country section of a shared
+~slurm_logs/RECON_plot_features_<cluster>_<date>.md~.
+
+Dispatch mode: ~Explore~ / general-purpose agents, ~run_in_background~,
+all in one message (scatter-gather).  Read-only, so the shared checkout
+and DVC cache are safe to share.
+
+** Phase B — Schema & vocabulary synthesis (KEEP — scrum master)
+
+Review the 5 recipes.  This is the judgment work that ties downstream
+tests to the schema:
+- Reconcile each country's tenure / tenure-system / soil vocabularies
+  against the canonical ~spellings~ lists in ~data_info.yml~.  *Extend*
+  the canonical lists (e.g. add a country's customary regime) rather
+  than force-fitting to a foreign label — the canonical block already
+  invites this for TenureSystem.
+- Decide area-unit conversions; confirm hectare is the canonical Area.
+- Decide GPS per country (emit vs. defer).
+- Resolve any cross-country label collisions before they reach tests.
+- Approve each recipe (or send it back to recon with specific gaps).
+
+Output: the approved recipes become the shared design artifacts the
+implementation agents reference.  Any canonical ~data_info.yml~ spelling
+extensions are made by the scrum master directly (one small commit on
+the integration branch), since they affect the cross-country schema.
+
+** Phase C — Implementation (DELEGATE, worktree-isolated, one agent per country)
+
+One agent per country (7 EHCVM + 4 bespoke).  Each writes the five
+artifacts for its country against the *approved recipe*, builds,
+verifies, and leaves a committed branch.  The prompt is a tight
+implementation brief that *references* the recipe — it does not embed
+the design.
+
+Critical repo-specific dispatch rules (from CLAUDE.md + scrum-master skill):
+- *Worktree base discipline*: put the self-reset block at the top of
+  every worker prompt —
+  : git -C "$(pwd)" fetch origin <integration-branch>
+  : git -C "$(pwd)" reset --hard origin/<integration-branch>
+  : git -C "$(pwd)" log -1 --oneline
+  Multi-agent dispatches have been observed landing on stale ~master~.
+- *.pth-pinned imports*: the main venv's ~lsms_library.pth~ hardcodes the
+  *main* checkout path, so ~import lsms_library~ inside a worktree runs
+  main-checkout code regardless of PYTHONPATH.  A worker that rebuilds
+  to verify is silently testing the wrong tree.  Mitigation: have each
+  worktree agent build a fresh venv (~python -m venv && poetry install~)
+  OR verify by static diff only.  Prefer fresh-venv for plot_features
+  because the verification (row counts, schema) genuinely needs to run
+  the worktree's code.
+- *DVC cache is shared* across agents at ~~/.local/share/lsms_library/~ —
+  concurrent agents building *different* countries do not conflict.
+- *Stop-list* (every worker prompt): do NOT touch ~data_info.yml~
+  canonical block (scrum master owns schema), any file matching
+  baseline/golden/expected/snapshot, ~pyproject.toml~/lockfiles, or any
+  other country.  Do NOT weaken/skip tests.  STOP + report if the task
+  seems to need any of these.
+- *Mandatory report format*: lead with "SCOPE DEVIATIONS" (files
+  touched outside the country dir); then commit SHA + branch,
+  verification output (one line per command incl. row count +
+  ~plot_features()~ shape), surprises, worktree path.
+- *Trust but verify*: after each worker, run ~git status~ on the *main*
+  checkout and ~git -C <worktree> status~ — catch silent main-checkout
+  edits regardless of the self-report.
+
+Verification each agent must run (in its own venv):
+: Country('<C>').plot_features()   # shape, index names, wave coverage, NaN frac
+
+** Phase D — Cross-country verification (KEEP + delegate the compute)
+
+After implementations land on the integration branch:
+- ~Feature('plot_features')()~ across all done countries — confirm the
+  ~country~ index level prepends and the union schema is consistent.
+- Run ~tests/test_schema_consistency.py~ + ~tests/test_feature.py~
+  (the ~test_column_table_has_countries~ guard now passes for
+  plot_features since ≥1 country declares it).
+- Sanity checks: Area in plausible hectare range per country, no
+  duplicate ~(country, t, i, plot_id)~, per-country NaN-fraction table.
+- Delegate the full ~--rebuild-caches~ pytest run to a Slurm job with a
+  Monitor filter (deterministic process; one-way log stream).
+
+* Branch / PR strategy
+
+- Cut an integration branch ~feature/plot-features-167~ off
+  ~development~.  Each country implementation is its own PR *based on
+  the integration branch* (or merged into it), so countries land
+  independently and a broken country doesn't block the rest.
+- Merge order: EHCVM cluster first (highest leverage, lowest per-country
+  risk once the shared recipe is approved), then the 4 bespoke ISA
+  countries, then GhanaSPS bootstrap.
+- Final integration → ~development~ → ~master~ when coverage is complete
+  and ~Feature('plot_features')()~ is green cross-country.
+
+* Execution checklist (when the human green-lights)
+
+1. [ ] Land Uganda PR #280 → development.
+2. [ ] Cut ~feature/plot-features-167~ off development.
+3. [ ] Phase A: dispatch 5 recon agents (1 EHCVM + Ethiopia, Malawi,
+       Nigeria, Tanzania), read-only, background.  Write recipes to
+       ~slurm_logs/RECON_plot_features_*.md~.
+4. [ ] Phase B: review + approve recipes; extend canonical spellings.
+5. [ ] Phase C: dispatch implementation agents (EHCVM ×7 share a recipe;
+       4 bespoke each own one), worktree-isolated, fresh venv each.
+6. [ ] Phase D: cross-country Feature() + schema tests + Slurm rebuild.
+7. [ ] GhanaSPS bootstrap as a separate track (needs data_scheme.yml).
+
+* Mandatory references for Phase C agents (added 2026-06-03)
+
+Every implementation agent prompt MUST instruct the agent to:
+
+1. *Consult the local add-feature skill* — read
+   ~.claude/skills/add-feature/SKILL.md~ and, for the pp/ph & multi-round
+   countries (Nigeria, Ethiopia, Tanzania, and Malawi's XS+Panel merge),
+   ~.claude/skills/add-feature/pp-ph/SKILL.md~.  This is the canonical
+   procedure; the Uganda files are the *reference implementation* it
+   points to, not a substitute for the skill.
+2. *Read ~{Country}/_/CONTENTS.org~ FIRST* (the skill mandates this) plus
+   the wave-level ~.org~ files — they carry hard-won data quirks.
+3. *Write blockers back to ~{Country}/_/CONTENTS.org~* — per the human's
+   2026-06-03 directive, anything unusual or blocking found while
+   building a country goes under a ~plot_features (GH #167)~ heading in
+   that country's CONTENTS.org, as part of the implementation commit.
+   (Read-only recon/refute agents instead return findings; the
+   coordinator records them — avoids concurrent writes to shared source.)
+4. *Verify with ~is_this_feature_sane()~* from ~lsms_library.diagnostics~
+   (13 checks; "not done until ~report.ok~ is True") AND
+   ~Feature('plot_features')(['<C>','Uganda'])~ for cross-country schema
+   parity.
+5. *Cross-check against the WB LSMS-ISA harmonised reference code* at
+   ~/var/tmp/lsms-isa-harmonised/reproduction/.../Cleaning_code/~ for file
+   names / variable names / ID-linkage logic (treat skeptically; verify
+   against data).  Would have caught Ethiopia's ~holder_id~ join key.
+6. *Copy the reference config*: EHCVM → Mali 2018-19; ESS → Ethiopia
+   2018-19; NPS/GHS/IHS/UNPS → Uganda or Malawi.
+7. *EHCVM household id*: emit the composite ~i: [grappe, menage]~ and let
+   the framework build the concatenated/zero-padded ~i~ — do NOT hand-pad
+   (the refuter showed a naive builder silently drops ~16% of Burkina
+   households where menage > 999).
+
+* Per-country recon corrections from adversarial refutation (2026-06-03)
+
+Recon recipes live in ~slurm_logs/2026-06-03_session/RECON_*.md~.  EVERY
+recipe had load-bearing errors caught by its refuter — recon proposes,
+refuter disposes.  Corrections that MUST fold into implementation:
+
+- *Uganda (pilot, already landed)*: acquire→Tenure mapping is wave-blind
+  (~85% wrong in 2005-06, 2A always 'owned').  Fix = wave-key the map
+  ((wave,File,Code)), NaN (not silent default) for unmapped, preserve 2A
+  detail, extend Tenure spellings via categorical_mapping.org with
+  use-rights / squatted values (human decision 2026-06-03).  Also: area
+  plausibility clamp/flag; document the 2018-19 21%-coverage cliff.
+- *Ethiopia*: (1) join sect3⋈sect2 must include ~holder_id~ in the key
+  (else +265..+1567 phantom rows/wave; plot_id collides) → plot_id =
+  holder_id+parcel_id+field_id.  (2) GPS is 100% "**CONFIDENTIAL**" →
+  DEFER Lat/Lon (recon's "first GPS country" was false).  (3) W2/W3
+  sample key is ~household_id2~ (recon was right; the REFUTER's "use
+  household_id" was a FALSE POSITIVE — it compared raw ids without
+  id_walk.  Ground truth: ethiopia.py panel chain + 2013-14 sample.py /
+  food_acquired all use household_id2; implementer verified household_id2
+  → 0.7% orphan and overrode the bad instruction.  Confirmed in PR #283).
+  (4) W1 tenure codes 10/11/12 uncovered; W1 area-unit 7='Other'.
+  (5) TenureSystem all-NaN (ESS has no analogue) → declare
+  ~optional: true~ in data_scheme.yml (a real, widely-used schema flag).
+- *EHCVM*: (1) TOGO IS FEASIBLE — module is in ~Togo/2018/Data1/~
+  (s16a_me_tgo2018.dta, 9557 rows); back in scope → 7 EHCVM countries,
+  ~91,500 rows.  (2) emit ~i:[grappe,menage]~ composite, verify orphans
+  on Burkina/Mali/Niger-2021 not Senegal.  Semantics/codes/hectares all
+  confirmed sound.
+- *Tanzania*: only 2019-20 & 2020-21 buildable (~8.5k rows); 2008-15 has
+  no ag source on disk (defer).  GPS redacted (defer).  Verify 2020-21
+  SEC_02 ~plot_id~ vs SEC_3A ~plotnum~ merge keys.
+- *Nigeria*: PP-only, single t=PP-quarter.  Tenure codes evolve per wave
+  → wave-key the map (same lesson as Uganda).  W4 area=s11aq4aa (not
+  s11aq4a=GPS-flag); W5 fully renumbered (s11b1q39≠irrigation,
+  s11b1q44≠soil — use s11b1q56/q61).  Non-standard area units → GPS only.
+- *Malawi*: 2004-05 deferred (no plot roster).  2016-17 XS ag_mod_d.dta
+  has a latin-1 byte (UnicodeDecodeError) — needs encoding override.
+  Tenure var switches ag_d03 (labeled, 2010-14) → ag_d02 (unlabeled
+  codes, 2016-20; need questionnaire).  (Refuters for Nigeria/Malawi
+  still running 2026-06-03 — confirm before implementing.)
+
+* Revised scope (2026-06-03)
+
+11 implementable countries (Togo restored): EHCVM ×7 (Mali, Niger,
+Senegal, Burkina_Faso, Benin, Togo, Guinea-Bissau) + Ethiopia, Malawi,
+Nigeria, Tanzania.  Deferred: GhanaSPS (no data_scheme.yml); pre-EHCVM
+waves (Niger 2011-12/2014-15, Mali 2014-15/2017-18, Burkina 2014);
+Tanzania 2008-15; Malawi 2004-05.  Gated behind the Uganda Tenure fix.
+
+* Open questions for the human
+
+- Integration branch name / merge cadence: one big PR per cluster, or
+  one PR per country?  (Recommend per-country for reviewability.)
+- GhanaSPS: in scope for this push or deferred?  It needs a full
+  ~data_scheme.yml~ bootstrap first — different shape of task.
+- ~plot_cultivation~ (per-season detail) is explicitly out of scope for
+  plot_features; is it a planned follow-on issue worth filing now?
+- The ~DESIGN_erhs_plot_features_2026-05-20.org~ referenced in
+  ~data_info.yml:107~ does not exist in-tree — dangling reference to
+  clean up or a doc that was never committed.

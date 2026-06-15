@@ -1,0 +1,23 @@
+#+TITLE: Liberia — country notes & known data issues
+
+* Survey identity
+Liberia 2018-19 is the **National Household Forest Survey (NHFS) 2018-2019**
+(LISGIS), a forest-livelihoods instrument — not a standard LSMS/HIES dwelling
+survey. Confirmed from the WB DDI (catalog 3787) and the household
+questionnaire (`liberia_hh_forestry_qx_final.pdf`).
+
+* Known data issues
+
+** housing — not available (2026-06-06)
+The NHFS questionnaire's 21-section table of contents has **no dwelling/housing
+module**. The two plausibly-named sections are not dwelling characteristics:
+- §18 "Household Access" = travel times to facilities (not physical attributes);
+- §19 "Forests and Construction" = whether *forest/wild products* were used for
+  construction (not roof/wall/floor materials).
+A full-text scan of the questionnaire and a data-level sweep of all 27 section
+files returned **zero** roof/wall/floor/toilet/water-source/electricity/rooms/
+dwelling-tenure variables. `housing` is therefore not implementable for Liberia.
+Tracked in GitHub issue #350.
+
+(Note: the NHFS *does* carry §17 Shocks and §10 Land Parcels, so `shocks` and
+`plot_features` remain implementable for Liberia — handled in their own batches.)

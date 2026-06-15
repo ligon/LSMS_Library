@@ -155,14 +155,21 @@ Waves = {'2008-15': ('upd4_hh_a.dta', ['r_hhid', 'round', 'UPHI'], map_08_15),
 waves = ['2008-09', '2010-11', '2012-13', '2014-15', '2019-20', '2020-21']
 wave_folder_map = {'2008-09':'2008-15', '2010-11':'2008-15', '2012-13':'2008-15', '2014-15':'2008-15', '2019-20':'2019-20', '2020-21':'2020-21'}
 
-def harmonized_food_labels(fn='../../_/food_items.org'):
-    # Harmonized food labels
-    food_items = pd.read_csv(fn,delimiter='|',skipinitialspace=True,converters={1:int,2:lambda s: s.strip()})
-    food_items.columns = [s.strip() for s in food_items.columns]
-    food_items = food_items[['Code','Preferred Label']].dropna()
-    food_items = food_items.set_index('Code')
-
-    return food_items.to_dict()['Preferred Label']
+def harmonized_food_labels(fn='../../_/categorical_mapping.org', name='harmonize_food'):
+    # Harmonized food labels.  Reads the canonical harmonize_food table
+    # (migrated from the retired food_items.org -- Unit #0 shared label
+    # foundation).  Returns a {raw per-wave survey label -> Preferred Label}
+    # dict by stacking every per-wave code column, so a raw food_acquired
+    # (j) label resolves to its canonical Preferred Label regardless of wave.
+    from lsms_library.local_tools import df_from_orgfile
+    hf = df_from_orgfile(fn, name=name)
+    wave_cols = [c for c in hf.columns if c not in ('Code', 'Preferred Label', 'FTC Label')]
+    out = {}
+    for col in wave_cols:
+        for raw, pref in zip(hf[col], hf['Preferred Label']):
+            if isinstance(raw, str) and raw.strip():
+                out[raw.strip()] = pref
+    return out
     
 
 def _sum_expenditures_from_file(fn, purchased, away, produced, given, itmcd, HHID,
@@ -278,7 +285,7 @@ def _household_roster_from_file(fn, sex='sex', age='age', HHID='HHID',
 
 def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market',farmgate='farmgate'):
 
-    food_items = harmonized_food_labels(fn='../../_/food_items.org')
+    food_items = harmonized_food_labels()
 
     df = get_dataframe(fn, convert_categoricals=True)
 
@@ -311,7 +318,7 @@ def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market'
     return prices
 
 def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,item='item',HHID='HHID'):
-    food_items = harmonized_food_labels(fn='../../_/food_items.org')
+    food_items = harmonized_food_labels()
 
     expenditures = _sum_expenditures_from_file(fn, purchased, away, produced, given,
                                                 itmcd=item, HHID=HHID, itemlabels=food_items)
@@ -323,7 +330,7 @@ def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,it
 
 def food_quantities(fn='',item='item',HHID='HHID',
                     purchased=None,away=None,produced=None,given=None,units=None):
-    food_items = harmonized_food_labels(fn='../../_/food_items.org')
+    food_items = harmonized_food_labels()
 
     quantities = _sum_expenditures_from_file(fn, purchased, away, produced, given,
                                               itmcd=item, HHID=HHID, units=units,
@@ -525,6 +532,18 @@ def food_acquired_to_canonical(df):
     work = work.rename(columns={'j': 'i_canon', 'i': 'j_canon'})
     work = work.rename(columns={'i_canon': 'i', 'j_canon': 'j'})
 
+    # Route the canonical item axis (j) through harmonize_food so it carries
+    # the shared Preferred Label rather than the raw UPPERCASE survey label
+    # (GH #443).  This is the SAME {raw label -> Preferred Label} resolver
+    # used by prices_and_units / food_expenditures / food_quantities and by
+    # crop_production, so food_acquired.j now joins crop_production.j.  Items
+    # with no harmonize_food entry keep their raw label (no fabrication); the
+    # row count is unchanged -- only the j *labels* change.
+    _food_labels = harmonized_food_labels()
+    _jcol = work['j'].astype('object')
+    work['j'] = _jcol.map(lambda s: _food_labels.get(s.strip(), s)
+                          if isinstance(s, str) else s)
+
     def _make(source_label, quant_col, unit_col, value_col=None):
         out = pd.DataFrame({
             't': work['t'].values,
@@ -545,17 +564,13 @@ def food_acquired_to_canonical(df):
     produced  = _make('produced',  'quant_own',      'unit_own')
     inkind    = _make('inkind',    'quant_inkind',   'unit_inkind')
 
-    out = pd.concat([purchased, produced, inkind], ignore_index=True)
-    # Keep rows with EITHER positive Quantity OR positive Expenditure.
-    # An expenditure-only row (HH reported food expenditure but no
-    # quantity) is legitimate data and is carried through with NaN
-    # Quantity.  Matches the shared
-    # ``transformations.food_acquired_to_canonical`` rule.
-    qty_ok = out['Quantity'].notna() & (out['Quantity'] > 0)
-    exp_ok = out['Expenditure'].notna() & (out['Expenditure'] > 0)
-    out = out[qty_ok | exp_ok]
+    from lsms_library.transformations import _finalize_canonical_food_acquired
 
-    out = out.set_index(['t', 'i', 'j', 'u', 's']).sort_index()
+    out = pd.concat([purchased, produced, inkind], ignore_index=True)
+    # Filter (qty>0 | exp>0; expenditure-only rows kept with NaN Quantity)
+    # via the shared tail (GH #251).  dedupe=False: Tanzania's per-source
+    # _make already yields unique canonical keys, so no groupby is needed.
+    out = _finalize_canonical_food_acquired(out, dedupe=False)
     return out
 
 
@@ -692,3 +707,1117 @@ def panel_ids(Waves):
         wave_matches, check_id_split = update_id(wave_matches,  check_id_split)
         updated_wave[wave_year] = wave_matches
     return recursive_D, updated_wave
+
+
+# ---------------------------------------------------------------------
+# plot_features (GH #167)
+# ---------------------------------------------------------------------
+
+ACRES_PER_HECTARE = 2.471053814671653  # 1 ha = 2.471... acres
+HECTARES_PER_ACRE = 1.0 / ACRES_PER_HECTARE  # 0.404686 ha / acre
+
+
+def _plot_harmonized_codes(tablename, key='Code', value='Preferred Label'):
+    """Load a {int code -> Preferred Label} dict from
+    Tanzania/_/categorical_mapping.org.  Codes whose Preferred Label is
+    blank / '---' map to pd.NA (so the column is left NaN)."""
+    from lsms_library.local_tools import get_categorical_mapping
+
+    raw = get_categorical_mapping(tablename=tablename, idxvars=key,
+                                  **{value: value})
+    out = {}
+    for k, v in raw.items():
+        try:
+            int_k = int(k)
+        except (TypeError, ValueError):
+            int_k = k
+        if pd.isna(v) or str(v).strip() in ('---', ''):
+            out[int_k] = pd.NA
+        else:
+            out[int_k] = str(v).strip()
+    return out
+
+
+def _map_plot_codes(series, code_map):
+    """Map a numeric (raw Stata) Series through ``code_map`` ({int: str}).
+    Returns a nullable string Series, NaN where the code is unmapped."""
+    if series is None:
+        return None
+    out = pd.to_numeric(series, errors='coerce').astype('Int64').map(code_map)
+    return out.astype('string').where(out.notna(), pd.NA)
+
+
+def plot_features_for_wave(t, sec02, sec3a, colmap):
+    """Build canonical ``plot_features`` for one Tanzania NPS wave.
+
+    The two source modules are merged on (hhid, plot):
+      AG_SEC_02 — plot area: farmer estimate (acres) + GPS-measured (acres).
+      AG_SEC_3A — plot detail: use status, soil type, irrigation, how
+                  acquired, and certificate of occupancy.
+
+    Parameters
+    ----------
+    t : str
+        Wave id ('2019-20' or '2020-21'); used as the ``t`` index value.
+    sec02, sec3a : pd.DataFrame
+        Raw AG_SEC_02 / AG_SEC_3A frames, loaded via
+        ``get_dataframe(..., convert_categoricals=False)`` so categorical
+        columns carry integer codes.
+    colmap : dict with keys
+        hhid       — household id column (sdd_hhid / y5_hhid)
+        plot       — within-HH plot column (plotnum / plot_id)
+        area_est   — farmer-estimated area, acres (ag2a_04)
+        area_gps   — GPS-measured area, acres   (ag2a_09)
+        use        — plot use status            (ag3a_03)
+        soil_type  — soil type                  (ag3a_10)
+        irrigated  — irrigated y/n              (ag3a_18)
+        erosion    — erosion-protection y/n     (ag3a_15)  [optional]
+        acquire    — how acquired               (ag3a_25)
+        legal_cert — certificate of occupancy   (ag3a_28a)
+        cert_other — other ownership document   (ag3a_28d) [optional]
+
+    Returns
+    -------
+    pd.DataFrame indexed by ``(t, i, plot_id)`` with columns
+        Area (hectares, float), AreaUnit (str, 'acres'),
+        SelfReportedArea (hectares, float — farmer estimate before the
+        GPS-preference merge), Tenure (str), TenureSystem (str),
+        SoilType (str), Irrigated (bool nullable), Owned (bool nullable),
+        Certificate (bool nullable), ErosionProtection (bool nullable),
+        Fallow (bool nullable).
+
+    The five reported item attributes beyond the original area/tenure/soil
+    set (SelfReportedArea, Owned, Certificate, ErosionProtection, Fallow)
+    mirror the WB LSMS-ISA Plot_dataset item fields (TZA_NPS*.do plot
+    block); each is a value the questionnaire records PER PLOT.  Per-HH
+    rollups (farm_size, nb_plots, nb_fallow_plots, soil_fertility_index)
+    are transformations over these item columns, NOT stored here.
+
+    GPS coordinates (ag2a_07__Latitude/Longitude) are CONFIDENTIAL /
+    redacted in the source and are deliberately NOT emitted.  plot_slope /
+    plot_elevation are ABSENT from the NPS instrument (the WB cleaning code
+    notes "plot slope (absent)" / "plot elevation (absent)"; they come from
+    external geospatial layers, not the survey) and are likewise omitted.
+    """
+    c = colmap
+    tenure_map = _plot_harmonized_codes('harmonize_tenure')
+    tenure_system_map = _plot_harmonized_codes('harmonize_tenure_system')
+    soil_map = _plot_harmonized_codes('harmonize_soil')
+
+    # --- AG_SEC_02: area ------------------------------------------------
+    a = sec02[[c['hhid'], c['plot']]].copy()
+    a['_hh'] = sec02[c['hhid']].apply(format_id)
+    a['_plot'] = sec02[c['plot']].apply(format_id)
+    area_gps = pd.to_numeric(sec02[c['area_gps']], errors='coerce').astype('Float64')
+    area_est = pd.to_numeric(sec02[c['area_est']], errors='coerce').astype('Float64')
+    # Plausibility clamp: parcels > 2500 acres (~1000 ha) are data-entry
+    # errors for smallholder plots (the 2020-21 GPS column has a 28710-acre
+    # outlier); drop to NaN so AreaUnit follows rather than poisoning
+    # area-weighted aggregates downstream (GH #167).
+    area_gps = area_gps.where((area_gps <= 2500) & (area_gps > 0) | area_gps.isna(), pd.NA)
+    area_est = area_est.where((area_est <= 2500) & (area_est > 0) | area_est.isna(), pd.NA)
+    # Prefer GPS-measured, fall back to farmer estimate.
+    area_acres = area_gps.where(area_gps.notna(), area_est)
+    a['Area'] = (area_acres * HECTARES_PER_ACRE).values
+    area_unit = pd.Series(['acres'] * len(sec02), index=sec02.index, dtype='string')
+    a['AreaUnit'] = area_unit.where(area_acres.notna(), pd.NA).values
+    # SelfReportedArea: the farmer estimate alone (ha), kept distinct from
+    # the GPS-preferred Area (WB Plot_dataset carries area_self_reported as
+    # its own item field).  Same plausibility clamp already applied above.
+    a['SelfReportedArea'] = (area_est * HECTARES_PER_ACRE).values
+    area = a[['_hh', '_plot', 'Area', 'AreaUnit', 'SelfReportedArea']]
+
+    # --- AG_SEC_3A: detail ---------------------------------------------
+    d = pd.DataFrame(index=sec3a.index)
+    d['_hh'] = sec3a[c['hhid']].apply(format_id)
+    d['_plot'] = sec3a[c['plot']].apply(format_id)
+
+    # Tenure from how-acquired, with a use-status override.
+    acq = pd.to_numeric(sec3a[c['acquire']], errors='coerce').astype('Int64')
+    tenure = acq.map(tenure_map).astype('string')
+    use = pd.to_numeric(sec3a[c['use']], errors='coerce').astype('Int64')
+    # ag3a_03 code 2 = RENTED OUT, 3 = GIVEN OUT -> Tenure rented_out.
+    tenure = tenure.where(~use.isin([2, 3]), 'rented_out')
+    d['Tenure'] = tenure.values
+
+    d['TenureSystem'] = _map_plot_codes(sec3a[c['legal_cert']], tenure_system_map).values
+    d['SoilType'] = _map_plot_codes(sec3a[c['soil_type']], soil_map).values
+
+    # Irrigated: ag3a_18 1=YES->True, 2=NO->False, else NaN.
+    irr = pd.to_numeric(sec3a[c['irrigated']], errors='coerce').astype('Int64')
+    irrigated = irr.map({1: True, 2: False}).astype('boolean')
+    d['Irrigated'] = irrigated.values
+
+    # --- reported item attributes (WB Plot_dataset parity, GAP 6) -------
+    # Owned: WB plot_owned recode of how-acquired ag3a_25 -- codes
+    # {1,2,5,9} (purchased / granted-titled / inherited / allocated as
+    # owner) -> True, any other acquisition mode -> False.  NaN where
+    # acquisition is unrecorded.  (TZA_NPS*.do plot block.)
+    owned = acq.map(lambda v: pd.NA if pd.isna(v)
+                    else (True if v in (1, 2, 5, 9) else False)).astype('boolean')
+    d['Owned'] = owned.values
+
+    # Certificate: WB plot_certificate.  Base from ag3a_28a (1,2 -> Yes;
+    # 3 -> No), promoted to True when any other ownership document
+    # ag3a_28d is in 1..5, and forced False when the plot is not Owned.
+    cert_a = pd.to_numeric(sec3a[c['legal_cert']], errors='coerce').astype('Int64')
+    cert = cert_a.map({1: True, 2: True, 3: False}).astype('boolean')
+    if c.get('cert_other') is not None and c['cert_other'] in sec3a.columns:
+        cert_d = pd.to_numeric(sec3a[c['cert_other']], errors='coerce').astype('Int64')
+        cert = cert.where(~cert_d.isin([1, 2, 3, 4, 5]), True)
+    cert = cert.where(~(owned == False), False)
+    d['Certificate'] = cert.values
+
+    # ErosionProtection: ag3a_15 1=YES->True, 2=NO->False, else NaN.
+    if c.get('erosion') is not None and c['erosion'] in sec3a.columns:
+        ero = pd.to_numeric(sec3a[c['erosion']], errors='coerce').astype('Int64')
+        d['ErosionProtection'] = ero.map({1: True, 2: False}).astype('boolean').values
+    else:
+        d['ErosionProtection'] = pd.array([pd.NA] * len(sec3a), dtype='boolean')
+
+    # Fallow: WB fallow_plot from use status ag3a_03 == 4 (left fallow);
+    # any other recorded use -> False; NaN where use is unrecorded.
+    fallow = use.map(lambda v: pd.NA if pd.isna(v)
+                     else (True if v == 4 else False)).astype('boolean')
+    d['Fallow'] = fallow.values
+
+    # --- merge (1:1 on hhid, plot) -------------------------------------
+    df = area.merge(d, on=['_hh', '_plot'], how='outer', indicator=True)
+    n_unmatched = int((df['_merge'] != 'both').sum())
+    if n_unmatched:
+        warnings.warn(
+            f"plot_features {t}: {n_unmatched} of {len(df)} (hhid, plot) "
+            f"rows did not match across AG_SEC_02 and AG_SEC_3A.")
+    df = df.drop(columns='_merge')
+
+    df['t'] = t
+    df = df.rename(columns={'_hh': 'i', '_plot': 'plot_id'})
+    df = df.set_index(['t', 'i', 'plot_id'])
+    df = df[['Area', 'AreaUnit', 'SelfReportedArea', 'Tenure', 'TenureSystem',
+             'SoilType', 'Irrigated', 'Owned', 'Certificate',
+             'ErosionProtection', 'Fallow']]
+    return df
+
+
+# Crop-production feature (parity-loop GAP 1).  Item-level harvest at the
+# natural grain (t, i, plot_id, j) -- one row per crop grown on a plot --
+# carrying ONLY reported survey fields.  No harvest_kg sum, no yield, no
+# main_crop, no value-share: those are transformations over these rows.
+CROP_PRODUCTION_COLUMNS = [
+    'Quantity', 'u', 'Quantity_sold', 'Value_sold',
+    'harvest_month', 'intercropped', 'perennial',
+]
+# NB: planting_month is part of the GAP-1 schema but is NOT recorded by the
+# Tanzania NPS instrument (the WB cleaning code notes "planting month
+# (absent)").  Both buildable waves lack it, so the column is omitted here
+# rather than carried all-null (which fails the no_all_null_columns sanity
+# check); it would be added back for a wave/country that records it.
+
+
+def _crop_labels(tablename='harmonize_crop'):
+    """{int crop code -> canonical Preferred Label} from
+    Tanzania/_/categorical_mapping.org.  Reuses ``_plot_harmonized_codes``
+    (codes with a blank Preferred Label collapse to pd.NA)."""
+    return _plot_harmonized_codes(tablename)
+
+
+def _months_to_int(series):
+    """Coerce a survey month column to nullable Int64 in 1..12; 0/blank -> NaN."""
+    m = pd.to_numeric(series, errors='coerce').astype('Int64')
+    return m.where((m >= 1) & (m <= 12), pd.NA)
+
+
+def crop_production_for_wave(t, seas, fruit, peren, sales, colmaps):
+    """Build canonical ``crop_production`` for one Tanzania NPS wave.
+
+    Three harvest modules are stacked at grain (hhid, plot, crop):
+      seas  -- AG_SEC_4A  seasonal/annual crops (harvest qty ``ag4a_27``,
+               zeroed where ``ag4a_19`` == 2 "did not harvest"; intercrop
+               ``ag4a_04``; harvest-end month ``ag4a_24_2``).
+      fruit -- AG_SEC_6A  perennial FRUIT trees (``ag6a_09``; intercrop
+               ``ag6a_05``; end month ``ag6a_07_4``).  perennial=True.
+      peren -- AG_SEC_6B  perennial NON-fruit/cash trees (``ag6b_09`` ...).
+               perennial=True.
+
+    Reported harvest quantity is recorded in KILOGRAMS by the questionnaire
+    ((KG) on every harvest variable), so ``u`` = 'kg' and the native
+    ``Quantity`` is the reported kg -- NO unit conversion is performed here.
+
+    Sales are recorded at the (hhid, crop) grain (no plot): seasonal in
+    AG_SEC_5A (``ag5a_02`` qty kg, ``ag5a_03`` value), perennial in 7A/7B.
+    We attach ``Quantity_sold`` / ``Value_sold`` to a harvest row ONLY when
+    the (hhid, crop) maps to exactly ONE plot in that wave -- so a reported
+    household-crop sale is carried without being split or duplicated across
+    plots (splitting would fabricate an allocation, which is a
+    transformation, not a reported value).  Where a crop spans >1 plot the
+    sold columns stay NaN.
+
+    planting_month is ABSENT in NPS (the WB cleaning code notes
+    "planting month (absent)") -> NaN.
+
+    Parameters
+    ----------
+    t : str            wave id ('2019-20' or '2020-21'); the ``t`` value.
+    seas, fruit, peren : pd.DataFrame
+        raw AG_SEC_4A / 6A / 6B frames (convert_categoricals=False).
+    sales : dict with optional keys 'seasonal' (5A), 'fruit' (7A),
+        'perennial' (7B), each a raw DataFrame or None.
+    colmaps : dict 'seasonal'/'fruit'/'perennial'/'sales_*' -> column-name
+        dicts (so 2019-20 'plotnum'/'sdd_hhid' vs 2020-21 'plot_id'/'y5_hhid'
+        differences live in the wave script, not here).
+
+    Returns
+    -------
+    pd.DataFrame indexed by (t, i, plot_id, j) with columns
+    CROP_PRODUCTION_COLUMNS.
+    """
+    crop_map = _crop_labels()
+
+    def _block(df, cm, perennial):
+        """One harvest module -> tidy (i, plot_id, code, fields) frame."""
+        if df is None or len(df) == 0:
+            return None
+        out = pd.DataFrame(index=df.index)
+        out['i'] = df[cm['hhid']].apply(format_id)
+        out['plot_id'] = df[cm['plot']].apply(format_id)
+        code = pd.to_numeric(df[cm['crop']], errors='coerce').astype('Int64')
+        out['_code'] = code
+        out['j'] = code.map(crop_map).astype('string')
+        qty = pd.to_numeric(df[cm['qty']], errors='coerce').astype('Float64')
+        # Seasonal: harvest is 0 where respondent did not harvest (ag4a_19==2).
+        if cm.get('harvested') is not None:
+            harvested = pd.to_numeric(df[cm['harvested']], errors='coerce')
+            qty = qty.where(harvested != 2, 0.0)
+        out['Quantity'] = qty
+        out['u'] = pd.Series(['kg'] * len(df), index=df.index, dtype='string')
+        out['u'] = out['u'].where(qty.notna(), pd.NA)
+        out['harvest_month'] = _months_to_int(df[cm['harvest_month']]).values
+        ic = pd.to_numeric(df[cm['intercrop']], errors='coerce').astype('Int64')
+        out['intercropped'] = ic.map({1: True, 2: False}).astype('boolean').values
+        out['perennial'] = perennial
+        return out
+
+    pieces = [
+        _block(seas, colmaps['seasonal'], False),
+        _block(fruit, colmaps['fruit'], True),
+        _block(peren, colmaps['perennial'], True),
+    ]
+    pieces = [p for p in pieces if p is not None]
+    if not pieces:
+        raise ValueError(f"crop_production {t}: no harvest source rows")
+    df = pd.concat(pieces, ignore_index=True)
+
+    # Drop rows with no resolvable crop label AND no quantity (pure noise).
+    df = df[~(df['j'].isna() & df['Quantity'].isna())].copy()
+
+    # --- reported sales, attached at the unambiguous single-plot grain ----
+    def _sales_block(raw, cm):
+        if raw is None or len(raw) == 0:
+            return None
+        s = pd.DataFrame(index=raw.index)
+        s['i'] = raw[cm['hhid']].apply(format_id)
+        s['_code'] = pd.to_numeric(raw[cm['crop']], errors='coerce').astype('Int64')
+        s['Quantity_sold'] = pd.to_numeric(raw[cm['qty']], errors='coerce').astype('Float64')
+        s['Value_sold'] = pd.to_numeric(raw[cm['value']], errors='coerce').astype('Float64')
+        s = s.dropna(subset=['_code'])
+        # Multiple sale rows per (i, crop) (e.g. fruit + non-fruit listed under
+        # the same code) -> sum reported quantities/values.
+        s = (s.groupby(['i', '_code'], dropna=False)[['Quantity_sold', 'Value_sold']]
+               .sum(min_count=1).reset_index())
+        return s
+
+    sales_pieces = [
+        _sales_block(sales.get('seasonal'), colmaps['sales_seasonal']),
+        _sales_block(sales.get('fruit'), colmaps['sales_fruit']),
+        _sales_block(sales.get('perennial'), colmaps['sales_perennial']),
+    ]
+    sales_pieces = [s for s in sales_pieces if s is not None]
+    if sales_pieces:
+        all_sales = pd.concat(sales_pieces, ignore_index=True)
+        all_sales = (all_sales.groupby(['i', '_code'], dropna=False)
+                     [['Quantity_sold', 'Value_sold']].sum(min_count=1)
+                     .reset_index())
+        # Only attach where (i, crop) lives on exactly one plot (no fabricated
+        # split across plots).
+        plot_count = df.groupby(['i', '_code'])['plot_id'].transform('nunique')
+        single = df[['i', '_code']].copy()
+        single['_single'] = (plot_count == 1).values
+        df = df.merge(all_sales, on=['i', '_code'], how='left')
+        df.loc[~single['_single'].values, ['Quantity_sold', 'Value_sold']] = pd.NA
+    else:
+        df['Quantity_sold'] = pd.Series([pd.NA] * len(df), dtype='Float64')
+        df['Value_sold'] = pd.Series([pd.NA] * len(df), dtype='Float64')
+
+    # j unresolved (rare 'Other' / unmapped) -> keep raw code as a string so
+    # the row is not silently dropped, but flag via the sentinel label.
+    df['j'] = df['j'].where(df['j'].notna(),
+                            df['_code'].astype('string').radd('crop_'))
+
+    df['t'] = t
+    df = df.drop(columns=['_code'])
+    df = df.set_index(['t', 'i', 'plot_id', 'j'])
+    # Collapse exact-duplicate (t,i,plot,j) rows (same crop listed twice on a
+    # plot across the seasonal+perennial stack is not expected, but guard):
+    if not df.index.is_unique:
+        df = df.groupby(level=['t', 'i', 'plot_id', 'j']).agg({
+            'Quantity': 'sum', 'u': 'first',
+            'Quantity_sold': 'first', 'Value_sold': 'first',
+            'harvest_month': 'max',
+            'intercropped': 'max', 'perennial': 'max',
+        })
+    df = df[CROP_PRODUCTION_COLUMNS]
+    return df
+
+
+# Plot-inputs feature (parity-loop GAP 2).  Item-level inputs applied to a
+# plot at the natural grain (t, i, plot_id, input, crop) -- one row per input
+# applied to a plot -- carrying ONLY reported survey fields.  No seed_kg sum,
+# no nitrogen_kg, no any-use flags, no fertilizer totals: those are
+# transformations over these rows.
+#   * input  : the input identity, on the shared harmonize_input labels --
+#              seed / organic fertilizer / a named inorganic-fertilizer product
+#              (Urea / DAP / NPK / CAN / SA / TSP / MRP / Other Fertilizer,
+#              from ag3a_48 / ag3a_55 codes) / herbicide / pesticide.
+#   * crop   : ONLY for seed rows -- the canonical harmonize_food/harmonize_crop
+#              Preferred Label of the crop the seed was sown for (NPS seed is
+#              reported per plot-crop in AG_SEC_4A).  pd.NA for plot-level
+#              inputs (fertilizer / herbicide / pesticide), which are recorded
+#              once per plot with no crop split.
+#   * Quantity + u : reported native quantity and its native unit.  Fertilizer
+#              quantities are in KG; seed/herbicide/pesticide units are the
+#              reported native unit code resolved to a tidy label (kg / litre /
+#              millilitre / 20 liter bucket / small/large cup), harmonized at
+#              API time by the country u table.
+#   * Purchased (bool) + Quantity_purchased : whether any of the input was
+#              purchased and (where the survey records it as a SEPARATE
+#              quantity) how much.  Organic fertilizer and seed record a
+#              purchased quantity (ag3a_44 / ag4a_10c_1); inorganic fert /
+#              herbicide / pesticide record only a purchased VALUE, so Purchased
+#              there is value>0 and Quantity_purchased is NaN (not fabricated).
+#   * Improved (bool) : seed rows only -- ag4a_08 improved/recycled-improved.
+PLOT_INPUTS_COLUMNS = ['Quantity', 'u', 'Purchased', 'Quantity_purchased',
+                       'Improved']
+
+# Native seed-unit code (ag4a_10_2 / ag4a_10c_2) -> tidy label.  kg/litre/etc.
+# are harmonized to the canonical u Preferred Label at API time by the country
+# u table; the bucket/cup rows were added to that table by this feature.
+_SEED_UNIT_LABELS = {
+    1: 'kg', 2: '20 liter bucket', 3: 'small cup', 4: 'large cup',
+    5: pd.NA,  # OTHER (SPECIFY) -- unit unknown
+}
+# Native herbicide/pesticide-unit code (ag3a_62_2 / ag3a_65b_2) -> tidy label.
+_LIQUID_UNIT_LABELS = {1: 'kg', 2: 'litre', 3: 'millilitre', 4: pd.NA}
+
+
+def _yn_true(series):
+    """Coerce a Stata 1=YES/2=NO column to a nullable boolean (1->True,
+    2->False, else NaN)."""
+    v = pd.to_numeric(series, errors='coerce').astype('Int64')
+    return v.map({1: True, 2: False}).astype('boolean')
+
+
+def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
+    """Build canonical ``plot_inputs`` for one Tanzania NPS wave.
+
+    Item-level inputs at grain (t, i, plot_id, input, crop) from two modules:
+      sec3a -- AG_SEC_3A plot detail: organic fertilizer (ag3a_41/42/43/44),
+               inorganic fertilizer type 1 (ag3a_47/48/49/51) and type 2
+               (ag3a_54/55/56/58), herbicide (ag3a_60/62_1/62_2/63), pesticide
+               (ag3a_65a/65b_1/65b_2/65c).  One row per (plot, input).
+      sec4a -- AG_SEC_4A seasonal-crop seed: ag4a_08 improved flag, ag4a_10_1/2
+               total seed qty+unit, ag4a_10c_1/2 purchased seed qty+unit,
+               ag4a_12 amount paid.  One SEED row per (plot, crop).
+
+    STORES REPORTED VALUES ONLY.  seed_kg / nitrogen_kg / inorganic_fertilizer
+    any-use flags are transformations over these rows, NOT columns here.
+
+    Parameters
+    ----------
+    t : str            wave id ('2019-20' or '2020-21'); the ``t`` value.
+    sec3a, sec4a : pd.DataFrame
+        raw AG_SEC_3A / AG_SEC_4A frames (convert_categoricals=False).
+    colmap : dict with keys hhid, plot, crop (the id columns, which differ
+        across waves: sdd_hhid/plotnum/cropid vs y5_hhid/plot_id/cropid).
+
+    Returns
+    -------
+    pd.DataFrame indexed by (t, i, plot_id, input, crop) with columns
+    PLOT_INPUTS_COLUMNS.
+    """
+    c = colmap
+    fert_type_map = _plot_harmonized_codes('harmonize_input')
+    crop_map = _crop_labels()
+
+    def _ids(df):
+        return (df[c['hhid']].apply(format_id), df[c['plot']].apply(format_id))
+
+    rows = []
+
+    # --- AG_SEC_4A: SEED (one row per plot-crop) ------------------------
+    if sec4a is not None and len(sec4a):
+        hh, plot = _ids(sec4a)
+        code = pd.to_numeric(sec4a[c['crop']], errors='coerce').astype('Int64')
+        qty = pd.to_numeric(sec4a['ag4a_10_1'], errors='coerce').astype('Float64')
+        unit = pd.to_numeric(sec4a['ag4a_10_2'], errors='coerce').astype('Int64')
+        pqty = pd.to_numeric(sec4a['ag4a_10c_1'], errors='coerce').astype('Float64')
+        paid = pd.to_numeric(sec4a['ag4a_12'], errors='coerce').astype('Float64')
+        seedtype = pd.to_numeric(sec4a['ag4a_08'], errors='coerce').astype('Int64')
+        seed = pd.DataFrame({
+            'i': hh.values, 'plot_id': plot.values,
+            'input': 'Seed',
+            'crop': code.map(crop_map).astype('string').values,
+            'Quantity': qty.values,
+            'u': unit.map(_SEED_UNIT_LABELS).astype('string').values,
+            # Purchased if a purchased quantity OR an amount paid is recorded.
+            'Purchased': ((pqty.fillna(0) > 0) | (paid.fillna(0) > 0)).values,
+            'Quantity_purchased': pqty.values,
+            'Improved': seedtype.map({1: True, 2: False, 3: True})
+                        .astype('boolean').values,
+        })
+        # A seed row is real only if a quantity OR a crop label is present.
+        seed = seed[seed['Quantity'].notna() | seed['crop'].notna()]
+        # crop unresolved -> keep raw code as crop_<code> (do not drop).
+        seed['crop'] = seed['crop'].where(
+            seed['crop'].notna(),
+            code.map(lambda x: f'crop_{int(x)}' if pd.notna(x) else pd.NA)
+                .astype('string').reindex(seed.index).values)
+        rows.append(seed)
+
+    # --- AG_SEC_3A: plot-level inputs (crop = NA) -----------------------
+    hh3, plot3 = _ids(sec3a)
+
+    def _liquid_unit(col):
+        return (pd.to_numeric(sec3a[col], errors='coerce').astype('Int64')
+                .map(_LIQUID_UNIT_LABELS).astype('string'))
+
+    # organic fertilizer
+    used = _yn_true(sec3a['ag3a_41'])
+    org = pd.DataFrame({
+        'i': hh3.values, 'plot_id': plot3.values, 'input': 'Organic Fertilizer',
+        'crop': pd.array([pd.NA] * len(sec3a), dtype='string'),
+        'Quantity': pd.to_numeric(sec3a['ag3a_42'], errors='coerce').astype('Float64').values,
+        'u': 'kg',
+        'Purchased': _yn_true(sec3a['ag3a_43']).values,
+        'Quantity_purchased': pd.to_numeric(sec3a['ag3a_44'], errors='coerce').astype('Float64').values,
+        'Improved': pd.array([pd.NA] * len(sec3a), dtype='boolean'),
+    })
+    org = org[used.fillna(False).values]
+
+    # inorganic fertilizer, first and second type
+    def _inorg(used_col, type_col, qty_col, val_col):
+        u = _yn_true(sec3a[used_col])
+        typ = pd.to_numeric(sec3a[type_col], errors='coerce').astype('Int64')
+        label = typ.map(fert_type_map).astype('string')
+        val = pd.to_numeric(sec3a[val_col], errors='coerce').astype('Float64')
+        d = pd.DataFrame({
+            'i': hh3.values, 'plot_id': plot3.values,
+            'input': label.where(label.notna(), 'Other Fertilizer').values,
+            'crop': pd.array([pd.NA] * len(sec3a), dtype='string'),
+            'Quantity': pd.to_numeric(sec3a[qty_col], errors='coerce').astype('Float64').values,
+            'u': 'kg',
+            # Inorganic fert records a purchased VALUE (TSH), not a separate
+            # purchased qty -> Purchased = value>0; Quantity_purchased NaN.
+            'Purchased': (val.fillna(0) > 0).astype('boolean').values,
+            'Quantity_purchased': pd.array([pd.NA] * len(sec3a), dtype='Float64'),
+            'Improved': pd.array([pd.NA] * len(sec3a), dtype='boolean'),
+        })
+        return d[u.fillna(False).values]
+
+    inorg1 = _inorg('ag3a_47', 'ag3a_48', 'ag3a_49', 'ag3a_51')
+    inorg2 = _inorg('ag3a_54', 'ag3a_55', 'ag3a_56', 'ag3a_58')
+
+    # herbicide
+    uh = _yn_true(sec3a['ag3a_60'])
+    valh = pd.to_numeric(sec3a['ag3a_63'], errors='coerce').astype('Float64')
+    herb = pd.DataFrame({
+        'i': hh3.values, 'plot_id': plot3.values, 'input': 'Herbicide',
+        'crop': pd.array([pd.NA] * len(sec3a), dtype='string'),
+        'Quantity': pd.to_numeric(sec3a['ag3a_62_1'], errors='coerce').astype('Float64').values,
+        'u': _liquid_unit('ag3a_62_2').values,
+        'Purchased': (valh.fillna(0) > 0).astype('boolean').values,
+        'Quantity_purchased': pd.array([pd.NA] * len(sec3a), dtype='Float64'),
+        'Improved': pd.array([pd.NA] * len(sec3a), dtype='boolean'),
+    })
+    herb = herb[uh.fillna(False).values]
+
+    # pesticide
+    up = _yn_true(sec3a['ag3a_65a'])
+    valp = pd.to_numeric(sec3a['ag3a_65c'], errors='coerce').astype('Float64')
+    pest = pd.DataFrame({
+        'i': hh3.values, 'plot_id': plot3.values, 'input': 'Pesticide',
+        'crop': pd.array([pd.NA] * len(sec3a), dtype='string'),
+        'Quantity': pd.to_numeric(sec3a['ag3a_65b_1'], errors='coerce').astype('Float64').values,
+        'u': _liquid_unit('ag3a_65b_2').values,
+        'Purchased': (valp.fillna(0) > 0).astype('boolean').values,
+        'Quantity_purchased': pd.array([pd.NA] * len(sec3a), dtype='Float64'),
+        'Improved': pd.array([pd.NA] * len(sec3a), dtype='boolean'),
+    })
+    pest = pest[up.fillna(False).values]
+
+    rows += [org, inorg1, inorg2, herb, pest]
+    df = pd.concat([r for r in rows if r is not None and len(r)], ignore_index=True)
+
+    # u is meaningless where there is no quantity.
+    df['u'] = df['u'].where(df['Quantity'].notna(), pd.NA)
+
+    df['t'] = t
+    df = df.set_index(['t', 'i', 'plot_id', 'input', 'crop'])
+    # Collapse the rare exact-duplicate (t,i,plot,input,crop) -- a plot listing
+    # the same inorganic-fertilizer product as both type 1 and type 2, or two
+    # raw crop codes that share a canonical Seed crop label (e.g. Beans +
+    # Cowpeas -> Pulses): sum the reported quantities, OR the purchased flag,
+    # keep the first unit.  ``min_count=1`` so an all-NA group stays NA (a plain
+    # ``sum`` would zero the all-NA Quantity_purchased of fertilizer rows, which
+    # record only a purchased VALUE, not a purchased quantity).  ``dropna=False``
+    # keeps the NA-crop (plot-level input) rows.
+    if not df.index.is_unique:
+        def _sum1(s):
+            return s.sum(min_count=1)
+        df = df.groupby(level=['t', 'i', 'plot_id', 'input', 'crop'],
+                        dropna=False).agg({
+            'Quantity': _sum1, 'u': 'first',
+            'Purchased': 'max', 'Quantity_purchased': _sum1,
+            'Improved': 'max',
+        })
+    df = df[PLOT_INPUTS_COLUMNS]
+    return df
+
+
+# Livestock feature (parity-loop GAP 4).  Item-level herd at the natural grain
+# (t, i, animal) -- one row per species/animal-type the household OWNS --
+# carrying ONLY reported survey fields.  No TLU, no herd-value total, no
+# engaged-in-livestock binary: those are transformations over these rows (the
+# WB binary = our ``groupby(['t','i']).size() > 0``).
+#
+# 'livestock' is in the framework ``_no_v_join`` set, so the grain is (t, i,
+# animal) with NO ``v`` cluster level joined.
+LIVESTOCK_COLUMNS = ['HeadCount', 'HeadAcquired', 'HeadSold']
+# NB: a herd VALUE column is part of the GAP-4 schema "where the source reports
+# it", but the Tanzania NPS livestock module (LF_SEC_02) records no current-
+# herd valuation -- only purchase value (lf02_08), sale value (lf02_26) and
+# loss values, each a transaction value, not a stock value.  So Value is
+# omitted here rather than carried all-null (which fails the
+# no_all_null_columns sanity check) -- the same discipline crop_production uses
+# for the absent planting_month.  A purchase/sale value is recoverable as a
+# transformation over HeadAcquired / HeadSold should a valuation be wanted.
+
+
+# Plausibility ceiling for a 12-month head-count FLOW (bought / sold).  The
+# largest legitimate flow observed is ~2500 head (a poultry operation); two
+# rows carry an obvious data-entry error where the TSH value was typed into the
+# count field (2019-20: HH 0525-001-001 "bought 324000" == its 324000-TSH
+# purchase value; 2020-21: HH 3722-001-01 "sold 100000" of its 10 owned
+# chickens for 10 TSH).  Clamp flows above 50000 to NaN -- well above any
+# plausible smallholder flow, so only the corrupt entries are dropped.  This is
+# the same plausibility-clamp discipline plot_features uses for >2500-acre
+# parcels (GH #167).
+_LIVESTOCK_FLOW_CEILING = 50000
+
+
+def _livestock_count(series, ceiling=None):
+    """Coerce a reported head-count column to nullable Float64 (>=0; negatives
+    -> NaN).  When ``ceiling`` is given, values above it (data-entry errors
+    where a TSH value landed in the count field) are also set to NaN."""
+    v = pd.to_numeric(series, errors='coerce').astype('Float64')
+    v = v.where(v >= 0, pd.NA)
+    if ceiling is not None:
+        v = v.where(v <= ceiling, pd.NA)
+    return v
+
+
+def livestock_for_wave(t, lf, colmap):
+    """Build canonical ``livestock`` for one Tanzania NPS wave.
+
+    The livestock roster (LF_SEC_02 in 2019-20 / 2020-21) is at the
+    (household, lvstckid) grain -- one row per animal TYPE the household was
+    asked about.  We keep ONLY the rows the household actually OWNS
+    (``lf02_01`` == 1), so the emitted grain is one row per (household, owned
+    species).  Each raw ``lvstckid`` is resolved to a canonical species
+    Preferred Label via this wave's column of the ``harmonize_species``
+    categorical table; pets (Dogs / Cats / Other -> blank label -> NaN) are
+    dropped, mirroring the WB ``drop if inlist(animal, 15, 16)``.
+
+    Reported item-level fields carried (NO aggregation):
+      HeadCount    -- currently owned = lf02_04_1 (indigenous) + lf02_04_2
+                      (improved/exotic).  Reported current stock.
+      HeadAcquired -- bought alive in the past 12 months (lf02_07).  The
+                      directly-reported acquisition flow that parallels
+                      HeadSold; births (lf02_05) and gifts received (lf02_10)
+                      are separate reported flows, NOT summed in here.
+      HeadSold     -- sold alive in the past 12 months (lf02_25).
+
+    Parameters
+    ----------
+    t : str          wave id ('2019-20' or '2020-21'); the ``t`` value.
+    lf : pd.DataFrame
+        raw LF_SEC_02 frame (convert_categoricals=False, so lvstckid carries
+        the integer code).
+    colmap : dict with keys
+        hhid    -- household id column (sdd_hhid / y5_hhid)
+        animal  -- animal-type code column (lvstckid)
+        own     -- own-y/n flag           (lf02_01; 1=yes, 2=no)
+        owned   -- [indigenous, improved] current-stock columns
+                   (['lf02_04_1', 'lf02_04_2'])
+        bought  -- head bought alive      (lf02_07)
+        sold    -- head sold alive        (lf02_25)
+        species_col -- this wave's column name in harmonize_species
+                       ('2019-20' / '2020-21')
+
+    Returns
+    -------
+    pd.DataFrame indexed by (t, i, animal) with columns LIVESTOCK_COLUMNS.
+    Emits raw hhid as ``i``; the country-level concatenator applies id_walk.
+    """
+    c = colmap
+    species_map = _plot_harmonized_codes('harmonize_species',
+                                         value='Preferred Label')
+    # _plot_harmonized_codes keys on the canonical 'Code' column, but the raw
+    # lvstckid uses this wave's own code column; for Tanzania the two coincide
+    # for every species we keep (1..14) and the divergent pet/other tail maps
+    # to NA either way -- but resolve through the wave column to be exact.
+    from lsms_library.local_tools import get_categorical_mapping
+    raw = get_categorical_mapping(tablename='harmonize_species',
+                                  idxvars=c['species_col'],
+                                  **{'Preferred Label': 'Preferred Label'})
+    species_map = {}
+    for k, v in raw.items():
+        try:
+            k = int(k)
+        except (TypeError, ValueError):
+            pass
+        species_map[k] = (pd.NA if (pd.isna(v) or str(v).strip() in ('', '---'))
+                          else str(v).strip())
+
+    out = pd.DataFrame(index=lf.index)
+    out['i'] = lf[c['hhid']].apply(format_id)
+    out['animal'] = _map_plot_codes(lf[c['animal']], species_map)
+
+    owned = lf[c['owned']].apply(pd.to_numeric, errors='coerce')
+    head = owned.sum(axis=1, min_count=1).astype('Float64')
+    out['HeadCount'] = head.where((head >= 0) & (head <= _LIVESTOCK_FLOW_CEILING),
+                                  pd.NA)
+    out['HeadAcquired'] = _livestock_count(lf[c['bought']],
+                                           ceiling=_LIVESTOCK_FLOW_CEILING)
+    out['HeadSold'] = _livestock_count(lf[c['sold']],
+                                       ceiling=_LIVESTOCK_FLOW_CEILING)
+
+    own = pd.to_numeric(lf[c['own']], errors='coerce')
+
+    # Keep only OWNED rows (own-flag == yes) with a resolvable species label.
+    out = out[(own == 1) & out['animal'].notna()].copy()
+
+    out['t'] = t
+    out = out.set_index(['t', 'i', 'animal'])
+    # Guard against a duplicated (t,i,animal): sum reported head counts.
+    if not out.index.is_unique:
+        out = out.groupby(level=['t', 'i', 'animal']).agg({
+            'HeadCount': lambda s: s.sum(min_count=1),
+            'HeadAcquired': lambda s: s.sum(min_count=1),
+            'HeadSold': lambda s: s.sum(min_count=1),
+        })
+    out = out[LIVESTOCK_COLUMNS]
+    return out
+
+
+# ---------------------------------------------------------------------------
+# Labor features (parity-loop GAP 3).  TWO distinct natural grains:
+#
+#   plot_labor        (t, i, plot_id, source)  -- plot-level person-days of
+#                     labor by source {family, hired}, from AG_SEC_3A, joins
+#                     crop_production / plot_inputs on (t, i, plot_id).
+#   people_last7days  (t, i, pid)              -- per-INDIVIDUAL 7-day activity
+#                     dummies / hours / wage-work industry, from HH_SEC_E1.
+#
+# Both store REPORTED person-level/plot-level fields ONLY.  The WB aggregate
+# constructs (total_labor_days / total_family_labor_days /
+# total_hired_labor_days = sums over plot_labor by source; hired_labor_value =
+# median-wage valuation over the hired rows) are TRANSFORMATIONS over these
+# rows, NEVER stored here.
+# ---------------------------------------------------------------------------
+
+# plot_labor at the natural grain (t, i, plot_id, source) -- one row per
+# (plot, source) -- carrying REPORTED person-days and (hired only) reported
+# cash wage.  source in {family, hired}; the GAP-3 schema also allows
+# {other/exchange} cross-country, but the NPS-SDD / Y5 AG_SEC_3A instrument
+# records no free / exchange labor block, so no 'other' rows arise for Tanzania
+# (we do not fabricate them).
+PLOT_LABOR_COLUMNS = ['PersonDays', 'Wage']
+
+# Plausibility ceiling for a per-(plot, gender, task) person-day cell.  A
+# single farm task in one season cannot legitimately absorb hundreds of
+# person-days from one gender group; values this large are data-entry errors
+# where a TSH wage amount was typed into a day field (2020-21 ag3a_74_1c reaches
+# 450000, ~0.7% of hired-labor plots carry such a corrupt cell).  Clamp cells
+# above 730 (two person-years) to NaN -- well above any plausible single-task
+# smallholder figure, so only the corrupt entries drop.  Same plausibility-clamp
+# discipline livestock / plot_features already use (GH #167).
+_PLOT_LABOR_DAY_CEILING = 730
+
+
+def _clamp_days(series):
+    """Coerce a reported person-day column to nullable Float64 (>=0; negatives
+    and values above the plausibility ceiling -> NaN)."""
+    v = pd.to_numeric(series, errors='coerce').astype('Float64')
+    return v.where((v >= 0) & (v <= _PLOT_LABOR_DAY_CEILING), pd.NA)
+
+
+def plot_labor_for_wave(t, sec3a, colmap):
+    """Build canonical ``plot_labor`` for one Tanzania NPS wave from AG_SEC_3A.
+
+    Item-level plot labor at grain (t, i, plot_id, source), source in
+    {family, hired}:
+
+      HIRED -- gated by ag3a_73 (did you hire labor? 1=yes/2=no).  PersonDays =
+        Sum over the three farm tasks (Land Prep / Weeding / Harvest, blocks
+        1/2/3) of the per-gender day cells ag3a_74_{1,2,3}{a,b,c} (woman / man /
+        child).  Wage = Sum over tasks of the cash paid ag3a_74_{1,2,3}d [TSH].
+        When ag3a_73==2 (no hired labor) PersonDays and Wage are 0.
+
+      FAMILY -- the household members' own reported days on the plot.  In
+        2020-21 (Y5) the questionnaire records per-member DAYS for each of the
+        three tasks (ag3a_72c_* prep / ag3a_72g_* weeding / ag3a_72k_*
+        harvest); PersonDays = the rowtotal over all member slots and tasks.
+        In 2019-20 (NPS-SDD) the family block records only the WORKER ROSTER IDs
+        per task (ag3a_72b/f/j_*) and NO day columns, so family person-days are
+        NOT reported that wave -- we emit NO family rows for 2019-20 rather than
+        fabricate a count (the WB NPS5.do rowtotals the ID columns as "days",
+        which we deliberately do NOT reproduce).  Wage is NaN for family rows.
+
+    Parameters
+    ----------
+    t : str            wave id ('2019-20' or '2020-21').
+    sec3a : pd.DataFrame   raw AG_SEC_3A (convert_categoricals=False).
+    colmap : dict with keys hhid, plot (the id columns: sdd_hhid/plotnum for
+        2019-20, y5_hhid/plot_id for 2020-21).
+
+    Returns
+    -------
+    pd.DataFrame indexed by (t, i, plot_id, source) with columns
+    PLOT_LABOR_COLUMNS (PersonDays, Wage).
+    """
+    c = colmap
+    hh = sec3a[c['hhid']].apply(format_id)
+    plot = sec3a[c['plot']].apply(format_id)
+
+    rows = []
+
+    # --- HIRED labor (ag3a_73 / ag3a_74_*) ------------------------------
+    hire_yn = pd.to_numeric(sec3a['ag3a_73'], errors='coerce')
+    day_cols = [f'ag3a_74_{task}{g}'
+                for task in (1, 2, 3) for g in ('a', 'b', 'c')]
+    wage_cols = [f'ag3a_74_{task}d' for task in (1, 2, 3)]
+    hired_days = pd.concat([_clamp_days(sec3a[col]) for col in day_cols],
+                           axis=1).sum(axis=1, min_count=1)
+    hired_wage = pd.concat(
+        [pd.to_numeric(sec3a[col], errors='coerce').astype('Float64')
+         for col in wage_cols],
+        axis=1).sum(axis=1, min_count=1)
+    # ag3a_73==2 -> the household hired no labor: 0 days, 0 wage.
+    hired_days = hired_days.where(hire_yn != 2, 0)
+    hired_wage = hired_wage.where(hire_yn != 2, 0)
+    hired = pd.DataFrame({
+        'i': hh.values, 'plot_id': plot.values, 'source': 'hired',
+        'PersonDays': hired_days.values, 'Wage': hired_wage.values,
+    })
+    # Keep a hired row only where the hire question was answered.
+    hired = hired[hire_yn.notna().values]
+    rows.append(hired)
+
+    # --- FAMILY labor -- DAYS only where the wave records them -----------
+    # 2020-21: ag3a_72c_* (prep) + ag3a_72g_* (weeding) + ag3a_72k_* (harvest).
+    fam_day_prefixes = ['ag3a_72c_', 'ag3a_72g_', 'ag3a_72k_']
+    fam_day_cols = [col for col in sec3a.columns
+                    if any(col.startswith(p) and col[len(p):].isdigit()
+                           for p in fam_day_prefixes)]
+    if fam_day_cols:
+        fam_days = pd.concat([_clamp_days(sec3a[col]) for col in fam_day_cols],
+                             axis=1).sum(axis=1, min_count=1)
+        family = pd.DataFrame({
+            'i': hh.values, 'plot_id': plot.values, 'source': 'family',
+            'PersonDays': fam_days.values,
+            'Wage': pd.array([pd.NA] * len(sec3a), dtype='Float64'),
+        })
+        # Keep a family row only where a day total is reported (>=0).
+        family = family[fam_days.notna().values]
+        rows.append(family)
+    # else (2019-20): family block is worker-IDs only, no days -> no family
+    # rows for this wave.
+
+    df = pd.concat([r for r in rows if r is not None and len(r)],
+                   ignore_index=True)
+    df['t'] = t
+    df = df.set_index(['t', 'i', 'plot_id', 'source'])
+    # Collapse the rare duplicate (t,i,plot_id,source): sum reported days,
+    # sum reported wage (min_count=1 keeps an all-NA group NA).
+    if not df.index.is_unique:
+        def _sum1(s):
+            return s.sum(min_count=1)
+        df = df.groupby(level=['t', 'i', 'plot_id', 'source']).agg({
+            'PersonDays': _sum1, 'Wage': _sum1,
+        })
+    df = df[PLOT_LABOR_COLUMNS]
+    return df
+
+
+# people_last7days at the natural grain (t, i, pid) -- one row per INDIVIDUAL,
+# carrying the REPORTED 7-day activity dummies / hours / wage-work industry,
+# mirroring Uganda's (the one country that already has this feature) construct.
+# Source HH_SEC_E1, following the NPS5.do labor block (lines 1026-1058) but
+# using the LABEL-CORRECT dummy<->hours pairing (the .do swaps farm_hrs/wage_hrs
+# relative to its own dummies; we pair each hours item with the activity it
+# actually times, per the questionnaire labels).
+PEOPLE_LAST7DAYS_COLUMNS = [
+    'farm_work', 'SOB_work', 'wage_work',
+    'farm_hrs', 'SB_hrs', 'wage_hrs',
+    'industry', 'working_age',
+]
+
+
+def _industry_from_isic(sec, isic_col, in_wage_emp):
+    """Classify the ISIC-division sector code (hh_e31b_2) into the canonical
+    coarse industry label, following the NPS .do ranges.  Only meaningful for
+    individuals in wage employment (``in_wage_emp`` True); others -> NA."""
+    s = pd.to_numeric(sec[isic_col], errors='coerce')
+    ind = pd.Series(pd.NA, index=sec.index, dtype='object')
+    ind = ind.mask((s == 1) | (s == 2), 'Agriculture')
+    ind = ind.mask(s == 3, 'Fishing')
+    ind = ind.mask((s >= 5) & (s <= 9), 'Mining')
+    ind = ind.mask((s >= 10) & (s <= 37), 'Manufacturing')
+    ind = ind.mask((s >= 41) & (s <= 43), 'Construction')
+    ind = ind.mask((s >= 45) & (s <= 4000), 'Services')
+    ind = ind.where(in_wage_emp.fillna(False), pd.NA)
+    return ind.astype('string')
+
+
+def people_last7days_for_wave(t, sec, colmap):
+    """Build canonical ``people_last7days`` for one Tanzania NPS wave.
+
+    Per-individual 7-day activity at grain (t, i, pid) from HH_SEC_E1:
+      farm_work  = hh_e07 (worked in HH agriculture, last 7 days)  1->1 / 2->0
+      SOB_work   = hh_e05 (ran an own non-farm business, last 7 days)
+      wage_work  = hh_e03 (worked as a wage employee, last 7 days)
+      farm_hrs   = hh_e08 (hours in HH ag),  0 if farm_work==0
+      SB_hrs     = hh_e06 (hours in own business), 0 if SOB_work==0
+      wage_hrs   = hh_e04 (hours in wage work), 0 if wage_work==0
+      industry   = coarse ISIC class of the wage job (hh_e31b_2), wage workers
+                   only (gated by hh_e28, "is the answer to wage-work Q yes?")
+      working_age= hh_e01_1==1 (member is 5 years or above)
+    All dummies / hours are set to 0 for members below working age, mirroring
+    the WB .do (every activity is zeroed when working_age==0).
+
+    Parameters
+    ----------
+    t : str            wave id ('2019-20' or '2020-21').
+    sec : pd.DataFrame    raw HH_SEC_E1 (convert_categoricals=False).
+    colmap : dict with keys hhid, pid (sdd_hhid/sdd_indid for 2019-20,
+        y5_hhid/indidy5 for 2020-21).
+
+    Returns
+    -------
+    pd.DataFrame indexed by (t, i, pid) with columns PEOPLE_LAST7DAYS_COLUMNS.
+    """
+    c = colmap
+    working_age = (pd.to_numeric(sec['hh_e01_1'], errors='coerce') == 1)
+
+    def _dummy(col):
+        v = pd.to_numeric(sec[col], errors='coerce').astype('Int64')
+        return v.map({1: True, 2: False}).astype('boolean')
+
+    def _hrs(col, work_dummy):
+        v = pd.to_numeric(sec[col], errors='coerce').astype('Float64')
+        # hours are meaningful only for those who did the activity; set 0 where
+        # the activity dummy is False (matching the .do gating).
+        return v.where(work_dummy.fillna(False), 0)
+
+    farm_work = _dummy('hh_e07')
+    sob_work = _dummy('hh_e05')
+    wage_work = _dummy('hh_e03')
+    in_wage_emp = (pd.to_numeric(sec['hh_e28'], errors='coerce') == 1)
+
+    out = pd.DataFrame({
+        'i': sec[c['hhid']].apply(format_id).values,
+        'pid': sec[c['pid']].apply(format_id).values,
+        'farm_work': farm_work.values,
+        'SOB_work': sob_work.values,
+        'wage_work': wage_work.values,
+        'farm_hrs': _hrs('hh_e08', farm_work).values,
+        'SB_hrs': _hrs('hh_e06', sob_work).values,
+        'wage_hrs': _hrs('hh_e04', wage_work).values,
+        'industry': _industry_from_isic(sec, 'hh_e31b_2', in_wage_emp).values,
+        'working_age': working_age.values,
+    })
+
+    # Below working age: zero every activity dummy / hours (the .do convention),
+    # but keep the row -- working_age itself stays the truthful flag.
+    not_wa = ~out['working_age']
+    for col in ('farm_work', 'SOB_work', 'wage_work'):
+        out.loc[not_wa, col] = False
+    for col in ('farm_hrs', 'SB_hrs', 'wage_hrs'):
+        out.loc[not_wa, col] = 0
+    out.loc[not_wa, 'industry'] = pd.NA
+
+    out['working_age'] = out['working_age'].astype('boolean')
+    out['t'] = t
+    out = out.set_index(['t', 'i', 'pid'])
+    # Drop rows whose every activity field is null (no labor screen answered).
+    if not out.index.is_unique:
+        out = out.groupby(level=['t', 'i', 'pid']).first()
+    out = out[PEOPLE_LAST7DAYS_COLUMNS]
+    return out
+
+
+# ===========================================================================
+# community_prices (parity-loop GAP C -- OURS-ONLY; maintainer priority)
+# ===========================================================================
+#
+# Item-level community/market prices at the natural grain (t, v, j, u) -- one
+# row per (community cluster v, harmonized food item j, native unit u) -- from
+# the COMMUNITY price questionnaire (CM_SEC_F / CM_SEC_F_ID), carrying ONLY the
+# REPORTED surveyed price.  This is the community-price arm of label
+# unification: j is the canonical Preferred Label from harmonize_community_price
+# (which REUSES harmonize_food / harmonize_crop Preferred Labels for every
+# priced food), so a community_prices row for "Maize (grain)" lines up with the
+# food_acquired (consumption) and crop_production (harvest) "Maize (grain)"
+# rows.  NO median/mean across clusters, NO community->household imputation:
+# those are transformations over these rows, never stored here.
+#
+# The price observation in CM_SEC_F_ID is "price cm_f063 for a quantity cm_f062
+# of native unit cm_f061" at the VILLAGE market (the cluster's local market);
+# the district-capital triple (cm_f064/65/66) is a DIFFERENT geographic level
+# (the district town), so it is NOT folded into the cluster grain -- the
+# village price is the cluster price the feature is about.  Price is normalized
+# to the REPORTED unit price = cm_f063 / cm_f062 (currency per ONE native unit
+# u): this is the reported price divided through by its own reported quantity
+# basis -- NOT a cross-row aggregation.  Rows with Price <= 0 or Quantity <= 0
+# are the questionnaire's "item not available / not priced" sentinels (price
+# and quantity both 0) and are dropped as non-observations.
+#
+# v == the community questionnaire's own cluster id (interview__key).  IMPORTANT
+# DATA LIMITATION (issue #113; full diagnosis + match rates in CONTENTS.org,
+# "Why the community-price <-> household link cannot be made cleanly"): the NPS
+# community instrument and the household instrument use INCOMPATIBLE cluster
+# coding -- v == interview__key is a per-INTERVIEW token (NOT a cluster id) with
+# ZERO overlap with sample().v (clusterid / y5_cluster).  The only shared
+# geography is the national admin tuple (community id_01..id_05 vs household
+# t0_region/district/ward); but it is many-to-many with the survey cluster even
+# within the household file (tracking design), so the best-case match is 38/99
+# communities -> a unique cluster in 2019-20, and for 2020-21 the district
+# numbering is irreconcilable (region+district+ward match == 0/488).  So
+# community_prices.v is the community cluster's NATIVE id and does NOT intersect
+# sample().v; a community->household price join is at best a REGION-level
+# fallback TRANSFORMATION (the documented #113 use), deliberately NOT baked into
+# this item-level feature.  Because the grain carries no
+# household i, the framework's _join_v_from_sample never fires (it requires an
+# i level), so v is left exactly as emitted -- no _no_v_join entry is needed.
+
+# Native community-price unit CODE (cm_f061, raw Stata integer; the decoded
+# label is KILOGRAMS/GRAMS/LITRES/MILLILITRES/PIECES, upper- or lower-cased by
+# wave) -> canonical Preferred Label, matching the country `u` categorical table
+# (Kg / Gram / Litre / Millilitre / Piece).  The 1..5 code space is identical
+# across both buildable waves.  Resolved in-script so the emitted u is already
+# canonical; the `u` table additionally carries the decoded-text variants so
+# the label axis is documented and the framework auto-map is an idempotent
+# no-op.
+_COMMUNITY_PRICE_UNIT_LABELS = {
+    1: 'Kg', 2: 'Gram', 3: 'Litre', 4: 'Millilitre', 5: 'Piece',
+}
+
+COMMUNITY_PRICES_COLUMNS = ['Price']
+
+
+def _community_price_codes(tablename='harmonize_community_price'):
+    """{int community-price item code -> canonical Preferred Label} from
+    Tanzania/_/categorical_mapping.org (Code -> Preferred Label).  Reuses the
+    harmonize_food Preferred Labels for every priced food so community_prices.j
+    joins food_acquired.j / crop_production.j; codes with a blank Preferred
+    Label collapse to pd.NA (none today -- all 52 codes carry a label)."""
+    return _plot_harmonized_codes(tablename)
+
+
+def community_prices_for_wave(t, idf, colmap):
+    """Build canonical ``community_prices`` for one Tanzania NPS wave.
+
+    Parameters
+    ----------
+    t : str          wave id ('2019-20' or '2020-21'); the ``t`` value.
+    idf : pd.DataFrame
+        raw CM_SEC_F_ID frame (convert_categoricals=False, so item_id carries
+        the integer community-price item code 1..52).
+    colmap : dict with keys
+        cluster -- community cluster id column (interview__key) -> v
+        item    -- community-price item code column (item_id)
+        unit    -- native unit column          (cm_f061)
+        qty     -- reported quantity basis      (cm_f062)
+        price   -- reported price for that qty  (cm_f063)
+
+    Returns
+    -------
+    pd.DataFrame indexed by (t, v, j, u) with column COMMUNITY_PRICES_COLUMNS
+    (['Price'] -- reported unit price, currency per one native unit u).
+    """
+    c = colmap
+    code_map = _community_price_codes()
+
+    price = pd.to_numeric(idf[c['price']], errors='coerce').astype('Float64')
+    qty = pd.to_numeric(idf[c['qty']], errors='coerce').astype('Float64')
+    code = pd.to_numeric(idf[c['item']], errors='coerce').astype('Int64')
+
+    unit_code = pd.to_numeric(idf[c['unit']], errors='coerce').astype('Int64')
+
+    out = pd.DataFrame({
+        'v': idf[c['cluster']].astype('string').str.strip(),
+        'j': code.map(code_map).astype('string'),
+        # Native unit CODE -> canonical Preferred Label.
+        'u': unit_code.map(_COMMUNITY_PRICE_UNIT_LABELS).astype('string'),
+        'Price': price,
+        '_qty': qty,
+    })
+
+    # Keep only genuine reported prices: a positive price for a positive
+    # quantity basis with a resolved item and unit.  Price<=0 & qty<=0 are the
+    # "item not available / not priced" questionnaire sentinels.
+    out = out[(out['Price'] > 0) & (out['_qty'] > 0)
+              & out['v'].notna() & out['j'].notna() & out['u'].notna()].copy()
+
+    # REPORTED unit price = price / quantity basis (currency per one native
+    # unit u).  This divides the reported price through by its own reported
+    # quantity -- not a cross-row aggregation.
+    out['Price'] = (out['Price'] / out['_qty']).astype('Float64')
+    out = out.drop(columns=['_qty'])
+
+    out['t'] = t
+
+    # ~10% of (t, v, j, u) tuples carry >1 source item code that the shared
+    # label deliberately MERGES (e.g. MILLET (GRAIN) + SORGHUM (GRAIN) -> the
+    # one harmonize_food label "Millet & Sorghum (grain)", exactly as
+    # food_acquired lumps them).  Within a single cluster and unit, combine the
+    # colliding reported unit prices by their MEAN -- a within-cluster,
+    # within-label combination forced by label unification, NOT the forbidden
+    # cross-cluster median.
+    # keep-first: a genuine REPORTED price per cell (consistent with the sibling
+    # community_prices features), not a computed mean over the label-lumped rows.
+    out = (out.groupby(['t', 'v', 'j', 'u'], as_index=False, dropna=False)
+              [['Price']].first())
+
+    # community_prices is a CLUSTER table -- there is no household i, the
+    # natural grain is (t, v, j, u).  But the framework's
+    # local_tools.map_index() (run on EVERY read path) unconditionally swaps
+    # j -> i whenever a `j` index level is present and an `i` level is NOT.
+    # That swap would rename our item level `j` to `i`, drop `j`, and collapse
+    # the table to (t, v, u).  To keep `j` intact WITHOUT touching the
+    # framework, carry a redundant `i` level (set equal to the cluster v)
+    # positioned BEFORE `j`: map_index then sees i present and j after i, so it
+    # does NOT swap, and the framework's _normalize_dataframe_index drops the
+    # undeclared `i` level (data_scheme declares (t, v, j, u)), leaving the
+    # canonical (t, v, j, u) grain.  v already in the index means
+    # _join_v_from_sample is skipped; the spurious i==v never reaches the API.
+    # (Same framework-compatibility shim Malawi/Ethiopia/Mali community_prices
+    # use -- see Malawi assemble_community_prices.)
+    out['i'] = out['v']
+    out = out.set_index(['t', 'v', 'i', 'j', 'u'])
+
+    out = out[COMMUNITY_PRICES_COLUMNS]
+    assert out.reset_index().duplicated(['t', 'v', 'j', 'u']).sum() == 0, \
+        f"community_prices {t}: (t,v,j,u) not unique"
+    return out
+    return out

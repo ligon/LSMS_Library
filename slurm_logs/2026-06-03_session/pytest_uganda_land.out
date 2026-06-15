@@ -1,0 +1,65 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 11%]
+........................................................................ [ 23%]
+........................................................................ [ 35%]
+...........s................................s......................s.... [ 47%]
+...........................s.........s...............................x.x [ 59%]
+..........x.............s......................s.........s.............. [ 71%]
+..............................s............ss.ssx......ssss.sss...ss.s.s [ 82%]
+...s.s.sssssssssssssssss.sss..ss.ss..ss................ssssss........... [ 94%]
+........................F.......                                         [100%]
+=================================== FAILURES ===================================
+________________ TestSample.test_covers_all_waves[EthiopiaRHS] _________________
+[gw6] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+
+self = <LSMS_Library.tests.test_sample.TestSample object at 0x148e3a624450>
+country_name = 'EthiopiaRHS'
+sample_df =              v  weight  panel_weight strata  Rural
+i     t                                           
+10101 1989   1  ...997  20     1.0           1.0     20  Rural
+20_66 1997  20     1.0           1.0     20  Rural
+
+[6253 rows x 5 columns]
+
+    def test_covers_all_waves(self, country_name, sample_df):
+        """sample() should cover all waves the country declares."""
+        c = ll.Country(country_name)
+        expected_waves = set(c.waves)
+        actual_waves = set(sample_df.index.get_level_values("t").unique())
+        missing = expected_waves - actual_waves
+>       assert not missing, (
+            f"{country_name} sample missing waves: {sorted(missing)}"
+        )
+E       AssertionError: EthiopiaRHS sample missing waves: ['1999', '2004', '2009']
+E       assert not {'1999', '2004', '2009'}
+
+tests/test_sample.py:149: AssertionError
+=============================== warnings summary ===============================
+tests/test_sample.py::TestSample::test_index_is_i_t[Uganda]
+tests/test_sample.py::TestSample::test_v_is_string_dtype[Uganda]
+tests/test_sample.py::TestSample::test_v_mostly_populated[Uganda]
+tests/test_sample.py::TestSample::test_has_v_column[Uganda]
+tests/test_sample.py::TestUganda2009MarketFallback::test_food_expenditures_retains_hybrid_v_HH
+tests/test_sample.py::TestUganda2009MarketFallback::test_no_nan_m_after_fallback
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq1
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[Uganda]
+tests/test_sample.py::TestSample::test_v_is_string_dtype[Uganda]
+tests/test_sample.py::TestSample::test_v_mostly_populated[Uganda]
+tests/test_sample.py::TestSample::test_has_v_column[Uganda]
+tests/test_sample.py::TestUganda2009MarketFallback::test_food_expenditures_retains_hybrid_v_HH
+tests/test_sample.py::TestUganda2009MarketFallback::test_no_nan_m_after_fallback
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq3
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py::TestUganda2009MarketFallback::test_household_characteristics_retains_hybrid_v_HH
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/tests/test_sample.py:405: UserWarning: household_characteristics: replaced 448 roster rows with NaN in one of ['t', 'v', 'i'] (typically v) by sentinel 'Mover' -- per-wave: {'2009-10': 110, '2013-14': 7, '2018-19': 328, '2019-20': 3}.  These are usually movers / split-offs whose sample() row lacks a cluster code.  Filter on index.get_level_values('v') == 'Mover' to recover the legacy drop (GH #197, GH #268).
+    return ll.Country("Uganda").household_characteristics(market="Region")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_sample.py::TestSample::test_covers_all_waves[EthiopiaRHS]
+1 failed, 545 passed, 58 skipped, 4 xfailed, 13 warnings in 87.77s (0:01:27)

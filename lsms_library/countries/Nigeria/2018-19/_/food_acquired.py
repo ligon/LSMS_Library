@@ -17,9 +17,22 @@ sys.path.append('../../../_/')
 from lsms_library.local_tools import to_parquet, get_categorical_mapping, get_dataframe
 from lsms_library.transformations import food_acquired_to_canonical
 
-food_labels = get_categorical_mapping(tablename='harmonize_food',
-                                       idxvars='Code',
-                                       **{'Preferred Label': 'Preferred Label'})
+_food_labels_raw = get_categorical_mapping(tablename='harmonize_food',
+                                           idxvars='Code',
+                                           **{'Preferred Label': 'Preferred Label'})
+# Re-key harmonize_food on INT codes so the numeric item_cd (int64 in the
+# source CSV) resolves to its Preferred Label.  The Code column is
+# string-keyed, so a raw int j would otherwise never match and stay numeric
+# (GH #443).  Codes with a blank / '---' label legitimately stay raw.
+food_labels = {}
+for _k, _v in _food_labels_raw.items():
+    try:
+        _ik = int(_k)
+    except (TypeError, ValueError):
+        continue
+    if pd.isna(_v) or str(_v).strip() in ('', '---'):
+        continue
+    food_labels[_ik] = str(_v).strip()
 
 _unit_raw = get_categorical_mapping(tablename='u',
                                      idxvars='Code',
@@ -51,7 +64,7 @@ def extract_food(fn, varmap, t, food_labels):
 
     # Keep relevant columns
     keep = ['t', 'i', 'j', 'u', 'm',
-            'Quantity', 'Expenditure', 'Produced']
+            'Quantity', 'Expenditure', 'Produced', 'kg_factor']
     # Only keep columns that exist (some may be absent in some waves)
     keep = [c for c in keep if c in df.columns]
     df = df[keep]
@@ -72,6 +85,7 @@ harvest_vars = {
     's10bq2b': 'u',                # unit of consumption
     's10bq10': 'Expenditure',      # total value purchased
     's10bq5a': 'Produced',         # home produced quantity
+    's10bq2_cvn': 'kg_factor',     # exact Kg/L conversion factor (GH #378)
     'zone': 'm',
 }
 harvest = extract_food('../Data/sect10b_harvestw4.csv',
@@ -85,6 +99,7 @@ planting_vars = {
     's7bq2b': 'u',
     's7bq10': 'Expenditure',
     's7bq5a': 'Produced',
+    's7bq2_cvn': 'kg_factor',      # exact Kg/L conversion factor (GH #378)
     'zone': 'm',
 }
 planting = extract_food('../Data/sect7b_plantingw4.csv',

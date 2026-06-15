@@ -1,0 +1,5 @@
+outs:
+- md5: 61f4ad0f63ecc552e75fe9b4895d2fec
+  size: 102561
+  hash: md5
+  path: livestock_agg_round7.tab

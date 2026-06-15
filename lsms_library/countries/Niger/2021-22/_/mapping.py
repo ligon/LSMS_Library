@@ -6,6 +6,35 @@ from lsms_library.transformations import food_acquired_to_canonical as food_acqu
 from collections import defaultdict
 
 
+_FIES_ITEMS = ['Worried', 'HealthyDiet', 'FewFoods', 'SkippedMeal',
+               'AteLess', 'RanOut', 'Hungry', 'WholeDay']
+
+
+def _to_fies_bool(s):
+    '''Coerce a FIES item column to nullable boolean.  The YAML
+    ``mapping: {Oui: True, Non: False}`` runs through df_data_grabber,
+    which leaves UNMAPPED values ("Ne sait pas" / "Refus" / NaN)
+    UNCHANGED rather than turning them into NaN.  So we keep only genuine
+    True/False and send everything else (residual strings, NaN) to
+    pd.NA.'''
+    return s.map(lambda x: True if x is True else (False if x is False else pd.NA)).astype('boolean')
+
+
+def food_security(df):
+    '''food_security post-processor: coerce the 8 FIES items to nullable
+    boolean and compute FIES_score (count of True across the 8 items;
+    NaN only when ALL 8 items are NaN).  See the food_security block in
+    data_info.yml for the EHCVM s08aq01..08 -> FAO item mapping.
+    '''
+    for c in _FIES_ITEMS:
+        df[c] = _to_fies_bool(df[c])
+    items = df[_FIES_ITEMS]
+    all_na = items.isna().all(axis=1)
+    score = items.eq(True).sum(axis=1)
+    df['FIES_score'] = score.where(~all_na).astype('Int64')
+    return df
+
+
 def v(value):
     '''
     Formatting cluster id (grappe is a single column).
@@ -40,7 +69,16 @@ def Age(value):
     '''
     Pass through Age list; numeric coercion of "." sentinels is done in
     household_roster() before age_handler is called.
+
+    The function name ``Age`` collides with the ``assets`` myvar
+    ``Age: s12q07`` (item age in years), which the framework binds to
+    this formatter by name (column_mapping in country.py).  That path
+    passes a *scalar*, not the roster's DOB Series; pass scalars
+    through unchanged so assets extraction does not crash on
+    ``list(<float>)`` (closes #321).
     '''
+    if not isinstance(value, pd.Series):
+        return value
     return list(value)
 
 

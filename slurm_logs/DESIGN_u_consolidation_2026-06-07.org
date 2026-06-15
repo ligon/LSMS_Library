@@ -1,0 +1,237 @@
+#+title: Design: unit-label (=u=) consolidation and cross-country scoping
+#+date: <2026-06-07 Sun>
+
+Layer 2--3 of the unit-=u= harmonization sketched in GH #361 and the
+food_acquired backlog triage.  Builds on the Layer-1 safety net (PR #366:
+numeric-code key normalization + =diagnostics.food_acquired_u_code_leaks=)
+and the kg-sentinel protection (PR #363 / GH #361).
+
+* Motivation
+
+The =u= index level (the unit each =food_acquired= quantity is measured
+in) is the single biggest source of cross-country inconsistency left in
+the food pipeline.  A fresh audit (=food_acquired_u_code_leaks= over all
+16 food_acquired countries, 2026-06-07) found 7 clean and 9 dirty:
+
+| Country       | n_u  | leak               | root cause                                  |
+|---------------+------+--------------------+---------------------------------------------|
+| Nigeria       |   82 | 32 codes (post-#366) | =Code=-keyed table, but incomplete          |
+| Togo          |   38 | 25 codes           | label-only table, missing code rows         |
+| Burkina_Faso  |   66 | 22 codes           | table identity-maps codes (=101.0 -> 101.0=) |
+| Senegal       |   62 | 1 code             | table identity-maps codes (=1.0 -> 1.0=)     |
+| Ethiopia      |  117 | 45 code-prefixed   | =1. Kilogram= not stripped                   |
+| Malawi        |  733 | 221 codes + 34 case-dupes | =Kg=/=kg=, =Piece=/=PIECE=            |
+| GhanaLSS      |   15 | 13 codes           | separate =unit_labels.org= (GH #348)        |
+| EthiopiaRHS   | 1451 | item-names in =u=   | extraction bug (GH #347)                    |
+| Nepal         |    — | build error        | separate                                    |
+
+Two structural problems underlie the per-country symptoms:
+
+1. *Fragmentation.* Unit-label data lives in three incompatible places:
+   per-country =#+name:u= tables (11 countries, three different shapes ---
+   =Code=-keyed, =Original Label=-keyed, and identity-mapped junk), plus
+   stray standalone files =GhanaLSS/_/unit_labels.org=,
+   =Senegal/_/units.org=, =GhanaSPS/_/units.org=.
+
+2. *No cross-country scoping for units.*  The metric units (=kg=, =g=,
+   =l=, =ml= and their case/spelling variants) are re-declared, country by
+   country, with the framework offering no shared default.  The global
+   =lsms_library/categorical_mapping/*.org= mechanism (GH #168) already
+   merges shared tables (=harmonize_assets=, =canonical_housing_labels=,
+   =kinship=) into every country --- but there is no global =u= table, and
+   the merge cannot compose one with a country table anyway (see below).
+
+The Layer-1 normalization (PR #366) closed the float-string-vs-int-key
+match, but it cannot help an identity-mapped table (Burkina, Senegal), a
+label-only table missing code rows (Togo), or a separate-file mechanism
+(GhanaLSS).  Those are *table-content* problems that a shared global table
+plus an additive merge solve structurally.
+
+* Current mechanism
+
+=Country.categorical_mapping= (=country.py:1030=) builds the per-country
+mapping dict:
+
+#+begin_src python
+self.__dict__['_categorical_mapping_cache'] = {**global_maps, **country_maps}
+#+end_src
+
+- =global_maps= := every =#+name:= table in =lsms_library/categorical_mapping/*.org=.
+- =country_maps= := every =#+name:= table in the country's
+  =_/categorical_mapping.org=.
+- The merge is *full-table override by name*: if a country defines
+  =#+name:u=, it completely replaces any global =u= table.
+
+=_apply_categorical_mappings= (=country.py:1583=) auto-applies a table to a
+column / index level whose name matches the table name (case-insensitive),
+keyed on the table's first non-=Preferred Label= column.  Per-wave columns
+are supported: Nigeria's =#+name:u= already carries
+=Code | Preferred Label | 2010-11 | 2012-13 | ...=.
+
+The *full-override* semantics are the blocker: a global =u.org= would only
+apply to countries that define no =#+name:u= of their own.  It cannot
+supply common rows (=kg=, =g=, ...) that a country table then extends.
+
+* Goals / non-goals
+
+Goals:
+- One place for unit-label data: =categorical_mapping.org= =#+name:u=
+  (per country) plus a global =categorical_mapping/u.org= (shared).
+- Countries declare only their *country-specific* containers; metric units
+  are inherited from the global table.
+- Drive =food_acquired_u_code_leaks= toward zero for every country.
+
+Non-goals (deferred):
+- Cross-*language* vocabulary harmonization (mapping French =Unité=,
+  Portuguese =Unidade=, English =unit= to one token).  That is Layer 3
+  proper and a separate, opinionated decision; this design only unifies
+  the *mechanism* and the metric core, preserving native container labels.
+- Per-item specific-gravity / kg-factor refinement (orthogonal; that is
+  the conversion path, not the label path).
+
+* Design
+
+** D1.  Additive global<->country merge, behind a per-table flag
+
+Replace the unconditional =dict.update= with a merge function that takes
+an =additive= flag.  =u= passes =additive=True=; every other table keeps
+the current full-override behavior (so =harmonize_assets= etc. are
+untouched --- low blast radius).
+
+#+begin_src python
+def _merge_categorical_tables(global_t, country_t, *, additive):
+    """Combine a global and a country categorical table.
+
+    additive=False (default): country_t fully replaces global_t (current
+        behavior).
+    additive=True: row-union on the source-label key; the country row wins
+        on key collision.  Used for `u` so a country inherits the global
+        metric units and only declares its country-specific containers.
+    """
+#+end_src
+
+Row identity for the union is the *source-label column* (the first
+non-=Preferred Label= column --- =Original Label= or =Code=).  Country
+rows override global rows with the same key; new country keys are added;
+unreferenced global keys remain.  Per-wave columns survive (a country may
+add wave columns the global table lacks; union is on rows, columns are
+outer-joined with country values winning).
+
+The set of additive tables is a small, explicit allow-list (initially
+={'u'}=), so the change is opt-in and auditable.
+
+** D2.  Global =lsms_library/categorical_mapping/u.org=
+
+A single =#+name:u= table for the universal units, =Original Label |
+Preferred Label=:
+
+- metric: =kg=, =Kg=, =KG=, =kilogram(me)=, =g=, =gram(me)=, =l=, =litre=,
+  =liter=, =ml=, =cl= -> canonical (=Kg=, =g=, =Litre=, =Millilitre=, ...).
+- the LCU sentinel =Value= -> =Value= (identity, documented).
+
+The canonical Preferred Labels here define the cross-country metric
+vocabulary.  Open decision (D5) on exact casing.
+
+The global table must *not* remap the reserved =kg= conversion sentinel on
+derived food tables --- already handled by =protect_u_sentinels= (GH #361),
+which exempts =_RESERVED_U_SENTINELS= when finalizing food_quantities /
+food_prices.  food_acquired (raw) still canonicalizes survey spellings.
+
+** D3.  Fold the stray files into =#+name:u=
+
+- =GhanaLSS/_/unit_labels.org= (table =unit_label=, columns
+  =Preferred Label | u=) -> rewrite as =#+name:u= with
+  =Original Label | Preferred Label= and let the framework auto-apply it;
+  retire =unit_labels.org= / =unitlabels.csv= and the in-script
+  =.replace(...)= in =GhanaLSS/_/food_acquired.py= (this is GH #348's
+  Tier-4 lift; note the GhanaLSS =u= is *codes*, so the lifted table must
+  decode codes -> labels, not the current label -> Preferred shape).
+- =Senegal/_/units.org=, =GhanaSPS/_/units.org= -> same fold-in; delete
+  the file once the wave scripts read the canonical table.
+
+** D4.  Standardize the table shape; delete identity-map junk
+
+- Canonical shape: =Original Label | Preferred Label [ | <wave> ... ]=.
+  (=Code= remains a permitted source-column name where the survey is
+  genuinely code-valued, e.g. Nigeria; the auto-mapper keys on the first
+  non-=Preferred Label= column either way.)
+- Delete identity-map rows that map a code to itself (=101.0 -> 101.0=,
+  =1.0 -> 1.0=); they exist only because there was no global fallback and
+  they actively defeat the leak audit.  Replace with real code->label rows
+  where the survey provides labels, or rely on the global table.
+
+* Per-country effect (illustrative)
+
+- Burkina / Senegal: drop the identity-map rows; inherit metric units from
+  the global table; add only the genuine local containers (=Tas=,
+  =Sachet=, ...).  Leaks -> 0 once the remaining survey codes are decoded.
+- Togo: inherit metric units; add the missing code rows for its local
+  units.
+- Nigeria: keep its =Code=-keyed table (+ #366 normalization); add rows
+  for the ~32 codes still missing.
+- Ethiopia: add a prefix-stripping table (=1. Kilogram -> Kilogram=), the
+  same pattern Niger used in #223.
+- Malawi: case-fold dupes (=kg -> Kg=, =PIECE -> Piece=) and decode the
+  =6B=/=22A= survey codes.
+
+Each lands as its own small PR (one bucket per PR), with
+=food_acquired_u_code_leaks(country)= as the acceptance metric.
+
+* Kg-sentinel interaction (already handled)
+
+The =kg= conversion tag emitted by food_quantities / food_prices is a
+framework sentinel, not a survey label.  =protect_u_sentinels= (GH #361)
+already prevents any =#+name:u= table --- global or country --- from
+remapping =_RESERVED_U_SENTINELS = {'kg', 'Value'}= on derived food
+tables.  The global =u.org= therefore cannot corrupt =xs('kg', level='u')=
+cross-country.
+
+* Risks
+
+- *Merge blast radius.*  Mitigated by the per-table =additive= allow-list:
+  only =u= changes behavior; =harmonize_assets= / =canonical_housing_labels=
+  / =kinship= keep full-override.
+- *Per-wave column interaction.*  The row-union must outer-join columns and
+  let country values win; needs a test with a country that carries wave
+  columns (Nigeria).
+- *Stale caches.*  No auto-staleness; every verification clears caches and
+  runs =LSMS_NO_CACHE=1=.  The =food_acquired_u_code_leaks= regression test
+  guards the already-clean set.
+
+* Acceptance criteria
+
+- =_merge_categorical_tables(..., additive=True)= row-unions correctly,
+  country row wins, wave columns preserved; unit-tested.
+- A global =categorical_mapping/u.org= exists and is inherited by a country
+  with no =#+name:u= (e.g. an EHCVM country after its identity rows are
+  removed).
+- =food_acquired_u_code_leaks= is non-increasing for every country and
+  reaches 0 for the buckets addressed in each follow-up PR.
+- No regression in =test_table_structure= / =test_food_labels= /
+  =test_u_code_leak= / =test_u_sentinel_protection=.
+
+* Sequencing
+
+1. (this design) =DESIGN_u_consolidation=.
+2. Framework: =_merge_categorical_tables= + =additive= allow-list (=u=).
+   Unit tests; no data change yet.
+3. Global =categorical_mapping/u.org= (metric core) + migrate one EHCVM
+   country (Senegal or Burkina: drop identity rows, inherit global) as the
+   proof of concept.
+4. Per-bucket follow-ups: Ethiopia prefix; Togo missing rows; Nigeria
+   missing codes; Malawi case-dupes; GhanaLSS #348 lift; EthiopiaRHS #347
+   extraction.
+
+* References
+
+- GH #361 (kg sentinel; PR #363) --- =_RESERVED_U_SENTINELS= /
+  =protect_u_sentinels=.
+- PR #366 --- numeric-code key normalization +
+  =diagnostics.food_acquired_u_code_leaks=.
+- GH #348 (GhanaLSS =u= codes + Tier-4 lift), GH #347 (EthiopiaRHS =u=
+  item-names).
+- GH #168 --- global =categorical_mapping/= cross-country tables.
+- GH #223 --- per-country =#+name:u= Tier 1--3 (Mali / Nigeria / Senegal /
+  Burkina renames; EHCVM tables).
+- =slurm_logs/DESIGN_food_acquired_canonical_2026-05-05.org= (#169),
+  =slurm_logs/DESIGN_food_prices_units_kwarg_2026-05-06.org= (units kwarg).

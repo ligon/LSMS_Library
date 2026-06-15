@@ -16,184 +16,184 @@
 | Rukingiri            | Rukungiri       |
 | Serere (From Soroti) | Serere          |
 
-#+name: food_items
-| Code | Preferred Label                | Aggregate Label    |
-|------+--------------------------------+--------------------|
-|  100 | Matoke (??)                    | Matoke             |
-|  101 | Matoke (bunch)                 | Matoke             |
-|  102 | Matoke (cluster)               | Matoke             |
-|  103 | Matoke (heap)                  | Matoke             |
-|  104 | Matoke (other)                 | Matoke             |
-|  105 | Sweet Potatoes (fresh)         | Sweet Potatoes     |
-|  106 | Sweet Potatoes (dry)           | Sweet Potatoes     |
-|  107 | Cassava (fresh)                | Cassava            |
-|  108 | Cassava (dry/flour)            | Cassava (flour)    |
-|  109 | Irish Potatoes                 | Irish Potatoes     |
-|  110 | Rice                           | Rice               |
-|  111 | Maize (grains)                 | Maize              |
-|  112 | Maize (cobs)                   | Maize              |
-|  113 | Maize (flour)                  | Maize              |
-|  114 | Bread                          | Bread              |
-|  115 | Millet                         | Millet             |
-|  116 | Sorghum                        | Sorghum            |
-|  117 | Beef                           | Beef               |
-|  118 | Pork                           | Pork               |
-|  119 | Goat Meat                      | Goat               |
-|  120 | Other Meat                     | Other Meat         |
-|  121 | Chicken                        | Chicken            |
-|  122 | Fresh Fish                     | Fish (fresh)       |
-|  123 | Dry/Smoked Fish                | Fish (dried)       |
-|  124 | Eggs                           | Eggs               |
-|  125 | Milk (fresh)                   | Milk (fresh)       |
-|  126 | Infant Formula                 | Infant Formula     |
-|  127 | Cooking Oil                    | Cooking Oil        |
-|  128 | Ghee                           | Ghee               |
-|  129 | Margarine, Butter, etc         | Butter, etc.       |
-|  130 | Passion Fruits                 | Passion Fruits     |
-|  131 | Sweet Bananas                  | Sweet Bananas      |
-|  132 | Mangos                         | Mangos             |
-|  133 | Oranges                        | Oranges            |
-|  134 | Other Fruits                   | Other Fruits       |
-|  135 | Onions                         | Onions             |
-|  136 | Tomatoes                       | Tomatoes           |
-|  137 | Cabbages                       | Cabbages           |
-|  138 | Dodo                           | Dodo               |
-|  139 | Other Vegetables               | Other Veg.         |
-|  140 | Beans (fresh)                  | Beans              |
-|  141 | Beans (dry)                    | Beans              |
-|  142 | Ground Nuts (in shell)         | Ground Nuts        |
-|  143 | Ground Nuts (shelled)          | Ground Nuts        |
-|  144 | Ground Nuts (pounded)          | Ground Nuts        |
-|  145 | Peas                           | Peas               |
-|  146 | Sim Sim                        | Sim Sim            |
-|  147 | Sugar                          | Sugar              |
-|  148 | Coffee                         | Coffee             |
-|  149 | Tea                            | Tea                |
-|  150 | Salt                           | Salt               |
-|  151 | Soda                           | Soda               |
-|  152 | Beer                           | Beer               |
-|  153 | Other Alcoholic Drinks         | Other Alcohol      |
-|  154 | Other Drinks                   | Other Drinks       |
-|  155 | Cigarettes                     | Cigarettes         |
-|  156 | Other Tobacco                  | Other Tobacco      |
-|  157 | Restaurant (food)              | Restaurant         |
-|  158 | Restaurant (soda)              | Soda               |
-|  159 | Restaurant (beer)              | Beer               |
-|  160 | Other Juice                    | Other Juice        |
-|  161 | Other Foods                    | Other Foods        |
-|  162 | Peas (dry)                     | Peas               |
-|  163 | Ground Nuts (paste)            | Ground Nuts        |
-|  164 | Green Pepper                   | Other Veg.         |
-|  165 | Pumpkins                       | Other Veg.         |
-|  166 | Avocado                        | Other Fruits       |
-|  167 | Carrots                        | Other Veg.         |
-|  168 | Eggplant                       | Other Veg.         |
-|  169 | Watermelon                     | Other Fruits       |
-|  170 | Pineapple                      | Other Fruits       |
-|  171 | Pawpaw                         | Other Fruits       |
-|  172 | Wheat (flour)                  | Wheat (flour)      |
-|  173 | Chapati                        | Chapati            |
-|  174 | Apples                         | Other Fruits       |
-|  175 | Water                          | Water              |
-|  180 | Sweet Potatoes (flour)         | Sweet Potatoes     |
-|  181 | Cassava (dry)                  | Cassava            |
-|  182 | Cassava (flour)                | Cassava            |
-|  190 | Bread                          | Bread              |
-|  191 | Bread                          | Bread              |
-| 1041 | Matoke (sack)                  | Matoke             |
-| 1042 | Matoke (piece)                 | Matoke             |
-| 1043 | Matoke (other)                 | Matoke             |
-| 1051 | Sweet Potatoes (white, fresh)  | Sweet Potatoes     |
-| 1052 | Sweet Potatoes (orange, fresh) | Sweet Potatoes     |
-| 1061 | Sweet Potatoes (white, dry)    | Sweet Potatoes     |
-| 1062 | Sweet Potatoes (orange, dry)   | Sweet Potatoes     |
-| 1063 | Sweet Potatoes (white, flour)  | Sweet Potatoes     |
-| 1064 | Sweet Potatoes (orange, flour) | Sweet Potatoes     |
-| 1081 | Cassava (dry)                  | Cassava            |
-| 1082 | Cassava (flour)                | Cassava (flour)    |
-| 1083 | Kabalagala                     | Kabalagala         |
-| 1101 | Rice (white)                   | Rice               |
-| 1102 | Rice (brown)                   | Rice               |
-| 1103 | Rice flour                     | Rice               |
-| 1111 | Maize (yellow;grains)          | Maize              |
-| 1112 | Maize (white;grains)           | Maize              |
-| 1121 | Maize (white;cobs)             | Maize              |
-| 1122 | Maize (yellow;cobs)            | Maize              |
-| 1131 | Maize (white;flour)            | Maize              |
-| 1132 | Maize (yellow;flour)           | Maize              |
-| 1151 | Millet Flour                   | Millet             |
-| 1171 | Beef Liver                     | Beef Liver         |
-| 1172 | Beef Offal                     | Beef Offal         |
-| 1173 | Beef (roasted)                 | Beef               |
-| 1174 | Sausages                       | Pork               |
-| 1181 | Pork                           | Pork               |
-| 1182 | Pork (roasted)                 | Pork               |
-| 1191 | Goat Liver                     | Goat Liver         |
-| 1192 | Goat Offal                     | Goat Offal         |
-| 1193 | Goat (roasted)                 | Goat               |
-| 1201 | Other Meat (roasted)           | Other Meat         |
-| 1211 | Chicken (off-layer)            | Chicken            |
-| 1212 | Chicken (broiler)              | Chicken            |
-| 1213 | Chicken (kroiler)              | Chicken            |
-| 1214 | Chicken (local)                | Chicken            |
-| 1215 | Chicken (roasted)              | Chicken            |
-| 1221 | Tilapia (fresh)                | Fish (fresh)       |
-| 1222 | Perch (fresh)                  | Fish (fresh)       |
-| 1231 | Tilapia (dried)                | Fish (dried)       |
-| 1232 | Perch (dried)                  | Fish (dried)       |
-| 1234 | Nkejje (dried)                 | Fish (dried)       |
-| 1235 | Other Fish (fresh)             | Fish (fresh)       |
-| 1236 | Other Fish (dried)             | Fish (dried)       |
-| 1237 | Mukene                         | Fish (fresh)       |
-| 1241 | Eggs (yellow yolk)             | Eggs               |
-| 1242 | Eggs (white yolk)              | Eggs               |
-| 1243 | Other Eggs                     | Eggs               |
-| 1251 | Milk (powdered)                | Milk (powdered)    |
-| 1252 | Bongo                          | Bongo              |
-| 1253 | Ice Cream                      | Ice Cream          |
-| 1254 | Yoghurt                        | Yogurt             |
-| 1271 | Cooking Oil (refined)          | Cooking Oil        |
-| 1272 | Cooking Oil (unrefined)        | Cooking Oil        |
-| 1281 | Cheese                         | Cheese             |
-| 1291 | Butter                         | Butter, etc.       |
-| 1311 | Ndiizi                         | Sweet Bananas      |
-| 1312 | Bogoya                         | Sweet Bananas      |
-| 1313 | Plantains                      | Plantains          |
-| 1351 | Garlic                         | Garlic             |
-| 1352 | Ginger (fresh)                 | Ginger             |
-| 1353 | Ginger (powder)                | Ginger             |
-| 1371 | Cabbage (red)                  | Cabbages           |
-| 1372 | Cabbage (green)                | Cabbages           |
-| 1391 | Other Spices                   | Other Spices       |
-| 1461 | Sim Sim                        | Sim Sim            |
-| 1462 | Sim Sim (paste)                | Sim Sim            |
-| 1471 | Honey                          | Honey              |
-| 1472 | Jam/Marmalade                  | Jam/Marmalade      |
-| 1481 | Coffee                         | Coffee             |
-| 1482 | Coffee (other)                 | Coffee             |
-| 1491 | Tea (leaves)                   | Tea                |
-| 1492 | Tea (other)                    | Tea                |
-| 1493 | Tea (green)                    | Tea                |
-| 1501 | Salt                           | Salt               |
-| 1531 | Waragi                         | Waragi             |
-| 1601 | Other Juice (fresh)            | Other Juice        |
-| 1602 | Other Juice (packed)           | Other Juice        |
-| 1603 | Other Juice (restaurants)      | Other Juice        |
-| 1651 | Pumpkin Leaves                 | Other Veg.         |
-| 1652 | Mushrooms                      | Other Veg.         |
-| 1653 | Cucumber                       | Other Veg.         |
-| 1654 | Okra                           | Other Veg.         |
-| 1721 | Macaroni/Spaghetti             | Macaroni/Spaghetti |
-| 1731 | Biscuits                       | Biscuits           |
-| 1732 | Cakes                          | Cake               |
-| 1733 | Donuts                         | Donut              |
-| 1734 | Cornflakes                     | Cornflakes         |
-| 1735 | Samosas                        | Samosa             |
-| 1741 | Yams (arrowroot)               | Yam                |
-| 1742 | Sugarcane                      | Sugarcane          |
-| 1743 | Jackfruit (fresh)              | Jackfruit          |
-| 1761 | Soybeans (fresh)               | Soybean            |
-| 1762 | Soybeans (dry)                 | Soybean            |
+#+name: harmonize_food
+| Code | Preferred Label                | Aggregate Label    | Nutrition Label                |
+|------+--------------------------------+--------------------+--------------------------------|
+|  100 | Matoke (??)                    | Matoke             | Matoke                         |
+|  101 | Matoke (bunch)                 | Matoke             | Matoke                         |
+|  102 | Matoke (cluster)               | Matoke             | Matoke                         |
+|  103 | Matoke (heap)                  | Matoke             | Matoke                         |
+|  104 | Matoke (other)                 | Matoke             | Matoke                         |
+|  105 | Sweet Potatoes (fresh)         | Sweet Potatoes     | Sweet Potatoes (fresh)         |
+|  106 | Sweet Potatoes (dry)           | Sweet Potatoes     | Sweet Potatoes (dry)           |
+|  107 | Cassava (fresh)                | Cassava            | Cassava (fresh)                |
+|  108 | Cassava (dry/flour)            | Cassava (flour)    | Cassava (dry/flour)            |
+|  109 | Irish Potatoes                 | Irish Potatoes     | Irish Potatoes                 |
+|  110 | Rice                           | Rice               | Rice                           |
+|  111 | Maize (grains)                 | Maize              | Maize (grains)                 |
+|  112 | Maize (cobs)                   | Maize              | Maize (cobs)                   |
+|  113 | Maize (flour)                  | Maize              | Maize (flour)                  |
+|  114 | Bread                          | Bread              | Bread                          |
+|  115 | Millet                         | Millet             | Millet                         |
+|  116 | Sorghum                        | Sorghum            | Sorghum                        |
+|  117 | Beef                           | Beef               | Beef                           |
+|  118 | Pork                           | Pork               | Pork                           |
+|  119 | Goat Meat                      | Goat               | Goat Meat                      |
+|  120 | Other Meat                     | Other Meat         | Other Meat                     |
+|  121 | Chicken                        | Chicken            | Chicken                        |
+|  122 | Fresh Fish                     | Fish (fresh)       | Fresh Fish                     |
+|  123 | Dry/Smoked Fish                | Fish (dried)       | Dry/Smoked Fish                |
+|  124 | Eggs                           | Eggs               | Eggs                           |
+|  125 | Milk (fresh)                   | Milk (fresh)       | Milk (fresh)                   |
+|  126 | Infant Formula                 | Infant Formula     | Infant Formula                 |
+|  127 | Cooking Oil                    | Cooking Oil        | Cooking Oil                    |
+|  128 | Ghee                           | Ghee               | Ghee                           |
+|  129 | Margarine, Butter, etc         | Butter, etc.       | Margarine, Butter, etc         |
+|  130 | Passion Fruits                 | Passion Fruits     | Passion Fruits                 |
+|  131 | Sweet Bananas                  | Sweet Bananas      | Sweet Bananas                  |
+|  132 | Mangos                         | Mangos             | Mangos                         |
+|  133 | Oranges                        | Oranges            | Oranges                        |
+|  134 | Other Fruits                   | Other Fruits       | Other Fruits                   |
+|  135 | Onions                         | Onions             | Onions                         |
+|  136 | Tomatoes                       | Tomatoes           | Tomatoes                       |
+|  137 | Cabbages                       | Cabbages           | Cabbages                       |
+|  138 | Dodo                           | Dodo               | Dodo                           |
+|  139 | Other Vegetables               | Other Veg.         | Other Vegetables               |
+|  140 | Beans (fresh)                  | Beans              | Beans (fresh)                  |
+|  141 | Beans (dry)                    | Beans              | Beans (dry)                    |
+|  142 | Ground Nuts (in shell)         | Ground Nuts        | Ground Nuts (in shell)         |
+|  143 | Ground Nuts (shelled)          | Ground Nuts        | Ground Nuts (shelled)          |
+|  144 | Ground Nuts (pounded)          | Ground Nuts        | Ground Nuts (pounded)          |
+|  145 | Peas                           | Peas               | Peas                           |
+|  146 | Sim Sim                        | Sim Sim            | Sim Sim                        |
+|  147 | Sugar                          | Sugar              | Sugar                          |
+|  148 | Coffee                         | Coffee             | Coffee                         |
+|  149 | Tea                            | Tea                | Tea                            |
+|  150 | Salt                           | Salt               | Salt                           |
+|  151 | Soda                           | Soda               | Soda                           |
+|  152 | Beer                           | Beer               | Beer                           |
+|  153 | Other Alcoholic Drinks         | Other Alcohol      | Other Alcoholic Drinks         |
+|  154 | Other Drinks                   | Other Drinks       | Other Drinks                   |
+|  155 | Cigarettes                     | Cigarettes         | Cigarettes                     |
+|  156 | Other Tobacco                  | Other Tobacco      | Other Tobacco                  |
+|  157 | Restaurant (food)              | Restaurant         | Restaurant (food)              |
+|  158 | Restaurant (soda)              | Soda               | Soda                           |
+|  159 | Restaurant (beer)              | Beer               | Beer                           |
+|  160 | Other Juice                    | Other Juice        | Other Juice                    |
+|  161 | Other Foods                    | Other Foods        | Other Foods                    |
+|  162 | Peas (dry)                     | Peas               | Peas (dry)                     |
+|  163 | Ground Nuts (paste)            | Ground Nuts        | Ground Nuts (paste)            |
+|  164 | Green Pepper                   | Other Veg.         | Green Pepper                   |
+|  165 | Pumpkins                       | Other Veg.         | Pumpkins                       |
+|  166 | Avocado                        | Other Fruits       | Avocado                        |
+|  167 | Carrots                        | Other Veg.         | Carrots                        |
+|  168 | Eggplant                       | Other Veg.         | Eggplant                       |
+|  169 | Watermelon                     | Other Fruits       | Watermelon                     |
+|  170 | Pineapple                      | Other Fruits       | Pineapple                      |
+|  171 | Pawpaw                         | Other Fruits       | Pawpaw                         |
+|  172 | Wheat (flour)                  | Wheat (flour)      | Wheat (flour)                  |
+|  173 | Chapati                        | Chapati            | Chapati                        |
+|  174 | Apples                         | Other Fruits       | Apples                         |
+|  175 | Water                          | Water              | Water                          |
+|  180 | Sweet Potatoes (flour)         | Sweet Potatoes     | Sweet Potatoes (flour)         |
+|  181 | Cassava (dry)                  | Cassava            | Cassava (dry)                  |
+|  182 | Cassava (flour)                | Cassava            | Cassava (flour)                |
+|  190 | Bread                          | Bread              | Bread                          |
+|  191 | Bread                          | Bread              | Bread                          |
+| 1041 | Matoke (sack)                  | Matoke             | Matoke                         |
+| 1042 | Matoke (piece)                 | Matoke             | Matoke                         |
+| 1043 | Matoke (other)                 | Matoke             | Matoke                         |
+| 1051 | Sweet Potatoes (white, fresh)  | Sweet Potatoes     | Sweet Potatoes (white, fresh)  |
+| 1052 | Sweet Potatoes (orange, fresh) | Sweet Potatoes     | Sweet Potatoes (orange, fresh) |
+| 1061 | Sweet Potatoes (white, dry)    | Sweet Potatoes     | Sweet Potatoes (white, dry)    |
+| 1062 | Sweet Potatoes (orange, dry)   | Sweet Potatoes     | Sweet Potatoes (orange, dry)   |
+| 1063 | Sweet Potatoes (white, flour)  | Sweet Potatoes     | Sweet Potatoes (white, flour)  |
+| 1064 | Sweet Potatoes (orange, flour) | Sweet Potatoes     | Sweet Potatoes (orange, flour) |
+| 1081 | Cassava (dry)                  | Cassava            | Cassava (dry)                  |
+| 1082 | Cassava (flour)                | Cassava (flour)    | Cassava (flour)                |
+| 1083 | Kabalagala                     | Kabalagala         | Kabalagala                     |
+| 1101 | Rice (white)                   | Rice               | Rice (white)                   |
+| 1102 | Rice (brown)                   | Rice               | Rice (brown)                   |
+| 1103 | Rice flour                     | Rice               | Rice flour                     |
+| 1111 | Maize (yellow;grains)          | Maize              | Maize (yellow;grains)          |
+| 1112 | Maize (white;grains)           | Maize              | Maize (white;grains)           |
+| 1121 | Maize (white;cobs)             | Maize              | Maize (white;cobs)             |
+| 1122 | Maize (yellow;cobs)            | Maize              | Maize (yellow;cobs)            |
+| 1131 | Maize (white;flour)            | Maize              | Maize (white;flour)            |
+| 1132 | Maize (yellow;flour)           | Maize              | Maize (yellow;flour)           |
+| 1151 | Millet Flour                   | Millet             | Millet Flour                   |
+| 1171 | Beef Liver                     | Beef Liver         | Beef Liver                     |
+| 1172 | Beef Offal                     | Beef Offal         | Beef Offal                     |
+| 1173 | Beef (roasted)                 | Beef               | Beef (roasted)                 |
+| 1174 | Sausages                       | Pork               | Sausages                       |
+| 1181 | Pork                           | Pork               | Pork                           |
+| 1182 | Pork (roasted)                 | Pork               | Pork (roasted)                 |
+| 1191 | Goat Liver                     | Goat Liver         | Goat Liver                     |
+| 1192 | Goat Offal                     | Goat Offal         | Goat Offal                     |
+| 1193 | Goat (roasted)                 | Goat               | Goat (roasted)                 |
+| 1201 | Other Meat (roasted)           | Other Meat         | Other Meat (roasted)           |
+| 1211 | Chicken (off-layer)            | Chicken            | Chicken (off-layer)            |
+| 1212 | Chicken (broiler)              | Chicken            | Chicken (broiler)              |
+| 1213 | Chicken (kroiler)              | Chicken            | Chicken (kroiler)              |
+| 1214 | Chicken (local)                | Chicken            | Chicken (local)                |
+| 1215 | Chicken (roasted)              | Chicken            | Chicken (roasted)              |
+| 1221 | Tilapia (fresh)                | Fish (fresh)       | Tilapia (fresh)                |
+| 1222 | Perch (fresh)                  | Fish (fresh)       | Perch (fresh)                  |
+| 1231 | Tilapia (dried)                | Fish (dried)       | Tilapia (dried)                |
+| 1232 | Perch (dried)                  | Fish (dried)       | Perch (dried)                  |
+| 1234 | Nkejje (dried)                 | Fish (dried)       | Nkejje (dried)                 |
+| 1235 | Other Fish (fresh)             | Fish (fresh)       | Other Fish (fresh)             |
+| 1236 | Other Fish (dried)             | Fish (dried)       | Other Fish (dried)             |
+| 1237 | Mukene                         | Fish (fresh)       | Mukene                         |
+| 1241 | Eggs (yellow yolk)             | Eggs               | Eggs (yellow yolk)             |
+| 1242 | Eggs (white yolk)              | Eggs               | Eggs (white yolk)              |
+| 1243 | Other Eggs                     | Eggs               | Other Eggs                     |
+| 1251 | Milk (powdered)                | Milk (powdered)    | Milk (powdered)                |
+| 1252 | Bongo                          | Bongo              | Bongo                          |
+| 1253 | Ice Cream                      | Ice Cream          | Ice Cream                      |
+| 1254 | Yoghurt                        | Yogurt             | Yoghurt                        |
+| 1271 | Cooking Oil (refined)          | Cooking Oil        | Cooking Oil (refined)          |
+| 1272 | Cooking Oil (unrefined)        | Cooking Oil        | Cooking Oil (unrefined)        |
+| 1281 | Cheese                         | Cheese             | Cheese                         |
+| 1291 | Butter                         | Butter, etc.       | Butter                         |
+| 1311 | Ndiizi                         | Sweet Bananas      | Ndiizi                         |
+| 1312 | Bogoya                         | Sweet Bananas      | Bogoya                         |
+| 1313 | Plantains                      | Plantains          | Plantains                      |
+| 1351 | Garlic                         | Garlic             | Garlic                         |
+| 1352 | Ginger (fresh)                 | Ginger             | Ginger (fresh)                 |
+| 1353 | Ginger (powder)                | Ginger             | Ginger (powder)                |
+| 1371 | Cabbage (red)                  | Cabbages           | Cabbage (red)                  |
+| 1372 | Cabbage (green)                | Cabbages           | Cabbage (green)                |
+| 1391 | Other Spices                   | Other Spices       | Other Spices                   |
+| 1461 | Sim Sim                        | Sim Sim            | Sim Sim                        |
+| 1462 | Sim Sim (paste)                | Sim Sim            | Sim Sim (paste)                |
+| 1471 | Honey                          | Honey              | Honey                          |
+| 1472 | Jam/Marmalade                  | Jam/Marmalade      | Jam/Marmalade                  |
+| 1481 | Coffee                         | Coffee             | Coffee                         |
+| 1482 | Coffee (other)                 | Coffee             | Coffee (other)                 |
+| 1491 | Tea (leaves)                   | Tea                | Tea (leaves)                   |
+| 1492 | Tea (other)                    | Tea                | Tea (other)                    |
+| 1493 | Tea (green)                    | Tea                | Tea (green)                    |
+| 1501 | Salt                           | Salt               | Salt                           |
+| 1531 | Waragi                         | Waragi             | Waragi                         |
+| 1601 | Other Juice (fresh)            | Other Juice        | Other Juice (fresh)            |
+| 1602 | Other Juice (packed)           | Other Juice        | Other Juice (packed)           |
+| 1603 | Other Juice (restaurants)      | Other Juice        | Other Juice (restaurants)      |
+| 1651 | Pumpkin Leaves                 | Other Veg.         | Pumpkin Leaves                 |
+| 1652 | Mushrooms                      | Other Veg.         | Mushrooms                      |
+| 1653 | Cucumber                       | Other Veg.         | Cucumber                       |
+| 1654 | Okra                           | Other Veg.         | Okra                           |
+| 1721 | Macaroni/Spaghetti             | Macaroni/Spaghetti | Macaroni/Spaghetti             |
+| 1731 | Biscuits                       | Biscuits           | Biscuits                       |
+| 1732 | Cakes                          | Cake               | Cakes                          |
+| 1733 | Donuts                         | Donut              | Donuts                         |
+| 1734 | Cornflakes                     | Cornflakes         | Cornflakes                     |
+| 1735 | Samosas                        | Samosa             | Samosas                        |
+| 1741 | Yams (arrowroot)               | Yam                | Yams (arrowroot)               |
+| 1742 | Sugarcane                      | Sugarcane          | Sugarcane                      |
+| 1743 | Jackfruit (fresh)              | Jackfruit          | Jackfruit (fresh)              |
+| 1761 | Soybeans (fresh)               | Soybean            | Soybeans (fresh)               |
+| 1762 | Soybeans (dry)                 | Soybean            | Soybeans (dry)                 |
 
 #+name: Roof
 | Alternate Spelling | Preferred Label |
@@ -555,3 +555,394 @@
 | 156090 | ---                               |                                    |                                  |                                   |                                   |                                   |                                   |                                   |                                   |
 | 181087 | ---                               |                                    |                                  |                                   |                                   |                                   |                                   |                                   |                                   |
 | 142090 | ---                               |                                    |                                  |                                   |                                   |                                   |                                   |                                   |                                   |
+
+# plot_features harmonization tables (GH #167 Phase 1; see uganda.py
+# plot_features_for_wave and data_info.yml Columns:plot_features).
+#
+# harmonize_tenure_system — AGSEC2A.a2aq7 / AGSEC2B.a2bq7 / s2aq7 codes
+#   to canonical TenureSystem spellings.  Stable across all 8 UNPS
+#   waves (2005-06 has 5='other'; 2009-10+ uses 6).
+# harmonize_soil — AGSEC2A.a2aq16 / AGSEC2B.a2bq14/a2bq17 / s2aq16 codes
+#   to canonical SoilType spellings.  2005-06 does not ask soil type.
+# harmonize_water — AGSEC2A.a2aq18/a2aq20 / AGSEC2B.a2bq16/a2bq19 codes.
+#   The Irrigated bool is derived as (water_label == 'Irrigated').
+#   Some Stata files mislabel this column as "soil type" — verify by
+#   inspecting the value distribution per wave.
+# harmonize_acquire — AGSEC2A.a2aq8 / AGSEC2B.a2bq8 "How did you acquire"
+#   codes, keyed by (File, Code) since the AGSEC2A and AGSEC2B code
+#   schemes diverge.  AGSEC2A entries map to 'owned' regardless of how
+#   the household came to own; AGSEC2B entries map to rented_in /
+#   other_tenure depending on whether the access is by-agreement or not.
+
+#+name: harmonize_tenure_system
+| Code | Preferred Label      |
+|------+----------------------|
+|    1 | freehold             |
+|    2 | leasehold            |
+|    3 | mailo                |
+|    4 | customary            |
+|    5 | other_tenure_system  |
+|    6 | other_tenure_system  |
+
+#+name: harmonize_soil
+| Code | Preferred Label   |
+|------+-------------------|
+|    1 | sand_loam         |
+|    2 | sandy_clay_loam   |
+|    3 | black_clay        |
+|    4 | other             |
+|    6 | other             |
+
+#+name: harmonize_water
+| Code | Preferred Label  |
+|------+------------------|
+|    1 | Irrigated        |
+|    2 | Rain-fed         |
+|    3 | Swamp/Wetland    |
+
+# WAVE-KEYED (GH #167).  The AGSEC2A/2B "how acquired" codes mean
+# DIFFERENT things across waves: 2B code 1 = 'purchased' in 2005-06 but
+# 'agreement with use-rights owner' in 2009-15; 2018-19 2B shifts to
+# 8/9/96; 2019-20 adopts the full 1-9 scheme on both files.  The old
+# (File,Code) table baked in the 2009-15 meaning and mislabelled ~85%
+# of 2005-06 2B rows.  This table is keyed on (Wave, File, Code).
+# Codes not listed for a wave (e.g. 'Do not know'=5, the malformed
+# 2009-10 2B code 3) and absent acquire columns (2018-19 2A is 0%
+# populated) map to NaN -- there is NO silent file-letter default.
+# Decisions: agreement-with-use-rights-owner -> use_right; without
+# agreement / cleared / just-walked-in -> squatted; leased-in -> leased;
+# given by local authority / government -> communal.  See
+# slurm_logs/DESIGN_plot_features_cross_country_workflow_2026-06-03.org.
+#+name: harmonize_acquire
+| Wave    | File | Code | Preferred Label |
+|---------+------+------+-----------------|
+| 2005-06 | 2A   |    1 | owned           |
+| 2005-06 | 2A   |    2 | inherited       |
+| 2005-06 | 2A   |    3 | inherited       |
+| 2005-06 | 2A   |    4 | squatted        |
+| 2005-06 | 2A   |    5 | other_tenure    |
+| 2005-06 | 2B   |    1 | owned           |
+| 2005-06 | 2B   |    2 | inherited       |
+| 2005-06 | 2B   |    3 | inherited       |
+| 2005-06 | 2B   |    4 | use_right       |
+| 2005-06 | 2B   |    5 | squatted        |
+| 2005-06 | 2B   |    6 | other_tenure    |
+| 2009-10 | 2A   |    1 | owned           |
+| 2009-10 | 2A   |    2 | inherited       |
+| 2009-10 | 2A   |    3 | leased          |
+| 2009-10 | 2A   |    4 | squatted        |
+| 2009-10 | 2A   |    6 | other_tenure    |
+| 2009-10 | 2B   |    1 | use_right       |
+| 2009-10 | 2B   |    2 | squatted        |
+| 2009-10 | 2B   |    6 | other_tenure    |
+| 2010-11 | 2A   |    1 | owned           |
+| 2010-11 | 2A   |    2 | inherited       |
+| 2010-11 | 2A   |    3 | leased          |
+| 2010-11 | 2A   |    4 | squatted        |
+| 2010-11 | 2A   |    6 | other_tenure    |
+| 2010-11 | 2B   |    1 | use_right       |
+| 2010-11 | 2B   |    2 | squatted        |
+| 2010-11 | 2B   |    6 | other_tenure    |
+| 2011-12 | 2A   |    1 | owned           |
+| 2011-12 | 2A   |    2 | inherited       |
+| 2011-12 | 2A   |    3 | leased          |
+| 2011-12 | 2A   |    4 | squatted        |
+| 2011-12 | 2A   |    6 | other_tenure    |
+| 2011-12 | 2B   |    1 | use_right       |
+| 2011-12 | 2B   |    2 | squatted        |
+| 2011-12 | 2B   |    6 | other_tenure    |
+| 2013-14 | 2A   |    1 | owned           |
+| 2013-14 | 2A   |    2 | inherited       |
+| 2013-14 | 2A   |    3 | leased          |
+| 2013-14 | 2A   |    4 | squatted        |
+| 2013-14 | 2A   |    6 | other_tenure    |
+| 2013-14 | 2B   |    1 | use_right       |
+| 2013-14 | 2B   |    2 | squatted        |
+| 2013-14 | 2B   |    6 | other_tenure    |
+| 2015-16 | 2A   |    1 | owned           |
+| 2015-16 | 2A   |    2 | inherited       |
+| 2015-16 | 2A   |    3 | leased          |
+| 2015-16 | 2A   |    4 | squatted        |
+| 2015-16 | 2A   |    6 | other_tenure    |
+| 2015-16 | 2B   |    1 | use_right       |
+| 2015-16 | 2B   |    2 | squatted        |
+| 2015-16 | 2B   |    6 | other_tenure    |
+| 2018-19 | 2B   |    8 | use_right       |
+| 2018-19 | 2B   |    9 | squatted        |
+| 2018-19 | 2B   |   96 | other_tenure    |
+| 2019-20 | 2A   |    1 | owned           |
+| 2019-20 | 2A   |    2 | inherited       |
+| 2019-20 | 2A   |    3 | leased          |
+| 2019-20 | 2A   |    4 | squatted        |
+| 2019-20 | 2A   |    6 | communal        |
+| 2019-20 | 2A   |    7 | communal        |
+| 2019-20 | 2A   |    8 | use_right       |
+| 2019-20 | 2A   |    9 | squatted        |
+| 2019-20 | 2A   |   96 | other_tenure    |
+| 2019-20 | 2B   |    1 | owned           |
+| 2019-20 | 2B   |    2 | inherited       |
+| 2019-20 | 2B   |    3 | leased          |
+| 2019-20 | 2B   |    4 | squatted        |
+| 2019-20 | 2B   |    6 | communal        |
+| 2019-20 | 2B   |    8 | use_right       |
+| 2019-20 | 2B   |    9 | squatted        |
+| 2019-20 | 2B   |   96 | other_tenure    |
+
+# harmonize_crop: crop-item code -> Preferred Label for the post-harvest
+# crop module (AGSEC5A/5B cropID).  The UNPS crop-code scheme is SEPARATE
+# from the food-consumption harmonize_food Code scheme (crop 130 = Maize
+# but food 130 = Passion Fruits), so crop labels live in their own table.
+# Where a crop is also a consumed food the Preferred Label REUSES the
+# harmonize_food *Aggregate Label* string (Maize, Beans, Rice, Sorghum,
+# Cassava, Sweet Potatoes, Ground Nuts, Sim Sim, Coffee, Tea, Onions,
+# Tomatoes, Cabbages, Sugarcane, Mangos, Oranges, Pineapple, Avocado,
+# Pawpaw, Passion Fruits, Soybean, Yam, Jackfruit, Millet) so
+# crop_production.j joins food_acquired(labels='Aggregate').j.  Non-food
+# crops (Cotton, Tobacco, Cocoa, Vanilla, Sunflower, Finger Millet, Field
+# / Cow / Pigeon / Chick Peas, Banana Beer, Cocoyam, Green Gram) get new
+# labels.  Land-status / non-crop codes (Fallow, Bush, Pastures, Forest,
+# Other) keep their literal label.
+#+name: harmonize_crop
+| Code | Preferred Label  |
+|------+------------------|
+|  111 | Wheat            |
+|  112 | Barley           |
+|  120 | Rice             |
+|  130 | Maize            |
+|  141 | Finger Millet    |
+|  150 | Sorghum          |
+|  210 | Beans            |
+|  211 | Beans            |
+|  221 | Field Peas       |
+|  222 | Cow Peas         |
+|  223 | Pigeon Peas      |
+|  224 | Chick Peas       |
+|  310 | Ground Nuts      |
+|  320 | Soybean          |
+|  330 | Sunflower        |
+|  340 | Sim Sim          |
+|  410 | Cabbages         |
+|  420 | Tomatoes         |
+|  430 | Carrots          |
+|  440 | Onions           |
+|  450 | Pumpkins         |
+|  460 | Dodo             |
+|  470 | Eggplant         |
+|  480 | Other Vegetable  |
+|  490 | Other Vegetable  |
+|  510 | Sugarcane        |
+|  520 | Cotton           |
+|  530 | Tobacco          |
+|  610 | Irish Potatoes   |
+|  620 | Sweet Potatoes   |
+|  630 | Cassava          |
+|  640 | Yam              |
+|  650 | Cocoyam          |
+|  700 | Oranges          |
+|  710 | Pawpaw           |
+|  720 | Pineapple        |
+|  741 | Banana Food      |
+|  742 | Banana Beer      |
+|  744 | Sweet Bananas    |
+|  750 | Mangos           |
+|  760 | Jackfruit        |
+|  770 | Avocado          |
+|  780 | Passion Fruits   |
+|  810 | Coffee           |
+|  811 | Coffee           |
+|  812 | Coffee           |
+|  820 | Cocoa            |
+|  830 | Tea              |
+|  840 | Ginger           |
+|  860 | Other Spice      |
+|  870 | Vanilla          |
+|  890 | Other Crop       |
+|  891 | Other Crop       |
+|  910 | Natural Pasture  |
+|  920 | Improved Pasture |
+|  930 | Fallow           |
+|  940 | Bush             |
+|  950 | Natural Forest   |
+|  960 | Plantation Trees |
+|  990 | Other Forest     |
+|  991 | Green Gram       |
+
+# harvest_units: harvest measurement-unit code -> Preferred Label for the
+# post-harvest crop module (AGSEC5A/5B a5aq6c / s5aq06b_1 and sold a5aq7c
+# / s5aq07c_1).  This is the UNPS *harvest* unit scheme (1=Kg, sacks,
+# tins, baskets, bunches, ...), distinct from the food-consumption u
+# scheme.  Preferred Labels reuse the canonical u-table unit strings where
+# they coincide (Kg, Sack/Tin/Basket/Bunch sizes, Number of Units
+# (General)).  kg-conversion factors are NOT stored here (they live in
+# transformations; the survey also carries a per-row conversion factor
+# a5aq6d / s5aq06d_1).
+#+name: harvest_units
+| Code | Preferred Label                   |
+|------+-----------------------------------|
+|    1 | Kg                                |
+|    2 | Gram                              |
+|    9 | Sack (120 kgs)                    |
+|   10 | Sack (100 kgs)                    |
+|   11 | Sack (80 kgs)                     |
+|   12 | Sack (50 kgs)                     |
+|   13 | Sack (unspecified)                |
+|   14 | Jerrican (20 lts)                 |
+|   15 | Jerrican (10 lts)                 |
+|   16 | Jerrican (5 lts)                  |
+|   17 | Jerrican (3 lts)                  |
+|   18 | Jerrican (2 lts)                  |
+|   20 | Tin (Debe) (20 lts)               |
+|   21 | Tin (5 lts)                       |
+|   22 | Plastic Basin (15 lts)            |
+|   29 | Kimbo/Cowboy/Blueband Tin (2kg)   |
+|   30 | Kimbo/Cowboy/Blueband Tin (1kg)   |
+|   31 | Kimbo/Cowboy/Blueband Tin (0.5kg) |
+|   32 | Cup/Mug(0.5lt)                    |
+|   37 | Basket (20 kg)                    |
+|   38 | Basket (10 kg)                    |
+|   39 | Basket (5 kg)                     |
+|   40 | Basket (2 kg)                     |
+|   63 | Crate                             |
+|   64 | Heap (unspecified)                |
+|   66 | Bundle (Unspecified)              |
+|   67 | Bunch (Big)                       |
+|   68 | Bunch (Medium)                    |
+|   69 | Bunch (Small)                     |
+|   70 | Cluster (Unspecified)             |
+|   83 | Tobacco leaf (Number)             |
+|   85 | Number of Units (General)         |
+|   87 | Piece (Big)                       |
+|   88 | Piece (Medium)                    |
+|   89 | Piece (Small)                     |
+|   90 | Heap (Big)                        |
+|   91 | Heap (Medium)                     |
+|   92 | Heap (Small)                      |
+|   93 | Cluster (Big)                     |
+|   94 | Cluster (Medium)                  |
+|   95 | Cluster (Small)                   |
+|   99 | Others specify                    |
+|  107 | Nice cup (100g) - Large           |
+|  108 | Nice cup (60g) - Medium           |
+|  119 | Nomi Tin (1kg)                    |
+|  120 | Nomi Tin (500g)                   |
+
+# harmonize_input: agricultural-input identity Code -> Preferred Label for
+# the plot_inputs feature (GAP 2).  One row per REPORTED input applied to a
+# plot, ``input`` axis.  The UNPS plot-input module (AGSEC3A/3B) records four
+# input BLOCKS per plot; the seed block lives in AGSEC4A.  Codes carry the
+# finest identity the source records, in distinct ranges per block so a
+# single table disambiguates:
+#   10        Seed                  (AGSEC4A seed block; Improved flag is a
+#             column, not a separate identity)
+#   20        Organic Fertilizer    (folds the UNPS single organic item;
+#             manure/compost not separately coded by UNPS)
+#   30        Inorganic Fertilizer  (type unreported)
+#   31..34    Inorganic by type     (a3aq14/15 1=Nitrate 2=Phosphate
+#             3=Potash 4=Mixed) -> Nitrate/Phosphate/Potash/Mixed Fertilizer
+#   40        Pesticide             (type unreported)
+#   41..46,49 Pesticide by type     (a3aq22/23 1=Insecticide 2=Miticide/
+#             Acaricide 3=Fungicide 4=Growth Regulator 5=Rodenticide
+#             6=Nematicide/Molluscicide 96->9=Other Pesticide)
+# UNPS records these identities directly (no urea/DAP/NPK product names): the
+# Nitrate/Phosphate/Potash/Mixed nutrient classes are what the questionnaire
+# asks.  This is a country-level shared input taxonomy across waves; the per-
+# wave source columns are documented in uganda.INPUT_COLMAPS, so no per-wave
+# code columns are needed (the wave scripts resolve labels before writing).
+#+name: harmonize_input
+| Code | Preferred Label              |
+|------+------------------------------|
+|   10 | Seed                         |
+|   20 | Organic Fertilizer           |
+|   30 | Inorganic Fertilizer         |
+|   31 | Nitrate Fertilizer           |
+|   32 | Phosphate Fertilizer         |
+|   33 | Potash Fertilizer            |
+|   34 | Mixed Fertilizer             |
+|   40 | Pesticide                    |
+|   41 | Insecticide                  |
+|   42 | Miticide/Acaricide           |
+|   43 | Fungicide                    |
+|   44 | Growth Regulator             |
+|   45 | Rodenticide                  |
+|   46 | Nematicide/Molluscicide      |
+|   49 | Other Pesticide              |
+
+# harmonize_pesticide_unit: pesticide quantity-unit Code -> Preferred Label
+# for the plot_inputs pesticide block (AGSEC3A a3aq24a / a3aq28a, AGSEC3B
+# a3bq24a / a3bq28a).  This is a tiny 2-code scheme (1=Kg, 2=Litres) distinct
+# from the UNPS harvest/seed unit scheme (which seed rows reuse via
+# harvest_units).  Organic/inorganic fertilizer quantities are implicitly Kg
+# (no unit column) -> u='Kg'.
+#+name: harmonize_pesticide_unit
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Kg              |
+|    2 | Litre           |
+
+# harmonize_species: livestock animal-type Code -> canonical species Preferred
+# Label for the livestock feature (GAP 4).  One row per REPORTED species/herd
+# a household owns, ``animal`` axis.  Source: the UNPS livestock roster the WB
+# code (UGA_UNPS1.do:710-720) reads only to collapse to a single engaged-y/n
+# binary; we keep the PRE-collapse roster.  Three roster sections per wave:
+#   AGSEC6A  large ruminants / draft  (cattle, donkeys, horses)   codes 1-12
+#   AGSEC6B  small ruminants          (goats, sheep, pigs)        codes 13-22
+#   AGSEC6C  poultry & other          (chicken, other birds,      codes 23-28
+#            rabbits, bees)                                      (2011-12+);
+#            the 2010-11 AGSEC6C roster uses a SEPARATE 31-42 code block for
+#            the same animals (Rabbits 31, chicken 32-38, turkeys/ducks/geese
+#            39-41, beehives 42) -- both blocks are folded into this one table.
+# The codes carry exotic/cross vs indigenous AND age/sex detail (Calves, Bulls,
+# Oxen, Heifer, Cows; Male/Female goats/sheep; Layers, Broilers, Pullets, ...);
+# that cross-row variation collapses to the SPECIES here -- the exotic/indigenous
+# and age/sex splits are sub-species detail recoverable from the raw codes if
+# needed, but unimportant for the harmonized species axis.  Per-head value and
+# herd value are NOT in this table (Value is a reported column; herd value =
+# Value x HeadCount is a transformation).
+#
+# 2009-10 and the AGSEC6A/6B sections of 2010-11 carry NO integer value labels
+# (the type comes through as a label STRING, e.g. 'Bulls and Oxen', 'Backyard
+# chicke'); uganda._species_string_map() maps those wave-specific strings to the
+# same canonical species, so a single Preferred Label set spans all waves.
+#+name: harmonize_species
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Cattle          |
+|    2 | Cattle          |
+|    3 | Cattle          |
+|    4 | Cattle          |
+|    5 | Cattle          |
+|    6 | Cattle          |
+|    7 | Cattle          |
+|    8 | Cattle          |
+|    9 | Cattle          |
+|   10 | Cattle          |
+|   11 | Donkeys         |
+|   12 | Horses          |
+|   13 | Goats           |
+|   14 | Goats           |
+|   15 | Sheep           |
+|   16 | Sheep           |
+|   17 | Pigs            |
+|   18 | Goats           |
+|   19 | Goats           |
+|   20 | Sheep           |
+|   21 | Sheep           |
+|   22 | Pigs            |
+|   23 | Chicken         |
+|   24 | Chicken         |
+|   25 | Chicken         |
+|   26 | Other Poultry   |
+|   27 | Rabbits         |
+|   28 | Bees            |
+|   31 | Rabbits         |
+|   32 | Chicken         |
+|   33 | Chicken         |
+|   34 | Chicken         |
+|   35 | Chicken         |
+|   36 | Chicken         |
+|   37 | Chicken         |
+|   38 | Chicken         |
+|   39 | Other Poultry   |
+|   40 | Other Poultry   |
+|   41 | Other Poultry   |
+|   42 | Bees            |

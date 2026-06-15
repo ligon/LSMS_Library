@@ -103,6 +103,71 @@ shocks:
         HowCoped1: MS10Q05B
         HowCoped2: MS10Q05C
 
+food_security:
+    # FAO Food Insecurity Experience Scale (FIES), ECVMA2 Section 14
+    # 'Sécurité alimentaire' (file ECVMA2_MS14P1, GH #332).
+    # Recall period: last 12 months.  MS14Q01..MS14Q08 map IN ORDER to
+    # the 8 canonical FIES items (verified against the .dta variable
+    # labels 2026-06-07 — same FAO battery as the EHCVM s08aq01..08):
+    #   Q01 inquiet de ne pas avoir suffisamment    -> Worried
+    #   Q02 pas pu manger nourriture saine/nutritive-> HealthyDiet
+    #   Q03 mangé une nourriture peu variée         -> FewFoods
+    #   Q04 dû sauter un repas                        -> SkippedMeal
+    #   Q05 mangé moins que ce que vous pensiez       -> AteLess
+    #   Q06 ménage n'avait plus de nourriture         -> RanOut
+    #   Q07 eu faim mais pas mangé                     -> Hungry
+    #   Q08 passé toute une journée sans manger        -> WholeDay
+    # Oui->True, Non->False; NSP / Refus / NaN -> NaN.
+    # Q09 (enfants <5 présents?) and Q10/Q11 (child-specific HealthyDiet
+    # / Hungry follow-ups) are NOT part of the household 8-item scale and
+    # are IGNORED.  FIES_score computed by food_security() in mapping.py.
+    file: NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS14P1.dta
+    idxvars:
+        i:
+            - GRAPPE
+            - MENAGE
+    myvars:
+        Worried:
+            - MS14Q01
+            - mapping:
+                Oui: True
+                Non: False
+        HealthyDiet:
+            - MS14Q02
+            - mapping:
+                Oui: True
+                Non: False
+        FewFoods:
+            - MS14Q03
+            - mapping:
+                Oui: True
+                Non: False
+        SkippedMeal:
+            - MS14Q04
+            - mapping:
+                Oui: True
+                Non: False
+        AteLess:
+            - MS14Q05
+            - mapping:
+                Oui: True
+                Non: False
+        RanOut:
+            - MS14Q06
+            - mapping:
+                Oui: True
+                Non: False
+        Hungry:
+            - MS14Q07
+            - mapping:
+                Oui: True
+                Non: False
+        WholeDay:
+            - MS14Q08
+            - mapping:
+                Oui: True
+                Non: False
+
 assets:
     file: NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS07P1.dta
     idxvars:

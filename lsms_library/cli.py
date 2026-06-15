@@ -164,6 +164,34 @@ def cache_list(
             print(f"{name}: <no cache>")
 
 
+@app.command("unpushed")
+def unpushed(
+    remote: Optional[str] = typer.Option(
+        None, "--remote", help="DVC remote to check (default: core.remote)."),
+    country: Optional[List[str]] = typer.Option(
+        None, "--country", help="Limit the check to a country directory (repeatable)."),
+) -> None:
+    """Report DVC-tracked files whose blobs are missing from the remote.
+
+    Catches the "dvc add'ed locally but never dvc push'ed" trap, where a
+    committed .dvc pointer has no blob on the shared cache — invisible
+    until a build needs the file. Exits non-zero when anything is unpushed.
+    """
+    from .data_access import unpushed_blobs
+
+    targets = list(country) if country else None
+    missing = unpushed_blobs(remote=remote, targets=targets)
+    if not missing:
+        typer.echo("All DVC-tracked blobs are present on the remote.")
+        return
+    typer.echo(
+        f"{len(missing)} path(s) out of sync with the remote "
+        f"(need `dvc push`):")
+    for p in missing:
+        typer.echo(f"  {p}")
+    raise typer.Exit(code=1)
+
+
 @cache_app.command("clear")
 def cache_clear(
     country: Optional[List[str]] = typer.Option(None, "--country", help="Country to clear (repeatable)."),

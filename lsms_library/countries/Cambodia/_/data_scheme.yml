@@ -22,3 +22,36 @@ Data Scheme:
     Generation: int
     Distance: int
     Affinity: str
+
+  individual_education:
+    index: (t, i, pid)
+    Educational Attainment: str
+
+  plot_features:
+    # Parcel roster, 2019-20 hh_sec_8.dta. Single clean LONG file
+    # (one row per (HHID, parcel)), so YAML path -- no script needed.
+    # Area is in mixed native units carried in AreaUnit; no area
+    # standardization. SoilType is not collected by this module.
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    Tenure: str
+    TenureSystem: str
+    LandUse: str
+    Irrigated: bool
+
+  housing:
+    index: (t, i)
+    Roof: str
+    Floor: str
+    Walls: str
+    Water: str
+    Toilet: str
+    Electricity: str
+    Rooms: float
+    Tenure: str
+
+  interview_date:
+    index: (t, i)
+    Int_t: datetime
+    materialize: make

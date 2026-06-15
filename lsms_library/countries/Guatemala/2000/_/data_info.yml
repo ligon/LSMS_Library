@@ -68,3 +68,26 @@ household_roster:
                 11: domestic worker
                 12: pensioner or guest
                 13: other non-relative
+
+individual_education:
+    file:
+        - ECV11P10.DTA
+    idxvars:
+        i: hogar
+        pid: caso
+    myvars:
+        Educational Attainment: p10acp
+
+assets:
+    # Section E14 durables: j is the item name; Quantity=p14a02 (number owned),
+    # Value=p14a05 (estimated value), Age=p14a03 (years owned). Rows for
+    # non-owned items carry NaN.
+    file:
+        - ECV17E14.DTA
+    idxvars:
+        i: hogar
+        j: item
+    myvars:
+        Quantity: p14a02
+        Value: p14a05
+        Age: p14a03

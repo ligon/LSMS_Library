@@ -25,3 +25,45 @@ Data Scheme:
     Distance: int
     Affinity: str
     Marital: str
+
+  individual_education:
+    index: (t, i, pid)
+    Educational Attainment: str
+
+  assets:
+    # ENCOVI 2000 section E14 (durables): one row per (household, item) over a
+    # fixed 38-item list; non-owned items carry NaN Quantity/Value/Age.
+    index: (t, i, j)
+    Quantity: float
+    Value: float
+    Age: float
+
+  shocks:
+    # ENCOVI 2000 Capitulo 3 "Situaciones Adversas".  LONG form, one row per
+    # (household, experienced shock).  Built by 2000/_/shocks.py from two files:
+    #   ECV05H03 (RESUMEN) -- per-household si/no occurrence flags, two families
+    #     p03a01a..m (13 "general"/community events) + p03a06a..p (15
+    #     "particular"/household events) = 28 event types.
+    #   ECV06H03 (DETALLE) -- one row per (household, problem) with `item` (the
+    #     event code, aligned 1:1 with the RESUMEN columns), `perdida` (impact
+    #     type) and `accion` (the single coping action taken).
+    # `Shock` is the event mapped to an English label (28 types: Drought,
+    #   Floods, General price rise, Loss of harvest, Illness or serious
+    #   accident, ...).  The row set is the union of RESUMEN-experienced and
+    #   DETALLE (hh,item) pairs.
+    # `Experienced` (bool) is the RESUMEN occurrence flag (True for every row by
+    #   construction; follows the Liberia occurrence-flag precedent).
+    # AffectedIncome / AffectedAssets come from DETALLE.perdida (1=income,
+    #   2=assets/patrimonio, 3=both, 4=none).  ENCOVI's impact item distinguishes
+    #   income vs. assets ONLY -- there is NO production/consumption breakdown,
+    #   so the canonical AffectedProduction/AffectedConsumption columns are not
+    #   declared (DEVIATION from the canonical schema).
+    # HowCoped0 is DETALLE.accion mapped to English text.  ENCOVI records a
+    #   SINGLE coping action per problem (no up-to-3 battery), so HowCoped1/
+    #   HowCoped2 do not exist in this instrument and are omitted (DEVIATION).
+    index: (t, i, Shock)
+    Experienced: bool
+    AffectedIncome: bool
+    AffectedAssets: bool
+    HowCoped0: str
+    materialize: make

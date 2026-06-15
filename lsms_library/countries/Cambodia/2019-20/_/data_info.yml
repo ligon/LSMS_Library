@@ -59,3 +59,65 @@ cluster_features:
     myvars:
         Region: s01q02
         Rural: s01q06b
+
+housing:
+    # Dwelling module hh_sec_4.dta. NB the questionnaire labels (read from the
+    # .dta variable labels) differ from the bare column-number intuition:
+    #   s04q04 = WALL material, s04q05 = ROOF material, s04q06 = FLOOR material.
+    #   s04q02 is FLOOR AREA (m^2), NOT a room count; s04q03 is the room count.
+    # All categorical columns already carry human-readable value labels, so no
+    # mapping is needed; Rooms (s04q03) is numeric.
+    file: ../Data/hh_sec_4.dta
+    idxvars:
+        i: HHID
+    myvars:
+        Roof: s04q05
+        Floor: s04q06
+        Walls: s04q04
+        Water: s04q08
+        Toilet: s04q19a
+        Electricity: s04q07
+        Rooms: s04q03
+        Tenure: s04q28
+
+plot_features:
+    # Parcel roster module hh_sec_8.dta. One row per (HHID, parcel),
+    # keyed by parcel_roster__id (1..12; no duplicate parcels per HH).
+    # All categorical columns already carry human-readable value labels
+    # (PRIVATE / RESIDENTIAL / ...), so no mapping is needed except the
+    # Yes/No -> bool coercion for the irrigation flag (s08q07). Area
+    # (s08q10a) is reported in mixed native units (s08q10b: SQUARE
+    # METERS / HECTARES / ACRE / RAI / KONG), carried verbatim in
+    # AreaUnit -- no kg/area standardization is attempted here.
+    #   s08q04 = how the parcel is held (TenureSystem)
+    #   s08q05 = how the parcel was acquired (Tenure)
+    #   s08q06 = current land use
+    #   s08q07 = irrigated? (Yes/No)
+    file: ../Data/hh_sec_8.dta
+    idxvars:
+        i: HHID
+        plot_id: parcel_roster__id
+    myvars:
+        Area: s08q10a
+        AreaUnit: s08q10b
+        Tenure: s08q05
+        TenureSystem: s08q04
+        LandUse: s08q06
+        Irrigated:
+            - s08q07
+            - mapping:
+                'Yes': True
+                'No': False
+
+individual_education:
+    # Education module hh_sec_3.dta. pid is `children_out_of_H__id` (a
+    # household-relative person sequence that matches the roster PID space,
+    # despite the misleading name); attainment is s03q04. NB the module also
+    # covers out-of-household children in school (s03q00='Yes'), which are
+    # not roster members and surface as spine orphans.
+    file: ../Data/hh_sec_3.dta
+    idxvars:
+        i: HHID
+        pid: children_out_of_H__id
+    myvars:
+        Educational Attainment: s03q04

@@ -1,0 +1,5 @@
+outs:
+- md5: 1ed0ab671ec744f4604350f4d1814b5f
+  size: 643295
+  hash: md5
+  path: consumptionaggregates_123456.tab

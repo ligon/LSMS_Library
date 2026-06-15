@@ -19,6 +19,21 @@ sample:
         Region: region
         District: district
 
+interview_date:
+    file: HH_MOD_A_FILT_13.dta
+    idxvars:
+        i: y2_hhid
+    myvars:
+        # Visit 1, Attempt 1 interview date split across three columns:
+        #   hh_a23a_1 = Day (numeric), hh_a23a_2 = Month (English name e.g.
+        #   'MAY'), hh_a23a_3 = Year.  Combined into a datetime by
+        #   malawi_date_ymd (year, month, day order).
+        int_t:
+            - hh_a23a_3
+            - hh_a23a_2
+            - hh_a23a_1
+            - mapping: malawi_date_ymd
+
 cluster_features:
     dfs:
         - df_main
@@ -149,3 +164,49 @@ assets:
         Quantity: hh_l03
         Age: hh_l04
         Value: hh_l05
+
+food_security:
+    # IHPS 2013 8-item adult food-insecurity battery (HH_MOD_T_13,
+    # hh_t13..hh_t20).  NOTE: NOT the standard FAO FIES wording/order used
+    # in IHS4/IHS5; mapped to the canonical FAO-FIES columns by concept
+    # (see _/mapping.py).  In particular HealthyDiet is sourced from the
+    # lack-of-money item (hh_t15) and RanOut from hh_t14.  Recall: 12 months.
+    # yes->True, no->False, missing->NA.
+    file: HH_MOD_T_13.dta
+    idxvars:
+        i: y2_hhid
+    myvars:
+        Worried:
+            - hh_t13
+            - mapping: fies_yesno
+        HealthyDiet:
+            - hh_t15
+            - mapping: fies_yesno
+        FewFoods:
+            - hh_t16
+            - mapping: fies_yesno
+        SkippedMeal:
+            - hh_t17
+            - mapping: fies_yesno
+        AteLess:
+            - hh_t18
+            - mapping: fies_yesno
+        RanOut:
+            - hh_t14
+            - mapping: fies_yesno
+        Hungry:
+            - hh_t19
+            - mapping: fies_yesno
+        WholeDay:
+            - hh_t20
+            - mapping: fies_yesno
+        FIES_score:
+            - hh_t13
+            - hh_t14
+            - hh_t15
+            - hh_t16
+            - hh_t17
+            - hh_t18
+            - hh_t19
+            - hh_t20
+            - mapping: fies_score

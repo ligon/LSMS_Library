@@ -77,6 +77,22 @@ household_roster:
         - i
         - pid
 
+individual_education:
+    # EHCVM 2021-22: highest education attained = educ_hi.  This wave's
+    # household_roster keys pid off a SCALAR `pid` column, and the individu
+    # file carries the same scalar `pid`, so individual_education uses
+    # `pid: pid` (scalar) to align (verified 22,362/22,362 individu keys
+    # overlap the roster after format_id).  i = country i([grappe, menage]).
+    file: ehcvm_individu_bfa2021.dta
+    idxvars:
+        v: grappe
+        i:
+            - grappe
+            - menage
+        pid: pid
+    myvars:
+        Educational Attainment: educ_hi
+
 cluster_features:
     file: s00_me_bfa2021.dta
     idxvars:
@@ -182,7 +198,9 @@ food_acquired:
         j:
             - s07bq01
             - mappings: ['harmonize_food', 'Original Label', 'Preferred Label']
-        u: s07bq03b
+        u:
+            - s07bq03b
+            - mappings: ['ehcvm_units', 'Code', 'Preferred Label']
     myvars:
         Quantity: s07bq03a
         Expenditure: s07bq08
@@ -223,3 +241,66 @@ interview_date:
             - menage
     myvars:
         Int_t: s00q23a
+
+food_security:
+    # FAO 8-item FIES, EHCVM §8A.  s08aq01..08 -> Worried..WholeDay in
+    # FAO order (same instrument as 2018-19; §8 was NOT split into
+    # sub-modules unlike §20).  Oui->True, Non->False,
+    # 'Ne sait pas'/'Refus'->NaN.  Recall: last 12 months.  s08aq07a/08a
+    # are frequency follow-ups -- ignored.  FIES_score computed in
+    # mapping.py's food_security() post-processor.
+    file: s08a_me_bfa2021.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        Worried:
+            - s08aq01
+            - mapping: &fies_yn
+                Oui: true
+                Non: false
+                Ne sait pas: null
+                Refus: null
+        HealthyDiet:
+            - s08aq02
+            - mapping: *fies_yn
+        FewFoods:
+            - s08aq03
+            - mapping: *fies_yn
+        SkippedMeal:
+            - s08aq04
+            - mapping: *fies_yn
+        AteLess:
+            - s08aq05
+            - mapping: *fies_yn
+        RanOut:
+            - s08aq06
+            - mapping: *fies_yn
+        Hungry:
+            - s08aq07
+            - mapping: *fies_yn
+        WholeDay:
+            - s08aq08
+            - mapping: *fies_yn
+
+subjective_well_being:
+    # EHCVM §20 'Pauvreté relative'.  In the 2021-22 instrument §20 was
+    # split into sub-modules A/B/C; sub-module A (s20a_me) is relative
+    # poverty, and s20aq05 is the ladder item equivalent to 2018-19's
+    # s20q05.  4-point relative-wealth scale, higher = better off
+    # (Très pauvre=1 ... Riche=4); Ne sait pas -> NaN.
+    file: s20a_me_bfa2021.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        Own Step:
+            - s20aq05
+            - mapping:
+                Très pauvre: 1
+                Pauvre: 2
+                Moyen: 3
+                Riche: 4
+                Ne sait pas: null

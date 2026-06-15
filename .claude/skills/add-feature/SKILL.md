@@ -14,7 +14,8 @@ For domain-specific guidance on particular features, load the relevant sub-skill
 - `add-feature/shocks` — Household shocks (natural disasters, economic shocks, coping strategies). Covers module identification across countries, effect variable mapping (Decrease→True), combined-effect splitting, French/English label handling, and the 26-binary-coping-indicator pattern in EHCVM surveys.
 - `add-feature/assets` — Durable goods ownership (item-level, no aggregation). Covers the Module L/M distinction across survey instruments and the design principle of passing item-level data without summing to household totals.
 - `add-feature/panel-ids` — Panel household ID linkage across waves. Covers ID stability patterns, composite IDs, household splits, cross-survey-program limitations, and the World Bank harmonised panel as a reference.
-- `add-feature/food-acquired` — Food acquisition data with unit conversions. The most complex feature — covers two approaches to unit-to-kg conversion: price-ratio inference from the data itself, and survey-provided conversion factor tables.
+- `add-feature/food-acquired` — Food acquisition data with unit conversions. The most complex feature — covers unit-to-kg conversion (price-ratio inference; survey-provided exact factors carried as a summable `Quantity_kg`; and the framework default) plus food-item and unit-label harmonization.
+  - `add-feature/food-acquired/units` — *Decoding and cleaning the unit (`u`) label itself* (distinct from kg conversion): the leak audit, the decode toolkit (`.dta` value labels → sibling-survey borrow → questionnaire → country `units` table), the accepted-residual convention, and the silent-failure gotchas (float-stringification, empty `get_categorical_mapping` dicts, reserved sentinels, metric-magnitude safety). Load when a new wave/country brings raw unit codes.
 - `add-feature/sample` — Sampling design (cluster/PSU assignment, household weights, strata, urban/rural). Covers weight variable discovery across countries, single-file vs multi-file YAML patterns (EHCVM ponderation files), and strata label harmonization.
 - `add-feature/pp-ph` — Post-planting / post-harvest countries (Nigeria, Ethiopia, GhanaSPS, Tanzania `2008-15/`). Covers the canonical duplicate-index bug, distinct-`t`-value script pattern, and attrition handling for people who appear in only one round.
 - `add-feature/housing` — Dwelling material characteristics (roof, floor). Covers module-letter instability across surveys, case normalization of Stata labels, and the Cross_Sectional + Panel merge pattern.
@@ -25,7 +26,7 @@ For domain-specific guidance on particular features, load the relevant sub-skill
 
 ## World Bank reference code
 
-The World Bank's LSMS-ISA Harmonised Panel project has Stata code mapping raw files and variables for all 8 countries. Saved at `/var/tmp/lsms-isa-harmonised/reproduction/Reproduction_v2/Code/Cleaning_code/`. GitHub: `lsms-worldbank/LSMS-ISA-harmonised-dataset-on-agricultural-productivity-and-welfare` (release v2.0).
+The World Bank's LSMS-ISA Harmonised Panel project has Stata code mapping raw files and variables for all 8 countries. The authoritative source is GitHub: `lsms-worldbank/LSMS-ISA-harmonised-dataset-on-agricultural-productivity-and-welfare` (release v2.0). A local checkout *may* exist at `/var/tmp/lsms-isa-harmonised/reproduction/Reproduction_v2/Code/Cleaning_code/`, but `/var/tmp` is ephemeral / node-local on HPC — do not rely on it across sessions or nodes; clone from GitHub if it is absent.
 
 Their goal (one huge merged .dta) differs from ours (uniform API, preserve detail), but their per-wave do files reveal file names, variable names, and ID linkage logic that are useful reference. Treat with skepticism — verify against actual data.
 
@@ -113,7 +114,12 @@ Identify which `.dta` file in each wave contains the needed variables.
 3. **Questionnaire PDFs** in `{wave}/Documentation/`
 4. **Naming convention inference** — within a wave, variables follow patterns (e.g., `hh_b02`, `hh_b03`, `hh_b04`)
 
-**Always pull the data and inspect it directly:**
+**Always pull the data and inspect it directly.** The `from_dta` /
+`pyreadstat.read_dta` idioms below are for **interactive inspection only** —
+both appear in CLAUDE.md's anti-patterns table and must NOT be copied into
+feature scripts. In scripts proper, always read via `get_dataframe()` /
+`df_data_grabber()` from `local_tools` (handles the local → DVC → WB-NADA
+fallback chain), and never hardcode an absolute path.
 ```python
 from ligonlibrary.dataframes import from_dta
 df = from_dta('/path/to/file.dta')
@@ -292,7 +298,27 @@ This tells the library: "look up the org table named `harmonize_food`, use the `
 
 ### Step 7: Verify
 
-**Run the built-in sanity checker:**
+**FIRST — defeat the cache, or you may verify stale data.** The library does
+NOT auto-invalidate caches when you edit a `data_info.yml`, a `_/{table}.py`
+script, or an upstream `.dta` (see CLAUDE.md "Cache Behavior"). A warm L2
+parquet from before your change will silently shadow your new wiring, so
+`c.{feature_name}()` can return old data — making a broken build look fine, or
+a correct fix look broken. Always verify a fresh build:
+
+```bash
+# either force a no-cache read for the session …
+LSMS_NO_CACHE=1 python -c "import lsms_library as ll; ll.Country('{Country}').{feature_name}()"
+# … or hard-clear this country's caches, then rebuild
+lsms-library cache clear --country {Country}
+```
+
+For script-path tables (`materialize: make`) a stale **L2-wave** parquet can
+shadow a source-script fix even under `LSMS_NO_CACHE=1`; prefer
+`lsms-library cache clear --country {Country}` (or `pytest --rebuild-caches`)
+in that case. This is not hypothetical — stale caches have masked real build
+bugs and broken tests (see the cache-staleness notes in CLAUDE.md).
+
+**Then run the built-in sanity checker** (against the fresh build):
 ```python
 from lsms_library.diagnostics import is_this_feature_sane
 import lsms_library as ll
@@ -400,3 +426,7 @@ The corresponding `data_scheme.yml` entry:
 - **DVC-tracked files:** Pull data with `dvc pull {path}.dvc` before building. Run from the DVC root (`lsms_library/countries/`).
 - **DVC lock contention:** If `dvc pull` hangs with `Unable to acquire lock`, clear stale locks: `rm -f lsms_library/countries/.dvc/tmp/*.lock lsms_library/countries/.dvc/tmp/rwlock`, then retry.  For parallel work across agents, use git worktrees so each has its own DVC lock.
 - **Pre-ISA vs ISA waves:** Earlier waves (e.g., Malawi 2004-05 "IHS2") predate the LSMS-ISA standardization and often use completely different module letters and variable naming conventions. Module L might be "non-food expenditures" in 2004-05 but "durable goods" in 2010+. Always verify via the World Bank data dictionary — never assume module letters are stable across survey instruments.
+- **`convert_categoricals` — value-label decode (bit several features in 2026-06):** `get_dataframe()` (and the YAML path) decode Stata/SPSS value labels by **default** (`convert_categoricals=True`). This cuts both ways:
+  - In a **script** (`materialize: make`) that assumes *numeric codes* — e.g. `df['itemcode'].astype('Int64').map(CODE_MAP)` or `pd.to_numeric(df['have_flag'])` — the default makes the column come back as the **label string** (`'Watches'`, `'Yes'`), so `int(...)`/`to_numeric` fails or NaNs out (→ empty melt, `No objects to concatenate`). Pass `get_dataframe(path, convert_categoricals=False)` to keep numeric codes.
+  - In **`data_info.yml`**, the flag is *inverted by presence*: `converted_categoricals: False` sets `convert_categoricals=False` (raw codes); **omitting** the line decodes labels. Setting it `False` on a file that carries labels surfaces raw codes (e.g. Sex `1.0/2.0`, Relationship undecoded → kinship not expanded). Match it to whether the source carries the labels you want.
+- **Bespoke `(t, i)` value tables + the `_no_v_join` exemption:** Some instruments record **household-level value aggregates**, not the canonical item-level `(t,i,j)` (e.g. EthiopiaRHS `assets`/`livestock`/`income`: farm/non-farm value, herd value, income subtotals). Model these as a documented bespoke `(t, i)` table with value columns (declare the bespoke index + columns in `data_scheme.yml`, comment why; cf. Liberia's reduced `assets`). **Add the feature name to `_no_v_join` in `country.py`** (alongside `assets`/`shocks`): `_join_v_from_sample` otherwise injects an all-NaN `v` index level for any `(i,t)` table when the wave has no matching `sample`, failing `no_null_index_levels`. Multiple identical-schema source files (e.g. one per village/region) **row-concatenate** automatically when listed together under `file:` — no script needed.

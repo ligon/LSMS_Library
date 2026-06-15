@@ -97,6 +97,29 @@ def food_acquired(df):
     return df
 
 
+_FIES_ITEMS = ['Worried', 'HealthyDiet', 'FewFoods', 'SkippedMeal',
+               'AteLess', 'RanOut', 'Hungry', 'WholeDay']
+
+
+def food_security(df):
+    '''Compute FIES_score from the 8 FAO FIES experience items.
+
+    EHCVM §8A items s08aq01..s08aq08 have already been mapped to the 8
+    canonical bool columns by the YAML ``mapping:`` blocks (Oui->True,
+    Non->False, everything else->NaN).  FIES_score is the row-wise count
+    of True across those 8 items.  Per the canonical contract it is NaN
+    only when ALL 8 items are NaN; otherwise NaN items count as 0 (not
+    affirmative).
+    '''
+    items = df[_FIES_ITEMS].apply(lambda c: c.map({True: 1, False: 0}))
+    score = items.sum(axis=1, skipna=True)
+    all_na = items.isna().all(axis=1)
+    score = score.where(~all_na, np.nan)
+    df = df.copy()
+    df['FIES_score'] = score.astype('Int64')
+    return df
+
+
 def pid(value):
     '''Formatting person id from (grappe, menage, individual).'''
     return (tools.format_id(value.iloc[0]) + '0'
@@ -111,7 +134,16 @@ def Age(value):
     CotedIvoire s01q03b (month) is already an integer (1-12); no
     month_map conversion needed.  The list is returned unchanged so
     household_roster() can unpack [age_raw, day, month, year].
+
+    The function name ``Age`` collides with the ``assets`` myvar
+    ``Age: s12q07`` (item age in years), which the framework binds to
+    this formatter by name (column_mapping in country.py).  That path
+    passes a *scalar*, not the roster's DOB Series; pass scalars
+    through unchanged so assets extraction does not crash on
+    ``list(<float>)`` (closes #321).
     '''
+    if not isinstance(value, pd.Series):
+        return value
     return list(value)
 
 

@@ -1,0 +1,133 @@
+#+TITLE: S3 DVC write-credentials: diagnosis, config-path migration, push wiring
+#+DATE: 2026-05-18
+#+AUTHOR: Ethan Ligon (with Claude)
+
+* Summary
+
+Restored and documented DVC S3 *write* access for the LSMS_Library
+DVC remote =ligonresearch_s3= (=s3://dvcbucket0/LSMS=, region
+us-west-1, AWS account =140514264862=).  The reported "dead writer
+key" was a red herring: the key was merely *inactive*, not deleted,
+and the =ligon= IAM user already carries full S3 write via group
+membership.  Alongside the fix, the writer-creds lookup was migrated
+to the user config dir to mirror the v0.7.0 =s3_creds= design and to
+make the long-standing CONTRIBUTING.org claim actually true.
+
+* Diagnosis
+
+** IAM topology (account 140514264862)
+
+- *Reader*: IAM user =dvc_reader=, key =AKIA…QAFG=, group
+  =s3_bucket_readers= → managed policy =AmazonS3ReadOnlyAccess=.
+  Auto-unlocked from =s3_reader_creds.gpg= via the WB-API-key flow
+  into =config.s3_creds_path()= and mirrored to
+  =lsms_library/countries/.dvc/s3_creds=.
+- *Writer*: the =ligon= IAM user already has full S3 write through
+  group =s3user= → =AmazonS3FullAccess= (and =LigonResearch= also
+  carries =AmazonS3FullAccess=).  Its key =AKIA…G6Y2HSWR=
+  (created 2022-09-29) shipped, with a *valid* secret, in
+  =.dvc/s3_write_creds=.
+- There is also an *unused* =dvc_writer= IAM group / =s3_bucket_writer=
+  managed policy (=s3:ListBucket= + =Put/GetObject=, **no
+  DeleteObject**).  Members are all human users; no dedicated service
+  user.  Not what =ligon= uses — recorded here so future debugging
+  doesn't chase it.
+
+** Root cause of the "dead key"
+
+Both of =ligon='s access keys were =Inactive=.  An inactive key
+returns =InvalidAccessKeyId= (S3) / =InvalidClientTokenId= (STS),
+which superficially looks like a deleted/never-existed key.  =ligon=
+is at the 2-key IAM hard limit, so minting a fresh key would have
+required deleting one first; instead the existing key was simply
+reactivated:
+
+: aws iam update-access-key --user-name ligon \
+:   --access-key-id AKIASBN2NQ4PG6Y2HSWR --status Active \
+:   --profile ligon-research-admin
+
+(admin = SSO profile =ligon-research-admin=, role
+=UCB-FederatedAdmins=; =aws sso login --profile ligon-research-admin=
+first.)  Verified end-to-end with a put/read/delete probe object
+under =s3://dvcbucket0/LSMS/.write-probe-*= (cleaned up with the
+admin profile, since the writer policy path has no DeleteObject —
+=ligon= does, via S3FullAccess, but the generic writer group does
+not).
+
+* The detection-gate vs. push-credential distinction
+
+This is the subtle part and the reason a naive "drop the file in"
+fix is insufficient:
+
+- =_check_remote_access= (data_access.py) only decides whether
+  =push_to_cache()= / =push_to_cache_batch()= will *attempt* a push.
+  It returns ="write"= on any of: =LSMS_S3_WRITE_KEY=,
+  =AWS_ACCESS_KEY_ID=/=AWS_SECRET_ACCESS_KEY=, or a non-empty
+  =s3_write_creds= file.
+- The *actual* =dvc push= authenticates through the S3 remote, whose
+  =.dvc/config= pins =credentialpath = s3_creds= (the **reader**).
+  =push_to_cache*= =subprocess.run(["dvc", ...])= with **no =env=**,
+  so the writer file is never handed to DVC.
+- Empirically verified (botocore via the =aws= CLI): with the shared
+  credentials file pinned to the reader *and* =AWS_ACCESS_KEY_ID= /
+  =AWS_SECRET_ACCESS_KEY= exported for the writer, botocore resolves
+  to the **writer** (=user/ligon=).  I.e. environment variables take
+  precedence over an explicit =credentialpath=.  So the supported
+  push recipe is to export the pair into the push shell; no
+  =.dvc/config= edit, reader stays the default identity.
+
+* Change made
+
+** Code
+
+- Added =config.s3_write_creds_path()= mirroring =s3_creds_path()=:
+  =$LSMS_S3_WRITE_CREDS= → =_config_dir()/s3_write_creds=.  Same
+  rationale as the v0.7.0 =s3_creds= migration — keep the plaintext
+  secret out of the (possibly read-only) package tree.
+- =_check_remote_access= now consults =config.s3_write_creds_path()=
+  first, falling back to the legacy in-tree
+  =<dvc_dir>/s3_write_creds= for older editable installs.  Purely
+  additive: existing detection paths are unchanged, ="write"= simply
+  resolves in *more* cases.  =gitnexus_impact= rated this HIGH (many
+  processes route through =_check_remote_access=) but the blast
+  radius is wholly inside =data_access.py='s permission chain and the
+  change is backward-compatible.
+
+** Tests
+
+- =tests/test_data_access.py=: the autouse =_patch_creds_path=
+  fixtures (=TestCheckRemoteAccess=, =TestPermissions=) now also
+  monkeypatch =s3_write_creds_path= → a distinct temp filename, so
+  the real (now-populated) user-config file cannot leak into tests
+  and silently flip ="read"= assertions to ="write"=.
+- Renamed the legacy test to
+  =test_s3_write_via_legacy_dvc_write_creds_file= and added
+  =test_s3_write_via_user_config_write_creds= for the preferred path.
+
+** Filesystem
+
+- Moved =.dvc/s3_write_creds= →
+  =config.s3_write_creds_path()= (resolves to
+  =~/.Misc/config/lsms_library/s3_write_creds= on this host, since
+  the config dir is relocated into the git-crypted dotfiles repo —
+  *not* the literal =~/.config/=).  Mode tightened =r-xr--= → =600=.
+  Verified =_check_remote_access(... ) == "write"= from the new
+  location with the legacy file absent.
+
+** Docs
+
+- Rewrote CONTRIBUTING.org §"Write access for RAs": mechanism 3 is
+  now accurate (code-backed user-config path + legacy fallback),
+  plus the detection-gate-vs-push-credential explanation, the
+  =aws iam update-access-key= reactivation note, and the
+  =export AWS_*= push recipe.
+
+* Follow-ups (not done; deliberate)
+
+- Key hygiene: the reactivated key dates to 2022 and the secret sits
+  in plaintext (mode 600) in the dotfiles config dir.  Rotation
+  (delete the older inactive key =AKIA…LCIIWLUM= to free a slot,
+  mint fresh, reinstall) is advisable but out of scope here.
+- =push_to_cache*= could grow an explicit =env=/writer-remote path so
+  the gate and the actual push share one credential source instead
+  of relying on the operator exporting env vars.  Noted, not built.

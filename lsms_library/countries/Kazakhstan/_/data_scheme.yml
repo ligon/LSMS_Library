@@ -5,6 +5,15 @@ Data Scheme:
     Region: str
     Rural: str
 
+  housing:
+    index: (t, i)
+    Walls: str
+    Toilet: str
+    Tenure: str
+    Electricity: str
+    Rooms: float
+    materialize: make
+
   household_roster:
     index: (t, i, pid)
     Sex: str
@@ -13,6 +22,24 @@ Data Scheme:
     Generation: int
     Distance: int
     Affinity: str
+
+  individual_education:
+    index: (t, i, pid)
+    Educational Attainment: str
+
+  subjective_well_being:
+    index: (t, i)
+    Own Step: int
+    materialize: make
+
+  assets:
+    # Durable goods owned (KZ96HSG_PUF b37 block, melted wide->long). Item-level
+    # (t, i, j); j is the recovered durable-item label.  Quantity = pieces;
+    # Value = pieces x per-piece price.
+    index: (t, i, j)
+    Quantity: float
+    Value: float
+    materialize: make
 
   sample:
     index: (i, t)

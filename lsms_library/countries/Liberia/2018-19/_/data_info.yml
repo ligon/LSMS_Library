@@ -13,6 +13,15 @@ household_roster:
         Age: S2_5
         MonthsSpent: S2_7
 
+individual_education:
+    file:
+        - "../Data/Household/sect2_public.dta"
+    idxvars:
+        i: hhid
+        pid: member_id
+    myvars:
+        Educational Attainment: S2_14
+
 cluster_features:
     file:
         - "../Data/Household/sect1_public.dta"
@@ -37,3 +46,86 @@ sample:
             - mapping:
                 rural: Rural
                 urban: Urban
+
+assets:
+    # Section 15 (durable goods) is LONG: one row per asset type per HH.
+    # j is the clean string `item_name` (NOT `item_id`, a lowercase dupe).
+    # Quantity=S15_2 ("how many owned"); Value=S15_5 (resale price of the
+    # most-recent purchase).  No Age and no separate purchase-price
+    # question in this instrument, so those canonical columns are omitted
+    # (-> NaN).  S15_6/S15_7 (forest-use / sufficiency) are dropped.
+    file:
+        - "../Data/Household/sect15_public.dta"
+    idxvars:
+        i: hhid
+        j: item_name
+    myvars:
+        Quantity: S15_2
+        Value: S15_5
+
+shocks:
+    # Section 17 (National Household Forest Survey shocks module) is LONG:
+    # one row per (hhid, shock_name).  shock_name carries the 14 shock-type
+    # labels (drought, floods, large rise in price of food, death of a
+    # member, ...).  S17_1 = "severely negatively affected in the past 12
+    # months" (yes/no) -> Experienced.  S17_5_A/B/C = first/second/third
+    # forest product collected to recover -> HowCoped0/1/2 (populated only
+    # where S17_4=yes, ~38% of experienced shocks).  Rows whose shock_name is
+    # the Stata '.' sentinel (84 HH with the module left blank) format_id to
+    # None and are dropped by the null-index guard.
+    file:
+        - "../Data/Household/sect17_public.dta"
+    idxvars:
+        i: hhid
+        Shock: shock_name
+    myvars:
+        Experienced:
+            - S17_1
+            - mapping:
+                "yes": True
+                "no": False
+        HowCoped0: S17_5_A
+        HowCoped1: S17_5_B
+        HowCoped2: S17_5_C
+
+plot_features:
+    # Section 10 (Land Parcels) of the National Household Forest Survey is
+    # clean LONG: one row per (hhid, parcel_id), no duplicates.  parcel_id
+    # is the per-household parcel identifier (float in source -> format_id
+    # makes it a clean string '1','2',...).  Area=S10_4 ("total area of
+    # parcel - respondent's estimate", native unit) with AreaUnit=S10_4B
+    # (acres / lot(s) / hectares / other -- units are NOT homogeneous, so
+    # Area is left in its native unit and the unit is carried alongside,
+    # following the Uganda/Tanzania pattern).  Tenure=S10_5 (ownership
+    # status) mapped to the canonical Tenure vocabulary.  S10_6A/S10_6B are
+    # use-payment amount / period (NOT GPS, despite the triage note) and
+    # are ~98% NaN, so they are omitted.  No SoilType / Irrigated /
+    # TenureSystem question exists in this instrument (-> those canonical
+    # columns are not declared).
+    file:
+        - "../Data/Household/sect10_public.dta"
+    idxvars:
+        i: hhid
+        plot_id: parcel_id
+    myvars:
+        Area: S10_4
+        AreaUnit: S10_4B
+        Tenure:
+            - S10_5
+            - mapping:
+                "owned by hh": owned
+                "rented in": rented_in
+                "free use (with permission)": use_right
+                "occupy (without permission)": squatted
+                "other specify": other_tenure
+
+interview_date:
+    # Cover/identification module sect1_public.dta; interview_date1 is the
+    # primary-visit date (datetime64; interview_date2/3 are follow-up visits,
+    # ignored). Single pre-formed date column -> no combine helper needed.
+    file:
+        - "../Data/Household/sect1_public.dta"
+    idxvars:
+        i: hhid
+    myvars:
+        Int_t: interview_date1

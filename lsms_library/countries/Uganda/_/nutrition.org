@@ -211,11 +211,11 @@ Number of labels: 130
 | Yoghurt                       |            55 |             0 |            2 |               1 |
 
 
-These labels in turn are drawn from =food_items.org=, using the "Preferred Label".  Note that these labels do /not/ include, e.g., "Matoke".
+These labels in turn are drawn from the =harmonize_food= table in =categorical_mapping.org=, using the "Preferred Label".  Note that these labels do /not/ include, e.g., "Matoke".
 #+begin_src python :results output raw table :session nutrition
 from uganda import harmonized_food_labels
 
-preferred_labels = harmonized_food_labels(fn='../_/food_items.org',key='Code',value='Preferred Label')
+preferred_labels = harmonized_food_labels(key='Code',value='Preferred Label')
 print(len(preferred_labels))
 
 # Check that all labels in q are values in preferred_labels:
@@ -2372,7 +2372,7 @@ if 'm' not in x.index.names:
 
 # Change to new expenditure labels
 x = x.rename(columns=i_labels)
-x = x.groupby('i',axis=1).sum()
+x = x.T.groupby('i').sum().T
 
 # Replace zeros with NaNs
 x = x.replace(0,np.nan)
@@ -2664,7 +2664,7 @@ if 'm' not in q.index.names:
 
 # Change to new expenditure labels
 q = q.rename(columns=i_labels)
-q = q.groupby('i',axis=1).sum()
+q = q.T.groupby('i').sum().T
 
 # Replace zeros with NaNs
 q = q.replace(0,np.nan)
@@ -2702,7 +2702,7 @@ if 'm' not in p.index.names:
 
 # Change to new expenditure labels
 p = p.rename(columns=i_labels)
-p = p.groupby('i',axis=1).mean()
+p = p.T.groupby('i').mean().T
 
 # Replace zeros with NaNs
 p = p.replace(0,np.nan)

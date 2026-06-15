@@ -24,9 +24,16 @@ from ethiopia import change_id, Waves, harmonized_food_labels
 
 
 def fix_food_labels():
+    # Unit #0 (2026-06-14): food labels are now resolved to canonical
+    # Preferred Labels at the WAVE-script level inside ethiopia.food_acquired
+    # (via harmonize_food_union_map), so this country-level rename is an
+    # idempotent no-op for the already-resolved waves.  We still build the
+    # union map from the migrated harmonize_food table (in
+    # categorical_mapping.org) so any wave parquet predating the migration
+    # gets harmonized on concat.  The raw food_items.org reads are gone.
     D = {}
     for w in Waves.keys():
-        D.update(harmonized_food_labels(fn='./food_items.org', key=w))
+        D.update(harmonized_food_labels(fn='./categorical_mapping.org', key=w))
     return D
 
 

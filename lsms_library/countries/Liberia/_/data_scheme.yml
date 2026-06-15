@@ -16,6 +16,66 @@ Data Scheme:
     Distance: int
     Affinity: str
 
+  interview_date:
+    index: (t, i)
+    Int_t: datetime
+
+  assets:
+    # 2018-19 (Section 15) records only count-owned and resale value.
+    # No Age and no purchase-recency / purchase-price questions in this
+    # instrument, so only Quantity and Value are declared.
+    index: (t, i, j)
+    Quantity: float
+    Value: float
+
+  individual_education:
+    index: (t, i, pid)
+    Educational Attainment: str
+
+  plot_features:
+    # 2018-19 Section 10 (Land Parcels), National Household Forest Survey.
+    # Clean LONG: one row per (i, plot_id) where plot_id = parcel_id.
+    # Area=S10_4 in native unit; AreaUnit=S10_4B (acres/lot(s)/hectares/
+    # other -- not homogeneous, so Area is kept native).  Tenure=S10_5
+    # mapped to the canonical vocabulary.  No SoilType / Irrigated /
+    # TenureSystem in this instrument; parcel GPS (S10_6A/B) is actually
+    # use-payment amount/period and ~98% NaN, so it is omitted.
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    Tenure: str
+
+  shocks:
+    # 2018-19 Section 17 (National Household Forest Survey). LONG form: one
+    # row per (household, EXPERIENCED shock-type). `Shock` is the shock_name
+    # label (14 types: drought, floods, food-price rise, death, illness, crop
+    # pests, ...). The NHFS enumerates all 14 types per HH with S17_1
+    # ("severely negatively affected in the past 12 months", yes/no); the
+    # mapping.py `shocks` post-processor keeps only S17_1==yes and drops the
+    # redundant Experienced flag (a row's existence conveys it, matching the
+    # other countries). This forest-survey instrument has NO income/asset/
+    # production/consumption impact breakdown, so the canonical Affected*
+    # columns are omitted. Coping is forest-specific: HowCoped0/1/2 are the
+    # first/second/third forest products the household collected to recover
+    # (S17_5_A/B/C); only populated for the ~38% of experienced shocks where
+    # forest products were used (S17_4=yes).
+    index: (t, i, Shock)
+    HowCoped0: str
+    HowCoped1: str
+    HowCoped2: str
+
+  months_food_inadequate:
+    # 2018-19 §16 'Food security' (sect16a_public.dta). MonthsInadequate=S16_2
+    # ("how many months in the past 12 did you not have enough food to feed the
+    # household", 1-12; the 'no'/S16_1 households are filled to 0). AnyInadequate
+    # =S16_1 ("faced a situation with not enough food in the last 12 months",
+    # yes/no). No which-months battery in this instrument (S16_3/S16_4 are
+    # forest-product coping follow-ups), so the count item is the source.
+    index: (t, i)
+    MonthsInadequate: int
+    AnyInadequate: bool
+    materialize: make
+
   sample:
     index: (i, t)
     v: str

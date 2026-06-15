@@ -22,17 +22,17 @@ The returned DataFrame prepends a `country` index level.
 
 ## Task-Specific Skills (read these on demand)
 
-- `.claude/skills/add-feature/SKILL.md` — adding a new table to a country. Has sub-skills for `sample`, `food-acquired`, `shocks`, `assets`, `panel-ids`, and `pp-ph` (post-planting/post-harvest countries — Nigeria, Ethiopia, GhanaSPS).
+- `.claude/skills/add-feature/SKILL.md` — adding a new table to a country. Has sub-skills for `sample`, `food-acquired` (and its nested `food-acquired/units` — decoding/cleaning the unit `u` label: leak audit, decode toolkit, and the silent-failure gotchas), `shocks`, `assets`, `panel-ids`, and `pp-ph` (post-planting/post-harvest countries — Nigeria, Ethiopia, GhanaSPS).
 - `.claude/skills/multi-round-waves.md` — Tanzania `2008-15/` multi-round folder pattern and `wave_folder_map`.
 - `.claude/skills/tanzania-panel-design.md` — NPS sub-panel split (extended vs. refresh).
 - `.claude/skills/demand-estimation.md` — running CFE demands via the Country API.
 - `.claude/skills/release/SKILL.md` — poetry build gotchas when cutting a wheel.
 - `.claude/skills/profiling/SKILL.md` — attributing CPU / memory cost inside Country / Feature / Wave hot paths (pyinstrument, cProfile + snakeviz, tracemalloc). Adds `make profile …` targets and a `--profile` flag on `bench/build_feature.py`.
-- `scrum-master-hpc` (shared sucoder skill at `/home/ligon/Projects/sucoder-skills/scrum-master-hpc/SKILL.md`) — dispatching subagents, worktrees, DVC lock hygiene. Read this before using the Agent tool for multi-country work. Library-specific addenda:
+- `scrum-master-hpc` (shared sucoder skill at `~/.sucoder/skills/scrum-master-hpc/SKILL.md`) — dispatching subagents, worktrees, DVC lock hygiene. Read this before using the Agent tool for multi-country work. Library-specific addenda:
   1. Subagents share the parquet cache at `~/.local/share/lsms_library/`, so concurrent agents building different countries don't conflict.
   2. The venv is at `{repo_root}/.venv/bin/python` (not in worktrees) — set `PYTHONPATH` to the worktree so development-branch code is picked up.
   3. **`.venv/lib/python3.11/site-packages/lsms_library.pth` hardcodes the main-repo path** — `PYTHONPATH` alone does NOT redirect imports of `lsms_library` to a worktree.  Worker agents that rebuild a feature to verify a YAML edit will silently run the main checkout's code.  Either (a) verify via static diff only, or (b) have the agent install a fresh venv inside its worktree.  See the `.pth`-pinned package imports pitfall in the scrum-master-hpc skill for detection and mitigations.
-  4. *Savio compute nodes only*: `.venv` is typically a symlink to `/local/jobNNN/venv` (node-local SSD) and goes stale whenever you land on a different node.  Recovery recipe lives in `.venv.lustre/README_WHY_THIS_EXISTS.md` at the repo root.  **Do not just grab `.venv.lustre/bin/python`** — every import will round-trip through Lustre.  Follow the README's Option 0 or Option A instead.  This guidance is Savio-specific; other environments (login nodes, laptops, non-HPC clusters) use a normal in-tree `.venv/` and this paragraph doesn't apply.
+  4. *Savio compute nodes only*: `.venv` is typically a symlink to `/local/jobNNN/venv` (node-local SSD) and goes stale whenever you land on a different node.  Recovery recipe lives in `.venv.lustre/README_WHY_THIS_EXISTS.md` at the repo root.  **Do not just grab `.venv.lustre/bin/python`** — every import will round-trip through Lustre.  Follow the README's **adopt-or-build recipe** (adopt any importable `/local/job*/venv` already on the node → tar-pipe build only if none → reclaim the stale ones), which gives cross-job persistence without root.  Note: a stable `/local/$USER/<repo>` path is NOT creatable by us (`/local` is `root:root`); a genuinely persistent path needs an HPC-support ticket (README "Admin endgame").  **Opt-in fast path**: `bin/savio_venv.sh` packages the venv as a single squashfs image (`.venv.sqfs`, ~255 MB / one Lustre inode vs ~33k files) and mounts it per job via apptainer's `squashfuse_ll` (`mount`/`umount`/`update` subcommands) — kills the Lustre-MDS load and sidesteps the per-job reaper; see `docs/savio_venv.md` for the model + how to rebuild the image when deps change.  This guidance is Savio-specific; other environments (login nodes, laptops, non-HPC clusters) use a normal in-tree `.venv/` and this paragraph doesn't apply.
 
 ## Repository Layout
 - Country root-level symlinks (e.g. `Uganda -> lsms_library/countries/Uganda`) are convenience only; actual config lives under `lsms_library/countries/`.
@@ -85,6 +85,8 @@ Lookup order for each setting: environment variable → config file → None.
 
 **Always read files with `get_dataframe()` from `local_tools`.** It handles `.dta` / `.csv` / `.parquet` via a fallback chain: local file on disk → DVC filesystem (`DVCFileSystem`) → WB NADA download via `data_access.get_data_file()`. A script written as `get_dataframe('../Data/file.dta')` works whether the file is local, DVC-cached, or has never been downloaded.
 
+> **Never run `dvc pull` / `dvc fetch` from the CLI to materialize source data — especially in parallel (multiple agents, `make -j`, scatter-gather sweeps).** The DVC CLI takes the global `.dvc/tmp/lock` and rebuilds the repo index by walking ~7k `.dvc` sidecars (~93 s/call on Lustre); concurrent callers collide and fail with *"Unable to acquire lock"* (measured 91.7% failure at 12 concurrent — see `slurm_logs/dvc_lock_repro/`). `get_dataframe()` / `_ensure_dvc_pulled()` instead download the blob **directly from S3 (lock-free, ~0.1 s)** via the v0.7.3 bypass — so any number of readers can run concurrently. The *write* path (`push_to_cache` / `push_to_cache_batch`) still takes the lock; it retries on contention with backoff (`_run_dvc_with_lock_retry`). A coordinating fetch/write queue was considered and judged **unnecessary**: reads are already lock-free, and writes don't contend in practice — a single contributor's writes batch into one `dvc add`/`push`, and the rare concurrent-writer overlap is absorbed by the retry above. See `SkunkWorks/dvc_writer_distribution.org`.
+
 **Always write parquets with `to_parquet(df, 'name.parquet')`** from `local_tools`. It redirects to `data_root()` via `_resolve_data_path()`, which inspects the call stack to infer country/wave and handles three patterns: bare `foo.parquet` from wave scripts, `../var/foo.parquet` from country scripts, and `../wave/_/foo.parquet` cross-wave refs. Stale parquets from before this migration may still exist in-tree; they are harmless artifacts.
 
 **Anti-patterns — do not use:**
@@ -95,6 +97,7 @@ Lookup order for each setting: environment variable → config file → None.
 | `pd.read_stata('/absolute/path/...')`                    | Breaks on other machines, no DVC/WB fallback     |
 | `pyreadstat.read_dta(path)` directly                     | Same — bypasses all access layers                |
 | `from_dta('lsms_library/countries/...')` with abs path   | Non-portable; use relative `../Data/` paths      |
+| `dvc pull` / `dvc fetch` CLI to materialize data         | Takes the global `.dvc/tmp/lock`; serializes and fails under concurrency. Use `get_dataframe()` (lock-free direct-S3 bypass). |
 
 **Adding new waves**: `lsms_library.data_access.discover_waves()` / `add_wave()`; `push_to_cache_batch()` for batched `dvc add` + `dvc push`. See `CONTRIBUTING.org`.
 

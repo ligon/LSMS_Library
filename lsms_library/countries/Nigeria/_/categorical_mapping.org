@@ -8,6 +8,32 @@
   sub-varieties (e.g. "Maize (shelled)" and "Maize (unshelled)" both
   aggregate to "Maize").
 
+  Community-price item codes (GAP C / community_prices feature) reuse this
+  same table.  The post-harvest community price module (Section C8,
+  sectc8_harvest*) in W3-W5 carries the consumption-module item_cd scheme,
+  so its items resolve directly via Code here -- no extension needed.  W1/W2
+  community-price use the community questionnaire's OWN (disjoint) item-code
+  scheme, mapped by NAME to these Preferred Labels in nigeria.py
+  (_W1W2_PRICE_ITEM), reusing existing food labels where the priced good is
+  a consumption-module food.  Codes 4001-4016 below register the only
+  genuinely NEW price-questionnaire items (prepared foods / drinks the
+  consumption module does not list: Moi moi, Akara, Kulikuli, the soups,
+  Kunu, juices, flours, Ice cream); they appear only in the W1/W2 community
+  price round (PH quarters 2011Q1/2013Q1).
+
+  Crop-production item codes (GAP 1 / crop_production feature) are appended
+  to the same table.  The post-harvest crop module (secta3*) uses its own
+  cropcode scheme (1010-9999), DISJOINT from the food-consumption codes
+  above (1-601), so they coexist in one Code column with no collision.  The
+  Preferred Label REUSES the consumed-food label where the crop is itself a
+  consumed food (e.g. cropcode 1080 MAIZE -> "Maize", 1110 RICE ->
+  "Rice--local"), so crop_production.j joins food_acquired.j on Preferred
+  Label.  New Preferred Labels are added only for non-food / newly-introduced
+  crops (Cotton, Tobacco, Gum arabic, Rubber, Jute, Cocoa, Cowpea, Wheat,
+  Ginger, ...).  The per-wave columns for crop rows carry the native crop
+  label in the PH harvest quarters (2011Q1/2013Q1/2016Q1/2019Q1); 2023-24
+  (PH quarter 2024Q1) has no column but resolves via Code.
+
 #+NAME: harmonize_food
 | Code | Preferred Label                         | Aggregate Label              | 2010Q3                                        | 2011Q1                                        | 2012Q3                                        | 2013Q1                                        | 2015Q3                                        | 2016Q1                                        | 2018Q3                                        | 2019Q1                                        |
 |------+-----------------------------------------+------------------------------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|
@@ -139,6 +165,136 @@
 |  163 | Gin                                     | Gin                          | Gin                                           | Gin                                           | Gin                                           | Gin                                           | Gin                                           | Gin                                           | Gin                                           | Gin                                           |
 |  164 | Other alcoholic beverages               | Other alcoholic beverages    | Other alcoholic beverages                     | Other alcoholic beverages                     | Other alcoholic beverages                     | Other alcoholic beverages                     | Other alcoholic beverages                     | Other alcoholic beverages                     | Other alcoholic beverages                     | Other alcoholic beverages                     |
 |  601 | Guava                                   | Guava                        | ---                                           | ---                                           | ---                                           | ---                                           | Guava                                         | Guava                                         | Guava                                         | Guava                                         |
+| 1010 | Cowpea | Cowpea | --- | Beans/Cowpea | --- | Beans/Cowpea | --- | Beans/Cowpea | --- | Beans/Cowpea |
+| 1020 | Cassava--roots | Cassava | --- | Cassava Old | --- | Cassava Old | --- | Cassava Old | --- | Cassava Old |
+| 1040 | Cocoyam | Cocoyam | --- | Cocoyam | --- | Cocoyam | --- | Cocoyam | --- | Cocoyam |
+| 1050 | Cotton | Cotton | --- | Cotton | --- | Cotton | --- | Cotton | --- | Cotton |
+| 1051 | Cotton | Cotton | --- | Seed Cotton | --- | Seed Cotton | --- | Seed Cotton | --- | Seed Cotton |
+| 1052 | Cotton | Cotton | --- | Cotton Lint | --- | Cotton Lint | --- | Cotton Lint | --- | Cotton Lint |
+| 1053 | Cotton | Cotton | --- | Cotton Seed | --- | Cotton Seed | --- | Cotton Seed | --- | Cotton Seed |
+| 1060 | Groundnuts (unshelled) | Groundnuts | --- | Ground Nut/Peanuts | --- | Ground Nut/Peanuts | --- | Ground Nut/Peanuts | --- | Ground Nut/Peanuts |
+| 1061 | Groundnuts (unshelled) | Groundnuts | --- | Unshelled Ground Nuts | --- | Unshelled Ground Nuts | --- | Unshelled Ground Nuts | --- | Unshelled Ground Nuts |
+| 1062 | Groundnuts (shelled) | Groundnuts | --- | Shelled Ground Nuts | --- | Shelled Ground Nuts | --- | Shelled Ground Nuts | --- | Shelled Ground Nuts |
+| 1070 | Guinea corn/sorghum | Guinea corn/sorghum | --- | Guinea Courn/Sorghum | --- | Guinea Courn/Sorghum | --- | Guinea Courn/Sorghum | --- | Guinea Courn/Sorghum |
+| 1080 | Maize | Maize | --- | Maize | --- | Maize | --- | Maize | --- | Maize |
+| 1081 | Maize (unshelled, on the cob) | Maize | --- | Unshelled Maize(Cob) | --- | Unshelled Maize(Cob) | --- | Unshelled Maize(Cob) | --- | Unshelled Maize(Cob) |
+| 1082 | Maize (shelled, off the cob) | Maize | --- | Shelled Maize(Grain) | --- | Shelled Maize(Grain) | --- | Shelled Maize(Grain) | --- | Shelled Maize(Grain) |
+| 1083 | Maize | Maize | --- | Pop Corn Maize | --- | Pop Corn Maize | --- | Pop Corn Maize | --- | Pop Corn Maize |
+| 1090 | Melon (unshelled) | Melon | --- | Melon | --- | Melon | --- | Melon | --- | Melon |
+| 1091 | Melon (unshelled) | Melon | --- | Unshelled Melon | --- | Unshelled Melon | --- | Unshelled Melon | --- | Unshelled Melon |
+| 1092 | Melon (shelled) | Melon | --- | Shelled Melon | --- | Shelled Melon | --- | Shelled Melon | --- | Shelled Melon |
+| 1093 | Watermelon | Watermelon | --- | Water Melon | --- | Water Melon | --- | Water Melon | --- | Water Melon |
+| 1100 | Millet | Millet | --- | Millet/Maiwa | --- | Millet/Maiwa | --- | Millet/Maiwa | --- | Millet/Maiwa |
+| 1110 | Rice--local | Rice | --- | Rice | --- | Rice | --- | Rice | --- | Rice |
+| 1111 | Rice--local | Rice | --- | Unshelled Rice(Paddy) | --- | Unshelled Rice(Paddy) | --- | Unshelled Rice(Paddy) | --- | Unshelled Rice(Paddy) |
+| 1112 | Rice--local | Rice | --- | Shelled Rice(Milled) | --- | Shelled Rice(Milled) | --- | Shelled Rice(Milled) | --- | Shelled Rice(Milled) |
+| 1120 | Yam--roots | Yam | --- | Yam | --- | Yam | --- | Yam | --- | Yam |
+| 1121 | Yam--roots | Yam | --- | White Yam | --- | White Yam | --- | White Yam | --- | White Yam |
+| 1122 | Yam--roots | Yam | --- | Yellow Yam | --- | Yellow Yam | --- | Yellow Yam | --- | Yellow Yam |
+| 1123 | Yam--roots | Yam | --- | Water Yam | --- | Water Yam | --- | Water Yam | --- | Water Yam |
+| 1124 | Yam--roots | Yam | --- | Three Leave Yam | --- | Three Leave Yam | --- | Three Leave Yam | --- | Three Leave Yam |
+| 2010 | Acha | Acha | --- | Acha | --- | Acha | --- | Acha | --- | Acha |
+| 2020 | Bambara nut | Bambara nut | --- | Bambara Nut | --- | Bambara Nut | --- | Bambara Nut | --- | Bambara Nut |
+| 2030 | Bananas | Bananas | --- | Banana | --- | Banana | --- | Banana | --- | Banana |
+| 2040 | Sesame | Sesame | --- | Beeni-Seed/Sesame | --- | Beeni-Seed/Sesame | --- | Beeni-Seed/Sesame | --- | Beeni-Seed/Sesame |
+| 2050 | Carrot | Carrot | --- | Carrot | --- | Carrot | --- | Carrot | --- | Carrot |
+| 2060 | Cucumber | Cucumber | --- | Cucumber | --- | Cucumber | --- | Cucumber | --- | Cucumber |
+| 2070 | Cabbage | Cabbage | --- | Cabbage | --- | Cabbage | --- | Cabbage | --- | Cabbage |
+| 2071 | Lettuce | Lettuce | --- | Letus | --- | Letus | --- | Letus | --- | Letus |
+| 2080 | Garden eggs/egg plant | Garden eggs/egg plant | --- | Garden Egg | --- | Garden Egg | --- | Garden Egg | --- | Garden Egg |
+| 2090 | Garlic | Garlic | --- | Garlic | --- | Garlic | --- | Garlic | --- | Garlic |
+| 2100 | Ginger | Ginger | --- | Ginger | --- | Ginger | --- | Ginger | --- | Ginger |
+| 2101 | Ginger | Ginger | --- | Ginger Peeled | --- | Ginger Peeled | --- | Ginger Peeled | --- | Ginger Peeled |
+| 2102 | Ginger | Ginger | --- | Ginger Split | --- | Ginger Split | --- | Ginger Split | --- | Ginger Split |
+| 2103 | Other Spices | Other Spices | --- | Other Spices/Vanila | --- | Other Spices/Vanila | --- | Other Spices/Vanila | --- | Other Spices/Vanila |
+| 2110 | Gum arabic | Gum arabic | --- | Gum Arabic | --- | Gum Arabic | --- | Gum Arabic | --- | Gum Arabic |
+| 2120 | Okra--fresh | Okra | --- | Okro | --- | Okro | --- | Okro | --- | Okro |
+| 2130 | Onions | Onions | --- | Onion | --- | Onion | --- | Onion | --- | Onion |
+| 2140 | Fresh Pepper | Fresh Pepper | --- | Pepper | --- | Pepper | --- | Pepper | --- | Pepper |
+| 2141 | Fresh Pepper | Fresh Pepper | --- | Sweet Pepper | --- | Sweet Pepper | --- | Sweet Pepper | --- | Sweet Pepper |
+| 2142 | Fresh Pepper | Fresh Pepper | --- | Small Pepper | --- | Small Pepper | --- | Small Pepper | --- | Small Pepper |
+| 2143 | Other Spices | Other Spices | --- | Atare | --- | Atare | --- | Atare | --- | Atare |
+| 2150 | Pigeon pea | Pigeon pea | --- | Pigeon Pea | --- | Pigeon Pea | --- | Pigeon Pea | --- | Pigeon Pea |
+| 2160 | Pineapples | Pineapples | --- | Pineapple | --- | Pineapple | --- | Pineapple | --- | Pineapple |
+| 2170 | Plantains | Plantains | --- | Plantain | --- | Plantain | --- | Plantain | --- | Plantain |
+| 2180 | Potatoes | Potatoes | --- | Potato | --- | Potato | --- | Potato | --- | Potato |
+| 2181 | Sweet potatoes | Sweet potatoes | --- | Sweet Potato | --- | Sweet Potato | --- | Sweet Potato | --- | Sweet Potato |
+| 2190 | Pumpkin | Pumpkin | --- | Pumpkin | --- | Pumpkin | --- | Pumpkin | --- | Pumpkin |
+| 2191 | Pumpkin | Pumpkin | --- | Pumpkin Leave | --- | Pumpkin Leave | --- | Pumpkin Leave | --- | Pumpkin Leave |
+| 2192 | Pumpkin | Pumpkin | --- | Pumpkin Fruit | --- | Pumpkin Fruit | --- | Pumpkin Fruit | --- | Pumpkin Fruit |
+| 2193 | Pumpkin | Pumpkin | --- | Pumpkin Seed | --- | Pumpkin Seed | --- | Pumpkin Seed | --- | Pumpkin Seed |
+| 2194 | Leaves (Cocoyam, Spinach, etc.) | Leaves | --- | Green Vegetable | --- | Green Vegetable | --- | Green Vegetable | --- | Green Vegetable |
+| 2195 | Leaves (Cocoyam, Spinach, etc.) | Leaves | --- | Dry Leaves(Kuka) | --- | Dry Leaves(Kuka) | --- | Dry Leaves(Kuka) | --- | Dry Leaves(Kuka) |
+| 2200 | Rizga | Rizga | --- | Rizga | --- | Rizga | --- | Rizga | --- | Rizga |
+| 2210 | Shea nuts | Shea nuts | --- | Shea Nuts | --- | Shea Nuts | --- | Shea Nuts | --- | Shea Nuts |
+| 2220 | Soya beans | Soya beans | --- | Soya Beans | --- | Soya Beans | --- | Soya Beans | --- | Soya Beans |
+| 2230 | Sugar cane | Sugar cane | --- | Sugar Cane | --- | Sugar Cane | --- | Sugar Cane | --- | Sugar Cane |
+| 2240 | Tea | Tea | --- | Tea | --- | Tea | --- | Tea | --- | Tea |
+| 2250 | Tobacco | Tobacco | --- | Tobacco | --- | Tobacco | --- | Tobacco | --- | Tobacco |
+| 2260 | Tomatoes | Tomatoes | --- | Tomato | --- | Tomato | --- | Tomato | --- | Tomato |
+| 2270 | Walnut | Walnut | --- | Walnut | --- | Walnut | --- | Walnut | --- | Walnut |
+| 2280 | Wheat | Wheat | --- | Wheat | --- | Wheat | --- | Wheat | --- | Wheat |
+| 2290 | Zobo | Zobo | --- | Zobo | --- | Zobo | --- | Zobo | --- | Zobo |
+| 2291 | Zobo | Zobo | --- | Zobo Seed | --- | Zobo Seed | --- | Zobo Seed | --- | Zobo Seed |
+| 3010 | Apples | Apples | --- | Apple | --- | Apple | --- | Apple | --- | Apple |
+| 3020 | Cashew nut | Cashew nut | --- | Cashew | --- | Cashew | --- | Cashew | --- | Cashew |
+| 3021 | Cashew nut | Cashew nut | --- | Cashew Fruit | --- | Cashew Fruit | --- | Cashew Fruit | --- | Cashew Fruit |
+| 3022 | Cashew nut | Cashew nut | --- | Cashew Nut | --- | Cashew Nut | --- | Cashew Nut | --- | Cashew Nut |
+| 3030 | Dry Pepper | Dry Pepper | --- | Chilli | --- | Chilli | --- | Chilli | --- | Chilli |
+| 3040 | Cocoa | Cocoa | --- | Cocoa | --- | Cocoa | --- | Cocoa | --- | Cocoa |
+| 3041 | Cocoa | Cocoa | --- | Cocoa Pod | --- | Cocoa Pod | --- | Cocoa Pod | --- | Cocoa Pod |
+| 3042 | Cocoa | Cocoa | --- | Cocoa Beans | --- | Cocoa Beans | --- | Cocoa Beans | --- | Cocoa Beans |
+| 3050 | Coconut | Coconut | --- | Coconut | --- | Coconut | --- | Coconut | --- | Coconut |
+| 3060 | Coffee | Coffee | --- | Coffe | --- | Coffe | --- | Coffe | --- | Coffe |
+| 3061 | Coffee | Coffee | --- | Coffe Arabica | --- | Coffe Arabica | --- | Coffe Arabica | --- | Coffe Arabica |
+| 3062 | Coffee | Coffee | --- | Coffee Robuster | --- | Coffee Robuster | --- | Coffee Robuster | --- | Coffee Robuster |
+| 3070 | Date palm | Date palm | --- | Date Palm | --- | Date Palm | --- | Date Palm | --- | Date Palm |
+| 3080 | Grapefruit | Grapefruit | --- | Grape Fruit | --- | Grape Fruit | --- | Grape Fruit | --- | Grape Fruit |
+| 3090 | Guava | Guava | --- | Guava | --- | Guava | --- | Guava | --- | Guava |
+| 3100 | Jute | Jute | --- | Jute | --- | Jute | --- | Jute | --- | Jute |
+| 3110 | Kola nut | Kola nut | --- | Kolanut | --- | Kolanut | --- | Kolanut | --- | Kolanut |
+| 3111 | Kola nut | Kola nut | --- | Kolanut Unshelled | --- | Kolanut Unshelled | --- | Kolanut Unshelled | --- | Kolanut Unshelled |
+| 3112 | Kola nut | Kola nut | --- | Kolanut Shelled | --- | Kolanut Shelled | --- | Kolanut Shelled | --- | Kolanut Shelled |
+| 3113 | Kola nut | Kola nut | --- | Bitter Kola | --- | Bitter Kola | --- | Bitter Kola | --- | Bitter Kola |
+| 3120 | Lemon | Lemon | --- | Lemon | --- | Lemon | --- | Lemon | --- | Lemon |
+| 3130 | Lime | Lime | --- | Lime | --- | Lime | --- | Lime | --- | Lime |
+| 3140 | Locust bean | Locust bean | --- | Locust Bean | --- | Locust Bean | --- | Locust Bean | --- | Locust Bean |
+| 3150 | Orange/tangerine | Orange/tangerine | --- | Mandarin/Tangerine | --- | Mandarin/Tangerine | --- | Mandarin/Tangerine | --- | Mandarin/Tangerine |
+| 3160 | Mangoes | Mangoes | --- | Mango | --- | Mango | --- | Mango | --- | Mango |
+| 3170 | Orange/tangerine | Orange/tangerine | --- | Orange | --- | Orange | --- | Orange | --- | Orange |
+| 3180 | Palm oil | Palm oil | --- | Oil Palm Tree | --- | Oil Palm Tree | --- | Oil Palm Tree | --- | Oil Palm Tree |
+| 3181 | Palm oil | Palm oil | --- | Fresh Fruit Bunch | --- | Fresh Fruit Bunch | --- | Fresh Fruit Bunch | --- | Fresh Fruit Bunch |
+| 3182 | Palm oil | Palm oil | --- | Fresh Nut | --- | Fresh Nut | --- | Fresh Nut | --- | Fresh Nut |
+| 3183 | Palm oil | Palm oil | --- | Palm Oil | --- | Palm Oil | --- | Palm Oil | --- | Palm Oil |
+| 3184 | Palm kernel | Palm kernel | --- | Palm Kernel | --- | Palm Kernel | --- | Palm Kernel | --- | Palm Kernel |
+| 3190 | Unground Ogbono | Ogbono | --- | Agbono(Oro Seed) | --- | Agbono(Oro Seed) | --- | Agbono(Oro Seed) | --- | Agbono(Oro Seed) |
+| 3200 | Oil bean | Oil bean | --- | Oil Bean | --- | Oil Bean | --- | Oil Bean | --- | Oil Bean |
+| 3210 | Pawpaw | Pawpaw | --- | Pawpaw | --- | Pawpaw | --- | Pawpaw | --- | Pawpaw |
+| 3220 | Avocado pear | Avocado pear | --- | Pear | --- | Pear | --- | Pear | --- | Pear |
+| 3221 | Avocado pear | Avocado pear | --- | Avocado Pear | --- | Avocado Pear | --- | Avocado Pear | --- | Avocado Pear |
+| 3230 | Rubber | Rubber | --- | Rubber | --- | Rubber | --- | Rubber | --- | Rubber |
+| 3231 | Rubber | Rubber | --- | Rubber Lump | --- | Rubber Lump | --- | Rubber Lump | --- | Rubber Lump |
+| 3232 | Rubber | Rubber | --- | Rubber Sheet | --- | Rubber Sheet | --- | Rubber Sheet | --- | Rubber Sheet |
+| 3240 | Cherry (Agbalumo) | Cherry (Agbalumo) | --- | Cherry(Agbalumo) | --- | Cherry(Agbalumo) | --- | Cherry(Agbalumo) | --- | Cherry(Agbalumo) |
+| 3250 | Eru | Eru | --- | Eru | --- | Eru | --- | Eru | --- | Eru |
+| 3260 | Iyere | Iyere | --- | Iyere | --- | Iyere | --- | Iyere | --- | Iyere |
+| 9999 | Other crop | Other crop | --- | Other (Specify) | --- | Other (Specify) | --- | Other (Specify) | --- | Other (Specify) |
+| 4001 | Millet flour | Millet flour | --- | Millet flour | --- | Millet flour | --- | --- | --- | --- |
+| 4002 | Plantain flour | Plantain flour | --- | Plantain flour | --- | Plantain flour | --- | --- | --- | --- |
+| 4003 | Fufu/Cassava dough (akpu) | Fufu/Cassava dough (akpu) | --- | Fufu/Cassava dough (akpu) | --- | Fufu/Cassava dough (akpu) | --- | --- | --- | --- |
+| 4004 | Moi moi | Moi moi | --- | Moi moi | --- | Moi moi | --- | --- | --- | --- |
+| 4005 | Akara (bean cake) | Akara (bean cake) | --- | Akara (bean cake) | --- | Akara (bean cake) | --- | --- | --- | --- |
+| 4006 | Kulikuli (groundnut cake) | Kulikuli (groundnut cake) | --- | Kulikuli (groundnut cake) | --- | Kulikuli (groundnut cake) | --- | --- | --- | --- |
+| 4007 | Orange juice | Orange juice | --- | Orange juice | --- | Orange juice | --- | --- | --- | --- |
+| 4008 | Pineapple juice | Pineapple juice | --- | Pineapple juice | --- | Pineapple juice | --- | --- | --- | --- |
+| 4009 | Cooked rice and stew | Cooked rice and stew | --- | Cooked rice and stew | --- | Cooked rice and stew | --- | --- | --- | --- |
+| 4010 | Fufu and soup | Fufu and soup | --- | Fufu and soup | --- | Fufu and soup | --- | --- | --- | --- |
+| 4011 | Tuo and soup | Tuo and soup | --- | Tuo and soup | --- | Tuo and soup | --- | --- | --- | --- |
+| 4012 | Amala and soup | Amala and soup | --- | Amala and soup | --- | Amala and soup | --- | --- | --- | --- |
+| 4013 | Gari and soup | Gari and soup | --- | Gari and soup | --- | Gari and soup | --- | --- | --- | --- |
+| 4014 | Pounded yam and soup | Pounded yam and soup | --- | Pounded yam and soup | --- | Pounded yam and soup | --- | --- | --- | --- |
+| 4015 | Ice cream | Ice cream | --- | Ice cream | --- | Ice cream | --- | --- | --- | --- |
+| 4016 | Kunu | Kunu | --- | Kunu | --- | Kunu | --- | --- | --- | --- |
 
 * Units
 
@@ -151,6 +307,19 @@
   Note: the same code number can mean different things across waves
   (e.g., code 10 = "medium derica" in wave 2 but "bin/basket" in
   waves 3-4).  The per-wave columns record the wave-specific meaning.
+
+  Harvest production units (GAP 1 / crop_production): the post-harvest
+  crop module (secta3*) reports harvest quantity in its own per-wave
+  production-unit-code scheme (which collides on Code with the food
+  scheme, so it is NOT given per-wave Code columns here).  crop_production.py
+  decodes the native unit label and normalizes it to a size-agnostic base
+  Preferred Label (Sack/Bag, Basket, Basin, Bowl, Bunch, Bundle, Tuber,
+  Heap, Stalk, Wheelbarrow, Piece, Pick-up, Jerry Can, Mudu, Congo, Derica,
+  Tiya, Kobiowu, Paint rubber, ...).  Codes 1001-1018 below register the
+  base harvest units that the food module's size-prefixed rows did not
+  already cover; the rest reuse existing food-unit Preferred Labels (Kg, g,
+  l, cl, Sack/Bag, Basket, Basin, Tuber, Wheelbarrow, ...).  kg-conversion
+  factors are NOT stored here (that is a transformation).
 
 #+NAME: u
 | Code | Preferred Label              | 2010-11                      | 2012-13                      | 2015-16                      | 2018-19                      |
@@ -204,6 +373,57 @@
 |  121 | medium packet/sachet         | ---                          | ---                          | medium packet/sachet         | medium packet/sachet         |
 |  122 | large packet/sachet          | ---                          | ---                          | large packet/sachet          | large packet/sachet          |
 |  900 | other specify                | ---                          | ---                          | other specify                | other specify                |
+| 22 | Basket Medium | Basket Medium | --- | --- | --- |
+| 23 | Basket Big | Basket Big | --- | --- | --- |
+| 32 | Basin Medium | Basin Medium | --- | --- | --- |
+| 33 | Basin Big/Large | Basin Big/Large | --- | --- | --- |
+| 34 | Basin Extra Large | Basin Extra Large | --- | --- | --- |
+| 53 | Yam Tuber Big/Large | Yam Tuber Big/Large | --- | --- | --- |
+| 63 | Bundle Big | Bundle Big | --- | --- | --- |
+| 93 | Jerry Can Big | Jerry Can Big | --- | --- | --- |
+| 94 | Jerry Can Large | Jerry Can Large | --- | --- | --- |
+| 125 | Packet | --- | --- | --- | Packet |
+| 130 | Sack/Bag | --- | --- | --- | Sack/Bag |
+| 140 | Basket | --- | --- | --- | Basket |
+| 150 | Basin | --- | --- | --- | Basin |
+| 170 | Wheelbarrow | --- | --- | --- | Wheelbarrow |
+| 200 | Loaf | --- | --- | --- | Loaf |
+| 211 | Tuber | --- | --- | --- | Tuber |
+| 240 | Bottle/Can | --- | --- | --- | Bottle/Can |
+| 250 | Sachet | --- | --- | --- | Sachet |
+| 251 | Bag of 20 Sachets | --- | --- | --- | Bag of 20 Sachets |
+| 270 | Cube | --- | --- | --- | Cube |
+| 280 | Metric Cup | --- | --- | --- | Metric Cup |
+| 290 | Wrap | --- | --- | --- | Wrap |
+| 300 | Spoon | --- | --- | --- | Spoon |
+| 301 | Tea Spoon | --- | --- | --- | Tea Spoon |
+| 302 | Table Spoon | --- | --- | --- | Table Spoon |
+| 310 | Crate | --- | --- | --- | Crate |
+| 320 | Slice | --- | --- | --- | Slice |
+| 330 | Whole Animal | --- | --- | --- | Whole Animal |
+| 340 | Shot | --- | --- | --- | Shot |
+| 131 | other specify (131) | --- | --- | other specify (131) | --- |
+| 151 | other specify (151) | --- | --- | other specify (151) | --- |
+| 152 | other specify (152) | --- | --- | other specify (152) | --- |
+| 1001 | Bowl | --- | --- | --- | --- |
+| 1002 | Bunch | --- | --- | --- | --- |
+| 1003 | Bundle | --- | --- | --- | --- |
+| 1004 | Cigarette cup | --- | --- | --- | --- |
+| 1005 | Congo | --- | --- | --- | --- |
+| 1006 | Derica | --- | --- | --- | --- |
+| 1007 | Heap | --- | --- | --- | --- |
+| 1008 | Jerry Can | --- | --- | --- | --- |
+| 1009 | Kobiowu | --- | --- | --- | --- |
+| 1010 | Milk cup | --- | --- | --- | --- |
+| 1011 | Mudu | --- | --- | --- | --- |
+| 1012 | Olodo | --- | --- | --- | --- |
+| 1013 | Packet/Sachet | --- | --- | --- | --- |
+| 1014 | Paint rubber | --- | --- | --- | --- |
+| 1015 | Pick-up | --- | --- | --- | --- |
+| 1016 | Piece | --- | --- | --- | --- |
+| 1017 | Stalk | --- | --- | --- | --- |
+| 1018 | Tiya | --- | --- | --- | --- |
+| 1019 | days | --- | --- | --- | --- |
 
 * Geopolitical Zones
 
@@ -401,3 +621,237 @@
 | Wood                 | Wood            |
 | Terrazzo             | Tiles           |
 | Marble               | Tiles           |
+
+* plot_features harmonization tables (GH #167)
+
+  Lasting plot characteristics from the post-planting Agriculture
+  module sect11b / sect11b1.  See =Nigeria/_/nigeria.py=
+  (=plot_features_for_wave=) and the per-wave
+  =Nigeria/{wave}/_/plot_features.py= scripts.
+
+** harmonize_acquire (WAVE-KEYED)
+
+  The "How was [PLOT] acquired?" code scheme EVOLVES across waves
+  (s11bq4 in W1; s11b1q4 in W2--W5): W1/W2 have 4 codes, W3 has 6,
+  W4 has 7, W5 fully re-orders to 9 codes (e.g. W5 code 2 = "rented
+  in", W4 code 2 = "rented for cash/inkind").  So the lookup MUST be
+  keyed on (Wave, Code) -- a flat Code map would mislabel rows.  This
+  mirrors the Uganda wave-keyed-acquire lesson (GH #167 pilot).
+
+  Canonical Tenure spellings (from lsms_library/data_info.yml):
+  purchase -> owned; rented -> rented_in; inheritance -> inherited;
+  sharecropped in -> sharecropped_in; used-free / distributed-by-
+  community / granted-by-customary-or-community -> communal;
+  temporary-land-exchange / allocated-by-government / gifted ->
+  other_tenure.  Codes absent for a wave map to NaN (no silent
+  default).
+
+#+NAME: harmonize_acquire
+| Wave    | Code | Preferred Label |
+|---------+------+-----------------|
+| 2010-11 |    1 | owned           |
+| 2010-11 |    2 | rented_in       |
+| 2010-11 |    3 | communal        |
+| 2010-11 |    4 | communal        |
+| 2012-13 |    1 | owned           |
+| 2012-13 |    2 | rented_in       |
+| 2012-13 |    3 | communal        |
+| 2012-13 |    4 | communal        |
+| 2015-16 |    1 | owned           |
+| 2015-16 |    2 | rented_in       |
+| 2015-16 |    3 | communal        |
+| 2015-16 |    4 | communal        |
+| 2015-16 |    5 | inherited       |
+| 2015-16 |    6 | sharecropped_in |
+| 2018-19 |    1 | owned           |
+| 2018-19 |    2 | rented_in       |
+| 2018-19 |    3 | communal        |
+| 2018-19 |    4 | communal        |
+| 2018-19 |    5 | inherited       |
+| 2018-19 |    6 | sharecropped_in |
+| 2018-19 |    7 | other_tenure    |
+| 2023-24 |    1 | owned           |
+| 2023-24 |    2 | rented_in       |
+| 2023-24 |    3 | communal        |
+| 2023-24 |    4 | communal        |
+| 2023-24 |    5 | inherited       |
+| 2023-24 |    6 | sharecropped_in |
+| 2023-24 |    7 | other_tenure    |
+| 2023-24 |    8 | other_tenure    |
+| 2023-24 |    9 | other_tenure    |
+
+** harmonize_tenure_system (W5 only: s11b1q4b)
+
+  Only the 2023-24 (W5) questionnaire asks the legal/customary tenure
+  regime separately (s11b1q4b).  Earlier waves leave TenureSystem NaN.
+  Canonical TenureSystem spellings: state / community / cooperative
+  were extended for this cross-country rollout (GH #167).
+
+#+NAME: harmonize_tenure_system
+| Code | Preferred Label     |
+|------+---------------------|
+|    1 | customary           |
+|    2 | freehold            |
+|    3 | leasehold           |
+|    4 | state               |
+|    5 | community           |
+|    6 | cooperative         |
+|   96 | other_tenure_system |
+
+** harmonize_soil (stable W2--W5: s11b1q44 / W5 s11b1q61)
+
+  W1 (2010-11) does not ask soil type -> SoilType NaN that wave.
+  SoilType has no canonical spellings constraint in data_info.yml, so
+  these descriptive labels are carried as-is.
+
+#+NAME: harmonize_soil
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | sandy           |
+|    2 | clay            |
+|    3 | sandy_clay      |
+|    4 | forest_loam     |
+|    5 | loamy           |
+|    6 | other           |
+|   96 | other           |
+
+* Agricultural inputs (plot_inputs, GAP 2)
+
+** harmonize_input -- input-type identity (the plot_inputs `input` axis)
+
+  The plot_inputs feature's ``input`` index level carries one of these
+  Preferred Labels.  The country-level ``_/plot_inputs.py`` script
+  resolves each module's native input identity to the Preferred Label
+  directly (mirroring how crop_production resolves crops via
+  harmonize_food), so this table is the canonical REGISTRY for the
+  cross-wave input taxonomy.  The per-wave columns record the native
+  source label / questionnaire concept each Preferred Label is built
+  from; ``---`` means the wave does not record that input separately.
+
+  Fertilizer types: W1/W2/W3 record a single fertilizer-type code per
+  acquisition channel (1=NPK, 2=UREA, 3=COMPOSITE MANURE -> Organic
+  Fertilizer, 4=OTHER); W4/W5 give NPK / Urea / other-inorganic /
+  organic each its own quantity column.  Pesticide / herbicide carry the
+  reported quantity used (+unit).  Animal Traction carries reported own +
+  rented animal-days (u = days).  Seeds are the per-plot-crop seed-use
+  rows (crop carried on the harmonize_food ``crop`` index level).  The
+  plain "did you use a tractor/machine?" question records no per-input
+  quantity at this grain, so it is NOT stored as a flag-only row (it is a
+  ``used_machinery`` transformation, not a data-layer item).
+
+#+NAME: harmonize_input
+| Code | Preferred Label            | 2010Q3            | 2012Q3            | 2015Q3              | 2018Q3             | 2023Q3             |
+|------+----------------------------+-------------------+-------------------+---------------------+--------------------+--------------------|
+|    1 | Seed                       | seed (sect11e)    | seed (sect11e)    | seed (sect11e)      | seed (sect11f)     | seed (sect11f)     |
+|    2 | NPK                        | npk               | NPK               | 1. NPK              | NPK                | NPK                |
+|    3 | Urea                       | urea              | UREA              | 2. UREA             | UREA               | UREA               |
+|    4 | Organic Fertilizer         | composite manure  | Composite Manure  | 3. COMPOSITE MANURE | organic fertilizer | organic fertilizer |
+|    5 | Other Inorganic Fertilizer | other (specify)   | Other (specify)   | 4. OTHER (SPECIFY)  | other inorganic    | other inorganic    |
+|    6 | Pesticide                  | pesticide         | pesticide         | pesticide           | pesticide          | pesticide          |
+|    7 | Herbicide                  | herbicide         | herbicide         | herbicide           | herbicide          | herbicide          |
+|    8 | Animal Traction            | animal traction   | animal traction   | animal traction     | animal traction    | animal traction    |
+
+* Livestock (livestock, GAP 4)
+
+** harmonize_species -- animal identity (the livestock `animal` axis)
+
+  The livestock feature's ``animal`` index level carries the ``Preferred
+  Label`` from this table.  The country-level ``_/livestock.py`` script
+  resolves each wave's native animal code (101--123, a single STABLE
+  scheme across all five GHS-Panel waves) to the Preferred Label directly
+  (mirroring how crop_production resolves crops via harmonize_food and
+  plot_inputs resolves inputs via harmonize_input), so this table is the
+  canonical REGISTRY for the cross-wave animal taxonomy.
+
+  Two label granularities, both retained as columns:
+  - ``Preferred Label`` keeps the ITEM as the survey records it -- the
+    cattle life-stages (Calf-Female / Calf-Male / Heifer / Steer / Cow /
+    Bull / Ox) and the chicken types (Chicken-Layer / Chicken-Local /
+    Chicken-Broiler / Chicken-Cockerel) stay DISTINCT, because each is a
+    separately-reported herd row for a household.  Collapsing them would
+    fold several reported (i, animal) rows into one index tuple and
+    destroy item-level detail (the whole point of going richer than the
+    WB single engaged-y/n binary).  This is the ``animal`` index value.
+  - ``Species`` is the canonical biological-species rollup (Cattle /
+    Donkeys / Horses / Goats / Sheep / Pigs / Poultry / Rabbits / Fish /
+    Camels / Other), where the cross-life-stage / cross-breed variation
+    is unimportant.  It is NOT an index level -- a downstream tlu /
+    herd-aggregation transformation groups the item rows by Species.
+
+  Code 123 (Other-Specify) maps to Preferred Label "Other Livestock"
+  (Species "Other").  ``v`` is NOT joined (livestock is in the framework
+  ``_no_v_join`` set -- the grain is (t, i, animal)).  The per-wave
+  columns record the native decoded animal label; ``---`` means the wave
+  does not enumerate that animal (W4/W5 dropped Rabbit 119 and Fish 121).
+
+#+NAME: harmonize_species
+| Code | Preferred Label | Species  | 2010-11         | 2012-13         | 2015-16            | 2018-19            | 2023-24            |
+|------+-----------------+----------+-----------------+-----------------+--------------------+--------------------+--------------------|
+|  101 | Calf-Female     | Cattle   | calf female     | CALF FEMALE     | 101. CALF FEMALE   | 101. CALF FEMALE   | 101. CALF FEMALE   |
+|  102 | Calf-Male       | Cattle   | calf male       | CALF MALE       | 102. CALF MALE     | 102. CALF MALE     | 102. CALF MALE     |
+|  103 | Heifer          | Cattle   | heifer          | HEIFER          | 103. HEIFER        | 103. HEIFER        | 103. HEIFER        |
+|  104 | Steer           | Cattle   | steer           | STEER           | 104. STEER         | 104. STEER         | 104. STEER         |
+|  105 | Cow             | Cattle   | cow             | COW             | 105. COW           | 105. COW           | 105. COW           |
+|  106 | Bull            | Cattle   | bull            | BULL            | 106. BULL          | 106. BULL          | 106. BULL          |
+|  107 | Ox              | Cattle   | ox              | OX              | 107. OX            | 107. OX            | 107. OX            |
+|  108 | Donkey          | Donkeys  | donkey          | DONKEY          | 108. DONKEY        | 108. DONKEY        | 108. DONKEY        |
+|  109 | Horse           | Horses   | horse           | HORSE           | 109. HORSE         | 109. HORSE         | 109. HORSE         |
+|  110 | Goat            | Goats    | goat            | GOAT            | 110. GOAT          | 110. GOAT          | 110. GOAT          |
+|  111 | Sheep           | Sheep    | sheep           | SHEEP           | 111. SHEEP         | 111. SHEEP         | 111. SHEEP         |
+|  112 | Pig             | Pigs     | pig             | PIG             | 112. PIG           | 112. PIG           | 112. PIG           |
+|  113 | Chicken-Layer   | Poultry  | chicken-layer   | CHICKEN-LAYER   | 113. CHICKEN-LAYER | 113. CHICKEN-LAYER | 113. CHICKEN-LAYER |
+|  114 | Chicken-Local   | Poultry  | chicken-local   | CHICKEN-LOCAL   | 114. CHICKEN-LOCAL | 114. CHICKEN-LOCAL | 114. CHICKEN-LOCAL |
+|  115 | Chicken-Broiler | Poultry  | chicken-broiler | CHICKEN-BROILER | 115. CHICKEN-BROILER | 115. CHICKEN-BROILER | 115. CHICKEN-BROILER |
+|  116 | Chicken-Cockerel| Poultry  | chicken-cockery | CHICKEN-COCKERY | 116. CHICKEN-COCKERY | 116. CHICKEN-COCKERY | 116. CHICKEN-COCKEREL |
+|  117 | Turkey          | Poultry  | turkey          | TURKEY          | 117. TURKEY        | 117. TURKEY        | 117. TURKEY        |
+|  118 | Duck            | Poultry  | duck            | DUCK            | 118. DUCK          | 118. DUCK          | 118. DUCK          |
+|  119 | Rabbit          | Rabbits  | rabbit          | RABBIT          | 119. RABBIT        | ---                | ---                |
+|  120 | Guinea Fowl     | Poultry  | guinea fowl     | GUINEA FOWL     | 120. GUINEA FOWL   | 120. GUINEA FOWL   | 120. GUINEA FOWL   |
+|  121 | Fish            | Fish     | fish            | FISH            | 121. FISH          | ---                | ---                |
+|  122 | Camel           | Camels   | camel           | CAMEL           | 122. CAMEL         | 122. CAMEL         | 122. CAMEL         |
+|  123 | Other Livestock | Other    | other (specify) | OTHER (SPECIFY) | 123. OTHER (SPECIFY) | 123. OTHER (SPECIFY) | 123. OTHER (SPECIFY) |
+
+* Labor (plot_labor + people_last7days, GAP 3)
+
+** harmonize_labor_source -- the plot_labor `source` axis
+
+  The plot_labor feature's ``source`` index level carries one of these
+  three Preferred Labels.  The country-level ``_/plot_labor.py`` script
+  emits the canonical label directly (mirroring how livestock emits the
+  harmonize_species label), so this table is the canonical REGISTRY for the
+  plot-labor source taxonomy.  Every GHS-Panel post-harvest plot labor
+  roster (secta2) splits reported plot labor into exactly these three
+  acquisition channels:
+  - ``family``  household-member labor (the worker-slot block, sa2q1[a-d]*).
+  - ``hired``   paid hired labor (man / woman / child blocks; carries Wage).
+  - ``other``   free / exchange labor (sa2q12a/b/c; no cash wage).
+
+#+NAME: harmonize_labor_source
+| Code | Preferred Label | Concept                                         |
+|------+-----------------+-------------------------------------------------|
+|    1 | family          | household-member labor (worker-slot roster)     |
+|    2 | hired           | paid hired labor (carries reported Wage)        |
+|    3 | other           | free / exchange labor (no cash wage)            |
+
+** harmonize_industry -- the people_last7days `Industry` axis
+
+  The people_last7days feature's ``Industry`` column carries one of these
+  Preferred Labels (the harmonized industry of a member's wage/main work;
+  ``<NA>`` for non-wage-workers / non-working-age).  The country-level
+  ``_/people_last7days.py`` script resolves each wave's native industry
+  code to the Preferred Label directly (W1-W4 the section-3 ``s3q14``
+  1--14 code grouping; W5 the ISIC-style ``s4aq41_code`` ranges), so this
+  table is the canonical REGISTRY for the wage-work industry taxonomy.
+  The grouping mirrors NGA_GHS{1..5}.do's ``ind_ag``..``ind_serv``
+  branches (no Fishing branch in the W1-W4 code list -> Fishing only
+  appears in W5).
+
+#+NAME: harmonize_industry
+| Code | Preferred Label | s3q14 (W1-W4) | s4aq41_code (W5) |
+|------+-----------------+---------------+------------------|
+|    1 | Agriculture     | 1             | 101--299         |
+|    2 | Fishing         | ---           | 301--399         |
+|    3 | Mining          | 2             | 501--999         |
+|    4 | Manufacturing   | 3--5          | 1010--4000       |
+|    5 | Construction    | 6             | 4100--4500       |
+|    6 | Services        | 7--14         | 4501--10000      |

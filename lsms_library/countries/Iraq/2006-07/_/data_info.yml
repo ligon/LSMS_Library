@@ -84,3 +84,54 @@ household_roster:
         Sex: q0102
         Age: q0103
         MonthsAway: q0113
+
+assets:
+    file:
+        - "../Data/2007ihses16_durable_goods.dta"
+    idxvars:
+        i: xhhkey
+        j: q1601_n
+    myvars:
+        Quantity: q1602
+        Value: q1604
+
+individual_education:
+    # Education module; q0406 = highest attainment (13 English-labeled levels).
+    # i=xhhkey, pid=xpers match the roster (0% spine orphans).
+    file:
+        - "../Data/2007ihses04_education.dta"
+    idxvars:
+        i: xhhkey
+        pid: xpers
+    myvars:
+        Educational Attainment: q0406
+
+housing:
+    # Dwelling module 2007ihses03. One row per household (xhhkey, unique).
+    # All columns are English value-labeled -> NAME strings, no mapping
+    # needed.  q0305 "Ceiling material" -> Roof.
+    file:
+        - "../Data/2007ihses03_housing.dta"
+    idxvars:
+        i: xhhkey
+    myvars:
+        Roof: q0305
+        Floor: q0306
+        Walls: q0304
+        Water: q0314
+        Toilet: q0320
+        Electricity: q0323_1
+        Tenure: q0327
+
+cluster_features:
+    # Cover page; one row per cluster v=xcluster. Region=xgov (governorate);
+    # Rural derived from the xstrat label via mapping.py:Rural. Constant
+    # within cluster (verified, 2961 clusters).
+    file:
+        - "../Data/2007ihses00_cover_page.dta"
+    idxvars:
+        v: xcluster
+    myvars:
+        Region: xgov
+        Rural:
+            - xstrat

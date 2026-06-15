@@ -1,0 +1,114 @@
+# EthiopiaRHS 2004 (Round 6).  Source: IFPRI ERHS 1989-2009 Dataverse
+# deposit (doi:10.7910/DVN/T8G8IV).
+#
+# R6 has NO person roster and NO item-level food in the IFPRI archive --
+# only pre-aggregated HH-level scalars.  So 2004 is wired as a set of
+# bespoke HH-level (t,i) aggregate tables (the documented value-table
+# pattern of assets/livestock/income), NOT household_roster/food_acquired.
+#
+# i-KEY (statically verified).  i = composite (paid, hhid) via the shared
+# ethiopiarhs.i formatter -- `hhid` is the HH-number-within-PA and is NOT
+# unique within the wave (308 distinct hhid vs 1598 rows); the PA code
+# `paid` (1..20, the SAME numeric peasant-association scheme as the 1994+
+# q1c) disambiguates.  This composite is in the SAME keyspace as the 1994+
+# panel's [q1c, hhid], so it joins the main panel (and gets a real v from
+# the 2004 sample below), NOT the 1989/1999-bespoke packed 5-digit hhid.
+#
+# All extraction is CODE-BASED (converted_categoricals: False): paid/hhid
+# and the value columns are read as stable numeric codes/scalars.
+#
+# R6-POPULATION FILTER.  consumptionaggregates_123456.tab and
+# livestockaggregates_123456.tab are POOLED R1-R6 files (1598 / 1616 rows);
+# only the rows with a non-NaN *6-suffixed column (cons6 -> 1368 HH,
+# livval6 -> 1355 HH) are the R6 population.  The consumption/livestock
+# df_edit hooks in _/ethiopiarhs.py drop the out-of-round all-NaN rows.
+
+# consumption: the *6 (R6) slice of the pooled aggregate file.
+# aeu6 is all-NaN in the source -> no AEU column.
+consumption:
+    file: consumptionaggregates_123456.tab
+    converted_categoricals: False
+    idxvars:
+        i:
+            - paid
+            - hhid
+    myvars:
+        HouseholdSize: hhsize6
+        TotalConsumption: cons6
+        FoodConsumption: food6
+        RealConsumptionPC: rconspc6
+        FoodPriceIndex: fpi6
+        Poor: poor6
+
+# livestock: the livval6/lsu6 (R6) slice of the pooled livestock-aggregate
+# file.  Reuses the existing (t,i) `livestock` feature (country-level concat
+# unions waves); _no_v_join already exempts `livestock`.
+livestock:
+    file: livestockaggregates_123456.tab
+    converted_categoricals: False
+    idxvars:
+        i:
+            - paid
+            - hhid
+    myvars:
+        LivestockValue: livval6
+        TLU: lsu6
+
+# area_output: HH x crop AREA (ha) + PRODUCTION (kg) totals, 2004 = 9 crops.
+# Source columns {crop}ha04 / {crop}prd04.
+area_output:
+    file: area_output_04rev.tab
+    converted_categoricals: False
+    idxvars:
+        i:
+            - paid
+            - hhid
+    myvars:
+        WhiteTeff_ha: wtefha04
+        WhiteTeff_kg: wtefprd04
+        BlackTeff_ha: btefha04
+        BlackTeff_kg: btefprd04
+        Barley_ha: barlha04
+        Barley_kg: barlprd04
+        Wheat_ha: whtha04
+        Wheat_kg: whtprd04
+        Maize_ha: maizha04
+        Maize_kg: maizprd04
+        Sorghum_ha: sorgha04
+        Sorghum_kg: sorgprd04
+        Coffee_ha: coffha04
+        Coffee_kg: coffprd04
+        Chat_ha: chatha04
+        Chat_kg: chatprd04
+        Enset_ha: ensetha04
+        Enset_kg: ensetprd04
+
+# Sampling design + cluster geography.  Extracted from the consumption
+# aggregate file (richest HH coverage); v = paid (numeric PA code 1..20).
+# The sample/cluster_features df_edit hooks dedup to (i)/(v) grain, set
+# uniform self-weights (ERHS is a purposive panel; see data_scheme.yml),
+# and map Region/Woreda via the cross-wave erhs_village_* Code tables.
+# REQUIRED for test_covers_all_waves: 2004 must be covered by sample().
+# (The all-NaN R6 rows do not carry a hhid clash; sample dedups on i.)
+sample:
+    file: consumptionaggregates_123456.tab
+    converted_categoricals: False
+    idxvars:
+        i:
+            - paid
+            - hhid
+    myvars:
+        v: paid
+        _present: cons6   # R6-population filter helper (dropped in sample hook)
+cluster_features:
+    file: consumptionaggregates_123456.tab
+    converted_categoricals: False
+    idxvars:
+        v: paid
+    myvars:
+        Region:
+            - paid
+            - mappings: ['erhs_village_region', 'Code', 'Region']
+        Woreda:
+            - paid
+            - mappings: ['erhs_village_woreda', 'Code', 'Woreda']

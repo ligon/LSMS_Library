@@ -112,6 +112,37 @@ def food_acquired(df):
     df = _decode_mojibake_in_df(df)
     return df
 
+_FIES_ITEMS = ['Worried', 'HealthyDiet', 'FewFoods', 'SkippedMeal',
+               'AteLess', 'RanOut', 'Hungry', 'WholeDay']
+
+
+def _to_fies_bool(s):
+    '''Coerce a FIES item column to nullable boolean.  The YAML
+    ``mapping: {Oui: True, Non: False}`` runs through df_data_grabber,
+    which leaves UNMAPPED values ("Ne sait pas" / "Refus" / NaN)
+    UNCHANGED rather than turning them into NaN.  So we keep only genuine
+    True/False and send everything else (residual strings, NaN) to
+    pd.NA.'''
+    return s.map(lambda x: True if x is True else (False if x is False else pd.NA)).astype('boolean')
+
+
+def food_security(df):
+    '''food_security post-processor: coerce the 8 FIES items to nullable
+    boolean and compute FIES_score.
+
+    FIES_score is the count of True across the 8 items, and is NaN only
+    when ALL 8 items are NaN (the question was not asked at all).
+    Partial NaNs count as not-True (FAO scoring).
+    '''
+    for c in _FIES_ITEMS:
+        df[c] = _to_fies_bool(df[c])
+    items = df[_FIES_ITEMS]
+    all_na = items.isna().all(axis=1)
+    score = items.eq(True).sum(axis=1)
+    df['FIES_score'] = score.where(~all_na).astype('Int64')
+    return df
+
+
 COPING_LABELS = {
     1: "Utilisation de son épargne",
     2: "Aide de parents ou d'amis",
@@ -211,7 +242,16 @@ def Age(value):
     Pre-process Age list: convert French month name (s01q03b) to integer.
     Sentinel 9999 for any component is left as-is; age_handler's is_valid()
     rejects values >= 2100 (covers 9999).
+
+    The function name ``Age`` collides with the ``assets`` myvar
+    ``Age: s12q07`` (item age in years), which the framework binds to
+    this formatter by name (column_mapping in country.py).  That path
+    passes a *scalar*, not the roster's DOB Series; pass scalars
+    through unchanged so assets extraction does not crash on
+    ``list(<float>)`` (closes #321).
     '''
+    if not isinstance(value, pd.Series):
+        return value
     month_map = {
         'Janvier': 1, 'Fevrier': 2, 'Février': 2, 'Mars': 3, 'Avril': 4,
         'Mai': 5, 'Juin': 6, 'Juillet': 7, 'Aout': 8, 'Août': 8,

@@ -1,0 +1,160 @@
+#+title: Serbia food items
+#+author: LSMS Library
+
+Harmonization table mapping the food-item codes of the Serbia LSMS 2007
+food-consumption diary (=m5_1_diary.dta=) to preferred English labels.
+
+* Why the join key is =proizvod=, not =nsifra=
+
+In =m5_1_diary.dta= the =nsifra= field holds the *Serbian product name*
+as text and =proizvod= holds the numeric product code.  The raw Serbian
+text is stored in a legacy single-byte (YUSCII-style) transliteration in
+which the pipe character ='|'= is used for the letter "đ" (e.g.
+=Gove|e meso= = "Goveđe meso", beef).  A literal ='|'= inside a cell
+cannot survive an org-mode pipe-delimited table, so this table keys on
+the clean numeric =proizvod= code instead.  =2007/_/food_acquired.py= was
+updated to look up =proizvod= -> Preferred Label.
+
+* Columns
+- =Preferred Label= :: canonical cross-survey English label.
+- =proizvod= :: the numeric product code (e.g. =0101=) from the source;
+  the join key.  Grouped by leading digits: 01 cereals/bread, 02
+  vegetables, 03 fruit/nuts, 04 meat, 05 fish, 06 fats/oils, 07
+  dairy/eggs, 08 sugar/spices/misc, 09 beverages, 10 tobacco, 11 meals
+  away.
+- =Serbian Label= :: the =nsifra= product name decoded from the source
+  YUSCII transliteration into readable Serbian Latin (documentation
+  only; not a join key).
+- =FCT ID= :: *SCAFFOLD -- not yet populated.*  Intended to key into the
+  Serbian Food and Nutrition Database (see "Food Conversion Table"
+  below).  Left blank pending a machine-readable FCT.
+
+#+name: food_label
+| Preferred Label                     | proizvod | Serbian Label                                                  | FCT ID |
+|-------------------------------------+----------+----------------------------------------------------------------+--------|
+| White Bread                         |     0101 | Beli hleb                                                      |        |
+| Semi-White Bread                    |     0102 | Polubeli hleb                                                  |        |
+| Black/Rye/Wholegrain Bread          |     0103 | Crni, ražani, integralni hleb                                 |        |
+| Pastries                            |     0104 | Peciva                                                         |        |
+| Other Bread                         |     0105 | Druge vrste hleba                                             |        |
+| Wheat/Rye Flour and Semolina        |     0106 | Pšenično, ražano brašno i griz                               |        |
+| Maize Flour and Maize               |     0107 | Kukuruzno brašno i kukuruz                                    |        |
+| Flour Products and Pasta            |     0108 | Proizvodi od brašna i testenine                              |        |
+| Other Cereals                       |     0109 | Druge vrste žita                                             |        |
+| Rice                                |     0110 | Pirinač                                                       |        |
+| Frozen Dough                        |     0111 | Smrznuto testo                                                |        |
+| Yeast                               |     0112 | Kvasac                                                        |        |
+| Potato                              |     0201 | Krompir                                                       |        |
+| Beans                               |     0202 | Pasulj                                                        |        |
+| Onion/Garlic/Leek                   |     0203 | Crni i beli luk i praziluk                                    |        |
+| Carrot/Greens/Celery/Beetroot       |     0204 | Šargarepa, zelen, celer, cvekla,                             |        |
+| Cabbage/Kale/Brussels/Broccoli      |     0205 | Kupus, kelj, prokelj, brokule                                |        |
+| Spinach/Chard (fresh, frozen)       |     0206 | Spanać, blitva svež i zamrznuti                              |        |
+| Cucumber                            |     0207 | Krastavac                                                     |        |
+| Tomato (fresh)                      |     0208 | Paradajz (svež)                                              |        |
+| Pepper (fresh, frozen, dried)       |     0209 | Paprika (sveža i zamrznuta i suva)                           |        |
+| Lettuce                             |     0210 | Zelena salata                                                 |        |
+| Peas/Green Beans (fresh, frozen)    |     0211 | Grašak,boranija, svež i zamrznut                            |        |
+| Mushrooms                           |     0212 | Pečurke, gljive                                              |        |
+| Other Fresh Vegetables              |     0213 | Ostalo sveže povrće                                          |        |
+| Pickled Vegetables                  |     0214 | Ukiseljeno povrće                                            |        |
+| Processed/Canned Vegetables         |     0215 | Prerađeno i konzerv. povrće, paradajz sok                   |        |
+| Apple                               |     0301 | Jabuke                                                        |        |
+| Pear                                |     0302 | Kruške                                                       |        |
+| Cherries (fresh, frozen)            |     0303 | Trešnje i višnje sveže, zamrznuto                           |        |
+| Apricots/Peaches (fresh, frozen)    |     0304 | Kajsije i breskve sveže, zamrznuto                           |        |
+| Plum                                |     0305 | Šljive                                                       |        |
+| Grape                               |     0306 | Grožđe                                                       |        |
+| Other Fresh Fruit                   |     0307 | Ostalo sveže  voće                                           |        |
+| Citrus (orange/lemon/mandarin)      |     0308 | Pomorandže, limun, mandarine, grejp                         |        |
+| Other Tropical Fruit                |     0309 | Ostalo južno voće, banane, ananas, kivi …                   |        |
+| Walnut/Hazelnut/Almond              |     0310 | Orah, lešnik, badem                                          |        |
+| Dried Fruit (plum/fig/grape)        |     0311 | Suvo voće, šljive, smokve, grožđe                           |        |
+| Jam/Compote/Preserves/Marmalade     |     0312 | Džem, kompot, slatko, marmelada                             |        |
+| Beef                                |     0401 | Goveđe meso                                                  |        |
+| Young Beef                          |     0402 | Juneće meso                                                  |        |
+| Veal                                |     0403 | Teleće meso                                                  |        |
+| Pork                                |     0404 | Svinjsko meso                                                 |        |
+| Suckling Pig                        |     0405 | Praseće meso                                                 |        |
+| Mutton/Goat                         |     0406 | Ovčije i kozije                                              |        |
+| Lamb/Kid                            |     0407 | Jagnjeće i jareće                                            |        |
+| Poultry                             |     0408 | Živinsko meso                                                 |        |
+| Other Fresh Meat and Offal          |     0409 | Ostalo sveže meso i iznutrice                               |        |
+| Dried/Cooked Bacon                  |     0410 | Suva i barena slanina                                        |        |
+| Dried Meat (boneless)               |     0411 | Suvo meso bez kostiju                                         |        |
+| Dried Meat (with bone)              |     0412 | Suvo meso sa kostima                                         |        |
+| Salami and Sausages                 |     0413 | Salame i kobasice svih vrsta                                 |        |
+| Frankfurters/Debreziner             |     0414 | Viršle, debreciner, safalade                                |        |
+| Other Sausage Products              |     0415 | Ostali kobasičarski proizvodi                               |        |
+| Canned/Processed Meat               |     0416 | Konzervirano i prerađeno meso                               |        |
+| Freshwater Fish (fresh, frozen)     |     0501 | Sveža/zamrz. rečna i jezer.riba                             |        |
+| Sea Fish (fresh, frozen)            |     0502 | Sveža i zamrznuta morska riba                               |        |
+| Fish Products                       |     0503 | Proizvodi i prerađev.od ribe                                |        |
+| Lard/Suet/Tallow                    |     0601 | Svinjska mast, salo, loj                                     |        |
+| Edible Oil                          |     0602 | Jestivo ulje                                                  |        |
+| Other Vegetable Fats                |     0603 | Ostale biljne masnoće                                        |        |
+| Margarine                           |     0604 | Margarin                                                      |        |
+| Milk                                |     0701 | Mleko                                                         |        |
+| Sour Milk/Yoghurt/Kefir             |     0702 | Kiselo mleko,  jogurt, kefir                                 |        |
+| White Cheese (all kinds)            |     0703 | Domaći, beli  sir (sve vrste)                                |        |
+| Other Cheese (yellow/hard/cream)    |     0704 | Ostale vrste sira (žuti, tvrdi, krem)                        |        |
+| Butter                              |     0705 | Maslac                                                        |        |
+| Kajmak/Cream/Mileram                |     0706 | Kajmak, pavlaka, mileram, vurda                             |        |
+| Ice Cream                           |     0707 | Sladoled                                                      |        |
+| Other Dairy Products                |     0708 | Ostali mlečni proizvodi                                      |        |
+| Eggs (chicken and other)            |     0709 | Jaja (kokošija i druga)                                      |        |
+| Sugar (crystal/cube/powder)         |     0801 | Šećer (kristal, kocke, prah)                                 |        |
+| Salt                                |     0802 | So                                                           |        |
+| Honey                               |     0803 | Med                                                          |        |
+| Chocolate and Chocolate Spread      |     0804 | Čokolade i čokoladni krem                                    |        |
+| Sweets/Biscuits/Candy               |     0805 | Slatkiši, keks, biskviti, bombone                           |        |
+| Salted Snacks (peanuts/chips)       |     0806 | Slani kikiriki, smoki, grisine, čips i sl.                  |        |
+| Cocoa                               |     0807 | Kakao                                                        |        |
+| Coffee (raw/roasted/ground)         |     0808 | Kafa (sirova, pržena, mlevena)                              |        |
+| Baby Food                           |     0809 | Hrana za odojčad                                            |        |
+| Spices                              |     0810 | Začini                                                      |        |
+| Tea                                 |     0811 | Čajevi                                                      |        |
+| Mayonnaise/Mustard/Ketchup          |     0812 | Majonez, senf, kečap                                        |        |
+| Instant Soup                        |     0813 | Instant supe                                                 |        |
+| Ready Meals                         |     0814 | Gotova jela                                                  |        |
+| Whipped Cream/Pudding               |     0815 | Šlag, puding, i sl.                                         |        |
+| Other Unspecified Products          |     0816 | Ostali nepomenuti proizvodi                                 |        |
+| Wine                                |     0901 | Vino                                                         |        |
+| Beer                                |     0902 | Pivo                                                         |        |
+| Rakija (spirits)                    |     0903 | Rakija                                                       |        |
+| Other Alcoholic Drinks              |     0904 | Ostala alkoholna pića                                       |        |
+| Mineral Water                       |     0905 | Mineralna (gazirana/negazirana) voda                       |        |
+| Soft Drinks (carbonated/still)      |     0906 | Gazirani i negazirani sokovi                                |        |
+| Natural Fruit Juices                |     0907 | Prirodni voćni sokovi                                       |        |
+| Cigarettes                          |     1001 | Cigarete                                                     |        |
+| Tobacco                             |     1002 | Duvan                                                        |        |
+| Food Away (work/school)             |     1101 | Hrana na poslu, u školi                                     |        |
+| Food in Restaurant (incl. delivery) |     1102 | Hrana u restoranu (i poručena hrana koja se dostavlja na kuću) |     |
+| Drinks Away (work/school)           |     1103 | Pice na poslu, u skoli                                      |        |
+| Drinks in Restaurant                |     1104 | Pice u restoranima                                          |        |
+
+* Food Conversion Table (FCT) -- TODO
+
+The =FCT ID= column above is a scaffold.  No freely-downloadable,
+machine-readable Serbian FCT was obtained for this commit.
+
+Candidate source: the *Serbian Food and Nutrition Database* developed by
+the Institute for Medical Research (IMR), University of Belgrade -- the
+first national FCDB built to EuroFIR criteria (LanguaL + EFSA FoodEx2
+coding; ~1046 foods + ~129 composite dishes).  See Gurinovic et al.
+(2016), "Establishment and advances in the online Serbian food and
+recipe data base harmonized with EuroFIR standards", /Food Chemistry/
+193:190--196, https://doi.org/10.1016/j.foodchem.2015.01.124; online
+entry via the EuroFIR FoodEXplorer network
+(https://www.eurofir.org/food-information/food-composition-databases/)
+and the IMR Serbian nutrition DB.  Access requires EuroFIR
+registration; there is no bulk public download.  A EuroFIR regional
+(Balkan Food Platform) FCT is the fallback.
+
+Remaining steps to wire nutrition:
+1. Obtain the Serbian FCDB (or a EuroFIR Balkan regional FCT) as CSV.
+2. Map each of the ~100 items here to an FCT food code; fill the
+   =FCT ID= column.
+3. Add a country-level =fct.py= / =nutrition.py= (cf. Panama,
+   Guatemala) joining =food_acquired= quantities to per-100g nutrient
+   values via =FCT ID=.

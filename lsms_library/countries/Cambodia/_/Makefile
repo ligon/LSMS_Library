@@ -8,7 +8,7 @@ LSMS_DATA_ROOT ?= $(if $(LSMS_DATA_DIR),$(LSMS_DATA_DIR),$(if $(XDG_DATA_HOME),$
 VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 
 var = $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_quantities.parquet $(VAR_DIR)/food_prices.parquet \
-	  $(VAR_DIR)/household_characteristics.parquet
+	  $(VAR_DIR)/interview_date.parquet
 
 all: $(parquet) $(var)
 
@@ -24,16 +24,16 @@ food_acquired_parquet := $(food_acquired:.py=.parquet)
 $(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
 	python food_acquired.py
 
-household_characteristics = $(shell find $(rounds) -name household_characteristics.py)
-household_characteristics_parquet := $(household_characteristics:.py=.parquet)
+../2019-20/_/interview_date.parquet: ../2019-20/_/interview_date.py
+	(cd ../2019-20/_; python interview_date.py)
 
-../%/_/household_characteristics.parquet:
-	(cd $(@D) && python household_characteristics.py)
+interview_date = $(shell find $(rounds) -name interview_date.py)
+interview_date_parquet := $(interview_date:.py=.parquet)
 
-$(VAR_DIR)/household_characteristics.parquet: household_characteristics.py $(household_characteristics_parquet)
-	python household_characteristics.py
+$(VAR_DIR)/interview_date.parquet: interview_date.py $(interview_date_parquet)
+	python interview_date.py
 
-%.parquet: %.py malawi.py
+%.parquet: %.py cambodia.py
 	(cd $(@D) && python ./$(<F))
 
 clean:

@@ -326,7 +326,7 @@
 #+NAME: u
 | Original Label                       | Preferred Label        |
 |--------------------------------------+------------------------|
-| 1.0                                  | 1.0                    |
+| 1.0                                  | NA                     |
 | 100. kg                              | Kg                     |
 | 1000. Bouteille de 20 litres         | Bouteille de 20 L      |
 | 1001. 12,5 cl (démi walatt)          | Demi walatt            |
@@ -464,3 +464,63 @@
 | Tiles              | Tiles           |
 | Earth              | Earth           |
 | Dung               | Earth with Dung |
+
+# plot_features harmonization tables (GH #167; EHCVM cluster).
+# Copied from the Mali EHCVM reference (PR #284).  Keyed on the integer
+# s16a codes — Stata value labels are stable, so keying on codes avoids
+# any French/Portuguese language branch.  Senegal 2018-19 and 2021-22
+# use identical code schemes (verified from the .dta value-label
+# metadata); the only 2021-22 delta is the s16aq10 code-3 relabel
+# "Fermage" -> "Fermage/colonage" (still rented_in, same code).
+#
+# harmonize_tenure — s16aq10 "mode de faire-valoir" -> canonical Tenure.
+#   1 Propriétaire -> owned; 2 Prêt gratuit (free loan of land under
+#   agreement, typically non-cash) -> use_right, which the canonical
+#   schema defines as "held under agreement with a use-rights owner";
+#   3 Fermage(/colonage) -> rented_in; 4 Métayage -> sharecropped_in;
+#   5 Gage (pledge / pawned land) and 6 Autre -> other_tenure.
+# harmonize_soil — s16aq18 -> SoilType (free-form str; English labels).
+# harmonize_water — s16aq17; the Irrigated bool is (label=='Irrigated').
+#   Codes 1-3 (well/canal/stream) -> Irrigated; 4 Pluviale -> Rain-fed;
+#   5 Marais -> Wetland; 6 Autre is unmapped (NaN).
+# harmonize_tenure_system — s16aq13 land-document regime -> the canonical
+#   TenureSystem spellings.  Only the three documents that imply a clear
+#   regime are mapped (1 Titre foncier -> freehold, 2 Permis d'exploiter
+#   -> granted_right_of_occupancy, 4 Bail -> leasehold).  Procès-verbal,
+#   Convention de vente, Autre, and Aucun have no defensible regime
+#   mapping and are left out (NaN) rather than force-fit.
+
+#+name: harmonize_tenure
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | owned           |
+|    2 | use_right       |
+|    3 | rented_in       |
+|    4 | sharecropped_in |
+|    5 | other_tenure    |
+|    6 | other_tenure    |
+
+#+name: harmonize_soil
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | sandy           |
+|    2 | loam            |
+|    3 | clay            |
+|    4 | hardpan         |
+|    5 | other           |
+
+#+name: harmonize_water
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Irrigated       |
+|    2 | Irrigated       |
+|    3 | Irrigated       |
+|    4 | Rain-fed        |
+|    5 | Wetland         |
+
+#+name: harmonize_tenure_system
+| Code | Preferred Label            |
+|------+----------------------------|
+|    1 | freehold                   |
+|    2 | granted_right_of_occupancy |
+|    4 | leasehold                  |

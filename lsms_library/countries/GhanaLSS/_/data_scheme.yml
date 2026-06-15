@@ -13,7 +13,9 @@ Index Info:
   index_info:
     cluster_features: (t, v)
     household_roster: (t, v, i, pid)
+    individual_education: (t, i, pid)
     food_acquired: (t, v, i, j)
+    food_security: (t, i)
 
 Data Scheme:
   cluster_features:
@@ -29,6 +31,25 @@ Data Scheme:
     Generation: int
     Distance: int
     Affinity: str
+  individual_education:
+    index: (t, i, pid)
+    Educational Attainment: str
+  plot_features:
+    # Section 8B (Agricultural land / farms) is a clean per-plot roster:
+    # one row per (household, farm).  The Section 10 module is non-farm
+    # ENTERPRISES (entno / "Enterprise name"), NOT agricultural plots --
+    # confirmed by reading the variable labels in every wave.  Wired for
+    # 1991-92, 1998-99, 2012-13, 2016-17 (the waves whose Section 8B is a
+    # genuine per-plot roster with a farm identifier + per-plot area).
+    # 1987-88/1988-89 store only household-level land totals (Y09A: ACRFRM
+    # etc.), so they are NOT plot_features.  2005-06 lacks Section 8
+    # agriculture (data jumps sec9 -> sec11).  AreaUnit/Tenure decoded from
+    # the GLSS7 value labels; 1=Acres,2=Poles,3=Ropes,4=Hectare in the
+    # older 4-code waves (no Plot/Other categories).
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    Tenure: str
   food_acquired:
     index: (t, i, j)
     Expenditure: float
@@ -47,5 +68,42 @@ Data Scheme:
   interview_date:
     index: (t, i)
     Int_t: datetime
+
+  food_security:
+    index: (t, i)
+    Worried: bool
+    HealthyDiet: bool
+    FewFoods: bool
+    SkippedMeal: bool
+    AteLess: bool
+    RanOut: bool
+    Hungry: bool
+    WholeDay: bool
+    FIES_score: int
+
+  housing:
+    # GLSS Section 7 "Housing" (dwelling characteristics).  Wired for the five
+    # waves whose Section-7 file carries value labels we could verify against
+    # the actual questionnaire/codebook: 1991-92 (S7.DTA), 1998-99 (SEC7.DTA),
+    # 2005-06 (sec7.dta), 2012-13 (SEC7.dta), 2016-17 (g7sec7.dta).  Codes
+    # differ across waves (GLSS3 6-code walls vs GLSS5/6/7 9-10 code walls;
+    # question numbering shifts), so each wave maps its own raw variables ->
+    # human-readable category strings inline.  Roof/Floor/Walls present in
+    # every wired wave; Water/Toilet/Rooms/Tenure/Electricity where available
+    # (1998-99 has no Electricity column, only a 'main source of lighting').
+    # 1987-88/1988-89 DO field a housing module (Y08.DAT: WALLS/FLOOR/ROOF),
+    # but their GLSS1/GLSS2 questionnaires are scanned-image PDFs with no text
+    # layer and the DDI/Basic-info docs carry no value codebook, so the numeric
+    # codes (WALLS 1-8, FLOOR 1-7, ROOF 1-9) cannot be decoded to labels -- those
+    # two waves are intentionally NOT wired (see CONTENTS notes / report).
+    index: (t, i)
+    Roof: str
+    Floor: str
+    Walls: str
+    Water: str
+    Toilet: str
+    Rooms: int
+    Tenure: str
+    Electricity: str
 
   panel_ids: !make

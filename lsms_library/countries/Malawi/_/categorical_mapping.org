@@ -226,38 +226,178 @@
 | Other                                                                                                       | Other                                                    |
 
 #+name: u
-| Preferred Label           | Code |
-|---------------------------+------|
-| Kilogramme                | 01    |
-| 50 kg Bag                 | 02    |
-| Pail (Small)              | 04a   |
-| Pail (Medium)             | 04b   |
-| Pail (Large)              | 04c   |
-| No.10 Plate (Flat)        | 06a   |
-| No.10 Plate (Heaped)      | 06b   |
-| No.12 Plate               | 07    |
-| Bunch (Small)             | 08a   |
-| Bunch (Medium)            | 08b   |
-| Bunch (Large)             | 08c   |
-| Piece (Small)             | 09a   |
-| Piece (Medium)            | 09b   |
-| Piece (Large)             | 09c   |
-| Heap (Small)              | 10a  |
-| Heap (Medium)             | 10b  |
-| Heap (Large)              | 10c  |
-| Heap (Small, special)     | 10d  |
-| Heap (Medium, special)    | 10e  |
-| Heap (Large, special)     | 10f  |
-| Bale                      | 11   |
-| Ox-Cart (Unshelled)       | 14   |
-| Litre                     | 15   |
-| Gram                      | 18   |
-| Millilitre                | 19   |
-| Teaspoon                  | 20   |
-| Satchet/Tube (Small)      | 22a  |
-| Satchet/Tube (Medium)     | 22b  |
-| Satchet/Tube (Large)      | 22c  |
-| Other (Specify)           | 23   |
+| Code | Preferred Label | hh_g03b_label |
+|------+-----------------+---------------|
+| 01 | Kilogramme |  |
+| 01a | Kilogramme |  |
+| 01b | Kilogramme |  |
+| 01c | Kilogramme |  |
+| 01d | Kilogramme |  |
+| 01e | Kilogramme |  |
+| 01f | Kilogramme |  |
+| 02 | 50 kg Bag |  |
+| 02a | 50 kg Bag |  |
+| 02b | 50 kg Bag |  |
+| 02c | 50 kg Bag |  |
+| 02d | 50 kg Bag |  |
+| 02e | 50 kg Bag |  |
+| 02f | 50 kg Bag |  |
+| 04 | Pail | PAIL |
+| 04a | Pail (Small) |  |
+| 04b | Pail (Medium) |  |
+| 04c | Pail (Large) |  |
+| 04d | Pail |  |
+| 04e | Pail |  |
+| 04f | Pail |  |
+| 05 | Pail (Large) | PAIL (LARGE) |
+| 05a | Pail (Large) |  |
+| 05b | Pail (Large) |  |
+| 05c | Pail (Large) |  |
+| 05d | Pail (Large) |  |
+| 05e | Pail (Large) |  |
+| 05f | Pail (Large) |  |
+| 06 | No 10 Plate | No 10 PLATE |
+| 06a | No.10 Plate (Flat) |  |
+| 06b | No.10 Plate (Heaped) |  |
+| 06c | No 10 Plate |  |
+| 06d | No 10 Plate |  |
+| 06e | No 10 Plate |  |
+| 06f | No 10 Plate |  |
+| 07 | No.12 Plate |  |
+| 07a | No 12 Plate | No 12 PLATE |
+| 07b | No 12 Plate | No 12 PLATE |
+| 07c | No.12 Plate |  |
+| 07d | No.12 Plate |  |
+| 07e | No.12 Plate |  |
+| 07f | No.12 Plate |  |
+| 08 | Bunch | bunch |
+| 08a | Bunch (Small) |  |
+| 08b | Bunch (Medium) |  |
+| 08c | Bunch (Large) |  |
+| 08d | Bunch |  |
+| 08e | Bunch |  |
+| 08f | Bunch |  |
+| 09 | Piece | PIECE |
+| 09a | Piece (Small) |  |
+| 09b | Piece (Medium) |  |
+| 09c | Piece (Large) |  |
+| 09d | Piece |  |
+| 09e | Piece |  |
+| 09f | Piece |  |
+| 10 | Heap | HEAP |
+| 10a | Heap (Small) | HEAP |
+| 10b | Heap (Medium) | HEAP |
+| 10c | Heap (Large) | HEAP |
+| 10d | Heap (Small, special) |  |
+| 10e | Heap (Medium, special) |  |
+| 10f | Heap (Large, special) |  |
+| 11 | Bale |  |
+| 14 | Ox-Cart (Unshelled) |  |
+| 15 | Litre | LITRE |
+| 15a | Litre |  |
+| 15b | Litre |  |
+| 15c | Litre |  |
+| 15d | Litre |  |
+| 15e | Litre |  |
+| 15f | Litre |  |
+| 18 | Gram | gram |
+| 18a | Gram |  |
+| 18b | Gram |  |
+| 18c | Gram |  |
+| 18d | Gram |  |
+| 18e | Gram |  |
+| 18f | Gram |  |
+| 19 | Millilitre | MILLILITRE |
+| 19a | Millilitre |  |
+| 19b | Millilitre |  |
+| 19c | Millilitre |  |
+| 19d | Millilitre |  |
+| 19e | Millilitre |  |
+| 19f | Millilitre |  |
+| 20 | Teaspoon | TEASPOON |
+| 20a | Teaspoon |  |
+| 20b | Teaspoon |  |
+| 20c | Teaspoon |  |
+| 20d | Teaspoon |  |
+| 20e | Teaspoon |  |
+| 20f | Teaspoon |  |
+| 22 | Satchet/Tube | SATCHET/TUBE |
+| 22a | Satchet/Tube (Small) | SATCHET/TUBE |
+| 22b | Satchet/Tube (Medium) | SATCHET/TUBE |
+| 22c | Satchet/Tube (Large) | SATCHET/TUBE |
+| 22d | Satchet/Tube |  |
+| 22e | Satchet/Tube |  |
+| 22f | Satchet/Tube |  |
+| 23 | Other (Specify) | OTHER (SPECIFY) |
+| 23a | Other (Specify) |  |
+| 23b | Other (Specify) |  |
+| 23c | Other (Specify) |  |
+| 23d | Other (Specify) |  |
+| 23e | Other (Specify) |  |
+| 23f | Other (Specify) |  |
+| 25 | Tina | TINA |
+| 25a | Tina | TINA |
+| 25b | Tina | TINA |
+| 25c | Tina | TINA |
+| 26 | 5 Litre Bucket(Chigoba) | 5 LITRE BUCKET(Chigoba) |
+| 27a | Basin (Small) | BASIN (SMALL) |
+| 27b | Basin (Small) | BASIN (SMALL) |
+| 27c | Basin (Small) | BASIN (SMALL) |
+| 27d | Basin (Small) | BASIN (SMALL) |
+| 27e | Basin (Small) | BASIN (SMALL) |
+| 28 | Piece (Small) | PIECE (SMALL) |
+| 29 | Piece (Medium) | PIECE (MEDIUM) |
+| 30 | Piece (Large) | PIECE (LARGE) |
+| 31 | Loaf (300g) | LOAF (300G) |
+| 32 | Loaf (600g) | LOAF (600G) |
+| 33 | Loaf (700g) | LOAF (700G) |
+| 34 | Packet (150g) | PACKET (150G) |
+| 35 | Packet (400g) | PACKET (400G) |
+| 36 | Packet (500g) | PACKET (500G) |
+| 37 | Packet (1kg) | PACKET (1KG) |
+| 38 | Heap (Small) | HEAP (SMALL) |
+| 39 | Heap (Medium) | HEAP (MEDIUM) |
+| 40 | Heap (Large) | HEAP (LARGE) |
+| 41 | Satchet/Tube (25g) | SATCHET/TUBE (25G) |
+| 42 | Satchet/Tube (50g) | SATCHET/TUBE (50G) |
+| 43 | Satchet/Tube (100g) | SATCHET/TUBE (100G) |
+| 44 | Cluster | CLUSTER |
+| 44a | Cluster | CLUSTER |
+| 44b | Cluster | CLUSTER |
+| 44c | Cluster | CLUSTER |
+| 50 | Tablespoon | TABLESPOON |
+| 51 | Packet | packet |
+| 54 | Packet(Small) | PACKET(SMALL) |
+| 55 | Packet (Large) | PACKET (LARGE) |
+| 57 | Tina (Small) | TINA (SMALL) |
+| 58 | Tina (Large) | TINA (LARGE) |
+| 59 | Tablespoon | TABLESPOON |
+| 60 | Packet | PACKET |
+| 65 | Packet (250g) | PACKET (250G) |
+| 70 | Packet (25g) | PACKET (25g) |
+| 71 | Tin 100G | TIN 100G |
+| 72 | Tin 250G | TIN 250G |
+| 73 | Tin 500G | TIN 500G |
+| 74 | Tin 1Kg | TIN 1KG |
+| C02 | 50 kg Bag |  |
+| C03 | 90 kg Bag |  |
+| C11 | Basket (Dengu) |  |
+| C12 | Ox-Cart |  |
+| K16 | Cup |  |
+| K17 | Tin |  |
+| 00 | Other (Specify) |  |
+| 03 | Other (Specify) |  |
+| 12 | Other (Specify) |  |
+| 13 | Other (Specify) |  |
+| 16 | Other (Specify) |  |
+| 17 | Other (Specify) |  |
+| 21 | Other (Specify) |  |
+| 49 | Other (Specify) |  |
+| 69 | Other (Specify) |  |
+| 76 | Other (Specify) |  |
+| 79 | Other (Specify) |  |
+| 99 | Other (Specify) |  |
+| 500 | Other (Specify) |  |
 
 #+name: district
 | Alternate Spelling     | Preferred Label |
@@ -330,3 +470,402 @@
 | WOOD               | Wood            |
 | Other (Specify)    | Other           |
 | OTHER(SPECIFY)     | Other           |
+
+# plot_features harmonization tables (GH #167).  These are keyed on the
+# raw integer Stata codes (NOT labels), so wave scripts read the source
+# with convert_categoricals=False and map the underlying codes.  This is
+# robust to the cross-wave label drift (Title Case vs UPPER CASE, the
+# 2019-20 '&amp;' HTML entity in soil labels, Chichewa parentheticals).
+#
+# harmonize_tenure — ag_d03 "How did you acquire this plot?" codes.
+#   LABELED and present in 2010-11 & 2013-14 ONLY.  ABSENT from 2016-17
+#   and 2019-20 ag_mod_d (where ag_d02 is "ID of Respondent", NOT
+#   tenure), so Tenure is NaN for those two waves.  TenureSystem is set
+#   to 'leasehold' only for the leasehold acquire code (6); otherwise NaN.
+# harmonize_soil — ag_d21 soil-type codes (all four buildable waves).
+# harmonize_irrigation — ag_d28a water-source codes.  The Irrigated bool
+#   is derived as (code != 7 and code notna): code 7 = 'Rainfed/No
+#   irrigation' is the only non-irrigated value across all waves.
+
+#+name: harmonize_tenure
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | communal        |
+|    2 | inherited       |
+|    3 | inherited       |
+|    4 | owned           |
+|    5 | owned           |
+|    6 | leased          |
+|    7 | rented_in       |
+|    8 | sharecropped_in |
+|    9 | other_tenure    |
+|   10 | other_tenure    |
+|   11 | other_tenure    |
+
+#+name: harmonize_soil
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | sandy           |
+|    2 | sandy_clay      |
+|    3 | clay            |
+|    4 | other           |
+
+#+name: harmonize_irrigation
+| Code | Preferred Label       |
+|------+-----------------------|
+|    1 | Divert stream         |
+|    2 | Bucket                |
+|    3 | Hand pump             |
+|    4 | Treadle pump          |
+|    5 | Motor pump            |
+|    6 | Gravity               |
+|    7 | Rainfed/No irrigation |
+|    8 | Other                 |
+|    9 | Other                 |
+
+# crop_production (GAP 1).  Code-keyed crop map for the IHS/IHPS
+# agricultural harvest modules.  Codes 1-48 are the SEASONAL (rainy-
+# season, Module G) crop codes; the perennial (Module P / tree-crop)
+# codes are offset by +1000 (codes 1001-1018) to keep the two namespaces
+# disjoint, exactly as the World Bank cleaning code does
+# (MWI_IHPS1.do:59 "replace crop_code = crop_code + 1000").  The same
+# numeric codes are stable across all four buildable waves (2010-11,
+# 2013-14, 2016-17, 2019-20); only the decoded label spelling drifts, so
+# we key on the integer code (convert_categoricals=False) rather than the
+# label string.  Preferred Labels REUSE the consumed-food labels from the
+# harmonize_food table above wherever the crop is also a food (Rice,
+# Sorghum, Pigeon Pea (Nandolo), Ground Bean, Groundnut, Tomato, Onion,
+# Cabbage, Sugar Cane, Banana, Mango, Papaya, Pineapple, Avocado, Guava,
+# Nkwani, Tanaposi Rape, Okra/Therere, Irish Potato, ...) so that
+# crop_production.j JOINS food_acquired.j on the shared Preferred Label.
+# New Preferred Labels are added ONLY for crops with no food analogue
+# (Maize as a grain crop, Wheat, Cassava, Sweet Potato, Beans, Soyabean,
+# Cotton, Sunflower, Paprika, Pea, Tobacco varieties, Tea, Coffee,
+# Macadamia, the citrus/stone-tree perennials).
+#+name: harmonize_crop
+| Code | Preferred Label      |
+|------+----------------------|
+|    1 | Maize                |
+|    2 | Maize                |
+|    3 | Maize                |
+|    4 | Maize                |
+|    5 | Tobacco              |
+|    6 | Tobacco              |
+|    7 | Tobacco              |
+|    8 | Tobacco              |
+|    9 | Tobacco              |
+|   10 | Tobacco              |
+|   11 | Groundnut            |
+|   12 | Groundnut            |
+|   13 | Groundnut            |
+|   14 | Groundnut            |
+|   15 | Groundnut            |
+|   16 | Groundnut            |
+|   17 | Rice                 |
+|   18 | Rice                 |
+|   19 | Rice                 |
+|   20 | Rice                 |
+|   21 | Rice                 |
+|   22 | Rice                 |
+|   23 | Rice                 |
+|   24 | Rice                 |
+|   25 | Rice                 |
+|   26 | Rice                 |
+|   27 | Ground Bean          |
+|   28 | Sweet Potato         |
+|   29 | Irish Potato         |
+|   30 | Wheat                |
+|   31 | Finger Millet        |
+|   32 | Sorghum              |
+|   33 | Pearl Millet         |
+|   34 | Beans                |
+|   35 | Soyabean             |
+|   36 | Pigeon Pea (Nandolo) |
+|   37 | Cotton               |
+|   38 | Sunflower            |
+|   39 | Sugar Cane           |
+|   40 | Cabbage              |
+|   41 | Tanaposi Rape        |
+|   42 | Nkwani               |
+|   43 | Okra/Therere         |
+|   44 | Tomato               |
+|   45 | Onion                |
+|   46 | Pea                  |
+|   47 | Paprika              |
+|   48 | Other                |
+| 1001 | Cassava              |
+| 1002 | Tea                  |
+| 1003 | Coffee               |
+| 1004 | Mango                |
+| 1005 | Citrus               |
+| 1006 | Papaya               |
+| 1007 | Banana               |
+| 1008 | Avocado              |
+| 1009 | Guava                |
+| 1010 | Citrus               |
+| 1011 | Citrus               |
+| 1012 | Peach                |
+| 1013 | Custard Apple        |
+| 1014 | Masuku               |
+| 1015 | Masau                |
+| 1016 | Pineapple            |
+| 1017 | Macadamia            |
+| 1018 | Other                |
+
+# crop_production harvest/sale UNIT codes (Module G/I/P/Q non-standard
+# unit list, codes 1-13).  This is a DIFFERENT code space from the
+# food-consumption `u` table above (whose codes are zero-padded strings),
+# so it gets its own Code-keyed table -- but the Preferred Labels REUSE
+# the same `u` Preferred Label strings ('Kilogramme', '50 kg Bag',
+# 'Pail', 'Bunch', 'Piece', 'Bale', ...) so crop_production.u joins
+# food_acquired.u on the shared physical-unit label.  '90 kg Bag',
+# 'Basket (Dengu)' and 'Ox-Cart' are crop-harvest-only physical units
+# also added to the `u` table.  kg-conversion factors are NOT stored
+# here (that is a transformations concern); this is the label axis only.
+#+name: harmonize_crop_unit
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Kilogramme      |
+|    2 | 50 kg Bag       |
+|    3 | 90 kg Bag       |
+|    4 | Pail (Small)    |
+|    5 | Pail (Large)    |
+|    6 | No 10 Plate     |
+|    7 | No 12 Plate     |
+|    8 | Bunch           |
+|    9 | Piece           |
+|   10 | Bale            |
+|   11 | Basket (Dengu)  |
+|   12 | Ox-Cart         |
+|   13 | Other (Specify) |
+
+# harmonize_input: agricultural-input identity for the plot_inputs feature
+# (GAP 2).  Codes 1-6 are the Module D inorganic-fertilizer type codes
+# (ag_d39a / slot-2 type); codes 7-11 are the Module D agrochemical type
+# codes (ag_d41a / ag_d41d) -- the source already numbers fertilizers 1-6
+# and pesticides 7-11 in one disjoint namespace within Module D.  Codes
+# 20 / 30 are synthetic for the two inputs the survey records without a
+# type code: organic fertilizer (ag_d36 Yes/No) and seed planted (Module
+# G ag_g04a).  Stable across the four IHS3+/IHPS waves (2010-11, 2013-14,
+# 2016-17, 2019-20), so no per-wave column is needed.
+#+name: harmonize_input
+| Code | Preferred Label       |
+|------+-----------------------|
+|    1 | NPK Fertilizer        |
+|    2 | DAP Fertilizer        |
+|    3 | CAN Fertilizer        |
+|    4 | Urea Fertilizer       |
+|    5 | D Compound Fertilizer |
+|    6 | Other Fertilizer      |
+|    7 | Insecticide           |
+|    8 | Herbicide             |
+|    9 | Fungicide             |
+|   10 | Fumigant              |
+|   11 | Other Pesticide       |
+|   20 | Organic Fertilizer    |
+|   30 | Seed                  |
+
+# harmonize_species: livestock-species identity for the livestock feature
+# (GAP 4).  Code-keyed map for the Module R livestock-roster animal code
+# (ag_r0a, "LIVESTOCK CODE"; convert_categoricals=False).  Two code
+# namespaces are reconciled here:
+#   * IHS3 2010-11 uses the fine 301-318 scheme (separate Donkey 305 /
+#     Mule-horse 306, Chicken-layer 310 / -broiler 312, Turkey 314 /
+#     Guinea fowl 316, Beehive 317; Bull/ox shares code 304).
+#   * IHS3-IHPS 2013-14 + IHS4/IHS5 (2016-17, 2019-20) use a coarser
+#     scheme: code 304 is just Bull, with Ox split out to 3304,
+#     Donkey/mule/horse merged to 3305, Chicken-layer/broiler merged to
+#     3310, Turkey/guinea-fowl merged to 3314, and Dove/pigeon at 319.
+# Each numeric code maps to exactly ONE canonical Preferred Label (no
+# within-wave collapse, so the (t, i, animal) index stays unique), but a
+# canonical label may be reached from several codes across the two
+# schemes (e.g. 314 Turkey & 316 Guinea fowl from 2010-11 are kept
+# distinct, while the later merged 3314 -> "Turkey/Guinea Fowl").  Code
+# 318 "Other (Specify)" maps to NaN (no canonical species) and so is
+# dropped from the animal index, like crop_production's "Other" crop.
+# The cattle subtypes (Calf, Steer/Heifer, Cow, Bull, Ox) are kept as
+# separate reported species rather than rolled into one "Cattle" label,
+# preserving the survey's item-level distinction; a tropical-livestock-
+# unit (TLU) rollup over species is a transformations concern, not a
+# stored column.
+#+name: harmonize_species
+| Code | Preferred Label   |
+|------+-------------------|
+|  301 | Calf              |
+|  302 | Steer/Heifer      |
+|  303 | Cow               |
+|  304 | Bull              |
+|  305 | Donkey            |
+|  306 | Mule/Horse        |
+|  307 | Goat              |
+|  308 | Sheep             |
+|  309 | Pig               |
+|  310 | Chicken-Layer     |
+|  311 | Local Hen         |
+|  312 | Chicken-Broiler   |
+|  313 | Local Cock        |
+|  314 | Turkey            |
+|  315 | Duck              |
+|  316 | Guinea Fowl       |
+|  317 | Beehive           |
+|  318 | ---               |
+|  319 | Dove/Pigeon       |
+| 3304 | Ox                |
+| 3305 | Donkey/Horse      |
+| 3310 | Chicken           |
+| 3314 | Turkey/Guinea Fowl|
+
+# harmonize_labor_source: plot-labor source identity for the plot_labor
+# feature (GAP 3, plot grain).  The Module D plot-labor block records three
+# distinct labor sources on a plot, each in its own set of person-day
+# columns: household (family) members, hired (paid) labor, and free /
+# exchange ("other") labor.  These are the `source` axis of plot_labor's
+# (t, i, plot, source) grain.  Stable across all four IHS3+/IHPS waves.
+# Code is a synthetic small-integer identity (the source is read from the
+# COLUMN block in Module D, not a numeric code in the data), so this table
+# is a label-stabilizer / documentation map rather than a code lookup.
+#+name: harmonize_labor_source
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | family          |
+|    2 | hired           |
+|    3 | other           |
+
+# harmonize_industry: wage-job industry identity for the people_last7days
+# feature (GAP 3, individual grain).  The labor module records each
+# individual's main wage-job industry as a 2-digit ISIC-style code
+# (hh_e20b).  The World Bank cleaning code (MWI_IHPS{1-4}.do labor block)
+# bins this code into six one-hot dummies (ind_ag / ind_fish / ind_mining /
+# ind_manuf / ind_const / ind_serv) via numeric ranges:
+#   11,12 -> Agriculture; 13 -> Fishing; 29 -> Mining;
+#   31-42 -> Manufacturing; 50 -> Construction; 61-96 -> Services.
+# We keep ONE harmonized industry label per individual (the natural
+# item-level form) instead of the six wide dummies; a per-industry dummy
+# (e.g. wage_industry == 'Agriculture') is then a trivial transformation.
+# Codes outside the six WB bins map to 'Other'; missing/no-wage-job -> NaN.
+# This table is read by malawi.py:_industry_label, which applies the WB
+# numeric-range bins (a range map, not a 1:1 code lookup), so the Code
+# column below lists only the canonical bin LABELS for reference, keyed by a
+# synthetic ordinal -- the actual hh_e20b->label binning lives in code.
+#+name: harmonize_industry
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Agriculture     |
+|    2 | Fishing         |
+|    3 | Mining          |
+|    4 | Manufacturing   |
+|    5 | Construction    |
+|    6 | Services        |
+|    7 | Other           |
+
+# community_prices ITEM codes (Community/Market questionnaire Module CK
+# "Reference prices of selected items", codes 1-51; GAP C).  This is a
+# DIFFERENT code space from the food-consumption food_acquired item lists
+# and the harmonize_crop crop codes, so -- like harmonize_crop /
+# harmonize_crop_unit -- it gets its own Code-keyed table.  The Preferred
+# Labels REUSE the SAME harmonize_food / harmonize_crop Preferred Label
+# strings for the items that are also consumed foods or grown crops (so a
+# surveyed community price for Maize Grain (Not As Ufa) / Rice / Beef /
+# Tomato / ... JOINS food_acquired.j and crop_production.crop on the
+# shared label axis).  The non-food priced goods (soap, batteries, tools,
+# fertilizer, transport, the ganyu day-wage, ...) get their own clear
+# Preferred Labels -- they have no consumed-food / crop counterpart, but
+# stay on the same j axis so a future price index can reach them.
+# Codes 3/4 are MILLING SERVICES (cost to grind a 50 kg bag), code 42 a
+# TRANSPORT service, code 51 the GANYU DAY-WAGE: priced "items" the survey
+# carries here but which are services, labelled as such.  The 2013-14
+# (IHPS) wave codes these items as the STRING "CK<n>" (CK1, CK3, CK22,
+# ...); the wave script strips the "CK" prefix to the same 1-51 integer
+# code before mapping.  2016-17 (IHS4) collected NO Module CK price
+# section -- community_prices is absent for that wave (reported, not
+# imputed).  kg/MK conversion is NOT stored here (a transformations
+# concern); this is the label axis only.
+#+name: harmonize_price_item
+| Code | Preferred Label                   |
+|------+-----------------------------------|
+|    1 | Maize Grain (Not As Ufa)          |
+|    2 | Maize Ufa Mgaiwa (Normal Flour)   |
+|    3 | Cost To Grind 50 Kg Maize         |
+|    4 | Cost To Grind 50 Kg Rice          |
+|    5 | Rice                              |
+|    6 | Bread                             |
+|    7 | Mandazi, Doughnut (Vendor)        |
+|    8 | Beans                             |
+|    9 | Cabbage                           |
+|   10 | Tomato                            |
+|   11 | Banana                            |
+|   12 | Fresh Milk                        |
+|   13 | Eggs                              |
+|   14 | Chicken                           |
+|   15 | Sun Dried Fish                    |
+|   16 | Beef                              |
+|   17 | Tea                               |
+|   18 | Salt                              |
+|   19 | Sugar                             |
+|   20 | Cooking Oil                       |
+|   21 | Chips (Vendor)                    |
+|   22 | Bar Soap                          |
+|   23 | Toothbrush                        |
+|   24 | Toothpaste                        |
+|   25 | Clothes Soap                      |
+|   26 | Vaseline/Glycerin                 |
+|   27 | Aspirin Or Panadol                |
+|   28 | Fansidar                          |
+|   29 | Chitenje Cloth                    |
+|   30 | Trousers (Second-Hand)            |
+|   31 | Soft Drink (Bottle)               |
+|   32 | Bottled/ Canned Beer              |
+|   33 | Cigarettes                        |
+|   34 | Battery (Dry Cell)                |
+|   35 | Watch (Digital)                   |
+|   36 | Firewood                          |
+|   37 | Charcoal                          |
+|   38 | Paraffin                          |
+|   39 | Chemical Fertilizer               |
+|   40 | Pesticides/Insecticides           |
+|   41 | Herbicides/Fungicides             |
+|   42 | Motorized Transport Of Crop       |
+|   43 | Hybrid Maize Seed                 |
+|   44 | Hand Hoe                          |
+|   45 | Panga                             |
+|   46 | Sickle                            |
+|   47 | Axe                               |
+|   48 | Bicycle                           |
+|   49 | Foam Mattress                     |
+|   50 | Mosquito Net                      |
+|   51 | Ganyu Wage (1 Day, Adult Male)    |
+
+# community_prices UNIT codes (Module CK unit list, codes 1-21; GAP C).
+# Same physical-unit label axis as the `u` food-consumption table and
+# harmonize_crop_unit: the Preferred Labels REUSE the shared `u` Preferred
+# Label strings ('Kilogramme', '50 kg Bag', 'Pail (Small)', 'Bunch',
+# 'Piece', 'Litre', ...) so community_prices.u joins food_acquired.u and
+# crop_production.u on the shared physical-unit label.  '90 kg Bag',
+# 'Basket (Dengu)' and 'Ox-Cart' already exist on the crop side; '5L Cup'
+# / 'Tin' / 'Satchet/Tube' likewise reuse the `u` labels.  Codes outside
+# 1-21 (rare 2013-14 data-entry artifacts: 0, 22, 23, 25, 48, 69, 200,
+# 500) fall through to NaN -- not faked into a unit.
+#+name: harmonize_price_unit
+| Code | Preferred Label         |
+|------+-------------------------|
+|    1 | Kilogramme              |
+|    2 | 50 kg Bag               |
+|    3 | 90 kg Bag               |
+|    4 | Pail (Small)            |
+|    5 | Pail (Large)            |
+|    6 | No 10 Plate             |
+|    7 | No 12 Plate             |
+|    8 | Bunch                   |
+|    9 | Piece                   |
+|   10 | Heap                    |
+|   11 | Bale                    |
+|   12 | Basket (Dengu)          |
+|   13 | Basket (Dengu)          |
+|   14 | Ox-Cart                 |
+|   15 | Litre                   |
+|   16 | Cup                     |
+|   17 | Tin                     |
+|   18 | Gram                    |
+|   19 | Millilitre              |
+|   20 | Satchet/Tube            |
+|   21 | Other (Specify)         |

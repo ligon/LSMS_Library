@@ -134,7 +134,16 @@ def Age(value):
     s01q03b Stata labels are Portuguese month names (Janeiro…Dezembro).
     get_dataframe() returns the label strings as categoricals.
     The sentinel 9999 is left as-is; household_roster() handles it.
+
+    The function name ``Age`` collides with the ``assets`` myvar
+    ``Age: s12q07`` (item age in years), which the framework binds to
+    this formatter by name (column_mapping in country.py).  That path
+    passes a *scalar*, not the roster's DOB Series; pass scalars
+    through unchanged so assets extraction does not crash on
+    ``list(<float>)`` (closes #321).
     '''
+    if not isinstance(value, pd.Series):
+        return value
     result = list(value)
     raw_month = value.iloc[2]
     if isinstance(raw_month, str):
@@ -168,6 +177,44 @@ def household_roster(df):
 
     df["Age"] = df.apply(_age_from_row, axis=1)
     df = df.drop('interview_date', axis='columns')
+    return df
+
+
+# FAO FIES 8 experience items, in canonical order (s08aq01..s08aq08).
+_FIES_ITEMS = ['Worried', 'HealthyDiet', 'FewFoods', 'SkippedMeal',
+               'AteLess', 'RanOut', 'Hungry', 'WholeDay']
+
+# Yes/No labels for the FIES items.  Guinea-Bissau's s08a value labels are
+# Portuguese (Sim/Não); French Oui/Non included defensively for any
+# differently-localized export.  Recusa (refused) / Não sabe (don't know)
+# and anything else fall through to pd.NA.
+_FIES_YES = {'Sim', 'Oui', 'sim', 'oui'}
+_FIES_NO = {'Não', 'Nao', 'Non', 'não', 'nao', 'non'}
+
+
+def _fies_bool(value):
+    if value in _FIES_YES:
+        return True
+    if value in _FIES_NO:
+        return False
+    return pd.NA
+
+
+def food_security(df):
+    '''FIES post-processor: map the 8 Portuguese Yes/No items to bool and
+    add FIES_score (count of True; NaN only when all 8 items are NaN).
+
+    s08aq01..s08aq08 arrive renamed to the canonical FAO names via
+    data_info.yml.  Sim->True, Não->False, Recusa/Não sabe/NaN->NA.
+    '''
+    for col in _FIES_ITEMS:
+        df[col] = df[col].map(_fies_bool).astype('boolean')
+
+    items = df[_FIES_ITEMS]
+    score = items.sum(axis=1, skipna=True)          # True counts as 1
+    all_na = items.isna().all(axis=1)               # no item answered
+    score = score.where(~all_na, other=pd.NA).astype('Int64')
+    df['FIES_score'] = score
     return df
 
 

@@ -32,3 +32,15 @@ Data Scheme:
     Generation: int
     Distance: int
     Affinity: str
+
+  individual_education:
+    index: (t, i, pid)
+    Educational Attainment: str
+
+  plot_features:
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    Irrigated:
+      type: bool
+      optional: true

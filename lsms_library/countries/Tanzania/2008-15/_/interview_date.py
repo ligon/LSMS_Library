@@ -27,7 +27,12 @@ months_dict = {'JANUARY': 1, 'FEBRUARY': 2, 'MARCH': 3, 'APRIL': 4, 'MAY': 5, 'J
                'JULY': 7, 'AUGUST': 8, 'SEPTEMBER': 9, 'OCTOBER': 10, 'NOVEMBER': 11, 'DECEMBER': 12, None: pd.NA}
 
 df['month'] = df['month'].map(months_dict)
-df['date'] = pd.to_datetime(df[['year', 'month', 'day']], errors='coerce')
+# Emit `int_t` (lowercase) to match the 2019-20 / 2020-21 waves, whose
+# data_info.yml maps `int_t: hh_a18`.  The framework canonicalizes
+# `int_t` -> `Int_t` (datetime) once on concat; emitting capital `Int_t`
+# here instead would leave the two spellings side-by-side and the
+# canonicalization would then collide into a duplicate column (GH #325).
+df['int_t'] = pd.to_datetime(df[['year', 'month', 'day']], errors='coerce')
 df=df.drop(columns=['year','month','day'])
 
 to_parquet(df,'interview_date.parquet')

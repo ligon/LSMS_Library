@@ -1,6 +1,16 @@
 Country: Albania
 Wave: 2005
 
+individual_education:
+    file: ../Data/educationB_cl.dta
+    idxvars:
+        i:
+            - m0_q00
+            - m0_q01
+        pid: m2b_q00
+    myvars:
+        Educational Attainment: m2b_q04
+
 cluster_features:
     file: ../Data/identification_cl.dta
     idxvars:
@@ -11,12 +21,18 @@ cluster_features:
         Rural: m0_ur
 
 household_roster:
+    # i=[m0_q00,m0_q01] -> composite via mapping.py:i() ('m0_q00-m0_q01') to
+    # match sample()'s household identity, so _join_v_from_sample resolves v.
+    # Bare i=m0_q01 keyed on the within-cluster household number (only ~12
+    # distinct), which collapsed the roster and broke the v-join (sample's i is
+    # the composite m0_q00-m0_q01; the within-cluster number is unique only
+    # inside a PSU).  v is NOT declared here -- the framework joins it from
+    # sample() (the 2004 / interview_date idiom).  See GH #340, CONTENTS.org.
     file:
         - ../Data/household_rosterA_cl.dta
 
     idxvars:
-        v: m0_q00
-        i: m0_q01
+        i: [m0_q00, m0_q01]
         pid: m1a_q00
 
     myvars:
@@ -56,3 +72,48 @@ household_roster:
                 14: Not related
 
         MonthsAway: m1a_q09
+
+housing:
+    # Module 13A dwelling. i=[m0_q00,m0_q01] uses the composite i() (mapping.py)
+    # to match the household identity built by sample.py, so _join_v_from_sample
+    # resolves v. Walls/Toilet/Tenure are value-labelled categoricals (NAME
+    # strings via convert_categoricals); Rooms is the integer room count.
+    # No Roof/Floor/Water/Electricity in Module 13A (water/electricity live in
+    # dwellingB_cl.dta).
+    file: ../Data/dwellingA_cl.dta
+    idxvars:
+        i:
+            - m0_q00
+            - m0_q01
+    myvars:
+        Walls: m13a_q02
+        Toilet: m13a_q10
+        Tenure: m13a_q14
+        Rooms: m13a_q08
+
+interview_date:
+    # Cover page identification_cl.dta; m0_date is int YYYYMMDD parsed by
+    # mapping.py:Int_t. i=[m0_q00,m0_q01] uses the composite i() to match the
+    # household identity built by sample.py (so _join_v_from_sample resolves v).
+    file:
+        - ../Data/identification_cl.dta
+    idxvars:
+        i: [m0_q00, m0_q01]
+    myvars:
+        Int_t:
+            - m0_date
+
+subjective_well_being:
+    # Module 7 "Subjective Poverty" (subjective_poverty_cl.dta).  Two
+    # economic-status ladder items are asked: m07_q09_1 = CURRENT step,
+    # m07_q09_2 = the retrospective companion.  Own Step = the current item
+    # (1-10; 1 = poorest, 10 = richest); the retrospective item is dropped.
+    # i=[m0_q00,m0_q01] -> composite via mapping.py:i() to match sample()'s
+    # household identity (the housing/interview_date idiom); the roster's bare
+    # i=m0_q01 is the known within-cluster-number defect we do NOT copy.
+    file:
+        - ../Data/subjective_poverty_cl.dta
+    idxvars:
+        i: [m0_q00, m0_q01]
+    myvars:
+        Own Step: m07_q09_1

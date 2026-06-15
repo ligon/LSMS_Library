@@ -102,6 +102,19 @@ The legacy approach uses a separate `unitlabels.csv` — the modern approach put
 
 Reference: `lsms_library/countries/Uganda/_/units.org`, `lsms_library/countries/Mali/_/categorical_mapping.org` (has `#+NAME: unit`)
 
+**When `u` comes through as numeric codes** (the common case for a fresh
+country/wave), getting it to clean native labels has its own toolkit and a
+recurring set of silent-failure gotchas (float-stringification, empty
+`get_categorical_mapping` dicts, reserved sentinels, metric-magnitude safety,
+and when to leave a code undecoded rather than guess). **Load the
+`add-feature/food-acquired/units` sub-skill** for that discipline, and verify
+with the leak audit before moving on:
+
+```python
+from lsms_library import diagnostics
+diagnostics.food_acquired_u_code_leaks('YourCountry')   # must be [] (or only documented residuals)
+```
+
 ### Step 3: Convert units to metric (THE CRITICAL STEP)
 
 There are two approaches, depending on what the survey provides:
@@ -140,19 +153,41 @@ For units whose names already encode the conversion (e.g., "Sack (120 kgs)" → 
 - `{Country}/_/kg_per_other_units.py` — infers remaining conversions from price ratios
 - `{Country}/_/kgs_per_other_units.json` — output of inference (merged with hand-coded)
 
-#### Approach B: Survey-provided conversion tables (Malawi pattern)
+#### Approach B: Survey-provided exact factors → summable `Quantity_kg` (Nigeria / Malawi pattern)
 
-Some surveys (Malawi IHS, Ethiopia ESS) include measured conversion factors as part of the survey data. These are item × unit × region specific — e.g., a "Pail (Small)" of maize weighs 1.93 kg in the North region.
+Some surveys ship a **measured, per-row kg factor** alongside each quantity —
+Nigeria GHS's `s10bq2_cvn` (Kg/L conversion for that household × item × unit ×
+*size*), or Malawi IHS's `ihs_foodconversion_factor` joined by item × unit ×
+region. This is *exact*, so prefer it over the inference (Approach A) where it
+exists.
 
-**Key files:**
-- `{Country}/{wave}/_/ihs3_conversions.csv` (Malawi) — pre-built from survey documentation
-- `{Country}/{wave}/Data/Food_CF_WaveN.dta` (Ethiopia) — survey-provided conversion factors
-- `{Country}/{wave}/Data/caloric_conversionfactor.dta` (Malawi 2019-20)
-- `{Country}/{wave}/Data/ihs_foodconversion_factor_*.dta` (Malawi 2019-20)
+**Do NOT convert in place at build time** (the pre-#413 Malawi pattern, which
+multiplied `Quantity` and stamped `u='kg'`). That discards the native unit
+label, breaks `food_prices(units='unitvalue')`, and — because the canonical
+index has no *size* level — cannot represent a factor that varies by size
+within one `(item, unit)`. Instead, keep the native `Quantity`/`u` and emit a
+summable **`Quantity_kg`** column (GH #378 / #410 / #413,
+`slurm_logs/DESIGN_per_row_kg_quantity_2026-06-07.org`):
 
-The code joins these factors onto the food data by item × unit × region.
+1. In the wave/country build, carry a per-row `kg_factor` (or compute
+   `Quantity_kg = Quantity × factor` per source) **before** the canonical
+   collapse — the factor is valid row-level; what is lossy is *summing* a
+   factor, which the framework never does.
+2. `food_acquired_to_canonical` threads it through the melt; `_finalize_…`
+   **sums** `Quantity_kg` like `Quantity`, so different-size rows of one
+   `(item, unit)` collapse without losing the exact kg total.
+3. `_apply_kg_conversion` prefers a non-null `Quantity_kg`; `conversion_to_kgs`
+   is `Quantity_kg`-aware (exact rows feed the price-per-kg *baseline* but are
+   excluded from the per-unit *inference*).
 
-Reference: `lsms_library/countries/Malawi/2010-11/_/food_acquired.py`
+The result: exact kg **and** native labels preserved, with the framework
+filling rows that lack an exact factor via Approach A/C.
+
+**Key files / references:**
+- Nigeria `2018-19/_/food_acquired.py` — maps `s10bq2_cvn`/`s7bq2_cvn` → `kg_factor` (#410).
+- Malawi `_/malawi.py` (`handling_unusual_units`, `food_acquired_to_canonical`) — per-source `cfactor` → `Quantity_kg` (#413).
+- Framework: `transformations.py` `_apply_kg_conversion`, `_finalize_canonical_food_acquired`, `conversion_to_kgs`.
+- `{Country}/{wave}/Data/ihs_foodconversion_factor_*.dta` (Malawi), `Food_CF_WaveN.dta` (Ethiopia) — the raw factor tables.
 
 #### Approach C: Framework-level conversion (default since GH #231)
 
@@ -179,16 +214,44 @@ Empirically (see `SkunkWorks/malawi_unit_resolution_diagnostic_2026-05-07.org`):
 
 ## Country-specific notes
 
-| Country | Approach | Conversion source | Status |
-|---------|----------|-------------------|--------|
-| Uganda | A (price-ratio) | `conversion_to_kgs.json` + `kg_per_other_units.py` | Complete |
-| Malawi | B (survey tables) | `ihs3_conversions.csv`, IHS food conversion factors | Partial (legacy .py scripts) |
-| Tanzania | A (price-ratio) | `conversion_to_kgs.json` | Complete (legacy) |
-| Ethiopia | B (survey tables) | `Food_CF_WaveN.dta` | Partial (legacy) |
-| Mali | Mixed | Has `categorical_mapping.org` for food items | Partial |
-| Nigeria | ? | Check for conversion factor files | Not started |
-| Niger | ? | Check for ECVMA/EHCVM conversion files | Not started |
-| Burkina Faso | ? | Check for EHCVM conversion files | Not started |
+**16 countries currently declare `food_acquired`:** Benin, Burkina_Faso,
+CotedIvoire, Ethiopia, EthiopiaRHS, GhanaLSS, Guinea-Bissau, Malawi, Mali,
+Nepal, Niger, Nigeria, Senegal, Tanzania, Togo, Uganda.
+
+Status below is from a fresh cross-country build (NO_CACHE, 2026-06-07);
+"kg-resolved" = share of `food_quantities(units='kgs')` rows reaching
+`u='kg'` (non-convertible container units — heaps, sachets — legitimately
+never reach kg, so 100% is not the target for every country).
+
+| Country | Schema | kg-resolved | Notes |
+|---------|--------|-------------|-------|
+| Uganda | canonical (s-axis) | high | Approach A, `conversion_to_kgs.json` + price-ratio; reference impl |
+| Tanzania | canonical | ~100% | Approach C default does the work |
+| Malawi | canonical | ~99.9% | Approach C + `#+name: u`; residual = container units (GH #116 closed) |
+| Ethiopia | canonical | ~44% | Approach B (`Food_CF_WaveN.dta`) only partly wired — see GH #115 |
+| Benin / Togo / CotedIvoire / Niger / Guinea-Bissau | canonical (via `transformations.food_acquired_to_canonical`) | varies | EHCVM; `#+name: u` tables wired (GH #223). Units are mostly non-metric containers (`Tas`, `Sachet`) so kg-resolution is intrinsically low |
+| Mali / Senegal | canonical | varies | EHCVM; `#+name: u` tables wired (GH #223) |
+| Nigeria | canonical | — | built (PP/PH wave scripts) |
+| Nepal | canonical | — | built |
+| **Burkina_Faso** | **legacy (`Produced` column, no s-axis)** | **0%** | NOT migrated to canonical; kg derivation broken — see GH #107 |
+| GhanaLSS | canonical but **`u` is raw codes** | — | unit_label map not applied to codes; build is partial — see GH #348 |
+| EthiopiaRHS | canonical but **`u` holds item names** | — | extraction bug — see GH #347 |
+
+**Reading this table:** "canonical" means the `[t, (v,) i, j, u, s] ×
+[Quantity, Expenditure]` long form (GH #169) — verify with
+`Country(c).food_acquired().columns == ['Quantity','Expenditure']` and an
+`s` index level.  A `Produced` column or a missing `s` level means the
+country is still on the pre-#169 wide shape and needs migration before the
+`_FOOD_DERIVED` kg path works.
+
+**Gap countries** (have a `data_scheme` but no `food_acquired`): Albania,
+Armenia, Azerbaijan, Cambodia, China, Guatemala, Guyana, India, Iraq,
+Kazakhstan, Kosovo, Liberia, Pakistan, Serbia, Tajikistan, Timor-Leste.
+Several (Serbia, Cambodia) carry a *legacy* `food_acquired.py` +
+`food_prices_quantities_and_expenditures.py` that predates the canonical
+schema — filling those is a *modernize-and-wire* job (port to
+`food_acquired_to_canonical`, declare in `data_scheme.yml`), not a
+from-scratch build.
 
 ## Check existing documentation first
 
@@ -396,3 +459,27 @@ greedy clustering.
 - **Missing conversion factors** — some unit × item combinations may lack conversion factors. The price-ratio method can fill these gaps.
 - **Multiple acquisition sources** — surveys typically ask about purchased, own-produced, received as gift. Each may have different units.
 - **Case-sensitive `u='kg'` lookups in downstream code** — the framework's `_apply_kg_conversion` lowercases unit lookups against `KNOWN_METRIC`, and Phase 4's `food_quantities(units='kgs')` tags converted rows with lowercase `'kg'`.  If a country's source data uses capital `'Kg'`, downstream code that does `df.xs('Kg', level='u')` will silently break against framework-derived input (Uganda nutrition.py / unitvalues.py hit this — fixed in PR #224 with case-insensitive `mask = u.str.lower() == 'kg'`).
+
+### Unit-label decode pitfalls (the silent ones)
+
+These leak raw codes into `u` **without raising** — the build looks fine but
+the audit fails. The `add-feature/food-acquired/units` sub-skill covers them
+in full; the ones that recur every new country:
+
+- **Float-stringified codes miss the dict.** A numeric unit code reaches a
+  `myvars`/mapping lookup as a float (`1.0`) while the table is keyed on string
+  codes (`'1'`), so the map silently misses every row. `format_id` is applied
+  to `idxvars` but **not** `myvars` — normalize before lookup:
+  `lambda x: unitsd.get(format_id(x), pd.NA)` (GhanaLSS #348).
+- **`get_categorical_mapping(tablename='units')` returns `{}` with no value
+  column** — pass the value column (`Label='Label'`), or the decode is dead and
+  *every* code leaks (GhanaLSS #348).
+- **`#` comments inside/just-above an org table sever it from its `#+name:`** —
+  `df_from_orgfile` then returns nothing; put comments above `#+name:` or after
+  the table.
+- **`10Kgs` is a quantity, not a unit** — relabeling to `Kg` without scaling is
+  off by 10×; *convert* (scale ×factor, tag `u='kg'`) and guard against
+  non-metric look-alikes (`10Giraffes`).
+- **Never invent a label for an undecodable code** — leave it and document it as
+  an accepted residual (Malawi 19, EHCVM `659/660/662`); it still yields valid
+  expenditures and `unitvalue`.

@@ -12,6 +12,18 @@ cluster_features:
                 urban: Urban
                 rural: Rural
 
+assets:
+    file: "../Data/m2_durables.dta"
+    idxvars:
+        i: [opstina, popkrug, dom]
+        j: s26
+    myvars:
+        Quantity: s27
+        Age: s28
+        Value:
+            - s30
+            - mappings: to_float
+
 household_roster:
     file:
         - "../Data/individual.dta"
@@ -53,3 +65,41 @@ sample:
     final_index:
         - i
         - t
+
+interview_date:
+    # Household file domacinstva.dta; Int_t from dana/mesa/goda (day/month/year)
+    # via mapping.py:Int_t. i=[opstina,popkrug,dom] matches roster. 100% coverage.
+    file:
+        - "../Data/domacinstva.dta"
+    idxvars:
+        i: [opstina, popkrug, dom]
+    myvars:
+        Int_t:
+            - dana
+            - mesa
+            - goda
+
+housing:
+    # Dwelling water/sanitation module (bo*) in household.dta. Administered to a
+    # sub-sample (~2744 of 5557 HH; rest NaN). i=[opstina,popkrug,dom] matches
+    # roster. No Roof/Floor/Walls/Tenure/Rooms/Electricity in this survey: the bo*
+    # block is exclusively a water-and-sanitation module, so housing declares only
+    # the Water and Toilet subset. Values are decoded NAME strings (value labels).
+    file:
+        - "../Data/household.dta"
+    idxvars:
+        i: [opstina, popkrug, dom]
+    myvars:
+        Water: bo2_1
+        Toilet: bo28
+
+individual_education:
+    # Education embedded in the roster file individual.dta; obrazovanje is the
+    # attainment code (00-11). pid=lice matches the roster (0% spine orphans).
+    file:
+        - "../Data/individual.dta"
+    idxvars:
+        i: [opstina, popkrug, dom]
+        pid: lice
+    myvars:
+        Educational Attainment: obrazovanje

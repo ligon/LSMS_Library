@@ -75,25 +75,40 @@ household_roster:
         MonthsSpent: s01q11
 
 food_acquired:
+    # EACI 2014-15 Section 13 records consumption per acquisition source
+    # as THREE separate quantity/unit pairs (GH #380), unlike the EHCVM
+    # single-total instrument:
+    #   s13q02   "A consommé le produit ..."          Oui/Non gate (NOT a quantity)
+    #   s13q03a  "Quantité totale ... acheté"         purchased quantity   (unit s13q03b)
+    #   s13q03c  "Valeur de cette quantité ... acheté" purchased value      -> Expenditure
+    #   s13q04a  "Quantité totale ... propre production" produced quantity  (unit s13q04b)
+    #   s13q05a  "Quantité totale ... reçu en cadeau,... troc" in-kind qty  (unit s13q05b)
+    # The wide grab below keeps each stream's quantity, unit and (for
+    # purchases) value as plain columns; the food_acquired(df) hook in
+    # mapping.py melts them into the canonical (t, v, i, j, u, s) long
+    # form with s in {purchased, produced, inkind}.  s13q03a/04a/05a are
+    # per-source quantities (NOT a total), so the EHCVM
+    # food_acquired_to_canonical (purchased = total - produced) is the
+    # WRONG reshape here and is deliberately not used.
     idxvars:
         v: grappe
         visit: passage
-        i: 
+        i:
             - grappe
             - menage
-        j: 
+        j:
             - s13q01
-            - mappings: ['harmonize_food', 'Original Label', 'Preferred Label']
-        u:
-            - s13q03b
-            - mappings: ['unit', 'Original Label', 'Preferred Label']
+            - mappings: ['harmonize_food', 'Code', 'Preferred Label']
     myvars:
-        Quantity: s13q02
-        Expenditure: s13q03c
-        Produced: s13q04a
+        QuantityPurchased: s13q03a
+        UnitPurchased: s13q03b
+        ExpenditurePurchased: s13q03c
+        QuantityProduced: s13q04a
+        UnitProduced: s13q04b
+        QuantityInkind: s13q05a
+        UnitInkind: s13q05b
     file:
-        - EACIALI_p1.dta:
-            Quantity: s13q03a
+        - EACIALI_p1.dta
         - EACIALI_p2.dta
 
 interview_date:

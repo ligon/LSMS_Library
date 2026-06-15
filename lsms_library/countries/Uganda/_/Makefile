@@ -21,7 +21,14 @@ VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 #     housing.py source exists in any Uganda wave).
 var = $(VAR_DIR)/shocks.parquet $(VAR_DIR)/nonfood_expenditures.parquet $(VAR_DIR)/enterprise_income.parquet \
 	  $(VAR_DIR)/assets.parquet $(VAR_DIR)/earnings.parquet $(VAR_DIR)/income.parquet \
-	  $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet
+	  $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet \
+	  $(VAR_DIR)/plot_features.parquet \
+	  $(VAR_DIR)/crop_production.parquet \
+	  $(VAR_DIR)/plot_inputs.parquet \
+	  $(VAR_DIR)/plot_labor.parquet \
+	  $(VAR_DIR)/livestock.parquet \
+	  $(VAR_DIR)/anthropometry.parquet \
+	  $(VAR_DIR)/months_food_inadequate.parquet
 
 all: $(parquet) $(var)
 
@@ -73,13 +80,55 @@ food_acquired_parquet := $(food_acquired:.py=.parquet)
 $(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
 	python food_acquired.py
 
+plot_features = $(shell find $(rounds) -name plot_features.py)
+plot_features_parquet := $(plot_features:.py=.parquet)
+
+$(VAR_DIR)/plot_features.parquet: plot_features.py $(plot_features_parquet)
+	python plot_features.py
+
+crop_production = $(shell find $(rounds) -name crop_production.py)
+crop_production_parquet := $(crop_production:.py=.parquet)
+
+$(VAR_DIR)/crop_production.parquet: crop_production.py $(crop_production_parquet)
+	python crop_production.py
+
+plot_inputs = $(shell find $(rounds) -name plot_inputs.py)
+plot_inputs_parquet := $(plot_inputs:.py=.parquet)
+
+$(VAR_DIR)/plot_inputs.parquet: plot_inputs.py $(plot_inputs_parquet)
+	python plot_inputs.py
+
+plot_labor = $(shell find $(rounds) -name plot_labor.py)
+plot_labor_parquet := $(plot_labor:.py=.parquet)
+
+$(VAR_DIR)/plot_labor.parquet: plot_labor.py $(plot_labor_parquet)
+	python plot_labor.py
+
+livestock = $(shell find $(rounds) -name livestock.py)
+livestock_parquet := $(livestock:.py=.parquet)
+
+$(VAR_DIR)/livestock.parquet: livestock.py $(livestock_parquet)
+	python livestock.py
+
+anthropometry = $(shell find $(rounds) -name anthropometry.py)
+anthropometry_parquet := $(anthropometry:.py=.parquet)
+
+$(VAR_DIR)/anthropometry.parquet: anthropometry.py $(anthropometry_parquet)
+	python anthropometry.py
+
+months_food_inadequate = $(shell find $(rounds) -name months_food_inadequate.py)
+months_food_inadequate_parquet := $(months_food_inadequate:.py=.parquet)
+
+$(VAR_DIR)/months_food_inadequate.parquet: months_food_inadequate.py $(months_food_inadequate_parquet)
+	python months_food_inadequate.py
+
 $(VAR_DIR)/income.parquet: income.py $(VAR_DIR)/enterprise_income.parquet $(VAR_DIR)/earnings.parquet
 	python income.py
 
 $(VAR_DIR)/nutrition.parquet $(VAR_DIR)/fct.parquet: nutrition.py $(VAR_DIR)/food_acquired.parquet nutrition.org
 	python nutrition.py
 
-%.parquet: %.py food_items.org uganda.py
+%.parquet: %.py categorical_mapping.org uganda.py
 	(cd $(@D) && python ./$(<F))
 
 clean:

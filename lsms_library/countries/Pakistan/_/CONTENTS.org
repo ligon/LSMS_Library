@@ -1,0 +1,29 @@
+#+TITLE: Pakistan — country notes & known data issues
+
+* Known data issues
+
+** individual_education — only primary grade available (2026-06-06)
+PIHS 1991 records educational attainment only as ~primgr~ (primary grade
+completed, codes 0–5) in the F03 section (F03C.DTA).  A scan of the F03*
+education files found no highest-level / secondary / tertiary attainment
+column — ~primgr~ caps at "5 = grade 5 or higher", so a university graduate
+and a primary-school leaver are indistinguishable.
+
+Wiring ~individual_education~ on ~primgr~ alone would **misrepresent
+attainment** cross-country (every Pakistani would appear to have at most
+primary education), so it is intentionally NOT wired.  The household roster
+(F01A.DTA, i=hid, pid=pid) and the (hid, pid) join are fine; only a usable
+highest-attainment variable is missing.
+
+Revisit if a fuller attainment variable is located (e.g. a secondary/tertiary
+column elsewhere in the instrument, or a later PIHS/PSLM wave).  Tracked in
+GitHub issue #344.
+
+
+* shocks — not available (2026-06-07, verified)
+
+=shocks= (a household adverse-events-and-coping roster, index =(t, i, Shock)=)
+is an ISA/EHCVM-specific module.  Pakistan Integrated Household Survey (PIHS) 1991 carries no such roster.  Verified
+this round by full variable-label inspection of the source =.dta= files:
+all 17 sections (=F01=–=F17=) are accounted for with no shocks chapter — the loan-purpose (§15) and migration-reason (§8) codes are not an events roster.  Not implementable from current data; revisit only if a coping roster
+is later identified.  Tracked in GitHub issue #352.

@@ -303,31 +303,14 @@
 
 * Food Units
 
+# Numeric code rows (101.0->101.0, ...) removed: the s07bq03b codes are now
+# decoded via the shared EHCVM codebook (categorical_mapping/ehcvm_units.org,
+# wired in data_info.yml `mappings:`), so these identity rows are dead
+# (GH #223 Layer 2 wiring).  Codes 254/255 have no label in any EHCVM source
+# and stay undecoded.
 #+NAME: u
 | Original Label            | Preferred Label |
 |---------------------------+-----------------|
-| 101.0                     | 101.0           |
-| 103.0                     | 103.0           |
-| 104.0                     | 104.0           |
-| 106.0                     | 106.0           |
-| 111.0                     | 111.0           |
-| 112.0                     | 112.0           |
-| 113.0                     | 113.0           |
-| 116.0                     | 116.0           |
-| 120.0                     | 120.0           |
-| 124.0                     | 124.0           |
-| 125.0                     | 125.0           |
-| 126.0                     | 126.0           |
-| 128.0                     | 128.0           |
-| 130.0                     | 130.0           |
-| 131.0                     | 131.0           |
-| 132.0                     | 132.0           |
-| 133.0                     | 133.0           |
-| 140.0                     | 140.0           |
-| 141.0                     | 141.0           |
-| 148.0                     | 148.0           |
-| 254.0                     | 254.0           |
-| 255.0                     | 255.0           |
 | Avec os au Kg             | Kg              |
 | Avec os au tas            | Tas             |
 | Bidon                     | Bidon           |
@@ -420,3 +403,59 @@
 | Sand               | Sand            |
 | Dung               | Earth with Dung |
 | Carpet             | Other           |
+
+# plot_features harmonization tables (GH #167; EHCVM cluster).
+# Copied from the Mali EHCVM reference (PR #284).  Keyed on the integer
+# s16a codes — Stata value labels are stable across EHCVM waves and
+# countries, so keying on codes avoids any French/Portuguese language
+# branch.  Burkina 2018-19 and 2021-22 use identical code schemes.
+# Burkina has NO co-propriétaire code 7 (that is Niger-2021 only).
+#
+# harmonize_tenure — s16aq10 "mode de faire-valoir" -> canonical Tenure.
+#   1 Propriétaire -> owned; 2 Prêt gratuit (free loan under agreement,
+#   typically non-cash) -> use_right ("held under agreement with a
+#   use-rights owner"); 3 Fermage -> rented_in; 4 Métayage ->
+#   sharecropped_in; 5 Gage (pledge/pawn) and 6 Autre -> other_tenure.
+# harmonize_soil — s16aq18 -> SoilType (free-form str; English labels).
+# harmonize_water — s16aq17; the Irrigated bool is (label=='Irrigated').
+# harmonize_tenure_system — s16aq13 land-document regime -> the canonical
+#   TenureSystem spellings.  Only the three documents implying a clear
+#   regime are mapped (1 Titre foncier -> freehold; 2 Permis d'exploiter
+#   -> granted_right_of_occupancy; 4 Bail -> leasehold).  Procès-verbal,
+#   Convention de vente, Autre, and Aucun have no defensible regime
+#   mapping and are left out (NaN) rather than force-fit.
+
+#+name: harmonize_tenure
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | owned           |
+|    2 | use_right       |
+|    3 | rented_in       |
+|    4 | sharecropped_in |
+|    5 | other_tenure    |
+|    6 | other_tenure    |
+
+#+name: harmonize_soil
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | sandy           |
+|    2 | loam            |
+|    3 | clay            |
+|    4 | hardpan         |
+|    5 | other           |
+
+#+name: harmonize_water
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Irrigated       |
+|    2 | Irrigated       |
+|    3 | Irrigated       |
+|    4 | Rain-fed        |
+|    5 | Wetland         |
+
+#+name: harmonize_tenure_system
+| Code | Preferred Label            |
+|------+----------------------------|
+|    1 | freehold                   |
+|    2 | granted_right_of_occupancy |
+|    4 | leasehold                  |

@@ -2,6 +2,89 @@ Country: Mali
 Wave: 2018-19
 
 
+subjective_well_being:
+    # EHCVM Section 20 'Pauvreté relative'.  s20q05 = self-placement on a
+    # 4-point relative-welfare ladder (Très pauvre / Pauvre / Moyen / Riche).
+    # Mapped to Own Step so higher = better off, consistent with the
+    # Malawi/Cantril ladder.  Ne sait pas / Refus / NaN -> NaN.
+    # NB: the 2018-19 .dta truncates the "Très pauvre" label to "Tr".
+    file: s20_me_mli2018.dta
+    idxvars:
+        v: grappe
+        i:
+            - grappe
+            - menage
+    myvars:
+        Own Step:
+            - s20q05
+            - mapping:
+                Tr: 1
+                Pauvre: 2
+                Moyen: 3
+                Riche: 4
+
+
+food_security:
+    # EHCVM Section 8A 'Sécurité alimentaire' — the FAO 8-item Food
+    # Insecurity Experience Scale (FIES), recall period = last 12 months
+    # ("12 derniers mois").  s08aq01..s08aq08 map IN ORDER to the 8
+    # canonical FIES items (verified against the .dta variable labels:
+    # q01=worried, q02=healthy/nutritious, q03=few foods, q04=skip meal,
+    # q05=ate less, q06=ran out, q07=hungry-not-eat, q08=whole day).
+    # Values Oui->True, Non->False; "Ne sait pas"/"Refus"/NaN->NaN.  The
+    # values are full strings (NOT truncated like the s20 SWB module).
+    # The s08aq07a/s08aq08a frequency follow-ups are ignored.  FIES_score
+    # (count of True across the 8 items) is computed by
+    # mapping.food_security().
+    file: s08a_me_mli2018.dta
+    idxvars:
+        v: grappe
+        i:
+            - grappe
+            - menage
+    myvars:
+        Worried:
+            - s08aq01
+            - mapping:
+                Oui: True
+                Non: False
+        HealthyDiet:
+            - s08aq02
+            - mapping:
+                Oui: True
+                Non: False
+        FewFoods:
+            - s08aq03
+            - mapping:
+                Oui: True
+                Non: False
+        SkippedMeal:
+            - s08aq04
+            - mapping:
+                Oui: True
+                Non: False
+        AteLess:
+            - s08aq05
+            - mapping:
+                Oui: True
+                Non: False
+        RanOut:
+            - s08aq06
+            - mapping:
+                Oui: True
+                Non: False
+        Hungry:
+            - s08aq07
+            - mapping:
+                Oui: True
+                Non: False
+        WholeDay:
+            - s08aq08
+            - mapping:
+                Oui: True
+                Non: False
+
+
 sample:
     dfs:
         - df_cover
@@ -108,9 +191,9 @@ food_acquired:
         i: 
             - grappe
             - menage
-        j: 
+        j:
             - s07bq01
-            - mappings: ['harmonize_food', 'Original Label', 'Preferred Label']
+            - mappings: ['harmonize_food', 'Code', 'Preferred Label']
         u: s07bq03b
     myvars:
         Quantity: s07bq03a
@@ -121,13 +204,17 @@ individual_education:
     file: ehcvm_individu_mli2018.dta
     idxvars:
         v: grappe
-        i: 
+        i:
             - grappe
             - menage
-        pid:
-            - grappe
-            - menage 
-            - numind
+        # 2018-19 uses a SCALAR within-household member number for pid, to
+        # match this wave's household_roster (which keys pid off the scalar
+        # s01q00a; numind == s01q00a here -- verified 46,014/46,014 key
+        # overlap).  The 3-column composite list [grappe, menage, numind]
+        # made Mali's pid() formatter build a "grappe0menage0numind"
+        # composite that the roster's scalar pid never matched (0% overlap;
+        # sibling of the Mali 2021-22 defect fixed in GH #322).
+        pid: numind
     myvars:
         Educational Attainment: 'educ_hi'
 

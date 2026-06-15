@@ -13,6 +13,32 @@ each grappe is visited in exactly one =vague=, so household
 identifier is =(grappe, menage)= without a vague level.  See
 CLAUDE.md "EHCVM countries" for the cross-country pattern.
 
+* food_acquired units (Benin<->Togo codebook link)
+
+Togo's =s07bq03b= unit variable stores bare numeric codes (100-662): its
+=.dta= lost the Stata value labels, so =convert_categoricals=True= still
+returns codes.  The labels survive in the *sibling EHCVM countries* whose
+=.dta= kept them --- chiefly *Benin*, which uses the identical standardized
+coding (=100=Kg=, =101=Litre=, =107=Boite=, =124=Gousse=, ...).
+
+The decode therefore borrows the sibling labels: the shared codebook
+=lsms_library/categorical_mapping/ehcvm_units.org= (=#+name:ehcvm_units=,
+built by unioning =s07bq03b= value labels across all 8 EHCVM countries ---
+see =slurm_logs/ehcvm_unit_codebook_2026-06-07.org=) is applied to =u= via
+=mappings: ['ehcvm_units','Code','Preferred Label']= in
+=2018/_/data_info.yml=.  Result: code leaks 25 -> 4.
+
+Residual codes (=114, 659, 660, 662=) are *item-specific local units* --
+659 banana/plantain, 660 meat, 662 yam/cassava/plantain portions, 114
+tomato -- with the size in =s07bq03c= (Petit/Moyen/Grand).  They have no
+label in *any* EHCVM source =.dta=, and the household-questionnaire =Unites=
+sheet is the generic 1--57 scheme, NOT the data's 100--700 coding (whose
+neighbours -- 663=Agoua, 664=Kpogban -- are specific local names).  No
+available source decodes them, so they are *accepted as undecodable* and
+left as codes (consistent with Malawi's residuals, #383).  They still
+contribute valid food_expenditures and per-native-unit =unitvalue= prices;
+only the kg aggregate excludes them.
+
 * Household Presence / MonthsSpent
 
 The EHCVM questionnaire (used in the 2018 wave) does NOT ask
@@ -32,3 +58,29 @@ rather than expecting a =MonthsSpent= column in =household_roster()=.
 
 Togo has no pre-EHCVM waves in the library, so no continuous
 months-of-presence variable is available for any wave.
+
+* plot_features (GH #167)
+
+Lasting parcel-level characteristics from the EHCVM agriculture module
+=s16a= (Togo is an EHCVM sibling of the Mali reference, PR #284).
+
+*** SOURCE LOCATION (read this first): the agriculture module lives in
+=2018/Data1/s16a_me_tgo2018.dta= (9557 parcel rows) — *NOT* in
+=2018/Data/=, which holds only =_forEthan= extracts.  Future
+maintainers will instinctively look in =Data/= and find nothing. ***
+
+Index =(t, i, plot_id)= where =i= is the EHCVM composite =(grappe,
+menage)= household id and =plot_id = "{s16aq02}_{s16aq03}"= (field _
+parcel sequence numbers), unique within each household.  =t = "2018"=
+(single EHCVM wave).
+
+Columns: =Area= (hectares; GPS measure =s16aq47= where =s16aq45==1=,
+else farmer estimate =s16aq09a= converted from its unit =s16aq09b=),
+=AreaUnit= (always "hectares"), =Tenure= (=s16aq10=), =TenureSystem=
+(=s16aq13=), =SoilType= (=s16aq18=), =Irrigated= (from water source
+=s16aq17=).  Latitude / Longitude deferred (no decimal-degree parcel
+GPS in EHCVM s16a).  The harmonize_* code maps live in
+=categorical_mapping.org=.
+
+Verification (2026-06-03): 9557 rows, unique =(t, i, plot_id)= index,
+=is_this_feature_sane= passes, 0% orphan households vs =sample()=.

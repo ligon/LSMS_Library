@@ -22,3 +22,42 @@ Data Scheme:
     Generation: int
     Distance: int
     Affinity: str
+
+  assets:
+    # 1993 module M2_NFS4 records only count-owned (dura_n); no value or
+    # age in this instrument, so only Quantity is declared.
+    index: (t, i, j)
+    Quantity: float
+
+  housing:
+    # 1993 dwelling characteristics merged from S4_HSV1 (structure/tenure)
+    # and S3_HSV2 (water/toilet) on hhid. All material/service values are
+    # human-readable names decoded from the SALDRU PSLSD 1993 codebook;
+    # Rooms is the integer total room count.
+    index: (t, i)
+    Roof: str
+    Walls: str
+    Floor: str
+    Rooms: int
+    Tenure: str
+    Water: str
+    Toilet: str
+
+  individual_education:
+    index: (t, i, pid)
+    Educational Attainment: str
+
+  interview_date:
+    index: (t, i)
+    Int_t: datetime
+
+  life_satisfaction:
+    # 1993 S5_PQL.dta (Section 9 'Perceived Quality of Life'), one row per
+    # household.  Only the overall satisfaction item `satisfie` is a genuine
+    # satisfaction rating (-> Domain='Overall'); safety/crime/priorities/
+    # comparison items in the same module are deliberately excluded.  Built
+    # by the wave script 1993/_/life_satisfaction.py (constant Domain level +
+    # WIDE->LONG reshape need a script, not YAML).
+    index: (t, i, Domain)
+    Satisfaction: str
+    materialize: make

@@ -29,6 +29,14 @@ Data Scheme:
     index: (t, i, pid)
     Educational Attainment: str
 
+  subjective_well_being:
+    # EHCVM Section 20 'Pauvreté relative' ladder item s20q05: household
+    # self-placement on a 4-point welfare ladder (higher = better off).
+    # Portuguese labels in the Guinea-Bissau .dta: Muito pobre / Pobre /
+    # Medio / Rico (+ Não sabe -> NaN).  LADDER construct only (Own Step).
+    index: (t, i)
+    Own Step: int
+
   shocks:
     index: (t, i, Shock)
     AffectedIncome: bool
@@ -66,3 +74,38 @@ Data Scheme:
   interview_date:
     index: (t, i)
     Int_t: datetime
+
+  food_security:
+    # FAO 8-item Food Insecurity Experience Scale (FIES), EHCVM Section
+    # 8A.  Recall period: last 12 months.  Items s08aq01..s08aq08 ->
+    # the 8 canonical FAO experience items (bool); FIES_score = count of
+    # True (0-8, NaN only when all 8 items are NaN).  Portuguese labels
+    # Sim/Não -> True/False; Recusa/Não sabe -> NaN.
+    index: (t, i)
+    Worried: bool
+    HealthyDiet: bool
+    FewFoods: bool
+    SkippedMeal: bool
+    AteLess: bool
+    RanOut: bool
+    Hungry: bool
+    WholeDay: bool
+    FIES_score: int
+
+  plot_features:
+    # Lasting parcel-level characteristics from the EHCVM agriculture
+    # module s16a (GH #167; Guinea-Bissau is an EHCVM sibling of the
+    # Mali reference, PR #284).  Single EHCVM wave: 2018-19 (no 2021-22).
+    # s16a value labels are Portuguese but the integer codes match the
+    # French EHCVM countries, so the harmonize_* tables key on the codes.
+    # plot_id = "{field_no}_{parcel_no}".  Latitude / Longitude are NOT
+    # emitted — EHCVM s16a has no decimal-degree parcel GPS (s16aq47 is
+    # an area, not a coordinate); deferred as in Uganda.
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    Tenure: str
+    TenureSystem: str
+    SoilType: str
+    Irrigated: bool
+    materialize: make

@@ -9,7 +9,7 @@ LSMS_DATA_ROOT ?= $(if $(LSMS_DATA_DIR),$(LSMS_DATA_DIR),$(if $(XDG_DATA_HOME),$
 VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 
 var = $(VAR_DIR)/food_acquired.parquet $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_quantities.parquet \
-	  $(VAR_DIR)/household_roster.parquet $(VAR_DIR)/household_characteristics.parquet \
+	  $(VAR_DIR)/household_roster.parquet \
 	  $(VAR_DIR)/interview_date.parquet
 
 all: $(var)
@@ -31,9 +31,6 @@ $(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
 
 ../2018-19/_/food_acquired.parquet: ../2018-19/_/food_acquired.py
 	(cd ../2018-19/_; python food_acquired.py)
-
-$(VAR_DIR)/household_characteristics.parquet: $(VAR_DIR)/household_roster.parquet household_roster.py household_characteristics.py
-	python household_characteristics.py 
 
 food_expenditures = $(shell find $(rounds) -name food_expenditures.py)
 food_expenditures_parquet := $(food_expenditures:.py=.parquet)
@@ -134,6 +131,61 @@ housing_parquet := $(housing:.py=.parquet)
 
 $(VAR_DIR)/housing.parquet: housing.py $(housing_parquet)
 	python housing.py
+
+# plot_features (GH #167).  The framework's grab_data calls
+# `make ../<wave>/_/plot_features.parquet` from this `_/` dir; the
+# pattern rule runs the wave script.  The VAR_DIR rule mirrors the
+# household_roster country-level convention above.
+plot_features = $(shell find $(rounds) -name plot_features.py)
+plot_features_parquet := $(plot_features:.py=.parquet)
+
+../%/_/plot_features.parquet: ../%/_/plot_features.py
+	(cd $(@D) && python plot_features.py)
+
+$(VAR_DIR)/plot_features.parquet: plot_features.py $(plot_features_parquet)
+	python plot_features.py
+
+# food_coping (#332, Family B).  Post-planting GHS section-9 coping
+# day-count battery (W1-W3).  The framework's grab_data calls
+# `make ../<wave>/_/food_coping.parquet` from this `_/` dir for each
+# wired wave; the pattern rule runs the wave script.  The VAR_DIR rule
+# concatenates them (mirrors plot_features above).
+food_coping = $(shell find $(rounds) -name food_coping.py)
+food_coping_parquet := $(food_coping:.py=.parquet)
+
+../%/_/food_coping.parquet: ../%/_/food_coping.py
+	(cd $(@D) && python food_coping.py)
+
+$(VAR_DIR)/food_coping.parquet: food_coping.py $(food_coping_parquet)
+	python food_coping.py
+
+# individual_education (GHS section 2, post-harvest only).  The
+# framework's grab_data calls `make ../<wave>/_/individual_education.parquet`
+# from this `_/` dir; the pattern rule runs the wave script.
+../%/_/individual_education.parquet: ../%/_/individual_education.py
+	(cd $(@D) && python individual_education.py)
+
+# anthropometry (GAP 5).  Single country-level script reads each wave's
+# post-harvest anthropometry section (sect4a/sect4b_harvest) + roster
+# (sect1_harvest, for Sex/Age) and concatenates to var/anthropometry.parquet.
+$(VAR_DIR)/anthropometry.parquet: anthropometry.py
+	python anthropometry.py
+
+# community_prices (GAP C).  Wave-level scripts read each year folder's
+# post-harvest community price module (Section C8, sectc8_harvest*) and
+# write a wave parquet at the PH quarter; the country-level concatenator
+# joins them to var/community_prices.parquet.  The wave-level split routes
+# the build through the framework's wave path, preserving the (t, v, j, u)
+# grain (the country-only fallback applies map_index(), which swaps a
+# j-without-i index level to i and collapses the table).
+community_prices = $(shell find $(rounds) -name community_prices.py)
+community_prices_parquet := $(community_prices:.py=.parquet)
+
+../%/_/community_prices.parquet: ../%/_/community_prices.py
+	(cd $(@D) && python community_prices.py)
+
+$(VAR_DIR)/community_prices.parquet: community_prices.py $(community_prices_parquet)
+	python community_prices.py
 
 ../2010-11/_/housing.parquet: ../2010-11/_/housing.py
 	(cd ../2010-11/_; python housing.py)

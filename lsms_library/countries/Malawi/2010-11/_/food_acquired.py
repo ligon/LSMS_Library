@@ -21,7 +21,7 @@ sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
 from malawi import (conversion_table_matching, food_acquired_to_canonical,
-                    normalize_food_label)
+                    normalize_food_label, _clean_freetext_unit)
 
 wave = "2010-11"
 
@@ -110,12 +110,12 @@ for src in ('consumed', 'bought', 'produced', 'gifted'):
     # Fill missing cfactor from inline regex extraction.
     df[cfactor_col] = df.apply(lambda x, c=cfactor_col, f=fallback:
                                x[c] or f, axis=1)
-    # Apply conversion factor (NaN cfactor -> identity).
-    df[quant_col] = df[quant_col].mul(df[cfactor_col].fillna(1))
-    # Canonical unit string: 'kg' if a cfactor was applied, else the
-    # raw unit-detail text, falling back to the unitcode if absent.
-    df[u_col] = np.where(~df[cfactor_col].isna(), 'kg', df[detail_col])
-    df[u_col] = df[u_col].replace('nan', pd.NA).fillna(df[code_col])
+    # Tidy the other-specify free text for use as a `u` label (after the
+    # grams/kg parse above): "1 Basket" -> "Basket" (GH #223 Layer 2).
+    df[detail_col] = df[detail_col].map(_clean_freetext_unit)
+    # Keep native quantity + native unit; food_acquired_to_canonical computes
+    # the summable Quantity_kg = quantity x cfactor (GH #378 / Malawi migration).
+    df[u_col] = df[detail_col].replace('nan', pd.NA).fillna(df[code_col])
 
 df['t'] = wave
 df = df.reset_index()

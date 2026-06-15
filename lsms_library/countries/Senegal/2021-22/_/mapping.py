@@ -63,6 +63,23 @@ def Region(value):
 
 
 
+FIES_ITEMS = ['Worried', 'HealthyDiet', 'FewFoods', 'SkippedMeal',
+              'AteLess', 'RanOut', 'Hungry', 'WholeDay']
+
+
+def food_security(df):
+    '''
+    Compute FIES_score: count of True across the 8 FAO FIES items.
+    NaN only when ALL eight items are NaN (item not asked / refused).
+    '''
+    items = df[FIES_ITEMS].apply(lambda c: c.map({True: True, False: False}))
+    score = items.sum(axis=1, min_count=1)
+    all_na = items.isna().all(axis=1)
+    score = score.where(~all_na, other=np.nan)
+    df['FIES_score'] = score.astype('Int64')
+    return df
+
+
 def previous_i(value):
     '''
     Formatting previous household id from (grappe, menage).

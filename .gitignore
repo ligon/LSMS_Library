@@ -17,6 +17,8 @@ env/
 # Poetry specific
 .venv
 .venv.lustre/
+.venv.sqfs
+*.sqfs
 
 # Make stamp dir
 .make/

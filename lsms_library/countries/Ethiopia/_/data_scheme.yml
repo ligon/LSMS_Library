@@ -36,6 +36,10 @@ Data Scheme:
     Distance: int
     Affinity: str
 
+  individual_education:
+    index: (t, i, pid)
+    Educational Attainment: str
+
   panel_ids:
     index: (t, i)
     previous_i: str
@@ -65,7 +69,379 @@ Data Scheme:
     Expenditure: float
     materialize: make
 
-  food_expenditures: !make
-  food_prices: !make
-  food_quantities: !make
+  plot_features:
+    # ESS post-planting parcel/field land characteristics (GH #167).
+    # One row per FIELD (sect3_pp), with parcel-level Tenure / SoilType
+    # broadcast from sect2_pp via the holder-aware join key
+    # (holder_id, household_id, parcel_id).  Cross-file join => script.
+    # Latitude/Longitude deferred: source GPS 100% '**CONFIDENTIAL**'.
+    # TenureSystem always NaN: ESS has no land-tenure-regime analogue.
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    Tenure: str
+    # ESS records no land-tenure-regime analogue (all land is state-owned
+    # under usufruct), so TenureSystem is legitimately all-NaN here.
+    # Mark optional so the all-null sanity check exempts it while the
+    # canonical column is still declared for cross-country alignment.
+    TenureSystem:
+      type: str
+      optional: true
+    SoilType: str
+    Irrigated: bool
+    # Reported item-level field/parcel attributes (WB Plot_dataset parity,
+    # GAP 6).  All three are surveyed Yes/No questions carried verbatim
+    # (no aggregation): Fallow = field land-status == "Fallow" (sect3 §3),
+    # ErosionProtection = field has an erosion-control structure (sect3),
+    # Certificate = parcel has a land-use certificate (sect2).  WB
+    # plot_owned is NOT added: it is a binary recode of the same acquire
+    # variable already carried as Tenure (a transform, derivable as
+    # Tenure in {communal, inherited, owned}); plot_slope / plot_dist_*
+    # are SRTM/geospatial raster joins, not survey-reported.
+    Fallow: bool
+    ErosionProtection: bool
+    Certificate: bool
+    materialize: make
+
+  crop_production:
+    # GAP 1 — item-level crop harvest at (t, i, plot_id, j, u).  One row
+    # per (plot, crop) from ESS §9 post-harvest (sect9_ph), carrying only
+    # REPORTED fields: harvest Quantity in its native unit u, Quantity_sold
+    # / Value_sold from §11 (attached at the unambiguous holder-crop join,
+    # see ethiopia.crop_production_for_wave SALES GRAIN CAVEAT),
+    # planting_month (§4) / harvest_month (§9), and the intercropped /
+    # perennial flags.  NO unit->kg conversion, NO yield / main-crop /
+    # value-share rollups (those are transformations).  plot_id and i match
+    # plot_features exactly, so the two features join on (t, i, plot_id).
+    # crop labels reuse the food Preferred Labels (harmonize_crop table) so
+    # crop_production.j joins food_acquired.j.  Multi-file joins (§9+§4+§11,
+    # + §3 for W1 intercrop) + code->label harmonization => script.
+    index: (t, i, plot_id, j, u)
+    Quantity: float
+    Quantity_sold: float
+    Value_sold: float
+    planting_month: int
+    harvest_month: int
+    intercropped: bool
+    perennial: bool
+    materialize: make
+
+  plot_inputs:
+    # GAP 2 -- item-level ag inputs at (t, i, plot_id, input, j).  One row
+    # per input APPLIED to a plot (or plot-crop), from the ESS post-planting
+    # input modules: §3 (sect3_pp) fertilizer/organic, §4 (sect4_pp) seed +
+    # pesticide, §5 (sect5_pp) seed purchase.  Carries only REPORTED,
+    # item-level fields:
+    #   input               input identity (Seed / Urea / DAP / NPS / Manure /
+    #                       Compost / Other Organic / Pesticide; Preferred
+    #                       Labels emitted in-script from harmonize_input).
+    #   Quantity + u        reported applied quantity in its native unit
+    #                       ('Kg' for every ESS input quantity).
+    #   Purchased           was the seed PURCHASED (nullable bool; seed rows,
+    #                       from the §5 purchased-flag, attached where the
+    #                       (holder, crop) maps to a single plot).
+    #   Quantity_purchased  reported purchased kg (seed rows; fertilizer
+    #                       purchased kg where the §3 module records it, W2+).
+    #   Improved            improved-seed flag (nullable bool; seed rows only).
+    #   Applied             reported applied/used dummy (nullable bool).  ESS
+    #                       records organic fertilizer (Manure/Compost/Other
+    #                       Organic) and Pesticide as a yes/no USE flag with NO
+    #                       quantity, so for those input types the reported
+    #                       datum is this flag (one row per applied input);
+    #                       also set for inorganic-fertilizer rows that report
+    #                       use without a kg.  NaN for seed rows (their use is
+    #                       implied by Quantity / Improved / Purchased).
+    #
+    # j (crop axis): the crop Preferred Label (harmonize_crop == food labels,
+    # so seed/pesticide rows join crop_production.j / food_acquired.j) for the
+    # crop-specific inputs (Seed, Pesticide); the 'Whole Plot' sentinel for
+    # plot-level fertilizer/organic inputs (which carry no crop -- j cannot be
+    # null as an index level, mirroring how crop_production fills its u level).
+    # plot_id and i match plot_features / crop_production exactly.
+    #
+    # NO nitrogen_kg / seed_kg sums, NO any-use roll-up flags, NO fertilizer
+    # totals (those are transformations over these item rows -- GAP 2/7).
+    # Multi-file joins (§3+§4+§5) + per-section grain + code->label
+    # harmonization => script (materialize: make).  Seed-purchase detail
+    # attaches from the (holder, crop)-grain §5 ONLY where the (holder, crop)
+    # maps to a single plot (the SALES GRAIN CAVEAT crop_production uses).
+    index: (t, i, plot_id, input, j)
+    Quantity: float
+    u: str
+    Purchased:
+      type: bool
+      optional: true
+    Quantity_purchased: float
+    Improved:
+      type: bool
+      optional: true
+    Applied:
+      type: bool
+      optional: true
+    materialize: make
+
+  livestock:
+    # GAP 4 -- item-level livestock at (t, i, animal).  One row per
+    # (household, canonical species) from ESS §8 (sect8a_ls W1/W2;
+    # sect8_1_ls + sect8_2_ls W3-W5), carrying only REPORTED roster fields:
+    #   HeadCount     current head owned/kept by the HH.
+    #   HeadAcquired  head PURCHASED alive in the last 12 months.
+    #   HeadSold      head SOLD alive in the last 12 months.
+    #   Value         total income from livestock SALES in the last 12 months
+    #                 (Birr).  The §8 roster records NO current herd-value
+    #                 question in any ESS wave, so Value carries the reported
+    #                 sale income (the only monetary §8 field); it is NOT a
+    #                 herd valuation.
+    # This is the PRE-COLLAPSE §8 roster the WB code reads then throws away
+    # down to a single engaged-in-livestock y/n binary (their recode of the
+    # post-planting cover pp_saq13 + collapse-max).  We keep the head counts
+    # / transactions instead -- strictly richer than their binary, over the
+    # same (broader, since §8 covers livestock-only HHs the PP module omits)
+    # set of households.
+    #
+    # animal axis: the canonical species Preferred Label (Cattle / Sheep /
+    # Goats / Camels / Poultry / Horses / Mules / Donkeys / Beehives) from
+    # the WAVE-KEYED harmonize_species table -- W1/W2 report Cattle/Poultry
+    # at the aggregate grain, W3-W5 split the herd by age/sex; the script
+    # folds the sub-codes (Bulls/Oxen/Cows/... -> Cattle) onto the canonical
+    # species and SUMS the reported head counts within each household (the
+    # within-household roll-up to the grain, NOT a WB collapse-to-binary).
+    #
+    # NO TLU / herd-value total / engaged-y/n binary baked in (those are
+    # transformations -- the binary = groupby(['t','i']).any() over these
+    # rows; tlu = Sum(head x species-TLU-factor)).  Grain is (t, i, animal)
+    # with NO v level: livestock is per-household, and the framework
+    # _no_v_join set already covers 'livestock'.  Multi-file join (count <->
+    # transactions on (holder, code)) + per-wave code->species harmonization
+    # + within-household sum => script (materialize: make).
+    index: (t, i, animal)
+    HeadCount: float
+    HeadAcquired: float
+    HeadSold: float
+    Value: float
+    materialize: make
+
+  food_security:
+    # FAO FIES 8-item experience scale (GH #332).  Confirmed ONLY in
+    # W5 (2021-22): ESS §8 file sect8_hh_w5.dta carries the FAO battery
+    # (s8q01..s8q08, mapped BY LABEL — not sequential FAO order; see the
+    # wave data_info.yml).  W4 (2018-19) §8 is an rCSI/coping-strategy
+    # battery (s8q02a..h = number-of-days frequency counts), NOT FIES, so
+    # it is deliberately NOT wired here; it belongs to a future rCSI
+    # feature.  W1-3 carry the rCSI/coping battery in §7 (sect7_hh,
+    # hh_s7q02_*), wired separately as `food_coping` below.
+    # Recall period: 12 months for 7 items; WholeDay (s8q06) is 30-day.
+    index: (t, i)
+    Worried: bool
+    HealthyDiet: bool
+    FewFoods: bool
+    SkippedMeal: bool
+    AteLess: bool
+    RanOut: bool
+    Hungry: bool
+    WholeDay: bool
+    FIES_score: int
+
+  food_coping:
+    # CSI / rCSI coping-strategies battery (GH #332, Family B).  ESS
+    # Section 7 ("Food Security"), household file sect7_hh_w{1,2,3}.dta,
+    # question hh_s7q02_{a..h} = "In the past 7 days, how many days have
+    # you or someone in your HH had to: [strategy]?" (integer 0-7).  This
+    # is the 8-item Coping Strategies Index; it embeds the 5 reduced-CSI
+    # (rCSI) strategies (LessPreferred, BorrowFood, LimitPortion,
+    # RestrictAdults, ReduceMeals) plus 3 survey-specific items
+    # (LimitVariety, NoFood, WholeDay).  Item wording confirmed verbatim
+    # from the ESS3 HH Questionnaire (Section 7, Q2, columns A-H).
+    #
+    # Wired ONLY for the rCSI day-count waves: W1 (2011-12), W2 (2013-14),
+    # W3 (2015-16).  W4 (2018-19) §8 s8q02a..h is a separate coping battery
+    # (future feature); W5 (2021-22) §8 is FAO FIES (wired as
+    # food_security).  Reshape (wide -> long over Strategy) requires a
+    # script => materialize: make.  Recall period: last 7 days.
+    index: (t, i, Strategy)
+    Days: int
+    materialize: make
+
+  anthropometry:
+    # GAP 5 -- NEW item-level feature at (t, i, pid) [individual].  One row
+    # per measured individual from the ESS §3 health module (sect3_hh),
+    # carrying ONLY the REPORTED body measures the WB code feeds into its
+    # zscore06 call (ETH_ESS1.do:1217-1235 and the parallel ESS2-5 blocks):
+    #   Weight      reported weight in kg (hh_s3q22 W1-W3 / s3q37 W4-W5).
+    #   Height      reported height in cm (hh_s3q23 W1-W3 / s3q38 W4-W5);
+    #               the WB data-clean (>200 cm -> NaN) drops unit-error
+    #               outliers (raw §3 carries 971/993 cm typos).
+    #   MUAC        mid-upper-arm circumference -- declared for cross-country
+    #               alignment but legitimately ALL-NaN for Ethiopia: NO ESS
+    #               wave asks a MUAC question.
+    #   Age_months  child age in completed months, and
+    #   Sex         M/F,
+    #               both joined from the §1 roster so the row is
+    #               self-describing for the downstream z-score transform
+    #               (the WB ``cage = age*12``; ``female = sex==2``).
+    #
+    # This is a DISTINCT feature from ``nutrition`` (nutrient intake), NOT a
+    # reuse of it.  The WHO-2006 z-scores (haz06/waz06/whz06/bmiz06) and
+    # wasting/stunting are NOT stored: they require the WHO reference
+    # population and are TRANSFORMS computed at query time over these raw
+    # measures, never data-layer columns.
+    #
+    # Grain is (t, i, pid) -- individual-level.  i/pid match
+    # household_roster exactly (W2/W3 emit household_id2/individual_id2; the
+    # other waves household_id/individual_id), so anthropometry joins the
+    # roster on (t, i, pid).  v is NOT baked in -- the framework auto-joins
+    # it from sample() at query time.  Cross-file join (§3 measures + §1
+    # age/sex) + per-wave var renumbering + within-individual de-dup =>
+    # script (materialize: make).
+    index: (t, i, pid)
+    Weight: float
+    Height: float
+    MUAC:
+      type: float
+      optional: true
+    Age_months: float
+    Sex: str
+    materialize: make
+
+  plot_labor:
+    # GAP 3.2 -- item-level plot labor at (t, i, plot_id, source).  One row
+    # per (plot, labor SOURCE) with source in {family, hired, other},
+    # carrying ONLY reported fields:
+    #   PersonDays  reported person-days of that source applied to the plot.
+    #               The ESS asks plot labor in two modules -- post-PLANTING
+    #               (§3 plot roster sect3_pp: hired pp_s3q28*/s3q30*, family
+    #               pp_s3q27*/s3q29* as weeks x days/week per member, other
+    #               pp_s3q29*/s3q31*) and post-HARVEST (§10 labor sect10_ph:
+    #               hired ph_s10q01*/s10q01*, family ph_s10q02*/s10q02*, other
+    #               ph_s10q03*/s10q03*).  The WB code (ETH_ESS1.do:554-799)
+    #               sums man+woman+child member rows of ONE source to a per-
+    #               source person-day total; THAT per-source total is the
+    #               natural item datum here (like livestock summing within-
+    #               species sub-codes), NOT the banned total_labor_days (which
+    #               is an egen rowtotal ACROSS sources / across PP+PH).  PP and
+    #               PH person-days of the SAME source are summed onto one
+    #               (plot, source) row (the survey's two-season split of that
+    #               source's labor -- WITHIN a single source, not cross-source).
+    #               The §10 file is plot x crop; person-days are summed over
+    #               crops to the plot (our grain is plot, not plot-crop).
+    #   Wage        reported cash daily wage PAID to hired labor (mean of the
+    #               reported man/woman/child wages pp_s3q28_c/f/i (PP) and
+    #               ph_s10q01_c/f/i (PH)).  This is the SURVEYED cash wage, NOT
+    #               the WB valuation_median_wages median-wage IMPUTATION; NaN
+    #               for family / other rows (the survey records no wage there).
+    #
+    # source axis: inline {family, hired, other} labels (3 fixed values,
+    # identical across every ESS wave -- emitted in-script, no org table).
+    # plot_id and i match plot_features / crop_production / plot_inputs
+    # exactly (holder_parcel_field plot_id; i = household_id2 for W2/W3, else
+    # household_id), so plot_labor joins them on (t, i, plot_id).
+    #
+    # NO total_labor_days / total_family_labor_days / total_hired_labor_days
+    # (cross-source / cross-module SUM transforms) and NO hired_labor_value
+    # (median-wage valuation) baked in -- all are transformations over these
+    # item rows (GAP 3 / GAP 7).  Grain is (t, i, plot_id, source); v is NOT
+    # baked in -- the framework auto-joins it from sample() at query time
+    # (plot_labor is household-linked and NOT in the _no_v_join set).  Per-
+    # wave var renumbering (W1-W3 hh_/pp_/ph_ prefix; W4-W5 bare s* stems) +
+    # multi-module within-source sum => script (materialize: make).
+    index: (t, i, plot_id, source)
+    PersonDays: float
+    # Wage is reported only on hired rows where the survey records a cash
+    # daily wage; family / other rows and unreported hired rows are NaN.
+    # Mark optional so the all-null sanity check exempts it on a hypothetical
+    # wage-free wave while the canonical column stays declared.
+    Wage:
+      type: float
+      optional: true
+    materialize: make
+
+  people_last7days:
+    # GAP 3.1 -- item-level individual 7-day activity at (t, i, pid).  One
+    # row per §4 labor-roster member (sect4_hh_w{N}), mirroring Uganda's
+    # existing per-individual schema (the one country we already have for
+    # this feature).  Carries ONLY the REPORTED per-individual data the WB
+    # labor block reads (ETH_ESS1.do:1242-1264):
+    #   farm_work / SOB_work / wage_work  did-this-activity dummies (worked
+    #                 on the HH farm / own non-farm business / for a wage in
+    #                 the last 7 days; nullable bool).  W1-W3 record only
+    #                 HOURS (hh_s4q04/05/07) and the WB recodes a dummy from
+    #                 them (hours>0 -> worked); W4-W5 carry explicit 1/2
+    #                 dummies (s4q05/08/12) separate from the hours.
+    #   farm_hrs / SB_hrs / wage_hrs      reported hours on each activity
+    #                 (hh_s4q04/05/07 W1-W3; s4q06/09/13 W4-W5).
+    #   industry      the single REPORTED wage-work industry Preferred Label
+    #                 (harmonize_industry: Agriculture / Fishing / Mining /
+    #                 Manufacturing / Construction / Services), from the same
+    #                 code (hh_s4q11_b W1-W3 / s4q34d W4-W5) the WB recodes
+    #                 into the six ind_* dummies -- we keep the label (the six
+    #                 dummies are trivially derived from it downstream).
+    #                 Blanked where the member is not employed (the WB gate
+    #                 hh_s4q09==2/.).
+    #   working_age   reported working-age flag (hh_s4q01=="X" W1-W3;
+    #                 s4q00==1 W4-W5; nullable bool).
+    #
+    # i / pid match household_roster exactly (household_id2 / individual_id2
+    # for W2/W3, else household_id / individual_id).  NO household rollups:
+    # the WB nb_members_working_age (egen-total) and the six ind_* dummies
+    # are transformations over these per-individual rows, never stored.  v is
+    # auto-joined from sample() at query time (people_last7days is household-
+    # linked, NOT in _no_v_join).  Per-wave var renumbering + code->industry
+    # harmonization + dummy-from-hours recode => script (materialize: make).
+    index: (t, i, pid)
+    farm_work: bool
+    SOB_work: bool
+    wage_work: bool
+    farm_hrs: float
+    SB_hrs: float
+    wage_hrs: float
+    industry: str
+    working_age: bool
+    materialize: make
+
+  community_prices:
+    # GAP C (maintainer priority) -- item-level SURVEYED FOOD prices at the
+    # CLUSTER grain (t, v, j, u).  One row per (EA/cluster v, food item j,
+    # unit u) from the ESS §10 community price questionnaire (the price
+    # module is sect10b1_com W1 / sect10b2_com W2 / sect10a2_com W3 /
+    # sect10b_com W4-W5).  Carries only REPORTED fields:
+    #   Price     the surveyed price (Birr) the enumerator recorded for the
+    #             item at the cluster market.
+    #   Quantity  the native quantity basis that price refers to (the
+    #             survey's Weight/Amount field, e.g. 3000 Birr for 100 Kg of
+    #             Teff).  Both are carried so the per-unit price (Price /
+    #             Quantity) is a downstream TRANSFORMATION, never baked in --
+    #             exactly as food_acquired carries Quantity + Expenditure and
+    #             food_prices derives the unit value.  NO median/mean across
+    #             clusters, NO community->household imputation (those are
+    #             transformations; this is the raw surveyed cluster price,
+    #             strictly better than the WB EA-median crop_price imputation).
+    #
+    # v axis: the EA/cluster id, in the SAME keyspace as sample().v for the
+    # same wave (ea_id for W1/W4/W5, ea_id2 for W2/W3 -- emitted by the wave
+    # scripts to match cluster_features / sample()), so community_prices.v ==
+    # sample().v for the same cluster and the prices join households via
+    # sample().  v is NATIVE (NOT framework-joined): there is no household i,
+    # so _join_v_from_sample (which gates on i) does not apply -- v is
+    # declared in the index here.
+    #
+    # j axis: harmonize_food Preferred Labels (via the
+    # harmonize_community_price item crosswalk + raw-label fallback), so
+    # community_prices.j JOINS food_acquired.j (consumption) and
+    # crop_production.j (harvest).  Only FOOD items are kept; the community
+    # module's non-food goods (Charcoal, Firewood, soap, Matches, ploughs,
+    # fertilizer, ...) have no harmonize_food label and are dropped (this is
+    # the community-FOOD-price arm of label unification).
+    # u axis: the shared u table Preferred Labels.
+    #
+    # Per-wave source files + per-wave column renaming + code-prefix
+    # stripping + item/unit code->label harmonization + W1 Birr/cents +
+    # whole/decimal arithmetic => script (materialize: make).
+    index: (t, v, j, u)
+    Price: float
+    Quantity: float
+    materialize: make
+
+  # food_expenditures, food_prices, food_quantities are derived at
+  # runtime from food_acquired — see _FOOD_DERIVED in country.py.  Do
+  # NOT register them here (per CLAUDE.md "Derived Tables").
   nutrition: !make

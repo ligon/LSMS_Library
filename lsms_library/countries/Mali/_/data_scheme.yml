@@ -25,6 +25,28 @@ Data Scheme:
   individual_education:
     index: (t, i, pid)
     Educational Attainment: str
+  subjective_well_being:
+    # EHCVM Section 20 'Pauvreté relative' (s20/s20a).  Self-placement on
+    # a 4-point relative-welfare ladder (Très pauvre / Pauvre / Moyen /
+    # Riche) mapped to Own Step 1-4 so higher = better off, consistent
+    # with the Malawi/Cantril ladder.  EHCVM waves only (2018-19, 2021-22).
+    index: (t, i)
+    Own Step: int
+  food_security:
+    # FAO 8-item Food Insecurity Experience Scale (FIES).  EHCVM §8A
+    # 'Sécurité alimentaire', recall period = last 12 months.  Both EHCVM
+    # waves (2018-19, 2021-22) read s08a_me_mli<yr>.dta; items
+    # s08aq01..s08aq08 map IN ORDER to the 8 canonical FIES items.
+    index: (t, i)
+    Worried: bool
+    HealthyDiet: bool
+    FewFoods: bool
+    SkippedMeal: bool
+    AteLess: bool
+    RanOut: bool
+    Hungry: bool
+    WholeDay: bool
+    FIES_score: int
   food_acquired:
     # Canonical post-2026-05-05 (GH #169): s axis carries acquisition
     # source (purchased / produced / inkind / other).  EHCVM 2018-19
@@ -44,9 +66,14 @@ Data Scheme:
     index: (t, v, i, j, u, s)
     Quantity: float
     Expenditure: float
+  # EHCVM visits each household across multiple vagues/passages, each with
+  # its own date.  The canonical interview_date is one date per household
+  # (t, v, i); _normalize_dataframe_index drops the undeclared `visit` level
+  # and collapses the duplicate rows via groupby.first(), keeping the first
+  # visit's date.  (GH #325)
   interview_date:
-    index: (t, visit, i)
-    Int_t: str
+    index: (t, v, i)
+    Int_t: datetime
   panel_ids: !make
   assets:
     index: (t, i, j)
@@ -67,3 +94,266 @@ Data Scheme:
     HowCoped0: str
     HowCoped1: str
     HowCoped2: str
+  food_coping:
+    # Non-FIES food-security: reduced Coping Strategies Index (rCSI)
+    # day-counts (#332).  EACI 2014-15 household questionnaire Section 17
+    # ("Sécurité alimentaire"), recall = last 7 days.  s17q02a..s17q02e
+    # are "nombre de jours" (0-7) the HH used each of the five canonical
+    # CSI strategies; survey code 9 ("Manquant") is dropped.  Long-form:
+    # one row per (t, i, Strategy).  EACI 2014-15 ONLY — the EHCVM waves
+    # (2018-19, 2021-22) use the FAO FIES instrument (food_security) and
+    # have no day-count coping block.  Built by a wave script + a
+    # country-level concatenator (reshape -> materialize: make).
+    index: (t, i, Strategy)
+    Days: int
+    materialize: make
+  plot_features:
+    # Lasting parcel-level characteristics from the EHCVM agriculture
+    # module s16a (GH #167; Mali is the EHCVM reference implementation).
+    # EHCVM waves only: 2018-19 and 2021-22.  The pre-EHCVM EACI waves
+    # (2014-15, 2017-18) use a different instrument and are deferred.
+    # plot_id = "{field_no}_{parcel_no}".  Latitude / Longitude are NOT
+    # emitted — EHCVM s16a has no decimal-degree parcel GPS (s16aq47 is
+    # an area, not a coordinate); deferred as in Uganda.
+    #
+    # Item-attribute audit vs the WB harmonised Plot_dataset (parity GAP 6):
+    # the WB EACI panel carries irrigated / plot_owned / plot_certificate
+    # (already our Irrigated / Tenure / TenureSystem) plus self_reported_area
+    # and the GAEZ-raster plot_slope / soil_fertility_index (geospatial / PCA
+    # transforms — NOT reported, out of scope).  erosion_protection and the
+    # per-plot fallow flag are EACI-instrument items absent from the EHCVM
+    # s16a module these two waves use, so they are not in the source.  Added
+    # the REPORTED s16a item attributes the audit surfaced: SelfReportedArea
+    # (farmer estimate, kept distinct from the GPS-preferred Area) and the
+    # surveyed slope/fertility tags Topography (s16aq19) / SoilFertility
+    # (s16aq20) — the reported analogues of the WB's GAEZ plot_slope /
+    # soil_fertility_index.  No farm_size / nb_plots / nb_fallow_plots /
+    # soil_fertility_index columns — those are transformations.py rollups.
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    SelfReportedArea: float
+    Tenure: str
+    TenureSystem: str
+    SoilType: str
+    Topography: str
+    SoilFertility: str
+    Irrigated: bool
+    materialize: make
+  crop_production:
+    # Item-level harvest, GAP 1 (parity loop).  One row per (t, i, plot,
+    # crop): the REPORTED quantities the survey records, NOT aggregates.
+    # The crop/harvest module lives in the EACI waves only (2014-15 EACI14
+    # s3a/s3b/s1c; 2017-18 EACI17 s7f/s7g/s11f/s11c).  The EHCVM waves
+    # (2018-19, 2021-22) have no harvest block — deferred (the same split
+    # as plot_features, but the opposite two waves).
+    #
+    # plot = "{field}_{parcel}" for seasonal crops; <NA> for perennial
+    # trees (the perennial roster is not on the seasonal field grid).
+    # crop = harmonize_food Preferred Label (food crops REUSE the consumed-
+    # food label so crop_production.j joins food_acquired.j; non-food crops
+    # — Coton, Soja, Voandzou, Dah/Fibre, tree species — get new labels).
+    # u   = harmonize unit label (`u` categorical table).
+    #
+    # NO harvest_kg / yield / main_crop / value-share columns — those are
+    # transformations.py rollups over these item rows.  2017-18 sold qty/
+    # value is recorded at (household, crop) grain (module s7g), so it is
+    # attached at the plot level only for single-plot crops; multi-plot
+    # crops carry NaN sold (see the wave script).  intercropped is recorded
+    # in 2014-15 (s1cq05 Pure/Association) only; NaN in 2017-18.
+    # Built by per-wave scripts + a country-level concatenator.
+    index: (t, i, plot, crop)
+    Quantity: float
+    u: str
+    Quantity_sold: float
+    Value_sold: float
+    planting_month: int
+    harvest_month: int
+    intercropped: bool
+    perennial: bool
+    materialize: make
+  plot_inputs:
+    # Item-level agricultural inputs, GAP 2 (parity loop).  One row per
+    # (t, i, plot, input, crop): the REPORTED inputs the survey records, NOT
+    # aggregates.  The input module lives in the EACI waves only (2014-15
+    # EACI14 s1e/s2c, 2017-18 EACI17 s11c/s7d).  The EHCVM waves (2018-19,
+    # 2021-22) have no agriculture-input block — deferred (same split as
+    # crop_production).
+    #
+    # plot  = "{field}_{parcel}" — the SAME plot id as crop_production /
+    #         plot_features.  crop is set on SEED rows only (the seed's crop,
+    #         harmonize_food Preferred Label); NaN for fertilizer/pesticide
+    #         rows (applied at the plot grain, not per-crop).
+    # input = harmonize_input Preferred Label (Seed / Urea / DAP / NPK /
+    #         Other inorganic / Manure / Compost / Other organic / Pesticide /
+    #         Fungicide / Herbicide / Other phytosanitary).  These are FIXED
+    #         questionnaire slots, not a decoded label column.
+    # u     = harmonize unit label (`u` categorical table).
+    #
+    # Purchased / Quantity_purchased come from the household input-purchase
+    # roster (s2d / s7b, HH grain) for fertilizers, and from the seed module's
+    # paid-for question (s11cq12) in 2017-18; organic-fertilizer Purchased is
+    # also derivable from the plot-level acquisition mode ('Achat').  Improved
+    # is set on seed rows (s1eq04 / s11cq10).
+    #
+    # NO seed_kg / nitrogen_kg / any-use flags / fertilizer totals — those are
+    # transformations.py rollups over these item rows.  Built by per-wave
+    # scripts + a country-level concatenator.
+    index: (t, i, plot, input, crop)
+    Quantity: float
+    u: str
+    Purchased: bool
+    Quantity_purchased: float
+    Improved: bool
+    materialize: make
+  livestock:
+    # Item-level animal roster, GAP 4 (parity loop).  One row per
+    # (t, i, animal): the REPORTED counts the survey records, NOT the WB
+    # single engaged-in-livestock binary (which is groupby(['t','i']).any()
+    # over these rows).  The livestock module lives in the EACI waves only
+    # (2014-15 EACIS4A_p2 / s4a; 2017-18 eaci17_s8ap2 + eaci17_s8b1p2 /
+    # s8a+s8b1).  The EHCVM waves (2018-19, 2021-22) carry no livestock
+    # roster — deferred (the same split as crop_production / plot_inputs).
+    #
+    # animal = harmonize_species Preferred Label, keyed on the survey's own
+    # integer species code (s4aq02 / s8aq02; identical across both EACI
+    # waves).  Mali's roster has a FINER grain than a coarse Cattle/Sheep/
+    # Goats/Poultry rollup (separate bulls/cows/heifers/calves, rams/ewes,
+    # bucks/does, three poultry types) — kept on the `animal` axis so we are
+    # richer than the WB binary AND than a species rollup.  NO v: the
+    # framework's _no_v_join set already excludes 'livestock', so the
+    # canonical grain is (t, i, animal) with no cluster level.
+    #
+    # HeadCount    = number currently in the herd (s4aq04 / s8aq06).
+    # HeadAcquired = number bought in the recall period (s4aq15 / s8b1q10).
+    # HeadSold     = number owned by the HH sold (s4aq22 / s8b1q13).
+    # Value        = gross SALES value (FCFA) where reported (s4aq24 /
+    #                s8b1q14); NaN otherwise — the EACI roster carries NO
+    #                current herd-value question.
+    #
+    # NO TLU / herd-value total / engaged-in-livestock binary — those are
+    # transformations.py rollups over these item rows.  Built by per-wave
+    # scripts + a country-level concatenator.
+    index: (t, i, animal)
+    HeadCount: float
+    HeadAcquired: float
+    HeadSold: float
+    Value: float
+    materialize: make
+  plot_labor:
+    # Item-level plot labor by source, GAP 3a (parity loop).  One row per
+    # (t, i, plot, source): the REPORTED person-days the survey records per
+    # labor source, NOT the WB per-plot collapsed totals
+    # (total_family_labor_days / total_hired_labor_days /
+    # total_other_labor_days / total_labor_days) or the median-wage
+    # valuation (hired_labor_value) — all of those are transformations.py
+    # rollups over these item rows.  The plot-labor module lives in the EACI
+    # waves only (2014-15 EACIMAINOUVRE_p1 [PP, s2b] + EACIS2F_p2 [PH, s2f];
+    # 2017-18 eaci17_s11ep1 [PP, s11e] + eaci17_s7ep2 [PH, s7e]).  The EHCVM
+    # waves (2018-19, 2021-22) carry no plot-labor roster — deferred (the
+    # same wave split as crop_production / plot_inputs / livestock).
+    #
+    # plot   = "{field}_{parcel}" — the SAME plot id as crop_production /
+    #          plot_inputs / plot_features (join on (t, i, plot)).
+    # source = harmonize_labor_source Preferred Label (Family / Hired /
+    #          Other), a FIXED questionnaire block, not a decoded column.
+    #
+    # PersonDays = reported person-days of that source on the plot, summed
+    #              over the two passages (post-planting + post-harvest) and
+    #              the man/woman/child demographic splits within a source
+    #              (PersonDays = persons * days-each, the product the WB
+    #              code forms before summing).  Units: person-days.
+    # Wage       = reported cash paid to HIRED labor (FCFA) where recorded;
+    #              NaN for family / other (no cash wage asked).
+    # Built by per-wave scripts + a country-level concatenator.  v auto-joins
+    # from sample() at API time (plot_labor is NOT in _no_v_join).
+    index: (t, i, plot, source)
+    PersonDays: float
+    Wage: float
+    materialize: make
+  people_last7days:
+    # Per-individual 7-day activity / time-use, GAP 3b (parity loop).  One
+    # row per (t, i, pid), mirroring Uganda's per-individual labor feature
+    # so the six labor-gap countries match the one we already have.  The
+    # REPORTED per-individual values the survey records, NOT any household
+    # roll-up (nb_members_working_age etc., which are transformations).  The
+    # individual labor/time-use module lives in the EACI waves only (2014-15
+    # EACIIND_p1 s04 block; 2017-18 eaci17_s04p1 s4 block, merged with
+    # eaci17_s01p1 for age).  The EHCVM waves (2018-19, 2021-22) carry no
+    # individual labor module — deferred (the same wave split as plot_labor).
+    #
+    # pid — the individual key, matching household_roster's pid (2014-15:
+    #       grappe-menage-s01q00; 2017-18: grappe-exploitation-codeid).  v
+    #       auto-joins from sample() at API time (NOT in _no_v_join).
+    #
+    # farm_work / SOB_work / wage_work — 7-day activity dummies (worked on
+    #       the household farm / own non-farm business / for a wage); NA
+    #       where the question was not answered (Manquant/NSP).
+    # farm_hrs / SB_hrs / wage_hrs — average WEEKLY hours in each activity,
+    #       the WB (months * days * hours) / 52 construction attributed to
+    #       the job of that type.  Units: hours/week.
+    # Industry — primary-job industry on harmonize_industry Preferred
+    #       Labels (Agriculture / Fishing / Mining / Manufacturing /
+    #       Construction / Services), decoded from the WB ind_* split over
+    #       the primary-job industry code (s04q22 / s4q13), exactly as the
+    #       WB code derives it: zeroed (-> NA) for self-employment / own-
+    #       account work and (2017-18) no-work, NA where the industry code
+    #       is missing or outside the six classes.  It is NOT gated on the
+    #       wage_work dummy, so a non-wage primary job in a recognized
+    #       industry still carries a label (faithful to the WB ind_*
+    #       construction; restrict to df.wage_work if a wage-only cut is
+    #       wanted — a transformation, not a stored column).
+    # working_age — nullable bool (the WB working_age = age >= 6 floor).
+    # Built by per-wave scripts + a country-level concatenator.
+    index: (t, i, pid)
+    farm_work: bool
+    SOB_work: bool
+    wage_work: bool
+    farm_hrs: float
+    SB_hrs: float
+    wage_hrs: float
+    Industry: str
+    working_age: bool
+    materialize: make
+  community_prices:
+    # Item-level cluster food prices, GAP C (parity loop).  One row per
+    # (t, v, j, u): the REPORTED price the EACI community price questionnaire
+    # records for a food item in a cluster, NOT a median / mean / index
+    # (those are transformations.py rollups over these rows) and NOT a
+    # community->household price imputation.  CLUSTER-level — there is no
+    # household i, so v is NATIVE (the community questionnaire's grappe, the
+    # SAME keyspace as sample().v, so the price joins households) and is
+    # declared in the index; the framework's _join_v_from_sample only
+    # augments tables that carry i, so it does not fire here.
+    #
+    # The community price module lives in the 2014-15 EACI wave ONLY
+    # (EACIS04_p1 post-planting + EACIS04_p2 post-harvest, rec_type 8,
+    # grappe-level).  The 2017-18 EACI wave dropped the community
+    # questionnaire; the EHCVM waves (2018-19, 2021-22) collect prices only
+    # at the region x milieu IHPC grain (ehcvm_prix), which has no grappe
+    # key and so cannot join the sample().v cluster keyspace — deferred.
+    #
+    # j = harmonize_food Preferred Label, decoded from item label s04q01
+    #     (food items REUSE the consumed-food label so community_prices.j
+    #     joins food_acquired.j / crop_production.j).
+    # u = u-table Preferred Label, decoded from unit label s04q09.
+    # Price    = s04q11, the surveyed price (FCFA) for a Quantity-sized lot.
+    # Quantity = s04q10, the native quantity that Price refers to (e.g. a
+    #            "Sac moyen" lot is 50, a per-kilogramme price is 1); the 999
+    #            loose-retail sentinel is coerced to NA.
+    # Within a cluster the instrument records a separate price per sale-form
+    # variety and per passage; several collapse to the same (j, u).  One
+    # reported price is SELECTED per (t, v, j, u) (post-harvest passage first,
+    # then questionnaire order) — never averaged.  Built by a per-wave script
+    # + a country-level concatenator.
+    #
+    # The wave/var parquets carry a redundant i==v level positioned before j
+    # (see mali.community_prices_finalize): the framework's map_index swaps
+    # j -> i on every read when j is present without i, so an i level keeps j
+    # intact; _normalize_dataframe_index then drops the undeclared i, surfacing
+    # this canonical (t, v, j, u).  Same shim Tanzania/Malawi community_prices
+    # use.
+    index: (t, v, j, u)
+    Price: float
+    Quantity: float
+    materialize: make

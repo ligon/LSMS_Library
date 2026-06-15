@@ -159,6 +159,24 @@ time, and no =u= table needs to be wired into
 =_/categorical_mapping.org=.  The framework's auto-discovery on
 =u= would be a no-op.
 
+**GH #348 fix (2026-06-07).** The country-level =unit_labels.org=
+=.replace()= only catches the *purchase* rows and the production rows
+whose wave already decoded =s8hq13= to a text label.  The *1991--92*
+wave decodes =s8hq13= itself via the wave-level =units= table
+(=1991-92/_/categorical_mapping.org=, =Code | Label=), but that decode
+was silently dead: =get_categorical_mapping(tablename='units')= was
+called with no value column, so =df_data_grabber= returned a
+column-less frame and the dict came back *empty* -- every code passed
+through, and the country-level =.replace()= only mopped up a subset,
+leaving 13 raw codes (1/7/8/9/12/14/16/17/18/19/22/23/25) in =u=.  Two
+one-line fixes in =1991-92/_/food_acquired.py=: (1) request the value
+column -- =get_categorical_mapping(tablename='units', Label='Label')=;
+(2) =s8hq13= reads as float (=1.0=) while the table keys are string
+codes (='1'=), so normalize via =format_id= before lookup
+(=unitsd.get(format_id(x), pd.NA)=), the same pattern used for =j=.
+Result: GhanaLSS =food_acquired= code leaks 13 -> 0; 1991--92 =u= now
+reads Pounds / Basket / Bowl / American tin / Tubers / ... .
+
 There is no =_/conversion_to_kgs.json= for GhanaLSS; the
 food_quantities pipeline for this country is currently a
 work-in-progress (see =food_prices_quantities_and_expenditures.py=
@@ -237,3 +255,48 @@ Ghana's LSMS-ISA participation is through the GhanaSPS (Social Panel Survey), no
 ** TODO household_characteristics.py
 ** TODO food_acquired.py
 ** TODO other_features.py
+
+* subjective_well_being — not available (2026-06-06)
+No GLSS wave (1987-88…2016-17) carries a subjective-well-being / life-evaluation /
+subjective-poverty ladder. GLSS7 §13 is "Governance, Peace, Security" (political
+participation + threat perception), not SWB. Confirmed by a variable-label scan of
+all section files. Resolves the #331 "unknown" → absent. Tracked in #331.
+
+
+* housing — implementable, not yet wired (2026-06-07)
+
+Contrary to an earlier triage (GH #350), GLSS DOES field a dwelling module:
+=g7sec7=/=g7sec7i=/=g7sec7j= (GLSS7 Section 7 "Housing"), =S7.DTA=/=SEC7.DTA=
+(earlier waves), plus =04_GHA_EXPHOUS= (housing expenditure).  The data is
+present in-repo but no =housing= feature is wired.  A future =housing=
+extractor is feasible — this is a feature gap, not an absence.
+
+* individual_education — wave coverage (2026-06-08, GH #109)
+
+=individual_education= (Educational Attainment from each round's Section 2A)
+is now wired for *5* of the 7 waves: 1998-99, *2005-06* (newly added),
+2012-13, 2016-17 — and was already absent-by-design only for the two GLSS1/2
+rounds.  Source files and label handling:
+
+| Wave    | File              | Var   | Labels                                    |
+|---------+-------------------+-------+-------------------------------------------|
+| 1998-99 | =SEC2A.DTA=       | s2aq2 | hand-decoded (no embedded value labels)   |
+| 2005-06 | =parta/sec2a.dta= | s2aq2 | embedded value labels (grade-level scheme)|
+| 2012-13 | =PARTA/SEC2a.dta= | s2aq2 | embedded value labels                     |
+| 2016-17 | =g7sec2.dta=      | s2aq2 | embedded value labels                     |
+
+Still NOT wired (genuine blockers, not feature gaps to close cheaply):
+
+- *1987-88 / 1988-89* (GLSS1/GLSS2): the education module lives in
+  =Y02A.DAT=/=Y02B.DAT= fixed-format =.DAT= files (parsed via =.DCT=
+  dictionaries), which are not in the local DVC blob cache and carry no
+  embedded value labels.  Wiring would require materializing those blobs and
+  hand-building a GLSS1/2 grade→label map from the questionnaire — but the
+  GLSS1/2 questionnaires are scanned-image PDFs with no text layer (same
+  blocker noted for =housing= above), so the codes cannot be reliably decoded.
+- *1991-92* (GLSS3): the cached =S2.DTA= blob is a cover/control file
+  (interviewer codes + interview dates), NOT the Section-2 education roster.
+  The GLSS3 person-level education module is among the ~140 un-cached blobs,
+  GLSS3 =.dta= files carry NO embedded value labels, and the correct file is
+  not identifiable from the cached set, so it is left unwired rather than
+  guessed.

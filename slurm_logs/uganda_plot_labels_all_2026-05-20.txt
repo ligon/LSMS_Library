@@ -1,0 +1,233 @@
+
+========== Wave 2005-06 ==========
+  --- AGSEC2A.dta ---
+    'a2aq4'                  size of this parcel in acres gps with two decimal digits
+    'a2aq5'                  size of this parcel in acres farmer estimation with decimal
+    'a2aq7'                  tenure system  vl={1='freehold', 2='leasehold', 3='mailo', 4='customary', 5='other'}
+    'a2aq8'                  how did u acquire this parcel  vl={1='purchased', 2="inherited or gift from head's family", 3="inherited or gift from spouse's family", 4='cleared', 5='other'}
+    'a2aq9'                  in which year did u first acquire this parcel
+  --- AGSEC2B.dta ---
+    'a2bq4'                  size of this parcel in acres - gps with two decimal digits
+    'a2bq5'                  size of this parcel in acres - farmer estimation with two de
+    'a2bq7'                  tenure system  vl={1='freehold', 2='leasehold', 3='mailo', 4='customary', 5='other'}
+    'a2bq8'                  how did u acquire this pacel  vl={1='purchased', 2="inherited or gift from head's family", 3="inherited or gift from spouse's family", 4='agreement with land/use rights owner', 5='without agreement with land/use rights owner', 6='other'}
+    'a2bq11'                 would u b willing to buy full ownership right to this parcel  vl={1='yes', 2='no'}
+
+========== Wave 2009-10 ==========
+  --- AGSEC2A.dta ---
+    'a2aq4'                  Size of the Parcel in acres- GPS
+    'a2aq5'                  Size of the Parcel in acres- Farmer estimation
+    'a2aq7'                  Tenure system  vl={1='Freehold', 2='Leasehold', 3=' Mailo', 4='Customary', 6='Other (specify'}
+    'a2aq8'                  How did you acquire this parcel?  vl={1='Purchased', 2='Inherited or Received as gift', 3='Leased- in', 4='Just walked in (cleared)', 5='Do not know', 6='Other (specify'}
+    'a2aq9'                  In which year did you first acquire this parcel?
+    'a2aq18'                 What soil type is I in this parcel?  vl={1='Good', 2='Fair', 3='Poor', 6='other'}
+    'a2aq19'                 What soil type/land quality is this parcel?
+    'a2aq20'                 What is the main water source to this parcel?  vl={1='Irrigated', 2='Rain-fed', 3='Swamp/wetland'}
+    'a2aq24'                 Is there any erosion control/water harvesting facility on th
+    'a2aq26a'                Who has the ownership/rights...? (2009/10 Roster Line Number)
+    'a2aq26b'                Who has the ownership/rights...? (2009/10 Roster Line Number)
+  --- AGSEC2B.dta ---
+    'a2bq4'                  Size of this parcel in acres-GPS with two decimal digits
+    'a2bq5'                  Size of this parcel in acres- Farmer estimation
+    'a2bq7'                  Tenure  vl={1='Freehold', 2='Leasehold', 3='Mailo', 4='Customary', 6='Other (specify)'}
+    'a2bq8'                  How did you acquire this parcel?  vl={1='Agreement with land/use rights owner', 2='Without agreement with land/use rights owner', 6='Other (specify)'}
+    'a2bq11'                 Would you willingly buy full ownership rights to this parcel  vl={1='Yes', 2='No'}
+    'a2bq17'                 What soil type is this parcel?  vl={1='Sand loam', 2='Sandy clay loam', 3='Black clay', 6='Other'}
+    'a2bq18'                 What soil quality is in this parcel  vl={1='Good', 2='Fair', 3='Poor', 4='Others'}
+    'a2bq19'                 What is the main water source to this parcel?  vl={1='Irrigated', 2='Rain-fed', 3='Swamp/Wetland'}
+    'a2bq23'                 Is there any erosion control/water harvesting facility on th
+
+========== Wave 2010-11 ==========
+  --- AGSEC2A.dta ---
+    'a2aq4'                  Size of the Parcel in acres- GPS
+    'a2aq5'                  Size of the Parcel in acres- Farmer estimation
+    'a2aq7'                  Tenure system  vl={1='Freehold', 2='Leasehold', 3=' Mailo', 4='Customary', 6='Other (specify'}
+    'a2aq8'                  How did you acquire this parcel?  vl={1='Purchased', 2='Inherited or Received as gift', 3='Leased- in', 4='Just walked in (cleared)', 5='Do not know', 6='Other (specify'}
+    'a2aq9'                  In which year did you first acquire this parcel?
+    'a2aq18'                 What soil type is I in this parcel?  vl={1='Good', 2='Fair', 3='Poor', 6='other'}
+    'a2aq19'                 What soil type/land quality is this parcel?
+    'a2aq20'                 What is the main water source to this parcel?  vl={1='Irrigated', 2='Rain-fed', 3='Swamp/wetland'}
+    'a2aq24a'                Is there any erosion control/water harvesting facility on this parcel?
+    'a2aq24b'                Is there any erosion control/water harvesting facility on this parcel?
+    'a2aq26a'                Who has the ownership/rights to this parcel?
+    'a2aq26b'                Who has the ownership/rights to this parcel?
+    'a2aq29'                 Have you ever been concerned that some body might dispute your ownership/use rig  vl={1='Yes', 2='No'}
+  --- AGSEC2B.dta ---
+    'a2bq4'                  Size of this parcel in acres-GPS with two decimal digits
+    'a2bq5'                  Size of this parcel in acres- Farmer estimation
+    'a2bq7'                  Tenure  vl={1='Freehold', 2='Leasehold', 3='Mailo', 4='Customary', 6='Other (specify)'}
+    'a2bq8'                  How did you acquire this parcel?  vl={1='Agreement with land/use rights owner', 2='Without agreement with land/use rights owner', 6='Other (specify)'}
+    'a2bq11'                 Would you willingly buy full ownership rights to this parcel?  vl={1='Yes', 2='No'}
+    'a2bq17'                 What soil type is this parcel?  vl={1='Sand loam', 2='Sandy clay loam', 3='Black clay', 6='Other'}
+    'a2bq18'                 What soil/land quality is in this parcel  vl={1='Good', 2='Fair', 3='Poor', 4='Others'}
+    'a2bq19'                 What is the main water source to this parcel?  vl={1='Irrigated', 2='Rain-fed', 3='Swamp/Wetland'}
+    'a2bq23a'                Is there any erosion control/water harvesting facility on this parcel?
+    'a2bq23b'                Is there any erosion control/water harvesting facility on this parcel?
+
+========== Wave 2011-12 ==========
+  --- AGSEC2A.dta ---
+    'a2aq4'                  Size of the Parcel in Acre-GPS
+    'a2aq5'                  Size of this parcel in acres- Farmer estimation
+    'a2aq7'                  Tenure System  vl={1='Freehold', 2='Leasehold', 3='Mailo', 4='Customary', 6='Other(Specify)'}
+    'a2aq8'                  How did you acquire this parcel?  vl={1='Purchased', 2='Inherited or received as gift', 3='Leased-in', 4='Just walked in (cleared)', 5='Do not know', 6='Other (Specify)'}
+    'a2aq9'                  In which year did you first acquire this parcel?
+    'a2aq16'                 What soil type is this parcel?  vl={1='Sand Loam', 2='Sandy Clay Loam', 3='Black Clay', 4='Other (Specify)'}
+    'a2aq17'                 What soil/land quality is in this parcel?  vl={1='Good', 2='Fair', 3='Poor'}
+    'a2aq18'                 What is the main water source to this parcel?  vl={1='sand loam', 2='Sandy clay loam', 3='Black clay', 6='Others'}
+    'a2aq22a'                Is there any erosion control/water harvesting facility on this parcel?  vl={1='Terraces', 2='Gabions/Sandbags', 3='Vetiver grass', 4='Tree belts', 5='Water harvest bunds', 6='Drainage ditches', 7='Dam', 8='Stone bunds', 9='Earth bunds', 10='None', 11='Other (Specify)'}
+    'a2aq22b'                Is there any erosion control/water harvesting facility on this parcel?  vl={1='Terraces', 2='Gabions/Sandbags', 3='Vetiver grass', 4='Tree belts', 5='Water harvest bunds', 6='Drainage ditches', 7='Dam', 8='Stone bunds', 9='Earth bunds', 10='None', 11='Other (Specify)'}
+    'a2aq24a'                Who has the Ownership/use rights to this parcel?
+    'a2aq24b'                Who has the Ownership/use rights to this parcel?
+    'a2aq25'                 Have you ever been concerned that somebody might dispute your ownership/use righ  vl={1='Yes', 2='No'}
+    'Visit_GPS_Parcel'       Were you able to visit the parcel to record the GPS measurement?  vl={1='Yes', 2='No'}
+    'GPS_Not_Captured'       Why was the GPS measurement not captured?  vl={1='Outside of LC1', 2='Inside LC1 but owner refused', 3='Inside LC1 but not accessible', 4='Other (specify)'}
+    'GPS_Manual'             Was the handheld GPS device able to capture the coordinates manually?  vl={1='Yes', 2='No'}
+    'Latitude_N_S'           Latitude - North or South  vl={1='N', 2='S'}
+    'Latitude_Degrees'       Latitude - Degrees (2 digits)
+    'Latitude_Minutes'       Latitude_Minutes: Latitude - Minutes (2 digits)
+    'Latitude_Seconds'       Latitude_Seconds: Latitude - Seconds (3 digits)
+    'Longitude_Degrees'      Longitude - Degrees (2 digits)
+    'Longitude_Minutes'      Longitude - Minutes (2 digits)
+    'Longitude_Seconds'      Longitude_Seconds: Longitude - Seconds (3 digits)
+    'Number_Satellites'      What was the number of satellites tracked at the time of GPS measurement?
+  --- AGSEC2B.dta ---
+    'a2bq1'                  Ownership  vl={1='Owned', 2='Access / Use Rights'}
+    'a2bq4'                  Size of the Parcel in Acre-GPS
+    'a2bq5'                  Size of this parcel in acres- Farmer estimation
+    'a2bq7'                  Tenure System  vl={1='Freehold', 2='Leasehold', 3='Mailo', 4='Customary', 6='Other(Specify)'}
+    'a2bq8'                  How did you acquire this parcel?  vl={1='Agreement with land/use rights owner', 2='Without agreement with land/use rights owner', 6='Other (Specify)'}
+    'a2bq14'                 What soil type is this parcel?  vl={1='Sand Loam', 2='Sandy Clay Loam', 3='Black Clay', 4='Other (Specify)'}
+    'a2bq15'                 What soil type is this parcel?  vl={1='Good', 2='Fair', 3='Poor'}
+    'a2bq16'                 What is the main water source to this parcel?  vl={1='Irrigated', 2='Rain-fed', 3='Swap/Wetland'}
+    'a2bq20a'                Is there any erosion control/water harvesting facility on this parcel?  vl={1='Terraces', 2='Gabions/Sandbags', 3='Vetiver grass', 4='Tree belts', 5='Water harvest bunds', 6='Drainage ditches', 7='Dam', 8='Stone bunds', 9='Earth bunds', 10='None', 11='Other (Specify)'}
+    'a2bq20b'                Is there any erosion control/water harvesting facility on this parcel?  vl={1='Terraces', 2='Gabions/Sandbags', 3='Vetiver grass', 4='Tree belts', 5='Water harvest bunds', 6='Drainage ditches', 7='Dam', 8='Stone bunds', 9='Earth bunds', 10='None', 11='Other (Specify)'}
+    'a2bq21a'                Who has the Ownership/use rights to this parcel?
+    'a2bq21b'                Who has the Ownership/use rights to this parcel?
+    'Visit_GPS_Parcel'       Were you able to visit the parcel to record the GPS measurement?  vl={1='Yes', 2='No'}
+    'GPS_Not_Captured'       Why was the GPS measurement not captured?  vl={1='Outside of LC1', 2='Inside LC1 but owner refused', 3='Inside LC1 but not accessible', 4='Other (specify)'}
+    'GPS_Manual'             Was the handheld GPS device able to capture the coordinates manually?  vl={1='Yes', 2='No'}
+    'Latitude_N_S'           Latitude - North or South  vl={1='N', 2='S'}
+    'Latitude_Degrees'       Latitude - Degrees (2 digits)
+    'Latitude_Minutes'       Latitude_Minutes: Latitude - Minutes (2 digits)
+    'Latitude_Seconds'       Latitude_Seconds: Latitude - Seconds (3 digits)
+    'Longitude_Degrees'      Longitude - Degrees (2 digits)
+    'Longitude_Minutes'      Longitude - Minutes (2 digits)
+    'Longitude_Seconds'      Longitude_Seconds: Longitude - Seconds (3 digits)
+    'Number_Satellites'      What was the number of satellites tracked at the time of GPS measurement?
+
+========== Wave 2013-14 ==========
+  --- AGSEC2A.dta ---
+    'a2aq1owned'             A2BQ1:Ownership  vl={1='Owned', 2='Access / Use Rights'}
+    'a2aq4'                  A2BQ4: Size of the Parcel in Acres
+    'a2aq5'                  A2BQ5:Size of this parcel in acres- Farmer estimation
+    'a2aq5_2'                Were you able to visit the parcel to record the GPS measurement?  vl={1='Yes', 2='No'}
+    'a2aq5_2_1'              Why was the GPS measurement not captured?  vl={1='Outside of LC1', 2='Inside LC1 but owner refused', 3='Inside LC1 but not accessible', 4='Other (specify)'}
+    'a2aq7'                  A2BQ6:Tenure System  vl={1='Freehold', 2='Leasehold', 3='Mailo', 4='Customary', 6='Other(Specify)'}
+    'a2aq8'                  A2Aq8:How did you acquire this parcel?  vl={1='Purchased', 2='Inherited or received as gift', 3='Leased-in', 4='Just walked in (cleared)', 5='Do not know', 6='Other (Specify)'}
+    'a2aq9'                  A2AQ9:In which year did you first acquire this parcel?
+    'a2aq16'                 A2BQ14:What soil type is this parcel?  vl={1='Sand Loam', 2='Sandy Clay Loam', 3='Black Clay', 6='Other (Specify)'}
+    'a2aq17'                 A2BQ15:What soil/land quality is in this parcel?  vl={1='Good', 2='Fair', 3='Poor'}
+    'a2aq18'                 A2BQ16:What is the main water source to this parcel?  vl={1='Irrigated', 2='Rain-fed', 3='Swamp/Wetland'}
+    'a2aq22a'                A2BQ20A:Is there any erosion control/water harvesting facility on this parcel?  vl={1='Terraces', 2='Gabions/Sandbags', 3='Vetiver grass', 4='Tree belts', 5='Water harvest bunds', 6='Drainage ditches', 7='Dam', 8='None', 9='Stone bunds', 10='Earth bunds', 11='Other (Specify)'}
+    'a2aq22b'                A2BQ20B:Is there any erosion control/water harvesting facility on this parcel?  vl={1='Terraces', 2='Gabions/Sandbags', 3='Vetiver grass', 4='Tree belts', 5='Water harvest bunds', 6='Drainage ditches', 7='Dam', 8='None', 9='Stone bunds', 10='Earth bunds', 11='Other (Specify)'}
+    'a2aq24b'                A2A24B:Who has the Ownership rights to <b> [A2BQ3]</b> Parcel?<font color=red>(2
+    'a2aq25'                 A2AQ25:Have you ever been concerned that somebody might dispute your  ownership/  vl={1='Yes', 2='No'}
+  --- AGSEC2B.dta ---
+    'a2bq1owned'             A2BQ1:Ownership  vl={1='Owned', 2='Access / Use Rights'}
+    'a2bq4'                  A2BQ4: Size of the Parcel in Acres
+    'a2bq5'                  A2BQ5:Size of this parcel in acres- Farmer estimation
+    'a2bq5_2_1'              Why was the GPS measurement not captured?  vl={1='Outside of LC1', 2='Inside LC1 but owner refused', 3='Inside LC1 but not accessible', 4='Other (specify)'}
+    'a2bq5_2'                Were you able to visit the parcel to record the GPS measurement?  vl={1='Yes', 2='No'}
+    'a2bq7'                  A2BQ6:Tenure System  vl={1='Freehold', 2='Leasehold', 3='Mailo', 4='Customary', 6='Other(Specify)'}
+    'a2bq8'                  A2BQ8:How did you acquire this parcel?  vl={1='Agreement with land/use rights owner', 2='Without agreement with land/use rights owner', 6='Other (Specify)'}
+    'a2bq14'                 A2BQ14:What soil type is this parcel?  vl={1='Sand Loam', 2='Sandy Clay Loam', 3='Black Clay', 6='Other (Specify)'}
+    'a2bq15'                 A2BQ15:What soil/land quality is in this parcel?  vl={1='Good', 2='Fair', 3='Poor'}
+    'a2bq16'                 A2BQ16:What is the main water source to this parcel?  vl={1='Irrigated', 2='Rain-fed', 3='Swamp/Wetland'}
+    'a2bq20a'                A2BQ20A:Is there any erosion control/water harvesting facility on this parcel?  vl={1='Terraces', 2='Gabions/Sandbags', 3='Vetiver grass', 4='Tree belts', 5='Water harvest bunds', 6='Drainage ditches', 7='Dam', 8='None', 9='Stone bunds', 10='Earth bunds', 11='Other (Specify)'}
+    'a2bq20b'                A2BQ20B:Is there any erosion control/water harvesting facility on this parcel?  vl={1='Terraces', 2='Gabions/Sandbags', 3='Vetiver grass', 4='Tree belts', 5='Water harvest bunds', 6='Drainage ditches', 7='Dam', 8='None', 9='Stone bunds', 10='Earth bunds', 11='Other (Specify)'}
+
+========== Wave 2015-16 ==========
+  --- AGSEC2A.dta ---
+    'a2aq1owned'             A2bq1:ownership  vl={1='Owned', 2='Access / Use Rights'}
+    'a2aq4'                  A2bq4: size of the parcel in acres
+    'a2aq5'                  A2bq5:size of this parcel in acres- farmer estimation
+    'a2aq7'                  A2bq6:tenure system  vl={1='Freehold', 2='Leasehold', 3='Mailo', 4='Customary', 6='Other(Specify)'}
+    'a2aq8'                  A2aq8:how did you acquire this parcel?  vl={1='Purchased', 2='Inherited or received as gift', 3='Leased-in', 4='Just walked in (cleared)', 5='Do not know', 6='Other (Specify)'}
+    'a2aq9'                  A2aq9:in which year did you first acquire this parcel?  vl={999='missing year'}
+    'a2aq16'                 A2bq14:what soil type is this parcel?  vl={1='Sand Loam', 2='Sandy Clay Loam', 3='Black Clay', 6='Other (Specify)'}
+    'a2aq17'                 A2bq15:what soil/land quality is in this parcel?  vl={1='Good', 2='Fair', 3='Poor'}
+    'a2aq18'                 A2bq16:what is the main water source to this parcel?  vl={1='Irrigated', 2='Rain-fed', 3='Swamp/Wetland'}
+    'a2aq22a'                A2bq20a:is there any erosion control/water harvesting facility on this parcel?  vl={1='Terraces', 2='Gabions/Sandbags', 3='Vetiver grass', 4='Tree belts', 5='Water harvest bunds', 6='Drainage ditches', 7='Dam', 8='None', 9='Stone bunds', 10='Earth bunds', 11='Other (Specify)'}
+    'a2aq22b'                A2bq20b:is there any erosion control/water harvesting facility on this parcel?  vl={1='Terraces', 2='Gabions/Sandbags', 3='Vetiver grass', 4='Tree belts', 5='Water harvest bunds', 6='Drainage ditches', 7='Dam', 8='None', 9='Stone bunds', 10='Earth bunds', 11='Other (Specify)'}
+    'a2aq24b'                A2a24b:who has the ownership rights to <b> [a2bq3]</b> parcel?<font color=red>(2  vl={99999999='owner not part of the household'}
+    'a2aq25'                 A2aq25:have you ever been concerned that somebody might dispute your  ownership/  vl={1='Yes', 2='No'}
+  --- AGSEC2B.dta ---
+    'a2bq1owned'             A2bq1:ownership  vl={1='Owned', 2='Access / Use Rights'}
+    'a2bq4'                  A2bq4: size of the parcel in acres
+    'a2bq5'                  A2bq5:size of this parcel in acres- farmer estimation
+    'a2bq7'                  A2bq6:tenure system  vl={1='Freehold', 2='Leasehold', 3='Mailo', 4='Customary', 6='Other(Specify)'}
+    'a2bq8'                  A2bq8:how did you acquire this parcel?  vl={1='Agreement with land/use rights owner', 2='Without agreement with land/use rights owner', 6='Other (Specify)'}
+    'a2bq14'                 A2bq14:what soil type is this parcel?  vl={1='Sand Loam', 2='Sandy Clay Loam', 3='Black Clay', 6='Other (Specify)'}
+    'a2bq15'                 A2bq15:what soil/land quality is in this parcel?  vl={1='Good', 2='Fair', 3='Poor'}
+    'a2bq16'                 A2bq16:what is the main water source to this parcel?  vl={1='Irrigated', 2='Rain-fed', 3='Swamp/Wetland'}
+    'a2bq20a'                A2bq20a:is there any erosion control/water harvesting facility on this parcel?  vl={1='Terraces', 2='Gabions/Sandbags', 3='Vetiver grass', 4='Tree belts', 5='Water harvest bunds', 6='Drainage ditches', 7='Dam', 8='None', 9='Stone bunds', 10='Earth bunds', 11='Other (Specify)'}
+    'a2bq20b'                A2bq20b:is there any erosion control/water harvesting facility on this parcel?  vl={1='Terraces', 2='Gabions/Sandbags', 3='Vetiver grass', 4='Tree belts', 5='Water harvest bunds', 6='Drainage ditches', 7='Dam', 8='None', 9='Stone bunds', 10='Earth bunds', 11='Other (Specify)'}
+    'Visit_GPS_Parcel'       Were you able to visit the parcel to record the gps measurement?  vl={1='Yes', 2='No'}
+    'GPS_Not_Captured'       Why was the gps measurement not captured?  vl={1='Outside of LC1', 2='Inside LC1 but owner refused', 3='Inside LC1 but not accessible', 4='Other (specify)'}
+    'GPS_Manual'             Was the handheld gps device able to capture the coordinates manually?  vl={1='Yes', 2='No'}
+
+========== Wave 2018-19 ==========
+  --- AGSEC2A.dta ---
+    's2aq3_1a'               3.1 Has size of [PARCEL] increased, remained the same or decreased since last wa  vl={1='Increased', 2='Remained the same', 3='Decreased'}
+    's2aq4'                  4. Size of this parcel in acres? GPS with two decimal digits
+    's2aq5'                  5. Size of this parcel in acres? Farmer estimation with two decimal digits
+    's2aq7'                  7. Tenure system  vl={1='Freehold', 2='Leasehold', 3='Mailo', 4='Customary', 6='Other (specify)'}
+    's2aq8'                  8. How did you acquire this parcel?  vl={1='Purchased', 2='Inherited or Received as gift', 3='Leased-in', 4='Just walked in (cleared)', 5='Do not know', 6='Given by local authorities', 7='Given by government', 8='Agreement with land/use rights owner', 9='Without agreement with land/use rights owner', 96='Other(specify)'}
+    's2aq9'                  9. In which year did you first acquire this parcel?  vl={999='missing year'}
+    's2aq16'                 16. What soil type is in this parcel?  vl={1='Sand loam', 2='Sandy clay loam', 3='Black clay', 4='Other (Specify)'}
+    's2aq17'                 17. What soil/land quality is this parcel?  vl={1='Good', 2='Fair', 3='Poor'}
+    'a2aq18'                 18. What is the main water source to this parcel?  vl={1='Irrigated', 2='Rain-fed', 3='Swamp/wetland'}
+    's2aq22a'                Is there any erosion control/ water harvesting facility on this parcel? (1/2)  vl={1='terra', 2='gabio', 3='vetiv', 4='tree', 5='water', 6='drain', 7='dam', 8='none', 9='stone', 10='earth'}
+    's2aq22b'                Is there any erosion control/ water harvesting facility on this parcel? (2/2)  vl={1='terra', 2='gabio', 3='vetiv', 4='tree', 5='water', 6='drain', 7='dam', 8='none', 9='stone', 10='earth'}
+    'a2aq31'                 31. In which year did your household acquire the formal title or certificate for
+    's2aq24__0'              Who has the Ownership rights to this parcel?  vl={99999999='owner not part of the household'}
+    's2aq24__1'              Who has the Ownership rights to this parcel?
+    'a2aq25'                 25. Have you ever been concerned that somebody might dispute your ownership/ use  vl={1='Yes', 2='No'}
+    'a2aq37'                 37. How likely do you think that there would be disagreement over the ownership  vl={1='Not at all (0%)', 2='Somewhat likely (25%)', 3='Likely (50%)', 4='Very likely (75%)', 5='Certainly, for sure (100%)'}
+  --- AGSEC2B.dta ---
+    's2aq03_1'               3.1 Has size of [PARCEL] increased, remained the same or decreased since last wa  vl={1='Increased', 2='Remained the same', 3='Decreased'}
+    's2aq04'                 4. Size of this parcel in acres? GPS with two decimal digits
+    's2aq05'                 5. Size of this parcel in acres? Farmer estimation with two decimal digits
+    's2aq07'                 7. Tenure system  vl={1='Freehold', 2='Leasehold', 3='Mailo', 4='Customary', 6='Other (specify)'}
+    's2aq08'                 8. How did you acquire this parcel?  vl={1='Purchased', 2='Inherited or Received as gift', 3='Leased-in', 4='Just walked in (cleared)', 5='Do not know', 6='Given by local authorities', 7='Given by government', 8='Agreement with land/use rights owner', 9='Without agreement with land/use rights owner', 96='Other(specify)'}
+    's2aq16'                 16. What soil type is in this parcel?  vl={1='Sand loam', 2='Sandy clay loam', 3='Black clay', 4='Other (Specify)'}
+    's2aq17'                 17. What soil/land quality is this parcel?  vl={1='Good', 2='Fair', 3='Poor'}
+    'a2aq18'                 18. What is the main water source to this parcel?  vl={1='Irrigated', 2='Rain-fed', 3='Swamp/wetland'}
+    's2aq22a'                Is there any erosion control/ water harvesting facility on this parcel? (1/2)  vl={1='terra', 2='gabio', 3='vetiv', 4='tree', 5='water', 6='drain', 7='dam', 8='none', 9='stone', 10='earth'}
+    's2aq22b'                Is there any erosion control/ water harvesting facility on this parcel? (2/2)  vl={1='terra', 2='gabio', 3='vetiv', 4='tree', 5='water', 6='drain', 7='dam', 8='none', 9='stone', 10='earth'}
+
+========== Wave 2019-20 ==========
+  --- agsec2a.dta ---
+    's2aq03_1a'              3.1 Has size of [PARCEL] increased, remained the same or decreased since last wa  vl={1='Increased', 2='Remained the same', 3='Decreased'}
+    's2aq4'                  4. Size of this parcel in acres? GPS with two decimal digits
+    's2aq5'                  5. Size of this parcel in acres? Farmer estimation with two decimal digits
+    's2aq7'                  7. Tenure system  vl={1='Freehold', 2='Leasehold', 3='Mailo', 4='Customary', 6='Other (specify)'}
+    's2aq8'                  8. How did you acquire this parcel?  vl={1='Purchased', 2='Inherited or Received as gift', 3='Leased-in', 4='Just walked in (cleared)', 5='Do not know', 6='Given by local authorities', 7='Given by government', 8='Agreement with land/use rights owner', 9='Without agreement with land/use rights owner', 96='Other(specify)'}
+    's2aq9'                  9. In which year did you first acquire this parcel?  vl={999='missing year'}
+    'a2aq18'                 18. What is the main water source to this parcel?  vl={1='Irrigated', 2='Rain-fed', 3='Swamp/wetland'}
+    's2aq22a'                22a.Is there any erosion control/water harvesting facility on this parcel? (1/2)  vl={1='terra', 2='gabio', 3='vetiv', 4='tree', 5='water', 6='drain', 7='dam', 8='none', 9='stone', 10='earth'}
+    's2aq22b'                22b.Is there any erosion control/water harvesting facility on this parcel? (2/2)  vl={1='terra', 2='gabio', 3='vetiv', 4='tree', 5='water', 6='drain', 7='dam', 8='none', 9='stone', 10='earth'}
+    'a2aq31'                 31. In which year did your household acquire the formal title or certificate for
+    's2aq24__0'              24a. Who has the Ownership rights to this parcel? - PID 1?  vl={99999999='owner not part of the household'}
+    's2aq24__1'              24b. Who has the Ownership rights to this parcel? - PID 2?
+    'a2aq25'                 25. Have you ever been concerned that somebody might dispute your ownership/ use  vl={1='Yes', 2='No'}
+    'a2aq37'                 37. How likely do you think that there would be disagreement over the ownership  vl={1='Not at all (0%)', 2='Somewhat likely (25%)', 3='Likely (50%)', 4='Very likely (75%)', 5='Certainly, for sure (100%)'}
+  --- agsec2b.dta ---
+    's2aq03_1'               3.1 Has size of [PARCEL] increased, remained the same or decreased since last wa  vl={1='Increased', 2='Remained the same', 3='Decreased'}
+    's2aq04'                 4. Size of this parcel in acres? GPS with two decimal digits
+    's2aq05'                 5. Size of this parcel in acres? Farmer estimation with two decimal digits
+    's2aq07'                 7. Tenure system  vl={1='Freehold', 2='Leasehold', 3='Mailo', 4='Customary', 6='Other (specify)'}
+    's2aq08'                 8. How did you acquire this parcel?  vl={1='Purchased', 2='Inherited or Received as gift', 3='Leased-in', 4='Just walked in (cleared)', 5='Do not know', 6='Given by local authorities', 7='Given by government', 8='Agreement with land/use rights owner', 9='Without agreement with land/use rights owner', 96='Other(specify)'}
+    'a2aq18'                 18. What is the main water source to this parcel?  vl={1='Irrigated', 2='Rain-fed', 3='Swamp/wetland'}
+    's2aq22a'                20a. Is there any erosion control/ water harvesting facility on this parcel? (1/  vl={1='terra', 2='gabio', 3='vetiv', 4='tree', 5='water', 6='drain', 7='dam', 8='none', 9='stone', 10='earth'}
+    's2aq22b'                20b. Is there any erosion control/ water harvesting facility on this parcel? (2/  vl={1='terra', 2='gabio', 3='vetiv', 4='tree', 5='water', 6='drain', 7='dam', 8='none', 9='stone', 10='earth'}

@@ -37,3 +37,145 @@ household_roster:
         Birthplace: s1q11
         Relationship: s1q3
         MonthsAway: s1q22
+
+interview_date:
+    file: g7sec0.dta
+    idxvars:
+        i:
+            - clust
+            - nh
+    myvars:
+        Int_t:
+            - ddate
+            - mdate
+            - ydate
+
+individual_education:
+    file: g7sec2.dta
+    idxvars:
+        v: clust
+        i:
+            - clust
+            - nh
+        pid: pid
+    myvars:
+        # s2aq2 = "highest grade completed"; value labels are embedded in the
+        # .dta and decoded automatically by get_dataframe().
+        Educational Attainment: s2aq2
+
+food_security:
+    # GLSS7 Section 9C 'Household Food Insecurity' = the FAO FIES 8-item
+    # battery, 12-month recall.  s9cq1..s9cq8 are in canonical FAO order
+    # (s9cq6 = "household ran out of food" confirms the alignment).
+    # Each item: Yes->True, No->False, "Don't Know"/Refused/NaN->NA
+    # (binarized by the same-named formatting fn in mapping.py).
+    file: g7sec9c.dta
+    idxvars:
+        i:
+            - clust
+            - nh
+    myvars:
+        Worried: s9cq1
+        HealthyDiet: s9cq2
+        FewFoods: s9cq3
+        SkippedMeal: s9cq4
+        AteLess: s9cq5
+        RanOut: s9cq6
+        Hungry: s9cq7
+        WholeDay: s9cq8
+        FIES_score:
+            - s9cq1
+            - s9cq2
+            - s9cq3
+            - s9cq4
+            - s9cq5
+            - s9cq6
+            - s9cq7
+            - s9cq8
+
+plot_features:
+    # Section 8B (Agricultural land) is a clean per-plot roster: one row per
+    # (household, farm).  s8bq3 = "Farm number" -> plot_id.  hid is already
+    # the canonical clust/nh composite, matching household_roster's i.
+    # s8bq4a/s8bq4b = farm size + unit; s8bq8 = how the land was obtained
+    # (mapped to the canonical Tenure vocabulary).  NB Section 10 in GLSS7
+    # is non-farm ENTERPRISES, not plots.
+    file: g7sec8b.dta
+    idxvars:
+        i: hid
+        plot_id: s8bq3
+    myvars:
+        Area: s8bq4a
+        AreaUnit: s8bq4b
+        Tenure:
+            - s8bq8
+            - mapping:
+                Bought: owned
+                Rented for cash or in kind: rented_in
+                Sharecropped by household: sharecropped_in
+                Use free of charge: use_right
+                Distributed by village/family: communal
+                Inherited: inherited
+
+housing:
+    # GLSS7 Section 7 dwelling characteristics.  Wall/Floor/Roof live in Part F
+    # (s7fq1/2/3); Water = Part D q1a1; Toilet = Part D q26a; Electricity =
+    # Part D q11a (most-used power source); Rooms = Part A q2; Tenure = Part B
+    # q1 (present holding agreement).  All these variables carry value labels in
+    # the .dta, so get_dataframe(convert_categoricals=True) decodes them; the
+    # mappings below only normalize the decoded GLSS7 labels to canonical forms.
+    file: g7sec7.dta
+    idxvars:
+        i:
+            - clust
+            - nh
+    myvars:
+        Walls:
+            - s7fq1
+            - mapping:
+                Mud/Mud bricks/Earth: Mud/Earth
+                Wood: Wood
+                Metal sheet/slate/asbestos: Metal/Asbestos
+                Stone: Stone
+                Burnt bricks: Burnt Bricks
+                Cement blocks/concrete: Cement/Concrete
+                Landcrete: Landcrete
+                Bamboo: Bamboo
+                Palm leaves/Thatch (grass/Raffia): Thatch
+                Other: Other
+        Floor:
+            - s7fq2
+            - mapping:
+                Earth/Mud: Earth/Mud
+                Cement/Concrete: Cement/Concrete
+                Stone: Stone
+                Burnt brick: Burnt Bricks
+                Wood: Wood
+                Vinyl tiles: Vinyl Tiles
+                Ceramic/Porcelain/Granite/Marble tiles: Ceramic/Marble Tiles
+                Terrazzo/Terrazzo tiles: Terrazzo
+                Other: Other
+        Roof:
+            - s7fq3
+            - mapping:
+                Mud/Mud bricks/Earth: Mud/Earth
+                Wood: Wood
+                Metal sheet: Metal Sheet
+                Slate/Asbestos: Slate/Asbestos
+                Cement/Concrete: Cement/Concrete
+                Bamboo: Bamboo
+                Thatch/Palm leaf or Raffia: Thatch
+                Roofing tile: Roofing Tiles
+                Other: Other
+        Water: s7dq1a1
+        Toilet: s7dq26a
+        Rooms: s7aq2
+        Tenure:
+            - s7bq1
+            - mapping:
+                Owning: Own
+                Renting: Rent
+                Rent-free: Rent-free
+                Perching: Perching
+                Squatting: Squatting
+        Electricity: s7dq11a

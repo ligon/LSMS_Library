@@ -54,3 +54,14 @@ household_roster:
                 not related: Not related
 
         MonthsAway: B1_Q08
+
+subjective_well_being:
+    # Section B10A "Subjective Poverty" (w2_hh_all.dta, one row per BHID).
+    # B10A_Q05 "step of poverty" is the welfare-ladder self-placement (1-10;
+    # 1 = poorest, 10 = richest).  i=BHID matches sample()/household_roster.
+    file:
+        - ../Data/w2_hh_all.dta
+    idxvars:
+        i: BHID
+    myvars:
+        Own Step: B10A_Q05

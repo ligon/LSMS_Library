@@ -1,0 +1,5 @@
+outs:
+- md5: d122dd568c62bd4e4e17f2e56e365f94
+  size: 23680046
+  hash: md5
+  path: roster.tab

@@ -1,0 +1,42 @@
+#+TITLE: Albania — country notes & known data issues
+
+* Known issues
+
+** household_roster 2002 & 2005 collapsed to the within-cluster id (RESOLVED)
+   :PROPERTIES:
+   :Discovered: 2026-06-06
+   :Resolved:   2026-06-07 (GH #340)
+   :Affects: household_roster (2002, 2005) and everything derived from it
+             (household_characteristics, demands), plus the v / weight join
+   :END:
+
+The 2002 and 2005 ~household_roster~ blocks keyed the household index ~i~ on the
+*within-cluster* household number, not the canonical household identity:
+
+- 2002 ~data_info.yml~: ~i: hh~  (hh is 1..N within a PSU; only 14 distinct values)
+- 2005 ~data_info.yml~: ~i: m0_q01~  (likewise the within-cluster number)
+
+But ~sample()~ builds the canonical household id as the *composite*
+~format_id(psu) + '-' + format_id(hh)~ (2002) / ~format_id(m0_q00) + '-' +
+format_id(m0_q01)~ (2005) — e.g. ~'1-2'~, 3599 households in 2002.
+
+Consequence (observed 2026-06-06 via ~Country('Albania').household_roster()~,
+~LSMS_NO_CACHE=1~): 2002/2005 rosters collapsed to ~12–14 "households" and got
+NO ~v~ from ~_join_v_from_sample()~ (their ~i~ didn't match the sample spine).
+2004 was fine.
+
+| wave | persons | unique hh | v joined? | expected hh |
+|------+---------+-----------+-----------+-------------|
+| 2002 |     146 |        14 | no        | ~3599       |
+| 2004 |    8025 |      1898 | yes       | ok          |
+| 2005 |     140 |        12 | no        | ~3840       |
+
+*Fix (2026-06-07)*: changed the 2002/2005 ~household_roster~ ~idxvars~ to the
+composite — ~i: [psu, hh]~ / ~i: [m0_q00, m0_q01]~ — which the framework wires to
+each wave's existing ~mapping.py:i()~ (returns ~format_id(...)-format_id(...)~,
+identical to ~sample.py~).  Also dropped the roster's bare ~v: psu~ / ~v: m0_q00~
+so ~_join_v_from_sample()~ fires (it short-circuits when ~v~ is already present).
+This is the 2004 / ~interview_date~ / ~subjective_well_being~ idiom (composite ~i~,
+no ~v~ declared) which matches sample at 0% orphans.
+
+Tracked in GitHub issue #340.

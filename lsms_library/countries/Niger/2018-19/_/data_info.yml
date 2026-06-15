@@ -43,12 +43,34 @@ food_acquired:
         i:
             - grappe
             - menage
-        j: s07bq01
+        j:
+            - s07bq01
+            - mappings: ['harmonize_food', 'Original Label', 'Preferred Label']
         u: s07bq03b
     myvars:
         Quantity: s07bq03a
         Expenditure: s07bq08
         Produced: s07bq04
+
+subjective_well_being:
+    # EHCVM Section 20 'Pauvreté relative'.  s20q05 = self-placement on a
+    # 4-point relative-welfare ladder (Très pauvre / Pauvre / Moyen /
+    # Riche).  Mapped to Own Step so higher = better off, consistent with
+    # the Malawi/Cantril ladder.  Ne sait pas / NaN -> NaN.
+    file: s20_me_ner2018.dta
+    idxvars:
+        v: grappe
+        i:
+            - grappe
+            - menage
+    myvars:
+        Own Step:
+            - s20q05
+            - mapping:
+                Très pauvre: 1
+                Pauvre: 2
+                Moyen: 3
+                Riche: 4
 
 household_roster:
   dfs:
@@ -247,3 +269,67 @@ interview_date:
             - menage
     myvars:
         int_t: s00q23a
+
+food_security:
+    # FAO Food Insecurity Experience Scale (FIES), EHCVM Section 8A
+    # 'Sécurité alimentaire'.  Recall period: last 12 months.
+    # s08aq01..s08aq08 map IN ORDER to the 8 canonical FIES items
+    # (verified against the .dta variable labels 2026-06-07):
+    #   q01 inquiet de ne pas avoir suffisamment    -> Worried
+    #   q02 pas pu manger nourriture saine/nutritive-> HealthyDiet
+    #   q03 mangé une nourriture peu variée         -> FewFoods
+    #   q04 sauter un repas                          -> SkippedMeal
+    #   q05 mangé moins que ce que vous auriez dû    -> AteLess
+    #   q06 ménage n'avait plus de nourriture        -> RanOut
+    #   q07 faim mais pas mangé                       -> Hungry
+    #   q08 passé toute une journée sans manger       -> WholeDay
+    # Oui->True, Non->False; Ne sait pas / Refus / NaN -> NaN.
+    # s08aq07a/q08a are frequency follow-ups -> IGNORED (binary scale).
+    # FIES_score (count of True across the 8 items, NaN iff all 8 NaN)
+    # is computed by the food_security() post-processor in mapping.py.
+    file: s08a_me_ner2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        Worried:
+            - s08aq01
+            - mapping:
+                Oui: True
+                Non: False
+        HealthyDiet:
+            - s08aq02
+            - mapping:
+                Oui: True
+                Non: False
+        FewFoods:
+            - s08aq03
+            - mapping:
+                Oui: True
+                Non: False
+        SkippedMeal:
+            - s08aq04
+            - mapping:
+                Oui: True
+                Non: False
+        AteLess:
+            - s08aq05
+            - mapping:
+                Oui: True
+                Non: False
+        RanOut:
+            - s08aq06
+            - mapping:
+                Oui: True
+                Non: False
+        Hungry:
+            - s08aq07
+            - mapping:
+                Oui: True
+                Non: False
+        WholeDay:
+            - s08aq08
+            - mapping:
+                Oui: True
+                Non: False

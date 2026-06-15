@@ -33,6 +33,74 @@ Data Scheme:
     Distance: int
     Affinity: str
 
+  individual_education:
+    index: (t, i, pid)
+    Educational Attainment: str
+    materialize: make
+
+  anthropometry:
+    # Item-level body measures (parity-loop GAP 5) at the natural grain
+    # (t, i, pid) -- one row per MEASURED individual.  A NEW feature, DISTINCT
+    # from 'nutrition' (which is nutrient intake): this stores the RAW reported
+    # anthropometric readings the WHO/2006 z-score transform consumes.
+    #   Weight : reported body weight, kilograms (hv_06 / hh_v05).
+    #   Height : reported standing-or-lying height/length, centimetres
+    #            (hv_07 / hh_v06).
+    #   MUAC   : mid-upper-arm circumference, centimetres (hv_10 / hh_v09);
+    #            recorded for children only, so partially null by construction.
+    # STORES REPORTED MEASURES ONLY -- the WHO/2006 reference-population z-scores
+    # (haz06 / waz06 / whz06 / bmiz06) and the wasting / stunting flags are a
+    # query-time TRANSFORM (reference lookup), NEVER stored here.  Sex and Age
+    # for the z-score transform join from household_roster at the same
+    # (t, i, pid) grain, so this feature stays narrow.
+    # SCOPE: all six NPS waves field section V -- 2008-09 / 2010-11 / 2012-13 /
+    # 2014-15 come from the 2008-15 multi-round panel file upd4_hh_v.dta
+    # (hv_06/hv_07/hv_10), 2019-20 from HH_SEC_V and 2020-21 from hh_sec_v
+    # (hh_v05/hh_v06/hh_v09).  The WB Reproduction panel keeps only rounds 1-3
+    # (NPS4 dropped anthropometry for "confidential birth dates", NPS5 carried
+    # only pre-computed SDD z-scores); we additionally retain the raw 2014-15,
+    # 2019-20 and 2020-21 readings because z-scores are not stored.
+    # v (cluster) joins from sample() at API time -- anthropometry is NOT in the
+    # framework _no_v_join set.
+    index: (t, i, pid)
+    Weight: float
+    Height: float
+    MUAC: float
+    materialize: make
+
+  life_satisfaction:
+    # Domain-satisfaction battery (Section G "Subjective Welfare", item
+    # hh_g03_* / hg_03_*).  Present in ALL Tanzania waves: 2008-09, 2010-11,
+    # 2012-13, 2014-15 (multi-round upd4_hh_g.dta), 2019-20 (HH_SEC_G.dta),
+    # and 2020-21 (hh_sec_g.dta).  The module is INDIVIDUAL-level (asked of
+    # every member 15+); each wave script REDUCES to the household HEAD (roster
+    # hh_b05/hb_05 == 'HEAD') and reshapes the 9 items WIDE->LONG.  Domains:
+    # Health, Finances, Housing, Job, HealthCareAccess, Education, Safety, plus
+    # TransportSafety + Overall (2019-/2020-) or Overall + Spouse (2008-15;
+    # item order differs).  Satisfaction = native 7-point ordinal label,
+    # Title-cased ("Very satisfied".."Very dissatisfied"); "NOT APPLICABLE"
+    # nulled.  NOT the Cantril ladder (that is subjective_well_being).
+    index: (t, i, Domain)
+    Satisfaction: str
+    materialize: make
+
+  food_coping:
+    # Coping-strategies / rCSI battery (Section H "Food Security", item
+    # hh_h02a..hh_h02h / hh_02_1..hh_02_8).  For each strategy the survey
+    # asks "in the past 7 days, how many days had to [...]" -- a day-count
+    # 0-7.  Present in 2010-11, 2012-13, 2014-15 (multi-round upd4_hh_h.dta;
+    # round 1 / 2008-09 did NOT field the module), 2019-20 (HH_SEC_H.dta),
+    # and 2020-21 (hh_sec_h.dta).  HOUSEHOLD-level; i = each wave's roster i
+    # (r_hhid / sdd_hhid / y5_hhid).  WIDE->LONG: one (t, i, Strategy) row
+    # per strategy.  Strategy names: the five canonical rCSI strategies
+    # (LessPreferred, LimitPortion, ReduceMeals, RestrictAdults, BorrowFood)
+    # plus survey-specific LimitVariety / NoFood / WholeDayWithout.  Days =
+    # native count 0-7.  The hh_h08 12-month-insufficiency item is out of
+    # scope (a months-style measure, not a coping-day count).
+    index: (t, i, Strategy)
+    Days: int
+    materialize: make
+
   interview_date:
     index: (t, i)
     Int_t: datetime
@@ -63,3 +131,260 @@ Data Scheme:
     index: (t, i)
     Roof: str
     Floor: str
+
+  plot_features:
+    # Lasting plot characteristics (GH #167).  Cross-file merge of
+    # AG_SEC_02 (area) and AG_SEC_3A (soil/irrigation/tenure) per wave;
+    # only 2019-20 and 2020-21 are buildable (2008-15 lacks an ag
+    # source on disk).  GPS coordinates are redacted in the source.
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    # SelfReportedArea: farmer-estimated plot area (ha) from ag2a_04, kept
+    # distinct from the GPS-preferred Area (WB area_self_reported).
+    SelfReportedArea: float
+    Tenure: str
+    TenureSystem: str
+    SoilType: str
+    Irrigated: bool
+    # Reported item attributes mirroring the WB Plot_dataset plot block
+    # (TZA_NPS*.do): Owned (plot_owned, ag3a_25), Certificate
+    # (plot_certificate, ag3a_28a/28d), ErosionProtection (ag3a_15),
+    # Fallow (ag3a_03==4).  Per-HH rollups (farm_size, nb_plots,
+    # nb_fallow_plots, soil_fertility_index) are transformations over these
+    # item columns, NOT stored here.
+    Owned: bool
+    Certificate: bool
+    ErosionProtection: bool
+    Fallow: bool
+    materialize: make
+
+  crop_production:
+    # Item-level crop harvest (parity-loop GAP 1) at the natural grain
+    # (t, i, plot_id, j) -- one row per crop grown on a plot.  Stacks three
+    # harvest modules per wave: AG_SEC_4A (seasonal/annual), AG_SEC_6A
+    # (perennial fruit), AG_SEC_6B (perennial non-fruit/cash trees); reported
+    # sales (5A/7A/7B) attached at the unambiguous single-plot (hhid, crop)
+    # grain.  j is the canonical Preferred Label from harmonize_crop, which
+    # REUSES harmonize_food Preferred Labels where a crop is a consumed food
+    # (Maize (grain), Rice (paddy), Pulses, ...) so crop_production.j joins
+    # food_acquired.j; new labels only for non-food crops (Cotton, Sisal,
+    # Coffee & Cocoa via the food label, Tobacco, ...).  u='kg' (every NPS
+    # harvest variable is recorded in kilograms).  Only 2019-20 and 2020-21
+    # are buildable; 2008-15 has no agriculture source on disk (same as
+    # plot_features).  STORES REPORTED VALUES ONLY -- harvest_kg sums,
+    # yield_kg, main_crop and value-shares are transformations over these
+    # rows, NOT columns here.
+    # planting_month is part of the GAP-1 schema but is NOT recorded by the
+    # NPS instrument (WB cleaning code: "planting month (absent)"), so it is
+    # omitted rather than carried all-null.
+    index: (t, i, plot_id, j)
+    Quantity: float
+    u: str
+    Quantity_sold: float
+    Value_sold: float
+    harvest_month: float
+    intercropped: bool
+    perennial: bool
+    materialize: make
+
+  plot_inputs:
+    # Item-level plot inputs (parity-loop GAP 2) at the natural grain
+    # (t, i, plot_id, input, crop) -- one row per input applied to a plot.
+    # Stacks the AG_SEC_3A plot-detail input modules (organic fertilizer
+    # ag3a_41..45; inorganic fertilizer type 1 ag3a_47..51 and type 2
+    # ag3a_54..58; herbicide ag3a_60..63; pesticide ag3a_65a..65c) and the
+    # AG_SEC_4A seasonal-crop seed module (ag4a_08 improved; ag4a_10_1/2 qty+unit;
+    # ag4a_10c_1/2 purchased qty+unit; ag4a_12 amount paid).
+    #   input : the input identity on the shared harmonize_input labels -- Seed /
+    #           Organic Fertilizer / a named inorganic-fertilizer product (Urea,
+    #           DAP, NPK, CAN, SA, TSP, MRP, Other Fertilizer from ag3a_48/55) /
+    #           Herbicide / Pesticide.
+    #   crop  : seed rows ONLY -- the canonical harmonize_food/harmonize_crop
+    #           Preferred Label of the crop the seed was sown for (NPS seed is
+    #           reported per plot-crop), so plot_inputs.crop joins crop_production.j
+    #           and food_acquired.j.  pd.NA for plot-level inputs (fertilizer /
+    #           herbicide / pesticide).  ~23% of rows are non-seed -> the crop
+    #           index level is partially null by construction.
+    #   u     : native unit -- 'kg' for fertilizer (the questionnaire records
+    #           fertilizer in KG); native litre/millilitre/bucket/cup for
+    #           seed / herbicide / pesticide, harmonized by the country u table.
+    # Only 2019-20 and 2020-21 are buildable; 2008-15 has no agriculture source
+    # on disk (same as plot_features / crop_production, GH #167).
+    # SEASON SCOPE: long-rainy-season modules (AG_SEC_3A / AG_SEC_4A) only,
+    # matching crop_production's long-rainy + perennial scope; the short-rainy
+    # AG_SEC_3B / AG_SEC_4B inputs are not stacked (few short-season plots use
+    # inputs -- e.g. 2 inorganic-fertilizer plots in 2019-20 3B).  This is why
+    # per-plot input coverage is ~half the WB Plot_dataset, which counts both
+    # seasons as separate plot-season rows.
+    # STORES REPORTED VALUES ONLY -- seed_kg / nitrogen_kg / any-use flags /
+    # fertilizer totals are transformations over these rows, NOT columns here.
+    index: (t, i, plot_id, input, crop)
+    Quantity: float
+    u: str
+    Purchased: bool
+    Quantity_purchased: float
+    Improved: bool
+    materialize: make
+
+  plot_labor:
+    # Item-level plot labor (parity-loop GAP 3, first of TWO labor grains) at
+    # the natural grain (t, i, plot_id, source) -- one row per (plot, source).
+    # Source from AG_SEC_3A; aligns plot_id with crop_production / plot_inputs
+    # so plot_labor joins them on (t, i, plot_id).
+    #   source : the labor source -- 'family' (household members' own days) or
+    #            'hired' (paid labor).  The GAP-3 schema also allows
+    #            'other'/'exchange' cross-country, but the NPS-SDD / Y5 AG_SEC_3A
+    #            instrument records NO free / exchange labor block, so no 'other'
+    #            rows arise for Tanzania (we do not fabricate them).  No raw-code
+    #            mapping is needed: the wave script emits the canonical 'family'
+    #            / 'hired' label directly.
+    #   PersonDays : REPORTED person-days of that source on the plot --
+    #                hired = Sum over the three farm tasks (Land Prep / Weeding /
+    #                Harvest) of the per-gender day cells ag3a_74_{1,2,3}{a,b,c};
+    #                family = Sum over members and tasks of the reported day
+    #                cells (2020-21: ag3a_72c_*/72g_*/72k_*).
+    #   Wage       : REPORTED cash wage PAID to hired labor (TSH), Sum over tasks
+    #                of ag3a_74_{1,2,3}d.  NaN for family rows (no cash wage).
+    # STORES REPORTED PERSON-DAYS / WAGE ONLY -- the WB aggregates
+    # total_labor_days / total_family_labor_days / total_hired_labor_days (sums
+    # over source) and hired_labor_value (median-wage valuation over the hired
+    # rows) are TRANSFORMATIONS, NEVER stored here.
+    # A per-cell plausibility clamp (>730 person-days per gender/task -> NaN)
+    # drops the ~0.7% of hired cells where a TSH value was typed into a day field
+    # (2020-21 ag3a_74_1c reaches 450000) -- same discipline livestock /
+    # plot_features use (GH #167).
+    # WAVE SCOPE: only 2019-20 (NPS-SDD Extended Panel) and 2020-21 (NPS Y5
+    # Refresh Panel) are buildable; the 2008-15 multi-round folder has no
+    # agriculture source on disk (same deferral as plot_features /
+    # crop_production / plot_inputs, GH #167).  FAMILY rows are emitted for
+    # 2020-21 only: the 2019-20 family-labor block records worker ROSTER IDs but
+    # NO days (ag3a_72b/f/j_*), so 2019-20 carries HIRED rows only -- we do not
+    # fabricate family person-days from the ID columns (which the WB NPS5.do
+    # erroneously rowtotals).  v (cluster) joins from sample() at API time --
+    # plot_labor is NOT in the framework _no_v_join set.
+    index: (t, i, plot_id, source)
+    PersonDays: float
+    Wage: float
+    materialize: make
+
+  people_last7days:
+    # Per-INDIVIDUAL 7-day activity (parity-loop GAP 3, second of TWO labor
+    # grains) at the natural grain (t, i, pid) -- one row per household member.
+    # NEW feature for Tanzania, mirroring Uganda's people_last7days construct
+    # (the one country that already has it).  Source HH_SEC_E1, following the WB
+    # NPS5.do labor block but using the LABEL-CORRECT dummy<->hours pairing (the
+    # .do swaps farm_hrs/wage_hrs relative to its own dummies; we pair each hours
+    # item with the activity it actually times, per the questionnaire labels).
+    #   farm_work / SOB_work / wage_work : REPORTED 7-day activity dummies --
+    #            did the member work in HH agriculture (hh_e07) / run an own
+    #            non-farm business (hh_e05) / work as a wage employee (hh_e03) in
+    #            the last 7 days.
+    #   farm_hrs / SB_hrs / wage_hrs : REPORTED hours in that activity in the
+    #            last 7 days (hh_e08 / hh_e06 / hh_e04); 0 where the matching
+    #            dummy is False.
+    #   industry : coarse ISIC class of the WAGE job (hh_e31b_2) -- Agriculture /
+    #            Fishing / Mining / Manufacturing / Construction / Services;
+    #            non-null only for wage workers (gated by hh_e28).
+    #   working_age : member is 5 years or above (hh_e01_1==1).  Below working
+    #            age, every activity dummy / hours is zeroed (the WB convention)
+    #            but the row is kept with working_age=False.
+    # REPORTED PER-INDIVIDUAL VALUES ONLY -- no household rollups / counts /
+    # labor-force-participation rates (those are transformations).
+    # WAVE SCOPE: 2019-20 and 2020-21 only.  2008-15 is deferred: its harmonised
+    # panel labor module (upd4_hh_e) is a "last 12 months" employment screen with
+    # NO 7-day HOURS items, so it cannot populate farm_hrs / SB_hrs / wage_hrs
+    # (the WB code reads the per-round raw SEC_B_C_D_E1_F_G1_U.dta 7-day `seq*`
+    # block, which is not the file present in our 2008-15 panel folder).
+    # i/pid match household_roster; v joins from sample() at API time.
+    index: (t, i, pid)
+    farm_work: bool
+    SOB_work: bool
+    wage_work: bool
+    farm_hrs: float
+    SB_hrs: float
+    wage_hrs: float
+    industry: str
+    working_age: bool
+    materialize: make
+
+  livestock:
+    # Item-level livestock herd (parity-loop GAP 4) at the natural grain
+    # (t, i, animal) -- one row per species/animal-type the household OWNS,
+    # from the livestock roster LF_SEC_02 (one source row per (household,
+    # lvstckid)).  RICHER than the WB cleaning code, which recodes the own-y/n
+    # flag (lf02_01 / s10aq2 / ag10a_02) and collapse(max)es every animal type
+    # down to a single household "engaged-in-livestock" BINARY -- discarding
+    # species, head counts, purchases and sales.  Their binary is recoverable
+    # as a transformation: livestock.groupby(['t','i']).size() > 0.
+    #   animal : canonical species/type Preferred Label from harmonize_species
+    #            (Bulls / Cows / Steers / Heifers / Male & Female Calves / Goats
+    #            / Sheep / Pigs / Chickens / Ducks / Other Poultry / Rabbits /
+    #            Donkeys).  Cattle sub-types are kept DISTINCT (the
+    #            questionnaire's own item grain); a coarser "Cattle" rollup and
+    #            a TLU index are transformations, NOT stored labels.  Pets
+    #            (Dogs / Cats / Other) are dropped, mirroring the WB
+    #            drop-if-inlist(animal, 15, 16) exclusion.
+    #   HeadCount    : currently owned = lf02_04_1 (indigenous) + lf02_04_2
+    #                  (improved/exotic).  Reported current stock.
+    #   HeadAcquired : bought alive in the past 12 months (lf02_07) -- the
+    #                  directly-reported acquisition flow that parallels
+    #                  HeadSold; births (lf02_05) / gifts (lf02_10) are separate
+    #                  reported flows, NOT summed in.
+    #   HeadSold     : sold alive in the past 12 months (lf02_25).
+    # A herd VALUE column is omitted: the NPS livestock module records no
+    # current-herd valuation (only transaction values lf02_08 purchase /
+    # lf02_26 sale), so carrying Value all-null would fail the
+    # no_all_null_columns sanity check -- the same discipline crop_production
+    # uses for the absent planting_month.
+    # Only 2019-20 (NPS-SDD Extended Panel) and 2020-21 (NPS Y5 Refresh Panel)
+    # are buildable; the 2008-15 multi-round folder has no livestock source on
+    # disk (same deferral as plot_features / crop_production / plot_inputs,
+    # GH #167).
+    # NO v level: 'livestock' is in the framework _no_v_join set, so the grain
+    # stays (t, i, animal) -- the framework does not join a cluster v.
+    index: (t, i, animal)
+    HeadCount: float
+    HeadAcquired: float
+    HeadSold: float
+    materialize: make
+
+  community_prices:
+    # Item-level community / market food prices (parity-loop GAP C -- OURS-ONLY,
+    # the maintainer-priority gap; the WB panel surveys no community prices).
+    # Natural grain (t, v, j, u) -- one row per (community cluster v, harmonized
+    # food item j, native unit u) -- from the COMMUNITY price questionnaire
+    # (CM_SEC_F_ID / cm_sec_f_id), carrying ONLY the REPORTED village-market
+    # unit price.  This is the community-price arm of label unification: j is
+    # the canonical Preferred Label from harmonize_community_price, which REUSES
+    # the harmonize_food / harmonize_crop Preferred Labels for every priced
+    # food, so a community_prices "Maize (grain)" row lines up with the
+    # food_acquired (consumption) and crop_production (harvest) "Maize (grain)"
+    # rows.  u is the native unit (Kg / Gram / Litre / Millilitre / Piece) on
+    # the shared `u` table.
+    #   Price : REPORTED unit price = cm_f063 / cm_f062 (currency per ONE native
+    #           unit u) -- the reported village price divided through by its own
+    #           reported quantity basis.  NO median/mean across clusters, NO
+    #           community->household imputation: those are TRANSFORMATIONS over
+    #           these rows (the documented #113 region-level fallback), never
+    #           stored here.  The district-capital price triple (cm_f064/65/66)
+    #           is a different geographic level (the district town) and is NOT
+    #           folded into the cluster grain.
+    # v is the community questionnaire's OWN native cluster id (interview__key).
+    # DATA LIMITATION (issue #113 / CONTENTS.org): the NPS community and
+    # household instruments use INCOMPATIBLE cluster coding -- the community
+    # interview__key has zero overlap with the household interview__key, and the
+    # community location codes reconcile to the household survey-design cluster
+    # only at the REGION level, not the EA/cluster level (~4% EA-tuple match).
+    # So community_prices.v does NOT intersect sample().v; the
+    # community->household join is a region-level fallback TRANSFORMATION,
+    # deliberately not baked in.  Because the grain has no household i, the
+    # framework's _join_v_from_sample never fires (it requires an i level), so v
+    # is left native -- no _no_v_join entry is needed.
+    # WAVE SCOPE: 2019-20 (NPS-SDD Extended Panel; 99 communities, ~3.2k priced
+    # rows) and 2020-21 (NPS Y5 Refresh Panel; 488 communities, ~14.8k priced
+    # rows).  2008-15 has no community questionnaire source on disk (the
+    # multi-round panel release retained only the household upd4_hh_* modules).
+    index: (t, v, j, u)
+    Price: float
+    materialize: make

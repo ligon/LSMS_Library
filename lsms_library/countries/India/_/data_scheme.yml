@@ -26,7 +26,38 @@ Data Scheme:
     Distance: int
     Affinity: str
     Educational Attainment: str
+  individual_education:
+    index: (t, i, pid)
+    Educational Attainment: str
+
   employment:
     index: (t, i, pid)
     Cash_per_day: float
     Rural: str
+
+  housing:
+    index: (t, i)
+    Tenure: str
+    Roof: str
+    Floor: str
+    Water: str
+    Toilet: str
+
+  interview_date:
+    index: (t, i)
+    Int_t: datetime
+    materialize: make
+
+  months_food_inadequate:
+    index: (t, i)
+    MonthsInadequate: int
+    AnyInadequate: bool
+    materialize: make
+
+  assets:
+    # Consumer durables owned (SECT07D §7D). Item-level (t, i, j); j is the
+    # recovered durable-item label.  §7D records counts only, so Quantity is
+    # the sole measure (no reported value).
+    index: (t, i, j)
+    Quantity: float
+    materialize: make

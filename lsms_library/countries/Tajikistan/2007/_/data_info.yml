@@ -72,3 +72,50 @@ sample:
     final_index:
         - i
         - t
+
+individual_education:
+    # m3bq5 "what is the highest diploma you have obtained?" — clean 8-level
+    # diploma labels in the .dta; pass through verbatim (free-text attainment).
+    file: ../Data/r1m3b.dta
+    idxvars:
+        i: hhid
+        pid: memid
+    myvars:
+        Educational Attainment: m3bq5
+
+housing:
+    # Module 7: r1m7a (structure + tenure), r1m7b (electricity),
+    # r1m7c (water + toilet).  One row per hhid in each; merged on i.
+    # Source labels are already human-readable strings (verbatim pass-through).
+    dfs:
+        - df_a
+        - df_b
+        - df_c
+    df_a:
+        file: ../Data/r1m7a.dta
+        idxvars:
+            i: hhid
+        myvars:
+            Tenure: m7aq13
+            Walls: m7aq3
+            Roof: m7aq4
+            Floor: m7aq5
+            Rooms: m7aq9
+    df_b:
+        file: ../Data/r1m7b.dta
+        idxvars:
+            i: hhid
+        myvars:
+            Electricity: m7bq9
+    df_c:
+        file: ../Data/r1m7c.dta
+        idxvars:
+            i: hhid
+        myvars:
+            Water: m7cq1
+            Toilet: m7cq24
+    merge_on:
+        - i
+    final_index:
+        - i
+        - t

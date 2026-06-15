@@ -124,6 +124,23 @@ individual_education:
     myvars:
         Educational Attainment: 'educ_hi'
 
+subjective_well_being:
+    file: ../Data1/s20_me_tgo2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        Own Step:
+            - s20q05
+            - mapping:
+                Très pauvre: 1
+                Pauvre: 2
+                Moyen: 3
+                Riche: 4
+                Ne sait pas: null
+                Refus: null
+
 assets:
     file: ../Data1/s12_me_tgo2018.dta
     idxvars:
@@ -209,7 +226,9 @@ food_acquired:
             - grappe
             - menage
         j: s07bq01
-        u: s07bq03b
+        u:
+            - s07bq03b
+            - mappings: ['ehcvm_units', 'Code', 'Preferred Label']
     myvars:
         Quantity: s07bq03a
         Expenditure: s07bq08
@@ -250,3 +269,83 @@ interview_date:
             - menage
     myvars:
         Int_t: s00q23a
+
+food_security:
+    # FAO Food Insecurity Experience Scale (FIES), EHCVM §8A
+    # 'Sécurité alimentaire'.  Recall period: last 12 months.
+    # Items s08aq01..s08aq08 map IN ORDER to the 8 canonical FIES
+    # items (verified against the Stata variable labels):
+    #   s08aq01 worried -> Worried
+    #   s08aq02 healthy/nutritious -> HealthyDiet
+    #   s08aq03 few kinds of foods -> FewFoods
+    #   s08aq04 skip a meal -> SkippedMeal
+    #   s08aq05 ate less -> AteLess
+    #   s08aq06 ran out of food -> RanOut
+    #   s08aq07 hungry but did not eat -> Hungry
+    #   s08aq08 whole day without eating -> WholeDay
+    # Oui->True, Non->False, Ne sait pas / Refus -> NaN.  s08aq07a /
+    # s08aq08a are frequency follow-ups and are ignored for the binary
+    # scale.  FIES_score (0-8) is the row-wise count of True items,
+    # computed by the food_security() formatting function in mapping.py.
+    file: ../Data1/s08a_me_tgo2018.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        Worried:
+            - s08aq01
+            - mapping:
+                Oui: True
+                Non: False
+                Ne sait pas: null
+                Refus: null
+        HealthyDiet:
+            - s08aq02
+            - mapping:
+                Oui: True
+                Non: False
+                Ne sait pas: null
+                Refus: null
+        FewFoods:
+            - s08aq03
+            - mapping:
+                Oui: True
+                Non: False
+                Ne sait pas: null
+                Refus: null
+        SkippedMeal:
+            - s08aq04
+            - mapping:
+                Oui: True
+                Non: False
+                Ne sait pas: null
+                Refus: null
+        AteLess:
+            - s08aq05
+            - mapping:
+                Oui: True
+                Non: False
+                Ne sait pas: null
+                Refus: null
+        RanOut:
+            - s08aq06
+            - mapping:
+                Oui: True
+                Non: False
+                Ne sait pas: null
+                Refus: null
+        Hungry:
+            - s08aq07
+            - mapping:
+                Oui: True
+                Non: False
+                Ne sait pas: null
+                Refus: null
+        WholeDay:
+            - s08aq08
+            - mapping:
+                Oui: True
+                Non: False
+                Ne sait pas: null
+                Refus: null

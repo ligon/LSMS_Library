@@ -265,3 +265,23 @@ print(fa.final.describe())
 : 50%       12.000000          3.950000
 : 75%       30.000000         12.600001
 : max      600.000000        800.000000
+
+* Known data issues
+
+** interview_date — not available (2026-06-06)
+ENCOVI 2000 carries no household-level interview-date field.  A scan of all
+40 ~2000/Data/*.DTA~ files (column names + Stata labels) for
+fecha/día/mes/año/entrevista found none; ~thogar~ (1–18, household size) and
+the ~p01a*~ block (housing characteristics) are not dates.  ~interview_date~
+is therefore not implementable for Guatemala from the available microdata.
+Tracked in GitHub issue #341.
+
+
+* shocks — implementable, not yet wired (2026-06-07)
+
+Contrary to an earlier triage (GH #352), ENCOVI 2000 DOES field a shocks
+module: Chapter 3 "Situaciones Adversas" (=ECV05H03.DTA= RESUMEN,
+=ECV06H03.DTA= DETALLE) records adverse events (=p03a01b= drought,
+=p03a06n= crop loss, =p03a01k= general price rise) AND coping "accion"
+codes.  Data present in-repo; =shocks= is not yet wired.  Implementable —
+a feature gap, not an absence.

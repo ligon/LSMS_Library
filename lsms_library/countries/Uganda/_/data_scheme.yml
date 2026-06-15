@@ -41,7 +41,7 @@ Data Scheme:
   earnings:
     materialize: make
     index: (t, i)
-    earnings: float
+    Earnings: float
   food_acquired:
     # Canonical post-2026-05-05 (GH #169): s in {purchased, produced, inkind}.
     # Wave scripts call uganda.food_acquired (wide form, source-suffixed
@@ -70,8 +70,267 @@ Data Scheme:
     materialize: make
     index: (t, i)
   assets: !make
+  months_food_inadequate:
+    # Family C (non-FIES food security): months in the last 12 the HH
+    # could not meet its food needs.  Source GSEC17 'Welfare and Food
+    # Security' food-deprivation item (h17q9 / h17q09) + which-months
+    # follow-up.  Present in 2009-10, 2010-11, 2011-12, 2013-14,
+    # 2015-16.  MonthsInadequate is <NA> for 2010-11 (no which-months
+    # follow-up that wave; only the binary item was asked).
+    index: (t, i)
+    MonthsInadequate: int
+    AnyInadequate: bool
+    materialize: make
   housing:
     index: (t, i)
     Roof: str
     Floor: str
+  plot_features:
+    # Lasting parcel-level characteristics for the Uganda UNPS waves
+    # (GH #167 Phase 1 pilot).  Uganda terminology: a "parcel" is the
+    # lasting land unit; what UNPS calls a "plot" is the within-parcel
+    # cropping subdivision (varies by season).  Our canonical plot_id
+    # is Uganda's parcelID suffixed with '_A' (AGSEC2A: owned) or '_B'
+    # (AGSEC2B: use-rights/rented) so the two source files can be
+    # concatenated without ID collision.  See
+    # slurm_logs/DESIGN_erhs_plot_features_2026-05-20.org.
+    # Latitude / Longitude are reserved in the canonical Columns block
+    # but NOT declared here — Uganda's parcel-level GPS in AGSEC2A is
+    # in a non-standard DMS encoding (Latitude_Minutes range 0-99 etc.)
+    # and is mostly NaN.  Adding GPS is a documented follow-up; for v1
+    # Uganda emits the six lasting-attribute columns only.
+    #
+    # GAP-6 parity audit (2026-06-14): added the REPORTED per-parcel
+    # item attributes the WB LSMS-ISA harmonised Plot_dataset carries
+    # (self_reported_area / plot_owned / plot_certificate /
+    # erosion_protection; UGA_UNPS1.do:396-650).  SelfReportedArea is
+    # the farmer estimate kept distinct from Area (which prefers GPS).
+    # PlotOwned / PlotCertificate / ErosionProtection are reported
+    # booleans.  The WB aggregates farm_size / nb_plots / nb_fallow_plots
+    # (sums/counts) and soil_fertility_index (PCA over geospatial
+    # soil-quality rasters) are transformations, NOT stored here; the WB
+    # plot_slope / soil-quality tags come from the GPS geovars raster
+    # keyed on the household, not the parcel questionnaire, so they are
+    # not survey-reported plot attributes and are excluded.
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    Tenure: str
+    TenureSystem: str
+    SoilType: str
+    Irrigated: bool
+    SelfReportedArea: float
+    PlotOwned: bool
+    PlotCertificate: bool
+    ErosionProtection: bool
+    materialize: make
+  crop_production:
+    # Item-level post-harvest crop module (GAP 1 parity build).  One row
+    # per REPORTED harvest record for a crop on a plot.  Source: AGSEC5A
+    # (season 1) + AGSEC5B (season 2) of the UNPS post-harvest
+    # questionnaire, joined to AGSEC4A for the intercropped flag.
+    #
+    # Grain (t, i, plot, j, u, season):
+    #   plot   — hhid-parcel-plot, mirroring the WB harmonised plot_id;
+    #            its parcel component is the parcel plot_features keys on.
+    #   j      — crop, on the shared 'harmonize_crop' Preferred Labels,
+    #            which REUSE the harmonize_food Aggregate Label strings
+    #            for food crops (Maize, Beans, Rice, ...) so a crop j
+    #            joins food_acquired(labels='Aggregate').j.
+    #   u      — reported native harvest unit ('harvest_units' table);
+    #            'Unknown' where a wave records no harvest unit label
+    #            (e.g. 2018-19 harvest side).
+    #   season — 'A' (first season) / 'B' (second season).
+    #
+    # Columns are REPORTED values only — no harvest_kg / yield /
+    # main_crop / value-share (those are transformations).  Missing in a
+    # wave -> NaN.  2005-06 is excluded: its AGSEC5A is a crop-area
+    # allocation matrix with no crop-level harvest quantities, and the
+    # WB LSMS-ISA panel itself starts at wave 1 (2009-10).
+    index: (t, i, plot, j, u, season)
+    Quantity: float
+    Quantity_sold: float
+    Value_sold: float
+    harvest_month: int
+    intercropped: bool
+    materialize: make
+  plot_inputs:
+    # Item-level agricultural-input module (GAP 2 parity build).  One row
+    # per REPORTED input applied to a plot.  Source: AGSEC3A (season 1) +
+    # AGSEC3B (season 2) plot-input modules for the fertilizer / pesticide
+    # blocks, and AGSEC4A (plot-crop roster) for the seed block.
+    #
+    # Grain (t, i, plot, input, j):
+    #   plot   — hhid-parcel-plot, mirroring the WB harmonised plot_id and
+    #            the crop_production plot key (join on (t, i, plot)); its
+    #            parcel component is the parcel plot_features keys on.
+    #   input  — the input identity on the shared 'harmonize_input'
+    #            Preferred Labels: Seed; Organic Fertilizer; Inorganic
+    #            Fertilizer refined by nutrient class (Nitrate / Phosphate /
+    #            Potash / Mixed Fertilizer); Pesticide refined by type
+    #            (Insecticide / Fungicide / Growth Regulator / ...).  These
+    #            are the finest identities the UNPS questionnaire records
+    #            (it asks nutrient class, not urea/DAP/NPK product names).
+    #   j      — the seed's crop, on harmonize_crop labels, for seed rows;
+    #            the sentinel 'n/a' for fertilizer/pesticide rows (no crop
+    #            linkage).  In the index so per-crop seed rows on a
+    #            multi-crop plot stay distinct (plot-crop seed grain) — ~38%
+    #            of seeded plots carry >1 crop.
+    #
+    # Columns are REPORTED values only — NO seed_kg / nitrogen_kg / any-use
+    # flags / fertilizer totals (those are transformations).  Missing in a
+    # wave -> NaN.  Improved is non-null only on seed rows (1=Improved seed
+    # type, 0=Traditional).  Quantity is NaN on 2009-10/2010-11 seed rows
+    # (those waves record no seed quantity, only purchased y/n + seed type).
+    index: (t, i, plot, input, j)
+    Quantity: float
+    u: str
+    Purchased: bool
+    Quantity_purchased: float
+    Improved: bool
+    materialize: make
+  livestock:
+    # Item-level livestock roster (GAP 4 parity build).  One row per
+    # REPORTED species/herd a household owns.  Source: the UNPS livestock
+    # roster (AGSEC6A large ruminants / AGSEC6B small ruminants / AGSEC6C
+    # poultry & other) that the WB code (UGA_UNPS1.do:710-720) reads only
+    # to collapse to a single engaged-livestock y/n binary.  We keep the
+    # PRE-collapse roster -- strictly richer than the WB construct.
+    #
+    # Grain (t, i, animal):
+    #   animal — canonical SPECIES on the 'harmonize_species' Preferred
+    #            Labels: Cattle, Goats, Sheep, Pigs, Donkeys, Horses,
+    #            Chicken, Other Poultry, Rabbits, Bees.  The roster's
+    #            exotic/indigenous and age/sex splits collapse to species
+    #            here (sub-species detail recoverable from raw codes).
+    #
+    # Columns are REPORTED values only (missing-in-wave -> NaN):
+    #   HeadCount     — head owned now
+    #   HeadAcquired  — head bought to raise (last reference period)
+    #   HeadSold      — head sold alive
+    #   Value         — reported per-head animal value ('value if you sold
+    #                   one today' in 2009-10/2010-11; 'average value of
+    #                   each one sold' for 2011-12+, which dropped the
+    #                   sell-today question)
+    # The WB engaged-livestock binary = groupby(['t','i']).any() over these
+    # rows; herd value = Value * HeadCount; TLU = sum(head * TLU-factor).
+    # All three are TRANSFORMATIONS -- never stored here.
+    #
+    # No v level: livestock is in the framework _no_v_join set
+    # (country.py), so the (t, i, animal) grain is final.  2005-06 is
+    # excluded (no canonical AGSEC6 roster; the WB panel starts at 2009-10).
+    index: (t, i, animal)
+    HeadCount: float
+    HeadAcquired: float
+    HeadSold: float
+    Value: float
+    materialize: make
+  anthropometry:
+    # Item-level anthropometry module (GAP 5 parity build).  One row per
+    # MEASURED individual.  Source: the GSEC6 anthropometry module of the
+    # UNPS questionnaire, the raw weight/height the WB code
+    # (UGA_UNPS{1..8}.do anthro section) feeds into ``zscore06`` — we keep
+    # ONLY the reported measures, never the z-scores / wasting flags.
+    #
+    # NEW feature, distinct from ``nutrition`` (which is nutrient INTAKE,
+    # consumption x food-composition tables).  anthropometry is body
+    # measurement.
+    #
+    # Grain (t, i, pid) [individual]:
+    #   pid — the individual key, matching household_roster's pid so the
+    #         child's Sex (and integer Age) join from the roster.  v auto-
+    #         joins from sample() at API time (anthropometry is NOT in the
+    #         framework _no_v_join set).
+    #
+    # Columns are REPORTED values ONLY (missing-in-wave -> NaN):
+    #   Weight     — kg
+    #   Height     — cm (lying-down length preferred, else standing height)
+    #   MUAC       — mid-upper-arm circumference, cm.  NaN throughout: no
+    #                UNPS wave records arm circumference (declared for
+    #                cross-country schema parity only).
+    #   Age_months — child age in months as recorded by the survey.  <NA>
+    #                in 2018-19 / 2019-20 (those waves dropped the in-module
+    #                age-in-months question; the WB code derives child age
+    #                from the roster there).
+    #
+    # NO haz06 / waz06 / whz06 / bmiz06 / wasting / stunting — all of those
+    # are WHO-2006 reference-population TRANSFORMS, computed at query time
+    # over (Weight, Height, child Age/Sex), never stored.
+    #
+    # Wired for 2009-10 .. 2019-20 (every wave with a GSEC6 anthro module).
+    # 2005-06 has no anthropometry module (the UNPS panel starts at 2009-10).
+    index: (t, i, pid)
+    Weight: float
+    Height: float
+    # No UNPS wave records mid-upper-arm circumference, so MUAC is
+    # legitimately all-NaN for Uganda.  Mark optional so the all-null
+    # sanity check exempts it while the canonical column stays declared
+    # for cross-country alignment (other countries — e.g. Ethiopia ESS —
+    # do record MUAC).
+    MUAC:
+      type: float
+      optional: true
+    Age_months: float
+    materialize: make
+  plot_labor:
+    # Item-level plot-labor module (GAP 3 parity build).  One row per
+    # REPORTED labor source on a plot-season.  Source: AGSEC3A (season 1) +
+    # AGSEC3B (season 2) plot-input modules -- the SAME files plot_inputs
+    # reads, whose labor block the WB code (UGA_UNPS1.do:467-509, and the
+    # corresponding block in UNPS2..8) reads only to build the per-parcel
+    # SUM columns total_labor_days / total_family_labor_days /
+    # total_hired_labor_days and the median-wage hired_labor_value.  We keep
+    # the PRE-collapse REPORTED person-days -- strictly richer than the WB
+    # construct, and those sums / the wage valuation are TRANSFORMATIONS,
+    # never stored here.
+    #
+    # Grain (t, i, plot, source, season):
+    #   plot   — hhid-parcel-plot, mirroring the WB harmonised plot_id and
+    #            the crop_production / plot_inputs / plot_features plot key
+    #            (join on (t, i, plot)); its parcel component is the parcel
+    #            plot_features keys on.
+    #   source — the labor identity, a tiny controlled vocabulary emitted
+    #            directly by the builder (uganda.LABOR_SOURCES): 'family'
+    #            (household labor), 'hired' (paid labor), 'other' (exchange /
+    #            communal labor — only recorded in 2011-12).  NOT a
+    #            categorical_mapping table: the label is assigned by the
+    #            builder, not decoded from a raw survey code.
+    #   season — 'A' (first season) / 'B' (second season).  Carried in the
+    #            grain (as in crop_production) because the same plot id
+    #            appears in BOTH AGSEC3A and AGSEC3B for ~64% of plots and the
+    #            labor question is per plot-season; collapsing the two seasons
+    #            into one (plot, source) row would require summing across
+    #            seasons (a transformation).
+    #
+    # Columns are REPORTED values only (missing-in-wave -> NaN):
+    #   PersonDays — reported person-days of that source on the plot-season.
+    #                For 'hired' / 'other' this is the row-sum of the survey's
+    #                own man/woman/child day cells of ONE labor question (the
+    #                reported quantity that question measures); for 'family' in
+    #                2013-14/2015-16 it is the row-sum of the per-family-worker
+    #                day cells of one question.  It is NOT a cross-plot /
+    #                cross-source aggregate (total_*_labor_days are those, and
+    #                stay in transformations).
+    #   Wage       — reported cash paid to HIRED labor (the survey's q43/q36
+    #                wage cell).  NaN on family / other rows.
+    #
+    # Coverage (family / hired availability per wave):
+    #   2009-10, 2010-11  family (q39) + hired (q42a-c) + wage (q43)
+    #   2011-12           family (q32) + hired (q35a-c) + wage (q36) + OTHER
+    #                     (exchange q47-q49) — the only wave with 'other'
+    #   2013-14, 2015-16  family (q33a_1..e_1) + hired (q35a-c) + wage (q36)
+    #   2018-19           hired (s3aq35a-c) + wage (s3aq36) ONLY — the WB code
+    #                     sets family to missing; AGSEC3B labor block absent so
+    #                     no season-B rows
+    #   2019-20           hired (s3aq35a-c) + wage (s3aq36) for BOTH seasons;
+    #                     NO family rows (family roster is in a separate
+    #                     AGSEC3A_1 file not in-repo) — documented partial
+    #
+    # No v level baked in: v auto-joins from sample() at API time (plot_labor
+    # is NOT in the framework _no_v_join set).  2005-06 is excluded (no
+    # plot-input/labor module; the UNPS panel starts at 2009-10).
+    index: (t, i, plot, source, season)
+    PersonDays: float
+    Wage: float
+    materialize: make
   nonfood_expenditures: !make

@@ -1,0 +1,5 @@
+outs:
+- md5: 7057655709e083c3864f9d981ebadfaf
+  size: 187267
+  hash: md5
+  path: livestockaggregates_123456.tab

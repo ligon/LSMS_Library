@@ -1613,6 +1613,14 @@ def id_walk(df: pd.DataFrame, updated_ids: dict[str, dict[str, str]], hh_index: 
     :meth:`.set_index`, :meth:`.merge`) is no longer a correctness
     hazard.  See ``tests/test_id_walk.py`` for the regression cases.
     '''
+    # Guard: a frame with no rows (e.g. a wave whose source yielded nothing)
+    # or one lacking a 't' level has no waves to split on; the final
+    # ``pd.concat([])`` would otherwise raise "No objects to concatenate".
+    # Empty-in -> empty-out, and the id_converted flag keeps it idempotent.
+    if df.empty or 't' not in (df.index.names or []):
+        df.attrs['id_converted'] = True
+        return df
+
     #seperate df into different waves:
     dfs = {}
     waves = df.index.get_level_values('t').unique()

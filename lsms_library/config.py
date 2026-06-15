@@ -123,3 +123,29 @@ def s3_creds_path() -> Path:
     if override:
         return Path(override).expanduser()
     return _config_dir() / "s3_creds"
+
+
+def s3_write_creds_path() -> Path:
+    """Return the user-writable path for S3 *writer* credentials.
+
+    Precedence: ``$LSMS_S3_WRITE_CREDS`` env var →
+    ``<config_dir>/s3_write_creds``.  Does NOT create the file or its
+    parent directory.
+
+    This is the writer analogue of :func:`s3_creds_path`.  Unlike the
+    reader credentials (auto-decrypted from ``s3_reader_creds.gpg`` via
+    the WB-API-key flow), the writer pair is installed by hand for
+    contributors who materialize new waves.  Keeping it out of the
+    package tree — alongside ``s3_creds`` — lets the library install
+    into a read-only site-packages directory and avoids stashing a
+    plaintext secret inside the git checkout.
+
+    :func:`lsms_library.data_access._check_remote_access` consults this
+    location first, falling back to the legacy in-tree
+    ``<dvc_dir>/s3_write_creds`` for editable installs that predate the
+    user-config layout.
+    """
+    override = os.environ.get("LSMS_S3_WRITE_CREDS", "").strip()
+    if override:
+        return Path(override).expanduser()
+    return _config_dir() / "s3_write_creds"

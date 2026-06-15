@@ -62,4 +62,24 @@ def Region(value):
         value_key = None
     return region_dict.get(value_key, pd.NA)
 
+def Int_t(value):
+    '''
+    Build interview date from first-visit (DAY1, MO1, YR1).  YR1 is a
+    2-digit year (e.g. 88, 89) -> 1988, 1989.  .DAT columns may arrive
+    as strings or ints.
+    '''
+    def _to_int(x):
+        if pd.isna(x):
+            return None
+        try:
+            return int(float(x))
+        except (TypeError, ValueError):
+            return None
+    d, m, y = _to_int(value.iloc[0]), _to_int(value.iloc[1]), _to_int(value.iloc[2])
+    if d is None or m is None or y is None or m < 1 or m > 12 or d < 1 or d > 31:
+        return pd.NaT
+    if y < 100:
+        y += 1900
+    return pd.to_datetime(f"{y}-{m}-{d}", format='%Y-%m-%d', errors='coerce')
+
 Visits = range(1,7)

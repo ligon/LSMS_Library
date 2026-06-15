@@ -26,4 +26,8 @@ x = id_walk(x, updated_ids)
 
 x = x.reset_index().set_index(['i','t'])
 
+# Canonical column name is Int_t (datetime); wave scripts emit `date`.
+# Rename so the cross-country Feature('interview_date') aligns (GH #325).
+x = x.rename(columns={'date': 'Int_t'})
+
 to_parquet(x.dropna(), '../var/interview_date.parquet')

@@ -200,133 +200,138 @@ follow-up, mirroring how Uganda's table evolved.  Use
 labels='Aggregate' for the coarse grouping.
 
 #+NAME: harmonize_food
-| Preferred Label | Aggregate | 1989 | 1994a | 1994b | 1995 | 1997 |
-|-----------------+-----------+------+-------+-------+------+------|
-| Adenguare | Vegetables | --- | 127 | --- | --- | 44 |
-| Araqi/Katikala | Beverages | 85 | 164 | 73 | 73 | 73 |
-| Avocado | Fruit | --- | --- | --- | --- | 30 |
-| Banana | Fruit | --- | 199 | --- | --- | 19 |
-| Barley | Cereals | 3 | 101 | 3 | 3 | 3 |
-| Beef | Meat | --- | 142 | 61 | 61 | 61 |
-| Beer (Birra) | Beverages | --- | 162 | 72 | 72 | 72 |
-| Beetroot | Vegetables | 56 | 207 | 55 | 55 | 55 |
-| Berbere | Condiments | --- | --- | 85 | 83 | 85 |
-| Biscuits | Other | 81 | --- | --- | --- | --- |
-| Bread | Cereals | --- | 191 | 86 | 86 | 86 |
-| Bula | Roots & Tubers | --- | --- | --- | --- | 100 |
-| Butter | Oils & Fats | 46 | 218 | 64 | 64 | 64 |
-| Cabbage | Vegetables | 58 | 208 | 59 | 59 | 59 |
-| Cactus fruit (Beles) | Fruit | --- | 189 | 91 | --- | --- |
-| Carrot | Vegetables | 57 | 209 | 56 | 56 | 56 |
-| Cassava | Roots & Tubers | 94 | --- | --- | --- | --- |
-| Chat | Stimulants | 25 | 163 | 17 | 17 | 17 |
-| Cheese | Dairy | 47 | --- | --- | --- | --- |
-| Chick Peas | Pulses | 32 | 124 | 40 | 40 | 40 |
-| Chicken | Meat | --- | 144 | 67 | 67 | 67 |
-| Coffee | Beverages | 82 | 181 | 16 | 16 | 16 |
-| Coffee leaf/Tea | Beverages | --- | --- | 90 | --- | 90 |
-| Cooking Oil | Oils & Fats | 38 | 185 | 82 | 82 | 82 |
-| Cow Peas | Pulses | --- | 123 | 41 | 41 | 41 |
-| Dagusa (finger millet) | Cereals | --- | 110 | --- | --- | 24 |
-| Dengollo | Cereals | --- | 106 | --- | --- | --- |
-| Eggs | Animal Products | --- | 145 | 68 | 68 | 68 |
-| Enset | Roots & Tubers | 91 | 194 | 18 | 18 | 18 |
-| Eucalyptus | Other | --- | --- | --- | --- | 22 |
-| Fasolia (haricot) | Pulses | 33 | --- | 35 | 35 | 35 |
-| Fenugreek (Abish) | Condiments | 34 | 204 | 54 | 54 | 54 |
-| Field Peas | Pulses | 80 | --- | 53 | 53 | 53 |
-| Flour | Cereals | --- | --- | 92 | --- | 92 |
-| Fruit | Fruit | 89 | 217 | 36 | 36 | 91 |
-| Garlic | Vegetables | 62 | 206 | 33 | 33 | 33 |
-| Gesho (hops) | Beverages | --- | --- | --- | --- | 21 |
-| Ginger | Condiments | 86 | 212 | 57 | 57 | 57 |
-| Goat Meat | Meat | 98 | --- | --- | --- | --- |
-| Godere (taro) | Roots & Tubers | --- | --- | --- | --- | 43 |
-| Grass | Other | --- | --- | --- | --- | 20 |
-| Green Vegetables | Vegetables | --- | 195 | 15 | 15 | 15 |
-| Groundnut | Oilseeds | --- | --- | --- | --- | 11 |
-| Guava | Fruit | --- | --- | --- | --- | 47 |
-| Hamicho | Roots & Tubers | --- | --- | --- | --- | 38 |
-| Haricot Beans | Pulses | --- | 129 | --- | --- | 52 |
-| Honey | Sugar | --- | 183 | 76 | 76 | 76 |
-| Horse Beans | Pulses | 30 | 122 | 9 | 9 | 9 |
-| Injera | Cereals | --- | 105 | --- | --- | 93 |
-| Injera+Wot | Prepared | --- | --- | 93 | --- | --- |
-| Intochi | Other | --- | --- | --- | --- | 101 |
-| Juice | Beverages | --- | --- | --- | --- | 94 |
-| Kale (Gomen) | Vegetables | 88 | 216 | 49 | 49 | --- |
-| Karia (chilli) | Condiments | 36 | --- | --- | --- | 84 |
-| Karibo/Keredo | Beverages | --- | 166 | 88 | --- | 88 |
-| Kiba-Nueg | Oilseeds | --- | --- | --- | --- | 98 |
-| Kocho | Roots & Tubers | --- | 196 | --- | --- | 39 |
-| Kundo Berbere | Condiments | --- | --- | --- | --- | 13 |
-| Lentils | Pulses | 16 | 121 | 14 | 14 | 14 |
-| Lettuce | Vegetables | 87 | 214 | 58 | 58 | 58 |
-| Linseed | Oilseeds | 10 | 201 | 10 | 10 | 10 |
-| Macaroni/Spaghetti | Cereals | 96 | 192 | 87 | 87 | 87 |
-| Maize | Cereals | 5 | 103 | 5 | 5 | 5 |
-| Mango | Fruit | --- | --- | --- | --- | 37 |
-| Meat | Meat | 48 | --- | --- | --- | 62 |
-| Merara | Other | --- | --- | --- | --- | 97 |
-| Milk | Dairy | 45 | 141 | 65 | 65 | 65 |
-| Milk (sour) | Dairy | 92 | --- | --- | --- | --- |
-| Millet | Cereals | 7 | --- | --- | --- | --- |
-| Mutton/Goat | Meat | --- | 143 | 62 | 62 | --- |
-| Noug/Suf | Oilseeds | --- | 126 | --- | --- | 48 |
-| Oats | Cereals | --- | --- | --- | --- | 8 |
-| Onion | Vegetables | 53 | 205 | 31 | 31 | 31 |
-| Orange | Fruit | --- | --- | --- | --- | 42 |
-| Pineapple | Fruit | --- | --- | --- | --- | 29 |
-| Potato | Roots & Tubers | 52 | 193 | 26 | 26 | 26 |
-| Pumpkin | Vegetables | --- | 197 | --- | --- | 60 |
-| Rice | Cereals | --- | 128 | --- | --- | 50 |
-| Salt | Condiments | 50 | 184 | 81 | 81 | 81 |
-| Salt (Amole) | Condiments | --- | 187 | --- | --- | --- |
-| Sesame | Oilseeds | --- | --- | --- | --- | 12 |
-| Shiferaw (moringa) | Vegetables | --- | 240 | --- | --- | 23 |
-| Shiro | Pulses | --- | 125 | --- | --- | 63 |
-| Sinnar | Cereals | --- | --- | --- | --- | 51 |
-| Soft Drinks | Beverages | --- | 165 | 74 | 74 | 74 |
-| Sorghum | Cereals | 6 | 104 | 6 | 6 | 6 |
-| Spices | Condiments | 37 | 186 | 83 | --- | 83 |
-| Spinach | Vegetables | 63 | --- | 32 | 32 | 32 |
-| Sugar | Sugar | 40 | 182 | 75 | 75 | 75 |
-| Sugarcane | Sugar | 90 | 252 | --- | --- | 27 |
-| Sunflower | Oilseeds | --- | --- | --- | --- | 25 |
-| Sweet Potato | Roots & Tubers | 20 | 253 | --- | --- | 45 |
-| Tea | Beverages | 35 | 188 | --- | --- | --- |
-| Teff | Cereals | --- | 100 | 1 | 1 | --- |
-| Teff (black) | Cereals | 2 | --- | 2 | 2 | 2 |
-| Teff (white) | Cereals | 1 | --- | --- | --- | 1 |
-| Tej | Beverages | 83 | --- | --- | --- | 71 |
-| Tella | Beverages | 84 | 161 | 71 | 71 | 70 |
-| Tobacco | Other | --- | --- | --- | --- | 28 |
-| Tomato | Vegetables | 51 | 198 | --- | --- | 46 |
-| Turmeric | Condiments | --- | --- | 89 | --- | 89 |
-| Wheat | Cereals | 4 | 102 | 4 | 4 | 4 |
-| Wine | Beverages | --- | --- | --- | --- | 96 |
-| Yam | Roots & Tubers | --- | --- | 34 | 34 | 34 |
-| Zengada | Cereals | --- | --- | --- | --- | 7 |
+| Preferred Label        | Aggregate       | Bellemare-etal13 Label | 1989 | 1994a | 1994b | 1995 | 1997 |
+|------------------------+-----------------+------------------------+------+-------+-------+------+------|
+| Adenguare              | Vegetables      | Vegetables             | ---  | 127   | ---   | ---  | 44   |
+| Araqi/Katikala         | Beverages       | Beverages              | 85   | 164   | 73    | 73   | 73   |
+| Avocado                | Fruit           | Fruit                  | ---  | ---   | ---   | ---  | 30   |
+| Banana                 | Fruit           | Fruit                  | ---  | 199   | ---   | ---  | 19   |
+| Barley                 | Cereals         | Barley                 | 3    | 101   | 3     | 3    | 3    |
+| Beef                   | Meat            | Meat                   | ---  | 142   | 61    | 61   | 61   |
+| Beer (Birra)           | Beverages       | Beverages              | ---  | 162   | 72    | 72   | 72   |
+| Beetroot               | Vegetables      | Vegetables             | 56   | 207   | 55    | 55   | 55   |
+| Berbere                | Condiments      | Condiments             | ---  | ---   | 85    | 83   | 85   |
+| Biscuits               | Other           | Other                  | 81   | ---   | ---   | ---  | ---  |
+| Bread                  | Cereals         | Cereals                | ---  | 191   | 86    | 86   | 86   |
+| Bula                   | Roots & Tubers  | Roots & Tubers         | ---  | ---   | ---   | ---  | 100  |
+| Butter                 | Oils & Fats     | Oils & Fats            | 46   | 218   | 64    | 64   | 64   |
+| Cabbage                | Vegetables      | Vegetables             | 58   | 208   | 59    | 59   | 59   |
+| Cactus fruit (Beles)   | Fruit           | Fruit                  | ---  | 189   | 91    | ---  | ---  |
+| Carrot                 | Vegetables      | Vegetables             | 57   | 209   | 56    | 56   | 56   |
+| Cassava                | Roots & Tubers  | Roots & Tubers         | 94   | ---   | ---   | ---  | ---  |
+| Chat                   | Stimulants      | Stimulants             | 25   | 163   | 17    | 17   | 17   |
+| Cheese                 | Dairy           | Dairy                  | 47   | ---   | ---   | ---  | ---  |
+| Chick Peas             | Pulses          | Pulses                 | 32   | 124   | 40    | 40   | 40   |
+| Chicken                | Meat            | Meat                   | ---  | 144   | 67    | 67   | 67   |
+| Coffee                 | Beverages       | Coffee                 | 82   | 181   | 16    | 16   | 16   |
+| Coffee leaf/Tea        | Beverages       | Beverages              | ---  | ---   | 90    | ---  | 90   |
+| Cooking Oil            | Oils & Fats     | Oils & Fats            | 38   | 185   | 82    | 82   | 82   |
+| Cow Peas               | Pulses          | Pulses                 | ---  | 123   | 41    | 41   | 41   |
+| Dagusa (finger millet) | Cereals         | Cereals                | ---  | 110   | ---   | ---  | 24   |
+| Dengollo               | Cereals         | Cereals                | ---  | 106   | ---   | ---  | ---  |
+| Eggs                   | Animal Products | Animal Products        | ---  | 145   | 68    | 68   | 68   |
+| Enset                  | Roots & Tubers  | Roots & Tubers         | 91   | 194   | 18    | 18   | 18   |
+| Eucalyptus             | Other           | Other                  | ---  | ---   | ---   | ---  | 22   |
+| Fasolia (haricot)      | Pulses          | Pulses                 | 33   | ---   | 35    | 35   | 35   |
+| Fenugreek (Abish)      | Condiments      | Condiments             | 34   | 204   | 54    | 54   | 54   |
+| Field Peas             | Pulses          | Pulses                 | 80   | ---   | 53    | 53   | 53   |
+| Flour                  | Cereals         | Cereals                | ---  | ---   | 92    | ---  | 92   |
+| Fruit                  | Fruit           | Fruit                  | 89   | 217   | 36    | 36   | 91   |
+| Garlic                 | Vegetables      | Vegetables             | 62   | 206   | 33    | 33   | 33   |
+| Gesho (hops)           | Beverages       | Beverages              | ---  | ---   | ---   | ---  | 21   |
+| Ginger                 | Condiments      | Condiments             | 86   | 212   | 57    | 57   | 57   |
+| Goat Meat              | Meat            | Meat                   | 98   | ---   | ---   | ---  | ---  |
+| Godere (taro)          | Roots & Tubers  | Roots & Tubers         | ---  | ---   | ---   | ---  | 43   |
+| Grass                  | Other           | Other                  | ---  | ---   | ---   | ---  | 20   |
+| Green Vegetables       | Vegetables      | Vegetables             | ---  | 195   | 15    | 15   | 15   |
+| Groundnut              | Oilseeds        | Oilseeds               | ---  | ---   | ---   | ---  | 11   |
+| Guava                  | Fruit           | Fruit                  | ---  | ---   | ---   | ---  | 47   |
+| Hamicho                | Roots & Tubers  | Roots & Tubers         | ---  | ---   | ---   | ---  | 38   |
+| Haricot Beans          | Pulses          | Pulses                 | ---  | 129   | ---   | ---  | 52   |
+| Honey                  | Sugar           | Sugar                  | ---  | 183   | 76    | 76   | 76   |
+| Horse Beans            | Pulses          | Beans                  | 30   | 122   | 9     | 9    | 9    |
+| Injera                 | Cereals         | Cereals                | ---  | 105   | ---   | ---  | 93   |
+| Injera+Wot             | Prepared        | Prepared               | ---  | ---   | 93    | ---  | ---  |
+| Intochi                | Other           | Other                  | ---  | ---   | ---   | ---  | 101  |
+| Juice                  | Beverages       | Beverages              | ---  | ---   | ---   | ---  | 94   |
+| Kale (Gomen)           | Vegetables      | Vegetables             | 88   | 216   | 49    | 49   | ---  |
+| Karia (chilli)         | Condiments      | Condiments             | 36   | ---   | ---   | ---  | 84   |
+| Karibo/Keredo          | Beverages       | Beverages              | ---  | 166   | 88    | ---  | 88   |
+| Kiba-Nueg              | Oilseeds        | Oilseeds               | ---  | ---   | ---   | ---  | 98   |
+| Kocho                  | Roots & Tubers  | Roots & Tubers         | ---  | 196   | ---   | ---  | 39   |
+| Kundo Berbere          | Condiments      | Condiments             | ---  | ---   | ---   | ---  | 13   |
+| Lentils                | Pulses          | Pulses                 | 16   | 121   | 14    | 14   | 14   |
+| Lettuce                | Vegetables      | Vegetables             | 87   | 214   | 58    | 58   | 58   |
+| Linseed                | Oilseeds        | Oilseeds               | 10   | 201   | 10    | 10   | 10   |
+| Macaroni/Spaghetti     | Cereals         | Cereals                | 96   | 192   | 87    | 87   | 87   |
+| Maize                  | Cereals         | Maize                  | 5    | 103   | 5     | 5    | 5    |
+| Mango                  | Fruit           | Fruit                  | ---  | ---   | ---   | ---  | 37   |
+| Meat                   | Meat            | Meat                   | 48   | ---   | ---   | ---  | 62   |
+| Merara                 | Other           | Other                  | ---  | ---   | ---   | ---  | 97   |
+| Milk                   | Dairy           | Dairy                  | 45   | 141   | 65    | 65   | 65   |
+| Milk (sour)            | Dairy           | Dairy                  | 92   | ---   | ---   | ---  | ---  |
+| Millet                 | Cereals         | Cereals                | 7    | ---   | ---   | ---  | ---  |
+| Mutton/Goat            | Meat            | Meat                   | ---  | 143   | 62    | 62   | ---  |
+| Noug/Suf               | Oilseeds        | Oilseeds               | ---  | 126   | ---   | ---  | 48   |
+| Oats                   | Cereals         | Cereals                | ---  | ---   | ---   | ---  | 8    |
+| Onion                  | Vegetables      | Vegetables             | 53   | 205   | 31    | 31   | 31   |
+| Orange                 | Fruit           | Fruit                  | ---  | ---   | ---   | ---  | 42   |
+| Pineapple              | Fruit           | Fruit                  | ---  | ---   | ---   | ---  | 29   |
+| Potato                 | Roots & Tubers  | Roots & Tubers         | 52   | 193   | 26    | 26   | 26   |
+| Pumpkin                | Vegetables      | Vegetables             | ---  | 197   | ---   | ---  | 60   |
+| Rice                   | Cereals         | Cereals                | ---  | 128   | ---   | ---  | 50   |
+| Salt                   | Condiments      | Condiments             | 50   | 184   | 81    | 81   | 81   |
+| Salt (Amole)           | Condiments      | Condiments             | ---  | 187   | ---   | ---  | ---  |
+| Sesame                 | Oilseeds        | Oilseeds               | ---  | ---   | ---   | ---  | 12   |
+| Shiferaw (moringa)     | Vegetables      | Vegetables             | ---  | 240   | ---   | ---  | 23   |
+| Shiro                  | Pulses          | Pulses                 | ---  | 125   | ---   | ---  | 63   |
+| Sinnar                 | Cereals         | Cereals                | ---  | ---   | ---   | ---  | 51   |
+| Soft Drinks            | Beverages       | Beverages              | ---  | 165   | 74    | 74   | 74   |
+| Sorghum                | Cereals         | Sorghum                | 6    | 104   | 6     | 6    | 6    |
+| Spices                 | Condiments      | Condiments             | 37   | 186   | 83    | ---  | 83   |
+| Spinach                | Vegetables      | Vegetables             | 63   | ---   | 32    | 32   | 32   |
+| Sugar                  | Sugar           | Sugar                  | 40   | 182   | 75    | 75   | 75   |
+| Sugarcane              | Sugar           | Sugar                  | 90   | 252   | ---   | ---  | 27   |
+| Sunflower              | Oilseeds        | Oilseeds               | ---  | ---   | ---   | ---  | 25   |
+| Sweet Potato           | Roots & Tubers  | Roots & Tubers         | 20   | 253   | ---   | ---  | 45   |
+| Tea                    | Beverages       | Beverages              | 35   | 188   | ---   | ---  | ---  |
+| Teff                   | Cereals         | Teff                   | ---  | 100   | 1     | 1    | ---  |
+| Teff (black)           | Cereals         | Teff                   | 2    | ---   | 2     | 2    | 2    |
+| Teff (white)           | Cereals         | Teff                   | 1    | ---   | ---   | ---  | 1    |
+| Tej                    | Beverages       | Beverages              | 83   | ---   | ---   | ---  | 71   |
+| Tella                  | Beverages       | Beverages              | 84   | 161   | 71    | 71   | 70   |
+| Tobacco                | Other           | Other                  | ---  | ---   | ---   | ---  | 28   |
+| Tomato                 | Vegetables      | Vegetables             | 51   | 198   | ---   | ---  | 46   |
+| Turmeric               | Condiments      | Condiments             | ---  | ---   | 89    | ---  | 89   |
+| Wheat                  | Cereals         | Wheat                  | 4    | 102   | 4     | 4    | 4    |
+| Wine                   | Beverages       | Beverages              | ---  | ---   | ---   | ---  | 96   |
+| Yam                    | Roots & Tubers  | Roots & Tubers         | ---  | ---   | 34    | 34   | 34   |
+| Zengada                | Cereals         | Cereals                | ---  | ---   | ---   | ---  | 7    |
 
 * harmonize_unit
 
 Unit code -> canonical label.  The ERHS unit code scheme is
 STABLE across the 1994+ waves (only spelling drifts), so a single
 Code column suffices (cf. harmonize_food which needed per-wave
-columns).  Metric & good-invariant codes map to framework-
-recognized tokens (1->kg, 2->"100 kg" so the explicit-metric
-parser yields 100, 19->litre, 92->g) and 30->Birr (currency:
-shared, intentionally no kg factor).  ALL OTHER units are local
-volumetric/containers whose kg-equivalent is good-specific; the
-food_acquired df_edit appends the food label (e.g. "Chinet/Butter")
-so the framework price-ratio inference recovers a per-good factor
-(metric units stay shared -- a kg is good-invariant).  1989
-unitcode is a different, in-data-unlabelled scheme -> 1989 units
-stay raw+good-specific (no metric distinction) pending Codeunit1.SPS.
+columns).  Metric codes map to framework-recognized tokens
+(1->kg, 2->"100 kg" so the explicit-metric parser yields 100,
+19->litre, 92->g) and 30->Birr (currency: intentionally no kg
+factor).  ALL OTHER codes map to their local volumetric/container
+unit NAME (Chinet, Kunna, ...).  The ``u`` index carries this unit
+label ALONE -- NOT a food label (GH #347).  The framework's
+price-ratio kg inference (transformations.conversion_to_kgs) groups
+by item within each unit, so it recovers a per-good kg factor for
+these local units with no food-label tagging.  Code 0 is the
+source's missing-unit sentinel -> empty label (dropped downstream,
+à la Uganda's ``0 | ---``).  1989 unitcode is a different,
+in-data-unlabelled scheme not mapped through this table -> 1989
+``u`` carries the raw unit code (still a unit token, no metric
+distinction) pending Codeunit1.SPS.
 
 #+NAME: harmonize_unit
 | Code | Preferred Label |
 |------+-----------------|
+| 0 |  |
 | 1 | kg |
 | 2 | 100 kg |
 | 3 | Chinet |

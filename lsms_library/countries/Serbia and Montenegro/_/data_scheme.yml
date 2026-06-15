@@ -6,6 +6,11 @@ Data Scheme:
     Region: str
     Rural: str
 
+  life_satisfaction:
+    index: (t, i, Domain)
+    Satisfaction: str
+    materialize: make
+
   household_roster:
     index: (t, i, pid)
     Sex: str
