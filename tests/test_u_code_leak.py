@@ -66,6 +66,17 @@ def test_leak_detector_no_u_level():
     assert diagnostics.food_acquired_u_code_leaks("X", df=df) == []
 
 
+def test_leak_detector_categorical_u_with_nan():
+    # Regression (master CI, post-v0.7.3): a *categorical* ``u`` level with a
+    # NaN keeps NaN as a float through ``.astype(str)`` (object dtype gives
+    # 'nan'), feeding ``re.match`` a float -> TypeError.  A NaN ``u`` means no
+    # unit was recorded, not a leaked code, so it must be skipped.
+    u_cat = pd.Categorical(["Kg", "Tas", "116", float("nan")])
+    idx = pd.MultiIndex.from_arrays([["x"] * 4, u_cat], names=["i", "u"])
+    df = pd.DataFrame({"Quantity": [1.0] * 4}, index=idx)
+    assert diagnostics.food_acquired_u_code_leaks("X", df=df) == ["116"]
+
+
 # --- cross-country regression (skips when caches/data unavailable) ----------
 
 # Clean per the 2026-06-07 audit; must stay clean.
