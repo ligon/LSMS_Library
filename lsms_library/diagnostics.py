@@ -520,9 +520,16 @@ def food_acquired_u_code_leaks(country: str, *,
         df = Country(country, preload_panel_ids=False).food_acquired()
     if not isinstance(df, pd.DataFrame) or "u" not in (df.index.names or []):
         return []
-    u = df.index.get_level_values("u").astype(str)
+    u = df.index.get_level_values("u")
     code = re.compile(r"^\s*\d")  # leading digit => code / code-prefix / item-name
-    return sorted({v for v in u.unique() if code.match(v)})
+    # Coerce per value and skip NaN.  A *categorical* ``u`` level keeps NaN as a
+    # float through ``.astype(str)`` (unlike object dtype, where NaN -> 'nan'),
+    # which fed ``re.match`` a float and raised TypeError (master CI, post-v0.7.3).
+    # A NaN ``u`` means no unit was recorded -- not a leaked code -- so skip it.
+    return sorted({
+        s for v in u.unique()
+        if pd.notna(v) and code.match(s := str(v))
+    })
 
 
 def _check_index_overlap_with_spine(df: pd.DataFrame, country: str) -> Check:
