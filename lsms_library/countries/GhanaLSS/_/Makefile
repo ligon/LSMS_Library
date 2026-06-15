@@ -29,14 +29,14 @@ $(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
 household_roster = $(shell find $(rounds) -name household_roster.py)
 household_roster_parquet := $(household_roster:.py=.parquet)
 
-../%/_/household_roster.parquet: @D/household_roster.py
+../%/_/household_roster.parquet: $(household_roster)
 	(cd $(@D) && python household_roster.py)
 
 $(VAR_DIR)/household_roster.parquet: household_roster.py $(household_roster_parquet)
 	python household_roster.py
 
 
-%.parquet: %.py food_items.org ghana.py
+%.parquet: %.py food_items.org ghanalss.py
 	(cd $(@D) && python ./$(<F))
 
 clean:
