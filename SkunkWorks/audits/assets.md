@@ -65,7 +65,7 @@ All datasets deliver: **`Quantity`, `Age`, `Value`, `Purchase Price`** (4 column
 - **Expected**: `(country, t, i, j)` when Feature('assets')() called
 - **Actual**: `(country, i, t, v, j)`
 
-**Root cause**: `Country._finalize_result()` reorders levels to `(i, t, v, ...)` and automatically adds `v` via `_join_v_from_sample()`. Assets not in the `_no_v_join` exemption list.
+**Root cause**: `Country._finalize_result()` reorders levels to `(i, t, v, ...)` and automatically adds `v` via `_join_v_from_sample()`. Assets not in the no-v-join exemption set (since GH #436 this set is declared in `lsms_library/data_info.yml`, not hardcoded in `country.py`; `assets` is now exempt via its v-free `index_info` entry).
 
 ### Duplicates:
 - **Index duplicated().sum()**: 0 across tested countries
@@ -119,7 +119,7 @@ Max value of 4,000 plausible for asset count in rare cases (e.g., livestock) but
 ## Recommendations
 
 1. **Update canonical schema**: Add assets columns to `data_info.yml` and clarify whether `v` is intended.
-2. **Add assets to `_no_v_join` exemption** if cluster context is not needed, or document it as required.
+2. **Exempt assets from the v-join** if cluster context is not needed (declarative since GH #436: a v-free `index_info` entry, or the `Join v from sample > skip_extra` list, in `lsms_library/data_info.yml`), or document `v` as required.
 3. **Harmonize column definitions** across Malawi, Nepal, Ethiopia, Nigeria to match canonical set.
 4. **Add currency metadata** or document that cross-country value comparisons require country-specific conversion.
 

@@ -1850,8 +1850,7 @@ class Country:
             # sample() would produce a non-canonical shape.  The set is declared
             # in lsms_library/data_info.yml ("Join v from sample" + index_info),
             # NOT hardcoded here (GH #436), so adding such a feature needs no
-            # framework-code edit.  See SkunkWorks/audits/framework_diagnosis.md
-            # for the original schema survey.
+            # framework-code edit.  See _no_v_join_tables() below.
             if (not v_already_present
                     and 'i' in current_names
                     and 't' in current_names
@@ -3238,9 +3237,13 @@ def _compute_no_v_join(data: dict) -> frozenset[str]:
     for table, spec in index_info.items():
         if not isinstance(spec, str):
             continue
-        levels = [tok.strip()
-                  for tok in spec.strip().lstrip("(").rstrip(")").split(",")
-                  if tok.strip()]
+        # Strip exactly one surrounding paren pair (mirrors
+        # feature._canonical_index_levels) so a level name containing a paren
+        # is not mangled, then split on commas into whole level tokens.
+        cleaned = spec.strip()
+        if cleaned.startswith("(") and cleaned.endswith(")"):
+            cleaned = cleaned[1:-1]
+        levels = [tok.strip() for tok in cleaned.split(",") if tok.strip()]
         if "v" not in levels:
             skip.add(table)
     skip.update(str(t) for t in (section.get("skip_extra") or []))
