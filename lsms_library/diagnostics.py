@@ -29,7 +29,7 @@ import pandas as pd
 import yaml as _yaml
 from pyarrow.lib import ArrowInvalid
 
-from .paths import data_root, COUNTRIES_ROOT
+from .paths import data_root, countries_root
 from .yaml_utils import load_yaml
 
 
@@ -148,7 +148,7 @@ def _load_scheme(country: str) -> dict:
     represent data that is genuinely unavailable for some countries (e.g.,
     ``panel_weight`` in cross-sectional surveys).
     """
-    yml = COUNTRIES_ROOT / country / "_" / "data_scheme.yml"
+    yml = countries_root() / country / "_" / "data_scheme.yml"
     if not yml.exists():
         return {}
     data = load_yaml(yml)

@@ -79,22 +79,43 @@ unconditionally at the top of `load_dataframe_with_dvc`
 benefits from this; there is no longer a special-case for the seven
 DVC-stage countries.
 
-**There is no automatic staleness check.** When you edit a wave's
-`data_info.yml`, a `_/{table}.py` script, or some other source, the
-library cannot tell that the source changed. Two ways to invalidate:
+**Automatic content-hash staleness (v0.8.0).** Each cached parquet
+carries an embedded content hash (in its pyarrow schema metadata) that
+covers everything determining its *pre-finalize* contents: the
+`LSMS_CACHE_SCHEMA` version, the wave's `data_info.yml`, the wave and
+country modules (`{wave_folder}.py`, `{country}.py`, `mapping.py`), any
+`_/{table}.py` script, and the **DVC sidecar md5** of each declared
+source file (the `.dta` itself is never hashed or downloaded). On read,
+the hash is recomputed from the current sources and compared:
 
-- Set `LSMS_NO_CACHE=1` for the session — this skips both the v0.7.0
-  top read (L2-country) and the L2-wave reads on the YAML path, forcing
-  a rebuild from source.
+- **match** → the cached parquet is served (fast path preserved);
+- **mismatch** → the cache is treated as stale and rebuilt from source;
+- **no embedded hash** (a parquet built before v0.8.0) → trusted once and
+  re-stamped, so the *next* read is guarded (no rebuild-all on upgrade).
+
+So editing a `data_info.yml`, a wave/country `_/{table}.py` script, the
+country module, or a source `.dta` (via its sidecar) now invalidates the
+cache automatically — no manual step required. The recompute is cheap
+(~1–4 ms; small config/sidecar reads only, no `.dta` hashing, no S3, no
+directory walk), preserving the v0.7.0 fast-path win.
+
+**Known limitations.** (1) Script-path tables whose sources are
+referenced via *dynamically-constructed* paths (not string literals in
+the `_/{table}.py`) are covered only by hashing the script text, not the
+source content — an out-of-band edit to such a source still needs a
+manual `cache clear`. (2) `assume_cache_fresh=True` deliberately skips
+the hash check ("I promise the cache is current"). (3) `LSMS_NO_CACHE=1`
+still forces a full rebuild.
+
+You can still invalidate manually:
+
+- Set `LSMS_NO_CACHE=1` for the session to force a rebuild from source.
 - Run `lsms-library cache clear --country {Country}` (optionally with
   `--method {table}`) to evict the affected L2-country and L2-wave
   parquets before the next call.
 
 Either way, the rebuild reads from L1 (the DVC blob cache) where
 possible, so you only pay the S3 cost once per blob per machine.
-
-Content-hash invalidation that automatically detects edits to
-`data_info.yml` and `_/{table}.py` is planned for v0.8.0.
 
 ## Cache Location
 

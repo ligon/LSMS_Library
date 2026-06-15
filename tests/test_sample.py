@@ -17,14 +17,14 @@ import pandas as pd
 # touching DVC locks.
 
 import lsms_library as ll
-from lsms_library.paths import COUNTRIES_ROOT
+from lsms_library.paths import countries_root
 from lsms_library.yaml_utils import load_yaml
 
 
 def _countries_with_sample() -> list[str]:
     """Discover countries whose data_scheme.yml declares a sample table."""
     countries = []
-    for yml in sorted(COUNTRIES_ROOT.glob("*/_/data_scheme.yml")):
+    for yml in sorted(countries_root().glob("*/_/data_scheme.yml")):
         data = load_yaml(yml)
         if not isinstance(data, dict):
             continue
@@ -49,7 +49,7 @@ NO_WEIGHT_COUNTRIES = {"China", "Kazakhstan", "Pakistan"}
 # tests re-enable automatically with no change here.
 def _countries_without_data() -> set[str]:
     unavailable = set()
-    for yml in sorted(COUNTRIES_ROOT.glob("*/_/data_scheme.yml")):
+    for yml in sorted(countries_root().glob("*/_/data_scheme.yml")):
         data = load_yaml(yml)
         if isinstance(data, dict) and data.get("data_available") is False:
             unavailable.add(yml.parent.parent.name)

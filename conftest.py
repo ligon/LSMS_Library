@@ -118,8 +118,8 @@ def _purge_country_caches(country_name: str) -> None:
     or import failure shouldn't stop the test session.
     """
     try:
-        from lsms_library.paths import COUNTRIES_ROOT
-        country_dir = COUNTRIES_ROOT / country_name
+        from lsms_library.paths import countries_root
+        country_dir = countries_root() / country_name
         if not (country_dir / "_" / "data_scheme.yml").exists():
             return
         from lsms_library import Country
@@ -163,7 +163,7 @@ def _purge_data_root_caches() -> None:
     or ``dvc-cache`` artefacts — by checking for the canonical
     ``data_scheme.yml`` under ``lsms_library/countries/{name}/_/``.
     """
-    from lsms_library.paths import COUNTRIES_ROOT, data_root
+    from lsms_library.paths import countries_root, data_root
 
     root = data_root()
     if not root.exists():
@@ -173,7 +173,7 @@ def _purge_data_root_caches() -> None:
     for country_dir in sorted(p for p in root.iterdir() if p.is_dir()):
         country_name = country_dir.name
         # Skip directories that aren't real LSMS countries.
-        if not (COUNTRIES_ROOT / country_name / "_" / "data_scheme.yml").exists():
+        if not (countries_root() / country_name / "_" / "data_scheme.yml").exists():
             continue
 
         try:
