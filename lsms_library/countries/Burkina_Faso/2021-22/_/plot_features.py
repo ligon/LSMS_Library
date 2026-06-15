@@ -6,12 +6,29 @@ each (grappe, menage).  See
 lsms_library/countries/Burkina_Faso/_/burkina_faso.py:plot_features_for_wave
 for the harmonization shared across both EHCVM waves (copied from the
 Mali EHCVM reference, PR #284).
+
+Household id (GH #460): UNLIKE 2018-19, the 2021-22 wave's mapping.py
+does NOT override i(), so its sample() / household_roster fall back to
+the country-level i() (grappe + 3-digit menage, no '0' separator).
+Verified empirically: sample 2021-22 carries old-form ids (e.g. '9120'
+for grappe=9, menage=120), NOT the canonical '90120'.  This script must
+build plot_features' i with the SAME formatter, so it passes the
+country i() (wrapped to ehcvm_i's (grappe, menage) signature).  Using
+ehcvm_i here would instead strand every 3-digit-menage household off
+sample().  (plot_features 2021-22 already reconciled 100% before #460;
+this keeps it so while #460 fixes the 2018-19 mismatch.)
 """
 import sys
+import pandas as pd
 
 sys.path.append('../../_/')
 from lsms_library.local_tools import get_dataframe, to_parquet
-from burkina_faso import plot_features_for_wave
+from burkina_faso import plot_features_for_wave, i as country_i
+
+
+def _old_i(grappe, menage):
+    """Country-level i() exposed with ehcvm_i's (grappe, menage) signature."""
+    return country_i(pd.Series([grappe, menage]))
 
 
 # convert_categoricals=False keeps the integer s16a codes that the
@@ -33,7 +50,7 @@ colmap = dict(
     water_source  = 's16aq17',
 )
 
-df = plot_features_for_wave('2021-22', src, colmap)
+df = plot_features_for_wave('2021-22', src, colmap, id_fn=_old_i)
 
 assert df.index.is_unique, "Non-unique (t, i, plot_id) index in plot_features 2021-22"
 assert len(df) > 0, "plot_features 2021-22 produced no rows"
