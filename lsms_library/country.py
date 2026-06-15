@@ -36,9 +36,20 @@ from importlib.resources import files
 import importlib
 from collections import defaultdict
 from .local_tools import df_data_grabber, format_id, get_categorical_mapping, get_dataframe, map_index, get_formatting_functions, panel_ids, id_walk, all_dfs_from_orgfile, to_parquet
+from .local_tools import (
+    LSMS_CACHE_SCHEMA,
+    cached_file_hash,
+    source_fingerprint,
+    scan_script_data_refs,
+    read_parquet_cache_hash,
+    cache_freshness,
+    stamp_parquet_hash,
+    _collect_file_paths_from_block,
+)
 from .paths import data_root, countries_root
 from .yaml_utils import load_yaml
 import importlib.util
+import hashlib
 import logging
 import os
 import warnings
@@ -391,6 +402,43 @@ def _rebuild_failure_error(country_name: str, method_name: str) -> RuntimeError:
     )
 
 
+# Module-level parse cache for data_info.yml, keyed on the file's CONTENT
+# hash (not mtime).  Re-parsing YAML on every wave on every cache-hash
+# computation was ~3.7 ms/wave and dominated the L2 read gate; Wave
+# objects are recreated on each ``country[wave]`` access so an
+# instance-level cache wouldn't persist.  Keying on the content hash
+# keeps this correct under edits (an edit changes the hash -> cache miss
+# -> reparse) while making repeat reads ~free.
+_DATA_INFO_CACHE: dict[str, dict[str, Any]] = {}
+
+# ``.org`` files in a country/wave ``_/`` dir that are build-time inputs
+# (food_items.org, categorical_mapping.org, unit_labels.org, ...) belong
+# in the cache hash: a script reads them at build time and bakes the
+# result into the parquet, so an edit must invalidate.  We hash *all*
+# ``*.org`` in the relevant ``_/`` dir except the ones below, which are
+# pure documentation never read by a build step -- hashing them would
+# cause a spurious full-country rebuild on a docs edit.
+_ORG_HASH_SKIP = {"CONTENTS.org"}
+
+
+def _parse_data_info_cached(path: Path, content_hash: str | None) -> dict[str, Any]:
+    """Parse a ``data_info.yml`` once per distinct content hash."""
+    if content_hash is None:
+        return {}
+    cached = _DATA_INFO_CACHE.get(content_hash)
+    if cached is not None:
+        return cached
+    try:
+        with open(path, "r") as fh:
+            parsed = load_yaml(fh)
+    except (OSError, yaml.YAMLError):
+        parsed = {}
+    if not isinstance(parsed, dict):
+        parsed = {}
+    _DATA_INFO_CACHE[content_hash] = parsed
+    return parsed
+
+
 class Wave:
     """A single survey wave within a country.
 
@@ -506,7 +554,73 @@ class Wave:
         if data_info:
            wave_data.extend([key for key in data_info.keys() if key not in ['Wave', 'Country']])
         return list(set(wave_data))
-    
+
+    def _input_hash(self, table: str) -> str | None:
+        """Content hash of every input that determines this wave's
+        contribution to *table*'s harmonized parquet.
+
+        Used by the L2 cache layer (v0.8.0) to detect stale wave-level
+        parquets.  Returns ``None`` when the wave has no ``_/`` directory
+        (nothing to verify -> caller preserves "read if present").
+
+        Inputs hashed (all small files; the multi-MB ``.dta`` is never
+        read -- its DVC sidecar md5 stands in via
+        :func:`source_fingerprint`):
+
+        - ``LSMS_CACHE_SCHEMA`` (library-wide extraction-logic version);
+        - the wave's ``data_info.yml`` (column maps / merges / derived);
+        - the wave-module formatting functions
+          (``{wave_folder}.py``, ``mapping.py``);
+        - YAML-path: the DVC fingerprint of each declared source file;
+        - script-path: the ``_/{table}.py`` text plus the fingerprints of
+          any data files it references as string literals.
+
+        Deliberately excluded: post-read transforms (kinship, spellings,
+        categorical mappings, ``_join_v_from_sample``) -- they re-run on
+        every read and never touch the cached parquet.
+        """
+        wave_dir = self.file_path / "_"
+        if not wave_dir.is_dir():
+            return None
+        di_hash = cached_file_hash(wave_dir / "data_info.yml")
+        parts = [
+            f"schema={LSMS_CACHE_SCHEMA}",
+            f"wave={self.year}",
+            f"table={table}",
+            "data_info=" + (di_hash or "none"),
+        ]
+        for mod in (f"{self.wave_folder}.py", "mapping.py"):
+            parts.append(f"mod:{mod}=" + (cached_file_hash(wave_dir / mod) or "none"))
+        # Build-time .org inputs in this wave's _/ (e.g. wave-local
+        # food_items.org / mapping tables).  CONTENTS.org and friends are
+        # skipped (docs, never read by a build step).
+        for org in sorted(wave_dir.glob("*.org")):
+            if org.name in _ORG_HASH_SKIP:
+                continue
+            parts.append(f"org:{org.name}=" + (cached_file_hash(org) or "none"))
+
+        data_info = _parse_data_info_cached(wave_dir / "data_info.yml", di_hash)
+        block = data_info.get(table) if isinstance(data_info, dict) else None
+        if block:
+            # YAML path: resolve each declared file exactly as
+            # Wave.grab_data does (``file_path / "Data" / fn`` then
+            # normpath), which handles both bare names (``foo.dta``) and
+            # ``../Data/foo.dta``-style entries.
+            for fn in sorted(set(_collect_file_paths_from_block(block))):
+                data_path = Path(os.path.normpath(self.file_path / "Data" / fn))
+                parts.append("src:" + source_fingerprint(data_path))
+        else:
+            # Script path: the script text is the primary input; literal
+            # data refs are folded in best-effort (see CRITICAL-1 in the
+            # design doc for the residual dynamic-path gap).
+            script = wave_dir / f"{table}.py"
+            parts.append(f"script:{table}.py=" + (cached_file_hash(script) or "none"))
+            for ref in sorted(set(scan_script_data_refs(script))):
+                data_path = Path(os.path.normpath(self.file_path / "Data" / ref))
+                parts.append("sref:" + source_fingerprint(data_path))
+
+        return hashlib.sha256("\x1f".join(parts).encode()).hexdigest()
+
     @property
     def formatting_functions(self) -> dict[str, Callable[..., Any]]:
         function_dic = self.country.formatting_functions
@@ -703,7 +817,21 @@ class Wave:
             cache_path = (data_root(self.country.name) / self.year / '_'
                           / f'{request}.parquet')
             if cache_path.exists() and not os.environ.get('LSMS_NO_CACHE'):
-                return pd.read_parquet(cache_path)
+                # v0.8.0 content-hash staleness for the YAML-path L2-wave
+                # parquet (same classification as L2-country; see
+                # load_dataframe_with_dvc).  Stale -> fall through and
+                # re-extract from source below.
+                expected_wave_hash = self._input_hash(request)
+                if cache_freshness(cache_path, expected_wave_hash) != "stale":
+                    try:
+                        df_cached = pd.read_parquet(cache_path)
+                    except (OSError, ArrowInvalid):
+                        df_cached = None
+                    if df_cached is not None:
+                        if (expected_wave_hash is not None
+                                and read_parquet_cache_hash(cache_path) is None):
+                            stamp_parquet_hash(cache_path, expected_wave_hash)
+                        return df_cached
 
         def check_adding_t(df):
             index_list = df.index.names
@@ -841,10 +969,21 @@ class Wave:
             country_name = self.country.name
             external_parquet = data_root(country_name) / self.wave_folder / "_" / f"{request}.parquet"
 
-            # Check if the parquet already exists before invoking Make
+            # Check if the parquet already exists before invoking Make.
+            # v0.8.0: skip a candidate whose embedded hash is STALE so a
+            # script/source edit forces Make to rebuild it (closes the
+            # "stale L2-wave parquet shadows a source-script fix" gap
+            # documented in CLAUDE.md "Cache Behavior").
+            expected_wave_hash = self._input_hash(request)
             parquet_fn = None
             for candidate in [external_parquet, intree_parquet]:
                 if candidate.exists():
+                    if cache_freshness(candidate, expected_wave_hash) == "stale":
+                        logger.debug(
+                            f"v0.8.0 wave cache STALE: {request} at {candidate}; "
+                            f"will rebuild via Make"
+                        )
+                        continue
                     parquet_fn = candidate
                     break
 
@@ -886,6 +1025,16 @@ class Wave:
                 return pd.DataFrame()
 
             df = pd.read_parquet(parquet_fn)
+            # NOTE: we deliberately do NOT trust-once-stamp script-path
+            # wave parquets here.  They are written hashless by the
+            # _/<table>.py scripts, so stamping the current hash onto a
+            # parquet we merely *read* would (a) mask a real staleness on
+            # the first edit and (b) bump the file mtime past the edited
+            # source, defeating Make's timestamp rebuild (v0.8.0
+            # CRITICAL-2).  Script-path staleness is instead governed by
+            # the L2-country hash gate, which evicts hashless wave
+            # parquets (see Country._evict_hashless_wave_caches) so this
+            # branch re-runs Make on the next stale read.
 
         if isinstance(df, pd.DataFrame):
             df = map_index(df)
@@ -903,7 +1052,8 @@ class Wave:
                 and not df.empty):
             try:
                 cache_path.parent.mkdir(parents=True, exist_ok=True)
-                df = to_parquet(df, cache_path, absolute_path=True)
+                df = to_parquet(df, cache_path, absolute_path=True,
+                                cache_hash=self._input_hash(request))
             except (OSError, ValueError, ArrowInvalid) as exc:
                 # Disk full / permission denied / parquet serialization
                 # failure -> warn and continue with the in-memory df.
@@ -1005,6 +1155,14 @@ class Country:
         coercion, ``_join_v_from_sample``) still runs on every read — only
         the cache-lookup / DVC layer is bypassed.  Useful on clusters where
         the parquet cache has been pre-built.  Ignores ``LSMS_NO_CACHE``.
+
+        .. note::
+           This is the one escape that *also* skips the v0.8.0 content-hash
+           staleness check — it is the explicit "I promise the cache
+           matches current sources" mode.  With the hash check now the
+           default, ``assume_cache_fresh`` is strictly weaker than the
+           default path and is a candidate for deprecation (see
+           SkunkWorks/dvc_object_management.org "Rethink trust_cache").
     trust_cache : bool
         Deprecated alias for ``assume_cache_fresh``.  Will be removed in
         v0.8.0.
@@ -1943,6 +2101,105 @@ class Country:
 
         return df
 
+    def _table_cache_hash(self, method_name: str, waves: list[str]) -> str | None:
+        """Composite content hash for the L2-country parquet of
+        *method_name* across *waves* (v0.8.0 cache invalidation).
+
+        Composed from each wave's :meth:`Wave._input_hash`, so editing a
+        single wave's source / config / script busts the country hash and
+        triggers a rebuild that re-reads only the changed wave's L2-wave
+        parquet.  Returns ``None`` (``unverifiable`` -> read-if-present)
+        when no wave can produce an input hash, so tables the scheme
+        can't introspect never regress the v0.7.0 fast path.
+        """
+        try:
+            wave_hashes: list[str] = []
+            any_hash = False
+            for w in sorted(waves):
+                try:
+                    wh = self[w]._input_hash(method_name)
+                except (KeyError, AttributeError, OSError):
+                    wh = None
+                wave_hashes.append(f"{w}={wh or 'none'}")
+                if wh is not None:
+                    any_hash = True
+            # Country-level inputs that wave hashes miss: the country-level
+            # concatenator script ``{country}/_/{table}.py`` (e.g.
+            # Uganda/_/food_acquired.py), the country module
+            # ``{country}/_/{name.lower()}.py`` (e.g. uganda.py, whose
+            # helpers the wave scripts import), and the country mapping.
+            # Without these, editing the concatenator or the country
+            # module leaves the hash unchanged and serves stale data --
+            # exactly the food_acquired_to_canonical class of bug.
+            cdir = self.file_path / "_"
+            country_parts = [
+                "ctbl=" + (cached_file_hash(cdir / f"{method_name}.py") or "none"),
+                "cmod=" + (cached_file_hash(cdir / f"{self.name.lower()}.py") or "none"),
+                "cmap=" + (cached_file_hash(cdir / "mapping.py") or "none"),
+                # data_scheme.yml declares the table registry and the
+                # `materialize: make` flags (which decide YAML-path vs
+                # script-path builds) -- build-relevant config, so an edit
+                # must invalidate.  Since #436/#455 it also carries
+                # per-feature `join_v` / derived declarations; those are
+                # read-time transforms, so hashing the whole file
+                # over-invalidates harmlessly on such edits (same coarse
+                # whole-file approach as data_info.yml).
+                "cscheme=" + (cached_file_hash(cdir / "data_scheme.yml") or "none"),
+                # The Makefile defines how every script-path (`!make`) table
+                # in this country is built, so an edit to it must invalidate.
+                # Country-level (one per country); affects all the country's
+                # tables (YAML-path included -- a harmless over-invalidation,
+                # since the Makefile is edited rarely).
+                "cmake=" + (cached_file_hash(cdir / "Makefile") or "none"),
+            ]
+            # Country-level build-time .org inputs (food_items.org,
+            # categorical_mapping.org, unit_labels.org, ...), CONTENTS.org
+            # excluded.  These are read by the country-level concatenator /
+            # harmonization helpers at build time.
+            for org in sorted(cdir.glob("*.org")):
+                if org.name in _ORG_HASH_SKIP:
+                    continue
+                country_parts.append(f"corg:{org.name}=" + (cached_file_hash(org) or "none"))
+            if any(not p.endswith("=none") for p in country_parts):
+                any_hash = True
+            if not any_hash:
+                return None
+            payload = (f"schema={LSMS_CACHE_SCHEMA}\x1ftable={method_name}\x1f"
+                       + "\x1f".join(country_parts) + "\x1f"
+                       + "\x1f".join(wave_hashes))
+            return hashlib.sha256(payload.encode()).hexdigest()
+        except Exception:
+            return None
+
+    def _evict_hashless_wave_caches(self, method_name: str) -> None:
+        """Delete L2-wave parquets for *method_name* that carry NO embedded
+        hash (i.e. written by a ``_/{table}.py`` script, which can't
+        self-invalidate).
+
+        Called when the L2-country hash is STALE.  Script-path wave
+        parquets are hashless, so trusting them on the rebuild descent
+        would re-serve stale data (and a read-time stamp would mask it
+        permanently -- the v0.8.0 CRITICAL-2 bug).  Deleting them forces
+        the descent's ``grab_data`` to re-run Make/the script.  Stamped
+        (YAML-path) wave parquets are LEFT ALONE: they self-invalidate
+        per-wave via their own hash gate, so deleting them would discard
+        the per-wave granularity for unchanged waves.
+        """
+        country_root = data_root(self.name)
+        if not country_root.exists():
+            return
+        # Glob matches round-name dirs too (Nigeria 2012Q3/, 2013Q1/),
+        # mirroring clear_cache's discovery.
+        for p in country_root.glob(f"*/_/{method_name}.parquet"):
+            if p.parent.parent.name in ("_", "var"):
+                continue
+            try:
+                if read_parquet_cache_hash(p) is None:
+                    p.unlink()
+                    logger.debug(f"v0.8.0 evicted hashless stale wave cache: {p}")
+            except OSError:
+                pass
+
     def _aggregate_wave_data(self, waves: list[str] | None = None, method_name: str | None = None) -> pd.DataFrame | dict[str, Any]:
         """Aggregates data across multiple waves using a single dataset method.
 
@@ -2310,13 +2567,22 @@ class Country:
             cache_path = data_root(self.name) / "var" / f"{method_name}.parquet"
             cache_exists = cache_path.exists()
 
-            # v0.7.0: best-effort cache read.  If a parquet exists at
-            # cache_path, read it and return without consulting DVC, the
-            # stage layer, or the wave loaders.  No staleness check is
-            # performed -- contributors editing source data are expected
-            # to clear the cache (`lsms-library cache clear --country X`)
-            # or set LSMS_NO_CACHE=1 in the environment.  Hash-based
-            # invalidation is deferred to v0.8.0.
+            # v0.7.0/v0.8.0: best-effort cache read.  If a parquet exists
+            # at cache_path AND is not stale, read it and return without
+            # consulting DVC, the stage layer, or the wave loaders.
+            #
+            # v0.8.0 content-hash staleness: the parquet carries an
+            # embedded ``lsms_cache_hash`` (see local_tools.to_parquet);
+            # we recompute the expected hash from this country's per-wave
+            # inputs and compare.  Classifications:
+            #   - unverifiable (no computable hash) -> read (v0.7.0 behavior)
+            #   - fresh        -> read
+            #   - legacy       -> read + trust-once re-stamp (migration)
+            #   - stale        -> fall through and rebuild from source
+            # Editing a wave's data_info.yml / wave module / _/<table>.py
+            # script or a source .dta (via its DVC sidecar md5) flips the
+            # hash and forces a rebuild.  ``assume_cache_fresh`` /
+            # ``LSMS_NO_CACHE`` short-circuit this (handled elsewhere).
             #
             # This block fixes the write-only-cache bug at the
             # `if not stage_infos:` branch below (which wrote a parquet
@@ -2332,25 +2598,47 @@ class Country:
             # kinship expansion, spelling normalization, and the
             # `_join_v_from_sample` augmentation still apply.
             no_cache = os.environ.get("LSMS_NO_CACHE", "").lower() in {"1", "true", "yes"}
+            cache_expected_hash = None
             if cache_exists and not no_cache:
-                try:
-                    cached_df = get_dataframe(cache_path)
-                    cached_df = map_index(cached_df)
+                cache_expected_hash = self._table_cache_hash(method_name, waves)
+                freshness = cache_freshness(cache_path, cache_expected_hash)
+                if freshness == "stale":
                     logger.debug(
-                        f"v0.7.0 cache read: {method_name} from {cache_path}"
+                        f"v0.8.0 cache STALE: {method_name} at {cache_path}; "
+                        f"rebuilding from source"
                     )
-                    return cached_df
-                except (OSError, ArrowInvalid) as cache_read_error:
-                    # Stale / corrupted cache parquet -> rebuild from source.
-                    # Surface to the user (not just debug log) so a silent
-                    # cache-miss isn't mistaken for a healthy build.
-                    # Programmer bugs (TypeError, AttributeError) propagate.
-                    warnings.warn(
-                        f"v0.7.0 cache read failed for {method_name} "
-                        f"({cache_read_error!r}); rebuilding from source",
-                        category=UserWarning,
-                        stacklevel=2,
-                    )
+                    # Hashless (script-written) L2-wave parquets can't
+                    # self-invalidate; evict them so the rebuild descent
+                    # re-runs Make/the script instead of reusing stale
+                    # data (CRITICAL-2).  Stamped YAML-path wave parquets
+                    # are left to self-invalidate per-wave.
+                    self._evict_hashless_wave_caches(method_name)
+                else:
+                    try:
+                        cached_df = get_dataframe(cache_path)
+                        cached_df = map_index(cached_df)
+                        if freshness == "legacy" and cache_expected_hash is not None:
+                            # Trust-once-then-stamp: parquet predates
+                            # hashing; assume it matches current sources
+                            # (same assumption v0.7.0 already made) and
+                            # stamp it so the next read is guarded.
+                            stamp_parquet_hash(cache_path, cache_expected_hash)
+                        logger.debug(
+                            f"v0.8.0 cache read ({freshness}): {method_name} "
+                            f"from {cache_path}"
+                        )
+                        return cached_df
+                    except (OSError, ArrowInvalid) as cache_read_error:
+                        # Stale / corrupted cache parquet -> rebuild from source.
+                        # Surface to the user (not just debug log) so a silent
+                        # cache-miss isn't mistaken for a healthy build.
+                        # Programmer bugs (TypeError, AttributeError) propagate.
+                        warnings.warn(
+                            f"v0.7.0 cache read failed for {method_name} "
+                            f"({cache_read_error!r}); rebuilding from source",
+                            category=UserWarning,
+                            stacklevel=2,
+                        )
 
             dvc_root = self.file_path.parent
 
@@ -2365,7 +2653,8 @@ class Country:
                         if isinstance(df, pd.DataFrame):
                             df = _enforce_rejected_column_spellings(df)
                             cache_path.parent.mkdir(parents=True, exist_ok=True)
-                            to_parquet(df, cache_path)
+                            to_parquet(df, cache_path,
+                                       cache_hash=self._table_cache_hash(method_name, waves))
                             logger.debug(f"Writing {method_name} to cache {cache_path}")
                         return df
 
@@ -2408,7 +2697,8 @@ class Country:
                             combined_df = next(iter(non_empty_df.values()))
                         combined_df = _enforce_rejected_column_spellings(combined_df)
                         cache_path.parent.mkdir(parents=True, exist_ok=True)
-                        to_parquet(combined_df, cache_path)
+                        to_parquet(combined_df, cache_path,
+                                   cache_hash=self._table_cache_hash(method_name, waves))
                         logger.debug(f"Writing {method_name} to cache {cache_path}")
                         return combined_df
 
@@ -2503,7 +2793,8 @@ class Country:
                 if isinstance(df, pd.DataFrame):
                     df = _enforce_rejected_column_spellings(df)
                     cache_path.parent.mkdir(parents=True, exist_ok=True)
-                    to_parquet(df, cache_path)
+                    to_parquet(df, cache_path,
+                               cache_hash=self._table_cache_hash(method_name, waves))
                     logger.debug(
                         f"v0.7.0 cache write (DVC fallback): {method_name} to {cache_path}"
                     )

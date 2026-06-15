@@ -585,7 +585,7 @@ Tracked so nothing falls through the cracks during v0.7.0 execution:
 - [ ] Verify + tag v0.7.0 (items 8, 9)
 
 ** Later / v0.8.0
-- [ ] Hash-based invalidation
+- [X] Hash-based invalidation (2026-06-14; see "Convergence: implemented design")
 - [ ] Retire DVC stage layer
 - [ ] =generate_dvc_stages.py= disposition decision
 - [ ] Deprecate =trust_cache=
@@ -594,6 +594,147 @@ Tracked so nothing falls through the cracks during v0.7.0 execution:
 - [ ] Uganda vestigial wave-level =dvc.yaml= cleanup (per HANDOFF_2026-04-01.org)
 - [ ] Tighten =s3_bucket_readers= policy scope
 - [ ] Periodic writer audit automation
+
+* Convergence: implemented design (2026-06-14)
+
+Implemented on branch =feature/l2-hash-invalidation= after a
+red-team/implement/adversary loop.  The shipped scheme differs from the
+original sketch above in several ways the red-team forced:
+
+** What gets hashed
+Per *wave* (=Wave._input_hash(table)= in =country.py=):
+- =LSMS_CACHE_SCHEMA= (a manual integer lever in =local_tools.py=);
+- the wave's =data_info.yml= content;
+- the wave-module formatting code (={wave_folder}.py=, =mapping.py=);
+- the wave's build-time =*.org= inputs in =_/= (=CONTENTS.org= excluded);
+- *YAML-path*: the DVC *sidecar* fingerprint of each declared source
+  file (never the multi-MB =.dta= itself), resolved exactly as
+  =grab_data= does (=file_path/"Data"/fn= + =normpath=, so both bare
+  =foo.dta= and =../Data/foo.dta= styles work);
+- *script-path*: the =_/{table}.py= text plus =ast=-scanned literal
+  data-file references.
+
+Per *country* (=Country._table_cache_hash=): SHA-256 over the
+sorted-by-wave composition of the per-wave hashes *plus* the
+country-level inputs the wave hashes can't see: =_/{table}.py= (the
+concatenator), =_/{name.lower()}.py= (the country module), =_/mapping.py=,
+=_/data_scheme.yml= (table registry + =materialize= flags; build-relevant),
+=_/Makefile= (defines every =!make= build), and the country's build-time
+=_/*.org= inputs (=CONTENTS.org= excluded).  A single wave's edit busts
+the country hash; for YAML-path tables the rebuild re-reads only the
+changed wave, while script-path tables rebuild the whole table (their
+hashless wave parquets can't self-invalidate -- see CRITICAL-2 /
+=_evict_hashless_wave_caches=).
+
+*Deliberately excluded* (they re-run on every read, post-cache, so they
+must NOT bust the parquet): =_finalize_result=, kinship expansion,
+canonical spellings, automatic categorical mappings, =_join_v_from_sample=.
+Library code is *not* hashed; =LSMS_CACHE_SCHEMA= is the lever for the
+rare library-wide pre-write extraction change.
+
+** Where the hash lives
+Embedded in the parquet's *pyarrow schema metadata* (key
+=b"lsms_cache_hash"=), not a =.parquet.hash= sidecar.  It therefore
+rotates atomically with the data via =os.replace=, can never desync, and
+is removed together with the parquet by =cache clear=.  =to_parquet= is
+now atomic for *all* callers (tmp + =os.replace=), fixing a latent
+torn-write bug independent of hashing.
+
+** Read-gate classification (=local_tools.cache_freshness=)
+- =unverifiable= (no computable hash) -> read; preserves v0.7.0
+  "read if present" (no regression for tables the scheme can't introspect);
+- =fresh= -> read;
+- =legacy= (parquet predates hashing) -> read + *trust-once-then-stamp*
+  (migration: no rebuild-all; same assumption v0.7.0 already made);
+- =stale= -> fall through and rebuild from source.
+
+Gates wired at three read sites: L2-country (=load_dataframe_with_dvc=),
+L2-wave YAML (=Wave.grab_data= top), and L2-wave *script* (the
+makefile-branch existence check + a trust-once stamp after read, since
+the 58+ =_/{table}.py= scripts write unstamped parquets we don't edit).
+
+** Escape hatches (unchanged semantics, now documented)
+- =LSMS_NO_CACHE=1= still forces a full rebuild (strongest hammer);
+- =assume_cache_fresh=True= is the *one* path that skips the hash check
+  ("I promise the cache matches") -- now strictly weaker than the
+  default and a deprecation candidate (see "Rethink trust_cache");
+- =LSMS_BUILD_BACKEND=make= bypasses the parquet tiers entirely.
+
+** Known, documented limitations
+- Script-path tables whose sources are referenced via
+  *dynamically-constructed* paths (not string literals) are covered only
+  by script-text hashing, not source-content hashing.  An out-of-band
+  edit to such a source still needs a manual =cache clear=.  (The
+  literal scan + script-text hash catch the common
+  =get_dataframe('../Data/foo.dta')= pattern and all script edits.)
+- =waves=-subset calls share the single =var/{table}.parquet= path; a
+  subset call computes its hash over the subset, so alternating
+  subset/full calls can cause rebuild churn (pre-existing aliasing, not
+  worsened in correctness).  *Rejected fix*: hashing over =self.waves=
+  always would make a subset-built parquet look fresh to a full call and
+  serve subset-as-full -- a correctness regression -- so we keep the
+  (safe) churn.
+- *F1 (residual, MEDIUM, non-regression).*  A *hashless* (script-written)
+  L2-wave parquet is still served when *no* L2-country parquet exists to
+  trigger eviction: the wave-level gates fall through to rebuild only on
+  =stale= (a wrong *stored* hash), and a hashless parquet classifies as
+  =legacy=, which is trusted.  Trigger is narrow -- a partial cache
+  (wave parquets present but the country table was never materialized)
+  followed by a source/script edit; it is *not* reachable via
+  =lsms-library cache clear= (which removes both tiers) and fails toward
+  serving slightly-stale data, never corruption.  This is the same
+  "soft" script-path L2-wave gap CLAUDE.md already documented for
+  =LSMS_NO_CACHE=; v0.8.0 closes it for the common (country-parquet
+  present, then stale) path via eviction but not for the
+  missing-country-parquet case.  *Fix path for a future round*: stamp
+  script-path wave parquets *after* a Make rebuild (only when freshly
+  built, never on a plain read -- that was the CRITICAL-2 bug), giving
+  them per-wave hash granularity like YAML tables.  Deferred because the
+  Make-mtime interaction can't be exercised offline without source data.
+- *F3 (LOW, perf only).*  Two concurrent agents can have one evict a
+  freshly-rebuilt hashless wave parquet from the other (indistinguishable
+  from a stale one), causing redundant Make work -- never stale data.
+- *F4 (LOW, conservative).*  The country module =({name}.py)= is in
+  *every* table's hash for that country, so editing it busts all that
+  country's tables.  Correct (its helpers are shared) but a coarse
+  hammer; a one-line edit triggers a full-country rebuild.
+
+** Cost
+No =.dta= content hashing, no directory walk, no DVC/S3 on the hot path.
+Measured gate overhead: =_table_cache_hash= ~16-22 ms (6-8 waves),
+=cache_freshness= footer read ~0.1 ms -- a few percent of a ~500 ms warm
+L2-country read; the v0.7.0 10-17x win is preserved.
+
+** Bug surfaced by the feature: GhanaLSS food_acquired missing =Quantity=
+
+The final regression (1310/1312 passing) left exactly two reds, both
+=GhanaLSS/food_acquired= (=test_declared_columns_present= and
+=test_feature_is_sane=): the declared =Quantity= column is absent.
+
+This is a *pre-existing build bug the feature surfaced*, not a cache
+regression.  Proof: with =LSMS_BUILD_BACKEND=make= (the entire parquet
+cache bypassed -- identical code on this branch and =development=), the
+GhanaLSS food_acquired build produces no =Quantity=.  The wave-level
+parquets have inconsistent columns (only =2016-17= emits =Quantity=;
+others emit =produced_quantity= / =produced_price= / =purchased_value=
+/ ...), so the country-level concatenation has no canonical =Quantity=.
+The test passed before only because a *stale* cached =var/food_acquired.parquet=
+(from an older build that had =Quantity=) masked the broken build; the
+v0.8.0 hash gate correctly detected the staleness and rebuilt, exposing
+it -- exactly the #243 "bug hidden behind a stale country-level cache"
+pattern this feature exists to prevent.  The other 39 countries'
+food_acquired pass.
+
+*Action*: fixing GhanaLSS food_acquired's wave scripts to emit a
+canonical =Quantity= is a separate data-harmonization ticket (out of
+scope for the cache layer).  Do NOT re-mask it by restoring a stale
+parquet.
+
+** Tests
+=tests/test_cache_hash_invalidation.py= -- primitives (file hash,
+fingerprint, ast scan, atomic write, freshness, stamp), legacy
+trust-once migration, stale-not-served, =assume_cache_fresh= escape,
+round-trip parity (hash vs plain path), read-only graceful degradation.
 
 * References
 

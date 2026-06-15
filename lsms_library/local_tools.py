@@ -76,7 +76,10 @@ from pyarrow.lib import ArrowInvalid
 from functools import lru_cache
 from pathlib import Path
 import os
+import ast
+import hashlib
 import time
+import uuid
 from importlib.resources import files
 from dvc.api import DVCFileSystem
 import pyreadstat
@@ -1271,12 +1274,220 @@ def change_encoding(s: str, from_encoding: str, to_encoding: str = 'utf-8', erro
     """
     return bytes(s,encoding=from_encoding).decode(to_encoding,errors=errors)
 
-def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_path: bool = False) -> pd.DataFrame:
+# ---------------------------------------------------------------------------
+# L2 cache content-hash invalidation (v0.8.0)
+# ---------------------------------------------------------------------------
+# A harmonized parquet (L2-country ``var/{table}.parquet`` or L2-wave
+# ``{wave}/_/{table}.parquet``) is stamped with a SHA-256 of everything
+# that determines its *pre-finalize* contents.  On read, the stamp is
+# recomputed and compared; a mismatch forces a rebuild from source.  See
+# SkunkWorks/dvc_object_management.org ("v0.8.0 Roadmap") for the design
+# and the converged decisions captured in its "Convergence" section.
+#
+# Bump LSMS_CACHE_SCHEMA when a LIBRARY-WIDE change to the *pre-write*
+# extraction logic (Wave.grab_data / df_data_grabber / the parquet layout
+# written by to_parquet) means existing parquets must be treated as stale
+# even though their per-table source inputs are unchanged.  Do NOT bump
+# for *post-read* transforms (Country._finalize_result, kinship expansion,
+# canonical spellings, automatic categorical mappings, _join_v_from_sample)
+# -- those re-run on every read and never touch the cached parquet.
+LSMS_CACHE_SCHEMA = 1
+
+# Schema-metadata key under which the content hash is embedded.  Embedding
+# (rather than a ``{parquet}.hash`` sidecar) means the hash rotates
+# atomically with the parquet via os.replace, can never desync from its
+# data, and is removed together with the parquet by ``cache clear``.
+_CACHE_HASH_KEY = b"lsms_cache_hash"
+
+# Extensions treated as survey source data when scanning script-path
+# tables for literal file references.
+_DATA_SUFFIXES = (".dta", ".csv", ".tab", ".dat", ".sav", ".txt", ".xlsx",
+                  ".xls", ".parquet")
+
+def cached_file_hash(path: str | Path) -> str | None:
+    """SHA-256 hex digest of *path*'s bytes, or ``None`` if absent/unreadable.
+
+    The name is historical -- this hashes content directly on every call.
+    An earlier (path, mtime, size) memo was removed because it could miss
+    an edit that lands within the filesystem's mtime granularity while
+    keeping the file size constant (a same-length one-character change to
+    a sidecar md5 or a YAML value).  The inputs hashed here are tiny
+    (sidecars ~91 B; ``data_info.yml`` / wave modules a few KB), so a
+    direct read is sub-millisecond and the memo bought almost nothing on
+    the L2 read path while introducing a real correctness gap.
+    """
+    try:
+        h = hashlib.sha256()
+        with open(path, "rb") as fh:
+            for chunk in iter(lambda: fh.read(1 << 20), b""):
+                h.update(chunk)
+        return h.hexdigest()
+    except OSError:
+        return None
+
+
+def source_fingerprint(data_path: str | Path) -> str:
+    """Fingerprint a survey source file for staleness hashing.
+
+    Prefers the DVC sidecar (``{data_path}.dvc`` -- ~91 B carrying DVC's
+    own md5 of the blob) so we never hash or download the multi-MB
+    ``.dta``.  Falls back to hashing the local file content for untracked
+    sources (a contributor mid-``dvc add``).  When neither exists the
+    source is unverifiable and a ``missing:`` sentinel is returned so the
+    composed hash still changes if the file later appears.
+    """
+    data_path = Path(data_path)
+    sidecar = data_path.with_name(data_path.name + ".dvc")
+    h = cached_file_hash(sidecar)
+    if h is not None:
+        return f"dvc:{data_path.name}:{h}"
+    h = cached_file_hash(data_path)
+    if h is not None:
+        return f"raw:{data_path.name}:{h}"
+    return f"missing:{data_path.name}"
+
+
+def scan_script_data_refs(script_path: str | Path):
+    """Yield data-file references that appear as *string literals* in a
+    ``_/{table}.py`` script (e.g. ``'../Data/foo.dta'``).
+
+    Uses ``ast`` so only genuine literals are picked up (not comments or
+    expressions).  Dynamically-constructed paths are not discoverable;
+    the script's own text is hashed separately, so a change to *which*
+    file is read still busts the hash.  Only an out-of-band edit to a
+    source that is BOTH undeclared AND referenced via a computed path
+    escapes -- a documented limitation of script-path coverage.
+    """
+    try:
+        src = Path(script_path).read_text()
+    except OSError:
+        return
+    try:
+        tree = ast.parse(src)
+    except SyntaxError:
+        return
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Constant) and isinstance(node.value, str):
+            val = node.value
+            if val.lower().endswith(_DATA_SUFFIXES):
+                yield val
+
+
+def _tmp_sibling(fn: Path) -> Path:
+    """A collision-free temp path in the same directory as *fn*.
+
+    Uses pid + a uuid4 so two threads in the same process (e.g. a
+    ``Feature()`` fan-out wrapped in a ThreadPool) never share a temp
+    name -- which would let one thread's cleanup unlink the other's
+    in-flight write.  Same-dir keeps ``os.replace`` atomic (same fs).
+    """
+    return fn.with_name(f"{fn.name}.tmp.{os.getpid()}.{uuid.uuid4().hex[:12]}")
+
+
+def _atomic_write_table(table, fn: str | Path) -> None:
+    """Write a pyarrow Table to *fn* via a temp file + ``os.replace``
+    so concurrent readers never observe a torn parquet."""
+    import pyarrow.parquet as pq
+    fn = Path(fn)
+    tmp = _tmp_sibling(fn)
+    try:
+        pq.write_table(table, str(tmp))
+        os.replace(tmp, fn)
+    except BaseException:
+        try:
+            tmp.unlink()
+        except OSError:
+            pass
+        raise
+
+
+def read_parquet_cache_hash(path: str | Path) -> str | None:
+    """Return the embedded ``lsms_cache_hash`` from a parquet's schema
+    metadata, or ``None`` for a legacy parquet / unreadable footer.
+
+    Reads only the footer (``read_schema``), so cost is ~1 ms regardless
+    of row count -- safe on the L2 read hot path.
+    """
+    try:
+        import pyarrow.parquet as pq
+        md = pq.read_schema(str(path)).metadata
+    except (OSError, ArrowInvalid):
+        return None
+    except Exception:
+        return None
+    if not md:
+        return None
+    raw = md.get(_CACHE_HASH_KEY)
+    if isinstance(raw, (bytes, bytearray)):
+        return raw.decode()
+    return raw
+
+
+def cache_freshness(path: str | Path, expected_hash: str | None) -> str:
+    """Classify an L2 parquet against the expected content hash.
+
+    Returns one of:
+
+    - ``'unverifiable'`` -- *expected_hash* is None (inputs couldn't be
+      enumerated); preserve the v0.7.0 "read if present" behavior (no
+      regression).
+    - ``'fresh'`` -- stored hash matches expected.
+    - ``'legacy'`` -- parquet predates hashing (no stored hash);
+      trust-once, caller should re-stamp so the next read is guarded.
+    - ``'stale'`` -- stored hash present and differs -> rebuild.
+    """
+    if expected_hash is None:
+        return "unverifiable"
+    stored = read_parquet_cache_hash(path)
+    if stored is None:
+        return "legacy"
+    return "fresh" if stored == expected_hash else "stale"
+
+
+def stamp_parquet_hash(path: str | Path, expected_hash: str | None) -> bool:
+    """Best-effort: embed *expected_hash* into an existing parquet's
+    schema metadata via an atomic rewrite.
+
+    Used for trust-once-then-stamp migration of legacy / script-written
+    parquets so subsequent reads are guarded.  Never raises; returns
+    ``True`` on success (or when the stamp is already present).
+    """
+    if expected_hash is None:
+        return False
+    # Cheap writability probe first: on a read-only cache (pip install,
+    # Savio Lustre) the rewrite can never succeed, so skip the expensive
+    # full read_table and bail immediately.
+    try:
+        if not os.access(Path(path).parent, os.W_OK):
+            return False
+    except OSError:
+        return False
+    try:
+        import pyarrow.parquet as pq
+        table = pq.read_table(str(path))
+        md = dict(table.schema.metadata or {})
+        if md.get(_CACHE_HASH_KEY) == expected_hash.encode():
+            return True
+        md[_CACHE_HASH_KEY] = expected_hash.encode()
+        table = table.replace_schema_metadata(md)
+        _atomic_write_table(table, path)
+        return True
+    except (OSError, ArrowInvalid):
+        return False
+    except Exception:
+        return False
+
+
+def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_path: bool = False, cache_hash: str | None = None) -> pd.DataFrame:
     """
     Write df to parquet file fn.
 
     Parquet (pyarrow) is slightly more picky about data types and layout than is pandas;
     here we fix some possible problems before calling pd.DataFrame.to_parquet.
+
+    The write is atomic: data is written to a PID-temp file and then
+    ``os.replace``-d into place, so a concurrent reader (multiple agents
+    share the cache root) never observes a half-written parquet.
 
     Parameters
     ----------
@@ -1285,6 +1496,12 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
         rewrite and use ``fn`` verbatim.  Intended for library callers
         (not wave/country scripts) that build an absolute path themselves
         and don't want the caller-inference heuristic to run.
+    cache_hash : str | None, default None
+        If given, embed this string under ``lsms_cache_hash`` in the
+        parquet's schema metadata.  Used by the L2 cache layer to stamp a
+        content hash for staleness detection (see :func:`cache_freshness`).
+        ``None`` writes a plain parquet (e.g. wave-script outputs, which
+        are stamped trust-once on first read instead).
     """
     if not absolute_path:
         fn = _resolve_data_path(fn)
@@ -1317,7 +1534,25 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
     else:
         df = all
 
-    df.to_parquet(fn, engine='pyarrow', index=index)
+    fn = Path(fn)
+    if cache_hash is not None:
+        import pyarrow as pa
+        table = pa.Table.from_pandas(df, preserve_index=index)
+        md = dict(table.schema.metadata or {})
+        md[_CACHE_HASH_KEY] = cache_hash.encode()
+        table = table.replace_schema_metadata(md)
+        _atomic_write_table(table, fn)
+    else:
+        tmp = _tmp_sibling(fn)
+        try:
+            df.to_parquet(tmp, engine='pyarrow', index=index)
+            os.replace(tmp, fn)
+        except BaseException:
+            try:
+                tmp.unlink()
+            except OSError:
+                pass
+            raise
 
     return df
 
