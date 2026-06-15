@@ -31,7 +31,7 @@ The returned DataFrame prepends a `country` index level.
 - `scrum-master-hpc` (shared sucoder skill at `~/.sucoder/skills/scrum-master-hpc/SKILL.md`) — dispatching subagents, worktrees, DVC lock hygiene. Read this before using the Agent tool for multi-country work. Library-specific addenda:
   1. Subagents share the parquet cache at `~/.local/share/lsms_library/`, so concurrent agents building different countries don't conflict.
   2. The venv is at `{repo_root}/.venv/bin/python` (not in worktrees) — set `PYTHONPATH` to the worktree so development-branch code is picked up.
-  3. **`.venv/lib/python3.11/site-packages/lsms_library.pth` hardcodes the main-repo path** — `PYTHONPATH` alone does NOT redirect imports of `lsms_library` to a worktree.  Worker agents that rebuild a feature to verify a YAML edit will silently run the main checkout's code.  Either (a) verify via static diff only, or (b) have the agent install a fresh venv inside its worktree.  See the `.pth`-pinned package imports pitfall in the scrum-master-hpc skill for detection and mitigations.
+  3. **`.venv/lib/python3.11/site-packages/lsms_library.pth` hardcodes the main-repo path** — `PYTHONPATH` alone does NOT redirect imports of `lsms_library` to a worktree.  Worker agents that rebuild a feature to verify a YAML edit will silently run the main checkout's code.  For **config** edits (`countries/{C}/_/...` — YAML/scripts/`.org`, the common case), set **`LSMS_COUNTRIES_ROOT=<worktree>/lsms_library/countries`** so the live package reads the worktree's config tree (GH #436); this is the clean fix and needs no fresh venv.  For **library-code** edits (`country.py`, `local_tools.py`, …) the `.pth` still pins to the main checkout, so either (a) verify via static diff only, or (b) have the agent install a fresh venv inside its worktree.  See the `.pth`-pinned package imports pitfall in the scrum-master-hpc skill for detection and mitigations.
   4. *Savio compute nodes only*: `.venv` is typically a symlink to `/local/jobNNN/venv` (node-local SSD) and goes stale whenever you land on a different node.  Recovery recipe lives in `.venv.lustre/README_WHY_THIS_EXISTS.md` at the repo root.  **Do not just grab `.venv.lustre/bin/python`** — every import will round-trip through Lustre.  Follow the README's **adopt-or-build recipe** (adopt any importable `/local/job*/venv` already on the node → tar-pipe build only if none → reclaim the stale ones), which gives cross-job persistence without root.  Note: a stable `/local/$USER/<repo>` path is NOT creatable by us (`/local` is `root:root`); a genuinely persistent path needs an HPC-support ticket (README "Admin endgame").  **Opt-in fast path**: `bin/savio_venv.sh` packages the venv as a single squashfs image (`.venv.sqfs`, ~255 MB / one Lustre inode vs ~33k files) and mounts it per job via apptainer's `squashfuse_ll` (`mount`/`umount`/`update` subcommands) — kills the Lustre-MDS load and sidesteps the per-job reaper; see `docs/savio_venv.md` for the model + how to rebuild the image when deps change.  This guidance is Savio-specific; other environments (login nodes, laptops, non-HPC clusters) use a normal in-tree `.venv/` and this paragraph doesn't apply.
 
 ## Repository Layout
@@ -55,7 +55,7 @@ Override the data root with `data_dir` in `~/.config/lsms_library/config.yml` or
     3. `pytest --rebuild-caches` (or `make test-full`) — same as the CLI above for *every* country under `data_root()`, run before the test session, then sets `LSMS_NO_CACHE=1`. Use when verifying a wave-script fix in CI; previously a stale L2-wave parquet could pass a test the source-only fix would have failed (Nigeria/Senegal age sentinels, 2026-04-25).
     4. `LSMS_BUILD_BACKEND=make` — bypasses both parquet tiers entirely; see below.
 - **`LSMS_BUILD_BACKEND=make`** bypasses both parquet tiers — every call rebuilds from source, with no L2-country or L2-wave writes or reads. (L1 still serves blobs; the bypass is over the harmonized parquet layer only.)
-- **`assume_cache_fresh=True`** is a narrower in-process short-circuit at the top of `_aggregate_wave_data` that still calls `_finalize_result` (so kinship expansion, spelling normalization, and `_join_v_from_sample` still apply). Use when L2-country is known fresh to skip all DVC / existence checks. It ignores `LSMS_NO_CACHE`. (`trust_cache=True` is a deprecated alias; removed in v0.8.0.)
+- **`assume_cache_fresh=True`** is a narrower in-process short-circuit at the top of `_aggregate_wave_data` that still calls `_finalize_result` (so kinship expansion, spelling normalization, and `_join_v_from_sample` still apply). Use when L2-country is known fresh to skip all DVC / existence checks. It ignores `LSMS_NO_CACHE`. (`trust_cache=True` is a deprecated alias for `assume_cache_fresh=True` — still accepted, emits `DeprecationWarning`; slated for removal in a future release.)
 - **Cache vs. API**: cached parquets store pre-transformation data. Kinship expansion, canonical spelling enforcement, and dtype coercion happen in `_finalize_result()` on every read — not at cache write time. So `pd.read_parquet(cache_path)` shows raw `Relationship` strings; the Country API shows decomposed `(Sex, Generation, Distance, Affinity)`.
 - **DVC stage layer is retired (v0.7.0).** Country-level `dvc.yaml` files are now `stages: {}`. All data loading goes through the cache + `load_from_waves` path. The `reproduce()` code path in `country.py` is dead code pending removal. See `SkunkWorks/dvc_object_management.org`.
 - **L2-wave cache for YAML-path tables (added 2026-04-15).** `Wave.grab_data()` now caches its result at `data_root()/{Country}/{wave}/_/{table}.parquet` on first call, for YAML-path tables only (script-path tables already wrote L2-wave parquets via their `to_parquet()` calls). This eliminates the per-wave DVC metadata lookup that previously made `_market_lookup` (and any other wave-iterating code) hit DVC SQLite on every call. Measured speedup: 408s → 0.02s per wave on Uganda `cluster_features`. Same staleness semantics as L2-country (no auto-invalidation; `LSMS_NO_CACHE=1` forces rebuild). The `to_parquet()` function gains an `absolute_path=True` kwarg to skip call-stack inference when the caller builds an absolute path itself.
@@ -79,9 +79,22 @@ Microdata must be obtained from the [World Bank Microdata Library](https://micro
 **User config** lives at `~/.config/lsms_library/config.yml`:
 ```yaml
 microdata_api_key: your_key_here
-# data_dir: /path/to/override   # same as LSMS_DATA_DIR env var
+# data_dir: /path/to/override        # same as LSMS_DATA_DIR env var
+# countries_dir: /path/to/config     # same as LSMS_COUNTRIES_ROOT env var
 ```
 Lookup order for each setting: environment variable → config file → None.
+
+**Two independent roots (GH #436 — code/config separation).** `data_dir` /
+`LSMS_DATA_DIR` overrides where the *derived caches + DVC blobs* live (see
+`docs/guide/caching.md`). `countries_dir` / `LSMS_COUNTRIES_ROOT` overrides
+where the *config tree* (`countries/{C}/_/data_info.yml`, `data_scheme.yml`,
+`*.org`, per-country `.py`) is read from — default is package-relative
+(`files("lsms_library")/"countries"`, via `paths.countries_root()`). Keeping
+them independent lets a pip-install or a git worktree point at a config tree
+under development while sharing the warm cache. **Resolve config paths via
+`countries_root()` / `Wave.file_path` / `Country.file_path`, never via a
+hardcoded `files("lsms_library")/"countries"`** — the latter ignores the
+override.
 
 **Always read files with `get_dataframe()` from `local_tools`.** It handles `.dta` / `.csv` / `.parquet` via a fallback chain: local file on disk → DVC filesystem (`DVCFileSystem`) → WB NADA download via `data_access.get_data_file()`. A script written as `get_dataframe('../Data/file.dta')` works whether the file is local, DVC-cached, or has never been downloaded.
 
@@ -159,7 +172,7 @@ Auto-unlock decrypts `s3_reader_creds.gpg` with an obfuscated passphrase at impo
 
 ## `sample()` and Cluster Identity
 
-The `sample` table (index `(i, t)`, columns `v`, `weight`, `panel_weight`, `strata`, `Rural`) is the single source of truth for mapping households to their sampling cluster. **As of 2026-04-10, `v` is joined from `sample()` at API time** by `_join_v_from_sample()` in `country.py`, called from `_finalize_result()` for any household-level table when the country has `sample` in its `data_scheme` and `v` isn't already present.
+The `sample` table (index `(i, t)`, columns `v`, `weight`, `panel_weight`, `strata`, `Rural`) is the single source of truth for mapping households to their sampling cluster. **As of 2026-04-10, `v` is joined from `sample()` at API time** by `_join_v_from_sample()` in `country.py`, called from `_finalize_result()` for any household-level table when the country has `sample` in its `data_scheme` and `v` isn't already present. **A feature can opt out of the v-join declaratively** (GH #436/#455 — the old hardcoded `_no_v_join` set in `country.py` is gone): in the canonical `lsms_library/data_info.yml`, either declare the table's index *without* `v` under `Index Info > index_info` (auto-exempts, e.g. `shocks`/`assets`), or add the feature to the `Join v from sample > skip_extra` list (e.g. `livestock`/`income`). No `country.py` edit. See `.claude/skills/add-feature/SKILL.md`.
 
 Rules:
 - Do NOT put `v` in feature `data_scheme.yml` indexes other than `cluster_features` (which owns it).
