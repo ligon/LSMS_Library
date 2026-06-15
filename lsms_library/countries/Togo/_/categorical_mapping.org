@@ -191,3 +191,181 @@
 | Plants/boutures de tubercules | Autre crop          |
 | Autres semences               | Autre crop          |
 | 20                            | Autre crop          |
+
+* Food / Crop Labels (the j and crop axes)
+
+# harmonize_food (EHCVM label foundation, finalized 2026-06-15 from the
+# accepted DRAFT propagated from Niger).  A SINGLE shared taxonomy maps
+# BOTH food_acquired.j (s07bq01 value labels) and crop_production.crop
+# (s16cq04) onto canonical Preferred Labels (the Niger design).  Consumed
+# by crop_production.py via get_categorical_mapping('harmonize_food', ...)
+# and by food_acquired's j-index mappings: clause in the wave data_info.yml.
+# Rows whose draft Preferred Label was blank (undecodable bare numeric
+# codes / unresolved items) are DROPPED so those Original Labels pass
+# through raw instead of mapping to ''.
+
+#+NAME: harmonize_food
+| Original Label                                                          | Preferred Label                                                                      |
+|-------------------------------------------------------------------------+--------------------------------------------------------------------------------------|
+| Abats et tripes (foie, rognon, etc.)                                    | Abats et tripes (foie, rognon, etc.)                                                 |
+| AdÃ©mÃ¨ (Feuilles crin-crin)                                            | Autres légumes en feuilles                                                           |
+| Afintin (Moutarde africaine)                                            | Soumbala (moutarde africaine)                                                        |
+| Ail                                                                     | Ail                                                                                  |
+| Ananas                                                                  | Ananas                                                                               |
+| Anchois fumÃ©                                                           | Autres poissons fumés                                                                |
+| Arachide grillÃ©e                                                       | Arachide grillée                                                                     |
+| Arachides dÃ©cortiquÃ©es ou pilÃ©es                                     | Arachides décortiquées                                                               |
+| Arachides fraÃ®ches en coques                                           | Arachides fraîches en coques                                                         |
+| Arachides sÃ©chÃ©es en coques                                           | Arachides séchées en coques                                                          |
+| ArÃ´me (Maggi, Jumbo, etc.)                                             | Arôme (Maggi, Jumbo, etc.)                                                           |
+| AttiÃ©ke                                                                | Attiéke                                                                              |
+| Aubergine, Courge/Courgette                                             | Aubergine, Courge/Courgette                                                          |
+| Autre lÃ©gumes frais n.d.a                                              | Autre légumes frais n.d.a                                                            |
+| Autres agrumes                                                          | Autres agrumes                                                                       |
+| Autres condiments (poivre etc.)                                         | Autres condiments (poivre etc.)                                                      |
+| Autres fruits (pommes, raisin, etc.)                                    | Autres fruits (pommes, raisin, etc.)                                                 |
+| Autres huiles n.d.a. (maÃ¯s, soja, huile palmiste, etc.)                | Autres huiles n.d.a. (maïs, huile palmiste, etc.)                                    |
+| Autres lÃ©gumes secs n.d.a                                              | Autres légumes secs n.d.a                                                            |
+| Autres produits alimentaires                                            | Autres produits alimentaires                                                         |
+| Autres produits laitiers                                                | Autres produits laitiers                                                             |
+| Autres tisanes et infusions n.d.a. (quinquelibat, citronelle, etc.)     | Autres tisanes et infusions n.d.a. (quinquelibat, citronelle, etc.)                  |
+| Autres tubercules n.d.a                                                 | Autres tubercules n.d.a                                                              |
+| Autres viandes n.d.a                                                    | Autres viandes n.d.a                                                                 |
+| Avocats                                                                 | Avocats                                                                              |
+| Banane douce                                                            | Banane douce                                                                         |
+| Beignets, galettes                                                      | Beignets, galettes                                                                   |
+| Beurre                                                                  | Beurre                                                                               |
+| Beurre de karitÃ©                                                       | Beurre de karité                                                                     |
+| Biscuits                                                                | Biscuits                                                                             |
+| BiÃ¨res et vins traditionnels (dolo, vin de palme, vin de raphia, etc.) | Bières et vins traditionnels (dolo, vin de palme, vin de raphia, vin de cajou, etc.) |
+| BiÃ¨res industrielles                                                   | Bières industrielles                                                                 |
+| BlÃ©                                                                    | Blé                                                                                  |
+| Boissons gazeuses (coca, etc.)                                          | Boissons gazeuses (coca, etc.)                                                       |
+| CafÃ©                                                                   | Café                                                                                 |
+| Canne Ã  sucre                                                          | Canne à sucre                                                                        |
+| Caramel, bonbons, confiseries, etc                                      | Caramel, bonbons, confiseries, etc                                                   |
+| Carotte                                                                 | Carotte                                                                              |
+| Carpe fraÃ®che                                                          | Carpes fraîches                                                                      |
+| Charcuterie (jambon, saucisson), conserves de viandes                   | Charcuterie (jambon, saucisson), conserves de viandes                                |
+| Chinchard frais                                                         | Autres poissons frais                                                                |
+| Chinchard fumÃ©                                                         | Autres poissons fumés                                                                |
+| Chocolat en poudre                                                      | Chocolat en poudre                                                                   |
+| Chocolat Ã  croquer, pÃ¢te Ã  tartiner                                  | Chocolat à croquer, pâte à tartiner                                                  |
+| Choux                                                                   | Choux                                                                                |
+| Citrons                                                                 | Citrons                                                                              |
+| ConcentrÃ© de tomate                                                    | Concentré de tomate                                                                  |
+| Concombre                                                               | Concombre                                                                            |
+| Conserves de poisson                                                    | Conserves de poisson                                                                 |
+| Crabes, crevettes et autres fruits de mer                               | Crabes, crevettes et autres fruits de mer                                            |
+| Croissants                                                              | Croissants                                                                           |
+| Cube alimentaire (Maggi, Jumbo, )                                       | Cube alimentaire (Maggi, Jumbo, )                                                    |
+| Dattes                                                                  | Dattes                                                                               |
+| Dorade fraiche                                                          | Autres poissons frais                                                                |
+| Eau minÃ©rale/ filtrÃ©e                                                 | Eau minérale/ filtrée                                                                |
+| Farine de blÃ© local ou importÃ©                                        | Farine de blé local ou importé                                                       |
+| Farine de maÃ¯s                                                         | Farine de maïs                                                                       |
+| Farine de mil                                                           | Farine de mil                                                                        |
+| Farines de manioc                                                       | Farines de manioc                                                                    |
+| Feuilles d'oseille (dakoumou, bissap/floerÃ¨)                           | Feuilles d'oseille                                                                   |
+| Feuilles de baobab                                                      | Feuilles de baobab                                                                   |
+| Fonio                                                                   | Fonio                                                                                |
+| Fromage local                                                           | Fromage                                                                              |
+| Gari, tapioca                                                           | Gari, tapioca                                                                        |
+| Gboma                                                                   | Autres légumes en feuilles                                                           |
+| Gibiers                                                                 | Gibiers                                                                              |
+| Gingembre                                                               | Gingembre                                                                            |
+| Gombo frais                                                             | Gombo frais                                                                          |
+| Gombo sec                                                               | Gombo sec                                                                            |
+| GÃ¢teaux                                                                | Gâteaux                                                                              |
+| Haricot vert                                                            | Haricot vert                                                                         |
+| Huile d'arachide                                                        | Huile d'arachide                                                                     |
+| Huile de coton                                                          | Huile de coton                                                                       |
+| Huile de palme raffinÃ©e                                                | Huile de palme raffinée                                                              |
+| Huile de palme rouge                                                    | Huile de palme rouge                                                                 |
+| Igname                                                                  | Igname                                                                               |
+| Jus de fruits (orange, bissap, gingembre, jus de cajou,etc.)            | Jus de fruits (orange, bissap, gingembre, jus de cajou,etc.)                         |
+| Jus en poudre                                                           | Jus en poudre                                                                        |
+| Lait caillÃ©, yaourt                                                    | Lait caillé, yaourt                                                                  |
+| Lait concentrÃ© non-sucrÃ©                                              | Lait concentré non-sucré                                                             |
+| Lait concentrÃ© sucrÃ©                                                  | Lait concentré sucré                                                                 |
+| Lait en poudre                                                          | Lait en poudre                                                                       |
+| Lait et farines pour bÃ©bÃ©                                             | Lait et farines pour bébé                                                            |
+| Lait frais                                                              | Lait frais                                                                           |
+| Mangue                                                                  | Mangue                                                                               |
+| Manioc                                                                  | Manioc                                                                               |
+| Maquereau frais                                                         | Maquereau (poisson de mer)                                                           |
+| Mayonnaise                                                              | Mayonnaise                                                                           |
+| MaÃ¯s en grains                                                         | Maïs en grain                                                                        |
+| MaÃ¯s en Ã©pis                                                          | Maïs en épi                                                                          |
+| Miel                                                                    | Miel                                                                                 |
+| Mil                                                                     | Mil                                                                                  |
+| Moringa, feuilles de manioc, feuilles de taro et autres feuilles        | Feuilles de manioc, feuilles de taro et, autres feuilles                             |
+| NiÃ©bÃ©/Haricots secs                                                   | Niébé/Haricots secs                                                                  |
+| Noix de cajou                                                           | Noix de cajou                                                                        |
+| Noix de coco                                                            | Noix de coco                                                                         |
+| Noix de cola                                                            | Noix de cola                                                                         |
+| Noix de karitÃ©                                                         | Noix de karité                                                                       |
+| Oeufs                                                                   | Œufs                                                                                 |
+| Oignon frais                                                            | Oignon frais                                                                         |
+| Orange                                                                  | Orange                                                                               |
+| Pain moderne                                                            | Pain moderne                                                                         |
+| Pain traditionnel                                                       | Pain traditionnel                                                                    |
+| PastÃ¨que, Melon                                                        | Pastèque, Melon                                                                      |
+| Patate douce                                                            | Patate douce                                                                         |
+| Petit pois secs                                                         | Petit pois secs                                                                      |
+| Petits pois                                                             | Petits pois                                                                          |
+| Piment                                                                  | Piment frais                                                                         |
+| Plantain                                                                | Plantain                                                                             |
+| Poisson sÃ©chÃ©                                                         | Poisson séché                                                                        |
+| Poivron frais                                                           | Poivron frais                                                                        |
+| Pomme de terre                                                          | Pomme de terre                                                                       |
+| Poulet sur pied                                                         | Poulet sur pied                                                                      |
+| PÃ¢te d'arachide                                                        | Pâte d'arachide                                                                      |
+| PÃ¢tes alimentaires                                                     | Pâtes alimentaires                                                                   |
+| Riz importÃ© brisÃ©                                                     | Riz importé non parfumé                                                              |
+| Riz importÃ© longs grains                                               | Riz importé non parfumé                                                              |
+| Riz local (KoviÃ©)                                                      | Autre Riz local                                                                      |
+| Riz local longs grains                                                  | Autre Riz local                                                                      |
+| Salade (laitue)                                                         | Salade (laitue)                                                                      |
+| Sel                                                                     | Sel                                                                                  |
+| Sorgho                                                                  | Sorgho                                                                               |
+| Sucre (poudre ou morceaux)                                              | Sucre (poudre ou morceaux)                                                           |
+| SÃ©same                                                                 | Sésame                                                                               |
+| Taro, macabo                                                            | Taro, macabo                                                                         |
+| ThÃ©                                                                    | Thé                                                                                  |
+| Tomate fraÃ®che                                                         | Tomate fraîche                                                                       |
+| Tomate sÃ©chÃ©e                                                         | Tomate séchée                                                                        |
+| Viande d'autres volailles domestiques                                   | Viande d'autres volailles domestiques                                                |
+| Viande de bÅ__uf                                                        | Viande de bœuf                                                                       |
+| Viande de chameau                                                       | Viande de chameau                                                                    |
+| Viande de chÃ¨vre                                                       | Viande de chèvre                                                                     |
+| Viande de mouton                                                        | Viande de mouton                                                                     |
+| Viande de porc                                                          | Viande de porc                                                                       |
+| Viande de poulet                                                        | Viande de poulet                                                                     |
+| Vinaigre /moutarde                                                      | Vinaigre /moutarde                                                                   |
+| Agrume                                                                  | Agrume                                                                               |
+| Amarante (Tchapata)                                                     | Amarante                                                                             |
+| Arachide                                                                | Arachide                                                                             |
+| Aubergine                                                               | Aubergine,                                                                           |
+| Autre (à préciser)                                                      | Autre crop                                                                           |
+| Blé                                                                     | Blé                                                                                  |
+| Café                                                                    | Café                                                                                 |
+| Calebassier                                                             | Calebassier                                                                          |
+| Chou                                                                    | Chou                                                                                 |
+| Coton                                                                   | Coton                                                                                |
+| Epinard                                                                 | Épinard                                                                              |
+| Gombo                                                                   | Gombo frais                                                                          |
+| Laitue                                                                  | Salade (laitue)                                                                      |
+| Manguier                                                                | Mangue                                                                               |
+| Maïs                                                                    | Maïs en grain                                                                        |
+| Melon                                                                   | Melon                                                                                |
+| Niébé                                                                   | Niébé/Haricots secs                                                                  |
+| Oignon                                                                  | Oignon frais                                                                         |
+| Oseille                                                                 | Oseille                                                                              |
+| Riz Paddy                                                               | Riz Paddy                                                                            |
+| Souchet                                                                 | Souchet                                                                              |
+| Sésame                                                                  | Sésame                                                                               |
+| Taro                                                                    | Taro, macabo                                                                         |
+| Thé                                                                     | Thé                                                                                  |
+| Tomate                                                                  | Tomate fraîche                                                                       |
+| Voandzou                                                                | Voandzou                                                                             |

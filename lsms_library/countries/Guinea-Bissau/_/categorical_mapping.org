@@ -153,3 +153,182 @@
 |    9 | Chicken         |
 |   10 | Guinea Fowl     |
 |   11 | Other Poultry   |
+
+* Food / Crop Labels (the j and crop axes)
+
+# harmonize_food (EHCVM label foundation, finalized 2026-06-15 from the
+# accepted DRAFT propagated from Niger).  A SINGLE shared taxonomy maps
+# BOTH food_acquired.j (s07bq01 value labels) and crop_production.crop
+# (s16cq04) onto canonical Preferred Labels (the Niger design).  Consumed
+# by crop_production.py via get_categorical_mapping('harmonize_food', ...)
+# and by food_acquired's j-index mappings: clause in the wave data_info.yml.
+# Rows whose draft Preferred Label was blank (undecodable bare numeric
+# codes / unresolved items) are DROPPED so those Original Labels pass
+# through raw instead of mapping to ''.
+
+#+NAME: harmonize_food
+| Original Label                                                 | Preferred Label                                                                      |
+|----------------------------------------------------------------+--------------------------------------------------------------------------------------|
+| Abacate                                                        | Avocats                                                                              |
+| Alho                                                           | Ail                                                                                  |
+| AnanÃ¡s                                                        | Ananas                                                                               |
+| Aroma (Maggi, Jumbo, etc.)                                     | Arôme (Maggi, Jumbo, etc.)                                                           |
+| Arroz importado perfumado                                      | Riz importé parfumé                                                                  |
+| Arroz importado simples                                        | Riz importé non parfumé                                                              |
+| Arroz local de Npampam                                         | Riz du Niger                                                                         |
+| Arroz local de bolanha                                         | Autre Riz local                                                                      |
+| AttiÃ©ke                                                       | Attiéké                                                                              |
+| AÃ§Ãºcar (em pÃ³ ou cubos)                                     | Sucre (poudre ou morceaux)                                                           |
+| Bagre fresco                                                   | Mâchoiron frais (guiguiri)                                                           |
+| Bagre fumado                                                   | Sillure fumé                                                                         |
+| Banana doce                                                    | Banane douce                                                                         |
+| Banana plantain                                                | Plantain                                                                             |
+| Batata inglesa                                                 | Pomme de terre                                                                       |
+| Batata-doce                                                    | Patate douce                                                                         |
+| Bebidas com gÃ¡s (coca-cola, etc.)                             | Boissons gazeuses (coca, etc.)                                                       |
+| Beringela, abÃ³bora/curgete                                    | Aubergine, Courge/Courgette                                                          |
+| Bolachas                                                       | Biscuits                                                                             |
+| Bolos                                                          | Gâteaux                                                                              |
+| Cabaceira                                                      | Fruit de baobab                                                                      |
+| CafÃ©                                                          | Café                                                                                 |
+| Candja fresco                                                  | Gombo frais                                                                          |
+| Candja seco                                                    | Gombo sec                                                                            |
+| Caramelo, bombons, pastÃ©is, etc                               | Caramel, bonbons, confiseries, etc                                                   |
+| Caranguejos, camarÃ£o e outros mariscos                        | Crabes, crevettes et autres fruits de mer                                            |
+| Carne de cabra                                                 | Viande de chèvre                                                                     |
+| Carne de carneiro                                              | Viande de mouton                                                                     |
+| Carne de galinha                                               | Viande de poulet                                                                     |
+| Carne de outras aves                                           | Viande d'autres volailles                                                            |
+| Carne de porco                                                 | Viande de porc                                                                       |
+| Carne de vaca                                                  | Viande de bœuf                                                                       |
+| Castanha de cajÃº                                              | Noix de cajou                                                                        |
+| CaÃ§a                                                          | Gibiers                                                                              |
+| Cebola fresca                                                  | Oignon frais                                                                         |
+| Cenoura                                                        | Carotte                                                                              |
+| Cervejas e Vinhos tradicional ( Vinho de caju)                 | Bières et vins traditionnels (dolo, vin de palme, vin de raphia, vin de cajou, etc.) |
+| Cervejas industriais                                           | Bières industrielles                                                                 |
+| Chabeu                                                         | Huile de palme rouge                                                                 |
+| Charcutaria (fiambre, chouriÃ§o), conservas de carne           | Charcuterie (jambon, saucisson), conserves de viandes                                |
+| Chocolate em pÃ³                                               | Chocolat en poudre                                                                   |
+| Chocolate para comer, pasta para barrar                        | Chocolat à croquer, pâte à tartiner                                                  |
+| ChÃ¡                                                           | Thé                                                                                  |
+| Concentrado de tomate                                          | Concentré de tomate                                                                  |
+| Conservas de peixe                                             | Conserves de poisson                                                                 |
+| Croissants                                                     | Croissants                                                                           |
+| Cubos de caldo (Maggi, Jumbo)                                  | Cube alimentaire (Maggi, Jumbo, )                                                    |
+| Djagatu                                                        | Aubergine,                                                                           |
+| Donetes/panguetes, panquecas                                   | Beignets, galettes                                                                   |
+| Ervilhas                                                       | Petits pois                                                                          |
+| Ervilhas secas                                                 | Petit pois secs                                                                      |
+| Farinha de milho bacil                                         | Farine de maïs                                                                       |
+| Farinha de milho preto                                         | Farine de mil                                                                        |
+| Farinha de trigo local ou importado                            | Farine de blé local ou importé                                                       |
+| Farinhas de mandioca                                           | Farines de manioc                                                                    |
+| FeijÃ£o verde                                                  | Haricot vert                                                                         |
+| FeijÃ£o-frade, feijÃ£o seco                                    | Niébé/Haricots secs                                                                  |
+| Folhas de azeda (badjique)                                     | Feuilles d'oseille                                                                   |
+| Folhas de cabaceira                                            | Feuilles de baobab                                                                   |
+| Folhas de mandioca, folhas de taro e outras folhas             | Feuilles de manioc, feuilles de taro et, autres feuilles                             |
+| Folhas locais                                                  | Autres légumes en feuilles                                                           |
+| Fundo                                                          | Fonio                                                                                |
+| Galinha vivo                                                   | Poulet sur pied                                                                      |
+| Gengibre                                                       | Gingembre                                                                            |
+| Inhame                                                         | Igname                                                                               |
+| Laranja                                                        | Orange                                                                               |
+| Leite coalhado, iogurte                                        | Lait caillé, yaourt                                                                  |
+| Leite condensado com aÃ§Ãºcar                                  | Lait concentré sucré                                                                 |
+| Leite condensado sem aÃ§Ãºcar                                  | Lait concentré non-sucré                                                             |
+| Leite e farinhas para bebÃ©                                    | Lait et farines pour bébé                                                            |
+| Leite em pÃ³                                                   | Lait en poudre                                                                       |
+| Leite fresco                                                   | Lait frais                                                                           |
+| LimÃ£o                                                         | Citrons                                                                              |
+| Maionese                                                       | Mayonnaise                                                                           |
+| Malagueta,  suculbembe                                         | Piment frais                                                                         |
+| Mancarra frescos com casca                                     | Arachides fraîches en coques                                                         |
+| Mancarra ralada                                                | Arachides pilées                                                                     |
+| Mancarra secos com casca                                       | Arachides séchées en coques                                                          |
+| Mancarra sem casca ou pilada                                   | Arachides décortiquées                                                               |
+| Mancarra torrada                                               | Arachide grillée                                                                     |
+| Mandioca                                                       | Manioc                                                                               |
+| Manga                                                          | Mangue                                                                               |
+| Manteiga                                                       | Beurre                                                                               |
+| Manteiga de karite                                             | Beurre de karité                                                                     |
+| Massas alimentÃ­cias                                           | Pâtes alimentaires                                                                   |
+| Mel                                                            | Miel                                                                                 |
+| Melancia, melÃ£o                                               | Pastèque, Melon                                                                      |
+| Milho bacil em espiga                                          | Maïs en épi                                                                          |
+| Milho bacil em grÃ£o                                           | Maïs en grain                                                                        |
+| Milho cavalo/Sorgo                                             | Sorgho                                                                               |
+| Milho preto                                                    | Mil                                                                                  |
+| Miudezas e tripas (fÃ­gado, rins, etc.)                        | Abats et tripes (foie, rognon, etc.)                                                 |
+| Neteto                                                         | Soumbala (moutarde africaine)                                                        |
+| Noz de coco                                                    | Noix de coco                                                                         |
+| Noz de cola                                                    | Noix de cola                                                                         |
+| Outras carnes n.e                                              | Autres viandes n.d.a                                                                 |
+| Outras farinhas de cereais                                     | Autres farines de céréales                                                           |
+| Outras tisanas e infusÃµes n.e. (quinqueliba, citronela, etc.) | Autres tisanes et infusions n.d.a. (quinquelibat, citronelle, etc.)                  |
+| Outros cereais                                                 | Autres céréales                                                                      |
+| Outros citrinos                                                | Autres agrumes (mandarine, pamplemousse, etc.)                                       |
+| Outros condimentos (pimenta, etc.)                             | Autres condiments (poivre etc.)                                                      |
+| Outros legumes frescos n.e                                     | Autre légumes frais n.d.a                                                            |
+| Outros produtos lÃ¡cteos                                       | Autres produits laitiers                                                             |
+| Outros tubÃ©rculos n.e                                         | Autres tubercules n.d.a                                                              |
+| Outros Ã³leos n.e. (milho, oleo de misto, etc.)                | Autres huiles n.d.a. (maïs, huile palmiste, etc.)                                    |
+| Ovos                                                           | Œufs                                                                                 |
+| Papaia                                                         | Papaye                                                                               |
+| Peixe seco                                                     | Poisson séché                                                                        |
+| Pepino                                                         | Concombre                                                                            |
+| Pimento fresco                                                 | Poivron frais                                                                        |
+| PÃ£o moderno                                                   | Pain moderne                                                                         |
+| PÃ£o tradicional                                               | Pain traditionnel                                                                    |
+| Queijo                                                         | Fromage                                                                              |
+| Repolho                                                        | Choux                                                                                |
+| Sal                                                            | Sel                                                                                  |
+| Salada (alface)                                                | Salade (laitue)                                                                      |
+| Sumos de fruta (laranja, hibisco, cajÃº, etc.)                 | Jus de fruits (orange, bissap, gingembre, jus de cajou,etc.)                         |
+| Sumos em pÃ³                                                   | Jus en poudre                                                                        |
+| SÃ©samo                                                        | Sésame                                                                               |
+| Tainha fresco                                                  | Autres poissons frais                                                                |
+| Taro, manfafa                                                  | Taro, macabo                                                                         |
+| Tomate fresco                                                  | Tomate fraîche                                                                       |
+| Tomate seco                                                    | Tomate séchée                                                                        |
+| TÃ¢maras                                                       | Dattes                                                                               |
+| Vinagre de limÃ£o                                              | Vinaigre de citron                                                                   |
+| Vinagre/mostrada                                               | Vinaigre /moutarde                                                                   |
+| Ã__gua filtrada                                                | Eau minérale/ filtrée                                                                |
+| Ã__leo de mancarra                                             | Huile d'arachide                                                                     |
+| Ã__leo de palma                                                | Huile de palme raffinée                                                              |
+| Ã__leo de soja                                                 | Huile de soja                                                                        |
+| Abóbora                                                        | Courge/Courgette                                                                     |
+| Alface                                                         | Salade (laitue)                                                                      |
+| Algodão                                                        | Coton                                                                                |
+| Ananas                                                         | Ananas                                                                               |
+| Arroz Mpampam                                                  | Riz du Niger                                                                         |
+| Arroz paddy                                                    | Riz Paddy                                                                            |
+| Badjiqui                                                       | Feuilles d'oseille                                                                   |
+| Beringela                                                      | Aubergine,                                                                           |
+| Beterraba                                                      | Betterave                                                                            |
+| Cajueiro                                                       | Noix de cajou                                                                        |
+| Cana-de-açucar                                                 | Canne à sucre                                                                        |
+| Candja                                                         | Gombo frais                                                                          |
+| Cebola                                                         | Oignon frais                                                                         |
+| Citrinos                                                       | Autres agrumes (mandarine, pamplemousse, etc.)                                       |
+| Coconete                                                       | Noix de coco                                                                         |
+| Feijão                                                         | Niébé/Haricots secs                                                                  |
+| Feijão verde                                                   | Haricot vert                                                                         |
+| Hortelã-pimenta                                                | Menthe                                                                               |
+| Malagueta                                                      | Piment frais                                                                         |
+| Mancarra                                                       | Arachide                                                                             |
+| Mangueira                                                      | Mangue                                                                               |
+| Melancia                                                       | Pastèque                                                                             |
+| Melão                                                          | Melon                                                                                |
+| Milho bacil                                                    | Maïs en grain                                                                        |
+| Milho cavalo                                                   | Sorgho                                                                               |
+| Outro (especificar)                                            | Autre crop                                                                           |
+| Papaeira                                                       | Papaye                                                                               |
+| Pimento                                                        | Poivron frais                                                                        |
+| Pinha                                                          | Ananas                                                                               |
+| Salsa                                                          | Persil                                                                               |
+| Sésamo                                                         | Sésame                                                                               |
+| Taro/Manfafa                                                   | Taro, macabo                                                                         |
+| Tomate                                                         | Tomate fraîche                                                                       |
