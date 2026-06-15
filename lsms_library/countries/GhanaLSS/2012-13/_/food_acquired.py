@@ -1,83 +1,118 @@
 #!/usr/bin/env python
+"""GhanaLSS 2012-13 food_acquired -> canonical long form.
+
+Emits index (t, i, j, u, s, visit) with columns [Quantity, Expenditure, Price].
+
+- s='purchased' from sec9b (food code = freqcd, decoded via harmonize_food Code_9b).
+  2012-13 purchases are VALUE-ONLY (no quantity, no unit): per the food-acquired
+  skill's LCU convention we emit u='Value', Expenditure=value, Quantity=Expenditure.
+  No physical quantity is fabricated (Phase-3 price-imputation is out of scope).
+- s='produced' from sec8h (food label = foodcd, decoded via harmonize_food Label_8h).
+  Produced rows carry a real Quantity (sum of the visit columns s8hq3..s8hq8), a
+  real unit u (s8hq9), and a farmgate Price (s8hq10).  Expenditure is NaN.
+
+visit is KEPT as its own index level (decision D1 -- do NOT fold into t).  The
+derived tables sum it out at API time.
+
+i = household id ('hid'), pre-composed "clust/nh" matching sample()'s HID.
+"""
 import sys
 import numpy as np
 import pandas as pd
 sys.path.append('../../../_/')
-from lsms_library.local_tools import df_from_orgfile, get_categorical_mapping, df_data_grabber, format_id, _to_numeric, to_parquet, get_dataframe
+from lsms_library.local_tools import (get_categorical_mapping, df_data_grabber,
+                                       format_id, _to_numeric, to_parquet,
+                                       get_dataframe)
+
 w = '2012-13'
 
-#categorical mapping
-labelsd = {}
-for column in ['Code_9b', 'Code_8h']:
-    labelsd[column] = get_categorical_mapping(tablename='harmonize_food',idxvars={'Code':(column,format_id)},**{'Label':'Preferred Label'})
-#units = df_from_orgfile('./categorical_mapping.org',name='s8hq9',encoding='ISO-8859-1')
-#unitsd = units.set_index('Code').to_dict('dict')
+# Food-item harmonization.
+# Purchases (sec9b) carry NUMERIC food codes (freqcd) -> map via Code_9b.
+# Produced (sec8h) carries TEXT food labels (foodcd) -> map via Label_8h.
+purchase_food = get_categorical_mapping(tablename='harmonize_food',
+                                        idxvars={'Code': ('Code_9b', format_id)},
+                                        **{'Label': 'Preferred Label'})
+produced_food = get_categorical_mapping(tablename='harmonize_food',
+                                        idxvars={'Code': 'Label_8h'},
+                                        **{'Label': 'Preferred Label'})
 
-# food expenditure
+############################################################
+# Purchases  (s = 'purchased')  -- value only, u = 'Value'
+############################################################
 idxvars = dict(i='hid',
-               j=('freqcd',lambda x: labelsd['Code_9b'][format_id(x)]))
+               j=('freqcd', lambda x: purchase_food.get(format_id(x), '')))
 
-myvars = dict()
-# Iterate over visits
+myvars = {f"Expenditure_{i}": (f"s9bq{i}", _to_numeric) for i in range(1, 7)}
+
+x = df_data_grabber('../Data/PARTB/sec9b.dta', idxvars,
+                    convert_categoricals=False, **myvars)
+
+purch_visits = []
 for i in range(1, 7):
-    myvars[f"Expenditure_{i}"]= (f"s9bq{i}",_to_numeric)
+    di = x.loc[:, [f"Expenditure_{i}"]].copy()
+    di.columns = ['Expenditure']
+    di['visit'] = i
+    di = di.reset_index().replace({r'': pd.NA, 0: np.nan})
+    purch_visits.append(di)
 
-x = df_data_grabber('../Data/PARTB/sec9b.dta',idxvars,convert_categoricals=False,**myvars)
+purch = pd.concat(purch_visits, ignore_index=True)
+# Drop non-food / unmapped purchase codes (j == '').  ~30% of the combined
+# Section-9B module is the legitimate NON-FOOD part -- expected, not data loss.
+purch = purch[(purch['j'] != '') & purch['j'].notna()]
+# Collapse any multiple records for the same (i, j, visit).
+purch = purch.groupby(['i', 'j', 'visit'], as_index=False)['Expenditure'].sum()
+purch = purch[purch['Expenditure'].notna()]
 
-dfs = {}
-for i in range(1, 7):
-    columns = [f"Expenditure_{i}"]
-    dfs[i] = x.loc[:,columns].copy()
-    dfs[i].columns = ['Expenditure']
-    dfs[i]['visit'] = i
-    dfs[i] = dfs[i].reset_index().replace({r'':pd.NA, 0 : np.nan})
+purch['u'] = 'Value'
+purch['s'] = 'purchased'
+# LCU convention: no physical quantity, so Quantity == Expenditure.
+purch['Quantity'] = purch['Expenditure']
+purch['Price'] = np.nan
 
-fe = pd.concat(dfs.values(),ignore_index=True)
-fe = fe.loc[fe['j'].isin(labelsd['Code_9b'].values())]
-fe= fe.groupby(['i', 'j', 'visit']).sum() # Deal with some cases with multiple records for purchases
-
-
-
-####################
-# Home produced
-####################
-
+############################################################
+# Home produced  (s = 'produced')  -- real Quantity, u, Price
+############################################################
 prod = get_dataframe('../Data/PARTB/sec8h.dta', convert_categoricals=True)
-#harmonize food labels and map unit labels:
-prod['foodcd'] = prod['foodcd'].replace(labelsd['Code_8h'])
+# keep only households that consumed own-produced food in the past 12 months
+prod = prod[prod['s8hq1'] == 'yes'].copy()
 
-# Some bizarre garbage in dta masquerading as extremely large numbers.
-#prod['s8hq14'] = prod.s8hq14.where(prod.s8hq14!=prod.s8hq14.max())
+prod['j'] = prod['foodcd'].map(produced_food)
+prod = prod[(prod['j'] != '') & prod['j'].notna()]
 
-prod = prod[prod['s8hq1'] == 'yes'] #select only if hh consumed any own produced food in the past 12 months
-#create produced column labels for each visit -- 3-day recall starting from the 2nd to 7th visit
+prod = prod.rename(columns={'hid': 'i', 's8hq9': 'u', 's8hq10': 'Price'})
+qty_cols = {f"s8hq{i}": f"Quantity_{i}" for i in range(3, 9)}
+prod = prod.rename(columns=qty_cols)
 
-selector_pro = {'hid': 'i',
-                'foodcd': 'j',
-                's8hq9': 'u',
-                's8hq10': 'Price'}
+keep = ['i', 'j', 'u', 'Price'] + list(qty_cols.values())
+prod = prod[keep].copy()
+prod = prod.replace({r'': pd.NA, 0: np.nan})
+# Non-string unit codes -> string (mirrors the legacy guard).
+prod['u'] = prod['u'].astype(str)
+# Collapse duplicate (i, j, u) records, summing visit quantities; Price = mean.
+agg = {c: 'sum' for c in qty_cols.values()}
+agg['Price'] = 'mean'
+prod = prod.groupby(['i', 'j', 'u'], as_index=False).agg(agg)
 
-selector_pro.update({f's8hq{i}':f'Produced_{i}' for i in range(3,9)})
+# Wide visit columns -> long.
+prod = pd.wide_to_long(prod, stubnames=['Quantity'], i=['i', 'j', 'u'],
+                       j='visit', sep='_', suffix=r'\d+').reset_index()
+prod = prod[prod['Quantity'].notna() & (prod['Quantity'] != 0)]
 
-y = prod.rename(columns=selector_pro)[[*selector_pro.values()]]
-#unit code 1.7498005798264095e+100 has no categorical mapping
-y.index = y.index.map(str)
+prod['s'] = 'produced'
+prod['Expenditure'] = np.nan
 
-#unstack by visits
-y = y.replace({r'':pd.NA, 0 : np.nan})
-y = y.loc[y['j'].isin(labelsd['Code_8h'].values())]
-y = y.groupby(['i','j','u']).sum() # Deal with some cases with multiple records for purchases
-y = pd.wide_to_long(y.reset_index(), stubnames=['Produced'], i=['i', 'j', 'u'], j='visit', sep='_', suffix='\\d+')
+############################################################
+# Stack the two sources into the s index level.
+############################################################
+cols = ['i', 'j', 'u', 's', 'visit', 'Quantity', 'Expenditure', 'Price']
+fa = pd.concat([purch[cols], prod[cols]], ignore_index=True)
 
-y = y.join(fe,how='outer')
+fa['t'] = w
+fa = fa.set_index(['t', 'i', 'j', 'u', 's', 'visit'])
+fa = fa.reorder_levels(['t', 'i', 'j', 'u', 's', 'visit'])
 
-y['w'] = w
-y = y.set_index('w', append=True)
-y = y.reorder_levels(['w','i','j','visit', 'u'])
+# Drop all-empty rows.
+fa = fa.replace(0, np.nan).dropna(how='all')
 
-fa = y.replace(0,np.nan).dropna(how='all')
-
-# Deal with non-string values in units
-fa.index = fa.index.set_levels(fa.index.levels[-1].astype(str),level='u')
-if __name__=='__main__':
-    to_parquet(fa,'food_acquired.parquet')
+if __name__ == '__main__':
+    to_parquet(fa, 'food_acquired.parquet')

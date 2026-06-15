@@ -1,65 +1,98 @@
 #!/usr/bin/env python
-from lsms_library.local_tools import to_parquet, get_dataframe
+"""GhanaLSS 1988-89 food_acquired (canonical).
+
+MONEY-ONLY wave (design doc D3), structurally identical to 1987-88: the
+expenditure module records monetary values only -- NO quantities, NO physical
+units.  Every row therefore carries the synthetic unit ``u='Value'`` with
+``Quantity == Expenditure == value`` (see the food-acquired skill, "LCU-only
+goods: u='Value'").
+
+Sources (read via the existing .DAT/.DCT get_dataframe path):
+  - Y12A.DAT : purchases   (FOODCD == Code_12A) -> s='purchased'
+  - Y12B.DAT : home produced (FOODCD == Code_12B) -> s='produced'
+
+Output:
+  - index  : (t, i, j, u, s, visit)   -- NO v (framework would join from
+             sample(), but this wave declares no sample, so v is unavailable;
+             nothing to join).  visit is KEPT as its own index level (design
+             doc D1): this 1980s wave has a single, degenerate "since my last
+             visit" recall, but it is present.
+  - columns: [Quantity, Expenditure]
+  - i = household id (built via the wave's canonical mapping.i() helper so the
+        keys match sample/roster), j = harmonized food item, u = 'Value',
+        s in {purchased, produced}, t = '1988-89'.
+
+Value-column choice: the per-RECALL-PERIOD value -- CFOODBLV (purchased_value,
+"amount spent since last visit") for purchases and VFOODCPD (produced_value
+per day) for production -- NOT the annualized *_yearly columns.
+"""
 import sys
-sys.path.append('../../_')
-from ghanalss import yearly_expenditure
 import numpy as np
 import pandas as pd
-sys.path.append('../../../_/')
-from lsms_library.local_tools import df_from_orgfile
+
+sys.path.append('../../_')          # ghanalss.py (country-level helpers)
+sys.path.append('.')                # mapping.py  (this wave's i() helper)
+import mapping
+from lsms_library.local_tools import df_from_orgfile, to_parquet, get_dataframe
 
 t = '1988-89'
-#categorical mapping
-labels = df_from_orgfile('./categorical_mapping.org',name='harmonize_food',encoding='ISO-8859-1')
+# Single, degenerate recall window for this 1980s wave (design doc D3).
+VISIT = 'since last visit'
+
+# ----------------------------------------------------------------------------
+# Food-item harmonization: Code_12A / Code_12B -> canonical Preferred Label.
+# ----------------------------------------------------------------------------
+labels = df_from_orgfile('./categorical_mapping.org', name='harmonize_food',
+                         encoding='ISO-8859-1')
 labelsd = {}
 for column in ['Code_12A', 'Code_12B']:
     labels[column] = labels[column].astype('Int64').astype('string')
     labelsd[column] = labels[['Preferred Label', column]].set_index(column).to_dict('dict')
 
 
-# food expenditure
-df = get_dataframe('../Data/Y12A.DAT')
-#map codes to categorical labels
-df['FOODCD'] = df['FOODCD'].astype('string').replace(labelsd['Code_12A']['Preferred Label'])
+def _load_side(fn, code_col, value_col, source):
+    """Read one money-only side and reshape to canonical long rows.
 
-df['purchased_value_yearly'] = df.apply(yearly_expenditure, axis=1)
+    Returns a DataFrame with columns [i, j, s, Quantity, Expenditure] (u/t/visit
+    added by the caller after concatenation).
+    """
+    df = get_dataframe(fn)
 
-selector_pur = {'HID': 'j', 
-              'FOODCD': 'i', 
-              'CFOODBLV': 'purchased_value', #amount spent since last visit
-              'purchased_value_yearly': 'purchased_value_yearly'}  
-x = df.rename(columns=selector_pur)[[*selector_pur.values()]]
-x = x.replace({'.':np.nan, 0: np.nan})
-xf = x.dropna(subset = x.columns.tolist()[2:], how ='all')
+    # Household id via the wave's canonical helper (matches sample/roster).
+    df['i'] = df['HID'].apply(mapping.i)
 
+    # Harmonized food item.
+    df['j'] = (df['FOODCD'].astype('string')
+                           .replace(labelsd[code_col]['Preferred Label']))
 
-#home produced amounts
-prod = get_dataframe('../Data/Y12B.DAT')
-#harmonize food labels and map unit labels:
-prod['FOODCD'] = prod['FOODCD'].astype('string').replace(labelsd['Code_12B']['Preferred Label'])
+    # Per-recall-period monetary value -> Expenditure (== Quantity, u='Value').
+    val = df[value_col].replace({'.': np.nan}).astype('float64')
 
-prod['UTFOODC'] = prod['UTFOODC'].astype(str)
-prod['produced_value_yearly'] = prod.apply(yearly_expenditure, 
-                                           cost = 'VFOODCPD', 
-                                           freq = 'TFOODC', 
-                                           freq_unit = 'UTFOODC', 
-                                           months = 'MFOODCLY', 
-                                           axis=1)
+    out = pd.DataFrame({'i': df['i'], 'j': df['j'], 'value': val})
+    out['s'] = source
 
-selector_pro = {'HID': 'j', 
-              'FOODCD': 'i', 
-              'VFOODCPD': 'produced_value_daily', #amount spent since last visit 
-              'produced_value_yearly': 'produced_value_yearly'}  
-y = prod.rename(columns=selector_pro)[[*selector_pro.values()]]
-y = y.replace({'.':np.nan, 0: np.nan})
-yf = y.dropna(subset = y.columns.tolist()[2:], how ='all')
+    # Drop rows with no usable value (missing / zero) and unmapped food codes.
+    out = out[out['value'].notna() & (out['value'] != 0)]
+    out = out[out['j'].notna() & (out['j'].astype('string') != '')]
+
+    out['Quantity'] = out['value']
+    out['Expenditure'] = out['value']
+    return out[['i', 'j', 's', 'Quantity', 'Expenditure']]
 
 
-#combine xf and yf
-xf['j'] = xf['j'].astype(str)
-yf['j'] = yf['j'].astype(str)
-f = xf.merge(yf, on = ['j','i'], how = 'outer')
-f['u'] = pd.NA
+# Purchases (Y12A): CFOODBLV == purchased_value ("amount spent since last visit").
+x = _load_side('../Data/Y12A.DAT', 'Code_12A', 'CFOODBLV', 'purchased')
+
+# Home produced (Y12B): VFOODCPD == produced_value_daily.
+y = _load_side('../Data/Y12B.DAT', 'Code_12B', 'VFOODCPD', 'produced')
+
+f = pd.concat([x, y], ignore_index=True)
+
+# Canonical unit / wave / visit levels.
+f['u'] = 'Value'
 f['t'] = t
-f = f.set_index(['j','t','i', 'u'])
+f['visit'] = VISIT
+
+f = f.set_index(['t', 'i', 'j', 'u', 's', 'visit'])[['Quantity', 'Expenditure']]
+
 to_parquet(f, 'food_acquired.parquet')
