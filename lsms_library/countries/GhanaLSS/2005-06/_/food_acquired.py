@@ -1,85 +1,107 @@
 #!/usr/bin/env python
-from lsms_library.local_tools import to_parquet
+"""GhanaLSS 2005-06 canonical food_acquired.
+
+Emits the canonical long form with a GhanaLSS-local ``visit`` index level:
+
+    index  : (t, i, j, u, s, visit)      -- NO v (joined from sample() at API time)
+    columns: [Quantity, Expenditure, Price]
+    s      : {purchased, produced}
+
+Purchases (Section 9B / Code_9b) are value-only: Expenditure = recorded value,
+u = 'Value', Quantity = Expenditure (no fabricated physical quantity; price-based
+imputation is a later, out-of-scope phase).  Production (Section 8H / Code_8h)
+carries a real Quantity in a native unit ``u`` plus a farmgate Price; its
+Expenditure is left NaN (no produced value is recorded).
+
+Food codes map to canonical ``j`` via the harmonize_food table; rows whose label
+is empty ('') are the non-food Section-9B block (codes ~165-277) and are dropped.
+
+Household id ``i`` is built EXACTLY as sample()/household_roster() build it -- by
+running this wave's mapping.i() over the pre-composed source ``hhid`` column --
+so food.i matches sample.i and v joins cleanly (fixes the GH #256 NaN-v bug).
+"""
 import sys
 sys.path.append('../../_')
+sys.path.append('../../../_/')
+
 import numpy as np
 import pandas as pd
-sys.path.append('../../../_/')
-from lsms_library.local_tools import df_from_orgfile, get_dataframe
+
+from lsms_library.local_tools import to_parquet, df_from_orgfile, get_dataframe
+import mapping
 
 t = '2005-06'
 
-selector_pur = {'hhid': 'j',
-                'freqcd': 'i'}
-
-#categorical mapping
-labels = df_from_orgfile('./categorical_mapping.org',name='harmonize_food',encoding='ISO-8859-1')
+# --- food-item harmonization (purchases: Code_9b; production: Code_8h) ----------
+labels = df_from_orgfile('./categorical_mapping.org', name='harmonize_food',
+                         encoding='ISO-8859-1')
 labelsd = {}
 for column in ['Code_9b', 'Code_8h']:
-    labelsd[column] = labels[['Preferred Label', column]].set_index(column).to_dict('dict')
-#units = df_from_orgfile('./categorical_mapping.org',name='s8hq9',encoding='ISO-8859-1')
-#unitsd = units.set_index('Code').to_dict('dict')
+    labelsd[column] = (labels[['Preferred Label', column]]
+                       .dropna(subset=[column])
+                       .set_index(column)['Preferred Label'].to_dict())
 
-#food expenditure
+
+def _drop_nonfood(s):
+    """Keep only rows whose harmonized j is a non-empty string label."""
+    return s.apply(lambda x: isinstance(x, str) and x.strip() != '')
+
+
+# ================================ PURCHASES (s9b) ==============================
+# Value-only.  Visits 1..10 each carry a recorded value in s9bq{visit}.
 df = get_dataframe('../Data/partb/sec9b.dta', convert_categoricals=False)
-df['freqcd'] = df['freqcd'].replace(labelsd['Code_9b']['Preferred Label'])
 
-df['hhid'] = df.apply(lambda x:f"{int(x['clust']):d}/{int(x['nh']):02d}",axis=1)
+# i exactly as sample()/roster() build it: mapping.i() over the *pre-composed*
+# source 'hhid' column (sample reads idxvars i: hhid -> format_id(hhid)).
+df['i'] = df['hhid'].apply(mapping.i)
+df['j'] = df['freqcd'].replace(labelsd['Code_9b'])
+df = df[_drop_nonfood(df['j'])]          # drop non-food Section-9B block (j == '')
 
-#create purchased column labels for each visit -- from the 2nd to 11th visit
-selector_pur.update({f's9bq{i}':f'purchased_value_v{i}' for i in range(1,11)})
-
-x = df.rename(columns=selector_pur)[[*selector_pur.values()]]
-x = x.replace({r'':pd.NA, 0 : np.nan})
-x = x.groupby(['j','i']).sum() # Deal with some cases with multiple records for purchases
-x = pd.wide_to_long(x.reset_index(),['purchased_value'],['j','i'],'visit',sep='_v')
-x = x.replace(0,np.nan).dropna()
-
-# Only select food expenditures,since section9b also recorded non-food expenditures.
-x = x.loc[x.index.isin(labelsd['Code_9b']['Preferred Label'].values(),level='i')]
-
-# Add null unit index
+pur_visit_cols = {f's9bq{v}': f'Expenditure_v{v}' for v in range(1, 11)}
+x = df.rename(columns=pur_visit_cols)[['i', 'j'] + list(pur_visit_cols.values())]
+x = x.replace({r'': pd.NA, 0: np.nan})
+# Several distinct freqcd codes harmonize to one j (e.g. 'Other Cereal'); sum
+# their per-visit values so (i, j) uniquely identifies a row for the melt.
+x = x.groupby(['i', 'j']).sum(min_count=1).reset_index()
+x = pd.wide_to_long(x, ['Expenditure'], ['i', 'j'], 'visit', sep='_v')
+x = x.dropna(subset=['Expenditure'])     # keep only visits with a recorded value
+x['s'] = 'purchased'
 x['u'] = 'Value'
-x = x.reset_index().set_index(['j','i','u','visit'])
+x['Quantity'] = x['Expenditure']         # value-only: Quantity carries the value
+x['Price'] = np.nan
+x = x.reset_index()
 
-#home produced amounts
+# ================================ PRODUCED (s8h) ==============================
+# Real quantity (visits 4..12) in a native unit (s8hq13), with a farmgate Price
+# (s8hq14).  Expenditure left NaN -- no produced value is recorded.
 prod = get_dataframe('../Data/partb/sec8h.dta', convert_categoricals=True)
-#harmonize food labels and map unit labels:
-prod['foodcd'] = prod['foodcd'].replace(labelsd['Code_8h']['Preferred Label'])
-#prod['s8hq13'] = prod['s8hq13'].replace(unitsd['Label'])
+prod = prod[prod['s8hq1'] == 'yes']      # only HH that consumed own produce
+prod['i'] = prod['hhid'].apply(mapping.i)
+prod['j'] = prod['foodcd'].replace(labelsd['Code_8h'])
+prod = prod[_drop_nonfood(prod['j'])]
 
-# Some bizarre garbage in dta masquerading as extremely large numbers.
-#prod['s8hq14'] = prod.s8hq14.where(prod.s8hq14!=prod.s8hq14.max())
+# Native unit label (decoded text, e.g. 'basket', 'kilogram') and farmgate price.
+prod['u'] = prod['s8hq13'].astype(str)
+prod['Price'] = prod['s8hq14']
 
-prod = prod[prod['s8hq1'] == 'yes'] #select only if hh consumed any own produced food in the past 12 months
-#create produced column labels for each visit -- 3-day recall starting from the 2nd to 7th visit
-prod['hhid'] = prod.apply(lambda x:f"{int(x['clust']):d}/{int(x['nh']):02d}",axis=1)
+pro_visit_cols = {f's8hq{v}': f'Quantity_v{v}' for v in range(4, 13)}
+keep = ['i', 'j', 'u', 'Price'] + list(pro_visit_cols.values())
+y = prod.rename(columns=pro_visit_cols)[keep]
+y = y.replace({r'': pd.NA, 0: np.nan})
+# As with purchases, distinct foodcd may share a j; sum per-visit quantities so
+# (i, j, u, Price) uniquely identifies a row for the melt.
+y = y.groupby(['i', 'j', 'u', 'Price']).sum(min_count=1).reset_index()
+y = pd.wide_to_long(y, ['Quantity'], ['i', 'j', 'u', 'Price'], 'visit', sep='_v')
+y = y.dropna(subset=['Quantity'])        # keep only visits with a recorded quantity
+y = y.reset_index()
+y['s'] = 'produced'
+y['Expenditure'] = np.nan
 
+# =============================== COMBINE & WRITE ==============================
+idx = ['t', 'i', 'j', 'u', 's', 'visit']
+fa = pd.concat([x, y], ignore_index=True)
+fa['t'] = t
+fa = fa.set_index(idx)[['Quantity', 'Expenditure', 'Price']]
+fa = fa.dropna(how='all')
 
-selector_pro = {'hhid': 'j',
-                'foodcd': 'i',
-                's8hq13': 'u',
-                's8hq14': 'produced_price'}
-
-selector_pro.update({f's8hq{i}':f'produced_quantity_v{i}' for i in range(4,13)})
-
-y = prod.rename(columns=selector_pro)[[*selector_pro.values()]]
-#unit code 1.7498005798264095e+100 has no categorical mapping
-y.index = y.index.map(str)
-
-#unstack by visits
-y = y.replace({r'':pd.NA, 0 : np.nan})
-y = y.groupby(['j','i','u']).sum() # Deal with some cases with multiple records for purchases
-y = pd.wide_to_long(y.reset_index(),['produced_quantity'],['j','i','u'],'visit',sep='_v')
-
-y = y.join(x,how='outer')
-
-y['t'] = t
-y = y.reset_index().set_index(['j','t','i','u','visit'])
-
-fa = y.groupby(['j','t','i','u']).sum()
-fa = fa.replace(0,np.nan).dropna(how='all')
-
-# Deal with non-string values in units
-fa.index = fa.index.set_levels(fa.index.levels[3].astype(str),level='u')
 to_parquet(fa, 'food_acquired.parquet')

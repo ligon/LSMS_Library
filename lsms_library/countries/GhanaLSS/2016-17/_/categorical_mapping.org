@@ -328,7 +328,7 @@
 | Cigarette                     | Tobacco                       |     645 | Cigarette                                            |         |                                |
 | Tobacco                       | Tobacco                       |     646 | Tobacco (processed)                                  |         |                                |
 | Other Tobacco                 | Other Tobacco                 |     647 | Other tobacco products                               |         |                                |
-|                               |                               |     650 | Kola Nuts                                            |         |                                |
+| Kola Nut                      | Pulses, Nuts                  |     650 | Kola Nuts                                            |         |                                |
 |                               |                               |     651 | Refuse collection                                    |         |                                |
 |                               |                               |     652 | Refuse disposal                                      |         |                                |
 |                               |                               |     653 | Expenditure on Public toilet                         |         |                                |

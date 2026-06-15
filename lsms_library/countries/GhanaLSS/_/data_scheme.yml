@@ -14,7 +14,7 @@ Index Info:
     cluster_features: (t, v)
     household_roster: (t, v, i, pid)
     individual_education: (t, i, pid)
-    food_acquired: (t, v, i, j)
+    food_acquired: (t, v, i, j, u, s, visit)
     food_security: (t, i)
 
 Data Scheme:
@@ -51,11 +51,10 @@ Data Scheme:
     AreaUnit: str
     Tenure: str
   food_acquired:
-    index: (t, i, j)
+    index: (t, i, j, u, s, visit)
     Expenditure: float
     Quantity: float
     Price: float
-    Produced: float
 
   sample:
     index: (i, t)
