@@ -15,6 +15,7 @@ import yaml
 
 from .country import Country, _log_issue
 from .local_tools import to_parquet
+from .paths import countries_root
 from .util.generate_dvc_stages import discover_countries as _discover_dvc_countries
 from .util.generate_dvc_stages import generate_country as _generate_dvc_country
 
@@ -61,7 +62,7 @@ def _dump_yaml(data: OrderedDict, path: Path) -> None:
 
 
 def _countries_root() -> Path:
-    return Path(__file__).resolve().parent / "countries"
+    return countries_root()
 
 
 def _dvc_cmd(*args: str) -> List[str]:
@@ -84,10 +85,10 @@ def _collect_dvc_status(target: str, cwd: Path) -> dict:
 
 
 def _available_country_dirs() -> List[str]:
-    countries_root = Path(__file__).resolve().parent / "countries"
+    country_dirs_root = _countries_root()
     names = [
         path.name
-        for path in countries_root.iterdir()
+        for path in country_dirs_root.iterdir()
         if path.is_dir() and not path.name.startswith(".")
     ]
     return sorted(names)
@@ -154,7 +155,7 @@ def cache_list(
 ) -> None:
     """List cached datasets."""
     countries = [country] if country else _available_country_dirs()
-    countries = [c for c in countries if (Path(__file__).resolve().parent / "countries" / c).exists()]
+    countries = [c for c in countries if (_countries_root() / c).exists()]
     for name in countries:
         country_obj = Country(name, preload_panel_ids=False)
         datasets = country_obj.cached_datasets()
@@ -397,7 +398,7 @@ def register(
 ) -> None:
     """Register a DVC materialization stage for a table."""
 
-    base_dir = Path(__file__).resolve().parent / "countries" / country
+    base_dir = _countries_root() / country
     has_wave = bool(wave and wave.lower() not in {"", "all_waves"})
 
     if dvc_file is None:

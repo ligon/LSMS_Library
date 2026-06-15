@@ -85,7 +85,7 @@ from dvc.api import DVCFileSystem
 import pyreadstat
 import inspect
 from typing import Any
-from .paths import data_root, var_path, wave_data_path, COUNTRIES_ROOT
+from .paths import data_root, var_path, wave_data_path, countries_root
 from .config import s3_creds_path as _s3_creds_path
 
 # Initialize DVC filesystem once and reuse it.
@@ -113,7 +113,10 @@ from .config import s3_creds_path as _s3_creds_path
 # ``DVCFileSystem`` construction time.  The auto-unlock pass later in
 # ``lsms_library/__init__.py`` populates it before the first S3 access.
 _PACKAGE_ROOT = Path(__file__).resolve().parent
-_COUNTRIES_DIR = _PACKAGE_ROOT / "countries"
+# GH #436: import-time snapshot of the countries config-tree root.  Honors
+# ``LSMS_COUNTRIES_ROOT`` set *before* import (the worktree model); does not
+# track a later override + ``countries_root.cache_clear()`` in-process.
+_COUNTRIES_DIR = countries_root()
 _DVC_CACHE_DIR = data_root() / "dvc-cache"
 _DVC_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 DVCFS = DVCFileSystem(
@@ -664,7 +667,7 @@ def _resolve_data_path(fn: str, stack_depth: int = 2) -> str:
 
     try:
         caller_file = Path(inspect.stack()[stack_depth].filename).resolve()
-        rel = caller_file.relative_to(COUNTRIES_ROOT)
+        rel = caller_file.relative_to(countries_root())
     except (IndexError, ValueError, TypeError):
         return fn_str
 

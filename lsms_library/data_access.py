@@ -59,10 +59,15 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from . import config
+from .paths import countries_root
 
 logger = logging.getLogger(__name__)
 
-_COUNTRIES_DIR = Path(__file__).resolve().parent / "countries"
+# GH #436: countries config-tree root.  Import-time snapshot of
+# ``countries_root()`` -- honors ``LSMS_COUNTRIES_ROOT`` when the env var is set
+# *before* import (the worktree model); it does NOT track a later override +
+# ``countries_root.cache_clear()`` within the same process.
+_COUNTRIES_DIR = countries_root()
 
 # WB LSMS collection: ISO-3166 alpha-3 codes for countries we track.
 # Used by discover_waves() to query the WB Microdata Library catalog.

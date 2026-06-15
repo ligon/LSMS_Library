@@ -46,7 +46,7 @@ from .local_tools import (
     stamp_parquet_hash,
     _collect_file_paths_from_block,
 )
-from .paths import data_root
+from .paths import data_root, countries_root
 from .yaml_utils import load_yaml
 import importlib.util
 import hashlib
@@ -499,7 +499,7 @@ class Wave:
         
     @property
     def file_path(self) -> Path:
-        return files("lsms_library") / "countries" / self.folder
+        return countries_root() / self.folder
 
     @property
     def resources(self) -> dict[str, Any]:
@@ -1185,7 +1185,7 @@ class Country:
 
     def __init__(self, country_name: str, preload_panel_ids: bool = False, verbose: bool = False, assume_cache_fresh: bool = False, trust_cache: bool = False) -> None:
         # Validate country name: reject path traversal attempts
-        countries_dir = Path(__file__).resolve().parent / "countries"
+        countries_dir = countries_root()
         country_dir = (countries_dir / country_name).resolve()
         if not country_dir.is_relative_to(countries_dir):
             raise ValueError(f"Invalid country name {country_name!r}: path traversal not allowed")
@@ -1220,7 +1220,7 @@ class Country:
 
     @property
     def file_path(self) -> Path:
-        return Path(__file__).resolve().parent / "countries" / self.name
+        return countries_root() / self.name
 
     @property
     def resources(self) -> dict[str, Any]:
@@ -2004,15 +2004,15 @@ class Country:
             current_names = list(df.index.names) if isinstance(df.index, pd.MultiIndex) else [df.index.name]
             v_already_present = ('v' in current_names
                                  or (isinstance(df, pd.DataFrame) and 'v' in df.columns))
-            # Tables whose canonical index in data_info.yml does NOT include
-            # v; joining v from sample() would produce a non-canonical shape.
-            # See SkunkWorks/audits/framework_diagnosis.md for the schema survey.
-            _no_v_join = {'sample', 'cluster_features', 'panel_ids', 'updated_ids',
-                          'shocks', 'assets', 'livestock', 'income'}
+            # Tables whose canonical index does NOT include v; joining v from
+            # sample() would produce a non-canonical shape.  The set is declared
+            # in lsms_library/data_info.yml ("Join v from sample" + index_info),
+            # NOT hardcoded here (GH #436), so adding such a feature needs no
+            # framework-code edit.  See _no_v_join_tables() below.
             if (not v_already_present
                     and 'i' in current_names
                     and 't' in current_names
-                    and method_name not in _no_v_join
+                    and method_name not in _no_v_join_tables()
                     and 'sample' in self.data_scheme):
                 df = self._join_v_from_sample(df)
 
@@ -3490,6 +3490,63 @@ def _expand_kinship(df: pd.DataFrame) -> pd.DataFrame:
         )
 
     return df
+
+
+# Historical hardcoded _no_v_join set (pre-GH-#436, code/config separation).
+# Used as a fallback if data_info.yml cannot be read or omits the declarative
+# "Join v from sample" section, so the framework never silently starts
+# fabricating v on tables that never carried it.
+_NO_V_JOIN_FALLBACK = frozenset({
+    'sample', 'cluster_features', 'panel_ids', 'updated_ids',
+    'shocks', 'assets', 'livestock', 'income',
+})
+
+
+def _compute_no_v_join(data: dict) -> frozenset[str]:
+    """Pure helper: derive the no-v-join set from a parsed data_info.yml dict.
+
+    A table is skipped when its canonical index (``Index Info > index_info``)
+    omits ``v``, or when it is listed under ``Join v from sample > skip_extra``.
+    Returns :data:`_NO_V_JOIN_FALLBACK` when the ``Join v from sample`` section
+    is absent (version skew against an older/foreign data_info.yml), so v-join
+    is never silently re-enabled on a table that never carried it.
+    """
+    section = data.get("Join v from sample") if isinstance(data, dict) else None
+    if not isinstance(section, dict):
+        return _NO_V_JOIN_FALLBACK
+    skip: set[str] = set()
+    index_info = (data.get("Index Info", {}) or {}).get("index_info", {}) or {}
+    for table, spec in index_info.items():
+        if not isinstance(spec, str):
+            continue
+        # Strip exactly one surrounding paren pair (mirrors
+        # feature._canonical_index_levels) so a level name containing a paren
+        # is not mangled, then split on commas into whole level tokens.
+        cleaned = spec.strip()
+        if cleaned.startswith("(") and cleaned.endswith(")"):
+            cleaned = cleaned[1:-1]
+        levels = [tok.strip() for tok in cleaned.split(",") if tok.strip()]
+        if "v" not in levels:
+            skip.add(table)
+    skip.update(str(t) for t in (section.get("skip_extra") or []))
+    return frozenset(skip)
+
+
+@lru_cache(maxsize=1)
+def _no_v_join_tables() -> frozenset[str]:
+    """Tables that ``_finalize_result`` must NOT join ``v`` onto.
+
+    Declarative source: ``lsms_library/data_info.yml`` (see
+    :func:`_compute_no_v_join`).  Falls back to the historical hardcoded set
+    (:data:`_NO_V_JOIN_FALLBACK`) when the file is missing or malformed.
+    """
+    try:
+        info_path = files("lsms_library") / "data_info.yml"
+        with open(info_path, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f) or {}
+        return _compute_no_v_join(data)
+    except Exception:
+        return _NO_V_JOIN_FALLBACK
 
 
 @lru_cache(maxsize=1)

@@ -18,7 +18,7 @@ import pandas as pd
 import pytest
 import yaml
 
-from lsms_library.paths import COUNTRIES_ROOT
+from lsms_library.paths import countries_root
 
 
 # ---------------------------------------------------------------------------
@@ -36,7 +36,7 @@ _SchemeLoader.add_constructor(
 def _countries_with_household_roster() -> list[str]:
     """Return sorted list of country names that declare household_roster."""
     countries = []
-    for yml in sorted(COUNTRIES_ROOT.glob("*/_/data_scheme.yml")):
+    for yml in sorted(countries_root().glob("*/_/data_scheme.yml")):
         country = yml.parent.parent.name
         with open(yml, "r", encoding="utf-8") as f:
             data = yaml.load(f, Loader=_SchemeLoader)
