@@ -218,9 +218,15 @@ def test_schema_version_is_a_real_lever(temp_data_dir, monkeypatch):
     assert after != before
 
 
-def test_legacy_country_parquet_is_trust_once_stamped(temp_data_dir):
+def test_legacy_country_parquet_is_trust_once_stamped(temp_data_dir, monkeypatch):
     """A pre-hash L2-country parquet is read (not rebuilt) and stamped so
     the next read is guarded."""
+    # The v-join is a read-time transform unrelated to the cache-hash
+    # behavior under test; stub it so the test doesn't try to materialize
+    # `sample` (which hits S3 in a no-credentials CI environment).
+    import lsms_library.country as country_mod
+    monkeypatch.setattr(country_mod.Country, "_join_v_from_sample",
+                        lambda self, df: df)
     c = _make_country()
     waves = c.waves
     expected = c._table_cache_hash("housing", waves)
@@ -371,10 +377,15 @@ def test_stale_country_read_evicts_hashless_wave_parquet(temp_data_dir):
     assert not wave_p.exists(), "stale read must evict the hashless wave parquet"
 
 
-def test_assume_cache_fresh_skips_hash_and_serves_stale(temp_data_dir):
+def test_assume_cache_fresh_skips_hash_and_serves_stale(temp_data_dir, monkeypatch):
     """assume_cache_fresh is the documented escape: it bypasses the hash
     check and serves whatever parquet is present."""
     import lsms_library as ll
+    import lsms_library.country as country_mod
+    # Stub the read-time v-join (see note in the trust-once test) so this
+    # cache-behavior test doesn't depend on S3 in CI.
+    monkeypatch.setattr(country_mod.Country, "_join_v_from_sample",
+                        lambda self, df: df)
     c0 = ll.Country("Albania")
     waves = c0.waves
     var_p = temp_data_dir / "Albania" / "var" / "housing.parquet"
