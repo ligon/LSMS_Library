@@ -65,7 +65,28 @@ No special-casing required; the canonical schema accommodates `u='Value'` direct
 
 ### Visit / round handling
 
-Some surveys record multiple visits per wave (EHCVM `vague`, pp/ph countries' planting / harvest rounds).  **Fold these into `t` rather than carrying a separate `visit` index level**, e.g., `2018-19_p1` / `2018-19_p2` for EHCVM passages, `2018Q3` / `2019Q1` for Nigeria pp/ph.  See `add-feature/pp-ph` for the script-path pattern.
+Distinguish two cases:
+
+1. **Distinct survey rounds / seasons** — EHCVM passages, pp/ph countries'
+   planting vs. harvest visits.  These are genuinely different reference
+   periods (different consumption windows).  **Fold them into `t`**, e.g.,
+   `2018-19_p1` / `2018-19_p2` for EHCVM passages, `2018Q3` / `2019Q1` for
+   Nigeria pp/ph.  See `add-feature/pp-ph` for the script-path pattern.
+
+2. **Repeated within-wave measurements** — a survey that visits the same
+   household many times over one wave to *build up* a single consumption
+   aggregate (e.g. GhanaLSS's ~dozen monthly visits from 1991-92 on).  Here the
+   visits are not distinct periods; they sum to one wave total.  **Keep a
+   `visit` index level** — `(t, v, i, j, u, s, visit)` — so `t` stays the wave
+   and the raw recall structure is preserved (harmonize the interface, not the
+   data).  The derived tables (`food_expenditures` / `food_prices` /
+   `food_quantities`) group by `[t,(v,)i,j,(u,)s]` — `visit` is in none of those
+   group-bys, so it is **summed out automatically**, giving per-wave totals for
+   free.  Folding these into `t` instead would wrongly make the derived tables
+   per-visit.  `Feature('food_acquired')` drops the country-local `visit` level
+   on cross-country concat (`_harmonize_country_frame`); the composable
+   cross-country interface is the derived tables, which have already aggregated
+   it.  Reference: GhanaLSS, `slurm_logs/DESIGN_ghanalss_food_acquired_2026-06-15.org` (decision D1).
 
 ## The unit conversion pipeline
 
