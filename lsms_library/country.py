@@ -2136,6 +2136,15 @@ class Country:
                 "ctbl=" + (cached_file_hash(cdir / f"{method_name}.py") or "none"),
                 "cmod=" + (cached_file_hash(cdir / f"{self.name.lower()}.py") or "none"),
                 "cmap=" + (cached_file_hash(cdir / "mapping.py") or "none"),
+                # data_scheme.yml declares the table registry and the
+                # `materialize: make` flags (which decide YAML-path vs
+                # script-path builds) -- build-relevant config, so an edit
+                # must invalidate.  Since #436/#455 it also carries
+                # per-feature `join_v` / derived declarations; those are
+                # read-time transforms, so hashing the whole file
+                # over-invalidates harmlessly on such edits (same coarse
+                # whole-file approach as data_info.yml).
+                "cscheme=" + (cached_file_hash(cdir / "data_scheme.yml") or "none"),
                 # The Makefile defines how every script-path (`!make`) table
                 # in this country is built, so an edit to it must invalidate.
                 # Country-level (one per country); affects all the country's

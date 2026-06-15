@@ -618,6 +618,7 @@ Per *country* (=Country._table_cache_hash=): SHA-256 over the
 sorted-by-wave composition of the per-wave hashes *plus* the
 country-level inputs the wave hashes can't see: =_/{table}.py= (the
 concatenator), =_/{name.lower()}.py= (the country module), =_/mapping.py=,
+=_/data_scheme.yml= (table registry + =materialize= flags; build-relevant),
 =_/Makefile= (defines every =!make= build), and the country's build-time
 =_/*.org= inputs (=CONTENTS.org= excluded).  A single wave's edit busts
 the country hash; for YAML-path tables the rebuild re-reads only the

@@ -294,6 +294,7 @@ def test_country_level_scripts_are_in_the_hash(temp_data_dir, monkeypatch):
     assert f"{base}/food_acquired.py" in asked, "country-level table script not hashed"
     assert f"{base}/uganda.py" in asked, "country module not hashed"
     assert f"{base}/Makefile" in asked, "country Makefile not hashed"
+    assert f"{base}/data_scheme.yml" in asked, "country data_scheme.yml not hashed"
 
 
 def test_org_build_inputs_in_hash_but_contents_org_excluded(temp_data_dir, monkeypatch):
