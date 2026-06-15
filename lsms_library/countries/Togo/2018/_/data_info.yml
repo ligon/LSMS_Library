@@ -225,7 +225,9 @@ food_acquired:
         i:
             - grappe
             - menage
-        j: s07bq01
+        j:
+            - s07bq01
+            - mappings: ['harmonize_food', 'Original Label', 'Preferred Label']
         u:
             - s07bq03b
             - mappings: ['ehcvm_units', 'Code', 'Preferred Label']
