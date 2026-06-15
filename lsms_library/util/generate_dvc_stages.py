@@ -18,13 +18,14 @@ import sys
 
 from lsms_library.country import _slugify as _country_slugify
 from lsms_library.yaml_utils import load_yaml as load_yaml_with_tags
+from lsms_library.paths import countries_root
 
 import yaml
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 LSMS_ROOT = REPO_ROOT / "lsms_library"
-COUNTRIES_ROOT = LSMS_ROOT / "countries"
+COUNTRIES_ROOT = countries_root()  # GH #436: honors LSMS_COUNTRIES_ROOT
 
 CORE_DEPS = [
     LSMS_ROOT / "cli.py",

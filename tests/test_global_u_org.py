@@ -36,8 +36,8 @@ def test_global_u_does_not_define_contested_metric_canonicals():
     # (Layer 3), so the global table must not force them.
     import re
     from pathlib import Path
-    from lsms_library.paths import COUNTRIES_ROOT
-    u_org = COUNTRIES_ROOT.parent / "categorical_mapping" / "u.org"
+    from lsms_library.paths import countries_root
+    u_org = countries_root().parent / "categorical_mapping" / "u.org"
     text = u_org.read_text(encoding="utf-8")
     table = [ln for ln in text.splitlines()
              if ln.strip().startswith("|") and "Preferred Label" not in ln

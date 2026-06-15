@@ -37,6 +37,8 @@ from urllib.parse import urlparse
 
 import yaml
 
+from lsms_library.paths import countries_root
+
 logger = logging.getLogger(__name__)
 
 
@@ -51,7 +53,7 @@ GEO_PATTERNS = [
     "*agri_gps*",
 ]
 
-COUNTRIES_DIR = Path(__file__).resolve().parent.parent / "countries"
+COUNTRIES_DIR = countries_root()  # GH #436: honors LSMS_COUNTRIES_ROOT
 
 
 # ---------------------------------------------------------------------------

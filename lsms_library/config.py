@@ -100,6 +100,18 @@ def data_dir() -> str | None:
     return get("data_dir", env_var="LSMS_DATA_DIR") or None
 
 
+def countries_dir() -> str | None:
+    """Return the country *config* tree override, or None.
+
+    Parallels :func:`data_dir`: lets a git worktree or an alternate config
+    checkout be read by the installed package (whose import location is
+    ``.pth``-pinned), so worktree / parallel-branch development can self-verify.
+    Lookup order: ``LSMS_COUNTRIES_ROOT`` env var -> ``countries_dir`` in
+    config.yml -> None.  See GH #436.
+    """
+    return get("countries_dir", env_var="LSMS_COUNTRIES_ROOT") or None
+
+
 def config_path() -> Path:
     """Return the path to the config file (may not exist yet)."""
     return _config_file()

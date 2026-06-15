@@ -13,7 +13,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from lsms_library.paths import COUNTRIES_ROOT
+from lsms_library.paths import countries_root
 
 # ---------------------------------------------------------------------------
 # Load canonical schema from data_info.yml
@@ -58,7 +58,7 @@ def _load_yaml(path: Path) -> dict:
 
 def _all_data_scheme_paths() -> list[Path]:
     """Return sorted list of all data_scheme.yml paths."""
-    return sorted(COUNTRIES_ROOT.glob("*/_/data_scheme.yml"))
+    return sorted(countries_root().glob("*/_/data_scheme.yml"))
 
 
 def _schemes_with_table(table: str) -> list[tuple[str, Path, dict]]:

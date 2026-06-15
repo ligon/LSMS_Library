@@ -8,10 +8,10 @@ from lsms_library.paths import data_root
 
 def _has_cached_table(country_name: str, table: str) -> bool:
     """Check if a table is cached (either data_root or in-tree)."""
-    from lsms_library.paths import COUNTRIES_ROOT
+    from lsms_library.paths import countries_root
     for candidate in [
         data_root(country_name) / "var" / f"{table}.parquet",
-        COUNTRIES_ROOT / country_name / "var" / f"{table}.parquet",
+        countries_root() / country_name / "var" / f"{table}.parquet",
     ]:
         if candidate.exists():
             return True

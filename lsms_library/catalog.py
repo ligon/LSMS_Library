@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 
-from .paths import COUNTRIES_ROOT
+from .paths import countries_root
 from .yaml_utils import load_yaml
 
 
@@ -27,7 +27,7 @@ def _country_dirs() -> tuple[str, ...]:
     ``"South Africa"`` survive intact.
     """
     out: list[str] = []
-    for p in sorted(COUNTRIES_ROOT.iterdir()):
+    for p in sorted(countries_root().iterdir()):
         if not p.is_dir() or p.name.startswith("."):
             continue
         if (p / "_" / "data_scheme.yml").exists():
@@ -37,7 +37,7 @@ def _country_dirs() -> tuple[str, ...]:
 
 def _declared_tables(country: str) -> set[str]:
     """The ``Data Scheme`` table names declared in *country*'s data_scheme.yml."""
-    f = COUNTRIES_ROOT / country / "_" / "data_scheme.yml"
+    f = countries_root() / country / "_" / "data_scheme.yml"
     if not f.exists():
         return set()
     with open(f, encoding="utf-8") as fh:

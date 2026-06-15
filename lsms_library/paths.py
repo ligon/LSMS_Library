@@ -34,7 +34,30 @@ from functools import lru_cache
 from pathlib import Path
 
 
-COUNTRIES_ROOT = Path(__file__).resolve().parent / "countries"
+@lru_cache(maxsize=None)
+def countries_root() -> Path:
+    """Return the root of the country *config* tree (``countries/{C}/_/...``).
+
+    Resolution order (mirrors :func:`data_root`):
+      1. ``LSMS_COUNTRIES_ROOT`` environment variable
+      2. ``countries_dir`` in ``~/.config/lsms_library/config.yml``
+      3. ``<package>/countries`` (install-relative default)
+
+    Overriding lets a git worktree or an alternate config checkout be read by
+    the installed package -- whose import location is ``.pth``-pinned to the
+    main checkout -- so worktree / parallel-branch development can build and
+    self-verify against its own config tree.  The default is byte-identical to
+    the historical ``Path(__file__).parent / "countries"`` constant, so the
+    common (no-override) case is unchanged.  See GH #436.
+
+    Cached; call ``countries_root.cache_clear()`` after changing the env var or
+    config (e.g. in tests), exactly like :func:`data_root`.
+    """
+    from . import config as _config
+    override = _config.countries_dir()
+    if override:
+        return Path(override).expanduser()
+    return Path(__file__).resolve().parent / "countries"
 
 
 _WHITESPACE_WARNED: set[str] = set()
@@ -104,7 +127,7 @@ def _caller_country_and_wave(stack_depth: int = 2) -> tuple[str | None, str | No
         return None, None
 
     try:
-        rel = caller.relative_to(COUNTRIES_ROOT)
+        rel = caller.relative_to(countries_root())
     except ValueError:
         return None, None
 
