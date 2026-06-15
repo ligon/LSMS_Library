@@ -524,3 +524,24 @@
 |    1 | freehold                   |
 |    2 | granted_right_of_occupancy |
 |    4 | leasehold                  |
+
+# harmonize_species_ehcvm — EHCVM s17 livestock species code (s17q02 in
+#    2018-19, s17q01 in 2021-22 — the column moves but the 1-11 value
+#    scheme is identical).  Codes are the elevage__id value labels:
+#    1 Bovins, 2 Ovins, 3 Caprins, 4 Camelins, 5 Equins, 6 Asins,
+#    7 Porcins, 8 Lapins, 9 Poules, 10 Pintades, 11 Autres volailles.
+#    (Cloned verbatim from Niger's harmonize_species_ehcvm.)
+#+NAME: harmonize_species_ehcvm
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Cattle          |
+|    2 | Sheep           |
+|    3 | Goats           |
+|    4 | Camels          |
+|    5 | Horses          |
+|    6 | Donkeys         |
+|    7 | Pigs            |
+|    8 | Rabbits         |
+|    9 | Chicken         |
+|   10 | Guinea Fowl     |
+|   11 | Other Poultry   |

@@ -125,3 +125,31 @@
 |    1 | freehold                   |
 |    2 | granted_right_of_occupancy |
 |    4 | leasehold                  |
+
+# livestock species (GAP 4; EHCVM cluster).
+#
+# harmonize_species_ehcvm — EHCVM s17 livestock roster species code
+# (Guinea-Bissau 2018-19 s17q02).  The integer 1-11 value scheme is shared
+# across the EHCVM countries (the value LABELS localize — French / Portuguese
+# — but the codes do not), so this table keys on the integer Code and is
+# reused verbatim from the Niger reference.  The wave-level _/livestock.py
+# loads s17 with convert_categoricals=False and maps the integer code here.
+# Codes are the elevage__id value labels: 1 Bovins, 2 Ovins, 3 Caprins,
+# 4 Camelins, 5 Equins, 6 Asins, 7 Porcins, 8 Lapins, 9 Poules, 10 Pintades,
+# 11 Autres volailles.  Preferred Label vocabulary: Cattle, Sheep, Goats,
+# Camels, Horses, Donkeys, Pigs, Rabbits, Chicken, Guinea Fowl, Other Poultry.
+
+#+NAME: harmonize_species_ehcvm
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Cattle          |
+|    2 | Sheep           |
+|    3 | Goats           |
+|    4 | Camels          |
+|    5 | Horses          |
+|    6 | Donkeys         |
+|    7 | Pigs            |
+|    8 | Rabbits         |
+|    9 | Chicken         |
+|   10 | Guinea Fowl     |
+|   11 | Other Poultry   |

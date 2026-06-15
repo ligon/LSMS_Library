@@ -93,3 +93,25 @@
 |    1 | freehold                   |
 |    2 | granted_right_of_occupancy |
 |    4 | leasehold                  |
+
+# livestock harmonize table (EHCVM cluster; cloned from Niger 2018-19,
+# PR for GAP 4).  s17q02 species code (elevage__id, 1-11) -> canonical
+# `animal`.  Shared EHCVM vocabulary so the animal axis matches the
+# other EHCVM countries.  Referenced from 2018/_/livestock.py via
+# tools.get_categorical_mapping('harmonize_species_ehcvm','Code',
+# 'Preferred Label').
+
+#+NAME: harmonize_species_ehcvm
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Cattle          |
+|    2 | Sheep           |
+|    3 | Goats           |
+|    4 | Camels          |
+|    5 | Horses          |
+|    6 | Donkeys         |
+|    7 | Pigs            |
+|    8 | Rabbits         |
+|    9 | Chicken         |
+|   10 | Guinea Fowl     |
+|   11 | Other Poultry   |

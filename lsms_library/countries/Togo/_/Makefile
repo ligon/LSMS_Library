@@ -31,6 +31,13 @@ $(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
 ../%/_/plot_features.parquet: ../%/_/plot_features.py
 	(cd $(@D) && python plot_features.py)
 
+# Wave-level livestock (EHCVM cluster; cloned from Niger).  Same gap as
+# plot_features above: the generic %.parquet rule never fires for it
+# because its food_items.org/malawi.py prereqs are absent, so give it an
+# explicit pattern rule.
+../%/_/livestock.parquet: ../%/_/livestock.py
+	(cd $(@D) && python livestock.py)
+
 %.parquet: %.py food_items.org malawi.py
 	(cd $(@D) && python ./$(<F))
 

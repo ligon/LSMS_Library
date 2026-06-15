@@ -35,6 +35,13 @@ $(VAR_DIR)/shocks.parquet: shocks.py $(shocks_parquet)
 ../%/_/shocks.parquet:
 	(cd $(@D) && python shocks.py)
 
+# livestock (GAP 4, item-level).  Script-path wave table: each wave's
+# _/livestock.py reads its s17 roster and writes the wave-level parquet via
+# to_parquet().  The wave-level grab_data() invokes
+# `make ../<wave>/_/livestock.parquet`, so this rule runs that wave script.
+../%/_/livestock.parquet: ../%/_/livestock.py categorical_mapping.org
+	(cd $(@D) && python livestock.py)
+
 %.parquet: %.py CONTENTS.org tanzania.py
 	(cd $(@D) && python ./$(<F))
 

@@ -86,3 +86,36 @@ Data Scheme:
   interview_date:
     index: (t, i)
     Int_t: datetime
+
+  livestock:
+    # Item-level livestock roster (GAP 4).  One row per REPORTED
+    # (household, species) the household owns/raises, from EHCVM §17
+    # 'Élevage' (s17_me_CIV2018.dta).  The roster is pre-filtered to owned
+    # species (s17q03 == 1).  An engaged-in-livestock HH binary is
+    # recoverable as groupby(['t','i']).any(); TLU is a Σ(head × factor)
+    # transformation — neither is a column here (item-level / reported
+    # discipline).
+    #
+    # GRAIN (t, i, animal) — NO v level: 'livestock' is in the framework's
+    # _no_v_join set, so the household-level rows carry no cluster level and
+    # the framework does NOT join one from sample().  `animal` is the
+    # harmonized species Preferred Label (harmonize_species_ehcvm: codes
+    # 1-11 -> Cattle / Sheep / Goats / Camels / Horses / Donkeys / Pigs /
+    # Rabbits / Chicken / Guinea Fowl / Other Poultry).
+    #
+    # CotedIvoire predates the standard EHCVM list (CLAUDE.md): its
+    # household id is format_id(grappe) + format_id(menage, zeropadding=3)
+    # (e.g. '1003'), NOT the 'E_'+grappe+'0'+menage scheme the Niger/Mali/
+    # Senegal EHCVM siblings use.  2018-19/_/livestock.py inlines that id
+    # construction to match sample().i.
+    #
+    # COLUMNS (reported, item-level): HeadCount (owned now, s17q06),
+    # HeadAcquired (number bought in the last 12 months, s17q08), HeadSold
+    # (number sold on the hoof in the last 12 months, s17q10).  A `Value`
+    # (herd value) column is OMITTED: EHCVM s17 records no current herd
+    # value (only purchase / sale FLOW values).
+    index: (t, i, animal)
+    HeadCount: float
+    HeadAcquired: float
+    HeadSold: float
+    materialize: make

@@ -79,3 +79,29 @@
 | Tiles              | Tiles           |
 | Dung               | Earth with Dung |
 | Other              | Other           |
+
+* Livestock Species
+
+# harmonize_species_ehcvm — EHCVM s17 livestock species codes (s17q02).
+# Codes are the elevage__id value labels: 1 Bovins, 2 Ovins, 3 Caprins,
+# 4 Camelins, 5 Equins, 6 Asins, 7 Porcins, 8 Lapins, 9 Poules,
+# 10 Pintades, 11 Autres volailles.  The Preferred Label vocabulary is the
+# shared EHCVM/ECVMA `animal` axis (Cattle / Sheep / Goats / Camels /
+# Horses / Donkeys / Pigs / Rabbits / Chicken / Guinea Fowl / Other
+# Poultry).  Referenced from 2018-19/_/livestock.py via
+# get_categorical_mapping('harmonize_species_ehcvm', 'Code', 'Preferred Label').
+
+#+NAME: harmonize_species_ehcvm
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Cattle          |
+|    2 | Sheep           |
+|    3 | Goats           |
+|    4 | Camels          |
+|    5 | Horses          |
+|    6 | Donkeys         |
+|    7 | Pigs            |
+|    8 | Rabbits         |
+|    9 | Chicken         |
+|   10 | Guinea Fowl     |
+|   11 | Other Poultry   |

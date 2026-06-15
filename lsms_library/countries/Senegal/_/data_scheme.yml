@@ -120,3 +120,28 @@ Data Scheme:
     SoilType: str
     Irrigated: bool
     materialize: make
+
+  livestock:
+    # Item-level livestock roster (GAP 4), cloned from the Niger EHCVM
+    # template.  One row per REPORTED (household, species) the household
+    # owns/raises, from the EHCVM Section 17 'Élevage' roster
+    # (s17_me_sen2018.dta).  The WB .do collapses this to a single
+    # engaged-in-livestock y/n binary (recoverable as
+    # groupby(['t','i']).any() over these rows); TLU is a Σ(head × factor)
+    # transformation — neither is a column here (item-level discipline).
+    #
+    # GRAIN (t, i, animal) — NO v level: 'livestock' is in the framework's
+    # _no_v_join set, so the household-level rows carry no cluster level and
+    # the framework does NOT join one from sample().  `animal` is the
+    # harmonized species Preferred Label (harmonize_species_ehcvm; codes
+    # 1-11).  EHCVM 2018-19 only (the 2021-22 round lacks this section).
+    #
+    # COLUMNS (reported, item-level): HeadCount (owned now), HeadAcquired
+    # (number bought in the last 12 months), HeadSold (number sold on the
+    # hoof in the last 12 months).  A `Value` (herd value) column is
+    # intentionally OMITTED: EHCVM s17 records no current herd value.
+    index: (t, i, animal)
+    HeadCount: float
+    HeadAcquired: float
+    HeadSold: float
+    materialize: make

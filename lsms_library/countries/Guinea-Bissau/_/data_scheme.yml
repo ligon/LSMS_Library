@@ -109,3 +109,35 @@ Data Scheme:
     SoilType: str
     Irrigated: bool
     materialize: make
+
+  livestock:
+    # Item-level livestock roster (GAP 4), cloned from the Niger EHCVM
+    # reference.  One row per REPORTED (household, species) the household
+    # owns/raises, from EHCVM Section 17 'Élevage' (s17_me_gnb2018.dta, one
+    # row per (household, species), pre-filtered to owned species
+    # s17q03 == 1).  The WB engaged-in-livestock y/n binary is recoverable
+    # as groupby(['t','i']).any() over these rows; TLU is a
+    # Σ(head × species-factor) transformation — neither is a column here
+    # (item-level / reported-values discipline).
+    #
+    # GRAIN (t, i, animal) — NO v level: 'livestock' is in the framework's
+    # _no_v_join set, so the household-level rows carry no cluster level and
+    # the framework does NOT join one from sample().  `animal` is the
+    # harmonized species Preferred Label (harmonize_species_ehcvm maps the
+    # 1-11 EHCVM species code s17q02 -> Cattle / Sheep / Goats / Camels /
+    # Horses / Donkeys / Pigs / Rabbits / Chicken / Guinea Fowl / Other
+    # Poultry).  The species value labels are French / Portuguese but the
+    # integer codes match the other EHCVM countries, so the mapping keys on
+    # the code (s17 loaded convert_categoricals=False).  Single EHCVM wave:
+    # 2018-19.
+    #
+    # COLUMNS (reported, item-level): HeadCount (owned now, s17q06),
+    # HeadAcquired (number bought in the last 12 months, s17q08), HeadSold
+    # (number sold on the hoof in the last 12 months, s17q10).  A `Value`
+    # (herd value) column is intentionally OMITTED: EHCVM s17 records only
+    # purchase / sale FLOW values, no current herd value.
+    index: (t, i, animal)
+    HeadCount: float
+    HeadAcquired: float
+    HeadSold: float
+    materialize: make
