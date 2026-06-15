@@ -49,7 +49,7 @@ The library has three cache tiers (see `docs/guide/caching.md` for the full pict
 
 Override the data root with `data_dir` in `~/.config/lsms_library/config.yml` or the `LSMS_DATA_DIR` env var (env var wins). All three tiers move together.
 
-- **No automatic staleness check.** Editing a wave's `data_info.yml`, a `_/{table}.py` script, or an upstream `.dta` file does NOT trigger a rebuild. Force one in order of increasing aggression:
+- **Automatic content-hash staleness (v0.8.0).** Each cached parquet embeds a content hash (pyarrow schema metadata key `lsms_cache_hash`) covering its pre-finalize inputs: `LSMS_CACHE_SCHEMA` (a manual library-version lever in `local_tools.py`), the wave's `data_info.yml`, the wave + country modules (`{wave_folder}.py`, `{country}.py`, `mapping.py`), any wave/country `_/{table}.py` script, and the **DVC sidecar md5** of each declared source (`.dta` never hashed/downloaded). On read: match → serve; mismatch → rebuild; **no embedded hash** (pre-v0.8.0 parquet) → trust-once + re-stamp (no rebuild-all on upgrade). Implemented in `Wave._input_hash()` / `Country._table_cache_hash()` with read gates at the L2-country read and both L2-wave reads (`local_tools.cache_freshness` / `stamp_parquet_hash`). Recompute is ~1–4 ms (config/sidecar reads only — no `.dta` hash, no S3, no tree walk), so the v0.7.0 fast path is preserved. *Excluded by design* (they re-run post-read, never touching the parquet): `_finalize_result`, kinship, spellings, categorical mappings, `_join_v_from_sample`. *Limitations*: (a) script-path sources referenced via **dynamically-built paths** (not string literals) are covered only by the script-text hash — an out-of-band edit to such a source still needs a manual clear; (b) script-path L2-wave parquets are written hashless by their scripts, so they can't self-invalidate — a stale L2-country hash instead **evicts** them (`Country._evict_hashless_wave_caches`) so the rebuild re-runs the script; *residual F1*: if the L2-country parquet is **absent** (partial cache — waves present, country table never materialized) a hashless wave parquet can still be served stale after a source edit (narrow, fail-safe, not reachable via `cache clear`; see `dvc_object_management.org` for the deferred stamp-after-Make fix); (c) `assume_cache_fresh=True` skips the hash check entirely. Manual overrides remain (in increasing aggression):
     1. `LSMS_NO_CACHE=1` in the session — bypasses L2-country reads and L2-wave reads on the YAML path. *Soft*: script-path L2-wave parquets (Nigeria PP/PH, Tanzania multi-round) are still read by `run_make_target` without consulting the env var, so a stale L2-wave parquet can shadow a source-script fix.
     2. `lsms-library cache clear --country {Country}` — physically removes L2-country (`var/`), the country-level companion (`_/`), AND every L2-wave parquet (`{wave}/_/{table}.parquet`) for that country. As of 2026-04-25 this also enumerates round-name wave dirs (Nigeria's `2012Q3/`, `2013Q1/`) that don't match `Country.waves`.
     3. `pytest --rebuild-caches` (or `make test-full`) — same as the CLI above for *every* country under `data_root()`, run before the test session, then sets `LSMS_NO_CACHE=1`. Use when verifying a wave-script fix in CI; previously a stale L2-wave parquet could pass a test the source-only fix would have failed (Nigeria/Senegal age sentinels, 2026-04-25).
@@ -229,14 +229,14 @@ Some countries have configs but no source `.dta` in the repository:
 
 ## Design / Skunkworks References
 
-- `SkunkWorks/dvc_object_management.org` — content-hash cache invalidation plan (stage layer retired in v0.7.0; hash-based invalidation deferred to v0.8.0).
+- `SkunkWorks/dvc_object_management.org` — content-hash cache invalidation (stage layer retired in v0.7.0; hash-based invalidation **implemented in v0.8.0** — see the "Convergence: implemented design" section).
 - `SkunkWorks/dvcfilesystem_runtime_override.org` — how the pip-install scenario works (runtime config override, lazy credential validation, no git ancestor required).
 - `SkunkWorks/cross_country_label_harmonization.org` — design sketch for `Feature(...)(harmonize=...)`.
 
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **LSMS_Library** (18505 symbols, 22102 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **LSMS_Library** (23735 symbols, 26551 relationships, 151 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > If any GitNexus tool warns the index is stale, run `npx gitnexus analyze` in terminal first.
 
