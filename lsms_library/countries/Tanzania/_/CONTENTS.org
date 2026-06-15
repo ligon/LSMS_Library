@@ -251,6 +251,115 @@ residue.  GPS-based matching is *not* available: Tanzania
    item-level with native =interview__key= =v= --- do not bake the lossy
    join in.
 
+*** Data-enabled result: =community_cluster_xwalk= implemented (2026-06-14, #113)
+
+The next-steps above were run with data access.  Headline: for **2020-21
+the survey cluster id is BAKED INTO the community admin codes**, so the
+match there is deterministic; 2019-20 falls back to =(region, ward)= + the
+date lever.  The district crosswalk is a dead end and the interviewer /
+team-id idea is unavailable.
+
+**Avenue A (cluster id elsewhere) --- dead.**  Scanned =CM_SEC_A= and
+=CM_SEC_B..G= in both waves: no =clusterid= / =strataid= / EA column
+anywhere.  Community GPS (=cm_gps__*=) is present but =**CONFIDENTIAL**=
+(redacted), and there is no Survey-Solutions paradata / assignment file in
+either =Data/= dir, so the interviewer / "responsible" id is stripped too
+(=cm_a17..cm_a25= are 1--4 rating items, not team codes).  The only shared
+geography remains the national admin tuple.
+
+**Avenue B (interview dates) --- confirmed and used.**  =CM_SEC_A.cm_start=
+(community) and =HH_SEC_A.hh_a18= (household) both carry real timestamps.
+Positive control (where =(region, ward)= already gives a UNIQUE cluster,
+does =cm_start= fall in that cluster's =hh_a18= window?): *99%* (2020-21,
+298/301) / *79%* (2019-20, 31/39) --- one field team runs the community
+interview and that cluster's household interviews in one visit, so the
+date genuinely separates wards that hold >1 cluster.
+
+**Avenue C (cluster id baked into the admin codes) --- the win for 2020-21.**
+The survey cluster id is *composite*, and for 2020-21 it is reconstructable
+from the community admin codes: with =y5_cluster= = =RR-DD-WWW-EE-CCC=, the
+tuple =(RR, WWW, EE, CCC)= equals the community =(id_01, id_03, id_04,
+id_05)= (region, ward, EA, cluster-seq) on *99--100%* of the geo-unique
+wards.  So 2020-21 resolves *deterministically* from those four codes --- no
+date heuristic --- dropping only the within-region district =DD=, the one
+field whose community (national code 11..128+) and household (within-region
+index 1..9) encodings are incompatible (=(region, district, ward)= =
+*0/488*).  2019-20 cannot use this: its =clusterid= uses an internal
+numbering, so =(region, ward, id_04)= → =clusterid= resolves only 14/99 ---
+it stays on =(region, ward)= + date.
+
+**Measured unique-cluster resolution** (honest; the desk estimates above
+were optimistic):
+
+| wave    | unique  | method                               | region fallback |
+|---------+---------+--------------------------------------+-----------------|
+| 2019-20 | 51/99   | (region, ward) geo 39 + date 12      |              48 |
+| 2020-21 | 458/488 | (region, ward, EA, seq) 455 + date 3 |              30 |
+
+The 2020-21 baked-in reconstruction (455 deterministic) beats the date-only
+=(region, ward)= approach (414) AND needs no heuristic; the date lever only
+breaks the 8 residual =(RR, WWW, EE, CCC)= collisions across =DD= (+3).  The
+2019-20 window is ±14d (the sparse Extended Panel widens well); 2020-21's is
+±7d (only the residual matters).  Every resolved =cluster= is a real
+=sample().v= (51/51, 458/458), so the household join is valid.
+
+**Implemented as the =community_cluster_xwalk= feature** (NOT a
+=transformations= step --- it is wave-specific, cross-file
+=CM_SEC_A=+=HH_SEC_A= logic, so it belongs on the script path):
+- =tanzania.link_community_to_cluster(t, cm_a, hh_a, window_days)= --- the
+  matcher (2020-21 reconstructs the cluster from (region, ward, EA, seq);
+  2019-20 keys on (region, ward) + date);
+- wave scripts =2019-20/_/community_cluster_xwalk.py= /
+  =2020-21/_/community_cluster_xwalk.py= (=materialize: make=) +
+  country-level =_/community_cluster_xwalk.py= concat;
+- grain =(t, v)= (=v= = community =interview__key=, joins =community_prices.v=);
+  columns =cluster= (resolved =sample().v= or NA), =region=, =match=
+  ('cluster' | 'region'), =n_candidates=.  =is_this_feature_sane().ok=.
+- =community_prices.v= stays native (the #442 decision); the lossy,
+  confidence-tagged link lives only in this crosswalk.
+
+**Remaining (the original #113 usage).**  The quantity/price fallback
+itself --- join =community_prices ⨝ community_cluster_xwalk → cluster v →
+households=, region fallback where =match != 'cluster'= --- is a separate
+consumer step (plausibly a =_FOOD_DERIVED=-style country transform, since
+it is "fill missing =food_prices= from another table").  Not yet wired.
+
+*** GPS-aided extension attempt for 2019-20 (2026-06-14, transient — coords NOT stored)
+
+Tried to push 2019-20 past 51/99 using location.  Conclusion: **2019-20 is
+structurally capped at ~52--54% clean assignment; geolocation does not help.**
+Method/evidence (coordinates used only in-memory for inference + validation,
+never written to any artifact):
+
+- *Validation (good news).*  The =community_cluster_xwalk= 2019-20 assignments
+  are geographically correct: the community GPS altitude (uncensored in
+  =CM_SEC_A.cm_gps__Altitude=) matches the assigned cluster's *true* elevation
+  within **26 m** (median) against =HH_SEC_WQT= real GPS (41 clusters), and
+  **27 m** against the WB harmonised =lsms_ag.parquet= =elevation= (103
+  clusters; bridged to our =clusterid= via =hh_id_original= == =sdd_hhid=, a
+  clean 569/569 household join).  The harmonised covariates are extracted at
+  the *true* location (only lat/lon are jittered ~4.5 km), so =elevation= is
+  usable.
+- *Extension (no gain).*  Altitude/elevation disambiguation of the ~12
+  ambiguous communities resolves only +1 (WQT) to +2 (WQT ∪ harmonised, 116
+  cluster references) -> 51 -> 53.  Candidate clusters within one ward usually
+  share similar elevation, so altitude can't separate them.
+- *Why it's capped.*  The binding constraint is the 37 communities whose
+  =(region, ward)= holds **no surviving baseline-pinned household** -- nothing
+  to link to.  The Extended-Panel tracking severs the community ↔
+  baseline-=clusterid= correspondence both ways: matching on *current* location
+  (=hh_a01_1=/=hh_a03_1=) instead of baseline is *worse* (unique 39->25,
+  no-match 37->42, ambiguous 23->32), because a current ward mixes households
+  from many baseline clusters.
+
+*Implication.*  For 2019-20 the community-price fallback is **region-level**;
+do not chase a cleaner =clusterid= assignment (it does not exist for a tracking
+panel).  Separately: a WB GPS-redaction MISS was found in =HH_SEC_WQT=
+(=wqt_13__Latitude/Longitude/Altitude= uncensored, 169 HH / 41 clusters) and
+reported to the WB; it is NOT ingested.  The clean =sdd_hhid= bridge to
+=lsms_ag.parquet= (true elevation + weather for 103 of 247 clusters) is a
+separate geovariables-feature opportunity (cf. #449).
+
 ** DONE Link  2019-20 and 2020-21 to panel
 CLOSED: [2026-03-29 Sat]
 According to docs this is possible; e.g., see p. 12 of [[../2019-20/Documentation/tznps_sdd_2019_20_basic_information_document_updated_november_2022.pdf][Basic Information Document]].
@@ -292,6 +401,38 @@ Consequences for the data:
    to prior waves.
 
 Source: NPS 2020/21 Basic Information Document, pp. 7--8.
+
+
+** TODO Pull WB geovariables (weather/distance/soil) for older NPS waves (#449)
+
+- GitHub :: [[https://github.com/ligon/LSMS_Library/issues/449][#449]]
+
+The WB LSMS-ISA *geovariables* module (GPS+raster-derived rainfall/climate,
+distance-to-road/market, soil quality, terrain, EVI, =ea_id= + offset GPS;
+household & plot level, cluster-constant) is available on the WB catalog for
+the *older* NPS waves but is NOT pulled into the repo.  Verified against the
+NADA data-file rosters (2026-06-14):
+
+| wave        | catalog idno                  | geovars file(s)                              |
+|-------------+-------------------------------+----------------------------------------------|
+| 2008-09 W1  | =TZA_2008_NPS-R1_v03_M=        | =HH.Geovariables_Y1=                          |
+| 2010-11 W2  | =TZA_2010_NPS-R2_v03_M=        | =HH.Geovariables_Y2=, =Plot.Geovariables_Y2=  |
+| 2012-13 W3  | =TZA_2012_NPS-R3_v01_M=        | =HouseholdGeovars_Y3=, =PlotGeovars_Y3=       |
+| 2014-15 W4  | =TZA_2014_NPS-R4_v03_M=        | none                                          |
+| 2008-15 UPD | =TZA_2008-2014_NPS-UPD_v01_M=  | none                                          |
+| 2019-20 SDD | =TZA_2019_NPS-SDD_v06_M=       | none                                          |
+| 2020-21 R5  | =TZA_2020_NPS-R5_v02_M=        | none                                          |
+
+*Repo caveat.*  The =2008-15/= folder is built from the *Uniform Panel
+Dataset* (=TZA_2008-2014_NPS-UPD=, the =upd4_hh_*= files), which carries NO
+geovars.  The geovars live in the *per-wave* studies (W1/W2/W3), so they must
+be pulled from those individual catalog entries and joined onto the panel
+household id --- not lifted from the UPD download already in use.
+
+The redesign waves (SDD 2019-20, R5 2020-21) dropped the public geovariables
+module entirely.  Orthogonal to #113: the geovars are household/EA-side and
+GPS-anonymised (and there is no community-level geovars), so they do NOT bridge
+the community↔cluster link.
 
 
 ** WAITING Duplicate rows in food_acquired from r_hhid/UPHI matching in 2008-15 (#114)
