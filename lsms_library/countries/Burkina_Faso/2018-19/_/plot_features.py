@@ -6,12 +6,19 @@ each (grappe, menage).  See
 lsms_library/countries/Burkina_Faso/_/burkina_faso.py:plot_features_for_wave
 for the harmonization shared across both EHCVM waves (copied from the
 Mali EHCVM reference, PR #284).
+
+Household id (GH #460): the 2018-19 wave's mapping.py overrides i() to
+the canonical EHCVM form (grappe + '0' + 2-digit menage), so sample() /
+household_roster carry 7-char ids for 3-digit menage.  This script must
+build plot_features' i with the SAME formatter, so it passes ehcvm_i.
+The previous default (the country-level 3-digit i()) stranded ~30% of
+2018-19 plot_features households off sample() (the #460 i-key bug).
 """
 import sys
 
 sys.path.append('../../_/')
 from lsms_library.local_tools import get_dataframe, to_parquet
-from burkina_faso import plot_features_for_wave
+from burkina_faso import plot_features_for_wave, ehcvm_i
 
 
 # convert_categoricals=False keeps the integer s16a codes that the
@@ -33,7 +40,7 @@ colmap = dict(
     water_source  = 's16aq17',
 )
 
-df = plot_features_for_wave('2018-19', src, colmap)
+df = plot_features_for_wave('2018-19', src, colmap, id_fn=ehcvm_i)
 
 assert df.index.is_unique, "Non-unique (t, i, plot_id) index in plot_features 2018-19"
 assert len(df) > 0, "plot_features 2018-19 produced no rows"

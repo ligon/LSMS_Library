@@ -108,10 +108,18 @@ def panel_ids(df):
 # Burkina Faso copies the Mali EHCVM reference implementation (PR #284):
 # a single per-wave agriculture-parcel file s16a_me_bfa{year} with a
 # uniform column scheme.  The only country-specific piece is the
-# household-id formatter ``i()`` above — Burkina uses
-# ``format_id(grappe) + format_id(menage, zeropadding=3)`` (no extra '0'
-# separators), which is what ``sample()`` and ``panel_ids`` use, so the
-# emitted ``i`` matches ``sample().i`` natively.
+# household-id formatter, which MUST match the one the wave's ``sample()``
+# uses (GH #460) — and that DIFFERS BY WAVE:
+#   * 2018-19: mapping.py overrides ``i()`` to ``ehcvm_i`` (grappe + '0' +
+#     2-digit menage), so sample() / household_roster carry 7-char ids for
+#     3-digit menage.  plot_features 2018-19 passes ``ehcvm_i``.
+#   * 2021-22: mapping.py has NO ``i()`` override, so sample() / roster fall
+#     back to the country-level ``i()`` (grappe + 3-digit menage, no '0'
+#     separator).  plot_features 2021-22 passes that old formatter.
+# ``plot_features_for_wave`` takes ``id_fn`` so each wave's plot_features.py
+# selects the formatter matching its own sample().  Hardcoding the old
+# ``i()`` (the pre-#460 behavior) stranded ~30% of 2018-19 plot_features
+# households (3-digit menage) off sample() — the #460 i-key 0.846 bug.
 
 
 def _harmonized_codes(tablename, key='Code', value='Preferred Label'):
@@ -143,22 +151,36 @@ def _map_codes(series, code_map):
     return out.astype('string').where(out.notna(), pd.NA)
 
 
-def plot_features_for_wave(t, source, colmap):
+def plot_features_for_wave(t, source, colmap, id_fn=None):
     """Build canonical ``plot_features`` for one Burkina Faso EHCVM wave.
 
-    Mirrors ``Mali/_/mali.py:plot_features_for_wave`` exactly except it
-    uses Burkina's ``i()`` household-id formatter.  Returns a DataFrame
-    indexed by ``(t, i, plot_id)`` with columns ``Area`` (hectares
-    float), ``AreaUnit`` ('hectares'), ``Tenure``, ``TenureSystem``,
+    Mirrors ``Mali/_/mali.py:plot_features_for_wave`` exactly except for
+    the household-id formatter.  Returns a DataFrame indexed by
+    ``(t, i, plot_id)`` with columns ``Area`` (hectares float),
+    ``AreaUnit`` ('hectares'), ``Tenure``, ``TenureSystem``,
     ``SoilType`` (str), and ``Irrigated`` (nullable bool).
 
     Required ``colmap`` keys: grappe, menage, field_no, parcel_no,
     area_gps, gps_measured, area_est, area_est_unit, tenure,
     tenure_system, soil_type, water_source.
 
+    ``id_fn(grappe, menage) -> str`` selects the household-id formatter,
+    which MUST match the one the wave's ``sample()`` uses (GH #460).
+    The 2018-19 wave's ``mapping.py`` overrides ``i()`` to the canonical
+    ``ehcvm_i`` form (``grappe + '0' + 2-digit menage``), so its sample /
+    roster carry 7-char ids for 3-digit menage; the 2021-22 wave has no
+    such override, so its sample / roster fall back to the country-level
+    :func:`i` (``grappe + 3-digit menage``, no separator).  Hardcoding
+    :func:`i` here therefore stranded ~30% of 2018-19 plot_features
+    households off ``sample()`` (the #460 plot_features 0.846 i-key bug).
+    Each wave's ``plot_features.py`` passes the formatter matching its own
+    ``sample()``; the default is :func:`ehcvm_i` (the canonical EHCVM id).
+
     Latitude / Longitude are deferred — EHCVM s16a has no decimal-degree
     parcel GPS (s16aq47 is an area, not a coordinate).
     """
+    if id_fn is None:
+        id_fn = ehcvm_i
     tenure_map = _harmonized_codes('harmonize_tenure')
     tenure_system_map = _harmonized_codes('harmonize_tenure_system')
     soil_map = _harmonized_codes('harmonize_soil')
@@ -171,9 +193,9 @@ def plot_features_for_wave(t, source, colmap):
     # blank.  Keeping them would emit a content-free "nan_nan" plot_id.
     src = source[source[c['field_no']].notna() & source[c['parcel_no']].notna()].copy()
 
-    # Household id: EHCVM composite (grappe, menage) via burkina i().
-    hh = src.apply(lambda r: i(pd.Series([r[c['grappe']], r[c['menage']]])),
-                   axis=1)
+    # Household id: composite (grappe, menage) via the wave-supplied
+    # formatter (must match the wave's sample(); see docstring, GH #460).
+    hh = src.apply(lambda r: id_fn(r[c['grappe']], r[c['menage']]), axis=1)
 
     field = src[c['field_no']].apply(tools.format_id)
     parcel = src[c['parcel_no']].apply(tools.format_id)
