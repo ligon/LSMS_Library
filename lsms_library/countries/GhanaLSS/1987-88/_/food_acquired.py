@@ -80,4 +80,11 @@ produced = _value_only_side('../Data/Y12B.DAT', 'Code_12B', 'VFOODCPD', 'produce
 
 f = pd.concat([purchased, produced])
 
+# Collapse within-grain duplicates: several raw food codes harmonize to one
+# Preferred Label j (e.g. multiple "soup" codes -> "Soup") at the same
+# (i, u, s, visit), so sum their value to keep the canonical (t,i,j,u,s,visit)
+# index unique -- otherwise the API-layer canonical-shape guard would collapse
+# them via groupby().first() and silently drop rows.
+f = f.groupby(level=f.index.names).sum(min_count=1)
+
 to_parquet(f, 'food_acquired.parquet')
