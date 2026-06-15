@@ -93,3 +93,101 @@
 |    1 | freehold                   |
 |    2 | granted_right_of_occupancy |
 |    4 | leasehold                  |
+
+# livestock harmonize table (EHCVM cluster; cloned from Niger 2018-19,
+# PR for GAP 4).  s17q02 species code (elevage__id, 1-11) -> canonical
+# `animal`.  Shared EHCVM vocabulary so the animal axis matches the
+# other EHCVM countries.  Referenced from 2018/_/livestock.py via
+# tools.get_categorical_mapping('harmonize_species_ehcvm','Code',
+# 'Preferred Label').
+
+#+NAME: harmonize_species_ehcvm
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Cattle          |
+|    2 | Sheep           |
+|    3 | Goats           |
+|    4 | Camels          |
+|    5 | Horses          |
+|    6 | Donkeys         |
+|    7 | Pigs            |
+|    8 | Rabbits         |
+|    9 | Chicken         |
+|   10 | Guinea Fowl     |
+|   11 | Other Poultry   |
+
+# plot_inputs harmonize tables (EHCVM cluster; cloned VERBATIM from Niger
+# 2018-19 GAP 2, parity loop 2026-06-15).  The EHCVM s16b input roster is
+# identical across the EHCVM countries (same French value labels), so the
+# Niger Original Labels match Togo's s16bq01 1:1 (verified: every Togo
+# input label is covered).  Referenced from 2018/_/plot_inputs.py via
+# tools.get_categorical_mapping('harmonize_input'/'harmonize_seed_crop',
+# 'Original Label', 'Preferred Label').
+#
+# harmonize_input — s16bq01 input-type label -> canonical input identity.
+# harmonize_seed_crop — EHCVM seed-type label -> the seed's crop.  The
+#   s16b roster has NO crop column; the crop is embedded in the seed-type
+#   label ('Semences de petit mil'), resolved here.  Catch-all seed slots
+#   ('Semences d'autres céréales', 'Autres semences', 'Plants/boutures de
+#   tubercules', the bare '20' slot) -> 'Autre crop'.
+
+#+NAME: harmonize_input
+| Original Label                            | Preferred Label     |
+|-------------------------------------------+---------------------|
+| engrais organiques-fumure                 | Organic manure      |
+| Engrais organiques-Fumure                 | Organic manure      |
+| Engrais organiques - déchets d'animaux    | Organic manure      |
+| engrais organiques-compost                | Organic compost     |
+| Engrais organiques-Compost                | Organic compost     |
+| Engrais organiques - Ordures ménagères    | Organic compost     |
+| engrais inorganiques - urée               | Urea                |
+| Engrais inorganiques - Urée               | Urea                |
+| engrais inorganiques - dap                | DAP                 |
+| Engrais inorganiques - DAP                | DAP                 |
+| DAP et autres engrais inorganiques        | DAP                 |
+| engrais inorganiques - npk 15/15          | NPK                 |
+| Engrais inorganiques - NPK 15/15          | NPK                 |
+| Engrais inorganiques - NPK/Formule unique | NPK                 |
+| Engrais inorganiques - Phosphates         | Phosphate           |
+| engrais inorganiques - mélange            | Mixed fertilizer    |
+| Engrais inorganiques - Mélange            | Mixed fertilizer    |
+| produits phytosanitaires - pesticides     | Pesticide           |
+| Produits phytosanitaires - Pesticides     | Pesticide           |
+| produits phytosanitaires - herbicides     | Herbicide           |
+| Produits phytosanitaires - Herbicides     | Herbicide           |
+| produits phytosanitaires - fongicides     | Fungicide           |
+| Produits phytosanitaires - Fongicides     | Fungicide           |
+| Produits phytosanitaires-Fongicides       | Fungicide           |
+| Produits phytosanitaires -Fongicides      | Fungicide           |
+| autres produits phytosanitaires           | Other phytosanitary |
+| Autres produits phytosanitaires           | Other phytosanitary |
+| semences                                  | Seed                |
+| Semences                                  | Seed                |
+| Semences de petit mil                     | Seed                |
+| Semences de sorgho                        | Seed                |
+| Semences de maïs                          | Seed                |
+| Semences de riz                           | Seed                |
+| Semences d'autres céréales                | Seed                |
+| Semences de coton                         | Seed                |
+| Semences de sésame                        | Seed                |
+| Semences de césame                        | Seed                |
+| Semences de haricots/niébé                | Seed                |
+| Plants/boutures de tubercules             | Seed                |
+| Autres semences                           | Seed                |
+| 20                                        | Seed                |
+
+#+NAME: harmonize_seed_crop
+| Original Label                | Preferred Label     |
+|-------------------------------+---------------------|
+| Semences de petit mil         | Mil                 |
+| Semences de sorgho            | Sorgho              |
+| Semences de maïs              | Maïs en grain       |
+| Semences de riz               | Riz Paddy           |
+| Semences de coton             | Coton               |
+| Semences de sésame            | Sésame              |
+| Semences de césame            | Sésame              |
+| Semences de haricots/niébé    | Niébé/Haricots secs |
+| Semences d'autres céréales    | Autre crop          |
+| Plants/boutures de tubercules | Autre crop          |
+| Autres semences               | Autre crop          |
+| 20                            | Autre crop          |

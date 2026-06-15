@@ -120,3 +120,138 @@ Data Scheme:
     SoilType: str
     Irrigated: bool
     materialize: make
+
+  livestock:
+    # Item-level livestock roster (GAP 4), cloned from the Niger EHCVM
+    # template.  One row per REPORTED (household, species) the household
+    # owns/raises, from the EHCVM Section 17 'Élevage' roster
+    # (s17_me_sen2018.dta).  The WB .do collapses this to a single
+    # engaged-in-livestock y/n binary (recoverable as
+    # groupby(['t','i']).any() over these rows); TLU is a Σ(head × factor)
+    # transformation — neither is a column here (item-level discipline).
+    #
+    # GRAIN (t, i, animal) — NO v level: 'livestock' is in the framework's
+    # _no_v_join set, so the household-level rows carry no cluster level and
+    # the framework does NOT join one from sample().  `animal` is the
+    # harmonized species Preferred Label (harmonize_species_ehcvm; codes
+    # 1-11).  EHCVM 2018-19 only (the 2021-22 round lacks this section).
+    #
+    # COLUMNS (reported, item-level): HeadCount (owned now), HeadAcquired
+    # (number bought in the last 12 months), HeadSold (number sold on the
+    # hoof in the last 12 months).  A `Value` (herd value) column is
+    # intentionally OMITTED: EHCVM s17 records no current herd value.
+    index: (t, i, animal)
+    HeadCount: float
+    HeadAcquired: float
+    HeadSold: float
+    materialize: make
+
+  crop_production:
+    # Item-level crop harvest (GAP 1), cloned from the Niger EHCVM template.
+    # One row per REPORTED (field, parcel, crop) harvest line from the EHCVM
+    # agriculture module s16c (s16c_me_sen2018.dta) — REPORTED values only;
+    # harvest_kg / yield / main_crop / value-shares are transformations,
+    # never columns here.  EHCVM 2018-19 only.  crop joins food via
+    # harmonize_food Preferred Labels; u via the u table (both label-
+    # preserving — Senegal's tables cover a subset of the s16c labels, the
+    # rest surface in raw French and are flagged by the sanity checker).
+    # plot = "{s16cq02}_{s16cq03}" aligns with plot_features' plot_id.  `u`
+    # is in the index (as in food_acquired): one (plot, crop) can be reported
+    # in several units.  Quantity_sold / Value_sold are at plot-crop grain
+    # (s16cq16a / s16cq17).  harvest_month is NA (the EHCVM s16c module has
+    # no planting/harvest-date question); intercropped from s16cq07.
+    index: (t, i, plot, crop, u)
+    Quantity: float
+    Quantity_sold: float
+    Value_sold: float
+    harvest_month: float
+    intercropped: bool
+    materialize: make
+
+  plot_inputs:
+    # Item-level agricultural inputs (GAP 2), cloned from the Niger EHCVM
+    # template.  One row per REPORTED input applied by a household from the
+    # EHCVM s16b roster (s16b_me_sen2018.dta): input identity, reported
+    # quantity used + native unit, purchased flag + reported purchased
+    # quantity, and (seed rows) the seed's crop on the shared harmonize_food
+    # labels.  REPORTED values only: seed_kg / nitrogen_kg / fertilizer
+    # totals are transformations, never columns.  EHCVM 2018-19 only.
+    #
+    # GRAIN (t, i, input, crop, u): Senegal (like Niger) records inputs at
+    # the HOUSEHOLD x input grain, NOT plot x input, so `plot` is NOT in the
+    # index (the feature keeps the GAP-2 name).  input -> harmonize_input;
+    # u -> the u table; crop -> harmonize_seed_crop on the seed label (both
+    # copied from Niger, with the Senegal-specific 'Semences d'arachide' ->
+    # Arachide seed slot added).  Non-crop-specific rows (every fertilizer /
+    # pesticide; unresolved seed crops) carry the sentinel
+    # '(not crop-specific)' rather than NaN — a NaN index level would be
+    # silently dropped by the framework's canonical NaN-key de-dup collapse.
+    # A missing unit is filled with the 'Manquant' u label for the same
+    # non-null reason.
+    index: (t, i, input, crop, u)
+    Quantity: float
+    Purchased: bool
+    Quantity_purchased: float
+    materialize: make
+
+  plot_labor:
+    # Item-level plot labor (GAP 3), cloned from the Niger EHCVM template.
+    # One row per REPORTED labor SOURCE on a plot, from the EHCVM s16a parcel
+    # module (s16a_me_sen2018.dta — the same file plot_features reads).
+    # EHCVM records family vs non-family (hired) only (NO free/exchange
+    # 'other').  The WB .do collapses these to total_labor_days /
+    # total_family_labor_days / total_hired_labor_days / hired_labor_value —
+    # all TRANSFORMATIONS over these rows, never columns here.  EHCVM 2018-19
+    # only.
+    #
+    # GRAIN (t, i, plot, source):
+    #   plot   -- "{field_no}_{parcel_no}", aligned with crop_production's
+    #             plot key and plot_features' plot_id.
+    #   source -- 'family' / 'hired' (EHCVM s16a has no 'other' source).
+    #             Small fixed vocabulary assigned in code (no categorical
+    #             table).
+    # COLUMNS (reported): PersonDays -- reported person-days of that source on
+    #   the plot (family = Σ member-day cells across the three phase grids;
+    #   hired = Σ(#workers × days) over the non-family grids — a within-source
+    #   sum of strata, NOT a cross-source rollup).  Wage -- cash PAID to hired
+    #   labor (CFA francs); NaN for family.  v auto-joins from sample().
+    #   units: PersonDays in days; Wage in CFA francs.
+    index: (t, i, plot, source)
+    PersonDays: float
+    Wage: float
+    materialize: make
+
+  people_last7days:
+    # Item-level individual 7-day labor (GAP 3), cloned from the Niger EHCVM
+    # template.  One row per individual carrying the REPORTED last-7-days
+    # labor participation, from the EHCVM s04 7-day module
+    # (s04_me_sen2018.dta) merged to the s01 roster (s01_me_sen2018.dta) for
+    # working_age.  This is the per-individual activity feature the GAP
+    # ranking targets (distinct from Uganda's legacy HH-level count).  No
+    # rollups: the WB nb_members_working_age HH total is a transformation.
+    # EHCVM 2018-19 only.
+    #
+    # GRAIN (t, i, pid): pid = s01q00a (matches household_roster).  v
+    # auto-joins from sample().
+    #
+    # COLUMNS (reported, per-individual):
+    #   farm_work / SOB_work / wage_work -- worked >=1h on own farm / own
+    #       business / for a wage in the last 7 days (nullable bool; s04q06 /
+    #       s04q07 / s04q08).
+    #   working_age -- member is of working age (Age >= 6, the survey
+    #       threshold).
+    # The EHCVM 7-day module records hours only for unpaid domestic tasks and
+    # the industry only as 12-month occupation codes (not the WB 7-day
+    # section ranges), so farm_hrs / SB_hrs / wage_hrs / Industry are NA
+    # (declared for cross-wave / cross-country schema parity).
+    # units: hours in hours.
+    index: (t, i, pid)
+    farm_work: bool
+    SOB_work: bool
+    wage_work: bool
+    farm_hrs: float
+    SB_hrs: float
+    wage_hrs: float
+    Industry: str
+    working_age: bool
+    materialize: make

@@ -31,6 +31,29 @@ $(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
 ../%/_/plot_features.parquet: ../%/_/plot_features.py
 	(cd $(@D) && python plot_features.py)
 
+# Wave-level livestock (EHCVM cluster; cloned from Niger).  Same gap as
+# plot_features above: the generic %.parquet rule never fires for it
+# because its food_items.org/malawi.py prereqs are absent, so give it an
+# explicit pattern rule.
+../%/_/livestock.parquet: ../%/_/livestock.py
+	(cd $(@D) && python livestock.py)
+
+# Wave-level EHCVM parity features (cloned from Niger 2018-19).  Same gap as
+# plot_features / livestock above: the generic %.parquet rule never fires
+# for them (the food_items.org/malawi.py prereqs are absent), so each gets
+# an explicit pattern rule that runs its self-contained wave script.
+../%/_/crop_production.parquet: ../%/_/crop_production.py
+	(cd $(@D) && python crop_production.py)
+
+../%/_/plot_inputs.parquet: ../%/_/plot_inputs.py
+	(cd $(@D) && python plot_inputs.py)
+
+../%/_/plot_labor.parquet: ../%/_/plot_labor.py
+	(cd $(@D) && python plot_labor.py)
+
+../%/_/people_last7days.parquet: ../%/_/people_last7days.py
+	(cd $(@D) && python people_last7days.py)
+
 %.parquet: %.py food_items.org malawi.py
 	(cd $(@D) && python ./$(<F))
 

@@ -79,3 +79,161 @@
 | Tiles              | Tiles           |
 | Dung               | Earth with Dung |
 | Other              | Other           |
+
+* Livestock Species
+
+# harmonize_species_ehcvm — EHCVM s17 livestock species codes (s17q02).
+# Codes are the elevage__id value labels: 1 Bovins, 2 Ovins, 3 Caprins,
+# 4 Camelins, 5 Equins, 6 Asins, 7 Porcins, 8 Lapins, 9 Poules,
+# 10 Pintades, 11 Autres volailles.  The Preferred Label vocabulary is the
+# shared EHCVM/ECVMA `animal` axis (Cattle / Sheep / Goats / Camels /
+# Horses / Donkeys / Pigs / Rabbits / Chicken / Guinea Fowl / Other
+# Poultry).  Referenced from 2018-19/_/livestock.py via
+# get_categorical_mapping('harmonize_species_ehcvm', 'Code', 'Preferred Label').
+
+#+NAME: harmonize_species_ehcvm
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Cattle          |
+|    2 | Sheep           |
+|    3 | Goats           |
+|    4 | Camels          |
+|    5 | Horses          |
+|    6 | Donkeys         |
+|    7 | Pigs            |
+|    8 | Rabbits         |
+|    9 | Chicken         |
+|   10 | Guinea Fowl     |
+|   11 | Other Poultry   |
+
+* Plot Features (the plot_id axis)
+
+# EHCVM-standard code-keyed harmonize tables for the agriculture-parcel
+# module s16a_me_CIV2018.dta, cloned verbatim from Niger/_/
+# categorical_mapping.org (PR #284 / #167 EHCVM cluster).  The EHCVM s16a
+# code schemes are uniform across the program, and the CotedIvoire 2018-19
+# s16a codes verified to match exactly:
+#   s16aq10 tenure        codes 1-6 (1 Propriétaire, 2 Prêt gratuit,
+#                         3 Fermage, 4 Métayage, 5 Gage, 6 Autre).
+#   s16aq13 tenure_system codes 1-7 (1 Titre foncier ... 7 Aucun).
+#   s16aq18 soil_type     codes 1-5 (1 Sableux, 2 Limoneux, 3 Argileux,
+#                         4 Glacis, 5 Autre).
+#   s16aq17 water_source  codes 1-6 (1-3 Irrigation*, 4 Pluviale,
+#                         5 Marais/wetlands, 6 Autre -> NA, irrigated NA).
+# Because the mapping is on the integer code (not a country-specific
+# string label), it transfers cleanly; CotedIvoire's code 6 water_source
+# ('Autre') has no Niger entry and falls through to NA (Irrigated NA),
+# which is the intended behavior.  Referenced from
+# 2018-19/_/plot_features.py via get_categorical_mapping(<table>, 'Code',
+# 'Preferred Label').
+
+#+name: harmonize_tenure
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | owned           |
+|    2 | use_right       |
+|    3 | rented_in       |
+|    4 | sharecropped_in |
+|    5 | other_tenure    |
+|    6 | other_tenure    |
+|    7 | owned           |
+
+#+name: harmonize_soil
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | sandy           |
+|    2 | loam            |
+|    3 | clay            |
+|    4 | hardpan         |
+|    5 | other           |
+
+#+name: harmonize_water
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Irrigated       |
+|    2 | Irrigated       |
+|    3 | Irrigated       |
+|    4 | Rain-fed        |
+|    5 | Wetland         |
+
+#+name: harmonize_tenure_system
+| Code | Preferred Label            |
+|------+----------------------------|
+|    1 | freehold                   |
+|    2 | granted_right_of_occupancy |
+|    4 | leasehold                  |
+
+* Agricultural Inputs (plot_inputs — the input axis)
+
+# EHCVM-standard string-keyed input tables for the household
+# agricultural-input roster s16b_me_CIV2018.dta, cloned from Niger/_/
+# categorical_mapping.org (GAP 2, 2026-06-14).  The EHCVM s16bq01 input
+# value labels are program-standard French strings; every CotedIvoire
+# 2018-19 s16bq01 label verified present here (Engrais inorganiques -
+# NPK/Formule unique, Produits phytosanitaires - Herbicides, Semences de
+# riz, DAP et autres engrais inorganiques, ...).  harmonize_seed_crop
+# resolves the crop embedded in each seed-type label onto a crop label
+# (the s16b roster has no crop column).  Referenced from
+# 2018-19/_/plot_inputs.py via get_categorical_mapping(<table>,
+# 'Original Label', 'Preferred Label').
+
+#+NAME: harmonize_input
+| Original Label                            | Preferred Label     |
+|-------------------------------------------+---------------------|
+| engrais organiques-fumure                 | Organic manure      |
+| Engrais organiques-Fumure                 | Organic manure      |
+| Engrais organiques - déchets d'animaux    | Organic manure      |
+| engrais organiques-compost                | Organic compost     |
+| Engrais organiques-Compost                | Organic compost     |
+| Engrais organiques - Ordures ménagères    | Organic compost     |
+| engrais inorganiques - urée               | Urea                |
+| Engrais inorganiques - Urée               | Urea                |
+| engrais inorganiques - dap                | DAP                 |
+| Engrais inorganiques - DAP                | DAP                 |
+| DAP et autres engrais inorganiques        | DAP                 |
+| engrais inorganiques - npk 15/15          | NPK                 |
+| Engrais inorganiques - NPK 15/15          | NPK                 |
+| Engrais inorganiques - NPK/Formule unique | NPK                 |
+| Engrais inorganiques - Phosphates         | Phosphate           |
+| engrais inorganiques - mélange            | Mixed fertilizer    |
+| Engrais inorganiques - Mélange            | Mixed fertilizer    |
+| produits phytosanitaires - pesticides     | Pesticide           |
+| Produits phytosanitaires - Pesticides     | Pesticide           |
+| produits phytosanitaires - herbicides     | Herbicide           |
+| Produits phytosanitaires - Herbicides     | Herbicide           |
+| produits phytosanitaires - fongicides     | Fungicide           |
+| Produits phytosanitaires - Fongicides     | Fungicide           |
+| Produits phytosanitaires-Fongicides       | Fungicide           |
+| Produits phytosanitaires -Fongicides      | Fungicide           |
+| autres produits phytosanitaires           | Other phytosanitary |
+| Autres produits phytosanitaires           | Other phytosanitary |
+| semences                                  | Seed                |
+| Semences                                  | Seed                |
+| Semences de petit mil                     | Seed                |
+| Semences de sorgho                        | Seed                |
+| Semences de maïs                          | Seed                |
+| Semences de riz                           | Seed                |
+| Semences d'autres céréales                | Seed                |
+| Semences de coton                         | Seed                |
+| Semences de sésame                        | Seed                |
+| Semences de césame                        | Seed                |
+| Semences de haricots/niébé                | Seed                |
+| Plants/boutures de tubercules             | Seed                |
+| Autres semences                           | Seed                |
+| 20                                        | Seed                |
+
+#+NAME: harmonize_seed_crop
+| Original Label                | Preferred Label     |
+|-------------------------------+---------------------|
+| Semences de petit mil         | Mil                 |
+| Semences de sorgho            | Sorgho              |
+| Semences de maïs              | Maïs en grain       |
+| Semences de riz               | Riz Paddy           |
+| Semences de coton             | Coton               |
+| Semences de sésame            | Sésame              |
+| Semences de césame            | Sésame              |
+| Semences de haricots/niébé    | Niébé/Haricots secs |
+| Semences d'autres céréales    | Autre crop          |
+| Plants/boutures de tubercules | Autre crop          |
+| Autres semences               | Autre crop          |
+| 20                            | Autre crop          |

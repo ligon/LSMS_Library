@@ -109,3 +109,159 @@ Data Scheme:
     SoilType: str
     Irrigated: bool
     materialize: make
+
+  livestock:
+    # Item-level livestock roster (GAP 4), cloned from the Niger EHCVM
+    # reference.  One row per REPORTED (household, species) the household
+    # owns/raises, from EHCVM Section 17 'Élevage' (s17_me_gnb2018.dta, one
+    # row per (household, species), pre-filtered to owned species
+    # s17q03 == 1).  The WB engaged-in-livestock y/n binary is recoverable
+    # as groupby(['t','i']).any() over these rows; TLU is a
+    # Σ(head × species-factor) transformation — neither is a column here
+    # (item-level / reported-values discipline).
+    #
+    # GRAIN (t, i, animal) — NO v level: 'livestock' is in the framework's
+    # _no_v_join set, so the household-level rows carry no cluster level and
+    # the framework does NOT join one from sample().  `animal` is the
+    # harmonized species Preferred Label (harmonize_species_ehcvm maps the
+    # 1-11 EHCVM species code s17q02 -> Cattle / Sheep / Goats / Camels /
+    # Horses / Donkeys / Pigs / Rabbits / Chicken / Guinea Fowl / Other
+    # Poultry).  The species value labels are French / Portuguese but the
+    # integer codes match the other EHCVM countries, so the mapping keys on
+    # the code (s17 loaded convert_categoricals=False).  Single EHCVM wave:
+    # 2018-19.
+    #
+    # COLUMNS (reported, item-level): HeadCount (owned now, s17q06),
+    # HeadAcquired (number bought in the last 12 months, s17q08), HeadSold
+    # (number sold on the hoof in the last 12 months, s17q10).  A `Value`
+    # (herd value) column is intentionally OMITTED: EHCVM s17 records only
+    # purchase / sale FLOW values, no current herd value.
+    index: (t, i, animal)
+    HeadCount: float
+    HeadAcquired: float
+    HeadSold: float
+    materialize: make
+
+  crop_production:
+    # Item-level crop harvest (GAP 1), cloned from the Niger EHCVM
+    # reference.  One row per REPORTED (field, parcel, crop) harvest line
+    # from s16c_me_gnb2018.dta — REPORTED values only; harvest_kg / yield /
+    # main_crop / value-shares are transformations, never columns here.
+    # Single EHCVM wave: 2018-19 (script-path).  crop joins food via the
+    # harmonize_food Preferred Labels where that table exists; Guinea-Bissau
+    # has NO harmonize_food table, so the raw Portuguese crop labels
+    # ('Cajueiro', 'Arroz paddy', 'Mancarra', ...) pass through unchanged
+    # (visible / flagged), never silently mis-mapped to the `u` fallback.
+    # u via the Portuguese `u` table.  ``u`` is in the index (as in
+    # food_acquired) because one (plot, crop) can be reported in several
+    # units.  plot = "{field_no}_{parcel_no}" aligns with plot_features'
+    # plot_id.  intercropped from s16cq07 ('Associação de culturas' / 'Pura').
+    # harvest_month / perennial are not recorded by s16c, so harvest_month is
+    # NaN and a perennial flag is omitted entirely.
+    index: (t, i, plot, crop, u)
+    Quantity: float
+    Quantity_sold: float
+    Value_sold: float
+    harvest_month: float
+    intercropped: bool
+    materialize: make
+
+  plot_inputs:
+    # Item-level agricultural inputs (GAP 2), cloned from the Niger EHCVM
+    # reference.  One row per REPORTED input applied by a household from
+    # s16b_me_gnb2018.dta: input identity, reported quantity used + native
+    # unit, purchased flag + reported purchased quantity, and (seed rows) the
+    # seed's crop.  REPORTED values only: seed_kg / nitrogen_kg / fertilizer
+    # totals are transformations, never columns.  Single EHCVM wave: 2018-19
+    # (script-path).
+    #
+    # GRAIN NOTE: EHCVM records inputs at the HOUSEHOLD x input grain, NOT
+    # plot x input (no parcel-level input question); the WB plot-level
+    # seed_kg / nitrogen_kg fabricates a plot split, which the reported-only
+    # rule forbids.  So `plot` is NOT in the index; the feature keeps the
+    # GAP-2 name `plot_inputs`.
+    #
+    # LABEL NOTE: Guinea-Bissau has NEITHER harmonize_input NOR
+    # harmonize_seed_crop, so the raw Portuguese input labels ('Sementes de
+    # arroz', 'Adubos inorgânicos - ureia', ...) pass through unchanged
+    # (visible / flagged) and seed crops resolve to the '(not crop-specific)'
+    # sentinel — never silently mis-mapped to the `u` fallback.  Non-crop-
+    # specific rows carry the sentinel rather than NaN so the index level is
+    # non-null and survives the framework's canonical NaN-key de-dup collapse.
+    # `u` via the Portuguese `u` table; a missing unit is filled with
+    # 'Manquant' for the same non-null reason.  Purchased from s16bq05
+    # ('Sim' / 'Não').
+    index: (t, i, input, crop, u)
+    Quantity: float
+    Purchased: bool
+    Quantity_purchased: float
+    materialize: make
+
+  plot_labor:
+    # Item-level plot labor (GAP 3), cloned from the Niger EHCVM reference.
+    # One row per REPORTED labor SOURCE on a plot from s16a_me_gnb2018.dta —
+    # the reported person-days the WB .do collapses to total_labor_days /
+    # total_family_labor_days / total_hired_labor_days / hired_labor_value
+    # (a median-wage valuation).  ALL of those are TRANSFORMATIONS over these
+    # rows, never columns here.  Single EHCVM wave: 2018-19 (script-path).
+    #
+    # GRAIN (t, i, plot, source):
+    #   plot   -- "{field_no}_{parcel_no}", aligned with crop_production's
+    #             plot key and plot_features' plot_id.
+    #   source -- 'family' / 'hired'.  EHCVM s16a records family vs non-family
+    #             (hired) labor only (NO free/exchange 'other' source).  Small
+    #             fixed vocabulary assigned in code (no categorical table).
+    #
+    # COLUMNS (reported, item-level):
+    #   PersonDays -- reported person-days of that source on the plot.  The
+    #                 survey reports a source as several day cells (per family
+    #                 member, or per hired-worker gender category, across the
+    #                 prep / maintenance / harvest phases); these are strata of
+    #                 the SAME (plot, source) item, so PersonDays is their
+    #                 within-source sum (NOT a forbidden cross-source rollup).
+    #                 EHCVM hired person-days = Σ(#workers × days).
+    #   Wage       -- cash PAID to hired labor where the survey records it.
+    #                 NaN for family (no cash paid).
+    # No categorical tables are needed (pure numeric grids).  v is NOT baked
+    # in (household-linked); the framework joins it from sample().
+    # units: PersonDays in days; Wage in CFA francs.
+    index: (t, i, plot, source)
+    PersonDays: float
+    Wage: float
+    materialize: make
+
+  people_last7days:
+    # Item-level individual 7-day labor (GAP 3), cloned from the Niger EHCVM
+    # reference.  One row per individual, carrying the REPORTED last-7-days
+    # labor participation — the per-individual activity feature the GAP
+    # ranking targets.  No rollups: the WB nb_members_working_age HH total is
+    # a transformation, not a column here.  Single EHCVM wave: 2018-19
+    # (script-path); two source files s04 (7-day dummies) + s01 (roster age),
+    # merged on (grappe, menage, s01q00a).
+    #
+    # GRAIN (t, i, pid): pid = s01q00a (matches household_roster).  v
+    # auto-joins from sample().
+    #
+    # COLUMNS (reported, per-individual):
+    #   farm_work / SOB_work / wage_work -- worked >=1h on own farm /
+    #       own business / for a wage in the last 7 days (nullable bool;
+    #       s04q06 / s04q07 / s04q08, integer-coded 1=yes / 2=no).
+    #   farm_hrs / SB_hrs / wage_hrs / Industry -- NA: the EHCVM 7-day module
+    #       records hours only for unpaid domestic tasks and the industry only
+    #       as 12-month occupation codes (not the WB 7-day section ranges), so
+    #       these are declared for cross-country schema parity but left NA.
+    #   working_age -- member is of working age (Age >= 6, the survey
+    #       threshold).  Age prefers reported years (s01q04a) else
+    #       survey_year - birth_year (s01q03c), mirroring household_roster.
+    # No categorical tables are needed (integer dummies + numeric age).
+    # units: hours in hours.
+    index: (t, i, pid)
+    farm_work: bool
+    SOB_work: bool
+    wage_work: bool
+    farm_hrs: float
+    SB_hrs: float
+    wage_hrs: float
+    Industry: str
+    working_age: bool
+    materialize: make
