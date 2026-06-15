@@ -29,9 +29,9 @@ The library maintains three independent caches, all rooted under
 
 | Tier | Path | Content | Populated by | Read by |
 |---|---|---|---|---|
-| **L2-country (parquet)** | `~/.local/share/lsms_library/{Country}/var/{table}.parquet` | Per-country, per-table harmonized output (waves concatenated, ready for analysis) | `Country.{table}()` after building from waves | The v0.7.0 top-of-function cache read in `load_dataframe_with_dvc` (`country.py:1611-1652`) |
+| **L2-country (parquet)** | `~/.local/share/lsms_library/{Country}/var/{table}.parquet` | Per-country, per-table harmonized output (waves concatenated, ready for analysis) | `Country.{table}()` after building from waves | The v0.7.0 top-of-function cache read in `load_dataframe_with_dvc` (hash-gated since v0.8.0) |
 | **L2-wave (parquet)** | `~/.local/share/lsms_library/{Country}/{wave}/_/{table}.parquet` | Per-wave harmonized output (one wave's portion of the table) | `Wave.grab_data()` on first call (YAML path, since 2026-04-15) or `_/{table}.py` scripts via `to_parquet()` (script path, always) | `Wave.grab_data()` on subsequent calls; `run_make_target` for script-path tables |
-| **L1 (DVC blobs)** | `~/.local/share/lsms_library/dvc-cache/{md5[:2]}/{md5[2:]}` | Content-addressed copies of the raw `.dta` files (and other DVC-tracked sources) | `_ensure_dvc_pulled()` in `local_tools.py` calls `Repo.fetch` on first read of any DVC-tracked file | `DVCFS.open()` via `DataFileSystem._get_fs_path`'s `typ == "cache"` branch |
+| **L1 (DVC blobs)** | `~/.local/share/lsms_library/dvc-cache/{md5[:2]}/{md5[2:]}` | Content-addressed copies of the raw `.dta` files (and other DVC-tracked sources) | `_ensure_dvc_pulled()` in `local_tools.py` downloads the blob **directly from S3** (sidecar md5 + the active DVC remote's fsspec backend) on first read, bypassing the DVC CLI / `Repo.fetch` (v0.7.3) | `DVCFS.open()` via `DataFileSystem._get_fs_path`'s `typ == "cache"` branch |
 
 All three tiers live under the same root, so a single `LSMS_DATA_DIR`
 environment variable moves them together. On a shared cluster, set
@@ -49,8 +49,9 @@ the parquet cache), the library re-runs wave aggregation. For each wave
 in turn, `Wave.grab_data()` checks L2-wave first and reads it directly
 on a hit. On an L2-wave miss the wave script calls `get_dataframe()` for
 its raw `.dta` files; on an L1 hit the file is served from the local
-blob cache via `DVCFS.open()`, on an L1 miss `_ensure_dvc_pulled` runs
-`Repo.fetch` to populate the cache and then `DVCFS.open` reads from it.
+blob cache via `DVCFS.open()`, on an L1 miss `_ensure_dvc_pulled`
+downloads the blob directly from S3 (via the sidecar md5, bypassing
+`Repo.fetch`) and then `DVCFS.open` reads from it.
 After the first cold rebuild, L1 and L2-wave both stay warm across
 sessions, so the next L2-country rebuild doesn't need any S3 traffic
 or repeated DVC SQLite lookups.
@@ -61,12 +62,18 @@ Empirical numbers on a Linux workstation, Niger `household_roster`
 | Scenario | Time | What's running |
 |---|---|---|
 | Truly cold (no caches) | ~600 s | First-ever fetch, every blob from S3, full DVC index build |
-| Cold-cold (L1 + L2-country both empty) | 460-510 s | Per-file `Repo.fetch` (~11 s each) + harmonization + parquet write |
+| Cold-cold (L1 + L2-country both empty) | 460-510 s | Per-file blob fetch + harmonization + parquet write |
 | **L2-country cold, L1 warm** | **~70 s** | Sidecar pre-check finds blobs in cache, no S3 traffic, harmonization + parquet write only |
 | All-warm (L2-country hit) | ~0.5 s | v0.7.0 top read returns the parquet directly |
 
-The interesting row is "L2-country cold, L1 warm": ~7× faster than
-cold-cold, because the per-file `Repo.fetch` overhead and the S3
+> **Note (v0.7.3+):** the two cold rows were measured in the
+> `Repo.fetch` era (~11 s/blob). The direct-S3 bypass now fetches each
+> blob in ~0.1 s and lock-free, so cold builds are dominated by
+> harmonization, not fetching — the absolute cold numbers are lower than
+> shown. The relative ordering still holds.
+
+The interesting row is "L2-country cold, L1 warm": much faster than
+cold-cold, because the per-file fetch overhead and the S3
 round-trips are both gone. Adding the L2-wave tier (2026-04-15) further
 removes the per-wave DVC SQLite metadata lookup on cold L2-country
 rebuilds (Uganda `cluster_features`: 408 s → 0.02 s per wave).
@@ -74,18 +81,22 @@ rebuilds (Uganda `cluster_features`: 408 s → 0.02 s per wave).
 ## Cross-Session Behavior
 
 As of v0.7.0, the library reads `{data_root}/{Country}/var/{table}.parquet`
-unconditionally at the top of `load_dataframe_with_dvc`
-(`lsms_library/country.py:1611-1652`) when the file exists. Every country
+at the top of `load_dataframe_with_dvc` when the file exists **and its
+embedded content hash is fresh (or absent)** — the v0.8.0 staleness check
+described next; before v0.8.0 this read was unconditional. Every country
 benefits from this; there is no longer a special-case for the seven
 DVC-stage countries.
 
 **Automatic content-hash staleness (v0.8.0).** Each cached parquet
 carries an embedded content hash (in its pyarrow schema metadata) that
 covers everything determining its *pre-finalize* contents: the
-`LSMS_CACHE_SCHEMA` version, the wave's `data_info.yml`, the wave and
-country modules (`{wave_folder}.py`, `{country}.py`, `mapping.py`), any
-`_/{table}.py` script, and the **DVC sidecar md5** of each declared
-source file (the `.dta` itself is never hashed or downloaded). On read,
+`LSMS_CACHE_SCHEMA` version, the wave's `data_info.yml`, the country's
+`data_scheme.yml` and `Makefile`, the wave and country modules
+(`{wave_folder}.py`, `{country}.py`, `mapping.py`), any `_/{table}.py`
+script, the build-time `*.org` inputs in `_/` (`food_items.org`,
+`categorical_mapping.org`, … — `CONTENTS.org` excluded), and the **DVC
+sidecar md5** of each declared source file (the `.dta` itself is never
+hashed or downloaded). On read,
 the hash is recomputed from the current sources and compared:
 
 - **match** → the cached parquet is served (fast path preserved);
@@ -132,6 +143,12 @@ All three tiers are under the user data directory:
 Override with the `LSMS_DATA_DIR` environment variable or the `data_dir`
 key in `~/.config/lsms_library/config.yml`. The env var takes precedence.
 
+This controls only the **data** root (caches + DVC blobs). The **config
+tree** (`countries/{C}/_/...`) is separately overridable via
+`LSMS_COUNTRIES_ROOT` / `countries_dir` (GH #436) — see CLAUDE.md "Data
+Access". Keeping the two independent is what lets a git worktree read its
+own config while sharing the warm cache.
+
 The library handles both DVC cache layouts because legacy `.dvc` sidecars
 in the `countries/` repo carry `md5-dos2unix` hashes from before the DVC
 3.0 cutover and write to the flat layout, while newer sidecars use the
@@ -145,8 +162,9 @@ This is a hard architectural rule: the package source tree
 only. Tracked data files live in the L1 cache under `data_root()`,
 not in the workspace.
 
-`_ensure_dvc_pulled` calls `Repo.fetch` (not `Repo.pull`) to populate
-the cache without checking files out into the package tree. And
+`_ensure_dvc_pulled` downloads blobs directly from S3 (via the sidecar
+md5, bypassing the DVC CLI / `Repo.fetch`) to populate the cache without
+checking files out into the package tree. And
 `local_file()` inside `get_dataframe` refuses to use any workspace copy
 of a file that has a sister `.dvc` sidecar — if it finds one, it emits
 a `UserWarning` with a cleanup command and falls through to the DVC
@@ -159,8 +177,8 @@ If you see warnings like:
 > through to the DVC cache path. Clean up with: `find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete`
 
 it means your dev checkout has leftover `.dta` files from a prior
-`dvc pull` (or from an older version of the library that did
-`Repo.pull` instead of `Repo.fetch`). Run the cleanup command to
+`dvc pull` (or from an older version of the library that checked files
+out via `Repo.pull`). Run the cleanup command to
 remove them. The cache under `data_root()` already has the same
 content; the warnings will stop and reads will use the canonical
 cache path.

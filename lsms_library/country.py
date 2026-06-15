@@ -1202,8 +1202,8 @@ class Country:
         self.wave_folder_map = {}
         if trust_cache:
             warnings.warn(
-                "trust_cache is deprecated and will be removed in v0.8.0. "
-                "Use assume_cache_fresh=True instead.",
+                "trust_cache is deprecated and will be removed in a future "
+                "release. Use assume_cache_fresh=True instead.",
                 DeprecationWarning,
                 stacklevel=2,
             )
