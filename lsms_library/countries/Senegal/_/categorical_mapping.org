@@ -545,3 +545,93 @@
 |    9 | Chicken         |
 |   10 | Guinea Fowl     |
 |   11 | Other Poultry   |
+
+* Agricultural Inputs (plot_inputs — the input axis)
+
+# harmonize_input (GAP 2 plot_inputs).  Cloned from Niger's harmonize_input
+# (the EHCVM s16b input-type labels are identical across the two EHCVM
+# countries).  Maps each wave's agricultural-input *type* label onto a
+# shared input taxonomy `Preferred Label`; the reported item-level
+# plot_inputs feature (grain (t, i, input, crop, u)) puts this Preferred
+# Label on its `input` index level.  STRING-KEYED on Original Label (the
+# integer code is not a stable key): the wave script loads
+# convert_categoricals=True and keys on the raw French label.  SENEGAL
+# DELTA: the s16b roster carries 'Semences d'arachide' (groundnut seed,
+# the largest seed slot — 1610 rows) which Niger's data does not; added
+# here mapping to Seed (its crop is resolved by harmonize_seed_crop below).
+# Referenced via tools.get_categorical_mapping('harmonize_input',
+# 'Original Label','Preferred Label').
+
+#+NAME: harmonize_input
+| Original Label                            | Preferred Label     |
+|-------------------------------------------+---------------------|
+| engrais organiques-fumure                 | Organic manure      |
+| Engrais organiques-Fumure                 | Organic manure      |
+| Engrais organiques - déchets d'animaux    | Organic manure      |
+| engrais organiques-compost                | Organic compost     |
+| Engrais organiques-Compost                | Organic compost     |
+| Engrais organiques - Ordures ménagères    | Organic compost     |
+| engrais inorganiques - urée               | Urea                |
+| Engrais inorganiques - Urée               | Urea                |
+| engrais inorganiques - dap                | DAP                 |
+| Engrais inorganiques - DAP                | DAP                 |
+| DAP et autres engrais inorganiques        | DAP                 |
+| engrais inorganiques - npk 15/15          | NPK                 |
+| Engrais inorganiques - NPK 15/15          | NPK                 |
+| Engrais inorganiques - NPK/Formule unique | NPK                 |
+| Engrais inorganiques - Phosphates         | Phosphate           |
+| engrais inorganiques - mélange            | Mixed fertilizer    |
+| Engrais inorganiques - Mélange            | Mixed fertilizer    |
+| produits phytosanitaires - pesticides     | Pesticide           |
+| Produits phytosanitaires - Pesticides     | Pesticide           |
+| produits phytosanitaires - herbicides     | Herbicide           |
+| Produits phytosanitaires - Herbicides     | Herbicide           |
+| produits phytosanitaires - fongicides     | Fungicide           |
+| Produits phytosanitaires - Fongicides     | Fungicide           |
+| Produits phytosanitaires-Fongicides       | Fungicide           |
+| Produits phytosanitaires -Fongicides      | Fungicide           |
+| autres produits phytosanitaires           | Other phytosanitary |
+| Autres produits phytosanitaires           | Other phytosanitary |
+| semences                                  | Seed                |
+| Semences                                  | Seed                |
+| Semences d'arachide                       | Seed                |
+| Semences de petit mil                     | Seed                |
+| Semences de sorgho                        | Seed                |
+| Semences de maïs                          | Seed                |
+| Semences de riz                           | Seed                |
+| Semences d'autres céréales                | Seed                |
+| Semences de coton                         | Seed                |
+| Semences de sésame                        | Seed                |
+| Semences de césame                        | Seed                |
+| Semences de haricots/niébé                | Seed                |
+| Plants/boutures de tubercules             | Seed                |
+| Autres semences                           | Seed                |
+| 20                                        | Seed                |
+
+# harmonize_seed_crop (GAP 2 plot_inputs).  EHCVM-only helper, cloned from
+# Niger's harmonize_seed_crop.  The s16b roster has NO crop column — the
+# crop is encoded in the seed-type label ('Semences de petit mil') — so
+# this table resolves each EHCVM seed-type label to a crop Preferred Label.
+# The catch-all seed slots ('Semences d'autres céréales', 'Autres
+# semences', 'Plants/boutures de tubercules', '20') resolve to 'Autre
+# crop'.  Non-seed input labels are absent here (the wave script consults
+# this table only for rows whose input resolved to 'Seed').  SENEGAL DELTA:
+# 'Semences d'arachide' -> 'Arachide' (the dominant Senegal seed crop, not
+# present in the Niger data).
+
+#+NAME: harmonize_seed_crop
+| Original Label                | Preferred Label     |
+|-------------------------------+---------------------|
+| Semences d'arachide           | Arachide            |
+| Semences de petit mil         | Mil                 |
+| Semences de sorgho            | Sorgho              |
+| Semences de maïs              | Maïs en grain       |
+| Semences de riz               | Riz Paddy           |
+| Semences de coton             | Coton               |
+| Semences de sésame            | Sésame              |
+| Semences de césame            | Sésame              |
+| Semences de haricots/niébé    | Niébé/Haricots secs |
+| Semences d'autres céréales    | Autre crop          |
+| Plants/boutures de tubercules | Autre crop          |
+| Autres semences               | Autre crop          |
+| 20                            | Autre crop          |

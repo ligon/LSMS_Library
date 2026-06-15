@@ -170,6 +170,121 @@ Data Scheme:
     index: (t, i)
     Int_t: datetime
 
+  crop_production:
+    # Item-level crop harvest (GAP 1; EHCVM parity loop 2026-06-15, cloned
+    # self-contained from Niger).  One row per REPORTED (field, parcel,
+    # crop) harvest line — REPORTED values only (harvest_kg / yield /
+    # main_crop are transformations, never columns).  2018-19 only: s16c
+    # records harvest qty+unit (s16cq12a/b), sold qty (s16cq16a), sale
+    # value (s16cq17) and the intercrop flag (s16cq07) at this plot-crop
+    # grain.  crop joins food via harmonize_food Preferred Labels; u via
+    # the u table; unmapped labels pass through unchanged.  u is in the
+    # index because one (plot, crop) can be reported in several units.
+    # plot = "{field_no}_{parcel_no}" aligns with plot_features' plot_id.
+    # i is the canonical EHCVM id (burkina_faso.ehcvm_i: grappe + '0' +
+    # 2-digit menage) reconciling 100% with sample().  harvest_month NA
+    # (no planting/harvest-date question in s16c); intercropped from
+    # s16cq07.
+    index: (t, i, plot, crop, u)
+    Quantity: float
+    Quantity_sold: float
+    Value_sold: float
+    harvest_month: float
+    intercropped: bool
+    materialize: make
+
+  plot_inputs:
+    # Item-level agricultural inputs (GAP 2; EHCVM parity loop 2026-06-15,
+    # cloned self-contained from Niger).  One row per REPORTED input
+    # applied: input identity (Seed / Urea / DAP / NPK / Phosphate / Mixed
+    # fertilizer / Organic manure / Organic compost / Pesticide / Herbicide
+    # / Fungicide / Other phytosanitary), reported quantity used + native
+    # unit, purchased flag + reported purchased quantity, and (seed rows)
+    # the seed's crop on the shared harmonize_food labels.  REPORTED values
+    # only.  Source s16b (2018-19) records inputs at the HOUSEHOLD x input
+    # grain, NOT plot x input (no parcel-level input data); the GAP-2 name
+    # `plot_inputs` is kept but `plot` is NOT in the index.  input ->
+    # harmonize_input; u -> the u table; the EHCVM roster has no crop
+    # column so seed crop is resolved from the seed label via
+    # harmonize_seed_crop.  Non-crop-specific rows carry the sentinel
+    # '(not crop-specific)' and a missing unit carries 'Manquant' — a NaN
+    # index level would be dropped by the framework's canonical NaN-key
+    # de-dup collapse.  i via burkina_faso.ehcvm_i (100% sample reconcile).
+    # ENCODING: s16b read default (utf-8) so accented labels match the maps.
+    index: (t, i, input, crop, u)
+    Quantity: float
+    Purchased: bool
+    Quantity_purchased: float
+    materialize: make
+
+  livestock:
+    # Item-level livestock roster (GAP 4; EHCVM parity loop 2026-06-15,
+    # cloned self-contained from Niger).  One row per REPORTED (household,
+    # species) owned — the pre-collapse roster (the WB engaged-in-livestock
+    # binary is groupby(['t','i']).any() over these rows; TLU is a
+    # Σ(head × factor) transform — neither is a column here).  GRAIN
+    # (t, i, animal) — NO v level ('livestock' is in the framework
+    # _no_v_join set).  `animal` is the harmonize_species_ehcvm Preferred
+    # Label (s17q02 codes 1-11 -> Cattle / Sheep / Goats / Camels / Horses
+    # / Donkeys / Pigs / Rabbits / Chicken / Guinea Fowl / Other Poultry).
+    # 2018-19 only: s17q06 head owned, s17q08 bought (HeadAcquired), s17q10
+    # sold; roster pre-filtered to owned species (s17q03==1).  No herd
+    # Value column (s17 records only purchase/sale FLOW values).
+    #
+    # I-KEY FIX (2026-06-15): the original (un-merged) livestock draft used
+    # the older burkina_faso.i() (grappe + 3-digit menage) which collides
+    # for the ~17% of households with a 3-digit menage, stranding them off
+    # sample() (83.4% i-key).  This build uses burkina_faso.ehcvm_i
+    # (grappe + '0' + 2-digit menage) — the SAME format sample() uses —
+    # giving 100% i-key ∩ sample.
+    index: (t, i, animal)
+    HeadCount: float
+    HeadAcquired: float
+    HeadSold: float
+    materialize: make
+
+  plot_labor:
+    # Item-level plot labor (GAP 3; EHCVM parity loop 2026-06-15, cloned
+    # self-contained from Niger).  One row per REPORTED labor SOURCE on a
+    # plot (the WB total_*_labor_days / hired_labor_value sums are
+    # transformations, never columns).  GRAIN (t, i, plot, source):
+    # plot = "{field_no}_{parcel_no}" aligned with crop_production /
+    # plot_features; source 'family' / 'hired' (EHCVM s16a records family
+    # vs non-family only — no free/exchange 'other').  PersonDays is the
+    # within-source sum of the member / gender-category / phase day cells
+    # (EHCVM hired = Σ #workers × days); Wage is the cash paid to hired
+    # labor (NaN for family).  i via burkina_faso.ehcvm_i (100% reconcile);
+    # v joins from sample().  2018-19 only (s16a family grids s16aq33/35/37b
+    # + hired grids s16aq39/41/43{a,b,c}).
+    index: (t, i, plot, source)
+    PersonDays: float
+    Wage: float
+    materialize: make
+
+  people_last7days:
+    # Item-level individual 7-day labor (GAP 3; EHCVM parity loop
+    # 2026-06-15, cloned self-contained from Niger).  One row per
+    # individual with the REPORTED last-7-days labor participation (this is
+    # the (t, i, pid) per-individual feature, NOT Uganda's legacy HH-level
+    # count).  GRAIN (t, i, pid): pid = s01q00a (matches household_roster);
+    # i via burkina_faso.ehcvm_i (100% reconcile); v auto-joins from
+    # sample().  COLUMNS: farm_work / SOB_work / wage_work (s04q06/07/08
+    # 1=Oui/2=Non -> bool) and working_age (roster Age >= 6, Age from
+    # s01q04a else 2018 - s01q03c birth year).  EHCVM's 7-day module
+    # records no productive-work hours nor the WB 7-day industry section
+    # code, so farm_hrs / SB_hrs / wage_hrs / Industry are NA (declared for
+    # cross-country schema parity).  2018-19 only.
+    index: (t, i, pid)
+    farm_work: bool
+    SOB_work: bool
+    wage_work: bool
+    farm_hrs: float
+    SB_hrs: float
+    wage_hrs: float
+    Industry: str
+    working_age: bool
+    materialize: make
+
   food_expenditures: !make
   food_prices: !make
   food_quantities: !make

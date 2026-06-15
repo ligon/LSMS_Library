@@ -459,3 +459,109 @@
 |    1 | freehold                   |
 |    2 | granted_right_of_occupancy |
 |    4 | leasehold                  |
+
+* Agriculture input / seed-crop / livestock-species harmonization
+#  (GAP 1-4 EHCVM parity, parity-loop 2026-06-15).  Copied from the Niger
+#  EHCVM reference (Niger/_/categorical_mapping.org).  These tables back the
+#  self-contained crop_production / plot_inputs / livestock wave scripts.
+#
+#  ENCODING NOTE: the Burkina EHCVM agriculture files (s16b/s16c) must be
+#  read with the DEFAULT (utf-8) encoding so the French value labels arrive
+#  with their accents intact ('Engrais inorganiques - Urée', 'Semences de
+#  maïs') — these are the keys below.  Reading with encoding='iso-8859-1'
+#  (as food_acquired.py does) STRIPS the accents ('Ure', 'mas') and would
+#  break every string match here.
+
+# harmonize_input — s16bq01 input-type label -> canonical input identity.
+# Keyed on the utf-8 value label (Original Label).  Burkina's trailing seed
+# slot whose label text was not stored is the bare '21' (the Niger sibling
+# uses '20'); it is the 'Autres semences' code -> Seed.
+
+#+NAME: harmonize_input
+| Original Label                            | Preferred Label     |
+|-------------------------------------------+---------------------|
+| engrais organiques-fumure                 | Organic manure      |
+| Engrais organiques-Fumure                 | Organic manure      |
+| Engrais organiques - déchets d'animaux    | Organic manure      |
+| engrais organiques-compost                | Organic compost     |
+| Engrais organiques-Compost                | Organic compost     |
+| Engrais organiques - Ordures ménagères    | Organic compost     |
+| engrais inorganiques - urée               | Urea                |
+| Engrais inorganiques - Urée               | Urea                |
+| engrais inorganiques - dap                | DAP                 |
+| Engrais inorganiques - DAP                | DAP                 |
+| DAP et autres engrais inorganiques        | DAP                 |
+| engrais inorganiques - npk 15/15          | NPK                 |
+| Engrais inorganiques - NPK 15/15          | NPK                 |
+| Engrais inorganiques - NPK/Formule unique | NPK                 |
+| Engrais inorganiques - Phosphates         | Phosphate           |
+| engrais inorganiques - mélange            | Mixed fertilizer    |
+| Engrais inorganiques - Mélange            | Mixed fertilizer    |
+| produits phytosanitaires - pesticides     | Pesticide           |
+| Produits phytosanitaires - Pesticides     | Pesticide           |
+| produits phytosanitaires - herbicides     | Herbicide           |
+| Produits phytosanitaires - Herbicides     | Herbicide           |
+| produits phytosanitaires - fongicides     | Fungicide           |
+| Produits phytosanitaires - Fongicides     | Fungicide           |
+| Produits phytosanitaires-Fongicides       | Fungicide           |
+| Produits phytosanitaires -Fongicides      | Fungicide           |
+| autres produits phytosanitaires           | Other phytosanitary |
+| Autres produits phytosanitaires           | Other phytosanitary |
+| semences                                  | Seed                |
+| Semences                                  | Seed                |
+| Semences de petit mil                     | Seed                |
+| Semences de sorgho                        | Seed                |
+| Semences de maïs                          | Seed                |
+| Semences de riz                           | Seed                |
+| Semences d'autres céréales                | Seed                |
+| Semences de coton                         | Seed                |
+| Semences de sésame                        | Seed                |
+| Semences de césame                        | Seed                |
+| Semences de haricots/niébé                | Seed                |
+| Plants/boutures de tubercules             | Seed                |
+| Autres semences                           | Seed                |
+| 20                                        | Seed                |
+| 21                                        | Seed                |
+
+# harmonize_seed_crop — EHCVM-only.  The s16b roster has NO crop column;
+# the crop is encoded in the seed-type label.  Resolves each seed label to
+# the crop's harmonize_food Preferred Label.  Catch-all seed slots ->
+# 'Autre crop'.  '21' is Burkina's trailing 'Autres semences' slot.
+
+#+NAME: harmonize_seed_crop
+| Original Label                | Preferred Label     |
+|-------------------------------+---------------------|
+| Semences de petit mil         | Mil                 |
+| Semences de sorgho            | Sorgho              |
+| Semences de maïs              | Maïs en grain       |
+| Semences de riz               | Riz Paddy           |
+| Semences de coton             | Coton               |
+| Semences de sésame            | Sésame              |
+| Semences de césame            | Sésame              |
+| Semences de haricots/niébé    | Niébé/Haricots secs |
+| Semences d'autres céréales    | Autre crop          |
+| Plants/boutures de tubercules | Autre crop          |
+| Autres semences               | Autre crop          |
+| 20                            | Autre crop          |
+| 21                            | Autre crop          |
+
+# harmonize_species_ehcvm — s17q02 livestock species CODE (1-11) ->
+# canonical species Preferred Label.  Code-keyed (load s17 with
+# convert_categoricals=False).  Codes are the elevage__id value labels:
+# 1 Bovins, 2 Ovins, 3 Caprins, 4 Camelins, 5 Equins, 6 Asins,
+# 7 Porcins, 8 Lapins, 9 Poules, 10 Pintades, 11 Autres volailles.
+
+#+NAME: harmonize_species_ehcvm
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Cattle          |
+|    2 | Sheep           |
+|    3 | Goats           |
+|    4 | Camels          |
+|    5 | Horses          |
+|    6 | Donkeys         |
+|    7 | Pigs            |
+|    8 | Rabbits         |
+|    9 | Chicken         |
+|   10 | Guinea Fowl     |
+|   11 | Other Poultry   |

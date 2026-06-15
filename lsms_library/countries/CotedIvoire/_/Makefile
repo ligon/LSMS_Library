@@ -42,6 +42,27 @@ $(VAR_DIR)/shocks.parquet: shocks.py $(shocks_parquet)
 ../%/_/livestock.parquet: ../%/_/livestock.py categorical_mapping.org
 	(cd $(@D) && python livestock.py)
 
+# EHCVM parity features (plot_features / crop_production / plot_inputs /
+# plot_labor / people_last7days).  Script-path wave tables like livestock:
+# each wave's _/<feature>.py reads its EHCVM source module(s) under
+# ../Data/Menage/ and writes the wave-level parquet via to_parquet().  The
+# wave-level grab_data() has no script fallback, so the per-feature pattern
+# rule runs the wave script (one rule per feature, mirroring livestock).
+../%/_/plot_features.parquet: ../%/_/plot_features.py categorical_mapping.org
+	(cd $(@D) && python plot_features.py)
+
+../%/_/crop_production.parquet: ../%/_/crop_production.py categorical_mapping.org
+	(cd $(@D) && python crop_production.py)
+
+../%/_/plot_inputs.parquet: ../%/_/plot_inputs.py categorical_mapping.org
+	(cd $(@D) && python plot_inputs.py)
+
+../%/_/plot_labor.parquet: ../%/_/plot_labor.py categorical_mapping.org
+	(cd $(@D) && python plot_labor.py)
+
+../%/_/people_last7days.parquet: ../%/_/people_last7days.py
+	(cd $(@D) && python people_last7days.py)
+
 %.parquet: %.py CONTENTS.org tanzania.py
 	(cd $(@D) && python ./$(<F))
 

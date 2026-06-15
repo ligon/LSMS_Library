@@ -14,6 +14,36 @@ def i(value):
     '''
     return tools.format_id(value.iloc[0]) + tools.format_id(value.iloc[1], zeropadding=3)
 
+
+def ehcvm_i(grappe, menage):
+    '''Canonical EHCVM household id reconciling with ``sample()``.
+
+    The Burkina EHCVM 2018-19 ``sample`` table builds ``i`` as
+    ``format_id(grappe) + '0' + format_id(menage, zeropadding=2)`` —
+    grappe, a literal ``'0'`` separator, then the menage zero-padded to
+    TWO digits.  (Verified empirically: this gives a 100% i-key
+    intersection with ``sample().i`` across s00/s01/s04/s16a/s16b/s16c/s17.)
+
+    This deliberately differs from the older :func:`i` above, which uses
+    ``format_id(grappe) + format_id(menage, zeropadding=3)`` (no separator,
+    3-digit menage).  The two AGREE only for two-digit menage; for the
+    ~17% of households with a three-digit menage (100-527) they diverge —
+    e.g. grappe=472, menage=141 -> :func:`i` makes ``'472141'`` but
+    ``sample()`` (and this helper) make ``'4720141'``.  Using :func:`i`
+    for the agriculture/livestock rosters therefore stranded ~17% of
+    households off ``sample()`` (the GAP-4 livestock i-key bug).  New
+    EHCVM features (livestock, crop_production, plot_inputs, plot_labor,
+    people_last7days) MUST use this helper.  ``i`` is left untouched
+    because ``food_acquired`` / ``plot_features`` already depend on it.
+
+    Returns None if either component is missing.
+    '''
+    g = tools.format_id(grappe)
+    m = tools.format_id(menage, zeropadding=2)
+    if g is None or m is None:
+        return None
+    return g + '0' + m
+
 def _household_roster_from_df(df, sex, age, HHID, sex_converter=None, age_converter=None,
                                months_spent='months_spent', Age_ints=None):
     """Inline replacement for lsms.tools.get_household_roster(fn_type=None)."""
