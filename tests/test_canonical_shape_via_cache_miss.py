@@ -123,34 +123,21 @@ TARGETS_OK = [
         "Nigeria", "food_expenditures", ["food_acquired"],
         id="PR242_Nigeria_food_expenditures",
     ),
-]
-
-
-TARGETS_XFAIL = [
+    # GH #109 (resolved): GhanaLSS food_acquired is now canonicalized at the
+    # wave level ([t, i, j, u, s, visit]) and concatenated at the country
+    # level, so this is a normal passing target.  It was previously an
+    # xfail(strict) pending the wave-level reshape; the marker was removed when
+    # the #109 work landed (the strict xfail xpassed as designed).
     pytest.param(
-        "GhanaLSS",
-        "food_acquired",
-        [],
-        id="PR243_GhanaLSS_food_acquired",
-        marks=pytest.mark.xfail(
-            reason=(
-                "GhanaLSS Phase-3 reshape is deferred to GH #109.  The "
-                "country-level _/food_acquired.py normalizer in PR #243 only "
-                "runs as a final fallback in load_from_waves, but every "
-                "Ghana wave declares food_acquired in its wave-level "
-                "data_scheme so the framework aggregates per-wave parquets "
-                "(non-canonical: i↔j swap in early waves, h/w naming in "
-                "1991-92/2012-13/2016-17, no `s` axis) instead of running "
-                "the country-level script.  Real fix: rewrite each wave's "
-                "_/food_acquired.py to emit canonical [t, i, j, u, s] "
-                "directly via food_acquired_to_canonical.  When that work "
-                "lands under #109, this xfail will start passing and the "
-                "marker should be removed."
-            ),
-            strict=True,
-        ),
+        "GhanaLSS", "food_acquired", [],
+        id="GH109_GhanaLSS_food_acquired",
     ),
 ]
+
+
+# No remaining xfail targets: the GhanaLSS food_acquired case moved to
+# TARGETS_OK above once GH #109 landed.
+TARGETS_XFAIL = []
 
 
 def _clear_country_caches(country: str, tables: list[str]) -> None:
