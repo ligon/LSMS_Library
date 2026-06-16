@@ -2052,7 +2052,14 @@ def map_index(df: pd.DataFrame) -> pd.DataFrame:
     needs_swap = False
     if 'j' in index_names:
         if 'i' not in index_names:
-            needs_swap = True
+            # The legacy j->i swap rescues OLD household parquets that stored
+            # the household id under 'j'.  A cluster-level item feature
+            # (e.g. community_prices, indexed by the cluster 'v' with NO
+            # household 'i') legitimately uses 'j' for the food item -- swapping
+            # it to 'i' makes 'j' undeclared and the food item gets dropped +
+            # collapsed away downstream (silent data loss).  Detect that shape
+            # by the presence of 'v' without 'i' and leave 'j' intact.
+            needs_swap = 'v' not in index_names
         else:
             try:
                 needs_swap = index_names.index('j') < index_names.index('i')

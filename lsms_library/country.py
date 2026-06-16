@@ -3772,6 +3772,21 @@ def _normalize_dataframe_index(
 
     current_names = list(df.index.names)
 
+    # Undo map_index()'s legacy j->i swap when the schema actually declares 'j'.
+    # map_index() renames a 'j' index level to 'i' whenever a table has no
+    # household 'i' level (a legacy old-parquet convention).  For a cluster-
+    # level item feature (e.g. community_prices, index (t, v, j, u) with no
+    # household i), that rename turns the declared 'j' into an *undeclared* 'i',
+    # which the level-drop + duplicate-collapse below then discards entirely --
+    # silent data loss (the food item collapses, leaving one price per cluster).
+    # When the schema wants 'j' (not 'i') and the frame carries the swapped 'i'
+    # but no 'j', restore the name so the level survives.  Household tables
+    # (declared 'i') and tables declaring both i and j are untouched.
+    if ('j' in declared and 'i' not in declared
+            and 'i' in current_names and 'j' not in current_names):
+        df = df.rename_axis(index={'i': 'j'})
+        current_names = list(df.index.names)
+
     # Add synthetic levels when declared but missing (e.g., 't' for wave outputs)
     missing_levels = [lvl for lvl in declared if lvl not in current_names]
     if missing_levels:

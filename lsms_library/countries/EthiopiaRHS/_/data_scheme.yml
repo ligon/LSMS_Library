@@ -205,4 +205,21 @@ Data Scheme:
     Woreda: str
     Rural: str
 
+  # community_prices (#438 / #275): PA-level SURVEYED food prices (an
+  # independent price series, distinct from the household food_acquired unit
+  # values).  Cluster-level (t, v, j, u) -- v IS in the index (no household i,
+  # no _join_v_from_sample).  Script-path (materialize: make): the country
+  # _/community_prices.py reads the three dedicated ERHS price instruments and
+  # writes var/community_prices.parquet:
+  #   price1234_rev (R1-R4, WOREDA-level p_r1..p_r4, broadcast to PAs),
+  #   rd6_kgpr_Mkt (R6/2004, PA-level kg_pr6), price2009 (R7/2009, price_r7).
+  # All price-per-KG -> u='Kg'.  j = harmonize_community_food Preferred Label
+  # (DRAFT; aligned with harmonize_food so prices join food_acquired /
+  # crop_production on j).  REPORTED prices only -- unmapped item codes
+  # (high aggregate codes) and non-positive prices are dropped.  Resolves #275.
+  community_prices:
+    index: (t, v, j, u)
+    Price: float
+    materialize: make
+
   panel_ids: !make
