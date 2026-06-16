@@ -118,3 +118,28 @@ anthropometry:
         Sex:
             - sex
             - mappings: ['erhs_sex', 'Code', 'Preferred Label']
+
+# crop_production (#438): R2 (1994b) HH x crop production (kg) -- PRODUCTION
+# ONLY.  The pooled R2/R3 area_output_r2r3rev.tab carries the R2 production
+# columns {stub}prd94_2 but NO R2 area columns (area exists only for R3:
+# {stub}ha95).  So only the {stub}_kg myvars are declared; the
+# crop_production hook leaves Area_ha NaN for this wave (documented in
+# data_scheme.yml).  9 crops.  i = [paid, hhid] -- paid (= q1c PA code) +
+# HH-no-within-village; this file keys on paid/hhid/q1b (verified present).
+crop_production:
+    file: area_output_r2r3rev.tab
+    converted_categoricals: False
+    idxvars:
+        i:
+            - paid
+            - hhid
+    myvars:
+        wtef_kg: wtefprd94_2
+        btef_kg: btefprd94_2
+        barl_kg: barlprd94_2
+        wht_kg: whtprd94_2
+        maiz_kg: maizprd94_2
+        sorg_kg: sorgprd94_2
+        coff_kg: coffprd94_2
+        chat_kg: chatprd94_2
+        enset_kg: ensetprd94_2

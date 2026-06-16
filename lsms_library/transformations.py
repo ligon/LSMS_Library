@@ -1185,6 +1185,45 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True):
     return v
 
 
+def legacy_area_output(country):
+    """Reproduce the retired EthiopiaRHS Country(X).area_output() (t,i) table.
+
+    The HH-level wide ``area_output`` table (#277) was retired in favour of the
+    item-level ``crop_production`` (t, i, j) feature (#438), which subsumes it.
+    This shim re-widens ``crop_production`` back to the old (t, i) shape with
+    per-crop ``{Crop}_kg`` (production) and ``{Crop}_ha`` (area) columns, so
+    callers migrating off ``area_output()`` keep working.
+
+    Note: ``crop_production`` covers MORE waves than the original ``area_output``
+    (R1-R4 + R6 + R7, not just R6/R7), so this shim now returns those extra
+    waves too.  New code should use ``crop_production()`` directly.
+
+    Parameters
+    ----------
+    country : Country
+        The Country instance (e.g., ``ll.Country('EthiopiaRHS')``).
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame indexed by (t, i) with ``{Crop}_kg`` / ``{Crop}_ha`` columns
+        (crop label spaces removed, e.g. ``WhiteTeff_kg``).
+    """
+    cp = country.crop_production().reset_index()
+    idx = [c for c in ('t', 'i') if c in cp.columns]
+    # crop label -> compact column stem ('White Teff' -> 'WhiteTeff')
+    cp['stem'] = cp['j'].astype(str).str.replace(' ', '', regex=False)
+    kg = cp.pivot_table(index=idx, columns='stem', values='Quantity',
+                        aggfunc='first')
+    ha = cp.pivot_table(index=idx, columns='stem', values='Area_ha',
+                        aggfunc='first')
+    kg.columns = [f'{c}_kg' for c in kg.columns]
+    ha.columns = [f'{c}_ha' for c in ha.columns]
+    out = kg.join(ha, how='outer').sort_index(axis=1)
+    out.columns.name = None
+    return out
+
+
 def legacy_locality(country):
     """Reproduce the pre-deprecation output of Country(X).locality().
 

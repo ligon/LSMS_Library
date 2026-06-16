@@ -3079,6 +3079,17 @@ class Country:
             "    loc = legacy_locality(Country('Uganda'))\n\n"
             "See docs/migration/locality.md for details."
         ),
+        'area_output': (
+            "Country('EthiopiaRHS').area_output() is deprecated and will be "
+            "removed in a future release. The HH-level (t, i) wide crop table "
+            "is subsumed by the item-level crop_production (t, i, j) feature "
+            "(GH #438), which covers more waves (R1-R4 + R6 + R7):\n\n"
+            "    Country('EthiopiaRHS').crop_production()  # (t, i, v, j, u)\n\n"
+            "For callers who need the legacy wide (t, i) shape, a compatibility "
+            "shim is available:\n\n"
+            "    from lsms_library.transformations import legacy_area_output\n"
+            "    ao = legacy_area_output(Country('EthiopiaRHS'))"
+        ),
     }
 
     def __getattr__(self, name):
@@ -3105,8 +3116,9 @@ class Country:
 
             def method(*args, **kwargs):
                 warnings.warn(dep_msg, DeprecationWarning, stacklevel=2)
-                from .transformations import legacy_locality
-                _shims = {'locality': legacy_locality}
+                from .transformations import legacy_locality, legacy_area_output
+                _shims = {'locality': legacy_locality,
+                          'area_output': legacy_area_output}
                 return _shims[name](self)
 
             method.__name__ = name

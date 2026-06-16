@@ -119,3 +119,35 @@ anthropometry:
         Sex:
             - sex
             - mappings: ['erhs_sex', 'Code', 'Preferred Label']
+
+# crop_production (#438): R3 (1995) HH x crop production (kg) + area (ha).
+# Source: the pooled R2/R3 area_output_r2r3rev.tab, R3 columns {stub}prd95
+# (production, kg) and {stub}ha95 (area, hectares), declared as {stub}_kg /
+# {stub}_ha myvars.  9 crops.  i = [paid, hhid] -- paid (= q1c PA code) +
+# HH-no-within-village (this file keys on paid/hhid/q1b, verified present).
+crop_production:
+    file: area_output_r2r3rev.tab
+    converted_categoricals: False
+    idxvars:
+        i:
+            - paid
+            - hhid
+    myvars:
+        wtef_kg: wtefprd95
+        wtef_ha: wtefha95
+        btef_kg: btefprd95
+        btef_ha: btefha95
+        barl_kg: barlprd95
+        barl_ha: barlha95
+        wht_kg: whtprd95
+        wht_ha: whtha95
+        maiz_kg: maizprd95
+        maiz_ha: maizha95
+        sorg_kg: sorgprd95
+        sorg_ha: sorgha95
+        coff_kg: coffprd95
+        coff_ha: coffha95
+        chat_kg: chatprd95
+        chat_ha: chatha95
+        enset_kg: ensetprd95
+        enset_ha: ensetha95

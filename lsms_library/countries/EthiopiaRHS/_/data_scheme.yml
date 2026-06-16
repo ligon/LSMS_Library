@@ -15,12 +15,15 @@ Country: EthiopiaRHS
 #    auto-derive household_characteristics, food_expenditures/food_quantities.
 #  - sample + cluster_features (all 8 waves where geography exists).
 #  - plot_features (1994a R1).
+#  - anthropometry (t,i,pid) 1994-1997 (R1-R4) + crop_production (t,i,j)
+#    1994-1997/2004/2009 (R1-R4,R6,R7) -- item-level parity features (#438).
 #  - bespoke HH-level (t,i) VALUE/aggregate tables where the IFPRI archive
 #    ships only pre-aggregated household scalars (no roster/item-level food):
 #    assets (1989 R1), livestock (1999 R5 + 2004 R6 + 2009 R7),
-#    income (1999 R5), consumption (2004 R6 + 2009 R7), hhsize (2009 R7),
-#    area_output (2004 R6 + 2009 R7).  These follow the documented
-#    _no_v_join (t,i) pattern (see country.py _no_v_join + CLAUDE.md).
+#    income (1999 R5), consumption (2004 R6 + 2009 R7), hhsize (2009 R7).
+#    These follow the documented _no_v_join (t,i) pattern (see CLAUDE.md).
+#    (The former HH-level `area_output` (t,i) table is RETIRED -- subsumed by
+#    the item-level crop_production above; #438.)
 #  - panel_ids (!make).
 
 Data Scheme:
@@ -99,35 +102,28 @@ Data Scheme:
     HouseholdSize: float    # hhsize
     MaleHead: float         # malehead (1 = male-headed)
 
-  # area_output (#277): HH x crop pre-aggregated AREA (ha) + PRODUCTION (kg)
-  # totals for 2004 (R6) and 2009 (R7).  NOT plot_features (no per-plot rows;
-  # this is the HH-level constructed crop summary).  Documented HH-level
-  # (t,i) variant.  Columns are the UNION of 2004 (9 crops: white/black teff,
-  # barley, wheat, maize, sorghum, coffee, chat, enset) and 2009 (6 cereals:
-  # white/black teff, barley, wheat, maize, sorghum); 2009 leaves
-  # coffee/chat/enset NaN (missing_ok column union).  Per-crop column
-  # naming: {Crop}_ha (hectares), {Crop}_kg (production).  i = composite
-  # (paid, hhid) via the shared ethiopiarhs.i formatter.  Added to _no_v_join.
-  area_output:
-    index: (t, i)
-    WhiteTeff_ha: float
-    WhiteTeff_kg: float
-    BlackTeff_ha: float
-    BlackTeff_kg: float
-    Barley_ha: float
-    Barley_kg: float
-    Wheat_ha: float
-    Wheat_kg: float
-    Maize_ha: float
-    Maize_kg: float
-    Sorghum_ha: float
-    Sorghum_kg: float
-    Coffee_ha: float        # 2004 only
-    Coffee_kg: float        # 2004 only
-    Chat_ha: float          # 2004 only
-    Chat_kg: float          # 2004 only
-    Enset_ha: float         # 2004 only
-    Enset_kg: float         # 2004 only
+  # crop_production (#438, Tier-2): item-level HH x crop production.  The
+  # ERHS area_output_* files are WIDE HH x crop AGGREGATES -- already summed
+  # across plots, so there is NO plot dimension; this is the documented ERHS
+  # reduced-grain variant ((t,i,j), not the canonical (t,i,plot,j)).  Per-
+  # wave data_info extracts each round's {stub}_kg (production, kg) and
+  # {stub}_ha (area, hectares) myvars; the `crop_production` df_edit hook in
+  # _/ethiopiarhs.py melts them to long (i, j), maps the 9 crop stubs to
+  # Preferred Labels (White/Black Teff, Barley, Wheat, Maize, Sorghum,
+  # Coffee, Chat, Enset), sets u='Kg', and drops rows with neither metric.
+  # The framework prepends t and joins v from sample() -> returned grain
+  # (i, t, v, j, u).  SUBSUMES the retired (t,i) wide `area_output` table.
+  #
+  # WAVE COVERAGE: 1994a (R1), 1994b (R2, PRODUCTION ONLY -- no area in the
+  # r2r3rev R2 columns), 1995 (R3), 1997 (R4), 2004 (R6), 2009 (R7, 6
+  # CEREALS only -- no coffee/chat/enset).  1999 (R5) is DEFERRED: its
+  # area_output_99 uses a packed-hhid keyspace with ~0.000 overlap vs the
+  # 1999 composite sample (documented follow-up; do NOT wire it here).
+  crop_production:
+    index: (t, i, j)
+    Quantity: float        # production, kg harvested
+    Area_ha: float         # area planted, hectares (NaN for 1994b R2)
+    u: str                 # constant 'Kg' (production unit)
 
   # anthropometry (#438 Tier-2): individual (t, i, pid) body measures for
   # the four 1994-1997 rounds (R1-R4), from the pooled wide

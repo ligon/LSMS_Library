@@ -223,3 +223,40 @@ anthropometry:
         Sex:
             - sex
             - mappings: ['erhs_sex', 'Code', 'Preferred Label']
+
+# crop_production (#438): R1 (1994a) HH x crop production (kg) + area (ha).
+# Source: area_output_94.tab (WIDE HH x crop aggregate, already summed over
+# plots -> reduced (t,i,j) grain).  9 crops: white/black teff, barley,
+# wheat, maize, sorghum, coffee, chat, enset.  Per-crop source columns
+# {stub}prd94 (production, kg) and {stub}ha94 (area, hectares), declared as
+# {stub}_kg / {stub}_ha myvars; the crop_production df_edit hook in
+# _/ethiopiarhs.py melts them to long (i, j), sets u='Kg'.
+# i-KEY: i = [q1c, hhid] -- peasant-association code + HH-no-within-village,
+# the SAME composite the 1994a roster uses (q1c+hhid; this file carries both
+# q1c+hhid and q5+paid -- all four ID cols present and verified).
+crop_production:
+    file: area_output_94.tab
+    converted_categoricals: False
+    idxvars:
+        i:
+            - q1c
+            - hhid
+    myvars:
+        wtef_kg: wtefprd94
+        wtef_ha: wtefha94
+        btef_kg: btefprd94
+        btef_ha: btefha94
+        barl_kg: barlprd94
+        barl_ha: barlha94
+        wht_kg: whtprd94
+        wht_ha: whtha94
+        maiz_kg: maizprd94
+        maiz_ha: maizha94
+        sorg_kg: sorgprd94
+        sorg_ha: sorgha94
+        coff_kg: coffprd94
+        coff_ha: coffha94
+        chat_kg: chatprd94
+        chat_ha: chatha94
+        enset_kg: ensetprd94
+        enset_ha: ensetha94

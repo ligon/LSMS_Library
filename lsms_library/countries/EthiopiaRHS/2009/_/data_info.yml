@@ -7,8 +7,9 @@
 # pattern), NOT household_roster/food_acquired.
 #
 # i-KEY (statically verified).  i = composite (pa, hhid) for the
-# consumption/hhsize/livestock files, and (paid, hhid) for the area_output
-# file -- `pa`/`paid` are the SAME numeric peasant-association code 1..20
+# consumption/hhsize/livestock files, and (paid, hhid) for the
+# crop_production source file -- `pa`/`paid` are the SAME numeric
+# peasant-association code 1..20
 # as q1c; `hhid` is the HH-number-within-PA (NOT unique within the wave:
 # 265 distinct vs 1357 rows), so the composite is mandatory.  Same keyspace
 # as the 1994+ panel -> joins the main panel + gets a real v from the 2009
@@ -16,7 +17,7 @@
 # False): pa/paid/hhid and the value columns are stable numeric scalars.
 #
 # The 2009 files are SINGLE-ROUND (not pooled), so the all-NaN-row drop in
-# the consumption/hhsize/area_output hooks is effectively a no-op here.
+# the consumption/hhsize hooks is effectively a no-op here.
 
 # consumption: HH-level R7 consumption scalars.  Poor uses poorpc7 (the
 # per-capita poverty indicator; 2009 has no plain `poor7`).  aeu absent.
@@ -60,13 +61,14 @@ livestock:
         LivestockValue: lvs_val7
         TLU: tlu7
 
-# area_output: HH x cereal AREA (ha) + PRODUCTION (kg), 2009 = 6 cereals
-# (white/black teff, barley, wheat, maize, sorghum).  Coffee/chat/enset are
-# NOT in the 2009 cereals file, so they are simply omitted here; the
-# country-level cross-wave concat unions columns, leaving 2009's
-# Coffee/Chat/Enset_ha/_kg NaN (the data_scheme declares the 2004+2009
-# union).  This file keys on `paid` (not `pa`).
-area_output:
+# crop_production (#438): R7 (2009) HH x cereal production (kg) + area (ha),
+# 6 CEREALS ONLY (white/black teff, barley, wheat, maize, sorghum).
+# Coffee/chat/enset are NOT in the 2009 cereals file, so only those 6 crop
+# stubs are declared here; the crop_production hook simply emits 6 crop rows
+# per HH (no NaN coffee/chat/enset rows).  Source: erhs7_meher_area_output_
+# cereals_2009.tab; per-crop columns {stub}prd09 / {stub}ha09 declared as
+# {stub}_kg / {stub}_ha myvars.  This file keys on `paid` (not `pa`).
+crop_production:
     file: erhs7_meher_area_output_cereals_2009.tab
     converted_categoricals: False
     idxvars:
@@ -74,18 +76,18 @@ area_output:
             - paid
             - hhid
     myvars:
-        WhiteTeff_ha: wtefha09
-        WhiteTeff_kg: wtefprd09
-        BlackTeff_ha: btefha09
-        BlackTeff_kg: btefprd09
-        Barley_ha: barlha09
-        Barley_kg: barlprd09
-        Wheat_ha: whtha09
-        Wheat_kg: whtprd09
-        Maize_ha: maizha09
-        Maize_kg: maizprd09
-        Sorghum_ha: sorgha09
-        Sorghum_kg: sorgprd09
+        wtef_kg: wtefprd09
+        wtef_ha: wtefha09
+        btef_kg: btefprd09
+        btef_ha: btefha09
+        barl_kg: barlprd09
+        barl_ha: barlha09
+        wht_kg: whtprd09
+        wht_ha: whtha09
+        maiz_kg: maizprd09
+        maiz_ha: maizha09
+        sorg_kg: sorgprd09
+        sorg_ha: sorgha09
 
 # Sampling design + cluster geography.  Extracted from the consumption
 # aggregate file; v = pa (numeric PA code 1..20).  Region/Woreda mapped

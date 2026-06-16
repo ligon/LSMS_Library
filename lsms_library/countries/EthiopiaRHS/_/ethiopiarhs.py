@@ -266,18 +266,6 @@ def hhsize(df):
     return _drop_all_nan_value_rows(df)
 
 
-def area_output(df):
-    """R6/R7 HH x crop area(ha)+production(kg): drop all-NaN-crop rows.
-
-    The 2004 source carries 9 crops (white/black teff, barley, wheat,
-    maize, sorghum, coffee, chat, enset); 2009 carries 6 cereals (the
-    teff/barley/wheat/maize/sorghum subset) and leaves coffee/chat/enset
-    absent (filled NaN by the wave data_info's missing_ok myvars).  A row
-    with no crop area or production at all carries no information -> drop.
-    """
-    return _drop_all_nan_value_rows(df)
-
-
 def anthropometry(df):
     """Individual (t, i, pid) body measures, one round-slice per wave (#438).
 
@@ -315,3 +303,46 @@ def anthropometry(df):
                     & (flat[k].astype('string').str.strip() != '')]
 
     return flat.set_index(idx)
+
+
+_CROP_LABELS = {
+    'wtef': 'White Teff', 'btef': 'Black Teff', 'barl': 'Barley',
+    'wht': 'Wheat', 'maiz': 'Maize', 'sorg': 'Sorghum',
+    'coff': 'Coffee', 'chat': 'Chat', 'enset': 'Enset',
+}
+
+
+def crop_production(df):
+    """Melt the wide ERHS HH x crop area_output_* slice to long (t,i,j) (#438).
+
+    Each wave's data_info extracts that round's per-crop production (kg) and
+    area (ha) as {stub}_kg / {stub}_ha myvars over an (i,) index.  Reshape to
+    one row per (i, j) crop: Quantity (kg), Area_ha, u='Kg'.  ERHS aggregates
+    are HH x crop (already summed over plots) -> reduced (t,i,j) grain, no
+    plot dimension.  Framework prepends t and joins v from sample().
+    """
+    idx = list(df.index.names)            # ('i',)
+    flat = df.reset_index()
+    parts = []
+    for stub, label in _CROP_LABELS.items():
+        kg, ha = f'{stub}_kg', f'{stub}_ha'
+        if kg not in flat.columns and ha not in flat.columns:
+            continue
+        part = flat[idx].copy()
+        part['j'] = label
+        part['Quantity'] = (pd.to_numeric(flat[kg], errors='coerce')
+                            if kg in flat.columns
+                            else pd.Series(np.nan, index=flat.index))
+        part['Area_ha'] = (pd.to_numeric(flat[ha], errors='coerce')
+                           if ha in flat.columns
+                           else pd.Series(np.nan, index=flat.index))
+        parts.append(part)
+    out = pd.concat(parts, ignore_index=True)
+    out = out[out['Quantity'].notna() | out['Area_ha'].notna()]
+    out['u'] = 'Kg'
+    out = out[out['j'].notna()]
+    for k in idx:
+        out = out[out[k].notna() & (out[k].astype('string').str.strip() != '')]
+    out = out.set_index(idx + ['j'])
+    out = out.groupby(level=out.index.names).first()   # defensive de-dupe
+    return out
