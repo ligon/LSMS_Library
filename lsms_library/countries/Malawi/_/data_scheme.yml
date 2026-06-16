@@ -174,9 +174,12 @@ Data Scheme:
     # main_crop / value-shares) are transformations, NOT stored columns.
     # 2004-05 (IHS2) deferred: household-level aggregated ag file, no
     # plot-crop roster.  See _/malawi.py:assemble_crop_production.
-    index: (t, i, plot, crop)
+    # u is an INDEX level (a grouping key), so collapsing an extra raw level
+    # sums Quantity WITHIN each unit and heterogeneous units survive as
+    # distinct rows (SkunkWorks/grain_aggregation_policy.org).  Was a column
+    # (a bug: a plot-crop measured in two units collapsed via .first()).
+    index: (t, i, plot, crop, u)
     Quantity: float
-    u: str
     Quantity_sold: float
     Value_sold: float
     planting_month: int

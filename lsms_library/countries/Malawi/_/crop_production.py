@@ -34,4 +34,13 @@ assert pieces, "crop_production: no wave-level parquets found"
 
 p = pd.concat(pieces)
 
+# Move u into the index (canonical (t, i, plot, crop, u)).  u is a grouping
+# key, not a free column: a plot-crop measured in two units must be two
+# distinct rows, not one survivor of a .first() collapse.  See
+# SkunkWorks/grain_aggregation_policy.org.  Wave parquets carry u as a
+# column; append it here so the country parquet's on-disk index matches the
+# declared schema.
+if 'u' in p.columns:
+    p = p.set_index('u', append=True)
+
 to_parquet(p, '../var/crop_production.parquet')

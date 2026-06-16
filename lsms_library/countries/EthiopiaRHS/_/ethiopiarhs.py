@@ -343,6 +343,6 @@ def crop_production(df):
     out = out[out['j'].notna()]
     for k in idx:
         out = out[out[k].notna() & (out[k].astype('string').str.strip() != '')]
-    out = out.set_index(idx + ['j'])
+    out = out.set_index(idx + ['j', 'u'])   # u is a grouping key, not a column
     out = out.groupby(level=out.index.names).first()   # defensive de-dupe
     return out
