@@ -428,3 +428,67 @@ distinction) pending Codeunit1.SPS.
 | 100 | Minilik |
 | 102 | Mezo |
 | 103 | Finala |
+
+* harmonize_community_food (#438 / #275 -- DRAFT, labels for review)
+
+Item-code -> Preferred Label for the ERHS community/market PRICE
+instruments (price1234_rev R1-R4, rd6_kgpr_Mkt R6, price2009 R7).  =Code=
+is the consistent low =item1234= scheme (1=white teff, 2=black teff, ...),
+which is stable across R1-R7.  =Original Label= is the R7 (price2009)
+=foodtype= text (the cleanest in-data label).  =Preferred Label= is the
+harmonized j, ALIGNED with the existing =harmonize_food= vocabulary where
+the item overlaps (so a priced food joins food_acquired / crop_production
+on j) -- e.g. Teff (white)/(black), Barley, Coffee, Enset, Araqi/Katikala,
+Coffee leaf/Tea match harmonize_food exactly.
+
+DRAFT -- the items flagged below are judgement calls (local Amharic names);
+Preferred Labels are the maintainer's curation domain.  Items NOT in this
+table (the high =code= 100+/300+/500+ aggregate codes, ~11% of R1-R4 price
+rows) are dropped by the community_prices script with a logged count.
+
+#+NAME: harmonize_community_food
+| Code | Original Label             | Preferred Label       |
+|------+----------------------------+-----------------------|
+|    1 | Teff (white)               | Teff (white)          |
+|    2 | Teff (black)               | Teff (black)          |
+|    3 | Barley (Gebis)             | Barley                |
+|    4 | Wheat/ Durahh (Sinde)      | Wheat                 |
+|    5 | Maize (Bekolo/Bahismashla) | Maize                 |
+|    6 | Sorghum (Mashila)          | Sorghum               |
+|    7 | Millet (Zengada)           | Millet                |
+|    9 | Horse Beans (Bakela)       | Horse Beans           |
+|   14 | Lentils (Misir)            | Lentils               |
+|   16 | Coffee                     | Coffee                |
+|   17 | Chat                       | Chat                  |
+|   18 | Enset                      | Enset                 |
+|   21 | Gesho                      | Gesho                 |
+|   26 | Potatoes                   | Potatoes              |
+|   28 | Salata                     | Lettuce (Salata)      |
+|   31 | Onions                     | Onions                |
+|   33 | Nech Shinkuri (garlic)     | Garlic                |
+|   35 | Fasolia                    | Haricot Beans (Fasolia) |
+|   40 | Chick Peas (Shimbra)       | Chick Peas            |
+|   41 | Cow Peas (Ater)            | Cow Peas              |
+|   46 | Tomatoes                   | Tomatoes              |
+|   47 | Vetch                      | Vetch                 |
+|   48 | Nueg                       | Noug                  |
+|   49 | Gommen                     | Kale (Gomen)          |
+|   53 | Field Peas                 | Field Peas            |
+|   54 | Fenugreek (abish)          | Fenugreek             |
+|   57 | Jinjibel (ginger)          | Ginger                |
+|   59 | Tikl Gommen (cabbage)      | Cabbage               |
+|   61 | Beef (yekebit siga)        | Beef                  |
+|   62 | Goat Meat (yefiyel siga)   | Goat Meat             |
+|   64 | Butter                     | Butter                |
+|   65 | Milk                       | Milk                  |
+|   67 | Chicken                    | Chicken               |
+|   68 | Eggs                       | Eggs                  |
+|   71 | Tej                        | Tej                   |
+|   73 | Araqi/Kathikala            | Araqi/Katikala        |
+|   75 | Sugar                      | Sugar                 |
+|   81 | Salt                       | Salt                  |
+|   82 | Cooking Oil                | Cooking Oil           |
+|   84 | Karia                      | Chili Pepper (Karia)  |
+|   85 | Berbere                    | Berbere               |
+|   86 | Bread (dabo)               | Bread (Dabo)          |
+|   90 | Coffee leag                | Coffee leaf/Tea       |
