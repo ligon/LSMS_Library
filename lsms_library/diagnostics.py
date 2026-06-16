@@ -166,7 +166,12 @@ def _load_scheme(country: str) -> dict:
             continue
         idx_raw = spec.get("index", "")
         idx = [s.strip() for s in str(idx_raw).strip("()").split(",") if s.strip()] if idx_raw else []
-        skip = {"index", "materialize", "backend"}
+        # Scheme meta-keys (not columns).  `aggregation` is the
+        # grain-aggregation-policy block (SkunkWorks/
+        # grain_aggregation_policy.org): a {level: reducer} map declaring how
+        # an extra index level collapses; documentary/forward-looking, not a
+        # data column.
+        skip = {"index", "materialize", "backend", "aggregation"}
         cols = {}
         optional_cols: set[str] = set()
         for k, v in spec.items():

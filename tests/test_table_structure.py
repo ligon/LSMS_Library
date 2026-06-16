@@ -97,8 +97,10 @@ def _load_all_schemes() -> dict[str, dict]:
                 continue
             idx_raw = spec.get("index", "")
             idx = _parse_index_tuple(str(idx_raw)) if idx_raw else []
-            # Skip non-column keys: 'index', 'materialize' (from !make tag), etc.
-            skip_keys = {"index", "materialize", "backend"}
+            # Skip non-column keys: 'index', 'materialize' (from !make tag),
+            # 'aggregation' (the grain-aggregation-policy {level: reducer} block;
+            # see SkunkWorks/grain_aggregation_policy.org), etc.
+            skip_keys = {"index", "materialize", "backend", "aggregation"}
             columns = {}
             optional_cols: set[str] = set()
             for k, v in spec.items():

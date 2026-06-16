@@ -200,7 +200,37 @@ footguns; they become lossless union+sentinel.
 - Geographic hierarchy (=woreda > v > i=) for the =<broadcast>= sentinel:
   worth it, or keep community_prices' explicit broadcast indefinitely?
 
+* Reality check (2026-06-16): visit values, and what plot_labor actually drops
+
+We checked the two multi-visit cases against the raw data before designing
+the =visit= level's VALUES.  Findings:
+
+- *=visit= = date is unsupported by our current data.*  The only multi-visit
+  feature today (GhanaLSS =food_acquired=, GLSS4/5/7) stores visits as WIDE
+  COLUMN ORDINALS (=s9bq{1..6}=, =s8hq{3..8}=, up to ~10 in 1991-92/2005-06);
+  the date of each visit is NOT recorded anywhere in the wave -- only a single
+  household interview date (=g7sec0.ddate/mdate/ydate=) plus an =hhstatus=
+  "all 7 visits" flag.  So =visit= stays an ORDINAL + =<sum>= sentinel; do NOT
+  build date-valued-visit machinery speculatively -- it waits for a feature
+  whose multi-visit data actually carries per-visit dates.
+- *Where per-visit DATES do exist:* the =interview_date= table.  Malawi's
+  household cover records two interview-visit dates (=hh_a23_1/_2= in 2010-11;
+  =interviewdate_v1/_v2= in 2016-17/2019-20 Panel), of which the table
+  currently keeps only Visit 1.  -> Give =interview_date= a =visit= index
+  (ordinal) carrying both dates, default aggregation =first= (= Visit 1).
+  Isolated change: age computation reads the roster's own date columns via
+  =age_handler=, NOT the =interview_date= table, so no consumer breaks.
+- *plot_labor correction (for the parked LSMS+ thread).*  =ag_d47*=/=ag_d48*=
+  are NOT two enumeration visits -- the raw labels are =ag_d47= = non-harvest
+  activities, =ag_d48= = harvesting (an ACTIVITY split; the "two visit columns"
+  comment in =malawi.py= is a misnomer to fix).  So =plot_labor='s =PersonDays=
+  sums over *man/woman/child* x *(non-harvest, harvest)* -- no visit axis.  The
+  detail being discarded is the gendered =man/woman/child= split (the #439
+  LSMS+ data, summed into oblivion) and the activity split.  When we pick up
+  plot_labor/LSMS+, frame it around THOSE axes, not visits.
+
 * Status
 
-Design sketch.  Prerequisite (1) implemented (PR #471); (2)-(5) pending.
-No code beyond (1) yet.
+Design sketch.  Prerequisites: (1) =u=-in-index implemented (PR #471);
+=interview_date= =visit= index in progress (the one place per-visit dates
+exist).  (2)-(5) pending.

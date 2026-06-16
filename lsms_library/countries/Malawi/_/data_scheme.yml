@@ -71,8 +71,28 @@ Data Scheme:
     Expenditure: float
     materialize: make
   interview_date:
-    index: (t, i)
+    # Malawi's panel cover files record TWO interview-visit dates per
+    # household (Visit 1 + a post-harvest Visit 2).  Rather than keep only
+    # Visit 1, both dates are preserved on an ordinal `visit` index level
+    # (1 = first visit, 2 = second visit), melted by the country-level
+    # malawi.interview_date df_edit hook.  This is the first application of
+    # the grain-aggregation-policy design (SkunkWorks/
+    # grain_aggregation_policy.org): preserve the richer survey detail,
+    # aggregate only when the analyst explicitly asks.
+    #   - 2010-11, 2016-17 (Panel), 2019-20 (Panel): visit in {1, 2}.
+    #   - 2004-05 (IHS2, single visit) and the 2016-17 / 2019-20
+    #     Cross_Sectional halves: visit = 1 only (no Visit-2 date recorded).
+    # `visit` is a Malawi-specific extra level on top of the canonical
+    # (t, v, i) grain; v auto-joins from sample() at API time, so the
+    # returned grain is (t, v, i, visit).
+    index: (t, i, visit)
     Int_t: datetime
+    # Forward-looking grain-aggregation policy (nothing reads this yet -- it
+    # documents the intended reduction).  Collapsing the `visit` level takes
+    # the FIRST (Visit-1) date, reproducing the legacy single-date table:
+    #   df.groupby(level=['t','v','i']).first()  ==  visit==1 rows.
+    aggregation:
+      visit: first
   shocks:
     index: (t, i, Shock)
     AffectedIncome: bool

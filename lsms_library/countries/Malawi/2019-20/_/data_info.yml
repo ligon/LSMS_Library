@@ -29,14 +29,20 @@ interview_date:
         - Panel/hh_mod_a_filt_19.dta:
             i: y4_hhid
             int_t: interviewdate_v1
+            int_t_v2: interviewdate_v2
     idxvars:
         i:
             - case_id
             - function: cs_i
     myvars:
-        # Cross_Sectional names the date column 'interviewDate'; the Panel
-        # file uses 'interviewdate_v1' (Visit 1), overridden per-file above.
-        # Both are 'YYYY-MM-DD' strings -> datetime via the Int_t coercion.
+        # Cross_Sectional names the date column 'interviewDate' (single
+        # visit); the Panel file uses 'interviewdate_v1' (Visit 1) +
+        # 'interviewdate_v2' (Visit 2), overridden per-file above.  Both are
+        # 'YYYY-MM-DD' strings -> datetime via the Int_t coercion.  The
+        # cross-sectional half has no Visit 2, so int_t_v2 is requested only
+        # from the Panel file (NaN-filled on concat for the CS rows).  Both
+        # date columns are melted to the `visit` index level by the
+        # country-level malawi.interview_date df_edit hook.
         int_t: interviewDate
 
 cluster_features:
