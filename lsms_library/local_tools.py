@@ -1223,9 +1223,19 @@ def df_from_orgfile(orgfn: str | Path, name: str | None = None, set_columns: boo
     # Get indices of #+name: lines:
     names = [i for i,s in enumerate(contents) if f'#+name: {name}'.lower()==s.strip().lower()]
 
-    if len(names)==0:
-        #warnings.warn(f'No table {name} in {orgfn}.')
+    if name is None:
+        # No table requested: the table is assumed to be the first thing in the
+        # file (modulo leading #+ option lines).  This is the documented
+        # default and the only case in which a missing #+name header is OK.
         start = 0
+    elif len(names)==0:
+        # A specific table was requested but does not exist.  Do NOT silently
+        # fall back to the first table in the file (GH #461): that silently
+        # mis-maps (e.g. an absent harmonize_seed_crop returning the `u` units
+        # table -> every crop labelled with a unit).  Raise a clear KeyError;
+        # both df_data_grabber and get_categorical_mapping already catch it and
+        # continue their search-path / add a contextual note.
+        raise KeyError(f'No table named {name!r} in {orgfn}.')
     elif len(names)>1:
         start = names[0]
         warnings.warn(f'More than one table with {name} in {orgfn}.  Reading first one at line {start}.')
