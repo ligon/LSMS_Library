@@ -1,205 +1,206 @@
-#+TITLE: Grain Aggregation Policy (Design, Not Yet Implemented)
+#+TITLE: Grain Composition: No Aggregation in Core (Design, Partially Implemented)
 #+DATE: 2026-06-16
-#+AUTHOR: Sue
+#+AUTHOR: Sue (with E. Ligon)
 
 * Context
 
 Surveys collect the same concept at different granularities.  One
-country records crop output per /plot/; another reports it per
-/household x crop/ (already summed over plots).  One records food
-acquisition per /visit/ within a wave; another records a single
-recall.  One prices food at the /peasant association/; another only at
-the /woreda/.  If each feature is to compose across countries via
-=ll.Feature(name)()=, these grains must reconcile to a common
-denominator -- WITHOUT discarding the finer detail a richer survey
-actually carries.
+country records crop output per /plot/; another reports /household x
+crop/ (already summed over plots).  One records food acquisition per
+/visit/ within a wave; another a single recall.  One prices food at the
+/peasant association/; another only at the /woreda/.  For a feature to
+compose across countries via =ll.Feature(name)()= these grains must sit
+in one frame -- WITHOUT discarding the detail a richer survey carries.
 
-The GhanaLSS =food_acquired= work solved one instance of this
-elegantly: the raw/wave parquet keeps a country-local =visit= index
-level, and the derived food tables (=food_expenditures=,
-=food_prices=, =food_quantities=) collapse over it so they compose
-with countries that have no =visit=.  The detail survives in the raw
-artifact; the aggregation is imposed only at the composing layer.
+The GhanaLSS =food_acquired= work solved one instance: the raw parquet
+keeps a country-local =visit= level, and the aggregation to a
+visit-free grain happens only in an explicitly-invoked transform.  This
+note generalizes that into a single contract and a single composition
+mechanism.
 
-This note generalizes that pattern into an explicit, per-column
-*grain aggregation policy*:
+This file is a design sketch.  The =u=-in-index prerequisite (below) is
+implemented (PR #471); the composition mechanism is not yet.
+
+* The contract: NO AGGREGATION IN CORE
 
 #+BEGIN_QUOTE
-Raw (wave/country) parquets encode the MAXIMAL grain the survey
-supports.  The canonical (composable) grain is the cross-country
-common denominator declared in =data_info.yml=.  Composition collapses
-the extra raw levels to the canonical grain via a DECLARED per-column
-aggregation -- never via a silent drop.
+The composition/access path -- =country.py= (=_finalize_result= /
+=_normalize_dataframe_index=), =feature.py= (=_harmonize_country_frame=),
+=local_tools= -- NEVER reduces grain.  It returns the MAXIMAL grain the
+instruments support, as a cross-country union with sentinel-filled
+missing levels.  ALL aggregation lives in =transformations.py= and is
+EXPLICITLY invoked (the analyst's own =groupby=, a =collapse(grain=...)=
+convenience, =units='kgvalue'=, the food-derived recipes).
 #+END_QUOTE
 
-This file is a design sketch.  Nothing here is implemented yet.
+"Core" excludes =transformations.py= by definition -- the latter's
+purpose IS aggregation/transformation, always at the analyst's request.
 
-* The keystone: the current generic collapse is lossy
+This is stronger and cleaner than "impose a canonical composable grain":
+it never imposes a grain at all.  =Feature('crop_production')(['Malawi'])=
+returns exactly =Country('Malawi').crop_production()= (plus the =country=
+level) -- the access-path asymmetry disappears because neither path
+aggregates.
 
-Two different collapse mechanisms exist today, and only one is safe:
+Aggregation vs transformation (both opt-in, both in =transformations.py=,
+but distinct):
+- *Aggregation* :: reduces grain (=groupby(...).sum()/median()=).  The
+  analyst's call, or =collapse(grain=...)=.
+- *Transformation* :: does NOT reduce the returned grain -- unit
+  conversion (kg), unit-value / median prices, kinship expansion,
+  spelling normalization, the =v=-join.  Stays available, explicitly
+  invoked.  (Some transforms aggregate INTERNALLY -- the kg-factor
+  inference medians prices, =transformations.py:713-717= -- which is why
+  "no aggregation of ANY sort" overshoots; the contract is about the
+  RETURNED grain never being implicitly reduced.)
 
-- *Generic (unsafe)* :: =country._normalize_dataframe_index= drops an
-  undeclared index level and resolves the resulting duplicates with
-  =groupby().first()= (=country.py= ~3817, the GH #323 path).  This
-  keeps one row per canonical tuple and SILENTLY DISCARDS the rest.
-- *Food-derived (safe)* :: =visit=/=s=/=u= are collapsed in the
-  =_FOOD_DERIVED= transform with an explicit *sum* (=reaggregate=True=).
+* Composition mechanism: union + sentinel-fill
 
-So "automatically summed over when composed" describes the bespoke
-food path, not a general facility.  The generic behavior is a
-=.first()= footgun.  Observed twice recently:
+Cross-country (and cross-wave) assembly takes the UNION of index levels.
+Where a country lacks a finer level another country carries, its rows
+get that level filled with a SENTINEL that names the row's relationship
+to the level -- so every row is self-describing about its aggregation
+state, and the reconciling operation travels in the data.
 
-- =community_prices= collapsed 2691 -> 108 rows (one price per cluster)
-  before the v0.8.x =map_index= fix.
-- The original =food_acquired= duplicate-tuple warning (GH #323).
+Example -- =Feature('crop_production')(['Malawi','EthiopiaRHS'])=:
 
-*The prerequisite for generalizing "max detail in raw" is replacing the
-silent =.first()= with a declared per-column aggregation, and making an
-UNDECLARED extra level loud (warn/refuse) rather than quiet.*  Without
-that, "encode maximal detail" merely multiplies the silent-loss surface.
+#+BEGIN_EXAMPLE
+country  t      v   i     j       u    plot     Quantity  Area_ha
+Malawi   2016  12   77    Maize   kg   1        120.0     0.5
+Malawi   2016  12   77    Maize   kg   2         80.0     0.4
+ERHS     1997   3    5    Maize   Kg   <sum>    400.0     0.5
+#+END_EXAMPLE
 
-* Per-column aggregation policy
-
-The collapse function is, in spirit:
+Malawi =plot= is a real id; ERHS has no plots, so =plot=<sum>= --
+"this value is already the all-plot total."  The analyst chooses the
+grain:
 
 #+BEGIN_SRC python
-result = raw.groupby(canonical_index_levels).agg(per_column_policy)
+# household x crop: Malawi sums across plots; ERHS passes through (identity)
+df.groupby(['country','t','v','i','j','u']).sum()
+# or stay plot-level, or any other grain -- the analyst's call, not the library's
 #+END_SRC
 
-where =canonical_index_levels= INCLUDES =u= (see next section), and the
-policy is per measure:
+Sentinel rules:
+- A RESERVED, stringified token (ids are already format_id strings; the
+  sentinel must not collide with a real level value).
+- Its VALUE names the implicit reconciliation -- ADVISORY, not enforced.
 
-- =sum=    :: additive measures -- Quantity, Expenditure, Area,
-  PersonDays, counts.
-- =median= :: prices.  House practice elsewhere aggregates prices by
-  median; summing prices is meaningless and the mean is less robust.
-- =first=  :: invariants that are constant within the finer level --
-  labels, Tenure, SoilType, etc.
-- (no policy) :: an extra raw level with NO declared policy WARNS (or
-  refuses), instead of =.first()=-dropping.
+** Sentinel vocabulary
 
-** Units need no commensurability -- keep =u= in the group key
+- =<sum>= :: /aggregated up/ from this level.  Detail is gone; you may
+  drop the level (identity) but never disaggregate.  (=plot=, =visit=,
+  =s=.)  In use.
+- =<broadcast>= / =<all>= :: /measured at a coarser level/; the value
+  applies uniformly to every finer unit, so it may be replicated DOWN
+  but was never a sum.  Reserved for the coarser-source case
+  (community_prices: a woreda price over its PAs).  Requires carrying
+  the geographic hierarchy (=woreda > v > i=) as index levels, which we
+  do NOT today -- so this is a FUTURE unification, noted not built.
+  community_prices keeps its explicit broadcast for now.
 
-Because =u= is itself a grouping key, =groupby([... , 'u']).sum()= sums
-the additive measures WITHIN each unit.  Heterogeneous units survive as
-SEPARATE rows; nothing is ever summed across incompatible units.  A
-household that harvested maize in =kg= on one plot and in =bags= on
-another collapses to two rows -- =(.., Maize, kg)= and
-=(.., Maize, bags)= -- which is correct and lossless.
+* The optional collapse convenience
 
-Consequently kg-conversion is NOT a precondition for composition.  It
-is a separate, OPT-IN projection for when the caller explicitly wants a
-single-unit basis -- exactly the existing =units== kwarg family
-(=food_quantities(units='kgs')=, =food_prices(units='kgvalue')=).
-Aggregation is always unit-safe; commensurability is a deliberate
-downstream ask.
-
-* =u= belongs in the canonical index
-
-For =groupby([..., 'u']).agg()= to preserve units, =u= must be a
-grouping key, i.e. an INDEX level -- not a free column.  The codebase
-is currently inconsistent here, and the inconsistencies are bugs:
-
-- =Ethiopia= (ESS) =crop_production= :: =(t, i, plot_id, j, u)= -- u in
-  the index.  Correct.
-- =Malawi= =crop_production= :: =(t, i, plot, crop)= with =u= as a
-  COLUMN.  *Bug.*
-- =EthiopiaRHS= =crop_production= :: declared =(t, i, j)= with =u= a
-  constant ='Kg'= column (PR #467).  *Bug* (degenerate today since u is
-  always Kg, but wrong in principle).
-- =community_prices= (all countries) :: =(t, v, j, u)=.  Correct --
-  already the target shape.
-
-Fixing the two =crop_production= cases to put =u= in the index is a
-concrete, low-risk cleanup that this policy needs anyway.
-
-* Taxonomy of grain differences
-
-Not every cross-country mismatch is an aggregation problem.
-
-- *Nested (this policy applies)* :: the coarser survey's grain is the
-  finer survey's grain summed over one extra level.  =crop_production=:
-  ISA =(t, i, plot, j, u)= vs EthiopiaRHS =(t, i, j, u)= -- =plot= is
-  the new =visit=.  Sum Quantity/Area over =plot= (keeping =u=) and the
-  two compose.  This is the highest-value first application.
-- *Orthogonal (policy does NOT apply)* :: the surveys differ in the
-  KIND of dimension, not the depth.  =plot_inputs=/=plot_labor= (#469):
-  ISA is =(plot, input|source)=; EthiopiaRHS is =(activity, source)= at
-  household grain (plough/weed/harvest), inputs by =crop=.  No
-  aggregation reconciles =plot= with =activity=; this is a genuine
-  schema divergence, documented as blocked.
-- *Coarser source (needs the INVERSE)* :: a survey collected at a
-  grain coarser than canonical.  =community_prices= R1-R4: prices at
-  =woreda=, canonical is =v= (PA).  There is no detail to aggregate
-  down -- it must be BROADCAST (woreda -> its PAs), an imputation, and
-  should arguably be flagged as imputed rather than presented as
-  observed.  Out of scope for the aggregation policy; noted for
-  completeness.
-
-* Proposed schema surface
-
-Declare the policy alongside the canonical index in =data_info.yml=:
+A plain =groupby(...).sum()= is correct only when every column is
+additive.  A feature with mixed columns (a quantity AND a price) needs
+=sum= for one and =median= for the other.  So =transformations.py= offers
+=collapse(df, grain=[...])= (exposed as a =Feature= method / =grain=
+kwarg) that applies a per-column policy declared in =data_info.yml=:
 
 #+BEGIN_SRC yaml
 crop_production:
   Index Info:
-    index_info: (t, v, i, j, u)     # canonical (composable) grain; u IS a level
-  aggregation:                       # how to collapse EXTRA raw levels
+    index_info: (t, v, i, j, u)     # the "natural" composable grain (a HINT
+                                     # for collapse(); NOT imposed on read)
+  aggregation:
     Quantity: sum
-    Area: sum
-    Price: median
-    # invariants -> first; anything with no policy WARNS on collapse
-  # raw parquets may carry extra levels (plot, season, visit, obs);
-  # they are summed/median'd to index_info on read.
+    Area_ha: sum
+    Price: median                    # house practice; transformations.py:713-717
 #+END_SRC
 
-Collapse rule (replacing the =.first()= block in
-=_normalize_dataframe_index=):
+Default is the raw sentinel-union (no aggregation).  =collapse()= is the
+single, explicit place an analyst reduces with the right per-column op --
+saving them from, e.g., =.sum()=-ing a price.
 
-#+BEGIN_SRC python
-extra = [lvl for lvl in df.index.names if lvl not in canonical]
-if extra:
-    policy = aggregation_policy(method_name)      # from data_info.yml
-    unpoliced = [c for c in df.columns if c not in policy]
-    if unpoliced:
-        warnings.warn(f"{method_name}: collapsing over {extra} with no "
-                      f"aggregation policy for {unpoliced}; refusing to "
-                      f".first()-drop (GH #323).")
-    df = df.groupby(level=canonical, observed=True).agg(policy)
-#+END_SRC
+* food_acquired -- the worked example
 
-The =labels=/=reaggregate== kwarg family is already a prototype of this
-on the =j= axis (collapsing food items to =Aggregate=).  This lifts the
-same idea to ANY extra index level, driven by declaration rather than
-bespoke per-feature code.
+=food_acquired= is the one feature whose columns want different
+treatment, and it decomposes cleanly under the contract.
+=Feature('food_acquired')= over a multi-visit + multi-source set returns:
 
-* Applications / first targets
+#+BEGIN_EXAMPLE
+index:   (country, t, v, i, j, u, s, visit)   # s=<sum>, visit=<sum> where absent
+columns: [Quantity, Expenditure, Price]
+#+END_EXAMPLE
 
-1. *Fix =u= placement* in =Malawi= and =EthiopiaRHS= =crop_production=
-   (move =u= into the index).  Low-risk; needed regardless.
-2. *crop_production plot grain* :: carry =plot= in the ISA raw parquets;
-   declare =sum= over =plot=; ERHS (no plot) and ISA then compose at
-   =(t, v, i, j, u)= with no special-casing.
-3. *Generalize the collapse* in =_normalize_dataframe_index= per the
-   rule above; retire the silent =.first()=.
-4. *Audit existing features* for undeclared extra levels currently being
-   =.first()=-dropped (the warning from step 3 surfaces them).
+No aggregation has happened.  The three "derived" views are then:
+- =food_expenditures= :: =groupby(...).Expenditure.sum()=.  PURE
+  aggregation -> dissolves into =collapse()=; stops being a table.
+- =food_quantities= (kg) :: kg-CONVERSION (transformation, core-provided
+  via =units=) THEN sum (=collapse=).
+- =food_prices= :: =Sum(exp)/Sum(qty)= (unit value) or median reported
+  =Price= -- an irreducible DERIVATION =transformations.py= provides
+  (the analyst cannot get a ratio-of-aggregates from one =groupby=).
+
+So the three methods exist because they are three different OPERATIONS;
+the contract sorts them into one pure-aggregation (collapse) and two
+transforms.
+
+* The three reduction sites today (what changes)
+
+Grain reduction already happens in three places with INCONSISTENT
+policies; the contract removes the two in core:
+| site                                            | today                  | under contract |
+|-------------------------------------------------+------------------------+----------------|
+| =country._normalize_dataframe_index= (~3817)    | =groupby().first()=    | union+sentinel (no agg) |
+| =feature._harmonize_country_frame= (88-91)      | =droplevel+.first()=   | union+sentinel (no agg) |
+| =transformations.py= (food/roster derived)      | sum / median (correct) | stays; gains =collapse()= |
+
+Both core =.first()= collapses are the GH #323 / #325 silent-data-loss
+footguns; they become lossless union+sentinel.
+
+* Taxonomy of grain differences
+
+- *Nested* :: coarser survey = finer survey summed over an extra level.
+  =crop_production= plot, =food_acquired= visit/s.  Union + =<sum>=
+  sentinel.  The main case.
+- *Coarser source* :: a survey collected at a grain COARSER than another.
+  community_prices woreda vs PA.  Union + =<broadcast>= sentinel, but
+  needs the geo hierarchy in the index -> future; explicit broadcast for
+  now.
+- *Orthogonal* :: surveys differ in the KIND of dimension, not depth.
+  =plot_inputs= / =plot_labor= (#469): ISA =(plot, source)= vs
+  EthiopiaRHS =(activity, source)= at household grain.  No sentinel
+  reconciles =plot= with =activity= -- genuine schema divergence, stays
+  documented-as-blocked.
+
+* Implementation order
+
+1. [DONE, PR #471] =u= in the canonical index (a grouping key).
+2. Standardize the item level to =j= everywhere (Malawi uses =crop=).
+   PREREQUISITE: =_harmonize_country_frame='s =have_all_canonical= guard
+   (=feature.py:77=) skips reduction when level names differ, so a
+   Malawi+ERHS =crop_production= =Feature= does not even reconcile today.
+3. Flip =_harmonize_country_frame= and =_normalize= from reduce-to-common
+   to expand-to-union + sentinel-fill; retire both =.first()= collapses.
+4. =transformations.collapse(df, grain=, policy=)= + the =data_info.yml=
+   =aggregation:= block; expose as a =Feature= method / =grain= kwarg.
+5. =food_expenditures= becomes a =collapse= recipe; audit features for
+   the now-loud "would have collapsed" cases.
 
 * Open questions
 
-- Where does the aggregation run -- per-country =_finalize_result=, or
-  at =Feature= assembly after the =country= level is prepended?  The
-  food-derived path runs per-country; cross-country composition then
-  concatenates.  A single declared policy should serve both, but the
-  call site needs to be pinned so it runs exactly once.
-- Median over an even count: define the convention (interpolate vs
-  lower) so results are reproducible across pandas versions.
-- Interaction with =cache_hash=: the aggregation policy is a
-  post-read transform (like spellings/kinship), so it should NOT enter
-  the L2 content hash -- the raw parquet is what's cached.  Confirm.
+- Sentinel token: exact reserved spelling (=<sum>=?), and whether it
+  lives in the same dtype as real level values cleanly (ids are strings
+  -> yes).
+- Median over an even count: pin the convention for reproducibility.
+- =cache_hash=: the cached parquet is the maximal-grain union; =collapse=
+  is a post-read transform, so the aggregation policy must NOT enter the
+  L2 content hash.  Confirm.
+- Geographic hierarchy (=woreda > v > i=) for the =<broadcast>= sentinel:
+  worth it, or keep community_prices' explicit broadcast indefinitely?
 
 * Status
 
-Design sketch.  Not implemented.  Depends on no other open work; the
-=u=-placement fixes (target 1) are independently shippable and are the
-natural first step.
+Design sketch.  Prerequisite (1) implemented (PR #471); (2)-(5) pending.
+No code beyond (1) yet.
