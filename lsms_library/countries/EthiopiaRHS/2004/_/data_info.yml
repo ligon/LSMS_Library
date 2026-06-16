@@ -54,9 +54,15 @@ livestock:
         LivestockValue: livval6
         TLU: lsu6
 
-# area_output: HH x crop AREA (ha) + PRODUCTION (kg) totals, 2004 = 9 crops.
-# Source columns {crop}ha04 / {crop}prd04.
-area_output:
+# crop_production (#438): R6 (2004) HH x crop production (kg) + area (ha).
+# Source: area_output_04rev.tab (9 crops: white/black teff, barley, wheat,
+# maize, sorghum, coffee, chat, enset).  Per-crop source columns
+# {stub}prd04 (production, kg) and {stub}ha04 (area, hectares), declared as
+# {stub}_kg / {stub}_ha myvars; the crop_production df_edit hook in
+# _/ethiopiarhs.py melts them to long (i, j).  i = composite (paid, hhid)
+# via the shared ethiopiarhs.i formatter (statically verified, same
+# keyspace as the 1994+ panel).
+crop_production:
     file: area_output_04rev.tab
     converted_categoricals: False
     idxvars:
@@ -64,24 +70,24 @@ area_output:
             - paid
             - hhid
     myvars:
-        WhiteTeff_ha: wtefha04
-        WhiteTeff_kg: wtefprd04
-        BlackTeff_ha: btefha04
-        BlackTeff_kg: btefprd04
-        Barley_ha: barlha04
-        Barley_kg: barlprd04
-        Wheat_ha: whtha04
-        Wheat_kg: whtprd04
-        Maize_ha: maizha04
-        Maize_kg: maizprd04
-        Sorghum_ha: sorgha04
-        Sorghum_kg: sorgprd04
-        Coffee_ha: coffha04
-        Coffee_kg: coffprd04
-        Chat_ha: chatha04
-        Chat_kg: chatprd04
-        Enset_ha: ensetha04
-        Enset_kg: ensetprd04
+        wtef_kg: wtefprd04
+        wtef_ha: wtefha04
+        btef_kg: btefprd04
+        btef_ha: btefha04
+        barl_kg: barlprd04
+        barl_ha: barlha04
+        wht_kg: whtprd04
+        wht_ha: whtha04
+        maiz_kg: maizprd04
+        maiz_ha: maizha04
+        sorg_kg: sorgprd04
+        sorg_ha: sorgha04
+        coff_kg: coffprd04
+        coff_ha: coffha04
+        chat_kg: chatprd04
+        chat_ha: chatha04
+        enset_kg: ensetprd04
+        enset_ha: ensetha04
 
 # Sampling design + cluster geography.  Extracted from the consumption
 # aggregate file (richest HH coverage); v = paid (numeric PA code 1..20).
