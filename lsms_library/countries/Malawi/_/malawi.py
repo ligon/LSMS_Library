@@ -230,6 +230,80 @@ def malawi_date_ymd(row):
     return pd.to_datetime(f"{int(d)} {month} {int(y)}", errors='coerce')
 
 
+def interview_date(df):
+    """Melt Malawi's per-visit interview dates onto a ``visit`` index level.
+
+    Country-level ``df_edit`` hook for the ``interview_date`` table
+    (auto-dispatched by table name; see country.py ``grab_data`` ->
+    ``formatting_functions.get(request)``).  This is the first application
+    of the grain-aggregation-policy design (SkunkWorks/
+    grain_aggregation_policy.org): the raw cover files of Malawi's panel
+    waves record TWO interview-visit dates per household, and we preserve
+    BOTH on an ordinal ``visit`` level rather than discarding Visit 2.
+
+    Input
+    -----
+    df : pd.DataFrame
+        Indexed per the wave's ``idxvars`` (after the framework prepends
+        ``t``, i.e. ``(t, i)``), carrying the Visit-1 interview date in a
+        ``int_t`` / ``Int_t`` column and -- where the wave records a second
+        visit -- the Visit-2 date in ``int_t_v2`` / ``Int_t_v2``.  The
+        column casing depends on whether the canonical ``int_t -> Int_t``
+        rejected-spelling rewrite has run yet (it has NOT at this wave-level
+        hook stage), so both spellings are accepted defensively.
+
+    Output
+    ------
+    pd.DataFrame indexed ``(<original idx>, visit)`` -- i.e. ``(t, i,
+    visit)`` -- with a single ``Int_t`` datetime column.  ``visit`` is an
+    ordinal Int64 level: ``1`` carries the Visit-1 date, ``2`` the Visit-2
+    date.  Visit-2 rows whose date is NaT (households not revisited, the
+    single-visit IHS2 wave, and the IHS4/IHS5 cross-sectional halves which
+    have no Visit 2) are DROPPED -- never fabricated.  A wave with no
+    Visit-2 column simply yields ``visit=1`` rows.
+
+    The framework then prepends ``t`` (already present) and joins ``v``
+    from ``sample()`` at API time, giving the returned grain
+    ``(t, v, i, visit)``.  Collapsing ``visit`` with the declared ``first``
+    aggregation (data_scheme.yml) reproduces the legacy Visit-1-only table.
+    """
+    def _pick(*names):
+        for n in names:
+            if n in df.columns:
+                return n
+        return None
+
+    v1_col = _pick('int_t', 'Int_t')
+    v2_col = _pick('int_t_v2', 'Int_t_v2')
+
+    if v1_col is None:
+        # Nothing to melt (defensive): hand back unchanged.
+        return df
+
+    idx_names = list(df.index.names)
+    flat = df.reset_index()
+
+    pieces = []
+    v1 = flat[idx_names].copy()
+    v1['visit'] = 1
+    v1['Int_t'] = pd.to_datetime(flat[v1_col], errors='coerce')
+    pieces.append(v1)
+
+    if v2_col is not None:
+        v2 = flat[idx_names].copy()
+        v2['visit'] = 2
+        v2['Int_t'] = pd.to_datetime(flat[v2_col], errors='coerce')
+        # Drop households not revisited (no Visit-2 date) -- reported only,
+        # no fabricated visits.
+        v2 = v2[v2['Int_t'].notna()]
+        pieces.append(v2)
+
+    out = pd.concat(pieces, ignore_index=True)
+    out['visit'] = out['visit'].astype('Int64')
+    out = out.set_index(idx_names + ['visit'])
+    return out
+
+
 def harmonize_food_labels(df, level='i'):
     """Apply the cross-wave union of Malawi's harmonize_food map to ``df``.
 

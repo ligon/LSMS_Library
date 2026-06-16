@@ -33,6 +33,18 @@ interview_date:
             - hh_a23a_2
             - hh_a23a_1
             - mapping: malawi_date_ymd
+        # Visit 2, Attempt 1 interview date -- same Day/Month-name/Year
+        # triplet layout one block later in Module A (labelled "Visit 2 -
+        # Interview Date ..." in the source).  hh_a37a_1 = Day, hh_a37a_2 =
+        # Month name, hh_a37a_3 = Year; ~3974 of 4000 panel HH revisited.
+        # Melted to the `visit` index level by malawi.interview_date.
+        # NB the hh_a23b_*/hh_a23c_* columns are Visit-1 re-attempts (NOT
+        # Visit 2), so the Visit-2 date lives in the hh_a37a_* block.
+        int_t_v2:
+            - hh_a37a_3
+            - hh_a37a_2
+            - hh_a37a_1
+            - mapping: malawi_date_ymd
 
 cluster_features:
     dfs:
