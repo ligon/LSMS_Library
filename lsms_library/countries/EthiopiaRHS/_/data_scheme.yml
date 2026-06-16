@@ -120,10 +120,12 @@ Data Scheme:
   # area_output_99 uses a packed-hhid keyspace with ~0.000 overlap vs the
   # 1999 composite sample (documented follow-up; do NOT wire it here).
   crop_production:
-    index: (t, i, j)
+    # u is an INDEX level (grouping key), not a column -- see
+    # SkunkWorks/grain_aggregation_policy.org.  Degenerate here (always 'Kg'),
+    # but the canonical shape carries u in the index uniformly.
+    index: (t, i, j, u)
     Quantity: float        # production, kg harvested
     Area_ha: float         # area planted, hectares (NaN for 1994b R2)
-    u: str                 # constant 'Kg' (production unit)
 
   # anthropometry (#438 Tier-2): individual (t, i, pid) body measures for
   # the four 1994-1997 rounds (R1-R4), from the pooled wide
