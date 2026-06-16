@@ -129,6 +129,27 @@ Data Scheme:
     Enset_ha: float         # 2004 only
     Enset_kg: float         # 2004 only
 
+  # anthropometry (#438 Tier-2): individual (t, i, pid) body measures for
+  # the four 1994-1997 rounds (R1-R4), from the pooled wide
+  # Anthropometry_R1-R4.tab (each wave slices its round's height{r}/weight{r}/
+  # age{r} columns; the `anthropometry` df_edit hook in _/ethiopiarhs.py drops
+  # out-of-round all-NaN rows and converts age years -> Age_months).  Matches
+  # the cross-country anthropometry schema (Ethiopia ESS / Malawi / Uganda):
+  #   Weight (kg), Height (cm), Age_months, Sex (M/F via erhs_sex).
+  # NO MUAC (ERHS records no mid-upper-arm circumference); the WHO z-scores
+  # the source ships (haz/waz/whz) are query-time TRANSFORMS, never stored.
+  # Grain (t, i, pid) aligns with household_roster's (i, pid); v auto-joins
+  # from sample() at API time -> returned grain (t, i, v, pid).  Built via
+  # the ERHS YAML + df_edit path (no materialize: make), like the rest of
+  # this country's features.  DEFERRED: 1989 (no body-measure module) and
+  # 1999/2004/2009 (R5-R7 not in Anthropometry_R1-R4.tab).
+  anthropometry:
+    index: (t, i, pid)
+    Weight: float
+    Height: float
+    Age_months: float
+    Sex: str
+
   # Mali-style clean YAML: extract wide per-source columns; the
   # `food_acquired` df_edit hook in _/ethiopiarhs.py melts them to
   # canonical long form on s. Price is API-derived (food_prices).

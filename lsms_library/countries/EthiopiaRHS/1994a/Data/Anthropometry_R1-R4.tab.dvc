@@ -1,0 +1,5 @@
+outs:
+- md5: c25caca1c5bfd211bb2c4bfcaecef24c
+  size: 4096463
+  hash: md5
+  path: Anthropometry_R1-R4.tab
