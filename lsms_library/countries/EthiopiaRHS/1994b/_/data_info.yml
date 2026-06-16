@@ -96,3 +96,25 @@ cluster_features:
         Woreda:
             - q1c
             - mappings: ['erhs_village_woreda', 'Code', 'Woreda']
+
+# anthropometry (#438 Tier-2): individual (t, i, pid) body measures.
+# 1994b is ROUND 2 of the pooled Anthropometry_R1-R4.tab (height2/weight2/
+# age2).  Keys (q1c, q1d, pid) join the roster keyspace (verified 1.000 HH/
+# person overlap); v auto-joins from sample().  See the 1994a block for the
+# full rationale; the `anthropometry` df_edit hook drops out-of-round
+# all-NaN-measure rows and converts age (years) -> Age_months.
+anthropometry:
+    file: Anthropometry_R1-R4.tab
+    converted_categoricals: False
+    idxvars:
+        i:
+            - q1c
+            - q1d
+        pid: pid
+    myvars:
+        Height: height2
+        Weight: weight2
+        Age_months: age2     # raw YEARS; df_edit hook multiplies by 12
+        Sex:
+            - sex
+            - mappings: ['erhs_sex', 'Code', 'Preferred Label']

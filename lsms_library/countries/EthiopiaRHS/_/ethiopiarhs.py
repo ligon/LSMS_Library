@@ -276,3 +276,42 @@ def area_output(df):
     with no crop area or production at all carries no information -> drop.
     """
     return _drop_all_nan_value_rows(df)
+
+
+def anthropometry(df):
+    """Individual (t, i, pid) body measures, one round-slice per wave (#438).
+
+    Source Anthropometry_R1-R4.tab is a POOLED wide file carrying every
+    measured person across rounds 1-4 in round-suffixed columns; each wave's
+    data_info extracts THAT round's height/weight/age (+ roster sex), so the
+    framework hands this hook a frame indexed (i, pid) with columns
+    [Height, Weight, Age_months, Sex] in which the out-of-round persons (not
+    measured in this round) are all-NaN on the measures.  Two fixes:
+
+    1. Drop the out-of-round rows -- those with NO height/weight/age at all
+       (Sex is roster-sourced and present for everyone, so an all-value-cols
+       drop would keep them; restrict the all-NaN test to the MEASURES).
+    2. ``Age_months`` arrives as raw AGE IN YEARS (the source ``age{r}``
+       column); multiply by 12 to match the cross-country anthropometry
+       convention (Ethiopia ESS / Malawi / Uganda).  ERHS-shipped WHO
+       z-scores (haz/waz/whz) are query-time transforms and are NOT carried.
+
+    NA-index rows (a person with no q1c/q1d/pid) cannot be placed in a
+    household -> dropped (they would fail the sanity no-null-index check).
+    """
+    idx = list(df.index.names)
+    flat = df.reset_index()
+
+    measures = [c for c in ('Height', 'Weight', 'Age_months') if c in flat.columns]
+    flat = flat.dropna(subset=measures, how='all')
+
+    # Age years -> months (cross-country convention).
+    if 'Age_months' in flat.columns:
+        flat['Age_months'] = pd.to_numeric(flat['Age_months'], errors='coerce') * 12
+
+    # Drop rows that cannot be assigned to a (i, pid) cell.
+    for k in idx:
+        flat = flat[flat[k].notna()
+                    & (flat[k].astype('string').str.strip() != '')]
+
+    return flat.set_index(idx)

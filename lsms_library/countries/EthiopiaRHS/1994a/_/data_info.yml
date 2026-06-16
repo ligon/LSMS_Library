@@ -196,3 +196,30 @@ plot_features:
             - mapping:
                 1: True       # Yes
                 2: False      # No
+
+# anthropometry (#438 Tier-2): individual (t, i, pid) body measures.
+# Source Anthropometry_R1-R4.tab is a POOLED wide file -- every measured
+# person across rounds 1-4 in round-suffixed columns (height{r}/weight{r}/
+# age{r}); 1994a is ROUND 1.  Keys (q1c, q1d, pid) sit in the roster
+# keyspace (q1c, hhid==q1d, ind==pid; statically verified 1.000 HH/person
+# overlap vs demo123), so (i, pid) joins household_roster and v auto-joins
+# from sample().  Sex 1/2 -> M/F via erhs_sex (same as the roster).  The
+# `anthropometry` df_edit hook in _/ethiopiarhs.py drops out-of-round
+# all-NaN-measure rows and converts age (years) -> Age_months (the
+# cross-country anthropometry convention; ERHS-shipped z-scores haz/waz/whz
+# are query-time transforms, NOT stored).
+anthropometry:
+    file: Anthropometry_R1-R4.tab
+    converted_categoricals: False
+    idxvars:
+        i:
+            - q1c
+            - q1d
+        pid: pid
+    myvars:
+        Height: height1
+        Weight: weight1
+        Age_months: age1     # raw YEARS; df_edit hook multiplies by 12
+        Sex:
+            - sex
+            - mappings: ['erhs_sex', 'Code', 'Preferred Label']
