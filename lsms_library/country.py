@@ -2230,6 +2230,61 @@ class Country:
             except OSError:
                 pass
 
+    def _assert_built_required_columns(self, df: Any, method_name: str,
+                                       scheme_entry: Any,
+                                       is_script_path: bool) -> None:
+        """Fail loudly if a script-path table is missing a required declared
+        column -- the signature of a stale hashless wave parquet shadowing a
+        wave-script fix (residual cache hazard, GH #479).
+
+        Script-path wave parquets are hashless and historically could silently
+        union a divergent per-era schema (e.g. GhanaLSS ``food_acquired`` served
+        without its declared ``Quantity`` column).  This converts that silent
+        wrong-data outcome into a loud, actionable error.
+
+        Scope and safety:
+        - Only *script-path* tables are checked (built by a ``_/{table}.py``
+          wave script / country concatenator or ``materialize: make``); pure
+          YAML-path tables self-invalidate per-wave and are skipped.
+        - Called POST-``_finalize_result`` (see the call site), so kinship-
+          decomposed columns (``Generation``/``Distance``/``Affinity``, added
+          from ``Relationship`` by ``_expand_kinship``) and the joined ``v``
+          level are already present -- no false positives from finalize-derived
+          fields.
+        - ``optional: true`` columns are exempt (genuinely-unavailable data).
+        A correct build always emits every required declared column -- the same
+        contract ``test_declared_columns_present`` enforces -- so this never
+        breaks a healthy build; it only fires on a malformed (stale-cache) one.
+        """
+        if not is_script_path or not isinstance(df, pd.DataFrame):
+            return
+        if not isinstance(scheme_entry, dict):
+            return
+        # Parse declared (non-optional) columns exactly as diagnostics /
+        # test_declared_columns_present do (skip index/materialize/etc. keys).
+        _skip = {"index", "materialize", "backend", "aggregation"}
+        required = [
+            k for k, v in scheme_entry.items()
+            if isinstance(k, str) and k not in _skip
+            and not (isinstance(v, dict) and v.get("optional"))
+        ]
+        present = set(map(str, df.columns)) | set(
+            n for n in df.index.names if n is not None
+        )
+        missing = [c for c in required if c not in present]
+        if missing:
+            raise RuntimeError(
+                f"{self.name}/{method_name}: freshly-built table is missing "
+                f"required declared column(s) {missing} (built columns: "
+                f"{sorted(map(str, df.columns))}). For a script-path table "
+                f"this almost always means a STALE script-written wave "
+                f"parquet shadowed a wave-script fix (residual cache hazard, "
+                f"GH #479) -- run `lsms-library cache clear --country "
+                f"{self.name}` and rebuild. If the column is genuinely "
+                f"unavailable for this country, mark it `optional: true` in "
+                f"{self.name}/_/data_scheme.yml."
+            )
+
     def _aggregate_wave_data(self, waves: list[str] | None = None, method_name: str | None = None,
                              currency: str | None = None) -> pd.DataFrame | dict[str, Any]:
         """Aggregates data across multiple waves using a single dataset method.
@@ -2641,12 +2696,10 @@ class Country:
                         f"v0.8.0 cache STALE: {method_name} at {cache_path}; "
                         f"rebuilding from source"
                     )
-                    # Hashless (script-written) L2-wave parquets can't
-                    # self-invalidate; evict them so the rebuild descent
-                    # re-runs Make/the script instead of reusing stale
-                    # data (CRITICAL-2).  Stamped YAML-path wave parquets
-                    # are left to self-invalidate per-wave.
-                    self._evict_hashless_wave_caches(method_name)
+                    # Eviction of hashless (script-written) wave parquets now
+                    # happens once, just before the rebuild descent below, so
+                    # it also covers the country-parquet-absent and
+                    # LSMS_NO_CACHE paths (residual F1, GH #479).
                 else:
                     try:
                         cached_df = get_dataframe(cache_path)
@@ -2673,6 +2726,23 @@ class Country:
                             category=UserWarning,
                             stacklevel=2,
                         )
+
+            # About to rebuild: every fall-through to here is a (re)build path
+            # -- cache stale, cache absent, LSMS_NO_CACHE, or a failed cache
+            # read.  Hashless (script-written) L2-wave parquets can't
+            # self-invalidate, so evict them now; the rebuild descent below
+            # (load_from_waves -> run_make_target) then re-runs Make/the script
+            # from source instead of reusing a stale wave parquet.  Closes
+            # residual F1 (GH #479): eviction previously fired ONLY in the
+            # `freshness == "stale"` branch above, so a PARTIAL cache (wave
+            # parquets present but the country parquet never materialized) --
+            # and likewise an LSMS_NO_CACHE run, for which script-path waves are
+            # "soft" -- silently served stale hashless wave data.  Stamped
+            # YAML-path wave parquets self-invalidate per-wave and are left
+            # untouched by the evictor.  The warm path already returned above,
+            # so this never runs on a cache hit; for tables with no hashless
+            # wave parquets it is a cheap directory-glob no-op.
+            self._evict_hashless_wave_caches(method_name)
 
             dvc_root = self.file_path.parent
 
@@ -2870,7 +2940,22 @@ class Country:
                 # the issues tracker before the exception propagates.
                 _log_issue(self.name, method_name, waves, error)
                 raise
-        return self._finalize_result(df, scheme_entry, method_name, currency=currency)
+        result = self._finalize_result(df, scheme_entry, method_name, currency=currency)
+        # Loud schema gate (GH #479): for script-path tables (whose hashless
+        # wave parquets can shadow a wave-script fix), fail with an actionable
+        # message if a required declared column is missing post-finalize, rather
+        # than silently returning wrong data.  ``materialize_backend`` is an
+        # unreliable signal -- GhanaLSS food_acquired is script-built via the
+        # wave-script fallback + a ``_/food_acquired.py`` concatenator yet
+        # declares no ``materialize: make`` -- so we also treat the presence of
+        # a country-level ``_/{table}.py`` concatenator as script-path.
+        is_script_path = (
+            materialize_backend == "make"
+            or (self.file_path / "_" / f"{method_name}.py").exists()
+        )
+        self._assert_built_required_columns(result, method_name, scheme_entry,
+                                            is_script_path)
+        return result
 
     def _compute_panel_ids(self) -> None:
         """
