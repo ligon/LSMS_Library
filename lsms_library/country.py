@@ -48,6 +48,7 @@ from .local_tools import (
 )
 from .paths import data_root, countries_root
 from .yaml_utils import load_yaml
+from .currency import attach_currency, is_monetary_table
 import importlib.util
 import hashlib
 import logging
@@ -2002,10 +2003,17 @@ class Country:
         result.attrs = dict(df.attrs)
         return result
 
-    def _finalize_result(self, df: Any, scheme_entry: dict[str, Any], method_name: str) -> pd.DataFrame | dict[str, Any]:
+    def _finalize_result(self, df: Any, scheme_entry: dict[str, Any], method_name: str,
+                         currency: str | None = None) -> pd.DataFrame | dict[str, Any]:
         """
         Apply final harmonization steps (index augmentation, normalization, id walk)
         before returning a dataset to callers.
+
+        ``currency`` (``'index'`` / ``'column'`` / ``None``) optionally attaches
+        the ISO 4217 currency label to monetary tables; see
+        :func:`lsms_library.currency.attach_currency`.  Applied last so it sits
+        on the fully-finalized frame and is preserved by the downstream
+        ``_relabel_j`` / ``_add_market_index`` steps in the caller.
         """
         if isinstance(df, dict):
             return df
@@ -2116,6 +2124,11 @@ class Country:
             # the universal safety-net.
             df = df.dropna(how='all')
 
+            # Attach the ISO 4217 currency label (last, so it rides through the
+            # caller's _relabel_j / _add_market_index without being dropped).
+            if currency is not None and method_name and not df.empty:
+                df = attach_currency(df, self.name, method_name, mode=currency)
+
         return df
 
     def _table_cache_hash(self, method_name: str, waves: list[str]) -> str | None:
@@ -2217,11 +2230,15 @@ class Country:
             except OSError:
                 pass
 
-    def _aggregate_wave_data(self, waves: list[str] | None = None, method_name: str | None = None) -> pd.DataFrame | dict[str, Any]:
+    def _aggregate_wave_data(self, waves: list[str] | None = None, method_name: str | None = None,
+                             currency: str | None = None) -> pd.DataFrame | dict[str, Any]:
         """Aggregates data across multiple waves using a single dataset method.
 
         If the required `.parquet` file is missing, it requests `Makefile` to
         generate only that file.
+
+        ``currency`` is forwarded to :meth:`_finalize_result` to optionally
+        attach the ISO 4217 currency label (monetary tables only).
         """
         if method_name not in self.data_scheme+['other_features', 'food_prices_quantities_and_expenditures', 'updated_ids']:
             warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
@@ -2243,7 +2260,7 @@ class Country:
             if parquet_path.exists():
                 df_cached = get_dataframe(parquet_path)
                 df_cached = map_index(df_cached)
-                return self._finalize_result(df_cached, scheme_entry, method_name)
+                return self._finalize_result(df_cached, scheme_entry, method_name, currency=currency)
 
         if (
             not self._panel_ids_attempted
@@ -2853,7 +2870,7 @@ class Country:
                 # the issues tracker before the exception propagates.
                 _log_issue(self.name, method_name, waves, error)
                 raise
-        return self._finalize_result(df, scheme_entry, method_name)
+        return self._finalize_result(df, scheme_entry, method_name, currency=currency)
 
     def _compute_panel_ids(self) -> None:
         """
@@ -3153,7 +3170,7 @@ class Country:
 
         if name in self.data_scheme or name in self._FOOD_DERIVED or name in self._ROSTER_DERIVED:
             def method(waves=None, market=None, labels='Preferred', age_cuts=None,
-                       units=None, volume_as_mass=True):
+                       units=None, volume_as_mass=True, currency=None):
                 if age_cuts is not None and name not in self._ROSTER_DERIVED:
                     raise TypeError(
                         f"{name}() got an unexpected keyword argument 'age_cuts'; "
@@ -3171,6 +3188,17 @@ class Country:
                         f"{name}() got an unexpected keyword argument 'volume_as_mass'; "
                         "only 'food_prices' and 'food_quantities' accept it."
                     )
+                if currency is not None:
+                    if currency not in {'index', 'column'}:
+                        raise ValueError(
+                            f"{name}() currency= must be 'index', 'column', or None; "
+                            f"got {currency!r}"
+                        )
+                    if not is_monetary_table(name, self.name):
+                        raise TypeError(
+                            f"{name}() got an unexpected keyword argument 'currency'; "
+                            "only tables with monetary columns accept it."
+                        )
                 # For derived food tables, try deriving from food_acquired first
                 # before falling back to wave-level scripts / make
                 if (name in self._FOOD_DERIVED
@@ -3194,7 +3222,8 @@ class Country:
                         if isinstance(fa, pd.DataFrame) and not fa.empty:
                             derived = transform_fn(fa, **transform_kwargs)
                             scheme_entry = self._materialization_entry(name)
-                            derived = self._finalize_result(derived, scheme_entry, name)
+                            derived = self._finalize_result(derived, scheme_entry, name,
+                                                            currency=currency)
                     except (FileNotFoundError, KeyError, ValueError, RuntimeError) as exc:
                         if units is not None:
                             # Caller explicitly asked for canonical units= behaviour;
@@ -3240,7 +3269,7 @@ class Country:
                             "Deriving %s from household_roster failed (%s); "
                             "falling back to legacy aggregation", name, exc)
 
-                result = self._aggregate_wave_data(waves, name)
+                result = self._aggregate_wave_data(waves, name, currency=currency)
                 # Apply relabeling to any table with a j index level
                 if (isinstance(result, pd.DataFrame) and not result.empty
                         and 'j' in (result.index.names or [])):
@@ -3313,6 +3342,17 @@ class Country:
                     "    compact labels ``00-03``, ``04-08``, …, ``51+``.\n"
                     "    Fractional breakpoints (e.g. ``(0.5, 1, 5)``) are\n"
                     "    allowed and trigger explicit ``[lo, hi)`` labels.\n"
+                )
+            if is_monetary_table(name, self.name):
+                doc_parts.append(
+                    "currency : {'index', 'column'}, optional\n"
+                    "    Attach the ISO 4217 currency code (resolved per wave,\n"
+                    "    e.g. UGX, NGN, XOF; GhanaLSS 2005-06 -> GHC vs 2016-17\n"
+                    "    -> GHS) to this monetary table.  ``'index'`` appends a\n"
+                    "    ``currency`` index level; ``'column'`` adds a column.\n"
+                    "    Defaults to ``None`` (omit) for single-country calls;\n"
+                    "    ``Feature(...)`` defaults to ``'index'``.  See\n"
+                    "    :func:`lsms_library.currency.attach_currency`.\n"
                 )
             method.__doc__ = "".join(doc_parts)
             method.__name__ = name
