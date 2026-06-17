@@ -143,3 +143,19 @@
 | Other 2 (specify)                                           | Other             |
 | other                                                       | Other             |
 | Other                                                       | Other             |
+| Air conditioner                                             | Air Conditioner   |
+| Air Conditioner                                             | Air Conditioner   |
+| Parabolic antenna/decoder                                   | Satellite Dish    |
+| Satellite Dish                                              | Satellite Dish    |
+| Musical Instrument                                          | Musical Instrument |
+| Guitar                                                      | Musical Instrument |
+| Piano                                                       | Musical Instrument |
+| Carpet                                                      | Carpet            |
+| Rug                                                         | Carpet            |
+| Gas Cylinder                                                | Gas Cylinder      |
+| Gas bottle                                                  | Gas Cylinder      |
+
+# GH #168 global-vocab extension (rows above): precise canonicals for items
+# previously bucketed coarsely (Air Conditioner<-Appliances, Satellite Dish<-
+# Electronics, Musical Instrument/Carpet/Gas Cylinder<-Other). English/canonical
+# variants here; French/Portuguese variants re-mapped in the per-country tables.

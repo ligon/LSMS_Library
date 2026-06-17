@@ -338,9 +338,9 @@
 #+name: harmonize_assets
 | Original Label                                        | Preferred Label |
 |-------------------------------------------------------+-----------------|
-| Antena parabólica/descodificador                      | Electronics     |
+| Antena parabólica/descodificador                      | Satellite Dish  |
 | Aparelhagem de estereofonia                           | DVD/CD Player   |
-| Aparelhos de ar condicionado/splits                   | Appliances      |
+| Aparelhos de ar condicionado/splits                   | Air Conditioner |
 | Armários e outros móveis                              | Furniture       |
 | Aspirador                                             | Appliances      |
 | Bicicleta                                             | Bicycle         |
@@ -359,10 +359,10 @@
 | Fogão elétrico ou a gás                               | Cooker          |
 | Forno micro-ondas ou elétrico                         | Cooker          |
 | Frigorífico                                           | Refrigerator    |
-| Garrafa de gás                                        | Other           |
+| Garrafa de gás                                        | Gas Cylinder    |
 | Gravador vídeo/CD/DVD                                 | DVD/CD Player   |
 | Grupo gerador                                         | Generator       |
-| Guitarra                                              | Other           |
+| Guitarra                                              | Musical Instrument |
 | Impressora/fax                                        | Electronics     |
 | Imóvel/casa                                           | House           |
 | Lareiras melhoradas                                   | Cooker          |
@@ -370,12 +370,12 @@
 | Misturador/máquina de sumos não elétrica              | Appliances      |
 | Máquina de lavar roupa, máquina de secar              | Washing Machine |
 | Máquina fotográfica                                   | Camera          |
-| Piano e outros instrumentos musicais                  | Other           |
+| Piano e outros instrumentos musicais                  | Musical Instrument |
 | Piroga e motor fora de bordo (barcos de recreio)      | Boat            |
 | Robô de cozinha elétrico (Trituradora)                | Appliances      |
 | Rádio simples/leitor de cassetes                      | Radio           |
 | Tablet                                                | Computer        |
-| Tapetes                                               | Other           |
+| Tapetes                                               | Carpet          |
 | Telefone fixo                                         | Phone (Landline) |
 | Telemóvel                                             | Phone (Mobile)  |
 | Televisor                                             | TV              |

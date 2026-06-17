@@ -1124,8 +1124,8 @@
 | Original Label                                 | Preferred Label |
 |------------------------------------------------+-----------------|
 | 166                                            | Other           |
-| Air conditioner                                | Appliances      |
-| Antenne parabolique / décodeur                 | Electronics     |
+| Air conditioner                                | Air Conditioner |
+| Antenne parabolique / décodeur                 | Satellite Dish  |
 | Appareil TV                                    | TV              |
 | Appareil photo                                 | Camera          |
 | Armchair                                       | Furniture       |
@@ -1134,16 +1134,16 @@
 | Autres meubles                                 | Furniture       |
 | Bed and mattress                               | Bed             |
 | Bicyclette                                     | Bicycle         |
-| Bonbonne de gaz                                | Other           |
+| Bonbonne de gaz                                | Gas Cylinder    |
 | Brouette                                       | Wheelbarrow     |
 | Camera                                         | Camera          |
 | Camescope                                      | Camera          |
 | Caméra Vidéo                                   | Camera          |
 | Chaise                                         | Furniture       |
 | Chaîne Hi Fi                                   | DVD/CD Player   |
-| Climatiseur/Split                              | Appliances      |
-| Climatiseurs/Splits amovibles                  | Appliances      |
-| Climatiseurs/splits                            | Appliances      |
+| Climatiseur/Split                              | Air Conditioner |
+| Climatiseurs/Splits amovibles                  | Air Conditioner |
+| Climatiseurs/splits                            | Air Conditioner |
 | Computer                                       | Computer        |
 | Congélateur                                    | Freezer         |
 | Cuisinière à gaz                               | Gas Cooker      |
@@ -1163,11 +1163,11 @@
 | Gas stove                                      | Gas Cooker      |
 | Generator                                      | Generator       |
 | Groupe électrogène                             | Generator       |
-| Guitare                                        | Other           |
+| Guitare                                        | Musical Instrument |
 | Immeuble/Maison                                | House           |
 | Imprimante/Fax                                 | Electronics     |
 | Improved stove                                 | Cooker          |
-| Instrument de musique                          | Other           |
+| Instrument de musique                          | Musical Instrument |
 | Iron                                           | Iron            |
 | Landline Telephone                             | Phone (Landline) |
 | Lave-linge, sèche linge                        | Washing Machine |
@@ -1182,12 +1182,12 @@
 | Motocycle                                      | Motorcycle      |
 | Moulinex/Food processor                        | Appliances      |
 | Moulinex/Robot de cuisine                      | Appliances      |
-| Musical Instrument                             | Other           |
+| Musical Instrument                             | Musical Instrument |
 | Oil stove                                      | Kerosene Cooker |
 | Ordinateur                                     | Computer        |
 | Other furniture                                | Furniture       |
-| Parabolic antenna/decoder                      | Electronics     |
-| Piano et autre appareil de musique             | Other           |
+| Parabolic antenna/decoder                      | Satellite Dish  |
+| Piano et autre appareil de musique             | Musical Instrument |
 | Pirogue et hors-bord (bateaux de plaisance)    | Boat            |
 | Portable telephone                             | Phone (Mobile)  |
 | Private car(not used for business)             | Car             |
@@ -1210,7 +1210,7 @@
 | Table à manger complet (table + chaises)       | Furniture       |
 | Tablette                                       | Computer        |
 | Tape player/CD/DVD                             | DVD/CD Player   |
-| Tapis                                          | Other           |
+| Tapis                                          | Carpet          |
 | Television set                                 | TV              |
 | Terrain non bâti                               | Land            |
 | Tondeuse à gazon et autre article de jardinage | Other           |

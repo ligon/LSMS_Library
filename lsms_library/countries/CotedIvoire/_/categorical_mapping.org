@@ -427,17 +427,17 @@
 #+name: harmonize_assets
 | Original Label                                 | Preferred Label |
 |------------------------------------------------+-----------------|
-| Antenne parabolique / décodeur                 | Electronics     |
+| Antenne parabolique / décodeur                 | Satellite Dish  |
 | Appareil TV                                    | TV              |
 | Appareil photo                                 | Camera          |
 | Armoires et autres meubles                     | Furniture       |
 | Aspirateur                                     | Appliances      |
 | Bicyclette                                     | Bicycle         |
-| Bonbonne de gaz                                | Other           |
+| Bonbonne de gaz                                | Gas Cylinder    |
 | Camescope                                      | Camera          |
 | Caméra Vidéo                                   | Camera          |
 | Chaîne Hi Fi                                   | DVD/CD Player   |
-| Climatiseurs/splits                            | Appliances      |
+| Climatiseurs/splits                            | Air Conditioner |
 | Congélateur                                    | Freezer         |
 | Cuisinière à gaz ou électrique                 | Cooker          |
 | Cyclomoteur/Vélomoteur, motocyclette           | Motorcycle      |
@@ -447,7 +447,7 @@
 | Foyers améliorés                               | Cooker          |
 | Fusils de chasse                               | Other           |
 | Groupe électrogène                             | Generator       |
-| Guitare                                        | Other           |
+| Guitare                                        | Musical Instrument |
 | Immeuble/Maison                                | House           |
 | Imprimante/Fax                                 | Electronics     |
 | Lave-linge, sèche linge                        | Washing Machine |
@@ -456,7 +456,7 @@
 | Matelas simple                                 | Mattress        |
 | Mixeur/Presse-fruits non électrique            | Appliances      |
 | Ordinateur                                     | Computer        |
-| Piano et autre appareil de musique             | Other           |
+| Piano et autre appareil de musique             | Musical Instrument |
 | Pirogue et hors-bord (bateaux de plaisance)    | Boat            |
 | Radio simple/Radiocassette                     | Radio           |
 | Robot de cuisine électrique (Moulinex)         | Appliances      |
@@ -465,7 +465,7 @@
 | Salon  (Fauteuils et table basse)              | Furniture       |
 | Table à manger  (table + chaises)              | Furniture       |
 | Tablette                                       | Computer        |
-| Tapis                                          | Other           |
+| Tapis                                          | Carpet          |
 | Terrain non bâti                               | Land            |
 | Tondeuse à gazon et autre article de jardinage | Other           |
 | Téléphone fixe                                 | Phone (Landline) |
