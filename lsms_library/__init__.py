@@ -80,6 +80,12 @@ Environment variables
 - ``LSMS_BUILD_BACKEND=make`` — force rebuild from source, bypassing
   both the cache and the DVC stage layer.
 - ``LSMS_SKIP_AUTH`` — suppress the import-time authentication attempt.
+- ``LSMS_MAKE_JOBS`` — make ``-j`` parallelism for source rebuilds
+  (default ``cpu_count // 2``). A country build runs one wave build per
+  job, i.e. that many concurrent large S3 fetches; set ``LSMS_MAKE_JOBS=1``
+  to serialize them on hosts where concurrent multipart reads are flaky.
+- ``LSMS_FETCH_ATTEMPTS`` — retry budget (default ``3``) for a single
+  blob's S3 fetch on a transient TLS error before falling back to streaming.
 
 Further reading
 ---------------
