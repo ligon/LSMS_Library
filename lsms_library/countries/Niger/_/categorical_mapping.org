@@ -1117,3 +1117,109 @@
 |    9 | Chicken         |
 |   10 | Guinea Fowl     |
 |   11 | Other Poultry   |
+
+# harmonize_assets (GH #168): per-country delta on top of the global
+# categorical_mapping/harmonize_assets.org base (row-additive merge).
+#+name: harmonize_assets
+| Original Label                                 | Preferred Label |
+|------------------------------------------------+-----------------|
+| 166                                            | Other           |
+| Air conditioner                                | Appliances      |
+| Antenne parabolique / décodeur                 | Electronics     |
+| Appareil TV                                    | TV              |
+| Appareil photo                                 | Camera          |
+| Armchair                                       | Furniture       |
+| Armoires et autres meubles                     | Furniture       |
+| Aspirateur                                     | Appliances      |
+| Autres meubles                                 | Furniture       |
+| Bed and mattress                               | Bed             |
+| Bicyclette                                     | Bicycle         |
+| Bonbonne de gaz                                | Other           |
+| Brouette                                       | Wheelbarrow     |
+| Camera                                         | Camera          |
+| Camescope                                      | Camera          |
+| Caméra Vidéo                                   | Camera          |
+| Chaise                                         | Furniture       |
+| Chaîne Hi Fi                                   | DVD/CD Player   |
+| Climatiseur/Split                              | Appliances      |
+| Climatiseurs/Splits amovibles                  | Appliances      |
+| Climatiseurs/splits                            | Appliances      |
+| Computer                                       | Computer        |
+| Congélateur                                    | Freezer         |
+| Cuisinière à gaz                               | Gas Cooker      |
+| Cuisinière à gaz ou électrique                 | Cooker          |
+| Cyclomoteur/Vélomoteur                         | Motorcycle      |
+| Cyclomoteur/Vélomoteur, motocyclette           | Motorcycle      |
+| Dining table and chairs                        | Furniture       |
+| Fan                                            | Fan             |
+| Fauteuil                                       | Furniture       |
+| Fer à repasser                                 | Iron            |
+| Fer à repasser à charbon                       | Iron            |
+| Fer à repasser électrique                      | Iron            |
+| Four à micro-onde ou électrique                | Cooker          |
+| Foyers améliorés                               | Cooker          |
+| Fusils de chasse                               | Other           |
+| Gas Cooker                                     | Gas Cooker      |
+| Gas stove                                      | Gas Cooker      |
+| Generator                                      | Generator       |
+| Groupe électrogène                             | Generator       |
+| Guitare                                        | Other           |
+| Immeuble/Maison                                | House           |
+| Imprimante/Fax                                 | Electronics     |
+| Improved stove                                 | Cooker          |
+| Instrument de musique                          | Other           |
+| Iron                                           | Iron            |
+| Landline Telephone                             | Phone (Landline) |
+| Lave-linge, sèche linge                        | Washing Machine |
+| Lit                                            | Bed             |
+| Lit + Matelas                                  | Bed             |
+| Lit simple                                     | Bed             |
+| Living room set                                | Furniture       |
+| Machine à coudre                               | Sewing Machine  |
+| Magnétoscope/CD/DVD                            | DVD/CD Player   |
+| Matelas simple                                 | Mattress        |
+| Mixeur/Presse-fruits non électrique            | Appliances      |
+| Motocycle                                      | Motorcycle      |
+| Moulinex/Food processor                        | Appliances      |
+| Moulinex/Robot de cuisine                      | Appliances      |
+| Musical Instrument                             | Other           |
+| Oil stove                                      | Kerosene Cooker |
+| Ordinateur                                     | Computer        |
+| Other furniture                                | Furniture       |
+| Parabolic antenna/decoder                      | Electronics     |
+| Piano et autre appareil de musique             | Other           |
+| Pirogue et hors-bord (bateaux de plaisance)    | Boat            |
+| Portable telephone                             | Phone (Mobile)  |
+| Private car(not used for business)             | Car             |
+| Radio simple/Radiocassette                     | Radio           |
+| Refrigerator/freezer                           | Refrigerator    |
+| Robot de cuisine électrique (Moulinex)         | Appliances      |
+| Réchaud (plaque) à gaz ou électrique           | Cooker          |
+| Réchaud à gaz                                  | Gas Cooker      |
+| Réchaud à pétrole                              | Kerosene Cooker |
+| Réfrigérateur                                  | Refrigerator    |
+| Réfrigérateur/Congélateur                      | Refrigerator    |
+| Salon  (Fauteuils et table basse)              | Furniture       |
+| Salon complet (Fauteuils et table basse)       | Furniture       |
+| Sewing machine                                 | Sewing Machine  |
+| Simple bed                                     | Bed             |
+| Simple mattress                                | Mattress        |
+| Simple radio/Radio cassette                    | Radio           |
+| Table                                          | Furniture       |
+| Table à manger  (table + chaises)              | Furniture       |
+| Table à manger complet (table + chaises)       | Furniture       |
+| Tablette                                       | Computer        |
+| Tape player/CD/DVD                             | DVD/CD Player   |
+| Tapis                                          | Other           |
+| Television set                                 | TV              |
+| Terrain non bâti                               | Land            |
+| Tondeuse à gazon et autre article de jardinage | Other           |
+| Téléphone fixe                                 | Phone (Landline) |
+| Téléphone portable                             | Phone (Mobile)  |
+| Ventilateur                                    | Fan             |
+| Ventilateur sur pied                           | Fan             |
+| Video Camera                                   | Camera          |
+| Voiture personnelle                            | Car             |
+| Voiture privée (hors voiture de fonction)      | Car             |
+| Wheelbarrow                                    | Wheelbarrow     |
+| chair                                          | Furniture       |
