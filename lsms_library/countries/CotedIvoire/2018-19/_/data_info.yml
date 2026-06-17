@@ -327,4 +327,10 @@ interview_date:
             - grappe
             - menage
     myvars:
-        Int_t: s00q23a
+        # q23/q24/q25 a/b = visits 1/2/3 start/end
+        int_start:    s00q23a
+        int_end:      s00q23b
+        int_start_v2: s00q24a
+        int_end_v2:   s00q24b
+        int_start_v3: s00q25a
+        int_end_v3:   s00q25b

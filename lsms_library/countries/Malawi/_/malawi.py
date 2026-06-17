@@ -14,7 +14,7 @@ import numpy as np
 import re
 import sys
 sys.path.append('../../../_/')
-from lsms_library.local_tools import conversion_table_matching_global, format_id
+from lsms_library.local_tools import conversion_table_matching_global, format_id, melt_visit_intervals
 
 
 def _extract_kg_conversion(series):
@@ -266,42 +266,14 @@ def interview_date(df):
     from ``sample()`` at API time, giving the returned grain
     ``(t, v, i, visit)``.  Collapsing ``visit`` with the declared ``first``
     aggregation (data_scheme.yml) reproduces the legacy Visit-1-only table.
+
+    Implementation delegates to the shared
+    :func:`lsms_library.local_tools.melt_visit_intervals` helper.  Malawi
+    records only an interview *date* per visit (no separate start/end), so we
+    pass ``start_base='int_t'`` and keep the legacy ``Int_t`` output column;
+    the EHCVM family reuses the same helper with start/end timestamps.
     """
-    def _pick(*names):
-        for n in names:
-            if n in df.columns:
-                return n
-        return None
-
-    v1_col = _pick('int_t', 'Int_t')
-    v2_col = _pick('int_t_v2', 'Int_t_v2')
-
-    if v1_col is None:
-        # Nothing to melt (defensive): hand back unchanged.
-        return df
-
-    idx_names = list(df.index.names)
-    flat = df.reset_index()
-
-    pieces = []
-    v1 = flat[idx_names].copy()
-    v1['visit'] = 1
-    v1['Int_t'] = pd.to_datetime(flat[v1_col], errors='coerce')
-    pieces.append(v1)
-
-    if v2_col is not None:
-        v2 = flat[idx_names].copy()
-        v2['visit'] = 2
-        v2['Int_t'] = pd.to_datetime(flat[v2_col], errors='coerce')
-        # Drop households not revisited (no Visit-2 date) -- reported only,
-        # no fabricated visits.
-        v2 = v2[v2['Int_t'].notna()]
-        pieces.append(v2)
-
-    out = pd.concat(pieces, ignore_index=True)
-    out['visit'] = out['visit'].astype('Int64')
-    out = out.set_index(idx_names + ['visit'])
-    return out
+    return melt_visit_intervals(df, start_base='int_t', out_start='Int_t')
 
 
 def harmonize_food_labels(df, level='i'):

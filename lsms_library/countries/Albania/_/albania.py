@@ -95,6 +95,101 @@ _SOIL = {
 }
 
 
+def albania_date_ymd(row):
+    """Combine a [year, month, day] row into a Timestamp.
+
+    Used by the ``interview_date`` table.  Albania's cover files record the
+    fieldwork interview date as three separate numeric columns -- "Day /
+    Month / Year of Interview" (2002 ``m0_q08d/m/y``, 2005 ``m0_q8d/m/y``)
+    or "date of enumeration (day/month/year)" (2004 ``m0_q04d/m/y``).
+    Declare the columns in **year, month, day** order in the wave's
+    data_info.yml ``int_t`` myvar with a trailing
+    ``mapping: albania_date_ymd``.
+
+    The month component is numeric (e.g. ``5``); it is handled by building a
+    'DAY MONTH YEAR' string and letting ``pd.to_datetime`` parse it (a name
+    like 'MAY' would also work).  Returns ``pd.NaT`` when any part is missing
+    or the date is unparseable -- so households with no recorded interview
+    date (e.g. an empty Visit-2 column) drop out rather than being fabricated.
+
+    The cover files load with ``convert_categoricals=True``, so a numeric
+    cell with no Stata value label can arrive as the sentinel string
+    ``'***Undefined Label'`` (and day/year as label-typed objects); each
+    component is therefore coerced with ``pd.to_numeric`` and any
+    non-numeric / undefined value yields ``pd.NaT`` rather than raising.
+
+    Mirrors :func:`lsms_library.countries.Malawi._.malawi.malawi_date_ymd`.
+    """
+    y, m, d = row.iloc[0], row.iloc[1], row.iloc[2]
+    if pd.isna(y) or pd.isna(m) or pd.isna(d):
+        return pd.NaT
+    # Year and day are always numeric calendar components; coerce defensively
+    # (categorical-label objects / '***Undefined Label' sentinels -> NaT).
+    y_num = pd.to_numeric(y, errors='coerce')
+    d_num = pd.to_numeric(d, errors='coerce')
+    if pd.isna(y_num) or pd.isna(d_num):
+        return pd.NaT
+    # Month may be a numeric code (5 / 5.0) or an English name ('MAY').
+    # A numeric month is parsed with an explicit %Y-%m-%d format so a string
+    # like '4 5 2002' is never mis-read as April-5 (the day/month order of a
+    # bare 'D M Y' string is ambiguous to pd.to_datetime); a month *name*
+    # ('MAY') is unambiguous and is parsed without a format.
+    m_num = pd.to_numeric(m, errors='coerce')
+    if pd.notna(m_num):
+        month = int(m_num)
+        return pd.to_datetime(
+            f"{int(y_num):04d}-{month:02d}-{int(d_num):02d}",
+            format="%Y-%m-%d", errors='coerce')
+    if isinstance(m, str) and m.strip():
+        return pd.to_datetime(
+            f"{int(d_num)} {m.strip()} {int(y_num)}", errors='coerce')
+    return pd.NaT
+
+
+def interview_date(df):
+    """Melt Albania's per-visit interview dates onto a ``visit`` index level.
+
+    Country-level ``df_edit`` hook for the ``interview_date`` table
+    (auto-dispatched by table name; see country.py ``grab_data`` ->
+    ``formatting_functions.get(request)``).  Mirrors
+    :func:`lsms_library.countries.Malawi._.malawi.interview_date`.
+
+    Per GH #474 the Albania waves previously wired ``Int_t`` to ``m0_date``,
+    which the source labels as "Date of last modification" / "data entry
+    date" -- a data-entry timestamp, NOT the fieldwork interview date.  The
+    real interview date lives in the "Day / Month / Year of Interview"
+    question columns, combined by :func:`albania_date_ymd` into ``Int_t``
+    (Visit 1) and -- where the wave's cover records a second enumerator visit
+    (2002 ``m0_q08*2``) -- ``Int_t_v2`` (Visit 2).
+
+    Input
+    -----
+    df : pd.DataFrame
+        Indexed per the wave's ``idxvars`` (after the framework prepends
+        ``t``, i.e. ``(t, i)``), carrying the Visit-1 interview date in a
+        ``int_t`` / ``Int_t`` column and -- where the wave records a second
+        visit -- the Visit-2 date in ``int_t_v2`` / ``Int_t_v2``.  Both
+        casings are accepted defensively (the ``int_t -> Int_t``
+        rejected-spelling rewrite has NOT run at this wave-level hook stage).
+
+    Output
+    ------
+    pd.DataFrame indexed ``(<original idx>, visit)`` -- i.e. ``(t, i,
+    visit)`` -- with a single ``Int_t`` datetime column.  ``visit`` is an
+    ordinal Int64 level: ``1`` carries the Visit-1 date, ``2`` the Visit-2
+    date.  Visit rows whose date is NaT are DROPPED -- never fabricated -- so
+    a single-visit wave (2004, 2005) yields only ``visit=1`` rows, and the
+    2002 Visit-2 columns (present in the questionnaire but empty in this data
+    file) yield no ``visit=2`` rows.
+
+    Delegates to the shared
+    :func:`lsms_library.local_tools.melt_visit_intervals` helper with
+    ``start_base='int_t'`` and the legacy ``Int_t`` output column (Albania
+    records only an interview *date* per visit, no separate start/end).
+    """
+    return tools.melt_visit_intervals(df, start_base='int_t', out_start='Int_t')
+
+
 def _clean_label(series):
     """Lower-case, whitespace-collapse a string/categorical label Series for
     case-insensitive mapping; NA stays NA."""

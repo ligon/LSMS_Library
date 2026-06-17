@@ -1036,12 +1036,22 @@ def df_data_grabber(fn: str | Path, idxvars: dict[str, Any] | str, convert_categ
         try:
             for k,v in kwargs.items():
                 out[k] = grabber(df,v)
-        except AttributeError:
-            if isinstance(kwargs,str):
-                out[k] = df[k]
-            else: # A list?
-                for k in kwargs:
+        except AttributeError as exc:
+            # Legacy fallback: a myvar whose value is a literal source-column
+            # name can be copied straight across when ``grabber`` cannot parse
+            # it.  But when a ``(column, function)`` myvar's *function* raised
+            # the AttributeError internally, this fallback instead masks it as
+            # a misleading ``KeyError`` on the renamed target key -- which cost
+            # real debugging time on GH #476.  Chain the original error so the
+            # genuine cause survives when the fallback itself fails.
+            try:
+                if isinstance(kwargs,str):
                     out[k] = df[k]
+                else: # A list?
+                    for k in kwargs:
+                        out[k] = df[k]
+            except Exception as fallback_exc:
+                raise fallback_exc from exc
     # When ``kwargs`` (myvars) is empty, ``out`` already holds just
     # the renamed idxvars frame (built above from the ``idxvars`` dict)
     # which is what ``set_index(list(idxvars.keys()))`` needs.  An
@@ -2076,6 +2086,82 @@ def map_index(df: pd.DataFrame) -> pd.DataFrame:
         df = df.rename_axis(index={'temp_j': 'j'})
 
     return df
+
+
+def melt_visit_intervals(df: pd.DataFrame,
+                         start_base: str = 'int_start', end_base: str = 'int_end',
+                         out_start: str = 'Interview start', out_end: str = 'Interview end',
+                         visit_level: str = 'visit') -> pd.DataFrame:
+    """Melt per-visit interview ``(start[, end])`` timestamps onto a ``visit`` index.
+
+    Shared ``df_edit``-hook helper for the ``interview_date`` table (an
+    application of the grain-aggregation-policy, SkunkWorks/
+    grain_aggregation_policy.org).  The number of enumerator visits needed to
+    complete a household questionnaire is distinct from the survey *round*
+    (post-planting / post-harvest, already carried by ``t``); some surveys
+    record a start (and end) timestamp per such visit.  We preserve every
+    visit on an ordinal ``visit`` level rather than keeping only the first.
+
+    Input columns (target names produced by the wave ``myvars``; both lower-
+    and capitalised first-letter spellings accepted):
+
+    - visit 1 start = ``start_base`` (default ``int_start``); end = ``end_base``
+      (default ``int_end``);
+    - visit n>=2 start = ``{start_base}_v{n}``; end = ``{end_base}_v{n}``.
+
+    The END columns are OPTIONAL: a survey that records only a start timestamp
+    (e.g. a single interview *date*) supplies just the start columns, and the
+    output then carries only ``out_start`` -- the all-NaT ``out_end`` column is
+    dropped.  Set ``out_start='Int_t'`` (with no end columns present) to
+    reproduce the legacy single-datetime-per-visit shape.
+
+    Output: indexed ``(<original idx>, visit)`` with columns ``out_start`` and
+    (where any end is recorded) ``out_end``; ``visit`` is an ordinal ``Int64``
+    (1, 2, 3, ...).  A visit whose start AND end are both NaT is DROPPED --
+    never fabricated -- so a household not visited that many times does not
+    surface at that visit number.  Collapsing ``visit`` with the declared
+    ``first`` aggregation reproduces the legacy first-visit-only table.
+    """
+    def _pick(*names):
+        return next((n for n in names if n in df.columns), None)
+
+    def _col(base, n):
+        cap = base[:1].upper() + base[1:]
+        if n == 1:
+            return _pick(base, cap)
+        return _pick(f'{base}_v{n}', f'{cap}_v{n}')
+
+    # Discover visits 1..N: stop at the first ordinal with neither a start nor
+    # an end column declared.
+    specs = []
+    n = 1
+    while True:
+        s, e = _col(start_base, n), _col(end_base, n)
+        if s is None and e is None:
+            break
+        specs.append((n, s, e))
+        n += 1
+    if not specs:
+        return df  # nothing to melt; hand back unchanged (defensive)
+
+    idx_names = list(df.index.names)
+    flat = df.reset_index()
+    pieces = []
+    for vnum, s, e in specs:
+        part = flat[idx_names].copy()
+        part[visit_level] = vnum
+        part[out_start] = pd.to_datetime(flat[s], errors='coerce') if s else pd.NaT
+        part[out_end] = pd.to_datetime(flat[e], errors='coerce') if e else pd.NaT
+        pieces.append(part)
+
+    out = pd.concat(pieces, ignore_index=True)
+    # Drop un-made visits (both start and end NaT); never fabricate a visit.
+    out = out[out[out_start].notna() | out[out_end].notna()]
+    out[visit_level] = out[visit_level].astype('Int64')
+    # Start-only surveys: drop the all-NaT end column entirely.
+    if out_end in out.columns and out[out_end].isna().all():
+        out = out.drop(columns=[out_end])
+    return out.set_index(idx_names + [visit_level])
 
 
 import importlib.util

@@ -167,8 +167,11 @@ Data Scheme:
     materialize: make
 
   interview_date:
-    index: (t, i)
-    Int_t: datetime
+    index: (t, i, visit)
+    Interview start: datetime
+    Interview end: datetime
+    aggregation:
+      visit: first
 
   crop_production:
     # Item-level crop harvest (GAP 1; EHCVM parity loop 2026-06-15, cloned

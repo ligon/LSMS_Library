@@ -206,7 +206,16 @@ Columns:
     HowCoped2:
       type: str
   interview_date:
+    # Int_t: legacy single interview datetime (most countries).  EHCVM
+    # records a start (and end) timestamp per enumerator visit, melted onto
+    # an ordinal `visit` index (local_tools.melt_visit_intervals) into
+    # Interview start / Interview end.  None required: a country emits
+    # whichever columns its source records (start-only -> Interview start).
     Int_t:
+      type: datetime
+    Interview start:
+      type: datetime
+    Interview end:
       type: datetime
   individual_education:
     Educational Attainment:

@@ -657,6 +657,23 @@ class Wave:
         
         formatting_functions = self.formatting_functions
 
+        # A function whose name matches a declared data_scheme table is that
+        # table's df_edit hook (dispatched per-table as
+        # ``final_mapping['df_edit']`` below), NOT a per-cell column formatter.
+        # Guard against a myvar that happens to share a name with such a table
+        # hook -- e.g. the legacy ``interview_date`` cover-page myvar inside an
+        # EHCVM ``household_roster`` colliding with the country-module
+        # ``interview_date(df)`` visit-melt hook.  Auto-binding the df-level
+        # hook as a per-cell formatter applies it to a scalar string and raises
+        # ``AttributeError`` (masked downstream as a misleading ``KeyError``),
+        # breaking the roster build / silently dropping waves (GH #476).  Such
+        # a myvar is treated as a plain column rename, exactly as it was before
+        # the table hook existed; the table's own df_edit dispatch is
+        # unaffected.
+        declared_tables = set(
+            ((self.country.resources or {}).get('Data Scheme') or {}).keys()
+        )
+
         def map_formatting_function(var_name, value, format_id_function = False):
             """Applies formatting functions if available, otherwise uses defaults."""
             if isinstance(value, list) and isinstance(value[-1], dict):
@@ -694,7 +711,7 @@ class Wave:
                         return (value[:-1], mapping)    
                 else:
                     return tuple(value)
-            if var_name in formatting_functions:
+            if var_name in formatting_functions and var_name not in declared_tables:
                 # Named formatting functions for idxvars (e.g., Benin's `i()`)
                 # expect composite keys (list values like [grappe, menage]).
                 # When the value is a simple string (single column), use
