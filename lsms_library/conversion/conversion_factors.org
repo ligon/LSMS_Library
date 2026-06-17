@@ -1,0 +1,279 @@
+#+TITLE: Currency conversion factors
+#+AUTHOR: Sue (Claude Opus 4.8) with Ethan Ligon
+#+DATE: 2026-06-17
+
+* Purpose
+
+Phase 2 of currency handling (see =slurm_logs/DESIGN_currency_conversion_2026-06-17.org=).
+This file is the single source of truth for converting nominal local-currency
+monetary values (=food_expenditures.Expenditure=, =assets.Value=, ...) to
+comparable bases.  =lsms_library.conversion.convert()= reads the
+=conversion_factors= table below via =df_from_orgfile=; the prose and the
+generator that produced it live alongside the numbers, so each column is
+documented next to the data it describes.
+
+* Reading the table
+
+- Key :: =(Country, Date)=, where =Country= is a repo country name (so =GHA=
+  appears as =GhanaLSS=) and =Date= is a calendar year.  =Currency= is carried
+  as a convenience column.  The key is *Country*, not *Currency*, because PPP
+  and CPI are country-specific even inside a currency union: Mali and Niger
+  both use XOF but have different price levels, hence different PPP factors
+  (compare their =PPP-2017= rows) -- one of which would be silently wrong if a
+  single XOF row served both.
+- Orientation :: every factor column is *LCU per target unit*, so
+
+  \[ x_{\text{target}} = x_{\text{LCU}} \,/\, \text{factor} . \]
+
+  A new conversion is a new column following this rule.
+- Missing :: an empty/=---= cell is =pd.NA=; =convert()= propagates it (no
+  silent fallback).
+
+* Column glossary
+
+- Currency :: ISO 4217 alpha-3 (matches =data_info.yml= =Currency:=).
+- FX :: LCU per current USD.  WDI =PA.NUS.FCRF= (official, period average).
+  Nominal USD at market rates.
+- PPP-2011 / PPP-2017 / PPP-2021 :: LCU per *constant-base-year PPP
+  international dollar* (real PPP).  Consumption PPP =PA.NUS.PRVT.PP=
+  benchmarked to the named year, with intertemporal deflation by the local CPI
+  baked in: for base \(b\),
+
+  \[ \text{PPP-}b(c,t) = \mathrm{PPP}_c(b)\,\cdot\,\frac{\mathrm{CPI}_c(t)}{\mathrm{CPI}_c(b)} . \]
+
+  =PPP-2017= is the headline welfare measure (World Bank poverty-line basis).
+- USD-real-2017 :: LCU per constant-2017 USD; =FX= composed with the US CPI
+  (=FP.CPI.TOTL= for USA), \(\text{FX}(c,t)\cdot \mathrm{CPI}_{US}(t)/\mathrm{CPI}_{US}(2017)\).
+  Consumer-basket deflator (standard for consumption/wages; a GDP-deflator
+  variant would be a separate column).  For *cross-country* welfare prefer
+  =PPP-2017=: market FX understates poorer countries' real consumption
+  (Balassa-Samuelson).
+- LCU-real-2017 :: LCU per constant-2017 local currency, \(\mathrm{CPI}_c(t)/\mathrm{CPI}_c(2017)\)
+  (local CPI only; intra-country temporal comparability).
+- CPI :: local consumer price index =FP.CPI.TOTL= (helper; not a conversion
+  target).
+
+* Redenomination caveat (v1 scope)
+
+The values below come from WDI, which publishes each series in the *current*
+currency unit.  For the four pre-redenomination waves whose ISO code differs
+from the modern default -- GhanaLSS <= 2005-06 (GHC), Tajikistan 1999 (TJR),
+Azerbaijan 1995 (AZM), Serbia-and-Montenegro 2002 (YUM) -- a row keyed on the
+calendar year would carry the *rebased* (modern-currency) factor, which is
+10^3-10^4 off the contemporaneous data.  =convert()= therefore returns =pd.NA=
++ a warning for any wave whose phase-1 currency code is a redenomination
+override (data-driven from =data_info.yml= =Currency:= =overrides=), regardless
+of what this table holds.  Sourcing contemporaneous-currency factors (IMF IFS)
+for those rows is deferred.
+
+* Provenance / regeneration
+
+Source: World Bank WDI, accessed 2026-06-17.  The table is a versioned
+snapshot, not a live query; =convert()= only reads it.  To refresh the vintage
+or extend coverage (more countries/years/columns), run the block below in
+Emacs (=C-c C-c=) -- it pulls WDI over plain HTTP (no extra dependency),
+composes the columns, and rewrites the table.  Extend =ISO3= for the full
+country set; add a column by adding it to =COLS= and =factors()=.
+
+#+begin_src python :results output :exports both
+import json, urllib.request
+
+# repo country name -> ISO3 (WDI).  Extend for the full country set.
+ISO3 = {"Uganda":"UGA","Mali":"MLI","Niger":"NER","GhanaLSS":"GHA",
+        "Tanzania":"TZA","Nigeria":"NGA","Ethiopia":"ETH","Malawi":"MWI"}
+CUR  = {"Uganda":"UGX","Mali":"XOF","Niger":"XOF","GhanaLSS":"GHS",
+        "Tanzania":"TZS","Nigeria":"NGN","Ethiopia":"ETB","Malawi":"MWK"}
+YEARS, BASES = range(2005, 2023), (2011, 2017, 2021)
+FX, PPP, CPI = "PA.NUS.FCRF", "PA.NUS.PRVT.PP", "FP.CPI.TOTL"
+COLS = ["FX","PPP-2011","PPP-2017","PPP-2021","USD-real-2017","LCU-real-2017","CPI"]
+
+def wdi(indicator, isos):
+    url = (f"https://api.worldbank.org/v2/country/{';'.join(isos)}/indicator/"
+           f"{indicator}?date={YEARS.start}:{YEARS.stop-1}&format=json&per_page=20000")
+    with urllib.request.urlopen(url, timeout=60) as r:
+        payload = json.load(r)
+    return {(row["countryiso3code"], int(row["date"])): float(row["value"])
+            for row in (payload[1] or []) if row["value"] is not None}
+
+isos = sorted(set(ISO3.values()) | {"USA"})
+fx, ppp, cpi = wdi(FX, isos), wdi(PPP, isos), wdi(CPI, isos)
+g = lambda d, iso, yr: d.get((iso, yr))
+
+def factors(iso, t):
+    row = {"FX": g(fx, iso, t)}
+    c_t = g(cpi, iso, t)
+    for b in BASES:
+        pb, cb = g(ppp, iso, b), g(cpi, iso, b)
+        row[f"PPP-{b}"] = pb * c_t / cb if (pb and c_t and cb) else None
+    us_t, us_b = g(cpi, "USA", t), g(cpi, "USA", 2017)
+    row["USD-real-2017"] = row["FX"] * us_t / us_b if (row["FX"] and us_t and us_b) else None
+    c_b = g(cpi, iso, 2017)
+    row["LCU-real-2017"] = c_t / c_b if (c_t and c_b) else None
+    row["CPI"] = c_t
+    return row
+
+def fmt(x):
+    if x is None: return "---"
+    if abs(x) >= 100: return f"{x:.1f}"
+    if abs(x) >= 1:   return f"{x:.3f}"
+    return f"{x:.5f}"
+
+hdr = ["Country","Currency","Date"] + COLS
+print("| " + " | ".join(hdr) + " |")
+print("|" + "+".join(["-"*(len(h)+2) for h in hdr]) + "|")
+for name in sorted(ISO3):
+    for t in YEARS:
+        row = factors(ISO3[name], t)
+        if all(row[c] is None for c in COLS): continue
+        print("| " + " | ".join([name, CUR[name], str(t)] + [fmt(row[c]) for c in COLS]) + " |")
+#+end_src
+
+* The table
+
+#+name: conversion_factors
+| Country | Currency | Date | FX | PPP-2011 | PPP-2017 | PPP-2021 | USD-real-2017 | LCU-real-2017 | CPI |
+|---------+----------+------+----+----------+----------+----------+---------------+---------------+-----|
+| Ethiopia | ETB | 2005 | 8.666 | 1.876 | 1.505 | 1.224 | 6.905 | 0.18331 | 44.846 |
+| Ethiopia | ETB | 2006 | 8.699 | 2.107 | 1.690 | 1.374 | 7.154 | 0.20585 | 50.361 |
+| Ethiopia | ETB | 2007 | 8.966 | 2.470 | 1.982 | 1.611 | 7.584 | 0.24134 | 59.044 |
+| Ethiopia | ETB | 2008 | 9.600 | 3.566 | 2.861 | 2.326 | 8.432 | 0.34839 | 85.234 |
+| Ethiopia | ETB | 2009 | 11.778 | 3.868 | 3.103 | 2.523 | 10.308 | 0.37795 | 92.465 |
+| Ethiopia | ETB | 2010 | 14.410 | 4.184 | 3.356 | 2.729 | 12.819 | 0.40875 | 100.000 |
+| Ethiopia | ETB | 2011 | 16.899 | 5.575 | 4.472 | 3.636 | 15.508 | 0.54466 | 133.2 |
+| Ethiopia | ETB | 2012 | 17.705 | 6.890 | 5.527 | 4.495 | 16.583 | 0.67320 | 164.7 |
+| Ethiopia | ETB | 2013 | 18.627 | 7.405 | 5.940 | 4.830 | 17.702 | 0.72345 | 177.0 |
+| Ethiopia | ETB | 2014 | 19.586 | 7.915 | 6.349 | 5.163 | 18.916 | 0.77329 | 189.2 |
+| Ethiopia | ETB | 2015 | 20.577 | 8.672 | 6.957 | 5.657 | 19.897 | 0.84729 | 207.3 |
+| Ethiopia | ETB | 2016 | 21.732 | 9.247 | 7.418 | 6.032 | 21.278 | 0.90345 | 221.0 |
+| Ethiopia | ETB | 2017 | 23.866 | 10.235 | 8.211 | 6.677 | 23.866 | 1.000 | 244.6 |
+| Ethiopia | ETB | 2018 | 27.429 | 11.651 | 9.347 | 7.600 | 28.099 | 1.138 | 278.5 |
+| Ethiopia | ETB | 2019 | 29.070 | 13.493 | 10.824 | 8.802 | 30.319 | 1.318 | 322.5 |
+| Ethiopia | ETB | 2020 | 34.927 | 16.240 | 13.028 | 10.594 | 36.878 | 1.587 | 388.2 |
+| Ethiopia | ETB | 2021 | 43.734 | 20.599 | 16.524 | 13.437 | 48.346 | 2.013 | 492.4 |
+| Ethiopia | ETB | 2022 | 51.756 | 27.579 | 22.124 | 17.990 | 61.793 | 2.695 | 659.2 |
+| GhanaLSS | GHS | 2005 | 0.90521 | 0.37658 | 0.37272 | 0.38340 | 0.72120 | 0.21806 | 52.567 |
+| GhanaLSS | GHS | 2006 | 0.91511 | 0.42056 | 0.41625 | 0.42817 | 0.75260 | 0.24353 | 58.706 |
+| GhanaLSS | GHS | 2007 | 0.93262 | 0.46571 | 0.46093 | 0.47413 | 0.78889 | 0.26967 | 65.008 |
+| GhanaLSS | GHS | 2008 | 1.052 | 0.54252 | 0.53696 | 0.55234 | 0.92427 | 0.31416 | 75.731 |
+| GhanaLSS | GHS | 2009 | 1.405 | 0.64694 | 0.64031 | 0.65865 | 1.230 | 0.37462 | 90.307 |
+| GhanaLSS | GHS | 2010 | 1.430 | 0.71638 | 0.70904 | 0.72935 | 1.272 | 0.41483 | 100.0 |
+| GhanaLSS | GHS | 2011 | 1.521 | 0.77891 | 0.77093 | 0.79301 | 1.395 | 0.45104 | 108.7 |
+| GhanaLSS | GHS | 2012 | 1.825 | 0.86604 | 0.85717 | 0.88171 | 1.709 | 0.50149 | 120.9 |
+| GhanaLSS | GHS | 2013 | 1.981 | 0.96708 | 0.95716 | 0.98458 | 1.883 | 0.56000 | 135.0 |
+| GhanaLSS | GHS | 2014 | 2.897 | 1.117 | 1.105 | 1.137 | 2.798 | 0.64674 | 155.9 |
+| GhanaLSS | GHS | 2015 | 3.715 | 1.308 | 1.295 | 1.332 | 3.592 | 0.75766 | 182.6 |
+| GhanaLSS | GHS | 2016 | 3.910 | 1.537 | 1.521 | 1.565 | 3.828 | 0.88990 | 214.5 |
+| GhanaLSS | GHS | 2017 | 4.351 | 1.727 | 1.709 | 1.758 | 4.351 | 1.000 | 241.1 |
+| GhanaLSS | GHS | 2018 | 4.585 | 1.862 | 1.843 | 1.895 | 4.697 | 1.078 | 259.9 |
+| GhanaLSS | GHS | 2019 | 5.217 | 1.995 | 1.974 | 2.031 | 5.442 | 1.155 | 278.5 |
+| GhanaLSS | GHS | 2020 | 5.596 | 2.192 | 2.170 | 2.232 | 5.908 | 1.269 | 306.0 |
+| GhanaLSS | GHS | 2021 | 5.806 | 2.411 | 2.386 | 2.454 | 6.418 | 1.396 | 336.5 |
+| GhanaLSS | GHS | 2022 | 8.272 | 3.164 | 3.132 | 3.221 | 9.877 | 1.832 | 441.7 |
+| Malawi | MWK | 2005 | 118.4 | 46.946 | 47.001 | 36.450 | 94.348 | 0.18868 | 64.197 |
+| Malawi | MWK | 2006 | 136.0 | 53.507 | 53.569 | 41.544 | 111.9 | 0.21505 | 73.168 |
+| Malawi | MWK | 2007 | 140.0 | 57.761 | 57.829 | 44.848 | 118.4 | 0.23215 | 78.986 |
+| Malawi | MWK | 2008 | 140.5 | 62.794 | 62.867 | 48.755 | 123.4 | 0.25237 | 85.868 |
+| Malawi | MWK | 2009 | 141.2 | 68.083 | 68.162 | 52.861 | 123.6 | 0.27363 | 93.100 |
+| Malawi | MWK | 2010 | 150.5 | 73.129 | 73.214 | 56.779 | 133.9 | 0.29391 | 100.0 |
+| Malawi | MWK | 2011 | 156.5 | 78.703 | 78.795 | 61.107 | 143.6 | 0.31631 | 107.6 |
+| Malawi | MWK | 2012 | 249.1 | 95.444 | 95.556 | 74.106 | 233.3 | 0.38360 | 130.5 |
+| Malawi | MWK | 2013 | 364.4 | 121.5 | 121.6 | 94.324 | 346.3 | 0.48825 | 166.1 |
+| Malawi | MWK | 2014 | 424.9 | 150.4 | 150.6 | 116.8 | 410.4 | 0.60442 | 205.6 |
+| Malawi | MWK | 2015 | 499.6 | 183.3 | 183.5 | 142.3 | 483.1 | 0.73659 | 250.6 |
+| Malawi | MWK | 2016 | 718.0 | 223.1 | 223.3 | 173.2 | 703.0 | 0.89651 | 305.0 |
+| Malawi | MWK | 2017 | 730.3 | 248.8 | 249.1 | 193.2 | 730.3 | 1.000 | 340.2 |
+| Malawi | MWK | 2018 | 732.3 | 279.7 | 280.0 | 217.2 | 750.2 | 1.124 | 382.5 |
+| Malawi | MWK | 2019 | 745.5 | 305.9 | 306.3 | 237.5 | 777.6 | 1.230 | 418.3 |
+| Malawi | MWK | 2020 | 749.5 | 332.3 | 332.7 | 258.0 | 791.4 | 1.336 | 454.4 |
+| Malawi | MWK | 2021 | 805.9 | 363.3 | 363.7 | 282.1 | 890.9 | 1.460 | 496.8 |
+| Malawi | MWK | 2022 | 949.0 | 439.5 | 440.0 | 341.2 | 1133.1 | 1.766 | 600.9 |
+| Mali | XOF | 2005 | 527.3 | 187.1 | 154.1 | 145.9 | 420.1 | 0.77892 | 85.860 |
+| Mali | XOF | 2006 | 522.4 | 190.0 | 156.5 | 148.2 | 429.7 | 0.79095 | 87.185 |
+| Mali | XOF | 2007 | 478.6 | 192.7 | 158.7 | 150.3 | 404.9 | 0.80211 | 88.416 |
+| Mali | XOF | 2008 | 446.0 | 210.3 | 173.3 | 164.0 | 391.7 | 0.87568 | 96.525 |
+| Mali | XOF | 2009 | 470.3 | 215.5 | 177.6 | 168.1 | 411.6 | 0.89725 | 98.903 |
+| Mali | XOF | 2010 | 494.8 | 217.9 | 179.5 | 169.9 | 440.2 | 0.90720 | 100.0 |
+| Mali | XOF | 2011 | 471.2 | 224.4 | 184.8 | 175.0 | 432.5 | 0.93401 | 103.0 |
+| Mali | XOF | 2012 | 510.6 | 236.3 | 194.7 | 184.3 | 478.2 | 0.98373 | 108.4 |
+| Mali | XOF | 2013 | 493.9 | 234.9 | 193.5 | 183.2 | 469.4 | 0.97776 | 107.8 |
+| Mali | XOF | 2014 | 493.8 | 236.9 | 195.2 | 184.8 | 476.9 | 0.98641 | 108.7 |
+| Mali | XOF | 2015 | 591.2 | 240.4 | 198.0 | 187.5 | 571.7 | 1.001 | 110.3 |
+| Mali | XOF | 2016 | 592.6 | 236.1 | 194.5 | 184.1 | 580.2 | 0.98271 | 108.3 |
+| Mali | XOF | 2017 | 580.7 | 240.2 | 197.9 | 187.3 | 580.7 | 1.000 | 110.2 |
+| Mali | XOF | 2018 | 555.4 | 240.9 | 198.5 | 187.9 | 569.0 | 1.003 | 110.6 |
+| Mali | XOF | 2019 | 585.9 | 236.9 | 195.2 | 184.8 | 611.1 | 0.98636 | 108.7 |
+| Mali | XOF | 2020 | 575.6 | 238.0 | 196.0 | 185.6 | 607.7 | 0.99068 | 109.2 |
+| Mali | XOF | 2021 | 554.5 | 247.3 | 203.7 | 192.9 | 613.0 | 1.030 | 113.5 |
+| Mali | XOF | 2022 | 623.8 | 271.1 | 223.3 | 211.4 | 744.7 | 1.129 | 124.4 |
+| Niger | XOF | 2005 | 527.3 | 198.1 | 198.1 | 159.7 | 420.1 | 0.81303 | 88.526 |
+| Niger | XOF | 2006 | 522.4 | 198.2 | 198.2 | 159.7 | 429.7 | 0.81336 | 88.562 |
+| Niger | XOF | 2007 | 478.6 | 198.3 | 198.3 | 159.8 | 404.9 | 0.81380 | 88.610 |
+| Niger | XOF | 2008 | 446.0 | 220.8 | 220.7 | 177.9 | 391.7 | 0.90580 | 98.627 |
+| Niger | XOF | 2009 | 470.3 | 222.0 | 222.0 | 178.9 | 411.6 | 0.91108 | 99.202 |
+| Niger | XOF | 2010 | 494.8 | 223.8 | 223.8 | 180.3 | 440.2 | 0.91841 | 100.0 |
+| Niger | XOF | 2011 | 471.2 | 230.4 | 230.4 | 185.6 | 432.5 | 0.94543 | 102.9 |
+| Niger | XOF | 2012 | 510.6 | 231.5 | 231.4 | 186.5 | 478.2 | 0.94974 | 103.4 |
+| Niger | XOF | 2013 | 493.9 | 236.8 | 236.7 | 190.8 | 469.4 | 0.97155 | 105.8 |
+| Niger | XOF | 2014 | 493.8 | 234.6 | 234.5 | 189.0 | 476.9 | 0.96251 | 104.8 |
+| Niger | XOF | 2015 | 591.2 | 233.2 | 233.2 | 187.9 | 571.7 | 0.95697 | 104.2 |
+| Niger | XOF | 2016 | 592.6 | 237.1 | 237.0 | 191.0 | 580.2 | 0.97280 | 105.9 |
+| Niger | XOF | 2017 | 580.7 | 243.7 | 243.7 | 196.4 | 580.7 | 1.000 | 108.9 |
+| Niger | XOF | 2018 | 555.4 | 250.9 | 250.9 | 202.2 | 569.0 | 1.030 | 112.1 |
+| Niger | XOF | 2019 | 585.9 | 244.7 | 244.6 | 197.2 | 611.1 | 1.004 | 109.3 |
+| Niger | XOF | 2020 | 575.6 | 251.8 | 251.7 | 202.9 | 607.7 | 1.033 | 112.5 |
+| Niger | XOF | 2021 | 554.5 | 261.5 | 261.4 | 210.7 | 613.0 | 1.073 | 116.8 |
+| Niger | XOF | 2022 | 623.8 | 272.5 | 272.4 | 219.6 | 744.7 | 1.118 | 121.7 |
+| Nigeria | NGN | 2005 | 131.3 | 46.297 | 33.226 | 26.981 | 104.6 | 0.28655 | 61.387 |
+| Nigeria | NGN | 2006 | 128.7 | 50.105 | 35.959 | 29.201 | 105.8 | 0.31012 | 66.436 |
+| Nigeria | NGN | 2007 | 125.8 | 52.805 | 37.896 | 30.774 | 106.4 | 0.32683 | 70.016 |
+| Nigeria | NGN | 2008 | 118.6 | 58.920 | 42.285 | 34.338 | 104.1 | 0.36468 | 78.125 |
+| Nigeria | NGN | 2009 | 148.9 | 66.308 | 47.587 | 38.643 | 130.3 | 0.41040 | 87.920 |
+| Nigeria | NGN | 2010 | 150.3 | 75.418 | 54.125 | 43.953 | 133.7 | 0.46679 | 100.0 |
+| Nigeria | NGN | 2011 | 153.9 | 83.583 | 59.985 | 48.711 | 141.2 | 0.51733 | 110.8 |
+| Nigeria | NGN | 2012 | 157.5 | 93.801 | 67.317 | 54.666 | 147.5 | 0.58057 | 124.4 |
+| Nigeria | NGN | 2013 | 157.3 | 101.8 | 73.036 | 59.310 | 149.5 | 0.62989 | 134.9 |
+| Nigeria | NGN | 2014 | 158.6 | 110.0 | 78.914 | 64.083 | 153.1 | 0.68058 | 145.8 |
+| Nigeria | NGN | 2015 | 192.4 | 119.9 | 86.023 | 69.857 | 186.1 | 0.74190 | 158.9 |
+| Nigeria | NGN | 2016 | 253.5 | 138.7 | 99.526 | 80.822 | 248.2 | 0.85835 | 183.9 |
+| Nigeria | NGN | 2017 | 305.8 | 161.6 | 116.0 | 94.159 | 305.8 | 1.000 | 214.2 |
+| Nigeria | NGN | 2018 | 306.1 | 181.1 | 130.0 | 105.5 | 313.6 | 1.121 | 240.1 |
+| Nigeria | NGN | 2019 | 306.9 | 201.7 | 144.8 | 117.6 | 320.1 | 1.249 | 267.5 |
+| Nigeria | NGN | 2020 | 358.8 | 228.5 | 164.0 | 133.2 | 378.9 | 1.414 | 302.9 |
+| Nigeria | NGN | 2021 | 401.2 | 267.2 | 191.8 | 155.7 | 443.5 | 1.654 | 354.3 |
+| Nigeria | NGN | 2022 | 426.0 | 317.6 | 227.9 | 185.1 | 508.6 | 1.966 | 421.1 |
+| Tanzania | TZS | 2005 | 1128.9 | 346.6 | 294.7 | 225.3 | 899.4 | 0.37896 | 66.333 |
+| Tanzania | TZS | 2006 | 1251.9 | 371.7 | 316.0 | 241.6 | 1029.6 | 0.40644 | 71.142 |
+| Tanzania | TZS | 2007 | 1245.0 | 397.8 | 338.2 | 258.6 | 1053.2 | 0.43499 | 76.140 |
+| Tanzania | TZS | 2008 | 1196.3 | 438.7 | 373.0 | 285.2 | 1050.8 | 0.47970 | 83.966 |
+| Tanzania | TZS | 2009 | 1320.3 | 492.0 | 418.3 | 319.8 | 1155.6 | 0.53795 | 94.162 |
+| Tanzania | TZS | 2010 | 1395.6 | 522.5 | 444.2 | 339.7 | 1241.5 | 0.57131 | 100.0 |
+| Tanzania | TZS | 2011 | 1557.4 | 588.8 | 500.6 | 382.8 | 1429.2 | 0.64381 | 112.7 |
+| Tanzania | TZS | 2012 | 1571.7 | 683.0 | 580.7 | 444.0 | 1472.1 | 0.74683 | 130.7 |
+| Tanzania | TZS | 2013 | 1597.6 | 736.8 | 626.4 | 479.0 | 1518.3 | 0.80561 | 141.0 |
+| Tanzania | TZS | 2014 | 1653.2 | 781.9 | 664.8 | 508.3 | 1596.7 | 0.85500 | 149.7 |
+| Tanzania | TZS | 2015 | 1991.4 | 825.6 | 702.0 | 536.7 | 1925.6 | 0.90278 | 158.0 |
+| Tanzania | TZS | 2016 | 2177.1 | 868.3 | 738.3 | 564.5 | 2131.7 | 0.94950 | 166.2 |
+| Tanzania | TZS | 2017 | 2228.9 | 914.5 | 777.6 | 594.5 | 2228.9 | 1.000 | 175.0 |
+| Tanzania | TZS | 2018 | 2263.8 | 946.5 | 804.8 | 615.3 | 2319.1 | 1.035 | 181.2 |
+| Tanzania | TZS | 2019 | 2288.2 | 979.3 | 832.6 | 636.6 | 2386.6 | 1.071 | 187.4 |
+| Tanzania | TZS | 2020 | 2294.1 | 1011.5 | 860.0 | 657.6 | 2422.3 | 1.106 | 193.6 |
+| Tanzania | TZS | 2021 | 2297.8 | 1048.8 | 891.8 | 681.9 | 2540.1 | 1.147 | 200.7 |
+| Tanzania | TZS | 2022 | 2303.0 | 1094.5 | 930.6 | 711.5 | 2749.7 | 1.197 | 209.5 |
+| Uganda | UGX | 2005 | 1780.5 | 540.1 | 487.4 | 471.8 | 1418.6 | 0.39980 | 66.679 |
+| Uganda | UGX | 2006 | 1831.5 | 579.6 | 523.1 | 506.3 | 1506.2 | 0.42903 | 71.554 |
+| Uganda | UGX | 2007 | 1723.5 | 615.2 | 555.2 | 537.4 | 1457.9 | 0.45537 | 75.946 |
+| Uganda | UGX | 2008 | 1720.4 | 689.4 | 622.1 | 602.1 | 1511.2 | 0.51025 | 85.098 |
+| Uganda | UGX | 2009 | 2030.5 | 779.1 | 703.1 | 680.5 | 1777.2 | 0.57667 | 96.176 |
+| Uganda | UGX | 2010 | 2177.6 | 810.1 | 731.0 | 707.5 | 1937.1 | 0.59960 | 100.0 |
+| Uganda | UGX | 2011 | 2522.8 | 944.3 | 852.1 | 824.7 | 2315.1 | 0.69892 | 116.6 |
+| Uganda | UGX | 2012 | 2504.6 | 1064.0 | 960.1 | 929.3 | 2345.9 | 0.78753 | 131.3 |
+| Uganda | UGX | 2013 | 2586.9 | 1116.2 | 1007.2 | 974.9 | 2458.5 | 0.82616 | 137.8 |
+| Uganda | UGX | 2014 | 2599.8 | 1150.5 | 1038.2 | 1004.9 | 2510.9 | 0.85157 | 142.0 |
+| Uganda | UGX | 2015 | 3240.6 | 1214.8 | 1096.3 | 1061.1 | 3133.5 | 0.89917 | 150.0 |
+| Uganda | UGX | 2016 | 3420.1 | 1284.1 | 1158.8 | 1121.6 | 3348.8 | 0.95048 | 158.5 |
+| Uganda | UGX | 2017 | 3611.2 | 1351.0 | 1219.2 | 1180.0 | 3611.2 | 1.000 | 166.8 |
+| Uganda | UGX | 2018 | 3727.1 | 1386.4 | 1251.1 | 1210.9 | 3818.1 | 1.026 | 171.1 |
+| Uganda | UGX | 2019 | 3704.0 | 1426.1 | 1287.0 | 1245.6 | 3863.3 | 1.056 | 176.0 |
+| Uganda | UGX | 2020 | 3718.2 | 1473.4 | 1329.6 | 1286.9 | 3925.9 | 1.091 | 181.9 |
+| Uganda | UGX | 2021 | 3587.1 | 1505.9 | 1358.9 | 1315.3 | 3965.3 | 1.115 | 185.9 |
+| Uganda | UGX | 2022 | 3689.8 | 1614.2 | 1456.7 | 1409.9 | 4405.4 | 1.195 | 199.3 |

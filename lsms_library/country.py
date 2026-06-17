@@ -1766,7 +1766,9 @@ class Country:
                 new_idx.append('m')
         if 'm' not in new_idx:
             new_idx.append('m')
-        return flat.set_index(new_idx)
+        result = flat.set_index(new_idx)
+        result.attrs = dict(df.attrs)  # set_index drops attrs (pandas 2.x)
+        return result
 
     def _location_lookup(self) -> pd.DataFrame:
         """
@@ -2128,6 +2130,10 @@ class Country:
             # caller's _relabel_j / _add_market_index without being dropped).
             if currency is not None and method_name and not df.empty:
                 df = attach_currency(df, self.name, method_name, mode=currency)
+
+            # Record the country so a later standalone convert() can recover it
+            # (Feature output instead carries `country` in the index).
+            df.attrs['country'] = self.name
 
         return df
 
@@ -3170,7 +3176,7 @@ class Country:
 
         if name in self.data_scheme or name in self._FOOD_DERIVED or name in self._ROSTER_DERIVED:
             def method(waves=None, market=None, labels='Preferred', age_cuts=None,
-                       units=None, volume_as_mass=True, currency=None):
+                       units=None, volume_as_mass=True, currency=None, numeraire=None):
                 if age_cuts is not None and name not in self._ROSTER_DERIVED:
                     raise TypeError(
                         f"{name}() got an unexpected keyword argument 'age_cuts'; "
@@ -3199,6 +3205,25 @@ class Country:
                             f"{name}() got an unexpected keyword argument 'currency'; "
                             "only tables with monetary columns accept it."
                         )
+                if numeraire is not None:
+                    if currency is not None:
+                        raise ValueError(
+                            f"{name}(): pass either currency= or numeraire=, not both."
+                        )
+                    if not is_monetary_table(name, self.name):
+                        raise TypeError(
+                            f"{name}() got an unexpected keyword argument 'numeraire'; "
+                            "only tables with monetary columns accept it."
+                        )
+                    from .conversion import conversion_targets
+                    if numeraire not in conversion_targets():
+                        raise ValueError(
+                            f"{name}(): unknown numeraire {numeraire!r}; "
+                            f"available: {conversion_targets()}"
+                        )
+                    # Attach the LCU label as an index level so the post-step
+                    # convert() can relabel it to the target basis.
+                    currency = 'index'
                 # For derived food tables, try deriving from food_acquired first
                 # before falling back to wave-level scripts / make
                 if (name in self._FOOD_DERIVED
@@ -3243,6 +3268,9 @@ class Country:
                         derived = self._relabel_j(derived, labels, reaggregate=reagg)
                         if market is not None:
                             derived = self._add_market_index(derived, column=market)
+                        if numeraire is not None:
+                            from .conversion import convert as _convert
+                            derived = _convert(derived, to=numeraire, country=self.name)
                         return derived
 
                 # Derive household_characteristics from household_roster
@@ -3277,6 +3305,9 @@ class Country:
                     result = self._relabel_j(result, labels, reaggregate=reagg)
                 if market is not None and isinstance(result, pd.DataFrame) and not result.empty:
                     result = self._add_market_index(result, column=market)
+                if numeraire is not None and isinstance(result, pd.DataFrame) and not result.empty:
+                    from .conversion import convert as _convert
+                    result = _convert(result, to=numeraire, country=self.name)
                 return result
             doc_parts = [
                 f"Return {name} as a DataFrame, aggregated across *waves*.\n\n",
@@ -3353,6 +3384,15 @@ class Country:
                     "    Defaults to ``None`` (omit) for single-country calls;\n"
                     "    ``Feature(...)`` defaults to ``'index'``.  See\n"
                     "    :func:`lsms_library.currency.attach_currency`.\n"
+                )
+                doc_parts.append(
+                    "numeraire : str, optional\n"
+                    "    Convert the monetary columns to a comparable basis -- a\n"
+                    "    target column of ``conversion_factors.org`` (e.g.\n"
+                    "    ``'PPP-2017'``, ``'FX'``, ``'USD-real-2017'``).  Mutually\n"
+                    "    exclusive with ``currency``.  Pre-reform redenomination\n"
+                    "    waves and missing factors yield ``NaN``.  See\n"
+                    "    :func:`lsms_library.conversion.convert`.\n"
                 )
             method.__doc__ = "".join(doc_parts)
             method.__name__ = name

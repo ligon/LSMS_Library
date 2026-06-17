@@ -154,6 +154,37 @@ def is_monetary_table(table: str, country: str | None = None) -> bool:
     return bool(_monetary_columns(table, country))
 
 
+@lru_cache(maxsize=1)
+def _all_monetary_columns() -> frozenset[str]:
+    """Union of every monetary column name across all tables.
+
+    Used by the standalone :func:`lsms_library.conversion.convert`, which sees
+    a labelled frame but not the table name, to decide which columns to scale.
+    """
+    cols: set[str] = set()
+    for names in _DEFAULT_MONETARY.values():
+        cols |= set(names)
+    for spec in _load_data_info().get("Columns", {}).values():
+        if isinstance(spec, dict):
+            for col, meta in spec.items():
+                if isinstance(meta, dict) and meta.get("monetary") is True:
+                    cols.add(col)
+    return frozenset(cols)
+
+
+def _redenomination_waves(country: str) -> frozenset[str]:
+    """Waves of *country* whose ISO code is a redenomination override.
+
+    These are pre-reform waves (e.g. GhanaLSS <= 2005-06 in GHC) whose nominal
+    values are in the historical currency unit; the conversion layer declines
+    to convert them in v1 (see conversion_factors.org).
+    """
+    spec = _load_data_info().get("Currency", {}).get(country)
+    if isinstance(spec, dict):
+        return frozenset((spec.get("overrides") or {}).keys())
+    return frozenset()
+
+
 def attach_currency(df: pd.DataFrame, country: str, table: str,
                     mode: str) -> pd.DataFrame:
     """Attach the ISO 4217 currency label to *df* for *country* / *table*.

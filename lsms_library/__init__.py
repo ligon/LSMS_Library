@@ -120,6 +120,7 @@ from .country import Country, Wave
 from .feature import Feature
 from .catalog import countries, features
 from .currency import currency_for
+from .conversion import convert
 from . import local_tools as tools
 from . import transformations
 from .dvc_permissions import authenticate
