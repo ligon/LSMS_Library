@@ -14,7 +14,7 @@ import numpy as np
 import re
 import sys
 sys.path.append('../../../_/')
-from lsms_library.local_tools import conversion_table_matching_global, format_id, melt_visit_dates
+from lsms_library.local_tools import conversion_table_matching_global, format_id, melt_visit_intervals
 
 
 def _extract_kg_conversion(series):
@@ -268,11 +268,12 @@ def interview_date(df):
     aggregation (data_scheme.yml) reproduces the legacy Visit-1-only table.
 
     Implementation delegates to the shared
-    :func:`lsms_library.local_tools.melt_visit_dates` helper (the EHCVM
-    family reuses the same melt via its own one-line hooks); the prior
-    inline v1/v2 logic was equivalent for Malawi's two-visit data.
+    :func:`lsms_library.local_tools.melt_visit_intervals` helper.  Malawi
+    records only an interview *date* per visit (no separate start/end), so we
+    pass ``start_base='int_t'`` and keep the legacy ``Int_t`` output column;
+    the EHCVM family reuses the same helper with start/end timestamps.
     """
-    return melt_visit_dates(df)
+    return melt_visit_intervals(df, start_base='int_t', out_start='Int_t')
 
 
 def harmonize_food_labels(df, level='i'):

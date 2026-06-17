@@ -2078,58 +2078,79 @@ def map_index(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def melt_visit_dates(df: pd.DataFrame, col_base: str = 'int_t',
-                     out_col: str = 'Int_t', visit_level: str = 'visit') -> pd.DataFrame:
-    """Melt per-visit interview-date columns onto an ordinal ``visit`` index.
+def melt_visit_intervals(df: pd.DataFrame,
+                         start_base: str = 'int_start', end_base: str = 'int_end',
+                         out_start: str = 'Interview start', out_end: str = 'Interview end',
+                         visit_level: str = 'visit') -> pd.DataFrame:
+    """Melt per-visit interview ``(start[, end])`` timestamps onto a ``visit`` index.
 
-    Shared ``df_edit``-hook helper for the ``interview_date`` table (the first
+    Shared ``df_edit``-hook helper for the ``interview_date`` table (an
     application of the grain-aggregation-policy, SkunkWorks/
-    grain_aggregation_policy.org).  Surveys that visit a household more than
-    once record a date per visit; we preserve them all on an ordinal ``visit``
-    level rather than collapsing to the first.
+    grain_aggregation_policy.org).  The number of enumerator visits needed to
+    complete a household questionnaire is distinct from the survey *round*
+    (post-planting / post-harvest, already carried by ``t``); some surveys
+    record a start (and end) timestamp per such visit.  We preserve every
+    visit on an ordinal ``visit`` level rather than keeping only the first.
 
-    Input: ``df`` indexed by the table's idxvars (e.g. ``(i,)`` or ``(t, i)``,
-    ``t`` is prepended by the framework later), carrying the visit dates in
-    columns named ``int_t`` (visit 1), ``int_t_v2`` (visit 2), ``int_t_v3``
-    (visit 3), ...  Both lower- and ``Int_t``-cased spellings are accepted,
-    since the canonical ``int_t -> Int_t`` rewrite has not run at hook stage.
+    Input columns (target names produced by the wave ``myvars``; both lower-
+    and capitalised first-letter spellings accepted):
 
-    Output: indexed ``(<original idx>, visit)`` with a single ``out_col``
-    datetime column; ``visit`` is an ordinal ``Int64`` (1, 2, 3, ...).  Rows
-    whose date is NaT (a household not visited that many times, a single-visit
-    wave) are DROPPED -- never fabricated -- so a household with only a later
-    visit's date surfaces at that visit number, and a wave with only visit 1
-    yields ``visit=1`` rows.  Collapsing ``visit`` with the declared ``first``
-    aggregation reproduces the legacy first-visit-only table.
+    - visit 1 start = ``start_base`` (default ``int_start``); end = ``end_base``
+      (default ``int_end``);
+    - visit n>=2 start = ``{start_base}_v{n}``; end = ``{end_base}_v{n}``.
+
+    The END columns are OPTIONAL: a survey that records only a start timestamp
+    (e.g. a single interview *date*) supplies just the start columns, and the
+    output then carries only ``out_start`` -- the all-NaT ``out_end`` column is
+    dropped.  Set ``out_start='Int_t'`` (with no end columns present) to
+    reproduce the legacy single-datetime-per-visit shape.
+
+    Output: indexed ``(<original idx>, visit)`` with columns ``out_start`` and
+    (where any end is recorded) ``out_end``; ``visit`` is an ordinal ``Int64``
+    (1, 2, 3, ...).  A visit whose start AND end are both NaT is DROPPED --
+    never fabricated -- so a household not visited that many times does not
+    surface at that visit number.  Collapsing ``visit`` with the declared
+    ``first`` aggregation reproduces the legacy first-visit-only table.
     """
     def _pick(*names):
         return next((n for n in names if n in df.columns), None)
 
+    def _col(base, n):
+        cap = base[:1].upper() + base[1:]
+        if n == 1:
+            return _pick(base, cap)
+        return _pick(f'{base}_v{n}', f'{cap}_v{n}')
+
+    # Discover visits 1..N: stop at the first ordinal with neither a start nor
+    # an end column declared.
     specs = []
-    v1 = _pick(col_base, out_col)
-    if v1 is None:
-        return df  # nothing to melt; hand back unchanged (defensive)
-    specs.append((1, v1))
-    n = 2
+    n = 1
     while True:
-        c = _pick(f'{col_base}_v{n}', f'{out_col}_v{n}')
-        if c is None:
+        s, e = _col(start_base, n), _col(end_base, n)
+        if s is None and e is None:
             break
-        specs.append((n, c))
+        specs.append((n, s, e))
         n += 1
+    if not specs:
+        return df  # nothing to melt; hand back unchanged (defensive)
 
     idx_names = list(df.index.names)
     flat = df.reset_index()
     pieces = []
-    for vnum, col in specs:
+    for vnum, s, e in specs:
         part = flat[idx_names].copy()
         part[visit_level] = vnum
-        part[out_col] = pd.to_datetime(flat[col], errors='coerce')
+        part[out_start] = pd.to_datetime(flat[s], errors='coerce') if s else pd.NaT
+        part[out_end] = pd.to_datetime(flat[e], errors='coerce') if e else pd.NaT
         pieces.append(part)
 
     out = pd.concat(pieces, ignore_index=True)
-    out = out[out[out_col].notna()]                 # drop NaT (un-made) visits
+    # Drop un-made visits (both start and end NaT); never fabricate a visit.
+    out = out[out[out_start].notna() | out[out_end].notna()]
     out[visit_level] = out[visit_level].astype('Int64')
+    # Start-only surveys: drop the all-NaT end column entirely.
+    if out_end in out.columns and out[out_end].isna().all():
+        out = out.drop(columns=[out_end])
     return out.set_index(idx_names + [visit_level])
 
 
