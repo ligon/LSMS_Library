@@ -1,0 +1,223 @@
+#+TITLE: Design: currency conversion (phase 2 of currency labeling)
+#+AUTHOR: Sue (Claude Opus 4.8) with Ethan Ligon
+#+DATE: 2026-06-17
+
+* Context
+
+Phase 1 (PR #478) attached an ISO 4217 currency label to every monetary
+value, keyed on =(country, wave)=, via =lsms_library/currency.py= and the
+=Currency:= section of =data_info.yml=.  That made cross-country monetary
+tables /labelled/ but still /incommensurable/: =ll.Feature('food_expenditures')=
+stacks NGN, UGX, XOF, ... at wildly different scales.
+
+Phase 2 turns the label into a /conversion/: nominal local-currency values
+become a common, comparable basis (market USD, PPP international dollars,
+real local currency, real PPP).  Phase 1 was deliberately built as the
+join key for exactly this step; nothing in phase 1 changes here.
+
+This document is the agreed design.  It also seeds the documentation header
+of the conversion-factor table it specifies (=conversion_factors.org=),
+since that file interleaves prose, the generator, and the data.
+
+* Design decisions (locked with EL)
+
+- Targets :: market USD (FX), PPP international dollars (consumption PPP),
+  real local currency (CPI-deflated), and real PPP (deflate + base-year
+  PPP -- the cross-country-and-time gold standard, the World Bank
+  poverty-line basis).  A "real USD" path (FX composed with a US deflator)
+  is also supported; see [[*The US-deflator question]].
+- Data representation :: a single /pure org-table/ in
+  =lsms_library/conversion/conversion_factors.org=, keyed on =(Country,
+  Date)=, one column per named conversion.  Readable, diffable, and
+  composable with the prose/documentation in the same file; the library
+  reads it the way it already reads =categorical_mapping.org=.
+- Extensibility :: adding a conversion is /adding a column/ (plus a recipe
+  line in the embedded generator).  No engine code changes.
+- API :: a =convert()= engine that operates on any phase-1-labelled frame,
+  plus thin =numeraire== kwarg sugar on the table methods and =Feature=.
+- Output :: replace the monetary columns in place with converted values,
+  relabel the =currency= index level to the target token (e.g. =PPP-2017=),
+  and stamp provenance in =df.attrs=.
+- No silent fallback :: a missing =(country, year)= factor, or an
+  out-of-scope pre-redenomination wave, yields =pd.NA= plus a warning --
+  never a wrong number.
+
+* The conversion-factor table
+
+** Key: =(Country, Date)=, not =(Currency, Date)=
+
+FX (LCU per USD) is currency-level (XOF has one USD rate), but *PPP and CPI
+are country-level even inside a currency union*: Benin and Niger both use
+XOF yet have different price levels, hence different PPP factors and
+different CPIs.  Keying on currency would assign one CFA country's PPP to
+all eight -- silently wrong for the whole EHCVM bloc.  So the primary key
+is =Country=; =Currency= is carried as a column (useful for FX and
+grouping).  =Country= is always available at conversion time: the
+=country= index level in =Feature= output, =self.name= in single-country
+calls (stamped into =df.attrs['country']= by =_finalize_result= so the
+standalone =convert()= can recover it).
+
+** Orientation: every factor is "LCU per target unit"
+
+Each conversion column holds, for that =(Country, Date)= row, the divisor
+=d= such that
+
+\[ x_{\text{target}} = x_{\text{LCU}} \,/\, d . \]
+
+This matches WDI's own convention for =PA.NUS.FCRF= and =PA.NUS.PPP=, and
+makes a user-added column unambiguous: fill in LCU per one unit of your
+target, and =convert()= is a single division regardless of the column.
+
+** Deflation is baked into the column; the base year is in the column name
+
+Because the table is per =(Country, Date)=, a column can pre-compose the
+PPP conversion /and/ the intertemporal deflation.  For a constant-2017
+PPP-dollar column,
+
+\[ d^{\text{PPP-2017}}_{c}(t) = \mathrm{PPP}_c(2017)\,\cdot\,\frac{\mathrm{CPI}_c(t)}{\mathrm{CPI}_c(2017)} , \]
+
+so dividing nominal LCU at wave-year \(t\) by this single number yields
+constant-2017 PPP international dollars (comparable across country /and/
+time).  Consequently the base year lives in the /column name/, the engine
+needs no =base=/=deflator= kwargs, and a new base year is just a new
+column.  Raw =CPI= is kept as a helper column for users who want to roll
+their own deflation, but is not itself a conversion target.
+
+** Columns shipped in v1
+
+- =FX= :: LCU per current USD; WDI =PA.NUS.FCRF= (official, period-average).
+  Nominal USD at market rates.
+- =PPP-2017= :: LCU per constant-2017 PPP international dollar (real PPP).
+  Consumption PPP =PA.NUS.PRVT.PP= benchmarked to 2017, deflated by local
+  CPI =FP.CPI.TOTL=.  Headline welfare measure.
+- =PPP-2011=, =PPP-2021= :: as above at the other ICP benchmark years.
+- =USD-real-2017= :: LCU per constant-2017 USD; =FX= composed with the US
+  CPI.  Second-best for welfare (see below) but standard for single-country
+  USD series.
+- =LCU-real-2017= :: LCU per constant-2017 local currency (local CPI only).
+  Intra-country temporal comparability.
+- =CPI= :: local consumer price index (helper; not a target).
+
+#+caption: Illustrative shape of conversion_factors.org (values are placeholders).
+#+name: tab:conversion_factors
+| Country  | Currency | Date | FX     | PPP-2017 | PPP-2011 | PPP-2021 | USD-real-2017 | LCU-real-2017 |  CPI |
+|----------+----------+------+--------+----------+----------+----------+---------------+---------------+------|
+| Uganda   | UGX      | 2019 | 3704.0 |   1240.0 |    980.0 |   1330.0 |        3450.0 |        1.05   | 95.2 |
+| Mali     | XOF      | 2019 |  585.9 |    245.0 |    210.0 |    260.0 |         560.0 |        1.02   | 98.1 |
+| Niger    | XOF      | 2019 |  585.9 |    232.0 |    198.0 |    248.0 |         560.0 |        1.01   | 99.0 |
+| GhanaLSS | GHS      | 2017 |    4.35 |     2.10 |     1.55 |     2.30 |          4.10 |        1.00   | 100.0 |
+
+Note Mali and Niger share =FX= (XOF) but differ on =PPP-2017= and =CPI= --
+the reason the key is =Country=, not =Currency=.
+
+** Generation, provenance, redenomination
+
+The table is populated by an org-babel source block in the same file that
+pulls WDI (and IMF IFS for gaps), computes the composed columns from
+declarative recipes, and writes the table; the prose above each column
+documents its indicator, base year, formula, and the snapshot vintage.  At
+runtime the library only /reads/ the table (no babel execution);
+regeneration is a maintainer Emacs/=make= step, mirroring how
+=categorical_mapping.org= is maintained.
+
+Redenomination is absorbed for free /if/ each row stores the
+contemporaneous-currency factor (the Ghana 2005 row carries the GHC-era
+FX, ~9072 GHC/USD, not the GHS-rebased ~0.9), so the factor matches our
+GHC-denominated 2005 data directly.  WDI is rebased to the current
+currency, so the four pre-reform waves (Ghana <= 2005-06, Tajikistan 1999,
+Azerbaijan 1995, Serbia-and-Montenegro 2002) need contemporaneous values
+from IMF IFS.  *v1 scope cut*: those rows stay =NA= and =convert()= warns
+rather than emit a 10^4-off number.
+
+* The engine
+
+** =convert(df, to, *, country=None) -> DataFrame=
+
+1. Recover the country per row: the =country= index level if present
+   (=Feature=), else =df.attrs['country']=, else the =country== argument.
+2. Map the =t= (wave) level to a calendar year (derive from the wave
+   string; a small override map handles stragglers).  /Refinement (not
+   v1)/: a fieldwork-weighted year from =interview_date= (present in 28/34
+   countries).
+3. Join the =conversion_factors= table on =(country, year)=, pull the =to=
+   column, and divide every =monetary:= column (from
+   =currency._monetary_columns=) by it.
+4. Replace the monetary columns in place; relabel the =currency= index
+   level (or add it) to the target token =to=; set
+   =df.attrs['conversion'] = {'to': to, 'vintage': ..., 'source': 'conversion_factors.org'}=.
+   Preserve =df.attrs['id_converted']= across any =set_index= (the
+   documented pandas-2.x gotcha).
+5. Missing factor or out-of-scope row -> =pd.NA= + one warning.
+
+=convert()= needs only =(country, t)= and the =monetary:= columns; it does
+/not/ require a phase-1 =currency= level to be present (it sets the basis
+token itself).  It is a pure transform, unit-testable on synthetic frames.
+
+** Kwarg sugar
+
+=numeraire=<column>= on the generated table methods and on
+=Feature.__call__= wraps =convert()=:
+
+#+begin_src python
+ll.Country('Uganda').food_expenditures(numeraire='PPP-2017')
+ll.Feature('food_expenditures')(['Mali','Niger'], numeraire='PPP-2017')
+df2 = ll.convert(df, to='USD-real-2017')   # any labelled frame
+#+end_src
+
+Guarding mirrors phase 1's =currency=/=units=: =numeraire= is accepted only
+on monetary tables and only for a column that exists in
+=conversion_factors.org= (else =ValueError= listing the available targets).
+=numeraire= and =currency= are mutually exclusive on a single call
+(converting already sets the basis label).
+
+* The US-deflator question (resolved)
+
+For a "real USD" path (nominal LCU -> USD via FX -> deflate to a base
+year), the standard deflator depends on what is valued: *consumption /
+expenditure / wages* (our case) deflate by the *US CPI* (consumer basket),
+whereas *GDP / output aggregates* use the *US GDP deflator*.  So
+=USD-real-2017= uses the US CPI; a =USD-realdef-2017= variant using the US
+GDP deflator can be added as a column if wanted.  Caveat documented in the
+table: for /cross-country/ welfare, "FX + US CPI" is dominated by the PPP
+route (market FX understates poorer countries' real consumption,
+Balassa-Samuelson); prefer =PPP-2017=.
+
+* Reproducibility
+
+The table is a versioned snapshot (a citable vintage), not a live API call
+per query.  =df.attrs['conversion']= records the target, the snapshot
+vintage, and the source file, so any converted frame is replicable.  An
+opt-in =lsms-library update-rates= (or the babel block) refreshes the
+snapshot and stamps a new vintage.
+
+* Out of scope for v1 / deferred
+
+- Contemporaneous-currency factors for the four pre-reform waves (need IMF
+  IFS); those rows stay =NA= meanwhile.
+- Fieldwork-weighted wave->year from =interview_date=.
+- Penn World Table as an alternate PPP source (would just be more columns).
+- A =basis= long-form representation (we chose replace-and-relabel).
+
+* TODO Implementation plan
+** TODO Author =lsms_library/conversion/conversion_factors.org= (prose + babel generator + table)
+** TODO Add factor-table reader + =convert()= to =lsms_library/currency.py= (or a new =conversion.py=)
+** TODO Stamp =df.attrs['country']= in =Country._finalize_result=
+** TODO Thread =numeraire== sugar through the generated =method()= and =Feature.__call__=
+** TODO Re-export =convert= from the package root
+** TODO Add =redenomination:= handling (NA + warn for the four pre-reform waves)
+** TODO Tests: factor lookup, per-target math, XOF country-level PPP divergence, NA policy, attrs/provenance, kwarg guards, Feature end-to-end
+
+* Verification
+
+- Unit (synthetic frames, no microdata): a known =(country, year, column)=
+  factor divides the monetary column correctly; Mali vs Niger get /different/
+  =PPP-2017= despite shared =FX=; pre-reform wave -> =NA= + warning; =attrs=
+  provenance set and =id_converted= preserved.
+- Guards: =numeraire= on a non-monetary table -> =TypeError=; unknown
+  target -> =ValueError= listing columns; =numeraire= + =currency= together
+  -> =ValueError=.
+- End-to-end (cache-gated): =Feature('food_expenditures')(['Mali','Niger'],
+  numeraire='PPP-2017')= returns comparable magnitudes with the =currency=
+  level relabelled =PPP-2017=.
+- Backward compatibility: default (=numeraire=None=) leaves every existing
+  call byte-identical.
