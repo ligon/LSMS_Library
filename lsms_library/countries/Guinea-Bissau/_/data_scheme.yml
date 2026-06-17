@@ -72,8 +72,11 @@ Data Scheme:
     Floor: str
 
   interview_date:
-    index: (t, i)
-    Int_t: datetime
+    index: (t, i, visit)
+    Interview start: datetime
+    Interview end: datetime
+    aggregation:
+      visit: first
 
   food_security:
     # FAO 8-item Food Insecurity Experience Scale (FIES), EHCVM Section

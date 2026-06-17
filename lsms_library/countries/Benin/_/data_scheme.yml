@@ -80,8 +80,11 @@ Data Scheme:
     Floor: str
 
   interview_date:
-    index: (t, i)
-    Int_t: datetime
+    index: (t, i, visit)
+    Interview start: datetime
+    Interview end: datetime
+    aggregation:
+      visit: first
   shocks:
     index: (t, i, Shock)
     AffectedIncome: bool

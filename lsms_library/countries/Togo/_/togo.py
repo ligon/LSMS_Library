@@ -332,3 +332,12 @@ def plot_features_for_wave(t, source, colmap):
     })
     df = df.set_index(['t', 'i', 'plot_id'])
     return df
+
+
+def interview_date(df):
+    """Melt EHCVM per-visit interview start/end timestamps onto a `visit`
+    index. q23/q24/q25 a/b = visit 1/2/3 start/end -> int_start/int_end[_v2/_v3].
+    Delegates to local_tools.melt_visit_intervals -> 'Interview start' /
+    'Interview end'; collapsing `visit` with `first` reproduces the legacy
+    single-date table."""
+    return tools.melt_visit_intervals(df)
