@@ -63,18 +63,39 @@ household_roster:
         MonthsAway: m1_q11
 
 interview_date:
-    # Cover page metadata_cl.dta; m0_date is int YYYYMMDD parsed by
-    # mapping.py:Int_t. i=[psu,hh] -> composite via mapping.py:i() to match
-    # sample()'s household identity ('psu-hh'); `hh` alone is only the
-    # within-cluster number (14 unique). See CONTENTS.org re: the roster's
-    # i=hh issue.
+    # Cover page metadata_cl.dta.  GH #474: previously wired Int_t to
+    # m0_date, which the source labels "Date of last modification" -- a
+    # data-entry timestamp, NOT the fieldwork interview date.  The real
+    # interview date is the "Day / Month / Year of Interview" question:
+    # Visit 1 = m0_q08d/m/y, Visit 2 = m0_q08d2/m2/y2 (Albania 2002 is a
+    # genuine two-visit survey; the *2 columns are empty in this file, so the
+    # country-level albania.interview_date melt yields no visit=2 rows -- NaT
+    # rows are dropped, never fabricated).  Columns are given year, month, day
+    # order and combined into a Timestamp by albania.albania_date_ymd, then
+    # melted onto a `visit` index level by the country-level
+    # albania.interview_date df_edit hook.
+    # i=[psu,hh] -> composite via mapping.py:i() to match sample()'s household
+    # identity ('psu-hh'); `hh` alone is only the within-cluster number (14
+    # unique). See CONTENTS.org re: the roster's i=hh issue.
+    # converted_categoricals: False -- the Year-of-Interview column carries a
+    # Stata value label that decodes every cell to '***Undefined Label'; read
+    # the underlying numeric code so albania_date_ymd sees 2002, not a label.
     file:
         - ../Data/metadata_cl.dta
+    converted_categoricals: False
     idxvars:
         i: [psu, hh]
     myvars:
-        Int_t:
-            - m0_date
+        int_t:
+            - m0_q08y
+            - m0_q08m
+            - m0_q08d
+            - mapping: albania_date_ymd
+        int_t_v2:
+            - m0_q08y2
+            - m0_q08m2
+            - m0_q08d2
+            - mapping: albania_date_ymd
 
 subjective_well_being:
     # Module 9 "Subjective Poverty" (subjpov_cl.dta).  m09_q09 "Economic status"

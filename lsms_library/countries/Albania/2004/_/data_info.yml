@@ -52,12 +52,22 @@ household_roster:
         MonthsAway: m1_q08
 
 interview_date:
-    # Cover page w3_hh_basic.dta; m0_date is int YYYYMMDD parsed by
-    # mapping.py:Int_t. i=chid matches the roster.
+    # Cover page w3_hh_basic.dta.  GH #474: previously wired Int_t to
+    # m0_date, which the source labels "data entry date" -- a data-entry
+    # timestamp, NOT the fieldwork interview date.  The real interview date
+    # is "date of enumeration (day/month/year)" = m0_q04d/m/y (single visit;
+    # the 2004 panel cover records no second enumerator visit).  Columns are
+    # given year, month, day order and combined into a Timestamp by
+    # albania.albania_date_ymd, then melted onto a `visit` index level
+    # (visit=1 only here) by the country-level albania.interview_date df_edit
+    # hook.  i=chid matches the roster.
     file:
         - ../Data/w3_hh_basic.dta
     idxvars:
         i: chid
     myvars:
-        Int_t:
-            - m0_date
+        int_t:
+            - m0_q04y
+            - m0_q04m
+            - m0_q04d
+            - mapping: albania_date_ymd

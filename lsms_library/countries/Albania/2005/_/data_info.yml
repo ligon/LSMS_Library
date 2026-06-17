@@ -92,16 +92,26 @@ housing:
         Rooms: m13a_q08
 
 interview_date:
-    # Cover page identification_cl.dta; m0_date is int YYYYMMDD parsed by
-    # mapping.py:Int_t. i=[m0_q00,m0_q01] uses the composite i() to match the
+    # Cover page identification_cl.dta.  GH #474: previously wired Int_t to
+    # m0_date, which the source labels "Date of last modification" -- a
+    # data-entry timestamp, NOT the fieldwork interview date.  The real
+    # interview date is the "Day / Month / Year of Interview" question =
+    # m0_q8d/m/y (single visit; the cover records no second enumerator
+    # visit).  Columns are given year, month, day order and combined into a
+    # Timestamp by albania.albania_date_ymd, then melted onto a `visit` index
+    # level (visit=1 only here) by the country-level albania.interview_date
+    # df_edit hook.  i=[m0_q00,m0_q01] uses the composite i() to match the
     # household identity built by sample.py (so _join_v_from_sample resolves v).
     file:
         - ../Data/identification_cl.dta
     idxvars:
         i: [m0_q00, m0_q01]
     myvars:
-        Int_t:
-            - m0_date
+        int_t:
+            - m0_q8y
+            - m0_q8m
+            - m0_q8d
+            - mapping: albania_date_ymd
 
 subjective_well_being:
     # Module 7 "Subjective Poverty" (subjective_poverty_cl.dta).  Two

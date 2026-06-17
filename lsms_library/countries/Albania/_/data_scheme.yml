@@ -66,8 +66,22 @@ Data Scheme:
     Own Step: int
 
   interview_date:
-    index: (t, i)
+    # GH #474: Int_t now comes from the "Day / Month / Year of Interview"
+    # question (Visit 1 = m0_q08*/m0_q04*/m0_q8*, Visit 2 = m0_q08*2 in
+    # 2002), NOT the m0_date last-modification / data-entry stamp.  Albania
+    # 2002 is a genuine two-visit survey, so -- following the Malawi pattern
+    # -- both visit dates are preserved on an ordinal `visit` index level
+    # (1 = first visit, 2 = second visit), melted by the country-level
+    # albania.interview_date df_edit hook (visit rows with a NaT date are
+    # dropped there).  2004 / 2005 are single-visit -> visit = 1 only; the
+    # 2002 *2 columns are empty in this data file -> no visit = 2 rows.
+    # `v` auto-joins from sample() at API time, so the returned grain is
+    # (t, v, i, visit).  Collapsing `visit` with the declared `first`
+    # aggregation reproduces the legacy Visit-1-only table.
+    index: (t, i, visit)
     Int_t: datetime
+    aggregation:
+      visit: first
 
   # Occurrence-only shocks module (2012 wave only; earlier waves have no
   # shocks module).  No impact (Affected*) or coping (HowCoped*) detail in
