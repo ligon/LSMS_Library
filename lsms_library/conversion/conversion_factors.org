@@ -15,19 +15,28 @@ documented next to the data it describes.
 * Reading the table
 
 - Key :: =(Country, Date)=, where =Country= is a repo country name (so =GHA=
-  appears as =GhanaLSS=) and =Date= is a calendar year.  =Currency= is carried
-  as a convenience column.  The key is *Country*, not *Currency*, because PPP
-  and CPI are country-specific even inside a currency union: Mali and Niger
-  both use XOF but have different price levels, hence different PPP factors
-  (compare their =PPP-2017= rows) -- one of which would be silently wrong if a
-  single XOF row served both.
+  appears as =GhanaLSS=).  The key is *Country*, not *Currency*, because PPP and
+  CPI are country-specific even inside a currency union: Mali and Niger both use
+  XOF but have different price levels, hence different =PPP-2017= rows -- one of
+  which would be silently wrong if a single XOF row served both.  =Currency= is
+  a convenience column.
+- Date :: an *ISO-8601 partial date* at any resolution -- =2019=, =2019-08=, or
+  =2019-08-15= -- resolved to the start of the period (=2019= -> =2019-01-01=,
+  =2019-08= -> =2019-08-01=).  Rows are currently yearly; finer rows can be
+  added where a wave straddles volatile months and the lookup will prefer them.
+- Time match (dynamic / as-of) :: =convert()= matches each row to the *most
+  recent factor at or before its interview date* (=merge_asof= backward), so a
+  household interviewed in 2019 within a =2018-19= wave gets the 2019 factor and
+  one interviewed in 2018 gets 2018 -- per household, exact.  Households with no
+  =interview_date= (and the 6 countries lacking the table) fall back to the
+  wave's nominal date (wave year -> Jan 1).
 - Orientation :: every factor column is *LCU per target unit*, so
 
   \[ x_{\text{target}} = x_{\text{LCU}} \,/\, \text{factor} . \]
 
   A new conversion is a new column following this rule.
-- Missing :: an empty/=---= cell is =pd.NA=; =convert()= propagates it (no
-  silent fallback).
+- Missing :: an empty/=---= cell, or a query date before a country's earliest
+  row, yields =pd.NA= (no silent fallback).
 
 * Column glossary
 

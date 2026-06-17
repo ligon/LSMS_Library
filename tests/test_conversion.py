@@ -20,14 +20,26 @@ from lsms_library.conversion import (
 from lsms_library.currency import CURRENCY_LEVEL
 
 
+@pytest.fixture(autouse=True)
+def _no_real_interview_dates(monkeypatch):
+    """Keep unit tests data-free: don't auto-load Country.interview_date().
+
+    Patched to {}, convert(interview_dates=None) falls back to the wave-nominal
+    date for every row (the historical behavior); tests needing real
+    per-household as-of selection pass an explicit interview_dates map.
+    """
+    import lsms_library.conversion as _cv
+    monkeypatch.setattr(_cv, "_interview_dates", lambda country: {})
+
+
 # ---------------------------------------------------------------------------
 # Factor table
 # ---------------------------------------------------------------------------
 
-def test_factor_table_loads_and_is_keyed():
+def test_factor_table_loads_with_parsed_date():
     f = _load_factors()
-    assert f.index.names == ["Country", "Date"]
-    assert {"FX", "PPP-2017"}.issubset(f.columns)
+    assert {"Country", "Date", "_date", "FX", "PPP-2017"}.issubset(f.columns)
+    assert pd.api.types.is_datetime64_any_dtype(f["_date"])
 
 
 def test_conversion_targets_excludes_helpers():
@@ -40,8 +52,12 @@ def test_conversion_targets_excludes_helpers():
 def test_country_keyed_not_currency_keyed():
     """Mali and Niger share FX (XOF) but must have distinct PPP (country-level)."""
     f = _load_factors()
-    assert f.at[("Mali", 2018), "FX"] == f.at[("Niger", 2018), "FX"]      # shared XOF
-    assert f.at[("Mali", 2018), "PPP-2017"] != f.at[("Niger", 2018), "PPP-2017"]
+
+    def cell(country, year, col):
+        return f.loc[(f["Country"] == country) & (f["Date"] == year), col].iloc[0]
+
+    assert cell("Mali", 2018, "FX") == cell("Niger", 2018, "FX")          # shared XOF
+    assert cell("Mali", 2018, "PPP-2017") != cell("Niger", 2018, "PPP-2017")
 
 
 @pytest.mark.parametrize("wave,year", [
@@ -156,6 +172,39 @@ def test_convert_no_monetary_columns_noop():
         warnings.simplefilter("always")
         out = convert(df, to="FX")
     assert "HouseholdSize" in out.columns and out["HouseholdSize"].iloc[0] == 4
+
+
+# ---------------------------------------------------------------------------
+# As-of by interview date
+# ---------------------------------------------------------------------------
+
+def test_convert_asof_per_household_interview_date():
+    # Same wave, two households interviewed in different calendar years -> each
+    # gets its contemporaneous (as-of) factor.  Uganda PPP-2017: 2018=1251.1,
+    # 2019=1287.0.
+    idx = pd.MultiIndex.from_tuples(
+        [("h1", "2018-19", "rice"), ("h2", "2018-19", "rice")],
+        names=["i", "t", "j"])
+    df = pd.DataFrame({"Expenditure": [1_000_000.0, 1_000_000.0]}, index=idx)
+    df.attrs["country"] = "Uganda"
+    idates = {("h1", "2018-19"): pd.Timestamp("2018-11-15"),
+              ("h2", "2018-19"): pd.Timestamp("2019-03-10")}
+    out = convert(df, to="PPP-2017", interview_dates=idates)
+    v = out["Expenditure"].tolist()
+    assert v[0] == pytest.approx(1_000_000 / 1251.1, rel=1e-3)   # 2018 factor
+    assert v[1] == pytest.approx(1_000_000 / 1287.0, rel=1e-3)   # 2019 factor
+    assert v[0] != v[1]
+
+
+def test_convert_falls_back_to_wave_year_without_interview_date():
+    idx = pd.MultiIndex.from_tuples(
+        [("h1", "2018-19", "rice"), ("h2", "2018-19", "rice")],
+        names=["i", "t", "j"])
+    df = pd.DataFrame({"Expenditure": [1_000_000.0, 1_000_000.0]}, index=idx)
+    df.attrs["country"] = "Uganda"
+    out = convert(df, to="PPP-2017", interview_dates={})   # no dates -> wave year 2018
+    v = out["Expenditure"].tolist()
+    assert v[0] == v[1] == pytest.approx(1_000_000 / 1251.1, rel=1e-3)
 
 
 # ---------------------------------------------------------------------------
