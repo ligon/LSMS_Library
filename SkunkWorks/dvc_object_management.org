@@ -674,23 +674,31 @@ the 58+ =_/{table}.py= scripts write unstamped parquets we don't edit).
   always would make a subset-built parquet look fresh to a full call and
   serve subset-as-full -- a correctness regression -- so we keep the
   (safe) churn.
-- *F1 (residual, MEDIUM, non-regression).*  A *hashless* (script-written)
-  L2-wave parquet is still served when *no* L2-country parquet exists to
-  trigger eviction: the wave-level gates fall through to rebuild only on
-  =stale= (a wrong *stored* hash), and a hashless parquet classifies as
-  =legacy=, which is trusted.  Trigger is narrow -- a partial cache
-  (wave parquets present but the country table was never materialized)
-  followed by a source/script edit; it is *not* reachable via
-  =lsms-library cache clear= (which removes both tiers) and fails toward
-  serving slightly-stale data, never corruption.  This is the same
-  "soft" script-path L2-wave gap CLAUDE.md already documented for
-  =LSMS_NO_CACHE=; v0.8.0 closes it for the common (country-parquet
-  present, then stale) path via eviction but not for the
-  missing-country-parquet case.  *Fix path for a future round*: stamp
-  script-path wave parquets *after* a Make rebuild (only when freshly
-  built, never on a plain read -- that was the CRITICAL-2 bug), giving
-  them per-wave hash granularity like YAML tables.  Deferred because the
-  Make-mtime interaction can't be exercised offline without source data.
+- *F1 (RESOLVED in GH #479).*  Formerly: a *hashless* (script-written)
+  L2-wave parquet was still served when *no* L2-country parquet existed to
+  trigger eviction (eviction fired only in the =stale=-hash branch, which
+  needs a country parquet to compare), so a partial cache (wave parquets
+  present but the country table never materialized) followed by a
+  source/script edit -- and likewise an =LSMS_NO_CACHE= run, for which
+  script-path waves are "soft" -- reused slightly-stale hashless wave data
+  (never corruption; not reachable via =lsms-library cache clear=, which
+  removes both tiers).  *Fix (the deferred "stamp-after-Make" was
+  rejected):* stamping a freshly-Made wave parquet is unsafe because
+  =try_make= is mtime-based and can skip a "fresh" rebuild, so the stamp
+  would mask staleness (the CRITICAL-2 trap).  Instead,
+  =_evict_hashless_wave_caches= now fires once just *before every* rebuild
+  descent (=stale=, *absent* country parquet, or =LSMS_NO_CACHE=) rather
+  than only in the =stale= branch -- the descent then re-runs Make/the
+  script from source.  Selective (deletes only hashless parquets; stamped
+  YAML waves self-invalidate per-wave), a no-op on the warm path (which
+  returns earlier), and validated cold against S3 source (eviction
+  confirmed firing on the absent-country rebuild; 160 script-path tables
+  rebuild clean).  *Belt-and-suspenders:*
+  =Country._assert_built_required_columns= (post-=_finalize_result=,
+  script-path tables only) raises an actionable "stale wave cache -> cache
+  clear" error if a build is missing a required declared column -- turning
+  the silent wrong-data symptom (GhanaLSS =food_acquired= without
+  =Quantity=, the bug this whole feature surfaced) into a loud failure.
 - *F3 (LOW, perf only).*  Two concurrent agents can have one evict a
   freshly-rebuilt hashless wave parquet from the other (indistinguishable
   from a stale one), causing redundant Make work -- never stale data.
