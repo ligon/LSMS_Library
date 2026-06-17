@@ -2522,6 +2522,22 @@ class Country:
             return df_local
 
         def load_from_waves(waves):
+            # Hashless (script-written) L2-wave parquets can't self-invalidate,
+            # so evict them at the start of every wave-rebuild descent; the loop
+            # below then re-runs Make/the script from source rather than reusing
+            # a stale wave parquet.  Closes residual F1 (GH #479) for the
+            # partial-cache (country parquet absent) and LSMS_NO_CACHE paths,
+            # which previously fell through to a wave rebuild WITHOUT eviction
+            # (eviction formerly fired only in the `freshness == "stale"`
+            # branch, reachable only when the L2-country parquet exists).  This
+            # lives INSIDE load_from_waves -- not earlier in the rebuild descent
+            # -- so it touches only the wave-rebuild path and never the DVC
+            # materialize-stage read path (`collect_stage_outputs`), whose stage
+            # outputs share the {wave}/_/{table}.parquet location and must not be
+            # evicted before being read.  Selective (deletes only hashless
+            # parquets; stamped YAML waves self-invalidate per-wave); never runs
+            # on a warm hit (the cache read returns before any rebuild descent).
+            self._evict_hashless_wave_caches(method_name)
             results = {}
             for w in waves:
                 wave_obj = self[w]
@@ -2726,23 +2742,6 @@ class Country:
                             category=UserWarning,
                             stacklevel=2,
                         )
-
-            # About to rebuild: every fall-through to here is a (re)build path
-            # -- cache stale, cache absent, LSMS_NO_CACHE, or a failed cache
-            # read.  Hashless (script-written) L2-wave parquets can't
-            # self-invalidate, so evict them now; the rebuild descent below
-            # (load_from_waves -> run_make_target) then re-runs Make/the script
-            # from source instead of reusing a stale wave parquet.  Closes
-            # residual F1 (GH #479): eviction previously fired ONLY in the
-            # `freshness == "stale"` branch above, so a PARTIAL cache (wave
-            # parquets present but the country parquet never materialized) --
-            # and likewise an LSMS_NO_CACHE run, for which script-path waves are
-            # "soft" -- silently served stale hashless wave data.  Stamped
-            # YAML-path wave parquets self-invalidate per-wave and are left
-            # untouched by the evictor.  The warm path already returned above,
-            # so this never runs on a cache hit; for tables with no hashless
-            # wave parquets it is a cheap directory-glob no-op.
-            self._evict_hashless_wave_caches(method_name)
 
             dvc_root = self.file_path.parent
 
