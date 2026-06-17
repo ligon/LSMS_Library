@@ -165,7 +165,9 @@ Data Scheme:
     Quantity: float
     Quantity_sold: float
     Value_sold: float
-    harvest_month: float
+    harvest_month:
+      type: float
+      optional: true
     intercropped: bool
     materialize: make
 
