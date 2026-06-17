@@ -177,7 +177,7 @@ class Feature:
         ]
 
     def __call__(self, countries: list[str] | None = None, trust_cache: bool | None = None,
-                 currency: str | None = 'index') -> pd.DataFrame:
+                 currency: str | None = 'index', numeraire: str | None = None) -> pd.DataFrame:
         """Load and concatenate data across countries.
 
         Parameters
@@ -194,6 +194,12 @@ class Feature:
             ``Country(...)`` calls, which default to ``None``.  A no-op for
             non-monetary tables (there is nothing to label).  See
             :func:`lsms_library.currency.attach_currency`.
+        numeraire : str, optional
+            Convert monetary columns to a comparable basis -- a target column of
+            ``conversion_factors.org`` (e.g. ``'PPP-2017'``).  Supersedes
+            ``currency`` (the converted frame is labelled with the target).  A
+            no-op for non-monetary tables.  See
+            :func:`lsms_library.conversion.convert`.
 
         Returns
         -------
@@ -206,25 +212,38 @@ class Feature:
             raise ValueError(
                 f"currency must be 'index', 'column', or None; got {currency!r}"
             )
+        monetary = is_monetary_table(self.table_name)
+        if numeraire is not None and monetary:
+            from .conversion import conversion_targets
+            if numeraire not in conversion_targets():
+                raise ValueError(
+                    f"Unknown numeraire {numeraire!r}; available: {conversion_targets()}"
+                )
         effective_trust_cache = trust_cache if trust_cache is not None else self.trust_cache
         targets = countries if countries is not None else self.countries
         frames: list[pd.DataFrame] = []
         canonical_levels = _canonical_index_levels(self.table_name)
 
-        # Currency is a no-op for non-monetary tables; only pass it through (and
-        # widen the canonical index so _harmonize_country_frame keeps the level)
-        # when this feature actually has monetary columns.
-        pass_currency = currency if is_monetary_table(self.table_name) else None
-        if pass_currency == 'index' and canonical_levels:
+        # numeraire supersedes currency; both are no-ops for non-monetary tables.
+        # Either way the output carries a `currency` index level (relabelled to
+        # the basis token for numeraire), so widen the canonical index to keep it.
+        use_numeraire = numeraire if monetary else None
+        pass_currency = None if use_numeraire else (currency if monetary else None)
+        if (use_numeraire is not None or pass_currency == 'index') and canonical_levels:
             canonical_levels = canonical_levels + [CURRENCY_LEVEL]
 
         for name in targets:
             try:
                 c = Country(name, trust_cache=effective_trust_cache)
                 method = getattr(c, self.table_name)
-                # Only pass currency= for monetary tables (it's the generated
-                # method that accepts it); preserve the bare call otherwise.
-                df = method(currency=pass_currency) if pass_currency is not None else method()
+                # Pass numeraire/currency only for monetary tables (the generated
+                # method accepts them); preserve the bare call otherwise.
+                if use_numeraire is not None:
+                    df = method(numeraire=use_numeraire)
+                elif pass_currency is not None:
+                    df = method(currency=pass_currency)
+                else:
+                    df = method()
                 if not isinstance(df, pd.DataFrame) or df.empty:
                     warnings.warn(
                         f"No data for {self.table_name} in {name}"
