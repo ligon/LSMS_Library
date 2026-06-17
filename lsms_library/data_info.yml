@@ -225,12 +225,14 @@ Columns:
       note: amount acquired in unit u, per acquisition source s
     Expenditure:
       type: float
+      monetary: true
       note: monetary value of the acquisition; primarily for
         s=purchased, also for s=inkind where the survey records an
         imputed value
     Price:
       type: float
       api_derived: true
+      monetary: true
       note: |
         Value per unit at the relevant point of acquisition.  Market
         price for s=purchased (Expenditure / Quantity, back-calculated
@@ -249,3 +251,78 @@ Rejected Spellings:
   # scan).  Substring rewrite is case-sensitive, so this matches 'int_t'
   # exactly without touching 'Int_t' or unrelated columns.
   int_t: Int_t
+
+# Per-country currency for monetary columns (ISO 4217 alpha-3).
+#
+# Monetary values in the harmonized tables (food_expenditures.Expenditure,
+# food_prices.Price, assets.Value, plot_labor.Wage, ...) are in nominal local
+# currency units.  Within a single country they are commensurable; across
+# countries (ll.Feature('food_expenditures')) they are not.  This section is the
+# single source of truth mapping (country, wave) -> ISO 4217 code, consumed by
+# lsms_library.currency.currency_for() and attached to monetary tables at API
+# time when the caller passes currency='index'/'column' (see currency.py).
+#
+# It is also the JOIN KEY for the planned conversion layer (FX / PPP / CPI ->
+# USD / international$ / real); that layer is NOT built yet.
+#
+# A value is either a scalar ISO code (constant across all of a country's waves)
+# or a mapping {default: CODE, overrides: {'<wave>': CODE, ...}}.  Wave keys MUST
+# be quoted strings -- they are matched against the string-valued `t` index level
+# (e.g. '2005-06', '1999'), so an unquoted 1999 (YAML int) would never match.
+#
+# Currency is a function of (country, wave), NOT country alone: two in-sample
+# redenominations changed both the SCALE and the ISO code mid-survey --
+#   * GhanaLSS: old cedi GHC -> Ghana cedi GHS at 2007 (1 GHS = 10,000 GHC).
+#   * Tajikistan: Tajikistani ruble TJR -> somoni TJS at 2000 (1 TJS = 1000 TJR).
+# Currency is also NOT injective with country: the 8 EHCVM/WAEMU countries all
+# share XOF.  Lines tagged `# VERIFY` are best-effort and should be confirmed
+# against the questionnaire/codebook before relying on them downstream.
+Currency:
+  Albania: ALL
+  Armenia: AMD
+  Azerbaijan:                       # only the 1995 wave is present (pre-2006
+    default: AZN                    # manat redenomination, 1 AZN = 5000 AZM)
+    overrides: {'1995': AZM}
+  Benin: XOF
+  Burkina_Faso: XOF
+  Cambodia: KHR
+  China: CNY
+  CotedIvoire: XOF
+  Ethiopia: ETB
+  EthiopiaRHS: ETB
+  GhanaLSS:                         # 2007 redenomination, 1 GHS = 10,000 GHC
+    default: GHS                    # (2012-13, 2016-17 -> GHS via default)
+    overrides:
+      '1987-88': GHC
+      '1988-89': GHC
+      '1991-92': GHC
+      '1998-99': GHC
+      '2005-06': GHC
+  GhanaSPS: GHS                     # waves 2009-10/2013-14/2017-18, all post-reform
+  Guatemala: GTQ
+  Guinea-Bissau: XOF
+  Guyana: GYD
+  India: INR
+  Iraq: IQD
+  Kazakhstan: KZT
+  Kosovo: EUR
+  Liberia: LRD                      # VERIFY: HIES may report USD (dual currency)
+  Malawi: MWK
+  Mali: XOF
+  Nepal: NPR
+  Niger: XOF
+  Nigeria: NGN
+  Pakistan: PKR
+  Senegal: XOF
+  Serbia: RSD                       # 2007 wave (RSD since 2006)
+  'Serbia and Montenegro':          # 2002, 2003 waves
+    default: CSD                    # Serbian dinar (CSD) from 2003
+    overrides: {'2002': YUM}        # VERIFY: Yugoslav dinar (YUM) in 2002
+  South Africa: ZAR
+  Tajikistan:                       # 2000 somoni reform, 1 TJS = 1000 TJR
+    default: TJS                    # (2003, 2007, 2009 -> TJS via default)
+    overrides: {'1999': TJR}
+  Tanzania: TZS
+  Timor-Leste: USD                  # USD official since 2000
+  Togo: XOF
+  Uganda: UGX

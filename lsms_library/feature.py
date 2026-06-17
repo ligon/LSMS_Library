@@ -11,6 +11,7 @@ import yaml
 from importlib.resources import files
 
 from .yaml_utils import load_yaml
+from .currency import CURRENCY_LEVEL, is_monetary_table
 from .paths import countries_root
 
 
@@ -175,7 +176,8 @@ class Feature:
             if isinstance(meta, dict) and meta.get("required", False)
         ]
 
-    def __call__(self, countries: list[str] | None = None, trust_cache: bool | None = None) -> pd.DataFrame:
+    def __call__(self, countries: list[str] | None = None, trust_cache: bool | None = None,
+                 currency: str | None = 'index') -> pd.DataFrame:
         """Load and concatenate data across countries.
 
         Parameters
@@ -185,6 +187,13 @@ class Feature:
         trust_cache : bool, optional
             If *True*, read existing cached parquets without validation.
             Defaults to the instance-level setting from ``__init__``.
+        currency : {'index', 'column', None}, optional
+            Attach the ISO 4217 currency code to monetary tables.  Defaults to
+            ``'index'`` here (cross-country stacking is exactly where mixed
+            currencies are silently incommensurable) -- unlike single-country
+            ``Country(...)`` calls, which default to ``None``.  A no-op for
+            non-monetary tables (there is nothing to label).  See
+            :func:`lsms_library.currency.attach_currency`.
 
         Returns
         -------
@@ -193,16 +202,29 @@ class Feature:
         """
         from . import Country
 
+        if currency is not None and currency not in {'index', 'column'}:
+            raise ValueError(
+                f"currency must be 'index', 'column', or None; got {currency!r}"
+            )
         effective_trust_cache = trust_cache if trust_cache is not None else self.trust_cache
         targets = countries if countries is not None else self.countries
         frames: list[pd.DataFrame] = []
         canonical_levels = _canonical_index_levels(self.table_name)
 
+        # Currency is a no-op for non-monetary tables; only pass it through (and
+        # widen the canonical index so _harmonize_country_frame keeps the level)
+        # when this feature actually has monetary columns.
+        pass_currency = currency if is_monetary_table(self.table_name) else None
+        if pass_currency == 'index' and canonical_levels:
+            canonical_levels = canonical_levels + [CURRENCY_LEVEL]
+
         for name in targets:
             try:
                 c = Country(name, trust_cache=effective_trust_cache)
                 method = getattr(c, self.table_name)
-                df = method()
+                # Only pass currency= for monetary tables (it's the generated
+                # method that accepts it); preserve the bare call otherwise.
+                df = method(currency=pass_currency) if pass_currency is not None else method()
                 if not isinstance(df, pd.DataFrame) or df.empty:
                     warnings.warn(
                         f"No data for {self.table_name} in {name}"
