@@ -1036,12 +1036,22 @@ def df_data_grabber(fn: str | Path, idxvars: dict[str, Any] | str, convert_categ
         try:
             for k,v in kwargs.items():
                 out[k] = grabber(df,v)
-        except AttributeError:
-            if isinstance(kwargs,str):
-                out[k] = df[k]
-            else: # A list?
-                for k in kwargs:
+        except AttributeError as exc:
+            # Legacy fallback: a myvar whose value is a literal source-column
+            # name can be copied straight across when ``grabber`` cannot parse
+            # it.  But when a ``(column, function)`` myvar's *function* raised
+            # the AttributeError internally, this fallback instead masks it as
+            # a misleading ``KeyError`` on the renamed target key -- which cost
+            # real debugging time on GH #476.  Chain the original error so the
+            # genuine cause survives when the fallback itself fails.
+            try:
+                if isinstance(kwargs,str):
                     out[k] = df[k]
+                else: # A list?
+                    for k in kwargs:
+                        out[k] = df[k]
+            except Exception as fallback_exc:
+                raise fallback_exc from exc
     # When ``kwargs`` (myvars) is empty, ``out`` already holds just
     # the renamed idxvars frame (built above from the ``idxvars`` dict)
     # which is what ``set_index(list(idxvars.keys()))`` needs.  An
