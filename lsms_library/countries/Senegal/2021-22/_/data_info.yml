@@ -254,7 +254,17 @@ interview_date:
             - grappe
             - menage
     myvars:
-        Int_t: s00q23a
+        # EHCVM cover records start+end timestamps for up to THREE enumerator
+        # visits needed to administer the questionnaire (cf. s00q22): q23a/b =
+        # visit 1 start/end, q24a/b = visit 2, q25a/b = visit 3.  Melted onto a
+        # `visit` index by senegal.interview_date.  (Do NOT confuse q23b =
+        # visit-1 END with a later visit.)
+        int_start:    s00q23a
+        int_end:      s00q23b
+        int_start_v2: s00q24a
+        int_end_v2:   s00q24b
+        int_start_v3: s00q25a
+        int_end_v3:   s00q25b
 
 food_security:
     # FAO FIES 8-item scale, EHCVM §8A 'Sécurité alimentaire'.

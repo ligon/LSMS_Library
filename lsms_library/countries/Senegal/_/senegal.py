@@ -246,3 +246,20 @@ def plot_features_for_wave(t, source, colmap):
     })
     df = df.set_index(['t', 'i', 'plot_id'])
     return df
+
+
+def interview_date(df):
+    """Melt EHCVM per-visit interview start/end timestamps onto a `visit` index.
+
+    Country-level df_edit hook for the interview_date table (dispatched by
+    table name via country.py grab_data).  EHCVM cover files record a start
+    and end datetime for each of the (up to two) enumerator visits needed to
+    complete the household questionnaire -- distinct from the survey round,
+    which `t` carries.  The wave data_info.yml maps q23a/q23b = visit-1
+    start/end and q24a/q24b = visit-2 start/end to int_start/int_end[_v2].
+    Delegates to the shared local_tools.melt_visit_intervals helper, producing
+    columns 'Interview start' / 'Interview end' on an ordinal `visit` index.
+    Collapsing `visit` with the declared `first` aggregation reproduces the
+    legacy visit-1-start single-date table.
+    """
+    return tools.melt_visit_intervals(df)

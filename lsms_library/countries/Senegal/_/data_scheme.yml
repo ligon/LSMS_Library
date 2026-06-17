@@ -88,8 +88,17 @@ Data Scheme:
     Floor: str
 
   interview_date:
-    index: (t, i)
-    Int_t: datetime
+    # EHCVM records start+end timestamps for each enumerator visit needed to
+    # complete the questionnaire (distinct from the survey round, which `t`
+    # carries).  Both visits are preserved on an ordinal `visit` level, melted
+    # by senegal.interview_date; v auto-joins from sample() -> grain
+    # (t, v, i, visit).  Collapsing `visit` with `first` reproduces the legacy
+    # visit-1-start single-date table.
+    index: (t, i, visit)
+    Interview start: datetime
+    Interview end: datetime
+    aggregation:
+      visit: first
 
   sample:
     index: (i, t)
