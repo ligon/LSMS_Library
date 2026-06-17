@@ -2078,6 +2078,61 @@ def map_index(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def melt_visit_dates(df: pd.DataFrame, col_base: str = 'int_t',
+                     out_col: str = 'Int_t', visit_level: str = 'visit') -> pd.DataFrame:
+    """Melt per-visit interview-date columns onto an ordinal ``visit`` index.
+
+    Shared ``df_edit``-hook helper for the ``interview_date`` table (the first
+    application of the grain-aggregation-policy, SkunkWorks/
+    grain_aggregation_policy.org).  Surveys that visit a household more than
+    once record a date per visit; we preserve them all on an ordinal ``visit``
+    level rather than collapsing to the first.
+
+    Input: ``df`` indexed by the table's idxvars (e.g. ``(i,)`` or ``(t, i)``,
+    ``t`` is prepended by the framework later), carrying the visit dates in
+    columns named ``int_t`` (visit 1), ``int_t_v2`` (visit 2), ``int_t_v3``
+    (visit 3), ...  Both lower- and ``Int_t``-cased spellings are accepted,
+    since the canonical ``int_t -> Int_t`` rewrite has not run at hook stage.
+
+    Output: indexed ``(<original idx>, visit)`` with a single ``out_col``
+    datetime column; ``visit`` is an ordinal ``Int64`` (1, 2, 3, ...).  Rows
+    whose date is NaT (a household not visited that many times, a single-visit
+    wave) are DROPPED -- never fabricated -- so a household with only a later
+    visit's date surfaces at that visit number, and a wave with only visit 1
+    yields ``visit=1`` rows.  Collapsing ``visit`` with the declared ``first``
+    aggregation reproduces the legacy first-visit-only table.
+    """
+    def _pick(*names):
+        return next((n for n in names if n in df.columns), None)
+
+    specs = []
+    v1 = _pick(col_base, out_col)
+    if v1 is None:
+        return df  # nothing to melt; hand back unchanged (defensive)
+    specs.append((1, v1))
+    n = 2
+    while True:
+        c = _pick(f'{col_base}_v{n}', f'{out_col}_v{n}')
+        if c is None:
+            break
+        specs.append((n, c))
+        n += 1
+
+    idx_names = list(df.index.names)
+    flat = df.reset_index()
+    pieces = []
+    for vnum, col in specs:
+        part = flat[idx_names].copy()
+        part[visit_level] = vnum
+        part[out_col] = pd.to_datetime(flat[col], errors='coerce')
+        pieces.append(part)
+
+    out = pd.concat(pieces, ignore_index=True)
+    out = out[out[out_col].notna()]                 # drop NaT (un-made) visits
+    out[visit_level] = out[visit_level].astype('Int64')
+    return out.set_index(idx_names + [visit_level])
+
+
 import importlib.util
 def get_formatting_functions(mod_path: Path, name: str, general_formatting_functions: dict[str, Any] = {}) -> dict[str, Any]:
     formatting_function = general_formatting_functions.copy()
