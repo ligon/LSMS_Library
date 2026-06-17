@@ -106,15 +106,30 @@ def test_convert_mali_niger_country_level_ppp():
     assert fx["Expenditure"].iloc[0] != out["Expenditure"].iloc[0]
 
 
-def test_convert_redenomination_wave_is_na():
+def test_convert_redenomination_wave_uses_contemporaneous_factor():
+    # GhanaLSS 2005-06 is old cedi (GHC); the table holds the contemporaneous
+    # GHC factor (rebased x 10,000), so the wave converts (no longer NA).
     idx = pd.MultiIndex.from_tuples([("h1", "2005-06", "rice")], names=["i", "t", "j"])
-    df = pd.DataFrame({"Expenditure": [50000.0]}, index=idx)
+    df = pd.DataFrame({"Expenditure": [37272.0]}, index=idx)
     df.attrs["country"] = "GhanaLSS"
+    out = convert(df, to="PPP-2017")
+    # PPP-2017(GhanaLSS, 2005) = 3727.2 GHC/intl$  ->  37272 / 3727.2 = 10.0
+    assert out["Expenditure"].iloc[0] == pytest.approx(10.0, rel=1e-3)
+    assert out["Expenditure"].notna().all()
+
+
+def test_convert_tajikistan_1999_fx_ok_ppp_na():
+    # 1999 is pre-reform TJR; FX is present (contemporaneous), but WDI has no
+    # 1999 Tajikistan CPI, so PPP-2017 is NA + a 'no factor' warning.
+    idx = pd.MultiIndex.from_tuples([("h1", "1999", "rice")], names=["i", "t", "j"])
+    df = pd.DataFrame({"Expenditure": [1237.8]}, index=idx)
+    df.attrs["country"] = "Tajikistan"
+    assert convert(df, to="FX")["Expenditure"].iloc[0] == pytest.approx(1.0, rel=1e-3)
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
-        out = convert(df, to="PPP-2017")
-    assert out["Expenditure"].isna().all()
-    assert any("redenomination" in str(x.message) for x in w)
+        ppp = convert(df, to="PPP-2017")
+    assert ppp["Expenditure"].isna().all()
+    assert any("no factor" in str(x.message) for x in w)
 
 
 def test_convert_missing_factor_is_na():

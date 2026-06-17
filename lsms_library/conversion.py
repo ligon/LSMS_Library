@@ -29,7 +29,6 @@ import pandas as pd
 from .currency import (
     CURRENCY_LEVEL,
     _all_monetary_columns,
-    _redenomination_waves,
 )
 from .local_tools import df_from_orgfile
 
@@ -126,26 +125,24 @@ def convert(df: pd.DataFrame, to: str, *, country: str | None = None,
     factors = _load_factors()
 
     factor_vals = []
-    missing, redenom = set(), set()
+    missing = set()
     for ctry, wave in zip(countries, waves):
-        if wave in _redenomination_waves(ctry):
-            factor_vals.append(pd.NA)
-            redenom.add((ctry, wave))
-            continue
+        # Pre-reform redenomination waves (GhanaLSS <= 2005-06, Tajikistan 1999,
+        # ...) carry CONTEMPORANEOUS old-currency factors in the table (keyed on
+        # the wave year), so they convert here too; a genuinely absent or NaN
+        # factor (e.g. Tajikistan 1999 PPP, no 1999 CPI) -> NA + warning.
         year = _wave_to_year(wave)
         try:
             val = factors.at[(ctry, year), to]
         except KeyError:
             val = pd.NA
+        if pd.isna(val):
             missing.add((ctry, year))
-        factor_vals.append(val if pd.notna(val) else pd.NA)
+            factor_vals.append(pd.NA)
+        else:
+            factor_vals.append(val)
 
     factor = pd.Series(pd.array(factor_vals, dtype="Float64"), index=df.index)
-    if redenom:
-        warnings.warn(
-            f"convert(to={to!r}): {len(redenom)} pre-reform redenomination "
-            f"wave(s) not convertible in v1 -> NA: {sorted(redenom)[:5]}"
-        )
     if missing:
         warnings.warn(
             f"convert(to={to!r}): no factor for {len(missing)} (country, year) "

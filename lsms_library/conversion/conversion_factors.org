@@ -53,18 +53,29 @@ documented next to the data it describes.
 - CPI :: local consumer price index =FP.CPI.TOTL= (helper; not a conversion
   target).
 
-* Redenomination caveat (v1 scope)
+* Redenomination handling
 
-The values below come from WDI, which publishes each series in the *current*
-currency unit.  For the four pre-redenomination waves whose ISO code differs
-from the modern default -- GhanaLSS <= 2005-06 (GHC), Tajikistan 1999 (TJR),
-Azerbaijan 1995 (AZM), Serbia-and-Montenegro 2002 (YUM) -- a row keyed on the
-calendar year would carry the *rebased* (modern-currency) factor, which is
-10^3-10^4 off the contemporaneous data.  =convert()= therefore returns =pd.NA=
-+ a warning for any wave whose phase-1 currency code is a redenomination
-override (data-driven from =data_info.yml= =Currency:= =overrides=), regardless
-of what this table holds.  Sourcing contemporaneous-currency factors (IMF IFS)
-for those rows is deferred.
+WDI publishes each series in the *current* currency unit, so a naive row keyed
+on the calendar year would carry the *rebased* factor -- 10^3-10^4 off the
+contemporaneous nominal data for a pre-reform wave (e.g. GhanaLSS 2005-06 is in
+old cedi GHC, ~10^4 the new cedi GHS).  Across a redenomination the
+contemporaneous old-currency factor is *exactly* the rebased factor times the
+redenomination scale (CPI is an index and is left raw), so the generator below
+rescales the pre-reform rows accordingly and tags them with the old ISO code:
+
+- GhanaLSS :: years < 2007 in GHC (x10,000).  Sanity: 1987 FX 153.7, 2005 FX
+  9052 GHC/USD -- matches the historical official rate; 2007+ are GHS.
+- Tajikistan :: 1999 in TJR (x1,000).  FX 1238 TJR/USD; PPP-/LCU-real columns
+  are NaN because WDI has no 1999 Tajikistan CPI (no silent guess).
+- Azerbaijan :: years < 2006 in AZM (x5,000).  1995 FX 4413 AZM/USD; 2006+ AZN.
+- Serbia and Montenegro :: YUM/CSD/RSD are 1:1, so the 2002 row needs no rescale.
+
+So these waves now *convert* (the engine just reads the contemporaneous factor;
+a genuinely missing/NaN factor still yields =pd.NA= + a warning).  The IMF IFS
+API was unreachable from the build host, but WDI itself reaches back to 1987 for
+these series, and rebased x scale is the exact contemporaneous value -- so IFS
+was not needed.  The FX/PPP/USD-real/LCU-real columns therefore show a deliberate
+10^3-10^4 discontinuity at each reform year; that is correct (the unit changed).
 
 * Provenance / regeneration
 
@@ -105,14 +116,25 @@ CUR = {
     "Serbia and Montenegro": "CSD", "South Africa": "ZAR", "Tajikistan": "TJS",
     "Tanzania": "TZS", "Timor-Leste": "USD", "Togo": "XOF", "Uganda": "UGX",
 }
-YEARS, BASES = range(2000, 2024), (2011, 2017, 2021)
+# Redenominations within the sample: rows before the reform year are rescaled to
+# the CONTEMPORANEOUS (pre-reform) currency = WDI-rebased value x scale, so the
+# factor matches that wave's nominal data (in the old unit).  CPI is an index
+# (scale-free) and is left raw.  YUM/CSD/RSD are 1:1, so Serbia needs no entry.
+REDENOM = {"GhanaLSS": (2007, 10000), "Tajikistan": (2000, 1000), "Azerbaijan": (2006, 5000)}
+# Contemporaneous ISO 4217 for pre-reform rows (so the Currency column is honest).
+OLD_CODE = {"GhanaLSS": "GHC", "Tajikistan": "TJR", "Azerbaijan": "AZM"}
+# Extra pre-2000 survey-wave years to emit beyond the default range.
+PRE_REFORM_EXTRA = {"GhanaLSS": [1987, 1988, 1991, 1998], "Tajikistan": [1999], "Azerbaijan": [1995]}
+
+YEARS, BASES = range(2000, 2024), (2011, 2017, 2021)   # default emission range
+PULL = range(1987, 2024)                               # fetch wide for old years
 FX, PPP, CPI = "PA.NUS.FCRF", "PA.NUS.PRVT.PP", "FP.CPI.TOTL"
 COLS = ["FX", "PPP-2011", "PPP-2017", "PPP-2021", "USD-real-2017", "LCU-real-2017", "CPI"]
 
 
 def wdi(indicator, isos):
     url = (f"https://api.worldbank.org/v2/country/{';'.join(isos)}/indicator/"
-           f"{indicator}?date={YEARS.start}:{YEARS.stop-1}&format=json&per_page=30000")
+           f"{indicator}?date={PULL.start}:{PULL.stop-1}&format=json&per_page=20000")
     with urllib.request.urlopen(url, timeout=120) as r:
         payload = json.load(r)
     return {(row["countryiso3code"], int(row["date"])): float(row["value"])
@@ -149,10 +171,20 @@ hdr = ["Country", "Currency", "Date"] + COLS
 print("| " + " | ".join(hdr) + " |")
 print("|" + "+".join(["-"*(len(h)+2) for h in hdr]) + "|")
 for name in sorted(ISO3):
-    for t in YEARS:
-        row = factors(ISO3[name], t)
+    iso = ISO3[name]
+    years = sorted(set(YEARS) | set(PRE_REFORM_EXTRA.get(name, [])))
+    for t in years:
+        row = factors(iso, t)
+        code = CUR[name]
+        if name in REDENOM:                       # contemporaneous old-currency rescale
+            ry, scale = REDENOM[name]
+            if t < ry:
+                code = OLD_CODE[name]
+                for c in COLS:
+                    if c != "CPI" and row[c] is not None:
+                        row[c] *= scale
         if all(row[c] is None for c in COLS): continue
-        print("| " + " | ".join([name, CUR[name], str(t)] + [fmt(row[c]) for c in COLS]) + " |")
+        print("| " + " | ".join([name, code, str(t)] + [fmt(row[c]) for c in COLS]) + " |")
 #+end_src
 
 * The table
@@ -208,12 +240,13 @@ for name in sorted(ISO3):
 | Armenia | AMD | 2021 | 503.8 | 215.6 | 187.8 | 164.2 | 556.9 | 1.128 | 140.1 |
 | Armenia | AMD | 2022 | 435.7 | 234.2 | 204.1 | 178.4 | 520.2 | 1.226 | 152.2 |
 | Armenia | AMD | 2023 | 392.5 | 238.9 | 208.1 | 182.0 | 487.9 | 1.250 | 155.3 |
-| Azerbaijan | AZN | 2000 | 0.89483 | 0.14654 | 0.15745 | 0.13720 | 0.62863 | 0.32685 | 48.867 |
-| Azerbaijan | AZN | 2001 | 0.93132 | 0.14881 | 0.15988 | 0.13932 | 0.67275 | 0.33191 | 49.623 |
-| Azerbaijan | AZN | 2002 | 0.97216 | 0.15293 | 0.16431 | 0.14318 | 0.71340 | 0.34111 | 50.998 |
-| Azerbaijan | AZN | 2003 | 0.98215 | 0.15635 | 0.16799 | 0.14638 | 0.73708 | 0.34872 | 52.137 |
-| Azerbaijan | AZN | 2004 | 0.98270 | 0.16684 | 0.17926 | 0.15620 | 0.75724 | 0.37212 | 55.635 |
-| Azerbaijan | AZN | 2005 | 0.94542 | 0.18298 | 0.19661 | 0.17132 | 0.75324 | 0.40814 | 61.020 |
+| Azerbaijan | AZM | 1995 | 4413.5 | 638.4 | 686.0 | 597.7 | 2743.8 | 1424.0 | 42.580 |
+| Azerbaijan | AZM | 2000 | 4474.2 | 732.7 | 787.2 | 686.0 | 3143.2 | 1634.3 | 48.867 |
+| Azerbaijan | AZM | 2001 | 4656.6 | 744.0 | 799.4 | 696.6 | 3363.8 | 1659.5 | 49.623 |
+| Azerbaijan | AZM | 2002 | 4860.8 | 764.7 | 821.6 | 715.9 | 3567.0 | 1705.5 | 50.998 |
+| Azerbaijan | AZM | 2003 | 4910.7 | 781.7 | 839.9 | 731.9 | 3685.4 | 1743.6 | 52.137 |
+| Azerbaijan | AZM | 2004 | 4913.5 | 834.2 | 896.3 | 781.0 | 3786.2 | 1860.6 | 55.635 |
+| Azerbaijan | AZM | 2005 | 4727.1 | 914.9 | 983.0 | 856.6 | 3766.2 | 2040.7 | 61.020 |
 | Azerbaijan | AZN | 2006 | 0.89345 | 0.19823 | 0.21298 | 0.18559 | 0.73479 | 0.44213 | 66.103 |
 | Azerbaijan | AZN | 2007 | 0.85812 | 0.23133 | 0.24855 | 0.21659 | 0.72587 | 0.51597 | 77.142 |
 | Azerbaijan | AZN | 2008 | 0.82162 | 0.27956 | 0.30037 | 0.26174 | 0.72168 | 0.62354 | 93.225 |
@@ -400,13 +433,17 @@ for name in sorted(ISO3):
 | EthiopiaRHS | ETB | 2021 | 43.734 | 20.599 | 16.524 | 13.437 | 48.346 | 2.013 | 492.4 |
 | EthiopiaRHS | ETB | 2022 | 51.756 | 27.579 | 22.124 | 17.990 | 61.793 | 2.695 | 659.2 |
 | EthiopiaRHS | ETB | 2023 | 54.601 | 35.914 | 28.810 | 23.427 | 67.873 | 3.509 | 858.4 |
-| GhanaLSS | GHS | 2000 | 0.54492 | 0.13761 | 0.13619 | 0.14010 | 0.38281 | 0.07968 | 19.208 |
-| GhanaLSS | GHS | 2001 | 0.71631 | 0.19472 | 0.19273 | 0.19825 | 0.51744 | 0.11276 | 27.182 |
-| GhanaLSS | GHS | 2002 | 0.79242 | 0.21295 | 0.21077 | 0.21681 | 0.58150 | 0.12331 | 29.726 |
-| GhanaLSS | GHS | 2003 | 0.86676 | 0.27636 | 0.27352 | 0.28136 | 0.65049 | 0.16003 | 38.576 |
-| GhanaLSS | GHS | 2004 | 0.89949 | 0.32622 | 0.32287 | 0.33212 | 0.69313 | 0.18890 | 45.537 |
-| GhanaLSS | GHS | 2005 | 0.90521 | 0.37658 | 0.37272 | 0.38340 | 0.72120 | 0.21806 | 52.567 |
-| GhanaLSS | GHS | 2006 | 0.91511 | 0.42056 | 0.41625 | 0.42817 | 0.75260 | 0.24353 | 58.706 |
+| GhanaLSS | GHC | 1987 | 153.7 | 59.680 | 59.068 | 60.760 | 71.225 | 34.558 | 0.83307 |
+| GhanaLSS | GHC | 1988 | 202.2 | 78.395 | 77.591 | 79.814 | 97.570 | 45.396 | 1.094 |
+| GhanaLSS | GHC | 1991 | 367.6 | 159.0 | 157.4 | 161.9 | 204.3 | 92.096 | 2.220 |
+| GhanaLSS | GHC | 1998 | 2311.7 | 935.7 | 926.1 | 952.6 | 1537.3 | 541.8 | 13.061 |
+| GhanaLSS | GHC | 2000 | 5449.2 | 1376.1 | 1361.9 | 1401.0 | 3828.1 | 796.8 | 19.208 |
+| GhanaLSS | GHC | 2001 | 7163.1 | 1947.2 | 1927.3 | 1982.5 | 5174.4 | 1127.6 | 27.182 |
+| GhanaLSS | GHC | 2002 | 7924.2 | 2129.5 | 2107.7 | 2168.1 | 5815.0 | 1233.1 | 29.726 |
+| GhanaLSS | GHC | 2003 | 8667.6 | 2763.6 | 2735.2 | 2813.6 | 6504.9 | 1600.3 | 38.576 |
+| GhanaLSS | GHC | 2004 | 8994.9 | 3262.2 | 3228.7 | 3321.2 | 6931.3 | 1889.0 | 45.537 |
+| GhanaLSS | GHC | 2005 | 9052.1 | 3765.8 | 3727.2 | 3834.0 | 7212.0 | 2180.6 | 52.567 |
+| GhanaLSS | GHC | 2006 | 9151.1 | 4205.6 | 4162.5 | 4281.7 | 7526.0 | 2435.3 | 58.706 |
 | GhanaLSS | GHS | 2007 | 0.93262 | 0.46571 | 0.46093 | 0.47413 | 0.78889 | 0.26967 | 65.008 |
 | GhanaLSS | GHS | 2008 | 1.052 | 0.54252 | 0.53696 | 0.55234 | 0.92427 | 0.31416 | 75.731 |
 | GhanaLSS | GHS | 2009 | 1.405 | 0.64694 | 0.64031 | 0.65865 | 1.230 | 0.37462 | 90.307 |
@@ -854,6 +891,7 @@ for name in sorted(ISO3):
 | South Africa | ZAR | 2021 | 14.779 | 8.225 | 7.824 | 7.525 | 16.337 | 1.175 | 171.7 |
 | South Africa | ZAR | 2022 | 16.356 | 8.804 | 8.375 | 8.054 | 19.528 | 1.258 | 183.7 |
 | South Africa | ZAR | 2023 | 18.450 | 9.339 | 8.884 | 8.544 | 22.935 | 1.334 | 194.9 |
+| Tajikistan | TJR | 1999 | 1237.8 | --- | --- | --- | 841.2 | --- | --- |
 | Tajikistan | TJS | 2000 | 2.076 | 0.45044 | --- | --- | 1.459 | --- | 28.349 |
 | Tajikistan | TJS | 2001 | 2.372 | 0.62427 | --- | --- | 1.714 | --- | 39.289 |
 | Tajikistan | TJS | 2002 | 2.764 | 0.70074 | --- | --- | 2.028 | --- | 44.102 |
