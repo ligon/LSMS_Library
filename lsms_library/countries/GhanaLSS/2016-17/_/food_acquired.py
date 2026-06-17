@@ -22,14 +22,20 @@ Sources:
         s8hq{i}p = selling price -> Price (farmgate)
     -> s='produced'.  No produced expenditure column -> Expenditure = NaN.
 
-Unit decode (D-units / GH #348):
-  The full g7sec9b/g7sec8h .dta carry Stata value labels on the unit columns, so
-  convert_categoricals=True yields native unit *label strings* (e.g. 'Heap').
-  Production labels are prefixed with the numeric code ("7. Bowl"); the prefix is
-  stripped.  Both are then mapped through the country-level unit_label org table
-  (raw label string -> canonical Preferred Label) so `u` holds clean labels with
-  no leading digits (leak audit clean).  NB: g7sec9b_small.dta does NOT carry the
-  value labels, so we read the full g7sec9b.dta here.
+Unit decode (D-units / GH #348, #453, #384):
+  - 9B (purchases): the full g7sec9b.dta is 3.2 GB (a dense food x household
+    matrix), so we read the 284 MB g7sec9b_small.dta -- which carries the
+    numeric s9bq*c unit codes but NO Stata value labels.  The code -> native
+    label map was lifted once from the full file's value labels (metadata-only
+    read) into categorical_mapping.org (#+name: unit_9b); decode_unit_code_9b
+    turns each numeric code into its native label.
+  - 8H (production): g7sec8h.dta is only 99 MB, so it is read categorically
+    (convert_categoricals=True) to get native unit label strings directly.
+    Its labels are prefixed with the numeric code ("7. Bowl"); the prefix is
+    stripped.
+  Both paths then map the native label through the country-level unit_label org
+  table (raw label string -> canonical Preferred Label) so `u` holds clean
+  labels with no leading digits (leak audit clean).
 """
 import re
 import warnings
@@ -69,14 +75,37 @@ def decode_unit(label):
     return _unit_map.get(s, pd.NA)
 
 
+# --- 9B units: numeric code -> native label, lifted once from the full
+# g7sec9b.dta's Stata value labels into categorical_mapping.org (unit_9b) so the
+# build reads the 284 MB g7sec9b_small.dta (no value labels) instead of the
+# 3.2 GB full file.  See #453 / #384.
+_u9b = df_from_orgfile('../../_/categorical_mapping.org', name='unit_9b').dropna()
+_unit_code_9b = dict(zip(_u9b['Code'].astype(int),
+                         _u9b['Label'].astype(str).str.strip()))
+
+
+def decode_unit_code_9b(code):
+    """9B numeric unit code -> canonical Preferred Label (code -> native -> PL)."""
+    if pd.isna(code):
+        return pd.NA
+    try:
+        native = _unit_code_9b.get(int(code))
+    except (ValueError, TypeError):
+        return pd.NA
+    return decode_unit(native) if native is not None else pd.NA
+
+
 def _stack_visits(df_num, df_cat, visits, qty_stem, unit_stem, label_map,
-                  item_col, exp_stem=None, price_stem=None):
+                  item_col, exp_stem=None, price_stem=None, unit_decoder=None):
     """Reshape one source module (one row per HH x item) into long form.
 
     `df_num` (convert_categoricals=False) supplies the numeric food codes and
-    amounts; `df_cat` (convert_categoricals=True) supplies the decoded unit
-    *label strings* for the unit columns.  The two reads are the same source
-    rows in the same order, so columns line up positionally.
+    amounts.  Units are decoded either from numeric codes in `df_num` via
+    `unit_decoder` (a code -> Preferred Label callable -- used for 9B, which
+    reads the small label-less file) or, when `unit_decoder` is None, from the
+    decoded *label strings* in `df_cat` (convert_categoricals=True; used for 8H,
+    whose source is small enough to read categorically).  `df_num`/`df_cat` are
+    the same source rows in the same order, so columns line up positionally.
 
     Stacks each visit into rows; emits columns Quantity/u (+ optional
     Expenditure, Price) with i (household), j (harmonized item), visit.
@@ -87,8 +116,12 @@ def _stack_visits(df_num, df_cat, visits, qty_stem, unit_stem, label_map,
 
     frames = []
     for v in visits:
+        if unit_decoder is not None:
+            u_vals = df_num[unit_stem.format(v=v)].apply(unit_decoder).values
+        else:
+            u_vals = df_cat[unit_stem.format(v=v)].apply(decode_unit).values
         cols = {'Quantity': _to_numeric(df_num[qty_stem.format(v=v)]).values,
-                'u': df_cat[unit_stem.format(v=v)].apply(decode_unit).values}
+                'u': u_vals}
         if exp_stem is not None:
             cols['Expenditure'] = _to_numeric(df_num[exp_stem.format(v=v)]).values
         if price_stem is not None:
@@ -114,12 +147,14 @@ purch_labels = get_categorical_mapping(
     tablename='harmonize_food',
     idxvars={'Code': ('Code_9b', format_id)}, **{'Label': 'Preferred Label'})
 
-num9b = get_dataframe('../Data/g7sec9b.dta', convert_categoricals=False)
-cat9b = get_dataframe('../Data/g7sec9b.dta', convert_categoricals=True)
-fe = _stack_visits(num9b, cat9b, range(1, 7),
+# Read the 284 MB g7sec9b_small.dta (NOT the 3.2 GB full g7sec9b.dta): _small
+# lacks value labels, but units are now decoded from numeric s9bq*c codes via
+# the unit_9b org table (decode_unit_code_9b).  See #453 / #384.
+num9b = get_dataframe('../Data/g7sec9b_small.dta', convert_categoricals=False)
+fe = _stack_visits(num9b, None, range(1, 7),
                    qty_stem='s9bq{v}b', unit_stem='s9bq{v}c',
                    label_map=purch_labels, item_col='freqcd',
-                   exp_stem='s9bq{v}a')
+                   exp_stem='s9bq{v}a', unit_decoder=decode_unit_code_9b)
 fe['s'] = 'purchased'
 
 
