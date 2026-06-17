@@ -1,8 +1,9 @@
 """GH #223 Layer 2 / DESIGN_u_consolidation: additive global<->country
 categorical-table merge.
 
-`u` is row-unioned (global metric core + country-specific rows, country
-wins on key collision); every other table keeps full-table override.
+`u` and `harmonize_assets` (GH #168) are row-unioned (global core +
+country-specific rows, country wins on key collision); every other table
+keeps full-table override.
 """
 from __future__ import annotations
 
@@ -21,6 +22,12 @@ def _tbl(rows, cols=("Original Label", "Preferred Label")):
 
 def test_u_is_additive():
     assert "u" in _ADDITIVE_CATEGORICAL_TABLES
+
+
+def test_harmonize_assets_is_additive():
+    # GH #168: the global harmonize_assets.org carries the shared vocabulary;
+    # per-country tables override only their country-specific rows.
+    assert "harmonize_assets" in _ADDITIVE_CATEGORICAL_TABLES
 
 
 def test_row_union_country_wins_and_inherits_global():
@@ -57,21 +64,27 @@ def test_row_union_falls_back_when_key_columns_disagree():
     assert out["Code"].tolist() == [1]
 
 
-def test_merge_u_additive_other_tables_override():
+def test_merge_additive_tables_rowunion_others_override():
     glob = {
         "u": _tbl([["kg", "Kg"], ["g", "g"]]),
         "harmonize_assets": _tbl([["bike", "Bicycle"], ["car", "Car"]]),
+        "Roof": _tbl([["grass", "Thatch"], ["tin", "Iron Sheets"]]),
     }
     ctry = {
-        "u": _tbl([["Tas", "Tas"]]),               # additive -> inherits kg/g
-        "harmonize_assets": _tbl([["bike", "Bike"]]),  # override -> replaces
+        "u": _tbl([["Tas", "Tas"]]),                   # additive -> inherits kg/g
+        "harmonize_assets": _tbl([["bike", "Bike"]]),  # additive (#168) -> inherits car
+        "Roof": _tbl([["grass", "Grass"]]),            # non-additive -> full override
     }
     merged = _merge_categorical_tables(glob, ctry)
     u = merged["u"].set_index("Original Label")["Preferred Label"].to_dict()
-    assert set(u) == {"kg", "g", "Tas"}            # u row-unioned
-    ha = merged["harmonize_assets"]
-    assert ha["Original Label"].tolist() == ["bike"]  # assets fully replaced
-    assert ha["Preferred Label"].tolist() == ["Bike"]
+    assert set(u) == {"kg", "g", "Tas"}                # u row-unioned
+    ha = merged["harmonize_assets"].set_index("Original Label")["Preferred Label"].to_dict()
+    assert set(ha) == {"bike", "car"}                  # assets row-unioned (#168)
+    assert ha["bike"] == "Bike"                        # country wins on collision
+    assert ha["car"] == "Car"                          # global row inherited
+    roof = merged["Roof"]
+    assert roof["Original Label"].tolist() == ["grass"]  # non-additive: fully replaced
+    assert roof["Preferred Label"].tolist() == ["Grass"]
 
 
 def test_merge_global_only_and_country_only_tables_pass_through():
