@@ -78,6 +78,7 @@ from pathlib import Path
 import os
 import ast
 import hashlib
+import ssl
 import time
 import uuid
 from importlib.resources import files
@@ -147,6 +148,70 @@ def _dvc_working_directory(path):
         yield
     finally:
         os.chdir(previous)
+
+
+#: Bounded retry for a single-blob S3 fetch before giving up to the streaming
+#: fallback (see :func:`_get_file_with_retry`).  Overridable via env for
+#: constrained / flaky-egress hosts.
+_FETCH_ATTEMPTS = int(os.getenv("LSMS_FETCH_ATTEMPTS", "3"))
+_FETCH_BASE_DELAY = 0.5  # seconds; doubled per retry
+
+
+def _is_transient_fetch_error(exc: BaseException) -> bool:
+    """Whether *exc* is a transient remote-read error worth retrying.
+
+    Concurrent multipart S3 downloads (s3fs ``_download_file_part_concurrent``)
+    occasionally corrupt a TLS record under heavy parallel load -- e.g. a
+    ``make -jN`` country build fetching several large ``.dta`` blobs at once --
+    raising ``ssl.SSLError('... DECRYPTION_FAILED_OR_BAD_RECORD_MAC ...')`` or
+    ``aiohttp.ClientPayloadError('Response payload is not completed')``.  These
+    are not connectivity failures (a retry succeeds) and not the same as
+    ``FileNotFoundError`` (wrong cache layout), which must NOT be retried.
+    """
+    if isinstance(exc, FileNotFoundError):
+        return False
+    if isinstance(exc, (ConnectionError, TimeoutError, ssl.SSLError)):
+        return True
+    name = type(exc).__name__
+    msg = str(exc)
+    return (
+        name in {"ClientPayloadError", "ClientError", "ClientOSError",
+                 "ServerTimeoutError", "ServerDisconnectedError",
+                 "IncompleteRead", "ReadTimeoutError", "ConnectTimeoutError"}
+        or "DECRYPTION_FAILED" in msg
+        or "BAD_RECORD_MAC" in msg
+        or "payload is not completed" in msg
+    )
+
+
+def _get_file_with_retry(fs, src: str, dst: str, *,
+                         attempts: int | None = None,
+                         base_delay: float = _FETCH_BASE_DELAY,
+                         sleep=time.sleep) -> None:
+    """``fs.get_file(src, dst)`` with bounded retry on transient TLS errors.
+
+    Re-raises ``FileNotFoundError`` immediately (the caller then tries the next
+    cache layout).  Retries transient errors (see
+    :func:`_is_transient_fetch_error`) with exponential backoff, cleaning up any
+    partial ``dst`` between attempts; re-raises once ``attempts`` is exhausted
+    or the error is non-transient (the caller then falls through to the
+    streaming fallback).  ``sleep`` is injectable for tests.
+    """
+    attempts = attempts if attempts is not None else _FETCH_ATTEMPTS
+    for attempt in range(max(1, attempts)):
+        try:
+            fs.get_file(src, dst)
+            return
+        except FileNotFoundError:
+            raise
+        except Exception as exc:  # noqa: BLE001 -- classify, then retry or re-raise
+            try:
+                Path(dst).unlink()
+            except OSError:
+                pass
+            if attempt + 1 >= attempts or not _is_transient_fetch_error(exc):
+                raise
+            sleep(base_delay * (2 ** attempt))
 
 
 def _ensure_dvc_pulled(fn) -> None:
@@ -304,14 +369,16 @@ def _ensure_dvc_pulled(fn) -> None:
         tmp = dst.with_suffix(dst.suffix + f".tmp.{os.getpid()}")
         for src in src_candidates:
             try:
-                fs.get_file(src, str(tmp))
+                _get_file_with_retry(fs, src, str(tmp))
                 tmp.rename(dst)
                 return
             except FileNotFoundError:
-                continue  # try the other layout
-            except OSError:
-                # Network / permission / disk error.  Clean up the tmp
-                # file if any partial write happened.
+                continue  # wrong layout -- try the other one
+            except Exception:  # noqa: BLE001
+                # Transient retries exhausted, or a non-transient remote / disk
+                # error (incl. aiohttp ClientPayloadError, not an OSError).
+                # Clean up any partial temp and fall through to the streaming
+                # fallback at the call site -- this function swallows by design.
                 try:
                     tmp.unlink()
                 except OSError:

@@ -315,6 +315,13 @@ def _make_jobs_flag() -> str | None:
     """
     Determine an appropriate make -j flag based on environment or CPU count.
     Returns the flag string (e.g. '-j4') or None if no parallelism is desired.
+
+    ``LSMS_MAKE_JOBS`` overrides the default (``cpu_count // 2``).  A
+    country-level build fans out to one ``python <table>.py`` per wave, so
+    ``-jN`` runs N wave builds -- and thus N concurrent large-blob S3 fetches --
+    in parallel.  On a host where concurrent multipart S3 reads occasionally
+    corrupt a TLS record under load (see ``local_tools._get_file_with_retry``,
+    which retries those), set ``LSMS_MAKE_JOBS=1`` to serialize the fetches.
     """
     make_jobs = os.getenv("LSMS_MAKE_JOBS")
     if make_jobs:
