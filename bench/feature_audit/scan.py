@@ -462,17 +462,18 @@ def _nan_fractions(df: pd.DataFrame) -> dict[str, float]:
     return out
 
 
-def phase2_kwargs(feature: str, countries: list[str], baseline: Any,
-                  per_country_rows: dict[str, int]) -> list[Finding]:
-    grid = KWARG_GRID.get(feature, [])
-    if not grid:
-        return []
+def _scan_one_kwarg(feature: str, countries: list[str], kwargs: dict[str, Any],
+                    base_totals: dict[str, float], base_nan: dict[str, float],
+                    base_len: int | None,
+                    per_country_rows: dict[str, int]) -> list[Finding]:
+    """Build ONE Feature(feature)(countries, **kwargs) and check it against the
+    no-kwarg baseline summaries.  Module-level + never-raising so it ships to a
+    pool worker; baseline *summaries* (totals/nan-fracs/len) are passed instead
+    of the baseline DataFrame, which is too big to pickle and not needed here.
+    """
     findings: list[Finding] = []
-    base_totals = _grand_totals(baseline) if isinstance(baseline, pd.DataFrame) else {}
-    base_nan = _nan_fractions(baseline) if isinstance(baseline, pd.DataFrame) else {}
-
-    for kwargs in grid:
-        result, captured, err, secs = _build(lambda kw=kwargs: ll.Feature(feature)(countries, **kw))
+    try:
+        result, captured, err, secs = _build(lambda: ll.Feature(feature)(countries, **kwargs))
         findings += _warnings_to_findings("2-kwargs", feature, captured, kwargs)
         if err is not None:
             findings.append(Finding(
@@ -480,23 +481,23 @@ def phase2_kwargs(feature: str, countries: list[str], baseline: Any,
                 status="error", severity="C", expected=False, kwargs=dict(kwargs),
                 detail=err,
             ))
-            continue
+            return findings
 
         findings += _assembly_invariants("2-kwargs", feature, result,
                                           per_country_rows, kwargs, check_rows=False)
         if not isinstance(result, pd.DataFrame) or result.empty:
-            continue
+            return findings
 
         # kwarg changing cardinality vs the no-kwarg assembled baseline is a
         # semantics signal (e.g. units price-modes drop unreported-price rows).
-        if isinstance(baseline, pd.DataFrame) and len(result) != len(baseline):
-            delta = len(result) - len(baseline)
+        if base_len is not None and len(result) != base_len:
+            delta = len(result) - base_len
             findings.append(Finding(
                 phase="2-kwargs", feature=feature, check="kwarg_changes_rowcount",
                 status="warn", severity="C", expected=None, kwargs=dict(kwargs),
-                detail=(f"row count {len(baseline)} -> {len(result)} ({delta:+d}) "
+                detail=(f"row count {base_len} -> {len(result)} ({delta:+d}) "
                         f"under this kwarg vs no-kwarg baseline"),
-                metrics={"baseline": len(baseline), "got": len(result), "delta": delta},
+                metrics={"baseline": base_len, "got": len(result), "delta": delta},
             ))
 
         # units mode that blows NaN-rate from <99% to ~100% on a value column
@@ -528,6 +529,62 @@ def phase2_kwargs(feature: str, countries: list[str], baseline: Any,
                         metrics={"column": col, "baseline": base_tot, "got": got,
                                  "rel_drift": drift},
                     ))
+        return findings
+    except Exception as e:  # noqa: BLE001 - worker must not crash the pool
+        findings.append(Finding(
+            phase="2-kwargs", feature=feature, check="worker", status="error",
+            severity="C", expected=False, kwargs=dict(kwargs),
+            detail=f"worker crashed: {type(e).__name__}: {e}",
+        ))
+        return findings
+
+
+def phase2_kwargs(feature: str, countries: list[str], baseline: Any,
+                  per_country_rows: dict[str, int], jobs: int = 1,
+                  build_timeout: int = DEFAULT_BUILD_TIMEOUT) -> list[Finding]:
+    """Exercise the per-feature kwarg grid.  Each variant is an independent warm
+    Feature() rebuild + transform, so with ``jobs > 1`` the variants run
+    concurrently in a pool — this is the dominant cost on the food features
+    (6 units/label/market passes over ~40 countries back-to-back when serial).
+    """
+    grid = KWARG_GRID.get(feature, [])
+    if not grid:
+        return []
+    base_totals = _grand_totals(baseline) if isinstance(baseline, pd.DataFrame) else {}
+    base_nan = _nan_fractions(baseline) if isinstance(baseline, pd.DataFrame) else {}
+    base_len = len(baseline) if isinstance(baseline, pd.DataFrame) else None
+
+    if jobs > 1 and len(grid) > 1:
+        findings: list[Finding] = []
+        pool = get_context("fork").Pool(processes=min(jobs, len(grid)))
+        try:
+            ars = [(kw, pool.apply_async(_scan_one_kwarg,
+                    (feature, countries, kw, base_totals, base_nan, base_len, per_country_rows)))
+                   for kw in grid]
+            for kw, ar in ars:
+                try:
+                    findings += ar.get(timeout=build_timeout)
+                except MPTimeoutError:
+                    findings.append(Finding(
+                        phase="2-kwargs", feature=feature, check="kwarg_timeout",
+                        status="error", severity="C", expected=False, kwargs=dict(kw),
+                        detail=f"kwarg build exceeded {build_timeout}s — killed",
+                    ))
+                except Exception as e:  # noqa: BLE001
+                    findings.append(Finding(
+                        phase="2-kwargs", feature=feature, check="worker",
+                        status="error", severity="C", expected=False, kwargs=dict(kw),
+                        detail=f"worker died: {type(e).__name__}: {e}",
+                    ))
+        finally:
+            pool.terminate()
+            pool.join()
+        return findings
+
+    findings = []
+    for kw in grid:
+        findings += _scan_one_kwarg(feature, countries, kw, base_totals, base_nan,
+                                    base_len, per_country_rows)
     return findings
 
 
@@ -624,7 +681,8 @@ def run(features: list[str], country_filter: list[str] | None,
             if "2" in phases:
                 if baseline is None and feature not in _PROPERTY_FEATURES:
                     baseline, *_ = _build(lambda: ll.Feature(feature)(countries))
-                emit(phase2_kwargs(feature, countries, baseline, per_country_rows))
+                emit(phase2_kwargs(feature, countries, baseline, per_country_rows,
+                                   jobs, build_timeout))
 
             print(f"    done in {time.perf_counter() - t0:.0f}s  "
                   f"(+{n_records - before} records)", file=sys.stderr, flush=True)
