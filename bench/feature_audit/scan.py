@@ -43,8 +43,8 @@ import sys
 import time
 import traceback
 import warnings
-from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import asdict, dataclass, field
+from multiprocessing import TimeoutError as MPTimeoutError, get_context
 from typing import Any, Callable
 
 # Pin per-process numerical thread pools to 1 BEFORE importing numpy/pandas.
@@ -115,6 +115,18 @@ KWARG_GRID: dict[str, list[dict[str, Any]]] = {
 # Columns that are additive across countries -> a relabel/reaggregate must
 # CONSERVE their grand total (Price is per-unit and must NOT).
 ADDITIVE_MEASURES = ("Quantity", "Expenditure")
+
+# Countries with no source microdata in the repo (CLAUDE.md "Countries Without
+# Microdata").  Their per-feature builds don't fail fast -- they spin in
+# fallback paths (Armenia's "manual aggregation", Nepal's make loop) -- so one
+# of them stalls the whole feature.  Skipped up front and logged transparently.
+# Override with --include-no-microdata.
+NO_MICRODATA = {"Nepal", "Armenia"}
+
+# Hard ceiling on a single country build (seconds).  A legitimate cold
+# food_acquired build for a big country is minutes, so this is generous; it only
+# trips on a genuine hang, after which the straggler worker is force-killed.
+DEFAULT_BUILD_TIMEOUT = 600
 
 # Substrings that classify a captured warning into an issue class + a quick
 # "expected?" hint for triage.  (severity, expected_by_default)
@@ -262,29 +274,57 @@ def _scan_one_country(feature: str, name: str) -> tuple[list[Finding], str, int 
         return findings, name, None
 
 
-def phase1a_country_sanity(feature: str, countries: list[str],
-                           jobs: int = 1) -> tuple[list[Finding], dict[str, int]]:
+def phase1a_country_sanity(
+    feature: str, countries: list[str], jobs: int = 1,
+    build_timeout: int = DEFAULT_BUILD_TIMEOUT,
+) -> tuple[list[Finding], dict[str, int]]:
     """Build each country's table alone and run is_this_feature_sane.
 
-    With ``jobs > 1`` the per-country builds fan out across a process pool —
-    safe because v0.7.3 reads are lock-free (direct S3) and each country writes
-    a distinct L2 cache path, so concurrent builds of different countries don't
-    contend.  Returns (findings, per_country_rowcount); the row counts feed the
-    Phase-1b conservation invariant.
+    ``countries`` is assumed already filtered of no-microdata countries by the
+    caller (``run``), since Phase 1b/2 share that filter.  With ``jobs > 1`` the
+    per-country builds fan out across a ``multiprocessing`` pool — safe because
+    v0.7.3 reads are lock-free (direct S3) and each country writes a distinct L2
+    cache path, so concurrent builds of different countries don't contend.  Each
+    build is bounded by ``build_timeout`` and a straggler is force-killed via
+    ``pool.terminate()`` so one hang can't block the feature.
+
+    Returns (findings, per_country_rowcount); the row counts feed the Phase-1b
+    conservation invariant.
     """
     findings: list[Finding] = []
     rows: dict[str, int] = {}
+    targets = countries
 
-    if jobs > 1 and len(countries) > 1:
-        with ProcessPoolExecutor(max_workers=min(jobs, len(countries))) as ex:
-            futs = {ex.submit(_scan_one_country, feature, c): c for c in countries}
-            for fut in as_completed(futs):
-                f_list, name, n = fut.result()  # _scan_one_country never raises
-                findings += f_list
-                if n is not None:
-                    rows[name] = n
+    if jobs > 1 and len(targets) > 1:
+        # fork: workers inherit the already-imported package + the BLAS=1 env,
+        # so no re-import cost and no thread oversubscription.
+        pool = get_context("fork").Pool(processes=min(jobs, len(targets)))
+        try:
+            ars = {c: pool.apply_async(_scan_one_country, (feature, c)) for c in targets}
+            for c, ar in ars.items():
+                try:
+                    f_list, name, n = ar.get(timeout=build_timeout)
+                    findings += f_list
+                    if n is not None:
+                        rows[name] = n
+                except MPTimeoutError:
+                    findings.append(Finding(
+                        phase="1a-sanity", feature=feature, country=c,
+                        check="build_timeout", status="error", severity="A",
+                        expected=False,
+                        detail=f"build exceeded {build_timeout}s — killed (likely hang)",
+                    ))
+                except Exception as e:  # noqa: BLE001 - worker died unexpectedly
+                    findings.append(Finding(
+                        phase="1a-sanity", feature=feature, country=c,
+                        check="worker", status="error", severity="A", expected=False,
+                        detail=f"worker died: {type(e).__name__}: {e}",
+                    ))
+        finally:
+            pool.terminate()   # force-kill any straggler still spinning
+            pool.join()
     else:
-        for name in countries:
+        for name in targets:
             f_list, name, n = _scan_one_country(feature, name)
             findings += f_list
             if n is not None:
@@ -513,7 +553,9 @@ def declaring_countries(feature: str, country_filter: list[str] | None) -> list[
 
 def run(features: list[str], country_filter: list[str] | None,
         phases: set[str], limit_countries: int | None,
-        out_path: str, jobs: int = 1) -> None:
+        out_path: str, jobs: int = 1,
+        build_timeout: int = DEFAULT_BUILD_TIMEOUT,
+        include_no_microdata: bool = False) -> None:
     """Stream one JSON record per check to *out_path* as each feature completes.
 
     Writing incrementally (and flushing per feature) means a multi-hour sweep is
@@ -552,19 +594,29 @@ def run(features: list[str], country_filter: list[str] | None,
                 continue
             if limit_countries:
                 countries = countries[:limit_countries]
+            # Drop known no-microdata countries BEFORE any phase: Feature() (used
+            # by Phase 1b/2) has no skip list and would spin on them in the main
+            # process.  Logged per (feature, country) so coverage stays honest.
+            excluded = set() if include_no_microdata else NO_MICRODATA
+            dropped = [c for c in countries if c in excluded]
+            countries = [c for c in countries if c not in excluded]
+            for c in dropped:
+                skip(feature, f"{c}: known no-source-data country (CLAUDE.md)")
             if not countries:
                 skip(feature, "no declaring country in filter")
                 continue
 
             t0 = time.perf_counter()
-            print(f"[{idx}/{len(features)} {feature}] {len(countries)} countries: "
+            print(f"[{idx}/{len(features)} {feature}] {len(countries)} countries"
+                  f"{f' (skipped {len(dropped)})' if dropped else ''}: "
                   f"{', '.join(countries)}", file=sys.stderr, flush=True)
 
             per_country_rows: dict[str, int] = {}
             baseline = None
             before = n_records
             if "1" in phases:
-                f1a, per_country_rows = phase1a_country_sanity(feature, countries, jobs)
+                f1a, per_country_rows = phase1a_country_sanity(
+                    feature, countries, jobs, build_timeout)
                 emit(f1a)
                 f1b, baseline = phase1b_assembly(feature, countries, per_country_rows)
                 emit(f1b)
@@ -602,13 +654,23 @@ def main(argv: list[str] | None = None) -> int:
                     help="parallel Phase-1a country builds (process pool). "
                          "Size to PHYSICAL cores (e.g. 24 on a 32-core node). "
                          "default 1 = sequential")
+    ap.add_argument("--build-timeout", type=int, default=DEFAULT_BUILD_TIMEOUT,
+                    help=f"per-country build hard ceiling, seconds "
+                         f"(default {DEFAULT_BUILD_TIMEOUT}); straggler is killed")
+    ap.add_argument("--include-no-microdata", action="store_true",
+                    help=f"don't skip the known no-source-data countries "
+                         f"({', '.join(sorted(NO_MICRODATA))})")
     args = ap.parse_args(argv)
 
     features = resolve_features(args.features)
     phases = set(args.phases.replace(" ", "").split(","))
+    skipped = "none" if args.include_no_microdata else ", ".join(sorted(NO_MICRODATA))
     print(f"feature-audit scan: {len(features)} features, jobs={args.jobs}, "
-          f"BLAS threads/worker={os.environ.get('OMP_NUM_THREADS')}", file=sys.stderr)
-    run(features, args.countries, phases, args.limit_countries, args.out, args.jobs)
+          f"BLAS threads/worker={os.environ.get('OMP_NUM_THREADS')}, "
+          f"build_timeout={args.build_timeout}s, skip_no_microdata=[{skipped}]",
+          file=sys.stderr)
+    run(features, args.countries, phases, args.limit_countries, args.out, args.jobs,
+        args.build_timeout, args.include_no_microdata)
     return 0
 
 
