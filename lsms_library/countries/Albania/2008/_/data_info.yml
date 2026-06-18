@@ -9,7 +9,9 @@ individual_education:
             - hh
         pid: id
     myvars:
-        Educational Attainment: m2b_q04
+        Educational Attainment:
+            - m2b_q04
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 household_roster:
     # i=[psu,hh] -> composite via mapping.py:i() ('psu-hh') to match sample()'s
