@@ -76,9 +76,49 @@ warn/fail/error subset is the candidate-finding list.
 - Warm vs cold cache: warm sweep is fast but a stale L2 parquet could mask/fake a
   finding. Red-team reproduces survivors **cold** (`LSMS_NO_CACHE=1`) from `/tmp`.
 
-## Downstream (planned `audit.workflow.js`)
+## cluster.py — collapse findings to root-cause patterns
 
-Consumes the warn/fail/error records:
+```bash
+python bench/feature_audit/cluster.py \
+  --in  bench/feature_audit/results/<date>/results.jsonl \
+  --out bench/feature_audit/results/<date>/clusters.json
+```
+
+The full sweep emits ~565 candidate findings, but most share a root cause (one
+schema mismatch in 30 countries; one repeated warning) or are by-design. This
+clusters the warn/fail/error records by `(check, severity, normalized-detail)`
+— numbers/countries/paths stripped from the detail — into ~56 patterns sorted
+hardest-first (`fail` → severity B → count). `clusters.json` is the input to the
+workflow. Fanning an agent per *raw record* would just re-derive the same
+handful of causes 30× over; fan per *cluster*.
+
+## audit.workflow.js — triage → red-team → file (Workflow tool)
+
+Multi-agent orchestration; requires explicit opt-in to run. Pass the clusters as
+`args` (the JS sandbox can't read files):
+
+```
+Workflow({ scriptPath: 'bench/feature_audit/audit.workflow.js',
+           args: { clusters: <parsed clusters.json>, file: false,
+                   repo: '<abs repo>', py: '<abs>/.venv/bin/python',
+                   resultsDir: '<abs>/bench/feature_audit/results/<date>' } })
+```
+
+- **Triage** (`pipeline`, one agent/cluster): classify real-bug / by-design /
+  false-positive / harness-artifact, with a repro and a number per claim.
+- **Red-team** (`parallel`, 3 lenses per real-bug — cold-repro, by-design
+  contract, source-truth): each tries to *refute*; default-refute-if-uncertain;
+  a majority refute kills it. A collapse/row-loss finding is only refuted if
+  losslessness is *proven* (skill caveat).
+- **File** (one agent): writes `audit_memo.md` + `confirmed_issues.jsonl`, dedups
+  against `gh issue list --state all --search "<fingerprint>"`, and — only when
+  `file: true` — runs `gh issue create` (labels `feature-audit` + class +
+  `auto-filed`, `audit-key: <fingerprint>` in the body for idempotency).
+  Default (`file: false`) is a **dry run** → `would_file.jsonl`.
+
+## Downstream — `audit.workflow.js` design notes
+
+Consumes the warn/fail/error records (via clusters):
 
 - **Phase 3 — triage** (`pipeline`, one agent per finding): read source config +
   transform + contract (CLAUDE.md, `.claude/skills/cross-country-features`,

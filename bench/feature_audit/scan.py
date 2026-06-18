@@ -108,7 +108,9 @@ KWARG_GRID: dict[str, list[dict[str, Any]]] = {
     "food_expenditures": [{"labels": "Aggregate"}, {"market": "Region"}],
     "food_acquired": [{"labels": "Aggregate"}],
     "assets": [{"labels": "Aggregate"}],
-    "household_characteristics": [{"age_cuts": [0, 5, 15, 60]}, {"market": "Region"}],
+    # no leading 0 in age_cuts: a leading 0 is deprecated and just emits a
+    # warning for every country (565-sweep cluster C023, a harness artifact).
+    "household_characteristics": [{"age_cuts": [5, 15, 60]}, {"market": "Region"}],
     "household_roster": [{"market": "Region"}],
 }
 
