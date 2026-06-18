@@ -919,3 +919,57 @@
 | 50   | Matches                  | MATCHES             | matches              |
 | 51   | Cigarettes               | CIGARETTES          | cigarettes           |
 | 52   | Batteries                | BATTERIES           | batteries            |
+
+# harmonize_education (GH #171) -- maps the value-labelled text codes of
+# hc_07 / hh_c07 "What is the highest grade completed by [NAME]?" onto the
+# canonical ordinal vocabulary (canonical_education_labels.org).  Codes are
+# the Tanzanian NPS schooling ladder (the .dta value labels):
+#   PP                  pre-primary
+#   ADULT               adult / informal education
+#   D1..D8              Darasa/Standard 1-8 (primary; D7 terminal, D8 the
+#                       older 8-year primary terminal)
+#   PREFORM 1           pre-form bridge into secondary
+#   F1..F4              Form 1-4 (lower secondary; F4 = O-level, terminal)
+#   F5..F6              Form 5-6 (upper secondary; F6 = A-level, terminal)
+#   'O'+COURSE / 'A'+COURSE / MS+COURSE / OSC
+#                       post-level training courses -> Vocational/Technical
+#   DIPLOMA             tertiary diploma/certificate
+#   U1..U5&+            university years -> Bachelor (first degree)
+# The 2020-21 wave lowercases some labels (pp/adult/diploma/osc) and spaces
+# 'MS+ COURSE'; both variants are listed so every wave resolves.  Row-additive
+# over the global harmonize_education base; key column is 'Original Label'.
+#+name: harmonize_education
+| Original Label | Preferred Label              |
+|----------------+------------------------------|
+| PP             | Pre-primary                  |
+| pp             | Pre-primary                  |
+| ADULT          | Informal                     |
+| adult          | Informal                     |
+| D1             | Primary incomplete           |
+| D2             | Primary incomplete           |
+| D3             | Primary incomplete           |
+| D4             | Primary incomplete           |
+| D5             | Primary incomplete           |
+| D6             | Primary incomplete           |
+| D7             | Primary complete             |
+| D8             | Primary complete             |
+| PREFORM 1      | Lower secondary              |
+| F1             | Lower secondary              |
+| F2             | Lower secondary              |
+| F3             | Lower secondary              |
+| F4             | Lower secondary complete     |
+| F5             | Upper secondary              |
+| F6             | Upper secondary complete     |
+| 'O'+COURSE     | Vocational/Technical         |
+| 'A'+COURSE     | Vocational/Technical         |
+| MS+COURSE      | Vocational/Technical         |
+| MS+ COURSE     | Vocational/Technical         |
+| OSC            | Vocational/Technical         |
+| osc            | Vocational/Technical         |
+| DIPLOMA        | Tertiary certificate/diploma |
+| diploma        | Tertiary certificate/diploma |
+| U1             | Bachelor                     |
+| U2             | Bachelor                     |
+| U3             | Bachelor                     |
+| U4             | Bachelor                     |
+| U5&+           | Bachelor                     |

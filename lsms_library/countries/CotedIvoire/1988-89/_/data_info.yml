@@ -86,3 +86,17 @@ household_roster:
                 11: Servant
                 12: Nephew/Niece
                 13: Other Relative
+
+individual_education:
+    file: ../Data/SEC03A1.DAT
+    idxvars:
+        i:
+            - CLUST
+            - NH
+        pid: PID
+    myvars:
+        # GH #171: CILSS Section 3 education GRADE (French ladder CP/CE/CM, 6E-3E,
+        # 2E-TER, U1-8; NUL/B=none, JE=Jardin d'Enfants) -> canonical.
+        Educational Attainment:
+            - GRADE
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']

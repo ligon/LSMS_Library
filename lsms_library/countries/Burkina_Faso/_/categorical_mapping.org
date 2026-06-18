@@ -296,8 +296,10 @@
 | ufs                                                                                                 | Oeufs                                        |
 | Canne Ã  sucre                                                                                       | Canne à sucre                                |
 | Chocolat Ã  croquer, pÃ¢te Ã  tartiner                                                               | Chocolat à croquer, pâte à tartiner          |
-| Cube (Maggi, Jumbo,)                                                                                | Cube alimentaire                             |
-| Feuilles (oseilles, baobab, boulvaka                                                                | Feuilles                                     |
+| Cube (Maggi, Jumbo,
+)                                                                                | Cube alimentaire                             |
+| Feuilles (oseilles, baobab, boulvaka
+                                                                | Feuilles                                     |
 | Viande de bÅuf                                                                                      | Viande de boeuf                              |
 | Viandes de bufs fraîches                                                                            | Viande de boeuf                              |
 
@@ -565,6 +567,31 @@
 |    9 | Chicken         |
 |   10 | Guinea Fowl     |
 |   11 | Other Poultry   |
+
+# harmonize_education (GH #171): per-country delta on the global ordinal base
+# (categorical_mapping/harmonize_education.org, row-additive). Maps this country's
+# attainment labels onto the canonical ordinal levels.
+#+name: harmonize_education
+| Original Label                | Preferred Label              |
+|-------------------------------+------------------------------|
+| Aucun                         | None                         |
+| Maternelle                    | Pre-primary                  |
+| Postprimaire  technique       | Vocational/Technical         |
+| Postprimaire général          | Lower secondary              |
+| Postsecondaire                | Tertiary certificate/diploma |
+| Primaire                      | Primary complete             |
+| Préscolaire                   | Pre-primary                  |
+| Second. 2nd  cycle général    | Upper secondary              |
+| Second. 2nd cycle tech. Prof. | Vocational/Technical         |
+| Second. gl 1                  | Lower secondary              |
+| Second. gl 2                  | Upper secondary              |
+| Second. tech. 1               | Vocational/Technical         |
+| Second. tech. 2               | Vocational/Technical         |
+| Secondaire 1er cycle          | Lower secondary              |
+| Secondaire général            | Lower secondary              |
+| Secondaire technique          | Vocational/Technical         |
+| Superieur                     | Bachelor                     |
+| Supérieur                     | Bachelor                     |
 
 # harmonize_assets (GH #168): per-country delta on the global base (row-additive).
 # Covers Burkina's French asset labels. NOTE: this country also has 26 raw

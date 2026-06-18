@@ -855,3 +855,153 @@
 |    4 | Manufacturing   | 3--5          | 1010--4000       |
 |    5 | Construction    | 6             | 4100--4500       |
 |    6 | Services        | 7--14         | 4501--10000      |
+
+* harmonize_education (GH #171)
+
+Maps Nigeria GHS-Panel highest-education-completed labels (section 2,
+post-harvest ``s2aq9`` in W1--W4, ``s2q9`` in W5) onto the canonical
+ordinal vocabulary (see ../../../categorical_mapping/canonical_education_labels.org).
+Row-additive over the global ``harmonize_education`` base: this delta
+carries only Nigeria's own attainment spellings.  The same survey level
+appears in three orthographic forms across waves -- lowercase (W1
+post-harvest ``sect2a_harvestw1``), UPPERCASE (W2
+``sect2a_harvestw2``), and numbered ``NN. LABEL`` (W3--W5) -- plus minor
+whitespace / wording variants; every observed exact string is listed so
+the dict lookup is total (unmapped strings would pass through verbatim
+and fail the canonical-vocabulary check).
+
+Level collapse (mirrors Uganda's grade collapse):
+- Nursery / Pre-Nursery / Kindergarten -> Pre-primary
+- Primary 1--5 (P1--P5) -> Primary incomplete; Primary 6 (P6) -> Primary complete
+- Junior Secondary 1--3 (JS1--JS3) -> Lower secondary
+- Senior Secondary 1--2 (SS1--SS2) / Lower 6 -> Upper secondary;
+  Senior Secondary 3 (SS3) / Upper 6 -> Upper secondary complete
+- Modern School (post-primary stream) -> Lower secondary
+- Vocational/Technical (secondary or tertiary) -> Vocational/Technical
+- Teacher Training / Teacher Certificate Grade II / NCE / Nursing School /
+  OND/ND / HND / Poly/Prof -> Tertiary certificate/diploma
+- University (any level) / 1st Degree -> Bachelor
+- Higher Degree / Post-Graduate Degree -> Postgraduate
+- Quranic / Integrated Quranic / Integrated Islamic Education /
+  Adult Education / Basic Literacy / Post Literacy -> Informal
+- None -> None
+
+#+name: harmonize_education
+| Original Label                                                     | Preferred Label              |
+|--------------------------------------------------------------------+------------------------------|
+| none                                                               | None                         |
+| NONE                                                               | None                         |
+| 0. NONE                                                            | None                         |
+| n1                                                                 | Pre-primary                  |
+| n2                                                                 | Pre-primary                  |
+| N1                                                                 | Pre-primary                  |
+| N2                                                                 | Pre-primary                  |
+| 1. N1                                                              | Pre-primary                  |
+| 2. N2                                                              | Pre-primary                  |
+| 1. NURSERY 1                                                       | Pre-primary                  |
+| 2. NURSERY 2                                                       | Pre-primary                  |
+| 3. PRE-NURSERY                                                     | Pre-primary                  |
+| 3. PRE-NURSERY (incl. Kindergarten)                                | Pre-primary                  |
+| p1                                                                 | Primary incomplete           |
+| p2                                                                 | Primary incomplete           |
+| p3                                                                 | Primary incomplete           |
+| p4                                                                 | Primary incomplete           |
+| p5                                                                 | Primary incomplete           |
+| P1                                                                 | Primary incomplete           |
+| P2                                                                 | Primary incomplete           |
+| P3                                                                 | Primary incomplete           |
+| P4                                                                 | Primary incomplete           |
+| P5                                                                 | Primary incomplete           |
+| 11. P1                                                             | Primary incomplete           |
+| 12. P2                                                             | Primary incomplete           |
+| 13. P3                                                             | Primary incomplete           |
+| 14. P4                                                             | Primary incomplete           |
+| 15. P5                                                             | Primary incomplete           |
+| 11. PRIMARY 1                                                      | Primary incomplete           |
+| 12. PRIMARY 2                                                      | Primary incomplete           |
+| 13. PRIMARY 3                                                      | Primary incomplete           |
+| 14. PRIMARY 4                                                      | Primary incomplete           |
+| 15. PRIMARY 5                                                      | Primary incomplete           |
+| p6                                                                 | Primary complete             |
+| P6                                                                 | Primary complete             |
+| 16. P6                                                             | Primary complete             |
+| 16. PRIMARY 6                                                      | Primary complete             |
+| js1                                                                | Lower secondary              |
+| js2                                                                | Lower secondary              |
+| js3                                                                | Lower secondary              |
+| JS1                                                                | Lower secondary              |
+| JS2                                                                | Lower secondary              |
+| JS3                                                                | Lower secondary              |
+| 21. JS1                                                            | Lower secondary              |
+| 22. JS2                                                            | Lower secondary              |
+| 23. JS3                                                            | Lower secondary              |
+| 21. JUNIOR SECONDARY 1 (JS 1)                                      | Lower secondary              |
+| 22. JUNIOR SECONDARY 2 (JS 2)                                      | Lower secondary              |
+| 23. JUNIOR SECONDARY 3 (JS 3)                                      | Lower secondary              |
+| modern school                                                      | Lower secondary              |
+| MODERN SCHOOL                                                      | Lower secondary              |
+| 33. MODERN SCHOOL                                                  | Lower secondary              |
+| ss1                                                                | Upper secondary              |
+| ss2                                                                | Upper secondary              |
+| SS1                                                                | Upper secondary              |
+| SS2                                                                | Upper secondary              |
+| 24. SS1                                                            | Upper secondary              |
+| 25. SS2                                                            | Upper secondary              |
+| 24. SENIOR SECONDARY 1 (SS 1)                                      | Upper secondary              |
+| 25. SENIOR SECONDARY 2 (SS 2)                                      | Upper secondary              |
+| lower 6                                                            | Upper secondary              |
+| 27. LOWER 6                                                        | Upper secondary              |
+| 27. LOWER 6 (HSE 1)                                                | Upper secondary              |
+| ss3                                                                | Upper secondary complete     |
+| SS3                                                                | Upper secondary complete     |
+| 26. SS3                                                            | Upper secondary complete     |
+| 26. SENIOR SECONDARY 3 (SS 3)                                      | Upper secondary complete     |
+| upper 6                                                            | Upper secondary complete     |
+| 28. UPPER 6                                                        | Upper secondary complete     |
+| 28. UPHER 6                                                        | Upper secondary complete     |
+| 28. UPPER 6 (HSE 2)                                                | Upper secondary complete     |
+| vocational/technical                                               | Vocational/Technical         |
+| VOCATIONAL/TECHNICAL                                               | Vocational/Technical         |
+| 32. VOCATIONAL/TECHNICAL                                           | Vocational/Technical         |
+| 321. SECONDARY VOCATIONAL/TECHNICAL/COMMERCIAL                     | Vocational/Technical         |
+| 322. TERTIARY VOCATIONAL/TECHNICAL/COMMERCIAL                      | Vocational/Technical         |
+| nce                                                                | Tertiary certificate/diploma |
+| NCE                                                                | Tertiary certificate/diploma |
+| 34. NCE                                                            | Tertiary certificate/diploma |
+| 34. NATIONAL CERTIFICATE OF EDUCATION                              | Tertiary certificate/diploma |
+| 35. NURSING SCHOOL                                                 | Tertiary certificate/diploma |
+| 35. NURSING SCHOOL (NON-UNIVERSITY)                                | Tertiary certificate/diploma |
+| 31. TEACHER TRAINING                                               | Tertiary certificate/diploma |
+| 31. TEACHER CERTIFICATE GRADE II (TCGDII)                          | Tertiary certificate/diploma |
+| poly/prof                                                          | Tertiary certificate/diploma |
+| POLY/PROF                                                          | Tertiary certificate/diploma |
+| 41. POLY/PROF                                                      | Tertiary certificate/diploma |
+| 41. POLYTECHNIC/PROF                                               | Tertiary certificate/diploma |
+| 411. OND 1, OND 2                                                  | Tertiary certificate/diploma |
+| 411. OND1/ND1,OND2/ND2                                             | Tertiary certificate/diploma |
+| 412. HND 1, HND 2                                                  | Tertiary certificate/diploma |
+| 412. HND1,HND2                                                     | Tertiary certificate/diploma |
+| 1st degree                                                         | Bachelor                     |
+| 1ST DEGREE                                                         | Bachelor                     |
+| 42. 1ST DEGREE                                                     | Bachelor                     |
+| 421. UNIVERSITY - LEVELS 100, 200 OR 300                           | Bachelor                     |
+| 421. UNIVERSITY - LEVELS 100, 200 OR, 300                          | Bachelor                     |
+| 422. UNIVERSITY  - 400 LEVEL                                       | Bachelor                     |
+| 422. UNIVERSITY - 400 LEVEL                                        | Bachelor                     |
+| 423. UNIVERSITY  - 500 LEVEL                                       | Bachelor                     |
+| 423. UNIVERSITY - 500 LEVEL                                        | Bachelor                     |
+| 424. UNIVERSITY  - 600 LEVEL                                       | Bachelor                     |
+| 424. UNIVERSITY - 600 LEVEL                                        | Bachelor                     |
+| higher degree                                                      | Postgraduate                 |
+| 43. HIGHER DEGREE                                                  | Postgraduate                 |
+| 43. HIGHER DEGREE / POST-GRADUATE DEGREE                           | Postgraduate                 |
+| quaranic                                                           | Informal                     |
+| QUARANIC                                                           | Informal                     |
+| 51. QUARANIC                                                       | Informal                     |
+| integrated quaranic                                                | Informal                     |
+| INTEGRATED QUARANIC                                                | Informal                     |
+| 52. INTEGRATED QUARANIC                                            | Informal                     |
+| 52. INTEGRATED ISLAMIC EDUCATION (ISLAMIYYA, TSANGAYA, OR QUR'ANIC) | Informal                    |
+| 61. ADULT EDUCATION                                                | Informal                     |
+| 62. BASIC LITERACY PROGRAM                                         | Informal                     |
+| 64. POST LITERACY II                                               | Informal                     |

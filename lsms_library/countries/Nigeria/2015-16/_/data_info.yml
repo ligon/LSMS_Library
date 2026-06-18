@@ -87,3 +87,17 @@ panel_ids:
         i: hhid
     myvars:
         previous_i: hhid
+
+individual_education:
+    # GH #171: highest education level completed per household member.
+    # Post-harvest section 2 (sect2_harvestw3) s2aq9, full coverage.
+    # Raw labels mapped onto the canonical ordinal vocabulary via the
+    # row-additive harmonize_education table.
+    file: sect2_harvestw3.dta
+    idxvars:
+        i: hhid
+        pid: indiv
+    myvars:
+        Educational Attainment:
+            - s2aq9
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']

@@ -1118,6 +1118,43 @@
 |   10 | Guinea Fowl     |
 |   11 | Other Poultry   |
 
+# harmonize_education (GH #171): Niger per-country delta on the global ordinal
+# base (categorical_mapping/harmonize_education.org, row-additive).  Covers BOTH
+# of Niger's education vocabularies: the EHCVM waves (2018-19, 2021-22) raw French
+# educ_hi level labels, AND the ECVMA waves (2011-12 English file
+# ecvmaind_p1p2_en.dta, 2014-15 French file ECVMA2_MS02P1.dta; ms02q23/MS02Q23,
+# "niveau d'instruction le plus élevé atteint").  All "Supérieur/Superior/
+# Superieur" (higher education) map to Bachelor, consistent with the other EHCVM
+# French countries' mapping.  'DK' -> Unknown ('Don't Know' is inherited from the
+# global base).  Keep this table one contiguous block — a '#'-comment between
+# rows silently truncates it.
+#+name: harmonize_education
+| Original Label                                      | Preferred Label              |
+|-----------------------------------------------------+------------------------------|
+| Aucun                                               | None                         |
+| Maternelle                                          | Pre-primary                  |
+| Préscolaire                                         | Pre-primary                  |
+| Preschool                                           | Pre-primary                  |
+| Primaire                                            | Primary complete             |
+| Primary                                             | Primary complete             |
+| Second. gl 1                                        | Lower secondary              |
+| Secondaire premier cycle général                    | Lower secondary              |
+| Secondary first cycle-general                       | Lower secondary              |
+| Second. gl 2                                        | Upper secondary              |
+| Secondaire second cycle général                     | Upper secondary              |
+| Secondary second cycle general                      | Upper secondary              |
+| Second. tech. 1                                     | Vocational/Technical         |
+| Second. tech. 2                                     | Vocational/Technical         |
+| Secondaire premier cycle technique et professionnel | Vocational/Technical         |
+| Secondaire second cycle technique et professionnel  | Vocational/Technical         |
+| Secondary first cycle technical & professional      | Vocational/Technical         |
+| Secondary second cycle technical& professional      | Vocational/Technical         |
+| Postsecondaire                                      | Tertiary certificate/diploma |
+| Superieur                                           | Bachelor                     |
+| Superior                                            | Bachelor                     |
+| Supérieur                                           | Bachelor                     |
+| DK                                                  | Unknown                      |
+
 # harmonize_assets (GH #168): per-country delta on top of the global
 # categorical_mapping/harmonize_assets.org base (row-additive merge).
 #+name: harmonize_assets

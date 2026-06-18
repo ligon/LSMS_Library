@@ -436,6 +436,22 @@
 | Tomate                                                                    | Tomate fraîche                                                                       |
 | Voandzou                                                                  | Voandzou                                                                             |
 
+# harmonize_education (GH #171): per-country delta on the global ordinal base
+# (categorical_mapping/harmonize_education.org, row-additive). Maps this country's
+# attainment labels onto the canonical ordinal levels.
+#+name: harmonize_education
+| Original Label  | Preferred Label              |
+|-----------------+------------------------------|
+| Aucun           | None                         |
+| Maternelle      | Pre-primary                  |
+| Postsecondaire  | Tertiary certificate/diploma |
+| Primaire        | Primary complete             |
+| Second. gl 1    | Lower secondary              |
+| Second. gl 2    | Upper secondary              |
+| Second. tech. 1 | Vocational/Technical         |
+| Second. tech. 2 | Vocational/Technical         |
+| Superieur       | Bachelor                     |
+
 # harmonize_assets (GH #168): Benin per-country delta on top of the global
 # categorical_mapping/harmonize_assets.org base (row-additive merge). Benin's
 # assets module records French labels; these map them onto the shared canonical
