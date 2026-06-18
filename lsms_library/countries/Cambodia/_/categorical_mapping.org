@@ -1,0 +1,36 @@
+#+title: Cambodia categorical mappings
+
+Row-additive delta over the global
+=lsms_library/categorical_mapping/harmonize_education.org= base (GH #493).
+Cambodia 2019-20, source s03q04 (hh_sec_3.dta). Cambodia uses a 6-3-3 ladder:
+primary = grades 1-6, lower secondary = grades 7-9 (leaving = the lower
+education certificate / diploma), upper secondary = grades 10-12 (leaving = the
+BacII / Baccalaureate II higher-education-entrance certificate).
+
+#+name: harmonize_education
+| Original Label                                          | Preferred Label              |
+|---------------------------------------------------------+------------------------------|
+| No class completed                                      | None                         |
+| Pre-school/Kindergarten                                 | Pre-primary                  |
+| Class one completed                                     | Primary incomplete           |
+| Class two completed                                     | Primary incomplete           |
+| Class three completed                                   | Primary incomplete           |
+| Class four completed                                    | Primary incomplete           |
+| Class five completed                                    | Primary incomplete           |
+| Class six completed                                     | Primary complete             |
+| Class seven completed                                   | Lower secondary              |
+| Class eight completed                                   | Lower secondary              |
+| Class nine completed without certificate                | Lower secondary              |
+| Lower education certificate (diploma)                   | Lower secondary complete     |
+| Class ten completed                                     | Upper secondary              |
+| Class eleven completed                                  | Upper secondary              |
+| Class twelve completed without certificate              | Upper secondary              |
+| Higher education certificate (BacII)                    | Upper secondary complete     |
+| Technical/vocational pre-secondary diploma/certificate  | Vocational/Technical         |
+| Technical/vocational post-secondary diploma/certificate | Vocational/Technical         |
+| College/university undergraduate but no degree          | Tertiary certificate/diploma |
+| Bachelor degree (B.A., BSc, etc.)                       | Bachelor                     |
+| Masters degree (M.A., MSc, etc)                         | Postgraduate                 |
+| Doctorate degree (PhD)                                  | Doctorate                    |
+| DonÂ´t know                                             | Unknown                      |
+| Other (Specify)                                         | Unknown                      |

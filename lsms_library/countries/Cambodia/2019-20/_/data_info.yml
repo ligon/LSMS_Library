@@ -120,4 +120,6 @@ individual_education:
         i: HHID
         pid: children_out_of_H__id
     myvars:
-        Educational Attainment: s03q04
+        Educational Attainment:
+            - s03q04
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
