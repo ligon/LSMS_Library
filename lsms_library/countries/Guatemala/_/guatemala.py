@@ -68,3 +68,54 @@ def harmonized_food_labels(fn='../../_/food_items.csv',key='Code',value='Preferr
     food_items = food_items.set_index(key)
 
     return food_items.squeeze().str.strip().to_dict()
+
+
+def individual_education(df):
+    """Refine Guatemala ENCOVI 2000 Educational Attainment with the grade year.
+
+    df_edit hook for ``individual_education`` (GH #493).  By the time this
+    runs, the YAML ``mappings: harmonize_education`` table has already mapped
+    the bare ``p07b27a`` nivel labels onto *coarse* canonical levels:
+
+        ninguno -> None,  preparatoria -> Pre-primary,
+        primaria -> "Primary complete",  educacion media -> "Lower secondary",
+        educacion superior -> Bachelor,  post-grado -> Postgraduate,
+        educacion adultos -> Informal,  nivel 9 -> Unknown.
+
+    Two levels need the grade year ``p07b27b`` (carried in ``edu_grade``) to
+    place them on the ordinal scale; this hook supplies that refinement and
+    drops the ``edu_grade`` helper column:
+
+      * Primary  (6-year cycle): grado 1-5 -> "Primary incomplete",
+        grado >=6 -> "Primary complete" (the coarse default, unchanged).
+      * Secondary "educacion media" = ciclo basico (years 1-3, lower
+        secondary) + ciclo diversificado (years 4-6, upper secondary):
+            grado 1-2 -> "Lower secondary"          (some basico)
+            grado 3   -> "Lower secondary complete" (basico finished)
+            grado 4-5 -> "Upper secondary"          (some diversificado)
+            grado >=6 -> "Upper secondary complete" (diversificado finished)
+
+    Rows with a missing/zero grade keep the coarse entry-tier label.
+    """
+    grade = pd.to_numeric(df.get('edu_grade'), errors='coerce')
+
+    # nivel code 9 is unlabelled in Stata, so convert_categoricals leaves it as
+    # the numeric value 9.0 -- the extraction-time `mappings:` table (string
+    # keys) can't reach it before it is stringified downstream.  Map it to
+    # Unknown here, where it is still numeric.  ``replace`` matches 9 / 9.0 /
+    # "9" / "9.0" so it is robust to either dtype.
+    att = df['Educational Attainment']
+    df['Educational Attainment'] = att = att.replace(
+        {9: 'Unknown', 9.0: 'Unknown', '9': 'Unknown', '9.0': 'Unknown'})
+
+    prim = att == 'Primary complete'
+    df.loc[prim & (grade < 6), 'Educational Attainment'] = 'Primary incomplete'
+
+    media = att == 'Lower secondary'
+    df.loc[media & (grade == 3), 'Educational Attainment'] = 'Lower secondary complete'
+    df.loc[media & (grade >= 4) & (grade <= 5), 'Educational Attainment'] = 'Upper secondary'
+    df.loc[media & (grade >= 6), 'Educational Attainment'] = 'Upper secondary complete'
+
+    if 'edu_grade' in df.columns:
+        df = df.drop(columns='edu_grade')
+    return df

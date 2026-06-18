@@ -1,0 +1,51 @@
+#+title: Guatemala categorical mappings
+#+description: Per-country, row-additive deltas over the global categorical
+#+  mapping bases (lsms_library/categorical_mapping/*.org).
+
+* Educational attainment (GH #493)
+
+Guatemala ENCOVI 2000 records highest education in the P07 (education)
+section of =ECV09P05.DTA=, Q27 "ultimo grado aprobado":
+
+- =p07b27a= (nivel) is value-labelled in Stata: ninguno / preparatoria /
+  primaria / educacion media / educacion superior / post-grado /
+  educacion adultos.  Code 9 is unlabelled (33 cases, scattered ages) and
+  is treated as Unknown.
+- =p07b27b= (grado) is the highest year passed within that level.
+
+This table maps the *bare* Stata value-labels of =p07b27a= onto coarse
+canonical levels.  The =individual_education(df)= df_edit hook in
+=guatemala.py= then *refines* the two grade-dependent levels using
+=p07b27b= (grado), which the bare nivel label cannot express:
+
+- "primaria" is a 6-year cycle: the table maps it to *Primary complete*;
+  the hook downgrades grado 1-5 to *Primary incomplete*.
+- "educacion media" spans the *ciclo basico* (lower secondary, media years
+  1-3) and the *ciclo diversificado* (upper secondary, media years 4-6).
+  The table maps it to *Lower secondary*; the hook promotes grado 3 ->
+  *Lower secondary complete*, grado 4-5 -> *Upper secondary*, grado 6+ ->
+  *Upper secondary complete*.
+- "educacion adultos" is non-graded adult literacy/equivalency -> Informal.
+- "educacion superior" is degree-track university -> Bachelor (the survey
+  does not separate a non-degree tertiary diploma here); "post-grado" ->
+  Postgraduate.
+- nivel code 9 is unlabelled in Stata, so it reaches the mapping as the
+  float-string "9.0" (and "9") -> Unknown.
+
+Only the Guatemala-specific Spanish labels appear below; canonical
+identity rows and English variants are inherited from the global base
+=lsms_library/categorical_mapping/harmonize_education.org= (so the hook's
+refined outputs such as "Primary incomplete" pass through unchanged).
+
+#+name: harmonize_education
+| Original Label     | Preferred Label  |
+|--------------------+------------------|
+| ninguno            | None             |
+| educacion adultos  | Informal         |
+| preparatoria       | Pre-primary      |
+| primaria           | Primary complete |
+| educacion media    | Lower secondary  |
+| educacion superior | Bachelor         |
+| post-grado         | Postgraduate     |
+| 9                  | Unknown          |
+| 9.0                | Unknown          |
