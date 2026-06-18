@@ -12,6 +12,20 @@ household_roster:
         Age: h2q9
         MonthsSpent: h2q6
 
+individual_education:
+    file: ../Data/GSEC4.dta
+    idxvars:
+        i: HHID
+        pid: PID
+    myvars:
+        # GH #171: highest grade/class completed (h4q4 this wave; the GSEC4
+        # question moved to h4q7 from 2009-10 on).  2005-06's value labels are
+        # all-lowercase ('completed p.7', ...), covered by the row-additive
+        # harmonize_education table (global base + Uganda per-country delta).
+        Educational Attainment:
+            - h4q4
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
+
 people_last7days:
     file: GSEC14.dta
     idxvars:

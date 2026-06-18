@@ -296,8 +296,10 @@
 | ufs                                                                                                 | Oeufs                                        |
 | Canne Ã  sucre                                                                                       | Canne à sucre                                |
 | Chocolat Ã  croquer, pÃ¢te Ã  tartiner                                                               | Chocolat à croquer, pâte à tartiner          |
-| Cube (Maggi, Jumbo,)                                                                                | Cube alimentaire                             |
-| Feuilles (oseilles, baobab, boulvaka                                                                | Feuilles                                     |
+| Cube (Maggi, Jumbo,
+)                                                                                | Cube alimentaire                             |
+| Feuilles (oseilles, baobab, boulvaka
+                                                                | Feuilles                                     |
 | Viande de bÅuf                                                                                      | Viande de boeuf                              |
 | Viandes de bufs fraîches                                                                            | Viande de boeuf                              |
 
@@ -590,3 +592,57 @@
 | Secondaire technique          | Vocational/Technical         |
 | Superieur                     | Bachelor                     |
 | Supérieur                     | Bachelor                     |
+
+# harmonize_assets (GH #168): per-country delta on the global base (row-additive).
+# Covers Burkina's French asset labels. NOTE: this country also has 26 raw
+# numeric codes (201-226) from a wave where assets were not decoded at
+# extraction; those need a wave-level code->label decode (separate task) before
+# they can be harmonized, so they are intentionally NOT mapped here.
+#+name: harmonize_assets
+| Original Label                                 | Preferred Label |
+|------------------------------------------------+-----------------|
+| Antenne parabolique / décodeur                 | Satellite Dish  |
+| Appareil TV                                    | TV              |
+| Appareil photo                                 | Camera          |
+| Armoires et autres meubles                     | Furniture       |
+| Aspirateur                                     | Appliances      |
+| Bicyclette                                     | Bicycle         |
+| Bonbonne de gaz                                | Gas Cylinder    |
+| Camescope                                      | Camera          |
+| Caméra Vidéo                                   | Camera          |
+| Chaîne Hi Fi                                   | DVD/CD Player   |
+| Climatiseurs/Splits amovibles                  | Air Conditioner |
+| Climatiseurs/splits                            | Air Conditioner |
+| Congélateur                                    | Freezer         |
+| Cuisinière à gaz ou électrique                 | Cooker          |
+| Cyclomoteur/Vélomoteur, motocyclette           | Motorcycle      |
+| Fer à repasser à charbon                       | Iron            |
+| Fer à repasser électrique                      | Iron            |
+| Four à micro-onde ou électrique                | Cooker          |
+| Foyers améliorés                               | Cooker          |
+| Fusils de chasse                               | Other           |
+| Groupe électrogène                             | Generator       |
+| Guitare                                        | Musical Instrument |
+| Immeuble/Maison                                | House           |
+| Imprimante/Fax                                 | Electronics     |
+| Lave-linge, sèche linge                        | Washing Machine |
+| Lit                                            | Bed             |
+| Magnétoscope/CD/DVD                            | DVD/CD Player   |
+| Matelas simple                                 | Mattress        |
+| Mixeur/Presse-fruits non électrique            | Appliances      |
+| Ordinateur                                     | Computer        |
+| Piano et autre appareil de musique             | Musical Instrument |
+| Radio simple/Radiocassette                     | Radio           |
+| Robot de cuisine électrique (Moulinex)         | Appliances      |
+| Réchaud (plaque) à gaz ou électrique           | Cooker          |
+| Réfrigérateur                                  | Refrigerator    |
+| Salon  (Fauteuils et table basse)              | Furniture       |
+| Table à manger  (table + chaises)              | Furniture       |
+| Tablette                                       | Computer        |
+| Tapis                                          | Carpet          |
+| Terrain non bâti                               | Land            |
+| Tondeuse à gazon et autre article de jardinage | Other           |
+| Téléphone fixe                                 | Phone (Landline) |
+| Téléphone portable                             | Phone (Mobile)  |
+| Ventilateur sur pied                           | Fan             |
+| Voiture personnelle                            | Car             |

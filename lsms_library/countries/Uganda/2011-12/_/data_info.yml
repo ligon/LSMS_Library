@@ -18,6 +18,19 @@ household_roster:
             - h2q9c
         MonthsSpent: h2q5
 
+individual_education:
+    file: ../Data/GSEC4.dta
+    idxvars:
+        i: HHID
+        pid: PID
+    myvars:
+        # GH #171: highest grade/class completed (h4q7).  Raw labels
+        # ('Completed P.7', ...) map onto the canonical ordinal levels via the
+        # row-additive harmonize_education table.
+        Educational Attainment:
+            - h4q7
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
+
 housing:
     file: ../Data/GSEC9A.dta
     idxvars:
