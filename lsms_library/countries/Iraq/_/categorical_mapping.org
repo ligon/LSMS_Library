@@ -1,0 +1,36 @@
+#+title: Iraq categorical mappings
+#+description: Per-country categorical label harmonization (row-additive delta
+#+  over the global tables in lsms_library/categorical_mapping/).
+
+# Educational attainment (GH #493). Iraqi ladder (from the questionnaire value
+# labels, ascending): Primary (6y) -> Intermediate/Mutawasita (3y, lower
+# secondary) -> Preparatory/Secondary/I'dadiya (3y, upper secondary) ->
+# Institute diploma (2y technical institute) -> Bachelor -> High/Postgraduate
+# diploma -> Masters -> Doctorate.  Note: this redeclares "Secondary" to
+# OVERRIDE the global base (which maps bare "Secondary" -> Lower secondary
+# complete); in the Iraqi codebook "Secondary" (q0406 code 6) sits above
+# "Intermediate" and is the upper-secondary I'dadiya certificate.
+#+name: harmonize_education
+| Original Label                    | Preferred Label              |
+|-----------------------------------+------------------------------|
+| No diploma, do not read and write | None                         |
+| No diploma, read only             | None                         |
+| No diploma, read and write        | None                         |
+| No certificate                    | None                         |
+| Elementary                        | Primary complete             |
+| Intermediate                      | Lower secondary complete     |
+| Intermediate (mid school)         | Lower secondary complete     |
+| Basic                             | Lower secondary complete     |
+| Secondary                         | Upper secondary complete     |
+| Preparatory                       | Upper secondary complete     |
+| Institute diploma                 | Tertiary certificate/diploma |
+| Diploma from an institution       | Tertiary certificate/diploma |
+| Bachelors degree                  | Bachelor                     |
+| Bachelor degree                   | Bachelor                     |
+| High diploma                      | Postgraduate                 |
+| Postgraduate diploma              | Postgraduate                 |
+| Masters degree                    | Postgraduate                 |
+| Master degree                     | Postgraduate                 |
+| Doctorate degree                  | Doctorate                    |
+| Phd (doctorate)                   | Doctorate                    |
+| Other                             | Unknown                      |
