@@ -42,13 +42,18 @@ individual_education:
     myvars:
         Educational Attainment:
             - bw003_
+            # GH #493: map Soviet-era post-secondary levels directly to the
+            # canonical ordinal vocabulary. Inline mapping RHS is used (a
+            # separate `mappings:` table on the same myvar would raise
+            # "unhashable type: dict"). See _/categorical_mapping.org for the
+            # full-label -> canonical documentation and level rationale.
             - mapping:
-                'occ. cou': Occupational courses
-                'PTU with': PTU with secondary education
-                'PTU, FSO': PTU/FSO without secondary education
-                'tech. co': Technical college
-                'univ. an': University and institute
-                'post-gra': Post-graduate
+                'occ. cou': Vocational/Technical
+                'PTU with': Vocational/Technical
+                'PTU, FSO': Vocational/Technical
+                'tech. co': Tertiary certificate/diploma
+                'univ. an': Bachelor
+                'post-gra': Postgraduate
 
 cluster_features:
     file: ../Data/KZ96SMP_PUF.dta
