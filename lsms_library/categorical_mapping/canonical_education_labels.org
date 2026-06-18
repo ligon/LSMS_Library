@@ -39,10 +39,20 @@ alongside the label for quantitative analysis.
   S.1-S.6; Mali numeric codes; Ethiopia numbered grades) map onto these coarse
   levels for cross-country comparability.  Grade-level detail, where needed,
   stays in the survey-specific data.
-- *Long-pole countries.* Mali, Nigeria and Tanzania encode attainment as raw
-  numeric grade codes that are not yet decoded at extraction; those need a
-  per-wave code->label decode before a `harmonize_education` table can map them
-  (tracked under #171).
+- *"Numeric long-poles" were all mis-identified columns, not numeric data.*  Every
+  country once flagged as raw-numeric turned out to have value-labelled text under
+  the *correct* column; the audits had simply read the wrong variable.  *Nigeria*
+  and *Tanzania* (#489): Tanzania's audit read `hh_c04` (*age started school*) not
+  `hh_c07` (*grade completed*); Nigeria's was `s2aq9` not the `s2q9` literacy y/n.
+  *Mali* hit a "family roster code" trap in BOTH EACI waves — 2014-15 was wired to
+  `s01q06` = *"Code du père dans le ménage"* (father's line number) and 2017-18 to
+  `s1q07` (a Oui/Non about the mother); the real columns are the value-labelled
+  `s02q23` / `s2q06` in the education modules, now harmonized (#171).  *Ethiopia*
+  (89 labels) and *GhanaLSS* (all 7 waves, 1987-2017) are harmonized too — including
+  the legacy GLSS1/2/3 fixed-width rounds, whose `.DAT` files `get_dataframe` reads
+  directly (the `.DCT` dictionaries are redundant) and whose `GRADE`/`s2q2` letter
+  ladder (P/M/S/A/T/PS/U, K=Koranic) was decoded from the GLSS questionnaires.  No
+  numeric residue remains across the LSMS-ISA education tables.
 - *Never-schooled handling.* The universal `dropna(how='all')` drops rows whose
   only column (`Educational Attainment`) is NaN, so never-schooled members are
   currently dropped rather than represented as `None`.  Whether to surface them

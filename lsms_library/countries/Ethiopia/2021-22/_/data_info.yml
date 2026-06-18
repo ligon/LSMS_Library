@@ -67,7 +67,9 @@ individual_education:
     myvars:
         # Highest grade completed (free-text survey labels; W5 labels are
         # uppercased and code-prefixed, e.g. "10. 10TH GRADE COMPLETE").
-        Educational Attainment: s2q06
+        Educational Attainment:
+            - s2q06
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 shocks:
     file: sect9_hh_w5.dta

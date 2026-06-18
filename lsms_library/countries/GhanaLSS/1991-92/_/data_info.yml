@@ -155,3 +155,18 @@ housing:
                 2: Generator
                 3: Kerosene/Gas lamp
                 4: Candles/Torches
+
+individual_education:
+    file: S2.DTA
+    idxvars:
+        v: clust
+        i:
+            - clust
+            - nh
+        pid: pid
+    myvars:
+        # GH #171: s2q2 = highest class/form completed (letter ladder P/M/JSS/S/A/T/PS/U,
+        # same coding as GLSS1/2); blanks = never-attended (s2q1=2), dropped via mapping.py.
+        Educational Attainment:
+            - s2q2
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']

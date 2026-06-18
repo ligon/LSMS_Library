@@ -206,7 +206,9 @@ individual_education:
         # ambiguous" (GH #322).
         pid: numind
     myvars:
-        Educational Attainment: 'educ_hi'
+        Educational Attainment:
+            - educ_hi
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 interview_date:
     file: s00_me_mli2021.dta

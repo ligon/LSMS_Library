@@ -38,3 +38,15 @@ household_roster:
         Relationship: REL
         MonthsAway: MON
 
+individual_education:
+    file: Y03I.DAT
+    idxvars:
+        v: CLUST
+        i: HID
+        pid: PID
+    myvars:
+        # GH #171: GLSS R1/R2 Section 3 Q7 "highest grade completed" (letter codes;
+        # K=Koranic, B=never-attended skip-code) -> canonical via harmonize_education.
+        Educational Attainment:
+            - GRADE
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
