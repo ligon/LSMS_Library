@@ -225,7 +225,9 @@ individual_education:
             - menage
         pid: numind
     myvars:
-        Educational Attainment: 'educ_hi'
+        Educational Attainment:
+            - educ_hi
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 housing:
     file: s11_me_ner2021.dta

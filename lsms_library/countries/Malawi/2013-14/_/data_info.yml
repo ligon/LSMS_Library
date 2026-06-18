@@ -98,7 +98,9 @@ individual_education:
         i: y2_hhid
         pid: PID
     myvars:
-        Educational Attainment: hh_c09
+        Educational Attainment:
+            - hh_c09
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 housing:
     file: HH_MOD_F_13.dta

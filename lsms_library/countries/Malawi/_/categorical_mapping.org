@@ -871,3 +871,33 @@
 |   19 | Millilitre              |
 |   20 | Satchet/Tube            |
 |   21 | Other (Specify)         |
+
+# harmonize_education (GH #171): per-country delta on the global ordinal base
+# (categorical_mapping/harmonize_education.org, row-additive). Maps this country's
+# attainment labels onto the canonical ordinal levels.
+#+name: harmonize_education
+| Original Label         | Preferred Label              |
+|------------------------+------------------------------|
+| A-LEVEL                | Upper secondary complete     |
+| DEGREE                 | Bachelor                     |
+| DIPLOMA                | Tertiary certificate/diploma |
+| JCE                    | Lower secondary              |
+| MASTERS                | Postgraduate                 |
+| MSCE                   | Lower secondary complete     |
+| MSCE/GCSE              | Lower secondary complete     |
+| NON-UNIV DIPLOMA       | Tertiary certificate/diploma |
+| NON-UNIVERSITY DIPLOMA | Tertiary certificate/diploma |
+| NONE                   | None                         |
+| Non-Univ Diploma       | Tertiary certificate/diploma |
+| POST-GRAD DEGREE       | Postgraduate                 |
+| POST-GRADUATE DEGREE   | Postgraduate                 |
+| PSLC                   | Primary complete             |
+| PhD                    | Doctorate                    |
+| Postgrad degree        | Postgraduate                 |
+| UNIVER DIPLOMA, DEGREE | Bachelor                     |
+| UNIVERSITY DIPLOMA     | Tertiary certificate/diploma |
+| Univer Diploma         | Tertiary certificate/diploma |
+| jce                    | Lower secondary              |
+| msce                   | Lower secondary complete     |
+| none                   | None                         |
+| pslc                   | Primary complete             |
