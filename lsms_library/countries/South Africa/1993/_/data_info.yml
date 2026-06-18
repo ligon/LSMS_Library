@@ -88,30 +88,38 @@ individual_education:
             - mapping:
                 # SALDRU PSLSD 1993 educ_c: highest education completed.
                 # No value labels in source (.dta int codes); decoded from
-                # the pre-1994 South African schooling ladder.
+                # the pre-1994 South African schooling ladder and mapped
+                # directly onto the canonical ordinal levels (GH #493).
+                # Primary = Sub A..Standard 5 (Grades 1-7); junior/lower
+                # secondary = Standards 6-7 (Grades 8-9, GETC at Grade 9);
+                # senior/upper secondary = Standards 8-10 (Grades 10-12,
+                # Standard 10 = Matric = upper secondary complete).
+                # NB this wave carries an inline mapping: dict, so the RHS
+                # values are canonical levels directly (a mappings: table on
+                # the same myvar would raise "unhashable type: dict").
                 -4: ~          # sentinel for missing — null out
                 -3: ~          # sentinel for missing — null out
                 -1: ~          # sentinel for missing — null out
                 0: "None"
-                1: "Sub A (Grade 1)"
-                2: "Sub B (Grade 2)"
-                3: "Standard 1 (Grade 3)"
-                4: "Standard 2 (Grade 4)"
-                5: "Standard 3 (Grade 5)"
-                6: "Standard 4 (Grade 6)"
-                7: "Standard 5 (Grade 7)"
-                8: "Standard 6 (Grade 8)"
-                9: "Standard 7 (Grade 9)"
-                10: "Standard 8 (Grade 10)"
-                11: "Standard 9 (Grade 11)"
-                12: "Standard 10 (Matric, Grade 12)"
-                13: "Diploma/certificate with less than Standard 10"
-                14: "Diploma/certificate with Standard 10"
-                15: "Degree"
-                16: "Postgraduate degree or diploma"
-                17: "Other"
-                18: "Don't know"
-                19: "Adult education / literacy"
+                1: "Primary incomplete"          # Sub A (Grade 1)
+                2: "Primary incomplete"          # Sub B (Grade 2)
+                3: "Primary incomplete"          # Standard 1 (Grade 3)
+                4: "Primary incomplete"          # Standard 2 (Grade 4)
+                5: "Primary incomplete"          # Standard 3 (Grade 5)
+                6: "Primary incomplete"          # Standard 4 (Grade 6)
+                7: "Primary complete"            # Standard 5 (Grade 7) completes primary
+                8: "Lower secondary"             # Standard 6 (Grade 8)
+                9: "Lower secondary complete"    # Standard 7 (Grade 9) completes GET phase
+                10: "Upper secondary"            # Standard 8 (Grade 10)
+                11: "Upper secondary"            # Standard 9 (Grade 11)
+                12: "Upper secondary complete"   # Standard 10 (Matric, Grade 12)
+                13: "Vocational/Technical"       # Diploma/certificate w/o Matric (pre-tertiary trade cert)
+                14: "Tertiary certificate/diploma" # Diploma/certificate with Standard 10 (post-Matric)
+                15: "Bachelor"                   # Degree
+                16: "Postgraduate"               # Postgraduate degree or diploma
+                17: "Unknown"                    # Other
+                18: "Unknown"                    # Don't know
+                19: "Informal"                   # Adult education / literacy
 
 assets:
     # Durable-goods module M2_NFS4.dta: Quantity (dura_n, count owned) per item
