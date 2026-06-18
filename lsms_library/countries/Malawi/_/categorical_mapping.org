@@ -457,8 +457,10 @@
 |--------------------+-----------------|
 | Smoothed mud       | Earth           |
 | SMOOTHED MUD       | Earth           |
+| Smoothed Mud       | Earth           |
 | Smooth cement      | Cement          |
 | SMOOTH CEMENT      | Cement          |
+| Smooth Cement      | Cement          |
 | Sand               | Sand            |
 | sand               | Sand            |
 | SAND               | Sand            |

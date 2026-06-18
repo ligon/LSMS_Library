@@ -294,3 +294,22 @@ Make-based builds default to half of available CPU cores. Override with:
 ```bash
 export LSMS_MAKE_JOBS=4
 ```
+
+A country-level build fans out to one `python <table>.py` per wave, so `-jN`
+runs `N` wave builds — and therefore `N` concurrent large-blob S3 fetches — in
+parallel. On most hosts that is pure speedup. On a host where **concurrent
+multipart S3 reads occasionally corrupt a TLS record under load** (symptoms:
+`ssl.SSLError: ... DECRYPTION_FAILED_OR_BAD_RECORD_MAC`, or
+`aiohttp.ClientPayloadError: Response payload is not completed`, mid-build), the
+fix is *not* a network change — connectivity is fine and a single fetch
+succeeds. Two levers:
+
+```bash
+export LSMS_MAKE_JOBS=1      # serialize wave builds (one S3 fetch at a time)
+export LSMS_FETCH_ATTEMPTS=5 # or: keep parallelism, retry transient TLS errors
+```
+
+The blob fetch (`local_tools._get_file_with_retry`) already retries these
+transient errors (`LSMS_FETCH_ATTEMPTS`, default 3) with exponential backoff
+before falling back to a single-stream read, so most such hiccups self-heal
+without touching `-j`. Reach for `LSMS_MAKE_JOBS=1` only if they persist.

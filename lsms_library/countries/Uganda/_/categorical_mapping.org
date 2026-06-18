@@ -946,3 +946,30 @@
 |   40 | Other Poultry   |
 |   41 | Other Poultry   |
 |   42 | Bees            |
+
+# harmonize_education (GH #171): Uganda per-country delta on the global ordinal
+# base (categorical_mapping/harmonize_education.org, row-additive). Maps Uganda's
+# P/J/S grade labels onto the canonical levels; "Don't Know" is inherited from global.
+#+name: harmonize_education
+| Original Label                                                      | Preferred Label              |
+|---------------------------------------------------------------------+------------------------------|
+| Completed Degree and above                                          | Bachelor                     |
+| Completed J.1                                                       | Lower secondary              |
+| Completed J.2                                                       | Lower secondary              |
+| Completed J.3                                                       | Lower secondary              |
+| Completed P.1                                                       | Primary incomplete           |
+| Completed P.2                                                       | Primary incomplete           |
+| Completed P.3                                                       | Primary incomplete           |
+| Completed P.4                                                       | Primary incomplete           |
+| Completed P.5                                                       | Primary incomplete           |
+| Completed P.6                                                       | Primary incomplete           |
+| Completed P.7                                                       | Primary complete             |
+| Completed Post secondary Specialized training or diploma            | Tertiary certificate/diploma |
+| Completed S.1                                                       | Lower secondary              |
+| Completed S.2                                                       | Lower secondary              |
+| Completed S.3                                                       | Lower secondary              |
+| Completed S.4                                                       | Lower secondary complete     |
+| Completed S.5                                                       | Upper secondary              |
+| Completed S.6                                                       | Upper secondary complete     |
+| Completed post primary/junior specialized traing/certificat/diploma | Vocational/Technical         |
+| Some schooling but not completed P.1                                | Primary incomplete           |

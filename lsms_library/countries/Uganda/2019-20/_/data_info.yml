@@ -25,7 +25,12 @@ individual_education:
         i: hhid
         pid: pid
     myvars:
-        Educational Attainment: s4q07
+        # GH #171: map raw attainment labels onto the canonical ordinal vocab
+        # via the row-additive harmonize_education table (global base +
+        # this country's per-country delta in _/categorical_mapping.org).
+        Educational Attainment:
+            - s4q07
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 people_last7days:
     file: HH/gsec15a.dta
