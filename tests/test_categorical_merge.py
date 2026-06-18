@@ -23,6 +23,12 @@ def test_u_is_additive():
     assert "u" in _ADDITIVE_CATEGORICAL_TABLES
 
 
+def test_harmonize_education_is_additive():
+    # GH #171: the global harmonize_education.org ordinal vocabulary is the
+    # shared base; per-country tables override only their own attainment labels.
+    assert "harmonize_education" in _ADDITIVE_CATEGORICAL_TABLES
+
+
 def test_row_union_country_wins_and_inherits_global():
     glob = _tbl([["kg", "Kg"], ["g", "g"], ["l", "Litre"]])
     ctry = _tbl([["kg", "KILO"], ["Tas", "Tas"]])   # overrides kg, adds Tas

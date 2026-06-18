@@ -1,0 +1,49 @@
+#+title: Harmonized Educational-Attainment Labels (Global)
+#+author: LSMS Library
+#+description: Global base mapping from raw survey education labels to the
+#+  canonical ordinal Preferred Labels (see canonical_education_labels.org).
+#+  Row-additive (GH #171): per-country `#+name: harmonize_education` tables
+#+  inherit these rows and override only their country-specific labels.
+#+  Holds canonical-identity rows plus common English/universal variants;
+#+  French/Portuguese/numeric variants live in the per-country tables.
+
+#+name: harmonize_education
+| Original Label               | Preferred Label              |
+|------------------------------+------------------------------|
+| None                         | None                         |
+| NONE                         | None                         |
+| No education                 | None                         |
+| Not educated                 | None                         |
+| Never attended               | None                         |
+| Informal                     | Informal                     |
+| Adult education              | Informal                     |
+| Quranic                      | Informal                     |
+| Pre-primary                  | Pre-primary                  |
+| Pre-school                   | Pre-primary                  |
+| Nursery                      | Pre-primary                  |
+| Kindergarten                 | Pre-primary                  |
+| Primary incomplete           | Primary incomplete           |
+| Primary complete             | Primary complete             |
+| Primary                      | Primary complete             |
+| Lower secondary              | Lower secondary              |
+| Lower secondary complete     | Lower secondary complete     |
+| Secondary                    | Lower secondary complete     |
+| Upper secondary              | Upper secondary              |
+| Upper secondary complete     | Upper secondary complete     |
+| Vocational/Technical         | Vocational/Technical         |
+| Vocational                   | Vocational/Technical         |
+| Technical                    | Vocational/Technical         |
+| Tertiary certificate/diploma | Tertiary certificate/diploma |
+| Diploma                      | Tertiary certificate/diploma |
+| Certificate                  | Tertiary certificate/diploma |
+| Bachelor                     | Bachelor                     |
+| Degree                       | Bachelor                     |
+| 1st Degree                   | Bachelor                     |
+| Postgraduate                 | Postgraduate                 |
+| Masters                      | Postgraduate                 |
+| Master's Degree              | Postgraduate                 |
+| Doctorate                    | Doctorate                    |
+| PhD                          | Doctorate                    |
+| Unknown                      | Unknown                      |
+| Don't Know                   | Unknown                      |
+| Refused                      | Unknown                      |

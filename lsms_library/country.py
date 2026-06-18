@@ -120,7 +120,12 @@ def _augment_numeric_code_keys(rdict: dict) -> dict:
 # needs to declare its country-specific rows; a country row wins on a
 # source-label key collision.  Every other table keeps the historical
 # full-table override.  Keep this allow-list small and explicit.
-_ADDITIVE_CATEGORICAL_TABLES = frozenset({'u'})
+#
+# ``harmonize_education`` (GH #171): a global ordinal-level vocabulary
+# (categorical_mapping/harmonize_education.org) is the shared base; per-country
+# tables add only their country-specific attainment labels (English grade
+# names, French/Portuguese levels, numeric grade codes) as overrides on top.
+_ADDITIVE_CATEGORICAL_TABLES = frozenset({'u', 'harmonize_education'})
 
 
 def _categorical_key_column(table: "pd.DataFrame") -> str | None:
