@@ -198,7 +198,9 @@ individual_education:
             - menage
         pid: numind
     myvars:
-        Educational Attainment: educ_hi
+        Educational Attainment:
+            - educ_hi
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 assets:
     file: Menage/s12_me_CIV2018.dta

@@ -950,6 +950,25 @@
 # harmonize_education (GH #171): Uganda per-country delta on the global ordinal
 # base (categorical_mapping/harmonize_education.org, row-additive). Maps Uganda's
 # P/J/S grade labels onto the canonical levels; "Don't Know" is inherited from global.
+#
+# The mapping is applied by exact, case-sensitive string match (the org table is
+# turned into a plain dict and .map()'d onto the raw labels), so each casing /
+# spelling variant that appears in any wave's GSEC4 attainment column must be
+# listed verbatim.  The table must stay ONE contiguous block of `|` rows — a
+# `#`-prefixed comment in the middle silently truncates it (the org reader stops
+# at the first non-table line), so all explanatory notes live here above #+name:.
+#
+# Rows below, grouped (by ordering, not by comments) as:
+#   * base Title-cased GSEC4 wording used by 2009-10..2019-20 (h4q7 / s4q07);
+#   * post-primary / post-secondary specialized-training spelling variants
+#     (2009-10..2015-16): post-primary -> Vocational/Technical,
+#     post-secondary -> Tertiary certificate/diploma;
+#   * "Some schooling ... not Completed P.1" capital-C variant;
+#   * 2005-06 all-lowercase GSEC4 (h4q4) wording (same canonical targets);
+#   * "Don't Know" / DK / dk sentinels -> Unknown;
+#   * sparse unlabeled numeric junk codes (1-2 records each in 2010-11/2011-12
+#     GSEC4; value labels never applied at source) -> Unknown, so the column
+#     stays fully canonical.
 #+name: harmonize_education
 | Original Label                                                      | Preferred Label              |
 |---------------------------------------------------------------------+------------------------------|
@@ -973,3 +992,34 @@
 | Completed S.6                                                       | Upper secondary complete     |
 | Completed post primary/junior specialized traing/certificat/diploma | Vocational/Technical         |
 | Some schooling but not completed P.1                                | Primary incomplete           |
+| Completed Post Primary Specialized Training or Certificate          | Vocational/Technical         |
+| Completed Post primary Specialized training or Certificate          | Vocational/Technical         |
+| Completed Post Secondary Specialized Training or diploma            | Tertiary certificate/diploma |
+| Some schooling but not Completed P.1                                | Primary incomplete           |
+| completed degree and above                                          | Bachelor                     |
+| completed j.1                                                       | Lower secondary              |
+| completed j.2                                                       | Lower secondary              |
+| completed j.3                                                       | Lower secondary              |
+| completed p.1                                                       | Primary incomplete           |
+| completed p.2                                                       | Primary incomplete           |
+| completed p.3                                                       | Primary incomplete           |
+| completed p.4                                                       | Primary incomplete           |
+| completed p.5                                                       | Primary incomplete           |
+| completed p.6                                                       | Primary incomplete           |
+| completed p.7                                                       | Primary complete             |
+| completed post primary specialized training or certificate          | Vocational/Technical         |
+| completed post secondary specialized training or diploma            | Tertiary certificate/diploma |
+| completed s.1                                                       | Lower secondary              |
+| completed s.2                                                       | Lower secondary              |
+| completed s.3                                                       | Lower secondary              |
+| completed s.4                                                       | Lower secondary complete     |
+| completed s.5                                                       | Upper secondary              |
+| completed s.6                                                       | Upper secondary complete     |
+| some schooling but not completed p.1                                | Primary incomplete           |
+| don't know                                                          | Unknown                      |
+| DK                                                                  | Unknown                      |
+| dk                                                                  | Unknown                      |
+| 1.0                                                                 | Unknown                      |
+| 2.0                                                                 | Unknown                      |
+| 3.0                                                                 | Unknown                      |
+| 52.0                                                                | Unknown                      |

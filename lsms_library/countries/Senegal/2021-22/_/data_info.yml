@@ -196,7 +196,9 @@ individual_education:
             - menage
         pid: numind
     myvars:
-        Educational Attainment: 'educ_hi'
+        Educational Attainment:
+            - educ_hi
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 subjective_well_being:
     # EHCVM §20 'Pauvreté relative' ladder.  In 2021-22 §20 was split

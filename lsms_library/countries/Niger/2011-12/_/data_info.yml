@@ -31,6 +31,20 @@ household_roster:
         Relationship: ms01q02
         MonthsSpent: ms01q19
 
+individual_education:
+    file: NER_2011_ECVMA_v01_M_Stata8/ecvmaind_p1p2_en.dta
+    idxvars:
+        i: hid
+        pid: ms01q00
+    myvars:
+        # GH #171: map raw attainment labels onto the canonical ordinal vocab
+        # via the row-additive harmonize_education table (global base +
+        # this country's per-country delta in _/categorical_mapping.org).
+        # 2011-12 reads the _en source, so labels arrive in English.
+        Educational Attainment:
+            - ms02q23
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
+
 cluster_features:
     dfs:
         - df_main

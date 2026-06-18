@@ -164,7 +164,9 @@ individual_education:
         i: case_id
         pid: id_code
     myvars:
-        Educational Attainment: hh_c09
+        Educational Attainment:
+            - hh_c09
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 housing:
     file: Full_Sample/Household/hh_mod_f.dta

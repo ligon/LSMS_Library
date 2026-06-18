@@ -121,11 +121,18 @@ def _augment_numeric_code_keys(rdict: dict) -> dict:
 # source-label key collision.  Every other table keeps the historical
 # full-table override.  Keep this allow-list small and explicit.
 #
+# ``harmonize_assets`` (GH #168): the asset conceptual space is small and
+# largely universal ("a bicycle is a bicycle"), so a global
+# categorical_mapping/harmonize_assets.org carries the shared vocabulary and a
+# country need only declare its country-specific raw labels (numeric codes,
+# French/Portuguese spellings, per-wave typos) as overrides on top of the
+# global base -- inherit-and-override, not re-list-everything.
+#
 # ``harmonize_education`` (GH #171): a global ordinal-level vocabulary
 # (categorical_mapping/harmonize_education.org) is the shared base; per-country
 # tables add only their country-specific attainment labels (English grade
 # names, French/Portuguese levels, numeric grade codes) as overrides on top.
-_ADDITIVE_CATEGORICAL_TABLES = frozenset({'u', 'harmonize_education'})
+_ADDITIVE_CATEGORICAL_TABLES = frozenset({'u', 'harmonize_assets', 'harmonize_education'})
 
 
 def _categorical_key_column(table: "pd.DataFrame") -> str | None:

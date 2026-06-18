@@ -102,6 +102,15 @@ $(VAR_DIR)/anthropometry.parquet: anthropometry.py $(anthropometry_parquet)
 ../%/_/anthropometry.parquet:
 	(cd $(@D) && python anthropometry.py)
 
+individual_education = $(shell find $(rounds) -name individual_education.py)
+individual_education_parquet := $(individual_education:.py=.parquet)
+
+$(VAR_DIR)/individual_education.parquet: individual_education.py $(individual_education_parquet)
+	python individual_education.py
+
+../%/_/individual_education.parquet:
+	(cd $(@D) && python individual_education.py)
+
 plot_labor = $(shell find $(rounds) -name plot_labor.py)
 plot_labor_parquet := $(plot_labor:.py=.parquet)
 

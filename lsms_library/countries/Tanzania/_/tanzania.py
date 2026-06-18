@@ -647,8 +647,30 @@ def id_walk(df, updated_ids, hh_index='j'):
 
     # df= df.rename(index=updated_ids,level=['t', hh_index])
     df.attrs['id_converted'] = True
-    return df  
+    return df
 
+
+def harmonize_education_labels(series):
+    '''Map raw NPS "highest grade completed" text codes onto the canonical
+    ordinal Educational-Attainment vocabulary (GH #171).
+
+    The mapping lives in ``_/categorical_mapping.org`` under
+    ``#+name: harmonize_education`` (Tanzania-specific NPS grade ladder:
+    PP, ADULT, D1..D8, F1..F6, 'O'+COURSE, DIPLOMA, U1..U5&+, plus the
+    2020-21 lowercase / spaced variants).  Any label not in the table folds
+    to 'Unknown' (none expected -- the table covers every value label across
+    all six NPS waves).  Called from each wave-level individual_education.py
+    so the framework's per-wave concatenation already carries canonical
+    labels (the country-level _/individual_education.py aggregator is the
+    no-per-wave-parquet fallback, so harmonization cannot live only there).
+    '''
+    from lsms_library.local_tools import all_dfs_from_orgfile
+    edu_map = all_dfs_from_orgfile('../../_/categorical_mapping.org')['harmonize_education']
+    rdict = (edu_map.assign(**{'Original Label': edu_map['Original Label'].str.strip()})
+             .set_index('Original Label')['Preferred Label'].to_dict())
+    raw = series.astype(str).str.strip()
+    mapped = raw.map(rdict)
+    return mapped.fillna('Unknown')
 
 
 def panel_ids(Waves):

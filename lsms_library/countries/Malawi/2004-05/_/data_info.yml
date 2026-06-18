@@ -68,7 +68,9 @@ individual_education:
         i: case_id
         pid: memid
     myvars:
-        Educational Attainment: c13
+        Educational Attainment:
+            - c13
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 housing:
     file: sec_g.dta

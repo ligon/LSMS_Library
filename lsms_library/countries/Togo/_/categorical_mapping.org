@@ -369,3 +369,70 @@
 | Thé                                                                     | Thé                                                                                  |
 | Tomate                                                                  | Tomate fraîche                                                                       |
 | Voandzou                                                                | Voandzou                                                                             |
+
+# harmonize_education (GH #171): per-country delta on the global ordinal base
+# (categorical_mapping/harmonize_education.org, row-additive). Maps this country's
+# attainment labels onto the canonical ordinal levels.
+#+name: harmonize_education
+| Original Label  | Preferred Label              |
+|-----------------+------------------------------|
+| Aucun           | None                         |
+| Maternelle      | Pre-primary                  |
+| Postsecondaire  | Tertiary certificate/diploma |
+| Primaire        | Primary complete             |
+| Second. gl 1    | Lower secondary              |
+| Second. gl 2    | Upper secondary              |
+| Second. tech. 1 | Vocational/Technical         |
+| Second. tech. 2 | Vocational/Technical         |
+| Superieur       | Bachelor                     |
+
+# harmonize_assets (GH #168): per-country delta on top of the global
+# categorical_mapping/harmonize_assets.org base (row-additive merge).
+#+name: harmonize_assets
+| Original Label                                 | Preferred Label |
+|------------------------------------------------+-----------------|
+| Antenne parabolique / décodeur                 | Satellite Dish  |
+| Appareil TV                                    | TV              |
+| Appareil photo                                 | Camera          |
+| Armoires et autres meubles                     | Furniture       |
+| Aspirateur                                     | Appliances      |
+| Bicyclette                                     | Bicycle         |
+| Bonbonne de gaz                                | Gas Cylinder    |
+| Camescope                                      | Camera          |
+| Caméra Vidéo                                   | Camera          |
+| Chaîne Hi Fi                                   | DVD/CD Player   |
+| Climatiseurs/splits                            | Air Conditioner |
+| Congélateur                                    | Freezer         |
+| Cuisinière à gaz ou électrique                 | Cooker          |
+| Cyclomoteur/Vélomoteur, motocyclette           | Motorcycle      |
+| Fer à repasser à charbon                       | Iron            |
+| Fer à repasser électrique                      | Iron            |
+| Four à micro-onde ou électrique                | Cooker          |
+| Foyers améliorés                               | Cooker          |
+| Fusils de chasse                               | Other           |
+| Groupe électrogène                             | Generator       |
+| Guitare                                        | Musical Instrument |
+| Immeuble/Maison                                | House           |
+| Imprimante/Fax                                 | Electronics     |
+| Lave-linge, sèche linge                        | Washing Machine |
+| Lit                                            | Bed             |
+| Magnétoscope/CD/DVD                            | DVD/CD Player   |
+| Matelas simple                                 | Mattress        |
+| Mixeur/Presse-fruits non électrique            | Appliances      |
+| Ordinateur                                     | Computer        |
+| Piano et autre appareil de musique             | Musical Instrument |
+| Pirogue et hors-bord (bateaux de plaisance)    | Boat            |
+| Radio simple/Radiocassette                     | Radio           |
+| Robot de cuisine électrique (Moulinex)         | Appliances      |
+| Réchaud (plaque) à gaz ou électrique           | Cooker          |
+| Réfrigérateur                                  | Refrigerator    |
+| Salon  (Fauteuils et table basse)              | Furniture       |
+| Table à manger  (table + chaises)              | Furniture       |
+| Tablette                                       | Computer        |
+| Tapis                                          | Carpet          |
+| Terrain non bâti                               | Land            |
+| Tondeuse à gazon et autre article de jardinage | Other           |
+| Téléphone fixe                                 | Phone (Landline) |
+| Téléphone portable                             | Phone (Mobile)  |
+| Ventilateur sur pied                           | Fan             |
+| Voiture personnelle                            | Car             |

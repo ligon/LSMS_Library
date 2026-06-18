@@ -17,6 +17,11 @@ _spec = importlib.util.spec_from_file_location("_uganda_age_helpers", _HELPERS)
 _mod = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_mod)
 
+_EDU_HELPERS = Path(__file__).resolve().parent.parent.parent / "_" / "_education_helpers.py"
+_edu_spec = importlib.util.spec_from_file_location("_uganda_education_helpers", _EDU_HELPERS)
+_edu_mod = importlib.util.module_from_spec(_edu_spec)
+_edu_spec.loader.exec_module(_edu_mod)
+
 INTERVIEW_YEAR = 2010
 
 
@@ -26,3 +31,8 @@ def Age(value):
 
 def household_roster(df):
     return _mod.run_household_roster(df, interview_year=INTERVIEW_YEAR)
+
+
+def individual_education(df):
+    # GH #171 df_edit hook: fold unlabeled float junk codes -> Unknown.
+    return _edu_mod.coerce_unmapped_to_unknown(df)

@@ -122,7 +122,9 @@ individual_education:
             - menage
         pid: numind
     myvars:
-        Educational Attainment: 'educ_hi'
+        Educational Attainment:
+            - educ_hi
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 subjective_well_being:
     file: ../Data1/s20_me_tgo2018.dta
