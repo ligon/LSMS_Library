@@ -216,3 +216,23 @@ the full file.  Code -> native label; canonicalized to Preferred Label through
 | Year six and above      | Postgraduate                 |
 | Year three              | Tertiary certificate/diploma |
 | Year two                | Tertiary certificate/diploma |
+| K                       | Informal                     |
+| A1                      | Upper secondary complete     |
+| A2                      | Upper secondary complete     |
+| JSS2                    | Lower secondary              |
+| B                       | None                         |
+| T1                      | Tertiary certificate/diploma |
+| T2                      | Tertiary certificate/diploma |
+| T3                      | Tertiary certificate/diploma |
+| T4                      | Tertiary certificate/diploma |
+| PS1                     | Tertiary certificate/diploma |
+| PS2                     | Tertiary certificate/diploma |
+| PS3                     | Tertiary certificate/diploma |
+| U1                      | Bachelor                     |
+| U2                      | Bachelor                     |
+| U3                      | Bachelor                     |
+| U4                      | Bachelor                     |
+| U5                      | Postgraduate                 |
+| U6                      | Postgraduate                 |
+| U7                      | Postgraduate                 |
+| U8                      | Postgraduate                 |
