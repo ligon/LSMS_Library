@@ -43,8 +43,17 @@ import sys
 import time
 import traceback
 import warnings
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import asdict, dataclass, field
 from typing import Any, Callable
+
+# Pin per-process numerical thread pools to 1 BEFORE importing numpy/pandas.
+# With N parallel build workers we want N cores doing N independent country
+# builds, NOT one country fanning a BLAS op across all cores (oversubscription).
+# setdefault: respect an explicit override from the environment.
+for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
+           "NUMEXPR_NUM_THREADS", "VECLIB_MAXIMUM_THREADS"):
+    os.environ.setdefault(_v, "1")
 
 import pandas as pd
 
@@ -195,17 +204,16 @@ def _warnings_to_findings(
 # Phase 1a -- per-country sanity (no kwargs)
 # ---------------------------------------------------------------------------
 
-def phase1a_country_sanity(feature: str, countries: list[str]) -> tuple[list[Finding], dict[str, int]]:
-    """Build each country's table alone and run is_this_feature_sane.
+def _scan_one_country(feature: str, name: str) -> tuple[list[Finding], str, int | None]:
+    """Build ONE (country, feature), run sanity, return (findings, name, rows).
 
-    Returns (findings, per_country_rowcount) -- the row counts feed the Phase-1b
-    conservation invariant.
+    Module-level and never-raising so it is safe to ship to a ProcessPoolExecutor
+    worker.  ``rows`` is None unless a non-empty DataFrame was built (it feeds the
+    Phase-1b row-conservation invariant).  Side effect: populates the country's
+    L2 cache, which is exactly the parallel cache-warming we want.
     """
     findings: list[Finding] = []
-    rows: dict[str, int] = {}
-    is_property = feature in _PROPERTY_FEATURES
-
-    for name in countries:
+    try:
         result, captured, err, secs = _build(lambda: load_feature(ll.Country(name), feature))
         findings += _warnings_to_findings("1a-sanity", feature, captured, {})
 
@@ -215,9 +223,9 @@ def phase1a_country_sanity(feature: str, countries: list[str]) -> tuple[list[Fin
                 status="error", severity="A", expected=False, detail=err,
                 metrics={"seconds": round(secs, 2)},
             ))
-            continue
+            return findings, name, None
 
-        if is_property:
+        if feature in _PROPERTY_FEATURES:
             # panel_ids / updated_ids return dicts -> record load, skip df checks.
             n = len(result) if hasattr(result, "__len__") else 0
             findings.append(Finding(
@@ -225,7 +233,7 @@ def phase1a_country_sanity(feature: str, countries: list[str]) -> tuple[list[Fin
                 check="build", status="pass", detail=f"property loaded ({n} entries)",
                 metrics={"entries": n, "seconds": round(secs, 2)},
             ))
-            continue
+            return findings, name, None
 
         if not isinstance(result, pd.DataFrame) or result.empty:
             findings.append(Finding(
@@ -233,9 +241,8 @@ def phase1a_country_sanity(feature: str, countries: list[str]) -> tuple[list[Fin
                 status="fail", severity="A", expected=False,
                 detail="empty / non-DataFrame result",
             ))
-            continue
+            return findings, name, None
 
-        rows[name] = len(result)
         report = is_this_feature_sane(result, name, feature)
         for c in report.checks:
             if c.status == "pass":
@@ -245,6 +252,43 @@ def phase1a_country_sanity(feature: str, countries: list[str]) -> tuple[list[Fin
                 status=c.status, severity="B" if c.status == "fail" else "C",
                 expected=False, detail=c.message,
             ))
+        return findings, name, len(result)
+    except Exception as e:  # noqa: BLE001 - a worker must never crash the pool
+        findings.append(Finding(
+            phase="1a-sanity", feature=feature, country=name, check="worker",
+            status="error", severity="A", expected=False,
+            detail=f"worker crashed: {type(e).__name__}: {e}",
+        ))
+        return findings, name, None
+
+
+def phase1a_country_sanity(feature: str, countries: list[str],
+                           jobs: int = 1) -> tuple[list[Finding], dict[str, int]]:
+    """Build each country's table alone and run is_this_feature_sane.
+
+    With ``jobs > 1`` the per-country builds fan out across a process pool —
+    safe because v0.7.3 reads are lock-free (direct S3) and each country writes
+    a distinct L2 cache path, so concurrent builds of different countries don't
+    contend.  Returns (findings, per_country_rowcount); the row counts feed the
+    Phase-1b conservation invariant.
+    """
+    findings: list[Finding] = []
+    rows: dict[str, int] = {}
+
+    if jobs > 1 and len(countries) > 1:
+        with ProcessPoolExecutor(max_workers=min(jobs, len(countries))) as ex:
+            futs = {ex.submit(_scan_one_country, feature, c): c for c in countries}
+            for fut in as_completed(futs):
+                f_list, name, n = fut.result()  # _scan_one_country never raises
+                findings += f_list
+                if n is not None:
+                    rows[name] = n
+    else:
+        for name in countries:
+            f_list, name, n = _scan_one_country(feature, name)
+            findings += f_list
+            if n is not None:
+                rows[name] = n
     return findings, rows
 
 
@@ -469,7 +513,7 @@ def declaring_countries(feature: str, country_filter: list[str] | None) -> list[
 
 def run(features: list[str], country_filter: list[str] | None,
         phases: set[str], limit_countries: int | None,
-        out_path: str) -> None:
+        out_path: str, jobs: int = 1) -> None:
     """Stream one JSON record per check to *out_path* as each feature completes.
 
     Writing incrementally (and flushing per feature) means a multi-hour sweep is
@@ -520,7 +564,7 @@ def run(features: list[str], country_filter: list[str] | None,
             baseline = None
             before = n_records
             if "1" in phases:
-                f1a, per_country_rows = phase1a_country_sanity(feature, countries)
+                f1a, per_country_rows = phase1a_country_sanity(feature, countries, jobs)
                 emit(f1a)
                 f1b, baseline = phase1b_assembly(feature, countries, per_country_rows)
                 emit(f1b)
@@ -554,11 +598,17 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--limit-countries", type=int, default=None,
                     help="cap countries per feature (smoke testing)")
     ap.add_argument("--out", default="bench/feature_audit/results.jsonl")
+    ap.add_argument("--jobs", "-j", type=int, default=1,
+                    help="parallel Phase-1a country builds (process pool). "
+                         "Size to PHYSICAL cores (e.g. 24 on a 32-core node). "
+                         "default 1 = sequential")
     args = ap.parse_args(argv)
 
     features = resolve_features(args.features)
     phases = set(args.phases.replace(" ", "").split(","))
-    run(features, args.countries, phases, args.limit_countries, args.out)
+    print(f"feature-audit scan: {len(features)} features, jobs={args.jobs}, "
+          f"BLAS threads/worker={os.environ.get('OMP_NUM_THREADS')}", file=sys.stderr)
+    run(features, args.countries, phases, args.limit_countries, args.out, args.jobs)
     return 0
 
 
