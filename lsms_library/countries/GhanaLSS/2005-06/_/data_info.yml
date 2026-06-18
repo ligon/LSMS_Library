@@ -55,7 +55,9 @@ individual_education:
         i: hhid
         pid: pid
     myvars:
-        Educational Attainment: s2aq2
+        Educational Attainment:
+            - s2aq2
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 housing:
     # GLSS5 Section 7 dwelling characteristics (parta/sec7.dta).  Wall/Floor/

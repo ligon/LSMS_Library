@@ -121,3 +121,98 @@ the full file.  Code -> native label; canonicalized to Preferred Label through
 |   73 | Kilogram                      |
 |   74 | Gram                          |
 |   99 | Other unit                    |
+
+# harmonize_education (GH #171): GhanaLSS attainment labels onto the canonical
+# ordinal levels.  Ghana ran TWO school systems: OLD (Primary P1-6, Middle M1-4,
+# Secondary S1-5/O-Level, Sixth Form L6/U6/A-Level) and NEW post-1987 (Primary,
+# JSS/JHS, SSS/SHS).  Basic-cycle completions (M4/Middle, JSS3) -> Lower secondary
+# complete; any senior-secondary completion (S5/O-Level, A-Level/Sixth Form,
+# SSS3/SHS) -> Upper secondary complete; 2016-17 'Year one..six' = tertiary years
+# (1-3 diploma, 4-5 Bachelor, 6+ Postgraduate).  Case-duplicated across waves.
+#+name: harmonize_education
+| Original Label          | Preferred Label              |
+|-------------------------+------------------------------|
+| JSS                     | Lower secondary complete     |
+| JSS/JHS 2               | Lower secondary              |
+| jss1                    | Lower secondary              |
+| JSS1/JHS1               | Lower secondary              |
+| jss2                    | Lower secondary              |
+| jss3                    | Lower secondary complete     |
+| JSS3/JHS3               | Lower secondary complete     |
+| Kindergarten            | Pre-primary                  |
+| Koranic stage           | Informal                     |
+| l6                      | Upper secondary complete     |
+| L6                      | Upper secondary complete     |
+| m1                      | Lower secondary              |
+| M1                      | Lower secondary              |
+| M2                      | Lower secondary              |
+| m2                      | Lower secondary              |
+| m3                      | Lower secondary              |
+| M3                      | Lower secondary              |
+| M4                      | Lower secondary complete     |
+| m4                      | Lower secondary complete     |
+| Middle                  | Lower secondary complete     |
+| none                    | None                         |
+| None                    | None                         |
+| nursing                 | Tertiary certificate/diploma |
+| Nursing                 | Tertiary certificate/diploma |
+| Other                   | Unknown                      |
+| other                   | Unknown                      |
+| Other tertiary          | Tertiary certificate/diploma |
+| other tertiary          | Tertiary certificate/diploma |
+| P/Sec. Nursing          | Tertiary certificate/diploma |
+| P/Sec. Teacher Training | Tertiary certificate/diploma |
+| P1                      | Primary incomplete           |
+| p1                      | Primary incomplete           |
+| p2                      | Primary incomplete           |
+| P2                      | Primary incomplete           |
+| P3                      | Primary incomplete           |
+| p3                      | Primary incomplete           |
+| P4                      | Primary incomplete           |
+| p4                      | Primary incomplete           |
+| P5                      | Primary incomplete           |
+| p5                      | Primary incomplete           |
+| P6                      | Primary complete             |
+| p6                      | Primary complete             |
+| Polytechnic             | Tertiary certificate/diploma |
+| polytechnic             | Tertiary certificate/diploma |
+| Pre school              | Pre-primary                  |
+| preschool               | Pre-primary                  |
+| Primary                 | Primary complete             |
+| S1                      | Upper secondary              |
+| s1                      | Upper secondary              |
+| S2                      | Upper secondary              |
+| s2                      | Upper secondary              |
+| S3                      | Upper secondary              |
+| s3                      | Upper secondary              |
+| s4                      | Upper secondary              |
+| S4                      | Upper secondary              |
+| S5                      | Upper secondary complete     |
+| s5                      | Upper secondary complete     |
+| Sec. (O Level)          | Upper secondary complete     |
+| SHS4                    | Upper secondary complete     |
+| Sixth Form              | Upper secondary complete     |
+| SS1/SHS1                | Upper secondary              |
+| SSS                     | Upper secondary complete     |
+| sss1                    | Upper secondary              |
+| sss2                    | Upper secondary              |
+| SSS2/SHS2               | Upper secondary              |
+| sss3                    | Upper secondary complete     |
+| SSS3/SHS3               | Upper secondary complete     |
+| teacher training        | Tertiary certificate/diploma |
+| Teacher Training        | Tertiary certificate/diploma |
+| tech training           | Vocational/Technical         |
+| Technical               | Vocational/Technical         |
+| u6                      | Upper secondary complete     |
+| U6                      | Upper secondary complete     |
+| university              | Bachelor                     |
+| University              | Bachelor                     |
+| voc                     | Vocational/Technical         |
+| Voc / Comm              | Vocational/Technical         |
+| Voc//Tec                | Vocational/Technical         |
+| Year five               | Bachelor                     |
+| Year four               | Bachelor                     |
+| Year one                | Tertiary certificate/diploma |
+| Year six and above      | Postgraduate                 |
+| Year three              | Tertiary certificate/diploma |
+| Year two                | Tertiary certificate/diploma |

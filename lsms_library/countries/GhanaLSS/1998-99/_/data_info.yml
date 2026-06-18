@@ -61,25 +61,29 @@ individual_education:
         # decoded from the GLSS4 household questionnaire, Section 2A).
         Educational Attainment:
             - s2aq2
+            # GH #171: codes -> canonical ordinal education levels directly.  This
+            # wave has an inline code->label step; the framework can't also chain
+            # the harmonize_education table on one myvar, so map to canonical here
+            # (same targets the table gives the other GhanaLSS waves' text labels).
             - mapping:
                 1: None
-                2: Kindergarten
-                3: Primary
-                4: Middle
-                5: JSS
-                6: SSS
-                7: Voc / Comm
-                8: Sec. (O Level)
-                9: Sixth Form
-                10: Teacher Training
-                11: Technical
-                12: P/Sec. Teacher Training
-                13: Nursing
-                14: P/Sec. Nursing
-                15: Polytechnic
-                16: University
-                17: Koranic stage
-                96: Other
+                2: Pre-primary
+                3: Primary complete
+                4: Lower secondary complete
+                5: Lower secondary complete
+                6: Upper secondary complete
+                7: Vocational/Technical
+                8: Upper secondary complete
+                9: Upper secondary complete
+                10: Tertiary certificate/diploma
+                11: Vocational/Technical
+                12: Tertiary certificate/diploma
+                13: Tertiary certificate/diploma
+                14: Tertiary certificate/diploma
+                15: Tertiary certificate/diploma
+                16: Bachelor
+                17: Informal
+                96: Unknown
 
 plot_features:
     # Section 8B (Agricultural land) -- clean per-plot roster, one row per

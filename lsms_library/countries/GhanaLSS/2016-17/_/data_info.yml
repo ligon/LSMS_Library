@@ -61,7 +61,9 @@ individual_education:
     myvars:
         # s2aq2 = "highest grade completed"; value labels are embedded in the
         # .dta and decoded automatically by get_dataframe().
-        Educational Attainment: s2aq2
+        Educational Attainment:
+            - s2aq2
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 food_security:
     # GLSS7 Section 9C 'Household Food Insecurity' = the FAO FIES 8-item

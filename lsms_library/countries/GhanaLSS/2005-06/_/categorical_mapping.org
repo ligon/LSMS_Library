@@ -174,7 +174,7 @@
 | Kenkey/Banku                 | Kenkey/Banku                 |     256 | banku or kenkey with sauce                                  |         |                            |
 | Other Prepared Meals         | Other Prepared Meals         |     257 | other prepared meals                                        |         |                            |
 | Fast Food                    | Fast Food                    |     258 | fast foods                                                  |         |                            |
-| Cooked Rice and Stew         | Cooked Rice and Stew Ê Ê     |     262 | cooked rice and sauce                                       |         |                            |
+| Cooked Rice and Stew         | Cooked Rice and Stew       |     262 | cooked rice and sauce                                       |         |                            |
 | Soup                         | Soup                         |     263 | fufu or tuo with soup                                       |         |                            |
 | Kenkey/Banku                 | Kenkey/Banku                 |     264 | banku or kenkey with sauce                                  |         |                            |
 | Other Prepared Meals         | Other Prepared Meals         |     265 | other meals                                                 |         |                            |

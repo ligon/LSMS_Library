@@ -56,7 +56,9 @@ individual_education:
         i: HID
         pid: PID
     myvars:
-        Educational Attainment: s2aq2
+        Educational Attainment:
+            - s2aq2
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 plot_features:
     # Section 8B (Agricultural land) -- clean per-plot roster, one row per
