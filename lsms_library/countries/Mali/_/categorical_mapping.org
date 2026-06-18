@@ -641,9 +641,18 @@
 | ind_const  | Construction    | x       | x       |
 | ind_serv   | Services        | x       | x       |
 
-# harmonize_education (GH #171): Mali EHCVM French levels (2018-19/2021-22).  NOTE: 2014-15 (s01q06) holds raw
-# unlabelled numeric codes 1-45 and 2017-18 (s1q07) is mis-wired to a Oui/Non
-# question -- both need a codebook/column fix and are intentionally NOT wired.
+# harmonize_education (GH #171): Mali per-country delta on the global ordinal base.
+# Covers TWO Mali vocabularies: the EHCVM waves (2018-19/2021-22) French *level*
+# labels (Fondamental 1/2, Secondaire General, Superieur) AND the 2014-15 EACI
+# wave's finer French *grade-year* labels (s02q23 "Nieme année" / "Neme
+# professionnel" / "Neme année supérieur").  Malian system: Fondamental 1 = grades
+# 1-6 (6 = complete), Fondamental 2 = grades 7-9 (9 = DEF complete), lycée/technique
+# = grades 10-12 / 1er-4eme professionnel, Supérieur = university.  2014-15 was
+# previously MIS-WIRED to s01q06 ("Code du père dans le ménage" -- a roster line
+# number, not education); corrected to the value-labelled s02q23 (GH #171).  Still
+# unfixed: 2017-18 still points at s1q07 (a Oui/Non question); its real attainment
+# column is s1q08, but that holds unlabelled numeric codes (0-62) needing the EACI
+# 2017 codebook to decode -- left for a follow-up, not guessed.
 #+name: harmonize_education
 | Original Label                        | Preferred Label              |
 |---------------------------------------+------------------------------|
@@ -654,3 +663,20 @@
 | Secondaire General                    | Upper secondary              |
 | Secondaire Technique et Professionnel | Vocational/Technical         |
 | Superieur                             | Bachelor                     |
+| 1ere année                            | Primary incomplete           |
+| 2eme année                            | Primary incomplete           |
+| 3eme année                            | Primary incomplete           |
+| 4eme année                            | Primary incomplete           |
+| 5eme année                            | Primary incomplete           |
+| 6eme année                            | Primary complete             |
+| 7eme année                            | Lower secondary              |
+| 8eme année                            | Lower secondary              |
+| 9eme année                            | Lower secondary complete     |
+| 10eme année/1er professionnel         | Upper secondary              |
+| 11eme année/2eme professionnel        | Upper secondary              |
+| 12eme année/3eme professionnel        | Upper secondary complete     |
+| 4eme professionnel                    | Vocational/Technical         |
+| 1ere année supérieur                  | Bachelor                     |
+| 2eme année supérieur                  | Bachelor                     |
+| 3eme année supérieur ou plus          | Bachelor                     |
+| Manquant                              | Unknown                      |

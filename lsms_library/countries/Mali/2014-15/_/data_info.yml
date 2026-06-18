@@ -183,7 +183,12 @@ individual_education:
             - menage
             - s01q
     myvars:
-        Educational Attainment: s01q06
+        # GH #171: s02q23 = "Niveau d'instruction le plus élevé atteint" (value-
+        # labelled French grade-years).  Was mis-wired to s01q06 = father's roster
+        # line ("Code du père dans le ménage"), not education.
+        Educational Attainment:
+            - s02q23
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 housing:
     file: EACIMEN_p1.dta

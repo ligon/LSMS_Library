@@ -39,15 +39,16 @@ alongside the label for quantitative analysis.
   S.1-S.6; Mali numeric codes; Ethiopia numbered grades) map onto these coarse
   levels for cross-country comparability.  Grade-level detail, where needed,
   stays in the survey-specific data.
-- *Long-pole countries (status).* Of the three suspected numeric long-poles,
-  *Nigeria* and *Tanzania* turned out to be **text under mis-identified columns**,
-  not numeric, and are now harmonized (#489): Tanzania's audit had read `hh_c04`
-  (*age started school*) instead of `hh_c07` (*grade completed*); Nigeria's was
-  `s2aq9` not the `s2q9` literacy y/n.  *Mali* is the genuine residue: 2014-15
-  `s01q06` holds raw **unlabelled numeric codes 1-45** (needs the EAC
-  questionnaire codebook) and 2017-18 `s1q07` is **mis-wired to a Oui/Non**
-  question — both flagged in `Mali/_/categorical_mapping.org`, not guessed.
-  *GhanaLSS* (84 messy text labels) remains to harmonize. (#171)
+- *Long-pole countries (status).* The suspected numeric long-poles were almost all
+  **mis-identified columns, not numeric data.**  *Nigeria* and *Tanzania* are text
+  and now harmonized (#489): Tanzania's audit had read `hh_c04` (*age started
+  school*) instead of `hh_c07` (*grade completed*); Nigeria's was `s2aq9` not the
+  `s2q9` literacy y/n.  *Mali 2014-15* was wired to `s01q06` = *"Code du père dans
+  le ménage"* (a roster line number, not education!) — the real, value-labelled
+  column is `s02q23`, now harmonized (#171).  *Ethiopia* (89 labels) and *GhanaLSS*
+  (84 two-system labels) are harmonized too.  The lone genuine residue is *Mali
+  2017-18*, whose real column `s1q08` holds unlabelled numeric codes (0-62) needing
+  the EACI 2017 codebook — flagged in `Mali/_/categorical_mapping.org`, not guessed.
 - *Never-schooled handling.* The universal `dropna(how='all')` drops rows whose
   only column (`Educational Attainment`) is NaN, so never-schooled members are
   currently dropped rather than represented as `None`.  Whether to surface them
