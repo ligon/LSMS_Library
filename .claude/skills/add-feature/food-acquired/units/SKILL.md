@@ -46,6 +46,21 @@ from the first source that has it:
    dropped the labels (the `.dta` of the same survey often still has them —
    Nigeria GHS).
 
+   *When the labelled `.dta` is huge, do not read it categorically just to
+   decode units.* `convert_categoricals=True` parses every row, which is
+   intractable for a pathologically large file — GhanaLSS GLSS7
+   `g7sec9b.dta` is a **3.2 GB dense food×household matrix** (a row per food
+   per household, mostly empty), and the script read it *twice*. There is a
+   small label-stripped variant (`g7sec9b_small.dta`, 284 MB) but it carries
+   **no** value labels. Lift the labels **once** via a metadata-only read —
+   `pyreadstat.read_dta(fn, metadataonly=True)` returns `(empty_df, meta)`
+   with `meta.variable_value_labels` (the `code → label` dicts) and skips the
+   data matrix (≈0 s even at 3.2 GB; only the download costs) — bake the map
+   into `categorical_mapping.org` (e.g. `#+name: unit_9b`, the #384 GLSS7
+   units map), then read the **small** variant for the data and decode its
+   numeric unit codes from that org table. The huge file is never read at
+   build time again. (GhanaLSS #453 / #384.)
+
 2. **A sibling survey in the same program.** If this survey's `.dta` lost its
    labels but uses a *standardized* coding shared across a survey family,
    borrow the labels from a sibling that kept them. The EHCVM family does
