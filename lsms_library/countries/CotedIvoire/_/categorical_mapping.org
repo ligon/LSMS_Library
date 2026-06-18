@@ -437,6 +437,31 @@
 | Second. tech. 1 | Vocational/Technical         |
 | Second. tech. 2 | Vocational/Technical         |
 | Superieur       | Bachelor                     |
+| NUL             | None                         |
+| B               | None                         |
+| JE              | Pre-primary                  |
+| CP1             | Primary incomplete           |
+| CP2             | Primary incomplete           |
+| CE1             | Primary incomplete           |
+| CE2             | Primary incomplete           |
+| CM1             | Primary incomplete           |
+| CM2             | Primary complete             |
+| 6E              | Lower secondary              |
+| 5E              | Lower secondary              |
+| 4E              | Lower secondary              |
+| 3E              | Lower secondary complete     |
+| 2E              | Upper secondary              |
+| 1RE             | Upper secondary              |
+| TER             | Upper secondary complete     |
+| U1              | Bachelor                     |
+| U2              | Bachelor                     |
+| U3              | Bachelor                     |
+| U4              | Bachelor                     |
+| U5              | Postgraduate                 |
+| U6              | Postgraduate                 |
+| U7              | Postgraduate                 |
+| U8              | Postgraduate                 |
+| X               | Unknown                      |
 
 # harmonize_assets (GH #168): per-country delta on top of the global
 # categorical_mapping/harmonize_assets.org base (row-additive merge).
