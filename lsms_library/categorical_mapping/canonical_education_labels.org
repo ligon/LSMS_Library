@@ -1,0 +1,49 @@
+#+title: Canonical Educational-Attainment Labels (Global Ordinal Vocabulary)
+#+author: LSMS Library
+#+description: The shared ordered vocabulary for the `individual_education`
+#+  `Educational Attainment` column (GH #171).  This is a documentation /
+#+  style-guide file: it is NOT read by code.  The applied mappings live in
+#+  `harmonize_education.org` (global base) and each country's
+#+  `categorical_mapping.org` (`#+name: harmonize_education`, row-additive over
+#+  the global base).  Per-country tables should map onto these Preferred
+#+  Labels and add new ones here only with care (the vocabulary is a social
+#+  convention, ordered low -> high).
+
+* Ordered levels
+
+The `Order` column is the intended ordinal rank (low education -> high); it is
+documentary here.  A future enhancement may emit it as a numeric column
+alongside the label for quantitative analysis.
+
+| Order | Preferred Label             | Covers                                                                 |
+|-------+-----------------------------+------------------------------------------------------------------------|
+|     0 | None                        | Never attended; no formal schooling; "not educated"                    |
+|     1 | Informal                    | Adult literacy; quranic / religious / integrated; non-graded informal  |
+|     2 | Pre-primary                 | Nursery; kindergarten; pre-school                                      |
+|     3 | Primary incomplete          | Some primary grades; primary cycle not finished                        |
+|     4 | Primary complete            | Full primary cycle finished (e.g. Uganda P.7, PSLC, Fondamental 1)      |
+|     5 | Lower secondary             | Some lower-secondary / junior / O-level grades                         |
+|     6 | Lower secondary complete    | Lower-secondary cycle finished (O-level, MSCE, BEPC, JCE)               |
+|     7 | Upper secondary             | Some upper-secondary / senior / A-level grades                         |
+|     8 | Upper secondary complete    | Upper-secondary cycle finished (A-level, baccalauréat)                  |
+|     9 | Vocational/Technical        | Technical / vocational training (post-primary or post-secondary)        |
+|    10 | Tertiary certificate/diploma | Non-degree tertiary: certificate, diploma, NCE, teacher training        |
+|    11 | Bachelor                    | First university degree (BA / BSc / licence / 1st degree)               |
+|    12 | Postgraduate                | Master's / postgraduate below doctorate                                |
+|    13 | Doctorate                   | PhD                                                                    |
+|     — | Unknown                     | Don't Know / refused / unmappable (non-ordinal sentinel)               |
+
+* Notes
+
+- *Country grade detail collapses here.* Country-specific grades (Uganda P.1-P.7,
+  S.1-S.6; Mali numeric codes; Ethiopia numbered grades) map onto these coarse
+  levels for cross-country comparability.  Grade-level detail, where needed,
+  stays in the survey-specific data.
+- *Long-pole countries.* Mali, Nigeria and Tanzania encode attainment as raw
+  numeric grade codes that are not yet decoded at extraction; those need a
+  per-wave code->label decode before a `harmonize_education` table can map them
+  (tracked under #171).
+- *Never-schooled handling.* The universal `dropna(how='all')` drops rows whose
+  only column (`Educational Attainment`) is NaN, so never-schooled members are
+  currently dropped rather than represented as `None`.  Whether to surface them
+  as a `None` row is an open #171 design question.
