@@ -640,3 +640,17 @@
 | ind_manuf  | Manufacturing   | x       | x       |
 | ind_const  | Construction    | x       | x       |
 | ind_serv   | Services        | x       | x       |
+
+# harmonize_education (GH #171): Mali EHCVM French levels (2018-19/2021-22).  NOTE: 2014-15 (s01q06) holds raw
+# unlabelled numeric codes 1-45 and 2017-18 (s1q07) is mis-wired to a Oui/Non
+# question -- both need a codebook/column fix and are intentionally NOT wired.
+#+name: harmonize_education
+| Original Label                        | Preferred Label              |
+|---------------------------------------+------------------------------|
+| Aucun                                 | None                         |
+| Maternelle                            | Pre-primary                  |
+| Fondamental 1                         | Primary complete             |
+| Fondamental 2                         | Lower secondary              |
+| Secondaire General                    | Upper secondary              |
+| Secondaire Technique et Professionnel | Vocational/Technical         |
+| Superieur                             | Bachelor                     |

@@ -57,7 +57,9 @@ individual_education:
     myvars:
         # Highest grade completed (free-text survey labels; W4 labels are
         # uppercased and code-prefixed, e.g. "1. 1ST GRADE COMPLETE").
-        Educational Attainment: s2q06
+        Educational Attainment:
+            - s2q06
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 shocks:
     file: sect9_hh_w4.dta

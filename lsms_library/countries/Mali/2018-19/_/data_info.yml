@@ -216,7 +216,9 @@ individual_education:
         # sibling of the Mali 2021-22 defect fixed in GH #322).
         pid: numind
     myvars:
-        Educational Attainment: 'educ_hi'
+        Educational Attainment:
+            - educ_hi
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 
 assets:

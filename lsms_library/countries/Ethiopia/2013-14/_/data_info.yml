@@ -81,7 +81,9 @@ individual_education:
         pid: individual_id
     myvars:
         # Highest grade completed (free-text survey labels).
-        Educational Attainment: hh_s2q05
+        Educational Attainment:
+            - hh_s2q05
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 shocks:
     file: sect8_hh_w2.dta
