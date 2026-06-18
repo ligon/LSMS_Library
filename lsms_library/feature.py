@@ -42,6 +42,36 @@ def _canonical_index_levels(table_name: str) -> list[str]:
     return [tok.strip() for tok in cleaned.split(",") if tok.strip()]
 
 
+# Tables whose measure columns are ADDITIVE across a dropped recall/visit level.
+# When collapsing the duplicate index left after dropping that level, these must
+# be SUMMED (not reduced via first(), which undercounts the cross-country total).
+# Motivating case (GH #501): GhanaLSS food_acquired carries a per-visit level
+# (~12 repeated visits over a month); CONTENTS.org states the visits are summed.
+# Keeping first() there silently kept only ~48% of total Quantity.
+_ADDITIVE_MEASURE_COLUMNS = {
+    "food_acquired": ("Quantity", "Expenditure"),
+}
+
+
+def _collapse_duplicate_index(df: pd.DataFrame, table_name: str) -> pd.DataFrame:
+    """Collapse duplicate index tuples left after dropping an extra index level.
+
+    For additive-measure tables (GH #501) sum the additive columns and re-derive
+    any unit-``Price`` column from the summed totals (price is per-unit, NOT
+    additive).  Otherwise keep the first row per group (the historical default).
+    """
+    additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name)
+    grouped = df.groupby(level=list(df.index.names), observed=True)
+    present = [c for c in (additive or ()) if c in df.columns]
+    if not present:
+        return grouped.first()
+    agg = {c: ("sum" if c in present else "first") for c in df.columns}
+    out = grouped.agg(agg)
+    if "Price" in out.columns and {"Expenditure", "Quantity"} <= set(out.columns):
+        out["Price"] = out["Expenditure"] / out["Quantity"].where(out["Quantity"] != 0)
+    return out
+
+
 def _harmonize_country_frame(
     df: pd.DataFrame, canonical_levels: list[str], country: str, table_name: str
 ) -> pd.DataFrame:
@@ -100,7 +130,7 @@ def _harmonize_country_frame(
                 )
                 df = df.droplevel(extra)
                 if not df.index.is_unique:
-                    df = df.groupby(level=list(df.index.names), observed=True).first()
+                    df = _collapse_duplicate_index(df, table_name)
 
     return df
 
