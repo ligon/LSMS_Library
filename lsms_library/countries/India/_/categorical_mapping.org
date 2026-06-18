@@ -1,0 +1,35 @@
+#+title: India categorical mappings
+#+description: Per-country, row-additive deltas on top of the global
+#+  categorical_mapping/*.org bases.  See
+#+  lsms_library/categorical_mapping/harmonize_education.org for the
+#+  inherited canonical-identity + common-English rows.
+
+# harmonize_education (GH #493): per-country delta for the India SLC 1997-98
+# survey (Uttar Pradesh / Bihar).  v01a05 "Educational Attainment" carries
+# Stata value labels truncated to 8 characters.  Full meanings come from the
+# Indian school ladder of the period:
+#   Illitera  = Illiterate                                   -> None
+#   Literate  = Literate, no formal schooling                -> Informal
+#   < Primar  = Below primary (some primary, not completed)  -> Primary incomplete
+#   Primary   = Primary completed (~class 5)                 -> Primary complete
+#   Middle    = Middle school completed (class 8)            -> Lower secondary complete
+#   Matric    = Matriculation / SSC (class 10 board)         -> Upper secondary
+#   Intermed  = Intermediate / Higher Secondary (class 12)   -> Upper secondary complete
+#   Diploma   = Diploma                                      -> Tertiary certificate/diploma
+#   Prof. de  = Professional degree (first prof. degree)     -> Bachelor
+#   BA/BSc    = Bachelor's degree                            -> Bachelor
+#   MA/MSc    = Master's degree                              -> Postgraduate
+#+name: harmonize_education
+| Original Label | Preferred Label              |
+|----------------+------------------------------|
+| Illitera       | None                         |
+| Literate       | Informal                     |
+| < Primar       | Primary incomplete           |
+| Primary        | Primary complete             |
+| Middle         | Lower secondary complete     |
+| Matric         | Upper secondary              |
+| Intermed       | Upper secondary complete     |
+| Diploma        | Tertiary certificate/diploma |
+| Prof. de       | Bachelor                     |
+| BA/BSc         | Bachelor                     |
+| MA/MSc         | Postgraduate                 |
