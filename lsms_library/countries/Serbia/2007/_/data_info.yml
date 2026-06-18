@@ -102,4 +102,6 @@ individual_education:
         i: [opstina, popkrug, dom]
         pid: lice
     myvars:
-        Educational Attainment: obrazovanje
+        Educational Attainment:
+            - obrazovanje
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
