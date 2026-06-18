@@ -67,13 +67,22 @@ individual_education:
     myvars:
         Educational Attainment:
             - s04_q4b
+            # Kosovo (former-Yugoslav) education ladder, s04_q4b "highest
+            # level completed" (codes 0-5, see Documentation/hheng.pdf Q4b
+            # and categorical_mapping.org #+name: harmonize_education).
+            # Inline-mapped to canonical levels directly because this myvar
+            # already carries an inline mapping (a mappings:-table on the
+            # same myvar would raise "unhashable type: dict").  "Primary"
+            # is the 8-year compulsory basic school (grades 1-8 = ISCED 1+2)
+            # -> Lower secondary complete; Gymnasium / Second. technical are
+            # the upper-secondary tracks; University -> Bachelor (first degree).
             - mapping:
-                Pre-Scho: Pre-School
-                Primary: Primary
-                'Second. ': Secondary
-                Gymnasiu: Gymnasium
-                Vocation: Vocational
-                Universi: University
+                Pre-Scho: Pre-primary
+                Primary: Lower secondary complete
+                'Second. ': Upper secondary complete
+                Gymnasiu: Upper secondary complete
+                Vocation: Vocational/Technical
+                Universi: Bachelor
 
 sample:
     file: "../Data/ID.dta"

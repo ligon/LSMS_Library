@@ -1,0 +1,51 @@
+#+title: Kosovo categorical mappings
+
+* Educational attainment (GH #493)
+
+Kosovo 2000 LSMS, =individual_education.Educational Attainment=, source
+=EDUC.dta= column =s04_q4b= ("highest level completed").  The Kosovo /
+former-Yugoslav education ladder (codes 0-5; see =2000/Documentation/hheng.pdf=
+question 4b, and the =s04_q4a= "highest class completed" grade detail):
+
+| Code | Survey level (label)       | ISCED reading                         |
+|------+----------------------------+---------------------------------------|
+|    0 | Preschool                  | pre-primary                           |
+|    1 | Primary (8-year basic)     | grades 1-8 = ISCED 1 + ISCED 2        |
+|    2 | Gymnasium                  | academic upper secondary              |
+|    3 | Secondary technical        | technical upper secondary             |
+|    4 | Vocational                 | vocational                            |
+|    5 | University                 | first university degree               |
+
+Non-obvious decisions:
+- *Primary -> Lower secondary complete.*  In the former-Yugoslav/Kosovo system
+  "primary school" (osnovna shkolla / shkolle fillore) is the single 8-year
+  compulsory basic-education cycle spanning grades 1-8 (the questionnaire shows
+  Primary covering CLASS/YEAR 1 TO 8, and =s04_q4a= tops out at 8 only for the
+  Primary level).  That cycle covers ISCED 1 (primary) AND ISCED 2 (lower
+  secondary), so "highest level completed = Primary" means completion of basic
+  compulsory education -> *Lower secondary complete*, not the global base's
+  ISCED-1-only "Primary complete".
+- *Gymnasium and Secondary technical -> Upper secondary complete.*  Both are
+  post-basic (ISCED 3) tracks; the level is the highest *completed*, so a person
+  whose top level is gymnasium/secondary-technical finished that upper-secondary
+  track (parallel to A-level/baccalaureat).
+- *University -> Bachelor.*  =s04_q4b= records only the level, with no
+  bachelor/master/doctorate split, so the first university degree (Bachelor) is
+  the appropriate canonical collapse.
+
+The labels reach the API via the Stata value labels (8-char truncated:
+=Pre-Scho=, =Primary=, =Second. =, =Gymnasiu=, =Vocation=, =Universi=).  Because
+the wave's =data_info.yml= already carries an inline =mapping:= on this myvar,
+the canonical levels are applied directly in that inline mapping's right-hand
+values (a separate =mappings:= table on the same myvar would raise "unhashable
+type: dict").  This table is the documentation of that wiring.
+
+#+name: harmonize_education
+| Original Label      | Preferred Label          |
+|---------------------+--------------------------|
+| Pre-School          | Pre-primary              |
+| Primary             | Lower secondary complete |
+| Secondary           | Upper secondary complete |
+| Gymnasium           | Upper secondary complete |
+| Vocational          | Vocational/Technical     |
+| University          | Bachelor                 |
