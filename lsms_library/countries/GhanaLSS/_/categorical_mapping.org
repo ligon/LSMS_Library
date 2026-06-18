@@ -236,3 +236,5 @@ the full file.  Code -> native label; canonicalized to Preferred Label through
 | U6                      | Postgraduate                 |
 | U7                      | Postgraduate                 |
 | U8                      | Postgraduate                 |
+| JSS1                    | Lower secondary              |
+| JSS3                    | Lower secondary complete     |

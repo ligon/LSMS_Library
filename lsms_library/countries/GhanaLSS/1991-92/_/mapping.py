@@ -142,3 +142,14 @@ def Rooms(value):
     return int(value)
 
 Visits = range(1,7)
+
+
+def individual_education(df):
+    """GH #171: GLSS3 s2q2 blanks = never-attended (s2q1=2); null them so dropna
+    removes them, consistent with the library's never-schooled handling."""
+    col = "Educational Attainment"
+    if col in df.columns:
+        df = df.copy()
+        blank = df[col].notna() & (df[col].astype(str).str.strip() == "")
+        df.loc[blank, col] = pd.NA
+    return df
