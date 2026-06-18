@@ -39,6 +39,22 @@ household_roster:
         Relationship: MS01Q02
         MonthsSpent: MS01Q19
 
+individual_education:
+    file: NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS02P1.dta
+    idxvars:
+        i:
+            - GRAPPE
+            - MENAGE
+        pid: MS02Q00
+    myvars:
+        # GH #171: map raw attainment labels onto the canonical ordinal vocab
+        # via the row-additive harmonize_education table (global base +
+        # this country's per-country delta in _/categorical_mapping.org).
+        # 2014-15 carries French labels.
+        Educational Attainment:
+            - MS02Q23
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
+
 cluster_features:
     file: NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS00P1.dta
     idxvars:
