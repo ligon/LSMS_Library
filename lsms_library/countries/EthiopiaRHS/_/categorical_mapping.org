@@ -175,16 +175,20 @@ coverage gap).
 * erhs_sex
 
 Codes 0 and 6 are 1989 demog89_1.sex data-entry errors (the
-labelled scheme is 1=Male/2=Female only) -> empty -> NA Sex, same
-treatment as the relnhhed 11/36 and reltn4 -9 sentinels.
+labelled scheme is 1=Male/2=Female only) -> NA Sex, same treatment
+as the relnhhed 11/36 and reltn4 -9 sentinels.  Their Preferred
+Label is the '---' null sentinel (df_from_orgfile maps '---' -> NA),
+not a blank cell: a blank cell loads as the empty string '' and
+leaks into the required Sex column instead of resolving to <NA>
+(GH #502).
 
 #+NAME: erhs_sex
 | Code | Preferred Label |
 |------+-----------------|
-|    0 |                 |
+|    0 | ---             |
 |    1 | M               |
 |    2 | F               |
-|    6 |                 |
+|    6 | ---             |
 
 * harmonize_food
 

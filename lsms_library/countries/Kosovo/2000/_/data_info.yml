@@ -49,7 +49,7 @@ household_roster:
 
 
         Age: s1a_q05
-        Marital_status:
+        Marital:
             - s1a_q06
             - mapping:
                   1: Married

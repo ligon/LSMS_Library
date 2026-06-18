@@ -47,12 +47,26 @@ sample:
             i: [opstina, popkrug, dom]
         myvars:
             v: popkrug
+            # GH #500: carry the full settlement key (opstina, popkrug) as
+            # plain columns so the df_hh<->df_ed join can match on it.  The
+            # household id `i` collapses [opstina, popkrug, dom] into one
+            # composite string, so opstina/popkrug aren't otherwise available
+            # as merge keys.  Dropped after the merge via `drop:` below.
+            opstina: opstina
+            popkrug: popkrug
             weight: hhweight
             panel_weight: popweight
     df_ed:
         file: "../Data/enumeration_district.dta"
+        # GH #500: opstina+popkrug is the unique settlement key in the
+        # enumeration-district file (popkrug alone is non-unique: 510 rows ->
+        # 328 unique popkrug).  Merging on popkrug (= v) alone multiplied
+        # household rows ~2x, then _normalize_dataframe_index collapsed the
+        # duplicate (i,t) tuples via groupby().first(), arbitrarily picking one
+        # cluster per household.  Joining on the full key makes it 1:1.
         idxvars:
-            v: popkrug
+            opstina: opstina
+            popkrug: popkrug
         myvars:
             Rural:
                 - tip
@@ -61,7 +75,11 @@ sample:
                     rural: Rural
             strata: region2
     merge_on:
-        - v
+        - opstina
+        - popkrug
+    drop:
+        - opstina
+        - popkrug
     final_index:
         - i
         - t

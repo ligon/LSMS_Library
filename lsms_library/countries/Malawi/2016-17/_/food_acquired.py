@@ -6,6 +6,7 @@ sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
 import json
+from lsms_library.local_tools import format_id
 from malawi import (handling_unusual_units, conversion_table_matching,
                     food_acquired_to_canonical, normalize_food_label)
 
@@ -21,6 +22,13 @@ hh_cs = get_dataframe('../Data/Cross_Sectional/hh_mod_a_filt.dta', convert_categ
 hh_pn = get_dataframe('../Data/Panel/hh_mod_a_filt_16.dta', convert_categoricals=True)
 regions_cs = hh_cs[['case_id', 'region']].rename(columns={'case_id': 'j'})
 regions_pn = hh_pn[['y3_hhid', 'region']].rename(columns={'y3_hhid': 'j'})
+# Apply the same household-id keyspace the framework's cs_i mapping applies
+# to sample/cluster_features/interview_date (GH #499): cross-sectional cases
+# get the 'cs-17-' prefix, panel cases stay bare; both pass through format_id.
+# Done here too so the `regions` join below (keyed on j) still matches after
+# the i/j ids are prefixed in `df`/`panel_df`.
+regions_cs['j'] = 'cs-17-' + regions_cs['j'].apply(format_id)
+regions_pn['j'] = regions_pn['j'].apply(format_id)
 regions = pd.concat([regions_cs, regions_pn]).drop_duplicates().set_index('j')['region']
 regions = regions.replace({'South': 'Southern'})
 regions.name = 'm'
@@ -34,6 +42,13 @@ df = df.rename(columns_dict, axis=1)
 panel_df = panel_df.rename(columns_dict, axis=1)
 df = df.loc[:, list(set(columns_dict.values()))]
 panel_df = panel_df.loc[:, list(set(columns_dict.values()))]
+# Align the household-id keyspace with sample/cluster_features/interview_date,
+# which apply the cs_i mapping ('cs-17-'+format_id(case_id)) to the
+# cross-sectional half and a bare format_id(y3_hhid) to the panel half
+# (GH #499).  Without this, food_acquired's household id never carried the
+# 'cs-17-' prefix, so _join_v_from_sample produced NULL v for ~141k rows.
+df['j'] = 'cs-17-' + df['j'].apply(format_id)
+panel_df['j'] = panel_df['j'].apply(format_id)
 df = pd.concat([df, panel_df], axis=0)
 df['i'] = normalize_food_label(df['i'].astype(str).str.capitalize())
 
