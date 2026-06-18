@@ -81,7 +81,9 @@ individual_education:
         i: HHID
         pid: MEMID
     myvars:
-        Educational Attainment: M3BQ4
+        Educational Attainment:
+            - M3BQ4
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 housing:
     # 2009 TLSS dropped the physical-structure block (no walls/roof/floor/

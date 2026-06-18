@@ -84,13 +84,16 @@ individual_education:
         pid: hhlid
     myvars:
         Educational Attainment:
+            # Grades-explicit ladder; right-hand values are canonical
+            # harmonize_education levels (GH #493) — a wave with an inline
+            # mapping: cannot also carry a mappings: table.
             - m3bq5
             - mapping:
-                0.0: none
-                1.0: primary (grades 1-4)
-                2.0: basic (grades 1-8(9))
-                3.0: secondary general (grades 9-10(11))
-                4.0: secondary special
-                5.0: secondary technical
-                6.0: higher education
-                7.0: graduate school/aspirantura
+                0.0: None                       # none
+                1.0: Primary complete           # primary (grades 1-4)
+                2.0: Lower secondary complete   # basic (grades 1-8(9))
+                3.0: Upper secondary complete   # secondary general (grades 9-10(11))
+                4.0: Vocational/Technical       # secondary special (technikum)
+                5.0: Vocational/Technical       # secondary technical
+                6.0: Bachelor                   # higher education (VUZ)
+                7.0: Postgraduate               # graduate school/aspirantura

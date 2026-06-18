@@ -1,0 +1,49 @@
+#+title: Tajikistan Categorical Mappings
+
+* Educational attainment (GH #493)
+
+Row-additive delta over the global
+=lsms_library/categorical_mapping/harmonize_education.org=.  Maps the
+Tajikistan TLSS Soviet-era education ladder onto the canonical ordinal
+vocabulary.  The 2007/2009 .dta value labels (decoded by the source) and the
+2003 inline-mapped labels (grades-explicit) are wired here; the 1999 inline
+mapping is rewritten in-place (it carries codes the framework cannot also
+table-map).  See CONTENTS.org and per-wave data_info.yml for provenance.
+
+Notes on the non-obvious levels:
+- =8th (9th) class= / =basic (grades 1-8(9))= = end of Soviet basic/incomplete
+  secondary (8 or 9 years) -> Lower secondary complete.
+- =secondary general= = full general secondary (10/11 yrs) -> Upper secondary
+  complete.
+- =secondary special= (technikum, среднее специальное), =secondary technical=,
+  =prof-tech school= (PTU), =spec tech school= = post-/secondary vocational
+  tiers; the canonical vocabulary has one slot -> Vocational/Technical.
+- =higher education= / =higher ed institute= (VUZ specialist diploma) = first
+  university degree -> Bachelor.
+- =graduate school/aspirantura= = postgraduate study -> Postgraduate.
+- =candidate of science= (kandidat nauk) and =doctor of science= (doktor nauk)
+  = research doctoral degrees -> Doctorate.
+- =other= = uncodable residual -> Unknown.
+
+#+name: harmonize_education
+| Original Label                      | Preferred Label          |
+|-------------------------------------+--------------------------|
+| none                                | None                     |
+| primary                             | Primary complete         |
+| primary (grades 1-4)                | Primary complete         |
+| basic                               | Lower secondary complete |
+| basic (grades 1-8(9))               | Lower secondary complete |
+| 8th (9th) class                     | Lower secondary complete |
+| secondary general                   | Upper secondary complete |
+| secondary general (grades 9-10(11)) | Upper secondary complete |
+| secondary school                    | Upper secondary complete |
+| secondary special                   | Vocational/Technical     |
+| secondary technical                 | Vocational/Technical     |
+| prof-tech school                    | Vocational/Technical     |
+| spec tech school                    | Vocational/Technical     |
+| higher education                    | Bachelor                 |
+| higher ed institute                 | Bachelor                 |
+| graduate school/aspirantura         | Postgraduate             |
+| candidate of science                | Doctorate                |
+| doctor of science                   | Doctorate                |
+| other                               | Unknown                  |

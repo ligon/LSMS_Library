@@ -84,17 +84,20 @@ individual_education:
         pid: iid
     myvars:
         Educational Attainment:
+            # Soviet ladder (codes decoded from the HH questionnaire); right-hand
+            # values are canonical harmonize_education levels (GH #493) — a wave
+            # with an inline mapping: cannot also carry a mappings: table.
             - s3q2
             - mapping:
-                1.0: 8th (9th) class
-                2.0: secondary school
-                3.0: prof-tech school
-                4.0: spec tech school
-                5.0: higher ed institute
-                6.0: candidate of science
-                7.0: doctor of science
-                8.0: other
-                9.0: none
+                1.0: Lower secondary complete   # 8th (9th) class
+                2.0: Upper secondary complete   # secondary school
+                3.0: Vocational/Technical       # prof-tech school (PTU)
+                4.0: Vocational/Technical        # spec tech school (technikum)
+                5.0: Bachelor                    # higher ed institute (VUZ)
+                6.0: Doctorate                   # candidate of science (kandidat nauk)
+                7.0: Doctorate                   # doctor of science (doktor nauk)
+                8.0: Unknown                     # other
+                9.0: None
 
 housing:
     # SSEC2 Part 2A (structure) + Part 2B (tenure/toilet).  Value labels are
