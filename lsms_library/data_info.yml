@@ -23,6 +23,8 @@ Index Info:
     panel_ids: (t, i)
     assets: (t, i, j)
     individual_education: (t, v, i, pid)
+    food_prices: (t, v, i, j, u, s)
+    food_quantities: (t, v, i, j, u, s)
 
 # Cluster-id (v) join policy.  _finalize_result() joins v from sample() onto
 # household-level (i, t) tables that lack it.  A table is SKIPPED when its

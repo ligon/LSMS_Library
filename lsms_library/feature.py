@@ -74,22 +74,33 @@ def _harmonize_country_frame(
     # there is at least one extra (keeps single-country reductions intact).
     if canonical_levels and isinstance(df.index, pd.MultiIndex):
         names = list(df.index.names)
-        extra = [n for n in names if n not in canonical_levels]
         have_all_canonical = all(lvl in names for lvl in canonical_levels)
-        if extra and have_all_canonical and len(names) > len(extra):
+        if have_all_canonical:
+            # Put the canonical levels in canonical ORDER (then any extras).  Do
+            # this even when there is no extra level to drop, so that the
+            # positional set_names in __call__ aligns levels by MEANING, not
+            # position: a country whose per-country index is correctly *named*
+            # but *ordered* e.g. [i, t, v] would otherwise have its t/v/i values
+            # scrambled under the canonical [t, v, i] labels (GH #498).
             ordered = [lvl for lvl in canonical_levels if lvl in names] + \
                       [n for n in names if n not in canonical_levels]
-            try:
-                df = df.reorder_levels(ordered)
-            except (ValueError, TypeError):
-                pass
-            warnings.warn(
-                f"{table_name}: dropping extra index level(s) {extra} from "
-                f"{country} before cross-country concat"
-            )
-            df = df.droplevel(extra)
-            if not df.index.is_unique:
-                df = df.groupby(level=list(df.index.names), observed=True).first()
+            if ordered != names:
+                try:
+                    df = df.reorder_levels(ordered)
+                    names = ordered
+                except (ValueError, TypeError):
+                    pass
+            # Remove undeclared extra index levels so every country shares the
+            # same MultiIndex names (keeps single-country reductions intact).
+            extra = [n for n in names if n not in canonical_levels]
+            if extra and len(names) > len(extra):
+                warnings.warn(
+                    f"{table_name}: dropping extra index level(s) {extra} from "
+                    f"{country} before cross-country concat"
+                )
+                df = df.droplevel(extra)
+                if not df.index.is_unique:
+                    df = df.groupby(level=list(df.index.names), observed=True).first()
 
     return df
 
