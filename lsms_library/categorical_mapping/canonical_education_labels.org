@@ -48,9 +48,11 @@ alongside the label for quantitative analysis.
   `s01q06` = *"Code du père dans le ménage"* (father's line number) and 2017-18 to
   `s1q07` (a Oui/Non about the mother); the real columns are the value-labelled
   `s02q23` / `s2q06` in the education modules, now harmonized (#171).  *Ethiopia*
-  (89 labels) and *GhanaLSS* (84 two-system labels, 4 modern waves) are harmonized
-  too.  No numeric residue remains; the GLSS1/2 (1987-89) `Y03I:GRADE` letter codes
-  are text and being wired separately.
+  (89 labels) and *GhanaLSS* (all 7 waves, 1987-2017) are harmonized too — including
+  the legacy GLSS1/2/3 fixed-width rounds, whose `.DAT` files `get_dataframe` reads
+  directly (the `.DCT` dictionaries are redundant) and whose `GRADE`/`s2q2` letter
+  ladder (P/M/S/A/T/PS/U, K=Koranic) was decoded from the GLSS questionnaires.  No
+  numeric residue remains across the LSMS-ISA education tables.
 - *Never-schooled handling.* The universal `dropna(how='all')` drops rows whose
   only column (`Educational Attainment`) is NaN, so never-schooled members are
   currently dropped rather than represented as `None`.  Whether to surface them
