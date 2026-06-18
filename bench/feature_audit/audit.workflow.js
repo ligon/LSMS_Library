@@ -9,18 +9,36 @@ export const meta = {
   ],
 }
 
-// ---- inputs (passed via the Workflow tool's `args`) -----------------------
-// args = { clusters: [...], file: bool, repo: str, py: str, resultsDir: str }
-const clusters  = (args && args.clusters) || []
+// ---- inputs --------------------------------------------------------------
+// Only small SCALARS travel via `args` (a large inline-JSON args blob does not
+// survive the scriptPath plumbing reliably).  The cluster list itself is loaded
+// from a file ON DISK by a loader agent — the JS sandbox can't read files, but
+// agents can.  Write the slice you want triaged to `slice` before launching.
+// args = { file: bool, repo: str, py: str, resultsDir: str, slice: str }
 const doFile    = !!(args && args.file)                       // DRY-RUN unless explicitly true
 const REPO      = (args && args.repo) || '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library'
 const PY        = (args && args.py)   || `${REPO}/.venv/bin/python`
 const RESULTS   = (args && args.resultsDir) || `${REPO}/bench/feature_audit/results/2026-06-18`
+const SLICE     = (args && args.slice) || `${RESULTS}/clusters_slice.json`
 const SKILL     = `${REPO}/.claude/skills/cross-country-features/SKILL.md`
 
+log(`args keys: ${args ? Object.keys(args).join(',') : '(none)'}; loading clusters from ${SLICE}`)
+
+const CLUSTERS_SCHEMA = {
+  type: 'object',
+  required: ['clusters'],
+  properties: { clusters: { type: 'array', items: { type: 'object' } } },
+}
+const loaded = await agent(
+  `Run \`cat ${SLICE}\`. It is a JSON array of audit "cluster" objects. Return it verbatim as ` +
+  `{"clusters": <that exact array>} — no edits, additions, reordering, or summarizing. ` +
+  `If the file is missing or empty, return {"clusters": []}.`,
+  { label: 'load-clusters', phase: 'Triage', schema: CLUSTERS_SCHEMA }
+)
+const clusters = (loaded && loaded.clusters) || []
 if (!clusters.length) {
-  log('no clusters in args — nothing to triage')
-  return { total: 0, confirmed: 0, items: [] }
+  log('no clusters loaded — nothing to triage')
+  return { total_clusters: 0, confirmed: 0, items: [] }
 }
 
 // ---- structured-output schemas -------------------------------------------
