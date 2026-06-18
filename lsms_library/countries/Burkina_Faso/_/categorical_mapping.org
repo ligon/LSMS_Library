@@ -565,3 +565,28 @@
 |    9 | Chicken         |
 |   10 | Guinea Fowl     |
 |   11 | Other Poultry   |
+
+# harmonize_education (GH #171): per-country delta on the global ordinal base
+# (categorical_mapping/harmonize_education.org, row-additive). Maps this country's
+# attainment labels onto the canonical ordinal levels.
+#+name: harmonize_education
+| Original Label                | Preferred Label              |
+|-------------------------------+------------------------------|
+| Aucun                         | None                         |
+| Maternelle                    | Pre-primary                  |
+| Postprimaire  technique       | Vocational/Technical         |
+| Postprimaire général          | Lower secondary              |
+| Postsecondaire                | Tertiary certificate/diploma |
+| Primaire                      | Primary complete             |
+| Préscolaire                   | Pre-primary                  |
+| Second. 2nd  cycle général    | Upper secondary              |
+| Second. 2nd cycle tech. Prof. | Vocational/Technical         |
+| Second. gl 1                  | Lower secondary              |
+| Second. gl 2                  | Upper secondary              |
+| Second. tech. 1               | Vocational/Technical         |
+| Second. tech. 2               | Vocational/Technical         |
+| Secondaire 1er cycle          | Lower secondary              |
+| Secondaire général            | Lower secondary              |
+| Secondaire technique          | Vocational/Technical         |
+| Superieur                     | Bachelor                     |
+| Supérieur                     | Bachelor                     |

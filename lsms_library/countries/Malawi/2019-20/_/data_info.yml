@@ -166,7 +166,9 @@ individual_education:
             - function: cs_i
         pid: PID
     myvars:
-        Educational Attainment: hh_c09
+        Educational Attainment:
+            - hh_c09
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 housing:
     file:

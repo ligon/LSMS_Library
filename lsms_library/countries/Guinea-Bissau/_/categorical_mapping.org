@@ -332,3 +332,16 @@
 | Sésamo                                                         | Sésame                                                                               |
 | Taro/Manfafa                                                   | Taro, macabo                                                                         |
 | Tomate                                                         | Tomate fraîche                                                                       |
+
+# harmonize_education (GH #171): per-country delta on the global ordinal base
+# (categorical_mapping/harmonize_education.org, row-additive). Maps this country's
+# attainment labels onto the canonical ordinal levels.
+#+name: harmonize_education
+| Original Label              | Preferred Label              |
+|-----------------------------+------------------------------|
+| Ensino Basico               | Primary complete             |
+| Ensino Secundário           | Lower secondary              |
+| Ensino Superior             | Bachelor                     |
+| Ensino Técnico/Profissional | Vocational/Technical         |
+| Nenhum                      | None                         |
+| Pre-escolar                 | Pre-primary                  |
