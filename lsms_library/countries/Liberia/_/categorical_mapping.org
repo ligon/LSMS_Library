@@ -1,0 +1,42 @@
+#+title: Liberia Categorical Mappings
+#+description: Per-country row-additive harmonization deltas (GH #493).
+#+  Rows here extend the global base
+#+  lsms_library/categorical_mapping/harmonize_education.org with the
+#+  Liberia-specific raw labels from S2_14 ("what is the highest grade
+#+  completed by [name]?", 2018-19 HIES/Forestry survey).
+#+
+#+  Source code list (ordinal):
+#+    0=pre-primary/no grade; 11-22=grade 1..grade 12;
+#+    23=aad (Associate of Arts Degree, 2-yr post-secondary diploma);
+#+    24-27=u1..u4 (university years 1-4, Bachelor track);
+#+    28=master and above (u5).
+#+
+#+  Liberian school ladder: primary = grades 1-6; junior (lower) secondary =
+#+  grades 7-9; senior (upper) secondary = grades 10-12. "Highest grade
+#+  completed", so grade N completed means level N is done: grade 6 completes
+#+  primary, grade 9 completes lower secondary, grade 12 completes upper
+#+  secondary; the in-between grades are the corresponding incomplete/"in
+#+  progress" level.
+
+#+name: harmonize_education
+| Original Label        | Preferred Label              |
+|-----------------------+------------------------------|
+| pre-primary/no grade  | Pre-primary                  |
+| grade 1               | Primary incomplete           |
+| grade 2               | Primary incomplete           |
+| grade 3               | Primary incomplete           |
+| grade 4               | Primary incomplete           |
+| grade 5               | Primary incomplete           |
+| grade 6               | Primary complete             |
+| grade 7               | Lower secondary              |
+| grade 8               | Lower secondary              |
+| grade 9               | Lower secondary complete     |
+| grade 10              | Upper secondary              |
+| grade 11              | Upper secondary              |
+| grade 12              | Upper secondary complete     |
+| aad                   | Tertiary certificate/diploma |
+| u1                    | Bachelor                     |
+| u2                    | Bachelor                     |
+| u3                    | Bachelor                     |
+| u4                    | Bachelor                     |
+| master and above (u5) | Postgraduate                 |

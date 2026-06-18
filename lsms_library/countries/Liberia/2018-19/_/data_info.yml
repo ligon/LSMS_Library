@@ -20,7 +20,9 @@ individual_education:
         i: hhid
         pid: member_id
     myvars:
-        Educational Attainment: S2_14
+        Educational Attainment:
+            - S2_14
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 cluster_features:
     file:
