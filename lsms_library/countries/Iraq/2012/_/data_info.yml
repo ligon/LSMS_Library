@@ -22,12 +22,33 @@ household_roster:
         - "../Data/2012ihses01_household_roster.dta"
     idxvars:
         v: cluster
-        i: hh
+        # i=questid is the unique household id (25,146 distinct, matching the
+        # cover-page sample keyspace 100%).  The roster `hh` field is only a
+        # within-dwelling sequence number (9 distinct values), so keying on it
+        # collapsed every household into 9 ids that matched 0% of sample, made
+        # v 100% NaN after _join_v_from_sample, and dropped wave 2012 entirely
+        # from household_characteristics (GH #499).  Mirrors housing/shocks/
+        # assets in this same wave, which already key on questid.
+        i: questid
         pid: idcode
     myvars:
         Sex: q0102
         Relationship: q0105
         Age: q0104
+        # IHSES 2012 roster has no residence-duration question, so every
+        # listed member is a current resident: MonthsAway=0 (constant via
+        # the months_away hook in 2012.py).  We use MonthsAway (not
+        # MonthsSpent) to match wave 2006-07, which carries real MonthsAway
+        # (q0113): roster_to_characteristics resolves a SINGLE residence
+        # column across the whole country-concatenated roster (monthsspent
+        # has precedence over monthsaway), so a wave that introduced
+        # MonthsSpent would make 2006-07's all-NaN MonthsSpent drop that
+        # wave instead.  Keeping both waves on MonthsAway avoids the
+        # all-NaN-column contamination that otherwise drops a whole wave
+        # from household_characteristics (GH #499).
+        MonthsAway:
+            - q0102
+            - mapping: months_away
 
 individual_education:
     # Education module; q0503 = highest attainment (12 English-labeled levels).
