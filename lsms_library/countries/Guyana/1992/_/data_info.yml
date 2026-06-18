@@ -89,7 +89,9 @@ individual_education:
         i: [ED, HH]
         pid: PID
     myvars:
-        Educational Attainment: HS
+        Educational Attainment:
+            - HS
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 housing:
     # Dwelling module HHCHAR.dta, block (16) HOUSING (questionnaire GUY02.pdf

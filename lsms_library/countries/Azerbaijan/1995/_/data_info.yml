@@ -76,7 +76,9 @@ individual_education:
         i: [ppid, hid]
         pid: pid
     myvars:
-        Educational Attainment: diploma
+        Educational Attainment:
+            - diploma
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 interview_date:
     # Cover module A00.dta; Int_t from dayint/moint/yrint (yrint 2-digit ->

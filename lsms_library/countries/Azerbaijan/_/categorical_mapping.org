@@ -1,0 +1,60 @@
+#+title: Categorical Mappings (Azerbaijan)
+
+* harmonize_education
+
+Azerbaijan SLC 1995 individual_education "Educational Attainment" comes
+from the =diploma= variable in =A03.dta= (Section 3 EDUCATION of the
+household questionnaire =queshhe.pdf=, question 2: "Highest diploma,
+degree or certificate received by [NAME]?").  Codes reach the API as
+stringified floats (=1.0=, =2.0=, ...).  The codebook (1-10) is decoded
+below and cross-checked against =yearsch= (years spent studying) and
+=agey= (age):
+
+| code | questionnaire label                                  | mean yearsch |
+|------+------------------------------------------------------+--------------|
+|    1 | Certificate of completing 8 classes                  |          8.2 |
+|    2 | Certificate of completing secondary school           |         10.2 |
+|    3 | Certificate of finishing prof/tech school (PTU)      |         11.3 |
+|    4 | Diploma of completing secondary technical school     |         12.9 |
+|    5 | Diploma of completing art/medical/other secondary    |         13.3 |
+|    6 | Diploma of completing a higher education establishment |       15.5 |
+|    7 | Diploma of a candidate of science                    |         17.5 |
+|    8 | Diploma of a doctor of science                       |         14.0 |
+|    9 | Diploma of professor                                 |         22.2 |
+|   10 | OTHER (no listed diploma)                            |          4.1 |
+|   13 | (undocumented; 3 children age 6-9, yearsch 0-1)      |          0.3 |
+
+Soviet-system rationale:
+- code 1 = "8 classes" = the 8-year compulsory incomplete-secondary
+  certificate -> Lower secondary complete.
+- code 2 = full general secondary (10/11 years) -> Upper secondary complete.
+- code 3 = PTU vocational school (worker qualification) -> Vocational/Technical.
+- codes 4 & 5 = "среднее специальное" specialized-secondary diplomas
+  (tekhnikum; medical/art college) award a mid-level-specialist diploma
+  one tier above the PTU -> Tertiary certificate/diploma.
+- code 6 = higher-education (university) diploma -> Bachelor.
+- codes 7, 8, 9 = candidate of science / doctor of science / professor
+  are postgraduate research degrees (candidate ~ PhD; doctor of science &
+  professor are the higher Soviet academic ranks) -> Doctorate.
+- code 10 = "OTHER" catch-all: largest group, mean age 25, age mode 5-15
+  (school-age children currently in primary/incomplete secondary) and
+  yearsch mode 0-8.  Genuinely heterogeneous "no diploma obtained" — not a
+  single attainment level — so mapped to Unknown rather than fabricating a
+  level.
+- code 13 = undocumented (outside 1-10); 3 children age 6-9 still in school
+  with no diploma -> Unknown.
+
+#+name: harmonize_education
+| Original Label | Preferred Label              |
+|----------------+------------------------------|
+| 1.0            | Lower secondary complete     |
+| 2.0            | Upper secondary complete     |
+| 3.0            | Vocational/Technical         |
+| 4.0            | Tertiary certificate/diploma |
+| 5.0            | Tertiary certificate/diploma |
+| 6.0            | Bachelor                     |
+| 7.0            | Doctorate                    |
+| 8.0            | Doctorate                    |
+| 9.0            | Doctorate                    |
+| 10.0           | Unknown                      |
+| 13.0           | Unknown                      |

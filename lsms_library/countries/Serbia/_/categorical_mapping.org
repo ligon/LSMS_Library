@@ -1,0 +1,33 @@
+#+title: Serbia categorical mappings
+
+* Educational attainment
+
+Serbia LSMS 2007 records ~obrazovanje~ ("highest level completed") as numeric
+codes 00-11.  The decode comes from the household questionnaire legend "Codes
+for B1. Education (highest level completed)" (srb07hhqe.pdf, p.2); the code ->
+age distribution in individual.dta corroborates it (code 00 median age 8,
+96.6% under 15; code 01 "No school" median age 73).  Row-additive delta on the
+global ~harmonize_education~ base.
+
+The leading ~Unknown -> Unknown~ row is intentional: the org reader
+(~df_from_orgfile~ -> ~_to_numeric~) coerces an all-numeric column to ints,
+which would strip the zero-padding ("00" -> 0) and break the match against the
+zero-padded raw codes ("00".."11").  One non-numeric cell forces the whole
+~Original Label~ column to stay string, preserving the codes verbatim.
+
+#+name: harmonize_education
+| Original Label | Preferred Label              |
+|----------------+------------------------------|
+| Unknown        | Unknown                      |
+| 00             | None                         |
+| 01             | None                         |
+| 02             | Primary incomplete           |
+| 03             | Primary complete             |
+| 04             | Vocational/Technical         |
+| 05             | Upper secondary complete     |
+| 06             | Upper secondary complete     |
+| 07             | Upper secondary complete     |
+| 08             | Tertiary certificate/diploma |
+| 09             | Bachelor                     |
+| 10             | Postgraduate                 |
+| 11             | Doctorate                    |

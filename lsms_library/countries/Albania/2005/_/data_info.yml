@@ -9,7 +9,9 @@ individual_education:
             - m0_q01
         pid: m2b_q00
     myvars:
-        Educational Attainment: m2b_q04
+        Educational Attainment:
+            - m2b_q04
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 cluster_features:
     file: ../Data/identification_cl.dta

@@ -81,7 +81,9 @@ individual_education:
         i: hhid
         pid: memid
     myvars:
-        Educational Attainment: m3bq5
+        Educational Attainment:
+            - m3bq5
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 housing:
     # Module 7: r1m7a (structure + tenure), r1m7b (electricity),

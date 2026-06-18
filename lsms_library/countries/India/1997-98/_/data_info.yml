@@ -60,7 +60,9 @@ individual_education:
       pid: idcode
       v: village
   myvars:
-      Educational Attainment: v01a05
+      Educational Attainment:
+          - v01a05
+          - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 housing:
   file:

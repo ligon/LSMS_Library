@@ -1,0 +1,43 @@
+#+TITLE: Albania — country-specific categorical mappings
+
+* Education attainment (GH #493)
+
+Row-additive delta over the global
+~lsms_library/categorical_mapping/harmonize_education.org~ base.  Maps
+Albania's raw ~m2b_q04~ "Educational Attainment" labels (waves 2005, 2008,
+2012) onto the canonical ordinal vocabulary.  ~None~ is already covered by the
+global base and is not repeated here.
+
+Albanian-system notes:
+- "8 or 9 Years school" / "8/9 years of school" = the compulsory basic
+  education cycle (8-year pre-2004 reform, 9-year after) ending ~age 14-15 =
+  ISCED 2 completion -> Lower secondary complete.
+- "Gymnazium" = general academic upper-secondary (shkollë e mesme e
+  përgjithshme); "Secondary general" is the same academic upper-secondary
+  track in the 2005/2008 label set -> Upper secondary complete.
+- Vocational tracks (2-3 yr, 4/5 yr) and "Technicum <2 years" (short
+  post-secondary technical) -> Vocational/Technical.
+- University (Albania/Abroad) = first university degree -> Bachelor.
+- Master / Post-Graduate (Albania/Abroad) -> Postgraduate.
+- Doctorate/PhD (Albania/Abroad) -> Doctorate.
+
+#+name: harmonize_education
+| Original Label          | Preferred Label          |
+|-------------------------+--------------------------|
+| 8 or 9 Years school     | Lower secondary complete |
+| 8/9 years of school     | Lower secondary complete |
+| Secondary general       | Upper secondary complete |
+| Gymnazium               | Upper secondary complete |
+| Vocational 4/5          | Vocational/Technical     |
+| Vocational 4-5 years    | Vocational/Technical     |
+| Vocational 2-3  years   | Vocational/Technical     |
+| Vocational 2-3 years    | Vocational/Technical     |
+| Technicum <2 years      | Vocational/Technical     |
+| University - Albania    | Bachelor                 |
+| University - Abroad     | Bachelor                 |
+| Master - Albania        | Postgraduate             |
+| Master - Abroad         | Postgraduate             |
+| Post-Graduate - Albania | Postgraduate             |
+| Post-Graduate - Abroad  | Postgraduate             |
+| Doctorate/PhD - Albania | Doctorate                |
+| Doctorate/PhD - Abroad  | Doctorate                |

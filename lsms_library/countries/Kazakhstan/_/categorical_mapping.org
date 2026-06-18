@@ -1,0 +1,33 @@
+#+title: Kazakhstan Categorical Mappings
+
+* Educational Attainment (GH #493)
+
+Kazakhstan 1996 (KLSS) records the highest professional / post-secondary
+institution attended in =bw003_= (general-school grade ladder is in =bw001_=,
+"completed secondary?" in =bw002_=).  The six =bw003_= categories are Soviet-era
+post-secondary levels.  Because the 1996 wave already carries an inline
+=mapping:= (truncated Stata code -> readable label) on Educational Attainment,
+the canonical levels are wired by pointing that inline mapping's right-hand
+values directly at the canonical vocabulary (a separate =mappings:= table on the
+same myvar would raise "unhashable type: dict").  This table documents the
+full-label -> canonical correspondence for review/reuse.
+
+Level rationale:
+- Occupational courses, PTU/FSO (with or without secondary): vocational-technical
+  schooling (PTU = Professionalno-Tekhnicheskoye Uchilishche, trade school) ->
+  Vocational/Technical.
+- Technical college (tekhnikum, среднее специальное): specialized-secondary
+  diploma, ISCED-5 short tertiary -> Tertiary certificate/diploma.
+- University and institute (vyssheye obrazovaniye, the Soviet 5-year specialist
+  diploma): first higher-education degree -> Bachelor.
+- Post-graduate (aspirantura, toward Candidate of Science) -> Postgraduate.
+
+#+name: harmonize_education
+| Original Label                     | Preferred Label              |
+|------------------------------------+------------------------------|
+| Occupational courses               | Vocational/Technical         |
+| PTU/FSO without secondary education | Vocational/Technical         |
+| PTU with secondary education       | Vocational/Technical         |
+| Technical college                  | Tertiary certificate/diploma |
+| University and institute           | Bachelor                     |
+| Post-graduate                      | Postgraduate                 |

@@ -104,7 +104,9 @@ individual_education:
         i: xhhkey
         pid: xpers
     myvars:
-        Educational Attainment: q0406
+        Educational Attainment:
+            - q0406
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 housing:
     # Dwelling module 2007ihses03. One row per household (xhhkey, unique).

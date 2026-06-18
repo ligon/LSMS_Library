@@ -38,7 +38,9 @@ individual_education:
         i: hh
         pid: idcode
     myvars:
-        Educational Attainment: q0503
+        Educational Attainment:
+            - q0503
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 # assets is built via the script path (_/assets.py) so that physical
 # instances of a durable (multiple `durable_serial` rows per
