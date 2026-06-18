@@ -42,6 +42,28 @@ def _household_roster_from_df(df, sex, age, HHID, sex_converter=None, age_conver
     return g.sum()
 
 
+def WeeksAway(value):
+    '''
+    Decode the 2019-20 weeks-away question (s02q14) to a numeric value.
+
+    The source column mixes the label 'Absent less than one week' with
+    numeric week counts (1.0 .. 52.0).  Left undecoded the label leaks
+    into household_roster['WeeksAway'] as a string, breaking the numeric
+    dtype and roster_to_characteristics' ``12 - weeks`` conversion
+    (GH #502).  'Absent less than one week' means essentially no absence
+    in the recall window, so it maps to 0; numeric counts pass through.
+    '''
+    if pd.isna(value):
+        return pd.NA
+    s = str(value).strip()
+    if s.lower().startswith('absent less than'):
+        return 0
+    try:
+        return int(float(s))
+    except (TypeError, ValueError):
+        return pd.NA
+
+
 def age_sex_composition(df):
     Age_ints = ((0,4),(4,9),(9,14),(14,19),(19,31),(31,51),(51,100))
     testdf = _household_roster_from_df(df, sex='s02q03',

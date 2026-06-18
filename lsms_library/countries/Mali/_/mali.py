@@ -45,10 +45,40 @@ def Relationship(value):
     else:
         return value.title()
 
+def MonthsSpent(value):
+    '''
+    Decode the 2014-15 EACI residence-duration question (s01q11) to a
+    numeric months-present value in 0..12.
+
+    Unlike the EHCVM waves (2017-18 s1q13, 2018-19 s01q12) whose source
+    column is a binary Oui/Non gate, the 2014-15 EACI column is a MONTHS
+    COUNT carrying raw French labels: a '36 mois et plus' top-code and a
+    'Manquant' missing sentinel alongside integer 0..35.  Left undecoded
+    those labels leak into household_roster['MonthsSpent'], and
+    roster_to_characteristics' to_numeric(errors='coerce') then turns
+    every '36 mois et plus' / 'Manquant' row into NaN, silently dropping
+    those members from household_characteristics (GH #502).
+
+    Mapping: '36 mois et plus' -> 12 (capped; resident the whole window),
+    'Manquant'/missing -> <NA>, numeric n -> min(n, 12).
+    '''
+    if pd.isna(value):
+        return pd.NA
+    s = str(value).strip()
+    if s in ('Manquant', 'NSP', ''):
+        return pd.NA
+    if s.lower().startswith('36 mois'):  # '36 mois et plus' top-code
+        return 12
+    try:
+        n = int(float(s))
+    except (TypeError, ValueError):
+        return pd.NA
+    return min(max(n, 0), 12)
+
 def Int_t(value):
     '''
     Formatting interview date
-    '''   
+    '''
     if pd.isna(value) or value == 'Manquant':
         return pd.NA
     else:
