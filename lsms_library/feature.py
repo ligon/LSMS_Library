@@ -23,6 +23,25 @@ def _load_global_columns() -> dict[str, dict[str, Any]]:
     return data.get("Columns", {})
 
 
+def _all_known_features() -> set[str]:
+    """Every table any country declares in its data_scheme.yml, plus the
+    runtime-derived tables -- i.e. the set of valid ``Feature(...)`` names.
+    Used to reject typos with a helpful suggestion rather than silently
+    returning an empty frame.
+    """
+    names: set[str] = set(_DERIVED_SOURCE)
+    try:
+        for f in Path(countries_root()).glob("*/_/data_scheme.yml"):
+            try:
+                ds = (load_yaml(f) or {}).get("Data Scheme") or {}
+                names.update(ds.keys() if isinstance(ds, dict) else ds)
+            except Exception:
+                continue
+    except Exception:
+        pass
+    return names
+
+
 def _canonical_index_levels(table_name: str) -> list[str]:
     """Return the canonical index level names for *table_name*.
 
@@ -40,6 +59,36 @@ def _canonical_index_levels(table_name: str) -> list[str]:
     if cleaned.startswith("(") and cleaned.endswith(")"):
         cleaned = cleaned[1:-1]
     return [tok.strip() for tok in cleaned.split(",") if tok.strip()]
+
+
+# Tables whose measure columns are ADDITIVE across a dropped recall/visit level.
+# When collapsing the duplicate index left after dropping that level, these must
+# be SUMMED (not reduced via first(), which undercounts the cross-country total).
+# Motivating case (GH #501): GhanaLSS food_acquired carries a per-visit level
+# (~12 repeated visits over a month); CONTENTS.org states the visits are summed.
+# Keeping first() there silently kept only ~48% of total Quantity.
+_ADDITIVE_MEASURE_COLUMNS = {
+    "food_acquired": ("Quantity", "Expenditure"),
+}
+
+
+def _collapse_duplicate_index(df: pd.DataFrame, table_name: str) -> pd.DataFrame:
+    """Collapse duplicate index tuples left after dropping an extra index level.
+
+    For additive-measure tables (GH #501) sum the additive columns and re-derive
+    any unit-``Price`` column from the summed totals (price is per-unit, NOT
+    additive).  Otherwise keep the first row per group (the historical default).
+    """
+    additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name)
+    grouped = df.groupby(level=list(df.index.names), observed=True)
+    present = [c for c in (additive or ()) if c in df.columns]
+    if not present:
+        return grouped.first()
+    agg = {c: ("sum" if c in present else "first") for c in df.columns}
+    out = grouped.agg(agg)
+    if "Price" in out.columns and {"Expenditure", "Quantity"} <= set(out.columns):
+        out["Price"] = out["Expenditure"] / out["Quantity"].where(out["Quantity"] != 0)
+    return out
 
 
 def _harmonize_country_frame(
@@ -74,22 +123,33 @@ def _harmonize_country_frame(
     # there is at least one extra (keeps single-country reductions intact).
     if canonical_levels and isinstance(df.index, pd.MultiIndex):
         names = list(df.index.names)
-        extra = [n for n in names if n not in canonical_levels]
         have_all_canonical = all(lvl in names for lvl in canonical_levels)
-        if extra and have_all_canonical and len(names) > len(extra):
+        if have_all_canonical:
+            # Put the canonical levels in canonical ORDER (then any extras).  Do
+            # this even when there is no extra level to drop, so that the
+            # positional set_names in __call__ aligns levels by MEANING, not
+            # position: a country whose per-country index is correctly *named*
+            # but *ordered* e.g. [i, t, v] would otherwise have its t/v/i values
+            # scrambled under the canonical [t, v, i] labels (GH #498).
             ordered = [lvl for lvl in canonical_levels if lvl in names] + \
                       [n for n in names if n not in canonical_levels]
-            try:
-                df = df.reorder_levels(ordered)
-            except (ValueError, TypeError):
-                pass
-            warnings.warn(
-                f"{table_name}: dropping extra index level(s) {extra} from "
-                f"{country} before cross-country concat"
-            )
-            df = df.droplevel(extra)
-            if not df.index.is_unique:
-                df = df.groupby(level=list(df.index.names), observed=True).first()
+            if ordered != names:
+                try:
+                    df = df.reorder_levels(ordered)
+                    names = ordered
+                except (ValueError, TypeError):
+                    pass
+            # Remove undeclared extra index levels so every country shares the
+            # same MultiIndex names (keeps single-country reductions intact).
+            extra = [n for n in names if n not in canonical_levels]
+            if extra and len(names) > len(extra):
+                warnings.warn(
+                    f"{table_name}: dropping extra index level(s) {extra} from "
+                    f"{country} before cross-country concat"
+                )
+                df = df.droplevel(extra)
+                if not df.index.is_unique:
+                    df = _collapse_duplicate_index(df, table_name)
 
     return df
 
@@ -220,6 +280,18 @@ class Feature:
                     f"Unknown numeraire {numeraire!r}; available: {conversion_targets()}"
                 )
         effective_trust_cache = trust_cache if trust_cache is not None else self.trust_cache
+        # Reject an unknown / mistyped table name with a helpful error instead of
+        # silently returning an empty DataFrame (e.g. Feature('food_expenditure')).
+        if not self.countries:
+            import difflib
+            sugg = difflib.get_close_matches(
+                self.table_name, sorted(_all_known_features()), n=1
+            )
+            hint = f" Did you mean {sugg[0]!r}?" if sugg else ""
+            raise ValueError(
+                f"Unknown feature {self.table_name!r}: no country declares it and "
+                f"it is not a runtime-derived table.{hint}"
+            )
         targets = countries if countries is not None else self.countries
         frames: list[pd.DataFrame] = []
         canonical_levels = _canonical_index_levels(self.table_name)
