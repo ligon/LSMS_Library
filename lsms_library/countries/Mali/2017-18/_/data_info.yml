@@ -131,8 +131,13 @@ individual_education:
             - exploitation 
             - codeid
     myvars:
-        Educational Attainment:  's1q07'
-    file: 'eaci17_s01p1.dta'
+        # GH #171: s2q06 = "dernière classe fréquentée ... dans le niveau déclaré"
+        # (value-labelled French grade-years), in the section-02 education module.
+        # Was mis-wired to s01p1:s1q07 = a Oui/Non roster question about the mother.
+        Educational Attainment:
+            - s2q06
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
+    file: 'eaci17_s02p1.dta'
 
 housing:
     file: eaci17_s06p1.dta

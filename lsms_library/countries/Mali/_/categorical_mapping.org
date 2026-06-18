@@ -649,10 +649,11 @@
 # 1-6 (6 = complete), Fondamental 2 = grades 7-9 (9 = DEF complete), lycée/technique
 # = grades 10-12 / 1er-4eme professionnel, Supérieur = university.  2014-15 was
 # previously MIS-WIRED to s01q06 ("Code du père dans le ménage" -- a roster line
-# number, not education); corrected to the value-labelled s02q23 (GH #171).  Still
-# unfixed: 2017-18 still points at s1q07 (a Oui/Non question); its real attainment
-# column is s1q08, but that holds unlabelled numeric codes (0-62) needing the EACI
-# 2017 codebook to decode -- left for a follow-up, not guessed.
+# number, not education); corrected to the value-labelled s02q23 (GH #171).  The
+# 2017-18 wave hit the SAME trap (s1q07 = a Oui/Non roster question about the
+# mother, not school); corrected to eaci17_s02p1.dta s2q06 -- value-labelled, the
+# same grade-year vocabulary as 2014-15 but with different accents/spacing (and a
+# source typo "supérierur"), hence the parallel rows below.
 #+name: harmonize_education
 | Original Label                        | Preferred Label              |
 |---------------------------------------+------------------------------|
@@ -680,3 +681,20 @@
 | 2eme année supérieur                  | Bachelor                     |
 | 3eme année supérieur ou plus          | Bachelor                     |
 | Manquant                              | Unknown                      |
+| Préscolaire/ Maternelle               | Pre-primary                  |
+| 1ère année                            | Primary incomplete           |
+| 2ème année                            | Primary incomplete           |
+| 3ème année                            | Primary incomplete           |
+| 4ème année                            | Primary incomplete           |
+| 5ème année                            | Primary incomplete           |
+| 6ème année                            | Primary complete             |
+| 7ème année                            | Lower secondary              |
+| 8ème année                            | Lower secondary              |
+| 9ème année                            | Lower secondary complete     |
+| 10ème année/ 1er professionnel        | Upper secondary              |
+| 11ème année/ 2ème professionnel       | Upper secondary              |
+| 12ème année/ 3ème professionnel       | Upper secondary complete     |
+| 4ème professionnel                    | Vocational/Technical         |
+| 1ère année supérieur                  | Bachelor                     |
+| 2ème année supérieur                  | Bachelor                     |
+| 3ème année supérierur ou plus         | Bachelor                     |

@@ -39,16 +39,18 @@ alongside the label for quantitative analysis.
   S.1-S.6; Mali numeric codes; Ethiopia numbered grades) map onto these coarse
   levels for cross-country comparability.  Grade-level detail, where needed,
   stays in the survey-specific data.
-- *Long-pole countries (status).* The suspected numeric long-poles were almost all
-  **mis-identified columns, not numeric data.**  *Nigeria* and *Tanzania* are text
-  and now harmonized (#489): Tanzania's audit had read `hh_c04` (*age started
-  school*) instead of `hh_c07` (*grade completed*); Nigeria's was `s2aq9` not the
-  `s2q9` literacy y/n.  *Mali 2014-15* was wired to `s01q06` = *"Code du père dans
-  le ménage"* (a roster line number, not education!) — the real, value-labelled
-  column is `s02q23`, now harmonized (#171).  *Ethiopia* (89 labels) and *GhanaLSS*
-  (84 two-system labels) are harmonized too.  The lone genuine residue is *Mali
-  2017-18*, whose real column `s1q08` holds unlabelled numeric codes (0-62) needing
-  the EACI 2017 codebook — flagged in `Mali/_/categorical_mapping.org`, not guessed.
+- *"Numeric long-poles" were all mis-identified columns, not numeric data.*  Every
+  country once flagged as raw-numeric turned out to have value-labelled text under
+  the *correct* column; the audits had simply read the wrong variable.  *Nigeria*
+  and *Tanzania* (#489): Tanzania's audit read `hh_c04` (*age started school*) not
+  `hh_c07` (*grade completed*); Nigeria's was `s2aq9` not the `s2q9` literacy y/n.
+  *Mali* hit a "family roster code" trap in BOTH EACI waves — 2014-15 was wired to
+  `s01q06` = *"Code du père dans le ménage"* (father's line number) and 2017-18 to
+  `s1q07` (a Oui/Non about the mother); the real columns are the value-labelled
+  `s02q23` / `s2q06` in the education modules, now harmonized (#171).  *Ethiopia*
+  (89 labels) and *GhanaLSS* (84 two-system labels, 4 modern waves) are harmonized
+  too.  No numeric residue remains; the GLSS1/2 (1987-89) `Y03I:GRADE` letter codes
+  are text and being wired separately.
 - *Never-schooled handling.* The universal `dropna(how='all')` drops rows whose
   only column (`Educational Attainment`) is NaN, so never-schooled members are
   currently dropped rather than represented as `None`.  Whether to surface them
