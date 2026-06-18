@@ -2,9 +2,21 @@
 
 from __future__ import annotations
 
+import inspect
 import warnings
 from pathlib import Path
 from typing import Any
+
+
+_UNSET = object()
+
+
+def _method_parameters(method: Any) -> set[str]:
+    """Parameter names a generated Country method accepts (for kwarg forwarding)."""
+    try:
+        return set(inspect.signature(method).parameters)
+    except (TypeError, ValueError):
+        return set()
 
 import pandas as pd
 import yaml
@@ -219,6 +231,38 @@ class Feature:
     def __repr__(self) -> str:
         return f"Feature({self.table_name!r})"
 
+    def __getattribute__(self, name: str) -> Any:
+        # Proxy the per-feature docstring from a representative Country method so
+        # `Feature('food_expenditures').__doc__` mirrors
+        # `Country(...).food_expenditures.__doc__` (GH #508).  Built lazily on
+        # first access and cached; the class docstring is left intact.
+        if name == "__doc__":
+            cached = object.__getattribute__(self, "__dict__").get("_proxied_doc", _UNSET)
+            if cached is not _UNSET:
+                return cached
+            doc = object.__getattribute__(self, "_build_proxied_doc")()
+            object.__getattribute__(self, "__dict__")["_proxied_doc"] = doc
+            return doc
+        return object.__getattribute__(self, name)
+
+    def _build_proxied_doc(self) -> str | None:
+        """The underlying ``Country(...).<table>`` docstring, prefixed with the
+        cross-country contract.  Falls back to the class docstring on any error."""
+        try:
+            from . import Country
+            ctries = self.countries
+            if not ctries:
+                return type(self).__doc__
+            base = getattr(Country(ctries[0]), self.table_name).__doc__ or ""
+            return (
+                f"Cross-country Feature for {self.table_name!r} -- mirrors "
+                f"``Country(...).{self.table_name}`` with *waves* -> *countries* "
+                f"(prepends a ``country`` index level; cross-country defaults "
+                f"differ, e.g. ``currency='index'``).\n\n{base}"
+            )
+        except Exception:
+            return type(self).__doc__
+
     @property
     def countries(self) -> list[str]:
         """Countries that declare this table in their data_scheme.yml."""
@@ -237,7 +281,8 @@ class Feature:
         ]
 
     def __call__(self, countries: list[str] | None = None, trust_cache: bool | None = None,
-                 currency: str | None = 'index', numeraire: str | None = None) -> pd.DataFrame:
+                 currency: str | None = 'index', numeraire: str | None = None,
+                 **kwargs: Any) -> pd.DataFrame:
         """Load and concatenate data across countries.
 
         Parameters
@@ -260,6 +305,14 @@ class Feature:
             ``currency`` (the converted frame is labelled with the target).  A
             no-op for non-monetary tables.  See
             :func:`lsms_library.conversion.convert`.
+        **kwargs
+            Any other per-feature option the underlying
+            ``Country(...).<table>`` method accepts (e.g. ``market``,
+            ``labels``, ``units``, ``age_cuts``) is forwarded to each country
+            (GH #508 -- ``Feature`` mirrors the ``Country`` method interface,
+            swapping *waves* -> *countries*).  ``market`` adds an ``m`` index
+            level across countries.  A kwarg a country's method does not accept
+            is ignored with a warning.
 
         Returns
         -------
@@ -303,19 +356,35 @@ class Feature:
         pass_currency = None if use_numeraire else (currency if monetary else None)
         if (use_numeraire is not None or pass_currency == 'index') and canonical_levels:
             canonical_levels = canonical_levels + [CURRENCY_LEVEL]
+        # `market` (forwarded below) adds an `m` index level via
+        # Country._add_market_index; widen the canonical index so the
+        # cross-country concat keeps it (GH #508), as for the currency level.
+        if kwargs.get("market") is not None and canonical_levels and "m" not in canonical_levels:
+            canonical_levels = canonical_levels + ["m"]
 
         for name in targets:
             try:
                 c = Country(name, trust_cache=effective_trust_cache)
                 method = getattr(c, self.table_name)
-                # Pass numeraire/currency only for monetary tables (the generated
-                # method accepts them); preserve the bare call otherwise.
+                # Build the per-country call: currency/numeraire with the monetary
+                # gating above, plus any extra per-feature kwargs (market, labels,
+                # units, age_cuts, ...) this country's generated method actually
+                # accepts -- mirroring the Country(...).<table> interface (GH #508).
+                call_kwargs: dict[str, Any] = {}
                 if use_numeraire is not None:
-                    df = method(numeraire=use_numeraire)
+                    call_kwargs["numeraire"] = use_numeraire
                 elif pass_currency is not None:
-                    df = method(currency=pass_currency)
-                else:
-                    df = method()
+                    call_kwargs["currency"] = pass_currency
+                accepted = _method_parameters(method)
+                for key, val in kwargs.items():
+                    if key in accepted:
+                        call_kwargs[key] = val
+                    elif val is not None:
+                        warnings.warn(
+                            f"{self.table_name}: {name}'s method does not accept "
+                            f"{key!r}; ignored for this country"
+                        )
+                df = method(**call_kwargs)
                 if not isinstance(df, pd.DataFrame) or df.empty:
                     warnings.warn(
                         f"No data for {self.table_name} in {name}"
