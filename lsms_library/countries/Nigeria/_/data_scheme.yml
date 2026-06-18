@@ -54,17 +54,22 @@ Data Scheme:
     materialize: make
 
   individual_education:
-    # Highest educational attainment per household member.  GHS
-    # section 2 (education) is collected only in the post-harvest
-    # round, so each wave maps to a single t = PH quarter (2011Q1,
-    # 2013Q1, 2016Q1, 2019Q1, 2024Q1) -> materialize: make.
-    # Educational Attainment = highest qualification (s2aq9 in W1-W4;
-    # numeric code s2q3 in W5), kept as raw per-wave labels/codes.
-    # W1/W2 coverage is low (~640/310 rows): those waves recorded the
-    # qualification only for members who had left school.
+    # Highest education level completed per household member (GH #171).
+    # Wired on the YAML path (per-wave _/data_info.yml block), mirroring
+    # Uganda -- one post-harvest section-2 file per wave, no script.  Like
+    # the other Nigeria YAML-path tables (shocks, assets), each wave is
+    # tagged on BOTH of its quarter t values (PP + PH), so the section-2
+    # rows appear under both 2010Q3/2011Q1, 2012Q3/2013Q1, etc.
+    # Educational Attainment = highest level completed: s2aq9 in W1-W4
+    # post-harvest (sect2a_harvestw1/w2, sect2_harvestw3/w4), s2q9 in W5
+    # (sect2_harvestw5).  Raw "NN. LEVEL" / cased labels are harmonized
+    # onto the canonical ordinal vocabulary via the row-additive
+    # harmonize_education table (global base + Nigeria delta in
+    # _/categorical_mapping.org).  W1/W2 coverage is low (~640/310 rows):
+    # those post-harvest sections recorded the level only for members
+    # who had left school.
     index: (t, i, pid)
     Educational Attainment: str
-    materialize: make
 
   panel_ids:
     index: (t, i)

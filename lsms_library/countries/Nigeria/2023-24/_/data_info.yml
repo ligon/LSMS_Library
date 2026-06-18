@@ -37,3 +37,19 @@ sample:
                 urban: Urban
                 Urban: Urban
                 URBAN: Urban
+
+individual_education:
+    # GH #171: highest education level completed per household member.
+    # Post-harvest section 2 (sect2_harvestw5) s2q9, full coverage.  The
+    # data_scheme comment's "numeric code s2q3" is superseded: s2q9
+    # carries the labelled "NN. LEVEL" attainment string here too.  Raw
+    # labels mapped onto the canonical ordinal vocabulary via the
+    # row-additive harmonize_education table.
+    file: Post Harvest Wave 5/Household/sect2_harvestw5.dta
+    idxvars:
+        i: hhid
+        pid: indiv
+    myvars:
+        Educational Attainment:
+            - s2q9
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']

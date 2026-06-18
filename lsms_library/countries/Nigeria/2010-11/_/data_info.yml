@@ -70,3 +70,19 @@ shocks:
         HowCoped0: s15aq5a
         HowCoped1: s15aq5b
         HowCoped2: s15aq5c
+
+individual_education:
+    # GH #171: highest education level completed per household member.
+    # Post-harvest section 2 (sect2a_harvestw1) records s2aq9 ("highest
+    # level completed") only for members who had LEFT school -> low
+    # coverage (~640 rows) in W1.  Raw labels mapped onto the canonical
+    # ordinal vocabulary via the row-additive harmonize_education table
+    # (global base + Nigeria delta in _/categorical_mapping.org).
+    file: Post Harvest Wave 1/Household/sect2a_harvestw1.dta
+    idxvars:
+        i: hhid
+        pid: indiv
+    myvars:
+        Educational Attainment:
+            - s2aq9
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
