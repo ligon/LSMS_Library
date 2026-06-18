@@ -23,6 +23,25 @@ def _load_global_columns() -> dict[str, dict[str, Any]]:
     return data.get("Columns", {})
 
 
+def _all_known_features() -> set[str]:
+    """Every table any country declares in its data_scheme.yml, plus the
+    runtime-derived tables -- i.e. the set of valid ``Feature(...)`` names.
+    Used to reject typos with a helpful suggestion rather than silently
+    returning an empty frame.
+    """
+    names: set[str] = set(_DERIVED_SOURCE)
+    try:
+        for f in Path(countries_root()).glob("*/_/data_scheme.yml"):
+            try:
+                ds = (load_yaml(f) or {}).get("Data Scheme") or {}
+                names.update(ds.keys() if isinstance(ds, dict) else ds)
+            except Exception:
+                continue
+    except Exception:
+        pass
+    return names
+
+
 def _canonical_index_levels(table_name: str) -> list[str]:
     """Return the canonical index level names for *table_name*.
 
@@ -261,6 +280,18 @@ class Feature:
                     f"Unknown numeraire {numeraire!r}; available: {conversion_targets()}"
                 )
         effective_trust_cache = trust_cache if trust_cache is not None else self.trust_cache
+        # Reject an unknown / mistyped table name with a helpful error instead of
+        # silently returning an empty DataFrame (e.g. Feature('food_expenditure')).
+        if not self.countries:
+            import difflib
+            sugg = difflib.get_close_matches(
+                self.table_name, sorted(_all_known_features()), n=1
+            )
+            hint = f" Did you mean {sugg[0]!r}?" if sugg else ""
+            raise ValueError(
+                f"Unknown feature {self.table_name!r}: no country declares it and "
+                f"it is not a runtime-derived table.{hint}"
+            )
         targets = countries if countries is not None else self.countries
         frames: list[pd.DataFrame] = []
         canonical_levels = _canonical_index_levels(self.table_name)
