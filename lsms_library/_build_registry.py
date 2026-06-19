@@ -27,7 +27,23 @@ Two genuinely hard sub-problems, each with a red-test in
 - *serialization* -- a default ``repr`` of a referenced object would embed a
   ``0x`` identity address and make the fingerprint non-deterministic.
   :func:`_ser` is an explicit type-dispatch with an else-*reject*; a red-test
-  asserts no ``0x[0-9a-f]+`` appears in any fingerprint part.
+  asserts no `` at 0x`` identity repr appears in any fingerprint part.
+
+Resolution coverage (hardened over five red-team rounds): module globals,
+function-level / cycle-dodge imports, NESTED code objects (comprehensions /
+lambdas / inner defs), callables held in constant containers, ``self.<method>``
+build calls resolved against the module's classes, the out-of-process SCRIPT
+route (every ``_/*.py`` build module's ``lsms_library`` imports), local helper
+modules (``spec_from_file_location``), and ``df_edit`` hooks.
+
+KNOWN RESIDUAL (accepted): a framework build helper reached by purely STRING-
+KEYED dynamic dispatch -- ``getattr(some_module, runtime_string)()`` /
+``importlib.import_module(runtime_string)`` where the name is not a static
+literal -- cannot be resolved statically and is NOT folded.  This is the same
+residual the v0.8.0 design accepts; it is backstopped by the manual
+``LSMS_CACHE_SCHEMA`` lever (folded into ``Wave._input_hash`` /
+``Country._table_cache_hash``), which a maintainer bumps on such an edit, plus
+``LSMS_NO_CACHE`` / ``cache clear`` / the ``make`` backend.
 """
 from __future__ import annotations
 
