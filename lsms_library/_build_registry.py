@@ -79,22 +79,26 @@ def _is_ours(obj) -> bool:
     return m.startswith("lsms_library") and m not in _EXCLUDED_MODULES
 
 
-# Pure hash/freshness MECHANISM callables: they compute or compare the embedded
-# cache hash and never touch DataFrame CONTENT.  Excluded per-callable (they sit
-# in local_tools beside genuine transforms) so folding them does not make the
-# content fingerprint self-referential -- editing the cache layer would
-# otherwise rebuild every cache.  Lets us re-tag Wave.grab_data (whose body IS a
-# content transform: check_adding_t, the >1e99 sentinel filter, the dfs merge,
-# map_index) without dragging the cache layer in.
+# Cache/hash MECHANISM callables: they compute or compare the embedded cache
+# hash and never touch DataFrame CONTENT.  Excluded per-callable so folding them
+# does not make the content fingerprint self-referential -- editing the cache
+# layer would otherwise rebuild every cache, and the Wave._input_hash /
+# Country._table_cache_hash methods would recurse into the fingerprint machinery
+# itself (they CALL build_transforms_fingerprint).  This lets us re-tag
+# Wave.grab_data (body IS a content transform: check_adding_t, the >1e99
+# sentinel filter, the dfs merge, map_index) and resolve self.<method> build
+# calls (column_mapping, formatting_functions) without dragging the cache in.
 # DELIBERATELY NOT excluded: to_parquet -- it mutates content on write
-# (astype/reset_index/set_index/replace), so it is genuine build-path code and
-# must stay versioned.  Each entry below was verified write/hash-only.
+# (astype/reset_index/set_index/replace), so it is genuine build-path code.
+# The local_tools entries were verified write/hash-only.
 _EXCLUDED_CALLABLES = frozenset({
     "lsms_library.local_tools.cache_freshness",
     "lsms_library.local_tools.read_parquet_cache_hash",
     "lsms_library.local_tools.stamp_parquet_hash",
     "lsms_library.local_tools.source_fingerprint",
     "lsms_library.local_tools.cached_file_hash",
+    "lsms_library.country.Wave._input_hash",          # the hash mechanism itself
+    "lsms_library.country.Country._table_cache_hash",  # (would self-reference)
 })
 
 
@@ -120,11 +124,24 @@ def _source(fn) -> str:
     return textwrap.dedent(inspect.getsource(fn))  # dedent: methods are class-indented
 
 
+def _strip_docstrings(tree):
+    # Docstrings are documentation, not build logic -- drop them so a docstring
+    # edit doesn't invalidate, and a stale pasted repr/address in a docstring
+    # (country.py column_mapping has one) can't land in the fingerprint.
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            b = node.body
+            if (b and isinstance(b[0], ast.Expr) and isinstance(getattr(b[0], "value", None), ast.Constant)
+                    and isinstance(b[0].value.value, str)):
+                node.body = b[1:] or [ast.Pass()]
+    return tree
+
+
 def _norm(fn) -> str:
-    # ast.dump drops comments + normalises whitespace, so a comment-only edit
-    # does not invalidate (docstring nodes are still included -- by design).
+    # ast.dump drops comments + normalises whitespace; we also strip docstrings,
+    # so neither a comment nor a docstring edit invalidates -- only logic does.
     try:
-        return ast.dump(ast.parse(_source(fn)))
+        return ast.dump(_strip_docstrings(ast.parse(_source(fn))))
     except (OSError, SyntaxError, TypeError):
         return f"<unsourced {fn.__module__}.{fn.__qualname__}>"
 
@@ -209,6 +226,34 @@ def _all_co_names(code) -> set:
     return names
 
 
+@functools.lru_cache(maxsize=None)
+def _module_classes(module_name: str) -> tuple:
+    mod = importlib.import_module(module_name)
+    return tuple(v for v in vars(mod).values()
+                 if isinstance(v, type) and getattr(v, "__module__", "") == module_name)
+
+
+def _resolve_methods(module_name: str, name: str) -> list:
+    """Resolve a bare attribute name (a ``self.X`` reference) against the methods
+    and properties of the classes defined in ``module_name``.
+
+    ``getattr(module, name)`` only finds module GLOBALS, so a build method called
+    on self -- e.g. ``Wave.column_mapping`` / ``Wave.formatting_functions``, which
+    drive YAML-route extraction -- is otherwise dropped (a stale-cache miss, GH
+    #522).  A name can live on more than one class (``formatting_functions`` on
+    both Wave and Country), so return all build-relevant matches.  The hash
+    machinery (Wave._input_hash, Country._table_cache_hash) is filtered by
+    _is_build_callable / _EXCLUDED_CALLABLES so the walk can't self-reference."""
+    out = []
+    for cls in _module_classes(module_name):
+        m = getattr(cls, name, None)
+        if isinstance(m, property):
+            m = m.fget
+        if _is_build_callable(m):
+            out.append(m)
+    return out
+
+
 def _closure_parts(fn, seen) -> list:
     fn = _unwrap(fn)
     if not hasattr(fn, "__code__"):
@@ -229,8 +274,11 @@ def _closure_parts(fn, seen) -> list:
             if imap is None:
                 imap = _import_map(fn)
             obj = imap.get(name)
-            if obj is None:
-                continue
+        if obj is None:
+            # Not a module global / import -> maybe a self.<method> build call.
+            for m in _resolve_methods(fn.__module__, name):
+                parts += _closure_parts(m, seen)
+            continue
         if _is_build_callable(obj):
             parts += _closure_parts(obj, seen)
         elif isinstance(obj, _CONST_TYPES):

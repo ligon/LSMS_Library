@@ -74,10 +74,29 @@ def test_additive_measure_columns_is_in_the_closure():
 
 
 def test_no_identity_address_leak():
-    """Serialization red-test: a default repr of any referenced object would
-    embed ``0x...`` and make the fingerprint non-deterministic."""
-    leaks = [p[:120] for p in _all_parts() if re.search(r"0x[0-9a-fA-F]+", p)]
+    """Serialization red-test: a default repr of any referenced object embeds an
+    identity address ('<X object at 0x..>' / '<function .. at 0x..>') and makes
+    the fingerprint non-deterministic.  Match the identity-repr signature ' at
+    0x' specifically -- a stray '0x' in a source string literal is deterministic
+    source, not a runtime leak (and docstrings are stripped in _norm anyway)."""
+    leaks = [p[:120] for p in _all_parts() if re.search(r"at 0x[0-9a-fA-F]+", p)]
     assert not leaks, f"identity-repr leak in fingerprint parts: {leaks}"
+
+
+def test_self_method_build_calls_are_versioned():
+    """Round-5 fix (GH #522): a build METHOD called on self from a tagged
+    transform -- Wave.column_mapping / formatting_functions, which drive
+    YAML-route extraction -- is resolved against the module's classes, not just
+    module globals.  Their source must be folded; the hash MECHANISM methods
+    (_input_hash, _table_cache_hash) must NOT (self-reference)."""
+    seen, parts = set(), []
+    for _qn, (fn, _t) in R._BUILD_TRANSFORMS.items():
+        parts += R._closure_parts(fn, seen)
+    assert any("Wave.column_mapping=" in p for p in parts), "column_mapping not versioned"
+    assert any("formatting_functions=" in p for p in parts), "formatting_functions not versioned"
+    leaked_mech = [q for q in seen if q.endswith("._input_hash") or q.endswith("._table_cache_hash")
+                   or "build_transforms_fingerprint" in q or "framework_imports_fingerprint" in q]
+    assert not leaked_mech, f"hash mechanism leaked into the closure (self-reference): {leaked_mech}"
 
 
 def test_fingerprint_is_deterministic():
@@ -231,6 +250,8 @@ def test_excluded_callables_are_write_or_hash_only():
     mutators = ("astype(", "reset_index(", "set_index(", "rename(", "fillna(",
                 "replace(", "dropna(", "groupby(", "merge(", "reindex(")
     for qn in R._EXCLUDED_CALLABLES:
+        if ".local_tools." not in qn:
+            continue  # country hash methods are excluded for self-reference, not content
         fn = getattr(lt, qn.rsplit(".", 1)[1], None)
         assert fn is not None, f"excluded callable {qn} not found"
         src = inspect.getsource(inspect.unwrap(fn))
