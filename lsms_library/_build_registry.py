@@ -256,3 +256,50 @@ def build_transforms_fingerprint(table: str | None = None) -> str:
             continue
         parts += _closure_parts(fn, seen)
     return hashlib.sha256("\x1f".join(sorted(set(parts))).encode()).hexdigest()
+
+
+@functools.lru_cache(maxsize=None)
+def framework_imports_fingerprint(paths: tuple) -> str:
+    """Fingerprint of the lsms_library framework callables imported by the given
+    build-route .py files (the SCRIPT-path ``_/{table}.py`` scripts and the
+    country/wave modules they import) plus their closures.
+
+    The script route runs out-of-process (``make`` invokes the script), so the
+    in-process closure walk from the tagged entry points cannot reach the
+    framework helpers a script uses (e.g. ``conversion_table_matching_global``,
+    ``melt_visit_intervals``, ``get_categorical_mapping``).  Those helpers DO
+    transform content baked into the L2 parquet -- the residual GH #522 hazard
+    for the script route.  A script's ``from lsms_library.X import name`` (any
+    scope) and ``import lsms_library.X [as Y]`` + attribute use are statically
+    resolvable, so we fold their closures in.  Returns "" when no framework
+    import is found.  Memoised per path-tuple (content fixed per process)."""
+    seen: set = set()
+    parts: list = []
+    for path in paths:
+        try:
+            tree = ast.parse(open(path, encoding="utf-8").read())
+        except (OSError, SyntaxError, UnicodeDecodeError, ValueError):
+            continue
+        targets = []          # (module_name, attr)
+        aliases = {}          # local alias -> lsms_library module name
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom) and (node.module or "").startswith("lsms_library"):
+                for a in node.names:
+                    targets.append((node.module, a.name))
+            elif isinstance(node, ast.Import):
+                for a in node.names:
+                    if a.name.startswith("lsms_library"):
+                        aliases[a.asname or a.name] = a.name
+        if aliases:
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name) \
+                        and node.value.id in aliases:
+                    targets.append((aliases[node.value.id], node.attr))
+        for modname, attr in sorted(set(targets)):
+            try:
+                obj = getattr(importlib.import_module(modname), attr, None)
+            except Exception:
+                obj = None
+            if _is_build_callable(obj):
+                parts += _closure_parts(obj, seen)
+    return hashlib.sha256("\x1f".join(sorted(set(parts))).encode()).hexdigest() if parts else ""

@@ -49,7 +49,7 @@ from .local_tools import (
 from .paths import data_root, countries_root
 from .yaml_utils import load_yaml
 from .currency import attach_currency, is_monetary_table
-from ._build_registry import build_transform, build_transforms_fingerprint
+from ._build_registry import build_transform, build_transforms_fingerprint, framework_imports_fingerprint
 import importlib.util
 import hashlib
 import logging
@@ -639,6 +639,19 @@ class Wave:
             for ref in sorted(set(scan_script_data_refs(script))):
                 data_path = Path(os.path.normpath(self.file_path / "Data" / ref))
                 parts.append("sref:" + source_fingerprint(data_path))
+            # Script route runs OUT-OF-PROCESS, so the in-process closure walk
+            # can't reach the framework helpers the script (and the country/wave
+            # modules it imports) use -- e.g. conversion_table_matching_global.
+            # Fold their import closures (GH #522, script route).  Best-effort.
+            try:
+                cmod = self.country.file_path / "_" / f"{self.country.name.lower()}.py"
+                fw = framework_imports_fingerprint((
+                    str(script), str(wave_dir / f"{self.wave_folder}.py"),
+                    str(wave_dir / "mapping.py"), str(cmod)))
+                if fw:
+                    parts.append("fwimp=" + fw)
+            except Exception:
+                pass
 
         # Build-path framework transform CODE (GH #522 / cache step 2): version
         # the @build_transform closure relevant to this table, so editing e.g.
@@ -2250,8 +2263,23 @@ class Country:
                 btf = build_transforms_fingerprint(method_name)
             except Exception:
                 btf = "none"
+            # Script route (country-level concatenator runs out-of-process): fold
+            # the framework helpers it + the country module import (GH #522,
+            # script route).  Gated on the concatenator existing so YAML-path
+            # tables are unaffected.  Per-wave script tables get this via each
+            # wave's _input_hash (composed into wave_hashes).
+            concat = cdir / f"{method_name}.py"
+            fwimp = ""
+            if concat.exists():
+                try:
+                    fwimp = framework_imports_fingerprint((
+                        str(concat), str(cdir / f"{self.name.lower()}.py"),
+                        str(cdir / "mapping.py")))
+                except Exception:
+                    fwimp = ""
             payload = (f"schema={LSMS_CACHE_SCHEMA}\x1ftable={method_name}\x1f"
                        + f"btf={btf}\x1f"
+                       + (f"fwimp={fwimp}\x1f" if fwimp else "")
                        + "\x1f".join(country_parts) + "\x1f"
                        + "\x1f".join(wave_hashes))
             return hashlib.sha256(payload.encode()).hexdigest()

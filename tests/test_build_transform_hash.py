@@ -190,6 +190,35 @@ def test_cache_mechanism_is_excluded_but_to_parquet_is_not():
         "to_parquet mutates content on write and MUST be versioned"
 
 
+def test_script_route_framework_helpers_are_versioned(monkeypatch):
+    """Round-3 fix (GH #522, script route): framework helpers reached only via
+    the OUT-OF-PROCESS script route -- e.g. conversion_table_matching_global,
+    imported by malawi.py and used by Malawi's food_acquired wave scripts -- are
+    invisible to the in-process closure walk.  framework_imports_fingerprint must
+    fold them, so editing the helper changes the wave hash (else: stale content)."""
+    import inspect
+    import lsms_library.local_tools as lt
+    c = lsms_library.country.Country("Malawi")
+    waves = [w for w in c.waves if (c[w].file_path / "_" / "food_acquired.py").exists()]
+    if not waves:
+        pytest.skip("no script-path food_acquired wave for Malawi")
+    w = c[waves[0]]
+    paths = (str(w.file_path / "_" / "food_acquired.py"),
+             str(c.file_path / "_" / "malawi.py"))
+    R.framework_imports_fingerprint.cache_clear()
+    base = R.framework_imports_fingerprint(paths)
+    assert base, "no framework-import closure folded for the Malawi script route"
+    # Editing the framework matcher's source must change the script-route hash.
+    target = inspect.unwrap(lt.conversion_table_matching_global)
+    real = inspect.getsource
+    monkeypatch.setattr(inspect, "getsource",
+                        lambda o: real(o) + "\n_redteam_probe = 1\n" if o is target else real(o))
+    R.framework_imports_fingerprint.cache_clear()
+    R.build_transforms_fingerprint.cache_clear()
+    assert R.framework_imports_fingerprint(paths) != base, \
+        "editing conversion_table_matching_global did not change the script-route fingerprint"
+
+
 def test_excluded_callables_are_write_or_hash_only():
     """Guard the _EXCLUDED_CALLABLES list: every excluded callable must be free
     of content-mutating ops, so the exclusion can never become a stale-cache."""
