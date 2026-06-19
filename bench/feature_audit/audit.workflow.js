@@ -66,7 +66,16 @@ const VERDICT_SCHEMA = {
 }
 
 // ---- prompt builders ------------------------------------------------------
-const ctx = (c) => `Cluster ${c.cluster_id} from a cross-country Feature() audit of the LSMS_Library repo.
+const GUARDRAIL = `HARD GUARDRAIL — this is a SHARED working tree with concurrent work in flight:
+  • NEVER run git that changes state: no checkout / switch / reset / stash / clean / branch / restore / merge.
+    (A prior run switched the branch and removed files from the working tree — do NOT repeat this.)
+  • NEVER edit, create, move, or delete a TRACKED file. Investigation is strictly READ-ONLY.
+  • Do NOT \`cd\` into the repo to run code. Read files by ABSOLUTE path; run every repro from /tmp
+    (\`cd /tmp && <py> -c "…"\`) so the import resolves the installed package, not the cwd.`
+
+const ctx = (c) => `${GUARDRAIL}
+
+Cluster ${c.cluster_id} from a cross-country Feature() audit of the LSMS_Library repo.
   repo: ${REPO}   python: ${PY} (use this exact interpreter)
   check: ${c.check}   severity-class: ${c.severity}   status: ${c.status}   occurrences: ${c.count}
   normalized pattern: ${c.pattern}
@@ -162,7 +171,11 @@ const payload = confirmed.map((t) => ({
   detail: t.cluster.example_detail,
 }))
 
-const filePrompt = `You are the filing step of the Feature() audit. ${confirmed.length} clusters survived
+const filePrompt = `${GUARDRAIL}
+(You MAY write new files under ${RESULTS} — it is gitignored — and run \`gh\`; that does not violate the
+guardrail. You must NOT run any git command or touch any tracked file.)
+
+You are the filing step of the Feature() audit. ${confirmed.length} clusters survived
 red-team as confirmed issues. Here is the payload (JSON):
 
 ${JSON.stringify(payload, null, 2)}
