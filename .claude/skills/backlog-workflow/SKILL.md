@@ -55,12 +55,34 @@ them.**
   tree. Forbid `checkout/switch/reset/stash/clean/branch/restore/merge` and any
   edit to tracked files; read by absolute path; run repros from `/tmp`. (Fix-agents
   edit only inside their own worktree.)
-- **Real verification, not "looks right."** Cold build from `/tmp`
-  (`LSMS_NO_CACHE=1`), targeted tests, and the audit harness re-run as the
-  regression net. For config-only edits, point the live package at the worktree
-  with `LSMS_COUNTRIES_ROOT=<wt>/lsms_library/countries` (no fresh venv needed);
-  for framework-code edits the `.pth` pins to the main checkout, so verify from
-  `cwd=worktree` or build a venv in the worktree.
+- **Real verification, not "looks right" — but use the cache intelligently.**
+  The cost trap (observed 2026-06-19): a blanket `LSMS_NO_CACHE=1` cold build
+  rebuilds every country from `.dta` source, and since `LSMS_NO_CACHE` does
+  **not write** the cache, N parallel agents each pay that from-source cost
+  independently — no shared warming. Match the repro to *where the defect lives*:
+  - **Assembly-time / post-read defects** (cross-country index collapse,
+    unnamed-index, `_join_v_from_sample` 100%-NaN-`v`, kinship/spelling, the
+    `groupby().first()` duplicate-collapse) re-run on *every*
+    `Feature()`/`Country()` call **on top of** the per-country parquets — they
+    never touch the cache. A **warm** call reproduces them identically in
+    seconds; `LSMS_NO_CACHE` buys nothing here. (Most Tier-A and several Tier-B
+    issues are this class.)
+  - **Config edits** (a country's `data_info.yml` / `data_scheme.yml` / `.org`):
+    the v0.8.0 content hash auto-invalidates *just that table for that country*
+    on the next normal read, leaving the other ~39 warm — so edit, then repro
+    **warm**; the touched table rebuilds itself, no global flag. (Or point the
+    live package at a worktree config with
+    `LSMS_COUNTRIES_ROOT=<wt>/lsms_library/countries`, no fresh venv.)
+  - **Framework-code edits to the per-country *build* path** (not assembly) are
+    the one case the hash does **not** cover, so a warm parquet shadows the
+    change — here you genuinely need a rebuild, but scope it with
+    `lsms-library cache clear --country X` (one country) instead of the global
+    `LSMS_NO_CACHE`. The `.pth` pins imports to the main checkout, so verify from
+    `cwd=worktree` or a worktree venv. Same caveat for **script-path wave
+    parquets** (Nigeria PP/PH, Tanzania multi-round), where `LSMS_NO_CACHE` is
+    "soft" (still read from disk) — clear the country instead.
+  - Then re-run `scan.py` as the cross-country regression net (itself a warm
+    read once the suspect tables are built once and shared).
 - **Red-team before PR.** A fix-agent's patch gets an independent skeptic: does it
   resolve the issue, *and* leave the healthy countries / data intact?
 - **PRs for human merge — never auto-merge.** Open a PR per fixed issue; a human
@@ -71,12 +93,17 @@ them.**
   coarse for `runtime_warning`-class findings and causes false dedup-skips).
 
 ## Gotchas seen in practice
-- **Stale local cache masquerades as a bug.** `cluster_features` "duplicates" were
-  a stale `var/` parquet; the build was already correct and CI (which rebuilds)
-  was green. Always confirm a failure reproduces on a **cold** build before
-  "fixing" it. The v0.8.0 cache hash versions inputs + per-country scripts but
-  **not framework transform code**, so a code-only harmonisation change can leave
-  hash-valid stale parquets (see #522).
+- **Stale local cache masquerades as a bug — but the v0.8.0 hash mostly handles
+  it now.** `cluster_features` "duplicates" were once a stale `var/` parquet (the
+  build was already correct; CI, which rebuilds, was green). The v0.8.0 content
+  hash now auto-invalidates on changes to inputs + per-country scripts, so a warm
+  read of a **config-covered** table is trustworthy — you do *not* need a blanket
+  cold build to trust it. The residual blind spot is **framework transform code**,
+  which the hash does NOT version (only the manual `LSMS_CACHE_SCHEMA` token) — a
+  code-only harmonisation change can leave hash-valid stale parquets (see #522).
+  So: trust warm for config/assembly defects; force a *scoped* rebuild
+  (`cache clear --country X`) only when validating a framework change to a
+  per-country build path.
 - **The Workflow runtime delivers `args` as a JSON *string*.** Parse it
   (`typeof args === 'string' ? JSON.parse(args) : args`) or `args.x` silently
   resolves to `String.prototype.x`. Pass bulk data (the issue/cluster list) via a
