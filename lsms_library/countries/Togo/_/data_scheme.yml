@@ -209,9 +209,9 @@ Data Scheme:
     farm_work: bool
     SOB_work: bool
     wage_work: bool
-    farm_hrs: float
-    SB_hrs: float
-    wage_hrs: float
-    Industry: str
+    farm_hrs: {type: float, optional: true}
+    SB_hrs: {type: float, optional: true}
+    wage_hrs: {type: float, optional: true}
+    Industry: {type: str, optional: true}
     working_age: bool
     materialize: make
