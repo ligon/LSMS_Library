@@ -86,3 +86,6 @@ lsms_library/countries/*/var/*
 # Other ignored patterns
 .coder-session/
 .gitnexus
+
+# Feature-audit run artifacts (results.jsonl / scan.log / memos)
+bench/feature_audit/results/
