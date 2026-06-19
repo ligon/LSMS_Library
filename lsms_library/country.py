@@ -836,7 +836,6 @@ class Wave:
     def mapping(self) -> dict[str, Any]:
         return {**self.categorical_mapping, **self.formatting_functions}
 
-    @build_transform()
     def grab_data(self, request: str) -> pd.DataFrame:
         '''
         get data from the data file

@@ -36,7 +36,9 @@ import functools
 import hashlib
 import importlib
 import inspect
+import sys
 import textwrap
+import types
 from typing import Callable
 
 # qualname -> (callable, tables).  ``tables == ()`` means "every table".
@@ -61,8 +63,20 @@ def registered_entry_points() -> frozenset:
     return frozenset(_BUILD_TRANSFORMS)
 
 
+# Modules excluded from the closure recursion: data ACCESS (DVC / S3 fetch +
+# credentials) and path/location code.  Neither transforms parquet *content* --
+# the source bytes are already versioned by the DVC sidecar md5
+# (source_fingerprint) and the config by the per-table hashes -- so descending
+# into them is pure over-invalidation (an S3-credential or path-layout edit
+# would needlessly rebuild every cache).  Transform code in local_tools
+# (df_data_grabber, format_id, get_dataframe, ...) is NOT excluded.  Keep this
+# set tiny and access-only; a transform must never live here.
+_EXCLUDED_MODULES = frozenset({"lsms_library.data_access", "lsms_library.paths"})
+
+
 def _is_ours(obj) -> bool:
-    return (getattr(obj, "__module__", "") or "").startswith("lsms_library")
+    m = getattr(obj, "__module__", "") or ""
+    return m.startswith("lsms_library") and m not in _EXCLUDED_MODULES
 
 
 def _unwrap(fn):
@@ -132,9 +146,12 @@ def _ser(obj, seen, parts) -> str:
             f"{k!r}:{_ser(v, seen, parts)}"
             for k, v in sorted(obj.items(), key=lambda kv: repr(kv[0]))
         ) + "}"
-    if isinstance(obj, (list, tuple, set, frozenset)):
-        xs = obj if isinstance(obj, (list, tuple)) else sorted(obj, key=repr)
-        return type(obj).__name__ + "[" + ",".join(_ser(v, seen, parts) for v in xs) + "]"
+    if isinstance(obj, (list, tuple)):
+        return type(obj).__name__ + "[" + ",".join(_ser(v, seen, parts) for v in obj) + "]"
+    if isinstance(obj, (set, frozenset)):
+        # Sort by SERIALISED form, not repr(obj): repr of a set element is
+        # PYTHONHASHSEED-sensitive when the element is itself a set/frozenset.
+        return type(obj).__name__ + "[" + ",".join(sorted(_ser(v, seen, parts) for v in obj)) + "]"
     raise TypeError(
         f"build constant of un-serialisable type {type(obj).__name__!r}; add a "
         f"case to lsms_library._build_registry._ser rather than leak an identity repr"
@@ -143,6 +160,24 @@ def _ser(obj, seen, parts) -> str:
 
 # Types we know how to fold into the fingerprint as a referenced constant.
 _CONST_TYPES = (dict, list, tuple, set, frozenset, str, int, float, bool)
+
+
+def _all_co_names(code) -> set:
+    """Every global/attribute name referenced by ``code`` AND its nested code
+    objects (comprehensions, lambdas, nested defs).
+
+    CPython keeps names referenced inside a nested scope out of the enclosing
+    function's ``co_names`` -- so a callable used only from an inner helper
+    (e.g. ``df_data_grabber``, called only from ``grab_data``'s nested
+    ``get_data``) would otherwise be invisible to the walk: a silent
+    under-invalidation (stale cache, GH #522).  Recursing ``co_consts`` closes
+    that.  (``co_freevars`` are closure cells, not global refs, so excluded.)
+    """
+    names = set(code.co_names)
+    for const in code.co_consts:
+        if isinstance(const, types.CodeType):
+            names |= _all_co_names(const)
+    return names
 
 
 def _closure_parts(fn, seen) -> list:
@@ -156,7 +191,10 @@ def _closure_parts(fn, seen) -> list:
     parts = [qn + "=" + _norm(fn)]
     mod = importlib.import_module(fn.__module__)
     imap = None  # parsed lazily, only if getattr misses
-    for name in fn.__code__.co_names:
+    # sorted(): _all_co_names is a set, so iteration order must be pinned.
+    for name in sorted(_all_co_names(fn.__code__)):
+        if name.startswith("__") and name.endswith("__"):
+            continue                    # dunder (e.g. __file__) -> import metadata / abs path: non-deterministic
         obj = getattr(mod, name, None)
         if obj is None:
             if imap is None:
@@ -181,7 +219,9 @@ def build_transforms_fingerprint(table: str | None = None) -> str:
     :func:`build_transforms_fingerprint.cache_clear` in tests that re-tag.
     """
     seen: set = set()
-    parts: list = []
+    # ast.dump's output format drifts across Python minor versions, so pin it:
+    # a 3.11 -> 3.12 move then invalidates uniformly rather than silently.
+    parts: list = [f"py={sys.version_info.major}.{sys.version_info.minor}"]
     for _qn, (fn, tables) in sorted(_BUILD_TRANSFORMS.items()):
         if table is not None and tables and table not in tables:
             continue

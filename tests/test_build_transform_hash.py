@@ -13,6 +13,7 @@ Plus drift (the tagged-entry-point set is pinned), determinism, per-table
 scoping, the no-wrapper tag invariant, and that the fingerprint is actually
 folded into both hash methods.
 """
+import os
 import re
 
 import pytest
@@ -29,7 +30,7 @@ EXPECTED_ENTRY_POINTS = {
     "lsms_library.build_transforms.fill_v_with_coord_bin",
     "lsms_library.build_transforms.apply_derived",
     "lsms_library.country._normalize_dataframe_index",
-    "lsms_library.country.Wave.grab_data",
+    "lsms_library.local_tools.df_data_grabber",
 }
 
 
@@ -56,7 +57,7 @@ def test_no_unresolved_build_imports():
     unresolved = []
     for qn, (fn, _t) in R._BUILD_TRANSFORMS.items():
         fn = R._unwrap(fn)
-        co = set(fn.__code__.co_names)
+        co = R._all_co_names(fn.__code__)   # nested scopes too (the #522-class fix)
         for name, obj in R._import_map(fn).items():
             if name in co and obj is None:
                 unresolved.append(f"{qn} -> {name}")
@@ -127,3 +128,75 @@ def test_fingerprint_is_wired_into_table_cache_hash(country_name, monkeypatch):
                         lambda table=None: "PERTURBED")
     perturbed = c._table_cache_hash("food_acquired", waves)
     assert perturbed != base, "build-transform fingerprint is NOT folded into _table_cache_hash"
+
+
+@pytest.mark.parametrize("country_name", ["Uganda"])
+def test_fingerprint_is_wired_into_input_hash(country_name, monkeypatch):
+    """Wave-level fold (red-team #5): perturbing the fingerprint must change
+    Wave._input_hash, else a refactor could drop the wave-level fold and serve
+    stale L2-wave parquets with every other test still green."""
+    c = lsms_library.country.Country(country_name)
+    w = c[c.waves[0]]
+    base = w._input_hash("food_acquired")
+    if base is None:
+        pytest.skip("wave input hash not introspectable")
+    monkeypatch.setattr(lsms_library.country, "build_transforms_fingerprint",
+                        lambda table=None: "PERTURBED")
+    assert w._input_hash("food_acquired") != base, \
+        "build-transform fingerprint is NOT folded into Wave._input_hash"
+
+
+def test_nested_scope_references_are_walked():
+    """Red-team #1/#2 regression: a callable referenced ONLY from a nested
+    helper (comprehension/lambda/inner def) must appear in _all_co_names.
+    Without co_consts recursion, df_data_grabber-class deps vanish -> stale cache."""
+    def outer():
+        def inner():
+            return _SENTINEL_NESTED_NAME()  # referenced only here
+        return [inner() for _ in range(_SENTINEL_NESTED_NAME and 1)]
+    names = R._all_co_names(outer.__code__)
+    assert "_SENTINEL_NESTED_NAME" in names, "nested-scope name not captured by _all_co_names"
+
+
+def test_df_data_grabber_is_versioned():
+    """Red-team #6 positive-coverage: the core extraction transform's SOURCE
+    must be a folded closure part (so editing it invalidates)."""
+    seen, parts = set(), []
+    for _qn, (fn, _t) in R._BUILD_TRANSFORMS.items():
+        parts += R._closure_parts(fn, seen)
+    joined = "\x1f".join(parts)
+    assert "local_tools.df_data_grabber=" in joined, \
+        "df_data_grabber not folded into the closure -> extraction edits would not invalidate"
+
+
+def test_no_absolute_path_or_dunder_leak():
+    """Red-team #3: __file__ resolves to the package's ABSOLUTE path; folding it
+    as a constant makes the hash machine/install-dependent.  Assert the package's
+    absolute path never appears in any part, and no dunder name=value constant
+    leaks.  (AST *source* dumps legitimately contain the literal string
+    'lsms_library' -- that is source, not a runtime path, so we match the real
+    absolute install path instead.)"""
+    seen, parts = set(), []
+    for _qn, (fn, _t) in R._BUILD_TRANSFORMS.items():
+        parts += R._closure_parts(fn, seen)
+    pkg_abs = os.path.dirname(lsms_library.__file__)        # /.../lsms_library (runtime, machine-specific)
+    bad = [p[:120] for p in parts if pkg_abs in p or re.search(r"\.__\w+__=", p)]
+    assert not bad, f"absolute-path / dunder constant leak: {bad}"
+
+
+def test_fingerprint_stable_across_pythonhashseed():
+    """Red-team #7: set/dict ordering must not depend on PYTHONHASHSEED.  Compute
+    the fingerprint in two subprocesses with different seeds and compare."""
+    import os
+    import subprocess
+    import sys
+    code = ("import lsms_library.country, lsms_library.build_transforms, lsms_library.local_tools;"
+            "from lsms_library import _build_registry as R;"
+            "print(R.build_transforms_fingerprint('food_acquired'))")
+    outs = []
+    for seed in ("0", "1"):
+        env = dict(os.environ, PYTHONHASHSEED=seed)
+        r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, env=env)
+        assert r.returncode == 0, r.stderr
+        outs.append(r.stdout.strip())
+    assert outs[0] == outs[1], f"fingerprint depends on PYTHONHASHSEED: {outs}"
