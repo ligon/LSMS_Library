@@ -305,6 +305,48 @@ def anthropometry(df):
     return flat.set_index(idx)
 
 
+def plot_features(df):
+    """Resolve (i, plot_id) collisions in ERHS land1all.tab (GH #513).
+
+    land1all.tab is non-unique on (q1c, q5, q21_1).  Of the 15 collision
+    groups carrying a non-null plot_id, 12 pair a placeholder "land TOTAL"
+    row (zero/NaN Area, all plot attributes NaN) with a real plot that
+    reuses its q21_1; under the downstream ``groupby().first()`` the
+    placeholder can sort first and SHADOW the genuine plot, leaking Area=0
+    into the API.  The remaining ~2 groups are genuinely-distinct plots
+    that happen to reuse a plot_id (e.g. HH Shumsha_301 plots 1 & 2, areas
+    1.00 vs 0.25 ha).
+
+    Fix: drop the zero-area attribute-less placeholders (the documented
+    "land TOTAL" residual), then cumcount-suffix any residual
+    genuinely-distinct collisions -- Albania precedent (albania.py:287-295)
+    -- so each physical plot keeps its own row instead of being dropped.
+    Single-country, single-wave; no canonical-index change (suffixes are
+    just ``_2`` on the few real collisions).
+    """
+    flat = df.reset_index()
+    area = pd.to_numeric(flat['Area'], errors='coerce')
+    attr_cols = [c for c in ('Tenure', 'SoilType', 'Irrigated')
+                 if c in flat.columns]
+    attrs_all_nan = (flat[attr_cols].isna().all(axis=1)
+                     if attr_cols else pd.Series(True, index=flat.index))
+    placeholder = (area.isna() | (area == 0)) & attrs_all_nan
+    flat = flat[~placeholder].copy()
+
+    key = [c for c in ('i', 'plot_id') if c in flat.columns]
+    if key and flat.duplicated(key, keep=False).any():
+        # Larger plot keeps the bare plot_id; smaller distinct plot -> _2.
+        flat = flat.sort_values('Area', ascending=False, na_position='last')
+        n = flat.groupby(key, dropna=False).cumcount()
+        extra = n > 0
+        flat.loc[extra, 'plot_id'] = (
+            flat.loc[extra, 'plot_id'].astype('string')
+            + '_' + (n[extra] + 1).astype('string'))
+
+    idx = [c for c in ('t', 'i', 'plot_id') if c in flat.columns]
+    return flat.set_index(idx)
+
+
 _CROP_LABELS = {
     'wtef': 'White Teff', 'btef': 'Black Teff', 'barl': 'Barley',
     'wht': 'Wheat', 'maiz': 'Maize', 'sorg': 'Sorghum',
