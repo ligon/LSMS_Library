@@ -1,0 +1,212 @@
+#+TITLE: Versioning Build-Path Transform Code in the L2 Cache Hash — Step 2 Design
+#+filetags: skunkworks cache lsms_library design
+#+DATE: <2026-06-19 Fri>
+#+AUTHOR: Ethan Ligon + Sue (Claude Opus 4.8)
+
+* Purpose
+
+Close the last gap in the v0.8.0 content-hash cache layer: build-path
+*transform code* is not versioned, so editing it can leave a hash-valid
+but stale L2 parquet (the GH #522 blind spot).  This is the *step 2*
+follow-up to PR #534 (which made the build/read boundary structural by
+moving the framework build-path transforms into =build_transforms.py=).
+
+This document is a design, not an execution log.  The implementation is
+deferred to a fresh session that can start from the
+[[#implementation-checklist][checklist]] below.
+
+* Background: what the hash covers today (v0.8.0)
+
+The L2 cache embeds a content hash in each parquet's pyarrow schema
+metadata (=lsms_cache_hash=).  =Wave._input_hash= and
+=Country._table_cache_hash= compose it from:
+
+- =LSMS_CACHE_SCHEMA= (a manual, library-wide version lever);
+- the wave =data_info.yml= and country =data_scheme.yml=;
+- the wave module(s) (={wave_folder}.py=, =mapping.py=), the country
+  module ({country}.py, e.g. =uganda.py=) and country =mapping.py=;
+- the country-level concatenator script ={country}/_/{table}.py= and the
+  script-path wave scripts ={wave}/_/{table}.py=;
+- the country =Makefile= and the build-time =*.org= inputs;
+- the DVC sidecar md5 of each declared source (=.dta= never hashed).
+
+The deliberate exclusions are *read-path* transforms (kinship, spellings,
+categorical maps, =_join_v_from_sample=): they re-run on every read and
+never touch the cached parquet, so they must NOT invalidate it.
+
+* The gap
+
+The hash versions build-path /inputs/ (config) and /per-country scripts/,
+but not the *framework transform code* those scripts import and call.  Edit
+the body of a shared framework build-path function and nothing in the hash
+changes — the warm parquet stays valid and is served stale.
+
+PR #534 took the first step: it isolated the framework build-path transforms
+into =build_transforms.py= so a step-2 change could fold /that module's/
+source into the hash.  The #534 review (Ligon, 2026-06-19) then established
+the decisive refinement:
+
+#+begin_quote
+The build-path surface is NOT confined to one module.  Build-path code also
+lives in =country.py= — and a =build_transforms.py=-only hash misses it.
+#+end_quote
+
+** Evidence: build-path code in country.py
+
+=_normalize_dataframe_index= (=country.py=) has four call sites:
+
+| Site            | Context                         | Phase                |
+|-----------------+---------------------------------+----------------------|
+| =country.py:2056= | inside =_finalize_result=         | read (post-write)    |
+| =country.py:2610= | inside =load_from_waves= (per-wave) | *build* (pre-parquet) |
+| =country.py:2824= | stage loading, before =to_parquet= | *build* (pre-parquet) |
+| =country.py:2878= | cache-load path                 | *build* (pre-parquet) |
+
+The consequential work is the duplicate-collapse at =country.py:4049-4068=
+(=if not df.index.is_unique: ... groupby(...).first()=).  At the build sites
+this collapse is baked into the parquet; at the read site the cached data is
+already unique, so the block is a *no-op*.  Its meaningful effect is therefore
+build-time, even though it is also reachable on the read path.
+
+Concrete proof the gap bites: PR #533 (the #514 fix) flips that collapse from
+=first()= to a sum for =food_acquired=.  Under a =build_transforms.py=-only
+hash, a warm Mali parquet built with the old =first()= would stay hash-valid
+and never rebuild → stale data.  (That is precisely why #514 needed
+=LSMS_NO_CACHE= to verify and an =LSMS_CACHE_SCHEMA= bump to ship safely.)
+
+=Wave.grab_data= (=country.py=) is the same class of straddler: it both reads
+its own L2-wave parquet (read short-circuit) and, on a miss, extracts +
+=apply_derived= + writes the parquet (build).
+
+** Why module-boundary hashing is insufficient
+
+"One module = the hashable build unit" holds for =transformations.py= (now
+purely read-path) and =build_transforms.py= (purely build-path), but breaks
+for =country.py=, where build-path and read-path code share the =Country= /
+=Wave= classes.  We cannot hash all of =country.py= without invalidating every
+parquet on every read-path edit — which defeats the warm cache.  We need a
+hash that selects *specific functions across modules*.
+
+* Proposed design: a cross-module =@build_transform= registry
+
+Tag build-path functions wherever they live, and fold the source text of every
+registered member into the cache hash.
+
+** Mechanics
+
+1. A small leaf module (e.g. =lsms_library/_build_registry.py=, importing
+   nothing from the package) defines:
+   #+begin_src python
+   _BUILD_TRANSFORMS = {}  # qualname -> callable
+
+   def build_transform(fn):
+       """Mark fn as build-path: its output is baked into the cached L2
+       parquet, so its source is versioned by the cache hash."""
+       _BUILD_TRANSFORMS[f"{fn.__module__}.{fn.__qualname__}"] = fn
+       return fn
+
+   def build_transforms_fingerprint() -> str:
+       import hashlib, inspect
+       parts = []
+       for qn in sorted(_BUILD_TRANSFORMS):
+           parts.append(qn + "=" + inspect.getsource(_BUILD_TRANSFORMS[qn]))
+       return hashlib.sha256("\x1f".join(parts).encode()).hexdigest()
+   #+end_src
+2. Decorate the build-path functions:
+   - =build_transforms.py=: =food_acquired_to_canonical=,
+     =_finalize_canonical_food_acquired=, =fill_v_with_coord_bin=,
+     =apply_derived=;
+   - =country.py=: =_normalize_dataframe_index=, =Wave.grab_data=.
+3. Fold =build_transforms_fingerprint()= into =Country._table_cache_hash= and
+   =Wave._input_hash= (one more =parts.append("btf=" + ...)= term).
+4. Demote =LSMS_CACHE_SCHEMA= from a correctness lever to a belt-and-suspenders
+   backstop (it still exists; it just stops being the only thing standing
+   between a build-code edit and stale data).
+
+** Why this shape
+
+- *Spans modules* — the registry is keyed by qualname, not file.
+- *Self-maintaining* — a new build-path transform is versioned the moment it
+  is decorated; a future author who forgets the decorator is the only failure
+  mode, and a lint test (below) guards it.  This subsumes the #534 "marker
+  comment" minor.
+- *No relocation* — nothing else moves into =build_transforms.py=, so the
+  forward-cycle risk (a build transform needing a =transformations.py= helper)
+  never arises.  =_normalize_dataframe_index= stays where it is, entangled with
+  =_aggregate_wave_data=, and is simply tagged.
+
+** The over-invalidation trade-off (decide at implementation time)
+
+| Option | Hash | Cost | Verdict |
+|--------+------+------+---------|
+| *Whole registry per table* (simple) | every table folds in the full =build_transforms_fingerprint()= | editing =food_acquired_to_canonical= over-invalidates ALL tables | recommended first cut — safe; matches today's =LSMS_CACHE_SCHEMA= coarseness; build transforms are edited rarely |
+| *Per-table transform set* (precise) | each table folds in only the transforms its build actually calls | needs a static or runtime map table→transforms | defer; the simple cut is correct, just occasionally over-eager |
+
+Start simple.  The warm-cache fast path is unaffected for the common case
+(no build-transform edit), and a rare over-rebuild is strictly safer than a
+missed one.
+
+* Alternatives considered (and rejected)
+
+- *Relocate =_normalize_dataframe_index= into =build_transforms.py=.*  Rejected:
+  it is entangled with =_aggregate_wave_data= and is dual-call (also read-path);
+  extracting it cleanly is a much larger, riskier change than tagging it.
+- *Curated explicit list* (a module-level =[(module, qualname), ...]= hashed via
+  =getsource=).  Functionally equivalent to the registry but hand-maintained —
+  re-opens the "a new transform silently isn't covered" risk unless paired with
+  the same lint test, in which case the decorator is strictly nicer.
+- *Hash all of =country.py= / =transformations.py=.*  Rejected: invalidates every
+  parquet on every read-path edit; defeats the warm cache — the exact failure
+  the v0.8.0 design was built to avoid.
+
+* Risks / open questions
+
+- =inspect.getsource= requires the =.py= source on disk.  True for editable
+  installs and the in-tree =.venv=; verify for a built wheel (source is shipped,
+  but confirm) — fall back to =LSMS_CACHE_SCHEMA= if unavailable.
+- Decorating a method (=Wave.grab_data=): =getsource= on the function object works;
+  ensure the decorator returns the function unchanged (no wrapper) so binding and
+  call semantics are identical — this must remain a *no-behavior-change* tag.
+- Source-text hashing is coarse: a comment or whitespace edit inside a tagged
+  function invalidates.  Acceptable (same coarseness as the existing whole-file
+  config hashing) and rare.
+- Script-path /wave/ transforms are already covered by =_input_hash= (the script
+  text is hashed).  This design is only about *framework* build-path code; the
+  two layers compose.
+
+* A guard against registry drift
+
+Add a test that asserts the set of =@build_transform=-decorated functions equals
+a checked-in expected set (or at least that the known build-path functions are
+all tagged).  This converts "someone forgot the decorator" from a silent
+stale-cache bug into a red test.
+
+* Implementation checklist
+:PROPERTIES:
+:CUSTOM_ID: implementation-checklist
+:END:
+
+1. Add =lsms_library/_build_registry.py= (=build_transform= decorator +
+   =build_transforms_fingerprint=).
+2. Decorate the 4 funcs in =build_transforms.py= and
+   =_normalize_dataframe_index= / =Wave.grab_data= in =country.py=
+   (run =gitnexus_impact= on each first per CLAUDE.md).
+3. Fold the fingerprint into =Country._table_cache_hash= and
+   =Wave._input_hash=; update their docstrings.
+4. Demote =LSMS_CACHE_SCHEMA= to a backstop in =local_tools= (keep it; restate
+   its role in CLAUDE.md's cache section).
+5. Add the registry-drift guard test.
+6. Verify: edit =_normalize_dataframe_index= (or apply #533) and confirm a warm
+   Mali =food_acquired= read now auto-rebuilds (no =LSMS_NO_CACHE= needed); confirm
+   a read-path edit (e.g. a kinship label) does NOT invalidate.
+7. Update the CLAUDE.md cache section to describe the build-transform fingerprint.
+
+* References
+
+- PR #534 — step 1 (build/read split: =build_transforms.py=).
+- PR #531 — the cache-aware verification discussion that started this.
+- PR #533 / GH #514 — the =_normalize_dataframe_index= collapse-policy change that
+  proves the gap.
+- GH #522 — the framework-transform-code cache blind spot.
+- GH #537 — =validate_acquisition_source= dormancy (surfaced alongside #534).
+- =SkunkWorks/dvc_object_management.org= — the v0.7.0/v0.8.0 cache design lineage.
