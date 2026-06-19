@@ -639,19 +639,26 @@ class Wave:
             for ref in sorted(set(scan_script_data_refs(script))):
                 data_path = Path(os.path.normpath(self.file_path / "Data" / ref))
                 parts.append("sref:" + source_fingerprint(data_path))
-            # Script route runs OUT-OF-PROCESS, so the in-process closure walk
-            # can't reach the framework helpers the script (and the country/wave
-            # modules it imports) use -- e.g. conversion_table_matching_global.
-            # Fold their import closures (GH #522, script route).  Best-effort.
-            try:
-                cmod = self.country.file_path / "_" / f"{self.country.name.lower()}.py"
-                fw = framework_imports_fingerprint((
-                    str(script), str(wave_dir / f"{self.wave_folder}.py"),
-                    str(wave_dir / "mapping.py"), str(cmod)))
-                if fw:
-                    parts.append("fwimp=" + fw)
-            except Exception:
-                pass
+
+        # Framework helpers reached via DYNAMIC dispatch -- out-of-process script
+        # builds, spec_from_file_location local helpers (Nigeria _age_helpers ->
+        # age_handler), and the df_edit hook dispatched by name (Malawi
+        # interview_date -> melt_visit_intervals) -- are invisible to the
+        # in-process closure walk.  Fold the lsms_library-import closures of EVERY
+        # build module in the wave's and country's _/ dirs, covering any local
+        # helper on BOTH routes (GH #522).  Best-effort; never raises.
+        try:
+            cdir = self.country.file_path / "_"
+            wave_pys = tuple(sorted(str(p) for p in wave_dir.glob("*.py"))) if wave_dir.is_dir() else ()
+            country_pys = tuple(sorted(str(p) for p in cdir.glob("*.py"))) if cdir.is_dir() else ()
+            # Two calls so the country tuple memoises ONCE across all waves
+            # (the combined tuple differs per wave -> would re-parse country _/).
+            fw_w = framework_imports_fingerprint(wave_pys)
+            fw_c = framework_imports_fingerprint(country_pys)
+            if fw_w or fw_c:
+                parts.append(f"fwimp={fw_w}:{fw_c}")
+        except Exception:
+            pass
 
         # Build-path framework transform CODE (GH #522 / cache step 2): version
         # the @build_transform closure relevant to this table, so editing e.g.
@@ -2263,20 +2270,16 @@ class Country:
                 btf = build_transforms_fingerprint(method_name)
             except Exception:
                 btf = "none"
-            # Script route (country-level concatenator runs out-of-process): fold
-            # the framework helpers it + the country module import (GH #522,
-            # script route).  Gated on the concatenator existing so YAML-path
-            # tables are unaffected.  Per-wave script tables get this via each
-            # wave's _input_hash (composed into wave_hashes).
-            concat = cdir / f"{method_name}.py"
-            fwimp = ""
-            if concat.exists():
-                try:
-                    fwimp = framework_imports_fingerprint((
-                        str(concat), str(cdir / f"{self.name.lower()}.py"),
-                        str(cdir / "mapping.py")))
-                except Exception:
-                    fwimp = ""
+            # Country-level build modules run framework helpers via dynamic
+            # dispatch (concatenator scripts, df_edit hooks in the country
+            # module).  Fold the lsms_library-import closures of every build
+            # module in the country _/ dir (GH #522, both routes).  Per-wave
+            # script tables also get this via each wave's _input_hash.
+            try:
+                country_pys = tuple(sorted(str(p) for p in cdir.glob("*.py"))) if cdir.is_dir() else ()
+                fwimp = framework_imports_fingerprint(country_pys)
+            except Exception:
+                fwimp = ""
             payload = (f"schema={LSMS_CACHE_SCHEMA}\x1ftable={method_name}\x1f"
                        + f"btf={btf}\x1f"
                        + (f"fwimp={fwimp}\x1f" if fwimp else "")

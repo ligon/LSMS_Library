@@ -190,33 +190,37 @@ def test_cache_mechanism_is_excluded_but_to_parquet_is_not():
         "to_parquet mutates content on write and MUST be versioned"
 
 
-def test_script_route_framework_helpers_are_versioned(monkeypatch):
-    """Round-3 fix (GH #522, script route): framework helpers reached only via
-    the OUT-OF-PROCESS script route -- e.g. conversion_table_matching_global,
-    imported by malawi.py and used by Malawi's food_acquired wave scripts -- are
-    invisible to the in-process closure walk.  framework_imports_fingerprint must
-    fold them, so editing the helper changes the wave hash (else: stale content)."""
+@pytest.mark.parametrize("country,table,helper", [
+    # script route, framework helper imported by the country module:
+    ("Malawi", "food_acquired", "conversion_table_matching_global"),
+    # script route, framework helper reached via a spec_from_file_location LOCAL
+    # helper (Nigeria _age_helpers.py -> age_handler) -- round-4 finding:
+    ("Nigeria", "household_roster", "age_handler"),
+    # YAML route, framework helper reached via a df_edit hook in the country
+    # module (Malawi interview_date -> melt_visit_intervals) -- round-4 finding:
+    ("Malawi", "interview_date", "melt_visit_intervals"),
+])
+def test_dynamically_dispatched_framework_helpers_are_versioned(monkeypatch, country, table, helper):
+    """GH #522, dynamic-dispatch routes (rounds 3-4): a framework content helper
+    reached out-of-process / via a local helper module / via a df_edit hook must
+    still invalidate its table's L2 hash when edited.  We fold the lsms_library
+    closures of every build module in the wave + country _/ dirs, so perturbing
+    the helper's source changes _table_cache_hash."""
     import inspect
     import lsms_library.local_tools as lt
-    c = lsms_library.country.Country("Malawi")
-    waves = [w for w in c.waves if (c[w].file_path / "_" / "food_acquired.py").exists()]
-    if not waves:
-        pytest.skip("no script-path food_acquired wave for Malawi")
-    w = c[waves[0]]
-    paths = (str(w.file_path / "_" / "food_acquired.py"),
-             str(c.file_path / "_" / "malawi.py"))
-    R.framework_imports_fingerprint.cache_clear()
-    base = R.framework_imports_fingerprint(paths)
-    assert base, "no framework-import closure folded for the Malawi script route"
-    # Editing the framework matcher's source must change the script-route hash.
-    target = inspect.unwrap(lt.conversion_table_matching_global)
+    c = lsms_library.country.Country(country)
+    base = c._table_cache_hash(table, c.waves)
+    if base is None:
+        pytest.skip(f"{country}.{table} not introspectable")
+    target = inspect.unwrap(getattr(lt, helper))
     real = inspect.getsource
     monkeypatch.setattr(inspect, "getsource",
                         lambda o: real(o) + "\n_redteam_probe = 1\n" if o is target else real(o))
     R.framework_imports_fingerprint.cache_clear()
     R.build_transforms_fingerprint.cache_clear()
-    assert R.framework_imports_fingerprint(paths) != base, \
-        "editing conversion_table_matching_global did not change the script-route fingerprint"
+    after = c._table_cache_hash(table, c.waves)
+    assert base != after, \
+        f"editing framework helper {helper} did NOT invalidate {country}.{table} (#522 reopened)"
 
 
 def test_excluded_callables_are_write_or_hash_only():
