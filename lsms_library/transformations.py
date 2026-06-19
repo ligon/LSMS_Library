@@ -1073,10 +1073,16 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True):
 def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True):
     """Derive food prices from food_acquired.
 
-    Returned at the natural grain of the input (``(t, v, i, j, u, s)``
-    after the Phase 3 canonical reshape, or a legacy subset) — analysts
-    compute medians / means across whatever dimension they care about,
-    so per-observation Price preserves information.
+    Returned at the canonical ``(t, i, j, u, s)`` grain (``v`` is omitted
+    and re-joined from ``sample()`` by ``_finalize_result`` at API time).
+    Any extra recall level present in the input — notably GhanaLSS's
+    ``visit`` — is aggregated out here via the median Price, mirroring how
+    ``food_quantities_from_acquired`` / ``food_expenditures_from_acquired``
+    collapse it with ``.sum()`` (price is per-unit, not additive, so median
+    rather than sum).  This keeps the three ``_FOOD_DERIVED`` transforms at
+    the same country-level grain so ``Feature('food_prices')`` no longer has
+    to drop a leaked ``visit`` level (and silently keep one arbitrary
+    visit's price) before the cross-country concat — see GH #517.
 
     Parameters
     ----------
@@ -1109,9 +1115,10 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True):
     Returns
     -------
     pd.DataFrame
-        Single-column ``Price`` DataFrame at the natural grain of the
-        input (typically ``(t, v, i, j, u, s)`` after the s-axis
-        migration).  Zero / infinite / NaN prices are dropped.
+        Single-column ``Price`` DataFrame at the canonical
+        ``(t, i, j, u, s)`` grain (``v`` re-joined downstream; any extra
+        recall level such as ``visit`` is collapsed via median Price).
+        Zero / infinite / NaN prices are dropped.
 
     Notes
     -----
@@ -1182,6 +1189,22 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True):
             v = df.assign(Price=np.nan)
 
     v = v[['Price']].replace([0, np.inf, -np.inf], np.nan).dropna()
+
+    # Aggregate over any non-canonical recall level (e.g. GhanaLSS's
+    # ``visit`` — ~12 repeated recall visits per month) at the country
+    # level, mirroring what ``food_quantities_from_acquired`` and
+    # ``food_expenditures_from_acquired`` do with ``.sum()``.  Price is
+    # per-unit and therefore NOT additive, so we collapse with the median
+    # rather than the sum.  ``v`` is omitted from the group-by (see the
+    # rationale in ``food_expenditures_from_acquired``): it is re-joined
+    # from ``sample()`` by ``_finalize_result`` at API time, and dropping
+    # it here avoids silently discarding HH whose cluster ID is
+    # unrecoverable.  Without this, ``visit`` leaked to
+    # ``Feature.food_prices`` where ``_collapse_duplicate_index`` kept one
+    # arbitrary visit's price via ``groupby().first()`` (GH #517).
+    group_by = [n for n in ['t', 'i', 'j', 'u', 's'] if n in v.index.names]
+    if group_by:
+        v = v.groupby(group_by).median()
     return v
 
 
