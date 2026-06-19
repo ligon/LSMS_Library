@@ -440,6 +440,11 @@ _DATA_INFO_CACHE: dict[str, dict[str, Any]] = {}
 # pure documentation never read by a build step -- hashing them would
 # cause a spurious full-country rebuild on a docs edit.
 _ORG_HASH_SKIP = {"CONTENTS.org"}
+# Build-input file suffixes content-hashed from a country/wave _/ dir (helper
+# module bodies + data/conversion tables).  .org is handled separately (skip
+# list above).  Build OUTPUTS go to the cache (data_root()), not _/, so every
+# matching _/ file is a committed build input (GH #522, rounds 7-8).
+_BUILD_INPUT_SUFFIXES = {".py", ".csv", ".json", ".txt", ".tab", ".tsv"}
 
 
 def _parse_data_info_cached(path: Path, content_hash: str | None) -> dict[str, Any]:
@@ -651,9 +656,18 @@ class Wave:
             cdir = self.country.file_path / "_"
             wave_pys = tuple(sorted(str(p) for p in wave_dir.glob("*.py"))) if wave_dir.is_dir() else ()
             country_pys = tuple(sorted(str(p) for p in cdir.glob("*.py"))) if cdir.is_dir() else ()
-            # (1) body hash, keyed by filename (NOT abs path -> machine-independent)
-            for p in wave_pys + country_pys:
-                parts.append(f"py:{Path(p).name}=" + (cached_file_hash(Path(p)) or "none"))
+            # (1) content-hash EVERY build INPUT in the wave + country _/ dirs --
+            # .py helper bodies AND .csv/.json/.txt conversion tables (e.g. Malawi
+            # ihs3_conversions.csv -> cfactor -> Quantity_kg, baked and not
+            # re-applied on read) -- keyed by filename -> machine-independent
+            # (GH #522, rounds 7-8).  Outputs go to the cache, not _/, so every
+            # such file is a committed build input.
+            for d in (wave_dir, self.country.file_path / "_"):
+                if not d.is_dir():
+                    continue
+                for p in sorted(d.glob("*")):
+                    if p.suffix.lower() in _BUILD_INPUT_SUFFIXES:
+                        parts.append(f"binp:{p.name}=" + (cached_file_hash(p) or "none"))
             # (2) import-closure fold; two calls so the country tuple memoises
             # ONCE across waves (a combined tuple differs per wave).
             fw_w = framework_imports_fingerprint(wave_pys)
@@ -2254,12 +2268,13 @@ class Country:
                 # since the Makefile is edited rarely).
                 "cmake=" + (cached_file_hash(cdir / "Makefile") or "none"),
             ]
-            # File-hash EVERY country-level build module (not just ctbl/cmod/cmap)
-            # so a LOCAL helper's own body -- e.g. _age_helpers.py
-            # (_clean_year / apply_age_handler, loaded via spec_from_file_location)
-            # -- is versioned (GH #522, round-7).
-            for p in sorted(cdir.glob("*.py")):
-                country_parts.append(f"cpy:{p.name}=" + (cached_file_hash(p) or "none"))
+            # Content-hash EVERY country-level build INPUT (not just ctbl/cmod/cmap):
+            # .py helper bodies (e.g. _age_helpers.py) AND .csv/.json/.txt data
+            # tables -- so a LOCAL helper or conversion table is versioned
+            # (GH #522, rounds 7-8).
+            for p in sorted(cdir.glob("*")):
+                if p.suffix.lower() in _BUILD_INPUT_SUFFIXES:
+                    country_parts.append(f"cbinp:{p.name}=" + (cached_file_hash(p) or "none"))
             # Country-level build-time .org inputs (food_items.org,
             # categorical_mapping.org, unit_labels.org, ...), CONTENTS.org
             # excluded.  These are read by the country-level concatenator /

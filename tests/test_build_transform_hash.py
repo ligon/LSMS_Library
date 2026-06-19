@@ -281,6 +281,24 @@ def test_local_helper_module_body_is_versioned(country_name, monkeypatch):
         f"{country_name} _age_helpers.py body not file-hashed -> editing it serves stale cache"
 
 
+def test_local_data_file_build_input_is_versioned(monkeypatch):
+    """Round-8 fix (GH #522): a .csv/.json data table in a _/ dir (Malawi
+    ihs3_conversions.csv -> cfactor -> Quantity_kg, baked and not re-applied on
+    read) must be content-hashed like the .py helper bodies."""
+    c = lsms_library.country.Country("Malawi")
+    csv = c.file_path / "2010-11" / "_" / "ihs3_conversions.csv"
+    if not csv.exists():
+        pytest.skip("no ihs3_conversions.csv")
+    base = c._table_cache_hash("food_acquired", c.waves)
+    if base is None:
+        pytest.skip("food_acquired not introspectable")
+    real = lsms_library.country.cached_file_hash
+    monkeypatch.setattr(lsms_library.country, "cached_file_hash",
+                        lambda p, _r=real, _h=str(csv): ((_r(p) or "") + "X") if str(p) == _h else _r(p))
+    assert c._table_cache_hash("food_acquired", c.waves) != base, \
+        "ihs3_conversions.csv not content-hashed -> editing it serves stale Quantity_kg"
+
+
 def test_excluded_callables_are_write_or_hash_only():
     """Guard the _EXCLUDED_CALLABLES list: every excluded callable must be free
     of content-mutating ops, so the exclusion can never become a stale-cache."""
