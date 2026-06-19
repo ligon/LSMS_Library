@@ -3380,6 +3380,7 @@ class Country:
                 if (name in self._ROSTER_DERIVED
                         and 'household_roster' in self.data_scheme):
                     from .transformations import roster_to_characteristics
+                    derived = None
                     try:
                         roster = self._aggregate_wave_data(waves, 'household_roster')
                         if isinstance(roster, pd.DataFrame) and not roster.empty:
@@ -3391,14 +3392,25 @@ class Country:
                             rc_kwargs = {'drop': 'pid', 'final_index': final_index}
                             if age_cuts is not None:
                                 rc_kwargs['age_cuts'] = tuple(age_cuts)
-                            result = roster_to_characteristics(roster, **rc_kwargs)
-                            if market is not None:
-                                result = self._add_market_index(result, column=market)
-                            return result
+                            derived = roster_to_characteristics(roster, **rc_kwargs)
                     except (FileNotFoundError, KeyError, ValueError, RuntimeError) as exc:
                         logger.info(
                             "Deriving %s from household_roster failed (%s); "
                             "falling back to legacy aggregation", name, exc)
+                        derived = None
+                    if derived is not None:
+                        # _add_market_index lives OUTSIDE the except so a
+                        # user-facing KeyError (a market= column this country
+                        # lacks) propagates, instead of being misread as a
+                        # derivation failure and falling through to the legacy
+                        # make/DVC path -- which has no rule for the derived
+                        # household_characteristics table and so emits spurious
+                        # "Makefile execution failed" + a misleading "could not
+                        # materialize" error (GH #518).  Mirrors the food-derived
+                        # path above.
+                        if market is not None:
+                            derived = self._add_market_index(derived, column=market)
+                        return derived
 
                 result = self._aggregate_wave_data(waves, name, currency=currency)
                 # Apply relabeling to any table with a j index level
