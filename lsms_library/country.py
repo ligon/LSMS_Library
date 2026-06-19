@@ -49,6 +49,7 @@ from .local_tools import (
 from .paths import data_root, countries_root
 from .yaml_utils import load_yaml
 from .currency import attach_currency, is_monetary_table
+from ._build_registry import build_transform, build_transforms_fingerprint
 import importlib.util
 import hashlib
 import logging
@@ -639,6 +640,16 @@ class Wave:
                 data_path = Path(os.path.normpath(self.file_path / "Data" / ref))
                 parts.append("sref:" + source_fingerprint(data_path))
 
+        # Build-path framework transform CODE (GH #522 / cache step 2): version
+        # the @build_transform closure relevant to this table, so editing e.g.
+        # apply_derived / food_acquired_to_canonical invalidates the L2-wave
+        # parquet.  Degrades to "none" (closure unversioned -> read-if-present),
+        # never raises out of the hash.  See lsms_library/_build_registry.py.
+        try:
+            parts.append("btf=" + build_transforms_fingerprint(table))
+        except Exception:
+            parts.append("btf=none")
+
         return hashlib.sha256("\x1f".join(parts).encode()).hexdigest()
 
     @property
@@ -825,6 +836,7 @@ class Wave:
     def mapping(self) -> dict[str, Any]:
         return {**self.categorical_mapping, **self.formatting_functions}
 
+    @build_transform()
     def grab_data(self, request: str) -> pd.DataFrame:
         '''
         get data from the data file
@@ -2231,7 +2243,15 @@ class Country:
                 any_hash = True
             if not any_hash:
                 return None
+            # Build-path framework transform CODE (GH #522 / cache step 2):
+            # folded in AFTER the any_hash gate so it never makes an otherwise
+            # unintrospectable table falsely "verifiable"; degrades to "none".
+            try:
+                btf = build_transforms_fingerprint(method_name)
+            except Exception:
+                btf = "none"
             payload = (f"schema={LSMS_CACHE_SCHEMA}\x1ftable={method_name}\x1f"
+                       + f"btf={btf}\x1f"
                        + "\x1f".join(country_parts) + "\x1f"
                        + "\x1f".join(wave_hashes))
             return hashlib.sha256(payload.encode()).hexdigest()
@@ -3974,6 +3994,7 @@ def _enforce_canonical_dtypes(df: pd.DataFrame, method_name: str) -> None:
             pass  # best-effort; don't break loading
 
 
+@build_transform()
 def _normalize_dataframe_index(
     df: pd.DataFrame,
     schema_entry: dict[str, Any],
