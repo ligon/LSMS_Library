@@ -24,6 +24,13 @@ inside =_normalize_dataframe_index=), which is exactly how #514's
 build-relevant constant is reached.  Also folds in deterministic
 serialization of callable-valued constants, the =dedent= fix, and the
 corrected direct-tagging of the =build_transforms.py= functions.
+
+Rev 4 (post-#539 final remarks).  =apply_derived= resolves to *no* =tables=
+— scoping it to =['sample']= would be *under*-invalidation, not mere caution.
+The serialiser becomes an explicit type-dispatch with an else-*reject*, and a
+second red-test asserts no =0x= identity address leaks into any fingerprint
+part: paired with the resolve-to-None guard, two cheap invariants for the two
+genuinely hard sub-problems (resolution + serialization).
 #+end_quote
 
 * Background: what the hash covers today (v0.8.0)
@@ -183,9 +190,11 @@ def _resolve(fn, name):
                     return getattr(tgt, alias.name, None)
     return None
 
-def _ser(obj, seen, parts):                          # deterministic; recurse into callable values
+def _ser(obj, seen, parts):                          # deterministic type-dispatch; no identity leaks
+    if isinstance(obj, (str, int, float, bool, type(None))):
+        return repr(obj)                             # primitive: stable repr
     if callable(obj) and _is_ours(obj):
-        parts += _closure_parts(obj, seen)
+        parts += _closure_parts(obj, seen)           # callable: qualname + hash its source
         return f"<fn {obj.__module__}.{obj.__qualname__}>"   # qualname, NOT repr (no 0x address)
     if isinstance(obj, dict):
         return "{" + ",".join(f"{k!r}:{_ser(v, seen, parts)}"
@@ -193,7 +202,9 @@ def _ser(obj, seen, parts):                          # deterministic; recurse in
     if isinstance(obj, (list, tuple, set, frozenset)):
         xs = obj if isinstance(obj, (list, tuple)) else sorted(obj, key=repr)
         return type(obj).__name__ + "[" + ",".join(_ser(v, seen, parts) for v in xs) + "]"
-    return repr(obj)
+    raise TypeError(                                 # else: REJECT, don't leak a default 0x repr
+        f"build constant of un-serialisable type {type(obj).__name__!r}; "
+        f"add a case to _ser rather than fall back to identity repr")
 
 def _closure_parts(fn, seen):
     qn = f"{fn.__module__}.{fn.__qualname__}"
@@ -231,10 +242,14 @@ and stale data).
 
 - =build_transforms.py=: =food_acquired_to_canonical=,
   =_finalize_canonical_food_acquired= → =tables=['food_acquired']=;
-  =apply_derived=, =fill_v_with_coord_bin= → *no* =tables= (any table may carry
-  a =derived:= block and the static walk can't see the call is conditional —
-  honest over-invalidation; edited rarely).  These are tagged *directly*
-  because =grab_data='s function-level import would otherwise drop them.
+  =apply_derived=, =fill_v_with_coord_bin= → *no* =tables=.  This is
+  *under*-invalidation avoidance, not mere caution: scoping them to =['sample']=
+  (the only current =derived:= consumer, Uganda 2009-10) would silently leave a
+  future non-=sample= =derived:= table's code-dependency on =apply_derived=
+  uncovered — only =sample= would fold in =apply_derived='s source.  No-=tables=
+  (honest over-invalidation; these are edited rarely) is the safe call.  They
+  are tagged *directly* because =grab_data='s function-level import would
+  otherwise drop them from its closure.
 - =country.py=: =_normalize_dataframe_index=, =Wave.grab_data= → no =tables=
   (every build).
 
@@ -245,6 +260,12 @@ matters for the food-specific transforms: without it, editing
 =food_acquired_to_canonical= would rebuild all 40 countries' =household_roster=.
 The =country.py= tags carry no =tables= (every build), so they land in every
 table's fingerprint regardless.
+
+A precise middle ground for =apply_derived= (deferred): compute its =tables= at
+hash time from "does this table's =data_info.yml= declare a =derived:= block?"
+— covering every =derived:= table and over-invalidating none, at the cost of
+the fingerprint reading config that is already loaded.  No-=tables= is a fine
+first cut; this is the upgrade if the over-invalidation ever bites.
 
 * Alternatives considered (and rejected)
 
@@ -265,9 +286,17 @@ table's fingerprint regardless.
   strip module/function docstrings before dump if judged too eager.
 - =_resolve='s AST scan handles =ImportFrom=; bare =import x.y= and string-keyed
   =getattr= are still invisible — the drift guard (layer 3) is the backstop.
-- Constant =repr= must be stable; =_ser= replaces callables with qualnames to
-  avoid the =0x= address non-determinism (the =_DERIVED_TRANSFORMERS= case).
+- Constant serialisation must be stable; =_ser= is an explicit type-dispatch
+  (primitive→repr, callable→qualname+source-hash, container→recurse, *else
+  raise*) so an unhandled type fails loudly rather than leaking a default =0x=
+  identity =repr= (the =_DERIVED_TRANSFORMERS= case).  A red-test asserts no
+  =0x[0-9a-f]+= appears in any fingerprint part — catching the whole
+  identity-leak class, parallel to the resolve-to-None guard.
 - Decorating =Wave.grab_data= must return the function unchanged (no wrapper).
+- =inspect.getsource= of a decorated function includes the
+  =@build_transform(...)= line — desirable, since editing =tables= then
+  correctly invalidates; =textwrap.dedent= (already applied) handles the
+  class-indentation of methods.
 - =grab_data= over-invalidates (a plumbing-only edit triggers a rebuild) and is
   a known blunt instrument; isolating its extraction core is a later refinement.
 
@@ -279,8 +308,9 @@ table's fingerprint regardless.
 1. Add =lsms_library/_build_registry.py= (=build_transform=, =_resolve=, =_ser=,
    =_closure_parts=, =build_transforms_fingerprint=).
 2. Tag entry points (run =gitnexus_impact= on each first): the 4 in
-   =build_transforms.py= (food funcs with =tables=); =_normalize_dataframe_index=
-   and =Wave.grab_data= in =country.py= (no =tables=).
+   =build_transforms.py= (food funcs =tables=['food_acquired']=; =apply_derived=
+   / =fill_v_with_coord_bin= *no* =tables=); =_normalize_dataframe_index= and
+   =Wave.grab_data= in =country.py= (no =tables=).
 3. Fold =build_transforms_fingerprint(method_name)= into
    =Country._table_cache_hash= and =Wave._input_hash= (inside the existing
    =try/except=); update docstrings.
@@ -288,9 +318,11 @@ table's fingerprint regardless.
    module-level imported by =country= + =feature=; convert =grab_data='s
    =apply_derived= import to module level.  Confirms the cycle is gone.
 5. Demote =LSMS_CACHE_SCHEMA= to a backstop in =local_tools=.
-6. Add the drift guard: (a) tagged-entry-point set equals a checked-in set;
-   (b) walk each tagged function's =ImportFrom= nodes and fail on any
-   unresolved-and-not-allowlisted build dependency.
+6. Add the two red-tests for the hard sub-problems: (a) tagged-entry-point set
+   equals a checked-in set; (b) *resolution* — walk each tagged function's
+   =ImportFrom= nodes and fail on any unresolved-and-not-allowlisted build
+   dependency; (c) *serialization* — assert no =0x[0-9a-f]+= appears in any
+   fingerprint part (no identity-repr leak).
 7. Verify: changing =_ADDITIVE_MEASURE_COLUMNS= (add a table) or
    =_declared_index_levels= auto-rebuilds a warm Mali =food_acquired= read (no
    =LSMS_NO_CACHE=); a kinship-label edit does NOT invalidate; editing
