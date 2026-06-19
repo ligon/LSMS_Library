@@ -947,11 +947,23 @@ class Wave:
                     try:
                         sub_df = get_data(sub_data_info, sub_mapping_details)
                         merge_dfs.append(sub_df.reset_index())
-                    except (FileNotFoundError, PathMissingError, DvcException) as exc:
+                    except (FileNotFoundError, PathMissingError, DvcException,
+                            KeyError) as exc:
                         if idx == 0:
                             # The primary sub-df is required; re-raise
                             raise
-                        # Secondary sub-dfs (e.g. geo files) are optional
+                        # Secondary sub-dfs (e.g. geo files) are optional.
+                        # ``KeyError`` covers the case where the source file
+                        # exists but lacks the requested columns -- e.g. a
+                        # df_geo whose YAML asks for ``lat_dd_mod``/``lon_dd_mod``
+                        # that the file doesn't carry (or carries under a
+                        # different casing/name).  df_data_grabber raises
+                        # ``KeyError`` for a missing column when ``missing_ok``
+                        # is False, and a single-file sub-df gets
+                        # ``missing_ok=False``.  Treat it like a missing file:
+                        # drop the optional sub-df rather than abort the whole
+                        # cluster_features table and lose the Region/District
+                        # that the primary df_main provides.  GH #515.
                         sub_file = sub_data_info.get('file', i)
                         warnings.warn(
                             f"{self.name}/{request}: could not load "
