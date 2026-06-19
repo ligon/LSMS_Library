@@ -2373,6 +2373,8 @@ class Country:
                 f"{self.name}/_/data_scheme.yml."
             )
 
+    @build_transform()  # orchestrator: nested safe_concat_dataframe_dict / load_from_waves bake cross-wave
+                        # alignment+concat into the parquet, not re-applied on read (#522, round-6)
     def _aggregate_wave_data(self, waves: list[str] | None = None, method_name: str | None = None,
                              currency: str | None = None) -> pd.DataFrame | dict[str, Any]:
         """Aggregates data across multiple waves using a single dataset method.

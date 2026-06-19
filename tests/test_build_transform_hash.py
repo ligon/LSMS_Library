@@ -31,6 +31,7 @@ EXPECTED_ENTRY_POINTS = {
     "lsms_library.build_transforms.apply_derived",
     "lsms_library.country._normalize_dataframe_index",
     "lsms_library.country.Wave.grab_data",
+    "lsms_library.country.Country._aggregate_wave_data",
     "lsms_library.local_tools.df_data_grabber",
 }
 
@@ -81,6 +82,23 @@ def test_no_identity_address_leak():
     source, not a runtime leak (and docstrings are stripped in _norm anyway)."""
     leaks = [p[:120] for p in _all_parts() if re.search(r"at 0x[0-9a-fA-F]+", p)]
     assert not leaks, f"identity-repr leak in fingerprint parts: {leaks}"
+
+
+def test_orchestrator_versioned_but_read_path_is_not():
+    """Round-6 fix: the build orchestrator _aggregate_wave_data bakes cross-wave
+    alignment+concat (nested safe_concat_dataframe_dict) into the parquet, NOT
+    re-applied on read, so it must be versioned.  But _finalize_result and its
+    read-path subtree (kinship/spellings), re-applied on every read, must NOT be
+    in the closure (else read-path edits over-invalidate the warm cache)."""
+    seen, parts = set(), []
+    for _qn, (fn, _t) in R._BUILD_TRANSFORMS.items():
+        parts += R._closure_parts(fn, seen)
+    joined = "\x1f".join(parts)
+    assert any("_aggregate_wave_data=" in p for p in parts), "orchestrator not versioned"
+    assert "safe_concat_dataframe_dict" in joined, "nested cross-wave concat not folded"
+    leaked = [q for q in seen if q.endswith("._finalize_result") or "_expand_kinship" in q
+              or "enforce_canonical_spellings" in q or q.endswith("._join_v_from_sample")]
+    assert not leaked, f"read-path transforms leaked into the build closure: {leaked}"
 
 
 def test_self_method_build_calls_are_versioned():

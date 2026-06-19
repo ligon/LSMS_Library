@@ -115,6 +115,11 @@ _EXCLUDED_CALLABLES = frozenset({
     "lsms_library.local_tools.cached_file_hash",
     "lsms_library.country.Wave._input_hash",          # the hash mechanism itself
     "lsms_library.country.Country._table_cache_hash",  # (would self-reference)
+    # _finalize_result is READ-path: re-applied on every read AFTER the cache,
+    # so an edit surfaces regardless of cache freshness.  It is reached from the
+    # tagged orchestrator _aggregate_wave_data; excluding it keeps the build
+    # fingerprint from over-invalidating on read-path edits (kinship/spellings).
+    "lsms_library.country.Country._finalize_result",
 })
 
 
