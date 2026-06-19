@@ -30,6 +30,7 @@ EXPECTED_ENTRY_POINTS = {
     "lsms_library.build_transforms.fill_v_with_coord_bin",
     "lsms_library.build_transforms.apply_derived",
     "lsms_library.country._normalize_dataframe_index",
+    "lsms_library.country.Wave.grab_data",
     "lsms_library.local_tools.df_data_grabber",
 }
 
@@ -147,15 +148,61 @@ def test_fingerprint_is_wired_into_input_hash(country_name, monkeypatch):
 
 
 def test_nested_scope_references_are_walked():
-    """Red-team #1/#2 regression: a callable referenced ONLY from a nested
-    helper (comprehension/lambda/inner def) must appear in _all_co_names.
-    Without co_consts recursion, df_data_grabber-class deps vanish -> stale cache."""
+    """Red-team #1/#2 regression -- NON-VACUOUS: a name referenced ONLY inside a
+    nested def must be ABSENT from the flat top-level co_names yet PRESENT in the
+    recursive _all_co_names.  (round-2 caught the earlier version putting the
+    sentinel in a comprehension iterable, which leaks into the enclosing
+    co_names and made the test pass even with the co_consts recursion removed.)"""
     def outer():
         def inner():
-            return _SENTINEL_NESTED_NAME()  # referenced only here
-        return [inner() for _ in range(_SENTINEL_NESTED_NAME and 1)]
-    names = R._all_co_names(outer.__code__)
-    assert "_SENTINEL_NESTED_NAME" in names, "nested-scope name not captured by _all_co_names"
+            return _SENTINEL_NESTED_NAME()   # referenced ONLY in this nested def
+        return inner
+    flat = set(outer.__code__.co_names)
+    assert "_SENTINEL_NESTED_NAME" not in flat, "test vacuous: name leaked into flat co_names"
+    assert "_SENTINEL_NESTED_NAME" in R._all_co_names(outer.__code__), \
+        "nested-scope name not captured -> co_consts recursion is broken (GH #522 reopens)"
+
+
+def test_grab_data_body_is_versioned():
+    """Round-2 fix: Wave.grab_data's inline content logic (check_adding_t, the
+    >1e99 sentinel filter, the dfs merge) and map_index (the j->i swap) must be
+    folded into the closure, else editing them serves a stale L2-wave parquet."""
+    seen, parts = set(), []
+    for _qn, (fn, _t) in R._BUILD_TRANSFORMS.items():
+        parts += R._closure_parts(fn, seen)
+    joined = "\x1f".join(parts)
+    assert "country.Wave.grab_data=" in joined, "grab_data body not versioned"
+    assert any("map_index" in p for p in parts), "map_index (j->i swap) not versioned"
+
+
+def test_cache_mechanism_is_excluded_but_to_parquet_is_not():
+    """Round-2 fix: re-tagging grab_data must NOT drag the pure hash/freshness
+    mechanism into the content fingerprint (self-referential over-invalidation)
+    -- BUT to_parquet mutates content on write (astype/reset_index/replace), so
+    it MUST stay versioned (excluding it would be a new under-invalidation)."""
+    seen = set()
+    for _qn, (fn, _t) in R._BUILD_TRANSFORMS.items():
+        R._closure_parts(fn, seen)
+    for prim in ("lsms_library.local_tools.cache_freshness",
+                 "lsms_library.local_tools.source_fingerprint"):
+        assert prim not in seen, f"pure hash primitive {prim} leaked into the content closure"
+    assert "lsms_library.local_tools.to_parquet" in seen, \
+        "to_parquet mutates content on write and MUST be versioned"
+
+
+def test_excluded_callables_are_write_or_hash_only():
+    """Guard the _EXCLUDED_CALLABLES list: every excluded callable must be free
+    of content-mutating ops, so the exclusion can never become a stale-cache."""
+    import inspect
+    from lsms_library import local_tools as lt
+    mutators = ("astype(", "reset_index(", "set_index(", "rename(", "fillna(",
+                "replace(", "dropna(", "groupby(", "merge(", "reindex(")
+    for qn in R._EXCLUDED_CALLABLES:
+        fn = getattr(lt, qn.rsplit(".", 1)[1], None)
+        assert fn is not None, f"excluded callable {qn} not found"
+        src = inspect.getsource(inspect.unwrap(fn))
+        bad = [m for m in mutators if m in src]
+        assert not bad, f"excluded {qn} contains content-mutating ops {bad} -> unsafe to exclude"
 
 
 def test_df_data_grabber_is_versioned():

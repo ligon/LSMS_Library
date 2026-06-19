@@ -79,6 +79,34 @@ def _is_ours(obj) -> bool:
     return m.startswith("lsms_library") and m not in _EXCLUDED_MODULES
 
 
+# Pure hash/freshness MECHANISM callables: they compute or compare the embedded
+# cache hash and never touch DataFrame CONTENT.  Excluded per-callable (they sit
+# in local_tools beside genuine transforms) so folding them does not make the
+# content fingerprint self-referential -- editing the cache layer would
+# otherwise rebuild every cache.  Lets us re-tag Wave.grab_data (whose body IS a
+# content transform: check_adding_t, the >1e99 sentinel filter, the dfs merge,
+# map_index) without dragging the cache layer in.
+# DELIBERATELY NOT excluded: to_parquet -- it mutates content on write
+# (astype/reset_index/set_index/replace), so it is genuine build-path code and
+# must stay versioned.  Each entry below was verified write/hash-only.
+_EXCLUDED_CALLABLES = frozenset({
+    "lsms_library.local_tools.cache_freshness",
+    "lsms_library.local_tools.read_parquet_cache_hash",
+    "lsms_library.local_tools.stamp_parquet_hash",
+    "lsms_library.local_tools.source_fingerprint",
+    "lsms_library.local_tools.cached_file_hash",
+})
+
+
+def _is_build_callable(obj) -> bool:
+    """A recursable build-path callable: ours, not in an excluded module, and
+    not a cache/hash-mechanism primitive (which never transforms content)."""
+    if not (callable(obj) and _is_ours(obj)):
+        return False
+    qn = f"{getattr(obj, '__module__', '')}.{getattr(obj, '__qualname__', '')}"
+    return qn not in _EXCLUDED_CALLABLES
+
+
 def _unwrap(fn):
     # follow functools.wraps / lru_cache __wrapped__ chains to the real function
     # (a cached helper is a _lru_cache_wrapper with no __code__ / source).
@@ -139,7 +167,8 @@ def _ser(obj, seen, parts) -> str:
     if isinstance(obj, (str, int, float, bool, type(None))):
         return repr(obj)
     if callable(obj) and _is_ours(obj):
-        parts += _closure_parts(obj, seen)
+        if _is_build_callable(obj):     # excluded cache primitives: name only, no recurse
+            parts += _closure_parts(obj, seen)
         return f"<fn {obj.__module__}.{obj.__qualname__}>"
     if isinstance(obj, dict):
         return "{" + ",".join(
@@ -202,7 +231,7 @@ def _closure_parts(fn, seen) -> list:
             obj = imap.get(name)
             if obj is None:
                 continue
-        if callable(obj) and _is_ours(obj):
+        if _is_build_callable(obj):
             parts += _closure_parts(obj, seen)
         elif isinstance(obj, _CONST_TYPES):
             parts.append(f"{fn.__module__}.{name}=" + _ser(obj, seen, parts))
