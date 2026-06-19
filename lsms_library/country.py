@@ -2053,7 +2053,7 @@ class Country:
 
         if isinstance(df, pd.DataFrame):
             df = self._augment_index_from_related_tables(df, scheme_entry, None)
-            df = _normalize_dataframe_index(df, scheme_entry, None)
+            df = _normalize_dataframe_index(df, scheme_entry, None, method_name)
 
             # Join v from sample() for household-level tables that lack it.
             # Skip if v is already in the index OR already present as a
@@ -2607,7 +2607,7 @@ class Country:
                         scheme_entry,
                         w,
                     )
-                    wave_result = _normalize_dataframe_index(wave_result, scheme_entry, w)
+                    wave_result = _normalize_dataframe_index(wave_result, scheme_entry, w, method_name)
 
                 if wave_result is None and not wave_has_table:
                     continue
@@ -2821,7 +2821,7 @@ class Country:
                                     scheme_entry,
                                     stage.wave,
                                 )
-                                df_wave = _normalize_dataframe_index(df_wave, scheme_entry, stage.wave)
+                                df_wave = _normalize_dataframe_index(df_wave, scheme_entry, stage.wave, method_name)
                                 stage_results[stage.wave or "ALL"] = df_wave
                         return stage_results
 
@@ -2879,6 +2879,7 @@ class Country:
                                 cached_df,
                                 scheme_entry,
                                 wave_hint,
+                                method_name,
                             )
                             return cached_df
                         except (FileNotFoundError, PathMissingError):
@@ -3977,6 +3978,7 @@ def _normalize_dataframe_index(
     df: pd.DataFrame,
     schema_entry: dict[str, Any],
     wave: str | None,
+    table_name: str | None = None,
 ) -> pd.DataFrame:
     """
     Reorder and reduce a dataframe's MultiIndex to match the declared schema.
@@ -3984,7 +3986,9 @@ def _normalize_dataframe_index(
     - Reorders index levels to match the declared order.
     - Drops unexpected index levels.
     - Synthesizes missing 't' levels for wave-specific tables.
-    - Collapses duplicate entries via first-observation aggregation.
+    - Collapses duplicate entries: SUMs the additive measure columns for
+      tables in ``_ADDITIVE_MEASURE_COLUMNS`` (``table_name``), else keeps the
+      first row per group (the historical default).
     """
 
     if not isinstance(df, pd.DataFrame):
@@ -4049,22 +4053,37 @@ def _normalize_dataframe_index(
     if not df.index.is_unique:
         present_levels = [lvl for lvl in declared if lvl in df.index.names]
         n_dropped = int(df.index.duplicated().sum())
-        # Convert unordered categoricals to strings so groupby.first() works
+        # Convert unordered categoricals to strings so the groupby below works
         for col in df.columns:
             if hasattr(df[col], 'cat') and not df[col].cat.ordered:
                 df[col] = df[col].astype(str).replace({'nan': pd.NA, 'None': pd.NA, '<NA>': pd.NA})
-        df = df.groupby(level=present_levels, observed=True).first()
-        if n_dropped:
-            # GH #323: collapsing a non-unique canonical index with .first()
-            # silently DISCARDS the dropped rows.  Surface it loudly rather
-            # than lose data quietly; a feature whose source legitimately has
-            # multiple rows per index tuple needs an explicit duplicate-
-            # aggregation policy (e.g. sum quantities) instead of .first().
-            warnings.warn(
-                f"Canonical index over {present_levels} had {n_dropped} "
-                f"duplicate tuple(s); collapsed via groupby().first(), dropping "
-                f"those rows (possible silent data loss — GH #323).",
-                RuntimeWarning,
-            )
+        # GH #514/#323: collapsing a non-unique canonical index with .first()
+        # silently DISCARDS the dropped rows.  For additive-measure tables
+        # (food_acquired, whose source legitimately records the same item across
+        # several transactions per (t,v,i,j,u,s)) SUM the additive columns and
+        # re-derive any per-unit Price from the summed totals -- no data lost,
+        # no warning.  Single source of truth for the additive column map lives
+        # in feature.py (imported lazily to avoid an import cycle).
+        from .feature import _ADDITIVE_MEASURE_COLUMNS
+        additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name) if table_name else None
+        present_additive = [c for c in (additive or ()) if c in df.columns]
+        if present_additive:
+            agg = {c: ('sum' if c in present_additive else 'first') for c in df.columns}
+            df = df.groupby(level=present_levels, observed=True).agg(agg)
+            if 'Price' in df.columns and {'Expenditure', 'Quantity'} <= set(df.columns):
+                df['Price'] = df['Expenditure'] / df['Quantity'].where(df['Quantity'] != 0)
+        else:
+            df = df.groupby(level=present_levels, observed=True).first()
+            if n_dropped:
+                # No aggregation policy for this table -- surface the loss
+                # loudly rather than drop rows quietly (a table whose source
+                # legitimately has multiple rows per index tuple needs an
+                # explicit policy, like the additive sum above).
+                warnings.warn(
+                    f"Canonical index over {present_levels} had {n_dropped} "
+                    f"duplicate tuple(s); collapsed via groupby().first(), dropping "
+                    f"those rows (possible silent data loss — GH #323).",
+                    RuntimeWarning,
+                )
 
     return df
