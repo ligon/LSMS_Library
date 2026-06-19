@@ -612,3 +612,15 @@ P:                                       [1, 0, consanguineal]   # low-confidenc
 "Other Unrelated Person":        [0, 0, unrelated]
 "Servants":                      [0, 0, servant]
 "Tenant/Boarder":                [0, 0, guest]
+
+# --- Albania LSMS variants (GH #516) ---
+# Source labels carry spaces around "/" and/or a lowercase "in-law" that the
+# title-case fallback ('X'.title()) does not reduce to any existing key:
+#   'Father / mother-in-law' -> 'Father / Mother-In-Law'
+#   'Grandfather / Mother'   -> 'Grandfather / Mother'  (gendered grandparent pair)
+#   'brother/sister in-law'  -> 'Brother/Sister In-Law'
+#   'father/mother in-law'   -> 'Father/Mother In-Law'
+"Father / Mother-In-Law":        [1, 0, affinal]
+"Grandfather / Mother":          [2, 0, consanguineal]
+"Brother/Sister In-Law":         [0, 1, affinal]
+"Father/Mother In-Law":          [1, 0, affinal]

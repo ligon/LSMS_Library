@@ -54,7 +54,7 @@ household_roster:
         Relationship:
             - rel_head
             - mapping:
-                '-1': ~        # sentinel for missing — null out
+                -1: ~          # sentinel for missing — null out (rel_head is int8; bare-int key)
                 1: "Resident Head"
                 2: "Absent Head"
                 3: "Wife or husband or partner"
