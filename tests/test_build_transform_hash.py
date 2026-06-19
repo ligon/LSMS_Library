@@ -260,6 +260,27 @@ def test_dynamically_dispatched_framework_helpers_are_versioned(monkeypatch, cou
         f"editing framework helper {helper} did NOT invalidate {country}.{table} (#522 reopened)"
 
 
+@pytest.mark.parametrize("country_name", ["Nigeria", "Uganda"])
+def test_local_helper_module_body_is_versioned(country_name, monkeypatch):
+    """Round-7 fix (GH #522): a LOCAL helper module loaded by spec_from_file_location
+    (e.g. _age_helpers.py: _clean_year / apply_age_handler bake DOB->Age into
+    household_roster) must have its OWN body file-hashed.  framework_imports_fingerprint
+    folds only its lsms_library-import closure (age_handler), not its own logic; the
+    all-_/*.py file-hash closes that.  Perturb the helper's content hash -> table hash changes."""
+    c = lsms_library.country.Country(country_name)
+    helper = c.file_path / "_" / "_age_helpers.py"
+    if not helper.exists():
+        pytest.skip(f"no _age_helpers.py for {country_name}")
+    base = c._table_cache_hash("household_roster", c.waves)
+    if base is None:
+        pytest.skip("household_roster not introspectable")
+    real = lsms_library.country.cached_file_hash
+    monkeypatch.setattr(lsms_library.country, "cached_file_hash",
+                        lambda p, _r=real, _h=str(helper): ((_r(p) or "") + "X") if str(p) == _h else _r(p))
+    assert c._table_cache_hash("household_roster", c.waves) != base, \
+        f"{country_name} _age_helpers.py body not file-hashed -> editing it serves stale cache"
+
+
 def test_excluded_callables_are_write_or_hash_only():
     """Guard the _EXCLUDED_CALLABLES list: every excluded callable must be free
     of content-mutating ops, so the exclusion can never become a stale-cache."""

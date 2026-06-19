@@ -29,12 +29,17 @@ Two genuinely hard sub-problems, each with a red-test in
   :func:`_ser` is an explicit type-dispatch with an else-*reject*; a red-test
   asserts no `` at 0x`` identity repr appears in any fingerprint part.
 
-Resolution coverage (hardened over five red-team rounds): module globals,
+Resolution coverage (hardened over seven red-team rounds): module globals,
 function-level / cycle-dodge imports, NESTED code objects (comprehensions /
 lambdas / inner defs), callables held in constant containers, ``self.<method>``
-build calls resolved against the module's classes, the out-of-process SCRIPT
-route (every ``_/*.py`` build module's ``lsms_library`` imports), local helper
-modules (``spec_from_file_location``), and ``df_edit`` hooks.
+build calls resolved against the module's classes, and the build ORCHESTRATOR
+``Country._aggregate_wave_data`` (its nested ``safe_concat`` cross-wave concat).
+The out-of-process SCRIPT route is covered in two complementary layers by the
+hash methods themselves (``Wave._input_hash`` / ``Country._table_cache_hash``):
+they (1) file-hash EVERY ``_/*.py`` build module's own body -- so a local helper
+loaded by ``spec_from_file_location`` (Nigeria ``_age_helpers.py``) or a
+``df_edit`` hook is versioned -- and (2) call ``framework_imports_fingerprint``
+to fold the ``lsms_library``-import closures those modules reach.
 
 KNOWN RESIDUAL (accepted): a framework build helper reached by purely STRING-
 KEYED dynamic dispatch -- ``getattr(some_module, runtime_string)()`` /

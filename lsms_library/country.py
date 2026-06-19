@@ -640,19 +640,22 @@ class Wave:
                 data_path = Path(os.path.normpath(self.file_path / "Data" / ref))
                 parts.append("sref:" + source_fingerprint(data_path))
 
-        # Framework helpers reached via DYNAMIC dispatch -- out-of-process script
-        # builds, spec_from_file_location local helpers (Nigeria _age_helpers ->
-        # age_handler), and the df_edit hook dispatched by name (Malawi
-        # interview_date -> melt_visit_intervals) -- are invisible to the
-        # in-process closure walk.  Fold the lsms_library-import closures of EVERY
-        # build module in the wave's and country's _/ dirs, covering any local
-        # helper on BOTH routes (GH #522).  Best-effort; never raises.
+        # Every build module in the wave + country _/ dirs contributes to the
+        # parquet via DYNAMIC dispatch (out-of-process scripts, df_edit hooks,
+        # spec_from_file_location LOCAL helpers like Nigeria _age_helpers.py).
+        # Two layers (GH #522): (1) file-hash each module's OWN body -- so e.g.
+        # _age_helpers.py's _clean_year/apply_age_handler is versioned; (2) fold
+        # the lsms_library-import CLOSURES those modules reach (age_handler,
+        # conversion_table_matching_global, ...).  Best-effort; never raises.
         try:
             cdir = self.country.file_path / "_"
             wave_pys = tuple(sorted(str(p) for p in wave_dir.glob("*.py"))) if wave_dir.is_dir() else ()
             country_pys = tuple(sorted(str(p) for p in cdir.glob("*.py"))) if cdir.is_dir() else ()
-            # Two calls so the country tuple memoises ONCE across all waves
-            # (the combined tuple differs per wave -> would re-parse country _/).
+            # (1) body hash, keyed by filename (NOT abs path -> machine-independent)
+            for p in wave_pys + country_pys:
+                parts.append(f"py:{Path(p).name}=" + (cached_file_hash(Path(p)) or "none"))
+            # (2) import-closure fold; two calls so the country tuple memoises
+            # ONCE across waves (a combined tuple differs per wave).
             fw_w = framework_imports_fingerprint(wave_pys)
             fw_c = framework_imports_fingerprint(country_pys)
             if fw_w or fw_c:
@@ -2251,6 +2254,12 @@ class Country:
                 # since the Makefile is edited rarely).
                 "cmake=" + (cached_file_hash(cdir / "Makefile") or "none"),
             ]
+            # File-hash EVERY country-level build module (not just ctbl/cmod/cmap)
+            # so a LOCAL helper's own body -- e.g. _age_helpers.py
+            # (_clean_year / apply_age_handler, loaded via spec_from_file_location)
+            # -- is versioned (GH #522, round-7).
+            for p in sorted(cdir.glob("*.py")):
+                country_parts.append(f"cpy:{p.name}=" + (cached_file_hash(p) or "none"))
             # Country-level build-time .org inputs (food_items.org,
             # categorical_mapping.org, unit_labels.org, ...), CONTENTS.org
             # excluded.  These are read by the country-level concatenator /
