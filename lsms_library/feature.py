@@ -356,11 +356,18 @@ class Feature:
         pass_currency = None if use_numeraire else (currency if monetary else None)
         if (use_numeraire is not None or pass_currency == 'index') and canonical_levels:
             canonical_levels = canonical_levels + [CURRENCY_LEVEL]
-        # `market` (forwarded below) adds an `m` index level via
-        # Country._add_market_index; widen the canonical index so the
-        # cross-country concat keeps it (GH #508), as for the currency level.
-        if kwargs.get("market") is not None and canonical_levels and "m" not in canonical_levels:
-            canonical_levels = canonical_levels + ["m"]
+        # `market` (forwarded below) is applied by Country._add_market_index,
+        # which DROPS the `v` level and inserts an `m` level.  Mirror that in the
+        # canonical level list -- drop `v`, add `m` -- so (a) _harmonize_country_frame
+        # can still reorder each frame to canonical order (with `v` gone, requiring
+        # every *original* canonical level to be present would skip the reorder),
+        # and (b) `expected_names` matches the real per-country nlevels, letting the
+        # GH#326 set_names restoration fire instead of leaving a trailing unnamed
+        # level (issue #511: food_prices(market='Region') -> [..., 's', None]).
+        if kwargs.get("market") is not None and canonical_levels:
+            canonical_levels = [lvl for lvl in canonical_levels if lvl != "v"]
+            if "m" not in canonical_levels:
+                canonical_levels = canonical_levels + ["m"]
 
         for name in targets:
             try:
@@ -409,6 +416,34 @@ class Feature:
         if not frames:
             return pd.DataFrame()
 
+        # pandas cannot stack frames whose index DEPTH/NAMES differ into a named
+        # MultiIndex -- it falls back to an unnamed object index, collapsing the
+        # WHOLE feature (issue #512: EthiopiaRHS's documented (t,i) reduced assets
+        # stacked with item-level (t,i,j); also surfaces under labels='Aggregate'
+        # when most countries KeyError-drop and a j-less survivor remains).  Keep
+        # the modal index shape and exclude the divergent frame(s) with a loud,
+        # named warning -- the excluded country stays available via
+        # Country(name).<table>().
+        if len(frames) > 1:
+            from collections import Counter
+            shape_of = lambda f: tuple(f.index.names)
+            counts = Counter(shape_of(f) for f in frames)
+            if len(counts) > 1:
+                modal = counts.most_common(1)[0][0]
+                kept = [f for f in frames if shape_of(f) == modal]
+                dropped = [f for f in frames if shape_of(f) != modal]
+                dropped_names = [f.index.get_level_values("country")[0]
+                                 for f in dropped if len(f)]
+                warnings.warn(
+                    f"{self.table_name}: excluded {len(dropped)} country frame(s) "
+                    f"{dropped_names} with a divergent index shape from the "
+                    f"cross-country assembly (kept modal shape {list(modal)}); "
+                    f"stacking heterogeneous index depths would collapse the whole "
+                    f"result to an unnamed index. Access the excluded data via "
+                    f"Country(name).{self.table_name}()."
+                )
+                frames = kept
+
         result = pd.concat(frames)
 
         # GH #326: pd.concat can leave the (structurally-consistent) index
@@ -424,9 +459,11 @@ class Feature:
             result.index = result.index.set_names(expected_names)
 
         # Surface (rather than silently return) the pathological case where
-        # heterogeneous per-country indices made pandas fall back to an
-        # unnamed object index of stringified tuples (GH #325).
-        if len(frames) > 1 and list(result.index.names) == [None]:
+        # heterogeneous per-country indices left an unnamed level -- either a full
+        # fallback to an unnamed object index (GH #325, names == [None]) or a
+        # PARTIAL collapse (e.g. ['country', None, None]) that previously slipped
+        # through silently (issue #512, labels='Aggregate' variant).
+        if len(frames) > 1 and None in list(result.index.names):
             shapes = {
                 f.index.get_level_values(0)[0] if len(f) else "?":
                     list(f.index.names)
