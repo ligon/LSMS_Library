@@ -10,19 +10,24 @@ export const meta = {
 }
 
 // ---- inputs --------------------------------------------------------------
-// Only small SCALARS travel via `args` (a large inline-JSON args blob does not
-// survive the scriptPath plumbing reliably).  The cluster list itself is loaded
-// from a file ON DISK by a loader agent — the JS sandbox can't read files, but
-// agents can.  Write the slice you want triaged to `slice` before launching.
+// `args` arrives as a JSON STRING (not a parsed object) through the Workflow
+// plumbing — so parse it.  Earlier failures (args.slice -> String.prototype.slice
+// the native function; args.clusters -> undefined) were this, NOT a size issue.
+// Cluster DATA is loaded from a file on disk by a loader agent (the JS sandbox
+// can't read files; agents can); only small scalars travel via args.
 // args = { file: bool, repo: str, py: str, resultsDir: str, slice: str }
-const doFile    = !!(args && args.file)                       // DRY-RUN unless explicitly true
-const REPO      = (args && args.repo) || '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library'
-const PY        = (args && args.py)   || `${REPO}/.venv/bin/python`
-const RESULTS   = (args && args.resultsDir) || `${REPO}/bench/feature_audit/results/2026-06-18`
-const SLICE     = (args && args.slice) || `${RESULTS}/clusters_slice.json`
+const A = (typeof args === 'string')
+  ? (() => { try { return JSON.parse(args) } catch (e) { return {} } })()
+  : (args && typeof args === 'object' ? args : {})
+
+const doFile    = !!A.file                                    // DRY-RUN unless explicitly true
+const REPO      = A.repo || '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library'
+const PY        = A.py   || `${REPO}/.venv/bin/python`
+const RESULTS   = A.resultsDir || `${REPO}/bench/feature_audit/results/2026-06-18`
+const SLICE     = A.slice || `${RESULTS}/clusters_slice.json`
 const SKILL     = `${REPO}/.claude/skills/cross-country-features/SKILL.md`
 
-log(`args keys: ${args ? Object.keys(args).join(',') : '(none)'}; loading clusters from ${SLICE}`)
+log(`parsed args keys: [${Object.keys(A).join(',')}]; slice=${SLICE}; file=${doFile}`)
 
 const CLUSTERS_SCHEMA = {
   type: 'object',
@@ -30,12 +35,15 @@ const CLUSTERS_SCHEMA = {
   properties: { clusters: { type: 'array', items: { type: 'object' } } },
 }
 const loaded = await agent(
-  `Run \`cat ${SLICE}\`. It is a JSON array of audit "cluster" objects. Return it verbatim as ` +
-  `{"clusters": <that exact array>} — no edits, additions, reordering, or summarizing. ` +
-  `If the file is missing or empty, return {"clusters": []}.`,
+  `Run exactly: cat ${SLICE}\n` +
+  `That file is a JSON array of audit "cluster" objects. Return it verbatim as ` +
+  `{"clusters": <that exact array>} — every element, no edits, additions, reordering, ` +
+  `truncation, or summarizing. Preserve all fields of every object. ` +
+  `If the file is genuinely missing or empty, return {"clusters": []}.`,
   { label: 'load-clusters', phase: 'Triage', schema: CLUSTERS_SCHEMA }
 )
 const clusters = (loaded && loaded.clusters) || []
+log(`loaded ${clusters.length} clusters from ${SLICE}`)
 if (!clusters.length) {
   log('no clusters loaded — nothing to triage')
   return { total_clusters: 0, confirmed: 0, items: [] }
