@@ -52,11 +52,15 @@ household_roster:
 
 individual_education:
     # Education module; q0503 = highest attainment (12 English-labeled levels).
-    # i=hh, pid=idcode match the roster (0% spine orphans).
+    # i=questid (matches sample/roster/housing/shocks); the source `hh` field is
+    # a within-dwelling sequence number (nunique 9 vs questid 25146), so keying
+    # on it gave 100% NaN v after _join_v_from_sample and silently dropped the
+    # 2012 wave from derived tables (GH #519; residual of the #505/#499 Iraq fix
+    # that missed this table).  pid=idcode matches the roster.
     file:
         - "../Data/2012ihses05_education.dta"
     idxvars:
-        i: hh
+        i: questid
         pid: idcode
     myvars:
         Educational Attainment:
