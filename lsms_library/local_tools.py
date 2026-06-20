@@ -56,6 +56,7 @@ See ``CLAUDE.md`` for the full anti-pattern list and data-access rules.
 """
 from __future__ import annotations
 
+from ._build_registry import build_transform
 from ligonlibrary.dataframes import from_dta
 import pyreadstat
 import struct
@@ -1013,6 +1014,7 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
 
 #def regularize_string(s):
 
+@build_transform()  # build-path: extraction/formatting baked verbatim into the L2 parquet (#522)
 def df_data_grabber(fn: str | Path, idxvars: dict[str, Any] | str, convert_categoricals: bool = True, encoding: str | None = None, orgtbl: str | None = None, missing_ok: bool = False, **kwargs: Any) -> pd.DataFrame:
     """From a file named fn, grab both index variables and additional variables
     specified in kwargs and construct a pandas dataframe.

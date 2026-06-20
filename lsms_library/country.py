@@ -49,6 +49,7 @@ from .local_tools import (
 from .paths import data_root, countries_root
 from .yaml_utils import load_yaml
 from .currency import attach_currency, is_monetary_table
+from ._build_registry import build_transform, build_transforms_fingerprint, framework_imports_fingerprint
 import importlib.util
 import hashlib
 import logging
@@ -439,6 +440,11 @@ _DATA_INFO_CACHE: dict[str, dict[str, Any]] = {}
 # pure documentation never read by a build step -- hashing them would
 # cause a spurious full-country rebuild on a docs edit.
 _ORG_HASH_SKIP = {"CONTENTS.org"}
+# Build-input file suffixes content-hashed from a country/wave _/ dir (helper
+# module bodies + data/conversion tables).  .org is handled separately (skip
+# list above).  Build OUTPUTS go to the cache (data_root()), not _/, so every
+# matching _/ file is a committed build input (GH #522, rounds 7-8).
+_BUILD_INPUT_SUFFIXES = {".py", ".csv", ".json", ".txt", ".tab", ".tsv"}
 
 
 def _parse_data_info_cached(path: Path, content_hash: str | None) -> dict[str, Any]:
@@ -639,6 +645,48 @@ class Wave:
                 data_path = Path(os.path.normpath(self.file_path / "Data" / ref))
                 parts.append("sref:" + source_fingerprint(data_path))
 
+        # Every build module in the wave + country _/ dirs contributes to the
+        # parquet via DYNAMIC dispatch (out-of-process scripts, df_edit hooks,
+        # spec_from_file_location LOCAL helpers like Nigeria _age_helpers.py).
+        # Two layers (GH #522): (1) file-hash each module's OWN body -- so e.g.
+        # _age_helpers.py's _clean_year/apply_age_handler is versioned; (2) fold
+        # the lsms_library-import CLOSURES those modules reach (age_handler,
+        # conversion_table_matching_global, ...).  Best-effort; never raises.
+        try:
+            cdir = self.country.file_path / "_"
+            wave_pys = tuple(sorted(str(p) for p in wave_dir.glob("*.py"))) if wave_dir.is_dir() else ()
+            country_pys = tuple(sorted(str(p) for p in cdir.glob("*.py"))) if cdir.is_dir() else ()
+            # (1) content-hash EVERY build INPUT in the wave + country _/ dirs --
+            # .py helper bodies AND .csv/.json/.txt conversion tables (e.g. Malawi
+            # ihs3_conversions.csv -> cfactor -> Quantity_kg, baked and not
+            # re-applied on read) -- keyed by filename -> machine-independent
+            # (GH #522, rounds 7-8).  Outputs go to the cache, not _/, so every
+            # such file is a committed build input.
+            for d in (wave_dir, self.country.file_path / "_"):
+                if not d.is_dir():
+                    continue
+                for p in sorted(d.glob("*")):
+                    if p.suffix.lower() in _BUILD_INPUT_SUFFIXES:
+                        parts.append(f"binp:{p.name}=" + (cached_file_hash(p) or "none"))
+            # (2) import-closure fold; two calls so the country tuple memoises
+            # ONCE across waves (a combined tuple differs per wave).
+            fw_w = framework_imports_fingerprint(wave_pys)
+            fw_c = framework_imports_fingerprint(country_pys)
+            if fw_w or fw_c:
+                parts.append(f"fwimp={fw_w}:{fw_c}")
+        except Exception:
+            pass
+
+        # Build-path framework transform CODE (GH #522 / cache step 2): version
+        # the @build_transform closure relevant to this table, so editing e.g.
+        # apply_derived / food_acquired_to_canonical invalidates the L2-wave
+        # parquet.  Degrades to "none" (closure unversioned -> read-if-present),
+        # never raises out of the hash.  See lsms_library/_build_registry.py.
+        try:
+            parts.append("btf=" + build_transforms_fingerprint(table))
+        except Exception:
+            parts.append("btf=none")
+
         return hashlib.sha256("\x1f".join(parts).encode()).hexdigest()
 
     @property
@@ -825,6 +873,7 @@ class Wave:
     def mapping(self) -> dict[str, Any]:
         return {**self.categorical_mapping, **self.formatting_functions}
 
+    @build_transform()  # body is build-path: check_adding_t, >1e99 sentinel, dfs merge, map_index (#522)
     def grab_data(self, request: str) -> pd.DataFrame:
         '''
         get data from the data file
@@ -2219,6 +2268,13 @@ class Country:
                 # since the Makefile is edited rarely).
                 "cmake=" + (cached_file_hash(cdir / "Makefile") or "none"),
             ]
+            # Content-hash EVERY country-level build INPUT (not just ctbl/cmod/cmap):
+            # .py helper bodies (e.g. _age_helpers.py) AND .csv/.json/.txt data
+            # tables -- so a LOCAL helper or conversion table is versioned
+            # (GH #522, rounds 7-8).
+            for p in sorted(cdir.glob("*")):
+                if p.suffix.lower() in _BUILD_INPUT_SUFFIXES:
+                    country_parts.append(f"cbinp:{p.name}=" + (cached_file_hash(p) or "none"))
             # Country-level build-time .org inputs (food_items.org,
             # categorical_mapping.org, unit_labels.org, ...), CONTENTS.org
             # excluded.  These are read by the country-level concatenator /
@@ -2231,7 +2287,26 @@ class Country:
                 any_hash = True
             if not any_hash:
                 return None
+            # Build-path framework transform CODE (GH #522 / cache step 2):
+            # folded in AFTER the any_hash gate so it never makes an otherwise
+            # unintrospectable table falsely "verifiable"; degrades to "none".
+            try:
+                btf = build_transforms_fingerprint(method_name)
+            except Exception:
+                btf = "none"
+            # Country-level build modules run framework helpers via dynamic
+            # dispatch (concatenator scripts, df_edit hooks in the country
+            # module).  Fold the lsms_library-import closures of every build
+            # module in the country _/ dir (GH #522, both routes).  Per-wave
+            # script tables also get this via each wave's _input_hash.
+            try:
+                country_pys = tuple(sorted(str(p) for p in cdir.glob("*.py"))) if cdir.is_dir() else ()
+                fwimp = framework_imports_fingerprint(country_pys)
+            except Exception:
+                fwimp = ""
             payload = (f"schema={LSMS_CACHE_SCHEMA}\x1ftable={method_name}\x1f"
+                       + f"btf={btf}\x1f"
+                       + (f"fwimp={fwimp}\x1f" if fwimp else "")
                        + "\x1f".join(country_parts) + "\x1f"
                        + "\x1f".join(wave_hashes))
             return hashlib.sha256(payload.encode()).hexdigest()
@@ -2322,6 +2397,8 @@ class Country:
                 f"{self.name}/_/data_scheme.yml."
             )
 
+    @build_transform()  # orchestrator: nested safe_concat_dataframe_dict / load_from_waves bake cross-wave
+                        # alignment+concat into the parquet, not re-applied on read (#522, round-6)
     def _aggregate_wave_data(self, waves: list[str] | None = None, method_name: str | None = None,
                              currency: str | None = None) -> pd.DataFrame | dict[str, Any]:
         """Aggregates data across multiple waves using a single dataset method.
@@ -3992,6 +4069,7 @@ def _enforce_canonical_dtypes(df: pd.DataFrame, method_name: str) -> None:
             pass  # best-effort; don't break loading
 
 
+@build_transform()
 def _normalize_dataframe_index(
     df: pd.DataFrame,
     schema_entry: dict[str, Any],

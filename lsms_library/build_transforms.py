@@ -21,7 +21,10 @@ backward compatibility with the country scripts that import them from there.
 import numpy as np
 import pandas as pd
 
+from ._build_registry import build_transform
 
+
+@build_transform(tables=['food_acquired'])
 def food_acquired_to_canonical(df: pd.DataFrame, drop_columns=('visit',)) -> pd.DataFrame:
     """Reshape wide-form ``food_acquired`` into canonical long-form on ``s``.
 
@@ -130,6 +133,7 @@ def food_acquired_to_canonical(df: pd.DataFrame, drop_columns=('visit',)) -> pd.
     return out
 
 
+@build_transform(tables=['food_acquired'])
 def _finalize_canonical_food_acquired(out: pd.DataFrame,
                                       *,
                                       index_levels=('t', 'i', 'j', 'u', 's'),
@@ -204,6 +208,7 @@ def _finalize_canonical_food_acquired(out: pd.DataFrame,
     return out.sort_index()
 
 
+@build_transform()
 def fill_v_with_coord_bin(df, target='v', lat='_lat', lon='_lon',
                           grid_degrees=0.05, prefix='@'):
     """Fill blank ``target`` entries with a synthetic ``{prefix}lat,lon`` label.
@@ -296,6 +301,7 @@ _DERIVED_TRANSFORMERS = {
 }
 
 
+@build_transform()
 def apply_derived(df, derived_spec):
     """Apply a ``derived:`` block from ``data_info.yml`` to a DataFrame.
 
