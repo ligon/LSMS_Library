@@ -33,17 +33,41 @@ household_roster:
                 14: Other
 
 cluster_features:
-    file: ../Data/APP1.dta
-    idxvars:
-        v: ppid
-    myvars:
-        Rural:
-            - inout
-            - mapping:
-                1.0: Urban
-                2.0: Urban
-                3.0: Urban
-                4.0: Rural
+    # PSU-level cluster table.  APP1.dta carries Rural (from `inout`);
+    # PP.dta (the PSU file already read by `sample` as df_weights) carries
+    # PSU-level geography: `zone` -> canonical Region (8 economic regions)
+    # and `raion` -> Rayon (admin rayon).  PP.dta is PSU-level (one row per
+    # ppid, zone/raion constant within ppid) and every interviewed PSU in
+    # APP1 is present, so the v=ppid join is 1:1 (no row multiplication).
+    # GH #530.  `m`/market is NOT baked in here -- it's added on demand by
+    # _add_market_index() when the user passes market='Region'.
+    dfs:
+        - df_inout
+        - df_geo
+    df_inout:
+        file: ../Data/APP1.dta
+        idxvars:
+            v: ppid
+        myvars:
+            Rural:
+                - inout
+                - mapping:
+                    1.0: Urban
+                    2.0: Urban
+                    3.0: Urban
+                    4.0: Rural
+    df_geo:
+        file: ../Data/PP.dta
+        idxvars:
+            v: ppid
+        myvars:
+            Region: zone
+            Rayon: raion
+    merge_on:
+        - v
+    final_index:
+        - t
+        - v
 
 sample:
     dfs:
